@@ -55,10 +55,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
 
         if (account.provider === "google") {
           username = profile?.name ?? "Usuario de Google";
-          avatarUrl = profile?.picture ?? null;
+          avatarUrl = (profile as any)?.picture ?? null;
         } else if (account.provider === "steam") {
-          username = profile?.personaname ?? "Usuario de Steam";
-          avatarUrl = profile?.avatarfull ?? null;
+          username = (profile as any)?.personaname ?? "Usuario de Steam";
+          avatarUrl = (profile as any)?.avatarfull ?? null;
         }
 
         await db

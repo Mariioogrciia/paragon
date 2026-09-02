@@ -165,7 +165,7 @@ export const psnProfiles = pgTable(
  */
 export const games = pgTable("game", {
   id: text("id").primaryKey(),
-  platform: text("platform").$type<"psn" | "steam">().notNull(),
+  platform: text("platform").$type<"psn" | "steam" | "google">().notNull(),
   /** npCommunicationId en PSN, appid en Steam. */
   nativeId: text("nativeId").notNull(),
   title: text("title").notNull(),

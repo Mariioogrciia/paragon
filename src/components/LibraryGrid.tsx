@@ -202,7 +202,7 @@ export function LibraryGrid({
           )}
         </button>
 
-        <div className="flex gap-1 ml-2" style={FIELD} className="rounded-[9px] p-1">
+        <div className="flex gap-1 ml-2 rounded-[9px] p-1" style={FIELD}>
           <button onClick={() => setView("grid")} className={`p-1.5 rounded-md ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
           </button>
