@@ -96,7 +96,7 @@ export default async function AmigosPage() {
                     <input type="hidden" name="requesterId" value={p.userId} />
                     <button
                       className="rounded-[9px] px-3.5 py-2 text-[13px] font-bold text-background"
-                      style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)" }}
+                      style={{ background: "var(--accent-grad)" }}
                     >
                       Aceptar
                     </button>

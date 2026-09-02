@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import { GameCard } from "@/components/GameCard";
 import { Dropdown } from "@/components/Dropdown";
 import { RatingStars } from "@/components/RatingStars";
@@ -30,6 +32,15 @@ const SORTS: { label: string; value: SortKey }[] = [
 
 const FIELD = { border: "1px solid #2b3546", background: "#0d121b" };
 
+/**
+ * Cuántos juegos se pintan de golpe.
+ *
+ * Filtrar es instantáneo aunque haya mil juegos (es un filter en memoria), pero
+ * *pintar* mil tarjetas con su imagen no lo es. Se pintan por tandas y el resto
+ * entra al llegar al final del scroll.
+ */
+const POR_PAGINA = 24;
+
 function Pill({
   active,
   onClick,
@@ -45,7 +56,7 @@ function Pill({
       className="rounded-[9px] px-3.5 py-2 text-xs font-semibold tracking-[0.02em] transition-colors"
       style={
         active
-          ? { background: "linear-gradient(160deg, #58a7ff, #2f7ad6)", color: "#061021" }
+          ? { background: "var(--accent-grad)", color: "#061021" }
           : { background: "transparent", color: "#8794a8" }
       }
     >
@@ -108,6 +119,28 @@ export function LibraryGrid({
       return jb.length - ja.length || a.localeCompare(b, "es");
     });
   }, [agrupar, visible]);
+
+  /* ------------------------- Carga progresiva ------------------------- */
+
+  const [pagina, setPagina] = useState(1);
+  const { ref: sentinela, inView } = useInView({ rootMargin: "400px" });
+
+  // Cualquier cambio de filtro devuelve al principio: si no, al filtrar
+  // seguiríamos "dentro" de la página 8 de una lista que ya no existe.
+  useEffect(() => {
+    setPagina(1);
+  }, [search, status, platform, publisher, genre, collection, sort, sortDir]);
+
+  const mostrados = useMemo(
+    () => visible.slice(0, pagina * POR_PAGINA),
+    [visible, pagina],
+  );
+
+  const hayMas = mostrados.length < visible.length;
+
+  useEffect(() => {
+    if (inView && hayMas) setPagina((p) => p + 1);
+  }, [inView, hayMas]);
 
   const hayVariasPlataformas = facets.platforms.length > 1;
   const filtrado =
@@ -323,9 +356,34 @@ export function LibraryGrid({
           ))}
         </div>
       ) : (
-        <div className={view === "grid" ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-2"}>
-          {visible.map(renderGame)}
-        </div>
+        <>
+          <motion.div
+            layout
+            className={view === "grid" ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-2"}
+          >
+            <AnimatePresence mode="popLayout">
+              {mostrados.map((game) => (
+                <motion.div
+                  key={game.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  {renderGame(game)}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Sentinela: al entrar en pantalla se pinta la página siguiente. */}
+          {hayMas && (
+            <div ref={sentinela} className="py-8 text-center text-[13px] text-muted">
+              Cargando más juegos…
+            </div>
+          )}
+        </>
       )}
     </div>
   );

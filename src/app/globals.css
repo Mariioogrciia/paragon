@@ -18,6 +18,15 @@
   --platinum: #9fd4ec;
 }
 
+/* El halo del fondo. Es una variable porque en claro tiene que desaparecer:
+   una mancha azul oscura sobre fondo blanco se ve como una suciedad. */
+:root {
+  --glow: #16203a;
+  /* Degradado de los botones primarios. Se deriva del acento para que
+     cambiarlo en el panel de apariencia mueva también los botones. */
+  --accent-grad: linear-gradient(160deg, var(--accent-2), var(--accent));
+}
+
 .light {
   --background: #f4f6fa;
   --surface: #ffffff;
@@ -29,6 +38,54 @@
   --accent-2: #3b82f6;
   --good: #10b981;
   --danger: #ef4444;
+  --glow: #dfe7f7;
+}
+
+/* Negro puro: en pantallas OLED el píxel se apaga y el contraste es total. */
+.oled {
+  --background: #000000;
+  --surface: #0a0a0c;
+  --surface-2: #141418;
+  --border: #232329;
+  --glow: #0a0f1c;
+}
+
+/* Bordes y texto más marcados, para quien necesita más separación visual. */
+.high-contrast {
+  --background: #000000;
+  --surface: #0c1017;
+  --surface-2: #1a212e;
+  --border: #5a6b82;
+  --foreground: #ffffff;
+  --muted: #c3cddb;
+  --glow: #101a2e;
+}
+
+/* ---------------------------------------------------------------- *
+ * Color de acento.                                                 *
+ *                                                                  *
+ * Son paletas cerradas y no un selector libre a propósito: con un   *
+ * color cualquiera es facilísimo acabar con texto ilegible sobre    *
+ * los botones, que van con texto oscuro encima del acento.          *
+ * ---------------------------------------------------------------- */
+.accent-violet {
+  --accent: #8b5cf6;
+  --accent-2: #c4b5fd;
+}
+
+.accent-red {
+  --accent: #ef4444;
+  --accent-2: #fca5a5;
+}
+
+.accent-green {
+  --accent: #10b981;
+  --accent-2: #6ee7b7;
+}
+
+.accent-orange {
+  --accent: #f59e0b;
+  --accent-2: #fcd34d;
 }
 
 @theme inline {
@@ -52,7 +109,7 @@
 
 body {
   background:
-    radial-gradient(1200px 600px at 15% -10%, #16203a 0%, var(--background) 60%)
+    radial-gradient(1200px 600px at 15% -10%, var(--glow) 0%, var(--background) 60%)
     fixed;
   color: var(--foreground);
   font-family: var(--font-sans);

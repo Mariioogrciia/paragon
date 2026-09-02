@@ -82,7 +82,7 @@ async function Landing() {
             <Link
               href="/entrar"
               className="rounded-xl px-6 py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(74,158,255,0.6)]"
-              style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)", boxShadow: "0 12px 34px rgba(74, 158, 255, 0.3)" }}
+              style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgba(74, 158, 255, 0.3)" }}
             >
               Empezar la caza
             </Link>
@@ -258,7 +258,7 @@ async function Landing() {
             <Link
               href="/entrar"
               className="rounded-xl px-[26px] py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(74,158,255,0.6)]"
-              style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)", boxShadow: "0 14px 40px rgba(74, 158, 255, 0.35)" }}
+              style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgba(74, 158, 255, 0.35)" }}
             >
               Conectar mi PlayStation
             </Link>

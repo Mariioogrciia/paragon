@@ -69,7 +69,7 @@ export default async function PerfilPage({
             <Link
               href={`/comparar/${handle}`}
               className="ml-auto rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background"
-              style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)" }}
+              style={{ background: "var(--accent-grad)" }}
             >
               Comparar conmigo
             </Link>

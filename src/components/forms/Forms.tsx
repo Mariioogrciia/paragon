@@ -22,7 +22,7 @@ function Submit({ children }: { children: React.ReactNode }) {
     <button
       disabled={pending}
       className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(74,158,255,0.6)] active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
-      style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)" }}
+      style={{ background: "var(--accent-grad)" }}
     >
       {pending ? "…" : children}
     </button>

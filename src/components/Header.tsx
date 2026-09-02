@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar } from "./Avatar";
+import { ThemeCustomizer } from "./ThemeCustomizer";
 
 const LOGGED_IN_NAV = [
   { label: "Panel", href: "/", match: (p: string) => p === "/" },
@@ -92,6 +93,8 @@ export function Header({
         </nav>
 
         <div className="ml-auto flex items-center gap-3.5">
+          <ThemeCustomizer />
+
           {user ? (
             <>
               {user.trophyLevel != null && (
@@ -126,7 +129,7 @@ export function Header({
               <Link
                 href="/entrar"
                 className="rounded-lg px-4 py-2 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(74,158,255,0.6)]"
-                style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)", boxShadow: "0 8px 24px rgba(74, 158, 255, 0.25)" }}
+                style={{ background: "var(--accent-grad)", boxShadow: "0 8px 24px rgba(74, 158, 255, 0.25)" }}
               >
                 Crear cuenta
               </Link>

@@ -162,7 +162,7 @@ export default async function AjustesPlataformasPage() {
           <form action={syncNowAction}>
             <button
               className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,167,255,0.4)] active:translate-y-0 active:scale-95"
-              style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)" }}
+              style={{ background: "var(--accent-grad)" }}
             >
               Sincronizar ahora
             </button>

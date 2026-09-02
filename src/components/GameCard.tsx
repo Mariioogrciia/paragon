@@ -25,12 +25,29 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
         className="relative flex aspect-video items-end p-3.5"
         style={{ background: coverGradient(game.id) }}
       >
+        {/*
+          Las carátulas llegan con proporciones distintas: las de PSN son
+          cuadradas y las de Steam panorámicas. En un marco 16:9, recortarlas
+          (`cover`) deja las cuadradas con un zoom brutal, y encajarlas
+          (`contain`) las deja pequeñas entre bandas negras. Así que se hacen
+          las dos cosas: una copia desenfocada rellena el marco y la imagen de
+          verdad va encima entera. Todos los juegos quedan al mismo tamaño y
+          ninguno se recorta.
+        */}
         {game.iconUrl && (
-          <img
-            src={game.iconUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-contain"
-          />
+          <>
+            <img
+              src={game.iconUrl}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl"
+            />
+            <img
+              src={game.iconUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-contain"
+            />
+          </>
         )}
 
         {/* Gradiente para asegurar legibilidad del texto sin importar la carátula */}
