@@ -270,7 +270,10 @@ async function Landing() {
       <footer className="flex flex-wrap items-center gap-5 border-t border-border py-6 text-xs text-muted">
         <span className="font-heading font-bold tracking-[0.08em]" style={{ color: "#b9c6d8" }}>PLATINOS</span>
         <span>Los perfiles de trofeos en privado no se pueden sincronizar.</span>
-        <span className="ml-auto">Datos de PSN · no afiliado a Sony</span>
+        <Link href="/faq" className="font-semibold hover:text-foreground">
+          Preguntas frecuentes
+        </Link>
+        <span className="ml-auto">Datos de PSN y Steam · no afiliado a Sony ni a Valve</span>
       </footer>
     </div>
   );

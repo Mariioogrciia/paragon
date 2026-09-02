@@ -3,11 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { CollectionPicker } from "@/components/Collections";
+import { CommunityRating } from "@/components/CommunityRating";
 import { gradeLabel, TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { ReviewEditor } from "@/components/ReviewEditor";
+import { TrophyList } from "@/components/TrophyList";
 import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
 import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
+import { getCommunityRating } from "@/lib/ratings";
 import { gameProgress, nextSteps } from "@/lib/stats";
 import type { Trophy } from "@/lib/types";
 
@@ -60,35 +63,6 @@ function ProximoRow({ trophy }: { trophy: Trophy }) {
   );
 }
 
-function TodosRow({ trophy }: { trophy: Trophy }) {
-  const oculto = trophy.hidden && !trophy.earned;
-
-  return (
-    <li
-      className="grid grid-cols-[48px_1fr] items-center gap-4 border-b border-border px-4 py-3.5 last:border-0 sm:grid-cols-[48px_1fr_100px_90px] sm:gap-[18px] sm:px-[18px]"
-      style={{ opacity: trophy.earned ? 1 : 0.42 }}
-    >
-      {trophy.iconUrl ? (
-        <img src={trophy.iconUrl} alt="" className="h-12 w-12 rounded-[13px] object-cover" />
-      ) : (
-        <TrophyTile grade={trophy.grade} size={48} />
-      )}
-
-      <div className="min-w-0">
-        <p className="text-[15px] font-semibold">{oculto ? "Trofeo oculto" : trophy.name}</p>
-        {!oculto && trophy.detail && <p className="mt-1 text-[13px] text-muted">{trophy.detail}</p>}
-      </div>
-
-      <span className="hidden text-[11px] font-bold uppercase tracking-[0.1em] sm:block" style={{ color: colorFor(trophy.grade) }}>
-        {gradeLabel(trophy.grade)}
-      </span>
-      <span className="hidden text-right text-xs text-muted sm:block">
-        {trophy.earnedAt ? relativeDate(trophy.earnedAt) : "—"}
-      </span>
-    </li>
-  );
-}
-
 export default async function JuegoPage({
   params,
 }: {
@@ -111,6 +85,7 @@ export default async function JuegoPage({
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
   const carpetas = esMio ? await listCollections(profile.userId) : [];
+  const valoracion = await getCommunityRating(game.id);
 
   const faltanParaPlatino =
     progress.hasPlatinum && !progress.platinumEarned ? progress.total - progress.earned : null;
@@ -220,6 +195,16 @@ export default async function JuegoPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-9">
+        <section
+          className="rounded-[18px] p-5"
+          style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+        >
+          <h2 className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+            Valoración de la comunidad
+          </h2>
+          <CommunityRating rating={valoracion} />
+        </section>
+
         {(esMio || game.review) && (
           <section>
             {esMio ? (
@@ -276,11 +261,7 @@ export default async function JuegoPage({
               {progress.earned} de {progress.total} conseguidos
             </span>
           </div>
-          <ul className="overflow-hidden rounded-[18px]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-            {game.trophies.map((t) => (
-              <TodosRow key={t.id} trophy={t} />
-            ))}
-          </ul>
+          <TrophyList trophies={game.trophies} />
         </section>
       </div>
     </div>

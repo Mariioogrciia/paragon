@@ -295,10 +295,12 @@ export interface StoreMetadata {
   developer?: string;
   publisher?: string;
   genres?: string[];
+  /** Carátula real, la que sirve la tienda. Ver headerImage() más abajo. */
+  headerImage?: string;
 }
 
 /**
- * Desarrolladora, editora y géneros, de la API pública de la tienda.
+ * Desarrolladora, editora, géneros y carátula, de la API pública de la tienda.
  *
  * Va muy limitada de peticiones (unas 200 cada 5 minutos), así que se pide una
  * vez por juego y se guarda. Si falla, no pasa nada: son metadatos para
@@ -314,6 +316,7 @@ export async function fetchStoreMetadata(appId: string): Promise<StoreMetadata |
           developers?: string[];
           publishers?: string[];
           genres?: { description: string }[];
+          header_image?: string;
         };
       }
     >
@@ -326,5 +329,6 @@ export async function fetchStoreMetadata(appId: string): Promise<StoreMetadata |
     developer: entry.data.developers?.[0],
     publisher: entry.data.publishers?.[0],
     genres: entry.data.genres?.map((g) => g.description),
+    headerImage: entry.data.header_image,
   };
 }

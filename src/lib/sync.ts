@@ -244,6 +244,10 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
       developer: metadata.developer ?? null,
       publisher: metadata.publisher ?? null,
       genres: metadata.genres ?? null,
+      // La carátula buena es la que da la tienda, con su hash. La ruta clásica
+      // (cdn.../steam/apps/<id>/header.jpg) devuelve un placeholder de 1 KB en
+      // los juegos recientes — por eso Battlefield 6 salía sin foto.
+      ...(metadata.headerImage ? { iconUrl: metadata.headerImage } : {}),
       metadataSyncedAt: new Date(),
     })
     .where(eq(games.id, gameId));
