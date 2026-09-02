@@ -9,6 +9,7 @@ import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByUserId, getGlobalStats } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
+import { ActivityFeed } from "@/components/ActivityFeed";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -481,6 +482,10 @@ export default async function HomePage() {
             )}
           </div>
         )}
+      </section>
+
+      <section>
+        <ActivityFeed userId={session.user.id} />
       </section>
     </div>
   );

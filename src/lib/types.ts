@@ -98,6 +98,8 @@ export interface Game {
   iconUrl?: string;
   lastPlayedAt?: string;
   rating?: number;
+  review?: string;
+  reviewDate?: string;
   progressPercent: number;
   definedTotal: number;
   earnedTotal: number;

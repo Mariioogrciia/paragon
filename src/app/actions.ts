@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames } from "@/db/schema";
+import { users, userGames, activities } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import {
@@ -295,6 +295,54 @@ export async function rateGameAction(gameId: string, rating: number) {
     .update(userGames)
     .set({ rating })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+
+  const activityId = crypto.randomUUID();
+  await db
+    .insert(activities)
+    .values({
+      id: activityId,
+      userId,
+      type: "rating",
+      gameId,
+      rating,
+    });
+
+  revalidatePath('/', 'layout');
+}
+
+export async function writeReviewAction(gameId: string, review: string, dateStr: string) {
+  const userId = await requireUserId();
+  const db = getDb();
+  
+  const reviewDate = dateStr ? new Date(dateStr) : null;
+
+  await db
+    .update(userGames)
+    .set({ review, reviewDate })
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+
+  const activityId = crypto.randomUUID();
+  await db
+    .insert(activities)
+    .values({
+      id: activityId,
+      userId,
+      type: "review",
+      gameId,
+      review,
+    });
+
+  revalidatePath('/', 'layout');
+}
+
+export async function setFavoritesAction(gameIds: string[]) {
+  const userId = await requireUserId();
+  const db = getDb();
+  
+  await db
+    .update(users)
+    .set({ favorites: gameIds })
+    .where(eq(users.id, userId));
 
   revalidatePath('/', 'layout');
 }

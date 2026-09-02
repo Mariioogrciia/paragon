@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { CollectionPicker } from "@/components/Collections";
 import { gradeLabel, TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
+import { ReviewEditor } from "@/components/ReviewEditor";
 import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
 import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
@@ -219,6 +220,30 @@ export default async function JuegoPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-9">
+        {(esMio || game.review) && (
+          <section>
+            {esMio ? (
+              <ReviewEditor 
+                gameId={game.id} 
+                initialReview={game.review} 
+                initialDate={game.reviewDate} 
+              />
+            ) : (
+              game.review && (
+                <div className="p-5 border rounded-xl bg-card border-border">
+                  <div className="flex gap-2 mb-3">
+                    <span className="text-xs font-bold uppercase tracking-widest text-accent">Reseña de {profile.displayName ?? handle}</span>
+                    {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
+                  </div>
+                  <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
+                    "{game.review}"
+                  </p>
+                </div>
+              )
+            )}
+          </section>
+        )}
+
         {esMio && <CollectionPicker collections={carpetas} gameId={game.id} />}
 
         {siguientes.length > 0 && (

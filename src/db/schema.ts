@@ -43,6 +43,9 @@ export const users = pgTable("user", {
   hideEmptyGames: boolean("hideEmptyGames").default(false),
   hideZeroProgressGames: boolean("hideZeroProgressGames").default(false),
   theme: text("theme").default("dark"),
+  
+  /** Lista de 4 IDs de juegos favoritos para mostrar en el perfil */
+  favorites: jsonb("favorites").$type<string[]>().default([]),
 
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
@@ -226,6 +229,8 @@ export const userGames = pgTable(
     /** Null mientras no hayamos traído el detalle de logros de este juego. */
     trophiesSyncedAt: timestamp("trophiesSyncedAt", { mode: "date" }),
     rating: integer("rating"),
+    review: text("review"),
+    reviewDate: timestamp("reviewDate", { mode: "date" }),
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
 );
@@ -289,6 +294,41 @@ export const collectionGames = pgTable(
     addedAt: timestamp("addedAt", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.collectionId, t.gameId] })],
+);
+
+export const friends = pgTable(
+  "friend",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    friendId: text("friendId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.friendId] })],
+);
+
+/* ------------------------------------------------------------------ *
+ * Actividad social y Feed (Timeline)                                 *
+ * ------------------------------------------------------------------ */
+
+export const activities = pgTable(
+  "activity",
+  {
+    id: text("id").primaryKey(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").$type<"review" | "rating" | "platinum" | "favorite" | "new_game">().notNull(),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    rating: integer("rating"),
+    review: text("review"),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  }
 );
 
 /**

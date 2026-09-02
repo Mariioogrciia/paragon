@@ -8,7 +8,9 @@ import { TrophyCountRow } from "@/components/TrophyCounts";
 import { UpcomingGames } from "@/components/UpcomingGames";
 import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
-import { summarise } from "@/lib/stats";
+import { gameProgress, summarise } from "@/lib/stats";
+import { FavoritePicker } from "@/components/FavoritePicker";
+import { coverGradient } from "@/lib/design";
 
 export default async function PerfilPage({
   params,
@@ -82,6 +84,44 @@ export default async function PerfilPage({
           <StatTile value={stats.juegos} label="Juegos" />
           <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
         </div>
+
+        {((profile.favorites?.length ?? 0) > 0 || esMio) && (
+          <section className="mt-8 mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-heading text-xl font-bold uppercase tracking-wide text-muted">Juegos Favoritos</h2>
+              {esMio && <FavoritePicker allGames={games} currentFavorites={profile.favorites ?? []} />}
+            </div>
+            
+            {(profile.favorites?.length ?? 0) > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {(profile.favorites ?? []).map(gameId => {
+                  const game = games.find(g => g.id === gameId);
+                  if (!game) return null;
+                  return (
+                    <Link key={game.id} href={`/u/${handle}/${game.id}`}>
+                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border/50 group transition-all hover:scale-105 hover:shadow-xl hover:border-accent" style={{ background: coverGradient(game.id) }}>
+                        {game.iconUrl && (
+                          <div 
+                            className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform group-hover:scale-110"
+                            style={{ backgroundImage: `url(${game.iconUrl})`, margin: '10% 10% 30% 10%' }}
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+                        <div className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white leading-tight drop-shadow-md">
+                          {game.title}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
+                Aún no has fijado tus juegos favoritos.
+              </div>
+            )}
+          </section>
+        )}
 
         <TrophyCountRow counts={stats.counts} />
 

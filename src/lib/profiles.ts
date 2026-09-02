@@ -28,6 +28,7 @@ export interface ProfileRow {
   handle: string | null;
   displayName: string | null;
   image: string | null;
+  favorites: string[] | null;
   accounts: PlatformAccount[];
 }
 
@@ -62,6 +63,7 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       handle: users.handle,
       displayName: users.name,
       image: users.image,
+      favorites: users.favorites,
     })
     .from(users)
     .where(where)
@@ -306,6 +308,8 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
       lastPlayedAt: userGames.lastPlayedAt,
       playtimeMinutes: userGames.playtimeMinutes,
       rating: userGames.rating,
+      review: userGames.review,
+      reviewDate: userGames.reviewDate,
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
@@ -330,6 +334,8 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,
     rating: r.rating ?? undefined,
+    review: r.review ?? undefined,
+    reviewDate: r.reviewDate?.toISOString() ?? undefined,
   }));
 
   return { player: toPlayer(profile), games };

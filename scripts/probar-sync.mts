@@ -54,8 +54,9 @@ try {
   const perfil = {
     userId: USER_ID,
     handle: "prueba_sync",
-    displayName: "Prueba",
+    displayName: "Mock User",
     image: null,
+    favorites: [],
     accounts: [
       {
         platform,
