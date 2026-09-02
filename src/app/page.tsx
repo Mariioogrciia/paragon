@@ -1,69 +1,487 @@
-import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { TiltCard } from "@/components/TiltCard";
+import { auth } from "@/auth";
+import { GameRow } from "@/components/GameRow";
+import { StatTile } from "@/components/StatTile";
+import { TrophyCountRow } from "@/components/TrophyCounts";
+import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
+import { coverGradient } from "@/lib/design";
+import { getLibrary, getProfileByUserId, getGlobalStats } from "@/lib/profiles";
+import { gameProgress, summarise } from "@/lib/stats";
 
-export default function Home() {
+const GRADE_ACCENT = {
+  platinum: "#9fd4ec",
+  gold: "#e2b53e",
+  silver: "#b9c2cc",
+  bronze: "#c07b4a",
+} as const;
+
+const SAMPLE_NEXT = [
+  { name: "Maestro de las artes marciales", rarity: "18,4%", grade: "gold" as const },
+  { name: "Coleccionista de hechizos", rarity: "31,7%", grade: "silver" as const },
+  { name: "Portador de la Gran Runa", rarity: "48,9%", grade: "bronze" as const },
+];
+
+const SAMPLE_SHELF = [
+  { title: "Elden Ring", pct: 74, ratio: "32/42", cover: "https://upload.wikimedia.org/wikipedia/en/b/b9/Elden_Ring_Box_art.jpg" },
+  { title: "Bloodborne", pct: 100, ratio: "40/40", cover: "https://upload.wikimedia.org/wikipedia/en/7/76/Bloodborne_cover_art.jpg" },
+  { title: "God of War Ragnarök", pct: 100, ratio: "36/36", cover: "https://upload.wikimedia.org/wikipedia/en/e/ee/God_of_War_Ragnar%C3%B6k_cover.jpg" },
+  { title: "Returnal", pct: 41, ratio: "12/31", cover: "https://upload.wikimedia.org/wikipedia/en/3/30/Returnal_cover_art.jpg" },
+  { title: "Hollow Knight", pct: 63, ratio: "39/63", cover: "https://upload.wikimedia.org/wikipedia/en/0/04/Hollow_Knight_first_cover_art.webp" },
+  { title: "Ghost of Tsushima", pct: 100, ratio: "55/55", cover: "https://upload.wikimedia.org/wikipedia/en/b/b6/Ghost_of_Tsushima.jpg" },
+];
+
+const FEATURES = [
+  {
+    num: "01",
+    title: "Qué te falta, no qué tienes",
+    body: "Cada juego se ordena por los trofeos que te quedan, con el que más gente consigue arriba. El platino va al final: es la consecuencia, no la tarea.",
+  },
+  {
+    num: "02",
+    title: "El rival siempre visible",
+    body: "Solo los juegos que tenéis los dos, barra contra barra. Comparar bibliotecas enteras no dice nada si uno lleva jugando el doble de años.",
+  },
+  {
+    num: "03",
+    title: "Sin credenciales de Sony",
+    body: "Escribes tu ID público de PlayStation y ya está. Nadie entrega contraseñas ni tokens, y nosotros no guardamos secretos de nadie.",
+  },
+];
+
+async function Landing() {
+  const globalStats = await getGlobalStats();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div>
+      <section className="grid items-center gap-14 py-4 lg:grid-cols-[1.15fr_0.85fr]">
+        <div>
+          <span
+            className="inline-flex items-center gap-2.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em]"
+            style={{ background: "rgba(74, 158, 255, 0.1)", border: "1px solid rgba(74, 158, 255, 0.28)", color: "#9ecbff" }}
+          >
+            <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
+            Rastreador de trofeos de PlayStation
+          </span>
+
+          <h1 className="font-heading mt-5 text-[74px] font-bold uppercase leading-[0.98] tracking-[-0.02em]">
+            El siguiente platino
+            <br />
+            <span className="text-gradient">no se espera.</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+          <p className="mt-6 max-w-[540px] text-lg leading-relaxed text-muted">
+            Conecta tu PlayStation y Platinos te dice exactamente qué trofeo
+            tienes más a mano, cuánto te separa del siguiente platino y quién
+            de tus rivales va por delante.
+          </p>
+
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <Link
+              href="/entrar"
+              className="rounded-xl px-6 py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(74,158,255,0.6)]"
+              style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)", boxShadow: "0 12px 34px rgba(74, 158, 255, 0.3)" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Empezar la caza
+            </Link>
+            <Link
+              href="#biblioteca"
+              className="rounded-xl px-[22px] py-4 text-[15px] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+              style={{ background: "#121721", border: "1px solid #263042", color: "#dbe5f2" }}
             >
-              Learning
-            </a>{" "}
-            center.
+              Ver un perfil de ejemplo
+            </Link>
+          </div>
+
+          <p className="mt-[18px] text-[13px] text-muted">
+            Solo tu ID público de PlayStation. Ni contraseñas, ni tokens, ni
+            permisos de Sony.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div
+          className="relative rounded-[20px] p-[26px]"
+          style={{ border: "1px solid #232c3d", background: "linear-gradient(#141b28, #0f141d)", boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)" }}
+        >
+          <div className="flex items-center gap-3.5">
+            <span
+              className="flex h-[62px] w-[62px] shrink-0 items-center justify-center rounded-2xl"
+              style={{ background: "linear-gradient(155deg, #cfeaf7, #6fb6d8 55%, #2b5f7d)", boxShadow: "0 0 34px rgba(159, 212, 236, 0.4)" }}
+            >
+              <TrophyIcon grade="platinum" size={34} />
+            </span>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted">Platino más cercano</p>
+              <p className="font-heading mt-1 text-[22px] font-bold">Elden Ring</p>
+            </div>
+          </div>
+
+          <div className="mt-[22px] flex items-end gap-3">
+            <span className="font-heading text-[68px] font-bold leading-[0.85] text-platinum">10</span>
+            <span className="pb-2 text-[13px] font-semibold text-muted">
+              trofeos
+              <br />
+              para el platino
+            </span>
+          </div>
+
+          <div className="mt-[18px] h-2.5 overflow-hidden rounded-full bg-surface-2">
+            <div className="h-full rounded-full" style={{ width: "74%", background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }} />
+          </div>
+          <div className="mt-2.5 flex justify-between text-xs text-muted">
+            <span>32 / 42 conseguidos</span>
+            <span className="font-bold" style={{ color: "#cfe4ff" }}>74%</span>
+          </div>
+
+          <ul className="mt-6 space-y-2">
+            {SAMPLE_NEXT.map((t) => (
+              <li
+                key={t.name}
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+                style={{ background: "#121824", border: "1px solid #1e2634" }}
+              >
+                <TrophyTile grade={t.grade} size={30} />
+                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{t.name}</span>
+                <span className="shrink-0 text-xs font-bold" style={{ color: GRADE_ACCENT[t.grade] }}>
+                  {t.rarity}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
-      </main>
+      </section>
+
+      <section className="grid grid-cols-2 gap-3 pt-2 lg:grid-cols-4">
+        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(74,158,255,0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="font-heading text-4xl font-bold leading-none text-platinum">{globalStats.platinos > 0 ? globalStats.platinos : "87"}</p>
+          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Platinos del grupo</p>
+        </div>
+        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString("es-ES") : "4.312"}</p>
+          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Trofeos contados</p>
+        </div>
+        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString("es-ES") : "214"}</p>
+          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Juegos rastreados</p>
+        </div>
+        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="font-heading text-4xl font-bold leading-none">{globalStats.completadoMedio > 0 ? `${globalStats.completadoMedio}%` : "68%"}</p>
+          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Completado medio</p>
+        </div>
+      </section>
+
+      <section id="biblioteca" className="pt-[72px]">
+        <h2 className="font-heading text-[34px] font-bold uppercase leading-tight tracking-[-0.01em]">
+          Tu biblioteca, ordenada por lo que te falta
+        </h2>
+        <p className="mb-6 mt-2 max-w-[620px] text-base text-muted">
+          Cada juego con su progreso real, su estado y los trofeos que
+          quedan. Sin abrir la consola.
+        </p>
+
+        <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
+          <div className="flex w-max gap-4 animate-marquee hover:[animation-play-state:paused]">
+            {[...SAMPLE_SHELF, ...SAMPLE_SHELF, ...SAMPLE_SHELF].map((g, i) => (
+              <TiltCard
+                key={`${g.title}-${i}`}
+                href="#biblioteca"
+                className="group relative w-[160px] shrink-0 cursor-pointer overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] sm:w-[220px]"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                <div
+                  className="relative flex aspect-[3/4] items-end p-4 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${g.cover})` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/40 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                  <p
+                    className="font-heading relative z-10 translate-y-2 text-[15px] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[17px]"
+                    style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
+                  >
+                    {g.title}
+                  </p>
+                </div>
+                <div className="relative z-10 bg-[var(--surface)] p-4 pt-1">
+                  <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${g.pct}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                    />
+                  </div>
+                  <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
+                    <span className="font-bold" style={{ color: "#cfe4ff" }}>{g.pct}%</span>
+                    <span>{g.ratio}</span>
+                  </div>
+                </div>
+              </TiltCard>
+            ))}
+          </div>
+          {/* Sombra lateral para difuminar los bordes del marquee */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
+        </div>
+
+        <div className="mt-[72px] grid gap-3.5 sm:grid-cols-3">
+          {FEATURES.map((f) => (
+            <div
+              key={f.num}
+              className="rounded-[18px] p-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(74,158,255,0.08)]"
+              style={{ border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" }}
+            >
+              <span
+                className="font-heading inline-flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold"
+                style={{ background: "rgba(74, 158, 255, 0.12)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#9ecbff" }}
+              >
+                {f.num}
+              </span>
+              <h3 className="font-heading mt-[18px] text-[21px] font-bold leading-tight">{f.title}</h3>
+              <p className="mt-3 text-[15px] leading-relaxed text-muted">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-[72px]">
+        <div
+          className="relative overflow-hidden rounded-[24px] p-12 sm:p-16"
+          style={{
+            border: "1px solid #26364d",
+            background:
+              "radial-gradient(600px 300px at 20% 0%, rgba(74, 158, 255, 0.22), transparent 70%), linear-gradient(160deg, #101a2b, #0b0f17)",
+          }}
+        >
+          <h2 className="font-heading max-w-[640px] text-[52px] font-bold uppercase leading-none tracking-[-0.02em]">
+            Nadie platina por casualidad.
+          </h2>
+          <div className="mt-[30px] flex flex-wrap items-center gap-[18px]">
+            <Link
+              href="/entrar"
+              className="rounded-xl px-[26px] py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(74,158,255,0.6)]"
+              style={{ background: "linear-gradient(160deg, #58a7ff, #2f7ad6)", boxShadow: "0 14px 40px rgba(74, 158, 255, 0.35)" }}
+            >
+              Conectar mi PlayStation
+            </Link>
+            <span className="text-sm text-muted">Gratis. Un ID y estás dentro.</span>
+          </div>
+        </div>
+      </section>
+
+      <footer className="flex flex-wrap items-center gap-5 border-t border-border py-6 text-xs text-muted">
+        <span className="font-heading font-bold tracking-[0.08em]" style={{ color: "#b9c6d8" }}>PLATINOS</span>
+        <span>Los perfiles de trofeos en privado no se pueden sincronizar.</span>
+        <span className="ml-auto">Datos de PSN · no afiliado a Sony</span>
+      </footer>
+    </div>
+  );
+}
+
+export default async function HomePage() {
+  const session = await auth();
+  if (!session?.user) return <Landing />;
+
+  const profile = await getProfileByUserId(session.user.id);
+  if (!profile?.handle || profile.accounts.length === 0) redirect("/bienvenida");
+
+  const { player, games } = await getLibrary(profile);
+  const stats = summarise(games);
+  const recientes = games.slice(0, 6);
+
+  const nearPlatinum = games
+    .map((g) => ({ game: g, progress: gameProgress(g) }))
+    .filter((g) => g.progress.hasPlatinum && !g.progress.platinumEarned)
+    .sort((a, b) => a.progress.total - a.progress.earned - (b.progress.total - b.progress.earned))
+    .slice(0, 3);
+
+  return (
+    <div className="space-y-9">
+      <div className="flex flex-wrap items-end gap-6">
+        <div>
+          <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-muted">
+            <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
+            {player.accounts.map((a) => a.username).join(" · ")}
+            {player.trophyLevel !== undefined && ` · nivel ${player.trophyLevel}`}
+          </p>
+          <h1 className="font-heading text-[42px] font-bold uppercase leading-none tracking-tight">
+            Hola, {player.name}
+          </h1>
+        </div>
+
+        <Link
+          href={`/u/${profile.handle}`}
+          className="ml-auto rounded-[10px] px-4 py-2.5 text-[13px] font-semibold"
+          style={{ background: "#121721", border: "1px solid #263042", color: "#cfe4ff" }}
+        >
+          Ver mi perfil completo →
+        </Link>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div
+          className="relative overflow-hidden rounded-[20px] p-6"
+          style={{
+            border: "1px solid #2a3a4d",
+            background:
+              "radial-gradient(400px 200px at 80% 0%, rgba(159, 212, 236, 0.22), transparent 70%), linear-gradient(165deg, #14202c, #0d131c)",
+          }}
+        >
+          <div className="flex items-center gap-2.5 text-platinum">
+            <TrophyIcon grade="platinum" size={22} />
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em]">Platinos</p>
+          </div>
+          <p
+            className="font-heading mt-2.5 text-[96px] font-bold leading-[0.85]"
+            style={{ color: "#dff0f8", textShadow: "0 0 40px rgba(159, 212, 236, 0.35)" }}
+          >
+            {stats.platinos}
+          </p>
+        </div>
+
+        <StatTile value={stats.trofeos} label="Trofeos" />
+        <StatTile value={stats.juegos} label="Juegos" />
+        <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
+      </div>
+
+      <TrophyCountRow
+        counts={stats.counts}
+        summary={`${stats.trofeos.toLocaleString("es-ES")} trofeos en ${stats.juegos} juegos`}
+      />
+
+      {nearPlatinum.length > 0 && (
+        <section>
+          <div className="mb-4 flex items-baseline gap-3.5">
+            <h2 className="font-heading text-2xl font-bold">A un paso del platino</h2>
+            <p className="text-[13px] text-muted">
+              Lo que menos te queda, ordenado por trofeos pendientes.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {nearPlatinum.map(({ game, progress }) => (
+              <TiltCard
+                key={game.id}
+                href={`/u/${profile.handle}/${game.id}`}
+                className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                <div className="relative flex aspect-[16/9] items-end p-4 overflow-hidden">
+                  <div 
+                    className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-50"
+                    style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }} 
+                  />
+                  {game.iconUrl && (
+                    <div 
+                      className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ backgroundImage: `url(${game.iconUrl})`, margin: '5% 15% 25% 15%' }}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                  <p
+                    className="font-heading relative z-10 translate-y-2 text-xl font-bold text-white transition-transform duration-300 group-hover:translate-y-0"
+                    style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}
+                  >
+                    {game.title}
+                  </p>
+                </div>
+                <div className="relative z-10 bg-[var(--surface)] p-[18px]">
+                  <div className="flex items-end gap-2.5">
+                    <p className="font-heading text-4xl font-bold leading-[0.9] text-platinum">
+                      {progress.total - progress.earned}
+                    </p>
+                    <p className="pb-1 text-[11px] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
+                      trofeos para
+                      <br />
+                      el platino
+                    </p>
+                  </div>
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-surface-2">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${progress.percent}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                    />
+                  </div>
+                  <div className="mt-2 flex justify-between text-xs text-muted">
+                    <span className="font-bold" style={{ color: "#cfe4ff" }}>{progress.percent}%</span>
+                    <span>{progress.earned}/{progress.total}</span>
+                  </div>
+                </div>
+              </TiltCard>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <div className="mb-4 flex items-baseline gap-3.5">
+          <h2 className="font-heading text-2xl font-bold">Jugado recientemente</h2>
+          <Link
+            href={`/u/${profile.handle}`}
+            className="ml-auto text-xs font-bold uppercase tracking-wide text-accent"
+          >
+            Toda la biblioteca ({stats.juegos})
+          </Link>
+        </div>
+
+        {recientes.length === 0 ? (
+          <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
+            No hay ningún juego en tus cuentas vinculadas. Suele ser que el
+            perfil está en privado en la plataforma.
+          </p>
+        ) : (
+          <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
+            <div className={`flex w-max gap-4 ${recientes.length >= 3 ? "animate-marquee" : ""} hover:[animation-play-state:paused]`}>
+              {[...recientes, ...recientes, ...recientes].map((game, i) => {
+                const progress = gameProgress(game);
+                return (
+                  <TiltCard
+                    key={`${game.id}-${i}`}
+                    href={`/u/${profile.handle}/${game.id}`}
+                    className="group relative w-[160px] shrink-0 cursor-pointer overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] sm:w-[220px]"
+                    style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+                  >
+                    <div className="relative flex aspect-[3/4] items-end p-4 overflow-hidden">
+                      <div 
+                        className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-40"
+                        style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }} 
+                      />
+                      {game.iconUrl && (
+                        <div 
+                          className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{ backgroundImage: `url(${game.iconUrl})`, margin: '10% 10% 30% 10%' }}
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                      <p
+                        className="font-heading relative z-10 translate-y-2 text-[15px] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[17px]"
+                        style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
+                      >
+                        {game.title}
+                      </p>
+                    </div>
+                    <div className="relative z-10 bg-[var(--surface)] p-4 pt-1">
+                      <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${progress.percent}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                        />
+                      </div>
+                      <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
+                        <span className="font-bold" style={{ color: "#cfe4ff" }}>{progress.percent}%</span>
+                        <span>{progress.earned}/{progress.total}</span>
+                      </div>
+                    </div>
+                  </TiltCard>
+                );
+              })}
+            </div>
+            {recientes.length >= 3 && (
+              <>
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent z-20" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent z-20" />
+              </>
+            )}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

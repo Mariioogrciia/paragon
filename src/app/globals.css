@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0d13;
+  --surface: #10151f;
+  --surface-2: #1b2330;
+  --border: #212a38;
+  --foreground: #e9eef7;
+  --muted: #8794a8;
+  --accent: #4a9eff;
+  --accent-2: #9fd4ec;
+  --good: #4ec98a;
+  --danger: #ff6b6b;
+
+  --bronze: #c07b4a;
+  --silver: #b9c2cc;
+  --gold: #e2b53e;
+  --platinum: #9fd4ec;
+}
+
+.light {
+  --background: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #eaedf4;
+  --border: #d8dee8;
+  --foreground: #10151f;
+  --muted: #64748b;
+  --accent: #2563eb;
+  --accent-2: #3b82f6;
+  --good: #10b981;
+  --danger: #ef4444;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-good: var(--good);
+  --color-danger: var(--danger);
+  --color-bronze: var(--bronze);
+  --color-silver: var(--silver);
+  --color-gold: var(--gold);
+  --color-platinum: var(--platinum);
+  --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-chakra), var(--font-barlow), ui-sans-serif, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 600px at 15% -10%, #16203a 0%, var(--background) 60%)
+    fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Título de sección/página: siempre en la fuente condensada de marca. */
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Texto degradado, para el remate de los titulares grandes. */
+.text-gradient {
+  background: linear-gradient(100deg, #9fd4ec, #4a9eff 55%, #b98cff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
