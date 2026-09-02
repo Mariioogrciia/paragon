@@ -10,6 +10,9 @@ export async function getFeed(userId: string) {
   const friendIds = friends.map((f) => f.userId);
   const userIds = [userId, ...friendIds];
 
+  // inArray crashes in Postgres when given an empty array — guard required.
+  if (userIds.length === 0) return [];
+
   const rows = await db
     .select({
       id: activities.id,
@@ -33,7 +36,11 @@ export async function getFeed(userId: string) {
     .from(activities)
     .innerJoin(users, eq(activities.userId, users.id))
     .innerJoin(games, eq(activities.gameId, games.id))
-    .where(inArray(activities.userId, userIds))
+    .where(
+      userIds.length === 1
+        ? eq(activities.userId, userIds[0])
+        : inArray(activities.userId, userIds)
+    )
     .orderBy(desc(activities.createdAt))
     .limit(50);
 

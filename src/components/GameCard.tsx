@@ -29,7 +29,7 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
           <img
             src={game.iconUrl}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         )}
 
@@ -75,7 +75,26 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
           <span className="font-heading text-[15px] font-bold" style={{ color: "#cfe4ff" }}>
             {progress.percent}%
           </span>
-          <span className="ml-auto flex items-center gap-1.5 text-muted">
+          {game.rating != null && (
+            <span className="flex items-center gap-0.5 ml-auto mr-1">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <svg
+                  key={s}
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill={s <= game.rating! ? "#f59e0b" : "none"}
+                  stroke={s <= game.rating! ? "#f59e0b" : "#8794a8"}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              ))}
+            </span>
+          )}
+          <span className={`flex items-center gap-1.5 text-muted ${game.rating != null ? "" : "ml-auto"}`}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
                 d="M7 4h10v5a5 5 0 0 1-10 0V4Z"
