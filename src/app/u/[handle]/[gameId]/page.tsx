@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
+import { Avatar } from "@/components/Avatar";
 import { CollectionPicker } from "@/components/Collections";
 import { CommunityRating } from "@/components/CommunityRating";
 import { Stars } from "@/components/Stars";
@@ -323,17 +324,20 @@ export default async function JuegoPage({
               />
             ) : (
               (game.review || game.rating) && (
-                <div className="p-5 border rounded-xl bg-surface border-border">
-                  <div className="flex gap-2 mb-3 items-center">
-                    <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña de {profile.displayName ?? handle}</span>
-                    {game.rating && <Stars value={game.rating} size={13} />}
-                    {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
+                <div className="flex gap-3 p-5 border rounded-xl bg-surface border-border">
+                  <Avatar src={profile.image} name={profile.displayName ?? handle} size={36} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap gap-2 mb-3 items-center">
+                      <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña de {profile.displayName ?? handle}</span>
+                      {game.rating && <Stars value={game.rating} size={13} />}
+                      {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
+                    </div>
+                    {game.review && (
+                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
+                        &quot;{game.review}&quot;
+                      </p>
+                    )}
                   </div>
-                  {game.review && (
-                    <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
-                      &quot;{game.review}&quot;
-                    </p>
-                  )}
                 </div>
               )
             )}

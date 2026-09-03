@@ -66,7 +66,7 @@ export default async function AmigosPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Rivales</h1>
+      <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Amigos</h1>
       <p className="mt-2.5 text-[15px] text-muted">
         Se añaden por su usuario de Paragon, no por su ID de plataforma.
       </p>
@@ -124,7 +124,7 @@ export default async function AmigosPage() {
         <div className="mb-4 flex items-baseline gap-3.5">
           <h2 className="font-heading text-2xl font-bold">Clasificación</h2>
           <span className="text-[13px] text-muted">
-            Tú y {ranking.length - (tengoCuenta ? 1 : 0)} rivales, por XP Paragon
+            Tú y {ranking.length - (tengoCuenta ? 1 : 0)} amigos, por XP Paragon
           </span>
         </div>
 

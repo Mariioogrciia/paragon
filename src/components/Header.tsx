@@ -28,7 +28,7 @@ const LOGGED_IN_NAV = [
     match: (p: string) => p.startsWith("/ligas"),
   },
   {
-    label: "Rivales",
+    label: "Amigos",
     href: "/amigos",
     match: (p: string) => p.startsWith("/amigos") || p.startsWith("/comparar"),
   },
