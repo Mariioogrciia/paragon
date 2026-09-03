@@ -19,6 +19,15 @@ aunque esas APIs jamás le dejaran consultarlo.
 Antigravity/Gemini en el IDE). Varias funciones existen por duplicado o a
 medias. Antes de tocar algo, mira si ya está hecho.
 
+**Aviso para quien esté trabajando en paralelo (Antigravity u otro agente),
+3 de septiembre de 2026:** para depurar un 500 en producción tuve que levantar
+un par de servidores locales de prueba, y al pararlos usé
+`taskkill /F /IM node.exe /T` — eso mata **todos** los procesos Node de la
+máquina, no solo los míos. Si tenías un `npm run dev` u otra cosa en Node
+corriendo en este equipo en ese momento, se cayó sin avisar. No debería
+volver a pasar (ver más abajo por qué hacía falta pararlos), pero si algo
+tuyo se cortó de golpe por esas fechas, es por esto.
+
 ---
 
 ## Decisiones de arquitectura que conviene no romper
