@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties, ReactNode } from "react";
 import { type Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
 import { TrophyIcon } from "./TrophyIcon";
@@ -15,6 +16,37 @@ import { TrophyIcon } from "./TrophyIcon";
 
 const TARJETA =
   "relative overflow-hidden rounded-2xl p-6 shadow-lg transition-transform hover:scale-[1.02]";
+
+/**
+ * Cada tarjeta enseña un solo número ("tu género más jugado"); esto la hace
+ * llevar al ranking entero de ese dato (`/u/[handle]/wrap/<métrica>`), para
+ * quien quiera ver qué hay en segundo y tercer puesto. Sin `handle` (perfil
+ * de ejemplo) se queda como un `div`, porque no hay datos reales a los que
+ * llevar.
+ */
+function Tarjeta({
+  href,
+  style,
+  children,
+}: {
+  href?: string;
+  style: CSSProperties;
+  children: ReactNode;
+}) {
+  if (!href) {
+    return (
+      <div className={TARJETA} style={style}>
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={href} className={TARJETA} style={style}>
+      {children}
+    </Link>
+  );
+}
 
 /**
  * El juego más "exprimido": por horas si las hay, y si no, por trofeos.
@@ -101,8 +133,8 @@ export function ParagonWrap({
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div
-          className={TARJETA}
+        <Tarjeta
+          href={handle ? `/u/${handle}/wrap/generos` : undefined}
           style={{
             background: "linear-gradient(140deg, #3b1d6e, #1c1040 70%, #120a26)",
             border: "1px solid rgba(167, 139, 250, 0.35)",
@@ -118,10 +150,10 @@ export function ParagonWrap({
               ? "Todavía no hay géneros en tu catálogo"
               : `Tienes ${topGenre.count} títulos de este género`}
           </p>
-        </div>
+        </Tarjeta>
 
-        <div
-          className={TARJETA}
+        <Tarjeta
+          href={handle ? `/u/${handle}/wrap/${topGame?.playtimeMinutes ? "horas" : "trofeos"}` : undefined}
           style={{
             background: topGame ? coverGradient(topGame.id) : "#131a26",
             border: "1px solid rgba(125, 179, 255, 0.35)",
@@ -144,10 +176,10 @@ export function ParagonWrap({
                 : `${topGame?.earnedTotal ?? 0} trofeos conseguidos`}
             </p>
           </div>
-        </div>
+        </Tarjeta>
 
-        <div
-          className={TARJETA}
+        <Tarjeta
+          href={handle ? `/u/${handle}/wrap/trofeos?rango=anio` : undefined}
           style={{
             background: "linear-gradient(140deg, #5a3410, #3a1f08 70%, #241305)",
             border: "1px solid rgba(251, 191, 36, 0.35)",
@@ -172,7 +204,7 @@ export function ParagonWrap({
               ? "Aún no hay trofeos con fecha de este año"
               : `Repartidos en ${juegosEsteAnio} ${juegosEsteAnio === 1 ? "juego" : "juegos"}`}
           </p>
-        </div>
+        </Tarjeta>
       </div>
     </section>
   );
