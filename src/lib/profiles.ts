@@ -389,6 +389,7 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
       publisher: gamesTable.publisher,
       genres: gamesTable.genres,
       pegi: gamesTable.pegi,
+      metadataSyncedAt: gamesTable.metadataSyncedAt,
       /**
        * Rareza del platino: el % de jugadores del juego que lo tienen. Es de
        * lo que sale la dificultad estimada (ver lib/difficulty). Se trae con
@@ -420,12 +421,18 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
     .where(eq(userGames.userId, profile.userId))
     .orderBy(desc(userGames.lastPlayedAt));
 
-  const sinPegi = rows.filter((row) => !row.pegi);
+  // Solo se reintenta lo que NUNCA se comprobó. `metadataSyncedAt` lo marca
+  // `syncIgdbMetadata`/`syncStoreMetadata` incluso cuando no encuentran nada,
+  // precisamente para no repetir la búsqueda — pero este paso, al vivir
+  // aparte, no miraba esa marca: los ~40 juegos que IGDB no tiene con ese
+  // nombre (o no clasifica) se quedaban `pegi: null` para siempre y
+  // disparaban las cuatro oleadas de `pegiPorTitulo` (la última, una consulta
+  // a IGDB por título) en **cada** carga de biblioteca. Sin nadie viéndolo
+  // fallar — la ficha seguía sin PEGI, así que parecía que "no había pasado
+  // nada" — pero era la causa real de que la app se sintiera lenta.
+  const sinPegi = rows.filter((row) => !row.pegi && !row.metadataSyncedAt);
   const encontrados = new Map<string, string>();
 
-  // IGDB admite muchos nombres en una sola consulta y su respuesta queda
-  // cacheada. Así las bibliotecas antiguas se completan al visitarlas, sin
-  // depender de que el cron haya acertado con su tanda aleatoria.
   if (sinPegi.length > 0) {
     try {
       // La primera tanda mejora la respuesta inmediata; el cron completa el
@@ -439,9 +446,13 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
         await Promise.all(
           lote.map((row) => {
             const pegi = lotePegi.get(row.title);
-            return pegi
-              ? db.update(gamesTable).set({ pegi }).where(eq(gamesTable.id, row.id))
-              : Promise.resolve();
+            // Se marca como comprobado tanto si se encontró como si no: es lo
+            // que evita volver a preguntarle a IGDB por el mismo título en la
+            // próxima carga de biblioteca.
+            return db
+              .update(gamesTable)
+              .set({ pegi: pegi ?? undefined, metadataSyncedAt: new Date() })
+              .where(eq(gamesTable.id, row.id));
           }),
         );
       }
