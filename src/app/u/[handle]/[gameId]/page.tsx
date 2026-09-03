@@ -14,6 +14,8 @@ import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
 import { getCommunityRating } from "@/lib/ratings";
 import { gameProgress, nextSteps, repartoDlc } from "@/lib/stats";
 import { dificultadDeJuego } from "@/lib/difficulty";
+import { estimarEta } from "@/lib/eta";
+import { EtaPlatinoCard } from "@/components/EtaPlatino";
 import type { Trophy } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 
@@ -102,6 +104,14 @@ export default async function JuegoPage({
         ? faltanBase
         : progress.total - progress.earned
       : null;
+
+  // Sin sistema de platino (Steam), la meta es simplemente terminar el
+  // juego: lo que falta es el resto del total. Con platino, es lo mismo que
+  // ya se enseña arriba en "Trofeos para el platino".
+  const faltanParaMeta = faltanParaPlatino ?? (
+    !progress.hasPlatinum && progress.percent < 100 ? progress.total - progress.earned : 0
+  );
+  const eta = faltanParaMeta > 0 ? estimarEta(game.trophies, faltanParaMeta) : null;
 
   return (
     <div className="-mx-7 -mt-9">
@@ -281,6 +291,8 @@ export default async function JuegoPage({
             </p>
           </section>
         )}
+
+        {eta && <EtaPlatinoCard eta={eta} esMio={esMio} />}
 
         <section
           className="rounded-[18px] p-5"
