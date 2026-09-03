@@ -295,6 +295,7 @@ export interface StoreMetadata {
   developer?: string;
   publisher?: string;
   genres?: string[];
+  pegi?: string;
   /** Carátula real, la que sirve la tienda. Ver headerImage() más abajo. */
   headerImage?: string;
 }
@@ -317,6 +318,7 @@ export async function fetchStoreMetadata(appId: string): Promise<StoreMetadata |
           publishers?: string[];
           genres?: { description: string }[];
           header_image?: string;
+          required_age?: number | string;
         };
       }
     >
@@ -325,10 +327,13 @@ export async function fetchStoreMetadata(appId: string): Promise<StoreMetadata |
   const entry = details?.[appId];
   if (!entry?.success || !entry.data) return null;
 
+  const age = Number(entry.data.required_age);
+
   return {
     developer: entry.data.developers?.[0],
     publisher: entry.data.publishers?.[0],
     genres: entry.data.genres?.map((g) => g.description),
+    pegi: Number.isFinite(age) && age > 0 ? String(age) : undefined,
     headerImage: entry.data.header_image,
   };
 }

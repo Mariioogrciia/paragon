@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import Link from "next/link";
+import { TiltCard } from "./TiltCard";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { gameProgress } from "@/lib/stats";
 import { ACHIEVEMENT_LABEL, type Game } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
+import { Pegi } from "@/components/Pegi";
 
 /**
  * Tarjeta de juego con carátula grande, a la manera de la biblioteca de la
@@ -16,13 +17,15 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
   const played = relativeDate(game.lastPlayedAt);
 
   return (
-    <Link
+    <TiltCard
       href={href}
-      className="group block overflow-hidden rounded-[18px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+      className={`group block rounded-[18px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] ${
+        progress.platinumEarned || progress.percent === 100 ? "holo-card" : ""
+      }`}
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       <div
-        className="relative flex aspect-video items-end p-3.5"
+        className="relative flex aspect-video items-end overflow-hidden rounded-t-[17px] p-3.5"
         style={{ background: coverGradient(game.id) }}
       >
         {/*
@@ -57,6 +60,16 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
         <span className="absolute right-3 top-3" style={{ backdropFilter: "blur(6px)" }}>
           <StatusBadge status={progress.status} />
         </span>
+
+        {/* Abajo a la derecha, fuera del camino del título y del badge de
+            estado. Solo aparece en los juegos que tienen clasificación: el
+            cron la va rellenando desde IGDB, así que al principio faltará en
+            muchos. */}
+        {game.pegi && (
+          <span className="absolute bottom-3 right-3">
+            <Pegi edad={game.pegi} />
+          </span>
+        )}
       </div>
 
       <div className="p-4">
@@ -128,6 +141,6 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
           </span>
         </div>
       </div>
-    </Link>
+    </TiltCard>
   );
 }

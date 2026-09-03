@@ -9,9 +9,11 @@ import {
   userGames,
   userTrophies,
   users,
+  userBadges,
 } from "@/db/schema";
 import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
+import { pegiPorTitulo } from "@/lib/igdb/client";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import {
   type AccountPlatform,
@@ -29,7 +31,10 @@ export interface ProfileRow {
   displayName: string | null;
   image: string | null;
   favorites: string[] | null;
+  profileTitle?: string | null;
+  profileBackgroundGameId?: string | null;
   accounts: PlatformAccount[];
+  badges: string[];
 }
 
 /** La cuenta de una plataforma concreta, si la tiene vinculada. */
@@ -64,6 +69,8 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       displayName: users.name,
       image: users.image,
       favorites: users.favorites,
+      profileTitle: users.profileTitle,
+      profileBackgroundGameId: users.profileBackgroundGameId,
     })
     .from(users)
     .where(where)
@@ -84,7 +91,14 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
     .from(platformAccounts)
     .where(eq(platformAccounts.userId, row.userId));
 
-  return { ...row, accounts };
+  const badgesRows = await db
+    .select({ badgeId: userBadges.badgeId })
+    .from(userBadges)
+    .where(eq(userBadges.userId, row.userId));
+    
+  const badges = badgesRows.map((b) => b.badgeId);
+
+  return { ...row, accounts, badges };
 }
 
 export function getProfileByUserId(userId: string) {
@@ -111,6 +125,36 @@ export async function setHandle(userId: string, handle: string) {
 
 export async function setProfileInfo(userId: string, name: string, image: string | null) {
   await db.update(users).set({ name, image }).where(eq(users.id, userId));
+}
+
+export async function grantBadge(userId: string, badgeId: string) {
+  await db
+    .insert(userBadges)
+    .values({ userId, badgeId })
+    .onConflictDoNothing();
+}
+
+export async function checkAndGrantBadges(userId: string) {
+  // Give "madrugador" to everyone for now (early adopters)
+  await grantBadge(userId, "madrugador");
+
+  const result = await db
+    .select({
+      totalGames: sql<number>`count(distinct ${userGames.gameId})`,
+      totalPlatinums: sql<number>`sum(CAST(${userGames.earned}->>'platinum' AS INTEGER))`,
+    })
+    .from(userGames)
+    .where(eq(userGames.userId, userId));
+
+  const platinums = Number(result[0]?.totalPlatinums ?? 0);
+  const games = Number(result[0]?.totalGames ?? 0);
+
+  if (platinums >= 1) await grantBadge(userId, "first_blood");
+  if (platinums >= 10) await grantBadge(userId, "cazador");
+  if (platinums >= 50) await grantBadge(userId, "experto");
+  if (platinums >= 100) await grantBadge(userId, "leyenda");
+  
+  if (games >= 100) await grantBadge(userId, "coleccionista");
 }
 
 export async function getGlobalStats() {
@@ -160,7 +204,13 @@ export async function linkAccount(
       ? await resolvePsn(input)
       : platform === "steam"
         ? await resolveSteam(input)
-        : await resolveGoogle(input);
+        : platform === "google"
+          ? await resolveGoogle(input)
+          : platform === "xbox"
+            ? await resolveXbox(input)
+            : platform === "epic"
+              ? await resolveEpic(input)
+              : await resolveUbisoft(input);
 
   await db
     .insert(platformAccounts)
@@ -189,6 +239,8 @@ export async function linkAccount(
   const juegos = resolved.legible
     ? await syncLibrary(userId, { platform, accountId: resolved.accountId })
     : 0;
+
+  await checkAndGrantBadges(userId);
 
   return { username: resolved.username, legible: resolved.legible, juegos };
 }
@@ -227,16 +279,28 @@ async function resolveSteam(input: string): Promise<Resolved> {
   };
 }
 
+// Google, Xbox, Epic y Ubisoft no tienen sincronización real todavía: sus
+// únicas APIs viables no dan la biblioteca de un jugador cualquiera (Google
+// Play Games solo devuelve logros del juego atado al Client ID; Xbox, Epic y
+// Ubisoft no tienen credenciales configuradas). Se dejan vincular para que la
+// cuenta quede guardada y visible, pero `legible: false` evita que
+// `syncLibrary` reciba ese accountId — antes caía por defecto en el lector de
+// Steam y le pedía la biblioteca a Steam con, por ejemplo, un gamertag de
+// Xbox.
 async function resolveGoogle(input: string): Promise<Resolved> {
-  // Mock resolver for Google Play games using email. 
-  // In a real app we'd use OAuth or an API.
-  return {
-    accountId: input,
-    username: input.split('@')[0] || input,
-    level: null,
-    avatarUrl: null,
-    legible: true,
-  };
+  return { accountId: input, username: input.split('@')[0] || input, level: null, avatarUrl: null, legible: false };
+}
+
+async function resolveXbox(input: string): Promise<Resolved> {
+  return { accountId: input, username: input, level: null, avatarUrl: null, legible: false };
+}
+
+async function resolveEpic(input: string): Promise<Resolved> {
+  return { accountId: input, username: input, level: null, avatarUrl: null, legible: false };
+}
+
+async function resolveUbisoft(input: string): Promise<Resolved> {
+  return { accountId: input, username: input, level: null, avatarUrl: null, legible: false };
 }
 
 /** Vuelve a traer las bibliotecas de todas las cuentas vinculadas. */
@@ -265,7 +329,29 @@ export async function resyncLibraries(userId: string): Promise<number> {
       );
   }
 
+  await checkAndGrantBadges(userId);
+
   return total;
+}
+
+export async function resyncPlatform(userId: string, platform: AccountPlatform): Promise<number> {
+  const account = await accountForUser(userId, platform);
+  if (!account || !account.isPublic) return 0;
+  const total = await syncLibrary(userId, { platform, accountId: account.accountId });
+  await db
+    .update(platformAccounts)
+    .set({ syncedAt: new Date() })
+    .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)));
+  return total;
+}
+
+async function accountForUser(userId: string, platform: AccountPlatform) {
+  const [account] = await db
+    .select({ accountId: platformAccounts.accountId, isPublic: platformAccounts.isPublic })
+    .from(platformAccounts)
+    .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)))
+    .limit(1);
+  return account ?? null;
 }
 
 export async function unlinkAccount(userId: string, platform: AccountPlatform) {
@@ -302,6 +388,23 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
       developer: gamesTable.developer,
       publisher: gamesTable.publisher,
       genres: gamesTable.genres,
+      pegi: gamesTable.pegi,
+      /**
+       * Rareza del platino: el % de jugadores del juego que lo tienen. Es de
+       * lo que sale la dificultad estimada (ver lib/difficulty). Se trae con
+       * una subconsulta y no con un join para no multiplicar filas de la
+       * biblioteca por cada trofeo.
+       */
+      platinumRarity: sql<number | null>`(
+        select ut."rarityPercent"
+        from ${userTrophies} ut
+        join ${gameTrophies} gt
+          on gt."gameId" = ut."gameId" and gt."trophyId" = ut."trophyId"
+        where ut."userId" = ${userGames.userId}
+          and ut."gameId" = ${userGames.gameId}
+          and gt.grade = 'platinum'
+        limit 1
+      )`,
       earnedTotal: userGames.earnedTotal,
       earned: userGames.earned,
       progressPercent: userGames.progressPercent,
@@ -310,11 +413,42 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
       rating: userGames.rating,
       review: userGames.review,
       reviewDate: userGames.reviewDate,
+      isWishlist: userGames.isWishlist,
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
     .where(eq(userGames.userId, profile.userId))
     .orderBy(desc(userGames.lastPlayedAt));
+
+  const sinPegi = rows.filter((row) => !row.pegi);
+  const encontrados = new Map<string, string>();
+
+  // IGDB admite muchos nombres en una sola consulta y su respuesta queda
+  // cacheada. Así las bibliotecas antiguas se completan al visitarlas, sin
+  // depender de que el cron haya acertado con su tanda aleatoria.
+  if (sinPegi.length > 0) {
+    try {
+      // La primera tanda mejora la respuesta inmediata; el cron completa el
+      // resto sin bloquear cada navegación del usuario.
+      for (let inicio = 0; inicio < Math.min(sinPegi.length, 100); inicio += 100) {
+        const lote = sinPegi.slice(inicio, inicio + 100);
+        const lotePegi = await pegiPorTitulo(lote.map((row) => row.title));
+
+        for (const [title, pegi] of lotePegi) encontrados.set(title, pegi);
+
+        await Promise.all(
+          lote.map((row) => {
+            const pegi = lotePegi.get(row.title);
+            return pegi
+              ? db.update(gamesTable).set({ pegi }).where(eq(gamesTable.id, row.id))
+              : Promise.resolve();
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("[library] pegi", error);
+    }
+  }
 
   const games: Game[] = rows.map((r) => ({
     id: r.id,
@@ -333,9 +467,12 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
     developer: r.developer ?? undefined,
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,
+    pegi: r.pegi ?? encontrados.get(r.title),
+    platinumRarity: r.platinumRarity ?? undefined,
     rating: r.rating ?? undefined,
     review: r.review ?? undefined,
     reviewDate: r.reviewDate?.toISOString() ?? undefined,
+    isWishlist: r.isWishlist ?? false,
   }));
 
   return { player: toPlayer(profile), games };
@@ -366,8 +503,15 @@ export async function getGameDetail(
 
   // Los juegos manuales no tienen cuenta de plataforma que sincronizar.
   const account = game.platform === "manual" ? null : accountFor(profile, game.platform);
+  
+  // Checking if we need to sync:
+  // 1. Never synced before
+  // 2. Or the library says we have X trophies, but our DB has Y trophies (means we got a new trophy and resynced the library, but not the details).
+  const rowsBeforeSync = await db.select({ earned: userTrophies.earned }).from(userTrophies).where(and(eq(userTrophies.gameId, gameId), eq(userTrophies.userId, profile.userId)));
+  const earnedInDb = rowsBeforeSync.filter(r => r.earned).length;
+  const outOfSync = game.earnedTotal !== undefined && game.earnedTotal > earnedInDb;
 
-  if (!estado?.syncedAt && account) {
+  if ((!estado?.syncedAt || outOfSync) && account) {
     // Solo se puede si la plataforma nos deja leer esa cuenta; si no,
     // mostramos lo que haya guardado (que puede ser nada) en vez de romper.
     try {
@@ -389,6 +533,8 @@ export async function getGameDetail(
       grade: gameTrophies.grade,
       hidden: gameTrophies.hidden,
       iconUrl: gameTrophies.iconUrl,
+      groupId: gameTrophies.groupId,
+      groupName: gameTrophies.groupName,
       earned: userTrophies.earned,
       earnedAt: userTrophies.earnedAt,
       rarityPercent: userTrophies.rarityPercent,
@@ -421,6 +567,10 @@ export async function getGameDetail(
     grade: r.grade ?? undefined,
     hidden: r.hidden,
     iconUrl: r.iconUrl ?? undefined,
+    // Sin esto, la agrupación por DLC de TrophyList no recibía nada y metía
+    // todos los trofeos en "Juego Base".
+    groupId: r.groupId ?? "default",
+    groupName: r.groupName ?? undefined,
     earned: r.earned ?? false,
     earnedAt: r.earnedAt?.toISOString(),
     rarityPercent: r.rarityPercent ?? undefined,
@@ -614,4 +764,17 @@ export async function removeFriend(userId: string, otherId: string) {
         ),
       ),
     );
+}
+
+/* --------------------------------- Metalogros --------------------------------- */
+
+export async function getUserBadges(userId: string) {
+  return db
+    .select({
+      badgeId: userBadges.badgeId,
+      earnedAt: userBadges.earnedAt,
+    })
+    .from(userBadges)
+    .where(eq(userBadges.userId, userId))
+    .orderBy(desc(userBadges.earnedAt));
 }

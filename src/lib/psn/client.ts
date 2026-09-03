@@ -1,6 +1,8 @@
 import {
   getProfileFromUserName,
   getTitleTrophies,
+  getTitleTrophyGroups,
+  getUserPlayedGames,
   getUserTitles,
   getUserTrophiesEarnedForTitle,
   getUserTrophyProfileSummary,
@@ -114,6 +116,56 @@ function toGame(title: TrophyTitle): Game {
   };
 }
 
+function claveTitulo(title: string): string {
+  return title
+    // Espacio, no vacío: PSN escribe "EA SPORTS™UFC®4" en la lista de trofeos
+    // y "EA SPORTS™ UFC® 4" en el historial de juego. Borrando el símbolo
+    // queda "sportsufc4" contra "sports ufc 4", y no casan nunca.
+    .replace(/[™®©]/g, " ")
+    // El historial añade la consola: "Grand Theft Auto V (PlayStation®5)".
+    .replace(/\(playstation[^)]*\)/gi, "")
+    // Y la lista de trofeos añade el sufijo del set: "FIFA 22 Trophies".
+    .replace(/\s*\b(trophy set|trophy list|trophies)\s*$/i, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    // "UFC4" y "UFC 4" son el mismo juego.
+    .replace(/([a-z])(\d)/g, "$1 $2")
+    .replace(/(\d)([a-z])/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function duracionEnMinutos(duration: string | undefined): number {
+  if (!duration) return 0;
+
+  const partes = duration.match(/^P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/);
+  if (!partes) return 0;
+
+  const dias = Number(partes[1] ?? 0);
+  const horas = Number(partes[2] ?? 0);
+  const minutos = Number(partes[3] ?? 0);
+  const segundos = Number(partes[4] ?? 0);
+  return Math.round(dias * 1_440 + horas * 60 + minutos + segundos / 60);
+}
+
+async function horasJugadas(accountId: string): Promise<Map<string, number>> {
+  const auth = await getAuthorization();
+  const jugados = new Map<string, number>();
+  const PAGE = 100;
+
+  for (let offset = 0; ; offset += PAGE) {
+    const response = await getUserPlayedGames(auth, accountId, { limit: PAGE, offset });
+    for (const title of response.titles) {
+      jugados.set(claveTitulo(title.name), duracionEnMinutos(title.playDuration));
+    }
+    if (response.titles.length < PAGE) break;
+  }
+
+  return jugados;
+}
+
 /**
  * Biblioteca de un jugador, ordenada por lo más reciente.
  *
@@ -139,6 +191,17 @@ export async function fetchLibrary(accountId: string): Promise<Game[]> {
 
     if (response.trophyTitles.length < PAGE) break;
     offset += PAGE;
+  }
+
+  try {
+    const jugados = await horasJugadas(accountId);
+    for (const game of games) {
+      game.playtimeMinutes = jugados.get(claveTitulo(game.title)) ?? 0;
+    }
+  } catch (error) {
+    // La privacidad de actividad puede bloquear este endpoint; la biblioteca
+    // de trofeos sigue siendo válida aunque no haya horas disponibles.
+    console.error("No se pudieron obtener las horas jugadas de PSN", error);
   }
 
   return games.sort((a, b) =>
@@ -192,6 +255,18 @@ export async function fetchTrophies(
     getUserTrophiesEarnedForTitle(auth, accountId, npCommunicationId, "all", options),
   ]);
 
+  const groupNamesById = new Map<string, string>();
+  if (definitions.hasTrophyGroups) {
+    try {
+      const groupsResponse = await getTitleTrophyGroups(auth, npCommunicationId, options);
+      for (const group of groupsResponse.trophyGroups) {
+        groupNamesById.set(group.trophyGroupId, group.trophyGroupName);
+      }
+    } catch (e) {
+      console.error("No se pudieron obtener los grupos de trofeos para " + npCommunicationId, e);
+    }
+  }
+
   const earnedById = new Map(
     earnedList.trophies.map((t) => [t.trophyId, t]),
   );
@@ -201,6 +276,10 @@ export async function fetchTrophies(
     // trae si lo tiene, la rareza y el objetivo del hito parcial.
     const earned = earnedById.get(definition.trophyId);
     const rarity = Number(earned?.trophyEarnedRate);
+
+    // psn-api no declara trophyGroupId en su tipo base de Trophy (o lo hace de forma opaca)
+    // pero sí está en el payload real si hasTrophyGroups es true.
+    const groupId = (definition as { trophyGroupId?: string }).trophyGroupId ?? "default";
 
     return {
       // El id nativo de PSN es el número; la unicidad es por juego, no global.
@@ -213,6 +292,8 @@ export async function fetchTrophies(
       rarityPercent: Number.isFinite(rarity) ? rarity : undefined,
       hidden: definition.trophyHidden,
       iconUrl: definition.trophyIconUrl,
+      groupId,
+      groupName: groupNamesById.get(groupId),
       progress: earned?.earned
         ? undefined
         : readProgress(earned, earned?.trophyProgressTargetValue),

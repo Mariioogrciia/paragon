@@ -9,6 +9,8 @@ import {
   getProfileByUserId,
 } from "@/lib/profiles";
 import { sharedGames, summarise } from "@/lib/stats";
+import { paragonProgress } from "@/lib/level";
+import { sharedTrophyLeads } from "@/lib/comparison";
 
 const OUTCOME = {
   ganas: { label: "Ganas", bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
@@ -64,6 +66,13 @@ export default async function CompararPage({
   const statsA = summarise(libA.games);
   const statsB = summarise(libB.games);
   const comunes = sharedGames([libA, libB]);
+  const nivelA = paragonProgress(libA.games);
+  const nivelB = paragonProgress(libB.games);
+  const lideres = await sharedTrophyLeads(
+    mio.userId,
+    suyo.userId,
+    comunes.map((game) => game.id),
+  );
   const ganados = comunes.filter((g) => g.progress[0].percent >= g.progress[1].percent).length;
 
   const platinoDif = statsA.platinos - statsB.platinos;
@@ -142,6 +151,19 @@ export default async function CompararPage({
         ))}
       </div>
 
+      <section className="mt-4 grid gap-3 sm:grid-cols-2">
+        {[{ name: libA.player.name, level: nivelA, color: "var(--accent-text)" }, { name: libB.player.name, level: nivelB, color: "var(--gold)" }].map((player) => (
+          <div key={player.name} className="rounded-[18px] border border-border bg-surface p-4">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-bold">Nivel Paragon de {player.name}</h2>
+              <span className="font-heading text-2xl font-bold" style={{ color: player.color }}>NV {player.level.level}</span>
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full" style={{ width: `${player.level.progreso}%`, background: player.color }} /></div>
+            <p className="mt-2 text-xs text-muted">{player.level.xp.toLocaleString("es-ES")} XP · {player.level.restante.toLocaleString("es-ES")} para el nivel {player.level.siguienteNivel}</p>
+          </div>
+        ))}
+      </section>
+
       <section className="mt-9">
         <div className="mb-4 flex items-baseline gap-3.5">
           <h2 className="font-heading text-2xl font-bold">Juegos en común</h2>
@@ -209,6 +231,23 @@ export default async function CompararPage({
           </div>
         )}
       </section>
+
+      {lideres.length > 0 && (
+        <section className="mt-9">
+          <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
+            <h2 className="font-heading text-2xl font-bold">Quién llegó antes</h2>
+            <span className="text-[13px] text-muted">Trofeos que ambos tenéis registrados</span>
+          </div>
+          <div className="grid gap-2">
+            {lideres.map((trofeo) => (
+              <div key={`${trofeo.gameId}:${trofeo.trophyId}`} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-3">
+                <div className="min-w-0"><p className="truncate text-sm font-semibold">{trofeo.trophyName}</p><p className="text-xs text-muted">{trofeo.gameTitle}</p></div>
+                <span className="shrink-0 text-xs font-bold text-accent">{trofeo.firstUserId === mio.userId ? libA.player.name : libB.player.name} llegó antes</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

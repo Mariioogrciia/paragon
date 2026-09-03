@@ -4,7 +4,9 @@ import { Barlow, Chakra_Petch } from "next/font/google";
 import { auth } from "@/auth";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { accountFor, getProfileByUserId } from "@/lib/profiles";
+import { getProfileByUserId } from "@/lib/profiles";
+import { getParagonLevel } from "@/lib/paragonLevel";
+import { contarSinLeer } from "@/lib/notifications";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
@@ -68,12 +70,16 @@ export default async function RootLayout({
     }
   }
 
+  const nivelParagon = sessionUser ? await getParagonLevel(sessionUser.id) : null;
+  const avisosSinLeer = sessionUser ? await contarSinLeer(sessionUser.id) : 0;
+
   const headerUser = sessionUser
     ? {
         handle: profile?.handle ?? null,
         name: sessionUser.name ?? "?",
         image: sessionUser.image,
-        trophyLevel: accountFor(profile, "psn")?.level ?? null,
+        paragonLevel: nivelParagon?.level ?? null,
+        paragonProgress: nivelParagon?.progreso ?? null,
       }
     : null;
 
@@ -98,7 +104,7 @@ export default async function RootLayout({
           enableSystem
           themes={["dark", "light", "oled", "high-contrast"]}
         >
-          <Header user={headerUser} />
+          <Header user={headerUser} avisosSinLeer={avisosSinLeer} />
           <main className="mx-auto w-full max-w-[1240px] flex-1 px-7 py-9">{children}</main>
           <Footer />
         </ThemeProvider>

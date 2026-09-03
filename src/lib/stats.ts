@@ -7,7 +7,7 @@ import {
   type TrophyCounts,
 } from "@/lib/types";
 
-export type GameStatus = "platinado" | "completado" | "en-curso" | "sin-empezar";
+export type GameStatus = "platinado" | "completado" | "en-curso" | "sin-empezar" | "deseados";
 
 export interface GameProgress {
   earned: number;
@@ -31,13 +31,18 @@ export function gameProgress(game: Game): GameProgress {
   const hasPlatinum = (game.defined?.platinum ?? 0) > 0;
   const platinumEarned = (game.earned?.platinum ?? 0) > 0;
 
-  const status: GameStatus = platinumEarned
-    ? "platinado"
-    : !hasPlatinum && game.progressPercent === 100
-      ? "completado"
-      : earned === 0
-        ? "sin-empezar"
-        : "en-curso";
+  let status: GameStatus;
+  if (game.isWishlist) {
+    status = "deseados";
+  } else if (platinumEarned) {
+    status = "platinado";
+  } else if (!hasPlatinum && game.progressPercent === 100) {
+    status = "completado";
+  } else if (earned === 0) {
+    status = "sin-empezar";
+  } else {
+    status = "en-curso";
+  }
 
   return {
     earned,
@@ -122,7 +127,7 @@ export function summarise(games: Game[]): PlayerSummary {
 
 /* ------------------------------ Búsqueda y filtros ----------------------------- */
 
-export type SortKey = "reciente" | "progreso" | "titulo" | "pendientes";
+export type SortKey = "reciente" | "progreso" | "titulo" | "pendientes" | "asequible";
 
 export interface LibraryFilters {
   search?: string;
@@ -204,6 +209,23 @@ export function sortGames(games: Game[], sort: SortKey): Game[] {
         };
         return restante(a) - restante(b);
       });
+    case "asequible":
+      // El platino más alcanzable primero: el que más gente ha sacado. Los
+      // ya platinados y los que no tienen dato de rareza van al final — no
+      // son candidatos a "¿qué me pongo a platinar?".
+      return copy.sort((a, b) => {
+        const puntua = (g: Game) => {
+          const p = gameProgress(g);
+          if (p.platinumEarned || g.platinumRarity === undefined) return -1;
+          return g.platinumRarity;
+        };
+        const pa = puntua(a);
+        const pb = puntua(b);
+        if (pa < 0 && pb < 0) return 0;
+        if (pa < 0) return 1;
+        if (pb < 0) return -1;
+        return pb - pa;
+      });
     default:
       return copy.sort((a, b) =>
         (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""),
@@ -249,6 +271,7 @@ export function libraryFacets(games: Game[]): {
 /* --------------------------------- Comparativa --------------------------------- */
 
 export interface SharedGame {
+  id: string;
   title: string;
   iconUrl?: string;
   /** Progreso por jugador, en el mismo orden que las librerías recibidas. */
@@ -273,6 +296,7 @@ export function sharedGames(libraries: Library[]): SharedGame[] {
     if (others.some((g) => !g)) continue;
 
     rows.push({
+      id: game.id,
       title: game.title,
       iconUrl: game.iconUrl,
       progress: [game, ...(others as Game[])].map(gameProgress),
@@ -280,4 +304,53 @@ export function sharedGames(libraries: Library[]): SharedGame[] {
   }
 
   return rows.sort((a, b) => b.progress[0].percent - a.progress[0].percent);
+}
+
+/* ------------------------------ Juego base y DLC ------------------------------ */
+
+export interface RepartoDlc {
+  base: { earned: number; total: number };
+  dlc: { earned: number; total: number };
+  /** Si el juego tiene contenido descargable con trofeos. */
+  tieneDlc: boolean;
+  /** Platino conseguido y juego base al 100%, pero quedan trofeos de DLC. */
+  baseCompletoConDlcPendiente: boolean;
+}
+
+/**
+ * Separa lo que es del juego base de lo que viene en DLC.
+ *
+ * Importa porque el platino SOLO depende del juego base: se puede tener el
+ * platino y seguir con la barra al 77% porque faltan trofeos de expansiones.
+ * Sin distinguirlo, la ficha parece decir que te falta juego por terminar, y
+ * un aviso de "te queda 1 para el platino" se equivocaría contando trofeos
+ * que no cuentan para él.
+ *
+ * PSN agrupa los trofeos en "default" (el juego) y "001", "002"... (cada
+ * DLC). En Steam no hay grupos: todo llega junto y esto devuelve todo como
+ * base, que es lo honesto — no tenemos el dato.
+ */
+export function repartoDlc(trophies: Trophy[]): RepartoDlc {
+  const esDlc = (t: Trophy) => (t.groupId ?? "default") !== "default";
+
+  const base = trophies.filter((t) => !esDlc(t));
+  const dlc = trophies.filter(esDlc);
+
+  const cuenta = (lista: Trophy[]) => ({
+    earned: lista.filter((t) => t.earned).length,
+    total: lista.length,
+  });
+
+  const baseCuenta = cuenta(base);
+  const dlcCuenta = cuenta(dlc);
+
+  return {
+    base: baseCuenta,
+    dlc: dlcCuenta,
+    tieneDlc: dlcCuenta.total > 0,
+    baseCompletoConDlcPendiente:
+      baseCuenta.total > 0 &&
+      baseCuenta.earned === baseCuenta.total &&
+      dlcCuenta.total > dlcCuenta.earned,
+  };
 }

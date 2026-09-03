@@ -8,6 +8,7 @@ export interface ManualGameInput {
   igdbId: number;
   title: string;
   coverUrl?: string;
+  pegi?: string;
   genres?: string[];
   developer?: string;
   publisher?: string;
@@ -40,7 +41,7 @@ function slugDevice(deviceLabel: string): string {
  * del catálogo: si otro usuario ya añadió "Celeste" en Switch, esta reutiliza
  * esa fila y solo crea el progreso de este usuario.
  */
-export async function addManualGame(userId: string, input: ManualGameInput): Promise<string> {
+export async function addManualGame(userId: string, input: ManualGameInput, isWishlist = false): Promise<string> {
   const db = getDb();
   const id = gameKey("manual", `${input.igdbId}:${slugDevice(input.deviceLabel)}`);
 
@@ -57,9 +58,14 @@ export async function addManualGame(userId: string, input: ManualGameInput): Pro
       developer: input.developer,
       publisher: input.publisher,
       genres: input.genres ?? null,
+      pegi: input.pegi ?? null,
       metadataSyncedAt: new Date(),
     })
     .onConflictDoNothing({ target: games.id });
+
+  if (input.pegi) {
+    await db.update(games).set({ pegi: input.pegi }).where(eq(games.id, id));
+  }
 
   const progressPercent = input.completed ? 100 : 0;
   const earnedTotal = input.completed ? 1 : 0;
@@ -71,20 +77,23 @@ export async function addManualGame(userId: string, input: ManualGameInput): Pro
       gameId: id,
       progressPercent,
       earnedTotal,
-      lastPlayedAt: new Date(),
+      lastPlayedAt: isWishlist ? null : new Date(),
       trophiesSyncedAt: new Date(),
+      isWishlist,
     })
     .onConflictDoUpdate({
       target: [userGames.userId, userGames.gameId],
-      set: { progressPercent, earnedTotal, lastPlayedAt: new Date() },
+      set: { progressPercent, earnedTotal, isWishlist, lastPlayedAt: isWishlist ? null : new Date() },
     });
 
-  await db.insert(activities).values({
-    id: crypto.randomUUID(),
-    userId,
-    type: "new_game",
-    gameId: id,
-  });
+  if (!isWishlist) {
+    await db.insert(activities).values({
+      id: crypto.randomUUID(),
+      userId,
+      type: "new_game",
+      gameId: id,
+    });
+  }
 
   return id;
 }
@@ -109,4 +118,24 @@ export async function setManualGameCompleted(
       earnedTotal: completed ? 1 : 0,
     })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+}
+
+export async function getWishlistIgdbIds(userId: string): Promise<number[]> {
+  const db = getDb();
+  
+  const rows = await db
+    .select({ nativeId: games.nativeId })
+    .from(userGames)
+    .innerJoin(games, eq(userGames.gameId, games.id))
+    .where(
+      and(
+        eq(userGames.userId, userId),
+        eq(userGames.isWishlist, true),
+        eq(games.platform, "manual")
+      )
+    );
+
+  return rows
+    .map((r) => parseInt(r.nativeId.split(":")[0]))
+    .filter((id) => !isNaN(id));
 }

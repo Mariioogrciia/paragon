@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
+import { gameTrophies, games, userGames, userTrophies, syncRuns } from "@/db/schema";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
 import {
   fetchAchievements,
@@ -140,12 +140,26 @@ export async function syncLibrary(
   userId: string,
   account: SyncAccount,
 ): Promise<number> {
+  // Google, Xbox, Epic y Ubisoft no tienen lector propio todavía. Sin esta
+  // salida, "cualquier plataforma que no sea psn" caía por defecto en el
+  // lector de Steam y le pedía la biblioteca a Steam con, p. ej., un gamertag
+  // de Xbox — de ahí que su cuenta se vincule con `legible: false` (ver
+  // resolveXbox/resolveEpic/resolveUbisoft/resolveGoogle en profiles.ts), lo
+  // que ya evita llegar aquí. Se deja explícito por si algo cambia esa
+  // bandera sin tocar esto.
+  if (account.platform !== "psn" && account.platform !== "steam") return 0;
+
   const library =
     account.platform === "psn"
       ? await fetchPsnLibrary(account.accountId)
       : await fetchSteamLibrary(account.accountId);
 
   if (library.length === 0) return 0;
+
+  const before = await db
+    .select({ total: sql<number>`coalesce(sum(${userGames.earnedTotal}), 0)` })
+    .from(userGames)
+    .where(eq(userGames.userId, userId));
 
   await saveLibrary(userId, library);
 
@@ -158,6 +172,18 @@ export async function syncLibrary(
       await syncGameTrophies(userId, account, game.id);
     });
   }
+
+  const after = await db
+    .select({ total: sql<number>`coalesce(sum(${userGames.earnedTotal}), 0)` })
+    .from(userGames)
+    .where(eq(userGames.userId, userId));
+  await db.insert(syncRuns).values({
+    id: crypto.randomUUID(),
+    userId,
+    platform: account.platform,
+    games: library.length,
+    newTrophies: Math.max(0, Number(after[0]?.total ?? 0) - Number(before[0]?.total ?? 0)),
+  });
 
   return library.length;
 }
@@ -181,6 +207,8 @@ async function saveTrophies(
           grade: t.grade ?? null,
           hidden: t.hidden ?? false,
           iconUrl: t.iconUrl,
+          groupId: t.groupId ?? "default",
+          groupName: t.groupName ?? null,
         })),
       )
       .onConflictDoUpdate({
@@ -189,6 +217,8 @@ async function saveTrophies(
           name: sqlExcluded("name"),
           detail: sqlExcluded("detail"),
           iconUrl: sqlExcluded("iconUrl"),
+          groupId: sqlExcluded("groupId"),
+          groupName: sqlExcluded("groupName"),
         },
       });
 
@@ -244,6 +274,7 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
       developer: metadata.developer ?? null,
       publisher: metadata.publisher ?? null,
       genres: metadata.genres ?? null,
+      pegi: metadata.pegi ?? null,
       // La carátula buena es la que da la tienda, con su hash. La ruta clásica
       // (cdn.../steam/apps/<id>/header.jpg) devuelve un placeholder de 1 KB en
       // los juegos recientes — por eso Battlefield 6 salía sin foto.
@@ -251,6 +282,45 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
       metadataSyncedAt: new Date(),
     })
     .where(eq(games.id, gameId));
+}
+
+import { searchGames } from "@/lib/igdb/client";
+
+async function syncIgdbMetadata(gameId: string, title: string): Promise<void> {
+  const [row] = await db
+    .select({ syncedAt: games.metadataSyncedAt })
+    .from(games)
+    .where(eq(games.id, gameId))
+    .limit(1);
+
+  if (row?.syncedAt) return;
+
+  try {
+    const results = await searchGames(title, 1);
+    const metadata = results[0];
+    
+    // We mark it as synced even if we found nothing, so we don't query IGDB every time.
+    if (!metadata) {
+      await db.update(games).set({ metadataSyncedAt: new Date() }).where(eq(games.id, gameId));
+      return;
+    }
+
+    await db
+      .update(games)
+      .set({
+        developer: metadata.developer ?? null,
+        publisher: metadata.publisher ?? null,
+        genres: metadata.genres ?? null,
+        pegi: metadata.pegi ?? null,
+        // Optional: only update coverUrl if the game doesn't have an icon yet, or overwrite it?
+        // PSN already gives a good iconUrl in the library. Let's keep the IGDB one if provided.
+        ...(metadata.coverUrl ? { iconUrl: metadata.coverUrl } : {}),
+        metadataSyncedAt: new Date(),
+      })
+      .where(eq(games.id, gameId));
+  } catch (error) {
+    console.error("Error fetching IGDB metadata:", error);
+  }
 }
 
 /**
@@ -271,7 +341,7 @@ export async function syncGameTrophies(
 
   if (platform === "psn") {
     const [row] = await db
-      .select({ service: games.service })
+      .select({ service: games.service, title: games.title })
       .from(games)
       .where(eq(games.id, gameId))
       .limit(1);
@@ -281,6 +351,10 @@ export async function syncGameTrophies(
       nativeId,
       row?.service ?? "trophy2",
     );
+    
+    if (row?.title) {
+      await syncIgdbMetadata(gameId, row.title);
+    }
   } else {
     trophies = await fetchAchievements(account.accountId, nativeId);
     await syncStoreMetadata(gameId, nativeId);

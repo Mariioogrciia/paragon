@@ -17,6 +17,16 @@ const LOGGED_IN_NAV = [
     href: "/amigos",
     match: (p: string) => p.startsWith("/amigos") || p.startsWith("/comparar"),
   },
+  {
+    label: "Planificador",
+    href: "/planificador",
+    match: (p: string) => p.startsWith("/planificador"),
+  },
+  {
+    label: "Rankings",
+    href: "/rankings",
+    match: (p: string) => p.startsWith("/rankings"),
+  },
 ];
 
 const LOGGED_OUT_NAV = [
@@ -26,13 +36,17 @@ const LOGGED_OUT_NAV = [
 
 export function Header({
   user,
+  avisosSinLeer = 0,
 }: {
   user: {
     handle: string | null;
     name: string;
     image?: string | null;
-    trophyLevel?: number | null;
+    paragonLevel?: number | null;
+    paragonProgress?: number | null;
   } | null;
+  /** Avisos pendientes, para el punto de la campana. */
+  avisosSinLeer?: number;
 }) {
   const pathname = usePathname();
 
@@ -46,30 +60,14 @@ export function Header({
     >
       <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-[30px] px-7">
         <Link href="/" className="flex items-center gap-2.5">
-          <span
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-[9px]"
+          <img
+            src="/logo.jpg"
+            alt="Paragon"
+            className="h-[30px] w-[30px] rounded-[9px]"
             style={{
-              background: "linear-gradient(150deg, var(--accent-2), var(--accent) 70%)",
               boxShadow: "0 0 18px rgb(var(--accent-rgb) / 0.45)",
             }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ color: "#08111f" }}>
-              <path
-                d="M7 4h10v5a5 5 0 0 1-10 0V4Z"
-                fill="currentColor"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M7 5H4v1.5A3.5 3.5 0 0 0 7.5 10M17 5h3v1.5A3.5 3.5 0 0 1 16.5 10"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path d="M12 14v3m-3.5 3h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </span>
+          />
           <span className="font-heading text-[18px] font-bold tracking-[0.06em]">PARAGON</span>
         </Link>
 
@@ -96,21 +94,48 @@ export function Header({
         </nav>
 
         <div className="ml-auto flex items-center gap-3.5">
+          {user && (
+            <Link
+              href="/avisos"
+              aria-label={
+                avisosSinLeer > 0 ? `Avisos: ${avisosSinLeer} sin leer` : "Avisos"
+              }
+              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground"
+              style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+
+              {/* Solo el punto, sin número: el número exacto ya está dentro, y
+                  aquí lo único que importa es si hay algo o no. */}
+              {avisosSinLeer > 0 && (
+                <span
+                  className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full"
+                  style={{ background: "var(--accent)", border: "2px solid var(--background)" }}
+                />
+              )}
+            </Link>
+          )}
+
           <ThemeCustomizer />
 
           {user ? (
             <>
-              {user.trophyLevel != null && (
-                <span
+              {user.paragonLevel != null && (
+                <Link
+                  href={user.handle ? `/u/${user.handle}#nivel-paragon` : "/"}
                   className="hidden items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3 sm:flex"
                   style={{ background: "var(--surface)", border: "1px solid #202836" }}
+                  title="Ver progreso del nivel Paragon"
                 >
                   <span
                     className="h-[26px] w-[26px] rounded-full"
-                    style={{ background: "conic-gradient(var(--accent) 0turn, var(--accent) 0.68turn, #212a3a 0.68turn, #212a3a 1turn)" }}
+                    style={{ background: `conic-gradient(var(--accent) 0%, var(--accent) ${user.paragonProgress ?? 0}%, #212a3a ${user.paragonProgress ?? 0}%, #212a3a 100%)` }}
                   />
-                  <span className="font-heading text-sm font-bold tracking-[0.04em]">NV {user.trophyLevel}</span>
-                </span>
+                  <span className="font-heading text-sm font-bold tracking-[0.04em]">NV {user.paragonLevel}</span>
+                </Link>
               )}
               <Link
                 href="/ajustes"

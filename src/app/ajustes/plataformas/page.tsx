@@ -1,12 +1,22 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { signOutAction, syncNowAction, unlinkAccountAction } from "@/app/actions";
+import { signOutAction, syncNowAction, syncPlatformAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, ProfileSettingsForm } from "@/components/forms/Forms";
+import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, LinkXboxForm, LinkEpicForm, LinkUbisoftForm, ProfileSettingsForm } from "@/components/forms/Forms";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 import { PLATFORM_LABEL, type AccountPlatform, type PlatformAccount } from "@/lib/types";
+import { getSyncHistory } from "@/lib/syncHistory";
+import {
+  PlayStationLogo,
+  SteamLogo,
+  GooglePlayLogo,
+  XboxLogo,
+  EpicGamesLogo,
+  UbisoftLogo,
+  NintendoLogo,
+} from "@/components/ui/PlatformLogos";
 
 export const metadata = { title: "Ajustes · Paragon" };
 
@@ -16,6 +26,9 @@ const AVATAR_BG: Record<AccountPlatform, string> = {
   psn: "linear-gradient(150deg, #2f7ad6, #6b3fd4)",
   steam: "linear-gradient(150deg, #2f7d9d, #1b2838)",
   google: "linear-gradient(150deg, #34A853, #4285F4)",
+  xbox: "linear-gradient(150deg, #107C10, #16a316)",
+  epic: "linear-gradient(150deg, #313131, #000000)",
+  ubisoft: "linear-gradient(150deg, #0070FF, #004ecc)",
 };
 
 const HELP: Record<AccountPlatform, string> = {
@@ -27,6 +40,12 @@ const HELP: Record<AccountPlatform, string> = {
     "perfil» y «Detalles del juego» tienen que estar en público.",
   google:
     "Tu cuenta de Google Play Games. Se sincronizan los logros de los juegos compatibles con la plataforma móvil.",
+  xbox:
+    "Tu Gamertag de Xbox. La vinculación sincroniza tu historial en ecosistemas Microsoft (en fase de desarrollo).",
+  epic:
+    "Tu nombre de usuario de Epic Games. Sincronización de biblioteca mediante proxy no oficial (en fase de desarrollo).",
+  ubisoft:
+    "Tu usuario de Ubisoft Connect. Se requiere tener la privacidad del perfil público (en fase de desarrollo).",
 };
 
 /** Ficha de una plataforma: vinculada o no, siempre con su formulario debajo. */
@@ -48,7 +67,12 @@ function PlatformSection({
           className="font-heading flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-lg font-bold shadow-md text-white"
           style={{ background: AVATAR_BG[platform] }}
         >
-          {PLATFORM_LABEL[platform].charAt(0)}
+          {platform === "psn" && <PlayStationLogo className="w-5 h-5" />}
+          {platform === "steam" && <SteamLogo className="w-5 h-5" />}
+          {platform === "google" && <GooglePlayLogo className="w-5 h-5" />}
+          {platform === "xbox" && <XboxLogo className="w-5 h-5" />}
+          {platform === "epic" && <EpicGamesLogo className="w-5 h-5" />}
+          {platform === "ubisoft" && <UbisoftLogo className="w-5 h-5" />}
         </span>
         <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">
           {PLATFORM_LABEL[platform]}
@@ -57,38 +81,45 @@ function PlatformSection({
 
       {account && (
         <div
-          className="mb-4 flex items-center gap-3.5 rounded-[14px] p-4"
+          className="mb-4 flex flex-col gap-3 rounded-[14px] p-4"
           style={{ border: "1px solid var(--border)", background: "var(--background)" }}
         >
-          <span
-            className="font-heading flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[13px] text-lg font-bold"
-            style={{ background: AVATAR_BG[platform] }}
-          >
-            {account.username.charAt(0).toUpperCase()}
-          </span>
-
-          <div className="min-w-0">
-            <p className="truncate text-[15px] font-semibold">{account.username}</p>
-            <p className="mt-0.5 text-xs text-muted">
-              {account.level !== null ? `Nivel ${account.level}` : "Cuenta vinculada"}
-              {sincronizado && ` · sincronizado ${sincronizado}`}
-            </p>
+          <div className="flex items-center gap-3">
+            <span
+              className="font-heading flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[12px] text-lg font-bold"
+              style={{ background: AVATAR_BG[platform] }}
+            >
+              {account.username.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[15px] font-semibold" title={account.username}>
+                {account.username}
+              </p>
+            </div>
+            <span
+              className="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em]"
+              style={
+                account.isPublic
+                  ? { background: "rgba(78, 201, 138, 0.12)", border: "1px solid rgba(78, 201, 138, 0.3)", color: "#4ec98a" }
+                  : { background: "rgba(226, 181, 62, 0.12)", border: "1px solid rgba(226, 181, 62, 0.3)", color: "#e2b53e" }
+              }
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ background: account.isPublic ? "#4ec98a" : "#e2b53e" }}
+              />
+              {account.isPublic ? "Vinculado" : "Privado"}
+            </span>
           </div>
 
-          <span
-            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em]"
-            style={
-              account.isPublic
-                ? { background: "rgba(78, 201, 138, 0.12)", border: "1px solid rgba(78, 201, 138, 0.3)", color: "#4ec98a" }
-                : { background: "rgba(226, 181, 62, 0.12)", border: "1px solid rgba(226, 181, 62, 0.3)", color: "#e2b53e" }
-            }
-          >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ background: account.isPublic ? "#4ec98a" : "#e2b53e" }}
-            />
-            {account.isPublic ? "Vinculado" : "Privado"}
-          </span>
+          <p className="text-xs text-muted leading-relaxed">
+            {account.level !== null ? `Nivel ${account.level}` : "Cuenta vinculada"}
+            {sincronizado && ` · sincronizado ${sincronizado}`}
+          </p>
+          <form action={syncPlatformAction} className="mt-2">
+            <input type="hidden" name="platform" value={platform} />
+            <button className="text-xs font-semibold text-accent hover:underline">Sincronizar {PLATFORM_LABEL[platform]}</button>
+          </form>
         </div>
       )}
 
@@ -121,7 +152,11 @@ export default async function AjustesPlataformasPage() {
   const psn = accountFor(profile, "psn");
   const steam = accountFor(profile, "steam");
   const google = accountFor(profile, "google");
+  const xbox = accountFor(profile, "xbox");
+  const epic = accountFor(profile, "epic");
+  const ubisoft = accountFor(profile, "ubisoft");
   const carpetas = await listCollections(session.user.id);
+  const historial = await getSyncHistory(session.user.id);
 
   return (
     <div className="flex flex-col gap-8">
@@ -142,6 +177,36 @@ export default async function AjustesPlataformasPage() {
         <PlatformSection platform="google" account={google}>
           <LinkGoogleForm current={google?.username} />
         </PlatformSection>
+
+        <PlatformSection platform="xbox" account={xbox}>
+          <LinkXboxForm current={xbox?.username} />
+        </PlatformSection>
+
+        <PlatformSection platform="epic" account={epic}>
+          <LinkEpicForm current={epic?.username} />
+        </PlatformSection>
+        
+        <PlatformSection platform="ubisoft" account={ubisoft}>
+          <LinkUbisoftForm current={ubisoft?.username} />
+        </PlatformSection>
+
+        <section className="mt-3.5 rounded-[18px] p-6 flex flex-col" style={CARD}>
+          <div className="flex items-center gap-3 mb-4 opacity-50">
+            <span
+              className="font-heading flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] shadow-md text-white"
+              style={{ background: "linear-gradient(150deg, #E60012, #a8000d)" }}
+            >
+              <NintendoLogo className="w-5 h-5" />
+            </span>
+            <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">Nintendo Switch</h2>
+          </div>
+          <div className="mt-auto pt-4 border-t border-white/5">
+            <p className="text-xs text-muted mb-2 font-semibold text-danger">Ecosistema cerrado</p>
+            <p className="text-xs text-muted">
+              Nintendo Switch no tiene sistema de trofeos propio ni API de actividad jugable.
+            </p>
+          </div>
+        </section>
       </div>
 
       <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
@@ -181,6 +246,20 @@ export default async function AjustesPlataformasPage() {
               calcula juego a juego. Al sincronizar se traen los más recientes y
               el resto se completa solo la primera vez que abres su ficha.
             </p>
+          </div>
+        </section>
+      )}
+
+      {historial.length > 0 && (
+        <section className="rounded-[18px] p-6" style={CARD}>
+          <h2 className="font-heading mb-4 text-[17px] font-bold tracking-[0.03em]">Historial de sincronización</h2>
+          <div className="space-y-2">
+            {historial.map((run) => (
+              <div key={run.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-xs">
+                <span className="font-semibold">{PLATFORM_LABEL[run.platform as AccountPlatform] ?? run.platform}</span>
+                <span className="text-muted">{run.games} juegos · {run.newTrophies} trofeos nuevos · {run.createdAt.toLocaleString("es-ES")}</span>
+              </div>
+            ))}
           </div>
         </section>
       )}

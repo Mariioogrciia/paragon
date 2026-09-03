@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities } from "@/db/schema";
+import { users, userGames, activities, activityComments, activityReactions } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import {
@@ -14,15 +14,20 @@ import {
 } from "@/lib/collections";
 import {
   acceptFriendRequest,
+  accountFor,
+  getProfileByUserId,
   isHandleTaken,
   linkAccount,
   removeFriend,
   resyncLibraries,
+  resyncPlatform,
   sendFriendRequest,
   setHandle,
   setProfileInfo,
   unlinkAccount,
 } from "@/lib/profiles";
+import { syncGameTrophies } from "@/lib/sync";
+import { parseGameKey } from "@/lib/types";
 import { PsnProfileNotFoundError } from "@/lib/psn/client";
 import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
 import {
@@ -31,6 +36,7 @@ import {
   SteamProfileNotFoundError,
 } from "@/lib/steam/client";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
+import { marcarTodoLeido } from "@/lib/notifications";
 import type { AccountPlatform } from "@/lib/types";
 
 export interface ActionState {
@@ -137,6 +143,21 @@ const PLATFORM_COPY: Record<
     missing: "Escribe tu correo electrónico asociado a Google Play.",
     privado: (nombre) => `Perfil privado.`,
   },
+  xbox: {
+    field: "gamertag",
+    missing: "Escribe tu Gamertag de Xbox.",
+    privado: (nombre) => `Perfil privado o no encontrado.`,
+  },
+  epic: {
+    field: "username",
+    missing: "Escribe tu nombre de usuario de Epic Games.",
+    privado: (nombre) => `Perfil privado o no encontrado.`,
+  },
+  ubisoft: {
+    field: "username",
+    missing: "Escribe tu nombre de usuario de Ubisoft Connect.",
+    privado: (nombre) => `Perfil privado o no encontrado.`,
+  },
 };
 
 async function linkPlatform(
@@ -184,11 +205,32 @@ export async function linkGoogleAction(
   return linkPlatform("google", formData);
 }
 
+export async function linkXboxAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  return linkPlatform("xbox", formData);
+}
+
+export async function linkEpicAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  return linkPlatform("epic", formData);
+}
+
+export async function linkUbisoftAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  return linkPlatform("ubisoft", formData);
+}
+
 export async function unlinkAccountAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   const platform = String(formData.get("platform") ?? "") as AccountPlatform;
 
-  if (platform !== "psn" && platform !== "steam") return;
+  if (!["psn", "steam", "google", "xbox", "epic", "ubisoft"].includes(platform)) return;
 
   await unlinkAccount(userId, platform);
   revalidatePath("/", "layout");
@@ -197,6 +239,14 @@ export async function unlinkAccountAction(formData: FormData): Promise<void> {
 export async function syncNowAction(): Promise<void> {
   const userId = await requireUserId();
   await resyncLibraries(userId);
+  revalidatePath("/", "layout");
+}
+
+export async function syncPlatformAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const platform = String(formData.get("platform")) as AccountPlatform;
+  if (!["psn", "steam", "google", "xbox", "epic", "ubisoft"].includes(platform)) return;
+  await resyncPlatform(userId, platform);
   revalidatePath("/", "layout");
 }
 
@@ -336,12 +386,36 @@ export async function writeReviewAction(gameId: string, review: string, dateStr:
   revalidatePath('/', 'layout');
 }
 
+export async function toggleActivityReactionAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const activityId = String(formData.get("activityId") ?? "");
+  if (!activityId) return;
+  const database = getDb();
+  const [existing] = await database.select({ userId: activityReactions.userId }).from(activityReactions).where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId))).limit(1);
+  if (existing) {
+    await database.delete(activityReactions).where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId)));
+  } else {
+    await database.insert(activityReactions).values({ activityId, userId });
+  }
+  revalidatePath("/", "layout");
+}
+
+export async function addActivityCommentAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const activityId = String(formData.get("activityId") ?? "");
+  const body = String(formData.get("body") ?? "").trim().slice(0, 500);
+  if (!activityId || !body) return;
+  await getDb().insert(activityComments).values({ id: crypto.randomUUID(), activityId, userId, body });
+  revalidatePath("/", "layout");
+}
+
 /* ---------------------------------- Juegos manuales --------------------------------- */
 
 export interface AddManualGameInput {
   igdbId: number;
   title: string;
   coverUrl?: string;
+  pegi?: string;
   genres?: string[];
   developer?: string;
   publisher?: string;
@@ -369,10 +443,90 @@ export async function addManualGameAction(input: AddManualGameInput): Promise<Ac
   return { success: `${input.title} añadido a tu biblioteca.` };
 }
 
+export async function addToWishlistAction(input: AddManualGameInput): Promise<ActionState> {
+  const userId = await requireUserId();
+
+  if (!input.title.trim() || !Number.isFinite(input.igdbId)) {
+    return { error: "Elige un juego de los resultados." };
+  }
+
+  await addManualGame(userId, {
+    ...input,
+    deviceLabel: input.deviceLabel.trim() || "Deseados",
+  }, true);
+
+  revalidatePath("/", "layout");
+
+  return { success: `${input.title} añadido a tu lista de deseados.` };
+}
+
 export async function setManualGameCompletedAction(gameId: string, completed: boolean): Promise<void> {
   const userId = await requireUserId();
   await setManualGameCompleted(userId, gameId, completed);
   revalidatePath("/", "layout");
+}
+
+/* ------------------------------------- Avisos ------------------------------------ */
+
+export async function marcarLeidoAction(): Promise<void> {
+  const userId = await requireUserId();
+  await marcarTodoLeido(userId);
+  revalidatePath("/", "layout");
+}
+
+/* ---------------------------------- Modo enfoque --------------------------------- */
+
+export interface RefrescoJuego {
+  /** Trofeos nuevos desde la última comprobación. Negativo nunca: solo suben. */
+  nuevos: number;
+  error?: string;
+}
+
+/**
+ * Vuelve a pedir los trofeos de UN juego a su plataforma.
+ *
+ * Es lo que hace útil el modo enfoque como segunda pantalla: acabas de sacar
+ * un trofeo en la tele y quieres verlo aquí sin esperar al cron ni
+ * resincronizar la biblioteca entera (que son decenas de segundos). Esto es
+ * una sola llamada, la del juego que tienes delante.
+ */
+export async function refrescarJuegoAction(gameId: string): Promise<RefrescoJuego> {
+  const userId = await requireUserId();
+  const db = getDb();
+
+  const [antes] = await db
+    .select({ earnedTotal: userGames.earnedTotal })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  if (!antes) return { nuevos: 0, error: "Ese juego no está en tu biblioteca." };
+
+  const profile = await getProfileByUserId(userId);
+  const { platform } = parseGameKey(gameId);
+
+  if (platform === "manual") {
+    return { nuevos: 0, error: "Un juego añadido a mano no tiene nada que sincronizar." };
+  }
+
+  const account = accountFor(profile, platform);
+  if (!account) return { nuevos: 0, error: "No tienes vinculada esa plataforma." };
+
+  try {
+    await syncGameTrophies(userId, { platform, accountId: account.accountId }, gameId);
+  } catch (error) {
+    return { nuevos: 0, error: describeError(error) };
+  }
+
+  const [despues] = await db
+    .select({ earnedTotal: userGames.earnedTotal })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  revalidatePath("/", "layout");
+
+  return { nuevos: Math.max(0, (despues?.earnedTotal ?? 0) - antes.earnedTotal) };
 }
 
 export async function setFavoritesAction(gameIds: string[]) {
@@ -385,4 +539,20 @@ export async function setFavoritesAction(gameIds: string[]) {
     .where(eq(users.id, userId));
 
   revalidatePath('/', 'layout');
+}
+
+export async function searchTrophyGuideAction(gameTitle: string, trophyName: string) {
+  try {
+    const query = encodeURIComponent(`${gameTitle} ${trophyName} trophy guide`);
+    const res = await fetch(`https://www.youtube.com/results?search_query=${query}`);
+    if (!res.ok) return null;
+    
+    const html = await res.text();
+    // YouTube's initial data contains video IDs like "videoId":"XXXXXXXXXXX"
+    const match = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+    return match ? match[1] : null;
+  } catch (error) {
+    console.error("Error fetching guide from YouTube", error);
+    return null;
+  }
 }

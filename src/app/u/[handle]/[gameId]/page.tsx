@@ -12,8 +12,10 @@ import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
 import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
 import { getCommunityRating } from "@/lib/ratings";
-import { gameProgress, nextSteps } from "@/lib/stats";
+import { gameProgress, nextSteps, repartoDlc } from "@/lib/stats";
+import { dificultadDeJuego } from "@/lib/difficulty";
 import type { Trophy } from "@/lib/types";
+import { Pegi } from "@/components/Pegi";
 
 function ProximoRow({ trophy }: { trophy: Trophy }) {
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
@@ -88,8 +90,18 @@ export default async function JuegoPage({
   const carpetas = esMio ? await listCollections(profile.userId) : [];
   const valoracion = await getCommunityRating(game.id);
 
+  // El platino solo depende del juego base: contar también los trofeos de DLC
+  // inflaba "lo que te falta" con cosas que no cuentan para él.
+  const reparto = repartoDlc(game.trophies);
+  const dificultad = dificultadDeJuego(game.trophies);
+  const faltanBase = reparto.base.total - reparto.base.earned;
+
   const faltanParaPlatino =
-    progress.hasPlatinum && !progress.platinumEarned ? progress.total - progress.earned : null;
+    progress.hasPlatinum && !progress.platinumEarned
+      ? reparto.base.total > 0
+        ? faltanBase
+        : progress.total - progress.earned
+      : null;
 
   return (
     <div className="-mx-7 -mt-9">
@@ -128,6 +140,7 @@ export default async function JuegoPage({
                 >
                   {game.deviceLabel}
                 </span>
+                {game.pegi && <Pegi edad={game.pegi} size="md" />}
                 {played && `Jugado ${played}`}
               </p>
 
@@ -189,6 +202,31 @@ export default async function JuegoPage({
                 <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
                   Trofeos para el platino
                 </p>
+                {reparto.tieneDlc && (
+                  <p className="mt-2 text-[11px] text-muted">
+                    Sin contar {reparto.dlc.total - reparto.dlc.earned} de DLC, que no
+                    cuentan para el platino.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Platino hecho pero quedan trofeos: son de DLC, y sin decirlo
+                la barra al 77% parece que falta juego por terminar. */}
+            {reparto.baseCompletoConDlcPendiente && (
+              <div
+                className="rounded-[18px] p-[22px]"
+                style={{ border: "1px solid var(--border)", background: "rgba(13, 19, 28, 0.75)", backdropFilter: "blur(8px)" }}
+              >
+                <p className="font-heading text-5xl font-bold leading-[0.9] text-platinum lg:text-[56px]">
+                  {reparto.dlc.total - reparto.dlc.earned}
+                </p>
+                <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
+                  Trofeos de DLC pendientes
+                </p>
+                <p className="mt-2 text-[11px] text-muted">
+                  El juego base está al 100%: lo que queda son expansiones.
+                </p>
               </div>
             )}
           </div>
@@ -196,6 +234,54 @@ export default async function JuegoPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-9">
+        {dificultad && (
+          <section
+            className="rounded-[18px] p-5"
+            style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+          >
+            <h2 className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+              Dificultad estimada {dificultad.desdePlatino ? "del platino" : "del 100%"}
+            </h2>
+
+            <div className="flex flex-wrap items-center gap-3.5">
+              <span
+                className="rounded-lg px-3 py-1.5 text-[15px] font-bold text-white"
+                style={{ background: dificultad.color }}
+              >
+                {dificultad.etiqueta}
+              </span>
+
+              {/* Seis barritas: la escala se ve de un vistazo sin tener que
+                  saber qué significa un 0,4%. */}
+              <span className="flex items-center gap-1" aria-hidden="true">
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <span
+                    key={n}
+                    className="h-4 w-2 rounded-sm"
+                    style={{
+                      background: n <= dificultad.nivel ? dificultad.color : "var(--border)",
+                    }}
+                  />
+                ))}
+              </span>
+
+              <span className="text-[13px] text-muted">
+                Solo el{" "}
+                <strong style={{ color: "var(--foreground)" }}>
+                  {dificultad.rareza.toFixed(1)}%
+                </strong>{" "}
+                de quienes lo juegan lo consigue
+              </span>
+            </div>
+
+            <p className="mt-3 text-[11px] leading-relaxed text-muted">
+              Estimada a partir de la rareza, que mezcla dificultad, duración y
+              cuánta gente abandona el juego. No mide habilidad: un platino
+              largo y fácil puede ser más raro que uno corto e imposible.
+            </p>
+          </section>
+        )}
+
         <section
           className="rounded-[18px] p-5"
           style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
@@ -230,7 +316,7 @@ export default async function JuegoPage({
                     {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
                   </div>
                   <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
-                    "{game.review}"
+                    &quot;{game.review}&quot;
                   </p>
                 </div>
               )
@@ -242,7 +328,7 @@ export default async function JuegoPage({
 
         {siguientes.length > 0 && (
           <section>
-            <div className="mb-1.5 flex items-center gap-3">
+            <div className="mb-1.5 flex flex-wrap items-center gap-3">
               <h2 className="font-heading text-2xl font-bold">Próximos pasos</h2>
               <span
                 className="rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em]"
@@ -250,6 +336,18 @@ export default async function JuegoPage({
               >
                 Lo más a mano
               </span>
+
+              {/* Solo para el dueño: el modo enfoque sincroniza contra la
+                  plataforma, así que en un perfil ajeno no pinta nada. */}
+              {esMio && (
+                <Link
+                  href={`/u/${handle}/${gameId}/enfoque`}
+                  className="ml-auto rounded-[10px] px-3.5 py-2 text-[13px] font-bold text-background"
+                  style={{ background: "var(--accent-grad)" }}
+                >
+                  Modo enfoque
+                </Link>
+              )}
             </div>
             <p className="mb-4 text-[13px] text-muted">
               Ordenado por lo que más gente consigue. El platino va siempre al
@@ -273,7 +371,7 @@ export default async function JuegoPage({
                 {progress.earned} de {progress.total} conseguidos
               </span>
             </div>
-            <TrophyList trophies={game.trophies} />
+            <TrophyList trophies={game.trophies} gameTitle={game.title} />
           </section>
         )}
       </div>

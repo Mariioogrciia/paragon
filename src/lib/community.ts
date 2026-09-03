@@ -3,6 +3,7 @@ import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, userGames, users } from "@/db/schema";
 import type { Platform } from "@/lib/types";
+import { getGame } from "@/lib/igdb/client";
 
 /**
  * Ficha global de un juego: `/juego/[id]`.
@@ -28,6 +29,8 @@ export interface GlobalGame {
   developer?: string;
   publisher?: string;
   genres?: string[];
+  pegi?: string;
+  summary?: string;
   hasPlatinum: boolean;
 }
 
@@ -42,13 +45,32 @@ export async function getGlobalGame(gameId: string): Promise<GlobalGame | null> 
       developer: gamesTable.developer,
       publisher: gamesTable.publisher,
       genres: gamesTable.genres,
+      pegi: gamesTable.pegi,
       defined: gamesTable.defined,
     })
     .from(gamesTable)
     .where(eq(gamesTable.id, gameId))
     .limit(1);
 
-  if (!row) return null;
+  if (!row) {
+    const igdbId = Number(gameId);
+    if (!Number.isInteger(igdbId)) return null;
+    const catalogGame = await getGame(igdbId);
+    if (!catalogGame) return null;
+    return {
+      id: `manual-${catalogGame.igdbId}:deseados`,
+      platform: "manual",
+      title: catalogGame.title,
+      deviceLabel: catalogGame.platforms.join(", ") || "Catálogo IGDB",
+      iconUrl: catalogGame.coverUrl,
+      developer: catalogGame.developer,
+      publisher: catalogGame.publisher,
+      genres: catalogGame.genres,
+      pegi: catalogGame.pegi,
+      summary: catalogGame.summary,
+      hasPlatinum: false,
+    };
+  }
 
   return {
     id: row.id,
@@ -59,6 +81,7 @@ export async function getGlobalGame(gameId: string): Promise<GlobalGame | null> 
     developer: row.developer ?? undefined,
     publisher: row.publisher ?? undefined,
     genres: row.genres ?? undefined,
+    pegi: row.pegi ?? undefined,
     hasPlatinum: Boolean((row.defined as Record<string, number> | null)?.platinum),
   };
 }

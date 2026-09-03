@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { addManualGameAction, type AddManualGameInput } from "@/app/actions";
+import { addManualGameAction, addToWishlistAction, type AddManualGameInput } from "@/app/actions";
+import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Pegi } from "@/components/Pegi";
 
 interface SearchResult {
   igdbId: number;
   title: string;
   coverUrl?: string;
+  pegi?: string;
   releaseDate?: string;
   platforms: string[];
   genres: string[];
@@ -43,13 +46,16 @@ export function AddManualGameModal() {
   const [completed, setCompleted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
     if (query.trim().length < 2) {
-      setResults([]);
-      setSearchError(null);
+      setTimeout(() => {
+        setResults([]);
+        setSearchError(null);
+      }, 0);
       return;
     }
 
@@ -104,6 +110,7 @@ export function AddManualGameModal() {
       igdbId: picked.igdbId,
       title: picked.title,
       coverUrl: picked.coverUrl,
+      pegi: picked.pegi,
       genres: picked.genres,
       developer: picked.developer,
       publisher: picked.publisher,
@@ -176,24 +183,44 @@ export function AddManualGameModal() {
 
               <div className="flex flex-col gap-1.5">
                 {results.map((game) => (
-                  <button
+                  <div
                     key={game.igdbId}
-                    onClick={() => setPicked(game)}
-                    className="flex items-center gap-3 p-2 text-left transition-colors rounded-xl hover:bg-surface-2"
+                    className="flex items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-surface-2"
                   >
                     <div className="w-10 h-14 overflow-hidden rounded-md shrink-0 bg-surface-2">
                       {game.coverUrl && (
                         <img src={game.coverUrl} alt="" className="object-cover w-full h-full" />
                       )}
                     </div>
-                    <div className="min-w-0">
+                    <button onClick={() => setPicked(game)} className="min-w-0 flex-1 text-left">
                       <p className="text-sm font-semibold truncate">{game.title}</p>
                       <p className="text-xs truncate text-muted">
                         {game.releaseDate ? new Date(game.releaseDate).getFullYear() : "Sin fecha"}
                         {game.platforms.length > 0 && ` · ${game.platforms.slice(0, 3).join(", ")}`}
                       </p>
-                    </div>
-                  </button>
+                      {game.pegi && <span className="mt-1 block"><Pegi edad={game.pegi} /></span>}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const result = await addToWishlistAction({
+                          igdbId: game.igdbId,
+                          title: game.title,
+                          coverUrl: game.coverUrl,
+                          pegi: game.pegi,
+                          genres: game.genres,
+                          developer: game.developer,
+                          publisher: game.publisher,
+                          deviceLabel: "Deseados",
+                          completed: false,
+                        });
+                        if (!result.error) setWishlistIds((ids) => [...ids, game.igdbId]);
+                      }}
+                      disabled={wishlistIds.includes(game.igdbId)}
+                      className="shrink-0 text-[11px] font-bold text-accent disabled:text-good"
+                    >
+                      {wishlistIds.includes(game.igdbId) ? "✓ Deseado" : "+ Deseados"}
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -211,6 +238,7 @@ export function AddManualGameModal() {
                 <p className="text-xs text-muted">
                   {picked.developer ?? picked.publisher ?? "Catálogo IGDB"}
                 </p>
+                {picked.pegi && <div className="mt-1"><Pegi edad={picked.pegi} /></div>}
                 <button
                   onClick={() => setPicked(null)}
                   className="mt-2 text-xs font-semibold text-accent hover:underline"
@@ -224,17 +252,12 @@ export function AddManualGameModal() {
               <label className="text-xs font-semibold uppercase tracking-wide text-muted">
                 ¿En qué lo has jugado?
               </label>
-              <select
+              <CustomSelect
                 value={device}
-                onChange={(e) => setDevice(e.target.value)}
-                className="w-full px-3 py-2 mt-1.5 text-sm border rounded-xl bg-background border-border outline-none focus:border-accent"
-              >
-                {DEVICE_OPTIONS.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
+                onChange={setDevice}
+                options={DEVICE_OPTIONS.map((d) => ({ value: d, label: d }))}
+                className="mt-1.5"
+              />
               {device === "Otro" && (
                 <input
                   autoFocus

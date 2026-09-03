@@ -4,6 +4,7 @@ import { coverGradient, monogram, relativeDate } from "@/lib/design";
 import { gameProgress } from "@/lib/stats";
 import type { Game } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
+import { Pegi } from "./Pegi";
 
 /**
  * Fila compacta de juego, como "Jugado recientemente" del panel: icono
@@ -38,6 +39,7 @@ export function GameRow({ game, href }: { game: Game; href: string }) {
             {game.deviceLabel}
             {played && ` · ${played}`}
           </span>
+          {game.pegi && <span className="mt-1 block"><Pegi edad={game.pegi} /></span>}
         </span>
 
         <span className="hidden items-center gap-3 sm:flex">

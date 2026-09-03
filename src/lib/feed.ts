@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
-import { activities, users, games } from "@/db/schema";
-import { inArray, desc, eq } from "drizzle-orm";
+import { activities, users, games, activityComments, activityReactions } from "@/db/schema";
+import { inArray, desc, eq, sql } from "drizzle-orm";
 import { listFriends } from "./profiles";
 
 export async function getFeed(userId: string) {
@@ -44,5 +44,30 @@ export async function getFeed(userId: string) {
     .orderBy(desc(activities.createdAt))
     .limit(50);
 
-  return rows;
+  if (rows.length === 0) return rows.map((row) => ({ ...row, reactions: 0, reacted: false, comments: [] }));
+
+  const activityIds = rows.map((row) => row.id);
+  const [reactionRows, commentRows] = await Promise.all([
+    db
+      .select({ activityId: activityReactions.activityId, total: sql<number>`count(*)`, reacted: sql<number>`count(*) filter (where ${activityReactions.userId} = ${userId})` })
+      .from(activityReactions)
+      .where(inArray(activityReactions.activityId, activityIds))
+      .groupBy(activityReactions.activityId),
+    db
+      .select({ activityId: activityComments.activityId, body: activityComments.body, userName: users.name, createdAt: activityComments.createdAt })
+      .from(activityComments)
+      .innerJoin(users, eq(users.id, activityComments.userId))
+      .where(inArray(activityComments.activityId, activityIds))
+      .orderBy(desc(activityComments.createdAt)),
+  ]);
+  const reactions = new Map(reactionRows.map((row) => [row.activityId, { total: Number(row.total), reacted: Number(row.reacted) > 0 }]));
+  const comments = new Map<string, typeof commentRows>(activityIds.map((id) => [id, []]));
+  for (const comment of commentRows) comments.get(comment.activityId)?.push(comment);
+
+  return rows.map((row) => ({
+    ...row,
+    reactions: reactions.get(row.id)?.total ?? 0,
+    reacted: reactions.get(row.id)?.reacted ?? false,
+    comments: comments.get(row.id) ?? [],
+  }));
 }

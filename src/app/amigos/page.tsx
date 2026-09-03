@@ -12,6 +12,8 @@ import {
   listPendingRequests,
 } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
+import { getParagonLevel } from "@/lib/paragonLevel";
+import { getPeriodRankings } from "@/lib/rankings";
 
 export const metadata = { title: "Amigos · Paragon" };
 
@@ -43,6 +45,7 @@ export default async function AmigosPage() {
 
         const { player, games } = await getLibrary(full);
         const stats = summarise(games);
+        const paragon = await getParagonLevel(full.userId);
 
         return {
           userId: full.userId,
@@ -52,12 +55,14 @@ export default async function AmigosPage() {
           trophyLevel: player.trophyLevel,
           esMio: full.userId === session.user.id,
           stats,
+          paragon,
         };
       }),
     )
   )
     .filter((r): r is NonNullable<typeof r> => r !== null)
-    .sort((a, b) => b.stats.platinos - a.stats.platinos);
+    .sort((a, b) => b.paragon.xp - a.paragon.xp);
+  const periodos = await getPeriodRankings(contendientes);
 
   return (
     <div>
@@ -119,7 +124,7 @@ export default async function AmigosPage() {
         <div className="mb-4 flex items-baseline gap-3.5">
           <h2 className="font-heading text-2xl font-bold">Clasificación</h2>
           <span className="text-[13px] text-muted">
-            Tú y {ranking.length - (tengoCuenta ? 1 : 0)} rivales, por platinos
+            Tú y {ranking.length - (tengoCuenta ? 1 : 0)} rivales, por XP Paragon
           </span>
         </div>
 
@@ -163,7 +168,7 @@ export default async function AmigosPage() {
                   {r.handle && (
                     <p className="mt-0.5 text-xs text-muted">
                       @{r.handle}
-                      {r.trophyLevel !== undefined && ` · nivel ${r.trophyLevel}`}
+                      · nivel Paragon {r.paragon.level} · {r.paragon.xp.toLocaleString("es-ES")} XP
                     </p>
                   )}
                 </div>
@@ -205,6 +210,15 @@ export default async function AmigosPage() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="mt-9 grid gap-3 lg:grid-cols-2">
+        {[{ title: "Esta semana", rows: periodos.semanal }, { title: "Este mes", rows: periodos.mensual }].map((periodo) => (
+          <div key={periodo.title} className="rounded-[18px] border border-border bg-surface p-5">
+            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{periodo.title}</h2>
+            {periodo.rows.length === 0 ? <p className="text-sm text-muted">Todavía no hay trofeos registrados.</p> : <ol className="space-y-2">{periodo.rows.map((row, index) => <li key={row.userId} className="flex items-center gap-3 text-sm"><span className="w-6 text-xs font-bold text-muted">{index + 1}</span><span className="min-w-0 flex-1 truncate font-semibold">{row.name ?? `@${row.handle ?? "usuario"}`}</span><span className="font-heading font-bold text-accent">{row.total} trofeos</span></li>)}</ol>}
+          </div>
+        ))}
       </section>
 
       {amigos.length > 0 && (

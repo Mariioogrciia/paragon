@@ -9,6 +9,7 @@ import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame } from "@/l
 import { getCommunityRating } from "@/lib/ratings";
 import { getProfileByUserId } from "@/lib/profiles";
 import { PLATFORM_LABEL } from "@/lib/types";
+import { Pegi } from "@/components/Pegi";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -78,6 +79,7 @@ export default async function JuegoGlobalPage({
                     {game.developer ?? game.publisher}
                   </span>
                 )}
+                {game.pegi && <Pegi edad={game.pegi} size="md" />}
               </p>
 
               <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[52px]">
@@ -117,6 +119,11 @@ export default async function JuegoGlobalPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-6">
+        {game.summary && (
+          <section className="max-w-[820px]">
+            <p className="text-lg leading-relaxed text-foreground/85">{game.summary}</p>
+          </section>
+        )}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile value={stats.owners} label="En biblioteca" />
           <StatTile value={stats.playing} label="Jugándolo ahora" />

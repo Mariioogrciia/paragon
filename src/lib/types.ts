@@ -13,17 +13,20 @@
  * la biblioteca, así que vive en el mismo tipo `Platform` para no duplicar
  * medio `stats.ts` y `LibraryGrid.tsx` con un tipo paralelo.
  */
-export type Platform = "psn" | "steam" | "google" | "manual";
+export type Platform = "psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" | "manual";
 
 /** Las que se vinculan por cuenta. Ver el comentario de "manual" arriba. */
 export type AccountPlatform = Exclude<Platform, "manual">;
 
-export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google"];
+export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google", "xbox", "epic", "ubisoft"];
 
 export const PLATFORM_LABEL: Record<Platform, string> = {
   psn: "PlayStation",
   steam: "Steam",
   google: "Google Play",
+  xbox: "Xbox",
+  epic: "Epic Games",
+  ubisoft: "Ubisoft Connect",
   manual: "Añadido a mano",
 };
 
@@ -32,6 +35,9 @@ export const ACHIEVEMENT_LABEL: Record<Platform, { one: string; many: string }> 
   psn: { one: "trofeo", many: "trofeos" },
   steam: { one: "logro", many: "logros" },
   google: { one: "logro", many: "logros" },
+  xbox: { one: "logro", many: "logros" },
+  epic: { one: "logro", many: "logros" },
+  ubisoft: { one: "logro", many: "logros" },
   manual: { one: "hito", many: "hitos" },
 };
 
@@ -89,6 +95,8 @@ export interface Trophy {
    * exponen, y aun así PSN no siempre devuelve el valor actual — ver psn.ts.
    */
   progress?: { current: number; target: number };
+  groupId?: string;
+  groupName?: string;
 }
 
 /* ------------------------------------------------------------------ *
@@ -119,15 +127,23 @@ export interface Game {
   /** Desglose por metal. Solo PSN. */
   defined?: TrophyCounts;
   earned?: TrophyCounts;
+  isWishlist?: boolean;
   /** "trophy" (PS3/PS4/Vita) o "trophy2" (PS5). Hace falta para pedir el detalle. */
   service?: "trophy" | "trophy2";
-  /** Minutos jugados. Solo Steam lo da. */
+  /** Minutos jugados. Steam y PSN pueden proporcionarlo. */
   playtimeMinutes?: number;
 
   /* Metadatos de catálogo, para agrupar y filtrar. */
   developer?: string;
   publisher?: string;
   genres?: string[];
+  pegi?: string;
+  /**
+   * % de jugadores del juego que tienen su platino. Es la base de la
+   * dificultad estimada (ver lib/difficulty). Solo en juegos con platino y
+   * cuyo detalle se ha sincronizado.
+   */
+  platinumRarity?: number;
 }
 
 export interface GameDetail extends Game {

@@ -1,10 +1,5 @@
+import React from "react";
 import Link from "next/link";
-
-export const metadata = {
-  title: "Preguntas frecuentes · Paragon",
-  description:
-    "Qué plataformas se pueden vincular, por qué algunas no, y qué hace Paragon con tus datos.",
-};
 
 const CARD = {
   border: "1px solid var(--border)",
@@ -151,7 +146,7 @@ const BIBLIOTECA: Pregunta[] = [
 function Bloque({ titulo, preguntas }: { titulo: string; preguntas: Pregunta[] }) {
   return (
     <section className="mt-9">
-      <h2 className="font-heading mb-4 text-2xl font-bold">{titulo}</h2>
+      <h3 className="font-heading mb-4 text-xl font-bold">{titulo}</h3>
 
       <div className="space-y-2.5">
         {preguntas.map((p) => (
@@ -184,22 +179,24 @@ function Bloque({ titulo, preguntas }: { titulo: string; preguntas: Pregunta[] }
   );
 }
 
-export default function FaqPage() {
+export function FAQSection() {
   return (
-    <div className="mx-auto max-w-[760px] pb-16">
-      <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
-        Preguntas frecuentes
-      </h1>
-      <p className="mt-3 text-[15px] text-muted">
-        Lo que suele preguntarse antes de vincular una cuenta, y lo que conviene
-        saber sobre lo que se puede y lo que no.
-      </p>
+    <div className="mx-auto max-w-[760px] py-16" id="faq">
+      <div className="text-center mb-10">
+        <h2 className="font-heading text-[42px] font-bold uppercase leading-none">
+          Preguntas frecuentes
+        </h2>
+        <p className="mt-3 text-[15px] text-muted">
+          Lo que suele preguntarse antes de vincular una cuenta, y lo que conviene
+          saber sobre lo que se puede y lo que no.
+        </p>
+      </div>
 
       <Bloque titulo="Lo básico" preguntas={GENERAL} />
       <Bloque titulo="Plataformas" preguntas={PLATAFORMAS} />
       <Bloque titulo="Biblioteca y valoraciones" preguntas={BIBLIOTECA} />
 
-      <p className="mt-9 text-[13px] text-muted">
+      <p className="mt-9 text-center text-[13px] text-muted">
         ¿Te falta algo por aquí?{" "}
         <Link href="/ajustes" className="font-semibold text-accent">
           Revisa tus ajustes

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TiltCard } from "@/components/TiltCard";
 import { auth } from "@/auth";
-import { GameRow } from "@/components/GameRow";
 import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
@@ -11,6 +10,16 @@ import { getLibrary, getProfileByUserId, getGlobalStats } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { UpcomingGames } from "@/components/UpcomingGames";
+import { TrophyHistory } from "@/components/TrophyHistory";
+import { rachas, resumenHistorico, trofeosPorMes } from "@/lib/history";
+import { FAQSection } from "@/components/FAQ";
+import { getWishlistIgdbIds } from "@/lib/manualGames";
+import { getWeeklyMissions } from "@/lib/missions";
+import { WeeklyMissions } from "@/components/WeeklyMissions";
+import { ActivityStats } from "@/components/ActivityStats";
+import { getTrophyRecommendations } from "@/lib/recommendations";
+import { TrophyRecommendations } from "@/components/TrophyRecommendations";
+import { paragonProgress } from "@/lib/level";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -26,12 +35,12 @@ const SAMPLE_NEXT = [
 ];
 
 const SAMPLE_SHELF = [
-  { title: "Elden Ring", pct: 74, ratio: "32/42", cover: "https://upload.wikimedia.org/wikipedia/en/b/b9/Elden_Ring_Box_art.jpg" },
-  { title: "Bloodborne", pct: 100, ratio: "40/40", cover: "https://upload.wikimedia.org/wikipedia/en/7/76/Bloodborne_cover_art.jpg" },
-  { title: "God of War Ragnarök", pct: 100, ratio: "36/36", cover: "https://upload.wikimedia.org/wikipedia/en/e/ee/God_of_War_Ragnar%C3%B6k_cover.jpg" },
-  { title: "Returnal", pct: 41, ratio: "12/31", cover: "https://upload.wikimedia.org/wikipedia/en/3/30/Returnal_cover_art.jpg" },
-  { title: "Hollow Knight", pct: 63, ratio: "39/63", cover: "https://upload.wikimedia.org/wikipedia/en/0/04/Hollow_Knight_first_cover_art.webp" },
-  { title: "Ghost of Tsushima", pct: 100, ratio: "55/55", cover: "https://upload.wikimedia.org/wikipedia/en/b/b6/Ghost_of_Tsushima.jpg" },
+  { title: "Elden Ring", pct: 74, ratio: "32/42", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" },
+  { title: "Bloodborne", pct: 100, ratio: "40/40", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/cob99l.jpg" },
+  { title: "God of War Ragnarök", pct: 100, ratio: "36/36", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/coba3d.jpg" },
+  { title: "Returnal", pct: 41, ratio: "12/31", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co3wc1.jpg" },
+  { title: "Hollow Knight", pct: 63, ratio: "39/63", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/cobfzp.jpg" },
+  { title: "Ghost of Tsushima", pct: 100, ratio: "55/55", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co2crj.jpg" },
 ];
 
 const FEATURES = [
@@ -88,7 +97,7 @@ async function Landing() {
               Empezar la caza
             </Link>
             <Link
-              href="#biblioteca"
+              href="/ejemplo"
               className="rounded-xl px-[22px] py-4 text-[15px] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#dbe5f2" }}
             >
@@ -223,25 +232,32 @@ async function Landing() {
           <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
         </div>
 
-        <div className="mt-[72px] grid gap-3.5 sm:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div
-              key={f.num}
-              className="rounded-[18px] p-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.08)]"
-              style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
-            >
-              <span
-                className="font-heading inline-flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold"
-                style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
+        <div className="mt-[72px]">
+          <h2 className="font-heading text-[30px] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
+            Cómo funciona
+          </h2>
+          <div className="grid gap-3.5 sm:grid-cols-3">
+            {FEATURES.map((f) => (
+              <div
+                key={f.num}
+                className="rounded-[18px] p-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.08)]"
+                style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
               >
-                {f.num}
-              </span>
-              <h3 className="font-heading mt-[18px] text-[21px] font-bold leading-tight">{f.title}</h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-muted">{f.body}</p>
-            </div>
-          ))}
+                <span
+                  className="font-heading inline-flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold"
+                  style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
+                >
+                  {f.num}
+                </span>
+                <h3 className="font-heading mt-[18px] text-[21px] font-bold leading-tight">{f.title}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-muted">{f.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+
+      <FAQSection />
 
       <section className="py-[72px]">
         <div
@@ -261,9 +277,9 @@ async function Landing() {
               className="rounded-xl px-[26px] py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
               style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgb(var(--accent-rgb) / 0.35)" }}
             >
-              Conectar mi PlayStation
+              Conectar mi cuenta
             </Link>
-            <span className="text-sm text-muted">Gratis. Un ID y estás dentro.</span>
+            <span className="text-sm text-muted">Gratis. Solo necesitas vincular tus plataformas.</span>
           </div>
         </div>
       </section>
@@ -280,13 +296,25 @@ export default async function HomePage() {
 
   const { player, games } = await getLibrary(profile);
   const stats = summarise(games);
-  const recientes = games.slice(0, 6);
+  const nivelParagon = paragonProgress(games);
+
+  const recientes = games.filter(g => !g.isWishlist).slice(0, 6);
+
+  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones] = await Promise.all([
+    trofeosPorMes(session.user.id),
+    rachas(session.user.id),
+    resumenHistorico(session.user.id),
+    getWishlistIgdbIds(session.user.id),
+    getWeeklyMissions(session.user.id),
+    getTrophyRecommendations(session.user.id),
+  ]);
 
   const nearPlatinum = games
     .map((g) => ({ game: g, progress: gameProgress(g) }))
     .filter((g) => g.progress.hasPlatinum && !g.progress.platinumEarned)
     .sort((a, b) => a.progress.total - a.progress.earned - (b.progress.total - b.progress.earned))
     .slice(0, 3);
+  const now = new Date().getTime();
 
   return (
     <div className="space-y-9">
@@ -295,7 +323,7 @@ export default async function HomePage() {
           <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-muted">
             <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
             {player.accounts.map((a) => a.username).join(" · ")}
-            {player.trophyLevel !== undefined && ` · nivel ${player.trophyLevel}`}
+            {` · nivel Paragon ${nivelParagon.level}`}
           </p>
           <h1 className="font-heading text-[42px] font-bold uppercase leading-none tracking-tight">
             Hola, {player.name}
@@ -341,6 +369,17 @@ export default async function HomePage() {
         counts={stats.counts}
         summary={`${stats.trofeos.toLocaleString("es-ES")} trofeos en ${stats.juegos} juegos`}
       />
+
+      <TrophyHistory
+        meses={mesesHistorico}
+        rachas={rachasUsuario}
+        resumen={resumen}
+        totalPerfil={stats.trofeos}
+      />
+
+      <WeeklyMissions missions={misiones} />
+      <ActivityStats games={games} now={now} />
+      <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} />
 
       {nearPlatinum.length > 0 && (
         <section>
@@ -408,7 +447,7 @@ export default async function HomePage() {
 
       {/* En la portada, que es donde se aterriza: en el perfil quedaba después
           de una biblioteca de cientos de juegos con carga progresiva. */}
-      <UpcomingGames />
+      <UpcomingGames wishlistedIgdbIds={wishlistIds} />
 
       <section>
         <div className="mb-4 flex items-baseline gap-3.5">

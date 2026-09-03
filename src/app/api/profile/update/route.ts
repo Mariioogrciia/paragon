@@ -17,6 +17,8 @@ export async function POST(request: Request) {
     const lastName = formData.get("lastName") as string | null;
     const language = formData.get("language") as string | null;
     const timezone = formData.get("timezone") as string | null;
+    const profileTitle = formData.get("profileTitle") as string | null;
+    const profileBackgroundGameId = formData.get("profileBackgroundGameId") as string | null;
     
     // We update everything but the email, because email is linked to the OAuth provider
     
@@ -27,6 +29,8 @@ export async function POST(request: Request) {
       lastName: lastName ?? null,
       language: language ?? "es-ES",
       timezone: timezone ?? "Europe/Madrid",
+      profileTitle: profileTitle?.trim().slice(0, 60) || null,
+      profileBackgroundGameId: profileBackgroundGameId?.trim() || null,
     }).where(eq(users.id, session.user.id));
 
     // Redirect back to settings page

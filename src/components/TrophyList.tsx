@@ -4,6 +4,7 @@ import { useState } from "react";
 import { gradeLabel, TrophyTile } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
 import type { Trophy } from "@/lib/types";
+import { TrophyGuideModal } from "./TrophyGuideModal";
 
 /**
  * Todos los logros de un juego, en lista o en cuadrícula.
@@ -12,8 +13,28 @@ import type { Trophy } from "@/lib/types";
  * tipo es cada cosa. La cuadrícula es la vitrina: iconos grandes, para mirar
  * lo conseguido. Por eso la que manda por defecto sigue siendo la lista.
  */
-export function TrophyList({ trophies }: { trophies: Trophy[] }) {
+export function TrophyList({ trophies, gameTitle }: { trophies: Trophy[], gameTitle: string }) {
   const [view, setView] = useState<"lista" | "cuadricula">("lista");
+  const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
+
+  const groups = new Map<string, { name: string; trophies: Trophy[] }>();
+  for (const t of trophies) {
+    const gId = t.groupId || "default";
+    if (!groups.has(gId)) {
+      groups.set(gId, {
+        name: t.groupName || (gId === "default" ? "Juego Base" : "Expansión"),
+        trophies: [],
+      });
+    }
+    groups.get(gId)!.trophies.push(t);
+  }
+
+  // Convert to array and put "default" first.
+  const groupList = Array.from(groups.values()).sort((a, b) => {
+    if (a.name === "Juego Base") return -1;
+    if (b.name === "Juego Base") return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   return (
     <div>
@@ -43,21 +64,41 @@ export function TrophyList({ trophies }: { trophies: Trophy[] }) {
         </div>
       </div>
 
-      {view === "lista" ? (
-        <ul
-          className="overflow-hidden rounded-[18px]"
-          style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-        >
-          {trophies.map((t) => (
-            <FilaLista key={t.id} trophy={t} />
-          ))}
-        </ul>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {trophies.map((t) => (
-            <TarjetaCuadricula key={t.id} trophy={t} />
-          ))}
-        </div>
+      <div className="space-y-8">
+        {groupList.map((group, idx) => (
+          <div key={idx} className="space-y-3">
+            {groupList.length > 1 && (
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted ml-2">
+                {group.name}
+              </h3>
+            )}
+            
+            {view === "lista" ? (
+              <ul
+                className="overflow-hidden rounded-[18px]"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                {group.trophies.map((t) => (
+                  <FilaLista key={t.id} trophy={t} onClick={() => setActiveTrophy(t)} />
+                ))}
+              </ul>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                {group.trophies.map((t) => (
+                  <TarjetaCuadricula key={t.id} trophy={t} onClick={() => setActiveTrophy(t)} />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {activeTrophy && (
+        <TrophyGuideModal 
+          gameTitle={gameTitle} 
+          trophy={activeTrophy} 
+          onClose={() => setActiveTrophy(null)} 
+        />
       )}
     </div>
   );
@@ -103,12 +144,13 @@ function ViewButton({
   );
 }
 
-function FilaLista({ trophy }: { trophy: Trophy }) {
+function FilaLista({ trophy, onClick }: { trophy: Trophy, onClick: () => void }) {
   const oculto = trophy.hidden && !trophy.earned;
 
   return (
     <li
-      className="grid grid-cols-[48px_1fr] items-center gap-4 border-b border-border px-4 py-3.5 last:border-0 sm:grid-cols-[48px_1fr_100px_90px] sm:gap-[18px] sm:px-[18px]"
+      onClick={onClick}
+      className="grid grid-cols-[48px_1fr] items-center gap-4 border-b border-border px-4 py-3.5 last:border-0 sm:grid-cols-[48px_1fr_100px_90px] sm:gap-[18px] sm:px-[18px] cursor-pointer hover:bg-white/5 transition-colors"
       style={{ opacity: trophy.earned ? 1 : 0.42 }}
     >
       <Icono trophy={trophy} size={48} />
@@ -133,13 +175,14 @@ function FilaLista({ trophy }: { trophy: Trophy }) {
   );
 }
 
-function TarjetaCuadricula({ trophy }: { trophy: Trophy }) {
+function TarjetaCuadricula({ trophy, onClick }: { trophy: Trophy, onClick: () => void }) {
   const oculto = trophy.hidden && !trophy.earned;
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
 
   return (
     <div
-      className="flex flex-col items-center rounded-[14px] p-4 text-center"
+      onClick={onClick}
+      className="flex flex-col items-center rounded-[14px] p-4 text-center cursor-pointer hover:scale-[1.02] transition-transform hover:bg-white/5"
       style={{
         border: "1px solid var(--border)",
         background: "var(--surface)",

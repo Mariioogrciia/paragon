@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getFeed } from "@/lib/feed";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { addActivityCommentAction, toggleActivityReactionAction } from "@/app/actions";
 
 function RatingStars({ rating }: { rating: number }) {
   return (
@@ -83,9 +84,25 @@ export async function ActivityFeed({ userId }: { userId: string }) {
 
                 {activity.type === "review" && activity.review && (
                   <div className="p-3 mt-3 text-sm italic border-l-2 bg-muted/20 border-accent/50 rounded-r-md text-foreground/80">
-                    "{activity.review}"
+                    &quot;{activity.review}&quot;
                   </div>
                 )}
+
+                <div className="mt-3 flex items-center gap-3">
+                  <form action={toggleActivityReactionAction}>
+                    <input type="hidden" name="activityId" value={activity.id} />
+                    <button className={`text-xs font-semibold ${activity.reacted ? "text-accent" : "text-muted hover:text-foreground"}`}>
+                      {activity.reacted ? "Aplaudido" : "Aplaudir"} · {activity.reactions}
+                    </button>
+                  </form>
+                  <span className="text-xs text-muted">{activity.comments.length} comentarios</span>
+                </div>
+                <form action={addActivityCommentAction} className="mt-2 flex gap-2">
+                  <input type="hidden" name="activityId" value={activity.id} />
+                  <input name="body" maxLength={500} placeholder="Escribe un comentario" className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs outline-none" />
+                  <button className="text-xs font-semibold text-accent">Enviar</button>
+                </form>
+                {activity.comments.length > 0 && <div className="mt-2 space-y-1">{activity.comments.slice(0, 3).map((comment, index) => <p key={`${comment.createdAt.toISOString()}-${index}`} className="text-xs text-muted"><strong className="text-foreground">{comment.userName ?? "Usuario"}:</strong> {comment.body}</p>)}</div>}
               </div>
               
               {activity.game.iconUrl && (

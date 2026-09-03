@@ -15,6 +15,7 @@ import {
   type SortKey,
 } from "@/lib/stats";
 import { PLATFORM_LABEL, type Game, type Platform } from "@/lib/types";
+import { Pegi } from "@/components/Pegi";
 
 const STATUS: { label: string; value: GameStatus | "todos" }[] = [
   { label: "Todos", value: "todos" },
@@ -22,12 +23,14 @@ const STATUS: { label: string; value: GameStatus | "todos" }[] = [
   { label: "Platinados", value: "platinado" },
   { label: "Al 100%", value: "completado" },
   { label: "Sin empezar", value: "sin-empezar" },
+  { label: "Deseados", value: "deseados" },
 ];
 
 const SORTS: { label: string; value: SortKey }[] = [
   { label: "Más reciente", value: "reciente" },
   { label: "Más completado", value: "progreso" },
   { label: "Lo que menos falta", value: "pendientes" },
+  { label: "Platino más asequible", value: "asequible" },
   { label: "Título (A-Z)", value: "titulo" },
 ];
 
@@ -158,7 +161,7 @@ export function LibraryGrid({
     if (view === "grid") {
       return (
         <div key={game.id} className="relative">
-          <GameCard game={game} href={`/u/${handle}/${game.id}`} />
+          <GameCard game={game} href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`} />
           <div className="absolute top-2 left-2 z-10 bg-black/50 backdrop-blur-md rounded-full px-2 py-1">
             <RatingStars gameId={game.id} initialRating={game.rating} />
           </div>
@@ -175,8 +178,9 @@ export function LibraryGrid({
           <div className="w-16 h-16 rounded-lg bg-surface-2" />
         )}
         <div className="flex-1 min-w-0">
-          <a href={`/u/${handle}/${game.id}`} className="font-bold text-lg hover:text-accent truncate block">{game.title}</a>
+          <a href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`} className="font-bold text-lg hover:text-accent truncate block">{game.title}</a>
           <p className="text-xs text-muted mt-1">{game.deviceLabel} · {game.progressPercent}% completado</p>
+          {game.pegi && <div className="mt-1"><Pegi edad={game.pegi} /></div>}
         </div>
         <div>
           <RatingStars gameId={game.id} initialRating={game.rating} />
@@ -371,10 +375,11 @@ export function LibraryGrid({
                 <motion.div
                   key={game.id}
                   layout
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: "-20px" }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.18 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 >
                   {renderGame(game)}
                 </motion.div>

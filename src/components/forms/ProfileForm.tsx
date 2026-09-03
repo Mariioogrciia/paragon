@@ -2,8 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
-export function ProfileForm({ user }: { user: any }) {
+interface ProfileFormUser {
+  id: string;
+  name: string | null;
+  image: string | null;
+  handle: string | null;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  language: string | null;
+  timezone: string | null;
+  profileTitle?: string | null;
+  profileBackgroundGameId?: string | null;
+}
+
+export function ProfileForm({ user }: { user: ProfileFormUser }) {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [avatar, setAvatar] = useState(user.image);
@@ -62,19 +77,27 @@ export function ProfileForm({ user }: { user: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre de usuario</label>
-              <input name="handle" defaultValue={user.handle} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="handle" defaultValue={user.handle ?? ""} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Email</label>
-              <input name="email" defaultValue={user.email} disabled className="w-full rounded-xl border border-white/10 bg-[var(--surface)]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
+              <input name="email" defaultValue={user.email ?? ""} disabled className="w-full rounded-xl border border-white/10 bg-[var(--surface)]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre</label>
-              <input name="firstName" defaultValue={user.firstName} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="firstName" defaultValue={user.firstName ?? ""} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Apellido</label>
-              <input name="lastName" defaultValue={user.lastName} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="lastName" defaultValue={user.lastName ?? ""} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Título del perfil</label>
+              <input name="profileTitle" maxLength={60} defaultValue={user.profileTitle ?? ""} placeholder="Ej. Cazador de platinos" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Juego para el fondo</label>
+              <input name="profileBackgroundGameId" defaultValue={user.profileBackgroundGameId ?? ""} placeholder="ID del juego de tu biblioteca" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
           </div>
         </section>
@@ -84,16 +107,24 @@ export function ProfileForm({ user }: { user: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Idioma</label>
-              <select name="language" defaultValue={user.language} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none">
-                <option value="es-ES">Español</option>
-                <option value="en-US">English</option>
-              </select>
+              <CustomSelect
+                name="language"
+                defaultValue={user.language ?? "es-ES"}
+                options={[
+                  { value: "es-ES", label: "Español" },
+                  { value: "en-US", label: "English" },
+                ]}
+              />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Zona horaria</label>
-              <select name="timezone" defaultValue={user.timezone} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none">
-                <option value="Europe/Madrid">(GMT+01:00) Madrid</option>
-              </select>
+              <CustomSelect
+                name="timezone"
+                defaultValue={user.timezone ?? "Europe/Madrid"}
+                options={[
+                  { value: "Europe/Madrid", label: "(GMT+01:00) Madrid" },
+                ]}
+              />
             </div>
           </div>
         </section>

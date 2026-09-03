@@ -5,6 +5,7 @@ const STATUS: Record<GameStatus, { label: string; bg: string; fg: string; border
   completado: { label: "Al 100%", bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e", border: "rgba(226, 181, 62, 0.32)" },
   "en-curso": { label: "En curso", bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff", border: "rgb(var(--accent-rgb) / 0.32)" },
   "sin-empezar": { label: "Sin empezar", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
+  deseados: { label: "Deseados", bg: "rgba(219, 112, 147, 0.14)", fg: "#ff8da1", border: "rgba(219, 112, 147, 0.32)" },
 };
 
 /** Etiqueta de estado de un juego, con los mismos tres colores en toda la app. */

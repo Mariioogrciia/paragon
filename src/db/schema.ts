@@ -46,6 +46,8 @@ export const users = pgTable("user", {
   
   /** Lista de 4 IDs de juegos favoritos para mostrar en el perfil */
   favorites: jsonb("favorites").$type<string[]>().default([]),
+  profileTitle: text("profileTitle"),
+  profileBackgroundGameId: text("profileBackgroundGameId"),
 
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
@@ -108,7 +110,7 @@ export const platformAccounts = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    platform: text("platform").$type<"psn" | "steam" | "google">().notNull(),
+    platform: text("platform").$type<"psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft">().notNull(),
     /** accountId de PSN, SteamID64 de Steam. */
     accountId: text("accountId").notNull(),
     /** El nombre público: online ID en PSN, persona name en Steam. */
@@ -169,7 +171,7 @@ export const psnProfiles = pgTable(
 export const games = pgTable("game", {
   id: text("id").primaryKey(),
   /** "manual" = añadido a mano (Switch, retro...), sin API detrás. */
-  platform: text("platform").$type<"psn" | "steam" | "google" | "manual">().notNull(),
+  platform: text("platform").$type<"psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" | "manual">().notNull(),
   /** npCommunicationId en PSN, appid en Steam, "<id de IGDB>:<dispositivo>" en manual. */
   nativeId: text("nativeId").notNull(),
   title: text("title").notNull(),
@@ -187,6 +189,7 @@ export const games = pgTable("game", {
   developer: text("developer"),
   publisher: text("publisher"),
   genres: jsonb("genres").$type<string[]>(),
+  pegi: text("pegi"),
   /** Null mientras no hayamos pedido los metadatos a la tienda. */
   metadataSyncedAt: timestamp("metadataSyncedAt", { mode: "date" }),
 });
@@ -206,6 +209,9 @@ export const gameTrophies = pgTable(
     grade: text("grade").$type<"bronze" | "silver" | "gold" | "platinum">(),
     hidden: boolean("hidden").notNull().default(false),
     iconUrl: text("iconUrl"),
+    /** ID del grupo de trofeos. "default" para el juego base, "001" etc para DLCs. */
+    groupId: text("groupId").notNull().default("default"),
+    groupName: text("groupName"),
   },
   (t) => [primaryKey({ columns: [t.gameId, t.trophyId] })],
 );
@@ -225,13 +231,14 @@ export const userGames = pgTable(
     /** Desglose por metal. Solo PSN. */
     earned: jsonb("earned").$type<Record<string, number>>(),
     lastPlayedAt: timestamp("lastPlayedAt", { mode: "date" }),
-    /** Minutos jugados. Solo Steam lo da. */
+    /** Minutos jugados, cuando la plataforma los proporciona. */
     playtimeMinutes: integer("playtimeMinutes"),
     /** Null mientras no hayamos traído el detalle de logros de este juego. */
     trophiesSyncedAt: timestamp("trophiesSyncedAt", { mode: "date" }),
     rating: integer("rating"),
     review: text("review"),
     reviewDate: timestamp("reviewDate", { mode: "date" }),
+    isWishlist: boolean("isWishlist").notNull().default(false),
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
 );
@@ -332,6 +339,34 @@ export const activities = pgTable(
   }
 );
 
+export const activityReactions = pgTable(
+  "activity_reaction",
+  {
+    activityId: text("activityId").notNull().references(() => activities.id, { onDelete: "cascade" }),
+    userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    reaction: text("reaction").notNull().default("aplauso"),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.activityId, t.userId] })],
+);
+
+export const activityComments = pgTable("activity_comment", {
+  id: text("id").primaryKey(),
+  activityId: text("activityId").notNull().references(() => activities.id, { onDelete: "cascade" }),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const syncRuns = pgTable("sync_run", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  platform: text("platform").notNull(),
+  games: integer("games").notNull().default(0),
+  newTrophies: integer("newTrophies").notNull().default(0),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
 /**
  * Amistades, por handle de plataforma.
  *
@@ -352,4 +387,63 @@ export const friendships = pgTable(
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   },
   (f) => [primaryKey({ columns: [f.requesterId, f.addresseeId] })],
+);
+
+/* ------------------------------------------------------------------ *
+ * Metalogros (Insignias de la app)                                   *
+ * ------------------------------------------------------------------ */
+
+export const userBadges = pgTable(
+  "user_badge",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    badgeId: text("badgeId").notNull(),
+    earnedAt: timestamp("earnedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.badgeId] })]
+);
+
+
+/* ------------------------------------------------------------------ *
+ * Avisos                                                             *
+ *                                                                    *
+ * Los genera el cron al sincronizar, no la navegación: la gracia es   *
+ * enterarte de que te falta un trofeo para el platino SIN tener que   *
+ * entrar a mirarlo.                                                  *
+ * ------------------------------------------------------------------ */
+
+export const notifications = pgTable(
+  "notification",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type")
+      .$type<"platino_cerca" | "lanzamiento" | "amigo_adelanta">()
+      .notNull(),
+    title: text("title").notNull(),
+    body: text("body"),
+    /** A dónde lleva al pulsarlo. */
+    href: text("href"),
+    /**
+     * Sin clave foránea a propósito: un aviso sobre un juego que luego
+     * desaparece del catálogo sigue teniendo sentido como texto, y no quiero
+     * que borrar un juego se lleve por delante el historial de avisos.
+     */
+    gameId: text("gameId"),
+    /**
+     * Lo que impide repetir el mismo aviso en cada pasada del cron. El índice
+     * único de abajo hace el trabajo: se inserta con onConflictDoNothing y
+     * listo, sin tener que consultar antes.
+     */
+    dedupeKey: text("dedupeKey").notNull(),
+    readAt: timestamp("readAt", { mode: "date" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (n) => [uniqueIndex("notification_dedupe_idx").on(n.userId, n.dedupeKey)],
 );

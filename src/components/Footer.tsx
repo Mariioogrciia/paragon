@@ -16,7 +16,7 @@ export function Footer() {
 
         <div className="flex items-center gap-6">
           <Link
-            href="/faq"
+            href="/#faq"
             className="font-medium text-muted hover:text-foreground transition-colors"
           >
             Preguntas frecuentes
@@ -27,6 +27,10 @@ export function Footer() {
           >
             Privacidad
           </Link>
+          <span className="hidden md:inline text-muted/60">·</span>
+          <span className="hidden md:inline text-[11px] text-muted/80">
+            Desarrollado por <strong className="text-foreground/80">Mario García</strong>
+          </span>
           <span className="hidden md:inline text-muted/60">·</span>
           <span className="hidden md:inline text-[11px] text-muted/80">
             No afiliado a Sony ni a Valve

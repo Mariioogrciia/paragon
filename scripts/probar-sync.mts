@@ -68,6 +68,7 @@ try {
         syncedAt: null,
       },
     ],
+    badges: [],
   };
 
   console.log("2. Leyendo la biblioteca desde la base de datos…");
