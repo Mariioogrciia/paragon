@@ -209,7 +209,17 @@ export default async function PerfilPage({
               if (!game) return null;
               const trophyRaw = showcaseTrophiesData.find(t => t.trophyId === pin.trophyId);
               if (!trophyRaw) return null;
-              const trophy = { ...trophyRaw, id: trophyRaw.trophyId, earned: true, grade: trophyRaw.grade ?? undefined };
+              const trophy = {
+                ...trophyRaw,
+                id: trophyRaw.trophyId,
+                earned: true,
+                grade: trophyRaw.grade ?? undefined,
+                // La fila de la tabla admite null (columna sin valor); el
+                // tipo Trophy usa undefined para "no hay" — el mismo ajuste
+                // que ya se hace arriba con `grade`.
+                iconUrl: trophyRaw.iconUrl ?? undefined,
+                groupName: trophyRaw.groupName ?? undefined,
+              };
               return { game, trophy };
             })
             .filter((item): item is NonNullable<typeof item> => item !== null)}
