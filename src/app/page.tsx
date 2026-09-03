@@ -10,6 +10,7 @@ import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByUserId, getGlobalStats } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { ActivityFeed } from "@/components/ActivityFeed";
+import { UpcomingGames } from "@/components/UpcomingGames";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -73,8 +74,8 @@ async function Landing() {
           </h1>
 
           <p className="mt-6 max-w-[540px] text-lg leading-relaxed text-muted">
-            Conecta tu PlayStation y Platinos te dice exactamente qué trofeo
-            tienes más a mano, cuánto te separa del siguiente platino y quién
+            Conecta tus cuentas y Paragon te dice exactamente qué trofeo o logro
+            tienes más a mano, cuánto te separa del 100% y quién
             de tus rivales va por delante.
           </p>
 
@@ -404,6 +405,10 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* En la portada, que es donde se aterriza: en el perfil quedaba después
+          de una biblioteca de cientos de juegos con carga progresiva. */}
+      <UpcomingGames />
 
       <section>
         <div className="mb-4 flex items-baseline gap-3.5">

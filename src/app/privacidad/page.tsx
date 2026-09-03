@@ -20,7 +20,7 @@ export default function PrivacidadPage() {
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">1. Información que recopilamos</h2>
         <p>
-          En <strong>Platinos</strong>, nos tomamos muy en serio tu privacidad. Solo recopilamos los datos estrictamente necesarios para ofrecerte el servicio:
+          En <strong>Paragon</strong>, nos tomamos muy en serio tu privacidad. Solo recopilamos los datos estrictamente necesarios para ofrecerte el servicio:
         </p>
         <ul className="list-disc pl-5 space-y-1 text-muted">
           <li><strong>Datos de autenticación:</strong> Nombre, dirección de correo electrónico y foto de perfil pública proporcionados a través de proveedores de inicio de sesión de terceros (como Google o Discord).</li>
@@ -33,8 +33,8 @@ export default function PrivacidadPage() {
         <h2 className="text-lg font-bold text-foreground">2. Uso de la información</h2>
         <p>Los datos recopilados se utilizan única y exclusivamente para:</p>
         <ul className="list-disc pl-5 space-y-1 text-muted">
-          <li>Permitirte iniciar sesión y gestionar tu cuenta en Platinos.</li>
-          <li>Calcular y mostrar tus estadísticas de trofeos y progreso.</li>
+          <li>Permitirte iniciar sesión y gestionar tu cuenta en Paragon.</li>
+          <li>Calcular y mostrar tus estadísticas de trofeos, logros y progreso.</li>
           <li>Facilitar la comparación y el feed de actividad con amigos dentro de la plataforma.</li>
         </ul>
         <p className="text-muted">
@@ -45,7 +45,7 @@ export default function PrivacidadPage() {
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">3. Seguridad de tus credenciales</h2>
         <p className="text-muted">
-          Platinos <strong>nunca solicita ni almacena contraseñas de tus cuentas de PlayStation o Steam</strong>. La sincronización se realiza mediante identificadores públicos sin requerir credenciales confidenciales de Sony ni de Valve.
+          Paragon <strong>nunca solicita ni almacena contraseñas de tus cuentas de PlayStation o Steam</strong>. La sincronización se realiza mediante identificadores públicos sin requerir credenciales confidenciales de Sony ni de Valve.
         </p>
       </section>
 

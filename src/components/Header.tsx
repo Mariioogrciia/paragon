@@ -70,7 +70,7 @@ export function Header({
               <path d="M12 14v3m-3.5 3h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </span>
-          <span className="font-heading text-[18px] font-bold tracking-[0.06em]">PLATINOS</span>
+          <span className="font-heading text-[18px] font-bold tracking-[0.06em]">PARAGON</span>
         </Link>
 
         <nav className="hidden items-center gap-1 sm:flex">

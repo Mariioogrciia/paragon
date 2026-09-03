@@ -136,6 +136,11 @@ export default async function PerfilPage({
 
         <TrophyCountRow counts={stats.counts} />
 
+        {/* Antes esto iba debajo de la biblioteca, y la biblioteca son cientos
+            de juegos con carga progresiva: había que llegar al fondo del todo
+            para ver los lanzamientos. Va delante justamente por eso. */}
+        <UpcomingGames />
+
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-3.5">
             <h2 className="font-heading text-2xl font-bold">Biblioteca</h2>
@@ -146,8 +151,6 @@ export default async function PerfilPage({
 
           <LibraryGrid games={games} handle={handle} collections={carpetas} esMio={esMio} />
         </section>
-
-        <UpcomingGames />
       </div>
     </div>
   );

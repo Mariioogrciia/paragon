@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Preguntas frecuentes · Platinos",
+  title: "Preguntas frecuentes · Paragon",
   description:
-    "Qué plataformas se pueden vincular, por qué algunas no, y qué hace Platinos con tus datos.",
+    "Qué plataformas se pueden vincular, por qué algunas no, y qué hace Paragon con tus datos.",
 };
 
 const CARD = {
@@ -22,7 +22,7 @@ const GENERAL: Pregunta[] = [
     a: (
       <>
         No, y no hay forma de dárnosla aunque quisieras: no existe ningún campo
-        para eso. Platinos lee los perfiles <strong>públicos</strong> con una
+        para eso. Paragon lee los perfiles <strong>públicos</strong> con una
         credencial del servidor. Vincular una cuenta es solo decir «este soy yo
         ahí», igual que escribir tu nombre de usuario.
       </>

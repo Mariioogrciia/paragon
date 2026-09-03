@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-4 px-7">
         <div className="flex items-center gap-4">
           <span className="font-heading font-bold tracking-[0.08em] text-foreground">
-            PLATINOS
+            PARAGON
           </span>
           <span className="hidden sm:inline text-muted/60">·</span>
           <span className="hidden sm:inline">

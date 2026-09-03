@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
 import { TrophyIcon } from "@/components/TrophyIcon";
 
-export const metadata = { title: "Entrar · Platinos" };
+export const metadata = { title: "Entrar · Paragon" };
 
 const STATS = [
   { value: "87", label: "Platino", color: "#9fd4ec" },
@@ -69,8 +69,8 @@ export default async function EntrarPage({
             sin contar.
           </h2>
           <p className="mt-5 max-w-[430px] text-base leading-relaxed text-muted">
-            Cada partida mueve un número. Platinos los lee todos y te dice
-            cuál está a un solo trofeo de caer.
+            Cada partida mueve un número. Paragon los lee todos y te dice
+            cuál está a un solo trofeo o logro de caer.
           </p>
         </div>
 
@@ -97,11 +97,11 @@ export default async function EntrarPage({
       <div className="flex flex-col justify-center bg-surface p-8 sm:p-11">
         <div className="max-w-[420px]">
           <h1 className="font-heading text-[38px] font-bold uppercase leading-[1.05] tracking-[-0.01em]">
-            Entra en Platinos
+            Entra en Paragon
           </h1>
           <p className="mt-3.5 text-[15px] leading-relaxed text-muted">
-            Elige con qué cuenta quieres entrar. Después vinculas tu perfil de
-            PlayStation, que es de donde salen los trofeos.
+            Elige con qué cuenta quieres entrar. Después vinculas tus perfiles de
+            PlayStation o Steam, que es de donde salen los trofeos y logros.
           </p>
 
           {mensajeError && (

@@ -33,7 +33,7 @@ export function UpcomingGames() {
   if (games.length === 0) return null;
 
   return (
-    <div className="rounded-[18px] border border-border bg-surface p-6 mt-8">
+    <div className="rounded-[18px] border border-border bg-surface p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-heading text-lg font-bold uppercase tracking-wide">
           Próximos lanzamientos

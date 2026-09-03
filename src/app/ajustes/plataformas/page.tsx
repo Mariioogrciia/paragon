@@ -8,7 +8,7 @@ import { relativeDate } from "@/lib/design";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 import { PLATFORM_LABEL, type AccountPlatform, type PlatformAccount } from "@/lib/types";
 
-export const metadata = { title: "Ajustes · Platinos" };
+export const metadata = { title: "Ajustes · Paragon" };
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 
-export const metadata = { title: "Ajustes · Platinos" };
+export const metadata = { title: "Ajustes · Paragon" };
 
 export default async function AjustesLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();

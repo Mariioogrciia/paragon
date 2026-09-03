@@ -188,7 +188,7 @@ export function AddFriendForm() {
   return (
     <form action={action}>
       <div className="flex gap-2.5">
-        <AtField name="handle" placeholder="usuario_de_platinos" />
+        <AtField name="handle" placeholder="usuario_de_paragon" />
         <Submit>Enviar solicitud</Submit>
       </div>
       <Feedback state={state} />

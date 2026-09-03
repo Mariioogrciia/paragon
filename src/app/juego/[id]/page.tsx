@@ -13,7 +13,7 @@ import { PLATFORM_LABEL } from "@/lib/types";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const game = await getGlobalGame(decodeURIComponent(id));
-  return { title: game ? `${game.title} · Platinos` : "Juego · Platinos" };
+  return { title: game ? `${game.title} · Paragon` : "Juego · Paragon" };
 }
 
 export default async function JuegoGlobalPage({

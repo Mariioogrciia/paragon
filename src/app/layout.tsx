@@ -21,8 +21,8 @@ const chakra = Chakra_Petch({
 });
 
 export const metadata: Metadata = {
-  title: "Platinos",
-  description: "Tu progreso de trofeos y el de tus amigos, en un solo sitio.",
+  title: "Paragon",
+  description: "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.",
 };
 
 /**

@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { HandleForm, LinkPsnForm, LinkSteamForm } from "@/components/forms/Forms";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 
-export const metadata = { title: "Bienvenida · Platinos" };
+export const metadata = { title: "Bienvenida · Paragon" };
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
@@ -42,7 +42,7 @@ export default async function BienvenidaPage() {
         </div>
 
         <p className="mb-4 mt-3 text-sm text-muted">
-          Es tu identificador dentro de Platinos, y por donde tus amigos te
+          Es tu identificador dentro de Paragon, y por donde tus amigos te
           añadirán. Minúsculas, números y guion bajo.
         </p>
 
