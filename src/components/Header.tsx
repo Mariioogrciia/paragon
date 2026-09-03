@@ -39,7 +39,10 @@ export function Header({
   return (
     <header
       className="sticky top-0 z-40 border-b border-border backdrop-blur"
-      style={{ background: "rgba(10, 13, 19, 0.88)" }}
+      // Translúcida sobre el fondo del tema, no un azul oscuro fijo: con el
+      // color incrustado, en modo claro la cabecera se quedaba negra y el
+      // texto (que sí sigue al tema) se volvía ilegible encima.
+      style={{ background: "color-mix(in srgb, var(--background) 88%, transparent)" }}
     >
       <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-[30px] px-7">
         <Link href="/" className="flex items-center gap-2.5">
