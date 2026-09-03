@@ -12,6 +12,7 @@ import {
   filterGames,
   libraryFacets,
   type GameStatus,
+  type HorasBucket,
   type SortKey,
 } from "@/lib/stats";
 import type { Dificultad } from "@/lib/difficulty";
@@ -98,6 +99,7 @@ export function LibraryGrid({
   const [genre, setGenre] = useState("");
   const [pegi, setPegi] = useState("");
   const [dificultad, setDificultad] = useState<Dificultad["nivel"] | 0>(0);
+  const [horas, setHoras] = useState<HorasBucket | "">("");
   const [collection, setCollection] = useState("");
   const [sort, setSort] = useState<SortKey>("reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -120,10 +122,11 @@ export function LibraryGrid({
       genre: genre || undefined,
       pegi: pegi || undefined,
       dificultad: dificultad || undefined,
+      horas: horas || undefined,
       sort,
       sortDir,
     });
-  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, sort, sortDir]);
+  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, horas, sort, sortDir]);
 
   const grupos = useMemo(() => {
     if (!agrupar) return null;
@@ -150,7 +153,7 @@ export function LibraryGrid({
   // seguiríamos "dentro" de la página 8 de una lista que ya no existe.
   useEffect(() => {
     setPagina(1);
-  }, [search, status, platform, publisher, genre, pegi, dificultad, collection, sort, sortDir]);
+  }, [search, status, platform, publisher, genre, pegi, dificultad, horas, collection, sort, sortDir]);
 
   const mostrados = useMemo(
     () => visible.slice(0, pagina * POR_PAGINA),
@@ -172,6 +175,7 @@ export function LibraryGrid({
     Boolean(genre) ||
     Boolean(pegi) ||
     Boolean(dificultad) ||
+    Boolean(horas) ||
     Boolean(collection);
 
   const renderGame = (game: Game) => {
@@ -367,6 +371,19 @@ export function LibraryGrid({
                 label: d.etiqueta,
                 count: d.count,
               })),
+            ]}
+            className="w-48"
+          />
+        )}
+
+        {facets.horas.length > 1 && (
+          <Dropdown
+            value={horas}
+            onChange={(v) => setHoras(v as HorasBucket | "")}
+            placeholder="Cualquier duración"
+            options={[
+              { value: "", label: "Cualquier duración" },
+              ...facets.horas.map((h) => ({ value: h.value, label: h.label, count: h.count })),
             ]}
             className="w-48"
           />

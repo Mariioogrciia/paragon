@@ -143,8 +143,40 @@ export interface LibraryFilters {
   pegi?: string;
   /** Nivel de dificultad estimada (lib/difficulty.ts), 1 (regalado) a 6 (brutal). */
   dificultad?: Dificultad["nivel"];
+  horas?: HorasBucket;
   sort?: SortKey;
   sortDir?: "asc" | "desc";
+}
+
+/**
+ * Tramos de horas jugadas. Ninguna plataforma da horas por fecha, así que
+ * este filtro es sobre el total acumulado de siempre (mismo aviso que
+ * `lib/personalRankings.ts` sobre las horas: es lo único que hay).
+ */
+export type HorasBucket = "sin-horas" | "0-10" | "10-50" | "50-100" | "100+";
+
+const TRAMOS_HORAS: { value: HorasBucket; label: string; min: number; max: number }[] = [
+  { value: "sin-horas", label: "Sin horas registradas", min: -1, max: 0 },
+  { value: "0-10", label: "Menos de 10 h", min: 0, max: 10 },
+  { value: "10-50", label: "10 - 50 h", min: 10, max: 50 },
+  { value: "50-100", label: "50 - 100 h", min: 50, max: 100 },
+  { value: "100+", label: "Más de 100 h", min: 100, max: Infinity },
+];
+
+function horasDe(game: Game): number {
+  return (game.playtimeMinutes ?? 0) / 60;
+}
+
+function enTramoDeHoras(game: Game, tramo: HorasBucket): boolean {
+  const def = TRAMOS_HORAS.find((t) => t.value === tramo);
+  if (!def) return true;
+
+  const horas = horasDe(game);
+  // "Sin horas registradas": ni playtimeMinutes ni horas ganadas, distinto de
+  // "menos de 10h", que sí tiene alguna hora contada.
+  if (tramo === "sin-horas") return !game.playtimeMinutes;
+
+  return horas > def.min && horas <= def.max;
 }
 
 /** Quita acentos y mayúsculas: buscar "pokemon" tiene que encontrar "Pokémon". */
@@ -206,6 +238,8 @@ export function filterGames(games: Game[], filters: LibraryFilters): Game[] {
       const d = dificultadDeGame(game);
       if (!d || d.nivel !== filters.dificultad) return false;
     }
+
+    if (filters.horas && !enTramoDeHoras(game, filters.horas)) return false;
 
     return true;
   });
@@ -279,6 +313,12 @@ export interface DificultadFacet {
   count: number;
 }
 
+export interface HorasFacet {
+  value: HorasBucket;
+  label: string;
+  count: number;
+}
+
 export function libraryFacets(games: Game[]): {
   publishers: Facet[];
   genres: Facet[];
@@ -287,6 +327,8 @@ export function libraryFacets(games: Game[]): {
   pegis: Facet[];
   /** Solo los niveles que de verdad tiene algún juego (no los seis siempre). */
   dificultades: DificultadFacet[];
+  /** Solo los tramos de horas que de verdad tiene algún juego. */
+  horas: HorasFacet[];
 } {
   const tally = (values: (string | null | undefined)[]) => {
     const map = new Map<string, number>();
@@ -316,12 +358,19 @@ export function libraryFacets(games: Game[]): {
     });
   }
 
+  const horas: HorasFacet[] = TRAMOS_HORAS.map((tramo) => ({
+    value: tramo.value,
+    label: tramo.label,
+    count: games.filter((g) => enTramoDeHoras(g, tramo.value)).length,
+  })).filter((f) => f.count > 0);
+
   return {
     publishers: tally(games.map(companyOf)),
     genres: tally(games.flatMap((g) => g.genres ?? [])),
     platforms: tally(games.map((g) => g.platform)),
     pegis,
     dificultades: [...dificultadesMap.values()].sort((a, b) => a.nivel - b.nivel),
+    horas,
   };
 }
 
