@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";
 import { type Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
 import { gruposPorTitulo } from "@/lib/stats";
@@ -128,15 +129,7 @@ export function ParagonWrap({
         <h2 className="font-heading text-[26px] font-bold uppercase tracking-wide flex items-center gap-2">
           <span className="text-xl">✨</span> Paragon Wrap
         </h2>
-        {handle && (
-          <a
-            href={`/api/wrap/${handle}`}
-            download={`paragon-wrap-${handle}.png`}
-            className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
-          >
-            Compartir imagen
-          </a>
-        )}
+        {handle && <CompartirImagenWrap handle={handle} />}
         <Link
           href="/ritmo"
           className={handle ? "text-xs font-bold uppercase tracking-wide text-accent hover:underline" : "ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"}

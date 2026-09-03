@@ -35,6 +35,26 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Paragon",
   description: "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.",
+  // El propio archivo `app/manifest.ts` ya hace que Next sirva
+  // /manifest.webmanifest y (con esta línea) lo enlace en el <head> — antes
+  // había además un `<link rel="manifest" href="/manifest.ts">` a mano en
+  // este layout, apuntando a una ruta que da 404 de verdad (el ".ts" nunca
+  // se sirve tal cual). Con un manifest que el navegador no puede leer,
+  // "Añadir a pantalla de inicio" no aparece en ningún sitio — ni en iOS ni
+  // en Android/escritorio — así que la app nunca se podía "instalar".
+  manifest: "/manifest.webmanifest",
+  // iOS ignora por completo los iconos del manifest (limitación de Safari,
+  // no nuestra): solo mira `apple-touch-icon`. Sin esto, "Añadir a pantalla
+  // de inicio" funciona pero el icono sale en blanco o es una captura fea
+  // de la propia página.
+  appleWebApp: {
+    capable: true,
+    title: "Paragon",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    apple: "/logo.jpg",
+  },
 };
 
 /**
@@ -103,7 +123,6 @@ export default async function RootLayout({
   return (
     <html lang="es" className={`${barlow.variable} ${chakra.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="manifest" href="/manifest.ts" />
         {/*
           El acento se aplica antes de pintar. Si esperásemos al efecto de
           React, la primera pintada saldría azul y cambiaría de color a la vista

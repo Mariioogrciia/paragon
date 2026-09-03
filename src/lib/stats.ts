@@ -256,7 +256,20 @@ export function filterGames(games: Game[], filters: LibraryFilters): Game[] {
     }
 
     if (filters.status && filters.status !== "todos") {
-      if (gameProgress(game).status !== filters.status) return false;
+      if (filters.status === "completado") {
+        // "Al 100%" es aparte de `gameProgress().status === "completado"` a
+        // propósito: ese estado derivado excluye cualquier juego que también
+        // cuente como platino (ver esPlatinoEquivalente — un 100% de Steam YA
+        // cuenta como platino, y un platino de verdad en PSN también), así
+        // que para casi cualquier biblioteca de PSN/Steam esa categoría
+        // estaba prácticamente vacía siempre — la píldora "Al 100%" no
+        // filtraba nada aunque el usuario tuviera decenas de juegos al 100%.
+        // Aquí "Al 100%" es justo eso: el propio porcentaje, sin importar si
+        // ese 100% también se cuenta como platino en las estadísticas.
+        if (game.isWishlist || game.progressPercent !== 100) return false;
+      } else if (gameProgress(game).status !== filters.status) {
+        return false;
+      }
     }
 
     if (filters.publisher && companyOf(game) !== filters.publisher) return false;

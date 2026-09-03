@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { GameCard } from "@/components/GameCard";
 import { Dropdown } from "@/components/Dropdown";
@@ -53,15 +53,17 @@ function Pill({
   active,
   onClick,
   children,
+  className = "",
 }: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className="rounded-[9px] px-3.5 py-2 text-xs font-semibold tracking-[0.02em] transition-colors hover:text-foreground"
+      className={`rounded-[9px] px-3.5 py-2 text-xs font-semibold tracking-[0.02em] transition-colors hover:text-foreground ${className}`}
       style={
         active
           ? { background: "var(--accent-grad)", color: "#061021" }
@@ -178,6 +180,13 @@ export function LibraryGrid({
     Boolean(horas) ||
     Boolean(collection);
 
+  // Cuántos de los filtros "secundarios" (los que se esconden detrás de "Más
+  // filtros") están puestos — para el aviso en el propio botón: no hace
+  // falta abrir el panel para saber que hay algo filtrando ahí dentro.
+  const filtrosSecundariosActivos = [collection, publisher, genre, pegi, dificultad, horas, agrupar].filter(
+    Boolean,
+  ).length;
+
   const renderGame = (game: Game) => {
     if (view === "grid") {
       return (
@@ -210,11 +219,14 @@ export function LibraryGrid({
     );
   };
 
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   return (
     <div>
+      {/* 1. Barra de búsqueda y controles de vista */}
       <div className="mb-4 flex flex-wrap items-center gap-2.5">
         <div
-          className="flex min-w-[220px] flex-1 items-center gap-2.5 rounded-xl px-3.5"
+          className="flex min-w-[220px] flex-1 items-center gap-2.5 rounded-xl px-3.5 transition-colors focus-within:border-accent"
           style={FIELD}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -246,7 +258,7 @@ export function LibraryGrid({
 
         <button 
           onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
-          className="h-[38px] w-[38px] flex items-center justify-center rounded-[9px] text-[18px] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
+          className="h-[38px] w-[38px] flex shrink-0 items-center justify-center rounded-[9px] text-[18px] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
           style={FIELD}
           title={sortDir === "asc" ? "Orden ascendente" : "Orden descendente"}
         >
@@ -263,11 +275,11 @@ export function LibraryGrid({
           )}
         </button>
 
-        <div className="flex gap-1 ml-2 rounded-[9px] p-1" style={FIELD}>
-          <button onClick={() => setView("grid")} className={`p-1.5 rounded-md ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
+        <div className="flex gap-1 rounded-[9px] p-1 shrink-0" style={FIELD}>
+          <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
           </button>
-          <button onClick={() => setView("list")} className={`p-1.5 rounded-md ${view === "list" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
+          <button onClick={() => setView("list")} className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           </button>
         </div>
@@ -275,138 +287,213 @@ export function LibraryGrid({
         {esMio && <AddManualGameModal />}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2.5">
+      {/* 2. Filtros organizados en cuadrícula para alinear los anchos */}
+      <div className="mb-6 flex flex-col gap-3">
+        {/* Barra de estados (8 elementos). Usamos grid para que los 8 ocupen lo mismo. */}
         <div
-          className="inline-flex gap-1.5 rounded-xl p-1"
+          className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5 rounded-xl p-1"
           style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
         >
           {STATUS.map((s) => (
-            <Pill key={s.value} active={status === s.value} onClick={() => setStatus(s.value)}>
+            <Pill 
+              key={s.value} 
+              active={status === s.value} 
+              onClick={() => setStatus(s.value)}
+              className="flex-1 w-full flex justify-center items-center text-center"
+            >
               {s.label}
             </Pill>
           ))}
         </div>
 
-        {hayVariasPlataformas && (
-          <div
-            className="inline-flex gap-1.5 rounded-xl p-1"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            <Pill active={platform === "todas"} onClick={() => setPlatform("todas")}>
-              Todas
-            </Pill>
-            {facets.platforms.map((p) => (
-              <Pill
-                key={p.value}
-                active={platform === p.value}
-                onClick={() => setPlatform(p.value as Platform)}
-              >
-                {PLATFORM_LABEL[p.value as Platform]} ({p.count})
+        {/* Plataforma (lo más usado) y el botón que esconde el resto: antes
+            se veían 6 desplegables + "Agrupar por empresa" a la vez, siempre,
+            aunque nadie los tocara — mucho ruido visual para filtros que la
+            mayoría usa poco. */}
+        <div className="flex flex-wrap items-center gap-3">
+          {hayVariasPlataformas && (
+            <div
+              className="flex flex-1 min-w-[240px] rounded-xl p-1 gap-1.5"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+            >
+              <Pill active={platform === "todas"} onClick={() => setPlatform("todas")} className="flex-1 flex justify-center text-center">
+                Todas
               </Pill>
-            ))}
-          </div>
-        )}
+              {facets.platforms.map((p) => (
+                <Pill
+                  key={p.value}
+                  active={platform === p.value}
+                  onClick={() => setPlatform(p.value as Platform)}
+                  className="flex-1 flex justify-center text-center"
+                >
+                  {PLATFORM_LABEL[p.value as Platform]} ({p.count})
+                </Pill>
+              ))}
+            </div>
+          )}
 
-        {collections.length > 0 && (
-          <Dropdown
-            value={collection}
-            onChange={setCollection}
-            placeholder="Todas las carpetas"
-            options={[
-              { value: "", label: "Todas las carpetas" },
-              ...collections.map(c => ({ value: c.id, label: c.name, count: c.gameIds.length }))
-            ]}
-            className="w-48"
-          />
-        )}
-
-        {facets.publishers.length > 0 && (
-          <Dropdown
-            value={publisher}
-            onChange={setPublisher}
-            placeholder="Todas las empresas"
-            options={[
-              { value: "", label: "Todas las empresas" },
-              ...facets.publishers.map(p => ({ value: p.value, label: p.value, count: p.count }))
-            ]}
-            className="w-48"
-          />
-        )}
-
-        {facets.genres.length > 0 && (
-          <Dropdown
-            value={genre}
-            onChange={setGenre}
-            placeholder="Todos los géneros"
-            options={[
-              { value: "", label: "Todos los géneros" },
-              ...facets.genres.map(g => ({ value: g.value, label: g.value, count: g.count }))
-            ]}
-            className="w-48"
-          />
-        )}
-
-        {facets.pegis.length > 1 && (
-          <Dropdown
-            value={pegi}
-            onChange={setPegi}
-            placeholder="Cualquier edad"
-            options={[
-              { value: "", label: "Cualquier edad" },
-              ...facets.pegis.map((p) => ({ value: p.value, label: `PEGI ${p.value}`, count: p.count })),
-            ]}
-            className="w-40"
-          />
-        )}
-
-        {facets.dificultades.length > 1 && (
-          <Dropdown
-            value={dificultad ? String(dificultad) : ""}
-            onChange={(v) => setDificultad((v ? Number(v) : 0) as Dificultad["nivel"] | 0)}
-            placeholder="Cualquier dificultad"
-            options={[
-              { value: "", label: "Cualquier dificultad" },
-              ...facets.dificultades.map((d) => ({
-                value: String(d.nivel),
-                label: d.etiqueta,
-                count: d.count,
-              })),
-            ]}
-            className="w-48"
-          />
-        )}
-
-        {facets.horas.length > 1 && (
-          <Dropdown
-            value={horas}
-            onChange={(v) => setHoras(v as HorasBucket | "")}
-            placeholder="Cualquier duración"
-            options={[
-              { value: "", label: "Cualquier duración" },
-              ...facets.horas.map((h) => ({ value: h.value, label: h.label, count: h.count })),
-            ]}
-            className="w-48"
-          />
-        )}
-
-        {facets.publishers.length > 0 && (
           <button
-            onClick={() => setAgrupar((v) => !v)}
-            className="rounded-[10px] px-3.5 py-2 text-[13px] font-semibold"
+            onClick={() => setShowAdvanced((v) => !v)}
+            className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-colors"
             style={
-              agrupar
+              showAdvanced || filtrosSecundariosActivos > 0
                 ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
                 : { ...FIELD, color: "var(--muted)" }
             }
           >
-            Agrupar por empresa
+            Más filtros
+            {filtrosSecundariosActivos > 0 && (
+              <span
+                className="flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold"
+                style={{ background: "var(--accent)", color: "#061021" }}
+              >
+                {filtrosSecundariosActivos}
+              </span>
+            )}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`transition-transform duration-200 ${showAdvanced ? "rotate-180" : ""}`}
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </button>
-        )}
 
-        {filtrado && (
-          <span className="text-[13px] text-muted">
-            {visible.length} de {games.length}
-          </span>
+          {filtrado && (
+            <div className="flex items-center gap-3">
+              <span className="text-[13px] text-muted">{visible.length} resultados</span>
+              <button
+                onClick={() => {
+                  setStatus("todos");
+                  setPlatform("todas");
+                  setCollection("");
+                  setPublisher("");
+                  setGenre("");
+                  setPegi("");
+                  setDificultad(0);
+                  setHoras("");
+                  setSearch("");
+                  setAgrupar(false);
+                }}
+                className="rounded-[10px] px-4 py-2 text-[13px] font-semibold text-muted hover:text-foreground transition-colors"
+                style={FIELD}
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Desplegables secundarios: solo se pintan si "Más filtros" está
+            abierto — antes vivían siempre visibles, aquí es donde estaba el
+            grueso del ruido. */}
+        {showAdvanced && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+          {collections.length > 0 && (
+            <Dropdown
+              value={collection}
+              onChange={setCollection}
+              placeholder="Todas las carpetas"
+              options={[
+                { value: "", label: "Todas las carpetas" },
+                ...collections.map(c => ({ value: c.id, label: c.name, count: c.gameIds.length }))
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {facets.publishers.length > 0 && (
+            <Dropdown
+              value={publisher}
+              onChange={setPublisher}
+              placeholder="Todas las empresas"
+              options={[
+                { value: "", label: "Todas las empresas" },
+                ...facets.publishers.map(p => ({ value: p.value, label: p.value, count: p.count }))
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {facets.genres.length > 0 && (
+            <Dropdown
+              value={genre}
+              onChange={setGenre}
+              placeholder="Todos los géneros"
+              options={[
+                { value: "", label: "Todos los géneros" },
+                ...facets.genres.map(g => ({ value: g.value, label: g.value, count: g.count }))
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {facets.pegis.length > 1 && (
+            <Dropdown
+              value={pegi}
+              onChange={setPegi}
+              placeholder="Cualquier edad"
+              options={[
+                { value: "", label: "Cualquier edad" },
+                ...facets.pegis.map((p) => ({ value: p.value, label: `PEGI ${p.value}`, count: p.count })),
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {facets.dificultades.length > 1 && (
+            <Dropdown
+              value={dificultad ? String(dificultad) : ""}
+              onChange={(v) => setDificultad((v ? Number(v) : 0) as Dificultad["nivel"] | 0)}
+              placeholder="Cualquier dificultad"
+              options={[
+                { value: "", label: "Cualquier dificultad" },
+                ...facets.dificultades.map((d) => ({
+                  value: String(d.nivel),
+                  label: d.etiqueta,
+                  count: d.count,
+                })),
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {facets.horas.length > 1 && (
+            <Dropdown
+              value={horas}
+              onChange={(v) => setHoras(v as HorasBucket | "")}
+              placeholder="Cualquier duración"
+              options={[
+                { value: "", label: "Cualquier duración" },
+                ...facets.horas.map((h) => ({ value: h.value, label: h.label, count: h.count })),
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {/* Agrupar por empresa: es un modo de visualización, no un filtro
+              que reduzca resultados, pero vive aquí dentro porque solo
+              interesa a quien ya está afinando la búsqueda. */}
+          {facets.publishers.length > 0 && (
+            <button
+              onClick={() => setAgrupar((v) => !v)}
+              className="col-span-1 rounded-[10px] px-4 py-2 text-[13px] font-semibold transition-colors"
+              style={
+                agrupar
+                  ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
+                  : { ...FIELD, color: "var(--muted)" }
+              }
+            >
+              Agrupar por empresa
+            </button>
+          )}
+        </div>
         )}
       </div>
 
@@ -434,21 +521,33 @@ export function LibraryGrid({
             layout
             className={view === "grid" ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-2"}
           >
-            <AnimatePresence mode="popLayout">
-              {mostrados.map((game) => (
-                <motion.div
-                  key={game.id}
-                  layout
-                  initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-20px" }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                >
-                  {renderGame(game)}
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {/*
+              Antes esto iba envuelto en `AnimatePresence mode="popLayout"`
+              con `whileInView` para la entrada. Escribir en el buscador
+              dispara un cambio de filtro por cada pulsación (g, gr, gra,
+              gran, grand...): cada una recalcula `visible` antes de que
+              `AnimatePresence` termine de digerir la salida de las tarjetas
+              de la pulsación anterior. Con una biblioteca grande (200+
+              juegos) el resultado era tarjetas "fantasma" que se quedaban
+              clavadas en pantalla a opacidad 1 aunque ya no estuvieran en
+              `visible` — el contador decía "5 resultados" y seguían
+              viéndose 27 tarjetas. Sin `AnimatePresence` no hay animación de
+              salida (una tarjeta que deja de cumplir el filtro desaparece
+              al instante, sin fundido), pero desaparece de verdad siempre —
+              que el filtro se equivoque en el número de tarjetas es un fallo
+              real de datos, no una animación de menos.
+            */}
+            {mostrados.map((game) => (
+              <motion.div
+                key={game.id}
+                layout
+                initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                {renderGame(game)}
+              </motion.div>
+            ))}
           </motion.div>
 
           {/* Sentinela: al entrar en pantalla se pinta la página siguiente. */}
