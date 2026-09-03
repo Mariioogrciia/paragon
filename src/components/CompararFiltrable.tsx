@@ -130,6 +130,9 @@ export function CompararFiltrable({
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
                       <div className="h-full rounded-full" style={{ width: `${p.percent}%`, background: "var(--accent-grad-h)" }} />
                     </div>
+                    {juego.horas[i] !== undefined && (
+                      <span className="text-[10px] text-muted">{juego.horas[i]!.toFixed(0)} h</span>
+                    )}
                   </div>
                 ))}
               </div>

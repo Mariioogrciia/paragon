@@ -149,12 +149,22 @@ export async function checkAndGrantBadges(userId: string) {
   // Give "madrugador" to everyone for now (early adopters)
   await grantBadge(userId, "madrugador");
 
+  // Un 100% de Steam cuenta como platino (ver esPlatinoEquivalente en
+  // lib/stats.ts): Steam no tiene trofeo de platino que sumar, así que sin
+  // este `+ count(...)` esas insignias nunca las conseguiría nadie que solo
+  // jugara ahí.
   const result = await db
     .select({
       totalGames: sql<number>`count(distinct ${userGames.gameId})`,
-      totalPlatinums: sql<number>`sum(CAST(${userGames.earned}->>'platinum' AS INTEGER))`,
+      totalPlatinums: sql<number>`
+        coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
+        + count(*) filter (
+          where ${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100
+        )
+      `,
     })
     .from(userGames)
+    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
     .where(eq(userGames.userId, userId));
 
   const platinums = Number(result[0]?.totalPlatinums ?? 0);
@@ -174,9 +184,15 @@ export async function getGlobalStats() {
       totalGames: sql<number>`count(distinct ${userGames.gameId})`,
       totalTrophies: sql<number>`sum(${userGames.earnedTotal})`,
       avgCompletion: sql<number>`avg(nullif(${userGames.progressPercent}, 0))`,
-      totalPlatinums: sql<number>`sum(CAST(${userGames.earned}->>'platinum' AS INTEGER))`,
+      totalPlatinums: sql<number>`
+        coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
+        + count(*) filter (
+          where ${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100
+        )
+      `,
     })
-    .from(userGames);
+    .from(userGames)
+    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId));
 
   const row = result[0];
   return {

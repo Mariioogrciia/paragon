@@ -216,10 +216,13 @@ export default async function CompararPage({
                         />
                       </div>
                       <span
-                        className="w-10 shrink-0 text-right text-xs font-bold"
+                        className="w-16 shrink-0 text-right text-xs font-bold"
                         style={i === 1 ? { color: "var(--muted)" } : undefined}
                       >
                         {p.percent}%
+                        {row.horas[i] !== undefined && (
+                          <span className="ml-1 font-normal text-muted">{row.horas[i]!.toFixed(0)}h</span>
+                        )}
                       </span>
                     </div>
                   ))}

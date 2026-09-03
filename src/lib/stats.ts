@@ -26,11 +26,28 @@ export interface GameProgress {
  * terminar un juego es el 100%, y por eso cae en "completado": no es que le
  * falte algo, es que esa plataforma no tiene metales.
  */
+/**
+ * Si esto cuenta como un platino, aunque no lo sea literalmente.
+ *
+ * Steam no tiene sistema de platino — su "terminar el juego" es el 100% de
+ * logros. Contarlo aparte (como "completado", no "platinado") era honesto
+ * pero le restaba mérito: para quien juega en Steam, sacarse todos los
+ * logros de un juego largo es exactamente el mismo hito que un platino en
+ * PSN. Así que cuenta como platino en las estadísticas (recuento de
+ * platinos, insignias, XP de nivel) y en el estado que se enseña — en todo
+ * salvo en el propio dato crudo `earned.platinum`, que sigue reflejando lo
+ * que de verdad devuelve cada API.
+ */
+export function esPlatinoEquivalente(game: Game): boolean {
+  if ((game.earned?.platinum ?? 0) > 0) return true;
+  return game.platform === "steam" && game.progressPercent === 100;
+}
+
 export function gameProgress(game: Game): GameProgress {
   const earned = game.earnedTotal;
   const total = game.definedTotal;
   const hasPlatinum = (game.defined?.platinum ?? 0) > 0;
-  const platinumEarned = (game.earned?.platinum ?? 0) > 0;
+  const platinumEarned = esPlatinoEquivalente(game);
 
   let status: GameStatus;
   if (game.isWishlist) {
@@ -103,8 +120,10 @@ export function summarise(games: Game[]): PlayerSummary {
 
   for (const g of games) {
     // El desglose por metal solo lo dan las plataformas que los tienen; el
-    // total, en cambio, cuenta siempre.
-    counts.platinum += g.earned?.platinum ?? 0;
+    // total, en cambio, cuenta siempre. `esPlatinoEquivalente` suma también
+    // los 100% de Steam, que no tienen trofeo de platino que contar pero
+    // cuentan como uno.
+    counts.platinum += esPlatinoEquivalente(g) ? 1 : 0;
     counts.gold += g.earned?.gold ?? 0;
     counts.silver += g.earned?.silver ?? 0;
     counts.bronze += g.earned?.bronze ?? 0;
@@ -383,6 +402,13 @@ export interface SharedGame {
   platform: Platform;
   /** Progreso por jugador, en el mismo orden que las librerías recibidas. */
   progress: GameProgress[];
+  /**
+   * Horas jugadas por jugador, mismo orden que `progress`. `undefined`
+   * cuando esa plataforma no las da (PSN no siempre las tiene) — se
+   * distingue de "0 horas" a propósito, para no enseñar un 0 que en
+   * realidad es "no lo sabemos".
+   */
+  horas: (number | undefined)[];
 }
 
 /**
@@ -402,12 +428,15 @@ export function sharedGames(libraries: Library[]): SharedGame[] {
     const others = rest.map((lib) => lib.games.find((g) => g.id === game.id));
     if (others.some((g) => !g)) continue;
 
+    const todos = [game, ...(others as Game[])];
+
     rows.push({
       id: game.id,
       title: game.title,
       iconUrl: game.iconUrl,
       platform: game.platform,
-      progress: [game, ...(others as Game[])].map(gameProgress),
+      progress: todos.map(gameProgress),
+      horas: todos.map((g) => (g.playtimeMinutes != null ? g.playtimeMinutes / 60 : undefined)),
     });
   }
 

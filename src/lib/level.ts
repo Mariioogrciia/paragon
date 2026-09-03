@@ -1,3 +1,4 @@
+import { esPlatinoEquivalente } from "@/lib/stats";
 import type { Game, TrophyCounts } from "@/lib/types";
 
 export const XP_POR_GRADO: Record<keyof TrophyCounts, number> = {
@@ -58,10 +59,18 @@ export function paragonProgress(games: Game[]): ParagonProgress {
 
   for (const game of games) {
     if (game.isWishlist) continue;
-    for (const grade of Object.keys(earned) as (keyof TrophyCounts)[]) {
+    for (const grade of ["bronze", "silver", "gold"] as const) {
       earned[grade] += game.earned?.[grade] ?? 0;
     }
-    if (game.progressPercent === 100) juegosCompletados += 1;
+
+    // Mutuamente excluyentes, igual que el estado en gameProgress (stats.ts):
+    // un 100% de Steam cuenta como platino, no como "juego completado" aparte
+    // — contarlo en los dos sería XP de más por el mismo hito.
+    if (esPlatinoEquivalente(game)) {
+      earned.platinum += 1;
+    } else if (game.progressPercent === 100) {
+      juegosCompletados += 1;
+    }
   }
 
   const trofeos = (["bronze", "silver", "gold"] as const).reduce(
