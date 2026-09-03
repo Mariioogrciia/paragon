@@ -1,9 +1,10 @@
 import "server-only";
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games as gamesTable, platformAccounts, userGames, users } from "@/db/schema";
+import { games as gamesTable, userGames, users } from "@/db/schema";
 import type { Platform } from "@/lib/types";
 import { getGame } from "@/lib/igdb/client";
+import { avatarUrlSql } from "@/lib/avatarSql";
 
 /**
  * Ficha global de un juego: `/juego/[id]`.
@@ -133,22 +134,7 @@ export async function getGameReviews(gameId: string): Promise<GameReview[]> {
       userId: users.id,
       handle: users.handle,
       name: users.name,
-      // Misma foto que en el resto de la app (ver resolveAvatarUrl en
-      // profiles.ts): PSN primero, luego cualquier otra cuenta con avatar,
-      // y solo si no hay ninguna la imagen genérica de la cuenta. Antes
-      // esto leía `users.image` a pelo, así que alguien con PSN vinculado
-      // pero sin imagen de login salía sin foto en sus reseñas.
-      image: sql<string | null>`
-        coalesce(
-          (select ${platformAccounts.avatarUrl} from ${platformAccounts}
-            where ${platformAccounts.userId} = ${users.id} and ${platformAccounts.platform} = 'psn'
-            limit 1),
-          (select ${platformAccounts.avatarUrl} from ${platformAccounts}
-            where ${platformAccounts.userId} = ${users.id} and ${platformAccounts.avatarUrl} is not null
-            limit 1),
-          ${users.image}
-        )
-      `,
+      image: avatarUrlSql(users.id, users.image),
       rating: userGames.rating,
       review: userGames.review,
       reviewDate: userGames.reviewDate,

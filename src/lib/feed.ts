@@ -2,6 +2,7 @@ import { getDb } from "@/db";
 import { activities, users, games, activityComments, activityReactions } from "@/db/schema";
 import { inArray, desc, eq, sql } from "drizzle-orm";
 import { listFriends } from "./profiles";
+import { avatarUrlSql } from "@/lib/avatarSql";
 
 export async function getFeed(userId: string) {
   const db = getDb();
@@ -24,7 +25,7 @@ export async function getFeed(userId: string) {
         id: users.id,
         handle: users.handle,
         name: users.name,
-        image: users.image,
+        image: avatarUrlSql(users.id, users.image),
       },
       game: {
         id: games.id,
@@ -86,7 +87,7 @@ export async function getGlobalFeed(currentUserId?: string) {
         id: users.id,
         handle: users.handle,
         name: users.name,
-        image: users.image,
+        image: avatarUrlSql(users.id, users.image),
       },
       game: {
         id: games.id,

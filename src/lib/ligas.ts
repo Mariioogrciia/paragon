@@ -1,6 +1,7 @@
 import { getDb } from "@/db";
 import { users, userTrophies, gameTrophies } from "@/db/schema";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
+import { avatarUrlSql } from "@/lib/avatarSql";
 
 export interface LigaUser {
   userId: string;
@@ -37,7 +38,7 @@ export async function getLigaMensual(): Promise<LigaUser[]> {
       userId: users.id,
       handle: users.handle,
       name: users.name,
-      image: users.image,
+      image: avatarUrlSql(users.id, users.image),
       points: pointsSql,
     })
     .from(userTrophies)
