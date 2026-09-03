@@ -20,14 +20,21 @@ import { generarAvisos } from "@/lib/notifications";
  * PSN y Steam se lleva decenas de segundos (biblioteca entera + detalle de los
  * juegos recientes de Steam), así que la función se quedaría sin tiempo a la
  * tercera persona. Se cogen los más desactualizados y el resto entra en la
- * pasada siguiente; con una ejecución por hora, la rotación cubre a todos.
+ * pasada siguiente.
+ *
+ * El plan Hobby de Vercel solo deja una ejecución diaria (no por hora, que es
+ * lo que pedía este cron al principio y Vercel rechazó el despliegue), así
+ * que la rotación entre usuarios es más lenta: cubre a todos en varios días
+ * en vez de en un día. Los límites de abajo van generosos porque, aun así,
+ * quien de verdad corta cada bloque es el chequeo de tiempo transcurrido, no
+ * estos números.
  */
 
 /** Segundos de la función. Vercel corta a 60 en el plan Hobby. */
 export const maxDuration = 60;
 
 /** Cuántas cuentas se intentan como mucho en una pasada. */
-const POR_PASADA = 5;
+const POR_PASADA = 8;
 
 /**
  * Cuántas fichas de juego se rellenan por pasada.
@@ -38,13 +45,13 @@ const POR_PASADA = 5;
  * ha abierto alguna vez. Rellenando unos cuantos por pasada, el histórico se
  * completa solo con el tiempo en vez de depender de que el usuario navegue.
  */
-const DETALLES_POR_PASADA = 12;
+const DETALLES_POR_PASADA = 40;
 
 /**
  * Cuántos juegos se intentan clasificar por pasada. Van todos en UNA consulta
  * a IGDB, así que el número puede ser generoso sin gastar cuota.
  */
-const PEGI_POR_PASADA = 40;
+const PEGI_POR_PASADA = 150;
 
 /**
  * Margen para cerrar. Si al terminar con una cuenta queda menos que esto, no
