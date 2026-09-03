@@ -83,8 +83,8 @@ function ViewButton({
       className="rounded-md p-1.5 transition-colors"
       style={
         active
-          ? { background: "rgba(74, 158, 255, 0.16)", color: "#cfe4ff" }
-          : { background: "transparent", color: "#8794a8" }
+          ? { background: "rgb(var(--accent-rgb) / 0.16)", color: "var(--accent-text)" }
+          : { background: "transparent", color: "var(--muted)" }
       }
     >
       <svg

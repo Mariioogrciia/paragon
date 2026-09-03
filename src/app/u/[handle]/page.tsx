@@ -10,6 +10,7 @@ import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { FavoritePicker } from "@/components/FavoritePicker";
+import { AddManualGameModal } from "@/components/AddManualGameModal";
 import { coverGradient } from "@/lib/design";
 
 export default async function PerfilPage({
@@ -25,18 +26,28 @@ export default async function PerfilPage({
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
 
-  if (profile.accounts.length === 0) {
+  const { player, games } = await getLibrary(profile);
+
+  // Antes esto cortaba en seco si no había cuenta vinculada. Ya no vale: un
+  // perfil puede tener solo juegos añadidos a mano y ninguna cuenta de PSN o
+  // Steam, y aun así tiene biblioteca que enseñar.
+  if (profile.accounts.length === 0 && games.length === 0) {
     return (
       <div className="py-16 text-center">
         <h1 className="text-xl font-medium">@{handle}</h1>
         <p className="mt-2 text-sm text-muted">
-          Todavía no ha vinculado ninguna cuenta de juego.
+          {esMio
+            ? "Todavía no has vinculado ninguna cuenta ni añadido ningún juego."
+            : "Todavía no ha vinculado ninguna cuenta de juego."}
         </p>
+        {esMio && (
+          <div className="flex justify-center mt-4">
+            <AddManualGameModal />
+          </div>
+        )}
       </div>
     );
   }
-
-  const { player, games } = await getLibrary(profile);
   const stats = summarise(games);
   // Las carpetas del dueño del perfil: son parte de cómo ordena su biblioteca.
   const carpetas = await listCollections(profile.userId);
@@ -45,7 +56,7 @@ export default async function PerfilPage({
     <div className="-mx-7 -mt-9">
       <div
         className="relative overflow-hidden border-b border-border"
-        style={{ background: "radial-gradient(700px 320px at 25% 0%, rgba(74, 158, 255, 0.18), transparent 70%)" }}
+        style={{ background: "radial-gradient(700px 320px at 25% 0%, rgb(var(--accent-rgb) / 0.18), transparent 70%)" }}
       >
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-end gap-5 px-7 pb-8 pt-10">
           <Avatar src={player.avatarUrl} name={player.name} size={92} />
@@ -133,7 +144,7 @@ export default async function PerfilPage({
             </span>
           </div>
 
-          <LibraryGrid games={games} handle={handle} collections={carpetas} />
+          <LibraryGrid games={games} handle={handle} collections={carpetas} esMio={esMio} />
         </section>
 
         <UpcomingGames />

@@ -63,7 +63,7 @@ export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[
               <div 
                 key={game.id} 
                 onClick={() => toggleGame(game.id)}
-                className={`relative aspect-[3/4] cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${selected.includes(game.id) ? "border-accent shadow-[0_0_15px_rgba(74,158,255,0.4)]" : "border-transparent opacity-80 hover:opacity-100"}`}
+                className={`relative aspect-[3/4] cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${selected.includes(game.id) ? "border-accent shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.4)]" : "border-transparent opacity-80 hover:opacity-100"}`}
                 style={{ background: coverGradient(game.id) }}
               >
                 {game.iconUrl && (

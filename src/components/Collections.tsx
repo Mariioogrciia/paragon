@@ -2,18 +2,18 @@ import { deleteCollectionAction, toggleGameCollectionAction } from "@/app/action
 import type { Collection } from "@/lib/collections";
 import { NewCollectionForm } from "./forms/Forms";
 
-const CARD = { border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" };
+const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
 const DENTRO = {
-  background: "rgba(74, 158, 255, 0.14)",
-  border: "1px solid rgba(74, 158, 255, 0.32)",
-  color: "#cfe4ff",
+  background: "rgb(var(--accent-rgb) / 0.14)",
+  border: "1px solid rgb(var(--accent-rgb) / 0.32)",
+  color: "var(--accent-text)",
 };
 
 const FUERA = {
-  background: "#121721",
-  border: "1px solid #263042",
-  color: "#8794a8",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  color: "var(--muted)",
 };
 
 /**
@@ -80,7 +80,7 @@ export function CollectionManager({ collections }: { collections: Collection[] }
         <li
           key={carpeta.id}
           className="flex items-center gap-3 rounded-xl px-4 py-3"
-          style={{ border: "1px solid #2b3546", background: "#0d121b" }}
+          style={{ border: "1px solid var(--border)", background: "var(--background)" }}
         >
           <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">
             {carpeta.name}

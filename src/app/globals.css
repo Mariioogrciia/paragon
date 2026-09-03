@@ -7,7 +7,13 @@
   --border: #212a38;
   --foreground: #e9eef7;
   --muted: #8794a8;
-  --accent: #4a9eff;
+  /* El acento se declara en canal RGB suelto para poder derivar de él los
+     tintes translúcidos (rgb(var(--accent-rgb) / .14)). Antes esos tintes
+     iban a pelo como rgba(74, 158, 255, .14) por toda la app, y por eso
+     cambiar de acento "no cambiaba casi nada": solo se movían dos o tres
+     botones. */
+  --accent-rgb: 74 158 255;
+  --accent: rgb(var(--accent-rgb));
   --accent-2: #9fd4ec;
   --good: #4ec98a;
   --danger: #ff6b6b;
@@ -18,13 +24,26 @@
   --platinum: #9fd4ec;
 }
 
-/* El halo del fondo. Es una variable porque en claro tiene que desaparecer:
-   una mancha azul oscura sobre fondo blanco se ve como una suciedad. */
 :root {
-  --glow: #16203a;
-  /* Degradado de los botones primarios. Se deriva del acento para que
-     cambiarlo en el panel de apariencia mueva también los botones. */
+  /* Tintes derivados del acento: fondo de píldora, borde de píldora, halo y
+     texto teñido. Cualquier acento nuevo los hereda sin tocar un componente. */
+  --accent-soft: rgb(var(--accent-rgb) / 0.14);
+  --accent-line: rgb(var(--accent-rgb) / 0.32);
+  --accent-glow: rgb(var(--accent-rgb) / 0.45);
+  /* Texto sobre fondo oscuro: el acento aclarado hasta que se lee cómodo.
+     En claro se invierte (ver .light), porque un azul pastel sobre blanco no
+     se distingue. */
+  --accent-text: color-mix(in srgb, var(--accent) 55%, white);
+
+  /* El halo del fondo. Sale del acento, así que cambiarlo repinta la página
+     entera y no solo los botones. En claro se apaga: una mancha de color
+     sobre fondo blanco se ve como suciedad. */
+  --glow: color-mix(in srgb, var(--accent) 18%, var(--background));
+
+  /* Degradados de marca. El vertical es el de los botones primarios; el
+     horizontal, el de las barras de progreso. */
   --accent-grad: linear-gradient(160deg, var(--accent-2), var(--accent));
+  --accent-grad-h: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 
 .light {
@@ -34,11 +53,12 @@
   --border: #d8dee8;
   --foreground: #10151f;
   --muted: #64748b;
-  --accent: #2563eb;
-  --accent-2: #3b82f6;
+  --accent-2: color-mix(in srgb, var(--accent) 55%, white);
   --good: #10b981;
   --danger: #ef4444;
-  --glow: #dfe7f7;
+  /* Al revés que en oscuro: el texto teñido se oscurece para que se lea. */
+  --accent-text: color-mix(in srgb, var(--accent) 75%, black);
+  --glow: color-mix(in srgb, var(--accent) 10%, var(--background));
 }
 
 /* Negro puro: en pantallas OLED el píxel se apaga y el contraste es total. */
@@ -47,7 +67,9 @@
   --surface: #0a0a0c;
   --surface-2: #141418;
   --border: #232329;
-  --glow: #0a0f1c;
+  /* Casi sin halo: el fondo tiene que quedarse en negro puro, que es el
+     motivo entero de este modo. */
+  --glow: color-mix(in srgb, var(--accent) 7%, var(--background));
 }
 
 /* Bordes y texto más marcados, para quien necesita más separación visual. */
@@ -58,7 +80,10 @@
   --border: #5a6b82;
   --foreground: #ffffff;
   --muted: #c3cddb;
-  --glow: #101a2e;
+  --accent-text: color-mix(in srgb, var(--accent) 30%, white);
+  --accent-soft: rgb(var(--accent-rgb) / 0.22);
+  --accent-line: rgb(var(--accent-rgb) / 0.6);
+  --glow: color-mix(in srgb, var(--accent) 12%, var(--background));
 }
 
 /* ---------------------------------------------------------------- *
@@ -69,24 +94,35 @@
  * los botones, que van con texto oscuro encima del acento.          *
  * ---------------------------------------------------------------- */
 .accent-violet {
-  --accent: #8b5cf6;
+  --accent-rgb: 139 92 246;
   --accent-2: #c4b5fd;
 }
 
 .accent-red {
-  --accent: #ef4444;
+  --accent-rgb: 239 68 68;
   --accent-2: #fca5a5;
 }
 
 .accent-green {
-  --accent: #10b981;
+  --accent-rgb: 16 185 129;
   --accent-2: #6ee7b7;
 }
 
 .accent-orange {
-  --accent: #f59e0b;
+  --accent-rgb: 245 158 11;
   --accent-2: #fcd34d;
 }
+
+/* El acento en claro es más saturado: los pasteles de arriba, pensados para
+   fondo oscuro, se lavan sobre blanco. */
+.light {
+  --accent-rgb: 37 99 235;
+}
+
+.light.accent-violet { --accent-rgb: 124 58 237; }
+.light.accent-red { --accent-rgb: 220 38 38; }
+.light.accent-green { --accent-rgb: 5 150 105; }
+.light.accent-orange { --accent-rgb: 217 119 6; }
 
 @theme inline {
   --color-background: var(--background);
@@ -125,7 +161,12 @@ h3,
 
 /* Texto degradado, para el remate de los titulares grandes. */
 .text-gradient {
-  background: linear-gradient(100deg, #9fd4ec, #4a9eff 55%, #b98cff);
+  background: linear-gradient(
+    100deg,
+    var(--accent-2),
+    var(--accent) 55%,
+    color-mix(in srgb, var(--accent) 60%, #b98cff)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;

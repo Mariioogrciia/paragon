@@ -6,6 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { GameCard } from "@/components/GameCard";
 import { Dropdown } from "@/components/Dropdown";
 import { RatingStars } from "@/components/RatingStars";
+import { AddManualGameModal } from "@/components/AddManualGameModal";
 import {
   companyOf,
   filterGames,
@@ -30,7 +31,7 @@ const SORTS: { label: string; value: SortKey }[] = [
   { label: "Título (A-Z)", value: "titulo" },
 ];
 
-const FIELD = { border: "1px solid #2b3546", background: "#0d121b" };
+const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
 
 /**
  * Cuántos juegos se pintan de golpe.
@@ -57,7 +58,7 @@ function Pill({
       style={
         active
           ? { background: "var(--accent-grad)", color: "#061021" }
-          : { background: "transparent", color: "#8794a8" }
+          : { background: "transparent", color: "var(--muted)" }
       }
     >
       {children}
@@ -69,10 +70,12 @@ export function LibraryGrid({
   games,
   handle,
   collections = [],
+  esMio = false,
 }: {
   games: Game[];
   handle: string;
   collections?: { id: string; name: string; gameIds: string[] }[];
+  esMio?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<GameStatus | "todos">("todos");
@@ -189,7 +192,7 @@ export function LibraryGrid({
           className="flex min-w-[220px] flex-1 items-center gap-2.5 rounded-xl px-3.5"
           style={FIELD}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8794a8" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <path d="m20 20-3.5-3.5" />
           </svg>
@@ -243,6 +246,8 @@ export function LibraryGrid({
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           </button>
         </div>
+
+        {esMio && <AddManualGameModal />}
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-2.5">
@@ -322,8 +327,8 @@ export function LibraryGrid({
             className="rounded-[10px] px-3.5 py-2 text-[13px] font-semibold"
             style={
               agrupar
-                ? { background: "rgba(74, 158, 255, 0.12)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#cfe4ff" }
-                : { ...FIELD, color: "#8794a8" }
+                ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
+                : { ...FIELD, color: "var(--muted)" }
             }
           >
             Agrupar por empresa

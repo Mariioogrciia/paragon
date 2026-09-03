@@ -168,8 +168,9 @@ export const psnProfiles = pgTable(
  */
 export const games = pgTable("game", {
   id: text("id").primaryKey(),
-  platform: text("platform").$type<"psn" | "steam" | "google">().notNull(),
-  /** npCommunicationId en PSN, appid en Steam. */
+  /** "manual" = añadido a mano (Switch, retro...), sin API detrás. */
+  platform: text("platform").$type<"psn" | "steam" | "google" | "manual">().notNull(),
+  /** npCommunicationId en PSN, appid en Steam, "<id de IGDB>:<dispositivo>" en manual. */
   nativeId: text("nativeId").notNull(),
   title: text("title").notNull(),
   /** Lo que se enseña: "PS5", "PS4", "PC"... */

@@ -30,7 +30,8 @@ import {
   SteamPrivateProfileError,
   SteamProfileNotFoundError,
 } from "@/lib/steam/client";
-import type { Platform } from "@/lib/types";
+import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
+import type { AccountPlatform } from "@/lib/types";
 
 export interface ActionState {
   error?: string;
@@ -114,7 +115,7 @@ export async function updateProfileAction(
 
 /** Qué hay que escribir en cada plataforma, y qué decir cuando no se puede leer. */
 const PLATFORM_COPY: Record<
-  Platform,
+  AccountPlatform,
   { field: string; missing: string; privado: (nombre: string) => string }
 > = {
   psn: {
@@ -139,7 +140,7 @@ const PLATFORM_COPY: Record<
 };
 
 async function linkPlatform(
-  platform: Platform,
+  platform: AccountPlatform,
   formData: FormData,
 ): Promise<ActionState> {
   const userId = await requireUserId();
@@ -185,7 +186,7 @@ export async function linkGoogleAction(
 
 export async function unlinkAccountAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
-  const platform = String(formData.get("platform") ?? "") as Platform;
+  const platform = String(formData.get("platform") ?? "") as AccountPlatform;
 
   if (platform !== "psn" && platform !== "steam") return;
 
@@ -333,6 +334,45 @@ export async function writeReviewAction(gameId: string, review: string, dateStr:
     });
 
   revalidatePath('/', 'layout');
+}
+
+/* ---------------------------------- Juegos manuales --------------------------------- */
+
+export interface AddManualGameInput {
+  igdbId: number;
+  title: string;
+  coverUrl?: string;
+  genres?: string[];
+  developer?: string;
+  publisher?: string;
+  deviceLabel: string;
+  completed: boolean;
+}
+
+export async function addManualGameAction(input: AddManualGameInput): Promise<ActionState> {
+  const userId = await requireUserId();
+
+  if (!input.title.trim() || !Number.isFinite(input.igdbId)) {
+    return { error: "Elige un juego de los resultados de búsqueda." };
+  }
+  if (!input.deviceLabel.trim()) {
+    return { error: "Di en qué lo has jugado (Switch, PS1, retro...)." };
+  }
+
+  await addManualGame(userId, {
+    ...input,
+    deviceLabel: input.deviceLabel.trim(),
+  });
+
+  revalidatePath("/", "layout");
+
+  return { success: `${input.title} añadido a tu biblioteca.` };
+}
+
+export async function setManualGameCompletedAction(gameId: string, completed: boolean): Promise<void> {
+  const userId = await requireUserId();
+  await setManualGameCompleted(userId, gameId, completed);
+  revalidatePath("/", "layout");
 }
 
 export async function setFavoritesAction(gameIds: string[]) {

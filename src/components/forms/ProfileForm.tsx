@@ -62,19 +62,19 @@ export function ProfileForm({ user }: { user: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre de usuario</label>
-              <input name="handle" defaultValue={user.handle} className="w-full rounded-xl border border-white/10 bg-[#121721] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="handle" defaultValue={user.handle} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Email</label>
-              <input name="email" defaultValue={user.email} disabled className="w-full rounded-xl border border-white/10 bg-[#121721]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
+              <input name="email" defaultValue={user.email} disabled className="w-full rounded-xl border border-white/10 bg-[var(--surface)]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre</label>
-              <input name="firstName" defaultValue={user.firstName} className="w-full rounded-xl border border-white/10 bg-[#121721] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="firstName" defaultValue={user.firstName} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Apellido</label>
-              <input name="lastName" defaultValue={user.lastName} className="w-full rounded-xl border border-white/10 bg-[#121721] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="lastName" defaultValue={user.lastName} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
           </div>
         </section>
@@ -84,14 +84,14 @@ export function ProfileForm({ user }: { user: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Idioma</label>
-              <select name="language" defaultValue={user.language} className="w-full rounded-xl border border-white/10 bg-[#121721] px-4 py-3 text-sm focus:border-accent focus:outline-none">
+              <select name="language" defaultValue={user.language} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none">
                 <option value="es-ES">Español</option>
                 <option value="en-US">English</option>
               </select>
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Zona horaria</label>
-              <select name="timezone" defaultValue={user.timezone} className="w-full rounded-xl border border-white/10 bg-[#121721] px-4 py-3 text-sm focus:border-accent focus:outline-none">
+              <select name="timezone" defaultValue={user.timezone} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none">
                 <option value="Europe/Madrid">(GMT+01:00) Madrid</option>
               </select>
             </div>
@@ -99,7 +99,7 @@ export function ProfileForm({ user }: { user: any }) {
         </section>
 
         <div className="flex justify-end">
-          <button type="submit" className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(74,158,255,0.4)]">
+          <button type="submit" className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgb(var(--accent-rgb) / 0.4)]">
             Guardar cambios
           </button>
         </div>

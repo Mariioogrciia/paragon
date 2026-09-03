@@ -8,7 +8,7 @@ export const metadata = {
 
 const CARD = {
   border: "1px solid var(--border)",
-  background: "linear-gradient(#131a26, #0e131c)",
+  background: "linear-gradient(var(--surface), var(--background))",
 };
 
 interface Pregunta {

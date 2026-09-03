@@ -31,7 +31,7 @@ export function CommunityRating({ rating }: { rating: Rating | null }) {
               height="15"
               viewBox="0 0 24 24"
               fill={llena ? "#f59e0b" : "none"}
-              stroke={llena || media ? "#f59e0b" : "#8794a8"}
+              stroke={llena || media ? "#f59e0b" : "var(--muted)"}
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"

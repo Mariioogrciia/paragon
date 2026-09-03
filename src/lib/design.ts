@@ -19,7 +19,7 @@ export const GRADE_TILE: Record<TrophyGrade, string> = {
  * Las plataformas sin metales (Steam) usan el azul de la casa: un logro suelto
  * no vale ni más ni menos que otro, y pintarlo de bronce sería mentir.
  */
-export const PLAIN_TILE = "linear-gradient(150deg, #9fd4ec, #4a9eff 60%, #2f5a8f)";
+export const PLAIN_TILE = "linear-gradient(150deg, var(--accent-2), var(--accent) 60%, color-mix(in srgb, var(--accent) 55%, black))";
 
 export function tileFor(grade?: TrophyGrade): string {
   return grade ? GRADE_TILE[grade] : PLAIN_TILE;
@@ -42,7 +42,7 @@ const COVERS = [
   "linear-gradient(150deg, #8f5ad8, #2b2059 60%, #0e0c1c)",
   "linear-gradient(150deg, #3f8f6f, #14453f 60%, #091a1a)",
   "linear-gradient(150deg, #d8b04a, #6b4a1f 60%, #1c1410)",
-  "linear-gradient(150deg, #6f7d92, #2a3446 60%, #0d1218)",
+  "linear-gradient(150deg, #6f7d92, var(--border) 60%, #0d1218)",
 ];
 
 function hash(id: string): number {
@@ -90,6 +90,6 @@ export interface Rarity {
 export function rarity(percent: number): Rarity {
   if (percent < 5) return { label: "Ultra raro", bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e" };
   if (percent < 20) return { label: "Muy raro", bg: "rgba(159, 212, 236, 0.14)", fg: "#9fd4ec" };
-  if (percent < 40) return { label: "Raro", bg: "rgba(74, 158, 255, 0.14)", fg: "#7ab8ff" };
-  return { label: "Común", bg: "rgba(135, 148, 168, 0.12)", fg: "#8794a8" };
+  if (percent < 40) return { label: "Raro", bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff" };
+  return { label: "Común", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)" };
 }

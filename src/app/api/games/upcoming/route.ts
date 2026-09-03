@@ -1,40 +1,27 @@
 import { NextResponse } from "next/server";
+import { IgdbNotConfiguredError, upcomingGames } from "@/lib/igdb/client";
 
 export async function GET() {
-  // En un entorno de producción, aquí conectarías con la API de IGDB o RAWG
-  // mediante un Client ID y Client Secret para obtener datos en tiempo real.
-  // const res = await fetch("https://api.igdb.com/v4/games", { ... });
-
-  const upcomingGames = [
-    {
-      id: "1",
-      title: "Grand Theft Auto VI",
-      releaseDate: "Otoño 2025",
-      platforms: ["PS5", "Xbox Series X|S"],
-      cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co7ihz.jpg",
-    },
-    {
-      id: "2",
-      title: "Monster Hunter Wilds",
-      releaseDate: "28 Feb 2025",
-      platforms: ["PS5", "PC", "Xbox Series X|S"],
-      cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co7d62.jpg",
-    },
-    {
-      id: "3",
-      title: "DOOM: The Dark Ages",
-      releaseDate: "2025",
-      platforms: ["PS5", "PC", "Xbox Series X|S"],
-      cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co8d8g.jpg",
-    },
-    {
-      id: "4",
-      title: "Death Stranding 2: On the Beach",
-      releaseDate: "2025",
-      platforms: ["PS5"],
-      cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co7in4.jpg",
-    },
-  ];
-
-  return NextResponse.json(upcomingGames);
+  try {
+    const games = await upcomingGames(8);
+    return NextResponse.json(
+      games.map((g) => ({
+        id: String(g.igdbId),
+        title: g.title,
+        releaseDate: g.releaseDate
+          ? new Date(g.releaseDate).toLocaleDateString("es-ES", { year: "numeric", month: "short" })
+          : "Por confirmar",
+        platforms: g.platforms,
+        cover: g.coverUrl ?? "",
+      })),
+    );
+  } catch (error) {
+    // Sin credenciales de IGDB (aún no configuradas) el bloque de
+    // "Próximos lanzamientos" simplemente no aparece, en vez de reventar la
+    // portada: UpcomingGames.tsx ya trata una lista vacía como "no mostrar".
+    if (!(error instanceof IgdbNotConfiguredError)) {
+      console.error("[upcoming-games]", error);
+    }
+    return NextResponse.json([]);
+  }
 }

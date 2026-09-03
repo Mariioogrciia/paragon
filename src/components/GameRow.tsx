@@ -48,7 +48,7 @@ export function GameRow({ game, href }: { game: Game; href: string }) {
                 width: `${progress.percent}%`,
                 background: progress.platinumEarned
                   ? "linear-gradient(90deg, #7fbcd8, #dff0f8)"
-                  : "linear-gradient(90deg, #4a9eff, #9fd4ec)",
+                  : "var(--accent-grad-h)",
               }}
             />
           </span>

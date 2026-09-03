@@ -3,6 +3,7 @@ import type { Session } from "next-auth";
 import { Barlow, Chakra_Petch } from "next/font/google";
 import { auth } from "@/auth";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
@@ -90,7 +91,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen transition-colors duration-300">
+      <body className="flex min-h-screen flex-col transition-colors duration-300">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -98,7 +99,8 @@ export default async function RootLayout({
           themes={["dark", "light", "oled", "high-contrast"]}
         >
           <Header user={headerUser} />
-          <main className="mx-auto max-w-[1240px] px-7 py-9">{children}</main>
+          <main className="mx-auto w-full max-w-[1240px] flex-1 px-7 py-9">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

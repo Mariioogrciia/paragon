@@ -46,8 +46,8 @@ export function Header({
           <span
             className="flex h-[30px] w-[30px] items-center justify-center rounded-[9px]"
             style={{
-              background: "linear-gradient(150deg, #9fd4ec, #4a9eff 70%)",
-              boxShadow: "0 0 18px rgba(74, 158, 255, 0.45)",
+              background: "linear-gradient(150deg, var(--accent-2), var(--accent) 70%)",
+              boxShadow: "0 0 18px rgb(var(--accent-rgb) / 0.45)",
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ color: "#08111f" }}>
@@ -79,11 +79,11 @@ export function Header({
               <Link
                 key={item.label}
                 href={href}
-                className="rounded-lg px-3.5 py-1.5 text-[13px] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgba(74,158,255,0.2)]"
+                className="rounded-lg px-3.5 py-1.5 text-[13px] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.2)]"
                 style={
                   active
-                    ? { background: "rgba(74, 158, 255, 0.12)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#cfe4ff" }
-                    : { background: "none", border: "1px solid transparent", color: "#8794a8" }
+                    ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
+                    : { background: "none", border: "1px solid transparent", color: "var(--muted)" }
                 }
               >
                 {item.label}
@@ -100,11 +100,11 @@ export function Header({
               {user.trophyLevel != null && (
                 <span
                   className="hidden items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3 sm:flex"
-                  style={{ background: "#121721", border: "1px solid #202836" }}
+                  style={{ background: "var(--surface)", border: "1px solid #202836" }}
                 >
                   <span
                     className="h-[26px] w-[26px] rounded-full"
-                    style={{ background: "conic-gradient(#4a9eff 0turn, #4a9eff 0.68turn, #212a3a 0.68turn, #212a3a 1turn)" }}
+                    style={{ background: "conic-gradient(var(--accent) 0turn, var(--accent) 0.68turn, #212a3a 0.68turn, #212a3a 1turn)" }}
                   />
                   <span className="font-heading text-sm font-bold tracking-[0.04em]">NV {user.trophyLevel}</span>
                 </span>
@@ -128,8 +128,8 @@ export function Header({
               </Link>
               <Link
                 href="/entrar"
-                className="rounded-lg px-4 py-2 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(74,158,255,0.6)]"
-                style={{ background: "var(--accent-grad)", boxShadow: "0 8px 24px rgba(74, 158, 255, 0.25)" }}
+                className="rounded-lg px-4 py-2 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)]"
+                style={{ background: "var(--accent-grad)", boxShadow: "0 8px 24px rgb(var(--accent-rgb) / 0.25)" }}
               >
                 Crear cuenta
               </Link>

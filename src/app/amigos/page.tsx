@@ -15,7 +15,7 @@ import { summarise } from "@/lib/stats";
 
 export const metadata = { title: "Amigos · Platinos" };
 
-const CARD = { border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" };
+const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 const POS_GOLD = "linear-gradient(150deg, #f7e3a8, #c39a2a)";
 
 export default async function AmigosPage() {
@@ -146,7 +146,7 @@ export default async function AmigosPage() {
                     i === 0
                       ? { background: POS_GOLD, color: "#3a2a08" }
                       : r.esMio
-                        ? { background: "rgba(74, 158, 255, 0.18)", color: "#9ecbff" }
+                        ? { background: "rgb(var(--accent-rgb) / 0.18)", color: "var(--accent-text)" }
                         : { background: "var(--surface-2)", color: "var(--muted)" }
                   }
                 >
@@ -189,7 +189,7 @@ export default async function AmigosPage() {
                     <Link
                       href={`/comparar/${r.handle}`}
                       className="rounded-[9px] px-3.5 py-2 text-[13px] font-semibold"
-                      style={{ background: "#151d29", border: "1px solid #2b3546", color: "#cfe4ff" }}
+                      style={{ background: "#151d29", border: "1px solid var(--border)", color: "var(--accent-text)" }}
                     >
                       Comparar
                     </Link>

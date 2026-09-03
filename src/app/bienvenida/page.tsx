@@ -5,7 +5,7 @@ import { accountFor, getProfileByUserId } from "@/lib/profiles";
 
 export const metadata = { title: "Bienvenida · Platinos" };
 
-const CARD = { border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" };
+const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
 /**
  * Alta en dos pasos. Se enseñan los dos a la vez, pero el segundo solo se
@@ -34,7 +34,7 @@ export default async function BienvenidaPage() {
         <div className="flex items-center gap-3">
           <span
             className="font-heading flex h-[30px] w-[30px] items-center justify-center rounded-[10px] text-sm font-bold"
-            style={{ background: "rgba(74, 158, 255, 0.12)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#9ecbff" }}
+            style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
           >
             1
           </span>
@@ -56,7 +56,7 @@ export default async function BienvenidaPage() {
         <div className="flex items-center gap-3">
           <span
             className="font-heading flex h-[30px] w-[30px] items-center justify-center rounded-[10px] text-sm font-bold"
-            style={{ background: "rgba(74, 158, 255, 0.12)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#9ecbff" }}
+            style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
           >
             2
           </span>

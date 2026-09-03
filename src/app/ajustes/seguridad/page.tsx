@@ -31,7 +31,7 @@ export default async function AjustesSeguridadPage() {
         <h2 className="font-semibold mb-4">Cuentas vinculadas (Inicio de sesión)</h2>
         <div className="flex flex-col gap-4">
           {userAccounts.map((acc) => (
-            <div key={acc.provider} className="flex items-center justify-between p-4 rounded-xl bg-[#121721] border border-white/5">
+            <div key={acc.provider} className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface)] border border-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-bold uppercase">
                   {acc.provider[0]}

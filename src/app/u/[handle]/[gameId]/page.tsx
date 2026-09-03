@@ -7,6 +7,7 @@ import { CommunityRating } from "@/components/CommunityRating";
 import { gradeLabel, TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { ReviewEditor } from "@/components/ReviewEditor";
 import { TrophyList } from "@/components/TrophyList";
+import { ManualGameStatus } from "@/components/ManualGameStatus";
 import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
 import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
@@ -20,7 +21,7 @@ function ProximoRow({ trophy }: { trophy: Trophy }) {
   return (
     <div
       className="grid grid-cols-[52px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[52px_1fr_190px] sm:gap-[18px]"
-      style={{ border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" }}
+      style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
     >
       <TrophyTile grade={trophy.grade} size={52} />
 
@@ -104,7 +105,7 @@ export default async function JuegoPage({
           <Link
             href={`/u/${handle}`}
             className="inline-block rounded-full px-3.5 py-1.5 text-xs font-semibold"
-            style={{ background: "rgba(10, 13, 19, 0.5)", border: "1px solid #2a3446", color: "#b9c6d8" }}
+            style={{ background: "rgba(10, 13, 19, 0.5)", border: "1px solid var(--border)", color: "#b9c6d8" }}
           >
             ← Biblioteca de @{handle}
           </Link>
@@ -123,7 +124,7 @@ export default async function JuegoPage({
               <p className="mb-2.5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
                 <span
                   className="rounded-md px-2.5 py-1"
-                  style={{ background: "rgba(74, 158, 255, 0.14)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#9ecbff" }}
+                  style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
                 >
                   {game.deviceLabel}
                 </span>
@@ -137,11 +138,11 @@ export default async function JuegoPage({
               <div className="mt-5 flex max-w-[560px] items-center gap-4">
                 <div
                   className="relative h-3 flex-1 overflow-hidden rounded-full"
-                  style={{ background: "rgba(10, 13, 19, 0.7)", border: "1px solid #2a3446" }}
+                  style={{ background: "rgba(10, 13, 19, 0.7)", border: "1px solid var(--border)" }}
                 >
                   <div
                     className="absolute inset-y-0 left-0 rounded-full"
-                    style={{ width: `${progress.percent}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                    style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
                   />
                 </div>
                 <span className="font-heading text-2xl font-bold">{progress.percent}%</span>
@@ -180,12 +181,12 @@ export default async function JuegoPage({
             {faltanParaPlatino !== null && (
               <div
                 className="rounded-[18px] p-[22px]"
-                style={{ border: "1px solid #2a3a4d", background: "rgba(13, 19, 28, 0.75)", backdropFilter: "blur(8px)" }}
+                style={{ border: "1px solid var(--border)", background: "rgba(13, 19, 28, 0.75)", backdropFilter: "blur(8px)" }}
               >
                 <p className="font-heading text-5xl font-bold leading-[0.9] text-platinum lg:text-[56px]">
                   {faltanParaPlatino}
                 </p>
-                <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "#cfe4ff" }}>
+                <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
                   Trofeos para el platino
                 </p>
               </div>
@@ -199,9 +200,17 @@ export default async function JuegoPage({
           className="rounded-[18px] p-5"
           style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
         >
-          <h2 className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
-            Valoración de la comunidad
-          </h2>
+          <div className="mb-2.5 flex items-center justify-between gap-3">
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+              Valoración de la comunidad
+            </h2>
+            <Link
+              href={`/juego/${encodeURIComponent(game.id)}`}
+              className="text-xs font-semibold text-accent hover:underline"
+            >
+              Ver estadísticas y reseñas de todos →
+            </Link>
+          </div>
           <CommunityRating rating={valoracion} />
         </section>
 
@@ -237,7 +246,7 @@ export default async function JuegoPage({
               <h2 className="font-heading text-2xl font-bold">Próximos pasos</h2>
               <span
                 className="rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em]"
-                style={{ background: "rgba(74, 158, 255, 0.14)", border: "1px solid rgba(74, 158, 255, 0.32)", color: "#9ecbff" }}
+                style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.32)", color: "var(--accent-text)" }}
               >
                 Lo más a mano
               </span>
@@ -254,15 +263,19 @@ export default async function JuegoPage({
           </section>
         )}
 
-        <section>
-          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="font-heading text-2xl font-bold">Todos los trofeos</h2>
-            <span className="text-[13px] text-muted">
-              {progress.earned} de {progress.total} conseguidos
-            </span>
-          </div>
-          <TrophyList trophies={game.trophies} />
-        </section>
+        {game.platform === "manual" ? (
+          esMio && <ManualGameStatus gameId={game.id} completed={progress.percent === 100} />
+        ) : (
+          <section>
+            <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="font-heading text-2xl font-bold">Todos los trofeos</h2>
+              <span className="text-[13px] text-muted">
+                {progress.earned} de {progress.total} conseguidos
+              </span>
+            </div>
+            <TrophyList trophies={game.trophies} />
+          </section>
+        )}
       </div>
     </div>
   );

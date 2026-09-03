@@ -60,7 +60,7 @@ async function Landing() {
         <div>
           <span
             className="inline-flex items-center gap-2.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em]"
-            style={{ background: "rgba(74, 158, 255, 0.1)", border: "1px solid rgba(74, 158, 255, 0.28)", color: "#9ecbff" }}
+            style={{ background: "rgb(var(--accent-rgb) / 0.1)", border: "1px solid rgb(var(--accent-rgb) / 0.28)", color: "var(--accent-text)" }}
           >
             <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
             Rastreador de trofeos de PlayStation
@@ -81,15 +81,15 @@ async function Landing() {
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/entrar"
-              className="rounded-xl px-6 py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(74,158,255,0.6)]"
-              style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgba(74, 158, 255, 0.3)" }}
+              className="rounded-xl px-6 py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
+              style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgb(var(--accent-rgb) / 0.3)" }}
             >
               Empezar la caza
             </Link>
             <Link
               href="#biblioteca"
               className="rounded-xl px-[22px] py-4 text-[15px] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
-              style={{ background: "#121721", border: "1px solid #263042", color: "#dbe5f2" }}
+              style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#dbe5f2" }}
             >
               Ver un perfil de ejemplo
             </Link>
@@ -128,11 +128,11 @@ async function Landing() {
           </div>
 
           <div className="mt-[18px] h-2.5 overflow-hidden rounded-full bg-surface-2">
-            <div className="h-full rounded-full" style={{ width: "74%", background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }} />
+            <div className="h-full rounded-full" style={{ width: "74%", background: "var(--accent-grad-h)" }} />
           </div>
           <div className="mt-2.5 flex justify-between text-xs text-muted">
             <span>32 / 42 conseguidos</span>
-            <span className="font-bold" style={{ color: "#cfe4ff" }}>74%</span>
+            <span className="font-bold" style={{ color: "var(--accent-text)" }}>74%</span>
           </div>
 
           <ul className="mt-6 space-y-2">
@@ -154,7 +154,7 @@ async function Landing() {
       </section>
 
       <section className="grid grid-cols-2 gap-3 pt-2 lg:grid-cols-4">
-        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(74,158,255,0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none text-platinum">{globalStats.platinos > 0 ? globalStats.platinos : "87"}</p>
           <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Platinos del grupo</p>
         </div>
@@ -206,11 +206,11 @@ async function Landing() {
                   <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${g.pct}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                      style={{ width: `${g.pct}%`, background: "var(--accent-grad-h)" }}
                     />
                   </div>
                   <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
-                    <span className="font-bold" style={{ color: "#cfe4ff" }}>{g.pct}%</span>
+                    <span className="font-bold" style={{ color: "var(--accent-text)" }}>{g.pct}%</span>
                     <span>{g.ratio}</span>
                   </div>
                 </div>
@@ -226,12 +226,12 @@ async function Landing() {
           {FEATURES.map((f) => (
             <div
               key={f.num}
-              className="rounded-[18px] p-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(74,158,255,0.08)]"
-              style={{ border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" }}
+              className="rounded-[18px] p-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.08)]"
+              style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
             >
               <span
                 className="font-heading inline-flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold"
-                style={{ background: "rgba(74, 158, 255, 0.12)", border: "1px solid rgba(74, 158, 255, 0.3)", color: "#9ecbff" }}
+                style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
               >
                 {f.num}
               </span>
@@ -248,7 +248,7 @@ async function Landing() {
           style={{
             border: "1px solid #26364d",
             background:
-              "radial-gradient(600px 300px at 20% 0%, rgba(74, 158, 255, 0.22), transparent 70%), linear-gradient(160deg, #101a2b, #0b0f17)",
+              "radial-gradient(600px 300px at 20% 0%, rgb(var(--accent-rgb) / 0.22), transparent 70%), linear-gradient(160deg, #101a2b, #0b0f17)",
           }}
         >
           <h2 className="font-heading max-w-[640px] text-[52px] font-bold uppercase leading-none tracking-[-0.02em]">
@@ -257,8 +257,8 @@ async function Landing() {
           <div className="mt-[30px] flex flex-wrap items-center gap-[18px]">
             <Link
               href="/entrar"
-              className="rounded-xl px-[26px] py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(74,158,255,0.6)]"
-              style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgba(74, 158, 255, 0.35)" }}
+              className="rounded-xl px-[26px] py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
+              style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgb(var(--accent-rgb) / 0.35)" }}
             >
               Conectar mi PlayStation
             </Link>
@@ -266,15 +266,6 @@ async function Landing() {
           </div>
         </div>
       </section>
-
-      <footer className="flex flex-wrap items-center gap-5 border-t border-border py-6 text-xs text-muted">
-        <span className="font-heading font-bold tracking-[0.08em]" style={{ color: "#b9c6d8" }}>PLATINOS</span>
-        <span>Los perfiles de trofeos en privado no se pueden sincronizar.</span>
-        <Link href="/faq" className="font-semibold hover:text-foreground">
-          Preguntas frecuentes
-        </Link>
-        <span className="ml-auto">Datos de PSN y Steam · no afiliado a Sony ni a Valve</span>
-      </footer>
     </div>
   );
 }
@@ -313,7 +304,7 @@ export default async function HomePage() {
         <Link
           href={`/u/${profile.handle}`}
           className="ml-auto rounded-[10px] px-4 py-2.5 text-[13px] font-semibold"
-          style={{ background: "#121721", border: "1px solid #263042", color: "#cfe4ff" }}
+          style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--accent-text)" }}
         >
           Ver mi perfil completo →
         </Link>
@@ -323,7 +314,7 @@ export default async function HomePage() {
         <div
           className="relative overflow-hidden rounded-[20px] p-6"
           style={{
-            border: "1px solid #2a3a4d",
+            border: "1px solid var(--border)",
             background:
               "radial-gradient(400px 200px at 80% 0%, rgba(159, 212, 236, 0.22), transparent 70%), linear-gradient(165deg, #14202c, #0d131c)",
           }}
@@ -400,11 +391,11 @@ export default async function HomePage() {
                   <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-surface-2">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${progress.percent}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                      style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
                     />
                   </div>
                   <div className="mt-2 flex justify-between text-xs text-muted">
-                    <span className="font-bold" style={{ color: "#cfe4ff" }}>{progress.percent}%</span>
+                    <span className="font-bold" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
                     <span>{progress.earned}/{progress.total}</span>
                   </div>
                 </div>
@@ -465,11 +456,11 @@ export default async function HomePage() {
                       <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
                         <div
                           className="h-full rounded-full"
-                          style={{ width: `${progress.percent}%`, background: "linear-gradient(90deg, #4a9eff, #9fd4ec)" }}
+                          style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
                         />
                       </div>
                       <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
-                        <span className="font-bold" style={{ color: "#cfe4ff" }}>{progress.percent}%</span>
+                        <span className="font-bold" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
                         <span>{progress.earned}/{progress.total}</span>
                       </div>
                     </div>

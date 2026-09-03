@@ -49,6 +49,7 @@ export async function ActivityFeed({ userId }: { userId: string }) {
           else if (activity.type === "review") actionText = "escribió una reseña de";
           else if (activity.type === "favorite") actionText = "añadió a favoritos";
           else if (activity.type === "platinum") actionText = "consiguió el platino en";
+          else if (activity.type === "new_game") actionText = "añadió a su biblioteca";
           else actionText = "jugó a";
 
           return (

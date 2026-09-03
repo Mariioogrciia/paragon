@@ -5,14 +5,26 @@
  * una consola: PS4 y PS5 son la misma (PSN) porque comparten trofeos.  *
  * ------------------------------------------------------------------ */
 
-export type Platform = "psn" | "steam" | "google";
+/**
+ * "manual" no es un ecosistema de logros como los demás: es el cajón para lo
+ * que no tiene API (Switch, retro, tablero...). No participa en
+ * `platformAccounts` — no hay cuenta que vincular, cada fila de `games` sale
+ * directamente de que alguien la añadió a mano — pero sí es un `Game` más en
+ * la biblioteca, así que vive en el mismo tipo `Platform` para no duplicar
+ * medio `stats.ts` y `LibraryGrid.tsx` con un tipo paralelo.
+ */
+export type Platform = "psn" | "steam" | "google" | "manual";
 
-export const PLATFORMS: Platform[] = ["psn", "steam", "google"];
+/** Las que se vinculan por cuenta. Ver el comentario de "manual" arriba. */
+export type AccountPlatform = Exclude<Platform, "manual">;
+
+export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google"];
 
 export const PLATFORM_LABEL: Record<Platform, string> = {
   psn: "PlayStation",
   steam: "Steam",
   google: "Google Play",
+  manual: "Añadido a mano",
 };
 
 /** Cómo llama cada plataforma a sus logros, para no decir "trofeo" en Steam. */
@@ -20,6 +32,7 @@ export const ACHIEVEMENT_LABEL: Record<Platform, { one: string; many: string }> 
   psn: { one: "trofeo", many: "trofeos" },
   steam: { one: "logro", many: "logros" },
   google: { one: "logro", many: "logros" },
+  manual: { one: "hito", many: "hitos" },
 };
 
 /**
@@ -123,7 +136,7 @@ export interface GameDetail extends Game {
 
 /** Una cuenta vinculada de una plataforma. */
 export interface PlatformAccount {
-  platform: Platform;
+  platform: AccountPlatform;
   accountId: string;
   username: string;
   /** Nivel de trofeos en PSN; Steam no tiene equivalente. */

@@ -38,8 +38,8 @@ export function Dropdown({ value, onChange, options, placeholder = "Seleccionar.
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-full rounded-[9px] px-3.5 py-2 text-[13px] font-semibold text-foreground transition-colors"
         style={{
-          border: "1px solid #2b3546",
-          background: "#0d121b",
+          border: "1px solid var(--border)",
+          background: "var(--background)",
         }}
       >
         <span>
@@ -69,7 +69,7 @@ export function Dropdown({ value, onChange, options, placeholder = "Seleccionar.
       {isOpen && (
         <div
           className="absolute z-50 mt-1 w-full overflow-hidden rounded-md shadow-lg"
-          style={{ background: "#0d121b", border: "1px solid #2b3546" }}
+          style={{ background: "var(--background)", border: "1px solid var(--border)" }}
         >
           <ul className="max-h-60 overflow-auto py-1">
             {options.map((option) => {

@@ -6,19 +6,19 @@ import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, ProfileSettings
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
-import { PLATFORM_LABEL, type Platform, type PlatformAccount } from "@/lib/types";
+import { PLATFORM_LABEL, type AccountPlatform, type PlatformAccount } from "@/lib/types";
 
 export const metadata = { title: "Ajustes · Platinos" };
 
-const CARD = { border: "1px solid var(--border)", background: "linear-gradient(#131a26, #0e131c)" };
+const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
-const AVATAR_BG: Record<Platform, string> = {
+const AVATAR_BG: Record<AccountPlatform, string> = {
   psn: "linear-gradient(150deg, #2f7ad6, #6b3fd4)",
   steam: "linear-gradient(150deg, #2f7d9d, #1b2838)",
   google: "linear-gradient(150deg, #34A853, #4285F4)",
 };
 
-const HELP: Record<Platform, string> = {
+const HELP: Record<AccountPlatform, string> = {
   psn:
     "Tu ID público de PlayStation, el nombre con el que juegas. Tu perfil de " +
     "trofeos tiene que estar en público para que podamos leerlo.",
@@ -35,7 +35,7 @@ function PlatformSection({
   account,
   children,
 }: {
-  platform: Platform;
+  platform: AccountPlatform;
   account: PlatformAccount | null;
   children: React.ReactNode;
 }) {
@@ -58,7 +58,7 @@ function PlatformSection({
       {account && (
         <div
           className="mb-4 flex items-center gap-3.5 rounded-[14px] p-4"
-          style={{ border: "1px solid #2b3546", background: "#0d121b" }}
+          style={{ border: "1px solid var(--border)", background: "var(--background)" }}
         >
           <span
             className="font-heading flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[13px] text-lg font-bold"

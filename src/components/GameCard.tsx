@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { gameProgress } from "@/lib/stats";
-import type { Game } from "@/lib/types";
+import { ACHIEVEMENT_LABEL, type Game } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 
 /**
@@ -27,27 +27,21 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
       >
         {/*
           Las carátulas llegan con proporciones distintas: las de PSN son
-          cuadradas y las de Steam panorámicas. En un marco 16:9, recortarlas
-          (`cover`) deja las cuadradas con un zoom brutal, y encajarlas
-          (`contain`) las deja pequeñas entre bandas negras. Así que se hacen
-          las dos cosas: una copia desenfocada rellena el marco y la imagen de
-          verdad va encima entera. Todos los juegos quedan al mismo tamaño y
-          ninguno se recorta.
+          cuadradas y las de Steam panorámicas. `object-contain` evita
+          recortar, pero ajusta cada una a su propio límite (alto si es
+          cuadrada, ancho si es panorámica), así que las cuadradas acaban
+          llenando toda la tarjeta y las panorámicas quedan más pequeñas con
+          bandas: parece que unas tienen más zoom que otras. Con `cover` el
+          marco se llena entero siempre, al mismo tamaño, recortando lo que
+          sobre por los lados (cuadradas) o arriba/abajo (panorámicas).
         */}
         {game.iconUrl && (
-          <>
-            <img
-              src={game.iconUrl}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl"
-            />
-            <img
-              src={game.iconUrl}
-              alt=""
-              className="absolute inset-0 h-full w-full object-contain"
-            />
-          </>
+          <img
+            src={game.iconUrl}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
         )}
 
         {/* Gradiente para asegurar legibilidad del texto sin importar la carátula */}
@@ -83,13 +77,13 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
               width: `${progress.percent}%`,
               background: progress.platinumEarned
                 ? "linear-gradient(90deg, #7fbcd8, #dff0f8)"
-                : "linear-gradient(90deg, #4a9eff, #9fd4ec)",
+                : "var(--accent-grad-h)",
             }}
           />
         </div>
 
         <div className="mt-2.5 flex items-center gap-2.5">
-          <span className="font-heading text-[15px] font-bold" style={{ color: "#cfe4ff" }}>
+          <span className="font-heading text-[15px] font-bold" style={{ color: "var(--accent-text)" }}>
             {progress.percent}%
           </span>
           {game.rating != null && (
@@ -101,7 +95,7 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
                   height="11"
                   viewBox="0 0 24 24"
                   fill={s <= game.rating! ? "#f59e0b" : "none"}
-                  stroke={s <= game.rating! ? "#f59e0b" : "#8794a8"}
+                  stroke={s <= game.rating! ? "#f59e0b" : "var(--muted)"}
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -129,7 +123,7 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
               <path d="M12 14v3m-3.5 3h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
             <span className="text-[11px] font-bold uppercase tracking-[0.06em]">
-              {progress.earned} trofeos
+              {progress.earned} {ACHIEVEMENT_LABEL[game.platform].many}
             </span>
           </span>
         </div>

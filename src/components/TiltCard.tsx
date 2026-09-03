@@ -40,7 +40,7 @@ export function TiltCard({
     <Link
       ref={cardRef}
       href={href}
-      className={`group transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(74,158,255,0.15)] ${className || ""}`}
+      className={`group transition-shadow duration-300 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.15)] ${className || ""}`}
       style={{
         ...style,
         transform,

@@ -14,10 +14,10 @@ import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import {
+  type AccountPlatform,
   type Game,
   type GameDetail,
   type Library,
-  type Platform,
   type PlatformAccount,
   type Player,
   type Trophy,
@@ -35,7 +35,7 @@ export interface ProfileRow {
 /** La cuenta de una plataforma concreta, si la tiene vinculada. */
 export function accountFor(
   profile: ProfileRow | null,
-  platform: Platform,
+  platform: AccountPlatform,
 ): PlatformAccount | null {
   return profile?.accounts.find((a) => a.platform === platform) ?? null;
 }
@@ -152,7 +152,7 @@ export interface LinkResult {
  */
 export async function linkAccount(
   userId: string,
-  platform: Platform,
+  platform: AccountPlatform,
   input: string,
 ): Promise<LinkResult> {
   const resolved =
@@ -268,7 +268,7 @@ export async function resyncLibraries(userId: string): Promise<number> {
   return total;
 }
 
-export async function unlinkAccount(userId: string, platform: Platform) {
+export async function unlinkAccount(userId: string, platform: AccountPlatform) {
   await db
     .delete(platformAccounts)
     .where(
@@ -364,7 +364,8 @@ export async function getGameDetail(
     )
     .limit(1);
 
-  const account = accountFor(profile, game.platform);
+  // Los juegos manuales no tienen cuenta de plataforma que sincronizar.
+  const account = game.platform === "manual" ? null : accountFor(profile, game.platform);
 
   if (!estado?.syncedAt && account) {
     // Solo se puede si la plataforma nos deja leer esa cuenta; si no,
@@ -459,7 +460,7 @@ export interface FriendRow {
   image: string | null;
   trophyLevel: number | null;
   avatarUrl: string | null;
-  platforms: Platform[];
+  platforms: AccountPlatform[];
 }
 
 function toFriendRow(p: ProfileRow): FriendRow {

@@ -24,15 +24,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
     ...(process.env.AUTH_GOOGLE_ID
       ? [
           Google({
+            // Une por email verificado en vez de rechazar el login.
+            //
+            // Sin esto, quien ya entró una vez con Discord y luego pulsa
+            // Google recibe un `OAuthAccountNotLinked` y vuelve al login sin
+            // explicación: Auth.js no enlaza dos proveedores al mismo usuario
+            // por su cuenta. Se llama "dangerous" porque con un proveedor que
+            // NO verifique el correo, cualquiera podría reclamar tu cuenta
+            // registrando ese email. Google y Discord sí lo verifican, que es
+            // la condición para que esto sea seguro.
+            allowDangerousEmailAccountLinking: true,
             authorization: {
+              // Sin el scope de Google Play Games: es "sensible" para Google
+              // (obliga a verificación y a listar cada tester a mano en modo
+              // Prueba, que es el "Acceso bloqueado" que se ve al entrar).
+              // Y de nada sirve: lib/google/client.ts explica por qué esa
+              // API nunca puede dar la biblioteca completa de un jugador,
+              // solo logros del juego atado a este Client ID. openid/email/
+              // profile son scopes normales — no piden verificación.
               params: {
-                scope: "openid email profile https://www.googleapis.com/auth/games",
+                scope: "openid email profile",
               },
             },
           }),
         ]
       : []),
-    ...(process.env.AUTH_DISCORD_ID ? [Discord] : []),
+    // Mismo motivo que en Google: si no, entrar por el otro proveedor con el
+    // mismo correo rebota al login sin decir por qué.
+    ...(process.env.AUTH_DISCORD_ID
+      ? [Discord({ allowDangerousEmailAccountLinking: true })]
+      : []),
   ],
   pages: {
     signIn: "/entrar",

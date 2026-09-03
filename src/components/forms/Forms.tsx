@@ -21,7 +21,7 @@ function Submit({ children }: { children: React.ReactNode }) {
   return (
     <button
       disabled={pending}
-      className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(74,158,255,0.6)] active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+      className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)] active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
       style={{ background: "var(--accent-grad)" }}
     >
       {pending ? "…" : children}
@@ -35,7 +35,7 @@ function Feedback({ state }: { state: ActionState }) {
   return null;
 }
 
-const FIELD = { border: "1px solid #2b3546", background: "#0d121b" };
+const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
 
 /** Campo de handle con el prefijo "@" a la manera de la maqueta. */
 function AtField({

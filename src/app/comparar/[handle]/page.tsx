@@ -13,7 +13,7 @@ import { sharedGames, summarise } from "@/lib/stats";
 const OUTCOME = {
   ganas: { label: "Ganas", bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
   pierdes: { label: "Pierdes", bg: "rgba(255, 107, 107, 0.12)", fg: "#ff8f8f", border: "rgba(255, 107, 107, 0.28)" },
-  empate: { label: "Empate", bg: "rgba(135, 148, 168, 0.12)", fg: "#8794a8", border: "rgba(135, 148, 168, 0.25)" },
+  empate: { label: "Empate", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
 };
 
 function outcome(a: number, b: number): keyof typeof OUTCOME {
@@ -180,7 +180,7 @@ export default async function CompararPage({
                     <div key={jugadores[i].player.id} className="flex items-center gap-3">
                       <span
                         className="w-[52px] shrink-0 text-[11px] font-bold uppercase tracking-[0.06em]"
-                        style={{ color: i === 0 ? "#9ecbff" : "#8794a8" }}
+                        style={{ color: i === 0 ? "var(--accent-text)" : "var(--muted)" }}
                       >
                         {jugadores[i].player.name}
                       </span>
@@ -189,13 +189,13 @@ export default async function CompararPage({
                           className="h-full rounded-full"
                           style={{
                             width: `${p.percent}%`,
-                            background: i === 0 ? "linear-gradient(90deg, #4a9eff, #9fd4ec)" : "#4a5668",
+                            background: i === 0 ? "var(--accent-grad-h)" : "#4a5668",
                           }}
                         />
                       </div>
                       <span
                         className="w-10 shrink-0 text-right text-xs font-bold"
-                        style={i === 1 ? { color: "#8794a8" } : undefined}
+                        style={i === 1 ? { color: "var(--muted)" } : undefined}
                       >
                         {p.percent}%
                       </span>
