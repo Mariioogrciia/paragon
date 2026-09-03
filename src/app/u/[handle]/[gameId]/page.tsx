@@ -12,7 +12,7 @@ import { TrophyList } from "@/components/TrophyList";
 import { ManualGameStatus } from "@/components/ManualGameStatus";
 import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
-import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
+import { getGameDetail, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { getCommunityRating } from "@/lib/ratings";
 import { gameProgress, nextSteps, repartoDlc } from "@/lib/stats";
 import { dificultadDeJuego } from "@/lib/difficulty";
@@ -325,7 +325,7 @@ export default async function JuegoPage({
             ) : (
               (game.review || game.rating) && (
                 <div className="flex gap-3 p-5 border rounded-xl bg-surface border-border">
-                  <Avatar src={profile.image} name={profile.displayName ?? handle} size={36} />
+                  <Avatar src={resolveAvatarUrl(profile)} name={profile.displayName ?? handle} size={36} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2 mb-3 items-center">
                       <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña de {profile.displayName ?? handle}</span>

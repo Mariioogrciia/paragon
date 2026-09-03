@@ -41,7 +41,17 @@ export interface ProfileRow {
   statusText?: string | null;
   accounts: PlatformAccount[];
   badges: string[];
+  /** Si esta cuenta es la del propio desarrollador de Paragon. */
+  esDesarrollador: boolean;
 }
+
+/**
+ * El correo del desarrollador, para la insignia "Desarrollador" en su
+ * propio perfil. No se enseña el correo en ningún sitio — de aquí solo sale
+ * un booleano — así que no hace falta guardarlo aparte ni ocultarlo del
+ * resto del código.
+ */
+const CORREO_DESARROLLADOR = "mario.meca2005@gmail.com";
 
 /** La cuenta de una plataforma concreta, si la tiene vinculada. */
 export function accountFor(
@@ -51,19 +61,35 @@ export function accountFor(
   return profile?.accounts.find((a) => a.platform === platform) ?? null;
 }
 
-function toPlayer(row: ProfileRow): Player {
+/**
+ * La foto de perfil "de verdad" de alguien, la misma en todos lados.
+ *
+ * PSN primero (es la que más gente tiene y suele ser la más reconocible),
+ * luego cualquier otra cuenta vinculada que tenga avatar (Steam, por
+ * ejemplo), y solo si no hay ninguna la imagen genérica de la cuenta
+ * (`users.image`, la del proveedor de login). Exportada porque antes cada
+ * pantalla resolvía el avatar a su manera — la cabecera del perfil usaba
+ * esto, pero las reseñas leían `users.image` a pelo, así que alguien sin
+ * imagen de login pero con PSN vinculado aparecía sin foto en sus reseñas y
+ * con foto en su propio perfil.
+ */
+export function resolveAvatarUrl(row: ProfileRow): string | undefined {
   const psnAccount = accountFor(row, "psn");
+  return (
+    psnAccount?.avatarUrl ??
+    row.accounts.find((a) => a.avatarUrl)?.avatarUrl ??
+    row.image ??
+    undefined
+  );
+}
 
+function toPlayer(row: ProfileRow): Player {
   return {
     id: row.userId,
     name: row.displayName ?? row.handle ?? "Sin nombre",
     accounts: row.accounts,
-    avatarUrl:
-      psnAccount?.avatarUrl ??
-      row.accounts.find((a) => a.avatarUrl)?.avatarUrl ??
-      row.image ??
-      undefined,
-    trophyLevel: psnAccount?.level ?? undefined,
+    avatarUrl: resolveAvatarUrl(row),
+    trophyLevel: accountFor(row, "psn")?.level ?? undefined,
   };
 }
 
@@ -82,6 +108,7 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       profileColor: users.profileColor,
       profileFrame: users.profileFrame,
       statusText: users.statusText,
+      email: users.email,
     })
     .from(users)
     .where(where)
@@ -109,7 +136,13 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
     
   const badges = badgesRows.map((b) => b.badgeId);
 
-  return { ...row, accounts, badges };
+  // `email` no forma parte de ProfileRow a propósito: se usa aquí mismo para
+  // el booleano y no debe salir de esta función, que alimenta Server
+  // Components cuyos props pueden acabar serializados hacia el cliente.
+  const { email, ...resto } = row;
+  const esDesarrollador = email === CORREO_DESARROLLADOR;
+
+  return { ...resto, accounts, badges, esDesarrollador };
 }
 
 export function getProfileByUserId(userId: string) {

@@ -4,7 +4,7 @@ import { Barlow, Chakra_Petch } from "next/font/google";
 import { auth } from "@/auth";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getProfileByUserId } from "@/lib/profiles";
+import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { contarSinLeer } from "@/lib/notifications";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -77,7 +77,11 @@ export default async function RootLayout({
     ? {
         handle: profile?.handle ?? null,
         name: sessionUser.name ?? "?",
-        image: sessionUser.image,
+        // La misma foto que en el resto de la app (ver resolveAvatarUrl):
+        // antes esto era `sessionUser.image`, la del proveedor de login, así
+        // que quien entraba con Google pero tenía PSN vinculado veía su cara
+        // de Google arriba y su avatar de PSN en el perfil y las reseñas.
+        image: (profile ? resolveAvatarUrl(profile) : undefined) ?? sessionUser.image,
         paragonLevel: nivelParagon?.level ?? null,
         paragonProgress: nivelParagon?.progreso ?? null,
       }

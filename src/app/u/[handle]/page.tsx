@@ -144,9 +144,24 @@ export default async function PerfilPage({
           </AvatarFrame>
 
           <div className="min-w-0">
-            <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
-              {profile.displayName ?? `@${handle}`}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
+                {profile.displayName ?? `@${handle}`}
+              </h1>
+              {profile.esDesarrollador && (
+                <span
+                  className="mb-1 inline-flex items-center gap-1.5 self-end rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em]"
+                  style={{ background: "rgba(159, 212, 236, 0.14)", border: "1px solid rgba(159, 212, 236, 0.35)", color: "#9fd4ec" }}
+                  title="Esta cuenta es de quien hace Paragon"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                  </svg>
+                  Desarrollador
+                </span>
+              )}
+            </div>
             <p className="mt-2 text-sm text-muted">
               @{handle}
               {player.accounts.map((a) => ` · ${a.username}`).join("")}
