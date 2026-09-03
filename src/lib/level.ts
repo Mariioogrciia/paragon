@@ -70,7 +70,12 @@ export function paragonProgress(games: Game[]): ParagonProgress {
   );
   const platinos = earned.platinum * XP_POR_GRADO.platinum;
   const completados = juegosCompletados * 100;
-  const total = trofeos + completados;
+  // Antes se quedaba fuera del total: el nivel de esta tarjeta salía más
+  // bajo que el de la navbar (que sí lo suma, en paragonLevel.ts) para
+  // cualquiera con algún platino, y el propio donut de abajo — que reparte
+  // sus 360° entre trofeos/platinos/completados sobre este total — se
+  // quedaba corto de espacio para el tramo de platinos.
+  const total = trofeos + platinos + completados;
 
   return {
     ...paragonLevelFromXp(total),

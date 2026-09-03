@@ -127,6 +127,12 @@ incondicional me costó una hora depurando un cambio que nunca se escribió.
   limited to daily cron jobs") → `vercel.json` a `0 3 * * *` y lotes por
   pasada más grandes en [route.ts](src/app/api/cron/sync/route.ts), para
   aprovechar la única ejecución diaria.
+- ~~El nivel Paragon no cuadraba entre la navbar y la tarjeta del perfil~~ →
+  [`lib/level.ts`](src/lib/level.ts) calculaba `platinos` (XP de los
+  platinos) y no lo sumaba al `total`, así que cualquiera con algún platino
+  veía un nivel más bajo bajo el Wrap que en la navbar (`lib/paragonLevel.ts`,
+  que sí lo suma). De paso arregla el propio donut de la tarjeta, que reparte
+  sus 360° entre trofeos/platinos/completados sobre ese mismo `total`.
 - ~~La app se sentía lenta~~ → `getLibrary` ([profiles.ts](src/lib/profiles.ts))
   reintentaba el PEGI en IGDB (cuatro oleadas, la última una consulta por
   título) para los mismos ~40 juegos **en cada carga de biblioteca**, porque
