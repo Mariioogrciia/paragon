@@ -102,7 +102,14 @@ incondicional me costó una hora depurando un cambio que nunca se escribió.
 1. **`igdbId` en `games` + emparejado.** Unificaría la ficha global entre
    plataformas y repartiría carátulas, géneros y PEGI a lo que falta. El
    emparejador por título ya está escrito (`pegiPorTitulo`), se reutiliza.
-2. **Compartir el Wrap como imagen** con `@vercel/og`.
+   **No tocado a propósito**: toca esquema y backfill sobre la base de
+   producción, y esta sesión ha ido sin ti delante — mejor con tú mirando.
+2. ~~Compartir el Wrap como imagen~~ → hecho el 3 de septiembre de 2026, con
+   `ImageResponse` de `next/og` (ya viene con Next, no hizo falta el paquete
+   `@vercel/og` suelto). Ruta [`/api/wrap/[handle]`](src/app/api/wrap/%5Bhandle%5D/route.tsx),
+   1200×630, mismas tres tarjetas que `ParagonWrap` con los mismos números
+   (`juegoDestacado`/`generoTop` se exportaron desde ahí para no duplicar la
+   cuenta). Botón "Compartir imagen" en la cabecera del Wrap del perfil.
 3. **Instalable en el móvil (PWA)** — aplazado a propósito.
 
 **Fallos conocidos, arreglados el 3 de septiembre de 2026:**
@@ -116,6 +123,17 @@ incondicional me costó una hora depurando un cambio que nunca se escribió.
   la propia UI ya decía ("en fase de desarrollo").
 - ~~`unlinkAccountAction` solo desvincula PSN y Steam~~ → ahora acepta las seis
   plataformas ([actions.ts](src/app/actions.ts)).
+- ~~El cron por hora no despliega en plan Hobby~~ (Vercel: "Hobby accounts are
+  limited to daily cron jobs") → `vercel.json` a `0 3 * * *` y lotes por
+  pasada más grandes en [route.ts](src/app/api/cron/sync/route.ts), para
+  aprovechar la única ejecución diaria.
+- ~~La app se sentía lenta~~ → `getLibrary` ([profiles.ts](src/lib/profiles.ts))
+  reintentaba el PEGI en IGDB (cuatro oleadas, la última una consulta por
+  título) para los mismos ~40 juegos **en cada carga de biblioteca**, porque
+  solo marcaba `pegi` cuando IGDB devolvía algo y nunca cuando no encontraba
+  nada. Ahora también escribe `metadataSyncedAt` al no encontrar nada, igual
+  que ya hacía `syncIgdbMetadata`, así que esos juegos se dejan de repreguntar
+  y solo los reintenta el cron en su rotación aleatoria.
 
 **Fallos conocidos sin arreglar:**
 - **`/juego/[id]` significa dos cosas**: un `games.id` (`psn-NPWR…`) o un id
