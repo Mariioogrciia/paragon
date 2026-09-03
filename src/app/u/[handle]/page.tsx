@@ -8,6 +8,9 @@ import { TrophyCountRow } from "@/components/TrophyCounts";
 import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle, getUserBadges } from "@/lib/profiles";
 import { summarise, type GameStatus } from "@/lib/stats";
+import { db } from "@/db";
+import { gameTrophies } from "@/db/schema";
+import { inArray } from "drizzle-orm";
 import { FavoritePicker } from "@/components/FavoritePicker";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
 import { coverGradient } from "@/lib/design";
@@ -86,14 +89,19 @@ export default async function PerfilPage({
   const juegosEsteAnio = await juegosDelAnio(profile.userId);
   const badges = await getUserBadges(profile.userId);
 
+  const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
+  const showcaseTrophiesData = showcaseTrophyIds.length > 0 
+    ? await db.select().from(gameTrophies).where(inArray(gameTrophies.trophyId, showcaseTrophyIds))
+    : [];
+
   const backgroundGame = games.find((game) => game.id === profile.profileBackgroundGameId) ?? (games.length > 0 ? games[0] : null);
   const backgroundImage = profile.profileBannerUrl || backgroundGame?.iconUrl;
 
-  const customStyle: React.CSSProperties = {};
+  const customStyle: any = {};
   if (profile.profileColor) {
-    customStyle["--accent" as any] = profile.profileColor;
+    customStyle["--accent"] = profile.profileColor;
     const rgb = hexToRgb(profile.profileColor);
-    if (rgb) customStyle["--accent-rgb" as any] = rgb;
+    if (rgb) customStyle["--accent-rgb"] = rgb;
   }
 
   return (
@@ -199,8 +207,9 @@ export default async function PerfilPage({
             .map(pin => {
               const game = games.find(g => g.id === pin.gameId);
               if (!game) return null;
-              const trophy = game.trophies.find(t => t.id === pin.trophyId);
-              if (!trophy) return null;
+              const trophyRaw = showcaseTrophiesData.find(t => t.trophyId === pin.trophyId);
+              if (!trophyRaw) return null;
+              const trophy = { ...trophyRaw, id: trophyRaw.trophyId, earned: true, grade: trophyRaw.grade ?? undefined };
               return { game, trophy };
             })
             .filter((item): item is NonNullable<typeof item> => item !== null)}

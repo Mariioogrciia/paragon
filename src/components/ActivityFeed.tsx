@@ -27,8 +27,7 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-export async function ActivityFeed({ userId }: { userId: string }) {
-  const activities = await getFeed(userId);
+export function ActivityFeed({ activities, currentUserId }: { activities: any[], currentUserId: string | null }) {
 
   if (activities.length === 0) {
     return (
@@ -99,10 +98,18 @@ export async function ActivityFeed({ userId }: { userId: string }) {
                 </div>
                 <form action={addActivityCommentAction} className="mt-2 flex gap-2">
                   <input type="hidden" name="activityId" value={activity.id} />
-                  <input name="body" maxLength={500} placeholder="Escribe un comentario" className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs outline-none" />
-                  <button className="text-xs font-semibold text-accent">Enviar</button>
+                  <input type="text" name="comment" placeholder="Añadir un comentario..." className="flex-1 bg-transparent border-b border-border/50 text-xs px-2 py-1.5 focus:outline-none focus:border-accent transition-colors" />
                 </form>
-                {activity.comments.length > 0 && <div className="mt-2 space-y-1">{activity.comments.slice(0, 3).map((comment, index) => <p key={`${comment.createdAt.toISOString()}-${index}`} className="text-xs text-muted"><strong className="text-foreground">{comment.userName ?? "Usuario"}:</strong> {comment.body}</p>)}</div>}
+                {activity.comments.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {activity.comments.map((comment: any, index: number) => (
+                      <div key={index} className="text-xs bg-muted/10 p-2 rounded-lg">
+                        <span className="font-semibold">{comment.userName || "Alguien"}</span>: {comment.body}
+                        <div className="text-[10px] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {activity.game.iconUrl && (

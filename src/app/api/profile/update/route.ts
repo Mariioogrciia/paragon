@@ -19,6 +19,10 @@ export async function POST(request: Request) {
     const timezone = formData.get("timezone") as string | null;
     const profileTitle = formData.get("profileTitle") as string | null;
     const profileBackgroundGameId = formData.get("profileBackgroundGameId") as string | null;
+    const profileBannerUrl = formData.get("profileBannerUrl") as string | null;
+    const profileColor = formData.get("profileColor") as string | null;
+    const profileFrame = formData.get("profileFrame") as string | null;
+    const statusText = formData.get("statusText") as string | null;
     
     // We update everything but the email, because email is linked to the OAuth provider
     
@@ -31,6 +35,10 @@ export async function POST(request: Request) {
       timezone: timezone ?? "Europe/Madrid",
       profileTitle: profileTitle?.trim().slice(0, 60) || null,
       profileBackgroundGameId: profileBackgroundGameId?.trim() || null,
+      profileBannerUrl: profileBannerUrl?.trim() || null,
+      profileColor: profileColor?.trim() || null,
+      profileFrame: profileFrame?.trim() || null,
+      statusText: statusText?.trim().slice(0, 100) || null,
     }).where(eq(users.id, session.user.id));
 
     // Redirect back to settings page

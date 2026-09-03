@@ -13,7 +13,19 @@ import { TrophyGuideModal } from "./TrophyGuideModal";
  * tipo es cada cosa. La cuadrícula es la vitrina: iconos grandes, para mirar
  * lo conseguido. Por eso la que manda por defecto sigue siendo la lista.
  */
-export function TrophyList({ trophies, gameTitle }: { trophies: Trophy[], gameTitle: string }) {
+export function TrophyList({ 
+  trophies, 
+  gameTitle, 
+  gameId, 
+  esMio, 
+  showcaseTrophies 
+}: { 
+  trophies: Trophy[]; 
+  gameTitle: string; 
+  gameId?: string;
+  esMio?: boolean;
+  showcaseTrophies?: { gameId: string, trophyId: string }[];
+}) {
   const [view, setView] = useState<"lista" | "cuadricula">("lista");
   const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
 
@@ -96,7 +108,10 @@ export function TrophyList({ trophies, gameTitle }: { trophies: Trophy[], gameTi
       {activeTrophy && (
         <TrophyGuideModal 
           gameTitle={gameTitle} 
+          gameId={gameId}
           trophy={activeTrophy} 
+          esMio={esMio}
+          isPinned={showcaseTrophies?.some(t => t.gameId === gameId && t.trophyId === activeTrophy.id)}
           onClose={() => setActiveTrophy(null)} 
         />
       )}

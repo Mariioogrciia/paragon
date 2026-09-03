@@ -9,6 +9,7 @@ import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByUserId, getGlobalStats } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { ActivityFeed } from "@/components/ActivityFeed";
+import { getFeed } from "@/lib/feed";
 import { UpcomingGames } from "@/components/UpcomingGames";
 import { TrophyHistory } from "@/components/TrophyHistory";
 import { rachas, resumenHistorico, trofeosPorMes } from "@/lib/history";
@@ -578,7 +579,7 @@ export default async function HomePage() {
       </section>
 
       <section>
-        <ActivityFeed userId={session.user.id} />
+        <ActivityFeed activities={await getFeed(session.user.id)} currentUserId={session.user.id} />
       </section>
     </div>
   );

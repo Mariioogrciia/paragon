@@ -52,6 +52,10 @@ export const users = pgTable("user", {
   
   profileTitle: text("profileTitle"),
   profileBackgroundGameId: text("profileBackgroundGameId"),
+  profileBannerUrl: text("profileBannerUrl"),
+  profileColor: text("profileColor"),
+  profileFrame: text("profileFrame"),
+  statusText: text("statusText"),
 
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });

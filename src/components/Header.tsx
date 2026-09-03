@@ -13,6 +13,21 @@ const LOGGED_IN_NAV = [
     match: (p: string) => p.startsWith("/u/"),
   },
   {
+    label: "Comunidad",
+    href: "/feed",
+    match: (p: string) => p.startsWith("/feed"),
+  },
+  {
+    label: "Noticias",
+    href: "/noticias",
+    match: (p: string) => p.startsWith("/noticias"),
+  },
+  {
+    label: "Ligas",
+    href: "/ligas",
+    match: (p: string) => p.startsWith("/ligas"),
+  },
+  {
     label: "Rivales",
     href: "/amigos",
     match: (p: string) => p.startsWith("/amigos") || p.startsWith("/comparar"),
@@ -31,6 +46,8 @@ const LOGGED_IN_NAV = [
 
 const LOGGED_OUT_NAV = [
   { label: "Inicio", href: "/", match: (p: string) => p === "/" },
+  { label: "Noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
+  { label: "Ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
   { label: "Cómo funciona", href: "/#biblioteca", match: (p: string) => false },
 ];
 

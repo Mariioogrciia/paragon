@@ -4,7 +4,9 @@ const STATUS: Record<GameStatus, { label: string; bg: string; fg: string; border
   platinado: { label: "Platinado", bg: "rgba(159, 212, 236, 0.14)", fg: "#9fd4ec", border: "rgba(159, 212, 236, 0.32)" },
   completado: { label: "Al 100%", bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e", border: "rgba(226, 181, 62, 0.32)" },
   "en-curso": { label: "En curso", bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff", border: "rgb(var(--accent-rgb) / 0.32)" },
+  "a-punto": { label: "A punto", bg: "rgba(167, 139, 250, 0.14)", fg: "#a78bfa", border: "rgba(167, 139, 250, 0.32)" },
   "sin-empezar": { label: "Sin empezar", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
+  abandonado: { label: "Abandonado", bg: "rgba(248, 113, 113, 0.12)", fg: "#f87171", border: "rgba(248, 113, 113, 0.25)" },
   deseados: { label: "Deseados", bg: "rgba(219, 112, 147, 0.14)", fg: "#ff8da1", border: "rgba(219, 112, 147, 0.32)" },
 };
 

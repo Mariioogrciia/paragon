@@ -1,19 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { searchTrophyGuideAction } from "@/app/actions";
+import { useEffect, useState, useTransition } from "react";
+import { searchTrophyGuideAction, pinTrophyAction } from "@/app/actions";
 import { type Trophy } from "@/lib/types";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { Pin, PinOff } from "lucide-react";
 
 export function TrophyGuideModal({
   gameTitle,
+  gameId,
   trophy,
+  esMio,
+  isPinned,
   onClose,
 }: {
   gameTitle: string;
+  gameId?: string;
   trophy: Trophy;
+  esMio?: boolean;
+  isPinned?: boolean;
   onClose: () => void;
 }) {
+  const [isPending, startTransition] = useTransition();
   const [videoId, setVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,14 +54,30 @@ export function TrophyGuideModal({
             </p>
           </div>
           
-          <button 
-            onClick={onClose}
-            className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-white/10"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center">
+            {esMio && gameId && (
+              <button 
+                onClick={() => {
+                  startTransition(async () => {
+                    await pinTrophyAction(gameId, trophy.id);
+                  });
+                }}
+                disabled={isPending}
+                title={isPinned ? "Quitar de la vitrina" : "Fijar en tu vitrina de perfil"}
+                className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${isPinned ? "bg-[rgb(var(--accent-rgb))] text-black" : "hover:bg-white/10 text-muted hover:text-white"}`}
+              >
+                {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
+              </button>
+            )}
+            <button 
+              onClick={onClose}
+              className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-white/10 text-muted hover:text-white"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
         
         <div className="relative aspect-video w-full bg-black">

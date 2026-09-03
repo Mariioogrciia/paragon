@@ -574,3 +574,54 @@ export async function searchTrophyGuideAction(gameTitle: string, trophyName: str
     return null;
   }
 }
+
+export async function submitExpressReviewAction(gameId: string, rating: number, review: string) {
+  const userId = await requireUserId();
+  const db = getDb();
+  
+  await db
+    .update(userGames)
+    .set({ rating, review, reviewDate: new Date() })
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+
+  // Guardar en el feed de actividad
+  const id = crypto.randomUUID();
+  await db
+    .insert(activities)
+    .values({
+      id,
+      userId,
+      type: "review",
+      gameId,
+      rating,
+      review,
+    });
+
+  revalidatePath("/", "layout");
+}
+
+export async function pinTrophyAction(gameId: string, trophyId: string) {
+  const userId = await requireUserId();
+  const db = getDb();
+
+  const profile = await getProfileByUserId(userId);
+  let showcase = profile?.showcaseTrophies || [];
+  
+  const existingIndex = showcase.findIndex(t => t.gameId === gameId && t.trophyId === trophyId);
+  if (existingIndex >= 0) {
+    showcase = showcase.filter((_, i) => i !== existingIndex);
+  } else {
+    if (showcase.length >= 3) {
+      return { error: "Solo puedes fijar un máximo de 3 trofeos." };
+    }
+    showcase.push({ gameId, trophyId });
+  }
+
+  await db
+    .update(users)
+    .set({ showcaseTrophies: showcase })
+    .where(eq(users.id, userId));
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}

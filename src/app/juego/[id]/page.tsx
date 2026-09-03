@@ -189,22 +189,8 @@ export default async function JuegoGlobalPage({
                           <span className="font-semibold">{r.name ?? "Alguien"}</span>
                         )}
                         {r.rating != null && (
-                          <span className="flex items-center gap-0.5">
-                            {[1, 2, 3, 4, 5].map((s) => (
-                              <svg
-                                key={s}
-                                width="12"
-                                height="12"
-                                viewBox="0 0 24 24"
-                                fill={s <= r.rating! ? "#f59e0b" : "none"}
-                                stroke={s <= r.rating! ? "#f59e0b" : "var(--muted)"}
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                              </svg>
-                            ))}
+                          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[rgb(var(--accent-rgb)/0.2)] text-[rgb(var(--accent-rgb))]">
+                            {r.rating}/10
                           </span>
                         )}
                         {r.reviewDate && (

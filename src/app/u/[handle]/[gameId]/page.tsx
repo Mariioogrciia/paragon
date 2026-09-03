@@ -312,24 +312,31 @@ export default async function JuegoPage({
           <CommunityRating rating={valoracion} />
         </section>
 
-        {(esMio || game.review) && (
+        {(esMio || game.review || game.rating) && (
           <section>
             {esMio ? (
               <ReviewEditor 
                 gameId={game.id} 
                 initialReview={game.review} 
-                initialDate={game.reviewDate} 
+                initialRating={game.rating ?? null} 
               />
             ) : (
-              game.review && (
-                <div className="p-5 border rounded-xl bg-card border-border">
-                  <div className="flex gap-2 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-widest text-accent">Reseña de {profile.displayName ?? handle}</span>
+              (game.review || game.rating) && (
+                <div className="p-5 border rounded-xl bg-surface border-border">
+                  <div className="flex gap-2 mb-3 items-center">
+                    <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña de {profile.displayName ?? handle}</span>
+                    {game.rating && (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-[rgb(var(--accent-rgb)/0.2)] text-[rgb(var(--accent-rgb))]">
+                        Nota: {game.rating}/10
+                      </span>
+                    )}
                     {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
                   </div>
-                  <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
-                    &quot;{game.review}&quot;
-                  </p>
+                  {game.review && (
+                    <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
+                      &quot;{game.review}&quot;
+                    </p>
+                  )}
                 </div>
               )
             )}
@@ -383,7 +390,13 @@ export default async function JuegoPage({
                 {progress.earned} de {progress.total} conseguidos
               </span>
             </div>
-            <TrophyList trophies={game.trophies} gameTitle={game.title} />
+            <TrophyList 
+              trophies={game.trophies} 
+              gameTitle={game.title} 
+              gameId={game.id}
+              esMio={esMio}
+              showcaseTrophies={profile.showcaseTrophies ?? []}
+            />
           </section>
         )}
       </div>
