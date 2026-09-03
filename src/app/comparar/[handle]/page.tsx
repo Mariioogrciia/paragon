@@ -11,6 +11,7 @@ import {
 import { sharedGames, summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { sharedTrophyLeads } from "@/lib/comparison";
+import { FiltroJuegosComunes } from "@/components/FiltroJuegosComunes";
 
 const OUTCOME = {
   ganas: { label: "Ganas", bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
@@ -172,67 +173,65 @@ export default async function CompararPage({
           </span>
         </div>
 
-        {comunes.length === 0 ? (
-          <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-            No tenéis ningún juego en común todavía.
-          </p>
-        ) : (
-          <div className="grid gap-2.5">
-            {comunes.map((row) => (
-              <div
-                key={row.title}
-                className="grid grid-cols-[52px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[52px_1fr_1.3fr_96px] sm:gap-5"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-              >
-                <span
-                  className="relative flex h-[52px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[13px]"
-                  style={{ background: coverGradient(row.title) }}
+        <FiltroJuegosComunes juegos={comunes} vacioMensaje="No tenéis ningún juego en común todavía.">
+          {(visibles) => (
+            <div className="grid gap-2.5">
+              {visibles.map((row) => (
+                <div
+                  key={row.id}
+                  className="grid grid-cols-[52px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[52px_1fr_1.3fr_96px] sm:gap-5"
+                  style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
                 >
-                  {row.iconUrl ? (
-                    <img src={row.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                  ) : (
-                    <span className="font-heading text-[15px] font-bold text-white">{monogram(row.title)}</span>
-                  )}
-                </span>
+                  <span
+                    className="relative flex h-[52px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[13px]"
+                    style={{ background: coverGradient(row.title) }}
+                  >
+                    {row.iconUrl ? (
+                      <img src={row.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                    ) : (
+                      <span className="font-heading text-[15px] font-bold text-white">{monogram(row.title)}</span>
+                    )}
+                  </span>
 
-                <p className="col-span-1 truncate text-[15px] font-semibold">{row.title}</p>
+                  <p className="col-span-1 truncate text-[15px] font-semibold">{row.title}</p>
 
-                <div className="col-span-2 grid gap-2 sm:col-span-1">
-                  {row.progress.map((p, i) => (
-                    <div key={jugadores[i].player.id} className="flex items-center gap-3">
-                      <span
-                        className="w-[52px] shrink-0 text-[11px] font-bold uppercase tracking-[0.06em]"
-                        style={{ color: i === 0 ? "var(--accent-text)" : "var(--muted)" }}
-                      >
-                        {jugadores[i].player.name}
-                      </span>
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${p.percent}%`,
-                            background: i === 0 ? "var(--accent-grad-h)" : "#4a5668",
-                          }}
-                        />
+                  <div className="col-span-2 grid gap-2 sm:col-span-1">
+                    {row.progress.map((p, i) => (
+                      <div key={jugadores[i].player.id} className="flex items-center gap-3">
+                        <span
+                          className="w-[52px] shrink-0 text-[11px] font-bold uppercase tracking-[0.06em]"
+                          style={{ color: i === 0 ? "var(--accent-text)" : "var(--muted)" }}
+                        >
+                          {jugadores[i].player.name}
+                        </span>
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${p.percent}%`,
+                              background: i === 0 ? "var(--accent-grad-h)" : "#4a5668",
+                            }}
+                          />
+                        </div>
+                        <span
+                          className="w-16 shrink-0 text-right text-xs font-bold"
+                          style={i === 1 ? { color: "var(--muted)" } : undefined}
+                        >
+                          {p.percent}%
+                          {row.horas[i] !== undefined && (
+                            <span className="ml-1 font-normal text-muted">{row.horas[i]!.toFixed(0)}h</span>
+                          )}
+                        </span>
                       </div>
-                      <span
-                        className="w-16 shrink-0 text-right text-xs font-bold"
-                        style={i === 1 ? { color: "var(--muted)" } : undefined}
-                      >
-                        {p.percent}%
-                        {row.horas[i] !== undefined && (
-                          <span className="ml-1 font-normal text-muted">{row.horas[i]!.toFixed(0)}h</span>
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                <OutcomeTag kind={outcome(row.progress[0].percent, row.progress[1].percent)} />
-              </div>
-            ))}
-          </div>
-        )}
+                  <OutcomeTag kind={outcome(row.progress[0].percent, row.progress[1].percent)} />
+                </div>
+              ))}
+            </div>
+          )}
+        </FiltroJuegosComunes>
       </section>
 
       {lideres.length > 0 && (
