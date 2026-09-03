@@ -150,20 +150,87 @@ function duracionEnMinutos(duration: string | undefined): number {
   return Math.round(dias * 1_440 + horas * 60 + minutos + segundos / 60);
 }
 
-async function horasJugadas(accountId: string): Promise<Map<string, number>> {
+interface HorasJugadas {
+  /**
+   * "ps4_game" | "ps5_native_game" | "pspc_game" | "ps3_game" | "unknown"…
+   * — de qué versión concreta es esta sesión, para poder repartirla si hace
+   * falta (ver `categoriaEsDelDispositivo`).
+   */
+  categoria: string;
+  minutos: number;
+}
+
+/**
+ * Horas jugadas, agrupadas por nombre — SIN colapsar a una sola cifra.
+ *
+ * El endpoint de PSN da una fila por CADA versión que se ha jugado de
+ * verdad: "Grand Theft Auto V" en PS4 y su versión "PlayStation®5" nativa
+ * son dos filas con horas propias (1620 h y 95 h en un caso real que
+ * motivó este código), no la misma cifra repetida. Se guardan todas y es
+ * `repartirHoras` quien decide, fila a fila, si hay que sumarlas o
+ * repartirlas.
+ */
+async function horasJugadas(accountId: string): Promise<Map<string, HorasJugadas[]>> {
   const auth = await getAuthorization();
-  const jugados = new Map<string, number>();
+  const jugados = new Map<string, HorasJugadas[]>();
   const PAGE = 100;
 
   for (let offset = 0; ; offset += PAGE) {
     const response = await getUserPlayedGames(auth, accountId, { limit: PAGE, offset });
     for (const title of response.titles) {
-      jugados.set(claveTitulo(title.name), duracionEnMinutos(title.playDuration));
+      const clave = claveTitulo(title.name);
+      const entrada = { categoria: title.category, minutos: duracionEnMinutos(title.playDuration) };
+      jugados.set(clave, [...(jugados.get(clave) ?? []), entrada]);
     }
     if (response.titles.length < PAGE) break;
   }
 
   return jugados;
+}
+
+/** Si una sesión de "ps4_game"/"ps5_native_game"/etc. es de esta ficha, por su deviceLabel ("PS4", "PS5", "PS3"...). */
+function categoriaEsDelDispositivo(categoria: string, deviceLabel: string): boolean {
+  const d = deviceLabel.toLowerCase();
+  if (categoria === "ps5_native_game") return d.includes("ps5");
+  if (categoria === "ps4_game") return d.includes("ps4");
+  if (categoria === "ps3_game") return d.includes("ps3");
+  if (categoria === "pspc_game") return d.includes("pc");
+  return false; // "unknown" u otra categoría nueva: no se reparte con confianza.
+}
+
+/**
+ * Reparte las horas jugadas entre las fichas de trofeos de un mismo nombre.
+ *
+ * Dos casos reales, distintos:
+ * 1. Una sola ficha para varias sesiones (típico cross-gen: la lista de
+ *    trofeos de PS4 vale también jugando en PS5) → se SUMAN todas.
+ * 2. Varias fichas — trofeos distintos por generación de verdad — → cada
+ *    sesión va a la ficha cuyo `deviceLabel` encaja con su categoría; lo
+ *    que no encaje con ninguna se le añade a la que se quede sin dato,
+ *    antes que perderlo.
+ */
+function repartirHoras(fichas: Game[], sesiones: HorasJugadas[]): void {
+  if (fichas.length === 1) {
+    fichas[0].playtimeMinutes = sesiones.reduce((total, s) => total + s.minutos, 0);
+    return;
+  }
+
+  const sinAsignar = [...sesiones];
+  for (const ficha of fichas) {
+    let total = 0;
+    for (let i = sinAsignar.length - 1; i >= 0; i--) {
+      if (categoriaEsDelDispositivo(sinAsignar[i].categoria, ficha.deviceLabel)) {
+        total += sinAsignar[i].minutos;
+        sinAsignar.splice(i, 1);
+      }
+    }
+    if (total > 0) ficha.playtimeMinutes = total;
+  }
+
+  if (sinAsignar.length > 0) {
+    const sinDatos = fichas.find((f) => f.playtimeMinutes === undefined);
+    if (sinDatos) sinDatos.playtimeMinutes = sinAsignar.reduce((total, s) => total + s.minutos, 0);
+  }
 }
 
 /**
@@ -195,21 +262,18 @@ export async function fetchLibrary(accountId: string): Promise<Game[]> {
 
   try {
     const jugados = await horasJugadas(accountId);
-    // PSN da UNA cifra de horas por nombre de juego, no por versión: la
-    // misma "Grand Theft Auto V" en PS4, PS5 y PS3 son tres filas nuestras
-    // (trofeos distintos por diseño), pero una sola entrada en `jugados`.
-    // Sin este `delete`, las tres se llevaban la cifra entera y un juego
-    // con versión en varias consolas aparecía con las mismas horas
-    // multiplicadas por cada copia al sumarlas en cualquier sitio. Se
-    // asigna a la más reciente (así vienen ordenados los `games` que llegan
-    // aquí) y el resto se queda sin dato, no a cero — cero diría "nunca
-    // jugado", que no es verdad.
+
+    // Agrupar nuestras fichas por el mismo nombre normalizado que usan las
+    // horas, para poder repartir sesión a sesión (ver repartirHoras).
+    const fichasPorNombre = new Map<string, Game[]>();
     for (const game of games) {
       const clave = claveTitulo(game.title);
-      if (jugados.has(clave)) {
-        game.playtimeMinutes = jugados.get(clave)!;
-        jugados.delete(clave);
-      }
+      fichasPorNombre.set(clave, [...(fichasPorNombre.get(clave) ?? []), game]);
+    }
+
+    for (const [clave, sesiones] of jugados) {
+      const fichas = fichasPorNombre.get(clave);
+      if (fichas && fichas.length > 0) repartirHoras(fichas, sesiones);
     }
   } catch (error) {
     // La privacidad de actividad puede bloquear este endpoint; la biblioteca
