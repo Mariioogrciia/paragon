@@ -1,7 +1,8 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Fecha: **3 de septiembre de 2026**.
+releer todo el historial. Última actualización: **3 de septiembre de 2026**
+(sesión larga, con Antigravity trabajando en paralelo todo el rato).
 
 ---
 
@@ -28,6 +29,11 @@ corriendo en este equipo en ese momento, se cayó sin avisar. No debería
 volver a pasar (ver más abajo por qué hacía falta pararlos), pero si algo
 tuyo se cortó de golpe por esas fechas, es por esto.
 
+**Los dos agentes commiteamos y empujamos directo a `master`, sin ramas ni
+PR.** Funciona porque tocamos archivos distintos casi siempre, pero si algún
+día chocáis de verdad en el mismo bloque de código, tocará resolverlo a
+mano. Antes de una sesión larga, `git pull` primero.
+
 ---
 
 ## Decisiones de arquitectura que conviene no romper
@@ -39,6 +45,11 @@ tuyo se cortó de golpe por esas fechas, es por esto.
 | `platform: "manual"` | Cajón para lo que no tiene API (Switch, retro). No participa en `platform_account`. Su `nativeId` es `<igdbId>:<dispositivo>`. |
 | El acento del tema se declara en canal RGB (`--accent-rgb`) | Permite derivar los tintes translúcidos. Antes iban a pelo (`rgba(74,158,255,.14)`) por toda la app y por eso cambiar de color "no cambiaba nada". |
 | El cron va por tandas y con reloj | Una cuenta con PSN+Steam tarda ~25 s. Vercel corta a 60. Se sincronizan los perfiles más rancios y el resto entra a la hora siguiente. |
+| La conexión a Postgres se cachea en `globalThis` en **todos** los entornos, dev incluido | Antes solo se cacheaba fuera de producción. En serverless un cold start solo evalúa el módulo una vez; sin cachear, cada acceso al proxy `db` abría un cliente nuevo (hasta 10 sockets) y no cerraba los anteriores → "max client connections reached" en Supabase. Ver `src/db/index.ts`. |
+| Un 100% de Steam cuenta como platino | Steam no tiene trofeo de platino que contar; su "terminar el juego" es el 100% de logros. `esPlatinoEquivalente()` en `lib/stats.ts` es la fuente única de verdad — úsala en cualquier sitio nuevo que cuente platinos (recuento de biblioteca, insignias, XP de nivel), no repitas `earned.platinum > 0` a pelo. |
+| La foto de perfil se resuelve siempre igual: PSN → cualquier cuenta con avatar → imagen genérica | En TypeScript (con un `ProfileRow` ya cargado) es `resolveAvatarUrl()` en `profiles.ts`; en SQL (listas de gente que no es "el perfil actual" — reseñas, ligas, feed, comparador) es `avatarUrlSql()` en `lib/avatarSql.ts`. Si añades una pantalla nueva que enseñe la cara de alguien, usa una de las dos — no leas `users.image` a pelo. |
+| Horas de PSN: nunca colapsar por nombre sin más | El endpoint de horas jugadas da una fila POR VERSIÓN REALMENTE JUGADA (PS4 y PS5 de un mismo juego son dos filas con horas propias, no la misma cifra repetida — ver la trampa de más abajo). `repartirHoras()` en `psn/client.ts` decide si sumar (una sola ficha de trofeos para el nombre) o repartir por dispositivo (varias fichas). Para "tu juego más jugado" A TRAVÉS de plataformas distintas (Steam + PSN del mismo título), es `gruposPorTitulo()` en `lib/stats.ts` quien suma. |
+| Tablas nuevas: SQL explícito, no `db:push` | Todas las tablas de esta sesión (`game_difficulty_vote`, `game_guide`, `game_guide_reply`) se crearon con scripts `CREATE TABLE IF NOT EXISTS` en `scripts/`, mismo motivo que `notification`: `db:push` compara el esquema entero y es más arriesgado sobre producción. |
 
 ---
 
@@ -56,15 +67,105 @@ y en medio falta una línea que nadie ve porque **no da error**.
 - Pedir dos cláusulas `fields` en una consulta de IGDB devuelve 200 y
   **descarta silenciosamente** parte de lo pedido.
 - El botón "Ver un perfil de ejemplo" apuntaba a un handle inexistente: 404.
+- **`getLibrary` reintentaba el PEGI en IGDB en cada carga de biblioteca**
+  para los ~40 juegos que IGDB no tiene: solo marcaba `pegi` cuando
+  encontraba algo, nunca cuando no. Esto era el grueso de "la app va lenta".
+- **Las horas de PSN se colapsaban por nombre de juego**, perdiendo datos
+  reales: un jugador con 1620 h en PS4 y 95 h en PS5 del mismo título
+  aparecía con 95 h en las dos fichas (o menos). El primer intento de
+  arreglarlo asumió que PSN da una sola cifra por nombre — **no es así**: da
+  una fila por versión realmente jugada, con su propia cifra. El arreglo de
+  verdad fue sumar/repartir, no elegir una y tirar el resto. Moraleja: probar
+  contra la API real con una cuenta que tenga el caso raro, no razonar sobre
+  lo que "debería" devolver.
+- **`NULL + count(*) filter (...)` es `NULL` en Postgres.** Al sumar
+  "100% de Steam cuenta como platino" a un `sum(CAST(...))` que puede salir
+  NULL (nadie con platinos de PSN), la insignia de platinos se quedaba a
+  cero para cualquiera sin ningún platino real, aunque tuviera Steam al
+  100%. Hace falta `coalesce(sum(...), 0) + count(...)`, no `sum(...) + count(...)`.
+- **Los deseados contaban como juegos de la biblioteca** en `summarise()` y
+  en las consultas SQL de insignias/estadísticas globales — nadie los
+  excluía explícitamente.
+- **Cada click en las estrellas insertaba una fila nueva en `activities`**
+  en vez de actualizar la existente: cambiar de opinión de 2 a 5 estrellas
+  dejaba 4 entradas idénticas en el feed.
 
 **Regla:** cuando conectes un dato nuevo, compruébalo **en la base y en
 pantalla**, no solo que compile. Y si un agente edita con scripts de
 sustitución de texto, que verifiquen que el patrón casó — un `print("ok")`
 incondicional me costó una hora depurando un cambio que nunca se escribió.
+Y si el dato viene de una API externa con una forma "obvia", compruébalo
+contra la API de verdad antes de escribir el arreglo — la forma obvia fue la
+que causó el bug de las horas de PSN la primera vez.
 
 ---
 
 ## Qué se hizo en esta sesión
+
+### Bugs de datos reales (no solo visuales)
+- **Horas de PSN mal atribuidas entre versiones de un mismo juego** —
+  arreglado de verdad en `psn/client.ts` (`repartirHoras`), con backfill
+  (`scripts/resincronizar-horas-psn.mts`) sobre las cuentas ya vinculadas.
+  Ver la trampa de arriba: el primer intento de arreglo fue insuficiente.
+- **Horas sumadas entre plataformas distintas** (Steam + PSN del mismo
+  juego) para "tu juego más jugado" — `gruposPorTitulo()` en `lib/stats.ts`,
+  usado en el Wrap y su ranking.
+- **Un 100% de Steam cuenta como platino** en todos los recuentos (biblioteca,
+  insignias, XP de nivel Paragon, navbar) — `esPlatinoEquivalente()`.
+  Backfill de insignias con `scripts/recalcular-insignias.mts`.
+- **Deseados ya no cuentan como juegos** de la biblioteca en ningún recuento.
+- **Feed de actividad sin duplicados**: valorar/reseñar actualiza la
+  actividad existente en vez de amontonar una nueva cada vez. Limpieza con
+  `scripts/limpiar-actividad-duplicada.mts`.
+- **Fuga de conexiones a Postgres** (`src/db/index.ts`) que causaba 500 en
+  producción y lentitud acumulada — la conexión no se cacheaba en
+  producción, así que cada acceso al proxy `db` abría un cliente nuevo.
+- **Foto de perfil inconsistente**: navbar, reseñas, ligas y feed leían la
+  imagen de tres formas distintas (con o sin el avatar de PSN). Unificado
+  con `resolveAvatarUrl` (TS) y `avatarUrlSql` (SQL, en `lib/avatarSql.ts`).
+
+### Funciones nuevas
+- **Comparación en grupo** (`/comparar`, sin handle): elige 2+ amigos desde
+  `/amigos` con checkboxes (formulario GET nativo, sin JS) y compara a todos
+  a la vez. `sharedGames()` (`lib/stats.ts`) ya aceptaba N bibliotecas.
+- **Filtros de búsqueda + plataforma** en ambos comparadores
+  (`FiltroJuegosComunes`, `CompararFiltrable`) y **filtro de horas jugadas**
+  en la biblioteca (con sus tramos: sin horas / <10h / 10-50h / 50-100h / 100h+).
+- **Ranking del Wrap**: cada tarjeta (género, juego más jugado, trofeos del
+  año) enlaza a `/u/[handle]/wrap/[horas|trofeos|generos]`, la lista entera
+  con filtro de fecha (real para trofeos/géneros; para horas, filtra qué
+  juegos entran, no recalcula — las plataformas no dan horas por fecha).
+- **Nivel Paragon corregido**: el platino no sumaba al total en la tarjeta
+  del perfil, y la navbar tenía su propia implementación paralela que
+  contaba distinto (y sin Steam al 100%). Ahora las dos coinciden.
+- **Dificultad votada por la comunidad** (1-5 estrellas, `game_difficulty_vote`),
+  junto a la dificultad estimada por rareza — dos señales, no una.
+- **Reseñas unificadas a 5 estrellas** (antes había dos escalas — 1-5 en la
+  biblioteca, 1-10 en la reseña express — mezclándose en la misma columna).
+- **Recomendaciones de trofeo mejoradas**: priorizan el juego base sobre DLC
+  (el platino nunca depende de expansiones), y desde la tarjeta se puede
+  anclar el trofeo, ver la guía en vídeo o ir a las guías escritas.
+- **Guías escritas, como un foro** (`/juego/[id]/guias`): hilos con
+  respuestas, tablas `game_guide`/`game_guide_reply`. Distinto de la reseña
+  (nota + 4 líneas) y del vídeo de un trofeo suelto (automático, no lo
+  escribe nadie de aquí).
+- **Comparador de precios** (`/juego/[id]`, solo Steam): CheapShark, sin
+  clave pero exige `User-Agent` descriptivo. No hay fuente pública
+  equivalente para PSN — se dice así en la pantalla, no se oculta.
+- **Panel de admin** (`/admin`), gateado a `profile.esDesarrollador` (un
+  correo hardcodeado en `profiles.ts`, nunca expuesto — solo un booleano):
+  métricas de toda la plataforma, sincronizaciones recientes de todos los
+  usuarios, tabla de usuarios.
+- **Insignia "Desarrollador"** visible en tu propio perfil, mismo mecanismo.
+- **Menú de navegación en móvil**: el `<nav>` de escritorio estaba
+  `hidden sm:flex` sin alternativa — no había forma de llegar a Comunidad,
+  Noticias, Ligas, etc. desde un móvil. Botón de hamburguesa + panel.
+- **Todos los desplegables con la misma estética**: había dos componentes
+  (`Dropdown`, `CustomSelect`) con estilos distintos, y el planificador
+  usaba un `<select>` nativo suelto. Unificados los tres.
+- Regla de diseño del usuario, guardada en memoria: **todo botón necesita
+  estado hover visible**.
+- Renombrado "Rivales" → "Amigos" en toda la app.
 
 ### Datos y catálogo
 - **IGDB conectado** (`lib/igdb/client.ts`): OAuth de Twitch, token cacheado.
@@ -111,8 +212,8 @@ incondicional me costó una hora depurando un cambio que nunca se escribió.
 1. **`igdbId` en `games` + emparejado.** Unificaría la ficha global entre
    plataformas y repartiría carátulas, géneros y PEGI a lo que falta. El
    emparejador por título ya está escrito (`pegiPorTitulo`), se reutiliza.
-   **No tocado a propósito**: toca esquema y backfill sobre la base de
-   producción, y esta sesión ha ido sin ti delante — mejor con tú mirando.
+   **Sigue sin tocar**: toca esquema y backfill sobre la base de producción;
+   mejor con alguien delante mirando, no en background.
 2. ~~Compartir el Wrap como imagen~~ → hecho el 3 de septiembre de 2026, con
    `ImageResponse` de `next/og` (ya viene con Next, no hizo falta el paquete
    `@vercel/og` suelto). Ruta [`/api/wrap/[handle]`](src/app/api/wrap/%5Bhandle%5D/route.tsx),
@@ -120,6 +221,13 @@ incondicional me costó una hora depurando un cambio que nunca se escribió.
    (`juegoDestacado`/`generoTop` se exportaron desde ahí para no duplicar la
    cuenta). Botón "Compartir imagen" en la cabecera del Wrap del perfil.
 3. **Instalable en el móvil (PWA)** — aplazado a propósito.
+4. **Auditoría "full responsive" completa.** Se arregló el desbordamiento
+   concreto de la cabecera en móvil (menú nuevo lo destapó), pero no se ha
+   repasado cada pantalla en cada ancho — es su propia tarea, con alcance
+   propio.
+5. Dos scripts sueltos sin trackear en la raíz del repo, de una sesión
+   anterior: `test-yt.js` y `award-badges.ts`. Ni se han tocado ni se han
+   borrado — decidir qué hacer con ellos.
 
 **Fallos conocidos, arreglados el 3 de septiembre de 2026:**
 - ~~Xbox, Epic y Ubisoft son vinculables pero no existen~~ → sus `resolve*`
@@ -157,10 +265,14 @@ incondicional me costó una hora depurando un cambio que nunca se escribió.
 - **Google Play** es un stub: su propia API no puede devolver la biblioteca de
   un jugador, solo logros del juego atado al Client ID.
 
-**Sin probar de punta a punta** (solo hay un usuario en la base):
+**Sin probar de punta a punta:**
 - Aviso de "un amigo te adelanta" — el SQL se validó a mano, el camino
   completo no.
 - Aviso de lanzamiento — los deseados actuales aún no han salido.
+
+(Ya hay 5 usuarios reales en la base, con cuentas PSN/Steam de verdad —
+la comparación en grupo, los rankings y el resto de esta sesión se probaron
+contra ellos, no con datos inventados.)
 
 ---
 
@@ -186,4 +298,10 @@ redesplegar. El plan Hobby limita los crons a **una ejecución diaria**; el
 **Migraciones:** la tabla `notification` se creó con SQL explícito
 (`CREATE TABLE IF NOT EXISTS`), no con `db:push`, para no darle a una
 herramienta la ocasión de proponer cambios sobre una base de producción.
-Recomendado seguir así con lo aditivo.
+Recomendado seguir así con lo aditivo. Mismo patrón para las tablas de
+`game_difficulty_vote` y `game_guide`/`game_guide_reply`: scripts en
+`scripts/crear-*.mts`, ya ejecutados contra producción.
+
+**CheapShark** (comparador de precios) no necesita clave, pero desde hace
+poco exige un `User-Agent` descriptivo o devuelve un error genérico —
+ya está puesto en `lib/prices.ts`, no hace falta variable de entorno nueva.
