@@ -61,7 +61,7 @@ function Pill({
   return (
     <button
       onClick={onClick}
-      className="rounded-[9px] px-3.5 py-2 text-xs font-semibold tracking-[0.02em] transition-colors"
+      className="rounded-[9px] px-3.5 py-2 text-xs font-semibold tracking-[0.02em] transition-colors hover:text-foreground"
       style={
         active
           ? { background: "var(--accent-grad)", color: "#061021" }

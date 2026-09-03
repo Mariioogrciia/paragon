@@ -61,7 +61,7 @@ export function CompararFiltrable({
             <div className="inline-flex gap-1.5 rounded-xl p-1" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
               <button
                 onClick={() => setPlataforma("todas")}
-                className="rounded-[9px] px-3 py-1.5 text-xs font-semibold"
+                className="rounded-[9px] px-3 py-1.5 text-xs font-semibold transition-colors hover:text-foreground"
                 style={plataforma === "todas" ? { background: "var(--accent-grad)", color: "#061021" } : { color: "var(--muted)" }}
               >
                 Todas
@@ -70,7 +70,7 @@ export function CompararFiltrable({
                 <button
                   key={p}
                   onClick={() => setPlataforma(p)}
-                  className="rounded-[9px] px-3 py-1.5 text-xs font-semibold"
+                  className="rounded-[9px] px-3 py-1.5 text-xs font-semibold transition-colors hover:text-foreground"
                   style={plataforma === p ? { background: "var(--accent-grad)", color: "#061021" } : { color: "var(--muted)" }}
                 >
                   {PLATFORM_LABEL[p]}
