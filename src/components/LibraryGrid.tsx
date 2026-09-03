@@ -14,12 +14,15 @@ import {
   type GameStatus,
   type SortKey,
 } from "@/lib/stats";
+import type { Dificultad } from "@/lib/difficulty";
 import { PLATFORM_LABEL, type Game, type Platform } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 
 const STATUS: { label: string; value: GameStatus | "todos" }[] = [
   { label: "Todos", value: "todos" },
   { label: "En curso", value: "en-curso" },
+  { label: "A punto de caramelo", value: "a-punto" },
+  { label: "Abandonados", value: "abandonado" },
   { label: "Platinados", value: "platinado" },
   { label: "Al 100%", value: "completado" },
   { label: "Sin empezar", value: "sin-empezar" },
@@ -74,17 +77,27 @@ export function LibraryGrid({
   handle,
   collections = [],
   esMio = false,
+  initialStatus,
 }: {
   games: Game[];
   handle: string;
   collections?: { id: string; name: string; gameIds: string[] }[];
   esMio?: boolean;
+  /**
+   * Estado inicial del filtro, para llegar aquí ya filtrado desde fuera
+   * (el panel enlaza a "A un paso del platino" con `?estado=a-punto`). Solo
+   * se lee al montar: cambiar el prop después no debería resetear lo que el
+   * usuario ya haya tocado a mano.
+   */
+  initialStatus?: GameStatus | "todos";
 }) {
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<GameStatus | "todos">("todos");
+  const [status, setStatus] = useState<GameStatus | "todos">(initialStatus ?? "todos");
   const [platform, setPlatform] = useState<Platform | "todas">("todas");
   const [publisher, setPublisher] = useState("");
   const [genre, setGenre] = useState("");
+  const [pegi, setPegi] = useState("");
+  const [dificultad, setDificultad] = useState<Dificultad["nivel"] | 0>(0);
   const [collection, setCollection] = useState("");
   const [sort, setSort] = useState<SortKey>("reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -105,10 +118,12 @@ export function LibraryGrid({
       platform,
       publisher: publisher || undefined,
       genre: genre || undefined,
+      pegi: pegi || undefined,
+      dificultad: dificultad || undefined,
       sort,
       sortDir,
     });
-  }, [games, collections, collection, search, status, platform, publisher, genre, sort, sortDir]);
+  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, sort, sortDir]);
 
   const grupos = useMemo(() => {
     if (!agrupar) return null;
@@ -135,7 +150,7 @@ export function LibraryGrid({
   // seguiríamos "dentro" de la página 8 de una lista que ya no existe.
   useEffect(() => {
     setPagina(1);
-  }, [search, status, platform, publisher, genre, collection, sort, sortDir]);
+  }, [search, status, platform, publisher, genre, pegi, dificultad, collection, sort, sortDir]);
 
   const mostrados = useMemo(
     () => visible.slice(0, pagina * POR_PAGINA),
@@ -155,6 +170,8 @@ export function LibraryGrid({
     platform !== "todas" ||
     Boolean(publisher) ||
     Boolean(genre) ||
+    Boolean(pegi) ||
+    Boolean(dificultad) ||
     Boolean(collection);
 
   const renderGame = (game: Game) => {
@@ -320,6 +337,36 @@ export function LibraryGrid({
             options={[
               { value: "", label: "Todos los géneros" },
               ...facets.genres.map(g => ({ value: g.value, label: g.value, count: g.count }))
+            ]}
+            className="w-48"
+          />
+        )}
+
+        {facets.pegis.length > 1 && (
+          <Dropdown
+            value={pegi}
+            onChange={setPegi}
+            placeholder="Cualquier edad"
+            options={[
+              { value: "", label: "Cualquier edad" },
+              ...facets.pegis.map((p) => ({ value: p.value, label: `PEGI ${p.value}`, count: p.count })),
+            ]}
+            className="w-40"
+          />
+        )}
+
+        {facets.dificultades.length > 1 && (
+          <Dropdown
+            value={dificultad ? String(dificultad) : ""}
+            onChange={(v) => setDificultad((v ? Number(v) : 0) as Dificultad["nivel"] | 0)}
+            placeholder="Cualquier dificultad"
+            options={[
+              { value: "", label: "Cualquier dificultad" },
+              ...facets.dificultades.map((d) => ({
+                value: String(d.nivel),
+                label: d.etiqueta,
+                count: d.count,
+              })),
             ]}
             className="w-48"
           />

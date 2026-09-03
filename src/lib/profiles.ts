@@ -33,6 +33,12 @@ export interface ProfileRow {
   favorites: string[] | null;
   profileTitle?: string | null;
   profileBackgroundGameId?: string | null;
+  /** Vitrina de Orgullo: hasta 3 trofeos fijados por el dueño del perfil. */
+  showcaseTrophies?: { gameId: string; trophyId: string }[] | null;
+  profileBannerUrl?: string | null;
+  profileColor?: string | null;
+  profileFrame?: string | null;
+  statusText?: string | null;
   accounts: PlatformAccount[];
   badges: string[];
 }
@@ -71,6 +77,11 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       favorites: users.favorites,
       profileTitle: users.profileTitle,
       profileBackgroundGameId: users.profileBackgroundGameId,
+      showcaseTrophies: users.showcaseTrophies,
+      profileBannerUrl: users.profileBannerUrl,
+      profileColor: users.profileColor,
+      profileFrame: users.profileFrame,
+      statusText: users.statusText,
     })
     .from(users)
     .where(where)

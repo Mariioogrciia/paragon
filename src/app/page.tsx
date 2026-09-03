@@ -314,6 +314,16 @@ export default async function HomePage() {
     .filter((g) => g.progress.hasPlatinum && !g.progress.platinumEarned)
     .sort((a, b) => a.progress.total - a.progress.earned - (b.progress.total - b.progress.earned))
     .slice(0, 3);
+
+  // Lo contrario de "a un paso": empezados y parados hace más de un año
+  // (mismo umbral que el filtro "Abandonados" de la biblioteca). Sin esto,
+  // solo se ve en el panel lo que va bien.
+  const abandonados = games
+    .map((g) => ({ game: g, progress: gameProgress(g) }))
+    .filter((g) => g.progress.status === "abandonado")
+    .sort((a, b) => new Date(a.game.lastPlayedAt ?? 0).getTime() - new Date(b.game.lastPlayedAt ?? 0).getTime())
+    .slice(0, 4);
+
   const now = new Date().getTime();
 
   return (
@@ -383,11 +393,17 @@ export default async function HomePage() {
 
       {nearPlatinum.length > 0 && (
         <section>
-          <div className="mb-4 flex items-baseline gap-3.5">
+          <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
             <h2 className="font-heading text-2xl font-bold">A un paso del platino</h2>
             <p className="text-[13px] text-muted">
               Lo que menos te queda, ordenado por trofeos pendientes.
             </p>
+            <Link
+              href={`/u/${profile.handle}?estado=a-punto`}
+              className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+            >
+              Ver todos →
+            </Link>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
@@ -440,6 +456,45 @@ export default async function HomePage() {
                   </div>
                 </div>
               </TiltCard>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {abandonados.length > 0 && (
+        <section>
+          <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
+            <h2 className="font-heading text-2xl font-bold">Juegos parados</h2>
+            <p className="text-[13px] text-muted">
+              Empezados y sin tocar hace más de un año.
+            </p>
+            <Link
+              href={`/u/${profile.handle}?estado=abandonado`}
+              className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+            >
+              Ver todos →
+            </Link>
+          </div>
+
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+            {abandonados.map(({ game, progress }) => (
+              <Link
+                key={game.id}
+                href={`/u/${profile.handle}/${game.id}`}
+                className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-surface-2"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                <span
+                  className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-cover bg-center"
+                  style={{ background: game.iconUrl ? `url(${game.iconUrl}) center/cover` : coverGradient(game.id) }}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-semibold" title={game.title}>
+                    {game.title}
+                  </p>
+                  <p className="text-[11px] text-muted">{progress.percent}% · sin tocar hace tiempo</p>
+                </div>
+              </Link>
             ))}
           </div>
         </section>

@@ -7,7 +7,7 @@ import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle, getUserBadges } from "@/lib/profiles";
-import { summarise } from "@/lib/stats";
+import { summarise, type GameStatus } from "@/lib/stats";
 import { FavoritePicker } from "@/components/FavoritePicker";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
 import { coverGradient } from "@/lib/design";
@@ -19,13 +19,36 @@ import { ParagonLevelCard } from "@/components/ParagonLevelCard";
 import { ParagonAchievements } from "@/components/ParagonAchievements";
 import { paragonProgress } from "@/lib/level";
 import { CollectionProgress } from "@/components/CollectionProgress";
+import { ShowcaseTrophies } from "@/components/ShowcaseTrophies";
+import { AvatarFrame } from "@/components/AvatarFrame";
+
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}` : null;
+}
+
+const ESTADOS_VALIDOS = [
+  "platinado",
+  "completado",
+  "en-curso",
+  "sin-empezar",
+  "deseados",
+  "a-punto",
+  "abandonado",
+];
 
 export default async function PerfilPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ handle: string }>;
+  searchParams: Promise<{ estado?: string }>;
 }) {
   const { handle } = await params;
+  const { estado } = await searchParams;
+  const initialStatus = ESTADOS_VALIDOS.includes(estado ?? "")
+    ? (estado as GameStatus)
+    : undefined;
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -64,10 +87,17 @@ export default async function PerfilPage({
   const badges = await getUserBadges(profile.userId);
 
   const backgroundGame = games.find((game) => game.id === profile.profileBackgroundGameId) ?? (games.length > 0 ? games[0] : null);
-  const backgroundImage = backgroundGame?.iconUrl;
+  const backgroundImage = profile.profileBannerUrl || backgroundGame?.iconUrl;
+
+  const customStyle: React.CSSProperties = {};
+  if (profile.profileColor) {
+    customStyle["--accent" as any] = profile.profileColor;
+    const rgb = hexToRgb(profile.profileColor);
+    if (rgb) customStyle["--accent-rgb" as any] = rgb;
+  }
 
   return (
-    <div className="-mx-7 -mt-9">
+    <div className="-mx-7 -mt-9" style={customStyle}>
       <div
         className="relative overflow-hidden border-b border-border"
         style={{
@@ -81,9 +111,13 @@ export default async function PerfilPage({
             className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${backgroundImage})`,
-              filter: "blur(40px) brightness(0.4)",
-              opacity: 0.5,
-              transform: "scale(1.1)",
+              ...(profile.profileBannerUrl
+                ? {}
+                : {
+                    filter: "blur(40px) brightness(0.4)",
+                    opacity: 0.5,
+                    transform: "scale(1.1)",
+                  }),
             }}
           />
         )}
@@ -97,7 +131,9 @@ export default async function PerfilPage({
         )}
 
         <div className="relative z-10 mx-auto flex max-w-[1240px] flex-wrap items-end gap-5 px-7 pb-8 pt-10">
-          <Avatar src={player.avatarUrl} name={player.name} size={92} />
+          <AvatarFrame frame={profile.profileFrame}>
+            <Avatar src={player.avatarUrl} name={player.name} size={92} />
+          </AvatarFrame>
 
           <div className="min-w-0">
             <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
@@ -107,7 +143,12 @@ export default async function PerfilPage({
               @{handle}
               {player.accounts.map((a) => ` · ${a.username}`).join("")}
             </p>
-            {profile.profileTitle && <p className="mt-2 text-sm font-semibold text-accent-2">{profile.profileTitle}</p>}
+            {profile.statusText && (
+              <p className="mt-2 text-sm italic opacity-80" style={{ color: "var(--foreground)" }}>
+                &quot;{profile.statusText}&quot;
+              </p>
+            )}
+            {profile.profileTitle && <p className="mt-2 text-sm font-semibold text-[rgb(var(--accent-rgb))]">{profile.profileTitle}</p>}
             {badges.length > 0 && <Badges earnedBadges={badges} />}
           </div>
 
@@ -151,6 +192,19 @@ export default async function PerfilPage({
         <ParagonLevelCard progress={nivelParagon} />
         <ParagonAchievements games={games} earnedIds={badges.map((badge) => badge.badgeId)} />
         <CollectionProgress collections={carpetas} games={games} handle={handle} />
+
+        <ShowcaseTrophies 
+          handle={handle} 
+          items={(profile.showcaseTrophies ?? [])
+            .map(pin => {
+              const game = games.find(g => g.id === pin.gameId);
+              if (!game) return null;
+              const trophy = game.trophies.find(t => t.id === pin.trophyId);
+              if (!trophy) return null;
+              return { game, trophy };
+            })
+            .filter((item): item is NonNullable<typeof item> => item !== null)}
+        />
 
         {((profile.favorites?.length ?? 0) > 0 || esMio) && (
           <section className="mt-8 mb-4">
@@ -201,7 +255,7 @@ export default async function PerfilPage({
             </span>
           </div>
 
-          <LibraryGrid games={games} handle={handle} collections={carpetas} esMio={esMio} />
+          <LibraryGrid games={games} handle={handle} collections={carpetas} esMio={esMio} initialStatus={initialStatus} />
         </section>
       </div>
     </div>

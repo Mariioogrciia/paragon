@@ -1,3 +1,4 @@
+import { dificultadDesdeRareza, type Dificultad } from "@/lib/difficulty";
 import {
   emptyCounts,
   type Game,
@@ -7,7 +8,7 @@ import {
   type TrophyCounts,
 } from "@/lib/types";
 
-export type GameStatus = "platinado" | "completado" | "en-curso" | "sin-empezar" | "deseados";
+export type GameStatus = "platinado" | "completado" | "en-curso" | "sin-empezar" | "deseados" | "a-punto" | "abandonado";
 
 export interface GameProgress {
   earned: number;
@@ -40,6 +41,10 @@ export function gameProgress(game: Game): GameProgress {
     status = "completado";
   } else if (earned === 0) {
     status = "sin-empezar";
+  } else if (game.progressPercent >= 80) {
+    status = "a-punto";
+  } else if (game.lastPlayedAt && (new Date().getTime() - new Date(game.lastPlayedAt).getTime()) > 1000 * 60 * 60 * 24 * 365) {
+    status = "abandonado";
   } else {
     status = "en-curso";
   }
@@ -135,6 +140,9 @@ export interface LibraryFilters {
   status?: GameStatus | "todos";
   publisher?: string;
   genre?: string;
+  pegi?: string;
+  /** Nivel de dificultad estimada (lib/difficulty.ts), 1 (regalado) a 6 (brutal). */
+  dificultad?: Dificultad["nivel"];
   sort?: SortKey;
   sortDir?: "asc" | "desc";
 }
@@ -153,6 +161,18 @@ function normalise(text: string): string {
 /** La empresa por la que agrupamos: la editora, y si no la hay, quien lo hizo. */
 export function companyOf(game: Game): string | null {
   return game.publisher ?? game.developer ?? null;
+}
+
+/**
+ * Dificultad estimada de un juego DE LA BIBLIOTECA (no de su ficha completa):
+ * `getLibrary` ya trae `platinumRarity` con una subconsulta (ver
+ * profiles.ts), así que esto no pide los trofeos uno a uno para filtrar
+ * trescientos juegos a la vez. Null cuando no hay rareza de platino que
+ * mirar (Steam, o un platino sin sincronizar todavía).
+ */
+export function dificultadDeGame(game: Game): Dificultad | null {
+  if (game.platinumRarity === undefined) return null;
+  return dificultadDesdeRareza(game.platinumRarity, true);
 }
 
 export function filterGames(games: Game[], filters: LibraryFilters): Game[] {
@@ -179,6 +199,13 @@ export function filterGames(games: Game[], filters: LibraryFilters): Game[] {
     if (filters.publisher && companyOf(game) !== filters.publisher) return false;
 
     if (filters.genre && !(game.genres ?? []).includes(filters.genre)) return false;
+
+    if (filters.pegi && game.pegi !== filters.pegi) return false;
+
+    if (filters.dificultad) {
+      const d = dificultadDeGame(game);
+      if (!d || d.nivel !== filters.dificultad) return false;
+    }
 
     return true;
   });
@@ -245,10 +272,21 @@ export interface Facet {
  * una editora desaparecieran las demás del desplegable, no habría forma de
  * cambiar de opinión sin borrar el filtro.
  */
+export interface DificultadFacet {
+  nivel: Dificultad["nivel"];
+  etiqueta: string;
+  color: string;
+  count: number;
+}
+
 export function libraryFacets(games: Game[]): {
   publishers: Facet[];
   genres: Facet[];
   platforms: Facet[];
+  /** Edades PEGI presentes en la biblioteca, ordenadas de menor a mayor. */
+  pegis: Facet[];
+  /** Solo los niveles que de verdad tiene algún juego (no los seis siempre). */
+  dificultades: DificultadFacet[];
 } {
   const tally = (values: (string | null | undefined)[]) => {
     const map = new Map<string, number>();
@@ -261,10 +299,29 @@ export function libraryFacets(games: Game[]): {
       .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value, "es"));
   };
 
+  const pegis = tally(games.map((g) => g.pegi)).sort(
+    (a, b) => Number(a.value) - Number(b.value),
+  );
+
+  const dificultadesMap = new Map<Dificultad["nivel"], DificultadFacet>();
+  for (const game of games) {
+    const d = dificultadDeGame(game);
+    if (!d) continue;
+    const previa = dificultadesMap.get(d.nivel);
+    dificultadesMap.set(d.nivel, {
+      nivel: d.nivel,
+      etiqueta: d.etiqueta,
+      color: d.color,
+      count: (previa?.count ?? 0) + 1,
+    });
+  }
+
   return {
     publishers: tally(games.map(companyOf)),
     genres: tally(games.flatMap((g) => g.genres ?? [])),
     platforms: tally(games.map((g) => g.platform)),
+    pegis,
+    dificultades: [...dificultadesMap.values()].sort((a, b) => a.nivel - b.nivel),
   };
 }
 
