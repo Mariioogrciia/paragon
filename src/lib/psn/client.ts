@@ -195,8 +195,21 @@ export async function fetchLibrary(accountId: string): Promise<Game[]> {
 
   try {
     const jugados = await horasJugadas(accountId);
+    // PSN da UNA cifra de horas por nombre de juego, no por versión: la
+    // misma "Grand Theft Auto V" en PS4, PS5 y PS3 son tres filas nuestras
+    // (trofeos distintos por diseño), pero una sola entrada en `jugados`.
+    // Sin este `delete`, las tres se llevaban la cifra entera y un juego
+    // con versión en varias consolas aparecía con las mismas horas
+    // multiplicadas por cada copia al sumarlas en cualquier sitio. Se
+    // asigna a la más reciente (así vienen ordenados los `games` que llegan
+    // aquí) y el resto se queda sin dato, no a cero — cero diría "nunca
+    // jugado", que no es verdad.
     for (const game of games) {
-      game.playtimeMinutes = jugados.get(claveTitulo(game.title)) ?? 0;
+      const clave = claveTitulo(game.title);
+      if (jugados.has(clave)) {
+        game.playtimeMinutes = jugados.get(clave)!;
+        jugados.delete(clave);
+      }
     }
   } catch (error) {
     // La privacidad de actividad puede bloquear este endpoint; la biblioteca

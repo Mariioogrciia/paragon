@@ -165,7 +165,7 @@ export async function checkAndGrantBadges(userId: string) {
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(eq(userGames.userId, userId));
+    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false)));
 
   const platinums = Number(result[0]?.totalPlatinums ?? 0);
   const games = Number(result[0]?.totalGames ?? 0);
@@ -192,7 +192,8 @@ export async function getGlobalStats() {
       `,
     })
     .from(userGames)
-    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId));
+    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+    .where(eq(userGames.isWishlist, false));
 
   const row = result[0];
   return {

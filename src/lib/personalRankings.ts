@@ -2,6 +2,7 @@ import "server-only";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games, userTrophies } from "@/db/schema";
+import { gruposPorTitulo } from "@/lib/stats";
 import type { Game } from "@/lib/types";
 
 /**
@@ -40,30 +41,29 @@ export interface FilaRankingJuego {
 }
 
 /**
- * Ranking de horas jugadas.
+ * Ranking de horas jugadas, sumadas entre plataformas si el mismo juego
+ * está en varias (Steam + PSN...), vía `gruposPorTitulo`.
  *
  * OJO: las plataformas solo dan el total acumulado de horas por juego, nunca
  * cuándo se jugaron — así que un "filtro de fecha" no puede recalcular las
  * horas de ese periodo, no existen. Lo que sí es real es filtrar QUÉ juegos
- * entran, por si se han tocado en el periodo (`lastPlayedAt`); las horas que
- * se enseñan siguen siendo las de siempre del juego. Se avisa de esto en la
- * pantalla en vez de fingir una precisión que no hay.
+ * entran, por si alguna de sus copias se ha tocado en el periodo
+ * (`lastPlayedAt`); las horas que se enseñan siguen siendo las de siempre.
+ * Se avisa de esto en la pantalla en vez de fingir una precisión que no hay.
  */
 export function rankingHoras(games: Game[], desde: Date | null): FilaRankingJuego[] {
-  return games
-    .filter((g) => !g.isWishlist && (g.playtimeMinutes ?? 0) > 0)
-    .filter((g) => {
+  return gruposPorTitulo(games)
+    .filter((grupo) => grupo.horasTotal > 0)
+    .filter((grupo) => {
       if (!desde) return true;
-      if (!g.lastPlayedAt) return false;
-      return new Date(g.lastPlayedAt) >= desde;
+      return grupo.copias.some((g) => g.lastPlayedAt && new Date(g.lastPlayedAt) >= desde);
     })
-    .map((g) => ({
-      gameId: g.id,
-      titulo: g.title,
-      iconUrl: g.iconUrl,
-      valor: Math.round((g.playtimeMinutes ?? 0) / 60),
-    }))
-    .sort((a, b) => b.valor - a.valor);
+    .map((grupo) => ({
+      gameId: grupo.principal.id,
+      titulo: grupo.principal.title,
+      iconUrl: grupo.principal.iconUrl,
+      valor: Math.round(grupo.horasTotal),
+    }));
 }
 
 /**

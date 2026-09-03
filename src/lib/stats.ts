@@ -113,7 +113,11 @@ export interface PlayerSummary {
   porPlataforma: Partial<Record<Platform, number>>;
 }
 
-export function summarise(games: Game[]): PlayerSummary {
+export function summarise(allGames: Game[]): PlayerSummary {
+  // Un deseado no es un juego que tengas: es una intención. Contarlo en
+  // "Juegos" inflaba la biblioteca con títulos que ni siquiera has tocado.
+  const games = allGames.filter((g) => !g.isWishlist);
+
   const counts = emptyCounts();
   const porPlataforma: Partial<Record<Platform, number>> = {};
   let trofeos = 0;
@@ -391,6 +395,59 @@ export function libraryFacets(games: Game[]): {
     dificultades: [...dificultadesMap.values()].sort((a, b) => a.nivel - b.nivel),
     horas,
   };
+}
+
+/**
+ * Clave para saber si dos juegos son "el mismo", cruzando plataformas: sin
+ * acentos, sin © ® ™, sin distinguir mayúsculas ni puntuación. Más agresiva
+ * que `normalise` (que es para el buscador) porque aquí un falso negativo
+ * (no juntar dos copias del mismo juego) es peor que uno positivo.
+ */
+function claveDeJuego(title: string): string {
+  return title
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+export interface GrupoDeJuego {
+  /** El juego con más horas del grupo — el que se enseña y al que se enlaza. */
+  principal: Game;
+  /** Todas las copias agrupadas (una si el juego solo está en una plataforma). */
+  copias: Game[];
+  /** Suma de horas de todas las copias. */
+  horasTotal: number;
+}
+
+/**
+ * Agrupa juegos por título A TRAVÉS de plataformas y suma sus horas.
+ *
+ * El mismo juego en Steam y en PSN son dos filas nuestras — es la decisión
+ * de arquitectura correcta, porque sus trofeos no coinciden — pero para "tu
+ * juego más jugado" sí hay que sumarlas: si no, un juego que tienes en dos
+ * sitios sale con menos horas que uno que solo tienes en uno, aunque le
+ * hayas dedicado más tiempo en total.
+ */
+export function gruposPorTitulo(games: Game[]): GrupoDeJuego[] {
+  const grupos = new Map<string, Game[]>();
+
+  for (const g of games) {
+    if (g.isWishlist) continue;
+    const clave = claveDeJuego(g.title);
+    grupos.set(clave, [...(grupos.get(clave) ?? []), g]);
+  }
+
+  return [...grupos.values()]
+    .map((copias) => {
+      const horasTotal = copias.reduce((total, g) => total + (g.playtimeMinutes ?? 0), 0) / 60;
+      const principal = [...copias].sort(
+        (a, b) => (b.playtimeMinutes ?? 0) - (a.playtimeMinutes ?? 0) || b.earnedTotal - a.earnedTotal,
+      )[0];
+      return { principal, copias, horasTotal };
+    })
+    .sort((a, b) => b.horasTotal - a.horasTotal);
 }
 
 /* --------------------------------- Comparativa --------------------------------- */

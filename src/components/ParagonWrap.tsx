@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { type Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
+import { gruposPorTitulo } from "@/lib/stats";
 import { TrophyIcon } from "./TrophyIcon";
 
 /**
@@ -48,27 +49,35 @@ function Tarjeta({
   );
 }
 
+export interface JuegoDestacado {
+  game: Game;
+  /** Horas sumadas de todas las copias del juego (Steam + PSN, etc.), no solo las de `game`. */
+  horasTotal: number;
+}
+
 /**
- * El juego más "exprimido": por horas si las hay, y si no, por trofeos.
+ * El juego más "exprimido": por horas si las hay (sumadas entre plataformas
+ * si el mismo juego está en varias), y si no, por trofeos.
  *
  * Exportada porque la reutiliza `/api/wrap/[handle]`, que genera la misma
  * tarjeta como imagen compartible: si la lógica se duplicara ahí, un cambio
  * aquí dejaría a la imagen contando otra historia que la pantalla.
  */
-export function juegoDestacado(games: Game[]): Game | undefined {
+export function juegoDestacado(games: Game[]): JuegoDestacado | undefined {
   if (games.length === 0) return undefined;
 
-  // Si hay horas de alguna plataforma, se compara por horas entre esos juegos;
-  // si no hay ninguna, se compara por trofeos.
-  const conHoras = games.filter((g) => (g.playtimeMinutes ?? 0) > 0);
+  const grupos = gruposPorTitulo(games);
+  const conHoras = grupos.filter((g) => g.horasTotal > 0);
 
   if (conHoras.length > 0) {
-    return conHoras.reduce((a, b) =>
-      (b.playtimeMinutes ?? 0) > (a.playtimeMinutes ?? 0) ? b : a,
-    );
+    const top = conHoras[0]; // gruposPorTitulo ya viene ordenado por horas desc.
+    return { game: top.principal, horasTotal: top.horasTotal };
   }
 
-  return games.reduce((a, b) => (b.earnedTotal > a.earnedTotal ? b : a));
+  const porTrofeos = games
+    .filter((g) => !g.isWishlist)
+    .reduce((a, b) => (b.earnedTotal > a.earnedTotal ? b : a));
+  return { game: porTrofeos, horasTotal: 0 };
 }
 
 export function generoTop(games: Game[]): { name: string; count: number } {
@@ -153,9 +162,9 @@ export function ParagonWrap({
         </Tarjeta>
 
         <Tarjeta
-          href={handle ? `/u/${handle}/wrap/${topGame?.playtimeMinutes ? "horas" : "trofeos"}` : undefined}
+          href={handle ? `/u/${handle}/wrap/${topGame?.horasTotal ? "horas" : "trofeos"}` : undefined}
           style={{
-            background: topGame ? coverGradient(topGame.id) : "#131a26",
+            background: topGame ? coverGradient(topGame.game.id) : "#131a26",
             border: "1px solid rgba(125, 179, 255, 0.35)",
           }}
         >
@@ -166,14 +175,14 @@ export function ParagonWrap({
             </h3>
             <p
               className="font-heading mb-2 truncate text-2xl font-bold leading-tight text-white"
-              title={topGame?.title}
+              title={topGame?.game.title}
             >
-              {topGame?.title ?? "Ninguno"}
+              {topGame?.game.title ?? "Ninguno"}
             </p>
             <p className="text-sm font-medium" style={{ color: "rgba(219, 234, 254, 0.9)" }}>
-              {topGame?.playtimeMinutes
-                ? `${(topGame.playtimeMinutes / 60).toFixed(1)} horas jugadas`
-                : `${topGame?.earnedTotal ?? 0} trofeos conseguidos`}
+              {topGame && topGame.horasTotal > 0
+                ? `${topGame.horasTotal.toFixed(1)} horas jugadas`
+                : `${topGame?.game.earnedTotal ?? 0} trofeos conseguidos`}
             </p>
           </div>
         </Tarjeta>

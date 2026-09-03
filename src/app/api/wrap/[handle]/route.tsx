@@ -103,7 +103,7 @@ export async function GET(
               borderRadius: "20px",
               padding: "28px",
               overflow: "hidden",
-              background: topGame ? coverGradient(topGame.id) : "#131a26",
+              background: topGame ? coverGradient(topGame.game.id) : "#131a26",
               border: "1px solid rgba(125, 179, 255, 0.35)",
             }}
           >
@@ -113,12 +113,12 @@ export async function GET(
                 Juego más exprimido
               </div>
               <div style={{ display: "flex", fontSize: 28, fontWeight: 700, color: "#ffffff", marginTop: "10px" }}>
-                {topGame?.title ?? "Ninguno"}
+                {topGame?.game.title ?? "Ninguno"}
               </div>
               <div style={{ display: "flex", fontSize: 16, fontWeight: 500, color: "rgba(219, 234, 254, 0.9)", marginTop: "10px" }}>
-                {topGame?.playtimeMinutes
-                  ? `${(topGame.playtimeMinutes / 60).toFixed(1)} horas jugadas`
-                  : `${topGame?.earnedTotal ?? 0} trofeos conseguidos`}
+                {topGame && topGame.horasTotal > 0
+                  ? `${topGame.horasTotal.toFixed(1)} horas jugadas`
+                  : `${topGame?.game.earnedTotal ?? 0} trofeos conseguidos`}
               </div>
             </div>
           </div>
