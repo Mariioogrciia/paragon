@@ -36,7 +36,7 @@ export function Dropdown({ value, onChange, options, placeholder = "Seleccionar.
     <div className={`relative ${className}`} ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full rounded-[9px] px-3.5 py-2 text-[13px] font-semibold text-foreground transition-colors"
+        className="flex items-center justify-between w-full rounded-[9px] px-3.5 py-2 text-[13px] font-semibold text-foreground transition-colors hover:border-accent/50"
         style={{
           border: "1px solid var(--border)",
           background: "var(--background)",

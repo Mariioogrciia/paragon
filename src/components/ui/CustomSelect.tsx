@@ -63,21 +63,25 @@ export function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm text-left transition-colors focus:border-accent focus:outline-none hover:border-white/20"
+        // Mismo aspecto que Dropdown.tsx (biblioteca, comparadores,
+        // planificador): antes este tenía su propio radio, borde y fondo, y
+        // el desplegable de un sitio no se parecía al de otro.
+        className="flex w-full items-center justify-between rounded-[9px] px-3.5 py-2 text-[13px] font-semibold text-foreground text-left transition-colors hover:border-accent/50"
+        style={{ border: "1px solid var(--border)", background: "var(--background)" }}
       >
         <span className={selectedOption ? "text-foreground" : "text-muted"}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <svg
-          width="16"
-          height="16"
+          width="12"
+          height="12"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`text-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`ml-2 text-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -90,25 +94,21 @@ export function CustomSelect({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute left-0 top-full z-50 mt-2 max-h-60 w-full overflow-y-auto rounded-xl border border-white/10 bg-[#0a0a0a] shadow-2xl"
+            className="absolute left-0 top-full z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-md shadow-lg"
+            style={{ background: "var(--background)", border: "1px solid var(--border)" }}
           >
-            <ul className="p-1">
+            <ul className="py-1">
               {options.map((option) => {
                 const isSelected = option.value === internalValue;
                 return (
-                  <li key={option.value}>
-                    <button
-                      type="button"
-                      onClick={() => handleSelect(option.value)}
-                      className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
-                        isSelected
-                          ? "bg-[var(--accent-grad)] text-white font-semibold"
-                          : "text-muted hover:bg-white/5 hover:text-foreground"
-                      }`}
-                      style={isSelected ? { background: "var(--accent-grad)", color: "#061021" } : {}}
-                    >
-                      {option.label}
-                    </button>
+                  <li
+                    key={option.value}
+                    onClick={() => handleSelect(option.value)}
+                    className={`cursor-pointer px-3.5 py-2 text-[13px] font-medium hover:bg-accent hover:text-white transition-colors ${
+                      isSelected ? "bg-accent/30 text-accent" : "text-foreground"
+                    }`}
+                  >
+                    {option.label}
                   </li>
                 );
               })}
