@@ -4,6 +4,45 @@ import { useState, useTransition } from "react";
 import { submitExpressReviewAction } from "@/app/actions";
 import { format } from "date-fns";
 import { Check } from "lucide-react";
+import { Stars } from "@/components/Stars";
+
+/**
+ * Selector de estrellas para la reseña express: mismo eje de 1 a 5 que
+ * `RatingStars` (biblioteca) y que la media de la comunidad, pero sin
+ * enviar en cada click — aquí el voto se guarda junto al texto al pulsar
+ * "Publicar", no antes.
+ */
+function SelectorEstrellas({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hover, setHover] = useState(0);
+
+  return (
+    <div className="flex items-center gap-1.5" onMouseLeave={() => setHover(0)}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(n === value ? 0 : n)}
+          onMouseEnter={() => setHover(n)}
+          className="transition-transform hover:scale-110 active:scale-95 focus:outline-none"
+          aria-label={`Puntuar con ${n} de 5 estrellas`}
+        >
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill={(hover || value) >= n ? "#e2b53e" : "none"}
+            stroke={(hover || value) >= n ? "#e2b53e" : "var(--muted)"}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function ReviewEditor({ 
   gameId, 
@@ -48,14 +87,10 @@ export function ReviewEditor({
         </button>
         <div className="flex gap-2 mb-3 items-center">
           <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Tu Reseña</span>
-          {initialRating ? (
-            <span className="text-xs font-bold px-2 py-0.5 rounded bg-[rgb(var(--accent-rgb)/0.2)] text-[rgb(var(--accent-rgb))]">
-              Nota: {initialRating}/10
-            </span>
-          ) : null}
+          {initialRating ? <Stars value={initialRating} /> : null}
         </div>
         <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
-          "{initialReview}"
+          &quot;{initialReview}&quot;
         </p>
       </div>
     );
@@ -66,23 +101,8 @@ export function ReviewEditor({
       <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña Express</h3>
       
       <div className="mb-4">
-        <label className="text-sm font-bold block mb-2">Tu nota (1-10)</label>
-        <div className="flex flex-wrap gap-1">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => (
-            <button
-              key={val}
-              type="button"
-              onClick={() => setRating(val)}
-              className={`w-8 h-8 rounded flex items-center justify-center text-sm font-bold transition-colors ${
-                rating >= val
-                  ? "bg-[rgb(var(--accent-rgb))] text-black"
-                  : "bg-[rgb(var(--accent-rgb)/0.1)] text-[rgb(var(--accent-rgb))] hover:bg-[rgb(var(--accent-rgb)/0.3)]"
-              }`}
-            >
-              {val}
-            </button>
-          ))}
-        </div>
+        <label className="text-sm font-bold block mb-2">Tu nota</label>
+        <SelectorEstrellas value={rating} onChange={setRating} />
       </div>
 
       <label className="text-sm font-bold block mb-2">Comentario breve</label>

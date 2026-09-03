@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CommunityRating } from "@/components/CommunityRating";
 import { CommunityDifficulty } from "@/components/CommunityDifficulty";
+import { Stars } from "@/components/Stars";
 import { StatTile } from "@/components/StatTile";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame } from "@/lib/community";
@@ -188,11 +189,7 @@ export default async function JuegoGlobalPage({
                         ) : (
                           <span className="font-semibold">{r.name ?? "Alguien"}</span>
                         )}
-                        {r.rating != null && (
-                          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[rgb(var(--accent-rgb)/0.2)] text-[rgb(var(--accent-rgb))]">
-                            {r.rating}/10
-                          </span>
-                        )}
+                        {r.rating != null && <Stars value={r.rating} size={12} />}
                         {r.reviewDate && (
                           <span className="text-xs text-muted">{relativeDate(r.reviewDate)}</span>
                         )}

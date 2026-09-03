@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { CollectionPicker } from "@/components/Collections";
 import { CommunityRating } from "@/components/CommunityRating";
+import { Stars } from "@/components/Stars";
 import { gradeLabel, TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { ReviewEditor } from "@/components/ReviewEditor";
 import { TrophyList } from "@/components/TrophyList";
@@ -325,11 +326,7 @@ export default async function JuegoPage({
                 <div className="p-5 border rounded-xl bg-surface border-border">
                   <div className="flex gap-2 mb-3 items-center">
                     <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña de {profile.displayName ?? handle}</span>
-                    {game.rating && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-[rgb(var(--accent-rgb)/0.2)] text-[rgb(var(--accent-rgb))]">
-                        Nota: {game.rating}/10
-                      </span>
-                    )}
+                    {game.rating && <Stars value={game.rating} size={13} />}
                     {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
                   </div>
                   {game.review && (
