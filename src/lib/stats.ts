@@ -331,6 +331,7 @@ export interface SharedGame {
   id: string;
   title: string;
   iconUrl?: string;
+  platform: Platform;
   /** Progreso por jugador, en el mismo orden que las librerías recibidas. */
   progress: GameProgress[];
 }
@@ -356,6 +357,7 @@ export function sharedGames(libraries: Library[]): SharedGame[] {
       id: game.id,
       title: game.title,
       iconUrl: game.iconUrl,
+      platform: game.platform,
       progress: [game, ...(others as Game[])].map(gameProgress),
     });
   }

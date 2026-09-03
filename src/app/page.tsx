@@ -52,13 +52,38 @@ const FEATURES = [
   },
   {
     num: "02",
-    title: "El rival siempre visible",
-    body: "Solo los juegos que tenéis los dos, barra contra barra. Comparar bibliotecas enteras no dice nada si uno lleva jugando el doble de años.",
+    title: "Amigos, uno a uno o en grupo",
+    body: "Solo los juegos que tenéis en común, barra contra barra. Compara con un amigo o con varios a la vez, como un clan.",
   },
   {
     num: "03",
     title: "Sin credenciales de Sony",
     body: "Escribes tu ID público de PlayStation y ya está. Nadie entrega contraseñas ni tokens, y nosotros no guardamos secretos de nadie.",
+  },
+  {
+    num: "04",
+    title: "El Wrap, con ranking detrás",
+    body: "Tu género más jugado, tu juego más exprimido, tus trofeos del año — y cada uno lleva al ranking entero, con filtro de fecha.",
+  },
+  {
+    num: "05",
+    title: "Dificultad, con dos ojos",
+    body: "La rareza real del platino y lo que opina quien ya se lo pasó, una al lado de la otra. Ninguna de las dos miente sola.",
+  },
+  {
+    num: "06",
+    title: "Avisos que no tienes que ir a buscar",
+    body: "Te queda poco para un platino, un juego se quedó parado, salió una expansión con trofeos nuevos — el cron te avisa sin que entres a mirar.",
+  },
+  {
+    num: "07",
+    title: "Modo enfoque",
+    body: "Pantalla completa con los trofeos más a mano, botones grandes y guía en vídeo. Para cuando ya sabes lo que vas a platinar hoy.",
+  },
+  {
+    num: "08",
+    title: "Nivel Paragon y ligas",
+    body: "XP por cada trofeo y por completar juegos, insignias por hitos, y una liga mensual que arranca de cero cada mes para todo el mundo.",
   },
 ];
 
@@ -237,21 +262,21 @@ async function Landing() {
           <h2 className="font-heading text-[30px] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
             Cómo funciona
           </h2>
-          <div className="grid gap-3.5 sm:grid-cols-3">
+          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <div
                 key={f.num}
-                className="rounded-[18px] p-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.08)]"
+                className="rounded-[18px] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.08)]"
                 style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
               >
                 <span
-                  className="font-heading inline-flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold"
+                  className="font-heading inline-flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[13px] font-bold"
                   style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
                 >
                   {f.num}
                 </span>
-                <h3 className="font-heading mt-[18px] text-[21px] font-bold leading-tight">{f.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-muted">{f.body}</p>
+                <h3 className="font-heading mt-4 text-[17px] font-bold leading-tight">{f.title}</h3>
+                <p className="mt-2.5 text-[13px] leading-relaxed text-muted">{f.body}</p>
               </div>
             ))}
           </div>

@@ -223,7 +223,26 @@ export default async function AmigosPage() {
 
       {amigos.length > 0 && (
         <section className="mt-9">
-          <h2 className="font-heading mb-3.5 text-2xl font-bold">Tus amigos</h2>
+          <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="font-heading text-2xl font-bold">Tus amigos</h2>
+            <p className="text-[13px] text-muted">
+              Marca dos o más para comparar como grupo, no solo de uno en uno.
+            </p>
+          </div>
+
+          {/*
+            Formulario GET, pero SIN envolver la lista: cada casilla se
+            asocia con `form="comparar-grupo"` en vez de ser descendiente de
+            este `<form>`, porque cada fila también tiene su propio
+            formulario pequeño para "Quitar" (`removeFriendAction`), y HTML
+            no admite formularios anidados. El atributo `form` en el input
+            es justo lo que existe para este caso: lo suma a la petición de
+            un formulario que no es su ancestro.
+
+            Con una sola casilla marcada, /comparar redirige a la
+            comparativa 1 a 1 de siempre; con dos o más, a la de grupo.
+          */}
+          <form id="comparar-grupo" action="/comparar" method="get" />
 
           <ul className="overflow-hidden rounded-[18px] border border-border bg-surface">
             {amigos.map((a) => (
@@ -231,6 +250,17 @@ export default async function AmigosPage() {
                 key={a.userId}
                 className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-0"
               >
+                {a.handle && (
+                  <input
+                    type="checkbox"
+                    form="comparar-grupo"
+                    name="con"
+                    value={a.handle}
+                    className="h-4 w-4 shrink-0 accent-accent"
+                    aria-label={`Incluir a @${a.handle} en la comparativa de grupo`}
+                  />
+                )}
+
                 <Avatar src={a.avatarUrl ?? a.image} name={a.handle ?? "?"} />
 
                 <div className="min-w-0 flex-1">
@@ -262,6 +292,15 @@ export default async function AmigosPage() {
               </li>
             ))}
           </ul>
+
+          <button
+            type="submit"
+            form="comparar-grupo"
+            className="mt-3 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background"
+            style={{ background: "var(--accent-grad)" }}
+          >
+            Comparar seleccionados
+          </button>
         </section>
       )}
     </div>
