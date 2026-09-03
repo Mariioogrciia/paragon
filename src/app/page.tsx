@@ -415,7 +415,7 @@ export default async function HomePage() {
 
       <WeeklyMissions missions={misiones} />
       <ActivityStats games={games} now={now} />
-      <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} />
+      <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />
 
       {nearPlatinum.length > 0 && (
         <section>

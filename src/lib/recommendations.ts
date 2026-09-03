@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, isNotNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
 
@@ -29,7 +29,16 @@ export async function getTrophyRecommendations(userId: string, limit = 6): Promi
     .innerJoin(games, eq(games.id, userTrophies.gameId))
     .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
     .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, false), eq(userGames.isWishlist, false), isNotNull(userTrophies.rarityPercent)))
-    .orderBy(desc(userGames.progressPercent), desc(userTrophies.rarityPercent), asc(userTrophies.earnedAt))
+    // El platino nunca depende del DLC (ver repartoDlc en lib/stats.ts), así
+    // que recomendar un trofeo de expansión antes que uno del juego base
+    // manda a por lo que menos hace falta primero. `default` va delante de
+    // cualquier otro groupId.
+    .orderBy(
+      sql`case when ${gameTrophies.groupId} = 'default' then 0 else 1 end`,
+      desc(userGames.progressPercent),
+      desc(userTrophies.rarityPercent),
+      asc(userTrophies.earnedAt),
+    )
     .limit(limit);
 
   return rows.map((row) => ({ ...row, rarityPercent: row.rarityPercent === null ? null : Number(row.rarityPercent) }));

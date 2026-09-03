@@ -87,12 +87,20 @@ export function gameProgress(game: Game): GameProgress {
 export function nextSteps(trophies: Trophy[], limit = 4): Trophy[] {
   const fraction = (t: Trophy) =>
     t.progress ? t.progress.current / t.progress.target : 0;
+  // "default" es el juego base; cualquier otro groupId es una expansión (ver
+  // TrophyList). El platino no depende de estos, así que recomendarlos antes
+  // que lo que sí hace falta para el platino era mandar a por lo que menos
+  // importa primero.
+  const esDlc = (t: Trophy) => (t.groupId ?? "default") !== "default";
 
   return trophies
     .filter((t) => !t.earned)
     .sort((a, b) => {
       if (a.grade === "platinum") return 1;
       if (b.grade === "platinum") return -1;
+
+      const dlc = Number(esDlc(a)) - Number(esDlc(b));
+      if (dlc !== 0) return dlc;
 
       const started = fraction(b) - fraction(a);
       if (started !== 0) return started;
