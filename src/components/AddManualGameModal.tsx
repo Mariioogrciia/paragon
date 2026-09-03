@@ -134,7 +134,7 @@ export function AddManualGameModal() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-[13px] font-semibold"
+        className="flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-[13px] font-semibold transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
         style={{ background: "var(--accent-grad)", color: "#061021" }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -216,7 +216,7 @@ export function AddManualGameModal() {
                         if (!result.error) setWishlistIds((ids) => [...ids, game.igdbId]);
                       }}
                       disabled={wishlistIds.includes(game.igdbId)}
-                      className="shrink-0 text-[11px] font-bold text-accent disabled:text-good"
+                      className="shrink-0 text-[11px] font-bold text-accent hover:underline disabled:text-good disabled:no-underline"
                     >
                       {wishlistIds.includes(game.igdbId) ? "✓ Deseado" : "+ Deseados"}
                     </button>
@@ -272,23 +272,21 @@ export function AddManualGameModal() {
             <div className="flex gap-2 mt-4">
               <button
                 onClick={() => setCompleted(false)}
-                className="flex-1 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors"
-                style={
+                className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold transition-colors ${
                   !completed
-                    ? { background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.35)", color: "var(--accent-text)" }
-                    : { background: "transparent", border: "1px solid var(--border)", color: "var(--muted)" }
-                }
+                    ? "border-[rgb(var(--accent-rgb)/0.35)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]"
+                    : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
+                }`}
               >
                 Sin empezar
               </button>
               <button
                 onClick={() => setCompleted(true)}
-                className="flex-1 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors"
-                style={
+                className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold transition-colors ${
                   completed
-                    ? { background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.35)", color: "var(--accent-text)" }
-                    : { background: "transparent", border: "1px solid var(--border)", color: "var(--muted)" }
-                }
+                    ? "border-[rgb(var(--accent-rgb)/0.35)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]"
+                    : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
+                }`}
               >
                 Completado
               </button>
@@ -299,7 +297,7 @@ export function AddManualGameModal() {
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="w-full mt-4 rounded-xl px-4 py-2.5 text-sm font-bold disabled:opacity-60"
+              className="w-full mt-4 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)] disabled:pointer-events-none disabled:opacity-60"
               style={{ background: "var(--accent-grad)", color: "#061021" }}
             >
               {saving ? "Añadiendo…" : "Añadir a mi biblioteca"}

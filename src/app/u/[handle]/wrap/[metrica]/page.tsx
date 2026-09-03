@@ -99,12 +99,11 @@ export default async function WrapRankingPage({
               <Link
                 key={otra}
                 href={`/u/${handle}/wrap/${otra}${rango !== "todo" ? `?rango=${rango}` : ""}`}
-                className="rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide"
-                style={
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-colors ${
                   otra === m
-                    ? { background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
-                    : { border: "1px solid var(--border)", color: "var(--muted)" }
-                }
+                    ? "border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]"
+                    : "border-[var(--border)] text-muted hover:text-foreground"
+                }`}
               >
                 {otra === "horas" ? "Horas" : otra === "trofeos" ? "Trofeos" : "Géneros"}
               </Link>
@@ -117,12 +116,12 @@ export default async function WrapRankingPage({
             <Link
               key={r.valor}
               href={`/u/${handle}/wrap/${m}${r.valor !== "todo" ? `?rango=${r.valor}` : ""}`}
-              className="rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide"
-              style={
+              className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-all ${
                 r.valor === rango
-                  ? { background: "var(--accent-grad)", color: "var(--background)" }
-                  : { border: "1px solid var(--border)", color: "var(--muted)" }
-              }
+                  ? "border-transparent text-[var(--background)] hover:-translate-y-0.5"
+                  : "border-[var(--border)] text-muted hover:text-foreground"
+              }`}
+              style={r.valor === rango ? { background: "var(--accent-grad)" } : undefined}
             >
               {r.etiqueta}
             </Link>

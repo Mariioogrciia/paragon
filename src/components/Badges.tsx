@@ -10,7 +10,7 @@ type BadgeDef = {
   bg: string;
 };
 
-const BADGE_DEFINITIONS: Record<string, BadgeDef> = {
+export const BADGE_DEFINITIONS: Record<string, BadgeDef> = {
   "first_blood": {
     id: "first_blood",
     name: "Primera Sangre",
@@ -52,6 +52,27 @@ const BADGE_DEFINITIONS: Record<string, BadgeDef> = {
     description: "Usuario pionero de Paragon",
     icon: <AchievementIcon id="madrugador" size={16} />,
     bg: "linear-gradient(135deg, #4c1d95, #8b5cf6)",
+  },
+  "critico": {
+    id: "critico",
+    name: "Crítico",
+    description: "Has escrito al menos 3 reseñas",
+    icon: <AchievementIcon id="critico" size={16} />,
+    bg: "linear-gradient(135deg, #be123c, #f43f5e)",
+  },
+  "sociable": {
+    id: "sociable",
+    name: "Sociable",
+    description: "Tienes al menos 3 amigos",
+    icon: <AchievementIcon id="sociable" size={16} />,
+    bg: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+  },
+  "rolero": {
+    id: "rolero",
+    name: "Rolero",
+    description: "Has jugado 5 juegos de RPG",
+    icon: <AchievementIcon id="rolero" size={16} />,
+    bg: "linear-gradient(135deg, #047857, #10b981)",
   }
 };
 

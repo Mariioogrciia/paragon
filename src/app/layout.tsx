@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Session } from "next-auth";
-import { Barlow, Chakra_Petch } from "next/font/google";
+import Script from "next/script";
+import { Barlow, Chakra_Petch, JetBrains_Mono } from "next/font/google";
 import { auth } from "@/auth";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -22,6 +23,15 @@ const chakra = Chakra_Petch({
   variable: "--font-chakra",
 });
 
+// Solo se usa cuando el visitante elige el estilo "Terminal" (ver
+// ThemeCustomizer.tsx / .estilo-terminal en globals.css) — se expone siempre
+// como variable CSS, cargada una vez, y esa clase decide si se aplica.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-jetbrains-mono",
+});
+
 export const metadata: Metadata = {
   title: "Paragon",
   description: "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.",
@@ -36,6 +46,8 @@ export const metadata: Metadata = {
 function relanzarSiEsDeNext(error: unknown): void {
   if (typeof (error as { digest?: unknown })?.digest === "string") throw error;
 }
+
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 export default async function RootLayout({
   children,
@@ -89,20 +101,49 @@ export default async function RootLayout({
     : null;
 
   return (
-    <html lang="es" className={`${barlow.variable} ${chakra.variable}`} suppressHydrationWarning>
+    <html lang="es" className={`${barlow.variable} ${chakra.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.ts" />
         {/*
           El acento se aplica antes de pintar. Si esperásemos al efecto de
           React, la primera pintada saldría azul y cambiaría de color a la vista
           del usuario en cada carga: un parpadeo feo y evitable.
+
+          `next/script` con `beforeInteractive` en vez de un `<script>` suelto:
+          un `<script>` a pelo dentro del árbol de React solo se ejecuta al
+          parsear el HTML del servidor — en cualquier re-render del lado del
+          cliente (Fast Refresh, navegación) React lo trata como un nodo del
+          DOM más y avisa por consola sin ejecutarlo. `next/script` lo saca de
+          ese ciclo.
+
+          Se comprueba primero el color libre (ThemeCustomizer.tsx, rueda de
+          color): si está guardado, manda sobre cualquier clase de acento
+          preset — mismo orden que sigue el propio componente al restaurarse.
         */}
-        <script
+        <Script
+          id="acento-inicial"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `try{var a=localStorage.getItem("platinos:acento");if(a)document.documentElement.classList.add(a)}catch(e){}`,
+            __html: `try{
+              var libre=localStorage.getItem("platinos:acento-libre");
+              if(libre){
+                var m=/^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(libre);
+                if(m){
+                  document.documentElement.style.setProperty("--accent-rgb", parseInt(m[1],16)+" "+parseInt(m[2],16)+" "+parseInt(m[3],16));
+                  document.documentElement.style.setProperty("--accent-2", libre);
+                }
+              } else {
+                var a=localStorage.getItem("platinos:acento");
+                if(a) document.documentElement.classList.add(a);
+              }
+              var e=localStorage.getItem("platinos:estilo");
+              if(e) document.documentElement.classList.add(e);
+            }catch(err){}`,
           }}
         />
       </head>
       <body className="flex min-h-screen flex-col transition-colors duration-300">
+        <ServiceWorkerRegister />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

@@ -481,3 +481,102 @@ export async function pegiPorTitulo(
 
   return salida;
 }
+
+/**
+ * Encuentra el juego completo en IGDB por su título, usando las mismas 4
+ * oleadas de búsqueda que `pegiPorTitulo`. Devuelve un mapa de Título -> IgdbGameResult.
+ */
+export async function matchIgdbGames(
+  titulos: string[],
+  limite?: number,
+): Promise<Map<string, IgdbGameResult>> {
+  const salida = new Map<string, IgdbGameResult>();
+  if (titulos.length === 0) return salida;
+
+  const porTitulo = new Map(titulos.map((t) => [t, variantes(t)]));
+
+  /* --- Oleada 1: coincidencia exacta --- */
+  const todas = [...new Set([...porTitulo.values()].flat())];
+  const lista = todas.map((t) => `"${t.replace(/"/g, '\\"')}"`).join(",");
+
+  const encontrados = await query<IgdbGame>(
+    "games",
+    `${FIELDS} where name = (${lista}); limit 500;`,
+  );
+
+  const gamePorNombre = new Map<string, IgdbGameResult>();
+  for (const g of encontrados) {
+    const format = formatGame(g);
+    const clave = normalizar(g.name);
+    // Prefer the first one found or one with cover/pegi
+    if (!gamePorNombre.has(clave)) gamePorNombre.set(clave, format);
+  }
+
+  const pendientes: string[] = [];
+  for (const [original, vs] of porTitulo) {
+    const match = vs.map((v) => gamePorNombre.get(normalizar(v))).find(Boolean);
+    if (match) salida.set(original, match);
+    else pendientes.push(original);
+  }
+
+  /* --- Oleada 2 (o 3 en el original): por alias --- */
+  const quedan: string[] = [];
+  if (pendientes.length > 0) {
+    try {
+      const alias = pendientes
+        .flatMap((t) => porTitulo.get(t) ?? [])
+        .map((t) => `"${t.replace(/"/g, '\\"')}"`)
+        .join(",");
+
+      const porAlias = await query<IgdbGame>(
+        "games",
+        `${FIELDS} where alternative_names.name = (${alias}); limit 400;`,
+      );
+
+      const gamePorAlias = new Map<string, IgdbGameResult>();
+      for (const g of porAlias) {
+        const format = formatGame(g);
+        for (const alt of g.alternative_names ?? []) {
+          const clave = normalizar(alt.name);
+          if (!gamePorAlias.has(clave)) gamePorAlias.set(clave, format);
+        }
+      }
+
+      for (const original of pendientes) {
+        const match = (porTitulo.get(original) ?? [])
+          .map((v) => gamePorAlias.get(normalizar(v)))
+          .find(Boolean);
+        if (match) salida.set(original, match);
+        else quedan.push(original);
+      }
+    } catch {
+      quedan.push(...pendientes);
+    }
+  }
+
+  /* --- Oleada 3 (o 4): uno a uno --- */
+  await porTandas(quedan, 4, limite, async (original) => {
+    for (const variante of porTitulo.get(original) ?? []) {
+      try {
+        const candidatos = await query<IgdbGame>(
+          "games",
+          `${FIELDS} where name ~ "${variante.replace(/"/g, '\\"')}"; limit 5;`,
+        );
+
+        const match = candidatos
+          .filter((c) => normalizar(c.name) === normalizar(variante))
+          .map(formatGame)
+          .find(Boolean);
+
+        if (match) {
+          salida.set(original, match);
+          return;
+        }
+      } catch {
+        // Ignorar
+      }
+    }
+  });
+
+  return salida;
+}

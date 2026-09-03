@@ -128,7 +128,7 @@ export default async function JuegoPage({
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
           <Link
             href={`/u/${handle}`}
-            className="inline-block rounded-full px-3.5 py-1.5 text-xs font-semibold"
+            className="inline-block rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors hover:text-white"
             style={{ background: "rgba(10, 13, 19, 0.5)", border: "1px solid var(--border)", color: "#b9c6d8" }}
           >
             ← Biblioteca de @{handle}
@@ -362,7 +362,7 @@ export default async function JuegoPage({
               {esMio && (
                 <Link
                   href={`/u/${handle}/${gameId}/enfoque`}
-                  className="ml-auto rounded-[10px] px-3.5 py-2 text-[13px] font-bold text-background"
+                  className="ml-auto rounded-[10px] px-3.5 py-2 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
                   style={{ background: "var(--accent-grad)" }}
                 >
                   Modo enfoque

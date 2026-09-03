@@ -19,6 +19,12 @@ export default async function AjustesLayout({ children }: { children: React.Reac
             General
           </Link>
           <Link
+            href="/ajustes/apariencia"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted hover:bg-white/5 hover:text-foreground transition-colors"
+          >
+            Apariencia
+          </Link>
+          <Link
             href="/ajustes/seguridad"
             className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted hover:bg-white/5 hover:text-foreground transition-colors"
           >

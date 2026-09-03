@@ -6,6 +6,27 @@ import { type Trophy } from "@/lib/types";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { Pin, PinOff } from "lucide-react";
 
+/**
+ * Atajos de guía escrita: en vez de "buscar en Google" desde el servidor
+ * (rasparlo bloquea a la primera petición — DuckDuckGo, que es más permisivo
+ * que Google, ya devuelve una página de "actividad sospechosa" en la
+ * primera prueba), se construye la URL de búsqueda de verdad y se abre en
+ * una pestaña nueva. Nada incrustado: la mayoría de estos sitios bloquean el
+ * framing (X-Frame-Options), y aunque no lo bloquearan, reproducir su
+ * contenido dentro de Paragon sin permiso no toca.
+ */
+const FUENTES_GUIA = [
+  { label: "Google", sitio: null },
+  { label: "Vandal", sitio: "vandal.elespanol.com" },
+  { label: "Meristation", sitio: "as.com/meristation" },
+  { label: "3DJuegos", sitio: "3djuegos.com" },
+] as const;
+
+function urlBusquedaGuia(gameTitle: string, trophyName: string, sitio: string | null) {
+  const consulta = `${gameTitle} "${trophyName}" guía trofeo${sitio ? ` site:${sitio}` : ""}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(consulta)}`;
+}
+
 export function TrophyGuideModal({
   gameTitle,
   gameId,
@@ -24,6 +45,7 @@ export function TrophyGuideModal({
   const [isPending, startTransition] = useTransition();
   const [videoId, setVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pestaña, setPestaña] = useState<"video" | "guia">("video");
 
   useEffect(() => {
     // Only search if we don't have a video id yet
@@ -79,27 +101,79 @@ export function TrophyGuideModal({
             </button>
           </div>
         </div>
-        
-        <div className="relative aspect-video w-full bg-black">
-          {loading ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-current border-t-transparent" />
-              <p className="text-sm">Buscando la mejor guía en YouTube...</p>
-            </div>
-          ) : videoId ? (
-            <iframe
-              className="absolute inset-0 h-full w-full border-0"
-              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-muted p-8 text-center">
-              <p className="text-lg mb-2">No se encontró vídeo</p>
-              <p className="text-sm">No pudimos encontrar una guía en YouTube para este trofeo de manera automática.</p>
-            </div>
-          )}
+
+        <div className="flex gap-1.5 border-b border-border px-6 py-2.5">
+          {(
+            [
+              { value: "video", label: "Vídeo" },
+              { value: "guia", label: "Guía escrita" },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setPestaña(t.value)}
+              className="rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors hover:text-foreground"
+              style={
+                pestaña === t.value
+                  ? { background: "rgb(var(--accent-rgb) / 0.14)", color: "var(--accent-text)" }
+                  : { color: "var(--muted)" }
+              }
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
+
+        {pestaña === "video" ? (
+          <div className="relative aspect-video w-full bg-black">
+            {loading ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-current border-t-transparent" />
+                <p className="text-sm">Buscando la mejor guía en YouTube...</p>
+              </div>
+            ) : videoId ? (
+              <iframe
+                className="absolute inset-0 h-full w-full border-0"
+                src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted p-8 text-center">
+                <p className="text-lg mb-2">No se encontró vídeo</p>
+                <p className="text-sm">No pudimos encontrar una guía en YouTube para este trofeo de manera automática.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 p-10 text-center">
+            <p className="max-w-sm text-sm text-muted">
+              Nadie de aquí escribe estas guías — se busca en internet, tú eliges dónde mirar.
+              Se abre en una pestaña nueva.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {FUENTES_GUIA.map((f) => (
+                <a
+                  key={f.label}
+                  href={urlBusquedaGuia(gameTitle, trophy.name, f.sitio)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 rounded-[10px] px-4 py-2.5 text-[13px] font-bold transition-all hover:-translate-y-0.5"
+                  style={
+                    f.sitio === null
+                      ? { background: "var(--accent-grad)", color: "var(--background)" }
+                      : { border: "1px solid var(--border)", color: "var(--foreground)" }
+                  }
+                >
+                  Buscar en {f.label}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M7 17 17 7M7 7h10v10" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
         
         <div className="p-4 px-6 text-[13px] text-muted flex justify-between items-end">
           <p className="max-w-[80%]">{trophy.detail || "Trofeo sin descripción adicional."}</p>

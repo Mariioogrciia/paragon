@@ -42,3 +42,7 @@ next-env.d.ts
 
 # datos locales: contiene el token NPSSO, nunca al repo
 /.data/
+
+# avatares y banners subidos por usuarios en local: contenido de runtime,
+# no código — y no fotos de nadie al historial de git.
+/public/uploads/

@@ -2,7 +2,7 @@ import "server-only";
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, userGames, users } from "@/db/schema";
-import type { Platform } from "@/lib/types";
+import { parseGameKey, type Platform } from "@/lib/types";
 import { getGame } from "@/lib/igdb/client";
 import { avatarUrlSql } from "@/lib/avatarSql";
 
@@ -22,8 +22,9 @@ import { avatarUrlSql } from "@/lib/avatarSql";
  */
 
 export interface GlobalGame {
-  id: string;
-  platform: Platform;
+  id: string; // The URL id (either igdbId as string, or legacy specific id)
+  igdbId?: number | null; // For redirects from legacy id
+  platform: Platform | "unified";
   title: string;
   deviceLabel: string;
   iconUrl?: string;
@@ -33,12 +34,81 @@ export interface GlobalGame {
   pegi?: string;
   summary?: string;
   hasPlatinum: boolean;
+  /** AppID de Steam (el nativeId de la fila `steam-<appid>`), si el juego
+   * tiene una versión de Steam entre sus filas. Es lo único que acepta
+   * CheapShark (ver lib/prices.ts) — para PSN o manual no hay comparador. */
+  steamId?: string | null;
 }
 
 export async function getGlobalGame(gameId: string): Promise<GlobalGame | null> {
+  const isNumeric = /^\d+$/.test(gameId);
+
+  if (isNumeric) {
+    const igdbId = parseInt(gameId, 10);
+    const rows = await db
+      .select({
+        id: gamesTable.id,
+        platform: gamesTable.platform,
+        title: gamesTable.title,
+        deviceLabel: gamesTable.deviceLabel,
+        iconUrl: gamesTable.iconUrl,
+        developer: gamesTable.developer,
+        publisher: gamesTable.publisher,
+        genres: gamesTable.genres,
+        pegi: gamesTable.pegi,
+        defined: gamesTable.defined,
+      })
+      .from(gamesTable)
+      .where(eq(gamesTable.igdbId, igdbId));
+
+    if (rows.length > 0) {
+      const rep = rows[0];
+      const hasPlatinum = rows.some((r) => Boolean((r.defined as any)?.platinum));
+      const platforms = [...new Set(rows.map((r) => r.platform))];
+      // Capitalize or just use the raw for now (we replace in the UI)
+      const deviceLabel = platforms.join(" / ");
+      const filaSteam = rows.find((r) => r.platform === "steam");
+
+      return {
+        id: gameId,
+        igdbId,
+        platform: platforms.length > 1 ? "unified" : platforms[0],
+        title: rep.title,
+        deviceLabel: deviceLabel,
+        iconUrl: rep.iconUrl ?? undefined,
+        developer: rep.developer ?? undefined,
+        publisher: rep.publisher ?? undefined,
+        genres: rep.genres ?? undefined,
+        pegi: rep.pegi ?? undefined,
+        hasPlatinum,
+        steamId: filaSteam ? parseGameKey(filaSteam.id).nativeId : null,
+      };
+    }
+
+    // Fallback a IGDB puro si no está en la base de datos
+    const catalogGame = await getGame(igdbId);
+    if (!catalogGame) return null;
+    return {
+      id: gameId, // usamos el mismo numérico para que la URL siga siendo /juego/123
+      igdbId,
+      platform: "manual",
+      title: catalogGame.title,
+      deviceLabel: catalogGame.platforms.join(", ") || "Catálogo IGDB",
+      iconUrl: catalogGame.coverUrl,
+      developer: catalogGame.developer,
+      publisher: catalogGame.publisher,
+      genres: catalogGame.genres,
+      pegi: catalogGame.pegi,
+      summary: catalogGame.summary,
+      hasPlatinum: false,
+    };
+  }
+
+  // Búsqueda por ID nativo/legado (ej. psn-NPWR12345)
   const [row] = await db
     .select({
       id: gamesTable.id,
+      igdbId: gamesTable.igdbId,
       platform: gamesTable.platform,
       title: gamesTable.title,
       deviceLabel: gamesTable.deviceLabel,
@@ -53,28 +123,11 @@ export async function getGlobalGame(gameId: string): Promise<GlobalGame | null> 
     .where(eq(gamesTable.id, gameId))
     .limit(1);
 
-  if (!row) {
-    const igdbId = Number(gameId);
-    if (!Number.isInteger(igdbId)) return null;
-    const catalogGame = await getGame(igdbId);
-    if (!catalogGame) return null;
-    return {
-      id: `manual-${catalogGame.igdbId}:deseados`,
-      platform: "manual",
-      title: catalogGame.title,
-      deviceLabel: catalogGame.platforms.join(", ") || "Catálogo IGDB",
-      iconUrl: catalogGame.coverUrl,
-      developer: catalogGame.developer,
-      publisher: catalogGame.publisher,
-      genres: catalogGame.genres,
-      pegi: catalogGame.pegi,
-      summary: catalogGame.summary,
-      hasPlatinum: false,
-    };
-  }
+  if (!row) return null;
 
   return {
     id: row.id,
+    igdbId: row.igdbId,
     platform: row.platform,
     title: row.title,
     deviceLabel: row.deviceLabel,
@@ -84,6 +137,7 @@ export async function getGlobalGame(gameId: string): Promise<GlobalGame | null> 
     genres: row.genres ?? undefined,
     pegi: row.pegi ?? undefined,
     hasPlatinum: Boolean((row.defined as Record<string, number> | null)?.platinum),
+    steamId: row.platform === "steam" ? parseGameKey(row.id).nativeId : null,
   };
 }
 
@@ -99,15 +153,27 @@ export interface GlobalGameStats {
 
 /** Cuánta gente lo tiene, lo está jugando y lo ha terminado. */
 export async function getGlobalGameStats(gameId: string): Promise<GlobalGameStats> {
-  const [row] = await db
+  const isNumeric = /^\d+$/.test(gameId);
+
+  let query = db
     .select({
       owners: sql<number>`count(*)`,
       playing: sql<number>`count(*) filter (where ${userGames.progressPercent} > 0 and ${userGames.progressPercent} < 100)`,
       completed: sql<number>`count(*) filter (where ${userGames.progressPercent} = 100)`,
       platinumed: sql<number>`count(*) filter (where cast(${userGames.earned}->>'platinum' as integer) > 0)`,
     })
-    .from(userGames)
-    .where(eq(userGames.gameId, gameId));
+    .from(userGames);
+
+  if (isNumeric) {
+    const igdbId = parseInt(gameId, 10);
+    query = query
+      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+      .where(eq(gamesTable.igdbId, igdbId)) as any;
+  } else {
+    query = query.where(eq(userGames.gameId, gameId)) as any;
+  }
+
+  const [row] = await query;
 
   return {
     owners: Number(row?.owners ?? 0),
@@ -129,7 +195,9 @@ export interface GameReview {
 
 /** Todas las reseñas de un juego, de cualquier usuario, no solo del dueño de un perfil. */
 export async function getGameReviews(gameId: string): Promise<GameReview[]> {
-  const rows = await db
+  const isNumeric = /^\d+$/.test(gameId);
+
+  let query = db
     .select({
       userId: users.id,
       handle: users.handle,
@@ -140,9 +208,18 @@ export async function getGameReviews(gameId: string): Promise<GameReview[]> {
       reviewDate: userGames.reviewDate,
     })
     .from(userGames)
-    .innerJoin(users, eq(users.id, userGames.userId))
-    .where(and(eq(userGames.gameId, gameId), isNotNull(userGames.review)))
-    .orderBy(desc(userGames.reviewDate));
+    .innerJoin(users, eq(users.id, userGames.userId));
+
+  if (isNumeric) {
+    const igdbId = parseInt(gameId, 10);
+    query = query
+      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+      .where(and(eq(gamesTable.igdbId, igdbId), isNotNull(userGames.review))) as any;
+  } else {
+    query = query.where(and(eq(userGames.gameId, gameId), isNotNull(userGames.review))) as any;
+  }
+
+  const rows = await query.orderBy(desc(userGames.reviewDate));
 
   return rows.map((r) => ({
     ...r,
@@ -151,13 +228,26 @@ export async function getGameReviews(gameId: string): Promise<GameReview[]> {
   }));
 }
 
-/** Si hace falta enlazar "ver mi ficha" sin arriesgarse a un 404. */
-export async function ownsGame(userId: string, gameId: string): Promise<boolean> {
+/** Si hace falta enlazar "ver mi ficha" sin arriesgarse a un 404. Devuelve el gameId específico que posee el usuario (útil para igdbId unificado) */
+export async function ownsGame(userId: string, gameId: string): Promise<string | null> {
+  const isNumeric = /^\d+$/.test(gameId);
+
+  if (isNumeric) {
+    const igdbId = parseInt(gameId, 10);
+    const [row] = await db
+      .select({ specificId: userGames.gameId })
+      .from(userGames)
+      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+      .where(and(eq(userGames.userId, userId), eq(gamesTable.igdbId, igdbId)))
+      .limit(1);
+    return row?.specificId ?? null;
+  }
+
   const [row] = await db
-    .select({ one: sql<number>`1` })
+    .select({ specificId: userGames.gameId })
     .from(userGames)
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
     .limit(1);
 
-  return Boolean(row);
+  return row?.specificId ?? null;
 }

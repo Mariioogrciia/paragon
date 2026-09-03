@@ -45,24 +45,22 @@ export function ManualGameStatus({
         <button
           onClick={() => toggle(false)}
           disabled={isPending}
-          className="flex-1 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60"
-          style={
+          className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 ${
             !completed
-              ? { background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.35)", color: "var(--accent-text)" }
-              : { background: "transparent", border: "1px solid var(--border)", color: "var(--muted)" }
-          }
+              ? "border-[rgb(var(--accent-rgb)/0.35)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]"
+              : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
+          }`}
         >
           Sin empezar
         </button>
         <button
           onClick={() => toggle(true)}
           disabled={isPending}
-          className="flex-1 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60"
-          style={
+          className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 ${
             completed
-              ? { background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.35)", color: "var(--accent-text)" }
-              : { background: "transparent", border: "1px solid var(--border)", color: "var(--muted)" }
-          }
+              ? "border-[rgb(var(--accent-rgb)/0.35)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]"
+              : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
+          }`}
         >
           Completado
         </button>

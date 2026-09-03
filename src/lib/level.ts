@@ -8,6 +8,22 @@ export const XP_POR_GRADO: Record<keyof TrophyCounts, number> = {
   platinum: 200,
 };
 
+/**
+ * Nivel Paragon mínimo para cada marco de avatar (`users.profileFrame`).
+ * Antes solo vivía como texto en el desplegable de /ajustes ("Nivel 10+"),
+ * sin que nada lo comprobara de verdad — cualquiera podía guardar "fire" a
+ * nivel 1. Se usa tanto para pintar el desplegable como para validar en
+ * `/api/profile/update`.
+ */
+export const FRAME_REQUISITOS: Record<string, number> = {
+  neon: 5,
+  gold: 10,
+  circuito: 25,
+  platinum: 50,
+  fire: 100,
+  cristal: 150,
+};
+
 export interface ParagonLevel {
   level: number;
   xp: number;

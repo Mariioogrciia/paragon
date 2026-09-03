@@ -19,6 +19,11 @@ const LOGGED_IN_NAV = [
     match: (p: string) => p.startsWith("/feed"),
   },
   {
+    label: "Descubrir",
+    href: "/descubrir",
+    match: (p: string) => p.startsWith("/descubrir"),
+  },
+  {
     label: "Noticias",
     href: "/noticias",
     match: (p: string) => p.startsWith("/noticias"),
@@ -171,7 +176,7 @@ export function Header({
               {user.paragonLevel != null && (
                 <Link
                   href={user.handle ? `/u/${user.handle}#nivel-paragon` : "/"}
-                  className="hidden items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3 sm:flex"
+                  className="hidden items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3 transition-colors hover:bg-[var(--surface-2)] sm:flex"
                   style={{ background: "var(--surface)", border: "1px solid #202836" }}
                   title="Ver progreso del nivel Paragon"
                 >
@@ -184,7 +189,7 @@ export function Header({
               )}
               <Link
                 href="/ajustes"
-                className="flex items-center gap-2.5"
+                className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
               >
                 <Avatar src={user.image} name={user.name} size={32} />
                 {user.handle && (
@@ -229,7 +234,7 @@ export function Header({
                   key={item.label}
                   href={href}
                   onClick={() => setMenuAbierto(false)}
-                  className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold tracking-[0.02em] transition-colors"
+                  className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold tracking-[0.02em] transition-colors hover:text-foreground"
                   style={
                     active
                       ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }

@@ -86,6 +86,132 @@
   --glow: color-mix(in srgb, var(--accent) 12%, var(--background));
 }
 
+/* Parallax simple del banner del perfil: solo en escritorio, porque
+   `background-attachment: fixed` no funciona bien con el scroll táctil. */
+@media (min-width: 768px) {
+  .perfil-banner-parallax {
+    background-attachment: fixed;
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Estilo (ThemeCustomizer.tsx). Eje distinto del modo/acento: el modo   *
+ * decide los colores base, el acento decide el color de marca, y esto   *
+ * decide la FORMA — radio de esquina, sombra, tipografía, textura de     *
+ * fondo. Un cambio de acento sin esto era "cambiar de camiseta"; esto    *
+ * es "cambiar de sitio web".                                             *
+ *                                                                        *
+ * Van con `[class*="…"]` (por substring, no una clase exacta) a         *
+ * propósito: cientos de componentes usan `rounded-xl`, `rounded-[18px]`, *
+ * `shadow-lg`, etc. cada uno a su manera. Reescribir cada componente     *
+ * para que dependiera de una variable de radio/sombra habría sido un    *
+ * refactor de toda la aplicación; este selector barre TODO lo que ya    *
+ * existe sin tocar ni un componente. Con `!important` porque Tailwind   *
+ * (v4) mete sus utilidades en `@layer utilities`, de menor prioridad     *
+ * que CSS suelto — no haría falta, pero así no depende de en qué orden  *
+ * acabe cargándose nada.                                                 *
+ * ---------------------------------------------------------------- */
+
+/* Terminal: monoespaciada, esquinas rectas, sin sombra, líneas de barrido
+   como un monitor CRT. La estética "hacker en la sala de servidores". */
+.estilo-terminal {
+  --font-sans: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-heading: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --glow: color-mix(in srgb, var(--accent) 26%, var(--background));
+}
+.estilo-terminal [class*="rounded"] { border-radius: 2px !important; }
+.estilo-terminal [class*="shadow"] { box-shadow: none !important; }
+.estilo-terminal h1, .estilo-terminal h2, .estilo-terminal h3, .estilo-terminal .font-heading {
+  letter-spacing: 0.03em;
+}
+.estilo-terminal body {
+  position: relative;
+}
+.estilo-terminal body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.035) 0px,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* Vidrio: esquinas muy redondeadas, superficies traslúcidas con
+   desenfoque real (backdrop-filter), sombra difusa. La estética "panel de
+   cristal flotando", pensada para el modo claro pero funciona en cualquiera. */
+.estilo-vidrio [class*="rounded"] { border-radius: 22px !important; }
+.estilo-vidrio [class*="shadow"] { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22) !important; }
+.estilo-vidrio [class*="bg-surface"] {
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+.estilo-vidrio { --glow: color-mix(in srgb, var(--accent) 24%, var(--background)); }
+
+/* Brutalista: cero redondeo, sombra dura desplazada (sin difuminar) y
+   degradados aplanados a color sólido. La estética de carteles impresos,
+   sin sutilezas. */
+.estilo-brutalista [class*="rounded"] { border-radius: 0px !important; }
+.estilo-brutalista [class*="shadow"] { box-shadow: 5px 5px 0 0 var(--foreground) !important; }
+.estilo-brutalista [style*="var(--accent-grad)"] { background: var(--accent) !important; }
+.estilo-brutalista h1, .estilo-brutalista h2, .estilo-brutalista .font-heading {
+  letter-spacing: -0.01em;
+}
+.estilo-brutalista { --glow: transparent; }
+
+/* Ambientaciones de plataforma: mismo lenguaje visual que los banners de
+   perfil (BannerPresets.tsx — curvas, hexágonos, retícula...), pero aquí
+   cubriendo el fondo entero de la página, no solo la cabecera de un perfil.
+   Cada una además trae su propio radio/sombra, para que se sienta como la
+   consola de verdad y no solo como "la web con un fondo distinto". */
+.estilo-ps5 body {
+  background:
+    radial-gradient(1100px 700px at 15% -10%, rgb(var(--accent-rgb) / 0.22) 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(159, 212, 236, 0.12) 0%, transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 2px, transparent 2px, transparent 120px),
+    linear-gradient(180deg, #050b1a 0%, #0a1428 100%)
+    fixed;
+}
+.estilo-ps5 [class*="rounded"] { border-radius: 20px !important; }
+.estilo-ps5 [class*="shadow"] { box-shadow: 0 10px 34px rgb(var(--accent-rgb) / 0.18) !important; }
+
+.estilo-xbox body {
+  background:
+    radial-gradient(1000px 600px at 85% -10%, rgba(61, 220, 100, 0.16) 0%, transparent 55%),
+    repeating-linear-gradient(60deg, rgba(61, 220, 100, 0.05) 0px, rgba(61, 220, 100, 0.05) 1px, transparent 1px, transparent 46px),
+    repeating-linear-gradient(-60deg, rgba(61, 220, 100, 0.04) 0px, rgba(61, 220, 100, 0.04) 1px, transparent 1px, transparent 46px),
+    linear-gradient(180deg, #060d08 0%, #0c1a10 100%)
+    fixed;
+}
+.estilo-xbox [class*="rounded"] { border-radius: 8px !important; }
+.estilo-xbox [class*="shadow"] { box-shadow: 0 6px 20px rgba(61, 220, 100, 0.15) !important; }
+
+.estilo-steam body {
+  background:
+    radial-gradient(900px 500px at 90% 0%, rgba(102, 192, 244, 0.14) 0%, transparent 55%),
+    repeating-linear-gradient(0deg, rgba(102, 192, 244, 0.04) 0px, rgba(102, 192, 244, 0.04) 1px, transparent 1px, transparent 42px),
+    repeating-linear-gradient(90deg, rgba(102, 192, 244, 0.04) 0px, rgba(102, 192, 244, 0.04) 1px, transparent 1px, transparent 42px),
+    linear-gradient(180deg, #0a0e17 0%, #0f1c2e 100%)
+    fixed;
+}
+.estilo-steam [class*="rounded"] { border-radius: 6px !important; }
+
+.estilo-switch body {
+  background:
+    radial-gradient(700px 500px at -5% 15%, rgba(230, 0, 18, 0.16) 0%, transparent 50%),
+    radial-gradient(700px 500px at 105% 85%, rgba(10, 185, 230, 0.16) 0%, transparent 50%),
+    linear-gradient(180deg, #131313 0%, #1c1c1c 100%)
+    fixed;
+}
+.estilo-switch [class*="rounded"] { border-radius: 14px !important; }
+.estilo-switch [class*="shadow"] { box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4) !important; }
+
 /* ---------------------------------------------------------------- *
  * Color de acento.                                                 *
  *                                                                  *
@@ -143,12 +269,69 @@
   --font-heading: var(--font-chakra), var(--font-barlow), ui-sans-serif, sans-serif;
 }
 
+html, body {
+  /* Prevenir rebote táctil (rubber-banding) en iOS para que se sienta como App nativa */
+  overscroll-behavior-y: none;
+}
+
 body {
   background:
     radial-gradient(1200px 600px at 15% -10%, var(--glow) 0%, var(--background) 60%)
     fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
+  
+  /* Respetar el notch / dynamic island y áreas seguras inferiores en móviles */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ---------------------------------------------------------------- *
+ * Hover universal de botones Y tarjetas.                            *
+ *                                                                    *
+ * Pedido varias veces y arreglado cada vez componente a componente,  *
+ * lo que garantiza que el siguiente botón o tarjeta nuevo (de este   *
+ * agente, de Antigravity, o el que sea) vuelva a salir sin hover.    *
+ * Esta regla va por ETIQUETA/patrón, no por componente: `button` y   *
+ * `a` con pinta de botón (clase con "rounded"), más cualquier `div`   *
+ * clicable marcado con `cursor-pointer` — que es como ya se marcan   *
+ * en este código las tarjetas sin enlace de por medio (FavoritePicker,*
+ * UpcomingGames, TrophyList...). Cubre TODO de una vez, incluido lo   *
+ * que no existe todavía.                                             *
+ *                                                                    *
+ * Dos capas, con cuidado de no pisar lo que ya funciona bien:        *
+ *  1. El resplandor (`filter: drop-shadow`) es universal y siempre   *
+ *     se suma: como propiedad, nada más en la app la toca en hover,  *
+ *     así que no puede chocar con nada existente.                    *
+ *  2. El levantamiento (`transform`) se salta a propósito cualquier  *
+ *     elemento que YA declare su propio `hover:scale-*` o            *
+ *     `hover:-translate-*` (las estrellas de valoración, las         *
+ *     tarjetas de juego con inclinación 3D...) — si no, esta regla   *
+ *     les borraría su animación ya afinada y la sustituiría por una  *
+ *     genérica.                                                      *
+ *                                                                    *
+ * CSS sin capa (`@layer`) le gana a las utilidades de Tailwind (que   *
+ * sí van en `@layer utilities`) pase lo que pase con la especifici-  *
+ * dad — por eso esto no necesita `!important` para ganarle a         *
+ * `hover:text-foreground` ni similares ya puestos en cualquier sitio. *
+ * ---------------------------------------------------------------- */
+button:not(:disabled),
+a[class*="rounded"],
+[class*="cursor-pointer"] {
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+button:not(:disabled):hover,
+a[class*="rounded"]:hover,
+[class*="cursor-pointer"]:hover {
+  filter: drop-shadow(0 0 12px rgb(var(--accent-rgb) / 0.5));
+}
+
+button:not(:disabled):not([class*="hover:scale"]):not([class*="hover:-translate"]):hover,
+a[class*="rounded"]:not([class*="hover:scale"]):not([class*="hover:-translate"]):hover,
+[class*="cursor-pointer"]:not([class*="hover:scale"]):not([class*="hover:-translate"]):hover {
+  transform: translateY(-1px);
 }
 
 /* Título de sección/página: siempre en la fuente condensada de marca. */
@@ -245,6 +428,33 @@ h3,
 .holo-card:hover::before {
   animation: holo-shimmer 1.5s linear infinite;
   filter: drop-shadow(0 0 8px rgba(127,188,216,0.5));
+}
+
+/* ---------------------------------------------------------------- *
+ * Marcos de avatar (AvatarFrame.tsx). Cada uno tiene su propio       *
+ * movimiento, no solo su propio color — si no, "marco nuevo" es solo *
+ * "gradiente con otro hex", que es justo lo que no se quería.        *
+ * ---------------------------------------------------------------- */
+@keyframes frame-pulse {
+  0%, 100% { opacity: 1; transform: scale(1.15); }
+  50% { opacity: 0.55; transform: scale(1.22); }
+}
+
+@keyframes frame-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes frame-flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.85; }
+  50% { opacity: 1; }
+  72% { opacity: 0.9; }
+}
+
+@keyframes frame-sweep {
+  0% { background-position: -150% center; }
+  100% { background-position: 250% center; }
 }
 
 /**

@@ -39,6 +39,10 @@ export interface ProfileRow {
   profileColor?: string | null;
   profileFrame?: string | null;
   statusText?: string | null;
+  /** Modo de tema (dark/light/oled/high-contrast) aplicado solo al contenedor
+   * del perfil público — no afecta al resto de la app ni al visitante. */
+  theme?: string | null;
+  profileSectionOrder?: string[] | null;
   accounts: PlatformAccount[];
   badges: string[];
   /** Si esta cuenta es la del propio desarrollador de Paragon. */
@@ -108,6 +112,8 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       profileColor: users.profileColor,
       profileFrame: users.profileFrame,
       statusText: users.statusText,
+      theme: users.theme,
+      profileSectionOrder: users.profileSectionOrder,
       email: users.email,
     })
     .from(users)
@@ -189,6 +195,8 @@ export async function checkAndGrantBadges(userId: string) {
   const result = await db
     .select({
       totalGames: sql<number>`count(distinct ${userGames.gameId})`,
+      totalReviews: sql<number>`count(${userGames.review})`,
+      totalRpgs: sql<number>`count(*) filter (where ${userGames.progressPercent} > 0 and ${gamesTable.genres}::jsonb ? 'Role-playing (RPG)')`,
       totalPlatinums: sql<number>`
         coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
         + count(*) filter (
@@ -202,6 +210,14 @@ export async function checkAndGrantBadges(userId: string) {
 
   const platinums = Number(result[0]?.totalPlatinums ?? 0);
   const games = Number(result[0]?.totalGames ?? 0);
+  const reviews = Number(result[0]?.totalReviews ?? 0);
+  const rpgs = Number(result[0]?.totalRpgs ?? 0);
+
+  const friendsResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(friendships)
+    .where(and(eq(friendships.status, "accepted"), or(eq(friendships.requesterId, userId), eq(friendships.addresseeId, userId))));
+  const friends = Number(friendsResult[0]?.count ?? 0);
 
   if (platinums >= 1) await grantBadge(userId, "first_blood");
   if (platinums >= 10) await grantBadge(userId, "cazador");
@@ -209,6 +225,9 @@ export async function checkAndGrantBadges(userId: string) {
   if (platinums >= 100) await grantBadge(userId, "leyenda");
   
   if (games >= 100) await grantBadge(userId, "coleccionista");
+  if (reviews >= 3) await grantBadge(userId, "critico");
+  if (friends >= 3) await grantBadge(userId, "sociable");
+  if (rpgs >= 5) await grantBadge(userId, "rolero");
 }
 
 export async function getGlobalStats() {
@@ -450,6 +469,7 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
       publisher: gamesTable.publisher,
       genres: gamesTable.genres,
       pegi: gamesTable.pegi,
+      igdbId: gamesTable.igdbId,
       metadataSyncedAt: gamesTable.metadataSyncedAt,
       /**
        * Rareza del platino: el % de jugadores del juego que lo tienen. Es de
@@ -540,6 +560,7 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,
     pegi: r.pegi ?? encontrados.get(r.title),
+    igdbId: r.igdbId,
     platinumRarity: r.platinumRarity ?? undefined,
     rating: r.rating ?? undefined,
     review: r.review ?? undefined,

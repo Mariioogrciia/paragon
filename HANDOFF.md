@@ -6,6 +6,51 @@ releer todo el historial. Última actualización: **3 de septiembre de 2026**
 
 ---
 
+## Sesión del 3 de septiembre de 2026 (tarde) — personalización de perfil
+
+Pedido: "más personalización del perfil y del estilo visual". Antes de tocar
+nada se comprobó qué había ya (bastante — ver la tabla de arriba, gran parte
+lo construyó Antigravity en paralelo sin dejarlo en este documento) y solo se
+cerraron los huecos reales:
+
+- **Bug corregido**: `/api/upload` escribía siempre en `users.image` sin
+  mirar si la subida era de avatar o de banner — subir un banner pisaba la
+  foto de perfil en silencio. Ahora manda un campo `kind` y actualiza la
+  columna correcta.
+- **`ThemeCustomizer`** (icono de arriba a la derecha): color de acento
+  libre (`<input type="color">`, se guarda aparte de los 5 presets) y una
+  sección "Temas" con combos de un clic (modo + acento juntos).
+- **`users.theme`**, que existía sin usarse, ahora decide el modo (oled,
+  alto contraste...) del **perfil público** de cada uno — aplicado solo al
+  contenedor de `/u/[handle]`, no afecta al modo del visitante en el resto
+  del sitio.
+- **`profileFrame` (marco del avatar) ahora se comprueba de verdad**: el
+  desplegable decía "Nivel 10+/50+/100+" pero nada lo exigía. Ahora
+  `FRAME_REQUISITOS` (`lib/level.ts`) se valida en el servidor
+  (`/api/profile/update`) contra el nivel real (`getParagonLevel`).
+- **Banner con vídeo** (mp4/webm, detectado por extensión) y **parallax**
+  simple en banners de imagen (`background-attachment: fixed`, solo
+  escritorio — clase `.perfil-banner-parallax` en `globals.css`).
+- **Títulos sugeridos por insignia ganada**: chips bajo el campo de título
+  en `/ajustes`, rellenan el input con el nombre de una insignia que ya
+  tienes (`BADGE_DEFINITIONS` de `Badges.tsx`, ahora exportado). Sigue
+  siendo texto libre — no hay otorgado automático que lo fuerce.
+- **Orden de secciones del perfil, arrastrable** (`Reorder` de
+  framer-motion, que ya estaba instalado — sin dependencia nueva). Columna
+  nueva `users.profileSectionOrder` (jsonb), migrada con
+  `scripts/anadir-orden-secciones-perfil.mts` (mismo patrón que las demás:
+  SQL explícito, no `db:push` — **ya ejecutado contra producción**).
+  `lib/profileSections.ts` tiene las claves y el orden por defecto;
+  `normalizeSectionOrder()` rellena con lo que falte si se añade una
+  sección nueva más adelante.
+
+No tocado a propósito: el sistema de auto-otorgado de insignias
+(`checkAndGrantBadges` en `lib/profiles.ts`) ya existe y sí otorga de verdad
+(primer platino, 10/50/100 platinos, 100+ juegos, madrugador) — pero no se
+tocó su lógica, solo se reutilizó para sugerir títulos.
+
+---
+
 ## Qué es
 
 Rastreador de trofeos y logros multiplataforma (Next.js 16 + Drizzle +

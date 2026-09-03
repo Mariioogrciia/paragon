@@ -100,7 +100,7 @@ export default async function AmigosPage() {
                   <form action={acceptFriendAction}>
                     <input type="hidden" name="requesterId" value={p.userId} />
                     <button
-                      className="rounded-[9px] px-3.5 py-2 text-[13px] font-bold text-background"
+                      className="rounded-[9px] px-3.5 py-2 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
                       style={{ background: "var(--accent-grad)" }}
                     >
                       Aceptar
@@ -193,8 +193,7 @@ export default async function AmigosPage() {
                   <div className="col-span-3 flex justify-end gap-2 sm:col-span-1">
                     <Link
                       href={`/comparar/${r.handle}`}
-                      className="rounded-[9px] px-3.5 py-2 text-[13px] font-semibold"
-                      style={{ background: "#151d29", border: "1px solid var(--border)", color: "var(--accent-text)" }}
+                      className="rounded-[9px] border border-[var(--border)] bg-[#151d29] px-3.5 py-2 text-[13px] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)]"
                     >
                       Comparar
                     </Link>
@@ -296,7 +295,7 @@ export default async function AmigosPage() {
           <button
             type="submit"
             form="comparar-grupo"
-            className="mt-3 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background"
+            className="mt-3 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
             style={{ background: "var(--accent-grad)" }}
           >
             Comparar seleccionados

@@ -198,7 +198,7 @@ export function FAQSection() {
 
       <p className="mt-9 text-center text-[13px] text-muted">
         ¿Te falta algo por aquí?{" "}
-        <Link href="/ajustes" className="font-semibold text-accent">
+        <Link href="/ajustes" className="font-semibold text-accent hover:underline">
           Revisa tus ajustes
         </Link>{" "}
         o escríbenos.

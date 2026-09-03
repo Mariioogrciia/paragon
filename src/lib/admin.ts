@@ -2,6 +2,7 @@ import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
+  activities,
   games,
   notifications,
   platformAccounts,
@@ -161,4 +162,39 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
     platinos: Number(juegosMap.get(f.userId)?.platinos ?? 0),
     insignias: insigniasMap.get(f.userId) ?? 0,
   }));
+}
+
+export interface AdminActivityRow {
+  id: string;
+  type: string;
+  rating: number | null;
+  review: string | null;
+  createdAt: Date;
+  userHandle: string | null;
+  userName: string | null;
+  gameTitle: string | null;
+}
+
+export async function getAdminActivities(limit = 50): Promise<AdminActivityRow[]> {
+  const rows = await db
+    .select({
+      id: activities.id,
+      type: activities.type,
+      rating: activities.rating,
+      review: activities.review,
+      createdAt: activities.createdAt,
+      userHandle: users.handle,
+      userName: users.name,
+      gameTitle: games.title,
+    })
+    .from(activities)
+    .innerJoin(users, eq(users.id, activities.userId))
+    .leftJoin(games, eq(games.id, activities.gameId))
+    // We only fetch reviews (or anything with text) for moderation by default
+    // We can also fetch just everything but filter in memory
+    .where(sql`${activities.review} IS NOT NULL AND ${activities.review} != ''`)
+    .orderBy(desc(activities.createdAt))
+    .limit(limit);
+
+  return rows;
 }

@@ -74,9 +74,13 @@ export function juegoDestacado(games: Game[]): JuegoDestacado | undefined {
     return { game: top.principal, horasTotal: top.horasTotal };
   }
 
-  const porTrofeos = games
-    .filter((g) => !g.isWishlist)
-    .reduce((a, b) => (b.earnedTotal > a.earnedTotal ? b : a));
+  const jugados = games.filter((g) => !g.isWishlist);
+  // Puede quedar vacío si toda la biblioteca son deseados: sin ningún juego
+  // "de verdad" no hay nada que destacar (antes esto reventaba con "Reduce
+  // of empty array" en cuanto alguien tenía solo deseados).
+  if (jugados.length === 0) return undefined;
+
+  const porTrofeos = jugados.reduce((a, b) => (b.earnedTotal > a.earnedTotal ? b : a));
   return { game: porTrofeos, horasTotal: 0 };
 }
 

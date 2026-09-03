@@ -23,7 +23,7 @@ import type { Trophy } from "@/lib/types";
  */
 
 /** Alto mínimo de cualquier cosa pulsable: es un móvil y se usa sin mirar. */
-const BOTON = "min-h-[64px] rounded-2xl text-lg font-bold transition-transform active:scale-[0.97]";
+const BOTON = "min-h-[64px] rounded-2xl text-lg font-bold transition-transform hover:scale-[1.02] active:scale-[0.97]";
 
 export function FocusMode({
   gameId,
@@ -145,7 +145,7 @@ export function FocusMode({
           <a
             href={volverA}
             aria-label="Salir del modo enfoque"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xl text-white/50 active:scale-95"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xl text-white/50 transition-transform hover:scale-105 hover:text-white active:scale-95"
             style={{ border: "1px solid rgba(255,255,255,0.16)" }}
           >
             ✕
@@ -223,7 +223,7 @@ export function FocusMode({
                       en la mano. */}
                   <button
                     onClick={() => setGuia(t)}
-                    className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-[15px] font-bold text-white/80 transition-transform active:scale-[0.98]"
+                    className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-[15px] font-bold text-white/80 transition-transform hover:scale-[1.01] hover:text-white active:scale-[0.98]"
                     style={{ border: "1px solid rgba(255,255,255,0.16)" }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -260,7 +260,7 @@ export function FocusMode({
 
             <a
               href={volverA}
-              className={`${BOTON} flex w-full items-center justify-center text-white/70 sm:w-40`}
+              className={`${BOTON} flex w-full items-center justify-center text-white/70 hover:text-white sm:w-40`}
               style={{ border: "1px solid rgba(255,255,255,0.16)" }}
             >
               Salir

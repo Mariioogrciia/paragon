@@ -47,7 +47,7 @@ export function CommunityDifficulty({
               type="button"
               disabled={!puedeVotar || pending}
               aria-label={`Votar dificultad ${n} de 5: ${ETIQUETAS[n - 1]}`}
-              className="disabled:cursor-default"
+              className="transition-transform hover:scale-110 active:scale-95 disabled:cursor-default disabled:hover:scale-100"
               onMouseEnter={() => puedeVotar && setHover(n)}
               onClick={() => {
                 if (!puedeVotar) return;

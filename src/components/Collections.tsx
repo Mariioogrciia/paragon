@@ -4,17 +4,11 @@ import { NewCollectionForm } from "./forms/Forms";
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
-const DENTRO = {
-  background: "rgb(var(--accent-rgb) / 0.14)",
-  border: "1px solid rgb(var(--accent-rgb) / 0.32)",
-  color: "var(--accent-text)",
-};
+const DENTRO_CLASE =
+  "border-[rgb(var(--accent-rgb)/0.32)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]";
 
-const FUERA = {
-  background: "var(--surface)",
-  border: "1px solid var(--border)",
-  color: "var(--muted)",
-};
+const FUERA_CLASE =
+  "border-[var(--border)] bg-[var(--surface)] text-muted hover:bg-[var(--surface-2)] hover:text-foreground";
 
 /**
  * Carpetas de un juego: se marca y se desmarca desde la propia ficha.
@@ -47,8 +41,7 @@ export function CollectionPicker({
                 <input type="hidden" name="collectionId" value={carpeta.id} />
                 <input type="hidden" name="gameId" value={gameId} />
                 <button
-                  className="flex items-center gap-2 rounded-full px-3.5 py-2 text-[13px] font-semibold"
-                  style={dentro ? DENTRO : FUERA}
+                  className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-colors ${dentro ? DENTRO_CLASE : FUERA_CLASE}`}
                 >
                   <span aria-hidden="true">{dentro ? "✓" : "+"}</span>
                   {carpeta.name}

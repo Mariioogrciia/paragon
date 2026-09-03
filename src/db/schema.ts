@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  index,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -56,6 +57,13 @@ export const users = pgTable("user", {
   profileColor: text("profileColor"),
   profileFrame: text("profileFrame"),
   statusText: text("statusText"),
+
+  /**
+   * Orden de las secciones del perfil público (wrap, stats, nivel, logros,
+   * colecciones, vitrina, favoritos, biblioteca). `null` = orden por
+   * defecto (`DEFAULT_SECTION_ORDER` en lib/profileSections.ts).
+   */
+  profileSectionOrder: jsonb("profileSectionOrder").$type<string[]>(),
 
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
@@ -194,13 +202,16 @@ export const games = pgTable("game", {
   defined: jsonb("defined").$type<Record<string, number>>(),
 
   /* Metadatos de catálogo, para agrupar y filtrar por empresa o género. */
+  igdbId: integer("igdbId"),
   developer: text("developer"),
   publisher: text("publisher"),
   genres: jsonb("genres").$type<string[]>(),
   pegi: text("pegi"),
   /** Null mientras no hayamos pedido los metadatos a la tienda. */
   metadataSyncedAt: timestamp("metadataSyncedAt", { mode: "date" }),
-});
+}, (g) => [
+  index("game_igdb_idx").on(g.igdbId),
+]);
 
 /** Definición de cada logro. También compartida entre usuarios. */
 export const gameTrophies = pgTable(

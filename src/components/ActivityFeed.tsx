@@ -90,7 +90,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                 <div className="mt-3 flex items-center gap-3">
                   <form action={toggleActivityReactionAction}>
                     <input type="hidden" name="activityId" value={activity.id} />
-                    <button className={`text-xs font-semibold ${activity.reacted ? "text-accent" : "text-muted hover:text-foreground"}`}>
+                    <button className={`text-xs font-semibold transition-opacity hover:opacity-75 ${activity.reacted ? "text-accent" : "text-muted hover:text-foreground"}`}>
                       {activity.reacted ? "Aplaudido" : "Aplaudir"} · {activity.reactions}
                     </button>
                   </form>

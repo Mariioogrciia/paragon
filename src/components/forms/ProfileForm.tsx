@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEditor";
+import { BADGE_DEFINITIONS } from "@/components/Badges";
+import { FRAME_REQUISITOS } from "@/lib/level";
+import { AvatarFrame } from "@/components/AvatarFrame";
+import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
+import { bannerPresetKey } from "@/lib/bannerPresets";
 
 interface ProfileFormUser {
   id: string;
@@ -20,16 +26,54 @@ interface ProfileFormUser {
   profileColor?: string | null;
   profileFrame?: string | null;
   statusText?: string | null;
+  theme?: string | null;
+  profileSectionOrder?: string[] | null;
 }
 
-export function ProfileForm({ user }: { user: ProfileFormUser }) {
+const FRAMES = [
+  { value: "", label: "Sin marco" },
+  { value: "neon", label: "Marco Neón (Nivel 5+)" },
+  { value: "gold", label: "Marco Dorado (Nivel 10+)" },
+  { value: "circuito", label: "Marco Circuito (Nivel 25+)" },
+  { value: "platinum", label: "Marco Platino (Nivel 50+)" },
+  { value: "fire", label: "Marco Fuego (Nivel 100+)" },
+  { value: "cristal", label: "Marco Cristal (Nivel 150+)" },
+];
+
+const TEMAS_PERFIL = [
+  { value: "dark", label: "Oscuro" },
+  { value: "light", label: "Claro" },
+  { value: "oled", label: "OLED" },
+  { value: "high-contrast", label: "Contraste alto" },
+];
+
+export function ProfileForm({
+  user,
+  nivel = 0,
+  badges = [],
+}: {
+  user: ProfileFormUser;
+  /** Nivel Paragon real del usuario — decide qué marcos puede elegir de
+   * verdad (el servidor también lo comprueba en /api/profile/update, esto
+   * es solo para no ofrecer algo que luego se va a descartar). */
+  nivel?: number;
+  /** Insignias ya ganadas, para sugerir títulos coherentes con ellas. */
+  badges?: string[];
+}) {
+  const [titulo, setTitulo] = useState(user.profileTitle ?? "");
+  const marcoBloqueado = (v: string) => FRAME_REQUISITOS[v] !== undefined && nivel < FRAME_REQUISITOS[v];
+  const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
+  const titulosSugeridos = badges
+    .map((id) => BADGE_DEFINITIONS[id]?.name)
+    .filter((n): n is string => Boolean(n));
+
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [avatar, setAvatar] = useState(user.image);
-  
+
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [banner, setBanner] = useState(user.profileBannerUrl);
-  
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -37,6 +81,7 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("kind", "avatar");
 
     const res = await fetch("/api/upload", {
       method: "POST",
@@ -58,6 +103,7 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
     setIsUploadingBanner(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("kind", "banner");
 
     const res = await fetch("/api/upload", {
       method: "POST",
@@ -103,8 +149,14 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
         <h2 className="font-semibold mb-4">Banner del perfil</h2>
         <div className="flex flex-col gap-4">
           <div className="h-32 w-full shrink-0 overflow-hidden rounded-xl bg-surface-2 border border-white/10 flex items-center justify-center">
-            {banner ? (
-              <img src={banner} alt="Banner" className="h-full w-full object-cover" />
+            {bannerPresetKey(banner) ? (
+              <PlatformBanner preset={bannerPresetKey(banner)!} className="h-full w-full" />
+            ) : banner ? (
+              /\.(mp4|webm)$/i.test(banner) ? (
+                <video src={banner} className="h-full w-full object-cover" autoPlay muted loop playsInline />
+              ) : (
+                <img src={banner} alt="Banner" className="h-full w-full object-cover" />
+              )
             ) : (
               <span className="text-muted text-sm">Sin banner personalizado</span>
             )}
@@ -112,9 +164,9 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
           <div>
             <label className="inline-block cursor-pointer rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-medium text-white hover:bg-[#4752C4] transition-colors">
               {isUploadingBanner ? "Subiendo..." : "Subir Banner"}
-              <input type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} disabled={isUploadingBanner} />
+              <input type="file" accept="image/*,video/mp4,video/webm" className="hidden" onChange={handleBannerUpload} disabled={isUploadingBanner} />
             </label>
-            <p className="mt-2 text-xs text-muted">Sustituye al fondo de juego. Formatos JPG, JPEG, PNG y GIF animados, ratio ideal 3:1</p>
+            <p className="mt-2 text-xs text-muted">Sustituye al fondo de juego. Imagen (JPG, PNG, GIF) o vídeo corto (MP4, WebM), ratio ideal 3:1</p>
           </div>
         </div>
       </section>
@@ -142,7 +194,29 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Título del perfil</label>
-              <input name="profileTitle" maxLength={60} defaultValue={user.profileTitle ?? ""} placeholder="Ej. Cazador de platinos" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input
+                name="profileTitle"
+                maxLength={60}
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                placeholder="Ej. Cazador de platinos"
+                className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none"
+              />
+              {titulosSugeridos.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {titulosSugeridos.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTitulo(t)}
+                      className="rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors hover:text-foreground"
+                      style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Juego para el fondo</label>
@@ -166,18 +240,47 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Marco del avatar</label>
-              <CustomSelect
-                name="profileFrame"
-                defaultValue={user.profileFrame ?? ""}
-                options={[
-                  { value: "", label: "Sin marco" },
-                  { value: "gold", label: "Marco Dorado (Nivel 10+)" },
-                  { value: "platinum", label: "Marco Platino (Nivel 50+)" },
-                  { value: "fire", label: "Marco Fuego (Nivel 100+)" },
-                ]}
-              />
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Tema del perfil</label>
+              <CustomSelect name="theme" defaultValue={user.theme ?? "dark"} options={TEMAS_PERFIL} />
+              <p className="mt-1.5 text-xs text-muted">Cómo se ve tu perfil para quien lo visite — no cambia el suyo propio.</p>
             </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Marco del avatar</label>
+              <div className="flex items-center gap-3">
+                <AvatarFrame frame={marco}>
+                  {avatar ? (
+                    <img src={avatar} alt="" className="h-11 w-11 object-cover" />
+                  ) : (
+                    <div
+                      className="flex h-11 w-11 items-center justify-center text-sm font-bold text-white"
+                      style={{ background: "var(--accent-grad)" }}
+                    >
+                      {user.name?.charAt(0).toUpperCase() || "?"}
+                    </div>
+                  )}
+                </AvatarFrame>
+                <div className="min-w-0 flex-1">
+                  <CustomSelect
+                    name="profileFrame"
+                    value={marco}
+                    onChange={setMarco}
+                    options={FRAMES.map((f) => (marcoBloqueado(f.value) ? { value: f.value, label: `🔒 ${f.label}` } : f))}
+                  />
+                </div>
+              </div>
+              <p className="mt-1.5 text-xs text-muted">Estás a nivel {nivel}. Los marcos bloqueados se descartan aunque los elijas.</p>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Banner por plataforma</label>
+            <BannerPresetPicker value={banner} onChange={setBanner} />
+            <p className="mt-1.5 text-xs text-muted">Arte propio de Paragon, sin fotos con derechos de por medio. Sustituye a lo que subas arriba; volver a subir un archivo lo reemplaza.</p>
+          </div>
+
+          <div className="mt-6">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Orden de secciones</label>
+            <ProfileSectionOrderEditor initialOrder={user.profileSectionOrder} />
           </div>
         </section>
 
@@ -217,3 +320,4 @@ export function ProfileForm({ user }: { user: ProfileFormUser }) {
     </div>
   );
 }
+

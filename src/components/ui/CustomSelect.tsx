@@ -99,7 +99,7 @@ export function CustomSelect({
           >
             <ul className="py-1">
               {options.map((option) => {
-                const isSelected = option.value === internalValue;
+                const isSelected = option.value === actualValue;
                 return (
                   <li
                     key={option.value}

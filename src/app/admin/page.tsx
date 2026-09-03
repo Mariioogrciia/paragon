@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getProfileByUserId } from "@/lib/profiles";
-import { getAdminOverview, getAdminUsers, getRecentSyncRuns } from "@/lib/admin";
+import { getAdminOverview, getAdminUsers, getRecentSyncRuns, getAdminActivities } from "@/lib/admin";
 import { PLATFORM_LABEL, type AccountPlatform } from "@/lib/types";
 import { relativeDate } from "@/lib/design";
+import { deleteActivityAction } from "@/app/actions";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -32,10 +33,11 @@ export default async function AdminPage() {
   const profile = await getProfileByUserId(session.user.id);
   if (!profile?.esDesarrollador) redirect("/");
 
-  const [overview, syncRuns, usuarios] = await Promise.all([
+  const [overview, syncRuns, usuarios, activities] = await Promise.all([
     getAdminOverview(),
     getRecentSyncRuns(30),
     getAdminUsers(),
+    getAdminActivities(50),
   ]);
 
   return (
@@ -137,6 +139,65 @@ export default async function AdminPage() {
                   <td className="px-4 py-2.5 text-muted">{relativeDate(u.createdAt) ?? "—"}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Moderación (Feed Global)</h2>
+        <div className="overflow-x-auto rounded-[14px]" style={CARD}>
+          <table className="w-full min-w-[700px] text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-[11px] font-bold uppercase tracking-[0.06em] text-muted">
+                <th className="px-4 py-3">Autor</th>
+                <th className="px-4 py-3">Juego</th>
+                <th className="px-4 py-3">Contenido</th>
+                <th className="px-4 py-3 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activities.map((a) => (
+                <tr key={a.id} className="border-b border-border last:border-0">
+                  <td className="px-4 py-2.5 font-semibold">
+                    <div className="flex flex-col">
+                      <span>{a.userName}</span>
+                      <span className="text-xs text-muted">@{a.userHandle ?? "?"}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-2.5 text-muted max-w-[200px] truncate" title={a.gameTitle ?? ""}>
+                    {a.gameTitle ?? "—"}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    {a.rating && (
+                      <div className="flex gap-0.5 text-yellow-500 mb-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < a.rating! ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                          </svg>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-sm break-words max-w-[350px]">
+                      {a.review ? `"${a.review}"` : <span className="italic text-muted">Sin texto</span>}
+                    </p>
+                    <p className="text-xs text-muted mt-1">{relativeDate(a.createdAt)}</p>
+                  </td>
+                  <td className="px-4 py-2.5 text-right">
+                    <form action={deleteActivityAction}>
+                      <input type="hidden" name="activityId" value={a.id} />
+                      <button className="rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white">
+                        Eliminar
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+              {activities.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-muted">No hay actividades recientes para moderar.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

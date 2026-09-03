@@ -442,6 +442,34 @@ export async function addActivityCommentAction(formData: FormData): Promise<void
   revalidatePath("/", "layout");
 }
 
+export async function deleteActivityAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const profile = await getProfileByUserId(userId);
+  if (!profile?.esDesarrollador) return;
+
+  const activityId = String(formData.get("activityId") ?? "");
+  if (!activityId) return;
+
+  // We find the activity to also nullify the review on user_game if necessary
+  const database = getDb();
+  const [activity] = await database
+    .select({ gameId: activities.gameId, userId: activities.userId, type: activities.type })
+    .from(activities)
+    .where(eq(activities.id, activityId))
+    .limit(1);
+
+  if (!activity) return;
+
+  await database.delete(activities).where(eq(activities.id, activityId));
+
+  // If this was a review/rating, we should also delete the text from user_games
+  if (activity.type === "review") {
+    await database.update(userGames).set({ review: null }).where(and(eq(userGames.userId, activity.userId), eq(userGames.gameId, activity.gameId!)));
+  }
+
+  revalidatePath("/", "layout");
+}
+
 /* ---------------------------------- Juegos manuales --------------------------------- */
 
 export interface AddManualGameInput {

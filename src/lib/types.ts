@@ -20,7 +20,14 @@ export type AccountPlatform = Exclude<Platform, "manual">;
 
 export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google", "xbox", "epic", "ubisoft"];
 
-export const PLATFORM_LABEL: Record<Platform, string> = {
+/**
+ * "unified" no es una plataforma real: es cómo se marca la ficha global de un
+ * juego (`/juego/[id]`, ver GlobalGame en lib/community.ts) cuando el mismo
+ * igdbId aparece en más de una plataforma a la vez (p. ej. PSN y Steam). Vive
+ * aquí, junto a `Platform`, para que una sola tabla sirva tanto a `Game.platform`
+ * (siempre `Platform`) como a `GlobalGame.platform` (`Platform | "unified"`).
+ */
+export const PLATFORM_LABEL: Record<Platform | "unified", string> = {
   psn: "PlayStation",
   steam: "Steam",
   google: "Google Play",
@@ -28,6 +35,7 @@ export const PLATFORM_LABEL: Record<Platform, string> = {
   epic: "Epic Games",
   ubisoft: "Ubisoft Connect",
   manual: "Añadido a mano",
+  unified: "Multiplataforma",
 };
 
 /** Cómo llama cada plataforma a sus logros, para no decir "trofeo" en Steam. */
@@ -144,6 +152,10 @@ export interface Game {
    * cuyo detalle se ha sincronizado.
    */
   platinumRarity?: number;
+  /** Id del catálogo de IGDB, si esta fila ya se emparejó con uno. Es lo que
+   * permite agrupar el mismo lanzamiento entre plataformas (ver GlobalGame en
+   * lib/community.ts) y filtrar recomendaciones de lo que ya se tiene. */
+  igdbId?: number | null;
 }
 
 export interface GameDetail extends Game {

@@ -62,7 +62,7 @@ export function NuevaGuiaForm({ gameId }: { gameId: string }) {
             });
           }}
           disabled={pending}
-          className="rounded-lg px-4 py-2 text-sm font-bold text-background disabled:opacity-50"
+          className="rounded-lg px-4 py-2 text-sm font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)] disabled:pointer-events-none disabled:opacity-50"
           style={{ background: "var(--accent-grad)" }}
         >
           {pending ? "Publicando…" : "Publicar guía"}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CommunityRating } from "@/components/CommunityRating";
@@ -32,31 +32,37 @@ export default async function JuegoGlobalPage({
   const game = await getGlobalGame(gameId);
   if (!game) notFound();
 
+  // Si hemos accedido con un ID legado (psn-...) pero tiene igdbId, redirigimos a la versión canónica unificada.
+  if (!/^\d+$/.test(gameId) && game.igdbId) {
+    redirect(`/juego/${game.igdbId}`);
+  }
+
   const [stats, rating, dificultadComunidad, reviews, session, precios] = await Promise.all([
     getGlobalGameStats(gameId),
     getCommunityRating(gameId),
     getDificultadComunidad(gameId),
     getGameReviews(gameId),
     auth(),
-    // Solo Steam: el appid es literalmente lo que sigue a "steam-" en el id
-    // (ver gameKey en lib/types), y es lo único con lo que se puede cruzar
-    // precios de varias tiendas — no hay una fuente pública equivalente
-    // para PSN.
-    game.platform === "steam" ? comparativaPreciosSteam(game.id.replace(/^steam-/, "")) : Promise.resolve(null),
+    // Buscamos ofertas si sabemos el ID de Steam
+    game.steamId ? comparativaPreciosSteam(game.steamId) : Promise.resolve(null),
   ]);
 
   let miFicha: string | null = null;
-  let tieneJuego = false;
+  // El id específico (p. ej. "steam-123") que posee el usuario, no el id de
+  // la URL: en una ficha unificada por igdbId, `gameId` puede ser el
+  // numérico y la biblioteca (`/u/[handle]/[gameId]`) espera el namespaced.
+  let miGameId: string | null = null;
   let miVotoDificultad: number | null = null;
   if (session?.user?.id) {
     let profile;
-    [profile, tieneJuego, miVotoDificultad] = await Promise.all([
+    [profile, miGameId, miVotoDificultad] = await Promise.all([
       getProfileByUserId(session.user.id),
       ownsGame(session.user.id, gameId),
       getMiVoto(session.user.id, gameId),
     ]);
-    if (profile?.handle && tieneJuego) miFicha = `/u/${profile.handle}/${gameId}`;
+    if (profile?.handle && miGameId) miFicha = `/u/${profile.handle}/${miGameId}`;
   }
+  const tieneJuego = miGameId !== null;
 
   return (
     <div className="-mx-7 -mt-9">

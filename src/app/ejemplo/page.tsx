@@ -51,7 +51,7 @@ export default function EjemploPage() {
             </span>
             <Link
               href="/entrar"
-              className="ml-auto rounded-[10px] px-4 py-2 text-[13px] font-bold text-background"
+              className="ml-auto rounded-[10px] px-4 py-2 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
               style={{ background: "var(--accent-grad)" }}
             >
               Crear el mío
@@ -134,7 +134,7 @@ export default function EjemploPage() {
           </p>
           <Link
             href="/entrar"
-            className="mt-5 inline-block rounded-xl px-6 py-3.5 text-[15px] font-bold text-background"
+            className="mt-5 inline-block rounded-xl px-6 py-3.5 text-[15px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
             style={{ background: "var(--accent-grad)" }}
           >
             Empezar la caza
