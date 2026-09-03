@@ -491,3 +491,43 @@ export const gameDifficultyVotes = pgTable(
   },
   (v) => [primaryKey({ columns: [v.userId, v.gameId] })],
 );
+
+/* ------------------------------------------------------------------ *
+ * Guías escritas, como un foro                                       *
+ *                                                                    *
+ * El vídeo de youtube (TrophyGuideModal) es de un trofeo suelto y no *
+ * lo escribe nadie de aquí — lo busca la propia app. Esto es lo      *
+ * contrario: alguien de la comunidad escribe una guía del JUEGO      *
+ * entero (rutas, orden recomendado, qué evitar) y el resto puede     *
+ * responder, como un hilo de foro. Dos tablas porque un hilo son dos *
+ * cosas — el primer mensaje y sus respuestas — no una lista plana.   *
+ * ------------------------------------------------------------------ */
+
+export const gameGuides = pgTable("game_guide", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  gameId: text("gameId")
+    .notNull()
+    .references(() => games.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const gameGuideReplies = pgTable("game_guide_reply", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  guideId: text("guideId")
+    .notNull()
+    .references(() => gameGuides.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});

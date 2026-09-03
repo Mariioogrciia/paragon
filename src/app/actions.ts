@@ -36,6 +36,7 @@ import {
   SteamProfileNotFoundError,
 } from "@/lib/steam/client";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
+import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
 import { marcarTodoLeido } from "@/lib/notifications";
 import { ownsGame } from "@/lib/community";
 import { votarDificultad } from "@/lib/communityDifficulty";
@@ -649,4 +650,37 @@ export async function pinTrophyAction(gameId: string, trophyId: string) {
 
   revalidatePath("/", "layout");
   return { success: true };
+}
+
+/* --------------------------------- Guías escritas --------------------------------- */
+
+export async function createGuideAction(gameId: string, title: string, body: string): Promise<{ error?: string; id?: string }> {
+  const userId = await requireUserId();
+
+  const tituloLimpio = title.trim();
+  const textoLimpio = body.trim();
+  if (!tituloLimpio || !textoLimpio) {
+    return { error: "Ponle un título y algo de texto." };
+  }
+
+  const id = await createGuide(userId, gameId, tituloLimpio, textoLimpio);
+  revalidatePath(`/juego/${gameId}/guias`);
+  return { id };
+}
+
+export async function replyToGuideAction(guideId: string, gameId: string, body: string): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+
+  const textoLimpio = body.trim();
+  if (!textoLimpio) return { error: "Escribe algo antes de responder." };
+
+  await replyToGuide(userId, guideId, textoLimpio);
+  revalidatePath(`/juego/${gameId}/guias/${guideId}`);
+  return {};
+}
+
+export async function deleteGuideAction(guideId: string, gameId: string): Promise<void> {
+  const userId = await requireUserId();
+  await deleteGuide(userId, guideId);
+  revalidatePath(`/juego/${gameId}/guias`);
 }

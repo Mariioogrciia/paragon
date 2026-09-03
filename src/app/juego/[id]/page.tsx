@@ -164,6 +164,12 @@ export default async function JuegoGlobalPage({
                 ? "Ninguna todavía"
                 : `${reviews.length} ${reviews.length === 1 ? "reseña" : "reseñas"}`}
             </span>
+            <Link
+              href={`/juego/${encodeURIComponent(game.id)}/guias`}
+              className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+            >
+              Guías escritas →
+            </Link>
           </div>
 
           {reviews.length === 0 ? (
