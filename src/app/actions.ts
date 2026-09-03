@@ -343,22 +343,36 @@ export async function signOutAction(): Promise<void> {
 export async function rateGameAction(gameId: string, rating: number) {
   const userId = await requireUserId();
   const db = getDb();
-  
+
   await db
     .update(userGames)
     .set({ rating })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
-  const activityId = crypto.randomUUID();
-  await db
-    .insert(activities)
-    .values({
-      id: activityId,
+  // Actualiza la actividad de valoración si ya había una para este juego, en
+  // vez de insertar otra: `RatingStars` guarda en cada click, así que sin
+  // esto, cambiar de opinión de 2 a 5 estrellas dejaba 4 entradas seguidas
+  // en el feed de actividad diciendo lo mismo con números distintos.
+  const [existente] = await db
+    .select({ id: activities.id })
+    .from(activities)
+    .where(and(eq(activities.userId, userId), eq(activities.gameId, gameId), eq(activities.type, "rating")))
+    .limit(1);
+
+  if (existente) {
+    await db
+      .update(activities)
+      .set({ rating, createdAt: new Date() })
+      .where(eq(activities.id, existente.id));
+  } else {
+    await db.insert(activities).values({
+      id: crypto.randomUUID(),
       userId,
       type: "rating",
       gameId,
       rating,
     });
+  }
 
   revalidatePath('/', 'layout');
 }
@@ -584,18 +598,29 @@ export async function submitExpressReviewAction(gameId: string, rating: number, 
     .set({ rating, review, reviewDate: new Date() })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
-  // Guardar en el feed de actividad
-  const id = crypto.randomUUID();
-  await db
-    .insert(activities)
-    .values({
-      id,
+  // Igual que en rateGameAction: si editas tu reseña, se actualiza la
+  // actividad que ya había en vez de amontonar una nueva.
+  const [existente] = await db
+    .select({ id: activities.id })
+    .from(activities)
+    .where(and(eq(activities.userId, userId), eq(activities.gameId, gameId), eq(activities.type, "review")))
+    .limit(1);
+
+  if (existente) {
+    await db
+      .update(activities)
+      .set({ rating, review, createdAt: new Date() })
+      .where(eq(activities.id, existente.id));
+  } else {
+    await db.insert(activities).values({
+      id: crypto.randomUUID(),
       userId,
       type: "review",
       gameId,
       rating,
       review,
     });
+  }
 
   revalidatePath("/", "layout");
 }
