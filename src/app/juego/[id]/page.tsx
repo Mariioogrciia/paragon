@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CommunityRating } from "@/components/CommunityRating";
+import { CommunityDifficulty } from "@/components/CommunityDifficulty";
 import { StatTile } from "@/components/StatTile";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame } from "@/lib/community";
 import { getCommunityRating } from "@/lib/ratings";
+import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";
 import { getProfileByUserId } from "@/lib/profiles";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
@@ -28,18 +30,23 @@ export default async function JuegoGlobalPage({
   const game = await getGlobalGame(gameId);
   if (!game) notFound();
 
-  const [stats, rating, reviews, session] = await Promise.all([
+  const [stats, rating, dificultadComunidad, reviews, session] = await Promise.all([
     getGlobalGameStats(gameId),
     getCommunityRating(gameId),
+    getDificultadComunidad(gameId),
     getGameReviews(gameId),
     auth(),
   ]);
 
   let miFicha: string | null = null;
+  let tieneJuego = false;
+  let miVotoDificultad: number | null = null;
   if (session?.user?.id) {
-    const [profile, tieneJuego] = await Promise.all([
+    let profile;
+    [profile, tieneJuego, miVotoDificultad] = await Promise.all([
       getProfileByUserId(session.user.id),
       ownsGame(session.user.id, gameId),
+      getMiVoto(session.user.id, gameId),
     ]);
     if (profile?.handle && tieneJuego) miFicha = `/u/${profile.handle}/${gameId}`;
   }
@@ -100,8 +107,15 @@ export default async function JuegoGlobalPage({
                 </div>
               )}
 
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col gap-3">
                 <CommunityRating rating={rating} />
+                <CommunityDifficulty
+                  gameId={game.id}
+                  media={dificultadComunidad?.media ?? null}
+                  votos={dificultadComunidad?.votos ?? 0}
+                  miVoto={miVotoDificultad}
+                  puedeVotar={tieneJuego}
+                />
               </div>
             </div>
 

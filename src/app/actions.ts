@@ -37,6 +37,8 @@ import {
 } from "@/lib/steam/client";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
 import { marcarTodoLeido } from "@/lib/notifications";
+import { ownsGame } from "@/lib/community";
+import { votarDificultad } from "@/lib/communityDifficulty";
 import type { AccountPlatform } from "@/lib/types";
 
 export interface ActionState {
@@ -384,6 +386,22 @@ export async function writeReviewAction(gameId: string, review: string, dateStr:
     });
 
   revalidatePath('/', 'layout');
+}
+
+/**
+ * Vota lo dura que le pareció a alguien la campaña de un juego (1-5).
+ *
+ * Solo quien lo tiene en su biblioteca puede votar — igual que las reseñas,
+ * que solo tienen efecto sobre la fila de `user_game` del propio dueño. Sin
+ * este chequeo cualquiera podría opinar de un juego que no ha tocado.
+ */
+export async function voteDifficultyAction(gameId: string, value: number): Promise<void> {
+  const userId = await requireUserId();
+
+  if (!(await ownsGame(userId, gameId))) return;
+
+  await votarDificultad(userId, gameId, value);
+  revalidatePath(`/juego/${gameId}`);
 }
 
 export async function toggleActivityReactionAction(formData: FormData): Promise<void> {

@@ -46,6 +46,10 @@ export const users = pgTable("user", {
   
   /** Lista de 4 IDs de juegos favoritos para mostrar en el perfil */
   favorites: jsonb("favorites").$type<string[]>().default([]),
+  
+  /** Lista de hasta 3 trofeos fijados para la Vitrina de Orgullo */
+  showcaseTrophies: jsonb("showcaseTrophies").$type<{ gameId: string, trophyId: string }[]>().default([]),
+  
   profileTitle: text("profileTitle"),
   profileBackgroundGameId: text("profileBackgroundGameId"),
 
@@ -446,4 +450,33 @@ export const notifications = pgTable(
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   },
   (n) => [uniqueIndex("notification_dedupe_idx").on(n.userId, n.dedupeKey)],
+);
+
+/* ------------------------------------------------------------------ *
+ * Dificultad votada por la comunidad                                 *
+ *                                                                    *
+ * La dificultad "estimada" (lib/difficulty.ts) sale de la rareza del *
+ * platino, que mezcla tres cosas — lo difícil que es, lo largo que   *
+ * es y cuánta gente lo abandona a la media hora. Un juego puede ser  *
+ * raro por ser un exclusivo poco vendido, no por ser duro. Esto es   *
+ * la segunda señal, la que da la gente que se lo ha pasado: cuánto   *
+ * les costó de verdad, del 1 al 5. Tabla aparte y no una columna más *
+ * en `user_game` porque es un eje distinto de la nota de la reseña   *
+ * (`rating`, que puntúa si el juego es BUENO, no si es DURO).        *
+ * ------------------------------------------------------------------ */
+
+export const gameDifficultyVotes = pgTable(
+  "game_difficulty_vote",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    /** 1 (regalado) a 5 (brutal), misma dirección que lib/difficulty.ts. */
+    value: integer("value").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (v) => [primaryKey({ columns: [v.userId, v.gameId] })],
 );
