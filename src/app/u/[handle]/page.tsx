@@ -5,7 +5,6 @@ import { Avatar } from "@/components/Avatar";
 import { LibraryGrid } from "@/components/LibraryGrid";
 import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
-import { UpcomingGames } from "@/components/UpcomingGames";
 import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle, getUserBadges } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
@@ -15,7 +14,6 @@ import { coverGradient } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
 import { juegosDelAnio, resumenHistorico } from "@/lib/history";
 import { Badges } from "@/components/Badges";
-import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { Pegi } from "@/components/Pegi";
 import { ParagonLevelCard } from "@/components/ParagonLevelCard";
 import { ParagonAchievements } from "@/components/ParagonAchievements";
@@ -64,11 +62,6 @@ export default async function PerfilPage({
   const resumen = await resumenHistorico(profile.userId);
   const juegosEsteAnio = await juegosDelAnio(profile.userId);
   const badges = await getUserBadges(profile.userId);
-  
-  let wishlistIds: number[] = [];
-  if (session?.user?.id) {
-    wishlistIds = await getWishlistIgdbIds(session.user.id);
-  }
 
   const backgroundGame = games.find((game) => game.id === profile.profileBackgroundGameId) ?? (games.length > 0 ? games[0] : null);
   const backgroundImage = backgroundGame?.iconUrl;
@@ -118,10 +111,18 @@ export default async function PerfilPage({
             {badges.length > 0 && <Badges earnedBadges={badges} />}
           </div>
 
+          <Link
+            href={`/u/${handle}/cv`}
+            className={`${esMio ? "ml-auto" : ""} rounded-[10px] px-4 py-2.5 text-[13px] font-bold`}
+            style={{ border: "1px solid var(--border)", color: "var(--foreground)" }}
+          >
+            Hoja de servicios
+          </Link>
+
           {!esMio && (
             <Link
               href={`/comparar/${handle}`}
-              className="ml-auto rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background"
+              className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background"
               style={{ background: "var(--accent-grad)" }}
             >
               Comparar conmigo
@@ -191,11 +192,6 @@ export default async function PerfilPage({
         )}
 
         <TrophyCountRow counts={stats.counts} />
-
-        {/* Antes esto iba debajo de la biblioteca, y la biblioteca son cientos
-            de juegos con carga progresiva: había que llegar al fondo del todo
-            para ver los lanzamientos. Va delante justamente por eso. */}
-        <UpcomingGames wishlistedIgdbIds={wishlistIds} />
 
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-3.5">

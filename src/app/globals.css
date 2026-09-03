@@ -246,3 +246,20 @@ h3,
   animation: holo-shimmer 1.5s linear infinite;
   filter: drop-shadow(0 0 8px rgba(127,188,216,0.5));
 }
+
+/**
+ * Impresión / "Guardar como PDF" del navegador.
+ *
+ * La cabecera fija y el pie son navegación, no contenido — en una impresión
+ * o un PDF no llevan a ningún sitio y solo restan página útil. Aplica a todo
+ * el sitio a propósito (nadie quiere la barra de navegación en un PDF de
+ * ninguna página), y es lo que usa /u/[handle]/cv para su botón "Descargar
+ * como PDF" sin necesitar un layout aparte para esa ruta.
+ */
+@media print {
+  header,
+  footer,
+  [data-no-print] {
+    display: none !important;
+  }
+}
