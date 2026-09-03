@@ -16,8 +16,14 @@ import { TrophyIcon } from "./TrophyIcon";
 const TARJETA =
   "relative overflow-hidden rounded-2xl p-6 shadow-lg transition-transform hover:scale-[1.02]";
 
-/** El juego más "exprimido": por horas si las hay, y si no, por trofeos. */
-function juegoDestacado(games: Game[]): Game | undefined {
+/**
+ * El juego más "exprimido": por horas si las hay, y si no, por trofeos.
+ *
+ * Exportada porque la reutiliza `/api/wrap/[handle]`, que genera la misma
+ * tarjeta como imagen compartible: si la lógica se duplicara ahí, un cambio
+ * aquí dejaría a la imagen contando otra historia que la pantalla.
+ */
+export function juegoDestacado(games: Game[]): Game | undefined {
   if (games.length === 0) return undefined;
 
   // Si hay horas de alguna plataforma, se compara por horas entre esos juegos;
@@ -33,7 +39,7 @@ function juegoDestacado(games: Game[]): Game | undefined {
   return games.reduce((a, b) => (b.earnedTotal > a.earnedTotal ? b : a));
 }
 
-function generoTop(games: Game[]): { name: string; count: number } {
+export function generoTop(games: Game[]): { name: string; count: number } {
   const cuenta = new Map<string, number>();
 
   for (const g of games) {
@@ -54,12 +60,19 @@ export function ParagonWrap({
   games,
   esteAnio,
   juegosEsteAnio,
+  handle,
 }: {
   games: Game[];
   /** Trofeos conseguidos este año (solo los que tienen fecha registrada). */
   esteAnio: number;
   /** Juegos distintos tocados este año. NO es el tamaño de la biblioteca. */
   juegosEsteAnio: number;
+  /**
+   * El handle del perfil, para el botón de compartir. Opcional porque el
+   * perfil de ejemplo (`/ejemplo`) no tiene una imagen que generar — ahí no
+   * hay datos reales que enseñar en una imagen para compartir.
+   */
+  handle?: string;
 }) {
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
@@ -70,9 +83,18 @@ export function ParagonWrap({
         <h2 className="font-heading text-[26px] font-bold uppercase tracking-wide flex items-center gap-2">
           <span className="text-xl">✨</span> Paragon Wrap
         </h2>
+        {handle && (
+          <a
+            href={`/api/wrap/${handle}`}
+            download={`paragon-wrap-${handle}.png`}
+            className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+          >
+            Compartir imagen
+          </a>
+        )}
         <Link
           href="/ritmo"
-          className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+          className={handle ? "text-xs font-bold uppercase tracking-wide text-accent hover:underline" : "ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"}
         >
           Ver mes a mes
         </Link>

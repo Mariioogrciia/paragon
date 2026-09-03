@@ -136,6 +136,7 @@ export default async function PerfilPage({
             games={games}
             esteAnio={resumen.esteAnio}
             juegosEsteAnio={juegosEsteAnio}
+            handle={handle}
           />
         )}
 
