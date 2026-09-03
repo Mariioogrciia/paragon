@@ -428,7 +428,14 @@ export const notifications = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     type: text("type")
-      .$type<"platino_cerca" | "lanzamiento" | "amigo_adelanta">()
+      .$type<
+        | "platino_cerca"
+        | "lanzamiento"
+        | "amigo_adelanta"
+        | "logros_nuevos"
+        | "abandonado"
+        | "resumen_semanal"
+      >()
       .notNull(),
     title: text("title").notNull(),
     body: text("body"),

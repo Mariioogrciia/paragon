@@ -11,6 +11,9 @@ const ICONO: Record<string, string> = {
   platino_cerca: "🏆",
   lanzamiento: "🚀",
   amigo_adelanta: "⚡",
+  logros_nuevos: "🧩",
+  abandonado: "🕸️",
+  resumen_semanal: "🗓️",
 };
 
 /**

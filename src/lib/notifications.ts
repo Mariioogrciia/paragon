@@ -3,6 +3,7 @@ import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import { listFriends } from "@/lib/profiles";
+import { relativeDate } from "@/lib/design";
 import {
   games,
   gameTrophies,
@@ -24,7 +25,13 @@ import {
  * cada hora, para siempre.
  */
 
-export type TipoAviso = "platino_cerca" | "lanzamiento" | "amigo_adelanta";
+export type TipoAviso =
+  | "platino_cerca"
+  | "lanzamiento"
+  | "amigo_adelanta"
+  | "logros_nuevos"
+  | "abandonado"
+  | "resumen_semanal";
 
 export interface Aviso {
   id: string;
@@ -179,6 +186,161 @@ async function avisosDePlatino(userId: string, handle: string | null): Promise<N
 }
 
 /**
+ * Un juego que ya platinaste ha ganado trofeos base nuevos.
+ *
+ * Pasa cuando un parche o un DLC añade logros a un juego que dabas por
+ * cerrado: la barra se queda como estaba, así que sin esto no hay forma de
+ * enterarse salvo tropezando con ello. Solo mira el grupo "default": si lo
+ * nuevo es una expansión con grupo propio, ya avisa de eso el juego en sí al
+ * mostrar "Trofeos de DLC pendientes" en su ficha.
+ */
+async function avisosDeLogrosNuevos(userId: string, handle: string | null): Promise<NuevoAviso[]> {
+  const filas = await db
+    .select({
+      gameId: games.id,
+      titulo: games.title,
+      dispositivo: games.deviceLabel,
+      definedTotal: games.definedTotal,
+      faltan: sql<number>`count(*) filter (
+        where ${userTrophies.earned} is not true and ${gameTrophies.grade} <> 'platinum'
+      )`,
+    })
+    .from(gameTrophies)
+    .innerJoin(games, eq(games.id, gameTrophies.gameId))
+    .innerJoin(
+      userGames,
+      and(eq(userGames.gameId, games.id), eq(userGames.userId, userId)),
+    )
+    .leftJoin(
+      userTrophies,
+      and(
+        eq(userTrophies.gameId, gameTrophies.gameId),
+        eq(userTrophies.trophyId, gameTrophies.trophyId),
+        eq(userTrophies.userId, userId),
+      ),
+    )
+    .where(eq(gameTrophies.groupId, "default"))
+    .groupBy(games.id, games.title, games.deviceLabel, games.definedTotal)
+    .having(
+      sql`bool_or(${gameTrophies.grade} = 'platinum' and ${userTrophies.earned} is true)
+          and count(*) filter (
+            where ${userTrophies.earned} is not true and ${gameTrophies.grade} <> 'platinum'
+          ) > 0`,
+    );
+
+  return filas.map((f) => {
+    const faltan = Number(f.faltan);
+    const nombre = `${f.titulo} (${f.dispositivo})`;
+
+    return {
+      userId,
+      type: "logros_nuevos" as const,
+      title: `${nombre} tiene trofeos nuevos`,
+      body:
+        faltan === 1
+          ? "Ya lo platinaste, pero un parche o DLC ha añadido 1 trofeo nuevo al juego base."
+          : `Ya lo platinaste, pero un parche o DLC ha añadido ${faltan} trofeos nuevos al juego base.`,
+      href: handle ? `/u/${handle}/${f.gameId}` : undefined,
+      gameId: f.gameId,
+      // El total definido entra en la clave: si vuelve a crecer más adelante
+      // (otro parche), es noticia otra vez.
+      dedupeKey: `logros_nuevos:${f.gameId}:${f.definedTotal}`,
+    };
+  });
+}
+
+/**
+ * Juegos empezados y parados hace tiempo.
+ *
+ * El filtro de "abandonados" en la biblioteca es pasivo — hay que ir a
+ * mirarlo. Esto es lo mismo pero empujando: si nadie te lo recuerda, un
+ * juego al 60% simplemente desaparece de la cabeza. `dedupeKey` lleva el
+ * año-mes para que, si se sigue sin tocar, vuelva a avisar el mes que viene
+ * en vez de una sola vez para siempre.
+ */
+const DIAS_ABANDONO = 90;
+
+async function avisosDeAbandonados(userId: string, handle: string | null): Promise<NuevoAviso[]> {
+  const limite = new Date(Date.now() - DIAS_ABANDONO * 86_400_000);
+
+  const filas = await db
+    .select({
+      gameId: games.id,
+      titulo: games.title,
+      dispositivo: games.deviceLabel,
+      progreso: userGames.progressPercent,
+      ultimaVez: userGames.lastPlayedAt,
+    })
+    .from(userGames)
+    .innerJoin(games, eq(games.id, userGames.gameId))
+    .where(
+      and(
+        eq(userGames.userId, userId),
+        eq(userGames.isWishlist, false),
+        sql`${userGames.progressPercent} between 1 and 99`,
+        sql`${userGames.lastPlayedAt} is not null and ${userGames.lastPlayedAt} < ${limite}`,
+      ),
+    );
+
+  const mesActual = new Date().toISOString().slice(0, 7);
+
+  return filas.map((f) => ({
+    userId,
+    type: "abandonado" as const,
+    title: `${f.titulo} (${f.dispositivo}) lleva tiempo parado`,
+    body: `Al ${f.progreso}%, sin tocarlo desde ${relativeDate(f.ultimaVez) ?? "hace tiempo"}.`,
+    href: handle ? `/u/${handle}/${f.gameId}` : undefined,
+    gameId: f.gameId,
+    dedupeKey: `abandonado:${f.gameId}:${mesActual}`,
+  }));
+}
+
+/**
+ * "Esta semana en Paragon": cuántos trofeos y en cuántos juegos, últimos 7
+ * días. Se llama solo los lunes (ver `generarAvisos`) — no tiene sentido un
+ * resumen semanal a mitad de semana, y así solo sale un aviso por semana en
+ * vez de uno cada pasada del cron.
+ *
+ * Sin trofeos que resumir no se genera nada: un aviso vacío ("0 trofeos esta
+ * semana") no informa, solo ocupa sitio en la bandeja.
+ */
+async function avisosDeResumenSemanal(userId: string): Promise<NuevoAviso[]> {
+  const desde = new Date(Date.now() - 7 * 86_400_000);
+
+  const [fila] = await db
+    .select({
+      trofeos: sql<number>`count(*)`,
+      juegos: sql<number>`count(distinct ${userTrophies.gameId})`,
+    })
+    .from(userTrophies)
+    .where(
+      and(
+        eq(userTrophies.userId, userId),
+        eq(userTrophies.earned, true),
+        sql`${userTrophies.earnedAt} >= ${desde}`,
+      ),
+    );
+
+  const trofeos = Number(fila?.trofeos ?? 0);
+  if (trofeos === 0) return [];
+
+  const juegos = Number(fila?.juegos ?? 0);
+
+  return [
+    {
+      userId,
+      type: "resumen_semanal" as const,
+      title: `Esta semana: ${trofeos} ${trofeos === 1 ? "trofeo" : "trofeos"}`,
+      body: `Repartidos en ${juegos} ${juegos === 1 ? "juego" : "juegos"}. Sigue así.`,
+      href: "/ritmo",
+      // La fecha de hoy: con el cron gateado a los lunes, alcanza para que
+      // no se duplique si la pasada se repitiera el mismo día.
+      dedupeKey: `resumen_semanal:${new Date().toISOString().slice(0, 10)}`,
+    },
+  ];
+}
+
+/**
  * Juegos de la lista de deseados cuya fecha de salida ya ha pasado.
  *
  * La fecha se pide a IGDB, no se guarda: son pocos juegos por usuario y la
@@ -298,13 +460,35 @@ export async function generarAvisos(
     .where(eq(users.id, userId))
     .limit(1);
 
-  const avisos: NuevoAviso[] = [...(await avisosDePlatino(userId, perfil?.handle ?? null))];
+  const handle = perfil?.handle ?? null;
+  const avisos: NuevoAviso[] = [...(await avisosDePlatino(userId, handle))];
 
   try {
     const amigos = await listFriends(userId);
     avisos.push(...(await avisosDeAmigos(userId, amigos.map((a) => a.userId))));
   } catch {
     // Sin amigos o con la consulta fallando, el resto de avisos sigue saliendo.
+  }
+
+  try {
+    avisos.push(...(await avisosDeLogrosNuevos(userId, handle)));
+  } catch (error) {
+    console.error("[avisos] logros_nuevos", userId, error);
+  }
+
+  try {
+    avisos.push(...(await avisosDeAbandonados(userId, handle)));
+  } catch (error) {
+    console.error("[avisos] abandonado", userId, error);
+  }
+
+  // 1 = lunes en JS (0 es domingo).
+  if (new Date().getDay() === 1) {
+    try {
+      avisos.push(...(await avisosDeResumenSemanal(userId)));
+    } catch (error) {
+      console.error("[avisos] resumen_semanal", userId, error);
+    }
   }
 
   // Un juego solo puede tener un aviso de platino vivo. Al bajar de 3 a 2
