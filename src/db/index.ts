@@ -13,6 +13,19 @@ import * as schema from "./schema";
  * `prepare: false` es obligatorio si el Postgres va detrás de un pooler en modo
  * transacción (Supabase, PgBouncer): las sentencias preparadas no sobreviven al
  * cambio de conexión entre requests.
+ *
+ * La conexión se cachea en `globalThis` EN TODOS los entornos, dev incluido.
+ * Antes solo se cacheaba fuera de producción, con la idea de que en
+ * serverless cada invocación es un proceso nuevo — pero un cold start solo
+ * pasa una vez; mientras la instancia de la función siga caliente (que es
+ * la mayoría de las peticiones), el módulo NO se reevalúa, así que sin
+ * cachear, `connect()` (y el proxy `db`, que lo llama en cada acceso a una
+ * propiedad) abría un cliente Postgres — hasta 10 sockets cada uno — por
+ * cada llamada, sin cerrar nunca los anteriores. Resultado: "max client
+ * connections reached" en Supabase y la app cada vez más lenta según se
+ * acumulaban. El caso que sí hay que cubrir es dev con recarga en caliente,
+ * donde el módulo se reevalúa a cada guardado — y `globalThis` sobrevive
+ * exactamente a eso, en cualquier entorno.
  */
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -32,15 +45,14 @@ function connect(): Db {
     );
   }
 
-  const conn = globalForDb.conn ?? postgres(url, { prepare: false });
+  // `max` bajo a propósito: en serverless puede haber muchas instancias de
+  // función calientes a la vez, cada una con su propio pool — el límite de
+  // Supabase (200 en el plan gratuito) es compartido entre todas.
+  const conn = globalForDb.conn ?? postgres(url, { prepare: false, max: 5 });
   const instance = drizzle(conn, { schema });
 
-  // En dev el módulo se reevalúa en cada recarga; sin esto se acumularían
-  // conexiones abiertas hasta agotar el pool.
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.conn = conn;
-    globalForDb.db = instance;
-  }
+  globalForDb.conn = conn;
+  globalForDb.db = instance;
 
   return instance;
 }
