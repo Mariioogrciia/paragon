@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Avatar } from "./Avatar";
 import { ThemeCustomizer } from "./ThemeCustomizer";
 
@@ -66,6 +67,8 @@ export function Header({
   avisosSinLeer?: number;
 }) {
   const pathname = usePathname();
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const nav = user?.handle ? LOGGED_IN_NAV : LOGGED_OUT_NAV;
 
   return (
     <header
@@ -75,7 +78,7 @@ export function Header({
       // texto (que sí sigue al tema) se volvía ilegible encima.
       style={{ background: "color-mix(in srgb, var(--background) 88%, transparent)" }}
     >
-      <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-[30px] px-7">
+      <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-3 px-4 sm:gap-[30px] sm:px-7">
         <Link href="/" className="flex items-center gap-2.5">
           <img
             src="/logo.jpg"
@@ -88,8 +91,28 @@ export function Header({
           <span className="font-heading text-[18px] font-bold tracking-[0.06em]">PARAGON</span>
         </Link>
 
+        {/* En móvil el <nav> de abajo está oculto (`sm:hidden` en la versión
+            de escritorio de esta línea antes de esto): sin este botón no
+            había ninguna forma de llegar a Comunidad, Noticias, Ligas,
+            Amigos, Planificador o Rankings desde un móvil. */}
+        <button
+          onClick={() => setMenuAbierto((v) => !v)}
+          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuAbierto}
+          className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground sm:hidden"
+          style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {menuAbierto ? (
+              <path d="M18 6 6 18M6 6l12 12" />
+            ) : (
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+
         <nav className="hidden items-center gap-1 sm:flex">
-          {(user?.handle ? LOGGED_IN_NAV : LOGGED_OUT_NAV).map((item) => {
+          {nav.map((item) => {
             const href = typeof item.href === "function" ? item.href(user?.handle ?? "") : item.href;
             const active = item.match(pathname);
 
@@ -168,12 +191,15 @@ export function Header({
             </>
           ) : (
             <>
-              <Link href="/entrar" className="text-sm text-muted hover:text-foreground">
+              {/* "Crear cuenta" ya lleva a /entrar; este texto es de sobra en
+                  el poco sitio que hay en móvil, y las dos juntas eran lo
+                  que sacaba la cabecera de los 375px de ancho. */}
+              <Link href="/entrar" className="hidden text-sm text-muted hover:text-foreground sm:inline">
                 Entrar
               </Link>
               <Link
                 href="/entrar"
-                className="rounded-lg px-4 py-2 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)]"
+                className="shrink-0 rounded-lg px-4 py-2 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)]"
                 style={{ background: "var(--accent-grad)", boxShadow: "0 8px 24px rgb(var(--accent-rgb) / 0.25)" }}
               >
                 Crear cuenta
@@ -182,6 +208,36 @@ export function Header({
           )}
         </div>
       </div>
+
+      {menuAbierto && (
+        <nav
+          className="border-t border-border px-3.5 py-3 sm:hidden"
+          style={{ background: "var(--background)" }}
+        >
+          <div className="flex flex-col gap-1">
+            {nav.map((item) => {
+              const href = typeof item.href === "function" ? item.href(user?.handle ?? "") : item.href;
+              const active = item.match(pathname);
+
+              return (
+                <Link
+                  key={item.label}
+                  href={href}
+                  onClick={() => setMenuAbierto(false)}
+                  className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold tracking-[0.02em] transition-colors"
+                  style={
+                    active
+                      ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
+                      : { background: "none", border: "1px solid transparent", color: "var(--muted)" }
+                  }
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }
