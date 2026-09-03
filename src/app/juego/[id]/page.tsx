@@ -11,6 +11,7 @@ import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame } from "@/l
 import { getCommunityRating } from "@/lib/ratings";
 import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";
 import { getProfileByUserId } from "@/lib/profiles";
+import { comparativaPreciosSteam } from "@/lib/prices";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 
@@ -31,12 +32,17 @@ export default async function JuegoGlobalPage({
   const game = await getGlobalGame(gameId);
   if (!game) notFound();
 
-  const [stats, rating, dificultadComunidad, reviews, session] = await Promise.all([
+  const [stats, rating, dificultadComunidad, reviews, session, precios] = await Promise.all([
     getGlobalGameStats(gameId),
     getCommunityRating(gameId),
     getDificultadComunidad(gameId),
     getGameReviews(gameId),
     auth(),
+    // Solo Steam: el appid es literalmente lo que sigue a "steam-" en el id
+    // (ver gameKey en lib/types), y es lo único con lo que se puede cruzar
+    // precios de varias tiendas — no hay una fuente pública equivalente
+    // para PSN.
+    game.platform === "steam" ? comparativaPreciosSteam(game.id.replace(/^steam-/, "")) : Promise.resolve(null),
   ]);
 
   let miFicha: string | null = null;
@@ -155,6 +161,50 @@ export default async function JuegoGlobalPage({
             />
           )}
         </div>
+
+        {precios && (
+          <section>
+            <div className="mb-4 flex flex-wrap items-baseline gap-3">
+              <h2 className="font-heading text-2xl font-bold">Dónde comprarlo</h2>
+              {precios.precioMasBajoHistorico != null && (
+                <span className="text-[13px] text-muted">
+                  Mínimo histórico: {precios.precioMasBajoHistorico.toFixed(2)} €
+                </span>
+              )}
+            </div>
+            <div className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+              {precios.ofertas.slice(0, 8).map((oferta, i) => (
+                <a
+                  key={oferta.tienda}
+                  href={oferta.url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="flex items-center gap-3 border-b border-border px-5 py-3.5 last:border-0 transition-colors hover:bg-surface-2"
+                >
+                  {i === 0 && (
+                    <span
+                      className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em]"
+                      style={{ background: "rgba(78, 201, 138, 0.14)", color: "#4ec98a", border: "1px solid rgba(78, 201, 138, 0.3)" }}
+                    >
+                      Más barato
+                    </span>
+                  )}
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold">{oferta.tienda}</span>
+                  {oferta.ahorro > 0 && (
+                    <span className="shrink-0 text-xs font-bold text-good">-{oferta.ahorro}%</span>
+                  )}
+                  {oferta.ahorro > 0 && (
+                    <span className="shrink-0 text-xs text-muted line-through">{oferta.precioOriginal.toFixed(2)} €</span>
+                  )}
+                  <span className="shrink-0 font-heading text-base font-bold">{oferta.precio.toFixed(2)} €</span>
+                </a>
+              ))}
+            </div>
+            <p className="mt-2.5 text-[11px] text-muted">
+              Precios vía CheapShark, pueden no incluir región ni impuestos exactos. Solo disponible para juegos de Steam.
+            </p>
+          </section>
+        )}
 
         <section>
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
