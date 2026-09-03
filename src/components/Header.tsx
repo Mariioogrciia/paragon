@@ -62,13 +62,18 @@ export function Header({
     image?: string | null;
     paragonLevel?: number | null;
     paragonProgress?: number | null;
+    esDesarrollador?: boolean;
   } | null;
   /** Avisos pendientes, para el punto de la campana. */
   avisosSinLeer?: number;
 }) {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const nav = user?.handle ? LOGGED_IN_NAV : LOGGED_OUT_NAV;
+  const nav = user?.handle
+    ? user.esDesarrollador
+      ? [...LOGGED_IN_NAV, { label: "Admin", href: "/admin", match: (p: string) => p.startsWith("/admin") }]
+      : LOGGED_IN_NAV
+    : LOGGED_OUT_NAV;
 
   return (
     <header

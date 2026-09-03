@@ -84,6 +84,7 @@ export default async function RootLayout({
         image: (profile ? resolveAvatarUrl(profile) : undefined) ?? sessionUser.image,
         paragonLevel: nivelParagon?.level ?? null,
         paragonProgress: nivelParagon?.progreso ?? null,
+        esDesarrollador: profile?.esDesarrollador ?? false,
       }
     : null;
 
