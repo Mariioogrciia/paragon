@@ -1,5 +1,6 @@
 import { tileFor } from "@/lib/design";
 import type { TrophyGrade } from "@/lib/types";
+import { TROPHY_TYPE_LABEL, type TrophyType } from "@/lib/trophyType";
 
 const COLORS: Record<TrophyGrade, string> = {
   bronze: "var(--bronze)",
@@ -60,6 +61,62 @@ export function TrophyIcon({
       style={{ color: COLORS[grade], opacity: dimmed ? 0.3 : 1 }}
     >
       {grade === "platinum" ? PSN_PLATINUM : PSN_CUP}
+    </svg>
+  );
+}
+
+const TROPHY_TYPE_PATHS: Record<TrophyType, React.ReactNode> = {
+  // Libro abierto: historia/campaña.
+  historia: (
+    <path d="M12 6.5c-1.4-1-3.2-1.5-5-1.5-1 0-2 .15-3 .45v12.5c1-.3 2-.45 3-.45 1.8 0 3.6.5 5 1.5m0-12.5c1.4-1 3.2-1.5 5-1.5 1 0 2 .15 3 .45v12.5c-1-.3-2-.45-3-.45-1.8 0-3.6.5-5 1.5m0-12.5v12.5" />
+  ),
+  // Gema: coleccionables.
+  coleccionable: <path d="M6 3h12l3 5-9 13L3 8z M3 8h18 M9 3l-2 5 5 13 5-13-2-5" />,
+  // Estrella con check: completista / 100%.
+  completista: (
+    <>
+      <path d="M12 2l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 16.7 6.1 19.9l1.3-6.5-4.9-4.6 6.6-.8z" />
+    </>
+  ),
+  // Dos figuras: multijugador.
+  multijugador: <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 2.5-5 5-5s5 2 5 5M16 11a3 3 0 1 0 0-6M14 20c0-2.5 1.8-4.5 4-5s5 1.5 5 5" />,
+  // Rayo: habilidad.
+  habilidad: <path d="M13 2 4 14h6l-1 8 9-12h-6z" />,
+  // Ojo tachado: secreto.
+  secreto: (
+    <>
+      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" />
+      <circle cx="12" cy="12" r="3" />
+      <line x1="3" y1="21" x2="21" y2="3" />
+    </>
+  ),
+};
+
+/**
+ * Iconito de categoría junto a un trofeo (ver lib/trophyType.ts). Salvo
+ * "Secreto" (dato real, `hidden`), el resto son una aproximación por
+ * palabras clave — el título del icono lo dice, no se presenta como certeza.
+ */
+export function TrophyTypeIcon({ tipo, size = 14 }: { tipo: TrophyType; size?: number }) {
+  const aproximado = tipo !== "secreto";
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      role="img"
+      aria-label={TROPHY_TYPE_LABEL[tipo]}
+    >
+      <title>
+        {TROPHY_TYPE_LABEL[tipo]}
+        {aproximado ? " (aproximado, por el texto del trofeo)" : ""}
+      </title>
+      {TROPHY_TYPE_PATHS[tipo]}
     </svg>
   );
 }

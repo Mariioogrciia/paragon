@@ -143,21 +143,28 @@ export function TrophyHistory({
                   )}
 
                   <span
-                    className="block rounded-t-[4px] transition-opacity group-hover:opacity-80"
+                    className="block rounded-t-[4px] transition-all duration-300 group-hover:opacity-100 group-hover:shadow-[0_0_15px_rgb(var(--accent-rgb)/0.8)]"
                     style={{
                       height: m.total === 0 ? 2 : `max(3px, ${alto}%)`,
                       background: m.total === 0 ? "var(--border)" : "var(--accent)",
+                      opacity: m.total === 0 ? 1 : 0.85,
                     }}
                     aria-hidden="true"
                   />
 
                   {/* Tooltip al pasar por encima: mes, total y platinos. */}
                   <div
-                    className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] shadow-lg group-hover:block"
-                    style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
+                    className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-2 text-[11px] shadow-2xl group-hover:block transition-all duration-300"
+                    style={{ 
+                      background: "rgba(20, 25, 35, 0.85)", 
+                      backdropFilter: "blur(12px)", 
+                      WebkitBackdropFilter: "blur(12px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      color: "white" 
+                    }}
                   >
-                    <span className="font-bold">{nombreLargo(m.mes)}</span>
-                    <span className="text-muted">
+                    <span className="font-bold text-accent-2">{nombreLargo(m.mes)}</span>
+                    <span className="opacity-90">
                       {" · "}
                       {m.total} {m.total === 1 ? "trofeo" : "trofeos"}
                       {m.platinos > 0 && ` · ${m.platinos} platino${m.platinos === 1 ? "" : "s"}`}

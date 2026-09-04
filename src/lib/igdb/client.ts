@@ -373,6 +373,14 @@ export async function getGame(igdbId: number): Promise<IgdbGameResult | null> {
  * Categorías de `websites` documentadas por IGDB — solo las que tiene
  * sentido enseñar como enlace con su propio icono/etiqueta. El resto (wikia,
  * facebook, apps de tienda móvil...) cae en el genérico "Sitio web".
+ *
+ * Los números son los ids de la tabla de referencia `website_types` de
+ * IGDB — comprobados a mano contra `POST /v4/website_types` el 4 de
+ * septiembre de 2026. El campo que los trae en `games.websites` se llamaba
+ * `category`; IGDB lo renombró a `type` en algún momento sin que el
+ * proyecto se enterara (`fields websites.category` sigue devolviendo 200
+ * pero **sin ese campo**, silencioso — ver DETAIL_FIELDS más abajo). Los
+ * IDs en sí no cambiaron, solo el nombre del campo que los trae.
  */
 const WEBSITE_LABELS: Record<number, string> = {
   1: "Sitio oficial",
@@ -386,6 +394,9 @@ const WEBSITE_LABELS: Record<number, string> = {
   16: "Epic Games Store",
   17: "GOG",
   18: "Discord",
+  22: "Xbox",
+  23: "PlayStation",
+  24: "Nintendo",
 };
 
 interface IgdbGameDetail extends IgdbGame {
@@ -395,7 +406,7 @@ interface IgdbGameDetail extends IgdbGame {
   screenshots?: { image_id: string }[];
   themes?: { name: string }[];
   game_modes?: { name: string }[];
-  websites?: { category: number; url: string }[];
+  websites?: { type: number; url: string }[];
   similar_games?: { id: number; name: string; cover?: { image_id: string } }[];
   artworks?: { image_id: string }[];
   videos?: { video_id: string; name: string }[];
@@ -428,7 +439,7 @@ const DETAIL_FIELDS =
   "platforms.abbreviation, platforms.name, genres.name, involved_companies.company.name, " +
   "involved_companies.developer, involved_companies.publisher, summary, storyline, " +
   "age_ratings.organization, age_ratings.rating_category, screenshots.image_id, " +
-  "themes.name, game_modes.name, websites.category, websites.url, artworks.image_id, " +
+  "themes.name, game_modes.name, websites.type, websites.url, artworks.image_id, " +
   "videos.video_id, videos.name, dlcs.name, dlcs.cover.image_id, dlcs.first_release_date, " +
   "expansions.name, expansions.cover.image_id, expansions.first_release_date, " +
   "franchises.name, collection.name, language_supports.language.native_name, language_supports.language_support_type.name, " +
@@ -494,8 +505,8 @@ export async function getGameDetails(igdbId: number): Promise<IgdbGameDetailResu
     themes: (g.themes ?? []).map((t) => t.name),
     gameModes: (g.game_modes ?? []).map((m) => m.name),
     websites: (g.websites ?? [])
-      .filter((w) => WEBSITE_LABELS[w.category])
-      .map((w) => ({ label: WEBSITE_LABELS[w.category], url: w.url })),
+      .filter((w) => WEBSITE_LABELS[w.type])
+      .map((w) => ({ label: WEBSITE_LABELS[w.type], url: w.url })),
     similarGames: (g.similar_games ?? []).slice(0, 12).map((s) => ({
       igdbId: s.id,
       title: s.name,

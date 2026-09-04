@@ -49,31 +49,18 @@ function juegosDelTitulo(titulo: string): string[] {
 }
 
 export async function getPsPlusMensual(): Promise<PsPlusMensual | null> {
+  // HARDCODE: El feed oficial de Sony está devolviendo "marzo" como el último "Monthly Games".
+  // Forzamos los de septiembre temporalmente como pidió el usuario.
+  const nombresSeptiembre = [
+    "Harry Potter: Quidditch Champions",
+    "MLB The Show 24",
+    "Little Nightmares II"
+  ];
+  
   try {
-    const res = await fetch(FEED_URL, {
-      headers: { "User-Agent": USER_AGENT },
-      next: { revalidate: 21_600 }, // 6h, como el resto de feeds — esto cambia una vez al mes.
-    });
-    if (!res.ok) return null;
-
-    const xml = await res.text();
-    const feed = await parser.parseString(xml);
-
-    // El tag "ps-plus" trae de todo (subidas de precio, noticias de
-    // catálogo...); el anuncio mensual siempre lleva "Monthly Games" en el
-    // título en inglés — es el patrón estable, no adivinar por fecha.
-    const anuncio = (feed.items ?? []).find((item) => /monthly games/i.test(item.title ?? ""));
-    if (!anuncio?.title) return null;
-
-    const nombres = juegosDelTitulo(anuncio.title);
-
-    // Una búsqueda de IGDB por nombre, en paralelo. `search` es difuso
-    // (mismo motivo que ya evita el emparejador de PEGI), pero aquí el
-    // coste de acertar con la edición equivocada de un mismo juego es
-    // bajo — es una carátula promocional, no un dato que se guarde.
     const juegos = (
       await Promise.all(
-        nombres.map(async (nombre): Promise<PsPlusJuego | null> => {
+        nombresSeptiembre.map(async (nombre): Promise<PsPlusJuego | null> => {
           try {
             const [resultado] = await searchGames(nombre, 1);
             if (!resultado) return null;
@@ -81,18 +68,18 @@ export async function getPsPlusMensual(): Promise<PsPlusMensual | null> {
           } catch {
             return null;
           }
-        }),
+        })
       )
     ).filter((g): g is PsPlusJuego => g !== null);
 
     return {
-      titulo: anuncio.title,
-      link: anuncio.link ?? FEED_URL,
-      fecha: anuncio.pubDate ?? null,
+      titulo: "PlayStation Plus Monthly Games for September",
+      link: "https://blog.playstation.com/tag/ps-plus/",
+      fecha: new Date().toISOString(),
       juegos,
     };
   } catch (error) {
-    console.error("[psPlus] no se pudo leer el feed", error);
+    console.error("[psPlus] error forzando septiembre", error);
     return null;
   }
 }

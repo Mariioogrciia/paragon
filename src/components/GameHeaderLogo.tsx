@@ -19,11 +19,19 @@ export function GameHeaderLogo({ title, steamId }: Props) {
   }
 
   return (
-    <img
-      src={`https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${steamId}/logo.png`}
-      alt={title}
-      onError={() => setError(true)}
-      className="mb-6 max-w-[320px] object-contain max-h-[140px] drop-shadow-2xl"
-    />
+    <>
+      {/* El logo de Steam ya es el título visualmente, pero es una imagen:
+          sin esto la página se quedaba sin ningún <h1> real cuando el logo
+          cargaba bien (confirmado en /juego/[id] en vivo) — un lector de
+          pantalla navega por encabezados y no encontraba nada marcando de
+          qué juego trata la ficha. */}
+      <h1 className="sr-only">{title}</h1>
+      <img
+        src={`https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${steamId}/logo.png`}
+        alt={title}
+        onError={() => setError(true)}
+        className="mb-6 max-w-[320px] object-contain max-h-[140px] drop-shadow-2xl"
+      />
+    </>
   );
 }

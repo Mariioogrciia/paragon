@@ -48,6 +48,15 @@ const POR_PASADA = 8;
 const DETALLES_POR_PASADA = 40;
 
 /**
+ * Tope aparte para Xbox dentro de esa misma tanda: OpenXBL (xbl.io) va en un
+ * nivel gratis de 150 peticiones/hora COMPARTIDO entre todos los usuarios
+ * con Xbox vinculado, no por cuenta — ver el aviso de riesgo en
+ * lib/xbl/client.ts. Sin este tope, una pasada con muchas fichas de Xbox sin
+ * detalle podría agotar el cupo de la hora entera para todo el mundo.
+ */
+const XBL_DETALLES_POR_PASADA = 10;
+
+/**
  * Cuántos juegos se intentan clasificar por pasada. Van todos en UNA consulta
  * a IGDB, así que el número puede ser generoso sin gastar cuota.
  */
@@ -159,6 +168,8 @@ export async function GET(request: Request) {
       )
       .limit(DETALLES_POR_PASADA);
 
+    let xboxDetalles = 0;
+
     for (const ficha of sinDetalle) {
       if (Date.now() - arranque > maxDuration * 1000 - MARGEN_MS) {
         agotado = true;
@@ -168,6 +179,11 @@ export async function GET(request: Request) {
       try {
         // El join ya descarta "manual", que no tiene API detrás.
         if (ficha.platform === "manual") continue;
+
+        if (ficha.platform === "xbox") {
+          if (xboxDetalles >= XBL_DETALLES_POR_PASADA) continue;
+          xboxDetalles++;
+        }
 
         await syncGameTrophies(
           ficha.userId,

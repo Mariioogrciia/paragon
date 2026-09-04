@@ -409,10 +409,11 @@ export default async function JuegoPage({
                 {progress.earned} de {progress.total} conseguidos
               </span>
             </div>
-            <TrophyList 
-              trophies={game.trophies} 
-              gameTitle={game.title} 
+            <TrophyList
+              trophies={game.trophies}
+              gameTitle={game.title}
               gameId={game.id}
+              platform={game.platform}
               esMio={esMio}
               showcaseTrophies={profile.showcaseTrophies ?? []}
             />

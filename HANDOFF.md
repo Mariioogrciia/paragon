@@ -7,6 +7,111 @@ todo el rato — más abajo hay un aviso de qué tocó él en medio de esta sesi
 
 ---
 
+## Epic Games — vinculación por OAuth, sesión arreglada, logros pendientes de una prueba en vivo
+
+Antigravity montó en paralelo (mismo rato que esta sesión) un proveedor OAuth
+de Epic Games en `auth.ts` + `linkEpicOAuthAction` + `LinkEpicForm` ya
+conectado de verdad al botón (antes seguía siendo el formulario viejo de
+texto). Tres cosas de esto se han tocado hoy:
+
+**1. Bug de sesión real, arreglado.** `linkEpicOAuthAction` llamaba a
+`signIn("epic", ...)` — el mismo mecanismo de login que Google/Discord, sin
+ningún callback que comprobara si ya había sesión abierta. Sin eso, Auth.js
+no encuentra ninguna cuenta Epic vinculada la primera vez, **crea un usuario
+de Paragon nuevo y cambia la sesión a él** — quien pulsa "Vincular Epic" se
+queda mirando una cuenta vacía, como si hubiera cerrado sesión de la suya
+real. Arreglado con un callback `signIn` en `auth.ts` que, si el proveedor es
+`epic`, escribe directamente en `platformAccounts` contra el usuario que YA
+tiene sesión y devuelve `false` — corta el flujo antes de que Auth.js toque
+`users`/`accounts`/`sessions`. **Sin probar en vivo todavía**: hace falta
+`AUTH_EPIC_ID`/`AUTH_EPIC_SECRET` reales (el usuario tiene que registrar una
+app en el portal de desarrolladores de Epic, como con xbl.io/ITAD) y
+completar un login real para confirmar que `auth()` lee la cookie de sesión
+correcta desde dentro de ese callback.
+
+**2. Tres bugs mecánicos de compilación, de Antigravity editando en paralelo
+mientras se escribía esto — arreglados sin tocar su intención:**
+- `actions.ts` llamaba a `signIn(...)` sin importarlo de `@/auth`.
+- El proveedor de Epic en `auth.ts` no tipaba `type`/`version`/`checks`
+  como literales (`"oauth"`, `"2.0"`, `["pkce","state"]`) — TypeScript los
+  ensanchaba a `string`/`string[]` y el build entero no compilaba.
+- `Forms.tsx` importaba `linkEpicOAuthAction` dos veces (una vez arriba del
+  todo, otra vez pegada a `LinkEpicForm`) — identificador duplicado.
+
+**3. Ver los logros de Epic — investigado a fondo, NO construido todavía.**
+El usuario pidió ver la biblioteca/logros de Epic. Comprobado:
+- **No hay API pública real.** El scope de OAuth de Epic (`basic_profile`,
+  `friends_list`, `presence`) no da biblioteca ni logros. La interfaz
+  "Ecom/Entitlements" de EOS es solo para que el desarrollador de un juego
+  compruebe si TÚ tienes SU juego — no para que un tercero liste tu
+  biblioteca entera. Hay un hilo abierto en el foro oficial de Epic
+  pidiendo justo esto ("make achievements publicly queryable via an API")
+  porque hoy no existe.
+- **Vía no oficial descartada**: herramientas tipo *Legendary* (el launcher
+  de Epic de código abierto) funcionan, pero piden que cada usuario copie a
+  mano un código de sesión de la web de Epic — un token personal, no un ID
+  público. Rompería la promesa de la propia portada ("Ni contraseñas, ni
+  tokens, ni permisos de nadie").
+- **El método real, confirmado por el propio mantenedor de Exophase** (foro,
+  hilo "Epic Games Achievement Tracking Added", 4 abr 2022): usan el MISMO
+  OAuth `basic_profile` que ya monta Antigravity, y con el token que da esa
+  autenticación llaman a un endpoint de Epic (no documentado públicamente)
+  que devuelve los logros de esa cuenta — su propia cita: *"our access
+  drops off after some time until you re-authenticate... so for
+  uninterrupted tracking it is best to leave the privacy setting on
+  Public"*. Confirmado también que Epic SÍ tiene un perfil de logros
+  público de verdad (`store.epicgames.com/u/...`, con niveles de privacidad
+  Public/Friends of Friends/Friends Only/Only Me — anuncio oficial "The
+  Epic Games Store My Achievements Update", abr 2022).
+- **Limitación real, según el propio Exophase**: solo funciona con juegos
+  que tienen logros habilitados (muchos exclusivos de Epic no los tienen), y
+  no da tiempo jugado.
+- **Para seguir de verdad hace falta al usuario**: registrar la app en el
+  portal de desarrolladores de Epic (`AUTH_EPIC_ID`/`AUTH_EPIC_SECRET`
+  reales) y completar un login real una vez, para poder inspeccionar en
+  vivo qué endpoint responde con los logros tras el OAuth — no se puede
+  reverse-engineerear sin una sesión real. Mismo método que se usó con ITAD
+  (probar contra la API real antes de escribir el código de verdad).
+
+---
+
+## Aviso: lo que Antigravity está construyendo en paralelo (visto de pasada)
+
+Según el propio usuario, Antigravity está trabajando en **importar biblioteca
+desde Playnite / GOG** como vía para Epic — encaja con el hueco ya
+documentado más abajo ("Epic vinculable pero sin biblioteca real"). No se ha
+tocado ni revisado ese código desde esta sesión; solo queda anotado aquí
+para no chocar ni duplicar el trabajo. Revisar `git status`/commits recientes
+de esa zona antes de tocar nada de importación de biblioteca.
+
+---
+
+## Sesión del 4 de septiembre de 2026 (madrugada) — histórico de precios e iconos de trofeo
+
+- **Gráfico "Precio a lo largo del tiempo"** en `/juego/[id]` (solo Steam,
+  junto a "Dónde comprarlo"): `lib/itad.ts` (nuevo, API de IsThereAnyDeal,
+  necesita `ITAD_API_KEY` — ya puesta) + `PriceHistoryChart.tsx` (SVG a
+  mano, sin dependencia nueva). CheapShark, la fuente que ya había, solo da
+  el precio actual y un "mínimo histórico" sin fecha — no valía para un
+  gráfico. Bug real de la integración nueva, ver la trampa de arriba
+  (formato de `since`).
+- **Iconitos de tipo de trofeo** (historia/coleccionable/completista/
+  multijugador/habilidad/secreto) en `TrophyList` (lista y cuadrícula) y
+  `TrophyGuideModal`. `lib/trophyType.ts` (nuevo): ninguna API da esta
+  categoría, así que es una heurística por palabras clave sobre
+  nombre+descripción del trofeo — **aproximada a propósito**, sin
+  categoría cuando no hay coincidencia clara (mayoría de casos, comprobado
+  contra 3000 trofeos reales: ~65% se queda sin etiqueta). "Secreto" es la
+  única que no es heurística, sale del campo real `hidden`.
+- **Bug corregido en la vista previa de marco de avatar** (`/ajustes`): ver
+  la trampa de arriba (`<img>` suelto sin flex).
+- Sin verificar en el navegador logueado (sin credenciales en este
+  entorno, mismo motivo de siempre) — sí verificado el gráfico de precios
+  contra un perfil real sin sesión (`/juego/3278`, Garry's Mod) y la
+  heurística de tipo de trofeo contra 3000 filas reales de la base.
+
+---
+
 ## Sesión del 4 de septiembre de 2026 (noche) — Descubrir por plataforma, ficha de juego, Estadísticas y guías de trofeo
 
 Sesión muy larga, a base de peticiones cortas encadenadas sin parar (varias
@@ -545,6 +650,21 @@ y en medio falta una línea que nadie ve porque **no da error**.
   arriba — sin `min-w-0`, una tira de scroll horizontal dentro de una
   columna de grid empuja la página entera a scroll horizontal, y no salta
   ningún error: se ve una barra de scroll abajo del todo y ya.
+- **La API de ITAD rechaza el ISO estándar de JS para `since`.**
+  `Date.toISOString()` da milisegundos + `Z` (`2024-09-04T11:18:47.655Z`);
+  `/games/history/v2` responde 200... no, responde **400** "Invalid 'since'
+  format" con eso — quiere segundos enteros y un offset explícito
+  (`+00:00`, no `Z`). Sin probarlo contra la API real (no basta con leer su
+  documentación, que solo dice `<date-time>`) el histórico de precios
+  volvía `[]` siempre, en silencio, y la sección entera no aparecía. Ver
+  `lib/itad.ts`.
+- **Un `<img>` suelto (sin `flex`/`block`) deja un hueco bajo la foto dentro
+  de un marco circular.** `AvatarFrame` clipa a círculo con
+  `overflow-hidden`, pero eso no arregla el hueco de línea de base que deja
+  un `<img>` inline por defecto — la vista previa de `/ajustes` usaba un
+  `<img>` a pelo en vez del componente `Avatar` (que sí centra con flex) y
+  la foto no llegaba a rellenar el marco del todo. Arreglado usando
+  `Avatar` ahí también.
 
 **Regla:** cuando conectes un dato nuevo, compruébalo **en la base y en
 pantalla**, no solo que compile. Y si un agente edita con scripts de
@@ -735,6 +855,55 @@ que causó el bug de las horas de PSN la primera vez.
   `manual-1234:deseados`. Lo arregla el punto 1.
 - **Google Play** es un stub: su propia API no puede devolver la biblioteca de
   un jugador, solo logros del juego atado al Client ID.
+
+**Xbox — construido y probado de punta a punta (4 de septiembre de 2026,
+madrugada).** Ya no es un stub (`legible: false`): sincroniza de verdad,
+mismo patrón que PSN/Steam. Vía **OpenXBL** (xbl.io) — riesgo asumido a
+propósito, sigue sin ser oficial de Microsoft, ver el aviso completo en la
+cabecera de `lib/xbl/client.ts`.
+- **`lib/xbl/client.ts`** (nuevo): `resolveProfile`, `canReadAchievements`,
+  `fetchLibrary`, `fetchAchievements` — mismas formas que `steam/client.ts`.
+  Sin metales (bronce/plata/oro/platino): Xbox da Gamerscore por logro, como
+  Steam.
+- **Enganchado en `sync.ts`** (`syncLibrary`/`syncGameTrophies`) y
+  **`profiles.ts`** (`resolveXbox` de verdad, ya no el stub). La UI de
+  vinculación (`LinkXboxForm`, `linkXboxAction`) ya existía de antes sin
+  tocar — solo hacía falta que `resolveXbox` dejara de devolver
+  `legible: false` siempre.
+- **Bugs reales encontrados probando contra la API de verdad** (no contra su
+  documentación, que en algunos puntos ni la tiene):
+  - Sin la cabecera `Accept-Language` explícita, los endpoints de logros
+    dan 400 ("invalid locale value: `*`").
+  - `GET /player/gamertag/{gamertag}` da 404 "no route matches" con un
+    gamertag que no existe, en vez de un "no encontrado" limpio — se usa
+    `GET /search/{gamertag}` en su lugar, que sí devuelve una lista vacía.
+  - **Bug propio, no de la API**: la primera versión de `fetchLibrary` leía
+    `data.titles` en vez de `data.content.titles` (la respuesta real viene
+    envuelta en `content`) — devolvía `[]` siempre, en silencio. Se pilló
+    al probar de extremo a extremo con `scripts/probar-sync.mts xbox
+    <XUID>` (ampliado para aceptar `xbox`, antes solo `psn|steam`), no
+    solo compilando.
+  - `achievement.totalAchievements` en la lista de biblioteca ha salido a 0
+    en juegos con logros conseguidos de verdad — campo que no es de fiar.
+    Igual que Steam, el progreso real se calcula en la sincronización de
+    detalle, nunca en la llamada de biblioteca.
+- **Probado de extremo a extremo** con una cuenta real
+  (`TalkyLicense530`): 6 juegos importados, detalle de Minecraft
+  sincronizado (133 logros, 7 conseguidos, el más raro al 0.04%) — datos
+  reales en las mismas tablas que PSN/Steam (`games`, `user_game`,
+  `game_trophy`, `user_trophy`), leídos de vuelta con `getLibrary`/
+  `getGameDetail` sin cambios.
+- **Presupuesto del nivel gratis (150 peticiones/hora, compartido entre
+  TODOS los usuarios con Xbox vinculado, no por cuenta)**: `XBL_DETAIL_LIMIT`
+  = 15 juegos por vinculación (`sync.ts`), y `XBL_DETALLES_POR_PASADA` = 10
+  por pasada de cron (`api/cron/sync/route.ts`) — sin este segundo tope, una
+  pasada con muchas fichas de Xbox sin detalle podría agotar el cupo de la
+  hora para todo el mundo, no solo para quien la disparó.
+- **Sin probar todavía**: qué devuelve la API con un perfil que tiene el
+  historial de juegos oculto por privacidad de Xbox — solo se ha probado
+  contra una cuenta propia y pública. `canReadAchievements` lo trata como
+  legible mientras la petición no falle de verdad (ver el comentario en el
+  propio archivo).
 
 **Sin probar de punta a punta:**
 - Aviso de "un amigo te adelanta" — el SQL se validó a mano, el camino

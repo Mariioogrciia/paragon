@@ -1,7 +1,5 @@
 import type { CSSProperties } from "react";
-import { FaPlaystation, FaXbox, FaSteam } from "react-icons/fa6";
-import { BsNintendoSwitch } from "react-icons/bs";
-import { SiEpicgames, SiUbisoft } from "react-icons/si";
+
 
 interface IconProps {
   size?: number;
@@ -10,25 +8,25 @@ interface IconProps {
 }
 
 export function PlayStationIcon({ size = 24, className, style }: IconProps) {
-  return <FaPlaystation size={size} className={className} style={style} />;
+  return <img src="/logos/playstation.svg" alt="PlayStation" width={size} height={size} className={className} style={{ objectFit: 'contain', ...style }} />;
 }
 
 export function SteamIcon({ size = 24, className, style }: IconProps) {
-  return <FaSteam size={size} className={className} style={style} />;
+  return <img src="/logos/steam.svg" alt="Steam" width={size} height={size} className={className} style={{ objectFit: 'contain', ...style }} />;
 }
 
 export function XboxIcon({ size = 24, className, style }: IconProps) {
-  return <FaXbox size={size} className={className} style={style} />;
+  return <img src="/logos/xbox.svg" alt="Xbox" width={size} height={size} className={className} style={{ objectFit: 'contain', ...style }} />;
 }
 
 export function NintendoIcon({ size = 24, className, style }: IconProps) {
-  return <BsNintendoSwitch size={size} className={className} style={style} />;
+  return <img src="/logos/nintendo.svg" alt="Nintendo" width={size} height={size} className={className} style={{ objectFit: 'contain', ...style }} />;
 }
 
 export function EpicGamesIcon({ size = 24, className, style }: IconProps) {
-  return <SiEpicgames size={size} className={className} style={style} />;
+  return <img src="/logos/epicgames.svg" alt="Epic Games" width={size} height={size} className={className} style={{ objectFit: 'contain', ...style }} />;
 }
 
 export function UbisoftIcon({ size = 24, className, style }: IconProps) {
-  return <SiUbisoft size={size} className={className} style={style} />;
+  return <img src="/logos/ubisoft.svg" alt="Ubisoft" width={size} height={size} className={className} style={{ objectFit: 'contain', ...style }} />;
 }

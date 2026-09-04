@@ -10,8 +10,8 @@ import {
   linkSteamAction,
   linkGoogleAction,
   linkXboxAction,
-  linkEpicAction,
   linkUbisoftAction,
+  linkEpicOAuthAction,
   updateProfileAction,
   type ActionState,
 } from "@/app/actions";
@@ -183,24 +183,11 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
 }
 
 export function LinkEpicForm({ current }: { current?: string | null }) {
-  const [state, action] = useActionState(linkEpicAction, EMPTY);
-
   return (
-    <form action={action}>
+    <form action={linkEpicOAuthAction}>
       <div className="flex gap-2.5">
-        <input
-          name="username"
-          type="text"
-          defaultValue={current ?? ""}
-          placeholder="Tu usuario de Epic Games"
-          autoComplete="off"
-          spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
-          style={FIELD}
-        />
-        <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
+        <Submit>{current ? "Reconectar con Epic Games" : "Vincular con Epic Games"}</Submit>
       </div>
-      <Feedback state={state} />
     </form>
   );
 }

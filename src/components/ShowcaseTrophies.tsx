@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type Game, type Trophy } from "@/lib/types";
 import { gradeLabel, TrophyIcon } from "./TrophyIcon";
 import { colorFor, rarity } from "@/lib/design";
+import { TiltCard } from "@/components/TiltCard";
 
 export function ShowcaseTrophies({ 
   items, 
@@ -26,10 +27,10 @@ export function ShowcaseTrophies({
           const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
           
           return (
-            <Link 
+            <TiltCard 
               key={`${game.id}-${trophy.id}`} 
               href={`/u/${handle}/${game.id}`}
-              className="relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:-translate-y-1 hover:shadow-xl hover:border-[rgb(var(--accent-rgb)/0.5)] group"
+              className={`relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-2xl hover:border-[rgb(var(--accent-rgb)/0.5)] group block ${trophy.grade === 'platinum' || trophy.grade === 'gold' ? 'holo-card' : ''}`}
             >
               <div className="absolute top-0 right-0 p-3 opacity-20 transition-opacity group-hover:opacity-40">
                 <TrophyIcon grade={trophy.grade ?? "bronze"} size={64} />
@@ -64,7 +65,7 @@ export function ShowcaseTrophies({
                   )}
                 </div>
               </div>
-            </Link>
+            </TiltCard>
           );
         })}
       </div>

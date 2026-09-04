@@ -105,6 +105,8 @@ export interface Trophy {
   progress?: { current: number; target: number };
   groupId?: string;
   groupName?: string;
+  /** Gamerscore real, solo Xbox — ver lib/paragonScore.ts. */
+  xp?: number;
 }
 
 /* ------------------------------------------------------------------ *

@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { and, desc, eq, gte, isNotNull, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, userGames } from "@/db/schema";
@@ -42,7 +43,16 @@ function parseGenres(raw: string | null): string[] {
  * útil hasta que pase un tiempo de uso real — es preferible a inventar una
  * fecha de alta que no se puede saber.
  */
-export async function getTrendingGames(limit = 12, dias = 30): Promise<(DiscoverGame & { recientes: number })[]> {
+/**
+ * Igual para todo el mundo, no personal de nadie — se cachea 5 minutos
+ * (`unstable_cache`, la capa de caché de datos de Next, no un `fetch`
+ * externo) para no repetir un `GROUP BY` sobre `user_game` en cada visita
+ * de cada visitante a /descubrir. Antes se recalculaba entero en cada
+ * carga; con pocos usuarios no se notaba, pero es coste real de Postgres
+ * que crece con las visitas, no con los datos.
+ */
+export const getTrendingGames = unstable_cache(
+  async (limit = 12, dias = 30): Promise<(DiscoverGame & { recientes: number })[]> => {
   const desde = new Date(Date.now() - dias * 24 * 60 * 60 * 1000);
 
   const rows = await db
@@ -70,7 +80,10 @@ export async function getTrendingGames(limit = 12, dias = 30): Promise<(Discover
       genres: parseGenres(r.genres),
       recientes: Number(r.recientes),
     }));
-}
+  },
+  ["trending-games"],
+  { revalidate: 300 },
+);
 
 /**
  * Nota media alta (>= 4.5, con al menos 2 votos para que no sea un solo
@@ -80,7 +93,8 @@ export async function getTrendingGames(limit = 12, dias = 30): Promise<(Discover
  * dejaría esto vacío siempre — se puede apretar más adelante cuando haya
  * más gente.
  */
-export async function getHiddenGems(limit = 12): Promise<(DiscoverGame & { notaMedia: number; votos: number; propietarios: number })[]> {
+export const getHiddenGems = unstable_cache(
+  async (limit = 12): Promise<(DiscoverGame & { notaMedia: number; votos: number; propietarios: number })[]> => {
   const rows = await db
     .select({
       igdbId: gamesTable.igdbId,
@@ -112,7 +126,10 @@ export async function getHiddenGems(limit = 12): Promise<(DiscoverGame & { notaM
       votos: Number(r.votos),
       propietarios: Number(r.propietarios),
     }));
-}
+  },
+  ["hidden-gems"],
+  { revalidate: 300 },
+);
 
 export interface GenreStrip {
   genero: string;

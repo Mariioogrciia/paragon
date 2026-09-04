@@ -96,9 +96,18 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                   </form>
                   <span className="text-xs text-muted">{activity.comments.length} comentarios</span>
                 </div>
-                <form action={addActivityCommentAction} className="mt-2 flex gap-2">
+                <form action={addActivityCommentAction} className="mt-2 flex items-center gap-2">
                   <input type="hidden" name="activityId" value={activity.id} />
                   <input type="text" name="comment" placeholder="Añadir un comentario..." className="flex-1 bg-transparent border-b border-border/50 text-xs px-2 py-1.5 focus:outline-none focus:border-accent transition-colors" />
+                  {/* Antes solo se podía enviar pulsando Intro dentro del
+                      campo — sin ningún botón visible que lo diera a
+                      entender. */}
+                  <button
+                    type="submit"
+                    className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-accent"
+                  >
+                    Enviar
+                  </button>
                 </form>
                 {activity.comments.length > 0 && (
                   <div className="mt-3 space-y-2">

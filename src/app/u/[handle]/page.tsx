@@ -14,6 +14,8 @@ import { gameTrophies } from "@/db/schema";
 import { inArray } from "drizzle-orm";
 import { FavoritePicker } from "@/components/FavoritePicker";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
+import { ImportLibraryModal } from "@/components/ImportLibraryModal";
+import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
 import { juegosDelAnio, resumenHistorico } from "@/lib/history";
@@ -79,7 +81,8 @@ export default async function PerfilPage({
             : "Todavía no ha vinculado ninguna cuenta de juego."}
         </p>
         {esMio && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 gap-3">
+            <ImportLibraryModal />
             <AddManualGameModal />
           </div>
         )}
@@ -278,6 +281,7 @@ export default async function PerfilPage({
                       // que ya se hace arriba con `grade`.
                       iconUrl: trophyRaw.iconUrl ?? undefined,
                       groupName: trophyRaw.groupName ?? undefined,
+                      xp: trophyRaw.xp ?? undefined,
                     };
                     return { game, trophy };
                   })
@@ -297,21 +301,26 @@ export default async function PerfilPage({
                       const game = games.find((g) => g.id === gameId);
                       if (!game) return null;
                       return (
-                        <Link key={game.id} href={`/u/${handle}/${game.id}`}>
-                          <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border/50 group transition-all hover:scale-105 hover:shadow-xl hover:border-accent" style={{ background: coverGradient(game.id) }}>
+                        <TiltCard 
+                          key={game.id} 
+                          href={`/u/${handle}/${game.id}`}
+                          className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border/50 transition-all hover:shadow-2xl hover:border-accent block"
+                          style={{ background: coverGradient(game.id) }}
+                        >
+                          <div className="w-full h-full">
                             {game.iconUrl && (
                               <div
-                                className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform group-hover:scale-110"
-                                style={{ backgroundImage: `url(${game.iconUrl})`, margin: '10% 10% 30% 10%' }}
+                                className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-110"
+                                style={{ backgroundImage: `url(${game.iconUrl})` }}
                               />
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
                             {game.pegi && <span className="absolute right-3 top-3"><Pegi edad={game.pegi} /></span>}
-                            <div className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white leading-tight drop-shadow-md">
+                            <div className="absolute bottom-4 left-4 right-4 text-sm font-bold text-white leading-tight drop-shadow-md translate-y-2 group-hover:translate-y-0 transition-transform">
                               {game.title}
                             </div>
                           </div>
-                        </Link>
+                        </TiltCard>
                       );
                     })}
                   </div>

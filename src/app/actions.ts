@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { users, userGames, activities, activityComments, activityReactions } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { auth, signOut } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 import {
   CollectionNameError,
   createCollection,
@@ -39,12 +39,14 @@ import {
   SteamPrivateProfileError,
   SteamProfileNotFoundError,
 } from "@/lib/steam/client";
+import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
 import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
 import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideError, type TrophyGuideRow } from "@/lib/trophyGuides";
 import { marcarTodoLeido } from "@/lib/notifications";
 import { ownsGame } from "@/lib/community";
 import { votarDificultad } from "@/lib/communityDifficulty";
+import { getGameRecommendations, type GameRecommendation } from "@/lib/recommendations";
 import type { AccountPlatform } from "@/lib/types";
 
 export interface ActionState {
@@ -70,6 +72,9 @@ function describeError(error: unknown): string {
   if (error instanceof SteamNotConfiguredError) return error.message;
   if (error instanceof SteamProfileNotFoundError) return error.message;
   if (error instanceof SteamPrivateProfileError) return error.message;
+
+  if (error instanceof XblNotConfiguredError) return error.message;
+  if (error instanceof XblProfileNotFoundError) return error.message;
 
   return "No se ha podido contactar con la plataforma. Inténtalo en un momento.";
 }
@@ -220,11 +225,10 @@ export async function linkXboxAction(
   return linkPlatform("xbox", formData);
 }
 
-export async function linkEpicAction(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  return linkPlatform("epic", formData);
+export async function linkEpicOAuthAction(): Promise<void> {
+  const userId = await requireUserId();
+  // Al iniciar sesión, Auth.js redirigirá a Epic Games, y al volver pasará por el linkAccount de auth.ts
+  await signIn("epic", { redirectTo: "/ajustes/plataformas" });
 }
 
 export async function linkUbisoftAction(
@@ -532,7 +536,11 @@ export async function toggleActivityReactionAction(formData: FormData): Promise<
 export async function addActivityCommentAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   const activityId = String(formData.get("activityId") ?? "");
-  const body = String(formData.get("body") ?? "").trim().slice(0, 500);
+  // El campo del formulario (ActivityFeed.tsx) se llama "comment", no
+  // "body" — leer "body" aquí devolvía siempre null, así que `body` salía
+  // "" y el guard de abajo cortaba en silencio: el comentario nunca se
+  // insertaba, sin ningún error visible para quien escribía.
+  const body = String(formData.get("comment") ?? "").trim().slice(0, 500);
   if (!activityId || !body) return;
   await getDb().insert(activityComments).values({ id: crypto.randomUUID(), activityId, userId, body });
   revalidatePath("/", "layout");
@@ -858,4 +866,17 @@ export async function deleteTrophyGuideAction(formData: FormData): Promise<void>
 
   await deleteTrophyGuide(userId, gameId, trophyId);
   revalidatePath(`/juego/${gameId}`);
+}
+
+/* ------------------------------- Ruleta del Backlog ------------------------------ */
+
+/**
+ * Respaldo de la Ruleta del Backlog (BacklogRoulette.tsx) para cuando el
+ * propio backlog está vacío (0% en todos, o biblioteca corta): en vez de no
+ * enseñar nada, tira de recomendaciones por género favorito — mismo dato que
+ * ya usa /descubrir/recomendaciones, no una consulta nueva a IGDB.
+ */
+export async function backlogFallbackAction(): Promise<GameRecommendation[]> {
+  const userId = await requireUserId();
+  return getGameRecommendations(userId, 20);
 }

@@ -11,7 +11,7 @@ import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame, getGameTro
 import { getCommunityRating } from "@/lib/ratings";
 import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";
 import { getProfileByUserId } from "@/lib/profiles";
-import { comparativaPreciosSteam } from "@/lib/prices";
+import { comparativaPreciosSteam, extraerSteamAppId } from "@/lib/prices";
 import { historicoPreciosSteam } from "@/lib/itad";
 import { PriceHistoryChart } from "@/components/PriceHistoryChart";
 import { PLATFORM_LABEL } from "@/lib/types";
@@ -27,6 +27,7 @@ import { GameLanguages } from "@/components/GameLanguages";
 import { GameDlcs } from "@/components/GameDlcs";
 import { GameTrophyBreakdown } from "@/components/GameTrophyBreakdown";
 import { BackButton } from "@/components/BackButton";
+import { GameWishlistCard } from "@/components/GameWishlistCard";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -50,18 +51,12 @@ export default async function JuegoGlobalPage({
     redirect(`/juego/${game.igdbId}`);
   }
 
-  const [stats, rating, dificultadComunidad, reviews, session, precios, historicoPrecios, detalles, trophyBreakdown] = await Promise.all([
+  const [stats, rating, dificultadComunidad, reviews, session, detalles, trophyBreakdown] = await Promise.all([
     getGlobalGameStats(gameId),
     getCommunityRating(gameId),
     getDificultadComunidad(gameId),
     getGameReviews(gameId),
     auth(),
-    // Buscamos ofertas si sabemos el ID de Steam
-    game.steamId ? comparativaPreciosSteam(game.steamId) : Promise.resolve(null),
-    // Histórico de precio a lo largo del tiempo (ITAD) — devuelve [] en
-    // silencio si falta ITAD_API_KEY o no hay AppID de Steam, igual que el
-    // resto de integraciones opcionales.
-    game.steamId ? historicoPreciosSteam(game.steamId) : Promise.resolve([]),
     // Capturas, historia, temas, modos de juego y enlaces oficiales: viven en
     // IGDB, no en nuestra base (games no guarda ese detalle) — se piden en
     // vivo, cacheadas por el propio cliente de IGDB (ver getGameDetails).
@@ -74,6 +69,23 @@ export default async function JuegoGlobalPage({
         })
       : Promise.resolve(null),
     game.igdbId ? getGameTrophyBreakdown(game.igdbId) : Promise.resolve([]),
+  ]);
+
+  // AppID de Steam: el de nuestra propia base si alguien ya sincronizó una
+  // copia (game.steamId), o si no el que enlaza IGDB (detalles.websites,
+  // categoría "Steam") — así el comparador y el histórico de precios
+  // funcionan para cualquier juego de PC del catálogo, no solo para los que
+  // ya tiene alguien en su biblioteca. Necesita `detalles`, así que va
+  // después del Promise.all de arriba, no dentro.
+  const steamAppId = game.steamId ?? extraerSteamAppId(detalles?.websites);
+
+  const [precios, historicoPrecios] = await Promise.all([
+    // Buscamos ofertas si sabemos el ID de Steam
+    steamAppId ? comparativaPreciosSteam(steamAppId) : Promise.resolve(null),
+    // Histórico de precio a lo largo del tiempo (ITAD) — devuelve [] en
+    // silencio si falta ITAD_API_KEY o no hay AppID de Steam, igual que el
+    // resto de integraciones opcionales.
+    steamAppId ? historicoPreciosSteam(steamAppId) : Promise.resolve([]),
   ]);
 
   let miFicha: string | null = null;
@@ -115,7 +127,7 @@ export default async function JuegoGlobalPage({
           <BackButton fallbackHref="/descubrir" dark />
           <div className="mt-2 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0 flex-1">
-              <GameHeaderLogo title={game.title} steamId={game.steamId} />
+              <GameHeaderLogo title={game.title} steamId={steamAppId} />
 
               <div className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-center gap-3 text-[13px] font-bold text-foreground">
@@ -229,60 +241,6 @@ export default async function JuegoGlobalPage({
           )}
         </div>
 
-        {precios && (
-          <section>
-            <div className="mb-4 flex flex-wrap items-baseline gap-3">
-              <h2 className="font-heading text-2xl font-bold">Dónde comprarlo</h2>
-              {precios.precioMasBajoHistorico != null && (
-                <span className="text-[13px] text-muted">
-                  Mínimo histórico: {precios.precioMasBajoHistorico.toFixed(2)} €
-                </span>
-              )}
-            </div>
-            <div className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-              {precios.ofertas.slice(0, 8).map((oferta, i) => (
-                <a
-                  key={oferta.tienda}
-                  href={oferta.url}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="flex items-center gap-3 border-b border-border px-5 py-3.5 last:border-0 transition-colors hover:bg-surface-2"
-                >
-                  {i === 0 && (
-                    <span
-                      className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em]"
-                      style={{ background: "rgba(78, 201, 138, 0.14)", color: "#4ec98a", border: "1px solid rgba(78, 201, 138, 0.3)" }}
-                    >
-                      Más barato
-                    </span>
-                  )}
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold">{oferta.tienda}</span>
-                  {oferta.ahorro > 0 && (
-                    <span className="shrink-0 text-xs font-bold text-good">-{oferta.ahorro}%</span>
-                  )}
-                  {oferta.ahorro > 0 && (
-                    <span className="shrink-0 text-xs text-muted line-through">{oferta.precioOriginal.toFixed(2)} €</span>
-                  )}
-                  <span className="shrink-0 font-heading text-base font-bold">{oferta.precio.toFixed(2)} €</span>
-                </a>
-              ))}
-            </div>
-            <p className="mt-2.5 text-[11px] text-muted">
-              Precios vía CheapShark, pueden no incluir región ni impuestos exactos. Solo disponible para juegos de Steam.
-            </p>
-
-            {historicoPrecios.length > 0 && (
-              <div className="mt-6">
-                <h3 className="mb-3 text-sm font-bold text-foreground">Precio a lo largo del tiempo</h3>
-                <div className="rounded-2xl px-4 py-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-                  <PriceHistoryChart puntos={historicoPrecios} />
-                </div>
-                <p className="mt-2.5 text-[11px] text-muted">Histórico vía IsThereAnyDeal.</p>
-              </div>
-            )}
-          </section>
-        )}
-
         <section>
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
             <h2 className="font-heading text-2xl font-bold">Reseñas de la comunidad</h2>
@@ -383,6 +341,73 @@ export default async function JuegoGlobalPage({
             gameModes={detalles.gameModes}
             websites={detalles.websites}
             franchises={detalles.franchises}
+          />
+        )}
+
+        {/* Al final de la columna a propósito: es la última pieza que se
+            consulta, no la primera decisión — valoración, dificultad, logros
+            y especificaciones van antes. */}
+        {precios && (
+          <div className="flex flex-col gap-4 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+            <div>
+              <h2 className="font-heading text-lg font-bold">Dónde comprarlo</h2>
+              {precios.precioMasBajoHistorico != null && (
+                <p className="mt-0.5 text-xs text-muted">
+                  Mínimo histórico: {precios.precioMasBajoHistorico.toFixed(2)} €
+                </p>
+              )}
+            </div>
+
+            <div className="overflow-hidden rounded-xl" style={{ border: "1px solid var(--border)" }}>
+              {precios.ofertas.slice(0, 6).map((oferta, i) => (
+                <a
+                  key={oferta.tienda}
+                  href={oferta.url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-border px-3.5 py-2.5 last:border-0 transition-colors hover:bg-surface-2"
+                >
+                  <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{oferta.tienda}</span>
+                  <span className="shrink-0 font-heading text-sm font-bold">{oferta.precio.toFixed(2)} €</span>
+                  {i === 0 && (
+                    <span
+                      className="shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.05em]"
+                      style={{ background: "rgba(78, 201, 138, 0.14)", color: "#4ec98a", border: "1px solid rgba(78, 201, 138, 0.3)" }}
+                    >
+                      Más barato
+                    </span>
+                  )}
+                  {oferta.ahorro > 0 && (
+                    <span className="shrink-0 text-[11px] font-bold text-good">-{oferta.ahorro}%</span>
+                  )}
+                </a>
+              ))}
+            </div>
+            <p className="-mt-2 text-[10px] text-muted">
+              Vía CheapShark. Puede no incluir región ni impuestos. Solo Steam.
+            </p>
+
+            {historicoPrecios.length > 0 && (
+              <div>
+                <h3 className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">Precio a lo largo del tiempo</h3>
+                <PriceHistoryChart puntos={historicoPrecios} compact />
+                <p className="mt-2 text-[10px] text-muted">Histórico vía IsThereAnyDeal.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Al final de todo: solo si de verdad hace falta (no está ya en tu
+            biblioteca ni en deseados) y hay sesión — si no, no hay nada real
+            que rellenar aquí y se deja como está. */}
+        {session?.user && !tieneJuego && game.igdbId && (
+          <GameWishlistCard
+            igdbId={game.igdbId}
+            title={game.title}
+            coverUrl={game.iconUrl}
+            genres={game.genres ?? []}
+            developer={game.developer}
+            publisher={game.publisher}
           />
         )}
       </div>

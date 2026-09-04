@@ -12,6 +12,8 @@ export function AchievementIcon({ id, size = 18 }: { id: string; size?: number }
     critico: "M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z",
     sociable: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m16 0v-2a4 4 0 0 0-3-3.87m2-4.13a4 4 0 0 1 0 7.75M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
     rolero: "M14.5 4h-5L7 7H4v3l-2.5 2.5a3.536 3.536 0 1 0 5 5L9 15v-3l3-3 5-5zM15 9l-4 4",
+    multiplataforma:
+      "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
   };
 
   return (

@@ -9,8 +9,6 @@ import { PlatformTiles } from "@/components/PlatformTiles";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
-import { ofertasSteam } from "@/lib/prices";
-import { getPsPlusMensual } from "@/lib/psPlus";
 import { novedades as getNovedades, destacadosRecientes, releaseLabelEs, IgdbNotConfiguredError } from "@/lib/igdb/client";
 import { BackButton } from "@/components/BackButton";
 
@@ -25,12 +23,10 @@ export default async function DescubrirPage() {
   // Tendencias, Joyas Ocultas y Próximos lanzamientos son iguales para
   // todo el mundo — no hace falta sesión para verlos, solo para añadir a
   // Deseados desde ahí (el propio botón de cada pieza ya lo comprueba).
-  const [tendencias, joyas, wishlistIds, ofertas, psPlus, novedades, destacados] = await Promise.all([
+  const [tendencias, joyas, wishlistIds, novedades, destacados] = await Promise.all([
     getTrendingGames(),
     getHiddenGems(),
     userId ? getWishlistIgdbIds(userId) : Promise.resolve([]),
-    ofertasSteam(),
-    getPsPlusMensual(),
     // Recién salidos O por salir, ordenados por hype — no solo lo que aún
     // no ha salido: un lanzamiento de hace dos semanas que todo el mundo
     // comenta también es "novedad". Ver el comentario de novedades() en
@@ -141,75 +137,9 @@ export default async function DescubrirPage() {
         )}
       </div>
 
-      {psPlus && psPlus.juegos.length > 0 && (
-        <div className="mb-10">
-          <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">PlayStation</p>
-          <section>
-            <div className="mb-4 flex flex-wrap items-baseline gap-3">
-              <h2 className="flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-                PlayStation Plus — juegos del mes
-              </h2>
-              {psPlus.fecha && (
-                <span className="text-xs text-muted">
-                  Anunciado el {new Date(psPlus.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}
-                </span>
-              )}
-              <a
-                href={psPlus.link}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
-              >
-                Ver el anuncio en el blog de PlayStation →
-              </a>
-            </div>
-            <GameGrid items={psPlus.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
-              {(g) => <DiscoverCard game={{ ...g, genres: [] }} fluid />}
-            </GameGrid>
-          </section>
-        </div>
-      )}
-
-      {ofertas.length > 0 && (
-        <div className="mb-10">
-          <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Steam</p>
-          <section>
-            <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              Ofertas en Steam
-            </h2>
-            <p className="mb-4 text-sm text-muted">
-              Vía CheapShark. No hay una fuente pública equivalente para la PlayStation Store — no se inventa una aquí.
-            </p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-              {ofertas.map((oferta) => (
-                <a
-                  key={oferta.url}
-                  href={oferta.url}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="flex flex-col overflow-hidden rounded-xl"
-                  style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                >
-                  <div className="relative aspect-video w-full overflow-hidden bg-surface-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={oferta.caratula} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                    <span className="absolute right-2 top-2 rounded-full bg-good px-2 py-0.5 text-[10px] font-bold text-black">
-                      -{oferta.ahorro}%
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <p className="truncate text-[13px] font-semibold">{oferta.titulo}</p>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-sm font-bold text-good">{oferta.precio.toFixed(2)} €</span>
-                      <span className="text-xs text-muted line-through">{oferta.precioOriginal.toFixed(2)} €</span>
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        </div>
-      )}
+      {/* "Ofertas en Steam" vivía aquí duplicada con /descubrir/steam,
+          mismos datos dos veces en sitios distintos — se quitó de la raíz,
+          se queda solo en la página de la plataforma. */}
 
       <div className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
         {userId ? (

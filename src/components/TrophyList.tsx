@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { gradeLabel, TrophyTile } from "@/components/TrophyIcon";
+import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
-import type { Trophy } from "@/lib/types";
+import { clasificarTrofeo } from "@/lib/trophyType";
+import { trophyScore } from "@/lib/trophyScore";
+import type { Platform, Trophy } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
 
 /**
@@ -13,16 +15,21 @@ import { TrophyGuideModal } from "./TrophyGuideModal";
  * tipo es cada cosa. La cuadrícula es la vitrina: iconos grandes, para mirar
  * lo conseguido. Por eso la que manda por defecto sigue siendo la lista.
  */
-export function TrophyList({ 
-  trophies, 
-  gameTitle, 
-  gameId, 
-  esMio, 
-  showcaseTrophies 
-}: { 
-  trophies: Trophy[]; 
-  gameTitle: string; 
+export function TrophyList({
+  trophies,
+  gameTitle,
+  gameId,
+  platform,
+  esMio,
+  showcaseTrophies,
+}: {
+  trophies: Trophy[];
+  gameTitle: string;
   gameId?: string;
+  /** Para el XP de Paragon Score de cada fila (lib/trophyScore.ts) — sin
+   * esto no hay forma de saber si un trofeo sin `grade` es de Steam o de
+   * Xbox, que se puntúan distinto. */
+  platform?: Platform;
   esMio?: boolean;
   showcaseTrophies?: { gameId: string, trophyId: string }[];
 }) {
@@ -91,13 +98,13 @@ export function TrophyList({
                 style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
               >
                 {group.trophies.map((t) => (
-                  <FilaLista key={t.id} trophy={t} onClick={() => setActiveTrophy(t)} />
+                  <FilaLista key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
                 ))}
               </ul>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                 {group.trophies.map((t) => (
-                  <TarjetaCuadricula key={t.id} trophy={t} onClick={() => setActiveTrophy(t)} />
+                  <TarjetaCuadricula key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
                 ))}
               </div>
             )}
@@ -159,8 +166,12 @@ function ViewButton({
   );
 }
 
-function FilaLista({ trophy, onClick }: { trophy: Trophy, onClick: () => void }) {
+function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
   const oculto = trophy.hidden && !trophy.earned;
+  const tipo = clasificarTrofeo(trophy);
+  const puntos = platform
+    ? trophyScore({ platform, grade: trophy.grade, xp: trophy.xp, rarityPercent: trophy.rarityPercent })
+    : null;
 
   return (
     <li
@@ -171,17 +182,27 @@ function FilaLista({ trophy, onClick }: { trophy: Trophy, onClick: () => void })
       <Icono trophy={trophy} size={48} />
 
       <div className="min-w-0">
-        <p className="text-[15px] font-semibold">{oculto ? "Trofeo oculto" : trophy.name}</p>
+        <p className="flex items-center gap-1.5 text-[15px] font-semibold">
+          {oculto ? "Trofeo oculto" : trophy.name}
+          {tipo && (
+            <span className="shrink-0 text-muted">
+              <TrophyTypeIcon tipo={tipo} />
+            </span>
+          )}
+        </p>
         {!oculto && trophy.detail && (
           <p className="mt-1 text-[13px] text-muted">{trophy.detail}</p>
         )}
       </div>
 
-      <span
-        className="hidden text-[11px] font-bold uppercase tracking-[0.1em] sm:block"
-        style={{ color: colorFor(trophy.grade) }}
-      >
-        {gradeLabel(trophy.grade)}
+      <span className="hidden sm:block">
+        <span
+          className="block text-[11px] font-bold uppercase tracking-[0.1em]"
+          style={{ color: colorFor(trophy.grade) }}
+        >
+          {gradeLabel(trophy.grade)}
+        </span>
+        {puntos !== null && <span className="text-[10px] text-muted">{puntos} pts</span>}
       </span>
       <span className="hidden text-right text-xs text-muted sm:block">
         {trophy.earnedAt ? relativeDate(trophy.earnedAt) : "—"}
@@ -190,20 +211,33 @@ function FilaLista({ trophy, onClick }: { trophy: Trophy, onClick: () => void })
   );
 }
 
-function TarjetaCuadricula({ trophy, onClick }: { trophy: Trophy, onClick: () => void }) {
+function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
   const oculto = trophy.hidden && !trophy.earned;
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
+  const tipo = clasificarTrofeo(trophy);
+  const puntos = platform
+    ? trophyScore({ platform, grade: trophy.grade, xp: trophy.xp, rarityPercent: trophy.rarityPercent })
+    : null;
 
   return (
     <div
       onClick={onClick}
-      className="flex flex-col items-center rounded-[14px] p-4 text-center cursor-pointer hover:scale-[1.02] transition-transform hover:bg-white/5"
+      className="relative flex flex-col items-center rounded-[14px] p-4 text-center cursor-pointer hover:scale-[1.02] transition-transform hover:bg-white/5"
       style={{
         border: "1px solid var(--border)",
         background: "var(--surface)",
         opacity: trophy.earned ? 1 : 0.42,
       }}
     >
+      {tipo && (
+        <span
+          className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full text-muted"
+          style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
+        >
+          <TrophyTypeIcon tipo={tipo} size={13} />
+        </span>
+      )}
+
       <Icono trophy={trophy} size={64} />
 
       <p className="mt-3 line-clamp-2 text-[13px] font-semibold">
@@ -216,6 +250,7 @@ function TarjetaCuadricula({ trophy, onClick }: { trophy: Trophy, onClick: () =>
       >
         {gradeLabel(trophy.grade)}
       </span>
+      {puntos !== null && <span className="text-[10px] text-muted">{puntos} pts</span>}
 
       {r && (
         <span

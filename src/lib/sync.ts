@@ -8,6 +8,7 @@ import {
   fetchLibrary as fetchSteamLibrary,
   fetchStoreMetadata,
 } from "@/lib/steam/client";
+import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 
 /**
@@ -52,6 +53,18 @@ function chunked<T>(items: T[], size = CHUNK): T[][] {
  */
 const STEAM_DETAIL_LIMIT = 40;
 const STEAM_CONCURRENCY = 6;
+
+/**
+ * Lo mismo que STEAM_DETAIL_LIMIT, pero mucho más bajo: OpenXBL (xbl.io) va
+ * en un nivel gratis de 150 peticiones/hora — ver la nota de riesgo en
+ * lib/xbl/client.ts. Vincular una cuenta ya gasta 3 peticiones antes de
+ * llegar aquí (buscar el gamertag, la biblioteca, comprobar que se puede
+ * leer), y cada juego puede necesitar más de una página. 15 juegos con
+ * concurrencia 2 deja margen de sobra para no agotar el cupo en una sola
+ * vinculación.
+ */
+const XBL_DETAIL_LIMIT = 15;
+const XBL_CONCURRENCY = 2;
 
 /** Lanza las tareas de N en N: ni una a una (lento) ni todas (Steam corta). */
 async function mapLimit<T>(items: T[], limit: number, run: (item: T) => Promise<void>) {
@@ -140,19 +153,21 @@ export async function syncLibrary(
   userId: string,
   account: SyncAccount,
 ): Promise<number> {
-  // Google, Xbox, Epic y Ubisoft no tienen lector propio todavía. Sin esta
-  // salida, "cualquier plataforma que no sea psn" caía por defecto en el
-  // lector de Steam y le pedía la biblioteca a Steam con, p. ej., un gamertag
-  // de Xbox — de ahí que su cuenta se vincule con `legible: false` (ver
-  // resolveXbox/resolveEpic/resolveUbisoft/resolveGoogle en profiles.ts), lo
-  // que ya evita llegar aquí. Se deja explícito por si algo cambia esa
-  // bandera sin tocar esto.
-  if (account.platform !== "psn" && account.platform !== "steam") return 0;
+  // Google, Epic y Ubisoft no tienen lector propio todavía. Sin esta salida,
+  // "cualquier plataforma que no sea psn/steam/xbox" caía por defecto en el
+  // lector de Steam y le pedía la biblioteca a Steam con, p. ej., un usuario
+  // de Epic — de ahí que su cuenta se vincule con `legible: false` (ver
+  // resolveEpic/resolveUbisoft/resolveGoogle en profiles.ts), lo que ya
+  // evita llegar aquí. Se deja explícito por si algo cambia esa bandera sin
+  // tocar esto.
+  if (account.platform !== "psn" && account.platform !== "steam" && account.platform !== "xbox") return 0;
 
   const library =
     account.platform === "psn"
       ? await fetchPsnLibrary(account.accountId)
-      : await fetchSteamLibrary(account.accountId);
+      : account.platform === "steam"
+        ? await fetchSteamLibrary(account.accountId)
+        : await fetchXblLibrary(account.accountId);
 
   if (library.length === 0) return 0;
 
@@ -169,6 +184,16 @@ export async function syncLibrary(
       .slice(0, STEAM_DETAIL_LIMIT);
 
     await mapLimit(recientes, STEAM_CONCURRENCY, async (game) => {
+      await syncGameTrophies(userId, account, game.id);
+    });
+  }
+
+  if (account.platform === "xbox") {
+    // Xbox no da `playtimeMinutes` (a diferencia de Steam), así que el
+    // filtro de "recientes" es por `lastPlayedAt`, que la biblioteca sí trae.
+    const recientes = library.filter((g) => g.lastPlayedAt).slice(0, XBL_DETAIL_LIMIT);
+
+    await mapLimit(recientes, XBL_CONCURRENCY, async (game) => {
       await syncGameTrophies(userId, account, game.id);
     });
   }
@@ -209,6 +234,7 @@ async function saveTrophies(
           iconUrl: t.iconUrl,
           groupId: t.groupId ?? "default",
           groupName: t.groupName ?? null,
+          xp: t.xp ?? null,
         })),
       )
       .onConflictDoUpdate({
@@ -219,6 +245,7 @@ async function saveTrophies(
           iconUrl: sqlExcluded("iconUrl"),
           groupId: sqlExcluded("groupId"),
           groupName: sqlExcluded("groupName"),
+          xp: sqlExcluded("xp"),
         },
       });
 
@@ -351,7 +378,17 @@ export async function syncGameTrophies(
       nativeId,
       row?.service ?? "trophy2",
     );
-    
+
+    if (row?.title) {
+      await syncIgdbMetadata(gameId, row.title);
+    }
+  } else if (platform === "xbox") {
+    trophies = await fetchXblAchievements(account.accountId, nativeId);
+
+    // Xbox no tiene una API de tienda pública como Steam (syncStoreMetadata
+    // es específica de appid de Steam) — se empareja por título en IGDB,
+    // igual que PSN.
+    const [row] = await db.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1);
     if (row?.title) {
       await syncIgdbMetadata(gameId, row.title);
     }
@@ -375,8 +412,11 @@ export async function syncGameTrophies(
 
   const earnedTotal = trophies.filter((t) => t.earned).length;
 
+  // Steam y Xbox comparten el mismo motivo: ninguna de las dos da el
+  // progreso en la llamada de biblioteca, así que se calcula aquí, con los
+  // logros de verdad ya en la mano — igual que definedTotal más abajo.
   const progreso =
-    platform === "steam"
+    platform === "steam" || platform === "xbox"
       ? {
           earnedTotal,
           progressPercent: Math.round((earnedTotal / trophies.length) * 100),
@@ -388,7 +428,7 @@ export async function syncGameTrophies(
     .set({ trophiesSyncedAt: new Date(), ...progreso })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
-  if (platform === "steam") {
+  if (platform === "steam" || platform === "xbox") {
     await db
       .update(games)
       .set({ definedTotal: trophies.length })

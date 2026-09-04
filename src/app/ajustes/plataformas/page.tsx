@@ -41,9 +41,11 @@ const HELP: Record<AccountPlatform, string> = {
   google:
     "Tu cuenta de Google Play Games. Se sincronizan los logros de los juegos compatibles con la plataforma móvil.",
   xbox:
-    "Tu Gamertag de Xbox. La vinculación sincroniza tu historial en ecosistemas Microsoft (en fase de desarrollo).",
+    "Tu Gamertag de Xbox. Sincroniza de verdad tu historial de logros, vía un " +
+    "servicio de terceros (no oficial de Microsoft) — puede fallar o dejar de " +
+    "funcionar si ese servicio cambia.",
   epic:
-    "Tu nombre de usuario de Epic Games. Sincronización de biblioteca mediante proxy no oficial (en fase de desarrollo).",
+    "Tu cuenta de Epic Games. Conecta directamente con los servicios oficiales (Epic Account Services).",
   ubisoft:
     "Tu usuario de Ubisoft Connect. Se requiere tener la privacidad del perfil público (en fase de desarrollo).",
 };

@@ -5,7 +5,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ProfileForm } from "@/components/forms/ProfileForm";
 import { getParagonLevel } from "@/lib/paragonLevel";
-import { getUserBadges } from "@/lib/profiles";
+import { getLibrary, getProfileByUserId, getUserBadges } from "@/lib/profiles";
 
 export default async function AjustesGeneralPage() {
   const session = await auth();
@@ -18,10 +18,26 @@ export default async function AjustesGeneralPage() {
 
   if (!dbUser) redirect("/entrar");
 
-  const [nivel, badges] = await Promise.all([
+  const [nivel, badges, profile] = await Promise.all([
     getParagonLevel(session.user.id),
     getUserBadges(session.user.id),
+    getProfileByUserId(session.user.id),
   ]);
 
-  return <ProfileForm user={dbUser} nivel={nivel.level} badges={badges.map((b) => b.badgeId)} />;
+  // Para el selector visual de "juego para el fondo" — solo lo mínimo
+  // (id/título/carátula), no la biblioteca entera con logros y todo.
+  const { games } = profile ? await getLibrary(profile) : { games: [] };
+  const juegosParaFondo = games
+    .filter((g) => !g.isWishlist && g.iconUrl)
+    .map((g) => ({ id: g.id, title: g.title, iconUrl: g.iconUrl! }));
+
+  return (
+    <ProfileForm
+      user={dbUser}
+      nivel={nivel.level}
+      badges={badges.map((b) => b.badgeId)}
+      favoritos={profile?.favorites ?? []}
+      juegos={juegosParaFondo}
+    />
+  );
 }

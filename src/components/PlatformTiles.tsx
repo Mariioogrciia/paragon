@@ -1,4 +1,4 @@
-import { PlayStationIcon, SteamIcon, XboxIcon, NintendoIcon, EpicGamesIcon } from "@/lib/platformIcons";
+import { PlayStationIcon, SteamIcon, XboxIcon, NintendoIcon, EpicGamesIcon, UbisoftIcon } from "@/lib/platformIcons";
 
 /**
  * Fila de accesos rápidos por plataforma en /descubrir. "Todo" ancla al
@@ -45,28 +45,35 @@ const TILES: Tile[] = [
       </svg>
     ),
   },
-  { label: "PlayStation", href: "/descubrir/playstation", bg: "#0f3d8a", fg: "#ffffff", icon: <PlayStationIcon size={22} /> },
+  { label: "PlayStation", href: "/descubrir/playstation", bg: "var(--surface-2)", fg: "var(--foreground)", icon: <PlayStationIcon size={22} /> },
   {
     label: "Xbox",
-    bg: "#0e7a0d",
-    fg: "#ffffff",
-    disabledNote: "Xbox se puede vincular, pero Descubrir aún no tiene una sección propia para su catálogo (en fase de desarrollo).",
+    href: "/descubrir/xbox",
+    bg: "var(--surface-2)",
+    fg: "var(--foreground)",
     icon: <XboxIcon size={22} />,
   },
-  { label: "Steam", href: "/descubrir/steam", bg: "#1b2838", fg: "#ffffff", icon: <SteamIcon size={22} /> },
+  { label: "Steam", href: "/descubrir/steam", bg: "var(--surface-2)", fg: "var(--foreground)", icon: <SteamIcon size={22} /> },
   {
     label: "Nintendo",
-    bg: "#b3121a",
-    fg: "#ffffff",
+    bg: "var(--surface-2)",
+    fg: "var(--foreground)",
     disabledNote: "Los juegos de Switch se registran a mano en tu biblioteca — Descubrir aún no tiene una sección propia para ellos (en fase de desarrollo).",
     icon: <NintendoIcon size={22} />,
   },
   {
     label: "Epic Games",
-    bg: "#2a2a2a",
-    fg: "#ffffff",
-    disabledNote: "Epic Games se puede vincular, pero Descubrir aún no tiene una sección propia para su catálogo (en fase de desarrollo).",
+    bg: "var(--surface-2)",
+    fg: "var(--foreground)",
+    disabledNote: "Epic Games se puede vincular, pero no hay ninguna fuente pública de noticias ni catálogo: su web bloquea hasta su propio feed RSS oficial.",
     icon: <EpicGamesIcon size={22} />,
+  },
+  {
+    label: "Ubisoft",
+    bg: "var(--surface-2)",
+    fg: "var(--foreground)",
+    disabledNote: "Ubisoft Connect se puede vincular, pero no tiene ningún feed de noticias público — su web no expone RSS.",
+    icon: <UbisoftIcon size={22} />,
   },
 ];
 

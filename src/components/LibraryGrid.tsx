@@ -7,6 +7,8 @@ import { GameCard } from "@/components/GameCard";
 import { Dropdown } from "@/components/Dropdown";
 import { RatingStars } from "@/components/RatingStars";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
+import { ImportLibraryModal } from "@/components/ImportLibraryModal";
+import { BacklogRoulette } from "@/components/BacklogRoulette";
 import {
   companyOf,
   filterGames,
@@ -18,6 +20,8 @@ import {
 import type { Dificultad } from "@/lib/difficulty";
 import { PLATFORM_LABEL, type Game, type Platform } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
+import { TiltCard } from "@/components/TiltCard";
+import { coverGradient } from "@/lib/design";
 
 const STATUS: { label: string; value: GameStatus | "todos" }[] = [
   { label: "Todos", value: "todos" },
@@ -105,7 +109,7 @@ export function LibraryGrid({
   const [collection, setCollection] = useState("");
   const [sort, setSort] = useState<SortKey>("reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [view, setView] = useState<"grid" | "list">("grid");
+  const [view, setView] = useState<"grid" | "list" | "mosaic">("grid");
   const [agrupar, setAgrupar] = useState(false);
 
   const facets = useMemo(() => libraryFacets(games), [games]);
@@ -199,6 +203,34 @@ export function LibraryGrid({
       );
     }
     
+    if (view === "mosaic") {
+      return (
+        <TiltCard
+          key={game.id}
+          href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`}
+          className="group relative block aspect-[4/5] overflow-hidden rounded-xl transition-all duration-300 hover:shadow-2xl hover:border-accent border border-border/50"
+          style={{ background: coverGradient(game.id) }}
+        >
+          {game.iconUrl && (
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-110"
+              style={{ backgroundImage: `url(${game.iconUrl})` }}
+            />
+          )}
+          <div className={`absolute inset-0 flex flex-col justify-end p-4 transition-opacity duration-300 ${game.iconUrl ? "bg-black/60 opacity-0 group-hover:opacity-100" : "bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-100"}`}>
+             <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform">
+               <div className="text-white font-bold text-sm leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mb-2">{game.title}</div>
+               <div className="flex items-center justify-between">
+                 <span className="text-xs font-bold text-accent-text drop-shadow-md">{game.progressPercent}%</span>
+                 <RatingStars gameId={game.id} initialRating={game.rating} />
+               </div>
+             </div>
+          </div>
+          {game.pegi && <span className={`absolute right-2 top-2 transition-opacity ${game.iconUrl ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}><Pegi edad={game.pegi} /></span>}
+        </TiltCard>
+      );
+    }
+    
     // List view
     return (
       <div key={game.id} className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border hover:bg-surface-2 transition-colors">
@@ -279,12 +311,21 @@ export function LibraryGrid({
             <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </button>
+            <button onClick={() => setView("mosaic")} className={`p-1.5 rounded-md transition-colors ${view === "mosaic" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            </button>
             <button onClick={() => setView("list")} className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
             </button>
           </div>
 
-          {esMio && <AddManualGameModal />}
+          {esMio && (
+            <>
+              <BacklogRoulette games={games} handle={handle} />
+              <ImportLibraryModal />
+              <AddManualGameModal />
+            </>
+          )}
         </div>
       </div>
 
@@ -510,7 +551,7 @@ export function LibraryGrid({
                 <h3 className="font-heading text-lg font-bold">{empresa}</h3>
                 <span className="text-xs text-muted">{juegos.length} juegos</span>
               </div>
-              <div className={view === "grid" ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-2"}>
+              <div className={view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}>
                 {juegos.map(renderGame)}
               </div>
             </section>
@@ -520,7 +561,7 @@ export function LibraryGrid({
         <>
           <motion.div
             layout
-            className={view === "grid" ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-2"}
+            className={view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}
           >
             {/*
               Antes esto iba envuelto en `AnimatePresence mode="popLayout"`

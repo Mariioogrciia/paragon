@@ -51,7 +51,7 @@ export function GameDetailsSidebar({ developer, publisher, releaseLabel, platfor
 
   return (
     <aside
-      className="space-y-4 rounded-2xl p-5 lg:sticky lg:top-24"
+      className="space-y-4 rounded-2xl p-5"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       <h2 className="font-heading text-lg font-bold uppercase tracking-wide">Detalles</h2>

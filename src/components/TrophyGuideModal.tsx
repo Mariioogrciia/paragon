@@ -11,7 +11,8 @@ import {
   type ActionState,
 } from "@/app/actions";
 import { type Trophy } from "@/lib/types";
-import { TrophyIcon } from "@/components/TrophyIcon";
+import { TrophyIcon, TrophyTypeIcon } from "@/components/TrophyIcon";
+import { clasificarTrofeo } from "@/lib/trophyType";
 import { Avatar } from "@/components/Avatar";
 import { relativeDate } from "@/lib/design";
 import type { TrophyGuideRow } from "@/lib/trophyGuides";
@@ -79,8 +80,16 @@ export function TrophyGuideModal({
       >
         <div className="flex items-center justify-between border-b border-border p-4 px-6">
           <div className="min-w-0">
-            <h2 className="truncate font-heading text-[18px] font-bold text-foreground">
+            <h2 className="flex items-center gap-2 truncate font-heading text-[18px] font-bold text-foreground">
               Guía de trofeo: {trophy.name}
+              {(() => {
+                const tipo = clasificarTrofeo(trophy);
+                return tipo ? (
+                  <span className="shrink-0 text-muted">
+                    <TrophyTypeIcon tipo={tipo} size={15} />
+                  </span>
+                ) : null;
+              })()}
             </h2>
             <p className="truncate text-[13px] text-muted">
               {gameTitle}

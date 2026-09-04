@@ -56,14 +56,21 @@ export interface PuntoPrecio {
 /**
  * Histórico de precios de un juego de Steam, ordenado por fecha ascendente.
  * `desdeAnios` limita cuánto atrás se pide (ITAD por defecto solo da los
- * últimos 3 meses si no se especifica `since`).
+ * últimos 3 meses si no se especifica `since`). 5 años por defecto: el
+ * gráfico (PriceHistoryChart) tiene un selector de rango tipo cripto
+ * (7D/1M/3M/1A/Todo) — para que "1A" y "Todo" digan algo de verdad hace
+ * falta pedir más de lo que se va a enseñar por defecto, no solo 2 años.
  */
-export async function historicoPreciosSteam(appId: string, desdeAnios = 2): Promise<PuntoPrecio[]> {
+export async function historicoPreciosSteam(appId: string, desdeAnios = 5): Promise<PuntoPrecio[]> {
   const itadId = await lookupItadId(appId);
   if (!itadId) return [];
 
   const desde = new Date();
   desde.setFullYear(desde.getFullYear() - desdeAnios);
+  // ITAD rechaza el ISO estándar de JS (milisegundos + "Z") con 400 "Invalid
+  // 'since' format" — comprobado a mano contra la API real. Quiere segundos
+  // enteros y un offset explícito (+00:00), no "Z".
+  const desdeIso = desde.toISOString().replace(/\.\d+Z$/, "+00:00");
 
   const entradas = await itadFetch<
     {
@@ -77,7 +84,7 @@ export async function historicoPreciosSteam(appId: string, desdeAnios = 2): Prom
   >(`/games/history/v2`, {
     id: itadId,
     country: "ES",
-    since: desde.toISOString(),
+    since: desdeIso,
   });
 
   if (!entradas || entradas.length === 0) return [];

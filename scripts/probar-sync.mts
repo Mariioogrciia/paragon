@@ -10,12 +10,12 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-const platform = (process.argv[2] ?? "psn") as "psn" | "steam";
+const platform = (process.argv[2] ?? "psn") as "psn" | "steam" | "xbox";
 const accountId = process.argv[3];
 
-if (!accountId || (platform !== "psn" && platform !== "steam")) {
+if (!accountId || (platform !== "psn" && platform !== "steam" && platform !== "xbox")) {
   console.error(
-    "Uso: npx tsx scripts/probar-sync.mts <psn|steam> <accountId de PSN o SteamID64>",
+    "Uso: npx tsx scripts/probar-sync.mts <psn|steam|xbox> <accountId de PSN, SteamID64 o XUID de Xbox>",
   );
   process.exit(1);
 }

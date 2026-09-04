@@ -20,6 +20,23 @@ import "server-only";
 const USER_AGENT = "Paragon/1.0 (+https://github.com/Mariioogrciia/paragon)";
 
 /**
+ * AppID de Steam a partir del enlace oficial que trae IGDB (categoría 13 de
+ * `websites`, ver lib/igdb/client.ts) — para juegos de PC que nadie ha
+ * vinculado todavía en Paragon (así que `games.nativeId` no tiene fila de
+ * Steam propia) pero que sí están en Steam de verdad. Sin esto, el
+ * comparador de precios solo funcionaba para los ~juegos que alguien ya
+ * había sincronizado, aunque el resto también tuviera tienda.
+ */
+export function extraerSteamAppId(websites: { label: string; url: string }[] | undefined): string | null {
+  for (const w of websites ?? []) {
+    if (w.label !== "Steam") continue;
+    const m = /\/app\/(\d+)/.exec(w.url);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+/**
  * Ids de tienda de CheapShark → nombre. Estaban mal desde hacía tiempo: el
  * id de cada tienda en su API no es estable en el sentido que uno
  * esperaría (comprobado contra `GET /stores` el 4 de septiembre de 2026),

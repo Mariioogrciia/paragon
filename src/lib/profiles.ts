@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/db/schema";
 import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
+import * as xbl from "@/lib/xbl/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import {
@@ -227,18 +229,43 @@ export async function checkAndGrantBadges(userId: string) {
     .where(and(eq(friendships.status, "accepted"), or(eq(friendships.requesterId, userId), eq(friendships.addresseeId, userId))));
   const friends = Number(friendsResult[0]?.count ?? 0);
 
+  // "Multiplataforma": las 3 plataformas que de verdad sincronizan
+  // (`isPublic: true` — no basta con haberla vinculado, PSN/Steam pueden
+  // quedarse en "Privado" si el perfil no es legible). Google/Epic/Ubisoft
+  // se quedan fuera a propósito: hoy ninguna sincroniza biblioteca de verdad.
+  const plataformasResult = await db
+    .select({ platform: platformAccounts.platform })
+    .from(platformAccounts)
+    .where(
+      and(
+        eq(platformAccounts.userId, userId),
+        eq(platformAccounts.isPublic, true),
+        sql`${platformAccounts.platform} in ('psn', 'steam', 'xbox')`,
+      ),
+    );
+  const plataformasReales = new Set(plataformasResult.map((p) => p.platform)).size;
+
   if (platinums >= 1) await grantBadge(userId, "first_blood");
   if (platinums >= 10) await grantBadge(userId, "cazador");
   if (platinums >= 50) await grantBadge(userId, "experto");
   if (platinums >= 100) await grantBadge(userId, "leyenda");
-  
+
   if (games >= 100) await grantBadge(userId, "coleccionista");
   if (reviews >= 3) await grantBadge(userId, "critico");
   if (friends >= 3) await grantBadge(userId, "sociable");
+  if (plataformasReales >= 3) await grantBadge(userId, "multiplataforma");
   if (rpgs >= 5) await grantBadge(userId, "rolero");
 }
 
-export async function getGlobalStats() {
+/**
+ * Suma sobre TODA la tabla `user_game`, igual para cualquiera que la mire
+ * (la portada de marketing, sin sesión) — se cachea 5 minutos para no
+ * recalcularla en cada visita anónima a "/". Antes se recalculaba entera
+ * cada vez; con pocos usuarios no se notaba, pero crece con las visitas,
+ * no con los datos.
+ */
+export const getGlobalStats = unstable_cache(
+  async () => {
   const result = await db
     .select({
       totalGames: sql<number>`count(distinct ${userGames.gameId})`,
@@ -262,7 +289,10 @@ export async function getGlobalStats() {
     trofeos: Number(row?.totalTrophies ?? 0),
     completadoMedio: Math.round(Number(row?.avgCompletion ?? 0)),
   };
-}
+  },
+  ["global-stats"],
+  { revalidate: 300 },
+);
 
 /* ------------------------------ Vincular cuentas ----------------------------- */
 
@@ -367,20 +397,33 @@ async function resolveSteam(input: string): Promise<Resolved> {
   };
 }
 
-// Google, Xbox, Epic y Ubisoft no tienen sincronización real todavía: sus
-// únicas APIs viables no dan la biblioteca de un jugador cualquiera (Google
-// Play Games solo devuelve logros del juego atado al Client ID; Xbox, Epic y
-// Ubisoft no tienen credenciales configuradas). Se dejan vincular para que la
-// cuenta quede guardada y visible, pero `legible: false` evita que
-// `syncLibrary` reciba ese accountId — antes caía por defecto en el lector de
-// Steam y le pedía la biblioteca a Steam con, por ejemplo, un gamertag de
-// Xbox.
+// Google, Epic y Ubisoft no tienen sincronización real todavía: sus únicas
+// APIs viables no dan la biblioteca de un jugador cualquiera (Google Play
+// Games solo devuelve logros del juego atado al Client ID; Epic y Ubisoft no
+// tienen credenciales configuradas). Se dejan vincular para que la cuenta
+// quede guardada y visible, pero `legible: false` evita que `syncLibrary`
+// reciba ese accountId — antes caía por defecto en el lector de Steam y le
+// pedía la biblioteca a Steam con, por ejemplo, un usuario de Epic.
 async function resolveGoogle(input: string): Promise<Resolved> {
   return { accountId: input, username: input.split('@')[0] || input, level: null, avatarUrl: null, legible: false };
 }
 
+/**
+ * Xbox sí tiene sincronización real, vía OpenXBL (xbl.io) — no una API
+ * oficial de Microsoft, ver el aviso de riesgo en lib/xbl/client.ts. El
+ * "nivel" de PSN no tiene equivalente aquí: se deja `level: null`, igual
+ * que Steam.
+ */
 async function resolveXbox(input: string): Promise<Resolved> {
-  return { accountId: input, username: input, level: null, avatarUrl: null, legible: false };
+  const profile = await xbl.resolveProfile(input);
+
+  return {
+    accountId: profile.xuid,
+    username: profile.gamertag,
+    level: null,
+    avatarUrl: profile.avatarUrl ?? null,
+    legible: await xbl.canReadAchievements(profile.xuid),
+  };
 }
 
 async function resolveEpic(input: string): Promise<Resolved> {
@@ -636,6 +679,7 @@ export async function getGameDetail(
       iconUrl: gameTrophies.iconUrl,
       groupId: gameTrophies.groupId,
       groupName: gameTrophies.groupName,
+      xp: gameTrophies.xp,
       earned: userTrophies.earned,
       earnedAt: userTrophies.earnedAt,
       rarityPercent: userTrophies.rarityPercent,
@@ -672,6 +716,7 @@ export async function getGameDetail(
     // todos los trofeos en "Juego Base".
     groupId: r.groupId ?? "default",
     groupName: r.groupName ?? undefined,
+    xp: r.xp ?? undefined,
     earned: r.earned ?? false,
     earnedAt: r.earnedAt?.toISOString(),
     rarityPercent: r.rarityPercent ?? undefined,

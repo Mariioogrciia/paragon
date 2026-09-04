@@ -12,6 +12,8 @@ import { RecentlyPlayed } from "@/components/RecentlyPlayed";
 import { PlaytimeComparison } from "@/components/PlaytimeComparison";
 import { FriendsLeaderboard } from "@/components/FriendsLeaderboard";
 import { BackButton } from "@/components/BackButton";
+import { ParagonScoreCard } from "@/components/ParagonScoreCard";
+import { getParagonScore } from "@/lib/paragonScore";
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
@@ -26,7 +28,7 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
 
-  const [dias, meses, horas, horasEnTotal, feed, { games: biblioteca }, amigos] = await Promise.all([
+  const [dias, meses, horas, horasEnTotal, feed, { games: biblioteca }, amigos, paragonScore] = await Promise.all([
     actividadPorDia(profile.userId),
     trofeosPorMes(profile.userId),
     horasPorJuego(profile.userId),
@@ -38,6 +40,7 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
     esMio ? getFeed(profile.userId) : Promise.resolve([]),
     getLibrary(profile),
     esMio ? estadisticasAmigos(profile.userId) : Promise.resolve([]),
+    getParagonScore(profile.userId),
   ]);
 
   // "Últimas sesiones" no es un dato que exista — ni PSN ni Steam dan un
@@ -56,6 +59,8 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
         <Link href={`/u/${handle}`} className="hover:underline">@{handle}</Link> / Estadísticas
       </p>
       <h1 className="mb-6 font-heading text-3xl font-bold uppercase tracking-wide">Estadísticas</h1>
+
+      <ParagonScoreCard score={paragonScore} />
 
       <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
         <ActivityHeatmap dias={dias} />

@@ -241,6 +241,15 @@ export const gameTrophies = pgTable(
     /** ID del grupo de trofeos. "default" para el juego base, "001" etc para DLCs. */
     groupId: text("groupId").notNull().default("default"),
     groupName: text("groupName"),
+    /**
+     * Gamerscore real del logro, solo Xbox (`rewards[].type === "Gamerscore"`
+     * en la respuesta de OpenXBL). PSN no tiene un peso propio por trofeo —
+     * usa `grade`; Steam tampoco — se estima por `rarityPercent`. Null en
+     * las otras dos plataformas a propósito, no un 0 inventado. Ver
+     * lib/paragonScore.ts, que es quien de verdad calcula la puntuación
+     * unificada a partir de esto (+ grade + rarityPercent).
+     */
+    xp: integer("xp"),
   },
   (t) => [primaryKey({ columns: [t.gameId, t.trophyId] })],
 );
@@ -283,7 +292,15 @@ export const userGames = pgTable(
      */
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
+  (t) => [
+    primaryKey({ columns: [t.userId, t.gameId] }),
+    // La PK (userId, gameId) no sirve para buscar solo por gameId — y hay
+    // más de 10 sitios que lo hacen (estadísticas de un juego, reseñas,
+    // recomendaciones, Descubrir...). Creado con SQL explícito
+    // (scripts/anadir-indices-rendimiento.mts), esto es solo para que
+    // drizzle-kit no proponga borrarlo.
+    index("user_game_gameId_idx").on(t.gameId),
+  ],
 );
 
 /** Estado de cada logro para un usuario. */
@@ -304,7 +321,12 @@ export const userTrophies = pgTable(
     progressCurrent: integer("progressCurrent"),
     progressTarget: integer("progressTarget"),
   },
-  (t) => [primaryKey({ columns: [t.userId, t.gameId, t.trophyId] })],
+  (t) => [
+    primaryKey({ columns: [t.userId, t.gameId, t.trophyId] }),
+    // Mismo motivo que en user_game: la rareza global de un logro y "quién
+    // lo tiene" se buscan por gameId solo, sin userId.
+    index("user_trophy_gameId_idx").on(t.gameId),
+  ],
 );
 
 /* ---------------------------------------------------------------- *
@@ -379,7 +401,14 @@ export const activities = pgTable(
     rating: integer("rating"),
     review: text("review"),
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
-  }
+  },
+  (t) => [
+    // No tenía ningún índice más allá de su propia PK — el feed de
+    // actividad (getFeed, la portada) filtra por userId de los amigos en
+    // una tabla que crece con cada valoración/reseña/platino.
+    index("activity_userId_idx").on(t.userId),
+    index("activity_gameId_idx").on(t.gameId),
+  ],
 );
 
 export const activityReactions = pgTable(
@@ -393,13 +422,17 @@ export const activityReactions = pgTable(
   (t) => [primaryKey({ columns: [t.activityId, t.userId] })],
 );
 
-export const activityComments = pgTable("activity_comment", {
-  id: text("id").primaryKey(),
-  activityId: text("activityId").notNull().references(() => activities.id, { onDelete: "cascade" }),
-  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
-  body: text("body").notNull(),
-  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
-});
+export const activityComments = pgTable(
+  "activity_comment",
+  {
+    id: text("id").primaryKey(),
+    activityId: text("activityId").notNull().references(() => activities.id, { onDelete: "cascade" }),
+    userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [index("activity_comment_activityId_idx").on(t.activityId)],
+);
 
 export const syncRuns = pgTable("sync_run", {
   id: text("id").primaryKey(),

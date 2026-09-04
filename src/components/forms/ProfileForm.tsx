@@ -7,6 +7,7 @@ import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEdito
 import { BADGE_DEFINITIONS } from "@/components/Badges";
 import { FRAME_REQUISITOS } from "@/lib/level";
 import { AvatarFrame } from "@/components/AvatarFrame";
+import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 
@@ -51,6 +52,8 @@ export function ProfileForm({
   user,
   nivel = 0,
   badges = [],
+  juegos = [],
+  favoritos = [],
 }: {
   user: ProfileFormUser;
   /** Nivel Paragon real del usuario — decide qué marcos puede elegir de
@@ -59,10 +62,17 @@ export function ProfileForm({
   nivel?: number;
   /** Insignias ya ganadas, para sugerir títulos coherentes con ellas. */
   badges?: string[];
+  /** Biblioteca (sin deseados, solo lo que tiene carátula) para el selector
+   * visual de "juego para el fondo" — antes había que escribir el ID a mano. */
+  juegos?: { id: string; title: string; iconUrl: string }[];
+  /** IDs de los juegos favoritos del usuario, para ponerlos primero en el
+   * selector — el fondo "basado en tu juego favorito" que se pidió. */
+  favoritos?: string[];
 }) {
   const [titulo, setTitulo] = useState(user.profileTitle ?? "");
   const marcoBloqueado = (v: string) => FRAME_REQUISITOS[v] !== undefined && nivel < FRAME_REQUISITOS[v];
   const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
+  const [fondoJuegoId, setFondoJuegoId] = useState(user.profileBackgroundGameId ?? "");
   const titulosSugeridos = badges
     .map((id) => BADGE_DEFINITIONS[id]?.name)
     .filter((n): n is string => Boolean(n));
@@ -220,7 +230,13 @@ export function ProfileForm({
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Juego para el fondo</label>
-              <input name="profileBackgroundGameId" defaultValue={user.profileBackgroundGameId ?? ""} placeholder="ID del juego de tu biblioteca" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <BackgroundGamePicker
+                juegos={juegos}
+                favoritos={favoritos}
+                value={fondoJuegoId}
+                onChange={setFondoJuegoId}
+              />
+              <input type="hidden" name="profileBackgroundGameId" value={fondoJuegoId} />
             </div>
             <div className="md:col-span-2">
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Estado</label>
@@ -247,17 +263,13 @@ export function ProfileForm({
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Marco del avatar</label>
               <div className="flex items-center gap-3">
+                {/* Avatar, no un <img> suelto: un <img> es inline por defecto y,
+                    dentro del div sin flex de Nucleo (AvatarFrame.tsx), dejaba
+                    un hueco fino abajo (el espacio de línea de base) — la foto
+                    no llegaba a rellenar el círculo del marco. Avatar ya
+                    centra con flex, igual que en el perfil público. */}
                 <AvatarFrame frame={marco}>
-                  {avatar ? (
-                    <img src={avatar} alt="" className="h-11 w-11 object-cover" />
-                  ) : (
-                    <div
-                      className="flex h-11 w-11 items-center justify-center text-sm font-bold text-white"
-                      style={{ background: "var(--accent-grad)" }}
-                    >
-                      {user.name?.charAt(0).toUpperCase() || "?"}
-                    </div>
-                  )}
+                  <Avatar src={avatar} name={user.name ?? "?"} size={44} />
                 </AvatarFrame>
                 <div className="min-w-0 flex-1">
                   <CustomSelect
@@ -321,3 +333,65 @@ export function ProfileForm({
   );
 }
 
+
+/**
+ * Selector visual de "juego para el fondo" del perfil — antes había que
+ * escribir el ID a mano en un campo de texto ("ID del juego de tu
+ * biblioteca"), sin ninguna pista de qué formato quería. Los favoritos van
+ * primero, marcados aparte: es la forma más directa de "banner basado en tu
+ * juego favorito" sin inventar un campo nuevo — `u/[handle]/page.tsx` ya
+ * usa `profileBackgroundGameId` para el fondo del perfil, con `games[0]`
+ * como último recurso si no se elige nada.
+ */
+function BackgroundGamePicker({
+  juegos,
+  favoritos,
+  value,
+  onChange,
+}: {
+  juegos: { id: string; title: string; iconUrl: string }[];
+  favoritos: string[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  const favoritosSet = new Set(favoritos);
+  const ordenados = [...juegos].sort((a, b) => {
+    const aFav = favoritosSet.has(a.id) ? 0 : 1;
+    const bFav = favoritosSet.has(b.id) ? 0 : 1;
+    return aFav - bFav;
+  });
+
+  if (ordenados.length === 0) {
+    return <p className="text-xs text-muted">Sin juegos en tu biblioteca todavía.</p>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        onClick={() => onChange("")}
+        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg text-[10px] font-semibold text-muted transition-colors hover:text-foreground"
+        style={{ border: `2px solid ${value === "" ? "var(--accent)" : "var(--border)"}` }}
+        title="Automático (el más reciente)"
+      >
+        Auto
+      </button>
+      {ordenados.slice(0, 24).map((g) => (
+        <button
+          key={g.id}
+          type="button"
+          onClick={() => onChange(g.id)}
+          title={g.title}
+          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg transition-transform hover:scale-105"
+          style={{ border: `2px solid ${value === g.id ? "var(--accent)" : "var(--border)"}` }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={g.iconUrl} alt="" className="h-full w-full object-cover" />
+          {favoritosSet.has(g.id) && (
+            <span className="absolute right-0.5 top-0.5 text-[10px] drop-shadow">⭐</span>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}

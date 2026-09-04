@@ -73,7 +73,14 @@ export const BADGE_DEFINITIONS: Record<string, BadgeDef> = {
     description: "Has jugado 5 juegos de RPG",
     icon: <AchievementIcon id="rolero" size={16} />,
     bg: "linear-gradient(135deg, #047857, #10b981)",
-  }
+  },
+  "multiplataforma": {
+    id: "multiplataforma",
+    name: "Multiplataforma",
+    description: "Tienes PlayStation, Steam y Xbox vinculados y sincronizando",
+    icon: <AchievementIcon id="multiplataforma" size={16} />,
+    bg: "linear-gradient(135deg, #1e3a8a, #6366f1)",
+  },
 };
 
 export function Badges({ earnedBadges }: { earnedBadges: { badgeId: string, earnedAt: Date }[] }) {
