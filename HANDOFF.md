@@ -1,12 +1,171 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **4 de septiembre de 2026**
-(sesión larguísima, con Antigravity trabajando en paralelo todo el rato).
+releer todo el historial. Última actualización: **4 de septiembre de 2026,
+por la noche** (sesión larguísima, con Antigravity trabajando en paralelo
+todo el rato — más abajo hay un aviso de qué tocó él en medio de esta sesión).
 
 ---
 
-## Sesión del 4 de septiembre de 2026 — estilos globales, Descubrir y compartir
+## Sesión del 4 de septiembre de 2026 (noche) — Descubrir por plataforma, ficha de juego, Estadísticas y guías de trofeo
+
+Sesión muy larga, a base de peticiones cortas encadenadas sin parar (varias
+veces se me pidió algo nuevo mientras estaba terminando lo anterior). Va
+agrupado por tema, no en orden cronológico.
+
+**Importante — estado de git**: parte de esto está commiteado (dos commits,
+`fa7b4fe` y `29aa96c`), pero **todo lo de después del segundo commit sigue
+sin subir** (botón volver, prioridad del avatar, logros por plataforma,
+Estadísticas de perfil, guías de trofeo, noticias por plataforma, página de
+Recomendaciones, gestor de carpetas). Revisa `git status` antes de asumir
+que algo de esta lista ya está en `master`.
+
+### Descubrir, reorganizado por plataforma
+- **`/descubrir/[plataforma]`** (PlayStation y Steam, nuevo): populares,
+  tendencia, más jugados (de Paragon, no un dato global — se dice en
+  pantalla), próximos/últimos lanzamientos a la vez con el mismo límite
+  (antes descuadraban, 8 vs 12), ofertas y "casi sin jugadores ahora mismo"
+  en Steam (contador público de Valve, en vivo, solo de lo ya catalogado
+  aquí — no hay equivalente para PSN, Sony no publica eso). Xbox/Nintendo/
+  Epic se quedan sin página propia a propósito: no tienen biblioteca
+  sincronizable, no hay datos reales que enseñar ahí.
+- **`HeroCarousel`**: un lanzamiento reciente y con hype de verdad
+  (`destacadosRecientes()` en `lib/igdb/client.ts` — solo lo ya salido, con
+  más exigencia de hype que el resto porque ahí solo cabe una pieza).
+  Rectangular y de alto fijo (antes cambiaba de tamaño entre juegos), fondo
+  con la misma carátula ampliada pero poco desenfoque + mucho oscurecido
+  (con más blur se veía como un resplandor de neón), carátula sin recortar.
+- **`novedades()`**: recientes O próximos por hype, no solo futuros — un
+  juego que salió hace dos semanas y todo el mundo comenta también es
+  "novedad" (caso real: *The Blood of Dawnwalker*).
+- **Variedad de layout**: se dejó de usar scroll horizontal para todo.
+  `GameGrid` (rejilla), `RankedList` (ranking numerado con barra, para más
+  jugados / casi sin jugadores), `ReleaseGrid` (lista con fecha), `CardCarousel`
+  + `PosterCard` (carrusel con flechas, no cinta automática) — cada tipo de
+  dato con el formato que le pega, en vez de la misma fila repetida.
+- **Página de Recomendaciones** (`/descubrir/recomendaciones`, nuevo, con su
+  propio icono en la fila de plataformas): "Porque te gusta X" y "Para ti"
+  vivían al final de `/descubrir` mezcladas con todo lo demás — ahora tienen
+  su propio sitio.
+- **Noticias por plataforma**: `lib/steamNews.ts` (nuevo, feed RSS oficial de
+  Valve, formato RDF/RSS1.0) junto al `lib/psNews.ts` que ya existía —
+  cada una en su propia página de plataforma, no mezcladas con las
+  generales de `/noticias`.
+
+### Ficha de juego (`/juego/[id]`)
+- **Bug de página entera rota**: faltaba un `</div>` de cierre (edición a
+  medias de Antigravity al envolver la barra lateral en un div nuevo) — Turbopack
+  daba parse error y la página entera devolvía 500. Arreglado.
+- **Scroll horizontal de toda la página**: el `1fr` de la rejilla (contenido +
+  barra lateral de 300px) no se encogía por debajo del ancho de su contenido
+  más ancho (la tira de capturas) — a diferencia de flex, un `1fr` de CSS
+  Grid tiene `min-width: auto` por defecto. Con `min-w-0` en la columna
+  principal se arregla: la tira scrollea por dentro, no empuja la página.
+- **Capturas de pantalla**: ahora abren un visor a pantalla completa en la
+  misma pestaña (antes `target="_blank"`), con Esc para cerrar, flechas del
+  teclado y en pantalla, X, contador "N/M". Mismas flechas que ya tenía
+  `GameVideos` para paginar la tira. `loading="lazy"` en una tira de 15-20
+  capturas dejaba huecos negros al entrar — las primeras 6 cargan sin esperar.
+- **"Juegos similares"**: pasó de una rejilla de 6 columnas (se apretaba
+  muchísimo junto a la barra lateral) a `CardCarousel`. De paso, un bug real:
+  el objeto que llega de IGDB usa `coverUrl`, no `iconUrl` (que es lo que lee
+  `PosterCard`) — ninguna carátula cargaba, spread directo sin mapear el campo.
+- **"Logros por plataforma"** (antes sin etiquetas, solo iconos con números
+  sueltos — nadie entendía qué eran): ahora dice "Logros" y, solo en PSN,
+  "puntos de nivel PSN" (la fórmula real de Sony: bronce 15, plata 30, oro
+  90, platino 300 — por eso solo aparece en PSN, Steam no puntúa sus logros).
+  Bug real de paso: `getGameTrophyBreakdown` solo miraba `games.defined` (el
+  desglose por metal, que es SOLO de PSN) — Steam salía siempre a 0 logros
+  en silencio. El total universal vive en `games.definedTotal`.
+- Botón "Volver" arriba (ver más abajo).
+
+### Botón "Volver" en casi toda la app
+`BackButton.tsx` (nuevo) usa `router.back()` de verdad — vuelve a la pantalla
+concreta de donde se vino (mismo scroll, mismos filtros), con una red de
+seguridad (`fallbackHref`) para cuando no hay historial (llegada directa).
+Puesto en ~24 páginas: admin, las 4 de ajustes (vía su layout compartido),
+amigos, avisos, comparar (los dos), descubrir (raíz y por plataforma),
+ejemplo, feed, ligas, noticias, planificador, privacidad, rankings, ritmo,
+perfil público, CV, ficha de juego, guías (las dos), biblioteca de un juego,
+Estadísticas, ranking del Wrap. Fuera a propósito: `/`, `/entrar`,
+`/bienvenida`, `/offline` (puntos de entrada/salida sin "atrás" real) y el
+modo Enfoque (ya tiene su propio botón de salida dedicado a pantalla completa).
+
+### Avatar: una foto subida a mano gana a PSN
+Antes `resolveAvatarUrl`/`avatarUrlSql` no distinguían "subiste una foto tú
+mismo" de "esta es la que puso Google/Discord al entrar la primera vez" —
+las dos viven en la misma columna `users.image`. Columna nueva
+`users.avatarPersonalizado` (migración ejecutada:
+`scripts/anadir-avatar-personalizado.mts`), que `/api/upload` marca a
+`true` solo al subir un avatar a mano. `resolveAvatarUrl` (profiles.ts) y
+`avatarUrlSql` (avatarSql.ts, firma cambiada — ahora pide también esa
+columna, revisar cualquier llamada nueva) le dan prioridad sobre PSN solo
+cuando el flag está activo; si nunca subiste nada, sigue como siempre (PSN
+primero).
+
+### Estadísticas de perfil (`/u/[handle]/estadisticas`, nuevo)
+- **Mapa de actividad estilo GitHub** (`ActivityHeatmap.tsx`) y **trofeos
+  por mes** — reales, de `earnedAt` (mismo dato que ya usa `/ritmo`, no
+  inventado). Tooltip propio al pasar el ratón (el `title` nativo tardaba
+  en salir y era minúsculo).
+- **"Horas jugadas, en perspectiva"** (`PlaytimeComparison.tsx`): el total
+  de horas de TODAS las plataformas vinculadas, sumadas y convertidas a
+  días como si se jugaran seguidas sin dormir (experimento mental, se dice
+  así en pantalla), con una comparación graciosa según la magnitud —
+  escala de hitos desde "un finde largo" hasta "una carrera universitaria y
+  un máster" o "toda tu infancia y adolescencia".
+- **`horasPorJuego()`**: ahora agrupa por `igdbId`, no por `games.id` — el
+  mismo juego en dos plataformas suma sus horas en una fila, no aparece
+  duplicado. Importante: esto es a propósito solo aquí (vista unificada del
+  perfil) — en `/descubrir/[plataforma]` (`mostPlayedOnPlatform`) las horas
+  siguen separadas por plataforma, porque ahí es lo que tiene sentido.
+- **"Jugado recientemente"**: no existe un registro de sesiones real en
+  PSN/Steam (solo `lastPlayedAt`, un único timestamp por juego) — esto es
+  el proxy más honesto que hay, no una lista de sesiones inventada.
+- **"Tú y tus amigos"** (`FriendsLeaderboard.tsx` + `estadisticasAmigos()`):
+  ranking por horas, reutilizando `summarise()` (misma fuente de verdad de
+  platinos/trofeos que ya usa cada perfil) en vez de reimplementar el
+  conteo en SQL aparte. Solo visible en tu propio perfil — es información
+  privada de quién ve el perfil (quiénes son sus amigos), nunca del perfil
+  de otra persona.
+
+### Guías de trofeo escritas en la plataforma
+Antes `TrophyGuideModal` en su pestaña "Guía escrita" solo mandaba a buscar
+en Google/Vandal/Meristation/3DJuegos. Tabla nueva `trophy_guide`
+(migración ejecutada: `scripts/crear-tabla-guias-trofeo.mts`; una fila por
+usuario+juego+trofeo, `upsert` al reescribir, no duplica) — `lib/trophyGuides.ts`,
+acciones en `actions.ts`. La pestaña ahora enseña las guías reales de la
+comunidad para ese trofeo y deja escribir/editar la tuya; los enlaces de
+búsqueda externa se quedan como alternativa al final, no como única opción.
+El idioma se guarda a partir de `users.language` (de momento siempre "es",
+no hay más interfaz que esa) — el campo ya existe para cuando haga falta.
+
+### Gestión de carpetas completa (`/planificador`)
+`CarpetasManager.tsx` (nuevo): crear carpeta y añadir juegos en el mismo
+paso, renombrar, eliminar, quitar un juego de una carpeta, y moverlo a otra
+con opción de crear una carpeta nueva en el momento de mover. Funciones
+nuevas en `lib/collections.ts` (`addGamesToCollection`,
+`removeGameFromCollection`, `moveGameToCollection`) y acciones a juego en
+`actions.ts`. No se pudo probar en el navegador (sin credenciales en este
+entorno) — revisar con una cuenta real antes de darlo por bueno del todo,
+aunque sigue el mismo patrón que `CollectionPicker`/`NewCollectionForm`, ya
+probados.
+
+### Lo que Antigravity tocó en paralelo, en medio de esta sesión
+- Bastante trabajo en `/juego/[id]`: `GameHeaderLogo` (logo oficial de Steam
+  en vez de carátula genérica), fondo con `artworkUrl`, `GameVideos`,
+  `GameLanguages`, `GameDlcs`, `GameTrophyBreakdown`, franquicias en el
+  panel de Detalles. Su edición dejó el `</div>` sin cerrar que rompió la
+  página entera (ver arriba) — no se ha revisado el resto a fondo.
+- **`lib/platformIcons.tsx` reescrito con `react-icons`** (`FaPlaystation`,
+  `FaSteam`, `FaXbox`, `BsNintendoSwitch`, `SiEpicgames`, `SiUbisoft`) — los
+  iconos de marca reales que se habían pedido antes en esta misma sesión,
+  mejor resueltos que el intento a mano. Dependencia nueva en package.json:
+  `react-icons`.
+
+---
+
+## Sesión del 4 de septiembre de 2026 (tarde) — estilos globales, Descubrir y compartir
 
 Sesión iterativa, a base de peticiones cortas sucesivas ("las cards con
 hover", "el filtro no filtra", "que se muevan como en la landing"...). Lo
@@ -312,6 +471,10 @@ mano. Antes de una sesión larga, `git pull` primero.
 | El hover global va por CSS sin `@layer`, no por componente | `globals.css`: reglas con `[class*="rounded"]`/`[class*="cursor-pointer"]` sobre `button`/`a`. Al no estar en ningún `@layer`, le gana a las utilidades de Tailwind (que sí van en `@layer utilities`) pase lo que pase con la especificidad — así un botón nuevo sale con hover sin que nadie tenga que acordarse de ponérselo. |
 | `overflow-hidden` recorta el propio `filter` del elemento que lo lleva | El resplandor de hover es `filter: drop-shadow`. Si el mismo elemento tiene `overflow-hidden` (para recortar una carátula a sus esquinas redondeadas), se recorta a sí mismo el resplandor. El recorte va siempre en un hijo interior, nunca en el elemento que declara el hover — ver `GameCard.tsx`/`DiscoverCard.tsx`. |
 | "Estilo" es un eje aparte de "modo" y "acento" | El modo (claro/oscuro/OLED/contraste) cambia colores base; el acento, el color de marca; el estilo (`lib/apariencia.ts`) cambia la FORMA de toda la página — radio, sombra, tipografía, fondo. Los tres son independientes: se puede querer OLED + acento verde + estilo Vidrio. |
+| Horas por juego: unificadas en el perfil, separadas por plataforma | En Estadísticas del perfil (`horasPorJuego`, `lib/profileStats.ts`) el mismo juego en dos plataformas suma sus horas en una fila — es "cuánto le he echado en total". En `/descubrir/[plataforma]` (`mostPlayedOnPlatform`, `lib/platformHub.ts`) se filtra `games.platform` ANTES de agrupar, así que cada plataforma solo cuenta sus propias horas. Las dos reglas son a propósito y no hay que igualarlas. |
+| `avatarPersonalizado` decide si la foto subida a mano gana a PSN | `users.image` guarda a la vez la imagen de login (Google/Discord) y la subida a mano desde /ajustes — sin ese booleano no hay forma de distinguirlas. Solo `/api/upload` (subida real de avatar) lo pone a `true`. Cualquier sitio nuevo que resuelva un avatar tiene que pasar por `resolveAvatarUrl`/`avatarUrlSql`, nunca leer `users.image` a pelo. |
+| Los logros de un juego: `defined` es solo-PSN, `definedTotal` es universal | `games.defined` (desglose por metal: bronce/plata/oro/platino) SOLO lo rellena PSN — Steam no tiene esa jerarquía. El total que vale para cualquier plataforma vive en `games.definedTotal`. Cualquier cosa que cuente "cuántos logros tiene este juego" sin mirar `definedTotal` como último recurso se deja Steam a cero, en silencio (pasó de verdad en `getGameTrophyBreakdown`). |
+| Un `1fr` de CSS Grid no se encoge solo — hace falta `min-w-0` | A diferencia de un flex item, un `1fr` de grid tiene `min-width: auto` por defecto: si el contenido de dentro es más ancho que el hueco (una tira de scroll horizontal, por ejemplo), el TRACK entero crece para caber en vez de recortarse — eso empuja la página entera a scroll horizontal. Pasó en la ficha de juego (columna principal junto a la barra lateral de 300px). Cualquier columna de grid que pueda llevar dentro algo con `overflow-x-auto` necesita `min-w-0`. |
 
 ---
 
@@ -371,6 +534,17 @@ y en medio falta una línea que nadie ve porque **no da error**.
   fallo de la app: es así desde siempre en WebKit. Cualquier "descargar
   esto" pensado para móvil necesita la Web Share API (`navigator.share`
   con `files`), no un enlace con `download`.
+- **`{ ...g, genres: [] }` no rellena un campo con nombre distinto.** Los
+  objetos de IGDB usan `coverUrl`; las tarjetas (`PosterCard`, `DiscoverCard`)
+  leen `iconUrl`. Hacer spread directo del objeto de IGDB dentro de `game={...}`
+  compila perfecto (ningún campo es obligatorio) y no carga ninguna
+  carátula, en silencio — pasó en "Juegos similares". Cuando se pase un
+  objeto de una función a un componente que espera otra forma, mapear los
+  campos a mano, no confiar en que el spread "ya cuadra".
+- **Un `1fr` de CSS Grid no se recorta solo.** Ver la fila de la tabla de
+  arriba — sin `min-w-0`, una tira de scroll horizontal dentro de una
+  columna de grid empuja la página entera a scroll horizontal, y no salta
+  ningún error: se ve una barra de scroll abajo del todo y ya.
 
 **Regla:** cuando conectes un dato nuevo, compruébalo **en la base y en
 pantalla**, no solo que compile. Y si un agente edita con scripts de
@@ -596,13 +770,16 @@ redesplegar. El plan Hobby limita los crons a **una ejecución diaria**; el
 (`CREATE TABLE IF NOT EXISTS`), no con `db:push`, para no darle a una
 herramienta la ocasión de proponer cambios sobre una base de producción.
 Recomendado seguir así con lo aditivo. Mismo patrón para las tablas de
-`game_difficulty_vote` y `game_guide`/`game_guide_reply`: scripts en
+`game_difficulty_vote`, `game_guide`/`game_guide_reply` y, de esta sesión,
+`trophy_guide` (`scripts/crear-tabla-guias-trofeo.mts`): scripts en
 `scripts/crear-*.mts`, ya ejecutados contra producción. Igual para columnas
 sueltas: `users.profileSectionOrder`
-(`scripts/anadir-orden-secciones-perfil.mts`) y `user_game.createdAt`
-(`scripts/anadir-createdat-user-game.mts`, para "Tendencias" en Descubrir),
-**ambas ya ejecutadas contra producción**. Sin confirmar si
-`scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
+(`scripts/anadir-orden-secciones-perfil.mts`), `user_game.createdAt`
+(`scripts/anadir-createdat-user-game.mts`, para "Tendencias" en Descubrir) y,
+de esta sesión, `users.avatarPersonalizado`
+(`scripts/anadir-avatar-personalizado.mts`, decide si el avatar subido a
+mano gana a PSN) — **todas ya ejecutadas contra producción**. Sin confirmar
+si `scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
 Antigravity) llegaron a correrse — ver el punto 1 de "Pendiente".
 
 **CheapShark** (comparador de precios) no necesita clave, pero desde hace

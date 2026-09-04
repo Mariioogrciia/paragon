@@ -5,6 +5,7 @@ import { getAdminOverview, getAdminUsers, getRecentSyncRuns, getAdminActivities 
 import { PLATFORM_LABEL, type AccountPlatform } from "@/lib/types";
 import { relativeDate } from "@/lib/design";
 import { deleteActivityAction } from "@/app/actions";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -42,6 +43,7 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-9">
+      <BackButton fallbackHref="/" />
       <div>
         <h1 className="font-heading text-[32px] font-bold uppercase leading-none">Admin</h1>
         <p className="mt-2 text-sm text-muted">Solo tú ves esto. Métricas de toda la plataforma, no de un perfil.</p>

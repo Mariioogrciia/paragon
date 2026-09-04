@@ -12,18 +12,21 @@ import { getCommunityRating } from "@/lib/ratings";
 import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";
 import { getProfileByUserId } from "@/lib/profiles";
 import { comparativaPreciosSteam } from "@/lib/prices";
+import { historicoPreciosSteam } from "@/lib/itad";
+import { PriceHistoryChart } from "@/components/PriceHistoryChart";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 import { getGameDetails, IgdbNotConfiguredError, releaseLabelEs } from "@/lib/igdb/client";
 import { GameDetailsSidebar } from "@/components/GameDetailsSidebar";
 import { ScreenshotStrip } from "@/components/ScreenshotStrip";
-import { DiscoverCard } from "@/components/DiscoverCard";
-import { GameGrid } from "@/components/GameGrid";
+import { CardCarousel } from "@/components/CardCarousel";
+import { PosterCard } from "@/components/PosterCard";
 import { GameHeaderLogo } from "@/components/GameHeaderLogo";
 import { GameVideos } from "@/components/GameVideos";
 import { GameLanguages } from "@/components/GameLanguages";
 import { GameDlcs } from "@/components/GameDlcs";
 import { GameTrophyBreakdown } from "@/components/GameTrophyBreakdown";
+import { BackButton } from "@/components/BackButton";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,7 +50,7 @@ export default async function JuegoGlobalPage({
     redirect(`/juego/${game.igdbId}`);
   }
 
-  const [stats, rating, dificultadComunidad, reviews, session, precios, detalles, trophyBreakdown] = await Promise.all([
+  const [stats, rating, dificultadComunidad, reviews, session, precios, historicoPrecios, detalles, trophyBreakdown] = await Promise.all([
     getGlobalGameStats(gameId),
     getCommunityRating(gameId),
     getDificultadComunidad(gameId),
@@ -55,6 +58,10 @@ export default async function JuegoGlobalPage({
     auth(),
     // Buscamos ofertas si sabemos el ID de Steam
     game.steamId ? comparativaPreciosSteam(game.steamId) : Promise.resolve(null),
+    // Histórico de precio a lo largo del tiempo (ITAD) — devuelve [] en
+    // silencio si falta ITAD_API_KEY o no hay AppID de Steam, igual que el
+    // resto de integraciones opcionales.
+    game.steamId ? historicoPreciosSteam(game.steamId) : Promise.resolve([]),
     // Capturas, historia, temas, modos de juego y enlaces oficiales: viven en
     // IGDB, no en nuestra base (games no guarda ese detalle) — se piden en
     // vivo, cacheadas por el propio cliente de IGDB (ver getGameDetails).
@@ -105,6 +112,7 @@ export default async function JuegoGlobalPage({
           style={{ background: detalles?.artworkUrl ? "rgba(11, 16, 24, 0.75)" : "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))" }}
         />
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
+          <BackButton fallbackHref="/descubrir" dark />
           <div className="mt-2 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0 flex-1">
               <GameHeaderLogo title={game.title} steamId={game.steamId} />
@@ -178,7 +186,12 @@ export default async function JuegoGlobalPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] gap-9 px-7 pb-24 pt-6 lg:grid lg:grid-cols-[1fr_300px] lg:items-start">
-      <div className="space-y-9">
+      {/* min-w-0: una columna `1fr` de grid no se encoge por debajo del
+          ancho de su contenido más ancho por defecto (a diferencia de flex).
+          Sin esto, la tira de capturas/vídeos (mucho más ancha que la
+          columna) no se recortaba a sí misma — empujaba TODA la página a
+          scroll horizontal, en vez de scrollear solo la tira por dentro. */}
+      <div className="min-w-0 space-y-9">
         {game.summary && (
           <section className="max-w-[820px]">
             <h2 className="mb-2 font-heading text-2xl font-bold">Acerca de</h2>
@@ -257,6 +270,16 @@ export default async function JuegoGlobalPage({
             <p className="mt-2.5 text-[11px] text-muted">
               Precios vía CheapShark, pueden no incluir región ni impuestos exactos. Solo disponible para juegos de Steam.
             </p>
+
+            {historicoPrecios.length > 0 && (
+              <div className="mt-6">
+                <h3 className="mb-3 text-sm font-bold text-foreground">Precio a lo largo del tiempo</h3>
+                <div className="rounded-2xl px-4 py-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                  <PriceHistoryChart puntos={historicoPrecios} />
+                </div>
+                <p className="mt-2.5 text-[11px] text-muted">Histórico vía IsThereAnyDeal.</p>
+              </div>
+            )}
           </section>
         )}
 
@@ -326,9 +349,11 @@ export default async function JuegoGlobalPage({
         {detalles && detalles.similarGames.length > 0 && (
           <section>
             <h2 className="mb-4 font-heading text-2xl font-bold">Juegos similares</h2>
-            <GameGrid items={detalles.similarGames} itemKey={(g) => g.igdbId}>
-              {(g) => <DiscoverCard game={{ ...g, genres: [] }} fluid />}
-            </GameGrid>
+            <CardCarousel>
+              {detalles.similarGames.map((g) => (
+                <PosterCard key={g.igdbId} game={{ igdbId: g.igdbId, title: g.title, iconUrl: g.coverUrl, genres: [] }} />
+              ))}
+            </CardCarousel>
           </section>
         )}
       </div>

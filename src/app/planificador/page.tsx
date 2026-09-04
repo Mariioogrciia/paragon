@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { listCollections } from "@/lib/collections";
-import { NewCollectionForm } from "@/components/forms/Forms";
 import { Planificador } from "@/components/Planificador";
+import { CarpetasManager } from "@/components/CarpetasManager";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Planificador · Paragon" };
 
@@ -23,12 +24,13 @@ export default async function PlanificadorPage() {
 
   return (
     <div className="space-y-6">
+      <BackButton fallbackHref="/" />
       <div>
         <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Planificador</h1>
         <p className="mt-2 max-w-[650px] text-sm text-muted">Crea una carpeta llamada «Plan de platinos» u «Objetivos» y añade juegos desde cada ficha para construir tu ruta.</p>
       </div>
-      <NewCollectionForm />
       <Planificador games={objetivos} handle={profile.handle} />
+      <CarpetasManager collections={collections} library={games} />
     </div>
   );
 }

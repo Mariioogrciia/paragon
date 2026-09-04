@@ -24,6 +24,16 @@ export const users = pgTable("user", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  /**
+   * `true` cuando la foto de perfil de `image` la subió la propia persona
+   * desde /ajustes (no la de Google/Discord al entrar por primera vez, ni
+   * la de PSN). Sin esto no hay forma de distinguir las dos cosas — las dos
+   * viven en la misma columna `image` — y `resolveAvatarUrl`/`avatarUrlSql`
+   * necesitan saberlo: una subida a mano manda sobre PSN, pero la imagen de
+   * login de Google no debería (si nadie subió nada, PSN sigue ganando,
+   * igual que siempre).
+   */
+  avatarPersonalizado: boolean("avatarPersonalizado").notNull().default(false),
 
   /**
    * Identificador dentro de la plataforma: lo elige el usuario al entrar por
@@ -556,3 +566,36 @@ export const gameGuideReplies = pgTable("game_guide_reply", {
   body: text("body").notNull(),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Guía escrita de UN trofeo concreto — distinta de `gameGuides` (el juego
+ * entero, como un foro): esto es "cómo consigo este trofeo en particular",
+ * lo que antes solo mandaba a buscar en Google desde `TrophyGuideModal`.
+ * Una fila por (usuario, juego, trofeo): escribir de nuevo edita la propia,
+ * no añade una segunda — mismo criterio que la reseña de un juego.
+ *
+ * `language`: el idioma en el que se escribió, no el de quien la lee — de
+ * momento solo hay interfaz en español (`users.language` por defecto
+ * "es-ES"), así que siempre será "es", pero la columna ya existe para
+ * cuando la plataforma tenga más de un idioma y haga falta filtrar.
+ */
+export const trophyGuides = pgTable(
+  "trophy_guide",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    trophyId: text("trophyId").notNull(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    language: text("language").notNull().default("es"),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("trophy_guide_user_trophy_idx").on(t.userId, t.gameId, t.trophyId)],
+);

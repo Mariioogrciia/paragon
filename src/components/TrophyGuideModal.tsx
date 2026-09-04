@@ -1,19 +1,30 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { searchTrophyGuideAction, pinTrophyAction } from "@/app/actions";
+import { useActionState, useEffect, useState, useTransition } from "react";
+import Link from "next/link";
+import {
+  searchTrophyGuideAction,
+  pinTrophyAction,
+  getTrophyGuidesAction,
+  saveTrophyGuideAction,
+  deleteTrophyGuideAction,
+  type ActionState,
+} from "@/app/actions";
 import { type Trophy } from "@/lib/types";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { Avatar } from "@/components/Avatar";
+import { relativeDate } from "@/lib/design";
+import type { TrophyGuideRow } from "@/lib/trophyGuides";
 import { Pin, PinOff } from "lucide-react";
 
+const EMPTY: ActionState = {};
+
 /**
- * Atajos de guía escrita: en vez de "buscar en Google" desde el servidor
- * (rasparlo bloquea a la primera petición — DuckDuckGo, que es más permisivo
- * que Google, ya devuelve una página de "actividad sospechosa" en la
- * primera prueba), se construye la URL de búsqueda de verdad y se abre en
- * una pestaña nueva. Nada incrustado: la mayoría de estos sitios bloquean el
- * framing (X-Frame-Options), y aunque no lo bloquearan, reproducir su
- * contenido dentro de Paragon sin permiso no toca.
+ * Enlaces de búsqueda externa — se quedan como alternativa cuando nadie de
+ * aquí ha escrito todavía nada de este trofeo, no como la única opción: la
+ * URL de verdad se abre en pestaña nueva, nada incrustado (la mayoría de
+ * estos sitios bloquean el framing, y aunque no lo hicieran, reproducir su
+ * contenido dentro de Paragon sin permiso no toca).
  */
 const FUENTES_GUIA = [
   { label: "Google", sitio: null },
@@ -57,12 +68,12 @@ export function TrophyGuideModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div 
+      <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
-      
-      <div 
+
+      <div
         className="relative flex w-full max-w-4xl flex-col overflow-hidden rounded-[24px] shadow-2xl"
         style={{ background: "var(--background)", border: "1px solid var(--border)" }}
       >
@@ -75,10 +86,10 @@ export function TrophyGuideModal({
               {gameTitle}
             </p>
           </div>
-          
+
           <div className="flex items-center">
             {esMio && gameId && (
-              <button 
+              <button
                 onClick={() => {
                   startTransition(async () => {
                     await pinTrophyAction(gameId, trophy.id);
@@ -91,7 +102,7 @@ export function TrophyGuideModal({
                 {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
               </button>
             )}
-            <button 
+            <button
               onClick={onClose}
               className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-white/10 text-muted hover:text-white"
             >
@@ -146,35 +157,9 @@ export function TrophyGuideModal({
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4 p-10 text-center">
-            <p className="max-w-sm text-sm text-muted">
-              Nadie de aquí escribe estas guías — se busca en internet, tú eliges dónde mirar.
-              Se abre en una pestaña nueva.
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {FUENTES_GUIA.map((f) => (
-                <a
-                  key={f.label}
-                  href={urlBusquedaGuia(gameTitle, trophy.name, f.sitio)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-[10px] px-4 py-2.5 text-[13px] font-bold transition-all hover:-translate-y-0.5"
-                  style={
-                    f.sitio === null
-                      ? { background: "var(--accent-grad)", color: "var(--background)" }
-                      : { border: "1px solid var(--border)", color: "var(--foreground)" }
-                  }
-                >
-                  Buscar en {f.label}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M7 17 17 7M7 7h10v10" />
-                  </svg>
-                </a>
-              ))}
-            </div>
-          </div>
+          <GuiaEscritaTab gameId={gameId} gameTitle={gameTitle} trophy={trophy} />
         )}
-        
+
         <div className="p-4 px-6 text-[13px] text-muted flex justify-between items-end">
           <p className="max-w-[80%]">{trophy.detail || "Trofeo sin descripción adicional."}</p>
           {trophy.earnedAt && (
@@ -183,6 +168,150 @@ export function TrophyGuideModal({
               Conseguido el {new Date(trophy.earnedAt).toLocaleDateString()}
             </p>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Submit({ children }: { children: React.ReactNode }) {
+  return (
+    <button
+      className="rounded-[10px] px-4 py-2 text-[13px] font-bold transition-all hover:-translate-y-0.5"
+      style={{ background: "var(--accent-grad)", color: "var(--background)" }}
+    >
+      {children}
+    </button>
+  );
+}
+
+/**
+ * La pestaña "Guía escrita": guías reales de gente de aquí, con hueco para
+ * escribir/editar la tuya. Sin `gameId` (fichas sin juego vinculado en la
+ * base) no hay dónde guardar nada, así que directamente no se ofrece
+ * escribir — solo quedan los enlaces de búsqueda de siempre.
+ */
+function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTitle: string; trophy: Trophy }) {
+  const [datos, setDatos] = useState<{ guides: TrophyGuideRow[]; currentUserId: string | null } | null>(null);
+  const [editando, setEditando] = useState(false);
+  const [state, action] = useActionState(saveTrophyGuideAction, EMPTY);
+
+  useEffect(() => {
+    if (!gameId) return;
+    getTrophyGuidesAction(gameId, trophy.id).then(setDatos);
+  }, [gameId, trophy.id]);
+
+  // Tras publicar con éxito, se recarga la lista y se cierra el formulario.
+  useEffect(() => {
+    if (state.success && gameId) {
+      getTrophyGuidesAction(gameId, trophy.id).then(setDatos);
+      setEditando(false);
+    }
+  }, [state.success, gameId, trophy.id]);
+
+  const mia = datos?.currentUserId ? datos.guides.find((g) => g.authorId === datos.currentUserId) : undefined;
+  const deOtros = datos?.guides.filter((g) => g.id !== mia?.id) ?? [];
+
+  return (
+    <div className="max-h-[60vh] overflow-y-auto p-6">
+      {!gameId ? (
+        <p className="mb-4 text-sm text-muted">Esta ficha no está vinculada a un juego, así que aquí no se puede guardar nada.</p>
+      ) : !datos ? (
+        <p className="text-sm text-muted">Cargando...</p>
+      ) : (
+        <>
+          {datos.guides.length === 0 && (
+            <p className="mb-4 text-sm text-muted">Nadie de aquí ha escrito todavía una guía de este trofeo. Sé el primero.</p>
+          )}
+
+          {mia && !editando && (
+            <div className="mb-3 rounded-xl p-4" style={{ border: "1px solid rgb(var(--accent-rgb) / 0.35)", background: "rgb(var(--accent-rgb) / 0.08)" }}>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wide text-accent-text">Tu guía</span>
+                <div className="flex gap-3">
+                  <button onClick={() => setEditando(true)} className="text-xs font-semibold text-muted hover:text-foreground">
+                    Editar
+                  </button>
+                  <form action={deleteTrophyGuideAction}>
+                    <input type="hidden" name="gameId" value={gameId} />
+                    <input type="hidden" name="trophyId" value={trophy.id} />
+                    <button className="text-xs font-semibold text-muted hover:text-danger">Borrar</button>
+                  </form>
+                </div>
+              </div>
+              <p className="whitespace-pre-wrap text-sm text-foreground/90">{mia.body}</p>
+            </div>
+          )}
+
+          {datos.currentUserId && (!mia || editando) && (
+            <form action={action} className="mb-4">
+              <input type="hidden" name="gameId" value={gameId} />
+              <input type="hidden" name="trophyId" value={trophy.id} />
+              <textarea
+                name="body"
+                defaultValue={mia?.body ?? ""}
+                rows={4}
+                maxLength={4000}
+                placeholder="Explica cómo se consigue este trofeo — qué falla, qué hay que evitar, un truco que no sea obvio..."
+                className="w-full resize-none rounded-xl p-3.5 text-sm outline-none placeholder:text-muted"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              />
+              <div className="mt-2 flex items-center gap-3">
+                <Submit>{mia ? "Guardar cambios" : "Publicar guía"}</Submit>
+                {editando && (
+                  <button type="button" onClick={() => setEditando(false)} className="text-xs font-semibold text-muted hover:text-foreground">
+                    Cancelar
+                  </button>
+                )}
+                {state.error && <p className="text-xs text-danger">{state.error}</p>}
+              </div>
+            </form>
+          )}
+
+          {!datos.currentUserId && (
+            <p className="mb-4 text-xs text-muted">
+              <Link href="/entrar" className="font-semibold text-accent hover:underline">Entra</Link> para escribir tu propia guía.
+            </p>
+          )}
+
+          {deOtros.length > 0 && (
+            <div className="space-y-3">
+              {deOtros.map((g) => (
+                <div key={g.id} className="rounded-xl p-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                  <div className="mb-2 flex items-center gap-2.5">
+                    <Avatar src={g.authorImage} name={g.authorName ?? g.authorHandle ?? "?"} size={24} />
+                    {g.authorHandle ? (
+                      <Link href={`/u/${g.authorHandle}`} className="text-[13px] font-semibold hover:underline">
+                        {g.authorName ?? `@${g.authorHandle}`}
+                      </Link>
+                    ) : (
+                      <span className="text-[13px] font-semibold">{g.authorName ?? "Alguien"}</span>
+                    )}
+                    <span className="text-xs text-muted">{relativeDate(g.updatedAt)}</span>
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm text-foreground/90">{g.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      <div className="mt-6 border-t border-border pt-4">
+        <p className="mb-2.5 text-xs text-muted">¿Prefieres buscarla fuera? Se abre en una pestaña nueva.</p>
+        <div className="flex flex-wrap gap-2">
+          {FUENTES_GUIA.map((f) => (
+            <a
+              key={f.label}
+              href={urlBusquedaGuia(gameTitle, trophy.name, f.sitio)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:text-foreground"
+              style={{ border: "1px solid var(--border)" }}
+            >
+              Buscar en {f.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>

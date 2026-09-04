@@ -5,6 +5,7 @@ import { getGamingNews } from "@/lib/rss";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = {
   title: "Noticias y Lanzamientos - Paragon",
@@ -22,6 +23,7 @@ export default async function NoticiasPage() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
+      <BackButton fallbackHref="/" />
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2">Lanzamientos Destacados</h1>
         <p className="text-muted">Los juegos más esperados de los próximos meses.</p>

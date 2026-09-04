@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
+import { BackButton } from "@/components/BackButton";
 import { getLibrary, getProfileByHandle, getProfileByUserId } from "@/lib/profiles";
 import { sharedGames } from "@/lib/stats";
 import { PLATFORM_LABEL } from "@/lib/types";
@@ -63,9 +63,7 @@ export default async function CompararGrupoPage({
 
   return (
     <div>
-      <Link href="/amigos" className="text-xs font-semibold text-muted hover:text-foreground">
-        ← Volver a Amigos
-      </Link>
+      <BackButton fallbackHref="/amigos" label="Volver a Amigos" />
 
       <h1 className="font-heading mt-3 text-[42px] font-bold uppercase leading-none">Comparativa de grupo</h1>
       <p className="mt-2.5 text-[15px] text-muted">

@@ -11,6 +11,7 @@ import { ActivityFeed } from "@/components/ActivityFeed";
 import { RecentlyPlayed } from "@/components/RecentlyPlayed";
 import { PlaytimeComparison } from "@/components/PlaytimeComparison";
 import { FriendsLeaderboard } from "@/components/FriendsLeaderboard";
+import { BackButton } from "@/components/BackButton";
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
@@ -50,6 +51,7 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
 
   return (
     <div>
+      <BackButton fallbackHref={`/u/${handle}`} />
       <p className="mb-1 text-xs font-bold uppercase tracking-widest text-muted">
         <Link href={`/u/${handle}`} className="hover:underline">@{handle}</Link> / Estadísticas
       </p>

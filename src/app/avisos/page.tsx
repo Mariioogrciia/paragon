@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { marcarLeidoAction } from "@/app/actions";
 import { listarAvisos } from "@/lib/notifications";
 import { relativeDate } from "@/lib/design";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Avisos · Paragon" };
 
@@ -31,6 +32,7 @@ export default async function AvisosPage() {
 
   return (
     <div className="mx-auto max-w-[760px]">
+      <BackButton fallbackHref="/" />
       <div className="flex flex-wrap items-end gap-3">
         <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Avisos</h1>
         {sinLeer > 0 && (

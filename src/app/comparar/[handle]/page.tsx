@@ -12,6 +12,7 @@ import { sharedGames, summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { sharedTrophyLeads } from "@/lib/comparison";
 import { FiltroJuegosComunes } from "@/components/FiltroJuegosComunes";
+import { BackButton } from "@/components/BackButton";
 
 const OUTCOME = {
   ganas: { label: "Ganas", bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
@@ -97,6 +98,7 @@ export default async function CompararPage({
 
   return (
     <div>
+      <BackButton fallbackHref="/amigos" />
       <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] sm:text-[50px]">
         {libA.player.name} <span className="text-accent">vs</span> {libB.player.name}
       </h1>

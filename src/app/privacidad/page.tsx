@@ -1,14 +1,9 @@
-import Link from "next/link";
+import { BackButton } from "@/components/BackButton";
 
 export default function PrivacidadPage() {
   return (
     <div className="mx-auto max-w-3xl py-12 px-4 space-y-8">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
-      >
-        ← Volver al inicio
-      </Link>
+      <BackButton fallbackHref="/" label="Volver al inicio" />
 
       <div className="space-y-4">
         <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">

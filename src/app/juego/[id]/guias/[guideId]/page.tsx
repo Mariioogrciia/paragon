@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { RespuestaGuiaForm } from "@/components/RespuestaGuiaForm";
+import { BackButton } from "@/components/BackButton";
 import { deleteGuideAction } from "@/app/actions";
 import { getGuide } from "@/lib/guides";
 import { relativeDate } from "@/lib/design";
@@ -28,9 +29,7 @@ export default async function GuiaPage({
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link href={`/juego/${encodeURIComponent(gameId)}/guias`} className="text-xs font-semibold text-muted hover:text-foreground">
-        ← Todas las guías
-      </Link>
+      <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}/guias`} label="Todas las guías" />
 
       <article className="mt-4">
         <h1 className="font-heading text-[28px] font-bold leading-tight">{guide.title}</h1>

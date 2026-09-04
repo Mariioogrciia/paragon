@@ -30,6 +30,8 @@ export interface ProfileRow {
   handle: string | null;
   displayName: string | null;
   image: string | null;
+  /** `true` si `image` la subió la propia persona (no la de Google/Discord del alta) — decide si le gana a PSN en resolveAvatarUrl. */
+  avatarPersonalizado: boolean;
   favorites: string[] | null;
   profileTitle?: string | null;
   profileBackgroundGameId?: string | null;
@@ -68,16 +70,21 @@ export function accountFor(
 /**
  * La foto de perfil "de verdad" de alguien, la misma en todos lados.
  *
- * PSN primero (es la que más gente tiene y suele ser la más reconocible),
- * luego cualquier otra cuenta vinculada que tenga avatar (Steam, por
- * ejemplo), y solo si no hay ninguna la imagen genérica de la cuenta
- * (`users.image`, la del proveedor de login). Exportada porque antes cada
+ * Una foto subida a mano desde /ajustes gana a todo — es la elección más
+ * explícita que hay, y quien se ha molestado en subir una no quiere ver la
+ * de PSN en su lugar. Si no ha subido ninguna, sigue como antes: PSN
+ * primero (la que más gente tiene y suele ser más reconocible), luego
+ * cualquier otra cuenta vinculada con avatar (Steam, por ejemplo), y solo
+ * si no hay ninguna la imagen genérica de la cuenta (`users.image`, la del
+ * proveedor de login — Google, Discord). Exportada porque antes cada
  * pantalla resolvía el avatar a su manera — la cabecera del perfil usaba
  * esto, pero las reseñas leían `users.image` a pelo, así que alguien sin
  * imagen de login pero con PSN vinculado aparecía sin foto en sus reseñas y
  * con foto en su propio perfil.
  */
 export function resolveAvatarUrl(row: ProfileRow): string | undefined {
+  if (row.avatarPersonalizado && row.image) return row.image;
+
   const psnAccount = accountFor(row, "psn");
   return (
     psnAccount?.avatarUrl ??
@@ -104,6 +111,7 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       handle: users.handle,
       displayName: users.name,
       image: users.image,
+      avatarPersonalizado: users.avatarPersonalizado,
       favorites: users.favorites,
       profileTitle: users.profileTitle,
       profileBackgroundGameId: users.profileBackgroundGameId,

@@ -7,6 +7,7 @@ import { ReleaseGrid } from "@/components/ReleaseGrid";
 import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
 import { PlayStationIcon, SteamIcon } from "@/lib/platformIcons";
+import { BackButton } from "@/components/BackButton";
 import {
   trendingOnPlatform,
   mostPlayedOnPlatform,
@@ -17,6 +18,9 @@ import {
 import { upcomingGames, recentReleases, IgdbNotConfiguredError } from "@/lib/igdb/client";
 import { ofertasSteam } from "@/lib/prices";
 import { getPsPlusMensual } from "@/lib/psPlus";
+import { getPsNews } from "@/lib/psNews";
+import { getSteamNews } from "@/lib/steamNews";
+import { NewsFeed } from "@/components/NewsFeed";
 
 const PLATAFORMAS: Record<string, { label: string; hubKey: PlataformaHub; color: string; icon: React.ReactNode }> = {
   playstation: { label: "PlayStation", hubKey: "psn", color: "#0f3d8a", icon: <PlayStationIcon size={26} /> },
@@ -38,7 +42,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
   const userId = session?.user?.id;
   const esSteam = plataforma === "steam";
 
-  const [tendencia, masJugados, recomendados, proximos, recientes, ofertas, psPlus, jugadoresBajos] = await Promise.all([
+  const [tendencia, masJugados, recomendados, proximos, recientes, ofertas, psPlus, jugadoresBajos, noticias] = await Promise.all([
     trendingOnPlatform(info.hubKey),
     mostPlayedOnPlatform(info.hubKey),
     recommendationsOnPlatform(userId ?? null, info.hubKey),
@@ -56,10 +60,15 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
     esSteam ? ofertasSteam() : Promise.resolve([]),
     !esSteam ? getPsPlusMensual() : Promise.resolve(null),
     esSteam ? casiSinJugadoresEnSteam() : Promise.resolve([]),
+    // Noticias propias de esta plataforma — no las generales de /noticias.
+    // Solo tiene sentido en su propia página: mezclarlas en el resto de
+    // Descubrir volvería a juntar cosas de plataformas distintas otra vez.
+    esSteam ? getSteamNews() : getPsNews(),
   ]);
 
   return (
     <div>
+      <BackButton fallbackHref="/descubrir" />
       <div className="mb-6 flex items-center gap-3">
         <span
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white"
@@ -74,6 +83,16 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">{info.label}</h1>
         </div>
       </div>
+
+      {noticias.length > 0 && (
+        <div className="mb-10">
+          <NewsFeed
+            titulo={`Noticias de ${info.label}`}
+            badge={esSteam ? "Actualizaciones de Steam" : "PS Store · PS Plus"}
+            items={noticias}
+          />
+        </div>
+      )}
 
       {recomendados.length > 0 && (
         <section className="mb-10">

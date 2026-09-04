@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { StatTile } from "@/components/StatTile";
+import { BackButton } from "@/components/BackButton";
 import { gradeLabel, TrophyTile } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
 import {
@@ -137,9 +138,7 @@ export default async function RitmoPage({
   return (
     <div className="space-y-9">
       <div>
-        <Link href="/" className="text-[13px] font-semibold text-muted hover:text-foreground">
-          ← Volver al panel
-        </Link>
+        <BackButton fallbackHref="/" label="Volver al panel" />
         <h1 className="font-heading mt-3 text-[42px] font-bold uppercase leading-none">
           {nombreMes(mes)}
         </h1>

@@ -189,11 +189,31 @@ export interface TrophyBreakdown {
   totalPoints: number;
 }
 
+/**
+ * Cuántos logros/trofeos define cada versión de este juego (una fila por
+ * plataforma en la que existe: `games.id` = `<plataforma>-<id>`, misma
+ * arquitectura de siempre), y a cuántos puntos de nivel de trofeos
+ * equivalen en PSN.
+ *
+ * `defined` (el desglose por metal: bronce/plata/oro/platino) es SOLO de
+ * PSN — Steam no tiene esa jerarquía, sus logros no llevan metal (ver el
+ * comentario en schema.ts). Mirar solo `defined` aquí dejaba Steam siempre
+ * a cero trofeos, en silencio: el total universal (todas las plataformas)
+ * vive en `definedTotal`, y es ahí donde hay que mirar cuando no hay
+ * desglose por metal.
+ *
+ * Los puntos son la fórmula real del nivel de trofeos de PSN (bronce 15,
+ * plata 30, oro 90, platino 300 — la que Sony usa desde 2020), así que solo
+ * tienen sentido donde hay metales que pesar: en Steam no existe un
+ * "puntos de logro" oficial, así que ahí se queda a cero a propósito, no
+ * inventado.
+ */
 export async function getGameTrophyBreakdown(igdbId: number): Promise<TrophyBreakdown[]> {
   const rows = await db
     .select({
       platform: gamesTable.platform,
       defined: gamesTable.defined,
+      definedTotal: gamesTable.definedTotal,
     })
     .from(gamesTable)
     .where(eq(gamesTable.igdbId, igdbId));
@@ -202,25 +222,19 @@ export async function getGameTrophyBreakdown(igdbId: number): Promise<TrophyBrea
 
   for (const row of rows) {
     const p = row.platform;
-    if (!breakdown[p]) {
-      breakdown[p] = { platform: p, totalTrophies: 0, totalPoints: 0 };
-    }
-    
-    // We try to estimate total trophies and points from `defined` object if it exists
-    const d = row.defined as any;
-    if (d) {
-      if (d.total) {
-        breakdown[p].totalTrophies += Number(d.total) || 0;
-      } else if (d.bronze !== undefined) {
-        breakdown[p].totalTrophies += (Number(d.bronze) || 0) + (Number(d.silver) || 0) + (Number(d.gold) || 0) + (Number(d.platinum) || 0);
-      }
-      
-      // Points estimation (standard: bronze 15, silver 30, gold 90, platinum 300)
-      if (d.bronze !== undefined) {
-        breakdown[p].totalPoints += (Number(d.bronze) || 0) * 15 + (Number(d.silver) || 0) * 30 + (Number(d.gold) || 0) * 90 + (Number(d.platinum) || 0) * 300;
-      } else if (d.totalPoints) {
-        breakdown[p].totalPoints += Number(d.totalPoints) || 0;
-      }
+    if (!breakdown[p]) breakdown[p] = { platform: p, totalTrophies: 0, totalPoints: 0 };
+
+    const d = row.defined as Record<string, number> | null;
+
+    if (d && d.bronze !== undefined) {
+      const bronce = Number(d.bronze) || 0;
+      const plata = Number(d.silver) || 0;
+      const oro = Number(d.gold) || 0;
+      const platino = Number(d.platinum) || 0;
+      breakdown[p].totalTrophies += bronce + plata + oro + platino;
+      breakdown[p].totalPoints += bronce * 15 + plata * 30 + oro * 90 + platino * 300;
+    } else {
+      breakdown[p].totalTrophies += row.definedTotal ?? 0;
     }
   }
 
@@ -246,7 +260,7 @@ export async function getGameReviews(gameId: string): Promise<GameReview[]> {
       userId: users.id,
       handle: users.handle,
       name: users.name,
-      image: avatarUrlSql(users.id, users.image),
+      image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
       rating: userGames.rating,
       review: userGames.review,
       reviewDate: userGames.reviewDate,

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BackButton } from "@/components/BackButton";
 import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import {
@@ -89,9 +90,7 @@ export default async function WrapRankingPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href={`/u/${handle}`} className="text-xs font-semibold text-muted hover:text-foreground">
-          ← Volver al perfil
-        </Link>
+        <BackButton fallbackHref={`/u/${handle}`} label="Volver al perfil" />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-heading text-[32px] font-bold uppercase leading-none">{TITULO[m]}</h1>
           <div className="flex flex-wrap gap-1.5">

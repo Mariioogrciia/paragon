@@ -2,6 +2,7 @@ import { getLigaMensual } from "@/lib/ligas";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = {
   title: "Liga Mensual - Paragon",
@@ -15,6 +16,7 @@ export default async function LigasPage() {
 
   return (
     <div className="mx-auto max-w-[800px] px-7 py-12">
+      <BackButton fallbackHref="/" />
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2 uppercase tracking-wide flex items-center gap-2 text-[rgb(var(--accent-rgb))]">
           <TrophyIcon grade="platinum" size={32} />

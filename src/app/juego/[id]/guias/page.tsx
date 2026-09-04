@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { NuevaGuiaForm } from "@/components/NuevaGuiaForm";
+import { BackButton } from "@/components/BackButton";
 import { getGlobalGame } from "@/lib/community";
 import { listGuides } from "@/lib/guides";
 import { relativeDate } from "@/lib/design";
@@ -32,9 +33,7 @@ export default async function GuiasPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="mx-auto max-w-[820px]">
-      <Link href={`/juego/${encodeURIComponent(gameId)}`} className="text-xs font-semibold text-muted hover:text-foreground">
-        ← {game.title}
-      </Link>
+      <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}`} label={game.title} />
 
       <div className="mt-3 mb-7 flex flex-wrap items-baseline gap-3">
         <h1 className="font-heading text-[32px] font-bold uppercase leading-none">Guías</h1>

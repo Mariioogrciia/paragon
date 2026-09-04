@@ -57,7 +57,10 @@ export async function POST(request: Request) {
     const db = getDb();
     await db
       .update(users)
-      .set(kind === "banner" ? { profileBannerUrl: fileUrl } : { image: fileUrl })
+      // `avatarPersonalizado: true` es lo que hace que esta imagen le gane a
+      // PSN en resolveAvatarUrl/avatarUrlSql — sin esto no hay forma de
+      // distinguir "subida a mano" de la imagen de Google/Discord del alta.
+      .set(kind === "banner" ? { profileBannerUrl: fileUrl } : { image: fileUrl, avatarPersonalizado: true })
       .where(eq(users.id, session.user.id));
 
     return NextResponse.json({ url: fileUrl });

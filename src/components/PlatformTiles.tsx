@@ -34,6 +34,17 @@ const TILES: Tile[] = [
       </svg>
     ),
   },
+  {
+    label: "Recomendaciones",
+    href: "/descubrir/recomendaciones",
+    bg: "var(--accent-grad)",
+    fg: "var(--background)",
+    icon: (
+      <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
+      </svg>
+    ),
+  },
   { label: "PlayStation", href: "/descubrir/playstation", bg: "#0f3d8a", fg: "#ffffff", icon: <PlayStationIcon size={22} /> },
   {
     label: "Xbox",
@@ -61,7 +72,7 @@ const TILES: Tile[] = [
 
 export function PlatformTiles() {
   return (
-    <div className="mb-8 grid grid-cols-3 gap-2 sm:grid-cols-6">
+    <div className="mb-8 grid grid-cols-4 gap-2 sm:grid-cols-7">
       {TILES.map((t) =>
         t.href ? (
           <a

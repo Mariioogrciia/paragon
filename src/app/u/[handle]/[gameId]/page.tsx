@@ -21,6 +21,7 @@ import { EtaPlatinoCard } from "@/components/EtaPlatino";
 import type { Trophy } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 import { CompartirImagen } from "@/components/CompartirImagen";
+import { BackButton } from "@/components/BackButton";
 
 function ProximoRow({ trophy }: { trophy: Trophy }) {
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
@@ -127,13 +128,12 @@ export default async function JuegoPage({
           style={{ background: "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))" }}
         />
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
-          <Link
-            href={`/u/${handle}`}
-            className="inline-block rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors hover:text-white"
-            style={{ background: "rgba(10, 13, 19, 0.5)", border: "1px solid var(--border)", color: "#b9c6d8" }}
-          >
-            ← Biblioteca de @{handle}
-          </Link>
+          <BackButton
+            fallbackHref={`/u/${handle}`}
+            label={`Biblioteca de @${handle}`}
+            className="mb-0 inline-flex rounded-full px-3.5 py-1.5 normal-case tracking-normal"
+            dark
+          />
 
           <div className="mt-7 grid items-end gap-6 lg:grid-cols-[150px_1fr_280px]">
             <span

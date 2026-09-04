@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { Badges } from "@/components/Badges";
 import { DescargarPdfButton } from "@/components/DescargarPdfButton";
+import { BackButton } from "@/components/BackButton";
 import { coverGradient } from "@/lib/design";
 import { paragonProgress } from "@/lib/level";
 import { getLibrary, getProfileByHandle, getUserBadges } from "@/lib/profiles";
@@ -56,7 +57,8 @@ export default async function HojaDeServiciosPage({
 
   return (
     <div className="mx-auto max-w-[820px] px-7 pb-24 pt-9 print:max-w-none print:px-0 print:pt-0">
-      <div className="mb-6 flex items-center justify-end gap-3 print:hidden" data-no-print>
+      <div className="mb-6 flex items-center justify-between gap-3 print:hidden" data-no-print>
+        <BackButton fallbackHref={`/u/${handle}`} className="mb-0" />
         <DescargarPdfButton />
       </div>
 

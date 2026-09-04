@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getLibrary, getProfileByUserId, listFriends } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getPeriodRankings } from "@/lib/rankings";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Rankings · Paragon" };
 
@@ -39,7 +39,7 @@ export default async function RankingsPage() {
   return (
     <div className="space-y-7">
       <div>
-        <Link href="/amigos" className="text-xs font-semibold text-muted hover:text-foreground">← Volver a Amigos</Link>
+        <BackButton fallbackHref="/amigos" label="Volver a Amigos" />
         <h1 className="font-heading mt-3 text-[42px] font-bold uppercase leading-none">Rankings</h1>
         <p className="mt-2 text-sm text-muted">Compite con tus amigos por actividad reciente y progreso acumulado.</p>
       </div>

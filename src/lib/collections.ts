@@ -132,3 +132,49 @@ export async function toggleGameInCollection(
   await db.insert(collectionGames).values({ collectionId, gameId });
   return true;
 }
+
+/** Comprueba que la carpeta es de este usuario antes de dejar tocarla — mismo motivo que el resto de funciones de aquí. */
+async function esDueño(userId: string, collectionId: string): Promise<boolean> {
+  const [carpeta] = await db
+    .select({ id: collections.id })
+    .from(collections)
+    .where(and(eq(collections.id, collectionId), eq(collections.userId, userId)))
+    .limit(1);
+  return Boolean(carpeta);
+}
+
+/**
+ * Añade varios juegos de golpe — para crear una carpeta y meter juegos en
+ * el mismo paso, en vez de una llamada por juego. `onConflictDoNothing`
+ * porque la clave primaria es (collectionId, gameId): si alguno ya estaba
+ * dentro, no pasa nada, no hace falta comprobarlo antes.
+ */
+export async function addGamesToCollection(userId: string, collectionId: string, gameIds: string[]): Promise<void> {
+  if (gameIds.length === 0) return;
+  if (!(await esDueño(userId, collectionId))) return;
+
+  await db
+    .insert(collectionGames)
+    .values(gameIds.map((gameId) => ({ collectionId, gameId })))
+    .onConflictDoNothing();
+}
+
+/** Saca un juego de una carpeta — a diferencia de `toggleGameInCollection`, esta siempre quita, nunca vuelve a meterlo. */
+export async function removeGameFromCollection(userId: string, collectionId: string, gameId: string): Promise<void> {
+  if (!(await esDueño(userId, collectionId))) return;
+
+  await db
+    .delete(collectionGames)
+    .where(and(eq(collectionGames.collectionId, collectionId), eq(collectionGames.gameId, gameId)));
+}
+
+/** Mover un juego de una carpeta a otra — sacarlo de la de origen y meterlo en la de destino, comprobando las dos. */
+export async function moveGameToCollection(
+  userId: string,
+  fromCollectionId: string,
+  toCollectionId: string,
+  gameId: string,
+): Promise<void> {
+  await removeGameFromCollection(userId, fromCollectionId, gameId);
+  await addGamesToCollection(userId, toCollectionId, [gameId]);
+}

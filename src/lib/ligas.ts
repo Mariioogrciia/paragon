@@ -38,7 +38,7 @@ export async function getLigaMensual(): Promise<LigaUser[]> {
       userId: users.id,
       handle: users.handle,
       name: users.name,
-      image: avatarUrlSql(users.id, users.image),
+      image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
       points: pointsSql,
     })
     .from(userTrophies)

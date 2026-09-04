@@ -56,6 +56,7 @@ try {
     handle: "prueba_sync",
     displayName: "Mock User",
     image: null,
+    avatarPersonalizado: false,
     favorites: [],
     accounts: [
       {

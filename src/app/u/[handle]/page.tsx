@@ -28,6 +28,7 @@ import { AvatarFrame } from "@/components/AvatarFrame";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
+import { BackButton } from "@/components/BackButton";
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -163,7 +164,10 @@ export default async function PerfilPage({
           />
         )}
 
-        <div className="relative z-10 mx-auto flex max-w-[1240px] flex-wrap items-end gap-5 px-7 pb-8 pt-10">
+        <div className="relative z-10 mx-auto max-w-[1240px] px-7 pt-6">
+          <BackButton fallbackHref="/" dark />
+        </div>
+        <div className="relative z-10 mx-auto flex max-w-[1240px] flex-wrap items-end gap-5 px-7 pb-8 pt-2">
           <AvatarFrame frame={profile.profileFrame}>
             <Avatar src={player.avatarUrl} name={player.name} size={92} />
           </AvatarFrame>

@@ -10,7 +10,11 @@ import {
   CollectionNameError,
   createCollection,
   deleteCollection,
+  renameCollection,
   toggleGameInCollection,
+  addGamesToCollection,
+  removeGameFromCollection,
+  moveGameToCollection,
 } from "@/lib/collections";
 import {
   acceptFriendRequest,
@@ -37,6 +41,7 @@ import {
 } from "@/lib/steam/client";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
 import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
+import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideError, type TrophyGuideRow } from "@/lib/trophyGuides";
 import { marcarTodoLeido } from "@/lib/notifications";
 import { ownsGame } from "@/lib/community";
 import { votarDificultad } from "@/lib/communityDifficulty";
@@ -297,6 +302,97 @@ export async function deleteCollectionAction(formData: FormData): Promise<void> 
 
   await deleteCollection(userId, id);
   revalidatePath("/", "layout");
+}
+
+export async function renameCollectionAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId();
+  const id = String(formData.get("collectionId") ?? "");
+  const name = String(formData.get("name") ?? "");
+
+  try {
+    await renameCollection(userId, id, name);
+    revalidatePath("/", "layout");
+    return { success: "Carpeta renombrada." };
+  } catch (error) {
+    if (error instanceof CollectionNameError) return { error: error.message };
+    return { error: "No se ha podido renombrar la carpeta." };
+  }
+}
+
+/** Crear una carpeta y meterle de golpe los juegos elegidos en el propio formulario de creación — no hace falta abrirla después para añadirlos uno a uno. */
+export async function createCollectionWithGamesAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const userId = await requireUserId();
+  const name = String(formData.get("name") ?? "");
+  const gameIds = formData.getAll("gameIds").map(String).filter(Boolean);
+
+  try {
+    const id = await createCollection(userId, name);
+    if (gameIds.length > 0) await addGamesToCollection(userId, id, gameIds);
+    revalidatePath("/", "layout");
+    return { success: "Carpeta creada." };
+  } catch (error) {
+    if (error instanceof CollectionNameError) return { error: error.message };
+    return { error: "No se ha podido crear la carpeta." };
+  }
+}
+
+export async function addGamesToCollectionAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const collectionId = String(formData.get("collectionId") ?? "");
+  const gameIds = formData.getAll("gameIds").map(String).filter(Boolean);
+
+  if (!collectionId || gameIds.length === 0) return;
+
+  await addGamesToCollection(userId, collectionId, gameIds);
+  revalidatePath("/", "layout");
+}
+
+export async function removeGameFromCollectionAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const collectionId = String(formData.get("collectionId") ?? "");
+  const gameId = String(formData.get("gameId") ?? "");
+
+  if (!collectionId || !gameId) return;
+
+  await removeGameFromCollection(userId, collectionId, gameId);
+  revalidatePath("/", "layout");
+}
+
+/** Mover a otra carpeta ya existente. Para "mover, con opción a crear una nueva al mover" ver `moveGameToNewCollectionAction`. */
+export async function moveGameToCollectionAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const fromCollectionId = String(formData.get("fromCollectionId") ?? "");
+  const toCollectionId = String(formData.get("toCollectionId") ?? "");
+  const gameId = String(formData.get("gameId") ?? "");
+
+  if (!fromCollectionId || !toCollectionId || !gameId) return;
+
+  await moveGameToCollection(userId, fromCollectionId, toCollectionId, gameId);
+  revalidatePath("/", "layout");
+}
+
+/** Mover a una carpeta que no existe todavía: se crea y el juego entra directo, en la misma acción. */
+export async function moveGameToNewCollectionAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const userId = await requireUserId();
+  const fromCollectionId = String(formData.get("fromCollectionId") ?? "");
+  const gameId = String(formData.get("gameId") ?? "");
+  const name = String(formData.get("name") ?? "");
+
+  try {
+    const toCollectionId = await createCollection(userId, name);
+    await moveGameToCollection(userId, fromCollectionId, toCollectionId, gameId);
+    revalidatePath("/", "layout");
+    return { success: `Movido a «${name}».` };
+  } catch (error) {
+    if (error instanceof CollectionNameError) return { error: error.message };
+    return { error: "No se ha podido mover el juego." };
+  }
 }
 
 /* ------------------------------------- Amigos ------------------------------------ */
@@ -711,4 +807,55 @@ export async function deleteGuideAction(guideId: string, gameId: string): Promis
   const userId = await requireUserId();
   await deleteGuide(userId, guideId);
   revalidatePath(`/juego/${gameId}/guias`);
+}
+
+/* ---------------------------- Guías escritas de trofeo (TrophyGuideModal) --------------------------- */
+
+/**
+ * El idioma con el que se guarda no es una elección del formulario: sale de
+ * `users.language` (por defecto "es-ES"), la misma preferencia de la
+ * plataforma — de momento siempre "es" porque no hay más interfaz que esa,
+ * pero ya sale de la persona, no a pelo en el código.
+ */
+export async function saveTrophyGuideAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId();
+  const gameId = String(formData.get("gameId") ?? "");
+  const trophyId = String(formData.get("trophyId") ?? "");
+  const body = String(formData.get("body") ?? "");
+
+  if (!gameId || !trophyId) return { error: "Falta el trofeo." };
+
+  const db = getDb();
+  const [dbUser] = await db.select({ language: users.language }).from(users).where(eq(users.id, userId)).limit(1);
+  const idioma = (dbUser?.language ?? "es-ES").slice(0, 2);
+
+  try {
+    await upsertTrophyGuide(userId, gameId, trophyId, body, idioma);
+    revalidatePath(`/juego/${gameId}`);
+    return { success: "Guía publicada." };
+  } catch (error) {
+    if (error instanceof TrophyGuideError) return { error: error.message };
+    return { error: "No se ha podido guardar la guía." };
+  }
+}
+
+/** Lo que necesita el modal para pintarse: las guías que hay y, si el visitante ha iniciado sesión, cuál de ellas es la suya (para "editar" en vez de "publicar"). */
+export async function getTrophyGuidesAction(
+  gameId: string,
+  trophyId: string,
+): Promise<{ guides: TrophyGuideRow[]; currentUserId: string | null }> {
+  const session = await auth();
+  const guides = await listTrophyGuides(gameId, trophyId);
+  return { guides, currentUserId: session?.user?.id ?? null };
+}
+
+export async function deleteTrophyGuideAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const gameId = String(formData.get("gameId") ?? "");
+  const trophyId = String(formData.get("trophyId") ?? "");
+
+  if (!gameId || !trophyId) return;
+
+  await deleteTrophyGuide(userId, gameId, trophyId);
+  revalidatePath(`/juego/${gameId}`);
 }

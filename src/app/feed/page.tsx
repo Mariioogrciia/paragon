@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { getGlobalFeed } from "@/lib/feed";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { redirect } from "next/navigation";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = {
   title: "Muro Social - Paragon",
@@ -15,6 +16,7 @@ export default async function GlobalFeedPage() {
 
   return (
     <div className="mx-auto max-w-[800px] px-7 py-12">
+      <BackButton fallbackHref="/" />
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2">Comunidad</h1>
         <p className="text-muted">Descubre a qué está jugando la comunidad de Paragon.</p>

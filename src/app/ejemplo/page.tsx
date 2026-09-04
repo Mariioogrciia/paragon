@@ -6,6 +6,7 @@ import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { DEMO_ANIO, DEMO_JUEGOS, DEMO_JUGADOR } from "@/lib/demo";
 import { gameProgress, summarise } from "@/lib/stats";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Perfil de ejemplo · Paragon" };
 
@@ -36,6 +37,7 @@ export default function EjemploPage() {
         }}
       >
         <div className="mx-auto max-w-[1240px] px-7 pb-8 pt-8">
+          <BackButton fallbackHref="/" dark />
           <div
             className="mb-6 flex flex-wrap items-center gap-3 rounded-xl px-4 py-3"
             style={{

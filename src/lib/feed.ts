@@ -25,7 +25,7 @@ export async function getFeed(userId: string) {
         id: users.id,
         handle: users.handle,
         name: users.name,
-        image: avatarUrlSql(users.id, users.image),
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
       },
       game: {
         id: games.id,
@@ -87,7 +87,7 @@ export async function getGlobalFeed(currentUserId?: string) {
         id: users.id,
         handle: users.handle,
         name: users.name,
-        image: avatarUrlSql(users.id, users.image),
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
       },
       game: {
         id: games.id,

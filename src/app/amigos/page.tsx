@@ -14,6 +14,7 @@ import {
 import { summarise } from "@/lib/stats";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getPeriodRankings } from "@/lib/rankings";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Amigos · Paragon" };
 
@@ -66,6 +67,7 @@ export default async function AmigosPage() {
 
   return (
     <div>
+      <BackButton fallbackHref="/" />
       <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Amigos</h1>
       <p className="mt-2.5 text-[15px] text-muted">
         Se añaden por su usuario de Paragon, no por su ID de plataforma.
