@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getProfileByHandle, getLibrary } from "@/lib/profiles";
 import { trofeosPorMes } from "@/lib/history";
-import { actividadPorDia, horasPorJuego } from "@/lib/profileStats";
+import { actividadPorDia, horasPorJuego, horasTotales, estadisticasAmigos } from "@/lib/profileStats";
 import { getFeed } from "@/lib/feed";
 import { ActivityHeatmap } from "@/components/ActivityHeatmap";
 import { TrophyMonthChart, PlaytimeBarChart } from "@/components/StatCharts";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { RecentlyPlayed } from "@/components/RecentlyPlayed";
+import { PlaytimeComparison } from "@/components/PlaytimeComparison";
+import { FriendsLeaderboard } from "@/components/FriendsLeaderboard";
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
@@ -23,16 +25,18 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
 
-  const [dias, meses, horas, feed, { games: biblioteca }] = await Promise.all([
+  const [dias, meses, horas, horasEnTotal, feed, { games: biblioteca }, amigos] = await Promise.all([
     actividadPorDia(profile.userId),
     trofeosPorMes(profile.userId),
     horasPorJuego(profile.userId),
-    // La actividad de amigos es información privada de quien la ve (quiénes
-    // son sus amigos y qué hacen) — solo se pide, y solo se enseña, en el
-    // propio perfil de quien ha iniciado sesión, nunca mirando el perfil de
-    // otra persona.
+    horasTotales(profile.userId),
+    // La actividad de amigos y el comparador con ellos son información
+    // privada de quien la ve (quiénes son sus amigos y qué hacen) — solo se
+    // piden, y solo se enseñan, en el propio perfil de quien ha iniciado
+    // sesión, nunca mirando el perfil de otra persona.
     esMio ? getFeed(profile.userId) : Promise.resolve([]),
     getLibrary(profile),
+    esMio ? estadisticasAmigos(profile.userId) : Promise.resolve([]),
   ]);
 
   // "Últimas sesiones" no es un dato que exista — ni PSN ni Steam dan un
@@ -55,6 +59,10 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
         <ActivityHeatmap dias={dias} />
       </section>
 
+      <div className="mb-8">
+        <PlaytimeComparison horasTotales={horasEnTotal} />
+      </div>
+
       <div className="mb-8 grid gap-5 lg:grid-cols-2">
         <TrophyMonthChart meses={meses} />
         <PlaytimeBarChart juegos={horas} />
@@ -71,10 +79,18 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
       )}
 
       {esMio && (
-        <section>
-          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Actividad de tus amigos</h2>
-          <ActivityFeed activities={feed} currentUserId={session?.user?.id ?? null} />
-        </section>
+        <>
+          <section className="mb-8">
+            <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Tú y tus amigos</h2>
+            <p className="mb-4 text-sm text-muted">Un vistazo rápido — cada fila lleva a las estadísticas completas de esa persona.</p>
+            <FriendsLeaderboard personas={amigos} propioUserId={profile.userId} />
+          </section>
+
+          <section>
+            <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Actividad de tus amigos</h2>
+            <ActivityFeed activities={feed} currentUserId={session?.user?.id ?? null} />
+          </section>
+        </>
       )}
     </div>
   );

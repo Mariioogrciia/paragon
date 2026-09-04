@@ -8,9 +8,10 @@ import type { DiaActividad } from "@/lib/profileStats";
  * sesiones real.
  *
  * Semanas de lunes a domingo (convención española, no la de GitHub que
- * empieza en domingo). Sin JS: el detalle de cada día va en `title`, un
- * tooltip nativo del navegador es suficiente para un dato secundario como
- * este.
+ * empieza en domingo). El detalle de cada día es un tooltip propio (CSS
+ * puro, `group-hover`, sin JS) — el `title` nativo del navegador tarda en
+ * aparecer y es minúsculo, así que no se notaba que hubiera nada al pasar
+ * el ratón.
  */
 const DIAS_SEMANA = ["L", "", "X", "", "V", "", ""];
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -80,14 +81,20 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
               <div key={i} className="flex flex-col gap-[3px]">
                 {semana.map((d, j) =>
                   d ? (
-                    <div
-                      key={j}
-                      title={`${fechaLarga(d.dia)} — ${d.trofeos} ${d.trofeos === 1 ? "trofeo" : "trofeos"}`}
-                      className="h-[11px] w-[11px] rounded-[2px]"
-                      style={{
-                        background: nivel(d.trofeos) === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${OPACIDAD_POR_NIVEL[nivel(d.trofeos)]})`,
-                      }}
-                    />
+                    <div key={j} className="group/dia relative h-[11px] w-[11px]">
+                      <div
+                        className="h-[11px] w-[11px] rounded-[2px]"
+                        style={{
+                          background: nivel(d.trofeos) === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${OPACIDAD_POR_NIVEL[nivel(d.trofeos)]})`,
+                        }}
+                      />
+                      <div
+                        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold opacity-0 shadow-lg transition-opacity group-hover/dia:opacity-100"
+                        style={{ background: "var(--foreground)", color: "var(--background)" }}
+                      >
+                        {d.trofeos} {d.trofeos === 1 ? "trofeo" : "trofeos"} · {fechaLarga(d.dia)}
+                      </div>
+                    </div>
                   ) : (
                     <div key={j} className="h-[11px] w-[11px]" />
                   ),
