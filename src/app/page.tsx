@@ -21,6 +21,7 @@ import { ActivityStats } from "@/components/ActivityStats";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { TrophyRecommendations } from "@/components/TrophyRecommendations";
 import { paragonProgress } from "@/lib/level";
+import { PsNewsFeed } from "@/components/PsNewsFeed";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -529,6 +530,8 @@ export default async function HomePage() {
       {/* En la portada, que es donde se aterriza: en el perfil quedaba después
           de una biblioteca de cientos de juegos con carga progresiva. */}
       <UpcomingGames wishlistedIgdbIds={wishlistIds} />
+
+      <PsNewsFeed />
 
       <section>
         <div className="mb-4 flex items-baseline gap-3.5">

@@ -154,6 +154,32 @@ export interface IgdbGameResult {
   pegi?: string;
 }
 
+/**
+ * Etiqueta de fecha en español, contando solo lo que IGDB sabe de verdad.
+ *
+ * Un juego anunciado "para 2028" llega con timestamp del 31 de diciembre de
+ * relleno (ver `precisionOf` más abajo). Pintarlo como "31 dic 2028" sería
+ * inventarse el día, así que cada precisión tiene su propio formato.
+ */
+export function releaseLabelEs(iso: string | undefined, precision: ReleasePrecision): string {
+  if (!iso || precision === "tbd") return "Fecha por confirmar";
+
+  const fecha = new Date(iso);
+
+  switch (precision) {
+    case "day":
+      return fecha.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    case "month":
+      return fecha.toLocaleDateString("es-ES", { month: "long", year: "numeric", timeZone: "UTC" });
+    case "quarter": {
+      const trimestre = Math.floor(fecha.getUTCMonth() / 3) + 1;
+      return `${trimestre}.º trimestre de ${fecha.getUTCFullYear()}`;
+    }
+    case "year":
+      return `Durante ${fecha.getUTCFullYear()}`;
+  }
+}
+
 /** `t_cover_big` es ~264x374; de sobra para tarjetas y miniaturas. */
 function coverUrl(image_id?: string): string | undefined {
   return image_id
@@ -213,15 +239,104 @@ const FIELDS =
   "involved_companies.developer, involved_companies.publisher, summary, age_ratings.organization, age_ratings.rating_category;";
 
 /**
+ * Filtro `platforms.abbreviation = (...)` de APIcalypse, para las páginas de
+ * plataforma en /descubrir/[plataforma]. "PC" es el proxy más cercano que
+ * tiene IGDB a "Steam" — también incluye Epic/GOG/venta directa, pero no hay
+ * un identificador de tienda más fino en su catálogo. Se documenta en la
+ * propia pantalla, no se oculta la imprecisión.
+ */
+const ABREVIATURAS_PLATAFORMA: Record<"playstation" | "steam", string[]> = {
+  playstation: ["PS4", "PS5"],
+  steam: ["PC"],
+};
+
+function filtroPlataforma(plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): string {
+  if (!plataforma) return "";
+  const lista = ABREVIATURAS_PLATAFORMA[plataforma].map((a) => `"${a}"`).join(",");
+  return ` & platforms.abbreviation = (${lista})`;
+}
+
+/**
  * Próximos lanzamientos: fecha de salida en el futuro, ordenados por hype
  * (cuánta gente en IGDB lo sigue) para que salgan los títulos grandes
  * primero y no ruido de catálogo.
  */
-export async function upcomingGames(limit = 8): Promise<IgdbGameResult[]> {
+export async function upcomingGames(limit = 8, plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): Promise<IgdbGameResult[]> {
   const now = Math.floor(Date.now() / 1000);
   const games = await query<IgdbGame>(
     "games",
-    `${FIELDS} where first_release_date > ${now} & cover != null & hypes != null; sort hypes desc; limit ${limit};`,
+    `${FIELDS} where first_release_date > ${now} & cover != null & hypes != null${filtroPlataforma(plataforma)}; sort hypes desc; limit ${limit};`,
+  );
+  return games.map(formatGame);
+}
+
+/**
+ * Lo contrario de `upcomingGames`: lanzamientos ya salidos, los más
+ * recientes primero. Para "Últimos lanzamientos" en la página de cada
+ * plataforma — se exige `hypes != null` por el mismo motivo que arriba, para
+ * no llenar la fila de ruido de catálogo sin seguimiento.
+ */
+export async function recentReleases(limit = 12, plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): Promise<IgdbGameResult[]> {
+  const now = Math.floor(Date.now() / 1000);
+  const games = await query<IgdbGame>(
+    "games",
+    `${FIELDS} where first_release_date <= ${now} & cover != null & hypes != null${filtroPlataforma(plataforma)}; sort first_release_date desc; limit ${limit};`,
+  );
+  return games.map(formatGame);
+}
+
+/**
+ * Cabecera de Descubrir: solo lanzamientos YA SALIDOS (no próximos —
+ * anunciar como destacado un juego que todavía no existe se queda raro en
+ * la pieza más grande de la página) y con un filtro de calidad algo más
+ * exigente que el resto (`hypes > 8`, no solo `!= null`): con 1-2 follows en
+ * IGDB cualquier cosa "tiene hype" técnicamente, y aquí sale una sola pieza
+ * enorme — no vale cualquier juego.
+ *
+ * `revalidate` explícito a un día: es contenido "destacado de hoy", no hace
+ * falta refrescarlo cada 6h como el resto del catálogo, pero tampoco debe
+ * quedarse la misma semana entera si sale algo nuevo con tirón.
+ */
+export async function destacadosRecientes(limit = 6): Promise<IgdbGameResult[]> {
+  const now = Math.floor(Date.now() / 1000);
+
+  async function buscar(diasAtras: number, minHype: number) {
+    const desde = now - diasAtras * 86_400;
+    const games = await query<IgdbGame>(
+      "games",
+      `${FIELDS} where first_release_date > ${desde} & first_release_date <= ${now} & cover != null & hypes > ${minHype}; sort first_release_date desc; limit ${limit};`,
+      86_400,
+    );
+    return games.map(formatGame);
+  }
+
+  // 30 días con exigencia real primero; si el catálogo no da para tanto
+  // (ventana corta, pocos lanzamientos seguidos en IGDB esa quincena), se
+  // abre a 90 días bajando el listón antes que dejar la cabecera vacía.
+  const primeros = await buscar(30, 8);
+  if (primeros.length > 0) return primeros;
+  return buscar(90, 3);
+}
+
+/**
+ * "Novedades": lo que se está hablando AHORA, no solo lo que aún no ha
+ * salido. `upcomingGames` se queda corto para eso — un juego que salió hace
+ * dos semanas y todo el mundo comenta (el caso real que lo hizo evidente:
+ * "The Blood of Dawnwalker") desaparecía del todo porque ya tiene
+ * `first_release_date` en el pasado. Aquí la ventana es "salido hace poco O
+ * está por salir" (día de hoy ± `diasAtras`/lejos en el futuro no hay
+ * límite), y dentro de esa ventana manda el hype, no la fecha — así lo
+ * reciente-y-popular compite con lo próximo-y-esperado en la misma lista.
+ */
+export async function novedades(
+  limit = 10,
+  plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA,
+  diasAtras = 45,
+): Promise<IgdbGameResult[]> {
+  const desde = Math.floor(Date.now() / 1000) - diasAtras * 86_400;
+  const games = await query<IgdbGame>(
+    "games",
+    `${FIELDS} where first_release_date > ${desde} & cover != null & hypes != null${filtroPlataforma(plataforma)}; sort hypes desc; limit ${limit};`,
   );
   return games.map(formatGame);
 }
@@ -250,6 +365,148 @@ export async function getGame(igdbId: number): Promise<IgdbGameResult | null> {
     `${FIELDS} where id = ${igdbId};`,
   );
   return games[0] ? formatGame(games[0]) : null;
+}
+
+/* --------------------------- Ficha ampliada (/juego/[id]) --------------------------- */
+
+/**
+ * Categorías de `websites` documentadas por IGDB — solo las que tiene
+ * sentido enseñar como enlace con su propio icono/etiqueta. El resto (wikia,
+ * facebook, apps de tienda móvil...) cae en el genérico "Sitio web".
+ */
+const WEBSITE_LABELS: Record<number, string> = {
+  1: "Sitio oficial",
+  3: "Wikipedia",
+  5: "Twitter / X",
+  6: "Twitch",
+  9: "YouTube",
+  13: "Steam",
+  14: "Reddit",
+  15: "itch.io",
+  16: "Epic Games Store",
+  17: "GOG",
+  18: "Discord",
+};
+
+interface IgdbGameDetail extends IgdbGame {
+  total_rating?: number;
+  total_rating_count?: number;
+  storyline?: string;
+  screenshots?: { image_id: string }[];
+  themes?: { name: string }[];
+  game_modes?: { name: string }[];
+  websites?: { category: number; url: string }[];
+  similar_games?: { id: number; name: string; cover?: { image_id: string } }[];
+  artworks?: { image_id: string }[];
+  videos?: { video_id: string; name: string }[];
+  dlcs?: { name: string; cover?: { image_id: string }; first_release_date?: number }[];
+  expansions?: { name: string; cover?: { image_id: string }; first_release_date?: number }[];
+  franchises?: { name: string }[];
+  collection?: { name: string };
+  language_supports?: { language?: { native_name: string }; language_support_type?: { name: string } }[];
+}
+
+export interface IgdbGameDetailResult extends IgdbGameResult {
+  totalRating?: number;
+  totalRatingCount?: number;
+  storyline?: string;
+  screenshots: string[];
+  themes: string[];
+  gameModes: string[];
+  websites: { label: string; url: string }[];
+  similarGames: { igdbId: number; title: string; coverUrl?: string }[];
+  artworkUrl?: string;
+  videos: { videoId: string; name: string }[];
+  dlcs: { name: string; coverUrl?: string; releaseDate?: string }[];
+  franchises: string[];
+  languages: { language: string; support: string[] }[];
+}
+
+const DETAIL_FIELDS =
+  "fields name, cover.image_id, first_release_date, release_dates.date, release_dates.human, " +
+  "total_rating, total_rating_count, " +
+  "platforms.abbreviation, platforms.name, genres.name, involved_companies.company.name, " +
+  "involved_companies.developer, involved_companies.publisher, summary, storyline, " +
+  "age_ratings.organization, age_ratings.rating_category, screenshots.image_id, " +
+  "themes.name, game_modes.name, websites.category, websites.url, artworks.image_id, " +
+  "videos.video_id, videos.name, dlcs.name, dlcs.cover.image_id, dlcs.first_release_date, " +
+  "expansions.name, expansions.cover.image_id, expansions.first_release_date, " +
+  "franchises.name, collection.name, language_supports.language.native_name, language_supports.language_support_type.name, " +
+  "similar_games.name, similar_games.cover.image_id;";
+
+/** `t_screenshot_big` es ~889x500 — de sobra para una tira de capturas. */
+function screenshotUrl(image_id: string): string {
+  return `https://images.igdb.com/igdb/image/upload/t_screenshot_big/${image_id}.jpg`;
+}
+
+/**
+ * Ficha ampliada de un juego para `/juego/[id]`: lo que ya daba `formatGame`
+ * más capturas, historia, temas, modos de juego y enlaces oficiales. Aparte
+ * de `getGame()` (y no una extensión de sus `FIELDS`) porque esos campos
+ * extra no los necesita nadie más — el buscador de "añadir a mano" o
+ * "próximos lanzamientos" no pintan una tira de capturas.
+ */
+export async function getGameDetails(igdbId: number): Promise<IgdbGameDetailResult | null> {
+  const games = await query<IgdbGameDetail>(
+    "games",
+    `${DETAIL_FIELDS} where id = ${igdbId};`,
+  );
+  const g = games[0];
+  if (!g) return null;
+
+  const base = formatGame(g);
+
+  // Parse languages
+  const langMap = new Map<string, Set<string>>();
+  for (const ls of g.language_supports ?? []) {
+    const langName = ls.language?.native_name;
+    const supportName = ls.language_support_type?.name;
+    if (langName && supportName) {
+      if (!langMap.has(langName)) langMap.set(langName, new Set());
+      langMap.get(langName)!.add(supportName);
+    }
+  }
+
+  const languages = Array.from(langMap.entries())
+    .map(([lang, supports]) => ({ language: lang, support: Array.from(supports) }))
+    .sort((a, b) => a.language.localeCompare(b.language));
+
+  // Combine DLCs and Expansions
+  const rawDlcs = [...(g.dlcs ?? []), ...(g.expansions ?? [])];
+  const dlcs = rawDlcs.map((d) => ({
+    name: d.name,
+    coverUrl: coverUrl(d.cover?.image_id),
+    releaseDate: d.first_release_date ? new Date(d.first_release_date * 1000).toISOString() : undefined,
+  })).sort((a, b) => (a.releaseDate ?? "").localeCompare(b.releaseDate ?? ""));
+
+  // Combine franchises and collection
+  const franchises = [
+    ...(g.collection?.name ? [g.collection.name] : []),
+    ...(g.franchises ?? []).map((f) => f.name),
+  ];
+
+  return {
+    ...base,
+    totalRating: g.total_rating,
+    totalRatingCount: g.total_rating_count,
+    storyline: g.storyline,
+    screenshots: (g.screenshots ?? []).map((s) => screenshotUrl(s.image_id)),
+    themes: (g.themes ?? []).map((t) => t.name),
+    gameModes: (g.game_modes ?? []).map((m) => m.name),
+    websites: (g.websites ?? [])
+      .filter((w) => WEBSITE_LABELS[w.category])
+      .map((w) => ({ label: WEBSITE_LABELS[w.category], url: w.url })),
+    similarGames: (g.similar_games ?? []).slice(0, 12).map((s) => ({
+      igdbId: s.id,
+      title: s.name,
+      coverUrl: coverUrl(s.cover?.image_id),
+    })),
+    artworkUrl: g.artworks?.[0] ? `https://images.igdb.com/igdb/image/upload/t_1080p/${g.artworks[0].image_id}.jpg` : undefined,
+    videos: (g.videos ?? []).map((v) => ({ videoId: v.video_id, name: v.name })),
+    dlcs,
+    franchises: [...new Set(franchises)],
+    languages,
+  };
 }
 
 /* ------------------------------ Clasificación PEGI ----------------------------- */

@@ -1,0 +1,81 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { auth } from "@/auth";
+import { getProfileByHandle, getLibrary } from "@/lib/profiles";
+import { trofeosPorMes } from "@/lib/history";
+import { actividadPorDia, horasPorJuego } from "@/lib/profileStats";
+import { getFeed } from "@/lib/feed";
+import { ActivityHeatmap } from "@/components/ActivityHeatmap";
+import { TrophyMonthChart, PlaytimeBarChart } from "@/components/StatCharts";
+import { ActivityFeed } from "@/components/ActivityFeed";
+import { RecentlyPlayed } from "@/components/RecentlyPlayed";
+
+export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
+  const { handle } = await params;
+  return { title: `Estadísticas de @${handle} · Paragon` };
+}
+
+export default async function EstadisticasPage({ params }: { params: Promise<{ handle: string }> }) {
+  const { handle } = await params;
+  const profile = await getProfileByHandle(handle);
+  if (!profile) notFound();
+
+  const session = await auth();
+  const esMio = session?.user?.id === profile.userId;
+
+  const [dias, meses, horas, feed, { games: biblioteca }] = await Promise.all([
+    actividadPorDia(profile.userId),
+    trofeosPorMes(profile.userId),
+    horasPorJuego(profile.userId),
+    // La actividad de amigos es información privada de quien la ve (quiénes
+    // son sus amigos y qué hacen) — solo se pide, y solo se enseña, en el
+    // propio perfil de quien ha iniciado sesión, nunca mirando el perfil de
+    // otra persona.
+    esMio ? getFeed(profile.userId) : Promise.resolve([]),
+    getLibrary(profile),
+  ]);
+
+  // "Últimas sesiones" no es un dato que exista — ni PSN ni Steam dan un
+  // registro de sesiones, solo la última vez que se tocó cada juego
+  // (`lastPlayedAt`). Esto es lo más cerca que hay de verdad: los juegos
+  // ordenados por esa fecha, no una lista de sesiones inventada.
+  const jugadoRecientemente = biblioteca
+    .filter((g) => !g.isWishlist && g.lastPlayedAt)
+    .sort((a, b) => new Date(b.lastPlayedAt!).getTime() - new Date(a.lastPlayedAt!).getTime())
+    .slice(0, 8);
+
+  return (
+    <div>
+      <p className="mb-1 text-xs font-bold uppercase tracking-widest text-muted">
+        <Link href={`/u/${handle}`} className="hover:underline">@{handle}</Link> / Estadísticas
+      </p>
+      <h1 className="mb-6 font-heading text-3xl font-bold uppercase tracking-wide">Estadísticas</h1>
+
+      <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+        <ActivityHeatmap dias={dias} />
+      </section>
+
+      <div className="mb-8 grid gap-5 lg:grid-cols-2">
+        <TrophyMonthChart meses={meses} />
+        <PlaytimeBarChart juegos={horas} />
+      </div>
+
+      {jugadoRecientemente.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Jugado recientemente</h2>
+          <p className="mb-4 text-sm text-muted">
+            La última vez que se tocó cada juego — ni PSN ni Steam dan un registro de sesiones, esto es lo más real que hay.
+          </p>
+          <RecentlyPlayed games={jugadoRecientemente} handle={handle} />
+        </section>
+      )}
+
+      {esMio && (
+        <section>
+          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Actividad de tus amigos</h2>
+          <ActivityFeed activities={feed} currentUserId={session?.user?.id ?? null} />
+        </section>
+      )}
+    </div>
+  );
+}

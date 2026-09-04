@@ -20,6 +20,7 @@ import { estimarEta } from "@/lib/eta";
 import { EtaPlatinoCard } from "@/components/EtaPlatino";
 import type { Trophy } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
+import { CompartirImagen } from "@/components/CompartirImagen";
 
 function ProximoRow({ trophy }: { trophy: Trophy }) {
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
@@ -240,6 +241,23 @@ export default async function JuegoPage({
                   El juego base está al 100%: lo que queda son expansiones.
                 </p>
               </div>
+            )}
+
+            {esMio && progress.platinumEarned && (
+              <CompartirImagen
+                url={`/api/trophy-card/${handle}/${encodeURIComponent(game.id)}`}
+                nombreArchivo={`paragon-platino-${game.id}.png`}
+                tituloCompartir={`Platino de ${game.title}`}
+                className="flex items-center justify-center gap-2 rounded-[18px] p-[18px] text-[13px] font-bold text-platinum transition-colors hover:text-white disabled:opacity-50"
+                style={{ border: "1px solid rgb(159 212 236 / 0.35)", background: "rgba(13, 19, 28, 0.75)" }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+                Compartir platino
+              </CompartirImagen>
             )}
           </div>
         </div>

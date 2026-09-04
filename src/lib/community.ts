@@ -183,6 +183,50 @@ export async function getGlobalGameStats(gameId: string): Promise<GlobalGameStat
   };
 }
 
+export interface TrophyBreakdown {
+  platform: string;
+  totalTrophies: number;
+  totalPoints: number;
+}
+
+export async function getGameTrophyBreakdown(igdbId: number): Promise<TrophyBreakdown[]> {
+  const rows = await db
+    .select({
+      platform: gamesTable.platform,
+      defined: gamesTable.defined,
+    })
+    .from(gamesTable)
+    .where(eq(gamesTable.igdbId, igdbId));
+
+  const breakdown: Record<string, TrophyBreakdown> = {};
+
+  for (const row of rows) {
+    const p = row.platform;
+    if (!breakdown[p]) {
+      breakdown[p] = { platform: p, totalTrophies: 0, totalPoints: 0 };
+    }
+    
+    // We try to estimate total trophies and points from `defined` object if it exists
+    const d = row.defined as any;
+    if (d) {
+      if (d.total) {
+        breakdown[p].totalTrophies += Number(d.total) || 0;
+      } else if (d.bronze !== undefined) {
+        breakdown[p].totalTrophies += (Number(d.bronze) || 0) + (Number(d.silver) || 0) + (Number(d.gold) || 0) + (Number(d.platinum) || 0);
+      }
+      
+      // Points estimation (standard: bronze 15, silver 30, gold 90, platinum 300)
+      if (d.bronze !== undefined) {
+        breakdown[p].totalPoints += (Number(d.bronze) || 0) * 15 + (Number(d.silver) || 0) * 30 + (Number(d.gold) || 0) * 90 + (Number(d.platinum) || 0) * 300;
+      } else if (d.totalPoints) {
+        breakdown[p].totalPoints += Number(d.totalPoints) || 0;
+      }
+    }
+  }
+
+  return Object.values(breakdown).sort((a, b) => b.totalTrophies - a.totalTrophies);
+}
+
 export interface GameReview {
   userId: string;
   handle: string | null;

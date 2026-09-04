@@ -125,17 +125,19 @@ export function ParagonWrap({
 
   return (
     <section className="mb-10">
-      <div className="mb-5 flex flex-wrap items-center gap-3">
+      <div className="mb-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="font-heading text-[26px] font-bold uppercase tracking-wide flex items-center gap-2">
           <span className="text-xl">✨</span> Paragon Wrap
         </h2>
-        {handle && <CompartirImagenWrap handle={handle} />}
-        <Link
-          href="/ritmo"
-          className={handle ? "text-xs font-bold uppercase tracking-wide text-accent hover:underline" : "ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"}
-        >
-          Ver mes a mes
-        </Link>
+        <div className="flex w-full items-center justify-between sm:w-auto sm:justify-end sm:gap-4">
+          {handle && <CompartirImagenWrap handle={handle} />}
+          <Link
+            href="/ritmo"
+            className="text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+          >
+            Ver mes a mes
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

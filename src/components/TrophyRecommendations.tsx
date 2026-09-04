@@ -50,7 +50,7 @@ export function TrophyRecommendations({
           {recommendations.map((r) => (
             <div
               key={`${r.gameId}:${r.trophyId}`}
-              className="flex items-center gap-2 rounded-xl border border-border p-3 transition-colors hover:bg-surface-2"
+              className="flex min-w-0 items-center gap-2 rounded-xl border border-border p-3 transition-colors hover:bg-surface-2"
             >
               <Link href={`/u/${handle}/${r.gameId}`} className="flex min-w-0 flex-1 items-center gap-3">
                 <TrophyTile grade="gold" size={38} />

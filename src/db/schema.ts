@@ -258,6 +258,20 @@ export const userGames = pgTable(
     review: text("review"),
     reviewDate: timestamp("reviewDate", { mode: "date" }),
     isWishlist: boolean("isWishlist").notNull().default(false),
+    /**
+     * Cuándo entró este juego en la biblioteca/deseados de este usuario —
+     * distinto de `lastPlayedAt` (cuándo se jugó) o `trophiesSyncedAt`
+     * (cuándo se sincronizó su detalle). Sirve para "Tendencias" en
+     * Descubrir (lib/discover.ts): con `default(now())` en la base, un
+     * INSERT nuevo lo recibe solo; los `onConflictDoUpdate` de sync.ts y
+     * manualGames.ts nunca tocan esta columna en su `set`, así que una fila
+     * ya existente conserva su fecha real de alta aunque se resincronice
+     * cien veces. Las filas de antes de esta columna se migran todas con la
+     * misma fecha (la de la migración) — Tendencias no tendrá datos reales
+     * que decir hasta que pase un tiempo de uso normal, y eso es preferible
+     * a fingir una fecha que nadie sabe cuál es.
+     */
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
 );

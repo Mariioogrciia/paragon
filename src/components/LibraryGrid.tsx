@@ -223,10 +223,9 @@ export function LibraryGrid({
 
   return (
     <div>
-      {/* 1. Barra de búsqueda y controles de vista */}
-      <div className="mb-4 flex flex-wrap items-center gap-2.5">
+      <div className="mb-4 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
         <div
-          className="flex min-w-[220px] flex-1 items-center gap-2.5 rounded-xl px-3.5 transition-colors focus-within:border-accent"
+          className="flex w-full sm:w-auto sm:min-w-[220px] flex-1 items-center gap-2.5 rounded-xl px-3.5 transition-colors focus-within:border-accent"
           style={FIELD}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -249,42 +248,44 @@ export function LibraryGrid({
           )}
         </div>
 
-        <Dropdown 
-          value={sort} 
-          onChange={(v) => setSort(v as SortKey)} 
-          options={SORTS} 
-          className="w-48"
-        />
+        <div className="flex w-full sm:w-auto flex-wrap items-center gap-2.5">
+          <Dropdown 
+            value={sort} 
+            onChange={(v) => setSort(v as SortKey)} 
+            options={SORTS} 
+            className="min-w-[160px] flex-1 sm:w-48 sm:flex-none"
+          />
 
-        <button 
-          onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
-          className="h-[38px] w-[38px] flex shrink-0 items-center justify-center rounded-[9px] text-[18px] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
-          style={FIELD}
-          title={sortDir === "asc" ? "Orden ascendente" : "Orden descendente"}
-        >
-          {sortDir === "asc" ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5"></line>
-              <polyline points="5 12 12 5 19 12"></polyline>
-            </svg>
-          ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <polyline points="19 12 12 19 5 12"></polyline>
-            </svg>
-          )}
-        </button>
+          <button 
+            onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
+            className="h-[38px] w-[38px] flex shrink-0 items-center justify-center rounded-[9px] text-[18px] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
+            style={FIELD}
+            title={sortDir === "asc" ? "Orden ascendente" : "Orden descendente"}
+          >
+            {sortDir === "asc" ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+            )}
+          </button>
 
-        <div className="flex gap-1 rounded-[9px] p-1 shrink-0" style={FIELD}>
-          <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          </button>
-          <button onClick={() => setView("list")} className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          </button>
+          <div className="flex gap-1 rounded-[9px] p-1 shrink-0" style={FIELD}>
+            <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </button>
+            <button onClick={() => setView("list")} className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </button>
+          </div>
+
+          {esMio && <AddManualGameModal />}
         </div>
-
-        {esMio && <AddManualGameModal />}
       </div>
 
       {/* 2. Filtros organizados en cuadrícula para alinear los anchos */}

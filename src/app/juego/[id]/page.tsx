@@ -7,13 +7,23 @@ import { CommunityDifficulty } from "@/components/CommunityDifficulty";
 import { Stars } from "@/components/Stars";
 import { StatTile } from "@/components/StatTile";
 import { coverGradient, relativeDate } from "@/lib/design";
-import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame } from "@/lib/community";
+import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame, getGameTrophyBreakdown } from "@/lib/community";
 import { getCommunityRating } from "@/lib/ratings";
 import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";
 import { getProfileByUserId } from "@/lib/profiles";
 import { comparativaPreciosSteam } from "@/lib/prices";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
+import { getGameDetails, IgdbNotConfiguredError, releaseLabelEs } from "@/lib/igdb/client";
+import { GameDetailsSidebar } from "@/components/GameDetailsSidebar";
+import { ScreenshotStrip } from "@/components/ScreenshotStrip";
+import { DiscoverCard } from "@/components/DiscoverCard";
+import { GameGrid } from "@/components/GameGrid";
+import { GameHeaderLogo } from "@/components/GameHeaderLogo";
+import { GameVideos } from "@/components/GameVideos";
+import { GameLanguages } from "@/components/GameLanguages";
+import { GameDlcs } from "@/components/GameDlcs";
+import { GameTrophyBreakdown } from "@/components/GameTrophyBreakdown";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -37,7 +47,7 @@ export default async function JuegoGlobalPage({
     redirect(`/juego/${game.igdbId}`);
   }
 
-  const [stats, rating, dificultadComunidad, reviews, session, precios] = await Promise.all([
+  const [stats, rating, dificultadComunidad, reviews, session, precios, detalles, trophyBreakdown] = await Promise.all([
     getGlobalGameStats(gameId),
     getCommunityRating(gameId),
     getDificultadComunidad(gameId),
@@ -45,6 +55,18 @@ export default async function JuegoGlobalPage({
     auth(),
     // Buscamos ofertas si sabemos el ID de Steam
     game.steamId ? comparativaPreciosSteam(game.steamId) : Promise.resolve(null),
+    // Capturas, historia, temas, modos de juego y enlaces oficiales: viven en
+    // IGDB, no en nuestra base (games no guarda ese detalle) — se piden en
+    // vivo, cacheadas por el propio cliente de IGDB (ver getGameDetails).
+    // Sin credenciales de IGDB, la ficha sigue funcionando: solo sin ese
+    // bloque, igual que ya hace "Próximos lanzamientos".
+    game.igdbId
+      ? getGameDetails(game.igdbId).catch((error) => {
+          if (!(error instanceof IgdbNotConfiguredError)) console.error("[juego-detalle-igdb]", error);
+          return null;
+        })
+      : Promise.resolve(null),
+    game.igdbId ? getGameTrophyBreakdown(game.igdbId) : Promise.resolve([]),
   ]);
 
   let miFicha: string | null = null;
@@ -68,89 +90,115 @@ export default async function JuegoGlobalPage({
     <div className="-mx-7 -mt-9">
       <div
         className="relative overflow-hidden border-b border-border"
-        style={{ background: "linear-gradient(135deg, #2b1b3f 0%, #16233d 55%, #0b1018 100%)" }}
+        style={
+          detalles?.artworkUrl
+            ? {
+                backgroundImage: `url(${detalles.artworkUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : { background: "linear-gradient(135deg, #2b1b3f 0%, #16233d 55%, #0b1018 100%)" }
+        }
       >
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))" }}
+          style={{ background: detalles?.artworkUrl ? "rgba(11, 16, 24, 0.75)" : "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))" }}
         />
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
-          <div className="mt-2 grid items-end gap-6 lg:grid-cols-[150px_1fr_auto]">
-            <span
-              className="relative flex h-[100px] w-[100px] shrink-0 items-center justify-center overflow-hidden rounded-[20px] lg:h-[150px] lg:w-[150px]"
-              style={{ background: coverGradient(game.id), boxShadow: "0 20px 50px rgba(0, 0, 0, 0.55)" }}
-            >
-              {game.iconUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={game.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-              )}
-            </span>
+          <div className="mt-2 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <GameHeaderLogo title={game.title} steamId={game.steamId} />
 
-            <div className="min-w-0">
-              <p className="mb-2.5 flex flex-wrap items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
-                <span
-                  className="rounded-md px-2.5 py-1"
-                  style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
-                >
-                  {PLATFORM_LABEL[game.platform]} · {game.deviceLabel}
-                </span>
-                {(game.developer || game.publisher) && (
-                  <span className="text-muted normal-case tracking-normal">
-                    {game.developer ?? game.publisher}
-                  </span>
-                )}
-                {game.pegi && <Pegi edad={game.pegi} size="md" />}
-              </p>
-
-              <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[52px]">
-                {game.title}
-              </h1>
-
-              {game.genres && game.genres.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {game.genres.map((g) => (
-                    <span
-                      key={g}
-                      className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-muted"
-                      style={{ border: "1px solid var(--border)" }}
-                    >
-                      {g}
-                    </span>
-                  ))}
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-3 text-[13px] font-bold text-foreground">
+                  {detalles?.totalRating && (
+                    <div className="flex items-center gap-1.5 text-accent">
+                      <span>⭐</span>
+                      <span>{(detalles.totalRating / 10).toFixed(1)} / 10</span>
+                    </div>
+                  )}
+                  {detalles?.totalRating && <span className="text-muted/50">|</span>}
+                  
+                  <div className="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                    {PLATFORM_LABEL[game.platform] ?? game.deviceLabel}
+                  </div>
+                  
+                  {detalles?.releasePrecision && detalles.releasePrecision !== "tbd" && detalles.releaseDate && (
+                    <>
+                      <span className="text-muted/50">|</span>
+                      <span className="text-muted font-medium">{releaseLabelEs(detalles.releaseDate, detalles.releasePrecision)}</span>
+                    </>
+                  )}
+                  
+                  {(game.developer || game.publisher) && (
+                    <>
+                      <span className="text-muted/50">|</span>
+                      <span className="text-muted font-medium">
+                        {game.developer ?? game.publisher}
+                      </span>
+                    </>
+                  )}
+                  {game.pegi && (
+                    <>
+                      <span className="text-muted/50">|</span>
+                      <Pegi edad={game.pegi} size="sm" />
+                    </>
+                  )}
                 </div>
-              )}
 
-              <div className="mt-4 flex flex-col gap-3">
-                <CommunityRating rating={rating} />
-                <CommunityDifficulty
-                  gameId={game.id}
-                  media={dificultadComunidad?.media ?? null}
-                  votos={dificultadComunidad?.votos ?? 0}
-                  miVoto={miVotoDificultad}
-                  puedeVotar={tieneJuego}
-                />
+                {game.genres && game.genres.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {game.genres.map((g) => (
+                      <span
+                        key={g}
+                        className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-muted"
+                        style={{ border: "1px solid var(--border)" }}
+                      >
+                        {g}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {miFicha && (
-              <Link
-                href={miFicha}
-                className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background whitespace-nowrap"
-                style={{ background: "var(--accent-grad)" }}
-              >
-                Ver mi ficha
-              </Link>
-            )}
+            <div className="flex flex-col gap-4 lg:items-end">
+              {miFicha && (
+                <Link
+                  href={miFicha}
+                  className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background whitespace-nowrap text-center"
+                  style={{ background: "var(--accent-grad)" }}
+                >
+                  Ver mi ficha
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-6">
+      <div className="mx-auto max-w-[1240px] gap-9 px-7 pb-24 pt-6 lg:grid lg:grid-cols-[1fr_300px] lg:items-start">
+      <div className="space-y-9">
         {game.summary && (
           <section className="max-w-[820px]">
+            <h2 className="mb-2 font-heading text-2xl font-bold">Acerca de</h2>
             <p className="text-lg leading-relaxed text-foreground/85">{game.summary}</p>
           </section>
         )}
+
+        {detalles && <ScreenshotStrip screenshots={detalles.screenshots} title={game.title} />}
+
+        {detalles?.storyline && (
+          <section className="max-w-[820px]">
+            <h2 className="mb-2 font-heading text-2xl font-bold">Historia</h2>
+            <p className="text-[15px] leading-relaxed text-foreground/85 whitespace-pre-wrap">{detalles.storyline}</p>
+          </section>
+        )}
+
+        {detalles?.videos && <GameVideos videos={detalles.videos} />}
+        {detalles?.languages && <GameLanguages languages={detalles.languages} />}
+        {detalles?.dlcs && <GameDlcs dlcs={detalles.dlcs} />}
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile value={stats.owners} label="En biblioteca" />
           <StatTile value={stats.playing} label="Jugándolo ahora" />
@@ -274,7 +322,46 @@ export default async function JuegoGlobalPage({
             </div>
           )}
         </section>
+
+        {detalles && detalles.similarGames.length > 0 && (
+          <section>
+            <h2 className="mb-4 font-heading text-2xl font-bold">Juegos similares</h2>
+            <GameGrid items={detalles.similarGames} itemKey={(g) => g.igdbId}>
+              {(g) => <DiscoverCard game={{ ...g, genres: [] }} fluid />}
+            </GameGrid>
+          </section>
+        )}
       </div>
+
+      <div className="flex flex-col gap-9">
+        <div className="flex flex-col gap-4 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <CommunityRating rating={rating} />
+          <div className="h-px w-full bg-border/50" />
+          <CommunityDifficulty
+            gameId={game.id}
+            media={dificultadComunidad?.media ?? null}
+            votos={dificultadComunidad?.votos ?? 0}
+            miVoto={miVotoDificultad}
+            puedeVotar={tieneJuego}
+          />
+        </div>
+        
+        <GameTrophyBreakdown breakdown={trophyBreakdown} />
+        {detalles && (
+          <GameDetailsSidebar
+            developer={game.developer}
+            publisher={game.publisher}
+            releaseLabel={detalles.releasePrecision !== "tbd" ? releaseLabelEs(detalles.releaseDate, detalles.releasePrecision) : undefined}
+            platforms={detalles.platforms}
+            genres={game.genres ?? []}
+            themes={detalles.themes}
+            gameModes={detalles.gameModes}
+            websites={detalles.websites}
+            franchises={detalles.franchises}
+          />
+        )}
+      </div>
+    </div>
     </div>
   );
 }

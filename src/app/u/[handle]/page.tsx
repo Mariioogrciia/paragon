@@ -237,11 +237,16 @@ export default async function PerfilPage({
               />
             ),
             stats: (
-              <div key="stats" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <StatTile value={stats.platinos} label="Platinos" accent="var(--platinum)" />
-                <StatTile value={stats.trofeos} label="Trofeos" />
-                <StatTile value={stats.juegos} label="Juegos" />
-                <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
+              <div key="stats">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <StatTile value={stats.platinos} label="Platinos" accent="var(--platinum)" />
+                  <StatTile value={stats.trofeos} label="Trofeos" />
+                  <StatTile value={stats.juegos} label="Juegos" />
+                  <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
+                </div>
+                <Link href={`/u/${handle}/estadisticas`} className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-accent hover:underline">
+                  Ver estadísticas completas →
+                </Link>
               </div>
             ),
             level: <ParagonLevelCard key="level" progress={nivelParagon} />,

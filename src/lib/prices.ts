@@ -19,6 +19,21 @@ import "server-only";
 
 const USER_AGENT = "Paragon/1.0 (+https://github.com/Mariioogrciia/paragon)";
 
+/**
+ * Ids de tienda de CheapShark → nombre. Estaban mal desde hacía tiempo: el
+ * id de cada tienda en su API no es estable en el sentido que uno
+ * esperaría (comprobado contra `GET /stores` el 4 de septiembre de 2026),
+ * así que varias entradas señalaban a la tienda equivocada — 23 mostraba
+ * "GamesPlanet" cuando en realidad es GameBillet, 27 "Gamesload" cuando es
+ * Gamesplanet, 28 "IndieGala" cuando es Gamesload, 30 "Voidu" cuando es
+ * IndieGala. Peor todavía: había un "PlayStation Store" (33) y un "Xbox
+ * Store" (31) que **nunca han existido** en CheapShark — no rastrea tiendas
+ * de consola, solo PC. El 33 real es DLGamer (inactiva); el 31, Blizzard
+ * Shop. No debería haber roto nada visible todavía (esos ids casi nunca
+ * salen en un `/games?steamAppID=`), pero de haber salido alguno habría
+ * enseñado una tienda que no es — y "PlayStation Store" habría hecho creer
+ * que aquí hay precios de PSN, que no los hay en ningún sitio público.
+ */
 const TIENDAS: Record<string, string> = {
   "1": "Steam",
   "2": "GamersGate",
@@ -26,16 +41,15 @@ const TIENDAS: Record<string, string> = {
   "7": "GOG",
   "8": "Origin",
   "11": "Humble Store",
-  "13": "Uplay+",
+  "13": "Uplay",
   "15": "Fanatical",
   "21": "WinGameStore",
-  "23": "GamesPlanet",
+  "23": "GameBillet",
   "25": "Epic Games Store",
-  "27": "Gamesload",
-  "28": "IndieGala",
-  "30": "Voidu",
-  "31": "Xbox Store",
-  "33": "PlayStation Store",
+  "27": "Gamesplanet",
+  "28": "Gamesload",
+  "30": "IndieGala",
+  "35": "DreamGame",
 };
 
 export interface OfertaPrecio {
@@ -94,4 +108,44 @@ export async function comparativaPreciosSteam(appId: string): Promise<Comparativ
     ofertas,
     precioMasBajoHistorico: detalle.cheapestPriceEver ? Number(detalle.cheapestPriceEver.price) : null,
   };
+}
+
+export interface OfertaDestacada {
+  titulo: string;
+  precio: number;
+  precioOriginal: number;
+  ahorro: number;
+  caratula: string;
+  url: string;
+}
+
+/**
+ * Las mejores ofertas de Steam ahora mismo — a diferencia de
+ * `comparativaPreciosSteam`, que compara UN juego concreto, esto es un
+ * escaparate general para Descubrir: "qué está de oferta", no "cuánto
+ * cuesta lo que ya tengo en la lista". Mismo endpoint de CheapShark, sin
+ * clave, mismo `User-Agent` obligatorio.
+ */
+export async function ofertasSteam(limit = 12): Promise<OfertaDestacada[]> {
+  const deals = await cheapShark<
+    {
+      title: string;
+      salePrice: string;
+      normalPrice: string;
+      savings: string;
+      thumb: string;
+      dealID: string;
+    }[]
+  >(`deals?storeID=1&pageSize=${limit}&sortBy=Deal%20Rating&onSale=true`);
+
+  if (!deals) return [];
+
+  return deals.map((d) => ({
+    titulo: d.title,
+    precio: Number(d.salePrice),
+    precioOriginal: Number(d.normalPrice),
+    ahorro: Math.round(Number(d.savings)),
+    caratula: d.thumb,
+    url: `https://www.cheapshark.com/redirect?dealID=${d.dealID}`,
+  }));
 }
