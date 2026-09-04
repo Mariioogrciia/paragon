@@ -146,6 +146,42 @@ rompería en producción, son enlaces reales a una búsqueda de Google (con
   quiere lo segundo de verdad, no hay fuente pública para PSN (mismo motivo
   que ya vale para el comparador de Steam).
 
+### Ofertas y PS Plus en Descubrir (más tarde el mismo día)
+- **Bug de datos real en el comparador de precios**: `TIENDAS` en
+  `lib/prices.ts` (los nombres de tienda de CheapShark) estaba
+  desactualizado — comprobado contra `GET /stores` de la propia API, varios
+  ids señalaban a la tienda equivocada (23 decía "GamesPlanet" y es
+  GameBillet; 27 decía "Gamesload" y es Gamesplanet; 28 decía "IndieGala" y
+  es Gamesload; 30 decía "Voidu" y es IndieGala). Peor: había un **31
+  "Xbox Store" y un 33 "PlayStation Store" que nunca han existido en
+  CheapShark** — esa API no rastrea tiendas de consola, solo PC. El 33 real
+  es DLGamer (inactiva); el 31, Blizzard Shop. Corregido con la lista real.
+  No parece haber roto nada visible (esos ids casi nunca salían en una
+  comparativa de verdad), pero de haber salido el 33 habría hecho pensar
+  que Paragon tiene precios de PSN, que no los tiene en ningún sitio.
+- **`ofertasSteam()`** (`lib/prices.ts`): escaparate general de "lo que
+  está de oferta ahora" en Steam vía CheapShark, distinto de
+  `comparativaPreciosSteam` (que compara un juego concreto). Sección
+  "💰 Ofertas en Steam" en Descubrir.
+- **PS Plus — juegos del mes** (`lib/psPlus.ts`): el blog de PlayStation
+  tiene un feed etiquetado real y vivo,
+  `blog.playstation.com/tag/ps-plus/feed/`, que sí trae el anuncio mensual
+  (filtrado por "Monthly Games" en el título, que es estable). No es un
+  catálogo navegable, es el anuncio con enlace al post — no hay API pública
+  de Sony para el catálogo en sí.
+- **Se probó y descartó "ofertas en PS Store"**: los tags del blog
+  `sale`/`sales`/`deals`/`discounts`/`ps-store` existen pero llevan sin
+  publicar nada desde 2020-2023 — no hay fuente pública viva. No se
+  construyó nada ahí a propósito, en vez de inventar un dato que no existe.
+- **Verificación incompleta**: se probó todo por `curl` directo contra las
+  APIs reales (CheapShark, el feed de PS Plus) antes de escribir el código,
+  pero no se pudo confirmar en el navegador — el `npm run dev` que llevaba
+  toda la sesión corriendo se había parado, y un servidor nuevo levantado
+  para probar dio `UNABLE_TO_VERIFY_LEAF_SIGNATURE` en **todo** fetch
+  saliente (CheapShark, el blog de PS, IGDB) — un problema de certificado
+  TLS del entorno de ese proceso concreto, no del código. Si vuelve a pasar
+  al levantar un dev server desde fuera de una terminal normal, es esto.
+
 ### Bugs ajenos, arreglados de paso (no se tocó su lógica, solo lo roto)
 Todo esto es de Antigravity, encontrado porque rompía el build o la app en
 runtime mientras se trabajaba en otra cosa al lado — no se ha revisado el
