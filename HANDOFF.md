@@ -1,8 +1,186 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **3 de septiembre de 2026**
-(sesión larga, con Antigravity trabajando en paralelo todo el rato).
+releer todo el historial. Última actualización: **4 de septiembre de 2026**
+(sesión larguísima, con Antigravity trabajando en paralelo todo el rato).
+
+---
+
+## Sesión del 4 de septiembre de 2026 — estilos globales, Descubrir y compartir
+
+Sesión iterativa, a base de peticiones cortas sucesivas ("las cards con
+hover", "el filtro no filtra", "que se muevan como en la landing"...). Lo
+agrupo por tema en vez de en orden cronológico.
+
+### Estilo de la app, no solo color
+- **Sistema de "Estilo"** (`lib/apariencia.ts`, `AppearanceSettings.tsx`,
+  antes un desplegable en la navbar — ahora en **`/ajustes/apariencia`**,
+  porque con 8 estilos + 5 acentos + color libre + 4 temas ya no cabía en un
+  menú de 224px). Es un eje aparte del modo (claro/oscuro/OLED/contraste) y
+  del acento: cambia radio de esquina, sombra, tipografía y hasta el fondo
+  de **toda la página**, no solo el color de los botones. 8 pieles:
+  Clásico, Terminal (monoespaciada, líneas CRT), Vidrio (cristal
+  esmerilado), Brutalista (sin esquinas, sombra dura), y cuatro
+  "ambientadas" en PS5/Xbox/Steam/Switch con fondo propio incluido. Técnica:
+  selectores `[class*="rounded"]`/`[class*="shadow"]` con CSS sin `@layer`
+  en `globals.css` — le gana a las utilidades de Tailwind (que sí van en
+  `@layer utilities`) sin tocar componente a componente. "Temas" son combos
+  de un clic (modo + acento + estilo).
+- **Color de acento libre** (`<input type="color">`) además de los 5
+  presets — se guarda como variable CSS suelta (`--accent-rgb`), no como
+  clase, y el script anti-parpadeo de `layout.tsx` lo aplica antes de
+  pintar para que no destelle azul en cada carga.
+- **Marcos de avatar**: de 3 a 6, cada uno con movimiento propio (pulso,
+  giro, barrido de luz — no solo otro gradiente). Nivel real exigido en
+  servidor (`FRAME_REQUISITOS` en `lib/level.ts`, comprobado en
+  `/api/profile/update`), con vista previa en vivo en `/ajustes`.
+- **Banners "de plataforma"** (`BannerPresets.tsx` /
+  `lib/bannerPresets.ts`): arte propio en SVG con el lenguaje visual de
+  PS5/Xbox/Steam/Switch/Retro/Paragon — **no fotografía oficial**, que tiene
+  derechos y no hay banco de imágenes del que tirar. Se guardan como
+  `"preset:<clave>"` en el mismo `profileBannerUrl` de siempre, sin columna
+  nueva.
+- **Hover universal** (`globals.css`, junto al bloque de Estilo): regla
+  global por etiqueta/patrón (`button`, `a[class*="rounded"]`,
+  `[class*="cursor-pointer"]`) que da resplandor + levantamiento a
+  cualquier botón o tarjeta de toda la app, incluidos los que no existen
+  todavía — pedido varias veces y arreglado cada vez componente a
+  componente, así que esta vez es una red de seguridad, no un parche más.
+  Se salta a propósito lo que ya tenga su propio `hover:scale-*`/
+  `hover:-translate-*` (estrellas, tarjetas con tilt 3D) para no pisarlo.
+
+### La trampa nueva de esta sesión: `overflow-hidden` se come el propio hover
+Un elemento con `overflow-hidden` **recorta su propio `filter`** (el
+resplandor de hover es `filter: drop-shadow`) — así que cualquier tarjeta
+que llevara `overflow-hidden` en el mismo `<Link>` que declaraba el hover
+(para recortar la carátula a las esquinas redondeadas) se quedaba sin
+resplandor ni levantamiento, en silencio, sin error. Pasó en
+`DiscoverCard.tsx` y en las tarjetas de "Para ti" de `/descubrir`. Arreglo:
+el recorte va en la carátula interior (que ya tenía su propio
+`overflow-hidden`, con `rounded-t-*` a juego), el `<Link>` exterior se
+queda libre. `GameCard.tsx` ya estaba bien construido así desde antes —
+mirar ahí si hace falta el patrón otra vez.
+
+### Biblioteca: filtros de verdad, no solo visuales
+- **"Más filtros" colapsable**: los 6 desplegables + "Agrupar por empresa"
+  vivían siempre visibles, aunque nadie los tocara — mucho ruido para poco
+  uso. Ahora solo Estado y Plataforma están siempre a la vista; el resto se
+  esconde detrás de un botón con contador.
+- **Bug real de filtrado**: escribir en el buscador dejaba tarjetas
+  "fantasma" en pantalla — el contador decía "5 resultados" y se veían 27.
+  Causa: `AnimatePresence mode="popLayout"` + `whileInView` (que solo anima
+  al entrar en el viewport) no se llevan bien con filtros que cambian
+  rápido (cada tecla es un filtro nuevo antes de que la animación de salida
+  de la anterior termine) — con una biblioteca de 200+ juegos, siempre
+  reproducible. Se quitó `AnimatePresence` de esa lista: sin animación de
+  salida, pero correcto siempre, que es lo que importa en un filtro.
+- **"Al 100%" no filtraba nada**: por la regla ya documentada ("100% de
+  Steam cuenta como platino"), casi cualquier juego al 100% cae en estado
+  `platinado`, no `completado` — esa categoría estaba casi siempre vacía.
+  `filterGames` (`lib/stats.ts`) ahora trata "Al 100%" como el propio
+  `progressPercent === 100`, no como esa categoría derivada.
+
+### Navbar recortada
+9 enlaces + "Admin" en una sola fila se apretaban en pantallas medianas.
+Los 5 más usados se quedan sueltos; Descubrir/Noticias/Planificador/Rankings
+van detrás de un "Más" (`MenuMas` en `Header.tsx`, mismo patrón que "Más
+filtros"). Admin ya no es un enlace de texto: es un icono de escudo junto
+al propio avatar, solo para `esDesarrollador`.
+
+### Guías de trofeo: sin scraping
+`TrophyGuideModal` gana una pestaña "Guía escrita" junto a la de vídeo. Se
+probó primero rasparlo (mismo mecanismo que ya usa la búsqueda de vídeo en
+YouTube) contra DuckDuckGo — **bloqueado con un desafío anti-bot a la
+primera petición**; Bing, degradado igual. En vez de algo frágil que se
+rompería en producción, son enlaces reales a una búsqueda de Google (con
+`site:` a Vandal/Meristation/3DJuegos como atajos), sin incrustar nada.
+
+### PWA e iOS: dos bugs de "no me deja descargar"
+- **El manifest estaba roto**: `layout.tsx` tenía un
+  `<link rel="manifest" href="/manifest.ts">` a mano, y esa ruta **da
+  404** — Next sirve el manifest de verdad en `/manifest.webmanifest` y lo
+  enlaza solo si se lo pides por `metadata.manifest`, no con un `<link>`
+  suelto. Sin manifest legible, "Añadir a pantalla de inicio" no aparece en
+  ningún sitio. Arreglado en `metadata` (`layout.tsx`), más
+  `appleWebApp`/`icons.apple` porque **iOS ignora los iconos del
+  manifest** y solo mira `apple-touch-icon`.
+- **Compartir el Wrap no descargaba nada en iPhone**: era un
+  `<a download="...">`, y **Safari en iOS ignora el atributo `download`**
+  (limitación de WebKit, no un fallo de la app) — abría la imagen sin más.
+  Arreglado con la Web Share API (`CompartirImagen.tsx`, genérico —
+  también lo usa la tarjeta de platino): en iOS abre la hoja de compartir
+  nativa (con "Guardar imagen" de verdad); en escritorio cae a la descarga
+  clásica por blob.
+
+### Descubrir ampliado
+- **Tendencias, Joyas Ocultas, Por género y buscador global** añadidos a lo
+  que ya había (recomendado por biblioteca). `lib/discover.ts`, nuevo.
+  "Tendencias" necesitó columna nueva **`user_game.createdAt`**
+  (`scripts/anadir-createdat-user-game.mts`, **ya ejecutada** — antes solo
+  existían `lastPlayedAt`/`trophiesSyncedAt`, que no dicen lo mismo). Las
+  filas de antes de la migración quedaron todas con la misma fecha, así
+  que Tendencias no dirá nada útil hasta que pase un tiempo de uso real —
+  a propósito, mejor que inventar una fecha que no se puede saber.
+  "Joyas Ocultas" (nota ≥4.5, ≤20 propietarios) sale vacía casi siempre
+  ahora mismo — con 5 usuarios reales apenas hay solapamiento de votos, es
+  esperable, no es un fallo.
+- **Movimiento tipo landing**: las filas horizontales de Descubrir usan el
+  mismo `.animate-marquee` que ya tenía la landing para el estante de
+  muestra — se desplazan solas y se paran al pasar el ratón. `FilaHorizontal`
+  ahora duplica el contenido internamente para el bucle sin corte.
+- **Buscador global de IGDB** (`DiscoverSearch.tsx`) reutiliza
+  `/api/games/search` y `addToWishlistAction`, que ya existían — nada
+  nuevo del lado del servidor.
+
+### Compartir y noticias
+- **Tarjeta de platino compartible** (`/api/trophy-card/[handle]/[gameId]`,
+  `ImageResponse` igual que el Wrap): carátula, horas, rareza del platino
+  con su etiqueta de dificultad, trofeos. Botón en la ficha del juego
+  cuando `progress.platinumEarned`. Pendiente de que el usuario dé el visto
+  bueno al diseño.
+- **Noticias de PlayStation** en el panel (`PsNewsFeed.tsx` +
+  `lib/psNews.ts`), con `rss-parser` — estaba en `package.json` sin usarse
+  en ningún sitio. Fuente: blog oficial de PlayStation. **Aviso**: la PS
+  Store no publica un feed público de ofertas/precios, así que esto es
+  "noticias" (lanzamientos, PS Plus), no un rastreador de precios — si se
+  quiere lo segundo de verdad, no hay fuente pública para PSN (mismo motivo
+  que ya vale para el comparador de Steam).
+
+### Bugs ajenos, arreglados de paso (no se tocó su lógica, solo lo roto)
+Todo esto es de Antigravity, encontrado porque rompía el build o la app en
+runtime mientras se trabajaba en otra cosa al lado — no se ha revisado el
+resto de su trabajo en profundidad:
+- `ParagonWrap.tsx`: `reduce()` sobre un array vacío cuando la biblioteca
+  es solo deseados (`Reduce of empty array with no initial value`).
+- `/offline`: le faltaba `"use client"` con un `onClick` dentro de un
+  Server Component — 500 en esa ruta.
+- `lib/ratings.ts`: un comentario JSDoc sin abrir a medio guardar, rompía
+  la compilación entera.
+- `juego/[id]/page.tsx` y `lib/recommendations.ts`: tipos desalineados con
+  la unificación por `igdbId` que Antigravity dejó a medias (`steamId` en
+  `GlobalGame`, `ownsGame` devolviendo el id específico en vez de un
+  booleano, `sql<string[]>` declarado sobre una columna que en realidad
+  sale como `string`).
+- `lib/badges.ts`: catálogo de insignias **muerto**, con ids distintos
+  (`first_link`, `streak_7`, `reviewer`...) a los que sí usa
+  `Badges.tsx`/`checkAndGrantBadges` — cero referencias en todo el código,
+  borrado. De paso: `checkAndGrantBadges` ya otorga las 9 insignias reales
+  (`critico`, `sociable`, `rolero` incluidas) — está completo, no hacía
+  falta migrar nada de la lista muerta.
+
+### Lo que Antigravity construyó en paralelo sin dejarlo aquí (visto de
+pasada, sin repasarlo a fondo)
+- **PWA/Service Worker** (`public/sw.js`, `ServiceWorkerRegister.tsx`,
+  `app/manifest.ts`, `/offline`) — el manifest estaba roto, ver arriba; el
+  resto no se ha auditado.
+- **`igdbId` en `games` + scripts de unificación**
+  (`scripts/anadir-igdbid-juegos.mts`, `scripts/unificar-catalogo.mts`) —
+  el punto 1 de "Pendiente" de más abajo parece que ya está en marcha o
+  hecho, no solo "sin tocar" como decía este documento. **Sin confirmar si
+  esos scripts ya se ejecutaron contra producción** — comprobar antes de
+  asumir que `games.igdbId` está poblado de verdad.
+- `/descubrir` original (solo recomendaciones por género) y el panel de
+  `/admin` con más métricas.
 
 ---
 
@@ -95,6 +273,9 @@ mano. Antes de una sesión larga, `git pull` primero.
 | La foto de perfil se resuelve siempre igual: PSN → cualquier cuenta con avatar → imagen genérica | En TypeScript (con un `ProfileRow` ya cargado) es `resolveAvatarUrl()` en `profiles.ts`; en SQL (listas de gente que no es "el perfil actual" — reseñas, ligas, feed, comparador) es `avatarUrlSql()` en `lib/avatarSql.ts`. Si añades una pantalla nueva que enseñe la cara de alguien, usa una de las dos — no leas `users.image` a pelo. |
 | Horas de PSN: nunca colapsar por nombre sin más | El endpoint de horas jugadas da una fila POR VERSIÓN REALMENTE JUGADA (PS4 y PS5 de un mismo juego son dos filas con horas propias, no la misma cifra repetida — ver la trampa de más abajo). `repartirHoras()` en `psn/client.ts` decide si sumar (una sola ficha de trofeos para el nombre) o repartir por dispositivo (varias fichas). Para "tu juego más jugado" A TRAVÉS de plataformas distintas (Steam + PSN del mismo título), es `gruposPorTitulo()` en `lib/stats.ts` quien suma. |
 | Tablas nuevas: SQL explícito, no `db:push` | Todas las tablas de esta sesión (`game_difficulty_vote`, `game_guide`, `game_guide_reply`) se crearon con scripts `CREATE TABLE IF NOT EXISTS` en `scripts/`, mismo motivo que `notification`: `db:push` compara el esquema entero y es más arriesgado sobre producción. |
+| El hover global va por CSS sin `@layer`, no por componente | `globals.css`: reglas con `[class*="rounded"]`/`[class*="cursor-pointer"]` sobre `button`/`a`. Al no estar en ningún `@layer`, le gana a las utilidades de Tailwind (que sí van en `@layer utilities`) pase lo que pase con la especificidad — así un botón nuevo sale con hover sin que nadie tenga que acordarse de ponérselo. |
+| `overflow-hidden` recorta el propio `filter` del elemento que lo lleva | El resplandor de hover es `filter: drop-shadow`. Si el mismo elemento tiene `overflow-hidden` (para recortar una carátula a sus esquinas redondeadas), se recorta a sí mismo el resplandor. El recorte va siempre en un hijo interior, nunca en el elemento que declara el hover — ver `GameCard.tsx`/`DiscoverCard.tsx`. |
+| "Estilo" es un eje aparte de "modo" y "acento" | El modo (claro/oscuro/OLED/contraste) cambia colores base; el acento, el color de marca; el estilo (`lib/apariencia.ts`) cambia la FORMA de toda la página — radio, sombra, tipografía, fondo. Los tres son independientes: se puede querer OLED + acento verde + estilo Vidrio. |
 
 ---
 
@@ -134,6 +315,26 @@ y en medio falta una línea que nadie ve porque **no da error**.
 - **Cada click en las estrellas insertaba una fila nueva en `activities`**
   en vez de actualizar la existente: cambiar de opinión de 2 a 5 estrellas
   dejaba 4 entradas idénticas en el feed.
+- **`overflow-hidden` se come el propio `filter` del hover.** Cualquier
+  tarjeta con `overflow-hidden` en el mismo elemento que declaraba el
+  resplandor de hover se quedaba sin resplandor, en silencio — el recorte
+  tiene que ir en un hijo interior.
+- **`AnimatePresence` + `whileInView` con filtros que cambian rápido**
+  dejaba tarjetas "fantasma" en pantalla (visibles, con su tamaño real, no
+  solo en el DOM) cuando el filtro las quitaba antes de que su animación de
+  entrada hubiera llegado a activarse. El contador de resultados decía una
+  cosa y la pantalla enseñaba otra — mismo timing en cada prueba, no un
+  caso raro.
+- **Un `<link rel="manifest" href="/manifest.ts">` a mano daba 404.** El
+  archivo especial `app/manifest.ts` de Next se sirve en
+  `/manifest.webmanifest`, y hay que pedírselo a Next por
+  `metadata.manifest`, no enlazarlo a pelo. Sin manifest legible, ningún
+  navegador ofrece "Instalar"/"Añadir a pantalla de inicio" — estuvo así
+  desde que se añadió, probablemente sin probarlo nunca en un móvil real.
+- **Safari en iOS ignora el atributo `download` de un `<a>`.** No es un
+  fallo de la app: es así desde siempre en WebKit. Cualquier "descargar
+  esto" pensado para móvil necesita la Web Share API (`navigator.share`
+  con `files`), no un enlace con `download`.
 
 **Regla:** cuando conectes un dato nuevo, compruébalo **en la base y en
 pantalla**, no solo que compile. Y si un agente edita con scripts de
@@ -254,25 +455,40 @@ que causó el bug de las horas de PSN la primera vez.
 ## Pendiente
 
 **Funciones acordadas y no hechas:**
-1. **`igdbId` en `games` + emparejado.** Unificaría la ficha global entre
-   plataformas y repartiría carátulas, géneros y PEGI a lo que falta. El
-   emparejador por título ya está escrito (`pegiPorTitulo`), se reutiliza.
-   **Sigue sin tocar**: toca esquema y backfill sobre la base de producción;
-   mejor con alguien delante mirando, no en background.
+1. **`igdbId` en `games` + emparejado.** ~~Sigue sin tocar~~ → Antigravity
+   parece haberlo empezado por su cuenta (`scripts/anadir-igdbid-juegos.mts`,
+   `scripts/unificar-catalogo.mts`, y `community.ts`/`recommendations.ts` ya
+   asumen `games.igdbId` poblado). **Sin confirmar si esos scripts se
+   ejecutaron contra producción** — compruébalo antes de dar por hecho que
+   el campo está relleno de verdad, y antes de escribir código nuevo que
+   dependa de él sin comprobarlo.
 2. ~~Compartir el Wrap como imagen~~ → hecho el 3 de septiembre de 2026, con
    `ImageResponse` de `next/og` (ya viene con Next, no hizo falta el paquete
    `@vercel/og` suelto). Ruta [`/api/wrap/[handle]`](src/app/api/wrap/%5Bhandle%5D/route.tsx),
    1200×630, mismas tres tarjetas que `ParagonWrap` con los mismos números
    (`juegoDestacado`/`generoTop` se exportaron desde ahí para no duplicar la
    cuenta). Botón "Compartir imagen" en la cabecera del Wrap del perfil.
-3. **Instalable en el móvil (PWA)** — aplazado a propósito.
+3. **Instalable en el móvil (PWA)** — Antigravity dejó el Service
+   Worker/manifest montados, pero el `<link>` al manifest daba 404 (ver
+   trampa nueva arriba); ya arreglado el 4 de septiembre. El resto del
+   Service Worker (`public/sw.js`, caché offline) **no se ha auditado**.
 4. **Auditoría "full responsive" completa.** Se arregló el desbordamiento
-   concreto de la cabecera en móvil (menú nuevo lo destapó), pero no se ha
-   repasado cada pantalla en cada ancho — es su propia tarea, con alcance
-   propio.
+   concreto de la cabecera en móvil (menú nuevo lo destapó) y se repasó la
+   biblioteca entera (búsqueda, filtros, "Más filtros") en 375px el 4 de
+   septiembre, pero el resto del sitio sigue sin auditar pantalla a
+   pantalla — es su propia tarea, con alcance propio.
 5. Dos scripts sueltos sin trackear en la raíz del repo, de una sesión
    anterior: `test-yt.js` y `award-badges.ts`. Ni se han tocado ni se han
    borrado — decidir qué hacer con ellos.
+6. **La tarjeta de platino compartible pidió mejora** (4 de septiembre): se
+   construyó una primera versión (`/api/trophy-card/[handle]/[gameId]`,
+   carátula + horas + rareza + trofeos) y se mandó de ejemplo, pero el
+   usuario no había dado el visto bueno al diseño todavía a fecha de este
+   documento — revisar si hubo feedback antes de darla por cerrada.
+7. **Notificaciones push de verdad.** Ya hay Service Worker y manifest de
+   PWA (de Antigravity); falta VAPID + tabla de suscripciones + el
+   manejador `push` + el punto donde disparar el envío. Identificado como
+   "el siguiente paso natural" el 4 de septiembre, no empezado.
 
 **Fallos conocidos, arreglados el 3 de septiembre de 2026:**
 - ~~Xbox, Epic y Ubisoft son vinculables pero no existen~~ → sus `resolve*`
@@ -345,7 +561,13 @@ redesplegar. El plan Hobby limita los crons a **una ejecución diaria**; el
 herramienta la ocasión de proponer cambios sobre una base de producción.
 Recomendado seguir así con lo aditivo. Mismo patrón para las tablas de
 `game_difficulty_vote` y `game_guide`/`game_guide_reply`: scripts en
-`scripts/crear-*.mts`, ya ejecutados contra producción.
+`scripts/crear-*.mts`, ya ejecutados contra producción. Igual para columnas
+sueltas: `users.profileSectionOrder`
+(`scripts/anadir-orden-secciones-perfil.mts`) y `user_game.createdAt`
+(`scripts/anadir-createdat-user-game.mts`, para "Tendencias" en Descubrir),
+**ambas ya ejecutadas contra producción**. Sin confirmar si
+`scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
+Antigravity) llegaron a correrse — ver el punto 1 de "Pendiente".
 
 **CheapShark** (comparador de precios) no necesita clave, pero desde hace
 poco exige un `User-Agent` descriptivo o devuelve un error genérico —
