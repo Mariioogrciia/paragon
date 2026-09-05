@@ -6,11 +6,14 @@ import { games, userGames, activities } from "@/db/schema";
 import { auth } from "@/auth";
 import { parseGameKey, type Platform, gameKey } from "@/lib/types";
 import { searchGames } from "@/lib/igdb/client";
+import { slugDevice } from "@/lib/manualGames";
 import { eq, and } from "drizzle-orm";
 
 export interface ImportedGame {
   title: string;
   platform: Platform;
+  /** Etiqueta original de la fuente (p. ej. "GOG", "Xbox"...), para el device label cuando cae en "manual". */
+  sourceLabel?: string;
   completed: boolean;
 }
 
@@ -32,8 +35,19 @@ export async function importGamesAction(importedGames: ImportedGame[]) {
 
   let imported = 0;
 
-  for (const g of importedGames) {
-    if (!g.title.trim()) continue;
+  for (const gRaw of importedGames) {
+    if (!gRaw.title.trim()) continue;
+
+    // Steam/PSN/Xbox/Google Play ya tienen sincronización real en Paragon
+    // (platformAccounts + cron), con su propio nativeId (appid/trophyId real).
+    // Si el CSV crea aquí una fila con un nativeId inventado (el igdbId), esa
+    // fila nunca recibe logros y, si el usuario ya tiene o más tarde vincula
+    // esa cuenta de verdad, queda duplicada junto a la real. Estas van a
+    // "manual" (como Epic/Ubisoft, que tampoco sincronizan biblioteca).
+    const g: ImportedGame =
+      gRaw.platform === "steam" || gRaw.platform === "psn" || gRaw.platform === "xbox" || gRaw.platform === "google"
+        ? { ...gRaw, platform: "manual", sourceLabel: gRaw.sourceLabel || gRaw.platform }
+        : gRaw;
 
     let igdbData = null;
     try {
@@ -45,19 +59,27 @@ export async function importGamesAction(importedGames: ImportedGame[]) {
       // Ignorar error de IGDB y seguir
     }
 
-    const nativeId = igdbData ? String(igdbData.igdbId) : slugify(g.title);
-    const id = gameKey(g.platform, nativeId);
-    
+    // steam/psn/xbox/google ya se remapearon a "manual" arriba - a este punto
+    // g.platform solo puede ser "epic", "ubisoft" o "manual".
     let deviceLabel = "";
     switch (g.platform) {
       case "epic": deviceLabel = "Epic Games"; break;
       case "ubisoft": deviceLabel = "Ubisoft"; break;
-      case "xbox": deviceLabel = "Xbox"; break;
-      case "steam": deviceLabel = "Steam"; break;
-      case "psn": deviceLabel = "PlayStation"; break;
-      case "google": deviceLabel = "Google Play"; break;
-      default: deviceLabel = "PC"; break;
+      default: deviceLabel = g.sourceLabel || "PC"; break;
     }
+
+    // "manual" sigue su convención propia (games.id = manual-<igdbId>:<dispositivo>,
+    // ver HANDOFF): sin el sufijo de dispositivo, dos importaciones distintas
+    // (o una importación y un alta manual posterior del mismo juego) crean
+    // filas duplicadas en vez de compartir una, y notifications.ts/manualGames.ts
+    // asumen ese formato al leer nativeId.split(":").
+    const nativeId =
+      g.platform === "manual"
+        ? `${igdbData ? igdbData.igdbId : `sin-match-${slugify(g.title)}`}:${slugDevice(deviceLabel)}`
+        : igdbData
+          ? String(igdbData.igdbId)
+          : slugify(g.title);
+    const id = gameKey(g.platform, nativeId);
 
     await db
       .insert(games)

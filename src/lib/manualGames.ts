@@ -18,7 +18,7 @@ export interface ManualGameInput {
 }
 
 /** Para que "Switch" y "switch " no acaben en dos filas distintas. */
-function slugDevice(deviceLabel: string): string {
+export function slugDevice(deviceLabel: string): string {
   return (
     deviceLabel
       .trim()

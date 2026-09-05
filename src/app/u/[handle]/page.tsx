@@ -31,6 +31,7 @@ import { normalizeSectionOrder } from "@/lib/profileSections";
 import { PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { BackButton } from "@/components/BackButton";
+import { SectionTabs } from "@/components/SectionTabs";
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -348,7 +349,26 @@ export default async function PerfilPage({
             ),
           };
 
-          return normalizeSectionOrder(profile.profileSectionOrder).map((clave) => secciones[clave] || null);
+          // La biblioteca de verdad (el grid de juegos y sus carpetas) es,
+          // con diferencia, lo más largo de la página — juntarla con el
+          // resto en un solo scroll es lo que hacía sentir la ficha caótica.
+          // Se separa en su propia pestaña; el resto sigue el orden que cada
+          // quien eligió en /ajustes (arrastrar y soltar), solo que entre
+          // ellas, no mezclado con la biblioteca.
+          const BIBLIOTECA_TAB = new Set(["collections", "biblioteca"]);
+          const orden = normalizeSectionOrder(profile.profileSectionOrder);
+          const resumenNodos = orden.filter((c) => !BIBLIOTECA_TAB.has(c)).map((c) => secciones[c] || null);
+          const bibliotecaNodos = orden.filter((c) => BIBLIOTECA_TAB.has(c)).map((c) => secciones[c] || null);
+
+          return (
+            <SectionTabs
+              storageKey="perfil"
+              tabs={[
+                { key: "resumen", label: "Resumen", content: <>{resumenNodos}</> },
+                { key: "biblioteca", label: "Biblioteca", badge: stats.juegos, content: <>{bibliotecaNodos}</> },
+              ]}
+            />
+          );
         })()}
       </div>
     </div>

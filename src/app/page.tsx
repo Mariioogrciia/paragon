@@ -23,6 +23,7 @@ import { getTrophyRecommendations } from "@/lib/recommendations";
 import { TrophyRecommendations } from "@/components/TrophyRecommendations";
 import { paragonProgress } from "@/lib/level";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { SectionTabs } from "@/components/SectionTabs";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -353,6 +354,252 @@ export default async function HomePage() {
     .slice(0, 4);
 
   const now = new Date().getTime();
+  const feed = await getFeed(session.user.id);
+
+  const nearPlatinumSection = nearPlatinum.length > 0 && (
+    <section>
+      <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
+        <h2 className="font-heading text-2xl font-bold">A un paso del platino</h2>
+        <p className="text-[13px] text-muted">
+          Lo que menos te queda, ordenado por trofeos pendientes.
+        </p>
+        <Link
+          href={`/u/${profile.handle}?estado=a-punto`}
+          className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+        >
+          Ver todos →
+        </Link>
+      </div>
+
+      <div className="grid gap-4">
+        {/* Widget Hero (El Próximo Objetivo Principal) */}
+        <TiltCard
+          href={`/u/${profile.handle}/${nearPlatinum[0].game.id}`}
+          className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+          style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+        >
+          <div className="relative flex flex-col sm:flex-row p-6 items-center sm:items-stretch overflow-hidden min-h-[220px]">
+            <div
+              className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-30"
+              style={nearPlatinum[0].game.iconUrl ? { backgroundImage: `url(${nearPlatinum[0].game.iconUrl})` } : { background: coverGradient(nearPlatinum[0].game.id) }}
+            />
+
+            {/* Portada a la izquierda (en escritorio) */}
+            <div className="relative z-10 w-32 h-44 sm:w-40 sm:h-56 shrink-0 rounded-xl overflow-hidden shadow-2xl mb-4 sm:mb-0 sm:mr-8 border border-border/50">
+               {nearPlatinum[0].game.iconUrl ? (
+                  <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${nearPlatinum[0].game.iconUrl})` }} />
+               ) : (
+                  <div className="w-full h-full" style={{ background: coverGradient(nearPlatinum[0].game.id) }} />
+               )}
+            </div>
+
+            {/* Info a la derecha */}
+            <div className="relative z-10 flex flex-col justify-center flex-1 w-full text-center sm:text-left">
+              <div className="inline-block mb-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-accent/20 text-accent-text border border-accent/30 w-fit mx-auto sm:mx-0">
+                Siguiente Platino
+              </div>
+              <h3 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-2" style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}>
+                {nearPlatinum[0].game.title}
+              </h3>
+
+              <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4">
+                <div className="flex items-end gap-3">
+                  <p className="font-heading text-[54px] font-bold leading-[0.8] text-platinum">
+                    {nearPlatinum[0].progress.total - nearPlatinum[0].progress.earned}
+                  </p>
+                  <p className="pb-1 text-xs font-bold uppercase leading-tight tracking-[0.1em] text-muted text-left">
+                    trofeos para<br />terminarlo
+                  </p>
+                </div>
+
+                <div className="w-full sm:w-1/2">
+                  <div className="flex justify-between text-xs text-muted mb-2 font-medium">
+                    <span>{nearPlatinum[0].progress.earned}/{nearPlatinum[0].progress.total}</span>
+                    <span className="font-bold text-accent-text">{nearPlatinum[0].progress.percent}%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-surface-2 shadow-inner">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+                      style={{ width: `${nearPlatinum[0].progress.percent}%`, background: "var(--accent-grad-h)" }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#0a0d13] via-[#0a0d13]/80 to-transparent opacity-90" />
+          </div>
+        </TiltCard>
+
+        {/* Los demás juegos, si hay, en formato pequeño debajo */}
+        {nearPlatinum.slice(1).length > 0 && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {nearPlatinum.slice(1).map(({ game, progress }) => (
+              <TiltCard
+                key={game.id}
+                href={`/u/${profile.handle}/${game.id}`}
+                className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                <div className="relative flex aspect-[21/9] items-end p-4 overflow-hidden">
+                  <div
+                    className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-50"
+                    style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                  <p
+                    className="font-heading relative z-10 translate-y-1 text-lg font-bold text-white transition-transform duration-300 group-hover:translate-y-0"
+                    style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}
+                  >
+                    {game.title}
+                  </p>
+                </div>
+                <div className="relative z-10 bg-[var(--surface)] p-[14px]">
+                  <div className="flex items-end gap-2.5">
+                    <p className="font-heading text-3xl font-bold leading-[0.9] text-platinum">
+                      {progress.total - progress.earned}
+                    </p>
+                    <p className="pb-1 text-[10px] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
+                      restantes
+                    </p>
+                    <span className="ml-auto font-bold text-sm" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
+                  </div>
+                  <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-2">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
+                    />
+                  </div>
+                </div>
+              </TiltCard>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
+  const abandonadosSection = abandonados.length > 0 && (
+    <section>
+      <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
+        <h2 className="font-heading text-2xl font-bold">Juegos parados</h2>
+        <p className="text-[13px] text-muted">
+          Empezados y sin tocar hace más de un año.
+        </p>
+        <Link
+          href={`/u/${profile.handle}?estado=abandonado`}
+          className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+        >
+          Ver todos →
+        </Link>
+      </div>
+
+      {/* Cerrado por defecto: de las secciones de "Progreso y actividad", esta
+          es la que menos pide verse cada visita — son juegos que, por
+          definición, llevan más de un año sin tocarse. Recuerda si ya
+          lo abriste una vez, por si de verdad vuelves a por ella. */}
+      <CollapsibleSection storageKey="juegos-parados" toggleLabel={`${abandonados.length} juegos parados`}>
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+          {abandonados.map(({ game, progress }) => (
+            <Link
+              key={game.id}
+              href={`/u/${profile.handle}/${game.id}`}
+              className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-surface-2"
+              style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+            >
+              <span
+                className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-cover bg-center"
+                style={{ background: game.iconUrl ? `url(${game.iconUrl}) center/cover` : coverGradient(game.id) }}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[13px] font-semibold" title={game.title}>
+                  {game.title}
+                </p>
+                <p className="text-[11px] text-muted">{progress.percent}% · sin tocar hace tiempo</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </CollapsibleSection>
+    </section>
+  );
+
+  const recientesSection = (
+    <section>
+      <div className="mb-4 flex items-baseline gap-3.5">
+        <h2 className="font-heading text-2xl font-bold">Jugado recientemente</h2>
+        <Link
+          href={`/u/${profile.handle}`}
+          className="ml-auto text-xs font-bold uppercase tracking-wide text-accent"
+        >
+          Toda la biblioteca ({stats.juegos})
+        </Link>
+      </div>
+
+      {recientes.length === 0 ? (
+        <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
+          No hay ningún juego en tus cuentas vinculadas. Suele ser que el
+          perfil está en privado en la plataforma.
+        </p>
+      ) : (
+        <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
+          <div className={`flex w-max gap-4 ${recientes.length >= 3 ? "animate-marquee" : ""} hover:[animation-play-state:paused]`}>
+            {[...recientes, ...recientes, ...recientes].map((game, i) => {
+              const progress = gameProgress(game);
+              return (
+                <TiltCard
+                  key={`${game.id}-${i}`}
+                  href={`/u/${profile.handle}/${game.id}`}
+                  className="group relative w-[160px] shrink-0 cursor-pointer overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] sm:w-[220px]"
+                  style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+                >
+                  <div className="relative flex aspect-[3/4] items-end p-4 overflow-hidden">
+                    <div
+                      className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-40"
+                      style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }}
+                    />
+                    {game.iconUrl && (
+                      <div
+                        className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ backgroundImage: `url(${game.iconUrl})`, margin: '10% 10% 30% 10%' }}
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                    <p
+                      className="font-heading relative z-10 translate-y-2 text-[15px] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[17px]"
+                      style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
+                    >
+                      {game.title}
+                    </p>
+                  </div>
+                  <div className="relative z-10 bg-[var(--surface)] p-4 pt-1">
+                    <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
+                      />
+                    </div>
+                    <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
+                      <span className="font-bold" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
+                      <span>{progress.earned}/{progress.total}</span>
+                    </div>
+                  </div>
+                </TiltCard>
+              );
+            })}
+          </div>
+          {recientes.length >= 3 && (
+            <>
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent z-20" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent z-20" />
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  );
 
   return (
     <div className="space-y-9">
@@ -377,303 +624,81 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div
-          className="relative overflow-hidden rounded-[20px] p-6"
-          style={{
-            border: "1px solid var(--border)",
-            background:
-              "radial-gradient(400px 200px at 80% 0%, rgba(159, 212, 236, 0.22), transparent 70%), linear-gradient(165deg, #14202c, #0d131c)",
-          }}
-        >
-          <div className="flex items-center gap-2.5 text-platinum">
-            <TrophyIcon grade="platinum" size={22} />
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em]">Platinos</p>
-          </div>
-          <p
-            className="font-heading mt-2.5 text-[96px] font-bold leading-[0.85]"
-            style={{ color: "#dff0f8", textShadow: "0 0 40px rgba(159, 212, 236, 0.35)" }}
-          >
-            {stats.platinos}
-          </p>
-        </div>
-
-        <StatTile value={stats.trofeos} label="Trofeos" />
-        <StatTile value={stats.juegos} label="Juegos" />
-        <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
-      </div>
-
-      <TrophyCountRow
-        counts={stats.counts}
-        summary={`${stats.trofeos.toLocaleString("es-ES")} trofeos en ${stats.juegos} juegos`}
-      />
-
-      <div className="grid gap-6 lg:grid-cols-[1fr_2.5fr]">
-        <div className="h-full">
-          <MonthlySummary meses={mesesHistorico} />
-        </div>
-        <TrophyHistory
-          meses={mesesHistorico}
-          rachas={rachasUsuario}
-          resumen={resumen}
-          totalPerfil={stats.trofeos}
-        />
-      </div>
-
-      <WeeklyMissions missions={misiones} />
-      <ActivityStats games={games} now={now} />
-      <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />
-
-      {nearPlatinum.length > 0 && (
-        <section>
-          <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
-            <h2 className="font-heading text-2xl font-bold">A un paso del platino</h2>
-            <p className="text-[13px] text-muted">
-              Lo que menos te queda, ordenado por trofeos pendientes.
-            </p>
-            <Link
-              href={`/u/${profile.handle}?estado=a-punto`}
-              className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
-            >
-              Ver todos →
-            </Link>
-          </div>
-
-          <div className="grid gap-4">
-            {/* Widget Hero (El Próximo Objetivo Principal) */}
-            <TiltCard
-              href={`/u/${profile.handle}/${nearPlatinum[0].game.id}`}
-              className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
-              style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-            >
-              <div className="relative flex flex-col sm:flex-row p-6 items-center sm:items-stretch overflow-hidden min-h-[220px]">
-                <div 
-                  className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-30"
-                  style={nearPlatinum[0].game.iconUrl ? { backgroundImage: `url(${nearPlatinum[0].game.iconUrl})` } : { background: coverGradient(nearPlatinum[0].game.id) }} 
-                />
-                
-                {/* Portada a la izquierda (en escritorio) */}
-                <div className="relative z-10 w-32 h-44 sm:w-40 sm:h-56 shrink-0 rounded-xl overflow-hidden shadow-2xl mb-4 sm:mb-0 sm:mr-8 border border-border/50">
-                   {nearPlatinum[0].game.iconUrl ? (
-                      <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${nearPlatinum[0].game.iconUrl})` }} />
-                   ) : (
-                      <div className="w-full h-full" style={{ background: coverGradient(nearPlatinum[0].game.id) }} />
-                   )}
-                </div>
-                
-                {/* Info a la derecha */}
-                <div className="relative z-10 flex flex-col justify-center flex-1 w-full text-center sm:text-left">
-                  <div className="inline-block mb-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-accent/20 text-accent-text border border-accent/30 w-fit mx-auto sm:mx-0">
-                    Siguiente Platino
-                  </div>
-                  <h3 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-2" style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}>
-                    {nearPlatinum[0].game.title}
-                  </h3>
-                  
-                  <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4">
-                    <div className="flex items-end gap-3">
-                      <p className="font-heading text-[54px] font-bold leading-[0.8] text-platinum">
-                        {nearPlatinum[0].progress.total - nearPlatinum[0].progress.earned}
-                      </p>
-                      <p className="pb-1 text-xs font-bold uppercase leading-tight tracking-[0.1em] text-muted text-left">
-                        trofeos para<br />terminarlo
-                      </p>
-                    </div>
-                    
-                    <div className="w-full sm:w-1/2">
-                      <div className="flex justify-between text-xs text-muted mb-2 font-medium">
-                        <span>{nearPlatinum[0].progress.earned}/{nearPlatinum[0].progress.total}</span>
-                        <span className="font-bold text-accent-text">{nearPlatinum[0].progress.percent}%</span>
-                      </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-surface-2 shadow-inner">
-                        <div
-                          className="h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
-                          style={{ width: `${nearPlatinum[0].progress.percent}%`, background: "var(--accent-grad-h)" }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#0a0d13] via-[#0a0d13]/80 to-transparent opacity-90" />
-              </div>
-            </TiltCard>
-
-            {/* Los demás juegos, si hay, en formato pequeño debajo */}
-            {nearPlatinum.slice(1).length > 0 && (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {nearPlatinum.slice(1).map(({ game, progress }) => (
-                  <TiltCard
-                    key={game.id}
-                    href={`/u/${profile.handle}/${game.id}`}
-                    className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
-                    style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                  >
-                    <div className="relative flex aspect-[21/9] items-end p-4 overflow-hidden">
-                      <div 
-                        className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-50"
-                        style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }} 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
-                      <p
-                        className="font-heading relative z-10 translate-y-1 text-lg font-bold text-white transition-transform duration-300 group-hover:translate-y-0"
-                        style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}
-                      >
-                        {game.title}
-                      </p>
-                    </div>
-                    <div className="relative z-10 bg-[var(--surface)] p-[14px]">
-                      <div className="flex items-end gap-2.5">
-                        <p className="font-heading text-3xl font-bold leading-[0.9] text-platinum">
-                          {progress.total - progress.earned}
-                        </p>
-                        <p className="pb-1 text-[10px] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
-                          restantes
-                        </p>
-                        <span className="ml-auto font-bold text-sm" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
-                      </div>
-                      <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-2">
-                        <div
-                          className="h-full rounded-full"
-                          style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
-                        />
-                      </div>
-                    </div>
-                  </TiltCard>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {abandonados.length > 0 && (
-        <section>
-          <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
-            <h2 className="font-heading text-2xl font-bold">Juegos parados</h2>
-            <p className="text-[13px] text-muted">
-              Empezados y sin tocar hace más de un año.
-            </p>
-            <Link
-              href={`/u/${profile.handle}?estado=abandonado`}
-              className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
-            >
-              Ver todos →
-            </Link>
-          </div>
-
-          {/* Cerrado por defecto: de las ~12 secciones de la portada, esta es
-              la que menos pide verse cada visita — son juegos que, por
-              definición, llevan más de un año sin tocarse. Recuerda si ya
-              lo abriste una vez, por si de verdad vuelves a por ella. */}
-          <CollapsibleSection storageKey="juegos-parados" toggleLabel={`${abandonados.length} juegos parados`}>
-            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-              {abandonados.map(({ game, progress }) => (
-                <Link
-                  key={game.id}
-                  href={`/u/${profile.handle}/${game.id}`}
-                  className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-surface-2"
-                  style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                >
-                  <span
-                    className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-cover bg-center"
-                    style={{ background: game.iconUrl ? `url(${game.iconUrl}) center/cover` : coverGradient(game.id) }}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-semibold" title={game.title}>
-                      {game.title}
-                    </p>
-                    <p className="text-[11px] text-muted">{progress.percent}% · sin tocar hace tiempo</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CollapsibleSection>
-        </section>
-      )}
-
-      {/* En la portada, que es donde se aterriza: en el perfil quedaba después
-          de una biblioteca de cientos de juegos con carga progresiva. */}
-      <UpcomingGames wishlistedIgdbIds={wishlistIds} />
-
-      <section>
-        <div className="mb-4 flex items-baseline gap-3.5">
-          <h2 className="font-heading text-2xl font-bold">Jugado recientemente</h2>
-          <Link
-            href={`/u/${profile.handle}`}
-            className="ml-auto text-xs font-bold uppercase tracking-wide text-accent"
-          >
-            Toda la biblioteca ({stats.juegos})
-          </Link>
-        </div>
-
-        {recientes.length === 0 ? (
-          <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-            No hay ningún juego en tus cuentas vinculadas. Suele ser que el
-            perfil está en privado en la plataforma.
-          </p>
-        ) : (
-          <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
-            <div className={`flex w-max gap-4 ${recientes.length >= 3 ? "animate-marquee" : ""} hover:[animation-play-state:paused]`}>
-              {[...recientes, ...recientes, ...recientes].map((game, i) => {
-                const progress = gameProgress(game);
-                return (
-                  <TiltCard
-                    key={`${game.id}-${i}`}
-                    href={`/u/${profile.handle}/${game.id}`}
-                    className="group relative w-[160px] shrink-0 cursor-pointer overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] sm:w-[220px]"
-                    style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                  >
-                    <div className="relative flex aspect-[3/4] items-end p-4 overflow-hidden">
-                      <div 
-                        className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-40"
-                        style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }} 
-                      />
-                      {game.iconUrl && (
-                        <div 
-                          className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                          style={{ backgroundImage: `url(${game.iconUrl})`, margin: '10% 10% 30% 10%' }}
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
-                      <p
-                        className="font-heading relative z-10 translate-y-2 text-[15px] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[17px]"
-                        style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
-                      >
-                        {game.title}
-                      </p>
-                    </div>
-                    <div className="relative z-10 bg-[var(--surface)] p-4 pt-1">
-                      <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
-                        <div
-                          className="h-full rounded-full"
-                          style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
-                        />
-                      </div>
-                      <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
-                        <span className="font-bold" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
-                        <span>{progress.earned}/{progress.total}</span>
-                      </div>
-                    </div>
-                  </TiltCard>
-                );
-              })}
-            </div>
-            {recientes.length >= 3 && (
+      <SectionTabs
+        storageKey="panel"
+        tabs={[
+          {
+            key: "resumen",
+            label: "Resumen",
+            content: (
               <>
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent z-20" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent z-20" />
-              </>
-            )}
-          </div>
-        )}
-      </section>
+                <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+                  <div
+                    className="relative overflow-hidden rounded-[20px] p-6"
+                    style={{
+                      border: "1px solid var(--border)",
+                      background:
+                        "radial-gradient(400px 200px at 80% 0%, rgba(159, 212, 236, 0.22), transparent 70%), linear-gradient(165deg, #14202c, #0d131c)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5 text-platinum">
+                      <TrophyIcon grade="platinum" size={22} />
+                      <p className="text-[11px] font-bold uppercase tracking-[0.14em]">Platinos</p>
+                    </div>
+                    <p
+                      className="font-heading mt-2.5 text-[96px] font-bold leading-[0.85]"
+                      style={{ color: "#dff0f8", textShadow: "0 0 40px rgba(159, 212, 236, 0.35)" }}
+                    >
+                      {stats.platinos}
+                    </p>
+                  </div>
 
-      <section>
-        <ActivityFeed activities={await getFeed(session.user.id)} currentUserId={session.user.id} />
-      </section>
+                  <StatTile value={stats.trofeos} label="Trofeos" />
+                  <StatTile value={stats.juegos} label="Juegos" />
+                  <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
+                </div>
+
+                <TrophyCountRow
+                  counts={stats.counts}
+                  summary={`${stats.trofeos.toLocaleString("es-ES")} trofeos en ${stats.juegos} juegos`}
+                />
+
+                <div className="grid gap-6 lg:grid-cols-[1fr_2.5fr]">
+                  <div className="h-full">
+                    <MonthlySummary meses={mesesHistorico} />
+                  </div>
+                  <TrophyHistory
+                    meses={mesesHistorico}
+                    rachas={rachasUsuario}
+                    resumen={resumen}
+                    totalPerfil={stats.trofeos}
+                  />
+                </div>
+
+                <WeeklyMissions missions={misiones} />
+                <ActivityStats games={games} now={now} />
+                <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />
+              </>
+            ),
+          },
+          {
+            key: "actividad",
+            label: "Progreso y actividad",
+            content: (
+              <>
+                {nearPlatinumSection}
+                {abandonadosSection}
+                <UpcomingGames wishlistedIgdbIds={wishlistIds} />
+                {recientesSection}
+                <section>
+                  <ActivityFeed activities={feed} currentUserId={session.user.id} />
+                </section>
+              </>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }
+

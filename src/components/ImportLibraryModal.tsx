@@ -39,21 +39,24 @@ export function ImportLibraryModal() {
           const title = row.Name || row.name || row.Title || row.title || row["Nombre"] || "";
           if (!title) continue;
 
-          const platformStr = (row.Platform || row.platform || row["Plataforma"] || "").toLowerCase();
+          const platformRaw = row.Platform || row.platform || row["Plataforma"] || "";
+          const platformStr = platformRaw.toLowerCase();
           let platform: Platform = "manual";
 
+          // Solo Epic/Ubisoft se importan como esa plataforma: son vinculables
+          // pero Paragon no sincroniza su biblioteca/logros (igual que aquí),
+          // así que un CSV no puede dejarlos en un estado peor. Steam/PSN/Xbox/
+          // Google SÍ tienen sincronización real (platformAccounts + cron) con
+          // su propio nativeId — importarlos como esa misma plataforma con un
+          // id inventado crearía una fila duplicada o huérfana que nunca recibe
+          // logros. Todo lo demás (incluido lo no reconocido) cae en "manual".
           if (platformStr.includes("epic")) platform = "epic";
           else if (platformStr.includes("ubisoft") || platformStr.includes("uplay")) platform = "ubisoft";
-          else if (platformStr.includes("xbox")) platform = "xbox";
-          else if (platformStr.includes("steam")) platform = "steam";
-          else if (platformStr.includes("playstation") || platformStr.includes("psn")) platform = "psn";
-          else if (platformStr.includes("gog")) platform = "manual"; // GOG como manual
-          else if (platformStr.includes("ea") || platformStr.includes("origin")) platform = "manual";
 
           const statusStr = (row.CompletionStatus || row.status || row["Estado"] || "").toLowerCase();
           const completed = statusStr.includes("beaten") || statusStr.includes("completed") || statusStr.includes("completado");
 
-          parsedGames.push({ title, platform, completed });
+          parsedGames.push({ title, platform, completed, sourceLabel: platformRaw || undefined });
         }
 
         if (parsedGames.length === 0) {
@@ -137,7 +140,7 @@ export function ImportLibraryModal() {
                 {games.slice(0, 50).map((g, i) => (
                   <div key={i} className="flex justify-between p-2.5 text-sm">
                     <span className="font-semibold truncate mr-4">{g.title}</span>
-                    <span className="text-xs text-muted shrink-0 capitalize px-2 py-0.5 rounded bg-surface-2">{g.platform}</span>
+                    <span className="text-xs text-muted shrink-0 capitalize px-2 py-0.5 rounded bg-surface-2">{g.sourceLabel || g.platform}</span>
                   </div>
                 ))}
                 {games.length > 50 && (
