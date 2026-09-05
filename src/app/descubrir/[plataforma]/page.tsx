@@ -21,6 +21,7 @@ import { getPsPlusMensual } from "@/lib/psPlus";
 import { getPsNews } from "@/lib/psNews";
 import { getSteamNews } from "@/lib/steamNews";
 import { NewsFeed } from "@/components/NewsFeed";
+import { relativeDate } from "@/lib/design";
 
 const PLATAFORMAS: Record<string, { label: string; hubKey: PlataformaHub; color: string; icon: React.ReactNode }> = {
   playstation: { label: "PlayStation", hubKey: "psn", color: "#0f3d8a", icon: <PlayStationIcon size={26} /> },
@@ -170,7 +171,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
         <section className="mb-10">
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
             <h2 className="flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              PlayStation Plus — juegos del mes
+              PlayStation Plus — juegos {psPlus.mes ? `de ${psPlus.mes}` : "del mes"}
             </h2>
             <a
               href={psPlus.link}
@@ -181,6 +182,16 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               Ver el anuncio →
             </a>
           </div>
+          {/* Sony no siempre publica el anuncio del mes en curso el día 1 —
+              esto es SIEMPRE el último post real del blog oficial, nunca una
+              lista puesta a mano. Si el post tiene más de ~40 días, se avisa
+              en vez de dejar que parezca el mes actual sin serlo. */}
+          {psPlus.fecha && Date.now() - new Date(psPlus.fecha).getTime() > 40 * 86_400_000 && (
+            <p className="-mt-2 mb-4 text-xs text-muted">
+              Último anuncio real del blog de PlayStation, de {relativeDate(psPlus.fecha)} — puede que ya no sea el
+              catálogo vigente si Sony no ha publicado el del mes en curso.
+            </p>
+          )}
           <GameGrid items={psPlus.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
             {(g) => <PosterCard game={{ ...g, genres: [] }} fluid />}
           </GameGrid>

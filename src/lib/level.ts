@@ -72,6 +72,14 @@ export function paragonLevelFromXp(xp: number): ParagonLevel {
 export function paragonProgress(games: Game[]): ParagonProgress {
   const earned: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 };
   let juegosCompletados = 0;
+  // Steam no tiene jerarquía de metales (`game.earned` se queda a null, ver
+  // lib/sync.ts) — sus logros sueltos no daban NADA de XP hasta ahora, solo
+  // el bonus de "platino" del 100% (abajo). `steamTrophyXp` (calculado en
+  // lib/profiles.ts/getLibrary, con `xpSteamPorRareza` de trophyScore.ts) ya
+  // pesa cada logro por su rareza real — un logro que tiene el 90% de la
+  // gente no es lo mismo que uno que tiene el 2%, ni de lejos el trato plano
+  // que tenía esto antes.
+  let steamXp = 0;
 
   for (const game of games) {
     if (game.isWishlist) continue;
@@ -79,16 +87,7 @@ export function paragonProgress(games: Game[]): ParagonProgress {
       earned[grade] += game.earned?.[grade] ?? 0;
     }
 
-    // Steam no tiene jerarquía de metales (`game.earned` se queda a null,
-    // ver lib/sync.ts) — sus logros sueltos no daban NADA de XP hasta ahora,
-    // solo el bonus de "platino" del 100% (abajo). Se cuentan al peso de
-    // bronce, el escalón más bajo de PSN: no hay dato de rareza aquí como sí
-    // lo hay en lib/paragonScore.ts (esa es una cifra aparte a propósito,
-    // ver la tabla de decisiones del HANDOFF) — esto solo iguala el trato,
-    // no puntúa por rareza.
-    if (game.platform === "steam") {
-      earned.bronze += game.earnedTotal;
-    }
+    steamXp += game.steamTrophyXp ?? 0;
 
     // Mutuamente excluyentes, igual que el estado en gameProgress (stats.ts):
     // un 100% de Steam cuenta como platino, no como "juego completado" aparte
@@ -100,10 +99,9 @@ export function paragonProgress(games: Game[]): ParagonProgress {
     }
   }
 
-  const trofeos = (["bronze", "silver", "gold"] as const).reduce(
-    (total, grade) => total + earned[grade] * XP_POR_GRADO[grade],
-    0,
-  );
+  const trofeos =
+    (["bronze", "silver", "gold"] as const).reduce((total, grade) => total + earned[grade] * XP_POR_GRADO[grade], 0) +
+    steamXp;
   const platinos = earned.platinum * XP_POR_GRADO.platinum;
   const completados = juegosCompletados * 100;
   // Antes se quedaba fuera del total: el nivel de esta tarjeta salía más

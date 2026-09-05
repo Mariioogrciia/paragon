@@ -16,6 +16,7 @@ import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
+import { xpSteamPorRareza } from "@/lib/trophyScore";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import {
   type AccountPlatform,
@@ -593,6 +594,28 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
     }
   }
 
+  // XP de nivel Paragon de los logros de Steam ya conseguidos, ponderado
+  // por rareza (mismos tramos que Paragon Score) — una sola consulta para
+  // toda la biblioteca agrupada por juego, no una por fila (N+1). Solo
+  // Steam: PSN pesa por metal (ya viene en `earned`, arriba) y sumarle esto
+  // también sería contar dos veces lo mismo.
+  const steamTrofeosGanados = await db
+    .select({ gameId: userTrophies.gameId, rarityPercent: userTrophies.rarityPercent })
+    .from(userTrophies)
+    .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+    .where(
+      and(
+        eq(userTrophies.userId, profile.userId),
+        eq(userTrophies.earned, true),
+        eq(gamesTable.platform, "steam"),
+      ),
+    );
+
+  const steamXpPorJuego = new Map<string, number>();
+  for (const t of steamTrofeosGanados) {
+    steamXpPorJuego.set(t.gameId, (steamXpPorJuego.get(t.gameId) ?? 0) + xpSteamPorRareza(t.rarityPercent));
+  }
+
   const games: Game[] = rows.map((r) => ({
     id: r.id,
     platform: r.platform,
@@ -613,6 +636,7 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
     pegi: r.pegi ?? encontrados.get(r.title),
     igdbId: r.igdbId,
     platinumRarity: r.platinumRarity ?? undefined,
+    steamTrophyXp: steamXpPorJuego.get(r.id),
     rating: r.rating ?? undefined,
     review: r.review ?? undefined,
     reviewDate: r.reviewDate?.toISOString() ?? undefined,

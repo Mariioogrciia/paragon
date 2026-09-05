@@ -281,10 +281,11 @@ export default async function JuegoPage({
                 {dificultad.etiqueta}
               </span>
 
-              {/* Seis barritas: la escala se ve de un vistazo sin tener que
-                  saber qué significa un 0,4%. */}
+              {/* Diez barritas (escala 1-10, la misma que usan sitios como
+                  PSNProfiles): se ve de un vistazo sin tener que saber qué
+                  significa un 0,4% de rareza. */}
               <span className="flex items-center gap-1" aria-hidden="true">
-                {[1, 2, 3, 4, 5, 6].map((n) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                   <span
                     key={n}
                     className="h-4 w-2 rounded-sm"

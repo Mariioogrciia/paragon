@@ -154,6 +154,14 @@ export interface Game {
    * cuyo detalle se ha sincronizado.
    */
   platinumRarity?: number;
+  /**
+   * XP de nivel Paragon de los logros de Steam ya conseguidos en este juego,
+   * ponderado por rareza (mismos tramos que `trophyScore.ts`/Paragon Score:
+   * un logro raro pesa más que uno que tiene todo el mundo). Solo Steam —
+   * PSN pesa por metal (`earned`) y ese ya cuenta aparte. Ver `paragonProgress`
+   * en lib/level.ts.
+   */
+  steamTrophyXp?: number;
   /** Id del catálogo de IGDB, si esta fila ya se emparejó con uno. Es lo que
    * permite agrupar el mismo lanzamiento entre plataformas (ver GlobalGame en
    * lib/community.ts) y filtrar recomendaciones de lo que ya se tiene. */

@@ -172,7 +172,7 @@ export interface LibraryFilters {
   publisher?: string;
   genre?: string;
   pegi?: string;
-  /** Nivel de dificultad estimada (lib/difficulty.ts), 1 (regalado) a 6 (brutal). */
+  /** Nivel de dificultad estimada (lib/difficulty.ts), 1 (regalado) a 10 (brutal). */
   dificultad?: Dificultad["nivel"];
   horas?: HorasBucket;
   sort?: SortKey;

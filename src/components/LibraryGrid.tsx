@@ -498,7 +498,10 @@ export function LibraryGrid({
                 { value: "", label: "Cualquier dificultad" },
                 ...facets.dificultades.map((d) => ({
                   value: String(d.nivel),
-                  label: d.etiqueta,
+                  // La etiqueta sola ya no basta para distinguir el filtro:
+                  // con la escala a 10 tramos, dos niveles seguidos pueden
+                  // compartir nombre (7 y 8 son los dos "Muy difícil").
+                  label: `${d.etiqueta} (${d.nivel}/10)`,
                   count: d.count,
                 })),
               ]}

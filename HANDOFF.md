@@ -7,6 +7,56 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 5 de septiembre de 2026 (continuación 3) — PS Plus real, Steam por rareza, dificultad a 10
+
+- **PS Plus mostraba juegos que ya no eran los reales**: `lib/psPlus.ts`
+  tenía un HARDCODE (de una sesión anterior, comentario "el feed está
+  devolviendo el mes viejo, forzamos estos mientras tanto") con 3 nombres
+  fijos de "septiembre" que se había quedado así, indistinguible en pantalla
+  de un dato real. Restaurada la lectura de verdad del feed
+  (`blog.playstation.com/tag/ps-plus/feed/`, dinámica, la que ya funcionaba
+  en una sesión previa). Aviso real de paso: el feed en sí lleva parado
+  desde marzo de 2026 (comprobado a mano) — Sony no ha publicado el anuncio
+  mensual desde entonces. Como no hay forma de saber el catálogo vigente sin
+  ese post, se enseña el último real (marzo) con su fecha, y un aviso en
+  pantalla si tiene más de ~40 días — nunca se vuelve a inventar un mes.
+- **Nivel Paragon: Steam ahora pesa por rareza, no plano**. La sesión
+  anterior había puesto los logros de Steam al peso fijo de bronce (10 XP
+  cada uno) para que dieran algo de XP — el usuario pidió que fuera "en base
+  al % de gente que lo tiene", como ya hace Paragon Score
+  (`trophyScore.ts`/`xpSteamPorRareza`, ahora exportada). Se añadió
+  `Game.steamTrophyXp` (calculado en `getLibrary`, lib/profiles.ts, con una
+  sola consulta agrupada por juego — no una por fila) y se cambiaron **los
+  dos sitios que calculan el nivel por separado**
+  (`lib/level.ts`/`paragonProgress` y `lib/paragonLevel.ts`/`getParagonLevel`,
+  la navbar) para sumar esto en vez del peso plano.
+- **Dificultad estimada, de 1-6 a 1-10**: se probó sacarla de una API o por
+  scraping antes de tocar nada (PSNProfiles es la referencia real de
+  "dificultad sobre 10" entre cazadores de trofeos) — bloqueado por un reto
+  de Cloudflare en la primera petición (comprobado a mano, `curl` devuelve
+  la página "Just a moment..."), mismo bloqueo exacto que ya tumbó el
+  scraping de Epic/DuckDuckGo/Bing en sesiones anteriores. Sin API pública
+  tampoco (ni IGDB, ni RAWG, ni IsThereAnyDeal tienen dificultad). En vez de
+  eso, `lib/difficulty.ts` reparte la MISMA rareza real (dato nuestro) en 10
+  tramos en lugar de 6, para poder enseñarla como "X/10" igual que esas
+  webs, sin depender de terceros. Cambiado también el filtro de dificultad
+  de la biblioteca (`LibraryGrid.tsx`) para incluir el número en la
+  etiqueta — con 10 tramos, dos niveles seguidos pueden compartir nombre
+  ("Muy difícil" es el 7 y el 8), y antes de este aviso el desplegable no
+  los distinguía.
+
+**Hallazgo aparte, sin tocar**: la consola del navegador muestra un error de
+hidratación de React en TODAS las páginas probadas, incluidas las que no se
+tocaron hoy (`/noticias`) — no es un bug de esta sesión, ya estaba antes.
+Anotado como tarea aparte en vez de mezclarlo con esto (`task_9310785c`).
+
+Verificado en el navegador contra un perfil real (`fende21`): la ficha de
+Assassin's Creed Unity (1,1% de rareza) sale "Muy difícil" con 8/10 barras,
+Black Myth: Wukong (6,0%) sale "Difícil" con 5/10 — la escala nueva
+distingue casos que antes caían en el mismo cajón de 6.
+
+---
+
 ## Sesión del 5 de septiembre de 2026 (continuación 2) — 4 correcciones pedidas directamente por el usuario
 
 - **Bug real en "Logros de Paragon"** (`ParagonAchievements.tsx`): el contador

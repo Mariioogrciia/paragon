@@ -21,7 +21,9 @@ const STEAM_TRAMOS: { bajo: number; xp: number }[] = [
   { bajo: 0, xp: 100 },
 ];
 
-function xpSteamPorRareza(rarityPercent: number | null | undefined): number {
+/** Exportada porque lib/profiles.ts (getLibrary) también la necesita para
+ * el XP de nivel Paragon de los logros de Steam — ver Game.steamTrophyXp. */
+export function xpSteamPorRareza(rarityPercent: number | null | undefined): number {
   if (rarityPercent == null) return STEAM_TRAMOS[0].xp;
   for (const tramo of STEAM_TRAMOS) {
     if (rarityPercent >= tramo.bajo) return tramo.xp;
