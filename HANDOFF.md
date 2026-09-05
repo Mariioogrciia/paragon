@@ -1,77 +1,221 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **4 de septiembre de 2026,
-por la noche** (sesión larguísima, con Antigravity trabajando en paralelo
-todo el rato — más abajo hay un aviso de qué tocó él en medio de esta sesión).
+releer todo el historial. Última actualización: **5 de septiembre de 2026**
+(continuación directa de la sesión larguísima del día 4, con Antigravity
+trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó él).
 
 ---
 
-## Epic Games — vinculación por OAuth, sesión arreglada, logros pendientes de una prueba en vivo
+## Sesión del 5 de septiembre de 2026 (continuación) — bug real en la importación de Antigravity, pestañas en panel/perfil, Wrap en Stories
 
-Antigravity montó en paralelo (mismo rato que esta sesión) un proveedor OAuth
-de Epic Games en `auth.ts` + `linkEpicOAuthAction` + `LinkEpicForm` ya
-conectado de verdad al botón (antes seguía siendo el formulario viejo de
-texto). Tres cosas de esto se han tocado hoy:
+### Bug real en `ImportLibraryModal`/`actions/import.ts` (de Antigravity)
 
-**1. Bug de sesión real, arreglado.** `linkEpicOAuthAction` llamaba a
-`signIn("epic", ...)` — el mismo mecanismo de login que Google/Discord, sin
-ningún callback que comprobara si ya había sesión abierta. Sin eso, Auth.js
-no encuentra ninguna cuenta Epic vinculada la primera vez, **crea un usuario
-de Paragon nuevo y cambia la sesión a él** — quien pulsa "Vincular Epic" se
-queda mirando una cuenta vacía, como si hubiera cerrado sesión de la suya
-real. Arreglado con un callback `signIn` en `auth.ts` que, si el proveedor es
-`epic`, escribe directamente en `platformAccounts` contra el usuario que YA
-tiene sesión y devuelve `false` — corta el flujo antes de que Auth.js toque
-`users`/`accounts`/`sessions`. **Sin probar en vivo todavía**: hace falta
-`AUTH_EPIC_ID`/`AUTH_EPIC_SECRET` reales (el usuario tiene que registrar una
-app en el portal de desarrolladores de Epic, como con xbl.io/ITAD) y
-completar un login real para confirmar que `auth()` lee la cookie de sesión
-correcta desde dentro de ese callback.
+Al revisar lo que Antigravity construyó en paralelo (importar biblioteca
+desde CSV de Playnite/GOG, ya comiteado): Steam/PSN/Xbox/Google tienen
+sincronización real en Paragon (`platformAccounts` + cron), con su propio
+`nativeId` (appid/trophyId real). El CSV los creaba con un `nativeId`
+inventado (el `igdbId` de IGDB) — una fila que nunca recibe logros y que,
+si el usuario ya tiene o más tarde vincula esa cuenta de verdad, queda
+duplicada junto a la real, en silencio. Arreglado enrutando esas cuatro
+plataformas a `"manual"` en el propio `importGamesAction` (igual que ya se
+hace con Epic/Ubisoft, que tampoco sincronizan biblioteca). De paso,
+`"manual"` ahora sigue de verdad su convención de `nativeId`
+(`<igdbId>:<dispositivo>`, ver la tabla de decisiones más abajo) en vez de
+un id sin sufijo de dispositivo — `manualGames.ts`/`notifications.ts` ya
+asumían ese formato al hacer `nativeId.split(":")`.
 
-**2. Tres bugs mecánicos de compilación, de Antigravity editando en paralelo
-mientras se escribía esto — arreglados sin tocar su intención:**
-- `actions.ts` llamaba a `signIn(...)` sin importarlo de `@/auth`.
-- El proveedor de Epic en `auth.ts` no tipaba `type`/`version`/`checks`
-  como literales (`"oauth"`, `"2.0"`, `["pkce","state"]`) — TypeScript los
-  ensanchaba a `string`/`string[]` y el build entero no compilaba.
-- `Forms.tsx` importaba `linkEpicOAuthAction` dos veces (una vez arriba del
-  todo, otra vez pegada a `LinkEpicForm`) — identificador duplicado.
+### Panel y perfil: pestañas, no todo en un solo scroll
 
-**3. Ver los logros de Epic — investigado a fondo, NO construido todavía.**
-El usuario pidió ver la biblioteca/logros de Epic. Comprobado:
-- **No hay API pública real.** El scope de OAuth de Epic (`basic_profile`,
-  `friends_list`, `presence`) no da biblioteca ni logros. La interfaz
-  "Ecom/Entitlements" de EOS es solo para que el desarrollador de un juego
-  compruebe si TÚ tienes SU juego — no para que un tercero liste tu
-  biblioteca entera. Hay un hilo abierto en el foro oficial de Epic
-  pidiendo justo esto ("make achievements publicly queryable via an API")
-  porque hoy no existe.
-- **Vía no oficial descartada**: herramientas tipo *Legendary* (el launcher
-  de Epic de código abierto) funcionan, pero piden que cada usuario copie a
-  mano un código de sesión de la web de Epic — un token personal, no un ID
-  público. Rompería la promesa de la propia portada ("Ni contraseñas, ni
-  tokens, ni permisos de nadie").
-- **El método real, confirmado por el propio mantenedor de Exophase** (foro,
-  hilo "Epic Games Achievement Tracking Added", 4 abr 2022): usan el MISMO
-  OAuth `basic_profile` que ya monta Antigravity, y con el token que da esa
-  autenticación llaman a un endpoint de Epic (no documentado públicamente)
-  que devuelve los logros de esa cuenta — su propia cita: *"our access
-  drops off after some time until you re-authenticate... so for
-  uninterrupted tracking it is best to leave the privacy setting on
-  Public"*. Confirmado también que Epic SÍ tiene un perfil de logros
-  público de verdad (`store.epicgames.com/u/...`, con niveles de privacidad
-  Public/Friends of Friends/Friends Only/Only Me — anuncio oficial "The
-  Epic Games Store My Achievements Update", abr 2022).
-- **Limitación real, según el propio Exophase**: solo funciona con juegos
-  que tienen logros habilitados (muchos exclusivos de Epic no los tienen), y
-  no da tiempo jugado.
-- **Para seguir de verdad hace falta al usuario**: registrar la app en el
-  portal de desarrolladores de Epic (`AUTH_EPIC_ID`/`AUTH_EPIC_SECRET`
-  reales) y completar un login real una vez, para poder inspeccionar en
-  vivo qué endpoint responde con los logros tras el OAuth — no se puede
-  reverse-engineerear sin una sesión real. Mismo método que se usó con ITAD
-  (probar contra la API real antes de escribir el código de verdad).
+El usuario reportó feedback de un amigo: la interfaz se ve caótica,
+sobre todo el panel (portada logueada, `/`) y la biblioteca (perfil,
+`/u/[handle]`) — ambas apilaban entre 7 y 10 secciones en un único scroll
+largo. `SectionTabs.tsx` (nuevo, cliente, recuerda la última pestaña por
+`localStorage`) las agrupa sin tocar ninguna sección por dentro:
+- **Panel** (`app/page.tsx`): "Resumen" (stats, historial mensual, misiones
+  semanales, recomendaciones) / "Progreso y actividad" (a un paso del
+  platino, juegos parados, próximos lanzamientos, jugado recientemente,
+  feed de actividad).
+- **Perfil** (`u/[handle]/page.tsx`): "Resumen" (wrap, stats, nivel,
+  logros, vitrina, favoritos) / "Biblioteca" (colecciones, el grid de
+  juegos de verdad). Se mantiene intacto el sistema de reordenar secciones
+  de `/ajustes` (`profileSectionOrder`) — solo se separan las dos secciones
+  pesadas (colecciones + biblioteca) del resto, no se aplana todo junto.
+
+Pendiente si sigue viéndose recargado: la ficha de juego (`/juego/[id]`) y
+Descubrir fueron las otras dos zonas candidatas que no se tocaron esta vez
+(el usuario priorizó panel + biblioteca).
+
+### Wrap ampliado en formato Stories (1ª de las 3 ideas pendientes)
+
+`WrapStories.tsx` (nuevo): botón "Ver Wrap completo" junto al Wrap de
+siempre, abre un visor a pantalla completa tipo Stories — barras de
+progreso arriba que avanzan solas cada 6s, se pausan al mantener pulsado,
+tocar/clicar izquierda-derecha o flechas del teclado para navegar, Esc
+para cerrar (mismo lenguaje que el visor de capturas de
+`ScreenshotStrip.tsx`). Ningún dato nuevo por sincronizar: reutiliza lo
+que ya calculaba el resto de la app (género/juego destacado, mejor mes y
+racha de `lib/history.ts`) y añade una sola pieza nueva,
+`lib/wrapPercentile.ts` — "estás en el top X% mundial" de trofeos-este-año
+contra el resto de usuarios reales, con un **umbral mínimo de 20 usuarios**
+con algún trofeo este año antes de mostrar esa diapositiva. Ahora mismo en
+producción solo hay 4 usuarios reales con trofeos este año, así que esa
+diapositiva no sale para nadie todavía — es lo esperado, no un fallo (el
+aviso pendiente que ya dejaba este mismo documento sobre "top X% no
+significa nada con pocos usuarios"). Sin trofeos con fecha este año, una
+única diapositiva honesta en vez de un carrusel de siete vacías.
+Verificado en el navegador contra un usuario real (`fende21`, 253 trofeos
+este año, sí navega las 6 diapositivas) y contra uno sin trofeos este año
+(`mario_16`, cae en la diapositiva única).
+
+**Pendiente de la lista de 8 ideas** (quedan 2 sin construir): Retos
+semanales (falta decidir a mano vs generador automático) y el webhook de
+Discord para anunciar logros (alternativa real al Rich Presence, que no es
+posible sin app de escritorio).
+
+---
+
+## Sesión del 5 de septiembre de 2026 — Epic cerrado, rendimiento, y 3 funciones nuevas (Ruleta, banner, Paragon Score)
+
+### Epic Games — CERRADO: vinculación real, logros descartados de verdad
+
+Continuación de lo que dejó Antigravity en `auth.ts` (proveedor OAuth +
+`linkEpicOAuthAction` + `LinkEpicForm` ya conectado al botón). Se probó de
+punta a punta con una cuenta real, con estos resultados:
+
+**Vinculación: funciona de verdad.** Se arreglaron 4 bugs reales, cada uno
+encontrado probando en vivo, no leyendo documentación:
+1. **Bug de sesión** — `signIn("epic", ...)` sin un callback que comprobara
+   si ya había sesión abierta hacía que Auth.js **creara un usuario de
+   Paragon nuevo y cambiara la sesión a él** al vincular Epic (el mismo
+   mecanismo de login que Google/Discord, mal usado para "vincular una
+   cuenta más"). Arreglado con un callback `signIn` en `auth.ts`: si el
+   proveedor es `epic`, escribe en `platformAccounts` contra el usuario que
+   YA tiene sesión y devuelve la URL de vuelta a `/ajustes/plataformas` en
+   vez de `true`/`false` (`false` a secas siempre lanza "AccessDenied" en
+   Auth.js, aunque el enlace haya ido bien — hay que devolver un string).
+2. **El endpoint de token de Epic no cumple RFC 6749 §2.3.1** — con un
+   secret que lleve `+` o `/`, la cabecera Basic estándar (percent-encode
+   antes de pasar a base64) hace que Epic la rechace con
+   `invalid_client_credentials`, aunque las credenciales sean correctas
+   (confirmado con un hilo del foro oficial de Epic, mismo error exacto).
+   El escape oficial documentado en los tipos de Auth.js (`token.request`)
+   **no está implementado de verdad** en el código que corre para
+   proveedores `type: "oauth"` en la versión instalada (comprobado leyendo
+   el propio `node_modules/@auth/core`). El que sí funciona de verdad es
+   `[customFetch]` (el mismo mecanismo que usan los proveedores oficiales
+   de Apple/Microsoft Entra ID para esto) — intercepta la petición de red
+   real y reescribe la cabecera Authorization en crudo, sin el
+   percent-encoding que rompe a Epic. Ver el comentario largo en `auth.ts`.
+3. Tres bugs mecánicos de compilación de Antigravity editando en paralelo
+   (import de `signIn` que faltaba en `actions.ts`, tipos sin `as const` en
+   el proveedor de Epic, `linkEpicOAuthAction` importado dos veces en
+   `Forms.tsx`) — arreglados sin tocar su intención.
+4. `PlatformTiles.tsx` usaba `UbisoftIcon` sin importarlo — rompía
+   `npm run build` para cualquiera. Arreglado.
+
+**Ver los logros de Epic: descartado, investigado a fondo y probado en
+vivo.**
+- La API oficial de Epic no da biblioteca ni logros a terceros — solo
+  `basic_profile`/`friends_list`/`presence`. Confirmado con un hilo abierto
+  en el foro oficial de Epic pidiendo justo esto porque no existe.
+- El método real de sitios como Exophase (confirmado por su propio
+  mantenedor, foro, abr. 2022) no es una API — es la página pública de
+  logros de Epic (`store.epicgames.com/u/<accountId>`, con niveles de
+  privacidad Public/Friends/etc., anuncio oficial "My Achievements Update"
+  abr. 2022). **Se comprobó en vivo con una cuenta real**: la página existe
+  y tiene los datos reales (se vieron en el navegador, sin ni siquiera
+  sesión propia). Pero una petición de servidor normal (`fetch` sin
+  navegador) recibe el reto anti-bot de Cloudflare, no el contenido —
+  mismo bloqueo exacto que ya tumbó el scraping de DuckDuckGo/Bing para las
+  guías de trofeo. Haría falta un navegador headless completo corriendo en
+  el servidor en cada sincronización — se decidió no construirlo: pesado,
+  frágil, puede romperse con cualquier cambio de Cloudflare sin avisar.
+- **Conclusión**: Epic se queda como Google Play — vinculable de verdad,
+  sin sincronizar biblioteca ni logros. Dicho así en el texto de
+  `/ajustes/plataformas`, no como promesa de "en fase de desarrollo".
+
+### Rendimiento
+
+- **5 índices nuevos** en producción (`scripts/anadir-indices-rendimiento.mts`,
+  ya ejecutado): `user_game`/`user_trophy` por `gameId` solo (la PK
+  compuesta no servía para eso, y hay 10+ sitios que filtran así — stats de
+  un juego, reseñas, recomendaciones, Descubrir...), y `activity` por
+  `userId`/`gameId` (no tenía NINGÚN índice más allá de su propia PK — el
+  feed de actividad escaneaba la tabla entera).
+- **`unstable_cache` (5 min)** en `getGlobalStats`, `getTrendingGames`,
+  `getHiddenGems` — antes se recalculaban enteros en cada visita de cada
+  visitante, aunque no son datos personales de nadie.
+- **Código muerto borrado**: `GameRow.tsx`, `ProgressBar.tsx` (cero
+  referencias en todo el proyecto), `test-yt.js`, `award-badges.ts` (sueltos
+  sin trackear desde sesiones anteriores). Sección de "Ofertas en Steam"
+  duplicada quitada de `/descubrir` raíz (se quedó solo en
+  `/descubrir/steam`, mismo criterio que ya se aplicó a PS Plus/noticias).
+
+### Xbox: noticias reales
+
+`lib/xboxNews.ts` + `/descubrir/xbox` — feed RSS oficial de Xbox Wire
+(`news.xbox.com`, comprobado a mano, 10 entradas reales). Epic y Ubisoft
+**no tienen esto**: la web de Epic bloquea con Cloudflare hasta su propio
+feed RSS oficial (403, mismo reto anti-bot que arriba); Ubisoft no tiene
+ningún RSS público descubierto (su web de noticias es una SPA sin feed).
+
+### Funciones nuevas (de una lista de 8 ideas del usuario, analizadas antes
+de construir — 3 resultaron ser trabajo ya hecho de sesiones anteriores:
+fijar 3 trofeos favoritos y las guías/vídeos comunitarios de trofeos ya
+existían tal cual se pedían)
+
+- **Ruleta del Backlog** (`BacklogRoulette.tsx`, en la biblioteca, solo para
+  el dueño): botón "¿A qué juego hoy?" que elige al azar entre lo sin
+  empezar/abandonado/&lt;15%, con animación de tragaperras. Si el backlog
+  está limpio, cae en recomendaciones por género favorito (reutiliza
+  `getGameRecommendations`, sin pedir nada nuevo a IGDB).
+- **Banner del juego favorito** — resultó que **ya existía casi entero**
+  (`profileBackgroundGameId`, con fallback automático al primer juego de la
+  biblioteca) — solo tenía una interfaz pésima: escribir el ID a mano en un
+  campo de texto. Cambiado por un selector visual (`BackgroundGamePicker`
+  en `ProfileForm.tsx`) con los favoritos marcados con ⭐ primero.
+- **Paragon Score — puntuación unificada entre plataformas** (el problema
+  real: PSN pesa por metal, Xbox por Gamerscore, Steam no pesaba nada — un
+  logro cualquiera de Steam contaba igual que el más raro del juego).
+  - `game_trophy.xp` (columna nueva, migración ya ejecutada) guarda el
+    Gamerscore real de cada logro de Xbox — antes se descartaba al
+    sincronizar (`lib/xbl/client.ts` ahora lo captura de
+    `rewards[].type === "Gamerscore"`).
+  - `lib/trophyScore.ts` (fórmula pura, sin `server-only` — la necesita
+    tanto el servidor como `TrophyList.tsx` en el cliente) + `lib/paragonScore.ts`
+    (consulta agregada por usuario, con `server-only`): PSN por su `grade`
+    de siempre, Xbox por su Gamerscore real, Steam estimado por
+    `rarityPercent` en tramos (nunca llega al peso de un platino entero — un
+    logro suelto, por raro que sea, no equivale a completar el juego).
+  - **A propósito, NO toca el nivel Paragon que ya existe** (navbar/tarjeta
+    de perfil/Wrap) — ese tiene un historial real de bugs de
+    desincronización entre sitios (ver la tabla de decisiones más abajo) y
+    tocarlo a fondo para meter Xbox/Steam ahí era un riesgo innecesario.
+    Esto es una cifra nueva y aparte.
+  - Tarjeta **"Paragon Score"** nueva en `/u/[handle]/estadisticas`
+    (desglose por plataforma, con el aviso de qué es dato real —PSN/Xbox—
+    y qué es estimación —Steam—), y el XP de cada trofeo suelto visible en
+    `TrophyList.tsx`.
+  - **Verificado contra datos reales**, no solo compilado: un usuario real
+    salió con 59.375 puntos (56.160 PSN / 2.810 Steam / 405 Xbox),
+    coherente con sus totales de trofeos.
+
+**Pendiente de la lista de 8 ideas** (analizadas, no construidas todavía):
+- **Wrap más amplio** (formato de diapositivas tipo Stories) — la mayoría
+  de los datos ya existen en algún sitio de la app, es sobre todo trabajo
+  de interfaz. Aviso pendiente: "top X% mundial" no significa nada con
+  pocos usuarios reales, necesita un umbral mínimo antes de enseñarlo.
+- **Retos semanales** — viable, pero el coste real es el mantenimiento
+  (alguien tiene que inventar 3 retos nuevos cada lunes). Pendiente decidir
+  si a mano o con un generador automático antes de construir nada.
+- **Discord Rich Presence** — la idea literal (ver "Playing Paragon" bajo
+  el nombre de alguien en Discord) **no es técnicamente posible** sin una
+  app de escritorio corriendo en el ordenador de esa persona (Rich
+  Presence es IPC local con el cliente de Discord, ninguna web app externa
+  puede escribirlo remotamente). La alternativa real y fácil es un webhook
+  de Discord anunciando logros en un canal — mucho menos vistoso, pero
+  factible hoy sin bot siquiera.
 
 ---
 
@@ -580,6 +724,8 @@ mano. Antes de una sesión larga, `git pull` primero.
 | `avatarPersonalizado` decide si la foto subida a mano gana a PSN | `users.image` guarda a la vez la imagen de login (Google/Discord) y la subida a mano desde /ajustes — sin ese booleano no hay forma de distinguirlas. Solo `/api/upload` (subida real de avatar) lo pone a `true`. Cualquier sitio nuevo que resuelva un avatar tiene que pasar por `resolveAvatarUrl`/`avatarUrlSql`, nunca leer `users.image` a pelo. |
 | Los logros de un juego: `defined` es solo-PSN, `definedTotal` es universal | `games.defined` (desglose por metal: bronce/plata/oro/platino) SOLO lo rellena PSN — Steam no tiene esa jerarquía. El total que vale para cualquier plataforma vive en `games.definedTotal`. Cualquier cosa que cuente "cuántos logros tiene este juego" sin mirar `definedTotal` como último recurso se deja Steam a cero, en silencio (pasó de verdad en `getGameTrophyBreakdown`). |
 | Un `1fr` de CSS Grid no se encoge solo — hace falta `min-w-0` | A diferencia de un flex item, un `1fr` de grid tiene `min-width: auto` por defecto: si el contenido de dentro es más ancho que el hueco (una tira de scroll horizontal, por ejemplo), el TRACK entero crece para caber en vez de recortarse — eso empuja la página entera a scroll horizontal. Pasó en la ficha de juego (columna principal junto a la barra lateral de 300px). Cualquier columna de grid que pueda llevar dentro algo con `overflow-x-auto` necesita `min-w-0`. |
+| Paragon Score es una cifra APARTE del nivel Paragon, nunca la misma | El nivel de la navbar/tarjeta de perfil (`lib/level.ts`, `paragonProgress`) solo cuenta metales de PSN (`game.earned`) y ya tiene un historial real de bugs de desincronización entre sitios. `lib/paragonScore.ts`/`lib/trophyScore.ts` es la puntuación unificada entre plataformas (PSN por metal, Xbox por Gamerscore real, Steam estimado por rareza) — vive aparte a propósito, no sustituye ni alimenta el nivel de siempre. |
+| La fórmula pura de puntuación vive sin `server-only`, la consulta a la base sí lo lleva | `lib/trophyScore.ts` (la función `trophyScore`) no puede tener `server-only` porque la usa tanto el servidor como `TrophyList.tsx` (componente de cliente, para enseñar el XP de un trofeo suelto). `lib/paragonScore.ts` sí lo lleva, porque consulta Postgres — importa la fórmula de trophyScore.ts en vez de repetirla. |
 
 ---
 
@@ -947,8 +1093,13 @@ sueltas: `users.profileSectionOrder`
 (`scripts/anadir-createdat-user-game.mts`, para "Tendencias" en Descubrir) y,
 de esta sesión, `users.avatarPersonalizado`
 (`scripts/anadir-avatar-personalizado.mts`, decide si el avatar subido a
-mano gana a PSN) — **todas ya ejecutadas contra producción**. Sin confirmar
-si `scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
+mano gana a PSN), y de la sesión del 5 de septiembre,
+`game_trophy.xp` (`scripts/anadir-xp-game-trophy.mts`, Gamerscore real de
+Xbox para Paragon Score) — **todas ya ejecutadas contra producción**. Los 5
+índices de rendimiento (`scripts/anadir-indices-rendimiento.mts`:
+`user_game`/`user_trophy` por `gameId`, `activity` por `userId`/`gameId`,
+`activity_comment` por `activityId`) también, mismo día. Sin confirmar si
+`scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
 Antigravity) llegaron a correrse — ver el punto 1 de "Pendiente".
 
 **CheapShark** (comparador de precios) no necesita clave, pero desde hace
