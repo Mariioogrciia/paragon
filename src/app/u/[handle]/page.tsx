@@ -33,6 +33,7 @@ import { PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { BackButton } from "@/components/BackButton";
 import { SectionTabs } from "@/components/SectionTabs";
+import { EstadisticasCompletas } from "@/components/EstadisticasCompletas";
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -376,6 +377,10 @@ export default async function PerfilPage({
               tabs={[
                 { key: "resumen", label: "Resumen", content: <>{resumenNodos}</> },
                 { key: "biblioteca", label: "Biblioteca", badge: stats.juegos, content: <>{bibliotecaNodos}</> },
+                // Mismo componente que la página standalone /u/[handle]/estadisticas
+                // (EstadisticasCompletas.tsx) — una sola fuente de verdad para las
+                // consultas y el layout, no una copia que se pueda desincronizar.
+                { key: "estadisticas", label: "Estadísticas", content: <EstadisticasCompletas handle={handle} /> },
               ]}
             />
           );
