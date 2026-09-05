@@ -1,9 +1,12 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";
+import { WrapStoriesButton } from "@/components/WrapStoriesButton";
 import { type Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
 import { gruposPorTitulo } from "@/lib/stats";
+import type { Rachas } from "@/lib/history";
+import type { PercentilAnio } from "@/lib/wrapPercentile";
 import { TrophyIcon } from "./TrophyIcon";
 
 /**
@@ -107,6 +110,10 @@ export function ParagonWrap({
   esteAnio,
   juegosEsteAnio,
   handle,
+  playerName,
+  mejorMes,
+  rachas,
+  percentil,
 }: {
   games: Game[];
   /** Trofeos conseguidos este año (solo los que tienen fecha registrada). */
@@ -119,6 +126,16 @@ export function ParagonWrap({
    * hay datos reales que enseñar en una imagen para compartir.
    */
   handle?: string;
+  /**
+   * Estos cuatro son opcionales y solo alimentan el botón "Ver Wrap
+   * completo" (WrapStories, el formato Stories ampliado) — sin `playerName`
+   * no se muestra el botón, porque sin nombre no hay a quién saludar en la
+   * portada de las diapositivas.
+   */
+  playerName?: string;
+  mejorMes?: { mes: string; total: number } | null;
+  rachas?: Rachas;
+  percentil?: PercentilAnio | null;
 }) {
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
@@ -129,7 +146,22 @@ export function ParagonWrap({
         <h2 className="font-heading text-[26px] font-bold uppercase tracking-wide flex items-center gap-2">
           <span className="text-xl">✨</span> Paragon Wrap
         </h2>
-        <div className="flex w-full items-center justify-between sm:w-auto sm:justify-end sm:gap-4">
+        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
+          {playerName && (
+            <WrapStoriesButton
+              data={{
+                playerName,
+                topGenre,
+                topGame,
+                esteAnio,
+                juegosEsteAnio,
+                mejorMes: mejorMes ?? null,
+                rachas: rachas ?? { actual: 0, mejor: 0, diasActivos: 0 },
+                percentil: percentil ?? null,
+                handle,
+              }}
+            />
+          )}
           {handle && <CompartirImagenWrap handle={handle} />}
           <Link
             href="/ritmo"

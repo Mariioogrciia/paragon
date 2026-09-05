@@ -18,7 +18,8 @@ import { ImportLibraryModal } from "@/components/ImportLibraryModal";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
-import { juegosDelAnio, resumenHistorico } from "@/lib/history";
+import { juegosDelAnio, rachas as rachasDe, resumenHistorico } from "@/lib/history";
+import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
 import { Badges } from "@/components/Badges";
 import { Pegi } from "@/components/Pegi";
 import { ParagonLevelCard } from "@/components/ParagonLevelCard";
@@ -97,6 +98,11 @@ export default async function PerfilPage({
   const resumen = await resumenHistorico(profile.userId);
   const juegosEsteAnio = await juegosDelAnio(profile.userId);
   const badges = await getUserBadges(profile.userId);
+  // Solo alimentan el Wrap ampliado (WrapStories); nada de esto se pinta si
+  // la biblioteca está vacía, así que no vale la pena pedirlo ahí arriba.
+  const [rachasPerfil, percentilAnio] = games.length > 0
+    ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
+    : [{ actual: 0, mejor: 0, diasActivos: 0 }, null];
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
   const showcaseTrophiesData = showcaseTrophyIds.length > 0 
@@ -242,6 +248,10 @@ export default async function PerfilPage({
                 esteAnio={resumen.esteAnio}
                 juegosEsteAnio={juegosEsteAnio}
                 handle={handle}
+                playerName={profile.displayName ?? player.name}
+                mejorMes={resumen.mejorMes}
+                rachas={rachasPerfil}
+                percentil={percentilAnio}
               />
             ),
             stats: (
