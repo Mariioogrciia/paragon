@@ -19,17 +19,15 @@ export default async function PlanificadorPage() {
     getLibrary(profile),
     listCollections(profile.userId),
   ]);
-  const plan = collections.find((collection) => /plan|objetiv|platino/i.test(collection.name));
-  const objetivos = plan ? games.filter((game) => plan.gameIds.includes(game.id) && !game.isWishlist) : [];
 
   return (
     <div className="space-y-6">
       <BackButton fallbackHref="/" />
       <div>
         <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Planificador</h1>
-        <p className="mt-2 max-w-[650px] text-sm text-muted">Crea una carpeta llamada «Plan de platinos» u «Objetivos» y añade juegos desde cada ficha para construir tu ruta.</p>
+        <p className="mt-2 max-w-[650px] text-sm text-muted">Elige cualquier carpeta como tu plan y añade juegos desde cada ficha para construir tu ruta.</p>
       </div>
-      <Planificador games={objetivos} handle={profile.handle} />
+      <Planificador collections={collections} library={games} handle={profile.handle} />
       <CarpetasManager collections={collections} library={games} />
     </div>
   );

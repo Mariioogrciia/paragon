@@ -79,6 +79,17 @@ export function paragonProgress(games: Game[]): ParagonProgress {
       earned[grade] += game.earned?.[grade] ?? 0;
     }
 
+    // Steam no tiene jerarquía de metales (`game.earned` se queda a null,
+    // ver lib/sync.ts) — sus logros sueltos no daban NADA de XP hasta ahora,
+    // solo el bonus de "platino" del 100% (abajo). Se cuentan al peso de
+    // bronce, el escalón más bajo de PSN: no hay dato de rareza aquí como sí
+    // lo hay en lib/paragonScore.ts (esa es una cifra aparte a propósito,
+    // ver la tabla de decisiones del HANDOFF) — esto solo iguala el trato,
+    // no puntúa por rareza.
+    if (game.platform === "steam") {
+      earned.bronze += game.earnedTotal;
+    }
+
     // Mutuamente excluyentes, igual que el estado en gameProgress (stats.ts):
     // un 100% de Steam cuenta como platino, no como "juego completado" aparte
     // — contarlo en los dos sería XP de más por el mismo hito.

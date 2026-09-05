@@ -8,6 +8,7 @@ export async function getParagonLevel(userId: string): Promise<ParagonLevel> {
   const rows = await db
     .select({
       earned: userGames.earned,
+      earnedTotal: userGames.earnedTotal,
       progressPercent: userGames.progressPercent,
       isWishlist: userGames.isWishlist,
       platform: games.platform,
@@ -23,6 +24,11 @@ export async function getParagonLevel(userId: string): Promise<ParagonLevel> {
     xp += (earned.bronze ?? 0) * 10;
     xp += (earned.silver ?? 0) * 25;
     xp += (earned.gold ?? 0) * 50;
+
+    // Mismo trato que en lib/level.ts (paragonProgress): Steam no tiene
+    // metales (`earned` se queda vacío) — sus logros sueltos se cuentan al
+    // peso de bronce, la única forma de que valgan algo antes del 100%.
+    if (row.platform === "steam") xp += row.earnedTotal * 10;
 
     // Mutuamente excluyentes, igual que en lib/stats.ts (gameProgress) y
     // lib/level.ts (paragonProgress): un 100% de Steam vale como platino

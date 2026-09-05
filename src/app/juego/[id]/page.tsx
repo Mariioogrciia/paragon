@@ -28,6 +28,8 @@ import { GameDlcs } from "@/components/GameDlcs";
 import { GameTrophyBreakdown } from "@/components/GameTrophyBreakdown";
 import { BackButton } from "@/components/BackButton";
 import { GameWishlistCard } from "@/components/GameWishlistCard";
+import { CollectionPicker } from "@/components/Collections";
+import { listCollections } from "@/lib/collections";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -94,12 +96,16 @@ export default async function JuegoGlobalPage({
   // numérico y la biblioteca (`/u/[handle]/[gameId]`) espera el namespaced.
   let miGameId: string | null = null;
   let miVotoDificultad: number | null = null;
+  // Las carpetas son propias de quien mira, no del juego — solo hace falta
+  // pedirlas cuando de verdad hay sesión, igual que el resto de este bloque.
+  let carpetas: Awaited<ReturnType<typeof listCollections>> = [];
   if (session?.user?.id) {
     let profile;
-    [profile, miGameId, miVotoDificultad] = await Promise.all([
+    [profile, miGameId, miVotoDificultad, carpetas] = await Promise.all([
       getProfileByUserId(session.user.id),
       ownsGame(session.user.id, gameId),
       getMiVoto(session.user.id, gameId),
+      listCollections(session.user.id),
     ]);
     if (profile?.handle && miGameId) miFicha = `/u/${profile.handle}/${miGameId}`;
   }
@@ -328,7 +334,14 @@ export default async function JuegoGlobalPage({
             puedeVotar={tieneJuego}
           />
         </div>
-        
+
+        {/* Solo si ya está en tu biblioteca: sin un `games.id` propio no hay
+            a qué carpeta añadirlo (una carpeta agrupa filas de `user_game`,
+            no fichas globales por igdbId). Mismo componente que ya usa
+            `/u/[handle]/[gameId]` — añadir y quitar es el mismo botón
+            (toggleGameCollectionAction), no dos acciones distintas. */}
+        {tieneJuego && miGameId && <CollectionPicker collections={carpetas} gameId={miGameId} />}
+
         <GameTrophyBreakdown breakdown={trophyBreakdown} />
         {detalles && (
           <GameDetailsSidebar

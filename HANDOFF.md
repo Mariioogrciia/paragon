@@ -7,6 +7,55 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 5 de septiembre de 2026 (continuación 2) — 4 correcciones pedidas directamente por el usuario
+
+- **Bug real en "Logros de Paragon"** (`ParagonAchievements.tsx`): el contador
+  de arriba (`4/6` o lo que sea) salía de `earnedIds.length` — el total de
+  TODAS las insignias que tiene el usuario en la base (incluidas otras que
+  ni se enseñan aquí, como "crítico"/"sociable"), no de cuántas de las 6 que
+  se pintan están conseguidas de verdad. Con el número exacto de insignias
+  ajenas coincidiendo por casualidad, salía "6/6" con solo 4 tarjetas en
+  verde. Arreglado calculando el total a partir del mismo booleano `earned`
+  que ya pinta cada tarjeta. De paso, "Experto"/"Leyenda"/"Cazador"/"Primera
+  joya" contaban solo platino real de PSN (`g.earned?.platinum`) — no el
+  100% de Steam, que `checkAndGrantBadges` (lib/profiles.ts) sí cuenta desde
+  hace tiempo vía `esPlatinoEquivalente`. Ahora las tarjetas usan la misma
+  función, así que el progreso que enseñan coincide con lo que de verdad
+  hace falta para la insignia.
+- **Añadir/quitar de una carpeta desde la ficha de juego** (`/juego/[id]`):
+  antes `CollectionPicker` solo vivía en `/u/[handle]/[gameId]` (tu propia
+  fila de biblioteca). Añadido también en la ficha global, cuando el juego
+  ya está en tu biblioteca (usa `ownsGame()`, que ya existía, para resolver
+  el `games.id` concreto) — mismo componente y misma acción
+  (`toggleGameCollectionAction`) que ya vale para las dos cosas, añadir y
+  quitar son el mismo botón.
+- **Nivel Paragon ahora cuenta trofeos de Steam** (antes solo contaba
+  metales de PSN + el bonus de "platino" al 100% de Steam; un logro suelto
+  de Steam sin llegar al 100% no daba XP). Se cuentan al peso de bronce (10
+  XP), el escalón más bajo de PSN — sin dato de rareza como sí tiene
+  `paragonScore.ts` (que sigue siendo una cifra aparte, sin tocar). Cambiado
+  en **los dos sitios que calculan esto por separado**
+  (`lib/level.ts`/`paragonProgress` y `lib/paragonLevel.ts`/`getParagonLevel`,
+  que usa la navbar) — el mismo historial de desincronización que ya avisaba
+  este documento, así que se tocaron los dos a la vez, con la misma regla.
+- **Planificador con más sustancia**: antes adivinaba qué carpeta era "el
+  plan" por su nombre (regex contra "plan"/"objetivo"/"platino" — una
+  carpeta con otro nombre no se enteraba de nada). Ahora se elige a mano con
+  un desplegable (cualquier carpeta vale). Añadido resumen real (juegos en
+  el plan, logros pendientes, progreso medio), un "Siguiente objetivo"
+  destacado (mismo lenguaje que "A un paso del platino" del panel, pero
+  sobre esta lista) y quitar del plan sin salir de la página
+  (`toggleGameCollectionAction`, reutilizada). `CarpetasManager` (gestión
+  completa de carpetas, ya construida en una sesión anterior) sigue debajo
+  tal cual.
+
+Sin verificar en el navegador logueado (sin credenciales en este entorno,
+mismo motivo de siempre) para el planificador y la carpeta en la ficha de
+juego — sí verificado el bug de logros y el nivel de Steam contra un perfil
+real (`fende21`) sin sesión propia.
+
+---
+
 ## Sesión del 5 de septiembre de 2026 (continuación) — bug real en la importación de Antigravity, pestañas en panel/perfil, Wrap en Stories
 
 ### Bug real en `ImportLibraryModal`/`actions/import.ts` (de Antigravity)
