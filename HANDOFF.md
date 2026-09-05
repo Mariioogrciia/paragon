@@ -7,6 +7,34 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 5 de septiembre de 2026 (continuación 5) — Retos semanales con variedad de verdad
+
+Última pendiente de la lista de 8. La decisión bloqueada era "a mano o con
+un generador automático" — se optó por automático: alguien inventando 3
+retos nuevos cada lunes es trabajo de mantenimiento para siempre, y no hay
+nadie dedicado a eso.
+
+`lib/missions.ts` tenía 4 retos fijos (siempre los mismos, solo cambiaban
+los números). Ahora hay un **catálogo de 12** y cada semana se eligen 4 al
+azar — pero con una semilla estable por semana (`mulberry32`, sembrado con
+un hash de "2026-W36"), no `Math.random()`: todo el mundo ve LOS MISMOS 4
+retos esta semana (comparables entre amigos, como una liga), y la semana
+que viene salen otros 4 solos, sin que nadie tenga que decidir nada. Nuevos
+en el catálogo: fin de semana cazador, doble ración (2 juegos), explorador
+(2 géneros), multiplataforma, racha de oro, cosecha de plata, ultra raro
+(≤5% de rareza) — antes solo estaban los 4 originales (ritmo de caza,
+platino semanal, rarezas, constancia).
+
+Sin tabla nueva ni migración: sigue calculándose en vivo contra
+`user_trophy` de esta semana, igual que antes — la única novedad real es
+CUÁLES de los 12 se enseñan. Verificado con datos reales (`fende21`, últimos
+30 días: 2 platinos, 12 trofeos raros, 5 juegos, 7 géneros, 25 días
+distintos) y con la secuencia de semillas (4 semanas seguidas dan 4
+combinaciones distintas, un año distinto con el mismo número de semana da
+otra combinación distinta).
+
+---
+
 ## Sesión del 5 de septiembre de 2026 (continuación 4) — Webhook de Discord para logros nuevos
 
 Última de las 3 ideas pendientes de la lista original de 8. La alternativa
@@ -211,11 +239,10 @@ Verificado en el navegador contra un usuario real (`fende21`, 253 trofeos
 este año, sí navega las 6 diapositivas) y contra uno sin trofeos este año
 (`mario_16`, cae en la diapositiva única).
 
-**Pendiente de la lista de 8 ideas** (queda 1 sin construir): Retos
-semanales — falta decidir a mano vs generador automático antes de construir
-nada (ver "Sesión del 5 de septiembre de 2026 — Epic cerrado..." más abajo).
-El webhook de Discord para anunciar logros ya está construido, ver la
-sesión de arriba.
+**Las 8 ideas originales están construidas** (Ruleta del Backlog, banner de
+juego favorito, Paragon Score, Wrap en Stories, 3 pestañas del perfil no
+estaban en la lista pero salieron del mismo hilo de trabajo, webhook de
+Discord y Retos semanales con catálogo — ver las sesiones de arriba).
 
 ---
 
