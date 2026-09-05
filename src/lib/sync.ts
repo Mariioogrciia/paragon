@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies, syncRuns } from "@/db/schema";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
@@ -10,6 +10,7 @@ import {
 } from "@/lib/steam/client";
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
+import { anunciarLogrosNuevos } from "@/lib/discordWebhook";
 
 /**
  * Trae datos de las plataformas y los guarda.
@@ -215,12 +216,47 @@ export async function syncLibrary(
 
 /* --------------------------------- Detalle -------------------------------- */
 
+/** Devuelve los trofeos de este lote que pasan a "conseguido" en esta misma
+ * sincronización — ni estaban guardados como conseguidos antes, ni son un
+ * trofeo que ya sabíamos que tenía. Es lo único que necesita el aviso de
+ * Discord (lib/discordWebhook.ts): sin esto, cada sincronización volvería a
+ * "avisar" de trofeos de hace años. */
+async function nuevosEnEsteLote(userId: string, gameId: string, batch: Trophy[]): Promise<Trophy[]> {
+  const conseguidos = batch.filter((t) => t.earned);
+  if (conseguidos.length === 0) return [];
+
+  const yaEstaban = await db
+    .select({ trophyId: userTrophies.trophyId })
+    .from(userTrophies)
+    .where(
+      and(
+        eq(userTrophies.userId, userId),
+        eq(userTrophies.gameId, gameId),
+        eq(userTrophies.earned, true),
+        inArray(
+          userTrophies.trophyId,
+          conseguidos.map((t) => t.id),
+        ),
+      ),
+    );
+  const yaEstabanSet = new Set(yaEstaban.map((r) => r.trophyId));
+
+  return conseguidos.filter((t) => !yaEstabanSet.has(t.id));
+}
+
 async function saveTrophies(
   userId: string,
   gameId: string,
   trophies: Trophy[],
-): Promise<void> {
+): Promise<Trophy[]> {
+  const nuevos: Trophy[] = [];
+
   for (const batch of chunked(trophies)) {
+    // Se comprueba ANTES de escribir: después del upsert de abajo, todo el
+    // lote está ya marcado como conseguido y no habría forma de distinguir
+    // lo nuevo de lo de siempre.
+    nuevos.push(...(await nuevosEnEsteLote(userId, gameId, batch)));
+
     await db
       .insert(gameTrophies)
       .values(
@@ -274,6 +310,8 @@ async function saveTrophies(
         },
       });
   }
+
+  return nuevos;
 }
 
 /**
@@ -364,6 +402,19 @@ export async function syncGameTrophies(
 ): Promise<number> {
   const { platform, nativeId } = parseGameKey(gameId);
 
+  // Antes de tocar nada: si nunca se ha traído el detalle de este juego
+  // (recién vinculada la cuenta, o un juego que se añadió a la biblioteca
+  // pero cuyos logros no se habían pedido todavía), CUALQUIER trofeo
+  // conseguido sale como "nuevo" en la comprobación de más abajo — aunque
+  // sea un platino de hace 5 años. Sin este aviso, vincular una cuenta con
+  // 200 juegos ya jugados mandaría 200 "¡enhorabuena!" al Discord de golpe.
+  const [{ trophiesSyncedAt: yaSincronizadoAntes } = { trophiesSyncedAt: null }] = await db
+    .select({ trophiesSyncedAt: userGames.trophiesSyncedAt })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+  const primeraSincronizacion = yaSincronizadoAntes === null;
+
   let trophies: Trophy[];
 
   if (platform === "psn") {
@@ -408,7 +459,7 @@ export async function syncGameTrophies(
     return 0;
   }
 
-  await saveTrophies(userId, gameId, trophies);
+  const nuevos = await saveTrophies(userId, gameId, trophies);
 
   const earnedTotal = trophies.filter((t) => t.earned).length;
 
@@ -433,6 +484,26 @@ export async function syncGameTrophies(
       .update(games)
       .set({ definedTotal: trophies.length })
       .where(eq(games.id, gameId));
+  }
+
+  // Se pide título/carátula ya al final (con cualquier metadato recién
+  // sincronizado arriba ya guardado) y solo si de verdad hay algo nuevo que
+  // avisar en una sincronización que NO es la primera — no vale la pena
+  // esta consulta extra en cada sincronización silenciosa, que es la
+  // inmensa mayoría, y la primera vez nunca es "nuevo" de verdad.
+  if (nuevos.length > 0 && !primeraSincronizacion) {
+    const [info] = await db
+      .select({ title: games.title, iconUrl: games.iconUrl })
+      .from(games)
+      .where(eq(games.id, gameId))
+      .limit(1);
+
+    await anunciarLogrosNuevos(userId, {
+      gameId,
+      juego: info?.title ?? gameId,
+      iconUrl: info?.iconUrl,
+      nuevos,
+    });
   }
 
   return trophies.length;

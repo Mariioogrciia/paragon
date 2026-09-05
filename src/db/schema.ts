@@ -75,6 +75,14 @@ export const users = pgTable("user", {
    */
   profileSectionOrder: jsonb("profileSectionOrder").$type<string[]>(),
 
+  /**
+   * URL del webhook de Discord donde anunciar los logros nuevos (ver
+   * lib/discordWebhook.ts). No hay bot ni permisos que pedir — el propio
+   * usuario crea el webhook desde los ajustes de su servidor de Discord
+   * (Integraciones → Webhooks) y pega la URL aquí. `null` = desactivado.
+   */
+  discordWebhookUrl: text("discordWebhookUrl"),
+
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
 

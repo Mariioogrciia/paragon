@@ -10,6 +10,7 @@ import { AvatarFrame } from "@/components/AvatarFrame";
 import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
+import { DiscordWebhookForm } from "@/components/forms/Forms";
 
 interface ProfileFormUser {
   id: string;
@@ -29,6 +30,7 @@ interface ProfileFormUser {
   statusText?: string | null;
   theme?: string | null;
   profileSectionOrder?: string[] | null;
+  discordWebhookUrl?: string | null;
 }
 
 const FRAMES = [
@@ -329,6 +331,14 @@ export function ProfileForm({
           </button>
         </div>
       </form>
+
+      {/* Fuera del <form> grande a propósito: son dos acciones de servidor
+          propias (guardar/probar), y un <form> dentro de otro no es HTML
+          válido — el navegador ignora el anidado y rompe el envío. */}
+      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <h2 className="font-semibold mb-4">Discord</h2>
+        <DiscordWebhookForm current={user.discordWebhookUrl} />
+      </section>
     </div>
   );
 }

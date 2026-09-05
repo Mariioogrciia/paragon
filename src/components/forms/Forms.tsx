@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import {
   addFriendAction,
@@ -13,6 +13,8 @@ import {
   linkUbisoftAction,
   linkEpicOAuthAction,
   updateProfileAction,
+  setDiscordWebhookAction,
+  testDiscordWebhookAction,
   type ActionState,
 } from "@/app/actions";
 
@@ -298,5 +300,61 @@ export function ProfileSettingsForm({
       </div>
       <Feedback state={state} />
     </form>
+  );
+}
+
+function TestButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="shrink-0 rounded-xl px-4 py-3.5 text-sm font-bold text-foreground transition-colors hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-50"
+      style={FIELD}
+    >
+      {pending ? "…" : "Probar"}
+    </button>
+  );
+}
+
+/**
+ * Webhook de Discord para anunciar logros nuevos (ver lib/discordWebhook.ts).
+ * Dos formularios sobre el mismo campo — guardar y probar son dos acciones
+ * de servidor distintas, y "Probar" tiene que funcionar con lo que hay
+ * escrito ANTES de guardar (para saber si la URL vale sin tener que
+ * guardarla primero a ciegas).
+ */
+export function DiscordWebhookForm({ current }: { current?: string | null }) {
+  const [url, setUrl] = useState(current ?? "");
+  const [stateGuardar, actionGuardar] = useActionState(setDiscordWebhookAction, EMPTY);
+  const [stateProbar, actionProbar] = useActionState(testDiscordWebhookAction, EMPTY);
+
+  return (
+    <div>
+      <form action={actionGuardar} className="flex gap-2.5">
+        <input
+          name="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://discord.com/api/webhooks/…"
+          autoComplete="off"
+          spellCheck={false}
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          style={FIELD}
+        />
+        <Submit>{current ? "Actualizar" : "Guardar"}</Submit>
+      </form>
+      <form action={actionProbar} className="mt-2.5 flex justify-end">
+        <input type="hidden" name="url" value={url} />
+        <TestButton />
+      </form>
+      <Feedback state={stateGuardar} />
+      <Feedback state={stateProbar} />
+      <p className="mt-3 text-xs leading-relaxed text-muted">
+        Se crea desde tu servidor de Discord: Ajustes del servidor → Integraciones → Webhooks → Nuevo
+        webhook, y se pega la URL aquí. Sin bot ni permisos que dar — Paragon solo manda un mensaje a
+        esa URL cuando consigues un trofeo nuevo.
+      </p>
+    </div>
   );
 }

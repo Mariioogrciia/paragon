@@ -7,6 +7,50 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 5 de septiembre de 2026 (continuación 4) — Webhook de Discord para logros nuevos
+
+Última de las 3 ideas pendientes de la lista original de 8. La alternativa
+real al Rich Presence (que no es técnicamente posible sin app de escritorio,
+ver más abajo): un webhook de Discord que anuncia logros nuevos en un canal,
+sin bot ni permisos OAuth — el propio usuario lo crea desde su Discord
+(Ajustes del servidor → Integraciones → Webhooks) y pega la URL en
+`/ajustes`.
+
+- **`users.discordWebhookUrl`** (migración ejecutada:
+  `scripts/anadir-discord-webhook.mts`). Validado con una regex estricta
+  (`esWebhookDiscordValido`, `lib/discordWebhook.ts`) antes de guardar: la
+  URL la pega el usuario y el servidor hace un POST a lo que sea que haya
+  ahí, así que sin validar el host cualquiera podría usar el propio
+  servidor de Paragon para mandar peticiones a una URL cualquiera (SSRF).
+- **Detección de "esto es nuevo de verdad"** en `lib/sync.ts`
+  (`saveTrophies`/`syncGameTrophies`): antes de cada upsert se comprueba qué
+  trofeos del lote YA estaban marcados como conseguidos en la base — los que
+  no lo estaban son los que se avisan. Sin esto, cada sincronización
+  "avisaría" de los mismos trofeos de siempre.
+- **Un aviso por juego y sincronización, no uno por trofeo**: sincronizar de
+  golpe 50 trofeos atrasados mandaría 50 mensajes seguidos (spam de verdad,
+  y tropieza con el límite de Discord de 5 peticiones/2s por webhook). Un
+  platino sí es su propio mensaje siempre — es el hito que se quiere
+  celebrar aparte del resto.
+- **Guarda real contra el caso más obvio de spam**: vincular una cuenta con
+  200 juegos ya jugados no manda 200 "¡enhorabuena!" de golpe — se comprueba
+  si `userGames.trophiesSyncedAt` era `null` (nunca se había pedido el
+  detalle de este juego) y, si es la primera sincronización de verdad, no se
+  avisa de nada: un platino de hace 5 años no es una noticia de hoy.
+- Ajustes nuevo en `/ajustes` (`DiscordWebhookForm`, `Forms.tsx`): guardar y
+  "Probar" son dos `<form>` con dos acciones de servidor distintas, fuera
+  del `<form>` grande de "Guardar cambios" del resto de la página — un
+  `<form>` dentro de otro no es HTML válido y el navegador ignora el
+  anidado.
+
+Sin verificar en el navegador logueado (sin credenciales en este entorno,
+mismo motivo de siempre, y hace falta un webhook de Discord real de todas
+formas) — sí comprobado a mano el regex de validación contra intentos de
+SSRF y URLs con trucos de query string, y revisado con cuidado
+`lib/sync.ts` por ser una zona sensible con historial real de bugs.
+
+---
+
 ## Sesión del 5 de septiembre de 2026 (continuación 3) — PS Plus real, Steam por rareza, dificultad a 10
 
 - **PS Plus mostraba juegos que ya no eran los reales**: `lib/psPlus.ts`
@@ -167,10 +211,11 @@ Verificado en el navegador contra un usuario real (`fende21`, 253 trofeos
 este año, sí navega las 6 diapositivas) y contra uno sin trofeos este año
 (`mario_16`, cae en la diapositiva única).
 
-**Pendiente de la lista de 8 ideas** (quedan 2 sin construir): Retos
-semanales (falta decidir a mano vs generador automático) y el webhook de
-Discord para anunciar logros (alternativa real al Rich Presence, que no es
-posible sin app de escritorio).
+**Pendiente de la lista de 8 ideas** (queda 1 sin construir): Retos
+semanales — falta decidir a mano vs generador automático antes de construir
+nada (ver "Sesión del 5 de septiembre de 2026 — Epic cerrado..." más abajo).
+El webhook de Discord para anunciar logros ya está construido, ver la
+sesión de arriba.
 
 ---
 

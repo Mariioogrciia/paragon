@@ -48,6 +48,7 @@ import { ownsGame } from "@/lib/community";
 import { votarDificultad } from "@/lib/communityDifficulty";
 import { getGameRecommendations, type GameRecommendation } from "@/lib/recommendations";
 import type { AccountPlatform } from "@/lib/types";
+import { setDiscordWebhookUrl, esWebhookDiscordValido, enviarWebhookDePrueba } from "@/lib/discordWebhook";
 
 export interface ActionState {
   error?: string;
@@ -128,6 +129,43 @@ export async function updateProfileAction(
   revalidatePath("/", "layout");
 
   return { success: "Perfil actualizado correctamente." };
+}
+
+/* ------------------------------ Webhook de Discord ----------------------------- */
+
+export async function setDiscordWebhookAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const userId = await requireUserId();
+  const url = String(formData.get("url") ?? "").trim();
+
+  try {
+    await setDiscordWebhookUrl(userId, url || null);
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "No se pudo guardar." };
+  }
+
+  revalidatePath("/ajustes");
+  return url ? { success: "Webhook guardado. Los logros nuevos se anuncian ahí." } : { success: "Webhook quitado." };
+}
+
+export async function testDiscordWebhookAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireUserId();
+  const url = String(formData.get("url") ?? "").trim();
+
+  if (!url) return { error: "Pega primero la URL del webhook." };
+  if (!esWebhookDiscordValido(url)) {
+    return { error: "Eso no parece una URL de webhook de Discord." };
+  }
+
+  const ok = await enviarWebhookDePrueba(url);
+  return ok
+    ? { success: "Mensaje de prueba enviado — revisa el canal de Discord." }
+    : { error: "Discord no aceptó el mensaje. Comprueba que el webhook sigue existiendo." };
 }
 
 /* ------------------------------ Cuentas de plataforma ----------------------------- */
