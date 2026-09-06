@@ -130,6 +130,36 @@ el hook `debug` de postgres.js para contar consultas, `pg_stat_statements`
 para tiempos por consulta, y un script que lee el stream marcando en qué
 milisegundo llega cada parte del HTML.
 
+### Sincronización automática al abrir la ficha de un juego
+
+Decisión del usuario tras plantearle las tres variables: **6 horas de
+caducidad, solo PSN y Steam, y solo al abrir la ficha de un juego** (no al
+entrar al perfil). `AutoSyncJuego.tsx` (nuevo) + la regla en
+`u/[handle]/[gameId]/page.tsx`.
+
+Reutiliza `refrescarJuegoAction` —la misma acción que ya usaba el modo
+enfoque— en vez de escribir sincronización nueva. Quien decide si toca es el
+SERVIDOR; el componente de cliente solo dispara. Así no hay dos copias de la
+regla que se puedan desincronizar.
+
+**Xbox queda fuera a propósito**: OpenXBL da 150 peticiones/hora compartidas
+entre TODOS los usuarios de Paragon. Los juegos manuales también quedan
+fuera (no hay nada que sincronizar). Y solo se dispara en TU propio juego:
+si no, cualquiera podría quemar cuota ajena abriendo un perfil público
+muchas veces.
+
+Ojo, ya existía algo parecido y sigue ahí: `getGameDetail` sincroniza de
+forma BLOQUEANTE cuando el juego no se ha sincronizado nunca o cuando
+detecta descuadre entre biblioteca y detalle. Lo nuevo es solo la caducidad
+por tiempo, y esa sí va en segundo plano.
+
+Verificado: la ficha carga igual y el componente no se monta para un
+visitante anónimo. Contra datos reales de `fende21`: 204 juegos de PSN
+caducados (>6h), 0 de Steam, y los 3 manuales correctamente excluidos.
+**Sin probar con sesión iniciada** (sin credenciales en este entorno, mismo
+motivo de siempre) — merece una comprobación real: abrir un juego tuyo de
+PSN que lleve más de 6h sin sincronizar y ver si aparece el aviso.
+
 ### Las pestañas del perfil son ahora rutas (el perfil pesa un 86% menos)
 
 `SectionTabs` renderiza las tres pestañas en el servidor y solo oculta las
