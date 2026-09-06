@@ -95,13 +95,19 @@ export default async function PerfilPage({
   }
   const stats = summarise(games);
   const nivelParagon = paragonProgress(games);
-  // Las carpetas del dueño del perfil: son parte de cómo ordena su biblioteca.
+  // Secuencial a propósito, no un descuido: el pool de Postgres tiene un
+  // máximo de 5 conexiones a la vez (ver db/index.ts) compartido con TODO
+  // lo demás que esta misma página ya pide (getLibrary, y lo que fetchea
+  // cada pestaña de SectionTabs, que se renderiza entera en el servidor
+  // aunque esté oculta). Un intento de paralelizar esto con Promise.all
+  // dejó una petición colgada más de 60s el 6 de septiembre de 2026 — la
+  // lentitud real de esta página tiene otra causa (pendiente de investigar
+  // con cuidado) y no vale la pena arriesgar un cuelgue por adelantar unos
+  // cientos de ms.
   const carpetas = await listCollections(profile.userId);
   const resumen = await resumenHistorico(profile.userId);
   const juegosEsteAnio = await juegosDelAnio(profile.userId);
   const badges = await getUserBadges(profile.userId);
-  // Solo alimentan el Wrap ampliado (WrapStories); nada de esto se pinta si
-  // la biblioteca está vacía, así que no vale la pena pedirlo ahí arriba.
   const [rachasPerfil, percentilAnio] = games.length > 0
     ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
     : [{ actual: 0, mejor: 0, diasActivos: 0 }, null];
