@@ -550,6 +550,14 @@ function limpiar(title: string): string {
     .replace(/[’‘]/g, "'")
     .replace(/\s*\b(trophy set|trophy list|trophies)\s*$/i, "")
     .replace(/\s+/g, " ")
+    // El patrón real más común es "Franchise®: Subtítulo" — el símbolo
+    // sustituido por espacio deja "Franchise : Subtítulo", con un espacio
+    // de más antes de los dos puntos que IGDB no tiene nunca. Una
+    // comparación EXACTA (`name = (...)`) fallaba por esto solo, para
+    // títulos tan corrientes como "Call of Duty®: Black Ops" — confirmado
+    // contra la API real el 5 de septiembre de 2026 (113 juegos sin
+    // igdbId, la mayoría con este patrón exacto).
+    .replace(/\s+:/g, ":")
     .trim();
 }
 

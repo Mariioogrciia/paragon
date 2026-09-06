@@ -323,7 +323,7 @@ async function saveTrophies(
  */
 async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void> {
   const [row] = await db
-    .select({ syncedAt: games.metadataSyncedAt })
+    .select({ syncedAt: games.metadataSyncedAt, title: games.title })
     .from(games)
     .where(eq(games.id, gameId))
     .limit(1);
@@ -331,19 +331,37 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
   if (row?.syncedAt) return;
 
   const metadata = await fetchStoreMetadata(nativeId);
-  if (!metadata) return;
+
+  // La API de la tienda no da igdbId (no es lo suyo) — sin este emparejado
+  // aparte, un juego de Steam sincronizado DESPUÉS del script de migración
+  // masiva se quedaba sin igdbId para siempre, aunque el resto de sus
+  // metadatos sí llegaran bien. Con el título que ya tenemos guardado (de
+  // la biblioteca de Steam) basta para buscarlo, igual que hace
+  // `syncIgdbMetadata` para PSN/Xbox.
+  let igdbId: number | null = null;
+  if (row?.title) {
+    try {
+      igdbId = (await searchGames(row.title, 1))[0]?.igdbId ?? null;
+    } catch {
+      // Sin IGDB no pasa nada: el resto de metadatos de Steam sigue
+      // guardándose igual más abajo.
+    }
+  }
+
+  if (!metadata && igdbId === null) return;
 
   await db
     .update(games)
     .set({
-      developer: metadata.developer ?? null,
-      publisher: metadata.publisher ?? null,
-      genres: metadata.genres ?? null,
-      pegi: metadata.pegi ?? null,
+      developer: metadata?.developer ?? null,
+      publisher: metadata?.publisher ?? null,
+      genres: metadata?.genres ?? null,
+      pegi: metadata?.pegi ?? null,
       // La carátula buena es la que da la tienda, con su hash. La ruta clásica
       // (cdn.../steam/apps/<id>/header.jpg) devuelve un placeholder de 1 KB en
       // los juegos recientes — por eso Battlefield 6 salía sin foto.
-      ...(metadata.headerImage ? { iconUrl: metadata.headerImage } : {}),
+      ...(metadata?.headerImage ? { iconUrl: metadata.headerImage } : {}),
+      igdbId,
       metadataSyncedAt: new Date(),
     })
     .where(eq(games.id, gameId));
@@ -380,6 +398,13 @@ async function syncIgdbMetadata(gameId: string, title: string): Promise<void> {
         // Optional: only update coverUrl if the game doesn't have an icon yet, or overwrite it?
         // PSN already gives a good iconUrl in the library. Let's keep the IGDB one if provided.
         ...(metadata.coverUrl ? { iconUrl: metadata.coverUrl } : {}),
+        // Se traía el emparejamiento con IGDB (developer/publisher/genres...)
+        // pero nunca se guardaba el propio `igdbId` — el campo que de verdad
+        // hace falta para agrupar el mismo juego entre plataformas
+        // (lib/community.ts) y para recomendaciones. Sin esto, cualquier
+        // juego de PSN/Xbox sincronizado DESPUÉS del script de migración
+        // masiva se quedaba sin igdbId para siempre, en silencio.
+        igdbId: metadata.igdbId ?? null,
         metadataSyncedAt: new Date(),
       })
       .where(eq(games.id, gameId));
