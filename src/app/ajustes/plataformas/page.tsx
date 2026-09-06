@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { signOutAction, syncNowAction, syncPlatformAction, unlinkAccountAction } from "@/app/actions";
+import { signOutAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, LinkXboxForm, LinkEpicForm, LinkUbisoftForm, ProfileSettingsForm } from "@/components/forms/Forms";
+import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, LinkXboxForm, LinkEpicForm, LinkUbisoftForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
@@ -118,10 +118,7 @@ function PlatformSection({
             {account.level !== null ? `Nivel ${account.level}` : "Cuenta vinculada"}
             {sincronizado && ` · sincronizado ${sincronizado}`}
           </p>
-          <form action={syncPlatformAction} className="mt-2">
-            <input type="hidden" name="platform" value={platform} />
-            <button className="text-xs font-semibold text-accent hover:underline">Sincronizar {PLATFORM_LABEL[platform]}</button>
-          </form>
+          <SyncPlatformForm platform={platform} label={PLATFORM_LABEL[platform]} />
         </div>
       )}
 
@@ -226,14 +223,7 @@ export default async function AjustesPlataformasPage() {
             Sincronización
           </h2>
 
-          <form action={syncNowAction}>
-            <button
-              className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,167,255,0.4)] active:translate-y-0 active:scale-95"
-              style={{ background: "var(--accent-grad)" }}
-            >
-              Sincronizar ahora
-            </button>
-          </form>
+          <SyncNowForm />
 
           <div
             className="mt-4 flex gap-3 rounded-xl p-3.5"

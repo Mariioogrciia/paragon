@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { ThemeCustomizer } from "./ThemeCustomizer";
-import { syncNowAction } from "@/app/actions";
+import { syncNowAction, type ActionState } from "@/app/actions";
+
+const SYNC_INICIAL: ActionState = {};
 
 /**
  * Antes eran 9 enlaces en una sola fila (más "Admin" como un décimo, para
@@ -131,35 +132,50 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
  * Antes "Sincronizar ahora" solo vivía en Ajustes → Plataformas, a varios
  * clics de cualquier pantalla — para "acabo de conseguir un trofeo y quiero
  * verlo ya" hacía falta saber que ese botón existía y dónde estaba. Mismo
- * `syncNowAction` de siempre, solo que accesible desde cualquier página.
+ * `syncNowAction` de siempre (con su cooldown, ver actions.ts), solo que
+ * accesible desde cualquier página — el aviso de "espera Xs" se enseña en
+ * un globo bajo el icono, no en silencio como antes de tener feedback.
  */
 function BotonSincronizar() {
-  const { pending } = useFormStatus();
+  const [state, action, pending] = useActionState(syncNowAction, SYNC_INICIAL);
+
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      aria-label="Sincronizar trofeos ahora"
-      title="Sincronizar trofeos ahora"
-      className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-50"
-      style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className={pending ? "animate-spin" : ""}
-      >
-        <path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9c2.5 0 4.7 1.1 6.2 2.8" />
-        <path d="M21 3v6h-6" />
-      </svg>
-    </button>
+    <div className="relative">
+      <form action={action}>
+        <button
+          type="submit"
+          disabled={pending}
+          aria-label="Sincronizar trofeos ahora"
+          title="Sincronizar trofeos ahora"
+          className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-50"
+          style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className={pending ? "animate-spin" : ""}
+          >
+            <path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9c2.5 0 4.7 1.1 6.2 2.8" />
+            <path d="M21 3v6h-6" />
+          </svg>
+        </button>
+      </form>
+      {state.error && (
+        <div
+          className="absolute right-0 top-11 z-50 w-48 rounded-lg px-3 py-2 text-xs font-semibold shadow-lg"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--danger)" }}
+        >
+          {state.error}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -252,11 +268,7 @@ export function Header({
         </nav>
 
         <div className="ml-auto flex items-center gap-3.5">
-          {user?.tieneCuentas && (
-            <form action={syncNowAction}>
-              <BotonSincronizar />
-            </form>
-          )}
+          {user?.tieneCuentas && <BotonSincronizar />}
 
           {user && (
             <Link

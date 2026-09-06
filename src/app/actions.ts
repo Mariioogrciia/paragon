@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, activityComments, activityReactions } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { users, userGames, activities, activityComments, activityReactions, platformAccounts } from "@/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 import { auth, signIn, signOut } from "@/auth";
 import {
   CollectionNameError,
@@ -286,18 +286,72 @@ export async function unlinkAccountAction(formData: FormData): Promise<void> {
   revalidatePath("/", "layout");
 }
 
-export async function syncNowAction(): Promise<void> {
-  const userId = await requireUserId();
-  await resyncLibraries(userId);
-  revalidatePath("/", "layout");
+/**
+ * Antes nada impedía darle a "Sincronizar ahora" veinte veces seguidas.
+ * Con Xbox vinculado eso puede agotar la cuota compartida de OpenXBL (150
+ * peticiones/hora entre TODOS los usuarios de Paragon, no por cuenta — ver
+ * el aviso en lib/xbl/client.ts) solo por un doble-clic o alguien
+ * impaciente. Se reutiliza `platformAccounts.syncedAt` (que `resyncLibraries`
+ * ya actualiza al terminar) en vez de una columna nueva: es exactamente
+ * "cuándo se sincronizó de verdad la última vez".
+ */
+const SYNC_COOLDOWN_MS = 2 * 60 * 1000;
+
+async function ultimaSincronizacion(
+  userId: string,
+  platform?: AccountPlatform,
+): Promise<Date | null> {
+  const db = getDb();
+  const [fila] = await db
+    .select({ ultimo: sql<Date | null>`max(${platformAccounts.syncedAt})` })
+    .from(platformAccounts)
+    .where(
+      platform
+        ? and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform))
+        : eq(platformAccounts.userId, userId),
+    );
+  return fila?.ultimo ? new Date(fila.ultimo) : null;
 }
 
-export async function syncPlatformAction(formData: FormData): Promise<void> {
+function esperaRestante(ultimo: Date | null): ActionState | null {
+  if (!ultimo) return null;
+  const transcurrido = Date.now() - ultimo.getTime();
+  if (transcurrido >= SYNC_COOLDOWN_MS) return null;
+
+  const segundos = Math.ceil((SYNC_COOLDOWN_MS - transcurrido) / 1000);
+  return { error: `Ya se sincronizó hace muy poco — espera ${segundos}s.` };
+}
+
+export async function syncNowAction(
+  _prev: ActionState,
+  _formData: FormData,
+): Promise<ActionState> {
+  const userId = await requireUserId();
+
+  const espera = esperaRestante(await ultimaSincronizacion(userId));
+  if (espera) return espera;
+
+  await resyncLibraries(userId);
+  revalidatePath("/", "layout");
+  return { success: "Sincronizado." };
+}
+
+export async function syncPlatformAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const userId = await requireUserId();
   const platform = String(formData.get("platform")) as AccountPlatform;
-  if (!["psn", "steam", "google", "xbox", "epic", "ubisoft"].includes(platform)) return;
+  if (!["psn", "steam", "google", "xbox", "epic", "ubisoft"].includes(platform)) {
+    return { error: "Plataforma no válida." };
+  }
+
+  const espera = esperaRestante(await ultimaSincronizacion(userId, platform));
+  if (espera) return espera;
+
   await resyncPlatform(userId, platform);
   revalidatePath("/", "layout");
+  return { success: "Sincronizado." };
 }
 
 /* ------------------------------------ Carpetas ----------------------------------- */

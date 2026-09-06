@@ -15,6 +15,8 @@ import {
   updateProfileAction,
   setDiscordWebhookAction,
   testDiscordWebhookAction,
+  syncNowAction,
+  syncPlatformAction,
   type ActionState,
 } from "@/app/actions";
 
@@ -356,5 +358,54 @@ export function DiscordWebhookForm({ current }: { current?: string | null }) {
         esa URL cuando consigues un trofeo nuevo.
       </p>
     </div>
+  );
+}
+
+function SyncSubmit() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      disabled={pending}
+      className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,167,255,0.4)] active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+      style={{ background: "var(--accent-grad)" }}
+    >
+      {pending ? "Sincronizando…" : "Sincronizar ahora"}
+    </button>
+  );
+}
+
+/** El botón "Sincronizar ahora" de Ajustes → Plataformas. Con cooldown de
+ * verdad ahora (ver syncNowAction): sin `useActionState` no había forma de
+ * enseñar "espera 47s" cuando se pulsaba de más — antes simplemente no
+ * pasaba nada, sin que nadie supiera por qué. */
+export function SyncNowForm() {
+  const [state, action] = useActionState(syncNowAction, EMPTY);
+  return (
+    <form action={action}>
+      <SyncSubmit />
+      <Feedback state={state} />
+    </form>
+  );
+}
+
+function SyncPlatformSubmit({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button disabled={pending} className="text-xs font-semibold text-accent hover:underline disabled:pointer-events-none disabled:opacity-50">
+      {pending ? "Sincronizando…" : `Sincronizar ${label}`}
+    </button>
+  );
+}
+
+/** Mismo cooldown que `SyncNowForm`, pero por plataforma (una cuenta a la
+ * vez) — el botón suelto que hay junto a cada cuenta vinculada. */
+export function SyncPlatformForm({ platform, label }: { platform: string; label: string }) {
+  const [state, action] = useActionState(syncPlatformAction, EMPTY);
+  return (
+    <form action={action} className="mt-2">
+      <input type="hidden" name="platform" value={platform} />
+      <SyncPlatformSubmit label={label} />
+      <Feedback state={state} />
+    </form>
   );
 }
