@@ -130,6 +130,46 @@ el hook `debug` de postgres.js para contar consultas, `pg_stat_statements`
 para tiempos por consulta, y un script que lee el stream marcando en qué
 milisegundo llega cada parte del HTML.
 
+### Las pestañas del perfil son ahora rutas (el perfil pesa un 86% menos)
+
+`SectionTabs` renderiza las tres pestañas en el servidor y solo oculta las
+que no tocan. El precio real de eso, medido: `LibraryGrid` es un componente
+de CLIENTE y recibía los 291 juegos enteros, así que **cada** visita al
+perfil mandaba 1.030 KB aunque la pestaña por defecto fuera "Resumen" y
+nadie mirase la biblioteca.
+
+| ruta | antes | ahora |
+|---|---|---|
+| `/u/[handle]` (Resumen) | 1.030 KB | **142 KB** |
+| `/u/[handle]/biblioteca` (nueva) | — | 457 KB, solo si vas |
+| `/u/[handle]/estadisticas` | ya existía | 535 KB |
+
+`ProfileTabsNav.tsx` (nuevo) mantiene el mismo aspecto que tenían las
+pestañas, así que no cambia la sensación de uso, y de regalo cada pestaña
+es enlazable y compartible (antes la activa vivía en `localStorage`,
+invisible desde fuera). El Resumen se ahorra además la consulta de
+carpetas. `SectionTabs` sigue existiendo y sigue usándose en el panel.
+
+`profileSections.ts` ya no ofrece "collections" ni "biblioteca" como
+secciones reordenables en /ajustes (no se pintan en el Resumen, ofrecerlas
+prometía algo que no iba a pasar). Los órdenes ya guardados con esas claves
+no rompen nada: `normalizeSectionOrder` las descarta.
+
+### Cosas que se revisaron y NO eran lo que este documento decía
+
+- **El error de hidratación en todas las páginas** (anotado como
+  `task_9310785c`): **no se reprodujo**. Ni en `/noticias` ni en el perfil
+  ni en la biblioteca aparece nada de hidratación en la consola. O se
+  arregló por el camino, o solo pasa con sesión iniciada (no comprobable en
+  este entorno, sin credenciales).
+- **"La nav tiene 9 destinos y satura"**: falso de facto. El Header ya
+  agrupa en 5 visibles (Panel, Biblioteca, Comunidad, Ligas, Amigos) más un
+  desplegable "Más" con Descubrir, Noticias, Planificador y Rankings. Sigue
+  habiendo solapes conceptuales reales (Rankings vs Ligas, Noticias sueltas
+  vs las de cada plataforma en Descubrir, `/ritmo` vs Estadísticas), pero
+  no es un problema de saturación visual y no justifica reestructurar
+  páginas.
+
 ### Favicon: el bug real (no era caché del navegador)
 
 La sesión anterior investigó "el favicon se ha ido", vio que `app/icon.jpg`
