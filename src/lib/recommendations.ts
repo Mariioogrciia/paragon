@@ -2,6 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
+import type { TrophyGrade } from "@/lib/types";
 
 export interface TrophyRecommendation {
   gameId: string;
@@ -11,6 +12,11 @@ export interface TrophyRecommendation {
   detail: string;
   rarityPercent: number | null;
   gameProgress: number;
+  /** Foto real del logro (PSN/Steam) — la tarjeta la usa en vez de un
+   * cuadrado de color por metal, que antes era SIEMPRE "oro" a pelo, sin
+   * mirar el metal real del trofeo. */
+  iconUrl: string | null;
+  grade: TrophyGrade | null;
 }
 
 export async function getTrophyRecommendations(userId: string, limit = 6): Promise<TrophyRecommendation[]> {
@@ -23,6 +29,8 @@ export async function getTrophyRecommendations(userId: string, limit = 6): Promi
       detail: gameTrophies.detail,
       rarityPercent: userTrophies.rarityPercent,
       gameProgress: userGames.progressPercent,
+      iconUrl: gameTrophies.iconUrl,
+      grade: gameTrophies.grade,
     })
     .from(userTrophies)
     .innerJoin(userGames, and(eq(userGames.userId, userTrophies.userId), eq(userGames.gameId, userTrophies.gameId)))
@@ -41,7 +49,12 @@ export async function getTrophyRecommendations(userId: string, limit = 6): Promi
     )
     .limit(limit);
 
-  return rows.map((row) => ({ ...row, rarityPercent: row.rarityPercent === null ? null : Number(row.rarityPercent) }));
+  return rows.map((row) => ({
+    ...row,
+    rarityPercent: row.rarityPercent === null ? null : Number(row.rarityPercent),
+    iconUrl: row.iconUrl ?? null,
+    grade: row.grade ?? null,
+  }));
 }
 
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";

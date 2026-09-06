@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type Game, type Trophy } from "@/lib/types";
 import { gradeLabel, TrophyIcon } from "./TrophyIcon";
+import { TrophyPhoto } from "@/components/TrophyList";
 import { colorFor, rarity } from "@/lib/design";
 import { TiltCard } from "@/components/TiltCard";
 
@@ -32,21 +33,23 @@ export function ShowcaseTrophies({
               href={`/u/${handle}/${game.id}`}
               className={`relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-2xl hover:border-[rgb(var(--accent-rgb)/0.5)] group block ${trophy.grade === 'platinum' || trophy.grade === 'gold' ? 'holo-card' : ''}`}
             >
-              <div className="absolute top-0 right-0 p-3 opacity-20 transition-opacity group-hover:opacity-40">
-                <TrophyIcon grade={trophy.grade ?? "bronze"} size={64} />
-              </div>
-              
               <div className="relative z-10 flex flex-col h-full">
-                <div className="mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: colorFor(trophy.grade ?? "bronze") }}>
-                    {gradeLabel(trophy.grade ?? "bronze")}
-                  </span>
-                  <h3 className="font-bold text-lg leading-tight mt-1 mb-1 group-hover:text-white transition-colors line-clamp-2">
-                    {trophy.name}
-                  </h3>
-                  <p className="text-xs text-muted font-medium line-clamp-1">
-                    {game.title}
-                  </p>
+                <div className="mb-3 flex items-start gap-3">
+                  {/* La foto real del logro, no un icono genérico por metal
+                      — antes esto era solo una marca de agua translúcida del
+                      color del metal, sin enseñar el trofeo en sí. */}
+                  <TrophyPhoto trophy={trophy} size={56} />
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: colorFor(trophy.grade ?? "bronze") }}>
+                      {gradeLabel(trophy.grade ?? "bronze")}
+                    </span>
+                    <h3 className="font-bold text-lg leading-tight mt-1 mb-1 group-hover:text-white transition-colors line-clamp-2">
+                      {trophy.name}
+                    </h3>
+                    <p className="text-xs text-muted font-medium line-clamp-1">
+                      {game.title}
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="mt-auto pt-4 flex items-center justify-between">

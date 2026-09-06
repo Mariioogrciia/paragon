@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { TrophyTile } from "@/components/TrophyIcon";
+import { TrophyPhoto } from "@/components/TrophyList";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";
 import type { TrophyRecommendation } from "@/lib/recommendations";
 import type { Trophy } from "@/lib/types";
@@ -29,6 +29,8 @@ export function TrophyRecommendations({
     detail: r.detail,
     earned: false,
     rarityPercent: r.rarityPercent ?? undefined,
+    grade: r.grade ?? undefined,
+    iconUrl: r.iconUrl ?? undefined,
   });
 
   return (
@@ -53,7 +55,7 @@ export function TrophyRecommendations({
               className="flex min-w-0 items-center gap-2 rounded-xl border border-border p-3 transition-colors hover:bg-surface-2"
             >
               <Link href={`/u/${handle}/${r.gameId}`} className="flex min-w-0 flex-1 items-center gap-3">
-                <TrophyTile grade="gold" size={38} />
+                <TrophyPhoto trophy={r} size={38} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{r.trophyName}</span>
                   <span className="mt-1 block truncate text-xs text-muted">{r.gameTitle} · {r.gameProgress}% completado</span>

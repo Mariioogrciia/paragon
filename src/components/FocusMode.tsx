@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { refrescarJuegoAction } from "@/app/actions";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";
-import { TrophyTile } from "@/components/TrophyIcon";
+import { TrophyPhoto } from "@/components/TrophyList";
 import { rarity } from "@/lib/design";
 import type { Trophy } from "@/lib/types";
 
@@ -186,7 +186,7 @@ export function FocusMode({
                   }}
                 >
                   <div className="flex items-start gap-3.5">
-                    <TrophyTile grade={t.grade} size={i === 0 ? 52 : 44} />
+                    <TrophyPhoto trophy={t} size={i === 0 ? 52 : 44} />
 
                     <div className="min-w-0 flex-1">
                       <p
