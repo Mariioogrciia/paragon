@@ -7,6 +7,61 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 6 de septiembre de 2026 — Notificaciones push de verdad
+
+Último "trabajo real sin empezar" identificado en el HANDOFF (el otro,
+confirmar `igdbId`, se hizo antes en esta misma tanda — ver más abajo). Ya
+había Service Worker y manifest de PWA (de Antigravity); faltaba VAPID +
+tabla de suscripciones + el manejador `push` + el disparador.
+
+- **Claves VAPID generadas** (`npx web-push generate-vapid-keys`,
+  `web-push` + `@types/web-push` añadidos a package.json) y puestas en
+  `.env.local` (`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/
+  `NEXT_PUBLIC_VAPID_PUBLIC_KEY` — la pública se repite con el prefijo
+  `NEXT_PUBLIC_` porque el navegador la necesita al suscribirse).
+  **IMPORTANTE — pendiente de quien tenga acceso al dashboard de Vercel**:
+  estas tres variables solo están en local. Sin ellas también en las
+  variables de entorno de producción, el interruptor de /ajustes se queda
+  sin `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (no se puede suscribir nadie) y
+  `enviarPush()` no manda nada (`asegurarConfigurado()` lo comprueba y no
+  hace nada en vez de fallar, pero tampoco avisa a nadie).
+- **`push_subscription`** (migración ejecutada:
+  `scripts/crear-tabla-push-subscription.mts`): una fila por NAVEGADOR
+  suscrito, no por usuario — quien tiene Paragon abierto en el móvil y en
+  el portátil recibe el aviso en los dos.
+- **`lib/webPush.ts`**: `enviarPush(userId, payload)` manda a todas las
+  suscripciones de ese usuario; si el servicio push responde 404/410 (la
+  suscripción ya no existe — desinstaló la PWA, borró datos del
+  navegador), se borra sola de la base en vez de reintentar para siempre.
+- **Disparador reutilizado del webhook de Discord**: el push se envía
+  desde el MISMO punto de `syncGameTrophies` (lib/sync.ts) con la MISMA
+  lista de `nuevos` (trofeos genuinamente nuevos en esta sincronización,
+  no ya conocidos) y la MISMA guarda contra la primera sincronización de
+  cada juego (sin esto, vincular una cuenta con 200 juegos ya jugados
+  mandaría 200 avisos push de golpe, igual que ya se evitó para Discord).
+- **`PushToggle.tsx`** (nuevo, en /ajustes, sección "Notificaciones del
+  navegador"): activar pide permiso al navegador, se suscribe con
+  `pushManager.subscribe()` y guarda la suscripción; desactivar hace las
+  dos cosas a la inversa. Botón "Probar" para no tener que esperar a un
+  trofeo real para saber si funciona.
+- **`public/sw.js`**: añadidos los manejadores `push` (pinta la
+  notificación del sistema) y `notificationclick` (lleva a la pestaña ya
+  abierta si existe, si no abre una nueva en la URL del aviso) — antes
+  solo tenía el caché offline, sin nada de push.
+
+**Verificado hasta donde el entorno deja**: migración ejecutada contra
+producción, TypeScript limpio, sintaxis del Service Worker válida
+(`node --check`), el Service Worker se registra e instala de verdad en el
+navegador de pruebas, y la conversión de la clave VAPID + la llamada real a
+`pushManager.subscribe()` llegan hasta el propio navegador sin errores —
+se detiene justo en el permiso de notificaciones, que este entorno
+automatizado deniega solo (no hay una persona real para concederlo). El
+envío de un push real de extremo a extremo (con una suscripción de verdad)
+no se ha podido probar por lo mismo — probarlo con una cuenta real antes
+de darlo por cerrado del todo.
+
+---
+
 ## Sesión del 5 de septiembre de 2026 (continuación 6) — Botón de sincronizar en la cabecera
 
 El usuario preguntó por trofeos "en tiempo real". Respuesta honesta: no es

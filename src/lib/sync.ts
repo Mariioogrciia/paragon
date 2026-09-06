@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { gameTrophies, games, userGames, userTrophies, syncRuns } from "@/db/schema";
+import { gameTrophies, games, userGames, userTrophies, syncRuns, users } from "@/db/schema";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
 import {
   fetchAchievements,
@@ -11,6 +11,7 @@ import {
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 import { anunciarLogrosNuevos } from "@/lib/discordWebhook";
+import { enviarPush } from "@/lib/webPush";
 
 /**
  * Trae datos de las plataformas y los guarda.
@@ -529,6 +530,23 @@ export async function syncGameTrophies(
       iconUrl: info?.iconUrl,
       nuevos,
     });
+
+    // Mismo "es de verdad nuevo" que el aviso de Discord de arriba — un
+    // push por juego y sincronización, no uno por trofeo, por la misma
+    // razón (evitar una tormenta de avisos al vincular una cuenta con
+    // biblioteca atrasada). enviarPush() no hace nada si el usuario no
+    // tiene ninguna suscripción guardada.
+    const [usuario] = await db.select({ handle: users.handle }).from(users).where(eq(users.id, userId)).limit(1);
+    const url = usuario?.handle ? `/u/${usuario.handle}/${gameId}` : "/";
+    const platino = nuevos.find((t) => t.grade === "platinum");
+    const titulo = info?.title ?? gameId;
+    await enviarPush(userId, platino
+      ? { title: "🏆 ¡Platino conseguido!", body: titulo, url }
+      : {
+          title: titulo,
+          body: nuevos.length === 1 ? "1 trofeo nuevo" : `${nuevos.length} trofeos nuevos`,
+          url,
+        });
   }
 
   return trophies.length;

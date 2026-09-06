@@ -11,6 +11,7 @@ import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { DiscordWebhookForm } from "@/components/forms/Forms";
+import { PushToggle } from "@/components/PushToggle";
 
 interface ProfileFormUser {
   id: string;
@@ -338,6 +339,11 @@ export function ProfileForm({
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
         <h2 className="font-semibold mb-4">Discord</h2>
         <DiscordWebhookForm current={user.discordWebhookUrl} />
+      </section>
+
+      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <h2 className="font-semibold mb-4">Notificaciones del navegador</h2>
+        <PushToggle />
       </section>
     </div>
   );

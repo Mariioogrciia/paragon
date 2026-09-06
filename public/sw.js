@@ -49,3 +49,45 @@ self.addEventListener('fetch', (event) => {
     );
   }
 });
+
+// --- Notificaciones push (ver lib/webPush.ts) -------------------------------
+// El payload lo manda enviarPush() ya como JSON: { title, body, url?, icon? }.
+// Sin `event.waitUntil`, el navegador puede matar el Service Worker antes de
+// que termine de pintar la notificación y esta nunca llega a aparecer.
+self.addEventListener('push', (event) => {
+  let datos = { title: 'Paragon', body: 'Tienes una novedad.' };
+  try {
+    if (event.data) datos = event.data.json();
+  } catch (error) {
+    // Un payload que no es JSON no debe tumbar el aviso entero — se enseña
+    // el genérico de arriba en vez de nada.
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(datos.title, {
+      body: datos.body,
+      icon: datos.icon || '/logo.jpg',
+      badge: '/logo.jpg',
+      data: { url: datos.url || '/' },
+    })
+  );
+});
+
+// Clic en la notificación: llevar a la pestaña ya abierta si existe (en vez
+// de abrir una segunda), y si no, abrir una nueva en la URL del aviso.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data && event.notification.data.url ? event.notification.data.url : '/';
+
+  event.waitUntil(
+    (async () => {
+      const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      const existente = clientList.find((c) => new URL(c.url).pathname === new URL(url, self.location.origin).pathname);
+      if (existente) {
+        existente.focus();
+        return;
+      }
+      await self.clients.openWindow(url);
+    })()
+  );
+});

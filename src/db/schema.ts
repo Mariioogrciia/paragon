@@ -640,3 +640,27 @@ export const trophyGuides = pgTable(
   },
   (t) => [uniqueIndex("trophy_guide_user_trophy_idx").on(t.userId, t.gameId, t.trophyId)],
 );
+
+/* ------------------------------------------------------------------ *
+ * Suscripciones a notificaciones push (Web Push / VAPID).             *
+ *                                                                     *
+ * Una fila por navegador suscrito, no por usuario: quien tiene            *
+ * Paragon instalado en el móvil Y abierto en el portátil recibe el     *
+ * aviso en los dos, y desinstalar de uno no debe tocar el otro. El     *
+ * `endpoint` (la URL propia del servicio push de ese navegador —      *
+ * FCM, Mozilla, etc.) es único de por sí; `p256dh`/`auth` son las      *
+ * claves de cifrado que exige el estándar Web Push para que el        *
+ * servidor de por medio no pueda leer el contenido del aviso.         *
+ * ------------------------------------------------------------------ */
+export const pushSubscriptions = pgTable("push_subscription", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});

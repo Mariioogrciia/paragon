@@ -49,6 +49,7 @@ import { votarDificultad } from "@/lib/communityDifficulty";
 import { getGameRecommendations, type GameRecommendation } from "@/lib/recommendations";
 import type { AccountPlatform } from "@/lib/types";
 import { setDiscordWebhookUrl, esWebhookDiscordValido, enviarWebhookDePrueba } from "@/lib/discordWebhook";
+import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 
 export interface ActionState {
   error?: string;
@@ -166,6 +167,41 @@ export async function testDiscordWebhookAction(
   return ok
     ? { success: "Mensaje de prueba enviado — revisa el canal de Discord." }
     : { error: "Discord no aceptó el mensaje. Comprueba que el webhook sigue existiendo." };
+}
+
+/* ------------------------------ Notificaciones push ----------------------------- */
+
+export async function subscribePushAction(subscription: {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const userId = await requireUserId();
+    await guardarSuscripcionPush(userId, subscription);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "No se pudo guardar." };
+  }
+}
+
+export async function unsubscribePushAction(endpoint: string): Promise<void> {
+  await requireUserId();
+  await borrarSuscripcionPush(endpoint);
+}
+
+/** Botón "Probar" de /ajustes — sin esto no hay forma de saber si el
+ * navegador de verdad entrega el aviso hasta que salga un trofeo real. */
+export async function testPushAction(): Promise<{ ok: boolean; error?: string }> {
+  const userId = await requireUserId();
+  try {
+    await enviarPush(userId, {
+      title: "✅ Paragon conectado",
+      body: "Cuando consigas un trofeo nuevo, se avisa aquí.",
+    });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "No se pudo enviar." };
+  }
 }
 
 /* ------------------------------ Cuentas de plataforma ----------------------------- */
