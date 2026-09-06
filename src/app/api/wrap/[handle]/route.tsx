@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { resumenHistorico, juegosDelAnio } from "@/lib/history";
-import { coverGradient } from "@/lib/design";
+import { coverGradient, urlAbsolutaParaOg } from "@/lib/design";
 import { generoTop, juegoDestacado } from "@/components/ParagonWrap";
 
 /**
@@ -28,6 +28,7 @@ export async function GET(
   }
 
   const { player, games } = await getLibrary(profile);
+  const avatarUrl = urlAbsolutaParaOg(player.avatarUrl);
   const resumen = await resumenHistorico(profile.userId);
   const juegosEsteAnio = await juegosDelAnio(profile.userId);
 
@@ -49,10 +50,10 @@ export async function GET(
         }}
       >
         <div style={{ display: "flex", alignItems: "center", marginBottom: "40px" }}>
-          {player.avatarUrl && (
+          {avatarUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={player.avatarUrl}
+              src={avatarUrl}
               width={72}
               height={72}
               style={{ borderRadius: "50%", marginRight: "22px" }}

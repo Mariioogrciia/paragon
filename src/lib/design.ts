@@ -1,6 +1,28 @@
 import type { TrophyGrade } from "@/lib/types";
 
 /**
+ * Convierte una URL relativa ("/uploads/foo.jpg", de un avatar subido a
+ * mano vía /api/upload) en absoluta. Hace falta solo para las imágenes
+ * generadas con `next/og` (Satori) — a diferencia del resto de la app, ahí
+ * un `<img src="/uploads/...">` no funciona (Satori exige URL absoluta) y
+ * revienta la generación entera de la imagen, no solo esa foto. El resto
+ * de <img> normales de la app siguen usando rutas relativas sin problema.
+ *
+ * Sin `VERCEL_PROJECT_PRODUCTION_URL` (en local) no hay forma fiable de
+ * saber el dominio propio, así que se devuelve `undefined` — sin avatar es
+ * mejor que con uno roto.
+ */
+export function urlAbsolutaParaOg(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  if (/^https?:\/\//i.test(url)) return url;
+
+  const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (!dominio) return undefined;
+
+  return `https://${dominio}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
+/**
  * Constantes visuales compartidas por las tarjetas de juego y trofeo.
  *
  * Los degradados están calcados de la maqueta: cada metal tiene su propia
