@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BackButton } from "@/components/BackButton";
 import { EstadisticasCompletas } from "@/components/EstadisticasCompletas";
+import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
@@ -17,6 +18,8 @@ export default async function EstadisticasPage({ params }: { params: Promise<{ h
         <Link href={`/u/${handle}`} className="hover:underline">@{handle}</Link> / Estadísticas
       </p>
       <h1 className="mb-6 font-heading text-3xl font-bold uppercase tracking-wide">Estadísticas</h1>
+
+      <ProfileTabsNav handle={handle} />
 
       <EstadisticasCompletas handle={handle} />
     </div>

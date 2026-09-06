@@ -60,7 +60,7 @@ function connect(): Db {
     globalForDb.conn ??
     postgres(url, {
       prepare: false,
-      max: 5,
+      max: Number(process.env.DB_POOL_MAX ?? 5),
       idle_timeout: 20,
       connect_timeout: 10,
       max_lifetime: 60 * 30,

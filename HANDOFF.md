@@ -46,45 +46,43 @@ closed early").
    página bajó de >120s a 3,5-5s. O sea que los cuelgues de 60s/131min eran
    del PROCESO, no de la base ni de la consulta.
 
-**Causa 1 — el pool del proceso se atasca ENTERO. NO ARREGLADO.**
-Esto es lo más importante de esta sesión, y lo que hay que atacar primero.
-Se le añadieron al pool `idle_timeout: 20`, `connect_timeout: 10`,
-`max_lifetime: 60 * 30` y `connection: { statement_timeout: 30s }` (mitigan,
-y conviene dejarlos) **pero NO lo resuelven**: el fallo se reprodujo igual
-después.
+**Causa 1 — el proceso se atasca entero tras horas vivo. Mitigado, NO
+demostrado.**
 
-Reproducción, medida hoy:
-1. Arranca `next dev` con `.next` limpio. El perfil carga en 3,8s en frío.
-2. Pide 3-5 renders FRESCOS seguidos de `/u/fende21` (con `?cb=` distinto
-   cada vez para saltarse el caché de dev).
-3. A partir de ahí el proceso queda **muerto de forma permanente** para
-   todo lo que necesite base de datos: `/u/[handle]`, `/feed` y `/ligas` se
-   cuelgan indefinidamente. Solo responden las páginas cacheadas
-   (`/rankings`, 0,23s) y las que no tocan la base (`/entrar`, 0,13s).
-4. **No se recupera solo**: probado dejarlo 75s en reposo y luego una única
-   petición paciente de 5 minutos — nunca termina.
-5. **Reiniciar `next dev` lo cura** hasta la próxima vez.
+Lo que se observó de verdad: en el proceso de `next dev` del usuario —vivo
+desde hacía horas y corriendo el código VIEJO del pool— `/u/[handle]`,
+`/feed` y `/ligas` se colgaban indefinidamente, y no se recuperaba solo
+(probado 75s en reposo + una petición paciente de 5 minutos: nunca
+termina). Solo respondían las páginas cacheadas (`/rankings`, 0,23s) y las
+que no tocan la base (`/entrar`, 0,13s). Reiniciar lo curaba.
 
-La prueba de que la culpa NO es de la base: con la app completamente
-colgada, un script aparte abre una conexión nueva al mismo Postgres y hace
-**la misma consulta por handle en 38ms**. La base está sana; lo que se
-atasca es el pool de ese proceso de Node. Cuando está atascado, la petición
-colgada llega a enviar 34 KB (la cáscara + el skeleton del Suspense) y se
-queda esperando el resto para siempre — que es exactamente el "GET
-/u/fende21 200 in 60s" y el "131.7min ... destination stream closed early"
-que reportó el usuario.
+La base NO tenía la culpa: con la app completamente colgada, un script
+aparte abrió una conexión nueva al mismo Postgres e hizo **la misma
+consulta por handle en 38ms**.
 
-Hipótesis para quien siga (por orden de sospecha): las 5 conexiones se
-quedan retenidas por consultas que nunca reciben respuesta (socket muerto
-que postgres.js no detecta, porque no hay timeout de consulta del lado del
-cliente y `statement_timeout` del servidor no salta si la respuesta no
-llega nunca); o renders abandonados (el navegador corta, Next sigue
-renderizando) que no sueltan lo que han pedido. Vías concretas: un timeout
-de cliente de verdad por consulta que además cierre y recicle esa conexión;
-`keep_alive` más agresivo en postgres.js; o subir `max` (con cuidado: hay
-un incidente real documentado de "max client connections reached", más
-abajo en este archivo). **Y lo más efectivo de todo sería reducir el
-trabajo por petición** — ver el párrafo del HTML de 1 MB más abajo.
+**Pero NO se reprodujo en un proceso limpio.** Con `.next` borrado y el
+servidor recién arrancado: 6 renders frescos seguidos (1 MB cada uno) a
+3,2s constantes, y además 5 peticiones abortadas a mitad de render
+(justo lo que genera el "destination stream closed early") sin degradar
+nada. Así que ni la carga normal ni los renders abandonados lo explican.
+
+**Hipótesis mejor sostenida**: el pooler de Supabase cierra las conexiones
+ociosas y postgres.js sigue usando sockets ya muertos, en los que ninguna
+respuesta llega nunca. Encaja con todo lo observado: tarda HORAS en
+aparecer (no minutos), es permanente, la base está sana y reiniciar lo
+cura. Contra eso van `idle_timeout: 20` (cierra las ociosas antes de que
+las cierre el pooler), `max_lifetime: 30min` (recicla aunque parezcan
+sanas), `connect_timeout` y `statement_timeout: 30s`. **Sin demostrar**:
+haría falta dejar un proceso vivo varias horas y ver si vuelve a pasar.
+Quien retome esto: si con el código nuevo vuelve a colgarse tras horas, la
+hipótesis del socket muerto es falsa y toca instrumentar el pool de verdad
+(contar consultas empezadas vs terminadas por conexión).
+
+**TRAMPA que confundió el diagnóstico durante una hora** — ver también el
+aviso de `.next` más abajo: hacer `npm run build` con `next dev` corriendo
+deja `.next` corrupto, y a partir de ahí las páginas se cuelgan o devuelven
+404 **exactamente igual que el bug de verdad**. Antes de investigar un
+cuelgue, borra `.next` y arranca limpio; si desaparece, era esto.
 
 **Causa 2 — la pestaña oculta bloqueaba el HTML (arreglada).** `SectionTabs`
 renderiza las 3 pestañas en el servidor aunque solo se vea una (a propósito:

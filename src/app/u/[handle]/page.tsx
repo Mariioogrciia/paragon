@@ -3,12 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
-import { LibraryGrid } from "@/components/LibraryGrid";
 import { StatTile } from "@/components/StatTile";
-import { TrophyCountRow } from "@/components/TrophyCounts";
-import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle, getUserBadges } from "@/lib/profiles";
-import { summarise, type GameStatus } from "@/lib/stats";
+import { summarise } from "@/lib/stats";
 import { db } from "@/db";
 import { gameTrophies } from "@/db/schema";
 import { inArray } from "drizzle-orm";
@@ -26,63 +23,26 @@ import { Pegi } from "@/components/Pegi";
 import { ParagonLevelCard } from "@/components/ParagonLevelCard";
 import { ParagonAchievements } from "@/components/ParagonAchievements";
 import { paragonProgress } from "@/lib/level";
-import { CollectionProgress } from "@/components/CollectionProgress";
 import { ShowcaseTrophies } from "@/components/ShowcaseTrophies";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { BackButton } from "@/components/BackButton";
-import { SectionTabs } from "@/components/SectionTabs";
-import { EstadisticasCompletas } from "@/components/EstadisticasCompletas";
-import { Suspense } from "react";
+import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 
-/** Hueco de "Estadísticas" mientras llega por streaming — mismo lenguaje de
- * skeleton que ya usa `UpcomingGames.tsx`, no un spinner suelto. */
-function EstadisticasCargando() {
-  return (
-    <div className="space-y-9">
-      {[1, 2].map((i) => (
-        <div key={i} className="rounded-[18px] border border-border bg-surface p-6">
-          <div className="mb-4 h-6 w-48 rounded bg-surface-2 animate-pulse" />
-          <div className="grid gap-3 md:grid-cols-2">
-            {[1, 2, 3, 4].map((j) => (
-              <div key={j} className="h-16 rounded-xl bg-surface-2/60 animate-pulse" />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}` : null;
 }
 
-const ESTADOS_VALIDOS = [
-  "platinado",
-  "completado",
-  "en-curso",
-  "sin-empezar",
-  "deseados",
-  "a-punto",
-  "abandonado",
-];
-
 export default async function PerfilPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ handle: string }>;
-  searchParams: Promise<{ estado?: string }>;
 }) {
   const { handle } = await params;
-  const { estado } = await searchParams;
-  const initialStatus = ESTADOS_VALIDOS.includes(estado ?? "")
-    ? (estado as GameStatus)
-    : undefined;
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -128,11 +88,11 @@ export default async function PerfilPage({
   //
   // Aun así se paraleliza acotado a 3, no las cinco de golpe: el pool sigue
   // siendo de 5 conexiones compartidas con todo lo demás que renderiza esta
-  // página a la vez (incluida la pestaña "Estadísticas", que ahora va por su
-  // propio <Suspense> pero sigue consultando en paralelo con esto). Tres deja
-  // margen de sobra y ya se lleva la mayor parte de la mejora.
-  const [carpetas, resumen, juegosEsteAnio] = await Promise.all([
-    listCollections(profile.userId),
+  // página a la vez. Tres deja margen de sobra y ya se lleva la mayor parte
+  // de la mejora.
+  // `listCollections` ya no se pide aquí: las carpetas se enseñaban en la
+  // sección "Colecciones", que vive ahora en /u/[handle]/biblioteca.
+  const [resumen, juegosEsteAnio] = await Promise.all([
     resumenHistorico(profile.userId),
     juegosDelAnio(profile.userId),
   ]);
@@ -314,7 +274,6 @@ export default async function PerfilPage({
             achievements: (
               <ParagonAchievements key="achievements" games={games} earnedIds={badges.map((badge) => badge.badgeId)} />
             ),
-            collections: <CollectionProgress key="collections" collections={carpetas} games={games} handle={handle} />,
             showcase: (
               <ShowcaseTrophies
                 key="showcase"
@@ -385,64 +344,34 @@ export default async function PerfilPage({
                 )}
               </section>
             ),
-            biblioteca: (
-              <div key="biblioteca" className="space-y-9">
-                <TrophyCountRow counts={stats.counts} />
-                <section>
-                  <div className="mb-4 flex flex-wrap items-center gap-3.5">
-                    <h2 className="font-heading text-2xl font-bold">Biblioteca</h2>
-                    <span className="text-[13px] text-muted">
-                      {games.length} juegos · del más reciente al más antiguo
-                    </span>
-                  </div>
-
-                  <LibraryGrid games={games} handle={handle} collections={carpetas} esMio={esMio} initialStatus={initialStatus} />
-                </section>
-              </div>
-            ),
+            // `collections` y `biblioteca` viven ahora en
+            // /u/[handle]/biblioteca, en su propia ruta.
           };
 
-          // La biblioteca de verdad (el grid de juegos y sus carpetas) es,
-          // con diferencia, lo más largo de la página — juntarla con el
-          // resto en un solo scroll es lo que hacía sentir la ficha caótica.
-          // Se separa en su propia pestaña; el resto sigue el orden que cada
-          // quien eligió en /ajustes (arrastrar y soltar), solo que entre
-          // ellas, no mezclado con la biblioteca.
-          const BIBLIOTECA_TAB = new Set(["collections", "biblioteca"]);
+          // Las tres pestañas del perfil son AHORA TRES RUTAS, no tres
+          // bloques renderizados a la vez y ocultos con `hidden`:
+          //   /u/[handle]            → esto (Resumen)
+          //   /u/[handle]/biblioteca → carpetas + grid de juegos
+          //   /u/[handle]/estadisticas → EstadisticasCompletas
+          //
+          // El motivo es medido, no estético: `LibraryGrid` es un componente
+          // de CLIENTE y recibía los 291 juegos enteros, así que el perfil
+          // mandaba 1.030 KB en cada visita aunque la pestaña por defecto
+          // fuera "Resumen" y nadie mirase la biblioteca. Con una ruta por
+          // pestaña, cada una paga solo lo suyo.
+          //
+          // Se respeta igual el orden de secciones de /ajustes
+          // (`profileSectionOrder`): las claves de biblioteca simplemente ya
+          // no viven aquí, y `normalizeSectionOrder` sigue mandando en el
+          // resto.
           const orden = normalizeSectionOrder(profile.profileSectionOrder);
-          const resumenNodos = orden.filter((c) => !BIBLIOTECA_TAB.has(c)).map((c) => secciones[c] || null);
-          const bibliotecaNodos = orden.filter((c) => BIBLIOTECA_TAB.has(c)).map((c) => secciones[c] || null);
+          const resumenNodos = orden.map((c) => secciones[c] || null);
 
           return (
-            <SectionTabs
-              storageKey="perfil"
-              tabs={[
-                { key: "resumen", label: "Resumen", content: <>{resumenNodos}</> },
-                { key: "biblioteca", label: "Biblioteca", badge: stats.juegos, content: <>{bibliotecaNodos}</> },
-                // Mismo componente que la página standalone /u/[handle]/estadisticas
-                // (EstadisticasCompletas.tsx) — una sola fuente de verdad para las
-                // consultas y el layout, no una copia que se pueda desincronizar.
-                //
-                // Dentro de <Suspense> a propósito: `SectionTabs` renderiza las 3
-                // pestañas en el servidor aunque solo se vea una (las oculta con
-                // `hidden`, sin desmontarlas, para no perder scroll ni repetir
-                // consultas al cambiar de pestaña). Sin esta frontera, el montón
-                // de consultas de "Estadísticas" — una pestaña que NO se ve por
-                // defecto — bloqueaba el HTML de "Resumen" y "Biblioteca": la
-                // página tardaba 3,5-5s en soltar nada, medido de verdad. Con
-                // Suspense, el resto del perfil se envía en cuanto está listo y
-                // las estadísticas llegan después, por streaming.
-                {
-                  key: "estadisticas",
-                  label: "Estadísticas",
-                  content: (
-                    <Suspense fallback={<EstadisticasCargando />}>
-                      <EstadisticasCompletas handle={handle} />
-                    </Suspense>
-                  ),
-                },
-              ]}
-            />
+            <>
+              <ProfileTabsNav handle={handle} juegos={stats.juegos} />
+              <div className="space-y-9">{resumenNodos}</div>
+            </>
           );
         })()}
       </div>

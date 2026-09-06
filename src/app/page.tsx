@@ -364,7 +364,7 @@ export default async function HomePage() {
           Lo que menos te queda, ordenado por trofeos pendientes.
         </p>
         <Link
-          href={`/u/${profile.handle}?estado=a-punto`}
+          href={`/u/${profile.handle}/biblioteca?estado=a-punto`}
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
         >
           Ver todos →
@@ -489,7 +489,7 @@ export default async function HomePage() {
           Empezados y sin tocar hace más de un año.
         </p>
         <Link
-          href={`/u/${profile.handle}?estado=abandonado`}
+          href={`/u/${profile.handle}/biblioteca?estado=abandonado`}
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
         >
           Ver todos →

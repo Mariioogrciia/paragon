@@ -6,16 +6,22 @@
  * guardara su orden) se añade al final con este mismo orden por defecto —
  * ver el uso en `u/[handle]/page.tsx`.
  */
+/*
+ * "collections" y "biblioteca" YA NO ESTÁN aquí: se mudaron a su propia
+ * ruta (`/u/[handle]/biblioteca`) y por tanto ya no son secciones
+ * reordenables del Resumen. Ofrecerlas en /ajustes prometía algo que no
+ * pasaría. Los órdenes ya guardados que las contengan no rompen nada:
+ * `normalizeSectionOrder` descarta cualquier clave que no esté en esta
+ * lista.
+ */
 export const DEFAULT_SECTION_ORDER = [
   "wrap",
   "stats",
   "recientes",
   "level",
   "achievements",
-  "collections",
   "showcase",
   "favoritos",
-  "biblioteca",
 ] as const;
 
 export type ProfileSectionKey = (typeof DEFAULT_SECTION_ORDER)[number];
@@ -26,10 +32,8 @@ export const SECTION_LABELS: Record<ProfileSectionKey, string> = {
   recientes: "Últimos trofeos",
   level: "Nivel Paragon",
   achievements: "Logros",
-  collections: "Colecciones",
   showcase: "Vitrina de trofeos",
   favoritos: "Juegos favoritos",
-  biblioteca: "Biblioteca",
 };
 
 /** Normaliza un orden guardado: solo claves válidas, sin duplicados, con
