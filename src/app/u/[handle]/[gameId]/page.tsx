@@ -6,7 +6,8 @@ import { Avatar } from "@/components/Avatar";
 import { CollectionPicker } from "@/components/Collections";
 import { CommunityRating } from "@/components/CommunityRating";
 import { Stars } from "@/components/Stars";
-import { gradeLabel, TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
+import { gradeLabel, TrophyIcon } from "@/components/TrophyIcon";
+import { TrophyPhoto } from "@/components/TrophyList";
 import { ReviewEditor } from "@/components/ReviewEditor";
 import { TrophyList } from "@/components/TrophyList";
 import { ManualGameStatus } from "@/components/ManualGameStatus";
@@ -31,7 +32,7 @@ function ProximoRow({ trophy }: { trophy: Trophy }) {
       className="grid grid-cols-[52px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[52px_1fr_190px] sm:gap-[18px]"
       style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
     >
-      <TrophyTile grade={trophy.grade} size={52} />
+      <TrophyPhoto trophy={trophy} size={52} />
 
       <div className="min-w-0">
         <p className="text-[15px] font-semibold">{trophy.name}</p>

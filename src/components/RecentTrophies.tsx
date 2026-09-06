@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { coverGradient, relativeDate } from "@/lib/design";
-import { TrophyTile } from "@/components/TrophyIcon";
+import { TrophyPhoto } from "@/components/TrophyList";
 import type { TrofeoReciente } from "@/lib/history";
 
 /**
@@ -30,7 +30,7 @@ export function RecentTrophies({ trofeos, handle }: { trofeos: TrofeoReciente[];
               )}
             </span>
 
-            <TrophyTile grade={t.grade ?? undefined} size={30} />
+            <TrophyPhoto trophy={t} size={30} />
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{t.nombre}</p>

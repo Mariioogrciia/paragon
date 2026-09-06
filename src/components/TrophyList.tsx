@@ -5,7 +5,7 @@ import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon"
 import { colorFor, rarity, relativeDate } from "@/lib/design";
 import { clasificarTrofeo } from "@/lib/trophyType";
 import { trophyScore } from "@/lib/trophyScore";
-import type { Platform, Trophy } from "@/lib/types";
+import type { Platform, Trophy, TrophyGrade } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
 
 /**
@@ -179,7 +179,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
       className="grid grid-cols-[48px_1fr] items-center gap-4 border-b border-border px-4 py-3.5 last:border-0 sm:grid-cols-[48px_1fr_100px_90px] sm:gap-[18px] sm:px-[18px] cursor-pointer hover:bg-white/5 transition-colors"
       style={{ opacity: trophy.earned ? 1 : 0.42 }}
     >
-      <Icono trophy={trophy} size={48} />
+      <TrophyPhoto trophy={trophy} size={48} />
 
       <div className="min-w-0">
         <p className="flex items-center gap-1.5 text-[15px] font-semibold">
@@ -238,7 +238,7 @@ function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, plat
         </span>
       )}
 
-      <Icono trophy={trophy} size={64} />
+      <TrophyPhoto trophy={trophy} size={64} />
 
       <p className="mt-3 line-clamp-2 text-[13px] font-semibold">
         {oculto ? "Trofeo oculto" : trophy.name}
@@ -264,9 +264,27 @@ function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, plat
   );
 }
 
-/* eslint-disable-next-line @next/next/no-img-element */
-function Icono({ trophy, size }: { trophy: Trophy; size: number }) {
-  if (!trophy.iconUrl) return <TrophyTile grade={trophy.grade} size={size} />;
+/**
+ * La foto real del logro (la que da PSN/Steam) siempre que exista — el
+ * cuadrado de color por metal (`TrophyTile`) es el respaldo para cuando de
+ * verdad no hay icono, no la primera opción. Exportada porque también la
+ * necesitan `u/[handle]/[gameId]/page.tsx` ("Próximos pasos") y
+ * `RecentTrophies.tsx` ("Últimos trofeos" del perfil): las dos enseñaban el
+ * cuadrado de color a secas incluso cuando el trofeo sí tenía foto.
+ *
+ * El tipo acepta cualquier objeto con `iconUrl`/`grade` (no exige un
+ * `Trophy` completo con id/nombre/earned...) porque `ultimosTrofeos()`
+ * (lib/history.ts) no trae la fila entera de un `Trophy`, solo lo que hace
+ * falta para pintarlo.
+ */
+export function TrophyPhoto({
+  trophy,
+  size,
+}: {
+  trophy: { iconUrl?: string | null; grade?: TrophyGrade | null };
+  size: number;
+}) {
+  if (!trophy.iconUrl) return <TrophyTile grade={trophy.grade ?? undefined} size={size} />;
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
