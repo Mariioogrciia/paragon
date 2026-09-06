@@ -750,11 +750,13 @@ export async function getGameDetail(
         : undefined,
   }));
 
-  // El progreso puede haber cambiado al sincronizar justo arriba.
+  // El progreso (y la fecha de sincronización) pueden haber cambiado al
+  // sincronizar justo arriba, así que se releen en vez de reusar `estado`.
   const [fresco] = await db
     .select({
       earnedTotal: userGames.earnedTotal,
       progressPercent: userGames.progressPercent,
+      trophiesSyncedAt: userGames.trophiesSyncedAt,
     })
     .from(userGames)
     .where(
@@ -767,6 +769,7 @@ export async function getGameDetail(
     definedTotal: trophies.length || game.definedTotal,
     earnedTotal: fresco?.earnedTotal ?? game.earnedTotal,
     progressPercent: fresco?.progressPercent ?? game.progressPercent,
+    trophiesSyncedAt: fresco?.trophiesSyncedAt ?? estado?.syncedAt ?? null,
     trophies,
   };
 }

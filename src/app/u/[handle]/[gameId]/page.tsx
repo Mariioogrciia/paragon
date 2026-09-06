@@ -23,6 +23,7 @@ import type { Trophy } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 import { CompartirImagen } from "@/components/CompartirImagen";
 import { BackButton } from "@/components/BackButton";
+import { AutoSyncJuego } from "@/components/AutoSyncJuego";
 
 function ProximoRow({ trophy }: { trophy: Trophy }) {
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
@@ -96,6 +97,30 @@ export default async function JuegoPage({
   const esMio = session?.user?.id === profile.userId;
   const carpetas = esMio ? await listCollections(profile.userId) : [];
   const valoracion = await getCommunityRating(game.id);
+
+  // ¿Toca refrescar este juego solo, en segundo plano? Las cuatro
+  // condiciones, todas necesarias (ver AutoSyncJuego.tsx para el porqué de
+  // cada una):
+  //
+  // 1. Es TU juego. Si no, cualquiera podría gastar cuota de APIs ajena solo
+  //    abriendo el perfil público de otra persona muchas veces.
+  // 2. PSN o Steam. Xbox NO: OpenXBL da 150 peticiones/hora compartidas
+  //    entre TODOS los usuarios de Paragon (ver lib/xbl/client.ts), así que
+  //    refrescar al abrir una ficha se comería la cuota de todo el mundo.
+  //    Los juegos manuales tampoco tienen nada que sincronizar.
+  // 3. Hace más de 6 horas de la última comprobación. Menos que eso no
+  //    compensa: el trofeo lleva ahí desde la última vez que miraste.
+  // 4. Ya se ha sincronizado alguna vez. Si no, `getGameDetail` acaba de
+  //    hacerlo él mismo unas líneas más arriba, de forma bloqueante.
+  const HORAS_PARA_REFRESCAR = 6;
+  const sincronizadoHace = game.trophiesSyncedAt
+    ? Date.now() - new Date(game.trophiesSyncedAt).getTime()
+    : null;
+  const tocaRefrescar =
+    esMio &&
+    (game.platform === "psn" || game.platform === "steam") &&
+    sincronizadoHace !== null &&
+    sincronizadoHace > HORAS_PARA_REFRESCAR * 60 * 60 * 1000;
 
   // El platino solo depende del juego base: contar también los trofeos de DLC
   // inflaba "lo que te falta" con cosas que no cuentan para él.
@@ -265,6 +290,8 @@ export default async function JuegoPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-9">
+        {tocaRefrescar && <AutoSyncJuego gameId={game.id} />}
+
         {dificultad && (
           <section
             className="rounded-[18px] p-5"

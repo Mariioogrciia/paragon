@@ -170,6 +170,15 @@ export interface Game {
 
 export interface GameDetail extends Game {
   trophies: Trophy[];
+  /**
+   * Cuándo se pidieron por última vez los trofeos de este juego a su
+   * plataforma. `null` si nunca (aunque en ese caso `getGameDetail` los pide
+   * en el momento, así que a la vuelta ya no suele serlo).
+   *
+   * Lo usa la ficha para decidir si toca refrescar en segundo plano — ver
+   * `AutoSyncJuego.tsx`.
+   */
+  trophiesSyncedAt: Date | null;
 }
 
 /** Una cuenta vinculada de una plataforma. */
