@@ -1,9 +1,94 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **5 de septiembre de 2026**
-(continuación directa de la sesión larguísima del día 4, con Antigravity
+releer todo el historial. Última actualización: **6 de septiembre de 2026**
+(continuación directa de la sesión larguísima del día 5, con Antigravity
 trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó él).
+
+---
+
+## Sesión del 6 de septiembre de 2026 (continuación) — foto real de los logros en todos lados, favicon/logo, y un aviso serio sobre el pool de conexiones
+
+### Foto real del logro, barrido completo
+
+El usuario pidió "siempre la foto, no logos" tras ver cuadrados de color
+genéricos donde debería verse el trofeo real. Encontrado y arreglado en
+**5 sitios** (todos con el mismo defecto: enseñar `TrophyTile`/`TrophyIcon`
+por metal en vez de `trophy.iconUrl`, la foto real que da PSN/Steam):
+
+1. **"Próximos pasos"** (`u/[handle]/[gameId]/page.tsx`).
+2. **"Últimos trofeos"** (`RecentTrophies.tsx`, sección nueva de esta misma
+   sesión — ver más abajo).
+3. **"Vitrina de Orgullo"** (`ShowcaseTrophies.tsx`): antes solo tenía una
+   marca de agua translúcida del color del metal en la esquina, sin
+   enseñar el trofeo en sí. Ahora la foto real, a tamaño visible.
+4. **"Siguiente trofeo"** (`TrophyRecommendations.tsx`, panel): tenía
+   **hardcodeado `<TrophyTile grade="gold" />` siempre**, sin mirar el
+   metal real — `lib/recommendations.ts` ni siquiera traía `iconUrl`/
+   `grade` en la consulta. Añadidos los dos campos.
+5. **Modo Enfoque** (`FocusMode.tsx`).
+
+La función que ya hacía esto bien (`Icono`, privada dentro de
+`TrophyList.tsx`) se exportó como **`TrophyPhoto`** — una sola fuente de
+verdad reutilizada en los 5 sitios, en vez de repetir el `if (!iconUrl)
+return <TrophyTile ...>` cinco veces.
+
+### Nueva sección: "Últimos trofeos" en el perfil
+
+Petición del usuario: ver los trofeos más recientes en el propio perfil,
+visible tanto para el dueño como para quien lo visita. `lib/history.ts`
+(`ultimosTrofeos`, reutiliza el mismo patrón de `trofeosDelMes` pero sin
+filtrar por mes) + `RecentTrophies.tsx`. Registrada en
+`lib/profileSections.ts` (clave `recientes`) para que también se pueda
+reordenar desde /ajustes como el resto de secciones del perfil. Verificado
+contra datos reales (`fende21`): muestra trofeos de "hoy" y "ayer"
+correctamente.
+
+### Favicon y logo
+
+El usuario reportó que el favicon "se había ido". Investigado: el archivo
+(`src/app/icon.jpg`) existe, es válido y el servidor lo sirve bien — no se
+ha tocado en ninguna sesión reciente. Casi seguro caché del navegador
+(recomendado cerrar la pestaña del todo). Además el usuario dijo que el
+logo actual "no le convence" y pidió uno nuevo, **literal: una copa o
+medalla**. Sin generador de imágenes en esta sesión — diseñado a mano como
+SVG (gradiente platino `#dff0f8→#7fbcd8→#3f7d99`, el mismo que ya usa toda
+la app para platino) y rasterizado con `sharp` (ya estaba en
+`node_modules`, dependencia de Next). **Mandada la propuesta al usuario
+como imagen — pendiente de su confirmación antes de reemplazar
+`src/app/icon.jpg`/`public/logo.jpg` de verdad.** El SVG fuente vive en el
+scratchpad de la sesión, no en el repo — si se aprueba, hay que rehacerlo
+o pedir el archivo.
+
+### Aviso serio: el pool de Postgres es de 5 conexiones, no paralelizar a la ligera
+
+El usuario reportó `/u/[handle]` tardando 4-5s (logs reales pegados:
+"GET /u/fende21 200 in 3.7s...4.2s..."). Encontradas 5 consultas
+independientes en `u/[handle]/page.tsx` hechas en **secuencia** (`await`
+suelto una detrás de otra) — se juntaron en un `Promise.all` para acortar
+la latencia total.
+
+**Se probó y salió mal**: una petición de prueba se quedó **colgada más de
+60 segundos** — peor que los 5s originales. Motivo real: `db/index.ts`
+capa el pool de Postgres a **`max: 5`** conexiones simultáneas a
+propósito (ya hubo un incidente real de "max client connections reached"
+en producción, documentado más abajo en este mismo archivo). Esta misma
+página ya pide varias conexiones vía `getLibrary()`, y **`SectionTabs`
+renderiza las 3 pestañas del perfil enteras en el servidor aunque estén
+ocultas** (incluida `EstadisticasCompletas`, que hace su propio montón de
+consultas) — disparar 6-8 consultas MÁS a la vez desde aquí encima superó
+lo que el pool puede dar de sí.
+
+**Revertido a secuencial** (commit `0f0bced`) — el estado que sí funciona,
+solo que despacio. **La lentitud real de `/u/[handle]` sigue sin
+arreglar.** Sospecha fuerte, sin confirmar: `SectionTabs` pide los datos
+de las 3 pestañas SIEMPRE, no solo la visible, así que "Estadísticas" se
+calcula entera aunque se esté mirando "Resumen" — arreglarlo de verdad
+significa que cada pestaña pida sus datos solo cuando se activa (o un
+`loading.tsx`/Suspense por pestaña), no meter más `Promise.all` contra un
+pool ya ajustado. **Cualquiera que retome esto: NO dispares varias
+consultas nuevas en paralelo en esta página sin contar cuántas conexiones
+pide ya el resto del árbol** — con 5 de tope, se agota rápido.
 
 ---
 
