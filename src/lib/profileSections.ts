@@ -9,6 +9,7 @@
 export const DEFAULT_SECTION_ORDER = [
   "wrap",
   "stats",
+  "recientes",
   "level",
   "achievements",
   "collections",
@@ -22,6 +23,7 @@ export type ProfileSectionKey = (typeof DEFAULT_SECTION_ORDER)[number];
 export const SECTION_LABELS: Record<ProfileSectionKey, string> = {
   wrap: "Resumen del año (Wrap)",
   stats: "Estadísticas rápidas",
+  recientes: "Últimos trofeos",
   level: "Nivel Paragon",
   achievements: "Logros",
   collections: "Colecciones",

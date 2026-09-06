@@ -215,6 +215,65 @@ export interface TrofeoDelMes {
   rarityPercent: number | null;
 }
 
+export interface TrofeoReciente extends TrofeoDelMes {
+  /** Carátula del juego (no del trofeo) — para la lista de "Últimos trofeos" del perfil. */
+  gameIconUrl: string | null;
+}
+
+/**
+ * Los últimos trofeos conseguidos, de toda la biblioteca — para "Últimos
+ * trofeos" en el perfil (visible tanto para el dueño como para quien lo
+ * visita, es información pública igual que el resto de la ficha). Mismo
+ * origen que `trofeosDelMes` (earnedAt de user_trophy), solo que sin
+ * filtrar por mes: la foto más reciente, sin más.
+ */
+export async function ultimosTrofeos(userId: string, limite = 8): Promise<TrofeoReciente[]> {
+  const filas = await db
+    .select({
+      gameId: userTrophies.gameId,
+      juego: games.title,
+      gameIconUrl: games.iconUrl,
+      trophyId: userTrophies.trophyId,
+      nombre: gameTrophies.name,
+      detalle: gameTrophies.detail,
+      grade: gameTrophies.grade,
+      iconUrl: gameTrophies.iconUrl,
+      earnedAt: userTrophies.earnedAt,
+      rarityPercent: userTrophies.rarityPercent,
+    })
+    .from(userTrophies)
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .leftJoin(
+      gameTrophies,
+      and(
+        eq(gameTrophies.gameId, userTrophies.gameId),
+        eq(gameTrophies.trophyId, userTrophies.trophyId),
+      ),
+    )
+    .where(
+      and(
+        eq(userTrophies.userId, userId),
+        eq(userTrophies.earned, true),
+        isNotNull(userTrophies.earnedAt),
+      ),
+    )
+    .orderBy(desc(userTrophies.earnedAt))
+    .limit(limite);
+
+  return filas.map((f) => ({
+    gameId: f.gameId,
+    juego: f.juego,
+    gameIconUrl: f.gameIconUrl ?? null,
+    trophyId: f.trophyId,
+    nombre: f.nombre ?? "Trofeo",
+    detalle: f.detalle ?? "",
+    grade: f.grade ?? null,
+    iconUrl: f.iconUrl ?? null,
+    earnedAt: f.earnedAt!.toISOString(),
+    rarityPercent: f.rarityPercent ?? null,
+  }));
+}
+
 export async function trofeosDelMes(userId: string, mes: string): Promise<TrofeoDelMes[]> {
   if (!esMesValido(mes)) return [];
 

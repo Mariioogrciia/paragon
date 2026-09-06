@@ -18,8 +18,9 @@ import { ImportLibraryModal } from "@/components/ImportLibraryModal";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
-import { juegosDelAnio, rachas as rachasDe, resumenHistorico } from "@/lib/history";
+import { juegosDelAnio, rachas as rachasDe, resumenHistorico, ultimosTrofeos } from "@/lib/history";
 import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
+import { RecentTrophies } from "@/components/RecentTrophies";
 import { Badges } from "@/components/Badges";
 import { Pegi } from "@/components/Pegi";
 import { ParagonLevelCard } from "@/components/ParagonLevelCard";
@@ -104,6 +105,9 @@ export default async function PerfilPage({
   const [rachasPerfil, percentilAnio] = games.length > 0
     ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
     : [{ actual: 0, mejor: 0, diasActivos: 0 }, null];
+  // Pública igual que el resto de la ficha: se ve tanto en tu propio
+  // perfil como en el de cualquiera que lo visite.
+  const recientes = await ultimosTrofeos(profile.userId);
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
   const showcaseTrophiesData = showcaseTrophyIds.length > 0 
@@ -268,6 +272,7 @@ export default async function PerfilPage({
                 </Link>
               </div>
             ),
+            recientes: recientes.length > 0 && <RecentTrophies key="recientes" trofeos={recientes} handle={handle} />,
             level: <ParagonLevelCard key="level" progress={nivelParagon} />,
             achievements: (
               <ParagonAchievements key="achievements" games={games} earnedIds={badges.map((badge) => badge.badgeId)} />

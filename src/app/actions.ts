@@ -194,10 +194,17 @@ export async function unsubscribePushAction(endpoint: string): Promise<void> {
 export async function testPushAction(): Promise<{ ok: boolean; error?: string }> {
   const userId = await requireUserId();
   try {
-    await enviarPush(userId, {
+    const resultado = await enviarPush(userId, {
       title: "✅ Paragon conectado",
       body: "Cuando consigas un trofeo nuevo, se avisa aquí.",
     });
+    // Antes esto devolvía {ok:true} pasara lo que pasara: enviarPush nunca
+    // lanzaba, solo se callaba si faltaban las claves VAPID o no había
+    // ninguna suscripción — el botón "Probar" decía "enviado" aunque no
+    // hubiera llegado a ningún sitio.
+    if (resultado.enviados === 0) {
+      return { ok: false, error: resultado.error ?? "No se pudo entregar el aviso." };
+    }
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "No se pudo enviar." };

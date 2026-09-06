@@ -72,6 +72,22 @@ export async function tieneSuscripcionPush(userId: string): Promise<boolean> {
   return Boolean(fila);
 }
 
+export interface ResultadoPush {
+  /** Cuántas suscripciones recibieron el aviso de verdad (200/201 del servicio push). */
+  enviados: number;
+  /** Cuántas suscripciones tenía el usuario en total, antes de descartar las muertas. */
+  total: number;
+  /**
+   * Por qué no llegó a nadie, si `enviados` es 0 — sin esto, "Probar" en
+   * /ajustes decía "enviado" pase lo que pasara (faltaran las claves VAPID,
+   * no hubiera ninguna suscripción, o fallara el envío): `enviarPush` nunca
+   * lanzaba, solo devolvía sin avisar de nada. Confirmado el 6 de
+   * septiembre de 2026: el usuario decía "no me salta la notificación" y
+   * el botón seguía diciendo que sí, sin ningún error real que mirar.
+   */
+  error?: string;
+}
+
 /**
  * Manda un aviso a TODOS los navegadores suscritos de un usuario. Si el
  * servidor de push responde que la suscripción ya no existe (410/404 — el
@@ -81,15 +97,22 @@ export async function tieneSuscripcionPush(userId: string): Promise<boolean> {
 export async function enviarPush(
   userId: string,
   payload: { title: string; body: string; url?: string; icon?: string },
-): Promise<void> {
-  if (!asegurarConfigurado()) return;
+): Promise<ResultadoPush> {
+  if (!asegurarConfigurado()) {
+    return { enviados: 0, total: 0, error: "Faltan VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY en el servidor." };
+  }
 
   const subs = await db
     .select()
     .from(pushSubscriptions)
     .where(eq(pushSubscriptions.userId, userId));
 
-  if (subs.length === 0) return;
+  if (subs.length === 0) {
+    return { enviados: 0, total: 0, error: "No hay ninguna suscripción guardada — activa las notificaciones primero." };
+  }
+
+  let enviados = 0;
+  let ultimoError: string | undefined;
 
   await Promise.all(
     subs.map(async (sub) => {
@@ -98,14 +121,22 @@ export async function enviarPush(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify(payload),
         );
+        enviados++;
       } catch (error) {
         const status = (error as { statusCode?: number }).statusCode;
         if (status === 404 || status === 410) {
           await borrarSuscripcionPush(sub.endpoint);
         } else {
           console.error("[webPush] no se pudo avisar", error);
+          ultimoError = error instanceof Error ? error.message : "Error desconocido enviando el push.";
         }
       }
     }),
   );
+
+  return {
+    enviados,
+    total: subs.length,
+    error: enviados === 0 ? (ultimoError ?? "La suscripción ya no es válida (se ha borrado).") : undefined,
+  };
 }
