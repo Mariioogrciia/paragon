@@ -7,6 +7,40 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 5 de septiembre de 2026 (continuación 6) — Botón de sincronizar en la cabecera
+
+El usuario preguntó por trofeos "en tiempo real". Respuesta honesta: no es
+posible — ni PSN, ni Steam, ni Xbox avisan por webhook cuando alguien
+desbloquea un trofeo, la única forma de saberlo es preguntar. Y preguntar
+automáticamente para todo el mundo tiene un techo real: el cron
+(`api/cron/sync/route.ts`) corre **una vez al día** porque el plan Hobby de
+Vercel no deja crons más frecuentes (se pidió cada hora al principio y
+Vercel rechazó el despliegue), y encima esa única pasada solo refresca 8
+cuentas — con más usuarios tarda varios días en darle la vuelta a todos.
+
+De las opciones planteadas (botón más visible / límite de frecuencia al
+botón / auto-refresco en la página / cron más frecuente con plan de pago),
+el usuario eligió solo la primera. `syncNowAction` (el mismo "Sincronizar
+ahora" que ya existía, escondido en Ajustes → Plataformas) ahora tiene un
+icono propio en la cabecera (`Header.tsx`), visible en cualquier página
+mientras haya sesión y al menos una cuenta vinculada
+(`headerUser.tieneCuentas`, nuevo en `layout.tsx`) — antes hacía falta saber
+que ese botón existía y bucear hasta ajustes para encontrarlo.
+
+**Pendiente, no construido a propósito** (el usuario no lo pidió esta vez,
+solo la primera opción): el botón sigue sin ningún límite de frecuencia —
+nada impide dar a "sincronizar" 20 veces seguidas, y con Xbox vinculado eso
+puede agotar la cuota compartida de OpenXBL (150 peticiones/hora entre
+TODOS los usuarios de Paragon con Xbox, no por cuenta — ver el aviso en
+`lib/xbl/client.ts`). Vale la pena un cooldown (p. ej. 1 sincronización cada
+2-3 minutos) antes de que alguien lo descubra por accidente.
+
+Sin verificar en el navegador logueado (sin credenciales, mismo motivo de
+siempre) — sí comprobado que la cabecera no rompe nada en páginas sin
+sesión y que tipa correctamente.
+
+---
+
 ## Sesión del 5 de septiembre de 2026 (continuación 5) — Retos semanales con variedad de verdad
 
 Última pendiente de la lista de 8. La decisión bloqueada era "a mano o con

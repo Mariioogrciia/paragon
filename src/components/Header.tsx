@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { Avatar } from "./Avatar";
 import { ThemeCustomizer } from "./ThemeCustomizer";
+import { syncNowAction } from "@/app/actions";
 
 /**
  * Antes eran 9 enlaces en una sola fila (más "Admin" como un décimo, para
@@ -125,6 +127,42 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
   );
 }
 
+/**
+ * Antes "Sincronizar ahora" solo vivía en Ajustes → Plataformas, a varios
+ * clics de cualquier pantalla — para "acabo de conseguir un trofeo y quiero
+ * verlo ya" hacía falta saber que ese botón existía y dónde estaba. Mismo
+ * `syncNowAction` de siempre, solo que accesible desde cualquier página.
+ */
+function BotonSincronizar() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      aria-label="Sincronizar trofeos ahora"
+      title="Sincronizar trofeos ahora"
+      className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-50"
+      style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className={pending ? "animate-spin" : ""}
+      >
+        <path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9c2.5 0 4.7 1.1 6.2 2.8" />
+        <path d="M21 3v6h-6" />
+      </svg>
+    </button>
+  );
+}
+
 export function Header({
   user,
   avisosSinLeer = 0,
@@ -136,6 +174,7 @@ export function Header({
     paragonLevel?: number | null;
     paragonProgress?: number | null;
     esDesarrollador?: boolean;
+    tieneCuentas?: boolean;
   } | null;
   /** Avisos pendientes, para el punto de la campana. */
   avisosSinLeer?: number;
@@ -213,6 +252,12 @@ export function Header({
         </nav>
 
         <div className="ml-auto flex items-center gap-3.5">
+          {user?.tieneCuentas && (
+            <form action={syncNowAction}>
+              <BotonSincronizar />
+            </form>
+          )}
+
           {user && (
             <Link
               href="/avisos"

@@ -117,6 +117,10 @@ export default async function RootLayout({
         paragonLevel: nivelParagon?.level ?? null,
         paragonProgress: nivelParagon?.progreso ?? null,
         esDesarrollador: profile?.esDesarrollador ?? false,
+        // Sin cuentas vinculadas no hay nada que sincronizar — el botón de
+        // la cabecera (ver Header.tsx) se esconde en vez de mostrarse
+        // deshabilitado, que invita a preguntarse "¿por qué no funciona?".
+        tieneCuentas: (profile?.accounts.length ?? 0) > 0,
       }
     : null;
 
