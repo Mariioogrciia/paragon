@@ -48,7 +48,31 @@ function connect(): Db {
   // `max` bajo a propósito: en serverless puede haber muchas instancias de
   // función calientes a la vez, cada una con su propio pool — el límite de
   // Supabase (200 en el plan gratuito) es compartido entre todas.
-  const conn = globalForDb.conn ?? postgres(url, { prepare: false, max: 5 });
+  //
+  // `idle_timeout`/`max_lifetime`/`connect_timeout`: sin esto, una conexión
+  // que se queda colgada a nivel de red (blip con Supabase, socket que deja
+  // de responder) ocupa su hueco del pool PARA SIEMPRE — con `max: 5`, basta
+  // con que esto le pase a 1 o 2 conexiones para que el resto de peticiones
+  // hagan cola sin límite de tiempo (visto de verdad: una petición tardó
+  // 131 minutos). `max_lifetime` recicla cada conexión periódicamente aunque
+  // esté "sana", así una zombi nunca dura más de esa ventana.
+  const conn =
+    globalForDb.conn ??
+    postgres(url, {
+      prepare: false,
+      max: 5,
+      idle_timeout: 20,
+      connect_timeout: 10,
+      max_lifetime: 60 * 30,
+      // Tope duro por sentencia. Sin esto, una consulta que se queda esperando
+      // una respuesta que no llega nunca retiene su conexión para siempre — y
+      // con `max: 5`, cinco de esas dejan la app entera colgada (medido: con
+      // el pool agotado, /feed y /ligas también se cuelgan, no solo el
+      // perfil; solo responden las páginas cacheadas, que no piden conexión).
+      // 30s es muy holgado: la consulta más lenta medida de verdad en esta
+      // app son ~300ms (pg_stat_statements).
+      connection: { statement_timeout: 30_000 },
+    });
   const instance = drizzle(conn, { schema });
 
   globalForDb.conn = conn;

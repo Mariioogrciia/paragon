@@ -7,6 +7,167 @@ trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó é
 
 ---
 
+## Sesión del 6 de septiembre de 2026 (continuación 2) — webhook de Discord confirmado en vivo, y aviso de conexión zombi en el pool
+
+### Webhook de Discord: confirmado funcionando de verdad, con un webhook real
+
+Primera prueba end-to-end real (hasta ahora solo se había verificado el regex
+de validación y el código a mano, ver sesión de más abajo). El usuario
+reportó "consigo un trofeo y no se manda el webhook" — **no era un bug**: el
+flujo correcto es conseguir el trofeo → darle a "Sincronizar ahora" (el icono
+de la cabecera) → el aviso llega. Paragon no sabe que existe un trofeo nuevo
+hasta que sincroniza de verdad contra PSN/Steam/Xbox (nada de tiempo real,
+ver la sesión del botón de sincronizar más abajo); si no se sincroniza, no
+hay nada que anunciar. Con ese flujo, el usuario confirmó que **el mensaje
+llega al canal de Discord tal cual**. `lib/discordWebhook.ts`/`lib/sync.ts`
+quedan verificados en producción, no solo revisados a mano.
+
+### La lentitud de `/u/[handle]`: medida de verdad — el pool SIGUE atascándose (sin resolver)
+
+Este documento llevaba dos sesiones diciendo dos cosas que **resultaron ser
+falsas al medirlas**. Queda corregido aquí para que nadie más las herede.
+
+**Los síntomas** (logs reales de `next dev` pegados por el usuario): un
+`SELECT` trivial por `handle` con `LIMIT 1` cancelado por `statement timeout`
+a los 60s (`57014`), y una petición a `/u/[handle]/[gameId]` que tardó
+**131,7 minutos** antes de que el navegador cortara ("the destination stream
+closed early").
+
+**Lo que se midió, en este orden** (todo reproducible, no deducido):
+1. **No hay ninguna `db.transaction` en toda la app** — así que no era una
+   transacción nuestra sin cerrar.
+2. **La base está perfectamente sana**: conectando aparte, el MISMO `select`
+   por handle que tardaba 60s desde la app tarda **49ms**. `select 1` 415ms
+   (primera conexión), `now()` 37ms, `count(*)` sobre `user` 64ms.
+3. **No hay tormenta de N+1**: instrumentando el cliente con el hook `debug`
+   de postgres.js, el perfil entero hace **28 consultas**, 19 distintas.
+   Ninguna pasa de ~300ms de media (`pg_stat_statements`), la mayoría 40-70ms.
+4. **Reiniciar el servidor lo curaba**: tras reiniciar `next dev`, la misma
+   página bajó de >120s a 3,5-5s. O sea que los cuelgues de 60s/131min eran
+   del PROCESO, no de la base ni de la consulta.
+
+**Causa 1 — el pool del proceso se atasca ENTERO. NO ARREGLADO.**
+Esto es lo más importante de esta sesión, y lo que hay que atacar primero.
+Se le añadieron al pool `idle_timeout: 20`, `connect_timeout: 10`,
+`max_lifetime: 60 * 30` y `connection: { statement_timeout: 30s }` (mitigan,
+y conviene dejarlos) **pero NO lo resuelven**: el fallo se reprodujo igual
+después.
+
+Reproducción, medida hoy:
+1. Arranca `next dev` con `.next` limpio. El perfil carga en 3,8s en frío.
+2. Pide 3-5 renders FRESCOS seguidos de `/u/fende21` (con `?cb=` distinto
+   cada vez para saltarse el caché de dev).
+3. A partir de ahí el proceso queda **muerto de forma permanente** para
+   todo lo que necesite base de datos: `/u/[handle]`, `/feed` y `/ligas` se
+   cuelgan indefinidamente. Solo responden las páginas cacheadas
+   (`/rankings`, 0,23s) y las que no tocan la base (`/entrar`, 0,13s).
+4. **No se recupera solo**: probado dejarlo 75s en reposo y luego una única
+   petición paciente de 5 minutos — nunca termina.
+5. **Reiniciar `next dev` lo cura** hasta la próxima vez.
+
+La prueba de que la culpa NO es de la base: con la app completamente
+colgada, un script aparte abre una conexión nueva al mismo Postgres y hace
+**la misma consulta por handle en 38ms**. La base está sana; lo que se
+atasca es el pool de ese proceso de Node. Cuando está atascado, la petición
+colgada llega a enviar 34 KB (la cáscara + el skeleton del Suspense) y se
+queda esperando el resto para siempre — que es exactamente el "GET
+/u/fende21 200 in 60s" y el "131.7min ... destination stream closed early"
+que reportó el usuario.
+
+Hipótesis para quien siga (por orden de sospecha): las 5 conexiones se
+quedan retenidas por consultas que nunca reciben respuesta (socket muerto
+que postgres.js no detecta, porque no hay timeout de consulta del lado del
+cliente y `statement_timeout` del servidor no salta si la respuesta no
+llega nunca); o renders abandonados (el navegador corta, Next sigue
+renderizando) que no sueltan lo que han pedido. Vías concretas: un timeout
+de cliente de verdad por consulta que además cierre y recicle esa conexión;
+`keep_alive` más agresivo en postgres.js; o subir `max` (con cuidado: hay
+un incidente real documentado de "max client connections reached", más
+abajo en este archivo). **Y lo más efectivo de todo sería reducir el
+trabajo por petición** — ver el párrafo del HTML de 1 MB más abajo.
+
+**Causa 2 — la pestaña oculta bloqueaba el HTML (arreglada).** `SectionTabs`
+renderiza las 3 pestañas en el servidor aunque solo se vea una (a propósito:
+las oculta con `hidden` sin desmontarlas, para no perder scroll ni repetir
+consultas al cambiar). El problema es que `<EstadisticasCompletas />` — una
+pestaña que NO se ve por defecto — bloqueaba el envío del HTML de "Resumen"
+y "Biblioteca". Metida en un `<Suspense>` con skeleton: el esqueleto sale a
+los **540ms** y las estadísticas llegan después por streaming.
+
+**Corregida la advertencia anterior sobre `Promise.all`.** El HANDOFF decía
+en mayúsculas "NO dispares varias consultas nuevas en paralelo en esta
+página". Era una conclusión equivocada del incidente: aquel cuelgue fue la
+conexión zombi (causa 1), no la concurrencia. Con la base sana, las cinco
+consultas del cuerpo del perfil se paralelizan **en tandas de 3** (no las
+cinco de golpe: el pool sigue siendo de 5 y se comparte con lo que rinde el
+resto del árbol) sin un solo cuelgue en las pruebas.
+
+**Resultado medido** (perfil real `fende21`, con `.next` limpio):
+
+| | antes | ahora |
+|---|---|---|
+| primer HTML útil | 3,5-5s | **0,54s** (esqueleto) |
+| contenido visible | ~3,5s | ~1,87s |
+| carga en frío | 3,5-5s | 3,8s |
+
+**AVISO sobre estas cifras**: las medidas intermedias de esta sesión se
+tomaron con un `.next` corrupto (ver el aviso de abajo) y algunas salieron
+peores de lo real. Lo que sí está verificado es que el `<Suspense>` hace su
+trabajo: la cáscara sale a los ~540ms en vez de esperar a todo.
+
+**Trampa que costó media hora — `npm run build` con `next dev` encima
+corrompe `.next`.** Tras hacer el build de producción con el servidor de
+desarrollo corriendo, `/u/[handle]` empezó a devolver **404 en 50ms sin
+compilar la ruta siquiera** (y no era un fallo de código: la consulta
+devolvía la fila perfectamente desde fuera). Se cura borrando `.next`
+entero y arrancando de nuevo. Si ves 404 en rutas que existen, es esto:
+no busques el bug en el código.
+
+**Lo que sigue pendiente aquí**: el HTML del perfil pesa **1.030 KB** porque
+las 3 pestañas se renderizan enteras (la biblioteca de 190 juegos incluida).
+Ese es el siguiente cuello de botella real, y probablemente también la vía
+más eficaz contra el atasco del pool: menos trabajo y menos consultas por
+petición. Herramientas usadas para medir esto, por si hace falta repetirlo:
+el hook `debug` de postgres.js para contar consultas, `pg_stat_statements`
+para tiempos por consulta, y un script que lee el stream marcando en qué
+milisegundo llega cada parte del HTML.
+
+### Favicon: el bug real (no era caché del navegador)
+
+La sesión anterior investigó "el favicon se ha ido", vio que `app/icon.jpg`
+existía y se servía bien, y lo achacó a caché del navegador. **No era caché.**
+Comprobado con `curl` sobre el HTML de verdad: el `<head>` solo llevaba
+`<link rel="apple-touch-icon">` y **ningún `<link rel="icon">`**. El culpable
+era `icons: { apple: "/logo.jpg" }` en el `metadata` de `layout.tsx`:
+declarar `icons` a mano hacía que Next dejara de emitir el enlace de la
+convención de archivos, así que `app/icon.jpg` se servía pero no lo
+enlazaba nadie.
+
+Arreglado pasando los dos iconos a la convención de archivos, que es lo que
+recomiendan los propios docs de Next (`node_modules/next/dist/docs/01-app/
+03-api-reference/03-file-conventions/01-metadata/app-icons.md`) y quitando
+`icons` del metadata:
+- `src/app/icon.jpg` (256×256, **11 KB**) → `<link rel="icon">`
+- `src/app/apple-icon.jpg` (180×180, 7 KB) → `<link rel="apple-touch-icon">`
+
+De paso, el favicon pesaba **429 KB** (el logo a 1024×1024 tal cual) y se
+descarga en cada visita de cada visitante para verse a 16-32px en la
+pestaña: ahora son 11 KB. El `logo.jpg` de 1024 sigue en `/public` para la
+cabecera y el manifest de la PWA, donde sí hace falta grande.
+
+Logo nuevo (copa con un mando dentro, gradiente platino) puesto por el
+usuario en `public/logo.jpg`; los otros dos se generan de ahí con `sharp`.
+
+### El cooldown del botón de sincronizar YA ESTABA HECHO
+
+Este documento lo listaba como pendiente ("nada impide dar a sincronizar 20
+veces seguidas"). Está construido: `SYNC_COOLDOWN_MS = 2 minutos` en
+`app/actions.ts`, aplicado tanto a `syncNowAction` como a
+`syncPlatformAction`, reutilizando `platformAccounts.syncedAt` en vez de una
+columna nueva. Pendiente tachado.
+
+---
+
 ## Sesión del 6 de septiembre de 2026 (continuación) — foto real de los logros en todos lados, favicon/logo, y un aviso serio sobre el pool de conexiones
 
 ### Foto real del logro, barrido completo
@@ -78,6 +239,13 @@ renderiza las 3 pestañas del perfil enteras en el servidor aunque estén
 ocultas** (incluida `EstadisticasCompletas`, que hace su propio montón de
 consultas) — disparar 6-8 consultas MÁS a la vez desde aquí encima superó
 lo que el pool puede dar de sí.
+
+> **CORREGIDO DESPUÉS — no te fíes de lo que dice el resto de este bloque.**
+> Todo lo de abajo culpa a la concurrencia, y al medirlo resultó ser falso:
+> la causa era una conexión zombi en el pool (sin `idle_timeout` ni
+> `max_lifetime`) y la pestaña oculta de Estadísticas bloqueando el HTML.
+> Ver "La lentitud de `/u/[handle]`, por fin medida" al principio de este
+> documento. Sí se puede paralelizar en esta página, con cabeza.
 
 **Revertido a secuencial** (commit `0f0bced`) — el estado que sí funciona,
 solo que despacio. **La lentitud real de `/u/[handle]` sigue sin

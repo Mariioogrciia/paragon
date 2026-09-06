@@ -35,6 +35,26 @@ import { bannerPresetKey } from "@/lib/bannerPresets";
 import { BackButton } from "@/components/BackButton";
 import { SectionTabs } from "@/components/SectionTabs";
 import { EstadisticasCompletas } from "@/components/EstadisticasCompletas";
+import { Suspense } from "react";
+
+/** Hueco de "Estadísticas" mientras llega por streaming — mismo lenguaje de
+ * skeleton que ya usa `UpcomingGames.tsx`, no un spinner suelto. */
+function EstadisticasCargando() {
+  return (
+    <div className="space-y-9">
+      {[1, 2].map((i) => (
+        <div key={i} className="rounded-[18px] border border-border bg-surface p-6">
+          <div className="mb-4 h-6 w-48 rounded bg-surface-2 animate-pulse" />
+          <div className="grid gap-3 md:grid-cols-2">
+            {[1, 2, 3, 4].map((j) => (
+              <div key={j} className="h-16 rounded-xl bg-surface-2/60 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -95,25 +115,36 @@ export default async function PerfilPage({
   }
   const stats = summarise(games);
   const nivelParagon = paragonProgress(games);
-  // Secuencial a propósito, no un descuido: el pool de Postgres tiene un
-  // máximo de 5 conexiones a la vez (ver db/index.ts) compartido con TODO
-  // lo demás que esta misma página ya pide (getLibrary, y lo que fetchea
-  // cada pestaña de SectionTabs, que se renderiza entera en el servidor
-  // aunque esté oculta). Un intento de paralelizar esto con Promise.all
-  // dejó una petición colgada más de 60s el 6 de septiembre de 2026 — la
-  // lentitud real de esta página tiene otra causa (pendiente de investigar
-  // con cuidado) y no vale la pena arriesgar un cuelgue por adelantar unos
-  // cientos de ms.
-  const carpetas = await listCollections(profile.userId);
-  const resumen = await resumenHistorico(profile.userId);
-  const juegosEsteAnio = await juegosDelAnio(profile.userId);
-  const badges = await getUserBadges(profile.userId);
+  // Paralelizado EN TANDAS DE 3, no todo de golpe — y esto tiene historia.
+  //
+  // El 6 de septiembre de 2026 se intentó un `Promise.all` con las cinco
+  // consultas a la vez y una petición se quedó colgada más de 60s; se
+  // revirtió a secuencial y quedó escrito "no paralelizar aquí". La causa
+  // real se encontró después, midiendo: NO era la concurrencia. Era una
+  // conexión del pool que se quedaba zombi (el pool no tenía `idle_timeout`
+  // ni `max_lifetime`, así que un socket colgado ocupaba su hueco para
+  // siempre — ver db/index.ts, ya arreglado). Con la base sana, el mismo
+  // `select` que tardaba 60s desde la app tarda 49ms medido directamente.
+  //
+  // Aun así se paraleliza acotado a 3, no las cinco de golpe: el pool sigue
+  // siendo de 5 conexiones compartidas con todo lo demás que renderiza esta
+  // página a la vez (incluida la pestaña "Estadísticas", que ahora va por su
+  // propio <Suspense> pero sigue consultando en paralelo con esto). Tres deja
+  // margen de sobra y ya se lleva la mayor parte de la mejora.
+  const [carpetas, resumen, juegosEsteAnio] = await Promise.all([
+    listCollections(profile.userId),
+    resumenHistorico(profile.userId),
+    juegosDelAnio(profile.userId),
+  ]);
+  // Pública igual que el resto de la ficha: se ve tanto en tu propio
+  // perfil como en el de cualquiera que lo visite.
+  const [badges, recientes] = await Promise.all([
+    getUserBadges(profile.userId),
+    ultimosTrofeos(profile.userId),
+  ]);
   const [rachasPerfil, percentilAnio] = games.length > 0
     ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
     : [{ actual: 0, mejor: 0, diasActivos: 0 }, null];
-  // Pública igual que el resto de la ficha: se ve tanto en tu propio
-  // perfil como en el de cualquiera que lo visite.
-  const recientes = await ultimosTrofeos(profile.userId);
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
   const showcaseTrophiesData = showcaseTrophyIds.length > 0 
@@ -391,7 +422,25 @@ export default async function PerfilPage({
                 // Mismo componente que la página standalone /u/[handle]/estadisticas
                 // (EstadisticasCompletas.tsx) — una sola fuente de verdad para las
                 // consultas y el layout, no una copia que se pueda desincronizar.
-                { key: "estadisticas", label: "Estadísticas", content: <EstadisticasCompletas handle={handle} /> },
+                //
+                // Dentro de <Suspense> a propósito: `SectionTabs` renderiza las 3
+                // pestañas en el servidor aunque solo se vea una (las oculta con
+                // `hidden`, sin desmontarlas, para no perder scroll ni repetir
+                // consultas al cambiar de pestaña). Sin esta frontera, el montón
+                // de consultas de "Estadísticas" — una pestaña que NO se ve por
+                // defecto — bloqueaba el HTML de "Resumen" y "Biblioteca": la
+                // página tardaba 3,5-5s en soltar nada, medido de verdad. Con
+                // Suspense, el resto del perfil se envía en cuanto está listo y
+                // las estadísticas llegan después, por streaming.
+                {
+                  key: "estadisticas",
+                  label: "Estadísticas",
+                  content: (
+                    <Suspense fallback={<EstadisticasCargando />}>
+                      <EstadisticasCompletas handle={handle} />
+                    </Suspense>
+                  ),
+                },
               ]}
             />
           );
