@@ -98,6 +98,7 @@ export interface Trophy {
   rarityPercent?: number;
   hidden?: boolean;
   iconUrl?: string;
+  isMissable?: boolean;
   /**
    * Hitos parciales ("31 de 48 cuervos"). Solo algunos juegos de PS5 los
    * exponen, y aun así PSN no siempre devuelve el valor actual — ver psn.ts.
