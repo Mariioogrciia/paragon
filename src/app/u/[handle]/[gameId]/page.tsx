@@ -187,6 +187,21 @@ export default async function JuegoPage({
                 {game.title}
               </h1>
 
+              <div className="mt-3 flex items-center gap-3">
+                <Link
+                  href={`/juego/${game.igdbId ?? game.id}`}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:bg-white/10 hover:text-white"
+                  title="Ver la ficha global de este juego con estadísticas de la comunidad"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                  Ver ficha global
+                </Link>
+              </div>
+
               <div className="mt-5 flex max-w-[560px] items-center gap-4">
                 <div
                   className="relative h-3 flex-1 overflow-hidden rounded-full"

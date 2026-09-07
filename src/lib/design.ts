@@ -89,12 +89,20 @@ export function monogram(title: string): string {
   return title.slice(0, 2).toUpperCase();
 }
 
-/** "hace 2 d", "hace 3 m"... la misma escala relativa en toda la app. */
 export function relativeDate(input?: string | Date | null): string | null {
   if (!input) return null;
 
-  const days = Math.floor((Date.now() - new Date(input).getTime()) / 86_400_000);
-  if (Number.isNaN(days)) return null;
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const now = new Date();
+  
+  // Limpiamos las horas para comparar solo días del calendario local
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const inputDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  
+  const diffTime = today.getTime() - inputDay.getTime();
+  const days = Math.round(diffTime / 86_400_000);
 
   if (days <= 0) return "hoy";
   if (days === 1) return "ayer";

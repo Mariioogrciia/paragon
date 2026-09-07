@@ -112,10 +112,7 @@ export function TrophyTypeIcon({ tipo, size = 14 }: { tipo: TrophyType; size?: n
       role="img"
       aria-label={TROPHY_TYPE_LABEL[tipo]}
     >
-      <title>
-        {TROPHY_TYPE_LABEL[tipo]}
-        {aproximado ? " (aproximado, por el texto del trofeo)" : ""}
-      </title>
+      <title>{`${TROPHY_TYPE_LABEL[tipo]}${aproximado ? " (aproximado, por el texto del trofeo)" : ""}`}</title>
       {TROPHY_TYPE_PATHS[tipo]}
     </svg>
   );
