@@ -3,18 +3,18 @@ import { auth } from "@/auth";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { writeFile } from "fs/promises";
+import { createClient } from "@supabase/supabase-js";
 import path from "path";
 
-/**
- * Extensiones admitidas por tipo de subida. El banner además admite vídeo
- * (mp4/webm) para banners animados; el avatar no, porque se recorta en
- * redondo y un vídeo ahí no aporta nada.
- */
 const EXTENSIONES_PERMITIDAS: Record<"avatar" | "banner", string[]> = {
-  avatar: [".jpg", ".jpeg", ".png", ".gif"],
-  banner: [".jpg", ".jpeg", ".png", ".gif", ".mp4", ".webm"],
+  avatar: [".jpg", ".jpeg", ".png", ".gif", ".webp"],
+  banner: [".jpg", ".jpeg", ".png", ".gif", ".mp4", ".webm", ".webp"],
 };
+
+// Inicializamos el cliente de Supabase (con service_role para saltar RLS desde el servidor)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(request: Request) {
   try {
@@ -23,10 +23,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Verificar si las variables de entorno están configuradas
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Faltan las variables de entorno de Supabase Storage.");
+      return NextResponse.json({ error: "Storage no configurado" }, { status: 500 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    // "avatar" por defecto: mantiene compatible cualquier llamada vieja que
-    // no mande `kind` todavía.
     const kindRaw = formData.get("kind") as string | null;
     const kind: "avatar" | "banner" = kindRaw === "banner" ? "banner" : "avatar";
 
@@ -42,24 +46,33 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Guardar en public/uploads/
-    const filename = `${session.user.id}-${Date.now()}${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    const filepath = path.join(uploadDir, filename);
+    // Subir a Supabase Storage (bucket "Avatars")
+    // Lo guardamos en una subcarpeta según el tipo (avatars/ o banners/)
+    const filename = `${kind}s/${session.user.id}-${Date.now()}${ext}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("Avatars")
+      .upload(filename, buffer, {
+        contentType: file.type,
+        upsert: true,
+      });
 
-    await writeFile(filepath, buffer);
+    if (uploadError) {
+      console.error("Error al subir a Supabase:", uploadError);
+      return NextResponse.json({ error: "Upload to storage failed" }, { status: 500 });
+    }
 
-    const fileUrl = `/uploads/${filename}`;
+    // Obtener la URL pública de la imagen
+    const { data: publicUrlData } = supabase.storage
+      .from("Avatars")
+      .getPublicUrl(filename);
+      
+    const fileUrl = publicUrlData.publicUrl;
 
-    // Actualizar la columna que corresponde: antes esto siempre escribía en
-    // `image` sin mirar qué se estaba subiendo, así que un banner nuevo
-    // pisaba el avatar en silencio.
+    // Actualizar la tabla de usuarios
     const db = getDb();
     await db
       .update(users)
-      // `avatarPersonalizado: true` es lo que hace que esta imagen le gane a
-      // PSN en resolveAvatarUrl/avatarUrlSql — sin esto no hay forma de
-      // distinguir "subida a mano" de la imagen de Google/Discord del alta.
       .set(kind === "banner" ? { profileBannerUrl: fileUrl } : { image: fileUrl, avatarPersonalizado: true })
       .where(eq(users.id, session.user.id));
 
