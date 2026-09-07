@@ -36,7 +36,13 @@ export interface SaludPlataforma {
 const PLATAFORMA = sql<string>`split_part(${userGames.gameId}, '-', 1)`;
 
 export async function saludSincronizacion(userId: string): Promise<SaludPlataforma[]> {
-  const desde = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000);
+  // ISO string, NO un Date: meter un `Date` de JS dentro de un fragmento
+  // `sql` crudo revienta siempre ("The string argument must be of type
+  // string... Received an instance of Date"), porque ahi drizzle no conoce
+  // el tipo de la columna y lo pasa tal cual al driver. Con los operadores
+  // tipados de drizzle (`lt`, `gte`...) si funciona un Date, porque esos si
+  // saben contra que columna comparan. Comprobado a mano contra la base.
+  const desde = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000).toISOString();
 
   const filas = await db
     .select({

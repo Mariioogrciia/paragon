@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import { listFriends } from "@/lib/profiles";
@@ -278,7 +278,12 @@ async function avisosDeAbandonados(userId: string, handle: string | null): Promi
         eq(userGames.userId, userId),
         eq(userGames.isWishlist, false),
         sql`${userGames.progressPercent} between 1 and 99`,
-        sql`${userGames.lastPlayedAt} is not null and ${userGames.lastPlayedAt} < ${limite}`,
+        // `isNotNull` + `lt` tipados en vez de un fragmento `sql` crudo: meter
+        // un `Date` dentro de un fragmento revienta siempre (drizzle no sabe
+        // el tipo ahi y lo pasa tal cual al driver). Ver el mismo arreglo mas
+        // abajo en `avisosDeResumenSemanal`.
+        isNotNull(userGames.lastPlayedAt),
+        lt(userGames.lastPlayedAt, limite),
       ),
     );
 
@@ -317,7 +322,7 @@ async function avisosDeResumenSemanal(userId: string): Promise<NuevoAviso[]> {
       and(
         eq(userTrophies.userId, userId),
         eq(userTrophies.earned, true),
-        sql`${userTrophies.earnedAt} >= ${desde}`,
+        gte(userTrophies.earnedAt, desde),
       ),
     );
 

@@ -130,7 +130,7 @@ export async function rankingGeneros(
     cross join lateral jsonb_array_elements_text(coalesce(g.genres, '[]'::jsonb)) as genero
     where ut."userId" = ${userId}
       and ut.earned = true
-      ${desde ? sql`and ut."earnedAt" >= ${desde}` : sql``}
+      ${desde ? sql`and ut."earnedAt" >= ${desde.toISOString()}` : sql``}
     group by genero
     order by count(*) desc
   `);
