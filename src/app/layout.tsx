@@ -81,17 +81,17 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   // NO declarar `icons` aquí a propósito. Antes había un `icons: { apple:
-  // "/logo.jpg" }` y el efecto real era que Next dejaba de emitir el
+  // "/logo.png" }` y el efecto real era que Next dejaba de emitir el
   // `<link rel="icon">` por completo — comprobado en vivo con `curl`: el
-  // <head> solo llevaba el apple-touch-icon, y `app/icon.jpg` se servía
+  // <head> solo llevaba el apple-touch-icon, y `app/icon.png` se servía
   // pero no lo enlazaba nadie. De ahí el "el favicon se ha ido" que se
   // achacó a caché del navegador en una sesión anterior; no era caché.
   // Ahora los dos iconos salen de la convención de archivos, que es lo que
   // recomiendan los propios docs de Next (ver
   // node_modules/next/dist/docs/.../01-metadata/app-icons.md):
-  //   - `app/icon.jpg`       (256x256) → <link rel="icon">
-  //   - `app/apple-icon.jpg` (180x180) → <link rel="apple-touch-icon">
-  // El `logo.jpg` de 1024 sigue en /public para la cabecera y el manifest,
+  //   - `app/icon.png`       (256x256) → <link rel="icon">
+  //   - `app/apple-icon.png` (180x180) → <link rel="apple-touch-icon">
+  // El `logo.png` de 1024 sigue en /public para la cabecera y el manifest,
   // donde sí hace falta grande.
 };
 

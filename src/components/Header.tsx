@@ -224,7 +224,7 @@ export function Header({
       <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-3 px-4 sm:gap-[30px] sm:px-7">
         <Link href="/" className="flex items-center gap-2.5">
           <img
-            src="/logo.jpg"
+            src="/logo.png"
             alt="Paragon"
             className="h-[30px] w-[30px] rounded-[9px]"
             style={{
