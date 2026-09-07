@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
@@ -35,6 +36,42 @@ import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}` : null;
+}
+
+/**
+ * Metadatos sociales del perfil. La IMAGEN no se declara aquí: la pone sola
+ * `opengraph-image.tsx` (convención de archivo de Next), que vive en esta
+ * misma carpeta.
+ *
+ * Los números van en la descripcion a proposito: "1.240 trofeos y 24
+ * platinos" da una razon para pulsar el enlace que "Perfil de Paragon" no
+ * da. Se reusa `getProfileByHandle`, que ya cachea por peticion, asi que
+ * esto no duplica consultas con el render de la pagina.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const profile = await getProfileByHandle(handle);
+  if (!profile) return { title: "Perfil no encontrado · Paragon" };
+
+  const { games } = await getLibrary(profile);
+  const stats = summarise(games);
+  const nombre = profile.displayName ?? handle;
+  const titulo = `${nombre} (@${handle}) · Paragon`;
+  const descripcion =
+    games.length === 0
+      ? `El perfil de trofeos de ${nombre} en Paragon.`
+      : `${stats.trofeos.toLocaleString("es-ES")} trofeos, ${stats.platinos.toLocaleString("es-ES")} platinos y ${stats.juegos.toLocaleString("es-ES")} juegos en Paragon.`;
+
+  return {
+    title: titulo,
+    description: descripcion,
+    openGraph: { title: titulo, description: descripcion, type: "profile" },
+    twitter: { card: "summary_large_image", title: titulo, description: descripcion },
+  };
 }
 
 export default async function PerfilPage({

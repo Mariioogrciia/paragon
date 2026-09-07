@@ -8,18 +8,22 @@ import type { TrophyGrade } from "@/lib/types";
  * revienta la generación entera de la imagen, no solo esa foto. El resto
  * de <img> normales de la app siguen usando rutas relativas sin problema.
  *
- * Sin `VERCEL_PROJECT_PRODUCTION_URL` (en local) no hay forma fiable de
- * saber el dominio propio, así que se devuelve `undefined` — sin avatar es
- * mejor que con uno roto.
+ * En produccion el dominio lo pone Vercel (`VERCEL_PROJECT_PRODUCTION_URL`);
+ * en local se cae a `http://localhost:3000`, que es donde corre `next dev`.
+ * Antes devolvia `undefined` en local, con el efecto practico de que ningun
+ * avatar subido a mano salia en NINGUNA tarjeta social mientras se
+ * desarrollaba — es decir, no habia forma de comprobar el hueco mas
+ * probable de romperse sin desplegar a produccion.
  */
 export function urlAbsolutaParaOg(url: string | undefined): string | undefined {
   if (!url) return undefined;
   if (/^https?:\/\//i.test(url)) return url;
 
-  const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (!dominio) return undefined;
+  const base = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000";
 
-  return `https://${dominio}${url.startsWith("/") ? "" : "/"}${url}`;
+  return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
 /**

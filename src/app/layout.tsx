@@ -32,9 +32,39 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
 });
 
+const DESCRIPCION = "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.";
+
+/**
+ * Dominio absoluto del sitio. `metadataBase` NO es opcional en cuanto hay
+ * imagenes sociales: sin el, Next no puede convertir "/u/x/opengraph-image"
+ * en la URL absoluta que exigen Discord, WhatsApp o Twitter, y la tarjeta
+ * simplemente no sale. `VERCEL_PROJECT_PRODUCTION_URL` la pone Vercel sola
+ * en cada despliegue (mismo criterio que ya usa `urlAbsolutaParaOg` en
+ * lib/design.ts: no se adivina ningun dominio fijo).
+ */
+const DOMINIO = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(DOMINIO),
   title: "Paragon",
-  description: "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.",
+  description: DESCRIPCION,
+  // Valores por defecto para CUALQUIER pagina que no declare los suyos.
+  // Antes la app no tenia nada de openGraph en ningun sitio, asi que
+  // compartir un enlace de Paragon dejaba un enlace pelado.
+  openGraph: {
+    siteName: "Paragon",
+    locale: "es_ES",
+    type: "website",
+    title: "Paragon",
+    description: DESCRIPCION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Paragon",
+    description: DESCRIPCION,
+  },
   // El propio archivo `app/manifest.ts` ya hace que Next sirva
   // /manifest.webmanifest y (con esta línea) lo enlace en el <head> — antes
   // había además un `<link rel="manifest" href="/manifest.ts">` a mano en

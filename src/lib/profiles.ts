@@ -1,5 +1,6 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
@@ -166,9 +167,20 @@ export function getProfileByUserId(userId: string) {
   return selectProfile(eq(users.id, userId));
 }
 
-export function getProfileByHandle(handle: string) {
+/**
+ * Memoizada por peticion con `cache()` de React.
+ *
+ * Hace falta desde que `/u/[handle]` tiene `generateMetadata`: Next llama a
+ * esa funcion Y al componente de pagina en la misma peticion, y las dos
+ * necesitan el perfil. Sin memoizar, cada visita hacia el trabajo dos veces
+ * — y como `getLibrary` recibe el objeto que devuelve esto, memoizar aqui
+ * es ademas lo que permite que la biblioteca entera (la consulta cara) se
+ * reuse en vez de repetirse. Es el patron que documenta el propio Next para
+ * este caso exacto.
+ */
+export const getProfileByHandle = cache((handle: string) => {
   return selectProfile(eq(users.handle, handle));
-}
+});
 
 export async function isHandleTaken(handle: string, exceptUserId?: string) {
   const [row] = await db
@@ -506,7 +518,8 @@ export async function unlinkAccount(userId: string, platform: AccountPlatform) {
  * este perfil: Steam o PSN solo nos dejarían leer ciertas cuentas, pero lo que
  * ya guardamos es nuestro. Salen los juegos de todas las plataformas juntos.
  */
-export async function getLibrary(profile: ProfileRow): Promise<Library> {
+export const getLibrary = cache(
+  async (profile: ProfileRow): Promise<Library> => {
   const rows = await db
     .select({
       id: gamesTable.id,
@@ -644,7 +657,7 @@ export async function getLibrary(profile: ProfileRow): Promise<Library> {
   }));
 
   return { player: toPlayer(profile), games };
-}
+});
 
 /**
  * Detalle de un juego.
