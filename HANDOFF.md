@@ -7,6 +7,134 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 7 de septiembre de 2026 (continuación) — perdibles de verdad, HLTB revisado, y "anclar juego"
+
+Retomada la sesión del mismo día. El usuario pidió expresamente revisar
+`TrophyTree.tsx`/`hltb.ts` (dejados sin auditar por la sesión anterior) y
+subir la cobertura real de "perdibles" antes de nada.
+
+### El bug real de "perdibles" no era el formato de tabla — eran dos bytes de control invisibles
+
+Investigando por qué ni Black Myth: Wukong ni MGS4 marcaban nada pese a
+tener guía real en PowerPyx, salió algo peor que lo que este documento
+sospechaba: `normalizar()` (`lib/powerpyx.ts`) llevaba **dos bytes de
+control (`0x08`, backspace) colados dentro de su propia regex de
+sufijos** — invisibles en cualquier editor, imposibles de ver con un
+`grep` normal — que impedían que "Trophy Guide & Roadmap" se recortara
+NUNCA del título de la guía. Como casi todas las guías de PowerPyx
+terminan así, esto rompía la coincidencia de título para la inmensa
+mayoría de juegos, no solo para los "casos raros" que se venía
+culpando. Ya estaba así en el commit anterior a esta sesión.
+
+Además, dos arreglos reales en el parser de la tabla: (1) bastantes
+celdas de nombre llevan un ancla de salto justo antes del `<br>` que el
+patrón viejo no cruzaba, colgando el aviso del trofeo ANTERIOR
+(comprobado contra MGS4 real: daba "Hands up!"/"SUNLIGHT!" mal); (2) el
+marcador pasó de "MISSABLE TROPHY" a solo "MISSABLE —" en las guías
+nuevas. Se sumó `resumenPerdibles`: las guías modernas listan TODOS los
+perdibles de golpe en un resumen antes de la tabla, más completo que el
+aviso suelto — subió Black Myth: Wukong de 2/7 a 7/7 detectados.
+Verificado en vivo contra powerpyx.com y contra la biblioteca real de
+`fende21`: los 7 trofeos de Wukong salen marcados de verdad en su ficha.
+
+**Lo que sigue limitando la cobertura, sin arreglar**: la búsqueda de
+PowerPyx solo devuelve 10 resultados y a veces la guía correcta ni entra
+ahí (probado con "Elden Ring": lo tapan 10 resultados de "Elden Ring
+Nightreign"). El título en la base sigue teniendo que coincidir EXACTO
+(MGS4 sigue sin encontrar guía: "Guns of the Patriots" en la base vs solo
+"Metal Gear Solid 4" en PowerPyx). Y algunos juegos (Silent Hill 2
+Remake) solo explican sus perdibles en prosa, sin nombrarlos en ningún
+sitio extraíble.
+
+### `hltb.ts` (Antigravity): mismo bug de raíz que "perdibles", y la API de HLTB cambió de verdad
+
+`syncGameHltb` cogía "el primer resultado" de la búsqueda a ciegas — la
+propia librería `howlongtobeat` calcula una `similarity` por Levenshtein
+pero NO reordena por ella, devuelve los resultados en el orden que da la
+API de HLTB (`sortCategory: "popular"`), así que el juego más popular
+que comparta alguna palabra con la búsqueda puede salir primero aunque
+sea otro juego. Arreglado: se coge el de mayor `similarity`, descartando
+si ni el mejor llega a un umbral razonable.
+
+**Hallazgo más importante, sin arreglar**: la API de HowLongToBeat
+**cambió de verdad** — el endpoint que usa esta librería (`/api/search`,
+incluso en su última versión publicada, 1.8.0) da **404 ahora mismo**,
+comprobado en vivo contra el servidor real. Inspeccionado el JS de
+howlongtobeat.com: el endpoint real ahora es `/api/search/site`, y exige
+un **token de seguridad en dos pasos** (`GET /api/search/site/init` para
+sacar `{token, hpKey, hpVal}`, luego `POST /api/search/site` con esos
+tres valores en headers `x-auth-token`/`x-hp-key`/`x-hp-val`). Esto no es
+solo una URL movida — es un mecanismo anti-scraping deliberado, un
+escalón por encima de lo que ya se asume con PowerPyx/OpenXBL, así que no
+se ha replicado sin decidirlo antes con el usuario. Mientras tanto, el
+tiempo de HLTB en el Planificador simplemente no aparece (nunca lanza).
+
+### GTA V otra vez: el mismo hardcode que se quitó hoy, reintroducido sin querer
+
+`GameHeaderLogo.tsx` (la cabecera de `/juego/[id]`, no la carátula de
+`GameCard.tsx` — sitio distinto) traía un `if (title === "grand theft
+auto v"...)` forzando una imagen fija de Steam en vez del logo dinámico
+de siempre. Comprobado: el logo dinámico (`.../apps/271590/logo.png`)
+carga perfectamente (200, ~60KB) — no había ninguna razón técnica.
+Revertido a como estaba, con el mismo criterio que ya dejó `GameCard.tsx`
+por escrito esta misma mañana: un dato/render que funciona no se tapa
+con un `if` por título. Como coincidía byte a byte con el commit
+anterior, no generó commit propio — simplemente no llegó a mezclarse.
+
+### Nueva función: anclar juego ("voy a por este platino ahora")
+
+Pedido por el usuario: marcar el juego al que le está dando prioridad
+ahora mismo, visible en su propia biblioteca y en su perfil público (para
+que quien lo visite sepa a qué está jugando). `user_game.pinnedAt`
+(migración ejecutada), `togglePinGameAction` (solo uno anclado a la vez,
+anclar otro desancla el anterior), botón de chincheta en la biblioteca
+(solo tuyo) y un banner dorado en el perfil público, lo primero que se ve
+debajo de la cabecera, visible para cualquiera.
+
+**Bug real encontrado y arreglado por el camino**: un botón anidado
+dentro de la tarjeta-enlace (`TiltCard`/`Link`) navega al juego al
+pulsarlo en vez de disparar su propio `onClick`, **incluso llamando a
+`preventDefault`/`stopPropagation`** — comprobado en vivo, no en teoría.
+Por eso el botón de anclar vive FUERA de `GameCard`, como overlay hermano
+desde `LibraryGrid` (mismo motivo por el que `RatingStars` tampoco vive
+dentro de `GameCard` — quien retome esto: cualquier control interactivo
+nuevo sobre una tarjeta de juego tiene que seguir este mismo patrón).
+
+Probado de punta a punta contra la cuenta real de `fende21`: anclar,
+verlo en el perfil, desanclar — sin dejar nada de prueba anclado.
+
+**Aviso de entorno, aparte**: durante esta sesión el `next dev` local se
+quedó sirviendo contenido **de una versión anterior** de la página (un
+`<div id="S:N" hidden>` con el HTML real nunca se llegó a revelar,
+mientras se seguía viendo una versión vieja) tras muchos ciclos de Fast
+Refresh seguidos. Reiniciar el proceso lo curó, dos veces. Es la misma
+familia de síntoma que "el proceso se atasca tras horas vivo" que ya
+documentó la sesión del 6 de septiembre — aquí pasó en minutos, no horas,
+con edición de archivos muy seguida. Si vuelve a pasar: reiniciar `next
+dev`, no busques el bug en el código primero.
+
+### VAPID: este documento decía "pendiente", ya no lo está
+
+La sección de más abajo (sesión del 6 de septiembre) decía en mayúsculas
+que las claves VAPID solo estaban en local y hacían falta en Vercel.
+**El usuario confirmó que ya están puestas en producción.** Corregido en
+su sitio. Sigue sin probarse un push real de extremo a extremo con una
+suscripción de verdad (motivo de siempre: sin persona real no hay
+permiso de notificaciones que conceder) — pero ahora sí se podría probar
+en producción, con una cuenta real.
+
+### Commits de esta sesión, separados por autoría/tema a propósito
+
+Cinco commits, no uno solo — el propio aviso de "disciplina de commits"
+de más abajo pedía exactamente esto: `trofeosPerdiblesDe`/tipos
+(100% de esta sesión), HLTB de Antigravity + el arreglo de similitud
+(mezclados en `hltb.ts`, imposible separar limpio en un archivo tan
+pequeño), tres retoques sueltos de Antigravity revisados sin objeción,
+"anclar juego" completo, y `TrophyTree.tsx` de Antigravity en su propio
+commit — con el mismo aviso de "sin auditar a fondo" que ya llevaba.
+
+---
+
 ## Sesión del 7 de septiembre de 2026 — responsive, tamaño de letra, Descubrir en tiempo real, y trofeos perdibles de verdad
 
 Sesión larga a base de peticiones cortas encadenadas, con Antigravity
@@ -606,12 +734,13 @@ tabla de suscripciones + el manejador `push` + el disparador.
   `.env.local` (`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/
   `NEXT_PUBLIC_VAPID_PUBLIC_KEY` — la pública se repite con el prefijo
   `NEXT_PUBLIC_` porque el navegador la necesita al suscribirse).
-  **IMPORTANTE — pendiente de quien tenga acceso al dashboard de Vercel**:
-  estas tres variables solo están en local. Sin ellas también en las
-  variables de entorno de producción, el interruptor de /ajustes se queda
-  sin `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (no se puede suscribir nadie) y
-  `enviarPush()` no manda nada (`asegurarConfigurado()` lo comprueba y no
-  hace nada en vez de fallar, pero tampoco avisa a nadie).
+  **YA PUESTAS EN VERCEL** (confirmado por el usuario el 7 de septiembre —
+  este documento decía "pendiente" y ya no lo estaba; corregido aquí para
+  que nadie más lo repita). Sigue sin probarse un push real de extremo a
+  extremo con una suscripción de verdad (el entorno automatizado deniega
+  el permiso de notificaciones solo, no hay una persona real para
+  concederlo) — eso sí sigue pendiente, y ahora sí se podría probar en
+  producción.
 - **`push_subscription`** (migración ejecutada:
   `scripts/crear-tabla-push-subscription.mts`): una fila por NAVEGADOR
   suscrito, no por usuario — quien tiene Paragon abierto en el móvil y en
