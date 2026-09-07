@@ -30,5 +30,10 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  // "scratch": zona de pruebas suelta (no forma parte de la app, nadie la
+  // importa desde src/). Sin excluirla, un archivo roto ahí dentro —
+  // pasó de verdad con un test de IGDB a medias— tira abajo `next build`
+  // entero: `include` de arriba capta CUALQUIER .ts del repo, no solo el
+  // de la app.
+  "exclude": ["node_modules", "scratch"]
 }
