@@ -60,7 +60,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
       onMouseEnter={() => setPausado(true)}
       onMouseLeave={() => setPausado(false)}
     >
-      <div className="relative flex h-[180px] items-stretch overflow-hidden" style={{ background: coverGradient(String(g.igdbId)) }}>
+      <div className="relative flex h-[210px] items-stretch overflow-hidden sm:h-[180px]" style={{ background: coverGradient(String(g.igdbId)) }}>
         {g.coverUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -75,11 +75,11 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
         )}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(90deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.8) 42%, rgba(0,0,0,.55) 100%)" }}
+          style={{ background: "linear-gradient(90deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.82) 55%, rgba(0,0,0,.62) 100%)" }}
         />
 
         {g.coverUrl && (
-          <div className="relative z-10 aspect-[3/4] h-full shrink-0 overflow-hidden" style={{ background: "rgba(0,0,0,.25)" }}>
+          <div className="relative z-10 w-[96px] shrink-0 overflow-hidden sm:aspect-[3/4] sm:h-full sm:w-auto" style={{ background: "rgba(0,0,0,.25)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={g.coverUrl} alt="" className="h-full w-full object-contain" />
           </div>
@@ -97,7 +97,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
             {g.pegi && <Pegi edad={g.pegi} />}
           </div>
 
-          <h2 className="font-heading text-xl font-bold uppercase leading-tight tracking-[-0.01em] line-clamp-1 drop-shadow-md sm:text-2xl">
+          <h2 className="font-heading text-lg font-bold uppercase leading-tight tracking-[-0.01em] line-clamp-2 drop-shadow-md sm:line-clamp-1 sm:text-2xl">
             {g.title}
           </h2>
 

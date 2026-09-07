@@ -268,7 +268,11 @@ export default async function AmigosPage() {
                 <div className="min-w-0 flex-1">
                   <Link
                     href={`/u/${a.handle}`}
-                    className="truncate text-sm hover:text-accent"
+                    // `block`: `truncate` (overflow-hidden + ellipsis +
+                    // nowrap) NO recorta en un elemento inline, y un <a> lo
+                    // es por defecto. Sin esto un nombre largo se salia de la
+                    // tarjeta (medido: 42px fuera con "Mario Garcia Romero").
+                    className="block truncate text-sm hover:text-accent"
                   >
                     {a.displayName ?? `@${a.handle}`}
                   </Link>
