@@ -18,6 +18,7 @@ import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { xpSteamPorRareza } from "@/lib/trophyScore";
+import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDe } from "@/lib/powerpyx";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import {
   type AccountPlatform,
@@ -535,6 +536,7 @@ export const getLibrary = cache(
       genres: gamesTable.genres,
       pegi: gamesTable.pegi,
       igdbId: gamesTable.igdbId,
+      hltb: gamesTable.hltb,
       metadataSyncedAt: gamesTable.metadataSyncedAt,
       /**
        * Rareza del platino: el % de jugadores del juego que lo tienen. Es de
@@ -706,6 +708,13 @@ export async function getGameDetail(
     }
   }
 
+  // Solo PSN: PowerPyx no tiene guías de Steam ni de Xbox (comprobado a
+  // mano — buscar "Garry's Mod" da "sin resultados"). Se pide en paralelo
+  // con la consulta de trofeos de abajo, no en serie, para no sumar su
+  // latencia a la de la base de datos.
+  const perdiblesPromesa =
+    game.platform === "psn" ? trofeosPerdiblesDe(game.title) : Promise.resolve(new Set<string>());
+
   const rows = await db
     .select({
       trophyId: gameTrophies.trophyId,
@@ -742,6 +751,11 @@ export async function getGameDetail(
                 else ${gameTrophies.trophyId} end`,
     );
 
+  // Se espera AQUÍ, no antes de pedir `rows`: las dos peticiones (PowerPyx y
+  // la base) corren en paralelo desde donde se lanzó `perdiblesPromesa`, así
+  // que esperar ahora no añade tiempo si la base tarda más (el caso normal).
+  const nombresPerdibles = await perdiblesPromesa;
+
   const trophies: Trophy[] = rows.map((r) => ({
     id: r.trophyId,
     name: r.name,
@@ -749,6 +763,13 @@ export async function getGameDetail(
     grade: r.grade ?? undefined,
     hidden: r.hidden,
     iconUrl: r.iconUrl ?? undefined,
+    // Ver lib/powerpyx.ts para el porqué: el texto que da PSN/Steam del
+    // propio trofeo nunca avisa de si es perdible (dos intentos de
+    // heurística lo confirmaron contra los 15.574 trofeos reales de la
+    // base), así que el dato viene de una guía externa escrita por una
+    // persona, emparejando por nombre normalizado. Vacío para Steam/Xbox
+    // (PowerPyx no los cubre) y para cualquier juego sin guía encontrada.
+    isMissable: nombresPerdibles.has(normalizarNombrePowerpyx(r.name)),
     // Sin esto, la agrupación por DLC de TrophyList no recibía nada y metía
     // todos los trofeos en "Juego Base".
     groupId: r.groupId ?? "default",

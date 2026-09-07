@@ -16,6 +16,17 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
   const progress = gameProgress(game);
   const played = relativeDate(game.lastPlayedAt);
 
+  // Sin casos especiales por título: `game.iconUrl` ya es el dato real
+  // (de PSN/Steam para juegos vinculados, de IGDB para los añadidos a mano).
+  // Hubo aquí un hardcode que forzaba una URL de Wikipedia para "Grand Theft
+  // Auto V"/"VI" por su título exacto — tapaba un iconUrl de GTA VI mal
+  // guardado en la base (la portada de GTA V emparejada por error, ya
+  // corregido), pero de paso SOBRESCRIBÍA la carátula real y correcta de
+  // GTA V que ya traía PSN, con una imagen externa no controlada. El sitio
+  // correcto para arreglar un dato mal guardado es el dato, no un `if` por
+  // título en el componente que lo pinta.
+  const iconUrl = game.iconUrl;
+
   return (
     <TiltCard
       href={href}
@@ -38,9 +49,9 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
           marco se llena entero siempre, al mismo tamaño, recortando lo que
           sobre por los lados (cuadradas) o arriba/abajo (panorámicas).
         */}
-        {game.iconUrl && (
+        {iconUrl && (
           <img
-            src={game.iconUrl}
+            src={iconUrl}
             alt=""
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover"
@@ -50,6 +61,10 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
         {/* Gradiente para asegurar legibilidad del texto sin importar la carátula */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
+        {/* Siempre visible: el hardcode de GTA V/VI escondía el título
+            porque el logo de Wikipedia ya lo llevaba dibujado dentro de la
+            imagen — la carátula real (de PSN, Steam o IGDB) es artwork, sin
+            texto, así que ocultarlo dejaría la tarjeta sin nombre. */}
         <span
           className="font-heading relative text-lg font-bold leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
           style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.8)" }}

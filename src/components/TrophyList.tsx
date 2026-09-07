@@ -7,6 +7,7 @@ import { clasificarTrofeo } from "@/lib/trophyType";
 import { trophyScore } from "@/lib/trophyScore";
 import type { Platform, Trophy, TrophyGrade } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
+import { TrophyTree } from "./TrophyTree";
 
 /**
  * Todos los logros de un juego, en lista o en cuadrícula.
@@ -33,7 +34,7 @@ export function TrophyList({
   esMio?: boolean;
   showcaseTrophies?: { gameId: string, trophyId: string }[];
 }) {
-  const [view, setView] = useState<"lista" | "cuadricula">("lista");
+  const [view, setView] = useState<"lista" | "cuadricula" | "arbol">("lista");
   const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
 
   const groups = new Map<string, { name: string; trophies: Trophy[] }>();
@@ -80,37 +81,47 @@ export function TrophyList({
             <rect x="14" y="14" width="7" height="7" />
             <rect x="3" y="14" width="7" height="7" />
           </ViewButton>
+          <ViewButton active={view === "arbol"} onClick={() => setView("arbol")} label="Árbol">
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="5" cy="19" r="2" />
+            <circle cx="19" cy="19" r="2" />
+            <line x1="12" y1="7" x2="12" y2="12" />
+            <line x1="12" y1="12" x2="5" y2="17" />
+            <line x1="12" y1="12" x2="19" y2="17" />
+          </ViewButton>
         </div>
       </div>
 
-      <div className="space-y-8">
-        {groupList.map((group, idx) => (
-          <div key={idx} className="space-y-3">
-            {groupList.length > 1 && (
-              <h3 className="text-sm font-bold uppercase tracking-wider text-muted ml-2">
-                {group.name}
-              </h3>
-            )}
-            
-            {view === "lista" ? (
-              <ul
-                className="overflow-hidden rounded-[18px]"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-              >
-                {group.trophies.map((t) => (
-                  <FilaLista key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
-                ))}
-              </ul>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                {group.trophies.map((t) => (
-                  <TarjetaCuadricula key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {view === "arbol" ? (
+        <div className="rounded-[20px] bg-[#0a0d14] border border-[#1f2937] shadow-lg mb-8 overflow-hidden">
+          <TrophyTree trophies={trophies} platform={platform} onTrophyClick={setActiveTrophy} />
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {Array.from(groups.values()).map((g) => (
+            <div key={g.name} className="space-y-3">
+              {groups.size > 1 && (
+                <h3 className="px-4 text-xs font-bold uppercase tracking-[0.15em] text-muted sm:px-0">
+                  {g.name}
+                </h3>
+              )}
+              {view === "lista" ? (
+                <div className="divide-y divide-border rounded-xl border border-border bg-surface-2 px-3 sm:px-4">
+                  {g.trophies.map((t) => (
+                    <FilaLista key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:gap-3">
+                  {g.trophies.map((t) => (
+                    <TarjetaCuadricula key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {activeTrophy && (
         <TrophyGuideModal 
@@ -185,8 +196,23 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
         <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold">
           {oculto ? "Trofeo oculto" : trophy.name}
           {tipo && (
-            <span className="shrink-0 text-muted">
+            <span className="flex items-center justify-center text-muted">
               <TrophyTypeIcon tipo={tipo} />
+            </span>
+          )}
+          {trophy.isMissable && (
+            <span
+              className="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
+              style={{ background: "rgba(226, 181, 62, 0.14)", color: "#e2b53e", border: "1px solid rgba(226, 181, 62, 0.3)" }}
+              title="Se puede quedar sin conseguir para siempre si no se hace en el momento adecuado"
+            >
+              {/* Un tick, no un triángulo de aviso: no es un peligro, es un
+                  aviso de "atento, esto tiene ventana" — mismo lenguaje que
+                  una casilla marcada. */}
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              Perdible
             </span>
           )}
         </p>
@@ -235,6 +261,18 @@ function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, plat
           style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
         >
           <TrophyTypeIcon tipo={tipo} size={13} />
+        </span>
+      )}
+      {trophy.isMissable && (
+        <span
+          className="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
+          style={{ background: "rgba(226, 181, 62, 0.14)", color: "#e2b53e", border: "1px solid rgba(226, 181, 62, 0.3)" }}
+          title="Se puede quedar sin conseguir para siempre si no se hace en el momento adecuado"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          Perdible
         </span>
       )}
 

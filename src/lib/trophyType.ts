@@ -64,3 +64,22 @@ export function clasificarTrofeo(trophy: { name: string; detail: string; hidden?
   }
   return null;
 }
+
+/*
+ * ¿Es un trofeo perdible? Ya NO vive aquí — ver lib/powerpyx.ts.
+ *
+ * Se probaron aquí dos heurísticas de texto sobre el propio nombre y
+ * descripción del trofeo, y las dos fallaron por la misma razón de fondo:
+ * comprobado contra los 15.574 trofeos reales de la base, la descripción
+ * que da PSN/Steam de un trofeo NUNCA avisa de si es perdible (0 contienen
+ * la palabra "missable", y las pocas coincidencias con patrones más amplios
+ * eran nombres de misión que casualmente sonaban a aviso — "Point of No
+ * Return" como título de nivel, no una advertencia real). A diferencia de
+ * `clasificarTrofeo` de aquí arriba, no había ninguna aproximación honesta
+ * posible con ESE dato: no es que acertara poco, es que la información no
+ * está ahí en absoluto.
+ *
+ * La fuente real es PowerPyx (una guía escrita por una persona), con su
+ * propia normalización y emparejamiento por nombre — ver el comentario
+ * largo en lib/powerpyx.ts.
+ */
