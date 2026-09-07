@@ -51,14 +51,21 @@ export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
-      className="animate-glint relative overflow-hidden rounded-[20px] p-6 text-white transition-all duration-300 hover:-translate-y-1"
+      // `h-full` importa de verdad aqui: esta tarjeta vive en una rejilla
+      // `[1fr_2.5fr]` (app/page.tsx) junto a "Tu ritmo", que es mucho mas
+      // alta. Sin esto, la tarjeta se quedaba con su altura natural y dejaba
+      // un hueco negro debajo en la columna izquierda — y el `h-full` del div
+      // de dentro no servia de nada, porque su padre no tenia altura contra
+      // la que resolverse. La variante de "mes sin trofeos" de arriba ya lo
+      // tenia; esta se habia quedado sin el.
+      className="animate-glint relative flex h-full flex-col overflow-hidden rounded-[20px] p-6 text-white transition-all duration-300 hover:-translate-y-1"
       style={{
         background: "linear-gradient(135deg, rgb(var(--accent-rgb) / 0.8), rgb(var(--accent-rgb) / 0.3))",
         border: "1px solid rgb(var(--accent-rgb) / 0.4)",
         boxShadow: "0 10px 30px rgb(var(--accent-rgb) / 0.15)",
       }}
     >
-      <div className="relative z-10 flex flex-col h-full justify-between">
+      <div className="relative z-10 flex flex-1 flex-col justify-between">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] opacity-80">
             Resumen de {nombreMes(mesActual.mes)}
