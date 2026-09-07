@@ -1,3 +1,4 @@
+import { dominioPublico } from "@/lib/site";
 import type { Metadata } from "next";
 import type { Session } from "next-auth";
 import Script from "next/script";
@@ -35,16 +36,13 @@ const jetbrainsMono = JetBrains_Mono({
 const DESCRIPCION = "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.";
 
 /**
- * Dominio absoluto del sitio. `metadataBase` NO es opcional en cuanto hay
- * imagenes sociales: sin el, Next no puede convertir "/u/x/opengraph-image"
- * en la URL absoluta que exigen Discord, WhatsApp o Twitter, y la tarjeta
- * simplemente no sale. `VERCEL_PROJECT_PRODUCTION_URL` la pone Vercel sola
- * en cada despliegue (mismo criterio que ya usa `urlAbsolutaParaOg` en
- * lib/design.ts: no se adivina ningun dominio fijo).
+ * `metadataBase` NO es opcional en cuanto hay imagenes sociales: sin el,
+ * Next no puede convertir "/u/x/opengraph-image" en la URL absoluta que
+ * exigen Discord, WhatsApp o Twitter, y la tarjeta simplemente no sale. El
+ * dominio sale de `lib/site.ts`, la misma fuente que usan `sitemap.ts` y
+ * `robots.ts`.
  */
-const DOMINIO = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : "http://localhost:3000";
+const DOMINIO = dominioPublico();
 
 export const metadata: Metadata = {
   metadataBase: new URL(DOMINIO),

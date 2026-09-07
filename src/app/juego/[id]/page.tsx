@@ -31,10 +31,30 @@ import { GameWishlistCard } from "@/components/GameWishlistCard";
 import { CollectionPicker } from "@/components/Collections";
 import { listCollections } from "@/lib/collections";
 
+/**
+ * La IMAGEN de la tarjeta social la pone sola `opengraph-image.tsx` (misma
+ * carpeta, convencion de Next). Lo que hay que declarar aqui es el titulo y
+ * la descripcion de openGraph: sin ellos se heredan los del layout raiz y la
+ * tarjeta salia titulada "Paragon" en vez de con el nombre del juego —
+ * comprobado en el HTML, no supuesto.
+ */
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const game = await getGlobalGame(decodeURIComponent(id));
-  return { title: game ? `${game.title} · Paragon` : "Juego · Paragon" };
+  if (!game) return { title: "Juego · Paragon" };
+
+  const titulo = `${game.title} · Paragon`;
+  const partes = [game.developer ?? game.publisher, (game.genres ?? []).slice(0, 2).join(", ")].filter(Boolean);
+  const descripcion = game.hasPlatinum
+    ? `Trofeos, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`
+    : `Logros, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`;
+
+  return {
+    title: titulo,
+    description: descripcion,
+    openGraph: { title: titulo, description: descripcion, type: "article" as const },
+    twitter: { card: "summary_large_image" as const, title: titulo, description: descripcion },
+  };
 }
 
 export default async function JuegoGlobalPage({
