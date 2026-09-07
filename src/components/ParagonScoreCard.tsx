@@ -17,7 +17,7 @@ export function ParagonScoreCard({ score }: { score: ParagonScoreBreakdown }) {
     <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
       <div className="mb-4 flex flex-wrap items-baseline gap-3">
         <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Paragon Score</h2>
-        <span className="text-[13px] text-muted">Puntuación unificada entre plataformas</span>
+        <span className="text-[0.8125rem] text-muted">Puntuación unificada entre plataformas</span>
       </div>
 
       <p className="font-heading text-4xl font-bold tabular-nums" style={{ color: "var(--accent-text)" }}>
@@ -43,7 +43,7 @@ export function ParagonScoreCard({ score }: { score: ParagonScoreBreakdown }) {
         ))}
       </div>
 
-      <p className="mt-4 text-[11px] leading-relaxed text-muted">
+      <p className="mt-4 text-[0.6875rem] leading-relaxed text-muted">
         PSN pesa por metal (bronce/plata/oro/platino) y Xbox por su Gamerscore real — los dos son datos oficiales de
         cada plataforma. Steam no tiene un peso propio por logro, así que aquí se estima por su rareza global (más
         raro, más puntos): es una aproximación, no un dato verificable como los otros dos.

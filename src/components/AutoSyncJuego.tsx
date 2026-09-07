@@ -61,7 +61,7 @@ export function AutoSyncJuego({ gameId }: { gameId: string }) {
 
   return (
     <p
-      className="mb-4 rounded-xl px-4 py-2.5 text-[13px] font-semibold"
+      className="mb-4 rounded-xl px-4 py-2.5 text-[0.8125rem] font-semibold"
       style={{
         background: "rgb(var(--accent-rgb) / 0.12)",
         border: "1px solid rgb(var(--accent-rgb) / 0.3)",

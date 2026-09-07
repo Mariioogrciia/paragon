@@ -56,7 +56,7 @@ export function PosterCard({
         {game.genres.length > 0 && (
           <div className="mt-1.5 flex flex-wrap gap-1">
             {game.genres.slice(0, 2).map((g) => (
-              <span key={g} className="rounded-md bg-white/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white backdrop-blur-sm">
+              <span key={g} className="rounded-md bg-white/15 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase text-white backdrop-blur-sm">
                 {g}
               </span>
             ))}

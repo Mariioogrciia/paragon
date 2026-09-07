@@ -65,8 +65,8 @@ export default async function CompararGrupoPage({
     <div>
       <BackButton fallbackHref="/amigos" label="Volver a Amigos" />
 
-      <h1 className="font-heading mt-3 text-[42px] font-bold uppercase leading-none">Comparativa de grupo</h1>
-      <p className="mt-2.5 text-[15px] text-muted">
+      <h1 className="font-heading mt-3 text-[2.625rem] font-bold uppercase leading-none">Comparativa de grupo</h1>
+      <p className="mt-2.5 text-[0.9375rem] text-muted">
         Solo los juegos que tenéis todos, uno al lado del otro.
       </p>
 
@@ -90,7 +90,7 @@ export default async function CompararGrupoPage({
           >
             <Avatar src={librerias[i].player.avatarUrl} name={librerias[i].player.name} size={44} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[15px] font-semibold">
+              <p className="truncate text-[0.9375rem] font-semibold">
                 {librerias[i].player.name}
                 {p.userId === mio.userId && <span className="text-muted"> (tú)</span>}
               </p>
@@ -115,13 +115,13 @@ export default async function CompararGrupoPage({
               className="grid min-w-[500px] items-center gap-2.5"
               style={{ gridTemplateColumns: `220px repeat(${participantes.length}, 100px)` }}
             >
-              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+              <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
                 Totales, de lo en común
               </span>
               {totales.map((t, i) => (
                 <div key={participantes[i].userId} className="text-center">
                   <p className="font-heading text-lg font-bold text-platinum">{t.platinos}</p>
-                  <p className="text-[10px] text-muted">{t.trofeos} trofeos</p>
+                  <p className="text-[0.625rem] text-muted">{t.trofeos} trofeos</p>
                 </div>
               ))}
             </div>

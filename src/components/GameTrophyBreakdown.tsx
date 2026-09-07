@@ -15,7 +15,7 @@ export function GameTrophyBreakdown({ breakdown }: { breakdown: TrophyBreakdown[
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-[15px] font-bold">Logros por plataforma</h3>
+        <h3 className="text-[0.9375rem] font-bold">Logros por plataforma</h3>
       </div>
       <p className="mb-4 text-xs text-muted">Cuántos trofeos/logros tiene definidos cada versión de este juego.</p>
       <div className="flex flex-col gap-1 rounded-xl bg-muted/10 p-2 border border-border/50">

@@ -15,8 +15,8 @@ export function Pegi({ edad, size = "sm" }: { edad: string; size?: "sm" | "md" }
 
   const medidas =
     size === "md"
-      ? "h-6 min-w-[30px] text-[13px]"
-      : "h-5 min-w-[26px] text-[11px]";
+      ? "h-6 min-w-[30px] text-[0.8125rem]"
+      : "h-5 min-w-[26px] text-[0.6875rem]";
 
   return (
     <span

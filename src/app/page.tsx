@@ -105,7 +105,7 @@ async function Landing() {
             Rastreador de trofeos de PlayStation
           </span>
 
-          <h1 className="font-heading mt-5 text-[74px] font-bold uppercase leading-[0.98] tracking-[-0.02em]">
+          <h1 className="font-heading mt-5 text-[4.625rem] font-bold uppercase leading-[0.98] tracking-[-0.02em]">
             El siguiente platino
             <br />
             <span className="text-gradient">no se espera.</span>
@@ -120,21 +120,21 @@ async function Landing() {
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/entrar"
-              className="rounded-xl px-6 py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
+              className="rounded-xl px-6 py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
               style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgb(var(--accent-rgb) / 0.3)" }}
             >
               Empezar la caza
             </Link>
             <Link
               href="/ejemplo"
-              className="rounded-xl px-[22px] py-4 text-[15px] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+              className="rounded-xl px-[22px] py-4 text-[0.9375rem] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#dbe5f2" }}
             >
               Ver un perfil de ejemplo
             </Link>
           </div>
 
-          <p className="mt-[18px] text-[13px] text-muted">
+          <p className="mt-[18px] text-[0.8125rem] text-muted">
             Solo tu ID público de PlayStation. Ni contraseñas, ni tokens, ni
             permisos de Sony.
           </p>
@@ -152,14 +152,14 @@ async function Landing() {
               <TrophyIcon grade="platinum" size={34} />
             </span>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted">Platino más cercano</p>
-              <p className="font-heading mt-1 text-[22px] font-bold">Elden Ring</p>
+              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">Platino más cercano</p>
+              <p className="font-heading mt-1 text-[1.375rem] font-bold">Elden Ring</p>
             </div>
           </div>
 
           <div className="mt-[22px] flex items-end gap-3">
-            <span className="font-heading text-[68px] font-bold leading-[0.85] text-platinum">10</span>
-            <span className="pb-2 text-[13px] font-semibold text-muted">
+            <span className="font-heading text-[4.25rem] font-bold leading-[0.85] text-platinum">10</span>
+            <span className="pb-2 text-[0.8125rem] font-semibold text-muted">
               trofeos
               <br />
               para el platino
@@ -182,7 +182,7 @@ async function Landing() {
                 style={{ background: "#121824", border: "1px solid #1e2634" }}
               >
                 <TrophyTile grade={t.grade} size={30} />
-                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{t.name}</span>
+                <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{t.name}</span>
                 <span className="shrink-0 text-xs font-bold" style={{ color: GRADE_ACCENT[t.grade] }}>
                   {t.rarity}
                 </span>
@@ -195,24 +195,24 @@ async function Landing() {
       <section className="grid grid-cols-2 gap-3 pt-2 lg:grid-cols-4">
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none text-platinum">{globalStats.platinos > 0 ? globalStats.platinos : "87"}</p>
-          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Platinos del grupo</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Platinos del grupo</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString("es-ES") : "4.312"}</p>
-          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Trofeos contados</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Trofeos contados</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString("es-ES") : "214"}</p>
-          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Juegos rastreados</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Juegos rastreados</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.completadoMedio > 0 ? `${globalStats.completadoMedio}%` : "68%"}</p>
-          <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">Completado medio</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Completado medio</p>
         </div>
       </section>
 
       <section id="biblioteca" className="pt-[72px]">
-        <h2 className="font-heading text-[34px] font-bold uppercase leading-tight tracking-[-0.01em]">
+        <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
           Tu biblioteca, ordenada por lo que te falta
         </h2>
         <p className="mb-6 mt-2 max-w-[620px] text-base text-muted">
@@ -235,7 +235,7 @@ async function Landing() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/40 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
                   <p
-                    className="font-heading relative z-10 translate-y-2 text-[15px] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[17px]"
+                    className="font-heading relative z-10 translate-y-2 text-[0.9375rem] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[1.0625rem]"
                     style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
                   >
                     {g.title}
@@ -248,7 +248,7 @@ async function Landing() {
                       style={{ width: `${g.pct}%`, background: "var(--accent-grad-h)" }}
                     />
                   </div>
-                  <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
+                  <div className="mt-2.5 flex justify-between text-[0.75rem] font-medium text-muted">
                     <span className="font-bold" style={{ color: "var(--accent-text)" }}>{g.pct}%</span>
                     <span>{g.ratio}</span>
                   </div>
@@ -262,7 +262,7 @@ async function Landing() {
         </div>
 
         <div className="mt-[72px]">
-          <h2 className="font-heading text-[30px] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
+          <h2 className="font-heading text-[1.875rem] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
             Cómo funciona
           </h2>
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
@@ -273,13 +273,13 @@ async function Landing() {
                 style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
               >
                 <span
-                  className="font-heading inline-flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[13px] font-bold"
+                  className="font-heading inline-flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[0.8125rem] font-bold"
                   style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
                 >
                   {f.num}
                 </span>
-                <h3 className="font-heading mt-4 text-[17px] font-bold leading-tight">{f.title}</h3>
-                <p className="mt-2.5 text-[13px] leading-relaxed text-muted">{f.body}</p>
+                <h3 className="font-heading mt-4 text-[1.0625rem] font-bold leading-tight">{f.title}</h3>
+                <p className="mt-2.5 text-[0.8125rem] leading-relaxed text-muted">{f.body}</p>
               </div>
             ))}
           </div>
@@ -297,13 +297,13 @@ async function Landing() {
               "radial-gradient(600px 300px at 20% 0%, rgb(var(--accent-rgb) / 0.22), transparent 70%), linear-gradient(160deg, #101a2b, #0b0f17)",
           }}
         >
-          <h2 className="font-heading max-w-[640px] text-[52px] font-bold uppercase leading-none tracking-[-0.02em]">
+          <h2 className="font-heading max-w-[640px] text-[3.25rem] font-bold uppercase leading-none tracking-[-0.02em]">
             Nadie platina por casualidad.
           </h2>
           <div className="mt-[30px] flex flex-wrap items-center gap-[18px]">
             <Link
               href="/entrar"
-              className="rounded-xl px-[26px] py-4 text-[15px] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
+              className="rounded-xl px-[26px] py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
               style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgb(var(--accent-rgb) / 0.35)" }}
             >
               Conectar mi cuenta
@@ -360,7 +360,7 @@ export default async function HomePage() {
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
         <h2 className="font-heading text-2xl font-bold">A un paso del platino</h2>
-        <p className="text-[13px] text-muted">
+        <p className="text-[0.8125rem] text-muted">
           Lo que menos te queda, ordenado por trofeos pendientes.
         </p>
         <Link
@@ -395,7 +395,7 @@ export default async function HomePage() {
 
             {/* Info a la derecha */}
             <div className="relative z-10 flex flex-col justify-center flex-1 w-full text-center sm:text-left">
-              <div className="inline-block mb-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-accent/20 text-accent-text border border-accent/30 w-fit mx-auto sm:mx-0">
+              <div className="inline-block mb-3 px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-widest bg-accent/20 text-accent-text border border-accent/30 w-fit mx-auto sm:mx-0">
                 Siguiente Platino
               </div>
               <h3 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-2" style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}>
@@ -404,7 +404,7 @@ export default async function HomePage() {
 
               <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4">
                 <div className="flex items-end gap-3">
-                  <p className="font-heading text-[54px] font-bold leading-[0.8] text-platinum">
+                  <p className="font-heading text-[3.375rem] font-bold leading-[0.8] text-platinum">
                     {nearPlatinum[0].progress.total - nearPlatinum[0].progress.earned}
                   </p>
                   <p className="pb-1 text-xs font-bold uppercase leading-tight tracking-[0.1em] text-muted text-left">
@@ -461,7 +461,7 @@ export default async function HomePage() {
                     <p className="font-heading text-3xl font-bold leading-[0.9] text-platinum">
                       {progress.total - progress.earned}
                     </p>
-                    <p className="pb-1 text-[10px] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
+                    <p className="pb-1 text-[0.625rem] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
                       restantes
                     </p>
                     <span className="ml-auto font-bold text-sm" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
@@ -485,7 +485,7 @@ export default async function HomePage() {
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
         <h2 className="font-heading text-2xl font-bold">Juegos parados</h2>
-        <p className="text-[13px] text-muted">
+        <p className="text-[0.8125rem] text-muted">
           Empezados y sin tocar hace más de un año.
         </p>
         <Link
@@ -514,10 +514,10 @@ export default async function HomePage() {
                 style={{ background: game.iconUrl ? `url(${game.iconUrl}) center/cover` : coverGradient(game.id) }}
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-semibold" title={game.title}>
+                <p className="truncate text-[0.8125rem] font-semibold" title={game.title}>
                   {game.title}
                 </p>
-                <p className="text-[11px] text-muted">{progress.percent}% · sin tocar hace tiempo</p>
+                <p className="text-[0.6875rem] text-muted">{progress.percent}% · sin tocar hace tiempo</p>
               </div>
             </Link>
           ))}
@@ -568,7 +568,7 @@ export default async function HomePage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
                     <p
-                      className="font-heading relative z-10 translate-y-2 text-[15px] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[17px]"
+                      className="font-heading relative z-10 translate-y-2 text-[0.9375rem] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[1.0625rem]"
                       style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
                     >
                       {game.title}
@@ -581,7 +581,7 @@ export default async function HomePage() {
                         style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
                       />
                     </div>
-                    <div className="mt-2.5 flex justify-between text-[12px] font-medium text-muted">
+                    <div className="mt-2.5 flex justify-between text-[0.75rem] font-medium text-muted">
                       <span className="font-bold" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
                       <span>{progress.earned}/{progress.total}</span>
                     </div>
@@ -610,14 +610,14 @@ export default async function HomePage() {
             {player.accounts.map((a) => a.username).join(" · ")}
             {` · nivel Paragon ${nivelParagon.level}`}
           </p>
-          <h1 className="font-heading text-[42px] font-bold uppercase leading-none tracking-tight">
+          <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none tracking-tight">
             Hola, {player.name}
           </h1>
         </div>
 
         <Link
           href={`/u/${profile.handle}`}
-          className="ml-auto rounded-[10px] px-4 py-2.5 text-[13px] font-semibold"
+          className="ml-auto rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-semibold"
           style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--accent-text)" }}
         >
           Ver mi perfil completo →
@@ -643,10 +643,10 @@ export default async function HomePage() {
                   >
                     <div className="flex items-center gap-2.5 text-platinum">
                       <TrophyIcon grade="platinum" size={22} />
-                      <p className="text-[11px] font-bold uppercase tracking-[0.14em]">Platinos</p>
+                      <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]">Platinos</p>
                     </div>
                     <p
-                      className="font-heading mt-2.5 text-[96px] font-bold leading-[0.85]"
+                      className="font-heading mt-2.5 text-[6rem] font-bold leading-[0.85]"
                       style={{ color: "#dff0f8", textShadow: "0 0 40px rgba(159, 212, 236, 0.35)" }}
                     >
                       {stats.platinos}

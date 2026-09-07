@@ -89,7 +89,7 @@ export function PlatformTiles() {
             style={{ background: t.bg, color: t.fg }}
           >
             {t.icon}
-            <span className="w-full break-words text-[10px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
+            <span className="w-full break-words text-[0.625rem] font-bold uppercase leading-tight tracking-wide sm:text-xs">
               {t.label}
             </span>
           </a>
@@ -101,7 +101,7 @@ export function PlatformTiles() {
             style={{ background: t.bg, color: t.fg }}
           >
             {t.icon}
-            <span className="w-full break-words text-[10px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
+            <span className="w-full break-words text-[0.625rem] font-bold uppercase leading-tight tracking-wide sm:text-xs">
               {t.label}
             </span>
           </span>

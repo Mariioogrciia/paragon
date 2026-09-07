@@ -66,7 +66,7 @@ export function CustomSelect({
         // Mismo aspecto que Dropdown.tsx (biblioteca, comparadores,
         // planificador): antes este tenía su propio radio, borde y fondo, y
         // el desplegable de un sitio no se parecía al de otro.
-        className="flex w-full items-center justify-between rounded-[9px] px-3.5 py-2 text-[13px] font-semibold text-foreground text-left transition-colors hover:border-accent/50"
+        className="flex w-full items-center justify-between rounded-[9px] px-3.5 py-2 text-[0.8125rem] font-semibold text-foreground text-left transition-colors hover:border-accent/50"
         style={{ border: "1px solid var(--border)", background: "var(--background)" }}
       >
         <span className={selectedOption ? "text-foreground" : "text-muted"}>
@@ -104,7 +104,7 @@ export function CustomSelect({
                   <li
                     key={option.value}
                     onClick={() => handleSelect(option.value)}
-                    className={`cursor-pointer px-3.5 py-2 text-[13px] font-medium hover:bg-accent hover:text-white transition-colors ${
+                    className={`cursor-pointer px-3.5 py-2 text-[0.8125rem] font-medium hover:bg-accent hover:text-white transition-colors ${
                       isSelected ? "bg-accent/30 text-accent" : "text-foreground"
                     }`}
                   >

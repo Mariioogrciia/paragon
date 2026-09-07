@@ -154,7 +154,7 @@ export function BannerPresetPicker({
           >
             <PlatformBanner preset={p.key} className="h-full w-full" />
           </span>
-          <span className="text-center text-[11px] font-semibold text-muted group-hover:text-foreground">
+          <span className="text-center text-[0.6875rem] font-semibold text-muted group-hover:text-foreground">
             {p.label}
           </span>
         </button>

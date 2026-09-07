@@ -19,7 +19,7 @@ export function ParagonLevelCard({ progress }: { progress: ParagonProgress }) {
         >
           <span className="flex h-[60px] w-[60px] flex-col items-center justify-center rounded-full bg-background">
             <span className="font-heading text-2xl font-bold leading-none">{progress.level}</span>
-            <span className="mt-1 text-[9px] font-bold uppercase tracking-wider text-muted">Nivel</span>
+            <span className="mt-1 text-[0.5625rem] font-bold uppercase tracking-wider text-muted">Nivel</span>
           </span>
         </div>
         <div className="min-w-0 flex-1">
@@ -48,7 +48,7 @@ export function ParagonLevelCard({ progress }: { progress: ParagonProgress }) {
             }}
           >
             <span className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-surface text-center">
-              <span className="font-heading text-xl font-bold">{progress.xp.toLocaleString("es-ES")}<small className="block text-[9px] uppercase tracking-wider text-muted">XP total</small></span>
+              <span className="font-heading text-xl font-bold">{progress.xp.toLocaleString("es-ES")}<small className="block text-[0.5625rem] uppercase tracking-wider text-muted">XP total</small></span>
             </span>
           </div>
           <div className="space-y-2">

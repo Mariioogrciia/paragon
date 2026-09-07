@@ -123,7 +123,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                     {activity.comments.map((comment: any, index: number) => (
                       <div key={index} className="text-xs bg-muted/10 p-2 rounded-lg">
                         <span className="font-semibold">{comment.userName || "Alguien"}</span>: {comment.body}
-                        <div className="text-[10px] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}</div>
+                        <div className="text-[0.625rem] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}</div>
                       </div>
                     ))}
                   </div>

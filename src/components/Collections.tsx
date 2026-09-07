@@ -26,8 +26,8 @@ export function CollectionPicker({
 }) {
   return (
     <section className="rounded-[18px] p-6" style={CARD}>
-      <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">Carpetas</h2>
-      <p className="mb-4 mt-2 text-[13px] text-muted">
+      <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">Carpetas</h2>
+      <p className="mb-4 mt-2 text-[0.8125rem] text-muted">
         Tus propias agrupaciones, para lo que no se puede ordenar solo.
       </p>
 
@@ -41,7 +41,7 @@ export function CollectionPicker({
                 <input type="hidden" name="collectionId" value={carpeta.id} />
                 <input type="hidden" name="gameId" value={gameId} />
                 <button
-                  className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-colors ${dentro ? DENTRO_CLASE : FUERA_CLASE}`}
+                  className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[0.8125rem] font-semibold transition-colors ${dentro ? DENTRO_CLASE : FUERA_CLASE}`}
                 >
                   <span aria-hidden="true">{dentro ? "✓" : "+"}</span>
                   {carpeta.name}
@@ -75,7 +75,7 @@ export function CollectionManager({ collections }: { collections: Collection[] }
           className="flex items-center gap-3 rounded-xl px-4 py-3"
           style={{ border: "1px solid var(--border)", background: "var(--background)" }}
         >
-          <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">
+          <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-semibold">
             {carpeta.name}
           </span>
           <span className="shrink-0 text-xs text-muted">
@@ -83,7 +83,7 @@ export function CollectionManager({ collections }: { collections: Collection[] }
           </span>
           <form action={deleteCollectionAction}>
             <input type="hidden" name="collectionId" value={carpeta.id} />
-            <button className="text-[13px] font-semibold text-muted hover:text-danger">
+            <button className="text-[0.8125rem] font-semibold text-muted hover:text-danger">
               Borrar
             </button>
           </form>

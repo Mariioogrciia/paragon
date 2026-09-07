@@ -80,7 +80,7 @@ export function TrophyGuideModal({
       >
         <div className="flex items-center justify-between border-b border-border p-4 px-6">
           <div className="min-w-0">
-            <h2 className="flex items-center gap-2 truncate font-heading text-[18px] font-bold text-foreground">
+            <h2 className="flex items-center gap-2 truncate font-heading text-[1.125rem] font-bold text-foreground">
               Guía de trofeo: {trophy.name}
               {(() => {
                 const tipo = clasificarTrofeo(trophy);
@@ -91,7 +91,7 @@ export function TrophyGuideModal({
                 ) : null;
               })()}
             </h2>
-            <p className="truncate text-[13px] text-muted">
+            <p className="truncate text-[0.8125rem] text-muted">
               {gameTitle}
             </p>
           </div>
@@ -132,7 +132,7 @@ export function TrophyGuideModal({
             <button
               key={t.value}
               onClick={() => setPestaña(t.value)}
-              className="rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors hover:text-foreground"
+              className="rounded-lg px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors hover:text-foreground"
               style={
                 pestaña === t.value
                   ? { background: "rgb(var(--accent-rgb) / 0.14)", color: "var(--accent-text)" }
@@ -169,10 +169,10 @@ export function TrophyGuideModal({
           <GuiaEscritaTab gameId={gameId} gameTitle={gameTitle} trophy={trophy} />
         )}
 
-        <div className="p-4 px-6 text-[13px] text-muted flex justify-between items-end">
+        <div className="p-4 px-6 text-[0.8125rem] text-muted flex justify-between items-end">
           <p className="max-w-[80%]">{trophy.detail || "Trofeo sin descripción adicional."}</p>
           {trophy.earnedAt && (
-            <p className="flex items-center gap-1.5 font-semibold text-accent-text bg-accent-text/10 px-2 py-1 rounded-md text-[11px] uppercase tracking-wider">
+            <p className="flex items-center gap-1.5 font-semibold text-accent-text bg-accent-text/10 px-2 py-1 rounded-md text-[0.6875rem] uppercase tracking-wider">
               <TrophyIcon grade={trophy.grade ?? "bronze"} size={14} />
               Conseguido el {new Date(trophy.earnedAt).toLocaleDateString()}
             </p>
@@ -186,7 +186,7 @@ export function TrophyGuideModal({
 function Submit({ children }: { children: React.ReactNode }) {
   return (
     <button
-      className="rounded-[10px] px-4 py-2 text-[13px] font-bold transition-all hover:-translate-y-0.5"
+      className="rounded-[10px] px-4 py-2 text-[0.8125rem] font-bold transition-all hover:-translate-y-0.5"
       style={{ background: "var(--accent-grad)", color: "var(--background)" }}
     >
       {children}
@@ -290,11 +290,11 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
                   <div className="mb-2 flex items-center gap-2.5">
                     <Avatar src={g.authorImage} name={g.authorName ?? g.authorHandle ?? "?"} size={24} />
                     {g.authorHandle ? (
-                      <Link href={`/u/${g.authorHandle}`} className="text-[13px] font-semibold hover:underline">
+                      <Link href={`/u/${g.authorHandle}`} className="text-[0.8125rem] font-semibold hover:underline">
                         {g.authorName ?? `@${g.authorHandle}`}
                       </Link>
                     ) : (
-                      <span className="text-[13px] font-semibold">{g.authorName ?? "Alguien"}</span>
+                      <span className="text-[0.8125rem] font-semibold">{g.authorName ?? "Alguien"}</span>
                     )}
                     <span className="text-xs text-muted">{relativeDate(g.updatedAt)}</span>
                   </div>

@@ -69,23 +69,23 @@ export default async function AmigosPage() {
   return (
     <div>
       <BackButton fallbackHref="/" />
-      <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Amigos</h1>
-      <p className="mt-2.5 text-[15px] text-muted">
+      <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">Amigos</h1>
+      <p className="mt-2.5 text-[0.9375rem] text-muted">
         Se añaden por su usuario de Paragon, no por su ID de plataforma.
       </p>
 
       <div className="mt-7 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_400px]">
         <section className="rounded-[18px] p-[22px]" style={CARD}>
-          <h2 className="font-heading mb-3.5 text-[17px] font-bold tracking-[0.03em]">Añadir a alguien</h2>
+          <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">Añadir a alguien</h2>
           <AddFriendForm />
-          <p className="mt-3 text-[13px] text-muted">
+          <p className="mt-3 text-[0.8125rem] text-muted">
             El handle lo elige cada uno al darse de alta. Pídeselo y escríbelo aquí.
           </p>
         </section>
 
         {pendientes.length > 0 && (
           <section className="rounded-[18px] p-[22px]" style={CARD}>
-            <h2 className="font-heading mb-3.5 text-[17px] font-bold tracking-[0.03em]">
+            <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">
               Solicitudes <span className="text-accent">{pendientes.length}</span>
             </h2>
 
@@ -103,7 +103,7 @@ export default async function AmigosPage() {
                   <form action={acceptFriendAction}>
                     <input type="hidden" name="requesterId" value={p.userId} />
                     <button
-                      className="rounded-[9px] px-3.5 py-2 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+                      className="rounded-[9px] px-3.5 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
                       style={{ background: "var(--accent-grad)" }}
                     >
                       Aceptar
@@ -112,7 +112,7 @@ export default async function AmigosPage() {
 
                   <form action={removeFriendAction}>
                     <input type="hidden" name="friendId" value={p.userId} />
-                    <button className="text-[13px] font-semibold text-muted hover:text-foreground">
+                    <button className="text-[0.8125rem] font-semibold text-muted hover:text-foreground">
                       Rechazar
                     </button>
                   </form>
@@ -126,7 +126,7 @@ export default async function AmigosPage() {
       <section className="mt-9">
         <div className="mb-4 flex items-baseline gap-3.5">
           <h2 className="font-heading text-2xl font-bold">Clasificación</h2>
-          <span className="text-[13px] text-muted">
+          <span className="text-[0.8125rem] text-muted">
             Tú y {ranking.length - (tengoCuenta ? 1 : 0)} amigos, por XP Paragon
           </span>
         </div>
@@ -164,7 +164,7 @@ export default async function AmigosPage() {
                 <Avatar src={r.avatarUrl} name={r.name} size={52} />
 
                 <div className="col-span-2 min-w-0 sm:col-span-1">
-                  <p className="truncate text-[15px] font-semibold">
+                  <p className="truncate text-[0.9375rem] font-semibold">
                     {r.name}
                     {r.esMio && " (tú)"}
                   </p>
@@ -181,28 +181,28 @@ export default async function AmigosPage() {
                     <TrophyIcon grade="platinum" size={15} />
                     {r.stats.platinos}
                   </p>
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Platinos</p>
+                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">Platinos</p>
                 </div>
                 <div>
-                  <p className="text-[17px] font-semibold">{r.stats.trofeos.toLocaleString("es-ES")}</p>
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Trofeos</p>
+                  <p className="text-[1.0625rem] font-semibold">{r.stats.trofeos.toLocaleString("es-ES")}</p>
+                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">Trofeos</p>
                 </div>
                 <div>
-                  <p className="text-[17px] font-semibold">{r.stats.completadoMedio}%</p>
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Medio</p>
+                  <p className="text-[1.0625rem] font-semibold">{r.stats.completadoMedio}%</p>
+                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">Medio</p>
                 </div>
 
                 {!r.esMio && r.handle && (
                   <div className="col-span-3 flex justify-end gap-2 sm:col-span-1">
                     <Link
                       href={`/comparar/${r.handle}`}
-                      className="rounded-[9px] border border-[var(--border)] bg-[#151d29] px-3.5 py-2 text-[13px] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)]"
+                      className="rounded-[9px] border border-[var(--border)] bg-[#151d29] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)]"
                     >
                       Comparar
                     </Link>
                     <Link
                       href={`/u/${r.handle}`}
-                      className="px-1 py-2 text-[13px] font-semibold text-muted hover:text-foreground"
+                      className="px-1 py-2 text-[0.8125rem] font-semibold text-muted hover:text-foreground"
                     >
                       Perfil
                     </Link>
@@ -227,7 +227,7 @@ export default async function AmigosPage() {
         <section className="mt-9">
           <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
             <h2 className="font-heading text-2xl font-bold">Tus amigos</h2>
-            <p className="text-[13px] text-muted">
+            <p className="text-[0.8125rem] text-muted">
               Marca dos o más para comparar como grupo, no solo de uno en uno.
             </p>
           </div>
@@ -302,7 +302,7 @@ export default async function AmigosPage() {
           <button
             type="submit"
             form="comparar-grupo"
-            className="mt-3 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+            className="mt-3 rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
             style={{ background: "var(--accent-grad)" }}
           >
             Comparar seleccionados

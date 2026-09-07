@@ -63,7 +63,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
         <p className="text-sm font-semibold">{total} trofeos ganados en los últimos 12 meses</p>
       </div>
       <div className="inline-flex gap-2">
-        <div className="flex flex-col gap-[3px] pt-4 text-[10px] font-semibold text-muted">
+        <div className="flex flex-col gap-[3px] pt-4 text-[0.625rem] font-semibold text-muted">
           {DIAS_SEMANA.map((d, i) => (
             <span key={i} className="flex h-[11px] items-center">{d}</span>
           ))}
@@ -71,7 +71,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
         <div>
           <div className="relative mb-1 h-3" style={{ width: semanas.length * 14 }}>
             {etiquetasMes.map((m) => (
-              <span key={m.semana} className="absolute text-[10px] font-semibold text-muted" style={{ left: m.semana * 14 }}>
+              <span key={m.semana} className="absolute text-[0.625rem] font-semibold text-muted" style={{ left: m.semana * 14 }}>
                 {m.texto}
               </span>
             ))}
@@ -89,7 +89,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
                         }}
                       />
                       <div
-                        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold opacity-0 shadow-lg transition-opacity group-hover/dia:opacity-100"
+                        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/dia:opacity-100"
                         style={{ background: "var(--foreground)", color: "var(--background)" }}
                       >
                         {d.trofeos} {d.trofeos === 1 ? "trofeo" : "trofeos"} · {fechaLarga(d.dia)}
@@ -104,7 +104,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
           </div>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-muted">
+      <div className="mt-3 flex items-center justify-end gap-1.5 text-[0.625rem] text-muted">
         <span>Menos</span>
         {OPACIDAD_POR_NIVEL.map((op, i) => (
           <div key={i} className="h-[11px] w-[11px] rounded-[2px]" style={{ background: op === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${op})` }} />

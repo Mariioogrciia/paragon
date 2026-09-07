@@ -134,7 +134,7 @@ export function AddManualGameModal() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-[13px] font-semibold transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+        className="flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-[0.8125rem] font-semibold transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
         style={{ background: "var(--accent-grad)", color: "#061021" }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -216,7 +216,7 @@ export function AddManualGameModal() {
                         if (!result.error) setWishlistIds((ids) => [...ids, game.igdbId]);
                       }}
                       disabled={wishlistIds.includes(game.igdbId)}
-                      className="shrink-0 text-[11px] font-bold text-accent hover:underline disabled:text-good disabled:no-underline"
+                      className="shrink-0 text-[0.6875rem] font-bold text-accent hover:underline disabled:text-good disabled:no-underline"
                     >
                       {wishlistIds.includes(game.igdbId) ? "✓ Deseado" : "+ Deseados"}
                     </button>

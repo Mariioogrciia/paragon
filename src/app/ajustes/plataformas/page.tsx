@@ -78,7 +78,7 @@ function PlatformSection({
           {platform === "epic" && <EpicGamesLogo className="w-5 h-5" />}
           {platform === "ubisoft" && <UbisoftLogo className="w-5 h-5" />}
         </span>
-        <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">
+        <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">
           {PLATFORM_LABEL[platform]}
         </h2>
       </div>
@@ -96,12 +96,12 @@ function PlatformSection({
               {account.username.charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[15px] font-semibold" title={account.username}>
+              <p className="truncate text-[0.9375rem] font-semibold" title={account.username}>
                 {account.username}
               </p>
             </div>
             <span
-              className="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em]"
+              className="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-[0.08em]"
               style={
                 account.isPublic
                   ? { background: "rgba(78, 201, 138, 0.12)", border: "1px solid rgba(78, 201, 138, 0.3)", color: "#4ec98a" }
@@ -125,7 +125,7 @@ function PlatformSection({
       )}
 
       <div className="mt-auto pt-4">
-        <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+        <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
           {account ? "Cambiar cuenta" : "Vincular cuenta"}
         </label>
         {children}
@@ -135,7 +135,7 @@ function PlatformSection({
         {account && (
           <form action={unlinkAccountAction} className="mt-4">
             <input type="hidden" name="platform" value={platform} />
-            <button className="text-[13px] font-semibold text-muted hover:text-danger">
+            <button className="text-[0.8125rem] font-semibold text-muted hover:text-danger">
               Desvincular {PLATFORM_LABEL[platform]}
             </button>
           </form>
@@ -204,7 +204,7 @@ export default async function AjustesPlataformasPage() {
             >
               <NintendoLogo className="w-5 h-5" />
             </span>
-            <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">Nintendo Switch</h2>
+            <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">Nintendo Switch</h2>
           </div>
           <div className="mt-auto pt-4 border-t border-white/5">
             <p className="text-xs text-muted mb-2 font-semibold text-danger">Ecosistema cerrado</p>
@@ -216,8 +216,8 @@ export default async function AjustesPlataformasPage() {
       </div>
 
       <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
-        <h2 className="font-heading mb-1 text-[17px] font-bold tracking-[0.03em]">Carpetas</h2>
-        <p className="mb-4 text-[13px] text-muted">
+        <h2 className="font-heading mb-1 text-[1.0625rem] font-bold tracking-[0.03em]">Carpetas</h2>
+        <p className="mb-4 text-[0.8125rem] text-muted">
           Tus agrupaciones a mano. Se crean y se rellenan desde la ficha de cada
           juego; aquí solo se repasan y se borran.
         </p>
@@ -226,7 +226,7 @@ export default async function AjustesPlataformasPage() {
 
       {(psn || steam) && (
         <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
-          <h2 className="font-heading mb-4 text-[17px] font-bold tracking-[0.03em]">
+          <h2 className="font-heading mb-4 text-[1.0625rem] font-bold tracking-[0.03em]">
             Sincronización
           </h2>
 
@@ -240,7 +240,7 @@ export default async function AjustesPlataformasPage() {
               <circle cx="12" cy="12" r="9" />
               <path d="M12 8h.01M11 12h1v4h1" />
             </svg>
-            <p className="text-[13px] leading-relaxed" style={{ color: "#d8c48a" }}>
+            <p className="text-[0.8125rem] leading-relaxed" style={{ color: "#d8c48a" }}>
               Steam no da el porcentaje de logros en la lista de juegos: se
               calcula juego a juego. Al sincronizar se traen los más recientes y
               el resto se completa solo la primera vez que abres su ficha.
@@ -251,10 +251,10 @@ export default async function AjustesPlataformasPage() {
 
       {salud.length > 0 && (
         <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
-          <h2 className="font-heading mb-1 text-[17px] font-bold tracking-[0.03em]">
+          <h2 className="font-heading mb-1 text-[1.0625rem] font-bold tracking-[0.03em]">
             Estado de la biblioteca
           </h2>
-          <p className="mb-4 text-[13px] text-muted">
+          <p className="mb-4 text-[0.8125rem] text-muted">
             Qué falta por traer de cada plataforma.
           </p>
 
@@ -264,7 +264,7 @@ export default async function AjustesPlataformasPage() {
 
       {historial.length > 0 && (
         <section className="rounded-[18px] p-6" style={CARD}>
-          <h2 className="font-heading mb-4 text-[17px] font-bold tracking-[0.03em]">Historial de sincronización</h2>
+          <h2 className="font-heading mb-4 text-[1.0625rem] font-bold tracking-[0.03em]">Historial de sincronización</h2>
           <div className="space-y-2">
             {historial.map((run) => (
               <div key={run.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-xs">

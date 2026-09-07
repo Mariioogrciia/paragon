@@ -57,7 +57,7 @@ export function SectionTabs({ storageKey, tabs }: { storageKey: string; tabs: Se
               role="tab"
               aria-selected={isActive}
               onClick={() => select(t.key)}
-              className="flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-bold uppercase tracking-wide transition-all duration-200 hover:-translate-y-0.5"
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-[0.8125rem] font-bold uppercase tracking-wide transition-all duration-200 hover:-translate-y-0.5"
               style={
                 isActive
                   ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
@@ -67,7 +67,7 @@ export function SectionTabs({ storageKey, tabs }: { storageKey: string; tabs: Se
               {t.label}
               {t.badge != null && (
                 <span
-                  className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                  className="rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold"
                   style={{ background: "var(--surface-2)", color: "var(--muted)" }}
                 >
                   {t.badge}

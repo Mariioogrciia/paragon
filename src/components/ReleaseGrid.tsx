@@ -34,7 +34,7 @@ export function ReleaseGrid({ items }: { items: IgdbGameResult[] }) {
             {g.genres.length > 0 && (
               <div className="mt-1 flex flex-wrap gap-1">
                 {g.genres.slice(0, 2).map((genre) => (
-                  <span key={genre} className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[9px] font-bold uppercase text-muted">
+                  <span key={genre} className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase text-muted">
                     {genre}
                   </span>
                 ))}

@@ -223,12 +223,12 @@ export default async function PerfilPage({
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
+              <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
                 {profile.displayName ?? `@${handle}`}
               </h1>
               {profile.esDesarrollador && (
                 <span
-                  className="mb-1 inline-flex items-center gap-1.5 self-end rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em]"
+                  className="mb-1 inline-flex items-center gap-1.5 self-end rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
                   style={{ background: "rgba(159, 212, 236, 0.14)", border: "1px solid rgba(159, 212, 236, 0.35)", color: "#9fd4ec" }}
                   title="Esta cuenta es de quien hace Paragon"
                 >
@@ -255,7 +255,7 @@ export default async function PerfilPage({
 
           <Link
             href={`/u/${handle}/cv`}
-            className={`${esMio ? "ml-auto" : ""} rounded-[10px] px-4 py-2.5 text-[13px] font-bold`}
+            className={`${esMio ? "ml-auto" : ""} rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold`}
             style={{ border: "1px solid var(--border)", color: "var(--foreground)" }}
           >
             Hoja de servicios
@@ -264,7 +264,7 @@ export default async function PerfilPage({
           {!esMio && (
             <Link
               href={`/comparar/${handle}`}
-              className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background"
+              className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background"
               style={{ background: "var(--accent-grad)" }}
             >
               Comparar conmigo

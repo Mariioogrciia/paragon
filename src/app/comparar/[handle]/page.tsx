@@ -29,7 +29,7 @@ function OutcomeTag({ kind }: { kind: keyof typeof OUTCOME }) {
   const o = OUTCOME[kind];
   return (
     <span
-      className="justify-self-end rounded-full px-[11px] py-1.5 text-[11px] font-bold uppercase tracking-[0.06em]"
+      className="justify-self-end rounded-full px-[11px] py-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
       style={{ background: o.bg, color: o.fg, border: `1px solid ${o.border}` }}
     >
       {o.label}
@@ -99,10 +99,10 @@ export default async function CompararPage({
   return (
     <div>
       <BackButton fallbackHref="/amigos" />
-      <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] sm:text-[50px]">
+      <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] sm:text-[3.125rem]">
         {libA.player.name} <span className="text-accent">vs</span> {libB.player.name}
       </h1>
-      <p className="mt-3 max-w-[620px] text-[15px] leading-relaxed text-muted">
+      <p className="mt-3 max-w-[620px] text-[0.9375rem] leading-relaxed text-muted">
         Solo los juegos que tenéis los dos: comparar bibliotecas enteras no
         dice nada si uno lleva jugando el doble de años.
       </p>
@@ -121,7 +121,7 @@ export default async function CompararPage({
             <div className="flex items-center gap-3.5">
               <Avatar src={player.avatarUrl} name={player.name} size={48} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[17px] font-semibold">{player.name}</p>
+                <p className="truncate text-[1.0625rem] font-semibold">{player.name}</p>
                 <p className="mt-0.5 text-xs text-muted">
                   {player.trophyLevel !== undefined
                     ? `Nivel ${player.trophyLevel}`
@@ -129,7 +129,7 @@ export default async function CompararPage({
                 </p>
               </div>
               <span
-                className="ml-auto shrink-0 rounded-full px-[11px] py-1.5 text-[11px] font-bold uppercase tracking-[0.06em]"
+                className="ml-auto shrink-0 rounded-full px-[11px] py-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
                 style={{ background: tag.bg, color: tag.fg, border: `1px solid ${tag.border}` }}
               >
                 {tag.label}
@@ -139,15 +139,15 @@ export default async function CompararPage({
             <div className="mt-5 grid grid-cols-3 gap-3.5">
               <div>
                 <p className="font-heading text-4xl font-bold leading-none text-platinum">{stats.platinos}</p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Platinos</p>
+                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">Platinos</p>
               </div>
               <div>
                 <p className="font-heading text-4xl font-bold leading-none">{stats.trofeos.toLocaleString("es-ES")}</p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Trofeos</p>
+                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">Trofeos</p>
               </div>
               <div>
                 <p className="font-heading text-4xl font-bold leading-none">{stats.completadoMedio}%</p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Medio</p>
+                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">Medio</p>
               </div>
             </div>
           </div>
@@ -170,7 +170,7 @@ export default async function CompararPage({
       <section className="mt-9">
         <div className="mb-4 flex items-baseline gap-3.5">
           <h2 className="font-heading text-2xl font-bold">Juegos en común</h2>
-          <span className="text-[13px] text-muted">
+          <span className="text-[0.8125rem] text-muted">
             {comunes.length} títulos{comunes.length > 0 && ` · ganas ${ganados} de ${comunes.length}`}
           </span>
         </div>
@@ -191,17 +191,17 @@ export default async function CompararPage({
                     {row.iconUrl ? (
                       <img src={row.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
                     ) : (
-                      <span className="font-heading text-[15px] font-bold text-white">{monogram(row.title)}</span>
+                      <span className="font-heading text-[0.9375rem] font-bold text-white">{monogram(row.title)}</span>
                     )}
                   </span>
 
-                  <p className="col-span-1 truncate text-[15px] font-semibold">{row.title}</p>
+                  <p className="col-span-1 truncate text-[0.9375rem] font-semibold">{row.title}</p>
 
                   <div className="col-span-2 grid gap-2 sm:col-span-1">
                     {row.progress.map((p, i) => (
                       <div key={jugadores[i].player.id} className="flex items-center gap-3">
                         <span
-                          className="w-[52px] shrink-0 text-[11px] font-bold uppercase tracking-[0.06em]"
+                          className="w-[52px] shrink-0 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
                           style={{ color: i === 0 ? "var(--accent-text)" : "var(--muted)" }}
                         >
                           {jugadores[i].player.name}
@@ -240,7 +240,7 @@ export default async function CompararPage({
         <section className="mt-9">
           <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
             <h2 className="font-heading text-2xl font-bold">Quién llegó antes</h2>
-            <span className="text-[13px] text-muted">Trofeos que ambos tenéis registrados</span>
+            <span className="text-[0.8125rem] text-muted">Trofeos que ambos tenéis registrados</span>
           </div>
           <div className="grid gap-2">
             {lideres.map((trofeo) => (

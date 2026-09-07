@@ -19,7 +19,7 @@ export function FriendsLeaderboard({ personas, propioUserId }: { personas: Stats
 
   return (
     <div className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-      <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-border px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted">
+      <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-border px-4 py-2 text-[0.625rem] font-bold uppercase tracking-widest text-muted">
         <span></span>
         <span className="text-right">Horas</span>
         <span className="text-right">Trofeos</span>

@@ -306,7 +306,7 @@ function buildSlides(data: WrapStoriesData): Slide[] {
           {handle && <CompartirImagenWrap handle={handle} />}
           <Link
             href="/ritmo"
-            className="rounded-xl px-4 py-2.5 text-center text-[13px] font-bold transition-colors hover:bg-white/10"
+            className="rounded-xl px-4 py-2.5 text-center text-[0.8125rem] font-bold transition-colors hover:bg-white/10"
             style={{ border: "1px solid rgba(255,255,255,0.25)", color: "white" }}
           >
             Ver mes a mes →

@@ -15,7 +15,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="rounded-[14px] p-4" style={CARD}>
       <p className="font-heading text-2xl font-bold">{value}</p>
-      <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{label}</p>
+      <p className="mt-1 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">{label}</p>
     </div>
   );
 }
@@ -45,7 +45,7 @@ export default async function AdminPage() {
     <div className="space-y-9">
       <BackButton fallbackHref="/" />
       <div>
-        <h1 className="font-heading text-[32px] font-bold uppercase leading-none">Admin</h1>
+        <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">Admin</h1>
         <p className="mt-2 text-sm text-muted">Solo tú ves esto. Métricas de toda la plataforma, no de un perfil.</p>
       </div>
 
@@ -86,7 +86,7 @@ export default async function AdminPage() {
         <div className="overflow-x-auto rounded-[14px]" style={CARD}>
           <table className="w-full min-w-[500px] text-sm">
             <thead>
-              <tr className="border-b border-border text-left text-[11px] font-bold uppercase tracking-[0.06em] text-muted">
+              <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
                 <th className="px-4 py-3">Usuario</th>
                 <th className="px-4 py-3">Plataforma</th>
                 <th className="px-4 py-3">Juegos</th>
@@ -119,7 +119,7 @@ export default async function AdminPage() {
         <div className="overflow-x-auto rounded-[14px]" style={CARD}>
           <table className="w-full min-w-[600px] text-sm">
             <thead>
-              <tr className="border-b border-border text-left text-[11px] font-bold uppercase tracking-[0.06em] text-muted">
+              <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
                 <th className="px-4 py-3">Usuario</th>
                 <th className="px-4 py-3">Cuentas</th>
                 <th className="px-4 py-3">Juegos</th>
@@ -151,7 +151,7 @@ export default async function AdminPage() {
         <div className="overflow-x-auto rounded-[14px]" style={CARD}>
           <table className="w-full min-w-[700px] text-sm">
             <thead>
-              <tr className="border-b border-border text-left text-[11px] font-bold uppercase tracking-[0.06em] text-muted">
+              <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
                 <th className="px-4 py-3">Autor</th>
                 <th className="px-4 py-3">Juego</th>
                 <th className="px-4 py-3">Contenido</th>

@@ -156,7 +156,7 @@ export default async function JuegoGlobalPage({
               <GameHeaderLogo title={game.title} steamId={steamAppId} />
 
               <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center gap-3 text-[13px] font-bold text-foreground">
+                <div className="flex flex-wrap items-center gap-3 text-[0.8125rem] font-bold text-foreground">
                   {detalles?.totalRating && (
                     <div className="flex items-center gap-1.5 text-accent">
                       <span>⭐</span>
@@ -165,7 +165,7 @@ export default async function JuegoGlobalPage({
                   )}
                   {detalles?.totalRating && <span className="text-muted/50">|</span>}
                   
-                  <div className="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                  <div className="flex items-center gap-1.5 uppercase tracking-wider text-[0.6875rem]">
                     {PLATFORM_LABEL[game.platform] ?? game.deviceLabel}
                   </div>
                   
@@ -197,7 +197,7 @@ export default async function JuegoGlobalPage({
                     {game.genres.map((g) => (
                       <span
                         key={g}
-                        className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-muted"
+                        className="rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold text-muted"
                         style={{ border: "1px solid var(--border)" }}
                       >
                         {g}
@@ -212,7 +212,7 @@ export default async function JuegoGlobalPage({
               {miFicha && (
                 <Link
                   href={miFicha}
-                  className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background whitespace-nowrap text-center"
+                  className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background whitespace-nowrap text-center"
                   style={{ background: "var(--accent-grad)" }}
                 >
                   Ver mi ficha
@@ -242,7 +242,7 @@ export default async function JuegoGlobalPage({
         {detalles?.storyline && (
           <section className="max-w-[820px]">
             <h2 className="mb-2 font-heading text-2xl font-bold">Historia</h2>
-            <p className="text-[15px] leading-relaxed text-foreground/85 whitespace-pre-wrap">{detalles.storyline}</p>
+            <p className="text-[0.9375rem] leading-relaxed text-foreground/85 whitespace-pre-wrap">{detalles.storyline}</p>
           </section>
         )}
 
@@ -270,7 +270,7 @@ export default async function JuegoGlobalPage({
         <section>
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
             <h2 className="font-heading text-2xl font-bold">Reseñas de la comunidad</h2>
-            <span className="text-[13px] text-muted">
+            <span className="text-[0.8125rem] text-muted">
               {reviews.length === 0
                 ? "Ninguna todavía"
                 : `${reviews.length} ${reviews.length === 1 ? "reseña" : "reseñas"}`}
@@ -311,7 +311,7 @@ export default async function JuegoGlobalPage({
                           <span className="text-xs text-muted">{relativeDate(r.reviewDate)}</span>
                         )}
                       </div>
-                      <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-wrap text-foreground/85">
+                      <p className="mt-2 text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-foreground/85">
                         {r.review}
                       </p>
                       {r.handle && (
@@ -400,23 +400,23 @@ export default async function JuegoGlobalPage({
                   rel="noopener noreferrer nofollow"
                   className="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-border px-3.5 py-2.5 last:border-0 transition-colors hover:bg-surface-2"
                 >
-                  <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{oferta.tienda}</span>
+                  <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{oferta.tienda}</span>
                   <span className="shrink-0 font-heading text-sm font-bold">{oferta.precio.toFixed(2)} €</span>
                   {i === 0 && (
                     <span
-                      className="shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.05em]"
+                      className="shrink-0 rounded-full px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-[0.05em]"
                       style={{ background: "rgba(78, 201, 138, 0.14)", color: "#4ec98a", border: "1px solid rgba(78, 201, 138, 0.3)" }}
                     >
                       Más barato
                     </span>
                   )}
                   {oferta.ahorro > 0 && (
-                    <span className="shrink-0 text-[11px] font-bold text-good">-{oferta.ahorro}%</span>
+                    <span className="shrink-0 text-[0.6875rem] font-bold text-good">-{oferta.ahorro}%</span>
                   )}
                 </a>
               ))}
             </div>
-            <p className="-mt-2 text-[10px] text-muted">
+            <p className="-mt-2 text-[0.625rem] text-muted">
               Vía CheapShark. Puede no incluir región ni impuestos. Solo Steam.
             </p>
 
@@ -424,7 +424,7 @@ export default async function JuegoGlobalPage({
               <div>
                 <h3 className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">Precio a lo largo del tiempo</h3>
                 <PriceHistoryChart puntos={historicoPrecios} compact />
-                <p className="mt-2 text-[10px] text-muted">Histórico vía IsThereAnyDeal.</p>
+                <p className="mt-2 text-[0.625rem] text-muted">Histórico vía IsThereAnyDeal.</p>
               </div>
             )}
           </div>

@@ -34,10 +34,10 @@ export function ManualGameStatus({
       className="rounded-[18px] p-5"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
-      <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+      <h2 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
         Progreso
       </h2>
-      <p className="mb-4 text-[13px] text-muted">
+      <p className="mb-4 text-[0.8125rem] text-muted">
         Este juego se añadió a mano: no hay logros que sincronizar, así que el
         progreso lo marcas tú.
       </p>

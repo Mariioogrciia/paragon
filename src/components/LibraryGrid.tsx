@@ -268,7 +268,7 @@ export function LibraryGrid({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, empresa o género…"
-            className="min-w-0 flex-1 bg-transparent py-3 text-[15px] text-foreground outline-none placeholder:text-muted"
+            className="min-w-0 flex-1 bg-transparent py-3 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           />
           {search && (
             <button
@@ -290,7 +290,7 @@ export function LibraryGrid({
 
           <button 
             onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
-            className="h-[38px] w-[38px] flex shrink-0 items-center justify-center rounded-[9px] text-[18px] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
+            className="h-[38px] w-[38px] flex shrink-0 items-center justify-center rounded-[9px] text-[1.125rem] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
             style={FIELD}
             title={sortDir === "asc" ? "Orden ascendente" : "Orden descendente"}
           >
@@ -381,7 +381,7 @@ export function LibraryGrid({
 
           <button
             onClick={() => setShowAdvanced((v) => !v)}
-            className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-colors"
+            className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-[0.8125rem] font-semibold transition-colors"
             style={
               showAdvanced || filtrosSecundariosActivos > 0
                 ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
@@ -391,7 +391,7 @@ export function LibraryGrid({
             Más filtros
             {filtrosSecundariosActivos > 0 && (
               <span
-                className="flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold"
+                className="flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.625rem] font-bold"
                 style={{ background: "var(--accent)", color: "#061021" }}
               >
                 {filtrosSecundariosActivos}
@@ -414,7 +414,7 @@ export function LibraryGrid({
 
           {filtrado && (
             <div className="flex items-center gap-3">
-              <span className="text-[13px] text-muted">{visible.length} resultados</span>
+              <span className="text-[0.8125rem] text-muted">{visible.length} resultados</span>
               <button
                 onClick={() => {
                   setStatus("todos");
@@ -428,7 +428,7 @@ export function LibraryGrid({
                   setSearch("");
                   setAgrupar(false);
                 }}
-                className="rounded-[10px] px-4 py-2 text-[13px] font-semibold text-muted hover:text-foreground transition-colors"
+                className="rounded-[10px] px-4 py-2 text-[0.8125rem] font-semibold text-muted hover:text-foreground transition-colors"
                 style={FIELD}
               >
                 Limpiar filtros
@@ -533,7 +533,7 @@ export function LibraryGrid({
           {facets.publishers.length > 0 && (
             <button
               onClick={() => setAgrupar((v) => !v)}
-              className="col-span-1 rounded-[10px] px-4 py-2 text-[13px] font-semibold transition-colors"
+              className="col-span-1 rounded-[10px] px-4 py-2 text-[0.8125rem] font-semibold transition-colors"
               style={
                 agrupar
                   ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
@@ -602,7 +602,7 @@ export function LibraryGrid({
 
           {/* Sentinela: al entrar en pantalla se pinta la página siguiente. */}
           {hayMas && (
-            <div ref={sentinela} className="py-8 text-center text-[13px] text-muted">
+            <div ref={sentinela} className="py-8 text-center text-[0.8125rem] text-muted">
               Cargando más juegos…
             </div>
           )}

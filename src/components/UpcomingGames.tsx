@@ -129,17 +129,17 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
               </div>
 
               <div className="flex min-w-0 flex-col">
-                <h3 className="font-heading text-[15px] font-bold leading-tight">
+                <h3 className="font-heading text-[0.9375rem] font-bold leading-tight">
                   {game.title}
                 </h3>
 
                 {estudio && (
-                  <p className="mt-0.5 truncate text-[11px] text-muted">{estudio}</p>
+                  <p className="mt-0.5 truncate text-[0.6875rem] text-muted">{estudio}</p>
                 )}
 
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   <span
-                    className="rounded-md px-2 py-0.5 text-[11px] font-bold"
+                    className="rounded-md px-2 py-0.5 text-[0.6875rem] font-bold"
                     style={{
                       background: "rgb(var(--accent-rgb) / 0.14)",
                       border: "1px solid rgb(var(--accent-rgb) / 0.3)",
@@ -149,7 +149,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                     {game.releaseLabel}
                   </span>
                   {falta && (
-                    <span className="text-[11px] font-semibold text-muted">{falta}</span>
+                    <span className="text-[0.6875rem] font-semibold text-muted">{falta}</span>
                   )}
                   {game.pegi && <Pegi edad={game.pegi} />}
                 </div>
@@ -159,7 +159,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                     {game.platforms.slice(0, 3).map((p) => (
                       <span
                         key={p}
-                        className="rounded-sm bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase"
+                        className="rounded-sm bg-white/10 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase"
                       >
                         {p}
                       </span>
@@ -167,7 +167,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                     {game.genres.map((g) => (
                       <span
                         key={g}
-                        className="rounded-sm px-1.5 py-0.5 text-[9px] font-bold uppercase text-muted"
+                        className="rounded-sm px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase text-muted"
                         style={{ border: "1px solid var(--border)" }}
                       >
                         {g}
@@ -177,7 +177,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                 )}
 
                 {game.summary && (
-                  <p className="mt-2 text-[12px] leading-relaxed text-muted line-clamp-2">
+                  <p className="mt-2 text-[0.75rem] leading-relaxed text-muted line-clamp-2">
                     {game.summary}
                   </p>
                 )}
@@ -191,7 +191,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
         })}
       </div>
 
-      <p className="mt-4 text-[11px] text-muted">
+      <p className="mt-4 text-[0.6875rem] text-muted">
         Datos de IGDB. Los resúmenes vienen en inglés, tal y como los publica el catálogo.
       </p>
 
@@ -260,7 +260,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                   {modalGame.platforms.map((p) => (
                     <span
                       key={p}
-                      className="rounded-sm bg-white/10 px-2 py-1 text-[10px] font-bold uppercase"
+                      className="rounded-sm bg-white/10 px-2 py-1 text-[0.625rem] font-bold uppercase"
                     >
                       {p}
                     </span>
@@ -268,7 +268,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                   {modalGame.genres.map((g) => (
                     <span
                       key={g}
-                      className="rounded-sm px-2 py-1 text-[10px] font-bold uppercase text-muted"
+                      className="rounded-sm px-2 py-1 text-[0.625rem] font-bold uppercase text-muted"
                       style={{ border: "1px solid var(--border)" }}
                     >
                       {g}
@@ -322,7 +322,7 @@ function WishlistButton({ game, initiallyAdded = false }: { game: UpcomingGame, 
           setAdded(true);
         });
       }}
-      className={`text-[11px] font-bold transition-colors ${
+      className={`text-[0.6875rem] font-bold transition-colors ${
         added ? "text-good" : "text-accent hover:text-accent-2"
       }`}
     >

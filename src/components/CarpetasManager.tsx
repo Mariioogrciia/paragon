@@ -197,7 +197,7 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`shrink-0 text-muted transition-transform ${abierta ? "rotate-90" : ""}`}>
             <path d="m9 6 6 6-6 6" />
           </svg>
-          <span className="min-w-0 truncate text-[15px] font-bold">{collection.name}</span>
+          <span className="min-w-0 truncate text-[0.9375rem] font-bold">{collection.name}</span>
           <span className="shrink-0 text-xs text-muted">{collection.gameIds.length}</span>
         </button>
 

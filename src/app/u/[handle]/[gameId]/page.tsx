@@ -36,8 +36,8 @@ function ProximoRow({ trophy }: { trophy: Trophy }) {
       <TrophyPhoto trophy={trophy} size={52} />
 
       <div className="min-w-0">
-        <p className="text-[15px] font-semibold">{trophy.name}</p>
-        {trophy.detail && <p className="mt-1 text-[13px] text-muted">{trophy.detail}</p>}
+        <p className="text-[0.9375rem] font-semibold">{trophy.name}</p>
+        {trophy.detail && <p className="mt-1 text-[0.8125rem] text-muted">{trophy.detail}</p>}
 
         {trophy.progress && trophy.progress.current > 0 && (
           <div className="mt-2.5 flex max-w-[300px] items-center gap-3">
@@ -58,12 +58,12 @@ function ProximoRow({ trophy }: { trophy: Trophy }) {
       </div>
 
       <div className="col-span-2 flex items-center justify-between gap-3 sm:col-span-1 sm:block sm:text-right">
-        <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: colorFor(trophy.grade) }}>
+        <p className="text-[0.6875rem] font-bold uppercase tracking-[0.1em]" style={{ color: colorFor(trophy.grade) }}>
           {gradeLabel(trophy.grade)}
         </p>
         {r && (
           <p
-            className="mt-1.5 inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em]"
+            className="mt-1.5 inline-block rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-[0.08em]"
             style={{ background: r.bg, color: r.fg }}
           >
             {r.label} · {trophy.rarityPercent!.toFixed(1)}%
@@ -172,7 +172,7 @@ export default async function JuegoPage({
             </span>
 
             <div className="min-w-0">
-              <p className="mb-2.5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+              <p className="mb-2.5 flex items-center gap-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
                 <span
                   className="rounded-md px-2.5 py-1"
                   style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
@@ -183,7 +183,7 @@ export default async function JuegoPage({
                 {played && `Jugado ${played}`}
               </p>
 
-              <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[52px]">
+              <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[3.25rem]">
                 {game.title}
               </h1>
 
@@ -207,10 +207,10 @@ export default async function JuegoPage({
                   (["platinum", "gold", "silver", "bronze"] as const).map((grade) => (
                     <div key={grade} className="flex items-center gap-2">
                       <TrophyIcon grade={grade} size={18} />
-                      <span className="font-heading text-[15px] font-bold">
+                      <span className="font-heading text-[0.9375rem] font-bold">
                         {game.earned![grade]}
                       </span>
-                      <span className="text-[11px] text-muted">
+                      <span className="text-[0.6875rem] text-muted">
                         de {game.defined![grade]} {gradeLabel(grade).toLowerCase()}
                         {game.defined![grade] === 1 ? "" : "s"}
                       </span>
@@ -219,10 +219,10 @@ export default async function JuegoPage({
                 ) : (
                   <div className="flex items-center gap-2">
                     <TrophyIcon grade="platinum" size={18} />
-                    <span className="font-heading text-[15px] font-bold">
+                    <span className="font-heading text-[0.9375rem] font-bold">
                       {progress.earned}
                     </span>
-                    <span className="text-[11px] text-muted">
+                    <span className="text-[0.6875rem] text-muted">
                       de {progress.total} logros
                     </span>
                   </div>
@@ -235,14 +235,14 @@ export default async function JuegoPage({
                 className="rounded-[18px] p-[22px]"
                 style={{ border: "1px solid var(--border)", background: "rgba(13, 19, 28, 0.75)", backdropFilter: "blur(8px)" }}
               >
-                <p className="font-heading text-5xl font-bold leading-[0.9] text-platinum lg:text-[56px]">
+                <p className="font-heading text-5xl font-bold leading-[0.9] text-platinum lg:text-[3.5rem]">
                   {faltanParaPlatino}
                 </p>
-                <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
+                <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
                   Trofeos para el platino
                 </p>
                 {reparto.tieneDlc && (
-                  <p className="mt-2 text-[11px] text-muted">
+                  <p className="mt-2 text-[0.6875rem] text-muted">
                     Sin contar {reparto.dlc.total - reparto.dlc.earned} de DLC, que no
                     cuentan para el platino.
                   </p>
@@ -257,13 +257,13 @@ export default async function JuegoPage({
                 className="rounded-[18px] p-[22px]"
                 style={{ border: "1px solid var(--border)", background: "rgba(13, 19, 28, 0.75)", backdropFilter: "blur(8px)" }}
               >
-                <p className="font-heading text-5xl font-bold leading-[0.9] text-platinum lg:text-[56px]">
+                <p className="font-heading text-5xl font-bold leading-[0.9] text-platinum lg:text-[3.5rem]">
                   {reparto.dlc.total - reparto.dlc.earned}
                 </p>
-                <p className="mt-2.5 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
+                <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
                   Trofeos de DLC pendientes
                 </p>
-                <p className="mt-2 text-[11px] text-muted">
+                <p className="mt-2 text-[0.6875rem] text-muted">
                   El juego base está al 100%: lo que queda son expansiones.
                 </p>
               </div>
@@ -274,7 +274,7 @@ export default async function JuegoPage({
                 url={`/api/trophy-card/${handle}/${encodeURIComponent(game.id)}`}
                 nombreArchivo={`paragon-platino-${game.id}.png`}
                 tituloCompartir={`Platino de ${game.title}`}
-                className="flex items-center justify-center gap-2 rounded-[18px] p-[18px] text-[13px] font-bold text-platinum transition-colors hover:text-white disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-[18px] p-[18px] text-[0.8125rem] font-bold text-platinum transition-colors hover:text-white disabled:opacity-50"
                 style={{ border: "1px solid rgb(159 212 236 / 0.35)", background: "rgba(13, 19, 28, 0.75)" }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -297,13 +297,13 @@ export default async function JuegoPage({
             className="rounded-[18px] p-5"
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
-            <h2 className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+            <h2 className="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
               Dificultad estimada {dificultad.desdePlatino ? "del platino" : "del 100%"}
             </h2>
 
             <div className="flex flex-wrap items-center gap-3.5">
               <span
-                className="rounded-lg px-3 py-1.5 text-[15px] font-bold text-white"
+                className="rounded-lg px-3 py-1.5 text-[0.9375rem] font-bold text-white"
                 style={{ background: dificultad.color }}
               >
                 {dificultad.etiqueta}
@@ -324,7 +324,7 @@ export default async function JuegoPage({
                 ))}
               </span>
 
-              <span className="text-[13px] text-muted">
+              <span className="text-[0.8125rem] text-muted">
                 Solo el{" "}
                 <strong style={{ color: "var(--foreground)" }}>
                   {dificultad.rareza.toFixed(1)}%
@@ -333,7 +333,7 @@ export default async function JuegoPage({
               </span>
             </div>
 
-            <p className="mt-3 text-[11px] leading-relaxed text-muted">
+            <p className="mt-3 text-[0.6875rem] leading-relaxed text-muted">
               Estimada a partir de la rareza, que mezcla dificultad, duración y
               cuánta gente abandona el juego. No mide habilidad: un platino
               largo y fácil puede ser más raro que uno corto e imposible.
@@ -348,7 +348,7 @@ export default async function JuegoPage({
           style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
         >
           <div className="mb-2.5 flex items-center justify-between gap-3">
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+            <h2 className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
               Valoración de la comunidad
             </h2>
             <Link
@@ -380,7 +380,7 @@ export default async function JuegoPage({
                       {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
                     </div>
                     {game.review && (
-                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
+                      <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap italic">
                         &quot;{game.review}&quot;
                       </p>
                     )}
@@ -398,7 +398,7 @@ export default async function JuegoPage({
             <div className="mb-1.5 flex flex-wrap items-center gap-3">
               <h2 className="font-heading text-2xl font-bold">Próximos pasos</h2>
               <span
-                className="rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em]"
+                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.08em]"
                 style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.32)", color: "var(--accent-text)" }}
               >
                 Lo más a mano
@@ -409,14 +409,14 @@ export default async function JuegoPage({
               {esMio && (
                 <Link
                   href={`/u/${handle}/${gameId}/enfoque`}
-                  className="ml-auto rounded-[10px] px-3.5 py-2 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+                  className="ml-auto rounded-[10px] px-3.5 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
                   style={{ background: "var(--accent-grad)" }}
                 >
                   Modo enfoque
                 </Link>
               )}
             </div>
-            <p className="mb-4 text-[13px] text-muted">
+            <p className="mb-4 text-[0.8125rem] text-muted">
               Ordenado por lo que más gente consigue. El platino va siempre al
               final: no es una tarea, es la consecuencia.
             </p>
@@ -434,7 +434,7 @@ export default async function JuegoPage({
           <section>
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="font-heading text-2xl font-bold">Todos los trofeos</h2>
-              <span className="text-[13px] text-muted">
+              <span className="text-[0.8125rem] text-muted">
                 {progress.earned} de {progress.total} conseguidos
               </span>
             </div>

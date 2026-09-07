@@ -146,7 +146,7 @@ export function BacklogRoulette({ games, handle }: { games: Game[]; handle: stri
                   <p className="font-heading text-lg font-bold">{candidato.title}</p>
                   <p className="mt-2 text-sm text-muted">{mensaje}</p>
                   {origen === "recomendado" && (
-                    <p className="mt-2 text-[11px] text-muted">
+                    <p className="mt-2 text-[0.6875rem] text-muted">
                       Tu backlog está limpio — esto es una recomendación por tus géneros favoritos, todavía no lo tienes.
                     </p>
                   )}

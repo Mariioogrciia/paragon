@@ -58,6 +58,31 @@ export const TEMAS = [
 const CLAVE_ACENTO = "platinos:acento";
 const CLAVE_ACENTO_LIBRE = "platinos:acento-libre";
 const CLAVE_ESTILO = "platinos:estilo";
+const CLAVE_TEXTO = "platinos:texto";
+
+/**
+ * Tamaño de letra de toda la interfaz.
+ *
+ * Se aplica como `font-size` del <html>, y funciona porque las clases de
+ * texto de la app estan en `rem` (se convirtieron 387 clases que estaban en
+ * px a proposito para esto: en px NO responden al tamaño de la raiz). 100%
+ * = 16px, el valor por defecto del navegador.
+ *
+ * Quien tenga el navegador o el movil configurado con letra mas grande no
+ * pierde ese ajuste: 100% respeta lo que ya tuviera puesto.
+ */
+export const TAMANOS_TEXTO = [
+  { value: "", label: "Normal", escala: "100%" },
+  { value: "grande", label: "Grande", escala: "112.5%" },
+  { value: "enorme", label: "Enorme", escala: "125%" },
+  { value: "pequeno", label: "Pequeño", escala: "87.5%" },
+] as const;
+
+function aplicarTamanoTexto(valor: string) {
+  const t = TAMANOS_TEXTO.find((x) => x.value === valor) ?? TAMANOS_TEXTO[0];
+  if (t.value) document.documentElement.style.fontSize = t.escala;
+  else document.documentElement.style.removeProperty("font-size");
+}
 
 function hexARgb(hex: string) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -97,6 +122,7 @@ export function useApariencia() {
   const [acento, setAcento] = useState("");
   const [acentoLibre, setAcentoLibre] = useState("");
   const [estilo, setEstilo] = useState("");
+  const [tamanoTexto, setTamanoTexto] = useState("");
   const [montado, setMontado] = useState(false);
 
   // El tema real solo se conoce en el cliente: pintarlo antes daría un desajuste
@@ -116,6 +142,7 @@ export function useApariencia() {
     // layout.tsx) antes de que React pintara nada; aquí solo se sincroniza
     // el estado de React con lo que ya está puesto en el <html>.
     setEstilo(localStorage.getItem(CLAVE_ESTILO) ?? "");
+    setTamanoTexto(localStorage.getItem(CLAVE_TEXTO) ?? "");
   }, []);
 
   function elegirAcento(valor: string) {
@@ -141,6 +168,13 @@ export function useApariencia() {
     else localStorage.removeItem(CLAVE_ESTILO);
   }
 
+  function elegirTamanoTexto(valor: string) {
+    setTamanoTexto(valor);
+    aplicarTamanoTexto(valor);
+    if (valor) localStorage.setItem(CLAVE_TEXTO, valor);
+    else localStorage.removeItem(CLAVE_TEXTO);
+  }
+
   function elegirTema(t: (typeof TEMAS)[number]) {
     setTheme(t.modo);
     elegirAcento(t.acento);
@@ -154,9 +188,11 @@ export function useApariencia() {
     acento,
     acentoLibre,
     estilo,
+    tamanoTexto,
     elegirAcento,
     elegirAcentoLibre,
     elegirEstilo,
+    elegirTamanoTexto,
     elegirTema,
   };
 }

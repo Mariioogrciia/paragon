@@ -22,7 +22,7 @@ interface Props {
 function Fila({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-muted">{label}</p>
+      <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">{label}</p>
       <div className="mt-1 text-sm font-semibold">{children}</div>
     </div>
   );
@@ -94,7 +94,7 @@ export function GameDetailsSidebar({ developer, publisher, releaseLabel, platfor
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 title={w.label}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-[11px] font-bold uppercase transition-colors hover:text-accent"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-[0.6875rem] font-bold uppercase transition-colors hover:text-accent"
                 style={{ border: "1px solid var(--border)" }}
               >
                 {w.label.slice(0, 1)}

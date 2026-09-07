@@ -48,7 +48,7 @@ export function ProfileTabsNav({
             role="tab"
             aria-selected={activa}
             aria-current={activa ? "page" : undefined}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-bold uppercase tracking-wide transition-all duration-200 hover:-translate-y-0.5"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-[0.8125rem] font-bold uppercase tracking-wide transition-all duration-200 hover:-translate-y-0.5"
             style={
               activa
                 ? {
@@ -62,7 +62,7 @@ export function ProfileTabsNav({
             {p.label}
             {p.badge != null && (
               <span
-                className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                className="rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold"
                 style={{ background: "var(--surface-2)", color: "var(--muted)" }}
               >
                 {p.badge}

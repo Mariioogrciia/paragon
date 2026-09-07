@@ -67,7 +67,7 @@ function BarrasNavegables({
               className="group flex h-full flex-1 flex-col justify-end"
             >
               <span
-                className="mb-1 text-center text-[10px] font-bold tabular-nums transition-opacity"
+                className="mb-1 text-center text-[0.625rem] font-bold tabular-nums transition-opacity"
                 style={{ opacity: activo ? 1 : 0 }}
               >
                 {m.total}
@@ -93,7 +93,7 @@ function BarrasNavegables({
         {meses.map((m) => (
           <span
             key={m.mes}
-            className="flex-1 text-center text-[10px]"
+            className="flex-1 text-center text-[0.625rem]"
             style={{
               color: m.mes === seleccionado ? "var(--accent-text)" : "var(--muted)",
               fontWeight: m.mes === seleccionado ? 700 : 400,
@@ -101,7 +101,7 @@ function BarrasNavegables({
           >
             {mesCorto(m.mes)}
             {m.mes.endsWith("-01") && (
-              <span className="block text-[9px]">{m.mes.slice(0, 4)}</span>
+              <span className="block text-[0.5625rem]">{m.mes.slice(0, 4)}</span>
             )}
           </span>
         ))}
@@ -139,10 +139,10 @@ export default async function RitmoPage({
     <div className="space-y-9">
       <div>
         <BackButton fallbackHref="/" label="Volver al panel" />
-        <h1 className="font-heading mt-3 text-[42px] font-bold uppercase leading-none">
+        <h1 className="font-heading mt-3 text-[2.625rem] font-bold uppercase leading-none">
           {nombreMes(mes)}
         </h1>
-        <p className="mt-2 text-[15px] text-muted">
+        <p className="mt-2 text-[0.9375rem] text-muted">
           {meses.some((m) => m.mes === mes)
             ? "Pincha en cualquier mes para ver su desglose."
             : // Se puede llegar aquí desde "Mejor mes", que puede ser de hace
@@ -176,7 +176,7 @@ export default async function RitmoPage({
             className="rounded-[18px] p-6"
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
-            <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+            <h2 className="mb-4 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
               Día a día
             </h2>
             <div className="flex h-[90px] items-end gap-[3px]">
@@ -189,7 +189,7 @@ export default async function RitmoPage({
                       background: d.total === 0 ? "var(--border)" : "var(--accent)",
                     }}
                   />
-                  <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[11px] group-hover:block"
+                  <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] group-hover:block"
                     style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
                   >
                     Día {Number(d.dia.slice(8))} · {d.total}
@@ -197,7 +197,7 @@ export default async function RitmoPage({
                 </div>
               ))}
             </div>
-            <div className="mt-1.5 flex justify-between text-[10px] text-muted">
+            <div className="mt-1.5 flex justify-between text-[0.625rem] text-muted">
               <span>1</span>
               <span>{desglose.porDia.length}</span>
             </div>
@@ -208,7 +208,7 @@ export default async function RitmoPage({
               className="rounded-[18px] p-6"
               style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
             >
-              <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+              <h2 className="mb-4 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
                 Por metal
               </h2>
               <div className="space-y-2.5">
@@ -218,7 +218,7 @@ export default async function RitmoPage({
                   .map((g) => (
                     <div key={g.grade ?? "sin"} className="flex items-center gap-3">
                       <TrophyTile grade={g.grade ?? undefined} size={28} />
-                      <span className="text-[13px] font-semibold">
+                      <span className="text-[0.8125rem] font-semibold">
                         {g.grade ? gradeLabel(g.grade) : "Logro"}
                       </span>
                       <span
@@ -236,7 +236,7 @@ export default async function RitmoPage({
               className="rounded-[18px] p-6"
               style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
             >
-              <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+              <h2 className="mb-4 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
                 Por juego
               </h2>
               <div className="space-y-2">
@@ -249,10 +249,10 @@ export default async function RitmoPage({
                     <span className="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-surface-2">
                       {j.iconUrl && <img src={j.iconUrl} alt="" className="h-full w-full object-cover" />}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">
+                    <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">
                       {j.juego}
                     </span>
-                    <span className="font-heading shrink-0 text-[15px] font-bold tabular-nums">
+                    <span className="font-heading shrink-0 text-[0.9375rem] font-bold tabular-nums">
                       {j.total}
                     </span>
                   </Link>
@@ -264,7 +264,7 @@ export default async function RitmoPage({
           <section>
             <div className="mb-4 flex flex-wrap items-baseline gap-3">
               <h2 className="font-heading text-2xl font-bold">Uno por uno</h2>
-              <span className="text-[13px] text-muted">
+              <span className="text-[0.8125rem] text-muted">
                 {trofeos.length} {trofeos.length === 1 ? "trofeo" : "trofeos"}, del más
                 reciente al más antiguo
               </span>
@@ -283,8 +283,8 @@ export default async function RitmoPage({
                     <TrophyTile grade={t.grade ?? undefined} size={38} />
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold">{t.nombre}</p>
-                      <p className="truncate text-[12px] text-muted">
+                      <p className="truncate text-[0.875rem] font-semibold">{t.nombre}</p>
+                      <p className="truncate text-[0.75rem] text-muted">
                         {t.juego}
                         {t.detalle && ` · ${t.detalle}`}
                       </p>
@@ -292,14 +292,14 @@ export default async function RitmoPage({
 
                     {r && (
                       <span
-                        className="hidden shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] sm:inline-block"
+                        className="hidden shrink-0 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] sm:inline-block"
                         style={{ background: r.bg, color: r.fg }}
                       >
                         {t.rarityPercent!.toFixed(1)}%
                       </span>
                     )}
 
-                    <span className="shrink-0 text-right text-[11px] text-muted">
+                    <span className="shrink-0 text-right text-[0.6875rem] text-muted">
                       día {new Date(t.earnedAt).getUTCDate()}
                       <span className="block">{relativeDate(t.earnedAt)}</span>
                     </span>

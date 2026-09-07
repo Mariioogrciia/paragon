@@ -80,7 +80,7 @@ export function CompararFiltrable({
           )}
 
           {(busqueda || plataforma !== "todas") && (
-            <span className="text-[13px] text-muted">{visibles.length} de {comunes.length}</span>
+            <span className="text-[0.8125rem] text-muted">{visibles.length} de {comunes.length}</span>
           )}
         </div>
       )}
@@ -100,7 +100,7 @@ export function CompararFiltrable({
               {participantes.map((p) => (
                 <span
                   key={p.userId}
-                  className="truncate text-center text-[11px] font-bold uppercase tracking-[0.08em] text-muted"
+                  className="truncate text-center text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted"
                   title={p.nombre}
                 >
                   {p.esMio ? "Tú" : p.nombre}
@@ -119,19 +119,19 @@ export function CompararFiltrable({
                     className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-cover bg-center"
                     style={{ background: juego.iconUrl ? `url(${juego.iconUrl}) center/cover` : coverGradient(juego.id) }}
                   />
-                  <span className="truncate text-[13px] font-semibold" title={juego.title}>
+                  <span className="truncate text-[0.8125rem] font-semibold" title={juego.title}>
                     {juego.title}
                   </span>
                 </div>
 
                 {juego.progress.map((p, i) => (
                   <div key={participantes[i].userId} className="flex flex-col items-center gap-1.5">
-                    <span className="text-[13px] font-semibold">{p.percent}%</span>
+                    <span className="text-[0.8125rem] font-semibold">{p.percent}%</span>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
                       <div className="h-full rounded-full" style={{ width: `${p.percent}%`, background: "var(--accent-grad-h)" }} />
                     </div>
                     {juego.horas[i] !== undefined && (
-                      <span className="text-[10px] text-muted">{juego.horas[i]!.toFixed(0)} h</span>
+                      <span className="text-[0.625rem] text-muted">{juego.horas[i]!.toFixed(0)} h</span>
                     )}
                   </div>
                 ))}

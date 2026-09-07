@@ -83,7 +83,7 @@ export default async function BibliotecaPage({
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-3.5">
             <h2 className="font-heading text-2xl font-bold">Juegos</h2>
-            <span className="text-[13px] text-muted">
+            <span className="text-[0.8125rem] text-muted">
               {games.length} juegos · del más reciente al más antiguo
             </span>
           </div>

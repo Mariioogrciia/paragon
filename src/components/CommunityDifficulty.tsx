@@ -67,13 +67,13 @@ export function CommunityDifficulty({
 
         {media != null ? (
           <>
-            <span className="font-heading text-[15px] font-bold">{media.toFixed(1).replace(".", ",")}</span>
-            <span className="text-[13px] text-muted">
+            <span className="font-heading text-[0.9375rem] font-bold">{media.toFixed(1).replace(".", ",")}</span>
+            <span className="text-[0.8125rem] text-muted">
               {votos} {votos === 1 ? "voto" : "votos"} de dificultad
             </span>
           </>
         ) : (
-          <span className="text-[13px] text-muted">Nadie ha votado la dificultad todavía.</span>
+          <span className="text-[0.8125rem] text-muted">Nadie ha votado la dificultad todavía.</span>
         )}
       </div>
 

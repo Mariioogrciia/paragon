@@ -34,17 +34,17 @@ export default async function AvisosPage() {
     <div className="mx-auto max-w-[760px]">
       <BackButton fallbackHref="/" />
       <div className="flex flex-wrap items-end gap-3">
-        <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Avisos</h1>
+        <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">Avisos</h1>
         {sinLeer > 0 && (
           <form action={marcarLeidoAction} className="ml-auto">
-            <button className="text-[13px] font-semibold text-accent hover:underline">
+            <button className="text-[0.8125rem] font-semibold text-accent hover:underline">
               Marcar todo como leído
             </button>
           </form>
         )}
       </div>
 
-      <p className="mt-2 text-[15px] text-muted">
+      <p className="mt-2 text-[0.9375rem] text-muted">
         Se generan solos al sincronizar tus cuentas, cada hora.
       </p>
 
@@ -60,9 +60,9 @@ export default async function AvisosPage() {
               <>
                 <span className="text-xl leading-none">{ICONO[a.type] ?? "•"}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-semibold">{a.title}</span>
-                  {a.body && <span className="mt-0.5 block text-[13px] text-muted">{a.body}</span>}
-                  <span className="mt-1 block text-[11px] text-muted">
+                  <span className="block text-[0.9375rem] font-semibold">{a.title}</span>
+                  {a.body && <span className="mt-0.5 block text-[0.8125rem] text-muted">{a.body}</span>}
+                  <span className="mt-1 block text-[0.6875rem] text-muted">
                     {relativeDate(a.createdAt)}
                   </span>
                 </span>

@@ -29,7 +29,7 @@ export function TrophyMonthChart({ meses }: { meses: MesConTrofeos[] }) {
       </div>
       <div className="mt-1.5 flex gap-1.5">
         {meses.map((m) => (
-          <span key={m.mes} className="flex-1 text-center text-[9px] font-semibold text-muted">
+          <span key={m.mes} className="flex-1 text-center text-[0.5625rem] font-semibold text-muted">
             {mesCorto(m.mes)}
           </span>
         ))}

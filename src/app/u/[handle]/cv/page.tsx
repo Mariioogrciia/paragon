@@ -91,7 +91,7 @@ export default async function HojaDeServiciosPage({
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
             <p className="font-heading text-2xl font-bold">{item.valor}</p>
-            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.1em] text-muted print:text-black/60">
+            <p className="mt-1 text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted print:text-black/60">
               {item.etiqueta}
             </p>
           </div>
@@ -100,7 +100,7 @@ export default async function HojaDeServiciosPage({
 
       {badges.length > 0 && (
         <section className="mb-9">
-          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted print:text-black/60">
+          <h2 className="mb-2 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted print:text-black/60">
             Insignias
           </h2>
           <Badges earnedBadges={badges} />
@@ -109,7 +109,7 @@ export default async function HojaDeServiciosPage({
 
       {destacados.length > 0 && (
         <section>
-          <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-muted print:text-black/60">
+          <h2 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted print:text-black/60">
             Juegos destacados
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -124,10 +124,10 @@ export default async function HojaDeServiciosPage({
                   style={{ background: g.iconUrl ? `url(${g.iconUrl}) center/cover` : coverGradient(g.id) }}
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold" title={g.title}>
+                  <p className="truncate text-[0.8125rem] font-semibold" title={g.title}>
                     {g.title}
                   </p>
-                  <p className="text-[11px] text-muted print:text-black/60">
+                  <p className="text-[0.6875rem] text-muted print:text-black/60">
                     {g.playtimeMinutes
                       ? `${(g.playtimeMinutes / 60).toFixed(0)} h`
                       : `${g.earnedTotal} trofeos`}
@@ -139,7 +139,7 @@ export default async function HojaDeServiciosPage({
         </section>
       )}
 
-      <p className="mt-12 text-center text-[11px] text-muted print:text-black/50">
+      <p className="mt-12 text-center text-[0.6875rem] text-muted print:text-black/50">
         Generado por Paragon · paragon.app/u/{handle}
       </p>
     </div>

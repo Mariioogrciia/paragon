@@ -143,7 +143,7 @@ export function ParagonWrap({
   return (
     <section className="mb-10">
       <div className="mb-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="font-heading text-[26px] font-bold uppercase tracking-wide flex items-center gap-2">
+        <h2 className="font-heading text-[1.625rem] font-bold uppercase tracking-wide flex items-center gap-2">
           <span className="text-xl">✨</span> Paragon Wrap
         </h2>
         <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
@@ -180,8 +180,8 @@ export function ParagonWrap({
             border: "1px solid rgba(167, 139, 250, 0.35)",
           }}
         >
-          <div className="absolute -right-4 -top-4 text-[80px] opacity-10">🎮</div>
-          <h3 className="mb-1 text-[13px] font-bold uppercase tracking-widest" style={{ color: "#c4b5fd" }}>
+          <div className="absolute -right-4 -top-4 text-[5rem] opacity-10">🎮</div>
+          <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#c4b5fd" }}>
             Género más jugado
           </h3>
           <p className="font-heading mb-2 text-3xl font-bold text-white">{topGenre.name}</p>
@@ -201,7 +201,7 @@ export function ParagonWrap({
         >
           <div className="absolute inset-0 bg-black/55" />
           <div className="relative z-10">
-            <h3 className="mb-1 text-[13px] font-bold uppercase tracking-widest" style={{ color: "#a8ccff" }}>
+            <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#a8ccff" }}>
               Juego más exprimido
             </h3>
             <p
@@ -228,7 +228,7 @@ export function ParagonWrap({
           <div className="absolute bottom-2 right-2 opacity-20">
             <TrophyIcon grade="gold" size={60} />
           </div>
-          <h3 className="mb-1 text-[13px] font-bold uppercase tracking-widest" style={{ color: "#fcd34d" }}>
+          <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#fcd34d" }}>
             Resumen del año
           </h3>
           <div className="mb-2 flex items-end gap-2">

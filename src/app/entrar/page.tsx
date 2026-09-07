@@ -87,7 +87,7 @@ export default async function EntrarPage({
                 <p className="font-heading mt-2.5 text-xl font-bold leading-none" style={{ color: s.color }}>
                   {s.value}
                 </p>
-                <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.1em] text-muted">{s.label}</p>
+                <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">{s.label}</p>
               </div>
             );
           })}
@@ -96,17 +96,17 @@ export default async function EntrarPage({
 
       <div className="flex flex-col justify-center bg-surface p-8 sm:p-11">
         <div className="max-w-[420px]">
-          <h1 className="font-heading text-[38px] font-bold uppercase leading-[1.05] tracking-[-0.01em]">
+          <h1 className="font-heading text-[2.375rem] font-bold uppercase leading-[1.05] tracking-[-0.01em]">
             Entra en Paragon
           </h1>
-          <p className="mt-3.5 text-[15px] leading-relaxed text-muted">
+          <p className="mt-3.5 text-[0.9375rem] leading-relaxed text-muted">
             Elige con qué cuenta quieres entrar. Después vinculas tus perfiles de
             PlayStation o Steam, que es de donde salen los trofeos y logros.
           </p>
 
           {mensajeError && (
             <p
-              className="mt-6 rounded-[14px] px-[18px] py-4 text-[13px] leading-relaxed"
+              className="mt-6 rounded-[14px] px-[18px] py-4 text-[0.8125rem] leading-relaxed"
               style={{
                 border: "1px solid rgba(248, 113, 113, 0.35)",
                 background: "rgba(248, 113, 113, 0.08)",
@@ -125,7 +125,7 @@ export default async function EntrarPage({
               }}
             >
               <button
-                className="group flex w-full items-center gap-3.5 rounded-xl px-[18px] py-4 text-left text-[15px] font-semibold transition-all duration-300 hover:bg-[var(--surface-2)] hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgb(var(--accent-rgb) / 0.2)] active:translate-y-0 active:scale-[0.98]"
+                className="group flex w-full items-center gap-3.5 rounded-xl px-[18px] py-4 text-left text-[0.9375rem] font-semibold transition-all duration-300 hover:bg-[var(--surface-2)] hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgb(var(--accent-rgb) / 0.2)] active:translate-y-0 active:scale-[0.98]"
                 style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 transition-colors group-hover:bg-white/10">
@@ -147,7 +147,7 @@ export default async function EntrarPage({
               }}
             >
               <button
-                className="group flex w-full items-center gap-3.5 rounded-xl px-[18px] py-4 text-left text-[15px] font-semibold transition-all duration-300 hover:bg-[var(--surface-2)] hover:border-[#5865F2] hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,101,242,0.2)] active:translate-y-0 active:scale-[0.98]"
+                className="group flex w-full items-center gap-3.5 rounded-xl px-[18px] py-4 text-left text-[0.9375rem] font-semibold transition-all duration-300 hover:bg-[var(--surface-2)] hover:border-[#5865F2] hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,101,242,0.2)] active:translate-y-0 active:scale-[0.98]"
                 style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#5865F2]/10 transition-colors group-hover:bg-[#5865F2]/20">
@@ -162,7 +162,7 @@ export default async function EntrarPage({
           </div>
 
           <p
-            className="mt-7 rounded-[14px] px-[18px] py-4 text-[13px] leading-relaxed"
+            className="mt-7 rounded-[14px] px-[18px] py-4 text-[0.8125rem] leading-relaxed"
             style={{ border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--muted)" }}
           >
             No guardamos contraseñas: el acceso lo lleva tu proveedor. Los

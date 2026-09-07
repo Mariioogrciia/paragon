@@ -10,7 +10,7 @@ import type { CommunityRating as Rating } from "@/lib/ratings";
 export function CommunityRating({ rating }: { rating: Rating | null }) {
   if (!rating) {
     return (
-      <p className="text-[13px] text-muted">Todavía no lo ha valorado nadie.</p>
+      <p className="text-[0.8125rem] text-muted">Todavía no lo ha valorado nadie.</p>
     );
   }
 
@@ -42,10 +42,10 @@ export function CommunityRating({ rating }: { rating: Rating | null }) {
         })}
       </span>
 
-      <span className="font-heading text-[15px] font-bold">
+      <span className="font-heading text-[0.9375rem] font-bold">
         {average.toFixed(1).replace(".", ",")}
       </span>
-      <span className="text-[13px] text-muted">
+      <span className="text-[0.8125rem] text-muted">
         {votes} {votes === 1 ? "valoración" : "valoraciones"}
       </span>
     </div>

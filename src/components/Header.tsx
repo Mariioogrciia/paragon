@@ -86,7 +86,7 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
       <button
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="flex items-center gap-1 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.2)]"
+        className="flex items-center gap-1 rounded-lg px-3.5 py-1.5 text-[0.8125rem] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.2)]"
         style={
           activo
             ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
@@ -111,7 +111,7 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
                 key={item.label}
                 href={item.href}
                 onClick={() => setAbierto(false)}
-                className="block rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors hover:text-foreground"
+                className="block rounded-lg px-3 py-2 text-[0.8125rem] font-semibold transition-colors hover:text-foreground"
                 style={active ? { color: "var(--accent-text)" } : { color: "var(--muted)" }}
               >
                 {item.label}
@@ -150,7 +150,7 @@ function BotonSincronizar({ comoFila = false }: { comoFila?: boolean }) {
           title="Sincronizar trofeos ahora"
           className={
             comoFila
-              ? "flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-[14px] font-semibold transition-colors hover:text-foreground disabled:opacity-50"
+              ? "flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold transition-colors hover:text-foreground disabled:opacity-50"
               : "flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-50"
           }
           style={
@@ -235,7 +235,7 @@ export function Header({
               el nombre no cabia y acababa solapado con el boton de menu
               (visto en un iPhone real, no en el emulador). El logo sigue,
               asi que la marca no desaparece. */}
-          <span className="hidden font-heading text-[18px] font-bold tracking-[0.06em] min-[400px]:inline">
+          <span className="hidden font-heading text-[1.125rem] font-bold tracking-[0.06em] min-[400px]:inline">
             PARAGON
           </span>
         </Link>
@@ -269,7 +269,7 @@ export function Header({
               <Link
                 key={item.label}
                 href={href}
-                className="rounded-lg px-3.5 py-1.5 text-[13px] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.2)]"
+                className="rounded-lg px-3.5 py-1.5 text-[0.8125rem] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.2)]"
                 style={
                   active
                     ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
@@ -366,7 +366,7 @@ export function Header({
               >
                 <Avatar src={user.image} name={user.name} size={32} />
                 {user.handle && (
-                  <span className="hidden text-[13px] font-semibold" style={{ color: "#b9c2cc" }}>
+                  <span className="hidden text-[0.8125rem] font-semibold" style={{ color: "#b9c2cc" }}>
                     @{user.handle}
                   </span>
                 )}
@@ -382,7 +382,7 @@ export function Header({
               </Link>
               <Link
                 href="/entrar"
-                className="shrink-0 rounded-lg px-4 py-2 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)]"
+                className="shrink-0 rounded-lg px-4 py-2 text-[0.8125rem] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)]"
                 style={{ background: "var(--accent-grad)", boxShadow: "0 8px 24px rgb(var(--accent-rgb) / 0.25)" }}
               >
                 Crear cuenta
@@ -407,7 +407,7 @@ export function Header({
                   key={item.label}
                   href={href}
                   onClick={() => setMenuAbierto(false)}
-                  className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold tracking-[0.02em] transition-colors hover:text-foreground"
+                  className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold tracking-[0.02em] transition-colors hover:text-foreground"
                   style={
                     active
                       ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
@@ -434,14 +434,14 @@ export function Header({
               <Link
                 href="/ajustes/apariencia"
                 onClick={() => setMenuAbierto(false)}
-                className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-muted transition-colors hover:text-foreground"
+                className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold text-muted transition-colors hover:text-foreground"
               >
                 Apariencia
               </Link>
               <Link
                 href="/ajustes"
                 onClick={() => setMenuAbierto(false)}
-                className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-muted transition-colors hover:text-foreground"
+                className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold text-muted transition-colors hover:text-foreground"
               >
                 Ajustes
               </Link>
@@ -449,7 +449,7 @@ export function Header({
                 <Link
                   href="/admin"
                   onClick={() => setMenuAbierto(false)}
-                  className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-muted transition-colors hover:text-foreground"
+                  className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold text-muted transition-colors hover:text-foreground"
                 >
                   Panel de administración
                 </Link>

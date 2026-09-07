@@ -96,7 +96,7 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
         </div>
 
         <div className="mt-2.5 flex items-center gap-2.5">
-          <span className="font-heading text-[15px] font-bold" style={{ color: "var(--accent-text)" }}>
+          <span className="font-heading text-[0.9375rem] font-bold" style={{ color: "var(--accent-text)" }}>
             {progress.percent}%
           </span>
           {game.rating != null && (
@@ -135,7 +135,7 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
               />
               <path d="M12 14v3m-3.5 3h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-bold uppercase tracking-[0.06em]">
+            <span className="text-[0.6875rem] font-bold uppercase tracking-[0.06em]">
               {progress.earned} {ACHIEVEMENT_LABEL[game.platform].many}
             </span>
           </span>

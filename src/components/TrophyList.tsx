@@ -182,7 +182,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
       <TrophyPhoto trophy={trophy} size={48} />
 
       <div className="min-w-0">
-        <p className="flex items-center gap-1.5 text-[15px] font-semibold">
+        <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold">
           {oculto ? "Trofeo oculto" : trophy.name}
           {tipo && (
             <span className="shrink-0 text-muted">
@@ -191,18 +191,18 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
           )}
         </p>
         {!oculto && trophy.detail && (
-          <p className="mt-1 text-[13px] text-muted">{trophy.detail}</p>
+          <p className="mt-1 text-[0.8125rem] text-muted">{trophy.detail}</p>
         )}
       </div>
 
       <span className="hidden sm:block">
         <span
-          className="block text-[11px] font-bold uppercase tracking-[0.1em]"
+          className="block text-[0.6875rem] font-bold uppercase tracking-[0.1em]"
           style={{ color: colorFor(trophy.grade) }}
         >
           {gradeLabel(trophy.grade)}
         </span>
-        {puntos !== null && <span className="text-[10px] text-muted">{puntos} pts</span>}
+        {puntos !== null && <span className="text-[0.625rem] text-muted">{puntos} pts</span>}
       </span>
       <span className="hidden text-right text-xs text-muted sm:block">
         {trophy.earnedAt ? relativeDate(trophy.earnedAt) : "—"}
@@ -240,21 +240,21 @@ function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, plat
 
       <TrophyPhoto trophy={trophy} size={64} />
 
-      <p className="mt-3 line-clamp-2 text-[13px] font-semibold">
+      <p className="mt-3 line-clamp-2 text-[0.8125rem] font-semibold">
         {oculto ? "Trofeo oculto" : trophy.name}
       </p>
 
       <span
-        className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.1em]"
+        className="mt-1.5 text-[0.625rem] font-bold uppercase tracking-[0.1em]"
         style={{ color: colorFor(trophy.grade) }}
       >
         {gradeLabel(trophy.grade)}
       </span>
-      {puntos !== null && <span className="text-[10px] text-muted">{puntos} pts</span>}
+      {puntos !== null && <span className="text-[0.625rem] text-muted">{puntos} pts</span>}
 
       {r && (
         <span
-          className="mt-2 rounded-full px-2 py-0.5 text-[10px] font-bold"
+          className="mt-2 rounded-full px-2 py-0.5 text-[0.625rem] font-bold"
           style={{ background: r.bg, color: r.fg }}
         >
           {trophy.rarityPercent!.toFixed(1)}%

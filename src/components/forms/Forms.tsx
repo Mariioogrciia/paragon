@@ -57,7 +57,7 @@ function AtField({
   return (
     <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-xl" style={FIELD}>
       <span
-        className="flex items-center px-3.5 text-[15px] font-bold text-muted"
+        className="flex items-center px-3.5 text-[0.9375rem] font-bold text-muted"
         style={{ background: "#151d29" }}
       >
         @
@@ -68,7 +68,7 @@ function AtField({
         placeholder={placeholder}
         autoComplete="off"
         spellCheck={false}
-        className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-[15px] font-semibold text-foreground outline-none placeholder:font-normal placeholder:text-muted"
+        className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-[0.9375rem] font-semibold text-foreground outline-none placeholder:font-normal placeholder:text-muted"
       />
     </div>
   );
@@ -108,7 +108,7 @@ export function LinkPsnForm({ current }: { current?: string | null }) {
           placeholder="Tu ID de PlayStation"
           autoComplete="off"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
@@ -130,7 +130,7 @@ export function LinkSteamForm({ current }: { current?: string | null }) {
           placeholder="tu_usuario, 7656119… o la URL del perfil"
           autoComplete="off"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
@@ -153,7 +153,7 @@ export function LinkGoogleForm({ current }: { current?: string | null }) {
           placeholder="Tu correo electrónico de Google Play"
           autoComplete="email"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
@@ -176,7 +176,7 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
           placeholder="Tu Gamertag de Xbox"
           autoComplete="off"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
@@ -209,7 +209,7 @@ export function LinkUbisoftForm({ current }: { current?: string | null }) {
           placeholder="Tu usuario de Ubisoft Connect"
           autoComplete="off"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
@@ -235,7 +235,7 @@ export function NewCollectionForm({ gameId }: { gameId?: string }) {
           placeholder="Nueva carpeta (p. ej. «Pendientes 2026»)"
           autoComplete="off"
           maxLength={40}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>Crear</Submit>
@@ -271,7 +271,7 @@ export function ProfileSettingsForm({
   return (
     <form action={action} className="mt-6 flex flex-col gap-4">
       <div>
-        <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+        <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
           Nombre a mostrar
         </label>
         <div className="flex flex-1 items-stretch overflow-hidden rounded-xl" style={FIELD}>
@@ -279,13 +279,13 @@ export function ProfileSettingsForm({
             name="name"
             defaultValue={currentName}
             placeholder="Ej. Alex"
-            className="w-full bg-transparent px-4 py-3.5 text-[15px] text-foreground placeholder-muted/50 outline-none"
+            className="w-full bg-transparent px-4 py-3.5 text-[0.9375rem] text-foreground placeholder-muted/50 outline-none"
             required
           />
         </div>
       </div>
       <div>
-        <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+        <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
           URL del Avatar
         </label>
         <div className="flex flex-1 items-stretch overflow-hidden rounded-xl" style={FIELD}>
@@ -293,7 +293,7 @@ export function ProfileSettingsForm({
             name="image"
             defaultValue={currentImage || ""}
             placeholder="https://..."
-            className="w-full bg-transparent px-4 py-3.5 text-[15px] text-foreground placeholder-muted/50 outline-none"
+            className="w-full bg-transparent px-4 py-3.5 text-[0.9375rem] text-foreground placeholder-muted/50 outline-none"
           />
         </div>
       </div>
@@ -341,7 +341,7 @@ export function DiscordWebhookForm({ current }: { current?: string | null }) {
           placeholder="https://discord.com/api/webhooks/…"
           autoComplete="off"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           style={FIELD}
         />
         <Submit>{current ? "Actualizar" : "Guardar"}</Submit>
@@ -366,7 +366,7 @@ function SyncSubmit() {
   return (
     <button
       disabled={pending}
-      className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,167,255,0.4)] active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+      className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,167,255,0.4)] active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
       style={{ background: "var(--accent-grad)" }}
     >
       {pending ? "Sincronizando…" : "Sincronizar ahora"}

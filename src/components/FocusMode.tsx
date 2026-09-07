@@ -135,7 +135,7 @@ export function FocusMode({
       <div className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-5 pb-6 pt-6 lg:max-w-[1100px] lg:px-8">
         <header className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+            <p className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-white/40">
               Modo enfoque
             </p>
             <h1 className="font-heading mt-1 truncate text-2xl font-bold uppercase leading-tight">
@@ -190,12 +190,12 @@ export function FocusMode({
 
                     <div className="min-w-0 flex-1">
                       <p
-                        className={`font-bold leading-tight ${i === 0 ? "text-xl" : "text-[17px]"}`}
+                        className={`font-bold leading-tight ${i === 0 ? "text-xl" : "text-[1.0625rem]"}`}
                       >
                         {t.name}
                       </p>
                       {t.detail && (
-                        <p className="mt-1.5 text-[15px] leading-snug text-white/60">
+                        <p className="mt-1.5 text-[0.9375rem] leading-snug text-white/60">
                           {t.detail}
                         </p>
                       )}
@@ -203,14 +203,14 @@ export function FocusMode({
                       <div className="mt-2.5 flex flex-wrap items-center gap-2">
                         {r && (
                           <span
-                            className="rounded-full px-2.5 py-1 text-[12px] font-bold uppercase tracking-[0.06em]"
+                            className="rounded-full px-2.5 py-1 text-[0.75rem] font-bold uppercase tracking-[0.06em]"
                             style={{ background: r.bg, color: r.fg }}
                           >
                             {r.label} · {t.rarityPercent!.toFixed(1)}%
                           </span>
                         )}
                         {t.progress && t.progress.current > 0 && (
-                          <span className="text-[13px] font-bold tabular-nums text-white/70">
+                          <span className="text-[0.8125rem] font-bold tabular-nums text-white/70">
                             {t.progress.current}/{t.progress.target}
                           </span>
                         )}
@@ -223,7 +223,7 @@ export function FocusMode({
                       en la mano. */}
                   <button
                     onClick={() => setGuia(t)}
-                    className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-[15px] font-bold text-white/80 transition-transform hover:scale-[1.01] hover:text-white active:scale-[0.98]"
+                    className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-[0.9375rem] font-bold text-white/80 transition-transform hover:scale-[1.01] hover:text-white active:scale-[0.98]"
                     style={{ border: "1px solid rgba(255,255,255,0.16)" }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -244,7 +244,7 @@ export function FocusMode({
             </p>
           )}
           {error && (
-            <p className="text-center text-[15px] text-red-400" aria-live="polite">
+            <p className="text-center text-[0.9375rem] text-red-400" aria-live="polite">
               {error}
             </p>
           )}

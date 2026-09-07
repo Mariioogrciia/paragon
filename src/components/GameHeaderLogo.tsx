@@ -12,7 +12,7 @@ export function GameHeaderLogo({ title, steamId }: Props) {
 
   if (!steamId || error) {
     return (
-      <h1 className="mb-6 font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[52px]">
+      <h1 className="mb-6 font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[3.25rem]">
         {title}
       </h1>
     );

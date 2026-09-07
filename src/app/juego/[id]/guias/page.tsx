@@ -36,8 +36,8 @@ export default async function GuiasPage({ params }: { params: Promise<{ id: stri
       <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}`} label={game.title} />
 
       <div className="mt-3 mb-7 flex flex-wrap items-baseline gap-3">
-        <h1 className="font-heading text-[32px] font-bold uppercase leading-none">Guías</h1>
-        <span className="text-[13px] text-muted">
+        <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">Guías</h1>
+        <span className="text-[0.8125rem] text-muted">
           {guias.length === 0 ? "Ninguna todavía" : `${guias.length} ${guias.length === 1 ? "guía" : "guías"}`}
         </span>
       </div>

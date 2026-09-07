@@ -83,7 +83,7 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="¿No sale entre las recomendaciones? Búscalo — catálogo completo de IGDB…"
-          className="min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 bg-transparent text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
         />
         {query && (
           <button onClick={() => setQuery("")} className="shrink-0 text-xs font-semibold text-muted hover:text-foreground">

@@ -92,13 +92,13 @@ export default async function WrapRankingPage({
       <div>
         <BackButton fallbackHref={`/u/${handle}`} label="Volver al perfil" />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-heading text-[32px] font-bold uppercase leading-none">{TITULO[m]}</h1>
+          <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">{TITULO[m]}</h1>
           <div className="flex flex-wrap gap-1.5">
             {METRICAS.map((otra) => (
               <Link
                 key={otra}
                 href={`/u/${handle}/wrap/${otra}${rango !== "todo" ? `?rango=${rango}` : ""}`}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                className={`rounded-full border px-3 py-1.5 text-[0.6875rem] font-bold uppercase tracking-wide transition-colors ${
                   otra === m
                     ? "border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.14)] text-[var(--accent-text)] hover:bg-[rgb(var(--accent-rgb)/0.22)]"
                     : "border-[var(--border)] text-muted hover:text-foreground"
@@ -115,7 +115,7 @@ export default async function WrapRankingPage({
             <Link
               key={r.valor}
               href={`/u/${handle}/wrap/${m}${r.valor !== "todo" ? `?rango=${r.valor}` : ""}`}
-              className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-all ${
+              className={`rounded-full border px-3 py-1.5 text-[0.6875rem] font-bold uppercase tracking-wide transition-all ${
                 r.valor === rango
                   ? "border-transparent text-[var(--background)] hover:-translate-y-0.5"
                   : "border-[var(--border)] text-muted hover:text-foreground"
@@ -155,11 +155,11 @@ export default async function WrapRankingPage({
 
               <div className="min-w-0 flex-1">
                 {f.href ? (
-                  <Link href={f.href} className="block truncate text-[14px] font-semibold hover:underline" title={f.etiqueta}>
+                  <Link href={f.href} className="block truncate text-[0.875rem] font-semibold hover:underline" title={f.etiqueta}>
                     {f.etiqueta}
                   </Link>
                 ) : (
-                  <span className="block truncate text-[14px] font-semibold" title={f.etiqueta}>
+                  <span className="block truncate text-[0.875rem] font-semibold" title={f.etiqueta}>
                     {f.etiqueta}
                   </span>
                 )}

@@ -28,11 +28,11 @@ export function Footer() {
             Privacidad
           </Link>
           <span className="hidden md:inline text-muted/60">·</span>
-          <span className="hidden md:inline text-[11px] text-muted/80">
+          <span className="hidden md:inline text-[0.6875rem] text-muted/80">
             Desarrollado por <strong className="text-foreground/80">Mario García</strong>
           </span>
           <span className="hidden md:inline text-muted/60">·</span>
-          <span className="hidden md:inline text-[11px] text-muted/80">
+          <span className="hidden md:inline text-[0.6875rem] text-muted/80">
             No afiliado a Sony ni a Valve
           </span>
         </div>

@@ -23,7 +23,7 @@ export function TrophyCountRow({ counts, summary }: { counts: Counts; summary?: 
           >
             <TrophyIcon grade={grade} size={20} />
             <span className="font-heading text-lg font-bold tabular-nums">{counts[grade]}</span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted">
               {GRADE_LABEL[grade]}
             </span>
           </li>

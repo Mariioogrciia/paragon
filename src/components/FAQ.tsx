@@ -151,7 +151,7 @@ function Bloque({ titulo, preguntas }: { titulo: string; preguntas: Pregunta[] }
       <div className="space-y-2.5">
         {preguntas.map((p) => (
           <details key={p.q} className="group rounded-[18px] p-5" style={CARD}>
-            <summary className="flex cursor-pointer items-center justify-between gap-4 text-[15px] font-semibold marker:content-['']">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 text-[0.9375rem] font-semibold marker:content-['']">
               {p.q}
               <span
                 className="shrink-0 text-muted transition-transform group-open:rotate-180"
@@ -171,7 +171,7 @@ function Bloque({ titulo, preguntas }: { titulo: string; preguntas: Pregunta[] }
                 </svg>
               </span>
             </summary>
-            <p className="mt-3 text-[15px] leading-relaxed text-muted">{p.a}</p>
+            <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">{p.a}</p>
           </details>
         ))}
       </div>
@@ -183,10 +183,10 @@ export function FAQSection() {
   return (
     <div className="mx-auto max-w-[760px] py-16" id="faq">
       <div className="text-center mb-10">
-        <h2 className="font-heading text-[42px] font-bold uppercase leading-none">
+        <h2 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
           Preguntas frecuentes
         </h2>
-        <p className="mt-3 text-[15px] text-muted">
+        <p className="mt-3 text-[0.9375rem] text-muted">
           Lo que suele preguntarse antes de vincular una cuenta, y lo que conviene
           saber sobre lo que se puede y lo que no.
         </p>
@@ -196,7 +196,7 @@ export function FAQSection() {
       <Bloque titulo="Plataformas" preguntas={PLATAFORMAS} />
       <Bloque titulo="Biblioteca y valoraciones" preguntas={BIBLIOTECA} />
 
-      <p className="mt-9 text-center text-[13px] text-muted">
+      <p className="mt-9 text-center text-[0.8125rem] text-muted">
         ¿Te falta algo por aquí?{" "}
         <Link href="/ajustes" className="font-semibold text-accent hover:underline">
           Revisa tus ajustes

@@ -24,7 +24,7 @@ export default async function PlanificadorPage() {
     <div className="space-y-6">
       <BackButton fallbackHref="/" />
       <div>
-        <h1 className="font-heading text-[42px] font-bold uppercase leading-none">Planificador</h1>
+        <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">Planificador</h1>
         <p className="mt-2 max-w-[650px] text-sm text-muted">Elige cualquier carpeta como tu plan y añade juegos desde cada ficha para construir tu ruta.</p>
       </div>
       <Planificador collections={collections} library={games} handle={profile.handle} />

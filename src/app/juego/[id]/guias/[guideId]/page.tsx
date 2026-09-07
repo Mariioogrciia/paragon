@@ -32,7 +32,7 @@ export default async function GuiaPage({
       <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}/guias`} label="Todas las guías" />
 
       <article className="mt-4">
-        <h1 className="font-heading text-[28px] font-bold leading-tight">{guide.title}</h1>
+        <h1 className="font-heading text-[1.75rem] font-bold leading-tight">{guide.title}</h1>
 
         <div className="mt-3 flex items-center gap-2.5">
           <Avatar src={guide.authorImage} name={guide.authorName ?? guide.authorHandle ?? "?"} size={28} />
@@ -46,7 +46,7 @@ export default async function GuiaPage({
           )}
         </div>
 
-        <p className="mt-5 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
+        <p className="mt-5 whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-foreground/90">
           {guide.body}
         </p>
       </article>

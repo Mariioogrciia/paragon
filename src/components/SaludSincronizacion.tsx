@@ -89,7 +89,7 @@ export function SaludSincronizacion({ filas }: { filas: Fila[] }) {
           type="button"
           onClick={ponerseAlDia}
           disabled={pendiente}
-          className="mt-3.5 rounded-xl px-4 py-2.5 text-[13px] font-bold transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+          className="mt-3.5 rounded-xl px-4 py-2.5 text-[0.8125rem] font-bold transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
           style={{
             background: "rgb(var(--accent-rgb) / 0.12)",
             border: "1px solid rgb(var(--accent-rgb) / 0.3)",
@@ -100,9 +100,9 @@ export function SaludSincronizacion({ filas }: { filas: Fila[] }) {
         </button>
       )}
 
-      {aviso && <p className="mt-2.5 text-[13px] text-muted">{aviso}</p>}
+      {aviso && <p className="mt-2.5 text-[0.8125rem] text-muted">{aviso}</p>}
 
-      <p className="mt-3 text-[12px] leading-relaxed text-muted">
+      <p className="mt-3 text-[0.75rem] leading-relaxed text-muted">
         &laquo;Sin detalle&raquo; son juegos de los que sabemos el total de trofeos pero no
         cuáles ni cuándo — hasta que se piden, no cuentan en el histórico ni en
         las rachas. La puesta al día va por tandas: si quedan más, se puede

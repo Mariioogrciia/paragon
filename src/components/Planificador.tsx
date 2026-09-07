@@ -95,19 +95,19 @@ export function Planificador({ collections, library, handle }: { collections: Co
           <div className="mb-5 grid grid-cols-3 gap-3">
             <div className="rounded-xl border border-border p-3 text-center">
               <p className="font-heading text-2xl font-bold">{objetivos.length}</p>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
                 {objetivos.length === 1 ? "juego" : "juegos"} en el plan
               </p>
             </div>
             <div className="rounded-xl border border-border p-3 text-center">
               <p className="font-heading text-2xl font-bold text-platinum">{totalFaltan}</p>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">logros pendientes</p>
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">logros pendientes</p>
             </div>
             <div className="rounded-xl border border-border p-3 text-center">
               <p className="font-heading text-2xl font-bold" style={{ color: "var(--accent-text)" }}>
                 {progresoMedio}%
               </p>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">progreso medio</p>
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">progreso medio</p>
             </div>
           </div>
 
@@ -134,7 +134,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
                 )}
               </div>
               <div className="relative z-10 min-w-0 flex-1">
-                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-accent">Siguiente</p>
+                <p className="text-[0.625rem] font-bold uppercase tracking-[0.12em] text-accent">Siguiente</p>
                 <p className="truncate text-lg font-bold text-white">{ordered[0].title}</p>
                 <p className="text-xs text-white/70">
                   {ordered[0].progressPercent}% · faltan {faltan(ordered[0])} logros

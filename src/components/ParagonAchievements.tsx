@@ -59,7 +59,7 @@ export function ParagonAchievements({ games, earnedIds }: { games: Game[]; earne
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-bold">{achievement.name}</h3>
-                    <span className="text-[10px] font-bold uppercase" style={{ color: earned ? "var(--good)" : "var(--muted)" }}>{earned ? "Conseguido" : `${value}/${achievement.target}`}</span>
+                    <span className="text-[0.625rem] font-bold uppercase" style={{ color: earned ? "var(--good)" : "var(--muted)" }}>{earned ? "Conseguido" : `${value}/${achievement.target}`}</span>
                   </div>
                   <p className="mt-1 text-xs text-muted">{achievement.description}</p>
                 </div>

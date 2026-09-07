@@ -40,7 +40,7 @@ export function ShowcaseTrophies({
                       color del metal, sin enseñar el trofeo en sí. */}
                   <TrophyPhoto trophy={trophy} size={56} />
                   <div className="min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: colorFor(trophy.grade ?? "bronze") }}>
+                    <span className="text-[0.625rem] font-bold uppercase tracking-widest" style={{ color: colorFor(trophy.grade ?? "bronze") }}>
                       {gradeLabel(trophy.grade ?? "bronze")}
                     </span>
                     <h3 className="font-bold text-lg leading-tight mt-1 mb-1 group-hover:text-white transition-colors line-clamp-2">
@@ -55,14 +55,14 @@ export function ShowcaseTrophies({
                 <div className="mt-auto pt-4 flex items-center justify-between">
                   {r && (
                     <span 
-                      className="inline-block rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wider"
+                      className="inline-block rounded px-2 py-1 text-[0.625rem] font-bold uppercase tracking-wider"
                       style={{ background: r.bg, color: r.fg }}
                     >
                       {r.label} · {trophy.rarityPercent!.toFixed(1)}%
                     </span>
                   )}
                   {trophy.earnedAt && (
-                    <span className="text-[10px] text-muted font-medium ml-auto">
+                    <span className="text-[0.625rem] text-muted font-medium ml-auto">
                       {new Date(trophy.earnedAt).toLocaleDateString()}
                     </span>
                   )}

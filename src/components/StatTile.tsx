@@ -38,12 +38,12 @@ export function StatTile({
           tarjeta más alta que las demás en vez de igualarlas. */}
       <div className="animate-glint flex h-full flex-col justify-center rounded-[20px] border border-border bg-surface p-6">
         <p
-          className="font-heading text-[40px] font-bold leading-none tabular-nums"
+          className="font-heading text-[2.5rem] font-bold leading-none tabular-nums"
           style={accent ? { color: accent } : undefined}
         >
           {value}
         </p>
-        <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-muted">{label}</p>
+        <p className="mt-3 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{label}</p>
         {hint && <p className="mt-2 text-xs text-muted">{hint}</p>}
       </div>
     </motion.div>

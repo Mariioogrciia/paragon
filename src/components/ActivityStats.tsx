@@ -29,11 +29,11 @@ export function ActivityStats({ games, now }: { games: Game[]; now: number }) {
       </div>
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr]">
         <div>
-          <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted">Horas por plataforma</h3>
+          <h3 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-wider text-muted">Horas por plataforma</h3>
           {plataformas.length === 0 ? <p className="text-sm text-muted">Todavía no hay horas disponibles.</p> : <div className="space-y-2.5">{plataformas.map(([platform, minutes]) => <div key={platform}><div className="mb-1 flex justify-between text-xs"><span className="font-semibold uppercase">{platform}</span><span className="text-muted">{horas(minutes)}</span></div><div className="h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-accent" style={{ width: `${Math.round((minutes / maxHoras) * 100)}%` }} /></div></div>)}</div>}
         </div>
         <div>
-          <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted">Sin actividad en 90 días</h3>
+          <h3 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-wider text-muted">Sin actividad en 90 días</h3>
           {abandonados.length === 0 ? <p className="text-sm text-muted">No hay juegos abandonados registrados.</p> : <ul className="space-y-2">{abandonados.map((game) => <li key={game.id} className="flex items-center justify-between gap-3 text-sm"><span className="min-w-0 truncate font-semibold">{game.title}</span><span className="shrink-0 text-xs text-muted">{game.progressPercent}%</span></li>)}</ul>}
         </div>
       </div>

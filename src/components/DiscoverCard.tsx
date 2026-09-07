@@ -57,9 +57,9 @@ export function DiscoverCard({
         {esquina && <div className="absolute right-2 top-2">{esquina}</div>}
       </div>
       <div className="p-3">
-        <p className="truncate text-[13px] font-semibold">{game.title}</p>
+        <p className="truncate text-[0.8125rem] font-semibold">{game.title}</p>
         {game.genres.length > 0 && (
-          <p className="mt-0.5 truncate text-[11px] text-muted">{game.genres.slice(0, 2).join(", ")}</p>
+          <p className="mt-0.5 truncate text-[0.6875rem] text-muted">{game.genres.slice(0, 2).join(", ")}</p>
         )}
       </div>
     </Link>

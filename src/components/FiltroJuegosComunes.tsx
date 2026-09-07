@@ -76,7 +76,7 @@ export function FiltroJuegosComunes<T extends { platform: Platform; title: strin
           )}
 
           {(busqueda || plataforma !== "todas") && (
-            <span className="text-[13px] text-muted">{visibles.length} de {juegos.length}</span>
+            <span className="text-[0.8125rem] text-muted">{visibles.length} de {juegos.length}</span>
           )}
         </div>
       )}

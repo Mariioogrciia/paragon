@@ -222,7 +222,7 @@ export function ProfileForm({
                       key={t}
                       type="button"
                       onClick={() => setTitulo(t)}
-                      className="rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors hover:text-foreground"
+                      className="rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold transition-colors hover:text-foreground"
                       style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
                     >
                       {t}
@@ -386,7 +386,7 @@ function BackgroundGamePicker({
       <button
         type="button"
         onClick={() => onChange("")}
-        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg text-[10px] font-semibold text-muted transition-colors hover:text-foreground"
+        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-semibold text-muted transition-colors hover:text-foreground"
         style={{ border: `2px solid ${value === "" ? "var(--accent)" : "var(--border)"}` }}
         title="Automático (el más reciente)"
       >
@@ -404,7 +404,7 @@ function BackgroundGamePicker({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={g.iconUrl} alt="" className="h-full w-full object-cover" />
           {favoritosSet.has(g.id) && (
-            <span className="absolute right-0.5 top-0.5 text-[10px] drop-shadow">⭐</span>
+            <span className="absolute right-0.5 top-0.5 text-[0.625rem] drop-shadow">⭐</span>
           )}
         </button>
       ))}

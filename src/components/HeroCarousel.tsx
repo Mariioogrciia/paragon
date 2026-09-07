@@ -60,7 +60,11 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
       onMouseEnter={() => setPausado(true)}
       onMouseLeave={() => setPausado(false)}
     >
-      <div className="relative flex h-[210px] items-stretch overflow-hidden sm:h-[180px]" style={{ background: coverGradient(String(g.igdbId)) }}>
+      {/* `min-h` y no `h` fija: con el tamaño de letra en "Grande" o
+          "Enorme" (ver /ajustes/apariencia) el contenido crece, y con una
+          altura fija + `overflow-hidden` el boton de deseados quedaba
+          cortado por abajo. Asi la pieza crece con el texto. */}
+      <div className="relative flex min-h-[210px] items-stretch overflow-hidden sm:min-h-[180px]" style={{ background: coverGradient(String(g.igdbId)) }}>
         {g.coverUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -88,12 +92,12 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
         <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-3 text-white sm:px-6">
           <div className="flex flex-wrap items-center gap-2">
             {g.platforms.slice(0, 1).map((p) => (
-              <span key={p} className="flex items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 text-[11px] font-bold backdrop-blur-sm">
+              <span key={p} className="flex items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 text-[0.6875rem] font-bold backdrop-blur-sm">
                 <IconoPlataforma platforms={[p]} />
                 {p}
               </span>
             ))}
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/70">{g.releaseLabel}</span>
+            <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-white/70">{g.releaseLabel}</span>
             {g.pegi && <Pegi edad={g.pegi} />}
           </div>
 
@@ -104,7 +108,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
           {g.genres.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {g.genres.slice(0, 2).map((genre) => (
-                <span key={genre} className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/85">
+                <span key={genre} className="rounded-full bg-white/10 px-2 py-0.5 text-[0.625rem] font-semibold text-white/85">
                   {genre}
                 </span>
               ))}

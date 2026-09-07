@@ -1,6 +1,6 @@
 "use client";
 
-import { ACENTOS, ESTILOS, MODOS, TEMAS, useApariencia } from "@/lib/apariencia";
+import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, useApariencia } from "@/lib/apariencia";
 
 /**
  * Panel de apariencia de verdad, para /ajustes/apariencia. Antes esto vivía
@@ -17,9 +17,11 @@ export function AppearanceSettings() {
     acento,
     acentoLibre,
     estilo,
+    tamanoTexto,
     elegirAcento,
     elegirAcentoLibre,
     elegirEstilo,
+    elegirTamanoTexto,
     elegirTema,
   } = useApariencia();
 
@@ -49,6 +51,33 @@ export function AppearanceSettings() {
               }
             >
               {m.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <h2 className="font-semibold mb-1">Tamaño del texto</h2>
+        <p className="mb-4 text-sm text-muted">
+          Afecta a toda la aplicación. Si ya tienes el navegador o el móvil con
+          la letra más grande, «Normal» respeta ese ajuste tuyo.
+        </p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {TAMANOS_TEXTO.map((t) => (
+            <button
+              key={t.value || "normal"}
+              onClick={() => elegirTamanoTexto(t.value)}
+              className="rounded-xl px-4 py-3 font-semibold transition-colors"
+              // Cada boton se enseña al tamaño que aplica, para poder
+              // elegirlo viendolo en vez de adivinando por el nombre.
+              style={{
+                fontSize: `calc(0.875rem * ${parseFloat(t.escala) / 100})`,
+                ...(tamanoTexto === t.value
+                  ? { background: "var(--accent)", color: "#061021" }
+                  : { background: "var(--surface-2)", color: "var(--muted)" }),
+              }}
+            >
+              {t.label}
             </button>
           ))}
         </div>
@@ -112,7 +141,7 @@ export function AppearanceSettings() {
               }
             >
               {e.label}
-              <span className="mt-0.5 block text-[11px] font-normal opacity-80">{e.desc}</span>
+              <span className="mt-0.5 block text-[0.6875rem] font-normal opacity-80">{e.desc}</span>
             </button>
           ))}
         </div>

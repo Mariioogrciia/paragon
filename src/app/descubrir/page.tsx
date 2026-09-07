@@ -84,7 +84,7 @@ export default async function DescubrirPage() {
                   key={g.igdbId}
                   game={{ igdbId: g.igdbId, title: g.title, iconUrl: g.coverUrl, genres: g.genres }}
                   badge={
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
                       {releaseLabelEs(g.releaseDate, g.releasePrecision)}
                     </span>
                   }
@@ -104,7 +104,7 @@ export default async function DescubrirPage() {
                 <DiscoverCard
                   game={g}
                   esquina={
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
                       +{g.recientes}
                     </span>
                   }
@@ -126,7 +126,7 @@ export default async function DescubrirPage() {
                   game={g}
                   fluid
                   esquina={
-                    <span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-yellow-400 backdrop-blur-sm">
+                    <span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-yellow-400 backdrop-blur-sm">
                       ★ {g.notaMedia}
                     </span>
                   }

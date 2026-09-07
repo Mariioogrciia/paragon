@@ -16,7 +16,7 @@ export function StatusBadge({ status }: { status: GameStatus }) {
 
   return (
     <span
-      className="shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-medium"
+      className="shrink-0 rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium"
       style={{ background: s.bg, color: s.fg, borderColor: s.border }}
     >
       {s.label}
@@ -28,7 +28,7 @@ export function StatusBadge({ status }: { status: GameStatus }) {
 export function RarityTag({ label, bg, fg }: { label: string; bg: string; fg: string }) {
   return (
     <span
-      className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium"
+      className="shrink-0 rounded-full px-2 py-0.5 text-[0.6875rem] font-medium"
       style={{ background: bg, color: fg }}
     >
       {label}

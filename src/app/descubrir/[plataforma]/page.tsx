@@ -120,7 +120,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
                 key={g.igdbId}
                 game={g}
                 badge={
-                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
                     +{g.recientes}
                   </span>
                 }
@@ -217,12 +217,12 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
                 <div className="relative aspect-video w-full overflow-hidden bg-surface-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={oferta.caratula} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                  <span className="absolute right-2 top-2 rounded-full bg-good px-2 py-0.5 text-[10px] font-bold text-black">
+                  <span className="absolute right-2 top-2 rounded-full bg-good px-2 py-0.5 text-[0.625rem] font-bold text-black">
                     -{oferta.ahorro}%
                   </span>
                 </div>
                 <div className="p-3">
-                  <p className="truncate text-[13px] font-semibold">{oferta.titulo}</p>
+                  <p className="truncate text-[0.8125rem] font-semibold">{oferta.titulo}</p>
                   <div className="mt-1 flex items-baseline gap-2">
                     <span className="text-sm font-bold text-good">{oferta.precio.toFixed(2)} €</span>
                     <span className="text-xs text-muted line-through">{oferta.precioOriginal.toFixed(2)} €</span>

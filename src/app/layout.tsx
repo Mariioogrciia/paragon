@@ -199,6 +199,13 @@ export default async function RootLayout({
               }
               var e=localStorage.getItem("platinos:estilo");
               if(e) document.documentElement.classList.add(e);
+              // Tamaño de letra: se aplica ANTES de pintar. Si se dejara al
+              // efecto de React, cada carga daria un salto visible de tamaño.
+              var t=localStorage.getItem("platinos:texto");
+              if(t){
+                var esc={grande:"112.5%",enorme:"125%",pequeno:"87.5%"}[t];
+                if(esc) document.documentElement.style.fontSize=esc;
+              }
             }catch(err){}`,
           }}
         />

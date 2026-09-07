@@ -45,15 +45,15 @@ export default function EjemploPage() {
               background: "rgb(var(--accent-rgb) / 0.1)",
             }}
           >
-            <span className="text-[13px] font-bold uppercase tracking-[0.08em]" style={{ color: "var(--accent-text)" }}>
+            <span className="text-[0.8125rem] font-bold uppercase tracking-[0.08em]" style={{ color: "var(--accent-text)" }}>
               Perfil de ejemplo
             </span>
-            <span className="text-[13px] text-muted">
+            <span className="text-[0.8125rem] text-muted">
               Datos inventados. Así se ve un perfil cuando vinculas tus cuentas.
             </span>
             <Link
               href="/entrar"
-              className="ml-auto rounded-[10px] px-4 py-2 text-[13px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+              className="ml-auto rounded-[10px] px-4 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
               style={{ background: "var(--accent-grad)" }}
             >
               Crear el mío
@@ -64,11 +64,11 @@ export default function EjemploPage() {
             <Avatar src={null} name={DEMO_JUGADOR.name} size={92} />
 
             <div className="min-w-0">
-              <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
+              <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
                 {DEMO_JUGADOR.name}
               </h1>
               <p className="mt-2 text-sm text-muted">@ejemplo · PS5 · PC · Switch</p>
-              <p className="mt-3 text-[13px] font-bold tracking-[0.06em] text-accent-2">
+              <p className="mt-3 text-[0.8125rem] font-bold tracking-[0.06em] text-accent-2">
                 NIVEL {DEMO_JUGADOR.trophyLevel}
               </p>
             </div>
@@ -111,7 +111,7 @@ export default function EjemploPage() {
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-3.5">
             <h2 className="font-heading text-2xl font-bold">Biblioteca</h2>
-            <span className="text-[13px] text-muted">
+            <span className="text-[0.8125rem] text-muted">
               {DEMO_JUEGOS.length} juegos · del más reciente al más antiguo
             </span>
           </div>
@@ -130,13 +130,13 @@ export default function EjemploPage() {
           style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
         >
           <h2 className="font-heading text-2xl font-bold">Esto con tus juegos</h2>
-          <p className="mx-auto mt-2 max-w-[520px] text-[15px] text-muted">
+          <p className="mx-auto mt-2 max-w-[520px] text-[0.9375rem] text-muted">
             Vinculas tu ID público de PlayStation o tu perfil de Steam y la
             biblioteca se rellena sola. Sin contraseñas ni tokens.
           </p>
           <Link
             href="/entrar"
-            className="mt-5 inline-block rounded-xl px-6 py-3.5 text-[15px] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+            className="mt-5 inline-block rounded-xl px-6 py-3.5 text-[0.9375rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
             style={{ background: "var(--accent-grad)" }}
           >
             Empezar la caza

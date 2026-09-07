@@ -50,7 +50,7 @@ export function TrophyHistory({
         style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
       >
         <h2 className="font-heading text-2xl font-bold">Tu ritmo</h2>
-        <p className="mt-2 text-[13px] text-muted">
+        <p className="mt-2 text-[0.8125rem] text-muted">
           Todavía no hay ningún trofeo con fecha registrada. Las fechas llegan
           al sincronizar el detalle de cada juego, y eso se va completando solo
           en segundo plano.
@@ -66,7 +66,7 @@ export function TrophyHistory({
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
         <h2 className="font-heading text-2xl font-bold">Tu ritmo</h2>
-        <p className="text-[13px] text-muted">
+        <p className="text-[0.8125rem] text-muted">
           Trofeos conseguidos por mes, del último año.
         </p>
         <Link
@@ -109,7 +109,7 @@ export function TrophyHistory({
         <div className="relative">
           {/* Una sola línea de rejilla, la del máximo, y su cifra. Más líneas
               compiten con las barras por la atención. */}
-          <span className="absolute left-0 top-0 text-[10px] tabular-nums text-muted">
+          <span className="absolute left-0 top-0 text-[0.625rem] tabular-nums text-muted">
             {maximo}
           </span>
           <div
@@ -137,7 +137,7 @@ export function TrophyHistory({
                   {/* Etiqueta directa solo en el mes pico: un número sobre cada
                       barra convierte la gráfica en una tabla mal puesta. */}
                   {esPico && (
-                    <span className="mb-1 text-center text-[11px] font-bold tabular-nums">
+                    <span className="mb-1 text-center text-[0.6875rem] font-bold tabular-nums">
                       {m.total}
                     </span>
                   )}
@@ -154,7 +154,7 @@ export function TrophyHistory({
 
                   {/* Tooltip al pasar por encima: mes, total y platinos. */}
                   <div
-                    className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-2 text-[11px] shadow-2xl group-hover:block transition-all duration-300"
+                    className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-2 text-[0.6875rem] shadow-2xl group-hover:block transition-all duration-300"
                     style={{ 
                       background: "rgba(20, 25, 35, 0.85)", 
                       backdropFilter: "blur(12px)", 
@@ -182,7 +182,7 @@ export function TrophyHistory({
               return (
                 <span
                   key={m.mes}
-                  className="flex-1 text-center text-[10px] text-muted"
+                  className="flex-1 text-center text-[0.625rem] text-muted"
                   aria-hidden="true"
                 >
                   {mes}
@@ -193,7 +193,7 @@ export function TrophyHistory({
           </div>
         </div>
 
-        <p className="mt-4 text-[11px] text-muted">
+        <p className="mt-4 text-[0.6875rem] text-muted">
           Sobre {resumen.conFecha.toLocaleString("es-ES")} de{" "}
           {totalPerfil.toLocaleString("es-ES")} trofeos: solo cuentan los que
           tienen fecha registrada. Las fechas llegan al sincronizar el detalle de

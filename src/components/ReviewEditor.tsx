@@ -89,7 +89,7 @@ export function ReviewEditor({
           <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Tu Reseña</span>
           {initialRating ? <Stars value={initialRating} /> : null}
         </div>
-        <p className="text-[15px] leading-relaxed whitespace-pre-wrap italic">
+        <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap italic">
           &quot;{initialReview}&quot;
         </p>
       </div>

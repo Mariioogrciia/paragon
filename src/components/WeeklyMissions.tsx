@@ -30,7 +30,7 @@ export function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full" style={{ width: `${porcentaje}%`, background: completada ? "var(--good)" : "var(--accent-grad-h)" }} /></div>
-                <span className="text-[10px] font-bold text-muted">+{mission.xp} XP</span>
+                <span className="text-[0.625rem] font-bold text-muted">+{mission.xp} XP</span>
               </div>
             </div>
           );

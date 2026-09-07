@@ -25,10 +25,10 @@ export default async function BienvenidaPage() {
 
   return (
     <div className="mx-auto max-w-[560px]">
-      <h1 className="font-heading text-[42px] font-bold uppercase leading-none">
+      <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
         Vamos a dejarte listo
       </h1>
-      <p className="mt-2.5 text-[15px] text-muted">Dos pasos y ya está.</p>
+      <p className="mt-2.5 text-[0.9375rem] text-muted">Dos pasos y ya está.</p>
 
       <section className="mt-7 rounded-[18px] p-6" style={CARD}>
         <div className="flex items-center gap-3">
@@ -38,7 +38,7 @@ export default async function BienvenidaPage() {
           >
             1
           </span>
-          <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">Elige tu nombre de usuario</h2>
+          <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">Elige tu nombre de usuario</h2>
         </div>
 
         <p className="mb-4 mt-3 text-sm text-muted">
@@ -60,7 +60,7 @@ export default async function BienvenidaPage() {
           >
             2
           </span>
-          <h2 className="font-heading text-[17px] font-bold tracking-[0.03em]">
+          <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">
             Vincula donde juegas
           </h2>
         </div>
@@ -73,14 +73,14 @@ export default async function BienvenidaPage() {
 
         <div className="space-y-5">
           <div>
-            <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+            <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
               PlayStation · tu ID público
             </label>
             <LinkPsnForm current={accountFor(profile, "psn")?.username} />
           </div>
 
           <div>
-            <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+            <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
               Steam · usuario, SteamID64 o URL del perfil
             </label>
             <LinkSteamForm current={accountFor(profile, "steam")?.username} />
