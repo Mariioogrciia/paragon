@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import Link from "next/link";
+import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { getTrendingGames, getHiddenGems } from "@/lib/discover";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { DiscoverSearch } from "@/components/DiscoverSearch";
@@ -56,6 +57,9 @@ export default async function DescubrirPage() {
 
   return (
     <div>
+      {/* Las listas de juegos son de servidor: sin esto habria que
+          recargar a mano para ver un lanzamiento nuevo. */}
+      <RefrescoAutomatico />
       <BackButton fallbackHref="/" />
       <div className="mb-6">
         <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">Descubrir</h1>

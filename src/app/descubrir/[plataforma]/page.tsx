@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { auth } from "@/auth";
 import { GameGrid } from "@/components/GameGrid";
 import { RankedList } from "@/components/RankedList";
@@ -69,6 +70,9 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
 
   return (
     <div>
+      {/* Las listas de juegos son de servidor: sin esto habria que
+          recargar a mano para ver un lanzamiento nuevo. */}
+      <RefrescoAutomatico />
       <BackButton fallbackHref="/descubrir" />
       <div className="mb-6 flex items-center gap-3">
         <span

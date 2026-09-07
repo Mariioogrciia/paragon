@@ -18,7 +18,7 @@ export function ReleaseGrid({ items }: { items: IgdbGameResult[] }) {
         <Link
           key={g.igdbId}
           href={`/juego/${g.igdbId}`}
-          className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-0 transition-colors hover:bg-surface-2"
+          className="flex h-[4.5rem] items-center gap-3 border-b border-border px-4 last:border-0 transition-colors hover:bg-surface-2"
         >
           <span
             className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg"
@@ -31,17 +31,18 @@ export function ReleaseGrid({ items }: { items: IgdbGameResult[] }) {
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold">{g.title}</p>
-            {g.genres.length > 0 && (
-              <div className="mt-1 flex flex-wrap gap-1">
-                {g.genres.slice(0, 2).map((genre) => (
-                  <span key={genre} className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase text-muted">
-                    {genre}
-                  </span>
-                ))}
-              </div>
-            )}
+            {/* La fila de generos se reserva SIEMPRE y no envuelve: un juego
+                sin generos hacia su fila mas baja, y dos etiquetas largas la
+                hacian mas alta. */}
+            <div className="mt-1 flex h-[1.1rem] items-center gap-1 overflow-hidden">
+              {g.genres.slice(0, 2).map((genre) => (
+                <span key={genre} className="shrink-0 rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase text-muted">
+                  {genre}
+                </span>
+              ))}
+            </div>
           </div>
-          <span className="shrink-0 text-right text-xs font-bold text-muted">{releaseLabelEs(g.releaseDate, g.releasePrecision)}</span>
+          <span className="shrink-0 whitespace-nowrap text-right text-xs font-bold text-muted">{releaseLabelEs(g.releaseDate, g.releasePrecision)}</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-muted">
             <path d="m9 6 6 6-6 6" />
           </svg>
