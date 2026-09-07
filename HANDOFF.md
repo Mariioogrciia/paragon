@@ -1,9 +1,209 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **6 de septiembre de 2026**
-(continuación directa de la sesión larguísima del día 5, con Antigravity
-trabajando en paralelo todo el rato — más abajo hay un aviso de qué tocó él).
+releer todo el historial. Última actualización: **7 de septiembre de 2026**
+(con Antigravity trabajando en paralelo todo el rato — más abajo hay un
+aviso de qué tocó él).
+
+---
+
+## Sesión del 7 de septiembre de 2026 — responsive, tamaño de letra, Descubrir en tiempo real, y trofeos perdibles de verdad
+
+Sesión larga a base de peticiones cortas encadenadas, con Antigravity
+editando los mismos archivos en paralelo varias veces (dos incidentes reales
+de `git add -A` arrastrando cambios suyos a un commit mío — ver el aviso de
+"disciplina de commits" más abajo). Va por tema, no en orden cronológico.
+
+### El build de producción estaba roto, y nadie se había dado cuenta
+
+`next build` fallaba entero con "Failed to type check" por un archivo suelto
+en `scratch/test_igdb.ts` (de Antigravity, un test a medias con un import
+que no existe). El motivo real: `tsconfig.json` incluye `**/*.ts` de TODO el
+repo, no solo `src/`, así que un archivo roto en cualquier carpeta tumbaba
+el build aunque nada de la app lo importara. Se excluyó `scratch/` en
+`tsconfig.json` — arreglo de una vez, no depende de que nadie se acuerde de
+no dejar archivos rotos sueltos. De paso se encontró y se borró
+`src/app/api/test-igdb/route.ts` (mismo problema, pero además rompía
+`/api/games/upcoming` con un 500 en desarrollo porque Turbopack invalida el
+build entero si cualquier módulo del árbol falla).
+
+### Responsive: la cabecera estaba rota en TODAS las pantallas
+
+Capturas reales del usuario en móvil mostraban el logo "PARAGON" solapado
+con el botón de menú, botones cortados en Comunidad/Amigos/Planificador, y
+"RECOMENDACIONES" pisando "PLAYSTATION" en Descubrir. Se repasó con una
+herramienta hecha ex profeso que mide el DOM a 375px (elementos que se salen
+de su contenedor o de la pantalla) en vez de comparar capturas a ojo.
+
+Causas reales encontradas, todas con el mismo patrón de fondo:
+- **La cabecera** metía 6 iconos en la misma barra. Sincronizar, apariencia,
+  ajustes y admin pasan al menú desplegable (con su nombre escrito, no un
+  icono suelto); en la barra se quedan logo, menú y avisos.
+- **24 archivos con rejillas sin columna base** (`grid gap-3 sm:grid-cols-2`
+  sin un `grid-cols-1` explícito antes). Sin columna explícita, una rejilla
+  usa columnas implícitas de tamaño `auto`, que se dimensionan al CONTENIDO
+  MÁXIMO y desbordan cuando no cabe — medido en las tarjetas de
+  lanzamientos: una pista de 248,75px en un hueco de 213px.
+- **Campos de formulario sin `min-w-0`**: un `<input>` trae un ancho mínimo
+  intrínseco (~180px) que `flex-1` NO anula, así que empujaba el botón de al
+  lado fuera de la pantalla ("Enviar solicitud" en Amigos, "Enviar" en los
+  comentarios del muro).
+- `truncate` no recorta en un elemento `inline` (un `<a>` lo es por
+  defecto) — un nombre largo en Amigos se salía 42px hasta que se le puso
+  `block`.
+
+Verificado a 375px, en Normal y con el tamaño de letra en Grande, sin
+desbordes: panel, biblioteca, estadísticas, ficha de juego, feed, noticias,
+ligas, Descubrir, Amigos, Planificador, Avisos, Ajustes.
+
+### Tamaño de letra, controlado por el usuario (no encogido por mí)
+
+Se pidió explícitamente que fuera un AJUSTE, no que yo redujera la
+tipografía. El obstáculo real: 387 clases de texto usaban píxeles fijos
+(`text-[13px]`), que no responden a un cambio del tamaño de la raíz.
+Convertidas todas a `rem` (`text-[0.8125rem]`) — verificado que a tamaño
+Normal el resultado renderiza IDÉNTICO a antes (h1 en 42px exactos). Nuevo
+control en `/ajustes/apariencia` (Pequeño 87,5% / Normal / Grande 112,5% /
+Enorme 125%), mismo patrón que tema y acento (`localStorage` + aplicado al
+`<html>` antes de pintar, para no dar un salto visual en cada carga).
+Probar con letra Grande destapó un fallo que no se veía de otro modo: el
+hero de Descubrir tenía altura FIJA con `overflow-hidden`, así que el botón
+de deseados quedaba cortado. Pasa a `min-h`.
+
+### Descubrir: el "tiempo real" tenía una trampa de caché
+
+`upcomingGames`/`recentReleases`/`destacadosRecientes` (lib/igdb/client.ts)
+metían el instante actual (`Date.now()`) en el CUERPO de la consulta a
+IGDB, y Next cachea cada `fetch` por su cuerpo — con el instante cambiando
+cada segundo, la caché de 6h **nunca acertaba**, así que cada visita a
+Descubrir iba a IGDB de verdad (que limita a 4 peticiones/segundo). Ahora el
+instante se redondea a ventanas de 5 minutos (`ahoraRedondeado`): la caché
+funciona y la lista sigue fresca. Se añadió `RefrescoAutomatico.tsx`
+(`router.refresh()` cada 5 min y al volver a la pestaña, sin perder el
+scroll — verificado) para lo que se pinta en el servidor.
+
+También en Descubrir: tarjetas de tamaño desigual (el hero saltaba entre
+210px y 268px al rotar según el juego tuviera título de una o dos líneas,
+géneros que cupieran en una fila, o —el caso más curioso— si el botón decía
+"+ Añadir a Deseados" o el más corto "✓ En Deseados") — ahora todas
+reservan el mismo hueco. El hero solo mostraba la PRIMERA plataforma de un
+juego multiplataforma (`slice(0, 1)`); ahora muestra todas (un icono por
+familia, sin repetir PS4/PS5). Fechas de lanzamiento en formato corto
+(`dd/mm/aaaa`, o `nov 2026`/`T4 2026`/`2028` según la precisión real que dé
+IGDB — nunca se inventa un día que no se sabe).
+
+### Ofertas, logos de sitios web, y PS Plus
+
+- Las ofertas de "Dónde comprarlo" SÍ eran enlaces válidos, pero pasaban por
+  una página intermedia de CheapShark que reenvía por JS — se siente como
+  que no llevan a ningún sitio. La de Steam ahora va DIRECTA a su ficha (el
+  appid ya se tiene); el resto no tiene alternativa (CheapShark no publica
+  la URL propia de cada oferta) y ahora se avisa en pantalla.
+- "Sitios web" en la ficha de juego mostraba un círculo con la INICIAL del
+  nombre — en Garry's Mod salían dos círculos con "S" (Sitio oficial/Steam)
+  y dos con "T" (Twitch/Twitter), indistinguibles. `SiteIcon.tsx` (nuevo)
+  da logos reales a 13 sitios conocidos.
+- PS Plus enseñaba el mes EN INGLÉS ("juegos de March"), ya traducido.
+  Comprobado contra el blog oficial: Sony no ha publicado ningún anuncio de
+  PS Plus desde el 25 de febrero de 2026 (el de marzo) — ni en el feed ni en
+  la web de la etiqueta. No es que el scraping esté roto: Sony sencillamente
+  no lo ha publicado. El aviso en pantalla ahora lo dice sin rodeos en vez
+  de un tímido "puede que ya no sea el catálogo vigente".
+
+### "Añadido a mano (4)" en el filtro de plataforma de la biblioteca
+
+El usuario reportó que ese filtro salía sin haber añadido nada a mano. Eran
+los 4 juegos de su lista de DESEADOS (se guardan como plataforma "manual"
+porque así los mete "+ Añadir a Deseados" desde Descubrir). Los deseados ya
+tienen su propio filtro de estado; ya no cuentan como plataforma
+(`lib/stats.ts`/`libraryFacets` filtra `!g.isWishlist` antes de contar).
+
+### "Tu legado": exportar todos los datos en un JSON
+
+Antigravity había empezado la misma idea en paralelo (misma función
+`exportarDatosUsuario`, mismo endpoint `/api/exportar`) — se fusionó en vez
+de duplicar. Recorre biblioteca, trofeos conseguidos, carpetas, amistades,
+insignias, votos de dificultad, guías escritas y el historial de
+sincronización, todo en consultas en paralelo. Deliberadamente sin
+credenciales (nunca se guardan) ni el perfil completo de otros usuarios.
+Botón en `/ajustes/seguridad`.
+
+### Trofeos perdibles: la desconfianza del usuario hacia Antigravity estaba justificada
+
+Antigravity había implementado "perdible" buscando la palabra literal
+dentro de guías de trofeo ESCRITAS POR LA COMUNIDAD (`trophy_guide`, con un
+simple `ilike`). Roto de dos formas: una guía que dijera "esto NO es
+perdible" habría coincidido igual, y `trophy_guide` tiene **0 filas en
+producción** — el aviso no iba a salir nunca, para ningún trofeo.
+
+Se probó sustituirlo por una heurística sobre el propio texto del trofeo
+(mismo patrón que `clasificarTrofeo`, que sí funciona para dificultad/tipo)
+y se descartó tras comprobarlo contra los **15.574 trofeos reales de la
+base**: 0 contienen la palabra "missable", y las pocas coincidencias con un
+patrón más amplio eran FALSOS POSITIVOS ("Point of No Return" y "Last
+Chance" resultaron ser nombres de misión/arena de un juego, no avisos). La
+descripción que da PSN/Steam de un trofeo sencillamente no lleva esta
+información — nunca.
+
+La fuente real que sí la tiene: **PowerPyx** (guías escritas por una
+persona), que marca cada trofeo perdible literalmente "MISSABLE TROPHY".
+`lib/powerpyx.ts` (nuevo) busca la guía por título exigiendo coincidencia
+EXACTA tras normalizar (nunca "el primer resultado" — buscando "The Witcher
+3" el primero es el DLC "Blood and Wine", no el juego base) y extrae los
+nombres marcados. Nunca lanza; un fallo es "sin aviso", no rompe la ficha.
+
+**Cobertura real, medida con honestidad — léase antes de dar esto por
+resuelto**: solo cubre PSN (PowerPyx no tiene guías de Steam/Xbox,
+comprobado con Garry's Mod: "sin resultados"). Y dentro de PSN, solo un
+subconjunto: PowerPyx cambió de formato de tabla con los años, y el parser
+escrito aquí cubre la tabla clásica (confirmado con Metal Gear Solid 4, 23
+trofeos detectados) pero no las guías más nuevas (TablePress o prosa por
+capítulos — Black Myth: Wukong, por ejemplo). Probado contra 6 juegos reales
+de una biblioteca real (Assassin's Creed Unity, los tres Uncharted
+Remastered, The Last of Us Part II, Black Myth: Wukong): **ninguno** mostró
+el aviso — 5 por no encontrar coincidencia exacta de título, 1 por el
+formato nuevo. El sistema es correcto y seguro (nunca miente), pero
+mejorarlo de verdad pasa por relajar la coincidencia de título (con
+cuidado: relajarla demasiado ya causó el caso de Blood and Wine) o sumar un
+segundo parser para el formato nuevo — ninguna de las dos hecha todavía.
+
+El tick en pantalla (`TrophyList.tsx`) pasó de un triángulo con el aviso
+solo en el `title` (invisible sin pasar el ratón) a un check real con la
+palabra "Perdible" escrita al lado, como pidió el usuario.
+
+### GTA VI tenía la carátula de GTA V, y un hardcode lo tapaba mal
+
+Al investigar lo de perdibles salió, sin buscarlo, que la ficha de **Grand
+Theft Auto VI mostraba la carátula de Grand Theft Auto V** — error de
+emparejamiento de IGDB en algún momento pasado. Corregido en la base
+(`games.iconUrl`). Y se encontró que Antigravity ya había "arreglado" esto
+antes con un hardcode en `GameCard.tsx` (comparando `game.title` contra
+"grand theft auto v"/"vi" literal para forzar una URL de Wikipedia) — con
+el dato de origen ya corregido, ese hardcode **sobrescribía la carátula
+real y correcta que ya tenía GTA V**, y de paso ocultaba el título de la
+tarjeta (el logo de Wikipedia lo llevaba dibujado dentro; la carátula real
+es artwork sin texto). Se quitó entero. Moraleja para quien retome esto:
+un dato mal guardado se arregla en el dato, nunca con un `if` por título en
+el componente que lo pinta.
+
+### Disciplina de commits, con Antigravity editando en paralelo
+
+Pasó tres veces en esta sesión (y ya había pasado en sesiones anteriores):
+un `git add -A` se llevó por delante archivos que Antigravity había tocado
+a la vez (un `CONTEXTO.md` suyo, una migración de logos de `.jpg` a `.png`,
+una línea `hltb: gamesTable.hltb` en `getLibrary`). Ninguno era dañino, pero
+mezclar autoría en un commit es peor que dividir en dos — se fueron
+separando en commits aparte según se detectaban. **Para quien retome esto
+con Antigravity trabajando a la vez: revisar `git status`/`git diff --cached`
+archivo por archivo antes de comitear, nunca fiarse de un `git add -A`.**
+
+### Lo que Antigravity está construyendo en paralelo, sin tocar
+
+`src/components/TrophyTree.tsx` y `src/lib/hltb.ts` — un árbol visual de
+trofeos y "Time to Beat" en el planificador, las dos ideas que esta misma
+sesión le había recomendado al usuario por separado. No se ha revisado ese
+código; si se retoma, conviene una revisión con el mismo nivel de
+escepticismo que se aplicó aquí a "perdibles" antes de confiar en él.
 
 ---
 
