@@ -32,11 +32,26 @@ export interface PsPlusJuego {
 
 export interface PsPlusMensual {
   titulo: string;
-  /** "March", tal cual sale en el título en inglés del post — para pintar "hace N meses" si no es el actual. */
+  /** El mes del anuncio, ya en español ("marzo"). El post de Sony viene en
+   *  inglés; traducirlo aquí evita que la pantalla acabe diciendo "juegos de
+   *  March", que es como salía antes. */
   mes: string | null;
   link: string;
   fecha: string | null;
   juegos: PsPlusJuego[];
+}
+
+const MESES_ES: Record<string, string> = {
+  january: "enero", february: "febrero", march: "marzo", april: "abril",
+  may: "mayo", june: "junio", july: "julio", august: "agosto",
+  september: "septiembre", october: "octubre", november: "noviembre", december: "diciembre",
+};
+
+/** El titulo del post viene en ingles ("...Monthly Games for March"). Si el
+ *  mes no se reconoce se devuelve tal cual: mejor en ingles que vacio. */
+function mesEnEspanol(mes: string | null): string | null {
+  if (!mes) return null;
+  return MESES_ES[mes.trim().toLowerCase()] ?? mes;
 }
 
 const FEED_URL = "https://blog.playstation.com/tag/ps-plus/feed/";
@@ -103,7 +118,7 @@ export async function getPsPlusMensual(): Promise<PsPlusMensual | null> {
 
     return {
       titulo: anuncio.title,
-      mes: mesDelTitulo(anuncio.title),
+      mes: mesEnEspanol(mesDelTitulo(anuncio.title)),
       link: anuncio.link ?? FEED_URL,
       fecha: anuncio.pubDate ?? null,
       juegos,

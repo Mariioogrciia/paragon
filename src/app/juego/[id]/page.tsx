@@ -26,6 +26,7 @@ import { GameVideos } from "@/components/GameVideos";
 import { GameLanguages } from "@/components/GameLanguages";
 import { GameDlcs } from "@/components/GameDlcs";
 import { GameTrophyBreakdown } from "@/components/GameTrophyBreakdown";
+import { SiteIcon } from "@/components/SiteIcon";
 import { BackButton } from "@/components/BackButton";
 import { GameWishlistCard } from "@/components/GameWishlistCard";
 import { CollectionPicker } from "@/components/Collections";
@@ -400,6 +401,9 @@ export default async function JuegoGlobalPage({
                   rel="noopener noreferrer nofollow"
                   className="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-border px-3.5 py-2.5 last:border-0 transition-colors hover:bg-surface-2"
                 >
+                  {/* Logo de la tienda: la lista se lee de un vistazo, sin
+                      tener que leer el nombre de cada fila. */}
+                  <SiteIcon label={oferta.tienda} size={14} />
                   <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{oferta.tienda}</span>
                   <span className="shrink-0 font-heading text-sm font-bold">{oferta.precio.toFixed(2)} €</span>
                   {i === 0 && (
@@ -417,7 +421,11 @@ export default async function JuegoGlobalPage({
               ))}
             </div>
             <p className="-mt-2 text-[0.625rem] text-muted">
-              Vía CheapShark. Puede no incluir región ni impuestos. Solo Steam.
+              Precios vía CheapShark; pueden no incluir región ni impuestos. La
+              oferta de Steam abre su ficha directamente
+              {precios.ofertas.some((o) => o.viaCheapShark)
+                ? "; el resto pasa por la redirección de CheapShark, que es lo único que publica su API."
+                : "."}
             </p>
 
             {historicoPrecios.length > 0 && (

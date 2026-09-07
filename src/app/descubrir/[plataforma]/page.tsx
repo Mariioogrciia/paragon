@@ -192,8 +192,11 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               en vez de dejar que parezca el mes actual sin serlo. */}
           {psPlus.fecha && Date.now() - new Date(psPlus.fecha).getTime() > 40 * 86_400_000 && (
             <p className="-mt-2 mb-4 text-xs text-muted">
-              Último anuncio real del blog de PlayStation, de {relativeDate(psPlus.fecha)} — puede que ya no sea el
-              catálogo vigente si Sony no ha publicado el del mes en curso.
+              Este es el último anuncio que Sony ha publicado en su blog oficial
+              ({relativeDate(psPlus.fecha)}), y por tanto lo único que se sabe
+              con certeza: desde entonces no ha salido ninguno nuevo, ni en el
+              feed ni en la web. No es el catálogo del mes en curso, y ponerlo
+              aquí a mano seria inventarselo.
             </p>
           )}
           <GameGrid items={psPlus.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">

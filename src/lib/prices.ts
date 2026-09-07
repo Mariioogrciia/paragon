@@ -75,6 +75,9 @@ export interface OfertaPrecio {
   precioOriginal: number;
   ahorro: number;
   url: string;
+  /** `true` si `url` pasa por la redireccion de CheapShark en vez de ir
+   *  directa a la tienda — ver el comentario en el mapeo de ofertas. */
+  viaCheapShark: boolean;
 }
 
 export interface ComparativaPrecios {
@@ -115,7 +118,20 @@ export async function comparativaPreciosSteam(appId: string): Promise<Comparativ
       precio: Number(d.price),
       precioOriginal: Number(d.retailPrice),
       ahorro: Math.round(Number(d.savings)),
-      url: `https://www.cheapshark.com/redirect?dealID=${d.dealID}`,
+      // La de Steam va DIRECTA a la tienda: el enlace de CheapShark pasa por
+      // una pagina intermedia suya que reenvia por JavaScript, y para el
+      // usuario eso se siente como que el enlace no lleva a ninguna parte.
+      // Aqui si se puede evitar porque el appid de Steam ya lo tenemos (es
+      // con lo que se ha buscado el juego). Para el resto de tiendas no hay
+      // alternativa: CheapShark no publica la URL propia de cada oferta, solo
+      // su redireccion.
+      url:
+        TIENDAS[d.storeID] === "Steam"
+          ? `https://store.steampowered.com/app/${appId}/`
+          : `https://www.cheapshark.com/redirect?dealID=${d.dealID}`,
+      /** `true` si el enlace pasa por la redireccion de CheapShark, para
+       *  poder avisarlo en pantalla en vez de que sorprenda. */
+      viaCheapShark: TIENDAS[d.storeID] !== "Steam",
     }))
     .sort((a, b) => a.precio - b.precio);
 

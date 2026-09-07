@@ -6,6 +6,7 @@
  * concreto — cada fila se oculta sola si no hay dato, no se rellena con
  * nada inventado.
  */
+import { SiteIcon } from "@/components/SiteIcon";
 
 interface Props {
   developer?: string;
@@ -94,10 +95,11 @@ export function GameDetailsSidebar({ developer, publisher, releaseLabel, platfor
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 title={w.label}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-[0.6875rem] font-bold uppercase transition-colors hover:text-accent"
+                aria-label={w.label}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-muted transition-colors hover:text-accent"
                 style={{ border: "1px solid var(--border)" }}
               >
-                {w.label.slice(0, 1)}
+                <SiteIcon label={w.label} />
               </a>
             ))}
           </div>

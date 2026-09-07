@@ -421,7 +421,14 @@ export function libraryFacets(games: Game[]): {
   return {
     publishers: tally(games.map(companyOf)),
     genres: tally(games.flatMap((g) => g.genres ?? [])),
-    platforms: tally(games.map((g) => g.platform)),
+    // Los deseados NO cuentan como plataforma. Se guardan como juegos
+    // "manual" (asi es como los mete "+ Añadir a Deseados" desde Descubrir),
+    // asi que la fila de filtros acababa enseñando "Añadido a mano (4)"
+    // cuando el usuario no habia añadido nada a mano: eran 4 juegos de su
+    // lista de deseados, que ya tienen su propio filtro de estado. "Añadido
+    // a mano" solo debe salir si de verdad has metido tu un juego en tu
+    // biblioteca.
+    platforms: tally(games.filter((g) => !g.isWishlist).map((g) => g.platform)),
     pegis,
     dificultades: [...dificultadesMap.values()].sort((a, b) => a.nivel - b.nivel),
     horas,
