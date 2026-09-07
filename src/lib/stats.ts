@@ -38,7 +38,17 @@ export interface GameProgress {
  * salvo en el propio dato crudo `earned.platinum`, que sigue reflejando lo
  * que de verdad devuelve cada API.
  */
-export function esPlatinoEquivalente(game: Game): boolean {
+/*
+ * Firma estructural (`Pick`, no `Game` entero) para que la puedan usar
+ * tambien las consultas agregadas que NO cargan la biblioteca completa —
+ * `clasificacionAmigos` (lib/rankings.ts) trae solo estos tres campos de
+ * cada fila. Cualquier `Game` sigue valiendo tal cual; lo que se evita es
+ * la tentacion de reimplementar la regla en SQL, que ya ha divergido entre
+ * sitios en el pasado (ver HANDOFF.md).
+ */
+export function esPlatinoEquivalente(
+  game: Pick<Game, "earned" | "platform" | "progressPercent">,
+): boolean {
   if ((game.earned?.platinum ?? 0) > 0) return true;
   return game.platform === "steam" && game.progressPercent === 100;
 }

@@ -6,14 +6,13 @@ import { Avatar } from "@/components/Avatar";
 import { AddFriendForm } from "@/components/forms/Forms";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import {
-  getLibrary,
   getProfileByUserId,
   listFriends,
   listPendingRequests,
 } from "@/lib/profiles";
-import { summarise } from "@/lib/stats";
-import { getParagonLevel } from "@/lib/paragonLevel";
-import { getPeriodRankings } from "@/lib/rankings";
+import { getParagonLevels } from "@/lib/paragonLevel";
+import { paragonLevelFromXp } from "@/lib/level";
+import { clasificacionAmigos, getPeriodRankings } from "@/lib/rankings";
 import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Amigos · Paragon" };
@@ -38,32 +37,34 @@ export default async function AmigosPage() {
     ...amigos.map((a) => a.userId),
   ];
 
-  const ranking = (
-    await Promise.all(
-      contendientes.map(async (userId) => {
-        const full = userId === session.user.id ? mio : await getProfileByUserId(userId);
-        if (!full || full.accounts.length === 0) return null;
+  // Tres consultas para TODA la clasificacion, independientemente de cuanta
+  // gente haya. Antes esto cargaba, por cada participante, su perfil + su
+  // biblioteca ENTERA + su nivel: del orden de 25-30 consultas para 5
+  // personas, lanzadas todas a la vez contra un pool de 5 conexiones. Era la
+  // pagina con mas papeletas de atascarlo (ver db/index.ts).
+  const [filasClasificacion, niveles, periodos] = await Promise.all([
+    clasificacionAmigos(contendientes),
+    getParagonLevels(contendientes),
+    getPeriodRankings(contendientes),
+  ]);
 
-        const { player, games } = await getLibrary(full);
-        const stats = summarise(games);
-        const paragon = await getParagonLevel(full.userId);
-
-        return {
-          userId: full.userId,
-          handle: full.handle,
-          name: player.name,
-          avatarUrl: player.avatarUrl,
-          trophyLevel: player.trophyLevel,
-          esMio: full.userId === session.user.id,
-          stats,
-          paragon,
-        };
-      }),
-    )
-  )
-    .filter((r): r is NonNullable<typeof r> => r !== null)
+  const ranking = filasClasificacion
+    .map((fila) => ({
+      userId: fila.userId,
+      handle: fila.handle,
+      name: fila.name ?? fila.handle ?? "Sin nombre",
+      avatarUrl: fila.avatarUrl ?? undefined,
+      trophyLevel: fila.trophyLevel ?? undefined,
+      esMio: fila.userId === session.user!.id,
+      stats: {
+        platinos: fila.platinos,
+        trofeos: fila.trofeos,
+        juegos: fila.juegos,
+        completadoMedio: fila.completadoMedio,
+      },
+      paragon: niveles.get(fila.userId) ?? paragonLevelFromXp(0),
+    }))
     .sort((a, b) => b.paragon.xp - a.paragon.xp);
-  const periodos = await getPeriodRankings(contendientes);
 
   return (
     <div>

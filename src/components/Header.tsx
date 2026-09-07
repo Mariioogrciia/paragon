@@ -36,7 +36,8 @@ const NAV_PRINCIPAL = [
   {
     label: "Amigos",
     href: "/amigos",
-    match: (p: string) => p.startsWith("/amigos") || p.startsWith("/comparar"),
+    match: (p: string) =>
+      p.startsWith("/amigos") || p.startsWith("/comparar") || p.startsWith("/rankings"),
   },
 ];
 
@@ -55,11 +56,6 @@ const NAV_MAS = [
     label: "Planificador",
     href: "/planificador",
     match: (p: string) => p.startsWith("/planificador"),
-  },
-  {
-    label: "Rankings",
-    href: "/rankings",
-    match: (p: string) => p.startsWith("/rankings"),
   },
 ];
 

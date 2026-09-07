@@ -28,6 +28,7 @@ export default function robots(): MetadataRoute.Robots {
         "/entrar",
         "/offline",
         "/planificador",
+        // Redirige a /amigos (ver next.config.ts); no hay nada que indexar.
         "/rankings",
         "/ritmo",
       ],
