@@ -226,10 +226,7 @@ export function Header({
           <img
             src="/logo.png"
             alt="Paragon"
-            className="h-[30px] w-[30px] rounded-[9px]"
-            style={{
-              boxShadow: "0 0 18px rgb(var(--accent-rgb) / 0.45)",
-            }}
+            className="h-[30px] w-[30px]"
           />
           {/* Se esconde por debajo de 400px: con los iconos de la derecha,
               el nombre no cabia y acababa solapado con el boton de menu

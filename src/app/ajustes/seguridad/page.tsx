@@ -49,6 +49,22 @@ export default async function AjustesSeguridadPage() {
         </div>
       </section>
 
+      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <h2 className="font-semibold mb-4">Tu legado (Exportar datos)</h2>
+        <p className="text-sm text-muted mb-6">
+          Descarga una copia completa de tu historial en la plataforma en formato JSON.
+          Incluye tus juegos, trofeos conseguidos, reseñas, carpetas, guías creadas y tu historial de sincronización. No incluye contraseñas ni tokens.
+        </p>
+        <a
+          href="/api/exportar"
+          download
+          className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:text-[var(--accent-text)] px-6 py-2.5 font-semibold transition-all"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Exportar mis datos
+        </a>
+      </section>
+
       <section className="rounded-[18px] p-6 border border-danger/30 bg-danger/5">
         <h2 className="font-semibold mb-4 text-danger">Cerrar sesión</h2>
         <p className="text-sm text-muted mb-6">Cierra la sesión actual en este navegador. Tendrás que volver a autenticarte la próxima vez que entres.</p>
