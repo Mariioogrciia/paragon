@@ -45,6 +45,7 @@ import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
 import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideError, type TrophyGuideRow } from "@/lib/trophyGuides";
 import { marcarTodoLeido } from "@/lib/notifications";
 import { ownsGame } from "@/lib/community";
+import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
 import { votarDificultad } from "@/lib/communityDifficulty";
 import { getGameRecommendations, type GameRecommendation } from "@/lib/recommendations";
 import type { AccountPlatform } from "@/lib/types";
@@ -1014,4 +1015,83 @@ export async function deleteTrophyGuideAction(formData: FormData): Promise<void>
 export async function backlogFallbackAction(): Promise<GameRecommendation[]> {
   const userId = await requireUserId();
   return getGameRecommendations(userId, 20);
+}
+
+/* ------------------------- Puesta al día por tandas ------------------------ */
+
+export interface PuestaAlDia {
+  /** Juegos refrescados en esta tanda. */
+  hechos: number;
+  /** Los que siguen pendientes después de esta tanda. */
+  restantes: number;
+  error?: string;
+}
+
+/**
+ * Refresca de golpe unos cuantos juegos pendientes de la biblioteca.
+ *
+ * La biblioteca sabe cuántos trofeos tiene cada juego, pero el detalle (qué
+ * trofeo y cuándo) solo llega al pedirlo juego a juego. Hasta ahora eso solo
+ * pasaba al abrir cada ficha o cuando el cron rellenaba unos cuantos por
+ * pasada — con una biblioteca grande, días de espera y ninguna forma de
+ * acelerarlo a mano.
+ *
+ * Va en tandas acotadas por TIEMPO, no solo por número, igual que el cron
+ * (`api/cron/sync/route.ts`): cada juego es una llamada a PSN o Steam y no
+ * se sabe de antemano cuánto tardará, así que se van haciendo hasta agotar
+ * el presupuesto y se devuelve cuántos quedan para que la interfaz pueda
+ * ofrecer otra tanda. Sin esto, una biblioteca de 300 juegos agotaría el
+ * tiempo de la función a medias y no se guardaría el progreso.
+ *
+ * Xbox queda fuera (lo filtra `juegosPendientes`): OpenXBL da 150
+ * peticiones/hora COMPARTIDAS entre todos los usuarios de Paragon, así que
+ * una puesta al día masiva pedida por una sola persona dejaría sin cuota a
+ * las demás.
+ */
+export async function ponerseAlDiaAction(): Promise<PuestaAlDia> {
+  const userId = await requireUserId();
+
+  const POR_TANDA = 12;
+  /** Presupuesto de tiempo de una tanda. Corto a propósito: es una acción
+   * con alguien esperando delante, no un proceso de fondo. */
+  const PRESUPUESTO_MS = 20_000;
+
+  const profile = await getProfileByUserId(userId);
+  const pendientes = await juegosPendientes(userId, POR_TANDA);
+
+  const arranque = Date.now();
+  let hechos = 0;
+
+  for (const gameId of pendientes) {
+    if (Date.now() - arranque > PRESUPUESTO_MS) break;
+
+    const { platform } = parseGameKey(gameId);
+    // `juegosPendientes` ya filtra a PSN/Steam en SQL, pero la guarda se
+    // queda: es lo que impide que un cambio futuro en esa consulta cuele
+    // aqui juegos manuales (que no tienen nada que sincronizar) o de Xbox
+    // (cuota compartida) sin que nadie se entere.
+    if (platform !== "psn" && platform !== "steam") continue;
+
+    const account = accountFor(profile, platform);
+    if (!account) continue;
+
+    try {
+      await syncGameTrophies(userId, { platform, accountId: account.accountId }, gameId);
+      hechos += 1;
+    } catch {
+      // Un juego que falla (retirado de la tienda, API con un mal rato) no
+      // puede cortar la tanda entera: se salta y se sigue con el siguiente.
+    }
+  }
+
+  // Se recuentan DESPUÉS de la tanda, no se restan a ojo: los que fallaron
+  // siguen pendientes de verdad y tienen que seguir contando como tales.
+  const salud = await saludSincronizacion(userId);
+  const restantes = salud
+    .filter((s) => s.plataforma === "psn" || s.plataforma === "steam")
+    .reduce((n, s) => n + s.sinDetalle + s.caducados, 0);
+
+  if (hechos > 0) revalidatePath("/", "layout");
+
+  return { hechos, restantes };
 }

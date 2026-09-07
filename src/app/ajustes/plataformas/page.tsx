@@ -5,6 +5,8 @@ import { CollectionManager } from "@/components/Collections";
 import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, LinkXboxForm, LinkEpicForm, LinkUbisoftForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
+import { SaludSincronizacion } from "@/components/SaludSincronizacion";
+import { saludSincronizacion } from "@/lib/syncHealth";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 import { PLATFORM_LABEL, type AccountPlatform, type PlatformAccount } from "@/lib/types";
 import { getSyncHistory } from "@/lib/syncHistory";
@@ -155,7 +157,12 @@ export default async function AjustesPlataformasPage() {
   const epic = accountFor(profile, "epic");
   const ubisoft = accountFor(profile, "ubisoft");
   const carpetas = await listCollections(session.user.id);
-  const historial = await getSyncHistory(session.user.id);
+  // Las dos en paralelo: son independientes y el pool no se resiente por
+  // dos consultas (ver el aviso de conexiones en db/index.ts).
+  const [historial, salud] = await Promise.all([
+    getSyncHistory(session.user.id),
+    saludSincronizacion(session.user.id),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -239,6 +246,19 @@ export default async function AjustesPlataformasPage() {
               el resto se completa solo la primera vez que abres su ficha.
             </p>
           </div>
+        </section>
+      )}
+
+      {salud.length > 0 && (
+        <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
+          <h2 className="font-heading mb-1 text-[17px] font-bold tracking-[0.03em]">
+            Estado de la biblioteca
+          </h2>
+          <p className="mb-4 text-[13px] text-muted">
+            Qué falta por traer de cada plataforma.
+          </p>
+
+          <SaludSincronizacion filas={salud} />
         </section>
       )}
 
