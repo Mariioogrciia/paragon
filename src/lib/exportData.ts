@@ -1,5 +1,5 @@
 import "server-only";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, or } from "drizzle-orm";
 import { db } from "@/db";
 import {
   users,
@@ -80,9 +80,9 @@ export async function exportarDatosUsuario(userId: string) {
       .from(collections)
       .where(eq(collections.userId, userId)),
     db
-      .select({ conUsuarioId: friendships.friendId, estado: friendships.status, desde: friendships.createdAt })
+      .select({ requesterId: friendships.requesterId, addresseeId: friendships.addresseeId, estado: friendships.status, desde: friendships.createdAt })
       .from(friendships)
-      .where(eq(friendships.userId, userId)),
+      .where(or(eq(friendships.requesterId, userId), eq(friendships.addresseeId, userId))),
     db.select({ id: userBadges.badgeId, conseguidaEl: userBadges.earnedAt }).from(userBadges).where(eq(userBadges.userId, userId)),
     db
       .select({ gameId: gameDifficultyVotes.gameId, valor: gameDifficultyVotes.value, el: gameDifficultyVotes.createdAt })
