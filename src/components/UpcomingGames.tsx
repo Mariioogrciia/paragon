@@ -69,7 +69,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
           <div className="h-6 w-48 rounded bg-surface-2 animate-pulse" />
           <div className="h-5 w-24 rounded bg-surface-2 animate-pulse" />
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex gap-3.5 rounded-xl border border-border bg-surface-2/40 p-3">
               <div className="h-[124px] w-[88px] shrink-0 rounded-lg bg-surface-2 animate-pulse" />
@@ -98,16 +98,19 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
 
   return (
     <div className="rounded-[18px] border border-border bg-surface p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-heading text-lg font-bold uppercase tracking-wide">
+      {/* `flex-wrap` + `min-w-0`: en un movil de 375px el titulo a dos lineas
+          y la etiqueta no caben en la misma fila, y la etiqueta se salia del
+          panel por la derecha. */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-heading min-w-0 text-lg font-bold uppercase tracking-wide">
           Próximos lanzamientos
         </h2>
-        <span className="rounded-md bg-accent/10 px-2 py-1 text-xs font-semibold uppercase text-accent">
+        <span className="shrink-0 rounded-md bg-accent/10 px-2 py-1 text-xs font-semibold uppercase text-accent">
           Tendencias
         </span>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {games.map((game) => {
           const falta = cuentaAtras(game);
           const estudio = game.developer ?? game.publisher;
@@ -116,10 +119,10 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
           return (
             <article
               key={game.id}
-              className="flex gap-3.5 rounded-xl border border-border bg-surface-2/40 p-3 transition-colors hover:bg-surface-2/80 cursor-pointer"
+              className="flex min-w-0 gap-3.5 rounded-xl border border-border bg-surface-2/40 p-3 transition-colors hover:bg-surface-2/80 cursor-pointer"
               onClick={() => router.push(`/juego/${game.igdbId}`)}
             >
-              <div className="h-[124px] w-[88px] shrink-0 overflow-hidden rounded-lg bg-surface-2">
+              <div className="h-[96px] w-[68px] shrink-0 overflow-hidden rounded-lg bg-surface-2 sm:h-[124px] sm:w-[88px]">
                 {game.cover && (
                   <img src={game.cover} alt="" className="h-full w-full object-cover" />
                 )}

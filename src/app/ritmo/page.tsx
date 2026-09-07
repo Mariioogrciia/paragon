@@ -159,7 +159,7 @@ export default async function RitmoPage({
         </p>
       ) : (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatTile value={desglose.total} label="Trofeos del mes" />
             <StatTile value={diasActivos} label="Días con caza" hint={`de ${desglose.porDia.length}`} />
             <StatTile
@@ -203,7 +203,7 @@ export default async function RitmoPage({
             </div>
           </section>
 
-          <div className="grid gap-3 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[0.9fr_1.1fr]">
             <section
               className="rounded-[18px] p-6"
               style={{ border: "1px solid var(--border)", background: "var(--surface)" }}

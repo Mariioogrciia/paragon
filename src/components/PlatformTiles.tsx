@@ -85,21 +85,25 @@ export function PlatformTiles() {
           <a
             key={t.label}
             href={t.href}
-            className="flex flex-col items-center justify-center gap-2 rounded-xl px-3 py-4 text-center transition-all"
+            className="flex min-w-0 flex-col items-center justify-center gap-2 rounded-xl px-1.5 py-4 text-center transition-all sm:px-3"
             style={{ background: t.bg, color: t.fg }}
           >
             {t.icon}
-            <span className="text-xs font-bold uppercase tracking-wide">{t.label}</span>
+            <span className="w-full break-words text-[10px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
+              {t.label}
+            </span>
           </a>
         ) : (
           <span
             key={t.label}
             title={t.disabledNote}
-            className="flex cursor-not-allowed flex-col items-center justify-center gap-2 rounded-xl px-3 py-4 text-center opacity-50"
+            className="flex min-w-0 cursor-not-allowed flex-col items-center justify-center gap-2 rounded-xl px-1.5 py-4 text-center opacity-50 sm:px-3"
             style={{ background: t.bg, color: t.fg }}
           >
             {t.icon}
-            <span className="text-xs font-bold uppercase tracking-wide">{t.label}</span>
+            <span className="w-full break-words text-[10px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
+              {t.label}
+            </span>
           </span>
         ),
       )}

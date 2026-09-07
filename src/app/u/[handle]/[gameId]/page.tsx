@@ -144,7 +144,7 @@ export default async function JuegoPage({
   const eta = faltanParaMeta > 0 ? estimarEta(game.trophies, faltanParaMeta) : null;
 
   return (
-    <div className="-mx-7 -mt-9">
+    <div className="-mx-4 -mt-9 sm:-mx-7">
       <div
         className="relative overflow-hidden border-b border-border"
         style={{ background: "linear-gradient(135deg, #2b1b3f 0%, #16233d 55%, #0b1018 100%)" }}

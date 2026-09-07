@@ -60,7 +60,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
       onMouseEnter={() => setPausado(true)}
       onMouseLeave={() => setPausado(false)}
     >
-      <div className="relative flex h-[180px] items-stretch" style={{ background: coverGradient(String(g.igdbId)) }}>
+      <div className="relative flex h-[180px] items-stretch overflow-hidden" style={{ background: coverGradient(String(g.igdbId)) }}>
         {g.coverUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img

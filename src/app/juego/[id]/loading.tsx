@@ -7,7 +7,7 @@
  */
 export default function JuegoLoading() {
   return (
-    <div className="-mx-7 -mt-9 animate-pulse">
+    <div className="-mx-4 -mt-9 sm:-mx-7 animate-pulse">
       <div
         className="relative overflow-hidden border-b border-border"
         style={{ background: "linear-gradient(135deg, #2b1b3f 0%, #16233d 55%, #0b1018 100%)" }}
@@ -45,7 +45,7 @@ export default function JuegoLoading() {
             ))}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-[104px] rounded-[20px] bg-surface-2/60" />
             ))}

@@ -265,7 +265,7 @@ async function Landing() {
           <h2 className="font-heading text-[30px] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
             Cómo funciona
           </h2>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <div
                 key={f.num}
@@ -435,7 +435,7 @@ export default async function HomePage() {
 
         {/* Los demás juegos, si hay, en formato pequeño debajo */}
         {nearPlatinum.slice(1).length > 0 && (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {nearPlatinum.slice(1).map(({ game, progress }) => (
               <TiltCard
                 key={game.id}
@@ -501,7 +501,7 @@ export default async function HomePage() {
           definición, llevan más de un año sin tocarse. Recuerda si ya
           lo abriste una vez, por si de verdad vuelves a por ella. */}
       <CollapsibleSection storageKey="juegos-parados" toggleLabel={`${abandonados.length} juegos parados`}>
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
           {abandonados.map(({ game, progress }) => (
             <Link
               key={game.id}
@@ -632,7 +632,7 @@ export default async function HomePage() {
             label: "Resumen",
             content: (
               <>
-                <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                   <div
                     className="relative overflow-hidden rounded-[20px] p-6"
                     style={{
@@ -663,7 +663,7 @@ export default async function HomePage() {
                   summary={`${stats.trofeos.toLocaleString("es-ES")} trofeos en ${stats.juegos} juegos`}
                 />
 
-                <div className="grid gap-6 lg:grid-cols-[1fr_2.5fr]">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2.5fr]">
                   <div className="h-full">
                     <MonthlySummary meses={mesesHistorico} />
                   </div>

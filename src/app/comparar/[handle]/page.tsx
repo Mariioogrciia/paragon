@@ -107,7 +107,7 @@ export default async function CompararPage({
         dice nada si uno lleva jugando el doble de años.
       </p>
 
-      <div className="mt-7 grid gap-3 sm:grid-cols-2">
+      <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {jugadores.map(({ player, stats, tag, leader }) => (
           <div
             key={player.id}
@@ -154,7 +154,7 @@ export default async function CompararPage({
         ))}
       </div>
 
-      <section className="mt-4 grid gap-3 sm:grid-cols-2">
+      <section className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {[{ name: libA.player.name, level: nivelA, color: "var(--accent-text)" }, { name: libB.player.name, level: nivelB, color: "var(--gold)" }].map((player) => (
           <div key={player.name} className="rounded-[18px] border border-border bg-surface p-4">
             <div className="flex items-center justify-between gap-3">

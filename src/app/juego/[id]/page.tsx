@@ -132,7 +132,7 @@ export default async function JuegoGlobalPage({
   const tieneJuego = miGameId !== null;
 
   return (
-    <div className="-mx-7 -mt-9">
+    <div className="-mx-4 -mt-9 sm:-mx-7">
       <div
         className="relative overflow-hidden border-b border-border"
         style={
@@ -250,7 +250,7 @@ export default async function JuegoGlobalPage({
         {detalles?.languages && <GameLanguages languages={detalles.languages} />}
         {detalles?.dlcs && <GameDlcs dlcs={detalles.dlcs} />}
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile value={stats.owners} label="En biblioteca" />
           <StatTile value={stats.playing} label="Jugándolo ahora" />
           <StatTile

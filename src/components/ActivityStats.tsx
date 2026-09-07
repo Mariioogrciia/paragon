@@ -27,7 +27,7 @@ export function ActivityStats({ games, now }: { games: Game[]; now: number }) {
         <div><h2 className="font-heading text-xl font-bold uppercase tracking-wide">Actividad y estadísticas</h2><p className="mt-1 text-sm text-muted">Una lectura rápida de cómo estás jugando.</p></div>
         {generoTop && <span className="text-xs text-muted">Género principal: <strong className="text-foreground">{generoTop[0]}</strong></span>}
       </div>
-      <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr]">
         <div>
           <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted">Horas por plataforma</h3>
           {plataformas.length === 0 ? <p className="text-sm text-muted">Todavía no hay horas disponibles.</p> : <div className="space-y-2.5">{plataformas.map(([platform, minutes]) => <div key={platform}><div className="mb-1 flex justify-between text-xs"><span className="font-semibold uppercase">{platform}</span><span className="text-muted">{horas(minutes)}</span></div><div className="h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-accent" style={{ width: `${Math.round((minutes / maxHoras) * 100)}%` }} /></div></div>)}</div>}

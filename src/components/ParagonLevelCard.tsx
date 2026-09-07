@@ -40,7 +40,7 @@ export function ParagonLevelCard({ progress }: { progress: ParagonProgress }) {
       </summary>
 
       <div className="border-t border-border px-5 pb-5 pt-4">
-        <div className="grid gap-5 sm:grid-cols-[140px_1fr] sm:items-center">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-[140px_1fr] sm:items-center">
           <div
             className="mx-auto flex h-[124px] w-[124px] items-center justify-center rounded-full"
             style={{

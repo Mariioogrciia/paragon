@@ -67,7 +67,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
         <PlaytimeComparison horasTotales={horasEnTotal} />
       </div>
 
-      <div className="mb-8 grid gap-5 lg:grid-cols-2">
+      <div className="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <TrophyMonthChart meses={meses} />
         <PlaytimeBarChart juegos={horas} />
       </div>

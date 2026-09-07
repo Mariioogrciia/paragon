@@ -55,7 +55,7 @@ function AtField({
   placeholder: string;
 }) {
   return (
-    <div className="flex flex-1 items-stretch overflow-hidden rounded-xl" style={FIELD}>
+    <div className="flex min-w-0 flex-1 items-stretch overflow-hidden rounded-xl" style={FIELD}>
       <span
         className="flex items-center px-3.5 text-[15px] font-bold text-muted"
         style={{ background: "#151d29" }}
@@ -79,7 +79,7 @@ export function HandleForm({ current, hasImage }: { current?: string | null, has
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <AtField name="handle" defaultValue={current ?? undefined} placeholder="mario_gg" />
         <Submit>{current ? "Cambiar" : "Continuar"}</Submit>
       </div>
@@ -101,7 +101,7 @@ export function LinkPsnForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="onlineId"
           defaultValue={current ?? ""}
@@ -123,7 +123,7 @@ export function LinkSteamForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="steamId"
           defaultValue={current ?? ""}
@@ -145,7 +145,7 @@ export function LinkGoogleForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="email"
           type="email"
@@ -168,7 +168,7 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="gamertag"
           type="text"
@@ -189,7 +189,7 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
 export function LinkEpicForm({ current }: { current?: string | null }) {
   return (
     <form action={linkEpicOAuthAction}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <Submit>{current ? "Reconectar con Epic Games" : "Vincular con Epic Games"}</Submit>
       </div>
     </form>
@@ -201,7 +201,7 @@ export function LinkUbisoftForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="username"
           type="text"
@@ -229,7 +229,7 @@ export function NewCollectionForm({ gameId }: { gameId?: string }) {
   return (
     <form action={action}>
       {gameId && <input type="hidden" name="gameId" value={gameId} />}
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="name"
           placeholder="Nueva carpeta (p. ej. «Pendientes 2026»)"
@@ -250,7 +250,7 @@ export function AddFriendForm() {
 
   return (
     <form action={action}>
-      <div className="flex gap-2.5">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <AtField name="handle" placeholder="usuario_de_paragon" />
         <Submit>Enviar solicitud</Submit>
       </div>

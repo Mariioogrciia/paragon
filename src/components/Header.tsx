@@ -132,7 +132,12 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
  * accesible desde cualquier página — el aviso de "espera Xs" se enseña en
  * un globo bajo el icono, no en silencio como antes de tener feedback.
  */
-function BotonSincronizar() {
+/**
+ * `comoFila`: la misma accion, pero como fila de texto para el menu movil.
+ * En la barra es un icono redondo (no cabe mas); dentro del menu, donde hay
+ * ancho de sobra, un icono suelto sin etiqueta no dice que hace.
+ */
+function BotonSincronizar({ comoFila = false }: { comoFila?: boolean }) {
   const [state, action, pending] = useActionState(syncNowAction, SYNC_INICIAL);
 
   return (
@@ -143,8 +148,16 @@ function BotonSincronizar() {
           disabled={pending}
           aria-label="Sincronizar trofeos ahora"
           title="Sincronizar trofeos ahora"
-          className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-50"
-          style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+          className={
+            comoFila
+              ? "flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-[14px] font-semibold transition-colors hover:text-foreground disabled:opacity-50"
+              : "flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-50"
+          }
+          style={
+            comoFila
+              ? { color: "var(--muted)" }
+              : { border: "1px solid var(--border)", color: "var(--muted)" }
+          }
         >
           <svg
             width="16"
@@ -161,6 +174,7 @@ function BotonSincronizar() {
             <path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9c2.5 0 4.7 1.1 6.2 2.8" />
             <path d="M21 3v6h-6" />
           </svg>
+          {comoFila && <span>{pending ? "Sincronizando…" : "Sincronizar ahora"}</span>}
         </button>
       </form>
       {state.error && (
@@ -217,7 +231,13 @@ export function Header({
               boxShadow: "0 0 18px rgb(var(--accent-rgb) / 0.45)",
             }}
           />
-          <span className="font-heading text-[18px] font-bold tracking-[0.06em]">PARAGON</span>
+          {/* Se esconde por debajo de 400px: con los iconos de la derecha,
+              el nombre no cabia y acababa solapado con el boton de menu
+              (visto en un iPhone real, no en el emulador). El logo sigue,
+              asi que la marca no desaparece. */}
+          <span className="hidden font-heading text-[18px] font-bold tracking-[0.06em] min-[400px]:inline">
+            PARAGON
+          </span>
         </Link>
 
         {/* En móvil el <nav> de abajo está oculto (`sm:hidden` en la versión
@@ -264,7 +284,14 @@ export function Header({
         </nav>
 
         <div className="ml-auto flex items-center gap-3.5">
-          {user?.tieneCuentas && <BotonSincronizar />}
+          {/* Sincronizar, tema y admin solo en escritorio: en movil viven
+              dentro del menu de la hamburguesa. Con los seis iconos a la vez
+              la barra se desbordaba y el logo quedaba pisado. Los avisos SI
+              se quedan: es lo unico que cambia solo y hay que poder ver de un
+              vistazo si tienes algo sin leer. */}
+          <span className="hidden sm:flex sm:items-center sm:gap-3.5">
+            {user?.tieneCuentas && <BotonSincronizar />}
+          </span>
 
           {user && (
             <Link
@@ -291,7 +318,9 @@ export function Header({
             </Link>
           )}
 
-          <ThemeCustomizer />
+          <span className="hidden sm:inline">
+            <ThemeCustomizer />
+          </span>
 
           {user ? (
             <>
@@ -318,7 +347,7 @@ export function Header({
                   href="/admin"
                   aria-label="Panel de administración"
                   title="Panel de administración"
-                  className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground"
+                  className="hidden h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground sm:flex"
                   style={
                     pathname.startsWith("/admin")
                       ? { border: "1px solid rgb(var(--accent-rgb) / 0.4)", color: "var(--accent-text)", background: "rgb(var(--accent-rgb) / 0.12)" }
@@ -390,6 +419,43 @@ export function Header({
               );
             })}
           </div>
+
+          {/* Lo que en escritorio son iconos sueltos de la barra. En movil no
+              caben ahi (seis iconos desbordaban la cabecera y pisaban el
+              logo), asi que viven aqui con su nombre escrito — que ademas se
+              entiende mejor que un icono a secas. */}
+          {user && (
+            <div className="mt-2 flex flex-col gap-1 border-t border-border pt-2">
+              {user.tieneCuentas && (
+                <div onClick={() => setMenuAbierto(false)}>
+                  <BotonSincronizar comoFila />
+                </div>
+              )}
+              <Link
+                href="/ajustes/apariencia"
+                onClick={() => setMenuAbierto(false)}
+                className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-muted transition-colors hover:text-foreground"
+              >
+                Apariencia
+              </Link>
+              <Link
+                href="/ajustes"
+                onClick={() => setMenuAbierto(false)}
+                className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-muted transition-colors hover:text-foreground"
+              >
+                Ajustes
+              </Link>
+              {user.esDesarrollador && (
+                <Link
+                  href="/admin"
+                  onClick={() => setMenuAbierto(false)}
+                  className="rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-muted transition-colors hover:text-foreground"
+                >
+                  Panel de administración
+                </Link>
+              )}
+            </div>
+          )}
         </nav>
       )}
     </header>

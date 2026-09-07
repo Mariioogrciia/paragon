@@ -212,7 +212,10 @@ export default async function RootLayout({
           themes={["dark", "light", "oled", "high-contrast"]}
         >
           <Header user={headerUser} avisosSinLeer={avisosSinLeer} />
-          <main className="mx-auto w-full max-w-[1240px] flex-1 px-7 py-9">{children}</main>
+          {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
+              56px de los 375 de un movil (un 15% del ancho) antes de que las
+              tarjetas de dentro pusieran su propio relleno encima. */}
+          <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-9 sm:px-7">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

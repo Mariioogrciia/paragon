@@ -169,7 +169,7 @@ export default async function PerfilPage({
   const temaClase = profile.theme && profile.theme !== "dark" ? profile.theme : "";
 
   return (
-    <div className={`-mx-7 -mt-9 ${temaClase}`} style={customStyle}>
+    <div className={`-mx-4 -mt-9 sm:-mx-7 ${temaClase}`} style={customStyle}>
       <div
         className="relative overflow-hidden border-b border-border"
         style={{
@@ -295,7 +295,7 @@ export default async function PerfilPage({
             ),
             stats: (
               <div key="stats">
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   <StatTile value={stats.platinos} label="Platinos" accent="var(--platinum)" />
                   <StatTile value={stats.trofeos} label="Trofeos" />
                   <StatTile value={stats.juegos} label="Juegos" />

@@ -145,7 +145,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           {esSteam && (
             <p className="mb-4 text-sm text-muted">IGDB no distingue Steam de otras tiendas de PC — puede incluir Epic, GOG u otras.</p>
           )}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {proximos.length > 0 && (
               <section>
                 <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">

@@ -13,7 +13,7 @@ export function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
         </div>
         <span className="text-xs font-semibold text-muted">{completadas}/{missions.length} · {xp} XP ganados</span>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {missions.map((mission) => {
           const completada = mission.progress >= mission.target;
           const porcentaje = Math.min(100, Math.round((mission.progress / mission.target) * 100));

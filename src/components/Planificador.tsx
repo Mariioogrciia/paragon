@@ -143,7 +143,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
             </div>
           </TiltCard>
 
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {ordered.slice(1).map((game) => (
               <div key={game.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
                 <Link href={`/u/${handle}/${game.id}`} className="flex min-w-0 flex-1 items-center gap-3 hover:opacity-90">

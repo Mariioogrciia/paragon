@@ -47,7 +47,7 @@ export function ParagonAchievements({ games, earnedIds }: { games: Game[]; earne
         </div>
         <span className="text-xs font-semibold text-muted">{totalConseguidos}/{ACHIEVEMENTS.length} conseguidos</span>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {evaluados.map(({ achievement, value, earned }) => {
           const percent = Math.min(100, Math.round((value / achievement.target) * 100));
           return (

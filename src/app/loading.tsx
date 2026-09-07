@@ -18,13 +18,13 @@ export default function RootLoading() {
         <div className="ml-auto h-10 w-40 rounded-[10px] bg-surface-2/60" />
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-[130px] rounded-[20px] bg-surface-2/60" />
         ))}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-[280px] rounded-[18px] bg-surface-2/50" />
         ))}

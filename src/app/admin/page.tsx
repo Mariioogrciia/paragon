@@ -49,7 +49,7 @@ export default async function AdminPage() {
         <p className="mt-2 text-sm text-muted">Solo tú ves esto. Métricas de toda la plataforma, no de un perfil.</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat value={overview.usuarios} label="Usuarios" />
         <Stat value={`+${overview.usuariosNuevosUltimos7Dias}`} label="Nuevos, últimos 7 días" />
         <Stat value={overview.juegosEnCatalogo} label="Juegos en catálogo" />

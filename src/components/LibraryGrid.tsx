@@ -355,7 +355,12 @@ export function LibraryGrid({
         <div className="flex flex-wrap items-center gap-3">
           {hayVariasPlataformas && (
             <div
-              className="flex flex-1 min-w-[240px] rounded-xl p-1 gap-1.5"
+              // `flex-wrap` y `min-w-0`: con 5 plataformas y etiquetas largas
+              // ("Añadido a mano (4)"), en un movil de 375px los botones no
+              // caben en una linea y, sin envolver, se salian de la pantalla
+              // y provocaban scroll horizontal en toda la pagina (medido: 401px
+              // de contenido en 375px de ancho).
+              className="flex flex-1 flex-wrap min-w-0 rounded-xl p-1 gap-1.5 sm:min-w-[240px] sm:flex-nowrap"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <Pill active={platform === "todas"} onClick={() => setPlatform("todas")} className="flex-1 flex justify-center text-center">

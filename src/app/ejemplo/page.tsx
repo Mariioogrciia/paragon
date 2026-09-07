@@ -28,7 +28,7 @@ export default function EjemploPage() {
   const favoritos = DEMO_JUEGOS.filter((g) => gameProgress(g).platinumEarned).slice(0, 4);
 
   return (
-    <div className="-mx-7 -mt-9">
+    <div className="-mx-4 -mt-9 sm:-mx-7">
       <div
         className="relative overflow-hidden border-b border-border"
         style={{
@@ -83,7 +83,7 @@ export default function EjemploPage() {
           juegosEsteAnio={DEMO_ANIO.juegos}
         />
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile value={stats.platinos} label="Platinos" accent="var(--platinum)" />
           <StatTile value={stats.trofeos} label="Trofeos" />
           <StatTile value={stats.juegos} label="Juegos" />
@@ -100,7 +100,7 @@ export default function EjemploPage() {
             <h2 className="font-heading mb-4 text-xl font-bold uppercase tracking-wide text-muted">
               Juegos favoritos
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {favoritos.map((game) => (
                 <GameCard key={game.id} game={game} href="/entrar" />
               ))}
@@ -116,7 +116,7 @@ export default function EjemploPage() {
             </span>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[...DEMO_JUEGOS]
               .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""))
               .map((game) => (

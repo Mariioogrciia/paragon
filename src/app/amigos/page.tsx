@@ -74,7 +74,7 @@ export default async function AmigosPage() {
         Se añaden por su usuario de Paragon, no por su ID de plataforma.
       </p>
 
-      <div className="mt-7 grid gap-3 lg:grid-cols-[1fr_400px]">
+      <div className="mt-7 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_400px]">
         <section className="rounded-[18px] p-[22px]" style={CARD}>
           <h2 className="font-heading mb-3.5 text-[17px] font-bold tracking-[0.03em]">Añadir a alguien</h2>
           <AddFriendForm />
@@ -214,7 +214,7 @@ export default async function AmigosPage() {
         )}
       </section>
 
-      <section className="mt-9 grid gap-3 lg:grid-cols-2">
+      <section className="mt-9 grid grid-cols-1 gap-3 lg:grid-cols-2">
         {[{ title: "Esta semana", rows: periodos.semanal }, { title: "Este mes", rows: periodos.mensual }].map((periodo) => (
           <div key={periodo.title} className="rounded-[18px] border border-border bg-surface p-5">
             <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{periodo.title}</h2>

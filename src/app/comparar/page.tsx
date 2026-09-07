@@ -77,7 +77,7 @@ export default async function CompararGrupoPage({
         </p>
       )}
 
-      <div className="mt-7 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-7 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {participantes.map((p, i) => (
           <div
             key={p.userId}

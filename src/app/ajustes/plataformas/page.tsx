@@ -171,7 +171,7 @@ export default async function AjustesPlataformasPage() {
         <p className="text-sm text-muted">Vincula tus plataformas para sincronizar tus trofeos automáticamente.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <PlatformSection platform="psn" account={psn}>
           <LinkPsnForm current={psn?.username} />
         </PlatformSection>

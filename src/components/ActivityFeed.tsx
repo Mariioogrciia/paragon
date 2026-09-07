@@ -53,16 +53,16 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
           else actionText = "jugó a";
 
           return (
-            <div key={activity.id} className="flex gap-4 p-4 transition-colors border rounded-xl bg-card hover:bg-accent/5">
+            <div key={activity.id} className="flex gap-3 p-3 transition-colors border rounded-xl bg-card hover:bg-accent/5 sm:gap-4 sm:p-4">
               {activity.user.image ? (
-                <img src={activity.user.image} alt="" className="w-10 h-10 rounded-full" />
+                <img src={activity.user.image} alt="" className="w-10 h-10 shrink-0 rounded-full" />
               ) : (
-                <div className="flex items-center justify-center w-10 h-10 font-bold rounded-full bg-accent/20 text-accent">
+                <div className="flex shrink-0 items-center justify-center w-10 h-10 font-bold rounded-full bg-accent/20 text-accent">
                   {activity.user.name?.[0]?.toUpperCase() ?? "?"}
                 </div>
               )}
               
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="text-sm">
                   <Link href={`/u/${activity.user.handle}`} className="font-semibold hover:underline">
                     {activity.user.name}
@@ -98,7 +98,16 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                 </div>
                 <form action={addActivityCommentAction} className="mt-2 flex items-center gap-2">
                   <input type="hidden" name="activityId" value={activity.id} />
-                  <input type="text" name="comment" placeholder="Añadir un comentario..." className="flex-1 bg-transparent border-b border-border/50 text-xs px-2 py-1.5 focus:outline-none focus:border-accent transition-colors" />
+                  {/* `min-w-0`: un <input> trae de serie un ancho minimo
+                      propio (~180px) que `flex-1` NO anula, asi que en un
+                      movil empujaba al boton "Enviar" fuera de la tarjeta
+                      (medido: 34px fuera). */}
+                  <input
+                    type="text"
+                    name="comment"
+                    placeholder="Añadir un comentario..."
+                    className="min-w-0 flex-1 bg-transparent border-b border-border/50 text-xs px-2 py-1.5 focus:outline-none focus:border-accent transition-colors"
+                  />
                   {/* Antes solo se podía enviar pulsando Intro dentro del
                       campo — sin ningún botón visible que lo diera a
                       entender. */}
@@ -123,7 +132,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
               
               {activity.game.iconUrl && (
                 <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="shrink-0">
-                  <img src={activity.game.iconUrl} alt="" className="w-12 h-12 rounded-md shadow-sm" />
+                  <img src={activity.game.iconUrl} alt="" className="h-10 w-10 rounded-md shadow-sm sm:h-12 sm:w-12" />
                 </Link>
               )}
             </div>
