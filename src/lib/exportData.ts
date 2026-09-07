@@ -1,5 +1,5 @@
 import "server-only";
-import { eq, and, desc, or } from "drizzle-orm";
+import { eq, and, desc, or, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import {
   users,
@@ -130,16 +130,6 @@ export async function exportarDatosUsuario(userId: string) {
       ? await db
           .select({ collectionId: collectionGames.collectionId, gameId: collectionGames.gameId })
           .from(collectionGames)
-          .where(and(...carpetaIds.map((id) => eq(collectionGames.collectionId, id)).slice(0, 1)))
-      : [];
-  // La condición de arriba solo cubriría una carpeta si hubiera más de una;
-  // se resuelve de verdad con un IN.
-  const { inArray } = await import("drizzle-orm");
-  const juegosPorCarpetaReal =
-    carpetaIds.length > 0
-      ? await db
-          .select({ collectionId: collectionGames.collectionId, gameId: collectionGames.gameId })
-          .from(collectionGames)
           .where(inArray(collectionGames.collectionId, carpetaIds))
       : [];
 
@@ -164,7 +154,7 @@ export async function exportarDatosUsuario(userId: string) {
     trofeosConseguidos,
     carpetas: carpetas.map((c) => ({
       ...c,
-      juegos: juegosPorCarpetaReal.filter((j) => j.collectionId === c.id).map((j) => j.gameId),
+      juegos: juegosPorCarpeta.filter((j) => j.collectionId === c.id).map((j) => j.gameId),
     })),
     amistades,
     insignias,
