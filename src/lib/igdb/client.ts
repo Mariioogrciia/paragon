@@ -178,26 +178,32 @@ export interface IgdbGameResult {
 /**
  * Etiqueta de fecha en español, contando solo lo que IGDB sabe de verdad.
  *
- * Un juego anunciado "para 2028" llega con timestamp del 31 de diciembre de
- * relleno (ver `precisionOf` más abajo). Pintarlo como "31 dic 2028" sería
- * inventarse el día, así que cada precisión tiene su propio formato.
+ * Formato corto (dd/mm/aaaa) a proposito: estas etiquetas viven en tarjetas
+ * estrechas, y "19 de noviembre de 2026" ocupaba tanto que partia la fila en
+ * dos y descuadraba el alto de unas tarjetas respecto a otras.
+ *
+ * Cada precision tiene su propio formato, y NINGUNO inventa lo que no se
+ * sabe: un juego anunciado "para 2028" llega de IGDB con un timestamp de
+ * relleno del 31 de diciembre (ver `precisionOf` mas abajo), asi que pintarlo
+ * como "31/12/2028" seria inventarse el dia y el mes. Por eso las precisiones
+ * bajas se quedan en mes, trimestre o año a secas.
  */
 export function releaseLabelEs(iso: string | undefined, precision: ReleasePrecision): string {
-  if (!iso || precision === "tbd") return "Fecha por confirmar";
+  if (!iso || precision === "tbd") return "Sin fecha";
 
   const fecha = new Date(iso);
+  const dosDigitos = (n: number) => String(n).padStart(2, "0");
 
   switch (precision) {
     case "day":
-      return fecha.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+      return `${dosDigitos(fecha.getUTCDate())}/${dosDigitos(fecha.getUTCMonth() + 1)}/${fecha.getUTCFullYear()}`;
     case "month":
-      return fecha.toLocaleDateString("es-ES", { month: "long", year: "numeric", timeZone: "UTC" });
-    case "quarter": {
-      const trimestre = Math.floor(fecha.getUTCMonth() / 3) + 1;
-      return `${trimestre}.º trimestre de ${fecha.getUTCFullYear()}`;
-    }
+      // Mes abreviado y no "11/2026": en numeros se confunde con un dia/mes.
+      return `${fecha.toLocaleDateString("es-ES", { month: "short", timeZone: "UTC" }).replace(".", "")} ${fecha.getUTCFullYear()}`;
+    case "quarter":
+      return `T${Math.floor(fecha.getUTCMonth() / 3) + 1} ${fecha.getUTCFullYear()}`;
     case "year":
-      return `Durante ${fecha.getUTCFullYear()}`;
+      return String(fecha.getUTCFullYear());
   }
 }
 
