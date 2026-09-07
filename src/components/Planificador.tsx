@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Dropdown } from "@/components/Dropdown";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
-import { toggleGameCollectionAction } from "@/app/actions";
+import { toggleGameCollectionAction, syncHltbAction } from "@/app/actions";
 import type { Collection } from "@/lib/collections";
 import type { Game } from "@/lib/types";
 
@@ -13,10 +13,18 @@ const ORDENES = [
   { value: "proximidad", label: "Más cerca" },
   { value: "progreso", label: "Más progreso" },
   { value: "horas", label: "Más horas" },
+  { value: "hltb", label: "Más rápido (HLTB)" },
 ];
 
 function faltan(game: Game): number {
   return Math.max(0, game.definedTotal - game.earnedTotal);
+}
+
+function formatHltb(game: Game) {
+  if (!game.hltb) return null;
+  const time = game.hltb.completionist || game.hltb.mainExtra || game.hltb.main;
+  if (!time) return null;
+  return `⏱ ${time}h`;
 }
 
 /**
@@ -37,14 +45,26 @@ export function Planificador({ collections, library, handle }: { collections: Co
     const conJuegos = collections.find((c) => c.gameIds.length > 0);
     return porNombre?.id ?? conJuegos?.id ?? collections[0]?.id ?? "";
   });
-  const [sort, setSort] = useState<"proximidad" | "horas" | "progreso">("proximidad");
+  const [sort, setSort] = useState<"proximidad" | "horas" | "progreso" | "hltb">("proximidad");
 
   const carpeta = collections.find((c) => c.id === collectionId);
-  const objetivos = carpeta ? jugables.filter((g) => carpeta.gameIds.includes(g.id)) : [];
+  // Excluimos los juegos que ya están al 100% (platinados) para que no salgan como "siguiente"
+  const objetivos = carpeta ? jugables.filter((g) => carpeta.gameIds.includes(g.id) && g.progressPercent < 100) : [];
+
+  // Petición diferida de HLTB
+  useEffect(() => {
+    const faltanHltb = objetivos.filter(g => !g.hltb).slice(0, 3);
+    faltanHltb.forEach(g => syncHltbAction(g.id, g.title));
+  }, [objetivos]);
 
   const ordered = useMemo(
     () =>
       [...objetivos].sort((a, b) => {
+        if (sort === "hltb") {
+          const aTime = a.hltb?.completionist || a.hltb?.mainExtra || a.hltb?.main || 99999;
+          const bTime = b.hltb?.completionist || b.hltb?.mainExtra || b.hltb?.main || 99999;
+          return aTime - bTime;
+        }
         if (sort === "horas") return (b.playtimeMinutes ?? 0) - (a.playtimeMinutes ?? 0);
         if (sort === "progreso") return b.progressPercent - a.progressPercent;
         return faltan(a) - faltan(b);
@@ -82,7 +102,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
             options={collections.map((c) => ({ value: c.id, label: c.name, count: c.gameIds.length }))}
             className="w-52"
           />
-          <Dropdown value={sort} onChange={(v) => setSort(v as typeof sort)} options={ORDENES} className="w-40" />
+          <Dropdown value={sort} onChange={(v) => setSort(v as typeof sort)} options={ORDENES} className="w-48" />
         </div>
       </div>
 
@@ -137,7 +157,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
                 <p className="text-[0.625rem] font-bold uppercase tracking-[0.12em] text-accent">Siguiente</p>
                 <p className="truncate text-lg font-bold text-white">{ordered[0].title}</p>
                 <p className="text-xs text-white/70">
-                  {ordered[0].progressPercent}% · faltan {faltan(ordered[0])} logros
+                  {ordered[0].progressPercent}% · faltan {faltan(ordered[0])} logros {formatHltb(ordered[0]) ? `· ${formatHltb(ordered[0])}` : ""}
                 </p>
               </div>
             </div>
@@ -156,7 +176,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold">{game.title}</span>
                     <span className="mt-1 block text-xs text-muted">
-                      {game.progressPercent}% · faltan {faltan(game)} logros
+                      {game.progressPercent}% · faltan {faltan(game)} logros {formatHltb(game) ? `· ${formatHltb(game)}` : ""}
                     </span>
                   </span>
                 </Link>
@@ -173,3 +193,4 @@ export function Planificador({ collections, library, handle }: { collections: Co
     </section>
   );
 }
+

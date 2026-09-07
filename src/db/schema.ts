@@ -225,6 +225,12 @@ export const games = pgTable("game", {
   publisher: text("publisher"),
   genres: jsonb("genres").$type<string[]>(),
   pegi: text("pegi"),
+  /** Tiempos extraídos de HowLongToBeat */
+  hltb: jsonb("hltb").$type<{
+    main?: number;
+    mainExtra?: number;
+    completionist?: number;
+  }>(),
   /** Null mientras no hayamos pedido los metadatos a la tienda. */
   metadataSyncedAt: timestamp("metadataSyncedAt", { mode: "date" }),
 }, (g) => [

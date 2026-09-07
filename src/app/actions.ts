@@ -1095,3 +1095,14 @@ export async function ponerseAlDiaAction(): Promise<PuestaAlDia> {
 
   return { hechos, restantes };
 }
+
+/* ---------------------------------- Time to Beat (HLTB) --------------------------------- */
+
+import { syncGameHltb } from "@/lib/hltb";
+
+export async function syncHltbAction(gameId: string, title: string): Promise<void> {
+  const userId = await requireUserId();
+  // Call the HLTB service
+  await syncGameHltb(gameId, title);
+  revalidatePath("/planificador");
+}

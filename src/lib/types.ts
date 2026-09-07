@@ -149,6 +149,11 @@ export interface Game {
   publisher?: string;
   genres?: string[];
   pegi?: string;
+  hltb?: {
+    main?: number;
+    mainExtra?: number;
+    completionist?: number;
+  };
   /**
    * % de jugadores del juego que tienen su platino. Es la base de la
    * dificultad estimada (ver lib/difficulty). Solo en juegos con platino y
