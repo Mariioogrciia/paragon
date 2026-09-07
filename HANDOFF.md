@@ -130,6 +130,72 @@ el hook `debug` de postgres.js para contar consultas, `pg_stat_statements`
 para tiempos por consulta, y un script que lee el stream marcando en qué
 milisegundo llega cada parte del HTML.
 
+### El dato que debería guiar qué se construye a partir de ahora
+
+Contando filas reales en la base (7 de septiembre de 2026):
+
+| tabla | filas |
+|---|---|
+| `user` | **6** |
+| `trophy_guide` | **0** |
+| `game_guide` | **0** |
+| `game_difficulty_vote` | **0** |
+| `collection` | 2 |
+| `activity` | 23 |
+
+Las tres funciones de comunidad están **construidas y conectadas a la
+interfaz** (se comprobó: `communityDifficulty`, `guides` y `trophyGuides`
+tienen sus páginas y componentes), pero vacías. No están rotas: es que con 6
+usuarios no hay nadie que escriba una guía ni vote una dificultad. Lo mismo
+vale para Ligas, Rankings, Feed y Comparar.
+
+**Conclusión para quien siga**: construir más funciones sociales es construir
+para una audiencia que todavía no existe. Lo que rinde hoy es lo que sirve a
+una sola persona — y, aparte, lo que pueda traer usuarios nuevos.
+
+### Tarjetas sociales (openGraph) — lo único que ataca el problema de los 6 usuarios
+
+La app no tenía **ni una línea de `openGraph`** en ninguna página, así que
+pegar un enlace de Paragon en Discord o WhatsApp dejaba un enlace pelado.
+
+- `u/[handle]/opengraph-image.tsx`: tarjeta del perfil con avatar, nivel, XP
+  y las cuatro cifras. Misma técnica que las dos imágenes que ya existían
+  (`api/wrap/[handle]`, `api/trophy-card/...`): Satori vía `ImageResponse`,
+  en Node porque `postgres-js` no va en edge.
+- `opengraph-image.tsx` en la raíz: la de por defecto.
+- `generateMetadata` en el perfil, con cifras reales en la descripción.
+- `metadataBase` en el layout raíz. **No es opcional** en cuanto hay
+  imágenes sociales: sin él, Next no puede resolver la URL absoluta que
+  exigen las redes y la tarjeta no sale.
+
+**Dos trampas que salieron al hacerlo, y que importan más que la función:**
+
+1. `generateMetadata` y la página corren en la MISMA petición y las dos
+   piden perfil + biblioteca. `getProfileByHandle` no estaba memoizada, así
+   que esto habría **duplicado** la consulta cara del perfil, deshaciendo la
+   optimización de las rutas. Ahora `getProfileByHandle` y `getLibrary` van
+   envueltas en `cache()` de React (el patrón que documenta el propio Next).
+   Quien añada `generateMetadata` a otra página: comprueba esto primero.
+2. `urlAbsolutaParaOg` devolvía `undefined` en local, con el efecto de que
+   ningún avatar subido a mano salía en NINGUNA tarjeta mientras se
+   desarrollaba. Ahora cae a `localhost:3000` en desarrollo, lo que además
+   arregla las dos imágenes que ya existían.
+
+### Estado de la biblioteca (/ajustes/plataformas)
+
+`lib/syncHealth.ts` + `SaludSincronizacion.tsx`. Enseña por plataforma
+cuántos juegos no tienen detalle de trofeos y cuántos llevan más de 6h sin
+refrescar, con un botón de puesta al día por tandas acotadas **por tiempo**
+(mismo patrón que el cron: cada juego es una llamada a la plataforma y sin
+presupuesto la función se agota a medias sin guardar progreso).
+
+Un juego sin detalle no cuenta en el histórico ni en las rachas, así que
+esto no era cosmético: `fende21` tenía 59 juegos de PSN así y nada lo decía
+en pantalla. Xbox y manuales quedan fuera (cuota compartida de OpenXBL / no
+hay nada que sincronizar), filtrado en SQL **y** con una guarda en el bucle.
+
+**Sin ver renderizado** (necesita sesión): merece un vistazo real.
+
 ### Sincronización automática al abrir la ficha de un juego
 
 Decisión del usuario tras plantearle las tres variables: **6 horas de
