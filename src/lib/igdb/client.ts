@@ -58,6 +58,27 @@ async function accessToken(): Promise<string> {
   return cachedToken.value;
 }
 
+/** Ventana de frescura de las consultas que dependen de "ahora". */
+const VENTANA_SEGUNDOS = 300;
+
+/**
+ * "Ahora", redondeado a la baja a la ventana de arriba.
+ *
+ * Importa mas de lo que parece: Next cachea cada `fetch` por su CUERPO, y el
+ * de estas consultas lleva el instante actual. Con `Date.now()` al segundo,
+ * el cuerpo cambiaba en cada peticion, asi que la cache de 6 horas NO
+ * acertaba NUNCA: cada visita a Descubrir iba a IGDB, que limita a 4
+ * peticiones por segundo. Redondeando, el cuerpo se repite dentro de la
+ * ventana y la cache funciona de verdad.
+ *
+ * 5 minutos es "tiempo real" a efectos practicos para esto: un lanzamiento
+ * es una fecha, no un instante, y ningun juego cambia de "proximo" a
+ * "salido" en menos de eso de forma que alguien lo note.
+ */
+function ahoraRedondeado(): number {
+  return Math.floor(Date.now() / 1000 / VENTANA_SEGUNDOS) * VENTANA_SEGUNDOS;
+}
+
 /**
  * POST contra un endpoint de IGDB con su lenguaje de consulta propio (APIcalypse).
  *
@@ -262,10 +283,11 @@ function filtroPlataforma(plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): st
  * primero y no ruido de catálogo.
  */
 export async function upcomingGames(limit = 8, plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): Promise<IgdbGameResult[]> {
-  const now = Math.floor(Date.now() / 1000);
+  const now = ahoraRedondeado();
   const games = await query<IgdbGame>(
     "games",
     `${FIELDS} where first_release_date > ${now} & cover != null & hypes != null${filtroPlataforma(plataforma)}; sort hypes desc; limit ${limit};`,
+    VENTANA_SEGUNDOS,
   );
   return games.map(formatGame);
 }
@@ -277,10 +299,11 @@ export async function upcomingGames(limit = 8, plataforma?: keyof typeof ABREVIA
  * no llenar la fila de ruido de catálogo sin seguimiento.
  */
 export async function recentReleases(limit = 12, plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): Promise<IgdbGameResult[]> {
-  const now = Math.floor(Date.now() / 1000);
+  const now = ahoraRedondeado();
   const games = await query<IgdbGame>(
     "games",
     `${FIELDS} where first_release_date <= ${now} & cover != null & hypes != null${filtroPlataforma(plataforma)}; sort first_release_date desc; limit ${limit};`,
+    VENTANA_SEGUNDOS,
   );
   return games.map(formatGame);
 }
@@ -298,7 +321,7 @@ export async function recentReleases(limit = 12, plataforma?: keyof typeof ABREV
  * quedarse la misma semana entera si sale algo nuevo con tirón.
  */
 export async function destacadosRecientes(limit = 6): Promise<IgdbGameResult[]> {
-  const now = Math.floor(Date.now() / 1000);
+  const now = ahoraRedondeado();
 
   async function buscar(diasAtras: number, minHype: number) {
     const desde = now - diasAtras * 86_400;

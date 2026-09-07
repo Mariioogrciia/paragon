@@ -18,6 +18,16 @@ export interface HeroGame {
 }
 
 /** El icono de plataforma es un extra visual, no la fuente de verdad — si no reconoce ninguna abreviatura, se queda sin icono y solo texto. */
+/** La familia de una plataforma concreta: "PS5" y "PS4" son la misma marca,
+ *  y repetir el logo de PlayStation dos veces no aporta nada. */
+function familiaPlataforma(p: string): string | null {
+  if (/PS[45]/.test(p)) return "PS5";
+  if (/Xbox|Series/i.test(p)) return "Xbox";
+  if (/Switch/i.test(p)) return "Switch";
+  if (/PC/.test(p)) return "PC";
+  return null;
+}
+
 function IconoPlataforma({ platforms }: { platforms: string[] }) {
   const p = platforms.join(" ");
   if (/PS[45]/.test(p)) return <PlayStationIcon size={14} />;
@@ -90,35 +100,60 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
         )}
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-3 text-white sm:px-6">
-          <div className="flex flex-wrap items-center gap-2">
-            {g.platforms.slice(0, 1).map((p) => (
-              <span key={p} className="flex items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 text-[0.6875rem] font-bold backdrop-blur-sm">
-                <IconoPlataforma platforms={[p]} />
-                {p}
+          <div className="flex h-[1.6rem] items-center gap-2 overflow-hidden">
+            {/* TODAS las plataformas, no solo la primera: un multiplataforma
+                salia etiquetado como si fuera exclusivo de Xbox o de Steam,
+                que es justo lo contrario de lo que interesa saber. Con mas de
+                una se enseña solo el icono (el nombre de las tres no cabe en
+                una linea de movil y partia la fila en dos, descuadrando el
+                alto de la pieza). */}
+            {g.platforms.length === 1 ? (
+              <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 text-[0.6875rem] font-bold backdrop-blur-sm">
+                <IconoPlataforma platforms={[g.platforms[0]]} />
+                {g.platforms[0]}
               </span>
-            ))}
+            ) : (
+              g.platforms.length > 0 && (
+                <span
+                  className="flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 backdrop-blur-sm"
+                  title={g.platforms.join(" · ")}
+                >
+                  {/* Un icono por FAMILIA, sin repetir: "PS4" y "PS5" son dos
+                      plataformas de IGDB pero un solo logo de PlayStation. */}
+                  {[...new Set(g.platforms.map(familiaPlataforma))]
+                    .filter(Boolean)
+                    .map((familia) => (
+                      <IconoPlataforma key={familia} platforms={[familia as string]} />
+                    ))}
+                </span>
+              )
+            )}
             <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-white/70">{g.releaseLabel}</span>
             {g.pegi && <Pegi edad={g.pegi} />}
           </div>
 
-          <h2 className="font-heading text-lg font-bold uppercase leading-tight tracking-[-0.01em] line-clamp-2 drop-shadow-md sm:line-clamp-1 sm:text-2xl">
+          <h2 className="font-heading min-h-[2.8em] text-lg font-bold uppercase leading-tight tracking-[-0.01em] line-clamp-2 drop-shadow-md sm:min-h-0 sm:line-clamp-1 sm:text-2xl">
             {g.title}
           </h2>
 
-          {g.genres.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
+          {/* La fila se dibuja SIEMPRE, aunque el juego no traiga generos: si
+              desaparece, esa diapositiva queda mas baja que las demas y el
+              carrusel pega un salto de alto al rotar (medido: 210px frente a
+              224px del resto). */}
+          {(
+            <div className="flex h-[1.35rem] items-center gap-1.5 overflow-hidden">
               {g.genres.slice(0, 2).map((genre) => (
-                <span key={genre} className="rounded-full bg-white/10 px-2 py-0.5 text-[0.625rem] font-semibold text-white/85">
+                <span key={genre} className="shrink-0 truncate rounded-full bg-white/10 px-2 py-0.5 text-[0.625rem] font-semibold text-white/85">
                   {genre}
                 </span>
               ))}
             </div>
           )}
 
-          <div className="mt-1 flex flex-wrap items-center gap-2.5">
+          <div className="mt-1 flex flex-nowrap items-center gap-2">
             <Link
               href={`/juego/${g.igdbId}`}
-              className="rounded-[10px] px-3.5 py-2 text-xs font-bold text-background whitespace-nowrap"
+              className="shrink-0 rounded-[10px] px-3 py-2 text-xs font-bold text-background whitespace-nowrap sm:px-3.5"
               style={{ background: "var(--accent-grad)" }}
             >
               Ver ficha
@@ -195,10 +230,20 @@ function WishlistButton({ game, initiallyAdded = false }: { game: HeroGame; init
           setAdded(true);
         })
       }
-      className="rounded-[10px] px-3.5 py-2 text-xs font-bold text-white backdrop-blur-sm transition-colors"
+      className="shrink-0 whitespace-nowrap rounded-[10px] px-3 py-2 text-xs font-bold text-white backdrop-blur-sm transition-colors sm:px-3.5"
       style={{ background: added ? "rgba(78,201,138,.25)" : "rgba(255,255,255,.15)" }}
     >
-      {isPending ? "Añadiendo..." : added ? "✓ En Deseados" : "+ Añadir a Deseados"}
+      {isPending ? (
+        "Añadiendo…"
+      ) : added ? (
+        <>
+          ✓ <span className="hidden sm:inline">En </span>Deseados
+        </>
+      ) : (
+        <>
+          + <span className="hidden sm:inline">Añadir a </span>Deseados
+        </>
+      )}
     </button>
   );
 }

@@ -52,14 +52,45 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
   const [loading, setLoading] = useState(true);
   const [modalGame, setModalGame] = useState<UpcomingGame | null>(null);
 
+  /**
+   * Se recarga sola: al montar, cada 5 minutos, y al volver a la pestaña.
+   *
+   * El servidor ya sirve datos frescos en ventanas de 5 minutos (ver
+   * `ahoraRedondeado` en lib/igdb/client.ts). Esto es la otra mitad: sin
+   * ello, alguien con la pagina abierta seguiria viendo la lista del momento
+   * en que entro, aunque por detras ya hubiera cambiado.
+   *
+   * Lo de "al volver a la pestaña" es lo que mas se nota en la practica: se
+   * deja Paragon abierto en una pestaña, se vuelve horas despues, y lo
+   * primero que pasa es que se actualiza.
+   */
   useEffect(() => {
-    fetch("/api/games/upcoming")
-      .then((res) => res.json())
-      .then((data) => {
-        setGames(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    let vivo = true;
+
+    async function traer() {
+      try {
+        const res = await fetch("/api/games/upcoming");
+        const data = await res.json();
+        if (vivo) setGames(data);
+      } catch {
+        // Sin conexion se queda la lista anterior, que es mejor que vaciarla.
+      } finally {
+        if (vivo) setLoading(false);
+      }
+    }
+
+    traer();
+    const cadaRato = setInterval(traer, 5 * 60 * 1000);
+    const alVolver = () => {
+      if (document.visibilityState === "visible") traer();
+    };
+    document.addEventListener("visibilitychange", alVolver);
+
+    return () => {
+      vivo = false;
+      clearInterval(cadaRato);
+      document.removeEventListener("visibilitychange", alVolver);
+    };
   }, []);
 
   if (loading) {
@@ -129,15 +160,16 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
               </div>
 
               <div className="flex min-w-0 flex-col">
-                <h3 className="font-heading text-[0.9375rem] font-bold leading-tight">
+                {/* Dos lineas SIEMPRE: un titulo corto y otro largo hacian
+                    tarjetas de distinto alto en la misma fila. */}
+                <h3 className="font-heading line-clamp-2 min-h-[2.4em] text-[0.9375rem] font-bold leading-tight">
                   {game.title}
                 </h3>
 
-                {estudio && (
-                  <p className="mt-0.5 truncate text-[0.6875rem] text-muted">{estudio}</p>
-                )}
+                {/* La linea del estudio se reserva aunque IGDB no lo traiga. */}
+                <p className="mt-0.5 h-[1.1rem] truncate text-[0.6875rem] text-muted">{estudio ?? ""}</p>
 
-                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                <div className="mt-1.5 flex h-[1.6rem] items-center gap-1.5 overflow-hidden">
                   <span
                     className="rounded-md px-2 py-0.5 text-[0.6875rem] font-bold"
                     style={{
@@ -154,8 +186,12 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                   {game.pegi && <Pegi edad={game.pegi} />}
                 </div>
 
-                {(game.platforms.length > 0 || game.genres.length > 0) && (
-                  <div className="mt-1.5 flex flex-wrap gap-1">
+                {/* Dos filas de etiquetas como maximo, con el hueco siempre
+                    reservado: con las plataformas completas de un
+                    multiplataforma, unas tarjetas llegaban a tres filas y
+                    otras a una. */}
+                {(
+                  <div className="mt-1.5 flex h-[2.6rem] flex-wrap content-start gap-1 overflow-hidden">
                     {game.platforms.slice(0, 3).map((p) => (
                       <span
                         key={p}

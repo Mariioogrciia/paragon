@@ -78,8 +78,12 @@ const TILES: Tile[] = [
 ];
 
 export function PlatformTiles() {
+  // `auto-rows-fr`: las filas de una rejilla se dimensionan por separado, asi
+  // que la primera (con "RECOMENDACIONES" partido en dos lineas) salia mas
+  // alta que la segunda — 87px frente a 75px. Con esto todas las celdas miden
+  // igual, que es lo que se espera de una fila de iconos.
   return (
-    <div className="mb-8 grid grid-cols-4 gap-2 sm:grid-cols-7">
+    <div className="mb-8 grid auto-rows-fr grid-cols-4 gap-2 sm:grid-cols-7">
       {TILES.map((t) =>
         t.href ? (
           <a
