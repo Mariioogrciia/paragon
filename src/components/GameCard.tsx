@@ -11,8 +11,27 @@ import { Pegi } from "@/components/Pegi";
  * maqueta. Si PSN no da icono (pasa con algunos juegos viejos), cae en un
  * degradado propio del juego en vez de un cuadrado gris: se sigue pudiendo
  * distinguir un juego de otro de un vistazo.
+ *
+ * El aviso de "Objetivo actual" (`game.isPinned`) es solo un badge pasivo,
+ * a propósito: toda la tarjeta es un `<Link>` (`TiltCard`), así que un
+ * control interactivo anidado aquí dentro (probado y descartado) navega a
+ * la ficha del juego al pulsarlo en vez de anclar/desanclar, aunque se le
+ * llame a `preventDefault`/`stopPropagation` en su propio `onClick` — el
+ * mismo motivo por el que `RatingStars` NO vive aquí dentro, sino como
+ * overlay hermano desde `LibraryGrid`. `PinGameButton` (el botón real de
+ * anclar) sigue ese mismo patrón, no este componente.
+ * `hidePinBadge` lo pasa `LibraryGrid` cuando ya está pintando el botón
+ * interactivo por encima (tu propia biblioteca), para no duplicar el aviso.
  */
-export function GameCard({ game, href }: { game: Game; href: string }) {
+export function GameCard({
+  game,
+  href,
+  hidePinBadge = false,
+}: {
+  game: Game;
+  href: string;
+  hidePinBadge?: boolean;
+}) {
   const progress = gameProgress(game);
   const played = relativeDate(game.lastPlayedAt);
 
@@ -60,6 +79,22 @@ export function GameCard({ game, href }: { game: Game; href: string }) {
 
         {/* Gradiente para asegurar legibilidad del texto sin importar la carátula */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+
+        {/* Esquina libre (arriba-izq. la ocupa RatingStars desde
+            LibraryGrid, arriba-der. StatusBadge, abajo-der. Pegi). */}
+        {game.isPinned && !hidePinBadge && (
+          <span
+            className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full px-2 py-1 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
+            style={{ background: "rgba(226, 181, 62, 0.85)", color: "#0b0d10" }}
+            title="A por este platino ahora mismo"
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0b0d10" stroke="#0b0d10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 17v5" />
+              <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z" />
+            </svg>
+            Objetivo actual
+          </span>
+        )}
 
         {/* Siempre visible: el hardcode de GTA V/VI escondía el título
             porque el logo de Wikipedia ya lo llevaba dibujado dentro de la

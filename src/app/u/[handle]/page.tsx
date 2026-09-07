@@ -31,6 +31,7 @@ import { PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { BackButton } from "@/components/BackButton";
 import { ProfileTabsNav } from "@/components/ProfileTabsNav";
+import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 
 
 function hexToRgb(hex: string) {
@@ -274,6 +275,11 @@ export default async function PerfilPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-6">
+        {(() => {
+          const juegoAnclado = games.find((g) => g.isPinned);
+          return juegoAnclado && <PinnedGameBanner game={juegoAnclado} handle={handle} />;
+        })()}
+
         {(() => {
           // Cada sección se define una vez, con su clave; el orden en que
           // salen en pantalla lo decide `profile.profileSectionOrder`

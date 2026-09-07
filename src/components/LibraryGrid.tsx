@@ -6,6 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { GameCard } from "@/components/GameCard";
 import { Dropdown } from "@/components/Dropdown";
 import { RatingStars } from "@/components/RatingStars";
+import { PinGameButton } from "@/components/PinGameButton";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
 import { ImportLibraryModal } from "@/components/ImportLibraryModal";
 import { BacklogRoulette } from "@/components/BacklogRoulette";
@@ -193,9 +194,25 @@ export function LibraryGrid({
 
   const renderGame = (game: Game) => {
     if (view === "grid") {
+      // `PinGameButton` va FUERA de `GameCard` a propósito, no en una de sus
+      // esquinas: toda la tarjeta es un `<Link>` (`TiltCard`) y un control
+      // interactivo anidado ahí dentro navega a la ficha al pulsarlo en vez
+      // de anclar/desanclar, aunque llame a `preventDefault`/
+      // `stopPropagation` en su propio `onClick` — comprobado en vivo, no
+      // solo en teoría. Mismo motivo por el que `RatingStars` tampoco vive
+      // dentro de `GameCard`.
       return (
         <div key={game.id} className="relative">
-          <GameCard game={game} href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`} />
+          {esMio && !game.isWishlist && (
+            <div className="absolute -top-2 right-2 z-10">
+              <PinGameButton gameId={game.id} pinned={game.isPinned ?? false} />
+            </div>
+          )}
+          <GameCard
+            game={game}
+            href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`}
+            hidePinBadge={esMio}
+          />
           <div className="absolute top-2 left-2 z-10 bg-black/50 backdrop-blur-md rounded-full px-2 py-1">
             <RatingStars gameId={game.id} initialRating={game.rating} />
           </div>

@@ -292,6 +292,14 @@ export const userGames = pgTable(
     reviewDate: timestamp("reviewDate", { mode: "date" }),
     isWishlist: boolean("isWishlist").notNull().default(false),
     /**
+     * Cuándo se ancló este juego como "el objetivo ahora mismo" — null si no
+     * está anclado. Solo uno a la vez por usuario (lo impone
+     * `togglePinGameAction`, no una constraint de la base): anclar uno
+     * desancla el anterior, para que el aviso en el perfil ("voy a por
+     * este platino ahora") sea siempre uno solo, no una lista.
+     */
+    pinnedAt: timestamp("pinnedAt", { mode: "date" }),
+    /**
      * Cuándo entró este juego en la biblioteca/deseados de este usuario —
      * distinto de `lastPlayedAt` (cuándo se jugó) o `trophiesSyncedAt`
      * (cuándo se sincronizó su detalle). Sirve para "Tendencias" en

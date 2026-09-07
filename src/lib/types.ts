@@ -139,6 +139,8 @@ export interface Game {
   defined?: TrophyCounts;
   earned?: TrophyCounts;
   isWishlist?: boolean;
+  /** El juego que este usuario ha anclado como objetivo actual — ver `togglePinGameAction`. */
+  isPinned?: boolean;
   /** "trophy" (PS3/PS4/Vita) o "trophy2" (PS5). Hace falta para pedir el detalle. */
   service?: "trophy" | "trophy2";
   /** Minutos jugados. Steam y PSN pueden proporcionarlo. */

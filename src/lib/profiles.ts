@@ -563,6 +563,7 @@ export const getLibrary = cache(
       review: userGames.review,
       reviewDate: userGames.reviewDate,
       isWishlist: userGames.isWishlist,
+      pinnedAt: userGames.pinnedAt,
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
@@ -656,6 +657,7 @@ export const getLibrary = cache(
     review: r.review ?? undefined,
     reviewDate: r.reviewDate?.toISOString() ?? undefined,
     isWishlist: r.isWishlist ?? false,
+    isPinned: r.pinnedAt != null,
   }));
 
   return { player: toPlayer(profile), games };

@@ -1106,3 +1106,46 @@ export async function syncHltbAction(gameId: string, title: string): Promise<voi
   await syncGameHltb(gameId, title);
   revalidatePath("/planificador");
 }
+
+/* ---------------------------------- Anclar juego (objetivo actual) --------------------------------- */
+
+/**
+ * Ancla o desancla un juego como "el objetivo ahora mismo" — el platino al
+ * que le estás dando prioridad, visible en tu propio perfil y en el de
+ * quien te visite. Solo uno a la vez: anclar otro desancla automáticamente
+ * el anterior (no tendría sentido enseñar dos "objetivos actuales" a la
+ * vez), así que esto es un UPDATE de toda la biblioteca del usuario, no un
+ * simple toggle de una fila — pero solo dos columnas, no cuesta más que
+ * cualquier otro cambio de esta pantalla.
+ *
+ * Mismo patrón de propiedad que `rateGameAction`/`writeReviewAction`: el
+ * `where` va siempre contra `userGames.userId = requireUserId()`, así que
+ * nadie puede anclar (ni desanclar) un juego en la biblioteca de otro.
+ */
+export async function togglePinGameAction(gameId: string): Promise<{ pinned: boolean }> {
+  const userId = await requireUserId();
+  const db = getDb();
+
+  const [actual] = await db
+    .select({ pinnedAt: userGames.pinnedAt })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  const yaAnclado = actual?.pinnedAt != null;
+
+  // Desancla SIEMPRE lo que hubiera antes (incluido este mismo juego, si ya
+  // estaba anclado) antes de, si toca, anclar el nuevo — así nunca queda
+  // más de uno anclado a la vez, sin depender de una constraint en la base.
+  await db.update(userGames).set({ pinnedAt: null }).where(eq(userGames.userId, userId));
+
+  if (!yaAnclado) {
+    await db
+      .update(userGames)
+      .set({ pinnedAt: new Date() })
+      .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+  }
+
+  revalidatePath("/", "layout");
+  return { pinned: !yaAnclado };
+}
