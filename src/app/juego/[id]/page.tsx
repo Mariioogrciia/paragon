@@ -27,6 +27,7 @@ import { GameLanguages } from "@/components/GameLanguages";
 import { GameDlcs } from "@/components/GameDlcs";
 import { GameTrophyBreakdown } from "@/components/GameTrophyBreakdown";
 import { SiteIcon } from "@/components/SiteIcon";
+import { GameGuideLink } from "@/components/GameGuideLink";
 import { BackButton } from "@/components/BackButton";
 import { GameWishlistCard } from "@/components/GameWishlistCard";
 import { CollectionPicker } from "@/components/Collections";
@@ -362,6 +363,8 @@ export default async function JuegoGlobalPage({
             `/u/[handle]/[gameId]` — añadir y quitar es el mismo botón
             (toggleGameCollectionAction), no dos acciones distintas. */}
         {tieneJuego && miGameId && <CollectionPicker collections={carpetas} gameId={miGameId} />}
+
+        <GameGuideLink title={game.title} />
 
         <GameTrophyBreakdown breakdown={trophyBreakdown} />
         {detalles && (

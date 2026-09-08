@@ -201,6 +201,19 @@ export default async function JuegoPage({
                   </svg>
                   Ver ficha global
                 </Link>
+                <a
+                  href={`https://www.google.com/search?q=${encodeURIComponent(`${game.title} guía completa mejores armas y armadura`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:bg-white/10 hover:text-white"
+                  title="Guía completa del juego en un sitio externo"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+                  </svg>
+                  Guía completa
+                </a>
               </div>
 
               <div className="mt-5 flex max-w-[560px] items-center gap-4">
