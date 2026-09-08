@@ -1,13 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
-import { clasificarTrofeo } from "@/lib/trophyType";
+import { clasificarTrofeo, TROPHY_TYPE_LABEL, type TrophyType } from "@/lib/trophyType";
 import { trophyScore } from "@/lib/trophyScore";
 import type { Platform, Trophy, TrophyGrade } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
 import { TrophyTree } from "./TrophyTree";
+
+/** Los filtros de tipo son justo `TrophyType` (ya calculado por trofeo con
+ * `clasificarTrofeo`) más "perdible", que no es un tipo sino un aviso aparte
+ * (`trophy.isMissable`, de PowerPyx — ver lib/powerpyx.ts) pero se pidió
+ * como filtro igual: "Perdibles, Multijugador/Online, Coleccionables...". */
+type Filtro = TrophyType | "perdible";
+
+const FILTROS_DISPONIBLES: { valor: Filtro; label: string }[] = [
+  { valor: "perdible", label: "Perdibles" },
+  { valor: "multijugador", label: "Multijugador" },
+  { valor: "coleccionable", label: "Coleccionables" },
+  { valor: "completista", label: "Completista" },
+  { valor: "historia", label: "Historia" },
+  { valor: "habilidad", label: "Habilidad" },
+  { valor: "secreto", label: "Secretos" },
+];
+
+/** Un trofeo pasa el filtro si coincide con AL MENOS UNO de los activos
+ * (unión, no intersección) — "enséñame perdibles Y coleccionables" tiene más
+ * sentido para un filtro rápido que exigir que sea las dos cosas a la vez,
+ * cosas que además casi nunca coinciden. Sin filtros activos, pasan todos. */
+function pasaFiltro(trophy: Trophy, activos: Set<Filtro>): boolean {
+  if (activos.size === 0) return true;
+  if (activos.has("perdible") && trophy.isMissable) return true;
+  const tipo = clasificarTrofeo(trophy);
+  return tipo !== null && activos.has(tipo);
+}
 
 /**
  * Todos los logros de un juego, en lista o en cuadrícula.
@@ -36,9 +63,38 @@ export function TrophyList({
 }) {
   const [view, setView] = useState<"lista" | "cuadricula" | "arbol">("lista");
   const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
+  const [filtros, setFiltros] = useState<Set<Filtro>>(new Set());
+
+  // Qué filtros tienen algo que enseñar en ESTE juego — de nada sirve un
+  // chip de "Multijugador" que, al pulsarlo, deja la lista vacía porque el
+  // juego no tiene ninguno. Se recalcula solo si cambia la lista de trofeos
+  // (no en cada render).
+  const filtrosConDatos = useMemo(() => {
+    const disponibles = new Set<Filtro>();
+    for (const t of trophies) {
+      if (t.isMissable) disponibles.add("perdible");
+      const tipo = clasificarTrofeo(t);
+      if (tipo) disponibles.add(tipo);
+    }
+    return disponibles;
+  }, [trophies]);
+
+  const trofeosFiltrados = useMemo(
+    () => trophies.filter((t) => pasaFiltro(t, filtros)),
+    [trophies, filtros],
+  );
+
+  function alternarFiltro(valor: Filtro) {
+    setFiltros((prev) => {
+      const next = new Set(prev);
+      if (next.has(valor)) next.delete(valor);
+      else next.add(valor);
+      return next;
+    });
+  }
 
   const groups = new Map<string, { name: string; trophies: Trophy[] }>();
-  for (const t of trophies) {
+  for (const t of trofeosFiltrados) {
     const gId = t.groupId || "default";
     if (!groups.has(gId)) {
       groups.set(gId, {
@@ -58,9 +114,42 @@ export function TrophyList({
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        {filtrosConDatos.size > 0 && view !== "arbol" && (
+          <div className="flex flex-wrap gap-1.5">
+            {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => {
+              const activo = filtros.has(f.valor);
+              return (
+                <button
+                  key={f.valor}
+                  type="button"
+                  onClick={() => alternarFiltro(f.valor)}
+                  aria-pressed={activo}
+                  className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-colors"
+                  style={
+                    activo
+                      ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
+                      : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
+                  }
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+            {filtros.size > 0 && (
+              <button
+                type="button"
+                onClick={() => setFiltros(new Set())}
+                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] text-muted hover:text-foreground"
+              >
+                Limpiar
+              </button>
+            )}
+          </div>
+        )}
+
         <div
-          className="inline-flex gap-1 rounded-[10px] p-1"
+          className="ml-auto inline-flex gap-1 rounded-[10px] p-1"
           style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
         >
           <ViewButton active={view === "lista"} onClick={() => setView("lista")} label="Lista">
