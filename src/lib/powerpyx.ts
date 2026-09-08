@@ -101,6 +101,18 @@ export function normalizar(titulo: string): string {
  * juego base — usar el primero a ciegas habría marcado trofeos al azar del
  * juego equivocado como perdibles. Sin coincidencia exacta, mejor no
  * enseñar nada que enseñar el aviso equivocado.
+ *
+ * El buscador de PowerPyx solo devuelve 10 resultados, así que a veces la
+ * guía correcta ni entra — comprobado con "Elden Ring": los 10 resultados
+ * de buscar el título pelado son de "Elden Ring Nightreign" (el spin-off,
+ * que también contiene "Elden Ring" en cada título suyo), la guía del
+ * juego base no aparece en ninguna posición. Añadir "Trophy Guide" a la
+ * consulta lo arregla de verdad, no solo lo mitiga — probado contra Elden
+ * Ring, Black Myth: Wukong, MGS4, Spider-Man 2 y Ghost of Tsushima: la
+ * coincidencia exacta pasa a salir SIEMPRE en primera posición, sin
+ * cambiar el resultado en ninguno de los que ya funcionaban. La comparación
+ * de igualdad sigue siendo estricta contra `normalizar()`, esto solo
+ * mejora QUÉ entra en los 10 resultados, no qué se acepta como bueno.
  */
 async function buscarGuia(titulo: string): Promise<string | null> {
   const objetivo = normalizar(titulo);
@@ -114,6 +126,18 @@ async function buscarGuia(titulo: string): Promise<string | null> {
   // sigue siendo con `normalizar()`, que ya ignora esto de todas formas.
   const consulta = titulo.replace(/[™®©]/g, "").trim();
 
+  const enGuia = await buscarEn(`${consulta} Trophy Guide`, objetivo);
+  if (enGuia) return enGuia;
+
+  // Reintento con el título pelado, por si acaso: añadir "Trophy Guide"
+  // mejoró los 5 casos probados, pero es una consulta añadida, no una
+  // certeza universal — mejor un segundo intento (misma caché de 30 días,
+  // así que casi nunca cuesta una petición real de más) que perder una
+  // coincidencia que sí habría salido con el título solo.
+  return buscarEn(consulta, objetivo);
+}
+
+async function buscarEn(consulta: string, objetivo: string): Promise<string | null> {
   const res = await fetch(`${BASE}/?s=${encodeURIComponent(consulta)}`, {
     headers: { "User-Agent": USER_AGENT },
     // Un mes: quién tiene guía y quién no apenas cambia. Es una consulta de
