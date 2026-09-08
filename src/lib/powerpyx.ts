@@ -113,6 +113,14 @@ export function normalizar(titulo: string): string {
  * cambiar el resultado en ninguno de los que ya funcionaban. La comparación
  * de igualdad sigue siendo estricta contra `normalizar()`, esto solo
  * mejora QUÉ entra en los 10 resultados, no qué se acepta como bueno.
+ *
+ * Las DOS búsquedas van en PARALELO (`Promise.all`), no una detrás de otra
+ * — bug real de rendimiento encontrado el mismo día que se escribió esto:
+ * en secuencia, cada ficha de juego de PSN tardaba 1,1-1,8s SOLO en esta
+ * función (medido en vivo), porque el caso más común es que ninguna de las
+ * dos búsquedas encuentre nada y antes se esperaba a que la primera
+ * fallara del todo antes de intentar la segunda. En paralelo cuesta lo que
+ * tarde la más lenta de las dos (~500-900ms), no la suma.
  */
 async function buscarGuia(titulo: string): Promise<string | null> {
   const objetivo = normalizar(titulo);
@@ -126,15 +134,14 @@ async function buscarGuia(titulo: string): Promise<string | null> {
   // sigue siendo con `normalizar()`, que ya ignora esto de todas formas.
   const consulta = titulo.replace(/[™®©]/g, "").trim();
 
-  const enGuia = await buscarEn(`${consulta} Trophy Guide`, objetivo);
-  if (enGuia) return enGuia;
-
-  // Reintento con el título pelado, por si acaso: añadir "Trophy Guide"
-  // mejoró los 5 casos probados, pero es una consulta añadida, no una
-  // certeza universal — mejor un segundo intento (misma caché de 30 días,
-  // así que casi nunca cuesta una petición real de más) que perder una
-  // coincidencia que sí habría salido con el título solo.
-  return buscarEn(consulta, objetivo);
+  const [conGuia, pelado] = await Promise.all([
+    buscarEn(`${consulta} Trophy Guide`, objetivo),
+    buscarEn(consulta, objetivo),
+  ]);
+  // La consulta con "Trophy Guide" es la que de verdad soluciona el caso
+  // real (Elden Ring tapado por Nightreign) — se prefiere si las dos
+  // encuentran algo, aunque en la práctica casi siempre coinciden.
+  return conGuia ?? pelado;
 }
 
 async function buscarEn(consulta: string, objetivo: string): Promise<string | null> {
