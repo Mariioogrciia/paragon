@@ -84,21 +84,35 @@ function ahoraRedondeado(): number {
  *
  * `revalidate` cachea la respuesta como el resto del catálogo (ver
  * steam/client.ts): el catálogo mundial de juegos no cambia minuto a minuto.
+ *
+ * Sigue lanzando a propósito (a diferencia de xbl/steam `get()`, que
+ * degradan a `null`): todo el que llama a esto ya lo espera y lo captura
+ * con su propio `.catch()` (descubrir/page.tsx, juego/[id]/page.tsx,
+ * api/games/upcoming/route.ts...). El `try/catch` de aquí es solo para dar
+ * un mensaje distinguible cuando el fallo es de RED (no HTTP) — mismo
+ * `TypeError: fetch failed` que ya causó un fallo real en xbl/client.ts
+ * (7 sept 2026, ver su comentario), sin capturar antes se veía igual que
+ * cualquier otro error sin más contexto en los logs.
  */
 async function query<T>(endpoint: string, body: string, revalidate = 21_600): Promise<T[]> {
   const token = await accessToken();
   const { clientId } = credentials();
 
-  const response = await fetch(`${IGDB_API}/${endpoint}`, {
-    method: "POST",
-    headers: {
-      "Client-ID": clientId,
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-    body,
-    next: { revalidate },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${IGDB_API}/${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Client-ID": clientId,
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      body,
+      next: { revalidate },
+    });
+  } catch (error) {
+    throw new Error(`IGDB: fallo de red en /${endpoint}`, { cause: error });
+  }
 
   if (!response.ok) {
     throw new Error(`IGDB respondió ${response.status} en /${endpoint}: ${await response.text()}`);

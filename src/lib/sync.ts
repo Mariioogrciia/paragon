@@ -547,6 +547,19 @@ export async function syncGameTrophies(
           body: nuevos.length === 1 ? "1 trofeo nuevo" : `${nuevos.length} trofeos nuevos`,
           url,
         });
+
+    // Se acaba de conseguir DE VERDAD (no es la primera sincronización, ver
+    // `primeraSincronizacion` arriba) — si este era el juego anclado como
+    // "objetivo actual" (ver togglePinGameAction, app/actions.ts), se
+    // desancla solo. Sin esto, el banner del perfil seguiría anunciando "a
+    // por este platino ahora" de un juego ya conseguido hasta que alguien
+    // se acordara de desanclarlo a mano.
+    if (platino) {
+      await db
+        .update(userGames)
+        .set({ pinnedAt: null })
+        .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+    }
   }
 
   return trophies.length;
