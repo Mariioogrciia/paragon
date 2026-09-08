@@ -7,6 +7,121 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 7-8 de septiembre de 2026 (continuación 2) — filtros, notas privadas, HLTB de verdad, push confirmado en vivo, y un bug de rendimiento propio
+
+Retomada varias veces la misma sesión larga. Va por tema.
+
+### Filtros de trofeos, notas privadas por juego, guía externa
+
+Tres piezas pequeñas, cada una en su commit:
+- **Filtros en la lista/cuadrícula de trofeos** (Perdibles, Multijugador,
+  Coleccionables, Historia, Habilidad, Secretos) — reutilizando
+  `clasificarTrofeo` (ya existía, solo se usaba para el icono) e
+  `isMissable` (de esta misma sesión). Solo se enseñan los chips que ESE
+  juego tiene algo que mostrar.
+- **Notas privadas por juego** (`user_game.notes`, migración ejecutada):
+  un recordatorio tipo "me falta el coleccionable 14 del capítulo 3",
+  nunca público — a diferencia de `review`/`rating`. Se trae solo en
+  `getGameDetail`, no en `getLibrary`, para no mandar notas privadas en
+  cada carga de la biblioteca.
+- **"Guía completa" como enlace externo**, a propósito NO como función de
+  comunidad propia: `game_guide` (el foro de guías que ya existe en
+  `/juego/[id]/guias`) tiene 0 filas en producción, la misma trampa de
+  siempre con pocos usuarios. Y a diferencia de perdibles, no hay una
+  fuente única razonable para "mejor arma/armadura" — cada juego tiene su
+  propia wiki con su propio formato. Un enlace a una búsqueda real
+  ("`<juego> guía completa mejores armas y armadura`") en `/juego/[id]` y
+  en la ficha de trofeos, sin sitio fijo (Fextralife/IGN/wiki oficial —
+  varía por juego, el buscador ya lo resuelve solo).
+
+### `TrophyTree.tsx` auditado con el mismo escepticismo que "perdibles"
+
+Pedido explícito del usuario, con una corrección propia primero: **sí
+estaba enganchado** (vista "Árbol" en `TrophyList.tsx`) — el HANDOFF
+anterior decía mal que no se usaba en ninguna página.
+
+Comprobado contra los 15.574 trofeos reales: hoy no rompe nada, pero
+`querySelector('[data-trophy-id="${id}"]')` interpolaba el id del trofeo
+SIN escapar dentro de un selector CSS — los logros de Steam llevan texto
+libre de la desarrolladora (hay ids con espacios y puntos, "Leg day",
+"geometry.ach.path08.08"; ninguno con comillas hoy, pero nada impide que
+un juego futuro use uno con comillas y rompa el árbol ENTERO). Arreglado
+con `CSS.escape()`. Y aviso añadido en la propia vista: las líneas del
+árbol son puramente visuales (ni PSN ni Steam exponen qué trofeo
+desbloquea a cuál) — sin decirlo, se lee como un tech tree real y no lo
+es. Verificado en vivo contra Black Myth: Wukong (36 nodos, 35 líneas,
+ninguna con coordenadas inválidas).
+
+### HLTB arreglado de verdad — `howlongtobeat-ts`, no reconstruir el token a mano
+
+El hallazgo de la sesión anterior (API de HLTB con token de seguridad en
+dos pasos) se iba a replicar a mano — mejor idea, buscado en npm primero:
+**`howlongtobeat-ts`** (github.com/Deadlock-too/howlongtobeat-ts),
+publicada hace 2 semanas **explícitamente por este mismo cambio de API**,
+mantenida activamente, con reintentos y manejo de 429/403 ya resueltos.
+Cambiado `lib/hltb.ts` para usarla en vez del paquete viejo `howlongtobeat`
+(desinstalado). Se mantiene "coger el mejor resultado por similitud, no
+el primero" de antes, y se añade: un fallo de RED ya no marca el juego
+como "comprobado sin dato" (antes cualquier error, incluida una petición
+que no llega a completarse, escribía `hltb: {}` igual que "no existe").
+
+Verificado de punta a punta contra producción: Black Myth: Wukong → 37.8h
+historia / 48.4h main+extra / 67.7h platino, guardado y leído de vuelta.
+
+**Horas estimadas en la ficha del juego** (pedido explícito: "por un lado
+modo historia y por otro para el platino"): `HltbCard.tsx` nueva, dos
+cifras separadas — distinta de `EtaPlatinoCard` (esa calcula CUÁNDO
+terminarás TÚ según tu ritmo real, solo tiene sentido si ya has empezado;
+HLTB es la media de la comunidad, útil incluso antes de empezar).
+`AutoSyncHltb` dispara la búsqueda una vez si `game.hltb` es `undefined`
+(nunca comprobado) — distingue de `{}` (comprobado, sin dato) para no
+repetir la búsqueda en cada visita. El Planificador también separa ahora
+"⏱ Xh historia" / "🏆 Xh platino" en vez de un número combinado, y el
+desplegable "Más rápido (HLTB)" se oculta solo cuando ningún juego del
+plan tiene dato todavía (vuelve a aparecer solo).
+
+**Aviso real del propio paquete**: HowLongToBeat bloquea rangos de IP de
+centros de datos (como los de Vercel) en el paso de "init" — si eso pasa
+algún día, se ve como un fallo de red normal, sin romper nada (mismo
+criterio que PowerPyx/OpenXBL, riesgo asumido a propósito).
+
+### Push de verdad confirmado en producción, con el usuario mirando
+
+Pendiente de sesiones anteriores, cerrado del todo esta vez: el usuario
+activó notificaciones en `/ajustes` (con su navegador real, permiso
+concedido) y probó el botón "Probar" — no le llegó nada en el momento
+porque estaba lejos del dispositivo (jugando a la consola). Se comprobó
+en paralelo, con acceso a la base de producción: la suscripción SÍ se
+guardó bien (`push_subscription`), y un envío directo con
+`webpush.sendNotification()` contra esa suscripción real recibió
+**201 de Google (FCM)** — el problema no estaba en el código. Un segundo
+envío, con el usuario ya delante, **confirmado recibido de verdad**. VAPID
+en Vercel + suscripción + entrega, las tres piezas verificadas en
+producción con datos reales, no solo revisadas a mano.
+
+### Bug propio: la mejora de búsqueda de perdibles duplicó el tiempo de carga
+
+Reportado por el usuario poco después de desplegar: "va lenta la página",
+solo con sesión iniciada. Medido en vivo contra producción: las páginas
+públicas cargan en ~0,15-0,2s (nada que ver), así que el cuello de
+botella estaba en las páginas con datos de usuario. Aislado con más
+medición: `buscarGuia` (lib/powerpyx.ts) tardaba **1,1-1,8 segundos SOLO
+ahí** — el arreglo de esta misma sesión para el caso Elden Ring/Nightreign
+añadió una segunda búsqueda EN SECUENCIA (primero con "Trophy Guide"
+añadido, si falla el título pelado), y el caso más común de verdad es que
+NINGUNA de las dos encuentre nada — la mayoría de fichas de PSN pagaban
+las dos peticiones completas, no una. Arreglado corriendo las dos en
+paralelo (`Promise.all`): MGS4 (el peor caso, sin coincidencia) baja de
+1813ms a 1064ms. Mismo resultado exacto, solo más rápido.
+
+**Moraleja para quien retome esto**: cualquier cambio que añada una
+petición externa nueva a una ruta que ya se sirve con sesión (no solo a
+un cron o una acción aislada) hay que medirlo en el momento, no dar por
+hecho que "en paralelo con la base" es gratis — aquí lo era hasta que la
+propia función pasó a tardar más que la base.
+
+---
+
 ## Sesión del 7 de septiembre de 2026 (continuación) — perdibles de verdad, HLTB revisado, y "anclar juego"
 
 Retomada la sesión del mismo día. El usuario pidió expresamente revisar
@@ -68,6 +183,13 @@ solo una URL movida — es un mecanismo anti-scraping deliberado, un
 escalón por encima de lo que ya se asume con PowerPyx/OpenXBL, así que no
 se ha replicado sin decidirlo antes con el usuario. Mientras tanto, el
 tiempo de HLTB en el Planificador simplemente no aparece (nunca lanza).
+
+> **ARREGLADO DE VERDAD el mismo 7/8 de septiembre, más tarde esta misma
+> sesión — no reconstruir el token a mano.** En vez de replicar el
+> mecanismo de dos pasos de arriba, se cambió a la librería
+> `howlongtobeat-ts` (activamente mantenida, publicada hace 2 semanas
+> explícitamente por este mismo cambio de API) — ver la sección "Horas
+> estimadas" más abajo para el detalle completo.
 
 ### GTA V otra vez: el mismo hardcode que se quitó hoy, reintroducido sin querer
 
