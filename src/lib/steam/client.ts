@@ -58,12 +58,23 @@ function apiKey(): string {
  * mes y se cachea; lo del jugador (biblioteca, logros conseguidos) NO se
  * cachea nunca, porque si no "Sincronizar ahora" devolvería lo de hace una
  * hora, que es justo lo contrario de lo que pide el botón.
+ *
+ * El propio `fetch` va en un `try/catch` a propósito (mismo bug real que
+ * `xbl/client.ts`, ver su comentario): un fallo de RED (no un 4xx/5xx, que
+ * ya devuelve `!response.ok`) lanzaba sin capturar hasta el botón
+ * "Sincronizar" de la cabecera, tirando abajo la app entera.
  */
 async function get<T>(url: string, cacheable = false): Promise<T | null> {
-  const response = await fetch(url, {
-    headers: { Accept: "application/json" },
-    ...(cacheable ? { next: { revalidate: 86_400 } } : { cache: "no-store" as const }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      ...(cacheable ? { next: { revalidate: 86_400 } } : { cache: "no-store" as const }),
+    });
+  } catch (error) {
+    console.error("[steam] fetch", url, error);
+    return null;
+  }
 
   if (!response.ok) return null;
 

@@ -458,20 +458,34 @@ export async function resyncLibraries(userId: string): Promise<number> {
   for (const account of profile.accounts) {
     if (!account.isPublic) continue;
 
-    total += await syncLibrary(userId, {
-      platform: account.platform,
-      accountId: account.accountId,
-    });
+    // Cada cuenta va en su propio try/catch a propósito (7 sept 2026, bug
+    // real en producción): antes, un fallo de red al pedir la biblioteca de
+    // UNA plataforma (visto con Xbox/OpenXBL, "fetch failed") abortaba el
+    // bucle entero sin capturar — y como esto se llama desde el botón
+    // "Sincronizar" de la cabecera (dentro del layout raíz), tiraba abajo
+    // la app ENTERA para cualquiera con esa cuenta vinculada, no solo esa
+    // sincronización. Ahora una plataforma caída no impide sincronizar el
+    // resto. Si falla, `syncedAt` NO se toca a propósito: que siga
+    // saliendo como "sin refrescar" es más honesto que fingir que se
+    // comprobó.
+    try {
+      total += await syncLibrary(userId, {
+        platform: account.platform,
+        accountId: account.accountId,
+      });
 
-    await db
-      .update(platformAccounts)
-      .set({ syncedAt: new Date() })
-      .where(
-        and(
-          eq(platformAccounts.userId, userId),
-          eq(platformAccounts.platform, account.platform),
-        ),
-      );
+      await db
+        .update(platformAccounts)
+        .set({ syncedAt: new Date() })
+        .where(
+          and(
+            eq(platformAccounts.userId, userId),
+            eq(platformAccounts.platform, account.platform),
+          ),
+        );
+    } catch (error) {
+      console.error("[resyncLibraries]", account.platform, error);
+    }
   }
 
   await checkAndGrantBadges(userId);
@@ -482,12 +496,21 @@ export async function resyncLibraries(userId: string): Promise<number> {
 export async function resyncPlatform(userId: string, platform: AccountPlatform): Promise<number> {
   const account = await accountForUser(userId, platform);
   if (!account || !account.isPublic) return 0;
-  const total = await syncLibrary(userId, { platform, accountId: account.accountId });
-  await db
-    .update(platformAccounts)
-    .set({ syncedAt: new Date() })
-    .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)));
-  return total;
+
+  // Mismo motivo que en resyncLibraries: un fallo de red de la plataforma
+  // (visto en vivo con Xbox/OpenXBL, "fetch failed") no debe reventar la
+  // Server Action sin capturar. `syncedAt` no se toca si falla.
+  try {
+    const total = await syncLibrary(userId, { platform, accountId: account.accountId });
+    await db
+      .update(platformAccounts)
+      .set({ syncedAt: new Date() })
+      .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)));
+    return total;
+  } catch (error) {
+    console.error("[resyncPlatform]", platform, error);
+    return 0;
+  }
 }
 
 async function accountForUser(userId: string, platform: AccountPlatform) {

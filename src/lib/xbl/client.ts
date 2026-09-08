@@ -53,19 +53,36 @@ function apiKey(): string {
  * GET contra OpenXBL. Nunca se cachea (a diferencia de steam/client.ts, que
  * sí cachea su catálogo): aquí todo es progreso del jugador, que es
  * justamente lo que "Sincronizar ahora" quiere fresco.
+ *
+ * El propio `fetch` va en un `try/catch` a propósito (7 sept 2026, bug real
+ * en producción): un fallo de RED (DNS, timeout, conexión rechazada — no un
+ * 4xx/5xx, que ya devuelve `!response.ok`) lanza un `TypeError: fetch
+ * failed` que antes se colaba sin capturar. Como esto se llama desde el
+ * botón "Sincronizar" de la CABECERA (`Header.tsx`, dentro del layout
+ * raíz), un solo fallo de red de OpenXBL tiraba abajo la app ENTERA para
+ * cualquiera con Xbox vinculado, no solo la sincronización — visto en vivo:
+ * "fetch failed" en `get()` propagándose sin capturar hasta
+ * `RootLayout`/`global-error.tsx`. Aquí se degrada igual que un `!ok`: sin
+ * datos de Xbox esta vez, no sin app.
  */
 async function get<T>(path: string): Promise<T | null> {
   const key = apiKey();
-  const response = await fetch(`${API}${path}`, {
-    headers: {
-      "X-Authorization": key,
-      Accept: "application/json",
-      // Sin esto, los endpoints de logros devuelven 400 — comprobado contra
-      // la API real, no está en ninguna documentación pública.
-      "Accept-Language": "en-US",
-    },
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API}${path}`, {
+      headers: {
+        "X-Authorization": key,
+        Accept: "application/json",
+        // Sin esto, los endpoints de logros devuelven 400 — comprobado contra
+        // la API real, no está en ninguna documentación pública.
+        "Accept-Language": "en-US",
+      },
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("[xbl] fetch", path, error);
+    return null;
+  }
 
   if (!response.ok) return null;
 
