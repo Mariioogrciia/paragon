@@ -1149,3 +1149,26 @@ export async function togglePinGameAction(gameId: string): Promise<{ pinned: boo
   revalidatePath("/", "layout");
   return { pinned: !yaAnclado };
 }
+
+/* ---------------------------------- Notas privadas por juego --------------------------------- */
+
+/**
+ * Guarda (o borra, si llega vacía) tu nota privada sobre un juego — un
+ * recordatorio de progreso ("me falta el coleccionable 14 del capítulo 3"),
+ * nunca pública. Mismo patrón de propiedad que `rateGameAction`/
+ * `writeReviewAction`: el `where` va siempre contra tu propio `userId`.
+ *
+ * Sin actividad ni notificación de por medio a propósito — a diferencia de
+ * `writeReviewAction`, esto no es contenido para el feed de nadie.
+ */
+export async function saveGameNotesAction(gameId: string, notes: string): Promise<void> {
+  const userId = await requireUserId();
+  const db = getDb();
+
+  await db
+    .update(userGames)
+    .set({ notes: notes.trim() || null })
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+
+  revalidatePath("/", "layout");
+}

@@ -290,6 +290,12 @@ export const userGames = pgTable(
     rating: integer("rating"),
     review: text("review"),
     reviewDate: timestamp("reviewDate", { mode: "date" }),
+    /**
+     * Nota privada tuya sobre este juego — un recordatorio de progreso
+     * ("me falta el coleccionable 14 del capítulo 3"), nunca pública, a
+     * diferencia de `review` (que sí se enseña a quien visite tu perfil).
+     */
+    notes: text("notes"),
     isWishlist: boolean("isWishlist").notNull().default(false),
     /**
      * Cuándo se ancló este juego como "el objetivo ahora mismo" — null si no

@@ -187,6 +187,14 @@ export interface GameDetail extends Game {
    * `AutoSyncJuego.tsx`.
    */
   trophiesSyncedAt: Date | null;
+  /**
+   * Nota privada tuya sobre este juego ("me falta el coleccionable 14 del
+   * capítulo 3") — nunca pública, solo se lee/escribe desde tu propia
+   * ficha (`esMio`). Deliberadamente fuera de `Game`/`getLibrary`: solo se
+   * trae en la ficha de un juego, no en la biblioteca entera, para no
+   * mandar notas privadas en cada carga de la lista.
+   */
+  notes: string | null;
 }
 
 /** Una cuenta vinculada de una plataforma. */

@@ -816,6 +816,7 @@ export async function getGameDetail(
       earnedTotal: userGames.earnedTotal,
       progressPercent: userGames.progressPercent,
       trophiesSyncedAt: userGames.trophiesSyncedAt,
+      notes: userGames.notes,
     })
     .from(userGames)
     .where(
@@ -829,6 +830,7 @@ export async function getGameDetail(
     earnedTotal: fresco?.earnedTotal ?? game.earnedTotal,
     progressPercent: fresco?.progressPercent ?? game.progressPercent,
     trophiesSyncedAt: fresco?.trophiesSyncedAt ?? estado?.syncedAt ?? null,
+    notes: fresco?.notes ?? null,
     trophies,
   };
 }
