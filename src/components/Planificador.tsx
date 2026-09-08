@@ -57,6 +57,20 @@ export function Planificador({ collections, library, handle }: { collections: Co
     faltanHltb.forEach(g => syncHltbAction(g.id, g.title));
   }, [objetivos]);
 
+  // ¿Tiene ALGÚN juego un tiempo de HLTB real? La API de HowLongToBeat
+  // cambió de verdad (7 sept 2026, ver lib/hltb.ts) — ahora mismo
+  // `syncGameHltb` nunca encuentra nada, así que sin esto "Más rápido
+  // (HLTB)" saldría siempre en el desplegable aunque ordenar por ahí no
+  // cambiara nada (todos los juegos empatan a "sin dato"). Se oculta la
+  // opción, no se borra: en cuanto algún juego tenga `hltb` de verdad
+  // (arreglen la API, o alguien ya lo tenía guardado de antes), vuelve a
+  // aparecer sola.
+  const hayHltb = objetivos.some((g) => g.hltb?.completionist || g.hltb?.mainExtra || g.hltb?.main);
+  const ordenesDisponibles = useMemo(
+    () => (hayHltb ? ORDENES : ORDENES.filter((o) => o.value !== "hltb")),
+    [hayHltb],
+  );
+
   const ordered = useMemo(
     () =>
       [...objetivos].sort((a, b) => {
@@ -102,7 +116,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
             options={collections.map((c) => ({ value: c.id, label: c.name, count: c.gameIds.length }))}
             className="w-52"
           />
-          <Dropdown value={sort} onChange={(v) => setSort(v as typeof sort)} options={ORDENES} className="w-48" />
+          <Dropdown value={sort} onChange={(v) => setSort(v as typeof sort)} options={ordenesDisponibles} className="w-48" />
         </div>
       </div>
 
