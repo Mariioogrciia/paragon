@@ -20,11 +20,18 @@ function faltan(game: Game): number {
   return Math.max(0, game.definedTotal - game.earnedTotal);
 }
 
+/** Historia y platino por separado (pedido explícito), no un solo número
+ * combinado — en el plan de platinos importan los dos: la historia dice
+ * "cuánto para ver el final", el platino "cuánto para el 100%". */
 function formatHltb(game: Game) {
   if (!game.hltb) return null;
-  const time = game.hltb.completionist || game.hltb.mainExtra || game.hltb.main;
-  if (!time) return null;
-  return `⏱ ${time}h`;
+  const historia = game.hltb.main;
+  const platino = game.hltb.completionist ?? game.hltb.mainExtra;
+  if (historia == null && platino == null) return null;
+  const partes = [];
+  if (historia != null) partes.push(`⏱ ${historia}h historia`);
+  if (platino != null) partes.push(`🏆 ${platino}h platino`);
+  return partes.join(" · ");
 }
 
 /**

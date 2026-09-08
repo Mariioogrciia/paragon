@@ -20,6 +20,7 @@ import { gameProgress, nextSteps, repartoDlc } from "@/lib/stats";
 import { dificultadDeJuego } from "@/lib/difficulty";
 import { estimarEta } from "@/lib/eta";
 import { EtaPlatinoCard } from "@/components/EtaPlatino";
+import { HltbCard, AutoSyncHltb } from "@/components/HltbCard";
 import type { Trophy } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 import { CompartirImagen } from "@/components/CompartirImagen";
@@ -369,6 +370,12 @@ export default async function JuegoPage({
             </p>
           </section>
         )}
+
+        <HltbCard hltb={game.hltb} />
+        {/* `undefined` = nunca comprobado; `{}` = comprobado y sin dato —
+            solo se dispara la búsqueda en el primer caso, para no repetirla
+            en cada visita de un juego que de verdad no tiene tiempo en HLTB. */}
+        {game.hltb === undefined && <AutoSyncHltb gameId={game.id} title={game.title} />}
 
         {eta && <EtaPlatinoCard eta={eta} esMio={esMio} />}
 
