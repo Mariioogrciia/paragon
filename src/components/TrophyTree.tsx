@@ -5,6 +5,17 @@ import type { Trophy, Platform } from "@/lib/types";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { colorFor } from "@/lib/design";
 
+/** Selector CSS seguro para `data-trophy-id`. Comprobado contra los 15.574
+ * trofeos reales de la base: ninguno lleva comillas ni barras invertidas
+ * hoy (no rompe con datos actuales), pero el id de un logro de Steam es
+ * texto libre que pone la desarrolladora (visto en la base: espacios,
+ * puntos, corchetes — "Leg day", "geometry.ach.path08.08") y nada impide
+ * que un juego futuro use uno con comillas. Sin `CSS.escape`, ESE trofeo
+ * rompería el `querySelector` de todo el árbol, no solo el suyo. */
+function selectorTrofeo(id: string): string {
+  return `[data-trophy-id="${typeof CSS !== "undefined" && CSS.escape ? CSS.escape(id) : id}"]`;
+}
+
 export function TrophyTree({
   trophies,
   platform,
@@ -17,7 +28,13 @@ export function TrophyTree({
   const containerRef = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<{ id: string; x1: number; y1: number; x2: number; y2: number; color: string }[]>([]);
 
-  // Agrupamos en 4 niveles
+  // Agrupamos en 4 niveles. IMPORTANTE para quien retome esto: ni PSN ni
+  // Steam exponen qué trofeo desbloquea a cuál — no existe ese dato en
+  // ninguna API. Las líneas de este árbol son puramente visuales (reparten
+  // los hijos entre padres del nivel de arriba por orden de lista, ver
+  // `childrenPerParent` más abajo), no una ruta de desbloqueo real. Por eso
+  // el pie de la vista lo dice explícito: sin ese aviso, el árbol se lee
+  // como un tech tree de verdad y no lo es.
   const levels = useMemo(() => {
     const hasGrades = trophies.some(t => t.grade);
     let l1: Trophy[] = [];
@@ -58,7 +75,7 @@ export function TrophyTree({
 
         for (let j = 0; j < currentLevel.length; j++) {
           const parent = currentLevel[j];
-          const parentEl = container.querySelector(`[data-trophy-id="${parent.id}"]`);
+          const parentEl = container.querySelector(selectorTrofeo(parent.id));
           if (!parentEl) continue;
           
           const parentRect = parentEl.getBoundingClientRect();
@@ -71,7 +88,7 @@ export function TrophyTree({
           
           for (let k = startIndex; k < endIndex; k++) {
             const child = nextLevel[k];
-            const childEl = container.querySelector(`[data-trophy-id="${child.id}"]`);
+            const childEl = container.querySelector(selectorTrofeo(child.id));
             if (!childEl) continue;
 
             const childRect = childEl.getBoundingClientRect();
@@ -114,8 +131,11 @@ export function TrophyTree({
 
   return (
     <div ref={containerRef} className="relative w-full py-10 px-4 min-h-[500px]">
-      <svg 
-        className="absolute inset-0 pointer-events-none z-0" 
+      <p className="relative z-10 mb-2 text-center text-[0.6875rem] text-muted">
+        Agrupado por metal (o rareza), no por orden real de desbloqueo — ni PSN ni Steam dicen qué trofeo requiere a cuál.
+      </p>
+      <svg
+        className="absolute inset-0 pointer-events-none z-0"
         style={{ width: "100%", height: "100%" }}
       >
         {lines.map(line => (
