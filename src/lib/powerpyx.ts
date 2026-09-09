@@ -95,6 +95,46 @@ export function normalizar(titulo: string): string {
 }
 
 /**
+ * Títulos que PowerPyx llama de otra forma real, curados a mano UNO A UNO
+ * — nunca una regla genérica ("quitar lo que va después de los dos
+ * puntos"), que es justo lo que ya se descartó a propósito: comprobado
+ * contra PowerPyx real que "Resident Evil 4" y "Resident Evil 4 Remake"
+ * tienen guías DISTINTAS de verdad, así que una regla de subtítulo habría
+ * reintroducido el caso "Blood and Wine" tarde o temprano.
+ *
+ * Cada entrada de aquí se comprobó a mano contra powerpyx.com el 9 de
+ * septiembre de 2026: se confirmó que la guía encontrada con el título de
+ * la derecha es la del MISMO juego que el de la izquierda, y que no existe
+ * ninguna guía real y distinta bajo el título más corto/distinto que
+ * pudiera colarse por error (el mismo cuidado que ya evitó el caso
+ * Resident Evil 4). Añadir una entrada nueva sin comprobar esto a mano
+ * primero reintroduce el riesgo que esta lista existe para evitar.
+ *
+ * La clave va normalizada (`normalizar()`) para no depender de mayúsculas,
+ * tildes o el símbolo ™/® exacto que traiga el título de PSN/Steam.
+ */
+const TITULOS_ALTERNATIVOS: Record<string, string> = {
+  // PowerPyx solo tiene la guía clásica bajo el nombre corto, sin el
+  // subtítulo — no hay ninguna otra guía real de "Metal Gear Solid 4" que
+  // sea un juego distinto.
+  [normalizar("Metal Gear Solid 4: Guns of the Patriots")]: "Metal Gear Solid 4",
+  // PowerPyx llama a su guía "Resident Evil 7" a secas (el subtítulo
+  // "Biohazard" es el nombre japonés del mismo juego, no otro producto).
+  [normalizar("Resident Evil 7: Biohazard")]: "Resident Evil 7",
+  // La guía de PowerPyx no lleva "Marvel's" delante — comprobado que no
+  // colisiona con "Marvel's Spider-Man 2", que tiene su propia guía aparte
+  // y su propio título distinto en la búsqueda.
+  [normalizar("Marvel's Spider-Man: Miles Morales")]: "Spider-Man: Miles Morales",
+  // El remake de 2020 de Mafia, PowerPyx lo llama "Mafia 1 Remake" en vez
+  // de solo "Mafia" — sin el "1 Remake" delante, la búsqueda no encuentra
+  // coincidencia exacta con el título tal cual lo da PSN.
+  [normalizar("Mafia: Definitive Edition")]: "Mafia 1 Remake: Definitive Edition",
+  // "WWII" (números romanos, como lo da PSN) vs "WW2" (como lo escribe
+  // PowerPyx) — mismo juego, solo cambia cómo se escribe el número.
+  [normalizar("Call of Duty: WWII")]: "Call of Duty WW2",
+};
+
+/**
  * Busca la guía de un juego por título y devuelve su URL — solo si hay una
  * coincidencia EXACTA tras normalizar. Nunca "el primer resultado": buscando
  * "The Witcher 3" el primer resultado real es el DLC "Blood and Wine", no el
@@ -134,14 +174,23 @@ async function buscarGuia(titulo: string): Promise<string | null> {
   // sigue siendo con `normalizar()`, que ya ignora esto de todas formas.
   const consulta = titulo.replace(/[™®©]/g, "").trim();
 
-  const [conGuia, pelado] = await Promise.all([
+  // Título alternativo curado a mano (ver TITULOS_ALTERNATIVOS arriba): va
+  // como una búsqueda MÁS, en paralelo con las otras dos — no sustituye a
+  // `objetivo` (la comparación de igualdad sigue siendo con el título real
+  // de PSN/Steam), sino que usa el título alternativo como SU PROPIO
+  // objetivo, porque la guía de PowerPyx en estos casos concretos se llama
+  // literalmente distinto, no solo con un sufijo de más o de menos.
+  const alternativo = TITULOS_ALTERNATIVOS[objetivo];
+
+  const [conGuia, pelado, porAlternativo] = await Promise.all([
     buscarEn(`${consulta} Trophy Guide`, objetivo),
     buscarEn(consulta, objetivo),
+    alternativo ? buscarEn(`${alternativo} Trophy Guide`, normalizar(alternativo)) : Promise.resolve(null),
   ]);
   // La consulta con "Trophy Guide" es la que de verdad soluciona el caso
   // real (Elden Ring tapado por Nightreign) — se prefiere si las dos
   // encuentran algo, aunque en la práctica casi siempre coinciden.
-  return conGuia ?? pelado;
+  return conGuia ?? pelado ?? porAlternativo;
 }
 
 async function buscarEn(consulta: string, objetivo: string): Promise<string | null> {
