@@ -125,7 +125,7 @@ export function TrophyList({
                   type="button"
                   onClick={() => alternarFiltro(f.valor)}
                   aria-pressed={activo}
-                  className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-colors"
+                  className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
                   style={
                     activo
                       ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
