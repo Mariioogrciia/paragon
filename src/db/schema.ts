@@ -231,6 +231,22 @@ export const games = pgTable("game", {
     mainExtra?: number;
     completionist?: number;
   }>(),
+  /**
+   * Trofeos perdibles (lib/powerpyx.ts), cacheados a nivel de JUEGO (no por
+   * usuario, como el resto de metadatos de catálogo de aquí arriba) — el
+   * mismo motivo que `guideVideoId` en game_trophy: la respuesta es la
+   * misma para cualquiera que consulte este juego. Antes se confiaba en la
+   * caché de `fetch` de Next (`next: { revalidate }`) para esto mismo, pero
+   * medido en vivo (9 sept 2026) tres visitas seguidas a la misma ficha
+   * tardaban igual (~1,3-1,5s cada vez) — esa caché no estaba funcionando
+   * de verdad, por lo que sea del entorno. Guardarlo en la propia base,
+   * como ya se hace con `hltb` y `guideVideoId`, es la única caché de las
+   * tres que se ha comprobado que sí acierta de verdad entre peticiones.
+   * `[]` (array vacío) = se comprobó y no hay ninguno; `null` = nunca se
+   * ha comprobado.
+   */
+  missableTrophies: jsonb("missableTrophies").$type<string[]>(),
+  missableTrophiesCheckedAt: timestamp("missableTrophiesCheckedAt", { mode: "date" }),
   /** Null mientras no hayamos pedido los metadatos a la tienda. */
   metadataSyncedAt: timestamp("metadataSyncedAt", { mode: "date" }),
 }, (g) => [

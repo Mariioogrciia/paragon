@@ -18,7 +18,7 @@ import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { xpSteamPorRareza } from "@/lib/trophyScore";
-import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDe } from "@/lib/powerpyx";
+import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import {
   type AccountPlatform,
@@ -737,8 +737,46 @@ export async function getGameDetail(
   // mano — buscar "Garry's Mod" da "sin resultados"). Se pide en paralelo
   // con la consulta de trofeos de abajo, no en serie, para no sumar su
   // latencia a la de la base de datos.
-  const perdiblesPromesa =
-    game.platform === "psn" ? trofeosPerdiblesDe(game.title) : Promise.resolve(new Set<string>());
+  //
+  // Cacheado en `games.missableTrophies` (30 días), a nivel de JUEGO, no de
+  // usuario — se confiaba en la caché de `fetch` de Next
+  // (`next: { revalidate }`, dentro de trofeosPerdiblesDe) para esto mismo,
+  // pero medido en vivo (9 sept 2026) tres visitas seguidas a la misma
+  // ficha tardaban igual, ~1,3-1,5s cada una — esa caché no estaba
+  // acertando de verdad, por lo que sea del entorno. Guardarlo en la
+  // propia base es el mismo patrón que ya funciona de verdad para
+  // `guideVideoId`/`hltb`, comprobado hoy mismo.
+  const perdiblesPromesa = (async () => {
+    if (game.platform !== "psn") return new Set<string>();
+
+    const [cache] = await db
+      .select({
+        missableTrophies: gamesTable.missableTrophies,
+        checkedAt: gamesTable.missableTrophiesCheckedAt,
+      })
+      .from(gamesTable)
+      .where(eq(gamesTable.id, gameId))
+      .limit(1);
+
+    const CACHE_MS = 30 * 86_400_000;
+    if (cache?.checkedAt && Date.now() - cache.checkedAt.getTime() < CACHE_MS) {
+      return new Set(cache.missableTrophies ?? []);
+    }
+
+    const { ok, nombres } = await trofeosPerdiblesDeConEstado(game.title);
+    // Solo se cachea si la búsqueda llegó a completarse de verdad — un
+    // fallo de red no es lo mismo que "se comprobó y no hay ninguno" (ver
+    // el comentario de `trofeosPerdiblesDeConEstado`). Sin este chequeo,
+    // un fallo de un momento dejaría el juego marcado "sin perdibles"
+    // durante 30 días.
+    if (ok) {
+      await db
+        .update(gamesTable)
+        .set({ missableTrophies: [...nombres], missableTrophiesCheckedAt: new Date() })
+        .where(eq(gamesTable.id, gameId));
+    }
+    return nombres;
+  })();
 
   const rows = await db
     .select({

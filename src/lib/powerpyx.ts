@@ -268,29 +268,48 @@ function resumenPerdibles(html: string): Set<string> {
 }
 
 /**
- * Punto de entrada: dado el título de un juego, los nombres normalizados de
- * sus trofeos perdibles según PowerPyx (vacío si no hay guía, si la
- * petición falla, o si algo no encaja). Nunca lanza — un fallo aquí no
- * puede tirar abajo la ficha de un juego.
+ * Igual que `trofeosPerdiblesDe`, pero además dice si la búsqueda llegó a
+ * completarse de verdad (`ok`) — hace falta esa distinción para cachear en
+ * base de datos (ver `getGameDetail`, lib/profiles.ts): un fallo de RED
+ * (visto en vivo: "fetch failed", certificado TLS, en este mismo entorno)
+ * no es lo mismo que "se preguntó a PowerPyx y no hay ningún perdible" —
+ * cachear lo primero como si fuera lo segundo dejaría el juego marcado
+ * "sin perdibles" durante 30 días por un fallo de un momento, el mismo
+ * error que ya se evitó a propósito para HLTB (lib/hltb.ts).
  */
-export async function trofeosPerdiblesDe(tituloJuego: string): Promise<Set<string>> {
+export async function trofeosPerdiblesDeConEstado(
+  tituloJuego: string,
+): Promise<{ ok: boolean; nombres: Set<string> }> {
   try {
     const guia = await buscarGuia(tituloJuego);
-    if (!guia) return new Set();
+    if (!guia) return { ok: true, nombres: new Set() };
 
     const res = await fetch(guia, {
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 30 * 86_400 },
     });
-    if (!res.ok) return new Set();
+    if (!res.ok) return { ok: true, nombres: new Set() };
     const html = await res.text();
 
     // Unión, no la primera que encuentre algo: son dos fuentes distintas
     // dentro de la misma página y ninguna cubre sola todos los casos (ver
     // el comentario de `resumenPerdibles`).
-    return new Set([...trofeosPerdibles(html), ...resumenPerdibles(html)]);
+    return { ok: true, nombres: new Set([...trofeosPerdibles(html), ...resumenPerdibles(html)]) };
   } catch (error) {
-    console.error("[powerpyx] trofeosPerdiblesDe", error);
-    return new Set();
+    console.error("[powerpyx] trofeosPerdiblesDeConEstado", error);
+    return { ok: false, nombres: new Set() };
   }
+}
+
+/**
+ * Punto de entrada: dado el título de un juego, los nombres normalizados de
+ * sus trofeos perdibles según PowerPyx (vacío si no hay guía, si la
+ * petición falla, o si algo no encaja). Nunca lanza — un fallo aquí no
+ * puede tirar abajo la ficha de un juego. Para cachear el resultado en
+ * base de datos, usar `trofeosPerdiblesDeConEstado` en su lugar: esta
+ * versión, a propósito, no distingue "no hay ninguno" de "falló la red".
+ */
+export async function trofeosPerdiblesDe(tituloJuego: string): Promise<Set<string>> {
+  const { nombres } = await trofeosPerdiblesDeConEstado(tituloJuego);
+  return nombres;
 }
