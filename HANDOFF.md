@@ -1,9 +1,76 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **7 de septiembre de 2026**
+releer todo el historial. Última actualización: **9 de septiembre de 2026**
 (con Antigravity trabajando en paralelo todo el rato — más abajo hay un
 aviso de qué tocó él).
+
+---
+
+## Sesión del 8-9 de septiembre de 2026 (continuación 3) — vídeo de guía cacheado, auditoría PSN, subtítulos descartados a propósito, hover
+
+Cuatro cosas propuestas por Claude, no pedidas por el usuario, con luz
+verde para todas.
+
+### El vídeo de guía por trofeo ya existía — solo le faltaba caché y un "buscar otro"
+
+El usuario pidió tener vídeos de localizaciones "más a mano" — ya existía
+(`TrophyGuideModal.tsx`, clic en cualquier trofeo de la lista, busca solo en
+YouTube y lo reproduce incrustado). Lo que sí faltaba, encontrado al
+revisarlo: **nunca guardaba el resultado** — cada persona que abría el
+mismo trofeo repetía la misma búsqueda de scraping en vivo. Arreglado con
+`game_trophy.guideVideoId` (migración ejecutada): se cachea a nivel de
+trofeo, no por usuario, la primera búsqueda vale para todo el mundo.
+
+Efecto secundario real de cachear: si la primera búsqueda pilla un vídeo
+irrelevante, se queda mal **para siempre**. Arreglado con
+`rebuscarVideoGuiaAction` + botón "No es este — buscar otro" (solo en tu
+propia ficha) — guarda TODOS los candidatos distintos de la búsqueda (antes
+solo el primero) y ofrece el siguiente al que ya había, no el mismo de
+siempre.
+
+### PSN auditado con el mismo criterio que Xbox/Steam/IGDB — sin nada que arreglar
+
+Tras el bug real de Xbox que tiró la app entera (ver la sesión anterior),
+se revisó `lib/psn/client.ts` con la misma sospecha. Encontrado: sí hay
+llamadas a `psn-api` sin `try/catch` propio (`horasJugadas`'s bucle
+principal, el `Promise.all` de `fetchTrophies`). Pero a diferencia de
+Xbox, **ya estaban protegidas en capas por encima** — `mapLimit` (ya
+existía, no es de esta sesión) envuelve cada juego en su propio
+`try/catch` ("un juego que falle no puede tumbar la sincronización
+entera"), y `resyncLibraries`/`resyncPlatform` (arreglados en la sesión
+anterior) protegen el nivel de cuenta. Ninguna ruta real llega sin
+capturar hasta el layout raíz. Auditado de verdad, no solo revisado por
+encima — conclusión honesta: no había nada que arreglar aquí.
+
+### Coincidencia de título por subtítulo — investigado y DESCARTADO a propósito
+
+Se planteó recortar el subtítulo tras ":" para que "Metal Gear Solid 4:
+Guns of the Patriots" encontrara la guía de PowerPyx (que solo se llama
+"Metal Gear Solid 4"). Probado contra PowerPyx real antes de escribir
+nada: **"Resident Evil 4" y "Resident Evil 4 Remake" tienen guías
+DISTINTAS y reales** — recortar "Remake" habría emparejado con el juego
+original de 2005, un caso real y actual de "Blood and Wine" otra vez, no
+teórico. Mismo problema con "Final Fantasy VII" vs "Final Fantasy VII
+Remake". **No se implementó** — MGS4 sigue sin encontrar guía, a
+propósito: correcto-pero-incompleto es mejor que adivinar mal. Quien
+retome esto: cualquier heurística de subtítulo necesitaría una lista
+curada de qué sufijos son "edición" (seguro) contra qué sufijos son "otro
+juego" (peligroso), no un recorte genérico por ":".
+
+### Auditoría de hover en todo el proyecto
+
+Regla del usuario: todo control clicable necesita hover visible. Barrido
+de todos los archivos con `<button>`/`onClick` sin NINGÚN `hover:` en el
+archivo entero — tres casos reales, ninguno de hoy: `CardCarousel.tsx`
+(las flechas tenían `transition-opacity` puesta pero sin ningún
+`hover:opacity-*` que la disparara — declaración muerta),
+`PriceHistoryChart.tsx` (mismo patrón que los chips de filtro de la
+sesión anterior: fondo por `style` inline sin hover), y
+`global-error.tsx` (sin clases en todo el archivo a propósito — el hover
+de sus dos botones va por `onMouseEnter`/`onMouseLeave` en vez de CSS).
+No es exhaustivo: un archivo con hover en un botón y sin él en otro no lo
+detecta este barrido, solo "archivo entero sin ninguno".
 
 ---
 
