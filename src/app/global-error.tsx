@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Solo se dispara si falla el propio layout raíz (sesión, `<html>`, lo que
@@ -21,6 +21,15 @@ export default function GlobalError({
   useEffect(() => {
     console.error("[global-error.tsx]", error);
   }, [error]);
+
+  // Sin clases en todo este archivo a propósito (ver el comentario de
+  // arriba) — un `hover:` de Tailwind no se puede escribir con `style`
+  // inline, así que el hover de los dos botones va por estado en vez de
+  // CSS. Regla del usuario para toda la UI: todo control clicable
+  // necesita un hover visible, sin excepción por ser la pantalla de
+  // "todo se rompió".
+  const [hoverReintentar, setHoverReintentar] = useState(false);
+  const [hoverInicio, setHoverInicio] = useState(false);
 
   return (
     <html lang="es">
@@ -53,12 +62,14 @@ export default function GlobalError({
         <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
           <button
             onClick={reset}
+            onMouseEnter={() => setHoverReintentar(true)}
+            onMouseLeave={() => setHoverReintentar(false)}
             style={{
               borderRadius: 8,
               padding: "10px 24px",
               fontWeight: 700,
               color: "#0b0e14",
-              background: "#7fbcd8",
+              background: hoverReintentar ? "#9ccfe6" : "#7fbcd8",
               border: "none",
               cursor: "pointer",
             }}
@@ -67,12 +78,15 @@ export default function GlobalError({
           </button>
           <a
             href="/"
+            onMouseEnter={() => setHoverInicio(true)}
+            onMouseLeave={() => setHoverInicio(false)}
             style={{
               borderRadius: 8,
               padding: "10px 24px",
               fontWeight: 700,
               color: "#e8eaed",
-              border: "1px solid #2a2f3a",
+              border: `1px solid ${hoverInicio ? "#4a5262" : "#2a2f3a"}`,
+              background: hoverInicio ? "rgba(255,255,255,0.05)" : "transparent",
               textDecoration: "none",
             }}
           >

@@ -31,7 +31,7 @@ export function CardCarousel({ children }: { children: React.ReactNode }) {
         type="button"
         aria-label="Anterior"
         onClick={() => mover(-1)}
-        className="absolute left-0 top-1/2 hidden h-9 w-9 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full text-lg font-bold shadow-lg transition-opacity sm:flex"
+        className="absolute left-0 top-1/2 hidden h-9 w-9 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full text-lg font-bold shadow-lg transition-opacity hover:opacity-70 sm:flex"
         style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
       >
         ‹
@@ -40,7 +40,7 @@ export function CardCarousel({ children }: { children: React.ReactNode }) {
         type="button"
         aria-label="Siguiente"
         onClick={() => mover(1)}
-        className="absolute right-0 top-1/2 hidden h-9 w-9 -translate-y-1/2 translate-x-3 items-center justify-center rounded-full text-lg font-bold shadow-lg transition-opacity sm:flex"
+        className="absolute right-0 top-1/2 hidden h-9 w-9 -translate-y-1/2 translate-x-3 items-center justify-center rounded-full text-lg font-bold shadow-lg transition-opacity hover:opacity-70 sm:flex"
         style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
       >
         ›

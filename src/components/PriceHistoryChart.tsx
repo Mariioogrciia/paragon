@@ -179,7 +179,7 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
             type="button"
             onClick={() => setRango(r.key)}
             aria-pressed={rango === r.key}
-            className={`rounded-md font-bold uppercase tracking-wide transition-colors ${compact ? "px-1.5 py-0.5 text-[0.625rem]" : "px-2.5 py-1 text-[0.6875rem]"}`}
+            className={`rounded-md font-bold uppercase tracking-wide transition-all hover:opacity-70 ${compact ? "px-1.5 py-0.5 text-[0.625rem]" : "px-2.5 py-1 text-[0.6875rem]"}`}
             style={
               rango === r.key
                 ? { background: "rgb(var(--accent-rgb) / 0.16)", color: "var(--accent-text)" }
