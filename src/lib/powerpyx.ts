@@ -166,13 +166,20 @@ async function buscarGuia(titulo: string): Promise<string | null> {
   const objetivo = normalizar(titulo);
   if (!objetivo) return null;
 
-  // El buscador de PowerPyx (WordPress) devuelve "sin resultados" si la
-  // consulta lleva el símbolo de marca registrada (™/®) que traen algunos
-  // títulos de PSN/Steam tal cual — comprobado a mano: buscar "Uncharted 4:
-  // A Thief's End™" no encuentra nada, buscar sin el "™" sí encuentra la
-  // guía exacta. Se busca con el título limpio; la comparación de igualdad
-  // sigue siendo con `normalizar()`, que ya ignora esto de todas formas.
-  const consulta = titulo.replace(/[™®©]/g, "").trim();
+  // El buscador de PowerPyx (WordPress) devuelve "sin resultados" (o
+  // resultados irrelevantes, que es peor) si la consulta lleva ciertos
+  // caracteres que traen algunos títulos de PSN/Steam tal cual — comprobado
+  // a mano, dos casos reales distintos:
+  // 1. El símbolo de marca registrada (™/®): "Uncharted 4: A Thief's
+  //    End™" no encuentra nada, sin el "™" sí encuentra la guía exacta.
+  // 2. LOS DOS PUNTOS, en general, no solo con marca registrada al lado:
+  //    "Call of Duty®: Black Ops 4" no encuentra nada, pero "Call of Duty
+  //    Black Ops 4" (mismas palabras, sin el ":") encuentra la guía exacta
+  //    en primera posición. No es un cambio de título — la comparación de
+  //    igualdad sigue siendo con `normalizar()`, que ya trata ":" como
+  //    puntuación de todas formas — es solo que WordPress busca peor con
+  //    ":" de por medio.
+  const consulta = titulo.replace(/[™®©:]/g, "").trim();
 
   // Título alternativo curado a mano (ver TITULOS_ALTERNATIVOS arriba): va
   // como una búsqueda MÁS, en paralelo con las otras dos — no sustituye a
