@@ -7,6 +7,74 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 9 de septiembre de 2026 (continuación 4) — más cobertura de perdibles, y tres peticiones nuevas sin cerrar
+
+### Perdibles: lista curada de títulos alternativos + los ":" rompen la búsqueda de PowerPyx
+
+El usuario pidió expresamente lo de MGS4 "con mucho cuidado y para juegos
+que se sabe" — nada de una regla genérica de subtítulo (ya descartada antes
+por el caso real Resident Evil 4 vs Resident Evil 4 Remake, guías
+distintas de verdad).
+
+`TITULOS_ALTERNATIVOS` (lib/powerpyx.ts): mapa fijo, comprobado a mano uno
+a uno contra powerpyx.com, de juegos reales de la biblioteca del usuario
+que PowerPyx llama de otra forma —
+
+- Metal Gear Solid 4: Guns of the Patriots → "Metal Gear Solid 4"
+- Resident Evil 7: Biohazard → "Resident Evil 7"
+- Marvel's Spider-Man: Miles Morales → "Spider-Man: Miles Morales" (sin
+  "Marvel's" — comprobado que no colisiona con "Marvel's Spider-Man 2")
+- Mafia: Definitive Edition → "Mafia 1 Remake: Definitive Edition"
+- Call of Duty: WWII → "Call of Duty WW2"
+
+Va como una tercera búsqueda en paralelo, usando el alternativo como su
+propio objetivo de comparación — la comparación contra el título REAL de
+PSN/Steam no se relaja. Verificado: las 5 guías se encuentran ahora (antes
+0). MGS4 pasa de 0 a 24 perdibles. Los otros 4 dan 0 perdibles — comprobado
+contra el HTML real que es CORRECTO (3 de esos 4 juegos tienen 0 perdibles
+de verdad; Resident Evil 7 tiene 31 pero solo en prosa sin lista de
+nombres, mismo caso ya documentado de Silent Hill 2).
+
+**Hallazgo aparte, más general y sin el riesgo de una lista curada**: los
+DOS PUNTOS por sí solos rompen la búsqueda de PowerPyx — "Call of Duty®:
+Black Ops 4" da 0 resultados, "Call of Duty Black Ops 4" (mismas palabras,
+sin ":") encuentra la guía real en primera posición. No es un cambio de
+título, es un problema de cómo busca WordPress con ese carácter — se quita
+de la CONSULTA (no de la comparación de igualdad, que sigue igual de
+estricta). Arregla Call of Duty Black Ops 4 y Ghost of Tsushima: Iki
+Island, sin tocar nada que ya funcionara.
+
+### Tres peticiones nuevas del usuario, sin empezar todavía
+
+1. **Función personal de "ocultar cosas"** — no de comunidad, algo como
+   poder ocultar tarjetas/elementos que aparecen en algún sitio de la app
+   que no interesan. **Sin concretar todavía qué se oculta ni dónde**
+   (¿recomendaciones de Descubrir? ¿juegos sugeridos? ¿noticias?) — hace
+   falta preguntarlo antes de construir nada, la sesión se cortó justo
+   antes de esa pregunta.
+2. **La campana de avisos "no tiene utilidad real"**, según el usuario —
+   se empezó a revisar qué hace de verdad hoy (`Header.tsx` línea ~194-309,
+   `avisosSinLeer`, ruta `/avisos`) pero se interrumpió antes de sacar
+   ninguna conclusión. Sigue sin revisar a fondo.
+3. **Quitar del selector de plataformas las que no se pueden sincronizar
+   de verdad** (Epic Games, y probablemente Google Play/Ubisoft por el
+   mismo motivo) — el usuario pegó una investigación real sobre la API de
+   Epic: no existe una REST API pública documentada para leer logros de
+   cuentas ajenas; solo queda ingeniería inversa de su GraphQL interno
+   (que puede cambiar sin avisar) o apoyarse en proyectos de la comunidad
+   (Legendary, Heroic Games Launcher) que ya descifraron su OAuth2. Nada
+   de esto se ha decidido ni construido — sigue exactamente como estaba
+   (`resolveEpic`/`resolveUbisoft`/`resolveGoogle` con `legible: false`,
+   vinculable pero sin sincronizar, la UI ya dice "en fase de desarrollo").
+
+**Para quien retome esto**: las tres siguen abiertas, ninguna se ha tocado
+más allá de leer el código de la campana por encima. La 1 necesita una
+pregunta directa al usuario antes de nada; la 3 es una decisión de
+producto (quitar la opción de vincular del todo, o dejarla como está con
+el aviso que ya tiene) más que un problema técnico nuevo.
+
+---
+
 ## Sesión del 8-9 de septiembre de 2026 (continuación 3) — vídeo de guía cacheado, auditoría PSN, subtítulos descartados a propósito, hover
 
 Cuatro cosas propuestas por Claude, no pedidas por el usuario, con luz
