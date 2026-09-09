@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import {
   searchTrophyGuideAction,
+  rebuscarVideoGuiaAction,
   pinTrophyAction,
   getTrophyGuidesAction,
   saveTrophyGuideAction,
@@ -57,6 +58,7 @@ export function TrophyGuideModal({
   const [isPending, startTransition] = useTransition();
   const [videoId, setVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rebuscando, setRebuscando] = useState(false);
   const [pestaña, setPestaña] = useState<"video" | "guia">("video");
 
   useEffect(() => {
@@ -69,6 +71,26 @@ export function TrophyGuideModal({
       setLoading(false);
     });
   }, [gameTitle, trophy.name, gameId, trophy.id]);
+
+  // "Buscar otro" — el vídeo cacheado puede no ser el correcto (la caché
+  // guarda "el primero" de esta misma sesión, no una comprobación de que
+  // sea el trofeo de verdad). Solo tiene sentido con `gameId` real: sin él
+  // no hay dónde guardar el resultado, y `rebuscarVideoGuiaAction` lo exige.
+  function buscarOtro() {
+    if (!gameId) return;
+    setRebuscando(true);
+    startTransition(async () => {
+      try {
+        const id = await rebuscarVideoGuiaAction(gameId, trophy.id, gameTitle, trophy.name);
+        setVideoId(id);
+      } catch {
+        // Sin sesión (requireUserId lanza) u otro fallo — se queda el vídeo
+        // que ya había, sin romper el modal.
+      } finally {
+        setRebuscando(false);
+      }
+    });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -149,10 +171,10 @@ export function TrophyGuideModal({
 
         {pestaña === "video" ? (
           <div className="relative aspect-video w-full bg-black">
-            {loading ? (
+            {loading || rebuscando ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-current border-t-transparent" />
-                <p className="text-sm">Buscando la mejor guía en YouTube...</p>
+                <p className="text-sm">{rebuscando ? "Buscando otro vídeo..." : "Buscando la mejor guía en YouTube..."}</p>
               </div>
             ) : videoId ? (
               <iframe
@@ -166,6 +188,26 @@ export function TrophyGuideModal({
                 <p className="text-lg mb-2">No se encontró vídeo</p>
                 <p className="text-sm">No pudimos encontrar una guía en YouTube para este trofeo de manera automática.</p>
               </div>
+            )}
+
+            {/* Solo en tu propia ficha: el vídeo es una búsqueda automática,
+                no una comprobación humana de que sea el trofeo correcto —
+                sin este botón, un acierto malo de la primera búsqueda se
+                queda cacheado mal para todo el mundo, para siempre. */}
+            {esMio && gameId && !loading && !rebuscando && (
+              <button
+                onClick={buscarOtro}
+                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-black/80"
+                style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(6px)" }}
+                title={videoId ? "¿No es el vídeo correcto? Busca otro." : "Buscar de nuevo"}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 4v6h-6" />
+                  <path d="M1 20v-6h6" />
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+                {videoId ? "No es este — buscar otro" : "Buscar de nuevo"}
+              </button>
             )}
           </div>
         ) : (

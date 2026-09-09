@@ -843,6 +843,31 @@ export async function setFavoritesAction(gameIds: string[]) {
 }
 
 /**
+ * Ids de vídeo de una búsqueda en YouTube, en el orden en que salen (sin
+ * duplicados) — no solo el primero, para que `rebuscarVideoGuiaAction`
+ * pueda ofrecer "el siguiente" cuando el primero no era el correcto.
+ */
+async function buscarCandidatosYouTube(query: string): Promise<string[]> {
+  try {
+    const res = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
+      // Sin esto YouTube a veces sirve una versión reducida de la página
+      // sin los datos de vídeo incrustados — comprobado a mano.
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    // Los datos iniciales de YouTube traen ids de vídeo como "videoId":"XXXXXXXXXXX",
+    // repetidos varias veces cada uno (aparecen en varios bloques de datos
+    // de la misma página) — de ahí el Set, para no ofrecer "el siguiente"
+    // y que sea el mismo vídeo de antes.
+    return [...new Set([...html.matchAll(/"videoId":"([a-zA-Z0-9_-]{11})"/g)].map((m) => m[1]))];
+  } catch (error) {
+    console.error("Error fetching guide from YouTube", error);
+    return [];
+  }
+}
+
+/**
  * Vídeo de YouTube de guía para un trofeo — cacheado en
  * `game_trophy.guideVideoId` (ver el comentario en schema.ts): la primera
  * persona que abre un trofeo dispara la búsqueda de verdad, todas las
@@ -872,23 +897,8 @@ export async function searchTrophyGuideAction(
     if (fila?.guideVideoId) return fila.guideVideoId;
   }
 
-  let videoId: string | null = null;
-  try {
-    const query = encodeURIComponent(`${gameTitle} ${trophyName} trophy guide`);
-    const res = await fetch(`https://www.youtube.com/results?search_query=${query}`, {
-      // Sin esto YouTube a veces sirve una versión reducida de la página
-      // sin los datos de vídeo incrustados — comprobado a mano.
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
-    });
-    if (res.ok) {
-      const html = await res.text();
-      // Los datos iniciales de YouTube traen ids de vídeo como "videoId":"XXXXXXXXXXX"
-      const match = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
-      videoId = match ? match[1] : null;
-    }
-  } catch (error) {
-    console.error("Error fetching guide from YouTube", error);
-  }
+  const candidatos = await buscarCandidatosYouTube(`${gameTitle} ${trophyName} trophy guide`);
+  const videoId = candidatos[0] ?? null;
 
   if (gameId && trophyId) {
     await db
@@ -896,6 +906,51 @@ export async function searchTrophyGuideAction(
       .set({ guideVideoId: videoId ?? "" })
       .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)));
   }
+
+  return videoId;
+}
+
+/**
+ * "Buscar otro vídeo" — fuerza una búsqueda nueva y SOBRESCRIBE la caché de
+ * `searchTrophyGuideAction`, en vez de leerla. Hace falta esta acción
+ * aparte porque, sin ella, un vídeo que la primera búsqueda pilló
+ * irrelevante se queda mal para SIEMPRE (nadie vuelve a preguntarle a
+ * YouTube una vez cacheado) — mismo tipo de riesgo que ya se documentó al
+ * meter la caché.
+ *
+ * No repite el mismo vídeo que ya había: coge el candidato que sigue al
+ * actual en la lista de resultados (o el primero, si el actual ya no
+ * aparece o no había ninguno todavía), en vez de re-lanzar la misma
+ * búsqueda y recibir el mismo primer resultado de siempre.
+ *
+ * Requiere sesión (no anónimo) para no dejar que cualquiera dispare
+ * búsquedas de scraping sin límite — el dato en sí es compartido entre
+ * todos, no privado de quien lo pide.
+ */
+export async function rebuscarVideoGuiaAction(
+  gameId: string,
+  trophyId: string,
+  gameTitle: string,
+  trophyName: string,
+): Promise<string | null> {
+  await requireUserId();
+  const db = getDb();
+
+  const [fila] = await db
+    .select({ guideVideoId: gameTrophies.guideVideoId })
+    .from(gameTrophies)
+    .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)))
+    .limit(1);
+
+  const candidatos = await buscarCandidatosYouTube(`${gameTitle} ${trophyName} trophy guide`);
+  const indiceActual = fila?.guideVideoId ? candidatos.indexOf(fila.guideVideoId) : -1;
+  const siguiente = indiceActual === -1 ? candidatos[0] : candidatos[indiceActual + 1];
+  const videoId = siguiente ?? null;
+
+  await db
+    .update(gameTrophies)
+    .set({ guideVideoId: videoId ?? "" })
+    .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)));
 
   return videoId;
 }
