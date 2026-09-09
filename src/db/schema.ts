@@ -264,6 +264,18 @@ export const gameTrophies = pgTable(
      * unificada a partir de esto (+ grade + rarityPercent).
      */
     xp: integer("xp"),
+    /**
+     * Vídeo de YouTube de guía para ESTE trofeo (`searchTrophyGuideAction`,
+     * `TrophyGuideModal.tsx`) — cacheado a nivel de trofeo, no por usuario:
+     * el vídeo correcto para "encuentra los 36 curios" es el mismo para
+     * cualquiera que juegue este juego. Sin esto, cada persona que abre el
+     * mismo trofeo repetía la misma búsqueda en YouTube desde cero — lento
+     * (scraping en vivo en cada clic) y frágil de más (más peticiones a un
+     * sitio sin API oficial de las que hacen falta). Cadena vacía ("") es
+     * "se buscó y no se encontró nada" — distinto de `null` ("nunca se ha
+     * buscado") para no repetir una búsqueda que ya sabemos que no da nada.
+     */
+    guideVideoId: text("guideVideoId"),
   },
   (t) => [primaryKey({ columns: [t.gameId, t.trophyId] })],
 );

@@ -60,12 +60,15 @@ export function TrophyGuideModal({
   const [pestaña, setPestaña] = useState<"video" | "guia">("video");
 
   useEffect(() => {
-    // Only search if we don't have a video id yet
-    searchTrophyGuideAction(gameTitle, trophy.name).then((id) => {
+    setLoading(true);
+    // gameId/trophy.id dejan que la acción cachee el resultado en
+    // game_trophy — sin ellos (juego manual sin gameId real) busca en vivo
+    // igual, solo que sin guardar para la próxima vez.
+    searchTrophyGuideAction(gameTitle, trophy.name, gameId, trophy.id).then((id) => {
       setVideoId(id);
       setLoading(false);
     });
-  }, [gameTitle, trophy.name]);
+  }, [gameTitle, trophy.name, gameId, trophy.id]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, activityComments, activityReactions, platformAccounts } from "@/db/schema";
+import { users, userGames, activities, activityComments, activityReactions, platformAccounts, gameTrophies } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { auth, signIn, signOut } from "@/auth";
 import {
@@ -842,20 +842,62 @@ export async function setFavoritesAction(gameIds: string[]) {
   revalidatePath('/', 'layout');
 }
 
-export async function searchTrophyGuideAction(gameTitle: string, trophyName: string) {
+/**
+ * Vídeo de YouTube de guía para un trofeo — cacheado en
+ * `game_trophy.guideVideoId` (ver el comentario en schema.ts): la primera
+ * persona que abre un trofeo dispara la búsqueda de verdad, todas las
+ * siguientes (de cualquier usuario) leen lo ya guardado, sin volver a
+ * pedirle nada a YouTube. `gameId`/`trophyId` son opcionales a propósito
+ * (un juego manual sin `gameId` real, por ejemplo): sin ellos se busca en
+ * vivo igual, solo que sin guardar el resultado para la próxima vez.
+ */
+export async function searchTrophyGuideAction(
+  gameTitle: string,
+  trophyName: string,
+  gameId?: string,
+  trophyId?: string,
+) {
+  const db = getDb();
+
+  if (gameId && trophyId) {
+    const [fila] = await db
+      .select({ guideVideoId: gameTrophies.guideVideoId })
+      .from(gameTrophies)
+      .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)))
+      .limit(1);
+
+    // "" = ya se buscó y no había nada — no repetir. `null`/fila ausente =
+    // nunca se ha buscado, sigue abajo.
+    if (fila?.guideVideoId === "") return null;
+    if (fila?.guideVideoId) return fila.guideVideoId;
+  }
+
+  let videoId: string | null = null;
   try {
     const query = encodeURIComponent(`${gameTitle} ${trophyName} trophy guide`);
-    const res = await fetch(`https://www.youtube.com/results?search_query=${query}`);
-    if (!res.ok) return null;
-    
-    const html = await res.text();
-    // YouTube's initial data contains video IDs like "videoId":"XXXXXXXXXXX"
-    const match = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
-    return match ? match[1] : null;
+    const res = await fetch(`https://www.youtube.com/results?search_query=${query}`, {
+      // Sin esto YouTube a veces sirve una versión reducida de la página
+      // sin los datos de vídeo incrustados — comprobado a mano.
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+    });
+    if (res.ok) {
+      const html = await res.text();
+      // Los datos iniciales de YouTube traen ids de vídeo como "videoId":"XXXXXXXXXXX"
+      const match = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+      videoId = match ? match[1] : null;
+    }
   } catch (error) {
     console.error("Error fetching guide from YouTube", error);
-    return null;
   }
+
+  if (gameId && trophyId) {
+    await db
+      .update(gameTrophies)
+      .set({ guideVideoId: videoId ?? "" })
+      .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)));
+  }
+
+  return videoId;
 }
 
 export async function submitExpressReviewAction(gameId: string, rating: number, review: string) {
