@@ -90,6 +90,41 @@ De paso, confirmado el `igdbId` de la lista de pendientes de más abajo
 (llevaba días sin comprobarse): **413 de 470 juegos (88%) lo tienen
 poblado en producción** — los scripts de Antigravity sí se ejecutaron.
 
+### Perdibles: la caché de `fetch` de Next no acertaba de verdad — cacheado en la base
+
+El usuario preguntó si el rendimiento se podía mejorar más. Medido en vivo:
+tres visitas seguidas a la misma ficha tardaban igual (~1,3-1,5s cada una,
+solo en la parte de perdibles) — la caché de 30 días que ya declaraba el
+`fetch` (`next: { revalidate }`) no estaba acertando de verdad en este
+entorno. Añadido `games.missableTrophies`/`missableTrophiesCheckedAt`
+(migración ejecutada), mismo patrón que `guideVideoId`/`hltb` — caché en
+base de datos, no en la del framework.
+
+**Bug real encontrado al VERIFICARLO, no solo escrito y dado por bueno**:
+la primera prueba en vivo escribió `missableTrophies: []` para Black
+Myth: Wukong — vacío, sabiendo que tiene 7. Causa real: un fallo de red
+(`fetch failed`, certificado TLS — propio de este entorno de pruebas
+local con algún proxy/antivirus haciendo inspección TLS, no de
+producción; el mismo tipo de error que ya salió con IGDB antes) que
+`trofeosPerdiblesDe` capturaba en silencio y devolvía como si fuera "se
+comprobó y no hay ninguno". Cachear eso habría dejado el juego marcado
+sin perdibles 30 días por un fallo de un momento — el mismo error que ya
+se evitó a propósito para HLTB, reintroducido aquí sin querer.
+
+Arreglado con `trofeosPerdiblesDeConEstado` (lib/powerpyx.ts): distingue
+"ok, no hay ninguno" (se cachea) de "falló la red" (no se cachea, se
+reintenta la próxima vez). Verificado en vivo las dos ramas: con la red
+fallando de verdad, la caché se queda sin tocar; sembrando el valor real
+a mano, la siguiente carga lo lee sin volver a tocar PowerPyx.
+
+**Aviso para quien retome esto**: este mismo entorno de desarrollo tiene
+algo (proxy corporativo, antivirus con inspección TLS) que rompe `fetch`
+a ciertos hosts externos (IGDB, PowerPyx) SOLO dentro del proceso de
+`next dev` — un script `tsx` suelto contra el mismo host, en la misma
+máquina, funciona bien. Si algo similar vuelve a pasar, no es
+necesariamente un bug de código: comprueba primero si un script aislado
+con `tsx` tiene el mismo problema antes de sospechar del código.
+
 ---
 
 ## Sesión del 7-8 de septiembre de 2026 (continuación 2) — filtros, notas privadas, HLTB de verdad, push confirmado en vivo, y un bug de rendimiento propio
