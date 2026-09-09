@@ -72,6 +72,24 @@ de sus dos botones va por `onMouseEnter`/`onMouseLeave` en vez de CSS).
 No es exhaustivo: un archivo con hover en un botón y sin él en otro no lo
 detecta este barrido, solo "archivo entero sin ninguno".
 
+### Barrido completo de `fetch` sin capturar — cerrado del todo, no solo lo encontrado por el camino
+
+Después del bug real de Xbox, se fueron arreglando `xbl/client.ts`,
+`steam/client.ts` e `igdb/client.ts` uno a uno según iban apareciendo.
+Para cerrar esto de verdad (no solo "los que tuve la suerte de mirar"),
+un barrido de los 13 archivos de `src/lib` con `await fetch(` — los diez
+restantes (`discordWebhook.ts`, `google/client.ts`, `itad.ts`,
+`platformHub.ts`, `prices.ts`, `psNews.ts`, `psPlus.ts`, `steamNews.ts`,
+`xboxNews.ts`, más los dos de `app/actions.ts` de esta sesión) **ya
+tenían su `fetch` dentro de un `try/catch` de verdad**, comprobado línea
+a línea, no solo "el archivo menciona catch en algún sitio". Conclusión:
+la clase de bug que tiró la app con Xbox está cerrada del todo en el
+proyecto, no solo en los tres sitios donde se encontró por casualidad.
+
+De paso, confirmado el `igdbId` de la lista de pendientes de más abajo
+(llevaba días sin comprobarse): **413 de 470 juegos (88%) lo tienen
+poblado en producción** — los scripts de Antigravity sí se ejecutaron.
+
 ---
 
 ## Sesión del 7-8 de septiembre de 2026 (continuación 2) — filtros, notas privadas, HLTB de verdad, push confirmado en vivo, y un bug de rendimiento propio
@@ -2096,13 +2114,10 @@ que causó el bug de las horas de PSN la primera vez.
 ## Pendiente
 
 **Funciones acordadas y no hechas:**
-1. **`igdbId` en `games` + emparejado.** ~~Sigue sin tocar~~ → Antigravity
-   parece haberlo empezado por su cuenta (`scripts/anadir-igdbid-juegos.mts`,
-   `scripts/unificar-catalogo.mts`, y `community.ts`/`recommendations.ts` ya
-   asumen `games.igdbId` poblado). **Sin confirmar si esos scripts se
-   ejecutaron contra producción** — compruébalo antes de dar por hecho que
-   el campo está relleno de verdad, y antes de escribir código nuevo que
-   dependa de él sin comprobarlo.
+1. ~~`igdbId` en `games` + emparejado.~~ → **Confirmado el 9 de septiembre**:
+   413 de 470 juegos (88%) tienen `igdbId` poblado en producción — los
+   scripts de Antigravity sí se ejecutaron de verdad. Este documento llevaba
+   días sin confirmarlo.
 2. ~~Compartir el Wrap como imagen~~ → hecho el 3 de septiembre de 2026, con
    `ImageResponse` de `next/og` (ya viene con Next, no hizo falta el paquete
    `@vercel/og` suelto). Ruta [`/api/wrap/[handle]`](src/app/api/wrap/%5Bhandle%5D/route.tsx),
