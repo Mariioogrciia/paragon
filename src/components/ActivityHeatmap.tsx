@@ -92,7 +92,13 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
                         }}
                       />
                       <div
-                        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/dia:opacity-100"
+                        className={`pointer-events-none absolute bottom-full z-20 mb-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/dia:opacity-100 ${
+                          // Centrado se salía por el lateral en las primeras/
+                          // últimas semanas, y `overflow-x-auto` lo recortaba
+                          // — ancladas al borde de su propia celda en vez de
+                          // centradas, igual que en HourlyHeatmap.
+                          i === 0 ? "left-0" : i === semanas.length - 1 ? "right-0" : "left-1/2 -translate-x-1/2"
+                        }`}
                         style={{ background: "var(--foreground)", color: "var(--background)" }}
                       >
                         {d.trofeos} {d.trofeos === 1 ? "trofeo" : "trofeos"} · {fechaLarga(d.dia)}

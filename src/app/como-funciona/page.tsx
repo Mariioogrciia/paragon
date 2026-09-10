@@ -271,8 +271,9 @@ export default function ComoFuncionaPage() {
                   esté el bot: <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/platinosalalcance</code>,{" "}
                   <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/hoy</code>,{" "}
                   <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/perfil</code>,{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/verguenza</code> y{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/racha</code>.
+                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/verguenza</code>,{" "}
+                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/racha</code> y{" "}
+                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/help</code>.
                 </Bloque>
                 <Bloque title="Anuncios del bot en un servidor">
                   Quien tenga permiso de gestionar el servidor puede escribir{" "}

@@ -94,7 +94,18 @@ export function HourlyHeatmap({ celdas }: { celdas: CeldaHoraria[] }) {
                     />
                     {valor > 0 && (
                       <div
-                        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/celda:opacity-100"
+                        className={`pointer-events-none absolute bottom-full z-20 mb-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/celda:opacity-100 ${
+                          // Centrado siempre se salía del borde en las columnas
+                          // de los extremos, y `overflow-x-auto` del
+                          // contenedor lo recortaba por el lateral — las
+                          // primeras/últimas columnas anclan al borde de su
+                          // propia celda en vez de centrarse.
+                          franja === 0
+                            ? "left-0"
+                            : franja === FRANJAS.length - 1
+                              ? "right-0"
+                              : "left-1/2 -translate-x-1/2"
+                        }`}
                         style={{ background: "var(--foreground)", color: "var(--background)" }}
                       >
                         {valor} {valor === 1 ? "trofeo" : "trofeos"} · {DIAS[dow]} {String(FRANJAS[franja]).padStart(2, "0")}h-{String((FRANJAS[franja] + 3) % 24).padStart(2, "0")}h

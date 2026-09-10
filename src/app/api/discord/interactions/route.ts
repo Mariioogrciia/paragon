@@ -128,6 +128,22 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   return mensaje(lineas.join("\n"));
 }
 
+function comandoHelp() {
+  return mensaje(
+    [
+      "**Comandos del bot de Paragon**",
+      "🏆 `/platinosalalcance` — juegos muy avanzados que llevan meses parados.",
+      "🎮 `/hoy [minutos] [genero]` — qué puedes cerrar hoy según el tiempo (y el tipo, si quieres).",
+      "👤 `/perfil [usuario]` — tus estadísticas de Paragon, o las de un amigo con Discord vinculado.",
+      "😳 `/verguenza` — juegos en tu biblioteca sin ni una hora, sin ni un trofeo.",
+      "🔥 `/racha` — tu racha actual de días seguidos ganando al menos un trofeo.",
+      "📣 `/anunciosaqui` — (solo quien gestione el servidor) anuncia aquí cuando alguien suba de nivel.",
+      "",
+      "Para que cualquiera de estos funcione, tu cuenta de Discord tiene que estar vinculada a una cuenta de Paragon — inicia sesión en Paragon con este mismo Discord.",
+    ].join("\n"),
+  );
+}
+
 async function comandoAnunciosAqui(guildId: string | null, channelId: string | null, discordUserId: string) {
   if (!guildId || !channelId) return mensaje("Esto solo funciona dentro de un servidor, no por DM.");
   await setAnnounceChannel(guildId, channelId, discordUserId);
@@ -217,6 +233,8 @@ export async function POST(request: Request) {
           return await comandoRacha(discordUserId);
         case "anunciosaqui":
           return await comandoAnunciosAqui(interaction.guild_id ?? null, interaction.channel_id ?? null, discordUserId);
+        case "help":
+          return comandoHelp();
       }
     } catch (error) {
       console.error("[discord-interactions]", interaction.data.name, error);

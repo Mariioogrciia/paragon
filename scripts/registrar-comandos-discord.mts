@@ -83,6 +83,10 @@ const COMANDOS = [
     description: "Tu racha actual de días seguidos ganando al menos un trofeo.",
   },
   {
+    name: "help",
+    description: "Qué comandos tiene el bot de Paragon y para qué sirve cada uno.",
+  },
+  {
     name: "anunciosaqui",
     description: "Anuncia en este canal cuando alguien del servidor suba de nivel Paragon.",
     // Bitfield de permisos de Discord como texto — 0x20 = MANAGE_GUILD
