@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { sugerirPorTiempo, type SugerenciaTiempo } from "@/lib/recomendadorTiempo";
+import { CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 import type { Game } from "@/lib/types";
 
 const OPCIONES = [
@@ -38,16 +39,20 @@ function Tarjeta({ s }: { s: SugerenciaTiempo }) {
  */
 export function RecomendadorTiempo({ juegos }: { juegos: Game[] }) {
   const [horas, setHoras] = useState(1);
-  const { victoriasRapidas, paraProfundizar } = useMemo(() => sugerirPorTiempo(juegos, horas), [juegos, horas]);
+  const [genero, setGenero] = useState<CategoriaDna | null>(null);
+  const { victoriasRapidas, paraProfundizar } = useMemo(
+    () => sugerirPorTiempo(juegos, horas, genero ?? undefined),
+    [juegos, horas, genero],
+  );
 
   if (juegos.length === 0) return null;
 
   return (
     <section className="mb-8">
       <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">¿Hoy qué juego?</h2>
-      <p className="mb-4 text-sm text-muted">Di cuánto tiempo tienes y te decimos qué puedes cerrar de verdad.</p>
+      <p className="mb-4 text-sm text-muted">Di cuánto tiempo tienes (y de qué tipo, si te apetece algo concreto) y te decimos qué puedes cerrar de verdad.</p>
 
-      <div className="mb-4 flex flex-wrap gap-1.5">
+      <div className="mb-2.5 flex flex-wrap gap-1.5">
         {OPCIONES.map((o) => (
           <button
             key={o.valor}
@@ -64,9 +69,37 @@ export function RecomendadorTiempo({ juegos }: { juegos: Game[] }) {
         ))}
       </div>
 
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        <button
+          onClick={() => setGenero(null)}
+          className="rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors"
+          style={
+            genero === null
+              ? { background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--foreground)" }
+              : { border: "1px solid transparent", color: "var(--muted)" }
+          }
+        >
+          Cualquier tipo
+        </button>
+        {CATEGORIAS_GENERO.map((c) => (
+          <button
+            key={c.key}
+            onClick={() => setGenero(genero === c.key ? null : c.key)}
+            className="rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors"
+            style={
+              genero === c.key
+                ? { background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--foreground)" }
+                : { border: "1px solid transparent", color: "var(--muted)" }
+            }
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
       {victoriasRapidas.length === 0 && paraProfundizar.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-6 text-center text-sm text-muted">
-          Nada que encaje ahora mismo — empieza algo nuevo, o pon datos de HLTB en más juegos empezados.
+          {genero ? "Nada de ese tipo que encaje ahora mismo — prueba con otro género o quita el filtro." : "Nada que encaje ahora mismo — empieza algo nuevo, o pon datos de HLTB en más juegos empezados."}
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

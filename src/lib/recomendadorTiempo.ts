@@ -1,5 +1,6 @@
 import type { Game } from "@/lib/types";
 import { esPlatinoEquivalente } from "@/lib/stats";
+import { CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 
 export interface SugerenciaTiempo {
   gameId: string;
@@ -7,6 +8,26 @@ export interface SugerenciaTiempo {
   iconUrl?: string;
   motivo: string;
   trofeosRestantes: number;
+}
+
+function mezclar<T>(arr: T[]): T[] {
+  const copia = [...arr];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+/**
+ * De entre los más relevantes (los primeros `entrePrimeros`, ya ordenados
+ * por lo bien que encajan), sortea cuáles se enseñan — así "victorias
+ * rápidas" no es SIEMPRE la misma lista exacta cada vez que se mira, sin
+ * dejar de ser de verdad relevante (nunca sale un candidato flojo solo por
+ * variedad, se sortea dentro de los buenos, no entre todos).
+ */
+function elegirConVariedad<T>(candidatos: T[], cuantos: number, entrePrimeros = 12): T[] {
+  return mezclar(candidatos.slice(0, entrePrimeros)).slice(0, cuantos);
 }
 
 /**
@@ -27,29 +48,37 @@ export interface SugerenciaTiempo {
  * Sin HLTB para un juego, simplemente no entra en la bolsa 2 — no se
  * inventa una estimación con la barra de trofeos, que no tiene relación
  * fiable con el tiempo (un trofeo puede ser instantáneo o de 20 horas).
+ *
+ * `genero` (opcional): filtra el backlog empezado a UNA categoría de
+ * Trophy DNA (lib/trophyDna.ts, mismo mapeo de géneros de IGDB) antes de
+ * repartir en las dos bolsas — "hoy me apetece un RPG", no solo "lo que
+ * menos me queda".
  */
 export function sugerirPorTiempo(
   games: Game[],
   horasDisponibles: number,
+  genero?: CategoriaDna,
 ): { victoriasRapidas: SugerenciaTiempo[]; paraProfundizar: SugerenciaTiempo[] } {
-  const empezados = games.filter(
-    (g) => !g.isWishlist && !esPlatinoEquivalente(g) && g.earnedTotal > 0 && g.definedTotal > g.earnedTotal,
-  );
+  const generosDelFiltro = genero ? CATEGORIAS_GENERO.find((c) => c.key === genero)?.generos : undefined;
 
-  const victoriasRapidas: SugerenciaTiempo[] = empezados
+  const empezados = games
+    .filter((g) => !g.isWishlist && !esPlatinoEquivalente(g) && g.earnedTotal > 0 && g.definedTotal > g.earnedTotal)
+    .filter((g) => !generosDelFiltro || generosDelFiltro.some((gen) => g.genres?.includes(gen)));
+
+  const candidatosRapidas = empezados
     .map((g) => ({ g, restantes: g.definedTotal - g.earnedTotal }))
     .filter((x) => x.restantes > 0 && x.restantes <= 3)
-    .sort((a, b) => a.restantes - b.restantes)
-    .slice(0, 6)
-    .map(({ g, restantes }) => ({
-      gameId: g.id,
-      titulo: g.title,
-      iconUrl: g.iconUrl,
-      trofeosRestantes: restantes,
-      motivo: `Solo te ${restantes === 1 ? "falta" : "faltan"} ${restantes} ${restantes === 1 ? "trofeo" : "trofeos"}`,
-    }));
+    .sort((a, b) => a.restantes - b.restantes);
 
-  const paraProfundizar: SugerenciaTiempo[] = empezados
+  const victoriasRapidas: SugerenciaTiempo[] = elegirConVariedad(candidatosRapidas, 6).map(({ g, restantes }) => ({
+    gameId: g.id,
+    titulo: g.title,
+    iconUrl: g.iconUrl,
+    trofeosRestantes: restantes,
+    motivo: `Solo te ${restantes === 1 ? "falta" : "faltan"} ${restantes} ${restantes === 1 ? "trofeo" : "trofeos"}`,
+  }));
+
+  const candidatosProfundizar = empezados
     .filter((g) => g.hltb?.completionist)
     .map((g) => {
       const horasJugadas = (g.playtimeMinutes ?? 0) / 60;
@@ -58,15 +87,15 @@ export function sugerirPorTiempo(
     })
     // Con margen del 30%: si dices "tengo 2h", una estimación de 2,3h sigue siendo razonable.
     .filter((x) => x.horasRestantes > 0 && x.horasRestantes <= horasDisponibles * 1.3)
-    .sort((a, b) => a.horasRestantes - b.horasRestantes)
-    .slice(0, 6)
-    .map(({ g, horasRestantes }) => ({
-      gameId: g.id,
-      titulo: g.title,
-      iconUrl: g.iconUrl,
-      trofeosRestantes: g.definedTotal - g.earnedTotal,
-      motivo: `~${horasRestantes < 1 ? "menos de 1" : Math.round(horasRestantes)}h para el 100% según HLTB`,
-    }));
+    .sort((a, b) => a.horasRestantes - b.horasRestantes);
+
+  const paraProfundizar: SugerenciaTiempo[] = elegirConVariedad(candidatosProfundizar, 6).map(({ g, horasRestantes }) => ({
+    gameId: g.id,
+    titulo: g.title,
+    iconUrl: g.iconUrl,
+    trofeosRestantes: g.definedTotal - g.earnedTotal,
+    motivo: `~${horasRestantes < 1 ? "menos de 1" : Math.round(horasRestantes)}h para el 100% según HLTB`,
+  }));
 
   return { victoriasRapidas, paraProfundizar };
 }

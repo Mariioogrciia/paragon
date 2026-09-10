@@ -2,16 +2,20 @@ import { NextResponse } from "next/server";
 import nacl from "tweetnacl";
 import { usuarioParagonDeDiscord } from "@/lib/discordBot";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
-import { platinosAlAlcance } from "@/lib/backlog";
+import { platinosAlAlcance, salonDeLaVerguenza } from "@/lib/backlog";
 import { sugerirPorTiempo } from "@/lib/recomendadorTiempo";
+import { summarise } from "@/lib/stats";
+import { getParagonLevel } from "@/lib/paragonLevel";
+import { rachas } from "@/lib/history";
+import { CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 
 /**
  * Endpoint de "Interactions" del bot de Discord — comandos de barra
- * (`/platinosalalcance`, `/quejuegohoy`). Configúralo en el Developer
- * Portal → tu aplicación → General Information → "Interactions Endpoint
- * URL" = https://tu-dominio/api/discord/interactions. Discord manda un
- * PING de prueba a esa URL nada más guardarla; si no responde bien, ni
- * deja guardar el campo.
+ * (`/platinosalalcance`, `/hoy`, `/perfil`, `/verguenza`, `/racha`).
+ * Configúralo en el Developer Portal → tu aplicación → General Information
+ * → "Interactions Endpoint URL" = https://tu-dominio/api/discord/interactions.
+ * Discord manda un PING de prueba a esa URL nada más guardarla; si no
+ * responde bien, ni deja guardar el campo.
  *
  * Nada de gateway ni conexión persistente: los comandos de barra son HTTP
  * puro, encajan tal cual en una ruta serverless — mismo modelo que ya usa
@@ -26,12 +30,14 @@ interface DiscordInteraction {
   user?: { id: string };
   data?: {
     name: string;
-    options?: { name: string; value: number }[];
+    options?: { name: string; value: string | number }[];
   };
 }
 
 const InteractionType = { PING: 1, APPLICATION_COMMAND: 2 } as const;
 const ResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4 } as const;
+
+const SIN_VINCULAR = "Tu cuenta de Discord no está vinculada a ninguna cuenta de Paragon — inicia sesión en Paragon con este mismo Discord primero.";
 
 /** Mensaje efímero (solo lo ve quien escribió el comando) — no tiene sentido spamear el canal con el backlog de otra persona. */
 function mensaje(contenido: string) {
@@ -43,7 +49,7 @@ function mensaje(contenido: string) {
 
 async function comandoPlatinosAlAlcance(discordUserId: string) {
   const userId = await usuarioParagonDeDiscord(discordUserId);
-  if (!userId) return mensaje("Tu cuenta de Discord no está vinculada a ninguna cuenta de Paragon — inicia sesión en Paragon con este mismo Discord primero.");
+  if (!userId) return mensaje(SIN_VINCULAR);
 
   const profile = await getProfileByUserId(userId);
   if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
@@ -56,18 +62,22 @@ async function comandoPlatinosAlAlcance(discordUserId: string) {
   return mensaje(`**Platinos al alcance:**\n${lineas.join("\n")}`);
 }
 
-async function comandoQueJuegoHoy(discordUserId: string, minutos: number) {
+async function comandoHoy(discordUserId: string, minutos: number, genero?: CategoriaDna) {
   const userId = await usuarioParagonDeDiscord(discordUserId);
-  if (!userId) return mensaje("Tu cuenta de Discord no está vinculada a ninguna cuenta de Paragon — inicia sesión en Paragon con este mismo Discord primero.");
+  if (!userId) return mensaje(SIN_VINCULAR);
 
   const profile = await getProfileByUserId(userId);
   if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
 
   const { games } = await getLibrary(profile);
-  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(games, minutos / 60);
+  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(games, minutos / 60, genero);
 
   if (victoriasRapidas.length === 0 && paraProfundizar.length === 0) {
-    return mensaje("Nada que encaje ahora mismo con ese tiempo — prueba a poner horas de HLTB en más juegos empezados desde la ficha de cada uno.");
+    return mensaje(
+      genero
+        ? "Nada de ese tipo que encaje ahora mismo — prueba con otro género o sin filtro."
+        : "Nada que encaje ahora mismo con ese tiempo — prueba a poner horas de HLTB en más juegos empezados desde la ficha de cada uno.",
+    );
   }
 
   const bloques: string[] = [];
@@ -78,6 +88,60 @@ async function comandoQueJuegoHoy(discordUserId: string, minutos: number) {
     bloques.push(`**Para profundizar:**\n${paraProfundizar.slice(0, 4).map((s) => `• ${s.titulo} — ${s.motivo}`).join("\n")}`);
   }
   return mensaje(bloques.join("\n\n"));
+}
+
+async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: string | null) {
+  const userIdPropio = await usuarioParagonDeDiscord(discordUserId);
+  if (!userIdPropio) return mensaje(SIN_VINCULAR);
+
+  // Sin usuario dado, tus propias estadísticas. Con uno dado, las suyas —
+  // siempre que también tenga Discord vinculado a Paragon; no hay forma de
+  // enseñar el perfil de alguien que no ha iniciado sesión aquí nunca.
+  const userId = discordUserIdObjetivo ? await usuarioParagonDeDiscord(discordUserIdObjetivo) : userIdPropio;
+  if (!userId) return mensaje("Esa persona no tiene su Discord vinculado a ninguna cuenta de Paragon.");
+
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return mensaje("No encuentro ese perfil de Paragon.");
+
+  const [{ games }, nivel] = await Promise.all([getLibrary(profile), getParagonLevel(userId)]);
+  const resumen = summarise(games);
+
+  return mensaje(
+    `**${profile.displayName ?? profile.handle ?? "Perfil"}** (@${profile.handle ?? "?"})\n` +
+      `🏆 ${resumen.platinos} platinos · 🎮 ${resumen.juegos} juegos · 🧩 ${resumen.trofeos.toLocaleString("es-ES")} trofeos\n` +
+      `⭐ Nivel Paragon ${nivel.level} (${nivel.progreso}% hasta el ${nivel.siguienteNivel})`,
+  );
+}
+
+async function comandoVerguenza(discordUserId: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
+
+  const { games } = await getLibrary(profile);
+  const juegos = salonDeLaVerguenza(games);
+  if (juegos.length === 0) return mensaje("Nada aquí — todo lo que tienes lo has tocado al menos una vez. 👏");
+
+  const lineas = juegos.slice(0, 10).map((g) => `😳 ${g.titulo}`);
+  const resto = juegos.length > 10 ? `\n… y ${juegos.length - 10} más` : "";
+  return mensaje(`**El Salón de la Vergüenza** (${juegos.length}):\n${lineas.join("\n")}${resto}`);
+}
+
+async function comandoRacha(discordUserId: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const r = await rachas(userId);
+  if (r.actual === 0) return mensaje("No tienes ninguna racha activa ahora mismo — gana un trofeo hoy para empezar una.");
+  return mensaje(`🔥 Llevas **${r.actual} ${r.actual === 1 ? "día" : "días"}** seguidos ganando al menos un trofeo. Tu mejor racha de siempre: ${r.mejor}.`);
+}
+
+/** Snowflake de Discord de la mención en la opción "usuario" de /perfil — `null` si no se puso ninguna. */
+function usuarioMencionado(interaction: DiscordInteraction): string | null {
+  const valor = interaction.data?.options?.find((o) => o.name === "usuario")?.value;
+  return typeof valor === "string" ? valor : null;
 }
 
 export async function POST(request: Request) {
@@ -115,12 +179,21 @@ export async function POST(request: Request) {
     if (!discordUserId) return mensaje("No he podido saber quién eres.");
 
     try {
-      if (interaction.data.name === "platinosalalcance") {
-        return await comandoPlatinosAlAlcance(discordUserId);
-      }
-      if (interaction.data.name === "quejuegohoy") {
-        const minutos = interaction.data.options?.find((o) => o.name === "minutos")?.value ?? 60;
-        return await comandoQueJuegoHoy(discordUserId, minutos);
+      switch (interaction.data.name) {
+        case "platinosalalcance":
+          return await comandoPlatinosAlAlcance(discordUserId);
+        case "hoy": {
+          const minutos = interaction.data.options?.find((o) => o.name === "minutos")?.value;
+          const generoOpt = interaction.data.options?.find((o) => o.name === "genero")?.value;
+          const genero = typeof generoOpt === "string" && CATEGORIAS_GENERO.some((c) => c.key === generoOpt) ? (generoOpt as CategoriaDna) : undefined;
+          return await comandoHoy(discordUserId, typeof minutos === "number" ? minutos : 60, genero);
+        }
+        case "perfil":
+          return await comandoPerfil(discordUserId, usuarioMencionado(interaction));
+        case "verguenza":
+          return await comandoVerguenza(discordUserId);
+        case "racha":
+          return await comandoRacha(discordUserId);
       }
     } catch (error) {
       console.error("[discord-interactions]", interaction.data.name, error);

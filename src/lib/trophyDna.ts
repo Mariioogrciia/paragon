@@ -10,7 +10,7 @@ import type { Game } from "@/lib/types";
  * las veces (mismo criterio que ya se aplicó descartando la heurística de
  * subtítulos de PowerPyx).
  */
-const CATEGORIAS = [
+export const CATEGORIAS_GENERO = [
   { key: "accion", label: "Acción", generos: ["Shooter", "Fighting", "Hack and slash/Beat 'em up", "Arcade"] },
   { key: "rpg", label: "RPG", generos: ["Role-playing (RPG)", "MOBA"] },
   { key: "aventura", label: "Aventura", generos: ["Adventure", "Point-and-click", "Visual Novel"] },
@@ -20,7 +20,7 @@ const CATEGORIAS = [
   { key: "deportes", label: "Deportes", generos: ["Sport", "Racing", "Pinball"] },
 ] as const;
 
-export type CategoriaDna = (typeof CATEGORIAS)[number]["key"];
+export type CategoriaDna = (typeof CATEGORIAS_GENERO)[number]["key"];
 
 const ARQUETIPOS: Record<CategoriaDna, string> = {
   accion: "El Adrenalínico",
@@ -56,11 +56,11 @@ export interface TrophyDna {
  * vez, no hay que elegir una.
  */
 export function calcularTrophyDna(games: Game[]): TrophyDna {
-  const pesos = new Map<CategoriaDna, number>(CATEGORIAS.map((c) => [c.key, 0]));
+  const pesos = new Map<CategoriaDna, number>(CATEGORIAS_GENERO.map((c) => [c.key, 0]));
 
   for (const g of games) {
     if (g.isWishlist || g.earnedTotal === 0 || !g.genres?.length) continue;
-    for (const cat of CATEGORIAS) {
+    for (const cat of CATEGORIAS_GENERO) {
       if (cat.generos.some((genero) => g.genres!.includes(genero))) {
         pesos.set(cat.key, (pesos.get(cat.key) ?? 0) + g.earnedTotal);
       }
@@ -68,7 +68,7 @@ export function calcularTrophyDna(games: Game[]): TrophyDna {
   }
 
   const max = Math.max(...pesos.values(), 0);
-  const ejes: EjeDna[] = CATEGORIAS.map((c) => ({
+  const ejes: EjeDna[] = CATEGORIAS_GENERO.map((c) => ({
     key: c.key,
     label: c.label,
     trofeos: pesos.get(c.key) ?? 0,

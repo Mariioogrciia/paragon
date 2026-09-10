@@ -24,14 +24,28 @@ if (!APPLICATION_ID || !BOT_TOKEN) {
   process.exit(1);
 }
 
+// Mismas categorías que Trophy DNA (lib/trophyDna.ts) — se repiten aquí a
+// mano porque este script corre suelto con `tsx`, sin pasar por Next, y
+// mantenerlo así de simple evita arrastrar el resto de la app solo para
+// una lista de 7 nombres que apenas cambia.
+const GENEROS = [
+  { name: "accion", value: "accion" },
+  { name: "rpg", value: "rpg" },
+  { name: "aventura", value: "aventura" },
+  { name: "estrategia", value: "estrategia" },
+  { name: "plataformas", value: "plataformas" },
+  { name: "puzles", value: "puzles" },
+  { name: "deportes", value: "deportes" },
+];
+
 const COMANDOS = [
   {
     name: "platinosalalcance",
     description: "Juegos muy avanzados que llevan meses parados — tu radar de platinos al alcance.",
   },
   {
-    name: "quejuegohoy",
-    description: "Qué puedes cerrar hoy según el tiempo que tengas.",
+    name: "hoy",
+    description: "Qué puedes cerrar hoy según el tiempo (y el tipo de juego) que te apetezca.",
     options: [
       {
         type: 4, // INTEGER
@@ -39,7 +53,34 @@ const COMANDOS = [
         description: "Cuántos minutos tienes hoy",
         required: false,
       },
+      {
+        type: 3, // STRING
+        name: "genero",
+        description: "Si te apetece un tipo concreto",
+        required: false,
+        choices: GENEROS,
+      },
     ],
+  },
+  {
+    name: "perfil",
+    description: "Tus estadísticas de Paragon, o las de un amigo con Discord vinculado.",
+    options: [
+      {
+        type: 6, // USER
+        name: "usuario",
+        description: "De quién (vacío = tú mismo)",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "verguenza",
+    description: "El Salón de la Vergüenza: juegos en tu biblioteca sin ni una hora, sin ni un trofeo.",
+  },
+  {
+    name: "racha",
+    description: "Tu racha actual de días seguidos ganando al menos un trofeo.",
   },
 ];
 
