@@ -7,6 +7,11 @@ function mesCorto(clave: string): string {
   return MESES_CORTOS[Number(clave.split("-")[1]) - 1] ?? clave.slice(5);
 }
 
+// `PlaytimeBarChart` vive en su propio archivo (components/PlaytimeBarChart.tsx)
+// desde que ganó un "ver más" interactivo — necesita "use client", y este
+// archivo se queda como Server Component para todo lo demás (TrophyMonthChart
+// no necesita interactividad, no tiene sentido forzarlo a cliente con ella).
+
 /** Barras de trofeos por mes — mismo dato y forma que ya usa /ritmo, aquí en compacto para la sección de estadísticas. */
 export function TrophyMonthChart({ meses }: { meses: MesConTrofeos[] }) {
   const maximo = Math.max(...meses.map((m) => m.total), 1);
@@ -39,31 +44,3 @@ export function TrophyMonthChart({ meses }: { meses: MesConTrofeos[] }) {
 }
 
 /** Ranking horizontal de horas por juego — estático (total acumulado), no una serie temporal: ver el comentario de lib/profileStats.ts sobre por qué no existe esa segunda. */
-export function PlaytimeBarChart({ juegos }: { juegos: { gameId: string; titulo: string; iconUrl: string | null; horas: number }[] }) {
-  if (juegos.length === 0) {
-    return (
-      <div className="rounded-2xl p-5 text-sm text-muted" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-        Ninguna plataforma vinculada ha reportado horas jugadas todavía.
-      </div>
-    );
-  }
-
-  const maximo = Math.max(...juegos.map((j) => j.horas), 1);
-
-  return (
-    <div className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-      <h3 className="mb-4 font-heading text-sm font-bold uppercase tracking-wide">Horas por juego</h3>
-      <div className="space-y-3">
-        {juegos.map((j) => (
-          <div key={j.gameId} className="flex items-center gap-3">
-            <span className="w-28 shrink-0 truncate text-xs font-semibold sm:w-36">{j.titulo}</span>
-            <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
-              <div className="h-full rounded-full" style={{ width: `${(j.horas / maximo) * 100}%`, background: "var(--accent-grad)" }} />
-            </div>
-            <span className="w-12 shrink-0 text-right text-xs font-bold text-muted">{j.horas} h</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}

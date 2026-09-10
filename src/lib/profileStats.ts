@@ -67,10 +67,15 @@ export async function actividadPorDia(userId: string, dias = 365): Promise<DiaAc
  * `igdbId` (o cualquier fila suelta) caen cada uno en la suya, con su
  * propio `games.id` como clave.
  */
-export async function horasPorJuego(userId: string, limit = 8): Promise<{ gameId: string; titulo: string; iconUrl: string | null; horas: number }[]> {
+export async function horasPorJuego(userId: string, limit?: number): Promise<{ gameId: string; titulo: string; iconUrl: string | null; horas: number }[]> {
   const clave = sql<string>`coalesce(${gamesTable.igdbId}::text, ${userGames.gameId})`;
 
-  const rows = await db
+  // `limit` es opcional a propósito: `PlaytimeBarChart` (componente) pide
+  // la lista COMPLETA (sin pasar `limit`) para poder enseñar un "Ver más"
+  // que despliegue TODOS los juegos con horas, no solo el top 8 que se
+  // pedía antes directamente en esta consulta — recortar aquí habría
+  // hecho imposible el "ver más" sin volver a pedir datos al servidor.
+  let query = db
     .select({
       clave,
       titulo: sql<string>`max(${gamesTable.title})`,
@@ -82,7 +87,11 @@ export async function horasPorJuego(userId: string, limit = 8): Promise<{ gameId
     .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), isNotNull(userGames.playtimeMinutes)))
     .groupBy(clave)
     .orderBy(desc(sql`sum(${userGames.playtimeMinutes})`))
-    .limit(limit);
+    .$dynamic();
+
+  if (limit != null) query = query.limit(limit);
+
+  const rows = await query;
 
   return rows.map((r) => ({
     gameId: r.clave,
