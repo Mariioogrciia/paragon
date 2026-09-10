@@ -288,8 +288,6 @@ async function Landing() {
         </div>
       </section>
 
-      <FAQSection />
-
       <section className="py-[72px]">
         <div
           className="relative overflow-hidden rounded-[24px] p-12 sm:p-16"
@@ -314,6 +312,8 @@ async function Landing() {
           </div>
         </div>
       </section>
+
+      <FAQSection />
     </div>
   );
 }
