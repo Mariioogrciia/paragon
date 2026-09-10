@@ -41,6 +41,7 @@ const SORTS: { label: string; value: SortKey }[] = [
   { label: "Lo que menos falta", value: "pendientes" },
   { label: "Platino más asequible", value: "asequible" },
   { label: "Título (A-Z)", value: "titulo" },
+  { label: "Más horas jugadas", value: "horas" },
 ];
 
 const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
@@ -96,6 +97,7 @@ export function LibraryGrid({
   collections = [],
   esMio = false,
   initialStatus,
+  initialSort,
 }: {
   games: Game[];
   handle: string;
@@ -108,6 +110,8 @@ export function LibraryGrid({
    * usuario ya haya tocado a mano.
    */
   initialStatus?: GameStatus | "todos";
+  /** Mismo mecanismo que `initialStatus`, para "Ver todas" de Horas por juego (`?orden=horas`). */
+  initialSort?: SortKey;
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<GameStatus | "todos">(initialStatus ?? "todos");
@@ -120,7 +124,7 @@ export function LibraryGrid({
   const [acquisitionFormat, setAcquisitionFormat] = useState<NonNullable<Game["acquisitionFormat"]> | "">("");
   const [porAmortizar, setPorAmortizar] = useState(false);
   const [collection, setCollection] = useState("");
-  const [sort, setSort] = useState<SortKey>("reciente");
+  const [sort, setSort] = useState<SortKey>(initialSort ?? "reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [view, setView] = useState<"grid" | "list" | "mosaic">("grid");
   const [agrupar, setAgrupar] = useState(false);

@@ -9,7 +9,7 @@ import { TrophyCountRow } from "@/components/TrophyCounts";
 import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
-import type { GameStatus } from "@/lib/stats";
+import type { GameStatus, SortKey } from "@/lib/stats";
 
 // Copiada tal cual de `/u/[handle]` al mudar aquí la biblioteca: el panel
 // enlaza con `?estado=a-punto` y `?estado=abandonado`, y esos enlaces ahora
@@ -23,6 +23,8 @@ const ESTADOS_VALIDOS = [
   "a-punto",
   "abandonado",
 ];
+
+const ORDENES_VALIDOS = ["reciente", "progreso", "titulo", "pendientes", "asequible", "horas"];
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
@@ -44,13 +46,16 @@ export default async function BibliotecaPage({
   searchParams,
 }: {
   params: Promise<{ handle: string }>;
-  searchParams: Promise<{ estado?: string }>;
+  searchParams: Promise<{ estado?: string; orden?: string }>;
 }) {
   const { handle } = await params;
-  const { estado } = await searchParams;
+  const { estado, orden } = await searchParams;
   const initialStatus = ESTADOS_VALIDOS.includes(estado ?? "")
     ? (estado as GameStatus)
     : undefined;
+  // `?orden=horas`: a dónde lleva "Ver todas" de Horas por juego en
+  // Estadísticas (PlaytimeBarChart.tsx) — mismo mecanismo que `?estado=`.
+  const initialSort = ORDENES_VALIDOS.includes(orden ?? "") ? (orden as SortKey) : undefined;
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -94,6 +99,7 @@ export default async function BibliotecaPage({
             collections={carpetas}
             esMio={esMio}
             initialStatus={initialStatus}
+            initialSort={initialSort}
           />
         </section>
       </div>

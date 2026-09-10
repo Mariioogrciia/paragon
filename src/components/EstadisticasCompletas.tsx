@@ -47,7 +47,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
   const [dias, meses, horas, horasEnTotal, feed, { games: biblioteca }, amigos, paragonScore, celdasHorarias, hitos] = await Promise.all([
     actividadPorDia(profile.userId),
     trofeosPorMes(profile.userId),
-    horasPorJuego(profile.userId),
+    horasPorJuego(profile.userId, 8),
     horasTotales(profile.userId),
     // La actividad de amigos y el comparador con ellos son información
     // privada de quien la ve (quiénes son sus amigos y qué hacen) — solo se
@@ -122,7 +122,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
       <div className="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <TrophyMonthChart meses={meses} />
-        <PlaytimeBarChart juegos={horas} />
+        <PlaytimeBarChart juegos={horas} handle={handle} />
       </div>
 
       {jugadoRecientemente.length > 0 && (

@@ -1,20 +1,29 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
-
-const TOP_INICIAL = 8;
+const TOP_MOSTRADO = 8;
 
 /**
- * "Horas por juego" — antes solo enseñaba el top 8 sin más (el límite
- * venía puesto en la propia consulta, `horasPorJuego(userId, 8)`). Ahora
- * recibe la lista COMPLETA ya calculada en el servidor (sin límite) y
- * corta a `TOP_INICIAL` aquí, en el cliente — un botón "Ver más" enseña
- * el resto sin volver a pedir nada al servidor, es la misma lista ya
- * cargada, solo que un simple recorte que cambia con el estado.
+ * "Horas por juego" — enseña el top 8 y un enlace real a la Biblioteca
+ * entera ordenada por horas (`?orden=horas`, ver biblioteca/page.tsx),
+ * no un "ver más" que solo desplegaba la misma listita de barras plana.
+ *
+ * Pedido explícito del usuario (10 sept 2026): la primera versión de
+ * este componente expandía la lista IN SITU con un botón "Ver más" — la
+ * queja fue que un botón que se limita a alargar el mismo gráfico no es
+ * "ver todo de una manera más organizada". La Biblioteca ya tiene
+ * búsqueda, filtros y carátulas — es la vista organizada de verdad, no
+ * hacía falta construir una nueva.
+ *
+ * Vuelve a ser Server Component (sin "use client") — la versión con
+ * expandir en cliente ya no hace falta mantener ese estado aquí.
  */
-export function PlaytimeBarChart({ juegos }: { juegos: { gameId: string; titulo: string; iconUrl: string | null; horas: number }[] }) {
-  const [expandido, setExpandido] = useState(false);
-
+export function PlaytimeBarChart({
+  juegos,
+  handle,
+}: {
+  juegos: { gameId: string; titulo: string; iconUrl: string | null; horas: number }[];
+  handle: string;
+}) {
   if (juegos.length === 0) {
     return (
       <div className="rounded-2xl p-5 text-sm text-muted" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
@@ -23,11 +32,8 @@ export function PlaytimeBarChart({ juegos }: { juegos: { gameId: string; titulo:
     );
   }
 
-  const visibles = expandido ? juegos : juegos.slice(0, TOP_INICIAL);
-  // El máximo SIEMPRE es el de la lista completa, no el de lo visible — si
-  // no, al contraer de vuelta a 8 las barras cambiarían de escala y las
-  // proporciones dejarían de significar lo mismo que un segundo antes.
-  const maximo = Math.max(...juegos.map((j) => j.horas), 1);
+  const visibles = juegos.slice(0, TOP_MOSTRADO);
+  const maximo = Math.max(...visibles.map((j) => j.horas), 1);
 
   return (
     <div className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
@@ -43,15 +49,16 @@ export function PlaytimeBarChart({ juegos }: { juegos: { gameId: string; titulo:
           </div>
         ))}
       </div>
-      {juegos.length > TOP_INICIAL && (
-        <button
-          type="button"
-          onClick={() => setExpandido((v) => !v)}
-          className="mt-4 text-xs font-bold uppercase tracking-wide text-accent transition-colors hover:text-accent-text"
-        >
-          {expandido ? "Ver menos" : `Ver más (${juegos.length - TOP_INICIAL} juegos más)`}
-        </button>
-      )}
+      {/* Siempre visible, no solo cuando hay más de TOP_MOSTRADO: la
+          consulta de arriba ya viene limitada a 8 (ver
+          EstadisticasCompletas.tsx), así que `juegos.length` nunca lo
+          superaría — comprobarlo aquí escondería el enlace siempre. */}
+      <Link
+        href={`/u/${handle}/biblioteca?orden=horas`}
+        className="mt-4 inline-block text-xs font-bold uppercase tracking-wide text-accent transition-colors hover:text-accent-text"
+      >
+        Ver todas las horas en la Biblioteca →
+      </Link>
     </div>
   );
 }

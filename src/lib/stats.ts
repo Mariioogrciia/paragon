@@ -173,7 +173,7 @@ export function summarise(allGames: Game[]): PlayerSummary {
 
 /* ------------------------------ Búsqueda y filtros ----------------------------- */
 
-export type SortKey = "reciente" | "progreso" | "titulo" | "pendientes" | "asequible";
+export type SortKey = "reciente" | "progreso" | "titulo" | "pendientes" | "asequible" | "horas";
 
 export interface LibraryFilters {
   search?: string;
@@ -339,6 +339,14 @@ export function sortGames(games: Game[], sort: SortKey): Game[] {
         };
         return restante(a) - restante(b);
       });
+    case "horas":
+      // Más horas jugadas primero — destino del "Ver más" de Horas por
+      // juego en Estadísticas (PlaytimeBarChart.tsx): ese gráfico ya
+      // enseña la lista entera al expandir, pero solo como barras; aquí
+      // es la misma información con todo lo demás de la Biblioteca
+      // (búsqueda, filtros, carátulas) para quien quiera algo más que
+      // una lista plana.
+      return copy.sort((a, b) => (b.playtimeMinutes ?? 0) - (a.playtimeMinutes ?? 0));
     case "asequible":
       // El platino más alcanzable primero: el que más gente ha sacado. Los
       // ya platinados y los que no tienen dato de rareza van al final — no
