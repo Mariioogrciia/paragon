@@ -55,7 +55,12 @@ export function HourlyHeatmap({ celdas }: { celdas: CeldaHoraria[] }) {
   const horaFin = (horaInicio + 3) % 24;
 
   return (
-    <div className="overflow-x-auto">
+    // `pt-8`: el tooltip de cada celda sale hacia ARRIBA (`bottom-full`) —
+    // sin este hueco, `overflow-x-auto` de aquí abajo también recorta en
+    // vertical (fijar solo overflow-x ya convierte esto en una caja de
+    // scroll en las dos direcciones, no solo la horizontal) y el tooltip se
+    // veía cortado por arriba en vez de flotar sobre la tarjeta.
+    <div className="overflow-x-auto pt-8 -mt-8">
       {porcentajeMejor >= 10 && (
         <p className="mb-3 text-sm font-semibold">
           El {porcentajeMejor}% de tus trofeos caen los {DIAS[mejorDow]} entre las{" "}

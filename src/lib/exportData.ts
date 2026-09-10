@@ -1,5 +1,5 @@
 import "server-only";
-import { eq, and, desc, or, inArray } from "drizzle-orm";
+import { eq, and, desc, or, inArray, isNotNull } from "drizzle-orm";
 import { db } from "@/db";
 import {
   users,
@@ -69,6 +69,9 @@ export async function exportarDatosUsuario(userId: string) {
         valoracion: userGames.rating,
         reseña: userGames.review,
         fechaReseña: userGames.reviewDate,
+        notaPrivada: userGames.notes,
+        formatoAdquisicion: userGames.acquisitionFormat,
+        precioPagado: userGames.pricePaid,
         enDeseados: userGames.isWishlist,
         añadidoEl: userGames.createdAt,
       })
@@ -124,6 +127,20 @@ export async function exportarDatosUsuario(userId: string) {
     .from(userTrophies)
     .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true)));
 
+  // Aparte de los conseguidos: contadores manuales en marcha (trofeos que
+  // ni la plataforma desglosa, "gana 50 partidas") — es texto que ha
+  // escrito la propia persona, se pierde igual que una nota si no se
+  // exporta con el resto.
+  const contadoresManuales = await db
+    .select({
+      gameId: userTrophies.gameId,
+      trophyId: userTrophies.trophyId,
+      actual: userTrophies.manualProgressCurrent,
+      meta: userTrophies.manualProgressTarget,
+    })
+    .from(userTrophies)
+    .where(and(eq(userTrophies.userId, userId), isNotNull(userTrophies.manualProgressTarget)));
+
   const carpetaIds = carpetas.map((c) => c.id);
   const juegosPorCarpeta =
     carpetaIds.length > 0
@@ -152,6 +169,7 @@ export async function exportarDatosUsuario(userId: string) {
     })),
     biblioteca: bibliotecaFilas,
     trofeosConseguidos,
+    contadoresManuales,
     carpetas: carpetas.map((c) => ({
       ...c,
       juegos: juegosPorCarpeta.filter((j) => j.collectionId === c.id).map((j) => j.gameId),

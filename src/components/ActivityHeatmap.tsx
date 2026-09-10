@@ -58,7 +58,10 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
   });
 
   return (
-    <div className="overflow-x-auto">
+    // Mismo motivo que en HourlyHeatmap.tsx: `overflow-x-auto` sin más
+    // también recorta en vertical, y el tooltip de cada día (que sale hacia
+    // arriba) se veía cortado por el borde de la tarjeta.
+    <div className="overflow-x-auto pt-8 -mt-8">
       <div className="mb-2 flex items-baseline justify-between">
         <p className="text-sm font-semibold">{total} trofeos ganados en los últimos 12 meses</p>
       </div>

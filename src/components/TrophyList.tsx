@@ -305,7 +305,13 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
             </span>
           )}
         </p>
-        {!oculto && trophy.detail && (
+        {/* El NOMBRE de un trofeo oculto se queda tapado a propósito (a
+            veces desvela algo de la trama él solo), pero la plataforma SÍ da
+            la descripción de qué hay que hacer para conseguirlo — antes se
+            tapaba también sin necesidad, dejando "Trofeo oculto" sin ninguna
+            pista de qué hacer. Ya se enseñaba igualmente al abrir la guía
+            del trofeo (TrophyGuideModal), esto solo lo hace consistente. */}
+        {trophy.detail && (
           <p className="mt-1 text-[0.8125rem] text-muted">{trophy.detail}</p>
         )}
       </div>
