@@ -155,3 +155,110 @@ export function resumenFinanciero(games: Game[]): ResumenFinanciero {
     juegosConDatos: conDatos.length,
   };
 }
+
+export interface EficienciaJuego {
+  gameId: string;
+  titulo: string;
+  iconUrl?: string;
+  horasReales: number;
+  horasHltb: number;
+  /** Positivo = más rápido que HLTB (buen cazador); negativo = te lo tomaste con más calma. */
+  diferenciaPct: number;
+}
+
+export interface ResumenEficiencia {
+  /** Media de `diferenciaPct` de todos los juegos con dato — tu ritmo general frente a HLTB. */
+  ritmoMedioPct: number | null;
+  juegosConDatos: number;
+}
+
+/**
+ * Tu ritmo real de caza frente a lo que HowLongToBeat estima para el
+ * completista — solo con juegos que YA tienes platinados/100%
+ * (`esPlatinoEquivalente`, mismo criterio de siempre) y que tienen los dos
+ * datos que hacen falta: `hltb.completionist` (estimación de la
+ * comunidad) y `playtimeMinutes` (tus horas reales, las que da la propia
+ * plataforma — no las metes tú a mano, a diferencia de `pricePaid`).
+ *
+ * `diferenciaPct` positivo = fuiste más rápido que la media (menos horas
+ * de las que estima HLTB); negativo = te lo tomaste con calma/exploraste
+ * más. Nada de "bueno" o "malo" en la propia función — eso lo decide la
+ * UI, aquí solo se calcula el número real.
+ */
+export function eficienciaPersonal(games: Game[]): EficienciaJuego[] {
+  return games
+    .filter((g) => !g.isWishlist && esPlatinoEquivalente(g))
+    .filter((g) => g.hltb?.completionist != null && g.hltb.completionist > 0 && g.playtimeMinutes && g.playtimeMinutes > 0)
+    .map((g) => {
+      const horasReales = g.playtimeMinutes! / 60;
+      const horasHltb = g.hltb!.completionist!;
+      return {
+        gameId: g.id,
+        titulo: g.title,
+        iconUrl: g.iconUrl,
+        horasReales,
+        horasHltb,
+        diferenciaPct: Math.round(((horasHltb - horasReales) / horasHltb) * 100),
+      };
+    })
+    .sort((a, b) => b.diferenciaPct - a.diferenciaPct);
+}
+
+export function resumenEficiencia(eficiencia: EficienciaJuego[]): ResumenEficiencia {
+  if (eficiencia.length === 0) return { ritmoMedioPct: null, juegosConDatos: 0 };
+  const media = eficiencia.reduce((acc, e) => acc + e.diferenciaPct, 0) / eficiencia.length;
+  return { ritmoMedioPct: Math.round(media), juegosConDatos: eficiencia.length };
+}
+
+export interface DeudaBacklog {
+  juegosContados: number;
+  /** Horas de HLTB "main" (ver los créditos) que faltan en lo ya empezado — solo cuenta juegos con ese dato. */
+  horasHistoriaRestantes: number;
+  /** Horas de HLTB "completionist" (100%/platino) que faltan en lo ya empezado. */
+  horasPlatinoRestantes: number;
+}
+
+/**
+ * "Deuda de backlog", en horas reales, no en número de juegos — 40 juegos
+ * pendientes no dice nada por sí solo (pueden ser 100h de indies o 4000h
+ * de RPGs). Solo cuenta juegos EMPEZADOS (progreso entre 1% y 99%, ni
+ * "vergüenza" sin tocar ni ya terminados) y solo con HLTB guardado —
+ * sin ese dato, el juego simplemente no suma, no se inventa una media.
+ *
+ * A propósito SIN una "fecha de liquidación": no hay ningún histórico de
+ * horas jugadas en el tiempo en este proyecto (`playtimeMinutes` es una
+ * foto del total actual, no una serie), así que no hay con qué calcular
+ * un ritmo real en horas/semana — solo un ritmo en TROFEOS/semana
+ * (`lib/history.ts`), que mezclado con horas de HLTB daría una fecha
+ * inventada con apariencia de dato real. Mejor decir "te faltan X horas"
+ * de verdad que "acabarás el 14 de diciembre" de mentira.
+ */
+export function deudaBacklog(games: Game[]): DeudaBacklog {
+  const empezados = games.filter((g) => !g.isWishlist && g.progressPercent > 0 && g.progressPercent < 100);
+
+  let horasHistoriaRestantes = 0;
+  let horasPlatinoRestantes = 0;
+  let juegosContados = 0;
+
+  for (const g of empezados) {
+    const jugadas = (g.playtimeMinutes ?? 0) / 60;
+    let contó = false;
+
+    const historiaEstimada = g.hltb?.main ?? g.hltb?.mainExtra;
+    if (historiaEstimada != null) {
+      horasHistoriaRestantes += Math.max(0, historiaEstimada - jugadas);
+      contó = true;
+    }
+    if (g.hltb?.completionist != null) {
+      horasPlatinoRestantes += Math.max(0, g.hltb.completionist - jugadas);
+      contó = true;
+    }
+    if (contó) juegosContados++;
+  }
+
+  return {
+    juegosContados,
+    horasHistoriaRestantes: Math.round(horasHistoriaRestantes),
+    horasPlatinoRestantes: Math.round(horasPlatinoRestantes),
+  };
+}

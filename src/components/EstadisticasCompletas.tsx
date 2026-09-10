@@ -9,8 +9,10 @@ import { HourlyHeatmap } from "@/components/HourlyHeatmap";
 import { HistoricalTimeline } from "@/components/HistoricalTimeline";
 import { PlatinosAlAlcance } from "@/components/PlatinosAlAlcance";
 import { SalonDeLaVerguenza } from "@/components/SalonDeLaVerguenza";
-import { platinosAlAlcance, salonDeLaVerguenza, costePorHora, resumenFinanciero } from "@/lib/backlog";
+import { platinosAlAlcance, salonDeLaVerguenza, costePorHora, resumenFinanciero, eficienciaPersonal, resumenEficiencia, deudaBacklog } from "@/lib/backlog";
 import { CostePorHora } from "@/components/CostePorHora";
+import { EficienciaPersonal } from "@/components/EficienciaPersonal";
+import { DeudaBacklog } from "@/components/DeudaBacklog";
 import { TrophyDnaRadar } from "@/components/TrophyDnaRadar";
 import { calcularTrophyDna } from "@/lib/trophyDna";
 import { TrophyMonthChart, PlaytimeBarChart } from "@/components/StatCharts";
@@ -75,6 +77,9 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
   const verguenza = esMio ? salonDeLaVerguenza(biblioteca) : [];
   const costes = esMio ? costePorHora(biblioteca) : [];
   const finanzas = esMio ? resumenFinanciero(biblioteca) : null;
+  const eficiencia = esMio ? eficienciaPersonal(biblioteca) : [];
+  const ritmo = esMio ? resumenEficiencia(eficiencia) : null;
+  const deuda = esMio ? deudaBacklog(biblioteca) : null;
   const dna = calcularTrophyDna(biblioteca);
 
   return (
@@ -144,6 +149,22 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
           <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Coste por hora</h2>
           <p className="mb-4 text-sm text-muted">Solo cuenta con lo que has puesto tú a mano en cada ficha — precio pagado y horas jugadas.</p>
           <CostePorHora juegos={costes} resumen={finanzas!} />
+        </section>
+      )}
+
+      {esMio && eficiencia.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Tu eficiencia de caza</h2>
+          <p className="mb-4 text-sm text-muted">Tus horas reales en lo ya platinado/100%, comparadas con la estimación de HowLongToBeat.</p>
+          <EficienciaPersonal juegos={eficiencia} resumen={ritmo!} />
+        </section>
+      )}
+
+      {esMio && deuda && deuda.juegosContados > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Deuda de backlog</h2>
+          <p className="mb-4 text-sm text-muted">En horas, no en número de juegos — lo que te falta en lo que ya tienes EMPEZADO, nada más.</p>
+          <DeudaBacklog deuda={deuda} />
         </section>
       )}
 
