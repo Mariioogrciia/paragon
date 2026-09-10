@@ -80,3 +80,31 @@ export function calcularTrophyDna(games: Game[]): TrophyDna {
 
   return { ejes, arquetipo };
 }
+
+/**
+ * % de afinidad de un juego de Descubrir con tu propio Trophy DNA — cruza
+ * los géneros IGDB del juego con los ejes ya calculados por
+ * `calcularTrophyDna` (mismo `valor` 0-100 que pinta el radar, no un
+ * cálculo aparte). Un juego puede tocar varios ejes a la vez (p.ej. un RPG
+ * de acción); se queda con el MÁS ALTO de los que coincidan, no una media
+ * — "92% de afinidad" tiene que reflejar tu eje más fuerte que de verdad
+ * aplica aquí, no diluirse por ejes que no tocan este juego.
+ *
+ * `null` (no un 0%) cuando no hay ningún eje con trofeos todavía (cuenta
+ * recién empezada) o el juego no tiene géneros que crucen con ninguno de
+ * los nuestros — un 0% sugeriría "sabemos que no te va a gustar", que es
+ * un dato que no tenemos; lo honesto es no enseñar el badge en absoluto.
+ */
+export function calcularAfinidad(ejes: EjeDna[], genresJuego: string[]): number | null {
+  if (genresJuego.length === 0) return null;
+  const generoSet = new Set(genresJuego);
+
+  let mejor: number | null = null;
+  for (const eje of ejes) {
+    if (eje.trofeos === 0) continue;
+    const cat = CATEGORIAS_GENERO.find((c) => c.key === eje.key);
+    if (!cat?.generos.some((g) => generoSet.has(g))) continue;
+    if (mejor === null || eje.valor > mejor) mejor = eje.valor;
+  }
+  return mejor;
+}

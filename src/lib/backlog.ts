@@ -61,6 +61,48 @@ export function salonDeLaVerguenza(games: Game[]): JuegoSinEmpezar[] {
     .map((g) => ({ gameId: g.id, titulo: g.title, iconUrl: g.iconUrl, deviceLabel: g.deviceLabel }));
 }
 
+export interface RescateBacklog {
+  gameId: string;
+  titulo: string;
+  iconUrl?: string;
+  horasHltb: number;
+  acquisitionFormat?: Game["acquisitionFormat"];
+}
+
+/**
+ * "Descubre en tu propio desván": el mejor juego para jugar hoy puede que
+ * ya lo tengas comprado (o incluido en una suscripción) y olvidado al 0% —
+ * mismo punto de partida que `salonDeLaVerguenza`, pero ordenado para
+ * sugerir uno concreto, no solo para dar vergüenza.
+ *
+ * A propósito SIN un umbral de "nota alta" (la idea original pedía
+ * Metacritic > 85): no hay ninguna nota de Metacritic guardada en el
+ * proyecto, solo la valoración personal de cada usuario
+ * (`Game.rating`), que un juego a 0% casi nunca tiene puesta todavía —
+ * inventar el corte con un dato que no existe sería peor que no ponerlo.
+ * Se ordena por duración (más corto primero) y prioriza lo que ya pagas
+ * vía suscripción (`acquisitionFormat` ps_plus/game_pass) sobre lo
+ * comprado aparte — ahí es donde de verdad se "regala" la cuota si no se
+ * toca.
+ */
+export function rescateBiblioteca(games: Game[], maxHoras = 15): RescateBacklog[] {
+  return games
+    .filter((g) => !g.isWishlist && g.progressPercent === 0)
+    .filter((g) => g.hltb?.completionist != null && g.hltb.completionist <= maxHoras)
+    .map((g) => ({
+      gameId: g.id,
+      titulo: g.title,
+      iconUrl: g.iconUrl,
+      horasHltb: g.hltb!.completionist!,
+      acquisitionFormat: g.acquisitionFormat,
+    }))
+    .sort((a, b) => {
+      const esSuscripcion = (f?: Game["acquisitionFormat"]) => (f === "ps_plus" || f === "game_pass" ? 0 : 1);
+      const diff = esSuscripcion(a.acquisitionFormat) - esSuscripcion(b.acquisitionFormat);
+      return diff !== 0 ? diff : a.horasHltb - b.horasHltb;
+    });
+}
+
 export interface CosteHora {
   gameId: string;
   titulo: string;

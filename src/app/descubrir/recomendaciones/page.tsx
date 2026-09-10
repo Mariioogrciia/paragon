@@ -2,13 +2,30 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getGameRecommendations } from "@/lib/recommendations";
-import { getRecommendationsByGenre } from "@/lib/discover";
+import { getRecommendationsByGenre, getPlatinosRelax } from "@/lib/discover";
+import { getProfileByUserId, getLibrary } from "@/lib/profiles";
+import { calcularTrophyDna, calcularAfinidad } from "@/lib/trophyDna";
+import { rescateBiblioteca } from "@/lib/backlog";
 import { coverGradient } from "@/lib/design";
 import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
 import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Recomendaciones · Paragon" };
+
+const LABEL_ADQUISICION: Record<string, string> = {
+  ps_plus: "PS Plus",
+  game_pass: "Game Pass",
+};
+
+function BadgeAfinidad({ valor }: { valor: number | null }) {
+  if (valor === null) return null;
+  return (
+    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-accent backdrop-blur-sm">
+      {valor}% afín
+    </span>
+  );
+}
 
 /**
  * Recomendaciones personalizadas, en su propia página — antes vivían al
@@ -21,10 +38,17 @@ export default async function RecomendacionesPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
-  const [tiras, recomendaciones] = await Promise.all([
+  const profile = await getProfileByUserId(session.user.id);
+  const { games: misJuegos } = profile ? await getLibrary(profile) : { games: [] };
+  const dna = calcularTrophyDna(misJuegos);
+
+  const [tiras, recomendaciones, relax] = await Promise.all([
     getRecommendationsByGenre(session.user.id),
     getGameRecommendations(session.user.id),
+    getPlatinosRelax(),
   ]);
+
+  const rescate = rescateBiblioteca(misJuegos);
 
   return (
     <div>
@@ -34,6 +58,63 @@ export default async function RecomendacionesPage() {
         <p className="mt-2 text-lg text-muted">Hechas a partir de tu propia biblioteca — por género, y en general.</p>
       </div>
 
+      {rescate.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Descubre en tu propio desván</h2>
+          <p className="mb-4 text-sm text-muted">Ya los tienes — a 0%, cortos, esperando desde hace quién sabe cuánto.</p>
+          <CardCarousel>
+            {rescate.map((g) => (
+              <Link
+                key={g.gameId}
+                href={`/u/${profile?.handle}/${g.gameId}`}
+                className="group relative block aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-xl sm:w-48"
+                style={{ background: coverGradient(g.gameId) }}
+              >
+                {g.iconUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={g.iconUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-sm" />
+                )}
+                <div className="absolute inset-0" style={{ background: "rgba(0,0,0,.55)" }} />
+                {g.iconUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+                {g.acquisitionFormat && LABEL_ADQUISICION[g.acquisitionFormat] && (
+                  <div className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
+                    {LABEL_ADQUISICION[g.acquisitionFormat]}
+                  </div>
+                )}
+                <div className="absolute inset-x-0 bottom-0 p-3">
+                  <p className="font-heading text-sm font-bold uppercase leading-tight text-white drop-shadow-md">{g.titulo}</p>
+                  <p className="mt-1 text-[0.6875rem] font-semibold text-white/70">~{g.horasHltb}h · al 0%</p>
+                </div>
+              </Link>
+            ))}
+          </CardCarousel>
+        </section>
+      )}
+
+      {relax.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Platinos Relax</h2>
+          <p className="mb-4 text-sm text-muted">Poco perdible, poca dificultad, poca duración — para cuando vienes saturado de otro juego.</p>
+          <CardCarousel>
+            {relax.map((g) => (
+              <PosterCard
+                key={g.igdbId}
+                game={g}
+                badge={
+                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
+                    ~{g.hltbCompletionist}h · {g.perdibles === 0 ? "0 perdibles" : `${g.perdibles} perdible`}
+                  </span>
+                }
+              />
+            ))}
+          </CardCarousel>
+        </section>
+      )}
+
       {tiras.map((tira) => (
         <section key={tira.genero} className="mb-10">
           <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
@@ -41,7 +122,7 @@ export default async function RecomendacionesPage() {
           </h2>
           <CardCarousel>
             {tira.juegos.map((g) => (
-              <PosterCard key={g.igdbId} game={g} />
+              <PosterCard key={g.igdbId} game={g} badge={<BadgeAfinidad valor={calcularAfinidad(dna.ejes, g.genres)} />} />
             ))}
           </CardCarousel>
         </section>
@@ -76,6 +157,9 @@ export default async function RecomendacionesPage() {
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
+                  <div className="absolute right-2 top-2">
+                    <BadgeAfinidad valor={calcularAfinidad(dna.ejes, rec.genres)} />
+                  </div>
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <h3 className="font-heading text-xl font-bold uppercase leading-tight drop-shadow-md">{rec.title}</h3>
                     {rec.ratingAverage && (
