@@ -76,12 +76,33 @@ export const users = pgTable("user", {
   profileSectionOrder: jsonb("profileSectionOrder").$type<string[]>(),
 
   /**
-   * URL del webhook de Discord donde anunciar los logros nuevos (ver
-   * lib/discordWebhook.ts). No hay bot ni permisos que pedir — el propio
-   * usuario crea el webhook desde los ajustes de su servidor de Discord
-   * (Integraciones → Webhooks) y pega la URL aquí. `null` = desactivado.
+   * URL del webhook de Discord — SUSTITUIDO por el bot (ver
+   * lib/discordBot.ts): un DM del bot no necesita que nadie cree ni pegue
+   * una URL, solo que haya iniciado sesión con Discord. Columna e
+   * historial se dejan tal cual por si alguien la tenía puesta, pero ya no
+   * la lee ni la escribe ningún código nuevo.
    */
   discordWebhookUrl: text("discordWebhookUrl"),
+  /**
+   * Avisos de trofeos por DM del bot de Discord de Paragon — opt-in
+   * (`false` por defecto: mandar un DM sin que lo hayan pedido sería
+   * spam). Solo funciona de verdad si la cuenta inició sesión con Discord
+   * alguna vez (`accounts`, provider='discord' — de ahí sale el ID al que
+   * escribirle) Y esa persona comparte un servidor con el bot con los DMs
+   * de miembros del servidor permitidos; si no, Discord devuelve un 403 al
+   * intentarlo, que se enseña tal cual en el botón "Probar" de Ajustes.
+   */
+  discordDmEnabled: boolean("discordDmEnabled").notNull().default(false),
+
+  /**
+   * Claves de `NAV_OCULTABLE` (lib/navPreferences.ts) que este usuario ha
+   * decidido ocultar de su propia cabecera — funciones opcionales que no le
+   * interesan (Comunidad, Ligas, Amigos, Descubrir, Noticias, Planificador).
+   * `null`/`[]` = se ven todas, el comportamiento de siempre. Es personal,
+   * no afecta a nadie más ni desactiva la función en el servidor: solo dejas
+   * de verla en tu propio menú.
+   */
+  hiddenNavItems: jsonb("hiddenNavItems").$type<string[]>().default([]),
 
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
@@ -324,6 +345,21 @@ export const userGames = pgTable(
      * diferencia de `review` (que sí se enseña a quien visite tu perfil).
      */
     notes: text("notes"),
+    /**
+     * De dónde tienes este juego — campo opcional, lo rellena el usuario a
+     * mano (nadie da esto por API). `null` = no dicho. Sirve para filtrar
+     * ("qué tengo en PS Plus") y para el coste por hora de abajo: un juego
+     * de catálogo cuesta 0€ aunque exista un precio de lista.
+     */
+    acquisitionFormat: text("acquisitionFormat").$type<"fisico" | "digital" | "ps_plus" | "game_pass" | "prestado" | "gratis">(),
+    /**
+     * Lo que pagaste TÚ por este juego (no el precio de lista) — para
+     * calcular €/hora jugada. `null` = no dicho; `0` es un valor real (vino
+     * gratis, en oferta a 0, o entra en la suscripción de `acquisitionFormat`).
+     * Independiente de `pricePaid`/histórico de precios de `lib/prices.ts`,
+     * que es el precio de MERCADO del juego, no lo que pagó esta persona.
+     */
+    pricePaid: doublePrecision("pricePaid"),
     isWishlist: boolean("isWishlist").notNull().default(false),
     /**
      * Cuándo se ancló este juego como "el objetivo ahora mismo" — null si no
@@ -376,6 +412,16 @@ export const userTrophies = pgTable(
     rarityPercent: doublePrecision("rarityPercent"),
     progressCurrent: integer("progressCurrent"),
     progressTarget: integer("progressTarget"),
+    /**
+     * Contador manual, para trofeos que ni PSN ni Steam desglosan
+     * (`progressCurrent`/`progressTarget` de arriba, cuando la propia
+     * plataforma sí lo hace) — "gana 50 partidas", "encuentra las 100
+     * plumas". Lo rellena el propio usuario a mano con un +/-, la
+     * plataforma nunca lo toca. `manualProgressTarget` null = todavía no
+     * configurado; se pide una vez y luego solo quedan los botones +/-.
+     */
+    manualProgressCurrent: integer("manualProgressCurrent"),
+    manualProgressTarget: integer("manualProgressTarget"),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.gameId, t.trophyId] }),

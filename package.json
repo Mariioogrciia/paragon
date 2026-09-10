@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1",
     "@icons-pack/react-simple-icons": "^13.15.1",
     "@supabase/supabase-js": "^2.115.0",
     "date-fns": "^4.4.0",
@@ -31,9 +34,12 @@
     "react-intersection-observer": "^11.0.1",
     "rss-parser": "^3.13.0",
     "server-only": "^0.0.1",
+    "tweetnacl": "^1.0.3",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",

@@ -5,7 +5,6 @@ import { games, platformAccounts, userGames, userTrophies } from "@/db/schema";
 import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
 import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
-import { generarAvisos } from "@/lib/notifications";
 
 /**
  * Sincronización desatendida.
@@ -237,26 +236,7 @@ export async function GET(request: Request) {
     }
   }
 
-  // Avisos, con los datos ya frescos. Van al final a propósito: si la pasada
-  // se queda sin tiempo antes, es preferible perder los avisos de esta hora
-  // que dejar la biblioteca sin sincronizar.
-  let avisos = 0;
-
-  for (const fila of pendientes) {
-    if (Date.now() - arranque > maxDuration * 1000 - 5_000) break;
-
-    try {
-      avisos += await generarAvisos(fila.userId, async (igdbId) => {
-        const juego = await getGame(igdbId);
-        return juego ? { titulo: juego.title, salida: juego.releaseDate } : null;
-      });
-    } catch (error) {
-      console.error("[cron-sync] avisos", fila.userId, error);
-    }
-  }
-
   return NextResponse.json({
-    avisosNuevos: avisos,
     sincronizados: resultados.filter((r) => r.error === undefined).length,
     fallidos: resultados.filter((r) => r.error !== undefined).length,
     fichasRellenadas: detalles,

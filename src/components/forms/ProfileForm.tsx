@@ -10,7 +10,7 @@ import { AvatarFrame } from "@/components/AvatarFrame";
 import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
-import { DiscordWebhookForm } from "@/components/forms/Forms";
+import { DiscordDmForm } from "@/components/forms/Forms";
 import { PushToggle } from "@/components/PushToggle";
 
 interface ProfileFormUser {
@@ -31,7 +31,7 @@ interface ProfileFormUser {
   statusText?: string | null;
   theme?: string | null;
   profileSectionOrder?: string[] | null;
-  discordWebhookUrl?: string | null;
+  discordDmEnabled?: boolean;
 }
 
 const FRAMES = [
@@ -57,6 +57,7 @@ export function ProfileForm({
   badges = [],
   juegos = [],
   favoritos = [],
+  discordVinculado = false,
 }: {
   user: ProfileFormUser;
   /** Nivel Paragon real del usuario — decide qué marcos puede elegir de
@@ -71,6 +72,8 @@ export function ProfileForm({
   /** IDs de los juegos favoritos del usuario, para ponerlos primero en el
    * selector — el fondo "basado en tu juego favorito" que se pidió. */
   favoritos?: string[];
+  /** Si esta cuenta inició sesión con Discord alguna vez — sin esto el bot no tiene a quién escribir. */
+  discordVinculado?: boolean;
 }) {
   const [titulo, setTitulo] = useState(user.profileTitle ?? "");
   const marcoBloqueado = (v: string) => FRAME_REQUISITOS[v] !== undefined && nivel < FRAME_REQUISITOS[v];
@@ -338,7 +341,7 @@ export function ProfileForm({
           válido — el navegador ignora el anidado y rompe el envío. */}
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
         <h2 className="font-semibold mb-4">Discord</h2>
-        <DiscordWebhookForm current={user.discordWebhookUrl} />
+        <DiscordDmForm enabled={user.discordDmEnabled ?? false} vinculado={discordVinculado} />
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">

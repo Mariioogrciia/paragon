@@ -587,6 +587,8 @@ export const getLibrary = cache(
       reviewDate: userGames.reviewDate,
       isWishlist: userGames.isWishlist,
       pinnedAt: userGames.pinnedAt,
+      acquisitionFormat: userGames.acquisitionFormat,
+      pricePaid: userGames.pricePaid,
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
@@ -681,6 +683,8 @@ export const getLibrary = cache(
     reviewDate: r.reviewDate?.toISOString() ?? undefined,
     isWishlist: r.isWishlist ?? false,
     isPinned: r.pinnedAt != null,
+    acquisitionFormat: r.acquisitionFormat ?? undefined,
+    pricePaid: r.pricePaid ?? undefined,
   }));
 
   return { player: toPlayer(profile), games };
@@ -794,6 +798,8 @@ export async function getGameDetail(
       rarityPercent: userTrophies.rarityPercent,
       progressCurrent: userTrophies.progressCurrent,
       progressTarget: userTrophies.progressTarget,
+      manualProgressCurrent: userTrophies.manualProgressCurrent,
+      manualProgressTarget: userTrophies.manualProgressTarget,
     })
     .from(gameTrophies)
     .leftJoin(
@@ -845,6 +851,10 @@ export async function getGameDetail(
       r.progressTarget != null
         ? { current: r.progressCurrent ?? 0, target: r.progressTarget }
         : undefined,
+    manualProgress:
+      r.manualProgressTarget != null
+        ? { current: r.manualProgressCurrent ?? 0, target: r.manualProgressTarget }
+        : undefined,
   }));
 
   // El progreso (y la fecha de sincronización) pueden haber cambiado al
@@ -871,6 +881,33 @@ export async function getGameDetail(
     notes: fresco?.notes ?? null,
     trophies,
   };
+}
+
+/**
+ * Contador manual de un trofeo (lib/types.ts: `Trophy.manualProgress`) — para
+ * lo que ni PSN ni Steam desglosan ("gana 50 partidas"). `target === null`
+ * lo borra (vuelve a "sin configurar"), no hay una fila que crear aparte:
+ * `userTrophies` ya tiene una fila para cada trofeo desde el primer sync
+ * (ver `syncGameTrophies` en lib/sync.ts), así que esto es un UPDATE, no un
+ * upsert — salvo que el juego no se haya sincronizado nunca, de ahí el
+ * `onConflictDoNothing` como red de seguridad silenciosa.
+ */
+export async function setManualTrophyProgress(
+  userId: string,
+  gameId: string,
+  trophyId: string,
+  current: number,
+  target: number | null,
+): Promise<void> {
+  const actualCurrent = target == null ? null : Math.max(0, Math.min(current, target));
+
+  await db
+    .insert(userTrophies)
+    .values({ userId, gameId, trophyId, manualProgressCurrent: actualCurrent, manualProgressTarget: target })
+    .onConflictDoUpdate({
+      target: [userTrophies.userId, userTrophies.gameId, userTrophies.trophyId],
+      set: { manualProgressCurrent: actualCurrent, manualProgressTarget: target },
+    });
 }
 
 /* ------------------------------------ Amigos ------------------------------------ */

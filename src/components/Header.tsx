@@ -16,6 +16,11 @@ const SYNC_INICIAL: ActionState = {};
  * detrás de "Más" (MenuMas, abajo), mismo patrón que "Más filtros" en la
  * biblioteca: no desaparece nada, solo deja de estar siempre a la vista.
  */
+/**
+ * `navKey`: casa con `NAV_OCULTABLE` (lib/navPreferences.ts) para poder
+ * ocultarlo desde /ajustes/ocultar. Panel y Biblioteca no llevan clave —
+ * son el núcleo de la app, no algo "opcional" que se pueda ocultar.
+ */
 const NAV_PRINCIPAL = [
   { label: "Panel", href: "/", match: (p: string) => p === "/" },
   {
@@ -27,39 +32,43 @@ const NAV_PRINCIPAL = [
     label: "Comunidad",
     href: "/feed",
     match: (p: string) => p.startsWith("/feed"),
+    navKey: "feed",
   },
   {
     label: "Ligas",
     href: "/ligas",
     match: (p: string) => p.startsWith("/ligas"),
+    navKey: "ligas",
   },
   {
     label: "Amigos",
     href: "/amigos",
     match: (p: string) =>
       p.startsWith("/amigos") || p.startsWith("/comparar") || p.startsWith("/rankings"),
+    navKey: "amigos",
   },
-];
+] as const;
 
 const NAV_MAS = [
   {
     label: "Descubrir",
     href: "/descubrir",
     match: (p: string) => p.startsWith("/descubrir"),
+    navKey: "descubrir",
   },
   {
     label: "Noticias",
     href: "/noticias",
     match: (p: string) => p.startsWith("/noticias"),
+    navKey: "noticias",
   },
   {
     label: "Planificador",
     href: "/planificador",
     match: (p: string) => p.startsWith("/planificador"),
+    navKey: "planificador",
   },
-];
-
-const LOGGED_IN_NAV = [...NAV_PRINCIPAL, ...NAV_MAS];
+] as const;
 
 const LOGGED_OUT_NAV = [
   { label: "Inicio", href: "/", match: (p: string) => p === "/" },
@@ -69,7 +78,15 @@ const LOGGED_OUT_NAV = [
 ];
 
 /** Desplegable de "Más": mismos enlaces que ya había, solo que agrupados. */
-function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
+function MenuMas({
+  pathname,
+  activo,
+  items,
+}: {
+  pathname: string;
+  activo: boolean;
+  items: typeof NAV_MAS[number][];
+}) {
   const [abierto, setAbierto] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
 
@@ -80,6 +97,8 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
     document.addEventListener("mousedown", fuera);
     return () => document.removeEventListener("mousedown", fuera);
   }, []);
+
+  if (items.length === 0) return null;
 
   return (
     <div className="relative" ref={panel}>
@@ -104,7 +123,7 @@ function MenuMas({ pathname, activo }: { pathname: string; activo: boolean }) {
           className="absolute left-0 z-50 mt-2 w-48 rounded-xl p-1.5 shadow-lg"
           style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
         >
-          {NAV_MAS.map((item) => {
+          {items.map((item) => {
             const active = item.match(pathname);
             return (
               <Link
@@ -191,7 +210,7 @@ function BotonSincronizar({ comoFila = false }: { comoFila?: boolean }) {
 
 export function Header({
   user,
-  avisosSinLeer = 0,
+  navOculta = [],
 }: {
   user: {
     handle: string | null;
@@ -202,16 +221,19 @@ export function Header({
     esDesarrollador?: boolean;
     tieneCuentas?: boolean;
   } | null;
-  /** Avisos pendientes, para el punto de la campana. */
-  avisosSinLeer?: number;
+  /** Claves de NAV_OCULTABLE que este usuario ha decidido no ver (/ajustes/ocultar). */
+  navOculta?: string[];
 }) {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const ocultas = new Set(navOculta);
+  const navPrincipalVisible = NAV_PRINCIPAL.filter((item) => !("navKey" in item) || !ocultas.has(item.navKey));
+  const navMasVisible = NAV_MAS.filter((item) => !ocultas.has(item.navKey));
   // El menú móvil (el de la hamburguesa) sigue enseñando todo en una lista,
   // "Más" incluido — ahí no hace falta esconder nada, ya está detrás de un
   // botón. Admin no entra aquí: vive como icono junto al avatar (ver abajo).
-  const nav = user?.handle ? LOGGED_IN_NAV : LOGGED_OUT_NAV;
-  const masActivo = NAV_MAS.some((item) => item.match(pathname));
+  const nav = user?.handle ? [...navPrincipalVisible, ...navMasVisible] : LOGGED_OUT_NAV;
+  const masActivo = navMasVisible.some((item) => item.match(pathname));
 
   return (
     <header
@@ -258,7 +280,7 @@ export function Header({
         </button>
 
         <nav className="hidden items-center gap-1 sm:flex">
-          {(user?.handle ? NAV_PRINCIPAL : LOGGED_OUT_NAV).map((item) => {
+          {(user?.handle ? navPrincipalVisible : LOGGED_OUT_NAV).map((item) => {
             const href = typeof item.href === "function" ? item.href(user?.handle ?? "") : item.href;
             const active = item.match(pathname);
 
@@ -277,43 +299,16 @@ export function Header({
               </Link>
             );
           })}
-          {user?.handle && <MenuMas pathname={pathname} activo={masActivo} />}
+          {user?.handle && <MenuMas pathname={pathname} activo={masActivo} items={navMasVisible} />}
         </nav>
 
         <div className="ml-auto flex items-center gap-3.5">
           {/* Sincronizar, tema y admin solo en escritorio: en movil viven
               dentro del menu de la hamburguesa. Con los seis iconos a la vez
-              la barra se desbordaba y el logo quedaba pisado. Los avisos SI
-              se quedan: es lo unico que cambia solo y hay que poder ver de un
-              vistazo si tienes algo sin leer. */}
+              la barra se desbordaba y el logo quedaba pisado. */}
           <span className="hidden sm:flex sm:items-center sm:gap-3.5">
             {user?.tieneCuentas && <BotonSincronizar />}
           </span>
-
-          {user && (
-            <Link
-              href="/avisos"
-              aria-label={
-                avisosSinLeer > 0 ? `Avisos: ${avisosSinLeer} sin leer` : "Avisos"
-              }
-              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground"
-              style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-
-              {/* Solo el punto, sin número: el número exacto ya está dentro, y
-                  aquí lo único que importa es si hay algo o no. */}
-              {avisosSinLeer > 0 && (
-                <span
-                  className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full"
-                  style={{ background: "var(--accent)", border: "2px solid var(--background)" }}
-                />
-              )}
-            </Link>
-          )}
 
           <span className="hidden sm:inline">
             <ThemeCustomizer />

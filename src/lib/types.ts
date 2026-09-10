@@ -104,6 +104,8 @@ export interface Trophy {
    * exponen, y aun así PSN no siempre devuelve el valor actual — ver psn.ts.
    */
   progress?: { current: number; target: number };
+  /** Igual que `progress`, pero lo lleva el usuario a mano — ver GameNotes/TrophyGuideModal. Solo tiene sentido enseñarlo cuando `progress` (el nativo de la plataforma) no existe. */
+  manualProgress?: { current: number; target: number };
   groupId?: string;
   groupName?: string;
   /** Gamerscore real, solo Xbox — ver lib/paragonScore.ts. */
@@ -145,6 +147,10 @@ export interface Game {
   service?: "trophy" | "trophy2";
   /** Minutos jugados. Steam y PSN pueden proporcionarlo. */
   playtimeMinutes?: number;
+  /** De dónde tienes este juego — lo dice el propio usuario, ninguna API lo da. */
+  acquisitionFormat?: "fisico" | "digital" | "ps_plus" | "game_pass" | "prestado" | "gratis";
+  /** Lo que pagó ESTA persona, no el precio de mercado — para €/hora. `undefined` = no dicho. */
+  pricePaid?: number;
 
   /* Metadatos de catálogo, para agrupar y filtrar. */
   developer?: string;

@@ -39,6 +39,12 @@ export default async function AjustesLayout({ children }: { children: React.Reac
           >
             Cuentas de Juegos
           </Link>
+          <Link
+            href="/ajustes/ocultar"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted hover:bg-white/5 hover:text-foreground transition-colors"
+          >
+            Ocultar
+          </Link>
         </nav>
       </aside>
 

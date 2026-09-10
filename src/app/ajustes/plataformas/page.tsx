@@ -179,22 +179,34 @@ export default async function AjustesPlataformasPage() {
         <PlatformSection platform="steam" account={steam}>
           <LinkSteamForm current={steam?.username} />
         </PlatformSection>
-        
-        <PlatformSection platform="google" account={google}>
-          <LinkGoogleForm current={google?.username} />
-        </PlatformSection>
 
         <PlatformSection platform="xbox" account={xbox}>
           <LinkXboxForm current={xbox?.username} />
         </PlatformSection>
 
-        <PlatformSection platform="epic" account={epic}>
-          <LinkEpicForm current={epic?.username} />
-        </PlatformSection>
-        
-        <PlatformSection platform="ubisoft" account={ubisoft}>
-          <LinkUbisoftForm current={ubisoft?.username} />
-        </PlatformSection>
+        {/* Google Play, Epic Games y Ubisoft ya no se ofrecen para vincular:
+            ninguna tiene una forma real de sincronizar logros de terceros
+            (sin API REST pública documentada, solo ingeniería inversa de su
+            GraphQL/OAuth interno — ver HANDOFF). Quien ya tuviera una cuenta
+            vinculada de antes la sigue viendo aquí, con la opción de
+            desvincularla, pero no se puede crear una nueva. */}
+        {google && (
+          <PlatformSection platform="google" account={google}>
+            <LinkGoogleForm current={google.username} />
+          </PlatformSection>
+        )}
+
+        {epic && (
+          <PlatformSection platform="epic" account={epic}>
+            <LinkEpicForm current={epic.username} />
+          </PlatformSection>
+        )}
+
+        {ubisoft && (
+          <PlatformSection platform="ubisoft" account={ubisoft}>
+            <LinkUbisoftForm current={ubisoft.username} />
+          </PlatformSection>
+        )}
 
         <section className="mt-3.5 rounded-[18px] p-6 flex flex-col" style={CARD}>
           <div className="flex items-center gap-3 mb-4 opacity-50">

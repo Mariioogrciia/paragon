@@ -27,6 +27,7 @@ import {
   resyncPlatform,
   sendFriendRequest,
   setHandle,
+  setManualTrophyProgress,
   setProfileInfo,
   unlinkAccount,
 } from "@/lib/profiles";
@@ -43,14 +44,14 @@ import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
 import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
 import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideError, type TrophyGuideRow } from "@/lib/trophyGuides";
-import { marcarTodoLeido } from "@/lib/notifications";
 import { ownsGame } from "@/lib/community";
 import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
 import { votarDificultad } from "@/lib/communityDifficulty";
 import { getGameRecommendations, type GameRecommendation } from "@/lib/recommendations";
 import type { AccountPlatform } from "@/lib/types";
-import { setDiscordWebhookUrl, esWebhookDiscordValido, enviarWebhookDePrueba } from "@/lib/discordWebhook";
+import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
+import { setHiddenNavItems } from "@/lib/navPreferences";
 
 export interface ActionState {
   error?: string;
@@ -133,41 +134,36 @@ export async function updateProfileAction(
   return { success: "Perfil actualizado correctamente." };
 }
 
-/* ------------------------------ Webhook de Discord ----------------------------- */
+/* -------------------------------- Bot de Discord -------------------------------- */
 
-export async function setDiscordWebhookAction(
+/**
+ * Activa/desactiva los DMs del bot — sustituye al webhook de antes (ya no
+ * hay URL que pegar). Solo tiene efecto de verdad si la cuenta inició
+ * sesión con Discord alguna vez; si no, se avisa aquí mismo en vez de
+ * dejar el interruptor encendido sin que vaya a pasar nada.
+ */
+export async function setDiscordDmAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
   const userId = await requireUserId();
-  const url = String(formData.get("url") ?? "").trim();
+  const activar = formData.get("activar") === "true";
 
-  try {
-    await setDiscordWebhookUrl(userId, url || null);
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : "No se pudo guardar." };
+  if (activar && !(await discordUserIdDe(userId))) {
+    return { error: "Tu cuenta no inició sesión con Discord — sin eso el bot no sabe a quién escribir." };
   }
 
+  await setDiscordDmEnabled(userId, activar);
   revalidatePath("/ajustes");
-  return url ? { success: "Webhook guardado. Los logros nuevos se anuncian ahí." } : { success: "Webhook quitado." };
+  return activar ? { success: "Avisos por Discord activados." } : { success: "Avisos por Discord desactivados." };
 }
 
-export async function testDiscordWebhookAction(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  await requireUserId();
-  const url = String(formData.get("url") ?? "").trim();
-
-  if (!url) return { error: "Pega primero la URL del webhook." };
-  if (!esWebhookDiscordValido(url)) {
-    return { error: "Eso no parece una URL de webhook de Discord." };
-  }
-
-  const ok = await enviarWebhookDePrueba(url);
-  return ok
-    ? { success: "Mensaje de prueba enviado — revisa el canal de Discord." }
-    : { error: "Discord no aceptó el mensaje. Comprueba que el webhook sigue existiendo." };
+export async function probarDiscordDmAction(_prev: ActionState): Promise<ActionState> {
+  const userId = await requireUserId();
+  const res = await probarDiscordDm(userId);
+  return res.ok
+    ? { success: "Mensaje de prueba enviado — revisa tus DMs de Discord." }
+    : { error: res.error ?? "No se pudo enviar." };
 }
 
 /* ------------------------------ Notificaciones push ----------------------------- */
@@ -767,11 +763,17 @@ export async function setManualGameCompletedAction(gameId: string, completed: bo
   revalidatePath("/", "layout");
 }
 
-/* ------------------------------------- Avisos ------------------------------------ */
+/* ------------------------------------- Ocultar ------------------------------------ */
 
-export async function marcarLeidoAction(): Promise<void> {
+/**
+ * Guarda de golpe el set completo de funciones ocultas (el formulario manda
+ * todas las que quedaron marcadas) — no hay "ocultar una a una" desde aquí,
+ * es una única lista que se reemplaza entera. Ver lib/navPreferences.ts.
+ */
+export async function setHiddenNavItemsAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
-  await marcarTodoLeido(userId);
+  const items = formData.getAll("navKey").map(String);
+  await setHiddenNavItems(userId, items);
   revalidatePath("/", "layout");
 }
 
@@ -1015,6 +1017,31 @@ export async function pinTrophyAction(gameId: string, trophyId: string) {
 
   revalidatePath("/", "layout");
   return { success: true };
+}
+
+/**
+ * Contador manual de un trofeo ("gana 50 partidas", "encuentra las 100
+ * plumas") — ver `setManualTrophyProgress` en lib/profiles.ts. `target: null`
+ * lo borra, para poder "quitar el contador" sin dejar un 0/0 raro.
+ */
+export async function actualizarContadorManualAction(
+  gameId: string,
+  trophyId: string,
+  current: number,
+  target: number | null,
+): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+
+  if (target != null && (!Number.isFinite(target) || target <= 0)) {
+    return { error: "La meta tiene que ser un número mayor que 0." };
+  }
+  if (!Number.isFinite(current) || current < 0) {
+    return { error: "El contador no puede ser negativo." };
+  }
+
+  await setManualTrophyProgress(userId, gameId, trophyId, Math.round(current), target != null ? Math.round(target) : null);
+  revalidatePath("/", "layout");
+  return {};
 }
 
 /* --------------------------------- Guías escritas --------------------------------- */
@@ -1268,4 +1295,36 @@ export async function saveGameNotesAction(gameId: string, notes: string): Promis
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
   revalidatePath("/", "layout");
+}
+
+const FORMATOS_ADQUISICION = ["fisico", "digital", "ps_plus", "game_pass", "prestado", "gratis"] as const;
+
+/**
+ * De dónde tienes el juego y cuánto pagaste — los dos campos de
+ * `userGames.acquisitionFormat`/`pricePaid` (schema.ts), rellenados a mano
+ * por el usuario. `format: null` borra el formato; `price: null` borra el
+ * precio — cada uno se puede quitar sin tocar el otro.
+ */
+export async function actualizarAdquisicionAction(
+  gameId: string,
+  format: string | null,
+  price: number | null,
+): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+
+  if (format != null && !FORMATOS_ADQUISICION.includes(format as (typeof FORMATOS_ADQUISICION)[number])) {
+    return { error: "Formato no válido." };
+  }
+  if (price != null && (!Number.isFinite(price) || price < 0)) {
+    return { error: "El precio no puede ser negativo." };
+  }
+
+  const db = getDb();
+  await db
+    .update(userGames)
+    .set({ acquisitionFormat: format as (typeof FORMATOS_ADQUISICION)[number] | null, pricePaid: price })
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+
+  revalidatePath("/", "layout");
+  return {};
 }

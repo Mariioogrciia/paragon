@@ -24,6 +24,8 @@ import { TrophyRecommendations } from "@/components/TrophyRecommendations";
 import { paragonProgress } from "@/lib/level";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
+import { RecomendadorTiempo } from "@/components/RecomendadorTiempo";
+import { esPlatinoEquivalente } from "@/lib/stats";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -75,8 +77,8 @@ const FEATURES = [
   },
   {
     num: "06",
-    title: "Avisos que no tienes que ir a buscar",
-    body: "Te queda poco para un platino, un juego se quedó parado, salió una expansión con trofeos nuevos — el cron te avisa sin que entres a mirar.",
+    title: "Notificaciones push de verdad",
+    body: "Un trofeo nuevo, tal cual lo desbloqueas, directo al móvil o al navegador — sin abrir la app para enterarte.",
   },
   {
     num: "07",
@@ -355,6 +357,10 @@ export default async function HomePage() {
 
   const now = new Date().getTime();
   const feed = await getFeed(session.user.id);
+
+  // Solo lo que hace falta para el recomendador — empezados y sin terminar,
+  // nada de biblioteca entera hacia el cliente.
+  const empezados = games.filter((g) => !g.isWishlist && !esPlatinoEquivalente(g) && g.earnedTotal > 0);
 
   const nearPlatinumSection = nearPlatinum.length > 0 && (
     <section>
@@ -686,6 +692,7 @@ export default async function HomePage() {
             label: "Progreso y actividad",
             content: (
               <>
+                <RecomendadorTiempo juegos={empezados} />
                 {nearPlatinumSection}
                 {abandonadosSection}
                 <UpcomingGames wishlistedIgdbIds={wishlistIds} />

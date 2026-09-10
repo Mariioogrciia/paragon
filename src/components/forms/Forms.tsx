@@ -13,12 +13,14 @@ import {
   linkUbisoftAction,
   linkEpicOAuthAction,
   updateProfileAction,
-  setDiscordWebhookAction,
-  testDiscordWebhookAction,
+  setDiscordDmAction,
+  probarDiscordDmAction,
   syncNowAction,
   syncPlatformAction,
+  setHiddenNavItemsAction,
   type ActionState,
 } from "@/app/actions";
+import type { NavKey } from "@/lib/navPreferences";
 
 const EMPTY: ActionState = {};
 
@@ -320,42 +322,56 @@ function TestButton() {
 }
 
 /**
- * Webhook de Discord para anunciar logros nuevos (ver lib/discordWebhook.ts).
- * Dos formularios sobre el mismo campo — guardar y probar son dos acciones
- * de servidor distintas, y "Probar" tiene que funcionar con lo que hay
- * escrito ANTES de guardar (para saber si la URL vale sin tener que
- * guardarla primero a ciegas).
+ * Avisos por el bot de Discord (ver lib/discordBot.ts) — sustituye al
+ * webhook de antes. Sin URL que pegar: si la cuenta inició sesión con
+ * Discord, el interruptor ya tiene a quién escribirle.
  */
-export function DiscordWebhookForm({ current }: { current?: string | null }) {
-  const [url, setUrl] = useState(current ?? "");
-  const [stateGuardar, actionGuardar] = useActionState(setDiscordWebhookAction, EMPTY);
-  const [stateProbar, actionProbar] = useActionState(testDiscordWebhookAction, EMPTY);
+export function DiscordDmForm({ enabled, vinculado }: { enabled: boolean; vinculado: boolean }) {
+  const [stateGuardar, actionGuardar] = useActionState(setDiscordDmAction, EMPTY);
+  const [stateProbar, actionProbar] = useActionState(probarDiscordDmAction, EMPTY);
+
+  if (!vinculado) {
+    return (
+      <p className="text-xs leading-relaxed text-muted">
+        Inicia sesión con Discord (en vez de con Google) para poder activar esto — sin eso el bot no
+        sabe a quién escribir.
+      </p>
+    );
+  }
 
   return (
     <div>
-      <form action={actionGuardar} className="flex gap-2.5">
-        <input
-          name="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://discord.com/api/webhooks/…"
-          autoComplete="off"
-          spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
-          style={FIELD}
-        />
-        <Submit>{current ? "Actualizar" : "Guardar"}</Submit>
-      </form>
-      <form action={actionProbar} className="mt-2.5 flex justify-end">
-        <input type="hidden" name="url" value={url} />
-        <TestButton />
+      <form action={actionGuardar} className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold">Avisos por DM del bot</p>
+          <p className="text-xs text-muted">Un mensaje directo del bot de Paragon cuando consigues un trofeo nuevo.</p>
+        </div>
+        <input type="hidden" name="activar" value={(!enabled).toString()} />
+        <button
+          type="submit"
+          role="switch"
+          aria-checked={enabled}
+          className="relative h-7 w-12 shrink-0 rounded-full transition-colors"
+          style={{ background: enabled ? "var(--accent)" : "var(--surface-2)" }}
+        >
+          <span
+            className="absolute top-1 h-5 w-5 rounded-full bg-white transition-transform"
+            style={{ transform: enabled ? "translateX(24px)" : "translateX(4px)" }}
+          />
+        </button>
       </form>
       <Feedback state={stateGuardar} />
+
+      {enabled && (
+        <form action={actionProbar} className="mt-3 flex justify-end">
+          <TestButton />
+        </form>
+      )}
       <Feedback state={stateProbar} />
+
       <p className="mt-3 text-xs leading-relaxed text-muted">
-        Se crea desde tu servidor de Discord: Ajustes del servidor → Integraciones → Webhooks → Nuevo
-        webhook, y se pega la URL aquí. Sin bot ni permisos que dar — Paragon solo manda un mensaje a
-        esa URL cuando consigues un trofeo nuevo.
+        Para que el bot pueda escribirte, tenéis que compartir un servidor de Discord (el mismo donde
+        está invitado el bot de Paragon) y tener activados los DMs de miembros del servidor.
       </p>
     </div>
   );
@@ -406,6 +422,43 @@ export function SyncPlatformForm({ platform, label }: { platform: string; label:
       <input type="hidden" name="platform" value={platform} />
       <SyncPlatformSubmit label={label} />
       <Feedback state={state} />
+    </form>
+  );
+}
+
+/**
+ * /ajustes/ocultar: lista de funciones opcionales que se pueden quitar de la
+ * cabecera. Se manda el set entero marcado (no hay "guardar uno a uno") —
+ * `setHiddenNavItemsAction` reemplaza la lista completa en cada envío.
+ */
+export function HiddenNavForm({
+  opciones,
+  ocultas,
+}: {
+  opciones: readonly { key: NavKey; label: string }[];
+  ocultas: string[];
+}) {
+  return (
+    <form action={setHiddenNavItemsAction} className="flex flex-col gap-1">
+      {opciones.map((opcion) => (
+        <label
+          key={opcion.key}
+          className="flex cursor-pointer items-center justify-between gap-3 rounded-xl px-4 py-3.5 transition-colors hover:bg-surface-2"
+          style={FIELD}
+        >
+          <span className="text-[0.9375rem] font-semibold">Ocultar {opcion.label}</span>
+          <input
+            type="checkbox"
+            name="navKey"
+            value={opcion.key}
+            defaultChecked={ocultas.includes(opcion.key)}
+            className="h-4 w-4 rounded border-white/10 bg-surface-2 text-accent focus:ring-accent"
+          />
+        </label>
+      ))}
+      <div className="mt-3">
+        <Submit>Guardar</Submit>
+      </div>
     </form>
   );
 }

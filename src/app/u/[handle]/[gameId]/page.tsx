@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CollectionPicker } from "@/components/Collections";
 import { GameNotes } from "@/components/GameNotes";
+import { AcquisitionEditor } from "@/components/AcquisitionEditor";
 import { CommunityRating } from "@/components/CommunityRating";
 import { Stars } from "@/components/Stars";
 import { gradeLabel, TrophyIcon } from "@/components/TrophyIcon";
@@ -430,6 +431,15 @@ export default async function JuegoPage({
         {esMio && <CollectionPicker collections={carpetas} gameId={game.id} />}
 
         {esMio && <GameNotes gameId={game.id} initialNotes={game.notes} />}
+
+        {esMio && (
+          <AcquisitionEditor
+            gameId={game.id}
+            format={game.acquisitionFormat}
+            price={game.pricePaid}
+            playtimeMinutes={game.playtimeMinutes}
+          />
+        )}
 
         {siguientes.length > 0 && (
           <section>

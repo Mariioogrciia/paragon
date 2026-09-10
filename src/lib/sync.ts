@@ -10,7 +10,7 @@ import {
 } from "@/lib/steam/client";
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
-import { anunciarLogrosNuevos } from "@/lib/discordWebhook";
+import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
 
 /**
@@ -220,7 +220,7 @@ export async function syncLibrary(
 /** Devuelve los trofeos de este lote que pasan a "conseguido" en esta misma
  * sincronización — ni estaban guardados como conseguidos antes, ni son un
  * trofeo que ya sabíamos que tenía. Es lo único que necesita el aviso de
- * Discord (lib/discordWebhook.ts): sin esto, cada sincronización volvería a
+ * Discord (lib/discordBot.ts): sin esto, cada sincronización volvería a
  * "avisar" de trofeos de hace años. */
 async function nuevosEnEsteLote(userId: string, gameId: string, batch: Trophy[]): Promise<Trophy[]> {
   const conseguidos = batch.filter((t) => t.earned);

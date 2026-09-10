@@ -2,9 +2,17 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getProfileByHandle, getLibrary } from "@/lib/profiles";
 import { trofeosPorMes } from "@/lib/history";
-import { actividadPorDia, horasPorJuego, horasTotales, estadisticasAmigos } from "@/lib/profileStats";
+import { actividadPorDia, horasPorJuego, horasTotales, estadisticasAmigos, franjasHorarias, hitosHistoricos } from "@/lib/profileStats";
 import { getFeed } from "@/lib/feed";
 import { ActivityHeatmap } from "@/components/ActivityHeatmap";
+import { HourlyHeatmap } from "@/components/HourlyHeatmap";
+import { HistoricalTimeline } from "@/components/HistoricalTimeline";
+import { PlatinosAlAlcance } from "@/components/PlatinosAlAlcance";
+import { SalonDeLaVerguenza } from "@/components/SalonDeLaVerguenza";
+import { platinosAlAlcance, salonDeLaVerguenza, costePorHora } from "@/lib/backlog";
+import { CostePorHora } from "@/components/CostePorHora";
+import { TrophyDnaRadar } from "@/components/TrophyDnaRadar";
+import { calcularTrophyDna } from "@/lib/trophyDna";
 import { TrophyMonthChart, PlaytimeBarChart } from "@/components/StatCharts";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { RecentlyPlayed } from "@/components/RecentlyPlayed";
@@ -31,7 +39,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
 
-  const [dias, meses, horas, horasEnTotal, feed, { games: biblioteca }, amigos, paragonScore] = await Promise.all([
+  const [dias, meses, horas, horasEnTotal, feed, { games: biblioteca }, amigos, paragonScore, celdasHorarias, hitos] = await Promise.all([
     actividadPorDia(profile.userId),
     trofeosPorMes(profile.userId),
     horasPorJuego(profile.userId),
@@ -44,6 +52,8 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
     getLibrary(profile),
     esMio ? estadisticasAmigos(profile.userId) : Promise.resolve([]),
     getParagonScore(profile.userId),
+    franjasHorarias(profile.userId),
+    hitosHistoricos(profile.userId),
   ]);
 
   // "Últimas sesiones" no es un dato que exista — ni PSN ni Steam dan un
@@ -55,13 +65,39 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
     .sort((a, b) => new Date(b.lastPlayedAt!).getTime() - new Date(a.lastPlayedAt!).getTime())
     .slice(0, 8);
 
+  // Backlog: solo en tu propio perfil — es información que solo le importa
+  // (o le da vergüenza) al dueño de la biblioteca, no a quien la visita.
+  const alcanzables = esMio ? platinosAlAlcance(biblioteca) : [];
+  const verguenza = esMio ? salonDeLaVerguenza(biblioteca) : [];
+  const costes = esMio ? costePorHora(biblioteca) : [];
+  const dna = calcularTrophyDna(biblioteca);
+
   return (
     <div>
       <ParagonScoreCard score={paragonScore} />
 
       <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+        <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">Trophy DNA</h2>
+        <TrophyDnaRadar dna={dna} />
+      </section>
+
+      {(hitos.primerPlatino || hitos.trofeoMasRaro || hitos.platinoAnejo || hitos.rachaMasLarga) && (
+        <section className="mb-8">
+          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Línea de tiempo</h2>
+          <HistoricalTimeline hitos={hitos} />
+        </section>
+      )}
+
+      <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
         <ActivityHeatmap dias={dias} />
       </section>
+
+      {celdasHorarias.some((c) => c.trofeos > 0) && (
+        <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">A qué horas juegas</h2>
+          <HourlyHeatmap celdas={celdasHorarias} />
+        </section>
+      )}
 
       <div className="mb-8">
         <PlaytimeComparison horasTotales={horasEnTotal} />
@@ -79,6 +115,32 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
             La última vez que se tocó cada juego — ni PSN ni Steam dan un registro de sesiones, esto es lo más real que hay.
           </p>
           <RecentlyPlayed games={jugadoRecientemente} handle={handle} />
+        </section>
+      )}
+
+      {esMio && alcanzables.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Platinos al alcance</h2>
+          <p className="mb-4 text-sm text-muted">
+            Muy avanzados y llevan meses parados — a veces solo hace falta acordarse de que estaban ahí.
+          </p>
+          <PlatinosAlAlcance juegos={alcanzables} />
+        </section>
+      )}
+
+      {esMio && costes.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Coste por hora</h2>
+          <p className="mb-4 text-sm text-muted">Solo cuenta con lo que has puesto tú a mano en cada ficha — precio pagado y horas jugadas.</p>
+          <CostePorHora juegos={costes} />
+        </section>
+      )}
+
+      {esMio && verguenza.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">El Salón de la Vergüenza</h2>
+          <p className="mb-4 text-sm text-muted">Juegos en tu biblioteca sin ni una hora, sin ni un trofeo.</p>
+          <SalonDeLaVerguenza juegos={verguenza} />
         </section>
       )}
 

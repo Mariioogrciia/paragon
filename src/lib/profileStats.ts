@@ -1,7 +1,7 @@
 import "server-only";
-import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games as gamesTable, userGames, userTrophies } from "@/db/schema";
+import { games as gamesTable, gameTrophies, userGames, userTrophies, users } from "@/db/schema";
 import { listFriends, getLibrary, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
 
@@ -147,4 +147,210 @@ export async function estadisticasAmigos(userId: string): Promise<StatsAmigo[]> 
   return conStats
     .filter((p): p is StatsAmigo => p !== null)
     .sort((a, b) => b.horas - a.horas);
+}
+
+export interface CeldaHoraria {
+  /** 0 = domingo ... 6 = sábado (como `extract(dow)` de Postgres). */
+  dow: number;
+  /** 0-23, en la zona horaria del propio usuario, no en UTC. */
+  hora: number;
+  trofeos: number;
+}
+
+/**
+ * Igual que `actividadPorDia`, pero cruzado por franja horaria — a qué hora
+ * del día y qué día de la semana caen de verdad tus trofeos, no solo qué
+ * día. Se convierte a la zona horaria guardada en Ajustes (`users.timezone`,
+ * por defecto Europe/Madrid): sin esto, todo el mundo aparecería jugando de
+ * madrugada en UTC. Sin ventana de tiempo a propósito — a diferencia del
+ * heatmap anual, aquí interesa el patrón de siempre, no solo el último año.
+ */
+export async function franjasHorarias(userId: string): Promise<CeldaHoraria[]> {
+  const [u] = await db.select({ timezone: users.timezone }).from(users).where(eq(users.id, userId)).limit(1);
+  const tz = u?.timezone || "Europe/Madrid";
+
+  const rows = await db
+    .select({
+      dow: sql<number>`extract(dow from (${userTrophies.earnedAt} at time zone 'UTC' at time zone ${tz}))::int`,
+      hora: sql<number>`extract(hour from (${userTrophies.earnedAt} at time zone 'UTC' at time zone ${tz}))::int`,
+      total: sql<number>`count(*)`,
+    })
+    .from(userTrophies)
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt)))
+    .groupBy(sql`1`, sql`2`);
+
+  return rows.map((r) => ({ dow: Number(r.dow), hora: Number(r.hora), trofeos: Number(r.total) }));
+}
+
+export interface PrimerPlatino {
+  gameId: string;
+  titulo: string;
+  iconUrl: string | null;
+  fecha: string;
+}
+
+export interface TrofeoMasRaro {
+  gameId: string;
+  tituloJuego: string;
+  nombre: string;
+  iconUrl: string | null;
+  rarityPercent: number;
+  fecha: string | null;
+}
+
+export interface PlatinoAnejo {
+  gameId: string;
+  titulo: string;
+  iconUrl: string | null;
+  dias: number;
+  desde: string;
+  hasta: string;
+}
+
+export interface RachaMasLarga {
+  dias: number;
+  desde: string;
+  hasta: string;
+}
+
+export interface HitosHistoricos {
+  primerPlatino: PrimerPlatino | null;
+  trofeoMasRaro: TrofeoMasRaro | null;
+  platinoAnejo: PlatinoAnejo | null;
+  rachaMasLarga: RachaMasLarga | null;
+}
+
+/**
+ * Hitos de toda tu carrera de trofeos, no de una ventana de tiempo: tu
+ * primer platino, el trofeo más raro que tienes, el platino que más tardó en
+ * caer desde el primer trofeo del juego (el "añejo"), y tu racha más larga de
+ * días seguidos ganando al menos un trofeo.
+ *
+ * "Platino" usa el mismo criterio que el resto de la app
+ * (`esPlatinoEquivalente` en lib/stats.ts: platino real en PSN, o 100% en
+ * Steam — no hay trofeo de platino que contar ahí) reescrito en SQL porque
+ * aquí hace falta cruzarlo con fechas de trofeos, no con la lista de juegos
+ * ya resuelta que usa `summarise()`.
+ */
+export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> {
+  const platinoCond = sql`(
+    coalesce((${userGames.earned}->>'platinum')::int, 0) > 0
+    or (${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100)
+  )`;
+
+  const [platinos, [raro], rachaDias] = await Promise.all([
+    db
+      .select({
+        gameId: userGames.gameId,
+        titulo: sql<string>`max(${gamesTable.title})`,
+        iconUrl: sql<string | null>`max(${gamesTable.iconUrl})`,
+        inicio: sql<string | null>`min(${userTrophies.earnedAt})`,
+        fin: sql<string | null>`max(${userTrophies.earnedAt})`,
+      })
+      .from(userGames)
+      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+      .innerJoin(
+        userTrophies,
+        and(eq(userTrophies.userId, userGames.userId), eq(userTrophies.gameId, userGames.gameId), eq(userTrophies.earned, true)),
+      )
+      .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), platinoCond))
+      .groupBy(userGames.gameId),
+
+    db
+      .select({
+        gameId: userTrophies.gameId,
+        tituloJuego: gamesTable.title,
+        nombre: gameTrophies.name,
+        iconUrl: gameTrophies.iconUrl,
+        rarityPercent: userTrophies.rarityPercent,
+        fecha: userTrophies.earnedAt,
+      })
+      .from(userTrophies)
+      .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+      .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
+      .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.rarityPercent)))
+      .orderBy(asc(userTrophies.rarityPercent))
+      .limit(1),
+
+    db
+      .select({ dia: sql<string>`to_char(date(${userTrophies.earnedAt}), 'YYYY-MM-DD')` })
+      .from(userTrophies)
+      .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt)))
+      .groupBy(sql`date(${userTrophies.earnedAt})`)
+      .orderBy(sql`date(${userTrophies.earnedAt})`),
+  ]);
+
+  const validos = platinos.filter((p): p is typeof p & { inicio: string; fin: string } => p.inicio != null && p.fin != null);
+
+  const masAntiguo = validos.length ? validos.reduce((a, b) => (new Date(a.fin) <= new Date(b.fin) ? a : b)) : null;
+  const primerPlatino: PrimerPlatino | null = masAntiguo
+    ? { gameId: masAntiguo.gameId, titulo: masAntiguo.titulo, iconUrl: masAntiguo.iconUrl, fecha: new Date(masAntiguo.fin).toISOString() }
+    : null;
+
+  const platinoAnejo: PlatinoAnejo | null = validos.length
+    ? (() => {
+        const conDias = validos.map((p) => ({
+          ...p,
+          dias: Math.round((new Date(p.fin).getTime() - new Date(p.inicio).getTime()) / 86_400_000),
+        }));
+        const peor = conDias.reduce((a, b) => (a.dias >= b.dias ? a : b));
+        return {
+          gameId: peor.gameId,
+          titulo: peor.titulo,
+          iconUrl: peor.iconUrl,
+          dias: peor.dias,
+          desde: new Date(peor.inicio).toISOString(),
+          hasta: new Date(peor.fin).toISOString(),
+        };
+      })()
+    : null;
+
+  // Racha más larga de días consecutivos con al menos un trofeo — sin
+  // ventana de tiempo, todo el historial. Los días vienen ya ordenados por
+  // la consulta; solo hace falta contar tramos de días seguidos.
+  let rachaMasLarga: RachaMasLarga | null = null;
+  if (rachaDias.length > 0) {
+    let mejorLargo = 1;
+    let mejorDesde = rachaDias[0].dia;
+    let mejorHasta = rachaDias[0].dia;
+    let largoActual = 1;
+    let desdeActual = rachaDias[0].dia;
+
+    for (let i = 1; i < rachaDias.length; i++) {
+      const anterior = new Date(`${rachaDias[i - 1].dia}T00:00:00Z`);
+      const actual = new Date(`${rachaDias[i].dia}T00:00:00Z`);
+      const diff = Math.round((actual.getTime() - anterior.getTime()) / 86_400_000);
+
+      if (diff === 1) {
+        largoActual++;
+      } else {
+        largoActual = 1;
+        desdeActual = rachaDias[i].dia;
+      }
+
+      if (largoActual > mejorLargo) {
+        mejorLargo = largoActual;
+        mejorDesde = desdeActual;
+        mejorHasta = rachaDias[i].dia;
+      }
+    }
+
+    rachaMasLarga = { dias: mejorLargo, desde: mejorDesde, hasta: mejorHasta };
+  }
+
+  return {
+    primerPlatino,
+    trofeoMasRaro: raro
+      ? {
+          gameId: raro.gameId,
+          tituloJuego: raro.tituloJuego,
+          nombre: raro.nombre,
+          iconUrl: raro.iconUrl,
+          rarityPercent: raro.rarityPercent!,
+          fecha: raro.fecha ? raro.fecha.toISOString() : null,
+        }
+      : null,
+    platinoAnejo,
+    rachaMasLarga,
+  };
 }

@@ -9,6 +9,7 @@ import {
   getTrophyGuidesAction,
   saveTrophyGuideAction,
   deleteTrophyGuideAction,
+  actualizarContadorManualAction,
   type ActionState,
 } from "@/app/actions";
 import { type Trophy } from "@/lib/types";
@@ -223,7 +224,106 @@ export function TrophyGuideModal({
             </p>
           )}
         </div>
+
+        {esMio && gameId && !trophy.earned && !trophy.progress && (
+          <ContadorManual gameId={gameId} trophy={trophy} />
+        )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Contador manual +/- para trofeos que ni PSN ni Steam desglosan ("gana 50
+ * partidas", "encuentra las 100 plumas") — a diferencia de `trophy.progress`
+ * (arriba, cuando la propia plataforma sí lo da), este lo lleva la persona a
+ * mano. Solo se enseña sin ese progreso nativo y con el trofeo sin conseguir
+ * todavía: una vez lo tienes, contar ya no aporta nada.
+ */
+function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) {
+  const [manual, setManual] = useState(trophy.manualProgress ?? null);
+  const [metaEnCurso, setMetaEnCurso] = useState("");
+  const [configurando, setConfigurando] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function guardar(current: number, target: number | null) {
+    startTransition(async () => {
+      const res = await actualizarContadorManualAction(gameId, trophy.id, current, target);
+      if (!res.error) {
+        setManual(target != null ? { current, target } : null);
+        setConfigurando(false);
+      }
+    });
+  }
+
+  if (!manual) {
+    return (
+      <div className="border-t border-border px-6 py-3.5">
+        {configurando ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const meta = Number(metaEnCurso);
+              if (meta > 0) guardar(0, meta);
+            }}
+            className="flex items-center gap-2.5"
+          >
+            <label className="text-xs font-semibold text-muted">Meta:</label>
+            <input
+              type="number"
+              min={1}
+              autoFocus
+              value={metaEnCurso}
+              onChange={(e) => setMetaEnCurso(e.target.value)}
+              placeholder="ej. 50"
+              className="w-20 rounded-lg px-2.5 py-1.5 text-sm font-semibold outline-none"
+              style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}
+            />
+            <button type="submit" disabled={isPending} className="rounded-lg px-3 py-1.5 text-xs font-bold text-background disabled:opacity-50" style={{ background: "var(--accent-grad)" }}>
+              Crear contador
+            </button>
+            <button type="button" onClick={() => setConfigurando(false)} className="text-xs font-semibold text-muted hover:text-foreground">
+              Cancelar
+            </button>
+          </form>
+        ) : (
+          <button onClick={() => setConfigurando(true)} className="text-xs font-semibold text-accent hover:underline">
+            + Llevar la cuenta tú mismo (contador manual)
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3.5 border-t border-border px-6 py-3.5">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => guardar(Math.max(0, manual.current - 1), manual.target)}
+          disabled={isPending || manual.current <= 0}
+          className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold transition-colors hover:text-foreground disabled:opacity-30"
+          style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+        >
+          −
+        </button>
+        <span className="min-w-[64px] text-center text-sm font-bold tabular-nums">
+          {manual.current}/{manual.target}
+        </span>
+        <button
+          onClick={() => guardar(Math.min(manual.target, manual.current + 1), manual.target)}
+          disabled={isPending || manual.current >= manual.target}
+          className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold transition-colors hover:text-foreground disabled:opacity-30"
+          style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+        >
+          +
+        </button>
+      </div>
+      <div className="h-1.5 flex-1 max-w-[200px] overflow-hidden rounded-full bg-surface-2">
+        <div className="h-full rounded-full" style={{ width: `${Math.round((manual.current / manual.target) * 100)}%`, background: "var(--gold)" }} />
+      </div>
+      <button onClick={() => guardar(0, null)} disabled={isPending} className="text-xs font-semibold text-muted hover:text-danger">
+        Quitar
+      </button>
     </div>
   );
 }
