@@ -3,7 +3,7 @@ name: Sincronización frecuente de trofeos
 # El plan Hobby de Vercel solo deja 1 ejecución diaria de un cron propio
 # (ver el comentario en src/app/api/cron/sync/route.ts — ya se probó por
 # horas y Vercel rechazó el despliegue). Esto llama a esa MISMA ruta, desde
-# fuera de Vercel, cada 15 minutos — la ruta no distingue quién la llama,
+# fuera de Vercel, cada 10 minutos — la ruta no distingue quién la llama,
 # solo exige la cabecera Authorization correcta (mismo CRON_SECRET de
 # siempre), así que no hace falta tocar nada del código ni del plan.
 #
@@ -21,7 +21,7 @@ on:
     # GitHub no garantiza el minuto exacto bajo carga de la plataforma —
     # puede llegar con algunos minutos de retraso en horas punta, es una
     # limitación conocida de los cron de GitHub Actions, no de este repo.
-    - cron: "*/15 * * * *"
+    - cron: "*/10 * * * *"
   workflow_dispatch: {} # Para poder lanzarlo a mano desde la pestaña Actions, sin esperar al reloj.
 
 jobs:

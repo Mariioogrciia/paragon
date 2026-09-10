@@ -449,12 +449,22 @@ export default async function HomePage() {
                 className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
                 style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
               >
-                <div className="relative flex aspect-[21/9] items-end p-4 overflow-hidden">
+                <div className="relative flex aspect-[21/9] items-end gap-3 p-4 overflow-hidden">
                   <div
-                    className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-50"
+                    className="absolute inset-[-15%] bg-cover bg-center blur-2xl opacity-40"
                     style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                  {/* Miniatura NÍTIDA — antes esta tarjeta solo llevaba el
+                      fondo desenfocado de arriba, así que la carátula real
+                      nunca se veía, solo un borrón de color. */}
+                  <div className="relative z-10 h-14 w-14 shrink-0 overflow-hidden rounded-lg shadow-lg">
+                    {game.iconUrl ? (
+                      <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${game.iconUrl})` }} />
+                    ) : (
+                      <div className="h-full w-full" style={{ background: coverGradient(game.id) }} />
+                    )}
+                  </div>
                   <p
                     className="font-heading relative z-10 translate-y-1 text-lg font-bold text-white transition-transform duration-300 group-hover:translate-y-0"
                     style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}
