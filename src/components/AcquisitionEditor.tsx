@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { actualizarAdquisicionAction } from "@/app/actions";
+import { ToggleChip } from "@/components/ToggleChip";
 
 const FORMATOS: { valor: string; label: string }[] = [
   { valor: "fisico", label: "Físico" },
@@ -87,18 +88,9 @@ export function AcquisitionEditor({
     <div className="flex flex-col gap-3 rounded-xl p-4" style={{ border: "1px solid rgb(var(--accent-rgb) / 0.3)", background: "var(--surface)" }}>
       <div className="flex flex-wrap gap-1.5">
         {FORMATOS.map((f) => (
-          <button
-            key={f.valor}
-            onClick={() => setFormatoSel(formatoSel === f.valor ? "" : f.valor)}
-            className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
-            style={
-              formatoSel === f.valor
-                ? { background: "rgb(var(--accent-rgb) / 0.16)", border: "1px solid rgb(var(--accent-rgb) / 0.4)", color: "var(--accent-text)" }
-                : { border: "1px solid var(--border)", color: "var(--muted)" }
-            }
-          >
+          <ToggleChip key={f.valor} active={formatoSel === f.valor} size="md" onClick={() => setFormatoSel(formatoSel === f.valor ? "" : f.valor)}>
             {f.label}
-          </button>
+          </ToggleChip>
         ))}
       </div>
 

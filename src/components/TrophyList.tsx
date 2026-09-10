@@ -8,6 +8,7 @@ import { trophyScore } from "@/lib/trophyScore";
 import type { Platform, Trophy, TrophyGrade } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
 import { TrophyTree } from "./TrophyTree";
+import { ToggleChip } from "./ToggleChip";
 
 /** Los filtros de tipo son justo `TrophyType` (ya calculado por trofeo con
  * `clasificarTrofeo`) más "perdible", que no es un tipo sino un aviso aparte
@@ -150,25 +151,11 @@ export function TrophyList({
     <div>
       {view !== "arbol" && hayFiltrosDeTipo && (
         <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
-          {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => {
-            const activo = filtros.has(f.valor);
-            return (
-              <button
-                key={f.valor}
-                type="button"
-                onClick={() => alternarFiltro(f.valor)}
-                aria-pressed={activo}
-                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
-                style={
-                  activo
-                    ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
-                    : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
-                }
-              >
-                {f.label}
-              </button>
-            );
-          })}
+          {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => (
+            <ToggleChip key={f.valor} active={filtros.has(f.valor)} onClick={() => alternarFiltro(f.valor)}>
+              {f.label}
+            </ToggleChip>
+          ))}
           {filtros.size > 0 && (
             <button
               type="button"
@@ -189,33 +176,13 @@ export function TrophyList({
                 arriba: no filtran por tipo de trofeo, uno filtra por estado
                 (ya lo tienes o no) y el otro solo reordena, no esconde nada. */}
             {trophies.some((t) => t.earned) && (
-              <button
-                type="button"
-                onClick={() => setOcultarConseguidos((v) => !v)}
-                aria-pressed={ocultarConseguidos}
-                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
-                style={
-                  ocultarConseguidos
-                    ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
-                    : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
-                }
-              >
+              <ToggleChip active={ocultarConseguidos} onClick={() => setOcultarConseguidos((v) => !v)}>
                 Ocultar conseguidos
-              </button>
+              </ToggleChip>
             )}
-            <button
-              type="button"
-              onClick={() => setOrdenCronologico((v) => !v)}
-              aria-pressed={ordenCronologico}
-              className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
-              style={
-                ordenCronologico
-                  ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
-                  : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
-              }
-            >
+            <ToggleChip active={ordenCronologico} onClick={() => setOrdenCronologico((v) => !v)}>
               Orden cronológico
-            </button>
+            </ToggleChip>
           </div>
         )}
 
