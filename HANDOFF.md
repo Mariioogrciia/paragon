@@ -103,14 +103,36 @@ sin que él lo autorice explícitamente), así que la UI en sí (colocación
 de badges, que el carrusel no se rompa visualmente) queda pendiente de
 que el usuario la mire con su cuenta real.
 
+**4. Atajos PWA: "Continuar juego anclado" y "Sugerencia para hoy"** —
+la parte barata del bloque General:
+- `app/enfoque/page.tsx` (nueva): destino fijo del shortcut — un shortcut
+  de manifest solo admite una URL estática, no "el juego anclado de quien
+  sea", así que resuelve en el momento el `userGames.pinnedAt` de quien
+  haya iniciado sesión (`getPinnedGameId()` nuevo en `profiles.ts`) y
+  redirige a su Modo Enfoque real. Sin nada anclado, a la biblioteca.
+- `SectionTabs.tsx` ahora lee `?tab=<key>` de la URL al montar (gana a lo
+  recordado en localStorage) — hacía falta para que "Sugerencia para hoy"
+  (`/?tab=actividad`) aterrice en la pestaña correcta de la portada.
+- Verificado sirviendo `/manifest.webmanifest` de verdad (los dos
+  shortcuts salen bien) y `/enfoque` redirigiendo a `/entrar` sin sesión.
+- Al tocar `SectionTabs.tsx` salió un error de eslint
+  (`react-hooks/set-state-in-effect`) — confirmado con `git stash` que YA
+  EXISTÍA en el código original antes de esta sesión, no lo causé yo.
+  Se deja igual a propósito (un lazy initializer arriesgaría un mismatch
+  de hidratación SSR) y se anota aparte, sin mezclarlo con este cambio.
+
 ### Pendiente de esta misma tanda, para quien retome esto
 
 - `/meta`, DM "empujón final" (bot) — necesitan decisión de producto del
   usuario (columna nueva / flag de opt-in), ver arriba.
-- Modo "Temporada/Mes de Caza" y atajos PWA (bloque General) — no
-  empezados todavía.
+- Modo "Temporada/Mes de Caza" (bloque General) — no empezado todavía.
+- Tarjeta de platino compartible en imagen (bloque General) — no
+  empezada, es la pieza más grande de las viables (generación de imagen
+  con diseño cuidado), se dejó para el final a propósito.
 - El resto del bloque Noticias (alertas de cierre de servicio, radar de
   servidores) sigue descartado por falta de fuente real, ya documentado.
+- El error de eslint pre-existente en `SectionTabs.tsx` — anotado como
+  tarea aparte, sin arreglar.
 
 ---
 
