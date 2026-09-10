@@ -42,6 +42,11 @@ const ResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4 } as const;
 
 const SIN_VINCULAR = "Tu cuenta de Discord no está vinculada a ninguna cuenta de Paragon — inicia sesión en Paragon con este mismo Discord primero.";
 
+/** Mensaje público — lo ve todo el canal. Solo para /perfil: presumir de estadísticas SÍ tiene sentido delante de los demás, a diferencia del backlog o la vergüenza de cada uno. */
+function mensajePublico(contenido: string) {
+  return NextResponse.json({ type: ResponseType.CHANNEL_MESSAGE_WITH_SOURCE, data: { content: contenido } });
+}
+
 /** Mensaje efímero (solo lo ve quien escribió el comando) — no tiene sentido spamear el canal con el backlog de otra persona. */
 function mensaje(contenido: string) {
   return NextResponse.json({
@@ -125,7 +130,7 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   if (hitos.primerPlatino) lineas.push(`🥇 Primer platino: ${hitos.primerPlatino.titulo}`);
   if (hitos.trofeoMasRaro) lineas.push(`💎 Trofeo más raro: ${hitos.trofeoMasRaro.nombre} (${hitos.trofeoMasRaro.rarityPercent.toFixed(1)}%)`);
 
-  return mensaje(lineas.join("\n"));
+  return mensajePublico(lineas.join("\n"));
 }
 
 function comandoHelp() {

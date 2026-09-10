@@ -47,6 +47,27 @@ const MESES_ES: Record<string, string> = {
   september: "septiembre", october: "octubre", november: "noviembre", december: "diciembre",
 };
 
+/**
+ * Precio mensual (España, tarifa de 1 mes) de cada nivel — curado a mano,
+ * NO en vivo. Se probó a sacarlo de `playstation.com/es-es/ps-plus/whats-new`
+ * (el precio real SÍ está embebido ahí, comprobado), pero dos peticiones
+ * idénticas seguidas devolvieron cifras distintas cada vez — huele a
+ * prueba A/B o precio promocional cambiando por petición, así que no es
+ * una fuente en la que fiarse para un precio "real". Sony cambia el precio
+ * de PS Plus muy de vez en cuando (a diferencia del catálogo mensual, que
+ * cambia cada mes) — un valor puesto a mano, con la fecha de cuándo se
+ * comprobó bien visible, es más honesto que un scraping que ya se ha visto
+ * que no es estable.
+ *
+ * ACTUALIZAR A MANO si Sony sube el precio — última comprobación abajo.
+ */
+export const PRECIO_PSPLUS_EUR = {
+  essential: 9.99,
+  extra: 15.99,
+  premium: 18.99,
+  comprobadoEl: "2026-09-10",
+} as const;
+
 /** El titulo del post viene en ingles ("...Monthly Games for March"). Si el
  *  mes no se reconoce se devuelve tal cual: mejor en ingles que vacio. */
 function mesEnEspanol(mes: string | null): string | null {

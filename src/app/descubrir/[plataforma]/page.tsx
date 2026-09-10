@@ -18,7 +18,7 @@ import {
 } from "@/lib/platformHub";
 import { upcomingGames, recentReleases, IgdbNotConfiguredError } from "@/lib/igdb/client";
 import { ofertasSteam } from "@/lib/prices";
-import { getPsPlusMensual } from "@/lib/psPlus";
+import { getPsPlusMensual, PRECIO_PSPLUS_EUR } from "@/lib/psPlus";
 import { getPsNews } from "@/lib/psNews";
 import { getSteamNews } from "@/lib/steamNews";
 import { NewsFeed } from "@/components/NewsFeed";
@@ -202,6 +202,27 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           <GameGrid items={psPlus.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
             {(g) => <PosterCard game={{ ...g, genres: [] }} fluid />}
           </GameGrid>
+
+          {/* Precio curado a mano, no en vivo — ver el aviso en lib/psPlus.ts
+              sobre por qué (la página oficial de Sony devolvía un precio
+              distinto en cada petición, no es una fuente fiable). */}
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+              <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">Essential</p>
+              <p className="font-heading text-lg font-bold">{PRECIO_PSPLUS_EUR.essential.toFixed(2)}€/mes</p>
+            </div>
+            <div className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+              <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">Extra</p>
+              <p className="font-heading text-lg font-bold">{PRECIO_PSPLUS_EUR.extra.toFixed(2)}€/mes</p>
+            </div>
+            <div className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+              <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">Premium</p>
+              <p className="font-heading text-lg font-bold">{PRECIO_PSPLUS_EUR.premium.toFixed(2)}€/mes</p>
+            </div>
+          </div>
+          <p className="mt-2 text-[0.6875rem] text-muted">
+            Tarifa de 1 mes en España, comprobada el {relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl)} — consulta siempre en la PS Store por si Sony lo ha cambiado desde entonces.
+          </p>
         </section>
       )}
 
