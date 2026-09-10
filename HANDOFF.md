@@ -7,6 +7,48 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación) — bug real en producción, encontrado montando el bot
+
+**RESUELTO** — las 5 columnas que llevaban desde el 9 de septiembre sin
+`db:push` (bloqueado por el aviso de `push_subscription`, ver más abajo)
+se han añadido con SQL explícito:
+[scripts/anadir-columnas-sesion-9-10-sept.mts](scripts/anadir-columnas-sesion-9-10-sept.mts).
+Se saltó `db:push` del todo — más seguro no tocar esa herramienta mientras
+el aviso de `push_subscription` siga sin resolver.
+
+**Esto no era solo "el contador manual no funciona todavía"**: `getLibrary`
+(lib/profiles.ts) ya seleccionaba `acquisitionFormat`/`pricePaid` sin
+comprobar que la columna existiera de verdad. Con el código ya desplegado
+(commits de hoy) y la columna sin crear, **cualquier carga de biblioteca en
+producción rompía** con "column does not exist" — no solo `/ajustes/ocultar`
+o el contador de trofeos como se pensaba antes, sino la propia ficha de
+cada juego y el panel de cualquiera. Se encontró depurando por qué
+`/platinosalalcance` daba "algo falló" en Discord: reproducido en local
+contra la base real (saltándose `server-only` con
+`NODE_OPTIONS="--conditions=react-server"`, el mismo condition que usa
+Next para sus Server Components — útil para depurar `lib/profiles.ts`
+fuera de Next sin tocar el código), y el error de Postgres decía
+literalmente `column user_game.acquisitionFormat does not exist`.
+
+**Aviso para quien retome esto**: cuando el código de una sesión depende de
+una columna nueva, desplegarlo ANTES de que la columna exista en
+producción rompe cosas de verdad, no solo la función nueva. La lección
+real no es "columnas antes de código" sino la de siempre en este
+proyecto: verificar en producción antes de dar algo por cerrado, no
+fiarse de que "compila limpio" sea suficiente.
+
+### El bot de Discord, funcionando
+
+Con la columna ya puesta, `/platinosalalcance` responde bien (probado con
+la cuenta real del usuario: 292 juegos, 10 platinos al alcance). Quedaba
+además un problema aparte, de una app de Discord DISTINTA (la de "Iniciar
+sesión con Discord", `AUTH_DISCORD_ID` — no la del bot): "redirect_uri de
+OAuth2 no válido" porque esa aplicación no tenía registrada
+`https://platinos-nine.vercel.app/api/auth/callback/discord` en
+OAuth2 → Redirects. Pendiente de que el usuario lo confirme arreglado.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 — Capacitor (Nivel 2 de "app nativa")
 
 El usuario preguntó por pasar Paragon a app nativa. Se le explicaron tres
