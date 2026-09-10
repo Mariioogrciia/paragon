@@ -7,6 +7,47 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 8) — push de las 18 primeras, Cerrojo de Hitos, cuarta tanda de Antigravity
+
+**Push hecho**: las 18 commits acumuladas de las continuaciones 4-7 (bot,
+Descubrir, Noticias, atajos PWA, fix del bot diferido, vinculación
+Google/Discord, "ver más" de horas, tercera tanda de Antigravity con el
+bug grave de `AutoSyncHltb`) ya están en `origin/master`, pedido
+explícito del usuario. Vercel debería desplegar solo desde ahí.
+
+**Cerrojo de Hitos construido** (el usuario confirmó explícitamente que
+lo metiera): `users.reservedMilestoneGameId` (migración ejecutada ya
+contra la base real), `proximoHito()` en `lib/milestones.ts` — el número
+del hito nunca se guarda, sale de contar tus platinos en el momento.
+Botón "Reservar para el hito #X" en la ficha de cualquier juego sin
+platinar, aviso cuando estás a 1 trofeo de OTRO juego con algo
+reservado en otro sitio.
+
+**Cuarta tanda de Antigravity, las 4 ideas construidas**: Diario del
+Platino (resumen narrativo de earnedAt/rarityPercent, verificado en el
+navegador contra Black Myth: Wukong), Grindeo (categoría nueva en el
+sistema de Smart Tags que ya existía, verificada contra 15.766 trofeos
+reales — 3.34%, sin falsos positivos evidentes), Detector de Atascos
+(aviso en portada si el juego anclado lleva ≥5 días sin trofeos),
+Dieta Gamer (aviso si los últimos 3 juegos terminados comparten género
+y suman >150h).
+
+**Responsive, pedido explícito del usuario**: revisado con capturas
+reales a 375px contra páginas públicas. Dos bugs reales encontrados y
+arreglados, no solo dados por buenos: la fila de píldoras de la ficha
+del juego sin `flex-wrap` (se habría salido del ancho en móvil con la
+tercera píldora nueva del Cerrojo de Hitos), y el botón flotante del
+scratchpad en Modo Enfoque quedando detrás del footer apilado de
+"¿Ya lo tengo?"/"Salir" en móvil (recalculado el offset).
+
+Todo verificado con `tsc`/`eslint`/`next build`, más navegador real
+donde había algo público que mirar. **Sigue habiendo commits sin
+push desde el momento de escribir esto** (Cerrojo de Hitos + cuarta
+tanda) — pendiente de que el usuario lo pida, mismo criterio de
+siempre.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación 6) — vincular Google/Discord con sesión activa, "ver más" en horas por juego
 
 Dos peticiones cortas y directas del usuario.
