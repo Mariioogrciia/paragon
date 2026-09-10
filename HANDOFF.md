@@ -7,6 +7,42 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 5) — bug real en producción: el bot decía "La aplicación no ha respondido"
+
+El usuario reportó el error probando `/perfil` en Discord, en PRODUCCIÓN.
+**Importante: este bug ya existía ANTES de la continuación 4** — nada de
+lo de hoy estaba desplegado todavía (seguía sin push), así que no lo
+causó ningún cambio de esta sesión. Es deuda de antes, encontrada ahora.
+
+**Causa real**: Discord exige contestar a una interacción en menos de 3
+segundos. El endpoint (`api/discord/interactions/route.ts`) calculaba
+TODO — varias consultas a la base, en `/juego` a veces un sync en vivo
+contra PSN/Steam — antes de devolver nada. Con un arranque en frío de
+Vercel eso pasa de 3s con facilidad, y Discord lo enseña como "no ha
+respondido" aunque el cálculo hubiera terminado bien un segundo después.
+
+**Arreglado con el patrón correcto de Discord (respuesta diferida)**:
+el POST contesta AL MOMENTO con tipo 5 (deferred), el cálculo de verdad
+corre dentro de `after()` de Next (leída su doc antes de usarla —
+funciona en Vercel de fábrica vía `waitUntil`) y al terminar edita la
+respuesta ya enviada con un `PATCH` al webhook de la propia interacción.
+`maxDuration = 30` añadido a la ruta, margen de sobra.
+
+Verificado: `tsc`/eslint/`next build` limpios, la ruta sirve de verdad en
+local (405 GET, 401 POST sin firma — sin crash), y el PATCH al webhook
+probado con un token inventado contra la API REAL de Discord devuelve
+"Invalid Webhook Token" — confirma que la forma de la petición es
+correcta, no solo que compila. **No se ha podido probar el flujo
+completo con una firma Ed25519 real** — haría falta la clave PRIVADA de
+Discord, que solo la tiene Discord.
+
+**⚠️ Este fix sigue SIN DESPLEGAR** (commit local, sin push, por la
+misma instrucción de no hacer push hasta que el usuario lo diga) — el
+bot en producción SIGUE con el bug hasta que se despliegue esto. Se le
+avisó explícitamente de esto al usuario en el momento.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación 4) — valorada la propuesta grande de Antigravity, y construido lo viable de tres bloques
 
 El usuario pegó dos tandas de ideas de Antigravity: una lista de 4 bloques
