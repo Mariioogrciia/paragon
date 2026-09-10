@@ -8,7 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
-import { contarSinLeer } from "@/lib/notifications";
+import { getHiddenNavItems } from "@/lib/navPreferences";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
@@ -106,6 +106,7 @@ function relanzarSiEsDeNext(error: unknown): void {
 }
 
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { CookieBanner } from "@/components/CookieBanner";
 
 export default async function RootLayout({
   children,
@@ -141,7 +142,7 @@ export default async function RootLayout({
   }
 
   const nivelParagon = sessionUser ? await getParagonLevel(sessionUser.id) : null;
-  const avisosSinLeer = sessionUser ? await contarSinLeer(sessionUser.id) : 0;
+  const navOculta = sessionUser ? await getHiddenNavItems(sessionUser.id) : [];
 
   const headerUser = sessionUser
     ? {
@@ -212,13 +213,14 @@ export default async function RootLayout({
       </head>
       <body className="flex min-h-screen flex-col transition-colors duration-300">
         <ServiceWorkerRegister />
+        <CookieBanner />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           themes={["dark", "light", "oled", "high-contrast"]}
         >
-          <Header user={headerUser} avisosSinLeer={avisosSinLeer} />
+          <Header user={headerUser} navOculta={navOculta} />
           {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
               56px de los 375 de un movil (un 15% del ancho) antes de que las
               tarjetas de dentro pusieran su propio relleno encima. */}

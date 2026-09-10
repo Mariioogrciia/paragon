@@ -1,4 +1,18 @@
+import Link from "next/link";
 import { BackButton } from "@/components/BackButton";
+
+export const metadata = { title: "Privacidad · Paragon" };
+
+function Seccion({ num, title, children }: { num: string; title: string; children: React.ReactNode }) {
+  return (
+    <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
+      <h2 className="text-lg font-bold text-foreground">
+        {num}. {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
 
 export default function PrivacidadPage() {
   return (
@@ -9,54 +23,135 @@ export default function PrivacidadPage() {
         <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">
           Política de Privacidad
         </h1>
-        <p className="text-sm text-muted">Última actualización: Septiembre 2026</p>
+        <p className="text-sm text-muted">Última actualización: septiembre de 2026</p>
       </div>
 
-      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
-        <h2 className="text-lg font-bold text-foreground">1. Información que recopilamos</h2>
-        <p>
-          En <strong>Paragon</strong>, nos tomamos muy en serio tu privacidad. Solo recopilamos los datos estrictamente necesarios para ofrecerte el servicio:
+      <Seccion num="1" title="Quién trata tus datos">
+        <p className="text-muted">
+          Paragon es un proyecto personal de <strong>Mario García</strong>, no una
+          empresa. A efectos del Reglamento General de Protección de Datos
+          (RGPD), Mario García es el responsable del tratamiento de los datos
+          que se describen aquí. Puedes escribir a{" "}
+          <a href="mailto:mario.meca2005@gmail.com" className="text-accent hover:underline">
+            mario.meca2005@gmail.com
+          </a>{" "}
+          para cualquier duda o para ejercer tus derechos (sección 6).
         </p>
-        <ul className="list-disc pl-5 space-y-1 text-muted">
-          <li><strong>Datos de autenticación:</strong> Nombre, dirección de correo electrónico y foto de perfil pública proporcionados a través de proveedores de inicio de sesión de terceros (como Google o Discord).</li>
-          <li><strong>Identificadores de juego:</strong> Identificador público de PlayStation Network (PSN ID) o Steam ID que decidas vincular voluntariamente.</li>
-          <li><strong>Datos de logros y juegos:</strong> Información pública sobre tus juegos, trofeos y horas jugadas extraída de las APIs oficiales o públicas de dichas plataformas.</li>
+      </Seccion>
+
+      <Seccion num="2" title="Qué datos recopilamos">
+        <p>Solo lo que hace falta para que el servicio funcione:</p>
+        <ul className="list-disc pl-5 space-y-1.5 text-muted">
+          <li>
+            <strong>Al crear tu cuenta:</strong> nombre, correo electrónico y
+            foto de perfil que nos entrega Google o Discord al iniciar sesión
+            con ellos (son los únicos dos proveedores de acceso; Paragon nunca
+            ve ni guarda tu contraseña de esos servicios).
+          </li>
+          <li>
+            <strong>Al vincular una plataforma de juego</strong> (PlayStation,
+            Steam, Xbox, y las que en el futuro se puedan vincular de verdad):
+            tu identificador público en esa plataforma, y los datos que esa
+            plataforma hace públicos con él — biblioteca de juegos, trofeos o
+            logros, horas jugadas y nivel. Se lee con credenciales del
+            servidor, nunca con las tuyas: vincular es decir «este soy yo ahí»,
+            no dar acceso a tu cuenta.
+          </li>
+          <li>
+            <strong>Contenido que escribes tú:</strong> reseñas, notas privadas
+            por juego, guías, comentarios, tu apodo («handle») y lo que
+            personalices en tu perfil público (título, banner, color, etc.).
+          </li>
+          <li>
+            <strong>Notificaciones push (opcional):</strong> si activas los
+            avisos del navegador en Ajustes, se guarda el «endpoint» que tu
+            propio navegador genera para poder enviarte esa notificación — no
+            es un dato que identifique tu persona, lo genera Chrome/Firefox/etc.
+            y solo sirve para eso.
+          </li>
+          <li>
+            <strong>Webhook de Discord (opcional):</strong> si pegas una URL de
+            webhook de tu propio servidor de Discord para recibir avisos de
+            trofeos ahí, esa URL se guarda tal cual la escribiste. Solo tú la
+            ves y solo se usa para enviar los mensajes que tú has pedido.
+          </li>
         </ul>
-      </section>
+      </Seccion>
 
-      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
-        <h2 className="text-lg font-bold text-foreground">2. Uso de la información</h2>
-        <p>Los datos recopilados se utilizan única y exclusivamente para:</p>
+      <Seccion num="3" title="Para qué se usan">
         <ul className="list-disc pl-5 space-y-1 text-muted">
-          <li>Permitirte iniciar sesión y gestionar tu cuenta en Paragon.</li>
-          <li>Calcular y mostrar tus estadísticas de trofeos, logros y progreso.</li>
-          <li>Facilitar la comparación y el feed de actividad con amigos dentro de la plataforma.</li>
+          <li>Dejarte entrar y gestionar tu cuenta.</li>
+          <li>Calcular y enseñar tus estadísticas de trofeos, logros y progreso.</li>
+          <li>La comparación entre amigos, el feed de comunidad y las ligas.</li>
+          <li>Enviarte los avisos push o de Discord que tú mismo activaste.</li>
         </ul>
         <p className="text-muted">
-          <strong>Nunca</strong> vendemos, alquilamos ni compartimos tus datos personales con terceras empresas para fines comerciales o publicitarios.
+          <strong>Nunca</strong> vendemos, alquilamos ni compartimos tus datos
+          personales con terceros con fines comerciales o publicitarios. Paragon
+          no muestra anuncios ni usa herramientas de analítica o publicidad de
+          terceros (ver la <Link href="/cookies" className="text-accent hover:underline">política de cookies</Link>).
         </p>
-      </section>
+      </Seccion>
 
-      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
-        <h2 className="text-lg font-bold text-foreground">3. Seguridad de tus credenciales</h2>
-        <p className="text-muted">
-          Paragon <strong>nunca solicita ni almacena contraseñas de tus cuentas de PlayStation o Steam</strong>. La sincronización se realiza mediante identificadores públicos sin requerir credenciales confidenciales de Sony ni de Valve.
-        </p>
-      </section>
+      <Seccion num="4" title="Con quién se comparte, y por qué">
+        <p className="text-muted">Ningún dato tuyo se vende. Sí hay servicios técnicos que lo procesan por nosotros o de los que leemos datos públicos:</p>
+        <ul className="list-disc pl-5 space-y-1.5 text-muted">
+          <li><strong>Vercel</strong> aloja la aplicación. <strong>Supabase</strong> aloja la base de datos. Ambos actúan como encargados del tratamiento, no como dueños de tus datos.</li>
+          <li><strong>Google y Discord</strong>, solo para el inicio de sesión (OAuth) — no reciben datos de trofeos ni de tu actividad en Paragon.</li>
+          <li><strong>PlayStation Network, Steam y Xbox</strong> (esta última vía un servicio de terceros no oficial): de ahí se <em>leen</em> tus datos públicos de trofeos, nunca se les envía nada.</li>
+          <li><strong>IGDB, PowerPyx, HowLongToBeat, YouTube e IsThereAnyDeal</strong>: fuentes de las que se lee información pública sobre los propios juegos (carátulas, géneros, guías, tiempos de finalización, precios) — no reciben datos tuyos, solo se les pide información sobre un juego.</li>
+          <li><strong>El servicio de notificaciones push de tu propio navegador</strong> (por ejemplo Firebase Cloud Messaging en Chrome), únicamente si activas los avisos — es el mecanismo estándar de la web, no algo propio de Paragon.</li>
+        </ul>
+      </Seccion>
 
-      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
-        <h2 className="text-lg font-bold text-foreground">4. Eliminación de datos</h2>
+      <Seccion num="5" title="Cuánto tiempo se conservan">
         <p className="text-muted">
-          Puedes solicitar la eliminación completa de tu cuenta y todos los datos asociados en cualquier momento desde los ajustes de tu perfil o poniéndote en contacto con el administrador.
+          Mientras tu cuenta exista. Si la eliminas (sección 6), se borran junto
+          a ella tus cuentas de plataforma vinculadas, tus notas privadas, tu
+          suscripción push y tu webhook de Discord. El contenido público que
+          hayas compartido con otras personas (reseñas, comentarios, guías)
+          puede quedar anonimizado en vez de borrado del todo, si borrarlo del
+          todo rompiera una conversación ajena.
         </p>
-      </section>
+      </Seccion>
 
-      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
-        <h2 className="text-lg font-bold text-foreground">5. Contacto</h2>
+      <Seccion num="6" title="Tus derechos">
         <p className="text-muted">
-          Si tienes alguna duda sobre esta política de privacidad, puedes contactarnos a través del correo de soporte técnico indicado en la plataforma.
+          Acceso, rectificación, supresión, portabilidad, oposición y
+          limitación del tratamiento — el listado completo del RGPD. La
+          eliminación de tu cuenta la puedes hacer tú mismo desde{" "}
+          <Link href="/ajustes/seguridad" className="text-accent hover:underline">Ajustes → Inicio de sesión y seguridad</Link>.
+          Para cualquier otro derecho, escribe a{" "}
+          <a href="mailto:mario.meca2005@gmail.com" className="text-accent hover:underline">mario.meca2005@gmail.com</a>.
+          También puedes reclamar ante la Agencia Española de Protección de
+          Datos (aepd.es) si consideras que no se ha atendido tu solicitud.
         </p>
-      </section>
+      </Seccion>
+
+      <Seccion num="7" title="Seguridad de tus credenciales">
+        <p className="text-muted">
+          Paragon <strong>nunca solicita ni almacena contraseñas</strong> de tus
+          cuentas de PlayStation, Steam, Xbox ni ninguna otra plataforma de
+          juego. La sincronización usa identificadores públicos, no
+          credenciales privadas de Sony, Valve ni Microsoft.
+        </p>
+      </Seccion>
+
+      <Seccion num="8" title="Menores de edad">
+        <p className="text-muted">
+          Paragon no está dirigido a menores de 14 años y no solicita
+          conscientemente datos de menores de esa edad. Si crees que un menor
+          nos ha facilitado datos, escríbenos y los eliminaremos.
+        </p>
+      </Seccion>
+
+      <Seccion num="9" title="Cambios en esta política">
+        <p className="text-muted">
+          Si esta política cambia de forma relevante, se actualizará la fecha
+          de arriba y, cuando el cambio sea importante, se avisará dentro de la
+          propia aplicación.
+        </p>
+      </Seccion>
     </div>
   );
 }

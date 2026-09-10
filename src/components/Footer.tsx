@@ -27,6 +27,18 @@ export function Footer() {
           >
             Privacidad
           </Link>
+          <Link
+            href="/cookies"
+            className="font-medium text-muted hover:text-foreground transition-colors"
+          >
+            Cookies
+          </Link>
+          <Link
+            href="/terminos"
+            className="font-medium text-muted hover:text-foreground transition-colors"
+          >
+            Términos
+          </Link>
           <span className="hidden md:inline text-muted/60">·</span>
           <span className="hidden md:inline text-[0.6875rem] text-muted/80">
             Desarrollado por <strong className="text-foreground/80">Mario García</strong>
