@@ -1,9 +1,8 @@
 import "server-only";
-import { and, asc, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, gameTrophies, userGames, userTrophies, users } from "@/db/schema";
-import { listFriends, getLibrary, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
-import { summarise } from "@/lib/stats";
+import { listFriends, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 
 /**
  * Datos para /u/[handle]/estadisticas.
@@ -123,38 +122,72 @@ export interface StatsAmigo {
 }
 
 /**
- * Tú y tus amigos, con los mismos números que ya enseña cada perfil —
- * `summarise()` (lib/stats.ts) es la fuente única de verdad para
- * platinos/trofeos (incluye el 100% de Steam como platino, excluye
- * deseados), así que se reutiliza en vez de reimplementar el conteo en SQL
- * aparte, donde sería fácil que las reglas se desincronizaran de las que ya
- * usa el resto de la app. Con el puñado de amigos que tiene cualquiera
- * aquí, una consulta de biblioteca por persona es barato — no hace falta
- * optimizar a una sola query.
+ * Tú y tus amigos, con los mismos números que ya enseña cada perfil.
+ *
+ * Antes esto llamaba a `getLibrary()` (la consulta más cara del
+ * proyecto — trae CADA juego con su rareza de platino por subconsulta,
+ * y de paso puede disparar un backfill de PEGI contra IGDB) una vez POR
+ * PERSONA — con 20 amigos, 20 consultas pesadas en paralelo solo para
+ * sacar 4 números de cada uno. Encontrado en el repaso de rendimiento
+ * del 10 de septiembre de 2026; el comentario que había aquí antes
+ * ("con el puñado de amigos que tiene cualquiera, es barato") ya no se
+ * sostiene con las funciones que se han ido sumando encima de
+ * `getLibrary` desde entonces.
+ *
+ * Arreglado con UNA sola consulta agregada (`userId IN (...)`) que
+ * replica EXACTAMENTE la misma regla que `summarise()`/
+ * `esPlatinoEquivalente()` (lib/stats.ts) — platino real O 100% de
+ * Steam, deseados excluidos — para no reimplementar el conteo con una
+ * regla que se pueda desincronizar de la que usa el resto de la app.
+ * Sin tocar `getLibrary` para nada de esto: de paso, mirar tus
+ * estadísticas de amigos ya no dispara backfills de metadatos sobre SUS
+ * juegos, que nunca debió depender de que tú abrieras esta pantalla.
  */
 export async function estadisticasAmigos(userId: string): Promise<StatsAmigo[]> {
   const propio = await getProfileByUserId(userId);
   if (!propio) return [];
 
   const amigos = await listFriends(userId);
-
   const personas = [
     { userId, handle: propio.handle, displayName: propio.displayName, avatarUrl: resolveAvatarUrl(propio) },
     ...amigos.map((a) => ({ userId: a.userId, handle: a.handle, displayName: a.displayName, avatarUrl: a.avatarUrl ?? undefined })),
   ];
 
-  const conStats = await Promise.all(
-    personas.map(async (persona) => {
-      const profile = persona.userId === userId ? propio : await getProfileByUserId(persona.userId);
-      if (!profile) return null;
-      const { games } = await getLibrary(profile);
-      const [resumen, horas] = await Promise.all([Promise.resolve(summarise(games)), horasTotales(persona.userId)]);
-      return { ...persona, horas, trofeos: resumen.trofeos, platinos: resumen.platinos, juegos: resumen.juegos };
-    }),
-  );
+  const ids = personas.map((p) => p.userId);
+  const filas = await db
+    .select({
+      userId: userGames.userId,
+      juegos: sql<number>`count(*) filter (where ${userGames.isWishlist} = false)`,
+      trofeos: sql<number>`coalesce(sum(${userGames.earnedTotal}) filter (where ${userGames.isWishlist} = false), 0)`,
+      // Misma regla que esPlatinoEquivalente(): platino real (metal) O
+      // 100% en Steam — no hay platino real que contar en Steam.
+      platinos: sql<number>`count(*) filter (
+        where ${userGames.isWishlist} = false
+          and (
+            (${userGames.earned}->>'platinum')::int > 0
+            or (${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100)
+          )
+      )`,
+      minutos: sql<number>`coalesce(sum(${userGames.playtimeMinutes}) filter (where ${userGames.isWishlist} = false), 0)`,
+    })
+    .from(userGames)
+    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+    .where(inArray(userGames.userId, ids))
+    .groupBy(userGames.userId);
 
-  return conStats
-    .filter((p): p is StatsAmigo => p !== null)
+  const statsPorId = new Map(filas.map((f) => [f.userId, f]));
+
+  return personas
+    .map((persona) => {
+      const s = statsPorId.get(persona.userId);
+      return {
+        ...persona,
+        horas: Math.round(Number(s?.minutos ?? 0) / 60),
+        trofeos: Number(s?.trofeos ?? 0),
+        platinos: Number(s?.platinos ?? 0),
+        juegos: Number(s?.juegos ?? 0),
+      };
+    })
     .sort((a, b) => b.horas - a.horas);
 }
 
