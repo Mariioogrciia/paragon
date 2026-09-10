@@ -121,14 +121,45 @@ la parte barata del bloque General:
   Se deja igual a propósito (un lazy initializer arriesgaría un mismatch
   de hidratación SSR) y se anota aparte, sin mezclarlo con este cambio.
 
+### Segunda tanda de Antigravity, ya el mismo día — mucho solapamiento real
+
+El usuario pegó una lista nueva (7 ideas + 7 repetidas con emoji). Antes
+de tocar nada se comprobó contra lo ya construido:
+
+- **Duplicados de verdad, no se repitió nada**: "Auditoría Financiera &
+  ROI" = `costePorHora()`/`resumenFinanciero()` (ya en producción desde
+  hoy). El resto del bot (`/juego`, `/nota`, `/ruleta`) y de
+  Descubrir/Noticias también ya estaban.
+- **Construido de esta tanda**: `eficienciaPersonal()` (tus horas reales
+  vs estimación HLTB, solo en lo ya platinado) y `deudaBacklog()` (horas
+  de HLTB restantes en lo empezado) — las dos en
+  `EstadisticasCompletas.tsx`. **A propósito SIN** la "fecha de
+  liquidación" que pedía la idea: no hay ningún histórico de horas
+  jugadas en el tiempo en este proyecto, solo una foto actual
+  (`playtimeMinutes`) — no hay con qué calcular horas/semana de verdad,
+  solo trofeos/semana. Prometerla habría sido un dato inventado con pinta
+  de real.
+- **Copia de seguridad (import)**: la mitad de export ya existe
+  (`exportarDatosUsuario`); el import NO se ha tocado — escribe datos del
+  usuario desde un archivo externo, más riesgo que todo lo demás de hoy
+  (que es solo lectura/cálculo), se quiere confirmación explícita antes.
+- **Hitos Redondos** (reservar el platino #25/#50/#100): viable pero
+  necesita columna nueva — mismo criterio que `/meta`, no se añade sin
+  decidirlo con el usuario.
+- **Modo Monotarea** (portada reducida al juego anclado): viable pero es
+  un rediseño real de la portada, no una pieza suelta — para su propio
+  turno.
+
 ### Pendiente de esta misma tanda, para quien retome esto
 
-- `/meta`, DM "empujón final" (bot) — necesitan decisión de producto del
-  usuario (columna nueva / flag de opt-in), ver arriba.
-- Modo "Temporada/Mes de Caza" (bloque General) — no empezado todavía.
-- Tarjeta de platino compartible en imagen (bloque General) — no
-  empezada, es la pieza más grande de las viables (generación de imagen
-  con diseño cuidado), se dejó para el final a propósito.
+- `/meta`, DM "empujón final" (bot), Hitos Redondos — necesitan decisión
+  de producto del usuario (columna nueva / flag de opt-in), ver arriba.
+- Import de la copia de seguridad — necesita confirmación explícita por
+  el riesgo de escribir datos desde un archivo externo.
+- Modo Monotarea y Modo "Temporada/Mes de Caza" — rediseños de portada,
+  no empezados.
+- Tarjeta de platino compartible en imagen — no empezada, es la pieza más
+  grande de las viables, se dejó para el final a propósito.
 - El resto del bloque Noticias (alertas de cierre de servicio, radar de
   servidores) sigue descartado por falta de fuente real, ya documentado.
 - El error de eslint pre-existente en `SectionTabs.tsx` — anotado como
