@@ -34,11 +34,13 @@ function elegirConVariedad<T>(candidatos: T[], cuantos: number, entrePrimeros = 
  * "Tengo X horas hoy" — dos bolsas, cada una con un dato real detrás, nada
  * inventado:
  *
- * 1. Victorias rápidas: juegos empezados con MUY pocos trofeos por sacar.
- *    El dato es real (`definedTotal - earnedTotal`), pero no hay ninguna
- *    fuente de "cuánto tarda CADA trofeo" — así que esta bolsa no depende
- *    de las horas disponibles, es "esto lo puedes cerrar hoy" siempre que
- *    tengas aunque sea un rato.
+ * 1. Victorias rápidas: juegos empezados con pocos trofeos por sacar. El
+ *    dato es real (`definedTotal - earnedTotal`), pero no hay ninguna
+ *    fuente de "cuánto tarda CADA trofeo" — así que el CORTE de "pocos" se
+ *    escala con las horas que digas (más tiempo, más margen para que
+ *    cuente como "rápido"), no un tiempo estimado inventado por trofeo.
+ *    Antes el corte era fijo (≤3, siempre) y la lista no cambiaba nunca al
+ *    tocar el selector de horas — parecía roto aunque no lo estuviera.
  * 2. Para profundizar: juegos empezados con horas de HowLongToBeat
  *    (`hltb.completionist`, la más completa) y horas ya jugadas real
  *    (`playtimeMinutes`) — la resta es lo que falta SEGÚN LA MEDIA de la
@@ -65,9 +67,15 @@ export function sugerirPorTiempo(
     .filter((g) => !g.isWishlist && !esPlatinoEquivalente(g) && g.earnedTotal > 0 && g.definedTotal > g.earnedTotal)
     .filter((g) => !generosDelFiltro || generosDelFiltro.some((gen) => g.genres?.includes(gen)));
 
+  // 30min→2 trofeos de corte, 1h→3, 1h30→4, 2h→5, 3h+→8 — más tiempo
+  // disponible, más margen para que un puñado de trofeos siga contando
+  // como "rápido". Tope en 10 para que "rápidas" no acabe siendo cualquier
+  // cosa con 3h+.
+  const corteRapidas = Math.min(10, Math.max(2, Math.round(horasDisponibles * 2.5)));
+
   const candidatosRapidas = empezados
     .map((g) => ({ g, restantes: g.definedTotal - g.earnedTotal }))
-    .filter((x) => x.restantes > 0 && x.restantes <= 3)
+    .filter((x) => x.restantes > 0 && x.restantes <= corteRapidas)
     .sort((a, b) => a.restantes - b.restantes);
 
   const victoriasRapidas: SugerenciaTiempo[] = elegirConVariedad(candidatosRapidas, 6).map(({ g, restantes }) => ({
