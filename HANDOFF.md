@@ -1,9 +1,418 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **9 de septiembre de 2026**
+releer todo el historial. Última actualización: **10 de septiembre de 2026**
 (con Antigravity trabajando en paralelo todo el rato — más abajo hay un
 aviso de qué tocó él).
+
+---
+
+## Sesión del 10 de septiembre de 2026 — Capacitor (Nivel 2 de "app nativa")
+
+El usuario preguntó por pasar Paragon a app nativa. Se le explicaron tres
+niveles honestos (PWA instalable / shell con Capacitor hacia las tiendas /
+reescritura nativa de verdad) y pidió el Nivel 2.
+
+### Por qué "shell", no una reescritura
+
+Next.js con server actions, cron, auth por cookies de sesión y streaming no
+sobrevive a un `next export` estático — así que en vez de reescribir la
+app, [capacitor.config.ts](capacitor.config.ts) usa `server.url` apuntando
+a la web de producción de verdad
+(`https://platinos-nine.vercel.app`, el dominio que dio el usuario — **hay
+que cambiarlo a mano en cuanto tenga un dominio propio**). Es el mismo
+patrón que una Trusted Web Activity de Android, con Capacitor dando
+también el lado de iOS. `capacitor-www/` es un placeholder que Capacitor
+exige que exista pero que nunca se ve — solo aparecería si `server.url`
+fallara al cargar (sin red, dominio mal puesto).
+
+### Se casi duplica el manifest ya arreglado antes — ojo con esto
+
+Al montar el PWA (antes de llegar a Capacitor en esta misma conversación)
+casi se crea un `public/manifest.json` nuevo sin comprobar antes que
+`app/manifest.ts` YA daba de alta un manifest real (arreglado en una
+sesión anterior, antes de esta traspaso — favicon/manifest antes rotos,
+ver el comentario de `layout.tsx`). Se revirtió a tiempo. **Aviso real de
+verdad para quien retome esto**: `npx capacitor-assets generate` escribió
+sin pedir permiso un `public/manifest.webmanifest` ESTÁTICO apuntando a un
+`icons/` roto — Next sirve archivos estáticos de `public/` ANTES que sus
+propias rutas dinámicas, así que ese archivo suelto habría estado
+pisando en silencio el manifest de verdad en cuanto se desplegara. Se
+borró. Si se vuelve a correr ese comando, comprobar que no reaparece.
+
+Sí se aprovechó para arreglar dos cosas menores que sí hacían falta:
+[apple-icon.png](src/app/apple-icon.png) llevaba transparencia sin
+aplanar (podía verse raro en iOS según el fondo del launcher) y el color
+de splash del manifest (`#0e1217`) no coincidía exactamente con el fondo
+real de la app (`#0a0d13`) — los dos ya alineados.
+
+### Qué se generó
+
+`npx cap add android` e `ios` — proyectos nativos completos en
+`android/` e `ios/`, cada uno con su propio `.gitignore` (autogenerado por
+Capacitor, cubre `Pods/`, `build/`, `DerivedData`, `local.properties`,
+etc. — sí se comprueba a mano, no es responsabilidad puesta a ciegas).
+Iconos y splash de verdad (no los del logo con fondo blanco por defecto
+que generó `@capacitor/assets` la primera vez —
+[resources/icon-foreground.png](resources/icon-foreground.png) +
+[icon-background.png](resources/icon-background.png) con el fondo oscuro
+real de la app, en vez del `icon.png` plano que da fondo blanco de
+serie).
+
+**`npm run build` de Next corre limpio con todo esto añadido** —
+comprobación real, no solo `tsc --noEmit` (que también pasa limpio).
+
+### Lo que el usuario tiene que hacer — no se puede montar desde aquí
+
+Este entorno es Windows sin Xcode, sin Android Studio, sin cuenta de
+Apple/Google Developer — nada de eso se puede tener ni simular desde
+aquí. Para llegar a un `.apk`/`.ipa` de verdad:
+
+- **Android**: instalar Android Studio, abrir la carpeta `android/`,
+  compilar. Cuenta de Google Play Developer (25$ pago único) solo hace
+  falta para PUBLICAR, no para probar en un móvil propio.
+- **iOS**: hace falta un Mac con Xcode — no hay forma de evitarlo, Apple no
+  permite compilar para iOS desde otro sistema. Cuenta de Apple Developer
+  (99$/año) para firmar y publicar.
+- **Push dentro del shell**: el Web Push que ya usa Paragon puede NO
+  funcionar igual dentro de una WKWebView de iOS (limitación conocida,
+  no de esta configuración) — si hace falta que funcione de verdad ahí
+  dentro, el camino real es el plugin nativo
+  `@capacitor/push-notifications` (APNs para iOS, FCM para Android), que
+  no se ha montado esta sesión por quedar fuera de "solo el shell".
+
+**Nada de esto se ha podido abrir en un dispositivo ni emulador real** —
+sin las herramientas de arriba no hay cómo, desde este entorno.
+
+---
+
+---
+
+## Sesión del 9 de septiembre de 2026 (continuación 9) — el webhook de Discord, sustituido por un bot de verdad
+
+El usuario preguntó por un bot de Telegram, se corrigió a "de Discord" —
+Paragon ya usa Discord como proveedor de login, así que hay una ventaja
+real: quien inició sesión con Discord ya tiene su ID de Discord guardado
+(`accounts`, provider='discord'), sin vincular nada aparte.
+
+### Qué cambia
+
+El webhook (`lib/discordWebhook.ts`, URL pegada a mano en Ajustes) queda
+SUSTITUIDO por [lib/discordBot.ts](src/lib/discordBot.ts): mismo contenido
+de aviso (trofeo nuevo / platino, con el mismo formato de embed de
+siempre), pero por DM del bot en vez de a un canal. Nueva columna
+`users.discordDmEnabled` (opt-in, `false` por defecto — mandar un DM sin
+pedirlo sería spam); la columna vieja `discordWebhookUrl` se deja tal cual
+en la base, sin que ningún código nuevo la lea ni la escriba.
+[ProfileForm](src/components/forms/ProfileForm.tsx)/[Forms.tsx](src/components/forms/Forms.tsx):
+el campo de URL se cambia por un interruptor simple, que solo funciona si
+la cuenta inició sesión con Discord (si no, se explica por qué en vez de
+enseñar el interruptor).
+
+### Comandos de barra, primera versión
+
+Nuevo endpoint
+[/api/discord/interactions](src/app/api/discord/interactions/route.ts) —
+HTTP puro (verificado con `tweetnacl`, nueva dependencia pequeña, sin
+bindings nativos), nada de gateway ni proceso persistente, encaja tal cual
+en una ruta serverless de Vercel:
+
+- `/platinosalalcance` — el mismo radar de la continuación 6, top 5.
+- `/quejuegohoy [minutos]` — el mismo recomendador de la continuación 7.
+
+Los dos comandos identifican a la persona por su ID de Discord (quien
+escribe el comando) buscando en `accounts` cuál es su cuenta de Paragon —
+si nunca inició sesión con Discord ahí, se le dice tal cual, no un error
+sin explicar. Nuevo
+[scripts/registrar-comandos-discord.mts](scripts/registrar-comandos-discord.mts)
+para darlos de alta en la API de Discord (no aparecen solos por escribir el
+código — hay que decírselo a Discord aparte, una vez por comando nuevo o
+cambiado).
+
+### Lo que tiene que hacer el usuario — esto no lo puedo montar yo
+
+Crear la aplicación de Discord y el bot es una cuenta/panel de terceros,
+fuera de lo que este entorno puede tocar. Pasos completos en
+`.env.example`, resumen aquí:
+
+1. Developer Portal de Discord → crear aplicación → pestaña **Bot** →
+   "Reset Token" → `DISCORD_BOT_TOKEN`.
+2. Misma aplicación → **General Information** → Public Key →
+   `DISCORD_PUBLIC_KEY`, y Application ID → `DISCORD_APPLICATION_ID`.
+3. Con esos dos ya puestos en Vercel: en esa misma página, "Interactions
+   Endpoint URL" = `https://tu-dominio/api/discord/interactions` — Discord
+   manda un PING de prueba nada más guardar el campo, y si el endpoint no
+   contesta bien (por eso hace falta tener el deploy con las env vars
+   puestas ANTES de rellenar esto), ni deja guardarlo.
+4. **OAuth2 → URL Generator** → marcar scope `bot` → permiso "Send
+   Messages" → abrir la URL que genera e invitar el bot a un servidor
+   propio (hace falta compartir servidor para poder mandarle DM a alguien).
+5. `npx tsx scripts/registrar-comandos-discord.mts` — una vez, para dar de
+   alta los dos comandos.
+
+**Nada de esto se ha podido probar en vivo** — necesita las cinco cosas de
+arriba puestas por el usuario. Compila limpio (`tsc --noEmit`), pero la
+verificación real (¿el bot manda el DM de verdad? ¿el comando responde a
+tiempo?) queda pendiente hasta que exista el bot.
+
+**La migración pendiente crece otra vez**: `discordDmEnabled` se suma a
+`hiddenNavItems`, `manualProgressCurrent`/`Target`, `acquisitionFormat` y
+`pricePaid` de sesiones anteriores — cinco columnas ya esperando el mismo
+`npm run db:push` bloqueado por el aviso de `push_subscription`, sin
+resolver desde la continuación 5.
+
+---
+
+## Sesión del 9 de septiembre de 2026 (continuación 8) — sync cada 15 min por fuera de Vercel, i18n aparcado
+
+El usuario preguntó por "varios idiomas y horarios", que resultó ser dos
+cosas — una aparcada a propósito, otra construida:
+
+**Multi-idioma: aparcado, era una idea suelta.** Confirmado que hoy la
+interfaz entera está en español a pelo, sin ninguna librería de i18n
+(`users.language` existe en la base pero de momento no traduce nada — ver
+el comentario en `schema.ts` junto a `trophyGuides.language`). Es un
+proyecto en sí mismo (next-intl + extraer cientos de textos de decenas de
+archivos), no algo que quepa junto a otra cosa. El usuario lo confirmó:
+no es prioridad ahora, queda apuntado para cuando lo sea.
+
+**Sincronización cada 15 minutos — resuelto SIN tocar el plan de Vercel.**
+El cron de `vercel.json` corría 1 vez al día porque el plan Hobby no deja
+más (ya estaba documentado en el propio `route.ts` — se probó por horas
+antes y Vercel rechazó el despliegue). En vez de pagar Vercel Pro (el
+usuario lo descartó, prefiere gratis), nuevo
+[.github/workflows/sync-frecuente.yml](.github/workflows/sync-frecuente.yml):
+un cron de GitHub Actions que llama a la MISMA ruta `/api/cron/sync` cada
+15 minutos desde fuera de Vercel — la ruta solo exige la cabecera
+`Authorization: Bearer <CRON_SECRET>` de siempre, no distingue quién
+llama, así que no hizo falta tocar ni una línea de `route.ts`. Revisado
+que no hay ningún gate de "solo si no se sincronizó hace X" que lo hiciera
+inútil llamarlo más a menudo — simplemente coge las cuentas más
+desactualizadas en cada pasada (`POR_PASADA = 8`), así que con pocos
+usuarios como los que tiene hoy Paragon esto significa que TODOS quedan
+sincronizados en minutos, no en días. El cron diario de Vercel se ha
+dejado tal cual, como red de seguridad.
+
+**Para que funcione de verdad, el usuario tiene que hacer esto a mano en
+GitHub** (Settings → Secrets and variables → Actions, del repo):
+- Secret `SITE_URL`: el dominio real de producción, sin barra al final.
+- Secret `CRON_SECRET`: el mismo valor exacto que ya tiene puesto en
+  Vercel (Project → Settings → Environment Variables).
+
+Sin esos dos secrets el workflow falla con un mensaje claro en vez de
+fallar en silencio (comprobado en el propio script). No se ha podido
+verificar la primera ejecución real porque necesita esos dos secrets
+puestos por el usuario y GitHub tarda en arrancar el primer cron.
+
+---
+
+## Sesión del 9 de septiembre de 2026 (continuación 7) — el bloque medio de las propuestas de Antigravity
+
+Las 4 ideas que se habían clasificado como "buenas pero de tamaño medio" en
+la continuación 6, todas construidas.
+
+- **Trophy DNA**: [lib/trophyDna.ts](src/lib/trophyDna.ts) pesa por TROFEOS
+  GANADOS (no juegos ni horas) agrupados por género real de IGDB, mapeado a
+  7 categorías propias — se dejaron fuera "souls-like" y "sigilo" de la idea
+  original porque IGDB no tiene esos géneros y no hay con qué detectarlos
+  sin adivinar (mismo motivo que ya descartó la heurística de subtítulos).
+  Radar SVG a mano en [TrophyDnaRadar.tsx](src/components/TrophyDnaRadar.tsx),
+  sin librería de gráficos. Visible en cualquier perfil, no solo el propio
+  — no es información privada ni da vergüenza.
+- **Coste por hora**: dos columnas nuevas en `userGames`
+  (`acquisitionFormat`, `pricePaid` — [schema.ts](src/db/schema.ts)),
+  rellenadas a mano desde [AcquisitionEditor.tsx](src/components/AcquisitionEditor.tsx)
+  en la ficha de cada juego. `costePorHora()` en
+  [lib/backlog.ts](src/lib/backlog.ts) solo cuenta con lo que el usuario ha
+  puesto — nada de precio de mercado ni de adivinar. Mejores/peores
+  amortizados en [CostePorHora.tsx](src/components/CostePorHora.tsx),
+  Estadísticas, solo tuyo.
+- **Control de formato/propiedad**: mismo `acquisitionFormat` de arriba
+  (físico/digital/PS Plus/Game Pass/prestado/gratis), mismo editor. **No
+  se ha hecho** el filtro "qué tengo en PS Plus que va a salir del
+  catálogo pronto" que pedía la idea original — no existe ninguna fuente
+  pública con fechas de salida del catálogo, ya se avisó de esto al
+  valorar la lista.
+- **"Tengo X horas hoy"**: [lib/recomendadorTiempo.ts](src/lib/recomendadorTiempo.ts),
+  dos bolsas con dato real cada una — "victorias rápidas" (≤3 trofeos
+  restantes, no depende del tiempo) y "para profundizar" (HLTB
+  `completionist` menos horas ya jugadas, con margen del 30%; sin HLTB para
+  ese juego, simplemente no entra, no se inventa una estimación con la
+  barra de trofeos). Es puro TypeScript sin `server-only` a propósito: el
+  cálculo corre en el propio navegador al cambiar de opción
+  ([RecomendadorTiempo.tsx](src/components/RecomendadorTiempo.tsx), en el
+  Panel, pestaña "Progreso y actividad").
+
+**Compila limpio** (`tsc --noEmit` sin errores, comprobado después de cada
+pieza). **Sigue sin verificarse en el navegador** — mismo motivo que las
+continuaciones 5 y 6, el puerto 3000 lo tiene ocupado el servidor de la
+otra sesión en paralelo.
+
+**IMPORTANTE — la migración pendiente sigue creciendo**: a `hiddenNavItems`
+y `manualProgressCurrent`/`manualProgressTarget` de sesiones anteriores se
+suman ahora `acquisitionFormat` y `pricePaid`. Los CUATRO bloqueados por el
+MISMO aviso de `push_subscription_endpoint_unique` (truncar 2 filas reales)
+sin relación con nada de esto — documentado ya dos veces, sigue sin
+resolverse. Quien retome esto: una sola vez, en una terminal con TTY,
+`npm run db:push`, decidir esa pregunta con calma, y entran las cuatro
+columnas juntas. Hasta entonces, todo lo de esta sesión y la anterior sigue
+sin poder probarse de verdad en producción.
+
+---
+
+## Sesión del 9 de septiembre de 2026 (continuación 6) — legal, y el primer bloque de las propuestas de Antigravity
+
+El usuario pidió mejorar la parte legal, y pasó una lista de 14 ideas de
+Antigravity. Se le devolvió una valoración por bloques (fácil-ya /
+medio-después / descartar por el mismo motivo que ya se descartó la
+heurística de subtítulos: heurística o scraping frágil que no escala) y
+pidió empezar por el bloque fácil.
+
+### Legal: privacidad reescrita + cookies + términos, nuevos
+
+[privacidad/page.tsx](src/app/privacidad/page.tsx) reescrita de cero (quién
+trata los datos, qué se recoge de verdad hoy — incluye push y webhook de
+Discord, que la versión anterior no mencionaba —, con quién se comparte y
+por qué, derechos RGPD). Nuevas [cookies/page.tsx](src/app/cookies/page.tsx)
+(Paragon no usa analítica ni publicidad, solo la cookie de sesión, exenta
+de consentimiento por ley) y [terminos/page.tsx](src/app/terminos/page.tsx)
+(no afiliación, fuentes de terceros no garantizadas, uso aceptable).
+[CookieBanner.tsx](src/components/CookieBanner.tsx) nuevo — el usuario lo
+pidió aunque no sea obligatorio hoy. Contacto: el correo personal del
+usuario (gmail), porque `soporte@paragon.app` no es una bandeja real
+todavía — se le explicó cómo montarla (ImprovMX/Cloudflare Email Routing)
+para cuando quiera cambiarlo.
+
+### El bloque "fácil" del backlog de ideas, las 5 construidas
+
+- **Salón de la Vergüenza** + "jugar a ciegas": [lib/backlog.ts](src/lib/backlog.ts)
+  (`salonDeLaVerguenza`) + [SalonDeLaVerguenza.tsx](src/components/SalonDeLaVerguenza.tsx)
+  — el temporizador de 2h vive en `localStorage`, no en la base (es un
+  empujón personal de este navegador, no algo que sincronizar).
+- **Radar de "Platinos al alcance"**: `platinosAlAlcance()` en el mismo
+  `lib/backlog.ts` + [PlatinosAlAlcance.tsx](src/components/PlatinosAlAlcance.tsx)
+  — ≥75% de progreso, sin tocar en 2 meses, excluyendo lo ya platinado con
+  `esPlatinoEquivalente` (el mismo criterio de siempre, no uno nuevo).
+- **Contador manual +/-**: dos columnas nuevas en `userTrophies`
+  (`manualProgressCurrent/Target`, [schema.ts](src/db/schema.ts)),
+  `setManualTrophyProgress` en [profiles.ts](src/lib/profiles.ts),
+  `actualizarContadorManualAction` en [actions.ts](src/app/actions.ts), y el
+  widget dentro de [TrophyGuideModal.tsx](src/components/TrophyGuideModal.tsx)
+  (la "ficha" de cada trofeo) — solo aparece si el trofeo no tiene progreso
+  NATIVO de la plataforma y no está conseguido todavía.
+- **Heatmap por franja horaria**: `franjasHorarias()` en
+  [profileStats.ts](src/lib/profileStats.ts) (convierte a la zona horaria de
+  Ajustes, no UTC a pelo) + [HourlyHeatmap.tsx](src/components/HourlyHeatmap.tsx).
+- **Línea de tiempo de hitos**: `hitosHistoricos()` en el mismo
+  `profileStats.ts` (primer platino, trofeo más raro, "platino añejo" —
+  cuánto tardó desde el primer trofeo hasta el platino —, racha más larga
+  de días seguidos) + [HistoricalTimeline.tsx](src/components/HistoricalTimeline.tsx).
+
+Las cinco viven en `EstadisticasCompletas.tsx`, las dos de backlog (Salón +
+Radar) solo en tu propio perfil (`esMio`) — son datos que solo le importan
+o le dan vergüenza al dueño, no a quien visita.
+
+### Ocultar del menú (continuación 5): correcto, sigue sin migrar
+
+Añadido en la sesión anterior, revisado y sigue igual: `hiddenNavItems`
+está en el código, no en la base todavía.
+
+**IMPORTANTE — sigue sin correr `npm run db:push`, ahora con MÁS columnas
+pendientes**: a lo de `hiddenNavItems` (continuación 5) se suman
+`manualProgressCurrent`/`manualProgressTarget` de esta sesión. Los tres
+bloqueados por el MISMO aviso interactivo sin relación con nada de esto
+(`push_subscription_endpoint_unique`, truncar 2 filas reales) que ya se
+documentó en la continuación 5 y sigue sin resolverse. Quien retome esto:
+**una sola vez, en una terminal con TTY**, correr `npm run db:push`,
+decidir con calma esa pregunta de `push_subscription` (probablemente
+"no truncar"), y de paso entran las tres columnas nuevas juntas. Hasta
+entonces: `/ajustes/ocultar` y el contador manual de trofeos fallarán en
+producción (columna inexistente) aunque el código compile limpio
+(`tsc --noEmit` sin errores, comprobado tras cada cambio de esta sesión).
+No se pudo verificar nada de esto en el navegador tampoco: el puerto 3000
+lo tenía ocupado el servidor de otra sesión trabajando en paralelo en este
+mismo proyecto, igual que en la continuación 5.
+
+---
+
+## Sesión del 9 de septiembre de 2026 (continuación 5) — las tres peticiones de la sesión anterior, cerradas (con una migración pendiente)
+
+El usuario respondió directamente a las tres preguntas que se habían
+quedado abiertas en la continuación 4. Las tres se han construido esta
+sesión:
+
+### Campana de avisos: quitada del todo
+
+El usuario confirmó "no tiene utilidad real, quitarla del todo". Se ha
+quitado el botón de la cabecera y toda la ruta `/avisos`
+([Header.tsx](src/components/Header.tsx), borrado
+`src/app/avisos/page.tsx`, `avisosSinLeer` fuera de
+[layout.tsx](src/app/layout.tsx)), y también la generación en el cron
+([route.ts](src/app/api/cron/sync/route.ts)) y `marcarLeidoAction`
+([actions.ts](src/app/actions.ts)) — no tenía sentido seguir generando
+avisos que ya nadie puede leer. **A propósito NO se ha tocado**
+`lib/notifications.ts` ni la tabla `notifications` de la base — código y
+tabla quedan huérfanos pero intactos, por si alguien quiere revivirlo o
+prefiere que se borre de verdad más adelante (eso sí sería destructivo).
+Las estadísticas de `avisosGenerados` en `/admin` se quedan como estaban,
+congeladas en el número histórico — no se ha tocado `lib/admin.ts`. La
+copy de marketing de la portada (`FEATURES` en
+[page.tsx](src/app/page.tsx), num. 06) hablaba de esto — cambiada a
+describir el push de verdad (que sí sigue vivo, confirmado en
+`lib/sync.ts` vía `enviarPush`), no de un hueco.
+
+### Selector de plataformas: Epic, Google Play y Ubisoft ya no se pueden vincular
+
+Tal y como pidió el usuario ("el resto quítalas de momento" + su propia
+investigación sobre Epic, sin API REST pública documentada). En
+[ajustes/plataformas/page.tsx](src/app/ajustes/plataformas/page.tsx) las
+tres tarjetas de vincular solo se enseñan **si la cuenta ya estaba
+vinculada de antes** (con su opción de desvincular intacta) — quien no
+tenía ninguna de las tres ya no puede crear una nueva. No se ha tocado el
+tipo `AccountPlatform` ni `resolveEpic`/`resolveUbisoft`/`resolveGoogle`
+en `lib/sync.ts`/`lib/profiles.ts`: sigue siendo reversible sin tocar
+datos, por si alguna de las tres consigue de verdad una vía oficial más
+adelante.
+
+### Ocultar funciones del menú — nuevo, personal, nada de comunidad
+
+El usuario pidió "ocultar tanto funcionalidades que no te interese como
+juegos". Esta sesión solo cierra la parte de **funcionalidades**: nueva
+página [/ajustes/ocultar](src/app/ajustes/ocultar/page.tsx) con una
+casilla por cada función opcional de la cabecera (Comunidad, Ligas,
+Amigos, Descubrir, Noticias, Planificador — Panel y Biblioteca no cuentan,
+son el núcleo). Columna nueva `users.hiddenNavItems` (jsonb,
+[schema.ts](src/db/schema.ts)), leída/escrita desde
+[lib/navPreferences.ts](src/lib/navPreferences.ts) y aplicada en
+[Header.tsx](src/components/Header.tsx) — filtra tanto la barra de
+escritorio como el desplegable "Más" y el menú móvil. Es 100% personal:
+oculta la función de TU menú, no la desactiva para nadie más ni toca la
+ruta (`/feed` sigue existiendo aunque la ocultes).
+
+**"Ocultar juegos" de la biblioteca NO se ha tocado esta sesión** —
+adrede: toca `getLibrary` en `lib/profiles.ts`, una función central que
+usan la biblioteca, el perfil público, el planificador y más sitios, y
+liarla sin tiempo de verificarla a fondo es justo el tipo de cambio
+apresurado que ha dado bugs reales antes en este proyecto (ver el bug del
+rendimiento de perdibles, sesión anterior). Queda para una sesión
+dedicada solo a eso.
+
+**IMPORTANTE — migración pendiente, no ejecutada**: la columna
+`hiddenNavItems` está en `schema.ts` pero `npm run db:push` no se ha
+podido correr — pidió una decisión interactiva sin relación con este
+cambio ("¿truncar `push_subscription`, que tiene 2 filas reales, por un
+`unique constraint` pendiente de antes?") que no se puede contestar a
+ciegas desde un proceso no interactivo. Esa tabla es la de las
+suscripciones push de verdad confirmadas en producción — no se ha tocado
+ni respondido nada. **Quien retome esto tiene que correr
+`npm run db:push` a mano** (una terminal con TTY), mirar bien esa
+pregunta del `unique constraint` de `push_subscription` (posible resto de
+trabajo de otra sesión en paralelo, no de esta) antes de decidir, y de
+paso confirmar que se crea `hiddenNavItems`. Hasta que eso no se corra,
+`/ajustes/ocultar` fallará en tiempo de ejecución (columna inexistente) —
+el código compila limpio (`tsc --noEmit` sin errores) pero no se ha
+podido probar en el navegador: el puerto 3000 lo tenía ocupado el
+servidor de otra sesión trabajando en paralelo en este mismo proyecto.
 
 ---
 
