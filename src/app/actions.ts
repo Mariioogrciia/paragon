@@ -1274,6 +1274,31 @@ export async function togglePinGameAction(gameId: string): Promise<{ pinned: boo
   return { pinned: !yaAnclado };
 }
 
+/* ---------------------------------- Cerrojo de Hitos --------------------------------- */
+
+/**
+ * Reserva (o quita la reserva de) este juego para tu próximo platino en
+ * número redondo — ver lib/milestones.ts. Solo uno a la vez: reservar uno
+ * nuevo sustituye al anterior, igual que anclar un juego (togglePinGameAction
+ * arriba) — no hace falta una constraint en la base, es una sola columna en
+ * `users`, no una fila por juego.
+ */
+export async function toggleReservarHitoAction(gameId: string): Promise<{ reservado: boolean }> {
+  const userId = await requireUserId();
+  const db = getDb();
+
+  const [actual] = await db.select({ gameId: users.reservedMilestoneGameId }).from(users).where(eq(users.id, userId)).limit(1);
+  const yaReservado = actual?.gameId === gameId;
+
+  await db
+    .update(users)
+    .set({ reservedMilestoneGameId: yaReservado ? null : gameId })
+    .where(eq(users.id, userId));
+
+  revalidatePath("/", "layout");
+  return { reservado: !yaReservado };
+}
+
 /* ---------------------------------- Notas privadas por juego --------------------------------- */
 
 /**

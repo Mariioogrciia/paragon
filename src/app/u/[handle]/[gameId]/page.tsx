@@ -15,9 +15,12 @@ import { TrophyList } from "@/components/TrophyList";
 import { ManualGameStatus } from "@/components/ManualGameStatus";
 import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
-import { getGameDetail, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
+import { getGameDetail, getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { getCommunityRating } from "@/lib/ratings";
-import { gameProgress, nextSteps, repartoDlc } from "@/lib/stats";
+import { gameProgress, nextSteps, repartoDlc, summarise } from "@/lib/stats";
+import { aUnTrofeoDelPlatino, getHitoReservado, proximoHito } from "@/lib/milestones";
+import { ReservarHitoButton } from "@/components/ReservarHitoButton";
+import { AvisoHitoReservado } from "@/components/AvisoHitoReservado";
 import { dificultadDeJuego } from "@/lib/difficulty";
 import { estimarEta } from "@/lib/eta";
 import { EtaPlatinoCard } from "@/components/EtaPlatino";
@@ -100,6 +103,19 @@ export default async function JuegoPage({
   const esMio = session?.user?.id === profile.userId;
   const carpetas = esMio ? await listCollections(profile.userId) : [];
   const valoracion = await getCommunityRating(game.id);
+
+  // Cerrojo de Hitos: solo se calcula en tu propio perfil — es tu reserva,
+  // a nadie más le importa ni puede tocarla (ver toggleReservarHitoAction).
+  const hito = esMio
+    ? await (async () => {
+        const { games: bibliotecaCompleta } = await getLibrary(profile);
+        const platinosActuales = summarise(bibliotecaCompleta).platinos;
+        return {
+          numero: proximoHito(platinosActuales),
+          reservado: await getHitoReservado(profile.userId, platinosActuales),
+        };
+      })()
+    : null;
 
   // ¿Toca refrescar este juego solo, en segundo plano? Las cuatro
   // condiciones, todas necesarias (ver AutoSyncJuego.tsx para el porqué de
@@ -216,6 +232,13 @@ export default async function JuegoPage({
                   </svg>
                   Guía completa
                 </a>
+                {esMio && hito && !progress.platinumEarned && (
+                  <ReservarHitoButton
+                    gameId={game.id}
+                    numero={hito.numero}
+                    reservadoInicial={hito.reservado?.gameId === game.id}
+                  />
+                )}
               </div>
 
               <div className="mt-5 flex max-w-[560px] items-center gap-4">
@@ -489,6 +512,9 @@ export default async function JuegoPage({
           esMio && <ManualGameStatus gameId={game.id} completed={progress.percent === 100} />
         ) : (
           <section>
+            {esMio && hito?.reservado && hito.reservado.gameId !== game.id && aUnTrofeoDelPlatino(game) && (
+              <AvisoHitoReservado hito={hito.reservado} handle={handle} />
+            )}
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="font-heading text-2xl font-bold">Todos los trofeos</h2>
               <span className="text-[0.8125rem] text-muted">

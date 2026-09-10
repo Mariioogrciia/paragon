@@ -111,6 +111,19 @@ export const users = pgTable("user", {
    */
   hiddenNavItems: jsonb("hiddenNavItems").$type<string[]>().default([]),
 
+  /**
+   * "Cerrojo de Hitos": el juego que has reservado para tu PRÓXIMO platino
+   * en número redondo (#25, #50, #100...) — un cazador de trofeos no
+   * quiere que ese número caiga en un indie de relleno en vez de en el
+   * juego que de verdad le importa. El número del hito no se guarda
+   * aparte: sale solo de `COUNT(platinos)` en el momento de mirarlo (ver
+   * `proximoHito()` en lib/milestones.ts), así que esta columna nunca
+   * puede quedar "desincronizada" con un número viejo. Solo uno a la vez
+   * (reservar otro sustituye al anterior) — no tiene sentido reservar dos
+   * juegos para el mismo hito. `null` = nada reservado.
+   */
+  reservedMilestoneGameId: text("reservedMilestoneGameId"),
+
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
 
