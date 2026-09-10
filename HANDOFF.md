@@ -7,6 +7,55 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 6) — vincular Google/Discord con sesión activa, "ver más" en horas por juego
+
+Dos peticiones cortas y directas del usuario.
+
+### Vincular Google↔Discord estando ya dentro
+
+Pulsar "Entrar con Discord" estando ya logueado con Google (o al revés)
+**no los unía** si los correos no coincidían — el caso normal, el Gmail y
+el Discord de una persona casi nunca comparten correo. Auth.js resolvía
+ese login por su cuenta y CAMBIABA la sesión a un usuario nuevo, perdiendo
+en silencio la cuenta activa. Es el MISMO fallo que ya estaba documentado
+y arreglado en `auth.ts` para Epic (vinculación de una fuente de datos, no
+de un login) — aplicado aquí al login de verdad.
+
+`vincularLoginASesionActiva()` en [auth.ts](src/auth.ts): con sesión
+abierta, escribe la fila en `accounts` A MANO contra ESE usuario (no deja
+que Auth.js decida) y corta su flujo por defecto con una redirección.
+Tres casos: cuenta nueva (se vincula), ya es tuya (re-login normal), de
+OTRO usuario de Paragon (se corta con aviso, nunca se fusiona en
+silencio). Sin sesión abierta, comportamiento de siempre (con el
+email-linking "peligroso" ya existente como red de seguridad).
+[ajustes/seguridad/page.tsx](src/app/ajustes/seguridad/page.tsx) ahora
+ofrece botones "Vincular con Google/Discord" para lo que falte, con
+banner de éxito/error.
+
+**No se ha podido probar con una sesión real** — necesitaría las
+credenciales del usuario. El código sigue el mismo patrón ya probado de
+Epic en el mismo archivo.
+
+### "Ver más" en Horas por juego
+
+El gráfico de Estadísticas solo enseñaba el top 8 (límite en la propia
+consulta SQL). `horasPorJuego()` ahora admite `limit` opcional
+(`.$dynamic()` de Drizzle); sin límite trae TODOS los juegos.
+`PlaytimeBarChart` se separó a su propio archivo cliente (antes vivía en
+`StatCharts.tsx`, un Server Component — no hacía falta forzar
+`TrophyMonthChart` a cliente por esto) con un botón "Ver más".
+
+**Verificado en el navegador real** contra `/u/fende21/estadisticas`
+(perfil público, sin sesión): "Ver más (251 juegos más)" despliega la
+lista entera con captura de pantalla comprobada, "Ver menos" contrae de
+vuelta.
+
+De paso, confirmado que `/help` del bot ya estaba al día con los 9
+comandos reales (se actualizó al arreglar el bug de la continuación 5,
+antes de que se pidiera aquí).
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación 5) — bug real en producción: el bot decía "La aplicación no ha respondido"
 
 El usuario reportó el error probando `/perfil` en Discord, en PRODUCCIÓN.
