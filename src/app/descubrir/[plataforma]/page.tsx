@@ -207,21 +207,22 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               sobre por qué (la página oficial de Sony devolvía un precio
               distinto en cada petición, no es una fuente fiable). */}
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-              <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">Essential</p>
-              <p className="font-heading text-lg font-bold">{PRECIO_PSPLUS_EUR.essential.toFixed(2)}€/mes</p>
-            </div>
-            <div className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-              <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">Extra</p>
-              <p className="font-heading text-lg font-bold">{PRECIO_PSPLUS_EUR.extra.toFixed(2)}€/mes</p>
-            </div>
-            <div className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-              <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">Premium</p>
-              <p className="font-heading text-lg font-bold">{PRECIO_PSPLUS_EUR.premium.toFixed(2)}€/mes</p>
-            </div>
+            {(
+              [
+                { label: "Essential", precio: PRECIO_PSPLUS_EUR.essential },
+                { label: "Extra", precio: PRECIO_PSPLUS_EUR.extra },
+                { label: "Premium", precio: PRECIO_PSPLUS_EUR.premium },
+              ] as const
+            ).map((nivel) => (
+              <div key={nivel.label} className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">{nivel.label}</p>
+                <p className="font-heading text-lg font-bold">{nivel.precio.mes.toFixed(2)}€/mes</p>
+                <p className="text-[0.6875rem] text-muted">o {nivel.precio.anual.toFixed(2)}€/año</p>
+              </div>
+            ))}
           </div>
           <p className="mt-2 text-[0.6875rem] text-muted">
-            Tarifa de 1 mes en España, comprobada el {relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl)} — consulta siempre en la PS Store por si Sony lo ha cambiado desde entonces.
+            Precios en España, comprobados el {relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl)} — consulta siempre en la PS Store por si Sony los ha cambiado desde entonces.
           </p>
         </section>
       )}
