@@ -1,7 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   friendships,
@@ -167,6 +167,22 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
 
 export function getProfileByUserId(userId: string) {
   return selectProfile(eq(users.id, userId));
+}
+
+/**
+ * Id del juego anclado (Modo Enfoque, `userGames.pinnedAt`) de un usuario,
+ * o `null` si no tiene ninguno — consulta mínima, sin pasar por
+ * `getLibrary` entera. Para el atajo PWA "Continuar juego anclado"
+ * (app/enfoque/page.tsx), que necesita saber a dónde redirigir sin cargar
+ * la biblioteca completa solo para eso.
+ */
+export async function getPinnedGameId(userId: string): Promise<string | null> {
+  const [row] = await db
+    .select({ gameId: userGames.gameId })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), isNotNull(userGames.pinnedAt)))
+    .limit(1);
+  return row?.gameId ?? null;
 }
 
 /**

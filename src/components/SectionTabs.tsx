@@ -19,6 +19,11 @@ export interface SectionTab {
  *
  * Recuerda la última pestaña vista por `storageKey` (debe ser único por
  * página) para que volver a la portada no te devuelva siempre a la primera.
+ *
+ * `?tab=<key>` en la URL GANA a lo recordado — para poder enlazar directo
+ * a una pestaña concreta (p. ej. el atajo PWA "Sugerencia para hoy" en
+ * app/manifest.ts, que enlaza a `/?tab=actividad`) sin depender de qué
+ * pestaña dejó guardada la última visita de ese navegador.
  */
 export function SectionTabs({ storageKey, tabs }: { storageKey: string; tabs: SectionTab[] }) {
   const [active, setActive] = useState(tabs[0]?.key);
@@ -26,6 +31,12 @@ export function SectionTabs({ storageKey, tabs }: { storageKey: string; tabs: Se
 
   useEffect(() => {
     try {
+      const deUrl = new URLSearchParams(window.location.search).get("tab");
+      if (deUrl && tabs.some((t) => t.key === deUrl)) {
+        setActive(deUrl);
+        localStorage.setItem(lsKey, deUrl);
+        return;
+      }
       const saved = localStorage.getItem(lsKey);
       if (saved && tabs.some((t) => t.key === saved)) setActive(saved);
     } catch {

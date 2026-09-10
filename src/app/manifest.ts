@@ -25,5 +25,26 @@ export default function manifest(): MetadataRoute.Manifest {
         type: 'image/png',
       },
     ],
+    // Accesos directos al mantener pulsado el icono de la app en el móvil.
+    // Un shortcut solo puede apuntar a una URL fija, no a "el juego que
+    // sea" — por eso "Continuar juego anclado" pasa por /enfoque (resuelve
+    // el anclado de quien haya iniciado sesión) en vez de enlazar un
+    // gameId concreto, que sería el de quien compiló esto, no el tuyo.
+    shortcuts: [
+      {
+        name: 'Continuar juego anclado',
+        short_name: 'Continuar',
+        description: 'Tu Modo Enfoque del juego que tienes anclado ahora mismo.',
+        url: '/enfoque',
+        icons: [{ src: '/logo.png', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Sugerencia para hoy',
+        short_name: 'Hoy',
+        description: 'Qué puedes cerrar hoy según el tiempo que tengas.',
+        url: '/?tab=actividad',
+        icons: [{ src: '/logo.png', sizes: '192x192', type: 'image/png' }],
+      },
+    ],
   };
 }
