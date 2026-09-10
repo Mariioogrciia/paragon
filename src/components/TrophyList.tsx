@@ -137,35 +137,57 @@ export function TrophyList({
     return a.name.localeCompare(b.name);
   });
 
+  // Antes los 8 chips de tipo, los 2 de vista (ocultar/orden) y los 3
+  // botones de Lista/Cuadrícula/Árbol vivían todos en la misma franja —
+  // hasta 13 controles seguidos en un juego con variedad real de
+  // categorías (Elden Ring, GTA V...). Se separa en dos filas con
+  // propósitos distintos: arriba QUÉ enseñar (categoría), abajo CÓMO
+  // enseñarlo (orden/vista) — mismo número de controles, pero agrupados
+  // por lo que hacen, no amontonados.
+  const hayFiltrosDeTipo = FILTROS_DISPONIBLES.some((f) => filtrosConDatos.has(f.valor));
+
   return (
     <div>
+      {view !== "arbol" && hayFiltrosDeTipo && (
+        <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
+          {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => {
+            const activo = filtros.has(f.valor);
+            return (
+              <button
+                key={f.valor}
+                type="button"
+                onClick={() => alternarFiltro(f.valor)}
+                aria-pressed={activo}
+                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
+                style={
+                  activo
+                    ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
+                    : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
+                }
+              >
+                {f.label}
+              </button>
+            );
+          })}
+          {filtros.size > 0 && (
+            <button
+              type="button"
+              onClick={() => setFiltros(new Set())}
+              className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] text-muted hover:text-foreground"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         {view !== "arbol" && (
           <div className="flex flex-wrap gap-1.5">
-            {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => {
-              const activo = filtros.has(f.valor);
-              return (
-                <button
-                  key={f.valor}
-                  type="button"
-                  onClick={() => alternarFiltro(f.valor)}
-                  aria-pressed={activo}
-                  className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
-                  style={
-                    activo
-                      ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
-                      : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
-                  }
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-
-            {/* "Ocultar conseguidos" y "Orden cronológico" — pedidos aparte
-                de los filtros por tipo de arriba: no filtran por CATEGORÍA
-                de trofeo, uno filtra por estado (ya lo tienes o no) y el
-                otro solo reordena, no esconde nada. */}
+            {/* "Ocultar conseguidos" y "Orden cronológico" — deliberadamente
+                en su propia fila, separados de los chips de categoría de
+                arriba: no filtran por tipo de trofeo, uno filtra por estado
+                (ya lo tienes o no) y el otro solo reordena, no esconde nada. */}
             {trophies.some((t) => t.earned) && (
               <button
                 type="button"
@@ -194,16 +216,6 @@ export function TrophyList({
             >
               Orden cronológico
             </button>
-
-            {filtros.size > 0 && (
-              <button
-                type="button"
-                onClick={() => setFiltros(new Set())}
-                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] text-muted hover:text-foreground"
-              >
-                Limpiar
-              </button>
-            )}
           </div>
         )}
 
