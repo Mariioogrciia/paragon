@@ -19,6 +19,8 @@ import { getGameDetail, getLibrary, getProfileByHandle, resolveAvatarUrl } from 
 import { getCommunityRating } from "@/lib/ratings";
 import { gameProgress, nextSteps, repartoDlc, summarise } from "@/lib/stats";
 import { aUnTrofeoDelPlatino, getHitoReservado, proximoHito } from "@/lib/milestones";
+import { generarDiarioPlatino } from "@/lib/diarioPlatino";
+import { DiarioPlatino } from "@/components/DiarioPlatino";
 import { ReservarHitoButton } from "@/components/ReservarHitoButton";
 import { AvisoHitoReservado } from "@/components/AvisoHitoReservado";
 import { dificultadDeJuego } from "@/lib/difficulty";
@@ -145,6 +147,7 @@ export default async function JuegoPage({
   // inflaba "lo que te falta" con cosas que no cuentan para él.
   const reparto = repartoDlc(game.trophies);
   const dificultad = dificultadDeJuego(game.trophies);
+  const diario = progress.platinumEarned ? generarDiarioPlatino(game.trophies) : null;
   const faltanBase = reparto.base.total - reparto.base.earned;
 
   const faltanParaPlatino =
@@ -206,7 +209,11 @@ export default async function JuegoPage({
                 {game.title}
               </h1>
 
-              <div className="mt-3 flex items-center gap-3">
+              {/* flex-wrap: con el botón de Reservar hito nuevo son ya 3
+                  píldoras en esta fila — sin envolver, en móvil se saldría
+                  del ancho de la pantalla en vez de bajar a una segunda
+                  línea. */}
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <Link
                   href={`/juego/${game.igdbId ?? game.id}`}
                   className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:bg-white/10 hover:text-white"
@@ -411,6 +418,8 @@ export default async function JuegoPage({
         {esMio && game.hltb === undefined && <AutoSyncHltb gameId={game.id} title={game.title} />}
 
         {eta && <EtaPlatinoCard eta={eta} esMio={esMio} />}
+
+        {diario && <DiarioPlatino diario={diario} titulo={game.title} />}
 
         <section
           className="rounded-[18px] p-5"

@@ -14,6 +14,8 @@ import { UpcomingGames } from "@/components/UpcomingGames";
 import { TrophyHistory } from "@/components/TrophyHistory";
 import { rachas, resumenHistorico, trofeosPorMes, talDiaComoHoy } from "@/lib/history";
 import { TalDiaComoHoy } from "@/components/TalDiaComoHoy";
+import { diasSinAvance } from "@/lib/profileStats";
+import { AvisoAtasco } from "@/components/AvisoAtasco";
 import { FAQSection } from "@/components/FAQ";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
@@ -337,7 +339,11 @@ export default async function HomePage() {
 
   const recientes = games.filter(g => !g.isWishlist).slice(0, 6);
 
-  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones, efemerides] = await Promise.all([
+  // Detector de Atascos: solo tiene sentido mirarlo si hay un juego anclado
+  // Y todavía no está platinado/100% (un juego ya terminado no se "atasca").
+  const juegoAnclado = games.find((g) => g.isPinned && !esPlatinoEquivalente(g)) ?? null;
+
+  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones, efemerides, diasAtascado] = await Promise.all([
     trofeosPorMes(session.user.id),
     rachas(session.user.id),
     resumenHistorico(session.user.id),
@@ -345,7 +351,11 @@ export default async function HomePage() {
     getWeeklyMissions(session.user.id),
     getTrophyRecommendations(session.user.id),
     talDiaComoHoy(session.user.id),
+    juegoAnclado ? diasSinAvance(session.user.id, juegoAnclado.id) : Promise.resolve(null),
   ]);
+
+  const UMBRAL_ATASCO = 5;
+  const mostrarAtasco = juegoAnclado && diasAtascado !== null && diasAtascado >= UMBRAL_ATASCO;
 
   const nearPlatinum = games
     .map((g) => ({ game: g, progress: gameProgress(g) }))
@@ -693,6 +703,9 @@ export default async function HomePage() {
                 </div>
 
                 <WeeklyMissions missions={misiones} />
+                {mostrarAtasco && juegoAnclado && (
+                  <AvisoAtasco gameId={juegoAnclado.id} titulo={juegoAnclado.title} dias={diasAtascado!} handle={profile.handle} />
+                )}
                 <TalDiaComoHoy efemerides={efemerides} handle={profile.handle} />
                 <ActivityStats games={games} now={now} />
                 <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />

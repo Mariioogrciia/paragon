@@ -22,6 +22,7 @@ const FILTROS_DISPONIBLES: { valor: Filtro; label: string }[] = [
   { valor: "completista", label: "Completista" },
   { valor: "historia", label: "Historia" },
   { valor: "habilidad", label: "Habilidad" },
+  { valor: "grindeo", label: "Grindeo" },
   { valor: "secreto", label: "Secretos" },
 ];
 

@@ -82,6 +82,8 @@ const TROPHY_TYPE_PATHS: Record<TrophyType, React.ReactNode> = {
   multijugador: <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 2.5-5 5-5s5 2 5 5M16 11a3 3 0 1 0 0-6M14 20c0-2.5 1.8-4.5 4-5s5 1.5 5 5" />,
   // Rayo: habilidad.
   habilidad: <path d="M13 2 4 14h6l-1 8 9-12h-6z" />,
+  // Flechas en círculo: repetir/acumular, grindeo.
+  grindeo: <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />,
   // Ojo tachado: secreto.
   secreto: (
     <>

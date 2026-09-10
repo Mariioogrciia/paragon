@@ -363,3 +363,20 @@ export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> 
     rachaMasLarga,
   };
 }
+
+/**
+ * "Detector de Atascos": días desde el último trofeo CONSEGUIDO de un
+ * juego — para el aviso del juego anclado (`pinnedAt`) en la portada. `null`
+ * si nunca se ha conseguido ningún trofeo con fecha en ese juego (recién
+ * empezado, o sincronizado sin fechas todavía) — ahí no hay "atasco" que
+ * detectar, solo falta de dato, y las dos cosas no deben confundirse.
+ */
+export async function diasSinAvance(userId: string, gameId: string): Promise<number | null> {
+  const [fila] = await db
+    .select({ ultimo: sql<Date | null>`max(${userTrophies.earnedAt})` })
+    .from(userTrophies)
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.gameId, gameId), eq(userTrophies.earned, true)));
+
+  if (!fila?.ultimo) return null;
+  return Math.floor((Date.now() - new Date(fila.ultimo).getTime()) / 86_400_000);
+}

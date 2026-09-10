@@ -11,7 +11,7 @@
  * directo del campo `hidden`, que sí es un dato real de la plataforma.
  */
 
-export type TrophyType = "historia" | "coleccionable" | "completista" | "multijugador" | "habilidad" | "secreto";
+export type TrophyType = "historia" | "coleccionable" | "completista" | "multijugador" | "habilidad" | "grindeo" | "secreto";
 
 export const TROPHY_TYPE_LABEL: Record<TrophyType, string> = {
   historia: "Historia",
@@ -19,6 +19,7 @@ export const TROPHY_TYPE_LABEL: Record<TrophyType, string> = {
   completista: "Completista",
   multijugador: "Multijugador",
   habilidad: "Habilidad",
+  grindeo: "Grindeo",
   secreto: "Secreto",
 };
 
@@ -29,6 +30,17 @@ const REGLAS: { tipo: Exclude<TrophyType, "secreto">; patron: RegExp }[] = [
     tipo: "completista",
     patron:
       /\b(100 ?%|master(ed)?|all (achievements|trophies)|every (level|mission|chapter)|domin[ao]|complet[ao] (el juego|todos)|platinum)\b/i,
+  },
+  {
+    // Verbo de acumular/repetir + un número grande — "kill 1000 enemies",
+    // "reach level 50", "earn 1,000,000 gold". Va ANTES que "coleccionable"
+    // a propósito: "collect 1000 coins" es grindeo, no la misma "busca los
+    // 10 coleccionables del mapa" que sí importa avisar aparte. El número
+    // grande es la señal real — sin él, "collect all fragments" (sin
+    // cifra) sigue cayendo en coleccionable más abajo, que es lo correcto.
+    tipo: "grindeo",
+    patron:
+      /\b(kill|defeat|earn|collect|obtain|acquire|accumulate|deal|win|play) \D{0,10}(\d{3,}|\d{1,3}(,\d{3})+)\b|\breach level \d{2,}\b|\bnivel \d{2,}\b|\bacumula\w*\b|\b(derrota|mata|consigue|gana|obt[eé]n) a? ?(\d{3,}|\d{1,3}(\.\d{3})+)\b/i,
   },
   {
     tipo: "coleccionable",

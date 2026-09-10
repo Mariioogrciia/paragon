@@ -6,6 +6,8 @@ import { getRecommendationsByGenre, getPlatinosRelax } from "@/lib/discover";
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { calcularTrophyDna, calcularAfinidad } from "@/lib/trophyDna";
 import { rescateBiblioteca } from "@/lib/backlog";
+import { dietaGamer } from "@/lib/dietaGamer";
+import { DietaGamer } from "@/components/DietaGamer";
 import { coverGradient } from "@/lib/design";
 import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
@@ -41,6 +43,7 @@ export default async function RecomendacionesPage() {
   const profile = await getProfileByUserId(session.user.id);
   const { games: misJuegos } = profile ? await getLibrary(profile) : { games: [] };
   const dna = calcularTrophyDna(misJuegos);
+  const dieta = dietaGamer(misJuegos);
 
   const [tiras, recomendaciones, relax] = await Promise.all([
     getRecommendationsByGenre(session.user.id),
@@ -57,6 +60,8 @@ export default async function RecomendacionesPage() {
         <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">Recomendaciones</h1>
         <p className="mt-2 text-lg text-muted">Hechas a partir de tu propia biblioteca — por género, y en general.</p>
       </div>
+
+      {dieta && <DietaGamer dieta={dieta} />}
 
       {rescate.length > 0 && (
         <section className="mb-10">

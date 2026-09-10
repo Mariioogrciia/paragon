@@ -326,7 +326,12 @@ export function FocusMode({
         type="button"
         onClick={() => setNotaAbierta(true)}
         aria-label="Apuntar una nota rápida"
-        className="fixed bottom-24 right-5 z-[110] flex h-12 w-12 items-center justify-center rounded-full text-white/70 shadow-lg transition-transform hover:scale-105 hover:text-white active:scale-95 sm:bottom-6"
+        // El footer con "¿Ya lo tengo?"/"Salir" (BOTON = min-h-64px cada
+        // uno) va en columna en móvil (dos botones apilados, ~150px+) y en
+        // fila a partir de `sm:` (una sola altura, ~76px) — el offset de
+        // abajo tiene que despejar cada caso, si no el botón del bloc de
+        // notas queda tapado detrás de "Salir".
+        className="fixed bottom-44 right-5 z-[110] flex h-12 w-12 items-center justify-center rounded-full text-white/70 shadow-lg transition-transform hover:scale-105 hover:text-white active:scale-95 sm:bottom-24"
         style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)" }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
