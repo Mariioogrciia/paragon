@@ -1,0 +1,47 @@
+name: Sincronización frecuente de trofeos
+
+# El plan Hobby de Vercel solo deja 1 ejecución diaria de un cron propio
+# (ver el comentario en src/app/api/cron/sync/route.ts — ya se probó por
+# horas y Vercel rechazó el despliegue). Esto llama a esa MISMA ruta, desde
+# fuera de Vercel, cada 15 minutos — la ruta no distingue quién la llama,
+# solo exige la cabecera Authorization correcta (mismo CRON_SECRET de
+# siempre), así que no hace falta tocar nada del código ni del plan.
+#
+# Configuración necesaria en GitHub (Settings → Secrets and variables →
+# Actions), una sola vez:
+#   - Secret  SITE_URL:     https://tu-dominio-real (sin barra al final)
+#   - Secret  CRON_SECRET:  el mismo valor exacto que ya tiene Vercel
+#     (Vercel → Project → Settings → Environment Variables → CRON_SECRET)
+#
+# El cron diario de vercel.json se deja tal cual, como red de seguridad si
+# este workflow fallara alguna vez — los dos llaman a la misma ruta
+# idempotente, no hay problema en que se pisen.
+on:
+  schedule:
+    # GitHub no garantiza el minuto exacto bajo carga de la plataforma —
+    # puede llegar con algunos minutos de retraso en horas punta, es una
+    # limitación conocida de los cron de GitHub Actions, no de este repo.
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {} # Para poder lanzarlo a mano desde la pestaña Actions, sin esperar al reloj.
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar a /api/cron/sync
+        run: |
+          if [ -z "${{ secrets.SITE_URL }}" ] || [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "Faltan los secrets SITE_URL y/o CRON_SECRET en este repo (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+
+          respuesta=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/sync")
+
+          echo "HTTP $respuesta"
+          cat /tmp/resp.json
+
+          if [ "$respuesta" -ge 300 ]; then
+            exit 1
+          fi
