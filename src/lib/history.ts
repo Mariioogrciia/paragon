@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games, gameTrophies, userTrophies, users } from "@/db/schema";
 import type { TrophyGrade } from "@/lib/types";
@@ -476,4 +476,45 @@ export async function talDiaComoHoy(userId: string, ahora = new Date()): Promise
     rarityPercent: f.rarityPercent ?? null,
     aniosAtras: ahora.getFullYear() - f.earnedAt!.getFullYear(),
   }));
+}
+
+/**
+ * "Oráculo de Platino": tu ritmo real de los últimos 90 días, en trofeos
+ * por semana — para proyectar una fecha de "a este paso, lo terminas el
+ * X" en el juego que sea (ver `prevision()` más abajo). A propósito
+ * TROFEOS por semana, no horas: ya se descartó una versión en horas para
+ * "Deuda de Backlog" porque no hay ningún histórico de horas jugadas en
+ * el tiempo en este proyecto — `earnedAt` sí es una serie real, por eso
+ * esto es honesto y aquello no lo era.
+ *
+ * `null` si no ha conseguido ningún trofeo en esos 90 días — sin ritmo
+ * reciente no hay con qué proyectar nada, y una media de "siempre" (siglos
+ * de inactividad incluidos) daría una fecha carente de sentido.
+ */
+export async function ritmoSemanal(userId: string): Promise<number | null> {
+  const desde = new Date(Date.now() - 90 * 86_400_000);
+
+  const [fila] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(userTrophies)
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, desde)));
+
+  const total = Number(fila?.total ?? 0);
+  if (total === 0) return null;
+
+  return total / (90 / 7);
+}
+
+export interface Prevision {
+  fecha: string;
+  semanas: number;
+}
+
+/** A tu ritmo real, cuándo terminarías `trofeosRestantes` — `null` si no hay ritmo reciente con el que proyectar nada (ver `ritmoSemanal`). */
+export function prevision(ritmo: number | null, trofeosRestantes: number): Prevision | null {
+  if (!ritmo || trofeosRestantes <= 0) return null;
+
+  const semanas = Math.ceil(trofeosRestantes / ritmo);
+  const fecha = new Date(Date.now() + semanas * 7 * 86_400_000);
+  return { fecha: fecha.toISOString(), semanas };
 }

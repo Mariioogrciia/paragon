@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { FocusMode } from "@/components/FocusMode";
 import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
 import { gameProgress, nextSteps } from "@/lib/stats";
+import { ritmoSemanal, prevision } from "@/lib/history";
 
 export const metadata = { title: "Modo enfoque · Paragon" };
 
@@ -40,6 +41,8 @@ export default async function EnfoquePage({
   if (!game) notFound();
 
   const progreso = gameProgress(game);
+  const ritmo = await ritmoSemanal(profile.userId);
+  const oraculo = prevision(ritmo, progreso.total - progreso.earned);
 
   return (
     <FocusMode
@@ -50,6 +53,7 @@ export default async function EnfoquePage({
       total={progreso.total}
       volverA={`/u/${handle}/${gameId}`}
       notasIniciales={game.notes}
+      oraculo={oraculo}
     />
   );
 }

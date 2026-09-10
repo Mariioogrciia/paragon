@@ -7,6 +7,7 @@ import { TrophyGuideModal } from "@/components/TrophyGuideModal";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { rarity } from "@/lib/design";
 import type { Trophy } from "@/lib/types";
+import type { Prevision } from "@/lib/history";
 
 /**
  * Modo enfoque: el móvil como segunda pantalla mientras se juega en la tele.
@@ -33,6 +34,7 @@ export function FocusMode({
   total,
   volverA,
   notasIniciales,
+  oraculo,
 }: {
   gameId: string;
   titulo: string;
@@ -43,6 +45,8 @@ export function FocusMode({
   volverA: string;
   /** Tu nota privada de siempre (`userGames.notes`) — para que el scratchpad no empiece en blanco si ya tenías algo apuntado desde la web. */
   notasIniciales?: string | null;
+  /** "Oráculo de Platino" — a tu ritmo real, cuándo terminarías esto (ver lib/history.ts). `null` sin ritmo reciente con el que proyectar nada. */
+  oraculo?: Prevision | null;
 }) {
   const router = useRouter();
   const [pendiente, startTransition] = useTransition();
@@ -205,6 +209,19 @@ export function FocusMode({
             {earned}/{total}
           </span>
         </div>
+
+        {/* Oráculo de Platino: una línea suelta, no una tarjeta — el Modo
+            Enfoque es deliberadamente austero, esto es un dato extra, no
+            un bloque que compita por atención con los trofeos de abajo. */}
+        {oraculo && (
+          <p className="mt-2 text-[0.8125rem] text-white/50">
+            A tu ritmo, lo terminas sobre el{" "}
+            <span className="font-semibold text-white/80">
+              {new Date(oraculo.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}
+            </span>{" "}
+            ({oraculo.semanas} {oraculo.semanas === 1 ? "semana" : "semanas"} a tu ritmo de los últimos 90 días).
+          </p>
+        )}
 
         {trofeos.length === 0 ? (
           <p className="mt-16 text-center text-lg text-white/50">

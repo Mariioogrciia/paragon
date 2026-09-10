@@ -4,6 +4,7 @@ import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { listCollections } from "@/lib/collections";
 import { Planificador } from "@/components/Planificador";
 import { CarpetasManager } from "@/components/CarpetasManager";
+import { FiltroEstadoAnimo } from "@/components/FiltroEstadoAnimo";
 import { BackButton } from "@/components/BackButton";
 
 export const metadata = { title: "Planificador · Paragon" };
@@ -27,6 +28,7 @@ export default async function PlanificadorPage() {
         <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">Planificador</h1>
         <p className="mt-2 max-w-[650px] text-sm text-muted">Elige cualquier carpeta como tu plan y añade juegos desde cada ficha para construir tu ruta.</p>
       </div>
+      <FiltroEstadoAnimo games={games} handle={profile.handle} />
       <Planificador collections={collections} library={games} handle={profile.handle} />
       <CarpetasManager collections={collections} library={games} />
     </div>
