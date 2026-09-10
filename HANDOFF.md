@@ -7,6 +7,112 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 3) — mi propio error de verdad con PS Plus, Xbox con más chicha, comandos nuevos del bot
+
+### El error real: PS Plus miraba el blog en inglés equivocado
+
+En la continuación 2 se concluyó "Sony no ha publicado el mes en curso" —
+**mal**. Se comprobó `blog.playstation.com` (inglés, EE.UU.), no
+`blog.es.playstation.com` (español) — el usuario pegó el enlace directo al
+post de septiembre, publicado ESE MISMO DÍA en el blog en español, y ahí
+seguía sin más. Doble fallo, no solo el dominio:
+
+- `lib/psPlus.ts` usaba `/tag/ps-plus/feed` (con guion). El tag de verdad,
+  el que SÍ lleva el anuncio mensual siempre, es `/tag/playstation-plus/`
+  (sin guion) — comprobado mirando los tags reales del HTML del post de
+  septiembre, no adivinando por el nombre parecido. Son dos taxonomías
+  distintas de WordPress, no la misma cosa con guion o sin él.
+- El título de Sony ha cambiado de formato más de una vez ("Juegos
+  mensuales de PlayStation Plus de X" → "Catálogo de juegos de
+  PlayStation Plus de/para X") — el patrón ya no ancla a una frase fija
+  completa, solo a "PlayStation Plus" + una palabra (el mes) + ":", para
+  no volver a romperse en silencio la próxima vez que Sony cambie el
+  formato otra vez.
+- El español conecta el ÚLTIMO juego de la lista con "y" en vez de coma
+  ("A, B, C y D") — antes esto partía mal "C y D" como un solo nombre. Se
+  normaliza a coma con un lookahead que solo toca la ÚLTIMA "y" del
+  título.
+- Coletillas variables cuando sobran juegos para el titular ("entre
+  otros", "y más", "y mucho más") se colaban como si fueran un juego más
+  y se buscaban en IGDB. Ya se filtran.
+
+**Lección para quien retome esto**: verificar contra la fuente real que el
+usuario está viendo, no la que parezca más obvia — un dominio en inglés
+"parecido" no es lo mismo que el que de verdad lee la aplicación en
+español, y comprobarlo una vez no basta si el título del anuncio puede
+cambiar de formato con el tiempo.
+
+Aprovechado para añadir: **precio anual** además del mensual de cada nivel
+(Essential/Extra/Premium), mismo criterio de dato curado con fecha visible
+— ver [lib/psPlus.ts](src/lib/psPlus.ts).
+
+### Xbox Descubrir, con más contenido de verdad
+
+- **Tendencia / Más jugados / Recomendado en Paragon**: mismo mecanismo
+  que ya tenían PlayStation y Steam
+  ([lib/platformHub.ts](src/lib/platformHub.ts)), con `"xbox"` añadido al
+  tipo `PlataformaHub` — cero código nuevo, son consultas genéricas sobre
+  `games.platform`.
+- **Recién llegados a Xbox Game Pass**: `news.xbox.com/en-us/tag/xbox-game-pass/feed`
+  publica varias "tandas" al mes (no un anuncio mensual único como PS
+  Plus) con el patrón "Coming to XBOX Game Pass: A, B, C, and More" — se
+  coge la más reciente de ESE tipo de post (el tag mezcla otros, como
+  "Free Play Days") y se etiqueta honestamente como "la última tanda", no
+  como "el catálogo del mes" que no es lo que es. Ver
+  [lib/xboxGamePass.ts](src/lib/xboxGamePass.ts).
+- **Descartado con motivo real**: descuentos de Xbox Store — CheapShark
+  (la fuente de precios de todo el proyecto) no rastrea NINGUNA tienda de
+  consola, solo PC, confirmado leyendo su propio código
+  (`lib/prices.ts`). El catálogo completo de PS Plus Extra/Premium
+  (cientos de juegos) se investigó y se aparcó — la herramienta de Sony
+  ("Game Finder") carga los datos por interacción de JavaScript, no por
+  un endpoint identificable con análisis estático en el tiempo
+  razonable de esta sesión.
+
+### Bot de Discord: 3 comandos más, `/perfil` público
+
+- `/help` — lista todos los comandos.
+- `/anunciosaqui` — cualquiera con permiso de gestionar el servidor lo usa
+  en el canal donde quiera los anuncios; guarda `(guildId, channelId)` en
+  la tabla nueva `discord_guild_settings`.
+- `anunciarNivelSiSube()` ([lib/discordBot.ts](src/lib/discordBot.ts)) se
+  llama dentro de `resyncLibraries` — o sea, tanto desde el botón manual
+  como desde el cron automático (Vercel + GitHub Actions), confirmado
+  leyendo el código: es la MISMA función. DM personal si tiene los avisos
+  activados, y anuncio con mención en cada servidor configurado donde de
+  verdad sea miembro (`esMiembroDelServidor`, comprobado vía la API de
+  Discord antes de publicar nada).
+- `/perfil` ahora es público (lo ve el canal, no solo quien pregunta) y
+  además enseña arquetipo de Trophy DNA, racha activa, primer platino y
+  trofeo más raro — antes esa info solo estaba en la web. El resto de
+  comandos siguen efímeros (privados).
+- Descripción del bot puesta vía `PATCH /applications/@me` con el propio
+  token — no hizo falta que el usuario entrara al Developer Portal para
+  esto.
+
+### Otros arreglos de esta sesión
+
+- **Tooltip cortado por los lados** en los dos heatmaps (horario y
+  anual): mismo motivo que el corte vertical de antes —
+  `overflow-x-auto` sin más recorta en las dos direcciones, y el tooltip
+  centrado se salía del borde en las celdas de los extremos. Ya anclan al
+  borde de su propia celda en vez de centrarse ahí.
+- **Trofeos ocultos** ya enseñan la descripción de qué hay que hacer (el
+  nombre se sigue tapando) — antes se tapaban las dos cosas sin
+  necesidad, cuando la propia guía del trofeo (un clic más allá) ya
+  enseñaba todo igualmente.
+- **Exportar tus datos** ahora incluye notas privadas, precio pagado,
+  formato de adquisición y contadores manuales en marcha — antes se
+  perdían al exportar.
+- **Panel financiero total** y **calculadora inversa de nivel Paragon**
+  en Estadísticas.
+- **Proyecto de Vercel "platinos" vacío**: se creó sin querer al correr
+  `vercel link --yes` para depurar (ver continuación 2/3) — el usuario
+  tiene que borrarlo a mano desde el dashboard, yo no tengo permiso para
+  eso.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación) — bug real en producción, encontrado montando el bot
 
 **RESUELTO** — las 5 columnas que llevaban desde el 9 de septiembre sin
