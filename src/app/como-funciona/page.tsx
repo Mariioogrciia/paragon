@@ -274,6 +274,13 @@ export default function ComoFuncionaPage() {
                   <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/verguenza</code> y{" "}
                   <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/racha</code>.
                 </Bloque>
+                <Bloque title="Anuncios del bot en un servidor">
+                  Quien tenga permiso de gestionar el servidor puede escribir{" "}
+                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/anunciosaqui</code> en el
+                  canal que quiera — a partir de ahí, el bot avisa ahí mismo cuando alguien del
+                  servidor sube de nivel Paragon (solo a quien tenga los avisos activados en Paragon,
+                  y solo si de verdad sigue en ese servidor).
+                </Bloque>
               </Grid>
             ),
           },

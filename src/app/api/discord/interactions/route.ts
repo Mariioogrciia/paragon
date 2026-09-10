@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import nacl from "tweetnacl";
-import { usuarioParagonDeDiscord } from "@/lib/discordBot";
+import { usuarioParagonDeDiscord, setAnnounceChannel } from "@/lib/discordBot";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { platinosAlAlcance, salonDeLaVerguenza } from "@/lib/backlog";
 import { sugerirPorTiempo } from "@/lib/recomendadorTiempo";
 import { summarise } from "@/lib/stats";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { rachas } from "@/lib/history";
-import { CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
+import { hitosHistoricos } from "@/lib/profileStats";
+import { calcularTrophyDna, CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 
 /**
  * Endpoint de "Interactions" del bot de Discord — comandos de barra
@@ -26,6 +27,8 @@ import { CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 // no el esquema entero de su API.
 interface DiscordInteraction {
   type: number;
+  guild_id?: string;
+  channel_id?: string;
   member?: { user?: { id: string } };
   user?: { id: string };
   data?: {
@@ -103,14 +106,32 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   const profile = await getProfileByUserId(userId);
   if (!profile) return mensaje("No encuentro ese perfil de Paragon.");
 
-  const [{ games }, nivel] = await Promise.all([getLibrary(profile), getParagonLevel(userId)]);
+  const [{ games }, nivel, racha, hitos] = await Promise.all([
+    getLibrary(profile),
+    getParagonLevel(userId),
+    rachas(userId),
+    hitosHistoricos(userId),
+  ]);
   const resumen = summarise(games);
+  const dna = calcularTrophyDna(games);
 
-  return mensaje(
-    `**${profile.displayName ?? profile.handle ?? "Perfil"}** (@${profile.handle ?? "?"})\n` +
-      `🏆 ${resumen.platinos} platinos · 🎮 ${resumen.juegos} juegos · 🧩 ${resumen.trofeos.toLocaleString("es-ES")} trofeos\n` +
-      `⭐ Nivel Paragon ${nivel.level} (${nivel.progreso}% hasta el ${nivel.siguienteNivel})`,
-  );
+  const lineas = [
+    `**${profile.displayName ?? profile.handle ?? "Perfil"}** (@${profile.handle ?? "?"})`,
+    `🏆 ${resumen.platinos} platinos · 🎮 ${resumen.juegos} juegos · 🧩 ${resumen.trofeos.toLocaleString("es-ES")} trofeos`,
+    `⭐ Nivel Paragon ${nivel.level} (${nivel.progreso}% hasta el ${nivel.siguienteNivel})`,
+  ];
+  if (dna.arquetipo) lineas.push(`🧬 ${dna.arquetipo}`);
+  if (racha.actual > 0) lineas.push(`🔥 Racha activa: ${racha.actual} ${racha.actual === 1 ? "día" : "días"} (mejor: ${racha.mejor})`);
+  if (hitos.primerPlatino) lineas.push(`🥇 Primer platino: ${hitos.primerPlatino.titulo}`);
+  if (hitos.trofeoMasRaro) lineas.push(`💎 Trofeo más raro: ${hitos.trofeoMasRaro.nombre} (${hitos.trofeoMasRaro.rarityPercent.toFixed(1)}%)`);
+
+  return mensaje(lineas.join("\n"));
+}
+
+async function comandoAnunciosAqui(guildId: string | null, channelId: string | null, discordUserId: string) {
+  if (!guildId || !channelId) return mensaje("Esto solo funciona dentro de un servidor, no por DM.");
+  await setAnnounceChannel(guildId, channelId, discordUserId);
+  return mensaje(`Hecho — a partir de ahora anuncio aquí los niveles Paragon que suba la gente de este servidor (solo a quien tenga los avisos de Discord activados en Paragon).`);
 }
 
 async function comandoVerguenza(discordUserId: string) {
@@ -194,6 +215,8 @@ export async function POST(request: Request) {
           return await comandoVerguenza(discordUserId);
         case "racha":
           return await comandoRacha(discordUserId);
+        case "anunciosaqui":
+          return await comandoAnunciosAqui(interaction.guild_id ?? null, interaction.channel_id ?? null, discordUserId);
       }
     } catch (error) {
       console.error("[discord-interactions]", interaction.data.name, error);

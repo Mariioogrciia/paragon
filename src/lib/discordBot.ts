@@ -1,8 +1,9 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { accounts, users } from "@/db/schema";
+import { accounts, discordGuildSettings, users } from "@/db/schema";
 import type { Trophy } from "@/lib/types";
+import { getParagonLevel } from "@/lib/paragonLevel";
 
 /**
  * Avisos de trofeos por DM del propio bot de Discord de Paragon —
@@ -61,10 +62,35 @@ export async function usuarioParagonDeDiscord(discordUserId: string): Promise<st
   return row?.userId ?? null;
 }
 
+function tokenHeaders(): { Authorization: string; "Content-Type": string } | null {
+  const token = process.env.DISCORD_BOT_TOKEN;
+  if (!token) return null;
+  return { Authorization: `Bot ${token}`, "Content-Type": "application/json" };
+}
+
+/** Manda un embed a un canal (de DM o de servidor, da igual — la API de Discord no distingue una vez tienes el ID). */
+async function enviarAlCanal(channelId: string, embed: EmbedDiscord): Promise<{ ok: boolean; error?: string }> {
+  const headers = tokenHeaders();
+  if (!headers) return { ok: false, error: "Falta DISCORD_BOT_TOKEN en el servidor." };
+
+  try {
+    const mensaje = await fetch(`${API_BASE}/channels/${channelId}/messages`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ embeds: [embed] }),
+    });
+    if (!mensaje.ok) return { ok: false, error: `Discord devolvió ${mensaje.status} al mandar el mensaje.` };
+    return { ok: true };
+  } catch (error) {
+    console.error("[discordBot] no se pudo avisar", error);
+    return { ok: false, error: "Fallo de red al hablar con Discord." };
+  }
+}
+
 /**
  * Manda un DM. Dos peticiones porque así funciona la API de Discord: no
  * hay "escribe a este usuario" directo, primero se abre (o reutiliza) el
- * canal de DM con él, y ahí sí se manda el mensaje.
+ * canal de DM con él, y ahí sí se manda el mensaje (con `enviarAlCanal`).
  *
  * Devuelve un motivo de fallo legible para el botón "Probar" de Ajustes —
  * el caso real más común es 403 (no comparte servidor con el bot, o tiene
@@ -72,10 +98,8 @@ export async function usuarioParagonDeDiscord(discordUserId: string): Promise<st
  * "algo falló" genérico.
  */
 async function enviarDM(discordUserId: string, embed: EmbedDiscord): Promise<{ ok: boolean; error?: string }> {
-  const token = process.env.DISCORD_BOT_TOKEN;
-  if (!token) return { ok: false, error: "Falta DISCORD_BOT_TOKEN en el servidor." };
-
-  const headers = { Authorization: `Bot ${token}`, "Content-Type": "application/json" };
+  const headers = tokenHeaders();
+  if (!headers) return { ok: false, error: "Falta DISCORD_BOT_TOKEN en el servidor." };
 
   try {
     const canal = await fetch(`${API_BASE}/users/@me/channels`, {
@@ -90,18 +114,102 @@ async function enviarDM(discordUserId: string, embed: EmbedDiscord): Promise<{ o
       return { ok: false, error: `Discord devolvió ${canal.status} al abrir el DM.` };
     }
     const { id: channelId } = (await canal.json()) as { id: string };
-
-    const mensaje = await fetch(`${API_BASE}/channels/${channelId}/messages`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ embeds: [embed] }),
-    });
-    if (!mensaje.ok) return { ok: false, error: `Discord devolvió ${mensaje.status} al mandar el mensaje.` };
-
-    return { ok: true };
+    return enviarAlCanal(channelId, embed);
   } catch (error) {
     console.error("[discordBot] no se pudo avisar", error);
     return { ok: false, error: "Fallo de red al hablar con Discord." };
+  }
+}
+
+/** ¿Esta persona sigue en ese servidor? Antes de anunciar algo suyo ahí — sin esto, cualquier servidor con canal configurado vería subir de nivel a gente que ni siquiera está en él. */
+async function esMiembroDelServidor(guildId: string, discordUserId: string): Promise<boolean> {
+  const headers = tokenHeaders();
+  if (!headers) return false;
+  try {
+    const res = await fetch(`${API_BASE}/guilds/${guildId}/members/${discordUserId}`, { headers });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** El canal de anuncios configurado para un servidor — `null` si nadie lo ha puesto con `/anunciosaqui`. */
+export async function getAnnounceChannel(guildId: string): Promise<string | null> {
+  const [row] = await db
+    .select({ channelId: discordGuildSettings.announceChannelId })
+    .from(discordGuildSettings)
+    .where(eq(discordGuildSettings.guildId, guildId))
+    .limit(1);
+  return row?.channelId ?? null;
+}
+
+export async function setAnnounceChannel(guildId: string, channelId: string, setBy: string): Promise<void> {
+  await db
+    .insert(discordGuildSettings)
+    .values({ guildId, announceChannelId: channelId, setBy })
+    .onConflictDoUpdate({ target: discordGuildSettings.guildId, set: { announceChannelId: channelId, setBy, updatedAt: new Date() } });
+}
+
+/**
+ * Si el nivel Paragon ha subido desde la última vez que se anunció, lo dice
+ * — por DM (si esa persona tiene los avisos activados) y en el canal de
+ * anuncios de cada servidor donde el bot tenga uno configurado Y esta
+ * persona sea de verdad miembro (ver `esMiembroDelServidor`). Se llama una
+ * vez por sincronización completa (`resyncLibraries`, no por juego) porque
+ * el nivel es global, no de un juego suelto.
+ *
+ * `lastAnnouncedParagonLevel: null` (primera vez que se calcula esto para
+ * alguien) NO anuncia nada — solo deja el nivel actual guardado como punto
+ * de partida. Sin esto, cualquiera que ya llevara, por ejemplo, nivel 40
+ * antes de que existiera esta función recibiría un "¡has subido al nivel
+ * 40!" falso en la primera sincronización.
+ */
+export async function anunciarNivelSiSube(userId: string): Promise<void> {
+  const [row] = await db
+    .select({ anterior: users.lastAnnouncedParagonLevel, discordDmEnabled: users.discordDmEnabled })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (!row) return;
+
+  const nivel = await getParagonLevel(userId);
+
+  if (row.anterior == null) {
+    await db.update(users).set({ lastAnnouncedParagonLevel: nivel.level }).where(eq(users.id, userId));
+    return;
+  }
+  if (nivel.level <= row.anterior) return;
+
+  await db.update(users).set({ lastAnnouncedParagonLevel: nivel.level }).where(eq(users.id, userId));
+
+  const discordUserId = await discordUserIdDe(userId);
+  if (!discordUserId) return;
+
+  if (row.discordDmEnabled) {
+    await enviarDM(discordUserId, {
+      title: `⭐ ¡Nivel Paragon ${nivel.level}!`,
+      description: "Le has dado bien esta temporada.",
+      color: COLOR_GENERICO,
+      footer: { text: "Paragon" },
+    });
+  }
+
+  const servidores = await db.select({ guildId: discordGuildSettings.guildId, channelId: discordGuildSettings.announceChannelId }).from(discordGuildSettings);
+  if (servidores.length === 0) return;
+
+  // Al canal SÍ va con mención (`<@id>`, Discord la convierte sola en un
+  // ping) — a diferencia del DM, aquí hay más gente delante y hace falta
+  // decir DE QUIÉN es el logro.
+  const anuncioServidor: EmbedDiscord = {
+    title: `⭐ Nivel Paragon ${nivel.level}`,
+    description: `<@${discordUserId}> ha llegado al nivel ${nivel.level} en Paragon.`,
+    color: COLOR_GENERICO,
+    footer: { text: "Paragon" },
+  };
+  for (const s of servidores) {
+    if (await esMiembroDelServidor(s.guildId, discordUserId)) {
+      await enviarAlCanal(s.channelId, anuncioServidor);
+    }
   }
 }
 

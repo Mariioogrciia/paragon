@@ -20,6 +20,7 @@ import { pegiPorTitulo } from "@/lib/igdb/client";
 import { xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
+import { anunciarNivelSiSube } from "@/lib/discordBot";
 import {
   type AccountPlatform,
   type Game,
@@ -489,6 +490,15 @@ export async function resyncLibraries(userId: string): Promise<number> {
   }
 
   await checkAndGrantBadges(userId);
+
+  // Nunca puede tirar abajo la sincronización — un DM que falla o Discord
+  // caído no es motivo para que el usuario se quede sin su biblioteca
+  // actualizada.
+  try {
+    await anunciarNivelSiSube(userId);
+  } catch (error) {
+    console.error("[resyncLibraries] anuncio de nivel", error);
+  }
 
   return total;
 }

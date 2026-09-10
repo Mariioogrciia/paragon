@@ -82,6 +82,14 @@ const COMANDOS = [
     name: "racha",
     description: "Tu racha actual de días seguidos ganando al menos un trofeo.",
   },
+  {
+    name: "anunciosaqui",
+    description: "Anuncia en este canal cuando alguien del servidor suba de nivel Paragon.",
+    // Bitfield de permisos de Discord como texto — 0x20 = MANAGE_GUILD
+    // ("Gestionar servidor"). Sin esto, cualquiera podría decidir dónde
+    // anuncia el bot en un servidor que no es suyo.
+    default_member_permissions: "32",
+  },
 ];
 
 async function main() {

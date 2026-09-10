@@ -46,3 +46,5 @@ next-env.d.ts
 # avatares y banners subidos por usuarios en local: contenido de runtime,
 # no código — y no fotos de nadie al historial de git.
 /public/uploads/
+
+.vercel

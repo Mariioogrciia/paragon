@@ -93,6 +93,13 @@ export const users = pgTable("user", {
    * intentarlo, que se enseña tal cual en el botón "Probar" de Ajustes.
    */
   discordDmEnabled: boolean("discordDmEnabled").notNull().default(false),
+  /**
+   * Último nivel Paragon que ya se anunció (DM + servidores, ver
+   * `anunciarNivelSiSube` en lib/discordBot.ts) — sin esto, cada
+   * sincronización volvería a anunciar el mismo nivel una y otra vez.
+   * `null` = nunca se ha anunciado ninguno todavía.
+   */
+  lastAnnouncedParagonLevel: integer("lastAnnouncedParagonLevel"),
 
   /**
    * Claves de `NAV_OCULTABLE` (lib/navPreferences.ts) que este usuario ha
@@ -746,6 +753,21 @@ export const trophyGuides = pgTable(
  * claves de cifrado que exige el estándar Web Push para que el        *
  * servidor de por medio no pueda leer el contenido del aviso.         *
  * ------------------------------------------------------------------ */
+/**
+ * Un canal de anuncios por servidor de Discord — dónde publica el bot
+ * cosas del tipo "Fende21 ha llegado al nivel 20" (ver
+ * `anunciarNivelSiSube` en lib/discordBot.ts). Lo configura quien tenga
+ * permiso de gestionar el servidor con `/anunciosaqui`, en el propio canal
+ * donde quiera que salgan. Sin fila para un servidor = ese servidor no
+ * recibe anuncios (solo DMs personales a quien los tenga activados).
+ */
+export const discordGuildSettings = pgTable("discord_guild_settings", {
+  guildId: text("guildId").primaryKey(),
+  announceChannelId: text("announceChannelId").notNull(),
+  setBy: text("setBy"),
+  updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
+});
+
 export const pushSubscriptions = pgTable("push_subscription", {
   id: text("id")
     .primaryKey()
