@@ -74,7 +74,7 @@ const LOGGED_OUT_NAV = [
   { label: "Inicio", href: "/", match: (p: string) => p === "/" },
   { label: "Noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
   { label: "Ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
-  { label: "Cómo funciona", href: "/#biblioteca", match: (p: string) => false },
+  { label: "Cómo funciona", href: "/como-funciona", match: (p: string) => p.startsWith("/como-funciona") },
 ];
 
 /** Desplegable de "Más": mismos enlaces que ya había, solo que agrupados. */

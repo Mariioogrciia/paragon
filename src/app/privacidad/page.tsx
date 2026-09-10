@@ -118,11 +118,12 @@ export default function PrivacidadPage() {
       <Seccion num="6" title="Tus derechos">
         <p className="text-muted">
           Acceso, rectificación, supresión, portabilidad, oposición y
-          limitación del tratamiento — el listado completo del RGPD. La
-          eliminación de tu cuenta la puedes hacer tú mismo desde{" "}
+          limitación del tratamiento — el listado completo del RGPD. Puedes
+          descargar una copia de tus propios datos desde{" "}
           <Link href="/ajustes/seguridad" className="text-accent hover:underline">Ajustes → Inicio de sesión y seguridad</Link>.
-          Para cualquier otro derecho, escribe a{" "}
-          <a href="mailto:mario.meca2005@gmail.com" className="text-accent hover:underline">mario.meca2005@gmail.com</a>.
+          Para eliminar tu cuenta, o para cualquier otro derecho, escribe a{" "}
+          <a href="mailto:mario.meca2005@gmail.com" className="text-accent hover:underline">mario.meca2005@gmail.com</a>{" "}
+          — se atiende en un máximo de 30 días, el plazo que marca el RGPD.
           También puedes reclamar ante la Agencia Española de Protección de
           Datos (aepd.es) si consideras que no se ha atendido tu solicitud.
         </p>

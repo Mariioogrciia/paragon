@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // las utilidades sin contenido (/offline, /entrar).
   const fijas: MetadataRoute.Sitemap = [
     { url: dominio, lastModified: ahora, changeFrequency: "daily", priority: 1 },
+    { url: `${dominio}/como-funciona`, lastModified: ahora, changeFrequency: "monthly", priority: 0.6 },
     { url: `${dominio}/descubrir`, lastModified: ahora, changeFrequency: "daily", priority: 0.8 },
     { url: `${dominio}/descubrir/playstation`, lastModified: ahora, changeFrequency: "daily", priority: 0.7 },
     { url: `${dominio}/descubrir/steam`, lastModified: ahora, changeFrequency: "daily", priority: 0.7 },

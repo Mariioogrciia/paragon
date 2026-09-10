@@ -285,6 +285,11 @@ async function Landing() {
               </div>
             ))}
           </div>
+          <div className="mt-8 text-center">
+            <Link href="/como-funciona" className="text-sm font-bold uppercase tracking-wide text-accent hover:underline">
+              Ver todo lo que hace Paragon →
+            </Link>
+          </div>
         </div>
       </section>
 
