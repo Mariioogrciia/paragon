@@ -1,24 +1,42 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import { getXboxNews } from "@/lib/xboxNews";
 import { NewsFeed } from "@/components/NewsFeed";
 import { XboxIcon } from "@/lib/platformIcons";
 import { BackButton } from "@/components/BackButton";
+import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
+import { CardCarousel } from "@/components/CardCarousel";
+import { RankedList } from "@/components/RankedList";
+import { PosterCard } from "@/components/PosterCard";
+import { trendingOnPlatform, mostPlayedOnPlatform, recommendationsOnPlatform } from "@/lib/platformHub";
 
 export const metadata = {
   title: "Xbox · Descubrir · Paragon",
 };
 
 /**
- * Solo noticias, a propósito — Xbox ya sincroniza biblioteca de verdad
- * (ver lib/xbl/client.ts), pero un catálogo tipo /descubrir/steam
- * (tendencias, más jugados...) necesita extender platformHub.ts, que es
- * trabajo aparte, no lo que se pidió aquí.
+ * Xbox ya sincroniza biblioteca de verdad (ver lib/xbl/client.ts), así que
+ * "tendencia"/"más jugados"/"recomendado" salen de datos REALES de Paragon
+ * — mismo mecanismo que ya usan PlayStation y Steam en
+ * `/descubrir/[plataforma]`, solo que Xbox tiene página propia porque no
+ * hay ni ofertas (CheapShark no rastrea tiendas de consola) ni un
+ * catálogo tipo PS Plus que mostrar aquí — de ahí que antes solo hubiera
+ * noticias.
  */
 export default async function DescubrirXboxPage() {
-  const noticias = await getXboxNews();
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  const [noticias, tendencia, masJugados, recomendados] = await Promise.all([
+    getXboxNews(),
+    trendingOnPlatform("xbox"),
+    mostPlayedOnPlatform("xbox"),
+    recommendationsOnPlatform(userId ?? null, "xbox"),
+  ]);
 
   return (
     <div>
+      <RefrescoAutomatico />
       <BackButton fallbackHref="/descubrir" />
       <div className="mb-6 flex items-center gap-3">
         <span
@@ -35,12 +53,56 @@ export default async function DescubrirXboxPage() {
         </div>
       </div>
 
+      {recomendados.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
+            {userId ? "Recomendado para ti en " : "Popular en "}Xbox
+          </h2>
+          <CardCarousel>
+            {recomendados.map((g) => (
+              <PosterCard key={g.igdbId} game={g} />
+            ))}
+          </CardCarousel>
+        </section>
+      )}
+
+      {tendencia.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Tendencia en Paragon</h2>
+          <CardCarousel>
+            {tendencia.map((g) => (
+              <PosterCard
+                key={g.igdbId}
+                game={g}
+                badge={
+                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
+                    +{g.recientes}
+                  </span>
+                }
+              />
+            ))}
+          </CardCarousel>
+        </section>
+      )}
+
+      {masJugados.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Los más jugados en Paragon</h2>
+          <p className="mb-4 text-sm text-muted">Por horas registradas de quien tiene cuenta vinculada aquí, no un dato global de Xbox.</p>
+          <RankedList items={masJugados} value={(g) => g.horas} valueLabel={(g) => `${g.horas} h`} />
+        </section>
+      )}
+
       {noticias.length > 0 ? (
         <NewsFeed titulo="Noticias de Xbox" badge="Xbox Wire" items={noticias} />
       ) : (
-        <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          No se han podido cargar las noticias ahora mismo. Prueba más tarde.
-        </p>
+        recomendados.length === 0 &&
+        tendencia.length === 0 &&
+        masJugados.length === 0 && (
+          <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
+            No se han podido cargar las noticias ahora mismo. Prueba más tarde.
+          </p>
+        )
       )}
     </div>
   );

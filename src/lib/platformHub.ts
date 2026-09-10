@@ -16,7 +16,7 @@ import type { DiscoverGame } from "@/lib/discover";
  * "psn" es el valor real de `games.platform`; la URL y el resto de la UI
  * dicen "playstation", que es más reconocible.
  */
-export type PlataformaHub = "psn" | "steam";
+export type PlataformaHub = "psn" | "steam" | "xbox";
 
 function parseGenres(raw: string | null): string[] {
   if (!raw) return [];
