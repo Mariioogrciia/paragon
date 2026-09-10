@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import nacl from "tweetnacl";
-import { usuarioParagonDeDiscord, setAnnounceChannel } from "@/lib/discordBot";
-import { getLibrary, getProfileByUserId } from "@/lib/profiles";
+import { usuarioParagonDeDiscord, setAnnounceChannel, anadirNotaJuego } from "@/lib/discordBot";
+import { getLibrary, getGameDetail, getProfileByUserId } from "@/lib/profiles";
 import { platinosAlAlcance, salonDeLaVerguenza } from "@/lib/backlog";
 import { sugerirPorTiempo } from "@/lib/recomendadorTiempo";
 import { summarise } from "@/lib/stats";
@@ -9,6 +9,9 @@ import { getParagonLevel } from "@/lib/paragonLevel";
 import { rachas } from "@/lib/history";
 import { hitosHistoricos } from "@/lib/profileStats";
 import { calcularTrophyDna, CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
+import { dificultadDeJuego } from "@/lib/difficulty";
+import { dominioPublico } from "@/lib/site";
+import type { Game } from "@/lib/types";
 
 /**
  * Endpoint de "Interactions" del bot de Discord — comandos de barra
@@ -53,6 +56,95 @@ function mensaje(contenido: string) {
     type: ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: { content: contenido, flags: 1 << 6 /* EPHEMERAL */ },
   });
+}
+
+/** Quita acentos/símbolos para comparar títulos escritos a mano ("elden ring" debe encontrar "Elden Ring"). */
+function normalizarTitulo(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/** Coincidencia exacta si la hay; si no, la primera que CONTENGA lo escrito — así "spider-man" encuentra "Marvel's Spider-Man 2" sin tener que escribir el título completo. */
+function encontrarJuegoPorTitulo(games: Game[], busqueda: string): Game | null {
+  const q = normalizarTitulo(busqueda);
+  if (!q) return null;
+  const exacto = games.find((g) => normalizarTitulo(g.title) === q);
+  if (exacto) return exacto;
+  return games.find((g) => normalizarTitulo(g.title).includes(q)) ?? null;
+}
+
+async function comandoJuego(discordUserId: string, busqueda: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
+
+  const { games } = await getLibrary(profile);
+  const encontrado = encontrarJuegoPorTitulo(games, busqueda);
+  if (!encontrado) return mensaje(`No encuentro "${busqueda}" en tu biblioteca de Paragon — comprueba el nombre exacto.`);
+
+  const detalle = await getGameDetail(profile, encontrado.id);
+  if (!detalle) return mensaje("No he podido cargar la ficha de ese juego ahora mismo.");
+
+  const dificultad = dificultadDeJuego(detalle.trophies);
+  const perdibles = detalle.trophies.filter((t) => t.isMissable).length;
+  const conseguidos = detalle.trophies.filter((t) => t.earned).length;
+
+  const lineas = [`**${detalle.title}**`];
+  if (detalle.hltb?.completionist) {
+    lineas.push(`⏱️ Platino/completista: ~${detalle.hltb.completionist}h (HowLongToBeat)`);
+  }
+  if (dificultad) {
+    lineas.push(`🎯 Dificultad estimada: ${dificultad.nivel}/10 — ${dificultad.etiqueta} (${dificultad.rareza.toFixed(1)}% de la comunidad lo tiene)`);
+  }
+  lineas.push(perdibles > 0 ? `⚠️ ${perdibles} trofeo${perdibles === 1 ? "" : "s"} perdible${perdibles === 1 ? "" : "s"} — cuidado con el orden` : "✅ Sin trofeos perdibles conocidos");
+  lineas.push(`🏆 Llevas ${conseguidos}/${detalle.trophies.length} (${detalle.progressPercent ?? 0}%)`);
+  lineas.push(`🔗 ${dominioPublico()}/u/${profile.handle}/${detalle.id}`);
+
+  return mensaje(lineas.join("\n"));
+}
+
+async function comandoNota(discordUserId: string, busqueda: string, texto: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
+
+  const { games } = await getLibrary(profile);
+  const encontrado = encontrarJuegoPorTitulo(games, busqueda);
+  if (!encontrado) return mensaje(`No encuentro "${busqueda}" en tu biblioteca de Paragon — comprueba el nombre exacto.`);
+
+  await anadirNotaJuego(userId, encontrado.id, texto);
+  return mensaje(`📝 Nota guardada en **${encontrado.title}**.`);
+}
+
+async function comandoRuleta(discordUserId: string, minutos: number, genero?: CategoriaDna) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
+
+  const { games } = await getLibrary(profile);
+  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(games, minutos / 60, genero);
+  const pool = [...victoriasRapidas, ...paraProfundizar];
+
+  if (pool.length === 0) {
+    return mensaje(
+      genero
+        ? "Nada de ese tipo que encaje ahora mismo — prueba con otro género o sin filtro."
+        : "Nada que encaje ahora mismo con ese tiempo — prueba a poner horas de HLTB en más juegos empezados desde la ficha de cada uno.",
+    );
+  }
+
+  const elegido = pool[Math.floor(Math.random() * pool.length)];
+  return mensaje(`🎲 **${elegido.titulo}** — ${elegido.motivo}`);
 }
 
 async function comandoPlatinosAlAlcance(discordUserId: string) {
@@ -142,6 +234,9 @@ function comandoHelp() {
       "👤 `/perfil [usuario]` — tus estadísticas de Paragon, o las de un amigo con Discord vinculado.",
       "😳 `/verguenza` — juegos en tu biblioteca sin ni una hora, sin ni un trofeo.",
       "🔥 `/racha` — tu racha actual de días seguidos ganando al menos un trofeo.",
+      "🎮 `/juego <título>` — ficha rápida: duración HLTB, dificultad, perdibles y tu progreso.",
+      "📝 `/nota <título> <texto>` — apunta una nota privada en un juego sin abrir la web.",
+      "🎲 `/ruleta [minutos] [genero]` — te elige UN juego que encaje con el tiempo que tienes.",
       "📣 `/anunciosaqui` — (solo quien gestione el servidor) anuncia aquí cuando alguien suba de nivel.",
       "",
       "Para que cualquiera de estos funcione, tu cuenta de Discord tiene que estar vinculada a una cuenta de Paragon — inicia sesión en Paragon con este mismo Discord.",
@@ -236,6 +331,25 @@ export async function POST(request: Request) {
           return await comandoVerguenza(discordUserId);
         case "racha":
           return await comandoRacha(discordUserId);
+        case "juego": {
+          const titulo = interaction.data.options?.find((o) => o.name === "titulo")?.value;
+          if (typeof titulo !== "string" || !titulo.trim()) return mensaje("Dime qué juego — por ejemplo `/juego Elden Ring`.");
+          return await comandoJuego(discordUserId, titulo);
+        }
+        case "nota": {
+          const titulo = interaction.data.options?.find((o) => o.name === "titulo")?.value;
+          const texto = interaction.data.options?.find((o) => o.name === "texto")?.value;
+          if (typeof titulo !== "string" || !titulo.trim() || typeof texto !== "string" || !texto.trim()) {
+            return mensaje("Hace falta el título del juego y el texto de la nota.");
+          }
+          return await comandoNota(discordUserId, titulo, texto);
+        }
+        case "ruleta": {
+          const minutos = interaction.data.options?.find((o) => o.name === "minutos")?.value;
+          const generoOpt = interaction.data.options?.find((o) => o.name === "genero")?.value;
+          const genero = typeof generoOpt === "string" && CATEGORIAS_GENERO.some((c) => c.key === generoOpt) ? (generoOpt as CategoriaDna) : undefined;
+          return await comandoRuleta(discordUserId, typeof minutos === "number" ? minutos : 60, genero);
+        }
         case "anunciosaqui":
           return await comandoAnunciosAqui(interaction.guild_id ?? null, interaction.channel_id ?? null, discordUserId);
         case "help":

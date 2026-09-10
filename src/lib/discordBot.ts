@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { accounts, discordGuildSettings, users } from "@/db/schema";
+import { accounts, discordGuildSettings, userGames, users } from "@/db/schema";
 import type { Trophy } from "@/lib/types";
 import { getParagonLevel } from "@/lib/paragonLevel";
 
@@ -295,4 +295,28 @@ export async function probarDiscordDm(userId: string): Promise<{ ok: boolean; er
 
 export async function setDiscordDmEnabled(userId: string, enabled: boolean): Promise<void> {
   await db.update(users).set({ discordDmEnabled: enabled }).where(eq(users.id, userId));
+}
+
+/**
+ * Nota privada de `/nota` desde Discord — mismo campo (`userGames.notes`)
+ * que ya rellena `saveGameNotesAction` desde la web
+ * (app/actions.ts), pero sin sesión de por medio: aquí quien escribe ya se
+ * identificó dando su ID de Discord, resuelto antes contra `accounts` por
+ * quien llama a esto (ver comandoNota en el route.ts de interactions).
+ * Añade al texto de siempre en vez de sustituirlo — un `/nota` no debería
+ * borrar la que ya tenías puesta desde la web sin querer.
+ */
+export async function anadirNotaJuego(userId: string, gameId: string, texto: string): Promise<void> {
+  const [actual] = await db
+    .select({ notes: userGames.notes })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  const nuevo = actual?.notes ? `${actual.notes}\n${texto.trim()}` : texto.trim();
+
+  await db
+    .update(userGames)
+    .set({ notes: nuevo })
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 }

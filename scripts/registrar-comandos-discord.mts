@@ -83,6 +83,55 @@ const COMANDOS = [
     description: "Tu racha actual de días seguidos ganando al menos un trofeo.",
   },
   {
+    name: "juego",
+    description: "Ficha rápida de un juego de tu biblioteca: duración, dificultad, perdibles y tu progreso.",
+    options: [
+      {
+        type: 3, // STRING
+        name: "titulo",
+        description: "Título del juego (no hace falta exacto)",
+        required: true,
+      },
+    ],
+  },
+  {
+    name: "nota",
+    description: "Apunta una nota privada en un juego de tu biblioteca sin abrir la web.",
+    options: [
+      {
+        type: 3, // STRING
+        name: "titulo",
+        description: "Título del juego (no hace falta exacto)",
+        required: true,
+      },
+      {
+        type: 3, // STRING
+        name: "texto",
+        description: "La nota que quieres guardar",
+        required: true,
+      },
+    ],
+  },
+  {
+    name: "ruleta",
+    description: "Te elige UN juego de tu backlog que encaje con el tiempo que tienes hoy.",
+    options: [
+      {
+        type: 4, // INTEGER
+        name: "minutos",
+        description: "Cuántos minutos tienes (por defecto 60)",
+        required: false,
+      },
+      {
+        type: 3, // STRING
+        name: "genero",
+        description: "Si te apetece un tipo concreto",
+        required: false,
+        choices: GENEROS,
+      },
+    ],
+  },
+  {
     name: "help",
     description: "Qué comandos tiene el bot de Paragon y para qué sirve cada uno.",
   },
