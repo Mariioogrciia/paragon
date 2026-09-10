@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { refrescarJuegoAction } from "@/app/actions";
+import { refrescarJuegoAction, saveGameNotesAction } from "@/app/actions";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { rarity } from "@/lib/design";
@@ -32,6 +32,7 @@ export function FocusMode({
   earned,
   total,
   volverA,
+  notasIniciales,
 }: {
   gameId: string;
   titulo: string;
@@ -40,6 +41,8 @@ export function FocusMode({
   earned: number;
   total: number;
   volverA: string;
+  /** Tu nota privada de siempre (`userGames.notes`) — para que el scratchpad no empiece en blanco si ya tenías algo apuntado desde la web. */
+  notasIniciales?: string | null;
 }) {
   const router = useRouter();
   const [pendiente, startTransition] = useTransition();
@@ -50,6 +53,45 @@ export function FocusMode({
   // ahí dentro el modal sale por encima; colgado fuera se quedaría detrás.
   const [guia, setGuia] = useState<Trophy | null>(null);
   const wakeLock = useRef<WakeLockSentinel | null>(null);
+
+  // Scratchpad OLED: para apuntar una clave/combinación sin salir del modo
+  // enfoque (salir apaga el WakeLock de arriba y rompe el "segunda
+  // pantalla"). Autoguardado con debounce en vez de un botón "Guardar" — a
+  // oscuras, con el mando en una mano y el móvil en la otra, un botón que
+  // hay que acertar a pulsar es fricción de más.
+  const [notaAbierta, setNotaAbierta] = useState(false);
+  const [nota, setNota] = useState(notasIniciales ?? "");
+  const notaGuardadaEn = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [notaGuardando, setNotaGuardando] = useState(false);
+
+  function cambiarNota(valor: string) {
+    setNota(valor);
+    if (notaGuardadaEn.current) clearTimeout(notaGuardadaEn.current);
+    notaGuardadaEn.current = setTimeout(() => {
+      setNotaGuardando(true);
+      saveGameNotesAction(gameId, valor).finally(() => setNotaGuardando(false));
+    }, 800);
+  }
+
+  // Al cerrar el bloc (o al desmontar, si alguien sale del modo enfoque con
+  // el debounce todavía pendiente) se fuerza el guardado inmediato — sin
+  // esto, cerrar rápido después de escribir podía perder los últimos
+  // caracteres si el debounce de 800ms no había llegado a saltar.
+  function cerrarNota() {
+    if (notaGuardadaEn.current) {
+      clearTimeout(notaGuardadaEn.current);
+      notaGuardadaEn.current = null;
+      setNotaGuardando(true);
+      saveGameNotesAction(gameId, nota).finally(() => setNotaGuardando(false));
+    }
+    setNotaAbierta(false);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (notaGuardadaEn.current) clearTimeout(notaGuardadaEn.current);
+    };
+  }, []);
 
   // La capa tapa la app, pero la app sigue debajo: sin esto se puede arrastrar
   // la página de fondo con el dedo y asoman cabecera y pie por detrás, que es
@@ -275,6 +317,62 @@ export function FocusMode({
           trophy={guia}
           onClose={() => setGuia(null)}
         />
+      )}
+
+      {/* Botón discreto del scratchpad — esquina inferior, encima de todo
+          (z-index más alto que el resto de la capa) pero pequeño: no debe
+          competir con "¿Ya lo tengo?", que es la acción de verdad. */}
+      <button
+        type="button"
+        onClick={() => setNotaAbierta(true)}
+        aria-label="Apuntar una nota rápida"
+        className="fixed bottom-24 right-5 z-[110] flex h-12 w-12 items-center justify-center rounded-full text-white/70 shadow-lg transition-transform hover:scale-105 hover:text-white active:scale-95 sm:bottom-6"
+        style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)" }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+        </svg>
+        {nota && <span className="absolute right-0 top-0 h-2.5 w-2.5 rounded-full bg-[rgb(159,212,236)]" />}
+      </button>
+
+      {notaAbierta && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Nota privada"
+          className="fixed inset-0 z-[120] flex flex-col justify-end bg-black/80 sm:items-center sm:justify-center"
+          onClick={cerrarNota}
+        >
+          <div
+            className="w-full rounded-t-2xl bg-black p-5 sm:max-w-md sm:rounded-2xl"
+            style={{ border: "1px solid rgba(255,255,255,0.16)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-white/40">
+                Nota privada — solo la ves tú
+              </p>
+              <span className="text-[0.6875rem] text-white/40">{notaGuardando ? "Guardando…" : nota ? "Guardado" : ""}</span>
+            </div>
+            <textarea
+              value={nota}
+              onChange={(e) => cambiarNota(e.target.value)}
+              maxLength={500}
+              autoFocus
+              placeholder="Ej: código de la taquilla de la sala de espera: DCM"
+              className="h-32 w-full resize-none rounded-xl bg-white/5 p-3 text-base text-white outline-none"
+              style={{ border: "1px solid rgba(255,255,255,0.16)" }}
+            />
+            <button
+              type="button"
+              onClick={cerrarNota}
+              className={`${BOTON} mt-3 w-full bg-white text-black`}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

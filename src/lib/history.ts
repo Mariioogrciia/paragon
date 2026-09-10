@@ -1,7 +1,7 @@
 import "server-only";
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, gameTrophies, userTrophies } from "@/db/schema";
+import { games, gameTrophies, userTrophies, users } from "@/db/schema";
 import type { TrophyGrade } from "@/lib/types";
 
 /**
@@ -410,4 +410,70 @@ export async function juegosDelAnio(userId: string): Promise<number> {
     );
 
   return Number(fila?.total ?? 0);
+}
+
+export interface Efemeride extends TrofeoDelMes {
+  gameIconUrl: string | null;
+  aniosAtras: number;
+}
+
+/**
+ * "Tal día como hoy": trofeos conseguidos el mismo día y mes que hoy, en
+ * años anteriores. Mismo origen que `ultimosTrofeos` (`earnedAt` de
+ * `user_trophy`), pero comparado por día/mes en tu propia zona horaria
+ * (`users.timezone`, mismo criterio que `franjasHorarias`) — sin la
+ * conversión, alguien que consiguió un platino a las 2 de la madrugada
+ * hora local podría aparecer como "ayer" en UTC, y el aniversario saldría
+ * un día tarde o pronto según dónde caiga la medianoche real.
+ */
+export async function talDiaComoHoy(userId: string, ahora = new Date()): Promise<Efemeride[]> {
+  const [u] = await db.select({ timezone: users.timezone }).from(users).where(eq(users.id, userId)).limit(1);
+  const tz = u?.timezone || "Europe/Madrid";
+
+  const fechaLocal = sql`(${userTrophies.earnedAt} at time zone 'UTC' at time zone ${tz})`;
+
+  const filas = await db
+    .select({
+      gameId: userTrophies.gameId,
+      juego: games.title,
+      gameIconUrl: games.iconUrl,
+      trophyId: userTrophies.trophyId,
+      nombre: gameTrophies.name,
+      detalle: gameTrophies.detail,
+      grade: gameTrophies.grade,
+      iconUrl: gameTrophies.iconUrl,
+      earnedAt: userTrophies.earnedAt,
+      rarityPercent: userTrophies.rarityPercent,
+    })
+    .from(userTrophies)
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .leftJoin(
+      gameTrophies,
+      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+    )
+    .where(
+      and(
+        eq(userTrophies.userId, userId),
+        eq(userTrophies.earned, true),
+        isNotNull(userTrophies.earnedAt),
+        sql`extract(month from ${fechaLocal}) = ${ahora.getMonth() + 1}`,
+        sql`extract(day from ${fechaLocal}) = ${ahora.getDate()}`,
+        sql`extract(year from ${fechaLocal}) < ${ahora.getFullYear()}`,
+      ),
+    )
+    .orderBy(desc(userTrophies.earnedAt));
+
+  return filas.map((f) => ({
+    gameId: f.gameId,
+    juego: f.juego,
+    gameIconUrl: f.gameIconUrl ?? null,
+    trophyId: f.trophyId,
+    nombre: f.nombre ?? "Trofeo",
+    detalle: f.detalle ?? "",
+    grade: f.grade ?? null,
+    iconUrl: f.iconUrl ?? null,
+    earnedAt: f.earnedAt!.toISOString(),
+    rarityPercent: f.rarityPercent ?? null,
+    aniosAtras: ahora.getFullYear() - f.earnedAt!.getFullYear(),
+  }));
 }

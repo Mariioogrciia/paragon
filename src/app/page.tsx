@@ -12,7 +12,8 @@ import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
 import { UpcomingGames } from "@/components/UpcomingGames";
 import { TrophyHistory } from "@/components/TrophyHistory";
-import { rachas, resumenHistorico, trofeosPorMes } from "@/lib/history";
+import { rachas, resumenHistorico, trofeosPorMes, talDiaComoHoy } from "@/lib/history";
+import { TalDiaComoHoy } from "@/components/TalDiaComoHoy";
 import { FAQSection } from "@/components/FAQ";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
@@ -336,13 +337,14 @@ export default async function HomePage() {
 
   const recientes = games.filter(g => !g.isWishlist).slice(0, 6);
 
-  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones] = await Promise.all([
+  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones, efemerides] = await Promise.all([
     trofeosPorMes(session.user.id),
     rachas(session.user.id),
     resumenHistorico(session.user.id),
     getWishlistIgdbIds(session.user.id),
     getWeeklyMissions(session.user.id),
     getTrophyRecommendations(session.user.id),
+    talDiaComoHoy(session.user.id),
   ]);
 
   const nearPlatinum = games
@@ -691,6 +693,7 @@ export default async function HomePage() {
                 </div>
 
                 <WeeklyMissions missions={misiones} />
+                <TalDiaComoHoy efemerides={efemerides} handle={profile.handle} />
                 <ActivityStats games={games} now={now} />
                 <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />
               </>

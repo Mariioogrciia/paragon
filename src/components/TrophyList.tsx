@@ -64,6 +64,8 @@ export function TrophyList({
   const [view, setView] = useState<"lista" | "cuadricula" | "arbol">("lista");
   const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
   const [filtros, setFiltros] = useState<Set<Filtro>>(new Set());
+  const [ocultarConseguidos, setOcultarConseguidos] = useState(false);
+  const [ordenCronologico, setOrdenCronologico] = useState(false);
 
   // Qué filtros tienen algo que enseñar en ESTE juego — de nada sirve un
   // chip de "Multijugador" que, al pulsarlo, deja la lista vacía porque el
@@ -80,8 +82,8 @@ export function TrophyList({
   }, [trophies]);
 
   const trofeosFiltrados = useMemo(
-    () => trophies.filter((t) => pasaFiltro(t, filtros)),
-    [trophies, filtros],
+    () => trophies.filter((t) => pasaFiltro(t, filtros) && (!ocultarConseguidos || !t.earned)),
+    [trophies, filtros, ocultarConseguidos],
   );
 
   function alternarFiltro(valor: Filtro) {
@@ -105,7 +107,29 @@ export function TrophyList({
     groups.get(gId)!.trophies.push(t);
   }
 
+  // "Orden cronológico": por fecha de consecución dentro de cada grupo, para
+  // ver cómo fue el progreso en el tiempo — los sin conseguir (sin
+  // `earnedAt`) se quedan al final, en su orden de siempre, no se
+  // intercalan con fecha inventada.
+  if (ordenCronologico) {
+    for (const g of groups.values()) {
+      g.trophies.sort((a, b) => {
+        if (!a.earnedAt && !b.earnedAt) return 0;
+        if (!a.earnedAt) return 1;
+        if (!b.earnedAt) return -1;
+        return new Date(a.earnedAt).getTime() - new Date(b.earnedAt).getTime();
+      });
+    }
+  }
+
   // Convert to array and put "default" first.
+  //
+  // Bug real encontrado de paso (no de esta sesión): este `groupList` se
+  // calculaba pero nunca se usaba más abajo — el render seguía leyendo
+  // `groups.values()` sin ordenar, así que "Juego Base" nunca salía
+  // garantizado primero cuando había más de un grupo. Se arregla aquí
+  // porque ya se estaba tocando este mismo bloque para el orden
+  // cronológico, no por buscarlo a propósito.
   const groupList = Array.from(groups.values()).sort((a, b) => {
     if (a.name === "Juego Base") return -1;
     if (b.name === "Juego Base") return 1;
@@ -115,7 +139,7 @@ export function TrophyList({
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        {filtrosConDatos.size > 0 && view !== "arbol" && (
+        {view !== "arbol" && (
           <div className="flex flex-wrap gap-1.5">
             {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => {
               const activo = filtros.has(f.valor);
@@ -136,6 +160,40 @@ export function TrophyList({
                 </button>
               );
             })}
+
+            {/* "Ocultar conseguidos" y "Orden cronológico" — pedidos aparte
+                de los filtros por tipo de arriba: no filtran por CATEGORÍA
+                de trofeo, uno filtra por estado (ya lo tienes o no) y el
+                otro solo reordena, no esconde nada. */}
+            {trophies.some((t) => t.earned) && (
+              <button
+                type="button"
+                onClick={() => setOcultarConseguidos((v) => !v)}
+                aria-pressed={ocultarConseguidos}
+                className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
+                style={
+                  ocultarConseguidos
+                    ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
+                    : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
+                }
+              >
+                Ocultar conseguidos
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setOrdenCronologico((v) => !v)}
+              aria-pressed={ordenCronologico}
+              className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-all hover:opacity-75"
+              style={
+                ordenCronologico
+                  ? { background: "rgb(var(--accent-rgb) / 0.18)", border: "1px solid rgb(var(--accent-rgb) / 0.5)", color: "var(--accent-text)" }
+                  : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }
+              }
+            >
+              Orden cronológico
+            </button>
+
             {filtros.size > 0 && (
               <button
                 type="button"
@@ -187,7 +245,7 @@ export function TrophyList({
         </div>
       ) : (
         <div className="space-y-8">
-          {Array.from(groups.values()).map((g) => (
+          {groupList.map((g) => (
             <div key={g.name} className="space-y-3">
               {groups.size > 1 && (
                 <h3 className="px-4 text-xs font-bold uppercase tracking-[0.15em] text-muted sm:px-0">

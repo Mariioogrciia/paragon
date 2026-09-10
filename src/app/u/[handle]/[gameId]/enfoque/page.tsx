@@ -49,6 +49,7 @@ export default async function EnfoquePage({
       earned={progreso.earned}
       total={progreso.total}
       volverA={`/u/${handle}/${gameId}`}
+      notasIniciales={game.notes}
     />
   );
 }

@@ -375,8 +375,17 @@ export default async function JuegoPage({
         <HltbCard hltb={game.hltb} />
         {/* `undefined` = nunca comprobado; `{}` = comprobado y sin dato —
             solo se dispara la búsqueda en el primer caso, para no repetirla
-            en cada visita de un juego que de verdad no tiene tiempo en HLTB. */}
-        {game.hltb === undefined && <AutoSyncHltb gameId={game.id} title={game.title} />}
+            en cada visita de un juego que de verdad no tiene tiempo en HLTB.
+            `esMio &&` es IMPRESCINDIBLE, no cosmético — bug real encontrado
+            en producción (10 sept 2026, verificado en el navegador):
+            `syncHltbAction` (app/actions.ts) llama a `requireUserId()`, que
+            hace `redirect("/entrar")` si no hay sesión. Sin este guard,
+            CUALQUIER visitante sin sesión que mirara la ficha pública de un
+            juego sin HLTB sincronizado (la mayoría — solo 2 juegos PSN lo
+            tienen en producción ahora mismo) era expulsado a /entrar al
+            segundo de cargar la página, sin poder ver la ficha. Mismo
+            criterio que ya usa `AutoSyncJuego` un poco más arriba. */}
+        {esMio && game.hltb === undefined && <AutoSyncHltb gameId={game.id} title={game.title} />}
 
         {eta && <EtaPlatinoCard eta={eta} esMio={esMio} />}
 

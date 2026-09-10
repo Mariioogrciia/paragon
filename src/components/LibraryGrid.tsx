@@ -45,6 +45,16 @@ const SORTS: { label: string; value: SortKey }[] = [
 
 const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
 
+/** Mismo mapeo que `AcquisitionEditor.tsx` — el valor guardado es un código, no texto para enseñar. */
+const LABEL_ADQUISICION: Record<string, string> = {
+  fisico: "Físico",
+  digital: "Digital",
+  ps_plus: "PS Plus",
+  game_pass: "Game Pass",
+  prestado: "Prestado",
+  gratis: "Gratis",
+};
+
 /**
  * Cuántos juegos se pintan de golpe.
  *
@@ -107,6 +117,8 @@ export function LibraryGrid({
   const [pegi, setPegi] = useState("");
   const [dificultad, setDificultad] = useState<Dificultad["nivel"] | 0>(0);
   const [horas, setHoras] = useState<HorasBucket | "">("");
+  const [acquisitionFormat, setAcquisitionFormat] = useState<NonNullable<Game["acquisitionFormat"]> | "">("");
+  const [porAmortizar, setPorAmortizar] = useState(false);
   const [collection, setCollection] = useState("");
   const [sort, setSort] = useState<SortKey>("reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -130,10 +142,12 @@ export function LibraryGrid({
       pegi: pegi || undefined,
       dificultad: dificultad || undefined,
       horas: horas || undefined,
+      acquisitionFormat: acquisitionFormat || undefined,
+      porAmortizar: porAmortizar || undefined,
       sort,
       sortDir,
     });
-  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, horas, sort, sortDir]);
+  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, sort, sortDir]);
 
   const grupos = useMemo(() => {
     if (!agrupar) return null;
@@ -160,7 +174,7 @@ export function LibraryGrid({
   // seguiríamos "dentro" de la página 8 de una lista que ya no existe.
   useEffect(() => {
     setPagina(1);
-  }, [search, status, platform, publisher, genre, pegi, dificultad, horas, collection, sort, sortDir]);
+  }, [search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, collection, sort, sortDir]);
 
   const mostrados = useMemo(
     () => visible.slice(0, pagina * POR_PAGINA),
@@ -183,14 +197,24 @@ export function LibraryGrid({
     Boolean(pegi) ||
     Boolean(dificultad) ||
     Boolean(horas) ||
+    Boolean(acquisitionFormat) ||
+    porAmortizar ||
     Boolean(collection);
 
   // Cuántos de los filtros "secundarios" (los que se esconden detrás de "Más
   // filtros") están puestos — para el aviso en el propio botón: no hace
   // falta abrir el panel para saber que hay algo filtrando ahí dentro.
-  const filtrosSecundariosActivos = [collection, publisher, genre, pegi, dificultad, horas, agrupar].filter(
-    Boolean,
-  ).length;
+  const filtrosSecundariosActivos = [
+    collection,
+    publisher,
+    genre,
+    pegi,
+    dificultad,
+    horas,
+    acquisitionFormat,
+    porAmortizar,
+    agrupar,
+  ].filter(Boolean).length;
 
   const renderGame = (game: Game) => {
     if (view === "grid") {
@@ -442,6 +466,8 @@ export function LibraryGrid({
                   setPegi("");
                   setDificultad(0);
                   setHoras("");
+                  setAcquisitionFormat("");
+                  setPorAmortizar(false);
                   setSearch("");
                   setAgrupar(false);
                 }}
@@ -543,6 +569,43 @@ export function LibraryGrid({
               className="w-full"
             />
           )}
+
+          {/* "En mi estantería" (físico), "de suscripción" (PS Plus/Game
+              Pass) — mismo dato (`acquisitionFormat`), un único desplegable
+              en vez de dos filtros sueltos: nadie tiene tantos formatos
+              distintos a la vez como para que hagan falta chips aparte. */}
+          {facets.acquisitionFormats.length > 1 && (
+            <Dropdown
+              value={acquisitionFormat}
+              onChange={(v) => setAcquisitionFormat(v as NonNullable<Game["acquisitionFormat"]> | "")}
+              placeholder="Cualquier formato"
+              options={[
+                { value: "", label: "Cualquier formato" },
+                ...facets.acquisitionFormats.map((f) => ({
+                  value: f.value,
+                  label: LABEL_ADQUISICION[f.value] ?? f.value,
+                  count: f.count,
+                })),
+              ]}
+              className="w-full"
+            />
+          )}
+
+          {/* "Por amortizar": mismo umbral (>5€/hora) y mismos dos
+              requisitos (precio Y horas puestos) que `costePorHora` en
+              Estadísticas — un botón, no un desplegable, porque es
+              sí/no, no una categoría. */}
+          <button
+            onClick={() => setPorAmortizar((v) => !v)}
+            className="col-span-1 rounded-[10px] px-4 py-2 text-[0.8125rem] font-semibold transition-colors"
+            style={
+              porAmortizar
+                ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
+                : { ...FIELD, color: "var(--muted)" }
+            }
+          >
+            Por amortizar (&gt;5€/h)
+          </button>
 
           {/* Agrupar por empresa: es un modo de visualización, no un filtro
               que reduzca resultados, pero vive aquí dentro porque solo

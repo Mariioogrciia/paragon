@@ -185,6 +185,10 @@ export interface LibraryFilters {
   /** Nivel de dificultad estimada (lib/difficulty.ts), 1 (regalado) a 10 (brutal). */
   dificultad?: Dificultad["nivel"];
   horas?: HorasBucket;
+  /** De dónde lo tienes (`Game.acquisitionFormat`) — solo lo que el usuario haya rellenado a mano. */
+  acquisitionFormat?: NonNullable<Game["acquisitionFormat"]>;
+  /** Más de 5€/hora jugada — mismo umbral que sugería la idea, solo con juegos que tienen precio Y horas puestos (ver `costePorHora` en lib/backlog.ts, mismo criterio). */
+  porAmortizar?: boolean;
   sort?: SortKey;
   sortDir?: "asc" | "desc";
 }
@@ -295,6 +299,17 @@ export function filterGames(games: Game[], filters: LibraryFilters): Game[] {
 
     if (filters.horas && !enTramoDeHoras(game, filters.horas)) return false;
 
+    if (filters.acquisitionFormat && game.acquisitionFormat !== filters.acquisitionFormat) return false;
+
+    if (filters.porAmortizar) {
+      // Mismos dos requisitos que `costePorHora` (lib/backlog.ts) — sin
+      // precio Y horas puestos, el juego no entra ni a favor ni en contra,
+      // no se adivina si está "por amortizar" con datos que no hay.
+      if (game.pricePaid == null || !game.playtimeMinutes || game.playtimeMinutes <= 0) return false;
+      const costeHora = game.pricePaid / (game.playtimeMinutes / 60);
+      if (costeHora <= 5) return false;
+    }
+
     return true;
   });
 
@@ -383,6 +398,8 @@ export function libraryFacets(games: Game[]): {
   dificultades: DificultadFacet[];
   /** Solo los tramos de horas que de verdad tiene algún juego. */
   horas: HorasFacet[];
+  /** Solo los formatos de adquisición (`Game.acquisitionFormat`) que de verdad tiene algún juego — casi nadie rellena los seis. */
+  acquisitionFormats: Facet[];
 } {
   const tally = (values: (string | null | undefined)[]) => {
     const map = new Map<string, number>();
@@ -432,6 +449,7 @@ export function libraryFacets(games: Game[]): {
     pegis,
     dificultades: [...dificultadesMap.values()].sort((a, b) => a.nivel - b.nivel),
     horas,
+    acquisitionFormats: tally(games.filter((g) => !g.isWishlist).map((g) => g.acquisitionFormat)),
   };
 }
 
