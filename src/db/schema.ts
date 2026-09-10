@@ -75,14 +75,11 @@ export const users = pgTable("user", {
    */
   profileSectionOrder: jsonb("profileSectionOrder").$type<string[]>(),
 
-  /**
-   * URL del webhook de Discord — SUSTITUIDO por el bot (ver
-   * lib/discordBot.ts): un DM del bot no necesita que nadie cree ni pegue
-   * una URL, solo que haya iniciado sesión con Discord. Columna e
-   * historial se dejan tal cual por si alguien la tenía puesta, pero ya no
-   * la lee ni la escribe ningún código nuevo.
-   */
-  discordWebhookUrl: text("discordWebhookUrl"),
+  // `discordWebhookUrl` (sustituida por el bot, lib/discordBot.ts) se quitó
+  // de verdad el 10 de septiembre de 2026 — ningún código la leía ni la
+  // escribía ya, confirmado con el usuario antes de borrarla pese a que
+  // una cuenta real la tenía puesta (su URL antigua, inútil desde que
+  // existe el bot).
   /**
    * Avisos de trofeos por DM del bot de Discord de Paragon — opt-in
    * (`false` por defecto: mandar un DM sin que lo hayan pedido sería
@@ -612,46 +609,15 @@ export const userBadges = pgTable(
  * entrar a mirarlo.                                                  *
  * ------------------------------------------------------------------ */
 
-export const notifications = pgTable(
-  "notification",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    userId: text("userId")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: text("type")
-      .$type<
-        | "platino_cerca"
-        | "lanzamiento"
-        | "amigo_adelanta"
-        | "logros_nuevos"
-        | "abandonado"
-        | "resumen_semanal"
-      >()
-      .notNull(),
-    title: text("title").notNull(),
-    body: text("body"),
-    /** A dónde lleva al pulsarlo. */
-    href: text("href"),
-    /**
-     * Sin clave foránea a propósito: un aviso sobre un juego que luego
-     * desaparece del catálogo sigue teniendo sentido como texto, y no quiero
-     * que borrar un juego se lleve por delante el historial de avisos.
-     */
-    gameId: text("gameId"),
-    /**
-     * Lo que impide repetir el mismo aviso en cada pasada del cron. El índice
-     * único de abajo hace el trabajo: se inserta con onConflictDoNothing y
-     * listo, sin tener que consultar antes.
-     */
-    dedupeKey: text("dedupeKey").notNull(),
-    readAt: timestamp("readAt", { mode: "date" }),
-    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
-  },
-  (n) => [uniqueIndex("notification_dedupe_idx").on(n.userId, n.dedupeKey)],
-);
+/*
+ * La tabla `notification` (y lib/notifications.ts) se quitaron de verdad
+ * el 10 de septiembre de 2026, en el repaso de limpieza — llevaban desde
+ * el 9 de septiembre huérfanas (la campana que las leía se quitó del
+ * todo esa sesión), y esta vez sí con confirmación explícita del usuario
+ * tras comprobar que había 8 filas reales (congeladas ahora en
+ * `AVISOS_CONGELADOS`, lib/admin.ts) y no una tabla vacía. Ver
+ * scripts/borrar-notification-y-webhook.mts para el DROP real.
+ */
 
 /* ------------------------------------------------------------------ *
  * Dificultad votada por la comunidad                                 *

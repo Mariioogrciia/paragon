@@ -4,13 +4,22 @@ import { db } from "@/db";
 import {
   activities,
   games,
-  notifications,
   platformAccounts,
   syncRuns,
   userBadges,
   userGames,
   users,
 } from "@/db/schema";
+
+/**
+ * "Avisos generados": congelado a mano en 8 (0 en los últimos 7 días) —
+ * eran los del sistema de campana que se quitó del todo (ver HANDOFF.md,
+ * sesión del 9 de septiembre de 2026). La tabla `notification` se borró
+ * en el repaso de limpieza del 10 de septiembre: ya no hay de dónde
+ * volver a contar esto, así que se congela en el número real que tenía
+ * en ese momento en vez de fingir que sigue habiendo datos que contar.
+ */
+const AVISOS_CONGELADOS = { total: 8, ultimos7: 0 };
 
 /**
  * Datos para `/admin` — la única pantalla que ve solo quien hace Paragon
@@ -51,13 +60,6 @@ export async function getAdminOverview(): Promise<AdminOverview> {
     .select({ n: sql<number>`coalesce(sum(${userGames.earnedTotal}), 0)` })
     .from(userGames);
 
-  const [avisosRow] = await db
-    .select({
-      total: sql<number>`count(*)`,
-      ultimos7: sql<number>`count(*) filter (where ${notifications.createdAt} >= now() - interval '7 days')`,
-    })
-    .from(notifications);
-
   const [usuariosNuevosRow] = await db
     .select({ n: sql<number>`count(*) filter (where ${users.createdAt} >= now() - interval '7 days')` })
     .from(users);
@@ -68,8 +70,8 @@ export async function getAdminOverview(): Promise<AdminOverview> {
     juegosEnCatalogo: Number(catalogoRow?.total ?? 0),
     juegosConPegi: Number(catalogoRow?.conPegi ?? 0),
     trofeosRegistrados: Number(trofeosRow?.n ?? 0),
-    avisosGenerados: Number(avisosRow?.total ?? 0),
-    avisosUltimos7Dias: Number(avisosRow?.ultimos7 ?? 0),
+    avisosGenerados: AVISOS_CONGELADOS.total,
+    avisosUltimos7Dias: AVISOS_CONGELADOS.ultimos7,
     usuariosNuevosUltimos7Dias: Number(usuariosNuevosRow?.n ?? 0),
   };
 }
