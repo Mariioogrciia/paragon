@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import nacl from "tweetnacl";
 import { usuarioParagonDeDiscord, setAnnounceChannel, anadirNotaJuego } from "@/lib/discordBot";
 import { getLibrary, getGameDetail, getProfileByUserId } from "@/lib/profiles";
@@ -15,16 +15,31 @@ import type { Game } from "@/lib/types";
 
 /**
  * Endpoint de "Interactions" del bot de Discord — comandos de barra
- * (`/platinosalalcance`, `/hoy`, `/perfil`, `/verguenza`, `/racha`).
- * Configúralo en el Developer Portal → tu aplicación → General Information
- * → "Interactions Endpoint URL" = https://tu-dominio/api/discord/interactions.
- * Discord manda un PING de prueba a esa URL nada más guardarla; si no
- * responde bien, ni deja guardar el campo.
+ * (`/platinosalalcance`, `/hoy`, `/perfil`, `/verguenza`, `/racha`, `/juego`,
+ * `/nota`, `/ruleta`, `/anunciosaqui`, `/help`). Configúralo en el Developer
+ * Portal → tu aplicación → General Information → "Interactions Endpoint
+ * URL" = https://tu-dominio/api/discord/interactions. Discord manda un PING
+ * de prueba a esa URL nada más guardarla; si no responde bien, ni deja
+ * guardarlo.
  *
  * Nada de gateway ni conexión persistente: los comandos de barra son HTTP
  * puro, encajan tal cual en una ruta serverless — mismo modelo que ya usa
  * el resto de la app.
+ *
+ * RESPUESTA DIFERIDA — bug real encontrado en producción (10 sept 2026,
+ * "La aplicación no ha respondido" en /perfil): Discord exige una
+ * respuesta a la interacción en menos de 3 segundos. Antes de este cambio
+ * se calculaba TODO (varias consultas a la base, a veces un sync en vivo
+ * contra PSN/Steam en `/juego`) antes de devolver nada — con un arranque
+ * en frío de Vercel eso pasa de 3s fácilmente, y Discord lo enseña como
+ * "no ha respondido" aunque el cálculo hubiera terminado bien un segundo
+ * después. Ahora se responde SIEMPRE al momento con tipo 5 (differed) y el
+ * cálculo de verdad corre en `after()` (node_modules/next/dist/docs/…
+ * /after.md — funciona en Vercel de fábrica, usa su `waitUntil`), editando
+ * la respuesta ya enviada vía el webhook de la propia interacción cuando
+ * termina. `maxDuration` más abajo le da margen de sobra a ese trabajo.
  */
+export const maxDuration = 30;
 
 // Tipos mínimos de la petición de Discord — solo los campos que se usan,
 // no el esquema entero de su API.
@@ -32,6 +47,7 @@ interface DiscordInteraction {
   type: number;
   guild_id?: string;
   channel_id?: string;
+  token: string;
   member?: { user?: { id: string } };
   user?: { id: string };
   data?: {
@@ -41,21 +57,37 @@ interface DiscordInteraction {
 }
 
 const InteractionType = { PING: 1, APPLICATION_COMMAND: 2 } as const;
-const ResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4 } as const;
+const ResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4, DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5 } as const;
+const EPHEMERAL = 1 << 6;
 
 const SIN_VINCULAR = "Tu cuenta de Discord no está vinculada a ninguna cuenta de Paragon — inicia sesión en Paragon con este mismo Discord primero.";
 
-/** Mensaje público — lo ve todo el canal. Solo para /perfil: presumir de estadísticas SÍ tiene sentido delante de los demás, a diferencia del backlog o la vergüenza de cada uno. */
-function mensajePublico(contenido: string) {
-  return NextResponse.json({ type: ResponseType.CHANNEL_MESSAGE_WITH_SOURCE, data: { content: contenido } });
+/** Solo el CONTENIDO — quién ve el mensaje (público/efímero) ya se decidió al diferir, no aquí. */
+function mensaje(content: string): { content: string } {
+  return { content };
 }
 
-/** Mensaje efímero (solo lo ve quien escribió el comando) — no tiene sentido spamear el canal con el backlog de otra persona. */
-function mensaje(contenido: string) {
-  return NextResponse.json({
-    type: ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-    data: { content: contenido, flags: 1 << 6 /* EPHEMERAL */ },
-  });
+/**
+ * Edita la respuesta diferida cuando ya se sabe el contenido real — el
+ * token de la interacción hace de autenticación por sí solo en este
+ * endpoint concreto de Discord, no hace falta el token del bot.
+ */
+async function editarRespuestaDiferida(token: string, content: string): Promise<void> {
+  const applicationId = process.env.DISCORD_APPLICATION_ID;
+  if (!applicationId) {
+    console.error("[discord-interactions] Falta DISCORD_APPLICATION_ID — no se puede editar la respuesta diferida.");
+    return;
+  }
+  try {
+    const res = await fetch(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    if (!res.ok) console.error("[discord-interactions] Discord devolvió", res.status, "editando la respuesta diferida:", await res.text());
+  } catch (error) {
+    console.error("[discord-interactions] fallo editando la respuesta diferida", error);
+  }
 }
 
 /** Quita acentos/símbolos para comparar títulos escritos a mano ("elden ring" debe encontrar "Elden Ring"). */
@@ -222,7 +254,7 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   if (hitos.primerPlatino) lineas.push(`🥇 Primer platino: ${hitos.primerPlatino.titulo}`);
   if (hitos.trofeoMasRaro) lineas.push(`💎 Trofeo más raro: ${hitos.trofeoMasRaro.nombre} (${hitos.trofeoMasRaro.rarityPercent.toFixed(1)}%)`);
 
-  return mensajePublico(lineas.join("\n"));
+  return mensaje(lineas.join("\n"));
 }
 
 function comandoHelp() {
@@ -281,6 +313,57 @@ function usuarioMencionado(interaction: DiscordInteraction): string | null {
   return typeof valor === "string" ? valor : null;
 }
 
+/**
+ * Todo el cálculo de verdad de un comando — vive aparte de `POST` porque
+ * esto es justo lo que corre DENTRO de `after()`, después de haber
+ * contestado ya a Discord con la respuesta diferida. Devuelve el texto
+ * final, nunca un `NextResponse` (eso ya se mandó).
+ */
+async function calcularRespuesta(interaction: DiscordInteraction, discordUserId: string): Promise<{ content: string }> {
+  const nombre = interaction.data!.name;
+  switch (nombre) {
+    case "platinosalalcance":
+      return await comandoPlatinosAlAlcance(discordUserId);
+    case "hoy": {
+      const minutos = interaction.data!.options?.find((o) => o.name === "minutos")?.value;
+      const generoOpt = interaction.data!.options?.find((o) => o.name === "genero")?.value;
+      const genero = typeof generoOpt === "string" && CATEGORIAS_GENERO.some((c) => c.key === generoOpt) ? (generoOpt as CategoriaDna) : undefined;
+      return await comandoHoy(discordUserId, typeof minutos === "number" ? minutos : 60, genero);
+    }
+    case "perfil":
+      return await comandoPerfil(discordUserId, usuarioMencionado(interaction));
+    case "verguenza":
+      return await comandoVerguenza(discordUserId);
+    case "racha":
+      return await comandoRacha(discordUserId);
+    case "juego": {
+      const titulo = interaction.data!.options?.find((o) => o.name === "titulo")?.value;
+      if (typeof titulo !== "string" || !titulo.trim()) return mensaje("Dime qué juego — por ejemplo `/juego Elden Ring`.");
+      return await comandoJuego(discordUserId, titulo);
+    }
+    case "nota": {
+      const titulo = interaction.data!.options?.find((o) => o.name === "titulo")?.value;
+      const texto = interaction.data!.options?.find((o) => o.name === "texto")?.value;
+      if (typeof titulo !== "string" || !titulo.trim() || typeof texto !== "string" || !texto.trim()) {
+        return mensaje("Hace falta el título del juego y el texto de la nota.");
+      }
+      return await comandoNota(discordUserId, titulo, texto);
+    }
+    case "ruleta": {
+      const minutos = interaction.data!.options?.find((o) => o.name === "minutos")?.value;
+      const generoOpt = interaction.data!.options?.find((o) => o.name === "genero")?.value;
+      const genero = typeof generoOpt === "string" && CATEGORIAS_GENERO.some((c) => c.key === generoOpt) ? (generoOpt as CategoriaDna) : undefined;
+      return await comandoRuleta(discordUserId, typeof minutos === "number" ? minutos : 60, genero);
+    }
+    case "anunciosaqui":
+      return await comandoAnunciosAqui(interaction.guild_id ?? null, interaction.channel_id ?? null, discordUserId);
+    case "help":
+      return comandoHelp();
+    default:
+      return mensaje("Comando no reconocido.");
+  }
+}
+
 export async function POST(request: Request) {
   const publicKey = process.env.DISCORD_PUBLIC_KEY;
   if (!publicKey) {
@@ -313,52 +396,39 @@ export async function POST(request: Request) {
   if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.data) {
     // En un servidor el autor va en `member.user`; en un DM al bot, en `user` a secas.
     const discordUserId = interaction.member?.user?.id ?? interaction.user?.id;
-    if (!discordUserId) return mensaje("No he podido saber quién eres.");
-
-    try {
-      switch (interaction.data.name) {
-        case "platinosalalcance":
-          return await comandoPlatinosAlAlcance(discordUserId);
-        case "hoy": {
-          const minutos = interaction.data.options?.find((o) => o.name === "minutos")?.value;
-          const generoOpt = interaction.data.options?.find((o) => o.name === "genero")?.value;
-          const genero = typeof generoOpt === "string" && CATEGORIAS_GENERO.some((c) => c.key === generoOpt) ? (generoOpt as CategoriaDna) : undefined;
-          return await comandoHoy(discordUserId, typeof minutos === "number" ? minutos : 60, genero);
-        }
-        case "perfil":
-          return await comandoPerfil(discordUserId, usuarioMencionado(interaction));
-        case "verguenza":
-          return await comandoVerguenza(discordUserId);
-        case "racha":
-          return await comandoRacha(discordUserId);
-        case "juego": {
-          const titulo = interaction.data.options?.find((o) => o.name === "titulo")?.value;
-          if (typeof titulo !== "string" || !titulo.trim()) return mensaje("Dime qué juego — por ejemplo `/juego Elden Ring`.");
-          return await comandoJuego(discordUserId, titulo);
-        }
-        case "nota": {
-          const titulo = interaction.data.options?.find((o) => o.name === "titulo")?.value;
-          const texto = interaction.data.options?.find((o) => o.name === "texto")?.value;
-          if (typeof titulo !== "string" || !titulo.trim() || typeof texto !== "string" || !texto.trim()) {
-            return mensaje("Hace falta el título del juego y el texto de la nota.");
-          }
-          return await comandoNota(discordUserId, titulo, texto);
-        }
-        case "ruleta": {
-          const minutos = interaction.data.options?.find((o) => o.name === "minutos")?.value;
-          const generoOpt = interaction.data.options?.find((o) => o.name === "genero")?.value;
-          const genero = typeof generoOpt === "string" && CATEGORIAS_GENERO.some((c) => c.key === generoOpt) ? (generoOpt as CategoriaDna) : undefined;
-          return await comandoRuleta(discordUserId, typeof minutos === "number" ? minutos : 60, genero);
-        }
-        case "anunciosaqui":
-          return await comandoAnunciosAqui(interaction.guild_id ?? null, interaction.channel_id ?? null, discordUserId);
-        case "help":
-          return comandoHelp();
-      }
-    } catch (error) {
-      console.error("[discord-interactions]", interaction.data.name, error);
-      return mensaje("Algo falló consultando tu biblioteca — inténtalo de nuevo en un momento.");
+    // Caso instantáneo, sin ir a la base — se contesta directo, sin diferir.
+    if (!discordUserId) {
+      return NextResponse.json({
+        type: ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: { content: "No he podido saber quién eres.", flags: EPHEMERAL },
+      });
     }
+
+    // Único comando público — presumir de estadísticas en /perfil SÍ tiene
+    // sentido delante del canal, a diferencia del backlog o la vergüenza
+    // de cada uno (todo lo demás es efímero).
+    const esPublico = interaction.data.name === "perfil";
+    const { token } = interaction;
+
+    // El cálculo de verdad (consultas a la base, a veces un sync en vivo)
+    // corre DESPUÉS de haber contestado ya — ver el aviso grande de arriba
+    // del archivo sobre por qué (bug real de "La aplicación no ha
+    // respondido" en producción).
+    after(async () => {
+      let contenido: string;
+      try {
+        contenido = (await calcularRespuesta(interaction, discordUserId)).content;
+      } catch (error) {
+        console.error("[discord-interactions]", interaction.data!.name, error);
+        contenido = "Algo falló consultando tu biblioteca — inténtalo de nuevo en un momento.";
+      }
+      await editarRespuestaDiferida(token, contenido);
+    });
+
+    return NextResponse.json({
+      type: ResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+      data: esPublico ? {} : { flags: EPHEMERAL },
+    });
   }
 
   return NextResponse.json({ error: "Comando no reconocido." }, { status: 400 });
