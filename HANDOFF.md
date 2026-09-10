@@ -7,6 +7,43 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 9) — repaso de saturación, y quinta tanda de Antigravity (con dos ideas descartadas por duplicar)
+
+El usuario pidió explícitamente revisar dónde la app se estaba quedando
+saturada de botones/filtros. Encontrado y arreglado el peor caso: la
+lista de trofeos (`TrophyList.tsx`) podía juntar hasta 13 controles en
+una sola franja (8 chips de categoría + 2 de vista + 3 de modo) en un
+juego con variedad real. Separado en dos filas por PROPÓSITO —arriba
+categoría, abajo vista— sin quitar ninguna función, solo agrupando.
+Verificado en el navegador real.
+
+Antigravity mandó una quinta tanda (4 ideas). Dos solapaban con algo ya
+construido esta misma sesión — se lo dije al usuario ANTES de tocar
+nada, y confirmó seguir solo con las dos que no:
+
+- **"La Espina Clavada"** ≈ `platinosAlAlcance()` (ya existe) — NO
+  construida.
+- **"Rentabilidad de Caza" (XP/hora)** ≈ Coste por hora + Eficiencia de
+  caza (ya existen) — NO construida, habría sido el mismo tipo de
+  saturación que se acababa de pedir vigilar.
+- **Oráculo de Platino**: `ritmoSemanal()`/`prevision()` en
+  `lib/history.ts` — trofeos/semana de los últimos 90 días (dato real)
+  proyectado sobre lo que falta. Una línea suelta en Modo Enfoque, no
+  una tarjeta nueva — esa pantalla es deliberadamente austera.
+- **Filtro por Estado de Ánimo**: `lib/estadoAnimo.ts` — los mismos
+  géneros IGDB de siempre, reagrupados por sensación. Su PROPIA sección
+  en el Planificador, a propósito NO otra fila en el filtro ya cargado
+  de la Biblioteca.
+
+Verificado contra datos reales (scripts sueltos): ritmo real ~11
+trofeos/semana; los 4 estados de ánimo dan resultados no vacíos (24-145
+juegos) contra la biblioteca real. `tsc`/`eslint`/`next build` limpios.
+
+**Sigue habiendo commits sin push** desde el Cerrojo de Hitos en
+adelante — pendiente de que el usuario lo pida.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación 8) — push de las 18 primeras, Cerrojo de Hitos, cuarta tanda de Antigravity
 
 **Push hecho**: las 18 commits acumuladas de las continuaciones 4-7 (bot,
