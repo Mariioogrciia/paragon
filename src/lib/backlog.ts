@@ -85,3 +85,31 @@ export function costePorHora(games: Game[]): CosteHora[] {
     })
     .sort((a, b) => a.costeHora - b.costeHora);
 }
+
+export interface ResumenFinanciero {
+  totalGastado: number;
+  totalHoras: number;
+  costeHoraMedio: number | null;
+  juegosConDatos: number;
+}
+
+/**
+ * El panel financiero de conjunto: cuánto has invertido en total y qué
+ * €/hora te ha salido de media — solo cuenta con juegos que tienen los dos
+ * datos puestos (precio Y horas), igual que `costePorHora`. Si nadie ha
+ * rellenado nada todavía, `costeHoraMedio` es `null` en vez de un 0 o un
+ * Infinity que no significan nada.
+ */
+export function resumenFinanciero(games: Game[]): ResumenFinanciero {
+  const conDatos = games.filter((g) => !g.isWishlist && g.pricePaid != null && g.playtimeMinutes && g.playtimeMinutes > 0);
+
+  const totalGastado = conDatos.reduce((acc, g) => acc + g.pricePaid!, 0);
+  const totalHoras = conDatos.reduce((acc, g) => acc + g.playtimeMinutes! / 60, 0);
+
+  return {
+    totalGastado,
+    totalHoras,
+    costeHoraMedio: totalHoras > 0 ? totalGastado / totalHoras : null,
+    juegosConDatos: conDatos.length,
+  };
+}

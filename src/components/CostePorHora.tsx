@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CosteHora } from "@/lib/backlog";
+import type { CosteHora, ResumenFinanciero } from "@/lib/backlog";
 
 function Fila({ g }: { g: CosteHora }) {
   return (
@@ -24,14 +24,35 @@ function Fila({ g }: { g: CosteHora }) {
  * Enseña los mejores y los peores, no la lista entera: es una curiosidad,
  * no una tabla que consultar a fondo.
  */
-export function CostePorHora({ juegos }: { juegos: CosteHora[] }) {
+export function CostePorHora({ juegos, resumen }: { juegos: CosteHora[]; resumen: ResumenFinanciero }) {
   if (juegos.length === 0) return null;
 
   const mejores = juegos.slice(0, 3);
   const peores = juegos.length > 3 ? [...juegos].reverse().slice(0, 3) : [];
 
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div>
+      {/* El panel de conjunto — cuánto has metido en total y qué €/hora te
+          ha salido de media, no solo el mejor/peor caso suelto de abajo. */}
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl p-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="text-[0.6875rem] font-bold uppercase tracking-widest text-muted">Invertido</p>
+          <p className="font-heading text-2xl font-bold">{resumen.totalGastado.toFixed(2)}€</p>
+        </div>
+        <div className="rounded-xl p-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="text-[0.6875rem] font-bold uppercase tracking-widest text-muted">Horas obtenidas</p>
+          <p className="font-heading text-2xl font-bold">{Math.round(resumen.totalHoras)}h</p>
+        </div>
+        <div className="rounded-xl p-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+          <p className="text-[0.6875rem] font-bold uppercase tracking-widest text-muted">€/hora de media</p>
+          <p className="font-heading text-2xl font-bold">{resumen.costeHoraMedio != null ? `${resumen.costeHoraMedio.toFixed(2)}€` : "—"}</p>
+        </div>
+      </div>
+      <p className="mb-4 text-xs text-muted">
+        Con {resumen.juegosConDatos} {resumen.juegosConDatos === 1 ? "juego" : "juegos"} con precio y horas puestos — cuantos más rellenes, más real será esta cifra.
+      </p>
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-muted">Mejor amortizados</h3>
         <div className="flex flex-col gap-2">
@@ -46,6 +67,7 @@ export function CostePorHora({ juegos }: { juegos: CosteHora[] }) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

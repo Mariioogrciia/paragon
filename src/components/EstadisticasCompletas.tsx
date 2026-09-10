@@ -9,7 +9,7 @@ import { HourlyHeatmap } from "@/components/HourlyHeatmap";
 import { HistoricalTimeline } from "@/components/HistoricalTimeline";
 import { PlatinosAlAlcance } from "@/components/PlatinosAlAlcance";
 import { SalonDeLaVerguenza } from "@/components/SalonDeLaVerguenza";
-import { platinosAlAlcance, salonDeLaVerguenza, costePorHora } from "@/lib/backlog";
+import { platinosAlAlcance, salonDeLaVerguenza, costePorHora, resumenFinanciero } from "@/lib/backlog";
 import { CostePorHora } from "@/components/CostePorHora";
 import { TrophyDnaRadar } from "@/components/TrophyDnaRadar";
 import { calcularTrophyDna } from "@/lib/trophyDna";
@@ -20,6 +20,8 @@ import { PlaytimeComparison } from "@/components/PlaytimeComparison";
 import { FriendsLeaderboard } from "@/components/FriendsLeaderboard";
 import { ParagonScoreCard } from "@/components/ParagonScoreCard";
 import { getParagonScore } from "@/lib/paragonScore";
+import { getParagonLevel } from "@/lib/paragonLevel";
+import { CalculadoraNivel } from "@/components/CalculadoraNivel";
 
 /**
  * El cuerpo de las estadísticas completas de un perfil: heatmap de
@@ -56,6 +58,8 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
     hitosHistoricos(profile.userId),
   ]);
 
+  const nivelParagon = esMio ? await getParagonLevel(profile.userId) : null;
+
   // "Últimas sesiones" no es un dato que exista — ni PSN ni Steam dan un
   // registro de sesiones, solo la última vez que se tocó cada juego
   // (`lastPlayedAt`). Esto es lo más cerca que hay de verdad: los juegos
@@ -70,11 +74,18 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
   const alcanzables = esMio ? platinosAlAlcance(biblioteca) : [];
   const verguenza = esMio ? salonDeLaVerguenza(biblioteca) : [];
   const costes = esMio ? costePorHora(biblioteca) : [];
+  const finanzas = esMio ? resumenFinanciero(biblioteca) : null;
   const dna = calcularTrophyDna(biblioteca);
 
   return (
     <div>
       <ParagonScoreCard score={paragonScore} />
+
+      {esMio && nivelParagon && (
+        <div className="mb-8">
+          <CalculadoraNivel nivelActual={nivelParagon.level} xpActual={nivelParagon.xp} />
+        </div>
+      )}
 
       <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
         <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">Trophy DNA</h2>
@@ -132,7 +143,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
         <section className="mb-8">
           <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Coste por hora</h2>
           <p className="mb-4 text-sm text-muted">Solo cuenta con lo que has puesto tú a mano en cada ficha — precio pagado y horas jugadas.</p>
-          <CostePorHora juegos={costes} />
+          <CostePorHora juegos={costes} resumen={finanzas!} />
         </section>
       )}
 
