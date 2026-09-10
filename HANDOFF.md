@@ -7,6 +7,113 @@ aviso de qué tocó él).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 4) — valorada la propuesta grande de Antigravity, y construido lo viable de tres bloques
+
+El usuario pegó dos tandas de ideas de Antigravity: una lista de 4 bloques
+(Descubrir/Noticias/Bot/General) y luego una reestructuración de IA mucho
+más grande (12 subrutas: `/descubrir/playstation/*`, `/steam/*`, `/xbox/*`,
+`/noticias/*`). Pidió primero SOLO el análisis de viabilidad (no construir
+nada), luego "adelante" con lo valorado. Se le preguntó explícitamente
+cómo encajar la IA grande y respondió: **solo lo viable, como secciones
+dentro de las páginas que ya existen, sin crear `/descubrir/playstation`,
+`/steam`, `/xbox` ni `/noticias/*` todavía** — la mitad de esas 12
+subpáginas dependían de fuentes que no existen (Leaving Soon de PS
+Plus/Game Pass, cierre de servidores, "perfect games" sin logros rotos,
+clásicos con trofeos añadidos) y se habrían quedado vacías o con
+"próximamente".
+
+**IMPORTANTE, pedido explícitamente por el usuario: NO HACER PUSH hasta
+que él lo diga** — vale para todo lo de esta continuación y lo que salga
+después mientras siga sin decirlo. Todo está commiteado en local, nada
+en el remoto.
+
+### Lo construido, en orden (el usuario se fue AFK y dijo "sigue como creas más óptimo")
+
+**1. Bot de Discord: `/juego`, `/nota`, `/ruleta`** — reutilizan cálculos
+que ya existían, cero dato nuevo:
+- `/juego <título>`: ficha rápida (HLTB, dificultad estimada, perdibles,
+  tu progreso, enlace a Paragon) buscando por título normalizado en tu
+  biblioteca — `getGameDetail` + `dificultadDeJuego` + `isMissable`, todo
+  ya calculado para la web.
+- `/nota <título> <texto>`: añade (no sustituye) a `userGames.notes` desde
+  Discord — `anadirNotaJuego()` nuevo en `lib/discordBot.ts`, mismo campo
+  que `saveGameNotesAction` de la web pero sin sesión.
+- `/ruleta [minutos] [genero]`: elige UN juego al azar del mismo pool que
+  ya calcula `sugerirPorTiempo()` (el motor de `/hoy`).
+- `/meta` (objetivos del mes) y el DM "empujón final" se dejaron FUERA a
+  propósito: el primero necesita columna nueva (no sumar otra migración
+  sin decidirla contigo) y el segundo necesita su propio flag de opt-in
+  como `discordDmEnabled`, decisión de producto que no me correspondía
+  tomar sola.
+- Falta correr `npx tsx scripts/registrar-comandos-discord.mts` para
+  darlos de alta en Discord — ya están en el script, sin ejecutar.
+
+**2. Descubrir → `/descubrir/recomendaciones`: afinidad, Platinos Relax,
+rescate de backlog** — las tres piezas del bloque Descubrir con dato real:
+- `calcularAfinidad()` (lib/trophyDna.ts): cruza géneros IGDB del juego
+  con tu Trophy DNA ya calculado (mismo 0-100 del radar). `null` (no 0%)
+  si no hay trofeos que crucen — nunca un "no te va a gustar" inventado.
+  Badge en las tres tiras de la página.
+- `getPlatinosRelax()` (lib/discover.ts): perdibles ≤1 + HLTB <20h +
+  dificultad baja por rareza real del platino, SOLO PSN y solo con dato
+  ya comprobado en los tres frentes. Sin filtro de "sin online" — no hay
+  ningún campo real que lo distinga (ver `trophyType.ts`).
+- `rescateBiblioteca()` (lib/backlog.ts): juegos tuyos a 0%, cortos,
+  priorizando lo que ya pagas vía PS Plus/Game Pass. Sin el filtro de
+  "nota alta" de la idea original (pedía Metacritic, que no existe en el
+  proyecto).
+- **Bug real encontrado verificando la query de Platinos Relax contra la
+  base real** (no solo escrita y dada por buena): (a) al menos una fila
+  de `games.missableTrophies` en producción está guardada como STRING
+  (json doble-serializado) en vez de array — `jsonb_array_length` revienta
+  contra eso; tratado como "sin comprobar", no como "0 perdibles". (b)
+  comprobado en vivo que **Postgres no garantiza evaluar los operandos de
+  un `AND` en el orden escrito** — un `and jsonb_typeof(...)='array' and
+  jsonb_array_length(...)<=N` seguía reventando porque el planner no
+  respetaba el short-circuit; hizo falta un `CASE` que impida llamar a la
+  función salvo cuando ya se sabe que es un array. Los dos, documentados
+  en el comentario de la query (lib/discover.ts).
+- Hoy mismo la sección sale casi vacía en producción: solo 2 juegos PSN
+  tienen perdibles Y HLTB comprobados (se rellenan al visitar la ficha de
+  cada uno, no de golpe) — mismo caso ya documentado de "joyas ocultas"
+  con pocos usuarios reales. No es un bug, es esperable con este volumen.
+
+**3. Noticias: sección "de tus juegos"** — `noticiasDeTuBiblioteca()`
+(lib/rss.ts) cruza el feed de Eurogamer con tu biblioteca+Wishlist por
+PALABRA COMPLETA (`\b...\b`, no `includes`) y solo títulos >3 caracteres,
+para no dar falsos positivos con palabras cortas/genéricas ("Up", "It",
+"GTA") — mismo cuidado que ya se aplicó al descartar la heurística de
+subtítulo de PowerPyx. Verificado contra el feed real: acierta "Resident
+Evil 4", "Monster Hunter Wilds", "No Man's Sky", sin falsos positivos en
+la prueba. `getGamingNews()` ahora acepta un límite — la sección nueva
+busca en un pool de 40, no solo en las 12 que se enseñan abajo.
+
+### Verificación real de esta continuación
+
+`tsc --noEmit`, `eslint` y `next build` completo limpios tras cada pieza
+(no solo al final). La query SQL de Platinos Relax se probó A MANO contra
+la base real con `postgres` suelto (mismo patrón que `scripts/*.mts`,
+scripts borrados después de usarlos) — así se encontraron los dos bugs de
+arriba, que `tsc`/`eslint`/build nunca habrían pillado. El matcher de
+noticias se probó contra el feed real de Eurogamer, no solo con datos
+inventados. **No verificado en el navegador con sesión real** — la página
+de recomendaciones exige login y no hay credenciales que usar desde aquí
+(entrar con las credenciales del usuario está fuera de lo que puedo hacer
+sin que él lo autorice explícitamente), así que la UI en sí (colocación
+de badges, que el carrusel no se rompa visualmente) queda pendiente de
+que el usuario la mire con su cuenta real.
+
+### Pendiente de esta misma tanda, para quien retome esto
+
+- `/meta`, DM "empujón final" (bot) — necesitan decisión de producto del
+  usuario (columna nueva / flag de opt-in), ver arriba.
+- Modo "Temporada/Mes de Caza" y atajos PWA (bloque General) — no
+  empezados todavía.
+- El resto del bloque Noticias (alertas de cierre de servicio, radar de
+  servidores) sigue descartado por falta de fuente real, ya documentado.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación 3) — mi propio error de verdad con PS Plus, Xbox con más chicha, comandos nuevos del bot
 
 ### El error real: PS Plus miraba el blog en inglés equivocado
