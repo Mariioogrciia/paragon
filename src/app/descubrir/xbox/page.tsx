@@ -9,6 +9,9 @@ import { CardCarousel } from "@/components/CardCarousel";
 import { RankedList } from "@/components/RankedList";
 import { PosterCard } from "@/components/PosterCard";
 import { trendingOnPlatform, mostPlayedOnPlatform, recommendationsOnPlatform } from "@/lib/platformHub";
+import { getXboxGamePassNuevos } from "@/lib/xboxGamePass";
+import { GameGrid } from "@/components/GameGrid";
+import { relativeDate } from "@/lib/design";
 
 export const metadata = {
   title: "Xbox · Descubrir · Paragon",
@@ -27,11 +30,12 @@ export default async function DescubrirXboxPage() {
   const session = await auth();
   const userId = session?.user?.id;
 
-  const [noticias, tendencia, masJugados, recomendados] = await Promise.all([
+  const [noticias, tendencia, masJugados, recomendados, gamePass] = await Promise.all([
     getXboxNews(),
     trendingOnPlatform("xbox"),
     mostPlayedOnPlatform("xbox"),
     recommendationsOnPlatform(userId ?? null, "xbox"),
+    getXboxGamePassNuevos(),
   ]);
 
   return (
@@ -93,12 +97,34 @@ export default async function DescubrirXboxPage() {
         </section>
       )}
 
+      {gamePass && gamePass.juegos.length > 0 && (
+        <section className="mb-10">
+          <div className="mb-1 flex flex-wrap items-baseline gap-3">
+            <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Recién llegados a Xbox Game Pass</h2>
+            <a href={gamePass.link} target="_blank" rel="noopener noreferrer nofollow" className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline">
+              Ver el anuncio →
+            </a>
+          </div>
+          {/* Microsoft publica varias tandas al mes, no una sola como PS
+              Plus — esto es "lo último añadido", no "el catálogo del mes",
+              y se dice así para no dar a entender que es un resumen
+              mensual cuando no lo es. */}
+          <p className="mb-4 text-[0.8125rem] text-muted">
+            La última tanda que ha anunciado Xbox {gamePass.fecha ? `(${relativeDate(gamePass.fecha)})` : ""} — Game Pass añade juegos varias veces al mes, esto no es el catálogo entero.
+          </p>
+          <GameGrid items={gamePass.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
+            {(g) => <PosterCard game={{ ...g, genres: [] }} fluid />}
+          </GameGrid>
+        </section>
+      )}
+
       {noticias.length > 0 ? (
         <NewsFeed titulo="Noticias de Xbox" badge="Xbox Wire" items={noticias} />
       ) : (
         recomendados.length === 0 &&
         tendencia.length === 0 &&
-        masJugados.length === 0 && (
+        masJugados.length === 0 &&
+        !gamePass && (
           <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
             No se han podido cargar las noticias ahora mismo. Prueba más tarde.
           </p>
