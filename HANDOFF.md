@@ -56,6 +56,58 @@ antes de que se pidiera aquí).
 
 ---
 
+## Sesión del 10 de septiembre de 2026 (continuación 7) — tercera tanda de Antigravity, y un bug real de verdad grave encontrado verificando
+
+Antigravity mandó una tercera lista (5 ideas). 4 viables sin esquema
+construidas, la 5ª (Cerrojo de Hitos, reservar el platino #25/#50/#100)
+se deja fuera — necesita columna nueva, mismo criterio que `/meta`.
+
+- **"Tal día como hoy"**: `talDiaComoHoy()` en `lib/history.ts` +
+  tarjeta en la portada (`TalDiaComoHoy.tsx`) — trofeos conseguidos el
+  mismo día/mes en años anteriores, en tu zona horaria.
+- **TrophyList.tsx**: "Ocultar conseguidos" y "Orden cronológico"
+  nuevos ("Solo perdibles" ya existía). De paso, arreglado un bug real
+  del mismo bloque: `groupList` (orden "Juego Base" primero) se
+  calculaba pero nunca se usaba en el render.
+- **LibraryGrid.tsx**: filtro "Por amortizar" (>5€/h) y desplegable de
+  formato de adquisición ("estantería"/"suscripción"), con faceta nueva
+  `acquisitionFormats` en `libraryFacets()`.
+- **Scratchpad OLED en Modo Enfoque**: botón + modal negro puro sobre
+  `FocusMode.tsx`, autoguardado con debounce sobre `saveGameNotesAction`
+  (mismo campo que `/nota` del bot), sin salir del modo ni apagar el
+  WakeLock.
+
+### ⚠️ Bug real GRAVE encontrado verificando en el navegador — NO era de esta sesión
+
+Probando "Ocultar conseguidos" sin sesión contra una ficha pública,
+Paragon expulsaba a `/entrar` al segundo de cargar. Causa: `AutoSyncHltb`
+(`HltbCard.tsx`) se montaba en `u/[handle]/[gameId]/page.tsx` **sin
+comprobar `esMio`** cuando `game.hltb` no estaba sincronizado (la
+mayoría de los casos — solo 2 juegos PSN lo tienen sincronizado hoy en
+producción) — y `syncHltbAction` llama a `requireUserId()`, que hace
+`redirect("/entrar")` sin sesión.
+
+**Impacto real, probablemente desde que existe esa función**: cualquier
+visitante SIN cuenta que mirase la ficha pública de casi cualquier
+juego (compartida por un amigo, un enlace, buscando en Google...) era
+expulsado a la pantalla de login sin poder ver nada. Un fallo así de
+grande en "ver un perfil público sin cuenta" — la función que hace que
+compartir Paragon tenga sentido — llevaba tiempo sin detectarse porque
+nadie lo prueba sin sesión iniciada normalmente.
+
+Arreglado con `esMio &&` antes de montar `AutoSyncHltb`, mismo guard que
+ya usaba `AutoSyncJuego` un poco más arriba en el mismo archivo — no
+hacía falta nada más nuevo, solo aplicar el patrón que ya existía.
+Verificado en el navegador: la redirección desaparece tras el fix
+(esperas de hasta 2s sin sesión, sin redirigir).
+
+**Aviso para quien retome esto**: mismo motivo de siempre — verificar
+de verdad en el navegador, no fiarse de que "compila y hace build
+limpio" sea suficiente. Este bug pasaba `tsc`/`eslint`/`next build` sin
+ningún aviso.
+
+---
+
 ## Sesión del 10 de septiembre de 2026 (continuación 5) — bug real en producción: el bot decía "La aplicación no ha respondido"
 
 El usuario reportó el error probando `/perfil` en Discord, en PRODUCCIÓN.
