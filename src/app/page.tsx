@@ -27,7 +27,6 @@ import { TrophyRecommendations } from "@/components/TrophyRecommendations";
 import { paragonProgress } from "@/lib/level";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
-import { RecomendadorTiempo } from "@/components/RecomendadorTiempo";
 import { esPlatinoEquivalente } from "@/lib/stats";
 
 const GRADE_ACCENT = {
@@ -375,10 +374,6 @@ export default async function HomePage() {
   const now = new Date().getTime();
   const feed = await getFeed(session.user.id);
 
-  // Solo lo que hace falta para el recomendador — empezados y sin terminar,
-  // nada de biblioteca entera hacia el cliente.
-  const empezados = games.filter((g) => !g.isWishlist && !esPlatinoEquivalente(g) && g.earnedTotal > 0);
-
   const nearPlatinumSection = nearPlatinum.length > 0 && (
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
@@ -717,7 +712,6 @@ export default async function HomePage() {
             label: "Progreso y actividad",
             content: (
               <>
-                <RecomendadorTiempo juegos={empezados} />
                 {nearPlatinumSection}
                 {abandonadosSection}
                 <UpcomingGames wishlistedIgdbIds={wishlistIds} />

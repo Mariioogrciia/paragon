@@ -9,7 +9,6 @@ import { RatingStars } from "@/components/RatingStars";
 import { PinGameButton } from "@/components/PinGameButton";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
 import { ImportLibraryModal } from "@/components/ImportLibraryModal";
-import { BacklogRoulette } from "@/components/BacklogRoulette";
 import {
   companyOf,
   filterGames,
@@ -366,7 +365,6 @@ export function LibraryGrid({
 
           {esMio && (
             <>
-              <BacklogRoulette games={games} handle={handle} />
               <ImportLibraryModal />
               <AddManualGameModal />
             </>

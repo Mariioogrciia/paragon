@@ -47,7 +47,6 @@ import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideErro
 import { ownsGame } from "@/lib/community";
 import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
 import { votarDificultad } from "@/lib/communityDifficulty";
-import { getGameRecommendations, type GameRecommendation } from "@/lib/recommendations";
 import type { AccountPlatform } from "@/lib/types";
 import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
@@ -1126,19 +1125,6 @@ export async function deleteTrophyGuideAction(formData: FormData): Promise<void>
 
   await deleteTrophyGuide(userId, gameId, trophyId);
   revalidatePath(`/juego/${gameId}`);
-}
-
-/* ------------------------------- Ruleta del Backlog ------------------------------ */
-
-/**
- * Respaldo de la Ruleta del Backlog (BacklogRoulette.tsx) para cuando el
- * propio backlog está vacío (0% en todos, o biblioteca corta): en vez de no
- * enseñar nada, tira de recomendaciones por género favorito — mismo dato que
- * ya usa /descubrir/recomendaciones, no una consulta nueva a IGDB.
- */
-export async function backlogFallbackAction(): Promise<GameRecommendation[]> {
-  const userId = await requireUserId();
-  return getGameRecommendations(userId, 20);
 }
 
 /* ------------------------- Puesta al día por tandas ------------------------ */
