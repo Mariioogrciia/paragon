@@ -65,14 +65,14 @@ const TILES: Tile[] = [
     label: "Epic Games",
     bg: "var(--surface-2)",
     fg: "var(--foreground)",
-    disabledNote: "Epic Games se puede vincular, pero no hay ninguna fuente pública de noticias ni catálogo: su web bloquea hasta su propio feed RSS oficial.",
+    disabledNote: "Ya no se puede vincular en Paragon (nunca tuvo sincronización real) — y tampoco hay ninguna fuente pública de noticias ni catálogo: su web bloquea hasta su propio feed RSS oficial.",
     icon: <EpicGamesIcon size={22} />,
   },
   {
     label: "Ubisoft",
     bg: "var(--surface-2)",
     fg: "var(--foreground)",
-    disabledNote: "Ubisoft Connect se puede vincular, pero no tiene ningún feed de noticias público — su web no expone RSS.",
+    disabledNote: "Ya no se puede vincular en Paragon (nunca tuvo sincronización real) — y tampoco tiene ningún feed de noticias público: su web no expone RSS.",
     icon: <UbisoftIcon size={22} />,
   },
 ];

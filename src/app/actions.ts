@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { users, userGames, activities, activityComments, activityReactions, platformAccounts, gameTrophies } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { auth, signIn, signOut } from "@/auth";
+import { auth, signOut } from "@/auth";
 import {
   CollectionNameError,
   createCollection,
@@ -47,7 +47,7 @@ import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideErro
 import { ownsGame } from "@/lib/community";
 import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
 import { votarDificultad } from "@/lib/communityDifficulty";
-import type { AccountPlatform } from "@/lib/types";
+import type { PlataformaVinculable } from "@/lib/types";
 import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 import { setHiddenNavItems } from "@/lib/navPreferences";
@@ -211,7 +211,7 @@ export async function testPushAction(): Promise<{ ok: boolean; error?: string }>
 
 /** Qué hay que escribir en cada plataforma, y qué decir cuando no se puede leer. */
 const PLATFORM_COPY: Record<
-  AccountPlatform,
+  PlataformaVinculable,
   { field: string; missing: string; privado: (nombre: string) => string }
 > = {
   psn: {
@@ -228,30 +228,15 @@ const PLATFORM_COPY: Record<
       `Perfil ${nombre} encontrado, pero es privado. En Steam: Perfil → Editar perfil → ` +
       `Privacidad, y pon "Mi perfil" y "Detalles del juego" en público.`,
   },
-  google: {
-    field: "email",
-    missing: "Escribe tu correo electrónico asociado a Google Play.",
-    privado: (nombre) => `Perfil privado.`,
-  },
   xbox: {
     field: "gamertag",
     missing: "Escribe tu Gamertag de Xbox.",
     privado: (nombre) => `Perfil privado o no encontrado.`,
   },
-  epic: {
-    field: "username",
-    missing: "Escribe tu nombre de usuario de Epic Games.",
-    privado: (nombre) => `Perfil privado o no encontrado.`,
-  },
-  ubisoft: {
-    field: "username",
-    missing: "Escribe tu nombre de usuario de Ubisoft Connect.",
-    privado: (nombre) => `Perfil privado o no encontrado.`,
-  },
 };
 
 async function linkPlatform(
-  platform: AccountPlatform,
+  platform: PlataformaVinculable,
   formData: FormData,
 ): Promise<ActionState> {
   const userId = await requireUserId();
@@ -288,13 +273,6 @@ export async function linkSteamAction(
   return linkPlatform("steam", formData);
 }
 
-export async function linkGoogleAction(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  return linkPlatform("google", formData);
-}
-
 export async function linkXboxAction(
   _prev: ActionState,
   formData: FormData,
@@ -302,26 +280,13 @@ export async function linkXboxAction(
   return linkPlatform("xbox", formData);
 }
 
-export async function linkEpicOAuthAction(): Promise<void> {
-  const userId = await requireUserId();
-  // Al iniciar sesión, Auth.js redirigirá a Epic Games, y al volver pasará por el linkAccount de auth.ts
-  await signIn("epic", { redirectTo: "/ajustes/plataformas" });
-}
-
-export async function linkUbisoftAction(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  return linkPlatform("ubisoft", formData);
-}
-
 export async function unlinkAccountAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
-  const platform = String(formData.get("platform") ?? "") as AccountPlatform;
+  const platformInput = String(formData.get("platform") ?? "");
 
-  if (!["psn", "steam", "google", "xbox", "epic", "ubisoft"].includes(platform)) return;
+  if (!["psn", "steam", "xbox"].includes(platformInput)) return;
 
-  await unlinkAccount(userId, platform);
+  await unlinkAccount(userId, platformInput as PlataformaVinculable);
   revalidatePath("/", "layout");
 }
 
@@ -338,7 +303,7 @@ const SYNC_COOLDOWN_MS = 2 * 60 * 1000;
 
 async function ultimaSincronizacion(
   userId: string,
-  platform?: AccountPlatform,
+  platform?: PlataformaVinculable,
 ): Promise<Date | null> {
   const db = getDb();
   const [fila] = await db
@@ -380,10 +345,11 @@ export async function syncPlatformAction(
   formData: FormData,
 ): Promise<ActionState> {
   const userId = await requireUserId();
-  const platform = String(formData.get("platform")) as AccountPlatform;
-  if (!["psn", "steam", "google", "xbox", "epic", "ubisoft"].includes(platform)) {
+  const platformInput = String(formData.get("platform"));
+  if (!["psn", "steam", "xbox"].includes(platformInput)) {
     return { error: "Plataforma no válida." };
   }
+  const platform = platformInput as PlataformaVinculable;
 
   const espera = esperaRestante(await ultimaSincronizacion(userId, platform));
   if (espera) return espera;

@@ -26,6 +26,7 @@ import {
   type Game,
   type GameDetail,
   type Library,
+  type PlataformaVinculable,
   type PlatformAccount,
   type Player,
   type Trophy,
@@ -345,21 +346,21 @@ export interface LinkResult {
  */
 export async function linkAccount(
   userId: string,
-  platform: AccountPlatform,
+  platform: PlataformaVinculable,
   input: string,
 ): Promise<LinkResult> {
-  const resolved =
-    platform === "psn"
-      ? await resolvePsn(input)
-      : platform === "steam"
-        ? await resolveSteam(input)
-        : platform === "google"
-          ? await resolveGoogle(input)
-          : platform === "xbox"
-            ? await resolveXbox(input)
-            : platform === "epic"
-              ? await resolveEpic(input)
-              : await resolveUbisoft(input);
+  let resolved: Resolved;
+  switch (platform) {
+    case "psn":
+      resolved = await resolvePsn(input);
+      break;
+    case "steam":
+      resolved = await resolveSteam(input);
+      break;
+    case "xbox":
+      resolved = await resolveXbox(input);
+      break;
+  }
 
   await db
     .insert(platformAccounts)
@@ -428,17 +429,6 @@ async function resolveSteam(input: string): Promise<Resolved> {
   };
 }
 
-// Google, Epic y Ubisoft no tienen sincronización real todavía: sus únicas
-// APIs viables no dan la biblioteca de un jugador cualquiera (Google Play
-// Games solo devuelve logros del juego atado al Client ID; Epic y Ubisoft no
-// tienen credenciales configuradas). Se dejan vincular para que la cuenta
-// quede guardada y visible, pero `legible: false` evita que `syncLibrary`
-// reciba ese accountId — antes caía por defecto en el lector de Steam y le
-// pedía la biblioteca a Steam con, por ejemplo, un usuario de Epic.
-async function resolveGoogle(input: string): Promise<Resolved> {
-  return { accountId: input, username: input.split('@')[0] || input, level: null, avatarUrl: null, legible: false };
-}
-
 /**
  * Xbox sí tiene sincronización real, vía OpenXBL (xbl.io) — no una API
  * oficial de Microsoft, ver el aviso de riesgo en lib/xbl/client.ts. El
@@ -455,14 +445,6 @@ async function resolveXbox(input: string): Promise<Resolved> {
     avatarUrl: profile.avatarUrl ?? null,
     legible: await xbl.canReadAchievements(profile.xuid),
   };
-}
-
-async function resolveEpic(input: string): Promise<Resolved> {
-  return { accountId: input, username: input, level: null, avatarUrl: null, legible: false };
-}
-
-async function resolveUbisoft(input: string): Promise<Resolved> {
-  return { accountId: input, username: input, level: null, avatarUrl: null, legible: false };
 }
 
 /** Vuelve a traer las bibliotecas de todas las cuentas vinculadas. */
@@ -519,7 +501,7 @@ export async function resyncLibraries(userId: string): Promise<number> {
   return total;
 }
 
-export async function resyncPlatform(userId: string, platform: AccountPlatform): Promise<number> {
+export async function resyncPlatform(userId: string, platform: PlataformaVinculable): Promise<number> {
   const account = await accountForUser(userId, platform);
   if (!account || !account.isPublic) return 0;
 
@@ -539,7 +521,7 @@ export async function resyncPlatform(userId: string, platform: AccountPlatform):
   }
 }
 
-async function accountForUser(userId: string, platform: AccountPlatform) {
+async function accountForUser(userId: string, platform: PlataformaVinculable) {
   const [account] = await db
     .select({ accountId: platformAccounts.accountId, isPublic: platformAccounts.isPublic })
     .from(platformAccounts)
@@ -548,7 +530,7 @@ async function accountForUser(userId: string, platform: AccountPlatform) {
   return account ?? null;
 }
 
-export async function unlinkAccount(userId: string, platform: AccountPlatform) {
+export async function unlinkAccount(userId: string, platform: PlataformaVinculable) {
   await db
     .delete(platformAccounts)
     .where(

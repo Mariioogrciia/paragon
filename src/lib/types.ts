@@ -18,6 +18,19 @@ export type Platform = "psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" 
 /** Las que se vinculan por cuenta. Ver el comentario de "manual" arriba. */
 export type AccountPlatform = Exclude<Platform, "manual">;
 
+/**
+ * Las que de verdad se pueden vincular hoy (11 de septiembre de 2026).
+ *
+ * `AccountPlatform` sigue siendo más ancho (incluye "google"/"epic"/
+ * "ubisoft") porque `Platform` lo necesita para `games.platform`: un juego
+ * importado a mano desde Playnite/GOG guarda ahí de qué launcher salió
+ * (ver `actions/import.ts`), que es un uso distinto de "cuenta vinculada
+ * con sincronización real". Google Play, Epic Games y Ubisoft Connect se
+ * quitaron del todo como plataformas VINCULABLES ese mismo día — ninguna
+ * llegó a sincronizar un solo dato real (`legible` era siempre `false`).
+ */
+export type PlataformaVinculable = "psn" | "steam" | "xbox";
+
 export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google", "xbox", "epic", "ubisoft"];
 
 /**
@@ -205,7 +218,7 @@ export interface GameDetail extends Game {
 
 /** Una cuenta vinculada de una plataforma. */
 export interface PlatformAccount {
-  platform: AccountPlatform;
+  platform: PlataformaVinculable;
   accountId: string;
   username: string;
   /** Nivel de trofeos en PSN; Steam no tiene equivalente. */

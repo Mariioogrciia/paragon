@@ -2,54 +2,37 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { HandleForm, LinkPsnForm, LinkSteamForm, LinkGoogleForm, LinkXboxForm, LinkEpicForm, LinkUbisoftForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { SaludSincronizacion } from "@/components/SaludSincronizacion";
 import { saludSincronizacion } from "@/lib/syncHealth";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
-import { PLATFORM_LABEL, type AccountPlatform, type PlatformAccount } from "@/lib/types";
+import { PLATFORM_LABEL, type AccountPlatform, type PlataformaVinculable, type PlatformAccount } from "@/lib/types";
 import { getSyncHistory } from "@/lib/syncHistory";
-import {
-  PlayStationLogo,
-  SteamLogo,
-  GooglePlayLogo,
-  XboxLogo,
-  EpicGamesLogo,
-  UbisoftLogo,
-  NintendoLogo,
-} from "@/components/ui/PlatformLogos";
+import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo } from "@/components/ui/PlatformLogos";
 
 export const metadata = { title: "Ajustes · Paragon" };
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
-const AVATAR_BG: Record<AccountPlatform, string> = {
+const AVATAR_BG: Record<PlataformaVinculable, string> = {
   psn: "linear-gradient(150deg, #2f7ad6, #6b3fd4)",
   steam: "linear-gradient(150deg, #2f7d9d, #1b2838)",
-  google: "linear-gradient(150deg, #34A853, #4285F4)",
   xbox: "linear-gradient(150deg, #107C10, #16a316)",
-  epic: "linear-gradient(150deg, #313131, #000000)",
-  ubisoft: "linear-gradient(150deg, #0070FF, #004ecc)",
 };
 
-const HELP: Record<AccountPlatform, string> = {
+const HELP: Record<PlataformaVinculable, string> = {
   psn:
     "Tu ID público de PlayStation, el nombre con el que juegas. Tu perfil de " +
     "trofeos tiene que estar en público para que podamos leerlo.",
   steam:
     "Tu usuario de Steam, tu SteamID64 o la URL de tu perfil. En Steam, «Mi " +
     "perfil» y «Detalles del juego» tienen que estar en público.",
-  google:
-    "Tu cuenta de Google Play Games. Se sincronizan los logros de los juegos compatibles con la plataforma móvil.",
   xbox:
     "Tu Gamertag de Xbox. Sincroniza de verdad tu historial de logros, vía un " +
     "servicio de terceros (no oficial de Microsoft) — puede fallar o dejar de " +
     "funcionar si ese servicio cambia.",
-  epic:
-    "Tu cuenta de Epic Games. Conecta directamente con los servicios oficiales (Epic Account Services).",
-  ubisoft:
-    "Tu usuario de Ubisoft Connect. Se requiere tener la privacidad del perfil público (en fase de desarrollo).",
 };
 
 /** Ficha de una plataforma: vinculada o no, siempre con su formulario debajo. */
@@ -58,7 +41,7 @@ function PlatformSection({
   account,
   children,
 }: {
-  platform: AccountPlatform;
+  platform: PlataformaVinculable;
   account: PlatformAccount | null;
   children: React.ReactNode;
 }) {
@@ -73,10 +56,7 @@ function PlatformSection({
         >
           {platform === "psn" && <PlayStationLogo className="w-5 h-5" />}
           {platform === "steam" && <SteamLogo className="w-5 h-5" />}
-          {platform === "google" && <GooglePlayLogo className="w-5 h-5" />}
           {platform === "xbox" && <XboxLogo className="w-5 h-5" />}
-          {platform === "epic" && <EpicGamesLogo className="w-5 h-5" />}
-          {platform === "ubisoft" && <UbisoftLogo className="w-5 h-5" />}
         </span>
         <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">
           {PLATFORM_LABEL[platform]}
@@ -152,10 +132,7 @@ export default async function AjustesPlataformasPage() {
   const profile = await getProfileByUserId(session.user.id);
   const psn = accountFor(profile, "psn");
   const steam = accountFor(profile, "steam");
-  const google = accountFor(profile, "google");
   const xbox = accountFor(profile, "xbox");
-  const epic = accountFor(profile, "epic");
-  const ubisoft = accountFor(profile, "ubisoft");
   const carpetas = await listCollections(session.user.id);
   // Las dos en paralelo: son independientes y el pool no se resiente por
   // dos consultas (ver el aviso de conexiones en db/index.ts).
@@ -184,30 +161,10 @@ export default async function AjustesPlataformasPage() {
           <LinkXboxForm current={xbox?.username} />
         </PlatformSection>
 
-        {/* Google Play, Epic Games y Ubisoft ya no se ofrecen para vincular:
-            ninguna tiene una forma real de sincronizar logros de terceros
-            (sin API REST pública documentada, solo ingeniería inversa de su
-            GraphQL/OAuth interno — ver HANDOFF). Quien ya tuviera una cuenta
-            vinculada de antes la sigue viendo aquí, con la opción de
-            desvincularla, pero no se puede crear una nueva. */}
-        {google && (
-          <PlatformSection platform="google" account={google}>
-            <LinkGoogleForm current={google.username} />
-          </PlatformSection>
-        )}
-
-        {epic && (
-          <PlatformSection platform="epic" account={epic}>
-            <LinkEpicForm current={epic.username} />
-          </PlatformSection>
-        )}
-
-        {ubisoft && (
-          <PlatformSection platform="ubisoft" account={ubisoft}>
-            <LinkUbisoftForm current={ubisoft.username} />
-          </PlatformSection>
-        )}
-
+        {/* Google Play, Epic Games y Ubisoft Connect se quitaron del todo el
+            11 de septiembre de 2026 — ninguna llegó a tener sincronización
+            real (ver HANDOFF.md), y las pocas cuentas que se habían llegado
+            a vincular no guardaban ningún dato sincronizado de verdad. */}
         <section className="mt-3.5 rounded-[18px] p-6 flex flex-col" style={CARD}>
           <div className="flex items-center gap-3 mb-4 opacity-50">
             <span

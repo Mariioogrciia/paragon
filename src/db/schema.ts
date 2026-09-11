@@ -11,6 +11,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
+import type { PlataformaVinculable } from "@/lib/types";
 
 /* ------------------------------------------------------------------ *
  * Tablas de Auth.js. Su forma la impone el adaptador, no la elegimos. *
@@ -182,7 +183,11 @@ export const platformAccounts = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    platform: text("platform").$type<"psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft">().notNull(),
+    // Solo un tipo, no un enum de Postgres de verdad — es la misma columna
+    // `text` de siempre, esto es solo el tipo que ve TypeScript. Estrechado
+    // a las 3 que de verdad se pueden vincular el 11 de septiembre de 2026
+    // (ver el comentario de `PlataformaVinculable` en lib/types.ts).
+    platform: text("platform").$type<PlataformaVinculable>().notNull(),
     /** accountId de PSN, SteamID64 de Steam. */
     accountId: text("accountId").notNull(),
     /** El nombre público: online ID en PSN, persona name en Steam. */

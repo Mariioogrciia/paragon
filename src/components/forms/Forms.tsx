@@ -8,10 +8,7 @@ import {
   createCollectionAction,
   linkPsnAction,
   linkSteamAction,
-  linkGoogleAction,
   linkXboxAction,
-  linkUbisoftAction,
-  linkEpicOAuthAction,
   updateProfileAction,
   setDiscordDmAction,
   probarDiscordDmAction,
@@ -142,29 +139,6 @@ export function LinkSteamForm({ current }: { current?: string | null }) {
   );
 }
 
-export function LinkGoogleForm({ current }: { current?: string | null }) {
-  const [state, action] = useActionState(linkGoogleAction, EMPTY);
-
-  return (
-    <form action={action}>
-      <div className="flex flex-col gap-2.5 sm:flex-row">
-        <input
-          name="email"
-          type="email"
-          defaultValue={current ?? ""}
-          placeholder="Tu correo electrónico de Google Play"
-          autoComplete="email"
-          spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
-          style={FIELD}
-        />
-        <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
-      </div>
-      <Feedback state={state} />
-    </form>
-  );
-}
-
 export function LinkXboxForm({ current }: { current?: string | null }) {
   const [state, action] = useActionState(linkXboxAction, EMPTY);
 
@@ -176,39 +150,6 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
           type="text"
           defaultValue={current ?? ""}
           placeholder="Tu Gamertag de Xbox"
-          autoComplete="off"
-          spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
-          style={FIELD}
-        />
-        <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
-      </div>
-      <Feedback state={state} />
-    </form>
-  );
-}
-
-export function LinkEpicForm({ current }: { current?: string | null }) {
-  return (
-    <form action={linkEpicOAuthAction}>
-      <div className="flex flex-col gap-2.5 sm:flex-row">
-        <Submit>{current ? "Reconectar con Epic Games" : "Vincular con Epic Games"}</Submit>
-      </div>
-    </form>
-  );
-}
-
-export function LinkUbisoftForm({ current }: { current?: string | null }) {
-  const [state, action] = useActionState(linkUbisoftAction, EMPTY);
-
-  return (
-    <form action={action}>
-      <div className="flex flex-col gap-2.5 sm:flex-row">
-        <input
-          name="username"
-          type="text"
-          defaultValue={current ?? ""}
-          placeholder="Tu usuario de Ubisoft Connect"
           autoComplete="off"
           spellCheck={false}
           className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
