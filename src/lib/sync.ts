@@ -12,6 +12,7 @@ import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibr
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
+import { HORAS_CADUCIDAD } from "@/lib/syncHealth";
 
 /**
  * Trae datos de las plataformas y los guarda.
@@ -67,6 +68,38 @@ const STEAM_CONCURRENCY = 6;
  */
 const XBL_DETAIL_LIMIT = 15;
 const XBL_CONCURRENCY = 2;
+
+/**
+ * De una lista de `gameId`, cuáles necesitan de verdad que se les vuelva a
+ * pedir el detalle: nunca sincronizados, o sincronizados hace más de
+ * `HORAS_CADUCIDAD` (mismo umbral que ya usa `lib/syncHealth.ts` para pintar
+ * "sin refrescar" en Ajustes → Plataformas — un solo criterio de "está
+ * fresco", no dos que se puedan desincronizar).
+ *
+ * Encontrado el 11 de septiembre de 2026 viendo un 504 real de producción:
+ * `syncLibrary` repetía las llamadas de detalle de Steam/Xbox (esquema +
+ * rareza global de cada logro) en CADA resincronización de la cuenta, sin
+ * mirar si esos juegos ya estaban al día — una sola cuenta de Steam con sus
+ * ~40 juegos "recientes" ya bastaba para agotar los 60s de Vercel a base de
+ * repetir siempre el mismo trabajo. Con este filtro, el caso normal (ya
+ * sincronizado hace poco) no vuelve a tocar la red.
+ */
+async function soloDesactualizados(userId: string, gameIds: string[]): Promise<string[]> {
+  if (gameIds.length === 0) return [];
+
+  const desde = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000);
+
+  const filas = await db
+    .select({ gameId: userGames.gameId, trophiesSyncedAt: userGames.trophiesSyncedAt })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), inArray(userGames.gameId, gameIds)));
+
+  const frescos = new Set(
+    filas.filter((f) => f.trophiesSyncedAt !== null && f.trophiesSyncedAt >= desde).map((f) => f.gameId),
+  );
+
+  return gameIds.filter((id) => !frescos.has(id));
+}
 
 /** Lanza las tareas de N en N: ni una a una (lento) ni todas (Steam corta). */
 async function mapLimit<T>(items: T[], limit: number, run: (item: T) => Promise<void>) {
@@ -185,8 +218,13 @@ export async function syncLibrary(
       .filter((g) => (g.playtimeMinutes ?? 0) > 0)
       .slice(0, STEAM_DETAIL_LIMIT);
 
-    await mapLimit(recientes, STEAM_CONCURRENCY, async (game) => {
-      await syncGameTrophies(userId, account, game.id);
+    // Solo los que de verdad estén desactualizados — ver el comentario de
+    // `soloDesactualizados`. Sin esto, cada resincronización repetía las
+    // ~40 llamadas de detalle aunque ya estuvieran frescas.
+    const pendientes = await soloDesactualizados(userId, recientes.map((g) => g.id));
+
+    await mapLimit(pendientes, STEAM_CONCURRENCY, async (gameId) => {
+      await syncGameTrophies(userId, account, gameId);
     });
   }
 
@@ -194,9 +232,10 @@ export async function syncLibrary(
     // Xbox no da `playtimeMinutes` (a diferencia de Steam), así que el
     // filtro de "recientes" es por `lastPlayedAt`, que la biblioteca sí trae.
     const recientes = library.filter((g) => g.lastPlayedAt).slice(0, XBL_DETAIL_LIMIT);
+    const pendientes = await soloDesactualizados(userId, recientes.map((g) => g.id));
 
-    await mapLimit(recientes, XBL_CONCURRENCY, async (game) => {
-      await syncGameTrophies(userId, account, game.id);
+    await mapLimit(pendientes, XBL_CONCURRENCY, async (gameId) => {
+      await syncGameTrophies(userId, account, gameId);
     });
   }
 

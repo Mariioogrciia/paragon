@@ -32,8 +32,19 @@ import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
 /** Segundos de la función. Vercel corta a 60 en el plan Hobby. */
 export const maxDuration = 60;
 
-/** Cuántas cuentas se intentan como mucho en una pasada. */
-const POR_PASADA = 8;
+/**
+ * Cuántas cuentas se intentan como mucho en una pasada.
+ *
+ * Bajado de 8 a 4 el 11 de septiembre de 2026: con solo ~6 usuarios reales,
+ * un tope de 8 no "repartía" nada — cada pasada intentaba resincronizar a
+ * TODO el mundo de golpe, y el margen de abajo solo protege ENTRE cuentas,
+ * no dentro de una (si `resyncLibraries` de una sola cuenta tarda de más, el
+ * chequeo de tiempo no puede hacer nada hasta que termina esa llamada). Con
+ * el cron externo llamando cada 15 min de verdad (ver cron-job.org), no hace
+ * falta currar tanto en cada pasada — cubre a todos en menos de una hora
+ * igual.
+ */
+const POR_PASADA = 4;
 
 /**
  * Cuántas fichas de juego se rellenan por pasada.
@@ -43,8 +54,11 @@ const POR_PASADA = 8;
  * abrir la ficha. Resultado: el histórico solo conoce los juegos que alguien
  * ha abierto alguna vez. Rellenando unos cuantos por pasada, el histórico se
  * completa solo con el tiempo en vez de depender de que el usuario navegue.
+ *
+ * Bajado de 40 a 15 el 11 de septiembre de 2026, mismo motivo que arriba —
+ * ver el aviso de las 3 pasadas que dieron 504 por pasarse de 60s.
  */
-const DETALLES_POR_PASADA = 40;
+const DETALLES_POR_PASADA = 15;
 
 /**
  * Tope aparte para Xbox dentro de esa misma tanda: OpenXBL (xbl.io) va en un
@@ -53,20 +67,33 @@ const DETALLES_POR_PASADA = 40;
  * lib/xbl/client.ts. Sin este tope, una pasada con muchas fichas de Xbox sin
  * detalle podría agotar el cupo de la hora entera para todo el mundo.
  */
-const XBL_DETALLES_POR_PASADA = 10;
+const XBL_DETALLES_POR_PASADA = 5;
 
 /**
  * Cuántos juegos se intentan clasificar por pasada. Van todos en UNA consulta
- * a IGDB, así que el número puede ser generoso sin gastar cuota.
+ * a IGDB, así que el número puede ser generoso sin gastar cuota — pero
+ * bajado de 150 a 60 el 11 de septiembre de 2026: una respuesta más grande
+ * de IGDB también tarda más en llegar, y con la función ya al límite de los
+ * 60s de Vercel cada segundo cuenta.
  */
-const PEGI_POR_PASADA = 150;
+const PEGI_POR_PASADA = 60;
 
 /**
- * Margen para cerrar. Si al terminar con una cuenta queda menos que esto, no
- * se empieza otra: mejor dejarla para la pasada siguiente que que la corten a
- * medias y quede a saber cómo.
+ * Margen para cerrar. Si al terminar con una cuenta/ficha/lote queda menos
+ * que esto, no se empieza otra: mejor dejarla para la pasada siguiente que
+ * que la corten a medias y quede a saber cómo.
+ *
+ * Subido de 15s a 25s el 11 de septiembre de 2026: encontradas 3 pasadas
+ * reales que tardaron ~61s y Vercel las cortó con un 504 (el plan Hobby
+ * corta a los 60s en seco, `maxDuration` de arriba) — el margen de 15s no
+ * bastaba porque solo protege ENTRE cuentas/juegos, no dentro de uno: si el
+ * chequeo pasa con 44s gastados (justo por debajo del tope de entonces,
+ * 45s) y la siguiente llamada de red tarda 10-15s de más de lo normal, la
+ * función ya se pasa de los 60s sin que ningún chequeo pueda evitarlo. Con
+ * 25s de margen el tope de arranque baja a 35s, dejando más aire para ese
+ * "uno más" que siempre puede colarse.
  */
-const MARGEN_MS = 15_000;
+const MARGEN_MS = 25_000;
 
 export async function GET(request: Request) {
   const secreto = process.env.CRON_SECRET;
