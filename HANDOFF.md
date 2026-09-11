@@ -1,9 +1,71 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **10 de septiembre de 2026**
+releer todo el historial. Última actualización: **11 de septiembre de 2026**
 (con Antigravity trabajando en paralelo todo el rato — más abajo hay un
 aviso de qué tocó él).
+
+---
+
+## Sesión del 10 de septiembre de 2026 (continuación 10) — repaso de rendimiento/limpieza, 3 bugs reportados probando en vivo, y PUSH — todo en `origin/master`
+
+**Estado real ahora mismo: no hay nada pendiente de subir.** El usuario
+pidió `push` dos veces en esta continuación; la segunda vez `git fetch`
+confirmó que el remoto ya tenía todo salvo los últimos 4 commits (subidos
+él mismo entre medias, probablemente probando algo) — se subieron esos 4
+y `origin/master` quedó al día con TODO lo de esta sesión larga (bot,
+Descubrir, Noticias, atajos PWA, fix del bot diferido, vinculación
+Google/Discord, las 5 tandas de Antigravity, Cerrojo de Hitos, y este
+repaso). Quien retome esto: comprobar con `git fetch` + `git log
+origin/master..HEAD` antes de asumir que hay algo sin subir.
+
+### Repaso de rendimiento/visual/limpieza (pedido explícito del usuario)
+
+- **N+1 real arreglado**: `estadisticasAmigos()` (lib/profileStats.ts)
+  llamaba a `getLibrary()` completo POR AMIGO solo para 4 números.
+  Sustituido por una consulta agregada (`userId IN (...)`, GROUP BY) que
+  replica exactamente `esPlatinoEquivalente()` — verificado contra la
+  base real (288 juegos, 24 platinos, coincide con lo visto en pantalla).
+- **`ToggleChip` compartido** (components/ToggleChip.tsx): consolida el
+  botón "chip" activo/inactivo que `TrophyList`, `AcquisitionEditor` y
+  `ReservarHitoButton` reinventaban cada uno con su propio bloque de
+  estilos. Los botones de LibraryGrid ("Por amortizar"/"Agrupar por
+  empresa") se dejaron FUERA a propósito — son otro patrón real (fila a
+  ancho completo, a juego con los desplegables vecinos).
+- **Borrado de verdad, con datos reales de por medio** (confirmado
+  explícitamente con el usuario tras comprobar que NO estaba vacío):
+  tabla `notification` (8 filas reales) y columna
+  `users.discordWebhookUrl` (1 cuenta real la tenía puesta). Encontrada
+  de paso una dependencia real que casi se rompe: `lib/admin.ts` SÍ leía
+  `notification` para la estadística "avisos generados" de `/admin` —
+  se congeló ese número a mano (`AVISOS_CONGELADOS`, lib/admin.ts) antes
+  de borrar la tabla, para no dejar esa página rota.
+  `scripts/borrar-notification-y-webhook.mts` ya ejecutado contra la
+  base real.
+
+### 3 bugs reportados probando en el navegador de verdad — 1 real, 2 falsas alarmas ya explicadas
+
+- **"Ver más" de Horas por juego → arreglado de verdad.** El usuario
+  probó el botón y no le convenció: expandir la misma lista de barras
+  en el sitio no es "ver todo de forma organizada". Ahora es un enlace
+  real a `/u/<handle>/biblioteca?orden=horas` — nuevo `SortKey "horas"`
+  en lib/stats.ts, mismo mecanismo `?estado=`→`initialStatus` que ya
+  existía, aplicado a `?orden=`→`initialSort`. `PlaytimeBarChart.tsx`
+  volvió a ser Server Component (ya no necesita estado de cliente).
+  Verificado en el navegador: el enlace llega con "Más horas jugadas"
+  ya seleccionado.
+- **"No veo Eficiencia de caza" → código y dato verificados correctos,
+  sin resolver del todo.** Black Myth: Wukong SÍ califica (platinado,
+  con `hltb.completionist` y `playtimeMinutes`) — debería aparecer.
+  Hipótesis más probable: se pierde en una página de Estadísticas ya
+  muy larga (muchas secciones apiladas antes de llegar ahí). **Si
+  vuelve a reportarse, pedir una captura de pantalla real** — no se ha
+  podido reproducir sin sesión.
+- **"No veo el botón de Reservar Hito" → no era un bug.** El botón se
+  oculta a propósito en juegos YA platinados (no tiene sentido reservar
+  un hito para algo ya conseguido) — el usuario estaba probando sobre
+  Black Myth: Wukong, que está al 100%. Habría que probarlo en un juego
+  sin platinar (p. ej. Star Wars Outlaws, 24%) para verlo de verdad.
 
 ---
 
