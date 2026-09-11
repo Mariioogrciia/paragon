@@ -1,7 +1,8 @@
 import "server-only";
 import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, gameTrophies, userTrophies, users } from "@/db/schema";
+import { games, gameTrophies, userTrophies } from "@/db/schema";
+import { getUserTimezone } from "@/lib/profiles";
 import type { TrophyGrade } from "@/lib/types";
 
 /**
@@ -427,8 +428,7 @@ export interface Efemeride extends TrofeoDelMes {
  * un día tarde o pronto según dónde caiga la medianoche real.
  */
 export async function talDiaComoHoy(userId: string, ahora = new Date()): Promise<Efemeride[]> {
-  const [u] = await db.select({ timezone: users.timezone }).from(users).where(eq(users.id, userId)).limit(1);
-  const tz = u?.timezone || "Europe/Madrid";
+  const tz = await getUserTimezone(userId);
 
   const fechaLocal = sql`(${userTrophies.earnedAt} at time zone 'UTC' at time zone ${tz})`;
 

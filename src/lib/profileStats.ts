@@ -1,8 +1,8 @@
 import "server-only";
 import { and, asc, desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games as gamesTable, gameTrophies, userGames, userTrophies, users } from "@/db/schema";
-import { listFriends, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
+import { games as gamesTable, gameTrophies, userGames, userTrophies } from "@/db/schema";
+import { listFriends, getProfileByUserId, getUserTimezone, resolveAvatarUrl } from "@/lib/profiles";
 
 /**
  * Datos para /u/[handle]/estadisticas.
@@ -208,8 +208,7 @@ export interface CeldaHoraria {
  * heatmap anual, aquí interesa el patrón de siempre, no solo el último año.
  */
 export async function franjasHorarias(userId: string): Promise<CeldaHoraria[]> {
-  const [u] = await db.select({ timezone: users.timezone }).from(users).where(eq(users.id, userId)).limit(1);
-  const tz = u?.timezone || "Europe/Madrid";
+  const tz = await getUserTimezone(userId);
 
   const rows = await db
     .select({

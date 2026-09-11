@@ -66,6 +66,21 @@ export interface ProfileRow {
  */
 const CORREO_DESARROLLADOR = "mario.meca2005@gmail.com";
 
+/**
+ * Zona horaria guardada en Ajustes (`users.timezone`, por defecto
+ * Europe/Madrid) — misma consulta que ya hacían por su cuenta
+ * `franjasHorarias()` (profileStats.ts) y `talDiaComoHoy()` (history.ts),
+ * centralizada aquí para no triplicarla. Sin esto, cualquier hora mostrada
+ * con `toLocaleString`/`toLocaleDateString` en el servidor sale en UTC (la
+ * zona del propio Vercel), no en la de quien mira la pantalla — encontrado
+ * el 11 de septiembre de 2026 en el Historial de sincronización de Ajustes
+ * → Plataformas, que iba 2h por detrás de la hora real en España.
+ */
+export async function getUserTimezone(userId: string): Promise<string> {
+  const [u] = await db.select({ timezone: users.timezone }).from(users).where(eq(users.id, userId)).limit(1);
+  return u?.timezone || "Europe/Madrid";
+}
+
 /** La cuenta de una plataforma concreta, si la tiene vinculada. */
 export function accountFor(
   profile: ProfileRow | null,

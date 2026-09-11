@@ -7,7 +7,7 @@ import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { SaludSincronizacion } from "@/components/SaludSincronizacion";
 import { saludSincronizacion } from "@/lib/syncHealth";
-import { accountFor, getProfileByUserId } from "@/lib/profiles";
+import { accountFor, getProfileByUserId, getUserTimezone } from "@/lib/profiles";
 import { PLATFORM_LABEL, type AccountPlatform, type PlataformaVinculable, type PlatformAccount } from "@/lib/types";
 import { getSyncHistory } from "@/lib/syncHistory";
 import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo } from "@/components/ui/PlatformLogos";
@@ -134,11 +134,12 @@ export default async function AjustesPlataformasPage() {
   const steam = accountFor(profile, "steam");
   const xbox = accountFor(profile, "xbox");
   const carpetas = await listCollections(session.user.id);
-  // Las dos en paralelo: son independientes y el pool no se resiente por
-  // dos consultas (ver el aviso de conexiones en db/index.ts).
-  const [historial, salud] = await Promise.all([
+  // Las tres en paralelo: son independientes y el pool no se resiente por
+  // tres consultas (ver el aviso de conexiones en db/index.ts).
+  const [historial, salud, tz] = await Promise.all([
     getSyncHistory(session.user.id),
     saludSincronizacion(session.user.id),
+    getUserTimezone(session.user.id),
   ]);
 
   return (
@@ -238,7 +239,7 @@ export default async function AjustesPlataformasPage() {
             {historial.map((run) => (
               <div key={run.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-xs">
                 <span className="font-semibold">{PLATFORM_LABEL[run.platform as AccountPlatform] ?? run.platform}</span>
-                <span className="text-muted">{run.games} juegos · {run.newTrophies} trofeos nuevos · {run.createdAt.toLocaleString("es-ES")}</span>
+                <span className="text-muted">{run.games} juegos · {run.newTrophies} trofeos nuevos · {run.createdAt.toLocaleString("es-ES", { timeZone: tz })}</span>
               </div>
             ))}
           </div>
