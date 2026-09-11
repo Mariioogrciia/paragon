@@ -97,6 +97,20 @@ export default async function DescubrirXboxPage() {
         </section>
       )}
 
+      <section className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl px-5 py-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+        <div>
+          <h2 className="font-heading text-lg font-bold uppercase tracking-wide">Catálogo de Game Pass</h2>
+          <p className="text-sm text-muted">Todo lo que incluye ahora mismo, separado por Consola y PC.</p>
+        </div>
+        <Link
+          href="/descubrir/xbox/gamepass"
+          className="rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wide text-background transition-all hover:-translate-y-0.5"
+          style={{ background: "var(--accent-grad)" }}
+        >
+          Explorar catálogo →
+        </Link>
+      </section>
+
       {gamePass && gamePass.juegos.length > 0 && (
         <section className="mb-10">
           <div className="mb-1 flex flex-wrap items-baseline gap-3">
