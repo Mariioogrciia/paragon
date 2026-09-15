@@ -32,8 +32,14 @@ function Fila({ g }: { g: EficienciaJuego }) {
 export function EficienciaPersonal({ juegos, resumen }: { juegos: EficienciaJuego[]; resumen: ResumenEficiencia }) {
   if (juegos.length === 0) return null;
 
-  const rapidos = juegos.slice(0, 3);
-  const pausados = juegos.length > 3 ? [...juegos].reverse().slice(0, 3) : [];
+  // `juegos` ya viene ordenado descendente por `diferenciaPct` (lib/backlog.ts).
+  // Antes esto era `slice(0, 3)` / `reverse().slice(0, 3)` a secas, sin mirar
+  // el signo — con pocos platinos comparados (el caso real de casi cualquier
+  // cuenta hoy) eso metía un juego más LENTO que la media bajo el título
+  // "Más rápido que la media" solo porque era el único que había. Ahora cada
+  // columna filtra por signo antes de recortar.
+  const rapidos = juegos.filter((g) => g.diferenciaPct > 0).slice(0, 3);
+  const pausados = juegos.filter((g) => g.diferenciaPct <= 0).slice(-3).reverse();
 
   return (
     <div>
@@ -48,12 +54,14 @@ export function EficienciaPersonal({ juegos, resumen }: { juegos: EficienciaJueg
       )}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div>
-          <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-muted">Más rápido que la media</h3>
-          <div className="flex flex-col gap-2">
-            {rapidos.map((g) => <Fila key={g.gameId} g={g} />)}
+        {rapidos.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-muted">Más rápido que la media</h3>
+            <div className="flex flex-col gap-2">
+              {rapidos.map((g) => <Fila key={g.gameId} g={g} />)}
+            </div>
           </div>
-        </div>
+        )}
         {pausados.length > 0 && (
           <div>
             <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-muted">Con más calma / exploración</h3>
