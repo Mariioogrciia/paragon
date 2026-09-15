@@ -65,12 +65,16 @@ export default async function HojaDeServiciosPage({
       <header className="mb-9 flex flex-wrap items-center gap-5 border-b border-border pb-7 print:border-black/20">
         <Avatar src={player.avatarUrl} name={player.name} size={72} />
         <div className="min-w-0 flex-1">
-          <h1 className="font-heading text-3xl font-bold uppercase leading-none">
+          {/* `truncate` real, no solo `min-w-0` en el contenedor: un nombre
+              de una sola palabra (sin espacios donde partir) no ajusta su
+              ancho solo, se sale de su caja y se pinta encima de "Nivel X"
+              al lado — visto en vivo a 375px con "FENDE21". */}
+          <h1 className="truncate font-heading text-3xl font-bold uppercase leading-none">
             {player.name}
           </h1>
           <p className="mt-2 text-sm text-muted print:text-black/60">@{handle}</p>
         </div>
-        <div className="text-right">
+        <div className="shrink-0 text-right">
           <p className="font-heading text-2xl font-bold">Nivel {nivel.level}</p>
           <p className="text-xs text-muted print:text-black/60">
             {nivel.xp.toLocaleString("es-ES")} XP Paragon

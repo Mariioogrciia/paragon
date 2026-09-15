@@ -19,8 +19,14 @@ export function GameLanguages({ languages }: Props) {
     <div className="mt-12">
       <h2 className="text-xl font-bold mb-4">Idiomas</h2>
       
+      {/* `min-w-full` en vez de `w-full`: con `w-full` a secas la tabla
+          nunca podía ser más ancha que este contenedor, así que en móvil
+          (4 columnas no caben en 375px) el `overflow-x-auto` de fuera no
+          llegaba a activarse nunca — el contenido se apretaba y la última
+          columna ("Interfaz") se cortaba en el borde, en vez de poder
+          desplazarse para leerla. */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm border-collapse">
+        <table className="min-w-full text-left text-sm border-collapse whitespace-nowrap">
           <tbody>
             {displayLangs.map((l) => {
               const hasAudio = l.support.includes("Audio");
