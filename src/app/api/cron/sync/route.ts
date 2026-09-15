@@ -5,6 +5,7 @@ import { games, platformAccounts, userGames, userTrophies } from "@/db/schema";
 import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
 import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
+import { HORAS_CADUCIDAD } from "@/lib/syncHealth";
 
 /**
  * Sincronización desatendida.
@@ -158,6 +159,9 @@ export async function GET(request: Request) {
   let detalles = 0;
 
   if (!agotado) {
+    // ISO string, no un Date crudo — ver el mismo aviso en syncHealth.ts.
+    const caducado = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000).toISOString();
+
     const sinDetalle = await db
       .select({
         userId: userGames.userId,
@@ -175,9 +179,15 @@ export async function GET(request: Request) {
           eq(platformAccounts.isPublic, true),
         ),
       )
-      // Nunca sincronizada, o sincronizada pero incompleta: si la biblioteca
-      // dice que tienes más trofeos de los que hay guardados con detalle, esa
-      // ficha se ha quedado corta y toca repescarla.
+      // Nunca sincronizada, sincronizada pero incompleta (la biblioteca dice
+      // que tienes más trofeos de los que hay guardados con detalle), o
+      // sincronizada hace más de HORAS_CADUCIDAD — este último caso es el
+      // que faltaba hasta el 15 de septiembre de 2026: esta consulta solo
+      // arreglaba fichas rotas, nunca refrescaba una completa pero vieja.
+      // Con eso, PSN se quedaba sin ninguna vía automática para limpiar su
+      // "sin refrescar" (Ajustes → Plataformas): la sincronización de
+      // cuenta (syncLibrary) no toca detalle de PSN, y esta era la única
+      // fase que sí podía — solo que no miraba la edad, solo si faltaba.
       //
       // Los nombres de tabla y columna se interpolan desde el esquema, no a
       // mano: escritos a pelo salía "user_trophies"/"game_id" (plural y snake
@@ -185,13 +195,18 @@ export async function GET(request: Request) {
       // con columnas en camelCase entrecomilladas, y la consulta reventaba con
       // un 500 en cada pasada del cron.
       .where(
-        sql`${userGames.trophiesSyncedAt} is null or coalesce(${userGames.earnedTotal}, 0) > (
+        sql`${userGames.trophiesSyncedAt} is null
+          or ${userGames.trophiesSyncedAt} < ${caducado}
+          or coalesce(${userGames.earnedTotal}, 0) > (
           select count(*) from ${userTrophies}
           where ${userTrophies.gameId} = ${userGames.gameId}
             and ${userTrophies.userId} = ${userGames.userId}
             and ${userTrophies.earned} = true
         )`,
       )
+      // Nulls first: lo que nunca se ha sincronizado importa más que lo que
+      // solo está viejo. Entre lo viejo, lo más rancio primero.
+      .orderBy(sql`${userGames.trophiesSyncedAt} asc nulls first`)
       .limit(DETALLES_POR_PASADA);
 
     let xboxDetalles = 0;
