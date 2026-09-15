@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, platformAccounts, userGames, userTrophies } from "@/db/schema";
+import { games, platformAccounts, syncRuns, userGames, userTrophies } from "@/db/schema";
 import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
 import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
@@ -278,11 +278,31 @@ export async function GET(request: Request) {
     }
   }
 
+  // Limpieza de `sync_run`: solo alimenta el "Historial de sincronización"
+  // de Ajustes → Plataformas, que ya limita a las 20 más recientes
+  // (getSyncHistory) — nadie mira más atrás de 30 días. Añadido el 15 de
+  // septiembre de 2026: con el cron corriendo cada 15 min de verdad (antes
+  // 1 vez al día), la tabla pasó de 4-40 filas/día a ~800/día — sin límite,
+  // crecería para siempre. Un DELETE barato (unos pocos miles de filas hoy),
+  // corre siempre, incluso si `agotado` — es independiente del resto y no
+  // vale la pena dejarlo para la pasada siguiente.
+  const RETENCION_SYNC_RUN_DIAS = 30;
+  let borrados = 0;
+
+  try {
+    const limite = new Date(Date.now() - RETENCION_SYNC_RUN_DIAS * 24 * 60 * 60 * 1000);
+    const eliminadas = await db.delete(syncRuns).where(lt(syncRuns.createdAt, limite)).returning({ id: syncRuns.id });
+    borrados = eliminadas.length;
+  } catch (error) {
+    console.error("[cron-sync] limpieza sync_run", error);
+  }
+
   return NextResponse.json({
     sincronizados: resultados.filter((r) => r.error === undefined).length,
     fallidos: resultados.filter((r) => r.error !== undefined).length,
     fichasRellenadas: detalles,
     clasificacionesPegi: clasificados,
+    syncRunBorrados: borrados,
     pendientesPorTiempo: agotado,
     segundos: Math.round((Date.now() - arranque) / 1000),
     resultados,
