@@ -80,6 +80,13 @@ export function paragonProgress(games: Game[]): ParagonProgress {
   // gente no es lo mismo que uno que tiene el 2%, ni de lejos el trato plano
   // que tenía esto antes.
   let steamXp = 0;
+  // Xbox no tiene metales (`earned` se queda vacío para esta plataforma,
+  // ver lib/sync.ts) ni bonus de "100% cuenta como platino" — solo el
+  // Gamerscore real de cada logro (`xboxTrophyXp`, ver types.ts), añadido
+  // el 15 de septiembre de 2026 al empezar a llegar sincronización real de
+  // Xbox: antes de esto, un logro suelto sin llegar al 100% del juego no
+  // daba nada de XP, a diferencia de Steam.
+  let xboxXp = 0;
 
   for (const game of games) {
     if (game.isWishlist) continue;
@@ -88,6 +95,7 @@ export function paragonProgress(games: Game[]): ParagonProgress {
     }
 
     steamXp += game.steamTrophyXp ?? 0;
+    xboxXp += game.xboxTrophyXp ?? 0;
 
     // Mutuamente excluyentes, igual que el estado en gameProgress (stats.ts):
     // un 100% de Steam cuenta como platino, no como "juego completado" aparte
@@ -101,7 +109,8 @@ export function paragonProgress(games: Game[]): ParagonProgress {
 
   const trofeos =
     (["bronze", "silver", "gold"] as const).reduce((total, grade) => total + earned[grade] * XP_POR_GRADO[grade], 0) +
-    steamXp;
+    steamXp +
+    xboxXp;
   const platinos = earned.platinum * XP_POR_GRADO.platinum;
   const completados = juegosCompletados * 100;
   // Antes se quedaba fuera del total: el nivel de esta tarjeta salía más

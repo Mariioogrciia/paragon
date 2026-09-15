@@ -17,7 +17,7 @@ import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
-import { xpSteamPorRareza } from "@/lib/trophyScore";
+import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import { anunciarNivelSiSube } from "@/lib/discordBot";
@@ -680,6 +680,30 @@ export const getLibrary = cache(
     steamXpPorJuego.set(t.gameId, (steamXpPorJuego.get(t.gameId) ?? 0) + xpSteamPorRareza(t.rarityPercent));
   }
 
+  // Mismo motivo que arriba, para Xbox: pesa por el Gamerscore real de cada
+  // logro (`gameTrophies.xp`, el mismo que ya usa Paragon Score) en vez de
+  // no dar nada hasta el 100% del juego.
+  const xboxTrofeosGanados = await db
+    .select({ gameId: userTrophies.gameId, xp: gameTrophies.xp })
+    .from(userTrophies)
+    .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+    .innerJoin(
+      gameTrophies,
+      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+    )
+    .where(
+      and(
+        eq(userTrophies.userId, profile.userId),
+        eq(userTrophies.earned, true),
+        eq(gamesTable.platform, "xbox"),
+      ),
+    );
+
+  const xboxXpPorJuego = new Map<string, number>();
+  for (const t of xboxTrofeosGanados) {
+    xboxXpPorJuego.set(t.gameId, (xboxXpPorJuego.get(t.gameId) ?? 0) + trophyScore({ platform: "xbox", xp: t.xp }));
+  }
+
   const games: Game[] = rows.map((r) => ({
     id: r.id,
     platform: r.platform,
@@ -701,6 +725,7 @@ export const getLibrary = cache(
     igdbId: r.igdbId,
     platinumRarity: r.platinumRarity ?? undefined,
     steamTrophyXp: steamXpPorJuego.get(r.id),
+    xboxTrophyXp: xboxXpPorJuego.get(r.id),
     rating: r.rating ?? undefined,
     review: r.review ?? undefined,
     reviewDate: r.reviewDate?.toISOString() ?? undefined,

@@ -189,6 +189,16 @@ export interface Game {
    * en lib/level.ts.
    */
   steamTrophyXp?: number;
+  /**
+   * Igual que `steamTrophyXp`, pero para Xbox: suma del Gamerscore real
+   * (`gameTrophies.xp`) de los logros ya conseguidos en este juego. Añadido
+   * el 15 de septiembre de 2026, al empezar a llegar sincronización real de
+   * Xbox — antes de esto un logro suelto de Xbox sin llegar al 100% del
+   * juego no daba NADA de XP de nivel, a diferencia de Steam (que ya pesaba
+   * por rareza) o PSN (que pesa por metal). Ver `paragonProgress` en
+   * lib/level.ts.
+   */
+  xboxTrophyXp?: number;
   /** Id del catálogo de IGDB, si esta fila ya se emparejó con uno. Es lo que
    * permite agrupar el mismo lanzamiento entre plataformas (ver GlobalGame en
    * lib/community.ts) y filtrar recomendaciones de lo que ya se tiene. */
