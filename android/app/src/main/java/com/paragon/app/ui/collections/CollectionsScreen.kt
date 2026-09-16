@@ -41,7 +41,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBack: () -> Unit = {}) {
     val repository = remember(tokenStore) { CollectionsRepository(tokenStore) }
-    val libraryRepository = remember(tokenStore) { LibraryRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
+    val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     val coroutineScope = rememberCoroutineScope()
 
     var result by remember { mutableStateOf<CollectionsResult?>(null) }

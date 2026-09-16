@@ -7,17 +7,21 @@ import com.paragon.app.data.network.LigaDto
 import retrofit2.HttpException
 
 /** Amigos y Liga (SocialScreen) — DOS conceptos distintos, ver GET /api/mobile/social en API-CONTRACT.md. */
+data class AmigoCuenta(val platform: String, val username: String)
+
 data class AmigoRow(
     val userId: String,
     val name: String,
     val handle: String?,
     val level: Int,
     val platinos: Int,
+    val accounts: List<AmigoCuenta> = emptyList(),
 )
 
 data class LigaRow(
     val userId: String,
     val name: String,
+    val handle: String?,
     val points: Int,
 )
 
@@ -34,11 +38,13 @@ private fun AmigoDto.toAmigoRow() = AmigoRow(
     handle = handle,
     level = trophyLevel ?: 1,
     platinos = platinos,
+    accounts = accounts.map { AmigoCuenta(it.platform, it.username) },
 )
 
 private fun LigaDto.toLigaRow() = LigaRow(
     userId = userId,
     name = name ?: handle ?: "Jugador",
+    handle = handle,
     points = points,
 )
 

@@ -18,6 +18,7 @@ data class FeedItem(
     val gameTitle: String,
     val reactions: Int,
     val timeAgo: String,
+    val userHandle: String,
 )
 
 sealed class FeedResult {
@@ -66,6 +67,7 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     gameTitle = game.title,
     reactions = reactions,
     timeAgo = relativeTimeEs(createdAt),
+    userHandle = user.handle ?: "",
 )
 
 class FeedRepository(private val tokenStore: TokenStore? = null) {

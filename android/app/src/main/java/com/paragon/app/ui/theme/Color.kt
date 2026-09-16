@@ -16,15 +16,15 @@ import androidx.compose.ui.graphics.Color
 internal var isDarkTheme by mutableStateOf(true)
 
 // --- Oscuro (el de siempre) ---
-private val DarkBackground = Color(0xFF0A0D13)
-private val DarkSurface = Color(0xFF10151F)
-private val DarkSurface2 = Color(0xFF1B2330)
-private val DarkBorder = Color(0xFF212A38)
-private val DarkForeground = Color(0xFFE9EEF7)
-private val DarkMuted = Color(0xFF8794A8)
-private val DarkAccent = Color(0xFF4A9EFF)
-private val DarkAccent2 = Color(0xFF9FD4EC)
-private val DarkAccentSoft = Color(0x234A9EFF) // ~14% opacity
+private val DarkBackground = Color(0xFF000000)
+private val DarkSurface = Color(0xFF0C0C0C)
+private val DarkSurface2 = Color(0xFF161616)
+private val DarkBorder = Color(0xFF262626)
+private val DarkForeground = Color(0xFFFFFFFF)
+private val DarkMuted = Color(0xFFA0A0A0)
+private val DarkAccent = Color(0xFFB026FF) // Neon Purple
+private val DarkAccent2 = Color(0xFFE08FFF)
+private val DarkAccentSoft = Color(0x23B026FF) // ~14% opacity
 private val DarkBronze = Color(0xFFC07B4A)
 private val DarkSilver = Color(0xFFB9C2CC)
 private val DarkGold = Color(0xFFE2B53E)

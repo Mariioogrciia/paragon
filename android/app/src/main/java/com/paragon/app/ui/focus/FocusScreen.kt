@@ -43,7 +43,9 @@ private val FocoNegro = Color(0xFF000000)
  */
 @Composable
 fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
-    val libraryRepository = remember(tokenStore) { LibraryRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
+    val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     val gameRepository = remember(tokenStore) { GameDetailRepository(tokenStore) }
     val coroutineScope = rememberCoroutineScope()
 

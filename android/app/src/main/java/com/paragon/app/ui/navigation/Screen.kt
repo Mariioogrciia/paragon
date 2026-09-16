@@ -14,6 +14,8 @@ sealed class Screen(val route: String, val title: String) {
     object LinkedAccounts : Screen("linked_accounts", "Cuentas Vinculadas")
     object Stats : Screen("stats", "Estadísticas")
     object Focus : Screen("focus", "Modo Enfoque")
-    object Compare : Screen("compare", "Comparar")
+    object Compare : Screen("compare?handle={handle}", "Comparar") {
+        fun routeFor(handle: String) = "compare?handle=$handle"
+    }
     object Collections : Screen("collections", "Carpetas")
 }

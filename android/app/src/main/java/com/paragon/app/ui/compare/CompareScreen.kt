@@ -36,20 +36,18 @@ import kotlinx.coroutines.launch
  * un toque sin tener que escribir su @handle a mano.
  */
 @Composable
-fun CompareScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
+fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack: () -> Unit = {}) {
     val repository = remember(tokenStore) { CompareRepository(tokenStore) }
     val socialRepository = remember(tokenStore) { SocialRepository(tokenStore) }
     val coroutineScope = rememberCoroutineScope()
-    var handle by remember { mutableStateOf("") }
+    var handle by remember(initialHandle) { mutableStateOf(initialHandle ?: "") }
     var result by remember { mutableStateOf<CompareResult?>(null) }
     var loading by remember { mutableStateOf(false) }
     var amigos by remember { mutableStateOf<List<AmigoRow>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        val social = socialRepository.getSocial()
-        amigos = (social as? SocialResult.Ok)?.data?.amigos.orEmpty()
-    }
-
+    // Declarada ANTES del LaunchedEffect que la usa — una función local de
+    // Kotlin no se puede llamar antes de su propia declaración textual en
+    // el mismo bloque, a diferencia de una función de nivel superior.
     fun buscar(query: String) {
         val limpio = query.trim().removePrefix("@")
         if (limpio.isBlank()) return
@@ -58,6 +56,15 @@ fun CompareScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
         coroutineScope.launch {
             result = repository.compare(limpio)
             loading = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val social = socialRepository.getSocial()
+        amigos = (social as? SocialResult.Ok)?.data?.amigos.orEmpty()
+
+        if (!initialHandle.isNullOrBlank()) {
+            buscar(initialHandle)
         }
     }
 

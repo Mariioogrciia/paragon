@@ -11,14 +11,20 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,36 +55,47 @@ import coil3.compose.AsyncImage
  * portada web). El desglose por metal (`trophyCounts`) sigue con
  * `PanelRepository.getMockTrophyCounts()`: no hay endpoint todavía para eso.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfile: UserProfile, globalStats: GlobalStats) {
     val repository = remember(tokenStore) { PanelRepository(tokenStore) }
-    val libraryRepository = remember(tokenStore) { LibraryRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
+    val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     val trophyCounts = remember { repository.getMockTrophyCounts() }
     var highlights by remember { mutableStateOf<HighlightsResult?>(null) }
     var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
+    
+    val haptic = LocalHapticFeedback.current
+    val retryCounter = remember { mutableIntStateOf(0) }
+    val pullToRefreshState = rememberPullToRefreshState()
+    var isInitialLoading by remember { mutableStateOf(true) }
 
-    // En paralelo, no en cadena — findPinnedGame() vuelve a pedir la
-    // Biblioteca entera, y encadenarlo detrás de highlights+milestone hacía
-    // que el banner del juego anclado tardara en aparecer (visible como un
-    // "tarda un poco" en pantalla) sin necesidad: las tres llamadas no
-    // dependen entre sí.
-    LaunchedEffect(Unit) {
+    LaunchedEffect(retryCounter.value) {
+        if (highlights == null) isInitialLoading = true
         coroutineScope {
             launch { highlights = repository.getHighlights() }
             launch { pinnedGame = libraryRepository.findPinnedGame() }
             launch { hito = (milestoneRepository.getMilestone() as? MilestoneResult.Ok)?.hito }
         }
+        isInitialLoading = false
+        pullToRefreshState.endRefresh()
+    }
+    
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            retryCounter.value += 1
+        }
     }
 
-    Scaffold(
-        containerColor = Background
-    ) { paddingValues ->
+    Box(modifier = Modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .background(Background),
             contentPadding = PaddingValues(bottom = 32.dp)
         ) {
             item {
@@ -157,11 +174,15 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
                     )
 
                     when (val current = highlights) {
-                        null -> Box(
-                            modifier = Modifier.fillMaxWidth().height(240.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(color = Accent)
+                        null -> {
+                            if (isInitialLoading) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().height(240.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CircularProgressIndicator(color = Accent)
+                                }
+                            }
                         }
                         is HighlightsResult.Error -> Text(
                             text = current.message,
@@ -214,6 +235,13 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
                 }
             }
         }
+        
+        PullToRefreshContainer(
+            state = pullToRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            containerColor = Surface,
+            contentColor = Accent
+        )
     }
 }
 

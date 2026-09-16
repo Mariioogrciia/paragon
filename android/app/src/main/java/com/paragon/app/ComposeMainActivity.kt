@@ -1,20 +1,30 @@
 package com.paragon.app
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.FirebaseMessaging
+import com.paragon.app.data.PushRepository
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.BASE_URL
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.panel.AppRoot
 import com.paragon.app.ui.theme.ParagonTheme
+import kotlinx.coroutines.launch
 
 /**
  * Único login real de la app (Google/Discord, sin contraseña — ver auth.ts en
@@ -32,6 +42,15 @@ class ComposeMainActivity : ComponentActivity() {
     // PanelScreen sepa que tiene que volver a pedir el panel real.
     private val refreshTrigger = mutableIntStateOf(0)
 
+    // Android 13+ (API 33) exige pedir este permiso en tiempo de ejecución
+    // para poder mostrar CUALQUIER notificación — sin él, FCM sigue
+    // entregando el mensaje pero ParagonFirebaseMessagingService no puede
+    // pintar nada. Se pide una vez; si se deniega, no se vuelve a insistir
+    // sin que el sistema decida que toca (mismo comportamiento por defecto
+    // de `registerForActivityResult`).
+    private val requestNotificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* nada que hacer con el resultado */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tokenStore = TokenStore(applicationContext)
@@ -39,6 +58,8 @@ class ComposeMainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         handleDeepLink(intent)
+        requestNotificationPermissionIfNeeded()
+        registerPushTokenIfLoggedIn()
 
         setContent {
             ParagonTheme(mode = themeStore.mode) {
@@ -65,6 +86,35 @@ class ComposeMainActivity : ComponentActivity() {
             if (!token.isNullOrBlank()) {
                 tokenStore.token = token
                 refreshTrigger.value += 1
+                // Recién logueado: registrar YA el token de FCM que ya
+                // teníamos (si lo había) contra este usuario nuevo — antes
+                // de esto no había sesión con la que autenticar la llamada.
+                registerPushTokenIfLoggedIn()
+            }
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val yaConcedido = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        if (!yaConcedido) requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    /**
+     * Le pide a Firebase el token de este dispositivo y lo manda al backend
+     * — sin `google-services.json` de por medio, `FirebaseApp.getApps()`
+     * está vacío y esto no hace nada, en silencio (mismo criterio que el
+     * resto de piezas opcionales de NativeAppSetup).
+     */
+    private fun registerPushTokenIfLoggedIn() {
+        if (tokenStore.token == null) return
+        if (FirebaseApp.getApps(applicationContext).isEmpty()) return
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            val token = task.result ?: return@addOnCompleteListener
+            lifecycleScope.launch {
+                PushRepository(tokenStore).registerToken(token)
             }
         }
     }

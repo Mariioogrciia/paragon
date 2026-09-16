@@ -19,7 +19,7 @@
         <activity
             android:name=".ComposeMainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
@@ -43,9 +43,41 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Notificaciones push nativas (FCM) — ver
+             com.paragon.app.push.ParagonFirebaseMessagingService y
+             POST /api/mobile/push-token en el proyecto Next.js. Solo hace
+             algo de verdad si android/app/google-services.json existe
+             (ver la condición en app/build.gradle); sin eso, el sistema
+             simplemente no tiene ningún token que darle a este servicio. -->
+        <service
+            android:name=".push.ParagonFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_paragon" />
+
+        <receiver
+            android:name=".widget.PinnedGameWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/pinned_game_widget_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 13+ exige pedir este permiso en tiempo de ejecución para
+         poder mostrar CUALQUIER notificación, incluidas las push — ver la
+         petición en ComposeMainActivity.kt. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

@@ -45,6 +45,8 @@ object ApiClient {
     fun milestoneApi(tokenStore: TokenStore): MilestoneApi = retrofit(tokenStore).create(MilestoneApi::class.java)
     fun collectionsApi(tokenStore: TokenStore): CollectionsApi = retrofit(tokenStore).create(CollectionsApi::class.java)
     fun compareApi(tokenStore: TokenStore): CompareApi = retrofit(tokenStore).create(CompareApi::class.java)
+    fun pushTokenApi(tokenStore: TokenStore): PushTokenApi = retrofit(tokenStore).create(PushTokenApi::class.java)
+    fun usersApi(tokenStore: TokenStore): UsersApi = retrofit(tokenStore).create(UsersApi::class.java)
 
     /**
      * Un único Retrofit cacheado para todos los servicios — `.create()` sobre

@@ -122,11 +122,11 @@ arreglados por Claude:**
       repositorios de red (Retrofit) contra los 4 endpoints reales. Repasado
       y compilado por Claude el 16/09, un bug pequeño encontrado y
       arreglado (ver arriba).
-- [ ] 5 piezas nuevas en el alcance (16/09, ver detalle arriba): Estadísticas,
+- [x] 5 piezas nuevas en el alcance (16/09, ver detalle arriba): Estadísticas,
       juego anclado/reservado, carpetas de juegos, Modo Enfoque, Comparar
       con amigos. **Backend de las 5 ya listo** (ver tareas de Claude,
-      abajo) — falta toda la UI en Android.
-- [ ] **Corrección crítica de UI (edge-to-edge)**, plan de Gemini del
+      abajo) — UI en Android completada por Gemini.
+- [x] **Corrección crítica de UI (edge-to-edge)**, plan de Gemini del
       16/09: tema equivocado en `ComposeMainActivity` (`AndroidManifest.xml`
       seguía en `AppTheme.NoActionBarLaunch`, con el splash de fondo — al
       activar `enableEdgeToEdge()` esa imagen se estira detrás de las
@@ -135,9 +135,8 @@ arreglados por Claude:**
       `MainScreen.kt` (el `padding` fijo iba ANTES del
       `windowInsetsPadding`, duplicando alto) + `Scaffold` redundante
       dentro de `PanelScreen.kt` (ya está el de `MainScreen`, el segundo
-      duplicaba los márgenes de `WindowInsets` → huecos negros). Gemini ya
-      empezó (`AndroidManifest.xml` cambiado); Claude no toca estos 3
-      archivos mientras Gemini los tenga en curso.
+      duplicaba los márgenes de `WindowInsets` → huecos negros). Terminado
+      por Gemini.
 
 ## Tareas de Claude (backend + enganche de datos reales)
 

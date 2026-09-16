@@ -12,6 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.BarChart
@@ -33,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -85,7 +95,22 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
     var searchQuery by remember { mutableStateOf("") }
     var isMenuExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
+    var bottomBarVisible by rememberSaveable { mutableStateOf(true) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < -15f) { // Scrolling down
+                    bottomBarVisible = false
+                } else if (available.y > 15f) { // Scrolling up
+                    bottomBarVisible = true
+                }
+                return Offset.Zero
+            }
+        }
+    }
 
     val items = listOf(
         BottomNavItem.Dashboard,
@@ -96,13 +121,14 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
     )
 
     Scaffold(
+        modifier = Modifier.nestedScroll(nestedScrollConnection),
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Background)
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                    .windowInsetsPadding(WindowInsets.statusBars),
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (isSearchActive) {
@@ -185,7 +211,7 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
                                 text = { Text("Comparar", color = Foreground) },
                                 onClick = {
                                     isMenuExpanded = false
-                                    navController.navigate(Screen.Compare.route)
+                                    navController.navigate("compare")
                                 }
                             )
                             DropdownMenuItem(
@@ -208,17 +234,16 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
             }
         },
         bottomBar = {
-            // Sin este padding, la barra de gestos/navegación del sistema
-            // (enableEdgeToEdge en ComposeMainActivity dibuja toda la app
-            // por debajo de ella) se solapa con las etiquetas de la barra
-            // inferior — el BOM de Compose de este proyecto (2024.02.00,
-            // fijado por compatibilidad con Kotlin 1.9.22) es de antes de
-            // que NavigationBar aplicara este inset por su cuenta.
-            NavigationBar(
-                containerColor = Background,
-                contentColor = Foreground,
-                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+            AnimatedVisibility(
+                visible = bottomBarVisible,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it })
             ) {
+                NavigationBar(
+                    containerColor = Background,
+                    contentColor = Foreground,
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+                ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
@@ -231,6 +256,7 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
                         icon = { Icon(item.icon, contentDescription = item.screen.title, modifier = Modifier.size(26.dp)) },
                         selected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true,
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             navController.navigate(item.screen.route) {
                                 // Evitar crear historial múltiple
                                 popUpTo(navController.graph.findStartDestination().id) {
@@ -251,23 +277,40 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
                 }
             }
         }
+    }
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Screen.Dashboard.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
+            exitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) },
+            popEnterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
+            popExitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
             composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, profile, stats) }
             composable(Screen.Library.route) { LibraryScreen(navController, tokenStore, searchQuery) }
             composable(Screen.Stats.route) { StatsScreen(tokenStore) }
-            composable(Screen.Feed.route) { FeedScreen(tokenStore) }
-            composable(Screen.Social.route) { SocialScreen(tokenStore) }
+            composable(Screen.Feed.route) { 
+                FeedScreen(tokenStore, onCompareClick = { handle ->
+                    navController.navigate(Screen.Compare.routeFor(handle))
+                }) 
+            }
+            composable(Screen.Social.route) { 
+                SocialScreen(tokenStore, onCompareClick = { handle ->
+                    navController.navigate(Screen.Compare.routeFor(handle))
+                }) 
+            }
 
             composable(Screen.Focus.route) {
                 FocusScreen(tokenStore, onBack = { navController.popBackStack() })
             }
-            composable(Screen.Compare.route) {
-                CompareScreen(tokenStore, onBack = { navController.popBackStack() })
+            composable(
+                route = Screen.Compare.route,
+                arguments = listOf(navArgument("handle") { nullable = true; defaultValue = null })
+            ) { backStackEntry ->
+                val initialHandle = backStackEntry.arguments?.getString("handle")
+                CompareScreen(tokenStore, initialHandle = initialHandle, onBack = { navController.popBackStack() })
             }
             composable(Screen.Collections.route) {
                 CollectionsScreen(navController, tokenStore, onBack = { navController.popBackStack() })

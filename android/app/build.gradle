@@ -4,6 +4,7 @@ apply plugin: 'com.android.application'
 // build "compila" pero ComposeMainActivity no existe de verdad y la app
 // revienta con ClassNotFoundException al lanzar, no al construir.
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'com.google.devtools.ksp'
 
 android {
     namespace = "com.paragon.app"
@@ -78,9 +79,19 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended"
     debugImplementation "androidx.compose.ui:ui-tooling"
     
-    // Image Loading (Coil for Compose)
+    // Image Loading & Colors
     implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")
+    implementation("androidx.palette:palette-ktx:1.0.0")
+
+    // Widgets (Glance)
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+
+    // Room Database
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
     
     // Networking
     implementation "com.squareup.retrofit2:retrofit:2.11.0"
@@ -92,6 +103,14 @@ dependencies {
     // Custom Tabs para el login (Google/Discord viven en la web, no hay
     // contraseña que pedir dentro de la app) — ver ComposeMainActivity.kt.
     implementation "androidx.browser:browser:$androidxBrowserVersion"
+
+    // Notificaciones push nativas (FCM) — ver push/ParagonFirebaseMessagingService.kt.
+    // El BOM fija la versión de firebase-messaging; funciona en tiempo de
+    // compilación aunque todavía no exista google-services.json (el plugin
+    // de más abajo es lo único condicionado a ese archivo — sin él, Firebase
+    // simplemente no se inicializa en tiempo de ejecución).
+    implementation platform("com.google.firebase:firebase-bom:33.7.0")
+    implementation "com.google.firebase:firebase-messaging"
 }
 
 apply from: 'capacitor.build.gradle'

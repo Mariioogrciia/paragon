@@ -2,6 +2,7 @@ package com.paragon.app.ui.feed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,6 +11,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,23 +37,39 @@ import com.paragon.app.data.mensajeFeed
 import com.paragon.app.ui.theme.*
 
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(tokenStore: TokenStore) {
+fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
     val repository = remember(tokenStore) { FeedRepository(tokenStore) }
     var result by remember { mutableStateOf<FeedResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
+    var isInitialLoading by remember { mutableStateOf(true) }
+    var selectedHandle by remember { mutableStateOf<String?>(null) }
+    val haptic = LocalHapticFeedback.current
+
+    val pullToRefreshState = rememberPullToRefreshState()
 
     LaunchedEffect(retryCounter.value) {
-        result = null
+        if (result == null) isInitialLoading = true
         result = repository.getFeed()
+        isInitialLoading = false
+        pullToRefreshState.endRefresh()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .padding(horizontal = 24.dp)
-    ) {
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            retryCounter.value += 1
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .padding(horizontal = 24.dp)
+        ) {
         Text(
             text = "COMUNIDAD",
             color = Foreground,
@@ -56,8 +79,12 @@ fun FeedScreen(tokenStore: TokenStore) {
         )
 
         when (val current = result) {
-            null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Accent)
+            null -> {
+                if (isInitialLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Accent)
+                    }
+                }
             }
             is FeedResult.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -83,17 +110,34 @@ fun FeedScreen(tokenStore: TokenStore) {
                         contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
                         items(current.items, key = { it.id }) { item ->
-                            FeedCard(item)
+                            FeedCard(item, onUserClick = { selectedHandle = item.userHandle })
                         }
                     }
                 }
             }
         }
+        }
+        
+        
+        PullToRefreshContainer(
+            state = pullToRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            containerColor = Surface,
+            contentColor = Accent
+        )
+
+        selectedHandle?.let { handle ->
+            com.paragon.app.ui.social.FriendProfileBottomSheet(
+                handle = handle,
+                tokenStore = tokenStore,
+                onDismiss = { selectedHandle = null },
+                onCompareClick = onCompareClick
+            )
+        }
     }
 }
-
 @Composable
-fun FeedCard(item: FeedItem) {
+fun FeedCard(item: FeedItem, onUserClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -106,7 +150,13 @@ fun FeedCard(item: FeedItem) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = item.userName, color = Accent, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(
+                    text = item.userName, 
+                    color = Accent, 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 14.sp,
+                    modifier = Modifier.clickable { onUserClick() }
+                )
                 Text(text = item.timeAgo, color = Muted, fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))

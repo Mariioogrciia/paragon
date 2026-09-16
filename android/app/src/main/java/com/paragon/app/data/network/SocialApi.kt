@@ -2,6 +2,9 @@ package com.paragon.app.data.network
 
 import retrofit2.http.GET
 
+/** Online ID de PSN / gamertag de Xbox / SteamID — para añadirlos directamente en esa plataforma. */
+data class AmigoCuentaDto(val platform: String, val username: String)
+
 data class AmigoDto(
     val userId: String,
     val name: String?,
@@ -12,6 +15,7 @@ data class AmigoDto(
     val trofeos: Int,
     val juegos: Int,
     val completadoMedio: Int,
+    val accounts: List<AmigoCuentaDto> = emptyList(),
 )
 
 data class LigaDto(

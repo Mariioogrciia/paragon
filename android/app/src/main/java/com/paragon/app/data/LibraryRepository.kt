@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import androidx.glance.appwidget.updateAll
 
 /** Biblioteca completa (LibraryScreen) — ver GET /api/mobile/library en API-CONTRACT.md. */
 data class LibraryGame(
@@ -21,6 +22,7 @@ data class LibraryGame(
     // ahí "completado al 100%" no es lo mismo que "platinado".
     val isPlatinado: Boolean,
     val lastPlayedAt: String?,
+    val isPinned: Boolean = false,
 ) {
     /** Para reutilizar StandardGameCard/HeroGameCard (GameCards.kt) tal cual. */
     fun toGameProgress() = GameProgress(
@@ -49,21 +51,52 @@ private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     earnedTotal = earnedTotal,
     isPlatinado = (earned?.platinum ?: 0) > 0,
     lastPlayedAt = lastPlayedAt,
+    isPinned = isPinned ?: false,
 )
 
-class LibraryRepository(private val tokenStore: TokenStore? = null) {
+private fun LibraryGame.toEntity() = com.paragon.app.data.local.LibraryGameEntity(
+    id = id,
+    title = title,
+    coverUrl = coverUrl,
+    progressPercent = progressPercent,
+    definedTotal = definedTotal,
+    earnedTotal = earnedTotal,
+    isPlatinado = isPlatinado,
+    lastPlayedAt = lastPlayedAt,
+    isPinned = isPinned
+)
+
+class LibraryRepository(
+    private val tokenStore: TokenStore? = null,
+    private val libraryDao: com.paragon.app.data.local.LibraryDao? = null,
+    private val context: android.content.Context? = null
+) {
     suspend fun getLibrary(): LibraryResult {
         val store = tokenStore ?: return LibraryResult.Error("Sin sesión.")
 
+        // 1. Obtener de caché local rápido si existe (Offline mode / Instant load)
+        val localGames = libraryDao?.getAllGames()?.map { it.toDomain() }
+        
         return try {
             val response = ApiClient.libraryApi(store).getLibrary()
-            // Deseados aparte (Wishlist): esta pantalla es "lo que tienes", no
-            // "lo que quieres" — mismo criterio que summarise() en la web.
-            LibraryResult.Ok(response.games.filterNot { it.isWishlist }.map { it.toLibraryGame() })
+            val remoteGames = response.games.filterNot { it.isWishlist }.map { it.toLibraryGame() }
+            
+            // 2. Guardar en caché local
+            libraryDao?.deleteAll()
+            libraryDao?.insertAll(remoteGames.map { it.toEntity() })
+            
+            // 3. Actualizar Widget para que refleje los datos nuevos
+            context?.let { ctx ->
+                com.paragon.app.widget.PinnedGameWidget().updateAll(ctx)
+            }
+            
+            LibraryResult.Ok(remoteGames)
         } catch (e: HttpException) {
-            LibraryResult.Error("El servidor respondió con un error (${e.code()}).")
+            if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames) 
+            else LibraryResult.Error("El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {
-            LibraryResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames)
+            else LibraryResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
     }
 
@@ -74,6 +107,10 @@ class LibraryRepository(private val tokenStore: TokenStore? = null) {
      * sesión, si la llamada falla, o si no hay nada anclado.
      */
     suspend fun findPinnedGameId(): String? {
+        // Miramos primero la caché local (mucho más rápido y seguro offline)
+        val localPinned = libraryDao?.getPinnedGame()?.id
+        if (localPinned != null) return localPinned
+        
         val store = tokenStore ?: return null
         return try {
             ApiClient.libraryApi(store).getLibrary().games.find { it.isPinned == true }?.id
@@ -82,8 +119,10 @@ class LibraryRepository(private val tokenStore: TokenStore? = null) {
         }
     }
 
-    /** Igual que `findPinnedGameId` pero con los datos ya listos para pintar un banner (portada, título, progreso). */
     suspend fun findPinnedGame(): LibraryGame? {
+        val localPinned = libraryDao?.getPinnedGame()?.toDomain()
+        if (localPinned != null) return localPinned
+        
         val store = tokenStore ?: return null
         return try {
             ApiClient.libraryApi(store).getLibrary().games.find { it.isPinned == true }?.toLibraryGame()

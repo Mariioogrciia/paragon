@@ -12,9 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.paragon.app.data.LibraryFilter
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.LibraryResult
@@ -33,26 +39,43 @@ private val FILTERS = listOf(
 )
 
 /** Biblioteca real contra GET /api/mobile/library (LibraryRepository). El botón "Ordenar" sigue sin acción — pendiente. */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQuery: String = "") {
-    val repository = remember(tokenStore) { LibraryRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
+    val repository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     var result by remember { mutableStateOf<LibraryResult?>(null) }
     var selectedFilter by remember { mutableIntStateOf(0) }
     var isSortMenuExpanded by remember { mutableStateOf(false) }
     var sortOption by remember { mutableIntStateOf(0) } // 0: Progreso, 1: Título A-Z, 2: Título Z-A
     val sortLabels = listOf("Progreso", "Título A-Z", "Título Z-A")
     val retryCounter = remember { mutableIntStateOf(0) }
+    val haptic = LocalHapticFeedback.current
+    
+    val pullToRefreshState = rememberPullToRefreshState()
+    var isInitialLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(retryCounter.value) {
-        result = null
+        if (result == null) isInitialLoading = true
         result = repository.getLibrary()
+        isInitialLoading = false
+        pullToRefreshState.endRefresh()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-    ) {
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            retryCounter.value += 1
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+        ) {
         // Cabecera con selector
         Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp)) {
             Row(
@@ -103,7 +126,10 @@ fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQu
                 FILTERS.forEachIndexed { index, (_, title) ->
                     Tab(
                         selected = selectedFilter == index,
-                        onClick = { selectedFilter = index },
+                        onClick = { 
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            selectedFilter = index 
+                        },
                         text = { Text(text = title, fontWeight = FontWeight.Bold) },
                         selectedContentColor = Accent,
                         unselectedContentColor = Muted
@@ -115,8 +141,12 @@ fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQu
         Spacer(modifier = Modifier.height(16.dp))
 
         when (val current = result) {
-            null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Accent)
+            null -> {
+                if (isInitialLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Accent)
+                    }
+                }
             }
             is LibraryResult.Error -> Box(
                 modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -169,5 +199,13 @@ fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQu
                 }
             }
         }
+        }
+        
+        PullToRefreshContainer(
+            state = pullToRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            containerColor = Surface,
+            contentColor = Accent
+        )
     }
 }

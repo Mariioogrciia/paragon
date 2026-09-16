@@ -45,7 +45,11 @@ import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.collections.AddToCollectionSheet
 import com.paragon.app.ui.theme.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.graphics.BitmapFactory
+import androidx.palette.graphics.Palette
 
 /**
  * Ficha de juego (plan sección 2.4) — cabecera hero con portada difuminada
@@ -121,6 +125,29 @@ private fun GameDetailContent(
     var pinned by remember(gameId) { mutableStateOf(game.isPinned) }
     var reservado by remember(gameId, hitoInicial) { mutableStateOf(hitoInicial?.gameId == gameId) }
     var showCollections by remember { mutableStateOf(false) }
+    var dynamicColor by remember { mutableStateOf(Accent) }
+
+    LaunchedEffect(game.coverUrl) {
+        withContext(Dispatchers.IO) {
+            try {
+                val url = java.net.URL(game.coverUrl)
+                val connection = url.openConnection()
+                connection.doInput = true
+                connection.connect()
+                val input = connection.inputStream
+                val bitmap = BitmapFactory.decodeStream(input)
+                if (bitmap != null) {
+                    val palette = Palette.from(bitmap).generate()
+                    val swatch = palette.vibrantSwatch ?: palette.dominantSwatch ?: palette.mutedSwatch
+                    if (swatch != null) {
+                        dynamicColor = Color(swatch.rgb)
+                    }
+                }
+            } catch (e: Exception) {
+                // Ignore, fallback to Accent
+            }
+        }
+    }
     // El número solo se conoce cuando ALGÚN juego está reservado (viene de
     // /api/mobile/milestone) — si no hay nada reservado todavía no hay
     // preview de número, mismo límite que tiene la API móvil.
@@ -144,7 +171,7 @@ private fun GameDetailContent(
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize().background(Background)) {
-        item { GameDetailHero(game = game, onBack = onBack) }
+        item { GameDetailHero(game = game, dynamicColor = dynamicColor, onBack = onBack) }
 
         item {
             GameActionsRow(
@@ -154,6 +181,7 @@ private fun GameDetailContent(
                 onTogglePin = { togglePin() },
                 onToggleReserve = { toggleReserve() },
                 onOpenCollections = { showCollections = true },
+                dynamicColor = dynamicColor,
             )
         }
 
@@ -174,7 +202,7 @@ private fun GameDetailContent(
 }
 
 @Composable
-private fun GameDetailHero(game: GameDetailData, onBack: () -> Unit) {
+private fun GameDetailHero(game: GameDetailData, dynamicColor: Color, onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth().height(320.dp)) {
         AsyncImage(
             model = game.coverUrl,
@@ -229,7 +257,7 @@ private fun GameDetailHero(game: GameDetailData, onBack: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth(game.percent / 100f)
                             .fillMaxHeight()
-                            .background(Accent, RoundedCornerShape(4.dp)),
+                            .background(dynamicColor, RoundedCornerShape(4.dp)),
                     )
                 }
             }
@@ -253,6 +281,7 @@ private fun GameActionsRow(
     onTogglePin: () -> Unit,
     onToggleReserve: () -> Unit,
     onOpenCollections: () -> Unit,
+    dynamicColor: Color,
 ) {
     Row(
         modifier = Modifier
@@ -264,7 +293,7 @@ private fun GameActionsRow(
         ActionChip(
             label = if (pinned) "Objetivo actual" else "Anclar objetivo",
             active = pinned,
-            accentColor = Accent,
+            accentColor = dynamicColor,
             onClick = onTogglePin,
         )
         ActionChip(
@@ -281,7 +310,7 @@ private fun GameActionsRow(
         ActionChip(
             label = "Carpetas",
             active = false,
-            accentColor = Accent,
+            accentColor = dynamicColor,
             onClick = onOpenCollections,
         )
     }
