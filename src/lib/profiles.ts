@@ -593,6 +593,34 @@ export async function unlinkAccount(userId: string, platform: PlataformaVinculab
     );
 }
 
+/**
+ * Ancla (o desancla) un juego para Modo Enfoque — mismo `userGames.pinnedAt`
+ * que usa la web. Extraída de `togglePinGameAction` (src/app/actions.ts)
+ * para poder llamarla también desde `/api/mobile/*` sin pasar por
+ * `requireUserId()` (que exige la cookie web). Desancla SIEMPRE lo que
+ * hubiera antes primero — nunca hay más de uno anclado a la vez.
+ */
+export async function togglePinnedGame(userId: string, gameId: string): Promise<{ pinned: boolean }> {
+  const [actual] = await db
+    .select({ pinnedAt: userGames.pinnedAt })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  const yaAnclado = actual?.pinnedAt != null;
+
+  await db.update(userGames).set({ pinnedAt: null }).where(eq(userGames.userId, userId));
+
+  if (!yaAnclado) {
+    await db
+      .update(userGames)
+      .set({ pinnedAt: new Date() })
+      .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+  }
+
+  return { pinned: !yaAnclado };
+}
+
 /* ---------------------------------- Datos de juego --------------------------------- */
 
 /**

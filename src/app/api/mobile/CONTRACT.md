@@ -133,6 +133,58 @@ no existe. La primera carga tras vincular una cuenta puede tardar algo
 más — puede disparar un resync de trofeos en el servidor si estaban
 desactualizados.
 
+## `POST /api/mobile/games/{gameId}/pin` — Anclar/desanclar para Modo Enfoque
+
+```json
+{ "pinned": true }
+```
+Sin body. Desancla SIEMPRE lo que hubiera antes primero — nunca hay más de
+un juego anclado a la vez, sin necesidad de mandar el id del anterior.
+
+## `POST /api/mobile/games/{gameId}/reserve` — Reservar/quitar para el próximo hito
+
+```json
+{ "reservado": true }
+```
+Sin body. "Cerrojo de Hitos": reserva este juego para tu próximo platino en
+número redondo (#25, #50...). Solo uno a la vez, igual que anclar.
+
+## `GET /api/mobile/milestone` — Qué hay reservado ahora mismo
+
+```json
+{ "hito": { "gameId": "abc123", "titulo": "Elden Ring", "iconUrl": "https://...", "numero": 100 } }
+```
+`hito` es `null` si no hay nada reservado, o si el juego reservado YA se
+platinó (el cerrojo se cumplió solo). `numero` se recalcula siempre a
+partir de tus platinos actuales, nunca se guarda un número viejo.
+
+## `GET /api/mobile/collections` — Carpetas de juegos
+
+```json
+{ "collections": [ { "id": "col_1", "name": "Para el finde", "gameIds": ["abc123", "def456"] } ] }
+```
+
+## `POST /api/mobile/collections` — Crear carpeta
+
+Body: `{ "name": "..." }` (máx. 40 caracteres). `{ "id": "col_1" }` o `400`
+con `{ "error": "..." }` si el nombre no vale.
+
+## `PATCH /api/mobile/collections/{id}` — Renombrar carpeta
+
+Body: `{ "name": "..." }`. `{ "ok": true }` o `400` igual que crear.
+
+## `DELETE /api/mobile/collections/{id}` — Borrar carpeta
+
+`{ "ok": true }`. No borra los juegos, solo la carpeta.
+
+## `POST /api/mobile/collections/{id}/games/{gameId}` — Meter/sacar un juego de la carpeta
+
+```json
+{ "dentro": true }
+```
+Sin body. `dentro: false` también si la carpeta no es tuya o no existe (no
+hay 404 aparte — el resultado que le importa al cliente es el mismo).
+
 ## `GET /api/mobile/accounts` — Qué cuentas están vinculadas
 
 ```json

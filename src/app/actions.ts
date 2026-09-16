@@ -30,8 +30,10 @@ import {
   setHandle,
   setManualTrophyProgress,
   setProfileInfo,
+  togglePinnedGame,
   unlinkAccount,
 } from "@/lib/profiles";
+import { toggleReservedMilestone } from "@/lib/milestones";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
 import { PsnProfileNotFoundError } from "@/lib/psn/client";
@@ -1203,30 +1205,9 @@ export async function syncHltbAction(gameId: string, title: string): Promise<voi
  */
 export async function togglePinGameAction(gameId: string): Promise<{ pinned: boolean }> {
   const userId = await requireUserId();
-  const db = getDb();
-
-  const [actual] = await db
-    .select({ pinnedAt: userGames.pinnedAt })
-    .from(userGames)
-    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
-    .limit(1);
-
-  const yaAnclado = actual?.pinnedAt != null;
-
-  // Desancla SIEMPRE lo que hubiera antes (incluido este mismo juego, si ya
-  // estaba anclado) antes de, si toca, anclar el nuevo — así nunca queda
-  // más de uno anclado a la vez, sin depender de una constraint en la base.
-  await db.update(userGames).set({ pinnedAt: null }).where(eq(userGames.userId, userId));
-
-  if (!yaAnclado) {
-    await db
-      .update(userGames)
-      .set({ pinnedAt: new Date() })
-      .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
-  }
-
+  const result = await togglePinnedGame(userId, gameId);
   revalidatePath("/", "layout");
-  return { pinned: !yaAnclado };
+  return result;
 }
 
 /* ---------------------------------- Cerrojo de Hitos --------------------------------- */
@@ -1240,18 +1221,9 @@ export async function togglePinGameAction(gameId: string): Promise<{ pinned: boo
  */
 export async function toggleReservarHitoAction(gameId: string): Promise<{ reservado: boolean }> {
   const userId = await requireUserId();
-  const db = getDb();
-
-  const [actual] = await db.select({ gameId: users.reservedMilestoneGameId }).from(users).where(eq(users.id, userId)).limit(1);
-  const yaReservado = actual?.gameId === gameId;
-
-  await db
-    .update(users)
-    .set({ reservedMilestoneGameId: yaReservado ? null : gameId })
-    .where(eq(users.id, userId));
-
+  const result = await toggleReservedMilestone(userId, gameId);
   revalidatePath("/", "layout");
-  return { reservado: !yaReservado };
+  return result;
 }
 
 /* ---------------------------------- Notas privadas por juego --------------------------------- */

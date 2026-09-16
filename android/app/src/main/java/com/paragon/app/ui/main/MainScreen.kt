@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -163,9 +164,16 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
             }
         },
         bottomBar = {
+            // Sin este padding, la barra de gestos/navegación del sistema
+            // (enableEdgeToEdge en ComposeMainActivity dibuja toda la app
+            // por debajo de ella) se solapa con las etiquetas de la barra
+            // inferior — el BOM de Compose de este proyecto (2024.02.00,
+            // fijado por compatibilidad con Kotlin 1.9.22) es de antes de
+            // que NavigationBar aplicara este inset por su cuenta.
             NavigationBar(
                 containerColor = Background,
-                contentColor = Foreground
+                contentColor = Foreground,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination

@@ -19,8 +19,7 @@ Un único login real: Google o Discord (no hay contraseña).
 3. Guardar `token` (ver `TokenStore.kt`) y mandarlo en cada llamada como:
    `Authorization: Bearer <token>`
 4. Si cualquier endpoint responde **401**, el token ha caducado o se cerró
-   sesión en la web — borrar el token guardado y volver a pedir login.
-   (`PanelRepository.kt`/`GameDetailRepository.kt` ya hacen esto.)
+   sesión — borrar el token guardado y volver a pedir login.
 
 Todos los endpoints de abajo exigen ese header. Sin él, o con un token no
 válido: `401 { "error": "No autenticado" }`.
@@ -33,8 +32,7 @@ válido: `401 { "error": "No autenticado" }`.
   "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68 }
 }
 ```
-`psnId` puede ser `null` (sin cuenta PSN vinculada). **Ya enganchado de
-verdad** en `PanelScreen` (perfil + stats reales, bajan desde `AppRoot`).
+`psnId` puede ser `null`. **Ya enganchado de verdad** en `PanelScreen`.
 
 ## `GET /api/mobile/panel/highlights` — "A un paso del platino" y "Recientes"
 
@@ -45,11 +43,8 @@ verdad** en `PanelScreen` (perfil + stats reales, bajan desde `AppRoot`).
 }
 ```
 MISMO cálculo que la web — `nearPlatinum` son juegos con platino real sin
-conseguir, ordenados por trofeos pendientes (máx. 3); `recent` son los
-últimos jugados, no deseados (máx. 6). Misma forma que `GameProgress` en
-Kotlin (`id`, `title`, `coverUrl`, `earnedTrophies`, `totalTrophies`,
-`percent`) — pensado para no tocar `GameCards.kt`. **Ya enganchado de
-verdad** en `PanelScreen`.
+conseguir (máx. 3), `recent` son los últimos jugados, no deseados (máx. 6).
+**Ya enganchado de verdad** en `PanelScreen`.
 
 ## `GET /api/mobile/library` — Biblioteca
 
@@ -64,18 +59,10 @@ verdad** en `PanelScreen`.
   "lastPlayedAt": "2026-09-01T12:00:00.000Z", "playtimeMinutes": 3120
 } ] }
 ```
-`platform`: `"psn" | "steam" | "xbox" | "manual"`.
-`defined`/`earned` son `null` en Steam/Xbox (no tienen desglose por metal).
-
-**Filtrado y orden son responsabilidad del cliente** — se manda el array
-completo, no hay `?estado=`/`?orden=` en el servidor. Estados para un
-selector como el de la web: `platinado`, `completado`, `en-curso`,
-`sin-empezar`, `deseados`, `a-punto`, `abandonado` — se derivan de
-`progressPercent`/`isWishlist`/`earnedTotal` vs `definedTotal`, no vienen
-como campo aparte. **Ya enganchado de verdad** en `LibraryScreen`
-(`LibraryRepository.getLibrary` + `filterByStatus()`) con una versión
-simplificada de 4 estados (Todos/Jugando/Completados/Abandonados), no los 7
-exactos de la web.
+`platform`: `"psn" | "steam" | "xbox" | "manual"`. `defined`/`earned` son
+`null` en Steam/Xbox. **Filtrado y orden son responsabilidad del
+cliente** — se manda el array completo. **Ya enganchado de verdad** en
+`LibraryScreen` (filtro de 4 estados simplificado, no los 7 de la web).
 
 ## `GET /api/mobile/feed` — Actividad (propia + amigos)
 
@@ -85,13 +72,11 @@ exactos de la web.
   "createdAt": "2026-09-15T20:00:00.000Z",
   "user": { "id": "u1", "handle": "mario", "name": "Mario", "image": "https://..." },
   "game": { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "deviceLabel": "PS5" },
-  "reactions": 3, "reacted": false,
-  "comments": [ { "activityId": "act_1", "body": "GG", "userName": "Ana", "createdAt": "..." } ]
+  "reactions": 3, "reacted": false
 } ] }
 ```
-`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`.
-Máximo 50 elementos, ya ordenados por fecha descendente. **Ya enganchado de
-verdad** en `FeedScreen` (`FeedRepository.getFeed`).
+`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`. Máx.
+50, ya ordenados por fecha descendente. **Ya enganchado de verdad**.
 
 ## `GET /api/mobile/social` — Amigos y Liga
 
@@ -99,22 +84,12 @@ Dos conceptos DISTINTOS, no la misma lista en otro orden:
 
 ```json
 {
-  "amigos": [ {
-    "userId": "u1", "name": "Mario", "handle": "mario", "avatarUrl": "https://...",
-    "trophyLevel": 14, "platinos": 87, "trofeos": 4312, "juegos": 214, "completadoMedio": 68
-  } ],
-  "liga": [ {
-    "userId": "u1", "handle": "mario", "name": "Mario", "image": "https://...", "points": 340
-  } ]
+  "amigos": [ { "userId": "u1", "name": "Mario", "handle": "mario", "avatarUrl": "https://...", "trophyLevel": 14, "platinos": 87, "trofeos": 4312, "juegos": 214, "completadoMedio": 68 } ],
+  "liga": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "https://...", "points": 340 } ]
 }
 ```
-- `amigos`: tú + tus amigos reales, con vuestras cifras de siempre. El
-  backend NO los ordena — `SocialRepository` los ordena por platinos en
-  el cliente.
-- `liga`: liga mensual **global** (todo el mundo, no solo amigos), puntuada
-  solo por trofeos de ESTE mes calendario (platino=100, oro=50, plata=25,
-  bronce/sin metal=10) — se reinicia cada mes, ya viene ordenada por
-  puntos. **Ya enganchado de verdad** en `SocialScreen`.
+`amigos` no llega ordenado del backend (se ordena en el cliente por
+platinos); `liga` sí, por puntos. **Ya enganchado de verdad**.
 
 ## `GET /api/mobile/games/{gameId}` — Ficha de juego
 
@@ -122,19 +97,60 @@ Dos conceptos DISTINTOS, no la misma lista en otro orden:
 { "game": {
   "id": "abc123", "platform": "psn", "title": "Elden Ring", "...": "(mismos campos que en /library)",
   "trophiesSyncedAt": "2026-09-10T08:00:00.000Z", "notes": "Guía: empezar por...",
-  "trophies": [ {
-    "id": "t1", "name": "Elden Lord", "detail": "Consigue uno de los finales.",
-    "grade": "platinum", "earned": true, "earnedAt": "2026-09-10T07:55:00.000Z",
-    "rarityPercent": 4.2, "hidden": false, "iconUrl": "https://...",
-    "isMissable": false, "xp": 300
-  } ]
+  "trophies": [ { "id": "t1", "name": "Elden Lord", "detail": "Consigue uno de los finales.", "grade": "platinum", "earned": true, "earnedAt": "2026-09-10T07:55:00.000Z", "rarityPercent": 4.2, "hidden": false, "iconUrl": "https://...", "isMissable": false, "xp": 300 } ]
 }}
 ```
-`grade` puede faltar en logros de Xbox/Steam sin metal (solo tienen `xp`).
-404 si el juego no es tuyo o no existe. **Ya enganchado de verdad** en
-`GameDetailScreen`.
+`grade` puede faltar en logros de Xbox/Steam sin metal. 404 si el juego no
+es tuyo. **Ya enganchado de verdad** en `GameDetailScreen`.
 
-## `GET /api/mobile/accounts` — Qué cuentas están vinculadas (NUEVO, sin enganchar en Android todavía)
+## `POST /api/mobile/games/{gameId}/pin` — Anclar/desanclar para Modo Enfoque (NUEVO, sin enganchar)
+
+```json
+{ "pinned": true }
+```
+Sin body. Desancla SIEMPRE lo que hubiera antes primero.
+
+## `POST /api/mobile/games/{gameId}/reserve` — Reservar/quitar para el próximo hito (NUEVO, sin enganchar)
+
+```json
+{ "reservado": true }
+```
+Sin body. "Cerrojo de Hitos": solo uno reservado a la vez.
+
+## `GET /api/mobile/milestone` — Qué hay reservado ahora mismo (NUEVO, sin enganchar)
+
+```json
+{ "hito": { "gameId": "abc123", "titulo": "Elden Ring", "iconUrl": "https://...", "numero": 100 } }
+```
+`hito` es `null` si no hay nada reservado, o si ya se platinó solo.
+`numero` (#25/#50/#100...) se recalcula siempre, nunca se guarda.
+
+## `GET /api/mobile/collections` — Carpetas de juegos (NUEVO, sin enganchar)
+
+```json
+{ "collections": [ { "id": "col_1", "name": "Para el finde", "gameIds": ["abc123", "def456"] } ] }
+```
+
+## `POST /api/mobile/collections` — Crear carpeta (NUEVO, sin enganchar)
+
+Body: `{ "name": "..." }` (máx. 40 caracteres). `{ "id": "col_1" }` o `400`.
+
+## `PATCH /api/mobile/collections/{id}` — Renombrar carpeta (NUEVO, sin enganchar)
+
+Body: `{ "name": "..." }`. `{ "ok": true }` o `400`.
+
+## `DELETE /api/mobile/collections/{id}` — Borrar carpeta (NUEVO, sin enganchar)
+
+`{ "ok": true }`. No borra los juegos, solo la carpeta.
+
+## `POST /api/mobile/collections/{id}/games/{gameId}` — Meter/sacar un juego de la carpeta (NUEVO, sin enganchar)
+
+```json
+{ "dentro": true }
+```
+Sin body. `dentro: false` también si la carpeta no es tuya.
+
+## `GET /api/mobile/accounts` — Qué cuentas están vinculadas
 
 ```json
 {
@@ -150,29 +166,29 @@ Dos conceptos DISTINTOS, no la misma lista en otro orden:
 }
 ```
 `configured` es si el servidor tiene ese proveedor OAuth dado de alta — no
-ofrecer el botón si es `false`, revienta al pulsarlo. Para **vincular**
-Google/Discord no hay un POST: se reabre `/movil/entrar/{provider}` (el
-mismo route del login) con sesión activa — la Custom Tab comparte cookies
-con Chrome, así que `signIn()` detecta la sesión y VINCULA en vez de crear
-una cuenta nueva.
+ofrecer el botón si es `false`. Para **vincular** Google/Discord no hay un
+POST: se reabre `/movil/entrar/{provider}` con sesión activa. **Ya
+enganchado de verdad** en `LinkedAccountsScreen`.
 
-## `POST /api/mobile/accounts/{platform}` — Vincular PSN/Steam/Xbox (NUEVO)
+## `POST /api/mobile/accounts/{platform}` — Vincular PSN/Steam/Xbox
 
 `{platform}` es `psn`, `steam` o `xbox`. Body: `{ "input": "tu-online-id-o-gamertag" }`.
 
 ```json
 { "username": "mario_psn", "legible": true, "juegos": 214 }
 ```
-`legible: false` si el perfil está en privado (se vincula igual, pero no se
-pueden leer sus juegos). Error `422` con `{ "error": "..." }` si la cuenta
-ya está vinculada a OTRO usuario de Paragon, o si la plataforma no
-responde.
+`legible: false` si el perfil está en privado. Error `422` si la cuenta ya
+está vinculada a OTRO usuario. **Ya enganchado de verdad**.
 
-## `DELETE /api/mobile/accounts/{platform}` — Desvincular PSN/Steam/Xbox (NUEVO)
+## `DELETE /api/mobile/accounts/{platform}` — Desvincular PSN/Steam/Xbox
 
-`{ "ok": true }`. Borra la cuenta vinculada, no los juegos ya importados.
+`{ "ok": true }`. **Ya enganchado de verdad**.
 
-## `POST /api/mobile/profile` — Ajustes del perfil (NUEVO)
+## `POST /api/mobile/profile` — Ajustes del perfil
 
 Body: `{ "name": "Mario", "image": "https://..." | null }`. `{ "ok": true }`
-o `400` si `name` viene vacío.
+o `400` si `name` viene vacío. **Ya enganchado de verdad** en `SettingsScreen`.
+
+## `POST /api/mobile/logout` — Cerrar sesión SOLO en este móvil
+
+Sin body. `{ "ok": true }` siempre. **Ya enganchado de verdad**.

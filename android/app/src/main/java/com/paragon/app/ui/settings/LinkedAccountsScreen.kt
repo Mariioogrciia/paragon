@@ -43,6 +43,11 @@ fun LinkedAccountsScreen(
     fun loadAccounts() {
         scope.launch {
             isLoading = true
+            // Sin esto, un fallo previo dejaba errorMessage puesto para
+            // siempre: el if/else if de abajo mira el error ANTES que
+            // response, así que una recarga con éxito nunca llegaba a
+            // pintar la lista, aunque `response` ya estuviera bien.
+            errorMessage = null
             when (val result = repository.getLinkedAccounts()) {
                 is SettingsResult.Ok -> response = result.data
                 is SettingsResult.Error -> errorMessage = result.message

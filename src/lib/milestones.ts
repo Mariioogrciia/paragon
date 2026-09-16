@@ -45,6 +45,24 @@ export async function getHitoReservado(userId: string, platinosActuales: number)
   };
 }
 
+/**
+ * Reserva (o quita la reserva de) un juego para el próximo hito redondo.
+ * Extraída de `toggleReservarHitoAction` (src/app/actions.ts) para
+ * reutilizarla también desde `/api/mobile/*`. Solo uno a la vez: reservar
+ * uno nuevo sustituye al anterior, una sola columna en `users`.
+ */
+export async function toggleReservedMilestone(userId: string, gameId: string): Promise<{ reservado: boolean }> {
+  const [actual] = await db.select({ gameId: users.reservedMilestoneGameId }).from(users).where(eq(users.id, userId)).limit(1);
+  const yaReservado = actual?.gameId === gameId;
+
+  await db
+    .update(users)
+    .set({ reservedMilestoneGameId: yaReservado ? null : gameId })
+    .where(eq(users.id, userId));
+
+  return { reservado: !yaReservado };
+}
+
 /** A un solo trofeo del platino (o 100% equivalente) — el caso que de verdad importa avisar antes de que pase. */
 export function aUnTrofeoDelPlatino(game: Game): boolean {
   if (game.isWishlist || esPlatinoEquivalente(game)) return false;
