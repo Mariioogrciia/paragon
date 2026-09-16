@@ -2,8 +2,224 @@
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **16 de septiembre de 2026**
-(con Antigravity trabajando en paralelo todo el rato — más abajo hay un
-aviso de qué tocó él).
+(con Gemini, dentro de Android Studio, trabajando en paralelo en la app
+nativa — más abajo hay el detalle completo de esa coordinación).
+
+---
+
+## Sesión del 16 de septiembre de 2026 (continuación 12) — arranca la app nativa Android en serio: backend completo, login sin web de por medio, sesión propia del móvil, y Gemini se queda sin cuota a medio arreglo visual
+
+Sesión larga y muy encadenada, en paralelo con **Gemini** (el asistente de
+IA integrado en Android Studio, no un Claude — coordinación por mensajes
+que el usuario pega de un lado a otro, sin canal directo entre los dos
+agentes). Reparto acordado desde el principio y documentado en
+[`PLAN-NATIVA.md`](PLAN-NATIVA.md) (con copia en
+[`android/PLAN-NATIVA.md`](android/PLAN-NATIVA.md), porque Gemini solo ve
+esa carpeta, no el resto del repo): Gemini construye la UI en Compose,
+Claude el backend Next.js y el enganche de datos reales. Contrato exacto
+de cada endpoint en [`src/app/api/mobile/CONTRACT.md`](src/app/api/mobile/CONTRACT.md)
+(copia en `android/API-CONTRACT.md`).
+
+**Punto de partida real, para quien no haya leído la continuación 11**: ya
+existía un `.apk` de depuración con un WebView de Capacitor (shell nativo
+que carga la web tal cual) y toques nativos (barra de estado, botón atrás,
+háptica, splash). Esta sesión es la primera vez que se construye una app
+**Compose de verdad**, con sus propias pantallas y su propia API — el
+WebView de Capacitor (`MainActivity.java`) se deja tal cual "conviviendo un
+tiempo" mientras la app Compose (`ComposeMainActivity.kt`, ya el launcher)
+crece, decisión explícita del usuario, sin fecha para retirarlo.
+
+### Arquitectura de auth: login que no pasa por ninguna página web
+
+Primer diseño (funcional pero mejorable): la app abría una Custom Tab a
+`/movil/enlazar`, que si no había sesión redirigía a `/entrar` — la página
+de login de la web, con su propio diseño — antes de llegar a Google/
+Discord. El usuario preguntó explícitamente "esto debería ser de la app,
+no de la web ¿no?" y tenía razón en lo que sí se podía arreglar (no en
+saltarse la Custom Tab entera: Google prohíbe reimplementar su login
+dentro de un WebView, por seguridad — solo vale navegador del sistema o
+Custom Tabs, que es justo el patrón que ya se usaba).
+
+Arreglado quitando el paso intermedio: `AppRoot.LoginGate` (Android) tiene
+ahora dos botones nativos, "Continuar con Google"/"Continuar con Discord",
+cada uno con el icono de marca real (mismos SVG que la web, convertidos a
+vector drawable en `res/drawable/ic_google.xml`/`ic_discord.xml`). Cada
+botón abre una Custom Tab directa a `/movil/entrar/{provider}` (nuevo route
+en `src/app/movil/entrar/[provider]/route.ts`) que llama a `signIn()`
+server-side sin renderizar nada — la Custom Tab va derecha a la pantalla
+real de Google/Discord, cero HTML de Paragon de por medio. `/movil/enlazar`
+sigue existiendo, pero solo como paso final (ya CON sesión) para mandar el
+token a la app por el deep link `paragon://auth?token=...`.
+
+### Sesión del móvil, independiente de la sesión web
+
+Hallazgo real revisando esto con calma: el token que recibía la app era
+literalmente la cookie que puso el login en el navegador (Custom Tabs
+comparten cookies con Chrome) — cerrar sesión en el Chrome de ese mismo
+teléfono habría matado también la sesión de la app, y viceversa, porque
+eran la misma fila de `session` en la base.
+
+Arreglado con `mintMobileSession(userId, sesionPrestada)` en
+[`lib/mobileAuth.ts`](src/lib/mobileAuth.ts): en cuanto `/movil/enlazar`
+recibe esa cookie prestada, la cambia por un `sessionToken` propio del
+móvil (fila nueva en `session`) y BORRA la prestada — desde ese momento son
+dos sesiones independientes de verdad. `POST /api/mobile/logout` (con
+`revokeMobileSession`) borra solo esa fila del móvil. El botón "Cerrar
+sesión" de `SettingsScreen` (Gemini) ya llama a este endpoint antes de
+limpiar el token local (`PanelRepository.logout()`, enganchado por Claude).
+
+### Los 20 endpoints de `/api/mobile/*`, todos reutilizando lógica ya probada de la web
+
+Ninguno reinventa cálculos — todos llaman a las mismas funciones de
+`src/lib/*` que ya usa la web, con `getMobileUserId(req)` (Bearer token)
+en vez de la cookie:
+
+- **Auth**: `mobileAuth.ts` (`getMobileUserId`, `mintMobileSession`,
+  `revokeMobileSession`, `describePlatformError` centralizado — ya no vive
+  duplicado en `actions.ts`).
+- **Panel**: `GET /panel` (perfil+stats), `GET /panel/highlights` ("a un
+  paso del platino"/"recientes", mismo `gameProgress()` que la portada web
+  — endpoint aparte para no duplicar ese cálculo en Kotlin).
+- **Biblioteca**: `GET /library` (array completo, filtro/orden en cliente,
+  igual que la web).
+- **Comunidad**: `GET /feed` (propia+amigos).
+- **Social**: `GET /social` (amigos + liga mensual global, dos conceptos
+  distintos).
+- **Ficha de juego**: `GET /games/{id}`, `POST /games/{id}/pin` (Modo
+  Enfoque), `POST /games/{id}/reserve` + `GET /milestone` (Cerrojo de
+  Hitos), `POST /games/{id}/notes` (nota privada), `POST /games/{id}/resync`
+  ("¿ya lo tengo?").
+- **Carpetas**: CRUD completo de `/collections` (crear/renombrar/borrar/
+  meter-sacar juego).
+- **Cuentas**: `GET /accounts`, `POST`/`DELETE /accounts/{platform}` (PSN/
+  Steam/Xbox — Google/Discord se vinculan reabriendo `/movil/entrar/
+  {provider}` con sesión activa, sin POST propio).
+- **Perfil**: `POST /profile` (nombre/foto).
+- **Estadísticas**: `GET /stats` — versión CURADA (Paragon Score, Trophy
+  DNA, rachas, histórico, financiero, eficiencia, deuda de backlog, horas
+  totales), sin los ~15 widgets del dashboard completo de la web (heatmaps
+  de calendario/horas, salón de la vergüenza...) — esos son mejores en
+  pantalla grande o ya están cubiertos en otro sitio.
+- **Comparar**: `GET /compare/{handle}` — versión CURADA, sin la carrera
+  trofeo a trofeo de la web (`sharedTrophyLeads`, la pieza más pesada).
+
+Para hacer esto sin duplicar código, cuatro funciones que vivían atadas a
+`requireUserId()` dentro de `actions.ts` se sacaron a `src/lib/profiles.ts`/
+`src/lib/milestones.ts` como funciones puras por `userId`
+(`togglePinnedGame`, `toggleReservedMilestone`, `refrescarJuego`,
+`saveGameNotes`) — las acciones de la web ahora son envoltorios finos que
+llaman a lo mismo, mismo patrón que ya se usó con `linkAccount`.
+
+### Bugs reales encontrados y arreglados
+
+- **Vincular una cuenta de PSN/Steam/Xbox ya vinculada a OTRO usuario** daba
+  el mensaje falso "No se ha podido contactar con la plataforma" — la base
+  de datos ya lo impedía (índice único `platform_account_identity_idx`),
+  pero el error no se explicaba. Ahora `PlatformAccountAlreadyLinkedError`
+  (`src/lib/profiles.ts`) da el mensaje real. Google/Discord ya estaban
+  bien por construcción (clave primaria de `accounts` en Auth.js).
+- **`LinkedAccountsScreen` (Android, de Gemini) se quedaba bloqueada en la
+  pantalla de error para siempre** tras un solo fallo de red, aunque una
+  recarga posterior tuviera éxito — `errorMessage` nunca se limpiaba al
+  reintentar, y el `if/else if` miraba el error antes que la respuesta
+  buena. Arreglado por Claude.
+- **Carátulas en blanco**: `iconUrl` viene `null` para muchos juegos de
+  verdad (dato normal, no un fallo — la web ya lo trata así en
+  `LibraryGrid.tsx` con un degradado de respaldo). El móvil no tenía ese
+  respaldo; añadido en `GameCards.kt` (inicial del juego sobre degradado).
+- **Barra de navegación inferior tapada por la barra de gestos del
+  sistema**: `NavigationBar` no reservaba ese inset sola (BOM de Compose
+  2024.02.00, de antes de que eso viniera por defecto) — arreglado con
+  `windowInsetsPadding(WindowInsets.navigationBars)`.
+
+### Auditoría de seguridad del backend móvil (pedida por precaución, no por un incidente)
+
+Sin problemas graves. Dos cosas anotadas para más adelante, sin urgencia
+con ~6 usuarios reales: (1) el `sessionToken` viaja en la URL del deep link
+— podría acabar en el logcat de algunos OEMs, mitigable con un código de un
+solo uso en vez del token directo; (2) ya no aplica del todo tras
+`mintMobileSession` (ver arriba), pero sigue sin existir un "cerrar sesión
+en TODOS los demás dispositivos" si algún día hace falta.
+
+### Alcance de la app nativa, decidido pantalla por pantalla con el usuario
+
+Repasadas TODAS las rutas reales de `src/app/` una por una, no solo lo que
+ya estaba construido. Dentro, además de las 8 pantallas + login ya reales
+(Panel/Biblioteca/Comunidad/Ligas y Amigos/Ficha de juego/Ajustes/Cuentas
+Vinculadas): **Estadísticas**, **juego anclado/Cerrojo de Hitos**,
+**carpetas de juegos**, **Modo Enfoque** (propuesto por Claude — la pieza
+que más sentido de "app nativa" tiene, jugar con el mando en la mano) y
+**Comparar con amigos** (propuesto por Claude). Las 5 tienen backend ya
+desplegado, CERO pantalla en Android todavía.
+
+Fuera a propósito, con motivo documentado en `PLAN-NATIVA.md` (no es "no
+dio tiempo"): Wrap, Hoja de servicios/CV (uso anual o para compartir hacia
+fuera — mejor un enlace que abra el navegador), Tu ritmo (se solapa con
+Estadísticas), Planificador salvo las carpetas, Ajustes → Apariencia/
+Ocultar/Seguridad (no aplican o ya están cubiertos), muro social global,
+Descubrir, Noticias, y todo lo de marketing/admin.
+
+**Hueco real encontrado, sin construir, sin prisa**: `/bienvenida`
+(onboarding de la primera vez) no tiene equivalente nativo — con el grupo
+cerrado de ~6 usuarios ya configurados desde la web no urge, pero sería el
+primer sitio donde rompería si entrara alguien nuevo solo desde el móvil.
+
+### Bug visual crítico, diagnosticado por Gemini y a medio arreglar cuando se acabó su cuota
+
+Plan de Gemini, diagnóstico correcto (coincide con lo que Claude ya había
+parcheado antes sin llegar a la causa raíz): `ComposeMainActivity` seguía
+con el tema `AppTheme.NoActionBarLaunch` en `AndroidManifest.xml`, que
+tiene el splash como fondo de ventana — al activar `enableEdgeToEdge()`
+esa imagen se estira detrás de las barras del sistema (el "smear" raro de
+capturas anteriores) y sin barras transparentes el sistema pinta una barra
+inferior blanca encima. Solución: pasar a `AppTheme.NoActionBar` (fondo
+negro, barras transparentes), más dos arreglos en Kotlin — el orden de
+modificadores del `topBar` en `MainScreen.kt` (el `padding` fijo iba ANTES
+del `windowInsetsPadding`, duplicando el alto) y quitar un `Scaffold`
+redundante dentro de `PanelScreen.kt` (ya hay uno en `MainScreen`, el
+segundo duplicaba los márgenes de `WindowInsets` → huecos negros).
+
+**A Gemini se le acabó la cuota con SOLO el primer cambio hecho**
+(`AndroidManifest.xml`, sin comitear — sigue así en el disco). Los otros
+dos (orden de modificadores en `MainScreen.kt`, `Scaffold` de más en
+`PanelScreen.kt`) siguen sin tocar. Quien retome esto: son los siguientes
+dos cambios a hacer, ya diagnosticados, no hace falta redescubrir nada.
+
+### Pendiente sin diagnosticar: cron cada 15 min / panel `/admin`
+
+El usuario reportó "en Vercel voy al panel de administración y va un poco
+mal", sin más detalle. Revisado el código de `/api/cron/sync` (auth por
+`CRON_SECRET` + cabecera, límites de tiempo) — tal cual quedó arreglado y
+verificado en la continuación 11 (15 de 15 ejecuciones con éxito). Sin
+acceso a los logs reales de Vercel ni a una captura del panel, no se ha
+podido diagnosticar más — pedir el detalle exacto (qué se ve mal, desde
+cuándo) antes de tocar nada.
+
+### Notificaciones nativas: necesitan infraestructura nueva, no es "conectar lo que ya hay"
+
+El usuario pidió notificaciones para la app nativa. Aviso importante para
+no prometer de más: el push que ya existe (`enviarPush`, claves VAPID) es
+**Web Push** — funciona en navegador o PWA instalada, pero **no llega a
+una app Android nativa**. Hace falta Firebase Cloud Messaging (FCM), que
+empieza por un proyecto de Firebase que **solo el usuario puede crear** en
+su consola — sin eso no hay nada que Claude ni Gemini puedan enchufar
+todavía. Sin empezar.
+
+### Aviso real para quien retome esto
+
+- `android/app/src/main/AndroidManifest.xml` tiene el cambio de tema de
+  Gemini **sin comitear** — revisarlo (es solo cambiar el `android:theme`
+  de `ComposeMainActivity` a `@style/AppTheme.NoActionBar`, bajo riesgo)
+  antes de seguir con los otros dos arreglos del mismo plan.
+- `src/app/globals.css`, `src/components/Header.tsx`,
+  `src/components/NativeAppSetup.tsx` llevan varias sesiones sin comitear,
+  de trabajo previo a esta — no son de esta sesión, se han dejado
+  intactos a propósito por no saber si es trabajo en curso de otra sesión.
+- `Paragon/` (una bóveda de Obsidian vacía) y `scratch/` en la raíz del
+  repo no tienen nada que ver con el proyecto — no tocados.
+- Comprobar con `git fetch` + `git log origin/master..HEAD` antes de asumir
+  que hay algo sin subir del backend: al cerrar esta entrada estaba todo
+  en `origin/master` salvo el `AndroidManifest.xml` de arriba.
 
 ---
 
