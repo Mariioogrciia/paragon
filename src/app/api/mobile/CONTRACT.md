@@ -32,11 +32,15 @@ válido: `401 { "error": "No autenticado" }`.
 
 ```json
 {
-  "profile": { "handle": "mario", "name": "Mario", "level": 14, "psnId": "mario_psn" },
+  "profile": { "handle": "mario", "name": "Mario", "level": 14, "psnId": "mario_psn", "image": "https://..." },
   "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68 }
 }
 ```
-`psnId` puede ser `null` (sin cuenta PSN vinculada).
+`psnId` puede ser `null` (sin cuenta PSN vinculada). `image` es la MISMA foto
+que se ve en toda la web (`resolveAvatarUrl` en lib/profiles.ts: subida a
+mano > PSN > cualquier otra cuenta vinculada > la del proveedor de login) —
+`null` si no hay ninguna. Para cambiarla desde la app, ver
+`POST /api/mobile/profile/avatar` más abajo.
 
 ## `GET /api/mobile/panel/highlights` — "A un paso del platino" y "Recientes"
 
@@ -230,6 +234,18 @@ y demás, ver `src/lib/profiles.ts`).
 Body: `{ "name": "Mario", "image": "https://..." | null }`. `{ "ok": true }`
 o `400` si `name` viene vacío.
 
+## `POST /api/mobile/profile/avatar` — Cambiar la foto de perfil
+
+`multipart/form-data` con un único campo `file` (jpg/jpeg/png/gif/webp).
+`{ "url": "https://..." }` o `400`/`500` con `{ "error": "..." }`. Sube a
+Supabase Storage (bucket `Avatars`) y actualiza `users.image` +
+`avatarPersonalizado: true` directamente — no hace falta llamar después a
+`POST /api/mobile/profile` para que se guarde, ya queda vinculada con la
+web al momento (mismo criterio que `/ajustes` en la web, ver
+`resolveAvatarUrl`). Versión para la app de `POST /api/upload` (esa exige
+la cookie de sesión de NextAuth, que la app no tiene — aquí se autentica
+igual que el resto de `/api/mobile/*`, con el Bearer token).
+
 ## `POST /api/mobile/logout` — Cerrar sesión SOLO en este móvil
 
 Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
@@ -246,7 +262,7 @@ Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
   "financiero": { "totalGastado": 1200, "totalHoras": 800, "costeHoraMedio": 1.5, "juegosConDatos": 40 },
   "eficiencia": { "ritmoMedioPct": -12, "juegosConDatos": 20 },
   "backlog": { "juegosContados": 15, "horasHistoriaRestantes": 120, "horasPlatinoRestantes": 300 },
-  "horasTotalesMinutos": 48000
+  "horasTotales": 14280
 }
 ```
 Versión CURADA para el móvil, no las ~15 piezas de

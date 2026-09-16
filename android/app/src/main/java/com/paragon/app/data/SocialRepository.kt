@@ -10,6 +10,7 @@ import retrofit2.HttpException
 data class AmigoRow(
     val userId: String,
     val name: String,
+    val handle: String?,
     val level: Int,
     val platinos: Int,
 )
@@ -30,6 +31,7 @@ sealed class SocialResult {
 private fun AmigoDto.toAmigoRow() = AmigoRow(
     userId = userId,
     name = name ?: handle ?: "Jugador",
+    handle = handle,
     level = trophyLevel ?: 1,
     platinos = platinos,
 )

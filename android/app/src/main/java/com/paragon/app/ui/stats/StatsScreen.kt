@@ -1,0 +1,293 @@
+package com.paragon.app.ui.stats
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.paragon.app.data.*
+import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.ui.theme.*
+import kotlin.math.roundToInt
+
+/**
+ * Estadísticas reales contra GET /api/mobile/stats (StatsRepository) — la
+ * versión curada para móvil (Paragon Score, ADN de trofeos, rachas,
+ * histórico, financiero, eficiencia de caza y deuda de backlog), no las ~15
+ * piezas de la web (`EstadisticasCompletas.tsx`).
+ */
+@Composable
+fun StatsScreen(tokenStore: TokenStore, onBack: (() -> Unit)? = null) {
+    val repository = remember(tokenStore) { StatsRepository(tokenStore) }
+    var result by remember { mutableStateOf<StatsResult?>(null) }
+    val retryCounter = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(retryCounter.value) {
+        result = null
+        result = repository.getStats()
+    }
+
+    Column(modifier = Modifier.fillMaxSize().background(Background)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (onBack != null) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Foreground)
+                }
+            } else {
+                Spacer(Modifier.width(16.dp))
+            }
+            Text(
+                text = "ESTADÍSTICAS",
+                color = Foreground,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = if (onBack != null) 0.dp else 16.dp),
+            )
+        }
+
+        when (val current = result) {
+            null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Accent)
+            }
+            is StatsResult.Error -> Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = current.message, color = Foreground, fontSize = 14.sp)
+                    Button(
+                        onClick = { retryCounter.value += 1 },
+                        modifier = Modifier.padding(top = 16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                    ) { Text("Reintentar") }
+                }
+            }
+            is StatsResult.Ok -> StatsContent(current.stats)
+        }
+    }
+}
+
+@Composable
+private fun StatsContent(stats: ParagonStats) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+    ) {
+        item { ParagonScoreCard(stats.paragonScore) }
+        item { TrophyDnaCard(stats.trophyDna) }
+        item { RachasCard(stats.rachas, stats.historico) }
+        item { FinancieroCard(stats.financiero, stats.horasTotales) }
+        item { EficienciaCard(stats.eficiencia) }
+        item { BacklogCard(stats.backlog) }
+    }
+}
+
+@Composable
+private fun SectionCard(title: String, subtitle: String? = null, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(20.dp))
+            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .padding(20.dp),
+    ) {
+        Text(text = title.uppercase(), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        if (subtitle != null) {
+            Text(text = subtitle, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp, bottom = 12.dp))
+        } else {
+            Spacer(Modifier.height(12.dp))
+        }
+        content()
+    }
+}
+
+@Composable
+private fun ParagonScoreCard(score: ParagonScoreStats) {
+    SectionCard(title = "Paragon Score", subtitle = "Puntuación unificada entre plataformas") {
+        Text(text = score.total.toString(), color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        if (score.porPlataforma.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            score.porPlataforma.forEach { fila ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(text = fila.platform.uppercase(), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = "${fila.puntos} pts · ${fila.trofeos} trofeos", color = Foreground, fontSize = 13.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrophyDnaCard(dna: TrophyDnaStats) {
+    SectionCard(
+        title = "ADN de trofeos",
+        subtitle = dna.arquetipo?.let { "Tu arquetipo: $it" } ?: "Sigue jugando para desbloquear tu arquetipo",
+    ) {
+        val max = dna.ejes.maxOfOrNull { it.valor } ?: 0
+        dna.ejes.sortedByDescending { it.valor }.forEach { eje ->
+            Column(modifier = Modifier.padding(vertical = 6.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = eje.label, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = "${eje.trofeos}", color = Muted, fontSize = 12.sp)
+                }
+                Spacer(Modifier.height(6.dp))
+                Box(modifier = Modifier.fillMaxWidth().height(6.dp).background(Surface2, RoundedCornerShape(3.dp))) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(if (max > 0) eje.valor / 100f else 0f)
+                            .fillMaxHeight()
+                            .background(Accent, RoundedCornerShape(3.dp)),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RachasCard(rachas: RachasStats, historico: HistoricoStats) {
+    SectionCard(title = "Rachas y actividad") {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            MiniStat(label = "Racha actual", value = "${rachas.actual}d", modifier = Modifier.weight(1f))
+            MiniStat(label = "Mejor racha", value = "${rachas.mejor}d", modifier = Modifier.weight(1f))
+            MiniStat(label = "Días activos", value = rachas.diasActivos.toString(), modifier = Modifier.weight(1f))
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "${historico.conFecha} trofeos con fecha conocida · ${historico.esteAnio} este año",
+            color = Muted,
+            fontSize = 12.sp,
+        )
+        historico.mejorMes?.let {
+            Text(
+                text = "Tu mejor mes: ${it.mes} (${it.total} trofeos)",
+                color = Foreground,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+    }
+}
+
+/**
+ * Las horas jugadas (`horasTotales`, YA en horas — `lib/profileStats.ts`
+ * devuelve horas, no minutos, pese al nombre viejo del campo que tenía la
+ * API) son un dato de siempre, sin depender de nada más — se enseñan
+ * primero y siempre, grandes. El coste por hora sí necesita precio Y tiempo
+ * jugado guardados por juego (ver `resumenFinanciero` en lib/backlog.ts),
+ * así que eso va aparte, debajo, y solo cuando hay datos — nunca escondiendo
+ * las horas si falta el precio.
+ */
+@Composable
+private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
+    SectionCard(title = "Horas jugadas") {
+        Text(text = "${"%,d".format(horasTotales).replace(",", ".")}h", color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        Text(
+            // Mismo dato que "Si juntaras las X horas... serían Y días" de
+            // PlaytimeComparison.tsx en la web, para que cuadre con lo que
+            // ya conoce quien también mira la web.
+            text = "= ${horasTotales / 24} días seguidos · en todas tus plataformas",
+            color = Muted,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider(color = Border)
+        Spacer(Modifier.height(16.dp))
+
+        Text(text = "COSTE POR HORA", color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = "Solo juegos con precio y tiempo jugado registrados", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp, bottom = 10.dp))
+
+        if (financiero.juegosConDatos == 0) {
+            Text(text = "Sin datos suficientes todavía.", color = Muted, fontSize = 13.sp)
+        } else {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MiniStat(label = "Gastado", value = "${financiero.totalGastado.roundToInt()}€", modifier = Modifier.weight(1f))
+                MiniStat(label = "Horas con precio", value = financiero.totalHoras.roundToInt().toString(), modifier = Modifier.weight(1f))
+                MiniStat(
+                    label = "€/hora",
+                    value = financiero.costeHoraMedio?.let { "%.2f€".format(it) } ?: "—",
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EficienciaCard(eficiencia: EficienciaStats) {
+    SectionCard(title = "Eficiencia de caza", subtitle = "Tu ritmo real frente a la estimación de HowLongToBeat") {
+        if (eficiencia.juegosConDatos == 0 || eficiencia.ritmoMedioPct == null) {
+            Text(text = "Sin datos suficientes todavía.", color = Muted, fontSize = 13.sp)
+        } else {
+            val esMasRapido = eficiencia.ritmoMedioPct >= 0
+            Text(
+                text = "${if (esMasRapido) "+" else ""}${eficiencia.ritmoMedioPct}%",
+                color = if (esMasRapido) Good else Danger,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = if (esMasRapido) "Más rápido que la media de HLTB" else "Te lo tomas con más calma que la media",
+                color = Muted,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun BacklogCard(backlog: BacklogStats) {
+    SectionCard(title = "Deuda de backlog", subtitle = "Horas restantes en lo que ya empezaste") {
+        if (backlog.juegosContados == 0) {
+            Text(text = "Nada empezado con dato de HowLongToBeat todavía.", color = Muted, fontSize = 13.sp)
+        } else {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MiniStat(label = "Hasta el final", value = "${backlog.horasHistoriaRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
+                MiniStat(label = "Hasta el platino", value = "${backlog.horasPlatinoRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
+                MiniStat(label = "Juegos contados", value = backlog.juegosContados.toString(), modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiniStat(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(Surface2, RoundedCornerShape(14.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Text(
+            text = value,
+            color = Foreground,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        )
+        Text(
+            text = label,
+            color = Muted,
+            fontSize = 11.sp,
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        )
+    }
+}

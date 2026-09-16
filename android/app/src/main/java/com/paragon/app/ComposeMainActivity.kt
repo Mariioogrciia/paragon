@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.BASE_URL
+import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.panel.AppRoot
 import com.paragon.app.ui.theme.ParagonTheme
 
@@ -25,6 +26,7 @@ import com.paragon.app.ui.theme.ParagonTheme
  */
 class ComposeMainActivity : ComponentActivity() {
     private lateinit var tokenStore: TokenStore
+    private lateinit var themeStore: ThemeStore
 
     // Se sube cada vez que llega un token nuevo por el deep link, para que
     // PanelScreen sepa que tiene que volver a pedir el panel real.
@@ -33,15 +35,17 @@ class ComposeMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tokenStore = TokenStore(applicationContext)
+        themeStore = ThemeStore(applicationContext)
 
         enableEdgeToEdge()
         handleDeepLink(intent)
 
         setContent {
-            ParagonTheme {
+            ParagonTheme(mode = themeStore.mode) {
                 val refresh by refreshTrigger
                 AppRoot(
                     tokenStore = tokenStore,
+                    themeStore = themeStore,
                     refreshKey = refresh,
                     onLoginRequested = { provider -> openLogin(provider) },
                 )

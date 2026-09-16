@@ -11,6 +11,7 @@ data class PanelProfileDto(
     val name: String,
     val level: Int,
     val psnId: String?,
+    val image: String?,
 )
 
 data class PanelStatsDto(

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
-import { getLibrary, getProfileByUserId } from "@/lib/profiles";
+import { getLibrary, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 
@@ -27,6 +27,10 @@ export async function GET(req: Request) {
       name: profile.displayName ?? profile.handle,
       level: nivel.level,
       psnId: psn?.username ?? psn?.accountId ?? null,
+      // Misma foto que se ve en toda la web (resolveAvatarUrl: subida a
+      // mano > PSN > cualquier otra cuenta > la del proveedor de login) —
+      // así la app arranca ya "vinculada" con la de la web sin nada más.
+      image: resolveAvatarUrl(profile) ?? null,
     },
     stats: {
       platinums: stats.platinos,

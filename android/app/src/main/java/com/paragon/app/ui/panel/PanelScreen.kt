@@ -2,6 +2,7 @@ package com.paragon.app.ui.panel
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -26,11 +28,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.paragon.app.data.GlobalStats
 import com.paragon.app.data.HighlightsResult
+import com.paragon.app.data.HitoReservado
+import com.paragon.app.data.LibraryGame
+import com.paragon.app.data.LibraryRepository
+import com.paragon.app.data.MilestoneRepository
+import com.paragon.app.data.MilestoneResult
 import com.paragon.app.data.PanelRepository
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.navigation.Screen
 import com.paragon.app.ui.theme.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import coil3.compose.AsyncImage
 
 /**
  * `userProfile`/`globalStats` ya son reales (bajan desde AppRoot vía
@@ -42,11 +52,24 @@ import com.paragon.app.ui.theme.*
 @Composable
 fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfile: UserProfile, globalStats: GlobalStats) {
     val repository = remember(tokenStore) { PanelRepository(tokenStore) }
+    val libraryRepository = remember(tokenStore) { LibraryRepository(tokenStore) }
+    val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     val trophyCounts = remember { repository.getMockTrophyCounts() }
     var highlights by remember { mutableStateOf<HighlightsResult?>(null) }
+    var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }
+    var hito by remember { mutableStateOf<HitoReservado?>(null) }
 
+    // En paralelo, no en cadena — findPinnedGame() vuelve a pedir la
+    // Biblioteca entera, y encadenarlo detrás de highlights+milestone hacía
+    // que el banner del juego anclado tardara en aparecer (visible como un
+    // "tarda un poco" en pantalla) sin necesidad: las tres llamadas no
+    // dependen entre sí.
     LaunchedEffect(Unit) {
-        highlights = repository.getHighlights()
+        coroutineScope {
+            launch { highlights = repository.getHighlights() }
+            launch { pinnedGame = libraryRepository.findPinnedGame() }
+            launch { hito = (milestoneRepository.getMilestone() as? MilestoneResult.Ok)?.hito }
+        }
     }
 
     Scaffold(
@@ -75,6 +98,26 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
                         fontSize = 14.sp,
                         modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
                     )
+
+                    pinnedGame?.let { game ->
+                        PinnedGameBanner(
+                            // A la ficha del juego, no directo a Modo Enfoque —
+                            // ese es un modo aparte que se elige a propósito
+                            // desde el menú, no algo que se cae encima al
+                            // tocar tu objetivo actual en el Panel.
+                            game = game,
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    hito?.let { h ->
+                        MilestoneBanner(
+                            hito = h,
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(h.gameId)) },
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
 
                     // Resumen Stats
                     LazyVerticalGrid(
@@ -205,6 +248,69 @@ fun PlatinumStatTile(value: Int) {
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+private val MilestoneGoldPanel = Color(0xFFE2B53E)
+
+/** Banner de "A por este platino ahora" — el juego anclado (PinGameButton en GameDetailScreen), lleva a Modo Enfoque. */
+@Composable
+fun PinnedGameBanner(game: LibraryGame, onClick: () -> Unit) {
+    val faltan = (game.definedTotal - game.earnedTotal).coerceAtLeast(0)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.horizontalGradient(colors = listOf(MilestoneGoldPanel.copy(alpha = 0.14f), Surface)),
+                shape = RoundedCornerShape(16.dp),
+            )
+            .border(1.dp, MilestoneGoldPanel.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AsyncImage(
+            model = game.coverUrl,
+            contentDescription = null,
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(Surface2),
+        )
+        Spacer(Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "A POR ESTE PLATINO AHORA", color = MilestoneGoldPanel, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(text = game.title, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+            Text(
+                text = "${game.progressPercent}% · ${if (faltan > 0) "faltan $faltan trofeos" else "¡a un paso!"}",
+                color = Muted,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+    }
+}
+
+/** Banner del Cerrojo de Hitos: qué juego está reservado para tu próximo platino en número redondo. */
+@Composable
+fun MilestoneBanner(hito: HitoReservado, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(16.dp))
+            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "CERROJO DE HITOS", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(
+                text = "${hito.titulo} reservado para tu platino #${hito.numero}",
+                color = Foreground,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
     }

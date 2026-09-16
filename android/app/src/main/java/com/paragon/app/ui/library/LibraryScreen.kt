@@ -27,6 +27,7 @@ import com.paragon.app.ui.theme.*
 private val FILTERS = listOf(
     LibraryFilter.TODOS to "Todos",
     LibraryFilter.JUGANDO to "Jugando",
+    LibraryFilter.PLATINADOS to "Platinados",
     LibraryFilter.COMPLETADOS to "Completados",
     LibraryFilter.ABANDONADOS to "Abandonados",
 )

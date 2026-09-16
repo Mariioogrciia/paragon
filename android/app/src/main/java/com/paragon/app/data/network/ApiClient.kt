@@ -41,6 +41,10 @@ object ApiClient {
     fun highlightsApi(tokenStore: TokenStore): HighlightsApi = retrofit(tokenStore).create(HighlightsApi::class.java)
     fun logoutApi(tokenStore: TokenStore): LogoutApi = retrofit(tokenStore).create(LogoutApi::class.java)
     fun settingsApi(tokenStore: TokenStore): SettingsApi = retrofit(tokenStore).create(SettingsApi::class.java)
+    fun statsApi(tokenStore: TokenStore): StatsApi = retrofit(tokenStore).create(StatsApi::class.java)
+    fun milestoneApi(tokenStore: TokenStore): MilestoneApi = retrofit(tokenStore).create(MilestoneApi::class.java)
+    fun collectionsApi(tokenStore: TokenStore): CollectionsApi = retrofit(tokenStore).create(CollectionsApi::class.java)
+    fun compareApi(tokenStore: TokenStore): CompareApi = retrofit(tokenStore).create(CompareApi::class.java)
 
     /**
      * Un único Retrofit cacheado para todos los servicios — `.create()` sobre

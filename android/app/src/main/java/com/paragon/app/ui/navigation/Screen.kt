@@ -12,4 +12,8 @@ sealed class Screen(val route: String, val title: String) {
     }
     object Settings : Screen("settings", "Ajustes")
     object LinkedAccounts : Screen("linked_accounts", "Cuentas Vinculadas")
+    object Stats : Screen("stats", "Estadísticas")
+    object Focus : Screen("focus", "Modo Enfoque")
+    object Compare : Screen("compare", "Comparar")
+    object Collections : Screen("collections", "Carpetas")
 }

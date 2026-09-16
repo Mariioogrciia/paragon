@@ -63,11 +63,13 @@ fun LinkedAccountsScreen(
     Scaffold(
         containerColor = Background,
         topBar = {
+            // Mismo motivo que en SettingsScreen: esta pantalla vive dentro
+            // del NavHost de MainScreen, debajo de su barra "PARAGON" — ese
+            // inset ya está consumido, repetirlo aquí solo infla la cabecera.
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-                    .windowInsetsPadding(WindowInsets.statusBars),
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {

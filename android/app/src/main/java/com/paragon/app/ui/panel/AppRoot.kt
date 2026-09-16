@@ -39,6 +39,7 @@ import com.paragon.app.R
 import com.paragon.app.data.PanelRepository
 import com.paragon.app.data.PanelResult
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.main.MainScreen
 import com.paragon.app.ui.theme.Accent
 import com.paragon.app.ui.theme.Background
@@ -60,6 +61,7 @@ import com.paragon.app.ui.theme.Surface as SurfaceColor
 @Composable
 fun AppRoot(
     tokenStore: TokenStore,
+    themeStore: ThemeStore,
     refreshKey: Int = 0,
     onLoginRequested: (provider: String) -> Unit = {},
 ) {
@@ -79,7 +81,7 @@ fun AppRoot(
             message = current.message,
             onRetry = { retryCounter.value += 1 },
         )
-        is PanelResult.Ok -> MainScreen(tokenStore, current.profile, current.stats)
+        is PanelResult.Ok -> MainScreen(tokenStore, themeStore, current.profile, current.stats)
     }
 }
 

@@ -3,6 +3,8 @@ package com.paragon.app.data
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.GameDetailDto
+import com.paragon.app.data.network.NotesRequest
+import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
 
 /**
@@ -30,6 +32,8 @@ data class GameDetailData(
     val earnedTrophies: Int,
     val totalTrophies: Int,
     val percent: Int,
+    val isPinned: Boolean,
+    val notes: String,
     val trophies: List<TrophyItem>,
 )
 
@@ -37,6 +41,9 @@ sealed class GameDetailResult {
     data class Ok(val detail: GameDetailData) : GameDetailResult()
     data class Error(val message: String) : GameDetailResult()
 }
+
+/** `error` viene relleno solo si la plataforma no respondió — nunca es un 4xx/5xx, ver POST .../resync. */
+data class ResyncOutcome(val nuevos: Int, val error: String?)
 
 private fun mapGrade(grade: String?): TrophyGrade? = when (grade) {
     "bronze" -> TrophyGrade.BRONZE
@@ -56,6 +63,8 @@ private fun GameDetailDto.toGameDetailData(): GameDetailData = GameDetailData(
     earnedTrophies = earnedTotal,
     totalTrophies = definedTotal,
     percent = progressPercent,
+    isPinned = isPinned ?: false,
+    notes = notes ?: "",
     trophies = trophies.map {
         TrophyItem(
             id = it.id,
@@ -88,6 +97,49 @@ class GameDetailRepository(private val tokenStore: TokenStore? = null) {
         }
     }
 
+    /** Anclar/desanclar este juego como objetivo de Modo Enfoque. Desancla siempre lo anterior, nunca hay dos a la vez. */
+    suspend fun togglePin(gameId: String): Boolean? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.gamesApi(store).togglePin(gameId).pinned
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** Reservar/quitar este juego del Cerrojo de Hitos. */
+    suspend fun toggleReserve(gameId: String): Boolean? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.gamesApi(store).toggleReserve(gameId).reservado
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** Guarda (o borra, si viene vacía) la nota privada de Modo Enfoque. */
+    suspend fun saveNotes(gameId: String, notes: String): Boolean {
+        val store = tokenStore ?: return false
+        return try {
+            ApiClient.gamesApi(store).saveNotes(gameId, NotesRequest(notes)).ok
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /** "¿Ya lo tengo?" — vuelve a pedir los trofeos de este juego sin esperar al cron. */
+    suspend fun resync(gameId: String): ResyncOutcome {
+        val store = tokenStore ?: return ResyncOutcome(0, "Sin sesión.")
+        return try {
+            val response = ApiClient.gamesApi(store).resync(gameId)
+            ResyncOutcome(response.nuevos, response.error)
+        } catch (e: HttpException) {
+            ResyncOutcome(0, e.paragonErrorMessage() ?: "El servidor respondió con un error (${e.code()}).")
+        } catch (e: Exception) {
+            ResyncOutcome(0, e.message ?: "No se pudo conectar con Paragon.")
+        }
+    }
+
     /**
      * Mantenido para pruebas/preview de Compose — las tarjetas de
      * PanelScreen (Panel sigue con datos mock salvo perfil/stats) usan ids
@@ -113,6 +165,8 @@ class GameDetailRepository(private val tokenStore: TokenStore? = null) {
             earnedTrophies = earned,
             totalTrophies = trophies.size,
             percent = (earned * 100) / trophies.size,
+            isPinned = false,
+            notes = "",
             trophies = trophies,
         )
     }

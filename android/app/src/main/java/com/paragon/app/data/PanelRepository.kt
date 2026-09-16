@@ -9,7 +9,9 @@ data class UserProfile(
     val handle: String,
     val name: String,
     val level: Int,
-    val psnId: String
+    val psnId: String,
+    // Misma foto que en la web (`resolveAvatarUrl`) — `null` si no hay ninguna.
+    val image: String? = null,
 )
 
 data class GlobalStats(
@@ -72,6 +74,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null) {
                     name = response.profile.name,
                     level = response.profile.level,
                     psnId = response.profile.psnId ?: "",
+                    image = response.profile.image,
                 ),
                 stats = GlobalStats(
                     platinums = response.stats.platinums,

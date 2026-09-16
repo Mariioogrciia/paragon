@@ -1,9 +1,12 @@
 package com.paragon.app.data.network
 
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 data class OauthAccountDto(
@@ -39,7 +42,14 @@ data class UpdateProfileRequest(
     val image: String?
 )
 
+data class AvatarUploadResponse(val url: String?, val error: String? = null)
+
 interface SettingsApi {
+    /** Ver src/app/api/mobile/profile/avatar/route.ts — multipart, campo `file`. */
+    @Multipart
+    @POST("api/mobile/profile/avatar")
+    suspend fun uploadAvatar(@Part file: MultipartBody.Part): AvatarUploadResponse
+
     @GET("api/mobile/accounts")
     suspend fun getLinkedAccounts(): LinkedAccountsResponse
 

@@ -5,6 +5,9 @@ import retrofit2.http.GET
 // Sin @JsonClass(generateAdapter = true) — mismo motivo que PanelApi.kt/
 // GamesApi.kt: KotlinJsonAdapterFactory (reflexión) lee estas data class
 // directamente, sin kapt.
+/** `null` en Steam/Xbox — no tienen desglose por metal (ver API-CONTRACT.md). */
+data class TrophyBreakdownDto(val bronze: Int, val silver: Int, val gold: Int, val platinum: Int)
+
 data class LibraryGameDto(
     val id: String,
     val platform: String,
@@ -13,7 +16,9 @@ data class LibraryGameDto(
     val progressPercent: Int,
     val definedTotal: Int,
     val earnedTotal: Int,
+    val earned: TrophyBreakdownDto?,
     val isWishlist: Boolean,
+    val isPinned: Boolean?,
     val lastPlayedAt: String?,
 )
 

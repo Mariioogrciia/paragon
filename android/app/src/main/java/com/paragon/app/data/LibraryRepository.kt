@@ -17,6 +17,9 @@ data class LibraryGame(
     val progressPercent: Int,
     val definedTotal: Int,
     val earnedTotal: Int,
+    // `false` en Steam/Xbox (sin desglose por metal, ver API-CONTRACT.md) —
+    // ahí "completado al 100%" no es lo mismo que "platinado".
+    val isPlatinado: Boolean,
     val lastPlayedAt: String?,
 ) {
     /** Para reutilizar StandardGameCard/HeroGameCard (GameCards.kt) tal cual. */
@@ -35,7 +38,7 @@ sealed class LibraryResult {
     data class Error(val message: String) : LibraryResult()
 }
 
-enum class LibraryFilter { TODOS, JUGANDO, COMPLETADOS, ABANDONADOS }
+enum class LibraryFilter { TODOS, JUGANDO, PLATINADOS, COMPLETADOS, ABANDONADOS }
 
 private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     id = id,
@@ -44,6 +47,7 @@ private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     progressPercent = progressPercent,
     definedTotal = definedTotal,
     earnedTotal = earnedTotal,
+    isPlatinado = (earned?.platinum ?: 0) > 0,
     lastPlayedAt = lastPlayedAt,
 )
 
@@ -60,6 +64,31 @@ class LibraryRepository(private val tokenStore: TokenStore? = null) {
             LibraryResult.Error("El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {
             LibraryResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+        }
+    }
+
+    /**
+     * El juego anclado ahora mismo (Modo Enfoque) — nunca hay más de uno.
+     * No hay un endpoint aparte para esto (ver API-CONTRACT.md), así que se
+     * mira el campo `isPinned` de la Biblioteca completa. `null` si no hay
+     * sesión, si la llamada falla, o si no hay nada anclado.
+     */
+    suspend fun findPinnedGameId(): String? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.libraryApi(store).getLibrary().games.find { it.isPinned == true }?.id
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** Igual que `findPinnedGameId` pero con los datos ya listos para pintar un banner (portada, título, progreso). */
+    suspend fun findPinnedGame(): LibraryGame? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.libraryApi(store).getLibrary().games.find { it.isPinned == true }?.toLibraryGame()
+        } catch (e: Exception) {
+            null
         }
     }
 }
@@ -86,6 +115,7 @@ fun List<LibraryGame>.filterByStatus(filter: LibraryFilter): List<LibraryGame> {
     return when (filter) {
         LibraryFilter.TODOS -> this
         LibraryFilter.JUGANDO -> filter { it.progressPercent in 1..99 }
+        LibraryFilter.PLATINADOS -> filter { it.isPlatinado }
         LibraryFilter.COMPLETADOS -> filter { it.progressPercent >= 100 }
         LibraryFilter.ABANDONADOS -> filter {
             it.progressPercent in 1..99 && (it.lastPlayedAt == null || it.lastPlayedAt < umbral)

@@ -47,6 +47,11 @@ export async function GET(req: Request) {
     financiero,
     eficiencia,
     backlog,
-    horasTotalesMinutos: horas,
+    // `horasTotales()` (lib/profileStats.ts) ya devuelve HORAS, no minutos —
+    // el nombre del campo lo dice para que quien lo consuma no tenga que ir
+    // a mirar la función (un bug real de la app Android dividía esto entre
+    // 60 otra vez creyendo que eran minutos, mostrando 238h en vez de las
+    // ~14 280h/595 días reales que sí salen bien en PlaytimeComparison.tsx).
+    horasTotales: horas,
   });
 }

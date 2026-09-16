@@ -1,9 +1,11 @@
 package com.paragon.app.ui.game
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,8 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,10 +37,15 @@ import coil3.compose.AsyncImage
 import com.paragon.app.data.GameDetailData
 import com.paragon.app.data.GameDetailRepository
 import com.paragon.app.data.GameDetailResult
+import com.paragon.app.data.HitoReservado
+import com.paragon.app.data.MilestoneRepository
+import com.paragon.app.data.MilestoneResult
 import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.ui.collections.AddToCollectionSheet
 import com.paragon.app.ui.theme.*
+import kotlinx.coroutines.launch
 
 /**
  * Ficha de juego (plan sección 2.4) — cabecera hero con portada difuminada
@@ -52,11 +61,16 @@ import com.paragon.app.ui.theme.*
 @Composable
 fun GameDetailScreen(gameId: String, tokenStore: TokenStore, onBack: () -> Unit = {}) {
     val repository = remember(tokenStore) { GameDetailRepository(tokenStore) }
+    val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     var result by remember { mutableStateOf<GameDetailResult?>(null) }
+    var hito by remember { mutableStateOf<HitoReservado?>(null) }
+    val retryCounter = remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(gameId) {
+    LaunchedEffect(gameId, retryCounter.value) {
         result = null
         result = repository.getGameDetail(gameId)
+        val milestoneResult = milestoneRepository.getMilestone()
+        hito = (milestoneResult as? MilestoneResult.Ok)?.hito
     }
 
     when (val current = result) {
@@ -81,14 +95,67 @@ fun GameDetailScreen(gameId: String, tokenStore: TokenStore, onBack: () -> Unit 
                 }
             }
         }
-        is GameDetailResult.Ok -> GameDetailContent(current.detail, onBack)
+        is GameDetailResult.Ok -> GameDetailContent(
+            gameId = gameId,
+            game = current.detail,
+            hitoInicial = hito,
+            tokenStore = tokenStore,
+            repository = repository,
+            onBack = onBack,
+            onMilestoneChanged = { retryCounter.value += 1 },
+        )
     }
 }
 
 @Composable
-private fun GameDetailContent(game: GameDetailData, onBack: () -> Unit) {
+private fun GameDetailContent(
+    gameId: String,
+    game: GameDetailData,
+    hitoInicial: HitoReservado?,
+    tokenStore: TokenStore,
+    repository: GameDetailRepository,
+    onBack: () -> Unit,
+    onMilestoneChanged: () -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var pinned by remember(gameId) { mutableStateOf(game.isPinned) }
+    var reservado by remember(gameId, hitoInicial) { mutableStateOf(hitoInicial?.gameId == gameId) }
+    var showCollections by remember { mutableStateOf(false) }
+    // El número solo se conoce cuando ALGÚN juego está reservado (viene de
+    // /api/mobile/milestone) — si no hay nada reservado todavía no hay
+    // preview de número, mismo límite que tiene la API móvil.
+    val numeroHito = hitoInicial?.numero
+
+    fun togglePin() {
+        pinned = !pinned
+        coroutineScope.launch {
+            val real = repository.togglePin(gameId)
+            if (real != null) pinned = real
+        }
+    }
+
+    fun toggleReserve() {
+        reservado = !reservado
+        coroutineScope.launch {
+            val real = repository.toggleReserve(gameId)
+            if (real != null) reservado = real
+            onMilestoneChanged()
+        }
+    }
+
     LazyColumn(modifier = Modifier.fillMaxSize().background(Background)) {
-        item { GameDetailHero(game, onBack) }
+        item { GameDetailHero(game = game, onBack = onBack) }
+
+        item {
+            GameActionsRow(
+                pinned = pinned,
+                reservado = reservado,
+                numeroHito = numeroHito,
+                onTogglePin = { togglePin() },
+                onToggleReserve = { toggleReserve() },
+                onOpenCollections = { showCollections = true },
+            )
+        }
 
         val grouped = game.trophies.sortedWith(
             compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
@@ -99,6 +166,10 @@ private fun GameDetailContent(game: GameDetailData, onBack: () -> Unit) {
         }
 
         item { Spacer(Modifier.height(32.dp)) }
+    }
+
+    if (showCollections) {
+        AddToCollectionSheet(gameId = gameId, tokenStore = tokenStore, onDismiss = { showCollections = false })
     }
 }
 
@@ -163,6 +234,74 @@ private fun GameDetailHero(game: GameDetailData, onBack: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+private val MilestoneGold = Color(0xFFE2B53E)
+
+/**
+ * Anclar (Modo Enfoque), reservar (Cerrojo de Hitos) y meter en una carpeta
+ * — las tres acciones nuevas de la ficha de juego, mismo patrón optimista
+ * que la web (PinGameButton/ReservarHitoButton: se pinta al momento, sin
+ * esperar la respuesta de red).
+ */
+@Composable
+private fun GameActionsRow(
+    pinned: Boolean,
+    reservado: Boolean,
+    numeroHito: Int?,
+    onTogglePin: () -> Unit,
+    onToggleReserve: () -> Unit,
+    onOpenCollections: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        ActionChip(
+            label = if (pinned) "Objetivo actual" else "Anclar objetivo",
+            active = pinned,
+            accentColor = Accent,
+            onClick = onTogglePin,
+        )
+        ActionChip(
+            label = when {
+                reservado && numeroHito != null -> "Reservado para el #$numeroHito"
+                reservado -> "Reservado"
+                numeroHito != null -> "Reservar para el #$numeroHito"
+                else -> "Reservar hito"
+            },
+            active = reservado,
+            accentColor = MilestoneGold,
+            onClick = onToggleReserve,
+        )
+        ActionChip(
+            label = "Carpetas",
+            active = false,
+            accentColor = Accent,
+            onClick = onOpenCollections,
+        )
+    }
+}
+
+@Composable
+private fun ActionChip(label: String, active: Boolean, accentColor: Color, onClick: () -> Unit) {
+    androidx.compose.material3.Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
+        color = if (active) accentColor.copy(alpha = 0.16f) else Surface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (active) accentColor.copy(alpha = 0.6f) else Border),
+    ) {
+        Text(
+            text = label,
+            color = if (active) accentColor else Foreground,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+        )
     }
 }
 

@@ -1,6 +1,7 @@
 package com.paragon.app.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +14,10 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
@@ -29,6 +31,7 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +51,10 @@ import com.paragon.app.data.PanelRepository
 import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.ui.collections.CollectionsScreen
+import com.paragon.app.ui.compare.CompareScreen
 import com.paragon.app.ui.feed.FeedScreen
+import com.paragon.app.ui.focus.FocusScreen
 import com.paragon.app.ui.game.GameDetailScreen
 import com.paragon.app.ui.library.LibraryScreen
 import com.paragon.app.ui.navigation.Screen
@@ -56,6 +62,7 @@ import com.paragon.app.ui.panel.PanelScreen
 import com.paragon.app.ui.social.SocialScreen
 import com.paragon.app.ui.settings.SettingsScreen
 import com.paragon.app.ui.settings.LinkedAccountsScreen
+import com.paragon.app.ui.stats.StatsScreen
 import com.paragon.app.ui.theme.Accent
 import com.paragon.app.ui.theme.Background
 import com.paragon.app.ui.theme.Border
@@ -66,12 +73,13 @@ import com.paragon.app.ui.theme.Muted
 sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
     object Dashboard : BottomNavItem(Screen.Dashboard, Icons.Default.Home)
     object Library : BottomNavItem(Screen.Library, Icons.AutoMirrored.Filled.List)
-    object Feed : BottomNavItem(Screen.Feed, Icons.Default.Notifications)
-    object Social : BottomNavItem(Screen.Social, Icons.Default.Person)
+    object Stats : BottomNavItem(Screen.Stats, Icons.Default.BarChart)
+    object Feed : BottomNavItem(Screen.Feed, Icons.Default.Groups)
+    object Social : BottomNavItem(Screen.Social, Icons.Default.EmojiEvents)
 }
 
 @Composable
-fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats) {
+fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.ThemeStore, profile: UserProfile, stats: GlobalStats) {
     val navController = rememberNavController()
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -82,6 +90,7 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
     val items = listOf(
         BottomNavItem.Dashboard,
         BottomNavItem.Library,
+        BottomNavItem.Stats,
         BottomNavItem.Feed,
         BottomNavItem.Social
     )
@@ -140,10 +149,24 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
-                                    .background(com.paragon.app.ui.theme.AccentSoft, androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
+                                    .background(com.paragon.app.ui.theme.AccentSoft, RoundedCornerShape(16.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(profile.name.take(1).uppercase(), color = Accent, fontWeight = FontWeight.Bold)
+                                // Misma foto que la web (`resolveAvatarUrl`, ver
+                                // API-CONTRACT.md) si el perfil ya tiene una —
+                                // solo cae a la inicial cuando no hay ninguna.
+                                if (!profile.image.isNullOrBlank()) {
+                                    coil3.compose.AsyncImage(
+                                        model = profile.image,
+                                        contentDescription = null,
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(RoundedCornerShape(16.dp)),
+                                    )
+                                } else {
+                                    Text(profile.name.take(1).uppercase(), color = Accent, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                         DropdownMenu(
@@ -151,6 +174,27 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
                             onDismissRequest = { isMenuExpanded = false },
                             modifier = Modifier.background(com.paragon.app.ui.theme.Surface)
                         ) {
+                            DropdownMenuItem(
+                                text = { Text("Modo Enfoque", color = Foreground) },
+                                onClick = {
+                                    isMenuExpanded = false
+                                    navController.navigate(Screen.Focus.route)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Comparar", color = Foreground) },
+                                onClick = {
+                                    isMenuExpanded = false
+                                    navController.navigate(Screen.Compare.route)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Carpetas", color = Foreground) },
+                                onClick = {
+                                    isMenuExpanded = false
+                                    navController.navigate(Screen.Collections.route)
+                                }
+                            )
                             DropdownMenuItem(
                                 text = { Text("Ajustes", color = Foreground) },
                                 onClick = {
@@ -180,8 +224,11 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
 
                 items.forEach { item ->
                     NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.screen.title) },
-                        label = { Text(item.screen.title) },
+                        // Sin `label`: con 5 pestañas, textos como "Estadísticas"
+                        // o "Comunidad" no caben y se cortan — mejor solo el
+                        // icono (más grande, para que siga siendo legible) con
+                        // `contentDescription` para accesibilidad.
+                        icon = { Icon(item.icon, contentDescription = item.screen.title, modifier = Modifier.size(26.dp)) },
                         selected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true,
                         onClick = {
                             navController.navigate(item.screen.route) {
@@ -212,14 +259,26 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
         ) {
             composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, profile, stats) }
             composable(Screen.Library.route) { LibraryScreen(navController, tokenStore, searchQuery) }
+            composable(Screen.Stats.route) { StatsScreen(tokenStore) }
             composable(Screen.Feed.route) { FeedScreen(tokenStore) }
             composable(Screen.Social.route) { SocialScreen(tokenStore) }
+
+            composable(Screen.Focus.route) {
+                FocusScreen(tokenStore, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Compare.route) {
+                CompareScreen(tokenStore, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Collections.route) {
+                CollectionsScreen(navController, tokenStore, onBack = { navController.popBackStack() })
+            }
             
             // Pantallas de Ajustes
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     profile = profile,
                     repository = remember { SettingsRepository(tokenStore) },
+                    themeStore = themeStore,
                     onBack = { navController.popBackStack() },
                     onNavigateToLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                     onLogout = {
