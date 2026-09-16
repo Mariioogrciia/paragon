@@ -23,7 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +43,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.paragon.app.ComposeMainActivity
 import com.paragon.app.data.GlobalStats
+import com.paragon.app.data.PanelRepository
+import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.feed.FeedScreen
@@ -49,6 +53,8 @@ import com.paragon.app.ui.library.LibraryScreen
 import com.paragon.app.ui.navigation.Screen
 import com.paragon.app.ui.panel.PanelScreen
 import com.paragon.app.ui.social.SocialScreen
+import com.paragon.app.ui.settings.SettingsScreen
+import com.paragon.app.ui.settings.LinkedAccountsScreen
 import com.paragon.app.ui.theme.Accent
 import com.paragon.app.ui.theme.Background
 import com.paragon.app.ui.theme.Border
@@ -70,6 +76,7 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
     var searchQuery by remember { mutableStateOf("") }
     var isMenuExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val items = listOf(
         BottomNavItem.Dashboard,
@@ -144,12 +151,10 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
                             modifier = Modifier.background(com.paragon.app.ui.theme.Surface)
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Cerrar sesión", color = Foreground) },
+                                text = { Text("Ajustes", color = Foreground) },
                                 onClick = {
                                     isMenuExpanded = false
-                                    tokenStore.clear()
-                                    // Reiniciamos la activity para que AppRoot vuelva a evaluar el token
-                                    (context as? ComposeMainActivity)?.recreate()
+                                    navController.navigate(Screen.Settings.route)
                                 }
                             )
                         }
@@ -201,9 +206,37 @@ fun MainScreen(tokenStore: TokenStore, profile: UserProfile, stats: GlobalStats)
             composable(Screen.Library.route) { LibraryScreen(navController, tokenStore, searchQuery) }
             composable(Screen.Feed.route) { FeedScreen(tokenStore) }
             composable(Screen.Social.route) { SocialScreen(tokenStore) }
-            // Sin entrada en la barra inferior — se llega desde el onClick
-            // de una tarjeta de juego (StandardGameCard/HeroGameCard en
-            // PanelScreen, ver GameCards.kt).
+            
+            // Pantallas de Ajustes
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    profile = profile,
+                    repository = remember { SettingsRepository(tokenStore) },
+                    onBack = { navController.popBackStack() },
+                    onNavigateToLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
+                    onLogout = {
+                        // Cierra sesión SOLO en este móvil (mintMobileSession
+                        // en el backend le da a la app un sessionToken propio,
+                        // ya no la cookie prestada del navegador) — no toca
+                        // ninguna sesión web. Si falla la llamada de red, se
+                        // borra el token local igualmente: PanelRepository.
+                        // logout() ya se traga ese error.
+                        coroutineScope.launch {
+                            PanelRepository(tokenStore).logout()
+                            tokenStore.clear()
+                            (context as? ComposeMainActivity)?.recreate()
+                        }
+                    }
+                )
+            }
+            composable(Screen.LinkedAccounts.route) {
+                LinkedAccountsScreen(
+                    repository = remember { SettingsRepository(tokenStore) },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            // Ficha de Juego
             composable(
                 route = Screen.GameDetail.route,
                 arguments = listOf(navArgument("gameId") { type = NavType.StringType }),
