@@ -97,6 +97,21 @@ como campo aparte.
 `type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`.
 Máximo 50 elementos, ya ordenados por fecha descendente.
 
+## `GET /api/mobile/users/{handle}` — Ficha de perfil de cualquiera
+
+```json
+{
+  "userId": "u1", "name": "Ana", "handle": "ana", "image": "https://...",
+  "level": 12, "platinos": 10, "trofeos": 1200,
+  "accounts": [ { "platform": "psn", "username": "ana_psn" } ],
+  "recentGames": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "percent": 74 } ]
+}
+```
+Para el bottom sheet de perfil al tocar a alguien en Comunidad/Amigos (no
+hace falta que sea amigo tuyo). `image` es la misma foto real que en toda
+la web (`resolveAvatarUrl`), `null` si no tiene ninguna. `404` si no existe
+ese handle. `recentGames` son los últimos 3 jugados, sin deseados.
+
 ## `GET /api/mobile/social` — Amigos y Liga
 
 Dos conceptos DISTINTOS, no la misma lista en otro orden:
