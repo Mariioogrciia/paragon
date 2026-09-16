@@ -16,6 +16,10 @@ import {
 import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
+import { PsnProfileNotFoundError } from "@/lib/psn/client";
+import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
+import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
+import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
@@ -30,6 +34,7 @@ import {
   type PlatformAccount,
   type Player,
   type Trophy,
+  parseGameKey,
   PLATFORM_LABEL,
 } from "@/lib/types";
 
@@ -619,6 +624,89 @@ export async function togglePinnedGame(userId: string, gameId: string): Promise<
   }
 
   return { pinned: !yaAnclado };
+}
+
+/**
+ * Traduce los fallos de las plataformas a algo que un humano pueda
+ * accionar — movida aquí desde `src/app/actions.ts` (donde vivía como
+ * `describeError`, privada) para poder usarla también desde `/api/mobile/*`
+ * y desde `refrescarJuego` de aquí abajo, sin duplicar la lista de casos.
+ */
+export function describePlatformError(error: unknown): string {
+  if (error instanceof PsnNotConfiguredError)
+    return "El servidor no tiene configurado el acceso a PSN (falta PSN_NPSSO).";
+  if (error instanceof PsnAuthError) return error.message;
+  if (error instanceof PsnProfileNotFoundError) return error.message;
+
+  if (error instanceof SteamNotConfiguredError) return error.message;
+  if (error instanceof SteamProfileNotFoundError) return error.message;
+  if (error instanceof SteamPrivateProfileError) return error.message;
+
+  if (error instanceof XblNotConfiguredError) return error.message;
+  if (error instanceof XblProfileNotFoundError) return error.message;
+
+  if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
+
+  return "No se ha podido contactar con la plataforma. Inténtalo en un momento.";
+}
+
+export interface RefrescoJuego {
+  /** Trofeos nuevos desde la última comprobación. Negativo nunca: solo suben. */
+  nuevos: number;
+  error?: string;
+}
+
+/**
+ * Vuelve a pedir los trofeos de UN juego a su plataforma — extraída de
+ * `refrescarJuegoAction` (src/app/actions.ts) para reutilizarla también
+ * desde `/api/mobile/*`. Es lo que hace útil Modo Enfoque como segunda
+ * pantalla: acabas de sacar un trofeo en la tele y quieres verlo aquí sin
+ * esperar al cron ni resincronizar la biblioteca entera.
+ */
+export async function refrescarJuego(userId: string, gameId: string): Promise<RefrescoJuego> {
+  const [antes] = await db
+    .select({ earnedTotal: userGames.earnedTotal })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  if (!antes) return { nuevos: 0, error: "Ese juego no está en tu biblioteca." };
+
+  const profile = await getProfileByUserId(userId);
+  const { platform } = parseGameKey(gameId);
+
+  if (platform === "manual") {
+    return { nuevos: 0, error: "Un juego añadido a mano no tiene nada que sincronizar." };
+  }
+
+  const account = profile ? accountFor(profile, platform) : null;
+  if (!account) return { nuevos: 0, error: "No tienes vinculada esa plataforma." };
+
+  try {
+    await syncGameTrophies(userId, { platform, accountId: account.accountId }, gameId);
+  } catch (error) {
+    return { nuevos: 0, error: describePlatformError(error) };
+  }
+
+  const [despues] = await db
+    .select({ earnedTotal: userGames.earnedTotal })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
+    .limit(1);
+
+  return { nuevos: Math.max(0, (despues?.earnedTotal ?? 0) - antes.earnedTotal) };
+}
+
+/**
+ * Guarda (o borra, si llega vacía) tu nota privada sobre un juego —
+ * extraída de `saveGameNotesAction` (src/app/actions.ts). Mismo campo que
+ * usa `/nota` del bot de Discord.
+ */
+export async function saveGameNotes(userId: string, gameId: string, notes: string): Promise<void> {
+  await db
+    .update(userGames)
+    .set({ notes: notes.trim() || null })
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 }
 
 /* ---------------------------------- Datos de juego --------------------------------- */

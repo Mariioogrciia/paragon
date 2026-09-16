@@ -19,13 +19,15 @@ import {
 import {
   acceptFriendRequest,
   accountFor,
+  describePlatformError,
   getProfileByUserId,
   isHandleTaken,
   linkAccount,
-  PlatformAccountAlreadyLinkedError,
+  refrescarJuego,
   removeFriend,
   resyncLibraries,
   resyncPlatform,
+  saveGameNotes,
   sendFriendRequest,
   setHandle,
   setManualTrophyProgress,
@@ -36,14 +38,6 @@ import {
 import { toggleReservedMilestone } from "@/lib/milestones";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
-import { PsnProfileNotFoundError } from "@/lib/psn/client";
-import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
-import {
-  SteamNotConfiguredError,
-  SteamPrivateProfileError,
-  SteamProfileNotFoundError,
-} from "@/lib/steam/client";
-import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
 import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
 import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideError, type TrophyGuideRow } from "@/lib/trophyGuides";
@@ -68,24 +62,10 @@ async function requireUserId(): Promise<string> {
   return session.user.id;
 }
 
-/** Traduce los fallos de las plataformas a algo que un humano pueda accionar. */
-function describeError(error: unknown): string {
-  if (error instanceof PsnNotConfiguredError)
-    return "El servidor no tiene configurado el acceso a PSN (falta PSN_NPSSO).";
-  if (error instanceof PsnAuthError) return error.message;
-  if (error instanceof PsnProfileNotFoundError) return error.message;
-
-  if (error instanceof SteamNotConfiguredError) return error.message;
-  if (error instanceof SteamProfileNotFoundError) return error.message;
-  if (error instanceof SteamPrivateProfileError) return error.message;
-
-  if (error instanceof XblNotConfiguredError) return error.message;
-  if (error instanceof XblProfileNotFoundError) return error.message;
-
-  if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
-
-  return "No se ha podido contactar con la plataforma. Inténtalo en un momento.";
-}
+// `describeError` vivía aquí duplicada — movida a `describePlatformError`
+// en src/lib/profiles.ts para poder reutilizarla también desde
+// /api/mobile/* (ver el import de arriba).
+const describeError = describePlatformError;
 
 export async function chooseHandleAction(
   _prev: ActionState,
@@ -749,57 +729,21 @@ export async function setHiddenNavItemsAction(formData: FormData): Promise<void>
 
 /* ---------------------------------- Modo enfoque --------------------------------- */
 
-export interface RefrescoJuego {
-  /** Trofeos nuevos desde la última comprobación. Negativo nunca: solo suben. */
-  nuevos: number;
-  error?: string;
-}
-
 /**
  * Vuelve a pedir los trofeos de UN juego a su plataforma.
  *
  * Es lo que hace útil el modo enfoque como segunda pantalla: acabas de sacar
  * un trofeo en la tele y quieres verlo aquí sin esperar al cron ni
  * resincronizar la biblioteca entera (que son decenas de segundos). Esto es
- * una sola llamada, la del juego que tienes delante.
+ * una sola llamada, la del juego que tienes delante. Lógica movida a
+ * `refrescarJuego` (src/lib/profiles.ts) para reutilizarla también desde
+ * `/api/mobile/*`.
  */
-export async function refrescarJuegoAction(gameId: string): Promise<RefrescoJuego> {
+export async function refrescarJuegoAction(gameId: string) {
   const userId = await requireUserId();
-  const db = getDb();
-
-  const [antes] = await db
-    .select({ earnedTotal: userGames.earnedTotal })
-    .from(userGames)
-    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
-    .limit(1);
-
-  if (!antes) return { nuevos: 0, error: "Ese juego no está en tu biblioteca." };
-
-  const profile = await getProfileByUserId(userId);
-  const { platform } = parseGameKey(gameId);
-
-  if (platform === "manual") {
-    return { nuevos: 0, error: "Un juego añadido a mano no tiene nada que sincronizar." };
-  }
-
-  const account = accountFor(profile, platform);
-  if (!account) return { nuevos: 0, error: "No tienes vinculada esa plataforma." };
-
-  try {
-    await syncGameTrophies(userId, { platform, accountId: account.accountId }, gameId);
-  } catch (error) {
-    return { nuevos: 0, error: describeError(error) };
-  }
-
-  const [despues] = await db
-    .select({ earnedTotal: userGames.earnedTotal })
-    .from(userGames)
-    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
-    .limit(1);
-
+  const resultado = await refrescarJuego(userId, gameId);
   revalidatePath("/", "layout");
-
-  return { nuevos: Math.max(0, (despues?.earnedTotal ?? 0) - antes.earnedTotal) };
+  return resultado;
 }
 
 export async function setFavoritesAction(gameIds: string[]) {
@@ -1239,13 +1183,7 @@ export async function toggleReservarHitoAction(gameId: string): Promise<{ reserv
  */
 export async function saveGameNotesAction(gameId: string, notes: string): Promise<void> {
   const userId = await requireUserId();
-  const db = getDb();
-
-  await db
-    .update(userGames)
-    .set({ notes: notes.trim() || null })
-    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
-
+  await saveGameNotes(userId, gameId, notes);
   revalidatePath("/", "layout");
 }
 

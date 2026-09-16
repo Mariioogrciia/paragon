@@ -192,3 +192,48 @@ o `400` si `name` viene vacío. **Ya enganchado de verdad** en `SettingsScreen`.
 ## `POST /api/mobile/logout` — Cerrar sesión SOLO en este móvil
 
 Sin body. `{ "ok": true }` siempre. **Ya enganchado de verdad**.
+
+## `GET /api/mobile/stats` — Estadísticas (NUEVO, sin enganchar)
+
+```json
+{
+  "paragonScore": { "total": 12450, "porPlataforma": [ { "platform": "psn", "puntos": 8000, "trofeos": 1200 } ] },
+  "trophyDna": { "ejes": [ { "key": "rpg", "label": "RPG", "valor": 100, "trofeos": 800 } ], "arquetipo": "El Completista" },
+  "rachas": { "actual": 4, "mejor": 12, "diasActivos": 88 },
+  "historico": { "conFecha": 4200, "esteAnio": 900, "mejorMes": { "mes": "2026-03", "total": 210 } },
+  "financiero": { "totalGastado": 1200, "totalHoras": 800, "costeHoraMedio": 1.5, "juegosConDatos": 40 },
+  "eficiencia": { "ritmoMedioPct": -12, "juegosConDatos": 20 },
+  "backlog": { "juegosContados": 15, "horasHistoriaRestantes": 120, "horasPlatinoRestantes": 300 },
+  "horasTotalesMinutos": 48000
+}
+```
+Versión CURADA, no las ~15 piezas del dashboard completo de la web
+(heatmaps, salón de la vergüenza, comparador con amigos...) — esas ya
+están cubiertas en otro sitio o no aportan tanto en móvil. `eficiencia.
+ritmoMedioPct` negativo = más lento que HowLongToBeat, positivo = más
+rápido.
+
+## `POST /api/mobile/games/{gameId}/notes` — Nota privada, Modo Enfoque (NUEVO, sin enganchar)
+
+Body: `{ "notes": "..." }` (vacía para borrarla). `{ "ok": true }`.
+
+## `POST /api/mobile/games/{gameId}/resync` — "¿Ya lo tengo?", Modo Enfoque (NUEVO, sin enganchar)
+
+```json
+{ "nuevos": 2 }
+```
+o `{ "nuevos": 0, "error": "..." }`. Siempre `200` — el cliente distingue
+por el campo `error`, nunca por el código HTTP.
+
+## `GET /api/mobile/compare/{handle}` — Comparar con alguien (NUEVO, sin enganchar)
+
+```json
+{
+  "me": { "name": "Mario", "level": 17, "platinos": 24, "trofeos": 4655, "juegos": 290 },
+  "them": { "name": "Ana", "level": 12, "platinos": 10, "trofeos": 1200, "juegos": 80 },
+  "sharedGames": [ { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "myPercent": 74, "theirPercent": 40, "myHours": 32, "theirHours": 10 } ]
+}
+```
+`handle` no tiene que ser tu amigo, cualquier perfil público vale. `404` si
+no existe, `409` si no tiene cuentas vinculadas. Sin la carrera trofeo a
+trofeo de la web ("quién lo sacó antes") — versión curada.

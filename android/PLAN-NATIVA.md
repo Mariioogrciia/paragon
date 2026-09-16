@@ -124,20 +124,41 @@ arreglados por Claude:**
       arreglado (ver arriba).
 - [ ] 5 piezas nuevas en el alcance (16/09, ver detalle arriba): Estadísticas,
       juego anclado/reservado, carpetas de juegos, Modo Enfoque, Comparar
-      con amigos. Todas necesitan su endpoint primero (tarea de Claude,
-      abajo) — empezando por juego anclado + carpetas.
+      con amigos. **Backend de las 5 ya listo** (ver tareas de Claude,
+      abajo) — falta toda la UI en Android.
+- [ ] **Corrección crítica de UI (edge-to-edge)**, plan de Gemini del
+      16/09: tema equivocado en `ComposeMainActivity` (`AndroidManifest.xml`
+      seguía en `AppTheme.NoActionBarLaunch`, con el splash de fondo — al
+      activar `enableEdgeToEdge()` esa imagen se estira detrás de las
+      barras del sistema; cambiar a `AppTheme.NoActionBar`, fondo negro y
+      barras transparentes) + orden de modificadores del `topBar` en
+      `MainScreen.kt` (el `padding` fijo iba ANTES del
+      `windowInsetsPadding`, duplicando alto) + `Scaffold` redundante
+      dentro de `PanelScreen.kt` (ya está el de `MainScreen`, el segundo
+      duplicaba los márgenes de `WindowInsets` → huecos negros). Gemini ya
+      empezó (`AndroidManifest.xml` cambiado); Claude no toca estos 3
+      archivos mientras Gemini los tenga en curso.
 
 ## Tareas de Claude (backend + enganche de datos reales)
 
-- [x] Endpoints de juego anclado/reservado y carpetas (16/09): `POST
-      /api/mobile/games/{gameId}/pin`, `POST .../reserve`, `GET
-      /api/mobile/milestone`, y CRUD completo de `/api/mobile/collections`
-      — reutilizando `togglePinGameAction`/`toggleReservarHitoAction` de
-      `actions.ts` (extraídas a `profiles.ts`/`milestones.ts` para no
-      duplicar lógica) y `lib/collections.ts` tal cual, sin tocarlo.
-      `tsc`/`eslint` limpios. Sin construir la pantalla en Android todavía.
-- [ ] Estadísticas, Modo Enfoque, Comparar — las otras 3 piezas del
-      alcance del 16/09, sin empezar todavía.
+- [x] Backend completo de las 5 piezas nuevas (16/09):
+  - Juego anclado/Cerrojo de Hitos/carpetas: `POST
+    /api/mobile/games/{gameId}/pin`, `POST .../reserve`, `GET
+    /api/mobile/milestone`, CRUD de `/api/mobile/collections`.
+  - Modo Enfoque: `POST /api/mobile/games/{gameId}/notes` (nota privada),
+    `POST .../resync` ("¿ya lo tengo?").
+  - Estadísticas: `GET /api/mobile/stats` — versión CURADA (Paragon Score,
+    Trophy DNA, rachas, histórico, financiero, eficiencia, deuda de
+    backlog, horas totales), sin las ~15 piezas del dashboard completo de
+    la web (heatmaps, salón de la vergüenza...).
+  - Comparar: `GET /api/mobile/compare/{handle}` — versión CURADA, sin la
+    carrera trofeo a trofeo de la web.
+  Todo reutilizando lógica ya existente (`togglePinGameAction`/
+  `toggleReservarHitoAction`/`refrescarJuegoAction`/`saveGameNotesAction`
+  extraídas de `actions.ts` a `profiles.ts`/`milestones.ts` para no
+  duplicar; `lib/collections.ts`, `lib/backlog.ts`, `lib/trophyDna.ts`,
+  `lib/paragonScore.ts`, `lib/stats.ts` sin tocar). `tsc`/`eslint` limpios
+  en cada paso. **Sin construir ninguna pantalla en Android todavía.**
 - [ ] Endpoint del desglose de trofeos por metal del Panel — el único dato
       que sigue mock. Sin prisa, nada más depende de esto.
 - [x] 3 bugs visuales reales arreglados (16/09): carátulas en blanco sin

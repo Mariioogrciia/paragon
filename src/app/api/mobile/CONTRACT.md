@@ -229,3 +229,62 @@ y demás, ver `src/lib/profiles.ts`).
 
 Body: `{ "name": "Mario", "image": "https://..." | null }`. `{ "ok": true }`
 o `400` si `name` viene vacío.
+
+## `POST /api/mobile/logout` — Cerrar sesión SOLO en este móvil
+
+Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
+`revokeMobileSession` en `lib/mobileAuth.ts`.
+
+## `GET /api/mobile/stats` — Estadísticas
+
+```json
+{
+  "paragonScore": { "total": 12450, "porPlataforma": [ { "platform": "psn", "puntos": 8000, "trofeos": 1200 } ] },
+  "trophyDna": { "ejes": [ { "key": "rpg", "label": "RPG", "valor": 100, "trofeos": 800 } ], "arquetipo": "El Completista" },
+  "rachas": { "actual": 4, "mejor": 12, "diasActivos": 88 },
+  "historico": { "conFecha": 4200, "esteAnio": 900, "mejorMes": { "mes": "2026-03", "total": 210 } },
+  "financiero": { "totalGastado": 1200, "totalHoras": 800, "costeHoraMedio": 1.5, "juegosConDatos": 40 },
+  "eficiencia": { "ritmoMedioPct": -12, "juegosConDatos": 20 },
+  "backlog": { "juegosContados": 15, "horasHistoriaRestantes": 120, "horasPlatinoRestantes": 300 },
+  "horasTotalesMinutos": 48000
+}
+```
+Versión CURADA para el móvil, no las ~15 piezas de
+`EstadisticasCompletas.tsx` (heatmaps de calendario/horas, salón de la
+vergüenza, comparador con amigos, gráficas de barras...) — esas son mejor
+en pantalla grande o ya están cubiertas en otro sitio (recientes/a un paso
+del platino en `/api/mobile/panel/highlights`, amigos en
+`/api/mobile/social`). `eficiencia.ritmoMedioPct` negativo significa más
+lento que la estimación de HowLongToBeat, positivo más rápido.
+
+## `POST /api/mobile/games/{gameId}/notes` — Nota privada (Modo Enfoque)
+
+Body: `{ "notes": "..." }` (vacía para borrarla). `{ "ok": true }`. Mismo
+campo que usa `/nota` del bot de Discord.
+
+## `POST /api/mobile/games/{gameId}/resync` — "¿Ya lo tengo?" (Modo Enfoque)
+
+```json
+{ "nuevos": 2 }
+```
+o `{ "nuevos": 0, "error": "..." }` — vuelve a pedir los trofeos de ESTE
+juego a su plataforma sin esperar al cron. Siempre `200`, nunca 4xx/5xx
+para el caso de error de plataforma: el cliente distingue por el campo
+`error`, igual que la web.
+
+## `GET /api/mobile/compare/{handle}` — Comparar con alguien
+
+```json
+{
+  "me": { "name": "Mario", "level": 17, "platinos": 24, "trofeos": 4655, "juegos": 290 },
+  "them": { "name": "Ana", "level": 12, "platinos": 10, "trofeos": 1200, "juegos": 80 },
+  "sharedGames": [ { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "myPercent": 74, "theirPercent": 40, "myHours": 32, "theirHours": 10 } ]
+}
+```
+`handle` no tiene que ser tu amigo — igual que en la web, cualquier perfil
+público se puede comparar. `404` si no existe ese handle, `409` si esa
+persona no tiene ninguna cuenta vinculada (nada que comparar). Versión
+CURADA: sin la carrera trofeo a trofeo ("quién lo sacó antes",
+`sharedTrophyLeads` en la web) — la pieza más pesada y la que menos aporta
+en una pantalla pequeña. `myHours`/`theirHours` pueden ser `null` si la
+plataforma no da tiempo jugado (Xbox, o Steam sin ese dato).
