@@ -2,12 +2,176 @@
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **16 de septiembre de 2026**
-(con Gemini, dentro de Android Studio, trabajando en paralelo en la app
-nativa — más abajo hay el detalle completo de esa coordinación).
+(con Gemini **y** Antigravity, los dos dentro de Android Studio, trabajando
+en paralelo en la app nativa a la vez que esta sesión — más abajo hay el
+detalle completo de esa coordinación, incluidos 4 bugs de compilación
+reales suyos que hubo que arreglar).
 
 ---
 
-## Sesión del 16 de septiembre de 2026 (continuación 12) — arranca la app nativa Android en serio: backend completo, login sin web de por medio, sesión propia del móvil, y Gemini se queda sin cuota a medio arreglo visual
+## Sesión del 16 de septiembre de 2026 (continuación 13) — las 6 pantallas nuevas de la app nativa, tema claro/oscuro, notificaciones push nativas (FCM), y una tanda larga de bugs reales ajenos arreglados
+
+Sesión muy larga, en paralelo otra vez con **Gemini** y, esta vez también,
+con **Antigravity** (otro asistente de IA dentro de Android Studio, ver la
+nota que ya existía en "Aviso: lo que Antigravity está construyendo en
+paralelo" más abajo) — los tres tocando la carpeta `android/` a la vez, sin
+canal directo entre agentes, solo lo que el usuario iba pegando de un lado a
+otro. Varias veces un archivo cambiaba de contenido entre que se leía y se
+escribía; el criterio seguido fue no revertir nunca ese trabajo ajeno, solo
+arreglar lo que de verdad no compilaba.
+
+### Las 5 pantallas que tenían backend pero cero UI, ya construidas
+
+Repasando el plan pantalla por pantalla con el usuario, quedaban
+**Estadísticas**, **Modo Enfoque**, **Comparar**, **Carpetas de juegos** y
+**juego anclado/Cerrojo de Hitos** — los 20 endpoints de `/api/mobile/*` ya
+existían de la continuación 12, pero ninguno tenía pantalla en Compose.
+Hechas las cinco (`ui/stats`, `ui/focus`, `ui/compare`, `ui/collections`,
+más los botones de anclar/reservar y los banners del Panel), siguiendo el
+mismo patrón `Api → Repository → Screen` que ya usaba el resto de la app:
+
+- **Estadísticas**: Paragon Score, ADN de trofeos, rachas, coste por hora,
+  eficiencia de caza, deuda de backlog — contra `GET /api/mobile/stats`.
+- **Modo Enfoque**: pantalla negra estilo "segunda pantalla", busca el
+  juego anclado vía `isPinned` en `/library` (no hay endpoint aparte —
+  ver API-CONTRACT.md), trofeos pendientes ordenados por rareza, nota
+  privada con autoguardado (debounce 800ms) y "¿Ya lo tengo?".
+- **Comparar**: buscador de `@handle` libre + lista de amigos reales (`GET
+  /social`) para elegir uno de un toque.
+- **Carpetas**: CRUD completo + un bottom sheet reutilizable
+  (`AddToCollectionSheet`) para meter/sacar el juego actual, abierto desde
+  la ficha de juego.
+- **Juego anclado / Cerrojo de Hitos**: fila de chips en la ficha de juego
+  (`GameActionsRow`) + dos banners nuevos en el Panel.
+
+Nuevo también: filtro **"Platinados"** en Biblioteca (`earned.platinum > 0`
+real, no "100% completado" — así Xbox/Steam sin platino no cuelan ahí).
+
+### Tema claro/oscuro/sistema
+
+Toda la app tenía los colores como `val` de nivel superior en `Color.kt`
+(`Background`, `Foreground`, etc.), leídos directo por ~20 pantallas sin
+pasar por `MaterialTheme.colorScheme` — así que meter un tema claro sin
+tocar esas 20 pantallas una a una necesitaba un truco: los `val` pasaron a
+ser propiedades computadas (`get() = if (isDarkTheme) Dark... else
+Light...`) que leen un `mutableStateOf` global. Cualquier Composable que ya
+usara `Background` se recompone solo con el cambio, sin que nadie tuviera
+que tocar una pantalla más. `ThemeStore` (mismo patrón que `TokenStore`,
+persistido en SharedPreferences) con tres modos, selector en Ajustes →
+Apariencia, cambia al instante.
+
+### Foto de perfil: vinculada con la web y editable desde la app
+
+`GET /api/mobile/panel` ahora manda `profile.image` con
+`resolveAvatarUrl(profile)` — la MISMA foto que resuelve la web (subida a
+mano > PSN > otra cuenta > proveedor de login), no una aproximación aparte.
+Nuevo endpoint `POST /api/mobile/profile/avatar` (multipart) para subirla
+desde el selector de imágenes del sistema — sube a Supabase Storage y
+actualiza `users.image` directamente, mismo criterio que `/ajustes` en la
+web. No podía reutilizarse `/api/upload` (la ruta de subida de la web) tal
+cual: esa exige la cookie de sesión de NextAuth, que la app no tiene (usa su
+propio `sessionToken` de `mintMobileSession`) — se duplicaron ~30 líneas a
+propósito en vez de tocar una ruta ya en producción.
+
+### Notificaciones push nativas (Firebase Cloud Messaging)
+
+Pedido explícito del usuario: una notificación cuando alguien te manda
+solicitud de amistad, y que llegue también a la app nativa, no solo a
+quien tenga la PWA/web abierta (Web Push, VAPID, no puede entregar nada a
+una app nativa — son mundos distintos).
+
+- Backend: tabla `fcm_token` (creada con SQL explícito, ver "Operación" —
+  el intento con `db:push` preguntó si truncar `push_subscription`, algo
+  sin relación, y se abortó ese camino), `lib/fcm.ts` (`enviarPushFcm`,
+  con el paquete `firebase-admin`), `POST /api/mobile/push-token` para que
+  la app registre el token del dispositivo. `sendFriendRequest`
+  (`lib/profiles.ts`) manda ahora por los dos canales a la vez
+  (`enviarPush` + `enviarPushFcm`); ninguno de los dos hace nada si el
+  destinatario no tiene nada registrado en ese canal.
+- Android: `google-services.json` (proyecto Firebase `paragon-d5455`,
+  puesto por el usuario), dependencias de `firebase-messaging` en
+  `build.gradle` (el plugin `google-services` solo se aplica SI ese
+  archivo existe — condición ya montada de antes, sin tocar), permiso
+  `POST_NOTIFICATIONS` pedido en tiempo de ejecución,
+  `ParagonFirebaseMessagingService` (pinta la notificación real del
+  sistema, reenvía el token si Firebase lo renueva).
+- **La clave de la cuenta de servicio de Firebase** (`FIREBASE_SERVICE_ACCOUNT_KEY`,
+  el JSON completo con la clave privada) la pegó el usuario en el chat —
+  nunca se escribió a ningún archivo del repo, se le pidió que la pusiera
+  él mismo en Vercel. Distinto por completo del `api_key` de
+  `google-services.json`: ese SÍ se subió a git (es una clave de cliente,
+  se compila dentro de cada APK igualmente), y GitHub lo marcó como
+  "secreto expuesto" — resuelto restringiéndolo en Google Cloud Console
+  por paquete (`com.paragon.app`) + huella SHA-1 del keystore de debug, no
+  rotándolo (no hacía falta).
+- **Sin probar de punta a punta todavía**: el código compila e instala,
+  pero hasta que el usuario no reinstale la app y la abra logueado, su
+  móvil no habrá registrado ningún token — el backend "dispara" el aviso
+  igualmente, pero no llega a ningún sitio, en silencio, sin error visible.
+
+### Bugs reales encontrados y arreglados
+
+- **Horas jugadas mostraban 238h en vez de ~14 280h/595 días reales**: el
+  campo `horasTotalesMinutos` de `/api/mobile/stats` llevaba ese nombre
+  desde siempre pero `horasTotales()` (`lib/profileStats.ts`) YA devuelve
+  horas, no minutos — la app dividía otra vez entre 60. Renombrado el
+  campo a `horasTotales` en la API y quitada la división en Android. Se
+  aprovechó para mostrar también "= X días seguidos", mismo dato que
+  `PlaytimeComparison.tsx` en la web.
+- **`/comparar/[handle]` (web) tiraba la página entera** ("Algo se ha
+  roto") con CUALQUIER amigo, no uno concreto — apuntaba a algo que corre
+  siempre igual, no a datos de una cuenta particular.
+  `sharedTrophyLeads()` ("quién llegó antes") es la única pieza de esa
+  página que no tiene ya la app móvil de respaldo (versión curada) ni se
+  usa en la comparativa de grupo — envuelta ahora en un `.catch()` que la
+  deja vacía si falla, en vez de tirar toda la comparativa. Causa raíz sin
+  confirmar del todo (sin acceso a los logs de runtime de Vercel, dieron
+  403 con el conector MCP disponible — parece un límite del plan, no un
+  fallo de permisos mal puesto).
+- **4 errores de compilación reales, ajenos** (Gemini/Antigravity, no
+  revertidos, solo arreglados):
+  - `SocialScreen.kt`/`FeedScreen.kt`: `.androidx.compose.foundation.clickable { ... }`
+    encadenado directo al modifier — no es Kotlin válido. Import normal +
+    `.clickable { ... }`.
+  - `CompareScreen.kt`: un `LaunchedEffect` llamaba a la función local
+    `buscar(...)` declarada MÁS ABAJO en el mismo composable — una función
+    local no se puede usar antes de su declaración textual, a diferencia
+    de una de nivel superior. Reordenada.
+  - `FriendProfileBottomSheet.kt`: la extracción del color dominante del
+    avatar (Palette, para el bottom sheet de perfil de un amigo) usaba
+    `asDrawable()`/`toBitmap()`, que no existen en Coil 3 (`coil3.BitmapImage`
+    con `.bitmap` es el camino correcto ahí), y le faltaba el `import` de
+    `allowHardware` — esa función sí existe en `coil3.request`, solo no
+    estaba importada.
+- **`GET /api/mobile/users/{handle}` (ficha de perfil de un amigo, de
+  Antigravity) nunca se había desplegado** — la app golpeaba el 404 HTML
+  de producción y Moshi no podía parsearlo ("Use JsonReader.setLenient...").
+  De paso, 2 errores de tipos reales (`profile.id`/`profile.name` no
+  existen en `ProfileRow`, es `profile.userId`/`profile.displayName`) que
+  habrían roto el build ENTERO de Vercel de haberse subido tal cual. Ya
+  desplegado, incluye `image` (misma foto real que pidió el usuario).
+- **IDs de PSN/Xbox/Steam de los amigos, visibles ahora** en `/amigos`
+  (web) y Comunidad (app) — antes solo se veían las cifras, no con qué
+  cuenta de plataforma añadir a esa persona directamente.
+
+### Sin probar / pendiente
+
+- Notificaciones push nativas de punta a punta (ver arriba) — falta que
+  el usuario reinstale y abra sesión para que se registre el primer token.
+- Causa raíz exacta del crash de `/comparar/[handle]` — el `.catch()`
+  evita que tire la página, pero no se confirmó qué fallaba de verdad en
+  `sharedTrophyLeads()` sin acceso a logs de runtime.
+- **Ideas para v1.0 de la app nativa, priorizadas pero sin construir**:
+  sesión de brainstorming aparte (+50 ideas del usuario) — recomendadas
+  como "core" para efecto wow/viralidad: tarjeta de trofeo compartible a
+  Instagram Stories (Canvas/Compose → Bitmap → `Intent`, ya desglosada en
+  tareas concretas en el chat, no en este documento), rachas diarias
+  (dato `rachas()` YA existe, solo falta UI prominente), notificaciones
+  push ricas (con carátula), terminar el widget de juego anclado que ya
+  empezó Antigravity, y una reacción ligera en el Feed (doble toque).
+  Explícitamente descartadas para v1.0: asistente IA, modo companion en
+  tiempo real (depende de APIs que PSN/Steam no exponen), todo el bloque
+  de monetización.
 
 Sesión larga y muy encadenada, en paralelo con **Gemini** (el asistente de
 IA integrado en Android Studio, no un Claude — coordinación por mensajes
@@ -3834,6 +3998,8 @@ Variables de entorno (ver `.env.example`):
 | `STEAM_API_KEY` | No caduca. |
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | Twitch dev. |
 | `CRON_SECRET` | **Falta en Vercel.** Sin ella la ruta del cron devuelve 503 a propósito. |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | Web Push (navegador/PWA) — `lib/webPush.ts`. Ya puestas desde la sesión del 6 de sept., faltaba anotarlas aquí. |
+| `FIREBASE_SERVICE_ACCOUNT_KEY` | **Nueva, de esta sesión.** JSON entero de la cuenta de servicio de Firebase (una sola línea), para `lib/fcm.ts` — el equivalente de las VAPID pero para la app nativa de Android. Ya puesta en Vercel por el usuario. |
 
 **Para que el cron funcione en producción hacen falta tres cosas:** subir
 `vercel.json` y la ruta, poner `CRON_SECRET` en las variables de Vercel, y
@@ -3860,7 +4026,15 @@ Xbox para Paragon Score) — **todas ya ejecutadas contra producción**. Los 5
 `user_game`/`user_trophy` por `gameId`, `activity` por `userId`/`gameId`,
 `activity_comment` por `activityId`) también, mismo día. Sin confirmar si
 `scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
-Antigravity) llegaron a correrse — ver el punto 1 de "Pendiente".
+Antigravity) llegaron a correrse — ver el punto 1 de "Pendiente". De esta
+sesión, `fcm_token` (`scripts/crear-tabla-fcm-token.mts`) — **ya ejecutada
+contra producción**. Ojo con este caso concreto: se intentó primero con
+`db:push` y drizzle-kit preguntó si truncar `push_subscription` (2 filas
+reales, gente con Web Push activado) para poder ponerle una restricción
+UNIQUE que no tenía nada que ver con la tabla nueva — se abortó ese camino
+sin tocar nada y se hizo con el script de siempre en su lugar. Esa
+restricción pendiente en `push_subscription` sigue sin resolverse (ver
+"Pendiente" más abajo si se añade una entrada).
 
 **CheapShark** (comparador de precios) no necesita clave, pero desde hace
 poco exige un `User-Agent` descriptivo o devuelve un error genérico —
