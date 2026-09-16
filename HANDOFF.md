@@ -1,9 +1,276 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **11 de septiembre de 2026**
+releer todo el historial. Última actualización: **16 de septiembre de 2026**
 (con Antigravity trabajando en paralelo todo el rato — más abajo hay un
 aviso de qué tocó él).
+
+---
+
+## Sesión del 11-16 de septiembre de 2026 (continuación 11) — cron arreglado de verdad, plataformas muertas fuera, Xbox sincronizando y con nivel real, primer `.apk` de Android compilado y con toques nativos
+
+Sesión larga, a lo largo de varios días, muy encadenada: cada arreglo
+destapaba el siguiente. Todo lo de código está en `origin/master` (12
+commits, confirmado con `git fetch` + `git log origin/master..HEAD` vacío
+al cerrar esta entrada). Va por tema.
+
+### Limpieza pedida directamente: Ruleta del Backlog, botón de sincronizar
+
+Dos peticiones cortas del usuario, sin más vuelta: quitados **"¿A qué
+juego hoy?"** (`BacklogRoulette.tsx`, en la Biblioteca) y **"¿Hoy qué
+juego?"** (`RecomendadorTiempo.tsx`, en el Panel) — borrados los dos
+componentes y sus usos, sin tocar `lib/recomendadorTiempo.ts` porque el
+comando `/ruleta` del bot de Discord lo sigue usando directamente. Y
+quitado el **icono de sincronizar de la cabecera** (`Header.tsx`,
+`BotonSincronizar` + `tieneCuentas` en `layout.tsx`) — con el cron externo
+corriendo cada 15 min de verdad ya no aportaba lo mismo que antes.
+Ajustes → Plataformas conserva su botón por cuenta a propósito (sirve
+para forzar un resync si una cuenta da problemas).
+
+### Descubrir → Xbox: catálogo completo de Game Pass
+
+Petición del usuario para vincular Medal (ver más abajo por qué se
+descartó) llevó a mirar qué más le faltaba a la sección de Xbox. Nueva
+página `/descubrir/xbox/gamepass` contra la API real del propio catálogo
+de Microsoft (`catalog.gamepass.com` + `displaycatalog.mp.microsoft.com`,
+documentada de forma no oficial por varios proyectos en GitHub, probada
+en vivo antes de construir nada) — 629 juegos de consola, 526 de PC,
+verificado contra la API real. **A propósito NO se llama "Standard"/
+"Ultimate"** como se pidió al principio: Microsoft no publica un catálogo
+distinto por esos dos planes (la diferencia real es sobre todo día de
+lanzamiento, no una lista de títulos aparte) — decidido con el usuario,
+separado por lo que la API sí distingue de verdad (Consola/PC). Sin
+emparejar con IGDB (1.155 juegos, demasiadas peticiones); cada tarjeta
+enlaza a la ficha oficial de xbox.com.
+
+### Medal.tv: investigado y descartado con evidencia real
+
+El usuario preguntó si se podía vincular Medal para enseñar los clips del
+usuario. Existió una API pública real (`developers.medal.tv/v1/latest`)
+para esto, documentada por varios wrappers en GitHub — pero **probada en
+vivo, está rota**: `/v1/generate_public_key` genera una clave al momento
+(200 OK), pero esa misma clave devuelve `"Authorization header was not
+found"` contra `/v1/latest` o `/v1/categories`, con varios formatos de
+cabecera probados. La página de desarrolladores actual de Medal
+(`medal.tv/developer/auto-clipping`) ya no menciona esta API en absoluto,
+solo habla de "auto-clipping" (un HTTP local que dispara el propio JUEGO
+en la máquina del jugador, nada que ver con leer clips ya grabados desde
+un servidor). Conclusión: API de lectura de clips descontinuada de hecho,
+aunque las rutas sigan respondiendo. No se construyó nada.
+
+### Repaso de seguridad: sin hallazgos de alta confianza
+
+Pedido explícito del usuario. Un agente de exploración repasó Server
+Actions, rutas API, `auth.ts`, clientes externos y todo `sql` crudo —
+inyección SQL (todo parametrizado vía Drizzle), IDOR (todo Server Action
+saca `userId` de la sesión, nunca del formulario), SSRF (hosts fijos en
+código), XSS (un solo `dangerouslySetInnerHTML`, con un color hex
+validado por regex, no dato de usuario). Nada por encima del umbral de
+confianza. Único detalle anotado, sin acción: el constructor de consultas
+de IGDB solo escapa comillas dobles, no barras invertidas — impacto nulo
+porque es de solo lectura contra el catálogo público de IGDB.
+`npm audit` aparte: 11 avisos, los 11 en `devDependencies` que nunca
+llegan a producción (`drizzle-kit` y el generador de iconos de
+Capacitor) — anotado, sin tocar.
+
+### Google Play, Epic Games y Ubisoft Connect: quitadas del todo
+
+Pedido explícito: "solo tenemos xbox, psn y steam". Ninguna de las tres
+llegó a tener sincronización real nunca (`resolveGoogle`/`resolveEpic`/
+`resolveUbisoft` devolvían siempre `legible: false`). Borrados los tres
+`resolve*` (`profiles.ts`), el proveedor OAuth de Epic entero en
+`auth.ts` (con el `customFetch` que arreglaba su Basic auth no conforme a
+RFC), las 3 acciones/formularios de vincular, y las 3 tarjetas en Ajustes
+→ Plataformas. Nuevo `PlataformaVinculable` (psn|steam|xbox, en
+`lib/types.ts`) como fuente única de verdad de "esto sí se puede
+vincular" — `AccountPlatform`/`Platform` (más anchos) se quedan porque
+`games.platform` los necesita para juegos importados a mano desde esos
+launchers (`actions/import.ts`), un uso distinto de "cuenta vinculada".
+
+**Hallazgo real de paso**: las 6 filas "google" que había en
+`platform_account` no eran vinculaciones deliberadas de Google Play
+Games — las creaba automáticamente el evento `linkAccount` de Auth.js
+**cada vez que alguien iniciaba sesión con Google** (login normal, no la
+función de logros). Ya quitado ese efecto secundario en `auth.ts`, así
+que no van a volver a aparecer. Borradas las 7 filas huérfanas (6 google
++ 1 epic, ninguna con dato sincronizado de verdad) con
+`scripts/borrar-cuentas-google-epic.mts`, ya ejecutado. Confirmado tras
+borrar: solo quedan psn(3)/steam(4)/xbox(1) en producción.
+
+### El 504 real del cron, encontrado con un trace de producción pegado por el usuario
+
+El arreglo de límites de la continuación 10 (`POR_PASADA`/`MARGEN_MS`)
+solo mitigaba. La causa real, encontrada mirando el trace de un 504 real
+que el usuario pegó desde el panel de Vercel: `syncLibrary` (`lib/sync.ts`)
+repetía el detalle completo de Steam (esquema + rareza global de cada
+logro) **en cada resincronización de la cuenta**, sin comprobar si ya
+estaba fresco — con 4 cuentas reales de 16-40 juegos "recientes" cada
+una, esto repetía cientos de peticiones idénticas pasada tras pasada.
+Nueva `soloDesactualizados()` en `sync.ts`: antes de pedir detalle a
+Steam o Xbox, filtra a los que llevan más de `HORAS_CADUCIDAD` (mismo
+umbral de `lib/syncHealth.ts`) sin sincronizar. Verificado contra la base
+real: de 107 juegos que se repetían siempre, quedaban 2 pendientes de
+verdad. **Verificado en producción tras desplegar**: 15 de 15 ejecuciones
+seguidas con éxito (antes 3 de 10 fallaban), 36-37s de duración (antes
+47-61s, al filo o por encima de los 60s de Vercel).
+
+De paso, la fase de "rellenar detalle" del cron (`api/cron/sync/route.ts`)
+solo arreglaba fichas rotas (nunca sincronizadas o con menos trofeos
+guardados de los que dice la biblioteca) — nunca refrescaba una ficha
+completa pero vieja, que es justo lo que dejaba a PSN con 208 juegos "sin
+refrescar" en Ajustes → Plataformas sin ninguna vía automática (PSN no
+tiene el equivalente a `syncLibrary` de Steam/Xbox). Ahora también entra
+`trophiesSyncedAt < HORAS_CADUCIDAD`, con lo nunca-sincronizado primero.
+Verificado contra la base real: 506 filas candidatas en total, orden
+correcto.
+
+**Migración a un cron externo de verdad**: GitHub Actions no daba un
+intervalo real fiable — confirmado con su propia API (9 ejecuciones en
+27h con el cron a `*/10 * * * *`, huecos de 2-4,5h) y con hilos oficiales
+de soporte de GitHub que dicen lo mismo (retrasos de horas en cuentas
+gratuitas, no minutos). Migrado a **cron-job.org** (gratis, intervalo real
+de 15 min, permite cabeceras `Authorization` personalizadas) llamando a
+la misma ruta `/api/cron/sync` — el workflow de GitHub Actions se deja
+como red de seguridad, la ruta es idempotente.
+
+Añadida también una **limpieza automática de `sync_run`** (>30 días) en
+cada pasada del cron: con el cron real cada 15 min (antes 1 vez al día),
+esa tabla pasó de 4-40 filas/día a ~800/día — sin límite, crecería para
+siempre sin que nadie lo note. La consulta que la muestra
+(`getSyncHistory`) ya limitaba a 20, así que no afectaba al rendimiento
+de la página, solo al tamaño de la tabla.
+
+### Xbox sincronizando de verdad, y con nivel real
+
+Faltaba `XBL_API_KEY` en Vercel (`XblNotConfiguredError` en los logs
+reales, pegados por el usuario) — puesta por el usuario en el panel de
+Vercel. **Verificado contra la base real tras el redeploy**: la cuenta
+pasó de 7 a 9 juegos, con `sync_run` reales cada pocos minutos.
+
+Repasando qué más tocaba ahora que Xbox sincroniza de verdad (antes daba
+`legible: false` siempre, nunca se había probado con dato real), se
+encontró un hueco real: `paragonProgress` (`lib/level.ts`) y
+`getParagonLevels` (`lib/paragonLevel.ts`) pesan cada logro de Steam por
+su rareza real, pero a Xbox no le daban NADA de XP hasta que el juego
+llegaba al 100% del todo (mismo problema que tuvo Steam antes de
+arreglarse). El dato para arreglarlo ya existía: `game_trophy.xp` guarda
+el Gamerscore real de cada logro (se añadió para Paragon Score, una
+cifra aparte). Nuevo `Game.xboxTrophyXp` (`types.ts`), calculado en
+`getLibrary` con el mismo patrón que `steamTrophyXp`, sumado en los DOS
+sitios que calculan el nivel a la vez (para no repetir el historial de
+desincronización que ya tuvo este código con Steam). Verificado contra
+la cuenta real: 46 logros de Xbox conseguidos, 630 XP que antes no
+contaban para nada.
+
+### La hora del Historial de sincronización salía mal (UTC, no España)
+
+Reportado con captura real por el usuario. `run.createdAt.toLocaleString
+("es-ES")` sin `timeZone` — en un Server Component esto corre en el
+servidor de Vercel (UTC), no en el navegador de quien mira la pantalla.
+Nuevo `getUserTimezone()` en `profiles.ts` (lee `users.timezone`, por
+defecto Europe/Madrid) — centraliza una consulta que `profileStats.ts`
+(`franjasHorarias`) e `history.ts` (`talDiaComoHoy`) ya hacían cada uno
+por su cuenta, sin triplicarla. Verificado forzando `TZ=UTC` (simula el
+entorno real de Vercel): sin el arreglo salía 18:45, con él 20:45 — la
+hora real.
+
+### Dos bugs reales a 375px, y uno de "poca muestra" en Estadísticas
+
+Pedido explícito de repaso responsive completo. Barrido con capturas
+reales contra producción (no solo el escáner de overflow de página, que
+no pillaba ninguno de los dos porque no había scroll horizontal, solo
+texto cortado/solapado dentro de su propia caja):
+- `GameLanguages.tsx` (ficha de juego, tabla de Idiomas): `w-full` dentro
+  de un `overflow-x-auto` es contradictorio — la tabla nunca podía ser
+  más ancha que su contenedor, así que la última columna ("Interfaz") se
+  cortaba en vez de poder desplazarse para leerla. Cambiado a
+  `min-w-full` + `whitespace-nowrap`.
+- `u/[handle]/cv/page.tsx` (Hoja de servicios): el nombre de usuario
+  ("FENDE21", una sola palabra sin espacios) se salía de su caja flex y
+  se pintaba encima de "Nivel X" al lado a 375px — `min-w-0` deja
+  encoger el flex-item pero no envuelve el texto sin `truncate`. Añadido.
+
+Y en Estadísticas, verificando por qué "Eficiencia de caza" no se veía
+(pendiente desde la continuación 10): el motivo real era que solo se
+muestra al dueño del perfil (nunca se pudo probar sin sesión). Con
+sesión, los datos reales de la cuenta SÍ cumplían las condiciones (Black
+Myth: Wukong, platinado, con HLTB), pero se encontró un bug real al
+simularlo: `EficienciaPersonal.tsx` recortaba "más rápido"/"con más
+calma" por POSICIÓN (`slice(0,3)`), no por signo — con un solo dato de
+-47% (más lento que la estimación), salía bajo el título "Más rápido que
+la media". Arreglado filtrando por signo antes de recortar. Revisado el
+componente hermano (`CostePorHora.tsx`, "mejor/peor amortizado") por si
+tenía el mismo fallo: no lo tiene, ahí €/hora es una magnitud siempre
+positiva, sin riesgo de etiqueta equivocada.
+
+### Primer `.apk` de Android compilado de verdad, y con toques nativos
+
+El usuario pidió pasar a probar el shell de Capacitor en Android Studio
+(generado en una sesión de HANDOFF anterior, nunca compilado). Bloqueo
+real encontrado: **Avast** (confirmado con sus procesos corriendo:
+`AvastSvc`, `aswEngSrv`) intercepta HTTPS de forma que Java/Gradle no se
+fía del certificado (`PKIX path building failed`), aunque curl/navegador
+lo lleven bien — mismo tipo de problema que el TLS de `next dev` con
+IGDB, documentado en sesiones anteriores, aquí en otro proceso. Probado
+sin éxito con rebajar AGP/SDK a versiones ya cacheadas (para evitar
+descargas nuevas) y con el JBR propio de Android Studio — ninguno de los
+dos esquivaba el problema, porque hacía falta descargar ALGO nuevo de
+todos modos. El usuario actualizó Android Studio a una build reciente
+(AI-261, de sobra para el AGP 8.13.0 real del proyecto) y pausó Avast Web
+Shield un momento — con eso, `./gradlew assembleDebug` compiló limpio a
+la primera con la configuración REAL del proyecto (AGP 8.13.0, SDK 36,
+sin rebajar nada). `.apk` de depuración (5,1 MB) entregado al usuario.
+
+Al probarlo, feedback directo: "es como una web, quiero que se sienta
+nativa de verdad". Se valoró nativo puro/React Native (reescribir toda
+la interfaz, meses, tres bases de código a mantener) y se descartó — el
+usuario solo quiere que su padre pueda usarla como una app de verdad, no
+justifica una reescritura completa por una persona más. En su lugar,
+instalados los plugins de Capacitor que sí faltaban (`@capacitor/status-
+bar`, `splash-screen`, `haptics`, `app`, `keyboard` — antes solo estaban
+los mínimos de core/android/ios) y nuevo `NativeAppSetup.tsx` (montado en
+`layout.tsx`, todo detrás de `Capacitor.isNativePlatform()` para no
+afectar a la web ni a su bundle): barra de estado con el color real de
+la app (antes el azul por defecto de la librería), botón atrás de
+Android navegando por el historial real de la SPA en vez de cerrar la
+app de golpe, vibración háptica ligera en cualquier botón/enlace, splash
+sin parón en blanco entre él y el contenido real. Nuevo `colors.xml`
+(no existía — `AppTheme` refería colores sin definirlos, colándose el
+índigo por defecto en diálogos nativos del sistema). Segundo `.apk`
+(5,4 MB) compilado y entregado, sin volver a tocar Avast (los plugins
+nuevos no pidieron ninguna descarga de Maven que no estuviera ya
+resuelta).
+
+**Sin verificar todavía**: si el segundo `.apk` con los toques nativos de
+verdad se siente bien para el usuario (y para su padre) — pendiente de
+que lo pruebe. **Aviso real para quien retome esto**: hay cambios SIN
+COMITEAR en `android/app/src/main/java/com/paragon/app/MainActivity.java`
+y `android/app/src/main/res/values/styles.xml` (edge-to-edge de verdad
+con `WindowCompat.setDecorFitsSystemWindows`, y deshabilitado el
+overscroll glow nativo del WebView) — parecen de Antigravity trabajando
+en lo mismo en paralelo, con buena pinta a primera vista, pero **no
+revisados a fondo** por esta sesión. Mismo criterio de siempre: repasar
+con escepticismo antes de comitear, no fiarse a ciegas.
+
+**Decisión de producto, no pendiente**: NO se ha publicado en Google
+Play Store, a propósito — Play tiene una política real contra apps que
+son solo un WebView sin funcionalidad nativa añadida ("minimum
+functionality"), y con ~6 usuarios reales el papeleo (cuenta de
+desarrollador, verificación de negocio, mantenimiento continuo del
+`targetSdkVersion`) no compensa todavía. El `.apk` de depuración se
+comparte a mano (sideload) por ahora. El usuario dijo explícitamente que
+quiere que esto "crezca de verdad" — replantear Play Store cuando haya
+crecimiento real que lo justifique.
+
+### Aparte, sin relación con el código: tarea programada sospechosa
+
+El usuario reportó una ventana de cmd abriéndose y cerrándose sola.
+Encontrada con el Programador de tareas de Windows: `OddsScannerFutbol`,
+creada el 11 de septiembre, ejecutando `C:\Users\mario\odds-bot\
+run_scanner.bat` cada 6 horas. El usuario confirmó que era suyo (un bot
+de cuotas de fútbol que había instalado él) y pidió quitar la tarea —
+hecho (`Unregister-ScheduledTask`), sin tocar los archivos de la carpeta
+`odds-bot` en sí. Nada que ver con Paragon ni con esta sesión.
 
 ---
 
