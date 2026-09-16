@@ -14,6 +14,7 @@ import { getParagonLevels } from "@/lib/paragonLevel";
 import { paragonLevelFromXp } from "@/lib/level";
 import { clasificacionAmigos, getPeriodRankings } from "@/lib/rankings";
 import { BackButton } from "@/components/BackButton";
+import { PLATFORM_LABEL } from "@/lib/types";
 
 export const metadata = { title: "Amigos · Paragon" };
 
@@ -280,6 +281,11 @@ export default async function AmigosPage() {
                     @{a.handle}
                     {a.trophyLevel !== null && ` · nivel ${a.trophyLevel}`}
                   </p>
+                  {a.accounts.length > 0 && (
+                    <p className="mt-0.5 truncate text-[0.6875rem] text-muted/80">
+                      {a.accounts.map((acc) => `${PLATFORM_LABEL[acc.platform]}: ${acc.username}`).join(" · ")}
+                    </p>
+                  )}
                 </div>
 
                 <Link

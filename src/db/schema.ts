@@ -764,3 +764,22 @@ export const pushSubscriptions = pgTable("push_subscription", {
   auth: text("auth").notNull(),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Tokens de Firebase Cloud Messaging — el equivalente de `pushSubscriptions`
+ * pero para la app nativa de Android, que no puede recibir Web Push (eso
+ * solo llega a navegador/PWA). Una fila por dispositivo, no por usuario,
+ * mismo criterio que arriba: instalar la app en dos móviles avisa en los
+ * dos. El token lo manda la propia app cuando Firebase se lo da o se lo
+ * renueva (ver POST /api/mobile/push-token, lib/fcm.ts).
+ */
+export const fcmTokens = pgTable("fcm_token", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});

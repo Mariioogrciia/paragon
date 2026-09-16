@@ -25,6 +25,8 @@ import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
 import { syncGameTrophies, syncLibrary } from "@/lib/sync";
 import { anunciarNivelSiSube } from "@/lib/discordBot";
+import { enviarPush } from "@/lib/webPush";
+import { enviarPushFcm } from "@/lib/fcm";
 import {
   type AccountPlatform,
   type Game,
@@ -1121,6 +1123,12 @@ export interface FriendRow {
   trophyLevel: number | null;
   avatarUrl: string | null;
   platforms: AccountPlatform[];
+  /**
+   * Igual que `platforms`, pero con el username/ID real de cada cuenta
+   * (Online ID de PSN, gamertag de Xbox, SteamID) — para poder añadir a un
+   * amigo directamente en esa plataforma sin tener que pedírselo aparte.
+   */
+  accounts: { platform: AccountPlatform; username: string }[];
 }
 
 function toFriendRow(p: ProfileRow): FriendRow {
@@ -1134,6 +1142,7 @@ function toFriendRow(p: ProfileRow): FriendRow {
     trophyLevel: player.trophyLevel ?? null,
     avatarUrl: player.avatarUrl ?? null,
     platforms: p.accounts.map((a) => a.platform),
+    accounts: p.accounts.map((a) => ({ platform: a.platform, username: a.username })),
   };
 }
 
@@ -1243,6 +1252,26 @@ export async function sendFriendRequest(fromUserId: string, toHandle: string) {
     addresseeId: target.userId,
     status: "pending",
   });
+
+  // Aviso push a quien la recibe — mismo mecanismo que "trofeo nuevo"/
+  // "platino conseguido" (ver enviarPush en lib/sync.ts), no hace falta que
+  // tenga Paragon abierto para enterarse. No hace nada si no tiene ninguna
+  // suscripción guardada (enviarPush ya lo comprueba solo).
+  const [remitente] = await db
+    .select({ handle: users.handle, name: users.name })
+    .from(users)
+    .where(eq(users.id, fromUserId))
+    .limit(1);
+  const nombreRemitente = remitente?.name ?? remitente?.handle ?? "Alguien";
+  const avisoSolicitud = {
+    title: "Nueva solicitud de amistad",
+    body: `${nombreRemitente} quiere ser tu amigo en Paragon.`,
+    url: "/amigos",
+  };
+  // Los dos canales a la vez: Web Push llega a quien tiene la web/PWA
+  // abierta, FCM a quien tiene la app nativa de Android — ninguno de los
+  // dos hace nada si el destinatario no tiene nada registrado en ese canal.
+  await Promise.all([enviarPush(target.userId, avisoSolicitud), enviarPushFcm(target.userId, avisoSolicitud)]);
 
   return { ok: true as const, accepted: false };
 }

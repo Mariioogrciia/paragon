@@ -70,11 +70,19 @@ export default async function CompararPage({
   const comunes = sharedGames([libA, libB]);
   const nivelA = paragonProgress(libA.games);
   const nivelB = paragonProgress(libB.games);
+  // "Quién llegó antes" es la pieza más pesada de esta página (JOIN sobre
+  // user_trophy + game_trophy) y la única cosa aquí que no tiene ya la app
+  // móvil de respaldo — si falla, que se quede vacía esta sección en vez de
+  // tirar TODA la comparativa (era exactamente eso lo que rompía la página
+  // entera, "Algo se ha roto", con cualquier amigo).
   const lideres = await sharedTrophyLeads(
     mio.userId,
     suyo.userId,
     comunes.map((game) => game.id),
-  );
+  ).catch((error) => {
+    console.error("[comparar] sharedTrophyLeads falló", error);
+    return [];
+  });
   const ganados = comunes.filter((g) => g.progress[0].percent >= g.progress[1].percent).length;
 
   const platinoDif = statsA.platinos - statsB.platinos;

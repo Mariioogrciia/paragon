@@ -22,11 +22,20 @@ export async function GET(req: Request) {
 
   const friends = await listFriends(userId);
   const friendIds = [userId, ...friends.map((f) => f.userId)];
+  // `clasificacionAmigos` (lib/rankings.ts) no trae cuentas de plataforma —
+  // solo lo justo para el ranking — así que se añaden aquí a partir de
+  // `listFriends`, que ya las tenía (ver FriendRow.accounts).
+  const accountsByUser = new Map(friends.map((f) => [f.userId, f.accounts]));
 
-  const [amigos, liga] = await Promise.all([
+  const [filas, liga] = await Promise.all([
     clasificacionAmigos(friendIds),
     getLigaMensual(),
   ]);
+
+  const amigos = filas.map((fila) => ({
+    ...fila,
+    accounts: accountsByUser.get(fila.userId) ?? [],
+  }));
 
   return NextResponse.json({ amigos, liga });
 }

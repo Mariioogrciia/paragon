@@ -105,7 +105,8 @@ Dos conceptos DISTINTOS, no la misma lista en otro orden:
 {
   "amigos": [ {
     "userId": "u1", "name": "Mario", "handle": "mario", "avatarUrl": "https://...",
-    "trophyLevel": 14, "platinos": 87, "trofeos": 4312, "juegos": 214, "completadoMedio": 68
+    "trophyLevel": 14, "platinos": 87, "trofeos": 4312, "juegos": 214, "completadoMedio": 68,
+    "accounts": [ { "platform": "psn", "username": "mario_psn" }, { "platform": "steam", "username": "Mario" } ]
   } ],
   "liga": [ {
     "userId": "u1", "handle": "mario", "name": "Mario", "image": "https://...", "points": 340
@@ -113,6 +114,9 @@ Dos conceptos DISTINTOS, no la misma lista en otro orden:
 }
 ```
 - `amigos`: tú + tus amigos reales, con vuestras cifras de siempre.
+  `accounts` es la lista de sus cuentas de plataforma vinculadas (puede
+  estar vacía) — el Online ID de PSN, gamertag de Xbox o SteamID reales,
+  para poder añadirlos directamente en esa plataforma.
 - `liga`: liga mensual **global** (todo el mundo, no solo amigos), puntuada
   solo por trofeos de ESTE mes calendario (platino=100, oro=50, plata=25,
   bronce/sin metal=10) — se reinicia cada mes. Pestaña "Ligas" del plan.
@@ -304,3 +308,23 @@ CURADA: sin la carrera trofeo a trofeo ("quién lo sacó antes",
 `sharedTrophyLeads` en la web) — la pieza más pesada y la que menos aporta
 en una pantalla pequeña. `myHours`/`theirHours` pueden ser `null` si la
 plataforma no da tiempo jugado (Xbox, o Steam sin ese dato).
+
+## `POST /api/mobile/push-token` — Notificaciones push nativas (FCM)
+
+Body: `{ "token": "..." }` — el token de Firebase Cloud Messaging del
+dispositivo (`FirebaseMessaging.getInstance().token` en Android). Llamar al
+arrancar la app (tras tener sesión) y cada vez que `onNewToken` lo renueve.
+`{ "ok": true }` o `400` si falta el token. Ver `lib/fcm.ts`.
+
+Esto es el equivalente para Android de la suscripción Web Push que ya usa
+la web — un canal aparte porque Web Push (VAPID) no puede entregar nada a
+una app nativa, solo a navegadores/PWA. Los eventos que ya avisaban por
+Web Push (solicitud de amistad, trofeo nuevo, platino conseguido...) mandan
+ahora los dos a la vez (`enviarPush` + `enviarPushFcm`); ninguno de los dos
+hace nada si el usuario no tiene nada registrado en ese canal, así que es
+seguro llamar a los dos siempre.
+
+**Necesita configurar `FIREBASE_SERVICE_ACCOUNT_KEY` en el servidor** (el
+JSON de la cuenta de servicio de Firebase) y `android/app/google-services.json`
+en el proyecto Android — sin eso, este endpoint sigue funcionando pero
+`enviarPushFcm` no manda nada de verdad, en silencio.
