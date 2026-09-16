@@ -30,6 +30,7 @@ import {
   type PlatformAccount,
   type Player,
   type Trophy,
+  PLATFORM_LABEL,
 } from "@/lib/types";
 
 export interface ProfileRow {
@@ -351,6 +352,28 @@ export interface LinkResult {
 }
 
 /**
+ * La cuenta de PSN/Steam/Xbox que se intenta vincular ya es de OTRO usuario
+ * de Paragon. La base de datos ya lo impedía a nivel de fila (índice único
+ * `platform_account_identity_idx` en `platform_account`, sobre
+ * `(platform, accountId)`) — lo que faltaba era explicarlo: sin este catch,
+ * la violación de unicidad de Postgres caía en el `catch` genérico de
+ * `linkPlatform` (actions.ts) y salía como "No se ha podido contactar con
+ * la plataforma", un mensaje falso (el contacto con la plataforma fue bien,
+ * el conflicto es entre dos cuentas de Paragon).
+ */
+export class PlatformAccountAlreadyLinkedError extends Error {}
+
+/** Error de Postgres (paquete `postgres`) por violar un índice único concreto. */
+function esViolacionDe(error: unknown, constraintName: string): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { code?: string }).code === "23505" &&
+    (error as { constraint_name?: string }).constraint_name === constraintName
+  );
+}
+
+/**
  * Vincula una cuenta de plataforma y trae su biblioteca por primera vez.
  *
  * Cada plataforma tiene su propia forma de decir "no puedo leer esto": PSN
@@ -377,29 +400,43 @@ export async function linkAccount(
       break;
   }
 
-  await db
-    .insert(platformAccounts)
-    .values({
-      userId,
-      platform,
-      accountId: resolved.accountId,
-      username: resolved.username,
-      level: resolved.level,
-      avatarUrl: resolved.avatarUrl,
-      isPublic: resolved.legible,
-      syncedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [platformAccounts.userId, platformAccounts.platform],
-      set: {
+  try {
+    await db
+      .insert(platformAccounts)
+      .values({
+        userId,
+        platform,
         accountId: resolved.accountId,
         username: resolved.username,
         level: resolved.level,
         avatarUrl: resolved.avatarUrl,
         isPublic: resolved.legible,
         syncedAt: new Date(),
-      },
-    });
+      })
+      .onConflictDoUpdate({
+        target: [platformAccounts.userId, platformAccounts.platform],
+        set: {
+          accountId: resolved.accountId,
+          username: resolved.username,
+          level: resolved.level,
+          avatarUrl: resolved.avatarUrl,
+          isPublic: resolved.legible,
+          syncedAt: new Date(),
+        },
+      });
+  } catch (error) {
+    // `onConflictDoUpdate` de arriba solo cubre el conflicto en
+    // (userId, platform) — volver a vincular TU PROPIA cuenta. El otro
+    // índice único, (platform, accountId), no tiene upsert configurado a
+    // propósito: esa cuenta real ya es de otro usuario de Paragon, y no
+    // hay nada sensato que "actualizar" ahí, solo explicarlo.
+    if (esViolacionDe(error, "platform_account_identity_idx")) {
+      throw new PlatformAccountAlreadyLinkedError(
+        `Esa cuenta de ${PLATFORM_LABEL[platform]} ya está vinculada a otro usuario de Paragon — cada cuenta real solo puede estar en un sitio.`,
+      );
+    }
+    throw error;
+  }
 
   const juegos = resolved.legible
     ? await syncLibrary(userId, { platform, accountId: resolved.accountId })

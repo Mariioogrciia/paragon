@@ -1,0 +1,84 @@
+package com.paragon.app.data
+
+import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.network.ApiClient
+import com.paragon.app.data.network.FeedItemDto
+import retrofit2.HttpException
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
+
+/** Actividad propia + amigos (FeedScreen) — ver GET /api/mobile/feed en API-CONTRACT.md. */
+data class FeedItem(
+    val id: String,
+    val type: String,
+    val rating: Int?,
+    val review: String?,
+    val userName: String,
+    val gameTitle: String,
+    val reactions: Int,
+    val timeAgo: String,
+)
+
+sealed class FeedResult {
+    data class Ok(val items: List<FeedItem>) : FeedResult()
+    data class Error(val message: String) : FeedResult()
+}
+
+/** "type" de activities (src/db/schema.ts) → frase en español, mismo criterio que la web. */
+fun mensajeFeed(item: FeedItem): String = when (item.type) {
+    "platinum" -> "Ha conseguido el Platino en ${item.gameTitle}."
+    "new_game" -> "Ha empezado a jugar a ${item.gameTitle}."
+    "review" -> "Ha escrito una reseña de ${item.gameTitle}."
+    "rating" -> "Ha valorado ${item.gameTitle}" + (item.rating?.let { " con $it/10." } ?: ".")
+    "favorite" -> "Ha marcado ${item.gameTitle} como favorito."
+    else -> "Ha hecho algo en ${item.gameTitle}."
+}
+
+// minSdk 24 no tiene java.time sin desugaring — SimpleDateFormat/Date sí
+// funcionan en cualquier API, de ahí no usar Instant aquí.
+private val ISO_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
+    timeZone = TimeZone.getTimeZone("UTC")
+}
+
+private fun relativeTimeEs(iso: String): String {
+    val millis = try {
+        ISO_FORMAT.parse(iso)?.time
+    } catch (e: Exception) {
+        null
+    } ?: return ""
+
+    val diffMinutes = (System.currentTimeMillis() - millis) / 60_000
+    return when {
+        diffMinutes < 1 -> "ahora mismo"
+        diffMinutes < 60 -> "hace ${diffMinutes}min"
+        diffMinutes < 60 * 24 -> "hace ${diffMinutes / 60}h"
+        else -> "hace ${diffMinutes / (60 * 24)}d"
+    }
+}
+
+private fun FeedItemDto.toFeedItem() = FeedItem(
+    id = id,
+    type = type,
+    rating = rating,
+    review = review,
+    userName = user.name ?: user.handle ?: "Alguien",
+    gameTitle = game.title,
+    reactions = reactions,
+    timeAgo = relativeTimeEs(createdAt),
+)
+
+class FeedRepository(private val tokenStore: TokenStore? = null) {
+    suspend fun getFeed(): FeedResult {
+        val store = tokenStore ?: return FeedResult.Error("Sin sesión.")
+
+        return try {
+            val response = ApiClient.feedApi(store).getFeed()
+            FeedResult.Ok(response.items.map { it.toFeedItem() })
+        } catch (e: HttpException) {
+            FeedResult.Error("El servidor respondió con un error (${e.code()}).")
+        } catch (e: Exception) {
+            FeedResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+        }
+    }
+}

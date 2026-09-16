@@ -22,6 +22,7 @@ import {
   getProfileByUserId,
   isHandleTaken,
   linkAccount,
+  PlatformAccountAlreadyLinkedError,
   removeFriend,
   resyncLibraries,
   resyncPlatform,
@@ -78,6 +79,8 @@ function describeError(error: unknown): string {
 
   if (error instanceof XblNotConfiguredError) return error.message;
   if (error instanceof XblProfileNotFoundError) return error.message;
+
+  if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
 
   return "No se ha podido contactar con la plataforma. Inténtalo en un momento.";
 }
