@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Antes de esto no existía colors.xml: AppTheme (styles.xml) referenciaba
+      @color/colorPrimary/colorPrimaryDark/colorAccent sin definirlos aquí,
+      así que se colaba el índigo #3F51B5 por defecto que trae la librería
+      capacitor-android de fábrica — se veía en cosas como el tinte de los
+      diálogos nativos del sistema (permisos, "compartir"...), que no pegaban
+      nada con el resto de la app. Puestos los mismos colores reales que usa
+      la web (globals.css, variables "background" y "accent-rgb"), 16 de
+      septiembre de 2026.
+    -->
+    <color name="colorPrimary">#0A0D13</color>
+    <color name="colorPrimaryDark">#0A0D13</color>
+    <color name="colorAccent">#4A9EFF</color>
+</resources>

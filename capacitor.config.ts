@@ -33,6 +33,31 @@ const config: CapacitorConfig = {
     // limitación conocida de WKWebView.
     contentInset: "automatic",
   },
+  // Toques nativos (16 de septiembre de 2026), pedido explícito del
+  // usuario: "es como una web, quiero que se sienta nativa de verdad".
+  // El resto de la config de estos plugins (color/estilo real de la
+  // barra de estado, háptica, botón atrás) va en tiempo de ejecución
+  // desde components/NativeAppSetup.tsx — solo puede saber el color
+  // real de la app (que viene de globals.css) desde ahí, no aquí.
+  plugins: {
+    SplashScreen: {
+      // El splash real (drawable/splash.png, oscuro) ya lo pinta Android
+      // antes de que cargue nada de JS a partir del propio recurso —
+      // `androidScaleType`/`layoutName` no hace falta tocarlos. Lo único
+      // que cambia aquí es NO ocultarlo solo, para evitar el parón en
+      // blanco/oscuro liso entre "termina de cargar el HTML" y "la página
+      // remota ha pintado algo de verdad" — se oculta a mano desde
+      // NativeAppSetup.tsx en cuanto el WebView está listo.
+      launchAutoHide: false,
+      backgroundColor: "#0a0d13",
+    },
+    Keyboard: {
+      // Sin esto, el teclado tapa el campo que se está rellenando en vez
+      // de que la página suba para dejarlo a la vista — se nota mucho más
+      // en un WebView que en un navegador normal.
+      resize: "body",
+    },
+  },
 };
 
 export default config;

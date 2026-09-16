@@ -106,6 +106,7 @@ function relanzarSiEsDeNext(error: unknown): void {
 }
 
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { NativeAppSetup } from "@/components/NativeAppSetup";
 import { CookieBanner } from "@/components/CookieBanner";
 
 export default async function RootLayout({
@@ -209,6 +210,7 @@ export default async function RootLayout({
       </head>
       <body className="flex min-h-screen flex-col transition-colors duration-300">
         <ServiceWorkerRegister />
+        <NativeAppSetup />
         <CookieBanner />
         <ThemeProvider
           attribute="class"
