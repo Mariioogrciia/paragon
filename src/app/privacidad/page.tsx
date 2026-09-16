@@ -88,8 +88,10 @@ export default function PrivacidadPage() {
         <p className="text-muted">
           <strong>Nunca</strong> vendemos, alquilamos ni compartimos tus datos
           personales con terceros con fines comerciales o publicitarios. Paragon
-          no muestra anuncios ni usa herramientas de analítica o publicidad de
-          terceros (ver la <Link href="/cookies" className="text-accent hover:underline">política de cookies</Link>).
+          no muestra anuncios ni usa publicidad de terceros. Sí medimos visitas
+          agregadas y anónimas con Vercel Analytics (sin cookies, sin
+          identificarte — ver la <Link href="/cookies" className="text-accent hover:underline">política de cookies</Link>{" "}
+          para el detalle exacto de qué mide).
         </p>
       </Seccion>
 

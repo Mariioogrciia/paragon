@@ -1,5 +1,6 @@
+import { Analytics } from "@vercel/analytics/next";
 import { dominioPublico } from "@/lib/site";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { Session } from "next-auth";
 import Script from "next/script";
 import { Barlow, Chakra_Petch, JetBrains_Mono } from "next/font/google";
@@ -43,6 +44,15 @@ const DESCRIPCION = "Tu progreso de trofeos y logros multiplataforma, en un solo
  * `robots.ts`.
  */
 const DOMINIO = dominioPublico();
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#0a0d13",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(DOMINIO),
@@ -211,6 +221,7 @@ export default async function RootLayout({
       <body className="flex min-h-screen flex-col transition-colors duration-300">
         <ServiceWorkerRegister />
         <NativeAppSetup />
+        <Analytics />
         <CookieBanner />
         <ThemeProvider
           attribute="class"

@@ -21,7 +21,8 @@ export default function CookiesPage() {
           Paragon <strong>no usa cookies de publicidad ni de analítica</strong>.
           No hay ningún píxel de rastreo, ni Google Analytics, ni redes
           sociales incrustadas que puedan seguirte. Solo hay una cookie, y es
-          la que te mantiene la sesión iniciada.
+          la que te mantiene la sesión iniciada — la analítica de uso que sí
+          medimos (ver más abajo) no usa cookies ni te identifica.
         </p>
       </section>
 
@@ -52,12 +53,33 @@ export default function CookiesPage() {
       </section>
 
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
+        <h2 className="text-lg font-bold text-foreground">Analítica de uso (Vercel Analytics)</h2>
+        <p className="text-muted">
+          Desde septiembre de 2026 medimos visitas agregadas (qué páginas se
+          ven, desde qué país aproximado, tipo de dispositivo) con{" "}
+          <a
+            href="https://vercel.com/docs/analytics/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="text-accent hover:underline"
+          >
+            Vercel Analytics
+          </a>
+          . No usa cookies — identifica cada visita con un hash anónimo que
+          se descarta a las 24 horas, no un identificador tuyo permanente —
+          y no cruza datos con ningún otro sitio, por eso no hace falta
+          pedir consentimiento para esto. No sabemos qué juegos miras tú en
+          concreto por esta vía: eso sale de tu cuenta, con sesión, no de
+          la analítica.
+        </p>
+      </section>
+
+      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">Si esto cambia</h2>
         <p className="text-muted">
-          Si en el futuro Paragon incorporase analítica o cualquier cookie no
-          imprescindible, se pedirá tu consentimiento explícito antes de
-          activarla y esta página se actualizará para explicarlo. Hoy, no hay
-          nada de eso que aceptar o rechazar.
+          Si en el futuro Paragon incorporase publicidad o cualquier cookie
+          no imprescindible, se pedirá tu consentimiento explícito antes de
+          activarla y esta página se actualizará para explicarlo.
         </p>
       </section>
 

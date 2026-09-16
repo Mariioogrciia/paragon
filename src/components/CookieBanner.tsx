@@ -8,11 +8,13 @@ const CLAVE = "platinos:cookies-aceptadas";
 /**
  * Aviso de cookies. Puramente informativo: Paragon solo usa la cookie de
  * sesión (imprescindible, sin consentimiento exigible por ley — ver
- * /cookies) y hoy no tiene ninguna cookie de analítica ni publicidad que
- * aceptar o rechazar. Aun así se enseña una vez, guardado en localStorage
- * (no en una cookie: no tendría sentido usar una cookie para recordar el
- * consentimiento de cookies), para ser transparentes desde el principio en
- * vez de esconderlo solo en el footer.
+ * /cookies) y no tiene ninguna cookie de analítica ni publicidad que
+ * aceptar o rechazar — Vercel Analytics (añadido el 16 de septiembre de
+ * 2026) no usa cookies ni guarda nada identificable, ver /cookies para el
+ * detalle real de qué mide. Aun así se enseña una vez, guardado en
+ * localStorage (no en una cookie: no tendría sentido usar una cookie para
+ * recordar el consentimiento de cookies), para ser transparentes desde el
+ * principio en vez de esconderlo solo en el footer.
  */
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);
@@ -45,7 +47,8 @@ export function CookieBanner() {
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3">
         <p className="text-[0.8125rem] text-muted">
           Solo usamos la cookie imprescindible para mantener tu sesión
-          iniciada — nada de analítica ni publicidad. Más detalles en{" "}
+          iniciada — sin cookies de publicidad, y la analítica de uso que
+          medimos no te identifica ni te sigue. Más detalles en{" "}
           <Link href="/cookies" className="text-accent hover:underline">
             Cookies
           </Link>
