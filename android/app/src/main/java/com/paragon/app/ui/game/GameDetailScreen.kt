@@ -1,5 +1,8 @@
 package com.paragon.app.ui.game
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -30,10 +33,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.appwidget.updateAll
 import coil3.compose.AsyncImage
+import com.paragon.app.data.local.ParagonDatabase
+import com.paragon.app.widget.PinnedGameWidget
 import com.paragon.app.data.GameDetailData
 import com.paragon.app.data.GameDetailRepository
 import com.paragon.app.data.GameDetailResult
@@ -44,6 +51,7 @@ import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.collections.AddToCollectionSheet
+import com.paragon.app.ui.share.ShareTrophyDialog
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,8 +70,16 @@ import androidx.palette.graphics.Palette
  * tarjeta del Panel aterriza aquí en el estado de error (404 real del
  * backend, "este juego no existe"), no en un fallo de la pantalla.
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun GameDetailScreen(gameId: String, tokenStore: TokenStore, onBack: () -> Unit = {}) {
+fun GameDetailScreen(
+    gameId: String,
+    tokenStore: TokenStore,
+    handle: String = "",
+    onBack: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) {
     val repository = remember(tokenStore) { GameDetailRepository(tokenStore) }
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     var result by remember { mutableStateOf<GameDetailResult?>(null) }
@@ -104,28 +120,43 @@ fun GameDetailScreen(gameId: String, tokenStore: TokenStore, onBack: () -> Unit 
             game = current.detail,
             hitoInicial = hito,
             tokenStore = tokenStore,
+            handle = handle,
             repository = repository,
             onBack = onBack,
             onMilestoneChanged = { retryCounter.value += 1 },
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope,
         )
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun GameDetailContent(
     gameId: String,
     game: GameDetailData,
     hitoInicial: HitoReservado?,
     tokenStore: TokenStore,
+    handle: String,
     repository: GameDetailRepository,
     onBack: () -> Unit,
     onMilestoneChanged: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope?,
+    animatedVisibilityScope: AnimatedVisibilityScope?,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val libraryDao = remember(context) { ParagonDatabase.getDatabase(context).libraryDao() }
     var pinned by remember(gameId) { mutableStateOf(game.isPinned) }
     var reservado by remember(gameId, hitoInicial) { mutableStateOf(hitoInicial?.gameId == gameId) }
     var showCollections by remember { mutableStateOf(false) }
+    var showShare by remember { mutableStateOf(false) }
     var dynamicColor by remember { mutableStateOf(Accent) }
+    // "Platino conseguido" real (mismo criterio que el filtro "Platinados"
+    // de Biblioteca en HANDOFF.md: earned.platinum > 0, no percent == 100 —
+    // un juego sin trofeo de Platino definido nunca debería ofrecer
+    // "Compartir Platino" aunque esté al 100%).
+    val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
 
     LaunchedEffect(game.coverUrl) {
         withContext(Dispatchers.IO) {
@@ -158,6 +189,14 @@ private fun GameDetailContent(
         coroutineScope.launch {
             val real = repository.togglePin(gameId)
             if (real != null) pinned = real
+            // La API ya lo ancló/desancló de verdad — sin esto, la caché
+            // local (de la que lee el widget) se queda con el juego
+            // anclado ANTERIOR hasta la próxima sincronización completa de
+            // la Biblioteca, que puede tardar horas (era el hueco real que
+            // dejaba el widget de Antigravity a medio terminar).
+            libraryDao.clearPinned()
+            if (real == true) libraryDao.setPinned(gameId)
+            PinnedGameWidget().updateAll(context)
         }
     }
 
@@ -171,16 +210,26 @@ private fun GameDetailContent(
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize().background(Background)) {
-        item { GameDetailHero(game = game, dynamicColor = dynamicColor, onBack = onBack) }
+        item {
+            GameDetailHero(
+                game = game,
+                dynamicColor = dynamicColor,
+                onBack = onBack,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+            )
+        }
 
         item {
             GameActionsRow(
                 pinned = pinned,
                 reservado = reservado,
                 numeroHito = numeroHito,
+                platinoConseguido = platinoConseguido,
                 onTogglePin = { togglePin() },
                 onToggleReserve = { toggleReserve() },
                 onOpenCollections = { showCollections = true },
+                onShare = { showShare = true },
                 dynamicColor = dynamicColor,
             )
         }
@@ -199,10 +248,40 @@ private fun GameDetailContent(
     if (showCollections) {
         AddToCollectionSheet(gameId = gameId, tokenStore = tokenStore, onDismiss = { showCollections = false })
     }
+
+    if (showShare) {
+        ShareTrophyDialog(
+            coverUrl = game.coverUrl,
+            gameTitle = game.title,
+            earnedTrophies = game.earnedTrophies,
+            totalTrophies = game.totalTrophies,
+            handle = handle,
+            onDismiss = { showShare = false },
+        )
+    }
 }
 
+/**
+ * La carátula pequeña de aquí abajo (no la de fondo difuminado, esa no
+ * "vuela" — solo confundiría el ojo con dos copias animando a la vez) usa
+ * la MISMA clave `game-cover-${id}` que `StandardGameCard` en
+ * `GameCards.kt` — así Compose sabe que son el mismo elemento visual al
+ * navegar desde Biblioteca. Si se llega desde cualquier otro sitio (Panel,
+ * Comunidad...) `sharedTransitionScope`/`animatedVisibilityScope` siguen
+ * sin ser null (todo el NavHost vive dentro del mismo `SharedTransitionLayout`,
+ * ver `MainScreen.kt`), pero como no hay ninguna card de origen con esa
+ * misma clave en pantalla a la vez, no hay nada que "volar" — se queda en
+ * el fundido normal, sin fallar.
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun GameDetailHero(game: GameDetailData, dynamicColor: Color, onBack: () -> Unit) {
+private fun GameDetailHero(
+    game: GameDetailData,
+    dynamicColor: Color,
+    onBack: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope?,
+    animatedVisibilityScope: AnimatedVisibilityScope?,
+) {
     Box(modifier = Modifier.fillMaxWidth().height(320.dp)) {
         AsyncImage(
             model = game.coverUrl,
@@ -223,15 +302,26 @@ private fun GameDetailHero(game: GameDetailData, dynamicColor: Color, onBack: ()
             modifier = Modifier.fillMaxSize().padding(24.dp),
             verticalAlignment = Alignment.Bottom,
         ) {
+            val coverModifier = Modifier
+                .width(96.dp)
+                .height(136.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Surface)
+                .let { base ->
+                    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                        with(sharedTransitionScope) {
+                            base.sharedElement(
+                                rememberSharedContentState(key = "game-cover-${game.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            )
+                        }
+                    } else base
+                }
             AsyncImage(
                 model = game.coverUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(96.dp)
-                    .height(136.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Surface),
+                modifier = coverModifier,
             )
             Spacer(Modifier.width(20.dp))
             Column {
@@ -278,9 +368,11 @@ private fun GameActionsRow(
     pinned: Boolean,
     reservado: Boolean,
     numeroHito: Int?,
+    platinoConseguido: Boolean,
     onTogglePin: () -> Unit,
     onToggleReserve: () -> Unit,
     onOpenCollections: () -> Unit,
+    onShare: () -> Unit,
     dynamicColor: Color,
 ) {
     Row(
@@ -313,6 +405,18 @@ private fun GameActionsRow(
             accentColor = dynamicColor,
             onClick = onOpenCollections,
         )
+        // Solo con el platino real conseguido (ver `platinoConseguido` en
+        // GameDetailContent) — sin esto, compartir un juego a medias no
+        // tendría nada que celebrar y confundiría el "efecto Wow" que busca
+        // esta función (idea #20 del brainstorm de v1.0).
+        if (platinoConseguido) {
+            ActionChip(
+                label = "Compartir Platino",
+                active = true,
+                accentColor = Platinum,
+                onClick = onShare,
+            )
+        }
     }
 }
 

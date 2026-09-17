@@ -21,9 +21,15 @@ data class PanelStatsDto(
     val completionRate: Int,
 )
 
+data class PanelRachaDto(
+    val actual: Int,
+    val mejor: Int,
+)
+
 data class PanelResponse(
     val profile: PanelProfileDto,
     val stats: PanelStatsDto,
+    val racha: PanelRachaDto,
 )
 
 interface PanelApi {

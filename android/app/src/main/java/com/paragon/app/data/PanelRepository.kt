@@ -21,6 +21,12 @@ data class GlobalStats(
     val completionRate: Int
 )
 
+/** Racha de días con al menos un trofeo — mismo cálculo que GET /api/mobile/stats (ver CONTRACT.md). */
+data class RachaGlobal(
+    val actual: Int,
+    val mejor: Int,
+)
+
 data class TrophyCounts(
     val platinum: Int,
     val gold: Int,
@@ -39,7 +45,7 @@ data class GameProgress(
 
 /** Perfil + stats reales, o por qué no se pudieron traer — ver /api/mobile/panel en el proyecto Next.js. */
 sealed class PanelResult {
-    data class Ok(val profile: UserProfile, val stats: GlobalStats) : PanelResult()
+    data class Ok(val profile: UserProfile, val stats: GlobalStats, val racha: RachaGlobal) : PanelResult()
     /** Sin token guardado, o el servidor lo rechazó (401): hace falta pasar por /movil/enlazar (login web). */
     object NeedsLogin : PanelResult()
     data class Error(val message: String) : PanelResult()
@@ -81,6 +87,10 @@ class PanelRepository(private val tokenStore: TokenStore? = null) {
                     trophies = response.stats.trophies,
                     games = response.stats.games,
                     completionRate = response.stats.completionRate,
+                ),
+                racha = RachaGlobal(
+                    actual = response.racha.actual,
+                    mejor = response.racha.mejor,
                 ),
             )
         } catch (e: HttpException) {

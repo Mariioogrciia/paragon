@@ -25,4 +25,13 @@ interface LibraryDao {
 
     @Query("DELETE FROM library_games")
     suspend fun deleteAll()
+
+    // Nunca hay dos juegos anclados a la vez (mismo criterio que el backend,
+    // ver togglePin en GameDetailRepository.kt) — desanclar TODOS antes de
+    // anclar uno nuevo es más simple y seguro que buscar cuál era el viejo.
+    @Query("UPDATE library_games SET isPinned = 0")
+    suspend fun clearPinned()
+
+    @Query("UPDATE library_games SET isPinned = 1 WHERE id = :gameId")
+    suspend fun setPinned(gameId: String)
 }

@@ -17,6 +17,7 @@ data class FeedItem(
     val userName: String,
     val gameTitle: String,
     val reactions: Int,
+    val reacted: Boolean,
     val timeAgo: String,
     val userHandle: String,
 )
@@ -66,6 +67,7 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     userName = user.name ?: user.handle ?: "Alguien",
     gameTitle = game.title,
     reactions = reactions,
+    reacted = reacted,
     timeAgo = relativeTimeEs(createdAt),
     userHandle = user.handle ?: "",
 )
@@ -81,6 +83,16 @@ class FeedRepository(private val tokenStore: TokenStore? = null) {
             FeedResult.Error("El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {
             FeedResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+        }
+    }
+
+    /** Alterna la reacción a una publicación — `null` si falla la llamada (quien la usa ya pinta en optimista antes). */
+    suspend fun toggleReaction(activityId: String): Boolean? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.feedApi(store).react(activityId).reacted
+        } catch (e: Exception) {
+            null
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.paragon.app.ui.panel
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,9 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,7 +54,7 @@ import coil3.compose.AsyncImage
  * portada web). El desglose por metal (`trophyCounts`) sigue con
  * `PanelRepository.getMockTrophyCounts()`: no hay endpoint todavía para eso.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfile: UserProfile, globalStats: GlobalStats) {
     val repository = remember(tokenStore) { PanelRepository(tokenStore) }
@@ -70,8 +69,13 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
     
     val haptic = LocalHapticFeedback.current
     val retryCounter = remember { mutableIntStateOf(0) }
-    val pullToRefreshState = rememberPullToRefreshState()
     var isInitialLoading by remember { mutableStateOf(true) }
+    // API estable de Material3 1.3.0+ (llegó con el BOM subido para el
+    // shared element): `PullToRefreshState` ya no lleva `isRefreshing`/
+    // `endRefresh()` como en la vieja API experimental — ahora ese estado
+    // lo posee quien llama, y `PullToRefreshBox` maneja el nestedScroll
+    // solo, sin `Modifier.nestedScroll(state.nestedScrollConnection)`.
+    var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(retryCounter.value) {
         if (highlights == null) isInitialLoading = true
@@ -81,17 +85,18 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
             launch { hito = (milestoneRepository.getMilestone() as? MilestoneResult.Ok)?.hito }
         }
         isInitialLoading = false
-        pullToRefreshState.endRefresh()
-    }
-    
-    if (pullToRefreshState.isRefreshing) {
-        LaunchedEffect(true) {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            retryCounter.value += 1
-        }
+        isRefreshing = false
     }
 
-    Box(modifier = Modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            isRefreshing = true
+            retryCounter.value += 1
+        },
+        modifier = Modifier.fillMaxSize(),
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -235,13 +240,6 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
                 }
             }
         }
-        
-        PullToRefreshContainer(
-            state = pullToRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            containerColor = Surface,
-            contentColor = Accent
-        )
     }
 }
 

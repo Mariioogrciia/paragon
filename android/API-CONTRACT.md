@@ -33,14 +33,19 @@ válido: `401 { "error": "No autenticado" }`.
 ```json
 {
   "profile": { "handle": "mario", "name": "Mario", "level": 14, "psnId": "mario_psn", "image": "https://..." },
-  "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68 }
+  "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68 },
+  "racha": { "actual": 4, "mejor": 12 }
 }
 ```
 `psnId` puede ser `null` (sin cuenta PSN vinculada). `image` es la MISMA foto
 que se ve en toda la web (`resolveAvatarUrl` en lib/profiles.ts: subida a
 mano > PSN > cualquier otra cuenta vinculada > la del proveedor de login) —
 `null` si no hay ninguna. Para cambiarla desde la app, ver
-`POST /api/mobile/profile/avatar` más abajo.
+`POST /api/mobile/profile/avatar` más abajo. `racha` es el MISMO cálculo que
+`GET /api/mobile/stats` (`rachas()` en `lib/history.ts`) — duplicado aquí
+solo como dato (no como función) para que el icono de racha de la cabecera
+no obligue a pedir todo el endpoint de Estadísticas en cada apertura de la
+app; `actual` es 0 si no se ha sacado ningún trofeo hoy o ayer.
 
 ## `GET /api/mobile/panel/highlights` — "A un paso del platino" y "Recientes"
 
@@ -96,6 +101,16 @@ como campo aparte.
 ```
 `type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`.
 Máximo 50 elementos, ya ordenados por fecha descendente.
+
+## `POST /api/mobile/feed/{activityId}/react` — Reaccionar/quitar reacción
+
+```json
+{ "reacted": true }
+```
+Alterna: si ya habías reaccionado, la quita y devuelve `false`. Mismo
+`toggleActivityReactionAction` que la web (botón de aplauso) — pensado para
+el doble toque en una tarjeta del Feed (idea #13 del brainstorm de v1.0),
+no hay un endpoint aparte para "quitar" solamente.
 
 ## `GET /api/mobile/users/{handle}` — Ficha de perfil de cualquiera
 

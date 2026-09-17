@@ -4,6 +4,7 @@ apply plugin: 'com.android.application'
 // build "compila" pero ComposeMainActivity no existe de verdad y la app
 // revienta con ClassNotFoundException al lanzar, no al construir.
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 apply plugin: 'com.google.devtools.ksp'
 
 android {
@@ -31,9 +32,10 @@ android {
     buildFeatures {
         compose true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
-    }
+    // Con Kotlin 2.0+ el compilador de Compose lo fija el plugin
+    // 'org.jetbrains.kotlin.plugin.compose' (misma versión que kotlinVersion,
+    // aplicado arriba) — composeOptions.kotlinCompilerExtensionVersion ya no
+    // se usa y su presencia con Kotlin 2.0 da error de configuración.
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -61,10 +63,13 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidxCoreVersion"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
     implementation "androidx.activity:activity-compose:$androidxActivityVersion"
-    implementation "androidx.navigation:navigation-compose:2.7.7"
-    
-    // Using an older compose BOM to ensure compatibility with Kotlin 1.9.22
-    def composeBom = platform("androidx.compose:compose-bom:2024.02.00")
+    implementation "androidx.navigation:navigation-compose:2.8.3"
+
+    // Subido desde 2024.02.00 (con Kotlin 1.9.22) para tener
+    // SharedTransitionLayout (transición de carátula compartida entre
+    // Biblioteca y Ficha de juego) — necesita animation/foundation 1.7.0+,
+    // que no existía en el BOM anterior.
+    def composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation composeBom
     androidTestImplementation composeBom
     

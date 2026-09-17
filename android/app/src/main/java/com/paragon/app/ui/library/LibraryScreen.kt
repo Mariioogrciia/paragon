@@ -1,5 +1,8 @@
 package com.paragon.app.ui.library
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -18,9 +21,7 @@ import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import com.paragon.app.data.LibraryFilter
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.LibraryResult
@@ -39,9 +40,15 @@ private val FILTERS = listOf(
 )
 
 /** Biblioteca real contra GET /api/mobile/library (LibraryRepository). El botón "Ordenar" sigue sin acción — pendiente. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQuery: String = "") {
+fun LibraryScreen(
+    navController: NavController,
+    tokenStore: TokenStore,
+    searchQuery: String = "",
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
     val repository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
@@ -52,25 +59,26 @@ fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQu
     val sortLabels = listOf("Progreso", "Título A-Z", "Título Z-A")
     val retryCounter = remember { mutableIntStateOf(0) }
     val haptic = LocalHapticFeedback.current
-    
-    val pullToRefreshState = rememberPullToRefreshState()
+
     var isInitialLoading by remember { mutableStateOf(true) }
+    var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(retryCounter.value) {
         if (result == null) isInitialLoading = true
         result = repository.getLibrary()
         isInitialLoading = false
-        pullToRefreshState.endRefresh()
+        isRefreshing = false
     }
 
-    if (pullToRefreshState.isRefreshing) {
-        LaunchedEffect(true) {
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            isRefreshing = true
             retryCounter.value += 1
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+        },
+        modifier = Modifier.fillMaxSize(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -192,7 +200,9 @@ fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQu
                         items(games) { game ->
                             StandardGameCard(
                                 game = game.toGameProgress(),
-                                onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) }
+                                onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
+                                sharedTransitionScope = sharedTransitionScope,
+                                animatedVisibilityScope = animatedVisibilityScope,
                             )
                         }
                     }
@@ -200,12 +210,5 @@ fun LibraryScreen(navController: NavController, tokenStore: TokenStore, searchQu
             }
         }
         }
-        
-        PullToRefreshContainer(
-            state = pullToRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            containerColor = Surface,
-            contentColor = Accent
-        )
     }
 }

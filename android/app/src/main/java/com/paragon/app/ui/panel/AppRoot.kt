@@ -81,7 +81,7 @@ fun AppRoot(
             message = current.message,
             onRetry = { retryCounter.value += 1 },
         )
-        is PanelResult.Ok -> MainScreen(tokenStore, themeStore, current.profile, current.stats)
+        is PanelResult.Ok -> MainScreen(tokenStore, themeStore, current.profile, current.stats, current.racha)
     }
 }
 

@@ -1,6 +1,7 @@
 package com.paragon.app.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -29,6 +32,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,6 +63,7 @@ import androidx.navigation.navArgument
 import com.paragon.app.ComposeMainActivity
 import com.paragon.app.data.GlobalStats
 import com.paragon.app.data.PanelRepository
+import com.paragon.app.data.RachaGlobal
 import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.auth.TokenStore
@@ -77,6 +83,7 @@ import com.paragon.app.ui.theme.Accent
 import com.paragon.app.ui.theme.Background
 import com.paragon.app.ui.theme.Border
 import com.paragon.app.ui.theme.Foreground
+import com.paragon.app.ui.theme.Gold
 import com.paragon.app.ui.theme.Muted
 
 // Definimos la estructura de items de navegación
@@ -88,8 +95,15 @@ sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
     object Social : BottomNavItem(Screen.Social, Icons.Default.EmojiEvents)
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.ThemeStore, profile: UserProfile, stats: GlobalStats) {
+fun MainScreen(
+    tokenStore: TokenStore,
+    themeStore: com.paragon.app.data.theme.ThemeStore,
+    profile: UserProfile,
+    stats: GlobalStats,
+    racha: RachaGlobal,
+) {
     val navController = rememberNavController()
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -163,6 +177,7 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
                         letterSpacing = 2.sp
                     )
                     Spacer(Modifier.weight(1f))
+                    StreakChip(racha = racha, onClick = { navController.navigate(Screen.Stats.route) })
                     IconButton(onClick = { isSearchActive = true }) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -279,6 +294,13 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
         }
     }
     ) { innerPadding ->
+        // SharedTransitionLayout envuelve TODO el NavHost (no solo Biblioteca/
+        // Ficha) porque la Ficha de juego se abre también desde el Panel,
+        // Comunidad, Ligas y Carpetas — todas necesitan compartir el mismo
+        // SharedTransitionScope para que la carátula pueda "volar" cuando SÍ
+        // hay una tarjeta de origen con la misma clave (Biblioteca), y
+        // simplemente no anime cuando no la hay (resto de orígenes).
+        SharedTransitionLayout {
         NavHost(
             navController = navController,
             startDestination = Screen.Dashboard.route,
@@ -289,7 +311,13 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
             popExitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
             composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, profile, stats) }
-            composable(Screen.Library.route) { LibraryScreen(navController, tokenStore, searchQuery) }
+            composable(Screen.Library.route) {
+                LibraryScreen(
+                    navController, tokenStore, searchQuery,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
+                )
+            }
             composable(Screen.Stats.route) { StatsScreen(tokenStore) }
             composable(Screen.Feed.route) { 
                 FeedScreen(tokenStore, onCompareClick = { handle ->
@@ -352,8 +380,52 @@ fun MainScreen(tokenStore: TokenStore, themeStore: com.paragon.app.data.theme.Th
                 arguments = listOf(navArgument("gameId") { type = NavType.StringType }),
             ) { backStackEntry ->
                 val gameId = backStackEntry.arguments?.getString("gameId") ?: return@composable
-                GameDetailScreen(gameId = gameId, tokenStore = tokenStore, onBack = { navController.popBackStack() })
+                GameDetailScreen(
+                    gameId = gameId,
+                    tokenStore = tokenStore,
+                    handle = profile.handle,
+                    onBack = { navController.popBackStack() },
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
+                )
             }
         }
+        }
+    }
+}
+
+/**
+ * Racha diaria estilo Duolingo (idea #7 del brainstorm de v1.0) — dato ya
+ * existía en `GET /api/mobile/stats` (`RachasCard` en `StatsScreen.kt`),
+ * pero enterrado en una pestaña que casi nadie abre a diario. Este chip la
+ * saca a la cabecera, visible en las 5 pestañas de la barra inferior, para
+ * que el usuario la vea cada vez que abre la app. Toca para ir a
+ * Estadísticas, donde ya está el desglose completo (mejor racha, días
+ * activos).
+ */
+@Composable
+private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
+    val viva = racha.actual > 0
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(14.dp))
+            .clickable { onClick() }
+            .background(if (viva) Gold.copy(alpha = 0.14f) else Color.Transparent)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.Default.Whatshot,
+            contentDescription = if (viva) "Racha de ${racha.actual} días" else "Sin racha activa",
+            tint = if (viva) Gold else Muted,
+            modifier = Modifier.size(20.dp),
+        )
+        Text(
+            text = racha.actual.toString(),
+            color = if (viva) Gold else Muted,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 4.dp),
+        )
     }
 }

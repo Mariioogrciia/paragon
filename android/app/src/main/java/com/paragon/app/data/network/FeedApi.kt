@@ -1,6 +1,8 @@
 package com.paragon.app.data.network
 
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 // Sin @JsonClass(generateAdapter = true) — mismo motivo que el resto de
 // DTOs de este paquete: KotlinJsonAdapterFactory los lee por reflexión.
@@ -16,12 +18,19 @@ data class FeedItemDto(
     val user: FeedUserDto,
     val game: FeedGameDto,
     val reactions: Int,
+    val reacted: Boolean,
 )
 
 data class FeedResponse(val items: List<FeedItemDto>)
+
+data class ReactResponse(val reacted: Boolean)
 
 interface FeedApi {
     /** Ver src/app/api/mobile/feed/route.ts en el proyecto Next.js. */
     @GET("api/mobile/feed")
     suspend fun getFeed(): FeedResponse
+
+    /** Alterna la reacción a una publicación — ver .../feed/{activityId}/react/route.ts. */
+    @POST("api/mobile/feed/{activityId}/react")
+    suspend fun react(@Path("activityId") activityId: String): ReactResponse
 }

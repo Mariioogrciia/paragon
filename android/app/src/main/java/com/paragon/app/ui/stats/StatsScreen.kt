@@ -136,6 +136,20 @@ private fun TrophyDnaCard(dna: TrophyDnaStats) {
         title = "ADN de trofeos",
         subtitle = dna.arquetipo?.let { "Tu arquetipo: $it" } ?: "Sigue jugando para desbloquear tu arquetipo",
     ) {
+        if (dna.ejes.size >= 3) {
+            TrophyDnaRadar(
+                ejes = dna.ejes,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            )
+            Text(
+                text = "Gira el gráfico con el dedo",
+                color = Muted,
+                fontSize = 11.sp,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+        }
+
         val max = dna.ejes.maxOfOrNull { it.valor } ?: 0
         dna.ejes.sortedByDescending { it.valor }.forEach { eje ->
             Column(modifier = Modifier.padding(vertical = 6.dp)) {

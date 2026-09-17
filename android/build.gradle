@@ -9,8 +9,13 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'com.google.gms:google-services:4.4.4'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
-        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.9.22-1.0.17"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"
+        // Kotlin 2.0 mueve el compilador de Compose fuera del propio Kotlin
+        // Gradle plugin — este es el plugin nuevo que lo reemplaza
+        // (composeOptions.kotlinCompilerExtensionVersion, en app/build.gradle,
+        // ya no aplica con Kotlin 2.0+, aplicamos este plugin en su lugar).
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.0.21"
+        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.0.21-1.0.28"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

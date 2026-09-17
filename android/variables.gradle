@@ -14,5 +14,9 @@ ext {
     androidxJunitVersion = '1.3.0'
     androidxEspressoCoreVersion = '3.7.0'
     cordovaAndroidVersion = '14.0.1'
-    kotlinVersion = '1.9.22'
+    // Subido desde 1.9.22 para poder usar SharedTransitionLayout de Compose
+    // (transición de carátula compartida Biblioteca -> Ficha de juego),
+    // que exige Compose BOM 2024.09.00+ y este es el Kotlin mínimo real
+    // que lo soporta con el nuevo plugin del compilador de Compose.
+    kotlinVersion = '2.0.21'
 }

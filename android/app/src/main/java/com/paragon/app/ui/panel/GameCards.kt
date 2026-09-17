@@ -1,5 +1,8 @@
 package com.paragon.app.ui.panel
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -163,8 +166,21 @@ fun HeroGameCard(game: GameProgress, onClick: () -> Unit = {}) {
     }
 }
 
+/**
+ * `sharedTransitionScope`/`animatedVisibilityScope` solo llegan no-nulos
+ * desde `LibraryScreen` (ver `MainScreen.kt`) — es el único origen que hace
+ * "volar" la carátula hasta `GameDetailHero` al tocar la tarjeta. El resto
+ * de sitios donde se usa esta card (Panel) siguen sin pasarlos y no animan
+ * nada especial, se quedan con el fundido normal de siempre.
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun StandardGameCard(game: GameProgress, onClick: () -> Unit = {}) {
+fun StandardGameCard(
+    game: GameProgress,
+    onClick: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) {
     Box(
         modifier = Modifier
             .width(180.dp)
@@ -180,10 +196,20 @@ fun StandardGameCard(game: GameProgress, onClick: () -> Unit = {}) {
                     .fillMaxWidth()
                     .weight(1f)
             ) {
+                val coverModifier = Modifier.fillMaxSize().let { base ->
+                    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                        with(sharedTransitionScope) {
+                            base.sharedElement(
+                                rememberSharedContentState(key = "game-cover-${game.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            )
+                        }
+                    } else base
+                }
                 GameCover(
                     coverUrl = game.coverUrl,
                     title = game.title,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = coverModifier,
                 )
                 Box(
                     modifier = Modifier

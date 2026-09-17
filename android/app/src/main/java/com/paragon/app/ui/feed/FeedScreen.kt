@@ -1,26 +1,36 @@
 package com.paragon.app.ui.feed
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +45,8 @@ import com.paragon.app.data.FeedResult
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.mensajeFeed
 import com.paragon.app.ui.theme.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,24 +58,24 @@ fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
     var isInitialLoading by remember { mutableStateOf(true) }
     var selectedHandle by remember { mutableStateOf<String?>(null) }
     val haptic = LocalHapticFeedback.current
-
-    val pullToRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(retryCounter.value) {
         if (result == null) isInitialLoading = true
         result = repository.getFeed()
         isInitialLoading = false
-        pullToRefreshState.endRefresh()
+        isRefreshing = false
     }
 
-    if (pullToRefreshState.isRefreshing) {
-        LaunchedEffect(true) {
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            isRefreshing = true
             retryCounter.value += 1
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize().nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+        },
+        modifier = Modifier.fillMaxSize(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -110,21 +122,13 @@ fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
                         contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
                         items(current.items, key = { it.id }) { item ->
-                            FeedCard(item, onUserClick = { selectedHandle = item.userHandle })
+                            FeedCard(item, repository = repository, onUserClick = { selectedHandle = item.userHandle })
                         }
                     }
                 }
             }
         }
         }
-        
-        
-        PullToRefreshContainer(
-            state = pullToRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            containerColor = Surface,
-            contentColor = Accent
-        )
 
         selectedHandle?.let { handle ->
             com.paragon.app.ui.social.FriendProfileBottomSheet(
@@ -136,13 +140,50 @@ fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
         }
     }
 }
+/**
+ * Doble toque para reaccionar (idea #13 del brainstorm de v1.0) — estado
+ * optimista igual que `togglePin`/`toggleReserve` en la ficha de juego: se
+ * pinta al momento (corazón + háptica fuerte) y la llamada de red va por
+ * detrás sin bloquear nada; si falla, se deja como está (una reacción de
+ * más o de menos en el Feed no merece un mensaje de error).
+ */
 @Composable
-fun FeedCard(item: FeedItem, onUserClick: () -> Unit) {
+fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit) {
+    var reacted by remember(item.id) { mutableStateOf(item.reacted) }
+    var reactionCount by remember(item.id) { mutableIntStateOf(item.reactions) }
+    var showBurst by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+
+    LaunchedEffect(showBurst) {
+        if (showBurst) {
+            delay(650)
+            showBurst = false
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(16.dp))
             .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .pointerInput(item.id) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        val nuevoEstado = !reacted
+                        reacted = nuevoEstado
+                        reactionCount += if (nuevoEstado) 1 else -1
+                        showBurst = nuevoEstado
+                        coroutineScope.launch {
+                            val real = repository.toggleReaction(item.id)
+                            if (real != null) {
+                                reacted = real
+                            }
+                        }
+                    },
+                )
+            }
             .padding(16.dp)
     ) {
         Column {
@@ -151,9 +192,9 @@ fun FeedCard(item: FeedItem, onUserClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = item.userName, 
-                    color = Accent, 
-                    fontWeight = FontWeight.Bold, 
+                    text = item.userName,
+                    color = Accent,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     modifier = Modifier.clickable { onUserClick() }
                 )
@@ -169,14 +210,34 @@ fun FeedCard(item: FeedItem, onUserClick: () -> Unit) {
                     modifier = Modifier.padding(top = 6.dp),
                 )
             }
-            if (item.reactions > 0) {
+            if (reactionCount > 0) {
+                val otros = reactionCount - if (reacted) 1 else 0
                 Text(
-                    text = "${item.reactions} reacciones",
-                    color = Muted,
+                    text = when {
+                        reacted && otros == 0 -> "Reaccionaste"
+                        reacted -> "Tú y $otros más reaccionasteis"
+                        else -> "$reactionCount reacciones"
+                    },
+                    color = if (reacted) Accent else Muted,
                     fontSize = 11.sp,
+                    fontWeight = if (reacted) FontWeight.SemiBold else FontWeight.Normal,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }
+        }
+
+        AnimatedVisibility(
+            visible = showBurst,
+            modifier = Modifier.align(Alignment.Center),
+            enter = scaleIn(animationSpec = tween(200)) + fadeIn(animationSpec = tween(150)),
+            exit = scaleOut(animationSpec = tween(250)) + fadeOut(animationSpec = tween(250)),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = null,
+                tint = Danger,
+                modifier = Modifier.size(72.dp),
+            )
         }
     }
 }
