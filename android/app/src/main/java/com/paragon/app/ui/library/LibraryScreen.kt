@@ -30,6 +30,7 @@ import com.paragon.app.data.filterByStatus
 import com.paragon.app.ui.navigation.Screen
 import com.paragon.app.ui.panel.StandardGameCard
 import com.paragon.app.ui.theme.*
+import com.paragon.app.util.rememberShakeListener
 
 private val FILTERS = listOf(
     LibraryFilter.TODOS to "Todos",
@@ -37,6 +38,7 @@ private val FILTERS = listOf(
     LibraryFilter.PLATINADOS to "Platinados",
     LibraryFilter.COMPLETADOS to "Completados",
     LibraryFilter.ABANDONADOS to "Abandonados",
+    LibraryFilter.BACKLOG to "Pila Vergüenza",
 )
 
 /** Biblioteca real contra GET /api/mobile/library (LibraryRepository). El botón "Ordenar" sigue sin acción — pendiente. */
@@ -62,6 +64,7 @@ fun LibraryScreen(
 
     var isInitialLoading by remember { mutableStateOf(true) }
     var isRefreshing by remember { mutableStateOf(false) }
+    var showRoulette by remember { mutableStateOf(false) }
 
     LaunchedEffect(retryCounter.value) {
         if (result == null) isInitialLoading = true
@@ -70,6 +73,15 @@ fun LibraryScreen(
         isRefreshing = false
     }
 
+    // "Agitar para jugar": juegos al 0% (backlog sin empezar) — el mismo
+    // gesto no tiene sentido con la ruleta ya abierta, de ahí `!showRoulette`
+    // en `enabled` en vez de comprobarlo solo dentro del callback.
+    val backlogGames = (result as? LibraryResult.Ok)?.games?.filter { it.progressPercent == 0 } ?: emptyList()
+    rememberShakeListener(enabled = backlogGames.isNotEmpty() && !showRoulette) {
+        showRoulette = true
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
@@ -209,6 +221,18 @@ fun LibraryScreen(
                 }
             }
         }
+        }
+    }
+
+        if (showRoulette && backlogGames.isNotEmpty()) {
+            ShakeRouletteOverlay(
+                candidates = backlogGames,
+                onDismiss = { showRoulette = false },
+                onOpenGame = { gameId ->
+                    showRoulette = false
+                    navController.navigate(Screen.GameDetail.routeFor(gameId))
+                },
+            )
         }
     }
 }

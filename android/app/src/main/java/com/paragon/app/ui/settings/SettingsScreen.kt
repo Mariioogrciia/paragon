@@ -29,6 +29,7 @@ import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.SettingsResult
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.theme.ThemeMode
+import com.paragon.app.data.theme.PlatformColor
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
@@ -205,6 +206,37 @@ fun SettingsScreen(
             Text("APARIENCIA", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
             ThemePicker(themeStore = themeStore)
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            PlatformPicker(themeStore = themeStore)
+
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Text("MODO SOLITARIO", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Surface, RoundedCornerShape(14.dp))
+                    .border(1.dp, Border, RoundedCornerShape(14.dp))
+                    .clickable { themeStore.setZenMode(!themeStore.zenMode) }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                    Text("Ocultar funciones sociales", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Oculta la Comunidad y Ligas. Ideal si solo usas la app como herramienta personal.", color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                androidx.compose.material3.Switch(
+                    checked = themeStore.zenMode,
+                    onCheckedChange = { themeStore.setZenMode(it) },
+                    colors = androidx.compose.material3.SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Accent,
+                    )
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -270,6 +302,45 @@ private fun ThemePicker(themeStore: ThemeStore) {
                     // siempre Accent (un azul), y en modo claro Background es
                     // casi blanco — usarlo aquí dejaría el texto casi
                     // invisible sobre el azul.
+                    color = if (selected) Color.White else Muted,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+    }
+}
+
+private val PLATFORM_OPTIONS = listOf(
+    PlatformColor.PARAGON to "Paragon",
+    PlatformColor.PLAYSTATION to "PSN",
+    PlatformColor.XBOX to "Xbox",
+    PlatformColor.STEAM to "Steam"
+)
+
+@Composable
+private fun PlatformPicker(themeStore: ThemeStore) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(14.dp))
+            .border(1.dp, Border, RoundedCornerShape(14.dp))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        PLATFORM_OPTIONS.forEach { (platform, label) ->
+            val selected = themeStore.platform == platform
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(if (selected) Accent else Color.Transparent)
+                    .clickable { themeStore.setPlatform(platform) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = label,
                     color = if (selected) Color.White else Muted,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,

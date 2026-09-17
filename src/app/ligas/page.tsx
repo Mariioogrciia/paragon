@@ -1,22 +1,56 @@
 import { getLigaMensual } from "@/lib/ligas";
+import { listUserLeagues } from "@/lib/leagues";
+import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { BackButton } from "@/components/BackButton";
+import { NewLeagueForm } from "@/components/forms/Forms";
 
 export const metadata = {
   title: "Liga Mensual - Paragon",
 };
 
 export default async function LigasPage() {
-  const ranking = await getLigaMensual();
-  
+  const session = await auth();
+  const [ranking, misLigas] = await Promise.all([
+    getLigaMensual(),
+    session?.user?.id ? listUserLeagues(session.user.id) : Promise.resolve([]),
+  ]);
+
   const monthName = new Date().toLocaleString("es-ES", { month: "long" });
   const year = new Date().getFullYear();
 
   return (
     <div className="mx-auto max-w-[800px] px-7 py-12">
       <BackButton fallbackHref="/" />
+
+      {session?.user?.id && (
+        <div className="mb-12">
+          <h2 className="font-heading text-xl font-bold mb-2">Tus ligas</h2>
+          <p className="text-muted text-sm mb-4">
+            Solo con quien tú quieras — invitas a amigos, no a toda la comunidad.
+          </p>
+
+          {misLigas.length > 0 && (
+            <div className="flex flex-col gap-2 mb-4">
+              {misLigas.map((liga) => (
+                <Link
+                  key={liga.id}
+                  href={`/ligas/${liga.id}`}
+                  className="flex items-center justify-between p-4 border rounded-xl border-border bg-surface hover:bg-accent/5 transition-colors"
+                >
+                  <span className="font-semibold">{liga.name}</span>
+                  <span className="text-xs text-muted">{liga.memberCount} {liga.memberCount === 1 ? "miembro" : "miembros"}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <NewLeagueForm />
+        </div>
+      )}
+
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2 uppercase tracking-wide flex items-center gap-2 text-[rgb(var(--accent-rgb))]">
           <TrophyIcon grade="platinum" size={32} />

@@ -11,9 +11,13 @@ import androidx.compose.ui.graphics.Color
  * está en automático). Los `val` de abajo son propiedades computadas que
  * leen esto: cualquier Composable que use `Background`, `Foreground`, etc.
  * (los ~20 archivos de pantallas que ya hacían `import ...theme.*`) se
+ * (los ~20 archivos de pantallas que ya hacían `import ...theme.*`) se
  * recompone solo con el cambio, sin tener que tocar ni una pantalla más.
  */
+import com.paragon.app.data.theme.PlatformColor
+
 internal var isDarkTheme by mutableStateOf(true)
+internal var activePlatformColor by mutableStateOf(PlatformColor.PARAGON)
 
 // --- Oscuro (el de siempre) ---
 private val DarkBackground = Color(0xFF000000)
@@ -22,9 +26,27 @@ private val DarkSurface2 = Color(0xFF161616)
 private val DarkBorder = Color(0xFF262626)
 private val DarkForeground = Color(0xFFFFFFFF)
 private val DarkMuted = Color(0xFFA0A0A0)
-private val DarkAccent = Color(0xFFB026FF) // Neon Purple
-private val DarkAccent2 = Color(0xFFE08FFF)
-private val DarkAccentSoft = Color(0x23B026FF) // ~14% opacity
+
+// Paragon (Neon Purple)
+private val DarkAccentParagon = Color(0xFFB026FF)
+private val DarkAccent2Paragon = Color(0xFFE08FFF)
+private val DarkAccentSoftParagon = Color(0x23B026FF)
+
+// PlayStation (Blue)
+private val DarkAccentPS = Color(0xFF0070D1)
+private val DarkAccent2PS = Color(0xFF4B9EF5)
+private val DarkAccentSoftPS = Color(0x230070D1)
+
+// Xbox (Green)
+private val DarkAccentXbox = Color(0xFF107C10)
+private val DarkAccent2Xbox = Color(0xFF38B238)
+private val DarkAccentSoftXbox = Color(0x23107C10)
+
+// Steam (Steam Blue)
+private val DarkAccentSteam = Color(0xFF66C0F4)
+private val DarkAccent2Steam = Color(0xFF8ED2F7)
+private val DarkAccentSoftSteam = Color(0x2366C0F4)
+
 private val DarkBronze = Color(0xFFC07B4A)
 private val DarkSilver = Color(0xFFB9C2CC)
 private val DarkGold = Color(0xFFE2B53E)
@@ -39,9 +61,27 @@ private val LightSurface2 = Color(0xFFEBEDF1)
 private val LightBorder = Color(0xFFDBDFE6)
 private val LightForeground = Color(0xFF12151B)
 private val LightMuted = Color(0xFF5B6472)
-private val LightAccent = Color(0xFF1D6FE0)
-private val LightAccent2 = Color(0xFF1B6E93)
-private val LightAccentSoft = Color(0x1A1D6FE0) // ~10% opacity
+
+// Paragon (Neon Purple)
+private val LightAccentParagon = Color(0xFF1D6FE0)
+private val LightAccent2Paragon = Color(0xFF1B6E93)
+private val LightAccentSoftParagon = Color(0x1A1D6FE0)
+
+// PlayStation (Blue)
+private val LightAccentPS = Color(0xFF00439C)
+private val LightAccent2PS = Color(0xFF005AB5)
+private val LightAccentSoftPS = Color(0x1A00439C)
+
+// Xbox (Green)
+private val LightAccentXbox = Color(0xFF0B5A0B)
+private val LightAccent2Xbox = Color(0xFF107C10)
+private val LightAccentSoftXbox = Color(0x1A0B5A0B)
+
+// Steam (Navy Blue)
+private val LightAccentSteam = Color(0xFF1B2838)
+private val LightAccent2Steam = Color(0xFF2A475E)
+private val LightAccentSoftSteam = Color(0x1A1B2838)
+
 private val LightBronze = Color(0xFFA8623A)
 private val LightSilver = Color(0xFF6B7480)
 private val LightGold = Color(0xFFAD8114)
@@ -56,9 +96,26 @@ val Border: Color get() = if (isDarkTheme) DarkBorder else LightBorder
 val Foreground: Color get() = if (isDarkTheme) DarkForeground else LightForeground
 val Muted: Color get() = if (isDarkTheme) DarkMuted else LightMuted
 
-val Accent: Color get() = if (isDarkTheme) DarkAccent else LightAccent
-val Accent2: Color get() = if (isDarkTheme) DarkAccent2 else LightAccent2
-val AccentSoft: Color get() = if (isDarkTheme) DarkAccentSoft else LightAccentSoft
+val Accent: Color get() = when (activePlatformColor) {
+    PlatformColor.PARAGON -> if (isDarkTheme) DarkAccentParagon else LightAccentParagon
+    PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccentPS else LightAccentPS
+    PlatformColor.XBOX -> if (isDarkTheme) DarkAccentXbox else LightAccentXbox
+    PlatformColor.STEAM -> if (isDarkTheme) DarkAccentSteam else LightAccentSteam
+}
+
+val Accent2: Color get() = when (activePlatformColor) {
+    PlatformColor.PARAGON -> if (isDarkTheme) DarkAccent2Paragon else LightAccent2Paragon
+    PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccent2PS else LightAccent2PS
+    PlatformColor.XBOX -> if (isDarkTheme) DarkAccent2Xbox else LightAccent2Xbox
+    PlatformColor.STEAM -> if (isDarkTheme) DarkAccent2Steam else LightAccent2Steam
+}
+
+val AccentSoft: Color get() = when (activePlatformColor) {
+    PlatformColor.PARAGON -> if (isDarkTheme) DarkAccentSoftParagon else LightAccentSoftParagon
+    PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccentSoftPS else LightAccentSoftPS
+    PlatformColor.XBOX -> if (isDarkTheme) DarkAccentSoftXbox else LightAccentSoftXbox
+    PlatformColor.STEAM -> if (isDarkTheme) DarkAccentSoftSteam else LightAccentSoftSteam
+}
 
 // Trophy Grades
 val Bronze: Color get() = if (isDarkTheme) DarkBronze else LightBronze

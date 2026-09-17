@@ -62,7 +62,7 @@ class ComposeMainActivity : ComponentActivity() {
         registerPushTokenIfLoggedIn()
 
         setContent {
-            ParagonTheme(mode = themeStore.mode) {
+            ParagonTheme(mode = themeStore.mode, platform = themeStore.platform) {
                 val refresh by refreshTrigger
                 AppRoot(
                     tokenStore = tokenStore,

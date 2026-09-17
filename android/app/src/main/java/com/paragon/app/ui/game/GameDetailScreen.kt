@@ -6,6 +6,8 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -13,12 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -234,12 +239,24 @@ private fun GameDetailContent(
             )
         }
 
+        item {
+            NotesSection(
+                initialNotes = game.notes,
+                dynamicColor = dynamicColor,
+                onSaveNotes = { newNotes ->
+                    coroutineScope.launch {
+                        repository.saveNotes(gameId, newNotes)
+                    }
+                }
+            )
+        }
+
         val grouped = game.trophies.sortedWith(
             compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
         )
 
         items(grouped) { trophy ->
-            TrophyRow(trophy, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+            TrophyRow(trophy, game = game, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
         }
 
         item { Spacer(Modifier.height(32.dp)) }
@@ -439,7 +456,17 @@ private fun ActionChip(label: String, active: Boolean, accentColor: Color, onCli
 }
 
 @Composable
-private fun TrophyRow(trophy: TrophyItem, modifier: Modifier = Modifier) {
+private fun TrophyRow(trophy: TrophyItem, game: GameDetailData, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val db = remember(context) { ParagonDatabase.getDatabase(context) }
+    val dao = remember(db) { db.stuckTrophyDao() }
+    val coroutineScope = rememberCoroutineScope()
+    var isStuck by remember(trophy.id) { mutableStateOf(false) }
+
+    LaunchedEffect(trophy.id) {
+        isStuck = dao.isStuck(trophy.id)
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -475,6 +502,44 @@ private fun TrophyRow(trophy: TrophyItem, modifier: Modifier = Modifier) {
         trophy.rarityPercent?.let {
             Text(text = "${it}%", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
+        if (!trophy.earned) {
+            IconButton(
+                onClick = {
+                    coroutineScope.launch {
+                        if (isStuck) {
+                            dao.removeStuckTrophy(trophy.id)
+                            isStuck = false
+                        } else {
+                            dao.addStuckTrophy(
+                                com.paragon.app.data.local.StuckTrophyEntity(
+                                    trophyId = trophy.id,
+                                    gameId = game.id,
+                                    gameTitle = game.title,
+                                    trophyName = trophy.name,
+                                    trophyDetail = trophy.detail,
+                                    trophyGrade = trophy.grade?.name,
+                                    coverUrl = game.coverUrl
+                                )
+                            )
+                            isStuck = true
+                        }
+                    }
+                },
+                modifier = Modifier.padding(start = 4.dp).size(24.dp)
+            ) {
+                Icon(Icons.Default.Star, contentDescription = "Atascar", tint = if (isStuck) Accent else Muted, modifier = Modifier.size(16.dp))
+            }
+            IconButton(
+                onClick = {
+                    val query = android.net.Uri.encode("${game.title} ${trophy.name} trophy guide")
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.youtube.com/results?search_query=$query"))
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.padding(start = 4.dp).size(24.dp)
+            ) {
+                Icon(Icons.Default.Search, contentDescription = "Buscar Guía", tint = Accent, modifier = Modifier.size(16.dp))
+            }
+        }
     }
 }
 
@@ -484,4 +549,77 @@ private fun gradeColor(grade: TrophyGrade?): Color = when (grade) {
     TrophyGrade.SILVER -> Silver
     TrophyGrade.BRONZE -> Bronze
     null -> Muted
+}
+
+@Composable
+private fun NotesSection(
+    initialNotes: String,
+    onSaveNotes: (String) -> Unit,
+    dynamicColor: Color
+) {
+    var notes by remember { mutableStateOf(initialNotes) }
+    var isEditing by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("NOTAS PRIVADAS", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            if (isEditing) {
+                TextButton(onClick = { 
+                    isEditing = false
+                    onSaveNotes(notes)
+                }) {
+                    Text("Guardar", color = dynamicColor, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+            } else if (notes.isNotBlank()) {
+                TextButton(onClick = { isEditing = true }) {
+                    Text("Editar", color = Muted, fontSize = 13.sp)
+                }
+            }
+        }
+        
+        if (isEditing) {
+            androidx.compose.material3.OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                placeholder = { Text("Apuntes, códigos, rutas de farmeo...", color = Muted, fontSize = 14.sp) },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = dynamicColor,
+                    unfocusedBorderColor = Border,
+                    focusedTextColor = Foreground,
+                    unfocusedTextColor = Foreground
+                )
+            )
+        } else {
+            if (notes.isBlank()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Surface, RoundedCornerShape(12.dp))
+                        .border(1.dp, Border, RoundedCornerShape(12.dp))
+                        .clickable { isEditing = true }
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Añadir nota personal...", color = Muted, fontSize = 14.sp)
+                }
+            } else {
+                Text(
+                    text = notes,
+                    color = Foreground,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Surface, RoundedCornerShape(12.dp))
+                        .border(1.dp, Border, RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                )
+            }
+        }
+    }
 }

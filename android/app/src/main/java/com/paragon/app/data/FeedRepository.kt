@@ -4,6 +4,7 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.FeedCommentDto
 import com.paragon.app.data.network.FeedItemDto
+import com.paragon.app.data.network.NewCommentRequest
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,6 +26,7 @@ data class FeedItem(
     val timeAgo: String,
     val userHandle: String,
     val comments: List<FeedComment> = emptyList(),
+    val views: Int = 0,
 )
 
 sealed class FeedResult {
@@ -76,6 +78,7 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     timeAgo = relativeTimeEs(createdAt),
     userHandle = user.handle ?: "",
     comments = comments.map { it.toFeedComment() },
+    views = views,
 )
 
 private fun FeedCommentDto.toFeedComment() = FeedComment(
@@ -103,6 +106,31 @@ class FeedRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return null
         return try {
             ApiClient.feedApi(store).react(activityId).reacted
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Registra una visualización — idempotente en el servidor. Devuelve si
+     * era nueva (para sumar +1 en el contador ya pintado) o `null` si falla
+     * la llamada (se deja pasar en silencio, es un contador, no una acción
+     * del usuario).
+     */
+    suspend fun registerView(activityId: String): Boolean? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.feedApi(store).registerView(activityId).isNew
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** Añade un comentario — `null` si falla la llamada o queda vacío. */
+    suspend fun addComment(activityId: String, body: String): FeedComment? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.feedApi(store).addComment(activityId, NewCommentRequest(body)).toFeedComment()
         } catch (e: Exception) {
             null
         }

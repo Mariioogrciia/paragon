@@ -15,13 +15,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.ui.input.pointer.pointerInput
@@ -49,10 +53,12 @@ import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+import com.paragon.app.data.theme.ThemeStore
+
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
+fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit) {
     val repository = remember(tokenStore) { FeedRepository(tokenStore) }
     var result by remember { mutableStateOf<FeedResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
@@ -135,6 +141,7 @@ fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
             com.paragon.app.ui.social.FriendProfileBottomSheet(
                 handle = handle,
                 tokenStore = tokenStore,
+                themeStore = themeStore,
                 onDismiss = { selectedHandle = null },
                 onCompareClick = onCompareClick
             )
@@ -152,14 +159,44 @@ fun FeedScreen(tokenStore: TokenStore, onCompareClick: (String) -> Unit) {
 fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit) {
     var reacted by remember(item.id) { mutableStateOf(item.reacted) }
     var reactionCount by remember(item.id) { mutableIntStateOf(item.reactions) }
+    var viewCount by remember(item.id) { mutableIntStateOf(item.views) }
+    var comments by remember(item.id) { mutableStateOf(item.comments) }
+    var showCommentInput by remember(item.id) { mutableStateOf(false) }
+    var commentText by remember(item.id) { mutableStateOf("") }
+    var isSendingComment by remember(item.id) { mutableStateOf(false) }
     var showBurst by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
+
+    fun toggleReaction() {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        val nuevoEstado = !reacted
+        reacted = nuevoEstado
+        reactionCount += if (nuevoEstado) 1 else -1
+        showBurst = nuevoEstado
+        coroutineScope.launch {
+            val real = repository.toggleReaction(item.id)
+            if (real != null) {
+                reacted = real
+            }
+        }
+    }
 
     LaunchedEffect(showBurst) {
         if (showBurst) {
             delay(650)
             showBurst = false
+        }
+    }
+
+    // Se registra en cuanto la tarjeta entra en composición (LazyColumn solo
+    // compone lo visible) — idempotente en el servidor (activity_view tiene
+    // PK compuesta), así que recomponer al volver a hacer scroll no infla
+    // el contador. `isNew` dice si esta llamada fue la que insertó la fila
+    // (el GET /feed que ya se pintó no puede saber de esta vista todavía).
+    LaunchedEffect(item.id) {
+        if (repository.registerView(item.id) == true) {
+            viewCount += 1
         }
     }
 
@@ -170,19 +207,7 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
             .border(1.dp, Border, RoundedCornerShape(16.dp))
             .pointerInput(item.id) {
                 detectTapGestures(
-                    onDoubleTap = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        val nuevoEstado = !reacted
-                        reacted = nuevoEstado
-                        reactionCount += if (nuevoEstado) 1 else -1
-                        showBurst = nuevoEstado
-                        coroutineScope.launch {
-                            val real = repository.toggleReaction(item.id)
-                            if (real != null) {
-                                reacted = real
-                            }
-                        }
-                    },
+                    onDoubleTap = { toggleReaction() },
                 )
             }
             .padding(16.dp)
@@ -211,28 +236,80 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                     modifier = Modifier.padding(top = 6.dp),
                 )
             }
-            if (reactionCount > 0) {
-                val otros = reactionCount - if (reacted) 1 else 0
-                Text(
-                    text = when {
-                        reacted && otros == 0 -> "Reaccionaste"
-                        reacted -> "Tú y $otros más reaccionasteis"
-                        else -> "$reactionCount reacciones"
-                    },
-                    color = if (reacted) Accent else Muted,
-                    fontSize = 11.sp,
-                    fontWeight = if (reacted) FontWeight.SemiBold else FontWeight.Normal,
-                    modifier = Modifier.padding(top = 8.dp),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                CountBadge(
+                    icon = if (reacted) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    count = reactionCount,
+                    tint = if (reacted) Danger else Muted,
+                    onClick = { toggleReaction() },
+                )
+                CountBadge(
+                    icon = Icons.Default.ChatBubbleOutline,
+                    count = comments.size,
+                    tint = Muted,
+                    onClick = { showCommentInput = !showCommentInput },
+                )
+                CountBadge(
+                    icon = Icons.Default.RemoveRedEye,
+                    count = viewCount,
+                    tint = Muted,
                 )
             }
-            if (item.comments.isNotEmpty()) {
+            if (showCommentInput) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    androidx.compose.material3.TextField(
+                        value = commentText,
+                        onValueChange = { commentText = it },
+                        placeholder = { Text("Añadir un comentario...", color = Muted, fontSize = 13.sp) },
+                        singleLine = true,
+                        enabled = !isSendingComment,
+                        colors = androidx.compose.material3.TextFieldDefaults.colors(
+                            focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                            unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                            focusedIndicatorColor = Accent,
+                            unfocusedIndicatorColor = Border,
+                            focusedTextColor = Foreground,
+                            unfocusedTextColor = Foreground,
+                        ),
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp),
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(
+                        enabled = !isSendingComment && commentText.isNotBlank(),
+                        onClick = {
+                            val body = commentText.trim()
+                            isSendingComment = true
+                            coroutineScope.launch {
+                                val created = repository.addComment(item.id, body)
+                                if (created != null) {
+                                    comments = comments + created
+                                    commentText = ""
+                                }
+                                isSendingComment = false
+                            }
+                        },
+                    ) {
+                        Text("Enviar", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                    }
+                }
+            }
+            if (comments.isNotEmpty()) {
                 Column(modifier = Modifier.padding(top = 10.dp)) {
                     HorizontalDivider(color = Border, modifier = Modifier.padding(bottom = 8.dp))
                     // Los 2 más recientes, estilo Instagram — el resto solo
                     // como contador, no hace falta desplegar 20 comentarios
-                    // en medio del Feed. Todavía sin poder escribir uno
-                    // desde la app (solo lectura, ver API-CONTRACT.md).
-                    item.comments.takeLast(2).forEach { comment ->
+                    // en medio del Feed.
+                    comments.takeLast(2).forEach { comment ->
                         Row(modifier = Modifier.padding(vertical = 2.dp)) {
                             Text(
                                 text = comment.userName,
@@ -248,9 +325,9 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                             )
                         }
                     }
-                    if (item.comments.size > 2) {
+                    if (comments.size > 2) {
                         Text(
-                            text = "Ver los ${item.comments.size} comentarios",
+                            text = "Ver los ${comments.size} comentarios",
                             color = Muted,
                             fontSize = 11.sp,
                             modifier = Modifier.padding(top = 2.dp),
@@ -273,5 +350,27 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                 modifier = Modifier.size(72.dp),
             )
         }
+    }
+}
+
+/**
+ * Icono + número, estilo Instagram — usado para reacciones/comentarios/vistas
+ * en FeedCard. `onClick` es opcional: las vistas no son una acción del
+ * usuario, así que ese badge se queda sin tocar (sin `clickable` de más).
+ */
+@Composable
+private fun CountBadge(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    count: Int,
+    tint: androidx.compose.ui.graphics.Color,
+    onClick: (() -> Unit)? = null,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
+    ) {
+        Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = count.toString(), color = tint, fontSize = 12.sp)
     }
 }

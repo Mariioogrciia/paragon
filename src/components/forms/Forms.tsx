@@ -4,13 +4,16 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import {
   addFriendAction,
+  addLeagueMemberAction,
   chooseHandleAction,
   createCollectionAction,
+  createLeagueAction,
   linkPsnAction,
   linkSteamAction,
   linkXboxAction,
   updateProfileAction,
   setDiscordDmAction,
+  setLeagueChallengeAction,
   probarDiscordDmAction,
   syncNowAction,
   syncPlatformAction,
@@ -184,6 +187,89 @@ export function NewCollectionForm({ gameId }: { gameId?: string }) {
         <Submit>Crear</Submit>
       </div>
       <Feedback state={state} />
+    </form>
+  );
+}
+
+/** Crear una liga — el creador entra como único miembro, se invita al resto desde la ficha de la liga (`AddLeagueMemberForm`). */
+export function NewLeagueForm() {
+  const [state, action] = useActionState(createLeagueAction, EMPTY);
+
+  return (
+    <form action={action}>
+      <div className="flex flex-col gap-2.5 sm:flex-row">
+        <input
+          name="name"
+          placeholder="Nombre de la liga (p. ej. «Los de siempre»)"
+          autoComplete="off"
+          maxLength={60}
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
+          style={FIELD}
+        />
+        <Submit>Crear liga</Submit>
+      </div>
+      <Feedback state={state} />
+    </form>
+  );
+}
+
+/** Fijar el juego de reto de una liga propia — quién llega antes al platino, aparte de la clasificación por puntos. */
+export function SetLeagueChallengeForm({
+  leagueId,
+  juegos,
+  actual,
+}: {
+  leagueId: string;
+  juegos: { id: string; title: string }[];
+  actual: string | null;
+}) {
+  return (
+    <form action={setLeagueChallengeAction} className="flex flex-col gap-2.5 sm:flex-row">
+      <input type="hidden" name="leagueId" value={leagueId} />
+      <select
+        name="gameId"
+        defaultValue={actual ?? ""}
+        className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none"
+        style={FIELD}
+      >
+        <option value="">Sin reto</option>
+        {juegos.map((j) => (
+          <option key={j.id} value={j.id}>{j.title}</option>
+        ))}
+      </select>
+      <Submit>Guardar</Submit>
+    </form>
+  );
+}
+
+/** Invitar a un amigo a una liga propia — solo ofrece amigos que todavía no son miembros (el backend igualmente exige que sean amigos de verdad). */
+export function AddLeagueMemberForm({
+  leagueId,
+  candidatos,
+}: {
+  leagueId: string;
+  candidatos: { userId: string; label: string }[];
+}) {
+  if (candidatos.length === 0) {
+    return <p className="text-sm text-muted">Ya están todos tus amigos disponibles en esta liga.</p>;
+  }
+
+  return (
+    <form action={addLeagueMemberAction} className="flex flex-col gap-2.5 sm:flex-row">
+      <input type="hidden" name="leagueId" value={leagueId} />
+      <select
+        name="friendUserId"
+        defaultValue=""
+        required
+        className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none"
+        style={FIELD}
+      >
+        <option value="" disabled>Elige a un amigo…</option>
+        {candidatos.map((c) => (
+          <option key={c.userId} value={c.userId}>{c.label}</option>
+        ))}
+      </select>
+      <Submit>Invitar</Submit>
     </form>
   );
 }

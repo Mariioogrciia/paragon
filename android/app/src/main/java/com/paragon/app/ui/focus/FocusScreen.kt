@@ -15,10 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paragon.app.data.ConnectivityObserver
 import com.paragon.app.data.GameDetailData
 import com.paragon.app.data.GameDetailRepository
 import com.paragon.app.data.GameDetailResult
 import com.paragon.app.data.LibraryRepository
+import com.paragon.app.data.NoteSaveResult
 import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
@@ -46,7 +48,7 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
     val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
-    val gameRepository = remember(tokenStore) { GameDetailRepository(tokenStore) }
+    val gameRepository = remember(tokenStore, db) { GameDetailRepository(tokenStore, db.gameDetailDao()) }
     val coroutineScope = rememberCoroutineScope()
 
     var pinnedGameId by remember { mutableStateOf<String?>(null) }
@@ -65,6 +67,21 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
             detailResult = gameRepository.getGameDetail(pinnedId)
         }
         loadingLibrary = false
+    }
+
+    // En cuanto vuelve la red, se manda cualquier nota escrita sin conexión
+    // (ver `saveNotes`/`flushPendingNotes` en GameDetailRepository) — sin
+    // esto, quedaría encolada hasta la próxima vez que alguien reabriera
+    // Modo Enfoque a mano.
+    LaunchedEffect(Unit) {
+        var wasOffline = false
+        ConnectivityObserver.observe(context).collect { online ->
+            if (online && wasOffline) {
+                gameRepository.flushPendingNotes()
+                retryCounter.value += 1
+            }
+            wasOffline = !online
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(FocoNegro)) {
@@ -88,6 +105,7 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
                 is GameDetailResult.Ok -> FocusContent(
                     gameId = pinnedGameId!!,
                     game = current.detail,
+                    fromCache = current.fromCache,
                     onBack = onBack,
                     coroutineScope = coroutineScope,
                     gameRepository = gameRepository,
@@ -134,22 +152,27 @@ private fun EmptyFocusState(onBack: () -> Unit) {
 private fun FocusContent(
     gameId: String,
     game: GameDetailData,
+    fromCache: Boolean,
     onBack: () -> Unit,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
     gameRepository: GameDetailRepository,
 ) {
     var nota by remember(gameId) { mutableStateOf(game.notes) }
     var guardando by remember { mutableStateOf(false) }
+    var notaEncolada by remember { mutableStateOf(false) }
     var comprobando by remember { mutableStateOf(false) }
     var aviso by remember { mutableStateOf<String?>(null) }
 
     // Autoguardado con debounce (800ms), igual que la web — se cancela solo
-    // si el usuario sigue escribiendo antes de que pase el tiempo.
+    // si el usuario sigue escribiendo antes de que pase el tiempo. Sin
+    // conexión, `saveNotes` la encola sola (ver GameDetailRepository) — aquí
+    // solo se refleja el resultado, sin tratarlo como un error.
     LaunchedEffect(nota) {
         if (nota == game.notes) return@LaunchedEffect
         delay(800)
         guardando = true
-        gameRepository.saveNotes(gameId, nota)
+        val resultado = gameRepository.saveNotes(gameId, nota)
+        notaEncolada = resultado == NoteSaveResult.Queued
         guardando = false
     }
 
@@ -176,6 +199,14 @@ private fun FocusContent(
                     maxLines = 1,
                     modifier = Modifier.padding(top = 2.dp),
                 )
+                if (fromCache) {
+                    Text(
+                        text = "Sin conexión — mostrando la última copia guardada",
+                        color = Color.White.copy(alpha = 0.5f),
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
             }
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Salir del modo enfoque", tint = Color.White)
@@ -229,6 +260,14 @@ private fun FocusContent(
                 if (guardando) Text("...", color = Color.White.copy(alpha = 0.4f), fontSize = 11.sp)
             },
         )
+        if (notaEncolada) {
+            Text(
+                text = "Guardada en el móvil — se sincronizará cuando vuelva la conexión",
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 11.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
 
         Spacer(Modifier.height(12.dp))
 

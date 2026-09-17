@@ -22,10 +22,10 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!-- El intent-filter de lanzador (MAIN/LAUNCHER) vive en los 4
+                 <activity-alias> de abajo, no aquí — así el icono real
+                 puede cambiar según el tema de plataforma sin tocar esta
+                 actividad para nada (ver IconSwitcher.kt). -->
             <!-- Deep link de vuelta desde /movil/enlazar (Custom Tab) con el
                  sessionToken del login real — ver ComposeMainActivity.kt. -->
             <intent-filter>
@@ -35,6 +35,79 @@
                 <data android:scheme="paragon" android:host="auth" />
             </intent-filter>
         </activity>
+
+        <!-- "Añadir a Paragon" desde el Sharesheet del sistema (compartir un
+             enlace/título desde Chrome, YouTube...) — ver ShareReceiverActivity.kt. -->
+        <activity
+            android:name=".ShareReceiverActivity"
+            android:label="Añadir a Paragon"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:excludeFromRecents="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          Icono dinámico por tema de plataforma (Ajustes → Apariencia, ver
+          ThemeStore.setPlatform() / IconSwitcher.kt) — Android no deja
+          cambiar `android:icon` de una actividad en caliente, así que la
+          técnica real es esta: 4 alias del MISMO ComposeMainActivity, cada
+          uno con su propio icono de lanzador, y solo uno `enabled` a la
+          vez (lo gestiona IconSwitcher.applyLauncherIcon, no el manifiesto
+          — aquí solo se fija el estado inicial de instalación, Paragon).
+        -->
+        <activity-alias
+            android:name=".IconParagon"
+            android:targetActivity=".ComposeMainActivity"
+            android:enabled="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".IconPlayStation"
+            android:targetActivity=".ComposeMainActivity"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_playstation"
+            android:roundIcon="@mipmap/ic_launcher_playstation_round"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".IconXbox"
+            android:targetActivity=".ComposeMainActivity"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_xbox"
+            android:roundIcon="@mipmap/ic_launcher_xbox_round"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".IconSteam"
+            android:targetActivity=".ComposeMainActivity"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_steam"
+            android:roundIcon="@mipmap/ic_launcher_steam_round"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -76,6 +149,10 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Sin diálogo de permiso real (normal, se concede sola) — la necesita
+         ConnectivityObserver.kt para saber cuándo ha vuelto la red y
+         disparar la sincronización de notas pendientes. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Android 13+ exige pedir este permiso en tiempo de ejecución para
          poder mostrar CUALQUIER notificación, incluidas las push — ver la
          petición en ComposeMainActivity.kt. -->

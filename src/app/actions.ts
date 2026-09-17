@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, activityComments, platformAccounts, gameTrophies } from "@/db/schema";
+import { users, userGames, activities, platformAccounts, gameTrophies } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import {
@@ -36,7 +36,8 @@ import {
   unlinkAccount,
 } from "@/lib/profiles";
 import { toggleReservedMilestone } from "@/lib/milestones";
-import { toggleActivityReaction } from "@/lib/feed";
+import { toggleActivityReaction, addActivityComment } from "@/lib/feed";
+import { createLeague, addLeagueMember, removeLeagueMember, deleteLeague, setLeagueChallenge, NotFriendsError } from "@/lib/leagues";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
@@ -617,9 +618,9 @@ export async function addActivityCommentAction(formData: FormData): Promise<void
   // "body" — leer "body" aquí devolvía siempre null, así que `body` salía
   // "" y el guard de abajo cortaba en silencio: el comentario nunca se
   // insertaba, sin ningún error visible para quien escribía.
-  const body = String(formData.get("comment") ?? "").trim().slice(0, 500);
-  if (!activityId || !body) return;
-  await getDb().insert(activityComments).values({ id: crypto.randomUUID(), activityId, userId, body });
+  const body = String(formData.get("comment") ?? "");
+  if (!activityId) return;
+  await addActivityComment(userId, activityId, body);
   revalidatePath("/", "layout");
 }
 
@@ -1212,4 +1213,66 @@ export async function actualizarAdquisicionAction(
 
   revalidatePath("/", "layout");
   return {};
+}
+
+/* ------------------------------------------- Ligas ------------------------------------------ */
+
+export async function createLeagueAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId();
+  const name = String(formData.get("name") ?? "");
+
+  const league = await createLeague(userId, name);
+  if (!league) return { error: "Ponle un nombre a la liga." };
+
+  revalidatePath("/ligas");
+  redirect(`/ligas/${league.id}`);
+}
+
+export async function addLeagueMemberAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const leagueId = String(formData.get("leagueId") ?? "");
+  const friendUserId = String(formData.get("friendUserId") ?? "");
+  if (!leagueId || !friendUserId) return;
+
+  try {
+    await addLeagueMember(leagueId, userId, friendUserId);
+  } catch (error) {
+    if (!(error instanceof NotFriendsError)) throw error;
+    // Solo puede pasar si alguien manipula el formulario a mano (la lista
+    // que se ve en la web solo ofrece amigos reales) — sin aviso al usuario,
+    // no hay nada que explicarle que no supiera ya.
+  }
+  revalidatePath(`/ligas/${leagueId}`);
+}
+
+export async function removeLeagueMemberAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const leagueId = String(formData.get("leagueId") ?? "");
+  const targetUserId = String(formData.get("targetUserId") ?? "");
+  if (!leagueId || !targetUserId) return;
+
+  await removeLeagueMember(leagueId, userId, targetUserId);
+  revalidatePath(`/ligas/${leagueId}`);
+  revalidatePath("/ligas");
+}
+
+export async function deleteLeagueAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const leagueId = String(formData.get("leagueId") ?? "");
+  if (!leagueId) return;
+
+  await deleteLeague(leagueId, userId);
+  revalidatePath("/ligas");
+  redirect("/ligas");
+}
+
+/** Fija el juego de reto de la liga — `gameId` vacío lo quita. */
+export async function setLeagueChallengeAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const leagueId = String(formData.get("leagueId") ?? "");
+  const gameId = String(formData.get("gameId") ?? "");
+  if (!leagueId) return;
+
+  await setLeagueChallenge(leagueId, userId, gameId || null);
+  revalidatePath(`/ligas/${leagueId}`);
 }

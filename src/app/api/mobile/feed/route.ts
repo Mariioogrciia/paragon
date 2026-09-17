@@ -28,6 +28,7 @@ export async function GET(req: Request) {
       reactions: item.reactions,
       reacted: item.reacted,
       comments: item.comments,
+      views: item.views,
     })),
   });
 }

@@ -40,7 +40,7 @@ sealed class LibraryResult {
     data class Error(val message: String) : LibraryResult()
 }
 
-enum class LibraryFilter { TODOS, JUGANDO, PLATINADOS, COMPLETADOS, ABANDONADOS }
+enum class LibraryFilter { TODOS, JUGANDO, PLATINADOS, COMPLETADOS, ABANDONADOS, BACKLOG }
 
 private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     id = id,
@@ -159,5 +159,6 @@ fun List<LibraryGame>.filterByStatus(filter: LibraryFilter): List<LibraryGame> {
         LibraryFilter.ABANDONADOS -> filter {
             it.progressPercent in 1..99 && (it.lastPlayedAt == null || it.lastPlayedAt < umbral)
         }
+        LibraryFilter.BACKLOG -> filter { it.progressPercent in 1..15 }
     }
 }

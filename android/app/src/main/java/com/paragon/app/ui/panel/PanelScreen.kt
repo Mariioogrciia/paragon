@@ -11,12 +11,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +38,9 @@ import com.paragon.app.data.HighlightsResult
 import com.paragon.app.data.HitoReservado
 import com.paragon.app.data.LibraryGame
 import com.paragon.app.data.LibraryRepository
+import com.paragon.app.data.CompareRepository
+import com.paragon.app.data.CompareResult
+import com.paragon.app.data.CompareSide
 import com.paragon.app.data.MilestoneRepository
 import com.paragon.app.data.MilestoneResult
 import com.paragon.app.data.PanelRepository
@@ -46,6 +51,7 @@ import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import coil3.compose.AsyncImage
+import com.paragon.app.data.theme.ThemeStore
 
 /**
  * `userProfile`/`globalStats` ya son reales (bajan desde AppRoot vía
@@ -56,16 +62,18 @@ import coil3.compose.AsyncImage
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfile: UserProfile, globalStats: GlobalStats) {
+fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore: ThemeStore, userProfile: UserProfile, globalStats: GlobalStats) {
     val repository = remember(tokenStore) { PanelRepository(tokenStore) }
     val context = androidx.compose.ui.platform.LocalContext.current
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
     val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
+    val compareRepository = remember(tokenStore) { CompareRepository(tokenStore) }
     val trophyCounts = remember { repository.getMockTrophyCounts() }
     var highlights by remember { mutableStateOf<HighlightsResult?>(null) }
     var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
+    var rivalComparison by remember { mutableStateOf<CompareResult?>(null) }
     
     val haptic = LocalHapticFeedback.current
     val retryCounter = remember { mutableIntStateOf(0) }
@@ -76,6 +84,14 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
     // lo posee quien llama, y `PullToRefreshBox` maneja el nestedScroll
     // solo, sin `Modifier.nestedScroll(state.nestedScrollConnection)`.
     var isRefreshing by remember { mutableStateOf(false) }
+    var showConfetti by remember { mutableStateOf(false) }
+
+    LaunchedEffect(showConfetti) {
+        if (showConfetti) {
+            kotlinx.coroutines.delay(2300)
+            showConfetti = false
+        }
+    }
 
     LaunchedEffect(retryCounter.value) {
         if (highlights == null) isInitialLoading = true
@@ -83,11 +99,17 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
             launch { highlights = repository.getHighlights() }
             launch { pinnedGame = libraryRepository.findPinnedGame() }
             launch { hito = (milestoneRepository.getMilestone() as? MilestoneResult.Ok)?.hito }
+            launch {
+                themeStore.rivalHandle?.let { handle ->
+                    rivalComparison = compareRepository.compare(handle)
+                }
+            }
         }
         isInitialLoading = false
         isRefreshing = false
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
@@ -138,7 +160,28 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
                             hito = h,
                             onClick = { navController.navigate(Screen.GameDetail.routeFor(h.gameId)) },
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    GoalBanner(
+                        currentPlatinums = globalStats.platinums,
+                        targetPlatinums = themeStore.targetPlatinums,
+                        onSetTarget = { themeStore.setTargetPlatinums(it) }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (themeStore.rivalHandle != null) {
+                        (rivalComparison as? CompareResult.Ok)?.let { result ->
+                            RivalBanner(
+                                rival = result.data.them,
+                                me = result.data.me,
+                                onClick = { navController.navigate(Screen.Compare.routeFor(themeStore.rivalHandle!!)) }
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
+                    } else if (hito == null) {
+                        // Spacer extra if we have neither milestone nor rival
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
 
                     // Resumen Stats
@@ -148,7 +191,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.heightIn(max = 300.dp) // Constraint para LazyGrid dentro de LazyColumn
                     ) {
-                        item { PlatinumStatTile(globalStats.platinums) }
+                        item { PlatinumStatTile(globalStats.platinums, onEasterEgg = { showConfetti = true }) }
                         item { StatTile("Trofeos", globalStats.trophies.toString()) }
                         item { StatTile("Juegos", globalStats.games.toString()) }
                         item { StatTile("Completado", "${globalStats.completionRate}%") }
@@ -241,10 +284,25 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, userProfil
             }
         }
     }
+
+        if (showConfetti) {
+            ConfettiOverlay(modifier = Modifier.fillMaxSize())
+        }
+    }
 }
 
+/**
+ * Easter egg: 5 toques seguidos (menos de 1s entre cada uno, si no se
+ * reinicia la cuenta) disparan `onEasterEgg` — lluvia de confeti en
+ * PanelScreen. `indication = null` porque el ripple de Material sobre un
+ * gradiente ya oscuro apenas se ve y aquí distraía más que ayudaba.
+ */
 @Composable
-fun PlatinumStatTile(value: Int) {
+fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
+    var tapCount by remember { mutableIntStateOf(0) }
+    var lastTapAt by remember { mutableLongStateOf(0L) }
+    val haptic = LocalHapticFeedback.current
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,6 +316,19 @@ fun PlatinumStatTile(value: Int) {
                 shape = RoundedCornerShape(20.dp)
             )
             .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .clickable(
+                indication = null,
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+            ) {
+                val now = System.currentTimeMillis()
+                tapCount = if (now - lastTapAt > 1000) 1 else tapCount + 1
+                lastTapAt = now
+                if (tapCount >= 5) {
+                    tapCount = 0
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onEasterEgg()
+                }
+            }
             .padding(24.dp)
     ) {
         Column {
@@ -339,6 +410,124 @@ fun MilestoneBanner(hito: HitoReservado, onClick: () -> Unit) {
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
+    }
+}
+
+@Composable
+fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        var input by remember { mutableStateOf(targetPlatinums?.toString() ?: "") }
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Meta de Platinos", color = Foreground) },
+            text = {
+                OutlinedTextField(
+                    value = input,
+                    onValueChange = { if (it.all { char -> char.isDigit() }) input = it },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                    placeholder = { Text("Ej: 50", color = Muted) }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val value = input.toIntOrNull()
+                    if (value != null && value > 0) {
+                        onSetTarget(value)
+                    } else {
+                        onSetTarget(null)
+                    }
+                    showDialog = false
+                }) {
+                    Text("Guardar", color = Accent)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    onSetTarget(null)
+                    showDialog = false
+                }) {
+                    Text("Eliminar Meta", color = Danger)
+                }
+            },
+            containerColor = Surface,
+            titleContentColor = Foreground
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(16.dp))
+            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .clickable { showDialog = true }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "META PERSONAL", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            if (targetPlatinums == null) {
+                Text(
+                    text = "Fijar meta de platinos",
+                    color = Foreground,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            } else {
+                val progress = currentPlatinums.toFloat() / targetPlatinums.toFloat()
+                Text(
+                    text = "Objetivo: $targetPlatinums Platinos",
+                    color = Foreground,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .height(8.dp)
+                        .background(Background, RoundedCornerShape(4.dp)),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress.coerceIn(0f, 1f))
+                            .fillMaxHeight()
+                            .background(Accent, RoundedCornerShape(4.dp)),
+                    )
+                }
+                Text(text = "$currentPlatinums / $targetPlatinums", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun RivalBanner(rival: CompareSide, me: CompareSide, onClick: () -> Unit) {
+    val winning = me.platinos >= rival.platinos
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (winning) Accent.copy(alpha=0.1f) else Surface, RoundedCornerShape(16.dp))
+            .border(1.dp, if (winning) Accent else Border, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "RIVAL PRINCIPAL", color = Danger, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(
+                text = "Tú (${me.platinos}) 🆚 ${rival.name} (${rival.platinos})",
+                color = Foreground,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+        Icon(androidx.compose.material.icons.Icons.Default.ArrowForward, contentDescription = null, tint = Muted)
     }
 }
 

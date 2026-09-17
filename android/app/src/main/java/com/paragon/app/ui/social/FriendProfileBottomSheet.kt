@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 fun FriendProfileBottomSheet(
     handle: String,
     tokenStore: TokenStore,
+    themeStore: com.paragon.app.data.theme.ThemeStore,
     onDismiss: () -> Unit,
     onCompareClick: (String) -> Unit
 ) {
@@ -105,7 +106,7 @@ fun FriendProfileBottomSheet(
                 }
                 is UserProfileResult.Ok -> {
                     val profile = current.profile
-                    ProfileContent(profile, dominantColor, onCompareClick = {
+                    ProfileContent(profile, dominantColor, themeStore = themeStore, onCompareClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onCompareClick(profile.handle)
                         onDismiss()
@@ -120,6 +121,7 @@ fun FriendProfileBottomSheet(
 private fun ProfileContent(
     profile: UserProfileDto, 
     dominantColor: Color?,
+    themeStore: com.paragon.app.data.theme.ThemeStore,
     onCompareClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -201,6 +203,22 @@ private fun ProfileContent(
                 colors = ButtonDefaults.buttonColors(containerColor = dominantColor ?: Accent)
             ) {
                 Text("⚔️ Comparar Trofeos", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = if (dominantColor != null) Color.White else Foreground)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            val isRival = themeStore.rivalHandle == profile.handle
+            OutlinedButton(
+                onClick = {
+                    if (isRival) themeStore.setRivalHandle(null)
+                    else themeStore.setRivalHandle(profile.handle)
+                },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isRival) Danger else Foreground),
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (isRival) Danger else Border)
+            ) {
+                Text(if (isRival) "Desfijar Rival Principal" else "Fijar como Rival Principal", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(modifier = Modifier.height(32.dp))

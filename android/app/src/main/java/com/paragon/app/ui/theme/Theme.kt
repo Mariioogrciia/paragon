@@ -6,10 +6,12 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import com.paragon.app.data.theme.ThemeMode
+import com.paragon.app.data.theme.PlatformColor
 
 @Composable
 fun ParagonTheme(
     mode: ThemeMode = ThemeMode.SISTEMA,
+    platform: PlatformColor = PlatformColor.PARAGON,
     content: @Composable () -> Unit
 ) {
     val dark = when (mode) {
@@ -21,9 +23,9 @@ fun ParagonTheme(
     // Se escribe ANTES de construir el colorScheme (no en un SideEffect,
     // que solo corre después de esta composición) para que Background/
     // Foreground/etc. — usados directo por casi todas las pantallas, sin
-    // pasar por MaterialTheme.colorScheme — ya lean el valor correcto desde
     // el primer frame, sin parpadeo del tema equivocado.
     isDarkTheme = dark
+    activePlatformColor = platform
 
     val colorScheme = if (dark) {
         darkColorScheme(

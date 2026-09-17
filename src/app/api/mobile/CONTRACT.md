@@ -111,11 +111,15 @@ como campo aparte.
   "user": { "id": "u1", "handle": "mario", "name": "Mario", "image": "https://..." },
   "game": { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "deviceLabel": "PS5" },
   "reactions": 3, "reacted": false,
-  "comments": [ { "activityId": "act_1", "body": "GG", "userName": "Ana", "createdAt": "..." } ]
+  "comments": [ { "activityId": "act_1", "body": "GG", "userName": "Ana", "createdAt": "..." } ],
+  "views": 12
 } ] }
 ```
 `type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`.
-Máximo 50 elementos, ya ordenados por fecha descendente.
+Máximo 50 elementos, ya ordenados por fecha descendente. `views`: número de
+usuarios distintos que han visto la publicación (tabla `activity_view`, PK
+compuesta por actividad+usuario — no cuenta visitas repetidas de la misma
+persona).
 
 ## `POST /api/mobile/feed/{activityId}/react` — Reaccionar/quitar reacción
 
@@ -126,6 +130,107 @@ Alterna: si ya habías reaccionado, la quita y devuelve `false`. Mismo
 `toggleActivityReactionAction` que la web (botón de aplauso) — pensado para
 el doble toque en una tarjeta del Feed (idea #13 del brainstorm de v1.0),
 no hay un endpoint aparte para "quitar" solamente.
+
+## `POST /api/mobile/feed/{activityId}/view` — Registrar visualización
+
+```json
+{ "isNew": true }
+```
+Idempotente — llamarlo varias veces por la misma persona solo inserta la
+primera vez; `isNew: false` en las siguientes. Pensado para llamarse cuando
+una tarjeta del Feed entra en pantalla (`LazyColumn` solo compone lo
+visible, así que sirve de aproximación razonable a "se ha visto"). El
+cliente usa `isNew` para saber si debe sumar +1 al contador que ya tenía
+pintado (el `GET /feed` no incluye la vista que se está a punto de
+registrar).
+
+## `POST /api/mobile/feed/{activityId}/comment` — Añadir un comentario
+
+Body: `{ "body": "GG" }`. Respuesta (el comentario recién creado, mismo
+shape que los de `GET /feed`):
+```json
+{ "activityId": "act_1", "body": "GG", "userName": "Mario", "createdAt": "..." }
+```
+`400` si el cuerpo, tras recortar espacios, queda vacío. Mismo
+`addActivityComment` que usa `addActivityCommentAction` en la web — antes
+la app solo podía leer comentarios, no escribirlos.
+
+## Ligas propias (`lib/leagues.ts`) — distintas de la Liga Mensual global
+
+Antes solo existía la "Liga Mensual" global (todos los usuarios, sin tabla
+propia, calculada al vuelo — ver `getLigaMensual` en `lib/ligas.ts`, sigue
+existiendo tal cual). Esto es otra cosa: ligas que crea un usuario, con
+nombre propio, y a las que solo se puede invitar a amigos reales
+(`areFriends`). Mismo cálculo de puntos (platino 100/oro 50/plata 25/resto
+10, mes en curso) pero acotado a los miembros de cada liga.
+
+### `GET /api/mobile/leagues` — Mis ligas
+
+```json
+{ "leagues": [ { "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "memberCount": 3 } ] }
+```
+
+### `POST /api/mobile/leagues` — Crear una liga
+
+Body: `{ "name": "..." }`. El creador entra como único miembro. `400` si el
+nombre, tras recortar espacios, queda vacío.
+```json
+{ "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "memberCount": 1 }
+```
+
+### `GET /api/mobile/leagues/{id}` — Clasificación de una liga (mes en curso)
+
+`404` si no existe o si no eres miembro (ver esta liga sin pertenecer a ella
+no tiene sentido).
+```json
+{
+  "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "isOwner": true,
+  "standings": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "points": 250 } ],
+  "challenge": {
+    "gameId": "abc123", "title": "Elden Ring", "iconUrl": "https://...",
+    "standings": [
+      { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "progressPercent": 100, "hasPlatinum": true, "platinumAt": "2026-09-10T07:55:00.000Z" },
+      { "userId": "u2", "handle": "ana", "name": "Ana", "image": "...", "progressPercent": 64, "hasPlatinum": false, "platinumAt": null }
+    ]
+  }
+}
+```
+Los miembros sin ningún trofeo este mes salen igualmente, con `points: 0` —
+la liga enseña a todos sus miembros, no solo a quien ya ha cazado algo.
+`challenge` es `null` si la liga no tiene ningún juego de reto fijado (ver
+`POST .../challenge`). Dentro, `standings` va ordenado por quién llegó
+antes al platino (o al 100% en Steam, que no tiene grado "platinum" propio
+— ver `esPlatinoEquivalente`), y luego por `progressPercent` para quien
+todavía no lo tiene.
+
+### `POST /api/mobile/leagues/{id}/challenge` — Fijar el juego de reto
+
+Body: `{ "gameId": "abc123" }` (o `{ "gameId": null }` para quitarlo). Solo
+el dueño (`403` si no lo eres). El picker de juego en el cliente usa la
+biblioteca del dueño (`GET /library`), igual que la web.
+
+### `POST /api/mobile/leagues/{id}/members` — Invitar a un amigo
+
+Body: `{ "userId": "..." }`. Solo el dueño puede invitar (`403` si no lo
+eres), y solo a alguien que ya sea tu amigo de verdad (relación `accepted`
+en `friendships`) — `400` en caso contrario.
+
+### `DELETE /api/mobile/leagues/{id}/members/{userId}` — Quitar a alguien
+
+El dueño puede quitar a cualquiera (menos a sí mismo — para eso está borrar
+la liga entera); cualquier otro miembro solo puede quitarse a sí mismo
+(salir). `403` en cualquier otro caso.
+
+### `POST /api/mobile/leagues/{id}/leave` — Salir de una liga
+
+Igual que el `DELETE` de arriba apuntando a tu propio `userId`, pero sin que
+la app tenga que conocerlo (solo tiene el token, no el id de usuario, a
+diferencia de la sesión completa de la web) — pensado para el botón "Salir"
+de la app móvil.
+
+### `DELETE /api/mobile/leagues/{id}` — Borrar la liga entera
+
+Solo el dueño (`403` si no lo eres). Cascada sobre los miembros.
 
 ## `GET /api/mobile/users/{handle}` — Ficha de perfil de cualquiera
 
@@ -373,3 +478,29 @@ seguro llamar a los dos siempre.
 JSON de la cuenta de servicio de Firebase) y `android/app/google-services.json`
 en el proyecto Android — sin eso, este endpoint sigue funcionando pero
 `enviarPushFcm` no manda nada de verdad, en silencio.
+
+## `GET /api/mobile/games/search?q=` — Buscar en el catálogo (IGDB)
+
+Pensado para "Añadir a Paragon" desde el Sharesheet de Android (compartir un
+título desde Chrome/YouTube). Mismo `searchGames` que usa
+`GET /api/games/search` en la web (`AddManualGameModal.tsx`), aquí detrás de
+auth móvil.
+```json
+{ "results": [ { "igdbId": 1234, "title": "Hades II", "coverUrl": "https://...", "developer": "Supergiant Games", "genres": ["Roguelike"], "pegi": "16" } ] }
+```
+`q` vacío devuelve `{ "results": [] }` sin llamar a IGDB.
+
+## `POST /api/mobile/wishlist` — Añadir un juego a Deseados
+
+Body (un resultado de la búsqueda de arriba, tal cual):
+```json
+{ "igdbId": 1234, "title": "Hades II", "coverUrl": "https://...", "pegi": "16", "genres": ["Roguelike"], "developer": "Supergiant Games", "publisher": "Supergiant Games", "deviceLabel": "Deseados" }
+```
+`deviceLabel` es opcional (por defecto "Deseados" — libre, no hay catálogo
+de dispositivos). Mismo `addManualGame(..., isWishlist=true)` que
+`addToWishlistAction` en la web — esa es una Server Action ligada a la
+cookie de sesión, no se puede llamar desde la app nativa, de ahí este
+endpoint aparte. `400` si falta `title`/`igdbId` válido.
+```json
+{ "gameId": "manual:1234:deseados" }
+```

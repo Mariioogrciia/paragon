@@ -558,6 +558,47 @@ export const activityComments = pgTable(
   (t) => [index("activity_comment_activityId_idx").on(t.activityId)],
 );
 
+// Contador de visualizaciones del Feed — una fila por (actividad, usuario
+// que la vio), igual que activityReactions, así una recarga o un scroll de
+// ida y vuelta no infla el contador. Registrado desde la app móvil cuando
+// una tarjeta entra en pantalla (ver POST /api/mobile/feed/{id}/view).
+export const activityViews = pgTable(
+  "activity_view",
+  {
+    activityId: text("activityId").notNull().references(() => activities.id, { onDelete: "cascade" }),
+    userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.activityId, t.userId] })],
+);
+
+/* ------------------------------------------------------------------ *
+ * Ligas — creadas por un usuario, solo con amigos (a diferencia de la  *
+ * "Liga Mensual" global de lib/ligas.ts, que sigue siendo de todos).   *
+ * ------------------------------------------------------------------ */
+
+export const leagues = pgTable("league", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  ownerId: text("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  // El "reto" de la liga — un juego concreto para picarse a ver quién llega
+  // antes al platino, aparte de la clasificación por puntos del mes.
+  // `null` = sin reto activo. `onDelete: "set null"` porque borrar un juego
+  // del catálogo no tiene por qué borrar la liga entera con él.
+  challengeGameId: text("challengeGameId").references(() => games.id, { onDelete: "set null" }),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const leagueMembers = pgTable(
+  "league_member",
+  {
+    leagueId: text("leagueId").notNull().references(() => leagues.id, { onDelete: "cascade" }),
+    userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    joinedAt: timestamp("joinedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.leagueId, t.userId] })],
+);
+
 export const syncRuns = pgTable("sync_run", {
   id: text("id").primaryKey(),
   userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),

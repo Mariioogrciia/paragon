@@ -272,6 +272,30 @@
 html, body {
   /* Prevenir rebote táctil (rubber-banding) en iOS para que se sienta como App nativa */
   overscroll-behavior-y: none;
+
+  /* Deshabilitar menús contextuales y selección de texto para un "look & feel" verdaderamente nativo */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Reactivar selección y escritura normal para los campos de texto donde sí tiene sentido */
+input, textarea {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+/* Evitar el "fantasma" que se crea al arrastrar enlaces e imágenes (exclusivo de web) */
+img, a {
+  -webkit-user-drag: none;
+  /* Elimina posibles resaltados grises transparentes residuales en Safari/WebKit */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Eliminar el anillo de enfoque azul de accesibilidad a menos que sea teclado (tab) */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 body {

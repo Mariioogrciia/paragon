@@ -69,6 +69,7 @@ import com.paragon.app.data.UserProfile
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.collections.CollectionsScreen
 import com.paragon.app.ui.compare.CompareScreen
+import com.paragon.app.ui.stuck.StuckTrophiesScreen
 import com.paragon.app.ui.feed.FeedScreen
 import com.paragon.app.ui.focus.FocusScreen
 import com.paragon.app.ui.game.GameDetailScreen
@@ -128,13 +129,21 @@ fun MainScreen(
         }
     }
 
-    val items = listOf(
-        BottomNavItem.Dashboard,
-        BottomNavItem.Library,
-        BottomNavItem.Stats,
-        BottomNavItem.Feed,
-        BottomNavItem.Social
-    )
+    val items = if (themeStore.zenMode) {
+        listOf(
+            BottomNavItem.Dashboard,
+            BottomNavItem.Library,
+            BottomNavItem.Stats
+        )
+    } else {
+        listOf(
+            BottomNavItem.Dashboard,
+            BottomNavItem.Library,
+            BottomNavItem.Stats,
+            BottomNavItem.Feed,
+            BottomNavItem.Social
+        )
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
@@ -239,6 +248,13 @@ fun MainScreen(
                                 }
                             )
                             DropdownMenuItem(
+                                text = { Text("Trofeos Atascados", color = Foreground) },
+                                onClick = {
+                                    isMenuExpanded = false
+                                    navController.navigate(Screen.StuckTrophies.route)
+                                }
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Ajustes", color = Foreground) },
                                 onClick = {
                                     isMenuExpanded = false
@@ -312,7 +328,7 @@ fun MainScreen(
             popEnterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
             popExitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
-            composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, profile, stats) }
+            composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, themeStore, profile, stats) }
             composable(Screen.Library.route) {
                 LibraryScreen(
                     navController, tokenStore, searchQuery,
@@ -322,12 +338,12 @@ fun MainScreen(
             }
             composable(Screen.Stats.route) { StatsScreen(tokenStore) }
             composable(Screen.Feed.route) { 
-                FeedScreen(tokenStore, onCompareClick = { handle ->
+                FeedScreen(tokenStore, themeStore, onCompareClick = { handle ->
                     navController.navigate(Screen.Compare.routeFor(handle))
                 }) 
             }
             composable(Screen.Social.route) { 
-                SocialScreen(tokenStore, onCompareClick = { handle ->
+                SocialScreen(tokenStore, themeStore, onCompareClick = { handle ->
                     navController.navigate(Screen.Compare.routeFor(handle))
                 }) 
             }
@@ -344,6 +360,9 @@ fun MainScreen(
             }
             composable(Screen.Collections.route) {
                 CollectionsScreen(navController, tokenStore, onBack = { navController.popBackStack() })
+            }
+            composable(Screen.StuckTrophies.route) {
+                StuckTrophiesScreen(onBack = { navController.popBackStack() })
             }
             
             // Pantallas de Ajustes

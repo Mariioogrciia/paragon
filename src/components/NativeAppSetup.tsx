@@ -25,14 +25,14 @@ export function NativeAppSetup() {
       const { Capacitor } = await import("@capacitor/core");
       if (!Capacitor.isNativePlatform()) return;
 
-      // --- Barra de estado con el color real de la app, no el índigo por
-      // defecto que trae Capacitor de fábrica. `Style.Dark` = iconos
-      // claros, para el fondo oscuro de #0a0d13 (ver globals.css). ---
+      // --- Barra de estado transparente y "edge-to-edge" (dibujada por encima
+      // de la app, en lugar de empujar el contenido hacia abajo) para aprovechar
+      // toda la pantalla como una verdadera app nativa. `Style.Dark` = iconos claros. ---
       try {
         const { StatusBar, Style } = await import("@capacitor/status-bar");
-        await StatusBar.setBackgroundColor({ color: "#0a0d13" });
+        // Overlay true: el WebView se dibuja debajo de la barra de estado.
+        await StatusBar.setOverlaysWebView({ overlay: true });
         await StatusBar.setStyle({ style: Style.Dark });
-        await StatusBar.setOverlaysWebView({ overlay: false });
       } catch (error) {
         console.error("[NativeAppSetup] status bar", error);
       }

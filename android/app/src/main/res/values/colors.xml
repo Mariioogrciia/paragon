@@ -13,4 +13,16 @@
     <color name="colorPrimary">#0A0D13</color>
     <color name="colorPrimaryDark">#0A0D13</color>
     <color name="colorAccent">#4A9EFF</color>
+
+    <!--
+      Fondo del icono real de la app (el logo "P", ver mipmap-*/ic_launcher_foreground.png,
+      generado a partir de public/uploads/LogoNoFondo.png) — uno por tema de
+      plataforma (Ajustes → Apariencia). El icono en sí es el mismo en los 4,
+      solo cambia este color de fondo (ver IconSwitcher.kt y los 4 XML de
+      mipmap-anydpi-v26/ic_launcher*.xml).
+    -->
+    <color name="ic_launcher_bg_paragon">#000000</color>
+    <color name="ic_launcher_bg_playstation">#003791</color>
+    <color name="ic_launcher_bg_xbox">#107C10</color>
+    <color name="ic_launcher_bg_steam">#1B2838</color>
 </resources>
