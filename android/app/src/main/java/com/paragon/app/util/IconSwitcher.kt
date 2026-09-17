@@ -34,6 +34,16 @@ fun applyLauncherIcon(context: Context, platform: PlatformColor) {
         } else {
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         }
-        pm.setComponentEnabledSetting(ComponentName(context.packageName, alias), state, PackageManager.DONT_KILL_APP)
+        try {
+            pm.setComponentEnabledSetting(ComponentName(context.packageName, alias), state, PackageManager.DONT_KILL_APP)
+        } catch (e: IllegalArgumentException) {
+            // "Activity class {...} does not exist" — pasa si el paquete
+            // instalado todavía no tiene estos alias (APK de antes de este
+            // cambio, o el sistema aún registrando componentes justo tras
+            // instalar/actualizar). Es un detalle cosmético del icono, así
+            // que nunca debe tirar abajo el resto de la app — se ignora y
+            // se reintentará solo (esto se llama en cada arranque, ver
+            // ThemeStore.init) en cuanto el paquete instalado sí los tenga.
+        }
     }
 }
