@@ -89,6 +89,67 @@ private fun StatsContent(stats: ParagonStats) {
         item { FinancieroCard(stats.financiero, stats.horasTotales) }
         item { EficienciaCard(stats.eficiencia) }
         item { BacklogCard(stats.backlog) }
+        item { HitosCard(stats.hitos) }
+    }
+}
+
+private val FECHA_ISO = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
+    timeZone = java.util.TimeZone.getTimeZone("UTC")
+}
+private val FECHA_CORTA = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale("es", "ES"))
+
+private fun fechaCorta(iso: String): String =
+    try { FECHA_CORTA.format(FECHA_ISO.parse(iso)!!) } catch (e: Exception) { iso }
+
+private val ICONO_GRADO = mapOf("bronze" to "🥉", "silver" to "🥈", "gold" to "🥇", "platinum" to "🏆")
+
+/**
+ * Hitos de toda la carrera de trofeos (no de una ventana de tiempo) — mismo
+ * dato que la línea de tiempo de la web (HistoricalTimeline.tsx). Cada hito
+ * puede faltar (p. ej. sin ningún platino todavía); se omite su fila, no se
+ * enseña vacía. Si no hay NINGÚN hito, no se pinta ni la tarjeta.
+ */
+@Composable
+private fun HitosCard(hitos: HitosStats) {
+    val filas = buildList {
+        hitos.primerTrofeo?.let {
+            add(Triple(ICONO_GRADO[it.grade] ?: "🎮", "Tu primer trofeo", "${it.nombre} · ${it.tituloJuego} · ${fechaCorta(it.fecha)}"))
+        }
+        hitos.primerPlatino?.let {
+            add(Triple("🏆", "Tu primer platino", "${it.titulo} · ${fechaCorta(it.fecha)}"))
+        }
+        hitos.trofeoMasRaro?.let {
+            add(Triple("💎", "Tu trofeo más raro", "${it.nombre} · ${"%.1f".format(it.rarityPercent)}% lo tiene · ${it.tituloJuego}"))
+        }
+        hitos.platinoAnejo?.takeIf { it.dias >= 30 }?.let {
+            val texto = if (it.dias >= 365) {
+                "${it.dias / 365} años y ${(it.dias % 365) / 30} meses en caer"
+            } else {
+                "${it.dias / 30} meses en caer"
+            }
+            add(Triple("🍷", "El platino añejo", "${it.titulo} · $texto"))
+        }
+        hitos.rachaMasLarga?.takeIf { it.dias >= 3 }?.let {
+            add(Triple("🔥", "Tu racha más larga", "${it.dias} días seguidos, del ${fechaCorta(it.desde)} al ${fechaCorta(it.hasta)}"))
+        }
+    }
+    if (filas.isEmpty()) return
+
+    SectionCard(title = "Hitos de tu carrera", subtitle = "Toda tu historia de trofeos, no solo este año") {
+        filas.forEachIndexed { index, (icono, etiqueta, detalle) ->
+            if (index > 0) {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = Border)
+                Spacer(Modifier.height(12.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = icono, fontSize = 20.sp, modifier = Modifier.padding(end = 12.dp))
+                Column {
+                    Text(text = etiqueta, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = detalle, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+            }
+        }
     }
 }
 

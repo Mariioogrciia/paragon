@@ -252,6 +252,7 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   ];
   if (dna.arquetipo) lineas.push(`🧬 ${dna.arquetipo}`);
   if (racha.actual > 0) lineas.push(`🔥 Racha activa: ${racha.actual} ${racha.actual === 1 ? "día" : "días"} (mejor: ${racha.mejor})`);
+  if (hitos.primerTrofeo) lineas.push(`🎮 Primer trofeo: ${hitos.primerTrofeo.nombre} (${hitos.primerTrofeo.tituloJuego})`);
   if (hitos.primerPlatino) lineas.push(`🥇 Primer platino: ${hitos.primerPlatino.titulo}`);
   if (hitos.trofeoMasRaro) lineas.push(`💎 Trofeo más raro: ${hitos.trofeoMasRaro.nombre} (${hitos.trofeoMasRaro.rarityPercent.toFixed(1)}%)`);
 

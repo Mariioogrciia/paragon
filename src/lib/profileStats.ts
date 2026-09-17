@@ -230,6 +230,15 @@ export interface PrimerPlatino {
   fecha: string;
 }
 
+export interface PrimerTrofeo {
+  gameId: string;
+  tituloJuego: string;
+  nombre: string;
+  iconUrl: string | null;
+  grade: "bronze" | "silver" | "gold" | "platinum" | null;
+  fecha: string;
+}
+
 export interface TrofeoMasRaro {
   gameId: string;
   tituloJuego: string;
@@ -255,6 +264,7 @@ export interface RachaMasLarga {
 }
 
 export interface HitosHistoricos {
+  primerTrofeo: PrimerTrofeo | null;
   primerPlatino: PrimerPlatino | null;
   trofeoMasRaro: TrofeoMasRaro | null;
   platinoAnejo: PlatinoAnejo | null;
@@ -279,7 +289,7 @@ export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> 
     or (${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100)
   )`;
 
-  const [platinos, [raro], rachaDias] = await Promise.all([
+  const [platinos, [raro], rachaDias, [primero]] = await Promise.all([
     db
       .select({
         gameId: userGames.gameId,
@@ -319,6 +329,24 @@ export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> 
       .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt)))
       .groupBy(sql`date(${userTrophies.earnedAt})`)
       .orderBy(sql`date(${userTrophies.earnedAt})`),
+
+    // El primerísimo trofeo de toda la cuenta — cualquier grado, cualquier
+    // juego, el más antiguo por fecha de todos los que tienen fecha real.
+    db
+      .select({
+        gameId: userTrophies.gameId,
+        tituloJuego: gamesTable.title,
+        nombre: gameTrophies.name,
+        iconUrl: gameTrophies.iconUrl,
+        grade: gameTrophies.grade,
+        fecha: userTrophies.earnedAt,
+      })
+      .from(userTrophies)
+      .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+      .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
+      .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt)))
+      .orderBy(asc(userTrophies.earnedAt))
+      .limit(1),
   ]);
 
   const validos = platinos.filter((p): p is typeof p & { inicio: string; fin: string } => p.inicio != null && p.fin != null);
@@ -380,6 +408,16 @@ export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> 
   }
 
   return {
+    primerTrofeo: primero
+      ? {
+          gameId: primero.gameId,
+          tituloJuego: primero.tituloJuego,
+          nombre: primero.nombre,
+          iconUrl: primero.iconUrl,
+          grade: primero.grade,
+          fecha: primero.fecha!.toISOString(),
+        }
+      : null,
     primerPlatino,
     trofeoMasRaro: raro
       ? {

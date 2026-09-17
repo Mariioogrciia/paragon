@@ -28,6 +28,20 @@ data class EficienciaStats(val ritmoMedioPct: Int?, val juegosConDatos: Int)
 
 data class BacklogStats(val juegosContados: Int, val horasHistoriaRestantes: Double, val horasPlatinoRestantes: Double)
 
+data class PrimerTrofeoStats(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val grade: String?, val fecha: String)
+data class PrimerPlatinoStats(val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
+data class TrofeoMasRaroStats(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val rarityPercent: Double, val fecha: String?)
+data class PlatinoAnejoStats(val gameId: String, val titulo: String, val iconUrl: String?, val dias: Int, val desde: String, val hasta: String)
+data class RachaMasLargaStats(val dias: Int, val desde: String, val hasta: String)
+
+data class HitosStats(
+    val primerTrofeo: PrimerTrofeoStats?,
+    val primerPlatino: PrimerPlatinoStats?,
+    val trofeoMasRaro: TrofeoMasRaroStats?,
+    val platinoAnejo: PlatinoAnejoStats?,
+    val rachaMasLarga: RachaMasLargaStats?,
+)
+
 data class ParagonStats(
     val paragonScore: ParagonScoreStats,
     val trophyDna: TrophyDnaStats,
@@ -37,6 +51,7 @@ data class ParagonStats(
     val eficiencia: EficienciaStats,
     val backlog: BacklogStats,
     val horasTotales: Int,
+    val hitos: HitosStats,
 )
 
 sealed class StatsResult {
@@ -63,6 +78,13 @@ private fun StatsResponse.toParagonStats() = ParagonStats(
     eficiencia = EficienciaStats(eficiencia.ritmoMedioPct, eficiencia.juegosConDatos),
     backlog = BacklogStats(backlog.juegosContados, backlog.horasHistoriaRestantes, backlog.horasPlatinoRestantes),
     horasTotales = horasTotales,
+    hitos = HitosStats(
+        primerTrofeo = hitos.primerTrofeo?.let { PrimerTrofeoStats(it.gameId, it.tituloJuego, it.nombre, it.iconUrl, it.grade, it.fecha) },
+        primerPlatino = hitos.primerPlatino?.let { PrimerPlatinoStats(it.gameId, it.titulo, it.iconUrl, it.fecha) },
+        trofeoMasRaro = hitos.trofeoMasRaro?.let { TrofeoMasRaroStats(it.gameId, it.tituloJuego, it.nombre, it.iconUrl, it.rarityPercent, it.fecha) },
+        platinoAnejo = hitos.platinoAnejo?.let { PlatinoAnejoStats(it.gameId, it.titulo, it.iconUrl, it.dias, it.desde, it.hasta) },
+        rachaMasLarga = hitos.rachaMasLarga?.let { RachaMasLargaStats(it.dias, it.desde, it.hasta) },
+    ),
 )
 
 class StatsRepository(private val tokenStore: TokenStore? = null) {

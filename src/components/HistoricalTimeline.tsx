@@ -50,13 +50,31 @@ function Hito({
  * ejemplo, sin ningún platino todavía) — se omite la tarjeta, no se enseña
  * vacía.
  */
-export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
-  const { primerPlatino, trofeoMasRaro, platinoAnejo, rachaMasLarga } = hitos;
+const ICONO_GRADO: Record<string, string> = {
+  bronze: "🥉",
+  silver: "🥈",
+  gold: "🥇",
+  platinum: "🏆",
+};
 
-  if (!primerPlatino && !trofeoMasRaro && !platinoAnejo && !rachaMasLarga) return null;
+export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
+  const { primerTrofeo, primerPlatino, trofeoMasRaro, platinoAnejo, rachaMasLarga } = hitos;
+
+  if (!primerTrofeo && !primerPlatino && !trofeoMasRaro && !platinoAnejo && !rachaMasLarga) return null;
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-2">
+      {primerTrofeo && (
+        <Hito
+          icono={primerTrofeo.grade ? ICONO_GRADO[primerTrofeo.grade] : "🎮"}
+          etiqueta="Tu primer trofeo"
+          titulo={primerTrofeo.nombre}
+          iconUrl={primerTrofeo.iconUrl}
+          detalle={`${fechaCorta(primerTrofeo.fecha)} · ${primerTrofeo.tituloJuego}`}
+          href={`/juego/${primerTrofeo.gameId}`}
+        />
+      )}
+
       {primerPlatino && (
         <Hito
           icono="🏆"

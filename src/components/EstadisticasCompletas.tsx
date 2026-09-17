@@ -98,7 +98,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
         <TrophyDnaRadar dna={dna} />
       </section>
 
-      {(hitos.primerPlatino || hitos.trofeoMasRaro || hitos.platinoAnejo || hitos.rachaMasLarga) && (
+      {(hitos.primerTrofeo || hitos.primerPlatino || hitos.trofeoMasRaro || hitos.platinoAnejo || hitos.rachaMasLarga) && (
         <section className="mb-8">
           <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Línea de tiempo</h2>
           <HistoricalTimeline hitos={hitos} />

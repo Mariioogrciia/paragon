@@ -30,6 +30,27 @@ data class BacklogDto(
     val horasPlatinoRestantes: Double,
 )
 
+data class PrimerTrofeoDto(
+    val gameId: String,
+    val tituloJuego: String,
+    val nombre: String,
+    val iconUrl: String?,
+    val grade: String?,
+    val fecha: String,
+)
+data class PrimerPlatinoDto(val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
+data class TrofeoMasRaroDto(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val rarityPercent: Double, val fecha: String?)
+data class PlatinoAnejoDto(val gameId: String, val titulo: String, val iconUrl: String?, val dias: Int, val desde: String, val hasta: String)
+data class RachaMasLargaDto(val dias: Int, val desde: String, val hasta: String)
+
+data class HitosDto(
+    val primerTrofeo: PrimerTrofeoDto?,
+    val primerPlatino: PrimerPlatinoDto?,
+    val trofeoMasRaro: TrofeoMasRaroDto?,
+    val platinoAnejo: PlatinoAnejoDto?,
+    val rachaMasLarga: RachaMasLargaDto?,
+)
+
 data class StatsResponse(
     val paragonScore: ParagonScoreDto,
     val trophyDna: TrophyDnaDto,
@@ -40,6 +61,7 @@ data class StatsResponse(
     val backlog: BacklogDto,
     // Ya son horas, no minutos — ver la nota en route.ts. NO dividir entre 60 otra vez.
     val horasTotales: Int,
+    val hitos: HitosDto,
 )
 
 interface StatsApi {
