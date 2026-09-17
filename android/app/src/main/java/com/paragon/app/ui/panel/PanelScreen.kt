@@ -62,7 +62,7 @@ import com.paragon.app.data.theme.ThemeStore
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore: ThemeStore, userProfile: UserProfile, globalStats: GlobalStats) {
+fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore: ThemeStore, userProfile: UserProfile, globalStats: GlobalStats, fromCache: Boolean = false) {
     val repository = remember(tokenStore) { PanelRepository(tokenStore) }
     val context = androidx.compose.ui.platform.LocalContext.current
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
@@ -140,8 +140,17 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                         text = "Nivel Paragon ${userProfile.level}",
                         color = Muted,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+                        modifier = Modifier.padding(top = 4.dp, bottom = if (fromCache) 4.dp else 24.dp)
                     )
+
+                    if (fromCache) {
+                        Text(
+                            text = "Sin conexión — mostrando la última copia guardada",
+                            color = Muted,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(bottom = 24.dp),
+                        )
+                    }
 
                     pinnedGame?.let { game ->
                         PinnedGameBanner(

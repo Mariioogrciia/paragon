@@ -105,6 +105,7 @@ fun MainScreen(
     profile: UserProfile,
     stats: GlobalStats,
     racha: RachaGlobal,
+    panelFromCache: Boolean = false,
 ) {
     val navController = rememberNavController()
     var isSearchActive by remember { mutableStateOf(false) }
@@ -328,7 +329,7 @@ fun MainScreen(
             popEnterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
             popExitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
-            composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, themeStore, profile, stats) }
+            composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, themeStore, profile, stats, panelFromCache) }
             composable(Screen.Library.route) {
                 LibraryScreen(
                     navController = navController,

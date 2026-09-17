@@ -1,6 +1,8 @@
 package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.local.PanelCacheEntity
+import com.paragon.app.data.local.PanelDao
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.GameCardDto
 import retrofit2.HttpException
@@ -45,7 +47,7 @@ data class GameProgress(
 
 /** Perfil + stats reales, o por qué no se pudieron traer — ver /api/mobile/panel en el proyecto Next.js. */
 sealed class PanelResult {
-    data class Ok(val profile: UserProfile, val stats: GlobalStats, val racha: RachaGlobal) : PanelResult()
+    data class Ok(val profile: UserProfile, val stats: GlobalStats, val racha: RachaGlobal, val fromCache: Boolean = false) : PanelResult()
     /** Sin token guardado, o el servidor lo rechazó (401): hace falta pasar por /movil/enlazar (login web). */
     object NeedsLogin : PanelResult()
     data class Error(val message: String) : PanelResult()
@@ -66,43 +68,76 @@ private fun GameCardDto.toGameProgress() = GameProgress(
     percent = percent,
 )
 
-class PanelRepository(private val tokenStore: TokenStore? = null) {
-    /** Perfil + stats reales del usuario logueado. Requiere el TokenStore del constructor. */
+class PanelRepository(private val tokenStore: TokenStore? = null, private val panelDao: PanelDao? = null) {
+    /**
+     * Perfil + stats reales del usuario logueado. Requiere el TokenStore del
+     * constructor.
+     *
+     * `AppRoot` usa este resultado para decidir si deja pasar a
+     * `MainScreen` — sin caché aquí, cualquier corte de red al abrir la app
+     * (aunque Biblioteca/Ficha de juego ya tuvieran la suya) dejaba a
+     * cualquiera atascado en la pantalla de error sin poder ver nada en
+     * absoluto. Mismo patrón "red primero, caché de respaldo" que
+     * `LibraryRepository`/`GameDetailRepository`.
+     */
     suspend fun getPanel(): PanelResult {
         val store = tokenStore ?: return PanelResult.NeedsLogin
         if (store.token == null) return PanelResult.NeedsLogin
 
         return try {
             val response = ApiClient.panelApi(store).getPanel()
-            PanelResult.Ok(
-                profile = UserProfile(
-                    handle = response.profile.handle,
-                    name = response.profile.name,
-                    level = response.profile.level,
-                    psnId = response.profile.psnId ?: "",
-                    image = response.profile.image,
-                ),
-                stats = GlobalStats(
-                    platinums = response.stats.platinums,
-                    trophies = response.stats.trophies,
-                    games = response.stats.games,
-                    completionRate = response.stats.completionRate,
-                ),
-                racha = RachaGlobal(
-                    actual = response.racha.actual,
-                    mejor = response.racha.mejor,
-                ),
+            val profile = UserProfile(
+                handle = response.profile.handle,
+                name = response.profile.name,
+                level = response.profile.level,
+                psnId = response.profile.psnId ?: "",
+                image = response.profile.image,
             )
+            val stats = GlobalStats(
+                platinums = response.stats.platinums,
+                trophies = response.stats.trophies,
+                games = response.stats.games,
+                completionRate = response.stats.completionRate,
+            )
+            val racha = RachaGlobal(actual = response.racha.actual, mejor = response.racha.mejor)
+
+            panelDao?.upsert(
+                PanelCacheEntity(
+                    handle = profile.handle,
+                    name = profile.name,
+                    level = profile.level,
+                    psnId = profile.psnId,
+                    image = profile.image,
+                    platinums = stats.platinums,
+                    trophies = stats.trophies,
+                    games = stats.games,
+                    completionRate = stats.completionRate,
+                    rachaActual = racha.actual,
+                    rachaMejor = racha.mejor,
+                )
+            )
+
+            PanelResult.Ok(profile, stats, racha)
         } catch (e: HttpException) {
             if (e.code() == 401) {
                 store.clear()
                 PanelResult.NeedsLogin
             } else {
-                PanelResult.Error("El servidor respondió con un error (${e.code()}).")
+                cachedPanel() ?: PanelResult.Error("El servidor respondió con un error (${e.code()}).")
             }
         } catch (e: Exception) {
-            PanelResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedPanel() ?: PanelResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
+    }
+
+    private suspend fun cachedPanel(): PanelResult.Ok? {
+        val cached = panelDao?.getCached() ?: return null
+        return PanelResult.Ok(
+            profile = UserProfile(cached.handle, cached.name, cached.level, cached.psnId, cached.image),
+            stats = GlobalStats(cached.platinums, cached.trophies, cached.games, cached.completionRate),
+            racha = RachaGlobal(cached.rachaActual, cached.rachaMejor),
+            fromCache = true,
+        )
     }
 
     suspend fun getHighlights(): HighlightsResult {

@@ -6,14 +6,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [LibraryGameEntity::class, CachedGameDetailEntity::class, PendingNoteEntity::class, StuckTrophyEntity::class],
-    version = 4,
+    entities = [LibraryGameEntity::class, CachedGameDetailEntity::class, PendingNoteEntity::class, StuckTrophyEntity::class, PanelCacheEntity::class],
+    version = 5,
     exportSchema = false,
 )
 abstract class ParagonDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
     abstract fun gameDetailDao(): GameDetailDao
     abstract fun stuckTrophyDao(): StuckTrophyDao
+    abstract fun panelDao(): PanelDao
 
     companion object {
         @Volatile

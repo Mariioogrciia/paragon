@@ -65,7 +65,9 @@ fun AppRoot(
     refreshKey: Int = 0,
     onLoginRequested: (provider: String) -> Unit = {},
 ) {
-    val repository = remember(tokenStore) { PanelRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val panelDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).panelDao() }
+    val repository = remember(tokenStore, panelDao) { PanelRepository(tokenStore, panelDao) }
     var result by remember { mutableStateOf<PanelResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
 
@@ -81,7 +83,7 @@ fun AppRoot(
             message = current.message,
             onRetry = { retryCounter.value += 1 },
         )
-        is PanelResult.Ok -> MainScreen(tokenStore, themeStore, current.profile, current.stats, current.racha)
+        is PanelResult.Ok -> MainScreen(tokenStore, themeStore, current.profile, current.stats, current.racha, current.fromCache)
     }
 }
 
