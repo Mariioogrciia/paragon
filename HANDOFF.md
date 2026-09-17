@@ -1,13 +1,65 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **16 de septiembre de 2026**
+releer todo el historial. Última actualización: **17 de septiembre de 2026**
 (con Gemini **y** Antigravity, los dos dentro de Android Studio, trabajando
 en paralelo en la app nativa a la vez que esta sesión — más abajo hay el
 detalle completo de esa coordinación, incluidos 4 bugs de compilación
 reales suyos que hubo que arreglar).
 
 ---
+
+## Sesión del 17 de septiembre de 2026 (continuación 14) — feedback probando en el móvil de verdad: comentarios en el Feed, pantalla propia para la racha, y confirmado que el push SÍ se registra
+
+Sesión corta, de repaso: el usuario probó en su móvil real la tanda de la
+continuación 13 (pantallas nuevas, tema, push, tarjeta compartible,
+reacciones) y dio feedback concreto función por función.
+
+### Lo que ya funcionaba de verdad, confirmado por el usuario probándolo
+
+Cuenta y perfil (todo), Comparar, Reaccionar en el Feed, la tarjeta
+compartible. **Eficiencia de caza / Deuda de backlog siguen "sin datos
+suficientes"** — confirmado que es lo esperado, no un bug (siguen sin
+existir precios ni HowLongToBeat guardados para sus juegos, ver
+continuación 13).
+
+### Diagnóstico real de las notificaciones push
+
+El usuario no había recibido ninguna todavía. Comprobado a mano contra la
+base de datos de producción: **sí hay un token de FCM registrado** para su
+cuenta (`fende21`, guardado el 16 de septiembre) — el registro del
+dispositivo funciona. Lo que pasa es que no se había disparado ningún
+evento real desde entonces (nadie le mandó solicitud, no entró ningún
+trofeo nuevo). Pendiente: probarlo con un evento real en vez de a ciegas.
+
+### Dos peticiones nuevas, construidas y desplegadas
+
+1. **Comentarios visibles en el Feed** — pidió ver también "los likes que
+   tiene y comentarios", no solo las reacciones. El backend ya mandaba
+   `comments` en `GET /api/mobile/feed` (contrato de la continuación 12,
+   nunca consumido en Android) — añadido el DTO que faltaba
+   (`FeedCommentDto`/`FeedComment`) y una vista estilo Instagram en cada
+   tarjeta (últimos 2 comentarios + "Ver los N comentarios" si hay más).
+   **Todavía de solo lectura** — no hay forma de escribir un comentario
+   nuevo desde la app, solo desde la web.
+2. **Pantalla propia para la racha** — al tocar el icono de fuego del
+   Panel, antes llevaba a la pantalla entera de Estadísticas; pedido
+   explícito de "algo dedicado a la racha", ni eso ni un simple popup
+   genérico. Nuevo `GET /api/mobile/racha` (reutiliza `rachas()` y
+   `actividadPorDia()`, ya existían, curado a 35 días/5 semanas en vez del
+   heatmap de 365 días de la web) + `RachaSheet.kt` (bottom sheet con
+   racha actual, mejor racha, días activos y una tira visual de las 5
+   últimas semanas).
+
+Ambos verificados con `tsc --noEmit` (backend) y `./gradlew assembleDebug`
+(Android) antes de subir — dos commits (`1118535` backend, `e0f5774`
+Android).
+
+### Sin probar todavía
+
+- Los comentarios nuevos en el Feed y la pantalla de la racha — construidos
+  y desplegados esta sesión, sin confirmar en el móvil real todavía.
+- Notificaciones push con un evento real (ver diagnóstico arriba).
 
 ## Sesión del 16 de septiembre de 2026 (continuación 13) — las 6 pantallas nuevas de la app nativa, tema claro/oscuro, notificaciones push nativas (FCM), y una tanda larga de bugs reales ajenos arreglados
 
