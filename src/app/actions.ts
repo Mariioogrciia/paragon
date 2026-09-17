@@ -1253,6 +1253,11 @@ export async function declineLeagueInviteAction(formData: FormData): Promise<voi
 
   await declineLeagueInvite(leagueId, userId);
   revalidatePath("/ligas");
+  // Se llama tanto desde /ligas (lista de invitaciones) como desde
+  // /ligas/{id} (al abrir el enlace de la propia invitación) — en el
+  // segundo caso, quedarse en esa página tras rechazarla ya no tiene nada
+  // que enseñar, así que siempre vuelve a la lista.
+  redirect("/ligas");
 }
 
 export async function addLeagueMemberAction(formData: FormData): Promise<void> {

@@ -24,6 +24,18 @@ function Grid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 gap-4 md:grid-cols-2">{children}</div>;
 }
 
+const DISCORD_INVITE_URL = process.env.DISCORD_APPLICATION_ID
+  ? `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_APPLICATION_ID}&scope=bot%20applications.commands&permissions=3072`
+  : undefined;
+
+function Comando({ nombre, children }: { nombre: string; children: React.ReactNode }) {
+  return (
+    <li>
+      <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/{nombre}</code> — {children}
+    </li>
+  );
+}
+
 export default function ComoFuncionaPage() {
   return (
     <div className="mx-auto max-w-5xl py-10">
@@ -267,20 +279,62 @@ export default function ComoFuncionaPage() {
                 </Bloque>
                 <Bloque title="Bot de Discord" href="/ajustes">
                   Activa los avisos por DM del bot de Paragon desde Ajustes — necesita que hayas
-                  iniciado sesión con Discord. Además, comandos de barra en cualquier servidor donde
-                  esté el bot: <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/platinosalalcance</code>,{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/hoy</code>,{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/perfil</code>,{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/verguenza</code>,{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/racha</code> y{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/help</code>.
+                  iniciado sesión con Discord. A partir de ahí te llegan por DM las cosas que ya
+                  llegan por push: solicitudes de amistad, subidas de nivel de gente a tu alrededor e
+                  invitaciones a ligas.
+                </Bloque>
+                <Bloque title="Añadir el bot a tu servidor">
+                  {DISCORD_INVITE_URL ? (
+                    <>
+                      Cualquiera puede invitarlo con este enlace —{" "}
+                      <a
+                        href={DISCORD_INVITE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent hover:underline"
+                      >
+                        añadir Paragon a un servidor de Discord →
+                      </a>{" "}
+                      — Discord pedirá qué servidor y confirmar los permisos (solo pide{" "}
+                      <em>Enviar mensajes</em>, para poder anunciar en el canal de{" "}
+                      <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/anunciosaqui</code>).
+                      No hace falta ser dueño del servidor, basta con permiso de &ldquo;Gestionar
+                      servidor&rdquo; ahí.
+                    </>
+                  ) : (
+                    "Bot en configuración — vuelve más tarde."
+                  )}
+                </Bloque>
+                <Bloque title="Comandos: tú y tu biblioteca">
+                  <ul className="space-y-1.5">
+                    <Comando nombre="perfil">tus estadísticas de Paragon, o las de un amigo con Discord vinculado.</Comando>
+                    <Comando nombre="racha">tu racha actual de días seguidos ganando al menos un trofeo.</Comando>
+                    <Comando nombre="platinosalalcance">juegos muy avanzados que llevan meses parados — tu radar de platinos cerca.</Comando>
+                    <Comando nombre="verguenza">el Salón de la Vergüenza: juegos sin ni una hora, sin ni un trofeo.</Comando>
+                    <Comando nombre="juego">ficha rápida de un juego de tu biblioteca (duración, dificultad, perdibles, tu progreso).</Comando>
+                    <Comando nombre="nota">apunta una nota privada en un juego sin abrir la web.</Comando>
+                    <Comando nombre="hoy">qué puedes cerrar hoy según el tiempo y el género que te apetezca.</Comando>
+                    <Comando nombre="ruleta">te elige un juego del backlog que encaje con el tiempo que tienes.</Comando>
+                  </ul>
+                </Bloque>
+                <Bloque title="Comandos: Ligas" href="/ligas" hrefLabel="Ver tus ligas →">
+                  <ul className="space-y-1.5">
+                    <Comando nombre="ligas">tus ligas creadas con amigos y tu posición en cada una.</Comando>
+                    <Comando nombre="liga">clasificación completa de una liga (nombre no hace falta exacto) y su reto, si tiene.</Comando>
+                    <Comando nombre="invitacionesliga">invitaciones a ligas que todavía no has aceptado ni rechazado.</Comando>
+                  </ul>
                 </Bloque>
                 <Bloque title="Anuncios del bot en un servidor">
                   Quien tenga permiso de gestionar el servidor puede escribir{" "}
                   <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/anunciosaqui</code> en el
                   canal que quiera — a partir de ahí, el bot avisa ahí mismo cuando alguien del
                   servidor sube de nivel Paragon (solo a quien tenga los avisos activados en Paragon,
-                  y solo si de verdad sigue en ese servidor).
+                  y solo si de verdad sigue en ese servidor). Solo hay un canal activo por servidor —
+                  volver a ejecutar el comando en otro canal cambia el destino, no lo añade.
+                </Bloque>
+                <Bloque title="/help, siempre a mano">
+                  El comando <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/help</code>{" "}
+                  lista todos los comandos del bot desde dentro de Discord, sin volver a esta página.
                 </Bloque>
               </Grid>
             ),

@@ -19,6 +19,7 @@ import { Avatar } from "@/components/Avatar";
 import { relativeDate } from "@/lib/design";
 import type { TrophyGuideRow } from "@/lib/trophyGuides";
 import { Pin, PinOff } from "lucide-react";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
 
 const EMPTY: ActionState = {};
 
@@ -386,11 +387,16 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
                   <button onClick={() => setEditando(true)} className="text-xs font-semibold text-muted hover:text-foreground">
                     Editar
                   </button>
-                  <form action={deleteTrophyGuideAction}>
-                    <input type="hidden" name="gameId" value={gameId} />
-                    <input type="hidden" name="trophyId" value={trophy.id} />
-                    <button className="text-xs font-semibold text-muted hover:text-danger">Borrar</button>
-                  </form>
+                  <ConfirmForm
+                    action={deleteTrophyGuideAction}
+                    hidden={{ gameId, trophyId: trophy.id }}
+                    title="¿Borrar tu guía?"
+                    message="Desaparece para todo el mundo. No se puede deshacer."
+                    confirmLabel="Sí, borrar"
+                    triggerClassName="text-xs font-semibold text-muted hover:text-danger"
+                  >
+                    Borrar
+                  </ConfirmForm>
                 </div>
               </div>
               <p className="whitespace-pre-wrap text-sm text-foreground/90">{mia.body}</p>

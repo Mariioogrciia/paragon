@@ -7,6 +7,7 @@ import { BackButton } from "@/components/BackButton";
 import { deleteGuideAction } from "@/app/actions";
 import { getGuide } from "@/lib/guides";
 import { relativeDate } from "@/lib/design";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
 
 export async function generateMetadata({ params }: { params: Promise<{ guideId: string }> }) {
   const { guideId } = await params;
@@ -40,9 +41,17 @@ export default async function GuiaPage({
           <span className="text-xs text-muted">· {relativeDate(guide.createdAt)}</span>
 
           {esAutor && (
-            <form action={deleteGuideAction.bind(null, guide.id, gameId)} className="ml-auto">
-              <button className="text-xs font-semibold text-muted hover:text-danger">Borrar guía</button>
-            </form>
+            <div className="ml-auto">
+              <ConfirmForm
+                action={deleteGuideAction.bind(null, guide.id, gameId)}
+                title="¿Borrar esta guía?"
+                message="Desaparece para todo el mundo, junto con sus respuestas. No se puede deshacer."
+                confirmLabel="Sí, borrar"
+                triggerClassName="text-xs font-semibold text-muted hover:text-danger"
+              >
+                Borrar guía
+              </ConfirmForm>
+            </div>
           )}
         </div>
 

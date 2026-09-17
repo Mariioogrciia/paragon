@@ -24,6 +24,7 @@ import com.paragon.app.data.network.BASE_URL
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.panel.AppRoot
 import com.paragon.app.ui.theme.ParagonTheme
+import com.paragon.app.util.flushPendingDisable
 import kotlinx.coroutines.launch
 
 /**
@@ -77,6 +78,15 @@ class ComposeMainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleDeepLink(intent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Ya no estamos en primer plano — si cambiar de tema dejó un alias
+        // de icono pendiente de apagar (ver IconSwitcher.kt), este es un
+        // punto seguro para terminarlo sin arriesgarse a cerrar una tarea
+        // que el usuario está mirando.
+        flushPendingDisable(applicationContext)
     }
 
     private fun handleDeepLink(intent: Intent?) {

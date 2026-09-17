@@ -1,4 +1,4 @@
-import { getLeagueDetail } from "@/lib/leagues";
+import { getLeagueDetail, getPendingLeagueInvite } from "@/lib/leagues";
 import { listFriends, getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
@@ -6,8 +6,9 @@ import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { BackButton } from "@/components/BackButton";
 import { AddLeagueMemberForm, SetLeagueChallengeForm } from "@/components/forms/Forms";
-import { removeLeagueMemberAction, deleteLeagueAction } from "@/app/actions";
+import { removeLeagueMemberAction, deleteLeagueAction, acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
 
 export const metadata = {
   title: "Liga - Paragon",
@@ -40,7 +41,35 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
     listFriends(session.user.id),
   ]);
 
-  if (!league) notFound();
+  if (!league) {
+    // No eres miembro aceptado — antes esto era un 404 sin más, incluso
+    // cuando el motivo real era "tienes una invitación sin responder"
+    // (el enlace de la notificación de invitación lleva aquí directo).
+    const invite = await getPendingLeagueInvite(id, session.user.id);
+    if (!invite) notFound();
+
+    return (
+      <div className="mx-auto max-w-[560px] px-7 py-12">
+        <BackButton fallbackHref="/ligas" />
+        <div className="mt-6 rounded-[18px] border border-border bg-surface p-6">
+          <h1 className="font-heading text-2xl font-bold mb-2">{invite.name}</h1>
+          <p className="text-muted text-sm mb-6">{invite.ownerName ?? "Alguien"} te ha invitado a esta liga — acéptala para ver la clasificación.</p>
+          <div className="flex items-center gap-3">
+            <form action={acceptLeagueInviteAction}>
+              <input type="hidden" name="leagueId" value={invite.id} />
+              <button className="rounded-lg px-4 py-2 text-sm font-bold text-background" style={{ background: "var(--accent-grad)" }}>
+                Aceptar
+              </button>
+            </form>
+            <form action={declineLeagueInviteAction}>
+              <input type="hidden" name="leagueId" value={invite.id} />
+              <button className="text-sm font-semibold text-muted hover:text-danger">Rechazar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isOwner = league.ownerId === session.user.id;
   const ocupados = new Set([
@@ -116,11 +145,16 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                 {isOwner && (
                   <td className="p-4 text-right">
                     {member.userId !== league.ownerId && (
-                      <form action={removeLeagueMemberAction}>
-                        <input type="hidden" name="leagueId" value={league.id} />
-                        <input type="hidden" name="targetUserId" value={member.userId} />
-                        <button className="text-xs font-semibold text-muted hover:text-danger">Quitar</button>
-                      </form>
+                      <ConfirmForm
+                        action={removeLeagueMemberAction}
+                        hidden={{ leagueId: league.id, targetUserId: member.userId }}
+                        title="¿Quitar de la liga?"
+                        message={`${member.name ?? member.handle ?? "Esta persona"} dejará de aparecer en la clasificación.`}
+                        confirmLabel="Sí, quitar"
+                        triggerClassName="text-xs font-semibold text-muted hover:text-danger"
+                      >
+                        Quitar
+                      </ConfirmForm>
                     )}
                   </td>
                 )}
@@ -141,11 +175,16 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                   <span className="font-semibold text-sm">{p.name ?? p.handle ?? "Alguien"}</span>
                   <span className="text-xs text-muted">esperando respuesta</span>
                 </div>
-                <form action={removeLeagueMemberAction}>
-                  <input type="hidden" name="leagueId" value={league.id} />
-                  <input type="hidden" name="targetUserId" value={p.userId} />
-                  <button className="text-xs font-semibold text-muted hover:text-danger">Cancelar invitación</button>
-                </form>
+                <ConfirmForm
+                  action={removeLeagueMemberAction}
+                  hidden={{ leagueId: league.id, targetUserId: p.userId }}
+                  title="¿Cancelar la invitación?"
+                  message={`${p.name ?? p.handle ?? "Esta persona"} ya no podrá aceptarla.`}
+                  confirmLabel="Sí, cancelar"
+                  triggerClassName="text-xs font-semibold text-muted hover:text-danger"
+                >
+                  Cancelar invitación
+                </ConfirmForm>
               </div>
             ))}
           </div>
@@ -198,18 +237,29 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
           <div>
             <h2 className="text-lg font-bold mb-2 text-danger">Borrar liga</h2>
             <p className="text-sm text-muted mb-2">Borra la liga entera para todos sus miembros — no se puede deshacer.</p>
-            <form action={deleteLeagueAction}>
-              <input type="hidden" name="leagueId" value={league.id} />
-              <button className="text-sm font-semibold text-danger hover:underline">Borrar esta liga</button>
-            </form>
+            <ConfirmForm
+              action={deleteLeagueAction}
+              hidden={{ leagueId: league.id }}
+              title="¿Borrar esta liga?"
+              message={`"${league.name}" desaparece para todos sus miembros, con su clasificación y su reto. No se puede deshacer.`}
+              confirmLabel="Sí, borrar"
+              triggerClassName="text-sm font-semibold text-danger hover:underline"
+            >
+              Borrar esta liga
+            </ConfirmForm>
           </div>
         </div>
       ) : (
-        <form action={removeLeagueMemberAction}>
-          <input type="hidden" name="leagueId" value={league.id} />
-          <input type="hidden" name="targetUserId" value={session.user.id} />
-          <button className="text-sm font-semibold text-muted hover:text-danger">Salir de esta liga</button>
-        </form>
+        <ConfirmForm
+          action={removeLeagueMemberAction}
+          hidden={{ leagueId: league.id, targetUserId: session.user.id }}
+          title="¿Salir de esta liga?"
+          message={`Dejarás de aparecer en la clasificación de "${league.name}" — el dueño tendría que volver a invitarte para que entres otra vez.`}
+          confirmLabel="Sí, salir"
+          triggerClassName="text-sm font-semibold text-muted hover:text-danger"
+        >
+          Salir de esta liga
+        </ConfirmForm>
       )}
     </div>
   );

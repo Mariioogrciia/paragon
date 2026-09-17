@@ -15,6 +15,7 @@ import { paragonLevelFromXp } from "@/lib/level";
 import { clasificacionAmigos, getPeriodRankings } from "@/lib/rankings";
 import { BackButton } from "@/components/BackButton";
 import { PLATFORM_LABEL } from "@/lib/types";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
 
 export const metadata = { title: "Amigos · Paragon" };
 
@@ -295,12 +296,16 @@ export default async function AmigosPage() {
                   Comparar
                 </Link>
 
-                <form action={removeFriendAction}>
-                  <input type="hidden" name="friendId" value={a.userId} />
-                  <button className="text-sm text-muted hover:text-danger">
-                    Quitar
-                  </button>
-                </form>
+                <ConfirmForm
+                  action={removeFriendAction}
+                  hidden={{ friendId: a.userId }}
+                  title="¿Quitar de tus amigos?"
+                  message={`${a.displayName ?? `@${a.handle}`} dejará de ver tu actividad y tendrías que volver a mandarle una solicitud para añadirle otra vez.`}
+                  confirmLabel="Sí, quitar"
+                  triggerClassName="text-sm text-muted hover:text-danger"
+                >
+                  Quitar
+                </ConfirmForm>
               </li>
             ))}
           </ul>

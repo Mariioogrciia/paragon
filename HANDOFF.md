@@ -9,7 +9,244 @@ reales suyos que hubo que arreglar).
 
 ---
 
-## Sesión del 17 de septiembre de 2026 (continuación 14) — feedback probando en el móvil de verdad: comentarios en el Feed, pantalla propia para la racha, y confirmado que el push SÍ se registra
+## Sesión del 17 de septiembre de 2026 (continuación 16) — arreglado el crash real de cambiar de tema, y guía completa del bot de Discord
+
+### El crash de cambiar el tema de plataforma — arreglado, causa confirmada
+
+Diagnóstico de la continuación 15 confirmado: `applyLauncherIcon`
+(`IconSwitcher.kt`) desactivaba el `<activity-alias>` que había lanzado la
+tarea que estaba EN PRIMER PLANO en ese momento — `DONT_KILL_APP` solo
+evita que el sistema mate el proceso, pero ActivityManager fuerza el cierre
+de cualquier Activity cuyo componente acaba de deshabilitarse, esté o no en
+pantalla, y esa era justo la Activity que el usuario estaba mirando.
+
+Arreglado sin tocar el patrón de los 4 alias: `currentForegroundAlias()`
+consulta `ActivityManager.getAppTasks()` (propio de la app, sin permisos
+extra) para saber qué alias lanzó la tarea actual. Si toca apagar justo
+ESE, no se apaga en el momento — se anota en un SharedPreferences propio
+(`paragon_icon_switcher`) y `flushPendingDisable()` lo termina más tarde,
+en dos puntos seguros donde ya no hay ninguna Activity viva usándolo:
+`ComposeMainActivity.onStop()` (la app pasa a segundo plano) y
+`ThemeStore.init` (arranque en frío siguiente). El icono nuevo se activa al
+instante igualmente — solo se retrasa un poco apagar el viejo, sin coste
+visible salvo, como mucho, ver el icono antiguo un momento de más en
+Recientes hasta el próximo `onStop`.
+
+Verificado con `./gradlew compileDebugKotlin` (compila limpio). **Sin
+probar todavía en un dispositivo real** — quien retome esto: cambiar de
+plataforma en Ajustes → Apariencia varias veces seguidas y confirmar que ya
+no cierra la app.
+
+### Guía completa del bot de Discord en `/como-funciona`
+
+Petición directa del usuario: la sección del bot en `/como-funciona` solo
+tenía un resumen suelto de comandos, sin decir cómo añadirlo a un servidor
+ni listar todos los comandos reales (faltaban `/juego`, `/nota`, `/ruleta`,
+`/ligas`, `/liga`, `/invitacionesliga` — comparado contra
+`scripts/registrar-comandos-discord.mts`, la fuente real de qué comandos
+existen). Reescrito el bloque completo:
+
+- **Enlace de invitación real**, construido en servidor con
+  `DISCORD_APPLICATION_ID` (`https://discord.com/oauth2/authorize?client_id=...&scope=bot%20applications.commands&permissions=3072`
+  — Ver canal + Enviar mensajes, lo mínimo que necesita para `/anunciosaqui`).
+- **Comandos agrupados** por tema (tú y tu biblioteca / Ligas), en vez de
+  una lista plana, con los 6 que faltaban.
+- Aclarado que `/anunciosaqui` solo tiene un canal activo a la vez por
+  servidor (confirmado contra `discordGuildSettings` en `discordBot.ts` —
+  volver a ejecutarlo en otro canal cambia el destino, no lo añade).
+
+Verificado con `tsc --noEmit` (limpio).
+
+### Push de invitación a liga — revisado de nuevo, sigue sin fallo visible en el código
+
+Repasado `addLeagueMember` (`lib/leagues.ts`) y `anunciarInvitacionLiga`
+(`discordBot.ts`) línea a línea: ni `enviarPush`, ni `enviarPushFcm`, ni
+`anunciarInvitacionLiga` lanzan nunca (los tres devuelven un resultado o
+`void` y capturan su propio error) — el `.catch()` que los envuelve en
+`addLeagueMember` es un cinturón de más, no encubre nada. Mismo diagnóstico
+que la sesión anterior: sin acceso a logs reales de Vercel o confirmación
+de que el invitado tiene token FCM registrado, no hay más que revisar en el
+código — hace falta un evento real para seguir.
+
+---
+
+## Sesión del 17 de septiembre de 2026 (continuación 15) — Comunidad solo de amigos, Ligas creables (con invitación real, duración y reto), confirmaciones antes de borrar, y varios guiños nativos
+
+Sesión muy larga, otra vez en paralelo con Gemini y Antigravity tocando
+`android/` a la vez (mismo criterio de siempre: no revertir su trabajo,
+solo arreglar lo que de verdad no compilaba — esta vez aparecieron un
+"Rival" nuevo en `ThemeStore`/`PanelScreen` con comparativa en directo, un
+"Modo Zen/Solo Player", y una pantalla `StuckTrophiesScreen` que no eran de
+esta sesión, no tocados salvo para que siguiera compilando junto con lo de
+aquí).
+
+### ⚠️ Aviso real sin resolver: cambiar el tema de plataforma cierra la app
+
+El usuario reporta que **al cambiar el color de plataforma en Ajustes
+(Paragon/PlayStation/Xbox/Steam) la app se sale entera**, no solo cambia el
+icono. `IconSwitcher.kt` (`applyLauncherIcon`) usa
+`setComponentEnabledSetting(..., PackageManager.DONT_KILL_APP)` sobre los 4
+`<activity-alias>` del icono dinámico — `DONT_KILL_APP` solo evita que el
+sistema mate el PROCESO, pero es un quirk real y conocido de Android que
+deshabilitar el alias que se usó para lanzar la tarea ACTUAL puede hacer
+que ActivityManager cierre esa tarea de todos modos, aunque el proceso siga
+vivo. Esto encajaría exactamente con "se sale de la app" al tocar el
+selector (que vive dentro de la misma `ComposeMainActivity` que se lanzó
+por uno de esos alias). Todavía no confirmado con logs reales ni
+reproducido paso a paso — **primer sitio por donde mirar si se retoma
+esto**: probablemente haga falta que el alias "activo" nunca se deshabilite
+a sí mismo si es el que lanzó la tarea corriente (comparar contra el
+`ComponentName` real de la `Activity` en pantalla antes de tocar su propio
+estado), o mover el cambio de icono a que ocurra en background sin tocar
+el alias que está siendo usado ahora mismo. Ya se intentó una vez arreglar
+un crash real relacionado (`IllegalArgumentException: Activity class {...}
+does not exist` cuando el paquete instalado no tenía aún los 4 alias) con
+un `try/catch` en `applyLauncherIcon` — ese arreglo sigue siendo válido y
+necesario, pero es un problema DISTINTO del que reporta ahora el usuario.
+
+### Comunidad de la web, ahora solo de amigos
+
+`getGlobalFeed()` (`src/lib/feed.ts`) mezclaba actividad de TODOS los
+perfiles públicos — la app nativa ya usaba la versión de amigos
+(`getFeed`), pero la web (`/feed`, pestaña "Comunidad") seguía con la
+global. Borrada `getGlobalFeed` entera (sin usos tras el cambio) y
+`/feed/page.tsx` apunta ahora a `getFeed(session.user.id)`, exige sesión
+(antes se podía ver sin login).
+
+### Ligas creadas por el usuario — la función grande de esta sesión
+
+Arrancó como "reto: quién platina antes un juego concreto" y creció en
+varias vueltas según feedback directo del usuario hasta ser una función
+completa aparte de la Liga Mensual global (`lib/ligas.ts`, sigue intacta):
+
+- **Tablas nuevas**: `league` (nombre, dueño, `challengeGameId` opcional,
+  `durationValue`/`durationUnit`/`endsAt` opcionales) y `league_member`
+  (con `status: "pending" | "accepted"`). Migraciones aplicadas a mano
+  contra producción con `scripts/crear-tablas-ligas.mts`,
+  `scripts/anadir-reto-a-ligas.mts` y
+  `scripts/anadir-duracion-y-invitaciones-ligas.mts` (mismo criterio de
+  siempre: SQL explícito en vez de `db:push`, que ya ha propuesto una vez
+  truncar una tabla sin relación).
+- **Invitación real, no automática** — la primera versión metía a
+  cualquier amigo invitado directo en la clasificación sin preguntarle;
+  corregido a medio construir tras aviso del propio usuario: entra como
+  `pending`, no cuenta para nada hasta `acceptLeagueInvite`. El dueño ve en
+  la ficha de la liga quién tiene invitación sin responder, con botón para
+  cancelarla. Al invitar, aviso por Web Push + FCM (mismo patrón que una
+  solicitud de amistad) y, si tiene Discord vinculado con los DMs
+  activados, también por ahí (`anunciarInvitacionLiga`,
+  `lib/discordBot.ts`).
+  - **Bug real encontrado y arreglado esta misma sesión**: el enlace de esa
+    notificación lleva a `/ligas/{id}`, pero esa página exigía ser miembro
+    YA ACEPTADO — cualquiera que tocara el enlace de su propia invitación
+    sin haberla aceptado antes se encontraba un 404 en vez de algo con qué
+    aceptar/rechazar. Arreglado: si `getLeagueDetail` devuelve `null`,
+    ahora se comprueba `getPendingLeagueInvite` antes de dar el 404, y si
+    hay una invitación de verdad se enseña una tarjeta con Aceptar/Rechazar.
+  - **El push de la invitación no ha llegado a probarse con éxito
+    todavía** (reportado por el usuario) — el código usa exactamente el
+    mismo camino que ya usan las solicitudes de amistad (`enviarPush` +
+    `enviarPushFcm`), sin ningún fallo encontrado revisándolo a fondo. Se
+    le añadió `try/catch` con `console.error` para que un fallo ahí nunca
+    pueda tirar la invitación en sí, pero sin acceso a los logs reales de
+    Vercel no se ha podido confirmar la causa. **Antes de seguir
+    mirándolo**: confirmar que la persona invitada tiene la app abierta al
+    menos una vez con notificaciones permitidas (token FCM registrado) y
+    que `FIREBASE_SERVICE_ACCOUNT_KEY` sigue puesta en Vercel.
+- **Duración opcional** — al crear una liga, número + días/semanas/meses/
+  años (`CustomSelect` en la web, chips en Android). Sin duración, la liga
+  no caduca. La clasificación de puntos pasó de "mes en curso" (calcado sin
+  pensar de la Liga Mensual global) a la ventana real de la propia liga:
+  desde `createdAt` hasta `endsAt` (o para siempre si no tiene).
+- **Reto** — el dueño elige un juego de su propia biblioteca para picarse a
+  ver quién llega antes al platino (o al 100% en Steam, que no tiene grado
+  "platinum" propio — mismo criterio que `esPlatinoEquivalente`). Selector
+  con desambiguación: si el mismo título está en dos plataformas, se
+  distingue con la plataforma al lado (antes salían dos líneas idénticas
+  sin poder saber cuál era cuál).
+- **Selectores nativos feos → `CustomSelect`**: el picker de reto y el de
+  invitar amigo en la web usaban `<select>` sin estilo, a petición directa
+  del usuario ("que sea igual que el resto de selectores de la página")
+  pasaron al mismo componente (`src/components/ui/CustomSelect.tsx`) que ya
+  usa el resto del sitio.
+- **Comandos de Discord nuevos**: `/ligas` (tus ligas + tu posición en cada
+  una), `/liga <nombre>` (clasificación completa + reto), `/invitacionesliga`
+  (pendientes sin responder) — ya registrados contra la API de Discord
+  (`scripts/registrar-comandos-discord.mts`, quedan globales, hasta 1h en
+  propagarse a todos los servidores).
+
+### Confirmación antes de cualquier acción destructiva
+
+Petición explícita del usuario: nada de borrar/quitar/salir de un solo
+toque sin preguntar antes. Nuevo componente reutilizable en cada lado:
+
+- Web: `src/components/ui/ConfirmForm.tsx` — envuelve el `<form
+  action={...}>` de siempre, intercepta el envío y abre un modal; el botón
+  visible YA NO manda el formulario directo, solo el de confirmar dentro
+  del modal (`formRef.current.requestSubmit()`). Aplicado a: quitar/salir/
+  cancelar invitación/borrar en Ligas, quitar amigo, borrar carpeta,
+  desvincular cuenta de plataforma, borrar guía de juego y de trofeo.
+- Android: `android/app/src/main/java/com/paragon/app/ui/common/ConfirmDialog.kt`
+  — mismo patrón con `AlertDialog`. Aplicado a los mismos casos que existen
+  en la app: borrar liga, quitar miembro, cancelar invitación, salir de la
+  liga, borrar carpeta, desvincular cuenta.
+- A propósito SIN confirmación (de bajo riesgo, fácil de deshacer):
+  rechazar una solicitud de amistad entrante, declinar una invitación a
+  liga que te mandan a ti, quitar un juego suelto de una carpeta.
+
+### Modo Enfoque offline
+
+Room cachea la ficha completa del juego anclado (trofeos + nota) para
+poder verla sin cobertura — `CachedGameDetailEntity`/`GameDetailDao`
+nuevos. Cola de notas sin sincronizar (`pending_notes`) que se manda sola
+en cuanto `ConnectivityObserver` (nuevo, `SensorManager`... no, 
+`ConnectivityManager.NetworkCallback`) detecta que ha vuelto la red — antes
+escribir una nota sin conexión la perdía en silencio.
+
+### Icono real de Paragon en el launcher (antes era la plantilla de Android Studio)
+
+Hallazgo real revisando esto: el icono del launcher llevaba TODA la vida
+siendo el robot/rejilla por defecto que trae la plantilla de Android
+Studio — nunca se había sustituido por la marca real. Generado el icono
+adaptativo de verdad a partir de `public/uploads/LogoNoFondo.png` (el logo
+"P", recortado y centrado con Python/Pillow) + 4 variantes de color de
+fondo por tema de plataforma (Paragon negro / PSN azul / Xbox verde / Steam
+azul noche) vía 4 `<activity-alias>` del mismo `ComposeMainActivity`,
+activados con `PackageManager.setComponentEnabledSetting` desde
+`ThemeStore.setPlatform()`. **Ver el aviso grande de arriba** — esto es
+justo lo que parece estar cerrando la app al cambiar de tema.
+
+### Otros guiños nativos de esta sesión (ideas de Antigravity, aprobadas una a una con el usuario)
+
+- **Confeti**: tocar 5 veces seguidas el número de Platinos del Panel
+  dispara una lluvia de confeti + vibración fuerte (`ConfettiOverlay.kt`,
+  `Canvas` con ~40 partículas, sin librería externa).
+- **Swipe para comparar**: deslizar una fila de Ligas/Amigos hacia la
+  izquierda salta directo a Comparar contra esa persona, sin pasar por su
+  perfil (`SwipeToCompareRow` en `SocialScreen.kt`).
+- **Agitar para elegir juego**: agitar el móvil en la Biblioteca abre una
+  ruleta (`ShakeRouletteOverlay.kt`) que elige al azar entre los juegos al
+  0% de progreso y lleva a su ficha (`util/ShakeDetector.kt`, acelerómetro
+  directo, sin librería de terceros).
+- **Compartir a Paragon**: nuevo botón "Paragon" en el menú de compartir de
+  Android (Chrome, YouTube...) — abre una búsqueda pre-rellenada contra el
+  catálogo real de IGDB y añade el juego elegido a Deseados. Antes esto era
+  100% solo-web (`addToWishlistAction`, ligado a la cookie de sesión, no
+  llamable desde la app nativa) — nuevos `GET /api/mobile/games/search` y
+  `POST /api/mobile/wishlist`.
+
+### Pendiente / sin confirmar al cerrar esta sesión
+
+- **El crash de cambiar de tema (ver aviso grande arriba) — el más urgente
+  si se retoma esto.**
+- Push de invitación a liga sin confirmar que llegue de verdad (ver
+  apartado de Ligas).
+- Últimos cambios de esta sesión (ConfirmForm/ConfirmDialog, el arreglo del
+  404 de invitaciones) compilados y verificados pero **sin comitear
+  todavía** al cerrar esta entrada — comprobar con `git status` antes de
+  asumir que ya está todo en `origin/master`.
+
+---
 
 Sesión corta, de repaso: el usuario probó en su móvil real la tanda de la
 continuación 13 (pantallas nuevas, tema, push, tarjeta compartible,

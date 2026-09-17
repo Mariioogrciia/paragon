@@ -1,6 +1,7 @@
 import { deleteCollectionAction, toggleGameCollectionAction } from "@/app/actions";
 import type { Collection } from "@/lib/collections";
 import { NewCollectionForm } from "./forms/Forms";
+import { ConfirmForm } from "./ui/ConfirmForm";
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
@@ -81,12 +82,16 @@ export function CollectionManager({ collections }: { collections: Collection[] }
           <span className="shrink-0 text-xs text-muted">
             {carpeta.gameIds.length} juegos
           </span>
-          <form action={deleteCollectionAction}>
-            <input type="hidden" name="collectionId" value={carpeta.id} />
-            <button className="text-[0.8125rem] font-semibold text-muted hover:text-danger">
-              Borrar
-            </button>
-          </form>
+          <ConfirmForm
+            action={deleteCollectionAction}
+            hidden={{ collectionId: carpeta.id }}
+            title="¿Borrar esta carpeta?"
+            message={`"${carpeta.name}" desaparece con los ${carpeta.gameIds.length} juegos que agrupa (los juegos en sí no se borran, solo la carpeta).`}
+            confirmLabel="Sí, borrar"
+            triggerClassName="text-[0.8125rem] font-semibold text-muted hover:text-danger"
+          >
+            Borrar
+          </ConfirmForm>
         </li>
       ))}
     </ul>

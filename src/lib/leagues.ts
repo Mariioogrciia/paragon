@@ -197,6 +197,26 @@ export async function listPendingLeagueInvites(userId: string): Promise<LeagueIn
 }
 
 /**
+ * La invitación pendiente de `userId` a ESA liga en concreto, si la hay —
+ * para que abrir el enlace de una invitación (notificación push, DM de
+ * Discord) enseñe algo con qué aceptar/rechazar en vez de un 404 (antes
+ * `getLeagueDetail` devolvía `null` sin más para quien no fuera miembro
+ * ACEPTADO, sin distinguir "no tienes nada que ver aquí" de "tienes una
+ * invitación sin responder").
+ */
+export async function getPendingLeagueInvite(leagueId: string, userId: string): Promise<LeagueInvite | null> {
+  const db = getDb();
+  const [row] = await db
+    .select({ id: leagues.id, name: leagues.name, ownerId: leagues.ownerId, ownerName: users.name })
+    .from(leagueMembers)
+    .innerJoin(leagues, eq(leagues.id, leagueMembers.leagueId))
+    .innerJoin(users, eq(users.id, leagues.ownerId))
+    .where(and(eq(leagueMembers.leagueId, leagueId), eq(leagueMembers.userId, userId), eq(leagueMembers.status, "pending")))
+    .limit(1);
+  return row ?? null;
+}
+
+/**
  * Clasificación del reto de una liga (progreso + fecha del platino) para un
  * juego concreto, acotada a `memberIds` — reutiliza `userGames` (ya tiene
  * `progressPercent`/`earned` por usuario, ver `clasificacionAmigos` en
@@ -424,11 +444,18 @@ export async function addLeagueMember(leagueId: string, ownerId: string, friendU
     body: `${nombreDueño} te ha invitado a la liga "${league.name}" en Paragon.`,
     url: `/ligas/${leagueId}`,
   };
+  // La invitación YA está guardada en la base (el insert de arriba) antes
+  // de llegar aquí — un fallo avisando por cualquiera de los tres canales
+  // nunca debe deshacer eso ni tirar la petición entera abajo, así que se
+  // registra el motivo en los logs (para poder diagnosticarlo de verdad
+  // luego) en vez de dejar que se propague.
   await Promise.all([
     enviarPush(friendUserId, aviso),
     enviarPushFcm(friendUserId, aviso),
     anunciarInvitacionLiga(friendUserId, league.name, nombreDueño, leagueId),
-  ]);
+  ]).catch((error) => {
+    console.error("[leagues] fallo avisando de la invitación", error);
+  });
 
   return true;
 }

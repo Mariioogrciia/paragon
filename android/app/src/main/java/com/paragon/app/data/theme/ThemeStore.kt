@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.paragon.app.util.applyLauncherIcon
+import com.paragon.app.util.flushPendingDisable
 
 enum class ThemeMode { SISTEMA, CLARO, OSCURO }
 enum class PlatformColor { PARAGON, PLAYSTATION, XBOX, STEAM }
@@ -48,6 +49,10 @@ class ThemeStore(context: Context) {
         // coste real, `setComponentEnabledSetting` con el mismo estado ya
         // puesto no hace nada.
         applyLauncherIcon(appContext, currentPlatform)
+        // Arranque en frío: si quedó un alias pendiente de apagar de la
+        // sesión anterior (ver IconSwitcher.kt), este es un punto seguro
+        // para terminarlo — ya no hay ninguna Activity viva usándolo.
+        flushPendingDisable(appContext)
     }
 
     private fun loadMode(): ThemeMode =

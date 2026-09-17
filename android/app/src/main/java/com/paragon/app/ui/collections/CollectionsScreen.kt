@@ -177,6 +177,8 @@ private fun CollectionsList(
     onRename: (Coleccion) -> Unit,
     onDelete: (Coleccion) -> Unit,
 ) {
+    var deleting by remember { mutableStateOf<Coleccion?>(null) }
+
     if (collections.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
             Text(text = "Todavía no tienes ninguna carpeta. Crea una con el +.", color = Muted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
@@ -206,11 +208,21 @@ private fun CollectionsList(
                 IconButton(onClick = { onRename(coleccion) }) {
                     Icon(Icons.Default.Edit, contentDescription = "Renombrar", tint = Muted)
                 }
-                IconButton(onClick = { onDelete(coleccion) }) {
+                IconButton(onClick = { deleting = coleccion }) {
                     Icon(Icons.Default.Delete, contentDescription = "Borrar", tint = Danger)
                 }
             }
         }
+    }
+
+    deleting?.let { coleccion ->
+        com.paragon.app.ui.common.ConfirmDialog(
+            title = "¿Borrar esta carpeta?",
+            message = "\"${coleccion.name}\" desaparece con los ${coleccion.gameIds.size} juegos que agrupa (los juegos en sí no se borran, solo la carpeta).",
+            confirmLabel = "Sí, borrar",
+            onConfirm = { onDelete(coleccion) },
+            onDismiss = { deleting = null },
+        )
     }
 }
 

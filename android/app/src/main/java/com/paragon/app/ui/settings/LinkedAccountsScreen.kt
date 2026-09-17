@@ -177,6 +177,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
     var inputUsername by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var isProcessing by remember { mutableStateOf(false) }
+    var showUnlinkConfirm by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -196,14 +197,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = platform.username ?: "Vinculado", color = Muted, fontSize = 14.sp)
                     IconButton(
-                        onClick = {
-                            scope.launch {
-                                isProcessing = true
-                                repository.unlinkPlatform(platform.platform)
-                                onUpdate()
-                                isProcessing = false
-                            }
-                        },
+                        onClick = { showUnlinkConfirm = true },
                         enabled = !isProcessing
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = "Desvincular", tint = Danger)
@@ -270,5 +264,22 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 Text(text = errorMsg!!, color = Danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
             }
         }
+    }
+
+    if (showUnlinkConfirm) {
+        com.paragon.app.ui.common.ConfirmDialog(
+            title = "¿Desvincular ${platform.platform.uppercase()}?",
+            message = "Tu progreso y trofeos ya guardados se quedan tal cual, pero deja de sincronizarse hasta que vuelvas a vincular la cuenta.",
+            confirmLabel = "Sí, desvincular",
+            onConfirm = {
+                scope.launch {
+                    isProcessing = true
+                    repository.unlinkPlatform(platform.platform)
+                    onUpdate()
+                    isProcessing = false
+                }
+            },
+            onDismiss = { showUnlinkConfirm = false },
+        )
     }
 }

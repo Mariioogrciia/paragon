@@ -38,6 +38,7 @@ import com.paragon.app.data.LibraryGame
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.LibraryResult
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.ui.common.ConfirmDialog
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -136,6 +137,8 @@ fun LeagueDetailSheet(
     }
 }
 
+private class PendingConfirm(val title: String, val message: String, val confirmLabel: String, val onConfirm: () -> Unit)
+
 @Composable
 private fun LeagueDetailContent(
     detail: LeagueDetail,
@@ -147,6 +150,8 @@ private fun LeagueDetailContent(
     onPickChallenge: () -> Unit,
     onClearChallenge: () -> Unit,
 ) {
+    var confirm by remember { mutableStateOf<PendingConfirm?>(null) }
+
     Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     Text(text = "Clasificación desde que se creó — solo entre los miembros de esta liga.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
     Text(text = textoDuracion(detail.durationValue, detail.durationUnit, detail.endsAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(bottom = 16.dp))
@@ -154,7 +159,17 @@ private fun LeagueDetailContent(
     detail.standings.forEachIndexed { index, member ->
         LeagueStandingRow(member, index + 1)
         if (detail.isOwner && member.userId != detail.ownerId) {
-            TextButton(onClick = { onRemove(member.userId) }, modifier = Modifier.padding(start = 8.dp)) {
+            TextButton(
+                onClick = {
+                    confirm = PendingConfirm(
+                        title = "¿Quitar de la liga?",
+                        message = "${member.name} dejará de aparecer en la clasificación.",
+                        confirmLabel = "Sí, quitar",
+                        onConfirm = { onRemove(member.userId) },
+                    )
+                },
+                modifier = Modifier.padding(start = 8.dp),
+            ) {
                 Text("Quitar de la liga", color = Danger, fontSize = 12.sp)
             }
         }
@@ -164,7 +179,19 @@ private fun LeagueDetailContent(
         Spacer(Modifier.height(16.dp))
         Text(text = "INVITACIONES SIN RESPONDER", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Spacer(Modifier.height(8.dp))
-        detail.pendingMembers.forEach { pending -> PendingMemberRow(pending, onCancel = { onRemove(pending.userId) }) }
+        detail.pendingMembers.forEach { pending ->
+            PendingMemberRow(
+                pending,
+                onCancel = {
+                    confirm = PendingConfirm(
+                        title = "¿Cancelar la invitación?",
+                        message = "${pending.name} ya no podrá aceptarla.",
+                        confirmLabel = "Sí, cancelar",
+                        onConfirm = { onRemove(pending.userId) },
+                    )
+                },
+            )
+        }
     }
 
     Spacer(Modifier.height(16.dp))
@@ -221,14 +248,42 @@ private fun LeagueDetailContent(
         }
 
         Spacer(Modifier.height(20.dp))
-        TextButton(onClick = onDelete) {
+        TextButton(
+            onClick = {
+                confirm = PendingConfirm(
+                    title = "¿Borrar esta liga?",
+                    message = "\"${detail.name}\" desaparece para todos sus miembros, con su clasificación y su reto. No se puede deshacer.",
+                    confirmLabel = "Sí, borrar",
+                    onConfirm = onDelete,
+                )
+            },
+        ) {
             Text("Borrar esta liga", color = Danger, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     } else {
         Spacer(Modifier.height(20.dp))
-        TextButton(onClick = onLeave) {
+        TextButton(
+            onClick = {
+                confirm = PendingConfirm(
+                    title = "¿Salir de esta liga?",
+                    message = "Dejarás de aparecer en la clasificación de \"${detail.name}\" — el dueño tendría que volver a invitarte para que entres otra vez.",
+                    confirmLabel = "Sí, salir",
+                    onConfirm = onLeave,
+                )
+            },
+        ) {
             Text("Salir de esta liga", color = Danger, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
+    }
+
+    confirm?.let { pending ->
+        ConfirmDialog(
+            title = pending.title,
+            message = pending.message,
+            confirmLabel = pending.confirmLabel,
+            onConfirm = pending.onConfirm,
+            onDismiss = { confirm = null },
+        )
     }
 }
 

@@ -11,6 +11,7 @@ import { accountFor, getProfileByUserId, getUserTimezone } from "@/lib/profiles"
 import { PLATFORM_LABEL, type AccountPlatform, type PlataformaVinculable, type PlatformAccount } from "@/lib/types";
 import { getSyncHistory } from "@/lib/syncHistory";
 import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo } from "@/components/ui/PlatformLogos";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
 
 export const metadata = { title: "Ajustes · Paragon" };
 
@@ -113,12 +114,18 @@ function PlatformSection({
         <p className="mt-2 text-xs text-muted">{HELP[platform]}</p>
 
         {account && (
-          <form action={unlinkAccountAction} className="mt-4">
-            <input type="hidden" name="platform" value={platform} />
-            <button className="text-[0.8125rem] font-semibold text-muted hover:text-danger">
+          <div className="mt-4">
+            <ConfirmForm
+              action={unlinkAccountAction}
+              hidden={{ platform }}
+              title={`¿Desvincular ${PLATFORM_LABEL[platform]}?`}
+              message="Tu progreso y trofeos ya guardados se quedan tal cual, pero deja de sincronizarse hasta que vuelvas a vincular la cuenta."
+              confirmLabel="Sí, desvincular"
+              triggerClassName="text-[0.8125rem] font-semibold text-muted hover:text-danger"
+            >
               Desvincular {PLATFORM_LABEL[platform]}
-            </button>
-          </form>
+            </ConfirmForm>
+          </div>
         )}
       </div>
     </section>
