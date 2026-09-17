@@ -12,6 +12,7 @@ import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibr
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
+import { enviarPushFcm } from "@/lib/fcm";
 import { HORAS_CADUCIDAD } from "@/lib/syncHealth";
 
 /**
@@ -579,13 +580,24 @@ export async function syncGameTrophies(
     const url = usuario?.handle ? `/u/${usuario.handle}/${gameId}` : "/";
     const platino = nuevos.find((t) => t.grade === "platinum");
     const titulo = info?.title ?? gameId;
-    await enviarPush(userId, platino
+    const aviso = platino
       ? { title: "🏆 ¡Platino conseguido!", body: titulo, url }
       : {
           title: titulo,
           body: nuevos.length === 1 ? "1 trofeo nuevo" : `${nuevos.length} trofeos nuevos`,
           url,
-        });
+        };
+    // `icon`/`imageUrl` es la carátula del juego que ya se pidió arriba
+    // (`info.iconUrl`) para el título — antes se dejaba fuera de los dos
+    // avisos aunque las dos funciones ya la soportaban (idea #23 del
+    // brainstorm de v1.0, "notificaciones ricas"). `enviarPushFcm` es la
+    // app nativa (Android); `enviarPush` es Web Push (navegador/PWA) — un
+    // usuario puede tener las dos suscripciones a la vez, de ahí mandar por
+    // los dos canales, mismo patrón que ya usa sendFriendRequest.
+    await Promise.all([
+      enviarPush(userId, { ...aviso, icon: info?.iconUrl ?? undefined }),
+      enviarPushFcm(userId, { ...aviso, imageUrl: info?.iconUrl ?? undefined }),
+    ]);
 
     // Se acaba de conseguir DE VERDAD (no es la primera sincronización, ver
     // `primeraSincronizacion` arriba) — si este era el juego anclado como

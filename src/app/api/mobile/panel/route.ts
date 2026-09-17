@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
+import { rachas } from "@/lib/history";
 
 /** Datos de la pantalla de Panel nativa (Android/Compose). Mismo cálculo que la portada web (`app/page.tsx`), reempaquetado en JSON. */
 export async function GET(req: Request) {
@@ -16,7 +17,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
   }
 
-  const { games } = await getLibrary(profile);
+  const [{ games }, racha] = await Promise.all([getLibrary(profile), rachas(userId)]);
   const stats = summarise(games);
   const nivel = paragonProgress(games);
   const psn = profile.accounts.find((a) => a.platform === "psn");
@@ -37,6 +38,14 @@ export async function GET(req: Request) {
       trophies: stats.trofeos,
       games: stats.juegos,
       completionRate: stats.completadoMedio,
+    },
+    // Mismo cálculo que /api/mobile/stats (lib/history.ts) — se duplica
+    // aquí a propósito solo el dato (no la función) para que el Panel
+    // pueda pintar la racha en la cabecera sin pedir el endpoint entero
+    // de Estadísticas de fondo cada vez que se abre la app.
+    racha: {
+      actual: racha.actual,
+      mejor: racha.mejor,
     },
   });
 }

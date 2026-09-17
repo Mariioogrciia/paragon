@@ -1,8 +1,35 @@
 import { getDb } from "@/db";
 import { activities, users, games, activityComments, activityReactions } from "@/db/schema";
-import { inArray, desc, eq, sql } from "drizzle-orm";
+import { inArray, desc, eq, and, sql } from "drizzle-orm";
 import { listFriends } from "./profiles";
 import { avatarUrlSql } from "@/lib/avatarSql";
+
+/**
+ * Reaccionar/quitar reacción a una publicación del Feed — función pura por
+ * `userId`, mismo patrón que `togglePinnedGame` (lib/profiles.ts):
+ * `toggleActivityReactionAction` (app/actions.ts) es ahora un envoltorio
+ * fino sobre esto, y `POST /api/mobile/feed/{activityId}/react` llama
+ * directo a lo mismo — sin duplicar la lógica de "insertar o borrar" entre
+ * la web y la app móvil.
+ */
+export async function toggleActivityReaction(userId: string, activityId: string): Promise<{ reacted: boolean }> {
+  const db = getDb();
+  const [existing] = await db
+    .select({ userId: activityReactions.userId })
+    .from(activityReactions)
+    .where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId)))
+    .limit(1);
+
+  if (existing) {
+    await db
+      .delete(activityReactions)
+      .where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId)));
+    return { reacted: false };
+  }
+
+  await db.insert(activityReactions).values({ activityId, userId });
+  return { reacted: true };
+}
 
 export async function getFeed(userId: string) {
   const db = getDb();

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, activityComments, activityReactions, platformAccounts, gameTrophies } from "@/db/schema";
+import { users, userGames, activities, activityComments, platformAccounts, gameTrophies } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import {
@@ -36,6 +36,7 @@ import {
   unlinkAccount,
 } from "@/lib/profiles";
 import { toggleReservedMilestone } from "@/lib/milestones";
+import { toggleActivityReaction } from "@/lib/feed";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
@@ -605,13 +606,7 @@ export async function toggleActivityReactionAction(formData: FormData): Promise<
   const userId = await requireUserId();
   const activityId = String(formData.get("activityId") ?? "");
   if (!activityId) return;
-  const database = getDb();
-  const [existing] = await database.select({ userId: activityReactions.userId }).from(activityReactions).where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId))).limit(1);
-  if (existing) {
-    await database.delete(activityReactions).where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId)));
-  } else {
-    await database.insert(activityReactions).values({ activityId, userId });
-  }
+  await toggleActivityReaction(userId, activityId);
   revalidatePath("/", "layout");
 }
 

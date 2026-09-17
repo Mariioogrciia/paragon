@@ -62,7 +62,7 @@ export async function borrarTokenFcm(token: string): Promise<void> {
  */
 export async function enviarPushFcm(
   userId: string,
-  payload: { title: string; body: string; url?: string },
+  payload: { title: string; body: string; url?: string; imageUrl?: string },
 ): Promise<void> {
   const firebaseApp = asegurarApp();
   if (!firebaseApp) return;
@@ -77,7 +77,13 @@ export async function enviarPushFcm(
       try {
         await messaging.send({
           token,
-          notification: { title: payload.title, body: payload.body },
+          // `imageUrl` es lo que convierte esto en una notificación "rica"
+          // (idea #23 del brainstorm de v1.0) — con la app en segundo plano,
+          // Play Services ya la pinta como imagen grande él solo; con la app
+          // en primer plano, `ParagonFirebaseMessagingService.kt` la carga a
+          // mano y usa `BigPictureStyle` (Firebase no hace nada automático
+          // en ese caso, ver su documentación de "foreground notifications").
+          notification: { title: payload.title, body: payload.body, imageUrl: payload.imageUrl },
           data: payload.url ? { url: payload.url } : undefined,
         });
       } catch (error) {
