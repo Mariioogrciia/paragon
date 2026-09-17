@@ -123,6 +123,7 @@ fun GameDetailScreen(
         is GameDetailResult.Ok -> GameDetailContent(
             gameId = gameId,
             game = current.detail,
+            fromCache = current.fromCache,
             hitoInicial = hito,
             tokenStore = tokenStore,
             handle = handle,
@@ -140,6 +141,7 @@ fun GameDetailScreen(
 private fun GameDetailContent(
     gameId: String,
     game: GameDetailData,
+    fromCache: Boolean,
     hitoInicial: HitoReservado?,
     tokenStore: TokenStore,
     handle: String,
@@ -218,6 +220,7 @@ private fun GameDetailContent(
         item {
             GameDetailHero(
                 game = game,
+                fromCache = fromCache,
                 dynamicColor = dynamicColor,
                 onBack = onBack,
                 sharedTransitionScope = sharedTransitionScope,
@@ -294,6 +297,7 @@ private fun GameDetailContent(
 @Composable
 private fun GameDetailHero(
     game: GameDetailData,
+    fromCache: Boolean,
     dynamicColor: Color,
     onBack: () -> Unit,
     sharedTransitionScope: SharedTransitionScope?,
@@ -348,6 +352,14 @@ private fun GameDetailHero(
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                 )
+                if (fromCache) {
+                    Text(
+                        text = "Sin conexión — mostrando la última copia guardada",
+                        color = Muted,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
                 Text(
                     text = "${game.earnedTrophies}/${game.totalTrophies} trofeos · ${game.percent}%",
                     color = Muted,

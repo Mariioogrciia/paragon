@@ -43,7 +43,7 @@ data class LibraryGame(
 }
 
 sealed class LibraryResult {
-    data class Ok(val games: List<LibraryGame>) : LibraryResult()
+    data class Ok(val games: List<LibraryGame>, val fromCache: Boolean = false) : LibraryResult()
     data class Error(val message: String) : LibraryResult()
 }
 
@@ -102,10 +102,10 @@ class LibraryRepository(
             
             LibraryResult.Ok(remoteGames)
         } catch (e: HttpException) {
-            if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames) 
+            if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)
             else LibraryResult.Error("El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {
-            if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames)
+            if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)
             else LibraryResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
     }

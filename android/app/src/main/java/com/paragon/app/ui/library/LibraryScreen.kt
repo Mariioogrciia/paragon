@@ -150,6 +150,15 @@ fun LibraryScreen(
                 }
             }
 
+            if ((result as? LibraryResult.Ok)?.fromCache == true) {
+                Text(
+                    text = "Sin conexión — mostrando la última copia guardada",
+                    color = Muted,
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             ScrollableTabRow(
