@@ -13,6 +13,23 @@ export const metadata = {
   title: "Liga - Paragon",
 };
 
+const ETIQUETA_UNIDAD: Record<string, [string, string]> = {
+  dias: ["día", "días"],
+  semanas: ["semana", "semanas"],
+  meses: ["mes", "meses"],
+  anios: ["año", "años"],
+};
+
+function textoDuracion(value: number | null, unit: string | null, endsAt: string | null): string {
+  if (!endsAt) return "Sin fecha de fin.";
+  const fecha = new Date(endsAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+  if (value && unit && ETIQUETA_UNIDAD[unit]) {
+    const [singular, plural] = ETIQUETA_UNIDAD[unit];
+    return `${value} ${value === 1 ? singular : plural} — termina el ${fecha}.`;
+  }
+  return `Termina el ${fecha}.`;
+}
+
 export default async function LeaguePage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
@@ -26,27 +43,27 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
   if (!league) notFound();
 
   const isOwner = league.ownerId === session.user.id;
-  const miembroIds = new Set(league.standings.map((s) => s.userId));
+  const ocupados = new Set([
+    ...league.standings.map((s) => s.userId),
+    ...league.pendingMembers.map((p) => p.userId),
+  ]);
   const candidatos = amigos
-    .filter((a) => !miembroIds.has(a.userId))
+    .filter((a) => !ocupados.has(a.userId))
     .map((a) => ({ userId: a.userId, label: a.displayName ?? a.handle ?? "Amigo" }));
 
   // Solo se pide la biblioteca completa si hace falta pintar el selector
   // (el dueño) — al resto de miembros esto no les sirve para nada.
-  let juegosDelDueño: { id: string; title: string }[] = [];
+  let juegosDelDueño: { id: string; title: string; deviceLabel: string }[] = [];
   if (isOwner) {
     const ownerProfile = await getProfileByUserId(league.ownerId);
     if (ownerProfile) {
       const library = await getLibrary(ownerProfile);
       juegosDelDueño = library.games
         .filter((g) => !g.isWishlist)
-        .map((g) => ({ id: g.id, title: g.title }))
+        .map((g) => ({ id: g.id, title: g.title, deviceLabel: g.deviceLabel }))
         .sort((a, b) => a.title.localeCompare(b.title));
     }
   }
-
-  const monthName = new Date().toLocaleString("es-ES", { month: "long" });
-  const year = new Date().getFullYear();
 
   return (
     <div className="mx-auto max-w-[800px] px-7 py-12">
@@ -54,7 +71,8 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
 
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2">{league.name}</h1>
-        <p className="text-muted">Clasificación de {monthName} {year} — solo entre los miembros de esta liga.</p>
+        <p className="text-muted">Clasificación desde que se creó — solo entre los miembros de esta liga.</p>
+        <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt)}</p>
       </div>
 
       <div className="bg-surface border border-border rounded-[18px] overflow-hidden shadow-sm mb-10">
@@ -111,6 +129,28 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
           </tbody>
         </table>
       </div>
+
+      {isOwner && league.pendingMembers.length > 0 && (
+        <div className="mb-10">
+          <h2 className="text-lg font-bold mb-2">Invitaciones sin responder</h2>
+          <div className="flex flex-col gap-2">
+            {league.pendingMembers.map((p) => (
+              <div key={p.userId} className="flex items-center justify-between p-3.5 border rounded-xl border-dashed border-border bg-surface/50">
+                <div className="flex items-center gap-3">
+                  <Avatar src={p.image} name={p.name ?? p.handle ?? "?"} size={32} />
+                  <span className="font-semibold text-sm">{p.name ?? p.handle ?? "Alguien"}</span>
+                  <span className="text-xs text-muted">esperando respuesta</span>
+                </div>
+                <form action={removeLeagueMemberAction}>
+                  <input type="hidden" name="leagueId" value={league.id} />
+                  <input type="hidden" name="targetUserId" value={p.userId} />
+                  <button className="text-xs font-semibold text-muted hover:text-danger">Cancelar invitación</button>
+                </form>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-10">
         <h2 className="font-heading text-xl font-bold mb-2 flex items-center gap-2">

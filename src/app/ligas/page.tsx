@@ -1,11 +1,12 @@
 import { getLigaMensual } from "@/lib/ligas";
-import { listUserLeagues } from "@/lib/leagues";
+import { listUserLeagues, listPendingLeagueInvites } from "@/lib/leagues";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { BackButton } from "@/components/BackButton";
 import { NewLeagueForm } from "@/components/forms/Forms";
+import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
 
 export const metadata = {
   title: "Liga Mensual - Paragon",
@@ -13,9 +14,10 @@ export const metadata = {
 
 export default async function LigasPage() {
   const session = await auth();
-  const [ranking, misLigas] = await Promise.all([
+  const [ranking, misLigas, invitaciones] = await Promise.all([
     getLigaMensual(),
     session?.user?.id ? listUserLeagues(session.user.id) : Promise.resolve([]),
+    session?.user?.id ? listPendingLeagueInvites(session.user.id) : Promise.resolve([]),
   ]);
 
   const monthName = new Date().toLocaleString("es-ES", { month: "long" });
@@ -24,6 +26,34 @@ export default async function LigasPage() {
   return (
     <div className="mx-auto max-w-[800px] px-7 py-12">
       <BackButton fallbackHref="/" />
+
+      {session?.user?.id && invitaciones.length > 0 && (
+        <div className="mb-8">
+          <h2 className="font-heading text-xl font-bold mb-2">Invitaciones a ligas</h2>
+          <div className="flex flex-col gap-2">
+            {invitaciones.map((inv) => (
+              <div key={inv.id} className="flex items-center justify-between p-4 border rounded-xl border-border bg-surface">
+                <div>
+                  <span className="font-semibold">{inv.name}</span>
+                  <p className="text-xs text-muted">{inv.ownerName ?? "Alguien"} te ha invitado</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <form action={acceptLeagueInviteAction}>
+                    <input type="hidden" name="leagueId" value={inv.id} />
+                    <button className="rounded-lg px-3 py-1.5 text-xs font-bold text-background" style={{ background: "var(--accent-grad)" }}>
+                      Aceptar
+                    </button>
+                  </form>
+                  <form action={declineLeagueInviteAction}>
+                    <input type="hidden" name="leagueId" value={inv.id} />
+                    <button className="text-xs font-semibold text-muted hover:text-danger">Rechazar</button>
+                  </form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {session?.user?.id && (
         <div className="mb-12">

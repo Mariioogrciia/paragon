@@ -3,21 +3,36 @@ import { users, userTrophies, gameTrophies, userGames, games, leagues, leagueMem
 import { eq, and, gte, lte, sql, inArray } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { areFriends } from "@/lib/profiles";
+import { enviarPush } from "@/lib/webPush";
+import { enviarPushFcm } from "@/lib/fcm";
+import { anunciarInvitacionLiga } from "@/lib/discordBot";
 
 /**
  * Ligas creadas por un usuario, solo entre amigos — distintas de la "Liga
  * Mensual" global (lib/ligas.ts, todo el mundo, sin tabla propia). Mismo
  * cálculo de puntos que esa (platino 100/oro 50/plata 25/resto 10), pero
- * acotado a los miembros de CADA liga en vez de a todos los usuarios.
+ * acotado a los miembros de CADA liga en vez de a todos los usuarios, y a
+ * la ventana de tiempo de la propia liga (desde que se creó, ver
+ * `scoringWindow`) en vez de al mes en curso.
  */
 
 export class NotFriendsError extends Error {}
+
+export type LeagueDurationUnit = "dias" | "semanas" | "meses" | "anios";
 
 export interface LeagueSummary {
   id: string;
   name: string;
   ownerId: string;
   memberCount: number;
+  endsAt: string | null;
+}
+
+export interface LeagueInvite {
+  id: string;
+  name: string;
+  ownerId: string;
+  ownerName: string | null;
 }
 
 export interface LeagueStandingRow {
@@ -28,17 +43,29 @@ export interface LeagueStandingRow {
   points: number;
 }
 
+export interface PendingMemberRow {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  image: string | null;
+}
+
 export interface LeagueDetail {
   id: string;
   name: string;
   ownerId: string;
+  durationValue: number | null;
+  durationUnit: LeagueDurationUnit | null;
+  endsAt: string | null;
   standings: LeagueStandingRow[];
+  /** Solo se rellena si `requestingUserId` es el dueño — para gestionar quién falta por aceptar. */
+  pendingMembers: PendingMemberRow[];
   challenge: LeagueChallenge | null;
 }
 
 /**
  * El "reto" de la liga — un juego concreto para picarse a ver quién llega
- * antes al platino, aparte de la clasificación por puntos del mes.
+ * antes al platino, aparte de la clasificación por puntos.
  */
 export interface ChallengeStandingRow {
   userId: string;
@@ -69,34 +96,65 @@ const pointsSql = sql<number>`
   )
 `;
 
-function monthBounds() {
-  const now = new Date();
-  return {
-    startOfMonth: new Date(now.getFullYear(), now.getMonth(), 1),
-    startOfNextMonth: new Date(now.getFullYear(), now.getMonth() + 1, 1),
-  };
+/** `from` + N días/semanas/meses/años — para `endsAt` al crear la liga. */
+function computeEndsAt(from: Date, value: number, unit: LeagueDurationUnit): Date {
+  const d = new Date(from);
+  switch (unit) {
+    case "dias":
+      d.setDate(d.getDate() + value);
+      break;
+    case "semanas":
+      d.setDate(d.getDate() + value * 7);
+      break;
+    case "meses":
+      d.setMonth(d.getMonth() + value);
+      break;
+    case "anios":
+      d.setFullYear(d.getFullYear() + value);
+      break;
+  }
+  return d;
 }
 
-/** Crea una liga con el creador ya como único miembro — se invita al resto con `addLeagueMember`. */
-export async function createLeague(ownerId: string, name: string): Promise<LeagueSummary | null> {
+/**
+ * Crea una liga con el creador ya como único miembro (aceptado — es quien
+ * la crea, no alguien invitado) — se invita al resto con `addLeagueMember`.
+ * `duration` es opcional: sin ella, la liga no tiene fecha de fin.
+ */
+export async function createLeague(
+  ownerId: string,
+  name: string,
+  duration?: { value: number; unit: LeagueDurationUnit },
+): Promise<LeagueSummary | null> {
   const trimmed = name.trim().slice(0, 60);
   if (!trimmed) return null;
 
   const db = getDb();
   const id = crypto.randomUUID();
-  await db.insert(leagues).values({ id, name: trimmed, ownerId });
-  await db.insert(leagueMembers).values({ leagueId: id, userId: ownerId });
+  const createdAt = new Date();
+  const endsAt = duration && duration.value > 0 ? computeEndsAt(createdAt, duration.value, duration.unit) : null;
 
-  return { id, name: trimmed, ownerId, memberCount: 1 };
+  await db.insert(leagues).values({
+    id,
+    name: trimmed,
+    ownerId,
+    createdAt,
+    endsAt,
+    durationValue: duration?.value ?? null,
+    durationUnit: duration?.unit ?? null,
+  });
+  await db.insert(leagueMembers).values({ leagueId: id, userId: ownerId, status: "accepted" });
+
+  return { id, name: trimmed, ownerId, memberCount: 1, endsAt: endsAt?.toISOString() ?? null };
 }
 
-/** Ligas de las que `userId` es miembro (propias o a las que le han añadido). */
+/** Ligas de las que `userId` ya es miembro ACEPTADO (propias o a las que le han añadido) — para invitaciones sin responder, ver `listPendingLeagueInvites`. */
 export async function listUserLeagues(userId: string): Promise<LeagueSummary[]> {
   const db = getDb();
   const memberships = await db
     .select({ leagueId: leagueMembers.leagueId })
     .from(leagueMembers)
-    .where(eq(leagueMembers.userId, userId));
+    .where(and(eq(leagueMembers.userId, userId), eq(leagueMembers.status, "accepted")));
   const leagueIds = memberships.map((m) => m.leagueId);
   if (leagueIds.length === 0) return [];
 
@@ -105,15 +163,37 @@ export async function listUserLeagues(userId: string): Promise<LeagueSummary[]> 
       id: leagues.id,
       name: leagues.name,
       ownerId: leagues.ownerId,
-      memberCount: sql<number>`count(*)`,
+      endsAt: leagues.endsAt,
+      // Solo cuentan los miembros que ya han aceptado — un invitado sin
+      // responder no debería sumar en "cuántos hay" de cara al resto.
+      memberCount: sql<number>`count(*) filter (where ${leagueMembers.status} = 'accepted')`,
     })
     .from(leagues)
     .innerJoin(leagueMembers, eq(leagueMembers.leagueId, leagues.id))
     .where(inArray(leagues.id, leagueIds))
-    .groupBy(leagues.id, leagues.name, leagues.ownerId, leagues.createdAt)
+    .groupBy(leagues.id, leagues.name, leagues.ownerId, leagues.endsAt, leagues.createdAt)
     .orderBy(leagues.createdAt);
 
-  return rows.map((r) => ({ ...r, memberCount: Number(r.memberCount) }));
+  return rows.map((r) => ({ ...r, memberCount: Number(r.memberCount), endsAt: r.endsAt?.toISOString() ?? null }));
+}
+
+/** Invitaciones a ligas todavía sin aceptar ni rechazar. */
+export async function listPendingLeagueInvites(userId: string): Promise<LeagueInvite[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: leagues.id,
+      name: leagues.name,
+      ownerId: leagues.ownerId,
+      ownerName: users.name,
+    })
+    .from(leagueMembers)
+    .innerJoin(leagues, eq(leagues.id, leagueMembers.leagueId))
+    .innerJoin(users, eq(users.id, leagues.ownerId))
+    .where(and(eq(leagueMembers.userId, userId), eq(leagueMembers.status, "pending")))
+    .orderBy(leagueMembers.joinedAt);
+
+  return rows;
 }
 
 /**
@@ -148,7 +228,7 @@ async function getChallengeStandings(gameId: string, memberIds: string[]): Promi
     .where(and(eq(userGames.gameId, gameId), inArray(userGames.userId, memberIds)));
 
   // Miembros que ni siquiera tienen este juego en su biblioteca: 0% aparte,
-  // mismo criterio que "miembro sin trofeos este mes" en getLeagueDetail.
+  // mismo criterio que "miembro sin trofeos" en getLeagueDetail.
   const withRow = new Set(progressRows.map((r) => r.userId));
   const missingIds = memberIds.filter((id) => !withRow.has(id));
   const missingProfiles = missingIds.length === 0 ? [] : await db
@@ -212,9 +292,12 @@ async function getChallengeStandings(gameId: string, memberIds: string[]): Promi
 }
 
 /**
- * Clasificación de una liga (mes en curso) + datos de la liga — `null` si no
- * existe o si `requestingUserId` no es miembro (autorización: ver la
- * clasificación de una liga en la que no estás no tiene sentido).
+ * Clasificación de una liga (desde que se creó hasta que acaba, o para
+ * siempre si no tiene duración — ver `computeEndsAt`) + datos de la liga.
+ * `null` si no existe o si `requestingUserId` no es miembro ACEPTADO
+ * (autorización: ver la clasificación de una liga que no has aceptado
+ * todavía no tiene sentido — para eso está `listPendingLeagueInvites` +
+ * `acceptLeagueInvite`).
  */
 export async function getLeagueDetail(leagueId: string, requestingUserId: string): Promise<LeagueDetail | null> {
   const db = getDb();
@@ -222,13 +305,18 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
   if (!league) return null;
 
   const memberRows = await db
-    .select({ userId: leagueMembers.userId })
+    .select({ userId: leagueMembers.userId, status: leagueMembers.status })
     .from(leagueMembers)
     .where(eq(leagueMembers.leagueId, leagueId));
-  const memberIds = memberRows.map((m) => m.userId);
+  const memberIds = memberRows.filter((m) => m.status === "accepted").map((m) => m.userId);
   if (!memberIds.includes(requestingUserId)) return null;
 
-  const { startOfMonth, startOfNextMonth } = monthBounds();
+  const scoreConditions = [
+    eq(userTrophies.earned, true),
+    gte(userTrophies.earnedAt, league.createdAt),
+    inArray(userTrophies.userId, memberIds),
+  ];
+  if (league.endsAt) scoreConditions.push(lte(userTrophies.earnedAt, league.endsAt));
 
   const scored = await db
     .select({
@@ -244,19 +332,12 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
       gameTrophies,
       and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
     )
-    .where(
-      and(
-        eq(userTrophies.earned, true),
-        gte(userTrophies.earnedAt, startOfMonth),
-        lte(userTrophies.earnedAt, startOfNextMonth),
-        inArray(userTrophies.userId, memberIds),
-      ),
-    )
+    .where(and(...scoreConditions))
     .groupBy(users.id);
 
   // El INNER JOIN con userTrophies deja fuera a cualquier miembro sin ni un
-  // trofeo este mes — se añaden a mano con 0 puntos, para que la liga
-  // enseñe a TODOS sus miembros, no solo a quien ya ha cazado algo.
+  // trofeo en la ventana de la liga — se añaden a mano con 0 puntos, para
+  // que la liga enseñe a TODOS sus miembros, no solo a quien ya ha cazado algo.
   const scoredIds = new Set(scored.map((r) => r.userId));
   const missingIds = memberIds.filter((id) => !scoredIds.has(id));
   const missingProfiles = missingIds.length === 0 ? [] : await db
@@ -276,7 +357,33 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
 
   const challenge = league.challengeGameId ? await getChallengeStandings(league.challengeGameId, memberIds) : null;
 
-  return { id: league.id, name: league.name, ownerId: league.ownerId, standings, challenge };
+  let pendingMembers: PendingMemberRow[] = [];
+  if (league.ownerId === requestingUserId) {
+    const pendingIds = memberRows.filter((m) => m.status === "pending").map((m) => m.userId);
+    if (pendingIds.length > 0) {
+      pendingMembers = await db
+        .select({
+          userId: users.id,
+          handle: users.handle,
+          name: users.name,
+          image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+        })
+        .from(users)
+        .where(inArray(users.id, pendingIds));
+    }
+  }
+
+  return {
+    id: league.id,
+    name: league.name,
+    ownerId: league.ownerId,
+    durationValue: league.durationValue,
+    durationUnit: league.durationUnit,
+    endsAt: league.endsAt?.toISOString() ?? null,
+    standings,
+    pendingMembers,
+    challenge,
+  };
 }
 
 /** Fija (o quita, con `gameId: null`) el juego de reto de la liga — solo el dueño. */
@@ -290,20 +397,64 @@ export async function setLeagueChallenge(leagueId: string, ownerId: string, game
 }
 
 /**
- * Añade un amigo a la liga — solo el dueño puede invitar, y solo a alguien
- * que ya sea su amigo de verdad (relación `accepted`), no a cualquiera.
+ * Invita a un amigo a la liga — solo el dueño puede invitar, y solo a
+ * alguien que ya sea su amigo de verdad (relación `accepted`), no a
+ * cualquiera. Entra como "pending": no aparece en la clasificación hasta
+ * que acepte (`acceptLeagueInvite`). Avisa por los mismos canales que una
+ * solicitud de amistad (Web Push + FCM) y, si tiene Discord vinculado con
+ * los DMs activados, también por ahí.
  */
 export async function addLeagueMember(leagueId: string, ownerId: string, friendUserId: string): Promise<boolean> {
   const db = getDb();
-  const [league] = await db.select({ ownerId: leagues.ownerId }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  const [league] = await db.select({ ownerId: leagues.ownerId, name: leagues.name }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
   if (!league || league.ownerId !== ownerId) return false;
   if (!(await areFriends(ownerId, friendUserId))) throw new NotFriendsError();
 
-  await db.insert(leagueMembers).values({ leagueId, userId: friendUserId }).onConflictDoNothing();
+  const inserted = await db
+    .insert(leagueMembers)
+    .values({ leagueId, userId: friendUserId, status: "pending" })
+    .onConflictDoNothing()
+    .returning({ userId: leagueMembers.userId });
+  if (inserted.length === 0) return true; // ya era miembro (o ya estaba invitado) — no hay nada nuevo que avisar
+
+  const [owner] = await db.select({ name: users.name, handle: users.handle }).from(users).where(eq(users.id, ownerId)).limit(1);
+  const nombreDueño = owner?.name ?? owner?.handle ?? "Alguien";
+  const aviso = {
+    title: "Invitación a una liga",
+    body: `${nombreDueño} te ha invitado a la liga "${league.name}" en Paragon.`,
+    url: `/ligas/${leagueId}`,
+  };
+  await Promise.all([
+    enviarPush(friendUserId, aviso),
+    enviarPushFcm(friendUserId, aviso),
+    anunciarInvitacionLiga(friendUserId, league.name, nombreDueño, leagueId),
+  ]);
+
   return true;
 }
 
-/** El dueño puede quitar a cualquiera (menos a sí mismo — para eso está `deleteLeague`); cualquier otro miembro solo puede quitarse a sí mismo (salir). */
+/** El invitado acepta — a partir de aquí sí cuenta en la clasificación. Solo el propio invitado. */
+export async function acceptLeagueInvite(leagueId: string, userId: string): Promise<boolean> {
+  const db = getDb();
+  const result = await db
+    .update(leagueMembers)
+    .set({ status: "accepted" })
+    .where(and(eq(leagueMembers.leagueId, leagueId), eq(leagueMembers.userId, userId), eq(leagueMembers.status, "pending")))
+    .returning({ userId: leagueMembers.userId });
+  return result.length > 0;
+}
+
+/** El invitado rechaza — se borra la fila, como si nunca le hubieran invitado. Solo el propio invitado. */
+export async function declineLeagueInvite(leagueId: string, userId: string): Promise<boolean> {
+  const db = getDb();
+  const result = await db
+    .delete(leagueMembers)
+    .where(and(eq(leagueMembers.leagueId, leagueId), eq(leagueMembers.userId, userId), eq(leagueMembers.status, "pending")))
+    .returning({ userId: leagueMembers.userId });
+  return result.length > 0;
+}
+
+/** El dueño puede quitar a cualquiera, aceptado o pendiente (menos a sí mismo — para eso está `deleteLeague`); cualquier otro miembro solo puede quitarse a sí mismo (salir). */
 export async function removeLeagueMember(leagueId: string, requestingUserId: string, targetUserId: string): Promise<boolean> {
   const db = getDb();
   const [league] = await db.select({ ownerId: leagues.ownerId }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);

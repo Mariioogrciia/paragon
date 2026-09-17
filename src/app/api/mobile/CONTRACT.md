@@ -160,32 +160,60 @@ la app solo podía leer comentarios, no escribirlos.
 Antes solo existía la "Liga Mensual" global (todos los usuarios, sin tabla
 propia, calculada al vuelo — ver `getLigaMensual` en `lib/ligas.ts`, sigue
 existiendo tal cual). Esto es otra cosa: ligas que crea un usuario, con
-nombre propio, y a las que solo se puede invitar a amigos reales
-(`areFriends`). Mismo cálculo de puntos (platino 100/oro 50/plata 25/resto
-10, mes en curso) pero acotado a los miembros de cada liga.
+nombre propio y duración opcional, y a las que solo se puede invitar a
+amigos reales (`areFriends`) — y que el invitado tiene que aceptar antes de
+contar en la clasificación (ver `status` más abajo). Mismo cálculo de
+puntos (platino 100/oro 50/plata 25/resto 10) que la Liga Mensual, pero
+acotado a los miembros de cada liga y a su propia ventana de tiempo (desde
+que se creó hasta que termina, o para siempre si no tiene duración) en vez
+del mes en curso.
 
-### `GET /api/mobile/leagues` — Mis ligas
+### `GET /api/mobile/leagues` — Mis ligas (ya aceptadas)
 
 ```json
-{ "leagues": [ { "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "memberCount": 3 } ] }
+{ "leagues": [ { "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "memberCount": 3, "endsAt": null } ] }
 ```
+`memberCount` solo cuenta miembros que ya aceptaron. Las invitaciones sin
+responder no salen aquí — ver `GET /leagues/invites`.
 
 ### `POST /api/mobile/leagues` — Crear una liga
 
-Body: `{ "name": "..." }`. El creador entra como único miembro. `400` si el
-nombre, tras recortar espacios, queda vacío.
+Body: `{ "name": "...", "durationValue"?: 3, "durationUnit"?: "dias" | "semanas" | "meses" | "anios" }`.
+El creador entra como único miembro (ya aceptado). Sin duración, la liga no
+tiene fecha de fin. `400` si el nombre, tras recortar espacios, queda vacío.
 ```json
-{ "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "memberCount": 1 }
+{ "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "memberCount": 1, "endsAt": "2026-12-17T00:00:00.000Z" }
 ```
 
-### `GET /api/mobile/leagues/{id}` — Clasificación de una liga (mes en curso)
+### `GET /api/mobile/leagues/invites` — Invitaciones sin responder
 
-`404` si no existe o si no eres miembro (ver esta liga sin pertenecer a ella
-no tiene sentido).
+```json
+{ "invites": [ { "id": "lg_2", "name": "Otra liga", "ownerId": "u3", "ownerName": "Ana" } ] }
+```
+
+### `POST /api/mobile/leagues/{id}/accept` — Aceptar una invitación
+
+Sin body. A partir de aquí sí cuentas en la clasificación. `404` si no hay
+ninguna invitación pendiente a esa liga para ti.
+```json
+{ "ok": true }
+```
+
+### `POST /api/mobile/leagues/{id}/decline` — Rechazar una invitación
+
+Sin body. Se borra, como si nunca hubiera llegado. `404` en las mismas
+condiciones que `/accept`.
+
+### `GET /api/mobile/leagues/{id}` — Clasificación de una liga
+
+`404` si no existe o si no eres miembro ACEPTADO (ver esta liga sin haber
+aceptado la invitación no tiene sentido — para eso está `/accept`).
 ```json
 {
   "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "isOwner": true,
+  "durationValue": 3, "durationUnit": "meses", "endsAt": "2026-12-17T00:00:00.000Z",
   "standings": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "points": 250 } ],
+  "pendingMembers": [ { "userId": "u4", "handle": "ana2", "name": "Ana", "image": "..." } ],
   "challenge": {
     "gameId": "abc123", "title": "Elden Ring", "iconUrl": "https://...",
     "standings": [
@@ -195,8 +223,10 @@ no tiene sentido).
   }
 }
 ```
-Los miembros sin ningún trofeo este mes salen igualmente, con `points: 0` —
-la liga enseña a todos sus miembros, no solo a quien ya ha cazado algo.
+Los miembros sin ningún trofeo en la ventana de la liga salen igualmente,
+con `points: 0` — la liga enseña a todos sus miembros aceptados, no solo a
+quien ya ha cazado algo. `pendingMembers` viene vacío salvo que
+`isOwner: true` (es información de gestión, no le interesa a nadie más).
 `challenge` es `null` si la liga no tiene ningún juego de reto fijado (ver
 `POST .../challenge`). Dentro, `standings` va ordenado por quién llegó
 antes al platino (o al 100% en Steam, que no tiene grado "platinum" propio
@@ -213,7 +243,9 @@ biblioteca del dueño (`GET /library`), igual que la web.
 
 Body: `{ "userId": "..." }`. Solo el dueño puede invitar (`403` si no lo
 eres), y solo a alguien que ya sea tu amigo de verdad (relación `accepted`
-en `friendships`) — `400` en caso contrario.
+en `friendships`) — `400` en caso contrario. Entra como `pending` — avisa
+por Web Push + FCM y, si tiene Discord vinculado con los DMs activados, por
+ahí también — y no cuenta en la clasificación hasta que acepte.
 
 ### `DELETE /api/mobile/leagues/{id}/members/{userId}` — Quitar a alguien
 

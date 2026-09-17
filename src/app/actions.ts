@@ -37,7 +37,7 @@ import {
 } from "@/lib/profiles";
 import { toggleReservedMilestone } from "@/lib/milestones";
 import { toggleActivityReaction, addActivityComment } from "@/lib/feed";
-import { createLeague, addLeagueMember, removeLeagueMember, deleteLeague, setLeagueChallenge, NotFriendsError } from "@/lib/leagues";
+import { createLeague, addLeagueMember, removeLeagueMember, deleteLeague, setLeagueChallenge, acceptLeagueInvite, declineLeagueInvite, NotFriendsError, type LeagueDurationUnit } from "@/lib/leagues";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
@@ -1217,15 +1217,42 @@ export async function actualizarAdquisicionAction(
 
 /* ------------------------------------------- Ligas ------------------------------------------ */
 
+const UNIDADES_DURACION: LeagueDurationUnit[] = ["dias", "semanas", "meses", "anios"];
+
 export async function createLeagueAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId();
   const name = String(formData.get("name") ?? "");
+  const durationValueRaw = String(formData.get("durationValue") ?? "");
+  const durationUnitRaw = String(formData.get("durationUnit") ?? "");
 
-  const league = await createLeague(userId, name);
+  const durationValue = Number(durationValueRaw);
+  const durationUnit = UNIDADES_DURACION.includes(durationUnitRaw as LeagueDurationUnit) ? (durationUnitRaw as LeagueDurationUnit) : null;
+  const duration = durationValue > 0 && durationUnit ? { value: durationValue, unit: durationUnit } : undefined;
+
+  const league = await createLeague(userId, name, duration);
   if (!league) return { error: "Ponle un nombre a la liga." };
 
   revalidatePath("/ligas");
   redirect(`/ligas/${league.id}`);
+}
+
+export async function acceptLeagueInviteAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const leagueId = String(formData.get("leagueId") ?? "");
+  if (!leagueId) return;
+
+  await acceptLeagueInvite(leagueId, userId);
+  revalidatePath("/ligas");
+  revalidatePath(`/ligas/${leagueId}`);
+}
+
+export async function declineLeagueInviteAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const leagueId = String(formData.get("leagueId") ?? "");
+  if (!leagueId) return;
+
+  await declineLeagueInvite(leagueId, userId);
+  revalidatePath("/ligas");
 }
 
 export async function addLeagueMemberAction(formData: FormData): Promise<void> {

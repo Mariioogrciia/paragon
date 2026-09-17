@@ -21,6 +21,7 @@ import {
   type ActionState,
 } from "@/app/actions";
 import type { NavKey } from "@/lib/navPreferences";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 const EMPTY: ActionState = {};
 
@@ -191,9 +192,17 @@ export function NewCollectionForm({ gameId }: { gameId?: string }) {
   );
 }
 
-/** Crear una liga — el creador entra como único miembro, se invita al resto desde la ficha de la liga (`AddLeagueMemberForm`). */
+const UNIDADES_DURACION = [
+  { value: "dias", label: "Días" },
+  { value: "semanas", label: "Semanas" },
+  { value: "meses", label: "Meses" },
+  { value: "anios", label: "Años" },
+];
+
+/** Crear una liga — el creador entra como único miembro, se invita al resto desde la ficha de la liga (`AddLeagueMemberForm`). Duración opcional: sin ella, la liga no tiene fecha de fin. */
 export function NewLeagueForm() {
   const [state, action] = useActionState(createLeagueAction, EMPTY);
+  const [durationUnit, setDurationUnit] = useState("");
 
   return (
     <form action={action}>
@@ -208,6 +217,25 @@ export function NewLeagueForm() {
         />
         <Submit>Crear liga</Submit>
       </div>
+      <div className="mt-2.5 flex items-center gap-2.5">
+        <span className="shrink-0 text-xs text-muted">Duración (opcional):</span>
+        <input
+          type="number"
+          name="durationValue"
+          min={1}
+          placeholder="3"
+          className="w-16 rounded-xl px-2.5 py-2 text-[0.8125rem] text-foreground outline-none"
+          style={FIELD}
+        />
+        <CustomSelect
+          name="durationUnit"
+          value={durationUnit}
+          onChange={setDurationUnit}
+          placeholder="Sin fecha de fin"
+          options={UNIDADES_DURACION}
+          className="w-40"
+        />
+      </div>
       <Feedback state={state} />
     </form>
   );
@@ -220,29 +248,35 @@ export function SetLeagueChallengeForm({
   actual,
 }: {
   leagueId: string;
-  juegos: { id: string; title: string }[];
+  juegos: { id: string; title: string; deviceLabel: string }[];
   actual: string | null;
 }) {
+  const [gameId, setGameId] = useState(actual ?? "");
+
+  // Un mismo título puede estar dos veces en la biblioteca (p. ej. en PS5 y
+  // en Switch) — si el nombre se repite, se enseña la plataforma al lado
+  // para saber cuál es cuál; si no se repite, no hace falta el ruido.
+  const repetidos = new Map<string, number>();
+  for (const j of juegos) repetidos.set(j.title, (repetidos.get(j.title) ?? 0) + 1);
+
+  const options = [
+    { value: "", label: "Sin reto" },
+    ...juegos.map((j) => ({
+      value: j.id,
+      label: (repetidos.get(j.title) ?? 0) > 1 ? `${j.title} (${j.deviceLabel})` : j.title,
+    })),
+  ];
+
   return (
     <form action={setLeagueChallengeAction} className="flex flex-col gap-2.5 sm:flex-row">
       <input type="hidden" name="leagueId" value={leagueId} />
-      <select
-        name="gameId"
-        defaultValue={actual ?? ""}
-        className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none"
-        style={FIELD}
-      >
-        <option value="">Sin reto</option>
-        {juegos.map((j) => (
-          <option key={j.id} value={j.id}>{j.title}</option>
-        ))}
-      </select>
+      <CustomSelect name="gameId" value={gameId} onChange={setGameId} options={options} className="min-w-0 flex-1" />
       <Submit>Guardar</Submit>
     </form>
   );
 }
 
-/** Invitar a un amigo a una liga propia — solo ofrece amigos que todavía no son miembros (el backend igualmente exige que sean amigos de verdad). */
+/** Invitar a un amigo a una liga propia — solo ofrece amigos que todavía no son miembros (aceptados o pendientes; el backend igualmente exige que sean amigos de verdad). */
 export function AddLeagueMemberForm({
   leagueId,
   candidatos,
@@ -250,6 +284,8 @@ export function AddLeagueMemberForm({
   leagueId: string;
   candidatos: { userId: string; label: string }[];
 }) {
+  const [friendUserId, setFriendUserId] = useState("");
+
   if (candidatos.length === 0) {
     return <p className="text-sm text-muted">Ya están todos tus amigos disponibles en esta liga.</p>;
   }
@@ -257,18 +293,14 @@ export function AddLeagueMemberForm({
   return (
     <form action={addLeagueMemberAction} className="flex flex-col gap-2.5 sm:flex-row">
       <input type="hidden" name="leagueId" value={leagueId} />
-      <select
+      <CustomSelect
         name="friendUserId"
-        defaultValue=""
-        required
-        className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none"
-        style={FIELD}
-      >
-        <option value="" disabled>Elige a un amigo…</option>
-        {candidatos.map((c) => (
-          <option key={c.userId} value={c.userId}>{c.label}</option>
-        ))}
-      </select>
+        value={friendUserId}
+        onChange={setFriendUserId}
+        placeholder="Elige a un amigo…"
+        options={candidatos.map((c) => ({ value: c.userId, label: c.label }))}
+        className="min-w-0 flex-1"
+      />
       <Submit>Invitar</Submit>
     </form>
   );

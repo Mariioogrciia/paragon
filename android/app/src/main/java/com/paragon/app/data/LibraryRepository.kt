@@ -23,6 +23,11 @@ data class LibraryGame(
     val isPlatinado: Boolean,
     val lastPlayedAt: String?,
     val isPinned: Boolean = false,
+    // Solo relleno al venir de red (toLibraryGame) — "" al salir de la
+    // caché local (LibraryGameEntity no lo guarda, ver data/local/). Basta
+    // para el picker de reto de ligas (siempre pide la biblioteca por red),
+    // no merece un bump de la base de Room por esto.
+    val platform: String = "",
 ) {
     /** Para reutilizar StandardGameCard/HeroGameCard (GameCards.kt) tal cual. */
     fun toGameProgress() = GameProgress(
@@ -52,6 +57,7 @@ private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     isPlatinado = (earned?.platinum ?: 0) > 0,
     lastPlayedAt = lastPlayedAt,
     isPinned = isPinned ?: false,
+    platform = platform,
 )
 
 private fun LibraryGame.toEntity() = com.paragon.app.data.local.LibraryGameEntity(

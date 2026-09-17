@@ -11,6 +11,7 @@ import { hitosHistoricos } from "@/lib/profileStats";
 import { calcularTrophyDna, CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 import { dificultadDeJuego } from "@/lib/difficulty";
 import { dominioPublico } from "@/lib/site";
+import { listUserLeagues, listPendingLeagueInvites, getLeagueDetail } from "@/lib/leagues";
 import type { Game } from "@/lib/types";
 
 /**
@@ -257,6 +258,73 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   return mensaje(lineas.join("\n"));
 }
 
+/** Coincidencia exacta si la hay; si no, la primera que CONTENGA lo escrito — mismo criterio que `encontrarJuegoPorTitulo`. */
+function encontrarLigaPorNombre<T extends { name: string }>(ligas: T[], busqueda: string): T | null {
+  const q = normalizarTitulo(busqueda);
+  if (!q) return null;
+  const exacta = ligas.find((l) => normalizarTitulo(l.name) === q);
+  if (exacta) return exacta;
+  return ligas.find((l) => normalizarTitulo(l.name).includes(q)) ?? null;
+}
+
+async function comandoLigas(discordUserId: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const ligas = await listUserLeagues(userId);
+  if (ligas.length === 0) return mensaje("No estás en ninguna liga todavía — créate una en Paragon o pide que te inviten.");
+
+  const lineas = await Promise.all(
+    ligas.map(async (liga) => {
+      const detalle = await getLeagueDetail(liga.id, userId);
+      const posicion = detalle?.standings.findIndex((s) => s.userId === userId);
+      const yo = posicion != null && posicion >= 0 ? detalle!.standings[posicion] : null;
+      const sufijo = yo ? ` — vas ${posicion! + 1}º con ${yo.points} pts` : "";
+      return `🏅 **${liga.name}** (${liga.memberCount} ${liga.memberCount === 1 ? "miembro" : "miembros"})${sufijo}`;
+    }),
+  );
+  return mensaje(lineas.join("\n"));
+}
+
+async function comandoLiga(discordUserId: string, nombre: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const ligas = await listUserLeagues(userId);
+  const encontrada = encontrarLigaPorNombre(ligas, nombre);
+  if (!encontrada) return mensaje(`No encuentro ninguna liga tuya llamada "${nombre}".`);
+
+  const detalle = await getLeagueDetail(encontrada.id, userId);
+  if (!detalle) return mensaje("No he podido cargar esa liga ahora mismo.");
+
+  const lineas = [`**${detalle.name}**`];
+  detalle.standings.forEach((s, i) => {
+    const nombreMostrado = s.name ?? s.handle ?? "Alguien";
+    lineas.push(`${i + 1}. ${nombreMostrado} — ${s.points} pts`);
+  });
+  if (detalle.challenge) {
+    lineas.push("", `🏆 Reto: **${detalle.challenge.title}**`);
+    detalle.challenge.standings.forEach((s, i) => {
+      const nombreMostrado = s.name ?? s.handle ?? "Alguien";
+      const estado = s.hasPlatinum ? "Platino" : `${s.progressPercent}%`;
+      lineas.push(`${i + 1}. ${nombreMostrado} — ${estado}`);
+    });
+  }
+  return mensaje(lineas.join("\n"));
+}
+
+async function comandoInvitacionesLiga(discordUserId: string) {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR);
+
+  const invitaciones = await listPendingLeagueInvites(userId);
+  if (invitaciones.length === 0) return mensaje("No tienes ninguna invitación a ligas pendiente.");
+
+  const lineas = invitaciones.map((inv) => `🏅 **${inv.name}** — invitación de ${inv.ownerName ?? "alguien"}`);
+  lineas.push("", `Acéptalas o recházalas desde la web (${dominioPublico()}/ligas) o la app.`);
+  return mensaje(lineas.join("\n"));
+}
+
 function comandoHelp() {
   return mensaje(
     [
@@ -269,6 +337,9 @@ function comandoHelp() {
       "🎮 `/juego <título>` — ficha rápida: duración HLTB, dificultad, perdibles y tu progreso.",
       "📝 `/nota <título> <texto>` — apunta una nota privada en un juego sin abrir la web.",
       "🎲 `/ruleta [minutos] [genero]` — te elige UN juego que encaje con el tiempo que tienes.",
+      "🏅 `/ligas` — tus ligas creadas con amigos y tu posición en cada una.",
+      "🏅 `/liga <nombre>` — clasificación completa de una liga (y su reto, si tiene).",
+      "✉️ `/invitacionesliga` — invitaciones a ligas sin responder todavía.",
       "📣 `/anunciosaqui` — (solo quien gestione el servidor) anuncia aquí cuando alguien suba de nivel.",
       "",
       "Para que cualquiera de estos funcione, tu cuenta de Discord tiene que estar vinculada a una cuenta de Paragon — inicia sesión en Paragon con este mismo Discord.",
@@ -357,6 +428,15 @@ async function calcularRespuesta(interaction: DiscordInteraction, discordUserId:
     }
     case "anunciosaqui":
       return await comandoAnunciosAqui(interaction.guild_id ?? null, interaction.channel_id ?? null, discordUserId);
+    case "ligas":
+      return await comandoLigas(discordUserId);
+    case "liga": {
+      const nombre = interaction.data!.options?.find((o) => o.name === "nombre")?.value;
+      if (typeof nombre !== "string" || !nombre.trim()) return mensaje("Dime el nombre de la liga — por ejemplo `/liga Los de siempre`.");
+      return await comandoLiga(discordUserId, nombre);
+    }
+    case "invitacionesliga":
+      return await comandoInvitacionesLiga(discordUserId);
     case "help":
       return comandoHelp();
     default:

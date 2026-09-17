@@ -132,6 +132,26 @@ const COMANDOS = [
     ],
   },
   {
+    name: "ligas",
+    description: "Tus ligas creadas con amigos y tu posición en cada una.",
+  },
+  {
+    name: "liga",
+    description: "Clasificación completa de una de tus ligas (y su reto, si tiene).",
+    options: [
+      {
+        type: 3, // STRING
+        name: "nombre",
+        description: "Nombre de la liga (no hace falta exacto)",
+        required: true,
+      },
+    ],
+  },
+  {
+    name: "invitacionesliga",
+    description: "Invitaciones a ligas que todavía no has aceptado ni rechazado.",
+  },
+  {
     name: "help",
     description: "Qué comandos tiene el bot de Paragon y para qué sirve cada uno.",
   },

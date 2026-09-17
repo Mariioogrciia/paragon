@@ -18,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 import com.paragon.app.data.AmigoRow
 import com.paragon.app.data.League
+import com.paragon.app.data.LeagueInvite
 import com.paragon.app.data.LeaguesRepository
 import com.paragon.app.data.LeaguesResult
 import com.paragon.app.data.LigaRow
@@ -47,6 +49,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
     val leaguesRepository = remember(tokenStore) { LeaguesRepository(tokenStore) }
     var result by remember { mutableStateOf<SocialResult?>(null) }
     var leaguesResult by remember { mutableStateOf<LeaguesResult?>(null) }
+    var invites by remember { mutableStateOf<List<LeagueInvite>>(emptyList()) }
     var selectedTab by remember { mutableIntStateOf(0) }
     val retryCounter = remember { mutableIntStateOf(0) }
     val leaguesRefresh = remember { mutableIntStateOf(0) }
@@ -63,6 +66,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
 
     LaunchedEffect(leaguesRefresh.value) {
         leaguesResult = leaguesRepository.getLeagues()
+        invites = leaguesRepository.getInvites()
     }
 
     Column(
@@ -110,6 +114,23 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
                 ) {
+                    if (invites.isNotEmpty()) {
+                        items(invites, key = { it.id }) { invite ->
+                            LeagueInviteRow(
+                                invite = invite,
+                                onAccept = {
+                                    coroutineScope.launch {
+                                        if (leaguesRepository.acceptInvite(invite.id)) leaguesRefresh.value += 1
+                                    }
+                                },
+                                onDecline = {
+                                    coroutineScope.launch {
+                                        if (leaguesRepository.declineInvite(invite.id)) leaguesRefresh.value += 1
+                                    }
+                                },
+                            )
+                        }
+                    }
                     item {
                         Row(
                             modifier = Modifier
@@ -207,9 +228,9 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
         if (showNewLeagueDialog) {
             NewLeagueDialog(
                 onDismiss = { showNewLeagueDialog = false },
-                onCreate = { name ->
+                onCreate = { name, durationValue, durationUnit ->
                     coroutineScope.launch {
-                        val created = leaguesRepository.createLeague(name)
+                        val created = leaguesRepository.createLeague(name, durationValue, durationUnit)
                         showNewLeagueDialog = false
                         if (created != null) {
                             leaguesRefresh.value += 1
@@ -223,29 +244,101 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
 }
 
 @Composable
-private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String) -> Unit) {
+private fun LeagueInviteRow(invite: LeagueInvite, onAccept: () -> Unit, onDecline: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(12.dp))
+            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .padding(16.dp),
+    ) {
+        Text(invite.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        Text("${invite.ownerName} te ha invitado", color = Muted, fontSize = 12.sp)
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                text = "Aceptar",
+                color = Accent,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp,
+                modifier = Modifier.clickable(onClick = onAccept),
+            )
+            Text(
+                text = "Rechazar",
+                color = Muted,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp,
+                modifier = Modifier.clickable(onClick = onDecline),
+            )
+        }
+    }
+}
+
+private val UNIDADES_DURACION = listOf("dias" to "Días", "semanas" to "Semanas", "meses" to "Meses", "anios" to "Años")
+
+@Composable
+private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, String?) -> Unit) {
     var name by remember { mutableStateOf("") }
+    var durationValue by remember { mutableStateOf("") }
+    var durationUnit by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Surface,
         title = { Text("Nueva liga", color = Foreground, fontWeight = FontWeight.Bold) },
         text = {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { if (it.length <= 60) name = it },
-                placeholder = { Text("Los de siempre") },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = Border,
-                    focusedTextColor = Foreground,
-                    unfocusedTextColor = Foreground,
-                ),
-            )
+            Column {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { if (it.length <= 60) name = it },
+                    placeholder = { Text("Los de siempre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Accent,
+                        unfocusedBorderColor = Border,
+                        focusedTextColor = Foreground,
+                        unfocusedTextColor = Foreground,
+                    ),
+                )
+                Spacer(Modifier.height(12.dp))
+                Text("Duración (opcional)", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Spacer(Modifier.height(6.dp))
+                OutlinedTextField(
+                    value = durationValue,
+                    onValueChange = { if (it.all { c -> c.isDigit() } && it.length <= 3) durationValue = it },
+                    placeholder = { Text("3") },
+                    singleLine = true,
+                    modifier = Modifier.width(80.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Accent,
+                        unfocusedBorderColor = Border,
+                        focusedTextColor = Foreground,
+                        unfocusedTextColor = Foreground,
+                    ),
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    UNIDADES_DURACION.forEach { (value, label) ->
+                        val selected = durationUnit == value
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (selected) Accent else Surface2)
+                                .clickable { durationUnit = if (selected) null else value }
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                        ) {
+                            Text(label, color = if (selected) androidx.compose.ui.graphics.Color.White else Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = { onCreate(name) }, enabled = name.isNotBlank()) {
+            TextButton(
+                onClick = { onCreate(name, durationValue.toIntOrNull(), durationUnit) },
+                enabled = name.isNotBlank(),
+            ) {
                 Text("Crear", color = Accent, fontWeight = FontWeight.SemiBold)
             }
         },

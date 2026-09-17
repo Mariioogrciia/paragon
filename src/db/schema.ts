@@ -586,6 +586,14 @@ export const leagues = pgTable("league", {
   // `null` = sin reto activo. `onDelete: "set null"` porque borrar un juego
   // del catálogo no tiene por qué borrar la liga entera con él.
   challengeGameId: text("challengeGameId").references(() => games.id, { onDelete: "set null" }),
+  // Duración opcional, elegida al crearla — `durationValue`/`durationUnit`
+  // se guardan tal cual (para poder enseñarlos, "3 meses") y `endsAt` ya
+  // calculado (para no repetir esa cuenta en cada consulta). Los tres
+  // `null` = liga sin fecha de fin, la clasificación cuenta desde que se
+  // creó y para siempre.
+  durationValue: integer("durationValue"),
+  durationUnit: text("durationUnit").$type<"dias" | "semanas" | "meses" | "anios">(),
+  endsAt: timestamp("endsAt", { mode: "date" }),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
 
@@ -594,6 +602,12 @@ export const leagueMembers = pgTable(
   {
     leagueId: text("leagueId").notNull().references(() => leagues.id, { onDelete: "cascade" }),
     userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    // "pending" hasta que el invitado la acepta — antes de esto cualquier
+    // amigo invitado aparecía YA en la clasificación sin haber dicho que
+    // sí, igual que si te apuntaran a algo sin preguntarte. Mismo patrón
+    // que `friendships.status` de arriba. El dueño entra directo como
+    // "accepted" (creador, no invitado — ver `createLeague`).
+    status: text("status").$type<"pending" | "accepted">().notNull().default("accepted"),
     joinedAt: timestamp("joinedAt", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.leagueId, t.userId] })],

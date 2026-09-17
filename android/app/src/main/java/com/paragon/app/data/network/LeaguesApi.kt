@@ -6,8 +6,11 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-data class LeagueDto(val id: String, val name: String, val ownerId: String, val memberCount: Int)
+data class LeagueDto(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?)
 data class LeaguesResponse(val leagues: List<LeagueDto>)
+data class LeagueInviteDto(val id: String, val name: String, val ownerId: String, val ownerName: String?)
+data class LeagueInvitesResponse(val invites: List<LeagueInviteDto>)
+data class PendingMemberDto(val userId: String, val handle: String?, val name: String?, val image: String?)
 data class LeagueStandingDto(val userId: String, val handle: String?, val name: String?, val image: String?, val points: Int)
 data class ChallengeStandingDto(
     val userId: String,
@@ -24,10 +27,14 @@ data class LeagueDetailDto(
     val name: String,
     val ownerId: String,
     val isOwner: Boolean,
+    val durationValue: Int?,
+    val durationUnit: String?,
+    val endsAt: String?,
     val standings: List<LeagueStandingDto>,
+    val pendingMembers: List<PendingMemberDto>,
     val challenge: LeagueChallengeDto?,
 )
-data class NewLeagueRequest(val name: String)
+data class NewLeagueRequest(val name: String, val durationValue: Int?, val durationUnit: String?)
 data class AddLeagueMemberRequest(val userId: String)
 data class SetLeagueChallengeRequest(val gameId: String?)
 
@@ -38,6 +45,15 @@ interface LeaguesApi {
 
     @POST("api/mobile/leagues")
     suspend fun createLeague(@Body request: NewLeagueRequest): LeagueDto
+
+    @GET("api/mobile/leagues/invites")
+    suspend fun getInvites(): LeagueInvitesResponse
+
+    @POST("api/mobile/leagues/{id}/accept")
+    suspend fun acceptInvite(@Path("id") id: String)
+
+    @POST("api/mobile/leagues/{id}/decline")
+    suspend fun declineInvite(@Path("id") id: String)
 
     @GET("api/mobile/leagues/{id}")
     suspend fun getLeagueDetail(@Path("id") id: String): LeagueDetailDto

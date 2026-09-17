@@ -298,6 +298,32 @@ export async function setDiscordDmEnabled(userId: string, enabled: boolean): Pro
 }
 
 /**
+ * Avisa por DM de una invitación a una liga (lib/leagues.ts,
+ * `addLeagueMember`) — mismo criterio que el resto de este archivo
+ * (`discordDmEnabled` + Discord vinculado), nunca lanza: un DM que falla
+ * no puede tirar abajo la invitación en sí, que ya se guardó en la base
+ * antes de llamar a esto.
+ */
+export async function anunciarInvitacionLiga(userId: string, leagueName: string, inviterName: string, leagueId: string): Promise<void> {
+  const [row] = await db.select({ activado: users.discordDmEnabled }).from(users).where(eq(users.id, userId)).limit(1);
+  if (!row?.activado) return;
+
+  const discordUserId = await discordUserIdDe(userId);
+  if (!discordUserId) return;
+
+  const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const href = dominio ? `https://${dominio}/ligas/${leagueId}` : undefined;
+
+  await enviarDM(discordUserId, {
+    title: "🏅 Invitación a una liga",
+    description: `${inviterName} te ha invitado a la liga **${leagueName}** en Paragon.`,
+    url: href,
+    color: COLOR_GENERICO,
+    footer: { text: "Paragon" },
+  });
+}
+
+/**
  * Nota privada de `/nota` desde Discord — mismo campo (`userGames.notes`)
  * que ya rellena `saveGameNotesAction` desde la web
  * (app/actions.ts), pero sin sesión de por medio: aquí quien escribe ya se

@@ -33,6 +33,7 @@ import com.paragon.app.data.LeagueDetail
 import com.paragon.app.data.LeagueDetailResult
 import com.paragon.app.data.LeagueStanding
 import com.paragon.app.data.LeaguesRepository
+import com.paragon.app.data.PendingMember
 import com.paragon.app.data.LibraryGame
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.LibraryResult
@@ -147,7 +148,8 @@ private fun LeagueDetailContent(
     onClearChallenge: () -> Unit,
 ) {
     Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-    Text(text = "Clasificación de este mes — solo entre los miembros de esta liga.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 16.dp))
+    Text(text = "Clasificación desde que se creó — solo entre los miembros de esta liga.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+    Text(text = textoDuracion(detail.durationValue, detail.durationUnit, detail.endsAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(bottom = 16.dp))
 
     detail.standings.forEachIndexed { index, member ->
         LeagueStandingRow(member, index + 1)
@@ -156,6 +158,13 @@ private fun LeagueDetailContent(
                 Text("Quitar de la liga", color = Danger, fontSize = 12.sp)
             }
         }
+    }
+
+    if (detail.isOwner && detail.pendingMembers.isNotEmpty()) {
+        Spacer(Modifier.height(16.dp))
+        Text(text = "INVITACIONES SIN RESPONDER", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Spacer(Modifier.height(8.dp))
+        detail.pendingMembers.forEach { pending -> PendingMemberRow(pending, onCancel = { onRemove(pending.userId) }) }
     }
 
     Spacer(Modifier.height(16.dp))
@@ -223,6 +232,54 @@ private fun LeagueDetailContent(
     }
 }
 
+private val ETIQUETA_UNIDAD = mapOf(
+    "dias" to ("día" to "días"),
+    "semanas" to ("semana" to "semanas"),
+    "meses" to ("mes" to "meses"),
+    "anios" to ("año" to "años"),
+)
+
+private fun textoDuracion(value: Int?, unit: String?, endsAt: String?): String {
+    if (endsAt == null) return "Sin fecha de fin."
+    val fecha = try {
+        java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+            .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+            .parse(endsAt)
+            ?.let { java.text.SimpleDateFormat("d 'de' MMMM 'de' yyyy", java.util.Locale("es", "ES")).format(it) }
+    } catch (e: Exception) {
+        null
+    } ?: return "Con fecha de fin."
+
+    val etiqueta = unit?.let { ETIQUETA_UNIDAD[it] }
+    return if (value != null && etiqueta != null) {
+        val (singular, plural) = etiqueta
+        "$value ${if (value == 1) singular else plural} — termina el $fecha."
+    } else {
+        "Termina el $fecha."
+    }
+}
+
+@Composable
+private fun PendingMemberRow(member: PendingMember, onCancel: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface2, RoundedCornerShape(12.dp))
+            .padding(14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column {
+            Text(text = member.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            Text(text = "esperando respuesta", color = Muted, fontSize = 11.sp)
+        }
+        TextButton(onClick = onCancel) {
+            Text("Cancelar", color = Muted, fontSize = 12.sp)
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+}
+
 @Composable
 private fun LeagueStandingRow(member: LeagueStanding, position: Int) {
     Row(
@@ -282,6 +339,9 @@ private fun GamePickerDialog(tokenStore: TokenStore, onDismiss: () -> Unit, onPi
                 is LibraryResult.Error -> Text(current.message, color = Muted, fontSize = 13.sp)
                 is LibraryResult.Ok -> {
                     val filtrados = current.games.filter { it.title.contains(search, ignoreCase = true) }
+                    // Un mismo título puede repetirse (p. ej. en PSN y en Xbox)
+                    // — si se repite, se enseña la plataforma al lado.
+                    val repetidos = current.games.groupingBy { it.title }.eachCount()
                     Column {
                         androidx.compose.material3.OutlinedTextField(
                             value = search,
@@ -299,8 +359,13 @@ private fun GamePickerDialog(tokenStore: TokenStore, onDismiss: () -> Unit, onPi
                         Spacer(Modifier.height(8.dp))
                         LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
                             items(filtrados, key = { it.id }) { game: LibraryGame ->
+                                val etiqueta = if ((repetidos[game.title] ?: 0) > 1 && game.platform.isNotBlank()) {
+                                    "${game.title} (${game.platform.uppercase()})"
+                                } else {
+                                    game.title
+                                }
                                 Text(
-                                    text = game.title,
+                                    text = etiqueta,
                                     color = Foreground,
                                     fontSize = 14.sp,
                                     modifier = Modifier
