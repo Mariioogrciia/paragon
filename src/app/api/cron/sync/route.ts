@@ -34,18 +34,35 @@ import { HORAS_CADUCIDAD } from "@/lib/syncHealth";
 export const maxDuration = 60;
 
 /**
+ * Presupuesto real de tiempo, en ms — no los 60s de `maxDuration` de arriba.
+ *
+ * Hallazgo real del 17 de septiembre de 2026: el cron de verdad
+ * (cron-job.org, cada 15 min) tiene su PROPIO timeout de cliente, fijo en
+ * 30s en el plan gratis (no se puede subir, Vercel sí aguantaría 60s). Con
+ * los topes de abajo en sus valores antiguos, una pasada normal tardaba
+ * 22-44s — por encima de esos 30s casi siempre, así que cron-job.org
+ * cortaba la conexión y marcaba "Fallido (timeout)" aunque Vercel SÍ
+ * terminara bien del todo unos segundos después (confirmado con los logs
+ * reales de Vercel: 200 en 36.9s). El resultado real era el mismo que si de
+ * verdad hubiera fallado: cron-job.org nunca ve el 200, así que desde fuera
+ * parece que el cron "no avanza", aunque el código en sí no tuviera ningún
+ * bug. Con el presupuesto real puesto en 22s (dejando los 8s que faltan
+ * hasta los 30s de cron-job.org de colchón para la ida y vuelta de la
+ * petición en sí, DNS, TLS...) la función tiene que devolver su respuesta
+ * bastante antes de que cron-job.org se rinda.
+ */
+const PRESUPUESTO_MS = 22_000;
+
+/**
  * Cuántas cuentas se intentan como mucho en una pasada.
  *
- * Bajado de 8 a 4 el 11 de septiembre de 2026: con solo ~6 usuarios reales,
- * un tope de 8 no "repartía" nada — cada pasada intentaba resincronizar a
- * TODO el mundo de golpe, y el margen de abajo solo protege ENTRE cuentas,
- * no dentro de una (si `resyncLibraries` de una sola cuenta tarda de más, el
- * chequeo de tiempo no puede hacer nada hasta que termina esa llamada). Con
- * el cron externo llamando cada 15 min de verdad (ver cron-job.org), no hace
- * falta currar tanto en cada pasada — cubre a todos en menos de una hora
- * igual.
+ * Bajado de 4 a 2 el 17 de septiembre de 2026 junto con `PRESUPUESTO_MS`
+ * de arriba: con el presupuesto real ahora en 22s en vez de los ~35s de
+ * antes, currar sobre menos cuentas a la vez es lo que de verdad hace que
+ * la pasada termine a tiempo — el margen de abajo solo protege ENTRE
+ * cuentas, no dentro de una.
  */
-const POR_PASADA = 4;
+const POR_PASADA = 2;
 
 /**
  * Cuántas fichas de juego se rellenan por pasada.
@@ -56,10 +73,10 @@ const POR_PASADA = 4;
  * ha abierto alguna vez. Rellenando unos cuantos por pasada, el histórico se
  * completa solo con el tiempo en vez de depender de que el usuario navegue.
  *
- * Bajado de 40 a 15 el 11 de septiembre de 2026, mismo motivo que arriba —
- * ver el aviso de las 3 pasadas que dieron 504 por pasarse de 60s.
+ * Bajado de 15 a 6 el 17 de septiembre de 2026, mismo motivo que
+ * `PRESUPUESTO_MS` de arriba.
  */
-const DETALLES_POR_PASADA = 15;
+const DETALLES_POR_PASADA = 6;
 
 /**
  * Tope aparte para Xbox dentro de esa misma tanda: OpenXBL (xbl.io) va en un
@@ -68,33 +85,29 @@ const DETALLES_POR_PASADA = 15;
  * lib/xbl/client.ts. Sin este tope, una pasada con muchas fichas de Xbox sin
  * detalle podría agotar el cupo de la hora entera para todo el mundo.
  */
-const XBL_DETALLES_POR_PASADA = 5;
+const XBL_DETALLES_POR_PASADA = 3;
 
 /**
  * Cuántos juegos se intentan clasificar por pasada. Van todos en UNA consulta
  * a IGDB, así que el número puede ser generoso sin gastar cuota — pero
- * bajado de 150 a 60 el 11 de septiembre de 2026: una respuesta más grande
- * de IGDB también tarda más en llegar, y con la función ya al límite de los
- * 60s de Vercel cada segundo cuenta.
+ * bajado de 60 a 30 el 17 de septiembre de 2026, mismo motivo que
+ * `PRESUPUESTO_MS` de arriba: una respuesta más grande de IGDB también
+ * tarda más en llegar, y ahora cada segundo cuenta el doble que antes.
  */
-const PEGI_POR_PASADA = 60;
+const PEGI_POR_PASADA = 30;
 
 /**
  * Margen para cerrar. Si al terminar con una cuenta/ficha/lote queda menos
  * que esto, no se empieza otra: mejor dejarla para la pasada siguiente que
  * que la corten a medias y quede a saber cómo.
  *
- * Subido de 15s a 25s el 11 de septiembre de 2026: encontradas 3 pasadas
- * reales que tardaron ~61s y Vercel las cortó con un 504 (el plan Hobby
- * corta a los 60s en seco, `maxDuration` de arriba) — el margen de 15s no
- * bastaba porque solo protege ENTRE cuentas/juegos, no dentro de uno: si el
- * chequeo pasa con 44s gastados (justo por debajo del tope de entonces,
- * 45s) y la siguiente llamada de red tarda 10-15s de más de lo normal, la
- * función ya se pasa de los 60s sin que ningún chequeo pueda evitarlo. Con
- * 25s de margen el tope de arranque baja a 35s, dejando más aire para ese
- * "uno más" que siempre puede colarse.
+ * Bajado de 25s a 8s el 17 de septiembre de 2026 junto con `PRESUPUESTO_MS`:
+ * con un presupuesto total de 22s, un margen de 25s no dejaría currar nada
+ * en absoluto (el primer chequeo ya fallaría). 8s de margen deja un tope de
+ * arranque de ~14s para cada cuenta/ficha/lote — de sobra visto lo rápido
+ * que responden PSN/Steam/Xbox en la práctica (0,3-1,5s por biblioteca).
  */
-const MARGEN_MS = 25_000;
+const MARGEN_MS = 8_000;
 
 export async function GET(request: Request) {
   const secreto = process.env.CRON_SECRET;
@@ -134,7 +147,7 @@ export async function GET(request: Request) {
   let agotado = false;
 
   for (const fila of pendientes) {
-    if (Date.now() - arranque > (maxDuration * 1000) - MARGEN_MS) {
+    if (Date.now() - arranque > PRESUPUESTO_MS - MARGEN_MS) {
       agotado = true;
       break;
     }
@@ -212,7 +225,7 @@ export async function GET(request: Request) {
     let xboxDetalles = 0;
 
     for (const ficha of sinDetalle) {
-      if (Date.now() - arranque > maxDuration * 1000 - MARGEN_MS) {
+      if (Date.now() - arranque > PRESUPUESTO_MS - MARGEN_MS) {
         agotado = true;
         break;
       }
@@ -261,7 +274,7 @@ export async function GET(request: Request) {
         // pasada siguiente, que es mejor que morir a mitad.
         const encontrados = await pegiPorTitulo(
           sinPegi.map((g) => g.title),
-          arranque + maxDuration * 1000 - MARGEN_MS,
+          arranque + PRESUPUESTO_MS - MARGEN_MS,
         );
 
         for (const juego of sinPegi) {
