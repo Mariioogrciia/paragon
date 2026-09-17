@@ -14,7 +14,8 @@ data class LibraryGameEntity(
     val earnedTotal: Int,
     val isPlatinado: Boolean,
     val lastPlayedAt: String?,
-    val isPinned: Boolean
+    val isPinned: Boolean,
+    val playtimeMinutes: Int? = null,
 ) {
     fun toDomain() = LibraryGame(
         id = id,
@@ -25,6 +26,7 @@ data class LibraryGameEntity(
         earnedTotal = earnedTotal,
         isPlatinado = isPlatinado,
         lastPlayedAt = lastPlayedAt,
-        isPinned = isPinned
+        isPinned = isPinned,
+        playtimeMinutes = playtimeMinutes,
     )
 }

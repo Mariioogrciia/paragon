@@ -18,6 +18,8 @@ import com.paragon.app.data.theme.PlatformColor
 
 internal var isDarkTheme by mutableStateOf(true)
 internal var activePlatformColor by mutableStateOf(PlatformColor.PARAGON)
+internal var activeCustomAccentColor by mutableStateOf<Long?>(null)
+internal var activeDynamicAccentColor by mutableStateOf<Color?>(null)
 
 // --- Oscuro (el de siempre) ---
 private val DarkBackground = Color(0xFF000000)
@@ -96,25 +98,34 @@ val Border: Color get() = if (isDarkTheme) DarkBorder else LightBorder
 val Foreground: Color get() = if (isDarkTheme) DarkForeground else LightForeground
 val Muted: Color get() = if (isDarkTheme) DarkMuted else LightMuted
 
-val Accent: Color get() = when (activePlatformColor) {
-    PlatformColor.PARAGON -> if (isDarkTheme) DarkAccentParagon else LightAccentParagon
-    PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccentPS else LightAccentPS
-    PlatformColor.XBOX -> if (isDarkTheme) DarkAccentXbox else LightAccentXbox
-    PlatformColor.STEAM -> if (isDarkTheme) DarkAccentSteam else LightAccentSteam
+val Accent: Color get() = when {
+    activeCustomAccentColor != null && activeCustomAccentColor != -1L -> Color(activeCustomAccentColor!!)
+    activeDynamicAccentColor != null -> activeDynamicAccentColor!!
+    activePlatformColor == PlatformColor.PARAGON -> if (isDarkTheme) DarkAccentParagon else LightAccentParagon
+    activePlatformColor == PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccentPS else LightAccentPS
+    activePlatformColor == PlatformColor.XBOX -> if (isDarkTheme) DarkAccentXbox else LightAccentXbox
+    activePlatformColor == PlatformColor.STEAM -> if (isDarkTheme) DarkAccentSteam else LightAccentSteam
+    else -> if (isDarkTheme) DarkAccentParagon else LightAccentParagon
 }
 
-val Accent2: Color get() = when (activePlatformColor) {
-    PlatformColor.PARAGON -> if (isDarkTheme) DarkAccent2Paragon else LightAccent2Paragon
-    PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccent2PS else LightAccent2PS
-    PlatformColor.XBOX -> if (isDarkTheme) DarkAccent2Xbox else LightAccent2Xbox
-    PlatformColor.STEAM -> if (isDarkTheme) DarkAccent2Steam else LightAccent2Steam
+val Accent2: Color get() = when {
+    activeCustomAccentColor != null && activeCustomAccentColor != -1L -> Color(activeCustomAccentColor!!).copy(alpha = 0.8f)
+    activeDynamicAccentColor != null -> activeDynamicAccentColor!!.copy(alpha = 0.8f)
+    activePlatformColor == PlatformColor.PARAGON -> if (isDarkTheme) DarkAccent2Paragon else LightAccent2Paragon
+    activePlatformColor == PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccent2PS else LightAccent2PS
+    activePlatformColor == PlatformColor.XBOX -> if (isDarkTheme) DarkAccent2Xbox else LightAccent2Xbox
+    activePlatformColor == PlatformColor.STEAM -> if (isDarkTheme) DarkAccent2Steam else LightAccent2Steam
+    else -> if (isDarkTheme) DarkAccent2Paragon else LightAccent2Paragon
 }
 
-val AccentSoft: Color get() = when (activePlatformColor) {
-    PlatformColor.PARAGON -> if (isDarkTheme) DarkAccentSoftParagon else LightAccentSoftParagon
-    PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccentSoftPS else LightAccentSoftPS
-    PlatformColor.XBOX -> if (isDarkTheme) DarkAccentSoftXbox else LightAccentSoftXbox
-    PlatformColor.STEAM -> if (isDarkTheme) DarkAccentSoftSteam else LightAccentSoftSteam
+val AccentSoft: Color get() = when {
+    activeCustomAccentColor != null && activeCustomAccentColor != -1L -> Color(activeCustomAccentColor!!).copy(alpha = 0.15f)
+    activeDynamicAccentColor != null -> activeDynamicAccentColor!!.copy(alpha = 0.15f)
+    activePlatformColor == PlatformColor.PARAGON -> if (isDarkTheme) DarkAccentSoftParagon else LightAccentSoftParagon
+    activePlatformColor == PlatformColor.PLAYSTATION -> if (isDarkTheme) DarkAccentSoftPS else LightAccentSoftPS
+    activePlatformColor == PlatformColor.XBOX -> if (isDarkTheme) DarkAccentSoftXbox else LightAccentSoftXbox
+    activePlatformColor == PlatformColor.STEAM -> if (isDarkTheme) DarkAccentSoftSteam else LightAccentSoftSteam
+    else -> if (isDarkTheme) DarkAccentSoftParagon else LightAccentSoftParagon
 }
 
 // Trophy Grades

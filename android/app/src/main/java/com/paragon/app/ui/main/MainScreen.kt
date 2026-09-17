@@ -331,7 +331,10 @@ fun MainScreen(
             composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, themeStore, profile, stats) }
             composable(Screen.Library.route) {
                 LibraryScreen(
-                    navController, tokenStore, searchQuery,
+                    navController = navController,
+                    tokenStore = tokenStore,
+                    themeStore = themeStore,
+                    searchQuery = searchQuery,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )

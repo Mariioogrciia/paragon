@@ -40,6 +40,7 @@ data class GameDetailData(
     val percent: Int,
     val isPinned: Boolean,
     val notes: String,
+    val playtimeMinutes: Int?,
     val trophies: List<TrophyItem>,
 )
 
@@ -77,6 +78,7 @@ private fun GameDetailDto.toGameDetailData(): GameDetailData = GameDetailData(
     percent = progressPercent,
     isPinned = isPinned ?: false,
     notes = notes ?: "",
+    playtimeMinutes = playtimeMinutes,
     trophies = trophies.map {
         TrophyItem(
             id = it.id,
@@ -107,6 +109,7 @@ private fun GameDetailData.toCachedEntity() = CachedGameDetailEntity(
     percent = percent,
     notes = notes,
     trophiesJson = trophyListAdapter.toJson(trophies),
+    playtimeMinutes = playtimeMinutes,
 )
 
 private fun CachedGameDetailEntity.toDomain() = GameDetailData(
@@ -118,6 +121,7 @@ private fun CachedGameDetailEntity.toDomain() = GameDetailData(
     percent = percent,
     isPinned = true, // solo se cachea el juego anclado (ver FocusScreen)
     notes = notes,
+    playtimeMinutes = playtimeMinutes,
     trophies = trophyListAdapter.fromJson(trophiesJson) ?: emptyList(),
 )
 
@@ -266,6 +270,7 @@ class GameDetailRepository(
             percent = (earned * 100) / trophies.size,
             isPinned = false,
             notes = "",
+            playtimeMinutes = 4260,
             trophies = trophies,
         )
     }

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [LibraryGameEntity::class, CachedGameDetailEntity::class, PendingNoteEntity::class, StuckTrophyEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class ParagonDatabase : RoomDatabase() {

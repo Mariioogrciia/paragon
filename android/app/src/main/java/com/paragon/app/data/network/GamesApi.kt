@@ -28,6 +28,7 @@ data class GameDetailDto(
     val earnedTotal: Int,
     val isPinned: Boolean?,
     val notes: String?,
+    val playtimeMinutes: Int?,
     val trophies: List<TrophyDto>,
 )
 

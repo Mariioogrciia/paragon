@@ -367,6 +367,19 @@ private fun GameDetailHero(
                             .background(dynamicColor, RoundedCornerShape(4.dp)),
                     )
                 }
+                // Total acumulado, no por sesión — la plataforma no da más
+                // detalle que eso (ver el comentario de horasPorJuego en
+                // lib/profileStats.ts, en el proyecto Next.js). `null` si la
+                // plataforma no lo reporta (algunos juegos manuales, o
+                // cuentas recién vinculadas sin sincronizar del todo).
+                game.playtimeMinutes?.let { minutos ->
+                    Text(
+                        text = "${minutos / 60}h jugadas",
+                        color = Muted,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
             }
         }
     }

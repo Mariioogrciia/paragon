@@ -36,11 +36,23 @@ class ThemeStore(context: Context) {
         if (prefs.contains(KEY_TARGET_PLATINUMS)) prefs.getInt(KEY_TARGET_PLATINUMS, 0) else null
     )
 
+    // Configuración Visual Avanzada
+    private var currentUseDynamicColor by mutableStateOf(prefs.getBoolean(KEY_USE_DYNAMIC_COLOR, false))
+    private var currentCustomAccentColor by mutableStateOf(
+        if (prefs.contains(KEY_CUSTOM_ACCENT_COLOR)) prefs.getLong(KEY_CUSTOM_ACCENT_COLOR, -1L) else null
+    )
+    private var currentFontFamily by mutableStateOf(prefs.getInt(KEY_FONT_FAMILY, 0))
+    private var currentLibraryLayout by mutableStateOf(prefs.getInt(KEY_LIBRARY_LAYOUT, 0))
+
     val mode: ThemeMode get() = current
     val platform: PlatformColor get() = currentPlatform
     val zenMode: Boolean get() = isZenModeEnabled
     val rivalHandle: String? get() = currentRivalHandle
     val targetPlatinums: Int? get() = currentTargetPlatinums
+    val useDynamicColor: Boolean get() = currentUseDynamicColor
+    val customAccentColor: Long? get() = currentCustomAccentColor
+    val fontFamily: Int get() = currentFontFamily
+    val libraryLayout: Int get() = currentLibraryLayout
 
     init {
         // Por si el icono real del launcher se quedó desincronizado de la
@@ -99,11 +111,39 @@ class ThemeStore(context: Context) {
         }
     }
 
+    fun setUseDynamicColor(value: Boolean) {
+        currentUseDynamicColor = value
+        prefs.edit().putBoolean(KEY_USE_DYNAMIC_COLOR, value).apply()
+    }
+
+    fun setCustomAccentColor(value: Long?) {
+        currentCustomAccentColor = value
+        if (value == null) {
+            prefs.edit().remove(KEY_CUSTOM_ACCENT_COLOR).apply()
+        } else {
+            prefs.edit().putLong(KEY_CUSTOM_ACCENT_COLOR, value).apply()
+        }
+    }
+
+    fun setFontFamily(value: Int) {
+        currentFontFamily = value
+        prefs.edit().putInt(KEY_FONT_FAMILY, value).apply()
+    }
+
+    fun setLibraryLayout(value: Int) {
+        currentLibraryLayout = value
+        prefs.edit().putInt(KEY_LIBRARY_LAYOUT, value).apply()
+    }
+
     companion object {
         private const val KEY_MODE = "mode"
         private const val KEY_PLATFORM = "platform"
         private const val KEY_ZEN_MODE = "zen_mode"
         private const val KEY_RIVAL_HANDLE = "rival_handle"
         private const val KEY_TARGET_PLATINUMS = "target_platinums"
+        private const val KEY_USE_DYNAMIC_COLOR = "use_dynamic_color"
+        private const val KEY_CUSTOM_ACCENT_COLOR = "custom_accent_color"
+        private const val KEY_FONT_FAMILY = "font_family"
+        private const val KEY_LIBRARY_LAYOUT = "library_layout"
     }
 }

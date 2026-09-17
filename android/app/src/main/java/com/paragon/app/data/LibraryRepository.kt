@@ -23,6 +23,8 @@ data class LibraryGame(
     val isPlatinado: Boolean,
     val lastPlayedAt: String?,
     val isPinned: Boolean = false,
+    /** Total acumulado, no por sesión — mismo dato que `horasPorJuego` en la web. `null` si la plataforma no lo da. */
+    val playtimeMinutes: Int? = null,
     // Solo relleno al venir de red (toLibraryGame) — "" al salir de la
     // caché local (LibraryGameEntity no lo guarda, ver data/local/). Basta
     // para el picker de reto de ligas (siempre pide la biblioteca por red),
@@ -57,6 +59,7 @@ private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     isPlatinado = (earned?.platinum ?: 0) > 0,
     lastPlayedAt = lastPlayedAt,
     isPinned = isPinned ?: false,
+    playtimeMinutes = playtimeMinutes,
     platform = platform,
 )
 
@@ -69,7 +72,8 @@ private fun LibraryGame.toEntity() = com.paragon.app.data.local.LibraryGameEntit
     earnedTotal = earnedTotal,
     isPlatinado = isPlatinado,
     lastPlayedAt = lastPlayedAt,
-    isPinned = isPinned
+    isPinned = isPinned,
+    playtimeMinutes = playtimeMinutes,
 )
 
 class LibraryRepository(

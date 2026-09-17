@@ -20,6 +20,7 @@ data class LibraryGameDto(
     val isWishlist: Boolean,
     val isPinned: Boolean?,
     val lastPlayedAt: String?,
+    val playtimeMinutes: Int?,
 )
 
 data class LibraryResponse(val games: List<LibraryGameDto>)

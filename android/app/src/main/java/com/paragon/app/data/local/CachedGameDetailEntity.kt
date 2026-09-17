@@ -20,6 +20,7 @@ data class CachedGameDetailEntity(
     val percent: Int,
     val notes: String,
     val trophiesJson: String,
+    val playtimeMinutes: Int? = null,
 )
 
 /**

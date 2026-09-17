@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -203,12 +204,21 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text("APARIENCIA", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text("APARIENCIA Y PERSONALIZACIÓN", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
             ThemePicker(themeStore = themeStore)
             
             Spacer(modifier = Modifier.height(12.dp))
             PlatformPicker(themeStore = themeStore)
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            DynamicColorToggle(themeStore = themeStore)
+
+            Spacer(modifier = Modifier.height(12.dp))
+            CustomColorPicker(themeStore = themeStore)
+
+            Spacer(modifier = Modifier.height(12.dp))
+            FontFamilyPicker(themeStore = themeStore)
 
             Spacer(modifier = Modifier.height(32.dp))
             
@@ -343,6 +353,121 @@ private fun PlatformPicker(themeStore: ThemeStore) {
                     text = label,
                     color = if (selected) Color.White else Muted,
                     fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DynamicColorToggle(themeStore: ThemeStore) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Surface, RoundedCornerShape(14.dp))
+                .border(1.dp, Border, RoundedCornerShape(14.dp))
+                .clickable { themeStore.setUseDynamicColor(!themeStore.useDynamicColor) }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                Text("Material You (Colores Dinámicos)", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text("Extrae los colores de tu fondo de pantalla", color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
+            }
+            androidx.compose.material3.Switch(
+                checked = themeStore.useDynamicColor,
+                onCheckedChange = { themeStore.setUseDynamicColor(it) },
+                colors = androidx.compose.material3.SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = Accent,
+                )
+            )
+        }
+    }
+}
+
+private val CUSTOM_COLORS = listOf(
+    -1L to "Auto",
+    0xFFFF3B30 to "Rojo",
+    0xFFFF9500 to "Naranja",
+    0xFFFFCC00 to "Amarillo",
+    0xFF4CD964 to "Verde",
+    0xFF5AC8FA to "Celeste",
+    0xFF007AFF to "Azul",
+    0xFF5856D6 to "Violeta",
+    0xFFFF2D55 to "Rosa"
+)
+
+@Composable
+private fun CustomColorPicker(themeStore: ThemeStore) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(14.dp))
+            .border(1.dp, Border, RoundedCornerShape(14.dp))
+            .padding(16.dp)
+    ) {
+        Text("Color de Acento Personalizado", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CUSTOM_COLORS.forEach { (colorValue, label) ->
+                val isSelected = (themeStore.customAccentColor ?: -1L) == colorValue
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(if (colorValue == -1L) Surface2 else Color(colorValue))
+                        .border(if (isSelected) 3.dp else 1.dp, if (isSelected) Foreground else Border, CircleShape)
+                        .clickable { themeStore.setCustomAccentColor(if (colorValue == -1L) null else colorValue) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (colorValue == -1L) {
+                        Text("X", color = Muted, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private val FONT_OPTIONS = listOf(
+    0 to "Moderna",
+    1 to "Elegante",
+    2 to "Retro",
+    3 to "Casual"
+)
+
+@Composable
+private fun FontFamilyPicker(themeStore: ThemeStore) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(14.dp))
+            .border(1.dp, Border, RoundedCornerShape(14.dp))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        FONT_OPTIONS.forEach { (fontIndex, label) ->
+            val selected = themeStore.fontFamily == fontIndex
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(if (selected) Accent else Color.Transparent)
+                    .clickable { themeStore.setFontFamily(fontIndex) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = label,
+                    color = if (selected) Color.White else Muted,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
             }

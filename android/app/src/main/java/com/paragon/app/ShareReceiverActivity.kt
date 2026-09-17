@@ -29,7 +29,7 @@ class ShareReceiverActivity : ComponentActivity() {
         val initialQuery = extractQuery(intent)
 
         setContent {
-            ParagonTheme(mode = themeStore.mode, platform = themeStore.platform) {
+            ParagonTheme(themeStore = themeStore) {
                 ShareAddScreen(
                     tokenStore = tokenStore,
                     initialQuery = initialQuery,

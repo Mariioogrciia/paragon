@@ -29,8 +29,12 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.filterByStatus
 import com.paragon.app.ui.navigation.Screen
 import com.paragon.app.ui.panel.StandardGameCard
+import com.paragon.app.ui.panel.HeroGameCard
 import com.paragon.app.ui.theme.*
+import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.util.rememberShakeListener
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.GridView
 
 private val FILTERS = listOf(
     LibraryFilter.TODOS to "Todos",
@@ -47,6 +51,7 @@ private val FILTERS = listOf(
 fun LibraryScreen(
     navController: NavController,
     tokenStore: TokenStore,
+    themeStore: ThemeStore,
     searchQuery: String = "",
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -132,6 +137,17 @@ fun LibraryScreen(
                         }
                     }
                 }
+                
+                // Toggle Vista (Grid / Lista)
+                IconButton(onClick = { 
+                    themeStore.setLibraryLayout(if (themeStore.libraryLayout == 0) 1 else 0) 
+                }) {
+                    Icon(
+                        if (themeStore.libraryLayout == 0) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
+                        contentDescription = "Cambiar Vista",
+                        tint = Muted
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -202,20 +218,28 @@ fun LibraryScreen(
                         Text(text = "Nada por aquí todavía.", color = Muted, fontSize = 14.sp)
                     }
                 } else {
+                    val isList = themeStore.libraryLayout == 1
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
+                        columns = GridCells.Fixed(if (isList) 1 else 2),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                         contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
                         items(games) { game ->
-                            StandardGameCard(
-                                game = game.toGameProgress(),
-                                onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
-                                sharedTransitionScope = sharedTransitionScope,
-                                animatedVisibilityScope = animatedVisibilityScope,
-                            )
+                            if (isList) {
+                                HeroGameCard(
+                                    game = game.toGameProgress(),
+                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) }
+                                )
+                            } else {
+                                StandardGameCard(
+                                    game = game.toGameProgress(),
+                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                )
+                            }
                         }
                     }
                 }
