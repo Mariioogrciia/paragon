@@ -2,11 +2,15 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
+import com.paragon.app.data.network.FeedCommentDto
 import com.paragon.app.data.network.FeedItemDto
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+
+/** Un comentario ya existente en una publicación — de momento solo lectura, no hay POST desde la app todavía. */
+data class FeedComment(val body: String, val userName: String, val timeAgo: String)
 
 /** Actividad propia + amigos (FeedScreen) — ver GET /api/mobile/feed en API-CONTRACT.md. */
 data class FeedItem(
@@ -20,6 +24,7 @@ data class FeedItem(
     val reacted: Boolean,
     val timeAgo: String,
     val userHandle: String,
+    val comments: List<FeedComment> = emptyList(),
 )
 
 sealed class FeedResult {
@@ -70,6 +75,13 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     reacted = reacted,
     timeAgo = relativeTimeEs(createdAt),
     userHandle = user.handle ?: "",
+    comments = comments.map { it.toFeedComment() },
+)
+
+private fun FeedCommentDto.toFeedComment() = FeedComment(
+    body = body,
+    userName = userName,
+    timeAgo = relativeTimeEs(createdAt),
 )
 
 class FeedRepository(private val tokenStore: TokenStore? = null) {

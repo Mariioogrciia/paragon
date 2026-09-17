@@ -8,6 +8,7 @@ import retrofit2.http.Path
 // DTOs de este paquete: KotlinJsonAdapterFactory los lee por reflexión.
 data class FeedUserDto(val id: String, val handle: String?, val name: String?, val image: String?)
 data class FeedGameDto(val id: String, val title: String, val iconUrl: String?, val deviceLabel: String?)
+data class FeedCommentDto(val activityId: String, val body: String, val userName: String, val createdAt: String)
 
 data class FeedItemDto(
     val id: String,
@@ -19,6 +20,7 @@ data class FeedItemDto(
     val game: FeedGameDto,
     val reactions: Int,
     val reacted: Boolean,
+    val comments: List<FeedCommentDto> = emptyList(),
 )
 
 data class FeedResponse(val items: List<FeedItemDto>)

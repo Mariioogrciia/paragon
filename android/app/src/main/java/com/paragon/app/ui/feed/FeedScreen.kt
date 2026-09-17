@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -223,6 +224,39 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                     fontWeight = if (reacted) FontWeight.SemiBold else FontWeight.Normal,
                     modifier = Modifier.padding(top = 8.dp),
                 )
+            }
+            if (item.comments.isNotEmpty()) {
+                Column(modifier = Modifier.padding(top = 10.dp)) {
+                    HorizontalDivider(color = Border, modifier = Modifier.padding(bottom = 8.dp))
+                    // Los 2 más recientes, estilo Instagram — el resto solo
+                    // como contador, no hace falta desplegar 20 comentarios
+                    // en medio del Feed. Todavía sin poder escribir uno
+                    // desde la app (solo lectura, ver API-CONTRACT.md).
+                    item.comments.takeLast(2).forEach { comment ->
+                        Row(modifier = Modifier.padding(vertical = 2.dp)) {
+                            Text(
+                                text = comment.userName,
+                                color = Foreground,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(
+                                text = "  ${comment.body}",
+                                color = Muted,
+                                fontSize = 12.sp,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+                    if (item.comments.size > 2) {
+                        Text(
+                            text = "Ver los ${item.comments.size} comentarios",
+                            color = Muted,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                    }
+                }
             }
         }
 

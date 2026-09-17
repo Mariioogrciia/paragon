@@ -75,6 +75,7 @@ import com.paragon.app.ui.game.GameDetailScreen
 import com.paragon.app.ui.library.LibraryScreen
 import com.paragon.app.ui.navigation.Screen
 import com.paragon.app.ui.panel.PanelScreen
+import com.paragon.app.ui.panel.RachaSheet
 import com.paragon.app.ui.social.SocialScreen
 import com.paragon.app.ui.settings.SettingsScreen
 import com.paragon.app.ui.settings.LinkedAccountsScreen
@@ -112,6 +113,7 @@ fun MainScreen(
     val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
     var bottomBarVisible by rememberSaveable { mutableStateOf(true) }
+    var showRachaSheet by remember { mutableStateOf(false) }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -177,7 +179,7 @@ fun MainScreen(
                         letterSpacing = 2.sp
                     )
                     Spacer(Modifier.weight(1f))
-                    StreakChip(racha = racha, onClick = { navController.navigate(Screen.Stats.route) })
+                    StreakChip(racha = racha, onClick = { showRachaSheet = true })
                     IconButton(onClick = { isSearchActive = true }) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -391,6 +393,10 @@ fun MainScreen(
             }
         }
         }
+    }
+
+    if (showRachaSheet) {
+        RachaSheet(tokenStore = tokenStore, onDismiss = { showRachaSheet = false })
     }
 }
 
