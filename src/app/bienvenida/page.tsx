@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { HandleForm, LinkPsnForm, LinkSteamForm } from "@/components/forms/Forms";
+import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm } from "@/components/forms/Forms";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 
 export const metadata = { title: "Bienvenida · Paragon" };
@@ -88,6 +88,13 @@ export default async function BienvenidaPage() {
               En Steam, «Mi perfil» y «Detalles del juego» tienen que estar en
               público para que se puedan leer los logros.
             </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
+              Xbox · tu Gamertag
+            </label>
+            <LinkXboxForm current={accountFor(profile, "xbox")?.username} />
           </div>
         </div>
       </section>
