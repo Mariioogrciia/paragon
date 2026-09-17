@@ -45,8 +45,10 @@ import com.paragon.app.data.theme.ThemeStore
 /** Amigos y Liga reales contra GET /api/mobile/social (SocialRepository) — dos listas distintas, no la misma con otro orden. */
 @Composable
 fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit) {
-    val repository = remember(tokenStore) { SocialRepository(tokenStore) }
-    val leaguesRepository = remember(tokenStore) { LeaguesRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
+    val repository = remember(tokenStore, cacheDao) { SocialRepository(tokenStore, cacheDao) }
+    val leaguesRepository = remember(tokenStore, cacheDao) { LeaguesRepository(tokenStore, cacheDao) }
     var result by remember { mutableStateOf<SocialResult?>(null) }
     var leaguesResult by remember { mutableStateOf<LeaguesResult?>(null) }
     var invites by remember { mutableStateOf<List<LeagueInvite>>(emptyList()) }
@@ -114,6 +116,9 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
                 ) {
+                    if (current.fromCache) {
+                        item { OfflineBanner() }
+                    }
                     if (invites.isNotEmpty()) {
                         items(invites, key = { it.id }) { invite ->
                             LeagueInviteRow(
@@ -187,6 +192,9 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
                     ) {
+                        if (current.fromCache) {
+                            item { OfflineBanner() }
+                        }
                         if (selectedTab == 0) {
                             itemsIndexed(current.data.liga, key = { _, row -> row.userId }) { index, row ->
                                 SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
@@ -241,6 +249,16 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
             )
         }
     }
+}
+
+/** Mismo aviso que Biblioteca/Panel/Ficha de juego/Comunidad cuando se sirve la caché de respaldo. */
+@Composable
+private fun OfflineBanner() {
+    Text(
+        text = "Sin conexión — mostrando la última copia guardada",
+        color = Muted,
+        fontSize = 11.sp,
+    )
 }
 
 @Composable

@@ -1,10 +1,15 @@
 package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.local.SimpleCacheDao
+import com.paragon.app.data.local.SimpleCacheEntity
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.FeedCommentDto
 import com.paragon.app.data.network.FeedItemDto
 import com.paragon.app.data.network.NewCommentRequest
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -30,7 +35,7 @@ data class FeedItem(
 )
 
 sealed class FeedResult {
-    data class Ok(val items: List<FeedItem>) : FeedResult()
+    data class Ok(val items: List<FeedItem>, val fromCache: Boolean = false) : FeedResult()
     data class Error(val message: String) : FeedResult()
 }
 
@@ -87,18 +92,33 @@ private fun FeedCommentDto.toFeedComment() = FeedComment(
     timeAgo = relativeTimeEs(createdAt),
 )
 
-class FeedRepository(private val tokenStore: TokenStore? = null) {
+private const val CACHE_KEY = "feed_items"
+private val feedMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+private val feedListAdapter = feedMoshi.adapter<List<FeedItem>>(
+    Types.newParameterizedType(List::class.java, FeedItem::class.java)
+)
+
+class FeedRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
+    /** Red primero, caché de respaldo (mismo patrón que Library/Panel/GameDetail) — Comunidad se quedaba en blanco sin conexión. */
     suspend fun getFeed(): FeedResult {
         val store = tokenStore ?: return FeedResult.Error("Sin sesión.")
 
         return try {
             val response = ApiClient.feedApi(store).getFeed()
-            FeedResult.Ok(response.items.map { it.toFeedItem() })
+            val items = response.items.map { it.toFeedItem() }
+            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, feedListAdapter.toJson(items)))
+            FeedResult.Ok(items)
         } catch (e: HttpException) {
-            FeedResult.Error("El servidor respondió con un error (${e.code()}).")
+            cachedFeed() ?: FeedResult.Error("El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {
-            FeedResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedFeed() ?: FeedResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
+    }
+
+    private suspend fun cachedFeed(): FeedResult.Ok? {
+        val json = cacheDao?.get(CACHE_KEY) ?: return null
+        val items = try { feedListAdapter.fromJson(json) } catch (e: Exception) { null } ?: return null
+        return FeedResult.Ok(items, fromCache = true)
     }
 
     /** Alterna la reacción a una publicación — `null` si falla la llamada (quien la usa ya pinta en optimista antes). */

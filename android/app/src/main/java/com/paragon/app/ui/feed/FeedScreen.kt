@@ -59,7 +59,9 @@ import com.paragon.app.data.theme.ThemeStore
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit) {
-    val repository = remember(tokenStore) { FeedRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
+    val repository = remember(tokenStore, cacheDao) { FeedRepository(tokenStore, cacheDao) }
     var result by remember { mutableStateOf<FeedResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
     var isInitialLoading by remember { mutableStateOf(true) }
@@ -94,8 +96,17 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
             color = Foreground,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
+            modifier = Modifier.padding(top = 16.dp, bottom = if ((result as? FeedResult.Ok)?.fromCache == true) 4.dp else 24.dp)
         )
+
+        if ((result as? FeedResult.Ok)?.fromCache == true) {
+            Text(
+                text = "Sin conexión — mostrando la última copia guardada",
+                color = Muted,
+                fontSize = 11.sp,
+                modifier = Modifier.padding(bottom = 24.dp),
+            )
+        }
 
         when (val current = result) {
             null -> {

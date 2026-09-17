@@ -1,10 +1,15 @@
 package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.local.SimpleCacheDao
+import com.paragon.app.data.local.SimpleCacheEntity
 import com.paragon.app.data.network.AddLeagueMemberRequest
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.NewLeagueRequest
 import com.paragon.app.data.network.SetLeagueChallengeRequest
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
 
 /** Ligas propias del usuario (SocialScreen, pestaña "Mis Ligas") — DISTINTAS de la Liga Mensual global. */
@@ -43,7 +48,7 @@ data class LeagueDetail(
 )
 
 sealed class LeaguesResult {
-    data class Ok(val leagues: List<League>) : LeaguesResult()
+    data class Ok(val leagues: List<League>, val fromCache: Boolean = false) : LeaguesResult()
     data class Error(val message: String) : LeaguesResult()
 }
 
@@ -52,15 +57,30 @@ sealed class LeagueDetailResult {
     data class Error(val message: String) : LeagueDetailResult()
 }
 
-class LeaguesRepository(private val tokenStore: TokenStore? = null) {
+private const val CACHE_KEY = "leagues_list"
+private val leaguesMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+private val leaguesListAdapter = leaguesMoshi.adapter<List<League>>(
+    Types.newParameterizedType(List::class.java, League::class.java)
+)
+
+class LeaguesRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
+    /** Red primero, caché de respaldo — solo la lista de "Mis Ligas", no el detalle de cada una (ver getLeagueDetail). */
     suspend fun getLeagues(): LeaguesResult {
         val store = tokenStore ?: return LeaguesResult.Error("Sin sesión.")
         return try {
             val response = ApiClient.leaguesApi(store).getLeagues()
-            LeaguesResult.Ok(response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt) })
+            val leagues = response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt) }
+            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, leaguesListAdapter.toJson(leagues)))
+            LeaguesResult.Ok(leagues)
         } catch (e: Exception) {
-            LeaguesResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedLeagues() ?: LeaguesResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
+    }
+
+    private suspend fun cachedLeagues(): LeaguesResult.Ok? {
+        val json = cacheDao?.get(CACHE_KEY) ?: return null
+        val leagues = try { leaguesListAdapter.fromJson(json) } catch (e: Exception) { null } ?: return null
+        return LeaguesResult.Ok(leagues, fromCache = true)
     }
 
     /** Invitaciones a ligas todavía sin responder — vacía si falla la llamada, no hay nada mejor que mostrar en ese caso. */
