@@ -47,6 +47,21 @@ solo como dato (no como función) para que el icono de racha de la cabecera
 no obligue a pedir todo el endpoint de Estadísticas en cada apertura de la
 app; `actual` es 0 si no se ha sacado ningún trofeo hoy o ayer.
 
+## `GET /api/mobile/racha` — Detalle de la racha diaria
+
+```json
+{
+  "actual": 4, "mejor": 12, "diasActivos": 88,
+  "dias": [ { "dia": "2026-08-14", "trofeos": 0 }, { "dia": "2026-08-15", "trofeos": 3 } ]
+}
+```
+Para la pantalla dedicada que se abre al tocar el icono de fuego del
+Panel — no la Estadísticas completa. `dias` son los últimos 35 (5
+semanas), pensados para una tira visual, no el heatmap de 365 días de la
+web. `actual`/`mejor`/`diasActivos` son el mismo cálculo que
+`GET /api/mobile/stats` y que el propio Panel (duplicado como dato en los
+tres sitios a propósito, ver la nota en `panel/route.ts`).
+
 ## `GET /api/mobile/panel/highlights` — "A un paso del platino" y "Recientes"
 
 ```json
