@@ -41,6 +41,7 @@
     "react-intersection-observer": "^11.0.1",
     "rss-parser": "^3.13.0",
     "server-only": "^0.0.1",
+    "sharp": "^0.35.4",
     "tweetnacl": "^1.0.3",
     "web-push": "^3.6.7"
   },

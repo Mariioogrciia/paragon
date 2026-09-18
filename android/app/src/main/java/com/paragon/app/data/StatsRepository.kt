@@ -17,6 +17,9 @@ data class ParagonScorePlataformaStats(val platform: String, val puntos: Int, va
 data class TrophyDnaEje(val key: String, val label: String, val valor: Int, val trofeos: Int)
 data class TrophyDnaStats(val ejes: List<TrophyDnaEje>, val arquetipo: String?)
 
+/** Distinto de `arquetipo` (ese es de GÉNERO) — mide CÓMO se cazan trofeos. */
+data class EstiloDeCazaStats(val nombre: String, val descripcion: String)
+
 data class RachasStats(val actual: Int, val mejor: Int, val diasActivos: Int)
 
 data class MejorMesStats(val mes: String, val total: Int)
@@ -47,6 +50,7 @@ data class HitosStats(
 data class ParagonStats(
     val paragonScore: ParagonScoreStats,
     val trophyDna: TrophyDnaStats,
+    val estiloDeCaza: EstiloDeCazaStats?,
     val rachas: RachasStats,
     val historico: HistoricoStats,
     val financiero: FinancieroStats,
@@ -70,6 +74,7 @@ private fun StatsResponse.toParagonStats() = ParagonStats(
         ejes = trophyDna.ejes.map { TrophyDnaEje(it.key, it.label, it.valor, it.trofeos) },
         arquetipo = trophyDna.arquetipo,
     ),
+    estiloDeCaza = estiloDeCaza?.let { EstiloDeCazaStats(it.nombre, it.descripcion) },
     rachas = RachasStats(rachas.actual, rachas.mejor, rachas.diasActivos),
     historico = HistoricoStats(
         conFecha = historico.conFecha,

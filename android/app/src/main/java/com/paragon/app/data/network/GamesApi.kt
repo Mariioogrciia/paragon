@@ -39,7 +39,11 @@ data class PinResponse(val pinned: Boolean)
 data class ReserveResponse(val reservado: Boolean)
 data class NotesRequest(val notes: String)
 data class OkResponse(val ok: Boolean)
-data class ResyncResponse(val nuevos: Int, val error: String? = null)
+// `platinoNuevo` viene null salvo que esta llamada haya descubierto un
+// platino de verdad nuevo (no en la primera sincronización) — para la
+// celebración en el momento en Modo Enfoque/Ficha de juego.
+data class PlatinoNuevoDto(val nombre: String, val iconUrl: String?)
+data class ResyncResponse(val nuevos: Int, val error: String? = null, val platinoNuevo: PlatinoNuevoDto? = null)
 
 interface GamesApi {
     /** Ver src/app/api/mobile/games/[gameId]/route.ts en el proyecto Next.js. */

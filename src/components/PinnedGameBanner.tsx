@@ -1,6 +1,30 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
+
+/** Cuenta de 0 al valor real en ~700ms al montar — mismo criterio que el
+ * contador del Paragon Score y las barras de progreso del Panel en
+ * Android: un número que aparece ya hecho se lee, pero contarlo hace que
+ * el ojo se pare un segundo justo donde interesa. */
+function useCountUp(target: number, durationMs = 700): number {
+  const [valor, setValor] = useState(0);
+  useEffect(() => {
+    let inicio: number | null = null;
+    let frame: number;
+    function paso(t: number) {
+      if (inicio === null) inicio = t;
+      const progreso = Math.min(1, (t - inicio) / durationMs);
+      setValor(Math.round(progreso * target));
+      if (progreso < 1) frame = requestAnimationFrame(paso);
+    }
+    frame = requestAnimationFrame(paso);
+    return () => cancelAnimationFrame(frame);
+  }, [target, durationMs]);
+  return valor;
+}
 
 /**
  * Banner del "objetivo actual" en el perfil — el juego que su dueño ha
@@ -11,17 +35,42 @@ import { coverGradient } from "@/lib/design";
  * dueño que para quien visita — es precisamente a la visita a quien va
  * dirigido el aviso.
  */
-export function PinnedGameBanner({ game, handle }: { game: Game; handle: string }) {
+export function PinnedGameBanner({
+  game,
+  handle,
+  aura,
+}: {
+  game: Game;
+  handle: string;
+  /** "Game Aura" — color dominante de la carátula (`lib/coverAura.ts`),
+   * `null` sin calcular todavía o si no se pudo. Solo tiñe un halo de
+   * fondo detrás del degradado dorado de siempre — el dorado se queda
+   * igual (significa "esto lo elegiste tú", no un cálculo), el aura solo
+   * añade la atmósfera propia de ESTE juego. */
+  aura?: string | null;
+}) {
   const href = `/u/${handle}/${game.id}`;
   const faltan = Math.max(0, game.definedTotal - game.earnedTotal);
+  const porcentaje = useCountUp(game.progressPercent);
+  // Barra de progreso propia (antes no había ninguna en este banner, solo
+  // el aro con el número) — se anima igual que el número, de 0 al valor
+  // real, en vez de aparecer ya llena.
+  const [anchoBarra, setAnchoBarra] = useState(0);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setAnchoBarra(game.progressPercent));
+    return () => cancelAnimationFrame(id);
+  }, [game.progressPercent]);
 
   return (
     <Link
       href={href}
       className="group flex items-center gap-4 overflow-hidden rounded-2xl p-4 transition-all hover:-translate-y-0.5"
       style={{
-        border: "1px solid rgba(226, 181, 62, 0.35)",
-        background: "linear-gradient(90deg, rgba(226, 181, 62, 0.1), var(--surface))",
+        border: "1px solid rgba(255, 255, 255, 0.10)",
+        background: aura
+          ? `linear-gradient(145deg, rgba(226,181,62,0.14), rgba(226,181,62,0.02) 45%, transparent 70%), radial-gradient(circle at 100% 0%, ${aura}2e, transparent 65%), var(--surface)`
+          : "linear-gradient(145deg, rgba(226,181,62,0.14), rgba(226,181,62,0.03) 45%, var(--surface))",
+        boxShadow: "0 0 0 1px rgba(226, 181, 62, 0.12), 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.06)",
       }}
     >
       <div
@@ -47,15 +96,24 @@ export function PinnedGameBanner({ game, handle }: { game: Game; handle: string 
         </p>
         <p className="mt-0.5 truncate font-heading text-lg font-bold">{game.title}</p>
         <p className="mt-0.5 text-xs text-muted">
-          {game.progressPercent}% · {faltan > 0 ? `faltan ${faltan} trofeos` : "¡a un paso!"}
+          {/* Antes decía "¡a un paso!" también con 0 restantes — sonaba a
+              que faltaba uno, no a que ya estaba platinado del todo (mismo
+              bug real que en la Hero Card de Android). */}
+          {porcentaje}% · {faltan > 0 ? `faltan ${faltan} trofeos` : "¡platinado!"}
         </p>
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <div
+            className="h-full rounded-full transition-[width] duration-700 ease-out"
+            style={{ width: `${anchoBarra}%`, background: "#e2b53e" }}
+          />
+        </div>
       </div>
 
       <div
         className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:flex"
         style={{ border: "3px solid rgba(226, 181, 62, 0.4)", color: "#e2b53e" }}
       >
-        {game.progressPercent}%
+        {porcentaje}%
       </div>
     </Link>
   );

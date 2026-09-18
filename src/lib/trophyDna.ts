@@ -1,4 +1,5 @@
 import type { Game } from "@/lib/types";
+import { esPlatinoEquivalente } from "@/lib/stats";
 
 /**
  * Trophy DNA: en qué géneros se te han ido de verdad los trofeos, no la
@@ -107,4 +108,61 @@ export function calcularAfinidad(ejes: EjeDna[], genresJuego: string[]): number 
     if (mejor === null || eje.valor > mejor) mejor = eje.valor;
   }
   return mejor;
+}
+
+export interface EstiloDeCaza {
+  nombre: string;
+  descripcion: string;
+}
+
+/**
+ * "Estilo de caza": a diferencia del arquetipo de `calcularTrophyDna` (QUÉ
+ * géneros juegas), esto mide CÓMO cazas trofeos — cuánto terminas lo que
+ * empiezas, cuántos juegos abarcas a la vez, cuánto te quedas en cada uno.
+ * Ideas #Fase 3 del documento de diseño ("Explorador, Perfeccionista,
+ * Competidor, Coleccionista, Maratonista"); se deja fuera "Competidor" —
+ * mediría algo como la rareza media de tus trofeos o tu puesto en ligas, y
+ * ninguno de los dos está disponible aquí sin una consulta aparte cara de
+ * verdad (rareza) o datos que no tiene todo el mundo (ligas) — mejor no
+ * inventarlo con lo que hay que dar un dato que no se puede sostener.
+ *
+ * Reglas en orden de prioridad (la primera que encaja gana) — pensadas para
+ * que cada persona caiga en la que más la define, no la primera que toca
+ * por casualidad:
+ * 1. Maratonista: pocos juegos, pero muchísimas horas en cada uno.
+ * 2. Perfeccionista: termina la mayoría de lo que empieza.
+ * 3. Coleccionista: bibloteca grande, pocos terminados — le vale con tener
+ *    trofeos de muchos sitios distintos.
+ * 4. Trotamundos: mucha variedad de géneros distintos jugados de verdad
+ *    (no solo comprados) — el "Explorador" del documento, renombrado para
+ *    no chocar con "El Explorador" que ya usa `calcularTrophyDna` para el
+ *    género Aventura (son cosas distintas, mismo nombre habría confundido
+ *    los dos badges en la misma pantalla).
+ * Si no encaja en ninguna o hay muy pocos juegos con progreso real (menos
+ * de 3), no se fuerza un arquetipo — mismo criterio que `arquetipo: null`
+ * de ahí arriba.
+ */
+export function calcularEstiloDeCaza(games: Game[]): EstiloDeCaza | null {
+  const jugados = games.filter((g) => !g.isWishlist && g.earnedTotal > 0);
+  if (jugados.length < 3) return null;
+
+  const completados = jugados.filter(esPlatinoEquivalente).length;
+  const tasaFinalizacion = completados / jugados.length;
+  const minutosTotales = jugados.reduce((sum, g) => sum + (g.playtimeMinutes ?? 0), 0);
+  const horasPorJuego = minutosTotales / 60 / jugados.length;
+  const generosDistintos = new Set(jugados.flatMap((g) => g.genres ?? [])).size;
+
+  if (horasPorJuego >= 30 && jugados.length <= 20) {
+    return { nombre: "El Maratonista", descripcion: "Pocos juegos, pero te los agotas de verdad — te quedas en cada mundo hasta el final." };
+  }
+  if (tasaFinalizacion >= 0.5 && jugados.length >= 5) {
+    return { nombre: "El Perfeccionista", descripcion: "Lo que empiezas, lo terminas — la mayoría de tu biblioteca está platinada o al 100%." };
+  }
+  if (jugados.length >= 25 && tasaFinalizacion < 0.2) {
+    return { nombre: "El Coleccionista", descripcion: "Te vale con tener trofeos de muchos sitios distintos — no todos necesitan terminarse." };
+  }
+  if (generosDistintos >= 6) {
+    return { nombre: "El Trotamundos", descripcion: "Saltas de género en género sin quedarte fijo en ninguno — variedad ante todo." };
+  }
+  return null;
 }

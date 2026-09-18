@@ -304,13 +304,16 @@ fun MainScreen(
                         selected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true,
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            // `saveState`/`restoreState` (quitados a propósito):
+                            // esos dos son justo lo que hacía que tocar una
+                            // pestaña de abajo resucitara la pantalla que
+                            // hubiera quedado a medias ahí la última vez (p.
+                            // ej. Ajustes, abierto desde el menú de Inicio),
+                            // en vez de llevar siempre a la raíz de esa
+                            // pestaña — que es lo que se pidió de verdad.
                             navController.navigate(item.screen.route) {
-                                // Evitar crear historial múltiple
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
+                                popUpTo(navController.graph.findStartDestination().id)
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(

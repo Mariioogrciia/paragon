@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -130,9 +131,11 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
             }
             is FeedResult.Ok -> {
                 if (current.items.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "Sin actividad todavía — la tuya o la de tus amigos aparecerá aquí.", color = Muted, fontSize = 14.sp)
-                    }
+                    com.paragon.app.ui.common.EmptyState(
+                        icon = Icons.Default.Groups,
+                        title = "Sin actividad todavía",
+                        description = "La tuya y la de tus amigos aparecerá aquí — platinos, reseñas, juegos nuevos.",
+                    )
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),

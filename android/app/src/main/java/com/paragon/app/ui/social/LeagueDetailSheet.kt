@@ -1,11 +1,16 @@
 package com.paragon.app.ui.social
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -157,7 +162,11 @@ private fun LeagueDetailContent(
     Text(text = textoDuracion(detail.durationValue, detail.durationUnit, detail.endsAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(bottom = 16.dp))
 
     detail.standings.forEachIndexed { index, member ->
-        LeagueStandingRow(member, index + 1)
+        // Puntos para superar al de arriba — dato nuevo, no venía de
+        // ningún sitio: sale de la propia lista ya ordenada, sin tocar la
+        // API. `null` para el primer puesto (no hay nadie por delante).
+        val puntosParaSubir = if (index == 0) null else detail.standings[index - 1].points - member.points
+        LeagueStandingRow(member, index + 1, puntosParaSubir)
         if (detail.isOwner && member.userId != detail.ownerId) {
             TextButton(
                 onClick = {
@@ -336,17 +345,88 @@ private fun PendingMemberRow(member: PendingMember, onCancel: () -> Unit) {
 }
 
 @Composable
-private fun LeagueStandingRow(member: LeagueStanding, position: Int) {
-    Row(
+private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaSubir: Int? = null) {
+    // El primer puesto se trata distinto a propósito (borde y fondo
+    // dorados, avatar más grande) — antes las filas eran todas idénticas
+    // salvo el número, y `member.image` ni se pintaba pese a venir del
+    // backend.
+    val esPrimero = position == 1
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(12.dp))
+            .background(
+                if (esPrimero) Platinum.copy(alpha = 0.12f) else Surface2,
+                RoundedCornerShape(12.dp),
+            )
+            .then(
+                if (esPrimero) Modifier.border(1.dp, Platinum.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+                else Modifier,
+            )
             .padding(14.dp),
+    ) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = "${position}º  ${member.name}", color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-        Text(text = "${member.points} pts", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(if (esPrimero) 36.dp else 30.dp)
+                    .clip(CircleShape)
+                    .background(Surface)
+                    .then(if (esPrimero) Modifier.border(2.dp, Platinum, CircleShape) else Modifier),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (member.image != null) {
+                    AsyncImage(
+                        model = member.image,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    )
+                } else {
+                    Text(member.name.take(1).uppercase(), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = "${position}º  ${member.name}",
+                color = if (esPrimero) Platinum else Foreground,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+            )
+            // Sale de la foto semanal del cron — null hasta que corra una
+            // vez para esta liga, o para alguien recién unido. 0 sí se
+            // enseña (te has mantenido en el mismo puesto).
+            if (member.movimiento != null && member.movimiento != 0) {
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = if (member.movimiento > 0) "▲ ${member.movimiento}" else "▼ ${-member.movimiento}",
+                    color = if (member.movimiento > 0) Good else Danger,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp,
+                )
+            }
+        }
+        Text(
+            text = "${member.points} pts",
+            color = Platinum,
+            fontWeight = FontWeight.Bold,
+            fontSize = if (esPrimero) 16.sp else 14.sp,
+        )
+    }
+    // Dato nuevo, calculado de la propia lista ya ordenada (sin tocar la
+    // API) — antes no había ninguna pista de cuánto falta para el puesto
+    // de arriba, solo el número de puntos de cada uno por separado.
+    if (puntosParaSubir != null && puntosParaSubir > 0) {
+        Text(
+            text = "$puntosParaSubir pts para superar al puesto de arriba",
+            color = Muted,
+            fontSize = 11.sp,
+            modifier = Modifier.padding(top = 4.dp, start = 40.dp),
+        )
+    }
     }
     Spacer(Modifier.height(8.dp))
 }

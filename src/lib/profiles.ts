@@ -23,7 +23,7 @@ import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
-import { syncGameTrophies, syncLibrary } from "@/lib/sync";
+import { syncGameTrophies, syncLibrary, type PlatinoNuevo } from "@/lib/sync";
 import { anunciarNivelSiSube } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
@@ -534,7 +534,7 @@ export async function resyncLibraries(userId: string): Promise<number> {
 
       await db
         .update(platformAccounts)
-        .set({ syncedAt: new Date() })
+        .set({ syncedAt: new Date(), lastAttemptedAt: new Date() })
         .where(
           and(
             eq(platformAccounts.userId, userId),
@@ -543,6 +543,19 @@ export async function resyncLibraries(userId: string): Promise<number> {
         );
     } catch (error) {
       console.error("[resyncLibraries]", account.platform, error);
+      // `syncedAt` no se toca (motivo de siempre, ver arriba), pero
+      // `lastAttemptedAt` SÍ — si no, una cuenta que falla siempre se
+      // queda siendo "la más rancia" para el cron para siempre y bloquea
+      // a todo el mundo detrás suyo (bug real del 18 sept 2026).
+      await db
+        .update(platformAccounts)
+        .set({ lastAttemptedAt: new Date() })
+        .where(
+          and(
+            eq(platformAccounts.userId, userId),
+            eq(platformAccounts.platform, account.platform),
+          ),
+        );
     }
   }
 
@@ -571,11 +584,18 @@ export async function resyncPlatform(userId: string, platform: PlataformaVincula
     const total = await syncLibrary(userId, { platform, accountId: account.accountId });
     await db
       .update(platformAccounts)
-      .set({ syncedAt: new Date() })
+      .set({ syncedAt: new Date(), lastAttemptedAt: new Date() })
       .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)));
     return total;
   } catch (error) {
     console.error("[resyncPlatform]", platform, error);
+    // Mismo motivo que resyncLibraries: `lastAttemptedAt` sí avanza aunque
+    // falle, para que el cron no la trate como "la más rancia" para
+    // siempre y bloquee a todo el mundo detrás suyo.
+    await db
+      .update(platformAccounts)
+      .set({ lastAttemptedAt: new Date() })
+      .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)));
     return 0;
   }
 }
@@ -656,6 +676,11 @@ export interface RefrescoJuego {
   /** Trofeos nuevos desde la última comprobación. Negativo nunca: solo suben. */
   nuevos: number;
   error?: string;
+  /** Rellenado solo si esta comprobación ha descubierto un platino nuevo
+   * de verdad (no en la primera sincronización) — para la celebración en
+   * el momento de Modo Enfoque/Ficha de juego. `null` en cualquier otro
+   * caso, incluidos los trofeos nuevos que no sean platino. */
+  platinoNuevo?: PlatinoNuevo | null;
 }
 
 /**
@@ -684,8 +709,10 @@ export async function refrescarJuego(userId: string, gameId: string): Promise<Re
   const account = profile ? accountFor(profile, platform) : null;
   if (!account) return { nuevos: 0, error: "No tienes vinculada esa plataforma." };
 
+  let platinoNuevo: PlatinoNuevo | null = null;
   try {
-    await syncGameTrophies(userId, { platform, accountId: account.accountId }, gameId);
+    const resultado = await syncGameTrophies(userId, { platform, accountId: account.accountId }, gameId);
+    platinoNuevo = resultado.platinoNuevo;
   } catch (error) {
     return { nuevos: 0, error: describePlatformError(error) };
   }
@@ -696,7 +723,7 @@ export async function refrescarJuego(userId: string, gameId: string): Promise<Re
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)))
     .limit(1);
 
-  return { nuevos: Math.max(0, (despues?.earnedTotal ?? 0) - antes.earnedTotal) };
+  return { nuevos: Math.max(0, (despues?.earnedTotal ?? 0) - antes.earnedTotal), platinoNuevo };
 }
 
 /**

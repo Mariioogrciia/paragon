@@ -1,4 +1,4 @@
-import type { TrophyDna } from "@/lib/trophyDna";
+import type { EstiloDeCaza, TrophyDna } from "@/lib/trophyDna";
 
 const TAMANO = 300;
 const CENTRO = TAMANO / 2;
@@ -20,7 +20,7 @@ function poligono(puntos: [number, number][]): string {
  * ya normalizados 0-100. SVG a mano, sin librería de gráficos: son 7 puntos
  * fijos, no vale la pena la dependencia por esto.
  */
-export function TrophyDnaRadar({ dna }: { dna: TrophyDna }) {
+export function TrophyDnaRadar({ dna, estiloDeCaza }: { dna: TrophyDna; estiloDeCaza?: EstiloDeCaza | null }) {
   const n = dna.ejes.length;
   if (n === 0 || dna.ejes.every((e) => e.trofeos === 0)) {
     return (
@@ -81,6 +81,19 @@ export function TrophyDnaRadar({ dna }: { dna: TrophyDna }) {
           <p className="mb-1">
             <span className="text-xs font-bold uppercase tracking-widest text-muted">Tu arquetipo</span>
             <span className="block font-heading text-xl font-bold uppercase tracking-wide">{dna.arquetipo}</span>
+          </p>
+        )}
+        {/* Distinto del arquetipo de arriba (ese es de GÉNERO) — esto es
+            el estilo de caza: cómo juegas, no a qué. Con su propia
+            descripción porque el nombre solo ("El Maratonista") no dice
+            nada sin contexto la primera vez que se ve. */}
+        {estiloDeCaza && (
+          <p className="mb-2 rounded-xl p-3" style={{ background: "var(--surface-2)" }}>
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+              Tu estilo de caza
+            </span>
+            <span className="block font-heading text-lg font-bold">{estiloDeCaza.nombre}</span>
+            <span className="mt-0.5 block text-xs text-muted">{estiloDeCaza.descripcion}</span>
           </p>
         )}
         {[...dna.ejes]

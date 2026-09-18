@@ -14,7 +14,7 @@ import { CostePorHora } from "@/components/CostePorHora";
 import { EficienciaPersonal } from "@/components/EficienciaPersonal";
 import { DeudaBacklog } from "@/components/DeudaBacklog";
 import { TrophyDnaRadar } from "@/components/TrophyDnaRadar";
-import { calcularTrophyDna } from "@/lib/trophyDna";
+import { calcularTrophyDna, calcularEstiloDeCaza } from "@/lib/trophyDna";
 import { TrophyMonthChart } from "@/components/StatCharts";
 import { PlaytimeBarChart } from "@/components/PlaytimeBarChart";
 import { ActivityFeed } from "@/components/ActivityFeed";
@@ -82,6 +82,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
   const ritmo = esMio ? resumenEficiencia(eficiencia) : null;
   const deuda = esMio ? deudaBacklog(biblioteca) : null;
   const dna = calcularTrophyDna(biblioteca);
+  const estiloDeCaza = calcularEstiloDeCaza(biblioteca);
 
   return (
     <div>
@@ -95,7 +96,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
       <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
         <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">Trophy DNA</h2>
-        <TrophyDnaRadar dna={dna} />
+        <TrophyDnaRadar dna={dna} estiloDeCaza={estiloDeCaza} />
       </section>
 
       {(hitos.primerTrofeo || hitos.primerPlatino || hitos.trofeoMasRaro || hitos.platinoAnejo || hitos.rachaMasLarga) && (

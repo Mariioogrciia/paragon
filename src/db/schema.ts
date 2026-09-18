@@ -198,6 +198,21 @@ export const platformAccounts = pgTable(
     /** Si el perfil es privado, no podremos leer sus juegos. */
     isPublic: boolean("isPublic").notNull().default(true),
     syncedAt: timestamp("syncedAt", { mode: "date" }),
+    /**
+     * Cuándo se INTENTÓ por última vez, éxito o no — distinto de
+     * `syncedAt` (solo se toca en un éxito de verdad, a propósito, para
+     * que "sin refrescar" en Ajustes → Plataformas sea honesto). Bug real
+     * en producción (18 sept 2026): el cron elige las `POR_PASADA` cuentas
+     * más rancias por `syncedAt` — una cuenta que falla SIEMPRE (token
+     * caducado, cuenta puesta en privado...) nunca actualiza `syncedAt`,
+     * así que se queda siendo "la más rancia" para SIEMPRE y ocupa ese
+     * hueco en cada pasada, dejando sin sincronizar a todo el mundo detrás
+     * suyo indefinidamente — no solo a esa cuenta. El cron ordena por
+     * `lastAttemptedAt` (que sí avanza aunque falle) en vez de `syncedAt`,
+     * así que una cuenta rota sigue reintentándose de vez en cuando, pero
+     * ya no bloquea a las demás.
+     */
+    lastAttemptedAt: timestamp("lastAttemptedAt", { mode: "date" }),
   },
   (a) => [
     primaryKey({ columns: [a.userId, a.platform] }),
@@ -290,6 +305,19 @@ export const games = pgTable("game", {
    */
   missableTrophies: jsonb("missableTrophies").$type<string[]>(),
   missableTrophiesCheckedAt: timestamp("missableTrophiesCheckedAt", { mode: "date" }),
+  /**
+   * "Game Aura": color dominante de la carátula (`#rrggbb`), para teñir el
+   * ambiente de la Hero Card en vez de dejarlo todo con el mismo azul de
+   * siempre — mismo criterio de caché que `missableTrophies` (una carátula
+   * no cambia de color, así que se calcula una vez por juego, no por
+   * usuario ni en cada petición). Se calcula en el servidor con `sharp`
+   * (lib/coverAura.ts) en vez de en el navegador con canvas — así no
+   * depende de que las carátulas se sirvan con cabeceras CORS, que no
+   * está garantizado (vienen de IGDB/PSN/Steam, dominios que no controlamos).
+   * `null` = nunca se ha calculado o la portada no cargó.
+   */
+  auraColor: text("auraColor"),
+  auraColorCheckedAt: timestamp("auraColorCheckedAt", { mode: "date" }),
   /** Null mientras no hayamos pedido los metadatos a la tienda. */
   metadataSyncedAt: timestamp("metadataSyncedAt", { mode: "date" }),
 }, (g) => [
@@ -609,6 +637,25 @@ export const leagueMembers = pgTable(
     // "accepted" (creador, no invitado — ver `createLeague`).
     status: text("status").$type<"pending" | "accepted">().notNull().default("accepted"),
     joinedAt: timestamp("joinedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.leagueId, t.userId] })],
+);
+
+/**
+ * Foto semanal de la clasificación de cada liga — sin esto no hay forma
+ * de saber "subiste 2 puestos esta semana", solo la clasificación de
+ * AHORA. Una fila por (liga, miembro), se SOBRESCRIBE cada semana (no se
+ * acumula historial completo, que no se usa para nada todavía) por un
+ * cron propio — ver /api/cron/league-snapshot. `rank` es 1-based.
+ */
+export const leagueStandingSnapshots = pgTable(
+  "league_standing_snapshot",
+  {
+    leagueId: text("leagueId").notNull().references(() => leagues.id, { onDelete: "cascade" }),
+    userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+    rank: integer("rank").notNull(),
+    points: integer("points").notNull(),
+    capturedAt: timestamp("capturedAt", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.leagueId, t.userId] })],
 );

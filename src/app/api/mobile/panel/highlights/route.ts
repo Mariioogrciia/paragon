@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { gameProgress } from "@/lib/stats";
+import { getTrophyRecommendations } from "@/lib/recommendations";
 import type { Game } from "@/lib/types";
 
 /**
@@ -33,7 +34,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
   }
 
-  const { games } = await getLibrary(profile);
+  const [{ games }, recomendaciones] = await Promise.all([
+    getLibrary(profile),
+    // "Siguiente trofeo" — ya existía en la portada web (app/page.tsx) y
+    // nunca había llegado al móvil. Mismo cálculo, no una aproximación
+    // aparte (prioriza juego base sobre DLC, progreso alto y mayor
+    // probabilidad real de conseguirlo — ver lib/recommendations.ts).
+    getTrophyRecommendations(userId, 4),
+  ]);
 
   // getLibrary ya devuelve los juegos ordenados por lastPlayedAt desc
   // (ver profiles.ts) — "recientes" es solo tomar los primeros no-deseados,
@@ -50,5 +58,16 @@ export async function GET(req: Request) {
   return NextResponse.json({
     nearPlatinum: nearPlatinum.map(toCard),
     recent: recent.map(toCard),
+    nextTrophies: recomendaciones.map((r) => ({
+      gameId: r.gameId,
+      gameTitle: r.gameTitle,
+      trophyId: r.trophyId,
+      trophyName: r.trophyName,
+      detail: r.detail,
+      rarityPercent: r.rarityPercent,
+      gameProgress: r.gameProgress,
+      iconUrl: r.iconUrl,
+      grade: r.grade,
+    })),
   });
 }

@@ -98,8 +98,10 @@ sealed class GameDetailResult {
     data class Error(val message: String) : GameDetailResult()
 }
 
+data class PlatinoNuevo(val nombre: String, val iconUrl: String?)
+
 /** `error` viene relleno solo si la plataforma no respondió — nunca es un 4xx/5xx, ver POST .../resync. */
-data class ResyncOutcome(val nuevos: Int, val error: String?)
+data class ResyncOutcome(val nuevos: Int, val error: String?, val platinoNuevo: PlatinoNuevo? = null)
 
 /** `Queued`: sin conexión, guardada en `pending_notes` para mandarla luego — no es un fallo real. */
 enum class NoteSaveResult { Saved, Queued, Error }
@@ -282,7 +284,7 @@ class GameDetailRepository(
         val store = tokenStore ?: return ResyncOutcome(0, "Sin sesión.")
         return try {
             val response = ApiClient.gamesApi(store).resync(gameId)
-            ResyncOutcome(response.nuevos, response.error)
+            ResyncOutcome(response.nuevos, response.error, response.platinoNuevo?.let { PlatinoNuevo(it.nombre, it.iconUrl) })
         } catch (e: HttpException) {
             ResyncOutcome(0, e.paragonErrorMessage() ?: "El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {

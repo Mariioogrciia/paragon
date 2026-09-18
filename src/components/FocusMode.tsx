@@ -8,6 +8,7 @@ import { TrophyPhoto } from "@/components/TrophyList";
 import { rarity } from "@/lib/design";
 import type { Trophy } from "@/lib/types";
 import type { Prevision } from "@/lib/history";
+import type { PlatinoNuevo } from "@/lib/sync";
 
 /**
  * Modo enfoque: el móvil como segunda pantalla mientras se juega en la tele.
@@ -52,6 +53,7 @@ export function FocusMode({
   const [pendiente, startTransition] = useTransition();
   const [aviso, setAviso] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [celebracion, setCelebracion] = useState<PlatinoNuevo | null>(null);
   // El trofeo cuya guía se está viendo. El modal se pinta DENTRO de la capa
   // del modo enfoque a propósito: la capa crea contexto de apilado, así que
   // ahí dentro el modal sale por encima; colgado fuera se quedaría detrás.
@@ -162,6 +164,15 @@ export function FocusMode({
           ? `¡${r.nuevos} ${r.nuevos === 1 ? "trofeo nuevo" : "trofeos nuevos"}!`
           : "Nada nuevo todavía",
       );
+      // Celebración EN EL MOMENTO, no solo el contador de arriba — solo
+      // cuando `refrescarJuegoAction` ha descubierto un platino de verdad
+      // nuevo (nunca en la primera sincronización de un juego). Se cierra
+      // sola a los 2.2s, apartada del resto del aviso — un platino real
+      // merece más que una línea de texto entre los botones.
+      if (r.platinoNuevo) {
+        setCelebracion(r.platinoNuevo);
+        setTimeout(() => setCelebracion(null), 2200);
+      }
       router.refresh();
     });
   }
@@ -394,6 +405,45 @@ export function FocusMode({
               Cerrar
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Celebración en el momento — 2.2s, se cierra sola (ver `comprobar`).
+          Colores de metal, igual que el resto del Modo Enfoque: nada de
+          acento ni tema aquí, es la misma regla de siempre. Breve a
+          propósito — si cada trofeo montara esta fiesta se volvería
+          cansino; esto solo pasa con un platino real. */}
+      {celebracion && (
+        <div
+          className="pointer-events-none fixed inset-0 z-[130] flex flex-col items-center justify-center gap-4 bg-black/70 text-center"
+          aria-live="polite"
+        >
+          <div
+            className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full"
+            style={{
+              border: "3px solid rgb(159,212,236)",
+              animation: "girarPlatino 900ms ease-out",
+            }}
+          >
+            {celebracion.iconUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={celebracion.iconUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-3xl">🏆</span>
+            )}
+          </div>
+          <div>
+            <p className="text-xl font-bold uppercase tracking-wide" style={{ color: "rgb(159,212,236)" }}>
+              Platino desbloqueado
+            </p>
+            <p className="mt-1 text-sm text-white/70">{celebracion.nombre}</p>
+          </div>
+          <style>{`
+            @keyframes girarPlatino {
+              from { transform: rotate(-15deg) scale(0.7); opacity: 0; }
+              to { transform: rotate(0deg) scale(1); opacity: 1; }
+            }
+          `}</style>
         </div>
       )}
     </div>

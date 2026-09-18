@@ -6,7 +6,9 @@
   --surface-2: #1b2330;
   --border: #212a38;
   --foreground: #e9eef7;
-  --muted: #8794a8;
+  /* Antes #8794a8 — muy poco contraste sobre el fondo oscuro para texto que
+     sigue siendo funcional (fechas, metadatos, subtítulos), no decorativo. */
+  --muted: #a7b0c0;
   /* El acento se declara en canal RGB suelto para poder derivar de él los
      tintes translúcidos (rgb(var(--accent-rgb) / .14)). Antes esos tintes
      iban a pelo como rgba(74, 158, 255, .14) por toda la app, y por eso

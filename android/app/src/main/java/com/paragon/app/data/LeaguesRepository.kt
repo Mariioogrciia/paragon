@@ -20,7 +20,9 @@ data class LeagueInvite(val id: String, val name: String, val ownerName: String)
 
 data class PendingMember(val userId: String, val name: String)
 
-data class LeagueStanding(val userId: String, val name: String, val handle: String?, val image: String?, val points: Int)
+// `movimiento` sale de la foto semanal del cron (/api/cron/league-snapshot)
+// — null hasta que corra una vez para esta liga, o para alguien recién unido.
+data class LeagueStanding(val userId: String, val name: String, val handle: String?, val image: String?, val points: Int, val movimiento: Int? = null)
 
 /** Clasificación del "reto" de la liga — un juego concreto, quién llega antes al platino. */
 data class ChallengeStanding(
@@ -138,7 +140,7 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
                     durationUnit = dto.durationUnit,
                     endsAt = dto.endsAt,
                     standings = dto.standings.map {
-                        LeagueStanding(it.userId, it.name ?: it.handle ?: "Alguien", it.handle, it.image, it.points)
+                        LeagueStanding(it.userId, it.name ?: it.handle ?: "Alguien", it.handle, it.image, it.points, it.movimiento)
                     },
                     pendingMembers = dto.pendingMembers.map { PendingMember(it.userId, it.name ?: it.handle ?: "Alguien") },
                     challenge = dto.challenge?.let { c ->

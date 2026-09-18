@@ -1,8 +1,10 @@
 package com.paragon.app.ui.focus
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -23,12 +25,17 @@ import com.paragon.app.data.GameSession
 import com.paragon.app.data.GameSessionRepository
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.NoteSaveResult
+import com.paragon.app.data.PlatinoNuevo
 import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.GameSessionEntity
 import com.paragon.app.ui.theme.*
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -184,6 +191,7 @@ private fun FocusContent(
     var notaEncolada by remember { mutableStateOf(false) }
     var comprobando by remember { mutableStateOf(false) }
     var aviso by remember { mutableStateOf<String?>(null) }
+    var celebracion by remember { mutableStateOf<PlatinoNuevo?>(null) }
     var mostrarDiario by remember { mutableStateOf(false) }
     var ultimaSesion by remember { mutableStateOf<GameSession?>(null) }
 
@@ -367,6 +375,12 @@ private fun FocusContent(
                         outcome.nuevos > 0 -> "¡${outcome.nuevos} ${if (outcome.nuevos == 1) "trofeo nuevo" else "trofeos nuevos"}!"
                         else -> "Nada nuevo todavía"
                     }
+                    // Celebración EN EL MOMENTO, no solo el aviso de arriba —
+                    // solo cuando de verdad se acaba de descubrir un platino
+                    // nuevo (nunca en la primera sincronización de un juego).
+                    if (outcome.platinoNuevo != null) {
+                        celebracion = outcome.platinoNuevo
+                    }
                 }
             },
             enabled = !comprobando,
@@ -381,6 +395,76 @@ private fun FocusContent(
     if (mostrarDiario) {
         DiarioDialog(sessionRepository = sessionRepository, onDismiss = { mostrarDiario = false })
     }
+
+    // Se cierra sola a los 2.2s — mismo criterio que la versión web
+    // (comprobar() en FocusMode.tsx).
+    LaunchedEffect(celebracion) {
+        if (celebracion != null) {
+            delay(2200)
+            celebracion = null
+        }
+    }
+
+    celebracion?.let { PlatinoCelebracion(it) }
+}
+
+/**
+ * Celebración EN EL MOMENTO de un platino nuevo — colores de metal (mismo
+ * Platinum de siempre), nada de acento ni tema, igual que el resto del
+ * Modo Enfoque. Breve a propósito (2.2s, ver `FocusContent`): si cada
+ * trofeo montara esta fiesta se volvería cansino, esto solo pasa con un
+ * platino real.
+ */
+@Composable
+private fun PlatinoCelebracion(platino: PlatinoNuevo) {
+    val escala by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = androidx.compose.animation.core.tween(400, easing = androidx.compose.animation.core.LinearOutSlowInEasing),
+        label = "escalaPlatino",
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.7f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(CircleShape)
+                    .border(3.dp, Platinum, CircleShape)
+                    .background(Color.White.copy(alpha = 0.06f))
+                    .graphicsLayer { scaleX = escala; scaleY = escala },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (platino.iconUrl != null) {
+                    AsyncImage(
+                        model = platino.iconUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    )
+                } else {
+                    Text("🏆", fontSize = 36.sp)
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "PLATINO DESBLOQUEADO",
+                color = Platinum,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+            )
+            Text(
+                text = platino.nombre,
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+    }
 }
 
 @Composable
@@ -389,14 +473,29 @@ private fun PendingTrophyCard(trofeo: TrophyItem, destacado: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = if (destacado) 0.09f else 0.04f), RoundedCornerShape(16.dp))
+            .then(if (destacado) Modifier.border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(16.dp)) else Modifier)
             .padding(14.dp),
         verticalAlignment = Alignment.Top,
     ) {
+        // Foto real del trofeo cuando la hay — antes esto era siempre un
+        // cuadrado de color por metal, ni siquiera de respaldo (mismo
+        // hueco que se arregló en la Lista de la Ficha de juego).
+        val tam = if (destacado) 44.dp else 36.dp
         Box(
             modifier = Modifier
-                .size(if (destacado) 44.dp else 36.dp)
-                .background(gradeColor(trofeo.grade).copy(alpha = 0.7f), RoundedCornerShape(if (destacado) 22.dp else 18.dp)),
-        )
+                .size(tam)
+                .clip(RoundedCornerShape(if (destacado) 14.dp else 12.dp))
+                .background(gradeColor(trofeo.grade).copy(alpha = 0.7f)),
+        ) {
+            if (trofeo.iconUrl != null) {
+                AsyncImage(
+                    model = trofeo.iconUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
         Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -486,7 +585,12 @@ private fun SessionTimerCard(
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.9f), contentColor = Color.Black),
                 ) {
-                    Text("⏱️ Iniciar sesión", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    // "Iniciar sesión" se confundía con iniciar sesión de
+                    // cuenta; "Empezar a jugar" sonaba a que Paragon
+                    // arrancaba el juego de verdad, que no puede — esto
+                    // solo arranca el cronómetro de seguimiento mientras
+                    // juegas en la consola/PC de verdad.
+                    Text("⏱️ Iniciar seguimiento", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

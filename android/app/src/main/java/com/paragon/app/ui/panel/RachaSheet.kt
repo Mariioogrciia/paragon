@@ -1,6 +1,12 @@
 package com.paragon.app.ui.panel
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -70,18 +76,39 @@ private fun RachaContent(detalle: RachaDetalle) {
             tint = if (viva) Gold else Muted,
             modifier = Modifier.size(56.dp),
         )
-        Text(
-            text = "${detalle.actual} ${if (detalle.actual == 1) "día" else "días"}",
-            color = if (viva) Gold else Foreground,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 4.dp),
-        )
-        Text(
-            text = if (viva) "Racha activa — sigue así" else "Sin racha activa — consigue un trofeo hoy para empezar una",
-            color = Muted,
-            fontSize = 13.sp,
-        )
+        // Sin racha, "0 días" en 32sp dominaba la pantalla y sonaba a fallo
+        // ("llevas 0 de algo") en vez de a invitación — mismo criterio en
+        // el hueco vacío de cualquier lista: no repetir el cero, decir qué
+        // hacer con él.
+        if (viva) {
+            Text(
+                text = "${detalle.actual} ${if (detalle.actual == 1) "día" else "días"}",
+                color = Gold,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+            Text(
+                text = "Racha activa — sigue así",
+                color = Muted,
+                fontSize = 13.sp,
+            )
+        } else {
+            Text(
+                text = "Tu próxima racha empieza hoy",
+                color = Foreground,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            Text(
+                text = "Completa un trofeo para activarla",
+                color = Muted,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
 
         Spacer(Modifier.height(20.dp))
 
@@ -121,19 +148,43 @@ private fun MiniStatRacha(label: String, value: String, modifier: Modifier = Mod
 @Composable
 private fun DiasGrid(dias: List<DiaActividad>) {
     val semanas = dias.chunked(7)
+    // El último día de la lista es hoy (35 días terminando hoy) — un pulso
+    // muy discreto ahí, no en el resto, para que se note dónde está "hoy"
+    // sin que el calendario entero titile.
+    val hoy = dias.lastOrNull()
+    val transicion = rememberInfiniteTransition(label = "pulsoHoy")
+    val pulso by transicion.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(1100), RepeatMode.Reverse),
+        label = "pulsoHoyAlpha",
+    )
+
     Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
         semanas.forEach { semana ->
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                 semana.forEach { dia ->
-                    val activo = dia.trofeos > 0
+                    // Intensidad por cantidad de trofeos ese día, no solo
+                    // "hubo o no hubo" — un día suelto y una tarde a tope
+                    // se veían exactamente igual antes.
+                    val color = when {
+                        dia.trofeos >= 3 -> Gold
+                        dia.trofeos == 2 -> Gold.copy(alpha = 0.65f)
+                        dia.trofeos == 1 -> Gold.copy(alpha = 0.35f)
+                        else -> Surface2
+                    }
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
-                            .background(if (activo) Gold.copy(alpha = 0.85f) else Surface2, RoundedCornerShape(6.dp)),
+                            .background(color, RoundedCornerShape(6.dp))
+                            .then(
+                                if (dia === hoy) {
+                                    Modifier.border(2.dp, Accent.copy(alpha = pulso), RoundedCornerShape(6.dp))
+                                } else Modifier,
+                            ),
                     )
                 }
-                // Rellena la última semana si tiene menos de 7 días (no debería, pero por si acaso).
                 repeat(7 - semana.size) {
                     Spacer(modifier = Modifier.weight(1f))
                 }

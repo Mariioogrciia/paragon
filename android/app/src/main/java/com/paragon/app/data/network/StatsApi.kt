@@ -9,6 +9,12 @@ data class TrophyDnaEjeDto(val key: String, val label: String, val valor: Int, v
 // `arquetipo` es null si todavía no hay ningún trofeo con género conocido — ver calcularTrophyDna en trophyDna.ts.
 data class TrophyDnaDto(val ejes: List<TrophyDnaEjeDto>, val arquetipo: String?)
 
+// Distinto de `arquetipo` (ese es de GÉNERO) — mide CÓMO se cazan trofeos,
+// no a qué se juega. `null` con menos de 3 juegos con progreso real o si
+// no encaja claramente en ninguna categoría — ver calcularEstiloDeCaza en
+// trophyDna.ts.
+data class EstiloDeCazaDto(val nombre: String, val descripcion: String)
+
 data class RachasDto(val actual: Int, val mejor: Int, val diasActivos: Int)
 
 data class MejorMesDto(val mes: String, val total: Int)
@@ -56,6 +62,7 @@ data class HitosDto(
 data class StatsResponse(
     val paragonScore: ParagonScoreDto,
     val trophyDna: TrophyDnaDto,
+    val estiloDeCaza: EstiloDeCazaDto? = null,
     val rachas: RachasDto,
     val historico: HistoricoDto,
     val financiero: FinancieroDto,

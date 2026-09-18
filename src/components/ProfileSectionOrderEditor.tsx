@@ -10,13 +10,27 @@ import { SECTION_LABELS, normalizeSectionOrder, type ProfileSectionKey } from "@
  * con el resto del formulario de /ajustes — mismo patrón que ya usa el
  * banner con su propio hidden input.
  */
-export function ProfileSectionOrderEditor({ initialOrder }: { initialOrder?: string[] | null }) {
+export function ProfileSectionOrderEditor({
+  initialOrder,
+  onChange,
+}: {
+  initialOrder?: string[] | null;
+  /** Para que el formulario que lo envuelve (`ProfileForm`) sepa si esto
+   * cambió y pueda activar "Guardar cambios" — sin esto, reordenar aquí no
+   * se notaba desde fuera hasta que se guardaba. */
+  onChange?: (json: string) => void;
+}) {
   const [orden, setOrden] = useState<ProfileSectionKey[]>(() => normalizeSectionOrder(initialOrder));
+
+  function reordenar(nuevo: ProfileSectionKey[]) {
+    setOrden(nuevo);
+    onChange?.(JSON.stringify(nuevo));
+  }
 
   return (
     <div>
       <input type="hidden" name="profileSectionOrder" value={JSON.stringify(orden)} />
-      <Reorder.Group axis="y" values={orden} onReorder={setOrden} className="flex flex-col gap-1.5">
+      <Reorder.Group axis="y" values={orden} onReorder={reordenar} className="flex flex-col gap-1.5">
         {orden.map((key) => (
           <Reorder.Item
             key={key}

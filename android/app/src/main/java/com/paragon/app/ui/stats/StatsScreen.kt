@@ -82,10 +82,15 @@ private fun StatsContent(stats: ParagonStats, handle: String) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+        // 32dp se quedaba corto y la última tarjeta (o el radar, según el
+        // tamaño de pantalla) terminaba pegada a la barra de navegación de
+        // abajo — más aún cuando esa barra se oculta/aparece al hacer
+        // scroll (ver bottomBarVisible en MainScreen.kt) y el hueco
+        // reservado cambia de tamaño en el momento.
+        contentPadding = PaddingValues(top = 8.dp, bottom = 96.dp),
     ) {
         item { ParagonScoreCard(stats.paragonScore) }
-        item { TrophyDnaCard(stats.trophyDna) }
+        item { TrophyDnaCard(stats.trophyDna, stats.estiloDeCaza) }
         item { RachasCard(stats.rachas, stats.historico) }
         item { FinancieroCard(stats.financiero, stats.horasTotales) }
         item { EficienciaCard(stats.eficiencia) }
@@ -250,8 +255,20 @@ private fun SectionCard(title: String, subtitle: String? = null, content: @Compo
 
 @Composable
 private fun ParagonScoreCard(score: ParagonScoreStats) {
+    // Cuenta de 0 al valor real en ~800ms — un número grande que aparece
+    // ya hecho se lee, pero no se siente; contarlo hace que el ojo se pare
+    // ahí un segundo, que es justo el sitio donde más queremos que se pare.
+    var animatedTotal by remember(score.total) { mutableStateOf(0) }
+    LaunchedEffect(score.total) {
+        androidx.compose.animation.core.animate(
+            initialValue = 0f,
+            targetValue = score.total.toFloat(),
+            animationSpec = androidx.compose.animation.core.tween(800),
+        ) { value, _ -> animatedTotal = value.toInt() }
+    }
+
     SectionCard(title = "Paragon Score", subtitle = "Puntuación unificada entre plataformas") {
-        Text(text = score.total.toString(), color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        Text(text = animatedTotal.toString(), color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         if (score.porPlataforma.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
             score.porPlataforma.forEach { fila ->
@@ -268,11 +285,26 @@ private fun ParagonScoreCard(score: ParagonScoreStats) {
 }
 
 @Composable
-private fun TrophyDnaCard(dna: TrophyDnaStats) {
+private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?) {
     SectionCard(
         title = "ADN de trofeos",
         subtitle = dna.arquetipo?.let { "Tu arquetipo: $it" } ?: "Sigue jugando para desbloquear tu arquetipo",
     ) {
+        // Distinto del arquetipo de arriba (ese es de GÉNERO) — esto es el
+        // estilo de caza: cómo juegas, no a qué.
+        if (estiloDeCaza != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+                    .background(Surface2, RoundedCornerShape(14.dp))
+                    .padding(14.dp),
+            ) {
+                Text(text = "TU ESTILO DE CAZA", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = estiloDeCaza.nombre, color = Foreground, fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+                Text(text = estiloDeCaza.descripcion, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+            }
+        }
         if (dna.ejes.size >= 3) {
             TrophyDnaRadar(
                 ejes = dna.ejes,
@@ -295,10 +327,16 @@ private fun TrophyDnaCard(dna: TrophyDnaStats) {
                     Text(text = "${eje.trofeos}", color = Muted, fontSize = 12.sp)
                 }
                 Spacer(Modifier.height(6.dp))
+                val fraccionObjetivo = if (max > 0) eje.valor / 100f else 0f
+                val fraccionAnimada by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = fraccionObjetivo,
+                    animationSpec = androidx.compose.animation.core.tween(700),
+                    label = "ejeDna",
+                )
                 Box(modifier = Modifier.fillMaxWidth().height(6.dp).background(Surface2, RoundedCornerShape(3.dp))) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(if (max > 0) eje.valor / 100f else 0f)
+                            .fillMaxWidth(fraccionAnimada)
                             .fillMaxHeight()
                             .background(Accent, RoundedCornerShape(3.dp)),
                     )

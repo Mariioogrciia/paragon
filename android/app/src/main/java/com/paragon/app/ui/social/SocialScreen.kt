@@ -185,26 +185,45 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                     }
                 }
                 is SocialResult.Ok -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 24.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
-                    ) {
-                        if (current.fromCache) {
-                            item { OfflineBanner() }
-                        }
-                        if (selectedTab == 0) {
-                            itemsIndexed(current.data.liga, key = { _, row -> row.userId }) { index, row ->
-                                SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                    LigaRowItem(row, index + 1, onClick = { selectedHandle = row.handle })
-                                }
+                    // Antes, sin amigos (o sin nadie en el ranking) esta lista
+                    // simplemente no pintaba nada — una pantalla en blanco,
+                    // sin ninguna pista de qué hacer.
+                    val vacioAmigos = selectedTab != 0 && current.data.amigos.isEmpty()
+                    val vacioLiga = selectedTab == 0 && current.data.liga.isEmpty()
+                    if (vacioAmigos) {
+                        com.paragon.app.ui.common.EmptyState(
+                            icon = Icons.Default.Add,
+                            title = "Todavía no tienes amigos en Paragon",
+                            description = "Búscalos por su @handle desde Comparar, o compartiendo el tuyo — así podéis ver el progreso del otro.",
+                        )
+                    } else if (vacioLiga) {
+                        com.paragon.app.ui.common.EmptyState(
+                            icon = Icons.Default.Add,
+                            title = "Sin ranking todavía",
+                            description = "En cuanto tengas amigos en Paragon, aquí saldréis clasificados por Paragon Score.",
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 24.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
+                        ) {
+                            if (current.fromCache) {
+                                item { OfflineBanner() }
                             }
-                        } else {
-                            itemsIndexed(current.data.amigos, key = { _, row -> row.userId }) { index, row ->
-                                SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                    AmigoRowItem(row, index + 1, onClick = { selectedHandle = row.handle })
+                            if (selectedTab == 0) {
+                                itemsIndexed(current.data.liga, key = { _, row -> row.userId }) { index, row ->
+                                    SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
+                                        LigaRowItem(row, index + 1, onClick = { selectedHandle = row.handle })
+                                    }
+                                }
+                            } else {
+                                itemsIndexed(current.data.amigos, key = { _, row -> row.userId }) { index, row ->
+                                    SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
+                                        AmigoRowItem(row, index + 1, onClick = { selectedHandle = row.handle })
+                                    }
                                 }
                             }
                         }

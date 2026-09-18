@@ -62,12 +62,15 @@ web. `actual`/`mejor`/`diasActivos` son el mismo cálculo que
 `GET /api/mobile/stats` y que el propio Panel (duplicado como dato en los
 tres sitios a propósito, ver la nota en `panel/route.ts`).
 
-## `GET /api/mobile/panel/highlights` — "A un paso del platino" y "Recientes"
+## `GET /api/mobile/panel/highlights` — "A un paso del platino", "Recientes" y "Siguiente trofeo"
 
 ```json
 {
   "nearPlatinum": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
-  "recent": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ]
+  "recent": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
+  "nextTrophies": [
+    { "gameId": "abc123", "gameTitle": "Elden Ring", "trophyId": "t1", "trophyName": "Maestro de las artes marciales", "detail": "...", "rarityPercent": 18.4, "gameProgress": 74, "iconUrl": "https://...", "grade": "gold" }
+  ]
 }
 ```
 MISMO cálculo que la portada web (`gameProgress()` en `src/lib/stats.ts`),
@@ -76,6 +79,13 @@ no una aproximación aparte — `nearPlatinum` son juegos con platino real
 (máx. 3); `recent` son los últimos jugados, no deseados (máx. 6). Endpoint
 separado de `/api/mobile/panel` a propósito: evita duplicar `gameProgress()`
 en Kotlin y que las dos versiones diverjan con el tiempo.
+
+`nextTrophies` es "Siguiente trofeo" (`getTrophyRecommendations()` en
+`lib/recommendations.ts`, máx. 4 para el móvil) — MISMA prioridad que la
+web ("Siguiente trofeo" en `app/page.tsx`): primero el juego BASE (el
+platino nunca depende del DLC), luego progreso alto, luego mayor
+probabilidad real de conseguirlo (`rarityPercent` más alto = menos raro).
+`rarityPercent`/`grade`/`iconUrl` pueden ser `null`.
 
 ## `GET /api/mobile/library` — Biblioteca
 
@@ -212,7 +222,7 @@ aceptado la invitación no tiene sentido — para eso está `/accept`).
 {
   "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "isOwner": true,
   "durationValue": 3, "durationUnit": "meses", "endsAt": "2026-12-17T00:00:00.000Z",
-  "standings": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "points": 250 } ],
+  "standings": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "points": 250, "movimiento": 2 } ],
   "pendingMembers": [ { "userId": "u4", "handle": "ana2", "name": "Ana", "image": "..." } ],
   "challenge": {
     "gameId": "abc123", "title": "Elden Ring", "iconUrl": "https://...",
@@ -232,6 +242,12 @@ quien ya ha cazado algo. `pendingMembers` viene vacío salvo que
 antes al platino (o al 100% en Steam, que no tiene grado "platinum" propio
 — ver `esPlatinoEquivalente`), y luego por `progressPercent` para quien
 todavía no lo tiene.
+
+`movimiento` (en el `standings` de arriba, no en el del reto) son puestos
+ganados (positivo) o perdidos (negativo) desde la última foto semanal —
+`null` si el cron `/api/cron/league-snapshot` no ha corrido todavía para
+esta liga, o si el miembro se unió después de la última foto. Ver
+`getLeagueRankings`/`leagueStandingSnapshots` en `lib/leagues.ts`.
 
 ### `POST /api/mobile/leagues/{id}/challenge` — Fijar el juego de reto
 
@@ -443,6 +459,7 @@ Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
 {
   "paragonScore": { "total": 12450, "porPlataforma": [ { "platform": "psn", "puntos": 8000, "trofeos": 1200 } ] },
   "trophyDna": { "ejes": [ { "key": "rpg", "label": "RPG", "valor": 100, "trofeos": 800 } ], "arquetipo": "El Completista" },
+  "estiloDeCaza": { "nombre": "El Maratonista", "descripcion": "Pocos juegos, pero te los agotas de verdad..." },
   "rachas": { "actual": 4, "mejor": 12, "diasActivos": 88 },
   "historico": { "conFecha": 4200, "esteAnio": 900, "mejorMes": { "mes": "2026-03", "total": 210 } },
   "financiero": { "totalGastado": 1200, "totalHoras": 800, "costeHoraMedio": 1.5, "juegosConDatos": 40 },
@@ -451,6 +468,12 @@ Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
   "horasTotales": 14280
 }
 ```
+`estiloDeCaza` es distinto de `trophyDna.arquetipo` (ese es de GÉNERO, qué
+juegas) — mide CÓMO cazas trofeos (terminas lo que empiezas, abarcas mucho,
+te quedas en pocos sitios...), ver `calcularEstiloDeCaza` en
+`lib/trophyDna.ts`. `null` con menos de 3 juegos con progreso real, o si no
+encaja claramente en ninguna categoría — no se fuerza una etiqueta sin base.
+
 Versión CURADA para el móvil, no las ~15 piezas de
 `EstadisticasCompletas.tsx` (heatmaps de calendario/horas, salón de la
 vergüenza, comparador con amigos, gráficas de barras...) — esas son mejor
@@ -467,19 +490,26 @@ campo que usa `/nota` del bot de Discord.
 ## `POST /api/mobile/games/{gameId}/resync` — "¿Ya lo tengo?" (Modo Enfoque)
 
 ```json
-{ "nuevos": 2 }
+{ "nuevos": 2, "platinoNuevo": { "nombre": "Maestro de las artes marciales", "iconUrl": "https://..." } }
 ```
 o `{ "nuevos": 0, "error": "..." }` — vuelve a pedir los trofeos de ESTE
 juego a su plataforma sin esperar al cron. Siempre `200`, nunca 4xx/5xx
 para el caso de error de plataforma: el cliente distingue por el campo
 `error`, igual que la web.
 
+`platinoNuevo` viene `null` (u omitido) salvo que ESTA llamada haya
+descubierto un platino de verdad nuevo — no en la primera sincronización
+de un juego (ver `primeraSincronizacion` en `lib/sync.ts`), y nunca por
+trofeos que no sean platino. Pensado para una celebración en el momento,
+no solo un contador — ver `syncGameTrophies`/`refrescarJuego`.
+
 ## `GET /api/mobile/compare/{handle}` — Comparar con alguien
 
 ```json
 {
-  "me": { "name": "Mario", "level": 17, "platinos": 24, "trofeos": 4655, "juegos": 290 },
-  "them": { "name": "Ana", "level": 12, "platinos": 10, "trofeos": 1200, "juegos": 80 },
+  "resultado": "gano",
+  "me": { "name": "Mario", "avatarUrl": "https://...", "level": 17, "platinos": 24, "trofeos": 4655, "juegos": 290 },
+  "them": { "name": "Ana", "avatarUrl": null, "level": 12, "platinos": 10, "trofeos": 1200, "juegos": 80 },
   "sharedGames": [ { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "myPercent": 74, "theirPercent": 40, "myHours": 32, "theirHours": 10 } ]
 }
 ```
@@ -489,7 +519,10 @@ persona no tiene ninguna cuenta vinculada (nada que comparar). Versión
 CURADA: sin la carrera trofeo a trofeo ("quién lo sacó antes",
 `sharedTrophyLeads` en la web) — la pieza más pesada y la que menos aporta
 en una pantalla pequeña. `myHours`/`theirHours` pueden ser `null` si la
-plataforma no da tiempo jugado (Xbox, o Steam sin ese dato).
+plataforma no da tiempo jugado (Xbox, o Steam sin ese dato). `resultado`
+es `"gano"`/`"pierdo"`/`"empate"`, por platinos — mismo criterio que la
+etiqueta "Vas ganando" de la web (`comparar/[handle]/page.tsx`).
+`avatarUrl` puede ser `null` si esa persona no tiene foto.
 
 ## `POST /api/mobile/push-token` — Notificaciones push nativas (FCM)
 

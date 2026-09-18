@@ -32,6 +32,7 @@ import { bannerPresetKey } from "@/lib/bannerPresets";
 import { BackButton } from "@/components/BackButton";
 import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { PinnedGameBanner } from "@/components/PinnedGameBanner";
+import { getOrComputeAuraColor } from "@/lib/coverAura";
 
 
 function hexToRgb(hex: string) {
@@ -169,6 +170,12 @@ export default async function PerfilPage({
   // visitante, que sigue siendo el suyo en el resto del sitio.
   const temaClase = profile.theme && profile.theme !== "dark" ? profile.theme : "";
 
+  // Game Aura del objetivo anclado (ver lib/coverAura.ts) — solo se pide
+  // para ESE juego, no para toda la biblioteca, así que es una consulta
+  // más (cacheada para siempre tras la primera vez), no N.
+  const juegoAnclado = games.find((g) => g.isPinned);
+  const auraAnclado = juegoAnclado ? await getOrComputeAuraColor(juegoAnclado.id, juegoAnclado.iconUrl) : null;
+
   return (
     <div className={`-mx-4 -mt-9 sm:-mx-7 ${temaClase}`} style={customStyle}>
       <div
@@ -275,10 +282,7 @@ export default async function PerfilPage({
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-6">
-        {(() => {
-          const juegoAnclado = games.find((g) => g.isPinned);
-          return juegoAnclado && <PinnedGameBanner game={juegoAnclado} handle={handle} />;
-        })()}
+        {juegoAnclado && <PinnedGameBanner game={juegoAnclado} handle={handle} aura={auraAnclado} />}
 
         {(() => {
           // Cada sección se define una vez, con su clave; el orden en que

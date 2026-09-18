@@ -57,9 +57,12 @@ fun StuckTrophiesScreen(onBack: () -> Unit) {
         containerColor = Background
     ) { innerPadding ->
         if (trophies.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                Text("No tienes ningún trofeo atascado.", color = Muted, fontSize = 14.sp)
-            }
+            com.paragon.app.ui.common.EmptyState(
+                icon = Icons.Default.Search,
+                title = "No tienes ningún trofeo atascado",
+                description = "Cuando un trofeo se te resista, márcalo desde su ficha y aparecerá aquí — con una guía en vídeo a un toque.",
+                modifier = Modifier.padding(innerPadding),
+            )
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 24.dp),

@@ -17,10 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import com.paragon.app.data.AmigoRow
 import com.paragon.app.data.CompareData
 import com.paragon.app.data.CompareRepository
 import com.paragon.app.data.CompareResult
+import com.paragon.app.data.CompareResultado
 import com.paragon.app.data.CompareSide
 import com.paragon.app.data.SharedGame
 import com.paragon.app.data.SocialRepository
@@ -176,7 +181,7 @@ private fun CompareContent(data: CompareData) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(bottom = 32.dp),
     ) {
-        item { CompareSummary(data.me, data.them) }
+        item { CompareSummary(data.me, data.them, data.resultado) }
         item {
             Text(
                 text = "JUEGOS EN COMÚN (${data.sharedGames.size})",
@@ -194,25 +199,68 @@ private fun CompareContent(data: CompareData) {
     }
 }
 
+/**
+ * Antes esto era solo texto (nombre/nivel/platinos), sin foto ni ninguna
+ * lectura de "quién va ganando" — la web ya tenía las dos cosas
+ * (`comparar/[handle]/page.tsx`: `Avatar` + etiqueta "Vas ganando"), esto
+ * las trae aquí con el mismo criterio (por platinos).
+ */
 @Composable
-private fun CompareSummary(me: CompareSide, them: CompareSide) {
-    Row(
+private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: CompareResultado) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(20.dp))
             .border(1.dp, Border, RoundedCornerShape(20.dp))
             .padding(20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        CompareColumn(label = "TÚ", side = me)
-        Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(Border))
-        CompareColumn(label = "ELLOS", side = them)
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            CompareColumn(label = "TÚ", side = me, destacado = resultado == CompareResultado.GANO)
+            Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(Border))
+            CompareColumn(label = "ELLOS", side = them, destacado = resultado == CompareResultado.PIERDO)
+        }
+        Spacer(Modifier.height(16.dp))
+        val (texto, color) = when (resultado) {
+            CompareResultado.GANO -> "Vas ganando" to Good
+            CompareResultado.PIERDO -> "Vas perdiendo" to Danger
+            CompareResultado.EMPATE -> "Empate a platinos" to Muted
+        }
+        Text(
+            text = texto,
+            color = color,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .background(color.copy(alpha = 0.14f), RoundedCornerShape(20.dp))
+                .padding(horizontal = 14.dp, vertical = 6.dp),
+        )
     }
 }
 
 @Composable
-private fun RowScope.CompareColumn(label: String, side: CompareSide) {
+private fun RowScope.CompareColumn(label: String, side: CompareSide, destacado: Boolean) {
     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Surface2)
+                .then(if (destacado) Modifier.border(2.dp, Accent, CircleShape) else Modifier),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (side.avatarUrl != null) {
+                AsyncImage(
+                    model = side.avatarUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                )
+            } else {
+                Text(side.name.take(1).uppercase(), color = Muted, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
         Text(text = label, color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Text(text = side.name, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
         Text(text = "Nivel ${side.level}", color = Muted, fontSize = 12.sp)
@@ -242,8 +290,17 @@ private fun SharedGameRow(game: SharedGame) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = game.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             Row(modifier = Modifier.padding(top = 4.dp)) {
-                Text(text = "Tú ${game.myPercent}%", color = Accent2, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text(text = "  ·  Ellos ${game.theirPercent}%", color = Muted, fontSize = 12.sp)
+                Text(
+                    text = "Tú ${game.myPercent}%${if (game.myPercent >= 100) " ✓" else ""}",
+                    color = if (game.myPercent >= 100) Good else Accent2,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = "  ·  Ellos ${game.theirPercent}%${if (game.theirPercent >= 100) " ✓" else ""}",
+                    color = if (game.theirPercent >= 100) Good else Muted,
+                    fontSize = 12.sp,
+                )
             }
         }
     }

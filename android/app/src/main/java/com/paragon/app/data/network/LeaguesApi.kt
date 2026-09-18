@@ -11,7 +11,9 @@ data class LeaguesResponse(val leagues: List<LeagueDto>)
 data class LeagueInviteDto(val id: String, val name: String, val ownerId: String, val ownerName: String?)
 data class LeagueInvitesResponse(val invites: List<LeagueInviteDto>)
 data class PendingMemberDto(val userId: String, val handle: String?, val name: String?, val image: String?)
-data class LeagueStandingDto(val userId: String, val handle: String?, val name: String?, val image: String?, val points: Int)
+// `movimiento` sale de la foto semanal del cron (/api/cron/league-snapshot)
+// — null hasta que corra una vez para esta liga, o para alguien recién unido.
+data class LeagueStandingDto(val userId: String, val handle: String?, val name: String?, val image: String?, val points: Int, val movimiento: Int? = null)
 data class ChallengeStandingDto(
     val userId: String,
     val handle: String?,

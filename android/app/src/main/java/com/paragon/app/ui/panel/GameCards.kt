@@ -1,5 +1,6 @@
 package com.paragon.app.ui.panel
 
+import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -10,18 +11,61 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.palette.graphics.Palette
 import coil3.compose.AsyncImage
 import com.paragon.app.data.GameProgress
 import com.paragon.app.ui.theme.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/**
+ * "Game Aura": el color ambiente que tiñe el degradado de fondo de una Hero
+ * Card, sacado de la propia carátula (`Palette`, misma librería que ya usa
+ * `GameDetailScreen` para el acento de sus botones) — cada juego se siente
+ * distinto en vez de que todo Inicio use el mismo azul de siempre. `null`
+ * mientras se descarga/analiza la portada o si falla, para que la Hero Card
+ * pueda seguir con su gradiente neutro de respaldo sin parpadear a un color
+ * a medias.
+ */
+@Composable
+private fun rememberCoverAuraColor(coverUrl: String): Color? {
+    var aura by remember(coverUrl) { mutableStateOf<Color?>(null) }
+    LaunchedEffect(coverUrl) {
+        if (coverUrl.isBlank()) return@LaunchedEffect
+        withContext(Dispatchers.IO) {
+            try {
+                val connection = java.net.URL(coverUrl).openConnection()
+                connection.doInput = true
+                connection.connect()
+                val bitmap = BitmapFactory.decodeStream(connection.getInputStream())
+                if (bitmap != null) {
+                    val palette = Palette.from(bitmap).generate()
+                    val swatch = palette.vibrantSwatch ?: palette.dominantSwatch ?: palette.mutedSwatch
+                    if (swatch != null) aura = Color(swatch.rgb)
+                }
+            } catch (e: Exception) {
+                // Se queda en null — la Hero Card sigue con su degradado neutro.
+            }
+        }
+    }
+    return aura
+}
 
 /**
  * `coverUrl` sale de `iconUrl` del backend, y puede venir vacío para
@@ -55,14 +99,41 @@ private fun GameCover(coverUrl: String, title: String, modifier: Modifier) {
     }
 }
 
+/**
+ * `label`/`labelColor`/`accentColor` parametrizados para poder reutilizar
+ * esta misma Hero Card tanto en "Cerca del platino" (azul, algorítmico)
+ * como en el juego que el usuario ancló a mano en Modo Enfoque (dorado,
+ * explícito) — antes el anclado tenía su propia versión plana y pequeña
+ * (una fila plana de 56dp, sin esta presencia) pese a ser la elección
+ * deliberada del usuario, no un cálculo.
+ */
 @Composable
-fun HeroGameCard(game: GameProgress, onClick: () -> Unit = {}) {
+fun HeroGameCard(
+    game: GameProgress,
+    onClick: () -> Unit = {},
+    label: String = "SIGUIENTE PLATINO",
+    labelColor: Color = Accent,
+    accentColor: Color = Accent,
+) {
+    val restantes = game.totalTrophies - game.earnedTrophies
+    val aura = rememberCoverAuraColor(game.coverUrl)
+    val shape = RoundedCornerShape(20.dp)
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(240.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            // Sombra suave y borde en degradado sutil (blanco 12%→2%) en
+            // vez de un borde plano de un solo color — mismo criterio que
+            // "bordes más sofisticados" del documento de diseño: da
+            // sensación de superficie elevada, no de rectángulo pintado.
+            .shadow(
+                elevation = 16.dp,
+                shape = shape,
+                ambientColor = Color.Black.copy(alpha = 0.4f),
+                spotColor = Color.Black.copy(alpha = 0.4f),
+            )
+            .clip(shape)
+            .border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.02f))), shape)
             .clickable { onClick() }
     ) {
         // Imagen de fondo con opacidad — sin degradado de respaldo aquí:
@@ -73,18 +144,29 @@ fun HeroGameCard(game: GameProgress, onClick: () -> Unit = {}) {
                 model = game.coverUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-                alpha = 0.3f
+                // `blur` necesita API 31+ (RenderEffect) — por debajo se
+                // queda sin desenfoque pero no rompe nada, sigue enseñando
+                // la portada atenuada igual que antes.
+                modifier = Modifier.fillMaxSize().blur(20.dp),
+                alpha = 0.25f
             )
         }
 
-        // Gradiente oscuro
+        // Gradiente oscuro — con un toque del color de la propia carátula
+        // en el medio cuando ya se conoce (Game Aura), no solo negro puro,
+        // para que cada juego tenga su propia atmósfera. `labelColor`/
+        // `accentColor` (dorado anclado / azul algorítmico) se quedan
+        // igual: esto solo tiñe el ambiente, no lo que ya significa algo.
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Background)
+                        colors = if (aura != null) {
+                            listOf(Color.Transparent, aura.copy(alpha = 0.22f), Background)
+                        } else {
+                            listOf(Color.Transparent, Background)
+                        }
                     )
                 )
         )
@@ -109,15 +191,24 @@ fun HeroGameCard(game: GameProgress, onClick: () -> Unit = {}) {
 
             Spacer(modifier = Modifier.width(20.dp))
 
+            // Con 0 trofeos restantes el juego YA está platinado — "SIGUIENTE
+            // PLATINO"/"A POR ESTE PLATINO AHORA" (las etiquetas que pasan
+            // los sitios que usan esta tarjeta) dejan de tener sentido, y
+            // "¡A un paso!" para algo ya terminado sonaba a que le faltaba
+            // uno, no a que ya estaba hecho — bug real visto en Biblioteca
+            // con juegos platinados de verdad.
+            val terminado = restantes <= 0
+            val etiquetaFinal = if (terminado) "PLATINADO" else label
+            val colorEtiqueta = if (terminado) Platinum else labelColor
             Column {
                 Text(
-                    text = "SIGUIENTE PLATINO",
-                    color = Accent,
+                    text = etiquetaFinal,
+                    color = colorEtiqueta,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                     modifier = Modifier
-                        .background(AccentSoft, RoundedCornerShape(12.dp))
+                        .background(colorEtiqueta.copy(alpha = 0.14f), RoundedCornerShape(12.dp))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
 
@@ -126,28 +217,56 @@ fun HeroGameCard(game: GameProgress, onClick: () -> Unit = {}) {
                     color = Foreground,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
+                    // Sin esto, un título largo ("Assassin's Creed Black
+                    // Flag Remastered"...) se comía el hueco reservado
+                    // para "trofeos restantes"/la barra de progreso más
+                    // abajo, dejando la tarjeta con una altura distinta
+                    // según el juego en vez de siempre 240dp.
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    lineHeight = 30.sp,
                     modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
                 )
 
-                Row(verticalAlignment = Alignment.Bottom) {
+                if (restantes > 0) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = restantes.toString(),
+                            color = Platinum,
+                            fontSize = 42.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = " trofeos\n restantes",
+                            color = Muted,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 6.dp, start = 4.dp)
+                        )
+                    }
+                } else {
+                    // Antes decía "¡A un paso!" también aquí — sonaba a que
+                    // faltaba uno, cuando en realidad ya está platinado
+                    // (bug real reportado con juegos de Biblioteca ya
+                    // terminados). "0 trofeos restantes" sin más también
+                    // suena a fallo, no a logro — de ahí el texto final.
                     Text(
-                        text = (game.totalTrophies - game.earnedTrophies).toString(),
+                        text = "¡Platinado!",
                         color = Platinum,
-                        fontSize = 42.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = " trofeos\n restantes",
-                        color = Muted,
-                        fontSize = 11.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 6.dp, start = 4.dp)
                     )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // ProgressBar
+                // ProgressBar — anima de 0 al valor real en vez de aparecer
+                // ya llena, mismo criterio que el contador del Paragon Score.
+                val progresoAnimado by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = game.percent / 100f,
+                    animationSpec = androidx.compose.animation.core.tween(800),
+                    label = "progresoHero",
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -156,9 +275,9 @@ fun HeroGameCard(game: GameProgress, onClick: () -> Unit = {}) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(game.percent / 100f)
+                            .fillMaxWidth(progresoAnimado)
                             .fillMaxHeight()
-                            .background(Accent, RoundedCornerShape(4.dp))
+                            .background(accentColor, RoundedCornerShape(4.dp))
                     )
                 }
             }
@@ -225,6 +344,8 @@ fun StandardGameCard(
                     color = Foreground,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(16.dp)
@@ -254,6 +375,11 @@ fun StandardGameCard(
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
+                val progresoAnimado by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = game.percent / 100f,
+                    animationSpec = androidx.compose.animation.core.tween(700),
+                    label = "progresoStandard",
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -262,7 +388,7 @@ fun StandardGameCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(game.percent / 100f)
+                            .fillMaxWidth(progresoAnimado)
                             .fillMaxHeight()
                             .background(Accent, RoundedCornerShape(2.5.dp))
                     )

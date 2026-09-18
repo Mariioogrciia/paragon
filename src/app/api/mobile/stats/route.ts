@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { getParagonScore } from "@/lib/paragonScore";
-import { calcularTrophyDna } from "@/lib/trophyDna";
+import { calcularTrophyDna, calcularEstiloDeCaza } from "@/lib/trophyDna";
 import { rachas, resumenHistorico } from "@/lib/history";
 import { resumenFinanciero, eficienciaPersonal, resumenEficiencia, deudaBacklog } from "@/lib/backlog";
 import { horasTotales, hitosHistoricos } from "@/lib/profileStats";
@@ -36,6 +36,7 @@ export async function GET(req: Request) {
   ]);
 
   const dna = calcularTrophyDna(games);
+  const estiloDeCaza = calcularEstiloDeCaza(games);
   const financiero = resumenFinanciero(games);
   const eficiencia = resumenEficiencia(eficienciaPersonal(games));
   const backlog = deudaBacklog(games);
@@ -43,6 +44,10 @@ export async function GET(req: Request) {
   return NextResponse.json({
     paragonScore: { total: paragonScore.total, porPlataforma: paragonScore.porPlataforma },
     trophyDna: { ejes: dna.ejes, arquetipo: dna.arquetipo },
+    // Distinto del `arquetipo` de arriba (ese es de GÉNERO); esto mide el
+    // estilo de caza — cómo juegas, no a qué. `null` si hay muy pocos
+    // juegos con progreso todavía para que signifique algo de verdad.
+    estiloDeCaza,
     rachas: rachasUsuario,
     historico,
     financiero,

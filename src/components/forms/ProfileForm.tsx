@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEditor";
+import { normalizeSectionOrder } from "@/lib/profileSections";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
 import { FRAME_REQUISITOS } from "@/lib/level";
 import { AvatarFrame } from "@/components/AvatarFrame";
@@ -89,6 +90,47 @@ export function ProfileForm({
 
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [banner, setBanner] = useState(user.profileBannerUrl);
+
+  // Resto de campos del formulario grande, controlados solo para poder
+  // saber si hay algo distinto de lo guardado — antes "Guardar cambios"
+  // estaba siempre activo, aunque no se hubiera tocado nada. Los valores
+  // iniciales (memorizados una vez) son la base de comparación.
+  const inicial = useState(() => ({
+    handle: user.handle ?? "",
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    statusText: user.statusText ?? "",
+    profileColor: user.profileColor ?? "#3b82f6",
+    theme: user.theme ?? "dark",
+    language: user.language ?? "es-ES",
+    timezone: user.timezone ?? "Europe/Madrid",
+    profileSectionOrder: JSON.stringify(normalizeSectionOrder(user.profileSectionOrder)),
+  }))[0];
+
+  const [handle, setHandle] = useState(inicial.handle);
+  const [firstName, setFirstName] = useState(inicial.firstName);
+  const [lastName, setLastName] = useState(inicial.lastName);
+  const [statusText, setStatusText] = useState(inicial.statusText);
+  const [profileColor, setProfileColor] = useState(inicial.profileColor);
+  const [theme, setTheme] = useState(inicial.theme);
+  const [language, setLanguage] = useState(inicial.language);
+  const [timezone, setTimezone] = useState(inicial.timezone);
+  const [sectionOrderJson, setSectionOrderJson] = useState(inicial.profileSectionOrder);
+
+  const hayCambiosSinGuardar =
+    handle !== inicial.handle ||
+    firstName !== inicial.firstName ||
+    lastName !== inicial.lastName ||
+    statusText !== inicial.statusText ||
+    profileColor !== inicial.profileColor ||
+    theme !== inicial.theme ||
+    language !== inicial.language ||
+    timezone !== inicial.timezone ||
+    sectionOrderJson !== inicial.profileSectionOrder ||
+    titulo !== (user.profileTitle ?? "") ||
+    marco !== (marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? "")) ||
+    fondoJuegoId !== (user.profileBackgroundGameId ?? "") ||
+    banner !== user.profileBannerUrl;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -194,7 +236,7 @@ export function ProfileForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre de usuario</label>
-              <input name="handle" defaultValue={user.handle ?? ""} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="handle" value={handle} onChange={(e) => setHandle(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Email</label>
@@ -202,11 +244,11 @@ export function ProfileForm({
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre</label>
-              <input name="firstName" defaultValue={user.firstName ?? ""} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Apellido</label>
-              <input name="lastName" defaultValue={user.lastName ?? ""} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Título del perfil</label>
@@ -246,7 +288,7 @@ export function ProfileForm({
             </div>
             <div className="md:col-span-2">
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Estado</label>
-              <input name="statusText" maxLength={100} defaultValue={user.statusText ?? ""} placeholder="¿A qué estás jugando?" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="statusText" maxLength={100} value={statusText} onChange={(e) => setStatusText(e.target.value)} placeholder="¿A qué estás jugando?" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
           </div>
         </section>
@@ -257,13 +299,13 @@ export function ProfileForm({
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Color del perfil</label>
               <div className="flex gap-2">
-                <input type="color" name="profileColor" defaultValue={user.profileColor ?? "#3b82f6"} className="h-11 w-11 rounded-lg border-0 bg-transparent p-0 cursor-pointer" />
+                <input type="color" name="profileColor" value={profileColor} onChange={(e) => setProfileColor(e.target.value)} className="h-11 w-11 rounded-lg border-0 bg-transparent p-0 cursor-pointer" />
                 <span className="text-xs text-muted self-center">Este color bañará tu perfil cuando lo visiten.</span>
               </div>
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Tema del perfil</label>
-              <CustomSelect name="theme" defaultValue={user.theme ?? "dark"} options={TEMAS_PERFIL} />
+              <CustomSelect name="theme" value={theme} onChange={setTheme} options={TEMAS_PERFIL} />
               <p className="mt-1.5 text-xs text-muted">Cómo se ve tu perfil para quien lo visite — no cambia el suyo propio.</p>
             </div>
             <div>
@@ -298,7 +340,7 @@ export function ProfileForm({
 
           <div className="mt-6">
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Orden de secciones</label>
-            <ProfileSectionOrderEditor initialOrder={user.profileSectionOrder} />
+            <ProfileSectionOrderEditor initialOrder={user.profileSectionOrder} onChange={setSectionOrderJson} />
           </div>
         </section>
 
@@ -309,7 +351,8 @@ export function ProfileForm({
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Idioma</label>
               <CustomSelect
                 name="language"
-                defaultValue={user.language ?? "es-ES"}
+                value={language}
+                onChange={setLanguage}
                 options={[
                   { value: "es-ES", label: "Español" },
                   { value: "en-US", label: "English" },
@@ -320,7 +363,8 @@ export function ProfileForm({
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Zona horaria</label>
               <CustomSelect
                 name="timezone"
-                defaultValue={user.timezone ?? "Europe/Madrid"}
+                value={timezone}
+                onChange={setTimezone}
                 options={[
                   { value: "Europe/Madrid", label: "(GMT+01:00) Madrid" },
                 ]}
@@ -330,7 +374,12 @@ export function ProfileForm({
         </section>
 
         <div className="flex justify-end">
-          <button type="submit" className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgb(var(--accent-rgb) / 0.4)]">
+          <button
+            type="submit"
+            disabled={!hayCambiosSinGuardar}
+            className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all enabled:hover:-translate-y-0.5 enabled:hover:shadow-[0_0_20px_rgb(var(--accent-rgb)_/_40%)] disabled:cursor-not-allowed disabled:opacity-40"
+            title={hayCambiosSinGuardar ? undefined : "No hay cambios sin guardar"}
+          >
             Guardar cambios
           </button>
         </div>

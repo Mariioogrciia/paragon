@@ -115,33 +115,71 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
             </tr>
           </thead>
           <tbody>
-            {league.standings.map((member, index) => (
-              <tr key={member.userId} className="border-b border-border">
-                <td className="p-4 text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm text-muted bg-surface-2">
-                    {index + 1}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar src={member.image} name={member.name ?? member.handle ?? "?"} size={36} />
-                    {member.handle ? (
-                      <Link href={`/u/${member.handle}`} className="font-bold hover:text-[rgb(var(--accent-rgb))] transition-colors">
-                        {member.name ?? `@${member.handle}`}
-                      </Link>
-                    ) : (
-                      <span className="font-bold">{member.name ?? "Alguien"}</span>
+            {league.standings.map((member, index) => {
+              // El primer puesto se trata distinto a propósito — antes
+              // todas las filas eran idénticas salvo el número, y era el
+              // puesto que más intensidad competitiva merecía.
+              const esPrimero = index === 0;
+              return (
+                <tr key={member.userId} className="border-b border-border" style={esPrimero ? { background: "rgba(226, 181, 62, 0.08)" } : undefined}>
+                  <td className="p-4 text-center">
+                    <span
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm"
+                      style={
+                        esPrimero
+                          ? { color: "#e2b53e", background: "rgba(226, 181, 62, 0.18)", border: "1px solid rgba(226, 181, 62, 0.5)" }
+                          : { color: "var(--muted)", background: "var(--surface-2)" }
+                      }
+                    >
+                      {index + 1}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div style={esPrimero ? { borderRadius: "9999px", border: "2px solid #e2b53e" } : undefined}>
+                        <Avatar src={member.image} name={member.name ?? member.handle ?? "?"} size={esPrimero ? 40 : 36} />
+                      </div>
+                      {member.handle ? (
+                        <Link href={`/u/${member.handle}`} className="font-bold hover:text-[rgb(var(--accent-rgb))] transition-colors">
+                          {member.name ?? `@${member.handle}`}
+                        </Link>
+                      ) : (
+                        <span className="font-bold">{member.name ?? "Alguien"}</span>
+                      )}
+                      {member.userId === league.ownerId && (
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wide text-muted">Dueño</span>
+                      )}
+                      {/* `movimiento` sale de la foto semanal del cron
+                          (/api/cron/league-snapshot) — null hasta que
+                          corra una vez para esta liga, o para alguien
+                          recién unido. 0 sí se enseña (te has mantenido). */}
+                      {member.movimiento != null && member.movimiento !== 0 && (
+                        <span
+                          className="inline-flex items-center gap-0.5 text-[0.6875rem] font-bold"
+                          style={{ color: member.movimiento > 0 ? "#45d483" : "#ff6b6b" }}
+                        >
+                          {member.movimiento > 0 ? "▲" : "▼"} {Math.abs(member.movimiento)}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-4 text-right">
+                    <span
+                      className="font-heading text-xl font-bold"
+                      style={{ color: esPrimero ? "#e2b53e" : "rgb(var(--accent-rgb))" }}
+                    >
+                      {member.points.toLocaleString()}
+                    </span>
+                    {/* Dato nuevo, calculado de la propia lista ya
+                        ordenada (sin tocar la API) — antes no había
+                        ninguna pista de cuánto falta para el puesto de
+                        arriba, solo el número de puntos de cada uno. */}
+                    {index > 0 && league.standings[index - 1].points > member.points && (
+                      <p className="mt-0.5 text-[0.6875rem] text-muted">
+                        +{(league.standings[index - 1].points - member.points).toLocaleString()} para subir
+                      </p>
                     )}
-                    {member.userId === league.ownerId && (
-                      <span className="text-[0.625rem] font-bold uppercase tracking-wide text-muted">Dueño</span>
-                    )}
-                  </div>
-                </td>
-                <td className="p-4 text-right">
-                  <span className="font-heading text-xl font-bold text-[rgb(var(--accent-rgb))]">
-                    {member.points.toLocaleString()}
-                  </span>
-                </td>
+                  </td>
                 {isOwner && (
                   <td className="p-4 text-right">
                     {member.userId !== league.ownerId && (
@@ -159,7 +197,8 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                   </td>
                 )}
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

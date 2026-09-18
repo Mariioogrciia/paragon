@@ -454,6 +454,24 @@ async function syncIgdbMetadata(gameId: string, title: string): Promise<void> {
   }
 }
 
+export interface PlatinoNuevo {
+  nombre: string;
+  iconUrl: string | null;
+}
+
+export interface SyncGameTrophiesResult {
+  totalTrophies: number;
+  /**
+   * Rellenado solo cuando esta pasada ha descubierto un platino de VERDAD
+   * nuevo (no la primera sincronización, ver `primeraSincronizacion` más
+   * abajo — el mismo criterio que ya usaba el aviso de Discord/push,
+   * `platino` un poco más abajo). Es lo que permite una celebración en el
+   * momento (ver `refrescarJuego`) sin tener que fiarse de comparar
+   * contadores de antes/después, que no dice CUÁL trofeo fue.
+   */
+  platinoNuevo: PlatinoNuevo | null;
+}
+
 /**
  * Logros de un juego para un usuario.
  *
@@ -465,7 +483,7 @@ export async function syncGameTrophies(
   userId: string,
   account: SyncAccount,
   gameId: string,
-): Promise<number> {
+): Promise<SyncGameTrophiesResult> {
   const { platform, nativeId } = parseGameKey(gameId);
 
   // Antes de tocar nada: si nunca se ha traído el detalle de este juego
@@ -522,7 +540,7 @@ export async function syncGameTrophies(
       .set({ trophiesSyncedAt: new Date() })
       .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
-    return 0;
+    return { totalTrophies: 0, platinoNuevo: null };
   }
 
   const nuevos = await saveTrophies(userId, gameId, trophies);
@@ -552,6 +570,11 @@ export async function syncGameTrophies(
       .where(eq(games.id, gameId));
   }
 
+  // Se guarda fuera del `if` de abajo para poder devolverlo al final — es
+  // lo que permite a quien llame (p. ej. "¿Ya lo tengo?" en Modo Enfoque)
+  // celebrar el platino EN EL MOMENTO en vez de solo enseñar un contador.
+  let platinoNuevo: PlatinoNuevo | null = null;
+
   // Se pide título/carátula ya al final (con cualquier metadato recién
   // sincronizado arriba ya guardado) y solo si de verdad hay algo nuevo que
   // avisar en una sincronización que NO es la primera — no vale la pena
@@ -579,6 +602,7 @@ export async function syncGameTrophies(
     const [usuario] = await db.select({ handle: users.handle }).from(users).where(eq(users.id, userId)).limit(1);
     const url = usuario?.handle ? `/u/${usuario.handle}/${gameId}` : "/";
     const platino = nuevos.find((t) => t.grade === "platinum");
+    if (platino) platinoNuevo = { nombre: platino.name, iconUrl: platino.iconUrl ?? info?.iconUrl ?? null };
     const titulo = info?.title ?? gameId;
     const aviso = platino
       ? { title: "🏆 ¡Platino conseguido!", body: titulo, url }
@@ -613,5 +637,5 @@ export async function syncGameTrophies(
     }
   }
 
-  return trophies.length;
+  return { totalTrophies: trophies.length, platinoNuevo };
 }

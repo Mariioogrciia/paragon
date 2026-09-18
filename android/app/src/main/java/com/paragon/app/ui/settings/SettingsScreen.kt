@@ -54,6 +54,15 @@ fun SettingsScreen(
     var successMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    // Antes el botón se activaba con solo tener un nombre no vacío, aunque
+    // fuera el mismo de siempre — "Guardar cambios" sin ningún cambio
+    // pendiente invita a pulsar sin necesidad. Se compara contra el último
+    // valor GUARDADO (no contra `profile` directo, que es una prop que no
+    // se actualiza sola tras guardar) para que el botón vuelva a
+    // desactivarse justo después de un guardado con éxito.
+    var nombreGuardado by remember { mutableStateOf(profile.name) }
+    var avatarGuardado by remember { mutableStateOf(profile.image) }
+    val hayCambiosSinGuardar = nameInput != nombreGuardado || avatarUrl != avatarGuardado
 
     val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -178,7 +187,11 @@ fun SettingsScreen(
                         successMessage = null
                         val result = repository.updateProfile(nameInput, avatarUrl)
                         when (result) {
-                            is SettingsResult.Ok -> successMessage = "Perfil actualizado"
+                            is SettingsResult.Ok -> {
+                                successMessage = "Perfil actualizado"
+                                nombreGuardado = nameInput
+                                avatarGuardado = avatarUrl
+                            }
                             is SettingsResult.Error -> errorMessage = result.message
                         }
                         isLoading = false
@@ -186,7 +199,7 @@ fun SettingsScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                enabled = !isLoading && nameInput.isNotBlank()
+                enabled = !isLoading && nameInput.isNotBlank() && hayCambiosSinGuardar
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(color = Background, modifier = Modifier.size(24.dp))

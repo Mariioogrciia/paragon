@@ -52,7 +52,9 @@ private val DarkSurface2Steam = Color(0xFF1B2838)
 private val DarkBorderSteam = Color(0xFF2A3F55)
 
 private val DarkForeground = Color(0xFFFFFFFF)
-private val DarkMuted = Color(0xFFA0A0A0)
+// Mismo valor que --muted en globals.css (web) — antes 0xFFA0A0A0, algo gris
+// para texto que sigue siendo funcional (fechas, metadatos), no decorativo.
+private val DarkMuted = Color(0xFFA7B0C0)
 
 // Paragon (Neon Purple)
 private val DarkAccentParagon = Color(0xFFB026FF)

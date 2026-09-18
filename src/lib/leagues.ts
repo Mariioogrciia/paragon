@@ -1,5 +1,5 @@
 import { getDb } from "@/db";
-import { users, userTrophies, gameTrophies, userGames, games, leagues, leagueMembers } from "@/db/schema";
+import { users, userTrophies, gameTrophies, userGames, games, leagues, leagueMembers, leagueStandingSnapshots } from "@/db/schema";
 import { eq, and, gte, lte, sql, inArray } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { areFriends } from "@/lib/profiles";
@@ -41,6 +41,11 @@ export interface LeagueStandingRow {
   name: string | null;
   image: string | null;
   points: number;
+  /** Puestos ganados (positivo) o perdidos (negativo) desde la última foto
+   * semanal (`/api/cron/league-snapshot`) — `null` si todavía no hay
+   * ninguna foto para este miembro (recién unido, o el cron no ha corrido
+   * ni una vez desde que se creó la liga). */
+  movimiento: number | null;
 }
 
 export interface PendingMemberRow {
@@ -83,6 +88,49 @@ export interface LeagueChallenge {
   title: string;
   iconUrl: string | null;
   standings: ChallengeStandingRow[];
+}
+
+/**
+ * Puntos de cada miembro AUN sin nombre/avatar, para el cron de snapshot
+ * semanal (`/api/cron/league-snapshot`) — ese solo necesita el ranking en
+ * sí, pedir el perfil de cada uno sería trabajo de sobra. Reutiliza la
+ * misma ventana de puntuación (`createdAt`..`endsAt`) que `getLeagueDetail`
+ * — dos cálculos de puntos por liga que no coincidieran sería peor que no
+ * tener el dato.
+ */
+export async function getLeagueRankings(leagueId: string): Promise<{ userId: string; points: number }[]> {
+  const db = getDb();
+  const [league] = await db.select().from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  if (!league) return [];
+
+  const memberRows = await db
+    .select({ userId: leagueMembers.userId, status: leagueMembers.status })
+    .from(leagueMembers)
+    .where(eq(leagueMembers.leagueId, leagueId));
+  const memberIds = memberRows.filter((m) => m.status === "accepted").map((m) => m.userId);
+  if (memberIds.length === 0) return [];
+
+  const scoreConditions = [
+    eq(userTrophies.earned, true),
+    gte(userTrophies.earnedAt, league.createdAt),
+    inArray(userTrophies.userId, memberIds),
+  ];
+  if (league.endsAt) scoreConditions.push(lte(userTrophies.earnedAt, league.endsAt));
+
+  const scored = await db
+    .select({ userId: userTrophies.userId, points: pointsSql })
+    .from(userTrophies)
+    .innerJoin(
+      gameTrophies,
+      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+    )
+    .where(and(...scoreConditions))
+    .groupBy(userTrophies.userId);
+
+  const puntosPorId = new Map(scored.map((r) => [r.userId, Number(r.points ?? 0)]));
+  return memberIds
+    .map((userId) => ({ userId, points: puntosPorId.get(userId) ?? 0 }))
+    .sort((a, b) => b.points - a.points);
 }
 
 const pointsSql = sql<number>`
@@ -370,10 +418,24 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
     .from(users)
     .where(inArray(users.id, missingIds));
 
-  const standings: LeagueStandingRow[] = [
+  const sinMovimiento: Omit<LeagueStandingRow, "movimiento">[] = [
     ...scored.map((r) => ({ ...r, points: Number(r.points ?? 0) })),
     ...missingProfiles.map((p) => ({ ...p, points: 0 })),
   ].sort((a, b) => b.points - a.points);
+
+  // Movimiento respecto a la última foto semanal — `rankAnteriorPorId`
+  // vacío (liga recién creada, cron sin correr todavía) deja `movimiento`
+  // en null para todos en vez de fingir un "sin cambios" que no es cierto.
+  const fotoAnterior = await db
+    .select({ userId: leagueStandingSnapshots.userId, rank: leagueStandingSnapshots.rank })
+    .from(leagueStandingSnapshots)
+    .where(eq(leagueStandingSnapshots.leagueId, leagueId));
+  const rankAnteriorPorId = new Map(fotoAnterior.map((f) => [f.userId, f.rank]));
+
+  const standings: LeagueStandingRow[] = sinMovimiento.map((row, i) => {
+    const anterior = rankAnteriorPorId.get(row.userId);
+    return { ...row, movimiento: anterior != null ? anterior - (i + 1) : null };
+  });
 
   const challenge = league.challengeGameId ? await getChallengeStandings(league.challengeGameId, memberIds) : null;
 

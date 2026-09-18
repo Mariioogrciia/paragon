@@ -43,9 +43,17 @@ export async function GET(
   const nivelB = paragonProgress(libB.games);
   const comunes = sharedGames([libA, libB]);
 
+  // Mismo criterio que la etiqueta "Vas ganando"/"Vas perdiendo"/"Empate"
+  // de la web (comparar/[handle]/page.tsx) — se calcula aquí para que el
+  // cliente móvil no tenga que repetir esta lógica.
+  const platinoDif = statsA.platinos - statsB.platinos;
+  const resultado: "gano" | "pierdo" | "empate" = platinoDif === 0 ? "empate" : platinoDif > 0 ? "gano" : "pierdo";
+
   return NextResponse.json({
+    resultado,
     me: {
       name: libA.player.name,
+      avatarUrl: libA.player.avatarUrl,
       level: nivelA.level,
       platinos: statsA.platinos,
       trofeos: statsA.trofeos,
@@ -53,6 +61,7 @@ export async function GET(
     },
     them: {
       name: libB.player.name,
+      avatarUrl: libB.player.avatarUrl,
       level: nivelB.level,
       platinos: statsB.platinos,
       trofeos: statsB.trofeos,

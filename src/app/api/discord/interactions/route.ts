@@ -8,7 +8,7 @@ import { summarise } from "@/lib/stats";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { rachas } from "@/lib/history";
 import { hitosHistoricos } from "@/lib/profileStats";
-import { calcularTrophyDna, CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
+import { calcularTrophyDna, calcularEstiloDeCaza, CATEGORIAS_GENERO, type CategoriaDna } from "@/lib/trophyDna";
 import { dificultadDeJuego } from "@/lib/difficulty";
 import { dominioPublico } from "@/lib/site";
 import { listUserLeagues, listPendingLeagueInvites, getLeagueDetail } from "@/lib/leagues";
@@ -244,6 +244,7 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   ]);
   const resumen = summarise(games);
   const dna = calcularTrophyDna(games);
+  const estiloDeCaza = calcularEstiloDeCaza(games);
 
   const lineas = [
     `**${profile.displayName ?? profile.handle ?? "Perfil"}** (@${profile.handle ?? "?"})`,
@@ -251,6 +252,7 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
     `⭐ Nivel Paragon ${nivel.level} (${nivel.progreso}% hasta el ${nivel.siguienteNivel})`,
   ];
   if (dna.arquetipo) lineas.push(`🧬 ${dna.arquetipo}`);
+  if (estiloDeCaza) lineas.push(`🎯 ${estiloDeCaza.nombre}`);
   if (racha.actual > 0) lineas.push(`🔥 Racha activa: ${racha.actual} ${racha.actual === 1 ? "día" : "días"} (mejor: ${racha.mejor})`);
   if (hitos.primerTrofeo) lineas.push(`🎮 Primer trofeo: ${hitos.primerTrofeo.nombre} (${hitos.primerTrofeo.tituloJuego})`);
   if (hitos.primerPlatino) lineas.push(`🥇 Primer platino: ${hitos.primerPlatino.titulo}`);

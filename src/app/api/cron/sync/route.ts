@@ -130,17 +130,30 @@ export async function GET(request: Request) {
 
   // Un usuario puede tener varias cuentas; `resyncLibraries` ya las recorre
   // todas, así que aquí interesa el usuario, ordenado por su cuenta más
-  // rancia. Los NULL (nunca sincronizados) van primero.
+  // rancia. Los NULL (nunca sincronizados o nunca intentados) van primero.
+  //
+  // Se ordena por `lastAttemptedAt`, NO por `syncedAt` — bug real en
+  // producción (18 sept 2026): `syncedAt` solo avanza en un ÉXITO
+  // (a propósito, ver el comentario en schema.ts), así que una cuenta que
+  // falla siempre (token caducado, cuenta puesta en privado...) se quedaba
+  // siendo "la más rancia" para SIEMPRE — con `POR_PASADA` fijo en 2, esa
+  // única cuenta rota ocupaba los dos huecos de cada pasada del cron para
+  // siempre, dejando a TODO EL MUNDO detrás suyo sin sincronizar
+  // indefinidamente (confirmado en vivo: 2h+ sin ninguna sincronización
+  // real para nadie, con el cron respondiendo 200 OK cada 15 min sin hacer
+  // nada útil). `lastAttemptedAt` sí avanza aunque falle, así que una
+  // cuenta rota vuelve a intentarse de vez en cuando pero ya no bloquea a
+  // las demás.
   const pendientes = await db
     .select({
       userId: platformAccounts.userId,
-      masAntiguo: sql<Date | null>`min(${platformAccounts.syncedAt})`,
+      masAntiguo: sql<Date | null>`min(${platformAccounts.lastAttemptedAt})`,
     })
     .from(platformAccounts)
     .groupBy(platformAccounts.userId)
     // El orden va entero en SQL crudo: envolverlo en asc() lo deja como
     // "nulls first asc", que Postgres rechaza.
-    .orderBy(sql`min(${platformAccounts.syncedAt}) asc nulls first`)
+    .orderBy(sql`min(${platformAccounts.lastAttemptedAt}) asc nulls first`)
     .limit(POR_PASADA);
 
   const resultados: { userId: string; juegos?: number; error?: string }[] = [];

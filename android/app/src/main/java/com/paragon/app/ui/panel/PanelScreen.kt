@@ -153,12 +153,21 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                     }
 
                     pinnedGame?.let { game ->
-                        PinnedGameBanner(
+                        // Antes esto era `PinnedGameBanner`, una fila plana de
+                        // 56dp — mucha menos presencia que `HeroGameCard` (la
+                        // de "Cerca del platino", más abajo) a pesar de ser
+                        // el objetivo que el usuario eligió a mano, no un
+                        // cálculo. Misma Hero Card, en dorado para
+                        // diferenciarla de la azul algorítmica.
+                        HeroGameCard(
+                            game = game.toGameProgress(),
+                            label = "A POR ESTE PLATINO AHORA",
+                            labelColor = MilestoneGoldPanel,
+                            accentColor = MilestoneGoldPanel,
                             // A la ficha del juego, no directo a Modo Enfoque —
                             // ese es un modo aparte que se elige a propósito
                             // desde el menú, no algo que se cae encima al
                             // tocar tu objetivo actual en el Panel.
-                            game = game,
                             onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
                         )
                         Spacer(modifier = Modifier.height(12.dp))
@@ -360,42 +369,6 @@ fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
 }
 
 private val MilestoneGoldPanel = Color(0xFFE2B53E)
-
-/** Banner de "A por este platino ahora" — el juego anclado (PinGameButton en GameDetailScreen), lleva a Modo Enfoque. */
-@Composable
-fun PinnedGameBanner(game: LibraryGame, onClick: () -> Unit) {
-    val faltan = (game.definedTotal - game.earnedTotal).coerceAtLeast(0)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.horizontalGradient(colors = listOf(MilestoneGoldPanel.copy(alpha = 0.14f), Surface)),
-                shape = RoundedCornerShape(16.dp),
-            )
-            .border(1.dp, MilestoneGoldPanel.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AsyncImage(
-            model = game.coverUrl,
-            contentDescription = null,
-            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(Surface2),
-        )
-        Spacer(Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = "A POR ESTE PLATINO AHORA", color = MilestoneGoldPanel, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            Text(text = game.title, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
-            Text(
-                text = "${game.progressPercent}% · ${if (faltan > 0) "faltan $faltan trofeos" else "¡a un paso!"}",
-                color = Muted,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-        }
-    }
-}
 
 /** Banner del Cerrojo de Hitos: qué juego está reservado para tu próximo platino en número redondo. */
 @Composable

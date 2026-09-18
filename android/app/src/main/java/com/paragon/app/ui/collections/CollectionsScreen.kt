@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -180,9 +181,11 @@ private fun CollectionsList(
     var deleting by remember { mutableStateOf<Coleccion?>(null) }
 
     if (collections.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-            Text(text = "Todavía no tienes ninguna carpeta. Crea una con el +.", color = Muted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        }
+        com.paragon.app.ui.common.EmptyState(
+            icon = Icons.Default.Folder,
+            title = "Todavía no tienes ninguna carpeta",
+            description = "Agrupa tus juegos como quieras — por saga, por plataforma, por lo que sea — y créalas con el + de arriba.",
+        )
         return
     }
 
@@ -229,9 +232,11 @@ private fun CollectionsList(
 @Composable
 private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> Unit, onRemove: (String) -> Unit) {
     if (games.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-            Text(text = "Ningún juego en esta carpeta todavía.", color = Muted, fontSize = 14.sp)
-        }
+        com.paragon.app.ui.common.EmptyState(
+            icon = Icons.Default.Folder,
+            title = "Ningún juego en esta carpeta todavía",
+            description = "Añádelos desde su ficha, o desde la Biblioteca con el menú de cada tarjeta.",
+        )
         return
     }
 

@@ -4,7 +4,12 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -139,15 +144,34 @@ fun LibraryScreen(
                     }
                 }
                 
-                // Toggle Vista (Grid / Lista)
-                IconButton(onClick = { 
-                    themeStore.setLibraryLayout(if (themeStore.libraryLayout == 0) 1 else 0) 
-                }) {
-                    Icon(
-                        if (themeStore.libraryLayout == 0) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
-                        contentDescription = "Cambiar Vista",
-                        tint = Muted
-                    )
+                // Selector de vista — antes era UN icono que cambiaba solo
+                // (cuadrícula/lista), sin dejar claro que hay dos formas
+                // distintas de ver lo mismo, ni cuál está activa a simple
+                // vista. Con las dos opciones siempre visibles y una
+                // resaltada queda claro que es una elección, no un botón
+                // de "siguiente estilo".
+                Row(
+                    modifier = Modifier
+                        .border(1.dp, Border, RoundedCornerShape(10.dp))
+                        .padding(2.dp),
+                ) {
+                    listOf(0 to Icons.Default.GridView, 1 to Icons.AutoMirrored.Filled.List).forEach { (layout, icon) ->
+                        val selected = themeStore.libraryLayout == layout
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (selected) Accent else Color.Transparent)
+                                .clickable { themeStore.setLibraryLayout(layout) }
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                icon,
+                                contentDescription = if (layout == 0) "Vista cuadrícula" else "Vista enfoque",
+                                tint = if (selected) Color.White else Muted,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
                 }
             }
 
