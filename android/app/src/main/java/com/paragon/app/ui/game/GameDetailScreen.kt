@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -448,12 +447,6 @@ private val FECHA_DIA_KEY = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.L
 private fun fechaCortaTimeline(iso: String): String =
     try { FECHA_CORTA_TIMELINE.format(FECHA_ISO_GAME_DETAIL.parse(iso)!!) } catch (e: Exception) { "" }
 
-/** Separación entre marcadores del mismo día en TrophyRarityChart — mismo criterio que MARKER_SPACING_PX en TrophyTimeline.tsx. */
-private const val MARKER_SPACING_PX = 28f
-
-/** Ancho mínimo por día en el eje X — mismo criterio y mismo valor que MIN_DAY_WIDTH_PX en TrophyTimeline.tsx (web). */
-private const val MIN_DAY_WIDTH_PX = 56
-
 /** Margen a los cuatro lados del área de puntos — sin esto, un trofeo con
  * 0%/100% de rareza exacto, o del primer/último día, queda con el centro
  * justo en el borde. Mismo criterio que MARKER_PADDING_PX en TrophyTimeline.tsx. */
@@ -555,8 +548,6 @@ private data class ResumenDia(
     val xFrac: Float,
 )
 
-private enum class ModoCronologia { RESUMEN, DETALLE }
-
 private val GRADOS_EN_ORDEN = listOf(TrophyGrade.PLATINUM, TrophyGrade.GOLD, TrophyGrade.SILVER, TrophyGrade.BRONZE)
 
 private fun gradeLabelEs(grade: TrophyGrade?): String = when (grade) {
@@ -611,287 +602,160 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
 
     val gradosPresentes = GRADOS_EN_ORDEN.filter { g -> puntos.any { it.trofeo.grade == g } }
     var seleccionado by remember { mutableStateOf<PuntoRareza?>(null) }
+    var diaPopup by remember { mutableStateOf<String?>(null) }
 
-    // El eje X NO es proporcional al tiempo transcurrido a propósito: un
-    // juego jugado a rachas (varios trofeos en pocos días, luego meses o
-    // años sin tocarlo) con una escala lineal real deja los huecos vacíos
-    // "robando" casi todo el ancho y la ráfaga entera aplastada en un
-    // puñado de píxeles — mismo criterio que TrophyTimeline.tsx en la web.
-    // Cada DÍA con trofeos se lleva un hueco igual en el eje, en orden
-    // cronológico; dentro de un mismo día, se abren en abanico horizontal
-    // (offsetPorId) — ninguno de los dos toca la fecha real que se enseña.
-    val (xFracPorId, offsetPorId, diasOrdenados) = remember(puntos) {
+    // Un marcador por DÍA (no por trofeo): nunca hay scroll, ni horizontal
+    // ni vertical. El eje X usa raíz cuadrada de los días transcurridos
+    // desde el primer trofeo (no el índice del día ni el tiempo lineal) —
+    // mismo criterio que TrophyTimeline.tsx en la web: así sí se aprecia
+    // qué días están cerca en el tiempo real y cuáles lejos (antes cada
+    // día se llevaba un hueco idéntico, sin ninguna información de
+    // distancia), pero una racha de días seguidos después de meses de
+    // silencio no se aplasta del todo como pasaría con una escala lineal
+    // pura. Un día con varios trofeos abre un popup con la lista al
+    // tocarlo, en vez de una gráfica con scroll.
+    val (diasOrdenados, resumenPorDia) = remember(puntos) {
         val porDia = LinkedHashMap<String, MutableList<PuntoRareza>>()
         puntos.forEach { p ->
             val dia = FECHA_DIA_KEY.format(java.util.Date(p.fechaMillis))
             porDia.getOrPut(dia) { mutableListOf() }.add(p)
         }
         val dias = porDia.keys.toList()
-        val xFrac = mutableMapOf<String, Float>()
-        val offset = mutableMapOf<String, Float>()
-        porDia.entries.forEachIndexed { diaIndex, (_, grupo) ->
-            val x = if (dias.size == 1) 0.5f else diaIndex.toFloat() / (dias.size - 1)
-            grupo.forEachIndexed { i, p ->
-                xFrac[p.trofeo.id] = x
-                offset[p.trofeo.id] = (i - (grupo.size - 1) / 2f) * MARKER_SPACING_PX
+        val primerDiaMillis = porDia[dias.first()]!!.minOf { it.fechaMillis }
+        val ultimoDiaMillis = porDia[dias.last()]!!.minOf { it.fechaMillis }
+        val rangoTotalDias = maxOf(1f, (ultimoDiaMillis - primerDiaMillis) / 86_400_000f)
+        val raizRangoTotal = kotlin.math.sqrt(rangoTotalDias)
+        val resumen = dias.map { dia ->
+            val grupo = porDia[dia]!!
+            val rarezaMedia = grupo.map { (it.trofeo.rarityPercent ?: 0.0).toFloat() }.average().toFloat()
+            val gradoDominante = GRADOS_EN_ORDEN.firstOrNull { g -> grupo.any { it.trofeo.grade == g } }
+            val xFrac = if (dias.size == 1) 0.5f else {
+                val diasDesdeElPrimero = (grupo.minOf { it.fechaMillis } - primerDiaMillis) / 86_400_000f
+                kotlin.math.sqrt(diasDesdeElPrimero) / raizRangoTotal
             }
+            ResumenDia(dia, grupo, rarezaMedia, gradoDominante, xFrac)
         }
-        Triple(xFrac, offset, dias)
+        dias to resumen
     }
 
     // Una etiqueta por cada mes nuevo, en el día donde empieza — sin esto,
-    // al dejar de ser el eje proporcional al tiempo, no hay forma de saber
-    // cuánto tiempo real representa desplazarse por el gráfico. Solo se
-    // usa en modo Detalle.
-    val etiquetasMes = remember(diasOrdenados) {
+    // al no ser el eje proporcional al tiempo lineal, no hay forma de saber
+    // cuánto tiempo real representa la distancia entre dos burbujas.
+    // Separación mínima entre dos etiquetas, en fracción del ancho total —
+    // con la escala de raíz cuadrada, varios meses pueden apretarse en muy
+    // poco espacio (un trofeo suelto cada mes, por ejemplo) y las
+    // etiquetas se solapan sin esto. Mismo criterio y mismo valor que
+    // GAP_MIN_ETIQUETA_FRAC en TrophyTimeline.tsx (web).
+    val etiquetasMes = remember(diasOrdenados, resumenPorDia) {
         val lista = mutableListOf<Pair<Float, String>>()
         var mesAnterior = ""
+        var fracUltimaEtiqueta = Float.NEGATIVE_INFINITY
         diasOrdenados.forEachIndexed { i, dia ->
             val mesKey = dia.substring(0, 7)
             if (mesKey == mesAnterior) return@forEachIndexed
+            val frac = resumenPorDia[i].xFrac
+            if (frac - fracUltimaEtiqueta < 0.06f) return@forEachIndexed
             mesAnterior = mesKey
-            val x = if (diasOrdenados.size == 1) 0.5f else i.toFloat() / (diasOrdenados.size - 1)
+            fracUltimaEtiqueta = frac
             val texto = try { FECHA_MES_CORTO.format(FECHA_DIA_KEY.parse(dia)!!) } catch (e: Exception) { dia }
-            lista.add(x to texto)
+            lista.add(frac to texto)
         }
         lista
     }
 
-    // Un marcador por DÍA (no por trofeo) para el modo Resumen — mismo
-    // criterio que `resumenPorDia` en TrophyTimeline.tsx (web): rareza
-    // media del día como posición Y, metal más alto presente como color
-    // del anillo (GRADOS_EN_ORDEN ya viene platino>oro>plata>bronce).
-    val resumenPorDia = remember(puntos, diasOrdenados) {
-        val porDia = LinkedHashMap<String, MutableList<PuntoRareza>>()
-        puntos.forEach { p ->
-            val dia = FECHA_DIA_KEY.format(java.util.Date(p.fechaMillis))
-            porDia.getOrPut(dia) { mutableListOf() }.add(p)
-        }
-        diasOrdenados.mapIndexed { i, dia ->
-            val grupo = porDia[dia] ?: emptyList()
-            val rarezaMedia = grupo.map { (it.trofeo.rarityPercent ?: 0.0).toFloat() }.average().toFloat()
-            val gradoDominante = GRADOS_EN_ORDEN.firstOrNull { g -> grupo.any { it.trofeo.grade == g } }
-            val xFrac = if (diasOrdenados.size == 1) 0.5f else i.toFloat() / (diasOrdenados.size - 1)
-            ResumenDia(dia, grupo, rarezaMedia, gradoDominante, xFrac)
-        }
-    }
-
-    // Resumen (por defecto) reparte un marcador por día en el ancho real
-    // disponible — nunca hay scroll. Detalle es la gráfica de siempre
-    // (ancho mínimo por día + scroll si hace falta, un marcador por
-    // trofeo). Tocar una burbuja de Resumen abre Detalle centrado en ese
-    // día — `scrollState` se hoistea aquí para poder moverlo desde fuera
-    // del propio Composable de scroll.
-    var modo by remember { mutableStateOf(ModoCronologia.RESUMEN) }
-    var focusDia by remember { mutableStateOf<String?>(null) }
-    val scrollState = rememberScrollState()
-    val density = LocalDensity.current
-
     Column(modifier = modifier) {
-        Row(
-            modifier = Modifier.padding(bottom = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (gradosPresentes.size > 1) {
-                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    gradosPresentes.forEach { g ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(8.dp).background(gradeColor(g), CircleShape))
-                            Spacer(Modifier.width(4.dp))
-                            Text(gradeLabelEs(g), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                        }
+        if (gradosPresentes.size > 1) {
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.padding(bottom = 14.dp)) {
+                gradosPresentes.forEach { g ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(8.dp).background(gradeColor(g), CircleShape))
+                        Spacer(Modifier.width(4.dp))
+                        Text(gradeLabelEs(g), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
-            } else {
-                Spacer(Modifier)
             }
+        }
 
-            Row(
+        Row {
+            EjeYRareza()
+            Spacer(Modifier.width(6.dp))
+
+            BoxWithConstraints(
                 modifier = Modifier
-                    .border(1.dp, Border, RoundedCornerShape(8.dp))
-                    .padding(2.dp),
+                    .weight(1f)
+                    .height(260.dp)
+                    .border(1.dp, Border.copy(alpha = 0.5f)),
             ) {
-                listOf(ModoCronologia.RESUMEN to "Resumen", ModoCronologia.DETALLE to "Detalle").forEach { (m, label) ->
-                    val selected = modo == m
+                val xInset = maxWidth - MARKER_PADDING_DP.dp * 2
+                val yInset = maxHeight - MARKER_PADDING_DP.dp * 2
+                fun xPara(frac: Float) = MARKER_PADDING_DP.dp + xInset * frac
+                fun yPara(frac: Float) = MARKER_PADDING_DP.dp + yInset * frac
+
+                listOf(0f, 25f, 50f, 75f, 100f).forEach { r ->
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(if (selected) Accent else Color.Transparent)
-                            .clickable { modo = m }
-                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .offset(y = yPara(r / 100f))
+                            .background(Border.copy(alpha = 0.4f)),
+                    )
+                }
+
+                resumenPorDia.forEach { d ->
+                    val single = d.grupo.singleOrNull()
+                    val tam = if (single != null) 30.dp else minOf(24 + d.grupo.size * 3, 44).dp
+                    Box(
+                        modifier = Modifier
+                            .offset(x = xPara(d.xFrac) - tam / 2, y = yPara(d.rarezaMedia / 100f) - tam / 2)
+                            .size(tam)
+                            .clip(CircleShape)
+                            .background(Surface2)
+                            .border(2.dp, gradeColor(d.gradoDominante), CircleShape)
+                            .clickable {
+                                if (single != null) {
+                                    seleccionado = if (seleccionado == single) null else single
+                                } else {
+                                    diaPopup = d.dia
+                                }
+                            },
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text(
-                            text = label,
-                            color = if (selected) Color.White else Muted,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                        if (single?.trofeo?.iconUrl != null) {
+                            AsyncImage(
+                                model = single.trofeo.iconUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                            )
+                        } else if (single == null) {
+                            Text(
+                                text = d.grupo.size.toString(),
+                                color = Foreground,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        } else {
+                            Text(
+                                text = gradeLabelEs(single.trofeo.grade).take(1),
+                                color = gradeColor(single.trofeo.grade),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
                     }
                 }
             }
         }
 
-        if (modo == ModoCronologia.RESUMEN) {
-            Row {
-                EjeYRareza()
-                Spacer(Modifier.width(6.dp))
-
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(260.dp)
-                        .border(1.dp, Border.copy(alpha = 0.5f)),
-                ) {
-                    val xInset = maxWidth - MARKER_PADDING_DP.dp * 2
-                    val yInset = maxHeight - MARKER_PADDING_DP.dp * 2
-                    fun xPara(frac: Float) = MARKER_PADDING_DP.dp + xInset * frac
-                    fun yPara(frac: Float) = MARKER_PADDING_DP.dp + yInset * frac
-
-                    listOf(0f, 25f, 50f, 75f, 100f).forEach { r ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .offset(y = yPara(r / 100f))
-                                .background(Border.copy(alpha = 0.4f)),
-                        )
-                    }
-
-                    resumenPorDia.forEach { d ->
-                        val single = d.grupo.singleOrNull()
-                        val tam = if (single != null) 30.dp else minOf(24 + d.grupo.size * 3, 44).dp
-                        Box(
-                            modifier = Modifier
-                                .offset(x = xPara(d.xFrac) - tam / 2, y = yPara(d.rarezaMedia / 100f) - tam / 2)
-                                .size(tam)
-                                .clip(CircleShape)
-                                .background(Surface2)
-                                .border(2.dp, gradeColor(d.gradoDominante), CircleShape)
-                                .clickable {
-                                    focusDia = d.dia
-                                    modo = ModoCronologia.DETALLE
-                                },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (single?.trofeo?.iconUrl != null) {
-                                AsyncImage(
-                                    model = single.trofeo.iconUrl,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize().clip(CircleShape),
-                                )
-                            } else if (single == null) {
-                                Text(
-                                    text = d.grupo.size.toString(),
-                                    color = Foreground,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            } else {
-                                Text(
-                                    text = gradeLabelEs(single.trofeo.grade).take(1),
-                                    color = gradeColor(single.trofeo.grade),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            Row {
-                EjeYRareza()
-                Spacer(Modifier.width(6.dp))
-
-                // BoxWithConstraints exterior solo para medir el ancho
-                // disponible real (el hueco que deja pesar `weight(1f)`) — el
-                // contenido interior se ensancha por encima de eso cuando hace
-                // falta y aparece scroll horizontal, en vez de comprimir cada
-                // día por debajo de MIN_DAY_WIDTH_PX.
-                BoxWithConstraints(modifier = Modifier.weight(1f)) {
-                    val anchoDisponible = maxWidth
-                    val anchoContenido = maxOf(anchoDisponible, (diasOrdenados.size * MIN_DAY_WIDTH_PX).dp)
-
-                    // Al entrar en Detalle desde una burbuja concreta de
-                    // Resumen, centra ese día en el scroll — si no, en un
-                    // juego con muchos días el día tocado puede caer fuera
-                    // de la ventana visible y parece que no ha pasado nada.
-                    LaunchedEffect(focusDia, anchoContenido, anchoDisponible) {
-                        val dia = focusDia ?: return@LaunchedEffect
-                        val idx = diasOrdenados.indexOf(dia)
-                        if (idx < 0) return@LaunchedEffect
-                        val xFrac = if (diasOrdenados.size == 1) 0.5f else idx.toFloat() / (diasOrdenados.size - 1)
-                        val targetDp = MARKER_PADDING_DP.dp + (anchoContenido - MARKER_PADDING_DP.dp * 2) * xFrac
-                        val targetPx = with(density) { targetDp.toPx() } - with(density) { anchoDisponible.toPx() } / 2f
-                        scrollState.scrollTo(targetPx.coerceAtLeast(0f).toInt())
-                    }
-
-                    Column(modifier = Modifier.horizontalScroll(scrollState)) {
-                        BoxWithConstraints(
-                            modifier = Modifier
-                                .width(anchoContenido)
-                                .height(260.dp)
-                                .border(1.dp, Border.copy(alpha = 0.5f)),
-                        ) {
-                            // Posición con margen de MARKER_PADDING_DP a los
-                            // cuatro lados — un trofeo con 0%/100% de rareza
-                            // exacto, o del primer/último día, no debe quedar
-                            // con el centro justo en el borde del área.
-                            val xInset = maxWidth - MARKER_PADDING_DP.dp * 2
-                            val yInset = maxHeight - MARKER_PADDING_DP.dp * 2
-                            fun xPara(frac: Float) = MARKER_PADDING_DP.dp + xInset * frac
-                            fun yPara(frac: Float) = MARKER_PADDING_DP.dp + yInset * frac
-
-                            listOf(0f, 25f, 50f, 75f, 100f).forEach { r ->
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(1.dp)
-                                        .offset(y = yPara(r / 100f))
-                                        .background(Border.copy(alpha = 0.4f)),
-                                )
-                            }
-
-                            puntos.forEach { p ->
-                                val xFrac = xFracPorId[p.trofeo.id] ?: 0f
-                                val yFrac = (p.trofeo.rarityPercent ?: 0.0).toFloat() / 100f
-                                val tam = 30.dp
-                                val offsetDia = (offsetPorId[p.trofeo.id] ?: 0f).dp
-                                Box(
-                                    modifier = Modifier
-                                        .offset(x = xPara(xFrac) - tam / 2 + offsetDia, y = yPara(yFrac) - tam / 2)
-                                        .size(tam)
-                                        .clip(CircleShape)
-                                        .background(Surface2)
-                                        .border(2.dp, gradeColor(p.trofeo.grade), CircleShape)
-                                        .clickable { seleccionado = if (seleccionado == p) null else p },
-                                ) {
-                                    if (p.trofeo.iconUrl != null) {
-                                        AsyncImage(
-                                            model = p.trofeo.iconUrl,
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxSize().clip(CircleShape),
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        Box(modifier = Modifier.width(anchoContenido).height(20.dp)) {
-                            val xInsetMeses = anchoContenido - MARKER_PADDING_DP.dp * 2
-                            etiquetasMes.forEach { (x, texto) ->
-                                Text(
-                                    text = texto,
-                                    color = Muted,
-                                    fontSize = 9.sp,
-                                    modifier = Modifier.offset(x = MARKER_PADDING_DP.dp + xInsetMeses * x - 14.dp, y = 2.dp),
-                                )
-                            }
-                        }
-                    }
+        Box(modifier = Modifier.height(20.dp).padding(start = 36.dp)) {
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                etiquetasMes.forEach { (x, texto) ->
+                    Text(
+                        text = texto,
+                        color = Muted,
+                        fontSize = 9.sp,
+                        modifier = Modifier.offset(x = maxWidth * x - 14.dp, y = 2.dp),
+                    )
                 }
             }
         }
@@ -916,6 +780,75 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                 )
             }
         }
+    }
+
+    val grupoPopup = diaPopup?.let { dia -> resumenPorDia.find { it.dia == dia }?.grupo }
+    if (grupoPopup != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { diaPopup = null },
+            containerColor = Surface,
+            title = {
+                Text(
+                    text = "${fechaCortaTimeline(grupoPopup.first().trofeo.earnedAt!!)} · ${grupoPopup.size} trofeos",
+                    color = Foreground,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            },
+            text = {
+                // Lista vertical normal (con scroll solo si hace falta,
+                // como cualquier lista) — nada de la gráfica ancha con
+                // scroll horizontal que se ve mal en una ventana pequeña.
+                androidx.compose.foundation.lazy.LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.heightIn(max = 360.dp),
+                ) {
+                    items(grupoPopup) { p ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Surface2, RoundedCornerShape(12.dp))
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Surface)
+                                    .border(2.dp, gradeColor(p.trofeo.grade), CircleShape),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                if (p.trofeo.iconUrl != null) {
+                                    AsyncImage(
+                                        model = p.trofeo.iconUrl,
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                    )
+                                } else {
+                                    Text(gradeLabelEs(p.trofeo.grade).take(1), color = gradeColor(p.trofeo.grade), fontWeight = FontWeight.Bold)
+                                }
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(p.trofeo.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    "${gradeLabelEs(p.trofeo.grade)} · ${p.trofeo.rarityPercent}%",
+                                    color = Muted,
+                                    fontSize = 11.sp,
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { diaPopup = null }) {
+                    Text("Cerrar", color = Accent, fontWeight = FontWeight.Bold)
+                }
+            },
+        )
     }
 }
 
