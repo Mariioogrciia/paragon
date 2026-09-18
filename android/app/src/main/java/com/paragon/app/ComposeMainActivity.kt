@@ -25,6 +25,7 @@ import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.panel.AppRoot
 import com.paragon.app.ui.theme.ParagonTheme
 import com.paragon.app.util.flushPendingDisable
+import com.paragon.app.work.PanelSyncWorker
 import kotlinx.coroutines.launch
 
 /**
@@ -61,6 +62,7 @@ class ComposeMainActivity : ComponentActivity() {
         handleDeepLink(intent)
         requestNotificationPermissionIfNeeded()
         registerPushTokenIfLoggedIn()
+        PanelSyncWorker.schedule(applicationContext)
 
         setContent {
             ParagonTheme(themeStore = themeStore) {

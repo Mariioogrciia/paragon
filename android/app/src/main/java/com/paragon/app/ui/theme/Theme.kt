@@ -46,8 +46,11 @@ fun ParagonTheme(
     val dynamicScheme = if (useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     } else null
-    
-    activeDynamicAccentColor = dynamicScheme?.primary
+
+    // Se guarda el `ColorScheme` completo (no solo `primary`) para que
+    // `Background`/`Surface`/`Border` en Color.kt también salgan del fondo
+    // de pantalla real cuando Material You está activo, no solo el acento.
+    activeDynamicScheme = dynamicScheme
 
     val colorScheme = dynamicScheme ?: if (dark) {
         darkColorScheme(

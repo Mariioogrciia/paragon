@@ -108,8 +108,19 @@ fun MainScreen(
     panelFromCache: Boolean = false,
 ) {
     val navController = rememberNavController()
+    // La lupa de la barra superior solo busca en Biblioteca (`searchQuery`
+    // más abajo nunca se pasa a ninguna otra pantalla) — se muestra solo
+    // ahí para no dejar un botón que no hace nada en el resto de pestañas.
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val isOnLibrary = currentRoute == Screen.Library.route
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    androidx.compose.runtime.LaunchedEffect(isOnLibrary) {
+        if (!isOnLibrary) {
+            isSearchActive = false
+            searchQuery = ""
+        }
+    }
     var isMenuExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -157,7 +168,7 @@ fun MainScreen(
                     .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isSearchActive) {
+                if (isSearchActive && isOnLibrary) {
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -190,12 +201,14 @@ fun MainScreen(
                     )
                     Spacer(Modifier.weight(1f))
                     StreakChip(racha = racha, onClick = { showRachaSheet = true })
-                    IconButton(onClick = { isSearchActive = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Buscar",
-                            tint = Foreground
-                        )
+                    if (isOnLibrary) {
+                        IconButton(onClick = { isSearchActive = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Buscar",
+                                tint = Foreground
+                            )
+                        }
                     }
                     Box {
                         IconButton(onClick = { isMenuExpanded = true }) {

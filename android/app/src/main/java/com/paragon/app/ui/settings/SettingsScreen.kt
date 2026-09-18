@@ -207,12 +207,12 @@ fun SettingsScreen(
             Text("APARIENCIA Y PERSONALIZACIÓN", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
             ThemePicker(themeStore = themeStore)
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            PlatformPicker(themeStore = themeStore)
-            
+
             Spacer(modifier = Modifier.height(12.dp))
             DynamicColorToggle(themeStore = themeStore)
+
+            Spacer(modifier = Modifier.height(12.dp))
+            PlatformPicker(themeStore = themeStore)
 
             Spacer(modifier = Modifier.height(12.dp))
             CustomColorPicker(themeStore = themeStore)
@@ -330,32 +330,52 @@ private val PLATFORM_OPTIONS = listOf(
 
 @Composable
 private fun PlatformPicker(themeStore: ThemeStore) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, Border, RoundedCornerShape(14.dp))
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        PLATFORM_OPTIONS.forEach { (platform, label) ->
-            val selected = themeStore.platform == platform
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (selected) Accent else Color.Transparent)
-                    .clickable { themeStore.setPlatform(platform) }
-                    .padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = label,
-                    color = if (selected) Color.White else Muted,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
+    // Plataforma y Material You son dos temas COMPLETOS (fondo + acento
+    // cada uno) que no pueden mandar los dos a la vez — mientras Material
+    // You esté activo, este selector se bloquea (en vez de dejarlo
+    // clicable sin ningún efecto visible, que era la queja real).
+    val blocked = themeStore.useDynamicColor
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Surface, RoundedCornerShape(14.dp))
+                .border(1.dp, Border, RoundedCornerShape(14.dp))
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            PLATFORM_OPTIONS.forEach { (platform, label) ->
+                val selected = !blocked && themeStore.platform == platform
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (selected) Accent else Color.Transparent)
+                        .clickable(enabled = !blocked) { themeStore.setPlatform(platform) }
+                        .padding(vertical = 10.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = label,
+                        color = when {
+                            selected -> Color.White
+                            blocked -> Muted.copy(alpha = 0.4f)
+                            else -> Muted
+                        },
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
             }
+        }
+        if (blocked) {
+            Text(
+                text = "Desactiva Material You para elegir un tema de plataforma (define fondo y acento).",
+                color = Muted,
+                fontSize = 11.sp,
+                lineHeight = 14.sp,
+                modifier = Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp),
+            )
         }
     }
 }
@@ -375,7 +395,7 @@ private fun DynamicColorToggle(themeStore: ThemeStore) {
         ) {
             Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
                 Text("Material You (Colores Dinámicos)", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                Text("Extrae los colores de tu fondo de pantalla", color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
+                Text("Extrae fondo y acento de tu fondo de pantalla — anula el tema de plataforma mientras esté activo", color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
             }
             androidx.compose.material3.Switch(
                 checked = themeStore.useDynamicColor,
@@ -411,6 +431,13 @@ private fun CustomColorPicker(themeStore: ThemeStore) {
             .padding(16.dp)
     ) {
         Text("Color de Acento Personalizado", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(
+            "Solo cambia el acento (botones, resaltados) — el fondo lo sigue decidiendo la plataforma o Material You",
+            color = Muted,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            modifier = Modifier.padding(top = 2.dp),
+        )
         Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
