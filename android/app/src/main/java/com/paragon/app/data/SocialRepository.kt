@@ -19,6 +19,7 @@ data class AmigoRow(
     val handle: String?,
     val level: Int,
     val platinos: Int,
+    val avatarUrl: String? = null,
     val accounts: List<AmigoCuenta> = emptyList(),
 )
 
@@ -27,6 +28,7 @@ data class LigaRow(
     val name: String,
     val handle: String?,
     val points: Int,
+    val avatarUrl: String? = null,
 )
 
 data class SocialData(val amigos: List<AmigoRow>, val liga: List<LigaRow>)
@@ -42,6 +44,7 @@ private fun AmigoDto.toAmigoRow() = AmigoRow(
     handle = handle,
     level = trophyLevel ?: 1,
     platinos = platinos,
+    avatarUrl = avatarUrl,
     accounts = accounts.map { AmigoCuenta(it.platform, it.username) },
 )
 
@@ -50,6 +53,7 @@ private fun LigaDto.toLigaRow() = LigaRow(
     name = name ?: handle ?: "Jugador",
     handle = handle,
     points = points,
+    avatarUrl = image,
 )
 
 private const val CACHE_KEY = "social_data"

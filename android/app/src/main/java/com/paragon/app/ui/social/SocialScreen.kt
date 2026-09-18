@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
@@ -552,8 +553,11 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
                     .padding(vertical = 18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("🥇", fontSize = 30.sp)
-                Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 4.dp))
+                Box(contentAlignment = Alignment.BottomEnd) {
+                    RowAvatar(primero.name, primero.avatarUrl, size = 56.dp)
+                    Text("🥇", fontSize = 20.sp)
+                }
+                Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 8.dp))
                 Text("${primero.points} puntos", color = PodiumGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 val segundo = top3.getOrNull(1)
                 if (segundo != null) {
@@ -584,9 +588,37 @@ private fun PodiumSecondaryCard(row: LigaRow, medalla: String, color: androidx.c
             .padding(14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(medalla, fontSize = 20.sp)
-        Text(row.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, modifier = Modifier.padding(top = 2.dp))
+        Box(contentAlignment = Alignment.BottomEnd) {
+            RowAvatar(row.name, row.avatarUrl, size = 40.dp)
+            Text(medalla, fontSize = 14.sp)
+        }
+        Text(row.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, modifier = Modifier.padding(top = 6.dp))
         Text("${row.points} puntos", color = Muted, fontSize = 11.sp)
+    }
+}
+
+/**
+ * Foto real si la hay (mismo criterio que el resto de la app — foto
+ * subida a mano / PSN / Steam), inicial como respaldo — antes estas dos
+ * listas eran solo texto, sin ninguna cara que distinga a un vistazo
+ * quién es quién.
+ */
+@Composable
+private fun RowAvatar(name: String, avatarUrl: String?, size: androidx.compose.ui.unit.Dp = 40.dp) {
+    Box(
+        modifier = Modifier.size(size).background(Surface2, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (!avatarUrl.isNullOrBlank()) {
+            coil3.compose.AsyncImage(
+                model = avatarUrl,
+                contentDescription = null,
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().clip(CircleShape),
+            )
+        } else {
+            Text(name.take(1).uppercase(), color = Muted, fontWeight = FontWeight.Bold, fontSize = (size.value / 2.4).sp)
+        }
     }
 }
 
@@ -599,11 +631,15 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
             .border(1.dp, Border, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
-            Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = "${row.points} puntos este mes", color = Muted, fontSize = 12.sp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RowAvatar(row.name, row.avatarUrl)
+            Column(modifier = Modifier.padding(start = 12.dp)) {
+                Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = "${row.points} puntos este mes", color = Muted, fontSize = 12.sp)
+            }
         }
         Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
@@ -618,18 +654,22 @@ fun AmigoRowItem(row: AmigoRow, position: Int, onClick: () -> Unit) {
             .border(1.dp, Border, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
-            Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = "Nivel Paragon ${row.level} · ${row.platinos} platinos", color = Muted, fontSize = 12.sp)
-            if (row.accounts.isNotEmpty()) {
-                Text(
-                    text = row.accounts.joinToString(" · ") { "${it.platform.uppercase()}: ${it.username}" },
-                    color = Muted,
-                    fontSize = 11.sp,
-                    modifier = Modifier.padding(top = 2.dp),
-                )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RowAvatar(row.name, row.avatarUrl)
+            Column(modifier = Modifier.padding(start = 12.dp)) {
+                Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = "Nivel Paragon ${row.level} · ${row.platinos} platinos", color = Muted, fontSize = 12.sp)
+                if (row.accounts.isNotEmpty()) {
+                    Text(
+                        text = row.accounts.joinToString(" · ") { "${it.platform.uppercase()}: ${it.username}" },
+                        color = Muted,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
             }
         }
         Text(text = "${position}º", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 20.sp)

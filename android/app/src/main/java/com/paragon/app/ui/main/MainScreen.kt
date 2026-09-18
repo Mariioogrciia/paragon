@@ -1,6 +1,7 @@
 package com.paragon.app.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -24,14 +26,19 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -232,38 +239,56 @@ fun MainScreen(
                         DropdownMenu(
                             expanded = isMenuExpanded,
                             onDismissRequest = { isMenuExpanded = false },
-                            modifier = Modifier.background(com.paragon.app.ui.theme.Surface)
+                            // Antes era el menú desplegable genérico de
+                            // Material sin más (fondo plano, texto suelto
+                            // sin iconos, "Ajustes" mezclado con accesos
+                            // directos como si fuera uno más) — borde +
+                            // esquinas propias de la app, un icono por
+                            // opción, y "Ajustes" separado por un divisor
+                            // porque es la única que no es un atajo a una
+                            // función, es la puerta a toda una sección.
+                            modifier = Modifier
+                                .background(com.paragon.app.ui.theme.Surface, RoundedCornerShape(14.dp))
+                                .border(1.dp, com.paragon.app.ui.theme.Border, RoundedCornerShape(14.dp))
+                                .width(220.dp)
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Modo Enfoque", color = Foreground) },
+                            HeaderMenuItem(
+                                icon = Icons.Default.CenterFocusStrong,
+                                label = "Modo Enfoque",
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.Focus.route)
                                 }
                             )
-                            DropdownMenuItem(
-                                text = { Text("Comparar", color = Foreground) },
+                            HeaderMenuItem(
+                                icon = Icons.AutoMirrored.Filled.CompareArrows,
+                                label = "Comparar",
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate("compare")
                                 }
                             )
-                            DropdownMenuItem(
-                                text = { Text("Carpetas", color = Foreground) },
+                            HeaderMenuItem(
+                                icon = Icons.Default.Folder,
+                                label = "Carpetas",
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.Collections.route)
                                 }
                             )
-                            DropdownMenuItem(
-                                text = { Text("Trofeos Atascados", color = Foreground) },
+                            HeaderMenuItem(
+                                icon = Icons.Default.Star,
+                                label = "Trofeos Atascados",
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.StuckTrophies.route)
                                 }
                             )
-                            DropdownMenuItem(
-                                text = { Text("Ajustes", color = Foreground) },
+                            HorizontalDivider(color = Border, modifier = Modifier.padding(vertical = 4.dp))
+                            HeaderMenuItem(
+                                icon = Icons.Default.Settings,
+                                label = "Ajustes",
+                                iconTint = Accent,
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.Settings.route)
@@ -431,6 +456,20 @@ fun MainScreen(
     if (showRachaSheet) {
         RachaSheet(tokenStore = tokenStore, onDismiss = { showRachaSheet = false })
     }
+}
+
+@Composable
+private fun HeaderMenuItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    iconTint: Color = Muted,
+) {
+    DropdownMenuItem(
+        text = { Text(label, color = Foreground, fontSize = 14.sp) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp)) },
+        onClick = onClick,
+    )
 }
 
 /**

@@ -1,8 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
-import { coverGradient, monogram } from "@/lib/design";
 import {
   getLibrary,
   getProfileByHandle,
@@ -11,7 +9,7 @@ import {
 import { sharedGames, summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { sharedTrophyLeads } from "@/lib/comparison";
-import { FiltroJuegosComunes } from "@/components/FiltroJuegosComunes";
+import { ComparePairGames } from "@/components/ComparePairGames";
 import { BackButton } from "@/components/BackButton";
 
 const OUTCOME = {
@@ -19,23 +17,6 @@ const OUTCOME = {
   pierdes: { label: "Pierdes", bg: "rgba(255, 107, 107, 0.12)", fg: "#ff8f8f", border: "rgba(255, 107, 107, 0.28)" },
   empate: { label: "Empate", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
 };
-
-function outcome(a: number, b: number): keyof typeof OUTCOME {
-  if (a === b) return "empate";
-  return a > b ? "ganas" : "pierdes";
-}
-
-function OutcomeTag({ kind }: { kind: keyof typeof OUTCOME }) {
-  const o = OUTCOME[kind];
-  return (
-    <span
-      className="justify-self-end rounded-full px-[11px] py-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
-      style={{ background: o.bg, color: o.fg, border: `1px solid ${o.border}` }}
-    >
-      {o.label}
-    </span>
-  );
-}
 
 export default async function CompararPage({
   params,
@@ -183,65 +164,10 @@ export default async function CompararPage({
           </span>
         </div>
 
-        <FiltroJuegosComunes juegos={comunes} vacioMensaje="No tenéis ningún juego en común todavía.">
-          {(visibles) => (
-            <div className="grid gap-2.5">
-              {visibles.map((row) => (
-                <div
-                  key={row.id}
-                  className="grid grid-cols-[52px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[52px_1fr_1.3fr_96px] sm:gap-5"
-                  style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                >
-                  <span
-                    className="relative flex h-[52px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[13px]"
-                    style={{ background: coverGradient(row.title) }}
-                  >
-                    {row.iconUrl ? (
-                      <img src={row.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                    ) : (
-                      <span className="font-heading text-[0.9375rem] font-bold text-white">{monogram(row.title)}</span>
-                    )}
-                  </span>
-
-                  <p className="col-span-1 truncate text-[0.9375rem] font-semibold">{row.title}</p>
-
-                  <div className="col-span-2 grid gap-2 sm:col-span-1">
-                    {row.progress.map((p, i) => (
-                      <div key={jugadores[i].player.id} className="flex items-center gap-3">
-                        <span
-                          className="w-[52px] shrink-0 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
-                          style={{ color: i === 0 ? "var(--accent-text)" : "var(--muted)" }}
-                        >
-                          {jugadores[i].player.name}
-                        </span>
-                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
-                          <div
-                            className="h-full rounded-full"
-                            style={{
-                              width: `${p.percent}%`,
-                              background: i === 0 ? "var(--accent-grad-h)" : "#4a5668",
-                            }}
-                          />
-                        </div>
-                        <span
-                          className="w-16 shrink-0 text-right text-xs font-bold"
-                          style={i === 1 ? { color: "var(--muted)" } : undefined}
-                        >
-                          {p.percent}%
-                          {row.horas[i] !== undefined && (
-                            <span className="ml-1 font-normal text-muted">{row.horas[i]!.toFixed(0)}h</span>
-                          )}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <OutcomeTag kind={outcome(row.progress[0].percent, row.progress[1].percent)} />
-                </div>
-              ))}
-            </div>
-          )}
-        </FiltroJuegosComunes>
+        <ComparePairGames
+          comunes={comunes}
+          jugadores={jugadores.map(({ player }) => ({ id: player.id, name: player.name }))}
+        />
       </section>
 
       {lideres.length > 0 && (

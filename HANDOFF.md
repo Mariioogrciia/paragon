@@ -1,11 +1,299 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **17-18 de septiembre de
-2026** (con Gemini **y** Antigravity, los dos dentro de Android Studio,
-trabajando en paralelo en la app nativa a la vez que esta sesión — más abajo
-hay el detalle completo de esa coordinación, incluidos 4 bugs de
-compilación reales suyos que hubo que arreglar).
+releer todo el historial. Última actualización: **19 de septiembre de
+2026** (continuación 19 — Claude Code, sesión larga centrada en Android +
+dos bugs reales de producción encontrados y arreglados).
+
+---
+
+## Sesión del 18-19 de septiembre de 2026 (continuación 19) — onboarding nuevo, rediseño de Ligas/perfil/marca, pasada de rendimiento web+Android, y dos bugs reales de producción
+
+### Bug real grave: "Algo se ha roto" al Comparar con cualquier amigo con juegos en común
+
+Reportado por el usuario con el error exacto de Vercel: `Functions cannot
+be passed directly to Client Components unless you explicitly expose it by
+marking it with "use server"`. Causa: `comparar/[handle]/page.tsx` (Server
+Component) le pasaba una función como `children` a `FiltroJuegosComunes`
+("use client"), el patrón render-prop — React no puede serializar una
+función a través del límite servidor→cliente, así que la página se rompía
+en cuanto había algún juego en común (es decir, casi siempre). Mi primer
+intento de reproducirlo (llamar a las funciones de datos directamente,
+`getLibrary`/`summarise`/`sharedTrophyLeads`) no lo pilló porque nunca
+llegaba a renderizar JSX — el bug estaba en el render, no en los datos.
+Arreglado moviendo el render-prop entero a un Client Component nuevo,
+`components/ComparePairGames.tsx`, que recibe solo datos serializables
+(`comunes`, `jugadores` con id/name) — no una función. `FiltroJuegosComunes`
+no se toca, se sigue pudiendo llamar desde un Client Component sin problema
+(el límite solo aplica servidor→cliente).
+
+### Bug real: el cron "no sincronizaba" hasta abrir la ficha del juego a mano
+
+Reportado por el usuario. La cola de detalle de trofeos (`syncGameTrophies`
+en el cron) es GLOBAL, compartida por TODOS los usuarios, con solo 6 huecos
+cada 15 min, y ordenaba solo por antigüedad — un juego "solo viejo" (nada
+nuevo de verdad) le quitaba el turno a un juego con un trofeo real
+esperando (`earnedTotal` de la biblioteca por encima de lo guardado).
+Arreglado: los "fuera de sincronía" van siempre primero en el `ORDER BY`.
+Ver `src/app/api/cron/sync/route.ts`.
+
+### Onboarding nuevo: login sin handle se quedaba en bucle de 409
+
+Un login nuevo (Google/Discord) sin `handle` todavía hacía que
+`GET /api/mobile/panel` devolviera 409 esperado, pero la app lo trataba
+como error genérico con un botón "Reintentar" que repetía la misma
+petición para siempre. Nuevo `POST /api/mobile/profile/handle` +
+`PanelResult.NeedsOnboarding` + pantalla nativa "Elige tu nombre de
+usuario".
+
+### Rediseño visual (pedido explícito, varios briefs del usuario)
+
+- Marca nueva: gema facetada + flecha ascendente (`ParagonMark.kt`),
+  sustituye la `P` en cuadrado. Degradado azul→púrpura.
+- Ligas: tarjeta de temporada + podio oro/plata/bronce con avatares reales
+  (el backend ya los mandaba, `AmigoRow`/`LigaRow` los descartaban al
+  mapear), identidad de color por liga privada.
+- Perfil de rival (`FriendProfileBottomSheet.kt`): cabecera con contexto,
+  anillo de avatar por nivel, botón degradado, tarjeta de Rivalidad (tú vs.
+  ellos con stats propias ya cacheadas), juegos recientes en tarjetas
+  legibles.
+- Cuentas Vinculadas: logos reales de PSN/Steam/Xbox (mismos paths SVG que
+  la web, convertidos a vector drawable) en vez de iniciales en un círculo.
+- Menú de la cabecera (avatar → desplegable): iconos por opción, "Ajustes"
+  separado con divisor.
+- Desglose de trofeos por metal del Panel: eran datos de PRUEBA fijos
+  (`PanelRepository.getMockTrophyCounts()`) — el backend ya calculaba esto
+  de verdad en `summarise()`, solo faltaba devolverlo en
+  `GET /api/mobile/panel`. Migration de Room 7→8 (`panel_cache` es caché
+  pero vive en la misma base que `game_sessions`, que ya no lo es).
+
+### Pasada de rendimiento (auditoría con dos agentes, web y Android)
+
+- Web: `getProfileByUserId` sin memoizar (llamada 2-3 veces por request);
+  `layout.tsx` en serie sin depender entre sí; `listFriends`/
+  `listPendingRequests` con el mismo N+1 que `rankings.ts` ya documentó y
+  arregló antes; cron con 30 UPDATE individuales de PEGI → 1 con CASE;
+  índice nuevo en `sync_run.createdAt` (ya ejecutado en producción).
+- Android: Game Aura descargaba la carátula DOS VECES por tarjeta
+  (`java.net.URL` a mano, ignorando la caché de Coil) — nuevo
+  `rememberCoverAuraColor()` compartido; N+1 real de "atascado" (una query
+  Room por trofeo al abrir una ficha) → una sola query; keys estables en
+  listas que no las tenían; filtro de Biblioteca memoizado; `crossfade`
+  global vía `ParagonApplication`; registro de push/WorkManager diferido a
+  después del primer frame.
+
+### Guías de privacidad PSN/Steam/Xbox + mensajes de error reales
+
+Un perfil privado hace que la sincronización falle en silencio (caso real
+de esta sesión: cuenta vinculada pero sin ningún juego importado). Nuevo
+`PrivacyGuide.tsx` (web) + desplegable nativo con los pasos reales por
+plataforma. `SettingsRepository.kt` (Android) mostraba el mismo mensaje
+genérico ("Cuenta ya vinculada a otro usuario o inválida") para CUALQUIER
+422, ocultando el motivo real — ahora usa `paragonErrorMessage()`.
+
+### Implementaciones futuras (pedidas por el usuario, NO empezadas)
+
+- **Apartado de eSports** en Noticias/Descubrir — de qué fuentes sacarlo,
+  todavía sin decidir.
+- **Easter egg tipo el dinosaurio de Chrome**, pero con un ranking propio
+  de Paragon — un minijuego simple, con vueltas propias (no una copia
+  literal), sin decidir todavía disparador ni mecánica exacta.
+
+---
+
+## Sesión del 18 de septiembre de 2026 (continuación 18) — pulido a partir de feedback real de Perplexity (temas, Cronología, Ligas, celebración de Platino) + un bug real de producción encontrado a medio pulir: el cron puede quedarse bloqueado para TODO EL MUNDO por una sola cuenta rota
+
+Sesión larga, con dos partes bien distintas: primero un recorrido completo
+de las tres fases de un documento de diseño (Perplexity revisando capturas
+de la app), luego un aviso real del usuario ("gané 2 trofeos y no me
+enteré ni yo") que destapó un bug de producción serio y bastante sutil.
+**Esta segunda parte quedó a medias — ver el aviso grande al final, es la
+prioridad real para quien retome esto.**
+
+### Fase 1-3 del documento de Perplexity — repasadas y aplicadas donde tenía sentido
+
+Antes de tocar nada se comprobó cada punto contra el código actual en vez
+de fiarse de las capturas a ciegas — varias cosas que Perplexity señalaba
+como rotas (cabeceras con el logo grande de PARAGON en Carpetas/Comparar/
+Trofeos Atascados, Comunidad mezclada con la Racha, usuario duplicado en
+publicaciones) **ya estaban bien en el código actual**, así que no se
+tocaron — deben venir de una build o una captura anterior a esta sesión.
+
+Lo que sí era un hueco real, aplicado en Android y/o web según el caso:
+
+- **Coherencia de temas (Android)**: Material You bloquea el selector de
+  Plataforma en vez de dejarlo clicable sin efecto; el color de acento
+  personalizado ahora es una capa aparte que nunca bloquea nada porque ya
+  no compite con el fondo. Fondo/superficie ahora SÍ cambian por
+  plataforma (antes solo el acento).
+- **Cronología (web + Android)**: rediseño completo otra vez — el modo
+  "Detalle" con scroll se quitó del todo (se veía mal, queja directa del
+  usuario), sustituido por burbujas por día que SIEMPRE caben sin scroll,
+  con escala de raíz cuadrada del tiempo transcurrido en el eje X (antes
+  cada día ocupaba un hueco idéntico, sin ninguna información real de
+  distancia temporal). Un día con más de un trofeo abre un popup simple
+  con la lista, no una gráfica.
+- **Iconos reales de trofeos** donde todavía faltaban: la Lista de la
+  Ficha de juego en Android (`GameDetailScreen.kt`) y las tarjetas
+  pendientes de Modo Enfoque (`FocusScreen.kt`) — las dos mostraban
+  siempre un cuadrado de color, nunca la foto real pese a que el dato ya
+  venía del backend.
+- **"Tu estilo de caza"** (`calcularEstiloDeCaza` en `lib/trophyDna.ts`):
+  Perfeccionista/Maratonista/Coleccionista/Trotamundos — distinto del
+  "arquetipo" que ya existía (ese es de GÉNERO, este es de CÓMO juegas).
+  Se dejó fuera "Competidor" a propósito: mediría rareza media o puesto
+  en ligas, ninguno de los dos disponible ahí sin una consulta cara aparte.
+- **Game Aura**: color dominante de la carátula. En Android ya existía
+  para la Ficha de juego (`Palette`); se extendió a las Hero Cards del
+  Panel. En la **web** se implementó NUEVO, en servidor con `sharp` (no
+  `<canvas>` en el navegador — las carátulas vienen de IGDB/PSN/Steam,
+  dominios sin CORS garantizado), cacheado por juego en
+  `games.auraColor`/`auraColorCheckedAt` (ver `lib/coverAura.ts`, mismo
+  patrón que `missableTrophies`).
+- **Movimiento semanal en Ligas**: tabla nueva `league_standing_snapshot`
+  + cron propio semanal (`/api/cron/league-snapshot`, lunes 4am,
+  registrado en `vercel.json`) — **deliberadamente separado** del cron de
+  sincronización para no arriesgar su presupuesto de tiempo, ya ajustado
+  de la sesión anterior. También "X pts para superar al de arriba",
+  calculado de la propia lista ya ordenada sin tocar la API.
+- **Celebración de Platino en el momento** (web + Android): reutiliza la
+  detección que ya existía para el aviso de Discord/push
+  (`syncGameTrophies` en `lib/sync.ts`, ahora devuelve `platinoNuevo` en
+  vez de solo un número) — se ve al pulsar "¿Ya lo tengo?" en Modo
+  Enfoque. 2.2s, colores de metal en Android (respeta la regla de "nada
+  de acento aquí" que ya tenía el Modo Enfoque de la web).
+- **Comparar (Android)**: no tenía avatares ni ninguna lectura de "quién
+  va ganando" — la web ya lo tenía todo (`comparar/[handle]/page.tsx`).
+  Añadido `resultado` ("gano"/"pierdo"/"empate", por platinos) al
+  `/api/mobile/compare/{handle}`, avatar real en cada columna.
+- **Estados vacíos comunes** (`EmptyState.kt`, Android): aplicado a
+  Trofeos Atascados, Carpetas (las dos: sin carpetas y carpeta sin
+  juegos), Comunidad. Hueco real encontrado de paso: la pestaña Amigos y
+  el ranking de Ligas en `SocialScreen.kt` se quedaban **completamente en
+  blanco** sin ningún mensaje si estaban vacíos.
+- **"Siguiente trofeo" (recomendaciones)** añadido a
+  `/api/mobile/panel/highlights` (`nextTrophies`) — ya existía en la
+  portada web (`getTrophyRecommendations` en `lib/recommendations.ts`)
+  pero nunca había llegado al móvil. **El dato ya está en el backend;
+  falta construir la pantalla/tarjeta en Android** — quien retome esto
+  puede seguir directo por ahí.
+- Bugs sueltos arreglados: "¡A un paso!" en juegos YA platinados (decía
+  eso con 0 trofeos restantes, sonaba a que faltaba uno); la navegación
+  inferior de Android resucitaba la pantalla que hubieras dejado a medias
+  (Ajustes) en vez de ir siempre a la raíz de la pestaña (se quitó
+  `saveState`/`restoreState` de los items del `NavigationBar`); botón
+  "Guardar cambios" del perfil (web) siempre activo aunque no hubiera
+  cambios.
+
+Todo esto está comiteado y desplegado en `origin/master`
+(`c728412`), junto con el arreglo de cron de abajo.
+
+### ⚠️ AVISO GRANDE: el cron puede bloquearse ENTERO por una sola cuenta rota — arreglado en el código, pero no se ha podido confirmar que ya funciona de verdad en producción
+
+El usuario reportó en mitad de la sesión: "gané 2 trofeos nuevos y no me
+ha llegado nada, ni del bot ni de la web ni notificación". Investigado a
+fondo, consultando la base de datos real directamente (con scripts
+temporales en `scripts/`, borrados después de usarlos — el patrón para
+esto, si hace falta otra vez, es escribir un `.mjs` con `postgres` +
+`dotenv` cargando `.env.local`, correrlo con `node`, y borrarlo al
+terminar; para código que necesite importar de `src/lib/*.ts` con
+`import "server-only"` arriba, `tsx` revienta fuera de Next — no se
+encontró un atajo limpio esta sesión, ver más abajo).
+
+**El bug real, ya arreglado en código:**
+
+El cron (`/api/cron/sync/route.ts`) elige las `POR_PASADA` (2) cuentas
+más "rancias" para sincronizar en cada pasada, y las ordenaba por
+`platformAccounts.syncedAt` — pero esa columna SOLO avanza si la
+sincronización tiene éxito de verdad (decisión a propósito de una sesión
+anterior, 7 sept, para que "sin refrescar" en Ajustes → Plataformas sea
+honesto). Consecuencia no vista hasta ahora: si UNA cuenta falla siempre
+(token caducado, cuenta puesta en privado, lo que sea), su `syncedAt`
+nunca avanza, así que se queda siendo "la más rancia" **para siempre** —
+y como solo hay 2 huecos por pasada, esa única cuenta rota los ocupa los
+dos en cada pasada, para siempre, dejando a TODO EL MUNDO detrás suyo sin
+sincronizar indefinidamente. No es que el cron falle: cron-job.org veía
+"200 OK" cada 15 min sin problema, el cron corría perfectamente — solo
+que no hacía nada útil, dando vueltas sobre la misma cuenta rota.
+
+Confirmado en vivo: se encontraron 2 cuentas de otros usuarios (no el
+dueño) atascadas desde las 10:45 UTC, y ninguna cuenta de nadie se había
+sincronizado desde las 11:15 UTC — más de 2 horas sin ningún avance real
+para nadie.
+
+**Arreglo aplicado:**
+
+1. Columna nueva `platformAccounts.lastAttemptedAt` (ver `schema.ts`) —
+   avanza SIEMPRE, éxito o no, a diferencia de `syncedAt`. El cron ahora
+   ordena por `lastAttemptedAt`, no por `syncedAt` — una cuenta rota
+   sigue reintentándose de vez en cuando pero ya no bloquea a las demás.
+   Migrado a mano con `scripts/anadir-lastattemptedat-platform-account.mts`
+   (con backfill `coalesce(syncedAt, now())`) porque `drizzle-kit push`
+   se paró en un prompt interactivo AJENO a este cambio (una constraint
+   `unique` pendiente en `fcm_token` — sin tocar, ver el aviso suelto más
+   abajo).
+2. `resyncLibraries`/`resyncPlatform` (`lib/profiles.ts`) actualizan
+   `lastAttemptedAt` tanto en el `try` como en el `catch`.
+3. Parche manual sobre la base real (`platformAccounts.syncedAt = now()`
+   para las 2 cuentas atascadas) para desatascar la cola YA MISMO,
+   sin esperar al despliegue.
+4. Comiteado y desplegado (`c728412`, push a `origin/master`) — la URL
+   real de producción es **`https://platinos-nine.vercel.app`** (no
+   estaba guardada en ningún sitio del repo a propósito, ver el
+   comentario en `lib/site.ts` — el usuario la dio en esta sesión, vale
+   la pena apuntarla aquí para no tener que volver a preguntar).
+
+**Lo que NO se pudo confirmar del todo — aquí es donde se quedó:**
+
+Después del despliegue, se llamó a mano al cron real
+(`curl -H "Authorization: Bearer $CRON_SECRET" https://platinos-nine.vercel.app/api/cron/sync`)
+y SÍ sincronizó de verdad la cuenta del usuario (290 juegos PSN+Steam+Xbox,
+17.6s, respuesta `{"sincronizados":2,...}`) — la lógica del arreglo
+funciona. Pero:
+
+- Entre las 11:45 UTC y el momento de esa llamada manual (~14:00 UTC), NO
+  hay ningún `sync_run` nuevo para NADIE en la base, aunque el usuario
+  enseñó una captura de cron-job.org con "200 OK" cada 15 min sin
+  interrupción en ese mismo hueco (incluida una ejecución a las 3:45 PM
+  hora local = 13:45 UTC, "Éxito 200 OK" en 16.18s). Es decir: cron-job.org
+  dice que llegó y que fue bien, pero la base no refleja ningún trabajo
+  real en ese hueco — **contradicción sin explicar todavía**. Posibles
+  pistas sin comprobar: que cron-job.org esté llamando a una URL/alias
+  distinto del de producción actual aunque parezca el mismo, algún tipo
+  de caché intermedia (aunque la duración de 16-20s no cuadra con una
+  respuesta cacheada), o que displaySea otra cosa completamente distinta
+  todavía sin identificar.
+- Incluso con la sincronización de biblioteca ya corriendo bien para el
+  usuario (confirmado con la llamada manual), sus 2 trofeos nuevos
+  concretos (en **Star Wars Outlaws**, `psn-NPWR30405_00`) seguían sin
+  aparecer en `user_trophy` — la llamada manual dio `newTrophies: 0` para
+  PSN. Esto puede ser perfectamente el retraso normal de la propia API de
+  PSN en reportar un trofeo recién conseguido (visto otras veces), NO
+  necesariamente un bug de Paragon — pero no se llegó a comprobar del
+  todo: quedaba pendiente forzar `syncGameTrophies` directo sobre
+  `psn-NPWR30405_00` para ver si PSN YA lo reporta y Paragon no lo está
+  leyendo bien, o si de verdad PSN todavía no lo tiene. Se intentó montar
+  ese script de diagnóstico (con un `node_modules/server-only` de mentira
+  dentro de `scripts/` para poder importar `lib/sync.ts` fuera de Next
+  sin que reviente el guard de `server-only`) pero la sesión se cortó
+  ahí — la carpeta de mentira se borró sin llegar a usarla.
+
+**Para quien retome esto**: antes de nada, comprobar si el usuario ya
+recibió el aviso de esos 2 trofeos (puede que se resolviera solo con el
+tiempo). Si no, la vía más rápida es abrir la Ficha de "Star Wars
+Outlaws" en la app o pulsar "¿Ya lo tengo?" en Modo Enfoque — eso llama a
+`syncGameTrophies` directo para ESE juego, sin depender de la rotación
+del cron ni de su retraso. Si con eso tampoco aparecen, ahí sí hay un bug
+real que investigar en `syncGameTrophies`/`fetchTrophies` (PSN). Y en
+paralelo, valdría la pena mirar la config real de cron-job.org (no solo
+el historial de ejecuciones, que ya se vio) para explicar la
+contradicción de arriba.
+
+Aviso aparte, sin relación: hay una constraint `unique` pendiente en
+`fcm_token` que `drizzle-kit push` pregunta si hay que truncar la tabla —
+no se ha tocado, alguien debería revisar por qué existe ese desajuste
+entre `schema.ts` y la base real antes de que otra migración se tropiece
+con lo mismo.
 
 ---
 
