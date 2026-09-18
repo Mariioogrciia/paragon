@@ -452,6 +452,11 @@ private const val MARKER_SPACING_PX = 28f
 /** Ancho mínimo por día en el eje X — mismo criterio y mismo valor que MIN_DAY_WIDTH_PX en TrophyTimeline.tsx (web). */
 private const val MIN_DAY_WIDTH_PX = 56
 
+/** Margen a los cuatro lados del área de puntos — sin esto, un trofeo con
+ * 0%/100% de rareza exacto, o del primer/último día, queda con el centro
+ * justo en el borde. Mismo criterio que MARKER_PADDING_PX en TrophyTimeline.tsx. */
+private const val MARKER_PADDING_DP = 16
+
 private val FECHA_MES_CORTO = java.text.SimpleDateFormat("MMM yy", java.util.Locale("es", "ES"))
 
 private val MilestoneGold = Color(0xFFE2B53E)
@@ -641,8 +646,12 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
         Row {
             // Eje Y: fuera del área con scroll, se queda fijo a la
             // izquierda mientras se desplaza el gráfico en horizontal.
+            // padding vertical = MARKER_PADDING_DP para que "0%"/"100%"
+            // queden a la altura real de sus gridlines (ver más abajo),
+            // no en el borde exacto donde un marcador quedaría cortado
+            // a la mitad.
             Column(
-                modifier = Modifier.width(30.dp).height(260.dp),
+                modifier = Modifier.width(30.dp).height(260.dp).padding(vertical = MARKER_PADDING_DP.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.End,
             ) {
@@ -666,12 +675,21 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                             .height(260.dp)
                             .border(1.dp, Border.copy(alpha = 0.5f)),
                     ) {
+                        // Posición con margen de MARKER_PADDING_DP a los
+                        // cuatro lados — un trofeo con 0%/100% de rareza
+                        // exacto, o del primer/último día, no debe quedar
+                        // con el centro justo en el borde del área.
+                        val xInset = maxWidth - MARKER_PADDING_DP.dp * 2
+                        val yInset = maxHeight - MARKER_PADDING_DP.dp * 2
+                        fun xPara(frac: Float) = MARKER_PADDING_DP.dp + xInset * frac
+                        fun yPara(frac: Float) = MARKER_PADDING_DP.dp + yInset * frac
+
                         listOf(0f, 25f, 50f, 75f, 100f).forEach { r ->
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(1.dp)
-                                    .offset(y = maxHeight * (r / 100f))
+                                    .offset(y = yPara(r / 100f))
                                     .background(Border.copy(alpha = 0.4f)),
                             )
                         }
@@ -683,7 +701,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                             val offsetDia = (offsetPorId[p.trofeo.id] ?: 0f).dp
                             Box(
                                 modifier = Modifier
-                                    .offset(x = maxWidth * xFrac - tam / 2 + offsetDia, y = maxHeight * yFrac - tam / 2)
+                                    .offset(x = xPara(xFrac) - tam / 2 + offsetDia, y = yPara(yFrac) - tam / 2)
                                     .size(tam)
                                     .clip(CircleShape)
                                     .background(Surface2)
@@ -703,12 +721,13 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                     }
 
                     Box(modifier = Modifier.width(anchoContenido).height(20.dp)) {
+                        val xInsetMeses = anchoContenido - MARKER_PADDING_DP.dp * 2
                         etiquetasMes.forEach { (x, texto) ->
                             Text(
                                 text = texto,
                                 color = Muted,
                                 fontSize = 9.sp,
-                                modifier = Modifier.offset(x = anchoContenido * x - 14.dp, y = 2.dp),
+                                modifier = Modifier.offset(x = MARKER_PADDING_DP.dp + xInsetMeses * x - 14.dp, y = 2.dp),
                             )
                         }
                     }
