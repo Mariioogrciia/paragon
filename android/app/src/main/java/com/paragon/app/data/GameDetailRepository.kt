@@ -34,6 +34,7 @@ data class TrophyItem(
     val earned: Boolean,
     val earnedAt: String?,
     val rarityPercent: Double?,
+    val iconUrl: String? = null,
 )
 
 data class PlatinumPrediction(val fechaMillis: Long, val dias: Int)
@@ -133,6 +134,7 @@ private fun GameDetailDto.toGameDetailData(): GameDetailData = GameDetailData(
             earned = it.earned,
             earnedAt = it.earnedAt,
             rarityPercent = it.rarityPercent,
+            iconUrl = it.iconUrl,
         )
     },
 )

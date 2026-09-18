@@ -10,8 +10,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -273,28 +273,8 @@ private fun GameDetailContent(
         }
 
         if (vistaCronologica) {
-            val cronologicos = game.trophies
-                .filter { it.earned && it.earnedAt != null }
-                .sortedBy { it.earnedAt }
-
-            if (cronologicos.isEmpty()) {
-                item {
-                    Text(
-                        text = "Aún no hay ningún trofeo con fecha registrada aquí.",
-                        color = Muted,
-                        fontSize = 13.sp,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    )
-                }
-            } else {
-                itemsIndexed(cronologicos) { index, trophy ->
-                    TimelineTrophyRow(
-                        trophy = trophy,
-                        esUltimo = index == cronologicos.lastIndex,
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                    )
-                }
+            item {
+                TrophyRarityChart(trophies = game.trophies, modifier = Modifier.padding(horizontal = 24.dp))
             }
         } else {
             val grouped = game.trophies.sortedWith(
@@ -546,40 +526,141 @@ private fun ActionChip(label: String, active: Boolean, accentColor: Color, onCli
     }
 }
 
+private data class PuntoRareza(val trofeo: TrophyItem, val fechaMillis: Long)
+
+private val GRADOS_EN_ORDEN = listOf(TrophyGrade.PLATINUM, TrophyGrade.GOLD, TrophyGrade.SILVER, TrophyGrade.BRONZE)
+
+private fun gradeLabelEs(grade: TrophyGrade?): String = when (grade) {
+    TrophyGrade.PLATINUM -> "Platino"
+    TrophyGrade.GOLD -> "Oro"
+    TrophyGrade.SILVER -> "Plata"
+    TrophyGrade.BRONZE -> "Bronce"
+    null -> "?"
+}
+
 /**
- * Fila de la vista "Cronología" — el mismo trofeo que TrophyRow pero en
- * formato línea de tiempo (punto + conector), la historia real de en qué
- * orden cayó cada uno en vez de la lista agrupada por metal.
+ * Vista "Cronología": cuándo cayó cada trofeo (eje X) y lo raro que es (eje
+ * Y, el % real — 0% arriba del todo, más raro, 100% abajo), con la foto
+ * real del trofeo, no un icono genérico. Mismo cálculo que TrophyTimeline.tsx
+ * en la web — solo cuenta lo que tiene `earnedAt` Y `rarityPercent` reales.
  */
 @Composable
-private fun TimelineTrophyRow(trophy: TrophyItem, esUltimo: Boolean, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(gradeColor(trophy.grade), RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(Icons.Default.Check, contentDescription = null, tint = Background, modifier = Modifier.size(16.dp))
+private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = Modifier) {
+    val puntos = remember(trophies) {
+        trophies
+            .filter { it.earned && it.earnedAt != null && it.rarityPercent != null }
+            .mapNotNull { t ->
+                val millis = try { FECHA_ISO_GAME_DETAIL.parse(t.earnedAt!!)?.time } catch (e: Exception) { null }
+                millis?.let { PuntoRareza(t, it) }
             }
-            if (!esUltimo) {
-                Box(
-                    modifier = Modifier
-                        .width(2.dp)
-                        .weight(1f, fill = false)
-                        .defaultMinSize(minHeight = 16.dp)
-                        .background(Border),
-                )
+            .sortedBy { it.fechaMillis }
+    }
+
+    if (puntos.size < 2) {
+        Text(
+            text = "Hacen falta al menos dos trofeos con fecha y rareza registradas para dibujar la gráfica.",
+            color = Muted,
+            fontSize = 13.sp,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = modifier.fillMaxWidth().padding(vertical = 24.dp),
+        )
+        return
+    }
+
+    val minFecha = puntos.first().fechaMillis
+    val maxFecha = puntos.last().fechaMillis
+    val rango = (maxFecha - minFecha).coerceAtLeast(1)
+    val gradosPresentes = GRADOS_EN_ORDEN.filter { g -> puntos.any { it.trofeo.grade == g } }
+    var seleccionado by remember { mutableStateOf<PuntoRareza?>(null) }
+
+    Column(modifier = modifier) {
+        if (gradosPresentes.size > 1) {
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.padding(bottom = 14.dp)) {
+                gradosPresentes.forEach { g ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(8.dp).background(gradeColor(g), CircleShape))
+                        Spacer(Modifier.width(4.dp))
+                        Text(gradeLabelEs(g), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
             }
         }
-        Column(modifier = Modifier.padding(start = 14.dp, bottom = 24.dp)) {
-            Text(text = trophy.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            if (trophy.detail.isNotBlank()) {
-                Text(text = trophy.detail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+
+        Row(modifier = Modifier.height(260.dp)) {
+            Column(
+                modifier = Modifier.width(30.dp).fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.End,
+            ) {
+                listOf("0%", "25%", "50%", "75%", "100%").forEach { Text(it, color = Muted, fontSize = 9.sp) }
             }
-            trophy.earnedAt?.let {
-                Text(text = fechaCortaTimeline(it), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+            Spacer(Modifier.width(6.dp))
+            BoxWithConstraints(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .border(1.dp, Border.copy(alpha = 0.5f)),
+            ) {
+                listOf(0f, 25f, 50f, 75f, 100f).forEach { r ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .offset(y = maxHeight * (r / 100f))
+                            .background(Border.copy(alpha = 0.4f)),
+                    )
+                }
+
+                puntos.forEach { p ->
+                    val xFrac = (p.fechaMillis - minFecha).toFloat() / rango
+                    val yFrac = (p.trofeo.rarityPercent ?: 0.0).toFloat() / 100f
+                    val tam = 30.dp
+                    Box(
+                        modifier = Modifier
+                            .offset(x = maxWidth * xFrac - tam / 2, y = maxHeight * yFrac - tam / 2)
+                            .size(tam)
+                            .clip(CircleShape)
+                            .background(Surface2)
+                            .border(2.dp, gradeColor(p.trofeo.grade), CircleShape)
+                            .clickable { seleccionado = if (seleccionado == p) null else p },
+                    ) {
+                        if (p.trofeo.iconUrl != null) {
+                            AsyncImage(
+                                model = p.trofeo.iconUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Row(modifier = Modifier.padding(top = 6.dp, start = 36.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(fechaCortaTimeline(puntos.first().trofeo.earnedAt!!), color = Muted, fontSize = 10.sp)
+            Spacer(Modifier.weight(1f))
+            Text(fechaCortaTimeline(puntos.last().trofeo.earnedAt!!), color = Muted, fontSize = 10.sp)
+        }
+
+        seleccionado?.let { p ->
+            Column(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .fillMaxWidth()
+                    .background(Surface, RoundedCornerShape(14.dp))
+                    .padding(14.dp),
+            ) {
+                Text(text = p.trofeo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                if (p.trofeo.detail.isNotBlank()) {
+                    Text(text = p.trofeo.detail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                Text(
+                    text = "${fechaCortaTimeline(p.trofeo.earnedAt!!)} · ${p.trofeo.rarityPercent}%",
+                    color = Muted,
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
             }
         }
     }

@@ -16,6 +16,7 @@ data class TrophyDto(
     val earned: Boolean,
     val earnedAt: String?,
     val rarityPercent: Double?,
+    val iconUrl: String?,
 )
 
 data class GameDetailDto(
