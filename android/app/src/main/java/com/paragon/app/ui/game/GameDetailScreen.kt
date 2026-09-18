@@ -438,10 +438,16 @@ private val FECHA_ISO_GAME_DETAIL = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:
     timeZone = java.util.TimeZone.getTimeZone("UTC")
 }
 private val FECHA_CORTA_TIMELINE = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale("es", "ES"))
+private val FECHA_DIA_KEY = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).apply {
+    timeZone = java.util.TimeZone.getTimeZone("UTC")
+}
 
 /** "23 jun 2026" a partir del ISO real de earnedAt — para la fecha de cada fila de la Cronología. */
 private fun fechaCortaTimeline(iso: String): String =
     try { FECHA_CORTA_TIMELINE.format(FECHA_ISO_GAME_DETAIL.parse(iso)!!) } catch (e: Exception) { "" }
+
+/** Separación entre marcadores del mismo día en TrophyRarityChart — mismo criterio que MARKER_SPACING_PX en TrophyTimeline.tsx. */
+private const val MARKER_SPACING_PX = 28f
 
 private val MilestoneGold = Color(0xFFE2B53E)
 
@@ -573,6 +579,25 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
     val gradosPresentes = GRADOS_EN_ORDEN.filter { g -> puntos.any { it.trofeo.grade == g } }
     var seleccionado by remember { mutableStateOf<PuntoRareza?>(null) }
 
+    // Varios trofeos el mismo día caen en la misma X — sin esto se apilan
+    // uno encima de otro. Se abren en abanico horizontal alrededor de su
+    // día real (mismo criterio que TrophyTimeline.tsx en la web), sin
+    // tocar la fecha real de cada uno.
+    val offsetPorId = remember(puntos) {
+        val porDia = LinkedHashMap<String, MutableList<PuntoRareza>>()
+        puntos.forEach { p ->
+            val dia = FECHA_DIA_KEY.format(java.util.Date(p.fechaMillis))
+            porDia.getOrPut(dia) { mutableListOf() }.add(p)
+        }
+        val mapa = mutableMapOf<String, Float>()
+        porDia.values.forEach { grupo ->
+            grupo.forEachIndexed { i, p ->
+                mapa[p.trofeo.id] = (i - (grupo.size - 1) / 2f) * MARKER_SPACING_PX
+            }
+        }
+        mapa
+    }
+
     Column(modifier = modifier) {
         if (gradosPresentes.size > 1) {
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.padding(bottom = 14.dp)) {
@@ -615,9 +640,10 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                     val xFrac = (p.fechaMillis - minFecha).toFloat() / rango
                     val yFrac = (p.trofeo.rarityPercent ?: 0.0).toFloat() / 100f
                     val tam = 30.dp
+                    val offsetDia = (offsetPorId[p.trofeo.id] ?: 0f).dp
                     Box(
                         modifier = Modifier
-                            .offset(x = maxWidth * xFrac - tam / 2, y = maxHeight * yFrac - tam / 2)
+                            .offset(x = maxWidth * xFrac - tam / 2 + offsetDia, y = maxHeight * yFrac - tam / 2)
                             .size(tam)
                             .clip(CircleShape)
                             .background(Surface2)

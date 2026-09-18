@@ -40,6 +40,28 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   const rangoFecha = maxFecha - minFecha;
   const xFor = (fecha: number) => (rangoFecha === 0 ? 50 : ((fecha - minFecha) / rangoFecha) * 100);
 
+  // Varios trofeos el mismo día caen exactamente en la misma X — sin esto
+  // se apilan uno encima de otro y solo se ve el de más arriba. Se
+  // abren en abanico horizontal alrededor de su día real (offsetPx, no
+  // cambia la fecha que se muestra ni el eje), ordenados por hora exacta
+  // dentro del día. Con muchos el mismo día el abanico se ensancha y ese
+  // tramo deja de ser proporcional al tiempo — aceptado a propósito, el
+  // caso normal es 2-4 al día.
+  const MARKER_SPACING_PX = 28;
+  const porDia = new Map<string, typeof puntos>();
+  for (const p of puntos) {
+    const dia = new Date(p.fechaMillis).toISOString().slice(0, 10);
+    const grupo = porDia.get(dia);
+    if (grupo) grupo.push(p);
+    else porDia.set(dia, [p]);
+  }
+  const offsetPorId = new Map<string, number>();
+  for (const grupo of porDia.values()) {
+    grupo.forEach((p, i) => {
+      offsetPorId.set(p.id, (i - (grupo.length - 1) / 2) * MARKER_SPACING_PX);
+    });
+  }
+
   const gradosPresentes = GRADES.filter((g) => puntos.some((p) => p.grade === g));
 
   return (
@@ -76,7 +98,11 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
             <div
               key={p.id}
               className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${xFor(p.fechaMillis)}%`, top: `${p.rarityPercent}%`, zIndex: hoverId === p.id ? 20 : 1 }}
+              style={{
+                left: `calc(${xFor(p.fechaMillis)}% + ${offsetPorId.get(p.id) ?? 0}px)`,
+                top: `${p.rarityPercent}%`,
+                zIndex: hoverId === p.id ? 20 : 1,
+              }}
               onMouseEnter={() => setHoverId(p.id)}
               onMouseLeave={() => setHoverId((id) => (id === p.id ? null : id))}
             >
