@@ -1,11 +1,234 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **17 de septiembre de 2026**
-(con Gemini **y** Antigravity, los dos dentro de Android Studio, trabajando
-en paralelo en la app nativa a la vez que esta sesión — más abajo hay el
-detalle completo de esa coordinación, incluidos 4 bugs de compilación
-reales suyos que hubo que arreglar).
+releer todo el historial. Última actualización: **17-18 de septiembre de
+2026** (con Gemini **y** Antigravity, los dos dentro de Android Studio,
+trabajando en paralelo en la app nativa a la vez que esta sesión — más abajo
+hay el detalle completo de esa coordinación, incluidos 4 bugs de
+compilación reales suyos que hubo que arreglar).
+
+---
+
+## Sesión del 17-18 de septiembre de 2026 (continuación 17) — cron real arreglado de verdad, offline de la app completo, y un buen puñado de funciones nuevas (DLC, predicción, Sesión de Enfoque, Galería de hitos, Cronología de rareza)
+
+Sesión larguísima, muy encadenada — cada cosa que se probaba destapaba la
+siguiente. Todo lo de código está en `origin/master` **salvo la
+sincronización en segundo plano (WorkManager)**, ver el aviso grande al
+final de esta entrada.
+
+### El cron real llevaba ~2 horas sin sincronizar a nadie — causa real encontrada
+
+El usuario reportó que el enlace de invitación a liga que manda el bot de
+Discord daba 404 — resultó ser que el arreglo de la continuación 15 (mirar
+`getPendingLeagueInvite` antes del 404) existía en el disco pero **nunca se
+había comiteado ni desplegado**. Comiteado y subido sin más
+(`f1ae4f5`) — pero investigando el push de esa invitación, salió un
+problema de verdad más gordo: el cron real (cron-job.org, cada 15 min)
+llevaba horas fallando.
+
+Diagnóstico paso a paso, sin dar nada por hecho:
+- Confirmado que `DATABASE_URL` en Vercel apunta al mismo proyecto de
+  Supabase que desarrollo (endpoint de diagnóstico temporal, comiteado y
+  quitado otra vez en cuanto sirvió — `2770909`…`65e16ee`).
+- Confirmado que las credenciales de PSN/Steam/Xbox funcionan bien en
+  producción (probadas en vivo contra cuentas reales desde el propio
+  servidor de Vercel).
+- La causa real: **cron-job.org tiene un timeout de cliente fijo en 30s en
+  el plan gratis, sin poder subirlo** — la ruta `/api/cron/sync` tardaba
+  22-44s con los topes de siempre, así que cron-job.org cortaba la conexión
+  y marcaba "Fallido (timeout)" en cada intento, aunque Vercel SÍ terminara
+  bien unos segundos después (confirmado con sus logs reales: 200 en
+  36.9s). El cron nunca tuvo un bug de código — cron-job.org simplemente no
+  llegaba a ver la respuesta.
+- Arreglado bajando el **presupuesto real** de la ruta a 22s (`PRESUPUESTO_MS`,
+  ya no atado a los 60s de `maxDuration` de Vercel) y los topes por pasada
+  (`POR_PASADA` 4→2, `DETALLES_POR_PASADA` 15→6, `XBL_DETALLES_POR_PASADA`
+  5→3, `PEGI_POR_PASADA` 60→30, `MARGEN_MS` 25s→8s) — `876cee0`. Efecto
+  secundario aceptado a propósito: con solo ~6 usuarios reales, dar la
+  vuelta completa a todos pasa de ~30 min a ~45 min, prefiriendo eso a que
+  se quede parado horas enteras.
+
+### El crash de cambiar el tema de plataforma — arreglado, causa confirmada
+
+`applyLauncherIcon` (`IconSwitcher.kt`) desactivaba el `<activity-alias>`
+que había lanzado la tarea EN PRIMER PLANO — `DONT_KILL_APP` solo evita que
+el sistema mate el proceso, pero ActivityManager fuerza el cierre de esa
+Activity igualmente. Arreglado con `currentForegroundAlias()`
+(`ActivityManager.getAppTasks()`) + `flushPendingDisable()` pospuesto a
+`onStop()`/arranque en frío — ver el detalle técnico completo más abajo en
+el historial de esta misma entrada de traspaso (quedó documentado la
+primera vez que se arregló, dentro de esta sesión). **Compila limpio, sin
+probar todavía en un dispositivo real.**
+
+### Guía completa del bot de Discord en `/como-funciona`
+
+Enlace de invitación real (`DISCORD_APPLICATION_ID`), comandos agrupados
+por tema con los 6 que faltaban (`/juego`, `/nota`, `/ruleta`, `/ligas`,
+`/liga`, `/invitacionesliga`), y aclarado que `/anunciosaqui` solo tiene un
+canal activo a la vez por servidor.
+
+### Offline de verdad — Panel, Biblioteca, Ficha de juego, Comunidad, Amigos, Mis Ligas
+
+Repaso pedido por el usuario ("pensar en algo offline"). Hallazgo más
+importante: **el Panel bloqueaba TODA la app sin red** — `AppRoot` (la
+puerta de entrada antes de `MainScreen`) no tenía ninguna caché, así que un
+corte de conexión dejaba a cualquiera atascado en el `ErrorGate` para
+siempre, sin poder llegar ni a Biblioteca ni a la Ficha de juego aunque esas
+dos SÍ tuvieran ya caché Room de antes.
+
+- **Aviso "Sin conexión — mostrando la última copia guardada"** añadido a
+  Biblioteca y Ficha de juego (ya tenían caché real pero nunca lo decían —
+  `GameDetailRepository` ya calculaba `fromCache` para Modo Enfoque, pero
+  `GameDetailScreen` lo descartaba sin más) — `ab8f10a`.
+- **Panel con caché offline nueva** (`PanelCacheEntity`/`PanelDao`, una
+  sola fila) — mismo patrón "red primero, caché de respaldo" que el resto —
+  `3baf0ed`.
+- **Comunidad, Amigos y Mis Ligas** con la misma caché de respaldo, vía una
+  tabla genérica clave-valor en JSON (`SimpleCacheEntity`/`SimpleCacheDao`,
+  evita tres entidades casi idénticas) — Mis Ligas solo cachea la LISTA, no
+  el detalle de cada liga (clasificación en vivo, más riesgo de confundir
+  con datos viejos de algo colaborativo) — `ad9170e`.
+- **Sincronización en segundo plano (WorkManager) — BLOQUEADA, sin
+  comitear.** Ver el aviso grande al final de esta entrada.
+
+### "Tu primer trofeo" en los hitos de carrera
+
+Nuevo hito en `hitosHistoricos()` (`lib/profileStats.ts`): el trofeo más
+antiguo de toda la cuenta por fecha, cualquier grado o juego — antes la
+línea de tiempo solo empezaba en el primer platino. En la web
+(`HistoricalTimeline.tsx`), en `/api/mobile/stats` + `StatsScreen.kt`
+(nueva tarjeta "Hitos de tu carrera" completa — el móvil nunca mostraba
+NINGUNO de estos hitos, ni siquiera los que el backend ya calculaba desde
+hace sesiones) y en `/perfil` de Discord — `16e7122`.
+
+### Horas jugadas por juego, en la app nativa
+
+`playtimeMinutes` ya lo mandaba el backend en `/library` y `/games/{id}`
+(documentado en `CONTRACT.md` como "mismos campos que en /library") pero la
+app nunca lo leía ni lo mostraba. Añadido a los DTOs, a los modelos de
+dominio y a las dos cachés Room (bump de la base a versión 4 en ese
+momento) — se muestra en `GameDetailScreen` bajo la barra de progreso —
+`ba48b0b`.
+
+### Cuatro ideas nuevas del usuario, priorizadas y construidas
+
+**Filtro "Solo falta el DLC"** (Biblioteca, web + app): ya tienes el
+Platino (o el 100% de Steam) pero el juego no llega al 100% global — antes
+"Platinados" ya los incluía mezclados con los que SÍ están al 100% del
+todo, este filtro los aísla.
+
+**Predicción de Platino** ("🔮 A este ritmo, lo tienes el jueves 24 de
+octubre", Ficha de juego): mide el ritmo de trofeos con fecha real en los
+últimos 14 días y proyecta ese ritmo sobre lo que falta. `null` si ya está
+platinado, si no hay ritmo reciente (menos de 2 trofeos en la ventana), o
+si la proyección sale a más de 2 años vista. Mismos umbrales en
+`predecirPlatino()` (web) y su equivalente en Kotlin — `da0b76b`.
+
+**Sesión de Enfoque con cronómetro y Diario privado** (dentro de Modo
+Enfoque, solo Android — encaje natural, ya era la pantalla de "sentarte a
+jugar"): "Iniciar sesión" guarda solo la hora de inicio
+(`GameSessionEntity`, Room) — no un timer en memoria, sobrevive a que
+Android mate el proceso mientras se juega al juego DE VERDAD. "Detener
+sesión" calcula trofeos conseguidos comparando el recuento de antes y
+después. "Diario" (botón nuevo, disponible con o sin juego anclado) lista
+las sesiones cerradas: *"Viernes, 2h 30m jugando a Elden Ring. Conseguidos
+2 trofeos."* 100% local, sin backend. **`game_sessions` es la primera tabla
+de Room que NO es caché** (dato real del usuario) — bump de versión a 7 con
+aviso explícito en `ParagonDatabase.kt` de que a partir de aquí hace falta
+una `Migration` de verdad, no vale `fallbackToDestructiveMigration` —
+`6d75e4b`.
+
+**Galería de hitos exportable** (Estadísticas → "Galería de hitos"):
+primer trofeo, trofeo más raro, y cada platino "redondo" (#1, #5, #10,
+#25, #50, cada 50 a partir de ahí, más siempre el último) con un botón que
+genera un póster vertical para compartir/guardar. Nuevo `platinosHitos` en
+`hitosHistoricos()` (numera los platinos por fecha real, filtra a los
+redondos). Reutiliza `TrophyShareCard`/`ShareTrophyDialog` (la misma pieza
+de "Compartir Platino" de `GameDetailScreen`) con dos parámetros nuevos
+(`badge`, `subtitle`) sin tocar el uso existente — `0a05667`.
+
+### Vista "Cronología" en la Ficha de juego — la que más vueltas dio, la favorita del usuario
+
+Pedida como "línea temporal por juego, con los trofeos" — la primera
+versión fue una lista vertical con icono genérico por metal, y el usuario
+aclaró que quería algo bien distinto: **una gráfica real de fecha × rareza,
+con la FOTO REAL de cada trofeo**, no un icono. Reescrita del todo:
+
+- Eje X = fecha en que cayó cada trofeo, eje Y = rareza real (0% arriba del
+  todo = más raro, 100% abajo = más común). Cada punto es la foto real del
+  trofeo (`iconUrl` — de paso, hueco real encontrado: `TrophyDto`/
+  `TrophyItem` en Android nunca habían tenido este campo, aunque el backend
+  ya lo mandaba) con un anillo del color del metal. Toca/pasa el ratón para
+  ver nombre, fecha y % exactos — `8fee650`.
+- **Trofeos del mismo día**: se apilaban exactamente en el mismo punto — se
+  abren en abanico horizontal (28px entre cada uno), ordenados por hora
+  exacta — `d2c6ce0`.
+- **El eje X dejó de ser proporcional al tiempo real**: un juego jugado a
+  rachas (ráfaga de trofeos en pocos días, luego meses/años sin tocarlo)
+  con una escala lineal real dejaba los huecos vacíos aplastando la ráfaga
+  entera en un puñado de píxeles — ni el abanico cabía ahí. Cada DÍA con
+  trofeos se lleva ahora un hueco IGUAL en el eje, en orden cronológico, no
+  proporcional al tiempo transcurrido — `6978de0`.
+- **Con muchos días distintos el problema volvía** (huecos cada vez más
+  estrechos): cada día se lleva un ancho MÍNIMO fijo (56px) en vez de un
+  hueco proporcional al número total de días — con pocos días el gráfico se
+  sigue estirando para llenar el ancho disponible, con muchos aparece
+  **scroll horizontal** (eje Y fijo a la izquierda mientras se hace
+  scroll) en vez de comprimir. Añadidas etiquetas de mes/año a lo largo del
+  eje, ya que dejó de ser proporcional al tiempo — `a476aaf`.
+- **Bug real de CSS encontrado al probarlo**: el contenedor con scroll
+  horizontal (`overflow-x-auto`) fuerza, por la propia spec, a que
+  `overflow-y` deje de ser "visible" — así que un trofeo con 0%/100% de
+  rareza exacto se recortaba a la mitad, y la fila de meses desaparecía
+  entera (le faltaba alto reservado). Arreglado con un margen de 16px a los
+  cuatro lados del área de puntos, verificado con `getBoundingClientRect()`
+  en el navegador contra una cuenta real — `52a73b1`.
+
+Toda la iteración de Cronología, tanto la gráfica como cada arreglo, está
+en web (`TrophyTimeline.tsx`, cuarta pestaña dentro de `TrophyList.tsx`,
+junto a Lista/Cuadrícula/Árbol) **y** en Android (`TrophyRarityChart` en
+`GameDetailScreen.kt`) con el mismo cálculo en los dos sitios.
+
+### Bug real ajeno arreglado: `LibraryScreen.kt` no compilaba
+
+Gemini/Antigravity añadieron en paralelo color dinámico, acento
+personalizado, tipografía y layout de biblioteca configurables
+(`ThemeStore`/`SettingsScreen`/`Color.kt`/`Theme.kt`) — `LibraryScreen`
+pasó a exigir un `themeStore: ThemeStore` como 3er parámetro, pero la
+llamada en `MainScreen.kt` no lo pasaba y caía en `searchQuery` por error
+de posición. Arreglado (un solo parámetro añadido), sin revertir nada de
+su trabajo — mismo criterio de siempre.
+
+### ⚠️ Aviso real para quien retome esto: WorkManager sin comitear, bloqueado por SSL
+
+Está escrito el código para sincronizar Panel + Biblioteca en segundo
+plano cada 15 min (`PanelSyncWorker.kt`, programado desde
+`ComposeMainActivity.onCreate`) pero **nunca se ha podido compilar**: este
+entorno no puede descargar la dependencia nueva (`androidx.work:work-runtime-ktx`)
+por un fallo de certificado SSL de Java (`PKIX path building failed`)
+contra `dl.google.com`/`repo.maven.apache.org` — `curl` sí llega bien a
+esas URLs (confirmado), así que es el almacén de confianza de Java
+(`cacerts`) el que no tiene la raíz que hace falta, no un problema de red.
+Probado con dos JDK distintos, mismo fallo en los dos.
+
+**Archivos afectados, sin comitear, todavía en el disco de esta sesión**:
+`android/app/build.gradle` (la línea de la dependencia nueva),
+`ComposeMainActivity.kt` (la llamada a `PanelSyncWorker.schedule(...)`), y
+la carpeta entera `android/app/src/main/java/com/paragon/app/work/`. Quien
+retome esto: o bien abrir el proyecto en Android Studio y hacer un Sync ahí
+(puede que su Gradle sí resuelva la dependencia con otra configuración de
+red/proxy), o arreglar el `cacerts` del JDK que use la máquina donde se
+ejecute esto.
+
+### Otros avisos que siguen en pie de sesiones anteriores
+
+- Push de invitación a liga: revisado de nuevo línea a línea
+  (`addLeagueMember`, `enviarPush`, `enviarPushFcm`,
+  `anunciarInvitacionLiga`) — ninguno lanza nunca, el código está bien.
+  Sigue haciendo falta un evento real + logs de Vercel para diagnosticar
+  más, no hay nada más que revisar sin eso.
+- `Paragon/` (bóveda de Obsidian vacía) y `scratch/` en la raíz del repo
+  siguen sin nada que ver con el proyecto — no tocados.
 
 ---
 
