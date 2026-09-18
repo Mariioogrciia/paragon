@@ -192,13 +192,7 @@ fun MainScreen(
                         Icon(Icons.Default.Close, contentDescription = "Cerrar búsqueda", tint = Foreground)
                     }
                 } else {
-                    Text(
-                        text = "PARAGON",
-                        color = Foreground,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp
-                    )
+                    ParagonWordmark()
                     Spacer(Modifier.weight(1f))
                     StreakChip(racha = racha, onClick = { showRachaSheet = true })
                     if (isOnLibrary) {
@@ -362,10 +356,10 @@ fun MainScreen(
                     navController.navigate(Screen.Compare.routeFor(handle))
                 }) 
             }
-            composable(Screen.Social.route) { 
-                SocialScreen(tokenStore, themeStore, onCompareClick = { handle ->
+            composable(Screen.Social.route) {
+                SocialScreen(tokenStore, themeStore, myHandle = profile.handle, onCompareClick = { handle ->
                     navController.navigate(Screen.Compare.routeFor(handle))
-                }) 
+                })
             }
 
             composable(Screen.Focus.route) {
@@ -436,6 +430,39 @@ fun MainScreen(
 
     if (showRachaSheet) {
         RachaSheet(tokenStore = tokenStore, onDismiss = { showRachaSheet = false })
+    }
+}
+
+/**
+ * Marca de Paragon para la cabecera — antes era solo texto plano
+ * ("PARAGON" en mayúsculas sin más), sin ningún símbolo reconocible ni
+ * presencia de marca. Reutiliza la MISMA insignia "P" con degradado de
+ * acento que ya se ve en la pantalla de login (`LoginGate` en
+ * `AppRoot.kt`), en miniatura — para que la marca sea consistente en toda
+ * la app, no un símbolo nuevo inventado aquí.
+ */
+@Composable
+private fun ParagonWordmark() {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .background(
+                    androidx.compose.ui.graphics.Brush.linearGradient(listOf(Accent, Accent.copy(alpha = 0.6f))),
+                    RoundedCornerShape(7.dp),
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = "P", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Black)
+        }
+        Text(
+            text = "PARAGON",
+            color = Foreground,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 2.sp,
+            modifier = Modifier.padding(start = 9.dp),
+        )
     }
 }
 

@@ -241,18 +241,24 @@ fun LibraryScreen(
                 }
             }
             is LibraryResult.Ok -> {
-                // Aplicar filtros, búsqueda y ordenación
-                val games = current.games
-                    .filterByStatus(FILTERS[selectedFilter].first)
-                    .filter { if (searchQuery.isBlank()) true else it.title.contains(searchQuery, ignoreCase = true) }
-                    .let { list ->
-                        when (sortOption) {
-                            0 -> list.sortedByDescending { it.progressPercent }
-                            1 -> list.sortedBy { it.title }
-                            2 -> list.sortedByDescending { it.title }
-                            else -> list
+                // Aplicar filtros, búsqueda y ordenación — memoizado: antes
+                // se recalculaba en CADA recomposición (p. ej. al escribir
+                // en el buscador letra a letra, o por el chip de racha de
+                // la cabecera), volviendo a filtrar/ordenar la biblioteca
+                // entera sin que nada relevante hubiera cambiado.
+                val games = remember(current.games, selectedFilter, searchQuery, sortOption) {
+                    current.games
+                        .filterByStatus(FILTERS[selectedFilter].first)
+                        .filter { if (searchQuery.isBlank()) true else it.title.contains(searchQuery, ignoreCase = true) }
+                        .let { list ->
+                            when (sortOption) {
+                                0 -> list.sortedByDescending { it.progressPercent }
+                                1 -> list.sortedBy { it.title }
+                                2 -> list.sortedByDescending { it.title }
+                                else -> list
+                            }
                         }
-                    }
+                }
 
                 if (games.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -267,7 +273,7 @@ fun LibraryScreen(
                         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                         contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
-                        items(games) { game ->
+                        items(games, key = { it.id }) { game ->
                             if (isList) {
                                 HeroGameCard(
                                     game = game.toGameProgress(),

@@ -1,6 +1,3 @@
-"use client";
-
-import Link from "next/link";
 import { type Game, type Trophy } from "@/lib/types";
 import { gradeLabel, TrophyIcon } from "./TrophyIcon";
 import { TrophyPhoto } from "@/components/TrophyList";

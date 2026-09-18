@@ -5,10 +5,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
@@ -31,6 +33,9 @@ import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
+import com.paragon.app.data.GlobalStats
+import com.paragon.app.data.PanelRepository
+import com.paragon.app.data.PanelResult
 import com.paragon.app.data.UserProfileRepository
 import com.paragon.app.data.UserProfileResult
 import com.paragon.app.data.auth.TokenStore
@@ -48,10 +53,17 @@ fun FriendProfileBottomSheet(
     onCompareClick: (String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val repository = remember(tokenStore) { UserProfileRepository(tokenStore) }
-    var result by remember { mutableStateOf<UserProfileResult?>(null) }
-    var dominantColor by remember { mutableStateOf<Color?>(null) }
     val context = LocalContext.current
+    val panelDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).panelDao() }
+    val repository = remember(tokenStore) { UserProfileRepository(tokenStore) }
+    // Solo para el bloque "Rivalidad" (tú vs. ellos) — mismo repositorio que
+    // ya usa el Panel, con su propia caché, así que esto no dispara una
+    // llamada de red visible: cada pantalla se trae sus propios datos en
+    // esta app, no se pasan las stats propias por props de un lado a otro.
+    val myPanelRepository = remember(tokenStore, panelDao) { PanelRepository(tokenStore, panelDao) }
+    var result by remember { mutableStateOf<UserProfileResult?>(null) }
+    var myStats by remember { mutableStateOf<GlobalStats?>(null) }
+    var dominantColor by remember { mutableStateOf<Color?>(null) }
     val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(handle) {
@@ -59,7 +71,7 @@ fun FriendProfileBottomSheet(
         result = null
         dominantColor = null
         result = repository.getProfile(handle)
-        
+
         val currentResult = result
         if (currentResult is UserProfileResult.Ok && !currentResult.profile.image.isNullOrBlank()) {
             val request = ImageRequest.Builder(context)
@@ -82,6 +94,11 @@ fun FriendProfileBottomSheet(
         }
     }
 
+    LaunchedEffect(Unit) {
+        val panel = myPanelRepository.getPanel()
+        if (panel is PanelResult.Ok) myStats = panel.stats
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -91,7 +108,7 @@ fun FriendProfileBottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.85f)
+                .fillMaxHeight(0.9f)
         ) {
             when (val current = result) {
                 null -> {
@@ -106,48 +123,77 @@ fun FriendProfileBottomSheet(
                 }
                 is UserProfileResult.Ok -> {
                     val profile = current.profile
-                    ProfileContent(profile, dominantColor, themeStore = themeStore, onCompareClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onCompareClick(profile.handle)
-                        onDismiss()
-                    }, onDismiss = onDismiss)
+                    ProfileContent(
+                        profile = profile,
+                        dominantColor = dominantColor,
+                        myStats = myStats,
+                        themeStore = themeStore,
+                        onCompareClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onCompareClick(profile.handle)
+                            onDismiss()
+                        },
+                        onDismiss = onDismiss,
+                    )
                 }
             }
         }
     }
 }
 
+/** Anillo del avatar por nivel — antes siempre el mismo borde neutro, sin comunicar nada del propio rango del jugador. */
+private fun ringColorForLevel(level: Int): Color = when {
+    level >= 50 -> Platinum
+    level >= 25 -> Color(0xFF9B59F6)
+    level >= 10 -> Accent
+    else -> Border
+}
+
+private fun archetypeForLevel(level: Int): String = when {
+    level >= 50 -> "Élite"
+    level >= 25 -> "Veterano"
+    level >= 10 -> "Cazador"
+    else -> "Explorador"
+}
+
 @Composable
 private fun ProfileContent(
-    profile: UserProfileDto, 
+    profile: UserProfileDto,
     dominantColor: Color?,
+    myStats: GlobalStats?,
     themeStore: com.paragon.app.data.theme.ThemeStore,
     onCompareClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val bgBrush = if (dominantColor != null) {
         Brush.verticalGradient(
-            colors = listOf(dominantColor.copy(alpha = 0.3f), Surface, Surface),
+            colors = listOf(dominantColor.copy(alpha = 0.22f), Surface, Surface),
             startY = 0f,
             endY = 600f
         )
     } else {
         Brush.verticalGradient(colors = listOf(Surface, Surface))
     }
+    val ringColor = ringColorForLevel(profile.level)
+    val isRival = themeStore.rivalHandle == profile.handle
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(bgBrush)
+            .verticalScroll(rememberScrollState())
     ) {
-        // Header con botón cerrar
+        // Cabecera: antes solo una X pegada a la esquina, sin ningún
+        // contexto de qué es esta pantalla.
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.End
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            Text("PERFIL DE JUGADOR", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             IconButton(
                 onClick = onDismiss,
-                modifier = Modifier.background(Background.copy(alpha = 0.5f), CircleShape)
+                modifier = Modifier.size(40.dp).background(Background.copy(alpha = 0.5f), CircleShape)
             ) {
                 Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Foreground)
             }
@@ -157,12 +203,11 @@ private fun ProfileContent(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .background(Background, CircleShape)
-                    .border(2.dp, dominantColor ?: Border, CircleShape),
+                    .border(3.dp, ringColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 if (!profile.image.isNullOrBlank()) {
@@ -177,14 +222,29 @@ private fun ProfileContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(profile.name, color = Foreground, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Text("@${profile.handle}", color = Muted, fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(14.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Text(profile.name, color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("@${profile.handle}", color = Muted, fontSize = 14.sp)
+            Text(
+                "Nivel Paragon ${profile.level} · ${archetypeForLevel(profile.level)}",
+                color = ringColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 4.dp),
+            )
 
-            // Estadísticas
+            if (profile.accounts.isNotEmpty()) {
+                Text(
+                    text = profile.accounts.joinToString(" · ") { it.platform.uppercase() } + " conectado" + (if (profile.accounts.size > 1) "s" else ""),
+                    color = Muted,
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(22.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -194,77 +254,142 @@ private fun ProfileContent(
                 StatItem("Trofeos", profile.trofeos.toString())
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
+            // Botón principal: antes blanco/color dominante puro, con
+            // demasiada presencia visual para lo que es — degradado de
+            // acento en vez de un blanco genérico.
             Button(
                 onClick = onCompareClick,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = dominantColor ?: Accent)
+                modifier = Modifier.fillMaxWidth().height(54.dp),
+                shape = RoundedCornerShape(14.dp),
+                contentPadding = PaddingValues(0.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             ) {
-                Text("⚔️ Comparar Trofeos", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = if (dominantColor != null) Color.White else Foreground)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Brush.linearGradient(listOf(Accent, dominantColor ?: Color(0xFF7657FF))), RoundedCornerShape(14.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("⚔ Comparar trofeos", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            val isRival = themeStore.rivalHandle == profile.handle
             OutlinedButton(
                 onClick = {
                     if (isRival) themeStore.setRivalHandle(null)
                     else themeStore.setRivalHandle(profile.handle)
                 },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isRival) Danger else Foreground),
-                border = androidx.compose.foundation.BorderStroke(1.dp, if (isRival) Danger else Border)
+                modifier = Modifier.fillMaxWidth().height(46.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isRival) Platinum else Foreground),
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (isRival) Platinum.copy(alpha = 0.5f) else Border)
             ) {
-                Text(if (isRival) "Desfijar Rival Principal" else "Fijar como Rival Principal", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                if (isRival) {
+                    Icon(Icons.Default.Star, contentDescription = null, tint = Platinum, modifier = Modifier.size(15.dp))
+                    Spacer(Modifier.width(6.dp))
+                }
+                Text(if (isRival) "Rival principal" else "Fijar como rival principal", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
+
+            if (myStats != null) {
+                RivalryCard(myStats = myStats, their = profile)
+                Spacer(modifier = Modifier.height(28.dp))
+            }
 
             if (profile.recentGames.isNotEmpty()) {
                 Text(
-                    "Últimos juegos",
-                    color = Foreground,
+                    "JUEGOS RECIENTES",
+                    color = Muted,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.Start).padding(bottom = 12.dp)
+                    letterSpacing = 1.sp,
+                    modifier = Modifier.align(Alignment.Start).padding(bottom = 10.dp)
                 )
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 28.dp),
                 ) {
-                    items(profile.recentGames) { game ->
-                        Box(
-                            modifier = Modifier
-                                .width(120.dp)
-                                .height(120.dp)
-                                .background(Background, RoundedCornerShape(8.dp))
-                                .clip(RoundedCornerShape(8.dp))
-                        ) {
-                            if (game.coverUrl.isNotBlank()) {
-                                AsyncImage(
-                                    model = game.coverUrl,
-                                    contentDescription = game.title,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.5f))
-                            )
-                            Column(
-                                modifier = Modifier.fillMaxSize().padding(8.dp),
-                                verticalArrangement = Arrangement.Bottom
-                            ) {
-                                Text(game.title, color = Foreground, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 2)
-                                Text("${game.percent}%", color = Platinum, fontSize = 10.sp)
-                            }
-                        }
+                    items(profile.recentGames, key = { it.id }) { game ->
+                        RecentGameCard(game)
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Tú vs. ellos — antes el perfil terminaba justo después de las stats
+ * básicas, sin ninguna lectura competitiva ("esto es lo que tengo que
+ * superar"). Usa las stats propias ya cacheadas (Panel), no inventa datos.
+ */
+@Composable
+private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
+    val filas = listOf(
+        Triple("Platinos", myStats.platinums, their.platinos),
+        Triple("Trofeos", myStats.trophies, their.trofeos),
+    )
+    val voyGanando = filas.count { (_, yo, ellos) -> yo > ellos }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface2, RoundedCornerShape(16.dp))
+            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .padding(18.dp)
+    ) {
+        Text("RIVALIDAD", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = "Vas por delante en $voyGanando de ${filas.size} categorías" + if (voyGanando == filas.size) " — les llevas ventaja en todo." else ".",
+            color = if (voyGanando > filas.size / 2) Good else Muted,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(Modifier.height(14.dp))
+        filas.forEach { (label, yo, ellos) ->
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(label, color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(70.dp))
+                Text("Tú $yo", color = if (yo >= ellos) Good else Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text("Ellos $ellos", color = if (ellos > yo) Danger else Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+/**
+ * Tarjeta horizontal con imagen aparte del texto — antes el texto iba
+ * encima de la carátula con una capa oscura semitransparente, legible pero
+ * apretado y sin más dato que el %.
+ */
+@Composable
+private fun RecentGameCard(game: com.paragon.app.data.network.RecentGameDto) {
+    Row(
+        modifier = Modifier
+            .width(220.dp)
+            .background(Surface2, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.size(64.dp).background(Background)) {
+            if (game.coverUrl.isNotBlank()) {
+                AsyncImage(
+                    model = game.coverUrl,
+                    contentDescription = game.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+            Text(game.title, color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 2)
+            Text("${game.percent}% completado", color = Platinum, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
         }
     }
 }

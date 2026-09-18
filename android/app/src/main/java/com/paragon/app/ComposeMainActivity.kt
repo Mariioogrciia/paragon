@@ -60,13 +60,20 @@ class ComposeMainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         handleDeepLink(intent)
-        requestNotificationPermissionIfNeeded()
-        registerPushTokenIfLoggedIn()
-        PanelSyncWorker.schedule(applicationContext)
 
         setContent {
             ParagonTheme(themeStore = themeStore) {
                 val refresh by refreshTrigger
+                // Nada de esto hace falta para pintar el primer frame — antes
+                // se llamaban en serie ANTES de `setContent`, en el camino
+                // crítico del arranque en frío. `LaunchedEffect(Unit)` las
+                // deja correr justo después de la primera composición, sin
+                // retrasar lo que el usuario ve primero.
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    requestNotificationPermissionIfNeeded()
+                    registerPushTokenIfLoggedIn()
+                    PanelSyncWorker.schedule(applicationContext)
+                }
                 AppRoot(
                     tokenStore = tokenStore,
                     themeStore = themeStore,

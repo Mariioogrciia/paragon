@@ -292,7 +292,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(horizontal = 24.dp)
                 ) {
-                    items(recentGames) { game ->
+                    items(recentGames, key = { it.id }) { game ->
                         StandardGameCard(
                             game = game,
                             onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) }

@@ -290,12 +290,23 @@ export async function GET(request: Request) {
           arranque + PRESUPUESTO_MS - MARGEN_MS,
         );
 
-        for (const juego of sinPegi) {
-          const pegi = encontrados.get(juego.title);
-          if (!pegi) continue;
-
-          await db.update(games).set({ pegi }).where(eq(games.id, juego.id));
-          clasificados++;
+        // Antes esto era un UPDATE por juego (hasta 30 round-trips
+        // secuenciales) dentro de un presupuesto ya recortado a propósito a
+        // 22s por los timeouts reales de cron-job.org (ver el comentario
+        // grande al principio de este archivo) — un único UPDATE con CASE
+        // hace lo mismo en un solo viaje.
+        const clasificadosAhora = sinPegi.filter((juego) => encontrados.has(juego.title));
+        if (clasificadosAhora.length > 0) {
+          await db.execute(sql`
+            UPDATE ${games} SET pegi = CASE id
+              ${sql.join(
+                clasificadosAhora.map((juego) => sql`WHEN ${juego.id} THEN ${encontrados.get(juego.title)}`),
+                sql` `,
+              )}
+            END
+            WHERE id IN (${sql.join(clasificadosAhora.map((juego) => sql`${juego.id}`), sql`, `)})
+          `);
+          clasificados += clasificadosAhora.length;
         }
       }
     } catch (error) {

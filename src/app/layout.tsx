@@ -142,18 +142,24 @@ export default async function RootLayout({
 
   const sessionUser = session?.user;
 
+  // Las tres no dependen entre sí — antes iban en serie (perfil, luego
+  // nivel, luego nav oculta) en el camino crítico de CADA página. `nivel`
+  // es la más cara de las tres (getParagonLevels escanea todo el
+  // historial de trofeos), así que ya no se queda esperando a que el
+  // perfil termine primero sin motivo.
   let profile = null;
-  if (sessionUser) {
-    try {
-      profile = await getProfileByUserId(sessionUser.id);
-    } catch (error) {
-      relanzarSiEsDeNext(error);
-      console.error("[layout] no se pudo leer el perfil:", error);
-    }
-  }
-
-  const nivelParagon = sessionUser ? await getParagonLevel(sessionUser.id) : null;
-  const navOculta = sessionUser ? await getHiddenNavItems(sessionUser.id) : [];
+  const [profileResult, nivelParagon, navOculta] = sessionUser
+    ? await Promise.all([
+        getProfileByUserId(sessionUser.id).catch((error) => {
+          relanzarSiEsDeNext(error);
+          console.error("[layout] no se pudo leer el perfil:", error);
+          return null;
+        }),
+        getParagonLevel(sessionUser.id),
+        getHiddenNavItems(sessionUser.id),
+      ])
+    : [null, null, []];
+  profile = profileResult;
 
   const headerUser = sessionUser
     ? {

@@ -64,11 +64,7 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.collections.AddToCollectionSheet
 import com.paragon.app.ui.share.ShareTrophyDialog
 import com.paragon.app.ui.theme.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import android.graphics.BitmapFactory
-import androidx.palette.graphics.Palette
 
 /**
  * Ficha de juego (plan sección 2.4) — cabecera hero con portada difuminada
@@ -160,6 +156,13 @@ private fun GameDetailContent(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val libraryDao = remember(context) { ParagonDatabase.getDatabase(context).libraryDao() }
+    val stuckTrophyDao = remember(context) { ParagonDatabase.getDatabase(context).stuckTrophyDao() }
+    // Una sola consulta para TODOS los trofeos de la pantalla, en vez de una
+    // por fila (ver el comentario de `getAllStuckIds` en StuckTrophyDao) —
+    // `TrophyRow` la recibe ya resuelta y solo actualiza este mismo Set al
+    // marcar/desmarcar, sin volver a leer Room por cada toque.
+    var stuckIds by remember(gameId) { mutableStateOf<Set<String>>(emptySet()) }
+    LaunchedEffect(gameId) { stuckIds = stuckTrophyDao.getAllStuckIds().toSet() }
     var pinned by remember(gameId) { mutableStateOf(game.isPinned) }
     var reservado by remember(gameId, hitoInicial) { mutableStateOf(hitoInicial?.gameId == gameId) }
     var showCollections by remember { mutableStateOf(false) }
@@ -172,27 +175,18 @@ private fun GameDetailContent(
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
     val prediccion = remember(game.trophies) { predecirPlatino(game.trophies) }
     var vistaCronologica by remember { mutableStateOf(false) }
+    // Antes se ordenaba dentro del propio LazyColumn (en cada recomposición
+    // del contenido, p. ej. al tocar el chip de racha de la cabecera) —
+    // ahora solo se recalcula si `game.trophies` cambia de verdad.
+    val trofeosOrdenados = remember(game.trophies) {
+        game.trophies.sortedWith(
+            compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
+        )
+    }
 
-    LaunchedEffect(game.coverUrl) {
-        withContext(Dispatchers.IO) {
-            try {
-                val url = java.net.URL(game.coverUrl)
-                val connection = url.openConnection()
-                connection.doInput = true
-                connection.connect()
-                val input = connection.inputStream
-                val bitmap = BitmapFactory.decodeStream(input)
-                if (bitmap != null) {
-                    val palette = Palette.from(bitmap).generate()
-                    val swatch = palette.vibrantSwatch ?: palette.dominantSwatch ?: palette.mutedSwatch
-                    if (swatch != null) {
-                        dynamicColor = Color(swatch.rgb)
-                    }
-                }
-            } catch (e: Exception) {
-                // Ignore, fallback to Accent
-            }
-        }
+    val coverAura = com.paragon.app.ui.common.rememberCoverAuraColor(game.coverUrl)
+    androidx.compose.runtime.LaunchedEffect(coverAura) {
+        if (coverAura != null) dynamicColor = coverAura
     }
     // El número solo se conoce cuando ALGÚN juego está reservado (viene de
     // /api/mobile/milestone) — si no hay nada reservado todavía no hay
@@ -278,12 +272,16 @@ private fun GameDetailContent(
                 TrophyRarityChart(trophies = game.trophies, modifier = Modifier.padding(horizontal = 24.dp))
             }
         } else {
-            val grouped = game.trophies.sortedWith(
-                compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
-            )
-
-            items(grouped) { trophy ->
-                TrophyRow(trophy, game = game, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+            items(trofeosOrdenados, key = { it.id }) { trophy ->
+                TrophyRow(
+                    trophy,
+                    game = game,
+                    isStuck = trophy.id in stuckIds,
+                    onStuckChange = { nuevo ->
+                        stuckIds = if (nuevo) stuckIds + trophy.id else stuckIds - trophy.id
+                    },
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                )
             }
         }
 
@@ -803,7 +801,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.heightIn(max = 360.dp),
                 ) {
-                    items(grupoPopup) { p ->
+                    items(grupoPopup, key = { it.trofeo.id }) { p ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -853,16 +851,16 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
 }
 
 @Composable
-private fun TrophyRow(trophy: TrophyItem, game: GameDetailData, modifier: Modifier = Modifier) {
+private fun TrophyRow(
+    trophy: TrophyItem,
+    game: GameDetailData,
+    isStuck: Boolean,
+    onStuckChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
-    val db = remember(context) { ParagonDatabase.getDatabase(context) }
-    val dao = remember(db) { db.stuckTrophyDao() }
+    val dao = remember(context) { ParagonDatabase.getDatabase(context).stuckTrophyDao() }
     val coroutineScope = rememberCoroutineScope()
-    var isStuck by remember(trophy.id) { mutableStateOf(false) }
-
-    LaunchedEffect(trophy.id) {
-        isStuck = dao.isStuck(trophy.id)
-    }
 
     Row(
         modifier = modifier
@@ -920,7 +918,7 @@ private fun TrophyRow(trophy: TrophyItem, game: GameDetailData, modifier: Modifi
                     coroutineScope.launch {
                         if (isStuck) {
                             dao.removeStuckTrophy(trophy.id)
-                            isStuck = false
+                            onStuckChange(false)
                         } else {
                             dao.addStuckTrophy(
                                 com.paragon.app.data.local.StuckTrophyEntity(
@@ -933,7 +931,7 @@ private fun TrophyRow(trophy: TrophyItem, game: GameDetailData, modifier: Modifi
                                     coverUrl = game.coverUrl
                                 )
                             )
-                            isStuck = true
+                            onStuckChange(true)
                         }
                     }
                 },

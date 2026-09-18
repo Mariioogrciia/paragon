@@ -1,6 +1,5 @@
 package com.paragon.app.ui.panel
 
-import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -27,45 +26,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.palette.graphics.Palette
 import coil3.compose.AsyncImage
 import com.paragon.app.data.GameProgress
+import com.paragon.app.ui.common.rememberCoverAuraColor
 import com.paragon.app.ui.theme.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
-/**
- * "Game Aura": el color ambiente que tiñe el degradado de fondo de una Hero
- * Card, sacado de la propia carátula (`Palette`, misma librería que ya usa
- * `GameDetailScreen` para el acento de sus botones) — cada juego se siente
- * distinto en vez de que todo Inicio use el mismo azul de siempre. `null`
- * mientras se descarga/analiza la portada o si falla, para que la Hero Card
- * pueda seguir con su gradiente neutro de respaldo sin parpadear a un color
- * a medias.
- */
-@Composable
-private fun rememberCoverAuraColor(coverUrl: String): Color? {
-    var aura by remember(coverUrl) { mutableStateOf<Color?>(null) }
-    LaunchedEffect(coverUrl) {
-        if (coverUrl.isBlank()) return@LaunchedEffect
-        withContext(Dispatchers.IO) {
-            try {
-                val connection = java.net.URL(coverUrl).openConnection()
-                connection.doInput = true
-                connection.connect()
-                val bitmap = BitmapFactory.decodeStream(connection.getInputStream())
-                if (bitmap != null) {
-                    val palette = Palette.from(bitmap).generate()
-                    val swatch = palette.vibrantSwatch ?: palette.dominantSwatch ?: palette.mutedSwatch
-                    if (swatch != null) aura = Color(swatch.rgb)
-                }
-            } catch (e: Exception) {
-                // Se queda en null — la Hero Card sigue con su degradado neutro.
-            }
-        }
-    }
-    return aura
-}
 
 /**
  * `coverUrl` sale de `iconUrl` del backend, y puede venir vacío para

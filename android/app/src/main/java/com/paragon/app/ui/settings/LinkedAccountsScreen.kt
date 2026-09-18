@@ -191,7 +191,7 @@ fun LinkedAccountsScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                items(response!!.oauth.filter { it.configured }) { oauth ->
+                items(response!!.oauth.filter { it.configured }, key = { it.provider }) { oauth ->
                     OauthItem(
                         oauth = oauth,
                         onLinkRequested = {
@@ -216,7 +216,7 @@ fun LinkedAccountsScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                items(response!!.platforms) { platform ->
+                items(response!!.platforms, key = { it.platform }) { platform ->
                     PlatformItem(
                         platform = platform,
                         repository = repository,

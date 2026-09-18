@@ -194,7 +194,7 @@ private fun CompareContent(data: CompareData) {
         if (data.sharedGames.isEmpty()) {
             item { Text(text = "Ningún juego en común todavía.", color = Muted, fontSize = 13.sp) }
         } else {
-            items(data.sharedGames) { SharedGameRow(it) }
+            items(data.sharedGames, key = { it.id }) { SharedGameRow(it) }
         }
     }
 }

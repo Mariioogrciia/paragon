@@ -386,22 +386,37 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
   ];
   if (league.endsAt) scoreConditions.push(lte(userTrophies.earnedAt, league.endsAt));
 
-  const scored = await db
-    .select({
-      userId: users.id,
-      handle: users.handle,
-      name: users.name,
-      image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
-      points: pointsSql,
-    })
-    .from(userTrophies)
-    .innerJoin(users, eq(users.id, userTrophies.userId))
-    .innerJoin(
-      gameTrophies,
-      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
-    )
-    .where(and(...scoreConditions))
-    .groupBy(users.id);
+  // `scored`, `fotoAnterior` (movimiento semanal) y `challenge` (reto) no
+  // dependen entre sí — antes iban en serie una detrás de otra, aunque
+  // ninguna necesita el resultado de la anterior. Solo `missingProfiles`
+  // sí depende de `scored` (necesita saber a quién le falta), así que ese
+  // se queda fuera del `Promise.all` y se pide después.
+  const [scored, fotoAnterior, challenge] = await Promise.all([
+    db
+      .select({
+        userId: users.id,
+        handle: users.handle,
+        name: users.name,
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+        points: pointsSql,
+      })
+      .from(userTrophies)
+      .innerJoin(users, eq(users.id, userTrophies.userId))
+      .innerJoin(
+        gameTrophies,
+        and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+      )
+      .where(and(...scoreConditions))
+      .groupBy(users.id),
+    // Movimiento respecto a la última foto semanal — `rankAnteriorPorId`
+    // vacío (liga recién creada, cron sin correr todavía) deja `movimiento`
+    // en null para todos en vez de fingir un "sin cambios" que no es cierto.
+    db
+      .select({ userId: leagueStandingSnapshots.userId, rank: leagueStandingSnapshots.rank })
+      .from(leagueStandingSnapshots)
+      .where(eq(leagueStandingSnapshots.leagueId, leagueId)),
+    league.challengeGameId ? getChallengeStandings(league.challengeGameId, memberIds) : Promise.resolve(null),
+  ]);
 
   // El INNER JOIN con userTrophies deja fuera a cualquier miembro sin ni un
   // trofeo en la ventana de la liga — se añaden a mano con 0 puntos, para
@@ -423,21 +438,12 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
     ...missingProfiles.map((p) => ({ ...p, points: 0 })),
   ].sort((a, b) => b.points - a.points);
 
-  // Movimiento respecto a la última foto semanal — `rankAnteriorPorId`
-  // vacío (liga recién creada, cron sin correr todavía) deja `movimiento`
-  // en null para todos en vez de fingir un "sin cambios" que no es cierto.
-  const fotoAnterior = await db
-    .select({ userId: leagueStandingSnapshots.userId, rank: leagueStandingSnapshots.rank })
-    .from(leagueStandingSnapshots)
-    .where(eq(leagueStandingSnapshots.leagueId, leagueId));
   const rankAnteriorPorId = new Map(fotoAnterior.map((f) => [f.userId, f.rank]));
 
   const standings: LeagueStandingRow[] = sinMovimiento.map((row, i) => {
     const anterior = rankAnteriorPorId.get(row.userId);
     return { ...row, movimiento: anterior != null ? anterior - (i + 1) : null };
   });
-
-  const challenge = league.challengeGameId ? await getChallengeStandings(league.challengeGameId, memberIds) : null;
 
   let pendingMembers: PendingMemberRow[] = [];
   if (league.ownerId === requestingUserId) {

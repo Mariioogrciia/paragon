@@ -44,7 +44,7 @@ import com.paragon.app.data.theme.ThemeStore
 
 /** Amigos y Liga reales contra GET /api/mobile/social (SocialRepository) — dos listas distintas, no la misma con otro orden. */
 @Composable
-fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit) {
+fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: String? = null, onCompareClick: (String) -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
     val repository = remember(tokenStore, cacheDao) { SocialRepository(tokenStore, cacheDao) }
@@ -137,19 +137,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                         }
                     }
                     item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Surface, RoundedCornerShape(12.dp))
-                                .border(1.dp, Border, RoundedCornerShape(12.dp))
-                                .clickable { showNewLeagueDialog = true }
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = null, tint = Accent)
-                            Text("Crear una liga con tus amigos", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        }
+                        CreateLeagueHero(onClick = { showNewLeagueDialog = true })
                     }
                     if (current.leagues.isEmpty()) {
                         item {
@@ -157,7 +145,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                                 text = "Solo con quien tú quieras — invita a amigos, no a toda la comunidad.",
                                 color = Muted,
                                 fontSize = 13.sp,
-                                modifier = Modifier.padding(top = 8.dp),
+                                modifier = Modifier.padding(top = 4.dp),
                             )
                         }
                     } else {
@@ -214,9 +202,24 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick:
                                 item { OfflineBanner() }
                             }
                             if (selectedTab == 0) {
-                                itemsIndexed(current.data.liga, key = { _, row -> row.userId }) { index, row ->
+                                val liga = current.data.liga
+                                val podio = liga.take(3)
+                                val resto = liga.drop(3)
+                                item {
+                                    LeagueSeasonCard(
+                                        totalParticipantes = liga.size,
+                                        miPosicion = liga.indexOfFirst { it.handle != null && it.handle == myHandle }.let { if (it >= 0) it + 1 else null },
+                                        misPuntos = liga.firstOrNull { it.handle != null && it.handle == myHandle }?.points,
+                                    )
+                                }
+                                if (podio.isNotEmpty()) {
+                                    item {
+                                        LeaguePodium(podio, onClick = { handle -> selectedHandle = handle })
+                                    }
+                                }
+                                itemsIndexed(resto, key = { _, row -> row.userId }) { index, row ->
                                     SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                        LigaRowItem(row, index + 1, onClick = { selectedHandle = row.handle })
+                                        LigaRowItem(row, index + 4, onClick = { selectedHandle = row.handle })
                                     }
                                 }
                             } else {
@@ -385,20 +388,205 @@ private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, Stri
     )
 }
 
+// Paleta de identidad para ligas privadas — antes "Goofy" era texto suelto
+// dentro de una tarjeta idéntica a todas las demás, sin nada propio. El
+// color sale del propio id (hash estable), no es aleatorio en cada recomposición.
+private val LEAGUE_COLORS = listOf(
+    androidx.compose.ui.graphics.Color(0xFF9B59F6), // púrpura
+    androidx.compose.ui.graphics.Color(0xFF3EC9C0), // turquesa
+    androidx.compose.ui.graphics.Color(0xFFF6A93E), // ámbar
+    androidx.compose.ui.graphics.Color(0xFFF6568D), // rosa
+    androidx.compose.ui.graphics.Color(0xFF5B8DF6), // azul
+)
+private fun leagueColor(id: String) = LEAGUE_COLORS[(id.hashCode().and(0x7FFFFFFF)) % LEAGUE_COLORS.size]
+
+/** Cuántos días quedan hasta `endsAt` (mismo formato ISO que manda el backend) — null si no hay fecha o ya pasó. */
+private fun diasHasta(endsAt: String?): Int? {
+    if (endsAt == null) return null
+    return try {
+        val fecha = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+            .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+            .parse(endsAt) ?: return null
+        val dias = ((fecha.time - System.currentTimeMillis()) / (1000 * 60 * 60 * 24)).toInt()
+        if (dias >= 0) dias else null
+    } catch (e: Exception) {
+        null
+    }
+}
+
+/** Antes era una fila de texto clicable — la acción principal de la pestaña necesita más presencia que una fila más. */
+@Composable
+private fun CreateLeagueHero(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                androidx.compose.ui.graphics.Brush.linearGradient(listOf(AccentSoft, Surface)),
+                RoundedCornerShape(16.dp),
+            )
+            .border(1.dp, Accent.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(18.dp),
+    ) {
+        Text("CREA TU PROPIA LIGA", color = Accent, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 1.sp)
+        Text(
+            "Compite con tus amigos durante el tiempo que quieras — solo entre quien tú invites.",
+            color = Muted,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Add, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(16.dp))
+            Text("Crear liga", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
+        }
+    }
+}
+
 @Composable
 fun LeagueRowItem(league: League, onClick: () -> Unit) {
+    val color = leagueColor(league.id)
+    val dias = diasHasta(league.endsAt)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(12.dp))
             .border(1.dp, Border, RoundedCornerShape(12.dp))
             .clickable { onClick() }
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = league.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        Text(text = "${league.memberCount} ${if (league.memberCount == 1) "miembro" else "miembros"}", color = Muted, fontSize = 12.sp)
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(color.copy(alpha = 0.16f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(league.name.take(1).uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 15.sp)
+        }
+        Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+            Text(text = league.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text(
+                text = "${league.memberCount} ${if (league.memberCount == 1) "miembro" else "miembros"}" +
+                    (dias?.let { " · Termina en $it ${if (it == 1) "día" else "días"}" } ?: ""),
+                color = Muted,
+                fontSize = 12.sp,
+            )
+        }
+    }
+}
+
+/**
+ * Tarjeta de temporada de la Liga Mensual global — antes la lista arrancaba
+ * directa en la primera fila, sin ningún contexto de "esto es una
+ * competición con reloj", solo un listado. `diaDelMes`/días restantes se
+ * calculan del propio calendario, no llegan del backend (la liga mensual no
+ * tiene fecha de fin propia, se resetea el día 1).
+ */
+@Composable
+private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPuntos: Int?) {
+    val cal = remember { java.util.Calendar.getInstance() }
+    val diasRestantes = remember { cal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH) - cal.get(java.util.Calendar.DAY_OF_MONTH) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                androidx.compose.ui.graphics.Brush.linearGradient(listOf(Platinum.copy(alpha = 0.14f), Surface)),
+                RoundedCornerShape(16.dp),
+            )
+            .border(1.dp, Platinum.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .padding(18.dp),
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                Text("LIGA MENSUAL", color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp)
+                Text("Los mejores cazatrofeos de este mes", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("⏱", fontSize = 13.sp)
+                Text(
+                    text = if (diasRestantes <= 0) "Termina hoy" else "Termina en $diasRestantes ${if (diasRestantes == 1) "día" else "días"}",
+                    color = if (diasRestantes <= 2) PodiumGold else Muted,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(start = 4.dp),
+                )
+            }
+        }
+        if (miPosicion != null && misPuntos != null) {
+            Spacer(Modifier.height(12.dp))
+            HorizontalDivider(color = Platinum.copy(alpha = 0.2f))
+            Spacer(Modifier.height(10.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("$misPuntos puntos", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text("Puesto $miPosicion de $totalParticipantes", color = Muted, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+// Mismo Platinum que ya usa LeagueStandingRow (LeagueDetailSheet.kt) para el
+// #1 — no el "Gold" de trofeos (Color.kt), que es un color distinto y
+// rompería la consistencia entre las dos pantallas de liga.
+private val PodiumGold get() = com.paragon.app.ui.theme.Platinum
+private val Silver = androidx.compose.ui.graphics.Color(0xFFB9C2CC)
+private val BronzeMedal = androidx.compose.ui.graphics.Color(0xFFC07B4A)
+
+/**
+ * Podio para el top 3 — antes las tres primeras filas eran indistinguibles
+ * del resto salvo por el número. El primero se lleva su propia tarjeta
+ * ancha (borde/halo dorado, más presencia); segundo y tercero van en un
+ * par de tarjetas compactas debajo, como un podio real.
+ */
+@Composable
+private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
+    Column(modifier = Modifier.padding(top = 12.dp)) {
+        top3.getOrNull(0)?.let { primero ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(PodiumGold.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                    .border(1.dp, PodiumGold.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                    .clickable { onClick(primero.handle) }
+                    .padding(vertical = 18.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text("🥇", fontSize = 30.sp)
+                Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 4.dp))
+                Text("${primero.points} puntos", color = PodiumGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                val segundo = top3.getOrNull(1)
+                if (segundo != null) {
+                    val diferencia = primero.points - segundo.points
+                    if (diferencia > 0) {
+                        Text("+$diferencia frente al segundo", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
+                    }
+                }
+            }
+        }
+        if (top3.size > 1) {
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                top3.getOrNull(1)?.let { PodiumSecondaryCard(it, "🥈", Silver, Modifier.weight(1f), onClick) }
+                top3.getOrNull(2)?.let { PodiumSecondaryCard(it, "🥉", BronzeMedal, Modifier.weight(1f), onClick) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PodiumSecondaryCard(row: LigaRow, medalla: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: (String?) -> Unit) {
+    Column(
+        modifier = modifier
+            .background(Surface, RoundedCornerShape(14.dp))
+            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+            .clickable { onClick(row.handle) }
+            .padding(14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(medalla, fontSize = 20.sp)
+        Text(row.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, modifier = Modifier.padding(top = 2.dp))
+        Text("${row.points} puntos", color = Muted, fontSize = 11.sp)
     }
 }
 
@@ -417,7 +605,7 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
             Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(text = "${row.points} puntos este mes", color = Muted, fontSize = 12.sp)
         }
-        Text(text = "${position}º", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }
 

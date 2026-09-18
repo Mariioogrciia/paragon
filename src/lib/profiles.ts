@@ -1,7 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   friendships,
@@ -189,9 +189,17 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
   return { ...resto, accounts, badges, esDesarrollador };
 }
 
-export function getProfileByUserId(userId: string) {
+/**
+ * Memoizada por petición con `cache()` de React — mismo motivo que
+ * `getProfileByHandle` (ver su comentario más abajo): `layout.tsx` la pide
+ * para la cabecera y CASI TODA página autenticada (page.tsx, ritmo,
+ * ajustes, comparar, ficha de juego...) la vuelve a pedir por su cuenta en
+ * el mismo request — sin memoizar son 3 queries (users/platformAccounts/
+ * userBadges) DOS veces por cada navegación, siempre.
+ */
+export const getProfileByUserId = cache((userId: string) => {
   return selectProfile(eq(users.id, userId));
-}
+});
 
 /**
  * Id del juego anclado (Modo Enfoque, `userGames.pinnedAt`) de un usuario,
@@ -1158,19 +1166,63 @@ export interface FriendRow {
   accounts: { platform: AccountPlatform; username: string }[];
 }
 
-function toFriendRow(p: ProfileRow): FriendRow {
-  const player = toPlayer(p);
+/**
+ * Mismo patrón que `clasificacionAmigos` en lib/rankings.ts (ver su
+ * comentario: "por cada participante... 25-30 consultas... la página con
+ * más papeletas de atascar el pool") — antes `listFriends`/
+ * `listPendingRequests` hacían exactamente ese N+1 vía
+ * `Promise.all(ids.map(getProfileByUserId))` (3 queries por id, lanzadas
+ * en paralelo contra el pool), el mismo problema que ya se documentó y se
+ * arregló ahí pero nunca se aplicó aquí. Dos queries con `inArray` en vez
+ * de 3×N — no hace falta `userBadges` (`toFriendRow` no lo usa), así que
+ * ni se pide.
+ */
+async function friendRowsForIds(userIds: string[]): Promise<FriendRow[]> {
+  if (userIds.length === 0) return [];
 
-  return {
-    userId: p.userId,
-    handle: p.handle,
-    displayName: p.displayName,
-    image: p.image,
-    trophyLevel: player.trophyLevel ?? null,
-    avatarUrl: player.avatarUrl ?? null,
-    platforms: p.accounts.map((a) => a.platform),
-    accounts: p.accounts.map((a) => ({ platform: a.platform, username: a.username })),
-  };
+  const [userRows, accountRows] = await Promise.all([
+    db
+      .select({
+        userId: users.id,
+        handle: users.handle,
+        displayName: users.name,
+        image: users.image,
+        avatarPersonalizado: users.avatarPersonalizado,
+      })
+      .from(users)
+      .where(inArray(users.id, userIds)),
+    db
+      .select({
+        userId: platformAccounts.userId,
+        platform: platformAccounts.platform,
+        username: platformAccounts.username,
+        level: platformAccounts.level,
+        avatarUrl: platformAccounts.avatarUrl,
+      })
+      .from(platformAccounts)
+      .where(inArray(platformAccounts.userId, userIds)),
+  ]);
+
+  return userRows.map((u) => {
+    const accounts = accountRows.filter((a) => a.userId === u.userId);
+    const psn = accounts.find((a) => a.platform === "psn");
+
+    return {
+      userId: u.userId,
+      handle: u.handle,
+      displayName: u.displayName,
+      image: u.image,
+      trophyLevel: psn?.level ?? null,
+      avatarUrl:
+        (u.avatarPersonalizado && u.image) ||
+        psn?.avatarUrl ||
+        accounts.find((a) => a.avatarUrl)?.avatarUrl ||
+        u.image ||
+        null,
+      platforms: accounts.map((a) => a.platform),
+      accounts: accounts.map((a) => ({ platform: a.platform, username: a.username })),
+    };
+  });
 }
 
 /** Amistades aceptadas, mirando en ambos sentidos: la fila es una sola. */
@@ -1195,11 +1247,7 @@ export async function listFriends(userId: string): Promise<FriendRow[]> {
     r.requesterId === userId ? r.addresseeId : r.requesterId,
   );
 
-  if (friendIds.length === 0) return [];
-
-  const profiles = await Promise.all(friendIds.map(getProfileByUserId));
-
-  return profiles.filter((p): p is ProfileRow => p !== null).map(toFriendRow);
+  return friendRowsForIds(friendIds);
 }
 
 /** Solicitudes que otros me han enviado y aún no he respondido. */
@@ -1211,11 +1259,7 @@ export async function listPendingRequests(userId: string): Promise<FriendRow[]> 
       and(eq(friendships.addresseeId, userId), eq(friendships.status, "pending")),
     );
 
-  const profiles = await Promise.all(
-    rows.map((r) => getProfileByUserId(r.requesterId)),
-  );
-
-  return profiles.filter((p): p is ProfileRow => p !== null).map(toFriendRow);
+  return friendRowsForIds(rows.map((r) => r.requesterId));
 }
 
 export async function areFriends(a: string, b: string): Promise<boolean> {
