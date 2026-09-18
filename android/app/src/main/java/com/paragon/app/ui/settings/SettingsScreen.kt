@@ -279,6 +279,29 @@ fun SettingsScreen(
                 Text("Cuentas Vinculadas", color = Foreground)
             }
 
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text("AYUDA", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // La guía completa (todo lo que hace Paragon + los comandos del
+            // bot de Discord uno a uno) ya existe entera en la web — se abre
+            // ahí en vez de duplicarla en Kotlin, mismo criterio que
+            // "Vincular" para Google/Discord (CustomTab, no una copia nativa).
+            Button(
+                onClick = {
+                    val url = android.net.Uri.parse(com.paragon.app.data.network.BASE_URL).buildUpon()
+                        .appendEncodedPath("como-funciona")
+                        .build()
+                    androidx.browser.customtabs.CustomTabsIntent.Builder().build().launchUrl(context, url)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Surface),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Cómo funciona Paragon (y el bot de Discord)", color = Foreground)
+            }
+
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(

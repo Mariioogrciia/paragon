@@ -7,6 +7,7 @@ import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.LinkedAccountsResponse
 import com.paragon.app.data.network.LinkPlatformRequest
 import com.paragon.app.data.network.UpdateProfileRequest
+import com.paragon.app.data.network.paragonErrorMessage
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -23,19 +24,25 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             val response = ApiClient.settingsApi(tokenStore).getLinkedAccounts()
             SettingsResult.Ok(response)
         } catch (e: HttpException) {
-            SettingsResult.Error("Error al cargar cuentas (${e.code()}).")
+            SettingsResult.Error(e.paragonErrorMessage() ?: "Error al cargar cuentas (${e.code()}).")
         } catch (e: Exception) {
             SettingsResult.Error(e.message ?: "Error de red.")
         }
     }
 
+    /**
+     * El 422 de /api/mobile/accounts/{platform} viene con el motivo real
+     * (NPSSO caducado, perfil no encontrado, perfil privado...) — antes se
+     * descartaba sin más y se enseñaba siempre el mismo "Cuenta ya
+     * vinculada a otro usuario o inválida", aunque el motivo real fuera
+     * otro completamente distinto.
+     */
     suspend fun linkPlatform(platform: String, username: String): SettingsResult<Unit> {
         return try {
             ApiClient.settingsApi(tokenStore).linkPlatform(platform, LinkPlatformRequest(username))
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
-            val message = if (e.code() == 422) "Cuenta ya vinculada a otro usuario o inválida." else "Error del servidor (${e.code()})"
-            SettingsResult.Error(message)
+            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
         } catch (e: Exception) {
             SettingsResult.Error(e.message ?: "Error de red.")
         }
@@ -46,7 +53,7 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             ApiClient.settingsApi(tokenStore).unlinkPlatform(platform)
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
-            SettingsResult.Error("Error del servidor (${e.code()})")
+            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
         } catch (e: Exception) {
             SettingsResult.Error(e.message ?: "Error de red.")
         }
@@ -57,8 +64,7 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             ApiClient.settingsApi(tokenStore).updateProfile(UpdateProfileRequest(name, image))
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
-            val message = if (e.code() == 400) "Nombre inválido." else "Error del servidor (${e.code()})"
-            SettingsResult.Error(message)
+            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
         } catch (e: Exception) {
             SettingsResult.Error(e.message ?: "Error de red.")
         }
@@ -93,7 +99,7 @@ class SettingsRepository(private val tokenStore: TokenStore) {
                 SettingsResult.Error(response.error ?: "No se pudo subir la imagen.")
             }
         } catch (e: HttpException) {
-            SettingsResult.Error("Error del servidor (${e.code()})")
+            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
         } catch (e: Exception) {
             SettingsResult.Error(e.message ?: "Error de red.")
         }

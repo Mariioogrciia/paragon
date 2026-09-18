@@ -22,6 +22,7 @@ import {
 } from "@/app/actions";
 import type { NavKey } from "@/lib/navPreferences";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { PrivacyGuide } from "@/components/PrivacyGuide";
 
 const EMPTY: ActionState = {};
 
@@ -117,6 +118,7 @@ export function LinkPsnForm({ current }: { current?: string | null }) {
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
       </div>
       <Feedback state={state} />
+      <PrivacyGuide platform="psn" />
     </form>
   );
 }
@@ -139,6 +141,7 @@ export function LinkSteamForm({ current }: { current?: string | null }) {
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
       </div>
       <Feedback state={state} />
+      <PrivacyGuide platform="steam" />
     </form>
   );
 }
@@ -162,6 +165,7 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
         <Submit>{current ? "Actualizar" : "Vincular"}</Submit>
       </div>
       <Feedback state={state} />
+      <PrivacyGuide platform="xbox" />
     </form>
   );
 }
