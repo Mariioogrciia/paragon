@@ -107,23 +107,30 @@ fun LibraryScreen(
                 .fillMaxSize()
                 .background(Background)
         ) {
-        // Cabecera con selector
+        // Cabecera con selector — antes "BIBLIOTECA" (32sp) + el desplegable
+        // de orden + el selector de vista iban los tres en la MISMA fila:
+        // en un móvil normal no caben, y el texto del desplegable se
+        // recortaba a medias ("Progreso" → "rogreso"). El título se lleva
+        // su propia fila; orden y vista bajan a una segunda fila con todo
+        // el ancho para ellos solos.
         Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp)) {
+            Text(
+                text = "BIBLIOTECA",
+                color = Foreground,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "BIBLIOTECA",
-                    color = Foreground,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
                 // Botón real de orden con DropdownMenu
                 Box {
-                    TextButton(onClick = { isSortMenuExpanded = true }) {
+                    TextButton(onClick = { isSortMenuExpanded = true }, contentPadding = PaddingValues(0.dp)) {
                         Text(text = sortLabels[sortOption], color = Muted, fontSize = 14.sp)
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Muted)
                     }
@@ -143,7 +150,7 @@ fun LibraryScreen(
                         }
                     }
                 }
-                
+
                 // Selector de vista — antes era UN icono que cambiaba solo
                 // (cuadrícula/lista), sin dejar claro que hay dos formas
                 // distintas de ver lo mismo, ni cuál está activa a simple

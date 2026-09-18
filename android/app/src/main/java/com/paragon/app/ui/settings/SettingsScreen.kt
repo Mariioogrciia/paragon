@@ -63,6 +63,10 @@ fun SettingsScreen(
     var nombreGuardado by remember { mutableStateOf(profile.name) }
     var avatarGuardado by remember { mutableStateOf(profile.image) }
     val hayCambiosSinGuardar = nameInput != nombreGuardado || avatarUrl != avatarGuardado
+    // "Cerrar Sesión" saltaba directo con un solo toque, sin nada de por
+    // medio — mismo criterio que "Desvincular" (LinkedAccountsScreen) y las
+    // acciones de Ligas (LeagueDetailSheet).
+    var showLogoutConfirm by remember { mutableStateOf(false) }
 
     val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -278,7 +282,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(
-                onClick = onLogout,
+                onClick = { showLogoutConfirm = true },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 32.dp),
@@ -288,6 +292,16 @@ fun SettingsScreen(
                 Text("Cerrar Sesión", color = Danger, fontWeight = FontWeight.Bold)
             }
         }
+    }
+
+    if (showLogoutConfirm) {
+        com.paragon.app.ui.common.ConfirmDialog(
+            title = "¿Cerrar sesión?",
+            message = "Tendrás que volver a entrar con Google o Discord para seguir viendo tus trofeos.",
+            confirmLabel = "Cerrar sesión",
+            onConfirm = onLogout,
+            onDismiss = { showLogoutConfirm = false },
+        )
     }
 }
 
