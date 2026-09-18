@@ -19,12 +19,16 @@ import com.paragon.app.data.ConnectivityObserver
 import com.paragon.app.data.GameDetailData
 import com.paragon.app.data.GameDetailRepository
 import com.paragon.app.data.GameDetailResult
+import com.paragon.app.data.GameSession
+import com.paragon.app.data.GameSessionRepository
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.NoteSaveResult
 import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.local.GameSessionEntity
 import com.paragon.app.ui.theme.*
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -49,11 +53,13 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
     val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     val gameRepository = remember(tokenStore, db) { GameDetailRepository(tokenStore, db.gameDetailDao()) }
+    val sessionRepository = remember(db) { GameSessionRepository(db.gameSessionDao()) }
     val coroutineScope = rememberCoroutineScope()
 
     var pinnedGameId by remember { mutableStateOf<String?>(null) }
     var detailResult by remember { mutableStateOf<GameDetailResult?>(null) }
     var loadingLibrary by remember { mutableStateOf(true) }
+    var activeSession by remember { mutableStateOf<GameSessionEntity?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(retryCounter.value) {
@@ -66,6 +72,7 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
         if (pinnedId != null) {
             detailResult = gameRepository.getGameDetail(pinnedId)
         }
+        activeSession = sessionRepository.getActiveSession()
         loadingLibrary = false
     }
 
@@ -89,7 +96,7 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
             loadingLibrary -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color.White)
             }
-            pinnedGameId == null -> EmptyFocusState(onBack)
+            pinnedGameId == null -> EmptyFocusState(onBack, sessionRepository)
             else -> when (val current = detailResult) {
                 null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color.White)
@@ -109,6 +116,9 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
                     onBack = onBack,
                     coroutineScope = coroutineScope,
                     gameRepository = gameRepository,
+                    sessionRepository = sessionRepository,
+                    activeSession = activeSession,
+                    onActiveSessionChanged = { activeSession = it },
                 )
             }
         }
@@ -116,7 +126,9 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
 }
 
 @Composable
-private fun EmptyFocusState(onBack: () -> Unit) {
+private fun EmptyFocusState(onBack: () -> Unit, sessionRepository: GameSessionRepository) {
+    var mostrarDiario by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -142,9 +154,16 @@ private fun EmptyFocusState(onBack: () -> Unit) {
             fontSize = 13.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
-        TextButton(onClick = onBack, modifier = Modifier.padding(top = 24.dp)) {
+        TextButton(onClick = { mostrarDiario = true }, modifier = Modifier.padding(top = 24.dp)) {
+            Text("Ver tu diario de sesiones", color = Color.White.copy(alpha = 0.6f))
+        }
+        TextButton(onClick = onBack) {
             Text("Volver", color = Color.White)
         }
+    }
+
+    if (mostrarDiario) {
+        DiarioDialog(sessionRepository = sessionRepository, onDismiss = { mostrarDiario = false })
     }
 }
 
@@ -156,12 +175,30 @@ private fun FocusContent(
     onBack: () -> Unit,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
     gameRepository: GameDetailRepository,
+    sessionRepository: GameSessionRepository,
+    activeSession: GameSessionEntity?,
+    onActiveSessionChanged: (GameSessionEntity?) -> Unit,
 ) {
     var nota by remember(gameId) { mutableStateOf(game.notes) }
     var guardando by remember { mutableStateOf(false) }
     var notaEncolada by remember { mutableStateOf(false) }
     var comprobando by remember { mutableStateOf(false) }
     var aviso by remember { mutableStateOf<String?>(null) }
+    var mostrarDiario by remember { mutableStateOf(false) }
+    var ultimaSesion by remember { mutableStateOf<GameSession?>(null) }
+
+    // Segundero puramente visual mientras la pantalla está abierta — la
+    // fuente de verdad es `activeSession.startMillis`, guardado en Room, así
+    // que si Android mata el proceso mientras se juega al juego DE VERDAD,
+    // la duración real no se pierde: se recalcula sola al volver.
+    var elapsedMillis by remember(activeSession?.id) { mutableLongStateOf(0L) }
+    LaunchedEffect(activeSession?.id) {
+        val inicio = activeSession?.startMillis ?: return@LaunchedEffect
+        while (true) {
+            elapsedMillis = System.currentTimeMillis() - inicio
+            delay(1000)
+        }
+    }
 
     // Autoguardado con debounce (800ms), igual que la web — se cancela solo
     // si el usuario sigue escribiendo antes de que pase el tiempo. Sin
@@ -208,6 +245,9 @@ private fun FocusContent(
                     )
                 }
             }
+            TextButton(onClick = { mostrarDiario = true }) {
+                Text("Diario", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+            }
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Salir del modo enfoque", tint = Color.White)
             }
@@ -228,7 +268,36 @@ private fun FocusContent(
             Text(text = "${game.earnedTrophies}/${game.totalTrophies}", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
+
+        SessionTimerCard(
+            enSesion = activeSession?.gameId == gameId,
+            hayOtraSesionActiva = activeSession != null && activeSession.gameId != gameId,
+            otraSesionTitulo = activeSession?.gameTitle,
+            elapsedMillis = elapsedMillis,
+            ultimaSesion = ultimaSesion,
+            onIniciar = {
+                coroutineScope.launch {
+                    sessionRepository.startSession(gameId, game.title, game.earnedTrophies)
+                    onActiveSessionChanged(sessionRepository.getActiveSession())
+                    ultimaSesion = null
+                }
+            },
+            onDetener = {
+                coroutineScope.launch {
+                    // Si la sesión activa es de OTRO juego (cambiaste de
+                    // anclado a medio jugar), no hay una ficha cargada con la
+                    // que medir trofeos nuevos de ese juego — se cierra con
+                    // 0 nuevos en vez de adivinar, más honesto que inventar
+                    // un número.
+                    val trofeosActuales = if (activeSession?.gameId == gameId) game.earnedTrophies else (activeSession?.trophiesAtStart ?: 0)
+                    ultimaSesion = sessionRepository.stopActiveSession(trofeosActuales)
+                    onActiveSessionChanged(null)
+                }
+            },
+        )
+
+        Spacer(Modifier.height(16.dp))
 
         if (pendientes.isEmpty()) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
@@ -275,6 +344,17 @@ private fun FocusContent(
             Text(text = it, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
         }
 
+        ultimaSesion?.let { sesion ->
+            Text(
+                text = "Sesión guardada: ${formatearDuracion(sesion.endMillis - sesion.startMillis)}" +
+                    if (sesion.trofeosConseguidos > 0) " — ${sesion.trofeosConseguidos} ${if (sesion.trofeosConseguidos == 1) "trofeo" else "trofeos"} nuevos" else "",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 12.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            )
+        }
+
         Button(
             onClick = {
                 comprobando = true
@@ -296,6 +376,10 @@ private fun FocusContent(
         ) {
             Text(text = if (comprobando) "Comprobando…" else "¿Ya lo tengo?", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
+    }
+
+    if (mostrarDiario) {
+        DiarioDialog(sessionRepository = sessionRepository, onDismiss = { mostrarDiario = false })
     }
 }
 
@@ -337,4 +421,160 @@ private fun gradeColor(grade: TrophyGrade?): Color = when (grade) {
     TrophyGrade.SILVER -> Silver
     TrophyGrade.BRONZE -> Bronze
     null -> Muted
+}
+
+/**
+ * "Iniciar sesión" te sientas a jugar de verdad → "Detener sesión" cuando
+ * paras, y queda anotado en el Diario. Un solo botón según haya o no una
+ * sesión activa — nunca los dos a la vez, no hace falta un tercer estado.
+ */
+@Composable
+private fun SessionTimerCard(
+    enSesion: Boolean,
+    hayOtraSesionActiva: Boolean,
+    otraSesionTitulo: String?,
+    elapsedMillis: Long,
+    ultimaSesion: GameSession?,
+    onIniciar: () -> Unit,
+    onDetener: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(16.dp))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        if (enSesion) {
+            Text(
+                text = formatearCronometro(elapsedMillis),
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(10.dp))
+            Button(
+                onClick = onDetener,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.9f), contentColor = Color.Black),
+            ) {
+                Text("Detener sesión", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+        } else {
+            if (hayOtraSesionActiva) {
+                Text(
+                    text = "Tienes una sesión activa en $otraSesionTitulo",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                )
+                OutlinedButton(
+                    onClick = onDetener,
+                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                ) {
+                    Text("Detener esa sesión", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Button(
+                    onClick = onIniciar,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.9f), contentColor = Color.Black),
+                ) {
+                    Text("⏱️ Iniciar sesión", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiarioDialog(sessionRepository: GameSessionRepository, onDismiss: () -> Unit) {
+    var sesiones by remember { mutableStateOf<List<GameSession>?>(null) }
+    LaunchedEffect(Unit) { sesiones = sessionRepository.getDiario() }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 480.dp)
+                .background(Color(0xFF111111), RoundedCornerShape(20.dp))
+                .padding(20.dp),
+        ) {
+            Text("TU DIARIO", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(
+                "Cuánto tiempo de verdad le dedicas a cada platino",
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 2.dp, bottom = 16.dp),
+            )
+            val current = sesiones
+            when {
+                current == null -> Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color.White)
+                }
+                current.isEmpty() -> Text(
+                    "Sin sesiones registradas todavía — inicia una desde Modo Enfoque.",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 13.sp,
+                )
+                else -> Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    current.forEach { sesion ->
+                        Column {
+                            Text(
+                                text = formatearFechaDiario(sesion.startMillis),
+                                color = Color.White.copy(alpha = 0.45f),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Text(
+                                text = "${formatearDuracion(sesion.endMillis - sesion.startMillis)} jugando a ${sesion.gameTitle}" +
+                                    if (sesion.trofeosConseguidos > 0) ". Conseguidos ${sesion.trofeosConseguidos} ${if (sesion.trofeosConseguidos == 1) "trofeo" else "trofeos"}." else ".",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                            )
+                        }
+                    }
+                }
+            }
+            TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End).padding(top = 12.dp)) {
+                Text("Cerrar", color = Color.White.copy(alpha = 0.7f))
+            }
+        }
+    }
+}
+
+private fun formatearCronometro(millis: Long): String {
+    val totalSegundos = millis / 1000
+    val horas = totalSegundos / 3600
+    val minutos = (totalSegundos % 3600) / 60
+    val segundos = totalSegundos % 60
+    return if (horas > 0) {
+        "%d:%02d:%02d".format(horas, minutos, segundos)
+    } else {
+        "%d:%02d".format(minutos, segundos)
+    }
+}
+
+/** "2h 30m" o "45m" si no llega a la hora — mismo formato que pide el diario, no el reloj HH:MM:SS del cronómetro en vivo. */
+private fun formatearDuracion(millis: Long): String {
+    val totalMinutos = (millis / 60_000).coerceAtLeast(1)
+    val horas = totalMinutos / 60
+    val minutos = totalMinutos % 60
+    return if (horas > 0) "${horas}h ${minutos}m" else "${minutos}m"
+}
+
+private val FORMATO_FECHA_DIARIO = java.text.SimpleDateFormat("EEEE d 'de' MMMM", java.util.Locale("es", "ES"))
+
+private fun formatearFechaDiario(millis: Long): String {
+    val texto = FORMATO_FECHA_DIARIO.format(java.util.Date(millis))
+    return texto.replaceFirstChar { it.uppercase() }
 }

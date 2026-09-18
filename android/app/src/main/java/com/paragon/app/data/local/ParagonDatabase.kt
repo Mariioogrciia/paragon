@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [LibraryGameEntity::class, CachedGameDetailEntity::class, PendingNoteEntity::class, StuckTrophyEntity::class, PanelCacheEntity::class, SimpleCacheEntity::class],
-    version = 6,
+    entities = [LibraryGameEntity::class, CachedGameDetailEntity::class, PendingNoteEntity::class, StuckTrophyEntity::class, PanelCacheEntity::class, SimpleCacheEntity::class, GameSessionEntity::class],
+    version = 7,
     exportSchema = false,
 )
 abstract class ParagonDatabase : RoomDatabase() {
@@ -16,6 +16,7 @@ abstract class ParagonDatabase : RoomDatabase() {
     abstract fun stuckTrophyDao(): StuckTrophyDao
     abstract fun panelDao(): PanelDao
     abstract fun simpleCacheDao(): SimpleCacheDao
+    abstract fun gameSessionDao(): GameSessionDao
 
     companion object {
         @Volatile
@@ -33,6 +34,15 @@ abstract class ParagonDatabase : RoomDatabase() {
                     // servidor) — de la 1 a la 2 basta con recrearla en vez
                     // de escribir un Migration para una tabla que se
                     // rellena sola en la próxima visita a cada pantalla.
+                    //
+                    // OJO al subir la versión a partir de la 7: game_sessions
+                    // (GameSessionEntity) ya NO es caché — es el diario
+                    // privado de sesiones del usuario, dato real que no se
+                    // puede volver a pedir a ningún servidor. Un
+                    // fallbackToDestructiveMigration en una versión futura
+                    // borraría ese diario entero sin avisar. A partir de
+                    // aquí, cualquier cambio de esquema necesita un
+                    // Migration de verdad, no vale recrear la base.
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
