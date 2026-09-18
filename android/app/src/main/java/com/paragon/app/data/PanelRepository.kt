@@ -22,7 +22,14 @@ data class GlobalStats(
     val platinums: Int,
     val trophies: Int,
     val games: Int,
-    val completionRate: Int
+    val completionRate: Int,
+    // Antes la app pintaba esto con PanelRepository.getMockTrophyCounts()
+    // (datos de prueba fijos) — el backend ya calculaba el desglose real
+    // en summarise() desde el principio, solo faltaba exponerlo en
+    // GET /api/mobile/panel.
+    val gold: Int = 0,
+    val silver: Int = 0,
+    val bronze: Int = 0,
 )
 
 /** Racha de días con al menos un trofeo — mismo cálculo que GET /api/mobile/stats (ver CONTRACT.md). */
@@ -113,6 +120,9 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 trophies = response.stats.trophies,
                 games = response.stats.games,
                 completionRate = response.stats.completionRate,
+                gold = response.stats.gold,
+                silver = response.stats.silver,
+                bronze = response.stats.bronze,
             )
             val racha = RachaGlobal(actual = response.racha.actual, mejor = response.racha.mejor)
 
@@ -129,6 +139,9 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                     completionRate = stats.completionRate,
                     rachaActual = racha.actual,
                     rachaMejor = racha.mejor,
+                    gold = stats.gold,
+                    silver = stats.silver,
+                    bronze = stats.bronze,
                 )
             )
 
@@ -167,7 +180,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
         val cached = panelDao?.getCached() ?: return null
         return PanelResult.Ok(
             profile = UserProfile(cached.handle, cached.name, cached.level, cached.psnId, cached.image),
-            stats = GlobalStats(cached.platinums, cached.trophies, cached.games, cached.completionRate),
+            stats = GlobalStats(cached.platinums, cached.trophies, cached.games, cached.completionRate, cached.gold, cached.silver, cached.bronze),
             racha = RachaGlobal(cached.rachaActual, cached.rachaMejor),
             fromCache = true,
         )
@@ -209,71 +222,4 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
         }
     }
 
-    // Simulamos la obtención de datos desde Next.js
-    fun getMockUserProfile(): UserProfile {
-        return UserProfile(
-            handle = "mario",
-            name = "Mario",
-            level = 14,
-            psnId = "mario_psn"
-        )
-    }
-
-    fun getMockGlobalStats(): GlobalStats {
-        return GlobalStats(
-            platinums = 87,
-            trophies = 4312,
-            games = 214,
-            completionRate = 68
-        )
-    }
-
-    fun getMockTrophyCounts(): TrophyCounts {
-        return TrophyCounts(
-            platinum = 87,
-            gold = 214,
-            silver = 890,
-            bronze = 3121
-        )
-    }
-
-    fun getMockNearPlatinum(): GameProgress {
-        return GameProgress(
-            id = "1",
-            title = "Elden Ring",
-            coverUrl = "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg",
-            earnedTrophies = 32,
-            totalTrophies = 42,
-            percent = 74
-        )
-    }
-
-    fun getMockRecentGames(): List<GameProgress> {
-        return listOf(
-            GameProgress(
-                id = "2",
-                title = "Bloodborne",
-                coverUrl = "https://images.igdb.com/igdb/image/upload/t_cover_big/cob99l.jpg",
-                earnedTrophies = 40,
-                totalTrophies = 40,
-                percent = 100
-            ),
-            GameProgress(
-                id = "3",
-                title = "God of War Ragnarök",
-                coverUrl = "https://images.igdb.com/igdb/image/upload/t_cover_big/coba3d.jpg",
-                earnedTrophies = 36,
-                totalTrophies = 36,
-                percent = 100
-            ),
-            GameProgress(
-                id = "4",
-                title = "Returnal",
-                coverUrl = "https://images.igdb.com/igdb/image/upload/t_cover_big/co3wc1.jpg",
-                earnedTrophies = 12,
-                totalTrophies = 31,
-                percent = 41
-            )
-        )
-    }
 }

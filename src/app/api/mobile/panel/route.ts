@@ -38,6 +38,14 @@ export async function GET(req: Request) {
       trophies: stats.trofeos,
       games: stats.juegos,
       completionRate: stats.completadoMedio,
+      // `summarise()` ya calculaba este desglose por metal (counts.gold/
+      // silver/bronze) — solo faltaba devolverlo aquí. La app nativa
+      // llevaba mostrando esto con datos de PRUEBA hardcodeados
+      // (`PanelRepository.getMockTrophyCounts()`), aunque el dato real ya
+      // se calculaba en el servidor desde el principio.
+      gold: stats.counts.gold,
+      silver: stats.counts.silver,
+      bronze: stats.counts.bronze,
     },
     // Mismo cálculo que /api/mobile/stats (lib/history.ts) — se duplica
     // aquí a propósito solo el dato (no la función) para que el Panel

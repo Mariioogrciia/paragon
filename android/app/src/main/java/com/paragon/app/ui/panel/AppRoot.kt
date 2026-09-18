@@ -150,14 +150,7 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .background(Brush.linearGradient(listOf(Accent, Accent.copy(alpha = 0.6f))), RoundedCornerShape(18.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(text = "P", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Black)
-            }
+            com.paragon.app.ui.common.ParagonMark(modifier = Modifier.size(64.dp))
 
             Text(
                 text = "PARAGON",

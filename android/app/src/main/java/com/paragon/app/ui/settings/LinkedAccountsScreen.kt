@@ -65,6 +65,14 @@ private fun platformShort(platform: String): String = when (platform) {
     else -> platform.take(2).uppercase()
 }
 
+/** Logo real por plataforma (mismos paths SVG que PlatformLogos.tsx en la web) — antes era solo la inicial en un círculo. */
+private fun platformIconRes(platform: String): Int? = when (platform) {
+    "psn" -> R.drawable.ic_playstation
+    "xbox" -> R.drawable.ic_xbox
+    "steam" -> R.drawable.ic_steam
+    else -> null
+}
+
 private fun platformPlaceholder(platform: String): String = when (platform) {
     "psn" -> "Tu Online ID de PSN"
     "xbox" -> "Tu Gamertag"
@@ -307,7 +315,17 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     modifier = Modifier.size(36.dp).background(brandColor.copy(alpha = 0.14f), CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = platformShort(platform.platform), color = brandColor, fontSize = 12.sp, fontWeight = FontWeight.Black)
+                    val iconRes = platformIconRes(platform.platform)
+                    if (iconRes != null) {
+                        Icon(
+                            painter = painterResource(iconRes),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    } else {
+                        Text(text = platformShort(platform.platform), color = brandColor, fontSize = 12.sp, fontWeight = FontWeight.Black)
+                    }
                 }
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(text = platformLabel(platform.platform), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)

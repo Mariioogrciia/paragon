@@ -28,4 +28,10 @@ data class PanelCacheEntity(
     val completionRate: Int,
     val rachaActual: Int,
     val rachaMejor: Int,
+    // Columnas nuevas (versión 8 de la base, ver MIGRATION_7_8 en
+    // ParagonDatabase.kt) — con valor por defecto para que una fila vieja
+    // ya guardada (antes de esta migración) no rompa la deserialización.
+    val gold: Int = 0,
+    val silver: Int = 0,
+    val bronze: Int = 0,
 )

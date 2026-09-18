@@ -33,7 +33,7 @@ válido: `401 { "error": "No autenticado" }`.
 ```json
 {
   "profile": { "handle": "mario", "name": "Mario", "level": 14, "psnId": "mario_psn", "image": "https://..." },
-  "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68 },
+  "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68, "gold": 214, "silver": 890, "bronze": 3121 },
   "racha": { "actual": 4, "mejor": 12 }
 }
 ```

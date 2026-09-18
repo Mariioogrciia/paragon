@@ -44,6 +44,7 @@ import com.paragon.app.data.CompareSide
 import com.paragon.app.data.MilestoneRepository
 import com.paragon.app.data.MilestoneResult
 import com.paragon.app.data.PanelRepository
+import com.paragon.app.data.TrophyCounts
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.navigation.Screen
@@ -55,10 +56,9 @@ import com.paragon.app.data.theme.ThemeStore
 
 /**
  * `userProfile`/`globalStats` ya son reales (bajan desde AppRoot vía
- * MainScreen — /api/mobile/panel). "A un paso del platino"/"recientes" ya
- * son reales también (/api/mobile/panel/highlights, mismo cálculo que la
- * portada web). El desglose por metal (`trophyCounts`) sigue con
- * `PanelRepository.getMockTrophyCounts()`: no hay endpoint todavía para eso.
+ * MainScreen — /api/mobile/panel, incluido el desglose por metal
+ * oro/plata/bronce). "A un paso del platino"/"recientes" ya son reales
+ * también (/api/mobile/panel/highlights, mismo cálculo que la portada web).
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -69,7 +69,6 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
     val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     val compareRepository = remember(tokenStore) { CompareRepository(tokenStore) }
-    val trophyCounts = remember { repository.getMockTrophyCounts() }
     var highlights by remember { mutableStateOf<HighlightsResult?>(null) }
     var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
@@ -217,9 +216,16 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Desglose de trofeos
+                    // Desglose de trofeos — datos reales de GET /api/mobile/panel
+                    // (antes era PanelRepository.getMockTrophyCounts(), fijo,
+                    // sin relación con la cuenta real del usuario).
                     TrophyCountRow(
-                        counts = trophyCounts,
+                        counts = TrophyCounts(
+                            platinum = globalStats.platinums,
+                            gold = globalStats.gold,
+                            silver = globalStats.silver,
+                            bronze = globalStats.bronze,
+                        ),
                         summary = "${globalStats.trophies} trofeos en ${globalStats.games} juegos"
                     )
 

@@ -4,10 +4,29 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+
+/**
+ * Añade el desglose por metal (oro/plata/bronce) a la caché del Panel —
+ * antes la app pintaba esto con datos de prueba fijos porque el backend no
+ * los exponía; ya los expone (GET /api/mobile/panel), así que la caché
+ * necesita sitio para guardarlos. `panel_cache` es solo caché (se rellena
+ * sola en la próxima visita si algo sale mal), pero está en la MISMA base
+ * que `game_sessions` (dato real, no recuperable) — de ahí el Migration de
+ * verdad en vez de `fallbackToDestructiveMigration`, que borraría las dos.
+ */
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE panel_cache ADD COLUMN gold INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE panel_cache ADD COLUMN silver INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE panel_cache ADD COLUMN bronze INTEGER NOT NULL DEFAULT 0")
+    }
+}
 
 @Database(
     entities = [LibraryGameEntity::class, CachedGameDetailEntity::class, PendingNoteEntity::class, StuckTrophyEntity::class, PanelCacheEntity::class, SimpleCacheEntity::class, GameSessionEntity::class],
-    version = 7,
+    version = 8,
     exportSchema = false,
 )
 abstract class ParagonDatabase : RoomDatabase() {
@@ -29,21 +48,21 @@ abstract class ParagonDatabase : RoomDatabase() {
                     ParagonDatabase::class.java,
                     "paragon_database"
                 )
-                    // Sin migraciones definidas todavía (solo tablas de
+                    // Sin migraciones definidas hasta la v6 (solo tablas de
                     // caché, nada que no se pueda volver a pedir al
-                    // servidor) — de la 1 a la 2 basta con recrearla en vez
-                    // de escribir un Migration para una tabla que se
-                    // rellena sola en la próxima visita a cada pantalla.
+                    // servidor) — recrear la base ahí no pierde nada real.
                     //
-                    // OJO al subir la versión a partir de la 7: game_sessions
-                    // (GameSessionEntity) ya NO es caché — es el diario
-                    // privado de sesiones del usuario, dato real que no se
-                    // puede volver a pedir a ningún servidor. Un
-                    // fallbackToDestructiveMigration en una versión futura
-                    // borraría ese diario entero sin avisar. A partir de
-                    // aquí, cualquier cambio de esquema necesita un
-                    // Migration de verdad, no vale recrear la base.
-                    .fallbackToDestructiveMigration()
+                    // A partir de la v7, game_sessions (GameSessionEntity) ya
+                    // NO es caché — es el diario privado de sesiones del
+                    // usuario, dato real que no se puede volver a pedir a
+                    // ningún servidor. `fallbackToDestructiveMigrationFrom`
+                    // limita el borrado automático a versiones viejas de
+                    // verdad sin dato real (1-6); de la 7 en adelante hace
+                    // falta un `Migration` explícito en `.addMigrations(...)`
+                    // — ver MIGRATION_7_8 más arriba — o Room lanza en vez de
+                    // borrar en silencio.
+                    .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5, 6)
+                    .addMigrations(MIGRATION_7_8)
                     .build()
                 INSTANCE = instance
                 instance

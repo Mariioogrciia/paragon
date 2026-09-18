@@ -19,6 +19,9 @@ data class PanelStatsDto(
     val trophies: Int,
     val games: Int,
     val completionRate: Int,
+    val gold: Int,
+    val silver: Int,
+    val bronze: Int,
 )
 
 data class PanelRachaDto(

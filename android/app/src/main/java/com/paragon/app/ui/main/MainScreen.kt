@@ -434,27 +434,16 @@ fun MainScreen(
 }
 
 /**
- * Marca de Paragon para la cabecera — antes era solo texto plano
- * ("PARAGON" en mayúsculas sin más), sin ningún símbolo reconocible ni
- * presencia de marca. Reutiliza la MISMA insignia "P" con degradado de
- * acento que ya se ve en la pantalla de login (`LoginGate` en
- * `AppRoot.kt`), en miniatura — para que la marca sea consistente en toda
- * la app, no un símbolo nuevo inventado aquí.
+ * Marca de Paragon para la cabecera — antes era una `P` dentro de un
+ * cuadrado (y antes de eso, solo texto plano), que no dice nada de la app
+ * por sí sola. Reutiliza el MISMO símbolo (`ParagonMark`: gema facetada +
+ * flecha ascendente) que la pantalla de login, en miniatura — marca
+ * consistente en toda la app, un solo sitio donde vive el dibujo.
  */
 @Composable
 private fun ParagonWordmark() {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .background(
-                    androidx.compose.ui.graphics.Brush.linearGradient(listOf(Accent, Accent.copy(alpha = 0.6f))),
-                    RoundedCornerShape(7.dp),
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = "P", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Black)
-        }
+        com.paragon.app.ui.common.ParagonMark(modifier = Modifier.size(22.dp))
         Text(
             text = "PARAGON",
             color = Foreground,
