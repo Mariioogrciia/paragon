@@ -47,6 +47,13 @@ solo como dato (no como función) para que el icono de racha de la cabecera
 no obligue a pedir todo el endpoint de Estadísticas en cada apertura de la
 app; `actual` es 0 si no se ha sacado ningún trofeo hoy o ayer.
 
+**`409` "Perfil sin terminar de configurar"**: login nuevo (Google/Discord)
+que todavía no tiene `handle` — el equivalente móvil de que la web te mande
+a `/bienvenida`. Se arregla con `POST /api/mobile/profile/handle` (ver más
+abajo); la app tiene que enseñar una pantalla para elegirlo en vez de
+tratarlo como un error genérico con "Reintentar" (ese botón repite la misma
+petición para siempre, nunca se arregla solo).
+
 ## `GET /api/mobile/racha` — Detalle de la racha diaria
 
 ```json
@@ -430,6 +437,15 @@ y demás, ver `src/lib/profiles.ts`).
 ## `DELETE /api/mobile/accounts/{platform}` — Desvincular PSN/Steam/Xbox
 
 `{ "ok": true }`. Borra la cuenta vinculada, no los juegos ya importados.
+
+## `POST /api/mobile/profile/handle` — Elegir nombre de usuario (alta nueva)
+
+Body: `{ "handle": "mario_gg" }`. `{ "ok": true, "handle": "mario_gg" }` o
+`400` (formato: 3-20 caracteres, minúsculas/números/guion bajo) / `409`
+(ya cogido). Paso 1 del alta — equivalente móvil de `HandleForm` en
+`src/app/bienvenida/page.tsx`. Sin esto, un login nuevo se queda en bucle
+contra el `409` de `GET /api/mobile/panel` sin ningún sitio desde el que
+arreglarlo.
 
 ## `POST /api/mobile/profile` — Ajustes del perfil
 

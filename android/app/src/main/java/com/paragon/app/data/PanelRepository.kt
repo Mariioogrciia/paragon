@@ -4,7 +4,9 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.PanelCacheEntity
 import com.paragon.app.data.local.PanelDao
 import com.paragon.app.data.network.ApiClient
+import com.paragon.app.data.network.ChooseHandleRequest
 import com.paragon.app.data.network.GameCardDto
+import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
 
 data class UserProfile(
@@ -50,7 +52,20 @@ sealed class PanelResult {
     data class Ok(val profile: UserProfile, val stats: GlobalStats, val racha: RachaGlobal, val fromCache: Boolean = false) : PanelResult()
     /** Sin token guardado, o el servidor lo rechazó (401): hace falta pasar por /movil/enlazar (login web). */
     object NeedsLogin : PanelResult()
+    /**
+     * Login nuevo (Google/Discord) sin `handle` todavía — el 409 real de
+     * /api/mobile/panel, no un error genérico. Sin este estado propio caía
+     * en `Error` con un "Reintentar" que repite la misma petición para
+     * siempre y nunca se arregla solo.
+     */
+    object NeedsOnboarding : PanelResult()
     data class Error(val message: String) : PanelResult()
+}
+
+/** Resultado de elegir el handle — ver POST /api/mobile/profile/handle. */
+sealed class ChooseHandleResult {
+    object Ok : ChooseHandleResult()
+    data class Error(val message: String) : ChooseHandleResult()
 }
 
 /** "A un paso del platino" + "Recientes" — ver /api/mobile/panel/highlights, mismo cálculo que la portada web. */
@@ -119,14 +134,32 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
 
             PanelResult.Ok(profile, stats, racha)
         } catch (e: HttpException) {
-            if (e.code() == 401) {
-                store.clear()
-                PanelResult.NeedsLogin
-            } else {
-                cachedPanel() ?: PanelResult.Error("El servidor respondió con un error (${e.code()}).")
+            when (e.code()) {
+                401 -> {
+                    store.clear()
+                    PanelResult.NeedsLogin
+                }
+                // Perfil sin handle todavía (alta nueva) — nunca se resuelve
+                // solo reintentando, así que no se mira la caché: hace falta
+                // la pantalla de onboarding.
+                409 -> PanelResult.NeedsOnboarding
+                else -> cachedPanel() ?: PanelResult.Error("El servidor respondió con un error (${e.code()}).")
             }
         } catch (e: Exception) {
             cachedPanel() ?: PanelResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+        }
+    }
+
+    /** Paso 1 del alta — ver POST /api/mobile/profile/handle. */
+    suspend fun chooseHandle(handle: String): ChooseHandleResult {
+        val store = tokenStore ?: return ChooseHandleResult.Error("Sin sesión.")
+        return try {
+            ApiClient.settingsApi(store).chooseHandle(ChooseHandleRequest(handle))
+            ChooseHandleResult.Ok
+        } catch (e: HttpException) {
+            ChooseHandleResult.Error(e.paragonErrorMessage() ?: "El servidor respondió con un error (${e.code()}).")
+        } catch (e: Exception) {
+            ChooseHandleResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
     }
 

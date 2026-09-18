@@ -42,6 +42,10 @@ data class UpdateProfileRequest(
     val image: String?
 )
 
+data class ChooseHandleRequest(val handle: String)
+
+data class ChooseHandleResponse(val ok: Boolean, val handle: String?)
+
 data class AvatarUploadResponse(val url: String?, val error: String? = null)
 
 interface SettingsApi {
@@ -64,4 +68,8 @@ interface SettingsApi {
 
     @POST("api/mobile/profile")
     suspend fun updateProfile(@Body request: UpdateProfileRequest): SuccessResponse
+
+    /** Paso 1 del alta nueva — ver src/app/api/mobile/profile/handle/route.ts. */
+    @POST("api/mobile/profile/handle")
+    suspend fun chooseHandle(@Body request: ChooseHandleRequest): ChooseHandleResponse
 }
