@@ -37,17 +37,16 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
 
   const minFecha = puntos[0].fechaMillis;
   const maxFecha = puntos[puntos.length - 1].fechaMillis;
-  const rangoFecha = maxFecha - minFecha;
-  const xFor = (fecha: number) => (rangoFecha === 0 ? 50 : ((fecha - minFecha) / rangoFecha) * 100);
 
-  // Varios trofeos el mismo día caen exactamente en la misma X — sin esto
-  // se apilan uno encima de otro y solo se ve el de más arriba. Se
-  // abren en abanico horizontal alrededor de su día real (offsetPx, no
-  // cambia la fecha que se muestra ni el eje), ordenados por hora exacta
-  // dentro del día. Con muchos el mismo día el abanico se ensancha y ese
-  // tramo deja de ser proporcional al tiempo — aceptado a propósito, el
-  // caso normal es 2-4 al día.
-  const MARKER_SPACING_PX = 28;
+  // El eje X NO es proporcional al tiempo transcurrido a propósito: un
+  // juego jugado a rachas (varios trofeos en pocos días, luego meses o
+  // años sin tocarlo) con una escala lineal real deja los huecos vacíos
+  // "robando" casi todo el ancho y la ráfaga entera aplastada en un
+  // puñado de píxeles — ahí ningún abanico cabe por mucho que separe.
+  // En su lugar, cada DÍA con trofeos se lleva un hueco igual en el eje,
+  // en orden cronológico — la fecha real de cada uno se sigue viendo al
+  // pasar el ratón, solo cambia que dos huecos de un día y de tres años
+  // ocupan el mismo ancho visual.
   const porDia = new Map<string, typeof puntos>();
   for (const p of puntos) {
     const dia = new Date(p.fechaMillis).toISOString().slice(0, 10);
@@ -55,6 +54,17 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
     if (grupo) grupo.push(p);
     else porDia.set(dia, [p]);
   }
+  const diasOrdenados = [...porDia.keys()];
+  const xPorDia = new Map(
+    diasOrdenados.map((dia, i) => [dia, diasOrdenados.length === 1 ? 50 : (i / (diasOrdenados.length - 1)) * 100]),
+  );
+  const diaDe = (p: (typeof puntos)[number]) => new Date(p.fechaMillis).toISOString().slice(0, 10);
+  const xFor = (p: (typeof puntos)[number]) => xPorDia.get(diaDe(p)) ?? 0;
+
+  // Dentro de un mismo día, varios trofeos siguen cayendo en la misma X —
+  // se abren en abanico horizontal (offsetPx, no cambia la fecha que se
+  // muestra), ordenados por hora exacta dentro del día.
+  const MARKER_SPACING_PX = 28;
   const offsetPorId = new Map<string, number>();
   for (const grupo of porDia.values()) {
     grupo.forEach((p, i) => {
@@ -99,7 +109,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
               key={p.id}
               className="absolute -translate-x-1/2 -translate-y-1/2"
               style={{
-                left: `calc(${xFor(p.fechaMillis)}% + ${offsetPorId.get(p.id) ?? 0}px)`,
+                left: `calc(${xFor(p)}% + ${offsetPorId.get(p.id) ?? 0}px)`,
                 top: `${p.rarityPercent}%`,
                 zIndex: hoverId === p.id ? 20 : 1,
               }}

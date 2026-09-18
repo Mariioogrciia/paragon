@@ -575,27 +575,34 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
 
     val minFecha = puntos.first().fechaMillis
     val maxFecha = puntos.last().fechaMillis
-    val rango = (maxFecha - minFecha).coerceAtLeast(1)
     val gradosPresentes = GRADOS_EN_ORDEN.filter { g -> puntos.any { it.trofeo.grade == g } }
     var seleccionado by remember { mutableStateOf<PuntoRareza?>(null) }
 
-    // Varios trofeos el mismo día caen en la misma X — sin esto se apilan
-    // uno encima de otro. Se abren en abanico horizontal alrededor de su
-    // día real (mismo criterio que TrophyTimeline.tsx en la web), sin
-    // tocar la fecha real de cada uno.
-    val offsetPorId = remember(puntos) {
+    // El eje X NO es proporcional al tiempo transcurrido a propósito: un
+    // juego jugado a rachas (varios trofeos en pocos días, luego meses o
+    // años sin tocarlo) con una escala lineal real deja los huecos vacíos
+    // "robando" casi todo el ancho y la ráfaga entera aplastada en un
+    // puñado de píxeles — mismo criterio que TrophyTimeline.tsx en la web.
+    // Cada DÍA con trofeos se lleva un hueco igual en el eje, en orden
+    // cronológico; dentro de un mismo día, se abren en abanico horizontal
+    // (offsetPorId) — ninguno de los dos toca la fecha real que se enseña.
+    val (xFracPorId, offsetPorId) = remember(puntos) {
         val porDia = LinkedHashMap<String, MutableList<PuntoRareza>>()
         puntos.forEach { p ->
             val dia = FECHA_DIA_KEY.format(java.util.Date(p.fechaMillis))
             porDia.getOrPut(dia) { mutableListOf() }.add(p)
         }
-        val mapa = mutableMapOf<String, Float>()
-        porDia.values.forEach { grupo ->
+        val dias = porDia.keys.toList()
+        val xFrac = mutableMapOf<String, Float>()
+        val offset = mutableMapOf<String, Float>()
+        porDia.entries.forEachIndexed { diaIndex, (_, grupo) ->
+            val x = if (dias.size == 1) 0.5f else diaIndex.toFloat() / (dias.size - 1)
             grupo.forEachIndexed { i, p ->
-                mapa[p.trofeo.id] = (i - (grupo.size - 1) / 2f) * MARKER_SPACING_PX
+                xFrac[p.trofeo.id] = x
+                offset[p.trofeo.id] = (i - (grupo.size - 1) / 2f) * MARKER_SPACING_PX
             }
         }
-        mapa
+        xFrac to offset
     }
 
     Column(modifier = modifier) {
@@ -637,7 +644,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                 }
 
                 puntos.forEach { p ->
-                    val xFrac = (p.fechaMillis - minFecha).toFloat() / rango
+                    val xFrac = xFracPorId[p.trofeo.id] ?: 0f
                     val yFrac = (p.trofeo.rarityPercent ?: 0.0).toFloat() / 100f
                     val tam = 30.dp
                     val offsetDia = (offsetPorId[p.trofeo.id] ?: 0f).dp
