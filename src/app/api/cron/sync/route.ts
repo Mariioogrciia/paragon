@@ -230,9 +230,27 @@ export async function GET(request: Request) {
             and ${userTrophies.earned} = true
         )`,
       )
-      // Nulls first: lo que nunca se ha sincronizado importa más que lo que
-      // solo está viejo. Entre lo viejo, lo más rancio primero.
-      .orderBy(sql`${userGames.trophiesSyncedAt} asc nulls first`)
+      // Bug real encontrado en vivo (18 sept 2026): esta cola es GLOBAL
+      // (todos los usuarios a la vez) y ordenaba solo por antigüedad — con
+      // DETALLES_POR_PASADA en 6 cada 15 min, un juego "solo viejo" (ya
+      // tiene su detalle, hace más de HORAS_CADUCIDAD que no se refresca,
+      // nada nuevo de verdad) le quitaba el turno a un juego con un
+      // TROFEO REAL esperando (`earnedTotal` de la biblioteca por encima de
+      // lo guardado — alguien lo jugó y consiguió algo, pero el detalle
+      // todavía no lo sabe). El usuario lo notaba como "el cron no
+      // funciona" hasta que abría la ficha del juego a mano, que sí fuerza
+      // ese sync concreto (ver el `outOfSync` de `getGameDetail`). Ahora los
+      // "fuera de sincronía" van SIEMPRE primero; entre ellos y entre el
+      // resto, el más rancio primero.
+      .orderBy(sql`
+        (coalesce(${userGames.earnedTotal}, 0) > (
+          select count(*) from ${userTrophies}
+          where ${userTrophies.gameId} = ${userGames.gameId}
+            and ${userTrophies.userId} = ${userGames.userId}
+            and ${userTrophies.earned} = true
+        )) desc,
+        ${userGames.trophiesSyncedAt} asc nulls first
+      `)
       .limit(DETALLES_POR_PASADA);
 
     let xboxDetalles = 0;
