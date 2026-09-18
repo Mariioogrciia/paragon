@@ -33,6 +33,7 @@ data class PrimerPlatinoStats(val gameId: String, val titulo: String, val iconUr
 data class TrofeoMasRaroStats(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val rarityPercent: Double, val fecha: String?)
 data class PlatinoAnejoStats(val gameId: String, val titulo: String, val iconUrl: String?, val dias: Int, val desde: String, val hasta: String)
 data class RachaMasLargaStats(val dias: Int, val desde: String, val hasta: String)
+data class PlatinoNumeradoStats(val numero: Int, val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
 
 data class HitosStats(
     val primerTrofeo: PrimerTrofeoStats?,
@@ -40,6 +41,7 @@ data class HitosStats(
     val trofeoMasRaro: TrofeoMasRaroStats?,
     val platinoAnejo: PlatinoAnejoStats?,
     val rachaMasLarga: RachaMasLargaStats?,
+    val platinosHitos: List<PlatinoNumeradoStats>,
 )
 
 data class ParagonStats(
@@ -84,6 +86,7 @@ private fun StatsResponse.toParagonStats() = ParagonStats(
         trofeoMasRaro = hitos.trofeoMasRaro?.let { TrofeoMasRaroStats(it.gameId, it.tituloJuego, it.nombre, it.iconUrl, it.rarityPercent, it.fecha) },
         platinoAnejo = hitos.platinoAnejo?.let { PlatinoAnejoStats(it.gameId, it.titulo, it.iconUrl, it.dias, it.desde, it.hasta) },
         rachaMasLarga = hitos.rachaMasLarga?.let { RachaMasLargaStats(it.dias, it.desde, it.hasta) },
+        platinosHitos = hitos.platinosHitos.map { PlatinoNumeradoStats(it.numero, it.gameId, it.titulo, it.iconUrl, it.fecha) },
     ),
 )
 

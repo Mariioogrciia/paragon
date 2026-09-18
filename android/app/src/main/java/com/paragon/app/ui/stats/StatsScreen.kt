@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +27,7 @@ import kotlin.math.roundToInt
  * piezas de la web (`EstadisticasCompletas.tsx`).
  */
 @Composable
-fun StatsScreen(tokenStore: TokenStore, onBack: (() -> Unit)? = null) {
+fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit)? = null) {
     val repository = remember(tokenStore) { StatsRepository(tokenStore) }
     var result by remember { mutableStateOf<StatsResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
@@ -71,13 +72,13 @@ fun StatsScreen(tokenStore: TokenStore, onBack: (() -> Unit)? = null) {
                     ) { Text("Reintentar") }
                 }
             }
-            is StatsResult.Ok -> StatsContent(current.stats)
+            is StatsResult.Ok -> StatsContent(current.stats, handle)
         }
     }
 }
 
 @Composable
-private fun StatsContent(stats: ParagonStats) {
+private fun StatsContent(stats: ParagonStats, handle: String) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -90,6 +91,7 @@ private fun StatsContent(stats: ParagonStats) {
         item { EficienciaCard(stats.eficiencia) }
         item { BacklogCard(stats.backlog) }
         item { HitosCard(stats.hitos) }
+        item { GaleriaHitosCard(stats.hitos, handle) }
     }
 }
 
@@ -152,6 +154,80 @@ private fun HitosCard(hitos: HitosStats) {
         }
     }
 }
+
+/** Un hito exportable — lo justo para pintar una fila y generar su tarjeta. */
+private data class HitoExportable(
+    val icono: String,
+    val etiqueta: String,
+    val detalle: String,
+    val coverUrl: String?,
+    val gameTitle: String,
+    val badge: String,
+    val subtitle: String,
+)
+
+/**
+ * "Galería de Hitos" — idea #5 del brainstorm: los mismos hitos de la
+ * tarjeta de arriba, pero con un botón para generar un póster vertical
+ * (reutiliza TrophyShareCard/ShareTrophyDialog, la misma pieza que ya usa
+ * GameDetailScreen para "Compartir Platino") y guardarlo/compartirlo. Los
+ * platinos "redondos" (#1, #10, #25, #50...) vienen ya filtrados del
+ * backend (platinosHitos en hitosHistoricos, lib/profileStats.ts) — aquí no
+ * se decide cuáles son hito, solo se pintan.
+ */
+@Composable
+private fun GaleriaHitosCard(hitos: HitosStats, handle: String) {
+    val items = buildList {
+        hitos.primerTrofeo?.let {
+            add(HitoExportable("🎮", "Tu primer trofeo", "${it.nombre} · ${fechaCorta(it.fecha)}", it.iconUrl, it.tituloJuego, "PRIMER TROFEO", fechaLarga(it.fecha)))
+        }
+        hitos.trofeoMasRaro?.let {
+            add(HitoExportable("💎", "Tu trofeo más raro", "${it.nombre} · ${"%.1f".format(it.rarityPercent)}% lo tiene", it.iconUrl, it.tituloJuego, "TROFEO MÁS RARO", it.nombre))
+        }
+        hitos.platinosHitos.forEach {
+            add(HitoExportable("🏆", "Tu platino #${it.numero}", "${it.titulo} · ${fechaCorta(it.fecha)}", it.iconUrl, it.titulo, "TU PLATINO #${it.numero}", fechaLarga(it.fecha)))
+        }
+    }
+    if (items.isEmpty()) return
+
+    var compartiendo by remember { mutableStateOf<HitoExportable?>(null) }
+
+    SectionCard(title = "Galería de hitos", subtitle = "Genera un póster para guardar o compartir") {
+        items.forEachIndexed { index, item ->
+            if (index > 0) {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = Border)
+                Spacer(Modifier.height(12.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = item.icono, fontSize = 20.sp, modifier = Modifier.padding(end = 12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = item.etiqueta, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = item.detalle, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                IconButton(onClick = { compartiendo = item }) {
+                    Icon(Icons.Default.Share, contentDescription = "Generar tarjeta", tint = Accent)
+                }
+            }
+        }
+    }
+
+    compartiendo?.let { item ->
+        com.paragon.app.ui.share.ShareTrophyDialog(
+            coverUrl = item.coverUrl ?: "",
+            gameTitle = item.gameTitle,
+            handle = handle,
+            badge = item.badge,
+            subtitle = item.subtitle,
+            onDismiss = { compartiendo = null },
+        )
+    }
+}
+
+private val FECHA_LARGA = java.text.SimpleDateFormat("d 'de' MMMM 'de' yyyy", java.util.Locale("es", "ES"))
+
+private fun fechaLarga(iso: String): String =
+    try { FECHA_LARGA.format(FECHA_ISO.parse(iso)!!) } catch (e: Exception) { iso }
 
 @Composable
 private fun SectionCard(title: String, subtitle: String? = null, content: @Composable ColumnScope.() -> Unit) {

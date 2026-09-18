@@ -41,9 +41,16 @@ import com.paragon.app.ui.theme.Platinum
 fun TrophyShareCard(
     coverUrl: String,
     gameTitle: String,
-    earnedTrophies: Int,
-    totalTrophies: Int,
     handle: String,
+    earnedTrophies: Int? = null,
+    totalTrophies: Int? = null,
+    // "PLATINO" por defecto (el uso de siempre, GameDetailScreen); la
+    // galería de hitos (StatsScreen) pasa "TU PLATINO #47", "PRIMER
+    // TROFEO"... — mismo diseño de tarjeta, distinto rótulo.
+    badge: String = "PLATINO",
+    // Sustituye a "X/Y trofeos conseguidos" cuando no hay esos dos números
+    // que mostrar (un hito no tiene "progreso", tiene una fecha).
+    subtitle: String? = null,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -88,7 +95,7 @@ fun TrophyShareCard(
 
             Column {
                 Text(
-                    text = "PLATINO",
+                    text = badge,
                     color = Platinum,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
@@ -104,11 +111,11 @@ fun TrophyShareCard(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
                 )
-                Text(
-                    text = "$earnedTrophies/$totalTrophies trofeos conseguidos",
-                    color = Muted,
-                    fontSize = 14.sp,
-                )
+                val lineaProgreso = subtitle
+                    ?: if (earnedTrophies != null && totalTrophies != null) "$earnedTrophies/$totalTrophies trofeos conseguidos" else null
+                lineaProgreso?.let {
+                    Text(text = it, color = Muted, fontSize = 14.sp)
+                }
                 Text(
                     text = "@$handle en Paragon",
                     color = Accent,

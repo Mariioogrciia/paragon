@@ -42,6 +42,7 @@ data class PrimerPlatinoDto(val gameId: String, val titulo: String, val iconUrl:
 data class TrofeoMasRaroDto(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val rarityPercent: Double, val fecha: String?)
 data class PlatinoAnejoDto(val gameId: String, val titulo: String, val iconUrl: String?, val dias: Int, val desde: String, val hasta: String)
 data class RachaMasLargaDto(val dias: Int, val desde: String, val hasta: String)
+data class PlatinoNumeradoDto(val numero: Int, val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
 
 data class HitosDto(
     val primerTrofeo: PrimerTrofeoDto?,
@@ -49,6 +50,7 @@ data class HitosDto(
     val trofeoMasRaro: TrofeoMasRaroDto?,
     val platinoAnejo: PlatinoAnejoDto?,
     val rachaMasLarga: RachaMasLargaDto?,
+    val platinosHitos: List<PlatinoNumeradoDto>,
 )
 
 data class StatsResponse(

@@ -47,9 +47,11 @@ import kotlinx.coroutines.launch
 fun ShareTrophyDialog(
     coverUrl: String,
     gameTitle: String,
-    earnedTrophies: Int,
-    totalTrophies: Int,
     handle: String,
+    earnedTrophies: Int? = null,
+    totalTrophies: Int? = null,
+    badge: String = "PLATINO",
+    subtitle: String? = null,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -70,6 +72,8 @@ fun ShareTrophyDialog(
                 earnedTrophies = earnedTrophies,
                 totalTrophies = totalTrophies,
                 handle = handle,
+                badge = badge,
+                subtitle = subtitle,
                 modifier = Modifier
                     .width(260.dp)
                     .drawWithContent {

@@ -263,12 +263,29 @@ export interface RachaMasLarga {
   hasta: string;
 }
 
+export interface PlatinoNumerado {
+  numero: number;
+  gameId: string;
+  titulo: string;
+  iconUrl: string | null;
+  fecha: string;
+}
+
 export interface HitosHistoricos {
   primerTrofeo: PrimerTrofeo | null;
   primerPlatino: PrimerPlatino | null;
   trofeoMasRaro: TrofeoMasRaro | null;
   platinoAnejo: PlatinoAnejo | null;
   rachaMasLarga: RachaMasLarga | null;
+  /** Solo los "redondos" (#1, #5, #10, #25, #50, múltiplos de 50 a partir de ahí) + siempre el último — la galería de hitos exportable, no la lista entera. */
+  platinosHitos: PlatinoNumerado[];
+}
+
+const NUMEROS_HITO_PLATINO = new Set([1, 5, 10, 25, 50, 75, 100]);
+
+/** "Redondo" para efectos de la galería de hitos — mismos números pequeños de siempre, y cada 50 a partir de 100. */
+function esNumeroDeHitoPlatino(n: number): boolean {
+  return NUMEROS_HITO_PLATINO.has(n) || (n > 100 && n % 50 === 0);
 }
 
 /**
@@ -351,6 +368,13 @@ export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> 
 
   const validos = platinos.filter((p): p is typeof p & { inicio: string; fin: string } => p.inicio != null && p.fin != null);
 
+  // Ordenados por fecha real de platino (no de inserción) para que el
+  // número de cada uno sea el que de verdad le tocó cronológicamente.
+  const ordenados = [...validos].sort((a, b) => new Date(a.fin).getTime() - new Date(b.fin).getTime());
+  const platinosHitos: PlatinoNumerado[] = ordenados
+    .map((p, index) => ({ numero: index + 1, gameId: p.gameId, titulo: p.titulo, iconUrl: p.iconUrl, fecha: new Date(p.fin).toISOString() }))
+    .filter((p) => esNumeroDeHitoPlatino(p.numero) || p.numero === ordenados.length);
+
   const masAntiguo = validos.length ? validos.reduce((a, b) => (new Date(a.fin) <= new Date(b.fin) ? a : b)) : null;
   const primerPlatino: PrimerPlatino | null = masAntiguo
     ? { gameId: masAntiguo.gameId, titulo: masAntiguo.titulo, iconUrl: masAntiguo.iconUrl, fecha: new Date(masAntiguo.fin).toISOString() }
@@ -431,6 +455,7 @@ export async function hitosHistoricos(userId: string): Promise<HitosHistoricos> 
       : null,
     platinoAnejo,
     rachaMasLarga,
+    platinosHitos,
   };
 }
 

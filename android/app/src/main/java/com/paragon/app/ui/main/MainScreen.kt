@@ -340,7 +340,7 @@ fun MainScreen(
                     animatedVisibilityScope = this,
                 )
             }
-            composable(Screen.Stats.route) { StatsScreen(tokenStore) }
+            composable(Screen.Stats.route) { StatsScreen(tokenStore, handle = profile.handle) }
             composable(Screen.Feed.route) { 
                 FeedScreen(tokenStore, themeStore, onCompareClick = { handle ->
                     navController.navigate(Screen.Compare.routeFor(handle))
