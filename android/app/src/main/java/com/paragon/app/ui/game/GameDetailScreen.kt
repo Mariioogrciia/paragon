@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,8 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -167,6 +170,7 @@ private fun GameDetailContent(
     // "Compartir Platino" aunque esté al 100%).
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
     val prediccion = remember(game.trophies) { predecirPlatino(game.trophies) }
+    var vistaCronologica by remember { mutableStateOf(false) }
 
     LaunchedEffect(game.coverUrl) {
         withContext(Dispatchers.IO) {
@@ -258,12 +262,48 @@ private fun GameDetailContent(
             )
         }
 
-        val grouped = game.trophies.sortedWith(
-            compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
-        )
+        item {
+            Row(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FilterChip(selected = vistaCronologica == false, onClick = { vistaCronologica = false }, label = { Text("Lista") })
+                FilterChip(selected = vistaCronologica == true, onClick = { vistaCronologica = true }, label = { Text("Cronología") })
+            }
+        }
 
-        items(grouped) { trophy ->
-            TrophyRow(trophy, game = game, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+        if (vistaCronologica) {
+            val cronologicos = game.trophies
+                .filter { it.earned && it.earnedAt != null }
+                .sortedBy { it.earnedAt }
+
+            if (cronologicos.isEmpty()) {
+                item {
+                    Text(
+                        text = "Aún no hay ningún trofeo con fecha registrada aquí.",
+                        color = Muted,
+                        fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    )
+                }
+            } else {
+                itemsIndexed(cronologicos) { index, trophy ->
+                    TimelineTrophyRow(
+                        trophy = trophy,
+                        esUltimo = index == cronologicos.lastIndex,
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                    )
+                }
+            }
+        } else {
+            val grouped = game.trophies.sortedWith(
+                compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
+            )
+
+            items(grouped) { trophy ->
+                TrophyRow(trophy, game = game, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+            }
         }
 
         item { Spacer(Modifier.height(32.dp)) }
@@ -414,6 +454,15 @@ private val FECHA_PREDICCION_FORMAT = java.text.SimpleDateFormat("EEEE d 'de' MM
 
 private fun fechaPrediccion(millis: Long): String = FECHA_PREDICCION_FORMAT.format(java.util.Date(millis))
 
+private val FECHA_ISO_GAME_DETAIL = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
+    timeZone = java.util.TimeZone.getTimeZone("UTC")
+}
+private val FECHA_CORTA_TIMELINE = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale("es", "ES"))
+
+/** "23 jun 2026" a partir del ISO real de earnedAt — para la fecha de cada fila de la Cronología. */
+private fun fechaCortaTimeline(iso: String): String =
+    try { FECHA_CORTA_TIMELINE.format(FECHA_ISO_GAME_DETAIL.parse(iso)!!) } catch (e: Exception) { "" }
+
 private val MilestoneGold = Color(0xFFE2B53E)
 
 /**
@@ -494,6 +543,45 @@ private fun ActionChip(label: String, active: Boolean, accentColor: Color, onCli
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
         )
+    }
+}
+
+/**
+ * Fila de la vista "Cronología" — el mismo trofeo que TrophyRow pero en
+ * formato línea de tiempo (punto + conector), la historia real de en qué
+ * orden cayó cada uno en vez de la lista agrupada por metal.
+ */
+@Composable
+private fun TimelineTrophyRow(trophy: TrophyItem, esUltimo: Boolean, modifier: Modifier = Modifier) {
+    Row(modifier = modifier.fillMaxWidth()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(gradeColor(trophy.grade), RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = Background, modifier = Modifier.size(16.dp))
+            }
+            if (!esUltimo) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .weight(1f, fill = false)
+                        .defaultMinSize(minHeight = 16.dp)
+                        .background(Border),
+                )
+            }
+        }
+        Column(modifier = Modifier.padding(start = 14.dp, bottom = 24.dp)) {
+            Text(text = trophy.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            if (trophy.detail.isNotBlank()) {
+                Text(text = trophy.detail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+            }
+            trophy.earnedAt?.let {
+                Text(text = fechaCortaTimeline(it), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
     }
 }
 

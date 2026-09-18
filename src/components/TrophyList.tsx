@@ -8,6 +8,7 @@ import { trophyScore } from "@/lib/trophyScore";
 import type { Platform, Trophy, TrophyGrade } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
 import { TrophyTree } from "./TrophyTree";
+import { TrophyTimeline } from "./TrophyTimeline";
 import { ToggleChip } from "./ToggleChip";
 
 /** Los filtros de tipo son justo `TrophyType` (ya calculado por trofeo con
@@ -63,7 +64,12 @@ export function TrophyList({
   esMio?: boolean;
   showcaseTrophies?: { gameId: string, trophyId: string }[];
 }) {
-  const [view, setView] = useState<"lista" | "cuadricula" | "arbol">("lista");
+  const [view, setView] = useState<"lista" | "cuadricula" | "arbol" | "cronologia">("lista");
+  // "Cronología" es como "Árbol": su propia vista de solo lectura, sin los
+  // filtros/orden de arriba (que son de la lista y la cuadrícula) — cuenta
+  // la historia de ESTE juego en el orden real en que pasó, no algo que
+  // reordenar más.
+  const mostrarControlesDeLista = view === "lista" || view === "cuadricula";
   const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
   const [filtros, setFiltros] = useState<Set<Filtro>>(new Set());
   const [ocultarConseguidos, setOcultarConseguidos] = useState(false);
@@ -149,7 +155,7 @@ export function TrophyList({
 
   return (
     <div>
-      {view !== "arbol" && hayFiltrosDeTipo && (
+      {mostrarControlesDeLista && hayFiltrosDeTipo && (
         <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
           {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => (
             <ToggleChip key={f.valor} active={filtros.has(f.valor)} onClick={() => alternarFiltro(f.valor)}>
@@ -169,7 +175,7 @@ export function TrophyList({
       )}
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        {view !== "arbol" && (
+        {mostrarControlesDeLista && (
           <div className="flex flex-wrap gap-1.5">
             {/* "Ocultar conseguidos" y "Orden cronológico" — deliberadamente
                 en su propia fila, separados de los chips de categoría de
@@ -216,12 +222,22 @@ export function TrophyList({
             <line x1="12" y1="12" x2="5" y2="17" />
             <line x1="12" y1="12" x2="19" y2="17" />
           </ViewButton>
+          <ViewButton active={view === "cronologia"} onClick={() => setView("cronologia")} label="Cronología">
+            <line x1="12" y1="3" x2="12" y2="21" />
+            <circle cx="12" cy="6" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="12" cy="18" r="1.5" />
+          </ViewButton>
         </div>
       </div>
 
       {view === "arbol" ? (
         <div className="rounded-[20px] bg-[#0a0d14] border border-[#1f2937] shadow-lg mb-8 overflow-hidden">
           <TrophyTree trophies={trophies} platform={platform} onTrophyClick={setActiveTrophy} />
+        </div>
+      ) : view === "cronologia" ? (
+        <div className="mb-8">
+          <TrophyTimeline trophies={trophies} />
         </div>
       ) : (
         <div className="space-y-8">
