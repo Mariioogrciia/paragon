@@ -40,6 +40,7 @@ private val FILTERS = listOf(
     LibraryFilter.TODOS to "Todos",
     LibraryFilter.JUGANDO to "Jugando",
     LibraryFilter.PLATINADOS to "Platinados",
+    LibraryFilter.PLATINADO_SIN_DLC to "Solo falta el DLC",
     LibraryFilter.COMPLETADOS to "Completados",
     LibraryFilter.ABANDONADOS to "Abandonados",
     LibraryFilter.BACKLOG to "Pila Vergüenza",

@@ -17,7 +17,7 @@ import { listCollections } from "@/lib/collections";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
 import { getGameDetail, getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { getCommunityRating } from "@/lib/ratings";
-import { gameProgress, nextSteps, repartoDlc, summarise } from "@/lib/stats";
+import { gameProgress, nextSteps, predecirPlatino, repartoDlc, summarise } from "@/lib/stats";
 import { aUnTrofeoDelPlatino, getHitoReservado, proximoHito } from "@/lib/milestones";
 import { generarDiarioPlatino } from "@/lib/diarioPlatino";
 import { DiarioPlatino } from "@/components/DiarioPlatino";
@@ -97,6 +97,7 @@ export default async function JuegoPage({
 
   const progress = gameProgress(game);
   const siguientes = nextSteps(game.trophies);
+  const prediccion = predecirPlatino(game.trophies);
   const played = relativeDate(game.lastPlayedAt);
 
   // Las carpetas son de quien mira, no de quien se mira: solo tiene sentido
@@ -260,6 +261,16 @@ export default async function JuegoPage({
                 </div>
                 <span className="font-heading text-2xl font-bold">{progress.percent}%</span>
               </div>
+
+              {prediccion && (
+                <p className="mt-2 text-[0.8125rem] text-muted">
+                  🔮 A este ritmo, lo tienes el{" "}
+                  <span className="font-semibold text-foreground">
+                    {new Date(prediccion.fecha).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}
+                  </span>
+                  .
+                </p>
+              )}
 
               {/* El desglose por metal solo existe en PSN; donde no lo hay,
                   el dato honesto es cuántos logros llevas del total. */}

@@ -12,6 +12,11 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import kotlin.math.ceil
 
 /**
  * Ficha de un juego (GameDetailScreen). Forma pensada para calzar directo
@@ -30,6 +35,46 @@ data class TrophyItem(
     val earnedAt: String?,
     val rarityPercent: Double?,
 )
+
+data class PlatinumPrediction(val fechaMillis: Long, val dias: Int)
+
+private val PREDICCION_ISO = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
+    timeZone = TimeZone.getTimeZone("UTC")
+}
+
+// Mismos umbrales que predecirPlatino() en lib/stats.ts, en el proyecto Next.js — no cambiar uno sin el otro.
+private const val VENTANA_RITMO_DIAS = 14
+private const val MINIMO_TROFEOS_PARA_RITMO = 2
+private const val MAX_DIAS_PREDICCION = 730
+private const val UN_DIA_MS = 86_400_000L
+
+/**
+ * "A este ritmo, lo tienes el jueves 24 de octubre" — mismo cálculo que la
+ * web (predecirPlatino en lib/stats.ts): ritmo reciente de trofeos con fecha
+ * proyectado sobre lo que falta. `null` si ya está, si no hay ritmo
+ * reciente que medir, o si la proyección sale demasiado lejana para ser útil.
+ * Se recalcula en cada composición (depende de "ahora"), nunca se guarda en
+ * la caché offline.
+ */
+fun predecirPlatino(trophies: List<TrophyItem>): PlatinumPrediction? {
+    val restantes = trophies.count { !it.earned }
+    if (restantes == 0) return null
+
+    val ahora = System.currentTimeMillis()
+    val desdeVentana = ahora - VENTANA_RITMO_DIAS * UN_DIA_MS
+    val recientes = trophies.count { t ->
+        if (!t.earned || t.earnedAt == null) return@count false
+        val millis = try { PREDICCION_ISO.parse(t.earnedAt)?.time } catch (e: Exception) { null } ?: return@count false
+        millis >= desdeVentana
+    }
+    if (recientes < MINIMO_TROFEOS_PARA_RITMO) return null
+
+    val ritmoPorDia = recientes.toDouble() / VENTANA_RITMO_DIAS
+    val dias = ceil(restantes / ritmoPorDia).toInt()
+    if (dias > MAX_DIAS_PREDICCION) return null
+
+    return PlatinumPrediction(ahora + dias * UN_DIA_MS, dias)
+}
 
 data class GameDetailData(
     val id: String,

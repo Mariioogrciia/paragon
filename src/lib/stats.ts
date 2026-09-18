@@ -120,6 +120,47 @@ export function nextSteps(trophies: Trophy[], limit = 4): Trophy[] {
     .slice(0, limit);
 }
 
+export interface PrediccionPlatino {
+  /** ISO, redondeado a medianoche — es un día, no un instante. */
+  fecha: string;
+  dias: number;
+}
+
+/** Ventana reciente sobre la que se mide el ritmo — más ancha diluye rachas puntuales, más estrecha reacciona antes a haber vuelto a jugar. */
+const VENTANA_RITMO_DIAS = 14;
+/** Con menos trofeos que esto en la ventana no hay ritmo real que medir, solo ruido (un par de trofeos sueltos cualquier tarde). */
+const MINIMO_TROFEOS_PARA_RITMO = 2;
+/** Por encima de esto la predicción deja de ser útil (una racha vieja de hace meses proyectada a años) — mejor no enseñar nada que una fecha absurda. */
+const MAX_DIAS_PREDICCION = 730;
+
+/**
+ * "A este ritmo, consigues el Platino el jueves 24 de octubre" — mide cuántos
+ * trofeos has ganado en los últimos `VENTANA_RITMO_DIAS` días (con fecha real,
+ * `userTrophies.earnedAt`) y proyecta ese ritmo sobre lo que te falta. `null`
+ * si ya lo tienes, si no hay ritmo reciente que medir, o si la proyección
+ * sale tan lejana que ya no es una predicción útil.
+ */
+export function predecirPlatino(trophies: Trophy[]): PrediccionPlatino | null {
+  const restantes = trophies.filter((t) => !t.earned).length;
+  if (restantes === 0) return null;
+
+  const ahora = Date.now();
+  const desdeVentana = ahora - VENTANA_RITMO_DIAS * 86_400_000;
+  const recientes = trophies.filter(
+    (t) => t.earned && t.earnedAt && new Date(t.earnedAt).getTime() >= desdeVentana,
+  ).length;
+  if (recientes < MINIMO_TROFEOS_PARA_RITMO) return null;
+
+  const ritmoPorDia = recientes / VENTANA_RITMO_DIAS;
+  const dias = Math.ceil(restantes / ritmoPorDia);
+  if (dias > MAX_DIAS_PREDICCION) return null;
+
+  const fecha = new Date(ahora + dias * 86_400_000);
+  fecha.setUTCHours(0, 0, 0, 0);
+
+  return { fecha: fecha.toISOString(), dias };
+}
+
 export interface PlayerSummary {
   platinos: number;
   juegos: number;
@@ -189,6 +230,14 @@ export interface LibraryFilters {
   acquisitionFormat?: NonNullable<Game["acquisitionFormat"]>;
   /** Más de 5€/hora jugada — mismo umbral que sugería la idea, solo con juegos que tienen precio Y horas puestos (ver `costePorHora` en lib/backlog.ts, mismo criterio). */
   porAmortizar?: boolean;
+  /**
+   * Ya tienes el Platino (o el 100% de Steam) pero el juego no llega al 100%
+   * global — casi siempre porque salió un DLC de pago con trofeos propios
+   * que no has conseguido. Sin esto no había forma de aislar solo esos: la
+   * píldora "Platinado" ya los incluye mezclados con los que SÍ están al
+   * 100% del todo (ver `esPlatinoEquivalente`, no depende de `progressPercent`).
+   */
+  soloFaltaDlc?: boolean;
   sort?: SortKey;
   sortDir?: "asc" | "desc";
 }
@@ -308,6 +357,12 @@ export function filterGames(games: Game[], filters: LibraryFilters): Game[] {
       if (game.pricePaid == null || !game.playtimeMinutes || game.playtimeMinutes <= 0) return false;
       const costeHora = game.pricePaid / (game.playtimeMinutes / 60);
       if (costeHora <= 5) return false;
+    }
+
+    if (filters.soloFaltaDlc) {
+      if (game.isWishlist) return false;
+      if (!esPlatinoEquivalente(game)) return false;
+      if (game.progressPercent === 100) return false;
     }
 
     return true;

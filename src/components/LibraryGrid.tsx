@@ -122,6 +122,7 @@ export function LibraryGrid({
   const [horas, setHoras] = useState<HorasBucket | "">("");
   const [acquisitionFormat, setAcquisitionFormat] = useState<NonNullable<Game["acquisitionFormat"]> | "">("");
   const [porAmortizar, setPorAmortizar] = useState(false);
+  const [soloFaltaDlc, setSoloFaltaDlc] = useState(false);
   const [collection, setCollection] = useState("");
   const [sort, setSort] = useState<SortKey>(initialSort ?? "reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -147,10 +148,11 @@ export function LibraryGrid({
       horas: horas || undefined,
       acquisitionFormat: acquisitionFormat || undefined,
       porAmortizar: porAmortizar || undefined,
+      soloFaltaDlc: soloFaltaDlc || undefined,
       sort,
       sortDir,
     });
-  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, sort, sortDir]);
+  }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, soloFaltaDlc, sort, sortDir]);
 
   const grupos = useMemo(() => {
     if (!agrupar) return null;
@@ -177,7 +179,7 @@ export function LibraryGrid({
   // seguiríamos "dentro" de la página 8 de una lista que ya no existe.
   useEffect(() => {
     setPagina(1);
-  }, [search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, collection, sort, sortDir]);
+  }, [search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, soloFaltaDlc, collection, sort, sortDir]);
 
   const mostrados = useMemo(
     () => visible.slice(0, pagina * POR_PAGINA),
@@ -202,6 +204,7 @@ export function LibraryGrid({
     Boolean(horas) ||
     Boolean(acquisitionFormat) ||
     porAmortizar ||
+    soloFaltaDlc ||
     Boolean(collection);
 
   // Cuántos de los filtros "secundarios" (los que se esconden detrás de "Más
@@ -216,6 +219,7 @@ export function LibraryGrid({
     horas,
     acquisitionFormat,
     porAmortizar,
+    soloFaltaDlc,
     agrupar,
   ].filter(Boolean).length;
 
@@ -470,6 +474,7 @@ export function LibraryGrid({
                   setHoras("");
                   setAcquisitionFormat("");
                   setPorAmortizar(false);
+                  setSoloFaltaDlc(false);
                   setSearch("");
                   setAgrupar(false);
                 }}
@@ -607,6 +612,22 @@ export function LibraryGrid({
             }
           >
             Por amortizar (&gt;5€/h)
+          </button>
+
+          {/* "Solo falta el DLC": Platinado (o 100% de Steam) pero el % global
+              no llega al 100 — casi siempre un DLC de pago con trofeos
+              propios sin conseguir. Mismo criterio de botón sí/no que "Por
+              amortizar", no una categoría del desplegable de Estado. */}
+          <button
+            onClick={() => setSoloFaltaDlc((v) => !v)}
+            className="col-span-1 rounded-[10px] px-4 py-2 text-[0.8125rem] font-semibold transition-colors"
+            style={
+              soloFaltaDlc
+                ? { background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }
+                : { ...FIELD, color: "var(--muted)" }
+            }
+          >
+            Solo falta el DLC
           </button>
 
           {/* Agrupar por empresa: es un modo de visualización, no un filtro

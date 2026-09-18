@@ -52,8 +52,10 @@ import com.paragon.app.data.GameDetailResult
 import com.paragon.app.data.HitoReservado
 import com.paragon.app.data.MilestoneRepository
 import com.paragon.app.data.MilestoneResult
+import com.paragon.app.data.PlatinumPrediction
 import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
+import com.paragon.app.data.predecirPlatino
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.collections.AddToCollectionSheet
 import com.paragon.app.ui.share.ShareTrophyDialog
@@ -164,6 +166,7 @@ private fun GameDetailContent(
     // un juego sin trofeo de Platino definido nunca debería ofrecer
     // "Compartir Platino" aunque esté al 100%).
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
+    val prediccion = remember(game.trophies) { predecirPlatino(game.trophies) }
 
     LaunchedEffect(game.coverUrl) {
         withContext(Dispatchers.IO) {
@@ -221,6 +224,7 @@ private fun GameDetailContent(
             GameDetailHero(
                 game = game,
                 fromCache = fromCache,
+                prediccion = prediccion,
                 dynamicColor = dynamicColor,
                 onBack = onBack,
                 sharedTransitionScope = sharedTransitionScope,
@@ -298,6 +302,7 @@ private fun GameDetailContent(
 private fun GameDetailHero(
     game: GameDetailData,
     fromCache: Boolean,
+    prediccion: PlatinumPrediction?,
     dynamicColor: Color,
     onBack: () -> Unit,
     sharedTransitionScope: SharedTransitionScope?,
@@ -392,10 +397,22 @@ private fun GameDetailHero(
                         modifier = Modifier.padding(top = 8.dp),
                     )
                 }
+                prediccion?.let {
+                    Text(
+                        text = "🔮 A este ritmo, lo tienes el ${fechaPrediccion(it.fechaMillis)}",
+                        color = Muted,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
             }
         }
     }
 }
+
+private val FECHA_PREDICCION_FORMAT = java.text.SimpleDateFormat("EEEE d 'de' MMMM", java.util.Locale("es", "ES"))
+
+private fun fechaPrediccion(millis: Long): String = FECHA_PREDICCION_FORMAT.format(java.util.Date(millis))
 
 private val MilestoneGold = Color(0xFFE2B53E)
 

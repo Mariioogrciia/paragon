@@ -47,7 +47,7 @@ sealed class LibraryResult {
     data class Error(val message: String) : LibraryResult()
 }
 
-enum class LibraryFilter { TODOS, JUGANDO, PLATINADOS, COMPLETADOS, ABANDONADOS, BACKLOG }
+enum class LibraryFilter { TODOS, JUGANDO, PLATINADOS, COMPLETADOS, ABANDONADOS, BACKLOG, PLATINADO_SIN_DLC }
 
 private fun LibraryGameDto.toLibraryGame() = LibraryGame(
     id = id,
@@ -170,5 +170,10 @@ fun List<LibraryGame>.filterByStatus(filter: LibraryFilter): List<LibraryGame> {
             it.progressPercent in 1..99 && (it.lastPlayedAt == null || it.lastPlayedAt < umbral)
         }
         LibraryFilter.BACKLOG -> filter { it.progressPercent in 1..15 }
+        // Modo Completista: ya tienes el Platino, pero el % global no llega
+        // al 100 — casi siempre un DLC de pago con trofeos propios sin
+        // conseguir. "Platinados" ya los incluye mezclados con los que SÍ
+        // están al 100% del todo; este los aísla.
+        LibraryFilter.PLATINADO_SIN_DLC -> filter { it.isPlatinado && it.progressPercent < 100 }
     }
 }
