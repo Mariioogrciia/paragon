@@ -102,6 +102,19 @@ Mundo Deportivo no tienen feed de eSports propio bajo esas rutas (404).
 Ver `src/lib/esportsNews.ts`, mismo patrón que `psNews.ts` (fetch + cache
 `revalidate`, falla en silencio a `[]`).
 
+**Pendiente real, bloqueado en el usuario**: pidió que además hubiera una
+sección aparte con próximos partidos/torneos/equipos, con datos de
+Liquipedia — investigado y NO es tan simple como cambiar la URL del feed.
+Liquipedia no tiene una API pública de partidos lista para usar: su página
+de ejemplo de "próximos partidos" da datos de 2019, y los partidos reales
+se pintan con un módulo Lua en su servidor (`{{#invoke:Lua|...}}` en el
+wikitext crudo) — para datos estructurados de verdad hace falta su API
+LPDB, que exige una clave que aprueban ELLOS a mano por caso de uso (ver
+`liquipedia.net/api-terms-of-use`). El usuario va a pedirla; en cuanto la
+tenga (como variable de entorno, nunca pegada en el chat — mismo cuidado
+que con `FIREBASE_SERVICE_ACCOUNT_KEY` esta misma sesión), montar la
+sección de partidos/equipos de verdad contra esa API.
+
 ### Easter egg "Cazador de Platinos" — hecho en esta misma sesión
 
 El equivalente de Paragon al dinosaurio de Chrome, en `/offline` (el
