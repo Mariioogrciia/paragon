@@ -91,13 +91,36 @@ plataforma. `SettingsRepository.kt` (Android) mostraba el mismo mensaje
 genérico ("Cuenta ya vinculada a otro usuario o inválida") para CUALQUIER
 422, ocultando el motivo real — ahora usa `paragonErrorMessage()`.
 
-### Implementaciones futuras (pedidas por el usuario, NO empezadas)
+### Apartado de eSports en Noticias — hecho en esta misma sesión
 
-- **Apartado de eSports** en Noticias/Descubrir — de qué fuentes sacarlo,
-  todavía sin decidir.
-- **Easter egg tipo el dinosaurio de Chrome**, pero con un ranking propio
-  de Paragon — un minijuego simple, con vueltas propias (no una copia
-  literal), sin decidir todavía disparador ni mecánica exacta.
+Nueva sección "eSports" en `/noticias`, entre "Noticias de tus juegos" y
+"Últimas Noticias". Fuente: `marca.com/rss/esports.xml` (LoL, VALORANT,
+Movistar KOI...) — probada en vivo, activa de verdad (noticias de horas,
+no años) y en español. Descartadas antes de elegirla: el RSS de eSports de
+AS (`as.com/rss/esports/portada.xml`) lleva congelado desde 2018; Vandal y
+Mundo Deportivo no tienen feed de eSports propio bajo esas rutas (404).
+Ver `src/lib/esportsNews.ts`, mismo patrón que `psNews.ts` (fetch + cache
+`revalidate`, falla en silencio a `[]`).
+
+### Easter egg "Cazador de Platinos" — hecho en esta misma sesión
+
+El equivalente de Paragon al dinosaurio de Chrome, en `/offline` (el
+fallback real de la PWA sin conexión — mismo disparador que el dino:
+aparece cuando no hay internet). La vuelta propia pedida por el usuario:
+en vez de saltar cactus sin más, el jugador (un rombo facetado, mismo
+lenguaje visual que `ParagonMark`) esquiva iconos de "señal rota" y CAZA
+trofeos dorados flotantes para sumar puntos extra.
+
+- `components/arcade/HunterGame.tsx`: el juego entero (Canvas a pelo,
+  sin librería), física simple, dificultad progresiva.
+- `POST/GET /api/arcade/score`: guarda la puntuación (autenticado) y
+  devuelve el top 10 + tu mejor puntuación/puesto. Corre entero en
+  cliente sin red — el envío del marcador es lo único que necesita
+  conexión, y falla en silencio si no la hay (se puede jugar offline de
+  verdad, que es el caso normal en esta pantalla).
+- Tabla nueva `arcade_score` (`scripts/crear-tabla-arcade-score.mts`, ya
+  ejecutada contra producción), con índice `(game, score desc)` para el
+  ranking.
 
 ---
 

@@ -1,8 +1,10 @@
 "use client";
 
+import { HunterGame } from "@/components/arcade/HunterGame";
+
 export default function OfflinePage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
+    <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4 py-10">
       <div className="mb-6 rounded-full bg-accent/10 p-6">
         <svg
           width="48"
@@ -23,13 +25,17 @@ export default function OfflinePage() {
       <p className="text-muted max-w-md">
         Parece que no tienes internet. Paragon funciona mejor con conexión para mantener sincronizados tus trofeos y logros.
       </p>
-      <button 
+      <button
         onClick={() => typeof window !== 'undefined' && window.location.reload()}
         className="mt-8 rounded-lg px-6 py-2.5 font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-lg"
         style={{ background: "var(--accent-grad)" }}
       >
         Reintentar
       </button>
+
+      {/* Mientras esperas: el easter egg de Paragon, mismo espíritu que el
+          dinosaurio de Chrome — pero cazando trofeos, no saltando cactus. */}
+      <HunterGame />
     </div>
   );
 }

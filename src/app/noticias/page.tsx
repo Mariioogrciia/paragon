@@ -3,6 +3,7 @@ import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { UpcomingGames } from "@/components/UpcomingGames";
 import { getGamingNews, noticiasDeTuBiblioteca, type NewsItem } from "@/lib/rss";
+import { getEsportsNews } from "@/lib/esportsNews";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { BackButton } from "@/components/BackButton";
@@ -77,9 +78,23 @@ export default async function NoticiasPage() {
   // Se pide un pool más grande que las 12 que se enseñan en "Últimas
   // Noticias" — el filtro "de tus juegos" busca en todo el pool, no solo en
   // lo último, para no perderse una noticia real de hace unos días.
-  const newsPool = await getGamingNews(session?.user?.id ? 40 : 12);
+  const [newsPool, esportsNewsRaw] = await Promise.all([
+    getGamingNews(session?.user?.id ? 40 : 12),
+    getEsportsNews(6),
+  ]);
   const news = newsPool.slice(0, 12);
   const noticiasPropias = session?.user?.id ? noticiasDeTuBiblioteca(newsPool, titulosPropios) : [];
+  // Mismo shape que NewsItem (TarjetaNoticia no distingue de dónde viene
+  // cada noticia) — se reutiliza la tarjeta ya existente en vez de una
+  // nueva solo para esto.
+  const esportsNews: NewsItem[] = esportsNewsRaw.map((item) => ({
+    id: item.id,
+    title: item.title,
+    link: item.link,
+    pubDate: item.pubDate,
+    summary: item.summary ?? undefined,
+    imageUrl: item.imageUrl,
+  }));
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
@@ -102,6 +117,20 @@ export default async function NoticiasPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {noticiasPropias.map((item) => (
               <TarjetaNoticia key={item.id} item={item} badge={item.juego} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {esportsNews.length > 0 && (
+        <div className="mb-16">
+          <div className="mb-8">
+            <h2 className="font-heading text-3xl font-bold mb-2">eSports</h2>
+            <p className="text-muted">LoL, VALORANT y competición española, vía Marca eSports.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {esportsNews.map((item) => (
+              <TarjetaNoticia key={item.id} item={item} badge="eSports" />
             ))}
           </div>
         </div>

@@ -885,3 +885,23 @@ export const fcmTokens = pgTable("fcm_token", {
   token: text("token").notNull().unique(),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Puntuaciones del easter egg de /offline (el "juego del dinosaurio" de
+ * Paragon — Cazador de Platinos, ver components/arcade/HunterGame.tsx).
+ * Una fila por partida, no "mejor puntuación por usuario" — así el
+ * ranking puede enseñar también actividad reciente, no solo el podio de
+ * siempre. `game` por si algún día hay más de un minijuego, aunque hoy
+ * solo exista "cazador".
+ */
+export const arcadeScores = pgTable("arcade_score", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  game: text("game").notNull().default("cazador"),
+  score: integer("score").notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
