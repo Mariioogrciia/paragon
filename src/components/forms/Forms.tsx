@@ -84,7 +84,7 @@ export function HandleForm({ current, hasImage }: { current?: string | null, has
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2.5 sm:flex-row">
-        <AtField name="handle" defaultValue={current ?? undefined} placeholder="mario_gg" />
+        <AtField name="handle" defaultValue={current ?? undefined} placeholder="tu_usuario" />
         <Submit>{current ? "Cambiar" : "Continuar"}</Submit>
       </div>
       

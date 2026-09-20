@@ -60,6 +60,12 @@ const NAV_MAS = [
     navKey: "noticias",
   },
   {
+    label: "eSports",
+    href: "/esports",
+    match: (p: string) => p.startsWith("/esports"),
+    navKey: "esports",
+  },
+  {
     label: "Planificador",
     href: "/planificador",
     match: (p: string) => p.startsWith("/planificador"),
@@ -70,6 +76,7 @@ const NAV_MAS = [
 const LOGGED_OUT_NAV = [
   { label: "Inicio", href: "/", match: (p: string) => p === "/" },
   { label: "Noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
+  { label: "eSports", href: "/esports", match: (p: string) => p.startsWith("/esports") },
   { label: "Ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
   { label: "Cómo funciona", href: "/como-funciona", match: (p: string) => p.startsWith("/como-funciona") },
 ];

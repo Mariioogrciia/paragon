@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiInstagram, SiTiktok, SiGithub } from "@icons-pack/react-simple-icons";
 
 export function Footer() {
   return (
@@ -46,8 +47,19 @@ export function Footer() {
             Términos
           </Link>
           <span className="hidden md:inline text-muted/60">·</span>
-          <span className="hidden md:inline text-[0.6875rem] text-muted/80">
+          <span className="hidden md:flex text-[0.6875rem] text-muted/80 items-center gap-2">
             Desarrollado por <strong className="text-foreground/80">Mario García</strong>
+            <div className="flex items-center gap-2 ml-1">
+              <a href="https://www.instagram.com/mariioogrciia/" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-foreground transition-colors">
+                <SiInstagram size={14} />
+              </a>
+              <a href="https://www.tiktok.com/@mariioogrciia" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-foreground transition-colors">
+                <SiTiktok size={14} />
+              </a>
+              <a href="https://github.com/Mariioogrciia" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-foreground transition-colors">
+                <SiGithub size={14} />
+              </a>
+            </div>
           </span>
           <span className="hidden md:inline text-muted/60">·</span>
           <span className="hidden md:inline text-[0.6875rem] text-muted/80">
