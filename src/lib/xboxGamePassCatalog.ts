@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 
 /**
  * Catálogo COMPLETO de Xbox Game Pass — distinto de `xboxGamePass.ts` (que
@@ -40,14 +41,20 @@ export type GamePassPlataforma = keyof typeof SIGL_IDS;
 const MARKET = "ES";
 const LANGUAGE = "es-es";
 // Mismo límite que usan las herramientas de referencia para esta API: mantener
-// la URL de `bigIds` bajo el tope que imponen proxies/CDN de por medio.
+// la URL de `bigIds` bajo el tope que imponen proxies/CDN de por medio (esto
+// es un límite de LA URL, no de caché — ver el aviso grande más abajo sobre
+// por qué ya no hace falta bajarlo para esquivar el tope de Next).
 const TAMANO_LOTE = 200;
 const CACHE_SEGUNDOS = 86_400; // el catálogo cambia unas pocas veces al mes, no hace falta pedirlo más a menudo.
 
 async function idsDelCatalogo(plataforma: GamePassPlataforma): Promise<string[]> {
+  // `cache: "no-store"` a propósito: el catálogo ENTERO ya se cachea una
+  // sola vez, ya parseado y pequeño, con `unstable_cache` al final de este
+  // archivo — cachear también esta llamada cruda por separado sería cachear
+  // dos veces lo mismo sin necesidad.
   const res = await fetch(
     `https://catalog.gamepass.com/sigls/v2?id=${SIGL_IDS[plataforma]}&language=${LANGUAGE}&market=${MARKET}`,
-    { next: { revalidate: CACHE_SEGUNDOS } },
+    { cache: "no-store" },
   );
   if (!res.ok) return [];
 
@@ -80,9 +87,16 @@ interface ProductoDisplayCatalog {
 }
 
 async function detallesDelLote(ids: string[]): Promise<GamePassCatalogGame[]> {
+  // Mismo motivo que arriba: sin caché de Next por fetch — algunos lotes de
+  // Microsoft (LocalizedProperties enteras, varias imágenes por producto)
+  // llegaban a pesar hasta 17MB, muy por encima del tope de 2MB por entrada
+  // que impone la data cache de Next. Antes se esquivaba bajando el tamaño
+  // de lote a 10 (más peticiones, más lento) — ahora ninguna respuesta
+  // cruda pasa por la caché de Next en absoluto, así que el tamaño de lote
+  // vuelve a poder ser el de siempre (200, el límite real es la URL).
   const res = await fetch(
     `https://displaycatalog.mp.microsoft.com/v7.0/products?bigIds=${ids.join(",")}&market=${MARKET}&languages=${LANGUAGE}`,
-    { next: { revalidate: CACHE_SEGUNDOS } },
+    { cache: "no-store" },
   );
   if (!res.ok) return [];
 
@@ -112,21 +126,32 @@ async function detallesDelLote(ids: string[]): Promise<GamePassCatalogGame[]> {
  * Catálogo entero de una de las dos plataformas, ordenado por título.
  * Nunca lanza — un fallo de red devuelve una lista vacía, igual que el resto
  * de integraciones externas de esta app (PowerPyx, HLTB, PS Plus...).
+ *
+ * Cacheada aquí, UNA VEZ, con `unstable_cache` — el resultado ya parseado
+ * (solo id/título/imagen/URL) pesa una fracción de las respuestas crudas de
+ * Microsoft, así que el límite de 2MB de la data cache de Next deja de ser
+ * un problema real pase lo que pase con el tamaño del catálogo. Antes se
+ * dejaba que Next cacheara cada respuesta CRUDA por separado (`fetch` con
+ * `next: { revalidate }`), y esas sí podían pasarse de 2MB con facilidad.
  */
-export async function getXboxGamePassCatalog(plataforma: GamePassPlataforma): Promise<GamePassCatalogGame[]> {
-  try {
-    const ids = await idsDelCatalogo(plataforma);
-    if (ids.length === 0) return [];
+export const getXboxGamePassCatalog = unstable_cache(
+  async (plataforma: GamePassPlataforma): Promise<GamePassCatalogGame[]> => {
+    try {
+      const ids = await idsDelCatalogo(plataforma);
+      if (ids.length === 0) return [];
 
-    const lotes: string[][] = [];
-    for (let i = 0; i < ids.length; i += TAMANO_LOTE) {
-      lotes.push(ids.slice(i, i + TAMANO_LOTE));
+      const lotes: string[][] = [];
+      for (let i = 0; i < ids.length; i += TAMANO_LOTE) {
+        lotes.push(ids.slice(i, i + TAMANO_LOTE));
+      }
+
+      const resultados = await Promise.all(lotes.map(detallesDelLote));
+      return resultados.flat().sort((a, b) => a.title.localeCompare(b.title, "es"));
+    } catch (error) {
+      console.error(`[xboxGamePassCatalog] no se pudo cargar el catálogo de ${plataforma}`, error);
+      return [];
     }
-
-    const resultados = await Promise.all(lotes.map(detallesDelLote));
-    return resultados.flat().sort((a, b) => a.title.localeCompare(b.title, "es"));
-  } catch (error) {
-    console.error(`[xboxGamePassCatalog] no se pudo cargar el catálogo de ${plataforma}`, error);
-    return [];
-  }
-}
+  },
+  ["xbox-gamepass-catalog"],
+  { revalidate: CACHE_SEGUNDOS },
+);
