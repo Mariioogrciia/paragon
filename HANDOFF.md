@@ -1,9 +1,56 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **19 de septiembre de
-2026** (continuación 19 — Claude Code, sesión larga centrada en Android +
-dos bugs reales de producción encontrados y arreglados).
+releer todo el historial. Última actualización: **20 de septiembre de
+2026** (continuación 20 — Claude Code, sesión corta: revisión de un
+arreglo de Antigravity + gestión de la clave de la API de Liquipedia).
+
+---
+
+## Sesión del 20 de septiembre de 2026 (continuación 20) — revisión del arreglo de caché de Xbox Game Pass + solicitud de la API de Liquipedia en marcha
+
+### Catálogo de Xbox Game Pass: arreglo de Antigravity revisado y mejorado
+
+El usuario pidió revisar un cambio de Antigravity: `getXboxGamePassCatalog`
+(`src/lib/xboxGamePassCatalog.ts`) estaba disparando avisos reales de build
+("items over 2MB can not be cached", hasta **17MB** en algún lote) — la
+data cache de Next.js tiene un tope de 2MB por entrada, y cada `fetch` a
+`displaycatalog.mp.microsoft.com` con `next: { revalidate }` cacheaba la
+respuesta CRUDA entera (`LocalizedProperties`, varias imágenes por
+producto...), mucho más pesada que lo que la app realmente usa.
+
+Antigravity ya lo había arreglado de verdad (bajando `TAMANO_LOTE` de 200 a
+10 + quitando el `Promise.all` por un bucle secuencial) — **funcionaba**,
+verificado en vivo (623 juegos de consola cargando bien), pero más lento y
+atado a ese tamaño de lote pequeño para siempre. Se hizo un arreglo más
+robusto encima: las respuestas crudas de Microsoft ya no pasan por la
+caché de Next en absoluto (`cache: "no-store"`); `unstable_cache` envuelve
+la función entera UNA vez y cachea solo el resultado ya parseado
+(id/título/imagen/URL, una fracción del peso). Con eso `TAMANO_LOTE` volvió
+a 200 (el límite real es la URL, no la caché) y `Promise.all` volvió a
+lanzar los lotes en paralelo. Verificado con `next build`: **0 avisos de
+"items over 2MB"** (antes salían varios).
+
+### Apartado de "próximos partidos" de eSports: bloqueado en la API de Liquipedia, solicitud en marcha
+
+Seguimiento del pendiente de la sesión anterior. El usuario ya se ha unido
+al Discord de Liquipedia (`liquipedia.net/discord`) para pedir acceso a la
+LiquipediaDB API (LPDB) — un bot/moderador le preguntó por qué wikis
+buscaba; se le indicó pedir **League of Legends, VALORANT y Counter-Strike**
+(las que ya cubren las noticias de Marca que alimentan la sección de
+eSports actual). Proceso confirmado leyendo `liquipedia.net/api-terms-of-use`
+de verdad (no inventado): el acceso a LPDB es "upon approved request", sin
+formulario de autoservicio — se pide en su Discord, y tras aprobarlo dan
+entrada a un "LiquipediaDB Dashboard" (solo visible logueado con cuenta de
+Liquipedia) con la clave y la documentación real de los endpoints. Límite
+ya conocido para cuando llegue: 60 peticiones/hora.
+
+**Siguiente paso real**: en cuanto el usuario tenga la clave (como variable
+de entorno en Vercel, NUNCA pegada en el chat — mismo cuidado que con
+`FIREBASE_SERVICE_ACCOUNT_KEY`), construir la sección de próximos
+partidos/torneos/equipos contra la LPDB API de verdad, en vez del parseo
+frágil del HTML renderizado que se descartó por romperse con cualquier
+cambio de diseño de Liquipedia.
 
 ---
 
