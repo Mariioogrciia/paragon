@@ -1,1 +1,90 @@
-{}
+{
+  "title": "Admin Control Center",
+  "subtitle": "Centro de control global de la plataforma.",
+  "tabs": {
+    "dashboard": "📊 Dashboard & Usuarios",
+    "leagues": "🏆 Ligas",
+    "system": "⚙️ Sistema & Moderación"
+  },
+  "dashboard": {
+    "stats": {
+      "users": "Usuarios",
+      "newUsers": "Nuevos, últimos 7 días",
+      "catalogGames": "Juegos en catálogo",
+      "withPegi": "Con PEGI",
+      "trophies": "Trofeos registrados",
+      "alerts": "Avisos generados",
+      "alertsLast7Days": "Avisos, últimos 7 días",
+      "linkedAccounts": "Cuentas vinculadas"
+    },
+    "accountsByPlatform": "Cuentas por plataforma",
+    "usersSection": "Usuarios",
+    "table": {
+      "user": "Usuario",
+      "accounts": "Cuentas",
+      "games": "Juegos",
+      "platinums": "Platinos",
+      "badges": "Insignias",
+      "joined": "Se unió",
+      "noAccounts": "—",
+      "noName": "Sin nombre"
+    }
+  },
+  "leagues": {
+    "title": "Moderación de Ligas",
+    "subtitle": "Gestiona y elimina grupos inapropiados.",
+    "table": {
+      "league": "Liga",
+      "creator": "Creador",
+      "members": "Miembros",
+      "created": "Creada",
+      "action": "Acción",
+      "delete": "Eliminar",
+      "empty": "No hay ligas creadas en la plataforma."
+    }
+  },
+  "system": {
+    "controls": {
+      "title": "Controles de Sistema",
+      "maintenanceMode": {
+        "title": "Modo Mantenimiento",
+        "description": "Muestra una página de error a los usuarios."
+      },
+      "stopXboxSync": {
+        "title": "Detener Sincronización (Xbox)",
+        "description": "Previene bans temporales si OpenXBL cae."
+      },
+      "comingSoon": "Próximamente"
+    },
+    "infrastructure": {
+      "title": "Estado de Infraestructura",
+      "supabase": "Supabase Database",
+      "psn": "PlayStation Network (NPSSO)",
+      "steam": "Steam Web API",
+      "xbox": "OpenXBL (Rate limit mode)"
+    },
+    "recentSyncs": {
+      "title": "Sincronizaciones recientes",
+      "table": {
+        "user": "Usuario",
+        "platform": "Plataforma",
+        "games": "Juegos",
+        "newTrophies": "Trofeos nuevos",
+        "when": "Cuándo",
+        "empty": "Todavía no hay sincronizaciones."
+      }
+    },
+    "moderation": {
+      "title": "Moderación (Feed Global)",
+      "table": {
+        "author": "Autor",
+        "game": "Juego",
+        "content": "Contenido",
+        "action": "Acción",
+        "delete": "Eliminar",
+        "noReview": "Sin texto",
+        "empty": "No hay actividades recientes para moderar."
+      }
+    }
+  }
+}

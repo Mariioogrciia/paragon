@@ -7,6 +7,7 @@ import { relativeDate } from "@/lib/design";
 import { deleteActivityAction, adminDeleteLeagueAction } from "@/app/actions";
 import { BackButton } from "@/components/BackButton";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -28,6 +29,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
   const profile = await getProfileByUserId(session.user.id);
   if (!profile?.esDesarrollador) redirect("/");
 
+  const t = await getTranslations("Admin");
   const searchParams = await props.searchParams;
   const currentTab = typeof searchParams.tab === "string" ? searchParams.tab : "dashboard";
 
@@ -44,16 +46,16 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       <BackButton fallbackHref="/" />
       
       <div>
-        <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">Admin Control Center</h1>
-        <p className="mt-2 text-sm text-muted">Centro de control global de la plataforma.</p>
+        <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">{t("title")}</h1>
+        <p className="mt-2 text-sm text-muted">{t("subtitle")}</p>
       </div>
 
       {/* Tabs Navigation */}
       <div className="flex items-center gap-2 border-b border-border pb-px overflow-x-auto">
         {[
-          { id: "dashboard", label: "📊 Dashboard & Usuarios" },
-          { id: "leagues", label: "🏆 Ligas" },
-          { id: "system", label: "⚙️ Sistema & Moderación" },
+          { id: "dashboard", label: t("tabs.dashboard") },
+          { id: "leagues", label: t("tabs.leagues") },
+          { id: "system", label: t("tabs.system") },
         ].map(tab => (
           <Link
             key={tab.id}
@@ -73,24 +75,24 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       {currentTab === "dashboard" && (
         <div className="space-y-9">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat value={overview.usuarios} label="Usuarios" />
-            <Stat value={`+${overview.usuariosNuevosUltimos7Dias}`} label="Nuevos, últimos 7 días" />
-            <Stat value={overview.juegosEnCatalogo} label="Juegos en catálogo" />
+            <Stat value={overview.usuarios} label={t("dashboard.stats.users")} />
+            <Stat value={`+${overview.usuariosNuevosUltimos7Dias}`} label={t("dashboard.stats.newUsers")} />
+            <Stat value={overview.juegosEnCatalogo} label={t("dashboard.stats.catalogGames")} />
             <Stat
               value={`${overview.juegosEnCatalogo > 0 ? Math.round((overview.juegosConPegi / overview.juegosEnCatalogo) * 100) : 0}%`}
-              label="Con PEGI"
+              label={t("dashboard.stats.withPegi")}
             />
-            <Stat value={overview.trofeosRegistrados.toLocaleString("es-ES")} label="Trofeos registrados" />
-            <Stat value={overview.avisosGenerados} label="Avisos generados" />
-            <Stat value={overview.avisosUltimos7Dias} label="Avisos, últimos 7 días" />
+            <Stat value={overview.trofeosRegistrados.toLocaleString("es-ES")} label={t("dashboard.stats.trophies")} />
+            <Stat value={overview.avisosGenerados} label={t("dashboard.stats.alerts")} />
+            <Stat value={overview.avisosUltimos7Dias} label={t("dashboard.stats.alertsLast7Days")} />
             <Stat
               value={overview.cuentasPorPlataforma.reduce((n, c) => n + c.total, 0)}
-              label="Cuentas vinculadas"
+              label={t("dashboard.stats.linkedAccounts")}
             />
           </div>
 
           <section>
-            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Cuentas por plataforma</h2>
+            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("dashboard.accountsByPlatform")}</h2>
             <div className="flex flex-wrap gap-2">
               {overview.cuentasPorPlataforma.map((c) => (
                 <span
@@ -105,25 +107,25 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
           </section>
 
           <section>
-            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Usuarios</h2>
+            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("dashboard.usersSection")}</h2>
             <div className="overflow-x-auto rounded-[14px]" style={CARD}>
               <table className="w-full min-w-[600px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
-                    <th className="px-4 py-3">Usuario</th>
-                    <th className="px-4 py-3">Cuentas</th>
-                    <th className="px-4 py-3">Juegos</th>
-                    <th className="px-4 py-3">Platinos</th>
-                    <th className="px-4 py-3">Insignias</th>
-                    <th className="px-4 py-3">Se unió</th>
+                    <th className="px-4 py-3">{t("dashboard.table.user")}</th>
+                    <th className="px-4 py-3">{t("dashboard.table.accounts")}</th>
+                    <th className="px-4 py-3">{t("dashboard.table.games")}</th>
+                    <th className="px-4 py-3">{t("dashboard.table.platinums")}</th>
+                    <th className="px-4 py-3">{t("dashboard.table.badges")}</th>
+                    <th className="px-4 py-3">{t("dashboard.table.joined")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {usuarios.map((u) => (
                     <tr key={u.userId} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
-                      <td className="px-4 py-2.5 font-semibold">{u.handle ? `@${u.handle}` : (u.displayName ?? "Sin nombre")}</td>
+                      <td className="px-4 py-2.5 font-semibold">{u.handle ? `@${u.handle}` : (u.displayName ?? t("dashboard.table.noName"))}</td>
                       <td className="px-4 py-2.5 text-muted">
-                        {u.cuentas.length === 0 ? "—" : u.cuentas.map((p) => PLATFORM_LABEL[p as AccountPlatform] ?? p).join(", ")}
+                        {u.cuentas.length === 0 ? t("dashboard.table.noAccounts") : u.cuentas.map((p) => PLATFORM_LABEL[p as AccountPlatform] ?? p).join(", ")}
                       </td>
                       <td className="px-4 py-2.5">{u.juegos}</td>
                       <td className="px-4 py-2.5">{u.platinos}</td>
@@ -142,19 +144,19 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       {currentTab === "leagues" && (
         <section className="space-y-6">
           <div>
-            <h2 className="font-heading mb-1 text-xl font-bold uppercase tracking-wide">Moderación de Ligas</h2>
-            <p className="text-sm text-muted">Gestiona y elimina grupos inapropiados.</p>
+            <h2 className="font-heading mb-1 text-xl font-bold uppercase tracking-wide">{t("leagues.title")}</h2>
+            <p className="text-sm text-muted">{t("leagues.subtitle")}</p>
           </div>
-          
+
           <div className="overflow-x-auto rounded-[14px]" style={CARD}>
             <table className="w-full min-w-[700px] text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
-                  <th className="px-4 py-3">Liga</th>
-                  <th className="px-4 py-3">Creador</th>
-                  <th className="px-4 py-3">Miembros</th>
-                  <th className="px-4 py-3">Creada</th>
-                  <th className="px-4 py-3 text-right">Acción</th>
+                  <th className="px-4 py-3">{t("leagues.table.league")}</th>
+                  <th className="px-4 py-3">{t("leagues.table.creator")}</th>
+                  <th className="px-4 py-3">{t("leagues.table.members")}</th>
+                  <th className="px-4 py-3">{t("leagues.table.created")}</th>
+                  <th className="px-4 py-3 text-right">{t("leagues.table.action")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -173,7 +175,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                       <form action={adminDeleteLeagueAction}>
                         <input type="hidden" name="leagueId" value={league.id} />
                         <button className="rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white">
-                          Eliminar
+                          {t("leagues.table.delete")}
                         </button>
                       </form>
                     </td>
@@ -181,7 +183,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                 ))}
                 {leagues.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-muted">No hay ligas creadas en la plataforma.</td>
+                    <td colSpan={5} className="px-4 py-8 text-center text-muted">{t("leagues.table.empty")}</td>
                   </tr>
                 )}
               </tbody>
@@ -197,64 +199,64 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Controles de Sistema (UI dummy para el futuro) */}
             <div>
-              <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Controles de Sistema</h2>
+              <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.controls.title")}</h2>
               <div className="rounded-[14px] p-6 flex flex-col gap-4" style={CARD}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold">Modo Mantenimiento</h3>
-                    <p className="text-xs text-muted">Muestra una página de error a los usuarios.</p>
+                    <h3 className="font-bold">{t("system.controls.maintenanceMode.title")}</h3>
+                    <p className="text-xs text-muted">{t("system.controls.maintenanceMode.description")}</p>
                   </div>
                   <button disabled className="bg-surface-2 text-muted px-4 py-2 rounded-full text-xs font-bold border border-border opacity-50 cursor-not-allowed">
-                    Próximamente
+                    {t("system.controls.comingSoon")}
                   </button>
                 </div>
                 <div className="h-px bg-border w-full" />
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold">Detener Sincronización (Xbox)</h3>
-                    <p className="text-xs text-muted">Previene bans temporales si OpenXBL cae.</p>
+                    <h3 className="font-bold">{t("system.controls.stopXboxSync.title")}</h3>
+                    <p className="text-xs text-muted">{t("system.controls.stopXboxSync.description")}</p>
                   </div>
                   <button disabled className="bg-surface-2 text-muted px-4 py-2 rounded-full text-xs font-bold border border-border opacity-50 cursor-not-allowed">
-                    Próximamente
+                    {t("system.controls.comingSoon")}
                   </button>
                 </div>
               </div>
             </div>
 
             <div>
-              <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Estado de Infraestructura</h2>
+              <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.infrastructure.title")}</h2>
               <div className="rounded-[14px] p-6 flex flex-col gap-4" style={CARD}>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-                  <span className="font-bold text-sm">Supabase Database</span>
+                  <span className="font-bold text-sm">{t("system.infrastructure.supabase")}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-                  <span className="font-bold text-sm">PlayStation Network (NPSSO)</span>
+                  <span className="font-bold text-sm">{t("system.infrastructure.psn")}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-                  <span className="font-bold text-sm">Steam Web API</span>
+                  <span className="font-bold text-sm">{t("system.infrastructure.steam")}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
-                  <span className="font-bold text-sm">OpenXBL (Rate limit mode)</span>
+                  <span className="font-bold text-sm">{t("system.infrastructure.xbox")}</span>
                 </div>
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Sincronizaciones recientes</h2>
+            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.recentSyncs.title")}</h2>
             <div className="overflow-x-auto rounded-[14px]" style={CARD}>
               <table className="w-full min-w-[500px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
-                    <th className="px-4 py-3">Usuario</th>
-                    <th className="px-4 py-3">Plataforma</th>
-                    <th className="px-4 py-3">Juegos</th>
-                    <th className="px-4 py-3">Trofeos nuevos</th>
-                    <th className="px-4 py-3">Cuándo</th>
+                    <th className="px-4 py-3">{t("system.recentSyncs.table.user")}</th>
+                    <th className="px-4 py-3">{t("system.recentSyncs.table.platform")}</th>
+                    <th className="px-4 py-3">{t("system.recentSyncs.table.games")}</th>
+                    <th className="px-4 py-3">{t("system.recentSyncs.table.newTrophies")}</th>
+                    <th className="px-4 py-3">{t("system.recentSyncs.table.when")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -269,7 +271,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                   ))}
                   {syncRuns.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-muted">Todavía no hay sincronizaciones.</td>
+                      <td colSpan={5} className="px-4 py-8 text-center text-muted">{t("system.recentSyncs.table.empty")}</td>
                     </tr>
                   )}
                 </tbody>
@@ -278,15 +280,15 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
           </section>
 
           <section>
-            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Moderación (Feed Global)</h2>
+            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.moderation.title")}</h2>
             <div className="overflow-x-auto rounded-[14px]" style={CARD}>
               <table className="w-full min-w-[700px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
-                    <th className="px-4 py-3">Autor</th>
-                    <th className="px-4 py-3">Juego</th>
-                    <th className="px-4 py-3">Contenido</th>
-                    <th className="px-4 py-3 text-right">Acción</th>
+                    <th className="px-4 py-3">{t("system.moderation.table.author")}</th>
+                    <th className="px-4 py-3">{t("system.moderation.table.game")}</th>
+                    <th className="px-4 py-3">{t("system.moderation.table.content")}</th>
+                    <th className="px-4 py-3 text-right">{t("system.moderation.table.action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -312,7 +314,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                           </div>
                         )}
                         <p className="text-sm break-words max-w-[350px]">
-                          {a.review ? `"${a.review}"` : <span className="italic text-muted">Sin texto</span>}
+                          {a.review ? `"${a.review}"` : <span className="italic text-muted">{t("system.moderation.table.noReview")}</span>}
                         </p>
                         <p className="text-xs text-muted mt-1">{relativeDate(a.createdAt)}</p>
                       </td>
@@ -320,7 +322,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                         <form action={deleteActivityAction}>
                           <input type="hidden" name="activityId" value={a.id} />
                           <button className="rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white">
-                            Eliminar
+                            {t("system.moderation.table.delete")}
                           </button>
                         </form>
                       </td>
@@ -328,7 +330,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                   ))}
                   {activities.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-muted">No hay actividades recientes para moderar.</td>
+                      <td colSpan={4} className="px-4 py-8 text-center text-muted">{t("system.moderation.table.empty")}</td>
                     </tr>
                   )}
                 </tbody>

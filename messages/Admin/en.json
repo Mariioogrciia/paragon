@@ -1,1 +1,90 @@
-{}
+{
+  "title": "Admin Control Center",
+  "subtitle": "Global control center for the platform.",
+  "tabs": {
+    "dashboard": "📊 Dashboard & Users",
+    "leagues": "🏆 Leagues",
+    "system": "⚙️ System & Moderation"
+  },
+  "dashboard": {
+    "stats": {
+      "users": "Users",
+      "newUsers": "New, last 7 days",
+      "catalogGames": "Games in catalog",
+      "withPegi": "With PEGI rating",
+      "trophies": "Trophies logged",
+      "alerts": "Alerts generated",
+      "alertsLast7Days": "Alerts, last 7 days",
+      "linkedAccounts": "Linked accounts"
+    },
+    "accountsByPlatform": "Accounts by platform",
+    "usersSection": "Users",
+    "table": {
+      "user": "User",
+      "accounts": "Accounts",
+      "games": "Games",
+      "platinums": "Platinums",
+      "badges": "Badges",
+      "joined": "Joined",
+      "noAccounts": "—",
+      "noName": "No name"
+    }
+  },
+  "leagues": {
+    "title": "League Moderation",
+    "subtitle": "Manage and remove inappropriate groups.",
+    "table": {
+      "league": "League",
+      "creator": "Creator",
+      "members": "Members",
+      "created": "Created",
+      "action": "Action",
+      "delete": "Delete",
+      "empty": "No leagues have been created on the platform."
+    }
+  },
+  "system": {
+    "controls": {
+      "title": "System Controls",
+      "maintenanceMode": {
+        "title": "Maintenance Mode",
+        "description": "Shows an error page to users."
+      },
+      "stopXboxSync": {
+        "title": "Stop Sync (Xbox)",
+        "description": "Prevents temporary bans if OpenXBL goes down."
+      },
+      "comingSoon": "Coming soon"
+    },
+    "infrastructure": {
+      "title": "Infrastructure Status",
+      "supabase": "Supabase Database",
+      "psn": "PlayStation Network (NPSSO)",
+      "steam": "Steam Web API",
+      "xbox": "OpenXBL (Rate limit mode)"
+    },
+    "recentSyncs": {
+      "title": "Recent syncs",
+      "table": {
+        "user": "User",
+        "platform": "Platform",
+        "games": "Games",
+        "newTrophies": "New trophies",
+        "when": "When",
+        "empty": "No syncs yet."
+      }
+    },
+    "moderation": {
+      "title": "Moderation (Global Feed)",
+      "table": {
+        "author": "Author",
+        "game": "Game",
+        "content": "Content",
+        "action": "Action",
+        "delete": "Delete",
+        "noReview": "No text",
+        "empty": "No recent activity to moderate."
+      }
+    }
+  }
+}
