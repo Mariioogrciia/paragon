@@ -82,6 +82,8 @@ export interface Rachas {
   mejor: number;
   /** Días distintos con al menos un trofeo. */
   diasActivos: number;
+  /** Si hoy ya cuenta para la racha — si no, y `actual > 0`, está en riesgo. */
+  hoyCuenta: boolean;
 }
 
 /**
@@ -106,7 +108,7 @@ export async function rachas(userId: string): Promise<Rachas> {
     .orderBy(sql`date(${userTrophies.earnedAt})`);
 
   const dias = filas.map((f) => f.dia);
-  if (dias.length === 0) return { actual: 0, mejor: 0, diasActivos: 0 };
+  if (dias.length === 0) return { actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false };
 
   const DIA_MS = 86_400_000;
   const aFecha = (s: string) => Date.parse(`${s}T00:00:00Z`);
@@ -126,8 +128,9 @@ export async function rachas(userId: string): Promise<Rachas> {
   const hoyUTC = Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate());
   const distancia = (hoyUTC - aFecha(dias[dias.length - 1])) / DIA_MS;
   const actual = distancia <= 1 ? corriendo : 0;
+  const hoyCuenta = distancia === 0;
 
-  return { actual, mejor, diasActivos: dias.length };
+  return { actual, mejor, diasActivos: dias.length, hoyCuenta };
 }
 
 export interface ResumenHistorico {

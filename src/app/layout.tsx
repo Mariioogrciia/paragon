@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getHiddenNavItems } from "@/lib/navPreferences";
+import { rachas } from "@/lib/history";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -153,7 +154,7 @@ export default async function RootLayout({
   // historial de trofeos), así que ya no se queda esperando a que el
   // perfil termine primero sin motivo.
   let profile = null;
-  const [profileResult, nivelParagon, navOculta] = sessionUser
+  const [profileResult, nivelParagon, navOculta, rachaUsuario] = sessionUser
     ? await Promise.all([
         getProfileByUserId(sessionUser.id).catch((error) => {
           relanzarSiEsDeNext(error);
@@ -162,8 +163,13 @@ export default async function RootLayout({
         }),
         getParagonLevel(sessionUser.id),
         getHiddenNavItems(sessionUser.id),
+        rachas(sessionUser.id).catch((error) => {
+          relanzarSiEsDeNext(error);
+          console.error("[layout] no se pudo leer la racha:", error);
+          return null;
+        }),
       ])
-    : [null, null, []];
+    : [null, null, [], null];
   profile = profileResult;
 
   const headerUser = sessionUser
@@ -178,6 +184,7 @@ export default async function RootLayout({
         paragonLevel: nivelParagon?.level ?? null,
         paragonProgress: nivelParagon?.progreso ?? null,
         esDesarrollador: profile?.esDesarrollador ?? false,
+        racha: rachaUsuario && rachaUsuario.actual > 0 ? { actual: rachaUsuario.actual, hoyCuenta: rachaUsuario.hoyCuenta } : null,
       }
     : null;
 

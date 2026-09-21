@@ -150,7 +150,7 @@ export default async function PerfilPage({
   ]);
   const [rachasPerfil, percentilAnio] = games.length > 0
     ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
-    : [{ actual: 0, mejor: 0, diasActivos: 0 }, null];
+    : [{ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }, null];
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
   const showcaseTrophiesData = showcaseTrophyIds.length > 0 

@@ -158,7 +158,7 @@ export async function ParagonWrap({
                 esteAnio,
                 juegosEsteAnio,
                 mejorMes: mejorMes ?? null,
-                rachas: rachas ?? { actual: 0, mejor: 0, diasActivos: 0 },
+                rachas: rachas ?? { actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false },
                 percentil: percentil ?? null,
                 handle,
               }}

@@ -162,6 +162,7 @@ export function Header({
     paragonLevel?: number | null;
     paragonProgress?: number | null;
     esDesarrollador?: boolean;
+    racha?: { actual: number; hoyCuenta: boolean } | null;
   } | null;
   /** Claves de NAV_OCULTABLE que este usuario ha decidido no ver (/ajustes/ocultar). */
   navOculta?: string[];
@@ -264,6 +265,24 @@ export function Header({
 
           {user ? (
             <>
+              {user.racha && user.racha.actual > 0 && (
+                <span
+                  className="hidden items-center gap-1.5 rounded-full px-3 py-1.5 sm:flex"
+                  title={user.racha.hoyCuenta ? t("rachaSeguraHint") : t("rachaRiesgoHint")}
+                  style={
+                    user.racha.hoyCuenta
+                      ? { background: "rgb(234 88 12 / 0.12)", border: "1px solid rgb(234 88 12 / 0.35)" }
+                      : { background: "rgb(234 88 12 / 0.06)", border: "1px solid rgb(234 88 12 / 0.18)" }
+                  }
+                >
+                  <span className={user.racha.hoyCuenta ? "" : "animate-pulse"} style={{ opacity: user.racha.hoyCuenta ? 1 : 0.55 }}>
+                    🔥
+                  </span>
+                  <span className="font-heading text-sm font-bold" style={{ color: "#fb923c" }}>
+                    {user.racha.actual}
+                  </span>
+                </span>
+              )}
               {user.paragonLevel != null && (
                 <Link
                   href={user.handle ? `/u/${user.handle}#nivel-paragon` : "/"}
@@ -366,6 +385,12 @@ export function Header({
               entiende mejor que un icono a secas. */}
           {user && (
             <div className="mt-2 flex flex-col gap-1 border-t border-border pt-2">
+              {user.racha && user.racha.actual > 0 && (
+                <div className="flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold" style={{ color: "#fb923c" }}>
+                  <span style={{ opacity: user.racha.hoyCuenta ? 1 : 0.55 }}>🔥</span>
+                  {t("rachaMovil", { dias: user.racha.actual })}
+                </div>
+              )}
               <Link
                 href="/ajustes/apariencia"
                 onClick={() => setMenuAbierto(false)}
