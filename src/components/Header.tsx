@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { ThemeCustomizer } from "./ThemeCustomizer";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 /**
  * Antes eran 9 enlaces en una sola fila (más "Admin" como un décimo, para
@@ -150,6 +151,7 @@ function MenuMas({
 export function Header({
   user,
   navOculta = [],
+  locale,
 }: {
   user: {
     handle: string | null;
@@ -161,6 +163,7 @@ export function Header({
   } | null;
   /** Claves de NAV_OCULTABLE que este usuario ha decidido no ver (/ajustes/ocultar). */
   navOculta?: string[];
+  locale?: string;
 }) {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -251,6 +254,9 @@ export function Header({
               de la hamburguesa. */}
           <span className="hidden sm:inline">
             <ThemeCustomizer />
+          </span>
+          <span className="hidden sm:inline">
+            <LanguageSwitcher currentLocale={locale || "es"} />
           </span>
 
           {user ? (
@@ -382,6 +388,9 @@ export function Header({
               )}
             </div>
           )}
+          <div className="mt-2 pt-2 border-t border-border px-3.5">
+            <LanguageSwitcher currentLocale={locale || "es"} />
+          </div>
         </nav>
       )}
     </header>

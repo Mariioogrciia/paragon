@@ -11,6 +11,8 @@ import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getHiddenNavItems } from "@/lib/navPreferences";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 
 const barlow = Barlow({
@@ -122,6 +124,9 @@ import { CookieBanner } from "@/components/CookieBanner";
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   // La sesión se pide dentro de un try a propósito. Este layout envuelve TODAS
   // las rutas, así que sin esto un fallo de configuración (falta DATABASE_URL,
   // la cadena apunta al puerto directo en vez del pooler, la base no responde)
@@ -177,7 +182,7 @@ export default async function RootLayout({
     : null;
 
   return (
-    <html lang="es" className={`${barlow.variable} ${chakra.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={`${barlow.variable} ${chakra.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
         {/*
           El acento se aplica antes de pintar. Si esperásemos al efecto de
@@ -229,19 +234,21 @@ export default async function RootLayout({
         <NativeAppSetup />
         <Analytics />
         <CookieBanner />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          themes={["dark", "light", "oled", "high-contrast"]}
-        >
-          <Header user={headerUser} navOculta={navOculta} />
-          {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
-              56px de los 375 de un movil (un 15% del ancho) antes de que las
-              tarjetas de dentro pusieran su propio relleno encima. */}
-          <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-9 sm:px-7">{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            themes={["dark", "light", "oled", "high-contrast"]}
+          >
+            <Header user={headerUser} navOculta={navOculta} locale={locale} />
+            {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
+                56px de los 375 de un movil (un 15% del ancho) antes de que las
+                tarjetas de dentro pusieran su propio relleno encima. */}
+            <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-9 sm:px-7">{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

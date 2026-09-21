@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, platformAccounts, gameTrophies } from "@/db/schema";
+import { users, userGames, activities, platformAccounts, gameTrophies, leagues } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import {
@@ -652,7 +652,37 @@ export async function deleteActivityAction(formData: FormData): Promise<void> {
   revalidatePath("/", "layout");
 }
 
+export async function adminDeleteLeagueAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const profile = await getProfileByUserId(userId);
+  if (!profile?.esDesarrollador) return;
+
+  const leagueId = String(formData.get("leagueId") ?? "");
+  if (!leagueId) return;
+
+  const database = getDb();
+  await database.delete(leagues).where(eq(leagues.id, leagueId));
+
+  revalidatePath("/", "layout");
+}
+
 /* ---------------------------------- Juegos manuales --------------------------------- */
+
+import { cookies } from "next/headers";
+
+export async function updateLanguageAction(locale: string): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set("NEXT_LOCALE", locale, { path: "/", maxAge: 31536000 }); // 1 year
+
+  // Si hay sesión iniciada, guardarlo también en base de datos para que le persiga
+  const session = await auth();
+  if (session?.user?.id) {
+    const database = getDb();
+    await database.update(users).set({ language: locale }).where(eq(users.id, session.user.id));
+  }
+  
+  revalidatePath("/", "layout");
+}
 
 export interface AddManualGameInput {
   igdbId: number;
