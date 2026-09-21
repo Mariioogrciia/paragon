@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { CompartirImagen } from "@/components/CompartirImagen";
 
 /**
@@ -7,11 +8,12 @@ import { CompartirImagen } from "@/components/CompartirImagen";
  * genérico (CompartirImagen.tsx, que también usa la tarjeta de platino).
  */
 export function CompartirImagenWrap({ handle }: { handle: string }) {
+  const t = useTranslations("Perfil");
   return (
     <CompartirImagen
       url={`/api/wrap/${handle}`}
       nombreArchivo={`paragon-wrap-${handle}.png`}
-      tituloCompartir="Mi Paragon Wrap"
+      tituloCompartir={t("CompartirImagenWrap.tituloCompartir")}
     />
   );
 }

@@ -1,6 +1,7 @@
 import type { Game } from "@/lib/types";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { AchievementIcon } from "@/components/AchievementIcon";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Cuenta platinos "de verdad": el metal real de PSN + el 100% de Steam
@@ -17,15 +18,16 @@ function platinosEquivalentes(games: Game[]): number {
 }
 
 const ACHIEVEMENTS = [
-  { id: "first_blood", name: "Primera joya", description: "Consigue tu primer platino.", target: 1, value: platinosEquivalentes, color: "var(--platinum)" },
-  { id: "cazador", name: "Cazador", description: "Consigue 10 platinos.", target: 10, value: platinosEquivalentes, color: "var(--accent)" },
-  { id: "experto", name: "Experto", description: "Consigue 50 platinos.", target: 50, value: platinosEquivalentes, color: "var(--gold)" },
-  { id: "leyenda", name: "Leyenda", description: "Consigue 100 platinos.", target: 100, value: platinosEquivalentes, color: "var(--bronze)" },
-  { id: "coleccionista", name: "Coleccionista", description: "Añade 100 juegos a tu biblioteca.", target: 100, value: (games: Game[]) => games.filter((g) => !g.isWishlist).length, color: "var(--good)" },
-  { id: "madrugador", name: "Pionero", description: "Forma parte de los primeros usuarios de Paragon.", target: 1, value: () => 1, color: "var(--accent-2)" },
+  { id: "first_blood", target: 1, value: platinosEquivalentes, color: "var(--platinum)" },
+  { id: "cazador", target: 10, value: platinosEquivalentes, color: "var(--accent)" },
+  { id: "experto", target: 50, value: platinosEquivalentes, color: "var(--gold)" },
+  { id: "leyenda", target: 100, value: platinosEquivalentes, color: "var(--bronze)" },
+  { id: "coleccionista", target: 100, value: (games: Game[]) => games.filter((g) => !g.isWishlist).length, color: "var(--good)" },
+  { id: "madrugador", target: 1, value: () => 1, color: "var(--accent-2)" },
 ] as const;
 
-export function ParagonAchievements({ games, earnedIds }: { games: Game[]; earnedIds: string[] }) {
+export async function ParagonAchievements({ games, earnedIds }: { games: Game[]; earnedIds: string[] }) {
+  const t = await getTranslations("Perfil");
   // `earned` se calcula igual aquí que en cada tarjeta (en vivo, con
   // `earnedIds` como red de seguridad si algún día cambia un umbral y una
   // insignia ya otorgada dejara de cumplirlo en teoría) — así el contador de
@@ -42,10 +44,10 @@ export function ParagonAchievements({ games, earnedIds }: { games: Game[]; earne
     <section className="rounded-[18px] border border-border bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Logros de Paragon</h2>
-          <p className="mt-1 text-sm text-muted">Retos internos por jugar, completar y coleccionar.</p>
+          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("ParagonAchievements.heading")}</h2>
+          <p className="mt-1 text-sm text-muted">{t("ParagonAchievements.subheading")}</p>
         </div>
-        <span className="text-xs font-semibold text-muted">{totalConseguidos}/{ACHIEVEMENTS.length} conseguidos</span>
+        <span className="text-xs font-semibold text-muted">{t("ParagonAchievements.countLabel", { done: totalConseguidos, total: ACHIEVEMENTS.length })}</span>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {evaluados.map(({ achievement, value, earned }) => {
@@ -58,10 +60,10 @@ export function ParagonAchievements({ games, earnedIds }: { games: Game[]; earne
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-bold">{achievement.name}</h3>
-                    <span className="text-[0.625rem] font-bold uppercase" style={{ color: earned ? "var(--good)" : "var(--muted)" }}>{earned ? "Conseguido" : `${value}/${achievement.target}`}</span>
+                    <h3 className="text-sm font-bold">{t(`ParagonAchievements.items.${achievement.id}.name`)}</h3>
+                    <span className="text-[0.625rem] font-bold uppercase" style={{ color: earned ? "var(--good)" : "var(--muted)" }}>{earned ? t("ParagonAchievements.earned") : t("ParagonAchievements.progressFraction", { value, target: achievement.target })}</span>
                   </div>
-                  <p className="mt-1 text-xs text-muted">{achievement.description}</p>
+                  <p className="mt-1 text-xs text-muted">{t(`ParagonAchievements.items.${achievement.id}.description`)}</p>
                 </div>
               </div>
               {!earned && <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full" style={{ width: `${percent}%`, background: achievement.color }} /></div>}

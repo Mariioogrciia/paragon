@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Botón "compartir imagen" genérico — la lógica que antes vivía solo en
@@ -25,7 +26,7 @@ export function CompartirImagen({
   tituloCompartir,
   className = "text-xs font-bold uppercase tracking-wide text-accent hover:underline disabled:opacity-50",
   style,
-  children = "Compartir imagen",
+  children,
 }: {
   /** Endpoint que devuelve la imagen (un `ImageResponse` de next/og). */
   url: string;
@@ -36,6 +37,7 @@ export function CompartirImagen({
   children?: React.ReactNode;
 }) {
   const [cargando, setCargando] = useState(false);
+  const t = useTranslations("Perfil");
 
   async function compartir() {
     setCargando(true);
@@ -72,7 +74,7 @@ export function CompartirImagen({
 
   return (
     <button onClick={compartir} disabled={cargando} className={className} style={style}>
-      {cargando ? "Preparando…" : children}
+      {cargando ? t("CompartirImagen.preparando") : (children ?? t("CompartirImagen.compartirImagen"))}
     </button>
   );
 }

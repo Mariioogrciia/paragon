@@ -2,6 +2,7 @@ import { getLeagueDetail, getPendingLeagueInvite } from "@/lib/leagues";
 import { listFriends, getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { BackButton } from "@/components/BackButton";
@@ -14,24 +15,32 @@ export const metadata = {
   title: "Liga - Paragon",
 };
 
-const ETIQUETA_UNIDAD: Record<string, [string, string]> = {
-  dias: ["día", "días"],
-  semanas: ["semana", "semanas"],
-  meses: ["mes", "meses"],
-  anios: ["año", "años"],
-};
+const UNIDADES = ["dias", "semanas", "meses", "anios"] as const;
 
-function textoDuracion(value: number | null, unit: string | null, endsAt: string | null): string {
-  if (!endsAt) return "Sin fecha de fin.";
+function textoDuracion(
+  value: number | null,
+  unit: string | null,
+  endsAt: string | null,
+  t: Awaited<ReturnType<typeof getTranslations>>,
+): string {
+  if (!endsAt) return t("LigaPage.sinFechaFin");
   const fecha = new Date(endsAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-  if (value && unit && ETIQUETA_UNIDAD[unit]) {
-    const [singular, plural] = ETIQUETA_UNIDAD[unit];
-    return `${value} ${value === 1 ? singular : plural} — termina el ${fecha}.`;
+  if (value && unit && (UNIDADES as readonly string[]).includes(unit)) {
+    const claves: Record<(typeof UNIDADES)[number], [string, string]> = {
+      dias: ["unidadDia", "unidadDias"],
+      semanas: ["unidadSemana", "unidadSemanas"],
+      meses: ["unidadMes", "unidadMeses"],
+      anios: ["unidadAnio", "unidadAnios"],
+    };
+    const [singularKey, pluralKey] = claves[unit as (typeof UNIDADES)[number]];
+    const unidadTexto = t(`LigaPage.${value === 1 ? singularKey : pluralKey}`);
+    return t("LigaPage.duracionConValor", { valor: value, unidad: unidadTexto, fecha });
   }
-  return `Termina el ${fecha}.`;
+  return t("LigaPage.terminaEl", { fecha });
 }
 
 export default async function LeaguePage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getTranslations("Perfil");
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
@@ -53,17 +62,17 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
         <BackButton fallbackHref="/ligas" />
         <div className="mt-6 rounded-[18px] border border-border bg-surface p-6">
           <h1 className="font-heading text-2xl font-bold mb-2">{invite.name}</h1>
-          <p className="text-muted text-sm mb-6">{invite.ownerName ?? "Alguien"} te ha invitado a esta liga — acéptala para ver la clasificación.</p>
+          <p className="text-muted text-sm mb-6">{t("LigaPage.invitacionTexto", { nombre: invite.ownerName ?? t("LigaPage.alguien") })}</p>
           <div className="flex items-center gap-3">
             <form action={acceptLeagueInviteAction}>
               <input type="hidden" name="leagueId" value={invite.id} />
               <button className="rounded-lg px-4 py-2 text-sm font-bold text-background" style={{ background: "var(--accent-grad)" }}>
-                Aceptar
+                {t("LigaPage.invitacionAceptar")}
               </button>
             </form>
             <form action={declineLeagueInviteAction}>
               <input type="hidden" name="leagueId" value={invite.id} />
-              <button className="text-sm font-semibold text-muted hover:text-danger">Rechazar</button>
+              <button className="text-sm font-semibold text-muted hover:text-danger">{t("LigaPage.invitacionRechazar")}</button>
             </form>
           </div>
         </div>
@@ -78,7 +87,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
   ]);
   const candidatos = amigos
     .filter((a) => !ocupados.has(a.userId))
-    .map((a) => ({ userId: a.userId, label: a.displayName ?? a.handle ?? "Amigo" }));
+    .map((a) => ({ userId: a.userId, label: a.displayName ?? a.handle ?? t("LigaPage.amigo") }));
 
   // Solo se pide la biblioteca completa si hace falta pintar el selector
   // (el dueño) — al resto de miembros esto no les sirve para nada.
@@ -100,17 +109,17 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
 
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2">{league.name}</h1>
-        <p className="text-muted">Clasificación desde que se creó — solo entre los miembros de esta liga.</p>
-        <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt)}</p>
+        <p className="text-muted">{t("LigaPage.clasificacionDesde")}</p>
+        <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt, t)}</p>
       </div>
 
       <div className="bg-surface border border-border rounded-[18px] overflow-hidden shadow-sm mb-10">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border bg-black/20 text-xs font-bold uppercase tracking-wider text-muted">
-              <th className="p-4 w-16 text-center">Pos</th>
-              <th className="p-4">Cazador</th>
-              <th className="p-4 text-right">Puntos</th>
+              <th className="p-4 w-16 text-center">{t("LigaPage.colPos")}</th>
+              <th className="p-4">{t("LigaPage.colCazador")}</th>
+              <th className="p-4 text-right">{t("LigaPage.colPuntos")}</th>
               {isOwner && <th className="p-4 w-20" />}
             </tr>
           </thead>
@@ -144,10 +153,10 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                           {member.name ?? `@${member.handle}`}
                         </Link>
                       ) : (
-                        <span className="font-bold">{member.name ?? "Alguien"}</span>
+                        <span className="font-bold">{member.name ?? t("LigaPage.alguien")}</span>
                       )}
                       {member.userId === league.ownerId && (
-                        <span className="text-[0.625rem] font-bold uppercase tracking-wide text-muted">Dueño</span>
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wide text-muted">{t("LigaPage.dueño")}</span>
                       )}
                       {/* `movimiento` sale de la foto semanal del cron
                           (/api/cron/league-snapshot) — null hasta que
@@ -176,7 +185,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                         arriba, solo el número de puntos de cada uno. */}
                     {index > 0 && league.standings[index - 1].points > member.points && (
                       <p className="mt-0.5 text-[0.6875rem] text-muted">
-                        +{(league.standings[index - 1].points - member.points).toLocaleString()} para subir
+                        {t("LigaPage.paraSubir", { n: (league.standings[index - 1].points - member.points).toLocaleString() })}
                       </p>
                     )}
                   </td>
@@ -186,12 +195,12 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                       <ConfirmForm
                         action={removeLeagueMemberAction}
                         hidden={{ leagueId: league.id, targetUserId: member.userId }}
-                        title="¿Quitar de la liga?"
-                        message={`${member.name ?? member.handle ?? "Esta persona"} dejará de aparecer en la clasificación.`}
-                        confirmLabel="Sí, quitar"
+                        title={t("LigaPage.quitarLiga")}
+                        message={t("LigaPage.quitarLigaMensaje", { nombre: member.name ?? member.handle ?? t("LigaPage.alguien") })}
+                        confirmLabel={t("LigaPage.quitarConfirmar")}
                         triggerClassName="text-xs font-semibold text-muted hover:text-danger"
                       >
-                        Quitar
+                        {t("LigaPage.quitar")}
                       </ConfirmForm>
                     )}
                   </td>
@@ -205,24 +214,24 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
 
       {isOwner && league.pendingMembers.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-lg font-bold mb-2">Invitaciones sin responder</h2>
+          <h2 className="text-lg font-bold mb-2">{t("LigaPage.invitacionesSinResponderTitulo")}</h2>
           <div className="flex flex-col gap-2">
             {league.pendingMembers.map((p) => (
               <div key={p.userId} className="flex items-center justify-between p-3.5 border rounded-xl border-dashed border-border bg-surface/50">
                 <div className="flex items-center gap-3">
                   <Avatar src={p.image} name={p.name ?? p.handle ?? "?"} size={32} />
-                  <span className="font-semibold text-sm">{p.name ?? p.handle ?? "Alguien"}</span>
-                  <span className="text-xs text-muted">esperando respuesta</span>
+                  <span className="font-semibold text-sm">{p.name ?? p.handle ?? t("LigaPage.alguien")}</span>
+                  <span className="text-xs text-muted">{t("LigaPage.esperandoRespuesta")}</span>
                 </div>
                 <ConfirmForm
                   action={removeLeagueMemberAction}
                   hidden={{ leagueId: league.id, targetUserId: p.userId }}
-                  title="¿Cancelar la invitación?"
-                  message={`${p.name ?? p.handle ?? "Esta persona"} ya no podrá aceptarla.`}
-                  confirmLabel="Sí, cancelar"
+                  title={t("LigaPage.cancelarInvitacionTitulo")}
+                  message={t("LigaPage.cancelarInvitacionMensaje", { nombre: p.name ?? p.handle ?? t("LigaPage.alguien") })}
+                  confirmLabel={t("LigaPage.cancelarConfirmar")}
                   triggerClassName="text-xs font-semibold text-muted hover:text-danger"
                 >
-                  Cancelar invitación
+                  {t("LigaPage.cancelarInvitacion")}
                 </ConfirmForm>
               </div>
             ))}
@@ -233,22 +242,22 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
       <div className="mb-10">
         <h2 className="font-heading text-xl font-bold mb-2 flex items-center gap-2">
           <TrophyIcon grade="platinum" size={20} />
-          Reto
+          {t("LigaPage.retoTitulo")}
         </h2>
         {league.challenge ? (
           <>
-            <p className="text-muted text-sm mb-4">A ver quién le pilla antes el platino a <span className="font-semibold text-foreground">{league.challenge.title}</span>.</p>
+            <p className="text-muted text-sm mb-4">{t("LigaPage.retoDescripcion", { juego: league.challenge.title })}</p>
             <div className="flex flex-col gap-2">
               {league.challenge.standings.map((member, index) => (
                 <div key={member.userId} className="flex items-center justify-between p-3.5 border rounded-xl border-border bg-surface">
                   <div className="flex items-center gap-3">
                     <span className="w-6 text-center text-sm font-bold text-muted">{index + 1}º</span>
                     <Avatar src={member.image} name={member.name ?? member.handle ?? "?"} size={32} />
-                    <span className="font-semibold text-sm">{member.name ?? member.handle ?? "Alguien"}</span>
+                    <span className="font-semibold text-sm">{member.name ?? member.handle ?? t("LigaPage.alguien")}</span>
                   </div>
                   {member.hasPlatinum ? (
                     <span className="text-xs font-bold text-[rgb(var(--accent-rgb))]">
-                      Platino · {new Date(member.platinumAt!).toLocaleDateString("es-ES")}
+                      {t("LigaPage.retoPlatino", { fecha: new Date(member.platinumAt!).toLocaleDateString("es-ES") })}
                     </span>
                   ) : (
                     <span className="text-xs text-muted">{member.progressPercent}%</span>
@@ -258,7 +267,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
             </div>
           </>
         ) : (
-          <p className="text-muted text-sm mb-4">Sin reto todavía — {isOwner ? "elige un juego de tu biblioteca para picaros a ver quién lo platina antes." : "el dueño de la liga puede elegir un juego para picarse."}</p>
+          <p className="text-muted text-sm mb-4">{t("LigaPage.retoSinTodavia")}{isOwner ? t("LigaPage.retoSinDueño") : t("LigaPage.retoSinMiembro")}</p>
         )}
         {isOwner && (
           <div className="mt-4">
@@ -270,21 +279,21 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
       {isOwner ? (
         <div className="flex flex-col gap-6">
           <div>
-            <h2 className="text-lg font-bold mb-2">Invitar a un amigo</h2>
+            <h2 className="text-lg font-bold mb-2">{t("LigaPage.invitarAmigoTitulo")}</h2>
             <AddLeagueMemberForm leagueId={league.id} candidatos={candidatos} />
           </div>
           <div>
-            <h2 className="text-lg font-bold mb-2 text-danger">Borrar liga</h2>
-            <p className="text-sm text-muted mb-2">Borra la liga entera para todos sus miembros — no se puede deshacer.</p>
+            <h2 className="text-lg font-bold mb-2 text-danger">{t("LigaPage.borrarLigaTitulo")}</h2>
+            <p className="text-sm text-muted mb-2">{t("LigaPage.borrarLigaAyuda")}</p>
             <ConfirmForm
               action={deleteLeagueAction}
               hidden={{ leagueId: league.id }}
-              title="¿Borrar esta liga?"
-              message={`"${league.name}" desaparece para todos sus miembros, con su clasificación y su reto. No se puede deshacer.`}
-              confirmLabel="Sí, borrar"
+              title={t("LigaPage.borrarLigaConfirmTitulo")}
+              message={t("LigaPage.borrarLigaConfirmMensaje", { nombre: league.name })}
+              confirmLabel={t("LigaPage.borrarConfirmar")}
               triggerClassName="text-sm font-semibold text-danger hover:underline"
             >
-              Borrar esta liga
+              {t("LigaPage.borrarEstaLiga")}
             </ConfirmForm>
           </div>
         </div>
@@ -292,12 +301,12 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
         <ConfirmForm
           action={removeLeagueMemberAction}
           hidden={{ leagueId: league.id, targetUserId: session.user.id }}
-          title="¿Salir de esta liga?"
-          message={`Dejarás de aparecer en la clasificación de "${league.name}" — el dueño tendría que volver a invitarte para que entres otra vez.`}
-          confirmLabel="Sí, salir"
+          title={t("LigaPage.salirTitulo")}
+          message={t("LigaPage.salirMensaje", { nombre: league.name })}
+          confirmLabel={t("LigaPage.salirConfirmar")}
           triggerClassName="text-sm font-semibold text-muted hover:text-danger"
         >
-          Salir de esta liga
+          {t("LigaPage.salirDeLaLiga")}
         </ConfirmForm>
       )}
     </div>

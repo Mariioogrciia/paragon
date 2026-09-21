@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import type { HitoReservado } from "@/lib/milestones";
 
 /**
@@ -12,7 +13,8 @@ import type { HitoReservado } from "@/lib/milestones";
  * exacto de conseguirlo. Es un aviso de "cuidado, esto pasaría si sigues" —
  * la próxima mejor cosa, honesta sobre lo que de verdad puede hacer.
  */
-export function AvisoHitoReservado({ hito, handle }: { hito: HitoReservado; handle: string }) {
+export async function AvisoHitoReservado({ hito, handle }: { hito: HitoReservado; handle: string }) {
+  const t = await getTranslations("Perfil");
   return (
     <div
       className="mb-4 flex items-center gap-3 rounded-xl p-4"
@@ -20,12 +22,16 @@ export function AvisoHitoReservado({ hito, handle }: { hito: HitoReservado; hand
     >
       <span className="text-xl">⚠️</span>
       <p className="text-sm leading-relaxed" style={{ color: "#e2b53e" }}>
-        Tienes reservado tu platino{" "}
-        <span className="font-bold">#{hito.numero}</span> para{" "}
-        <Link href={`/u/${handle}/${hito.gameId}`} className="underline hover:opacity-80">
-          {hito.titulo}
-        </Link>
-        . Si sacas este platino ahora, se lo quitas.
+        {t.rich("AvisoHitoReservado.message", {
+          numero: hito.numero,
+          titulo: hito.titulo,
+          strong: (chunks) => <span className="font-bold">{chunks}</span>,
+          link: (chunks) => (
+            <Link href={`/u/${handle}/${hito.gameId}`} className="underline hover:opacity-80">
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     </div>
   );

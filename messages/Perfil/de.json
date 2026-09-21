@@ -1,1 +1,447 @@
-{}
+{
+  "PerfilPage": {
+    "metaNoEncontrado": "Profil nicht gefunden · Paragon",
+    "metaDescripcionVacia": "Das Trophäenprofil von {nombre} auf Paragon.",
+    "metaDescripcionStats": "{trofeos} Trophäen, {platinos} Platin und {juegos} Spiele auf Paragon.",
+    "sinCuentaPropio": "Du hast noch kein Konto verknüpft oder Spiele hinzugefügt.",
+    "sinCuentaAjeno": "Diese Person hat noch kein Spielkonto verknüpft.",
+    "desarrolladorTooltip": "Dieses Konto gehört dem Macher von Paragon",
+    "desarrolladorBadge": "Entwickler",
+    "hojaDeServicios": "Spielerkarte",
+    "compararConmigo": "Mit mir vergleichen",
+    "statPlatinos": "Platin",
+    "statTrofeos": "Trophäen",
+    "statJuegos": "Spiele",
+    "statCompletadoMedio": "Ø Abschluss",
+    "verEstadisticas": "Alle Statistiken ansehen →",
+    "favoritosTitulo": "Lieblingsspiele",
+    "favoritosVacio": "Du hast noch keine Lieblingsspiele festgelegt."
+  },
+  "EstadisticasPage": {
+    "meta": "Statistiken von @{handle} · Paragon",
+    "breadcrumb": "Statistiken",
+    "titulo": "Statistiken"
+  },
+  "CvPage": {
+    "meta": "Spielerkarte von @{handle} · Paragon",
+    "nivel": "Level {nivel}",
+    "xpParagon": "{xp} Paragon-XP",
+    "statPlatinos": "Platin",
+    "statTrofeos": "Trophäen",
+    "statJuegos": "Spiele",
+    "statJugadas": "Gespielt",
+    "insignias": "Abzeichen",
+    "destacados": "Top-Spiele",
+    "horas": "{horas} Std.",
+    "trofeosCount": "{n} Trophäen",
+    "footer": "Erstellt mit Paragon · paragon.app/u/{handle}"
+  },
+  "WrapRankingPage": {
+    "tituloHoras": "Rangliste der Spielstunden",
+    "tituloTrofeos": "Rangliste der Trophäen pro Spiel",
+    "tituloGeneros": "Rangliste der Genres",
+    "rango7d": "7 Tage",
+    "rango30d": "30 Tage",
+    "rango90d": "90 Tage",
+    "rangoAnio": "Dieses Jahr",
+    "rangoTodo": "Alles",
+    "volverAlPerfil": "Zurück zum Profil",
+    "pestañaHoras": "Stunden",
+    "pestañaTrofeos": "Trophäen",
+    "pestañaGeneros": "Genres",
+    "notaHoras": "Die Plattformen geben nur die insgesamt angesammelten Stunden pro Spiel an, nie wann gespielt wurde. Der Datumsfilter entscheidet, welche Spiele auftauchen (ob in diesem Zeitraum gespielt wurde); die Stundenzahl jedes Spiels bleibt trotzdem die Gesamtzahl.",
+    "vacio": "Für diesen Zeitraum liegen noch keine Daten vor.",
+    "unidadHoras": "Std.",
+    "unidadTrofeos": "Trophäen"
+  },
+  "AmigosPage": {
+    "meta": "Freunde · Paragon",
+    "titulo": "Freunde",
+    "subtitulo": "Füge Leute über ihren Paragon-Benutzernamen hinzu, nicht über ihre Plattform-ID.",
+    "añadirTitulo": "Jemanden hinzufügen",
+    "añadirAyuda": "Jeder wählt seinen Handle bei der Anmeldung. Frag danach und trag ihn hier ein.",
+    "solicitudesTitulo": "Anfragen",
+    "solicitudNivel": "Level {nivel}",
+    "aceptar": "Annehmen",
+    "rechazar": "Ablehnen",
+    "clasificacionTitulo": "Rangliste",
+    "clasificacionSubtitulo": "Du und {n} Freunde, nach Paragon-XP",
+    "clasificacionVacia": "Du hast noch niemanden mit verknüpftem PlayStation-Konto hinzugefügt. Frag nach dem Benutzernamen und trag ihn oben ein.",
+    "sinNombre": "Kein Name",
+    "tu": " (du)",
+    "nivelXp": "Paragon-Level {nivel} · {xp} XP",
+    "statPlatinos": "Platin",
+    "statTrofeos": "Trophäen",
+    "statMedio": "Durchschnitt",
+    "comparar": "Vergleichen",
+    "perfil": "Profil",
+    "periodoSemanal": "Diese Woche",
+    "periodoMensual": "Diesen Monat",
+    "periodoVacio": "Noch keine Trophäen erfasst.",
+    "periodoTrofeos": "{n} Trophäen",
+    "tusAmigosTitulo": "Deine Freunde",
+    "tusAmigosAyuda": "Markiere zwei oder mehr, um sie als Gruppe zu vergleichen, nicht nur einzeln.",
+    "checkboxAria": "@{handle} in den Gruppenvergleich aufnehmen",
+    "amigoNivel": " · Level {nivel}",
+    "quitarTitulo": "Aus deinen Freunden entfernen?",
+    "quitarMensaje": "{nombre} sieht deine Aktivität nicht mehr, und du müsstest eine neue Freundschaftsanfrage senden, um die Person wieder hinzuzufügen.",
+    "quitarConfirmar": "Ja, entfernen",
+    "quitar": "Entfernen",
+    "compararSeleccionados": "Auswahl vergleichen"
+  },
+  "CompararGrupoPage": {
+    "meta": "Gruppenvergleich · Paragon",
+    "volverAAmigos": "Zurück zu Freunde",
+    "titulo": "Gruppenvergleich",
+    "subtitulo": "Nur die Spiele, die ihr alle gemeinsam habt, nebeneinander.",
+    "noExiste": "@{handles} existiert nicht. ",
+    "sinBiblioteca": "@{handles} hat noch kein Konto verknüpft.",
+    "tu": " (du)",
+    "sinComunes": "Kein gemeinsames Spiel in der ganzen Gruppe.",
+    "totalesComun": "Summen, nur gemeinsame Spiele",
+    "trofeos": "{n} Trophäen"
+  },
+  "CompararPage": {
+    "sinCuenta": "@{handle} hat noch kein Spielkonto verknüpft, es gibt also nichts zu vergleichen.",
+    "subtitulo": "Nur die Spiele, die ihr beide habt: die ganze Bibliothek zu vergleichen sagt nichts aus, wenn einer doppelt so lange spielt.",
+    "empate": "Unentschieden",
+    "vasGanando": "Du liegst vorn",
+    "aPlatinos": "{n} Platin zurück",
+    "vaGanando": "Diese Person liegt vorn",
+    "statPlatinos": "Platin",
+    "statTrofeos": "Trophäen",
+    "statMedio": "Durchschnitt",
+    "nivelParagonDe": "Paragon-Level von {nombre}",
+    "nivelAbreviado": "LV {nivel}",
+    "xpParaNivel": "{xp} XP · {restante} bis Level {siguiente}",
+    "juegosEnComun": "Gemeinsame Spiele",
+    "titulos": "{n} Titel",
+    "ganasDeCuantos": " · du gewinnst {ganados} von {total}",
+    "quienLlegoAntes": "Wer war zuerst da",
+    "trofeosAmbos": "Trophäen, die ihr beide erfasst habt",
+    "llegoAntes": "{nombre} war zuerst da"
+  },
+  "LigasPage": {
+    "meta": "Monatsliga - Paragon",
+    "invitacionesTitulo": "Liga-Einladungen",
+    "teHaInvitado": "{nombre} hat dich eingeladen",
+    "alguien": "Jemand",
+    "aceptar": "Annehmen",
+    "rechazar": "Ablehnen",
+    "tusLigasTitulo": "Deine Ligen",
+    "tusLigasAyuda": "Nur mit wem du willst — du lädst Freunde ein, nicht die ganze Community.",
+    "miembro": "Mitglied",
+    "miembros": "Mitglieder",
+    "tituloLiga": "Monatsliga {mes} {anio}",
+    "descripcion": "Miss dich diesen Monat mit dem Rest der Community beim Trophäenjagen. (Platin: 100, Gold: 50, Silber: 25, Bronze: 10)",
+    "vacio": "Diesen Monat punktet noch niemand. Sei der Erste!",
+    "colPos": "Platz",
+    "colCazador": "Jäger",
+    "colPuntos": "Punkte"
+  },
+  "LigaPage": {
+    "meta": "Liga - Paragon",
+    "unidadDia": "Tag",
+    "unidadDias": "Tage",
+    "unidadSemana": "Woche",
+    "unidadSemanas": "Wochen",
+    "unidadMes": "Monat",
+    "unidadMeses": "Monate",
+    "unidadAnio": "Jahr",
+    "unidadAnios": "Jahre",
+    "sinFechaFin": "Kein Enddatum.",
+    "duracionConValor": "{valor} {unidad} — endet am {fecha}.",
+    "terminaEl": "Endet am {fecha}.",
+    "invitacionAceptar": "Annehmen",
+    "invitacionRechazar": "Ablehnen",
+    "invitacionTexto": "{nombre} hat dich zu dieser Liga eingeladen — nimm an, um die Rangliste zu sehen.",
+    "alguien": "Jemand",
+    "clasificacionDesde": "Rangliste seit der Erstellung — nur unter den Mitgliedern dieser Liga.",
+    "colPos": "Platz",
+    "colCazador": "Jäger",
+    "colPuntos": "Punkte",
+    "dueño": "Besitzer",
+    "paraSubir": "+{n} um aufzusteigen",
+    "quitarLiga": "Aus der Liga entfernen?",
+    "quitarLigaMensaje": "{nombre} erscheint nicht mehr in der Rangliste.",
+    "quitarConfirmar": "Ja, entfernen",
+    "quitar": "Entfernen",
+    "invitacionesSinResponderTitulo": "Offene Einladungen",
+    "esperandoRespuesta": "wartet auf Antwort",
+    "cancelarInvitacionTitulo": "Einladung stornieren?",
+    "cancelarInvitacionMensaje": "{nombre} kann sie dann nicht mehr annehmen.",
+    "cancelarConfirmar": "Ja, stornieren",
+    "cancelarInvitacion": "Einladung stornieren",
+    "retoTitulo": "Herausforderung",
+    "retoDescripcion": "Mal sehen, wer sich zuerst das Platin von {juego} schnappt.",
+    "retoPlatino": "Platin · {fecha}",
+    "retoSinTodavia": "Noch keine Herausforderung — ",
+    "retoSinDueño": "wähle ein Spiel aus deiner Bibliothek, um zu sehen, wer es zuerst platiniert.",
+    "retoSinMiembro": "der Liga-Besitzer kann ein Spiel dafür auswählen.",
+    "invitarAmigoTitulo": "Einen Freund einladen",
+    "borrarLigaTitulo": "Liga löschen",
+    "borrarLigaAyuda": "Löscht die gesamte Liga für alle Mitglieder — das kann nicht rückgängig gemacht werden.",
+    "borrarLigaConfirmTitulo": "Diese Liga löschen?",
+    "borrarLigaConfirmMensaje": "„{nombre}“ verschwindet für alle Mitglieder, samt Rangliste und Herausforderung. Das kann nicht rückgängig gemacht werden.",
+    "borrarConfirmar": "Ja, löschen",
+    "borrarEstaLiga": "Diese Liga löschen",
+    "salirTitulo": "Diese Liga verlassen?",
+    "salirMensaje": "Du erscheinst nicht mehr in der Rangliste von „{nombre}“ — der Besitzer müsste dich erneut einladen, damit du wieder beitreten kannst.",
+    "salirConfirmar": "Ja, verlassen",
+    "salirDeLaLiga": "Diese Liga verlassen",
+    "amigo": "Freund"
+  },
+  "FriendsLeaderboard": {
+    "sinAmigos": "Du hast noch keine Freunde hinzugefügt — sobald du welche hast, siehst du hier den Vergleich.",
+    "horas": "Stunden",
+    "trofeos": "Trophäen",
+    "platinos": "Platin",
+    "alguien": "Jemand",
+    "tu": "du"
+  },
+  "CompararFiltrable": {
+    "buscarPlaceholder": "Nach Titel suchen…",
+    "todas": "Alle",
+    "contador": "{visibles} von {total}",
+    "ningunJuego": "Kein Spiel entspricht diesen Filtern.",
+    "tu": "Du",
+    "horas": "{horas} Std."
+  },
+  "ComparePairGames": {
+    "vacioMensaje": "Ihr habt noch kein gemeinsames Spiel.",
+    "horasAbrev": "{horas} Std.",
+    "outcome": {
+      "ganas": "Du gewinnst",
+      "pierdes": "Du verlierst",
+      "empate": "Unentschieden"
+    }
+  },
+  "FiltroJuegosComunes": {
+    "ningunJuegoComun": "Noch kein gemeinsames Spiel.",
+    "buscarPlaceholder": "Nach Titel suchen…",
+    "todas": "Alle",
+    "contador": "{visibles} von {total}",
+    "ningunJuego": "Kein Spiel entspricht diesen Filtern."
+  },
+  "ParagonWrap": {
+    "titulo": "Paragon Wrap",
+    "verMesAMes": "Monat für Monat ansehen",
+    "generoMasJugado": "Meistgespieltes Genre",
+    "generoNinguno": "Keins",
+    "sinGeneros": "Noch keine Genres in deinem Katalog",
+    "titulosDeGenero": "Du hast {count} Titel dieses Genres",
+    "juegoMasExprimido": "Meistgespieltes Spiel",
+    "horasJugadas": "{horas} Stunden gespielt",
+    "trofeosConseguidos": "{trofeos} Trophäen erhalten",
+    "resumenDelAnio": "Jahresrückblick",
+    "trofeos": "Trophäen",
+    "sinTrofeosEsteAnio": "Noch keine Trophäen mit Datum in diesem Jahr",
+    "repartidosEnJuegos": "Verteilt auf {count, plural, one {# Spiel} other {# Spiele}}"
+  },
+  "WrapStories": {
+    "cerrar": "Schließen",
+    "anterior": "Zurück",
+    "siguiente": "Weiter",
+    "vacioTitulo": "Noch kein Wrap für {playerName}",
+    "vacioTexto": "Sobald du Trophäen mit Datum in diesem Jahr hast, erscheinen sie hier.",
+    "marca": "Paragon Wrap",
+    "portadaTitulo": "So war dein Jahr,<br></br>{playerName}",
+    "trofeosConseguidos": "Trophäen<br></br>erhalten",
+    "generoMasJugado": "Meistgespieltes Genre",
+    "titulosDeGenero": "{count, plural, one {1 Titel dieses Genres} other {# Titel dieses Genres}}",
+    "juegoMasExprimido": "Meistgespieltes Spiel",
+    "horasJugadas": "{horas} Stunden gespielt",
+    "trofeosConseguidosCount": "{n} Trophäen erhalten",
+    "tuMejorMes": "Dein bester Monat",
+    "trofeosEseMes": "Trophäen in diesem Monat",
+    "racha": "Serie",
+    "diaSeguido": "{count, plural, one {Tag in Folge, deine beste Serie} other {Tage in Folge, deine beste Serie}}",
+    "diaDistinto": "{count, plural, one {# verschiedener Tag} other {# verschiedene Tage}} insgesamt auf Trophäenjagd",
+    "comoTeComparas": "Wie du abschneidest",
+    "topPercentil": "Top {percentil}%",
+    "percentilTexto": "Von {total} Leuten mit Trophäen dieses Jahr auf Paragon haben weniger als {percentil}% mehr erreicht als du.",
+    "cierreTitulo": "{esteAnio} Trophäen verteilt auf {count, plural, one {# Spiel} other {# Spiele}}",
+    "cierreSubtitulo": "Das war dein Jahr auf Paragon.",
+    "verMesAMes": "Monat für Monat ansehen →",
+    "meses": {
+      "enero": "Januar",
+      "febrero": "Februar",
+      "marzo": "März",
+      "abril": "April",
+      "mayo": "Mai",
+      "junio": "Juni",
+      "julio": "Juli",
+      "agosto": "August",
+      "septiembre": "September",
+      "octubre": "Oktober",
+      "noviembre": "November",
+      "diciembre": "Dezember"
+    }
+  },
+  "WrapStoriesButton": {
+    "verWrapCompleto": "Ganzen Wrap ansehen"
+  },
+  "ParagonLevelCard": {
+    "itemTrofeos": "Trophäen",
+    "itemPlatinos": "Platin",
+    "itemJuegosCompletados": "Abgeschlossene Spiele",
+    "nivelLabel": "Level",
+    "title": "Paragon-Level",
+    "xpCompact": "{xp} XP",
+    "maxLevelReached": "Du hast das Höchstlevel dieser Stufe erreicht.",
+    "xpToNextLevel": "{xp} XP bis Level {level}",
+    "xpTotalLabel": "XP gesamt",
+    "xpSourceHeading": "Woher deine XP kommt",
+    "xpExplanation": "Jede Trophäe gibt XP je nach Seltenheit: Bronze 10, Silber 25, Gold 50 und Platin 200. Ein abgeschlossenes Spiel gibt 100 XP dazu.",
+    "footerHelp": "Der Kreis oben zeigt, wie weit du im aktuellen Level bist. Öffne diesen Bereich für die Aufschlüsselung und was noch fehlt."
+  },
+  "ParagonScoreCard": {
+    "title": "Paragon Score",
+    "subtitle": "Einheitliche Wertung über alle Plattformen",
+    "platformStats": "{puntos} Pkt. · {count, plural, one {# Trophäe} other {# Trophäen}}",
+    "explanation": "PSN gewichtet nach Metall (Bronze/Silber/Gold/Platin) und Xbox nach echtem Gamerscore — beides sind offizielle Daten der jeweiligen Plattform. Steam hat kein eigenes Gewicht pro Erfolg, deshalb wird es hier über die globale Seltenheit geschätzt (seltener = mehr Punkte): eine Näherung, kein überprüfbarer Wert wie bei den anderen beiden."
+  },
+  "ParagonAchievements": {
+    "heading": "Paragon-Erfolge",
+    "subheading": "Interne Herausforderungen fürs Spielen, Abschließen und Sammeln.",
+    "countLabel": "{done}/{total} erreicht",
+    "earned": "Erreicht",
+    "progressFraction": "{value}/{target}",
+    "items": {
+      "first_blood": {
+        "name": "Erstes Juwel",
+        "description": "Hol dir dein erstes Platin."
+      },
+      "cazador": {
+        "name": "Jäger",
+        "description": "Hol dir 10 Platin-Trophäen."
+      },
+      "experto": {
+        "name": "Experte",
+        "description": "Hol dir 50 Platin-Trophäen."
+      },
+      "leyenda": {
+        "name": "Legende",
+        "description": "Hol dir 100 Platin-Trophäen."
+      },
+      "coleccionista": {
+        "name": "Sammler",
+        "description": "Füge 100 Spiele zu deiner Bibliothek hinzu."
+      },
+      "madrugador": {
+        "name": "Pionier",
+        "description": "Gehöre zu den ersten Nutzern von Paragon."
+      }
+    }
+  },
+  "ShowcaseTrophies": {
+    "heading": "Stolz-Vitrine"
+  },
+  "Badges": {
+    "items": {
+      "first_blood": {
+        "name": "Erstes Blut",
+        "description": "Du hast dein erstes Platin geholt"
+      },
+      "cazador": {
+        "name": "Jäger",
+        "description": "Du hast 10 Platin-Trophäen geholt"
+      },
+      "experto": {
+        "name": "Experte",
+        "description": "Du hast 50 Platin-Trophäen geholt"
+      },
+      "leyenda": {
+        "name": "Legende",
+        "description": "Du hast 100 Platin-Trophäen geholt"
+      },
+      "coleccionista": {
+        "name": "Sammler",
+        "description": "Du hast über 100 Spiele in deiner Bibliothek"
+      },
+      "madrugador": {
+        "name": "Frühaufsteher",
+        "description": "Paragon-Pionier"
+      },
+      "critico": {
+        "name": "Kritiker",
+        "description": "Du hast mindestens 3 Rezensionen geschrieben"
+      },
+      "sociable": {
+        "name": "Gesellig",
+        "description": "Du hast mindestens 3 Freunde"
+      },
+      "rolero": {
+        "name": "Rollenspieler",
+        "description": "Du hast 5 RPGs gespielt"
+      },
+      "multiplataforma": {
+        "name": "Plattformübergreifend",
+        "description": "Du hast PlayStation, Steam und Xbox verknüpft und synchronisiert"
+      }
+    }
+  },
+  "ScreenshotStrip": {
+    "heading": "Screenshots",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "close": "Schließen",
+    "screenshotAlt": "Screenshot von {title} {index}"
+  },
+  "ReviewEditor": {
+    "ratingAriaLabel": "Mit {n} von 5 Sternen bewerten",
+    "writeReviewCta": "+ Kurzrezension schreiben und bewerten",
+    "edit": "Bearbeiten",
+    "yourReviewLabel": "Deine Rezension",
+    "title": "Express-Rezension",
+    "yourRatingLabel": "Deine Bewertung",
+    "commentLabel": "Kurzer Kommentar",
+    "commentPlaceholder": "Wie fandest du das Spiel?",
+    "cancel": "Abbrechen",
+    "saving": "Speichern...",
+    "publish": "Veröffentlichen"
+  },
+  "Stars": {
+    "ariaLabel": "{value} von 5 Sternen"
+  },
+  "AvisoAtasco": {
+    "message": "Seit <strong>{dias} Tagen</strong> kein Fortschritt bei <link>{titulo}</link>. Hängst du fest?",
+    "guideLink": "Guide zur nächsten Trophäe ansehen",
+    "dismiss": "Ich brauche eine Pause"
+  },
+  "AvisoHitoReservado": {
+    "message": "Du hast dein Platin <strong>Nr. {numero}</strong> für <link>{titulo}</link> reserviert. Wenn du dieses Platin jetzt holst, nimmst du es der Person weg."
+  },
+  "ReservarHitoButton": {
+    "quitarReserva": "Reservierung für diesen Meilenstein aufheben",
+    "reservarTitulo": "Dieses Spiel für dein Platin Nr. {numero} reservieren",
+    "reservado": "Reserviert für Nr. {numero}",
+    "reservar": "Für Nr. {numero} reservieren"
+  },
+  "ProfileTabsNav": {
+    "resumen": "Übersicht",
+    "biblioteca": "Bibliothek",
+    "estadisticas": "Statistiken"
+  },
+  "ProfileSectionOrderEditor": {
+    "ayuda": "Zieh, um die Reihenfolge auf deinem öffentlichen Profil zu ändern."
+  },
+  "SalonDeLaVerguenza": {
+    "pendientes": "{count, plural, one {# Spiel wartet.} other {# Spiele warten.}}",
+    "pruebaDeDosHoras": "2-Stunden-Test",
+    "tiempoRestante": "Noch {tiempo}, um zu entscheiden, ob es bleibt oder zurück auf den Stapel wandert.",
+    "otro": "Ein anderes",
+    "terminar": "Beenden",
+    "jugarACiegas": "🎲 Blind zocken (2h-Test)"
+  },
+  "CompartirImagen": {
+    "compartirImagen": "Bild teilen",
+    "preparando": "Wird vorbereitet…"
+  },
+  "CompartirImagenWrap": {
+    "tituloCompartir": "Mein Paragon Wrap"
+  },
+  "DescargarPdfButton": {
+    "descargar": "Als PDF herunterladen"
+  }
+}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { acceptFriendAction, removeFriendAction } from "@/app/actions";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
@@ -23,6 +24,7 @@ const CARD = { border: "1px solid var(--border)", background: "linear-gradient(v
 const POS_GOLD = "linear-gradient(150deg, #f7e3a8, #c39a2a)";
 
 export default async function AmigosPage() {
+  const t = await getTranslations("Perfil");
   const session = await auth();
   if (!session?.user) redirect("/entrar");
 
@@ -54,7 +56,7 @@ export default async function AmigosPage() {
     .map((fila) => ({
       userId: fila.userId,
       handle: fila.handle,
-      name: fila.name ?? fila.handle ?? "Sin nombre",
+      name: fila.name ?? fila.handle ?? t("AmigosPage.sinNombre"),
       avatarUrl: fila.avatarUrl ?? undefined,
       trophyLevel: fila.trophyLevel ?? undefined,
       esMio: fila.userId === session.user!.id,
@@ -71,24 +73,24 @@ export default async function AmigosPage() {
   return (
     <div>
       <BackButton fallbackHref="/" />
-      <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">Amigos</h1>
+      <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">{t("AmigosPage.titulo")}</h1>
       <p className="mt-2.5 text-[0.9375rem] text-muted">
-        Se añaden por su usuario de Paragon, no por su ID de plataforma.
+        {t("AmigosPage.subtitulo")}
       </p>
 
       <div className="mt-7 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_400px]">
         <section className="rounded-[18px] p-[22px]" style={CARD}>
-          <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">Añadir a alguien</h2>
+          <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">{t("AmigosPage.añadirTitulo")}</h2>
           <AddFriendForm />
           <p className="mt-3 text-[0.8125rem] text-muted">
-            El handle lo elige cada uno al darse de alta. Pídeselo y escríbelo aquí.
+            {t("AmigosPage.añadirAyuda")}
           </p>
         </section>
 
         {pendientes.length > 0 && (
           <section className="rounded-[18px] p-[22px]" style={CARD}>
             <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">
-              Solicitudes <span className="text-accent">{pendientes.length}</span>
+              {t("AmigosPage.solicitudesTitulo")} <span className="text-accent">{pendientes.length}</span>
             </h2>
 
             <ul className="space-y-3">
@@ -98,7 +100,7 @@ export default async function AmigosPage() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">@{p.handle}</p>
                     {p.trophyLevel !== null && (
-                      <p className="mt-0.5 text-xs text-muted">nivel {p.trophyLevel}</p>
+                      <p className="mt-0.5 text-xs text-muted">{t("AmigosPage.solicitudNivel", { nivel: p.trophyLevel })}</p>
                     )}
                   </div>
 
@@ -108,14 +110,14 @@ export default async function AmigosPage() {
                       className="rounded-[9px] px-3.5 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
                       style={{ background: "var(--accent-grad)" }}
                     >
-                      Aceptar
+                      {t("AmigosPage.aceptar")}
                     </button>
                   </form>
 
                   <form action={removeFriendAction}>
                     <input type="hidden" name="friendId" value={p.userId} />
                     <button className="text-[0.8125rem] font-semibold text-muted hover:text-foreground">
-                      Rechazar
+                      {t("AmigosPage.rechazar")}
                     </button>
                   </form>
                 </li>
@@ -127,16 +129,15 @@ export default async function AmigosPage() {
 
       <section className="mt-9">
         <div className="mb-4 flex items-baseline gap-3.5">
-          <h2 className="font-heading text-2xl font-bold">Clasificación</h2>
+          <h2 className="font-heading text-2xl font-bold">{t("AmigosPage.clasificacionTitulo")}</h2>
           <span className="text-[0.8125rem] text-muted">
-            Tú y {ranking.length - (tengoCuenta ? 1 : 0)} amigos, por XP Paragon
+            {t("AmigosPage.clasificacionSubtitulo", { n: ranking.length - (tengoCuenta ? 1 : 0) })}
           </span>
         </div>
 
         {ranking.length === 0 ? (
           <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-            Todavía no has añadido a nadie con la PlayStation vinculada. Pídele
-            su usuario y escríbelo arriba.
+            {t("AmigosPage.clasificacionVacia")}
           </p>
         ) : (
           <div className="grid gap-2.5">
@@ -168,12 +169,12 @@ export default async function AmigosPage() {
                 <div className="col-span-2 min-w-0 sm:col-span-1">
                   <p className="truncate text-[0.9375rem] font-semibold">
                     {r.name}
-                    {r.esMio && " (tú)"}
+                    {r.esMio && t("AmigosPage.tu")}
                   </p>
                   {r.handle && (
                     <p className="mt-0.5 text-xs text-muted">
                       @{r.handle}
-                      · nivel Paragon {r.paragon.level} · {r.paragon.xp.toLocaleString("es-ES")} XP
+                      {t("AmigosPage.nivelXp", { nivel: r.paragon.level, xp: r.paragon.xp.toLocaleString("es-ES") })}
                     </p>
                   )}
                 </div>
@@ -183,15 +184,15 @@ export default async function AmigosPage() {
                     <TrophyIcon grade="platinum" size={15} />
                     {r.stats.platinos}
                   </p>
-                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">Platinos</p>
+                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statPlatinos")}</p>
                 </div>
                 <div>
                   <p className="text-[1.0625rem] font-semibold">{r.stats.trofeos.toLocaleString("es-ES")}</p>
-                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">Trofeos</p>
+                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statTrofeos")}</p>
                 </div>
                 <div>
                   <p className="text-[1.0625rem] font-semibold">{r.stats.completadoMedio}%</p>
-                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">Medio</p>
+                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statMedio")}</p>
                 </div>
 
                 {!r.esMio && r.handle && (
@@ -200,13 +201,13 @@ export default async function AmigosPage() {
                       href={`/comparar/${r.handle}`}
                       className="rounded-[9px] border border-[var(--border)] bg-[#151d29] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)]"
                     >
-                      Comparar
+                      {t("AmigosPage.comparar")}
                     </Link>
                     <Link
                       href={`/u/${r.handle}`}
                       className="px-1 py-2 text-[0.8125rem] font-semibold text-muted hover:text-foreground"
                     >
-                      Perfil
+                      {t("AmigosPage.perfil")}
                     </Link>
                   </div>
                 )}
@@ -217,10 +218,10 @@ export default async function AmigosPage() {
       </section>
 
       <section className="mt-9 grid grid-cols-1 gap-3 lg:grid-cols-2">
-        {[{ title: "Esta semana", rows: periodos.semanal }, { title: "Este mes", rows: periodos.mensual }].map((periodo) => (
+        {[{ title: t("AmigosPage.periodoSemanal"), rows: periodos.semanal }, { title: t("AmigosPage.periodoMensual"), rows: periodos.mensual }].map((periodo) => (
           <div key={periodo.title} className="rounded-[18px] border border-border bg-surface p-5">
             <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{periodo.title}</h2>
-            {periodo.rows.length === 0 ? <p className="text-sm text-muted">Todavía no hay trofeos registrados.</p> : <ol className="space-y-2">{periodo.rows.map((row, index) => <li key={row.userId} className="flex items-center gap-3 text-sm"><span className="w-6 text-xs font-bold text-muted">{index + 1}</span><span className="min-w-0 flex-1 truncate font-semibold">{row.name ?? `@${row.handle ?? "usuario"}`}</span><span className="font-heading font-bold text-accent">{row.total} trofeos</span></li>)}</ol>}
+            {periodo.rows.length === 0 ? <p className="text-sm text-muted">{t("AmigosPage.periodoVacio")}</p> : <ol className="space-y-2">{periodo.rows.map((row, index) => <li key={row.userId} className="flex items-center gap-3 text-sm"><span className="w-6 text-xs font-bold text-muted">{index + 1}</span><span className="min-w-0 flex-1 truncate font-semibold">{row.name ?? `@${row.handle ?? "usuario"}`}</span><span className="font-heading font-bold text-accent">{t("AmigosPage.periodoTrofeos", { n: row.total })}</span></li>)}</ol>}
           </div>
         ))}
       </section>
@@ -228,9 +229,9 @@ export default async function AmigosPage() {
       {amigos.length > 0 && (
         <section className="mt-9">
           <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="font-heading text-2xl font-bold">Tus amigos</h2>
+            <h2 className="font-heading text-2xl font-bold">{t("AmigosPage.tusAmigosTitulo")}</h2>
             <p className="text-[0.8125rem] text-muted">
-              Marca dos o más para comparar como grupo, no solo de uno en uno.
+              {t("AmigosPage.tusAmigosAyuda")}
             </p>
           </div>
 
@@ -261,7 +262,7 @@ export default async function AmigosPage() {
                     name="con"
                     value={a.handle}
                     className="h-4 w-4 shrink-0 accent-accent"
-                    aria-label={`Incluir a @${a.handle} en la comparativa de grupo`}
+                    aria-label={t("AmigosPage.checkboxAria", { handle: a.handle })}
                   />
                 )}
 
@@ -280,7 +281,7 @@ export default async function AmigosPage() {
                   </Link>
                   <p className="text-xs text-muted">
                     @{a.handle}
-                    {a.trophyLevel !== null && ` · nivel ${a.trophyLevel}`}
+                    {a.trophyLevel !== null && t("AmigosPage.amigoNivel", { nivel: a.trophyLevel })}
                   </p>
                   {a.accounts.length > 0 && (
                     <p className="mt-0.5 truncate text-[0.6875rem] text-muted/80">
@@ -293,18 +294,18 @@ export default async function AmigosPage() {
                   href={`/comparar/${a.handle}`}
                   className="rounded-lg border border-border px-3 py-1.5 text-sm hover:border-accent/50"
                 >
-                  Comparar
+                  {t("AmigosPage.comparar")}
                 </Link>
 
                 <ConfirmForm
                   action={removeFriendAction}
                   hidden={{ friendId: a.userId }}
-                  title="¿Quitar de tus amigos?"
-                  message={`${a.displayName ?? `@${a.handle}`} dejará de ver tu actividad y tendrías que volver a mandarle una solicitud para añadirle otra vez.`}
-                  confirmLabel="Sí, quitar"
+                  title={t("AmigosPage.quitarTitulo")}
+                  message={t("AmigosPage.quitarMensaje", { nombre: a.displayName ?? `@${a.handle}` })}
+                  confirmLabel={t("AmigosPage.quitarConfirmar")}
                   triggerClassName="text-sm text-muted hover:text-danger"
                 >
-                  Quitar
+                  {t("AmigosPage.quitar")}
                 </ConfirmForm>
               </li>
             ))}
@@ -316,7 +317,7 @@ export default async function AmigosPage() {
             className="mt-3 rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
             style={{ background: "var(--accent-grad)" }}
           >
-            Comparar seleccionados
+            {t("AmigosPage.compararSeleccionados")}
           </button>
         </section>
       )}

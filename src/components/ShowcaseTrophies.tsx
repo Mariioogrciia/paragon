@@ -3,21 +3,24 @@ import { gradeLabel, TrophyIcon } from "./TrophyIcon";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { colorFor, rarity } from "@/lib/design";
 import { TiltCard } from "@/components/TiltCard";
+import { getTranslations } from "next-intl/server";
 
-export function ShowcaseTrophies({ 
-  items, 
-  handle 
-}: { 
+export async function ShowcaseTrophies({
+  items,
+  handle
+}: {
   items: { game: Game; trophy: Trophy }[];
   handle: string;
 }) {
   if (items.length === 0) return null;
 
+  const t = await getTranslations("Perfil");
+
   return (
     <section className="mt-8 mb-4">
       <h2 className="font-heading text-xl font-bold uppercase tracking-wide text-[rgb(var(--accent-rgb))] mb-4 flex items-center gap-2">
         <TrophyIcon grade="platinum" size={24} />
-        Vitrina de Orgullo
+        {t("ShowcaseTrophies.heading")}
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

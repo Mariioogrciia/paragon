@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 /**
  * Nota de un juego, en estrellas — de solo lectura.
  *
@@ -10,8 +12,9 @@
  * ReviewEditor el selector ahora también vota en estrellas, no en números.
  */
 export function Stars({ value, size = 14 }: { value: number; size?: number }) {
+  const t = useTranslations("Perfil");
   return (
-    <span className="inline-flex items-center gap-0.5" aria-label={`${value} de 5 estrellas`}>
+    <span className="inline-flex items-center gap-0.5" aria-label={t("Stars.ariaLabel", { value })}>
       {[1, 2, 3, 4, 5].map((n) => (
         <svg
           key={n}

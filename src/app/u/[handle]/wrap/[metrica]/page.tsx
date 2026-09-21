@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
@@ -14,20 +15,6 @@ import {
 const METRICAS = ["horas", "trofeos", "generos"] as const;
 type Metrica = (typeof METRICAS)[number];
 
-const TITULO: Record<Metrica, string> = {
-  horas: "Ranking de horas jugadas",
-  trofeos: "Ranking de trofeos por juego",
-  generos: "Ranking de géneros",
-};
-
-const RANGOS: { valor: RangoFecha; etiqueta: string }[] = [
-  { valor: "7d", etiqueta: "7 días" },
-  { valor: "30d", etiqueta: "30 días" },
-  { valor: "90d", etiqueta: "90 días" },
-  { valor: "anio", etiqueta: "Este año" },
-  { valor: "todo", etiqueta: "Todo" },
-];
-
 export async function generateMetadata({
   params,
 }: {
@@ -35,7 +22,13 @@ export async function generateMetadata({
 }) {
   const { metrica } = await params;
   const m = METRICAS.includes(metrica as Metrica) ? (metrica as Metrica) : "trofeos";
-  return { title: `${TITULO[m]} · Paragon` };
+  const t = await getTranslations("Perfil");
+  const titulos: Record<Metrica, string> = {
+    horas: t("WrapRankingPage.tituloHoras"),
+    trofeos: t("WrapRankingPage.tituloTrofeos"),
+    generos: t("WrapRankingPage.tituloGeneros"),
+  };
+  return { title: `${titulos[m]} · Paragon` };
 }
 
 export default async function WrapRankingPage({
@@ -48,6 +41,21 @@ export default async function WrapRankingPage({
   const { handle, metrica } = await params;
   if (!METRICAS.includes(metrica as Metrica)) notFound();
   const m = metrica as Metrica;
+  const t = await getTranslations("Perfil");
+
+  const TITULO: Record<Metrica, string> = {
+    horas: t("WrapRankingPage.tituloHoras"),
+    trofeos: t("WrapRankingPage.tituloTrofeos"),
+    generos: t("WrapRankingPage.tituloGeneros"),
+  };
+
+  const RANGOS: { valor: RangoFecha; etiqueta: string }[] = [
+    { valor: "7d", etiqueta: t("WrapRankingPage.rango7d") },
+    { valor: "30d", etiqueta: t("WrapRankingPage.rango30d") },
+    { valor: "90d", etiqueta: t("WrapRankingPage.rango90d") },
+    { valor: "anio", etiqueta: t("WrapRankingPage.rangoAnio") },
+    { valor: "todo", etiqueta: t("WrapRankingPage.rangoTodo") },
+  ];
 
   const { rango: rangoParam } = await searchParams;
   const rango: RangoFecha = (RANGOS.find((r) => r.valor === rangoParam)?.valor ?? "todo") as RangoFecha;
@@ -68,7 +76,7 @@ export default async function WrapRankingPage({
       iconUrl: f.iconUrl,
       href: `/u/${handle}/${f.gameId}`,
     }));
-    unidad = "h";
+    unidad = t("WrapRankingPage.unidadHoras");
   } else if (m === "trofeos") {
     const filas2 = await rankingTrofeosPorJuego(profile.userId, desde);
     filas = filas2.map((f) => ({
@@ -78,11 +86,11 @@ export default async function WrapRankingPage({
       iconUrl: f.iconUrl,
       href: `/u/${handle}/${f.gameId}`,
     }));
-    unidad = "trofeos";
+    unidad = t("WrapRankingPage.unidadTrofeos");
   } else {
     const filas3 = await rankingGeneros(profile.userId, desde);
     filas = filas3.map((f) => ({ clave: f.genero, etiqueta: f.genero, valor: f.valor }));
-    unidad = "trofeos";
+    unidad = t("WrapRankingPage.unidadTrofeos");
   }
 
   const max = filas[0]?.valor ?? 0;
@@ -90,7 +98,7 @@ export default async function WrapRankingPage({
   return (
     <div className="space-y-6">
       <div>
-        <BackButton fallbackHref={`/u/${handle}`} label="Volver al perfil" />
+        <BackButton fallbackHref={`/u/${handle}`} label={t("WrapRankingPage.volverAlPerfil")} />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">{TITULO[m]}</h1>
           <div className="flex flex-wrap gap-1.5">
@@ -104,7 +112,7 @@ export default async function WrapRankingPage({
                     : "border-[var(--border)] text-muted hover:text-foreground"
                 }`}
               >
-                {otra === "horas" ? "Horas" : otra === "trofeos" ? "Trofeos" : "Géneros"}
+                {otra === "horas" ? t("WrapRankingPage.pestañaHoras") : otra === "trofeos" ? t("WrapRankingPage.pestañaTrofeos") : t("WrapRankingPage.pestañaGeneros")}
               </Link>
             ))}
           </div>
@@ -129,16 +137,14 @@ export default async function WrapRankingPage({
 
         {m === "horas" && (
           <p className="mt-3 text-xs text-muted">
-            Las plataformas solo dan el total de horas acumuladas por juego, nunca cuándo se
-            jugaron. El filtro de fecha decide qué juegos entran (si se han tocado en ese
-            periodo); las horas de cada uno siguen siendo las de siempre.
+            {t("WrapRankingPage.notaHoras")}
           </p>
         )}
       </div>
 
       {filas.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          No hay datos para este periodo todavía.
+          {t("WrapRankingPage.vacio")}
         </p>
       ) : (
         <ol className="space-y-2">

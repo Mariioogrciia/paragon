@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /**
  * Pestañas del perfil, pero como ENLACES a rutas de verdad, no como
@@ -30,11 +31,12 @@ export function ProfileTabsNav({
 }) {
   const pathname = usePathname();
   const base = `/u/${handle}`;
+  const t = useTranslations("Perfil");
 
   const pestanas = [
-    { label: "Resumen", href: base },
-    { label: "Biblioteca", href: `${base}/biblioteca`, badge: juegos },
-    { label: "Estadísticas", href: `${base}/estadisticas` },
+    { label: t("ProfileTabsNav.resumen"), href: base },
+    { label: t("ProfileTabsNav.biblioteca"), href: `${base}/biblioteca`, badge: juegos },
+    { label: t("ProfileTabsNav.estadisticas"), href: `${base}/estadisticas` },
   ];
 
   return (

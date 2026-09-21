@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * "Descargar como PDF" sin generar nada en el servidor: el diálogo de
  * impresión del propio navegador, con `@media print` (globals.css) quitando
@@ -8,6 +10,7 @@
  * Hobby solo para esto.
  */
 export function DescargarPdfButton() {
+  const t = useTranslations("Perfil");
   return (
     <button
       onClick={() => window.print()}
@@ -15,7 +18,7 @@ export function DescargarPdfButton() {
       className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_-6px_rgba(88,167,255,0.4)] active:translate-y-0"
       style={{ background: "var(--accent-grad)" }}
     >
-      Descargar como PDF
+      {t("DescargarPdfButton.descargar")}
     </button>
   );
 }

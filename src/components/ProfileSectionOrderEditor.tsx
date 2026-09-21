@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Reorder } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { SECTION_LABELS, normalizeSectionOrder, type ProfileSectionKey } from "@/lib/profileSections";
 
 /**
@@ -21,6 +22,7 @@ export function ProfileSectionOrderEditor({
   onChange?: (json: string) => void;
 }) {
   const [orden, setOrden] = useState<ProfileSectionKey[]>(() => normalizeSectionOrder(initialOrder));
+  const t = useTranslations("Perfil");
 
   function reordenar(nuevo: ProfileSectionKey[]) {
     setOrden(nuevo);
@@ -49,7 +51,7 @@ export function ProfileSectionOrderEditor({
           </Reorder.Item>
         ))}
       </Reorder.Group>
-      <p className="mt-2 text-xs text-muted">Arrastra para cambiar el orden en que se ven en tu perfil público.</p>
+      <p className="mt-2 text-xs text-muted">{t("ProfileSectionOrderEditor.ayuda")}</p>
     </div>
   );
 }
