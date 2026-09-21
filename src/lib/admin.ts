@@ -200,3 +200,36 @@ export async function getAdminActivities(limit = 50): Promise<AdminActivityRow[]
 
   return rows;
 }
+
+export interface AdminLeagueRow {
+  id: string;
+  name: string;
+  ownerName: string | null;
+  ownerHandle: string | null;
+  createdAt: Date;
+  members: number;
+}
+
+export async function getAdminLeagues(): Promise<AdminLeagueRow[]> {
+  const { leagues, leagueMembers, users } = await import("@/db/schema");
+  
+  const rows = await db
+    .select({
+      id: leagues.id,
+      name: leagues.name,
+      ownerName: users.name,
+      ownerHandle: users.handle,
+      createdAt: leagues.createdAt,
+      members: sql<number>`count(${leagueMembers.userId})`
+    })
+    .from(leagues)
+    .innerJoin(users, eq(users.id, leagues.ownerId))
+    .leftJoin(leagueMembers, eq(leagueMembers.leagueId, leagues.id))
+    .groupBy(leagues.id, users.name, users.handle, leagues.createdAt)
+    .orderBy(desc(leagues.createdAt));
+
+  return rows.map(r => ({
+    ...r,
+    members: Number(r.members)
+  }));
+}
