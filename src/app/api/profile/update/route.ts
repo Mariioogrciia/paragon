@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { FRAME_REQUISITOS } from "@/lib/level";
 import { normalizeSectionOrder } from "@/lib/profileSections";
+import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 
 const TEMAS_VALIDOS = ["dark", "light", "oled", "high-contrast"];
 
@@ -30,6 +31,17 @@ export async function POST(request: Request) {
     const statusText = formData.get("statusText") as string | null;
     const theme = formData.get("theme") as string | null;
     const profileSectionOrderRaw = formData.get("profileSectionOrder") as string | null;
+
+    // Bloquea el guardado entero si cualquiera de los campos que otros
+    // pueden ver (nombre, título, estado) lleva lenguaje ofensivo — nada
+    // ofensivo llega a guardarse, ni siquiera el resto de campos "limpios"
+    // del mismo envío, para no complicar qué se guardó y qué no.
+    const textosAComprobar = [firstName, lastName, profileTitle, statusText].filter(
+      (v): v is string => Boolean(v && v.trim()),
+    );
+    if (textosAComprobar.some((texto) => contieneLenguajeOfensivo(texto))) {
+      return NextResponse.redirect(new URL("/ajustes?error=contenido_ofensivo", request.url));
+    }
 
     // El desplegable de /ajustes dice "Nivel 10+/50+/100+", pero hasta ahora
     // nada lo comprobaba: cualquiera podía guardar el marco de fuego a nivel

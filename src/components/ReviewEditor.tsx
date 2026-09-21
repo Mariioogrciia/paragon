@@ -60,11 +60,17 @@ export function ReviewEditor({
   const [rating, setRating] = useState(initialRating ?? 0);
   const [review, setReview] = useState(initialReview || "");
   const [isSaving, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
+    setError(null);
     startTransition(async () => {
-      await submitExpressReviewAction(gameId, rating, review);
-      setIsEditing(false);
+      try {
+        await submitExpressReviewAction(gameId, rating, review);
+        setIsEditing(false);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : t("ReviewEditor.genericError"));
+      }
     });
   };
 
@@ -119,7 +125,13 @@ export function ReviewEditor({
       <div className="text-right text-xs text-muted mt-1 mb-4">
         {review.length}/250
       </div>
-      
+
+      {error && (
+        <p className="mb-4 rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }}>
+          {error}
+        </p>
+      )}
+
       <div className="flex items-center gap-4">
         <div className="flex gap-2 ml-auto">
           <button 

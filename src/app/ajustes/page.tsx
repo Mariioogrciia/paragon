@@ -7,9 +7,11 @@ import { ProfileForm } from "@/components/forms/ProfileForm";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getLibrary, getProfileByUserId, getUserBadges } from "@/lib/profiles";
 
-export default async function AjustesGeneralPage() {
+export default async function AjustesGeneralPage(props: { searchParams: Promise<{ error?: string }> }) {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
+
+  const { error } = await props.searchParams;
 
   const db = getDb();
   const dbUser = await db.query.users.findFirst({
@@ -40,7 +42,16 @@ export default async function AjustesGeneralPage() {
     .map((g) => ({ id: g.id, title: g.title, iconUrl: g.iconUrl! }));
 
   return (
-    <ProfileForm
+    <>
+      {error === "contenido_ofensivo" && (
+        <p
+          className="mb-4 rounded-lg px-4 py-3 text-sm font-semibold"
+          style={{ background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }}
+        >
+          No se ha guardado nada — algún campo (nombre, título o estado) contiene lenguaje ofensivo. Cámbialo e inténtalo de nuevo.
+        </p>
+      )}
+      <ProfileForm
       user={dbUser}
       nivel={nivel.level}
       badges={badges.map((b) => b.badgeId)}
@@ -48,5 +59,6 @@ export default async function AjustesGeneralPage() {
       juegos={juegosParaFondo}
       discordVinculado={discordVinculado}
     />
+    </>
   );
 }

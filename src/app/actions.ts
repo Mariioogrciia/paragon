@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { users, userGames, activities, platformAccounts, gameTrophies, leagues } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
+import { contieneLenguajeOfensivo, errorSiOfensivo } from "@/lib/contentFilter";
 import { auth, signOut } from "@/auth";
 import {
   CollectionNameError,
@@ -88,6 +89,8 @@ export async function chooseHandleAction(
   if (await isHandleTaken(handle, userId)) {
     return { error: "Ese nombre de usuario ya está cogido." };
   }
+  const errorOfensivo = errorSiOfensivo(handle);
+  if (errorOfensivo) return { error: errorOfensivo };
 
   await setHandle(userId, handle);
   
@@ -113,6 +116,8 @@ export async function updateProfileAction(
   if (!name) {
     return { error: "El nombre a mostrar no puede estar vacío." };
   }
+  const errorOfensivo = errorSiOfensivo(name);
+  if (errorOfensivo) return { error: errorOfensivo };
 
   await setProfileInfo(userId, name, image || null);
   revalidatePath("/", "layout");
@@ -565,7 +570,11 @@ export async function rateGameAction(gameId: string, rating: number) {
 export async function writeReviewAction(gameId: string, review: string, dateStr: string) {
   const userId = await requireUserId();
   const db = getDb();
-  
+
+  if (contieneLenguajeOfensivo(review)) {
+    throw new Error("Esa reseña contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo.");
+  }
+
   const reviewDate = dateStr ? new Date(dateStr) : null;
 
   await db
@@ -900,7 +909,11 @@ export async function rebuscarVideoGuiaAction(
 export async function submitExpressReviewAction(gameId: string, rating: number, review: string) {
   const userId = await requireUserId();
   const db = getDb();
-  
+
+  if (contieneLenguajeOfensivo(review)) {
+    throw new Error("Esa reseña contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo.");
+  }
+
   await db
     .update(userGames)
     .set({ rating, review, reviewDate: new Date() })
@@ -994,6 +1007,9 @@ export async function createGuideAction(gameId: string, title: string, body: str
   if (!tituloLimpio || !textoLimpio) {
     return { error: "Ponle un título y algo de texto." };
   }
+  if (contieneLenguajeOfensivo(tituloLimpio) || contieneLenguajeOfensivo(textoLimpio)) {
+    return { error: "Esa guía contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo." };
+  }
 
   const id = await createGuide(userId, gameId, tituloLimpio, textoLimpio);
   revalidatePath(`/juego/${gameId}/guias`);
@@ -1005,6 +1021,9 @@ export async function replyToGuideAction(guideId: string, gameId: string, body: 
 
   const textoLimpio = body.trim();
   if (!textoLimpio) return { error: "Escribe algo antes de responder." };
+  if (contieneLenguajeOfensivo(textoLimpio)) {
+    return { error: "Esa respuesta contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo." };
+  }
 
   await replyToGuide(userId, guideId, textoLimpio);
   revalidatePath(`/juego/${gameId}/guias/${guideId}`);
@@ -1258,6 +1277,9 @@ export async function createLeagueAction(_prev: ActionState, formData: FormData)
   const durationValue = Number(durationValueRaw);
   const durationUnit = UNIDADES_DURACION.includes(durationUnitRaw as LeagueDurationUnit) ? (durationUnitRaw as LeagueDurationUnit) : null;
   const duration = durationValue > 0 && durationUnit ? { value: durationValue, unit: durationUnit } : undefined;
+
+  const errorOfensivo = errorSiOfensivo(name);
+  if (errorOfensivo) return { error: errorOfensivo };
 
   const league = await createLeague(userId, name, duration);
   if (!league) return { error: "Ponle un nombre a la liga." };

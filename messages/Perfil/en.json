@@ -399,7 +399,8 @@
     "commentPlaceholder": "What did you think of the game?",
     "cancel": "Cancel",
     "saving": "Saving...",
-    "publish": "Publish"
+    "publish": "Publish",
+    "genericError": "Could not save. Try again."
   },
   "Stars": {
     "ariaLabel": "{value} out of 5 stars"

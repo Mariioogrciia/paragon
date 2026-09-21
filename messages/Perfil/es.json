@@ -399,7 +399,8 @@
     "commentPlaceholder": "¿Qué te pareció el juego?",
     "cancel": "Cancelar",
     "saving": "Guardando...",
-    "publish": "Publicar"
+    "publish": "Publicar",
+    "genericError": "No se ha podido guardar. Inténtalo de nuevo."
   },
   "Stars": {
     "ariaLabel": "{value} de 5 estrellas"

@@ -399,7 +399,8 @@
     "commentPlaceholder": "Wie fandest du das Spiel?",
     "cancel": "Abbrechen",
     "saving": "Speichern...",
-    "publish": "Veröffentlichen"
+    "publish": "Veröffentlichen",
+    "genericError": "Konnte nicht gespeichert werden. Versuch es erneut."
   },
   "Stars": {
     "ariaLabel": "{value} von 5 Sternen"

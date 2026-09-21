@@ -399,7 +399,8 @@
     "commentPlaceholder": "Qu'as-tu pensé du jeu ?",
     "cancel": "Annuler",
     "saving": "Enregistrement...",
-    "publish": "Publier"
+    "publish": "Publier",
+    "genericError": "Impossible d'enregistrer. Réessaie."
   },
   "Stars": {
     "ariaLabel": "{value} sur 5 étoiles"

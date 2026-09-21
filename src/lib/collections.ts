@@ -2,6 +2,7 @@ import "server-only";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { collectionGames, collections } from "@/db/schema";
+import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 
 /**
  * Carpetas del usuario.
@@ -27,6 +28,8 @@ function cleanName(raw: string): string {
   if (name.length === 0) throw new CollectionNameError("Ponle un nombre a la carpeta.");
   if (name.length > MAX_NAME)
     throw new CollectionNameError(`Como mucho ${MAX_NAME} caracteres.`);
+  if (contieneLenguajeOfensivo(name))
+    throw new CollectionNameError("Ese nombre contiene lenguaje ofensivo — cámbialo.");
 
   return name;
 }
