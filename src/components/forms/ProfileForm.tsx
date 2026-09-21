@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEditor";
 import { normalizeSectionOrder } from "@/lib/profileSections";
@@ -35,23 +36,6 @@ interface ProfileFormUser {
   discordDmEnabled?: boolean;
 }
 
-const FRAMES = [
-  { value: "", label: "Sin marco" },
-  { value: "neon", label: "Marco Neón (Nivel 5+)" },
-  { value: "gold", label: "Marco Dorado (Nivel 10+)" },
-  { value: "circuito", label: "Marco Circuito (Nivel 25+)" },
-  { value: "platinum", label: "Marco Platino (Nivel 50+)" },
-  { value: "fire", label: "Marco Fuego (Nivel 100+)" },
-  { value: "cristal", label: "Marco Cristal (Nivel 150+)" },
-];
-
-const TEMAS_PERFIL = [
-  { value: "dark", label: "Oscuro" },
-  { value: "light", label: "Claro" },
-  { value: "oled", label: "OLED" },
-  { value: "high-contrast", label: "Contraste alto" },
-];
-
 export function ProfileForm({
   user,
   nivel = 0,
@@ -76,6 +60,25 @@ export function ProfileForm({
   /** Si esta cuenta inició sesión con Discord alguna vez — sin esto el bot no tiene a quién escribir. */
   discordVinculado?: boolean;
 }) {
+  const t = useTranslations("Onboarding");
+
+  const FRAMES = [
+    { value: "", label: t("profileForm.frames.none") },
+    { value: "neon", label: t("profileForm.frames.neon") },
+    { value: "gold", label: t("profileForm.frames.gold") },
+    { value: "circuito", label: t("profileForm.frames.circuito") },
+    { value: "platinum", label: t("profileForm.frames.platinum") },
+    { value: "fire", label: t("profileForm.frames.fire") },
+    { value: "cristal", label: t("profileForm.frames.cristal") },
+  ];
+
+  const TEMAS_PERFIL = [
+    { value: "dark", label: t("profileForm.themes.dark") },
+    { value: "light", label: t("profileForm.themes.light") },
+    { value: "oled", label: t("profileForm.themes.oled") },
+    { value: "high-contrast", label: t("profileForm.themes.highContrast") },
+  ];
+
   const [titulo, setTitulo] = useState(user.profileTitle ?? "");
   const marcoBloqueado = (v: string) => FRAME_REQUISITOS[v] !== undefined && nivel < FRAME_REQUISITOS[v];
   const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
@@ -179,12 +182,12 @@ export function ProfileForm({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-bold mb-2">Información personal</h1>
-        <p className="text-sm text-muted">Gestiona tu información personal y preferencias.</p>
+        <h1 className="text-xl font-bold mb-2">{t("profileForm.title")}</h1>
+        <p className="text-sm text-muted">{t("profileForm.description")}</p>
       </div>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-4">Subir Avatar</h2>
+        <h2 className="font-semibold mb-4">{t("profileForm.avatar.title")}</h2>
         <div className="flex items-center gap-6">
           <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-surface-2 border border-white/10 flex items-center justify-center">
             {avatar ? (
@@ -195,16 +198,16 @@ export function ProfileForm({
           </div>
           <div>
             <label className="cursor-pointer rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-medium text-white hover:bg-[#4752C4] transition-colors">
-              {isUploading ? "Subiendo..." : "Subir Avatar"}
+              {isUploading ? t("profileForm.avatar.uploading") : t("profileForm.avatar.uploadButton")}
               <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
             </label>
-            <p className="mt-2 text-xs text-muted">Formatos JPG, JPEG, PNG y GIF, hasta 5 MB</p>
+            <p className="mt-2 text-xs text-muted">{t("profileForm.avatar.hint")}</p>
           </div>
         </div>
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-4">Banner del perfil</h2>
+        <h2 className="font-semibold mb-4">{t("profileForm.banner.title")}</h2>
         <div className="flex flex-col gap-4">
           <div className="h-32 w-full shrink-0 overflow-hidden rounded-xl bg-surface-2 border border-white/10 flex items-center justify-center">
             {bannerPresetKey(banner) ? (
@@ -216,15 +219,15 @@ export function ProfileForm({
                 <img src={banner} alt="Banner" className="h-full w-full object-cover" />
               )
             ) : (
-              <span className="text-muted text-sm">Sin banner personalizado</span>
+              <span className="text-muted text-sm">{t("profileForm.banner.empty")}</span>
             )}
           </div>
           <div>
             <label className="inline-block cursor-pointer rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-medium text-white hover:bg-[#4752C4] transition-colors">
-              {isUploadingBanner ? "Subiendo..." : "Subir Banner"}
+              {isUploadingBanner ? t("profileForm.banner.uploading") : t("profileForm.banner.uploadButton")}
               <input type="file" accept="image/*,video/mp4,video/webm" className="hidden" onChange={handleBannerUpload} disabled={isUploadingBanner} />
             </label>
-            <p className="mt-2 text-xs text-muted">Sustituye al fondo de juego. Imagen (JPG, PNG, GIF) o vídeo corto (MP4, WebM), ratio ideal 3:1</p>
+            <p className="mt-2 text-xs text-muted">{t("profileForm.banner.hint")}</p>
           </div>
         </div>
       </section>
@@ -232,32 +235,32 @@ export function ProfileForm({
       <form action="/api/profile/update" method="POST" className="flex flex-col gap-8">
         <input type="hidden" name="profileBannerUrl" value={banner ?? ""} />
         <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-          <h2 className="font-semibold mb-4">Detalles del perfil</h2>
+          <h2 className="font-semibold mb-4">{t("profileForm.details.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre de usuario</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.usernameLabel")}</label>
               <input name="handle" value={handle} onChange={(e) => setHandle(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Email</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.emailLabel")}</label>
               <input name="email" defaultValue={user.email ?? ""} disabled className="w-full rounded-xl border border-white/10 bg-[var(--surface)]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Nombre</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.firstNameLabel")}</label>
               <input name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Apellido</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.lastNameLabel")}</label>
               <input name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Título del perfil</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.profileTitleLabel")}</label>
               <input
                 name="profileTitle"
                 maxLength={60}
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
-                placeholder="Ej. Cazador de platinos"
+                placeholder={t("profileForm.details.profileTitlePlaceholder")}
                 className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none"
               />
               {titulosSugeridos.length > 0 && (
@@ -277,7 +280,7 @@ export function ProfileForm({
               )}
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Juego para el fondo</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.backgroundGameLabel")}</label>
               <BackgroundGamePicker
                 juegos={juegos}
                 favoritos={favoritos}
@@ -287,29 +290,29 @@ export function ProfileForm({
               <input type="hidden" name="profileBackgroundGameId" value={fondoJuegoId} />
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Estado</label>
-              <input name="statusText" maxLength={100} value={statusText} onChange={(e) => setStatusText(e.target.value)} placeholder="¿A qué estás jugando?" className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.statusLabel")}</label>
+              <input name="statusText" maxLength={100} value={statusText} onChange={(e) => setStatusText(e.target.value)} placeholder={t("profileForm.details.statusPlaceholder")} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
           </div>
         </section>
 
         <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-          <h2 className="font-semibold mb-4">Personalización Visual</h2>
+          <h2 className="font-semibold mb-4">{t("profileForm.visual.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Color del perfil</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.colorLabel")}</label>
               <div className="flex gap-2">
                 <input type="color" name="profileColor" value={profileColor} onChange={(e) => setProfileColor(e.target.value)} className="h-11 w-11 rounded-lg border-0 bg-transparent p-0 cursor-pointer" />
-                <span className="text-xs text-muted self-center">Este color bañará tu perfil cuando lo visiten.</span>
+                <span className="text-xs text-muted self-center">{t("profileForm.visual.colorHint")}</span>
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Tema del perfil</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.themeLabel")}</label>
               <CustomSelect name="theme" value={theme} onChange={setTheme} options={TEMAS_PERFIL} />
-              <p className="mt-1.5 text-xs text-muted">Cómo se ve tu perfil para quien lo visite — no cambia el suyo propio.</p>
+              <p className="mt-1.5 text-xs text-muted">{t("profileForm.visual.themeHint")}</p>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Marco del avatar</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.frameLabel")}</label>
               <div className="flex items-center gap-3">
                 {/* Avatar, no un <img> suelto: un <img> es inline por defecto y,
                     dentro del div sin flex de Nucleo (AvatarFrame.tsx), dejaba
@@ -328,27 +331,27 @@ export function ProfileForm({
                   />
                 </div>
               </div>
-              <p className="mt-1.5 text-xs text-muted">Estás a nivel {nivel}. Los marcos bloqueados se descartan aunque los elijas.</p>
+              <p className="mt-1.5 text-xs text-muted">{t("profileForm.visual.frameHint", { nivel })}</p>
             </div>
           </div>
 
           <div className="mt-6">
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Banner por plataforma</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.bannerLabel")}</label>
             <BannerPresetPicker value={banner} onChange={setBanner} />
-            <p className="mt-1.5 text-xs text-muted">Arte propio de Paragon, sin fotos con derechos de por medio. Sustituye a lo que subas arriba; volver a subir un archivo lo reemplaza.</p>
+            <p className="mt-1.5 text-xs text-muted">{t("profileForm.visual.bannerHint")}</p>
           </div>
 
           <div className="mt-6">
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Orden de secciones</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.sectionOrderLabel")}</label>
             <ProfileSectionOrderEditor initialOrder={user.profileSectionOrder} onChange={setSectionOrderJson} />
           </div>
         </section>
 
         <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-          <h2 className="font-semibold mb-4">Configuración regional</h2>
+          <h2 className="font-semibold mb-4">{t("profileForm.regional.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Idioma</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.languageLabel")}</label>
               <CustomSelect
                 name="language"
                 value={language}
@@ -360,7 +363,7 @@ export function ProfileForm({
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">Zona horaria</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.timezoneLabel")}</label>
               <CustomSelect
                 name="timezone"
                 value={timezone}
@@ -378,9 +381,9 @@ export function ProfileForm({
             type="submit"
             disabled={!hayCambiosSinGuardar}
             className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all enabled:hover:-translate-y-0.5 enabled:hover:shadow-[0_0_20px_rgb(var(--accent-rgb)_/_40%)] disabled:cursor-not-allowed disabled:opacity-40"
-            title={hayCambiosSinGuardar ? undefined : "No hay cambios sin guardar"}
+            title={hayCambiosSinGuardar ? undefined : t("profileForm.noChanges")}
           >
-            Guardar cambios
+            {t("profileForm.saveButton")}
           </button>
         </div>
       </form>
@@ -389,12 +392,12 @@ export function ProfileForm({
           propias (guardar/probar), y un <form> dentro de otro no es HTML
           válido — el navegador ignora el anidado y rompe el envío. */}
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-4">Discord</h2>
+        <h2 className="font-semibold mb-4">{t("profileForm.discordTitle")}</h2>
         <DiscordDmForm enabled={user.discordDmEnabled ?? false} vinculado={discordVinculado} />
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-4">Notificaciones del navegador</h2>
+        <h2 className="font-semibold mb-4">{t("profileForm.pushTitle")}</h2>
         <PushToggle />
       </section>
     </div>
@@ -422,6 +425,7 @@ function BackgroundGamePicker({
   value: string;
   onChange: (id: string) => void;
 }) {
+  const t = useTranslations("Onboarding");
   const favoritosSet = new Set(favoritos);
   const ordenados = [...juegos].sort((a, b) => {
     const aFav = favoritosSet.has(a.id) ? 0 : 1;
@@ -430,7 +434,7 @@ function BackgroundGamePicker({
   });
 
   if (ordenados.length === 0) {
-    return <p className="text-xs text-muted">Sin juegos en tu biblioteca todavía.</p>;
+    return <p className="text-xs text-muted">{t("profileForm.backgroundPicker.empty")}</p>;
   }
 
   return (
@@ -440,9 +444,9 @@ function BackgroundGamePicker({
         onClick={() => onChange("")}
         className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg text-[0.625rem] font-semibold text-muted transition-colors hover:text-foreground"
         style={{ border: `2px solid ${value === "" ? "var(--accent)" : "var(--border)"}` }}
-        title="Automático (el más reciente)"
+        title={t("profileForm.backgroundPicker.autoTitle")}
       >
-        Auto
+        {t("profileForm.backgroundPicker.auto")}
       </button>
       {ordenados.slice(0, 24).map((g) => (
         <button

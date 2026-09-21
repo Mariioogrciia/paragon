@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { subscribePushAction, unsubscribePushAction, testPushAction } from "@/app/actions";
 
 const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
@@ -25,6 +26,7 @@ type Estado = "sin-soporte" | "cargando" | "denegado" | "activo" | "inactivo";
  * hay un trofeo nuevo (ver lib/sync.ts), llegue o no la pestaña abierta.
  */
 export function PushToggle() {
+  const t = useTranslations("Onboarding");
   const [estado, setEstado] = useState<Estado>("cargando");
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [pendiente, setPendiente] = useState(false);
@@ -56,7 +58,7 @@ export function PushToggle() {
     try {
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
       if (!vapidKey) {
-        setMensaje("El servidor no tiene configuradas las notificaciones push todavía.");
+        setMensaje(t("pushToggle.notConfigured"));
         return;
       }
 
@@ -76,14 +78,14 @@ export function PushToggle() {
       const resultado = await subscribePushAction({ endpoint: json.endpoint, keys: json.keys });
       if (!resultado.ok) {
         await sub.unsubscribe();
-        setMensaje(resultado.error ?? "No se pudo activar.");
+        setMensaje(resultado.error ?? t("pushToggle.activateError"));
         return;
       }
 
       setEstado("activo");
-      setMensaje("Notificaciones activadas.");
+      setMensaje(t("pushToggle.activated"));
     } catch (error) {
-      setMensaje(error instanceof Error ? error.message : "No se pudo activar.");
+      setMensaje(error instanceof Error ? error.message : t("pushToggle.activateError"));
     } finally {
       setPendiente(false);
     }
@@ -100,9 +102,9 @@ export function PushToggle() {
         await sub.unsubscribe();
       }
       setEstado("inactivo");
-      setMensaje("Notificaciones desactivadas.");
+      setMensaje(t("pushToggle.deactivated"));
     } catch (error) {
-      setMensaje(error instanceof Error ? error.message : "No se pudo desactivar.");
+      setMensaje(error instanceof Error ? error.message : t("pushToggle.deactivateError"));
     } finally {
       setPendiente(false);
     }
@@ -112,25 +114,24 @@ export function PushToggle() {
     setPendiente(true);
     setMensaje(null);
     const resultado = await testPushAction();
-    setMensaje(resultado.ok ? "Aviso enviado — debería llegarte en unos segundos." : (resultado.error ?? "No se pudo enviar."));
+    setMensaje(resultado.ok ? t("pushToggle.testSent") : (resultado.error ?? t("pushToggle.testError")));
     setPendiente(false);
   }
 
   if (estado === "sin-soporte") {
-    return <p className="text-sm text-muted">Este navegador no admite notificaciones push.</p>;
+    return <p className="text-sm text-muted">{t("pushToggle.notSupported")}</p>;
   }
 
   if (estado === "denegado") {
     return (
       <p className="text-sm text-muted">
-        Bloqueaste las notificaciones para este sitio. Actívalas desde los ajustes del navegador (el icono junto a
-        la barra de direcciones) para poder encenderlas aquí.
+        {t("pushToggle.denied")}
       </p>
     );
   }
 
   if (estado === "cargando") {
-    return <p className="text-sm text-muted">Comprobando…</p>;
+    return <p className="text-sm text-muted">{t("pushToggle.checking")}</p>;
   }
 
   return (
@@ -145,7 +146,7 @@ export function PushToggle() {
               className="rounded-xl px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-50"
               style={FIELD}
             >
-              {pendiente ? "…" : "Desactivar"}
+              {pendiente ? "…" : t("pushToggle.deactivate")}
             </button>
             <button
               type="button"
@@ -153,7 +154,7 @@ export function PushToggle() {
               disabled={pendiente}
               className="text-xs font-semibold text-accent hover:underline disabled:pointer-events-none disabled:opacity-50"
             >
-              Probar
+              {t("pushToggle.test")}
             </button>
           </>
         ) : (
@@ -164,14 +165,13 @@ export function PushToggle() {
             className="rounded-xl px-4 py-2.5 text-sm font-bold text-background transition-all hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-50"
             style={{ background: "var(--accent-grad)" }}
           >
-            {pendiente ? "…" : "Activar notificaciones"}
+            {pendiente ? "…" : t("pushToggle.activate")}
           </button>
         )}
       </div>
       {mensaje && <p className="mt-2 text-xs text-muted">{mensaje}</p>}
       <p className="mt-3 text-xs leading-relaxed text-muted">
-        Un aviso cuando consigas un trofeo nuevo, aunque no tengas Paragon abierto — llega directo del navegador, sin
-        pasar por ningún tercero.
+        {t("pushToggle.hint")}
       </p>
     </div>
   );

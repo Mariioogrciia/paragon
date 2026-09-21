@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Papa from "papaparse";
 import { importGamesAction, type ImportedGame } from "@/app/actions/import";
 import type { Platform } from "@/lib/types";
 
 export function ImportLibraryModal() {
+  const t = useTranslations("Onboarding");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [games, setGames] = useState<ImportedGame[]>([]);
@@ -60,13 +62,13 @@ export function ImportLibraryModal() {
         }
 
         if (parsedGames.length === 0) {
-          setError("No se encontraron juegos válidos en el CSV. Asegúrate de que haya una columna 'Name'.");
+          setError(t("importLibraryModal.invalidCsv"));
         } else {
           setGames(parsedGames);
         }
       },
       error: (err) => {
-        setError("Error leyendo el CSV: " + err.message);
+        setError(t("importLibraryModal.csvReadError", { message: err.message }));
       }
     });
   }
@@ -88,7 +90,7 @@ export function ImportLibraryModal() {
       close();
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Error al importar");
+      setError(err.message || t("importLibraryModal.importError"));
       setImporting(false);
     }
   }
@@ -104,7 +106,7 @@ export function ImportLibraryModal() {
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
-        Importar CSV
+        {t("importLibraryModal.trigger")}
       </button>
     );
   }
@@ -113,7 +115,7 @@ export function ImportLibraryModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
       <div className="w-full max-w-lg overflow-hidden border shadow-2xl bg-card rounded-2xl border-border flex flex-col max-h-[85vh]">
         <div className="flex items-center justify-between p-4 border-b shrink-0 border-border">
-          <h2 className="text-lg font-bold">Importar Biblioteca</h2>
+          <h2 className="text-lg font-bold">{t("importLibraryModal.title")}</h2>
           <button onClick={close} className="text-muted hover:text-foreground">✕</button>
         </div>
 
@@ -125,8 +127,12 @@ export function ImportLibraryModal() {
                   <svg className="w-8 h-8 mb-3 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <p className="mb-2 text-sm text-muted"><span className="font-semibold text-foreground">Haz click para subir</span> tu CSV (Playnite / GOG)</p>
-                  <p className="text-xs text-muted">Debe contener columnas como Name, Platform...</p>
+                  <p className="mb-2 text-sm text-muted">
+                    {t.rich("importLibraryModal.dropzone", {
+                      strong: (chunks) => <span className="font-semibold text-foreground">{chunks}</span>,
+                    })}
+                  </p>
+                  <p className="text-xs text-muted">{t("importLibraryModal.dropzoneHint")}</p>
                 </div>
                 <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
               </label>
@@ -134,8 +140,13 @@ export function ImportLibraryModal() {
             </div>
           ) : (
             <div>
-              <p className="mb-4 text-sm">Se han encontrado <strong>{games.length}</strong> juegos listos para importar. El proceso emparejará automáticamente cada juego con su carátula de IGDB. Esto puede tardar un poco.</p>
-              
+              <p className="mb-4 text-sm">
+                {t.rich("importLibraryModal.gamesFound", {
+                  count: games.length,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </p>
+
               <div className="max-h-[250px] overflow-y-auto mb-4 border border-border rounded-lg bg-surface divide-y divide-border">
                 {games.slice(0, 50).map((g, i) => (
                   <div key={i} className="flex justify-between p-2.5 text-sm">
@@ -145,7 +156,7 @@ export function ImportLibraryModal() {
                 ))}
                 {games.length > 50 && (
                   <div className="p-2.5 text-center text-xs text-muted font-semibold bg-surface-2">
-                    ...y {games.length - 50} juegos más.
+                    {t("importLibraryModal.moreGames", { count: games.length - 50 })}
                   </div>
                 )}
               </div>
@@ -155,7 +166,7 @@ export function ImportLibraryModal() {
               {importing && (
                 <div className="mb-4">
                   <div className="flex justify-between text-xs mb-1 font-bold text-accent">
-                    <span>Importando...</span>
+                    <span>{t("importLibraryModal.importing")}</span>
                     <span>{progress}%</span>
                   </div>
                   <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
@@ -170,7 +181,7 @@ export function ImportLibraryModal() {
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)] disabled:pointer-events-none disabled:opacity-60"
                 style={{ background: "var(--accent-grad)", color: "#061021" }}
               >
-                {importing ? "Importando..." : "Comenzar Importación"}
+                {importing ? t("importLibraryModal.importing") : t("importLibraryModal.startImport")}
               </button>
             </div>
           )}

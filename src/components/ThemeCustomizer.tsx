@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 /**
  * Antes esto era un desplegable entero (modo, acento, estilo, temas) metido
@@ -8,11 +11,12 @@ import Link from "next/link";
  * lib/apariencia.ts) y esto se quedó en lo que siempre debió ser: un atajo.
  */
 export function ThemeCustomizer() {
+  const t = useTranslations("Onboarding");
   return (
     <Link
       href="/ajustes/apariencia"
-      aria-label="Apariencia"
-      title="Apariencia"
+      aria-label={t("themeCustomizer.label")}
+      title={t("themeCustomizer.label")}
       className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground"
       style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
     >
