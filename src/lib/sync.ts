@@ -13,7 +13,7 @@ import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
-import { HORAS_CADUCIDAD } from "@/lib/syncHealth";
+import { horasCaducidadDe } from "@/lib/syncHealth";
 
 /**
  * Trae datos de las plataformas y los guarda.
@@ -85,10 +85,10 @@ const XBL_CONCURRENCY = 2;
  * repetir siempre el mismo trabajo. Con este filtro, el caso normal (ya
  * sincronizado hace poco) no vuelve a tocar la red.
  */
-async function soloDesactualizados(userId: string, gameIds: string[]): Promise<string[]> {
+async function soloDesactualizados(userId: string, gameIds: string[], platform: Platform): Promise<string[]> {
   if (gameIds.length === 0) return [];
 
-  const desde = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000);
+  const desde = new Date(Date.now() - horasCaducidadDe(platform) * 60 * 60 * 1000);
 
   const filas = await db
     .select({ gameId: userGames.gameId, trophiesSyncedAt: userGames.trophiesSyncedAt })
@@ -229,7 +229,7 @@ export async function syncLibrary(
     // el caché de 6h.
     const pendientes = opts.forzarDetalle
       ? recientes.map((g) => g.id)
-      : await soloDesactualizados(userId, recientes.map((g) => g.id));
+      : await soloDesactualizados(userId, recientes.map((g) => g.id), "steam");
 
     await mapLimit(pendientes, STEAM_CONCURRENCY, async (gameId) => {
       await syncGameTrophies(userId, account, gameId);
@@ -242,7 +242,7 @@ export async function syncLibrary(
     const recientes = library.filter((g) => g.lastPlayedAt).slice(0, XBL_DETAIL_LIMIT);
     const pendientes = opts.forzarDetalle
       ? recientes.map((g) => g.id)
-      : await soloDesactualizados(userId, recientes.map((g) => g.id));
+      : await soloDesactualizados(userId, recientes.map((g) => g.id), "xbox");
 
     await mapLimit(pendientes, XBL_CONCURRENCY, async (gameId) => {
       await syncGameTrophies(userId, account, gameId);

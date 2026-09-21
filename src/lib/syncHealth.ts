@@ -21,6 +21,22 @@ import type { Platform } from "@/lib/types";
  * umbral que usa la sincronización automática de la ficha de juego. */
 export const HORAS_CADUCIDAD = 6;
 
+/**
+ * Lo mismo, pero solo para Xbox — bajado a 1h el 21 de septiembre de 2026 a
+ * petición del usuario, que es (todavía) el ÚNICO con Xbox vinculado en toda
+ * la plataforma: con un solo usuario, el riesgo real de agotar el cupo
+ * compartido de OpenXBL (150/hora) es minúsculo, y 6h de caché hacía que un
+ * trofeo recién conseguido tardara horas en aparecer. Si se suman más
+ * usuarios de Xbox, esto habrá que revisarlo — volver a subirlo, o volver a
+ * medir el cupo real gastado por hora.
+ */
+export const HORAS_CADUCIDAD_XBOX = 1;
+
+/** El umbral de caducidad que toca según la plataforma — ver `HORAS_CADUCIDAD_XBOX`. */
+export function horasCaducidadDe(plataforma: string): number {
+  return plataforma === "xbox" ? HORAS_CADUCIDAD_XBOX : HORAS_CADUCIDAD;
+}
+
 export interface SaludPlataforma {
   plataforma: Platform;
   /** Juegos de esa plataforma en la biblioteca. */
@@ -43,13 +59,18 @@ export async function saludSincronizacion(userId: string): Promise<SaludPlatafor
   // tipados de drizzle (`lt`, `gte`...) si funciona un Date, porque esos si
   // saben contra que columna comparan. Comprobado a mano contra la base.
   const desde = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000).toISOString();
+  const desdeXbox = new Date(Date.now() - HORAS_CADUCIDAD_XBOX * 60 * 60 * 1000).toISOString();
 
   const filas = await db
     .select({
       plataforma: PLATAFORMA,
       total: sql<number>`count(*)::int`,
       sinDetalle: sql<number>`count(*) filter (where ${userGames.trophiesSyncedAt} is null)::int`,
-      caducados: sql<number>`count(*) filter (where ${userGames.trophiesSyncedAt} < ${desde})::int`,
+      // Xbox caduca antes que el resto (HORAS_CADUCIDAD_XBOX) — ver el
+      // comentario de esa constante.
+      caducados: sql<number>`count(*) filter (
+        where ${userGames.trophiesSyncedAt} < case when ${PLATAFORMA} = 'xbox' then ${desdeXbox} else ${desde} end
+      )::int`,
     })
     .from(userGames)
     .where(eq(userGames.userId, userId))

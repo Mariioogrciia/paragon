@@ -5,7 +5,7 @@ import { games, platformAccounts, syncRuns, userGames, userTrophies } from "@/db
 import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
 import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
-import { HORAS_CADUCIDAD } from "@/lib/syncHealth";
+import { HORAS_CADUCIDAD, HORAS_CADUCIDAD_XBOX } from "@/lib/syncHealth";
 
 /**
  * Sincronización desatendida.
@@ -192,6 +192,8 @@ export async function GET(request: Request) {
   if (!agotado) {
     // ISO string, no un Date crudo — ver el mismo aviso en syncHealth.ts.
     const caducado = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000).toISOString();
+    // Xbox caduca antes que el resto — ver HORAS_CADUCIDAD_XBOX en syncHealth.ts.
+    const caducadoXbox = new Date(Date.now() - HORAS_CADUCIDAD_XBOX * 60 * 60 * 1000).toISOString();
 
     const sinDetalle = await db
       .select({
@@ -227,7 +229,7 @@ export async function GET(request: Request) {
       // un 500 en cada pasada del cron.
       .where(
         sql`${userGames.trophiesSyncedAt} is null
-          or ${userGames.trophiesSyncedAt} < ${caducado}
+          or ${userGames.trophiesSyncedAt} < (case when ${games.platform} = 'xbox' then ${caducadoXbox} else ${caducado} end)
           or coalesce(${userGames.earnedTotal}, 0) > (
           select count(*) from ${userTrophies}
           where ${userTrophies.gameId} = ${userGames.gameId}
