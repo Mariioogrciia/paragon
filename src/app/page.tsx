@@ -103,16 +103,18 @@ async function Landing() {
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/entrar"
-              className="rounded-xl px-6 py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
+              className="flex flex-col items-center justify-center rounded-xl px-6 py-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
               style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgb(var(--accent-rgb) / 0.3)" }}
             >
-              {t("ctaEmpezar")}
+              <span className="text-[0.9375rem] font-bold text-background">{t("ctaEmpezar")}</span>
+              <span className="mt-0.5 text-[0.625rem] font-bold tracking-wide text-background opacity-80">{t("ctaEmpezarSubtext")}</span>
             </Link>
             <Link
               href="/ejemplo"
-              className="rounded-xl px-[22px] py-4 text-[0.9375rem] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+              className="flex items-center gap-2 rounded-xl px-[22px] py-4 text-[0.9375rem] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#dbe5f2" }}
             >
+              <span aria-hidden="true" className="text-base opacity-70">👁️</span>
               {t("ctaVerEjemplo")}
             </Link>
           </div>
@@ -130,7 +132,10 @@ async function Landing() {
             </div>
           )}
 
-          <p className="mt-[18px] text-[0.8125rem] text-muted">
+          <p className="mt-[18px] flex items-center gap-2 text-[0.8125rem] text-muted">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-good/15 text-good">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            </span>
             {t("soloIdPublico")}
           </p>
         </div>
@@ -204,7 +209,13 @@ async function Landing() {
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString("es-ES") : "4.312"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statTrofeosContados")}</p>
+          <p className="mt-2.5 flex items-center gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-good opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-good"></span>
+            </span>
+            {t("statTrofeosContados")}
+          </p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString("es-ES") : "214"}</p>
