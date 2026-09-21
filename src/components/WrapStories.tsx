@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
@@ -10,15 +11,17 @@ import type { MesConTrofeos, Rachas } from "@/lib/history";
 import type { PercentilAnio } from "@/lib/wrapPercentile";
 import type { JuegoDestacado } from "@/components/ParagonWrap";
 
-const MESES_CORTOS = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-];
+const MESES_INDICES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+] as const;
 
-function nombreMes(clave: string): string {
+function claveMes(clave: string): string {
   const [, mes] = clave.split("-");
-  return MESES_CORTOS[Number(mes) - 1] ?? mes;
+  return MESES_INDICES[Number(mes) - 1] ?? mes;
 }
+
+type TFunction = ReturnType<typeof useTranslations>;
 
 /** 6s por diapositiva: suficiente para leer un número grande y una frase corta. */
 const DURACION_MS = 6000;
@@ -57,7 +60,8 @@ interface Slide {
  * de `ScreenshotStrip.tsx`.
  */
 export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose: () => void }) {
-  const slides = useMemo<Slide[]>(() => buildSlides(data), [data]);
+  const t = useTranslations("Perfil");
+  const slides = useMemo<Slide[]>(() => buildSlides(data, t), [data, t]);
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const pausedRef = useRef(false);
@@ -143,7 +147,7 @@ export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose:
 
         <button
           type="button"
-          aria-label="Cerrar"
+          aria-label={t("WrapStories.cerrar")}
           onClick={onClose}
           className="absolute right-3 top-8 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/50"
         >
@@ -151,8 +155,8 @@ export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose:
         </button>
 
         {/* Zonas de toque, debajo del contenido interactivo (compartir/enlaces) */}
-        <button type="button" aria-label="Anterior" onClick={prev} className="absolute inset-y-0 left-0 z-10 w-[35%]" />
-        <button type="button" aria-label="Siguiente" onClick={next} className="absolute inset-y-0 right-0 z-10 w-[65%]" />
+        <button type="button" aria-label={t("WrapStories.anterior")} onClick={prev} className="absolute inset-y-0 left-0 z-10 w-[35%]" />
+        <button type="button" aria-label={t("WrapStories.siguiente")} onClick={next} className="absolute inset-y-0 right-0 z-10 w-[65%]" />
 
         <div className="relative z-10 flex h-full flex-col justify-center p-8">{slide.content}</div>
       </div>
@@ -160,7 +164,7 @@ export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose:
   );
 }
 
-function buildSlides(data: WrapStoriesData): Slide[] {
+function buildSlides(data: WrapStoriesData, t: TFunction): Slide[] {
   const { playerName, topGenre, topGame, esteAnio, juegosEsteAnio, mejorMes, rachas, percentil, handle } = data;
 
   // Sin ningún trofeo con fecha este año no hay historia que contar todavía
@@ -173,9 +177,9 @@ function buildSlides(data: WrapStoriesData): Slide[] {
         content: (
           <div className="text-center text-white">
             <p className="text-5xl">✨</p>
-            <h2 className="font-heading mt-5 text-2xl font-bold">Todavía no hay Wrap para {playerName}</h2>
+            <h2 className="font-heading mt-5 text-2xl font-bold">{t("WrapStories.vacioTitulo", { playerName })}</h2>
             <p className="mt-3 text-sm text-white/70">
-              En cuanto tengas trofeos con fecha registrada este año, aparecen aquí.
+              {t("WrapStories.vacioTexto")}
             </p>
           </div>
         ),
@@ -189,12 +193,14 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       background: { background: "linear-gradient(150deg, #5a3410, #3a1f08 70%, #241305)" },
       content: (
         <div className="text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#fcd34d]">Paragon Wrap</p>
-          <h2 className="font-heading mt-3 text-3xl font-bold leading-tight">Así fue tu año,<br />{playerName}</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#fcd34d]">{t("WrapStories.marca")}</p>
+          <h2 className="font-heading mt-3 text-3xl font-bold leading-tight">
+            {t.rich("WrapStories.portadaTitulo", { playerName, br: () => <br /> })}
+          </h2>
           <div className="mt-8 flex items-end gap-3">
             <p className="font-heading text-7xl font-bold leading-none">{esteAnio}</p>
             <p className="pb-2 text-sm font-semibold text-white/80">
-              trofeos<br />conseguidos
+              {t.rich("WrapStories.trofeosConseguidos", { br: () => <br /> })}
             </p>
           </div>
           <div className="mt-6 opacity-70"><TrophyIcon grade="gold" size={40} /></div>
@@ -206,11 +212,11 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       background: { background: "linear-gradient(150deg, #3b1d6e, #1c1040 70%, #120a26)" },
       content: (
         <div className="text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#c4b5fd]">Género más jugado</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#c4b5fd]">{t("WrapStories.generoMasJugado")}</p>
           <p className="mt-6 text-6xl">🎮</p>
           <h2 className="font-heading mt-6 text-4xl font-bold">{topGenre.name}</h2>
           <p className="mt-3 text-sm text-white/70">
-            {topGenre.count === 1 ? "1 título de este género" : `${topGenre.count} títulos de este género`}
+            {t("WrapStories.titulosDeGenero", { count: topGenre.count })}
           </p>
         </div>
       ),
@@ -226,12 +232,12 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       background: { background: `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)), ${coverGradient(topGame.game.id)}` },
       content: (
         <div className="text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#a8ccff]">Juego más exprimido</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#a8ccff]">{t("WrapStories.juegoMasExprimido")}</p>
           <h2 className="font-heading mt-6 text-4xl font-bold leading-tight">{topGame.game.title}</h2>
           <p className="mt-3 text-sm font-medium text-white/80">
             {topGame.horasTotal > 0
-              ? `${topGame.horasTotal.toFixed(1)} horas jugadas`
-              : `${topGame.game.earnedTotal} trofeos conseguidos`}
+              ? t("WrapStories.horasJugadas", { horas: topGame.horasTotal.toFixed(1) })
+              : t("WrapStories.trofeosConseguidosCount", { n: topGame.game.earnedTotal })}
           </p>
         </div>
       ),
@@ -244,11 +250,11 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       background: { background: "linear-gradient(150deg, #14202c, #0d131c)" },
       content: (
         <div className="text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#9fd4ec]">Tu mejor mes</p>
-          <h2 className="font-heading mt-6 text-4xl font-bold">{nombreMes(mejorMes.mes)}</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#9fd4ec]">{t("WrapStories.tuMejorMes")}</p>
+          <h2 className="font-heading mt-6 text-4xl font-bold">{t(`WrapStories.meses.${claveMes(mejorMes.mes)}`)}</h2>
           <div className="mt-4 flex items-end gap-2">
             <p className="font-heading text-6xl font-bold text-platinum">{mejorMes.total}</p>
-            <p className="pb-1 text-sm text-white/70">trofeos ese mes</p>
+            <p className="pb-1 text-sm text-white/70">{t("WrapStories.trofeosEseMes")}</p>
           </div>
         </div>
       ),
@@ -261,14 +267,14 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       background: { background: "linear-gradient(150deg, #0f3d2e, #0a2620 70%, #061715)" },
       content: (
         <div className="text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6ee7b7]">Racha</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6ee7b7]">{t("WrapStories.racha")}</p>
           <p className="mt-6 text-6xl">🔥</p>
           <div className="mt-4 flex items-end gap-2">
             <p className="font-heading text-6xl font-bold">{rachas.mejor}</p>
-            <p className="pb-1 text-sm text-white/70">{rachas.mejor === 1 ? "día seguido, tu mejor racha" : "días seguidos, tu mejor racha"}</p>
+            <p className="pb-1 text-sm text-white/70">{t("WrapStories.diaSeguido", { count: rachas.mejor })}</p>
           </div>
           <p className="mt-3 text-sm text-white/70">
-            {rachas.diasActivos} {rachas.diasActivos === 1 ? "día distinto" : "días distintos"} cazando trofeos en total
+            {t("WrapStories.diaDistinto", { count: rachas.diasActivos })}
           </p>
         </div>
       ),
@@ -281,11 +287,10 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       background: { background: "linear-gradient(150deg, #2c2438, #1a1522 70%, #100d16)" },
       content: (
         <div className="text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#e2b53e]">Cómo te comparas</p>
-          <h2 className="font-heading mt-6 text-5xl font-bold">Top {percentil.percentil}%</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#e2b53e]">{t("WrapStories.comoTeComparas")}</p>
+          <h2 className="font-heading mt-6 text-5xl font-bold">{t("WrapStories.topPercentil", { percentil: percentil.percentil })}</h2>
           <p className="mt-4 text-sm text-white/70">
-            De {percentil.totalUsuarios} personas con trofeos este año en Paragon, menos de {percentil.percentil}%
-            han conseguido más que tú.
+            {t("WrapStories.percentilTexto", { total: percentil.totalUsuarios, percentil: percentil.percentil })}
           </p>
         </div>
       ),
@@ -299,9 +304,9 @@ function buildSlides(data: WrapStoriesData): Slide[] {
       <div className="text-white">
         <p className="text-5xl">🏆</p>
         <h2 className="font-heading mt-5 text-2xl font-bold">
-          {esteAnio} trofeos repartidos en {juegosEsteAnio} {juegosEsteAnio === 1 ? "juego" : "juegos"}
+          {t("WrapStories.cierreTitulo", { esteAnio, count: juegosEsteAnio })}
         </h2>
-        <p className="mt-3 text-sm text-white/70">Ese fue tu año en Paragon.</p>
+        <p className="mt-3 text-sm text-white/70">{t("WrapStories.cierreSubtitulo")}</p>
         <div className="mt-8 flex flex-col gap-2.5">
           {handle && <CompartirImagenWrap handle={handle} />}
           <Link
@@ -309,7 +314,7 @@ function buildSlides(data: WrapStoriesData): Slide[] {
             className="rounded-xl px-4 py-2.5 text-center text-[0.8125rem] font-bold transition-colors hover:bg-white/10"
             style={{ border: "1px solid rgba(255,255,255,0.25)", color: "white" }}
           >
-            Ver mes a mes →
+            {t("WrapStories.verMesAMes")}
           </Link>
         </div>
       </div>

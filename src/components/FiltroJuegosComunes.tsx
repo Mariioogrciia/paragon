@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { PLATFORM_LABEL, type Platform } from "@/lib/types";
 
 /**
@@ -12,13 +13,15 @@ import { PLATFORM_LABEL, type Platform } from "@/lib/types";
 export function FiltroJuegosComunes<T extends { platform: Platform; title: string }>({
   juegos,
   children,
-  vacioMensaje = "Ningún juego en común todavía.",
+  vacioMensaje,
 }: {
   juegos: T[];
   children: (visibles: T[]) => React.ReactNode;
   /** Cuando `juegos` ya viene vacío — distinto de "los filtros no dejan nada". */
   vacioMensaje?: string;
 }) {
+  const t = useTranslations("Perfil");
+  const mensajeVacio = vacioMensaje ?? t("FiltroJuegosComunes.ningunJuegoComun");
   const [busqueda, setBusqueda] = useState("");
   const [plataforma, setPlataforma] = useState<Platform | "todas">("todas");
 
@@ -48,7 +51,7 @@ export function FiltroJuegosComunes<T extends { platform: Platform; title: strin
             <input
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por título…"
+              placeholder={t("FiltroJuegosComunes.buscarPlaceholder")}
               className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-foreground outline-none placeholder:text-muted"
             />
           </div>
@@ -60,7 +63,7 @@ export function FiltroJuegosComunes<T extends { platform: Platform; title: strin
                 className="rounded-[9px] px-3 py-1.5 text-xs font-semibold transition-colors hover:text-foreground"
                 style={plataforma === "todas" ? { background: "var(--accent-grad)", color: "#061021" } : { color: "var(--muted)" }}
               >
-                Todas
+                {t("FiltroJuegosComunes.todas")}
               </button>
               {plataformasPresentes.map((p) => (
                 <button
@@ -76,14 +79,16 @@ export function FiltroJuegosComunes<T extends { platform: Platform; title: strin
           )}
 
           {(busqueda || plataforma !== "todas") && (
-            <span className="text-[0.8125rem] text-muted">{visibles.length} de {juegos.length}</span>
+            <span className="text-[0.8125rem] text-muted">
+              {t("FiltroJuegosComunes.contador", { visibles: visibles.length, total: juegos.length })}
+            </span>
           )}
         </div>
       )}
 
       {visibles.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          {juegos.length === 0 ? vacioMensaje : "Ningún juego con esos filtros."}
+          {juegos.length === 0 ? mensajeVacio : t("FiltroJuegosComunes.ningunJuego")}
         </p>
       ) : (
         children(visibles)

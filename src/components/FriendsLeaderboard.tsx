@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import type { StatsAmigo } from "@/lib/profileStats";
 
@@ -8,11 +9,13 @@ import type { StatsAmigo } from "@/lib/profileStats";
  * para el detalle real (gráficos, mapa de actividad); esto es el resumen,
  * no la duplica.
  */
-export function FriendsLeaderboard({ personas, propioUserId }: { personas: StatsAmigo[]; propioUserId: string }) {
+export async function FriendsLeaderboard({ personas, propioUserId }: { personas: StatsAmigo[]; propioUserId: string }) {
+  const t = await getTranslations("Perfil");
+
   if (personas.length <= 1) {
     return (
       <div className="rounded-2xl p-5 text-sm text-muted" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-        Todavía no tienes amigos añadidos — en cuanto tengas alguno, aquí sale cómo os comparáis.
+        {t("FriendsLeaderboard.sinAmigos")}
       </div>
     );
   }
@@ -21,9 +24,9 @@ export function FriendsLeaderboard({ personas, propioUserId }: { personas: Stats
     <div className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
       <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-border px-4 py-2 text-[0.625rem] font-bold uppercase tracking-widest text-muted">
         <span></span>
-        <span className="text-right">Horas</span>
-        <span className="text-right">Trofeos</span>
-        <span className="text-right">Platinos</span>
+        <span className="text-right">{t("FriendsLeaderboard.horas")}</span>
+        <span className="text-right">{t("FriendsLeaderboard.trofeos")}</span>
+        <span className="text-right">{t("FriendsLeaderboard.platinos")}</span>
       </div>
       {personas.map((p, i) => {
         const esYo = p.userId === propioUserId;
@@ -37,8 +40,8 @@ export function FriendsLeaderboard({ personas, propioUserId }: { personas: Stats
               <span className="w-4 shrink-0 text-center text-xs font-bold text-muted">{i + 1}</span>
               <Avatar src={p.avatarUrl} name={p.displayName ?? p.handle ?? "?"} size={28} />
               <span className="min-w-0 truncate text-sm font-semibold">
-                {p.displayName ?? (p.handle ? `@${p.handle}` : "Alguien")}
-                {esYo && <span className="ml-1.5 text-xs font-normal text-accent">(tú)</span>}
+                {p.displayName ?? (p.handle ? `@${p.handle}` : t("FriendsLeaderboard.alguien"))}
+                {esYo && <span className="ml-1.5 text-xs font-normal text-accent">({t("FriendsLeaderboard.tu")})</span>}
               </span>
             </span>
             <span className="text-right text-sm font-bold">{p.horas.toLocaleString("es-ES")}</span>

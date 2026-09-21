@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import { Badges } from "@/components/Badges";
 import { DescargarPdfButton } from "@/components/DescargarPdfButton";
@@ -10,7 +11,8 @@ import { summarise } from "@/lib/stats";
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  return { title: `Hoja de servicios de @${handle} · Paragon` };
+  const t = await getTranslations("Perfil");
+  return { title: t("CvPage.meta", { handle }) };
 }
 
 /**
@@ -27,6 +29,7 @@ export default async function HojaDeServiciosPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
+  const t = await getTranslations("Perfil");
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -75,19 +78,19 @@ export default async function HojaDeServiciosPage({
           <p className="mt-2 text-sm text-muted print:text-black/60">@{handle}</p>
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-heading text-2xl font-bold">Nivel {nivel.level}</p>
+          <p className="font-heading text-2xl font-bold">{t("CvPage.nivel", { nivel: nivel.level })}</p>
           <p className="text-xs text-muted print:text-black/60">
-            {nivel.xp.toLocaleString("es-ES")} XP Paragon
+            {t("CvPage.xpParagon", { xp: nivel.xp.toLocaleString("es-ES") })}
           </p>
         </div>
       </header>
 
       <section className="mb-9 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { valor: stats.platinos, etiqueta: "Platinos" },
-          { valor: stats.trofeos, etiqueta: "Trofeos" },
-          { valor: stats.juegos, etiqueta: "Juegos" },
-          { valor: horas > 0 ? `${horas.toLocaleString("es-ES")} h` : "—", etiqueta: "Jugadas" },
+          { valor: stats.platinos, etiqueta: t("CvPage.statPlatinos") },
+          { valor: stats.trofeos, etiqueta: t("CvPage.statTrofeos") },
+          { valor: stats.juegos, etiqueta: t("CvPage.statJuegos") },
+          { valor: horas > 0 ? t("CvPage.horas", { horas: horas.toLocaleString("es-ES") }) : "—", etiqueta: t("CvPage.statJugadas") },
         ].map((item) => (
           <div
             key={item.etiqueta}
@@ -105,7 +108,7 @@ export default async function HojaDeServiciosPage({
       {badges.length > 0 && (
         <section className="mb-9">
           <h2 className="mb-2 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted print:text-black/60">
-            Insignias
+            {t("CvPage.insignias")}
           </h2>
           <Badges earnedBadges={badges} />
         </section>
@@ -114,7 +117,7 @@ export default async function HojaDeServiciosPage({
       {destacados.length > 0 && (
         <section>
           <h2 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted print:text-black/60">
-            Juegos destacados
+            {t("CvPage.destacados")}
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {destacados.map((g) => (
@@ -133,8 +136,8 @@ export default async function HojaDeServiciosPage({
                   </p>
                   <p className="text-[0.6875rem] text-muted print:text-black/60">
                     {g.playtimeMinutes
-                      ? `${(g.playtimeMinutes / 60).toFixed(0)} h`
-                      : `${g.earnedTotal} trofeos`}
+                      ? t("CvPage.horas", { horas: (g.playtimeMinutes / 60).toFixed(0) })
+                      : t("CvPage.trofeosCount", { n: g.earnedTotal })}
                   </p>
                 </div>
               </div>
@@ -144,7 +147,7 @@ export default async function HojaDeServiciosPage({
       )}
 
       <p className="mt-12 text-center text-[0.6875rem] text-muted print:text-black/50">
-        Generado por Paragon · paragon.app/u/{handle}
+        {t("CvPage.footer", { handle })}
       </p>
     </div>
   );

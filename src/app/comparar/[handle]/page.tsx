@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import {
@@ -12,10 +13,10 @@ import { sharedTrophyLeads } from "@/lib/comparison";
 import { ComparePairGames } from "@/components/ComparePairGames";
 import { BackButton } from "@/components/BackButton";
 
-const OUTCOME = {
-  ganas: { label: "Ganas", bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
-  pierdes: { label: "Pierdes", bg: "rgba(255, 107, 107, 0.12)", fg: "#ff8f8f", border: "rgba(255, 107, 107, 0.28)" },
-  empate: { label: "Empate", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
+const OUTCOME_STYLE = {
+  ganas: { bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
+  pierdes: { bg: "rgba(255, 107, 107, 0.12)", fg: "#ff8f8f", border: "rgba(255, 107, 107, 0.28)" },
+  empate: { bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
 };
 
 export default async function CompararPage({
@@ -24,6 +25,7 @@ export default async function CompararPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
+  const t = await getTranslations("Perfil");
 
   const session = await auth();
   if (!session?.user) redirect("/entrar");
@@ -39,8 +41,7 @@ export default async function CompararPage({
   if (suyo.accounts.length === 0) {
     return (
       <p className="py-16 text-center text-sm text-muted">
-        @{handle} todavía no ha vinculado ninguna cuenta de juego, así que no hay
-        nada que comparar.
+        {t("CompararPage.sinCuenta", { handle })}
       </p>
     );
   }
@@ -69,16 +70,16 @@ export default async function CompararPage({
   const platinoDif = statsA.platinos - statsB.platinos;
   const tagA =
     platinoDif === 0
-      ? { ...OUTCOME.empate, label: "Empate" }
+      ? { ...OUTCOME_STYLE.empate, label: t("CompararPage.empate") }
       : platinoDif > 0
-        ? { ...OUTCOME.ganas, label: "Vas ganando" }
-        : { ...OUTCOME.empate, label: `A ${-platinoDif} platinos` };
+        ? { ...OUTCOME_STYLE.ganas, label: t("CompararPage.vasGanando") }
+        : { ...OUTCOME_STYLE.empate, label: t("CompararPage.aPlatinos", { n: -platinoDif }) };
   const tagB =
     platinoDif === 0
-      ? { ...OUTCOME.empate, label: "Empate" }
+      ? { ...OUTCOME_STYLE.empate, label: t("CompararPage.empate") }
       : platinoDif > 0
-        ? { ...OUTCOME.empate, label: `A ${platinoDif} platinos` }
-        : { ...OUTCOME.ganas, label: "Va ganando" };
+        ? { ...OUTCOME_STYLE.empate, label: t("CompararPage.aPlatinos", { n: platinoDif }) }
+        : { ...OUTCOME_STYLE.ganas, label: t("CompararPage.vaGanando") };
 
   const jugadores = [
     { player: libA.player, stats: statsA, tag: tagA, leader: platinoDif >= 0 },
@@ -92,8 +93,7 @@ export default async function CompararPage({
         {libA.player.name} <span className="text-accent">vs</span> {libB.player.name}
       </h1>
       <p className="mt-3 max-w-[620px] text-[0.9375rem] leading-relaxed text-muted">
-        Solo los juegos que tenéis los dos: comparar bibliotecas enteras no
-        dice nada si uno lleva jugando el doble de años.
+        {t("CompararPage.subtitulo")}
       </p>
 
       <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -128,15 +128,15 @@ export default async function CompararPage({
             <div className="mt-5 grid grid-cols-3 gap-3.5">
               <div>
                 <p className="font-heading text-4xl font-bold leading-none text-platinum">{stats.platinos}</p>
-                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">Platinos</p>
+                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">{t("CompararPage.statPlatinos")}</p>
               </div>
               <div>
                 <p className="font-heading text-4xl font-bold leading-none">{stats.trofeos.toLocaleString("es-ES")}</p>
-                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">Trofeos</p>
+                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">{t("CompararPage.statTrofeos")}</p>
               </div>
               <div>
                 <p className="font-heading text-4xl font-bold leading-none">{stats.completadoMedio}%</p>
-                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">Medio</p>
+                <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">{t("CompararPage.statMedio")}</p>
               </div>
             </div>
           </div>
@@ -147,20 +147,20 @@ export default async function CompararPage({
         {[{ name: libA.player.name, level: nivelA, color: "var(--accent-text)" }, { name: libB.player.name, level: nivelB, color: "var(--gold)" }].map((player) => (
           <div key={player.name} className="rounded-[18px] border border-border bg-surface p-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-bold">Nivel Paragon de {player.name}</h2>
-              <span className="font-heading text-2xl font-bold" style={{ color: player.color }}>NV {player.level.level}</span>
+              <h2 className="text-sm font-bold">{t("CompararPage.nivelParagonDe", { nombre: player.name })}</h2>
+              <span className="font-heading text-2xl font-bold" style={{ color: player.color }}>{t("CompararPage.nivelAbreviado", { nivel: player.level.level })}</span>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full" style={{ width: `${player.level.progreso}%`, background: player.color }} /></div>
-            <p className="mt-2 text-xs text-muted">{player.level.xp.toLocaleString("es-ES")} XP · {player.level.restante.toLocaleString("es-ES")} para el nivel {player.level.siguienteNivel}</p>
+            <p className="mt-2 text-xs text-muted">{t("CompararPage.xpParaNivel", { xp: player.level.xp.toLocaleString("es-ES"), restante: player.level.restante.toLocaleString("es-ES"), siguiente: player.level.siguienteNivel })}</p>
           </div>
         ))}
       </section>
 
       <section className="mt-9">
         <div className="mb-4 flex items-baseline gap-3.5">
-          <h2 className="font-heading text-2xl font-bold">Juegos en común</h2>
+          <h2 className="font-heading text-2xl font-bold">{t("CompararPage.juegosEnComun")}</h2>
           <span className="text-[0.8125rem] text-muted">
-            {comunes.length} títulos{comunes.length > 0 && ` · ganas ${ganados} de ${comunes.length}`}
+            {t("CompararPage.titulos", { n: comunes.length })}{comunes.length > 0 && t("CompararPage.ganasDeCuantos", { ganados, total: comunes.length })}
           </span>
         </div>
 
@@ -173,14 +173,14 @@ export default async function CompararPage({
       {lideres.length > 0 && (
         <section className="mt-9">
           <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
-            <h2 className="font-heading text-2xl font-bold">Quién llegó antes</h2>
-            <span className="text-[0.8125rem] text-muted">Trofeos que ambos tenéis registrados</span>
+            <h2 className="font-heading text-2xl font-bold">{t("CompararPage.quienLlegoAntes")}</h2>
+            <span className="text-[0.8125rem] text-muted">{t("CompararPage.trofeosAmbos")}</span>
           </div>
           <div className="grid gap-2">
             {lideres.map((trofeo) => (
               <div key={`${trofeo.gameId}:${trofeo.trophyId}`} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-3">
                 <div className="min-w-0"><p className="truncate text-sm font-semibold">{trofeo.trophyName}</p><p className="text-xs text-muted">{trofeo.gameTitle}</p></div>
-                <span className="shrink-0 text-xs font-bold text-accent">{trofeo.firstUserId === mio.userId ? libA.player.name : libB.player.name} llegó antes</span>
+                <span className="shrink-0 text-xs font-bold text-accent">{t("CompararPage.llegoAntes", { nombre: trofeo.firstUserId === mio.userId ? libA.player.name : libB.player.name })}</span>
               </div>
             ))}
           </div>

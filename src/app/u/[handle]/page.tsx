@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { StatTile } from "@/components/StatTile";
@@ -56,8 +57,9 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
+  const t = await getTranslations("Perfil");
   const profile = await getProfileByHandle(handle);
-  if (!profile) return { title: "Perfil no encontrado · Paragon" };
+  if (!profile) return { title: t("PerfilPage.metaNoEncontrado") };
 
   const { games } = await getLibrary(profile);
   const stats = summarise(games);
@@ -65,8 +67,12 @@ export async function generateMetadata({
   const titulo = `${nombre} (@${handle}) · Paragon`;
   const descripcion =
     games.length === 0
-      ? `El perfil de trofeos de ${nombre} en Paragon.`
-      : `${stats.trofeos.toLocaleString("es-ES")} trofeos, ${stats.platinos.toLocaleString("es-ES")} platinos y ${stats.juegos.toLocaleString("es-ES")} juegos en Paragon.`;
+      ? t("PerfilPage.metaDescripcionVacia", { nombre })
+      : t("PerfilPage.metaDescripcionStats", {
+          trofeos: stats.trofeos.toLocaleString("es-ES"),
+          platinos: stats.platinos.toLocaleString("es-ES"),
+          juegos: stats.juegos.toLocaleString("es-ES"),
+        });
 
   return {
     title: titulo,
@@ -82,6 +88,7 @@ export default async function PerfilPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
+  const t = await getTranslations("Perfil");
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -100,8 +107,8 @@ export default async function PerfilPage({
         <h1 className="text-xl font-medium">@{handle}</h1>
         <p className="mt-2 text-sm text-muted">
           {esMio
-            ? "Todavía no has vinculado ninguna cuenta ni añadido ningún juego."
-            : "Todavía no ha vinculado ninguna cuenta de juego."}
+            ? t("PerfilPage.sinCuentaPropio")
+            : t("PerfilPage.sinCuentaAjeno")}
         </p>
         {esMio && (
           <div className="flex justify-center mt-4 gap-3">
@@ -238,13 +245,13 @@ export default async function PerfilPage({
                 <span
                   className="mb-1 inline-flex items-center gap-1.5 self-end rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
                   style={{ background: "rgba(159, 212, 236, 0.14)", border: "1px solid rgba(159, 212, 236, 0.35)", color: "#9fd4ec" }}
-                  title="Esta cuenta es de quien hace Paragon"
+                  title={t("PerfilPage.desarrolladorTooltip")}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="16 18 22 12 16 6" />
                     <polyline points="8 6 2 12 8 18" />
                   </svg>
-                  Desarrollador
+                  {t("PerfilPage.desarrolladorBadge")}
                 </span>
               )}
             </div>
@@ -266,7 +273,7 @@ export default async function PerfilPage({
             className={`${esMio ? "ml-auto" : ""} rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold`}
             style={{ border: "1px solid var(--border)", color: "var(--foreground)" }}
           >
-            Hoja de servicios
+            {t("PerfilPage.hojaDeServicios")}
           </Link>
 
           {!esMio && (
@@ -275,7 +282,7 @@ export default async function PerfilPage({
               className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background"
               style={{ background: "var(--accent-grad)" }}
             >
-              Comparar conmigo
+              {t("PerfilPage.compararConmigo")}
             </Link>
           )}
         </div>
@@ -306,13 +313,13 @@ export default async function PerfilPage({
             stats: (
               <div key="stats">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <StatTile value={stats.platinos} label="Platinos" accent="var(--platinum)" />
-                  <StatTile value={stats.trofeos} label="Trofeos" />
-                  <StatTile value={stats.juegos} label="Juegos" />
-                  <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
+                  <StatTile value={stats.platinos} label={t("PerfilPage.statPlatinos")} accent="var(--platinum)" />
+                  <StatTile value={stats.trofeos} label={t("PerfilPage.statTrofeos")} />
+                  <StatTile value={stats.juegos} label={t("PerfilPage.statJuegos")} />
+                  <StatTile value={`${stats.completadoMedio}%`} label={t("PerfilPage.statCompletadoMedio")} />
                 </div>
                 <Link href={`/u/${handle}/estadisticas`} className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-accent hover:underline">
-                  Ver estadísticas completas →
+                  {t("PerfilPage.verEstadisticas")}
                 </Link>
               </div>
             ),
@@ -351,7 +358,7 @@ export default async function PerfilPage({
             favoritos: ((profile.favorites?.length ?? 0) > 0 || esMio) && (
               <section key="favoritos" className="mt-8 mb-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-heading text-xl font-bold uppercase tracking-wide text-muted">Juegos Favoritos</h2>
+                  <h2 className="font-heading text-xl font-bold uppercase tracking-wide text-muted">{t("PerfilPage.favoritosTitulo")}</h2>
                   {esMio && <FavoritePicker allGames={games} currentFavorites={profile.favorites ?? []} />}
                 </div>
 
@@ -386,7 +393,7 @@ export default async function PerfilPage({
                   </div>
                 ) : (
                   <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
-                    Aún no has fijado tus juegos favoritos.
+                    {t("PerfilPage.favoritosVacio")}
                   </div>
                 )}
               </section>

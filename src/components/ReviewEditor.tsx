@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { submitExpressReviewAction } from "@/app/actions";
 import { format } from "date-fns";
 import { Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Stars } from "@/components/Stars";
 
 /**
@@ -13,6 +14,7 @@ import { Stars } from "@/components/Stars";
  * "Publicar", no antes.
  */
 function SelectorEstrellas({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const t = useTranslations("Perfil");
   const [hover, setHover] = useState(0);
 
   return (
@@ -24,7 +26,7 @@ function SelectorEstrellas({ value, onChange }: { value: number; onChange: (v: n
           onClick={() => onChange(n === value ? 0 : n)}
           onMouseEnter={() => setHover(n)}
           className="transition-transform hover:scale-110 active:scale-95 focus:outline-none"
-          aria-label={`Puntuar con ${n} de 5 estrellas`}
+          aria-label={t("ReviewEditor.ratingAriaLabel", { n })}
         >
           <svg
             width="26"
@@ -53,6 +55,7 @@ export function ReviewEditor({
   initialReview?: string | null; 
   initialRating?: number | null;
 }) {
+  const t = useTranslations("Perfil");
   const [isEditing, setIsEditing] = useState(false);
   const [rating, setRating] = useState(initialRating ?? 0);
   const [review, setReview] = useState(initialReview || "");
@@ -71,7 +74,7 @@ export function ReviewEditor({
         onClick={() => setIsEditing(true)}
         className="w-full py-4 text-sm font-semibold border-2 border-dashed rounded-xl border-border hover:border-[rgb(var(--accent-rgb))] hover:text-[rgb(var(--accent-rgb))] text-muted transition-colors"
       >
-        + Escribir reseña express y dar nota
+        {t("ReviewEditor.writeReviewCta")}
       </button>
     );
   }
@@ -83,10 +86,10 @@ export function ReviewEditor({
           onClick={() => setIsEditing(true)}
           className="absolute top-4 right-4 text-xs font-semibold text-muted opacity-0 group-hover:opacity-100 transition-opacity hover:text-white"
         >
-          Editar
+          {t("ReviewEditor.edit")}
         </button>
         <div className="flex gap-2 mb-3 items-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Tu Reseña</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">{t("ReviewEditor.yourReviewLabel")}</span>
           {initialRating ? <Stars value={initialRating} /> : null}
         </div>
         <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap italic">
@@ -98,19 +101,19 @@ export function ReviewEditor({
 
   return (
     <div className="p-5 border shadow-lg rounded-xl bg-surface border-[rgb(var(--accent-rgb)/0.3)]">
-      <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña Express</h3>
-      
+      <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">{t("ReviewEditor.title")}</h3>
+
       <div className="mb-4">
-        <label className="text-sm font-bold block mb-2">Tu nota</label>
+        <label className="text-sm font-bold block mb-2">{t("ReviewEditor.yourRatingLabel")}</label>
         <SelectorEstrellas value={rating} onChange={setRating} />
       </div>
 
-      <label className="text-sm font-bold block mb-2">Comentario breve</label>
+      <label className="text-sm font-bold block mb-2">{t("ReviewEditor.commentLabel")}</label>
       <textarea
         value={review}
         onChange={(e) => setReview(e.target.value)}
         maxLength={250}
-        placeholder="¿Qué te pareció el juego?"
+        placeholder={t("ReviewEditor.commentPlaceholder")}
         className="w-full h-24 p-3 text-sm bg-background border border-border rounded-lg resize-none focus:outline-none focus:border-[rgb(var(--accent-rgb))] transition-all"
       />
       <div className="text-right text-xs text-muted mt-1 mb-4">
@@ -128,14 +131,14 @@ export function ReviewEditor({
             className="px-4 py-2 text-sm font-semibold text-muted hover:text-white"
             disabled={isSaving}
           >
-            Cancelar
+            {t("ReviewEditor.cancel")}
           </button>
-          <button 
-            onClick={handleSave} 
+          <button
+            onClick={handleSave}
             disabled={isSaving || (rating === 0 && !review.trim())}
             className="px-4 py-2 text-sm font-bold rounded-lg bg-[rgb(var(--accent-rgb))] text-black shadow-md disabled:opacity-50 transition-all hover:bg-[rgb(var(--accent-rgb)/0.8)]"
           >
-            {isSaving ? "Guardando..." : "Publicar"}
+            {isSaving ? t("ReviewEditor.saving") : t("ReviewEditor.publish")}
           </button>
         </div>
       </div>

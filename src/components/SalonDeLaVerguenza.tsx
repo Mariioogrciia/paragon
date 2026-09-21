@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { JuegoSinEmpezar } from "@/lib/backlog";
 
 const CLAVE = "platinos:jugar-a-ciegas";
@@ -41,6 +42,7 @@ function formatoRestante(ms: number): string {
 export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
   const [prueba, setPrueba] = useState<Prueba | null>(null);
   const [ahora, setAhora] = useState(() => Date.now());
+  const t = useTranslations("Perfil");
 
   useEffect(() => {
     setPrueba(leerPrueba());
@@ -74,7 +76,7 @@ export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
   return (
     <div className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
       <p className="mb-4 text-sm text-muted">
-        {juegos.length} {juegos.length === 1 ? "juego" : "juegos"} esperando.
+        {t("SalonDeLaVerguenza.pendientes", { count: juegos.length })}
       </p>
 
       {pruebaActiva ? (
@@ -83,18 +85,18 @@ export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
             <img src={juegoElegido!.iconUrl} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted">Prueba de 2 horas</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-muted">{t("SalonDeLaVerguenza.pruebaDeDosHoras")}</p>
             <Link href={`/juego/${juegoElegido!.gameId}`} className="block truncate text-base font-bold hover:underline" title={juegoElegido!.titulo}>
               {juegoElegido!.titulo}
             </Link>
-            <p className="text-xs text-muted">Quedan {formatoRestante(restanteMs)} para decidir si sigue o vuelve al fondo del montón.</p>
+            <p className="text-xs text-muted">{t("SalonDeLaVerguenza.tiempoRestante", { tiempo: formatoRestante(restanteMs) })}</p>
           </div>
           <div className="flex shrink-0 gap-2">
             <button onClick={elegirAlAzar} className="rounded-lg px-3 py-2 text-xs font-semibold text-muted transition-colors hover:text-foreground" style={{ border: "1px solid var(--border)" }}>
-              Otro
+              {t("SalonDeLaVerguenza.otro")}
             </button>
             <button onClick={terminarPrueba} className="rounded-lg px-3 py-2 text-xs font-semibold text-muted transition-colors hover:text-foreground" style={{ border: "1px solid var(--border)" }}>
-              Terminar
+              {t("SalonDeLaVerguenza.terminar")}
             </button>
           </div>
         </div>
@@ -104,7 +106,7 @@ export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
           className="rounded-xl px-5 py-2.5 text-sm font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb)_/_0.6)]"
           style={{ background: "var(--accent-grad)" }}
         >
-          🎲 Jugar a ciegas (prueba de 2h)
+          {t("SalonDeLaVerguenza.jugarACiegas")}
         </button>
       )}
 

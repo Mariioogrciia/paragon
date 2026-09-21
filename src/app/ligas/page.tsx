@@ -1,5 +1,6 @@
 import { getLigaMensual } from "@/lib/ligas";
 import { listUserLeagues, listPendingLeagueInvites } from "@/lib/leagues";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
@@ -13,6 +14,7 @@ export const metadata = {
 };
 
 export default async function LigasPage() {
+  const t = await getTranslations("Perfil");
   const session = await auth();
   const [ranking, misLigas, invitaciones] = await Promise.all([
     getLigaMensual(),
@@ -29,24 +31,24 @@ export default async function LigasPage() {
 
       {session?.user?.id && invitaciones.length > 0 && (
         <div className="mb-8">
-          <h2 className="font-heading text-xl font-bold mb-2">Invitaciones a ligas</h2>
+          <h2 className="font-heading text-xl font-bold mb-2">{t("LigasPage.invitacionesTitulo")}</h2>
           <div className="flex flex-col gap-2">
             {invitaciones.map((inv) => (
               <div key={inv.id} className="flex items-center justify-between p-4 border rounded-xl border-border bg-surface">
                 <div>
                   <span className="font-semibold">{inv.name}</span>
-                  <p className="text-xs text-muted">{inv.ownerName ?? "Alguien"} te ha invitado</p>
+                  <p className="text-xs text-muted">{t("LigasPage.teHaInvitado", { nombre: inv.ownerName ?? t("LigasPage.alguien") })}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <form action={acceptLeagueInviteAction}>
                     <input type="hidden" name="leagueId" value={inv.id} />
                     <button className="rounded-lg px-3 py-1.5 text-xs font-bold text-background" style={{ background: "var(--accent-grad)" }}>
-                      Aceptar
+                      {t("LigasPage.aceptar")}
                     </button>
                   </form>
                   <form action={declineLeagueInviteAction}>
                     <input type="hidden" name="leagueId" value={inv.id} />
-                    <button className="text-xs font-semibold text-muted hover:text-danger">Rechazar</button>
+                    <button className="text-xs font-semibold text-muted hover:text-danger">{t("LigasPage.rechazar")}</button>
                   </form>
                 </div>
               </div>
@@ -57,9 +59,9 @@ export default async function LigasPage() {
 
       {session?.user?.id && (
         <div className="mb-12">
-          <h2 className="font-heading text-xl font-bold mb-2">Tus ligas</h2>
+          <h2 className="font-heading text-xl font-bold mb-2">{t("LigasPage.tusLigasTitulo")}</h2>
           <p className="text-muted text-sm mb-4">
-            Solo con quien tú quieras — invitas a amigos, no a toda la comunidad.
+            {t("LigasPage.tusLigasAyuda")}
           </p>
 
           {misLigas.length > 0 && (
@@ -71,7 +73,7 @@ export default async function LigasPage() {
                   className="flex items-center justify-between p-4 border rounded-xl border-border bg-surface hover:bg-accent/5 transition-colors"
                 >
                   <span className="font-semibold">{liga.name}</span>
-                  <span className="text-xs text-muted">{liga.memberCount} {liga.memberCount === 1 ? "miembro" : "miembros"}</span>
+                  <span className="text-xs text-muted">{liga.memberCount} {liga.memberCount === 1 ? t("LigasPage.miembro") : t("LigasPage.miembros")}</span>
                 </Link>
               ))}
             </div>
@@ -84,23 +86,23 @@ export default async function LigasPage() {
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2 uppercase tracking-wide flex items-center gap-2 text-[rgb(var(--accent-rgb))]">
           <TrophyIcon grade="platinum" size={32} />
-          Liga Mensual de {monthName} {year}
+          {t("LigasPage.tituloLiga", { mes: monthName, anio: year })}
         </h1>
-        <p className="text-muted">Compite con el resto de la comunidad cazando trofeos este mes. (Platino: 100, Oro: 50, Plata: 25, Bronce: 10)</p>
+        <p className="text-muted">{t("LigasPage.descripcion")}</p>
       </div>
 
       {ranking.length === 0 ? (
         <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
-          Aún no hay cazadores puntuando este mes. ¡Sé el primero!
+          {t("LigasPage.vacio")}
         </div>
       ) : (
         <div className="bg-surface border border-border rounded-[18px] overflow-hidden shadow-sm">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-black/20 text-xs font-bold uppercase tracking-wider text-muted">
-                <th className="p-4 w-16 text-center">Pos</th>
-                <th className="p-4">Cazador</th>
-                <th className="p-4 text-right">Puntos</th>
+                <th className="p-4 w-16 text-center">{t("LigasPage.colPos")}</th>
+                <th className="p-4">{t("LigasPage.colCazador")}</th>
+                <th className="p-4 text-right">{t("LigasPage.colPuntos")}</th>
               </tr>
             </thead>
             <tbody>
@@ -127,7 +129,7 @@ export default async function LigasPage() {
                           {user.name ?? `@${user.handle}`}
                         </Link>
                       ) : (
-                        <span className="font-bold">{user.name ?? "Alguien"}</span>
+                        <span className="font-bold">{user.name ?? t("LigasPage.alguien")}</span>
                       )}
                     </div>
                   </td>

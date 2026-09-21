@@ -1,16 +1,17 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { coverGradient, monogram } from "@/lib/design";
 import type { SharedGame } from "@/lib/stats";
 import { FiltroJuegosComunes } from "@/components/FiltroJuegosComunes";
 
-const OUTCOME = {
-  ganas: { label: "Ganas", bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
-  pierdes: { label: "Pierdes", bg: "rgba(255, 107, 107, 0.12)", fg: "#ff8f8f", border: "rgba(255, 107, 107, 0.28)" },
-  empate: { label: "Empate", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
+const OUTCOME_STYLE = {
+  ganas: { bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
+  pierdes: { bg: "rgba(255, 107, 107, 0.12)", fg: "#ff8f8f", border: "rgba(255, 107, 107, 0.28)" },
+  empate: { bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
 };
 
-function outcome(a: number, b: number): keyof typeof OUTCOME {
+function outcome(a: number, b: number): keyof typeof OUTCOME_STYLE {
   if (a === b) return "empate";
   return a > b ? "ganas" : "pierdes";
 }
@@ -33,8 +34,10 @@ export function ComparePairGames({
   comunes: SharedGame[];
   jugadores: { id: string; name: string }[];
 }) {
+  const t = useTranslations("Perfil");
+
   return (
-    <FiltroJuegosComunes juegos={comunes} vacioMensaje="No tenéis ningún juego en común todavía.">
+    <FiltroJuegosComunes juegos={comunes} vacioMensaje={t("ComparePairGames.vacioMensaje")}>
       {(visibles) => (
         <div className="grid gap-2.5">
           {visibles.map((row) => (
@@ -81,7 +84,7 @@ export function ComparePairGames({
                     >
                       {p.percent}%
                       {row.horas[i] !== undefined && (
-                        <span className="ml-1 font-normal text-muted">{row.horas[i]!.toFixed(0)}h</span>
+                        <span className="ml-1 font-normal text-muted">{t("ComparePairGames.horasAbrev", { horas: row.horas[i]!.toFixed(0) })}</span>
                       )}
                     </span>
                   </div>
@@ -91,12 +94,12 @@ export function ComparePairGames({
               <span
                 className="justify-self-end rounded-full px-[11px] py-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.06em]"
                 style={{
-                  background: OUTCOME[outcome(row.progress[0].percent, row.progress[1].percent)].bg,
-                  color: OUTCOME[outcome(row.progress[0].percent, row.progress[1].percent)].fg,
-                  border: `1px solid ${OUTCOME[outcome(row.progress[0].percent, row.progress[1].percent)].border}`,
+                  background: OUTCOME_STYLE[outcome(row.progress[0].percent, row.progress[1].percent)].bg,
+                  color: OUTCOME_STYLE[outcome(row.progress[0].percent, row.progress[1].percent)].fg,
+                  border: `1px solid ${OUTCOME_STYLE[outcome(row.progress[0].percent, row.progress[1].percent)].border}`,
                 }}
               >
-                {OUTCOME[outcome(row.progress[0].percent, row.progress[1].percent)].label}
+                {t(`ComparePairGames.outcome.${outcome(row.progress[0].percent, row.progress[1].percent)}`)}
               </span>
             </div>
           ))}

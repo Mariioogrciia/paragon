@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { getTranslations } from "next-intl/server";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";
 import { WrapStoriesButton } from "@/components/WrapStoriesButton";
 import { type Game } from "@/lib/types";
@@ -105,7 +106,7 @@ export function generoTop(games: Game[]): { name: string; count: number } {
   return top;
 }
 
-export function ParagonWrap({
+export async function ParagonWrap({
   games,
   esteAnio,
   juegosEsteAnio,
@@ -137,6 +138,7 @@ export function ParagonWrap({
   rachas?: Rachas;
   percentil?: PercentilAnio | null;
 }) {
+  const t = await getTranslations("Perfil");
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
 
@@ -144,7 +146,7 @@ export function ParagonWrap({
     <section className="mb-10">
       <div className="mb-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="font-heading text-[1.625rem] font-bold uppercase tracking-wide flex items-center gap-2">
-          <span className="text-xl">✨</span> Paragon Wrap
+          <span className="text-xl">✨</span> {t("ParagonWrap.titulo")}
         </h2>
         <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
           {playerName && (
@@ -167,7 +169,7 @@ export function ParagonWrap({
             href="/ritmo"
             className="text-xs font-bold uppercase tracking-wide text-accent hover:underline"
           >
-            Ver mes a mes
+            {t("ParagonWrap.verMesAMes")}
           </Link>
         </div>
       </div>
@@ -182,13 +184,15 @@ export function ParagonWrap({
         >
           <div className="absolute -right-4 -top-4 text-[5rem] opacity-10">🎮</div>
           <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#c4b5fd" }}>
-            Género más jugado
+            {t("ParagonWrap.generoMasJugado")}
           </h3>
-          <p className="font-heading mb-2 text-3xl font-bold text-white">{topGenre.name}</p>
+          <p className="font-heading mb-2 text-3xl font-bold text-white">
+            {topGenre.count === 0 ? t("ParagonWrap.generoNinguno") : topGenre.name}
+          </p>
           <p className="text-sm" style={{ color: "rgba(233, 226, 255, 0.8)" }}>
             {topGenre.count === 0
-              ? "Todavía no hay géneros en tu catálogo"
-              : `Tienes ${topGenre.count} títulos de este género`}
+              ? t("ParagonWrap.sinGeneros")
+              : t("ParagonWrap.titulosDeGenero", { count: topGenre.count })}
           </p>
         </Tarjeta>
 
@@ -202,18 +206,18 @@ export function ParagonWrap({
           <div className="absolute inset-0 bg-black/55" />
           <div className="relative z-10">
             <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#a8ccff" }}>
-              Juego más exprimido
+              {t("ParagonWrap.juegoMasExprimido")}
             </h3>
             <p
               className="font-heading mb-2 truncate text-2xl font-bold leading-tight text-white"
               title={topGame?.game.title}
             >
-              {topGame?.game.title ?? "Ninguno"}
+              {topGame?.game.title ?? t("ParagonWrap.generoNinguno")}
             </p>
             <p className="text-sm font-medium" style={{ color: "rgba(219, 234, 254, 0.9)" }}>
               {topGame && topGame.horasTotal > 0
-                ? `${topGame.horasTotal.toFixed(1)} horas jugadas`
-                : `${topGame?.game.earnedTotal ?? 0} trofeos conseguidos`}
+                ? t("ParagonWrap.horasJugadas", { horas: topGame.horasTotal.toFixed(1) })
+                : t("ParagonWrap.trofeosConseguidos", { trofeos: topGame?.game.earnedTotal ?? 0 })}
             </p>
           </div>
         </Tarjeta>
@@ -229,20 +233,20 @@ export function ParagonWrap({
             <TrophyIcon grade="gold" size={60} />
           </div>
           <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#fcd34d" }}>
-            Resumen del año
+            {t("ParagonWrap.resumenDelAnio")}
           </h3>
           <div className="mb-2 flex items-end gap-2">
             <p className="font-heading text-4xl font-bold text-white">{esteAnio}</p>
             <p className="mb-1 text-sm" style={{ color: "rgba(254, 240, 199, 0.8)" }}>
-              trofeos
+              {t("ParagonWrap.trofeos")}
             </p>
           </div>
           {/* Antes aquí salía el tamaño de la biblioteca entera, que no tiene
               nada que ver con este año. */}
           <p className="text-sm" style={{ color: "rgba(254, 240, 199, 0.8)" }}>
             {juegosEsteAnio === 0
-              ? "Aún no hay trofeos con fecha de este año"
-              : `Repartidos en ${juegosEsteAnio} ${juegosEsteAnio === 1 ? "juego" : "juegos"}`}
+              ? t("ParagonWrap.sinTrofeosEsteAnio")
+              : t("ParagonWrap.repartidosEnJuegos", { count: juegosEsteAnio })}
           </p>
         </Tarjeta>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * Tira de capturas de IGDB, en scroll horizontal — solo se pinta si el
@@ -22,6 +23,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
  * más los mismos controles en pantalla.
  */
 export function ScreenshotStrip({ screenshots, title }: { screenshots: string[]; title: string }) {
+  const t = useTranslations("Perfil");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [abierta, setAbierta] = useState<number | null>(null);
 
@@ -45,12 +47,12 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-heading text-2xl font-bold">Capturas de pantalla</h2>
+        <h2 className="font-heading text-2xl font-bold">{t("ScreenshotStrip.heading")}</h2>
         {screenshots.length > 2 && (
           <div className="flex gap-2">
             <button
               type="button"
-              aria-label="Anterior"
+              aria-label={t("ScreenshotStrip.previous")}
               onClick={() => scroll("left")}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-muted transition-colors hover:bg-white/10 hover:text-white"
             >
@@ -58,7 +60,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
             </button>
             <button
               type="button"
-              aria-label="Siguiente"
+              aria-label={t("ScreenshotStrip.next")}
               onClick={() => scroll("right")}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-muted transition-colors hover:bg-white/10 hover:text-white"
             >
@@ -79,7 +81,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={src}
-              alt={`Captura de ${title} ${i + 1}`}
+              alt={t("ScreenshotStrip.screenshotAlt", { title, index: i + 1 })}
               className="h-full w-full object-cover"
               loading={i < 6 ? "eager" : "lazy"}
             />
@@ -91,7 +93,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setAbierta(null)}>
           <button
             type="button"
-            aria-label="Cerrar"
+            aria-label={t("ScreenshotStrip.close")}
             onClick={() => setAbierta(null)}
             className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
           >
@@ -102,7 +104,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
             <>
               <button
                 type="button"
-                aria-label="Anterior"
+                aria-label={t("ScreenshotStrip.previous")}
                 onClick={(e) => {
                   e.stopPropagation();
                   setAbierta((i) => (i === null ? i : (i - 1 + screenshots.length) % screenshots.length));
@@ -113,7 +115,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
               </button>
               <button
                 type="button"
-                aria-label="Siguiente"
+                aria-label={t("ScreenshotStrip.next")}
                 onClick={(e) => {
                   e.stopPropagation();
                   setAbierta((i) => (i === null ? i : (i + 1) % screenshots.length));
@@ -128,7 +130,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={screenshots[abierta]}
-            alt={`Captura de ${title} ${abierta + 1}`}
+            alt={t("ScreenshotStrip.screenshotAlt", { title, index: abierta + 1 })}
             className="max-h-full max-w-full rounded-lg object-contain"
             onClick={(e) => e.stopPropagation()}
           />

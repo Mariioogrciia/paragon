@@ -1,6 +1,7 @@
 import React from "react";
 import { TrophyIcon } from "./TrophyIcon";
 import { AchievementIcon } from "./AchievementIcon";
+import { getTranslations } from "next-intl/server";
 
 type BadgeDef = {
   id: string;
@@ -83,8 +84,10 @@ export const BADGE_DEFINITIONS: Record<string, BadgeDef> = {
   },
 };
 
-export function Badges({ earnedBadges }: { earnedBadges: { badgeId: string, earnedAt: Date }[] }) {
+export async function Badges({ earnedBadges }: { earnedBadges: { badgeId: string, earnedAt: Date }[] }) {
   if (earnedBadges.length === 0) return null;
+
+  const t = await getTranslations("Perfil");
 
   return (
     <div className="mt-3 flex flex-wrap gap-2">
@@ -103,8 +106,8 @@ export function Badges({ earnedBadges }: { earnedBadges: { badgeId: string, earn
             {/* Tooltip */}
             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg px-3 py-2 shadow-xl group-hover:block"
                  style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-              <p className="text-[0.8125rem] font-bold text-foreground">{badge.name}</p>
-              <p className="text-[0.6875rem] text-muted mt-0.5">{badge.description}</p>
+              <p className="text-[0.8125rem] font-bold text-foreground">{t(`Badges.items.${badge.id}.name`)}</p>
+              <p className="text-[0.6875rem] text-muted mt-0.5">{t(`Badges.items.${badge.id}.description`)}</p>
             </div>
           </div>
         );
