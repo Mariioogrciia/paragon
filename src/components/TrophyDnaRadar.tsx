@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { EstiloDeCaza, TrophyDna } from "@/lib/trophyDna";
 
 const TAMANO = 300;
@@ -21,11 +22,12 @@ function poligono(puntos: [number, number][]): string {
  * fijos, no vale la pena la dependencia por esto.
  */
 export function TrophyDnaRadar({ dna, estiloDeCaza }: { dna: TrophyDna; estiloDeCaza?: EstiloDeCaza | null }) {
+  const t = useTranslations("Analitica.trophyDnaRadar");
   const n = dna.ejes.length;
   if (n === 0 || dna.ejes.every((e) => e.trofeos === 0)) {
     return (
       <p className="text-sm text-muted">
-        Todavía no hay suficientes trofeos con género conocido para dibujar tu Trophy DNA.
+        {t("sinDatos")}
       </p>
     );
   }
@@ -79,7 +81,7 @@ export function TrophyDnaRadar({ dna, estiloDeCaza }: { dna: TrophyDna; estiloDe
       <div className="flex flex-1 flex-col gap-2">
         {dna.arquetipo && (
           <p className="mb-1">
-            <span className="text-xs font-bold uppercase tracking-widest text-muted">Tu arquetipo</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-muted">{t("tuArquetipo")}</span>
             <span className="block font-heading text-xl font-bold uppercase tracking-wide">{dna.arquetipo}</span>
           </p>
         )}
@@ -90,7 +92,7 @@ export function TrophyDnaRadar({ dna, estiloDeCaza }: { dna: TrophyDna; estiloDe
         {estiloDeCaza && (
           <p className="mb-2 rounded-xl p-3" style={{ background: "var(--surface-2)" }}>
             <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
-              Tu estilo de caza
+              {t("tuEstiloDeCaza")}
             </span>
             <span className="block font-heading text-lg font-bold">{estiloDeCaza.nombre}</span>
             <span className="mt-0.5 block text-xs text-muted">{estiloDeCaza.descripcion}</span>
@@ -105,7 +107,7 @@ export function TrophyDnaRadar({ dna, estiloDeCaza }: { dna: TrophyDna; estiloDe
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
                 <div className="h-full rounded-full" style={{ width: `${e.valor}%`, background: "var(--accent-grad)" }} />
               </div>
-              <span className="w-16 shrink-0 text-right font-bold tabular-nums text-muted">{e.trofeos} trofeos</span>
+              <span className="w-16 shrink-0 text-right font-bold tabular-nums text-muted">{t("trofeos", { count: e.trofeos })}</span>
             </div>
           ))}
       </div>

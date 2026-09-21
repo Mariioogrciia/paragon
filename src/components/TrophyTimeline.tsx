@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { colorFor } from "@/lib/design";
 import { GRADES, type Trophy, type TrophyGrade } from "@/lib/types";
-
-const GRADE_LABEL: Record<TrophyGrade, string> = { platinum: "Platino", gold: "Oro", silver: "Plata", bronze: "Bronce" };
 
 /** Alto del área de puntos (sin la fila de meses de abajo). */
 const PLOT_HEIGHT_PX = 300;
@@ -44,6 +43,8 @@ function formatFecha(millis: number): string {
  * pasar el ratón por encima da el mismo detalle en una tarjeta pequeña.
  */
 export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
+  const t = useTranslations("Analitica.trophyTimeline");
+  const GRADE_LABEL: Record<TrophyGrade, string> = { platinum: t("platino"), gold: t("oro"), silver: t("plata"), bronze: t("bronce") };
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [popupDia, setPopupDia] = useState<string | null>(null);
 
@@ -55,7 +56,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   if (puntos.length < 2) {
     return (
       <p className="py-8 text-center text-sm text-muted">
-        Hacen falta al menos dos trofeos con fecha y rareza registradas para dibujar la gráfica.
+        {t("minimoDatos")}
       </p>
     );
   }
@@ -231,14 +232,14 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
           >
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-bold">
-                {formatFecha(grupoPopup[0].fechaMillis)} · {grupoPopup.length} trofeos
+                {t("popupTitulo", { fecha: formatFecha(grupoPopup[0].fechaMillis), count: grupoPopup.length })}
               </p>
               <button
                 type="button"
                 onClick={() => setPopupDia(null)}
                 className="rounded-full px-2 py-1 text-xs font-bold text-muted hover:text-foreground"
               >
-                Cerrar
+                {t("cerrar")}
               </button>
             </div>
             <div className="space-y-2">

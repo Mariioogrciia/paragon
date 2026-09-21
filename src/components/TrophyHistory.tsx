@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { StatTile } from "@/components/StatTile";
 import type { MesConTrofeos, Rachas, ResumenHistorico } from "@/lib/history";
 
@@ -15,19 +16,14 @@ import type { MesConTrofeos, Rachas, ResumenHistorico } from "@/lib/history";
  * a mirar aquí.
  */
 
-const MESES_CORTOS = [
-  "ene", "feb", "mar", "abr", "may", "jun",
-  "jul", "ago", "sep", "oct", "nov", "dic",
-];
-
-function etiquetaMes(clave: string): { mes: string; anio: string; esEnero: boolean } {
+function etiquetaMes(clave: string, mesesCortos: string[]): { mes: string; anio: string; esEnero: boolean } {
   const [anio, mes] = clave.split("-");
   const indice = Number(mes) - 1;
-  return { mes: MESES_CORTOS[indice] ?? mes, anio, esEnero: indice === 0 };
+  return { mes: mesesCortos[indice] ?? mes, anio, esEnero: indice === 0 };
 }
 
-function nombreLargo(clave: string): string {
-  const { mes, anio } = etiquetaMes(clave);
+function nombreLargo(clave: string, mesesCortos: string[]): string {
+  const { mes, anio } = etiquetaMes(clave, mesesCortos);
   return `${mes} ${anio}`;
 }
 
@@ -43,17 +39,18 @@ export function TrophyHistory({
   /** Trofeos del perfil, para poder decir sobre cuántos se está calculando. */
   totalPerfil: number;
 }) {
+  const t = useTranslations("Analitica.trophyHistory");
+  const mesesCortos = t.raw("mesesCortos") as string[];
+
   if (resumen.conFecha === 0) {
     return (
       <section
         className="rounded-[18px] p-6"
         style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
       >
-        <h2 className="font-heading text-2xl font-bold">Tu ritmo</h2>
+        <h2 className="font-heading text-2xl font-bold">{t("tituloSinFechas")}</h2>
         <p className="mt-2 text-[0.8125rem] text-muted">
-          Todavía no hay ningún trofeo con fecha registrada. Las fechas llegan
-          al sincronizar el detalle de cada juego, y eso se va completando solo
-          en segundo plano.
+          {t("sinFechas")}
         </p>
       </section>
     );
@@ -65,38 +62,38 @@ export function TrophyHistory({
   return (
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
-        <h2 className="font-heading text-2xl font-bold">Tu ritmo</h2>
+        <h2 className="font-heading text-2xl font-bold">{t("titulo")}</h2>
         <p className="text-[0.8125rem] text-muted">
-          Trofeos conseguidos por mes, del último año.
+          {t("subtitulo")}
         </p>
         <Link
           href="/ritmo"
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
         >
-          Ver desglose
+          {t("verDesglose")}
         </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile
           value={rachas.actual}
-          label="Racha actual"
-          hint={rachas.actual === 0 ? "Hoy o ayer, ninguno" : "días seguidos"}
+          label={t("rachaActual")}
+          hint={rachas.actual === 0 ? t("rachaActualHintCero") : t("diasSeguidosHint")}
         />
-        <StatTile value={rachas.mejor} label="Mejor racha" hint="días seguidos" />
-        <StatTile value={resumen.esteAnio} label="Este año" />
+        <StatTile value={rachas.mejor} label={t("mejorRacha")} hint={t("diasSeguidosHint")} />
+        <StatTile value={resumen.esteAnio} label={t("esteAnio")} />
         {/* El mejor mes lleva a su propio desglose: es la cifra que más pide
             "¿y eso de dónde sale?". */}
         {resumen.mejorMes ? (
           <Link href={`/ritmo?mes=${resumen.mejorMes.mes}`}>
             <StatTile
               value={resumen.mejorMes.total}
-              label="Mejor mes"
-              hint={nombreLargo(resumen.mejorMes.mes)}
+              label={t("mejorMes")}
+              hint={nombreLargo(resumen.mejorMes.mes, mesesCortos)}
             />
           </Link>
         ) : (
-          <StatTile value="—" label="Mejor mes" />
+          <StatTile value={t("sinMejorMes")} label={t("mejorMes")} />
         )}
       </div>
 
@@ -131,7 +128,7 @@ export function TrophyHistory({
                 <Link
                   key={m.mes}
                   href={`/ritmo?mes=${m.mes}`}
-                  aria-label={`${nombreLargo(m.mes)}: ${m.total} trofeos. Ver desglose`}
+                  aria-label={t("barAriaLabel", { mes: nombreLargo(m.mes, mesesCortos), count: m.total })}
                   className="group relative flex h-full flex-1 flex-col justify-end"
                 >
                   {/* Etiqueta directa solo en el mes pico: un número sobre cada
@@ -163,11 +160,11 @@ export function TrophyHistory({
                       color: "white" 
                     }}
                   >
-                    <span className="font-bold text-accent-2">{nombreLargo(m.mes)}</span>
+                    <span className="font-bold text-accent-2">{nombreLargo(m.mes, mesesCortos)}</span>
                     <span className="opacity-90">
                       {" · "}
-                      {m.total} {m.total === 1 ? "trofeo" : "trofeos"}
-                      {m.platinos > 0 && ` · ${m.platinos} platino${m.platinos === 1 ? "" : "s"}`}
+                      {t("trofeosCount", { count: m.total })}
+                      {m.platinos > 0 && ` · ${t("tooltipPlatinos", { count: m.platinos })}`}
                     </span>
                   </div>
 
@@ -178,7 +175,7 @@ export function TrophyHistory({
 
           <div className="mt-2 flex gap-1.5">
             {meses.map((m) => {
-              const { mes, anio, esEnero } = etiquetaMes(m.mes);
+              const { mes, anio, esEnero } = etiquetaMes(m.mes, mesesCortos);
               return (
                 <span
                   key={m.mes}
@@ -194,10 +191,7 @@ export function TrophyHistory({
         </div>
 
         <p className="mt-4 text-[0.6875rem] text-muted">
-          Sobre {resumen.conFecha.toLocaleString("es-ES")} de{" "}
-          {totalPerfil.toLocaleString("es-ES")} trofeos: solo cuentan los que
-          tienen fecha registrada. Las fechas llegan al sincronizar el detalle de
-          cada juego, y eso se completa solo en segundo plano.
+          {t("footer", { conFecha: resumen.conFecha.toLocaleString("es-ES"), total: totalPerfil.toLocaleString("es-ES") })}
         </p>
       </div>
     </section>

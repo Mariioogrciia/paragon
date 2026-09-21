@@ -2,20 +2,18 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import type { MesConTrofeos } from "@/lib/history";
 
-const MESES_CORTOS = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-];
-
-function nombreMes(clave: string): string {
+function nombreMes(clave: string, nombresMeses: string[]): string {
   const [, mes] = clave.split("-");
   const indice = Number(mes) - 1;
-  return MESES_CORTOS[indice] ?? mes;
+  return nombresMeses[indice] ?? mes;
 }
 
 export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
+  const t = useTranslations("Analitica.monthlySummary");
+  const nombresMeses = t.raw("meses") as string[];
   if (!meses || meses.length === 0) return null;
 
   // El último mes del array es el actual, según trofeosPorMes()
@@ -34,13 +32,13 @@ export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
       >
         <div>
           <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">
-            {nombreMes(mesActual.mes)}
+            {nombreMes(mesActual.mes, nombresMeses)}
           </p>
           <h3 className="font-heading mt-2 text-xl font-bold leading-tight text-foreground/85">
-            Todavía ningún trofeo este mes
+            {t("sinTrofeosTitulo")}
           </h3>
         </div>
-        <p className="mt-4 text-sm text-muted">El primero se enseña aquí en cuanto lo consigas.</p>
+        <p className="mt-4 text-sm text-muted">{t("sinTrofeosTexto")}</p>
       </div>
     );
   }
@@ -68,26 +66,26 @@ export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
       <div className="relative z-10 flex flex-1 flex-col justify-between">
         <div>
           <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] opacity-80">
-            Resumen de {nombreMes(mesActual.mes)}
+            {t("resumenDe", { mes: nombreMes(mesActual.mes, nombresMeses) })}
           </p>
           <h3 className="font-heading mt-2 text-2xl font-bold leading-tight">
-            Has conseguido {mesActual.total} trofeos este mes
+            {t("conseguidos", { count: mesActual.total })}
           </h3>
         </div>
-        
+
         <div className="mt-4 flex items-end justify-between">
           <div>
             <p className="text-sm font-medium opacity-90">
-              {mesActual.platinos > 0 
-                ? `¡Incluyendo ${mesActual.platinos} platino${mesActual.platinos > 1 ? 's' : ''}!` 
-                : "Sigue así para acercarte al platino."}
+              {mesActual.platinos > 0
+                ? t("incluyendoPlatinos", { count: mesActual.platinos })
+                : t("sigueAsi")}
             </p>
           </div>
           <Link
             href={`/ritmo?mes=${mesActual.mes}`}
             className="rounded-full bg-white/20 px-3 py-1.5 text-[0.6875rem] font-bold backdrop-blur-md transition-colors hover:bg-white/30"
           >
-            Ver desglose →
+            {t("verDesglose")}
           </Link>
         </div>
       </div>

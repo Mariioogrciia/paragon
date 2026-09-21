@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { Efemeride } from "@/lib/history";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { gradeLabel } from "@/components/TrophyIcon";
@@ -12,6 +13,7 @@ import { colorFor } from "@/lib/design";
  * diciendo "hoy no pasó nada hace tiempo".
  */
 export function TalDiaComoHoy({ efemerides, handle }: { efemerides: Efemeride[]; handle: string }) {
+  const t = useTranslations("Analitica.talDiaComoHoy");
   if (efemerides.length === 0) return null;
 
   return (
@@ -20,7 +22,7 @@ export function TalDiaComoHoy({ efemerides, handle }: { efemerides: Efemeride[];
       style={{ border: "1px solid var(--border)", background: "linear-gradient(165deg, rgba(159, 212, 236, 0.08), var(--surface))" }}
     >
       <h2 className="mb-4 flex items-center gap-2 font-heading text-lg font-bold uppercase tracking-wide">
-        🕰️ Tal día como hoy
+        {t("titulo")}
       </h2>
       <div className="flex flex-col gap-3">
         {efemerides.slice(0, 4).map((e) => (
@@ -38,7 +40,7 @@ export function TalDiaComoHoy({ efemerides, handle }: { efemerides: Efemeride[];
               <p className="text-xs font-bold uppercase tracking-wide" style={{ color: colorFor(e.grade ?? undefined) }}>
                 {gradeLabel(e.grade ?? undefined)}
               </p>
-              <p className="text-[0.6875rem] text-muted">hace {e.aniosAtras} {e.aniosAtras === 1 ? "año" : "años"}</p>
+              <p className="text-[0.6875rem] text-muted">{t("haceAnios", { count: e.aniosAtras })}</p>
             </div>
           </Link>
         ))}

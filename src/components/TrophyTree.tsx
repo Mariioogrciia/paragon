@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import type { Trophy, Platform } from "@/lib/types";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { colorFor } from "@/lib/design";
@@ -25,6 +26,7 @@ export function TrophyTree({
   platform?: Platform;
   onTrophyClick: (t: Trophy) => void;
 }) {
+  const t = useTranslations("Analitica.trophyTree");
   const containerRef = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<{ id: string; x1: number; y1: number; x2: number; y2: number; color: string }[]>([]);
 
@@ -132,7 +134,7 @@ export function TrophyTree({
   return (
     <div ref={containerRef} className="relative w-full py-10 px-4 min-h-[500px]">
       <p className="relative z-10 mb-2 text-center text-[0.6875rem] text-muted">
-        Agrupado por metal (o rareza), no por orden real de desbloqueo — ni PSN ni Steam dicen qué trofeo requiere a cuál.
+        {t("aviso")}
       </p>
       <svg
         className="absolute inset-0 pointer-events-none z-0"
@@ -156,27 +158,27 @@ export function TrophyTree({
       <div className="flex flex-col items-center gap-20 relative z-10 w-full mx-auto pb-10">
         {levels.map((levelTrophies, i) => (
           <div key={i} className="flex flex-row flex-wrap justify-center gap-10 w-full">
-            {levelTrophies.map(t => {
-              const baseColor = colorFor(t.grade || "bronze");
-              const isEarned = t.earned;
-              const isHidden = t.hidden && !t.earned;
-              
+            {levelTrophies.map(trophy => {
+              const baseColor = colorFor(trophy.grade || "bronze");
+              const isEarned = trophy.earned;
+              const isHidden = trophy.hidden && !trophy.earned;
+
               return (
-                <div 
-                  key={t.id}
-                  data-trophy-id={t.id}
+                <div
+                  key={trophy.id}
+                  data-trophy-id={trophy.id}
                   className="relative group cursor-pointer transition-transform hover:scale-110 flex flex-col items-center"
-                  onClick={() => onTrophyClick(t)}
+                  onClick={() => onTrophyClick(trophy)}
                 >
-                  <div 
+                  <div
                     className="absolute inset-0 rounded-full blur-xl transition-opacity opacity-0 group-hover:opacity-60"
                     style={{ backgroundColor: baseColor, zIndex: -1 }}
                   />
                   <div className={`relative z-10 transition-all ${isEarned ? 'opacity-100 ring-2 ring-white/20 rounded-xl shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'opacity-50 grayscale'}`}>
-                    <TrophyPhoto trophy={t} size={64} />
+                    <TrophyPhoto trophy={trophy} size={64} />
                   </div>
                   <span className="max-w-[150px] text-center text-xs font-semibold truncate px-2 opacity-0 group-hover:opacity-100 transition-opacity text-white bg-black/60 rounded backdrop-blur-sm absolute -bottom-7 z-20 whitespace-nowrap">
-                    {isHidden ? "Trofeo oculto" : t.name}
+                    {isHidden ? t("trofeoOculto") : trophy.name}
                   </span>
                 </div>
               );

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { DiaActividad } from "@/lib/profileStats";
 
 /**
@@ -13,9 +14,6 @@ import type { DiaActividad } from "@/lib/profileStats";
  * aparecer y es minúsculo, así que no se notaba que hubiera nada al pasar
  * el ratón.
  */
-const DIAS_SEMANA = ["L", "", "X", "", "V", "", ""];
-const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
 function nivel(trofeos: number): number {
   if (trofeos === 0) return 0;
   if (trofeos <= 2) return 1;
@@ -32,6 +30,10 @@ function fechaLarga(iso: string): string {
 }
 
 export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
+  const t = useTranslations("Analitica.activityHeatmap");
+  const DIAS_SEMANA = t.raw("diasSemanaIniciales") as string[];
+  const MESES = t.raw("mesesCortos") as string[];
+
   if (dias.length === 0) return null;
 
   // Relleno de días vacíos al principio para que la primera semana empiece en lunes.
@@ -63,7 +65,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
     // arriba) se veía cortado por el borde de la tarjeta.
     <div className="overflow-x-auto pt-8 -mt-8">
       <div className="mb-2 flex items-baseline justify-between">
-        <p className="text-sm font-semibold">{total} trofeos ganados en los últimos 12 meses</p>
+        <p className="text-sm font-semibold">{t("totalTrofeos", { count: total })}</p>
       </div>
       <div className="inline-flex gap-2">
         <div className="flex flex-col gap-[3px] pt-4 text-[0.625rem] font-semibold text-muted">
@@ -101,7 +103,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
                         }`}
                         style={{ background: "var(--foreground)", color: "var(--background)" }}
                       >
-                        {d.trofeos} {d.trofeos === 1 ? "trofeo" : "trofeos"} · {fechaLarga(d.dia)}
+                        {t("tooltip", { count: d.trofeos, fecha: fechaLarga(d.dia) })}
                       </div>
                     </div>
                   ) : (
@@ -114,11 +116,11 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-end gap-1.5 text-[0.625rem] text-muted">
-        <span>Menos</span>
+        <span>{t("menos")}</span>
         {OPACIDAD_POR_NIVEL.map((op, i) => (
           <div key={i} className="h-[11px] w-[11px] rounded-[2px]" style={{ background: op === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${op})` }} />
         ))}
-        <span>Más</span>
+        <span>{t("mas")}</span>
       </div>
     </div>
   );

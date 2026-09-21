@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { getFeed } from "@/lib/feed";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -28,29 +29,30 @@ function RatingStars({ rating }: { rating: number }) {
 }
 
 export function ActivityFeed({ activities, currentUserId }: { activities: any[], currentUserId: string | null }) {
+  const t = useTranslations("Analitica.activityFeed");
 
   if (activities.length === 0) {
     return (
       <div className="py-12 text-center border rounded-xl bg-card/50 text-muted border-border/50">
-        <p>No hay actividad reciente.</p>
-        <p className="mt-2 text-sm">Añade amigos para ver su actividad aquí.</p>
+        <p>{t("sinActividad")}</p>
+        <p className="mt-2 text-sm">{t("anadeAmigos")}</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-6 mt-8">
-      <h2 className="text-xl font-bold tracking-tight">Actividad Reciente</h2>
-      
+      <h2 className="text-xl font-bold tracking-tight">{t("titulo")}</h2>
+
       <div className="flex flex-col gap-4">
         {activities.map((activity) => {
           let actionText = "";
-          if (activity.type === "rating") actionText = "puntuó";
-          else if (activity.type === "review") actionText = "escribió una reseña de";
-          else if (activity.type === "favorite") actionText = "añadió a favoritos";
-          else if (activity.type === "platinum") actionText = "consiguió el platino en";
-          else if (activity.type === "new_game") actionText = "añadió a su biblioteca";
-          else actionText = "jugó a";
+          if (activity.type === "rating") actionText = t("accionRating");
+          else if (activity.type === "review") actionText = t("accionReview");
+          else if (activity.type === "favorite") actionText = t("accionFavorite");
+          else if (activity.type === "platinum") actionText = t("accionPlatinum");
+          else if (activity.type === "new_game") actionText = t("accionNewGame");
+          else actionText = t("accionDefault");
 
           return (
             <div key={activity.id} className="flex gap-3 p-3 transition-colors border rounded-xl bg-card hover:bg-accent/5 sm:gap-4 sm:p-4">
@@ -91,10 +93,10 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                   <form action={toggleActivityReactionAction}>
                     <input type="hidden" name="activityId" value={activity.id} />
                     <button className={`text-xs font-semibold transition-opacity hover:opacity-75 ${activity.reacted ? "text-accent" : "text-muted hover:text-foreground"}`}>
-                      {activity.reacted ? "Aplaudido" : "Aplaudir"} · {activity.reactions}
+                      {activity.reacted ? t("aplaudido") : t("aplaudir")} · {activity.reactions}
                     </button>
                   </form>
-                  <span className="text-xs text-muted">{activity.comments.length} comentarios</span>
+                  <span className="text-xs text-muted">{t("comentarios", { count: activity.comments.length })}</span>
                 </div>
                 <form action={addActivityCommentAction} className="mt-2 flex items-center gap-2">
                   <input type="hidden" name="activityId" value={activity.id} />
@@ -105,7 +107,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                   <input
                     type="text"
                     name="comment"
-                    placeholder="Añadir un comentario..."
+                    placeholder={t("comentarioPlaceholder")}
                     className="min-w-0 flex-1 bg-transparent border-b border-border/50 text-xs px-2 py-1.5 focus:outline-none focus:border-accent transition-colors"
                   />
                   {/* Antes solo se podía enviar pulsando Intro dentro del
@@ -115,14 +117,14 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                     type="submit"
                     className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-accent"
                   >
-                    Enviar
+                    {t("enviar")}
                   </button>
                 </form>
                 {activity.comments.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {activity.comments.map((comment: any, index: number) => (
                       <div key={index} className="text-xs bg-muted/10 p-2 rounded-lg">
-                        <span className="font-semibold">{comment.userName || "Alguien"}</span>: {comment.body}
+                        <span className="font-semibold">{comment.userName || t("alguien")}</span>: {comment.body}
                         <div className="text-[0.625rem] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}</div>
                       </div>
                     ))}

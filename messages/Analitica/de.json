@@ -1,1 +1,275 @@
-{}
+{
+  "planificadorPage": {
+    "title": "Planer",
+    "subtitle": "Wähle einen beliebigen Ordner als Plan und füge Spiele von jeder Spielseite hinzu, um deine Route aufzubauen."
+  },
+  "ritmoPage": {
+    "backButton": "Zurück zur Übersicht",
+    "helpCurrentYear": "Klicke auf einen Monat, um die Aufschlüsselung zu sehen.",
+    "helpOutOfRange": "Dieser Monat liegt außerhalb des letzten Jahres und ist unten deshalb nicht markiert. Klicke auf einen Balken, um zu den letzten 12 Monaten zurückzukehren.",
+    "noTrophiesInMonth": "Keine Trophäen mit Datum in {mes}.",
+    "statTrophiesMonth": "Trophäen diesen Monat",
+    "statActiveDays": "Aktive Jagdtage",
+    "statActiveDaysHint": "von {total}",
+    "statBestDay": "Bester Tag",
+    "statBestDayHint": "Tag {dia}",
+    "statGamesTouched": "Gespielte Titel",
+    "dayByDay": "Tag für Tag",
+    "dayTooltip": "Tag {dia} · {total}",
+    "byMetal": "Nach Metall",
+    "achievement": "Achievement",
+    "byGame": "Nach Spiel",
+    "oneByOne": "Alle einzeln",
+    "trophyCount": "{count, plural, one {# Trophäe} other {# Trophäen}}, von der neuesten zur ältesten",
+    "dayShort": "Tag {dia}",
+    "barAriaLabel": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}",
+    "nombreMes": "{mes} {anio}",
+    "mesesLargos": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+  },
+  "planificador": {
+    "ordenProximidad": "Am nächsten",
+    "ordenProgreso": "Meister Fortschritt",
+    "ordenHoras": "Meiste Stunden",
+    "ordenHltb": "Am schnellsten (HLTB)",
+    "historyHours": "⏱ {horas} Std. Story",
+    "platinumHours": "🏆 {horas} Std. Platin",
+    "titulo": "Platin-Plan",
+    "subtitulo": "Deine offenen Spiele, sortiert für die nächste Session.",
+    "sinCarpetas": "Du hast noch keinen Ordner. Erstelle unten einen (der Name ist egal, er muss nicht mehr „Platin-Plan“ heißen) und füge die Spiele hinzu, die du hier verfolgen willst.",
+    "carpetaVacia": "„{carpeta}“ ist noch leer. Füge Spiele von der Spielseite oder unten unter „Deine Ordner“ hinzu.",
+    "juegosEnPlan": "{count, plural, one {Spiel} other {Spiele}} im Plan",
+    "logrosPendientes": "offene Achievements",
+    "progresoMedio": "durchschnittlicher Fortschritt",
+    "siguiente": "Als Nächstes",
+    "progresoFaltan": "{pct}% · noch {faltan} Achievements {hltb}",
+    "quitar": "Entfernen"
+  },
+  "statCharts": {
+    "trofeosPorMes": "Trophäen pro Monat",
+    "verDetalle": "Details ansehen →",
+    "tooltip": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}",
+    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+  },
+  "statusBadge": {
+    "platinado": "Platin",
+    "completado": "100%",
+    "enCurso": "In Arbeit",
+    "aPunto": "Fast geschafft",
+    "sinEmpezar": "Nicht begonnen",
+    "abandonado": "Abgebrochen",
+    "deseados": "Wunschliste"
+  },
+  "estadisticasCompletas": {
+    "trophyDna": "Trophy DNA",
+    "lineaDeTiempo": "Zeitleiste",
+    "aQueHorasJuegas": "Zu welchen Uhrzeiten du spielst",
+    "jugadoRecientemente": "Zuletzt gespielt",
+    "jugadoRecientementeSub": "Wann jedes Spiel zuletzt angerührt wurde — weder PSN noch Steam führen ein echtes Sitzungsprotokoll, das ist die realistischste Annäherung.",
+    "platinosAlAlcance": "Platin in Reichweite",
+    "platinosAlAlcanceSub": "Fast fertig und seit Monaten liegengeblieben — manchmal reicht schon die Erinnerung, dass sie noch da sind.",
+    "costePorHora": "Kosten pro Stunde",
+    "costePorHoraSub": "Zählt nur, was du selbst pro Spiel eingetragen hast — gezahlter Preis und Spielzeit.",
+    "eficienciaDeCaza": "Dein Jagdtempo",
+    "eficienciaDeCazaSub": "Deine tatsächlichen Stunden bei bereits platinierten/100%-Titeln, verglichen mit der HowLongToBeat-Schätzung.",
+    "deudaDeBacklog": "Backlog-Schuld",
+    "deudaDeBacklogSub": "In Stunden, nicht in Spielanzahl — was dir bei bereits BEGONNENEN Spielen noch fehlt, sonst nichts.",
+    "salonDeLaVerguenza": "Die Ruhmeshalle der Schande",
+    "salonDeLaVerguenzaSub": "Spiele in deiner Bibliothek ohne eine einzige Stunde, ohne eine einzige Trophäe.",
+    "tuYTusAmigos": "Du und deine Freunde",
+    "tuYTusAmigosSub": "Ein schneller Überblick — jede Zeile führt zu den vollständigen Statistiken dieser Person.",
+    "actividadDeTusAmigos": "Aktivität deiner Freunde"
+  },
+  "activityStats": {
+    "titulo": "Aktivität und Statistiken",
+    "subtitulo": "Ein schneller Überblick darüber, wie du spielst.",
+    "generoPrincipal": "Hauptgenre:",
+    "horasPorPlataforma": "Stunden pro Plattform",
+    "sinHoras": "Noch keine Stunden verfügbar.",
+    "sinActividad90": "Keine Aktivität seit 90 Tagen",
+    "sinAbandonados": "Keine abgebrochenen Spiele erfasst."
+  },
+  "activityHeatmap": {
+    "diasSemanaIniciales": ["M", "", "M", "", "F", "", ""],
+    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+    "totalTrofeos": "{count, plural, one {# Trophäe erhalten} other {# Trophäen erhalten}} in den letzten 12 Monaten",
+    "tooltip": "{count, plural, one {# Trophäe} other {# Trophäen}} · {fecha}",
+    "menos": "Weniger",
+    "mas": "Mehr"
+  },
+  "activityFeed": {
+    "sinActividad": "Keine aktuelle Aktivität.",
+    "anadeAmigos": "Füge Freunde hinzu, um ihre Aktivität hier zu sehen.",
+    "titulo": "Letzte Aktivität",
+    "accionRating": "bewertete",
+    "accionReview": "schrieb eine Rezension zu",
+    "accionFavorite": "zu Favoriten hinzugefügt",
+    "accionPlatinum": "erhielt Platin in",
+    "accionNewGame": "zur Bibliothek hinzugefügt",
+    "accionDefault": "spielte",
+    "aplaudido": "Applaudiert",
+    "aplaudir": "Applaudieren",
+    "comentarios": "{count, plural, one {# Kommentar} other {# Kommentare}}",
+    "comentarioPlaceholder": "Kommentar hinzufügen...",
+    "enviar": "Senden",
+    "alguien": "Jemand"
+  },
+  "historicalTimeline": {
+    "tuPrimerTrofeo": "Deine erste Trophäe",
+    "tuPrimerPlatino": "Dein erstes Platin",
+    "tuTrofeoMasRaro": "Deine seltenste Trophäe",
+    "elPlatinoAnejo": "Das gereifte Platin",
+    "tuRachaMasLarga": "Deine längste Serie",
+    "loTiene": "{pct}% haben sie · {juego}",
+    "completadoAnios": "Abgeschlossen {anios} Jahre und {meses} Monate nach Beginn",
+    "completadoMeses": "Abgeschlossen {meses} Monate nach Beginn",
+    "diasSeguidos": "{count, plural, one {# Tag in Folge} other {# Tage in Folge}}",
+    "rachaDetalle": "Vom {desde} bis {hasta}, ohne einen Tag Pause Trophäen gesammelt"
+  },
+  "trophyTimeline": {
+    "platino": "Platin",
+    "oro": "Gold",
+    "plata": "Silber",
+    "bronce": "Bronze",
+    "minimoDatos": "Es werden mindestens zwei Trophäen mit erfasstem Datum und Seltenheit benötigt, um die Grafik zu zeichnen.",
+    "popupTitulo": "{fecha} · {count, plural, one {# Trophäe} other {# Trophäen}}",
+    "cerrar": "Schließen"
+  },
+  "trophyHistory": {
+    "sinFechas": "Es gibt noch keine Trophäe mit erfasstem Datum. Daten kommen hinzu, sobald die Spieldetails synchronisiert werden, und das füllt sich im Hintergrund von selbst weiter.",
+    "tituloSinFechas": "Dein Tempo",
+    "titulo": "Dein Tempo",
+    "subtitulo": "Trophäen pro Monat, aus dem letzten Jahr.",
+    "verDesglose": "Details ansehen",
+    "rachaActual": "Aktuelle Serie",
+    "rachaActualHintCero": "Heute oder gestern keine",
+    "diasSeguidosHint": "Tage in Folge",
+    "mejorRacha": "Beste Serie",
+    "esteAnio": "Dieses Jahr",
+    "mejorMes": "Bester Monat",
+    "sinMejorMes": "—",
+    "trofeosCount": "{count, plural, one {# Trophäe} other {# Trophäen}}",
+    "tooltipPlatinos": "{count, plural, one {# Platin} other {# Platins}}",
+    "barAriaLabel": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}. Details ansehen",
+    "footer": "Von {conFecha} von {total} Trophäen: Nur die mit erfasstem Datum zählen. Daten kommen hinzu, sobald die Spieldetails synchronisiert werden, und das läuft im Hintergrund von selbst.",
+    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+  },
+  "trophyTree": {
+    "aviso": "Gruppiert nach Metall (oder Seltenheit), nicht nach echter Freischaltreihenfolge — weder PSN noch Steam geben an, welche Trophäe welche voraussetzt.",
+    "trofeoOculto": "Versteckte Trophäe"
+  },
+  "trophyDnaRadar": {
+    "sinDatos": "Es gibt noch nicht genug Trophäen mit bekanntem Genre, um deine Trophy DNA zu zeichnen.",
+    "tuArquetipo": "Dein Archetyp",
+    "tuEstiloDeCaza": "Dein Jagdstil",
+    "trofeos": "{count, plural, one {# Trophäe} other {# Trophäen}}"
+  },
+  "trophyRecommendations": {
+    "titulo": "Nächste Trophäe",
+    "subtitulo": "Automatische Priorität: zuerst das Basisspiel (Platin hängt nie vom DLC ab), hoher Fortschritt und höhere Erfolgswahrscheinlichkeit.",
+    "verBiblioteca": "Bibliothek ansehen",
+    "sinRecomendaciones": "Noch keine Empfehlungen. Synchronisiere die Details eines Spiels, um seine Trophäen zu erfahren.",
+    "progresoCompletado": "{juego} · {pct}% abgeschlossen",
+    "verGuia": "Video-Guide ansehen und anheften",
+    "guiasEscritas": "Geschriebene Guides zu diesem Spiel"
+  },
+  "hourlyHeatmap": {
+    "dias": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+    "resumen": "{pct}% deiner Trophäen fallen auf {dia} zwischen {inicio}:00 und {fin}:00 Uhr.",
+    "tooltip": "{count, plural, one {# Trophäe} other {# Trophäen}} · {dia} {inicio}-{fin} Uhr"
+  },
+  "monthlySummary": {
+    "meses": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "sinTrofeosTitulo": "Diesen Monat noch keine Trophäe",
+    "sinTrofeosTexto": "Die erste erscheint hier, sobald du sie holst.",
+    "resumenDe": "Zusammenfassung {mes}",
+    "conseguidos": "{count, plural, one {Du hast # Trophäe} other {Du hast # Trophäen}} diesen Monat geholt",
+    "incluyendoPlatinos": "{count, plural, one {Darunter # Platin!} other {Darunter # Platins!}}",
+    "sigueAsi": "Weiter so, um näher ans Platin zu kommen.",
+    "verDesglose": "Details ansehen →"
+  },
+  "playtimeBarChart": {
+    "sinHoras": "Keine verknüpfte Plattform hat bisher Spielstunden gemeldet.",
+    "titulo": "Stunden pro Spiel",
+    "verTodas": "Alle Stunden in der Bibliothek ansehen →"
+  },
+  "playtimeComparison": {
+    "titulo": "Spielstunden, im Vergleich",
+    "subtitulo": "Würdest du die erfassten {horas} Stunden am Stück spielen, ohne zu schlafen, wären das...",
+    "dias": "{count, plural, one {# Tag} other {# Tage}}",
+    "loMismoQue": "Ungefähr wie <strong>{hito}</strong>.",
+    "hitos": {
+      "h0": "ein kurzes Aufwärmen",
+      "h1": "ein Hin- und Rückflug mit Zwischenstopps",
+      "h2": "ein Musikfestival am Wochenende",
+      "h3": "ein langes Wochenende",
+      "h5": "eine ganze Arbeitswoche, Montag bis Freitag",
+      "h7": "eine ganze Woche Urlaub",
+      "h10": "ein Sommerlager",
+      "h14": "zwei Wochen Krankschreibung",
+      "h21": "den Führerschein machen, von der ersten Fahrstunde bis zur Prüfung",
+      "h30": "einen ganzen Monat am Stück",
+      "h45": "einen intensiven Sommer-Sprachkurs",
+      "h60": "sich auf eine kurze Beamtenprüfung vorbereiten",
+      "h90": "ein ganzes Schultrimester",
+      "h180": "ein halbes Schuljahr",
+      "h270": "ein komplettes Schuljahr, von September bis Juni",
+      "h365": "ein ganzes Jahr, von Januar bis Januar",
+      "h548": "eine mittlere Berufsausbildung",
+      "h730": "eine höhere Berufsausbildung",
+      "h1460": "ein komplettes Studium",
+      "h1825": "ein Studium plus Master",
+      "h2190": "ein Medizinstudium, die Facharztausbildung fast inklusive",
+      "h2555": "die gesamte Mittel- und Oberstufe zusammen",
+      "h3650": "ein Jahrzehnt — wortwörtlich",
+      "h6570": "deine ganze Kindheit und Jugend, bis zur Volljährigkeit"
+    }
+  },
+  "priceHistoryChart": {
+    "masBarataTodas": "Günstigster (alle Shops)",
+    "sinHistorico": "Für dieses Spiel ist noch nicht genug Preisverlauf gespeichert.",
+    "sinHistoricoTienda": "Dieser Shop hat noch nicht genug eigenen Verlauf — versuch es mit „Günstigster (alle Shops)“.",
+    "rango7d": "7T",
+    "rango1m": "1M",
+    "rango3m": "3M",
+    "rango1a": "1J",
+    "rangoTodo": "Alles",
+    "ariaLabel": "Preisverlauf: von {inicio} € bis {fin} €, zwischen {fechaInicio} und {fechaFin}. Minimum {min} €, Maximum {max} €."
+  },
+  "deudaBacklog": {
+    "paraVerCreditos": "Bis zum Abspann",
+    "deHistoriaFaltan": "Story fehlen dir bei bereits begonnenen Spielen",
+    "para100": "Für 100%",
+    "faltanPlatinar": "fehlen dir, um Begonnenes zu platinieren/abzuschließen",
+    "footer": "Bei {count, plural, one {# begonnenen Spiel mit} other {# begonnenen Spielen mit}} gespeicherter HowLongToBeat-Dauer — begonnene Spiele ohne diese Daten zählen hier nicht."
+  },
+  "dietaGamer": {
+    "titulo": "🥗 Deine Gamer-Diät ist sehr einseitig",
+    "textoPrefix": "Deine letzten 3 abgeschlossenen Spiele —",
+    "textoSuffix": "— sind alle <strong>{genero}</strong> und kommen zusammen auf mehr als <strong>{horas} Stunden</strong>. Probier vor deinem nächsten großen Abenteuer der gleichen Art etwas anderes — ein Indie, ein Jump-and-Run oder ein kurzes Puzzlespiel zum Gaumenreinigen."
+  },
+  "eficienciaPersonal": {
+    "horasComparadas": "{horas} Std. deine · {horasHltb} Std. laut HLTB geschätzt",
+    "tuRitmoMedio": "Dein Durchschnittstempo",
+    "masRapido": "{pct}% schneller",
+    "conMasCalma": "{pct}% gemütlicher",
+    "justoEnLaMedia": "Genau im Durchschnitt",
+    "comparadoCon": "als die HowLongToBeat-Schätzung, bei {count, plural, one {# verglichenen Platin} other {# verglichenen Platins}}",
+    "masRapidoQueLaMedia": "Schneller als der Durchschnitt",
+    "conMasCalmaExploracion": "Gemütlicher / erkundend"
+  },
+  "calculadoraNivel": {
+    "titulo": "Wie weit bis Level ...?",
+    "vasPorElNivel": "Du bist aktuell auf Level {nivel}.",
+    "quieroLlegar": "Ich will Level erreichen",
+    "nivelInvalido": "Gib ein gültiges Level ein.",
+    "yaConseguido": "Hast du schon — du bist über diesem Level.",
+    "teFaltan": "Dir fehlen <strong>{xp} XP</strong>.",
+    "orientativo": "Nur eine Orientierung, keine Einkaufsliste — niemand holt nur eine Trophäenart:",
+    "equivalencia": "≈ {cantidad} {label}, wenn es nur davon wäre"
+  },
+  "talDiaComoHoy": {
+    "titulo": "🕰️ An diesem Tag",
+    "haceAnios": "vor {count, plural, one {# Jahr} other {# Jahren}}"
+  }
+}

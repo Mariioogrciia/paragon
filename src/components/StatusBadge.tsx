@@ -1,25 +1,27 @@
+import { useTranslations } from "next-intl";
 import type { GameStatus } from "@/lib/stats";
 
-const STATUS: Record<GameStatus, { label: string; bg: string; fg: string; border: string }> = {
-  platinado: { label: "Platinado", bg: "rgba(159, 212, 236, 0.14)", fg: "#9fd4ec", border: "rgba(159, 212, 236, 0.32)" },
-  completado: { label: "Al 100%", bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e", border: "rgba(226, 181, 62, 0.32)" },
-  "en-curso": { label: "En curso", bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff", border: "rgb(var(--accent-rgb) / 0.32)" },
-  "a-punto": { label: "A punto", bg: "rgba(167, 139, 250, 0.14)", fg: "#a78bfa", border: "rgba(167, 139, 250, 0.32)" },
-  "sin-empezar": { label: "Sin empezar", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
-  abandonado: { label: "Abandonado", bg: "rgba(248, 113, 113, 0.12)", fg: "#f87171", border: "rgba(248, 113, 113, 0.25)" },
-  deseados: { label: "Deseados", bg: "rgba(219, 112, 147, 0.14)", fg: "#ff8da1", border: "rgba(219, 112, 147, 0.32)" },
+const STATUS_STYLE: Record<GameStatus, { key: string; bg: string; fg: string; border: string }> = {
+  platinado: { key: "platinado", bg: "rgba(159, 212, 236, 0.14)", fg: "#9fd4ec", border: "rgba(159, 212, 236, 0.32)" },
+  completado: { key: "completado", bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e", border: "rgba(226, 181, 62, 0.32)" },
+  "en-curso": { key: "enCurso", bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff", border: "rgb(var(--accent-rgb) / 0.32)" },
+  "a-punto": { key: "aPunto", bg: "rgba(167, 139, 250, 0.14)", fg: "#a78bfa", border: "rgba(167, 139, 250, 0.32)" },
+  "sin-empezar": { key: "sinEmpezar", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
+  abandonado: { key: "abandonado", bg: "rgba(248, 113, 113, 0.12)", fg: "#f87171", border: "rgba(248, 113, 113, 0.25)" },
+  deseados: { key: "deseados", bg: "rgba(219, 112, 147, 0.14)", fg: "#ff8da1", border: "rgba(219, 112, 147, 0.32)" },
 };
 
 /** Etiqueta de estado de un juego, con los mismos tres colores en toda la app. */
 export function StatusBadge({ status }: { status: GameStatus }) {
-  const s = STATUS[status];
+  const t = useTranslations("Analitica.statusBadge");
+  const s = STATUS_STYLE[status];
 
   return (
     <span
       className="shrink-0 rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium"
       style={{ background: s.bg, color: s.fg, borderColor: s.border }}
     >
-      {s.label}
+      {t(s.key)}
     </span>
   );
 }

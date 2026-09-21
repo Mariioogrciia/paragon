@@ -1,6 +1,6 @@
+import { useTranslations } from "next-intl";
 import type { CeldaHoraria } from "@/lib/profileStats";
 
-const DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 // De 3 en 3 horas: 24 columnas por hora exacta eran demasiado finas para
 // leerse en móvil, y la caza de trofeos no se decide minuto a minuto.
 const FRANJAS = [0, 3, 6, 9, 12, 15, 18, 21];
@@ -23,6 +23,8 @@ const OPACIDAD_POR_NIVEL = [0, 0.25, 0.45, 0.7, 1];
  * (`franjasHorarias` en lib/profileStats.ts).
  */
 export function HourlyHeatmap({ celdas }: { celdas: CeldaHoraria[] }) {
+  const t = useTranslations("Analitica.hourlyHeatmap");
+  const DIAS = t.raw("dias") as string[];
   const total = celdas.reduce((acc, c) => acc + c.trofeos, 0);
   if (total === 0) return null;
 
@@ -63,8 +65,7 @@ export function HourlyHeatmap({ celdas }: { celdas: CeldaHoraria[] }) {
     <div className="overflow-x-auto pt-8 -mt-8">
       {porcentajeMejor >= 10 && (
         <p className="mb-3 text-sm font-semibold">
-          El {porcentajeMejor}% de tus trofeos caen los {DIAS[mejorDow]} entre las{" "}
-          {String(horaInicio).padStart(2, "0")}:00 y las {String(horaFin).padStart(2, "0")}:00.
+          {t("resumen", { pct: porcentajeMejor, dia: DIAS[mejorDow], inicio: String(horaInicio).padStart(2, "0"), fin: String(horaFin).padStart(2, "0") })}
         </p>
       )}
       <div className="inline-flex min-w-full gap-2">
@@ -108,7 +109,7 @@ export function HourlyHeatmap({ celdas }: { celdas: CeldaHoraria[] }) {
                         }`}
                         style={{ background: "var(--foreground)", color: "var(--background)" }}
                       >
-                        {valor} {valor === 1 ? "trofeo" : "trofeos"} · {DIAS[dow]} {String(FRANJAS[franja]).padStart(2, "0")}h-{String((FRANJAS[franja] + 3) % 24).padStart(2, "0")}h
+                        {t("tooltip", { count: valor, dia: DIAS[dow], inicio: String(FRANJAS[franja]).padStart(2, "0"), fin: String((FRANJAS[franja] + 3) % 24).padStart(2, "0") })}
                       </div>
                     )}
                   </div>

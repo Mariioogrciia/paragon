@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { Game } from "@/lib/types";
 
 function horas(minutos: number): string {
@@ -5,6 +6,7 @@ function horas(minutos: number): string {
 }
 
 export function ActivityStats({ games, now }: { games: Game[]; now: number }) {
+  const t = useTranslations("Analitica.activityStats");
   const jugados = games.filter((game) => !game.isWishlist);
   const porPlataforma = new Map<string, number>();
   for (const game of jugados) {
@@ -24,17 +26,17 @@ export function ActivityStats({ games, now }: { games: Game[]; now: number }) {
   return (
     <section className="rounded-[18px] border border-border bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-        <div><h2 className="font-heading text-xl font-bold uppercase tracking-wide">Actividad y estadísticas</h2><p className="mt-1 text-sm text-muted">Una lectura rápida de cómo estás jugando.</p></div>
-        {generoTop && <span className="text-xs text-muted">Género principal: <strong className="text-foreground">{generoTop[0]}</strong></span>}
+        <div><h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("titulo")}</h2><p className="mt-1 text-sm text-muted">{t("subtitulo")}</p></div>
+        {generoTop && <span className="text-xs text-muted">{t("generoPrincipal")} <strong className="text-foreground">{generoTop[0]}</strong></span>}
       </div>
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr]">
         <div>
-          <h3 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-wider text-muted">Horas por plataforma</h3>
-          {plataformas.length === 0 ? <p className="text-sm text-muted">Todavía no hay horas disponibles.</p> : <div className="space-y-2.5">{plataformas.map(([platform, minutes]) => <div key={platform}><div className="mb-1 flex justify-between text-xs"><span className="font-semibold uppercase">{platform}</span><span className="text-muted">{horas(minutes)}</span></div><div className="h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-accent" style={{ width: `${Math.round((minutes / maxHoras) * 100)}%` }} /></div></div>)}</div>}
+          <h3 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-wider text-muted">{t("horasPorPlataforma")}</h3>
+          {plataformas.length === 0 ? <p className="text-sm text-muted">{t("sinHoras")}</p> : <div className="space-y-2.5">{plataformas.map(([platform, minutes]) => <div key={platform}><div className="mb-1 flex justify-between text-xs"><span className="font-semibold uppercase">{platform}</span><span className="text-muted">{horas(minutes)}</span></div><div className="h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-accent" style={{ width: `${Math.round((minutes / maxHoras) * 100)}%` }} /></div></div>)}</div>}
         </div>
         <div>
-          <h3 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-wider text-muted">Sin actividad en 90 días</h3>
-          {abandonados.length === 0 ? <p className="text-sm text-muted">No hay juegos abandonados registrados.</p> : <ul className="space-y-2">{abandonados.map((game) => <li key={game.id} className="flex items-center justify-between gap-3 text-sm"><span className="min-w-0 truncate font-semibold">{game.title}</span><span className="shrink-0 text-xs text-muted">{game.progressPercent}%</span></li>)}</ul>}
+          <h3 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-wider text-muted">{t("sinActividad90")}</h3>
+          {abandonados.length === 0 ? <p className="text-sm text-muted">{t("sinAbandonados")}</p> : <ul className="space-y-2">{abandonados.map((game) => <li key={game.id} className="flex items-center justify-between gap-3 text-sm"><span className="min-w-0 truncate font-semibold">{game.title}</span><span className="shrink-0 text-xs text-muted">{game.progressPercent}%</span></li>)}</ul>}
         </div>
       </div>
     </section>
