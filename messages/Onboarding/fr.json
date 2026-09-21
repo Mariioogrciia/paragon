@@ -1,1 +1,326 @@
-{}
+{
+  "bienvenida": {
+    "title": "On va te préparer",
+    "subtitle": "Deux étapes et c'est fini.",
+    "step1": {
+      "title": "Choisis ton nom d'utilisateur",
+      "description": "C'est ton identifiant dans Paragon, celui par lequel tes amis t'ajouteront. Minuscules, chiffres et tirets bas."
+    },
+    "step2": {
+      "title": "Relie tes plateformes de jeu",
+      "description": "Une seule suffit pour commencer ; tu pourras ajouter l'autre plus tard depuis les paramètres. Pas besoin de mot de passe ni de jeton pour l'une ou l'autre : c'est le serveur qui se charge de lire les trophées.",
+      "psnLabel": "PlayStation · ton identifiant public",
+      "steamLabel": "Steam · pseudo, SteamID64 ou URL du profil",
+      "steamHint": "Sur Steam, « Mon profil » et « Détails du jeu » doivent être publics pour qu'on puisse lire tes succès.",
+      "xboxLabel": "Xbox · ton Gamertag"
+    }
+  },
+  "movilEnlazar": {
+    "error": {
+      "title": "Impossible de relier l'application",
+      "description": "Réessaie depuis le bouton « Connexion » dans l'application Paragon."
+    },
+    "linking": {
+      "title": "Connexion à l'application…",
+      "description": "Si tu ne reviens pas automatiquement à l'application, appuie sur le lien.",
+      "openApp": "Ouvrir Paragon"
+    }
+  },
+  "ajustesOcultar": {
+    "title": "Masquer",
+    "description": "Rien à voir avec la communauté — c'est uniquement pour toi. Retire du menu les fonctions qui ne t'intéressent pas ; elles restent visibles pour tout le monde, toi seul arrêtes de les voir."
+  },
+  "ajustesPlataformas": {
+    "title": "Comptes de jeu",
+    "description": "Relie tes plateformes pour synchroniser tes trophées automatiquement.",
+    "help": {
+      "psn": "Ton identifiant public PlayStation, le nom sous lequel tu joues. Ton profil de trophées doit être public pour qu'on puisse le lire.",
+      "steam": "Ton pseudo Steam, ton SteamID64 ou l'URL de ton profil. Sur Steam, « Mon profil » et « Détails du jeu » doivent être publics.",
+      "xbox": "Ton Gamertag Xbox. Synchronise réellement ton historique de succès via un service tiers (non officiel de Microsoft) — peut échouer ou cesser de fonctionner si ce service change."
+    },
+    "linked": "Relié",
+    "private": "Privé",
+    "levelLabel": "Niveau {level}",
+    "accountLinked": "Compte relié",
+    "syncedAt": " · synchronisé {date}",
+    "changeAccount": "Changer de compte",
+    "linkAccount": "Relier un compte",
+    "confirmUnlink": {
+      "title": "Dissocier {platform} ?",
+      "message": "Ta progression et tes trophées déjà enregistrés restent tels quels, mais la synchronisation s'arrête jusqu'à ce que tu relies le compte à nouveau.",
+      "confirmLabel": "Oui, dissocier",
+      "trigger": "Dissocier {platform}"
+    },
+    "nintendo": {
+      "title": "Nintendo Switch",
+      "badge": "Écosystème fermé",
+      "description": "Nintendo Switch n'a ni système de trophées propre ni API d'activité."
+    },
+    "collections": {
+      "title": "Dossiers",
+      "description": "Tes regroupements manuels. Ils se créent et se remplissent depuis la fiche de chaque jeu ; ici, tu les consultes et les supprimes seulement."
+    },
+    "sync": {
+      "title": "Synchronisation",
+      "steamNote": "Steam ne donne pas le pourcentage de succès dans la liste des jeux : il est calculé jeu par jeu. La synchronisation récupère les plus récents, le reste se complète seulement la première fois que tu ouvres sa fiche."
+    },
+    "health": {
+      "title": "État de la bibliothèque",
+      "description": "Ce qu'il manque encore pour chaque plateforme."
+    },
+    "history": {
+      "title": "Historique de synchronisation",
+      "row": "{games} jeux · {newTrophies} nouveaux trophées · {date}"
+    }
+  },
+  "ajustesSeguridad": {
+    "title": "Connexion et sécurité",
+    "description": "Vérifie les comptes avec lesquels tu te connectes et ferme ta session active.",
+    "linkedBanner": "Compte relié — tu peux maintenant te connecter à Paragon avec l'un ou l'autre.",
+    "alreadyLinkedBanner": "Ce compte est déjà relié à un AUTRE utilisateur de Paragon — il ne peut pas être rattaché au tien. Si c'est une erreur, déconnecte-toi et connecte-toi directement avec lui pour voir à quel compte il appartient.",
+    "linkedAccounts": {
+      "title": "Comptes reliés (Connexion)",
+      "linked": "Relié",
+      "hint": "Relie un autre moyen de te connecter — avec les deux actifs, l'un ou l'autre ouvre ce même compte, même avec des e-mails différents.",
+      "linkWith": "Relier avec {provider}",
+      "linkAction": "Relier"
+    },
+    "export": {
+      "title": "Ton héritage (Exporter les données)",
+      "description": "Télécharge une copie complète de ton historique sur la plateforme au format JSON. Inclut tes jeux, trophées obtenus, avis, dossiers, guides créés et ton historique de synchronisation. N'inclut ni mots de passe ni jetons.",
+      "button": "Exporter mes données"
+    },
+    "signOut": {
+      "title": "Se déconnecter",
+      "description": "Ferme la session actuelle sur ce navigateur. Tu devras te reconnecter la prochaine fois.",
+      "button": "Se déconnecter"
+    }
+  },
+  "forms": {
+    "common": {
+      "save": "Enregistrer",
+      "test": "Tester"
+    },
+    "handle": {
+      "placeholder": "ton_pseudo",
+      "change": "Modifier",
+      "continue": "Continuer",
+      "keepAvatar": "Utiliser la photo de mon compte comme avatar"
+    },
+    "psn": {
+      "placeholder": "Ton identifiant PlayStation",
+      "update": "Mettre à jour",
+      "link": "Relier"
+    },
+    "steam": {
+      "placeholder": "ton_pseudo, 7656119… ou l'URL de ton profil",
+      "update": "Mettre à jour",
+      "link": "Relier"
+    },
+    "xbox": {
+      "placeholder": "Ton Gamertag Xbox",
+      "update": "Mettre à jour",
+      "link": "Relier"
+    },
+    "collection": {
+      "placeholder": "Nouveau dossier (ex. « À faire 2026 »)",
+      "create": "Créer"
+    },
+    "league": {
+      "namePlaceholder": "Nom de la ligue (ex. « La bande habituelle »)",
+      "create": "Créer la ligue",
+      "durationLabel": "Durée (facultatif) :",
+      "durationPlaceholder": "3",
+      "durationNone": "Sans date de fin",
+      "durationUnits": {
+        "dias": "Jours",
+        "semanas": "Semaines",
+        "meses": "Mois",
+        "anios": "Années"
+      },
+      "noChallenge": "Pas de défi",
+      "noFriendsAvailable": "Tous tes amis sont déjà dans cette ligue.",
+      "chooseFriend": "Choisis un ami…",
+      "invite": "Inviter"
+    },
+    "friend": {
+      "placeholder": "pseudo_paragon",
+      "sendRequest": "Envoyer la demande"
+    },
+    "profile": {
+      "displayNameLabel": "Nom affiché",
+      "displayNamePlaceholder": "Ex. Alex",
+      "avatarUrlLabel": "URL de l'avatar",
+      "avatarUrlPlaceholder": "https://...",
+      "save": "Enregistrer le profil"
+    },
+    "discordDm": {
+      "notLinked": "Connecte-toi avec Discord (plutôt qu'avec Google) pour pouvoir activer ceci — sans ça, le bot ne sait pas à qui écrire.",
+      "title": "Alertes par MP du bot",
+      "description": "Un message privé du bot Paragon dès que tu obtiens un nouveau trophée.",
+      "hint": "Pour que le bot puisse t'écrire, vous devez partager un serveur Discord (celui où le bot Paragon est invité) et avoir les MP des membres du serveur activés."
+    },
+    "sync": {
+      "syncNow": "Synchroniser maintenant",
+      "syncing": "Synchronisation…",
+      "syncPlatform": "Synchroniser {label}"
+    },
+    "hiddenNav": {
+      "hideLabel": "Masquer {label}"
+    }
+  },
+  "profileForm": {
+    "title": "Informations personnelles",
+    "description": "Gère tes informations personnelles et tes préférences.",
+    "avatar": {
+      "title": "Téléverser un avatar",
+      "uploadButton": "Téléverser un avatar",
+      "uploading": "Envoi en cours...",
+      "hint": "Formats JPG, JPEG, PNG et GIF, jusqu'à 5 Mo"
+    },
+    "banner": {
+      "title": "Bannière du profil",
+      "empty": "Aucune bannière personnalisée",
+      "uploadButton": "Téléverser une bannière",
+      "uploading": "Envoi en cours...",
+      "hint": "Remplace le fond du jeu. Image (JPG, PNG, GIF) ou courte vidéo (MP4, WebM), ratio idéal 3:1"
+    },
+    "details": {
+      "title": "Détails du profil",
+      "usernameLabel": "Nom d'utilisateur",
+      "emailLabel": "E-mail",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "profileTitleLabel": "Titre du profil",
+      "profileTitlePlaceholder": "Ex. Chasseur de platine",
+      "backgroundGameLabel": "Jeu pour le fond",
+      "statusLabel": "Statut",
+      "statusPlaceholder": "À quoi joues-tu ?"
+    },
+    "visual": {
+      "title": "Personnalisation visuelle",
+      "colorLabel": "Couleur du profil",
+      "colorHint": "Cette couleur baignera ton profil quand on le visite.",
+      "themeLabel": "Thème du profil",
+      "themeHint": "L'apparence de ton profil pour les visiteurs — ça ne change pas le tien.",
+      "frameLabel": "Cadre de l'avatar",
+      "frameHint": "Tu es au niveau {nivel}. Les cadres verrouillés sont ignorés même si tu les choisis.",
+      "bannerLabel": "Bannière par plateforme",
+      "bannerHint": "Illustrations propres à Paragon, sans photos soumises à des droits. Remplace ce que tu téléverses au-dessus ; téléverser un nouveau fichier le remplace à nouveau.",
+      "sectionOrderLabel": "Ordre des sections"
+    },
+    "regional": {
+      "title": "Paramètres régionaux",
+      "languageLabel": "Langue",
+      "timezoneLabel": "Fuseau horaire"
+    },
+    "saveButton": "Enregistrer les modifications",
+    "noChanges": "Aucune modification non enregistrée",
+    "discordTitle": "Discord",
+    "pushTitle": "Notifications du navigateur",
+    "frames": {
+      "none": "Sans cadre",
+      "neon": "Cadre Néon (Niveau 5+)",
+      "gold": "Cadre Doré (Niveau 10+)",
+      "circuito": "Cadre Circuit (Niveau 25+)",
+      "platinum": "Cadre Platine (Niveau 50+)",
+      "fire": "Cadre Feu (Niveau 100+)",
+      "cristal": "Cadre Cristal (Niveau 150+)"
+    },
+    "themes": {
+      "dark": "Sombre",
+      "light": "Clair",
+      "oled": "OLED",
+      "highContrast": "Contraste élevé"
+    },
+    "backgroundPicker": {
+      "empty": "Encore aucun jeu dans ta bibliothèque.",
+      "autoTitle": "Automatique (le plus récent)",
+      "auto": "Auto"
+    }
+  },
+  "appearanceSettings": {
+    "title": "Apparence",
+    "description": "L'apparence de l'application pour toi dans ce navigateur — ça ne change pas ce que voient les autres.",
+    "modeTitle": "Mode",
+    "textSizeTitle": "Taille du texte",
+    "textSizeDescription": "Affecte toute l'application. Si ton navigateur ou ton téléphone a déjà un texte plus grand, « Normal » respecte ce réglage.",
+    "accentTitle": "Accent",
+    "freeColor": "Couleur libre",
+    "styleTitle": "Style",
+    "styleDescription": "Pas seulement la couleur — le rayon des coins, l'ombre, la typographie et même le fond changent selon le style.",
+    "themesTitle": "Thèmes",
+    "themesDescription": "Combos en un clic : mode + accent + style en même temps."
+  },
+  "themeCustomizer": {
+    "label": "Apparence"
+  },
+  "pushToggle": {
+    "notConfigured": "Les notifications push ne sont pas encore configurées sur le serveur.",
+    "activateError": "Impossible de l'activer.",
+    "activated": "Notifications activées.",
+    "deactivateError": "Impossible de la désactiver.",
+    "deactivated": "Notifications désactivées.",
+    "testSent": "Avis envoyé — il devrait t'arriver dans quelques secondes.",
+    "testError": "Impossible de l'envoyer.",
+    "notSupported": "Ce navigateur ne prend pas en charge les notifications push.",
+    "denied": "Tu as bloqué les notifications pour ce site. Active-les depuis les paramètres du navigateur (l'icône près de la barre d'adresse) pour pouvoir les allumer ici.",
+    "checking": "Vérification…",
+    "deactivate": "Désactiver",
+    "test": "Tester",
+    "activate": "Activer les notifications",
+    "hint": "Un avis dès que tu obtiens un nouveau trophée, même si Paragon n'est pas ouvert — il arrive directement du navigateur, sans passer par un tiers."
+  },
+  "privacyGuide": {
+    "title": {
+      "psn": "Où rendre mon profil PSN public ?",
+      "steam": "Où rendre mon profil Steam public ?",
+      "xbox": "Où rendre mon historique Xbox public ?"
+    },
+    "steps": {
+      "psn": [
+        "Depuis la console (PS5/PS4) : Paramètres → Utilisateurs et comptes → Confidentialité → Personnaliser.",
+        "Cherche « Niveau de trophées, jeux et vitrines » (ou « Trophées ») et mets-le sur « N'importe qui » / « Tout le monde ».",
+        "Si tu préfères depuis le mobile : app PlayStation → ton profil → icône des paramètres → Confidentialité du compte → Trophées.",
+        "Le changement est immédiat — pas besoin de redémarrer la session ni d'attendre."
+      ],
+      "steam": [
+        "Va sur ton profil Steam (web ou client) → « Modifier le profil » → « Paramètres de confidentialité ».",
+        "Mets « Mes détails de profil » sur Public.",
+        "C'est celui que presque tout le monde oublie : mets « Détails du jeu » AUSSI sur Public — sans ça, Steam ne laisse pas lire ta bibliothèque même si le profil est déjà public.",
+        "Clique sur « Enregistrer les modifications » en bas de la page."
+      ],
+      "xbox": [
+        "Sur la console ou dans l'app Xbox : ton profil → « Sécurité et confidentialité en ligne » → « Afficher les détails et personnaliser ».",
+        "Cherche « Historique de jeu et statistiques » (ou « Partager le contenu ») et mets-le sur « Tout le monde ».",
+        "Xbox utilise un service tiers non officiel (OpenXBL) pour lire ceci — si ton profil est déjà public et que ça ne marche toujours pas, ce n'est pas ton réglage, réessaie plus tard."
+      ]
+    }
+  },
+  "importLibraryModal": {
+    "trigger": "Importer un CSV",
+    "title": "Importer la bibliothèque",
+    "invalidCsv": "Aucun jeu valide n'a été trouvé dans le CSV. Assure-toi qu'il y a une colonne 'Name'.",
+    "csvReadError": "Erreur de lecture du CSV : {message}",
+    "importError": "Erreur lors de l'import",
+    "dropzone": "<strong>Clique pour téléverser</strong> ton CSV (Playnite / GOG)",
+    "dropzoneHint": "Doit contenir des colonnes comme Name, Platform...",
+    "gamesFound": "<strong>{count}</strong> jeux prêts à être importés ont été trouvés. Le processus associera automatiquement chaque jeu à sa jaquette IGDB. Cela peut prendre un moment.",
+    "moreGames": "...et {count} jeux de plus.",
+    "importing": "Importation...",
+    "startImport": "Démarrer l'import"
+  },
+  "platformTiles": {
+    "todo": "Tout",
+    "recommendations": "Recommandations",
+    "playstation": "PlayStation",
+    "xbox": "Xbox",
+    "steam": "Steam",
+    "nintendo": "Nintendo",
+    "nintendoNote": "Les jeux Switch sont enregistrés manuellement dans ta bibliothèque — Découvrir n'a pas encore de section dédiée pour eux (en développement).",
+    "epicGames": "Epic Games",
+    "epicGamesNote": "Ne peut plus être relié sur Paragon (n'a jamais eu de vraie synchronisation) — et il n'y a aucune source d'actualités ou de catalogue public non plus : son site bloque même son propre flux RSS officiel.",
+    "ubisoft": "Ubisoft",
+    "ubisoftNote": "Ne peut plus être relié sur Paragon (n'a jamais eu de vraie synchronisation) — et n'a pas non plus de flux d'actualités public : son site n'expose pas de RSS."
+  }
+}

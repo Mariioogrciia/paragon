@@ -1,1 +1,326 @@
-{}
+{
+  "bienvenida": {
+    "title": "Let's get you set up",
+    "subtitle": "Two steps and you're done.",
+    "step1": {
+      "title": "Choose your username",
+      "description": "This is your identifier within Paragon, and how your friends will add you. Lowercase letters, numbers and underscores."
+    },
+    "step2": {
+      "title": "Link where you play",
+      "description": "One is enough to get started; you can add the other one later from settings. No password or token needed for either — reading your achievements is the server's job.",
+      "psnLabel": "PlayStation · your public ID",
+      "steamLabel": "Steam · username, SteamID64 or profile URL",
+      "steamHint": "On Steam, both \"My Profile\" and \"Game Details\" need to be public for us to read your achievements.",
+      "xboxLabel": "Xbox · your Gamertag"
+    }
+  },
+  "movilEnlazar": {
+    "error": {
+      "title": "Couldn't link the app",
+      "description": "Try again from the \"Sign in\" button inside the Paragon app."
+    },
+    "linking": {
+      "title": "Linking with the app…",
+      "description": "If you're not taken back to the app automatically, tap the link.",
+      "openApp": "Open Paragon"
+    }
+  },
+  "ajustesOcultar": {
+    "title": "Hide",
+    "description": "Nothing to do with community — this is just for you. Remove features you're not interested in from the menu; they're still there for everyone else, you just stop seeing them."
+  },
+  "ajustesPlataformas": {
+    "title": "Game Accounts",
+    "description": "Link your platforms to sync your trophies automatically.",
+    "help": {
+      "psn": "Your public PlayStation ID, the name you play under. Your trophy profile needs to be public for us to read it.",
+      "steam": "Your Steam username, your SteamID64, or your profile URL. On Steam, both \"My Profile\" and \"Game Details\" need to be public.",
+      "xbox": "Your Xbox Gamertag. Syncs your real achievement history via a third-party service (not official from Microsoft) — it can fail or stop working if that service changes."
+    },
+    "linked": "Linked",
+    "private": "Private",
+    "levelLabel": "Level {level}",
+    "accountLinked": "Account linked",
+    "syncedAt": " · synced {date}",
+    "changeAccount": "Change account",
+    "linkAccount": "Link account",
+    "confirmUnlink": {
+      "title": "Unlink {platform}?",
+      "message": "Your progress and trophies already saved stay as they are, but syncing stops until you link the account again.",
+      "confirmLabel": "Yes, unlink",
+      "trigger": "Unlink {platform}"
+    },
+    "nintendo": {
+      "title": "Nintendo Switch",
+      "badge": "Closed ecosystem",
+      "description": "Nintendo Switch has no trophy system or activity API of its own."
+    },
+    "collections": {
+      "title": "Folders",
+      "description": "Your manual groupings. They're created and filled from each game's page; here you only review and delete them."
+    },
+    "sync": {
+      "title": "Sync",
+      "steamNote": "Steam doesn't give an achievement percentage in the game list: it's calculated game by game. Syncing brings in the most recent ones, and the rest fills in the first time you open that game's page."
+    },
+    "health": {
+      "title": "Library status",
+      "description": "What's still missing from each platform."
+    },
+    "history": {
+      "title": "Sync history",
+      "row": "{games} games · {newTrophies} new trophies · {date}"
+    }
+  },
+  "ajustesSeguridad": {
+    "title": "Sign-in and security",
+    "description": "Review the accounts you sign in with and close your active session.",
+    "linkedBanner": "Account linked — you can now sign in to Paragon with either one.",
+    "alreadyLinkedBanner": "That account is already linked to ANOTHER Paragon user — it can't be joined to yours. If this is a mistake, sign out and sign in directly with it to see which account it belongs to.",
+    "linkedAccounts": {
+      "title": "Linked accounts (Sign-in)",
+      "linked": "Linked",
+      "hint": "Link another way to sign in — with both active, either one opens this same account, even with different emails.",
+      "linkWith": "Link with {provider}",
+      "linkAction": "Link"
+    },
+    "export": {
+      "title": "Your legacy (Export data)",
+      "description": "Download a full copy of your history on the platform in JSON format. Includes your games, trophies earned, reviews, folders, guides created and your sync history. Does not include passwords or tokens.",
+      "button": "Export my data"
+    },
+    "signOut": {
+      "title": "Sign out",
+      "description": "Sign out of the current session in this browser. You'll need to sign in again next time.",
+      "button": "Sign out"
+    }
+  },
+  "forms": {
+    "common": {
+      "save": "Save",
+      "test": "Test"
+    },
+    "handle": {
+      "placeholder": "your_username",
+      "change": "Change",
+      "continue": "Continue",
+      "keepAvatar": "Use my account photo as avatar"
+    },
+    "psn": {
+      "placeholder": "Your PlayStation ID",
+      "update": "Update",
+      "link": "Link"
+    },
+    "steam": {
+      "placeholder": "your_username, 7656119… or your profile URL",
+      "update": "Update",
+      "link": "Link"
+    },
+    "xbox": {
+      "placeholder": "Your Xbox Gamertag",
+      "update": "Update",
+      "link": "Link"
+    },
+    "collection": {
+      "placeholder": "New folder (e.g. \"To do in 2026\")",
+      "create": "Create"
+    },
+    "league": {
+      "namePlaceholder": "League name (e.g. \"The usual crew\")",
+      "create": "Create league",
+      "durationLabel": "Duration (optional):",
+      "durationPlaceholder": "3",
+      "durationNone": "No end date",
+      "durationUnits": {
+        "dias": "Days",
+        "semanas": "Weeks",
+        "meses": "Months",
+        "anios": "Years"
+      },
+      "noChallenge": "No challenge",
+      "noFriendsAvailable": "All your friends are already in this league.",
+      "chooseFriend": "Choose a friend…",
+      "invite": "Invite"
+    },
+    "friend": {
+      "placeholder": "paragon_username",
+      "sendRequest": "Send request"
+    },
+    "profile": {
+      "displayNameLabel": "Display name",
+      "displayNamePlaceholder": "E.g. Alex",
+      "avatarUrlLabel": "Avatar URL",
+      "avatarUrlPlaceholder": "https://...",
+      "save": "Save profile"
+    },
+    "discordDm": {
+      "notLinked": "Sign in with Discord (instead of Google) to be able to turn this on — without that, the bot doesn't know who to message.",
+      "title": "DM alerts from the bot",
+      "description": "A direct message from the Paragon bot whenever you earn a new trophy.",
+      "hint": "For the bot to be able to message you, you both need to share a Discord server (the same one the Paragon bot is invited to) and have DMs from server members enabled."
+    },
+    "sync": {
+      "syncNow": "Sync now",
+      "syncing": "Syncing…",
+      "syncPlatform": "Sync {label}"
+    },
+    "hiddenNav": {
+      "hideLabel": "Hide {label}"
+    }
+  },
+  "profileForm": {
+    "title": "Personal information",
+    "description": "Manage your personal information and preferences.",
+    "avatar": {
+      "title": "Upload Avatar",
+      "uploadButton": "Upload Avatar",
+      "uploading": "Uploading...",
+      "hint": "JPG, JPEG, PNG and GIF formats, up to 5 MB"
+    },
+    "banner": {
+      "title": "Profile banner",
+      "empty": "No custom banner",
+      "uploadButton": "Upload Banner",
+      "uploading": "Uploading...",
+      "hint": "Replaces the game background. Image (JPG, PNG, GIF) or short video (MP4, WebM), ideal ratio 3:1"
+    },
+    "details": {
+      "title": "Profile details",
+      "usernameLabel": "Username",
+      "emailLabel": "Email",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "profileTitleLabel": "Profile title",
+      "profileTitlePlaceholder": "E.g. Platinum hunter",
+      "backgroundGameLabel": "Background game",
+      "statusLabel": "Status",
+      "statusPlaceholder": "What are you playing?"
+    },
+    "visual": {
+      "title": "Visual customization",
+      "colorLabel": "Profile color",
+      "colorHint": "This color will wash over your profile when others visit it.",
+      "themeLabel": "Profile theme",
+      "themeHint": "How your profile looks to visitors — it doesn't change yours.",
+      "frameLabel": "Avatar frame",
+      "frameHint": "You're at level {nivel}. Locked frames are discarded even if you pick them.",
+      "bannerLabel": "Platform banner",
+      "bannerHint": "Paragon's own artwork, no photos with rights involved. Replaces what you upload above; uploading a new file again overrides it.",
+      "sectionOrderLabel": "Section order"
+    },
+    "regional": {
+      "title": "Regional settings",
+      "languageLabel": "Language",
+      "timezoneLabel": "Time zone"
+    },
+    "saveButton": "Save changes",
+    "noChanges": "No unsaved changes",
+    "discordTitle": "Discord",
+    "pushTitle": "Browser notifications",
+    "frames": {
+      "none": "No frame",
+      "neon": "Neon Frame (Level 5+)",
+      "gold": "Gold Frame (Level 10+)",
+      "circuito": "Circuit Frame (Level 25+)",
+      "platinum": "Platinum Frame (Level 50+)",
+      "fire": "Fire Frame (Level 100+)",
+      "cristal": "Crystal Frame (Level 150+)"
+    },
+    "themes": {
+      "dark": "Dark",
+      "light": "Light",
+      "oled": "OLED",
+      "highContrast": "High contrast"
+    },
+    "backgroundPicker": {
+      "empty": "No games in your library yet.",
+      "autoTitle": "Automatic (most recent)",
+      "auto": "Auto"
+    }
+  },
+  "appearanceSettings": {
+    "title": "Appearance",
+    "description": "How the app looks to you in this browser — it doesn't change how others see it.",
+    "modeTitle": "Mode",
+    "textSizeTitle": "Text size",
+    "textSizeDescription": "Affects the whole app. If your browser or phone already has larger text, \"Normal\" respects that setting of yours.",
+    "accentTitle": "Accent",
+    "freeColor": "Custom color",
+    "styleTitle": "Style",
+    "styleDescription": "Not just the color — corner radius, shadow, typography and even the background change depending on the style.",
+    "themesTitle": "Themes",
+    "themesDescription": "One-click combos: mode + accent + style all at once."
+  },
+  "themeCustomizer": {
+    "label": "Appearance"
+  },
+  "pushToggle": {
+    "notConfigured": "Push notifications aren't configured on the server yet.",
+    "activateError": "Couldn't activate it.",
+    "activated": "Notifications enabled.",
+    "deactivateError": "Couldn't deactivate it.",
+    "deactivated": "Notifications disabled.",
+    "testSent": "Notice sent — it should reach you in a few seconds.",
+    "testError": "Couldn't send it.",
+    "notSupported": "This browser doesn't support push notifications.",
+    "denied": "You blocked notifications for this site. Enable them from your browser settings (the icon next to the address bar) to turn them on here.",
+    "checking": "Checking…",
+    "deactivate": "Deactivate",
+    "test": "Test",
+    "activate": "Enable notifications",
+    "hint": "A notice whenever you earn a new trophy, even if Paragon isn't open — it comes straight from the browser, without going through any third party."
+  },
+  "privacyGuide": {
+    "title": {
+      "psn": "Where do I make my PSN profile public?",
+      "steam": "Where do I make my Steam profile public?",
+      "xbox": "Where do I make my Xbox history public?"
+    },
+    "steps": {
+      "psn": [
+        "From the console (PS5/PS4): Settings → Users and Accounts → Privacy → Customize.",
+        "Find \"Trophy Level, Games, and Showcases\" (or \"Trophies\") and set it to \"Anyone\" / \"Everyone\".",
+        "If you'd rather do it from your phone: PlayStation app → your profile → settings icon → Account Privacy → Trophies.",
+        "The change is instant — no need to restart your session or wait."
+      ],
+      "steam": [
+        "Go to your Steam profile (web or client) → \"Edit Profile\" → \"Privacy Settings\".",
+        "Set \"My Profile\" to Public.",
+        "This is the one almost everyone misses: set \"Game Details\" to Public TOO — without it, Steam won't let us read your library even if your profile is already public.",
+        "Click \"Save Changes\" at the bottom of the page."
+      ],
+      "xbox": [
+        "On the console or in the Xbox app: your profile → \"Online safety & privacy\" → \"View details & customize\".",
+        "Find \"Game history and compare\" (or \"Share content\") and set it to \"Everyone\".",
+        "Xbox uses an unofficial third-party service (OpenXBL) to read this — if your profile is already public and it's still not working, it's not your setting, try again later."
+      ]
+    }
+  },
+  "importLibraryModal": {
+    "trigger": "Import CSV",
+    "title": "Import Library",
+    "invalidCsv": "No valid games were found in the CSV. Make sure it has a 'Name' column.",
+    "csvReadError": "Error reading the CSV: {message}",
+    "importError": "Error importing",
+    "dropzone": "<strong>Click to upload</strong> your CSV (Playnite / GOG)",
+    "dropzoneHint": "Must contain columns like Name, Platform...",
+    "gamesFound": "Found <strong>{count}</strong> games ready to import. The process will automatically match each game with its IGDB cover art. This may take a while.",
+    "moreGames": "...and {count} more games.",
+    "importing": "Importing...",
+    "startImport": "Start Import"
+  },
+  "platformTiles": {
+    "todo": "All",
+    "recommendations": "Recommendations",
+    "playstation": "PlayStation",
+    "xbox": "Xbox",
+    "steam": "Steam",
+    "nintendo": "Nintendo",
+    "nintendoNote": "Switch games are registered manually in your library — Discover doesn't have its own section for them yet (in development).",
+    "epicGames": "Epic Games",
+    "epicGamesNote": "It can no longer be linked on Paragon (it never had real syncing) — and there's no public news source or catalog either: its site blocks even its own official RSS feed.",
+    "ubisoft": "Ubisoft",
+    "ubisoftNote": "It can no longer be linked on Paragon (it never had real syncing) — and it has no public news feed either: its site doesn't expose RSS."
+  }
+}

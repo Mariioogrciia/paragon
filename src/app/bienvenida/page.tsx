@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm } from "@/components/forms/Forms";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = { title: "Bienvenida · Paragon" };
 
@@ -23,12 +24,14 @@ export default async function BienvenidaPage() {
     redirect(`/u/${profile.handle}`);
   }
 
+  const t = await getTranslations("Onboarding");
+
   return (
     <div className="mx-auto max-w-[560px]">
       <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
-        Vamos a dejarte listo
+        {t("bienvenida.title")}
       </h1>
-      <p className="mt-2.5 text-[0.9375rem] text-muted">Dos pasos y ya está.</p>
+      <p className="mt-2.5 text-[0.9375rem] text-muted">{t("bienvenida.subtitle")}</p>
 
       <section className="mt-7 rounded-[18px] p-6" style={CARD}>
         <div className="flex items-center gap-3">
@@ -38,12 +41,11 @@ export default async function BienvenidaPage() {
           >
             1
           </span>
-          <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">Elige tu nombre de usuario</h2>
+          <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">{t("bienvenida.step1.title")}</h2>
         </div>
 
         <p className="mb-4 mt-3 text-sm text-muted">
-          Es tu identificador dentro de Paragon, y por donde tus amigos te
-          añadirán. Minúsculas, números y guion bajo.
+          {t("bienvenida.step1.description")}
         </p>
 
         <HandleForm current={profile?.handle} hasImage={!!session.user.image} />
@@ -61,38 +63,35 @@ export default async function BienvenidaPage() {
             2
           </span>
           <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">
-            Vincula donde juegas
+            {t("bienvenida.step2.title")}
           </h2>
         </div>
 
         <p className="mb-5 mt-3 text-sm text-muted">
-          Con una basta para empezar; la otra la puedes añadir cuando quieras
-          desde ajustes. No hace falta contraseña ni token en ninguna de las
-          dos: de leer los logros se encarga el servidor.
+          {t("bienvenida.step2.description")}
         </p>
 
         <div className="space-y-5">
           <div>
             <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-              PlayStation · tu ID público
+              {t("bienvenida.step2.psnLabel")}
             </label>
             <LinkPsnForm current={accountFor(profile, "psn")?.username} />
           </div>
 
           <div>
             <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-              Steam · usuario, SteamID64 o URL del perfil
+              {t("bienvenida.step2.steamLabel")}
             </label>
             <LinkSteamForm current={accountFor(profile, "steam")?.username} />
             <p className="mt-2 text-xs text-muted">
-              En Steam, «Mi perfil» y «Detalles del juego» tienen que estar en
-              público para que se puedan leer los logros.
+              {t("bienvenida.step2.steamHint")}
             </p>
           </div>
 
           <div>
             <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-              Xbox · tu Gamertag
+              {t("bienvenida.step2.xboxLabel")}
             </label>
             <LinkXboxForm current={accountFor(profile, "xbox")?.username} />
           </div>

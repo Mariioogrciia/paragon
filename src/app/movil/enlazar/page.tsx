@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { mintMobileSession } from "@/lib/mobileAuth";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Auth.js usa sesión en base de datos (no JWT): la cookie que pone al
@@ -36,12 +37,14 @@ export default async function EnlazarMovilPage() {
   const store = await cookies();
   const sesionPrestada = COOKIE_NAMES.map((name) => store.get(name)?.value).find(Boolean);
 
+  const t = await getTranslations("Onboarding");
+
   if (!sesionPrestada) {
     return (
       <main className="mx-auto max-w-md px-6 py-16 text-center">
-        <h1 className="font-heading text-xl font-bold">No se pudo enlazar la app</h1>
+        <h1 className="font-heading text-xl font-bold">{t("movilEnlazar.error.title")}</h1>
         <p className="mt-3 text-sm text-muted">
-          Vuelve a intentarlo desde el botón de &quot;Entrar&quot; dentro de la app de Paragon.
+          {t("movilEnlazar.error.description")}
         </p>
       </main>
     );
@@ -52,12 +55,12 @@ export default async function EnlazarMovilPage() {
 
   return (
     <main className="mx-auto max-w-md px-6 py-16 text-center">
-      <h1 className="font-heading text-xl font-bold">Enlazando con la app…</h1>
+      <h1 className="font-heading text-xl font-bold">{t("movilEnlazar.linking.title")}</h1>
       <p className="mt-3 text-sm text-muted">
-        Si no vuelves a la app automáticamente, pulsa el enlace.
+        {t("movilEnlazar.linking.description")}
       </p>
       <a href={deepLink} className="mt-6 inline-block font-semibold text-accent underline">
-        Abrir Paragon
+        {t("movilEnlazar.linking.openApp")}
       </a>
       <meta httpEquiv="refresh" content={`0;url=${deepLink}`} />
     </main>

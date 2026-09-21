@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, useApariencia } from "@/lib/apariencia";
 
 /**
@@ -10,6 +11,7 @@ import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, useApariencia } from "@/
  * enlace a esta página.
  */
 export function AppearanceSettings() {
+  const t = useTranslations("Onboarding");
   const {
     montado,
     theme,
@@ -30,14 +32,14 @@ export function AppearanceSettings() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-bold mb-2">Apariencia</h1>
+        <h1 className="text-xl font-bold mb-2">{t("appearanceSettings.title")}</h1>
         <p className="text-sm text-muted">
-          Cómo ves tú la aplicación en este navegador — no cambia lo que ven los demás.
+          {t("appearanceSettings.description")}
         </p>
       </div>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-4">Modo</h2>
+        <h2 className="font-semibold mb-4">{t("appearanceSettings.modeTitle")}</h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {MODOS.map((m) => (
             <button
@@ -57,10 +59,9 @@ export function AppearanceSettings() {
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-1">Tamaño del texto</h2>
+        <h2 className="font-semibold mb-1">{t("appearanceSettings.textSizeTitle")}</h2>
         <p className="mb-4 text-sm text-muted">
-          Afecta a toda la aplicación. Si ya tienes el navegador o el móvil con
-          la letra más grande, «Normal» respeta ese ajuste tuyo.
+          {t("appearanceSettings.textSizeDescription")}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {TAMANOS_TEXTO.map((t) => (
@@ -84,7 +85,7 @@ export function AppearanceSettings() {
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-4">Acento</h2>
+        <h2 className="font-semibold mb-4">{t("appearanceSettings.accentTitle")}</h2>
         <div className="flex flex-wrap items-center gap-3">
           {ACENTOS.map((a) => (
             <button
@@ -102,8 +103,8 @@ export function AppearanceSettings() {
             />
           ))}
           <label
-            title="Color libre"
-            aria-label="Color libre"
+            title={t("appearanceSettings.freeColor")}
+            aria-label={t("appearanceSettings.freeColor")}
             className="relative h-10 w-10 shrink-0 cursor-pointer rounded-full transition-transform hover:scale-110"
             style={{
               background: acentoLibre || "conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red)",
@@ -118,14 +119,14 @@ export function AppearanceSettings() {
               className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             />
           </label>
-          <span className="text-xs text-muted">Color libre</span>
+          <span className="text-xs text-muted">{t("appearanceSettings.freeColor")}</span>
         </div>
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-1">Estilo</h2>
+        <h2 className="font-semibold mb-1">{t("appearanceSettings.styleTitle")}</h2>
         <p className="mb-4 text-xs text-muted">
-          No solo el color — el radio de esquina, la sombra, la tipografía y hasta el fondo cambian según el estilo.
+          {t("appearanceSettings.styleDescription")}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {ESTILOS.map((e) => (
@@ -148,8 +149,8 @@ export function AppearanceSettings() {
       </section>
 
       <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
-        <h2 className="font-semibold mb-1">Temas</h2>
-        <p className="mb-4 text-xs text-muted">Combos de un clic: modo + acento + estilo a la vez.</p>
+        <h2 className="font-semibold mb-1">{t("appearanceSettings.themesTitle")}</h2>
+        <p className="mb-4 text-xs text-muted">{t("appearanceSettings.themesDescription")}</p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {TEMAS.map((t) => (
             <button
