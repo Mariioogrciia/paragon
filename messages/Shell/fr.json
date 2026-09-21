@@ -111,10 +111,14 @@
     "puesto": " · place n°{puesto}"
   },
   "Home": {
-    "badge": "Suivi de trophées PlayStation",
+    "badge": "PlayStation, Steam et Xbox, unifiés",
     "heroTitleLine1": "Le prochain platine",
     "heroTitleLine2": "n'attend pas.",
     "heroDescription": "Connecte tes comptes et Paragon te dit exactement quel trophée ou succès est à ta portée, à combien tu es des 100 % et lequel de tes rivaux est devant.",
+    "heroDescripcionSocial": "Affronte des ligues, garde ta série quotidienne et compare-toi à tes amis — pas un tableur automatique, un vrai club.",
+    "socialProofTexto": "Rejoins les chasseurs qui font déjà monter leur niveau Paragon.",
+    "calloutRuta": "On calcule ta route optimale",
+    "calloutRareza": "Vraie rareté de la communauté",
     "ctaEmpezar": "Lancer la chasse",
     "ctaVerEjemplo": "Voir un profil d'exemple",
     "soloIdPublico": "Juste ton identifiant PlayStation public. Ni mot de passe, ni jeton, ni autorisation Sony.",

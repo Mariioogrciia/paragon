@@ -111,10 +111,14 @@
     "puesto": " · puesto #{puesto}"
   },
   "Home": {
-    "badge": "Rastreador de trofeos de PlayStation",
+    "badge": "PlayStation, Steam y Xbox, unificado",
     "heroTitleLine1": "El siguiente platino",
     "heroTitleLine2": "no se espera.",
     "heroDescription": "Conecta tus cuentas y Paragon te dice exactamente qué trofeo o logro tienes más a mano, cuánto te separa del 100% y quién de tus rivales va por delante.",
+    "heroDescripcionSocial": "Compite en ligas, mantén tu racha diaria y compárate con tus amigos — no es un Excel automático, es un club.",
+    "socialProofTexto": "Únete a los cazadores que ya están subiendo su nivel Paragon.",
+    "calloutRuta": "Te calculamos la ruta óptima",
+    "calloutRareza": "Rareza real de la comunidad",
     "ctaEmpezar": "Empezar la caza",
     "ctaVerEjemplo": "Ver un perfil de ejemplo",
     "soloIdPublico": "Solo tu ID público de PlayStation. Ni contraseñas, ni tokens, ni permisos de Sony.",

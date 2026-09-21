@@ -111,10 +111,14 @@
     "puesto": " · rank #{puesto}"
   },
   "Home": {
-    "badge": "PlayStation trophy tracker",
+    "badge": "PlayStation, Steam and Xbox, unified",
     "heroTitleLine1": "The next platinum",
     "heroTitleLine2": "doesn't wait.",
     "heroDescription": "Connect your accounts and Paragon tells you exactly which trophy or achievement is within reach, how far you are from 100%, and which of your rivals is ahead.",
+    "heroDescripcionSocial": "Compete in leagues, keep your daily streak, and compare yourself with friends — it's not an automatic spreadsheet, it's a club.",
+    "socialProofTexto": "Join the hunters already leveling up their Paragon level.",
+    "calloutRuta": "We calculate the optimal route for you",
+    "calloutRareza": "Real community rarity",
     "ctaEmpezar": "Start the hunt",
     "ctaVerEjemplo": "See a sample profile",
     "soloIdPublico": "Just your public PlayStation ID. No passwords, no tokens, no permissions from Sony.",

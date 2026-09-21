@@ -32,6 +32,7 @@ import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { CardBuilder } from "@/components/CardBuilder";
+import { PlayStationLogo, SteamLogo, XboxLogo } from "@/components/ui/PlatformLogos";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -79,6 +80,11 @@ async function Landing() {
           >
             <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
             {t("badge")}
+            <span className="ml-1 flex items-center gap-1.5 border-l pl-2" style={{ borderColor: "rgb(var(--accent-rgb) / 0.3)" }}>
+              <PlayStationLogo width={13} height={13} aria-label="PlayStation" />
+              <SteamLogo width={13} height={13} aria-label="Steam" />
+              <XboxLogo width={13} height={13} aria-label="Xbox" />
+            </span>
           </span>
 
           <h1 className="font-heading mt-5 text-[4.625rem] font-bold uppercase leading-[0.98] tracking-[-0.02em]">
@@ -89,6 +95,9 @@ async function Landing() {
 
           <p className="mt-6 max-w-[540px] text-lg leading-relaxed text-muted">
             {t("heroDescription")}
+          </p>
+          <p className="mt-2.5 max-w-[540px] text-base leading-relaxed" style={{ color: "var(--accent-text)" }}>
+            {t("heroDescripcionSocial")}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -107,6 +116,19 @@ async function Landing() {
               {t("ctaVerEjemplo")}
             </Link>
           </div>
+
+          {topHunters.length > 0 && (
+            <div className="mt-6 flex items-center gap-3">
+              <div className="flex -space-x-3">
+                {topHunters.slice(0, 5).map((hunter) => (
+                  <span key={hunter.userId} className="block rounded-full" style={{ border: "2px solid var(--background)" }}>
+                    <Avatar src={hunter.image} name={hunter.name ?? hunter.handle ?? "?"} size={34} />
+                  </span>
+                ))}
+              </div>
+              <p className="text-[0.8125rem] font-semibold text-muted">{t("socialProofTexto")}</p>
+            </div>
+          )}
 
           <p className="mt-[18px] text-[0.8125rem] text-muted">
             {t("soloIdPublico")}
@@ -144,9 +166,13 @@ async function Landing() {
             <span>{t("conseguidos", { conseguidos: 32, total: 42 })}</span>
             <span className="font-bold" style={{ color: "var(--accent-text)" }}>74%</span>
           </div>
+          <p className="mt-1.5 flex items-center gap-1.5 text-[0.6875rem] font-semibold" style={{ color: "var(--accent-text)" }}>
+            <span aria-hidden="true">↳</span>
+            {t("calloutRuta")}
+          </p>
 
           <ul className="mt-6 space-y-2">
-            {SAMPLE_NEXT.map((s) => (
+            {SAMPLE_NEXT.map((s, i) => (
               <li
                 key={s.name}
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5"
@@ -154,6 +180,14 @@ async function Landing() {
               >
                 <TrophyTile grade={s.grade} size={30} />
                 <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{s.name}</span>
+                {i === 0 && (
+                  <span
+                    className="hidden shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide sm:flex"
+                    style={{ background: "rgb(var(--accent-rgb) / 0.14)", color: "var(--accent-text)" }}
+                  >
+                    {t("calloutRareza")}
+                  </span>
+                )}
                 <span className="shrink-0 text-xs font-bold" style={{ color: GRADE_ACCENT[s.grade] }}>
                   {s.rarity}
                 </span>

@@ -111,10 +111,14 @@
     "puesto": " · Platz #{puesto}"
   },
   "Home": {
-    "badge": "PlayStation-Trophäen-Tracker",
+    "badge": "PlayStation, Steam und Xbox, vereint",
     "heroTitleLine1": "Das nächste Platin",
     "heroTitleLine2": "wartet nicht.",
     "heroDescription": "Verbinde deine Konten, und Paragon zeigt dir genau, welche Trophäe oder welches Achievement am nächsten liegt, wie weit du von 100 % entfernt bist und welcher deiner Rivalen vorne liegt.",
+    "heroDescripcionSocial": "Tritt in Ligen an, halte deine tägliche Serie am Leben und vergleiche dich mit Freunden — keine automatische Tabelle, ein echter Club.",
+    "socialProofTexto": "Schließ dich den Jägern an, die schon ihr Paragon-Level steigern.",
+    "calloutRuta": "Wir berechnen deine optimale Route",
+    "calloutRareza": "Echte Seltenheit der Community",
     "ctaEmpezar": "Jagd starten",
     "ctaVerEjemplo": "Beispielprofil ansehen",
     "soloIdPublico": "Nur deine öffentliche PlayStation-ID. Kein Passwort, kein Token, keine Berechtigungen von Sony.",
