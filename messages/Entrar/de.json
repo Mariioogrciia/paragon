@@ -1,0 +1,11 @@
+{
+  "title": "Einloggen bei Paragon",
+  "description": "Wähle das Konto, mit dem du dich anmelden möchtest. Danach verknüpfst du deine PlayStation- oder Steam-Profile, um Trophäen und Erfolge zu synchronisieren.",
+  "google": "Weiter mit Google",
+  "discord": "Weiter mit Discord",
+  "disclaimer": "Wir speichern keine Passwörter: Dein Anbieter übernimmt den Zugang. Trophäen werden aus dem öffentlichen PSN-Profil ausgelesen, daher muss deine Trophäen-Sichtbarkeit öffentlich sein.",
+  "stats": {
+    "heading": "4.312 Trophäen\nunbemerkt.",
+    "subheading": "Jedes Spiel verändert eine Zahl. Paragon liest sie alle und zeigt dir, welches Spiel nur noch eine Trophäe vom Abschluss entfernt ist."
+  }
+}

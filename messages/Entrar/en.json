@@ -1,0 +1,11 @@
+{
+  "title": "Log in to Paragon",
+  "description": "Choose which account you want to use. Then you'll link your PlayStation or Steam profiles to sync your trophies and achievements.",
+  "google": "Continue with Google",
+  "discord": "Continue with Discord",
+  "disclaimer": "We don't store passwords: your provider handles access. Trophies are read from your public PSN profile, so your trophy privacy must be visible.",
+  "stats": {
+    "heading": "4,312 trophies\nleft uncounted.",
+    "subheading": "Every session moves a number. Paragon reads them all and tells you which game is one trophy away from completion."
+  }
+}

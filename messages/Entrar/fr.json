@@ -1,0 +1,11 @@
+{
+  "title": "Connexion à Paragon",
+  "description": "Choisissez le compte que vous souhaitez utiliser. Ensuite, vous lierez vos profils PlayStation ou Steam pour synchroniser vos trophées et succès.",
+  "google": "Continuer avec Google",
+  "discord": "Continuer avec Discord",
+  "disclaimer": "Nous ne stockons pas les mots de passe : votre fournisseur gère l'accès. Les trophées sont lus à partir de votre profil PSN public, donc votre confidentialité de trophées doit être visible.",
+  "stats": {
+    "heading": "4 312 trophées\nnon comptés.",
+    "subheading": "Chaque session modifie un nombre. Paragon les lit tous et vous indique quel jeu n'est plus qu'à un trophée d'être complété."
+  }
+}
