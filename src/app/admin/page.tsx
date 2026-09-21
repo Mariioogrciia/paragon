@@ -33,13 +33,17 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
   const searchParams = await props.searchParams;
   const currentTab = typeof searchParams.tab === "string" ? searchParams.tab : "dashboard";
 
-  const [overview, syncRuns, usuarios, activities, leagues] = await Promise.all([
-    getAdminOverview(),
-    getRecentSyncRuns(30),
-    getAdminUsers(),
-    getAdminActivities(50),
-    getAdminLeagues(),
-  ]);
+  // Solo se piden los datos de la pestaña activa, no las cinco a la vez.
+  // El pool de conexiones a la base de datos tiene `max: 5` a propósito
+  // (ver db/index.ts) — cargar esta página entera pedía hasta 7 conexiones
+  // simultáneas (5 de aquí + 3 más dentro de getAdminUsers), lo que la
+  // dejaba lenta o directamente sin responder ("le doy a Ligas y no pasa
+  // nada"), el mismo cuello de botella que ya tumbó /feed y /ligas antes.
+  const [overview, usuarios] =
+    currentTab === "dashboard" ? await Promise.all([getAdminOverview(), getAdminUsers()]) : [null, null];
+  const leagues = currentTab === "leagues" ? await getAdminLeagues() : null;
+  const [syncRuns, activities] =
+    currentTab === "system" ? await Promise.all([getRecentSyncRuns(30), getAdminActivities(50)]) : [null, null];
 
   return (
     <div className="space-y-9 max-w-[1400px] mx-auto px-4 py-8">
@@ -72,7 +76,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       </div>
 
       {/* TAB: DASHBOARD */}
-      {currentTab === "dashboard" && (
+      {currentTab === "dashboard" && overview && usuarios && (
         <div className="space-y-9">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat value={overview.usuarios} label={t("dashboard.stats.users")} />
@@ -141,7 +145,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       )}
 
       {/* TAB: LIGAS */}
-      {currentTab === "leagues" && (
+      {currentTab === "leagues" && leagues && (
         <section className="space-y-6">
           <div>
             <h2 className="font-heading mb-1 text-xl font-bold uppercase tracking-wide">{t("leagues.title")}</h2>
@@ -193,7 +197,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       )}
 
       {/* TAB: SISTEMA */}
-      {currentTab === "system" && (
+      {currentTab === "system" && syncRuns && activities && (
         <div className="space-y-9">
           
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
