@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { replyToGuideAction } from "@/app/actions";
 
 export function RespuestaGuiaForm({ guideId, gameId }: { guideId: string; gameId: string }) {
+  const t = useTranslations("Biblioteca");
   const [texto, setTexto] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -13,7 +15,7 @@ export function RespuestaGuiaForm({ guideId, gameId }: { guideId: string; gameId
       <textarea
         value={texto}
         onChange={(e) => setTexto(e.target.value)}
-        placeholder="Responde con tu experiencia, una corrección, una duda…"
+        placeholder={t("RespuestaGuiaForm.placeholder")}
         className="h-24 w-full resize-none rounded-lg px-3.5 py-2.5 text-sm outline-none"
         style={{ border: "1px solid var(--border)", background: "var(--background)" }}
       />
@@ -35,7 +37,7 @@ export function RespuestaGuiaForm({ guideId, gameId }: { guideId: string; gameId
           className="rounded-lg px-4 py-2 text-sm font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)] disabled:pointer-events-none disabled:opacity-50"
           style={{ background: "var(--accent-grad)" }}
         >
-          {pending ? "Enviando…" : "Responder"}
+          {pending ? t("RespuestaGuiaForm.sending") : t("RespuestaGuiaForm.submit")}
         </button>
       </div>
     </div>

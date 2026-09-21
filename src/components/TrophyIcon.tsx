@@ -1,6 +1,7 @@
+import { useTranslations } from "next-intl";
 import { tileFor } from "@/lib/design";
 import type { TrophyGrade } from "@/lib/types";
-import { TROPHY_TYPE_LABEL, type TrophyType } from "@/lib/trophyType";
+import type { TrophyType } from "@/lib/trophyType";
 
 const COLORS: Record<TrophyGrade, string> = {
   bronze: "var(--bronze)",
@@ -16,9 +17,17 @@ export const GRADE_LABEL: Record<TrophyGrade, string> = {
   platinum: "Platino",
 };
 
-/** Nombre del metal, o "Logro" donde la plataforma no los tiene. */
-export function gradeLabel(grade?: TrophyGrade): string {
-  return grade ? GRADE_LABEL[grade] : "Logro";
+/**
+ * Nombre del metal, o "Logro" donde la plataforma no los tiene.
+ *
+ * Acepta un `t` opcional (namespace "Biblioteca", ver messages/Biblioteca) —
+ * quien lo llame desde dentro de un componente ya traducido se lo pasa; sin
+ * él, se queda con el fallback en español de siempre, para no romper a
+ * quienes todavía no lo pasan.
+ */
+export function gradeLabel(grade?: TrophyGrade, t?: (key: string) => string): string {
+  if (!grade) return t ? t("TrophyIcon.logro") : "Logro";
+  return t ? t(`TrophyIcon.grade.${grade}`) : GRADE_LABEL[grade];
 }
 
 const PSN_CUP = (
@@ -50,6 +59,7 @@ export function TrophyIcon({
   dimmed?: boolean;
   size?: number;
 }) {
+  const t = useTranslations("Biblioteca");
   return (
     <svg
       width={size}
@@ -57,7 +67,7 @@ export function TrophyIcon({
       viewBox="0 0 24 24"
       fill="none"
       role="img"
-      aria-label={GRADE_LABEL[grade]}
+      aria-label={t(`TrophyIcon.grade.${grade}`)}
       style={{ color: COLORS[grade], opacity: dimmed ? 0.3 : 1 }}
     >
       {grade === "platinum" ? PSN_PLATINUM : PSN_CUP}
@@ -100,7 +110,9 @@ const TROPHY_TYPE_PATHS: Record<TrophyType, React.ReactNode> = {
  * palabras clave — el título del icono lo dice, no se presenta como certeza.
  */
 export function TrophyTypeIcon({ tipo, size = 14 }: { tipo: TrophyType; size?: number }) {
+  const t = useTranslations("Biblioteca");
   const aproximado = tipo !== "secreto";
+  const label = t(`TrophyIcon.tipos.${tipo}`);
   return (
     <svg
       width={size}
@@ -112,9 +124,9 @@ export function TrophyTypeIcon({ tipo, size = 14 }: { tipo: TrophyType; size?: n
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label={TROPHY_TYPE_LABEL[tipo]}
+      aria-label={label}
     >
-      <title>{`${TROPHY_TYPE_LABEL[tipo]}${aproximado ? " (aproximado, por el texto del trofeo)" : ""}`}</title>
+      <title>{`${label}${aproximado ? t("TrophyIcon.tipoAproximado") : ""}`}</title>
       {TROPHY_TYPE_PATHS[tipo]}
     </svg>
   );

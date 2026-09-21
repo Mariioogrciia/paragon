@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useTranslations } from "next-intl";
 import { GameCard } from "@/components/GameCard";
 import { Dropdown } from "@/components/Dropdown";
 import { RatingStars } from "@/components/RatingStars";
@@ -23,36 +24,36 @@ import { Pegi } from "@/components/Pegi";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
 
-const STATUS: { label: string; value: GameStatus | "todos" }[] = [
-  { label: "Todos", value: "todos" },
-  { label: "En curso", value: "en-curso" },
-  { label: "A punto de caramelo", value: "a-punto" },
-  { label: "Abandonados", value: "abandonado" },
-  { label: "Platinados", value: "platinado" },
-  { label: "Al 100%", value: "completado" },
-  { label: "Sin empezar", value: "sin-empezar" },
-  { label: "Deseados", value: "deseados" },
+const STATUS_KEYS: { key: string; value: GameStatus | "todos" }[] = [
+  { key: "status.todos", value: "todos" },
+  { key: "status.enCurso", value: "en-curso" },
+  { key: "status.aPunto", value: "a-punto" },
+  { key: "status.abandonado", value: "abandonado" },
+  { key: "status.platinado", value: "platinado" },
+  { key: "status.completado", value: "completado" },
+  { key: "status.sinEmpezar", value: "sin-empezar" },
+  { key: "status.deseados", value: "deseados" },
 ];
 
-const SORTS: { label: string; value: SortKey }[] = [
-  { label: "Más reciente", value: "reciente" },
-  { label: "Más completado", value: "progreso" },
-  { label: "Lo que menos falta", value: "pendientes" },
-  { label: "Platino más asequible", value: "asequible" },
-  { label: "Título (A-Z)", value: "titulo" },
-  { label: "Más horas jugadas", value: "horas" },
+const SORT_KEYS: { key: string; value: SortKey }[] = [
+  { key: "sort.reciente", value: "reciente" },
+  { key: "sort.progreso", value: "progreso" },
+  { key: "sort.pendientes", value: "pendientes" },
+  { key: "sort.asequible", value: "asequible" },
+  { key: "sort.titulo", value: "titulo" },
+  { key: "sort.horas", value: "horas" },
 ];
 
 const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
 
 /** Mismo mapeo que `AcquisitionEditor.tsx` — el valor guardado es un código, no texto para enseñar. */
-const LABEL_ADQUISICION: Record<string, string> = {
-  fisico: "Físico",
-  digital: "Digital",
-  ps_plus: "PS Plus",
-  game_pass: "Game Pass",
-  prestado: "Prestado",
-  gratis: "Gratis",
+const ADQUISICION_KEYS: Record<string, string> = {
+  fisico: "adquisicion.fisico",
+  digital: "adquisicion.digital",
+  ps_plus: "adquisicion.psPlus",
+  game_pass: "adquisicion.gamePass",
+  prestado: "adquisicion.prestado",
+  gratis: "adquisicion.gratis",
 };
 
 /**
@@ -112,6 +113,24 @@ export function LibraryGrid({
   /** Mismo mecanismo que `initialStatus`, para "Ver todas" de Horas por juego (`?orden=horas`). */
   initialSort?: SortKey;
 }) {
+  const t = useTranslations("Biblioteca.LibraryGrid");
+
+  const STATUS = useMemo(
+    () => STATUS_KEYS.map((s) => ({ label: t(s.key), value: s.value })),
+    [t],
+  );
+  const SORTS = useMemo(
+    () => SORT_KEYS.map((s) => ({ label: t(s.key), value: s.value })),
+    [t],
+  );
+  const LABEL_ADQUISICION = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(ADQUISICION_KEYS).map(([code, key]) => [code, t(key)]),
+      ) as Record<string, string>,
+    [t],
+  );
+
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<GameStatus | "todos">(initialStatus ?? "todos");
   const [platform, setPlatform] = useState<Platform | "todas">("todas");
@@ -157,18 +176,19 @@ export function LibraryGrid({
   const grupos = useMemo(() => {
     if (!agrupar) return null;
 
+    const sinEmpresa = t("sinEmpresa");
     const map = new Map<string, Game[]>();
     for (const game of visible) {
-      const key = companyOf(game) ?? "Sin empresa";
+      const key = companyOf(game) ?? sinEmpresa;
       map.set(key, [...(map.get(key) ?? []), game]);
     }
 
     return [...map.entries()].sort(([a, ja], [b, jb]) => {
-      if (a === "Sin empresa") return 1;
-      if (b === "Sin empresa") return -1;
+      if (a === sinEmpresa) return 1;
+      if (b === sinEmpresa) return -1;
       return jb.length - ja.length || a.localeCompare(b, "es");
     });
-  }, [agrupar, visible]);
+  }, [agrupar, visible, t]);
 
   /* ------------------------- Carga progresiva ------------------------- */
 
@@ -289,7 +309,9 @@ export function LibraryGrid({
         )}
         <div className="flex-1 min-w-0">
           <a href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`} className="font-bold text-lg hover:text-accent truncate block">{game.title}</a>
-          <p className="text-xs text-muted mt-1">{game.deviceLabel} · {game.progressPercent}% completado</p>
+          <p className="text-xs text-muted mt-1">
+            {game.deviceLabel} · {t("listPercentCompleted", { percent: game.progressPercent })}
+          </p>
           {game.pegi && <div className="mt-1"><Pegi edad={game.pegi} /></div>}
         </div>
         <div>
@@ -315,7 +337,7 @@ export function LibraryGrid({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por título, empresa o género…"
+            placeholder={t("searchPlaceholder")}
             className="min-w-0 flex-1 bg-transparent py-3 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
           />
           {search && (
@@ -323,7 +345,7 @@ export function LibraryGrid({
               onClick={() => setSearch("")}
               className="shrink-0 text-xs font-semibold text-muted hover:text-foreground"
             >
-              Limpiar
+              {t("clear")}
             </button>
           )}
         </div>
@@ -340,7 +362,7 @@ export function LibraryGrid({
             onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
             className="h-[38px] w-[38px] flex shrink-0 items-center justify-center rounded-[9px] text-[1.125rem] transition-colors hover:bg-surface-2 text-muted hover:text-foreground"
             style={FIELD}
-            title={sortDir === "asc" ? "Orden ascendente" : "Orden descendente"}
+            title={sortDir === "asc" ? t("sortAsc") : t("sortDesc")}
           >
             {sortDir === "asc" ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -411,7 +433,7 @@ export function LibraryGrid({
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <Pill active={platform === "todas"} onClick={() => setPlatform("todas")} className="flex-1 flex justify-center text-center">
-                Todas
+                {t("allPlatforms")}
               </Pill>
               {facets.platforms.map((p) => (
                 <Pill
@@ -420,7 +442,7 @@ export function LibraryGrid({
                   onClick={() => setPlatform(p.value as Platform)}
                   className="flex-1 flex justify-center text-center"
                 >
-                  {PLATFORM_LABEL[p.value as Platform]} ({p.count})
+                  {t("platformCount", { label: PLATFORM_LABEL[p.value as Platform], count: p.count })}
                 </Pill>
               ))}
             </div>
@@ -435,7 +457,7 @@ export function LibraryGrid({
                 : { ...FIELD, color: "var(--muted)" }
             }
           >
-            Más filtros
+            {t("moreFilters")}
             {filtrosSecundariosActivos > 0 && (
               <span
                 className="flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.625rem] font-bold"
@@ -461,7 +483,7 @@ export function LibraryGrid({
 
           {filtrado && (
             <div className="flex items-center gap-3">
-              <span className="text-[0.8125rem] text-muted">{visible.length} resultados</span>
+              <span className="text-[0.8125rem] text-muted">{t("resultsCount", { count: visible.length })}</span>
               <button
                 onClick={() => {
                   setStatus("todos");
@@ -481,7 +503,7 @@ export function LibraryGrid({
                 className="rounded-[10px] px-4 py-2 text-[0.8125rem] font-semibold text-muted hover:text-foreground transition-colors"
                 style={FIELD}
               >
-                Limpiar filtros
+                {t("clearFilters")}
               </button>
             </div>
           )}
@@ -496,9 +518,9 @@ export function LibraryGrid({
             <Dropdown
               value={collection}
               onChange={setCollection}
-              placeholder="Todas las carpetas"
+              placeholder={t("folderPlaceholder")}
               options={[
-                { value: "", label: "Todas las carpetas" },
+                { value: "", label: t("folderPlaceholder") },
                 ...collections.map(c => ({ value: c.id, label: c.name, count: c.gameIds.length }))
               ]}
               className="w-full"
@@ -509,9 +531,9 @@ export function LibraryGrid({
             <Dropdown
               value={publisher}
               onChange={setPublisher}
-              placeholder="Todas las empresas"
+              placeholder={t("publisherPlaceholder")}
               options={[
-                { value: "", label: "Todas las empresas" },
+                { value: "", label: t("publisherPlaceholder") },
                 ...facets.publishers.map(p => ({ value: p.value, label: p.value, count: p.count }))
               ]}
               className="w-full"
@@ -522,9 +544,9 @@ export function LibraryGrid({
             <Dropdown
               value={genre}
               onChange={setGenre}
-              placeholder="Todos los géneros"
+              placeholder={t("genrePlaceholder")}
               options={[
-                { value: "", label: "Todos los géneros" },
+                { value: "", label: t("genrePlaceholder") },
                 ...facets.genres.map(g => ({ value: g.value, label: g.value, count: g.count }))
               ]}
               className="w-full"
@@ -535,10 +557,10 @@ export function LibraryGrid({
             <Dropdown
               value={pegi}
               onChange={setPegi}
-              placeholder="Cualquier edad"
+              placeholder={t("pegiPlaceholder")}
               options={[
-                { value: "", label: "Cualquier edad" },
-                ...facets.pegis.map((p) => ({ value: p.value, label: `PEGI ${p.value}`, count: p.count })),
+                { value: "", label: t("pegiPlaceholder") },
+                ...facets.pegis.map((p) => ({ value: p.value, label: t("pegiOption", { value: p.value }), count: p.count })),
               ]}
               className="w-full"
             />
@@ -548,15 +570,15 @@ export function LibraryGrid({
             <Dropdown
               value={dificultad ? String(dificultad) : ""}
               onChange={(v) => setDificultad((v ? Number(v) : 0) as Dificultad["nivel"] | 0)}
-              placeholder="Cualquier dificultad"
+              placeholder={t("difficultyPlaceholder")}
               options={[
-                { value: "", label: "Cualquier dificultad" },
+                { value: "", label: t("difficultyPlaceholder") },
                 ...facets.dificultades.map((d) => ({
                   value: String(d.nivel),
                   // La etiqueta sola ya no basta para distinguir el filtro:
                   // con la escala a 10 tramos, dos niveles seguidos pueden
                   // compartir nombre (7 y 8 son los dos "Muy difícil").
-                  label: `${d.etiqueta} (${d.nivel}/10)`,
+                  label: t("difficultyOption", { label: d.etiqueta, level: d.nivel }),
                   count: d.count,
                 })),
               ]}
@@ -568,9 +590,9 @@ export function LibraryGrid({
             <Dropdown
               value={horas}
               onChange={(v) => setHoras(v as HorasBucket | "")}
-              placeholder="Cualquier duración"
+              placeholder={t("hoursPlaceholder")}
               options={[
-                { value: "", label: "Cualquier duración" },
+                { value: "", label: t("hoursPlaceholder") },
                 ...facets.horas.map((h) => ({ value: h.value, label: h.label, count: h.count })),
               ]}
               className="w-full"
@@ -585,9 +607,9 @@ export function LibraryGrid({
             <Dropdown
               value={acquisitionFormat}
               onChange={(v) => setAcquisitionFormat(v as NonNullable<Game["acquisitionFormat"]> | "")}
-              placeholder="Cualquier formato"
+              placeholder={t("formatPlaceholder")}
               options={[
-                { value: "", label: "Cualquier formato" },
+                { value: "", label: t("formatPlaceholder") },
                 ...facets.acquisitionFormats.map((f) => ({
                   value: f.value,
                   label: LABEL_ADQUISICION[f.value] ?? f.value,
@@ -611,7 +633,7 @@ export function LibraryGrid({
                 : { ...FIELD, color: "var(--muted)" }
             }
           >
-            Por amortizar (&gt;5€/h)
+            {t("porAmortizar")}
           </button>
 
           {/* "Solo falta el DLC": Platinado (o 100% de Steam) pero el % global
@@ -627,7 +649,7 @@ export function LibraryGrid({
                 : { ...FIELD, color: "var(--muted)" }
             }
           >
-            Solo falta el DLC
+            {t("soloFaltaDlc")}
           </button>
 
           {/* Agrupar por empresa: es un modo de visualización, no un filtro
@@ -643,7 +665,7 @@ export function LibraryGrid({
                   : { ...FIELD, color: "var(--muted)" }
               }
             >
-              Agrupar por empresa
+              {t("agruparPorEmpresa")}
             </button>
           )}
         </div>
@@ -652,7 +674,7 @@ export function LibraryGrid({
 
       {visible.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          Ningún juego con esos filtros.
+          {t("noResults")}
         </p>
       ) : grupos ? (
         <div className="space-y-8">
@@ -660,7 +682,7 @@ export function LibraryGrid({
             <section key={empresa}>
               <div className="mb-3 flex items-baseline gap-3">
                 <h3 className="font-heading text-lg font-bold">{empresa}</h3>
-                <span className="text-xs text-muted">{juegos.length} juegos</span>
+                <span className="text-xs text-muted">{t("groupCount", { count: juegos.length })}</span>
               </div>
               <div className={view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}>
                 {juegos.map(renderGame)}
@@ -706,7 +728,7 @@ export function LibraryGrid({
           {/* Sentinela: al entrar en pantalla se pinta la página siguiente. */}
           {hayMas && (
             <div ref={sentinela} className="py-8 text-center text-[0.8125rem] text-muted">
-              Cargando más juegos…
+              {t("loadingMore")}
             </div>
           )}
         </>

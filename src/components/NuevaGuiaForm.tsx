@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createGuideAction } from "@/app/actions";
 
 export function NuevaGuiaForm({ gameId }: { gameId: string }) {
+  const t = useTranslations("Biblioteca");
   const [abierto, setAbierto] = useState(false);
   const [titulo, setTitulo] = useState("");
   const [texto, setTexto] = useState("");
@@ -19,7 +21,7 @@ export function NuevaGuiaForm({ gameId }: { gameId: string }) {
         className="w-full rounded-xl border-2 border-dashed py-4 text-sm font-semibold transition-colors hover:border-accent hover:text-accent"
         style={{ borderColor: "var(--border)", color: "var(--muted)" }}
       >
-        + Escribir una guía
+        {t("NuevaGuiaForm.writeGuide")}
       </button>
     );
   }
@@ -30,14 +32,14 @@ export function NuevaGuiaForm({ gameId }: { gameId: string }) {
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
         maxLength={120}
-        placeholder="Título — p. ej. «Ruta óptima sin perderse ningún coleccionable»"
+        placeholder={t("NuevaGuiaForm.titlePlaceholder")}
         className="mb-3 w-full rounded-lg px-3.5 py-2.5 text-sm font-semibold outline-none"
         style={{ border: "1px solid var(--border)", background: "var(--background)" }}
       />
       <textarea
         value={texto}
         onChange={(e) => setTexto(e.target.value)}
-        placeholder="Explícalo con calma: orden recomendado, qué te dejaría para el final, trampas típicas…"
+        placeholder={t("NuevaGuiaForm.bodyPlaceholder")}
         className="h-40 w-full resize-none rounded-lg px-3.5 py-2.5 text-sm outline-none"
         style={{ border: "1px solid var(--border)", background: "var(--background)" }}
       />
@@ -48,7 +50,7 @@ export function NuevaGuiaForm({ gameId }: { gameId: string }) {
           disabled={pending}
           className="px-4 py-2 text-sm font-semibold text-muted hover:text-foreground"
         >
-          Cancelar
+          {t("NuevaGuiaForm.cancel")}
         </button>
         <button
           onClick={() => {
@@ -65,7 +67,7 @@ export function NuevaGuiaForm({ gameId }: { gameId: string }) {
           className="rounded-lg px-4 py-2 text-sm font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)] disabled:pointer-events-none disabled:opacity-50"
           style={{ background: "var(--accent-grad)" }}
         >
-          {pending ? "Publicando…" : "Publicar guía"}
+          {pending ? t("NuevaGuiaForm.publishing") : t("NuevaGuiaForm.publish")}
         </button>
       </div>
     </div>

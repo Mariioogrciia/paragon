@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
 import { TiltCard } from "./TiltCard";
 import { coverGradient, relativeDate } from "@/lib/design";
@@ -5,6 +7,7 @@ import { gameProgress } from "@/lib/stats";
 import { ACHIEVEMENT_LABEL, type Game } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 import { Pegi } from "@/components/Pegi";
+import { useTranslations } from "next-intl";
 
 /**
  * Tarjeta de juego con carátula grande, a la manera de la biblioteca de la
@@ -32,6 +35,7 @@ export function GameCard({
   href: string;
   hidePinBadge?: boolean;
 }) {
+  const t = useTranslations("Biblioteca.GameCard");
   const progress = gameProgress(game);
   const played = relativeDate(game.lastPlayedAt);
 
@@ -86,13 +90,13 @@ export function GameCard({
           <span
             className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full px-2 py-1 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
             style={{ background: "rgba(226, 181, 62, 0.85)", color: "#0b0d10" }}
-            title="A por este platino ahora mismo"
+            title={t("objetivoActualTitle")}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="#0b0d10" stroke="#0b0d10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 17v5" />
               <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z" />
             </svg>
-            Objetivo actual
+            {t("objetivoActual")}
           </span>
         )}
 

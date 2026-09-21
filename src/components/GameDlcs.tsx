@@ -1,16 +1,19 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { getTranslations } from "next-intl/server";
 
 interface Props {
   dlcs: { name: string; coverUrl?: string; releaseDate?: string }[];
 }
 
-export function GameDlcs({ dlcs }: Props) {
+export async function GameDlcs({ dlcs }: Props) {
   if (dlcs.length === 0) return null;
+
+  const t = await getTranslations("Biblioteca");
 
   return (
     <div className="mt-12">
-      <h2 className="text-xl font-bold mb-4">Contenido adicional</h2>
+      <h2 className="text-xl font-bold mb-4">{t("GameDlcs.title")}</h2>
       <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
         {dlcs.map((dlc) => (
           <div key={dlc.name} className="w-[180px] shrink-0 snap-start flex flex-col gap-2">
@@ -20,7 +23,7 @@ export function GameDlcs({ dlcs }: Props) {
                 <img src={dlc.coverUrl} alt={dlc.name} className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center p-4 text-center text-xs text-muted">
-                  Sin portada
+                  {t("GameDlcs.noCover")}
                 </div>
               )}
             </div>

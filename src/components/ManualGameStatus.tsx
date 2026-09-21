@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { setManualGameCompletedAction } from "@/app/actions";
+import { useTranslations } from "next-intl";
 
 /**
  * Juegos sin API: no hay lista de logros que enseñar, así que en vez de
@@ -17,6 +18,7 @@ export function ManualGameStatus({
   gameId: string;
   completed: boolean;
 }) {
+  const t = useTranslations("Biblioteca");
   const router = useRouter();
   const [completed, setCompleted] = useState(initialCompleted);
   const [isPending, startTransition] = useTransition();
@@ -35,11 +37,10 @@ export function ManualGameStatus({
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       <h2 className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
-        Progreso
+        {t("ManualGameStatus.title")}
       </h2>
       <p className="mb-4 text-[0.8125rem] text-muted">
-        Este juego se añadió a mano: no hay logros que sincronizar, así que el
-        progreso lo marcas tú.
+        {t("ManualGameStatus.description")}
       </p>
       <div className="flex gap-2 max-w-sm">
         <button
@@ -51,7 +52,7 @@ export function ManualGameStatus({
               : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
           }`}
         >
-          Sin empezar
+          {t("ManualGameStatus.notStarted")}
         </button>
         <button
           onClick={() => toggle(true)}
@@ -62,7 +63,7 @@ export function ManualGameStatus({
               : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
           }`}
         >
-          Completado
+          {t("ManualGameStatus.completed")}
         </button>
       </div>
     </section>

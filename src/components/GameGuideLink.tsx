@@ -16,8 +16,11 @@
  * la wiki correcta (Fextralife para souls-likes, IGN o la wiki oficial para
  * el resto) como primer resultado.
  */
-export function GameGuideLink({ title }: { title: string }) {
-  const query = encodeURIComponent(`${title} guía completa mejores armas y armadura`);
+import { getTranslations } from "next-intl/server";
+
+export async function GameGuideLink({ title }: { title: string }) {
+  const t = await getTranslations("Biblioteca");
+  const query = encodeURIComponent(t("GameGuideLink.searchQuery", { title }));
   const href = `https://www.google.com/search?q=${query}`;
 
   return (
@@ -38,8 +41,8 @@ export function GameGuideLink({ title }: { title: string }) {
         </svg>
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-sm font-bold">Guía completa del juego</span>
-        <span className="block text-xs text-muted">Mejores armas, armadura y más — en un sitio externo</span>
+        <span className="block text-sm font-bold">{t("GameGuideLink.title")}</span>
+        <span className="block text-xs text-muted">{t("GameGuideLink.subtitle")}</span>
       </span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-muted">
         <path d="M7 17 17 7" />

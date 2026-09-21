@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ESTADOS_ANIMO, juegosPorEstadoAnimo, type EstadoAnimoKey } from "@/lib/estadoAnimo";
 import type { Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
@@ -13,13 +14,14 @@ import { coverGradient } from "@/lib/design";
  * resultado compacto, nada más.
  */
 export function FiltroEstadoAnimo({ games, handle }: { games: Game[]; handle: string }) {
+  const t = useTranslations("Biblioteca");
   const [elegido, setElegido] = useState<EstadoAnimoKey | null>(null);
 
   const resultado = useMemo(() => (elegido ? juegosPorEstadoAnimo(games, elegido).slice(0, 8) : []), [games, elegido]);
 
   return (
     <section className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-      <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">¿Qué te pide el cuerpo hoy?</h2>
+      <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">{t("FiltroEstadoAnimo.title")}</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {ESTADOS_ANIMO.map((e) => (
           <button
@@ -43,7 +45,7 @@ export function FiltroEstadoAnimo({ games, handle }: { games: Game[]; handle: st
       {elegido && (
         <div className="mt-4">
           {resultado.length === 0 ? (
-            <p className="text-sm text-muted">Nada pendiente de ese tipo ahora mismo — tu backlog está limpio en esta categoría.</p>
+            <p className="text-sm text-muted">{t("FiltroEstadoAnimo.empty")}</p>
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-1">
               {resultado.map((g) => (

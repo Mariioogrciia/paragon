@@ -1,19 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { actualizarAdquisicionAction } from "@/app/actions";
 import { ToggleChip } from "@/components/ToggleChip";
 
-const FORMATOS: { valor: string; label: string }[] = [
-  { valor: "fisico", label: "Físico" },
-  { valor: "digital", label: "Digital" },
-  { valor: "ps_plus", label: "PS Plus" },
-  { valor: "game_pass", label: "Game Pass" },
-  { valor: "prestado", label: "Prestado" },
-  { valor: "gratis", label: "Gratis" },
-];
-
-const LABEL_FORMATO = Object.fromEntries(FORMATOS.map((f) => [f.valor, f.label]));
+const FORMATO_VALORES = ["fisico", "digital", "ps_plus", "game_pass", "prestado", "gratis"] as const;
 
 function horasDe(playtimeMinutes: number | undefined): number | null {
   if (!playtimeMinutes || playtimeMinutes <= 0) return null;
@@ -39,11 +31,15 @@ export function AcquisitionEditor({
   price: number | undefined;
   playtimeMinutes: number | undefined;
 }) {
+  const t = useTranslations("Biblioteca");
   const [editando, setEditando] = useState(false);
   const [formatoSel, setFormatoSel] = useState(format ?? "");
   const [precioSel, setPrecioSel] = useState(price != null ? String(price) : "");
   const [isPending, startTransition] = useTransition();
   const [guardado, setGuardado] = useState({ format, price });
+
+  const FORMATOS = FORMATO_VALORES.map((valor) => ({ valor, label: t(`AcquisitionEditor.format.${valor}`) }));
+  const LABEL_FORMATO = Object.fromEntries(FORMATOS.map((f) => [f.valor, f.label]));
 
   const horas = horasDe(playtimeMinutes);
   const costeHora = guardado.price != null && horas ? guardado.price / horas : null;
@@ -76,10 +72,10 @@ export function AcquisitionEditor({
               {costeHora != null && <span> · {costeHora.toFixed(2)}€/h</span>}
             </>
           ) : (
-            "¿De dónde tienes este juego, y cuánto pagaste?"
+            t("AcquisitionEditor.prompt")
           )}
         </span>
-        <span className="shrink-0 text-xs font-semibold text-accent">Editar</span>
+        <span className="shrink-0 text-xs font-semibold text-accent">{t("AcquisitionEditor.edit")}</span>
       </button>
     );
   }
@@ -95,14 +91,14 @@ export function AcquisitionEditor({
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="text-xs font-semibold text-muted">Pagaste:</label>
+        <label className="text-xs font-semibold text-muted">{t("AcquisitionEditor.paid")}</label>
         <input
           type="number"
           min={0}
           step="0.01"
           value={precioSel}
           onChange={(e) => setPrecioSel(e.target.value)}
-          placeholder="0.00"
+          placeholder={t("AcquisitionEditor.pricePlaceholder")}
           className="w-24 rounded-lg px-2.5 py-1.5 text-sm font-semibold outline-none"
           style={{ border: "1px solid var(--border)", background: "var(--background)" }}
         />
@@ -111,7 +107,7 @@ export function AcquisitionEditor({
 
       <div className="flex justify-end gap-2">
         <button onClick={() => setEditando(false)} disabled={isPending} className="px-3 py-1.5 text-xs font-semibold text-muted hover:text-foreground">
-          Cancelar
+          {t("AcquisitionEditor.cancel")}
         </button>
         <button
           onClick={guardar}
@@ -119,7 +115,7 @@ export function AcquisitionEditor({
           className="rounded-lg px-4 py-1.5 text-xs font-bold text-background disabled:opacity-50"
           style={{ background: "var(--accent-grad)" }}
         >
-          {isPending ? "Guardando…" : "Guardar"}
+          {isPending ? t("AcquisitionEditor.saving") : t("AcquisitionEditor.save")}
         </button>
       </div>
     </div>

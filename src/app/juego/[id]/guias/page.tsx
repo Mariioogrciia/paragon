@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { NuevaGuiaForm } from "@/components/NuevaGuiaForm";
@@ -31,14 +32,16 @@ export default async function GuiasPage({ params }: { params: Promise<{ id: stri
 
   if (!game) notFound();
 
+  const t = await getTranslations("Biblioteca.GuiasPage");
+
   return (
     <div className="mx-auto max-w-[820px]">
       <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}`} label={game.title} />
 
       <div className="mt-3 mb-7 flex flex-wrap items-baseline gap-3">
-        <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">Guías</h1>
+        <h1 className="font-heading text-[2rem] font-bold uppercase leading-none">{t("titulo")}</h1>
         <span className="text-[0.8125rem] text-muted">
-          {guias.length === 0 ? "Ninguna todavía" : `${guias.length} ${guias.length === 1 ? "guía" : "guías"}`}
+          {t("guiasCount", { count: guias.length })}
         </span>
       </div>
 
@@ -48,13 +51,19 @@ export default async function GuiasPage({ params }: { params: Promise<{ id: stri
         </div>
       ) : (
         <p className="mb-7 rounded-xl border border-border bg-surface px-4 py-4 text-center text-sm text-muted">
-          <Link href="/entrar" className="font-semibold text-accent hover:underline">Entra</Link> para escribir una guía.
+          {t.rich("entraParaEscribir", {
+            link: (chunks) => (
+              <Link href="/entrar" className="font-semibold text-accent hover:underline">
+                {chunks}
+              </Link>
+            ),
+          })}
         </p>
       )}
 
       {guias.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-10 text-center text-sm text-muted">
-          Nadie ha escrito una guía de este juego todavía. Sé el primero.
+          {t("sinGuias")}
         </p>
       ) : (
         <div className="flex flex-col gap-3">
@@ -72,7 +81,7 @@ export default async function GuiasPage({ params }: { params: Promise<{ id: stri
                 <span className="text-xs font-semibold">{g.authorName ?? `@${g.authorHandle}`}</span>
                 <span className="text-xs text-muted">· {relativeDate(g.createdAt)}</span>
                 <span className="ml-auto text-xs font-bold text-accent">
-                  {g.respuestas} {g.respuestas === 1 ? "respuesta" : "respuestas"}
+                  {t("respuestasCount", { count: g.respuestas })}
                 </span>
               </div>
             </Link>

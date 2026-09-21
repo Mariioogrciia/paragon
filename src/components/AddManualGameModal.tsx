@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { addManualGameAction, addToWishlistAction, type AddManualGameInput } from "@/app/actions";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { Pegi } from "@/components/Pegi";
@@ -34,6 +35,7 @@ const DEVICE_OPTIONS = [
 ];
 
 export function AddManualGameModal() {
+  const t = useTranslations("Biblioteca");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -67,13 +69,13 @@ export function AddManualGameModal() {
         const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         if (!res.ok) {
-          setSearchError(data.error ?? "Búsqueda no disponible.");
+          setSearchError(data.error ?? t("AddManualGameModal.searchUnavailable"));
           setResults([]);
         } else {
           setResults(data);
         }
       } catch {
-        setSearchError("No se ha podido buscar. Revisa tu conexión.");
+        setSearchError(t("AddManualGameModal.searchFailed"));
       } finally {
         setSearching(false);
       }
@@ -99,7 +101,7 @@ export function AddManualGameModal() {
     if (!picked) return;
     const deviceLabel = device === "Otro" ? customDevice.trim() : device;
     if (!deviceLabel) {
-      setSaveError("Di en qué lo has jugado.");
+      setSaveError(t("AddManualGameModal.missingDevice"));
       return;
     }
 
@@ -141,7 +143,7 @@ export function AddManualGameModal() {
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        Añadir juego
+        {t("AddManualGameModal.addGame")}
       </button>
     );
   }
@@ -151,9 +153,9 @@ export function AddManualGameModal() {
       <div className="w-full max-w-lg overflow-hidden border shadow-2xl bg-card rounded-2xl border-border">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-bold">
-            {picked ? "Confirma el juego" : "Buscar juego"}
+            {picked ? t("AddManualGameModal.confirmGame") : t("AddManualGameModal.searchGame")}
           </h2>
-          <button onClick={close} className="text-muted hover:text-foreground">
+          <button onClick={close} className="text-muted hover:text-foreground" aria-label={t("AddManualGameModal.close")}>
             ✕
           </button>
         </div>
@@ -165,20 +167,19 @@ export function AddManualGameModal() {
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Título del juego (ej. Celeste, Chrono Trigger…)"
+                placeholder={t("AddManualGameModal.titlePlaceholder")}
                 className="w-full px-4 py-2.5 text-sm border rounded-xl bg-background border-border outline-none focus:border-accent"
               />
               <p className="mt-2 text-xs text-muted">
-                Para lo que no tiene logros automáticos: Switch, retro, tablero…
-                Se busca en el catálogo de IGDB.
+                {t("AddManualGameModal.searchHelp")}
               </p>
             </div>
 
             <div className="max-h-[360px] overflow-y-auto px-4 pb-4">
-              {searching && <p className="py-6 text-sm text-center text-muted">Buscando…</p>}
+              {searching && <p className="py-6 text-sm text-center text-muted">{t("AddManualGameModal.searching")}</p>}
               {searchError && <p className="py-6 text-sm text-center text-red-400">{searchError}</p>}
               {!searching && !searchError && query.trim().length >= 2 && results.length === 0 && (
-                <p className="py-6 text-sm text-center text-muted">Sin resultados para &quot;{query}&quot;.</p>
+                <p className="py-6 text-sm text-center text-muted">{t("AddManualGameModal.noResults", { query })}</p>
               )}
 
               <div className="flex flex-col gap-1.5">
@@ -195,7 +196,7 @@ export function AddManualGameModal() {
                     <button onClick={() => setPicked(game)} className="min-w-0 flex-1 text-left">
                       <p className="text-sm font-semibold truncate">{game.title}</p>
                       <p className="text-xs truncate text-muted">
-                        {game.releaseDate ? new Date(game.releaseDate).getFullYear() : "Sin fecha"}
+                        {game.releaseDate ? new Date(game.releaseDate).getFullYear() : t("AddManualGameModal.noDate")}
                         {game.platforms.length > 0 && ` · ${game.platforms.slice(0, 3).join(", ")}`}
                       </p>
                       {game.pegi && <span className="mt-1 block"><Pegi edad={game.pegi} /></span>}
@@ -218,7 +219,7 @@ export function AddManualGameModal() {
                       disabled={wishlistIds.includes(game.igdbId)}
                       className="shrink-0 text-[0.6875rem] font-bold text-accent hover:underline disabled:text-good disabled:no-underline"
                     >
-                      {wishlistIds.includes(game.igdbId) ? "✓ Deseado" : "+ Deseados"}
+                      {wishlistIds.includes(game.igdbId) ? t("AddManualGameModal.wishlisted") : t("AddManualGameModal.addToWishlist")}
                     </button>
                   </div>
                 ))}
@@ -236,21 +237,21 @@ export function AddManualGameModal() {
               <div className="min-w-0">
                 <p className="font-bold">{picked.title}</p>
                 <p className="text-xs text-muted">
-                  {picked.developer ?? picked.publisher ?? "Catálogo IGDB"}
+                  {picked.developer ?? picked.publisher ?? t("AddManualGameModal.igdbCatalog")}
                 </p>
                 {picked.pegi && <div className="mt-1"><Pegi edad={picked.pegi} /></div>}
                 <button
                   onClick={() => setPicked(null)}
                   className="mt-2 text-xs font-semibold text-accent hover:underline"
                 >
-                  Elegir otro
+                  {t("AddManualGameModal.pickAnother")}
                 </button>
               </div>
             </div>
 
             <div className="mt-5">
               <label className="text-xs font-semibold uppercase tracking-wide text-muted">
-                ¿En qué lo has jugado?
+                {t("AddManualGameModal.deviceLabel")}
               </label>
               <CustomSelect
                 value={device}
@@ -263,7 +264,7 @@ export function AddManualGameModal() {
                   autoFocus
                   value={customDevice}
                   onChange={(e) => setCustomDevice(e.target.value)}
-                  placeholder="Ej. Master System, tablero, arcade…"
+                  placeholder={t("AddManualGameModal.customDevicePlaceholder")}
                   className="w-full px-3 py-2 mt-2 text-sm border rounded-xl bg-background border-border outline-none focus:border-accent"
                 />
               )}
@@ -278,7 +279,7 @@ export function AddManualGameModal() {
                     : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
                 }`}
               >
-                Sin empezar
+                {t("AddManualGameModal.notStarted")}
               </button>
               <button
                 onClick={() => setCompleted(true)}
@@ -288,7 +289,7 @@ export function AddManualGameModal() {
                     : "border-[var(--border)] bg-transparent text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
                 }`}
               >
-                Completado
+                {t("AddManualGameModal.completed")}
               </button>
             </div>
 
@@ -300,7 +301,7 @@ export function AddManualGameModal() {
               className="w-full mt-4 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)] disabled:pointer-events-none disabled:opacity-60"
               style={{ background: "var(--accent-grad)", color: "#061021" }}
             >
-              {saving ? "Añadiendo…" : "Añadir a mi biblioteca"}
+              {saving ? t("AddManualGameModal.adding") : t("AddManualGameModal.addToLibrary")}
             </button>
           </div>
         )}

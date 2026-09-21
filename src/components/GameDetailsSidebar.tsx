@@ -7,6 +7,7 @@
  * nada inventado.
  */
 import { SiteIcon } from "@/components/SiteIcon";
+import { getTranslations } from "next-intl/server";
 
 interface Props {
   developer?: string;
@@ -45,48 +46,50 @@ function Chips({ items }: { items: string[] }) {
   );
 }
 
-export function GameDetailsSidebar({ developer, publisher, releaseLabel, platforms, genres, themes, gameModes, websites, franchises }: Props) {
+export async function GameDetailsSidebar({ developer, publisher, releaseLabel, platforms, genres, themes, gameModes, websites, franchises }: Props) {
   const hayAlgo =
     developer || publisher || releaseLabel || platforms.length > 0 || genres.length > 0 || themes.length > 0 || gameModes.length > 0 || websites.length > 0 || (franchises && franchises.length > 0);
   if (!hayAlgo) return null;
+
+  const t = await getTranslations("Biblioteca.GameDetailsSidebar");
 
   return (
     <aside
       className="space-y-4 rounded-2xl p-5"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
-      <h2 className="font-heading text-lg font-bold uppercase tracking-wide">Detalles</h2>
+      <h2 className="font-heading text-lg font-bold uppercase tracking-wide">{t("title")}</h2>
 
-      {developer && <Fila label="Desarrollador">{developer}</Fila>}
-      {publisher && publisher !== developer && <Fila label="Editor">{publisher}</Fila>}
-      {releaseLabel && <Fila label="Fecha de lanzamiento">{releaseLabel}</Fila>}
+      {developer && <Fila label={t("developer")}>{developer}</Fila>}
+      {publisher && publisher !== developer && <Fila label={t("publisher")}>{publisher}</Fila>}
+      {releaseLabel && <Fila label={t("releaseDate")}>{releaseLabel}</Fila>}
       {platforms.length > 0 && (
-        <Fila label="Plataformas">
+        <Fila label={t("platforms")}>
           <Chips items={platforms} />
         </Fila>
       )}
       {genres.length > 0 && (
-        <Fila label="Géneros">
+        <Fila label={t("genres")}>
           <Chips items={genres} />
         </Fila>
       )}
       {themes.length > 0 && (
-        <Fila label="Temas">
+        <Fila label={t("themes")}>
           <Chips items={themes} />
         </Fila>
       )}
       {gameModes.length > 0 && (
-        <Fila label="Modos de juego">
+        <Fila label={t("gameModes")}>
           <Chips items={gameModes} />
         </Fila>
       )}
       {franchises && franchises.length > 0 && (
-        <Fila label="Franquicias">
+        <Fila label={t("franchises")}>
           <Chips items={franchises} />
         </Fila>
       )}
       {websites.length > 0 && (
-        <Fila label="Sitios web">
+        <Fila label={t("websites")}>
           <div className="flex flex-wrap gap-2">
             {websites.map((w) => (
               <a

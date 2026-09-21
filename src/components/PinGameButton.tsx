@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { togglePinGameAction } from "@/app/actions";
 
 /**
@@ -20,13 +21,14 @@ import { togglePinGameAction } from "@/app/actions";
  * a bloquear el click esperando una respuesta de red.
  */
 export function PinGameButton({ gameId, pinned: pinnedInicial }: { gameId: string; pinned: boolean }) {
+  const t = useTranslations("Biblioteca");
   const [pinned, setPinned] = useState(pinnedInicial);
   const [, startTransition] = useTransition();
 
   return (
     <button
       type="button"
-      title={pinned ? "Quitar como objetivo actual" : "Anclar como objetivo actual — se verá en tu perfil"}
+      title={pinned ? t("PinGameButton.unpin") : t("PinGameButton.pin")}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

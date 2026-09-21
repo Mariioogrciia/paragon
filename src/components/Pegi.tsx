@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 /**
  * Distintivo PEGI (clasificación por edades).
  *
@@ -10,6 +14,7 @@
  * todos los juegos, y PSN no lo da.
  */
 export function Pegi({ edad, size = "sm" }: { edad: string; size?: "sm" | "md" }) {
+  const t = useTranslations("Biblioteca");
   const color =
     edad === "18" ? "#c0392b" : edad === "3" || edad === "7" ? "#1e824c" : "#d35400";
 
@@ -22,8 +27,8 @@ export function Pegi({ edad, size = "sm" }: { edad: string; size?: "sm" | "md" }
     <span
       className={`inline-flex items-center justify-center rounded-[4px] px-1 font-bold text-white ${medidas}`}
       style={{ background: color }}
-      title={`PEGI ${edad}: no recomendado para menores de ${edad} años`}
-      aria-label={`PEGI ${edad}`}
+      title={t("Pegi.titleAttr", { edad })}
+      aria-label={t("Pegi.ariaLabel", { edad })}
     >
       {edad}
     </span>

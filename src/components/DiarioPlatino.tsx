@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { DiarioPlatino as Diario } from "@/lib/diarioPlatino";
 
 function fechaLarga(iso: string): string {
@@ -11,35 +12,54 @@ function fechaLarga(iso: string): string {
  * ya son públicas en la propia lista de abajo, esto solo las cuenta como
  * historia en vez de como filas sueltas.
  */
-export function DiarioPlatino({ diario, titulo }: { diario: Diario; titulo: string }) {
+export async function DiarioPlatino({ diario, titulo }: { diario: Diario; titulo: string }) {
+  const t = await getTranslations("Biblioteca.DiarioPlatino");
+  const strong = (chunks: React.ReactNode) => <span className="font-semibold text-foreground">{chunks}</span>;
+  const italic = (chunks: React.ReactNode) => <span className="italic">{chunks}</span>;
+
   return (
     <section
       className="mb-8 rounded-2xl p-5"
       style={{ border: "1px solid var(--border)", background: "linear-gradient(165deg, rgba(159, 212, 236, 0.08), var(--surface))" }}
     >
-      <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">📖 El diario del platino</h2>
+      <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">{t("titulo")}</h2>
       <div className="space-y-3 text-sm leading-relaxed">
         <p>
-          Tu aventura en <span className="font-bold">{titulo}</span> empezó el{" "}
-          <span className="font-semibold text-foreground">{fechaLarga(diario.primeraFecha)}</span>, con{" "}
-          <span className="italic">&ldquo;{diario.primerTrofeo}&rdquo;</span>.
+          {t.rich("inicio", {
+            b: (chunks) => <span className="font-bold">{chunks}</span>,
+            strong,
+            italic,
+            titulo,
+            fecha: fechaLarga(diario.primeraFecha),
+            primerTrofeo: diario.primerTrofeo,
+          })}
         </p>
         {diario.muroDias >= 3 && (
           <p>
-            Tu mayor muro fue superar <span className="italic">&ldquo;{diario.muroTrofeo}&rdquo;</span> — estuviste{" "}
-            <span className="font-semibold text-foreground">{diario.muroDias} {diario.muroDias === 1 ? "día" : "días"}</span> sin desbloquear nada antes de conseguirlo.
+            {t.rich("muro", {
+              strong,
+              italic,
+              muroTrofeo: diario.muroTrofeo,
+              dias: diario.muroDias,
+            })}
           </p>
         )}
         {diario.masRaro && diario.masRaro.rarityPercent < 20 && (
           <p>
-            Tu mayor hazaña fue <span className="italic">&ldquo;{diario.masRaro.nombre}&rdquo;</span>, conseguido solo por el{" "}
-            <span className="font-semibold text-foreground">{diario.masRaro.rarityPercent.toFixed(1)}%</span> de quienes juegan esto.
+            {t.rich("hazana", {
+              strong,
+              italic,
+              nombre: diario.masRaro.nombre,
+              porcentaje: diario.masRaro.rarityPercent.toFixed(1),
+            })}
           </p>
         )}
         <p>
-          Finalmente, te coronaste el{" "}
-          <span className="font-semibold text-foreground">{fechaLarga(diario.fechaPlatino)}</span>, tras{" "}
-          <span className="font-semibold text-foreground">{diario.diasTotales} {diario.diasTotales === 1 ? "día" : "días"}</span> de caza.
+          {t.rich("final", {
+            strong,
+            fecha: fechaLarga(diario.fechaPlatino),
+            dias: diario.diasTotales,
+          })}
         </p>
       </div>
     </section>

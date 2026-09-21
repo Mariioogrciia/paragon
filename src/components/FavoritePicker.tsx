@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { setFavoritesAction } from "@/app/actions";
 import { Game } from "@/lib/types";
 import { TiltCard } from "./TiltCard";
 import { coverGradient } from "@/lib/design";
 
 export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[], currentFavorites: string[] }) {
+  const t = useTranslations("Biblioteca");
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>(currentFavorites || []);
   const [search, setSearch] = useState("");
@@ -34,7 +36,7 @@ export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[
         onClick={() => setIsOpen(true)}
         className="px-3 py-1.5 text-xs font-semibold rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
       >
-        Editar favoritos
+        {t("FavoritePicker.edit")}
       </button>
     );
   }
@@ -43,14 +45,14 @@ export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
       <div className="w-full max-w-2xl overflow-hidden border shadow-2xl bg-card rounded-2xl border-border">
         <div className="p-4 border-b border-border flex justify-between items-center">
-          <h2 className="text-xl font-bold">Selecciona tus favoritos ({selected.length}/4)</h2>
+          <h2 className="text-xl font-bold">{t("FavoritePicker.selectTitle", { count: selected.length })}</h2>
           <button onClick={() => setIsOpen(false)} className="text-muted hover:text-foreground">✕</button>
         </div>
         
         <div className="p-4 bg-muted/10">
           <input 
             type="text" 
-            placeholder="Buscar juego..." 
+            placeholder={t("FavoritePicker.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full px-4 py-2 border rounded-xl bg-background border-border"
@@ -88,10 +90,10 @@ export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[
 
         <div className="p-4 border-t border-border flex justify-end gap-3">
           <button onClick={() => setIsOpen(false)} className="px-4 py-2 text-sm font-semibold text-muted hover:text-foreground">
-            Cancelar
+            {t("FavoritePicker.cancel")}
           </button>
           <button onClick={handleSave} className="px-4 py-2 text-sm font-bold rounded-xl bg-accent text-white shadow-lg">
-            Guardar favoritos
+            {t("FavoritePicker.save")}
           </button>
         </div>
       </div>

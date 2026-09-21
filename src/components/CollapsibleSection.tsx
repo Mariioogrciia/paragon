@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * Colapsa contenido de baja prioridad en la portada (empieza cerrado) y
@@ -27,6 +28,7 @@ export function CollapsibleSection({
   // sin parpadeo) y solo se ABRE después, si el navegador recuerda que esta
   // persona ya lo había desplegado — un salto de cerrado a abierto se lee
   // como "esto sigue cargando", uno de abierto a cerrado se lee como un bug.
+  const t = useTranslations("Biblioteca");
   const [open, setOpen] = useState(defaultOpen);
   const key = `platinos:seccion:${storageKey}`;
 
@@ -58,7 +60,9 @@ export function CollapsibleSection({
         className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted transition-colors hover:text-foreground"
       >
         <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
-        {open ? `Ocultar ${toggleLabel}` : `Mostrar ${toggleLabel}`}
+        {open
+          ? t("CollapsibleSection.hide", { label: toggleLabel })
+          : t("CollapsibleSection.show", { label: toggleLabel })}
       </button>
       {open && children}
     </div>
