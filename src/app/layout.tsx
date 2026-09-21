@@ -233,8 +233,8 @@ export default async function RootLayout({
         <ServiceWorkerRegister />
         <NativeAppSetup />
         <Analytics />
-        <CookieBanner />
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <CookieBanner />
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
