@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { HitosHistoricos } from "@/lib/profileStats";
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
@@ -58,6 +59,7 @@ const ICONO_GRADO: Record<string, string> = {
 };
 
 export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
+  const t = useTranslations("Analitica.historicalTimeline");
   const { primerTrofeo, primerPlatino, trofeoMasRaro, platinoAnejo, rachaMasLarga } = hitos;
 
   if (!primerTrofeo && !primerPlatino && !trofeoMasRaro && !platinoAnejo && !rachaMasLarga) return null;
@@ -67,7 +69,7 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
       {primerTrofeo && (
         <Hito
           icono={primerTrofeo.grade ? ICONO_GRADO[primerTrofeo.grade] : "🎮"}
-          etiqueta="Tu primer trofeo"
+          etiqueta={t("tuPrimerTrofeo")}
           titulo={primerTrofeo.nombre}
           iconUrl={primerTrofeo.iconUrl}
           detalle={`${fechaCorta(primerTrofeo.fecha)} · ${primerTrofeo.tituloJuego}`}
@@ -78,7 +80,7 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
       {primerPlatino && (
         <Hito
           icono="🏆"
-          etiqueta="Tu primer platino"
+          etiqueta={t("tuPrimerPlatino")}
           titulo={primerPlatino.titulo}
           iconUrl={primerPlatino.iconUrl}
           detalle={fechaCorta(primerPlatino.fecha)}
@@ -89,10 +91,10 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
       {trofeoMasRaro && (
         <Hito
           icono="💎"
-          etiqueta="Tu trofeo más raro"
+          etiqueta={t("tuTrofeoMasRaro")}
           titulo={trofeoMasRaro.nombre}
           iconUrl={trofeoMasRaro.iconUrl}
-          detalle={`${trofeoMasRaro.rarityPercent.toFixed(1)}% lo tiene · ${trofeoMasRaro.tituloJuego}`}
+          detalle={t("loTiene", { pct: trofeoMasRaro.rarityPercent.toFixed(1), juego: trofeoMasRaro.tituloJuego })}
           href={`/juego/${trofeoMasRaro.gameId}`}
         />
       )}
@@ -100,13 +102,13 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
       {platinoAnejo && platinoAnejo.dias >= 30 && (
         <Hito
           icono="🍷"
-          etiqueta="El platino añejo"
+          etiqueta={t("elPlatinoAnejo")}
           titulo={platinoAnejo.titulo}
           iconUrl={platinoAnejo.iconUrl}
           detalle={
             platinoAnejo.dias >= 365
-              ? `Completado ${Math.floor(platinoAnejo.dias / 365)} años y ${Math.round((platinoAnejo.dias % 365) / 30)} meses después de empezarlo`
-              : `Completado ${Math.round(platinoAnejo.dias / 30)} meses después de empezarlo`
+              ? t("completadoAnios", { anios: Math.floor(platinoAnejo.dias / 365), meses: Math.round((platinoAnejo.dias % 365) / 30) })
+              : t("completadoMeses", { meses: Math.round(platinoAnejo.dias / 30) })
           }
           href={`/juego/${platinoAnejo.gameId}`}
         />
@@ -115,10 +117,10 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
       {rachaMasLarga && rachaMasLarga.dias >= 3 && (
         <Hito
           icono="🔥"
-          etiqueta="Tu racha más larga"
-          titulo={`${rachaMasLarga.dias} días seguidos`}
+          etiqueta={t("tuRachaMasLarga")}
+          titulo={t("diasSeguidos", { count: rachaMasLarga.dias })}
           iconUrl={null}
-          detalle={`Del ${fechaCorta(rachaMasLarga.desde)} al ${fechaCorta(rachaMasLarga.hasta)}, ganando trofeos sin parar un día`}
+          detalle={t("rachaDetalle", { desde: fechaCorta(rachaMasLarga.desde), hasta: fechaCorta(rachaMasLarga.hasta) })}
         />
       )}
     </div>

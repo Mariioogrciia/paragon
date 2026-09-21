@@ -2,19 +2,13 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Dropdown } from "@/components/Dropdown";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
 import { toggleGameCollectionAction, syncHltbAction } from "@/app/actions";
 import type { Collection } from "@/lib/collections";
 import type { Game } from "@/lib/types";
-
-const ORDENES = [
-  { value: "proximidad", label: "Más cerca" },
-  { value: "progreso", label: "Más progreso" },
-  { value: "horas", label: "Más horas" },
-  { value: "hltb", label: "Más rápido (HLTB)" },
-];
 
 function faltan(game: Game): number {
   return Math.max(0, game.definedTotal - game.earnedTotal);
@@ -23,14 +17,14 @@ function faltan(game: Game): number {
 /** Historia y platino por separado (pedido explícito), no un solo número
  * combinado — en el plan de platinos importan los dos: la historia dice
  * "cuánto para ver el final", el platino "cuánto para el 100%". */
-function formatHltb(game: Game) {
+function formatHltb(game: Game, t: ReturnType<typeof useTranslations>) {
   if (!game.hltb) return null;
   const historia = game.hltb.main;
   const platino = game.hltb.completionist ?? game.hltb.mainExtra;
   if (historia == null && platino == null) return null;
   const partes = [];
-  if (historia != null) partes.push(`⏱ ${historia}h historia`);
-  if (platino != null) partes.push(`🏆 ${platino}h platino`);
+  if (historia != null) partes.push(t("historyHours", { horas: historia }));
+  if (platino != null) partes.push(t("platinumHours", { horas: platino }));
   return partes.join(" · ");
 }
 
@@ -45,6 +39,13 @@ function formatHltb(game: Game) {
  * lista) y quitar del plan sin salir de la página.
  */
 export function Planificador({ collections, library, handle }: { collections: Collection[]; library: Game[]; handle: string }) {
+  const t = useTranslations("Analitica.planificador");
+  const ORDENES = [
+    { value: "proximidad", label: t("ordenProximidad") },
+    { value: "progreso", label: t("ordenProgreso") },
+    { value: "horas", label: t("ordenHoras") },
+    { value: "hltb", label: t("ordenHltb") },
+  ];
   const jugables = useMemo(() => library.filter((g) => !g.isWishlist), [library]);
 
   const [collectionId, setCollectionId] = useState(() => {
@@ -100,10 +101,9 @@ export function Planificador({ collections, library, handle }: { collections: Co
   if (collections.length === 0) {
     return (
       <section className="rounded-[18px] border border-border bg-surface p-5">
-        <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Plan de platinos</h2>
+        <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("titulo")}</h2>
         <p className="mt-2 text-sm text-muted">
-          Todavía no tienes ninguna carpeta. Crea una más abajo (el nombre da igual, ya no hace
-          falta que se llame "Plan de platinos") y añade los juegos que quieras seguir aquí.
+          {t("sinCarpetas")}
         </p>
       </section>
     );
@@ -113,8 +113,8 @@ export function Planificador({ collections, library, handle }: { collections: Co
     <section className="rounded-[18px] border border-border bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Plan de platinos</h2>
-          <p className="mt-1 text-sm text-muted">Tus juegos pendientes, ordenados para elegir la próxima sesión.</p>
+          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("titulo")}</h2>
+          <p className="mt-1 text-sm text-muted">{t("subtitulo")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Dropdown
@@ -129,7 +129,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
 
       {objetivos.length === 0 ? (
         <p className="text-sm text-muted">
-          «{carpeta?.name}» está vacía todavía. Añade juegos desde su ficha o desde «Tus carpetas», más abajo.
+          {t("carpetaVacia", { carpeta: carpeta?.name ?? "" })}
         </p>
       ) : (
         <>
@@ -137,18 +137,18 @@ export function Planificador({ collections, library, handle }: { collections: Co
             <div className="rounded-xl border border-border p-3 text-center">
               <p className="font-heading text-2xl font-bold">{objetivos.length}</p>
               <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
-                {objetivos.length === 1 ? "juego" : "juegos"} en el plan
+                {t("juegosEnPlan", { count: objetivos.length })}
               </p>
             </div>
             <div className="rounded-xl border border-border p-3 text-center">
               <p className="font-heading text-2xl font-bold text-platinum">{totalFaltan}</p>
-              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">logros pendientes</p>
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">{t("logrosPendientes")}</p>
             </div>
             <div className="rounded-xl border border-border p-3 text-center">
               <p className="font-heading text-2xl font-bold" style={{ color: "var(--accent-text)" }}>
                 {progresoMedio}%
               </p>
-              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">progreso medio</p>
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">{t("progresoMedio")}</p>
             </div>
           </div>
 
@@ -175,10 +175,10 @@ export function Planificador({ collections, library, handle }: { collections: Co
                 )}
               </div>
               <div className="relative z-10 min-w-0 flex-1">
-                <p className="text-[0.625rem] font-bold uppercase tracking-[0.12em] text-accent">Siguiente</p>
+                <p className="text-[0.625rem] font-bold uppercase tracking-[0.12em] text-accent">{t("siguiente")}</p>
                 <p className="truncate text-lg font-bold text-white">{ordered[0].title}</p>
                 <p className="text-xs text-white/70">
-                  {ordered[0].progressPercent}% · faltan {faltan(ordered[0])} logros {formatHltb(ordered[0]) ? `· ${formatHltb(ordered[0])}` : ""}
+                  {t("progresoFaltan", { pct: ordered[0].progressPercent, faltan: faltan(ordered[0]), hltb: formatHltb(ordered[0], t) ? `· ${formatHltb(ordered[0], t)}` : "" })}
                 </p>
               </div>
             </div>
@@ -197,14 +197,14 @@ export function Planificador({ collections, library, handle }: { collections: Co
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold">{game.title}</span>
                     <span className="mt-1 block text-xs text-muted">
-                      {game.progressPercent}% · faltan {faltan(game)} logros {formatHltb(game) ? `· ${formatHltb(game)}` : ""}
+                      {t("progresoFaltan", { pct: game.progressPercent, faltan: faltan(game), hltb: formatHltb(game, t) ? `· ${formatHltb(game, t)}` : "" })}
                     </span>
                   </span>
                 </Link>
                 <form action={toggleGameCollectionAction}>
                   <input type="hidden" name="collectionId" value={collectionId} />
                   <input type="hidden" name="gameId" value={game.id} />
-                  <button className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-danger">Quitar</button>
+                  <button className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-danger">{t("quitar")}</button>
                 </form>
               </div>
             ))}

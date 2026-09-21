@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import type { PuntoPrecio } from "@/lib/itad";
 
@@ -52,17 +53,22 @@ function colapsarPorDia(puntos: PuntoPrecio[]): PuntoDia[] {
 
 type RangoKey = "7d" | "1m" | "3m" | "1a" | "todo";
 
-const RANGOS: { key: RangoKey; label: string; dias: number | null }[] = [
-  { key: "7d", label: "7D", dias: 7 },
-  { key: "1m", label: "1M", dias: 30 },
-  { key: "3m", label: "3M", dias: 90 },
-  { key: "1a", label: "1A", dias: 365 },
-  { key: "todo", label: "Todo", dias: null },
+const RANGO_DIAS: { key: RangoKey; dias: number | null }[] = [
+  { key: "7d", dias: 7 },
+  { key: "1m", dias: 30 },
+  { key: "3m", dias: 90 },
+  { key: "1a", dias: 365 },
+  { key: "todo", dias: null },
 ];
 
 const MS_DIA = 86_400_000;
 
 export function PriceHistoryChart({ puntos, compact = false }: Props) {
+  const t = useTranslations("Analitica.priceHistoryChart");
+  const RANGOS: { key: RangoKey; label: string; dias: number | null }[] = RANGO_DIAS.map((r) => ({
+    ...r,
+    label: t(r.key === "7d" ? "rango7d" : r.key === "1m" ? "rango1m" : r.key === "3m" ? "rango3m" : r.key === "1a" ? "rango1a" : "rangoTodo"),
+  }));
   const [hover, setHover] = useState<number | null>(null);
   const [rango, setRango] = useState<RangoKey>("3m");
   const [tienda, setTienda] = useState<string>(TODAS_LAS_TIENDAS);
@@ -92,7 +98,7 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
     <CustomSelect
       value={tienda}
       onChange={setTienda}
-      options={[{ value: TODAS_LAS_TIENDAS, label: "Más barata (todas)" }, ...tiendas.map((t) => ({ value: t, label: t }))]}
+      options={[{ value: TODAS_LAS_TIENDAS, label: t("masBarataTodas") }, ...tiendas.map((nombreTienda) => ({ value: nombreTienda, label: nombreTienda }))]}
     />
   );
 
@@ -102,8 +108,8 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
         {selectorTienda && <div className="mb-3">{selectorTienda}</div>}
         <p className="rounded-xl border border-border bg-surface px-4 py-6 text-center text-sm text-muted">
           {tienda === TODAS_LAS_TIENDAS
-            ? "Todavía no hay suficiente histórico de precio guardado para este juego."
-            : "Esta tienda no tiene suficiente histórico propio — prueba con \"Más barata (todas)\"."}
+            ? t("sinHistorico")
+            : t("sinHistoricoTienda")}
         </p>
       </div>
     );
@@ -197,7 +203,7 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           className="w-full"
           role="img"
-          aria-label={`Evolución del precio: de ${dias[0].precio.toFixed(2)} € a ${dias[dias.length - 1].precio.toFixed(2)} €, entre ${formatoTooltip(dias[0].fecha)} y ${formatoTooltip(dias[dias.length - 1].fecha)}. Mínimo ${min.toFixed(2)} €, máximo ${max.toFixed(2)} €.`}
+          aria-label={t("ariaLabel", { inicio: dias[0].precio.toFixed(2), fin: dias[dias.length - 1].precio.toFixed(2), fechaInicio: formatoTooltip(dias[0].fecha), fechaFin: formatoTooltip(dias[dias.length - 1].fecha), min: min.toFixed(2), max: max.toFixed(2) })}
           onMouseLeave={() => setHover(null)}
           onMouseMove={(e) => actualizarHover(e.clientX, e.currentTarget.getBoundingClientRect())}
           onTouchStart={(e) => {

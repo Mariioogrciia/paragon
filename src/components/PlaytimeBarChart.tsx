@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const TOP_MOSTRADO = 8;
 
@@ -24,10 +25,12 @@ export function PlaytimeBarChart({
   juegos: { gameId: string; titulo: string; iconUrl: string | null; horas: number }[];
   handle: string;
 }) {
+  const t = useTranslations("Analitica.playtimeBarChart");
+
   if (juegos.length === 0) {
     return (
       <div className="rounded-2xl p-5 text-sm text-muted" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-        Ninguna plataforma vinculada ha reportado horas jugadas todavía.
+        {t("sinHoras")}
       </div>
     );
   }
@@ -37,7 +40,7 @@ export function PlaytimeBarChart({
 
   return (
     <div className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-      <h3 className="mb-4 font-heading text-sm font-bold uppercase tracking-wide">Horas por juego</h3>
+      <h3 className="mb-4 font-heading text-sm font-bold uppercase tracking-wide">{t("titulo")}</h3>
       <div className="space-y-3">
         {visibles.map((j) => (
           <div key={j.gameId} className="flex items-center gap-3">
@@ -57,7 +60,7 @@ export function PlaytimeBarChart({
         href={`/u/${handle}/biblioteca?orden=horas`}
         className="mt-4 inline-block text-xs font-bold uppercase tracking-wide text-accent transition-colors hover:text-accent-text"
       >
-        Ver todas las horas en la Biblioteca →
+        {t("verTodas")}
       </Link>
     </div>
   );

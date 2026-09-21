@@ -1,11 +1,6 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { MesConTrofeos } from "@/lib/history";
-
-const MESES_CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
-function mesCorto(clave: string): string {
-  return MESES_CORTOS[Number(clave.split("-")[1]) - 1] ?? clave.slice(5);
-}
 
 // `PlaytimeBarChart` vive en su propio archivo (components/PlaytimeBarChart.tsx)
 // desde que ganó un "ver más" interactivo — necesita "use client", y este
@@ -14,17 +9,24 @@ function mesCorto(clave: string): string {
 
 /** Barras de trofeos por mes — mismo dato y forma que ya usa /ritmo, aquí en compacto para la sección de estadísticas. */
 export function TrophyMonthChart({ meses }: { meses: MesConTrofeos[] }) {
+  const t = useTranslations("Analitica.statCharts");
+  const mesesCortos = t.raw("mesesCortos") as string[];
+
+  function mesCorto(clave: string): string {
+    return mesesCortos[Number(clave.split("-")[1]) - 1] ?? clave.slice(5);
+  }
+
   const maximo = Math.max(...meses.map((m) => m.total), 1);
 
   return (
     <div className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
       <div className="mb-1 flex items-baseline justify-between">
-        <h3 className="font-heading text-sm font-bold uppercase tracking-wide">Trofeos por mes</h3>
-        <Link href="/ritmo" className="text-xs font-semibold text-accent hover:underline">Ver el detalle →</Link>
+        <h3 className="font-heading text-sm font-bold uppercase tracking-wide">{t("trofeosPorMes")}</h3>
+        <Link href="/ritmo" className="text-xs font-semibold text-accent hover:underline">{t("verDetalle")}</Link>
       </div>
       <div className="mt-4 flex h-[120px] items-end gap-1.5 border-b border-border">
         {meses.map((m) => (
-          <div key={m.mes} className="group relative flex-1" title={`${mesCorto(m.mes)}: ${m.total} trofeos`}>
+          <div key={m.mes} className="group relative flex-1" title={t("tooltip", { mes: mesCorto(m.mes), count: m.total })}>
             <div
               className="mx-auto w-full rounded-t-sm transition-opacity group-hover:opacity-80"
               style={{ height: Math.max((m.total / maximo) * 110, m.total > 0 ? 3 : 0), background: "var(--accent-grad)" }}

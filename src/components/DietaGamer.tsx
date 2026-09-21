@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { DietaGamer as Dieta } from "@/lib/dietaGamer";
 
 /**
@@ -6,25 +7,29 @@ import type { DietaGamer as Dieta } from "@/lib/dietaGamer";
  * siguiente juegazo largo del mismo tipo.
  */
 export function DietaGamer({ dieta }: { dieta: Dieta }) {
+  const t = useTranslations("Analitica.dietaGamer");
+
   return (
     <section
       className="mb-10 rounded-2xl p-5"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       <h2 className="mb-2 flex items-center gap-2 font-heading text-lg font-bold uppercase tracking-wide">
-        🥗 Tu dieta gamer está muy densa
+        {t("titulo")}
       </h2>
       <p className="text-sm leading-relaxed text-muted">
-        Tus últimos 3 juegos terminados —{" "}
+        {t("textoPrefix")}{" "}
         {dieta.juegos.map((j, i) => (
           <span key={j.gameId}>
             <span className="font-semibold text-foreground">{j.titulo}</span>
             {i < dieta.juegos.length - 1 ? ", " : ""}
           </span>
-        ))}
-        — son todos de <span className="font-semibold text-foreground">{dieta.genero}</span> y suman más de{" "}
-        <span className="font-semibold text-foreground">{dieta.horasTotales}h</span>. Prueba algo distinto antes de tu
-        próxima gran aventura del mismo tipo — un indie, unas plataformas o un puzle cortito para limpiar el paladar.
+        ))}{" "}
+        {t.rich("textoSuffix", {
+          genero: dieta.genero,
+          horas: dieta.horasTotales,
+          strong: (chunks) => <span className="font-semibold text-foreground">{chunks}</span>,
+        })}
       </p>
     </section>
   );

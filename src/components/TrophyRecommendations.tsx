@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";
 import type { TrophyRecommendation } from "@/lib/recommendations";
@@ -21,6 +22,7 @@ export function TrophyRecommendations({
   // que ya usa la ficha de cada juego (TrophyGuideModal), con el mismo botón
   // de anclar que ya tiene ese modal: no hacía falta inventar un segundo
   // sitio para fijar un trofeo, solo enchufarlo aquí también.
+  const t = useTranslations("Analitica.trophyRecommendations");
   const [activa, setActiva] = useState<TrophyRecommendation | null>(null);
 
   const trofeoDeRecomendacion = (r: TrophyRecommendation): Trophy => ({
@@ -37,16 +39,16 @@ export function TrophyRecommendations({
     <section className="rounded-[18px] border border-border bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Siguiente trofeo</h2>
+          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("titulo")}</h2>
           <p className="mt-1 text-sm text-muted">
-            Prioridad automática: primero el juego base (el platino nunca depende del DLC), progreso alto y mayor probabilidad de conseguirlo.
+            {t("subtitulo")}
           </p>
         </div>
-        <Link href={`/u/${handle}`} className="text-xs font-bold uppercase tracking-wide text-accent hover:underline">Ver biblioteca</Link>
+        <Link href={`/u/${handle}`} className="text-xs font-bold uppercase tracking-wide text-accent hover:underline">{t("verBiblioteca")}</Link>
       </div>
 
       {recommendations.length === 0 ? (
-        <p className="text-sm text-muted">Sin recomendaciones todavía. Sincroniza el detalle de algún juego para conocer sus trofeos.</p>
+        <p className="text-sm text-muted">{t("sinRecomendaciones")}</p>
       ) : (
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {recommendations.map((r) => (
@@ -58,14 +60,14 @@ export function TrophyRecommendations({
                 <TrophyPhoto trophy={r} size={38} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{r.trophyName}</span>
-                  <span className="mt-1 block truncate text-xs text-muted">{r.gameTitle} · {r.gameProgress}% completado</span>
+                  <span className="mt-1 block truncate text-xs text-muted">{t("progresoCompletado", { juego: r.gameTitle, pct: r.gameProgress })}</span>
                 </span>
               </Link>
               <span className="shrink-0 text-xs font-bold text-good">{r.rarityPercent?.toFixed(1)}%</span>
 
               <button
                 onClick={() => setActiva(r)}
-                title="Ver guía en vídeo y anclar"
+                title={t("verGuia")}
                 className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-white/10 hover:text-foreground"
                 style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
               >
@@ -76,7 +78,7 @@ export function TrophyRecommendations({
 
               <Link
                 href={`/juego/${encodeURIComponent(r.gameId)}/guias`}
-                title="Guías escritas de este juego"
+                title={t("guiasEscritas")}
                 className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-white/10 hover:text-foreground"
                 style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
               >

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { getProfileByHandle, getLibrary } from "@/lib/profiles";
 import { trofeosPorMes } from "@/lib/history";
@@ -38,6 +39,7 @@ import { CalculadoraNivel } from "@/components/CalculadoraNivel";
  * y el título; aquí, en la pestaña, ya está todo eso puesto por el perfil.
  */
 export async function EstadisticasCompletas({ handle }: { handle: string }) {
+  const t = await getTranslations("Analitica.estadisticasCompletas");
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
 
@@ -95,13 +97,13 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
       )}
 
       <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-        <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">Trophy DNA</h2>
+        <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">{t("trophyDna")}</h2>
         <TrophyDnaRadar dna={dna} estiloDeCaza={estiloDeCaza} />
       </section>
 
       {(hitos.primerTrofeo || hitos.primerPlatino || hitos.trofeoMasRaro || hitos.platinoAnejo || hitos.rachaMasLarga) && (
         <section className="mb-8">
-          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Línea de tiempo</h2>
+          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("lineaDeTiempo")}</h2>
           <HistoricalTimeline hitos={hitos} />
         </section>
       )}
@@ -112,7 +114,7 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
       {celdasHorarias.some((c) => c.trofeos > 0) && (
         <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">A qué horas juegas</h2>
+          <h2 className="mb-4 font-heading text-lg font-bold uppercase tracking-wide">{t("aQueHorasJuegas")}</h2>
           <HourlyHeatmap celdas={celdasHorarias} />
         </section>
       )}
@@ -128,9 +130,9 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
       {jugadoRecientemente.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Jugado recientemente</h2>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("jugadoRecientemente")}</h2>
           <p className="mb-4 text-sm text-muted">
-            La última vez que se tocó cada juego — ni PSN ni Steam dan un registro de sesiones, esto es lo más real que hay.
+            {t("jugadoRecientementeSub")}
           </p>
           <RecentlyPlayed games={jugadoRecientemente} handle={handle} />
         </section>
@@ -138,9 +140,9 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
       {esMio && alcanzables.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Platinos al alcance</h2>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("platinosAlAlcance")}</h2>
           <p className="mb-4 text-sm text-muted">
-            Muy avanzados y llevan meses parados — a veces solo hace falta acordarse de que estaban ahí.
+            {t("platinosAlAlcanceSub")}
           </p>
           <PlatinosAlAlcance juegos={alcanzables} />
         </section>
@@ -148,32 +150,32 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
       {esMio && costes.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Coste por hora</h2>
-          <p className="mb-4 text-sm text-muted">Solo cuenta con lo que has puesto tú a mano en cada ficha — precio pagado y horas jugadas.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("costePorHora")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("costePorHoraSub")}</p>
           <CostePorHora juegos={costes} resumen={finanzas!} />
         </section>
       )}
 
       {esMio && eficiencia.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Tu eficiencia de caza</h2>
-          <p className="mb-4 text-sm text-muted">Tus horas reales en lo ya platinado/100%, comparadas con la estimación de HowLongToBeat.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("eficienciaDeCaza")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("eficienciaDeCazaSub")}</p>
           <EficienciaPersonal juegos={eficiencia} resumen={ritmo!} />
         </section>
       )}
 
       {esMio && deuda && deuda.juegosContados > 0 && (
         <section className="mb-8">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Deuda de backlog</h2>
-          <p className="mb-4 text-sm text-muted">En horas, no en número de juegos — lo que te falta en lo que ya tienes EMPEZADO, nada más.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("deudaDeBacklog")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("deudaDeBacklogSub")}</p>
           <DeudaBacklog deuda={deuda} />
         </section>
       )}
 
       {esMio && verguenza.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">El Salón de la Vergüenza</h2>
-          <p className="mb-4 text-sm text-muted">Juegos en tu biblioteca sin ni una hora, sin ni un trofeo.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("salonDeLaVerguenza")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("salonDeLaVerguenzaSub")}</p>
           <SalonDeLaVerguenza juegos={verguenza} />
         </section>
       )}
@@ -181,13 +183,13 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
       {esMio && (
         <>
           <section className="mb-8">
-            <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Tú y tus amigos</h2>
-            <p className="mb-4 text-sm text-muted">Un vistazo rápido — cada fila lleva a las estadísticas completas de esa persona.</p>
+            <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("tuYTusAmigos")}</h2>
+            <p className="mb-4 text-sm text-muted">{t("tuYTusAmigosSub")}</p>
             <FriendsLeaderboard personas={amigos} propioUserId={profile.userId} />
           </section>
 
           <section>
-            <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Actividad de tus amigos</h2>
+            <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("actividadDeTusAmigos")}</h2>
             <ActivityFeed activities={feed} currentUserId={session?.user?.id ?? null} />
           </section>
         </>
