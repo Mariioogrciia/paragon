@@ -7,7 +7,8 @@ import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
-import { getLibrary, getProfileByUserId, getGlobalStats } from "@/lib/profiles";
+import { getLibrary, getProfileByUserId, getGlobalStats, getTopHunters } from "@/lib/profiles";
+import { Avatar } from "@/components/Avatar";
 import { gameProgress, summarise } from "@/lib/stats";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
@@ -56,6 +57,7 @@ const FEATURE_KEYS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 
 async function Landing() {
   const globalStats = await getGlobalStats();
+  const topHunters = await getTopHunters(5);
   const t = await getTranslations("Shell.Home");
 
   const FEATURES = FEATURE_KEYS.map((key, i) => ({
@@ -176,6 +178,54 @@ async function Landing() {
           <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statCompletadoMedio")}</p>
         </div>
       </section>
+
+      {topHunters.length > 0 && (
+        <section className="pt-[72px]">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
+                {t("muroFamaTitulo")}
+              </h2>
+              <p className="mt-2 max-w-[560px] text-base text-muted">{t("muroFamaDescripcion")}</p>
+            </div>
+          </div>
+
+          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {topHunters.map((hunter, i) => (
+              <Link
+                key={hunter.userId}
+                href={`/u/${hunter.handle}`}
+                className="group relative flex flex-col items-center gap-3 rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1"
+                style={
+                  i === 0
+                    ? { border: "1px solid rgb(var(--accent-rgb) / 0.4)", background: "linear-gradient(var(--surface), rgb(var(--accent-rgb) / 0.08))", boxShadow: "0 0 30px rgb(var(--accent-rgb) / 0.12)" }
+                    : { border: "1px solid var(--border)", background: "var(--surface)" }
+                }
+              >
+                <span
+                  className="font-heading absolute left-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-[0.6875rem] font-bold"
+                  style={
+                    i === 0
+                      ? { background: "var(--accent-grad)", color: "#061021" }
+                      : { background: "var(--surface-2)", color: "var(--muted)" }
+                  }
+                >
+                  {i + 1}
+                </span>
+                <Avatar src={hunter.image} name={hunter.name ?? hunter.handle ?? "?"} size={64} />
+                <div className="min-w-0">
+                  <p className="truncate text-[0.9375rem] font-bold">{hunter.name ?? `@${hunter.handle}`}</p>
+                  <p className="truncate text-xs text-muted">@{hunter.handle}</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <TrophyIcon grade="platinum" size={16} />
+                  <span className="font-heading text-lg font-bold text-platinum">{hunter.platinos}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section id="biblioteca" className="pt-[72px]">
         <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">

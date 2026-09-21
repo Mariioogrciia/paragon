@@ -2,6 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { avatarUrlSql } from "@/lib/avatarSql";
 import { db } from "@/db";
 import {
   friendships,
@@ -354,6 +355,54 @@ export const getGlobalStats = unstable_cache(
   };
   },
   ["global-stats"],
+  { revalidate: 300 },
+);
+
+export interface TopHunter {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  image: string | null;
+  platinos: number;
+}
+
+/**
+ * Top cazatrofeos de toda la plataforma, por platinos de siempre (no del mes,
+ * a diferencia de `getLigaMensual`) — para el "Muro de la Fama" de la
+ * landing. Misma cuenta de platino-equivalente que `getGlobalStats`: el
+ * campo `platinum` de PSN/Xbox más el 100% de Steam, que no tiene trofeo de
+ * platino propio. Requiere `handle` porque el enlace del perfil lo necesita.
+ */
+export const getTopHunters = unstable_cache(
+  async (limit: number): Promise<TopHunter[]> => {
+    const platinosSql = sql<number>`
+      coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
+      + count(*) filter (
+        where ${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100
+      )
+    `;
+
+    const rows = await db
+      .select({
+        userId: users.id,
+        handle: users.handle,
+        name: users.name,
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+        platinos: platinosSql,
+      })
+      .from(userGames)
+      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+      .innerJoin(users, eq(users.id, userGames.userId))
+      .where(and(eq(userGames.isWishlist, false), isNotNull(users.handle)))
+      .groupBy(users.id)
+      .orderBy(desc(platinosSql))
+      .limit(limit);
+
+    return rows
+      .map((r) => ({ ...r, platinos: Number(r.platinos ?? 0) }))
+      .filter((r) => r.platinos > 0);
+  },
+  ["top-hunters"],
   { revalidate: 300 },
 );
 
