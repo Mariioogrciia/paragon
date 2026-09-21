@@ -1,1 +1,90 @@
-{}
+{
+  "title": "Admin Control Center",
+  "subtitle": "Centre de contrôle global de la plateforme.",
+  "tabs": {
+    "dashboard": "📊 Tableau de bord & Utilisateurs",
+    "leagues": "🏆 Ligues",
+    "system": "⚙️ Système & Modération"
+  },
+  "dashboard": {
+    "stats": {
+      "users": "Utilisateurs",
+      "newUsers": "Nouveaux, 7 derniers jours",
+      "catalogGames": "Jeux au catalogue",
+      "withPegi": "Avec classification PEGI",
+      "trophies": "Trophées enregistrés",
+      "alerts": "Signalements générés",
+      "alertsLast7Days": "Signalements, 7 derniers jours",
+      "linkedAccounts": "Comptes liés"
+    },
+    "accountsByPlatform": "Comptes par plateforme",
+    "usersSection": "Utilisateurs",
+    "table": {
+      "user": "Utilisateur",
+      "accounts": "Comptes",
+      "games": "Jeux",
+      "platinums": "Platines",
+      "badges": "Badges",
+      "joined": "Inscrit le",
+      "noAccounts": "—",
+      "noName": "Sans nom"
+    }
+  },
+  "leagues": {
+    "title": "Modération des ligues",
+    "subtitle": "Gérez et supprimez les groupes inappropriés.",
+    "table": {
+      "league": "Ligue",
+      "creator": "Créateur",
+      "members": "Membres",
+      "created": "Créée le",
+      "action": "Action",
+      "delete": "Supprimer",
+      "empty": "Aucune ligue créée sur la plateforme."
+    }
+  },
+  "system": {
+    "controls": {
+      "title": "Contrôles système",
+      "maintenanceMode": {
+        "title": "Mode maintenance",
+        "description": "Affiche une page d'erreur aux utilisateurs."
+      },
+      "stopXboxSync": {
+        "title": "Arrêter la synchronisation (Xbox)",
+        "description": "Évite les bannissements temporaires en cas de panne d'OpenXBL."
+      },
+      "comingSoon": "Bientôt disponible"
+    },
+    "infrastructure": {
+      "title": "État de l'infrastructure",
+      "supabase": "Base de données Supabase",
+      "psn": "PlayStation Network (NPSSO)",
+      "steam": "Steam Web API",
+      "xbox": "OpenXBL (mode limitation de débit)"
+    },
+    "recentSyncs": {
+      "title": "Synchronisations récentes",
+      "table": {
+        "user": "Utilisateur",
+        "platform": "Plateforme",
+        "games": "Jeux",
+        "newTrophies": "Nouveaux trophées",
+        "when": "Quand",
+        "empty": "Aucune synchronisation pour le moment."
+      }
+    },
+    "moderation": {
+      "title": "Modération (fil global)",
+      "table": {
+        "author": "Auteur",
+        "game": "Jeu",
+        "content": "Contenu",
+        "action": "Action",
+        "delete": "Supprimer",
+        "noReview": "Aucun texte",
+        "empty": "Aucune activité récente à modérer."
+      }
+    }
+  }
+}

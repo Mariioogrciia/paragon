@@ -1,1 +1,90 @@
-{}
+{
+  "title": "Admin Control Center",
+  "subtitle": "Zentrale Steuerung für die gesamte Plattform.",
+  "tabs": {
+    "dashboard": "📊 Dashboard & Nutzer",
+    "leagues": "🏆 Ligen",
+    "system": "⚙️ System & Moderation"
+  },
+  "dashboard": {
+    "stats": {
+      "users": "Nutzer",
+      "newUsers": "Neu, letzte 7 Tage",
+      "catalogGames": "Spiele im Katalog",
+      "withPegi": "Mit PEGI-Einstufung",
+      "trophies": "Erfasste Trophäen",
+      "alerts": "Erstellte Meldungen",
+      "alertsLast7Days": "Meldungen, letzte 7 Tage",
+      "linkedAccounts": "Verknüpfte Konten"
+    },
+    "accountsByPlatform": "Konten nach Plattform",
+    "usersSection": "Nutzer",
+    "table": {
+      "user": "Nutzer",
+      "accounts": "Konten",
+      "games": "Spiele",
+      "platinums": "Platins",
+      "badges": "Abzeichen",
+      "joined": "Beigetreten",
+      "noAccounts": "—",
+      "noName": "Kein Name"
+    }
+  },
+  "leagues": {
+    "title": "Ligen-Moderation",
+    "subtitle": "Unangemessene Gruppen verwalten und entfernen.",
+    "table": {
+      "league": "Liga",
+      "creator": "Ersteller",
+      "members": "Mitglieder",
+      "created": "Erstellt",
+      "action": "Aktion",
+      "delete": "Löschen",
+      "empty": "Auf der Plattform wurden keine Ligen erstellt."
+    }
+  },
+  "system": {
+    "controls": {
+      "title": "Systemsteuerung",
+      "maintenanceMode": {
+        "title": "Wartungsmodus",
+        "description": "Zeigt Nutzern eine Fehlerseite an."
+      },
+      "stopXboxSync": {
+        "title": "Synchronisierung stoppen (Xbox)",
+        "description": "Verhindert temporäre Sperren, falls OpenXBL ausfällt."
+      },
+      "comingSoon": "Demnächst verfügbar"
+    },
+    "infrastructure": {
+      "title": "Infrastrukturstatus",
+      "supabase": "Supabase-Datenbank",
+      "psn": "PlayStation Network (NPSSO)",
+      "steam": "Steam Web API",
+      "xbox": "OpenXBL (Ratenbegrenzungsmodus)"
+    },
+    "recentSyncs": {
+      "title": "Letzte Synchronisierungen",
+      "table": {
+        "user": "Nutzer",
+        "platform": "Plattform",
+        "games": "Spiele",
+        "newTrophies": "Neue Trophäen",
+        "when": "Wann",
+        "empty": "Noch keine Synchronisierungen."
+      }
+    },
+    "moderation": {
+      "title": "Moderation (Globaler Feed)",
+      "table": {
+        "author": "Autor",
+        "game": "Spiel",
+        "content": "Inhalt",
+        "action": "Aktion",
+        "delete": "Löschen",
+        "noReview": "Kein Text",
+        "empty": "Keine aktuellen Aktivitäten zur Moderation."
+      }
+    }
+  }
+}
