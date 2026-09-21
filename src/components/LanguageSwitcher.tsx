@@ -20,11 +20,22 @@ const CAMBIANDO: Record<string, string> = {
   fr: "Changement de langue…",
 };
 
+/** Si falla la petición (red, servidor reiniciando…), este es el aviso —
+ *  nunca la pantalla genérica de "Algo se ha roto" de toda la app por algo
+ *  tan menor como no poder cambiar el idioma. */
+const FALLO: Record<string, string> = {
+  es: "No se pudo cambiar. Inténtalo de nuevo.",
+  en: "Couldn't switch. Try again.",
+  de: "Wechsel fehlgeschlagen. Erneut versuchen.",
+  fr: "Échec du changement. Réessaie.",
+};
+
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  
+
   const [abierto, setAbierto] = useState(false);
+  const [fallo, setFallo] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,9 +48,16 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
 
   const handleLanguageChange = (locale: string) => {
     setAbierto(false);
+    setFallo(false);
     startTransition(async () => {
-      await updateLanguageAction(locale);
-      router.refresh();
+      try {
+        await updateLanguageAction(locale);
+        router.refresh();
+      } catch {
+        // Red caída, servidor reiniciando... — se queda en el idioma actual
+        // en vez de tumbar la app entera con la pantalla de error genérica.
+        setFallo(true);
+      }
     });
   };
 
@@ -70,7 +88,10 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
       )}
 
       <button
-        onClick={() => setAbierto((v) => !v)}
+        onClick={() => {
+          setFallo(false);
+          setAbierto((v) => !v);
+        }}
         aria-expanded={abierto}
         disabled={isPending}
         className="flex items-center justify-center h-9 w-9 rounded-full transition-colors hover:text-foreground disabled:opacity-60"
@@ -91,6 +112,16 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
           </svg>
         )}
       </button>
+
+      {fallo && !isPending && (
+        <div
+          role="alert"
+          className="absolute right-0 z-50 mt-2 w-48 rounded-lg px-3 py-2 text-xs font-semibold shadow-lg"
+          style={{ background: "var(--surface)", border: "1px solid rgb(239 68 68 / 0.4)", color: "rgb(248 113 113)" }}
+        >
+          {FALLO[currentLocale] ?? FALLO.es}
+        </div>
+      )}
 
       {abierto && (
         <div
