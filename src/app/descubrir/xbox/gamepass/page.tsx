@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 import { GamePassCatalog } from "@/components/GamePassCatalog";
 import { getXboxGamePassCatalog } from "@/lib/xboxGamePassCatalog";
@@ -16,6 +17,7 @@ export const metadata = {
  * "Standard"/"Ultimate".
  */
 export default async function XboxGamePassCatalogoPage() {
+  const t = await getTranslations("Descubrir.GamePassCatalogoPage");
   const [consola, pc] = await Promise.all([
     getXboxGamePassCatalog("consola"),
     getXboxGamePassCatalog("pc"),
@@ -33,17 +35,15 @@ export default async function XboxGamePassCatalogoPage() {
         </span>
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted">
-            <Link href="/descubrir" className="hover:underline">Descubrir</Link> /{" "}
-            <Link href="/descubrir/xbox" className="hover:underline">Xbox</Link> / Catálogo
+            <Link href="/descubrir" className="hover:underline">{t("breadcrumbDescubrir")}</Link> /{" "}
+            <Link href="/descubrir/xbox" className="hover:underline">Xbox</Link> / {t("breadcrumbCatalogo")}
           </p>
-          <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">Catálogo de Game Pass</h1>
+          <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">{t("titulo")}</h1>
         </div>
       </div>
 
       <p className="mb-6 max-w-2xl text-sm text-muted">
-        Todo lo que incluye Xbox Game Pass ahora mismo, tal cual lo publica Microsoft — separado por Consola y PC
-        porque son catálogos distintos de verdad. Cada tarjeta lleva a su ficha oficial en xbox.com (no están
-        emparejadas con la base de Paragon, son demasiadas para eso).
+        {t("descripcion")}
       </p>
 
       <GamePassCatalog consola={consola} pc={pc} />

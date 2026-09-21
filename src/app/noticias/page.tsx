@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { getTranslations } from "next-intl/server";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { UpcomingGames } from "@/components/UpcomingGames";
@@ -14,6 +15,7 @@ export const metadata = {
 
 
 export default async function NoticiasPage() {
+  const t = await getTranslations("Descubrir.NoticiasPage");
   const session = await auth();
 
   let wishlistIds: number[] = [];
@@ -44,8 +46,8 @@ export default async function NoticiasPage() {
     <div className="mx-auto max-w-[1240px] px-7 py-12">
       <BackButton fallbackHref="/" />
       <div className="mb-8">
-        <h1 className="font-heading text-3xl font-bold mb-2">Lanzamientos Destacados</h1>
-        <p className="text-muted">Los juegos más esperados de los próximos meses.</p>
+        <h1 className="font-heading text-3xl font-bold mb-2">{t("titulo")}</h1>
+        <p className="text-muted">{t("subtitulo")}</p>
       </div>
 
       <div className="mb-16">
@@ -55,8 +57,8 @@ export default async function NoticiasPage() {
       {noticiasPropias.length > 0 && (
         <div className="mb-16">
           <div className="mb-8">
-            <h2 className="font-heading text-3xl font-bold mb-2">Noticias de tus juegos</h2>
-            <p className="text-muted">Menciones de algo que tienes en tu biblioteca o en tu Wishlist.</p>
+            <h2 className="font-heading text-3xl font-bold mb-2">{t("noticiasPropiasTitulo")}</h2>
+            <p className="text-muted">{t("noticiasPropiasDescripcion")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {noticiasPropias.map((item) => (
@@ -69,13 +71,13 @@ export default async function NoticiasPage() {
 
 
       <div className="mb-8">
-        <h2 className="font-heading text-3xl font-bold mb-2">Últimas Noticias</h2>
-        <p className="text-muted">Mantente al día con la actualidad de Eurogamer.</p>
+        <h2 className="font-heading text-3xl font-bold mb-2">{t("ultimasNoticiasTitulo")}</h2>
+        <p className="text-muted">{t("ultimasNoticiasDescripcion")}</p>
       </div>
 
       {news.length === 0 ? (
         <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
-          No se han podido cargar las noticias en este momento.
+          {t("sinNoticias")}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

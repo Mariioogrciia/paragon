@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { addToWishlistAction } from "@/app/actions";
 import { coverGradient } from "@/lib/design";
 import { Pegi } from "@/components/Pegi";
@@ -26,6 +27,7 @@ interface SearchResult {
  * de buscar juegos.
  */
 export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
+  const t = useTranslations("Descubrir.DiscoverSearch");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -52,13 +54,13 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
         const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         if (!res.ok) {
-          setError(data.error ?? "Búsqueda no disponible.");
+          setError(data.error ?? t("errorBusquedaNoDisponible"));
           setResults([]);
         } else {
           setResults(data);
         }
       } catch {
-        setError("No se ha podido buscar. Revisa tu conexión.");
+        setError(t("errorConexion"));
       } finally {
         setSearching(false);
       }
@@ -82,22 +84,22 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="¿No sale entre las recomendaciones? Búscalo — catálogo completo de IGDB…"
+          placeholder={t("placeholder")}
           className="min-w-0 flex-1 bg-transparent text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
         />
         {query && (
           <button onClick={() => setQuery("")} className="shrink-0 text-xs font-semibold text-muted hover:text-foreground">
-            Limpiar
+            {t("limpiar")}
           </button>
         )}
       </div>
 
       {query.trim().length >= 2 && (
         <div className="mt-3 rounded-2xl p-2" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          {searching && <p className="py-6 text-center text-sm text-muted">Buscando…</p>}
+          {searching && <p className="py-6 text-center text-sm text-muted">{t("buscando")}</p>}
           {error && <p className="py-6 text-center text-sm text-danger">{error}</p>}
           {!searching && !error && results.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted">Sin resultados para &quot;{query}&quot;.</p>
+            <p className="py-6 text-center text-sm text-muted">{t("sinResultados", { query })}</p>
           )}
 
           <div className="flex flex-col gap-1">
@@ -112,7 +114,7 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
                 <Link href={`/juego/${game.igdbId}`} className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{game.title}</p>
                   <p className="truncate text-xs text-muted">
-                    {game.releaseDate ? new Date(game.releaseDate).getFullYear() : "Sin fecha"}
+                    {game.releaseDate ? new Date(game.releaseDate).getFullYear() : t("sinFecha")}
                     {game.platforms.length > 0 && ` · ${game.platforms.slice(0, 3).join(", ")}`}
                   </p>
                   {game.pegi && <span className="mt-1 block"><Pegi edad={game.pegi} /></span>}
@@ -136,7 +138,7 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
                     disabled={addedIds.includes(game.igdbId)}
                     className="shrink-0 rounded-lg px-3 py-2 text-xs font-bold text-accent disabled:text-good"
                   >
-                    {addedIds.includes(game.igdbId) ? "✓ Deseado" : "+ Deseados"}
+                    {addedIds.includes(game.igdbId) ? t("yaDeseado") : t("anadirDeseados")}
                   </button>
                 )}
               </div>

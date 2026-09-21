@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { TrophyPhoto } from "@/components/TrophyList";
 import type { TrofeoReciente } from "@/lib/history";
@@ -10,12 +11,13 @@ import type { TrofeoReciente } from "@/lib/history";
  * ficha: es la foto de "qué se ha estado cazando últimamente", pública por
  * lo mismo que ya lo es la biblioteca entera.
  */
-export function RecentTrophies({ trofeos, handle }: { trofeos: TrofeoReciente[]; handle: string }) {
+export async function RecentTrophies({ trofeos, handle }: { trofeos: TrofeoReciente[]; handle: string }) {
+  const tSeccion = await getTranslations("Descubrir.RecentTrophies");
   if (trofeos.length === 0) return null;
 
   return (
     <section>
-      <h2 className="mb-4 font-heading text-2xl font-bold">Últimos trofeos</h2>
+      <h2 className="mb-4 font-heading text-2xl font-bold">{tSeccion("titulo")}</h2>
       <div className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
         {trofeos.map((t) => (
           <Link

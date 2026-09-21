@@ -1,1 +1,183 @@
-{}
+{
+  "DescubrirPage": {
+    "titulo": "Découvrir",
+    "subtitulo": "Ce que joue la communauté, et ce qu'il te reste à découvrir.",
+    "multiplataforma": "Multiplateforme",
+    "novedades": "Nouveautés",
+    "tendencias": "Tendances sur Paragon",
+    "joyasOcultas": "Pépites cachées",
+    "joyasOcultasDescripcion": "Note excellente, mais presque personne ne l'a encore.",
+    "recomendacionesLogueado": "Tes recommandations personnalisées ont maintenant leur propre section — <link>découvre-les ici</link>.",
+    "recomendacionesInvitado": "<link>Connecte-toi</link> pour voir des recommandations basées sur ta propre bibliothèque — par genre, et en général."
+  },
+  "PlataformaPage": {
+    "breadcrumb": "Découvrir",
+    "noticiasTitulo": "Actus {plataforma}",
+    "badgeSteam": "Mises à jour Steam",
+    "badgePlaystation": "PS Store · PS Plus",
+    "recomendadoPara": "Recommandé pour toi sur {plataforma}",
+    "popularEn": "Populaire sur {plataforma}",
+    "tendenciaEnParagon": "Tendance sur Paragon",
+    "masJugados": "Les plus joués sur Paragon",
+    "masJugadosDescripcion": "Selon les heures enregistrées par les comptes liés ici, pas une donnée globale {plataforma}.",
+    "avisoSteamIgdb": "IGDB ne distingue pas Steam des autres boutiques PC — cela peut inclure Epic, GOG ou d'autres.",
+    "proximosLanzamientos": "Prochaines sorties phares",
+    "ultimosLanzamientos": "Dernières sorties",
+    "psPlusTituloConMes": "PlayStation Plus — jeux de {mes}",
+    "psPlusTituloSinMes": "PlayStation Plus — jeux du mois",
+    "verAnuncio": "Voir l'annonce →",
+    "psPlusAviso": "Ceci est la dernière annonce publiée par Sony sur son blog officiel ({fecha}), donc la seule chose qu'on sache avec certitude : aucune nouvelle n'est sortie depuis, ni dans le flux ni sur le site. Ce n'est pas le catalogue du mois en cours, et l'indiquer ici à la main reviendrait à l'inventer.",
+    "precioMes": "{precio} €/mois",
+    "precioAnual": "ou {precio} €/an",
+    "preciosAviso": "Prix en Espagne, vérifiés le {fecha} — vérifie toujours sur le PS Store au cas où Sony les aurait changés depuis.",
+    "ofertasSteam": "Offres Steam",
+    "viaCheapshark": "Via CheapShark.",
+    "jugadoresBajosTitulo": "Presque aucun joueur en ce moment",
+    "jugadoresBajosDescripcion": "Compteur public de Steam, en direct — uniquement pour les jeux Steam déjà catalogués ici, pas un balayage de tout Steam.",
+    "avisoNoSteam": "Sony ne publie pas combien de personnes jouent à un titre en ce moment (ni les offres du PS Store) — contrairement à Steam, il n'existe pas de source publique pour ces deux données, donc elles n'apparaissent pas ici.",
+    "jugandoAhora": "{n} en train de jouer"
+  },
+  "RecomendacionesPage": {
+    "titulo": "Recommandations",
+    "subtitulo": "Basées sur ta propre bibliothèque — par genre, et en général.",
+    "desvanTitulo": "Découvre ce que tu as déjà",
+    "desvanDescripcion": "Tu les as déjà — à 0 %, courts, en attente depuis on ne sait combien de temps.",
+    "alCero": "à 0 %",
+    "relaxTitulo": "Platines relax",
+    "relaxDescripcion": "Peu ratable, peu difficile, peu long — pour quand tu es saturé d'un autre jeu.",
+    "perdiblesCero": "0 trophée ratable",
+    "perdiblesOtro": "{n} trophée ratable",
+    "porqueTeGusta": "Parce que tu aimes {genero}",
+    "paraTi": "Pour toi",
+    "sinDatos": "On n'a pas encore assez de données dans ta bibliothèque pour te faire des recommandations. Ajoute plus de jeux !",
+    "jugadores": "{n} joueurs"
+  },
+  "XboxPage": {
+    "breadcrumb": "Découvrir",
+    "titulo": "Xbox",
+    "recomendadoPara": "Recommandé pour toi sur Xbox",
+    "popularEn": "Populaire sur Xbox",
+    "tendenciaEnParagon": "Tendance sur Paragon",
+    "masJugados": "Les plus joués sur Paragon",
+    "masJugadosDescripcion": "Selon les heures enregistrées par les comptes liés ici, pas une donnée globale Xbox.",
+    "gamepassTitulo": "Catalogue du Game Pass",
+    "gamepassDescripcion": "Tout ce qu'il inclut actuellement, séparé en Console et PC.",
+    "explorarCatalogo": "Explorer le catalogue →",
+    "recienLlegados": "Nouveautés sur Xbox Game Pass",
+    "verAnuncio": "Voir l'annonce →",
+    "gamepassAviso": "La dernière vague annoncée par Xbox {fecha} — le Game Pass ajoute des jeux plusieurs fois par mois, ce n'est pas le catalogue complet.",
+    "noticiasTitulo": "Actus Xbox",
+    "noticiasBadge": "Xbox Wire",
+    "sinNoticias": "Impossible de charger les actus pour le moment. Réessaie plus tard."
+  },
+  "GamePassCatalogoPage": {
+    "breadcrumbDescubrir": "Découvrir",
+    "breadcrumbCatalogo": "Catalogue",
+    "titulo": "Catalogue du Game Pass",
+    "descripcion": "Tout ce qu'inclut le Xbox Game Pass en ce moment, tel que publié par Microsoft — séparé en Console et PC parce que ce sont vraiment des catalogues distincts. Chaque carte renvoie à sa fiche officielle sur xbox.com (ils ne sont pas associés à la base de Paragon, il y en a trop pour ça)."
+  },
+  "NoticiasPage": {
+    "titulo": "Sorties phares",
+    "subtitulo": "Les jeux les plus attendus des prochains mois.",
+    "noticiasPropiasTitulo": "Actus de tes jeux",
+    "noticiasPropiasDescripcion": "Mentions de quelque chose que tu as dans ta bibliothèque ou ta liste de souhaits.",
+    "ultimasNoticiasTitulo": "Dernières actus",
+    "ultimasNoticiasDescripcion": "Reste à jour avec l'actualité d'Eurogamer.",
+    "sinNoticias": "Impossible de charger les actus pour le moment."
+  },
+  "EsportsPage": {
+    "titulo": "Centre eSports",
+    "subtitulo": "Résultats, matchs en direct et actualité compétitive.",
+    "noticiasTitulo": "Actus eSports",
+    "noticiasDescripcion": "LoL, VALORANT et compétition espagnole, via Marca eSports.",
+    "badge": "eSports"
+  },
+  "FeedPage": {
+    "titulo": "Communauté",
+    "subtitulo": "Ton activité et celle de tes amis.",
+    "vacio": "C'est calme par ici. Sois le premier à partager quelque chose !"
+  },
+  "DiscoverSearch": {
+    "placeholder": "Pas dans les recommandations ? Cherche-le — catalogue IGDB complet…",
+    "limpiar": "Effacer",
+    "buscando": "Recherche…",
+    "errorBusquedaNoDisponible": "Recherche indisponible.",
+    "errorConexion": "Impossible de rechercher. Vérifie ta connexion.",
+    "sinResultados": "Aucun résultat pour « {query} ».",
+    "sinFecha": "Pas de date",
+    "anadirDeseados": "+ Liste de souhaits",
+    "yaDeseado": "✓ Dans la liste"
+  },
+  "EsportsHub": {
+    "filtrarPor": "FILTRER PAR :",
+    "todos": "Tous",
+    "ningunJuego": "aucun jeu",
+    "enDirecto": "En direct",
+    "sinPartidosDirecto": "Aucun match de {juego} en direct pour le moment.",
+    "proximosPartidos": "Prochains matchs",
+    "sinPartidosProgramados": "Aucun match programmé.",
+    "hoy": "Aujourd'hui",
+    "manana": "Demain",
+    "ultimosResultados": "Derniers résultats",
+    "sinResultadosRecientes": "Aucun résultat récent.",
+    "sinStream": "Pas de stream",
+    "twitch": "Twitch",
+    "vs": "VS"
+  },
+  "UpcomingGames": {
+    "titulo": "Prochaines sorties",
+    "badgeTendencias": "Tendances",
+    "saleHoy": "Sortie aujourd'hui",
+    "manana": "Demain",
+    "enDias": "Dans {n} jours",
+    "enUnMes": "Dans 1 mois",
+    "enMeses": "Dans {n} mois",
+    "anadiendo": "Ajout...",
+    "enDeseados": "✓ Dans la liste de souhaits",
+    "anadirDeseados": "+ Ajouter à la liste de souhaits",
+    "avisoIgdb": "Données IGDB. Les résumés sont en anglais, tels que publiés dans le catalogue.",
+    "detallesTitulo": "Détails du jeu",
+    "catalogoIgdb": "Catalogue IGDB",
+    "expectacion": "/100 d'attente",
+    "sinopsis": "Résumé",
+    "sinDescripcion": "Aucune description disponible."
+  },
+  "GamePassCatalog": {
+    "consolaTab": "Console ({n})",
+    "pcTab": "PC ({n})",
+    "consolaLabel": "console",
+    "pcLabel": "PC",
+    "buscarPlaceholder": "Chercher dans le catalogue…",
+    "sinCatalogo": "Impossible de charger le catalogue {plataforma} pour le moment. Réessaie plus tard.",
+    "sinCoincidencias": "Rien ne correspond à « {busqueda} ».",
+    "contador": "{mostrados} sur {total} jeux"
+  },
+  "HeroCarousel": {
+    "anterior": "Précédent",
+    "siguiente": "Suivant",
+    "irA": "Aller à {titulo}",
+    "verFicha": "Voir la fiche",
+    "anadiendo": "Ajout…",
+    "botonDeseadosAnadido": "✓ <hide>Dans la liste de </hide>souhaits",
+    "botonDeseadosAnadir": "+ <hide>Ajouter à la liste de </hide>souhaits"
+  },
+  "CardCarousel": {
+    "anterior": "Précédent",
+    "siguiente": "Suivant"
+  },
+  "RecentTrophies": {
+    "titulo": "Derniers trophées"
+  },
+  "PlatinosAlAlcance": {
+    "progreso": "{percent}% · {n, plural, one {il te manque # trophée} other {il te manque # trophées}}",
+    "sinTocar": "Intouché depuis {fecha}",
+    "horasParaTerminar": " · ~{horas}h selon HLTB pour le terminer"
+  },
+  "WeeklyMissions": {
+    "titulo": "Missions hebdomadaires",
+    "subtitulo": "De petits objectifs pour garder la chasse active.",
+    "contador": "{completadas}/{total} · {xp} XP gagnés",
+    "completada": "Terminée",
+    "progreso": "{actual}/{total}"
+  }
+}

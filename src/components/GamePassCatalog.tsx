@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { useTranslations } from "next-intl";
 import type { GamePassCatalogGame, GamePassPlataforma } from "@/lib/xboxGamePassCatalog";
 
 const FIELD = { border: "1px solid var(--border)", background: "var(--background)" };
@@ -58,6 +59,7 @@ export function GamePassCatalog({
   consola: GamePassCatalogGame[];
   pc: GamePassCatalogGame[];
 }) {
+  const t = useTranslations("Descubrir.GamePassCatalog");
   const [plataforma, setPlataforma] = useState<GamePassPlataforma>("consola");
   const [busqueda, setBusqueda] = useState("");
   const [pagina, setPagina] = useState(1);
@@ -92,7 +94,7 @@ export function GamePassCatalog({
               plataforma === "consola" ? "bg-accent text-white" : "text-muted hover:text-foreground"
             }`}
           >
-            Consola ({consola.length})
+            {t("consolaTab", { n: consola.length })}
           </button>
           <button
             onClick={() => setPlataforma("pc")}
@@ -100,7 +102,7 @@ export function GamePassCatalog({
               plataforma === "pc" ? "bg-accent text-white" : "text-muted hover:text-foreground"
             }`}
           >
-            PC ({pc.length})
+            {t("pcTab", { n: pc.length })}
           </button>
         </div>
 
@@ -115,7 +117,7 @@ export function GamePassCatalog({
           <input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Buscar en el catálogo…"
+            placeholder={t("buscarPlaceholder")}
             className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-foreground outline-none placeholder:text-muted"
           />
         </div>
@@ -123,16 +125,16 @@ export function GamePassCatalog({
 
       {catalogo.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          No se ha podido cargar el catálogo de {plataforma === "consola" ? "consola" : "PC"} ahora mismo. Prueba más tarde.
+          {t("sinCatalogo", { plataforma: plataforma === "consola" ? t("consolaLabel") : t("pcLabel") })}
         </p>
       ) : filtrados.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          Nada que coincida con &quot;{busqueda}&quot;.
+          {t("sinCoincidencias", { busqueda })}
         </p>
       ) : (
         <>
           <p className="mb-3 text-xs text-muted">
-            {mostrados.length} de {filtrados.length} juegos
+            {t("contador", { mostrados: mostrados.length, total: filtrados.length })}
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
             {mostrados.map((juego) => (

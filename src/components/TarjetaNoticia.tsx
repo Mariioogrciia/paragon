@@ -1,9 +1,15 @@
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, enUS, de, fr } from "date-fns/locale";
+import { getLocale } from "next-intl/server";
 import type { NewsItem } from "@/lib/rss";
 
+const DATE_FNS_LOCALES = { es, en: enUS, de, fr } as const;
+
 /** Misma tarjeta para "Noticias de tus juegos" y "Últimas Noticias" — el `badge` opcional es lo único que cambia. */
-export function TarjetaNoticia({ item, badge }: { item: NewsItem; badge?: string }) {
+export async function TarjetaNoticia({ item, badge }: { item: NewsItem; badge?: string }) {
+  const locale = await getLocale();
+  const dateFnsLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? es;
+
   return (
     <a
       href={item.link}
@@ -24,7 +30,7 @@ export function TarjetaNoticia({ item, badge }: { item: NewsItem; badge?: string
       <div className="p-5 flex flex-col flex-1">
         <div className="mb-2 flex items-center gap-2">
           <span className="text-xs font-semibold text-[rgb(var(--accent-rgb))] uppercase tracking-wider">
-            {formatDistanceToNow(new Date(item.pubDate), { addSuffix: true, locale: es })}
+            {formatDistanceToNow(new Date(item.pubDate), { addSuffix: true, locale: dateFnsLocale })}
           </span>
           {badge && (
             <span className="rounded-full bg-[rgb(var(--accent-rgb)/0.15)] px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-[rgb(var(--accent-rgb))]">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { getXboxNews } from "@/lib/xboxNews";
 import { NewsFeed } from "@/components/NewsFeed";
@@ -27,6 +28,7 @@ export const metadata = {
  * noticias.
  */
 export default async function DescubrirXboxPage() {
+  const t = await getTranslations("Descubrir.XboxPage");
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -51,16 +53,16 @@ export default async function DescubrirXboxPage() {
         </span>
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted">
-            <Link href="/descubrir" className="hover:underline">Descubrir</Link> / Xbox
+            <Link href="/descubrir" className="hover:underline">{t("breadcrumb")}</Link> / Xbox
           </p>
-          <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">Xbox</h1>
+          <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">{t("titulo")}</h1>
         </div>
       </div>
 
       {recomendados.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
-            {userId ? "Recomendado para ti en " : "Popular en "}Xbox
+            {userId ? t("recomendadoPara") : t("popularEn")}
           </h2>
           <CardCarousel>
             {recomendados.map((g) => (
@@ -72,7 +74,7 @@ export default async function DescubrirXboxPage() {
 
       {tendencia.length > 0 && (
         <section className="mb-10">
-          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Tendencia en Paragon</h2>
+          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("tendenciaEnParagon")}</h2>
           <CardCarousel>
             {tendencia.map((g) => (
               <PosterCard
@@ -91,32 +93,32 @@ export default async function DescubrirXboxPage() {
 
       {masJugados.length > 0 && (
         <section className="mb-10">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Los más jugados en Paragon</h2>
-          <p className="mb-4 text-sm text-muted">Por horas registradas de quien tiene cuenta vinculada aquí, no un dato global de Xbox.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("masJugados")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("masJugadosDescripcion")}</p>
           <RankedList items={masJugados} value={(g) => g.horas} valueLabel={(g) => `${g.horas} h`} />
         </section>
       )}
 
       <section className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl px-5 py-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
         <div>
-          <h2 className="font-heading text-lg font-bold uppercase tracking-wide">Catálogo de Game Pass</h2>
-          <p className="text-sm text-muted">Todo lo que incluye ahora mismo, separado por Consola y PC.</p>
+          <h2 className="font-heading text-lg font-bold uppercase tracking-wide">{t("gamepassTitulo")}</h2>
+          <p className="text-sm text-muted">{t("gamepassDescripcion")}</p>
         </div>
         <Link
           href="/descubrir/xbox/gamepass"
           className="rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wide text-background transition-all hover:-translate-y-0.5"
           style={{ background: "var(--accent-grad)" }}
         >
-          Explorar catálogo →
+          {t("explorarCatalogo")}
         </Link>
       </section>
 
       {gamePass && gamePass.juegos.length > 0 && (
         <section className="mb-10">
           <div className="mb-1 flex flex-wrap items-baseline gap-3">
-            <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Recién llegados a Xbox Game Pass</h2>
+            <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("recienLlegados")}</h2>
             <a href={gamePass.link} target="_blank" rel="noopener noreferrer nofollow" className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline">
-              Ver el anuncio →
+              {t("verAnuncio")}
             </a>
           </div>
           {/* Microsoft publica varias tandas al mes, no una sola como PS
@@ -124,7 +126,7 @@ export default async function DescubrirXboxPage() {
               y se dice así para no dar a entender que es un resumen
               mensual cuando no lo es. */}
           <p className="mb-4 text-[0.8125rem] text-muted">
-            La última tanda que ha anunciado Xbox {gamePass.fecha ? `(${relativeDate(gamePass.fecha)})` : ""} — Game Pass añade juegos varias veces al mes, esto no es el catálogo entero.
+            {t("gamepassAviso", { fecha: gamePass.fecha ? `(${relativeDate(gamePass.fecha)})` : "" })}
           </p>
           <GameGrid items={gamePass.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
             {(g) => <PosterCard game={{ ...g, genres: [] }} fluid />}
@@ -133,14 +135,14 @@ export default async function DescubrirXboxPage() {
       )}
 
       {noticias.length > 0 ? (
-        <NewsFeed titulo="Noticias de Xbox" badge="Xbox Wire" items={noticias} />
+        <NewsFeed titulo={t("noticiasTitulo")} badge={t("noticiasBadge")} items={noticias} />
       ) : (
         recomendados.length === 0 &&
         tendencia.length === 0 &&
         masJugados.length === 0 &&
         !gamePass && (
           <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-            No se han podido cargar las noticias ahora mismo. Prueba más tarde.
+            {t("sinNoticias")}
           </p>
         )
       )}
