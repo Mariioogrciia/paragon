@@ -1,6 +1,8 @@
+import { getTranslations } from "next-intl/server";
 import type { WeeklyMission } from "@/lib/missions";
 
-export function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
+export async function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
+  const t = await getTranslations("Descubrir.WeeklyMissions");
   const completadas = missions.filter((mission) => mission.progress >= mission.target).length;
   const xp = missions.filter((mission) => mission.progress >= mission.target).reduce((total, mission) => total + mission.xp, 0);
 
@@ -8,10 +10,10 @@ export function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
     <section className="rounded-[18px] border border-border bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Misiones semanales</h2>
-          <p className="mt-1 text-sm text-muted">Pequeños objetivos para mantener la caza activa.</p>
+          <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("titulo")}</h2>
+          <p className="mt-1 text-sm text-muted">{t("subtitulo")}</p>
         </div>
-        <span className="text-xs font-semibold text-muted">{completadas}/{missions.length} · {xp} XP ganados</span>
+        <span className="text-xs font-semibold text-muted">{t("contador", { completadas, total: missions.length, xp })}</span>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {missions.map((mission) => {
@@ -25,7 +27,7 @@ export function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
                   <p className="mt-1 text-xs text-muted">{mission.description}</p>
                 </div>
                 <span className="shrink-0 text-xs font-bold" style={{ color: completada ? "var(--good)" : "var(--accent-text)" }}>
-                  {completada ? "Completada" : `${Math.min(mission.progress, mission.target)}/${mission.target}`}
+                  {completada ? t("completada") : t("progreso", { actual: Math.min(mission.progress, mission.target), total: mission.target })}
                 </span>
               </div>
               <div className="mt-3 flex items-center gap-2">

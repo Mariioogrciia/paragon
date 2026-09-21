@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import type { PlatinoAlAlcance } from "@/lib/backlog";
 import { relativeDate } from "@/lib/design";
 
@@ -6,7 +7,8 @@ import { relativeDate } from "@/lib/design";
  * Radar de "platinos al alcance" — juegos muy avanzados que llevan meses
  * parados. Ver `platinosAlAlcance()` en lib/backlog.ts para el criterio.
  */
-export function PlatinosAlAlcance({ juegos }: { juegos: PlatinoAlAlcance[] }) {
+export async function PlatinosAlAlcance({ juegos }: { juegos: PlatinoAlAlcance[] }) {
+  const t = await getTranslations("Descubrir.PlatinosAlAlcance");
   if (juegos.length === 0) return null;
 
   return (
@@ -22,11 +24,11 @@ export function PlatinosAlAlcance({ juegos }: { juegos: PlatinoAlAlcance[] }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold" title={g.titulo}>{g.titulo}</p>
             <p className="text-xs text-muted">
-              {g.progressPercent}% · te {g.trofeosRestantes === 1 ? "falta" : "faltan"} {g.trofeosRestantes} {g.trofeosRestantes === 1 ? "trofeo" : "trofeos"}
+              {t("progreso", { percent: g.progressPercent, n: g.trofeosRestantes })}
             </p>
             <p className="text-[0.6875rem] text-muted">
-              Sin tocar desde {relativeDate(g.ultimaVez)}
-              {g.horasHltb ? ` · ~${g.horasHltb}h según HLTB para terminarlo` : ""}
+              {t("sinTocar", { fecha: relativeDate(g.ultimaVez) ?? "" })}
+              {g.horasHltb ? t("horasParaTerminar", { horas: g.horasHltb }) : ""}
             </p>
           </div>
           <div className="shrink-0 text-right">

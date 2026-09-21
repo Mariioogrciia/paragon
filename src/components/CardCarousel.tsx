@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Fila con scroll horizontal y flechas de paginación — a diferencia de
@@ -10,6 +11,7 @@ import { useRef } from "react";
  * repetirla aquí volvía monótono todo el sitio.
  */
 export function CardCarousel({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("Descubrir.CardCarousel");
   const ref = useRef<HTMLDivElement>(null);
 
   function mover(direccion: 1 | -1) {
@@ -29,7 +31,7 @@ export function CardCarousel({ children }: { children: React.ReactNode }) {
       </div>
       <button
         type="button"
-        aria-label="Anterior"
+        aria-label={t("anterior")}
         onClick={() => mover(-1)}
         className="absolute left-0 top-1/2 hidden h-9 w-9 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full text-lg font-bold shadow-lg transition-opacity hover:opacity-70 sm:flex"
         style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
@@ -38,7 +40,7 @@ export function CardCarousel({ children }: { children: React.ReactNode }) {
       </button>
       <button
         type="button"
-        aria-label="Siguiente"
+        aria-label={t("siguiente")}
         onClick={() => mover(1)}
         className="absolute right-0 top-1/2 hidden h-9 w-9 -translate-y-1/2 translate-x-3 items-center justify-center rounded-full text-lg font-bold shadow-lg transition-opacity hover:opacity-70 sm:flex"
         style={{ background: "var(--surface)", border: "1px solid var(--border)" }}

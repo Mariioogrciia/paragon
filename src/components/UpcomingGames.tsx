@@ -4,6 +4,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { addToWishlistAction } from "@/app/actions";
 import { Pegi } from "@/components/Pegi";
 
@@ -30,7 +31,7 @@ interface UpcomingGame {
  * Con precisión de trimestre o de año la cuenta atrás sería falsa: IGDB
  * rellena esos casos con el 31 de diciembre (ver la ruta de la API).
  */
-function cuentaAtras(game: UpcomingGame): string | null {
+function cuentaAtras(game: UpcomingGame, t: ReturnType<typeof useTranslations>): string | null {
   if (game.releasePrecision !== "day" || !game.releaseDate) return null;
 
   const dias = Math.ceil(
@@ -38,15 +39,16 @@ function cuentaAtras(game: UpcomingGame): string | null {
   );
 
   if (dias < 0) return null;
-  if (dias === 0) return "Sale hoy";
-  if (dias === 1) return "Mañana";
-  if (dias < 30) return `En ${dias} días`;
+  if (dias === 0) return t("saleHoy");
+  if (dias === 1) return t("manana");
+  if (dias < 30) return t("enDias", { n: dias });
 
   const meses = Math.round(dias / 30);
-  return meses === 1 ? "En 1 mes" : `En ${meses} meses`;
+  return meses === 1 ? t("enUnMes") : t("enMeses", { n: meses });
 }
 
 export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: number[] }) {
+  const t = useTranslations("Descubrir.UpcomingGames");
   const router = useRouter();
   const [games, setGames] = useState<UpcomingGame[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,16 +136,16 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
           panel por la derecha. */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-heading min-w-0 text-lg font-bold uppercase tracking-wide">
-          Próximos lanzamientos
+          {t("titulo")}
         </h2>
         <span className="shrink-0 rounded-md bg-accent/10 px-2 py-1 text-xs font-semibold uppercase text-accent">
-          Tendencias
+          {t("badgeTendencias")}
         </span>
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {games.map((game) => {
-          const falta = cuentaAtras(game);
+          const falta = cuentaAtras(game, t);
           const estudio = game.developer ?? game.publisher;
           const isWishlisted = wishlistedIgdbIds.includes(game.igdbId);
 
@@ -228,7 +230,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
       </div>
 
       <p className="mt-4 text-[0.6875rem] text-muted">
-        Datos de IGDB. Los resúmenes vienen en inglés, tal y como los publica el catálogo.
+        {t("avisoIgdb")}
       </p>
 
       {/* Modal de detalles */}
@@ -242,7 +244,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-              <h2 className="text-lg font-bold">Detalles del juego</h2>
+              <h2 className="text-lg font-bold">{t("detallesTitulo")}</h2>
               <button onClick={() => setModalGame(null)} className="text-muted hover:text-foreground">
                 ✕
               </button>
@@ -260,7 +262,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                     {modalGame.title}
                   </h3>
                   <p className="text-sm text-muted mb-2">
-                    {modalGame.developer ?? modalGame.publisher ?? "Catálogo IGDB"}
+                    {modalGame.developer ?? modalGame.publisher ?? t("catalogoIgdb")}
                   </p>
                   
                   <div className="flex flex-wrap gap-1.5 mb-2">
@@ -275,17 +277,17 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                       {modalGame.releaseLabel}
                     </span>
                     {modalGame.pegi && <Pegi edad={modalGame.pegi} />}
-                    {cuentaAtras(modalGame) && (
+                    {cuentaAtras(modalGame, t) && (
                       <span className="text-xs font-semibold text-muted bg-surface-2 px-2 py-0.5 rounded-md">
-                        {cuentaAtras(modalGame)}
+                        {cuentaAtras(modalGame, t)}
                       </span>
                     )}
                   </div>
-                  
+
                   {modalGame.rating != null && (
                     <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold">
                       <span className="text-accent-2">★</span>
-                      <span>{modalGame.rating}/100 expectación</span>
+                      <span>{modalGame.rating}{t("expectacion")}</span>
                     </div>
                   )}
                 </div>
@@ -315,11 +317,11 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
               
               {modalGame.summary ? (
                 <div className="text-sm leading-relaxed text-muted">
-                  <h4 className="font-bold text-foreground mb-2 text-xs uppercase tracking-wider">Sinopsis</h4>
+                  <h4 className="font-bold text-foreground mb-2 text-xs uppercase tracking-wider">{t("sinopsis")}</h4>
                   <p>{modalGame.summary}</p>
                 </div>
               ) : (
-                <p className="text-sm text-muted italic">Sin descripción disponible.</p>
+                <p className="text-sm text-muted italic">{t("sinDescripcion")}</p>
               )}
               
               <div className="mt-6 flex">
@@ -337,6 +339,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
 }
 
 function WishlistButton({ game, initiallyAdded = false }: { game: UpcomingGame, initiallyAdded?: boolean }) {
+  const t = useTranslations("Descubrir.UpcomingGames");
   const [isPending, startTransition] = useTransition();
   const [added, setAdded] = useState(initiallyAdded);
 
@@ -362,7 +365,7 @@ function WishlistButton({ game, initiallyAdded = false }: { game: UpcomingGame, 
         added ? "text-good" : "text-accent hover:text-accent-2"
       }`}
     >
-      {isPending ? "Añadiendo..." : added ? "✓ En Deseados" : "+ Añadir a Deseados"}
+      {isPending ? t("anadiendo") : added ? t("enDeseados") : t("anadirDeseados")}
     </button>
   );
 }

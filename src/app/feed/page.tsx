@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { getTranslations } from "next-intl/server";
 import { getFeed } from "@/lib/feed";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { redirect } from "next/navigation";
@@ -9,6 +10,7 @@ export const metadata = {
 };
 
 export default async function GlobalFeedPage() {
+  const t = await getTranslations("Descubrir.FeedPage");
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
@@ -22,15 +24,15 @@ export default async function GlobalFeedPage() {
     <div className="mx-auto max-w-[800px] px-7 py-12">
       <BackButton fallbackHref="/" />
       <div className="mb-8">
-        <h1 className="font-heading text-3xl font-bold mb-2">Comunidad</h1>
-        <p className="text-muted">Actividad tuya y de tus amigos.</p>
+        <h1 className="font-heading text-3xl font-bold mb-2">{t("titulo")}</h1>
+        <p className="text-muted">{t("subtitulo")}</p>
       </div>
 
       {activities.length > 0 ? (
         <ActivityFeed activities={activities} currentUserId={session?.user?.id ?? null} />
       ) : (
         <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
-          El muro está muy tranquilo. ¡Sé el primero en compartir algo!
+          {t("vacio")}
         </div>
       )}
     </div>

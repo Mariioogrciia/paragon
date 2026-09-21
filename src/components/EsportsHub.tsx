@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { SiTwitch } from "@icons-pack/react-simple-icons";
+import { useTranslations, useLocale } from "next-intl";
 import type { EsportsMatch } from "@/lib/pandascore";
+
+const LOCALE_TAGS: Record<string, string> = { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR" };
 
 export function EsportsHub({
   live,
@@ -13,6 +16,9 @@ export function EsportsHub({
   upcoming: EsportsMatch[];
   past: EsportsMatch[];
 }) {
+  const t = useTranslations("Descubrir.EsportsHub");
+  const locale = useLocale();
+  const localeTag = LOCALE_TAGS[locale] ?? "es-ES";
   const [filter, setFilter] = useState<string>("Todos");
 
   // Sacamos los juegos únicos para los botones de filtro
@@ -30,13 +36,13 @@ export function EsportsHub({
       
       {/* Filtros por Juego */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-        <span className="text-sm font-bold text-muted mr-2 shrink-0">FILTRAR POR:</span>
-        <button 
-          onClick={() => setFilter("Todos")} 
+        <span className="text-sm font-bold text-muted mr-2 shrink-0">{t("filtrarPor")}</span>
+        <button
+          onClick={() => setFilter("Todos")}
           className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === "Todos" ? "text-background" : "bg-surface border border-border text-muted hover:text-foreground hover:bg-surface-2"}`}
           style={filter === "Todos" ? { background: "var(--accent-grad)" } : {}}
         >
-          Todos
+          {t("todos")}
         </button>
         {allGames.map(game => (
           <button 
@@ -62,14 +68,14 @@ export function EsportsHub({
                   {filteredLive.length > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
                   <span className={`relative inline-flex rounded-full h-3 w-3 ${filteredLive.length > 0 ? "bg-red-500" : "bg-muted/50"}`}></span>
                 </span>
-                <h3 className="font-heading font-bold text-xl uppercase tracking-wide">En Directo {filteredLive.length > 0 ? `(${filteredLive.length})` : ""}</h3>
+                <h3 className="font-heading font-bold text-xl uppercase tracking-wide">{t("enDirecto")} {filteredLive.length > 0 ? `(${filteredLive.length})` : ""}</h3>
               </div>
             </div>
             
             <div className="flex flex-col gap-4">
               {filteredLive.length === 0 ? (
                 <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm font-medium">
-                  No hay ningún partido en directo de {filter === "Todos" ? "ningún juego" : filter} ahora mismo.
+                  {t("sinPartidosDirecto", { juego: filter === "Todos" ? t("ningunJuego") : filter })}
                 </div>
               ) : (
                 filteredLive.map((match) => (
@@ -117,10 +123,10 @@ export function EsportsHub({
                             className="flex items-center gap-2 bg-[#9146FF] hover:bg-[#a970ff] text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow hover:-translate-y-0.5 w-[140px] justify-center"
                           >
                             <SiTwitch size={16} />
-                            Twitch
+                            {t("twitch")}
                           </a>
                         ) : (
-                          <span className="text-xs text-muted font-medium bg-surface-2 px-3 py-1.5 rounded-lg border border-border inline-block">Sin stream</span>
+                          <span className="text-xs text-muted font-medium bg-surface-2 px-3 py-1.5 rounded-lg border border-border inline-block">{t("sinStream")}</span>
                         )}
                       </div>
                     </div>
@@ -133,29 +139,29 @@ export function EsportsHub({
           {/* PRÓXIMOS PARTIDOS */}
           <section>
             <div className="mb-4">
-              <h3 className="font-heading font-bold text-xl uppercase tracking-wide">Próximos Partidos</h3>
+              <h3 className="font-heading font-bold text-xl uppercase tracking-wide">{t("proximosPartidos")}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {filteredUpcoming.length === 0 ? (
                 <div className="col-span-1 sm:col-span-2 p-6 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
-                  No hay partidos programados.
+                  {t("sinPartidosProgramados")}
                 </div>
               ) : (
                 filteredUpcoming.map((match) => {
                   const d = new Date(match.date);
                   const isToday = d.toDateString() === new Date().toDateString();
                   const isTomorrow = d.toDateString() === new Date(Date.now() + 86400000).toDateString();
-                  
-                  let dateString = d.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
-                  if (isToday) dateString = "Hoy";
-                  if (isTomorrow) dateString = "Mañana";
+
+                  let dateString = d.toLocaleDateString(localeTag, { day: "numeric", month: "short" });
+                  if (isToday) dateString = t("hoy");
+                  if (isTomorrow) dateString = t("manana");
 
                   return (
                     <div key={match.id} className="rounded-xl border border-border bg-surface p-4 flex flex-col hover:bg-surface-2 transition-colors cursor-default">
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-[0.625rem] font-bold text-muted uppercase tracking-wider bg-surface-2 px-2 py-1 rounded border border-border">{match.game} • {match.league}</span>
                         <span className="text-xs font-semibold text-[rgb(var(--accent-rgb))] bg-[rgb(var(--accent-rgb)/0.1)] px-2 py-1 rounded-md">
-                          {dateString} - {d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+                          {dateString} - {d.toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
                       <div className="flex items-center justify-between font-bold text-sm">
@@ -163,7 +169,7 @@ export function EsportsHub({
                           <img src={getLogo(match.team1.logo)} alt="" className="w-5 h-5 object-contain bg-white rounded-sm" />
                           <span className="truncate">{match.team1.name}</span>
                         </div>
-                        <span className="text-muted/50 text-xs w-[10%] text-center">VS</span>
+                        <span className="text-muted/50 text-xs w-[10%] text-center">{t("vs")}</span>
                         <div className="flex items-center justify-end gap-2 w-[40%] text-right">
                           <span className="truncate">{match.team2.name}</span>
                           <img src={getLogo(match.team2.logo)} alt="" className="w-5 h-5 object-contain bg-white rounded-sm" />
@@ -181,12 +187,12 @@ export function EsportsHub({
         <div className="w-full lg:w-[340px] shrink-0">
           <section className="h-full flex flex-col">
             <div className="mb-4">
-              <h3 className="font-heading font-bold text-xl uppercase tracking-wide">Últimos Resultados</h3>
+              <h3 className="font-heading font-bold text-xl uppercase tracking-wide">{t("ultimosResultados")}</h3>
             </div>
             <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 flex-1 shadow-sm">
               {filteredPast.length === 0 ? (
                 <div className="p-4 text-center text-muted text-sm">
-                  No hay resultados recientes.
+                  {t("sinResultadosRecientes")}
                 </div>
               ) : (
                 filteredPast.map((res) => {
@@ -196,7 +202,7 @@ export function EsportsHub({
                     <div key={res.id} className="flex flex-col p-3 rounded-xl hover:bg-surface-2 transition-colors border border-transparent hover:border-border cursor-default bg-background/50">
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-[0.625rem] font-bold text-muted uppercase tracking-wider">{res.game} • {res.league}</span>
-                        <span className="text-[0.625rem] font-semibold text-muted bg-surface px-1.5 py-0.5 rounded border border-border">{new Date(res.date).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</span>
+                        <span className="text-[0.625rem] font-semibold text-muted bg-surface px-1.5 py-0.5 rounded border border-border">{new Date(res.date).toLocaleDateString(localeTag, { day: "numeric", month: "short" })}</span>
                       </div>
                       <div className="flex flex-col gap-2 text-sm font-bold">
                         <div className="flex justify-between items-center">

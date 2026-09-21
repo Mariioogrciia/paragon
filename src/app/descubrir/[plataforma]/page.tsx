@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { auth } from "@/auth";
 import { GameGrid } from "@/components/GameGrid";
@@ -40,6 +41,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
   const info = PLATAFORMAS[plataforma];
   if (!info) notFound();
 
+  const t = await getTranslations("Descubrir.PlataformaPage");
   const session = await auth();
   const userId = session?.user?.id;
   const esSteam = plataforma === "steam";
@@ -83,7 +85,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
         </span>
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted">
-            <Link href="/descubrir" className="hover:underline">Descubrir</Link> / {info.label}
+            <Link href="/descubrir" className="hover:underline">{t("breadcrumb")}</Link> / {info.label}
           </p>
           <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">{info.label}</h1>
         </div>
@@ -92,8 +94,8 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {noticias.length > 0 && (
         <div className="mb-10">
           <NewsFeed
-            titulo={`Noticias de ${info.label}`}
-            badge={esSteam ? "Actualizaciones de Steam" : "PS Store · PS Plus"}
+            titulo={t("noticiasTitulo", { plataforma: info.label })}
+            badge={esSteam ? t("badgeSteam") : t("badgePlaystation")}
             items={noticias}
           />
         </div>
@@ -102,8 +104,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {recomendados.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
-            {userId ? "Recomendado para ti en " : "Popular en "}
-            {info.label}
+            {userId ? t("recomendadoPara", { plataforma: info.label }) : t("popularEn", { plataforma: info.label })}
           </h2>
           <CardCarousel>
             {recomendados.map((g) => (
@@ -116,7 +117,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {tendencia.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-            Tendencia en Paragon
+            {t("tendenciaEnParagon")}
           </h2>
           <CardCarousel>
             {tendencia.map((g) => (
@@ -137,9 +138,9 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {masJugados.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-            Los más jugados en Paragon
+            {t("masJugados")}
           </h2>
-          <p className="mb-4 text-sm text-muted">Por horas registradas de quien tiene cuenta vinculada aquí, no un dato global de {info.label}.</p>
+          <p className="mb-4 text-sm text-muted">{t("masJugadosDescripcion", { plataforma: info.label })}</p>
           <RankedList items={masJugados} value={(g) => g.horas} valueLabel={(g) => `${g.horas} h`} />
         </section>
       )}
@@ -147,13 +148,13 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {(proximos.length > 0 || recientes.length > 0) && (
         <div className="mb-10">
           {esSteam && (
-            <p className="mb-4 text-sm text-muted">IGDB no distingue Steam de otras tiendas de PC — puede incluir Epic, GOG u otras.</p>
+            <p className="mb-4 text-sm text-muted">{t("avisoSteamIgdb")}</p>
           )}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {proximos.length > 0 && (
               <section>
                 <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-                  Próximos lanzamientos destacados
+                  {t("proximosLanzamientos")}
                 </h2>
                 <ReleaseGrid items={proximos} />
               </section>
@@ -162,7 +163,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
             {recientes.length > 0 && (
               <section>
                 <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-                  Últimos lanzamientos
+                  {t("ultimosLanzamientos")}
                 </h2>
                 <ReleaseGrid items={recientes} />
               </section>
@@ -175,7 +176,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
         <section className="mb-10">
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
             <h2 className="flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              PlayStation Plus — juegos {psPlus.mes ? `de ${psPlus.mes}` : "del mes"}
+              {psPlus.mes ? t("psPlusTituloConMes", { mes: psPlus.mes }) : t("psPlusTituloSinMes")}
             </h2>
             <a
               href={psPlus.link}
@@ -183,7 +184,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               rel="noopener noreferrer nofollow"
               className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
             >
-              Ver el anuncio →
+              {t("verAnuncio")}
             </a>
           </div>
           {/* Sony no siempre publica el anuncio del mes en curso el día 1 —
@@ -192,11 +193,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               en vez de dejar que parezca el mes actual sin serlo. */}
           {psPlus.fecha && Date.now() - new Date(psPlus.fecha).getTime() > 40 * 86_400_000 && (
             <p className="-mt-2 mb-4 text-xs text-muted">
-              Este es el último anuncio que Sony ha publicado en su blog oficial
-              ({relativeDate(psPlus.fecha)}), y por tanto lo único que se sabe
-              con certeza: desde entonces no ha salido ninguno nuevo, ni en el
-              feed ni en la web. No es el catálogo del mes en curso, y ponerlo
-              aquí a mano seria inventarselo.
+              {t("psPlusAviso", { fecha: relativeDate(psPlus.fecha) ?? "" })}
             </p>
           )}
           <GameGrid items={psPlus.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
@@ -216,13 +213,13 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
             ).map((nivel) => (
               <div key={nivel.label} className="rounded-xl p-3.5 text-center" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
                 <p className="text-[0.625rem] font-bold uppercase tracking-widest text-muted">{nivel.label}</p>
-                <p className="font-heading text-lg font-bold">{nivel.precio.mes.toFixed(2)}€/mes</p>
-                <p className="text-[0.6875rem] text-muted">o {nivel.precio.anual.toFixed(2)}€/año</p>
+                <p className="font-heading text-lg font-bold">{t("precioMes", { precio: nivel.precio.mes.toFixed(2) })}</p>
+                <p className="text-[0.6875rem] text-muted">{t("precioAnual", { precio: nivel.precio.anual.toFixed(2) })}</p>
               </div>
             ))}
           </div>
           <p className="mt-2 text-[0.6875rem] text-muted">
-            Precios en España, comprobados el {relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl)} — consulta siempre en la PS Store por si Sony los ha cambiado desde entonces.
+            {t("preciosAviso", { fecha: relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl) ?? "" })}
           </p>
         </section>
       )}
@@ -230,9 +227,9 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {esSteam && ofertas.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-            Ofertas en Steam
+            {t("ofertasSteam")}
           </h2>
-          <p className="mb-4 text-sm text-muted">Vía CheapShark.</p>
+          <p className="mb-4 text-sm text-muted">{t("viaCheapshark")}</p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {ofertas.map((oferta) => (
               <a
@@ -266,19 +263,18 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       {esSteam && jugadoresBajos.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-            Casi sin jugadores ahora mismo
+            {t("jugadoresBajosTitulo")}
           </h2>
           <p className="mb-4 text-sm text-muted">
-            Contador público de Steam, en vivo — solo de los juegos de Steam que ya hay catalogados aquí, no un barrido de todo Steam.
+            {t("jugadoresBajosDescripcion")}
           </p>
-          <RankedList items={jugadoresBajos} value={(g) => g.jugandoAhora} valueLabel={(g) => `${g.jugandoAhora} jugando`} />
+          <RankedList items={jugadoresBajos} value={(g) => g.jugandoAhora} valueLabel={(g) => t("jugandoAhora", { n: g.jugandoAhora })} />
         </section>
       )}
 
       {!esSteam && (
         <p className="rounded-xl border border-border bg-surface px-4 py-6 text-center text-sm text-muted">
-          Sony no publica cuánta gente juega cada título ahora mismo (ni ofertas de PS Store) — a diferencia de Steam, no hay
-          fuente pública para esos dos datos, así que no aparecen aquí.
+          {t("avisoNoSteam")}
         </p>
       )}
     </div>

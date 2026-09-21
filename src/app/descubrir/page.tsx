@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { getTrendingGames, getHiddenGems } from "@/lib/discover";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
@@ -18,6 +19,7 @@ export const metadata = {
 };
 
 export default async function DescubrirPage() {
+  const t = await getTranslations("Descubrir.DescubrirPage");
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -62,8 +64,8 @@ export default async function DescubrirPage() {
       <RefrescoAutomatico />
       <BackButton fallbackHref="/" />
       <div className="mb-6">
-        <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">Descubrir</h1>
-        <p className="mt-2 text-lg text-muted">Qué está jugando la comunidad, y qué te falta por encontrar.</p>
+        <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">{t("titulo")}</h1>
+        <p className="mt-2 text-lg text-muted">{t("subtitulo")}</p>
       </div>
 
       <HeroCarousel items={hero} wishlistedIgdbIds={wishlistIds} />
@@ -77,11 +79,11 @@ export default async function DescubrirPage() {
           así que no tiene una sola plataforma que ponerle en la cabecera.
           Ver el comentario de lib/discover.ts. */}
       <div id="multiplataforma" className="mb-10 scroll-mt-24">
-        <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Multiplataforma</p>
+        <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">{t("multiplataforma")}</p>
 
         {novedades.length > 0 && (
           <section className="mb-8">
-            <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Novedades</h2>
+            <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("novedades")}</h2>
             <CardCarousel>
               {novedades.map((g) => (
                 <PosterCard
@@ -101,7 +103,7 @@ export default async function DescubrirPage() {
         {tendencias.length > 0 && (
           <section className="mb-8">
             <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              Tendencias en Paragon
+              {t("tendencias")}
             </h2>
             <FilaHorizontal items={tendencias} itemKey={(g) => g.igdbId}>
               {(g) => (
@@ -121,9 +123,9 @@ export default async function DescubrirPage() {
         {joyas.length > 0 && (
           <section>
             <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              Joyas ocultas
+              {t("joyasOcultas")}
             </h2>
-            <p className="mb-4 text-sm text-muted">Nota altísima, pero casi nadie la tiene todavía.</p>
+            <p className="mb-4 text-sm text-muted">{t("joyasOcultasDescripcion")}</p>
             <GameGrid items={joyas} itemKey={(g) => g.igdbId}>
               {(g) => (
                 <DiscoverCard
@@ -147,20 +149,21 @@ export default async function DescubrirPage() {
 
       <div className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
         {userId ? (
-          <>
-            Tus recomendaciones personalizadas ahora tienen su propio apartado —{" "}
-            <Link href="/descubrir/recomendaciones" className="font-semibold text-accent hover:underline">
-              míralas aquí
-            </Link>
-            .
-          </>
+          t.rich("recomendacionesLogueado", {
+            link: (chunks) => (
+              <Link href="/descubrir/recomendaciones" className="font-semibold text-accent hover:underline">
+                {chunks}
+              </Link>
+            ),
+          })
         ) : (
-          <>
-            <Link href="/entrar" className="font-semibold text-accent hover:underline">
-              Inicia sesión
-            </Link>{" "}
-            para ver recomendaciones hechas a partir de tu propia biblioteca — por género, y en general.
-          </>
+          t.rich("recomendacionesInvitado", {
+            link: (chunks) => (
+              <Link href="/entrar" className="font-semibold text-accent hover:underline">
+                {chunks}
+              </Link>
+            ),
+          })
         )}
       </div>
     </div>

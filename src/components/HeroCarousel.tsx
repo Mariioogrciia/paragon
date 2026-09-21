@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { coverGradient } from "@/lib/design";
 import { addToWishlistAction } from "@/app/actions";
 import { Pegi } from "@/components/Pegi";
@@ -51,6 +52,7 @@ function IconoPlataforma({ platforms }: { platforms: string[] }) {
  * mezclada con los géneros.
  */
 export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGame[]; wishlistedIgdbIds?: number[] }) {
+  const t = useTranslations("Descubrir.HeroCarousel");
   const [i, setI] = useState(0);
   const [pausado, setPausado] = useState(false);
 
@@ -156,7 +158,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
               className="shrink-0 rounded-[10px] px-3 py-2 text-xs font-bold text-background whitespace-nowrap sm:px-3.5"
               style={{ background: "var(--accent-grad)" }}
             >
-              Ver ficha
+              {t("verFicha")}
             </Link>
             <WishlistButton key={g.igdbId} game={g} initiallyAdded={wishlistedIgdbIds.includes(g.igdbId)} />
           </div>
@@ -168,7 +170,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
           <div className="absolute bottom-3 left-2 z-10 flex gap-1.5 sm:left-4">
             <button
               type="button"
-              aria-label="Anterior"
+              aria-label={t("anterior")}
               onClick={() => setI((n) => (n - 1 + items.length) % items.length)}
               className="flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
             >
@@ -176,7 +178,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
             </button>
             <button
               type="button"
-              aria-label="Siguiente"
+              aria-label={t("siguiente")}
               onClick={() => setI((n) => (n + 1) % items.length)}
               className="flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
             >
@@ -188,7 +190,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
               <button
                 key={item.igdbId}
                 type="button"
-                aria-label={`Ir a ${item.title}`}
+                aria-label={t("irA", { titulo: item.title })}
                 onClick={() => setI(idx)}
                 className="h-1.5 rounded-full transition-all"
                 style={{ width: idx === i ? 18 : 6, background: idx === i ? "#fff" : "rgba(255,255,255,.4)" }}
@@ -210,6 +212,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
  * nuevo (y un `added` nuevo) cada vez.
  */
 function WishlistButton({ game, initiallyAdded = false }: { game: HeroGame; initiallyAdded?: boolean }) {
+  const t = useTranslations("Descubrir.HeroCarousel");
   const [isPending, startTransition] = useTransition();
   const [added, setAdded] = useState(initiallyAdded);
 
@@ -234,15 +237,15 @@ function WishlistButton({ game, initiallyAdded = false }: { game: HeroGame; init
       style={{ background: added ? "rgba(78,201,138,.25)" : "rgba(255,255,255,.15)" }}
     >
       {isPending ? (
-        "Añadiendo…"
+        t("anadiendo")
       ) : added ? (
-        <>
-          ✓ <span className="hidden sm:inline">En </span>Deseados
-        </>
+        t.rich("botonDeseadosAnadido", {
+          hide: (chunks) => <span className="hidden sm:inline">{chunks}</span>,
+        })
       ) : (
-        <>
-          + <span className="hidden sm:inline">Añadir a </span>Deseados
-        </>
+        t.rich("botonDeseadosAnadir", {
+          hide: (chunks) => <span className="hidden sm:inline">{chunks}</span>,
+        })
       )}
     </button>
   );

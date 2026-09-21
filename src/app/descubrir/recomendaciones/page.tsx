@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { getGameRecommendations } from "@/lib/recommendations";
 import { getRecommendationsByGenre, getPlatinosRelax } from "@/lib/discover";
@@ -37,6 +38,7 @@ function BadgeAfinidad({ valor }: { valor: number | null }) {
  * cada recomendación.
  */
 export default async function RecomendacionesPage() {
+  const t = await getTranslations("Descubrir.RecomendacionesPage");
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
@@ -57,16 +59,16 @@ export default async function RecomendacionesPage() {
     <div>
       <BackButton fallbackHref="/descubrir" />
       <div className="mb-8">
-        <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">Recomendaciones</h1>
-        <p className="mt-2 text-lg text-muted">Hechas a partir de tu propia biblioteca — por género, y en general.</p>
+        <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">{t("titulo")}</h1>
+        <p className="mt-2 text-lg text-muted">{t("subtitulo")}</p>
       </div>
 
       {dieta && <DietaGamer dieta={dieta} />}
 
       {rescate.length > 0 && (
         <section className="mb-10">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Descubre en tu propio desván</h2>
-          <p className="mb-4 text-sm text-muted">Ya los tienes — a 0%, cortos, esperando desde hace quién sabe cuánto.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("desvanTitulo")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("desvanDescripcion")}</p>
           <CardCarousel>
             {rescate.map((g) => (
               <Link
@@ -92,7 +94,7 @@ export default async function RecomendacionesPage() {
                 )}
                 <div className="absolute inset-x-0 bottom-0 p-3">
                   <p className="font-heading text-sm font-bold uppercase leading-tight text-white drop-shadow-md">{g.titulo}</p>
-                  <p className="mt-1 text-[0.6875rem] font-semibold text-white/70">~{g.horasHltb}h · al 0%</p>
+                  <p className="mt-1 text-[0.6875rem] font-semibold text-white/70">~{g.horasHltb}h · {t("alCero")}</p>
                 </div>
               </Link>
             ))}
@@ -102,8 +104,8 @@ export default async function RecomendacionesPage() {
 
       {relax.length > 0 && (
         <section className="mb-10">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">Platinos Relax</h2>
-          <p className="mb-4 text-sm text-muted">Poco perdible, poca dificultad, poca duración — para cuando vienes saturado de otro juego.</p>
+          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("relaxTitulo")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("relaxDescripcion")}</p>
           <CardCarousel>
             {relax.map((g) => (
               <PosterCard
@@ -111,7 +113,7 @@ export default async function RecomendacionesPage() {
                 game={g}
                 badge={
                   <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
-                    ~{g.hltbCompletionist}h · {g.perdibles === 0 ? "0 perdibles" : `${g.perdibles} perdible`}
+                    ~{g.hltbCompletionist}h · {g.perdibles === 0 ? t("perdiblesCero") : t("perdiblesOtro", { n: g.perdibles })}
                   </span>
                 }
               />
@@ -123,7 +125,7 @@ export default async function RecomendacionesPage() {
       {tiras.map((tira) => (
         <section key={tira.genero} className="mb-10">
           <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
-            Porque te gusta <span className="text-accent">{tira.genero}</span>
+            {t("porqueTeGusta", { genero: tira.genero })}
           </h2>
           <CardCarousel>
             {tira.juegos.map((g) => (
@@ -134,10 +136,10 @@ export default async function RecomendacionesPage() {
       ))}
 
       <section>
-        <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">Para ti</h2>
+        <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("paraTi")}</h2>
         {recomendaciones.length === 0 ? (
           <div className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-            No tenemos suficientes datos en tu biblioteca para hacerte recomendaciones todavía. ¡Añade más juegos!
+            {t("sinDatos")}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -190,7 +192,7 @@ export default async function RecomendacionesPage() {
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                       </svg>
-                      {rec.owners} jugadores
+                      {t("jugadores", { n: rec.owners })}
                     </span>
                   </div>
                 </div>
