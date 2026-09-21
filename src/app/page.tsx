@@ -7,8 +7,9 @@ import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
-import { getLibrary, getProfileByUserId, getGlobalStats, getTopHunters } from "@/lib/profiles";
+import { getLibrary, getProfileByUserId, getGlobalStats, getTopHunters, getRarestTrophiesThisWeek } from "@/lib/profiles";
 import { Avatar } from "@/components/Avatar";
+import { TrophyPhoto } from "@/components/TrophyList";
 import { gameProgress, summarise } from "@/lib/stats";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
@@ -58,6 +59,7 @@ const FEATURE_KEYS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 async function Landing() {
   const globalStats = await getGlobalStats();
   const topHunters = await getTopHunters(5);
+  const rareTrophies = await getRarestTrophiesThisWeek(6);
   const t = await getTranslations("Shell.Home");
 
   const FEATURES = FEATURE_KEYS.map((key, i) => ({
@@ -221,6 +223,42 @@ async function Landing() {
                   <TrophyIcon grade="platinum" size={16} />
                   <span className="font-heading text-lg font-bold text-platinum">{hunter.platinos}</span>
                 </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {rareTrophies.length > 0 && (
+        <section className="pt-[72px]">
+          <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
+            {t("rarosTitulo")}
+          </h2>
+          <p className="mt-2 max-w-[560px] text-base text-muted">{t("rarosDescripcion")}</p>
+
+          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {rareTrophies.map((rt, i) => (
+              <Link
+                key={`${rt.userId}-${rt.gameId}-${i}`}
+                href={`/u/${rt.handle}`}
+                className="flex items-center gap-3.5 rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                <TrophyPhoto trophy={{ iconUrl: rt.trophyIconUrl, grade: rt.grade }} size={48} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[0.9375rem] font-bold">{rt.trophyName}</p>
+                  <p className="truncate text-xs text-muted">{rt.gameTitle}</p>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <Avatar src={rt.image} name={rt.name ?? rt.handle ?? "?"} size={18} />
+                    <span className="truncate text-[0.6875rem] text-muted">@{rt.handle}</span>
+                  </div>
+                </div>
+                <span
+                  className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold"
+                  style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
+                >
+                  {t("rarosPorcentaje", { percent: rt.rarityPercent.toFixed(1) })}
+                </span>
               </Link>
             ))}
           </div>

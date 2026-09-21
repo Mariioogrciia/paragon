@@ -1,7 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { db } from "@/db";
 import {
@@ -355,6 +355,69 @@ export const getGlobalStats = unstable_cache(
   };
   },
   ["global-stats"],
+  { revalidate: 300 },
+);
+
+export interface RareTrophy {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  image: string | null;
+  trophyName: string;
+  trophyIconUrl: string | null;
+  grade: "bronze" | "silver" | "gold" | "platinum" | null;
+  gameId: string;
+  gameTitle: string;
+  rarityPercent: number;
+  earnedAt: Date;
+}
+
+/**
+ * Los trofeos más raros que se han conseguido de verdad en la plataforma
+ * esta última semana — para el bloque "élite" de la landing. Nunca trofeos
+ * `hidden` (spoiler del propio juego) ni sin `rarityPercent` (Xbox no lo da).
+ */
+export const getRarestTrophiesThisWeek = unstable_cache(
+  async (limit: number): Promise<RareTrophy[]> => {
+    const desde = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const rows = await db
+      .select({
+        userId: users.id,
+        handle: users.handle,
+        name: users.name,
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+        trophyName: gameTrophies.name,
+        trophyIconUrl: gameTrophies.iconUrl,
+        grade: gameTrophies.grade,
+        gameId: gamesTable.id,
+        gameTitle: gamesTable.title,
+        rarityPercent: userTrophies.rarityPercent,
+        earnedAt: userTrophies.earnedAt,
+      })
+      .from(userTrophies)
+      .innerJoin(users, eq(users.id, userTrophies.userId))
+      .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+      .innerJoin(
+        gameTrophies,
+        and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+      )
+      .where(
+        and(
+          eq(userTrophies.earned, true),
+          eq(gameTrophies.hidden, false),
+          isNotNull(users.handle),
+          isNotNull(userTrophies.rarityPercent),
+          isNotNull(userTrophies.earnedAt),
+          gte(userTrophies.earnedAt, desde),
+        ),
+      )
+      .orderBy(sql`${userTrophies.rarityPercent} asc`)
+      .limit(limit);
+
+    return rows.map((r) => ({ ...r, rarityPercent: Number(r.rarityPercent ?? 0), earnedAt: r.earnedAt! }));
+  },
+  ["rarest-trophies-week"],
   { revalidate: 300 },
 );
 
