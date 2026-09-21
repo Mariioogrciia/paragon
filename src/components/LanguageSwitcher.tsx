@@ -11,6 +11,15 @@ const IDIOMAS = [
   { id: "fr", label: "Français", flag: "🇫🇷" },
 ];
 
+/** Texto del overlay de carga, en el idioma de ANTES de cambiar — el nuevo
+ *  todavía no ha llegado del servidor mientras esto está en pantalla. */
+const CAMBIANDO: Record<string, string> = {
+  es: "Cambiando de idioma…",
+  en: "Switching language…",
+  de: "Sprache wird geändert…",
+  fr: "Changement de langue…",
+};
+
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -38,20 +47,49 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
 
   return (
     <div className="relative" ref={panel}>
+      {isPending && (
+        <div
+          className="fixed inset-0 z-[999] flex flex-col items-center justify-center gap-3"
+          style={{ background: "rgba(6, 8, 13, 0.6)", backdropFilter: "blur(2px)" }}
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="animate-spin"
+            style={{ color: "var(--accent)" }}
+          >
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" opacity="0.25" />
+            <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+          <p className="text-sm font-semibold text-white/90">{CAMBIANDO[currentLocale] ?? CAMBIANDO.es}</p>
+        </div>
+      )}
+
       <button
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
         disabled={isPending}
-        className="flex items-center justify-center h-9 w-9 rounded-full transition-colors hover:text-foreground"
+        className="flex items-center justify-center h-9 w-9 rounded-full transition-colors hover:text-foreground disabled:opacity-60"
         style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
         title="Cambiar idioma"
         aria-label="Cambiar idioma"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          <path d="M2 12h20" />
-        </svg>
+        {isPending ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" opacity="0.25" />
+            <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            <path d="M2 12h20" />
+          </svg>
+        )}
       </button>
 
       {abierto && (
