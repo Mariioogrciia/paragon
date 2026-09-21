@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { deleteCollectionAction, toggleGameCollectionAction } from "@/app/actions";
 import type { Collection } from "@/lib/collections";
 import { NewCollectionForm } from "./forms/Forms";
@@ -18,18 +19,19 @@ const FUERA_CLASE =
  * acción de servidor y el estado vive en la base, así que funciona igual con la
  * pestaña recién abierta o con dos abiertas a la vez.
  */
-export function CollectionPicker({
+export async function CollectionPicker({
   collections,
   gameId,
 }: {
   collections: Collection[];
   gameId: string;
 }) {
+  const t = await getTranslations("Biblioteca.Collections");
   return (
     <section className="rounded-[18px] p-6" style={CARD}>
-      <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">Carpetas</h2>
+      <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">{t("titulo")}</h2>
       <p className="mb-4 mt-2 text-[0.8125rem] text-muted">
-        Tus propias agrupaciones, para lo que no se puede ordenar solo.
+        {t("subtitulo")}
       </p>
 
       {collections.length > 0 && (
@@ -59,11 +61,13 @@ export function CollectionPicker({
 }
 
 /** Listado con borrado, para ajustes. */
-export function CollectionManager({ collections }: { collections: Collection[] }) {
+export async function CollectionManager({ collections }: { collections: Collection[] }) {
+  const t = await getTranslations("Biblioteca.Collections");
+
   if (collections.length === 0) {
     return (
       <p className="text-sm text-muted">
-        Todavía no tienes carpetas. Se crean desde la ficha de cualquier juego.
+        {t("sinCarpetas")}
       </p>
     );
   }
@@ -80,17 +84,17 @@ export function CollectionManager({ collections }: { collections: Collection[] }
             {carpeta.name}
           </span>
           <span className="shrink-0 text-xs text-muted">
-            {carpeta.gameIds.length} juegos
+            {t("juegosCantidad", { cantidad: carpeta.gameIds.length })}
           </span>
           <ConfirmForm
             action={deleteCollectionAction}
             hidden={{ collectionId: carpeta.id }}
-            title="¿Borrar esta carpeta?"
-            message={`"${carpeta.name}" desaparece con los ${carpeta.gameIds.length} juegos que agrupa (los juegos en sí no se borran, solo la carpeta).`}
-            confirmLabel="Sí, borrar"
+            title={t("confirmarBorrarTitulo")}
+            message={t("confirmarBorrarMensaje", { nombre: carpeta.name, cantidad: carpeta.gameIds.length })}
+            confirmLabel={t("confirmarBorrarBoton")}
             triggerClassName="text-[0.8125rem] font-semibold text-muted hover:text-danger"
           >
-            Borrar
+            {t("borrar")}
           </ConfirmForm>
         </li>
       ))}

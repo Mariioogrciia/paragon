@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CollectionPicker } from "@/components/Collections";
@@ -33,7 +34,8 @@ import { CompartirImagen } from "@/components/CompartirImagen";
 import { BackButton } from "@/components/BackButton";
 import { AutoSyncJuego } from "@/components/AutoSyncJuego";
 
-function ProximoRow({ trophy }: { trophy: Trophy }) {
+async function ProximoRow({ trophy }: { trophy: Trophy }) {
+  const t = await getTranslations("Biblioteca");
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
 
   return (
@@ -67,7 +69,7 @@ function ProximoRow({ trophy }: { trophy: Trophy }) {
 
       <div className="col-span-2 flex items-center justify-between gap-3 sm:col-span-1 sm:block sm:text-right">
         <p className="text-[0.6875rem] font-bold uppercase tracking-[0.1em]" style={{ color: colorFor(trophy.grade) }}>
-          {gradeLabel(trophy.grade)}
+          {gradeLabel(trophy.grade, t)}
         </p>
         {r && (
           <p
@@ -88,6 +90,8 @@ export default async function JuegoPage({
   params: Promise<{ handle: string; gameId: string }>;
 }) {
   const { handle, gameId } = await params;
+
+  const t = await getTranslations("Biblioteca");
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -178,7 +182,7 @@ export default async function JuegoPage({
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
           <BackButton
             fallbackHref={`/u/${handle}`}
-            label={`Biblioteca de @${handle}`}
+            label={t("GameDetailPage.backLabel", { handle })}
             className="mb-0 inline-flex rounded-full px-3.5 py-1.5 normal-case tracking-normal"
             dark
           />
@@ -202,7 +206,7 @@ export default async function JuegoPage({
                   {game.deviceLabel}
                 </span>
                 {game.pegi && <Pegi edad={game.pegi} size="md" />}
-                {played && `Jugado ${played}`}
+                {played && t("GameDetailPage.playedAgo", { played })}
               </p>
 
               <h1 className="font-heading text-4xl font-bold uppercase leading-none tracking-[-0.01em] lg:text-[3.25rem]">
@@ -217,27 +221,27 @@ export default async function JuegoPage({
                 <Link
                   href={`/juego/${game.igdbId ?? game.id}`}
                   className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:bg-white/10 hover:text-white"
-                  title="Ver la ficha global de este juego con estadísticas de la comunidad"
+                  title={t("GameDetailPage.globalPageTitleAttr")}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="2" y1="12" x2="22" y2="12" />
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                   </svg>
-                  Ver ficha global
+                  {t("GameDetailPage.globalPageLink")}
                 </Link>
                 <a
-                  href={`https://www.google.com/search?q=${encodeURIComponent(`${game.title} guía completa mejores armas y armadura`)}`}
+                  href={`https://www.google.com/search?q=${encodeURIComponent(t("GameDetailPage.externalGuideQuery", { title: game.title }))}`}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
                   className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:bg-white/10 hover:text-white"
-                  title="Guía completa del juego en un sitio externo"
+                  title={t("GameDetailPage.externalGuideTitleAttr")}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
                   </svg>
-                  Guía completa
+                  {t("GameDetailPage.externalGuideLink")}
                 </a>
                 {esMio && hito && !progress.platinumEarned && (
                   <ReservarHitoButton
@@ -272,7 +276,7 @@ export default async function JuegoPage({
                         {game.earned![grade]}
                       </span>
                       <span className="text-[0.6875rem] text-muted">
-                        de {game.defined![grade]} {gradeLabel(grade).toLowerCase()}
+                        {t("GameDetailPage.ofLabel")} {game.defined![grade]} {gradeLabel(grade, t).toLowerCase()}
                         {game.defined![grade] === 1 ? "" : "s"}
                       </span>
                     </div>
@@ -284,7 +288,7 @@ export default async function JuegoPage({
                       {progress.earned}
                     </span>
                     <span className="text-[0.6875rem] text-muted">
-                      de {progress.total} logros
+                      {t("GameDetailPage.ofAchievements", { count: progress.total })}
                     </span>
                   </div>
                 )}
@@ -300,12 +304,11 @@ export default async function JuegoPage({
                   {faltanParaPlatino}
                 </p>
                 <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
-                  Trofeos para el platino
+                  {t("GameDetailPage.trophiesForPlatinum")}
                 </p>
                 {reparto.tieneDlc && (
                   <p className="mt-2 text-[0.6875rem] text-muted">
-                    Sin contar {reparto.dlc.total - reparto.dlc.earned} de DLC, que no
-                    cuentan para el platino.
+                    {t("GameDetailPage.excludingDlc", { count: reparto.dlc.total - reparto.dlc.earned })}
                   </p>
                 )}
               </div>
@@ -322,10 +325,10 @@ export default async function JuegoPage({
                   {reparto.dlc.total - reparto.dlc.earned}
                 </p>
                 <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
-                  Trofeos de DLC pendientes
+                  {t("GameDetailPage.pendingDlcTrophies")}
                 </p>
                 <p className="mt-2 text-[0.6875rem] text-muted">
-                  El juego base está al 100%: lo que queda son expansiones.
+                  {t("GameDetailPage.baseCompleteDlcRemaining")}
                 </p>
               </div>
             )}
@@ -334,7 +337,7 @@ export default async function JuegoPage({
               <CompartirImagen
                 url={`/api/trophy-card/${handle}/${encodeURIComponent(game.id)}`}
                 nombreArchivo={`paragon-platino-${game.id}.png`}
-                tituloCompartir={`Platino de ${game.title}`}
+                tituloCompartir={t("GameDetailPage.sharePlatinumTitle", { title: game.title })}
                 className="flex items-center justify-center gap-2 rounded-[18px] p-[18px] text-[0.8125rem] font-bold text-platinum transition-colors hover:text-white disabled:opacity-50"
                 style={{ border: "1px solid rgb(159 212 236 / 0.35)", background: "rgba(13, 19, 28, 0.75)" }}
               >
@@ -343,7 +346,7 @@ export default async function JuegoPage({
                   <polyline points="16 6 12 2 8 6" />
                   <line x1="12" y1="2" x2="12" y2="15" />
                 </svg>
-                Compartir platino
+                {t("GameDetailPage.sharePlatinum")}
               </CompartirImagen>
             )}
           </div>
@@ -359,7 +362,9 @@ export default async function JuegoPage({
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
             <h2 className="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
-              Dificultad estimada {dificultad.desdePlatino ? "del platino" : "del 100%"}
+              {t("GameDetailPage.difficultyHeading", {
+                basis: dificultad.desdePlatino ? "platinum" : "hundred",
+              })}
             </h2>
 
             <div className="flex flex-wrap items-center gap-3.5">
@@ -386,18 +391,17 @@ export default async function JuegoPage({
               </span>
 
               <span className="text-[0.8125rem] text-muted">
-                Solo el{" "}
-                <strong style={{ color: "var(--foreground)" }}>
-                  {dificultad.rareza.toFixed(1)}%
-                </strong>{" "}
-                de quienes lo juegan lo consigue
+                {t.rich("GameDetailPage.rarityStat", {
+                  strong: (chunks) => (
+                    <strong style={{ color: "var(--foreground)" }}>{chunks}</strong>
+                  ),
+                  percent: dificultad.rareza.toFixed(1),
+                })}
               </span>
             </div>
 
             <p className="mt-3 text-[0.6875rem] leading-relaxed text-muted">
-              Estimada a partir de la rareza, que mezcla dificultad, duración y
-              cuánta gente abandona el juego. No mide habilidad: un platino
-              largo y fácil puede ser más raro que uno corto e imposible.
+              {t("GameDetailPage.difficultyExplanation")}
             </p>
           </section>
         )}
@@ -427,13 +431,13 @@ export default async function JuegoPage({
         >
           <div className="mb-2.5 flex items-center justify-between gap-3">
             <h2 className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
-              Valoración de la comunidad
+              {t("GameDetailPage.communityRatingHeading")}
             </h2>
             <Link
               href={`/juego/${encodeURIComponent(game.id)}`}
               className="text-xs font-semibold text-accent hover:underline"
             >
-              Ver estadísticas y reseñas de todos →
+              {t("GameDetailPage.viewAllStatsAndReviews")}
             </Link>
           </div>
           <CommunityRating rating={valoracion} />
@@ -453,7 +457,9 @@ export default async function JuegoPage({
                   <Avatar src={resolveAvatarUrl(profile)} name={profile.displayName ?? handle} size={36} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2 mb-3 items-center">
-                      <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">Reseña de {profile.displayName ?? handle}</span>
+                      <span className="text-xs font-bold uppercase tracking-widest text-[rgb(var(--accent-rgb))]">
+                        {t("GameDetailPage.reviewBy", { name: profile.displayName ?? handle })}
+                      </span>
                       {game.rating && <Stars value={game.rating} size={13} />}
                       {game.reviewDate && <span className="text-xs text-muted">{game.reviewDate.split("T")[0]}</span>}
                     </div>
@@ -485,12 +491,12 @@ export default async function JuegoPage({
         {siguientes.length > 0 && (
           <section>
             <div className="mb-1.5 flex flex-wrap items-center gap-3">
-              <h2 className="font-heading text-2xl font-bold">Próximos pasos</h2>
+              <h2 className="font-heading text-2xl font-bold">{t("GameDetailPage.nextStepsHeading")}</h2>
               <span
                 className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.08em]"
                 style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.32)", color: "var(--accent-text)" }}
               >
-                Lo más a mano
+                {t("GameDetailPage.nextStepsBadge")}
               </span>
 
               {/* Solo para el dueño: el modo enfoque sincroniza contra la
@@ -501,17 +507,16 @@ export default async function JuegoPage({
                   className="ml-auto rounded-[10px] px-3.5 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
                   style={{ background: "var(--accent-grad)" }}
                 >
-                  Modo enfoque
+                  {t("GameDetailPage.focusModeLink")}
                 </Link>
               )}
             </div>
             <p className="mb-4 text-[0.8125rem] text-muted">
-              Ordenado por lo que más gente consigue. El platino va siempre al
-              final: no es una tarea, es la consecuencia.
+              {t("GameDetailPage.nextStepsExplanation")}
             </p>
             <div className="grid gap-2.5">
-              {siguientes.map((t) => (
-                <ProximoRow key={t.id} trophy={t} />
+              {siguientes.map((trophy) => (
+                <ProximoRow key={trophy.id} trophy={trophy} />
               ))}
             </div>
           </section>
@@ -525,9 +530,9 @@ export default async function JuegoPage({
               <AvisoHitoReservado hito={hito.reservado} handle={handle} />
             )}
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="font-heading text-2xl font-bold">Todos los trofeos</h2>
+              <h2 className="font-heading text-2xl font-bold">{t("GameDetailPage.allTrophiesHeading")}</h2>
               <span className="text-[0.8125rem] text-muted">
-                {progress.earned} de {progress.total} conseguidos
+                {t("GameDetailPage.trophiesEarnedOf", { earned: progress.earned, total: progress.total })}
               </span>
             </div>
             <TrophyList

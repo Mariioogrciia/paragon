@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   searchTrophyGuideAction,
   rebuscarVideoGuiaAction,
@@ -37,8 +38,8 @@ const FUENTES_GUIA = [
   { label: "3DJuegos", sitio: "3djuegos.com" },
 ] as const;
 
-function urlBusquedaGuia(gameTitle: string, trophyName: string, sitio: string | null) {
-  const consulta = `${gameTitle} "${trophyName}" guía trofeo${sitio ? ` site:${sitio}` : ""}`;
+function urlBusquedaGuia(gameTitle: string, trophyName: string, sitio: string | null, terminoBusqueda: string) {
+  const consulta = `${gameTitle} "${trophyName}" ${terminoBusqueda}${sitio ? ` site:${sitio}` : ""}`;
   return `https://www.google.com/search?q=${encodeURIComponent(consulta)}`;
 }
 
@@ -57,6 +58,7 @@ export function TrophyGuideModal({
   isPinned?: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations("Biblioteca");
   const [isPending, startTransition] = useTransition();
   const [videoId, setVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ export function TrophyGuideModal({
         <div className="flex items-center justify-between border-b border-border p-4 px-6">
           <div className="min-w-0">
             <h2 className="flex items-center gap-2 truncate font-heading text-[1.125rem] font-bold text-foreground">
-              Guía de trofeo: {trophy.name}
+              {t("TrophyGuideModal.title", { name: trophy.name })}
               {(() => {
                 const tipo = clasificarTrofeo(trophy);
                 return tipo ? (
@@ -132,7 +134,7 @@ export function TrophyGuideModal({
                   });
                 }}
                 disabled={isPending}
-                title={isPinned ? "Quitar de la vitrina" : "Fijar en tu vitrina de perfil"}
+                title={isPinned ? t("TrophyGuideModal.unpin") : t("TrophyGuideModal.pin")}
                 className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${isPinned ? "bg-[rgb(var(--accent-rgb))] text-black" : "hover:bg-white/10 text-muted hover:text-white"}`}
               >
                 {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
@@ -152,8 +154,8 @@ export function TrophyGuideModal({
         <div className="flex gap-1.5 border-b border-border px-6 py-2.5">
           {(
             [
-              { value: "video", label: "Vídeo" },
-              { value: "guia", label: "Guía escrita" },
+              { value: "video", label: t("TrophyGuideModal.tabVideo") },
+              { value: "guia", label: t("TrophyGuideModal.tabWrittenGuide") },
             ] as const
           ).map((t) => (
             <button
@@ -176,7 +178,7 @@ export function TrophyGuideModal({
             {loading || rebuscando ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-current border-t-transparent" />
-                <p className="text-sm">{rebuscando ? "Buscando otro vídeo..." : "Buscando la mejor guía en YouTube..."}</p>
+                <p className="text-sm">{rebuscando ? t("TrophyGuideModal.searchingAnother") : t("TrophyGuideModal.searchingBest")}</p>
               </div>
             ) : videoId ? (
               <iframe
@@ -187,8 +189,8 @@ export function TrophyGuideModal({
               />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-muted p-8 text-center">
-                <p className="text-lg mb-2">No se encontró vídeo</p>
-                <p className="text-sm">No pudimos encontrar una guía en YouTube para este trofeo de manera automática.</p>
+                <p className="text-lg mb-2">{t("TrophyGuideModal.noVideoFound")}</p>
+                <p className="text-sm">{t("TrophyGuideModal.noVideoFoundDetail")}</p>
               </div>
             )}
 
@@ -201,27 +203,27 @@ export function TrophyGuideModal({
                 onClick={buscarOtro}
                 className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-black/80"
                 style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(6px)" }}
-                title={videoId ? "¿No es el vídeo correcto? Busca otro." : "Buscar de nuevo"}
+                title={videoId ? t("TrophyGuideModal.wrongVideoHint") : t("TrophyGuideModal.searchAgain")}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 4v6h-6" />
                   <path d="M1 20v-6h6" />
                   <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
                 </svg>
-                {videoId ? "No es este — buscar otro" : "Buscar de nuevo"}
+                {videoId ? t("TrophyGuideModal.wrongVideoButton") : t("TrophyGuideModal.searchAgain")}
               </button>
             )}
           </div>
         ) : (
-          <GuiaEscritaTab gameId={gameId} gameTitle={gameTitle} trophy={trophy} />
+          <GuiaEscritaTab gameId={gameId} gameTitle={gameTitle} trophy={trophy} t={t} />
         )}
 
         <div className="p-4 px-6 text-[0.8125rem] text-muted flex justify-between items-end">
-          <p className="max-w-[80%]">{trophy.detail || "Trofeo sin descripción adicional."}</p>
+          <p className="max-w-[80%]">{trophy.detail || t("TrophyGuideModal.noDescription")}</p>
           {trophy.earnedAt && (
             <p className="flex items-center gap-1.5 font-semibold text-accent-text bg-accent-text/10 px-2 py-1 rounded-md text-[0.6875rem] uppercase tracking-wider">
               <TrophyIcon grade={trophy.grade ?? "bronze"} size={14} />
-              Conseguido el {new Date(trophy.earnedAt).toLocaleDateString()}
+              {t("TrophyGuideModal.earnedOn", { date: new Date(trophy.earnedAt).toLocaleDateString() })}
             </p>
           )}
         </div>
@@ -242,6 +244,7 @@ export function TrophyGuideModal({
  * todavía: una vez lo tienes, contar ya no aporta nada.
  */
 function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) {
+  const t = useTranslations("Biblioteca");
   const [manual, setManual] = useState(trophy.manualProgress ?? null);
   const [metaEnCurso, setMetaEnCurso] = useState("");
   const [configurando, setConfigurando] = useState(false);
@@ -269,27 +272,27 @@ function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) 
             }}
             className="flex items-center gap-2.5"
           >
-            <label className="text-xs font-semibold text-muted">Meta:</label>
+            <label className="text-xs font-semibold text-muted">{t("TrophyGuideModal.manualCounter.goalLabel")}</label>
             <input
               type="number"
               min={1}
               autoFocus
               value={metaEnCurso}
               onChange={(e) => setMetaEnCurso(e.target.value)}
-              placeholder="ej. 50"
+              placeholder={t("TrophyGuideModal.manualCounter.goalPlaceholder")}
               className="w-20 rounded-lg px-2.5 py-1.5 text-sm font-semibold outline-none"
               style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}
             />
             <button type="submit" disabled={isPending} className="rounded-lg px-3 py-1.5 text-xs font-bold text-background disabled:opacity-50" style={{ background: "var(--accent-grad)" }}>
-              Crear contador
+              {t("TrophyGuideModal.manualCounter.create")}
             </button>
             <button type="button" onClick={() => setConfigurando(false)} className="text-xs font-semibold text-muted hover:text-foreground">
-              Cancelar
+              {t("TrophyGuideModal.manualCounter.cancel")}
             </button>
           </form>
         ) : (
           <button onClick={() => setConfigurando(true)} className="text-xs font-semibold text-accent hover:underline">
-            + Llevar la cuenta tú mismo (contador manual)
+            {t("TrophyGuideModal.manualCounter.start")}
           </button>
         )}
       </div>
@@ -323,7 +326,7 @@ function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) 
         <div className="h-full rounded-full" style={{ width: `${Math.round((manual.current / manual.target) * 100)}%`, background: "var(--gold)" }} />
       </div>
       <button onClick={() => guardar(0, null)} disabled={isPending} className="text-xs font-semibold text-muted hover:text-danger">
-        Quitar
+        {t("TrophyGuideModal.manualCounter.remove")}
       </button>
     </div>
   );
@@ -346,7 +349,7 @@ function Submit({ children }: { children: React.ReactNode }) {
  * base) no hay dónde guardar nada, así que directamente no se ofrece
  * escribir — solo quedan los enlaces de búsqueda de siempre.
  */
-function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTitle: string; trophy: Trophy }) {
+function GuiaEscritaTab({ gameId, gameTitle, trophy, t }: { gameId?: string; gameTitle: string; trophy: Trophy; t: ReturnType<typeof useTranslations> }) {
   const [datos, setDatos] = useState<{ guides: TrophyGuideRow[]; currentUserId: string | null } | null>(null);
   const [editando, setEditando] = useState(false);
   const [state, action] = useActionState(saveTrophyGuideAction, EMPTY);
@@ -370,32 +373,32 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
   return (
     <div className="max-h-[60vh] overflow-y-auto p-6">
       {!gameId ? (
-        <p className="mb-4 text-sm text-muted">Esta ficha no está vinculada a un juego, así que aquí no se puede guardar nada.</p>
+        <p className="mb-4 text-sm text-muted">{t("TrophyGuideModal.writtenGuide.notLinked")}</p>
       ) : !datos ? (
-        <p className="text-sm text-muted">Cargando...</p>
+        <p className="text-sm text-muted">{t("TrophyGuideModal.writtenGuide.loading")}</p>
       ) : (
         <>
           {datos.guides.length === 0 && (
-            <p className="mb-4 text-sm text-muted">Nadie de aquí ha escrito todavía una guía de este trofeo. Sé el primero.</p>
+            <p className="mb-4 text-sm text-muted">{t("TrophyGuideModal.writtenGuide.empty")}</p>
           )}
 
           {mia && !editando && (
             <div className="mb-3 rounded-xl p-4" style={{ border: "1px solid rgb(var(--accent-rgb) / 0.35)", background: "rgb(var(--accent-rgb) / 0.08)" }}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wide text-accent-text">Tu guía</span>
+                <span className="text-xs font-bold uppercase tracking-wide text-accent-text">{t("TrophyGuideModal.writtenGuide.yours")}</span>
                 <div className="flex gap-3">
                   <button onClick={() => setEditando(true)} className="text-xs font-semibold text-muted hover:text-foreground">
-                    Editar
+                    {t("TrophyGuideModal.writtenGuide.edit")}
                   </button>
                   <ConfirmForm
                     action={deleteTrophyGuideAction}
                     hidden={{ gameId, trophyId: trophy.id }}
-                    title="¿Borrar tu guía?"
-                    message="Desaparece para todo el mundo. No se puede deshacer."
-                    confirmLabel="Sí, borrar"
+                    title={t("TrophyGuideModal.writtenGuide.deleteConfirmTitle")}
+                    message={t("TrophyGuideModal.writtenGuide.deleteConfirmMessage")}
+                    confirmLabel={t("TrophyGuideModal.writtenGuide.deleteConfirmLabel")}
                     triggerClassName="text-xs font-semibold text-muted hover:text-danger"
                   >
-                    Borrar
+                    {t("TrophyGuideModal.writtenGuide.delete")}
                   </ConfirmForm>
                 </div>
               </div>
@@ -412,15 +415,15 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
                 defaultValue={mia?.body ?? ""}
                 rows={4}
                 maxLength={4000}
-                placeholder="Explica cómo se consigue este trofeo — qué falla, qué hay que evitar, un truco que no sea obvio..."
+                placeholder={t("TrophyGuideModal.writtenGuide.placeholder")}
                 className="w-full resize-none rounded-xl p-3.5 text-sm outline-none placeholder:text-muted"
                 style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
               />
               <div className="mt-2 flex items-center gap-3">
-                <Submit>{mia ? "Guardar cambios" : "Publicar guía"}</Submit>
+                <Submit>{mia ? t("TrophyGuideModal.writtenGuide.saveChanges") : t("TrophyGuideModal.writtenGuide.publish")}</Submit>
                 {editando && (
                   <button type="button" onClick={() => setEditando(false)} className="text-xs font-semibold text-muted hover:text-foreground">
-                    Cancelar
+                    {t("TrophyGuideModal.writtenGuide.cancel")}
                   </button>
                 )}
                 {state.error && <p className="text-xs text-danger">{state.error}</p>}
@@ -430,7 +433,13 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
 
           {!datos.currentUserId && (
             <p className="mb-4 text-xs text-muted">
-              <Link href="/entrar" className="font-semibold text-accent hover:underline">Entra</Link> para escribir tu propia guía.
+              {t.rich("TrophyGuideModal.writtenGuide.signInToWrite", {
+                link: (chunks) => (
+                  <Link href="/entrar" className="font-semibold text-accent hover:underline">
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           )}
 
@@ -445,7 +454,7 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
                         {g.authorName ?? `@${g.authorHandle}`}
                       </Link>
                     ) : (
-                      <span className="text-[0.8125rem] font-semibold">{g.authorName ?? "Alguien"}</span>
+                      <span className="text-[0.8125rem] font-semibold">{g.authorName ?? t("TrophyGuideModal.writtenGuide.someone")}</span>
                     )}
                     <span className="text-xs text-muted">{relativeDate(g.updatedAt)}</span>
                   </div>
@@ -458,18 +467,18 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy }: { gameId?: string; gameTi
       )}
 
       <div className="mt-6 border-t border-border pt-4">
-        <p className="mb-2.5 text-xs text-muted">¿Prefieres buscarla fuera? Se abre en una pestaña nueva.</p>
+        <p className="mb-2.5 text-xs text-muted">{t("TrophyGuideModal.writtenGuide.searchElsewhere")}</p>
         <div className="flex flex-wrap gap-2">
           {FUENTES_GUIA.map((f) => (
             <a
               key={f.label}
-              href={urlBusquedaGuia(gameTitle, trophy.name, f.sitio)}
+              href={urlBusquedaGuia(gameTitle, trophy.name, f.sitio, t("TrophyGuideModal.writtenGuide.searchTerm"))}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-lg px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:text-foreground"
               style={{ border: "1px solid var(--border)" }}
             >
-              Buscar en {f.label}
+              {t("TrophyGuideModal.writtenGuide.searchOn", { site: f.label })}
             </a>
           ))}
         </div>

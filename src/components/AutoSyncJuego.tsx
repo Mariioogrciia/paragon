@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { refrescarJuegoAction } from "@/app/actions";
 
 /**
@@ -32,6 +33,7 @@ import { refrescarJuegoAction } from "@/app/actions";
  * saber si funcionó.
  */
 export function AutoSyncJuego({ gameId }: { gameId: string }) {
+  const t = useTranslations("Biblioteca");
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [nuevos, setNuevos] = useState(0);
@@ -68,7 +70,7 @@ export function AutoSyncJuego({ gameId }: { gameId: string }) {
         color: "var(--accent-text)",
       }}
     >
-      ✨ {nuevos === 1 ? "1 trofeo nuevo" : `${nuevos} trofeos nuevos`} desde la última vez
+      {t("AutoSyncJuego.newTrophies", { count: nuevos })}
     </p>
   );
 }

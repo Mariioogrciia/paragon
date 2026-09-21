@@ -2,6 +2,7 @@
 
 import { useActionState, useMemo, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
   createCollectionWithGamesAction,
@@ -22,13 +23,14 @@ const FIELD = { border: "1px solid var(--border)", background: "var(--background
 
 function Submit({ children, small = false }: { children: React.ReactNode; small?: boolean }) {
   const { pending } = useFormStatus();
+  const t = useTranslations("Biblioteca");
   return (
     <button
       disabled={pending}
       className={`shrink-0 rounded-lg font-bold text-background transition-opacity disabled:opacity-50 ${small ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"}`}
       style={{ background: "var(--accent-grad)" }}
     >
-      {pending ? "…" : children}
+      {pending ? t("CarpetasManager.submitPending") : children}
     </button>
   );
 }
@@ -41,6 +43,7 @@ function Feedback({ state }: { state: ActionState }) {
 
 /** Checklist con filtro por texto — se repite igual al crear una carpeta y al añadir juegos a una ya existente. */
 function GamePicker({ library, name, yaDentro = [] }: { library: Game[]; name: string; yaDentro?: string[] }) {
+  const t = useTranslations("Biblioteca");
   const [filtro, setFiltro] = useState("");
   const disponibles = library.filter((g) => !g.isWishlist && !yaDentro.includes(g.id));
   const filtrados = filtro
@@ -52,13 +55,13 @@ function GamePicker({ library, name, yaDentro = [] }: { library: Game[]; name: s
       <input
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}
-        placeholder="Buscar en tu biblioteca..."
+        placeholder={t("CarpetasManager.searchLibrary")}
         className="mb-2 w-full rounded-lg px-3 py-2 text-sm outline-none placeholder:text-muted"
         style={FIELD}
       />
       <div className="max-h-56 overflow-y-auto rounded-lg" style={FIELD}>
         {filtrados.length === 0 ? (
-          <p className="p-3 text-xs text-muted">Nada que coincida.</p>
+          <p className="p-3 text-xs text-muted">{t("CarpetasManager.noMatches")}</p>
         ) : (
           filtrados.map((g) => (
             <label key={g.id} className="flex cursor-pointer items-center gap-2.5 border-b border-border px-3 py-2 last:border-0 hover:bg-surface-2">
@@ -79,6 +82,7 @@ function GamePicker({ library, name, yaDentro = [] }: { library: Game[]; name: s
 }
 
 function NuevaCarpetaForm({ library, onClose }: { library: Game[]; onClose: () => void }) {
+  const t = useTranslations("Biblioteca");
   const [state, action] = useActionState(createCollectionWithGamesAction, EMPTY);
 
   return (
@@ -87,17 +91,17 @@ function NuevaCarpetaForm({ library, onClose }: { library: Game[]; onClose: () =
         <input
           name="name"
           autoFocus
-          placeholder="Nombre de la carpeta"
+          placeholder={t("CarpetasManager.folderNamePlaceholder")}
           maxLength={40}
           className="min-w-0 flex-1 rounded-lg px-3.5 py-2.5 text-sm outline-none placeholder:text-muted"
           style={FIELD}
         />
-        <Submit>Crear</Submit>
+        <Submit>{t("CarpetasManager.create")}</Submit>
         <button type="button" onClick={onClose} className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-muted hover:text-foreground">
-          Cancelar
+          {t("CarpetasManager.cancel")}
         </button>
       </div>
-      <p className="mt-3 text-xs font-semibold text-muted">Añade juegos ahora mismo (opcional, se puede hacer luego):</p>
+      <p className="mt-3 text-xs font-semibold text-muted">{t("CarpetasManager.addGamesNow")}</p>
       <GamePicker library={library} name="gameIds" />
       <Feedback state={state} />
     </form>
@@ -106,6 +110,7 @@ function NuevaCarpetaForm({ library, onClose }: { library: Game[]; onClose: () =
 
 /** El desplegable de "mover a otra carpeta" — llama a la acción directamente (no es un <form>, `Dropdown` no dispara eventos de formulario) y ofrece crear una carpeta nueva en el mismo sitio. */
 function MoverA({ juego, carpetaActual, otrasCarpetas }: { juego: Game; carpetaActual: string; otrasCarpetas: Collection[] }) {
+  const t = useTranslations("Biblioteca");
   const [abierto, setAbierto] = useState(false);
   const [creandoNueva, setCreandoNueva] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -119,14 +124,14 @@ function MoverA({ juego, carpetaActual, otrasCarpetas }: { juego: Game; carpetaA
         <input
           name="name"
           autoFocus
-          placeholder="Nombre de la carpeta nueva"
+          placeholder={t("CarpetasManager.newFolderNamePlaceholder")}
           maxLength={40}
           className="min-w-0 flex-1 rounded-lg px-2.5 py-1.5 text-xs outline-none placeholder:text-muted"
           style={FIELD}
         />
-        <Submit small>Mover</Submit>
+        <Submit small>{t("CarpetasManager.move")}</Submit>
         <button type="button" onClick={() => setCreandoNueva(false)} className="text-xs font-semibold text-muted hover:text-foreground">
-          Cancelar
+          {t("CarpetasManager.cancel")}
         </button>
         {stateNueva.error && <p className="text-xs text-danger">{stateNueva.error}</p>}
       </form>
@@ -141,7 +146,7 @@ function MoverA({ juego, carpetaActual, otrasCarpetas }: { juego: Game; carpetaA
         disabled={isPending}
         className="text-xs font-semibold text-muted hover:text-foreground disabled:opacity-50"
       >
-        Mover a…
+        {t("CarpetasManager.moveTo")}
       </button>
       {abierto && (
         <div className="absolute right-0 z-20 mt-1 w-48 overflow-hidden rounded-lg shadow-lg" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
@@ -172,7 +177,7 @@ function MoverA({ juego, carpetaActual, otrasCarpetas }: { juego: Game; carpetaA
             }}
             className="block w-full border-t border-border px-3 py-2 text-left text-xs font-bold text-accent hover:bg-surface-2"
           >
-            + Nueva carpeta
+            {t("CarpetasManager.newFolder")}
           </button>
         </div>
       )}
@@ -181,6 +186,7 @@ function MoverA({ juego, carpetaActual, otrasCarpetas }: { juego: Game; carpetaA
 }
 
 function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Collection; library: Game[]; otrasCarpetas: Collection[] }) {
+  const t = useTranslations("Biblioteca");
   const [abierta, setAbierta] = useState(false);
   const [editando, setEditando] = useState(false);
   const [añadiendo, setAñadiendo] = useState(false);
@@ -204,20 +210,20 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
         {!editando && (
           <div className="flex shrink-0 items-center gap-3">
             <button type="button" onClick={() => setEditando(true)} className="text-xs font-semibold text-muted hover:text-foreground">
-              Renombrar
+              {t("CarpetasManager.rename")}
             </button>
             {confirmarBorrado ? (
               <form action={deleteCollectionAction} className="flex items-center gap-1.5">
                 <input type="hidden" name="collectionId" value={collection.id} />
-                <span className="text-xs text-muted">¿Seguro?</span>
-                <button className="text-xs font-bold text-danger">Sí</button>
+                <span className="text-xs text-muted">{t("CarpetasManager.confirmDelete")}</span>
+                <button className="text-xs font-bold text-danger">{t("CarpetasManager.yes")}</button>
                 <button type="button" onClick={() => setConfirmarBorrado(false)} className="text-xs font-semibold text-muted hover:text-foreground">
-                  No
+                  {t("CarpetasManager.no")}
                 </button>
               </form>
             ) : (
               <button type="button" onClick={() => setConfirmarBorrado(true)} className="text-xs font-semibold text-muted hover:text-danger">
-                Eliminar
+                {t("CarpetasManager.delete")}
               </button>
             )}
           </div>
@@ -239,9 +245,9 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
             className="min-w-0 flex-1 rounded-lg px-3 py-2 text-sm outline-none"
             style={FIELD}
           />
-          <Submit small>Guardar</Submit>
+          <Submit small>{t("CarpetasManager.save")}</Submit>
           <button type="button" onClick={() => setEditando(false)} className="text-xs font-semibold text-muted hover:text-foreground">
-            Cancelar
+            {t("CarpetasManager.cancel")}
           </button>
           <Feedback state={stateRename} />
         </form>
@@ -250,7 +256,7 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
       {abierta && (
         <div className="border-t border-border p-4">
           {juegos.length === 0 ? (
-            <p className="text-sm text-muted">Ningún juego todavía.</p>
+            <p className="text-sm text-muted">{t("CarpetasManager.noGamesYet")}</p>
           ) : (
             <div className="space-y-1.5">
               {juegos.map((g) => (
@@ -268,7 +274,7 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
                   <form action={removeGameFromCollectionAction}>
                     <input type="hidden" name="collectionId" value={collection.id} />
                     <input type="hidden" name="gameId" value={g.id} />
-                    <button className="text-xs font-semibold text-muted hover:text-danger">Quitar</button>
+                    <button className="text-xs font-semibold text-muted hover:text-danger">{t("CarpetasManager.remove")}</button>
                   </form>
                 </div>
               ))}
@@ -280,15 +286,15 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
               <input type="hidden" name="collectionId" value={collection.id} />
               <GamePicker library={library} name="gameIds" yaDentro={collection.gameIds} />
               <div className="mt-2 flex gap-2">
-                <Submit small>Añadir</Submit>
+                <Submit small>{t("CarpetasManager.add")}</Submit>
                 <button type="button" onClick={() => setAñadiendo(false)} className="text-xs font-semibold text-muted hover:text-foreground">
-                  Cerrar
+                  {t("CarpetasManager.close")}
                 </button>
               </div>
             </form>
           ) : (
             <button type="button" onClick={() => setAñadiendo(true)} className="mt-4 text-xs font-bold text-accent hover:underline">
-              + Añadir juegos
+              {t("CarpetasManager.addGames")}
             </button>
           )}
         </div>
@@ -298,12 +304,13 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
 }
 
 export function CarpetasManager({ collections, library }: { collections: Collection[]; library: Game[] }) {
+  const t = useTranslations("Biblioteca");
   const [creando, setCreando] = useState(false);
 
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-heading text-xl font-bold uppercase tracking-wide">Tus carpetas</h2>
+        <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("CarpetasManager.title")}</h2>
         {!creando && (
           <button
             type="button"
@@ -311,7 +318,7 @@ export function CarpetasManager({ collections, library }: { collections: Collect
             className="rounded-lg px-4 py-2 text-sm font-bold text-background"
             style={{ background: "var(--accent-grad)" }}
           >
-            + Nueva carpeta
+            {t("CarpetasManager.newFolder")}
           </button>
         )}
       </div>
@@ -324,7 +331,7 @@ export function CarpetasManager({ collections, library }: { collections: Collect
 
       {collections.length === 0 && !creando ? (
         <p className="rounded-xl p-5 text-sm text-muted" style={CARD}>
-          Todavía no tienes ninguna carpeta. Crea la primera para empezar a organizar tu biblioteca.
+          {t("CarpetasManager.emptyState")}
         </p>
       ) : (
         <div className="space-y-3">

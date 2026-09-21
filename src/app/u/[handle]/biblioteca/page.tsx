@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { BackButton } from "@/components/BackButton";
 import { CollectionProgress } from "@/components/CollectionProgress";
@@ -48,6 +49,7 @@ export default async function BibliotecaPage({
   params: Promise<{ handle: string }>;
   searchParams: Promise<{ estado?: string; orden?: string }>;
 }) {
+  const t = await getTranslations("Biblioteca");
   const { handle } = await params;
   const { estado, orden } = await searchParams;
   const initialStatus = ESTADOS_VALIDOS.includes(estado ?? "")
@@ -76,9 +78,9 @@ export default async function BibliotecaPage({
         <Link href={`/u/${handle}`} className="hover:underline">
           @{handle}
         </Link>{" "}
-        / Biblioteca
+        / {t("BibliotecaPage.breadcrumb")}
       </p>
-      <h1 className="mb-6 font-heading text-3xl font-bold uppercase tracking-wide">Biblioteca</h1>
+      <h1 className="mb-6 font-heading text-3xl font-bold uppercase tracking-wide">{t("BibliotecaPage.title")}</h1>
 
       <ProfileTabsNav handle={handle} juegos={stats.juegos} />
 
@@ -87,9 +89,9 @@ export default async function BibliotecaPage({
         <TrophyCountRow counts={stats.counts} />
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-3.5">
-            <h2 className="font-heading text-2xl font-bold">Juegos</h2>
+            <h2 className="font-heading text-2xl font-bold">{t("BibliotecaPage.gamesHeading")}</h2>
             <span className="text-[0.8125rem] text-muted">
-              {games.length} juegos · del más reciente al más antiguo
+              {t("BibliotecaPage.gamesCount", { count: games.length })}
             </span>
           </div>
 

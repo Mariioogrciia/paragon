@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { addToWishlistAction } from "@/app/actions";
 
 /**
@@ -25,6 +26,7 @@ export function GameWishlistCard({
   developer?: string;
   publisher?: string;
 }) {
+  const t = useTranslations("Biblioteca");
   const [isPending, startTransition] = useTransition();
   const [added, setAdded] = useState(false);
 
@@ -34,8 +36,8 @@ export function GameWishlistCard({
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       <div>
-        <h2 className="font-heading text-lg font-bold">¿Te falta este?</h2>
-        <p className="mt-0.5 text-xs text-muted">Añádelo a deseados para no perderlo de vista.</p>
+        <h2 className="font-heading text-lg font-bold">{t("GameWishlistCard.title")}</h2>
+        <p className="mt-0.5 text-xs text-muted">{t("GameWishlistCard.subtitle")}</p>
       </div>
       <button
         disabled={isPending || added}
@@ -59,7 +61,7 @@ export function GameWishlistCard({
         }`}
         style={added ? { background: "rgba(78, 201, 138, 0.14)", border: "1px solid rgba(78, 201, 138, 0.3)" } : { background: "var(--accent-grad)" }}
       >
-        {isPending ? "Añadiendo…" : added ? "✓ En deseados" : "+ Añadir a deseados"}
+        {isPending ? t("GameWishlistCard.adding") : added ? t("GameWishlistCard.added") : t("GameWishlistCard.add")}
       </button>
     </div>
   );

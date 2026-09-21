@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
 
@@ -49,6 +50,7 @@ export function PinnedGameBanner({
    * añade la atmósfera propia de ESTE juego. */
   aura?: string | null;
 }) {
+  const t = useTranslations("Biblioteca");
   const href = `/u/${handle}/${game.id}`;
   const faltan = Math.max(0, game.definedTotal - game.earnedTotal);
   const porcentaje = useCountUp(game.progressPercent);
@@ -92,14 +94,18 @@ export function PinnedGameBanner({
             <path d="M12 17v5" />
             <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z" />
           </svg>
-          A por este platino ahora
+          {t("PinnedGameBanner.currentTarget")}
         </p>
         <p className="mt-0.5 truncate font-heading text-lg font-bold">{game.title}</p>
         <p className="mt-0.5 text-xs text-muted">
           {/* Antes decía "¡a un paso!" también con 0 restantes — sonaba a
               que faltaba uno, no a que ya estaba platinado del todo (mismo
               bug real que en la Hero Card de Android). */}
-          {porcentaje}% · {faltan > 0 ? `faltan ${faltan} trofeos` : "¡platinado!"}
+          {t("PinnedGameBanner.status", {
+            percent: porcentaje,
+            hasRemaining: faltan > 0 ? "yes" : "no",
+            remaining: faltan,
+          })}
         </p>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
           <div

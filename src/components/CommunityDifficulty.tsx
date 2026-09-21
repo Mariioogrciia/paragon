@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { voteDifficultyAction } from "@/app/actions";
-
-const ETIQUETAS = ["Regalado", "Fácil", "Media", "Difícil", "Brutal"];
 
 /**
  * Voto de la comunidad sobre lo dura que es la campaña, junto a la nota media
@@ -28,9 +27,18 @@ export function CommunityDifficulty({
   /** Solo quien tiene el juego en su biblioteca puede votar. */
   puedeVotar: boolean;
 }) {
+  const t = useTranslations("Biblioteca");
   const [valorLocal, setValorLocal] = useState(miVoto);
   const [pending, startTransition] = useTransition();
   const [hover, setHover] = useState<number | null>(null);
+
+  const ETIQUETAS = [
+    t("CommunityDifficulty.labelGifted"),
+    t("CommunityDifficulty.labelEasy"),
+    t("CommunityDifficulty.labelMedium"),
+    t("CommunityDifficulty.labelHard"),
+    t("CommunityDifficulty.labelBrutal"),
+  ];
 
   const mostrado = hover ?? valorLocal ?? Math.round(media ?? 0);
 
@@ -46,7 +54,7 @@ export function CommunityDifficulty({
               key={n}
               type="button"
               disabled={!puedeVotar || pending}
-              aria-label={`Votar dificultad ${n} de 5: ${ETIQUETAS[n - 1]}`}
+              aria-label={t("CommunityDifficulty.voteAriaLabel", { n, label: ETIQUETAS[n - 1] })}
               className="transition-transform hover:scale-110 active:scale-95 disabled:cursor-default disabled:hover:scale-100"
               onMouseEnter={() => puedeVotar && setHover(n)}
               onClick={() => {
@@ -69,17 +77,19 @@ export function CommunityDifficulty({
           <>
             <span className="font-heading text-[0.9375rem] font-bold">{media.toFixed(1).replace(".", ",")}</span>
             <span className="text-[0.8125rem] text-muted">
-              {votos} {votos === 1 ? "voto" : "votos"} de dificultad
+              {t("CommunityDifficulty.votes", { count: votos })}
             </span>
           </>
         ) : (
-          <span className="text-[0.8125rem] text-muted">Nadie ha votado la dificultad todavía.</span>
+          <span className="text-[0.8125rem] text-muted">{t("CommunityDifficulty.noVotes")}</span>
         )}
       </div>
 
       {puedeVotar && (
         <p className="text-xs text-muted">
-          {valorLocal ? `Votaste: ${ETIQUETAS[valorLocal - 1]}` : "Vota lo dura que te pareció."}
+          {valorLocal
+            ? t("CommunityDifficulty.youVoted", { label: ETIQUETAS[valorLocal - 1] })
+            : t("CommunityDifficulty.votePrompt")}
         </p>
       )}
     </div>

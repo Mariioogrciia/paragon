@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CommunityRating } from "@/components/CommunityRating";
@@ -133,6 +134,8 @@ export default async function JuegoGlobalPage({
   }
   const tieneJuego = miGameId !== null;
 
+  const t = await getTranslations("Biblioteca.JuegoPage");
+
   return (
     <div className="-mx-4 -mt-9 sm:-mx-7">
       <div
@@ -217,7 +220,7 @@ export default async function JuegoGlobalPage({
                   className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background whitespace-nowrap text-center"
                   style={{ background: "var(--accent-grad)" }}
                 >
-                  Ver mi ficha
+                  {t("verFicha")}
                 </Link>
               )}
             </div>
@@ -234,7 +237,7 @@ export default async function JuegoGlobalPage({
       <div className="min-w-0 space-y-9">
         {game.summary && (
           <section className="max-w-[820px]">
-            <h2 className="mb-2 font-heading text-2xl font-bold">Acerca de</h2>
+            <h2 className="mb-2 font-heading text-2xl font-bold">{t("acercaDe")}</h2>
             <p className="text-lg leading-relaxed text-foreground/85">{game.summary}</p>
           </section>
         )}
@@ -243,7 +246,7 @@ export default async function JuegoGlobalPage({
 
         {detalles?.storyline && (
           <section className="max-w-[820px]">
-            <h2 className="mb-2 font-heading text-2xl font-bold">Historia</h2>
+            <h2 className="mb-2 font-heading text-2xl font-bold">{t("historia")}</h2>
             <p className="text-[0.9375rem] leading-relaxed text-foreground/85 whitespace-pre-wrap">{detalles.storyline}</p>
           </section>
         )}
@@ -253,41 +256,39 @@ export default async function JuegoGlobalPage({
         {detalles?.dlcs && <GameDlcs dlcs={detalles.dlcs} />}
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatTile value={stats.owners} label="En biblioteca" />
-          <StatTile value={stats.playing} label="Jugándolo ahora" />
+          <StatTile value={stats.owners} label={t("enBiblioteca")} />
+          <StatTile value={stats.playing} label={t("jugandoAhora")} />
           <StatTile
             value={stats.completed}
-            label={game.hasPlatinum ? "Al 100%" : "Completado"}
+            label={game.hasPlatinum ? t("al100") : t("completado")}
           />
           {game.hasPlatinum ? (
-            <StatTile value={stats.platinumed} label="Platinado" accent="var(--platinum)" />
+            <StatTile value={stats.platinumed} label={t("platinado")} accent="var(--platinum)" />
           ) : (
             <StatTile
               value={stats.owners > 0 ? `${Math.round((stats.completed / stats.owners) * 100)}%` : "—"}
-              label="Tasa de finalización"
+              label={t("tasaFinalizacion")}
             />
           )}
         </div>
 
         <section>
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
-            <h2 className="font-heading text-2xl font-bold">Reseñas de la comunidad</h2>
+            <h2 className="font-heading text-2xl font-bold">{t("resenasComunidad")}</h2>
             <span className="text-[0.8125rem] text-muted">
-              {reviews.length === 0
-                ? "Ninguna todavía"
-                : `${reviews.length} ${reviews.length === 1 ? "reseña" : "reseñas"}`}
+              {t("resenasCount", { count: reviews.length })}
             </span>
             <Link
               href={`/juego/${encodeURIComponent(game.id)}/guias`}
               className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
             >
-              Guías escritas →
+              {t("guiasEscritas")}
             </Link>
           </div>
 
           {reviews.length === 0 ? (
             <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-              Nadie ha escrito una reseña de este juego todavía. Sé el primero desde tu ficha.
+              {t("sinResenas")}
             </p>
           ) : (
             <div className="flex flex-col gap-3">
@@ -306,7 +307,7 @@ export default async function JuegoGlobalPage({
                             {r.name ?? `@${r.handle}`}
                           </Link>
                         ) : (
-                          <span className="font-semibold">{r.name ?? "Alguien"}</span>
+                          <span className="font-semibold">{r.name ?? t("alguien")}</span>
                         )}
                         {r.rating != null && <Stars value={r.rating} size={12} />}
                         {r.reviewDate && (
@@ -321,7 +322,7 @@ export default async function JuegoGlobalPage({
                           href={`/u/${r.handle}/${game.id}`}
                           className="mt-2 inline-block text-xs font-semibold text-accent hover:underline"
                         >
-                          Ver su ficha →
+                          {t("verSuFicha")}
                         </Link>
                       )}
                     </div>
@@ -334,7 +335,7 @@ export default async function JuegoGlobalPage({
 
         {detalles && detalles.similarGames.length > 0 && (
           <section>
-            <h2 className="mb-4 font-heading text-2xl font-bold">Juegos similares</h2>
+            <h2 className="mb-4 font-heading text-2xl font-bold">{t("juegosSimilares")}</h2>
             <CardCarousel>
               {detalles.similarGames.map((g) => (
                 <PosterCard key={g.igdbId} game={{ igdbId: g.igdbId, title: g.title, iconUrl: g.coverUrl, genres: [] }} />
@@ -387,10 +388,10 @@ export default async function JuegoGlobalPage({
         {precios && (
           <div className="flex flex-col gap-4 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
             <div>
-              <h2 className="font-heading text-lg font-bold">Dónde comprarlo</h2>
+              <h2 className="font-heading text-lg font-bold">{t("dondeComprarlo")}</h2>
               {precios.precioMasBajoHistorico != null && (
                 <p className="mt-0.5 text-xs text-muted">
-                  Mínimo histórico: {precios.precioMasBajoHistorico.toFixed(2)} €
+                  {t("minimoHistorico", { precio: precios.precioMasBajoHistorico.toFixed(2) })}
                 </p>
               )}
             </div>
@@ -414,7 +415,7 @@ export default async function JuegoGlobalPage({
                       className="shrink-0 rounded-full px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-[0.05em]"
                       style={{ background: "rgba(78, 201, 138, 0.14)", color: "#4ec98a", border: "1px solid rgba(78, 201, 138, 0.3)" }}
                     >
-                      Más barato
+                      {t("masBarato")}
                     </span>
                   )}
                   {oferta.ahorro > 0 && (
@@ -424,18 +425,17 @@ export default async function JuegoGlobalPage({
               ))}
             </div>
             <p className="-mt-2 text-[0.625rem] text-muted">
-              Precios vía CheapShark; pueden no incluir región ni impuestos. La
-              oferta de Steam abre su ficha directamente
+              {t("preciosDisclaimer")}
               {precios.ofertas.some((o) => o.viaCheapShark)
-                ? "; el resto pasa por la redirección de CheapShark, que es lo único que publica su API."
-                : "."}
+                ? t("preciosDisclaimerSufijoCheapShark")
+                : t("preciosDisclaimerSufijoSolo")}
             </p>
 
             {historicoPrecios.length > 0 && (
               <div>
-                <h3 className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">Precio a lo largo del tiempo</h3>
+                <h3 className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">{t("precioTiempo")}</h3>
                 <PriceHistoryChart puntos={historicoPrecios} compact />
-                <p className="mt-2 text-[0.625rem] text-muted">Histórico vía IsThereAnyDeal.</p>
+                <p className="mt-2 text-[0.625rem] text-muted">{t("historicoViaITAD")}</p>
               </div>
             )}
           </div>

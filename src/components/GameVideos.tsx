@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   videos: { videoId: string; name: string }[];
@@ -9,6 +10,7 @@ interface Props {
 
 export function GameVideos({ videos }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("Biblioteca");
 
   if (videos.length === 0) return null;
 
@@ -22,7 +24,7 @@ export function GameVideos({ videos }: Props) {
   return (
     <div className="mt-12">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold">Vídeos</h2>
+        <h2 className="text-xl font-bold">{t("GameVideos.title")}</h2>
         {videos.length > 2 && (
           <div className="flex gap-2">
             <button

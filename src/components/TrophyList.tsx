@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
-import { clasificarTrofeo, TROPHY_TYPE_LABEL, type TrophyType } from "@/lib/trophyType";
+import { clasificarTrofeo, type TrophyType } from "@/lib/trophyType";
 import { trophyScore } from "@/lib/trophyScore";
 import type { Platform, Trophy, TrophyGrade } from "@/lib/types";
 import { TrophyGuideModal } from "./TrophyGuideModal";
@@ -17,15 +18,15 @@ import { ToggleChip } from "./ToggleChip";
  * como filtro igual: "Perdibles, Multijugador/Online, Coleccionables...". */
 type Filtro = TrophyType | "perdible";
 
-const FILTROS_DISPONIBLES: { valor: Filtro; label: string }[] = [
-  { valor: "perdible", label: "Perdibles" },
-  { valor: "multijugador", label: "Multijugador" },
-  { valor: "coleccionable", label: "Coleccionables" },
-  { valor: "completista", label: "Completista" },
-  { valor: "historia", label: "Historia" },
-  { valor: "habilidad", label: "Habilidad" },
-  { valor: "grindeo", label: "Grindeo" },
-  { valor: "secreto", label: "Secretos" },
+const FILTROS_DISPONIBLES: { valor: Filtro }[] = [
+  { valor: "perdible" },
+  { valor: "multijugador" },
+  { valor: "coleccionable" },
+  { valor: "completista" },
+  { valor: "historia" },
+  { valor: "habilidad" },
+  { valor: "grindeo" },
+  { valor: "secreto" },
 ];
 
 /** Un trofeo pasa el filtro si coincide con AL MENOS UNO de los activos
@@ -64,6 +65,7 @@ export function TrophyList({
   esMio?: boolean;
   showcaseTrophies?: { gameId: string, trophyId: string }[];
 }) {
+  const t = useTranslations("Biblioteca");
   const [view, setView] = useState<"lista" | "cuadricula" | "arbol" | "cronologia">("lista");
   // "Cronología" es como "Árbol": su propia vista de solo lectura, sin los
   // filtros/orden de arriba (que son de la lista y la cuadrícula) — cuenta
@@ -103,16 +105,17 @@ export function TrophyList({
     });
   }
 
+  const nombreJuegoBase = t("TrophyList.baseGame");
   const groups = new Map<string, { name: string; trophies: Trophy[] }>();
-  for (const t of trofeosFiltrados) {
-    const gId = t.groupId || "default";
+  for (const trofeo of trofeosFiltrados) {
+    const gId = trofeo.groupId || "default";
     if (!groups.has(gId)) {
       groups.set(gId, {
-        name: t.groupName || (gId === "default" ? "Juego Base" : "Expansión"),
+        name: trofeo.groupName || (gId === "default" ? nombreJuegoBase : t("TrophyList.expansion")),
         trophies: [],
       });
     }
-    groups.get(gId)!.trophies.push(t);
+    groups.get(gId)!.trophies.push(trofeo);
   }
 
   // "Orden cronológico": por fecha de consecución dentro de cada grupo, para
@@ -139,8 +142,8 @@ export function TrophyList({
   // porque ya se estaba tocando este mismo bloque para el orden
   // cronológico, no por buscarlo a propósito.
   const groupList = Array.from(groups.values()).sort((a, b) => {
-    if (a.name === "Juego Base") return -1;
-    if (b.name === "Juego Base") return 1;
+    if (a.name === nombreJuegoBase) return -1;
+    if (b.name === nombreJuegoBase) return 1;
     return a.name.localeCompare(b.name);
   });
 
@@ -159,7 +162,7 @@ export function TrophyList({
         <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
           {FILTROS_DISPONIBLES.filter((f) => filtrosConDatos.has(f.valor)).map((f) => (
             <ToggleChip key={f.valor} active={filtros.has(f.valor)} onClick={() => alternarFiltro(f.valor)}>
-              {f.label}
+              {t(`TrophyList.filtro.${f.valor}`)}
             </ToggleChip>
           ))}
           {filtros.size > 0 && (
@@ -168,7 +171,7 @@ export function TrophyList({
               onClick={() => setFiltros(new Set())}
               className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] text-muted hover:text-foreground"
             >
-              Limpiar
+              {t("TrophyList.clear")}
             </button>
           )}
         </div>
@@ -181,13 +184,13 @@ export function TrophyList({
                 en su propia fila, separados de los chips de categoría de
                 arriba: no filtran por tipo de trofeo, uno filtra por estado
                 (ya lo tienes o no) y el otro solo reordena, no esconde nada. */}
-            {trophies.some((t) => t.earned) && (
+            {trophies.some((trofeo) => trofeo.earned) && (
               <ToggleChip active={ocultarConseguidos} onClick={() => setOcultarConseguidos((v) => !v)}>
-                Ocultar conseguidos
+                {t("TrophyList.hideEarned")}
               </ToggleChip>
             )}
             <ToggleChip active={ordenCronologico} onClick={() => setOrdenCronologico((v) => !v)}>
-              Orden cronológico
+              {t("TrophyList.chronologicalOrder")}
             </ToggleChip>
           </div>
         )}
@@ -196,7 +199,7 @@ export function TrophyList({
           className="ml-auto inline-flex gap-1 rounded-[10px] p-1"
           style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
         >
-          <ViewButton active={view === "lista"} onClick={() => setView("lista")} label="Lista">
+          <ViewButton active={view === "lista"} onClick={() => setView("lista")} label={t("TrophyList.view.list")}>
             <line x1="8" y1="6" x2="21" y2="6" />
             <line x1="8" y1="12" x2="21" y2="12" />
             <line x1="8" y1="18" x2="21" y2="18" />
@@ -207,14 +210,14 @@ export function TrophyList({
           <ViewButton
             active={view === "cuadricula"}
             onClick={() => setView("cuadricula")}
-            label="Cuadrícula"
+            label={t("TrophyList.view.grid")}
           >
             <rect x="3" y="3" width="7" height="7" />
             <rect x="14" y="3" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" />
             <rect x="3" y="14" width="7" height="7" />
           </ViewButton>
-          <ViewButton active={view === "arbol"} onClick={() => setView("arbol")} label="Árbol">
+          <ViewButton active={view === "arbol"} onClick={() => setView("arbol")} label={t("TrophyList.view.tree")}>
             <circle cx="12" cy="5" r="2" />
             <circle cx="5" cy="19" r="2" />
             <circle cx="19" cy="19" r="2" />
@@ -222,7 +225,7 @@ export function TrophyList({
             <line x1="12" y1="12" x2="5" y2="17" />
             <line x1="12" y1="12" x2="19" y2="17" />
           </ViewButton>
-          <ViewButton active={view === "cronologia"} onClick={() => setView("cronologia")} label="Cronología">
+          <ViewButton active={view === "cronologia"} onClick={() => setView("cronologia")} label={t("TrophyList.view.timeline")}>
             <line x1="12" y1="3" x2="12" y2="21" />
             <circle cx="12" cy="6" r="1.5" />
             <circle cx="12" cy="12" r="1.5" />
@@ -321,6 +324,7 @@ function ViewButton({
 }
 
 function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
+  const t = useTranslations("Biblioteca");
   const oculto = trophy.hidden && !trophy.earned;
   const tipo = clasificarTrofeo(trophy);
   const puntos = platform
@@ -337,7 +341,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
 
       <div className="min-w-0">
         <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold">
-          {oculto ? "Trofeo oculto" : trophy.name}
+          {oculto ? t("TrophyList.hiddenTrophy") : trophy.name}
           {tipo && (
             <span className="flex items-center justify-center text-muted">
               <TrophyTypeIcon tipo={tipo} />
@@ -347,7 +351,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
             <span
               className="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
               style={{ background: "rgba(226, 181, 62, 0.14)", color: "#e2b53e", border: "1px solid rgba(226, 181, 62, 0.3)" }}
-              title="Se puede quedar sin conseguir para siempre si no se hace en el momento adecuado"
+              title={t("TrophyList.missableHint")}
             >
               {/* Un tick, no un triángulo de aviso: no es un peligro, es un
                   aviso de "atento, esto tiene ventana" — mismo lenguaje que
@@ -355,7 +359,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 6 9 17l-5-5" />
               </svg>
-              Perdible
+              {t("TrophyList.missable")}
             </span>
           )}
         </p>
@@ -375,9 +379,9 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
           className="block text-[0.6875rem] font-bold uppercase tracking-[0.1em]"
           style={{ color: colorFor(trophy.grade) }}
         >
-          {gradeLabel(trophy.grade)}
+          {gradeLabel(trophy.grade, t)}
         </span>
-        {puntos !== null && <span className="text-[0.625rem] text-muted">{puntos} pts</span>}
+        {puntos !== null && <span className="text-[0.625rem] text-muted">{t("TrophyList.points", { points: puntos })}</span>}
       </span>
       <span className="hidden text-right text-xs text-muted sm:block">
         {trophy.earnedAt ? relativeDate(trophy.earnedAt) : "—"}
@@ -387,6 +391,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
 }
 
 function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
+  const t = useTranslations("Biblioteca");
   const oculto = trophy.hidden && !trophy.earned;
   const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
   const tipo = clasificarTrofeo(trophy);
@@ -416,28 +421,28 @@ function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, plat
         <span
           className="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
           style={{ background: "rgba(226, 181, 62, 0.14)", color: "#e2b53e", border: "1px solid rgba(226, 181, 62, 0.3)" }}
-          title="Se puede quedar sin conseguir para siempre si no se hace en el momento adecuado"
+          title={t("TrophyList.missableHint")}
         >
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6 9 17l-5-5" />
           </svg>
-          Perdible
+          {t("TrophyList.missable")}
         </span>
       )}
 
       <TrophyPhoto trophy={trophy} size={64} />
 
       <p className="mt-3 line-clamp-2 text-[0.8125rem] font-semibold">
-        {oculto ? "Trofeo oculto" : trophy.name}
+        {oculto ? t("TrophyList.hiddenTrophy") : trophy.name}
       </p>
 
       <span
         className="mt-1.5 text-[0.625rem] font-bold uppercase tracking-[0.1em]"
         style={{ color: colorFor(trophy.grade) }}
       >
-        {gradeLabel(trophy.grade)}
+        {gradeLabel(trophy.grade, t)}
       </span>
-      {puntos !== null && <span className="text-[0.625rem] text-muted">{puntos} pts</span>}
+      {puntos !== null && <span className="text-[0.625rem] text-muted">{t("TrophyList.points", { points: puntos })}</span>}
 
       {r && (
         <span

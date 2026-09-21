@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { CommunityRating as Rating } from "@/lib/ratings";
 
 /**
@@ -7,10 +8,12 @@ import type { CommunityRating as Rating } from "@/lib/ratings";
  * juntos siempre, porque un 5,0 con un voto no dice lo mismo que un 4,2 con
  * cuarenta, y con estrellas solas no hay forma de distinguirlos.
  */
-export function CommunityRating({ rating }: { rating: Rating | null }) {
+export async function CommunityRating({ rating }: { rating: Rating | null }) {
+  const t = await getTranslations("Biblioteca");
+
   if (!rating) {
     return (
-      <p className="text-[0.8125rem] text-muted">Todavía no lo ha valorado nadie.</p>
+      <p className="text-[0.8125rem] text-muted">{t("CommunityRating.noRatings")}</p>
     );
   }
 
@@ -46,7 +49,7 @@ export function CommunityRating({ rating }: { rating: Rating | null }) {
         {average.toFixed(1).replace(".", ",")}
       </span>
       <span className="text-[0.8125rem] text-muted">
-        {votes} {votes === 1 ? "valoración" : "valoraciones"}
+        {t("CommunityRating.votes", { count: votes })}
       </span>
     </div>
   );

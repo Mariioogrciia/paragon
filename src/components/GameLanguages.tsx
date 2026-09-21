@@ -2,6 +2,7 @@
 
 import { Check, X } from "lucide-react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   languages: { language: string; support: string[] }[];
@@ -9,6 +10,7 @@ interface Props {
 
 export function GameLanguages({ languages }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations("Biblioteca");
 
   if (languages.length === 0) return null;
 
@@ -17,7 +19,7 @@ export function GameLanguages({ languages }: Props) {
 
   return (
     <div className="mt-12">
-      <h2 className="text-xl font-bold mb-4">Idiomas</h2>
+      <h2 className="text-xl font-bold mb-4">{t("GameLanguages.title")}</h2>
       
       {/* `min-w-full` en vez de `w-full`: con `w-full` a secas la tabla
           nunca podía ser más ancha que este contenedor, así que en móvil
@@ -43,19 +45,19 @@ export function GameLanguages({ languages }: Props) {
                   <td className="py-3 px-2 text-center text-muted">
                     <span className="inline-flex items-center gap-1">
                       {hasAudio ? <Check size={14} className="text-foreground" /> : <X size={14} className="opacity-30" />}
-                      <span className={hasAudio ? "text-foreground" : "opacity-30"}>Audio</span>
+                      <span className={hasAudio ? "text-foreground" : "opacity-30"}>{t("GameLanguages.audio")}</span>
                     </span>
                   </td>
                   <td className="py-3 px-2 text-center text-muted">
                     <span className="inline-flex items-center gap-1">
                       {hasSub ? <Check size={14} className="text-foreground" /> : <X size={14} className="opacity-30" />}
-                      <span className={hasSub ? "text-foreground" : "opacity-30"}>Subtítulos</span>
+                      <span className={hasSub ? "text-foreground" : "opacity-30"}>{t("GameLanguages.subtitles")}</span>
                     </span>
                   </td>
                   <td className="py-3 px-2 text-center text-muted">
                     <span className="inline-flex items-center gap-1">
                       {hasInt ? <Check size={14} className="text-foreground" /> : <X size={14} className="opacity-30" />}
-                      <span className={hasInt ? "text-foreground" : "opacity-30"}>Interfaz</span>
+                      <span className={hasInt ? "text-foreground" : "opacity-30"}>{t("GameLanguages.interface")}</span>
                     </span>
                   </td>
                 </tr>
@@ -70,7 +72,7 @@ export function GameLanguages({ languages }: Props) {
           onClick={() => setExpanded(!expanded)}
           className="mt-4 text-accent hover:underline text-sm font-semibold"
         >
-          {expanded ? "Mostrar menos" : `Mostrar los ${languages.length} idiomas`}
+          {expanded ? t("GameLanguages.showLess") : t("GameLanguages.showAll", { count: languages.length })}
         </button>
       )}
     </div>

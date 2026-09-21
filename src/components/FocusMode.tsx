@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { refrescarJuegoAction, saveGameNotesAction } from "@/app/actions";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";
 import { TrophyPhoto } from "@/components/TrophyList";
@@ -49,6 +50,7 @@ export function FocusMode({
   /** "Oráculo de Platino" — a tu ritmo real, cuándo terminarías esto (ver lib/history.ts). `null` sin ritmo reciente con el que proyectar nada. */
   oraculo?: Prevision | null;
 }) {
+  const t = useTranslations("Biblioteca.FocusMode");
   const router = useRouter();
   const [pendiente, startTransition] = useTransition();
   const [aviso, setAviso] = useState<string | null>(null);
@@ -161,8 +163,8 @@ export function FocusMode({
 
       setAviso(
         r.nuevos > 0
-          ? `¡${r.nuevos} ${r.nuevos === 1 ? "trofeo nuevo" : "trofeos nuevos"}!`
-          : "Nada nuevo todavía",
+          ? t("trofeosNuevos", { nuevos: r.nuevos })
+          : t("nadaNuevo"),
       );
       // Celebración EN EL MOMENTO, no solo el contador de arriba — solo
       // cuando `refrescarJuegoAction` ha descubierto un platino de verdad
@@ -183,7 +185,7 @@ export function FocusMode({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Modo enfoque: ${titulo}`}
+      aria-label={t("ariaLabel", { titulo })}
       className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-black text-white"
     >
       {/* Ancho de móvil por defecto; en pantalla grande se abre para que quepan
@@ -193,7 +195,7 @@ export function FocusMode({
         <header className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-white/40">
-              Modo enfoque
+              {t("modoEnfoque")}
             </p>
             <h1 className="font-heading mt-1 truncate text-2xl font-bold uppercase leading-tight">
               {titulo}
@@ -201,7 +203,7 @@ export function FocusMode({
           </div>
           <a
             href={volverA}
-            aria-label="Salir del modo enfoque"
+            aria-label={t("salirAriaLabel")}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xl text-white/50 transition-transform hover:scale-105 hover:text-white active:scale-95"
             style={{ border: "1px solid rgba(255,255,255,0.16)" }}
           >
@@ -226,28 +228,28 @@ export function FocusMode({
             un bloque que compita por atención con los trofeos de abajo. */}
         {oraculo && (
           <p className="mt-2 text-[0.8125rem] text-white/50">
-            A tu ritmo, lo terminas sobre el{" "}
-            <span className="font-semibold text-white/80">
-              {new Date(oraculo.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}
-            </span>{" "}
-            ({oraculo.semanas} {oraculo.semanas === 1 ? "semana" : "semanas"} a tu ritmo de los últimos 90 días).
+            {t.rich("oraculo", {
+              strong: (chunks) => <span className="font-semibold text-white/80">{chunks}</span>,
+              fecha: new Date(oraculo.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long" }),
+              semanas: oraculo.semanas,
+            })}
           </p>
         )}
 
         {trofeos.length === 0 ? (
           <p className="mt-16 text-center text-lg text-white/50">
-            No queda ningún trofeo pendiente aquí. Está hecho.
+            {t("sinTrofeos")}
           </p>
         ) : (
           // En móvil, una columna: se lee de un vistazo con el mando en la
           // mano. En pantalla grande, los tres a la vez y sin scroll.
           <ol className="mt-6 flex-1 space-y-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-3 lg:space-y-0">
-            {trofeos.map((t, i) => {
-              const r = t.rarityPercent !== undefined ? rarity(t.rarityPercent) : null;
+            {trofeos.map((trofeo, i) => {
+              const r = trofeo.rarityPercent !== undefined ? rarity(trofeo.rarityPercent) : null;
 
               return (
                 <li
-                  key={t.id}
+                  key={trofeo.id}
                   className="rounded-2xl p-4"
                   style={{
                     // Al primero se le da más peso: es el que hay que mirar.
@@ -256,17 +258,17 @@ export function FocusMode({
                   }}
                 >
                   <div className="flex items-start gap-3.5">
-                    <TrophyPhoto trophy={t} size={i === 0 ? 52 : 44} />
+                    <TrophyPhoto trophy={trofeo} size={i === 0 ? 52 : 44} />
 
                     <div className="min-w-0 flex-1">
                       <p
                         className={`font-bold leading-tight ${i === 0 ? "text-xl" : "text-[1.0625rem]"}`}
                       >
-                        {t.name}
+                        {trofeo.name}
                       </p>
-                      {t.detail && (
+                      {trofeo.detail && (
                         <p className="mt-1.5 text-[0.9375rem] leading-snug text-white/60">
-                          {t.detail}
+                          {trofeo.detail}
                         </p>
                       )}
 
@@ -276,12 +278,12 @@ export function FocusMode({
                             className="rounded-full px-2.5 py-1 text-[0.75rem] font-bold uppercase tracking-[0.06em]"
                             style={{ background: r.bg, color: r.fg }}
                           >
-                            {r.label} · {t.rarityPercent!.toFixed(1)}%
+                            {r.label} · {trofeo.rarityPercent!.toFixed(1)}%
                           </span>
                         )}
-                        {t.progress && t.progress.current > 0 && (
+                        {trofeo.progress && trofeo.progress.current > 0 && (
                           <span className="text-[0.8125rem] font-bold tabular-nums text-white/70">
-                            {t.progress.current}/{t.progress.target}
+                            {trofeo.progress.current}/{trofeo.progress.target}
                           </span>
                         )}
                       </div>
@@ -292,14 +294,14 @@ export function FocusMode({
                       pantalla de verdad: el juego en la tele y el cómo se hace
                       en la mano. */}
                   <button
-                    onClick={() => setGuia(t)}
+                    onClick={() => setGuia(trofeo)}
                     className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-[0.9375rem] font-bold text-white/80 transition-transform hover:scale-[1.01] hover:text-white active:scale-[0.98]"
                     style={{ border: "1px solid rgba(255,255,255,0.16)" }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                       <path d="M8 5v14l11-7z" />
                     </svg>
-                    Ver guía
+                    {t("verGuia")}
                   </button>
                 </li>
               );
@@ -325,7 +327,7 @@ export function FocusMode({
               disabled={pendiente}
               className={`${BOTON} w-full bg-white text-black disabled:opacity-60 sm:flex-1`}
             >
-              {pendiente ? "Comprobando…" : "¿Ya lo tengo?"}
+              {pendiente ? t("comprobando") : t("yaLoTengo")}
             </button>
 
             <a
@@ -333,7 +335,7 @@ export function FocusMode({
               className={`${BOTON} flex w-full items-center justify-center text-white/70 hover:text-white sm:w-40`}
               style={{ border: "1px solid rgba(255,255,255,0.16)" }}
             >
-              Salir
+              {t("salir")}
             </a>
           </div>
         </div>
@@ -353,7 +355,7 @@ export function FocusMode({
       <button
         type="button"
         onClick={() => setNotaAbierta(true)}
-        aria-label="Apuntar una nota rápida"
+        aria-label={t("notaAriaLabel")}
         // El footer con "¿Ya lo tengo?"/"Salir" (BOTON = min-h-64px cada
         // uno) va en columna en móvil (dos botones apilados, ~150px+) y en
         // fila a partir de `sm:` (una sola altura, ~76px) — el offset de
@@ -373,7 +375,7 @@ export function FocusMode({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Nota privada"
+          aria-label={t("notaPrivadaAriaLabel")}
           className="fixed inset-0 z-[120] flex flex-col justify-end bg-black/80 sm:items-center sm:justify-center"
           onClick={cerrarNota}
         >
@@ -384,16 +386,16 @@ export function FocusMode({
           >
             <div className="mb-3 flex items-center justify-between">
               <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-white/40">
-                Nota privada — solo la ves tú
+                {t("notaPrivadaTitulo")}
               </p>
-              <span className="text-[0.6875rem] text-white/40">{notaGuardando ? "Guardando…" : nota ? "Guardado" : ""}</span>
+              <span className="text-[0.6875rem] text-white/40">{notaGuardando ? t("guardando") : nota ? t("guardado") : ""}</span>
             </div>
             <textarea
               value={nota}
               onChange={(e) => cambiarNota(e.target.value)}
               maxLength={500}
               autoFocus
-              placeholder="Ej: código de la taquilla de la sala de espera: DCM"
+              placeholder={t("notaPlaceholder")}
               className="h-32 w-full resize-none rounded-xl bg-white/5 p-3 text-base text-white outline-none"
               style={{ border: "1px solid rgba(255,255,255,0.16)" }}
             />
@@ -402,7 +404,7 @@ export function FocusMode({
               onClick={cerrarNota}
               className={`${BOTON} mt-3 w-full bg-white text-black`}
             >
-              Cerrar
+              {t("cerrar")}
             </button>
           </div>
         </div>
@@ -434,7 +436,7 @@ export function FocusMode({
           </div>
           <div>
             <p className="text-xl font-bold uppercase tracking-wide" style={{ color: "rgb(159,212,236)" }}>
-              Platino desbloqueado
+              {t("platinoDesbloqueado")}
             </p>
             <p className="mt-1 text-sm text-white/70">{celebracion.nombre}</p>
           </div>

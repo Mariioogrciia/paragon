@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ponerseAlDiaAction } from "@/app/actions";
 import { PLATFORM_LABEL, type Platform } from "@/lib/types";
 
@@ -23,6 +24,7 @@ interface Fila {
 }
 
 export function SaludSincronizacion({ filas }: { filas: Fila[] }) {
+  const t = useTranslations("Biblioteca");
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [pendiente, setPendiente] = useState(false);
@@ -48,9 +50,11 @@ export function SaludSincronizacion({ filas }: { filas: Fila[] }) {
 
       setAviso(
         r.hechos === 0
-          ? "No se ha podido refrescar ninguno esta vez."
-          : `${r.hechos} ${r.hechos === 1 ? "juego actualizado" : "juegos actualizados"}.` +
-            (r.restantes > 0 ? ` Quedan ${r.restantes}: puedes darle otra vez.` : " Ya está todo al día."),
+          ? t("SaludSincronizacion.noneRefreshed")
+          : t("SaludSincronizacion.updated", { count: r.hechos }) +
+            (r.restantes > 0
+              ? t("SaludSincronizacion.remaining", { count: r.restantes })
+              : t("SaludSincronizacion.allUpToDate")),
       );
       router.refresh();
     });
@@ -68,14 +72,14 @@ export function SaludSincronizacion({ filas }: { filas: Fila[] }) {
             >
               <span className="font-semibold">{PLATFORM_LABEL[f.plataforma] ?? f.plataforma}</span>
               <span className="text-muted">
-                {f.total} juegos ·{" "}
+                {t("SaludSincronizacion.totalGames", { count: f.total })}{" "}
                 {alDia ? (
-                  <span style={{ color: "var(--accent-text)" }}>al día</span>
+                  <span style={{ color: "var(--accent-text)" }}>{t("SaludSincronizacion.upToDate")}</span>
                 ) : (
                   <>
-                    {f.sinDetalle > 0 && <>{f.sinDetalle} sin detalle</>}
+                    {f.sinDetalle > 0 && <>{t("SaludSincronizacion.noDetail", { count: f.sinDetalle })}</>}
                     {f.sinDetalle > 0 && f.caducados > 0 && " · "}
-                    {f.caducados > 0 && <>{f.caducados} sin refrescar</>}
+                    {f.caducados > 0 && <>{t("SaludSincronizacion.stale", { count: f.caducados })}</>}
                   </>
                 )}
               </span>
@@ -96,18 +100,14 @@ export function SaludSincronizacion({ filas }: { filas: Fila[] }) {
             color: "var(--accent-text)",
           }}
         >
-          {pendiente ? "Poniendo al día…" : "Ponerse al día"}
+          {pendiente ? t("SaludSincronizacion.updating") : t("SaludSincronizacion.catchUp")}
         </button>
       )}
 
       {aviso && <p className="mt-2.5 text-[0.8125rem] text-muted">{aviso}</p>}
 
       <p className="mt-3 text-[0.75rem] leading-relaxed text-muted">
-        &laquo;Sin detalle&raquo; son juegos de los que sabemos el total de trofeos pero no
-        cuáles ni cuándo — hasta que se piden, no cuentan en el histórico ni en
-        las rachas. La puesta al día va por tandas: si quedan más, se puede
-        repetir. Xbox no entra a propósito, porque su API va con un cupo por
-        hora compartido entre todos los usuarios de Paragon.
+        {t("SaludSincronizacion.explanation")}
       </p>
     </div>
   );

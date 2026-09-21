@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { RespuestaGuiaForm } from "@/components/RespuestaGuiaForm";
@@ -28,9 +29,11 @@ export default async function GuiaPage({
 
   const esAutor = session?.user?.id === guide.authorId;
 
+  const t = await getTranslations("Biblioteca.GuiaDetailPage");
+
   return (
     <div className="mx-auto max-w-[820px]">
-      <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}/guias`} label="Todas las guías" />
+      <BackButton fallbackHref={`/juego/${encodeURIComponent(gameId)}/guias`} label={t("todasLasGuias")} />
 
       <article className="mt-4">
         <h1 className="font-heading text-[1.75rem] font-bold leading-tight">{guide.title}</h1>
@@ -44,12 +47,12 @@ export default async function GuiaPage({
             <div className="ml-auto">
               <ConfirmForm
                 action={deleteGuideAction.bind(null, guide.id, gameId)}
-                title="¿Borrar esta guía?"
-                message="Desaparece para todo el mundo, junto con sus respuestas. No se puede deshacer."
-                confirmLabel="Sí, borrar"
+                title={t("confirmarBorrarTitulo")}
+                message={t("confirmarBorrarMensaje")}
+                confirmLabel={t("confirmarBorrarBoton")}
                 triggerClassName="text-xs font-semibold text-muted hover:text-danger"
               >
-                Borrar guía
+                {t("borrarGuia")}
               </ConfirmForm>
             </div>
           )}
@@ -62,7 +65,7 @@ export default async function GuiaPage({
 
       <section className="mt-9">
         <h2 className="font-heading mb-3.5 text-lg font-bold uppercase tracking-wide">
-          {guide.replies.length === 0 ? "Respuestas" : `${guide.replies.length} ${guide.replies.length === 1 ? "respuesta" : "respuestas"}`}
+          {t("respuestasHeading", { count: guide.replies.length })}
         </h2>
 
         <div className="flex flex-col gap-3">
@@ -85,7 +88,13 @@ export default async function GuiaPage({
             <RespuestaGuiaForm guideId={guide.id} gameId={gameId} />
           ) : (
             <p className="rounded-xl border border-border bg-surface px-4 py-4 text-center text-sm text-muted">
-              <Link href="/entrar" className="font-semibold text-accent hover:underline">Entra</Link> para responder.
+              {t.rich("entraParaResponder", {
+                link: (chunks) => (
+                  <Link href="/entrar" className="font-semibold text-accent hover:underline">
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           )}
         </div>
