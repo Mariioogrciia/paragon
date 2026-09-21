@@ -54,15 +54,20 @@ export const maxDuration = 60;
 const PRESUPUESTO_MS = 22_000;
 
 /**
- * Cuántas cuentas se intentan como mucho en una pasada.
+ * Cuántos USUARIOS se intentan como mucho en una pasada — es solo un tope,
+ * no un objetivo: el bucle de abajo ya corta en cuanto se acaba
+ * `PRESUPUESTO_MS`, así que subir esto no puede hacer que una pasada se
+ * pase de tiempo, solo le da más margen para aprovecharlo si sobra.
  *
- * Bajado de 4 a 2 el 17 de septiembre de 2026 junto con `PRESUPUESTO_MS`
- * de arriba: con el presupuesto real ahora en 22s en vez de los ~35s de
- * antes, currar sobre menos cuentas a la vez es lo que de verdad hace que
- * la pasada termine a tiempo — el margen de abajo solo protege ENTRE
- * cuentas, no dentro de una.
+ * Subido de 2 a 4 el 21 de septiembre de 2026: con solo 8 usuarios reales
+ * y `POR_PASADA=2`, la rotación completa tardaba 4 pasadas (~1h) en volver
+ * a tocar la misma cuenta — quien ganaba un trofeo lo veía aparecer en
+ * Paragon hasta una hora después, no en los 15 min que parece prometer el
+ * cron. Con 4, la rotación baja a ~30 min. Si la base de usuarios crece
+ * mucho, esto habrá que revisarlo otra vez (más usuarios reales = cada uno
+ * vuelve a esperar más, haga lo que haga este número).
  */
-const POR_PASADA = 2;
+const POR_PASADA = 4;
 
 /**
  * Cuántas fichas de juego se rellenan por pasada.
