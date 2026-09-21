@@ -1,9 +1,196 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **20 de septiembre de
-2026** (continuación 20 — Claude Code, sesión corta: revisión de un
-arreglo de Antigravity + gestión de la clave de la API de Liquipedia).
+releer todo el historial. Última actualización: **21 de septiembre de
+2026** (continuación 21 — Claude Code, sesión larga: la app entera
+traducida a 4 idiomas, media docena de bugs reales de producción
+arreglados, la landing rehecha con datos reales, y un primer filtro de
+contenido ofensivo).
+
+---
+
+## Sesión del 21 de septiembre de 2026 (continuación 21) — i18n completo, bugs reales de producción, landing con datos reales, filtro de contenido
+
+Sesión muy larga con temas bien distintos. Resumen ejecutivo antes del
+detalle: **la plataforma entera es ahora multi-idioma (ES/EN/DE/FR)**,
+se encontraron y arreglaron **varios bugs reales de producción** (no
+hipotéticos — confirmados contra datos reales antes y después de cada
+arreglo), la landing pasó de "tarjeta bonita + FAQ" a tener prueba
+social real, y hay un primer filtro de lenguaje ofensivo en todo el
+texto libre que otros usuarios pueden ver.
+
+### Internacionalización completa (ES/EN/DE/FR)
+
+Lo que había al empezar la sesión: `next-intl` instalado y UN único
+namespace traducido (`/entrar`), dejado a medias por Antigravity — el
+selector de idioma de la cabecera ya existía y cambiaba el idioma de
+verdad, pero el resto de la app (cientos de pantallas) seguía en
+español fijo pasara lo que pasara con el idioma elegido.
+
+**Arquitectura nueva, antes de traducir nada**: `messages/<locale>.json`
+(un archivo gigante por idioma) se sustituyó por
+`messages/<Namespace>/{es,en,de,fr}.json` — una carpeta por sección de
+la app, registrada en `messages/manifest.ts`, fundidas todas en
+`src/i18n/request.ts` en cada petición. El motivo: con varios agentes
+traduciendo secciones distintas EN PARALELO, un único archivo por
+idioma se habría pisado constantemente. Namespaces:
+**Entrar** (ya existía), **Shell** (cabecera/pie/legal/home/easter
+egg), **Onboarding** (bienvenida/ajustes/vincular), **Biblioteca**
+(juegos/trofeos/guías/modo enfoque), **Perfil** (social/ligas/Wrap),
+**Descubrir** (noticias/eSports/feed), **Analítica**
+(estadísticas/gráficas), **Admin**.
+
+Cada namespace se hizo con un agente en un **worktree de git aislado**
+(para que no se pisaran entre sí ni con la sesión principal), revisado
+y fusionado a mano uno a uno: `git add -A` dentro del worktree,
+commit, `git merge --no-ff` a master, `npx tsc --noEmit` y
+`npx next build` después de cada fusión, worktree borrado. Varios
+agentes tuvieron que reanudarse tras cortes por límite de sesión de la
+API (rate limit) — se retomaron con `SendMessage` al `agentId`, sin
+perder el trabajo ya hecho.
+
+**Bug real encontrado en el propio proceso, antes de pushear nada**: al
+probar en el navegador tras fusionar el namespace Shell, la app entera
+(no una pantalla en concreto) se caía a la pantalla de error genérica.
+Causa: `CookieBanner.tsx` (namespace Shell) recibió `useTranslations()`
+en esta pasada, pero `layout.tsx` lo montaba **fuera** de
+`<NextIntlClientProvider>` — cualquier componente cliente con
+`useTranslations` fuera de ese proveedor revienta con "context ... was
+not found", y como `CookieBanner` está en el layout raíz, tumbaba TODA
+la app, no una página. Arreglado moviendo el `<CookieBanner />` dentro
+del provider (`523349e`). Verificado build limpio + navegación real sin
+errores de servidor ni de cliente antes de pushear el resto.
+
+**Otro bug real, de un agente durante la extracción de Biblioteca**: en
+`TrophyList.tsx`, el bucle `.map((t, i) => ...)` de trofeos usaba `t`
+como nombre del parámetro, tapando la variable `t` del traductor — el
+propio agente lo detectó porque `tsc` fallaba, y lo arregló renombrando
+la variable a `trofeo` (sin cambio de comportamiento). De paso el mismo
+agente encontró y arregló `TrophyCounts.tsx` leyendo `GRADE_LABEL` sin
+pasar por el traductor, y `ManualGameStatus.tsx` a medio migrar (import
+sin usar, de una pasada anterior interrumpida).
+
+**Limitación conocida, dejada así a propósito**: el filtro de contenido
+ofensivo (más abajo) solo cubre español e inglés — alemán y francés se
+quedan fuera por ahora, nadie ha escrito contenido libre en esos
+idiomas todavía. Ampliable en `lib/contentFilter.ts` cuando haga falta.
+
+### Bugs reales de producción, encontrados y arreglados esta sesión
+
+- **Xbox: el cron "no traía los trofeos"** — reportado por el usuario,
+  confirmado contra `sync_run` real: el cron SÍ disparaba cada 15 min,
+  pero cada juego de Xbox solo se refrescaba una vez cada 6h (mismo
+  caché que PSN/Steam, por el cupo compartido de OpenXBL). Con el
+  usuario como único usuario de Xbox de toda la plataforma ahora mismo,
+  el riesgo de agotar ese cupo por refrescar más a menudo es mínimo —
+  bajado a `HORAS_CADUCIDAD_XBOX = 1h`, aplicado de forma consistente
+  en los tres sitios que compartían el umbral de 6h: `soloDesactualizados`
+  (sync.ts), `saludSincronizacion` (el aviso de "sin refrescar" en
+  Ajustes) y la cola de recuperación del cron (`9a05a18`). Si se suman
+  más usuarios de Xbox, revisar otra vez.
+- **"Sincronizar ahora" actualizaba la biblioteca pero no el detalle**
+  — mismo caché de 6h, pero aplicado también al botón manual, sin
+  distinguir "el cron de fondo" de "un usuario esperando delante de la
+  pantalla". `resyncLibraries()`/`syncLibrary()` aceptan ahora
+  `{ forzarDetalle: true }`, que solo pasa el botón manual — el cron
+  nunca lo pasa (`b28e379`).
+- **Admin lento / "le doy a Ligas y no pasa nada"** — la página pedía
+  hasta 7 conexiones simultáneas a la base de datos (5 del `Promise.all`
+  de la página + 3 dentro de `getAdminUsers`) contra un pool con
+  `max: 5` a propósito (`db/index.ts`) — mismo cuello de botella que ya
+  colgó `/feed` y `/ligas` en una sesión anterior. Arreglado pidiendo
+  solo los datos de la pestaña activa (`7d5913a`).
+- **Dos fechas de ETA al platino contradictorias en la misma ficha de
+  juego** — `predecirPlatino` (stats.ts, ventana plana de 14 días) y
+  `estimarEta` (eta.ts, ventana de 30 días sobre el tramo real de
+  actividad) daban fechas con meses de diferencia entre sí en la misma
+  pantalla. Se quitó la primera (menos honesta), se quedó solo la
+  tarjeta `EtaPlatinoCard` (`9ebdfd3`).
+- **Un `Date` crudo pasado a un `sql\`\`\`` de Drizzle** en
+  `getRarestTrophiesThisWeek` (nueva query de la landing) — el driver
+  de postgres lo rechaza ("Received an instance of Date"). Mismo error
+  ya documentado en otras partes del código; arreglado con `gte()`
+  tipado en vez de la plantilla SQL a mano (`8ca474c`).
+
+### Landing: de "tarjeta bonita" a datos reales + feedback de diseño aplicado
+
+Dos rondas de brainstorm (traídas por el usuario desde otra IA),
+filtradas antes de construir nada — se descartó explícitamente el
+"feed en directo simulado" (inventar actividad falsa con solo 8
+usuarios reales es mentir al visitante) y el rediseño visual completo
+de tipografía/glassmorphism (el usuario decidió no tocar la estética).
+Lo que sí se construyó, todo con datos reales verificados contra
+producción antes de pushear:
+
+- **`getTopHunters()`** (profiles.ts): Muro de la Fama, top 5 por
+  platinos de siempre (no del mes, a diferencia de la Liga Mensual).
+- **`getRarestTrophiesThisWeek()`** (profiles.ts): trofeos genuinamente
+  raros (verificado: 1.9%, 7.4%...) conseguidos de verdad en los
+  últimos 7 días, excluyendo `hidden` (serían spoiler) y sin dato de
+  rareza (Xbox no lo da).
+- **Comparativa "app oficial" vs "con Paragon"** y **`CardBuilder.tsx`**
+  (generador interactivo de tarjeta — nombre + juego de muestra, vista
+  previa en vivo, CTA a `/entrar`, sin llamar a ninguna API).
+- **Segunda ronda de feedback, las 4 aplicadas**: badge del hero
+  corregido (decía "Rastreador de trofeos de PlayStation" pese a
+  soportar Steam/Xbox desde hace tiempo — ahora con los 3 logos reales),
+  tira de avatares reales bajo el CTA (reutiliza los mismos
+  `topHunters` ya cargados, cero coste extra), anotaciones ancladas
+  DENTRO de la tarjeta "Platino más cercano" explicando el porqué
+  ("Te calculamos la ruta óptima", "Rareza real de la comunidad" — en
+  flujo normal, no bocadillos flotantes fuera de la tarjeta, para no
+  arriesgar el móvil), y un segundo subtítulo dejando claro que Paragon
+  no es solo automatización ("no es un Excel automático, es un club").
+
+### Rachas (streaks), estilo Duolingo
+
+Primera de una lista de ideas de gamificación valoradas con el usuario
+(rachas/pase de temporada/vitrinas temáticas — se priorizó rachas por
+ser la más barata y la que menos depende de que haya más usuarios). El
+cálculo ya existía (`rachas()` en `lib/history.ts`, usado por la app
+móvil y el bot de Discord desde hacía tiempo) pero en web vivía
+enterrado como un número más dentro de las estadísticas — nada visible
+ni constante. Ahora un icono de llama en la cabecera (junto al nivel
+Paragon), visible en toda la app mientras haya sesión y racha activa,
+con dos estados: sólida si ya se consiguió algo hoy, apagada y
+pulsando si todavía no (el aviso de "la vas a perder" es lo que de
+verdad hace volver a la gente). `rachas()` ahora también devuelve
+`hoyCuenta` (`b93ced4`). Pendientes de la misma lista, no construidas
+todavía: **Pase de Temporada** (reutilizaría `AvatarFrames`/
+`BannerPresets`/`SiteIcons`, ya existentes) y **Vitrinas Temáticas de
+Coleccionista** (extendería `Collections`/`ShowcaseTrophies`).
+
+### Filtro de lenguaje ofensivo
+
+A petición del usuario, para todo texto libre que OTROS usuarios
+puedan ver: reseñas, guías y respuestas a guías, nombre a mostrar,
+@handle, título de perfil, **estado** (`statusText`), y nombres de
+carpetas/ligas. Bloquea el envío entero (no censura con asteriscos, no
+deja pasar y modera después) — nada ofensivo llega nunca a la base de
+datos. Lista local en `lib/contentFilter.ts` (español + inglés,
+coincidencia por palabra completa con `\b` para no bloquear "clase",
+"cockpit", "cocktail"...) en vez de una API de moderación de terceros
+— no hay presupuesto para eso en un proyecto de este tamaño. Probado
+contra 14 casos (5 que deben bloquear, 9 que no) antes de pushear
+(`dfdbf40`).
+
+**Dejado fuera a propósito**: las notas privadas de juego
+(`saveGameNotesAction`) — nunca las ve nadie más que el propio usuario,
+así que moderarlas no protege a nadie.
+
+**Limitación conocida**: el filtro coincide por palabra completa, así
+que en un texto SIN espacios (un @handle tipo "putomario") una palabra
+ofensiva pegada a otras letras puede colarse. Aceptado a propósito
+frente al riesgo contrario (bloquear palabras normales por casualidad,
+tipo "clase"/"pass" con un filtro de subcadena).
+
+### README puesto al día
+
+Describía solo PSN y "añadir Steam o Xbox algún día" como algo futuro,
+cuando ambos llevan tiempo integrados, más i18n, ligas, Wrap, Descubrir,
+modo enfoque y la app nativa vía Capacitor. Cabecera con logo y badges,
+lista de funciones reales, variables de entorno resumidas (con remisión
+a `.env.example` para el detalle de cada una) (`23ec74f`).
 
 ---
 
@@ -4739,6 +4926,29 @@ que causó el bug de las horas de PSN la primera vez.
 ---
 
 ## Pendiente
+
+**De la sesión del 21 de septiembre (continuación 21), sin cerrar:**
+- **i18n: solo texto de interfaz traducido, no contenido**. Las 42
+  páginas + 135 componentes están traducidos a ES/EN/DE/FR, pero cosas
+  como `relativeDate()` (lib/design.ts, "hoy"/"ayer"/"hace X días") o
+  los textos de `lib/missions.ts` (retos semanales) siguen devolviendo
+  literales fijos en español sin importar el idioma activo — señalado
+  por los propios agentes que tradujeron Descubrir/Biblioteca, no
+  arreglado todavía.
+- **Filtro de contenido ofensivo solo en ES/EN** — alemán y francés
+  quedan sin cubrir en `lib/contentFilter.ts` (ver el apartado de la
+  sesión más arriba).
+- **Pase de Temporada y Vitrinas Temáticas de Coleccionista** — siguientes
+  de la lista de gamificación priorizada con el usuario tras Rachas, no
+  empezadas.
+- **Rediseño visual de la landing (tipografía, glassmorphism, degradados)**
+  — propuesto por el usuario vía otra IA, decisión explícita de NO
+  tocar la estética por ahora. Si se retoma, ojo: `globals.css` es
+  global a toda la app, no solo a la landing — habría que decidir
+  alcance antes de tocar nada.
+- **Dominio propio (`paragontrofeos.com` estaba libre a fecha de la
+  sesión)** — comprobado disponible, no comprado. La app sigue en
+  `platinos-nine.vercel.app`.
 
 **Funciones acordadas y no hechas:**
 1. ~~`igdbId` en `games` + emparejado.~~ → **Confirmado el 9 de septiembre**:
