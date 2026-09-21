@@ -31,6 +31,7 @@ import { paragonProgress } from "@/lib/level";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
 import { esPlatinoEquivalente } from "@/lib/stats";
+import { CardBuilder } from "@/components/CardBuilder";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -343,6 +344,64 @@ async function Landing() {
           </div>
         </div>
       </section>
+
+      <section className="pt-[72px]">
+        <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
+          {t("comparativaTitulo")}
+        </h2>
+        <p className="mt-2 max-w-[560px] text-base text-muted">{t("comparativaDescripcion")}</p>
+
+        <div className="mt-7 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="rounded-[20px] p-7 opacity-80 grayscale" style={{ border: "1px solid #2a2f38", background: "#181b20" }}>
+            <p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-[#8a8f98]">{t("comparativaAntesTitulo")}</p>
+            <div className="mt-5 space-y-2">
+              {["t1", "t2", "t3", "t4"].map((key) => (
+                <div key={key} className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ background: "#20242b" }}>
+                  <span className="h-7 w-7 shrink-0 rounded-full" style={{ background: "#3a3f47" }} />
+                  <span className="truncate text-sm text-[#a8adb5]">{t(`comparativaAntesItem.${key}`)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="relative overflow-hidden rounded-[20px] p-7"
+            style={{ border: "1px solid rgb(var(--accent-rgb) / 0.35)", background: "linear-gradient(var(--surface), rgb(var(--accent-rgb) / 0.06))", boxShadow: "0 0 40px rgb(var(--accent-rgb) / 0.1)" }}
+          >
+            <p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
+              {t("comparativaDespuesTitulo")}
+            </p>
+            <div className="mt-5 space-y-2">
+              <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                <TrophyIcon grade="gold" size={28} />
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{t("comparativaAntesItem.t1")}</span>
+                  <span className="block text-xs" style={{ color: "var(--accent-text)" }}>{t("comparativaRareza", { percent: "6.2" })}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                <TrophyIcon grade="silver" size={28} />
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{t("comparativaAntesItem.t2")}</span>
+                  <span className="block text-xs" style={{ color: "var(--accent-text)" }}>{t("comparativaRareza", { percent: "22.8" })}</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                <span className="text-sm font-semibold">{t("comparativaDificultad")}</span>
+                <span className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold" style={{ background: "rgb(239 68 68 / 0.15)", color: "#f87171" }}>
+                  {t("comparativaDificultadValor")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+                <span className="text-sm font-semibold">{t("comparativaEta")}</span>
+                <span className="text-sm font-bold" style={{ color: "var(--accent-text)" }}>{t("comparativaEtaValor")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CardBuilder games={SAMPLE_SHELF} />
 
       <section className="py-[72px]">
         <div
