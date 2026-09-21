@@ -99,6 +99,9 @@ function normalizeMatch(match: any, status: "running" | "upcoming" | "past"): Es
   if (gameName === "LoL") gameName = "LoL"; // PandaScore ya devuelve "LoL" u otros nombres, pero aseguramos limpieza
   if (gameName.includes("Valorant")) gameName = "VALORANT";
   if (gameName.includes("CS:GO") || gameName.includes("Counter-Strike")) gameName = "CS2";
+  if (gameName.includes("Mobile Legends")) gameName = "Mobile Legends";
+  if (gameName.includes("Rainbow")) gameName = "R6 Siege";
+  if (gameName.includes("King of Glory")) gameName = "Honor of Kings";
 
   return {
     id: String(match.id),
