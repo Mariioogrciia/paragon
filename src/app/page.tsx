@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { TiltCard } from "@/components/TiltCard";
 import { auth } from "@/auth";
 import { StatTile } from "@/components/StatTile";
@@ -51,51 +52,17 @@ const SAMPLE_SHELF = [
   { title: "Ghost of Tsushima", pct: 100, ratio: "55/55", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co2crj.jpg" },
 ];
 
-const FEATURES = [
-  {
-    num: "01",
-    title: "Qué te falta, no qué tienes",
-    body: "Cada juego se ordena por los trofeos que te quedan, con el que más gente consigue arriba. El platino va al final: es la consecuencia, no la tarea.",
-  },
-  {
-    num: "02",
-    title: "Amigos, uno a uno o en grupo",
-    body: "Solo los juegos que tenéis en común, barra contra barra. Compara con un amigo o con varios a la vez, como un clan.",
-  },
-  {
-    num: "03",
-    title: "Sin credenciales de Sony",
-    body: "Escribes tu ID público de PlayStation y ya está. Nadie entrega contraseñas ni tokens, y nosotros no guardamos secretos de nadie.",
-  },
-  {
-    num: "04",
-    title: "El Wrap, con ranking detrás",
-    body: "Tu género más jugado, tu juego más exprimido, tus trofeos del año — y cada uno lleva al ranking entero, con filtro de fecha.",
-  },
-  {
-    num: "05",
-    title: "Dificultad, con dos ojos",
-    body: "La rareza real del platino y lo que opina quien ya se lo pasó, una al lado de la otra. Ninguna de las dos miente sola.",
-  },
-  {
-    num: "06",
-    title: "Notificaciones push de verdad",
-    body: "Un trofeo nuevo, tal cual lo desbloqueas, directo al móvil o al navegador — sin abrir la app para enterarte.",
-  },
-  {
-    num: "07",
-    title: "Modo enfoque",
-    body: "Pantalla completa con los trofeos más a mano, botones grandes y guía en vídeo. Para cuando ya sabes lo que vas a platinar hoy.",
-  },
-  {
-    num: "08",
-    title: "Nivel Paragon y ligas",
-    body: "XP por cada trofeo y por completar juegos, insignias por hitos, y una liga mensual que arranca de cero cada mes para todo el mundo.",
-  },
-];
+const FEATURE_KEYS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 
 async function Landing() {
   const globalStats = await getGlobalStats();
+  const t = await getTranslations("Shell.Home");
+
+  const FEATURES = FEATURE_KEYS.map((key, i) => ({
+    num: String(i + 1).padStart(2, "0"),
+    title: t(`features.${key}.titulo`),
+    body: t(`features.${key}.cuerpo`),
+  }));
 
   return (
     <div>
@@ -106,19 +73,17 @@ async function Landing() {
             style={{ background: "rgb(var(--accent-rgb) / 0.1)", border: "1px solid rgb(var(--accent-rgb) / 0.28)", color: "var(--accent-text)" }}
           >
             <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
-            Rastreador de trofeos de PlayStation
+            {t("badge")}
           </span>
 
           <h1 className="font-heading mt-5 text-[4.625rem] font-bold uppercase leading-[0.98] tracking-[-0.02em]">
-            El siguiente platino
+            {t("heroTitleLine1")}
             <br />
-            <span className="text-gradient">no se espera.</span>
+            <span className="text-gradient">{t("heroTitleLine2")}</span>
           </h1>
 
           <p className="mt-6 max-w-[540px] text-lg leading-relaxed text-muted">
-            Conecta tus cuentas y Paragon te dice exactamente qué trofeo o logro
-            tienes más a mano, cuánto te separa del 100% y quién
-            de tus rivales va por delante.
+            {t("heroDescription")}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -127,20 +92,19 @@ async function Landing() {
               className="rounded-xl px-6 py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
               style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgb(var(--accent-rgb) / 0.3)" }}
             >
-              Empezar la caza
+              {t("ctaEmpezar")}
             </Link>
             <Link
               href="/ejemplo"
               className="rounded-xl px-[22px] py-4 text-[0.9375rem] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#dbe5f2" }}
             >
-              Ver un perfil de ejemplo
+              {t("ctaVerEjemplo")}
             </Link>
           </div>
 
           <p className="mt-[18px] text-[0.8125rem] text-muted">
-            Solo tu ID público de PlayStation. Ni contraseñas, ni tokens, ni
-            permisos de Sony.
+            {t("soloIdPublico")}
           </p>
         </div>
 
@@ -156,17 +120,15 @@ async function Landing() {
               <TrophyIcon grade="platinum" size={34} />
             </span>
             <div>
-              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">Platino más cercano</p>
+              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("platinoMasCercano")}</p>
               <p className="font-heading mt-1 text-[1.375rem] font-bold">Elden Ring</p>
             </div>
           </div>
 
           <div className="mt-[22px] flex items-end gap-3">
             <span className="font-heading text-[4.25rem] font-bold leading-[0.85] text-platinum">10</span>
-            <span className="pb-2 text-[0.8125rem] font-semibold text-muted">
-              trofeos
-              <br />
-              para el platino
+            <span className="pb-2 text-[0.8125rem] font-semibold text-muted whitespace-pre-line">
+              {t("trofeosParaElPlatino")}
             </span>
           </div>
 
@@ -174,21 +136,21 @@ async function Landing() {
             <div className="h-full rounded-full" style={{ width: "74%", background: "var(--accent-grad-h)" }} />
           </div>
           <div className="mt-2.5 flex justify-between text-xs text-muted">
-            <span>32 / 42 conseguidos</span>
+            <span>{t("conseguidos", { conseguidos: 32, total: 42 })}</span>
             <span className="font-bold" style={{ color: "var(--accent-text)" }}>74%</span>
           </div>
 
           <ul className="mt-6 space-y-2">
-            {SAMPLE_NEXT.map((t) => (
+            {SAMPLE_NEXT.map((s) => (
               <li
-                key={t.name}
+                key={s.name}
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5"
                 style={{ background: "#121824", border: "1px solid #1e2634" }}
               >
-                <TrophyTile grade={t.grade} size={30} />
-                <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{t.name}</span>
-                <span className="shrink-0 text-xs font-bold" style={{ color: GRADE_ACCENT[t.grade] }}>
-                  {t.rarity}
+                <TrophyTile grade={s.grade} size={30} />
+                <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{s.name}</span>
+                <span className="shrink-0 text-xs font-bold" style={{ color: GRADE_ACCENT[s.grade] }}>
+                  {s.rarity}
                 </span>
               </li>
             ))}
@@ -199,29 +161,28 @@ async function Landing() {
       <section className="grid grid-cols-2 gap-3 pt-2 lg:grid-cols-4">
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none text-platinum">{globalStats.platinos > 0 ? globalStats.platinos : "87"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Platinos del grupo</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statPlatinosGrupo")}</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString("es-ES") : "4.312"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Trofeos contados</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statTrofeosContados")}</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString("es-ES") : "214"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Juegos rastreados</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statJuegosRastreados")}</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <p className="font-heading text-4xl font-bold leading-none">{globalStats.completadoMedio > 0 ? `${globalStats.completadoMedio}%` : "68%"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">Completado medio</p>
+          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statCompletadoMedio")}</p>
         </div>
       </section>
 
       <section id="biblioteca" className="pt-[72px]">
         <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
-          Tu biblioteca, ordenada por lo que te falta
+          {t("bibliotecaTitulo")}
         </h2>
         <p className="mb-6 mt-2 max-w-[620px] text-base text-muted">
-          Cada juego con su progreso real, su estado y los trofeos que
-          quedan. Sin abrir la consola.
+          {t("bibliotecaDescripcion")}
         </p>
 
         <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
@@ -267,7 +228,7 @@ async function Landing() {
 
         <div className="mt-[72px]">
           <h2 className="font-heading text-[1.875rem] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
-            Cómo funciona
+            {t("comoFuncionaTitulo")}
           </h2>
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
@@ -289,7 +250,7 @@ async function Landing() {
           </div>
           <div className="mt-8 text-center">
             <Link href="/como-funciona" className="text-sm font-bold uppercase tracking-wide text-accent hover:underline">
-              Ver todo lo que hace Paragon →
+              {t("verTodoComoFunciona")}
             </Link>
           </div>
         </div>
@@ -305,7 +266,7 @@ async function Landing() {
           }}
         >
           <h2 className="font-heading max-w-[640px] text-[3.25rem] font-bold uppercase leading-none tracking-[-0.02em]">
-            Nadie platina por casualidad.
+            {t("ctaFinalTitulo")}
           </h2>
           <div className="mt-[30px] flex flex-wrap items-center gap-[18px]">
             <Link
@@ -313,9 +274,9 @@ async function Landing() {
               className="rounded-xl px-[26px] py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
               style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgb(var(--accent-rgb) / 0.35)" }}
             >
-              Conectar mi cuenta
+              {t("ctaFinalBoton")}
             </Link>
-            <span className="text-sm text-muted">Gratis. Solo necesitas vincular tus plataformas.</span>
+            <span className="text-sm text-muted">{t("ctaFinalNota")}</span>
           </div>
         </div>
       </section>
@@ -328,6 +289,8 @@ async function Landing() {
 export default async function HomePage() {
   const session = await auth();
   if (!session?.user) return <Landing />;
+
+  const t = await getTranslations("Shell.Home");
 
   const profile = await getProfileByUserId(session.user.id);
   if (!profile?.handle || profile.accounts.length === 0) redirect("/bienvenida");
@@ -377,15 +340,15 @@ export default async function HomePage() {
   const nearPlatinumSection = nearPlatinum.length > 0 && (
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
-        <h2 className="font-heading text-2xl font-bold">A un paso del platino</h2>
+        <h2 className="font-heading text-2xl font-bold">{t("aUnPasoDelPlatino")}</h2>
         <p className="text-[0.8125rem] text-muted">
-          Lo que menos te queda, ordenado por trofeos pendientes.
+          {t("loQueMenosTeQueda")}
         </p>
         <Link
           href={`/u/${profile.handle}/biblioteca?estado=a-punto`}
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
         >
-          Ver todos →
+          {t("verTodos")}
         </Link>
       </div>
 
@@ -414,7 +377,7 @@ export default async function HomePage() {
             {/* Info a la derecha */}
             <div className="relative z-10 flex flex-col justify-center flex-1 w-full text-center sm:text-left">
               <div className="inline-block mb-3 px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-widest bg-accent/20 text-accent-text border border-accent/30 w-fit mx-auto sm:mx-0">
-                Siguiente Platino
+                {t("siguientePlatino")}
               </div>
               <h3 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-2" style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}>
                 {nearPlatinum[0].game.title}
@@ -425,8 +388,8 @@ export default async function HomePage() {
                   <p className="font-heading text-[3.375rem] font-bold leading-[0.8] text-platinum">
                     {nearPlatinum[0].progress.total - nearPlatinum[0].progress.earned}
                   </p>
-                  <p className="pb-1 text-xs font-bold uppercase leading-tight tracking-[0.1em] text-muted text-left">
-                    trofeos para<br />terminarlo
+                  <p className="pb-1 text-xs font-bold uppercase leading-tight tracking-[0.1em] text-muted text-left whitespace-pre-line">
+                    {t("trofeosParaTerminarlo")}
                   </p>
                 </div>
 
@@ -484,7 +447,7 @@ export default async function HomePage() {
                       {progress.total - progress.earned}
                     </p>
                     <p className="pb-1 text-[0.625rem] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
-                      restantes
+                      {t("restantes")}
                     </p>
                     <span className="ml-auto font-bold text-sm" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
                   </div>
@@ -506,15 +469,15 @@ export default async function HomePage() {
   const abandonadosSection = abandonados.length > 0 && (
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
-        <h2 className="font-heading text-2xl font-bold">Juegos parados</h2>
+        <h2 className="font-heading text-2xl font-bold">{t("juegosParados")}</h2>
         <p className="text-[0.8125rem] text-muted">
-          Empezados y sin tocar hace más de un año.
+          {t("empezadosSinTocar")}
         </p>
         <Link
           href={`/u/${profile.handle}/biblioteca?estado=abandonado`}
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
         >
-          Ver todos →
+          {t("verTodos")}
         </Link>
       </div>
 
@@ -522,7 +485,7 @@ export default async function HomePage() {
           es la que menos pide verse cada visita — son juegos que, por
           definición, llevan más de un año sin tocarse. Recuerda si ya
           lo abriste una vez, por si de verdad vuelves a por ella. */}
-      <CollapsibleSection storageKey="juegos-parados" toggleLabel={`${abandonados.length} juegos parados`}>
+      <CollapsibleSection storageKey="juegos-parados" toggleLabel={t("juegosParadosToggle", { n: abandonados.length })}>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
           {abandonados.map(({ game, progress }) => (
             <Link
@@ -539,7 +502,7 @@ export default async function HomePage() {
                 <p className="truncate text-[0.8125rem] font-semibold" title={game.title}>
                   {game.title}
                 </p>
-                <p className="text-[0.6875rem] text-muted">{progress.percent}% · sin tocar hace tiempo</p>
+                <p className="text-[0.6875rem] text-muted">{t("sinTocarHaceTiempo", { porcentaje: progress.percent })}</p>
               </div>
             </Link>
           ))}
@@ -551,19 +514,18 @@ export default async function HomePage() {
   const recientesSection = (
     <section>
       <div className="mb-4 flex items-baseline gap-3.5">
-        <h2 className="font-heading text-2xl font-bold">Jugado recientemente</h2>
+        <h2 className="font-heading text-2xl font-bold">{t("jugadoRecientemente")}</h2>
         <Link
           href={`/u/${profile.handle}`}
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent"
         >
-          Toda la biblioteca ({stats.juegos})
+          {t("todaLaBiblioteca", { juegos: stats.juegos })}
         </Link>
       </div>
 
       {recientes.length === 0 ? (
         <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-          No hay ningún juego en tus cuentas vinculadas. Suele ser que el
-          perfil está en privado en la plataforma.
+          {t("sinJuegosVinculados")}
         </p>
       ) : (
         <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
@@ -630,10 +592,10 @@ export default async function HomePage() {
           <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-muted">
             <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
             {player.accounts.map((a) => a.username).join(" · ")}
-            {` · nivel Paragon ${nivelParagon.level}`}
+            {t("nivelParagon", { nivel: nivelParagon.level })}
           </p>
           <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none tracking-tight">
-            Hola, {player.name}
+            {t("hola", { nombre: player.name })}
           </h1>
         </div>
 
@@ -642,7 +604,7 @@ export default async function HomePage() {
           className="ml-auto rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-semibold"
           style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--accent-text)" }}
         >
-          Ver mi perfil completo →
+          {t("verPerfilCompleto")}
         </Link>
       </div>
 
@@ -651,7 +613,7 @@ export default async function HomePage() {
         tabs={[
           {
             key: "resumen",
-            label: "Resumen",
+            label: t("tabResumen"),
             content: (
               <>
                 <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
@@ -665,7 +627,7 @@ export default async function HomePage() {
                   >
                     <div className="flex items-center gap-2.5 text-platinum">
                       <TrophyIcon grade="platinum" size={22} />
-                      <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]">Platinos</p>
+                      <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]">{t("platinos")}</p>
                     </div>
                     <p
                       className="font-heading mt-2.5 text-[6rem] font-bold leading-[0.85]"
@@ -675,14 +637,14 @@ export default async function HomePage() {
                     </p>
                   </div>
 
-                  <StatTile value={stats.trofeos} label="Trofeos" />
-                  <StatTile value={stats.juegos} label="Juegos" />
-                  <StatTile value={`${stats.completadoMedio}%`} label="Completado medio" />
+                  <StatTile value={stats.trofeos} label={t("trofeos")} />
+                  <StatTile value={stats.juegos} label={t("juegos")} />
+                  <StatTile value={`${stats.completadoMedio}%`} label={t("completadoMedio")} />
                 </div>
 
                 <TrophyCountRow
                   counts={stats.counts}
-                  summary={`${stats.trofeos.toLocaleString("es-ES")} trofeos en ${stats.juegos} juegos`}
+                  summary={t("trofeosEnJuegos", { trofeos: stats.trofeos.toLocaleString("es-ES"), juegos: stats.juegos })}
                 />
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2.5fr]">
@@ -709,7 +671,7 @@ export default async function HomePage() {
           },
           {
             key: "actividad",
-            label: "Progreso y actividad",
+            label: t("tabActividad"),
             content: (
               <>
                 {nearPlatinumSection}
@@ -727,4 +689,3 @@ export default async function HomePage() {
     </div>
   );
 }
-

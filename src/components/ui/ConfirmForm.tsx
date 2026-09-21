@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /**
  * Envuelve una acción destructiva (borrar, quitar, salir, desvincular...)
@@ -15,8 +16,8 @@ export function ConfirmForm({
   hidden,
   title,
   message,
-  confirmLabel = "Sí, continuar",
-  cancelLabel = "Cancelar",
+  confirmLabel,
+  cancelLabel,
   triggerClassName,
   children,
 }: {
@@ -31,6 +32,9 @@ export function ConfirmForm({
   /** Contenido del botón que abre el modal — mismo texto/icono que ya tenía cada sitio. */
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Shell.ConfirmForm");
+  const resolvedConfirmLabel = confirmLabel ?? t("siContinuar");
+  const resolvedCancelLabel = cancelLabel ?? t("cancelar");
   const [open, setOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -71,7 +75,7 @@ export function ConfirmForm({
                   onClick={() => setOpen(false)}
                   className="text-sm font-semibold text-muted transition-colors hover:text-foreground"
                 >
-                  {cancelLabel}
+                  {resolvedCancelLabel}
                 </button>
                 <button
                   type="button"
@@ -81,7 +85,7 @@ export function ConfirmForm({
                   }}
                   className="rounded-lg bg-danger px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
                 >
-                  {confirmLabel}
+                  {resolvedConfirmLabel}
                 </button>
               </div>
             </motion.div>

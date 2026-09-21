@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar } from "./Avatar";
 import { ThemeCustomizer } from "./ThemeCustomizer";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -20,26 +21,26 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
  * son el núcleo de la app, no algo "opcional" que se pueda ocultar.
  */
 const NAV_PRINCIPAL = [
-  { label: "Panel", href: "/", match: (p: string) => p === "/" },
+  { labelKey: "panel", href: "/", match: (p: string) => p === "/" },
   {
-    label: "Biblioteca",
+    labelKey: "biblioteca",
     href: (handle: string) => `/u/${handle}`,
     match: (p: string) => p.startsWith("/u/"),
   },
   {
-    label: "Comunidad",
+    labelKey: "comunidad",
     href: "/feed",
     match: (p: string) => p.startsWith("/feed"),
     navKey: "feed",
   },
   {
-    label: "Ligas",
+    labelKey: "ligas",
     href: "/ligas",
     match: (p: string) => p.startsWith("/ligas"),
     navKey: "ligas",
   },
   {
-    label: "Amigos",
+    labelKey: "amigos",
     href: "/amigos",
     match: (p: string) =>
       p.startsWith("/amigos") || p.startsWith("/comparar") || p.startsWith("/rankings"),
@@ -49,25 +50,25 @@ const NAV_PRINCIPAL = [
 
 const NAV_MAS = [
   {
-    label: "Descubrir",
+    labelKey: "descubrir",
     href: "/descubrir",
     match: (p: string) => p.startsWith("/descubrir"),
     navKey: "descubrir",
   },
   {
-    label: "Noticias",
+    labelKey: "noticias",
     href: "/noticias",
     match: (p: string) => p.startsWith("/noticias"),
     navKey: "noticias",
   },
   {
-    label: "eSports",
+    labelKey: "esports",
     href: "/esports",
     match: (p: string) => p.startsWith("/esports"),
     navKey: "esports",
   },
   {
-    label: "Planificador",
+    labelKey: "planificador",
     href: "/planificador",
     match: (p: string) => p.startsWith("/planificador"),
     navKey: "planificador",
@@ -75,11 +76,11 @@ const NAV_MAS = [
 ] as const;
 
 const LOGGED_OUT_NAV = [
-  { label: "Inicio", href: "/", match: (p: string) => p === "/" },
-  { label: "Noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
-  { label: "eSports", href: "/esports", match: (p: string) => p.startsWith("/esports") },
-  { label: "Ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
-  { label: "Cómo funciona", href: "/como-funciona", match: (p: string) => p.startsWith("/como-funciona") },
+  { labelKey: "inicio", href: "/", match: (p: string) => p === "/" },
+  { labelKey: "noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
+  { labelKey: "esports", href: "/esports", match: (p: string) => p.startsWith("/esports") },
+  { labelKey: "ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
+  { labelKey: "comoFunciona", href: "/como-funciona", match: (p: string) => p.startsWith("/como-funciona") },
 ];
 
 /** Desplegable de "Más": mismos enlaces que ya había, solo que agrupados. */
@@ -92,6 +93,7 @@ function MenuMas({
   activo: boolean;
   items: typeof NAV_MAS[number][];
 }) {
+  const t = useTranslations("Shell.Header");
   const [abierto, setAbierto] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
 
@@ -117,7 +119,7 @@ function MenuMas({
             : { background: "none", border: "1px solid transparent", color: "var(--muted)" }
         }
       >
-        Más
+        {t("nav.mas")}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-200 ${abierto ? "rotate-180" : ""}`}>
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -132,13 +134,13 @@ function MenuMas({
             const active = item.match(pathname);
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
                 onClick={() => setAbierto(false)}
                 className="block rounded-lg px-3 py-2 text-[0.8125rem] font-semibold transition-colors hover:text-foreground"
                 style={active ? { color: "var(--accent-text)" } : { color: "var(--muted)" }}
               >
-                {item.label}
+                {t(`nav.${item.labelKey}`)}
               </Link>
             );
           })}
@@ -165,6 +167,7 @@ export function Header({
   navOculta?: string[];
   locale?: string;
 }) {
+  const t = useTranslations("Shell.Header");
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const ocultas = new Set(navOculta);
@@ -212,7 +215,7 @@ export function Header({
             Amigos, Planificador o Rankings desde un móvil. */}
         <button
           onClick={() => setMenuAbierto((v) => !v)}
-          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          aria-label={menuAbierto ? t("cerrarMenu") : t("abrirMenu")}
           aria-expanded={menuAbierto}
           className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground sm:hidden"
           style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
@@ -233,7 +236,7 @@ export function Header({
 
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={href}
                 className="rounded-lg px-3.5 py-1.5 text-[0.8125rem] font-semibold tracking-[0.04em] transition-all duration-300 hover:text-white hover:shadow-[0_0_15px_rgb(var(--accent-rgb) / 0.2)]"
                 style={
@@ -242,7 +245,7 @@ export function Header({
                     : { background: "none", border: "1px solid transparent", color: "var(--muted)" }
                 }
               >
-                {item.label}
+                {t(`nav.${item.labelKey}`)}
               </Link>
             );
           })}
@@ -266,13 +269,13 @@ export function Header({
                   href={user.handle ? `/u/${user.handle}#nivel-paragon` : "/"}
                   className="hidden items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3 transition-colors hover:bg-[var(--surface-2)] sm:flex"
                   style={{ background: "var(--surface)", border: "1px solid #202836" }}
-                  title="Ver progreso del nivel Paragon"
+                  title={t("verProgresoParagon")}
                 >
                   <span
                     className="h-[26px] w-[26px] rounded-full"
                     style={{ background: `conic-gradient(var(--accent) 0%, var(--accent) ${user.paragonProgress ?? 0}%, #212a3a ${user.paragonProgress ?? 0}%, #212a3a 100%)` }}
                   />
-                  <span className="font-heading text-sm font-bold tracking-[0.04em]">NV {user.paragonLevel}</span>
+                  <span className="font-heading text-sm font-bold tracking-[0.04em]">{t("nivelAbrev", { nivel: user.paragonLevel })}</span>
                 </Link>
               )}
               {/* Antes "Admin" era un décimo enlace de texto metido entre los
@@ -282,8 +285,8 @@ export function Header({
               {user.esDesarrollador && (
                 <Link
                   href="/admin"
-                  aria-label="Panel de administración"
-                  title="Panel de administración"
+                  aria-label={t("panelAdministracion")}
+                  title={t("panelAdministracion")}
                   className="hidden h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground sm:flex"
                   style={
                     pathname.startsWith("/admin")
@@ -315,14 +318,14 @@ export function Header({
                   el poco sitio que hay en móvil, y las dos juntas eran lo
                   que sacaba la cabecera de los 375px de ancho. */}
               <Link href="/entrar" className="hidden text-sm text-muted hover:text-foreground sm:inline">
-                Entrar
+                {t("entrar")}
               </Link>
               <Link
                 href="/entrar"
                 className="shrink-0 rounded-lg px-4 py-2 text-[0.8125rem] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.6)]"
                 style={{ background: "var(--accent-grad)", boxShadow: "0 8px 24px rgb(var(--accent-rgb) / 0.25)" }}
               >
-                Crear cuenta
+                {t("crearCuenta")}
               </Link>
             </>
           )}
@@ -341,7 +344,7 @@ export function Header({
 
               return (
                 <Link
-                  key={item.label}
+                  key={item.labelKey}
                   href={href}
                   onClick={() => setMenuAbierto(false)}
                   className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold tracking-[0.02em] transition-colors hover:text-foreground"
@@ -351,7 +354,7 @@ export function Header({
                       : { background: "none", border: "1px solid transparent", color: "var(--muted)" }
                   }
                 >
-                  {item.label}
+                  {t(`nav.${item.labelKey}`)}
                 </Link>
               );
             })}
@@ -368,14 +371,14 @@ export function Header({
                 onClick={() => setMenuAbierto(false)}
                 className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold text-muted transition-colors hover:text-foreground"
               >
-                Apariencia
+                {t("apariencia")}
               </Link>
               <Link
                 href="/ajustes"
                 onClick={() => setMenuAbierto(false)}
                 className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold text-muted transition-colors hover:text-foreground"
               >
-                Ajustes
+                {t("ajustes")}
               </Link>
               {user.esDesarrollador && (
                 <Link
@@ -383,7 +386,7 @@ export function Header({
                   onClick={() => setMenuAbierto(false)}
                   className="rounded-lg px-3.5 py-2.5 text-[0.875rem] font-semibold text-muted transition-colors hover:text-foreground"
                 >
-                  Panel de administración
+                  {t("panelAdministracion")}
                 </Link>
               )}
             </div>

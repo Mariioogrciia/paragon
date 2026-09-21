@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * "Cazador de Platinos" — el easter egg de /offline, el equivalente de
@@ -37,6 +38,7 @@ interface FilaRanking {
 }
 
 export function HunterGame() {
+  const t = useTranslations("Shell.HunterGame");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [estado, setEstado] = useState<Estado>("esperando");
   const [puntuacion, setPuntuacion] = useState(0);
@@ -276,7 +278,7 @@ export function HunterGame() {
         onClick={salto}
         role="button"
         tabIndex={0}
-        aria-label="Cazador de Platinos — pulsa para saltar"
+        aria-label={t("ariaLabel")}
       >
         <canvas ref={canvasRef} width={ANCHO} height={ALTO} className="block w-full" style={{ imageRendering: "pixelated" }} />
 
@@ -284,22 +286,22 @@ export function HunterGame() {
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 px-4 text-center backdrop-blur-sm">
             {estado === "esperando" ? (
               <>
-                <p className="font-heading text-lg font-bold uppercase">Cazador de Platinos</p>
+                <p className="font-heading text-lg font-bold uppercase">{t("titulo")}</p>
                 <p className="max-w-xs text-sm text-muted">
-                  Espacio o toca para saltar. Esquiva las señales rotas, coge los trofeos dorados.
+                  {t("instrucciones")}
                 </p>
                 <span className="mt-2 rounded-full px-4 py-2 text-xs font-bold uppercase" style={{ background: "var(--accent-grad)", color: "#061021" }}>
-                  Jugar
+                  {t("jugar")}
                 </span>
               </>
             ) : (
               <>
-                <p className="font-heading text-2xl font-bold">{puntuacion} pts</p>
-                {esNuevoRecord && <p className="text-xs font-bold text-accent">¡Nuevo récord personal!</p>}
-                {sinSesion && <p className="text-xs text-muted">Entra en Paragon para guardar tu puntuación en el ranking.</p>}
-                {enviando && <p className="text-xs text-muted">Guardando…</p>}
+                <p className="font-heading text-2xl font-bold">{t("puntos", { puntuacion })}</p>
+                {esNuevoRecord && <p className="text-xs font-bold text-accent">{t("nuevoRecord")}</p>}
+                {sinSesion && <p className="text-xs text-muted">{t("sinSesion")}</p>}
+                {enviando && <p className="text-xs text-muted">{t("guardando")}</p>}
                 <span className="mt-2 rounded-full px-4 py-2 text-xs font-bold uppercase" style={{ background: "var(--accent-grad)", color: "#061021" }}>
-                  Otra vez
+                  {t("otraVez")}
                 </span>
               </>
             )}
@@ -313,12 +315,12 @@ export function HunterGame() {
 
       {ranking && ranking.top.length > 0 && (
         <div className="mt-4 rounded-xl p-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="mb-2 text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">Ranking — Cazador de Platinos</p>
+          <p className="mb-2 text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">{t("rankingTitulo")}</p>
           <div className="space-y-1.5">
             {ranking.top.slice(0, 5).map((fila, i) => (
               <div key={fila.userId} className="flex items-center justify-between text-sm">
                 <span className="text-muted">
-                  {i + 1}. {fila.name ?? fila.handle ?? "Jugador"}
+                  {i + 1}. {fila.name ?? fila.handle ?? t("jugadorDefecto")}
                 </span>
                 <span className="font-bold text-foreground">{fila.score}</span>
               </div>
@@ -326,7 +328,7 @@ export function HunterGame() {
           </div>
           {ranking.mia && (
             <p className="mt-2 text-xs text-muted">
-              Tu mejor puntuación: {ranking.mia.score}{ranking.mia.puesto ? ` · puesto #${ranking.mia.puesto}` : ""}
+              {t("tuMejorPuntuacion", { puntuacion: ranking.mia.score })}{ranking.mia.puesto ? t("puesto", { puesto: ranking.mia.puesto }) : ""}
             </p>
           )}
         </div>

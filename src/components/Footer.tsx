@@ -1,17 +1,19 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { SiInstagram, SiTiktok, SiGithub } from "@icons-pack/react-simple-icons";
 
 export function Footer() {
+  const t = useTranslations("Shell.Footer");
   return (
     <footer className="mt-auto border-t border-border py-8 text-xs text-muted">
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-4 px-7">
         <div className="flex items-center gap-4">
           <span className="font-heading font-bold tracking-[0.08em] text-foreground">
-            PARAGON
+            {t("marca")}
           </span>
           <span className="hidden sm:inline text-muted/60">·</span>
           <span className="hidden sm:inline">
-            Rastreador de trofeos y logros multiplataforma
+            {t("tagline")}
           </span>
         </div>
 
@@ -20,35 +22,35 @@ export function Footer() {
             href="/como-funciona"
             className="font-medium text-muted hover:text-foreground transition-colors"
           >
-            Cómo funciona
+            {t("comoFunciona")}
           </Link>
           <Link
             href="/#faq"
             className="font-medium text-muted hover:text-foreground transition-colors"
           >
-            Preguntas frecuentes
+            {t("faq")}
           </Link>
           <Link
             href="/privacidad"
             className="font-medium text-muted hover:text-foreground transition-colors"
           >
-            Privacidad
+            {t("privacidad")}
           </Link>
           <Link
             href="/cookies"
             className="font-medium text-muted hover:text-foreground transition-colors"
           >
-            Cookies
+            {t("cookies")}
           </Link>
           <Link
             href="/terminos"
             className="font-medium text-muted hover:text-foreground transition-colors"
           >
-            Términos
+            {t("terminos")}
           </Link>
           <span className="hidden md:inline text-muted/60">·</span>
           <span className="hidden md:flex text-[0.6875rem] text-muted/80 items-center gap-2">
-            Desarrollado por <strong className="text-foreground/80">Mario García</strong>
+            {t("desarrolladoPor")} <strong className="text-foreground/80">Mario García</strong>
             <div className="flex items-center gap-2 ml-1">
               <a href="https://www.instagram.com/mariioogrciia/" target="_blank" rel="noopener noreferrer" className="text-muted hover:text-foreground transition-colors">
                 <SiInstagram size={14} />
@@ -63,7 +65,7 @@ export function Footer() {
           </span>
           <span className="hidden md:inline text-muted/60">·</span>
           <span className="hidden md:inline text-[0.6875rem] text-muted/80">
-            No afiliado a Sony ni a Valve
+            {t("noAfiliado")}
           </span>
         </div>
       </div>

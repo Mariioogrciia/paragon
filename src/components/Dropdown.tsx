@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export interface Option {
   value: string;
@@ -16,10 +17,12 @@ interface DropdownProps {
   className?: string;
 }
 
-export function Dropdown({ value, onChange, options, placeholder = "Seleccionar...", className = "" }: DropdownProps) {
+export function Dropdown({ value, onChange, options, placeholder, className = "" }: DropdownProps) {
+  const t = useTranslations("Shell.Dropdown");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const resolvedPlaceholder = placeholder ?? t("seleccionar");
   const selectedOption = options.find((o) => o.value === value);
 
   useEffect(() => {
@@ -48,7 +51,7 @@ export function Dropdown({ value, onChange, options, placeholder = "Seleccionar.
               {selectedOption.label} {selectedOption.count !== undefined && <span className="text-muted ml-1">({selectedOption.count})</span>}
             </>
           ) : (
-            placeholder
+            resolvedPlaceholder
           )}
         </span>
         <svg
