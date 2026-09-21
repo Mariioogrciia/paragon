@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const CLAVE = "platinos:cookies-aceptadas";
 
@@ -17,6 +18,7 @@ const CLAVE = "platinos:cookies-aceptadas";
  * principio en vez de esconderlo solo en el footer.
  */
 export function CookieBanner() {
+  const t = useTranslations("Shell.CookieBanner");
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -42,24 +44,24 @@ export function CookieBanner() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border px-4 py-4 backdrop-blur"
       style={{ background: "color-mix(in srgb, var(--background) 92%, transparent)" }}
       role="region"
-      aria-label="Aviso de cookies"
+      aria-label={t("ariaLabel")}
     >
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3">
         <p className="text-[0.8125rem] text-muted">
-          Solo usamos la cookie imprescindible para mantener tu sesión
-          iniciada — sin cookies de publicidad, y la analítica de uso que
-          medimos no te identifica ni te sigue. Más detalles en{" "}
-          <Link href="/cookies" className="text-accent hover:underline">
-            Cookies
-          </Link>
-          .
+          {t.rich("texto", {
+            cookiesLink: (chunks) => (
+              <Link href="/cookies" className="text-accent hover:underline">
+                {chunks}
+              </Link>
+            ),
+          })}
         </p>
         <button
           onClick={aceptar}
           className="shrink-0 rounded-lg px-4 py-2 text-[0.8125rem] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgb(var(--accent-rgb) / 0.5)]"
           style={{ background: "var(--accent-grad)" }}
         >
-          Entendido
+          {t("entendido")}
         </button>
       </div>
     </div>

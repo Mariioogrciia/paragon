@@ -1,4 +1,6 @@
+import React from "react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 import { SectionTabs } from "@/components/SectionTabs";
 
@@ -13,7 +15,7 @@ function Bloque({ title, children, href, hrefLabel }: { title: string; children:
       <div className="text-sm leading-relaxed text-muted">{children}</div>
       {href && (
         <Link href={href} className="mt-3 inline-block text-xs font-bold uppercase tracking-wide text-accent hover:underline">
-          {hrefLabel ?? "Ir →"}
+          {hrefLabel}
         </Link>
       )}
     </div>
@@ -36,16 +38,18 @@ function Comando({ nombre, children }: { nombre: string; children: React.ReactNo
   );
 }
 
-export default function ComoFuncionaPage() {
+export default async function ComoFuncionaPage() {
+  const t = await getTranslations("Shell.ComoFunciona");
+  const tShell = await getTranslations("Shell.BackButton");
+
   return (
     <div className="mx-auto max-w-5xl py-10">
-      <BackButton fallbackHref="/" label="Volver al inicio" />
+      <BackButton fallbackHref="/" label={tShell("volverAlInicio")} />
 
       <div className="mb-8">
-        <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">Cómo funciona</h1>
+        <h1 className="font-heading text-4xl font-bold uppercase tracking-wide">{t("titulo")}</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Todo lo que hace Paragon, explicado de verdad — no una lista de titulares, sino qué hace
-          cada cosa y dónde encontrarla.
+          {t("descripcion")}
         </p>
       </div>
 
@@ -54,325 +58,253 @@ export default function ComoFuncionaPage() {
         tabs={[
           {
             key: "vincular",
-            label: "Vincular cuentas",
+            label: t("tabs.vincular"),
             content: (
               <Grid>
-                <Bloque title="PlayStation, Steam y Xbox" href="/ajustes/plataformas" hrefLabel="Vincular una cuenta →">
-                  Escribes tu identificador público (tu ID de PSN, tu SteamID64/URL de perfil, o tu
-                  Gamertag) — nunca una contraseña, no hay ni campo para eso. En PSN el perfil de
-                  trofeos tiene que ser público; en Steam hacen falta dos ajustes en público a la vez
-                  (&ldquo;Mi perfil&rdquo; y &ldquo;Detalles del juego&rdquo;). Xbox usa un servicio de
-                  terceros no oficial (OpenXBL) — puede fallar si ese servicio cambia, no depende de
-                  Microsoft.
+                <Bloque title={t("vincular.b1t")} href="/ajustes/plataformas" hrefLabel={t("vincular.b1href")}>
+                  {t("vincular.b1")}
                 </Bloque>
-                <Bloque title="Qué plataformas NO se pueden vincular todavía">
-                  Epic Games, Google Play y Ubisoft Connect se han quitado del selector — ninguna tiene
-                  hoy una vía real (API pública documentada) para leer trofeos de terceros. No es una
-                  limitación de Paragon, es que esas plataformas no lo permiten sin ingeniería inversa
-                  de su API interna.
+                <Bloque title={t("vincular.b2t")}>
+                  {t("vincular.b2")}
                 </Bloque>
-                <Bloque title="Sincronización automática">
-                  Un cron recorre las cuentas vinculadas y trae lo nuevo solo, sin que tengas que
-                  entrar. Además, cada vez que abres la ficha de un juego se comprueba si hace falta
-                  refrescarlo.
+                <Bloque title={t("vincular.b3t")}>
+                  {t("vincular.b3")}
                 </Bloque>
-                <Bloque title="Sincronizar ahora" href="/ajustes/plataformas">
-                  Botón manual en la cabecera (y en Ajustes → Cuentas de Juegos) para forzar una
-                  sincronización inmediata, con un cooldown para no golpear las APIs de origen sin
-                  necesidad.
+                <Bloque title={t("vincular.b4t")} href="/ajustes/plataformas" hrefLabel={t("irFlecha")}>
+                  {t("vincular.b4")}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "trofeos",
-            label: "Trofeos y perdibles",
+            label: t("tabs.trofeos"),
             content: (
               <Grid>
-                <Bloque title="Biblioteca ordenada por lo que falta" href="/#biblioteca">
-                  Cada juego se ordena por trofeos pendientes, con el más fácil de conseguir arriba —
-                  el platino es la consecuencia de terminar la lista, no la tarea en sí.
+                <Bloque title={t("trofeos.b1t")} href="/#biblioteca" hrefLabel={t("irFlecha")}>
+                  {t("trofeos.b1")}
                 </Bloque>
-                <Bloque title="Trofeos perdibles (PowerPyx)">
-                  Los trofeos que puedes perderte para siempre si no los sacas a tiempo, sacados de
-                  guías reales de PowerPyx — con una lista curada de títulos alternativos para los
-                  juegos que PowerPyx llama de otra forma (comprobados uno a uno, no una regla
-                  genérica que adivine mal).
+                <Bloque title={t("trofeos.b2t")}>
+                  {t("trofeos.b2")}
                 </Bloque>
-                <Bloque title="Guía en vídeo por trofeo">
-                  Clic en cualquier trofeo de la lista y busca sola una guía en YouTube — cacheada a
-                  nivel de trofeo (la primera búsqueda vale para todo el mundo), con un botón &ldquo;No
-                  es este — buscar otro&rdquo; si el vídeo no es el correcto.
+                <Bloque title={t("trofeos.b3t")}>
+                  {t("trofeos.b3")}
                 </Bloque>
-                <Bloque title="Guía escrita de la comunidad">
-                  En la misma ficha del trofeo, una pestaña de guía escrita por cualquier usuario de
-                  Paragon — con enlaces de búsqueda externa (Google, Vandal, Meristation, 3DJuegos) si
-                  todavía no hay ninguna.
+                <Bloque title={t("trofeos.b4t")}>
+                  {t("trofeos.b4")}
                 </Bloque>
-                <Bloque title="Contador manual +/-">
-                  Para trofeos que ni la plataforma desglosa (&ldquo;gana 50 partidas&rdquo;,
-                  &ldquo;encuentra 100 objetos&rdquo;) — tú pones la meta y llevas la cuenta con dos
-                  botones, en la misma ficha del trofeo.
+                <Bloque title={t("trofeos.b5t")}>
+                  {t("trofeos.b5")}
                 </Bloque>
-                <Bloque title="Filtros y árbol de trofeos">
-                  Filtra la lista por Perdibles, Multijugador, Coleccionables, Historia, Habilidad o
-                  Secretos. La vista &ldquo;Árbol&rdquo; conecta trofeos relacionados visualmente — un
-                  apoyo para leerlos de un vistazo, no un dato real de qué desbloquea a cuál (ni PSN ni
-                  Steam lo exponen).
+                <Bloque title={t("trofeos.b6t")}>
+                  {t("trofeos.b6")}
                 </Bloque>
-                <Bloque title="Tiempo estimado (HowLongToBeat)">
-                  Horas de historia y de completista de la comunidad de HLTB, en la ficha del juego y en
-                  el Planificador — la media de todo el mundo, no una promesa personalizada.
+                <Bloque title={t("trofeos.b7t")}>
+                  {t("trofeos.b7")}
                 </Bloque>
-                <Bloque title="Modo enfoque">
-                  Pantalla completa con los trofeos más a mano y botones grandes, para cuando ya sabes
-                  qué vas a platinar hoy y no quieres distracciones.
+                <Bloque title={t("trofeos.b8t")}>
+                  {t("trofeos.b8")}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "estadisticas",
-            label: "Estadísticas",
+            label: t("tabs.estadisticas"),
             content: (
               <Grid>
-                <Bloque title="Paragon Score y nivel" href="/">
-                  Una puntuación única que pesa cada trofeo por su rareza real (y por el Gamerscore en
-                  Xbox) — de ahí sale tu nivel Paragon y tu progreso hacia el siguiente.
+                <Bloque title={t("estadisticas.b1t")} href="/" hrefLabel={t("irFlecha")}>
+                  {t("estadisticas.b1")}
                 </Bloque>
-                <Bloque title="Insignias">
-                  Hitos automáticos (tu primer platino, rachas, volumen de trofeos…) que se desbloquean
-                  solos al cumplir la condición, sin nada que reclamar a mano.
+                <Bloque title={t("estadisticas.b2t")}>
+                  {t("estadisticas.b2")}
                 </Bloque>
-                <Bloque title="Mapa de actividad y por franja horaria">
-                  Un cuadrito por día con los trofeos ganados (estilo GitHub), y un segundo mapa
-                  cruzando día de la semana y hora — a qué horas juegas de verdad, no solo qué días.
+                <Bloque title={t("estadisticas.b3t")}>
+                  {t("estadisticas.b3")}
                 </Bloque>
-                <Bloque title="Trophy DNA">
-                  Un radar por género (Acción, RPG, Aventura, Estrategia, Plataformas, Puzles,
-                  Deportes) pesado por tus trofeos ganados de verdad, no por tu biblioteca entera — con
-                  un arquetipo asignado según tu categoría más fuerte.
+                <Bloque title={t("estadisticas.b4t")}>
+                  {t("estadisticas.b4")}
                 </Bloque>
-                <Bloque title="Línea de tiempo de hitos">
-                  Tu primer platino, tu trofeo más raro, el &ldquo;platino añejo&rdquo; (el que más tardó
-                  desde el primer trofeo hasta el platino) y tu racha más larga de días seguidos.
+                <Bloque title={t("estadisticas.b5t")}>
+                  {t("estadisticas.b5")}
                 </Bloque>
-                <Bloque title="Coste por hora">
-                  Pones lo que pagaste por un juego y de dónde lo tienes (físico, digital, PS Plus, Game
-                  Pass, prestado, gratis) en su ficha, y Paragon calcula el €/hora con tus horas
-                  jugadas reales — nada inventado, solo lo que tú mismo has puesto.
+                <Bloque title={t("estadisticas.b6t")}>
+                  {t("estadisticas.b6")}
                 </Bloque>
-                <Bloque title="Dificultad estimada">
-                  El % de gente que tiene el platino de cada juego (o el trofeo más raro, si no hay
-                  platino) traducido a una escala de dificultad — un dato real de rareza, no una nota de
-                  opinión.
+                <Bloque title={t("estadisticas.b7t")}>
+                  {t("estadisticas.b7")}
                 </Bloque>
-                <Bloque title="Estadísticas completas" href="/u/tu-handle/estadisticas" hrefLabel="Ver tus estadísticas →">
-                  Todo lo anterior junto en la pestaña &ldquo;Estadísticas&rdquo; de tu perfil, más horas
-                  en perspectiva, gráficas mensuales y comparación con tus amigos.
+                <Bloque title={t("estadisticas.b8t")} href="/u/tu-handle/estadisticas" hrefLabel={t("estadisticas.b8href")}>
+                  {t("estadisticas.b8")}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "backlog",
-            label: "Backlog y descubrir",
+            label: t("tabs.backlog"),
             content: (
               <Grid>
-                <Bloque title="Radar de platinos al alcance">
-                  Juegos con mucho progreso (75%+) que llevan meses sin tocarse — para acordarte de que
-                  estaban ahí, a un empujón del platino.
+                <Bloque title={t("backlog.b1t")}>
+                  {t("backlog.b1")}
                 </Bloque>
-                <Bloque title="El Salón de la Vergüenza">
-                  Juegos en tu biblioteca sin ni una hora, sin ni un trofeo — con un botón
-                  &ldquo;Jugar a ciegas&rdquo; que elige uno al azar y te da una prueba de 2 horas.
+                <Bloque title={t("backlog.b2t")}>
+                  {t("backlog.b2")}
                 </Bloque>
-                <Bloque title="¿Hoy qué juego?" href="/">
-                  Dices cuánto tiempo tienes (y de qué género, si quieres) y te sugiere &ldquo;victorias
-                  rápidas&rdquo; (pocos trofeos reales por sacar) y juegos &ldquo;para profundizar&rdquo;
-                  (según horas de HLTB menos lo ya jugado). Sortea entre lo más relevante, así no repite
-                  siempre lo mismo.
+                <Bloque title={t("backlog.b3t")} href="/" hrefLabel={t("irFlecha")}>
+                  {t("backlog.b3")}
                 </Bloque>
-                <Bloque title="Descubrir" href="/descubrir" hrefLabel="Explorar catálogo →">
-                  Catálogo por plataforma, tendencias, próximos lanzamientos y recomendaciones basadas
-                  en lo que ya juegas — para cuando no sabes qué añadir a la lista de deseados.
+                <Bloque title={t("backlog.b4t")} href="/descubrir" hrefLabel={t("backlog.b4href")}>
+                  {t("backlog.b4")}
                 </Bloque>
-                <Bloque title="Lista de deseados">
-                  Marca cualquier juego como deseado desde su ficha o desde Descubrir — no cuenta como
-                  &ldquo;juego tuyo&rdquo; en ninguna estadística hasta que lo tengas de verdad.
+                <Bloque title={t("backlog.b5t")}>
+                  {t("backlog.b5")}
                 </Bloque>
-                <Bloque title="Noticias" href="/noticias" hrefLabel="Ver noticias →">
-                  Lanzamientos y novedades de PlayStation, Xbox y Steam, sacadas de fuentes públicas de
-                  cada plataforma.
+                <Bloque title={t("backlog.b6t")} href="/noticias" hrefLabel={t("backlog.b6href")}>
+                  {t("backlog.b6")}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "comunidad",
-            label: "Comunidad y amigos",
+            label: t("tabs.comunidad"),
             content: (
               <Grid>
-                <Bloque title="Feed de actividad" href="/feed" hrefLabel="Ver el feed →">
-                  Lo que hacen tus amigos — platinos, reseñas, comentarios — en un solo sitio, con
-                  reacciones y respuestas.
+                <Bloque title={t("comunidad.b1t")} href="/feed" hrefLabel={t("comunidad.b1href")}>
+                  {t("comunidad.b1")}
                 </Bloque>
-                <Bloque title="Reseñas y valoraciones">
-                  Puntúa y escribe sobre cualquier juego que tengas, visible en tu perfil público y en
-                  la ficha del juego para todo el mundo.
+                <Bloque title={t("comunidad.b2t")}>
+                  {t("comunidad.b2")}
                 </Bloque>
-                <Bloque title="Guías de juego (foro)">
-                  Guías escritas por cualquier usuario sobre un juego entero (a diferencia de la guía
-                  de UN trofeo, ver la pestaña de Trofeos), con respuestas de otros usuarios.
+                <Bloque title={t("comunidad.b3t")}>
+                  {t("comunidad.b3")}
                 </Bloque>
-                <Bloque title="Comparar con amigos" href="/comparar" hrefLabel="Comparar biblioteca →">
-                  Solo los juegos que tenéis en común, barra contra barra — con uno o con varios amigos
-                  a la vez, como un clan.
+                <Bloque title={t("comunidad.b4t")} href="/comparar" hrefLabel={t("comunidad.b4href")}>
+                  {t("comunidad.b4")}
                 </Bloque>
-                <Bloque title="Amigos y rankings" href="/amigos" hrefLabel="Ver amigos →">
-                  Pide y acepta amistades, y compara rankings de trofeos, platinos y horas entre tu
-                  grupo.
+                <Bloque title={t("comunidad.b5t")} href="/amigos" hrefLabel={t("comunidad.b5href")}>
+                  {t("comunidad.b5")}
                 </Bloque>
-                <Bloque title="Ligas mensuales" href="/ligas" hrefLabel="Ver la liga →">
-                  Una clasificación que arranca de cero cada mes para todo el mundo — no importa cuánto
-                  llevas jugando, todos empiezan igual el día 1.
+                <Bloque title={t("comunidad.b6t")} href="/ligas" hrefLabel={t("comunidad.b6href")}>
+                  {t("comunidad.b6")}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "planificador",
-            label: "Planificador y Wrap",
+            label: t("tabs.planificador"),
             content: (
               <Grid>
-                <Bloque title="Planificador" href="/planificador" hrefLabel="Abrir el planificador →">
-                  Organiza en qué orden vas a platinar tu backlog, con horas estimadas de HLTB
-                  desglosadas en historia y platino — y un desplegable para ordenar por &ldquo;más
-                  rápido&rdquo; cuando hay datos.
+                <Bloque title={t("planificador.b1t")} href="/planificador" hrefLabel={t("planificador.b1href")}>
+                  {t("planificador.b1")}
                 </Bloque>
-                <Bloque title="Tu ritmo" href="/ritmo" hrefLabel="Ver tu ritmo →">
-                  Trofeos por mes, tu racha actual y tu mejor racha histórica, y un resumen de tu
-                  actividad a lo largo del tiempo.
+                <Bloque title={t("planificador.b2t")} href="/ritmo" hrefLabel={t("planificador.b2href")}>
+                  {t("planificador.b2")}
                 </Bloque>
-                <Bloque title="Wrap anual">
-                  Un resumen tipo &ldquo;Spotify Wrapped&rdquo; de tu año en trofeos — tu género más
-                  jugado, tu juego más exprimido, tus trofeos del año — con formato Stories y enlace al
-                  ranking real detrás de cada cifra.
+                <Bloque title={t("planificador.b3t")}>
+                  {t("planificador.b3")}
                 </Bloque>
-                <Bloque title="Misiones semanales">
-                  Pequeños objetivos que se renuevan cada semana (gana X trofeos, prueba un juego
-                  nuevo…) — opcionales, sin premio más allá de la propia racha.
+                <Bloque title={t("planificador.b4t")}>
+                  {t("planificador.b4")}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "notificaciones",
-            label: "Notificaciones",
+            label: t("tabs.notificaciones"),
             content: (
               <Grid>
-                <Bloque title="Push del navegador" href="/ajustes">
-                  Un aviso directo al móvil o al navegador en cuanto desbloqueas un trofeo — actívalo
-                  desde Ajustes. En iPhone hace falta instalar Paragon desde &ldquo;Compartir → Añadir a
-                  pantalla de inicio&rdquo; en Safari para que funcione (limitación de Apple, no de
-                  Paragon).
+                <Bloque title={t("notificaciones.b1t")} href="/ajustes" hrefLabel={t("irFlecha")}>
+                  {t("notificaciones.b1")}
                 </Bloque>
-                <Bloque title="Bot de Discord" href="/ajustes">
-                  Activa los avisos por DM del bot de Paragon desde Ajustes — necesita que hayas
-                  iniciado sesión con Discord. A partir de ahí te llegan por DM las cosas que ya
-                  llegan por push: solicitudes de amistad, subidas de nivel de gente a tu alrededor e
-                  invitaciones a ligas.
+                <Bloque title={t("notificaciones.b2t")} href="/ajustes" hrefLabel={t("irFlecha")}>
+                  {t("notificaciones.b2")}
                 </Bloque>
-                <Bloque title="Añadir el bot a tu servidor">
+                <Bloque title={t("notificaciones.b3t")}>
                   {DISCORD_INVITE_URL ? (
-                    <>
-                      Cualquiera puede invitarlo con este enlace —{" "}
-                      <a
-                        href={DISCORD_INVITE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-accent hover:underline"
-                      >
-                        añadir Paragon a un servidor de Discord →
-                      </a>{" "}
-                      — Discord pedirá qué servidor y confirmar los permisos (solo pide{" "}
-                      <em>Enviar mensajes</em>, para poder anunciar en el canal de{" "}
-                      <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/anunciosaqui</code>).
-                      No hace falta ser dueño del servidor, basta con permiso de &ldquo;Gestionar
-                      servidor&rdquo; ahí.
-                    </>
+                    t.rich("notificaciones.b3ConLink", {
+                      link: (chunks) => (
+                        <a
+                          href={DISCORD_INVITE_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-accent hover:underline"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                      enviarMensajes: (chunks) => <em>{chunks}</em>,
+                      comando: (chunks) => <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">{chunks}</code>,
+                    })
                   ) : (
-                    "Bot en configuración — vuelve más tarde."
+                    t("notificaciones.b3SinConfigurar")
                   )}
                 </Bloque>
-                <Bloque title="Comandos: tú y tu biblioteca">
+                <Bloque title={t("notificaciones.b4t")}>
                   <ul className="space-y-1.5">
-                    <Comando nombre="perfil">tus estadísticas de Paragon, o las de un amigo con Discord vinculado.</Comando>
-                    <Comando nombre="racha">tu racha actual de días seguidos ganando al menos un trofeo.</Comando>
-                    <Comando nombre="platinosalalcance">juegos muy avanzados que llevan meses parados — tu radar de platinos cerca.</Comando>
-                    <Comando nombre="verguenza">el Salón de la Vergüenza: juegos sin ni una hora, sin ni un trofeo.</Comando>
-                    <Comando nombre="juego">ficha rápida de un juego de tu biblioteca (duración, dificultad, perdibles, tu progreso).</Comando>
-                    <Comando nombre="nota">apunta una nota privada en un juego sin abrir la web.</Comando>
-                    <Comando nombre="hoy">qué puedes cerrar hoy según el tiempo y el género que te apetezca.</Comando>
-                    <Comando nombre="ruleta">te elige un juego del backlog que encaje con el tiempo que tienes.</Comando>
+                    <Comando nombre="perfil">{t("notificaciones.cmdPerfil")}</Comando>
+                    <Comando nombre="racha">{t("notificaciones.cmdRacha")}</Comando>
+                    <Comando nombre="platinosalalcance">{t("notificaciones.cmdPlatinosalalcance")}</Comando>
+                    <Comando nombre="verguenza">{t("notificaciones.cmdVerguenza")}</Comando>
+                    <Comando nombre="juego">{t("notificaciones.cmdJuego")}</Comando>
+                    <Comando nombre="nota">{t("notificaciones.cmdNota")}</Comando>
+                    <Comando nombre="hoy">{t("notificaciones.cmdHoy")}</Comando>
+                    <Comando nombre="ruleta">{t("notificaciones.cmdRuleta")}</Comando>
                   </ul>
                 </Bloque>
-                <Bloque title="Comandos: Ligas" href="/ligas" hrefLabel="Ver tus ligas →">
+                <Bloque title={t("notificaciones.b5t")} href="/ligas" hrefLabel={t("notificaciones.b5href")}>
                   <ul className="space-y-1.5">
-                    <Comando nombre="ligas">tus ligas creadas con amigos y tu posición en cada una.</Comando>
-                    <Comando nombre="liga">clasificación completa de una liga (nombre no hace falta exacto) y su reto, si tiene.</Comando>
-                    <Comando nombre="invitacionesliga">invitaciones a ligas que todavía no has aceptado ni rechazado.</Comando>
+                    <Comando nombre="ligas">{t("notificaciones.cmdLigas")}</Comando>
+                    <Comando nombre="liga">{t("notificaciones.cmdLiga")}</Comando>
+                    <Comando nombre="invitacionesliga">{t("notificaciones.cmdInvitacionesliga")}</Comando>
                   </ul>
                 </Bloque>
-                <Bloque title="Anuncios del bot en un servidor">
-                  Quien tenga permiso de gestionar el servidor puede escribir{" "}
-                  <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/anunciosaqui</code> en el
-                  canal que quiera — a partir de ahí, el bot avisa ahí mismo cuando alguien del
-                  servidor sube de nivel Paragon (solo a quien tenga los avisos activados en Paragon,
-                  y solo si de verdad sigue en ese servidor). Solo hay un canal activo por servidor —
-                  volver a ejecutar el comando en otro canal cambia el destino, no lo añade.
+                <Bloque title={t("notificaciones.b6t")}>
+                  {t.rich("notificaciones.b6ConComando", {
+                    comando: (chunks) => <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">{chunks}</code>,
+                  })}
                 </Bloque>
-                <Bloque title="/help, siempre a mano">
-                  El comando <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">/help</code>{" "}
-                  lista todos los comandos del bot desde dentro de Discord, sin volver a esta página.
+                <Bloque title={t("notificaciones.b7t")}>
+                  {t.rich("notificaciones.b7ConComando", {
+                    comando: (chunks) => <code className="rounded bg-surface-2 px-1 py-0.5 text-xs">{chunks}</code>,
+                  })}
                 </Bloque>
               </Grid>
             ),
           },
           {
             key: "perfil",
-            label: "Perfil y privacidad",
+            label: t("tabs.perfil"),
             content: (
               <Grid>
-                <Bloque title="Perfil público personalizable" href="/ajustes">
-                  Banner, color de acento, marco de avatar (según tu nivel Paragon), título y estado
-                  personalizados, y el orden de las secciones de tu perfil a tu gusto.
+                <Bloque title={t("perfil.b1t")} href="/ajustes" hrefLabel={t("irFlecha")}>
+                  {t("perfil.b1")}
                 </Bloque>
-                <Bloque title="Carpetas y Vitrina de Orgullo">
-                  Agrupa tus juegos en carpetas a mano, y fija hasta 3 trofeos en una vitrina destacada
-                  en tu perfil.
+                <Bloque title={t("perfil.b2t")}>
+                  {t("perfil.b2")}
                 </Bloque>
-                <Bloque title="Notas privadas por juego">
-                  Un recordatorio que solo ves tú (&ldquo;me falta el coleccionable 14 del capítulo
-                  3&rdquo;) — nunca público, a diferencia de la reseña.
+                <Bloque title={t("perfil.b3t")}>
+                  {t("perfil.b3")}
                 </Bloque>
-                <Bloque title="Ocultar funciones del menú" href="/ajustes/ocultar" hrefLabel="Personalizar tu menú →">
-                  Quita del menú las funciones que no te interesen (Comunidad, Ligas, Amigos, Descubrir,
-                  Noticias, Planificador) — solo para ti, sigue existiendo para todo el mundo.
+                <Bloque title={t("perfil.b4t")} href="/ajustes/ocultar" hrefLabel={t("perfil.b4href")}>
+                  {t("perfil.b4")}
                 </Bloque>
-                <Bloque title="Temas visuales">
-                  Oscuro, claro, OLED o contraste alto, más un color de acento libre — se aplica antes
-                  de pintar la página, sin parpadeos.
+                <Bloque title={t("perfil.b5t")}>
+                  {t("perfil.b5")}
                 </Bloque>
-                <Bloque title="Privacidad, cookies y datos" href="/privacidad" hrefLabel="Leer la política →">
-                  Qué datos se piden y por qué, sin analítica ni publicidad de terceros — ver también{" "}
-                  <Link href="/cookies" className="text-accent hover:underline">Cookies</Link> y{" "}
-                  <Link href="/terminos" className="text-accent hover:underline">Términos</Link>.
+                <Bloque title={t("perfil.b6t")} href="/privacidad" hrefLabel={t("perfil.b6href")}>
+                  {t.rich("perfil.b6ConLinks", {
+                    cookies: (chunks) => <Link href="/cookies" className="text-accent hover:underline">{chunks}</Link>,
+                    terminos: (chunks) => <Link href="/terminos" className="text-accent hover:underline">{chunks}</Link>,
+                  })}
                 </Bloque>
-                <Bloque title="Exportar tus datos" href="/ajustes/seguridad" hrefLabel="Ir a seguridad →">
-                  Descarga en JSON todo lo que Paragon sabe de ti, desde Ajustes → Inicio de sesión y
-                  seguridad. Para eliminar tu cuenta del todo, de momento se pide por correo — ver{" "}
-                  <Link href="/privacidad" className="text-accent hover:underline">Privacidad</Link>.
+                <Bloque title={t("perfil.b7t")} href="/ajustes/seguridad" hrefLabel={t("perfil.b7href")}>
+                  {t.rich("perfil.b7ConLink", {
+                    privacidad: (chunks) => <Link href="/privacidad" className="text-accent hover:underline">{chunks}</Link>,
+                  })}
                 </Bloque>
               </Grid>
             ),

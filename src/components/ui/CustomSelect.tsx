@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface Option {
   value: string;
@@ -24,9 +25,11 @@ export function CustomSelect({
   value,
   defaultValue,
   onChange,
-  placeholder = "Selecciona una opción",
+  placeholder,
   className = "",
 }: CustomSelectProps) {
+  const t = useTranslations("Shell.CustomSelect");
+  const resolvedPlaceholder = placeholder ?? t("seleccionaOpcion");
   const [isOpen, setIsOpen] = useState(false);
   const [internalValue, setInternalValue] = useState(defaultValue || "");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,7 +73,7 @@ export function CustomSelect({
         style={{ border: "1px solid var(--border)", background: "var(--background)" }}
       >
         <span className={selectedOption ? "text-foreground" : "text-muted"}>
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.label : resolvedPlaceholder}
         </span>
         <svg
           width="12"

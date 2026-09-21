@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * "Volver" con el historial del navegador (`router.back()`), no con una
@@ -14,7 +15,7 @@ import { ArrowLeft } from "lucide-react";
  */
 export function BackButton({
   fallbackHref,
-  label = "Volver",
+  label,
   dark = false,
   className = "",
 }: {
@@ -24,7 +25,9 @@ export function BackButton({
   dark?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("Shell.BackButton");
   const router = useRouter();
+  const resolvedLabel = label ?? t("volver");
 
   return (
     <button
@@ -43,7 +46,7 @@ export function BackButton({
       } ${className}`}
     >
       <ArrowLeft size={14} />
-      {label}
+      {resolvedLabel}
     </button>
   );
 }
