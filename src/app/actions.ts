@@ -322,7 +322,7 @@ export async function syncNowAction(
   const espera = esperaRestante(await ultimaSincronizacion(userId));
   if (espera) return espera;
 
-  await resyncLibraries(userId);
+  await resyncLibraries(userId, { forzarDetalle: true });
   revalidatePath("/", "layout");
   return { success: "Sincronizado." };
 }

@@ -188,6 +188,7 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
 export async function syncLibrary(
   userId: string,
   account: SyncAccount,
+  opts: { forzarDetalle?: boolean } = {},
 ): Promise<number> {
   // Google, Epic y Ubisoft no tienen lector propio todavía. Sin esta salida,
   // "cualquier plataforma que no sea psn/steam/xbox" caía por defecto en el
@@ -221,8 +222,14 @@ export async function syncLibrary(
 
     // Solo los que de verdad estén desactualizados — ver el comentario de
     // `soloDesactualizados`. Sin esto, cada resincronización repetía las
-    // ~40 llamadas de detalle aunque ya estuvieran frescas.
-    const pendientes = await soloDesactualizados(userId, recientes.map((g) => g.id));
+    // ~40 llamadas de detalle aunque ya estuvieran frescas. `forzarDetalle`
+    // (solo desde "Sincronizar ahora", nunca desde el cron) se lo salta a
+    // propósito: es un gesto explícito del propio usuario esperando ver YA
+    // un trofeo que sabe que tiene, no algo que deba esperar a que caduque
+    // el caché de 6h.
+    const pendientes = opts.forzarDetalle
+      ? recientes.map((g) => g.id)
+      : await soloDesactualizados(userId, recientes.map((g) => g.id));
 
     await mapLimit(pendientes, STEAM_CONCURRENCY, async (gameId) => {
       await syncGameTrophies(userId, account, gameId);
@@ -233,7 +240,9 @@ export async function syncLibrary(
     // Xbox no da `playtimeMinutes` (a diferencia de Steam), así que el
     // filtro de "recientes" es por `lastPlayedAt`, que la biblioteca sí trae.
     const recientes = library.filter((g) => g.lastPlayedAt).slice(0, XBL_DETAIL_LIMIT);
-    const pendientes = await soloDesactualizados(userId, recientes.map((g) => g.id));
+    const pendientes = opts.forzarDetalle
+      ? recientes.map((g) => g.id)
+      : await soloDesactualizados(userId, recientes.map((g) => g.id));
 
     await mapLimit(pendientes, XBL_CONCURRENCY, async (gameId) => {
       await syncGameTrophies(userId, account, gameId);

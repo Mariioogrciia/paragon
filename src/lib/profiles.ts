@@ -514,8 +514,16 @@ async function resolveXbox(input: string): Promise<Resolved> {
   };
 }
 
-/** Vuelve a traer las bibliotecas de todas las cuentas vinculadas. */
-export async function resyncLibraries(userId: string): Promise<number> {
+/**
+ * Vuelve a traer las bibliotecas de todas las cuentas vinculadas.
+ *
+ * `forzarDetalle`: solo lo pasa el botón "Sincronizar ahora" (con su propio
+ * cooldown de 2 min, ver actions.ts) — salta el caché de 6h de detalle de
+ * trofeos para Steam/Xbox, porque es un usuario esperando delante de la
+ * pantalla a ver un trofeo concreto, no el cron de fondo. El cron NUNCA
+ * pasa esto, para no arriesgar el cupo compartido de OpenXBL.
+ */
+export async function resyncLibraries(userId: string, opts: { forzarDetalle?: boolean } = {}): Promise<number> {
   const profile = await getProfileByUserId(userId);
   if (!profile) return 0;
 
@@ -535,10 +543,11 @@ export async function resyncLibraries(userId: string): Promise<number> {
     // saliendo como "sin refrescar" es más honesto que fingir que se
     // comprobó.
     try {
-      total += await syncLibrary(userId, {
-        platform: account.platform,
-        accountId: account.accountId,
-      });
+      total += await syncLibrary(
+        userId,
+        { platform: account.platform, accountId: account.accountId },
+        opts,
+      );
 
       await db
         .update(platformAccounts)
