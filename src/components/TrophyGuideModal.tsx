@@ -135,14 +135,14 @@ export function TrophyGuideModal({
                 }}
                 disabled={isPending}
                 title={isPinned ? t("TrophyGuideModal.unpin") : t("TrophyGuideModal.pin")}
-                className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${isPinned ? "bg-[rgb(var(--accent-rgb))] text-black" : "hover:bg-white/10 text-muted hover:text-white"}`}
+                className={`ml-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors ${isPinned ? "bg-[rgb(var(--accent-rgb))] text-black" : "hover:bg-white/10 text-muted hover:text-white"}`}
               >
                 {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
               </button>
             )}
             <button
               onClick={onClose}
-              className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-white/10 text-muted hover:text-white"
+              className="ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-white/10 text-muted hover:text-white"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12" />

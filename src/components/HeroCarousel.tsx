@@ -172,7 +172,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
               type="button"
               aria-label={t("anterior")}
               onClick={() => setI((n) => (n - 1 + items.length) % items.length)}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
             >
               ‹
             </button>
@@ -180,7 +180,7 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
               type="button"
               aria-label={t("siguiente")}
               onClick={() => setI((n) => (n + 1) % items.length)}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
             >
               ›
             </button>

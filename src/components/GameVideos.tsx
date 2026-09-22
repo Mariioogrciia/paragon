@@ -29,13 +29,13 @@ export function GameVideos({ videos }: Props) {
           <div className="flex gap-2">
             <button
               onClick={() => scroll("left")}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-muted hover:bg-white/10 hover:text-white transition-colors"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-border text-muted hover:bg-white/10 hover:text-white transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => scroll("right")}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-muted hover:bg-white/10 hover:text-white transition-colors"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-border text-muted hover:bg-white/10 hover:text-white transition-colors"
             >
               <ChevronRight size={16} />
             </button>

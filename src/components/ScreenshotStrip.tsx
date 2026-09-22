@@ -54,7 +54,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
               type="button"
               aria-label={t("ScreenshotStrip.previous")}
               onClick={() => scroll("left")}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-muted transition-colors hover:bg-white/10 hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-border text-muted transition-colors hover:bg-white/10 hover:text-white"
             >
               <ChevronLeft size={16} />
             </button>
@@ -62,7 +62,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
               type="button"
               aria-label={t("ScreenshotStrip.next")}
               onClick={() => scroll("right")}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-muted transition-colors hover:bg-white/10 hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-border text-muted transition-colors hover:bg-white/10 hover:text-white"
             >
               <ChevronRight size={16} />
             </button>
