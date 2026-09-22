@@ -1503,6 +1503,31 @@ export async function areFriends(a: string, b: string): Promise<boolean> {
   return Boolean(row);
 }
 
+export type FriendshipStatus = "amigos" | "solicitudEnviada" | "solicitudRecibida" | "ninguna";
+
+/**
+ * Estado de amistad entre `viewerId` (quien mira) y `otherId` (el perfil
+ * que está viendo) — para decidir qué botón enseñar en el perfil de
+ * alguien: "Añadir amigo", "Solicitud enviada" (deshabilitado) o
+ * "Aceptar solicitud" (si ya te la había mandado él).
+ */
+export async function getFriendshipStatus(viewerId: string, otherId: string): Promise<FriendshipStatus> {
+  const [row] = await db
+    .select({ requesterId: friendships.requesterId, status: friendships.status })
+    .from(friendships)
+    .where(
+      or(
+        and(eq(friendships.requesterId, viewerId), eq(friendships.addresseeId, otherId)),
+        and(eq(friendships.requesterId, otherId), eq(friendships.addresseeId, viewerId)),
+      ),
+    )
+    .limit(1);
+
+  if (!row) return "ninguna";
+  if (row.status === "accepted") return "amigos";
+  return row.requesterId === viewerId ? "solicitudEnviada" : "solicitudRecibida";
+}
+
 export async function sendFriendRequest(fromUserId: string, toHandle: string) {
   const target = await getProfileByHandle(toHandle);
   if (!target) return { ok: false as const, error: "No existe nadie con ese usuario." };

@@ -534,6 +534,33 @@ export async function acceptFriendAction(formData: FormData): Promise<void> {
   revalidatePath("/amigos");
 }
 
+/**
+ * Enviar solicitud desde el propio perfil de la otra persona — ya sabemos
+ * su handle (estamos mirándolo), a diferencia de `addFriendAction` (el
+ * formulario de /amigos, donde hay que escribirlo). `profilePath` para
+ * revalidar esa página en concreto, no solo /amigos: el botón tiene que
+ * cambiar de estado sin recargar.
+ */
+export async function sendFriendRequestFromProfileAction(
+  handle: string,
+  profilePath: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const userId = await requireUserId();
+  const result = await sendFriendRequest(userId, handle);
+  if (!result.ok) return { ok: false, error: result.error };
+
+  revalidatePath(profilePath);
+  revalidatePath("/amigos");
+  return { ok: true };
+}
+
+export async function acceptFriendRequestFromProfileAction(requesterId: string, profilePath: string): Promise<void> {
+  const userId = await requireUserId();
+  await acceptFriendRequest(userId, requesterId);
+  revalidatePath(profilePath);
+  revalidatePath("/amigos");
+}
+
 export async function removeFriendAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   await removeFriend(userId, String(formData.get("friendId")));

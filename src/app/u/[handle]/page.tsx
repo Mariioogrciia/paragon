@@ -6,7 +6,8 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { StatTile } from "@/components/StatTile";
-import { getLibrary, getProfileByHandle, getUserBadges } from "@/lib/profiles";
+import { getLibrary, getProfileByHandle, getUserBadges, getFriendshipStatus } from "@/lib/profiles";
+import { FriendRequestButton } from "@/components/FriendRequestButton";
 import { summarise } from "@/lib/stats";
 import { db } from "@/db";
 import { gameTrophies } from "@/db/schema";
@@ -135,36 +136,35 @@ export default async function PerfilPage({
   // siempre — ver db/index.ts, ya arreglado). Con la base sana, el mismo
   // `select` que tardaba 60s desde la app tarda 49ms medido directamente.
   //
-  // Aun así se paraleliza acotado a 3, no las cinco de golpe: el pool sigue
+  // Aun así se paraleliza acotado a 3, no todo de golpe: el pool sigue
   // siendo de 5 conexiones compartidas con todo lo demás que renderiza esta
   // página a la vez. Tres deja margen de sobra y ya se lleva la mayor parte
-  // de la mejora.
+  // de la mejora — de ahí las tres tandas de abajo, cada una con `Promise.all`
+  // pero ninguna con más de 3 queries a la vez (la última cuenta 3: las 2 de
+  // rachas/percentil que ya iban juntas, más el estado de amistad).
   // `listCollections` ya no se pide aquí: las carpetas se enseñaban en la
   // sección "Colecciones", que vive ahora en /u/[handle]/biblioteca.
-  // Las tres tandas de abajo eran tres `Promise.all` seguidos: ninguna
-  // depende de lo que resuelve la anterior (todas solo necesitan
-  // `profile.userId`/`games`, ya resueltos), así que iban en cascada sin
-  // motivo — fusionadas en una sola espera.
   // Pública igual que el resto de la ficha: se ve tanto en tu propio
   // perfil como en el de cualquiera que lo visite.
-  const [
-    resumen,
-    juegosEsteAnio,
-    badges,
-    recientes,
-    palmares,
-    clanMembership,
-    [rachasPerfil, percentilAnio],
-  ] = await Promise.all([
+  const [resumen, juegosEsteAnio, badges] = await Promise.all([
     resumenHistorico(profile.userId),
     juegosDelAnio(profile.userId),
     getUserBadges(profile.userId),
+  ]);
+  const [recientes, palmares, clanMembership] = await Promise.all([
     ultimosTrofeos(profile.userId),
     getUserTrophyCase(profile.userId),
     getUserClan(profile.userId),
+  ]);
+  const [[rachasPerfil, percentilAnio], estadoAmistad] = await Promise.all([
     games.length > 0
       ? Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
       : Promise.resolve([{ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }, null] as const),
+    // Solo hace falta si estás mirando el perfil de otra persona con
+    // sesión iniciada — nadie más lo va a ver.
+    !esMio && session?.user?.id
+      ? getFriendshipStatus(session.user.id, profile.userId)
+      : Promise.resolve("ninguna" as const),
   ]);
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
@@ -305,6 +305,15 @@ export default async function PerfilPage({
             >
               {t("PerfilPage.compararConmigo")}
             </Link>
+          )}
+
+          {!esMio && session?.user?.id && (
+            <FriendRequestButton
+              handle={handle}
+              otherUserId={profile.userId}
+              initialStatus={estadoAmistad}
+              profilePath={`/u/${handle}`}
+            />
           )}
         </div>
       </div>
