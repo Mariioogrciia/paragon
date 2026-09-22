@@ -36,6 +36,7 @@ import { BackButton } from "@/components/BackButton";
 import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
+import { getUserClan } from "@/lib/clans";
 
 
 function hexToRgb(hex: string) {
@@ -146,10 +147,11 @@ export default async function PerfilPage({
   ]);
   // Pública igual que el resto de la ficha: se ve tanto en tu propio
   // perfil como en el de cualquiera que lo visite.
-  const [badges, recientes, palmares] = await Promise.all([
+  const [badges, recientes, palmares, clanMembership] = await Promise.all([
     getUserBadges(profile.userId),
     ultimosTrofeos(profile.userId),
     getUserTrophyCase(profile.userId),
+    getUserClan(profile.userId),
   ]);
   const [rachasPerfil, percentilAnio] = games.length > 0
     ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
@@ -242,6 +244,11 @@ export default async function PerfilPage({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
+                {clanMembership && (
+                  <Link href={`/clanes/${clanMembership.clan.tag.toLowerCase()}`} className="mr-2 text-[var(--accent-text)] opacity-80 hover:opacity-100 transition-opacity">
+                    [{clanMembership.clan.tag}]
+                  </Link>
+                )}
                 {profile.displayName ?? `@${handle}`}
               </h1>
               {profile.esDesarrollador && (
