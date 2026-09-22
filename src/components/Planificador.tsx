@@ -157,7 +157,8 @@ export function Planificador({ collections, library, handle }: { collections: Co
               biblioteca entera. */}
           <TiltCard
             href={`/u/${handle}/${ordered[0].id}`}
-            className="group relative mb-4 block overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)]"
+            className="group relative mb-4 block rounded-2xl transition-all duration-300 hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)]"
+            innerClassName="overflow-hidden rounded-2xl"
             style={{ border: "1px solid var(--border)" }}
           >
             <div className="relative flex items-center gap-4 overflow-hidden p-4" style={!ordered[0].iconUrl ? { background: coverGradient(ordered[0].id) } : undefined}>

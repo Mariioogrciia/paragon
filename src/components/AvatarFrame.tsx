@@ -27,7 +27,7 @@ const RENDERERS: Record<string, (children: React.ReactNode) => React.ReactNode> 
   fire: (children) => (
     <div className="relative inline-flex items-center justify-center">
       <div
-        className="absolute inset-0 z-0 rounded-full"
+        className="absolute inset-0 z-0 rounded-full avatar-frame-motion"
         style={{
           boxShadow: "0 0 15px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.6)",
           background: "linear-gradient(135deg, #EF4444, #F97316)",
@@ -44,7 +44,7 @@ const RENDERERS: Record<string, (children: React.ReactNode) => React.ReactNode> 
   neon: (children) => (
     <div className="relative inline-flex items-center justify-center">
       <div
-        className="absolute inset-0 z-0 rounded-full border-2"
+        className="absolute inset-0 z-0 rounded-full border-2 avatar-frame-motion"
         style={{
           borderColor: "#22d3ee",
           boxShadow: "0 0 12px #22d3ee, 0 0 24px rgba(34, 211, 238, 0.6)",
@@ -53,7 +53,7 @@ const RENDERERS: Record<string, (children: React.ReactNode) => React.ReactNode> 
         }}
       />
       <div
-        className="absolute inset-0 z-0 rounded-full border-2"
+        className="absolute inset-0 z-0 rounded-full border-2 avatar-frame-motion"
         style={{
           borderColor: "#e879f9",
           boxShadow: "0 0 10px #e879f9",
@@ -69,7 +69,7 @@ const RENDERERS: Record<string, (children: React.ReactNode) => React.ReactNode> 
   circuito: (children) => (
     <div className="relative inline-flex items-center justify-center">
       <div
-        className="absolute inset-0 z-0 rounded-full"
+        className="absolute inset-0 z-0 rounded-full avatar-frame-motion"
         style={{
           border: "2px dashed #34d399",
           transform: "scale(1.2)",
@@ -105,7 +105,7 @@ const RENDERERS: Record<string, (children: React.ReactNode) => React.ReactNode> 
         style={{ transform: "scale(1.18)" }}
       >
         <div
-          className="h-full w-full"
+          className="h-full w-full avatar-frame-motion"
           style={{
             background:
               "linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.9) 48%, #dff0f8 52%, transparent 70%)",

@@ -18,6 +18,7 @@ export const NAV_OCULTABLE = [
   { key: "noticias", label: "Noticias" },
   { key: "esports", label: "eSports" },
   { key: "planificador", label: "Planificador" },
+  { key: "clanes", label: "Clanes" },
 ] as const;
 
 export type NavKey = (typeof NAV_OCULTABLE)[number]["key"];

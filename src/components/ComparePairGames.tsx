@@ -58,7 +58,7 @@ export function ComparePairGames({
                 )}
               </span>
 
-              <p className="col-span-1 truncate text-[0.9375rem] font-semibold">{row.title}</p>
+              <p className="col-span-1 min-w-0 truncate text-[0.9375rem] font-semibold">{row.title}</p>
 
               <div className="col-span-2 grid gap-2 sm:col-span-1">
                 {row.progress.map((p, i) => (

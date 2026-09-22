@@ -944,3 +944,23 @@ export const arcadeScores = pgTable("arcade_score", {
   score: integer("score").notNull(),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+export const clans = pgTable("clans", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull().unique(),
+  tag: text("tag").notNull().unique(),
+  description: text("description").notNull().default(""),
+  ownerId: text("ownerId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  logoUrl: text("logoUrl"),
+  level: integer("level").notNull().default(1),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const clanMembers = pgTable("clan_members", {
+  clanId: text("clanId").notNull().references(() => clans.id, { onDelete: "cascade" }),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: text("role").notNull().default("member"), // 'owner', 'admin', 'member'
+  joinedAt: timestamp("joinedAt", { mode: "date" }).notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.clanId, t.userId] }),
+]);

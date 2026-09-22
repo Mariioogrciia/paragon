@@ -31,7 +31,8 @@ export async function ShowcaseTrophies({
             <TiltCard 
               key={`${game.id}-${trophy.id}`} 
               href={`/u/${handle}/${game.id}`}
-              className={`relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-2xl hover:border-[rgb(var(--accent-rgb)/0.5)] group block ${trophy.grade === 'platinum' || trophy.grade === 'gold' ? 'holo-card' : ''}`}
+              className={`relative rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-2xl hover:border-[rgb(var(--accent-rgb)/0.5)] group block ${trophy.grade === 'platinum' || trophy.grade === 'gold' ? 'holo-card' : ''}`}
+              innerClassName="overflow-hidden rounded-xl"
             >
               <div className="relative z-10 flex flex-col h-full">
                 <div className="mb-3 flex items-start gap-3">
