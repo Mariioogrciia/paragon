@@ -5396,3 +5396,26 @@ La Vercel CLI (`vercel logs <url-de-deployment>`, `vercel inspect
 no perder tiempo reproduciendo en local primero (el bug no se reproducía
 ni en `next dev` ni en `next start` local: solo se manifestaba en el
 empaquetado serverless real de Vercel).
+
+---
+
+## Continuación del 22 de septiembre de 2026 — resto de objetivos táctiles
+
+Tras el incidente de arriba, se retomó el resto de hallazgos de baja
+prioridad de la auditoría, con la misma cautela (build real + verificación
+en producción tras cada push, no solo local):
+
+- **Objetivos táctiles a 44px**: flechas del Hero de Descubrir, cabeceras
+  de `GameVideos`/`ScreenshotStrip`, cabecera del modal de guía de trofeo
+  (pin/cerrar). Verificado en el navegador contra `/descubrir` antes de
+  desplegar.
+- **Dejado sin tocar a propósito**: el contador manual del propio modal de
+  guía (fila estrecha con barra de progreso, más riesgo de desbordar en
+  móvil sin poder verlo en pantalla real), la deduplicación
+  `CustomSelect`/`Dropdown` (deuda técnica, sin bug funcional) y
+  `FocusMode` (su `bg-black`/`text-white` es el "modo cine" deliberado de
+  pantalla completa, no un descuido de tema — no está documentado como tal
+  en el propio componente, pero por diseño no debería seguir la paleta).
+- Migrar las carátulas de la biblioteca a `next/image` sigue sin hacerse:
+  mismo motivo que la sesión anterior (hosts dinámicos de PSN/Xbox sin
+  poder confirmarlos contra una cuenta real).
