@@ -1,13 +1,12 @@
-import { getClanByTag, getClanScore, getClanMembers, getClanActivity } from "@/lib/clans";
+import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends } from "@/lib/clans";
 import { notFound } from "next/navigation";
 import { ClanActions } from "./ClanActions";
+import { InviteFriendsButton } from "./InviteFriendsButton";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { users } from "@/db/schema";
-import { inArray } from "drizzle-orm";
 import { Avatar } from "@/components/Avatar";
-import { avatarUrlSql } from "@/lib/avatarSql";
 import { ClanActivityFeed } from "@/components/ClanActivityFeed";
+
+const MEDALLA: Record<number, string> = { 0: "🥇", 1: "🥈", 2: "🥉" };
 
 export default async function ClanPage({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params;
@@ -18,25 +17,17 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
   const session = await auth();
   const userId = session?.user?.id;
 
-  const [score, members, actividad] = await Promise.all([
-    getClanScore(clan.id),
-    getClanMembers(clan.id),
+  const [leaderboard, actividad] = await Promise.all([
+    getClanLeaderboard(clan.id),
     getClanActivity(clan.id),
   ]);
+  const score = leaderboard.reduce((sum, m) => sum + m.score, 0);
 
-  const amIMember = members.some(m => m.userId === userId);
+  const amIMember = leaderboard.some(m => m.userId === userId);
   const amIOwner = clan.ownerId === userId;
 
-  const userIds = members.map(m => m.userId);
-  const memberProfiles = await db
-    .select({
-      id: users.id,
-      handle: users.handle,
-      name: users.name,
-      image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
-    })
-    .from(users)
-    .where(inArray(users.id, userIds));
+  // Solo se calcula si hace falta: nadie más lo va a ver.
+  const invitables = amIOwner && userId ? await getInvitableFriends(userId, clan.id) : [];
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
@@ -58,18 +49,21 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
             </div>
             <div>
               <p className="text-xs text-muted uppercase tracking-wider">Miembros</p>
-              <p className="text-2xl font-bold font-mono">{members.length}</p>
+              <p className="text-2xl font-bold font-mono">{leaderboard.length}</p>
             </div>
           </div>
         </div>
 
-        {userId && (
-          <ClanActions 
-            clanId={clan.id} 
-            amIMember={amIMember} 
-            amIOwner={amIOwner} 
-          />
-        )}
+        <div className="flex flex-wrap items-start gap-3">
+          {amIOwner && <InviteFriendsButton clanId={clan.id} friends={invitables} />}
+          {userId && (
+            <ClanActions
+              clanId={clan.id}
+              amIMember={amIMember}
+              amIOwner={amIOwner}
+            />
+          )}
+        </div>
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
@@ -79,26 +73,29 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
         </div>
 
         <div className="min-w-0">
-          <h2 className="font-heading text-2xl font-bold mb-6">Miembros ({members.length})</h2>
-          <div className="grid gap-3">
-            {memberProfiles.map(p => {
-              const membership = members.find(m => m.userId === p.id);
-              return (
-                <a
-                  key={p.id}
-                  href={`/u/${p.handle}`}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3 hover:border-[var(--accent)] transition-colors"
-                >
-                  <Avatar src={p.image} name={p.name ?? p.handle ?? "?"} size={40} />
-                  <div className="min-w-0">
-                    <p className="truncate font-bold">{p.name || p.handle}</p>
-                    <p className="text-xs text-muted">
-                      {membership?.role === 'owner' ? "🏆 Líder" : "Miembro"}
-                    </p>
-                  </div>
-                </a>
-              );
-            })}
+          <h2 className="font-heading text-2xl font-bold mb-6">Ranking ({leaderboard.length})</h2>
+          <div className="grid gap-2">
+            {leaderboard.map((m, i) => (
+              <a
+                key={m.userId}
+                href={`/u/${m.handle}`}
+                className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3 hover:border-[var(--accent)] transition-colors"
+              >
+                <span className="w-5 shrink-0 text-center text-sm font-bold text-muted">
+                  {MEDALLA[i] ?? i + 1}
+                </span>
+                <Avatar src={m.image} name={m.name ?? m.handle ?? "?"} size={40} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-bold">{m.name || m.handle}</p>
+                  <p className="text-xs text-muted">
+                    {m.role === "owner" ? "Líder" : "Miembro"} · {m.trofeos} trofeos
+                  </p>
+                </div>
+                <span className="shrink-0 text-right font-mono text-sm font-bold text-[var(--accent-text)]">
+                  {m.score.toLocaleString()}
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       </div>

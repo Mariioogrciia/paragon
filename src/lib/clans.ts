@@ -1,10 +1,13 @@
 import "server-only";
 import { db } from "@/db";
-import { clans, clanMembers, games, gameTrophies, userTrophies, activities, users } from "@/db/schema";
+import { clans, clanMembers, clanInvites, games, gameTrophies, userTrophies, activities, users } from "@/db/schema";
 import { eq, and, inArray, desc } from "drizzle-orm";
 import { trophyScore } from "./trophyScore";
 import { errorSiOfensivo } from "./contentFilter";
 import { avatarUrlSql } from "./avatarSql";
+import { listFriends } from "./profiles";
+import { enviarPush } from "./webPush";
+import { enviarPushFcm } from "./fcm";
 import type { TrophyGrade } from "./types";
 
 /**
@@ -111,64 +114,107 @@ export async function getClanMembers(clanId: string) {
     .where(eq(clanMembers.clanId, clanId));
 }
 
+export interface ClanLeaderboardEntry {
+  userId: string;
+  role: string;
+  handle: string | null;
+  name: string | null;
+  image: string | null;
+  score: number;
+  trofeos: number;
+}
+
 /**
- * Calcula la puntuación total de un clan sumando el Paragon Score
- * (`lib/paragonScore.ts`) trofeo a trofeo de todos sus miembros.
+ * Ranking interno del clan: cada miembro con su Paragon Score (trofeo a
+ * trofeo, misma fórmula unificada entre plataformas de
+ * `lib/paragonScore.ts`) y su recuento de trofeos, ordenado de mayor a
+ * menor — "quién está carreando".
  *
- * La versión original de esta función no compilaba: leía columnas que no
- * existen en el esquema (`userGames.earnedPlatinum` y compañía — el
- * desglose por metal vive en el jsonb `earned`, no en columnas sueltas) y
- * llamaba a `trophyScore()` con una forma de argumentos que no es la suya
- * (esa función puntúa UN trofeo, no un resumen de juego). En vez de arreglar
- * esa fórmula a mano, reutiliza la fuente de verdad que ya existe para
- * "puntuación unificada entre plataformas" (`getParagonScore`,
- * `lib/paragonScore.ts`) en vez de reinventarla con datos que no cuadran.
+ * La versión original de `getClanScore` (ahora sustituida) no compilaba:
+ * leía columnas que no existen en el esquema (`userGames.earnedPlatinum` y
+ * compañía — el desglose por metal vive en el jsonb `earned`, no en
+ * columnas sueltas) y llamaba a `trophyScore()` con una forma de
+ * argumentos que no es la suya (esa función puntúa UN trofeo, no un
+ * resumen de juego).
  *
- * Una sola consulta para todo el clan, no una por miembro: la primera
- * versión hacía un round-trip a la base por cada `member.userId` dentro de
- * un `for`, el mismo antipatrón N+1 que ya se corrigió antes en otros sitios
- * de este proyecto (PEGI, horas de PSN) — con un clan grande, cada carga de
- * `/clanes/[tag]` disparaba decenas de queries.
+ * Una sola consulta a `user_trophy` para todo el clan, no una por miembro
+ * (mismo antipatrón N+1 ya corregido antes en este proyecto — PEGI, horas
+ * de PSN): se agrupa en memoria por `userId` en vez de una query aparte
+ * por cada uno.
  */
-export async function getClanScore(clanId: string) {
-  const memberIds = await db
-    .select({ userId: clanMembers.userId })
+export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboardEntry[]> {
+  const members = await db
+    .select({ userId: clanMembers.userId, role: clanMembers.role })
     .from(clanMembers)
     .where(eq(clanMembers.clanId, clanId));
 
-  if (memberIds.length === 0) return 0;
+  if (members.length === 0) return [];
 
-  const rows = await db
-    .select({
-      platform: games.platform,
-      grade: gameTrophies.grade,
-      xp: gameTrophies.xp,
-      rarityPercent: userTrophies.rarityPercent,
-    })
-    .from(userTrophies)
-    .innerJoin(games, eq(games.id, userTrophies.gameId))
-    .innerJoin(
-      gameTrophies,
-      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
-    )
-    .where(
-      and(
-        inArray(userTrophies.userId, memberIds.map((m) => m.userId)),
-        eq(userTrophies.earned, true),
-      ),
-    );
+  const memberIds = members.map((m) => m.userId);
 
-  let totalScore = 0;
-  for (const row of rows) {
-    totalScore += trophyScore({
+  const [trophyRows, profiles] = await Promise.all([
+    db
+      .select({
+        userId: userTrophies.userId,
+        platform: games.platform,
+        grade: gameTrophies.grade,
+        xp: gameTrophies.xp,
+        rarityPercent: userTrophies.rarityPercent,
+      })
+      .from(userTrophies)
+      .innerJoin(games, eq(games.id, userTrophies.gameId))
+      .innerJoin(
+        gameTrophies,
+        and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+      )
+      .where(and(inArray(userTrophies.userId, memberIds), eq(userTrophies.earned, true))),
+    db
+      .select({
+        id: users.id,
+        handle: users.handle,
+        name: users.name,
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+      })
+      .from(users)
+      .where(inArray(users.id, memberIds)),
+  ]);
+
+  const stats = new Map<string, { score: number; trofeos: number }>();
+  for (const row of trophyRows) {
+    const actual = stats.get(row.userId) ?? { score: 0, trofeos: 0 };
+    actual.score += trophyScore({
       platform: row.platform,
       grade: row.grade as TrophyGrade | null,
       xp: row.xp,
       rarityPercent: row.rarityPercent,
     });
+    actual.trofeos += 1;
+    stats.set(row.userId, actual);
   }
 
-  return totalScore;
+  const profileMap = new Map(profiles.map((p) => [p.id, p]));
+
+  return members
+    .map((m) => {
+      const p = profileMap.get(m.userId);
+      const s = stats.get(m.userId) ?? { score: 0, trofeos: 0 };
+      return {
+        userId: m.userId,
+        role: m.role,
+        handle: p?.handle ?? null,
+        name: p?.name ?? null,
+        image: p?.image ?? null,
+        score: s.score,
+        trofeos: s.trofeos,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
+}
+
+/** Puntuación total del clan — suma del ranking de arriba. */
+export async function getClanScore(clanId: string): Promise<number> {
+  const leaderboard = await getClanLeaderboard(clanId);
+  return leaderboard.reduce((sum, m) => sum + m.score, 0);
 }
 
 /**
@@ -210,4 +256,105 @@ export async function getClanActivity(clanId: string, limite = 15) {
     .where(inArray(activities.userId, memberIds.map((m) => m.userId)))
     .orderBy(desc(activities.createdAt))
     .limit(limite);
+}
+
+/* ------------------------------------------------------------------ *
+ * Invitaciones                                                       *
+ *                                                                    *
+ * Solo el líder puede invitar, y solo a amigos suyos — "roles         *
+ * expandidos" (sublíderes con permiso de invitar) queda pendiente,    *
+ * de momento un solo dueño por clan mantiene esto simple. La          *
+ * invitación se BORRA al resolverse (aceptada o rechazada), no se     *
+ * guarda historial — es un buzón de pendientes, no un registro.       *
+ * ------------------------------------------------------------------ */
+
+/**
+ * Amigos del usuario que se pueden invitar a ESTE clan ahora mismo: ni ya
+ * están en un clan (el suyo o cualquier otro), ni ya tienen una invitación
+ * pendiente a este mismo clan.
+ */
+export async function getInvitableFriends(userId: string, clanId: string) {
+  const amigos = await listFriends(userId);
+  if (amigos.length === 0) return [];
+
+  const amigoIds = amigos.map((a) => a.userId);
+  const [enAlgunClan, yaInvitados] = await Promise.all([
+    db.select({ userId: clanMembers.userId }).from(clanMembers).where(inArray(clanMembers.userId, amigoIds)),
+    db
+      .select({ userId: clanInvites.invitedUserId })
+      .from(clanInvites)
+      .where(and(eq(clanInvites.clanId, clanId), inArray(clanInvites.invitedUserId, amigoIds))),
+  ]);
+
+  const excluidos = new Set([...enAlgunClan.map((m) => m.userId), ...yaInvitados.map((i) => i.userId)]);
+  return amigos.filter((a) => !excluidos.has(a.userId));
+}
+
+export async function inviteToClan(clanId: string, invitedByUserId: string, invitedUserId: string) {
+  const [clan] = await db.select().from(clans).where(eq(clans.id, clanId)).limit(1);
+  if (!clan) throw new Error("Clan no encontrado");
+  if (clan.ownerId !== invitedByUserId) throw new Error("Solo el líder del clan puede invitar");
+
+  const yaEnClan = await getUserClan(invitedUserId);
+  if (yaEnClan) throw new Error("Esa persona ya está en un clan");
+
+  const amigos = await listFriends(invitedByUserId);
+  if (!amigos.some((a) => a.userId === invitedUserId)) throw new Error("Solo puedes invitar a amigos tuyos");
+
+  try {
+    await db.insert(clanInvites).values({ clanId, invitedUserId, invitedByUserId });
+  } catch (err) {
+    if (err instanceof Error && "code" in err && (err as { code?: string }).code === "23505") {
+      throw new Error("Ya le has invitado a este clan");
+    }
+    throw err;
+  }
+
+  const [remitente] = await db.select({ handle: users.handle, name: users.name }).from(users).where(eq(users.id, invitedByUserId)).limit(1);
+  const nombreRemitente = remitente?.name ?? remitente?.handle ?? "Alguien";
+  const aviso = {
+    title: "Invitación a un clan",
+    body: `${nombreRemitente} te invita a unirte a [${clan.tag}] ${clan.name}.`,
+    url: "/clanes",
+  };
+  // Los dos canales a la vez, mismo patrón que las solicitudes de amistad
+  // (lib/profiles.ts) — ninguno hace nada si el destinatario no tiene nada
+  // registrado en ese canal.
+  await Promise.all([enviarPush(invitedUserId, aviso), enviarPushFcm(invitedUserId, aviso)]);
+}
+
+/** Invitaciones pendientes de un usuario, en cualquier clan. */
+export async function getPendingInvites(userId: string) {
+  return db
+    .select({
+      clanId: clanInvites.clanId,
+      clanName: clans.name,
+      clanTag: clans.tag,
+      invitedByName: users.name,
+      invitedByHandle: users.handle,
+      createdAt: clanInvites.createdAt,
+    })
+    .from(clanInvites)
+    .innerJoin(clans, eq(clans.id, clanInvites.clanId))
+    .innerJoin(users, eq(users.id, clanInvites.invitedByUserId))
+    .where(eq(clanInvites.invitedUserId, userId))
+    .orderBy(desc(clanInvites.createdAt));
+}
+
+export async function acceptClanInvite(userId: string, clanId: string) {
+  const [invite] = await db
+    .select()
+    .from(clanInvites)
+    .where(and(eq(clanInvites.clanId, clanId), eq(clanInvites.invitedUserId, userId)))
+    .limit(1);
+  if (!invite) throw new Error("Esa invitación ya no existe");
+
+  // joinClan ya comprueba que no estés en otro clan (aplicado también a
+  // nivel de base con el índice único de clan_members.userId).
+  await joinClan(userId, clanId);
+  await db.delete(clanInvites).where(and(eq(clanInvites.clanId, clanId), eq(clanInvites.invitedUserId, userId)));
+}
+
+export async function declineClanInvite(userId: string, clanId: string) {
+  await db.delete(clanInvites).where(and(eq(clanInvites.clanId, clanId), eq(clanInvites.invitedUserId, userId)));
 }

@@ -1,6 +1,6 @@
 "use server";
 import { auth } from "@/auth";
-import { createClan, joinClan, leaveClan, getUserClan } from "@/lib/clans";
+import { createClan, joinClan, leaveClan, getUserClan, inviteToClan, acceptClanInvite, declineClanInvite } from "@/lib/clans";
 import { getLibrary } from "@/lib/profiles";
 import { getProfileByUserId } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
@@ -54,4 +54,30 @@ export async function leaveClanAction(clanId: string) {
   revalidatePath("/clanes");
   const profile = await getProfileByUserId(session.user.id);
   if (profile) revalidatePath(`/u/${profile.handle}`);
+}
+
+export async function inviteToClanAction(clanId: string, invitedUserId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("No autenticado");
+
+  await inviteToClan(clanId, session.user.id, invitedUserId);
+  revalidatePath(`/clanes`);
+}
+
+export async function acceptClanInviteAction(clanId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("No autenticado");
+
+  await acceptClanInvite(session.user.id, clanId);
+  revalidatePath("/clanes");
+  const profile = await getProfileByUserId(session.user.id);
+  if (profile) revalidatePath(`/u/${profile.handle}`);
+}
+
+export async function declineClanInviteAction(clanId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("No autenticado");
+
+  await declineClanInvite(session.user.id, clanId);
+  revalidatePath("/clanes");
 }

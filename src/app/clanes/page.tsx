@@ -3,24 +3,30 @@ import { clans, clanMembers } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
 import Link from "next/link";
 import { ClanCreateForm } from "./ClanCreateForm";
+import { PendingClanInvites } from "./PendingClanInvites";
 import { auth } from "@/auth";
+import { getPendingInvites } from "@/lib/clans";
 
 export default async function ClanesPage() {
   const session = await auth();
-  
-  // Obtener todos los clanes y contar sus miembros
-  const allClanes = await db
-    .select({
-      id: clans.id,
-      name: clans.name,
-      tag: clans.tag,
-      description: clans.description,
-      memberCount: sql<number>`count(${clanMembers.userId})`.mapWith(Number),
-    })
-    .from(clans)
-    .leftJoin(clanMembers, sql`${clans.id} = ${clanMembers.clanId}`)
-    .groupBy(clans.id)
-    .orderBy(desc(sql`count(${clanMembers.userId})`));
+  const userId = session?.user?.id;
+
+  const [allClanes, invitaciones] = await Promise.all([
+    // Obtener todos los clanes y contar sus miembros
+    db
+      .select({
+        id: clans.id,
+        name: clans.name,
+        tag: clans.tag,
+        description: clans.description,
+        memberCount: sql<number>`count(${clanMembers.userId})`.mapWith(Number),
+      })
+      .from(clans)
+      .leftJoin(clanMembers, sql`${clans.id} = ${clanMembers.clanId}`)
+      .groupBy(clans.id)
+      .orderBy(desc(sql`count(${clanMembers.userId})`)),
+    userId ? getPendingInvites(userId) : Promise.resolve([]),
+  ]);
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
@@ -31,6 +37,8 @@ export default async function ClanesPage() {
         </div>
         {session?.user && <ClanCreateForm />}
       </div>
+
+      {invitaciones.length > 0 && <PendingClanInvites invites={invitaciones} />}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {allClanes.map((clan) => (

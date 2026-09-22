@@ -964,3 +964,19 @@ export const clanMembers = pgTable("clan_members", {
 }, (t) => [
   primaryKey({ columns: [t.clanId, t.userId] }),
 ]);
+
+/**
+ * Invitación pendiente a un clan — se borra al resolverse (aceptada o
+ * rechazada), no se guarda historial. La PK compuesta evita invitar dos
+ * veces a la misma persona al mismo clan sin necesitar una columna de
+ * estado aparte.
+ */
+export const clanInvites = pgTable("clan_invite", {
+  clanId: text("clanId").notNull().references(() => clans.id, { onDelete: "cascade" }),
+  invitedUserId: text("invitedUserId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  invitedByUserId: text("invitedByUserId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.clanId, t.invitedUserId] }),
+  index("clan_invite_invitedUserId_idx").on(t.invitedUserId),
+]);
