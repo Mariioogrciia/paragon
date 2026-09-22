@@ -12,7 +12,6 @@ import { paragonProgress } from "@/lib/level";
 import { sharedTrophyLeads } from "@/lib/comparison";
 import { ComparePairGames } from "@/components/ComparePairGames";
 import { BackButton } from "@/components/BackButton";
-import { RivalryRadarLazy } from "@/components/RivalryRadarLazy";
 
 const OUTCOME_STYLE = {
   ganas: { bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
@@ -87,41 +86,6 @@ export default async function CompararPage({
     { player: libB.player, stats: statsB, tag: tagB, leader: platinoDif <= 0 },
   ];
 
-  const normalize = (val: number, max: number) => max === 0 ? 0 : Math.round((val / max) * 100);
-
-  const radarData = [
-    {
-      subject: "XP Total",
-      A: normalize(nivelA.xp, Math.max(nivelA.xp, nivelB.xp)),
-      B: normalize(nivelB.xp, Math.max(nivelA.xp, nivelB.xp)),
-      fullMark: 100
-    },
-    {
-      subject: "Platinos",
-      A: normalize(statsA.platinos, Math.max(statsA.platinos, statsB.platinos)),
-      B: normalize(statsB.platinos, Math.max(statsA.platinos, statsB.platinos)),
-      fullMark: 100
-    },
-    {
-      subject: "Volumen (Juegos)",
-      A: normalize(statsA.juegos, Math.max(statsA.juegos, statsB.juegos)),
-      B: normalize(statsB.juegos, Math.max(statsA.juegos, statsB.juegos)),
-      fullMark: 100
-    },
-    {
-      subject: "Completismo %",
-      A: statsA.completadoMedio,
-      B: statsB.completadoMedio,
-      fullMark: 100
-    },
-    {
-      subject: "Trofeos Totales",
-      A: normalize(statsA.trofeos, Math.max(statsA.trofeos, statsB.trofeos)),
-      B: normalize(statsB.trofeos, Math.max(statsA.trofeos, statsB.trofeos)),
-      fullMark: 100
-    }
-  ];
-
   return (
     <div>
       <BackButton fallbackHref="/amigos" />
@@ -178,20 +142,6 @@ export default async function CompararPage({
           </div>
         ))}
       </div>
-
-      <section className="mt-9">
-        <div className="mb-4 flex items-baseline gap-3.5">
-          <h2 className="font-heading text-2xl font-bold">Radar de Rivalidad</h2>
-          <span className="text-[0.8125rem] text-muted">
-            Cara a cara
-          </span>
-        </div>
-        <RivalryRadarLazy
-          data={radarData}
-          userA={{ name: libA.player.name, color: "var(--accent-text)" }}
-          userB={{ name: libB.player.name, color: "var(--gold)" }}
-        />
-      </section>
 
       <section className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {[{ name: libA.player.name, level: nivelA, color: "var(--accent-text)" }, { name: libB.player.name, level: nivelB, color: "var(--gold)" }].map((player) => (

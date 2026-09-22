@@ -276,8 +276,7 @@ export function LibraryGrid({
         <TiltCard
           key={game.id}
           href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`}
-          className="group relative block aspect-[4/5] rounded-xl transition-all duration-300 hover:shadow-2xl hover:border-accent border border-border/50"
-          innerClassName="overflow-hidden rounded-xl"
+          className="group relative block aspect-[4/5] overflow-hidden rounded-xl transition-all duration-300 hover:shadow-2xl hover:border-accent border border-border/50"
           style={{ background: coverGradient(game.id) }}
         >
           {game.iconUrl && (
@@ -379,13 +378,13 @@ export function LibraryGrid({
           </button>
 
           <div className="flex gap-1 rounded-[9px] p-1 shrink-0" style={FIELD}>
-            <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-background" : "text-muted hover:text-foreground"}`}>
+            <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </button>
-            <button onClick={() => setView("mosaic")} className={`p-1.5 rounded-md transition-colors ${view === "mosaic" ? "bg-accent text-background" : "text-muted hover:text-foreground"}`}>
+            <button onClick={() => setView("mosaic")} className={`p-1.5 rounded-md transition-colors ${view === "mosaic" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
             </button>
-            <button onClick={() => setView("list")} className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-accent text-background" : "text-muted hover:text-foreground"}`}>
+            <button onClick={() => setView("list")} className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-accent text-white" : "text-muted hover:text-foreground"}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
             </button>
           </div>

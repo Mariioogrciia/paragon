@@ -6,24 +6,11 @@ export function TiltCard({
   href,
   children,
   className,
-  innerClassName,
   style,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
-  /**
-   * `overflow-hidden` va aquí, NUNCA en `className` — el propio `<Link>` es
-   * quien lleva el `hover:shadow-*` (y quien rota con el tilt), y
-   * `overflow-hidden` en el mismo elemento que declara ese resplandor lo
-   * recorta a sí mismo en silencio, sin ningún error (misma trampa que
-   * `overflow-hidden` con un `filter: drop-shadow` — ver HANDOFF.md). El
-   * radio de esquina (`rounded-*`) tiene que repetirse en los dos sitios:
-   * aquí para que el recorte coincida con la carátula, y en `className`
-   * para que la sombra/el borde del propio `<Link>` salgan con la misma
-   * forma.
-   */
-  innerClassName?: string;
   style?: React.CSSProperties;
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null);
@@ -33,7 +20,6 @@ export function TiltCard({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -66,7 +52,7 @@ export function TiltCard({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {innerClassName ? <div className={`h-full w-full ${innerClassName}`}>{children}</div> : children}
+      {children}
     </Link>
   );
 }

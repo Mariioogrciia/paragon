@@ -68,16 +68,11 @@ function haceTiempo(date: Date | string): string {
 }
 
 async function Landing() {
-  // Cuatro consultas independientes entre sí: en paralelo, no en cascada —
-  // esta es la página pública más visitada (sin sesión), así que un
-  // waterfall aquí pega directo al TTFB de todo el tráfico no autenticado.
-  const [globalStats, topHunters, rareTrophies, recentPlatinums, t] = await Promise.all([
-    getGlobalStats(),
-    getTopHunters(5),
-    getRarestTrophiesThisWeek(6),
-    getRecentPlatinumActivity(10),
-    getTranslations("Shell.Home"),
-  ]);
+  const globalStats = await getGlobalStats();
+  const topHunters = await getTopHunters(5);
+  const rareTrophies = await getRarestTrophiesThisWeek(6);
+  const recentPlatinums = await getRecentPlatinumActivity(10);
+  const t = await getTranslations("Shell.Home");
 
   const FEATURES = FEATURE_KEYS.map((key, i) => ({
     num: String(i + 1).padStart(2, "0"),
@@ -608,7 +603,7 @@ export default async function HomePage() {
   // Y todavía no está platinado/100% (un juego ya terminado no se "atasca").
   const juegoAnclado = games.find((g) => g.isPinned && !esPlatinoEquivalente(g)) ?? null;
 
-  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones, efemerides, diasAtascado, feed] = await Promise.all([
+  const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones, efemerides, diasAtascado] = await Promise.all([
     trofeosPorMes(session.user.id),
     rachas(session.user.id),
     resumenHistorico(session.user.id),
@@ -617,7 +612,6 @@ export default async function HomePage() {
     getTrophyRecommendations(session.user.id),
     talDiaComoHoy(session.user.id),
     juegoAnclado ? diasSinAvance(session.user.id, juegoAnclado.id) : Promise.resolve(null),
-    getFeed(session.user.id),
   ]);
 
   const UMBRAL_ATASCO = 5;
@@ -639,6 +633,7 @@ export default async function HomePage() {
     .slice(0, 4);
 
   const now = new Date().getTime();
+  const feed = await getFeed(session.user.id);
 
   const nearPlatinumSection = nearPlatinum.length > 0 && (
     <section>

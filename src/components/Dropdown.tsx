@@ -84,7 +84,7 @@ export function Dropdown({ value, onChange, options, placeholder, className = ""
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`cursor-pointer px-3.5 py-2 text-[0.8125rem] font-medium hover:bg-accent hover:text-background transition-colors ${
+                  className={`cursor-pointer px-3.5 py-2 text-[0.8125rem] font-medium hover:bg-accent hover:text-white transition-colors ${
                     isSelected ? "bg-accent/30 text-accent" : "text-foreground"
                   }`}
                 >

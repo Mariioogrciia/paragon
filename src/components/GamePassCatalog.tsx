@@ -91,7 +91,7 @@ export function GamePassCatalog({
           <button
             onClick={() => setPlataforma("consola")}
             className={`rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
-              plataforma === "consola" ? "bg-accent text-background" : "text-muted hover:text-foreground"
+              plataforma === "consola" ? "bg-accent text-white" : "text-muted hover:text-foreground"
             }`}
           >
             {t("consolaTab", { n: consola.length })}
@@ -99,7 +99,7 @@ export function GamePassCatalog({
           <button
             onClick={() => setPlataforma("pc")}
             className={`rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
-              plataforma === "pc" ? "bg-accent text-background" : "text-muted hover:text-foreground"
+              plataforma === "pc" ? "bg-accent text-white" : "text-muted hover:text-foreground"
             }`}
           >
             {t("pcTab", { n: pc.length })}

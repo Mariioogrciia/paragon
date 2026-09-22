@@ -79,7 +79,7 @@ export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[
                   {game.title}
                 </div>
                 {selected.includes(game.id) && (
-                  <div className="absolute top-2 right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center text-background font-bold text-xs">
+                  <div className="absolute top-2 right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center text-white font-bold text-xs">
                     ✓
                   </div>
                 )}
@@ -92,7 +92,7 @@ export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[
           <button onClick={() => setIsOpen(false)} className="px-4 py-2 text-sm font-semibold text-muted hover:text-foreground">
             {t("FavoritePicker.cancel")}
           </button>
-          <button onClick={handleSave} className="px-4 py-2 text-sm font-bold rounded-xl bg-accent text-background shadow-lg">
+          <button onClick={handleSave} className="px-4 py-2 text-sm font-bold rounded-xl bg-accent text-white shadow-lg">
             {t("FavoritePicker.save")}
           </button>
         </div>

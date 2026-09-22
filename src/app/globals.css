@@ -523,21 +523,3 @@ h3,
   pointer-events: none;
 }
 
-/**
- * Ninguna animación de esta hoja respetaba `prefers-reduced-motion`
- * (auditoría de accesibilidad, 22 sept 2026) — el marquee de Descubrir, el
- * brillo holográfico de platinos, los marcos de avatar en movimiento y el
- * glint metálico corren siempre, sin salida para quien tiene sensibilidad
- * vestibular. Se paran en seco (sin transición) en vez de solo acortar la
- * duración: es lo que pide la media query.
- */
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee,
-  .holo-card::before,
-  .holo-card:hover::before,
-  .animate-glint::after,
-  .avatar-frame-motion {
-    animation: none !important;
-  }
-}
-
