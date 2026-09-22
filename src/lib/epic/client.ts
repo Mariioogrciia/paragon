@@ -1,5 +1,4 @@
 import "server-only";
-import { gotScraping } from "got-scraping";
 import { gameKey, type Game, type Trophy, type TrophyGrade } from "@/lib/types";
 
 /**
@@ -80,6 +79,21 @@ export class EpicPrivateProfileError extends Error {
  * cabecera para cualquiera). `got` lanza en vez de devolver un `response.ok`
  * a false, así que aquí el `catch` cubre TANTO el fallo de red como un
  * 4xx/5xx real — a diferencia de Steam/PSN, donde eso son dos pasos.
+ *
+ * `got-scraping` se importa DENTRO de la función, no arriba del todo del
+ * archivo — bug real en producción (22 sept 2026): este archivo lo importa
+ * `lib/profiles.ts`, que es universal (prácticamente toda página pasa por
+ * ahí), así que un `import` estático de `got-scraping` se evaluaba en
+ * CUALQUIER carga de página, no solo al sincronizar Epic. Cuando el
+ * paquete externo falló en el entorno serverless de Vercel
+ * (`Failed to load external module got-scraping-...: Error: ADM-ZIP:
+ * Invalid filename` — un problema de cómo Vercel empaqueta sus ficheros de
+ * datos de huella de navegador, no de este código), tiró abajo la web
+ * ENTERA, no solo Epic. Un `import()` dinámico aquí dentro hace que el
+ * módulo solo se cargue cuando de verdad se sincroniza una cuenta de Epic
+ * — la ruta menos transitada de toda la app — así que si vuelve a fallar,
+ * se queda contenido en el `catch` de abajo en vez de tumbar cualquier
+ * página.
  */
 async function query<T>(operationName: string, variables: object, sha256Hash: string): Promise<T | null> {
   const url =
@@ -88,6 +102,7 @@ async function query<T>(operationName: string, variables: object, sha256Hash: st
     `&extensions=${encodeURIComponent(JSON.stringify({ persistedQuery: { version: 1, sha256Hash } }))}`;
 
   try {
+    const { gotScraping } = await import("got-scraping");
     const response = await gotScraping({ url, responseType: "json", timeout: { request: 15_000 } });
     return response.body as T;
   } catch (error) {
