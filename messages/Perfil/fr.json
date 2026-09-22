@@ -137,7 +137,8 @@
     "vacio": "Personne ne marque de points ce mois-ci pour l'instant. Sois le premier !",
     "colPos": "Rang",
     "colCazador": "Chasseur",
-    "colPuntos": "Points"
+    "colPuntos": "Points",
+    "historialTitulo": "Champions des mois précédents"
   },
   "LigaPage": {
     "meta": "Ligue - Paragon",
@@ -157,6 +158,8 @@
     "invitacionTexto": "{nombre} t'a invité(e) dans cette ligue — accepte pour voir le classement.",
     "alguien": "Quelqu'un",
     "clasificacionDesde": "Classement depuis sa création — uniquement entre les membres de cette ligue.",
+    "actividadTitulo": "Activité récente",
+    "actividadConsiguio": "a obtenu {trofeo}",
     "colPos": "Rang",
     "colCazador": "Chasseur",
     "colPuntos": "Points",

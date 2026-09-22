@@ -19,17 +19,21 @@ export type Platform = "psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" 
 export type AccountPlatform = Exclude<Platform, "manual">;
 
 /**
- * Las que de verdad se pueden vincular hoy (11 de septiembre de 2026).
+ * Las que de verdad se pueden vincular hoy (22 de septiembre de 2026).
  *
- * `AccountPlatform` sigue siendo más ancho (incluye "google"/"epic"/
- * "ubisoft") porque `Platform` lo necesita para `games.platform`: un juego
- * importado a mano desde Playnite/GOG guarda ahí de qué launcher salió
- * (ver `actions/import.ts`), que es un uso distinto de "cuenta vinculada
- * con sincronización real". Google Play, Epic Games y Ubisoft Connect se
- * quitaron del todo como plataformas VINCULABLES ese mismo día — ninguna
+ * `AccountPlatform` sigue siendo más ancho (incluye "google"/"ubisoft")
+ * porque `Platform` lo necesita para `games.platform`: un juego importado a
+ * mano desde Playnite/GOG guarda ahí de qué launcher salió (ver
+ * `actions/import.ts`), que es un uso distinto de "cuenta vinculada con
+ * sincronización real". Google Play y Ubisoft Connect siguen fuera — ninguna
  * llegó a sincronizar un solo dato real (`legible` era siempre `false`).
+ *
+ * Epic Games volvió el 22 de septiembre de 2026: el primer intento (commit
+ * 4102bc1, retirado en 43226b0) era vía OAuth y nunca leyó logros de nadie.
+ * Este es un camino distinto — lectura pública anónima por epicAccountId,
+ * sin que el usuario autorice nada, ver lib/epic/client.ts — y sí funciona.
  */
-export type PlataformaVinculable = "psn" | "steam" | "xbox";
+export type PlataformaVinculable = "psn" | "steam" | "xbox" | "epic";
 
 export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google", "xbox", "epic", "ubisoft"];
 
@@ -160,6 +164,13 @@ export interface Game {
   service?: "trophy" | "trophy2";
   /** Minutos jugados. Steam y PSN pueden proporcionarlo. */
   playtimeMinutes?: number;
+  /**
+   * Minutos jugados en las últimas 2 semanas — solo Steam. Es lo único que
+   * hay de "actividad reciente" real: ninguna plataforma da sesiones con
+   * inicio y fin, solo esta ventana de tiempo (Steam) o un timestamp de
+   * última vez jugado (`lastPlayedAt`, todas). Ver lib/steam/client.ts.
+   */
+  playtimeRecentMinutes?: number;
   /** De dónde tienes este juego — lo dice el propio usuario, ninguna API lo da. */
   acquisitionFormat?: "fisico" | "digital" | "ps_plus" | "game_pass" | "prestado" | "gratis";
   /** Lo que pagó ESTA persona, no el precio de mercado — para €/hora. `undefined` = no dicho. */
@@ -199,6 +210,12 @@ export interface Game {
    * lib/level.ts.
    */
   xboxTrophyXp?: number;
+  /**
+   * Igual que `steamTrophyXp`/`xboxTrophyXp`, pero para Epic Games: suma del
+   * XP real de cada logro (`gameTrophies.xp`, mismo campo que ya usa Xbox)
+   * de los ya conseguidos en este juego. Ver `paragonProgress` en lib/level.ts.
+   */
+  epicTrophyXp?: number;
   /** Id del catálogo de IGDB, si esta fila ya se emparejó con uno. Es lo que
    * permite agrupar el mismo lanzamiento entre plataformas (ver GlobalGame en
    * lib/community.ts) y filtrar recomendaciones de lo que ya se tiene. */

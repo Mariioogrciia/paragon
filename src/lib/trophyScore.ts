@@ -43,7 +43,7 @@ export function trophyScore({
   rarityPercent?: number | null;
 }): number {
   if (platform === "psn" && grade) return XP_POR_GRADO[grade];
-  if (platform === "xbox") return xp ?? 15;
+  if (platform === "xbox" || platform === "epic") return xp ?? 15;
   if (platform === "steam") return xpSteamPorRareza(rarityPercent);
   return 10;
 }

@@ -123,7 +123,10 @@
     "ctaEmpezarSubtext": "et découvre ton Niveau Paragon",
     "ctaVerEjemplo": "Voir un profil d'exemple",
     "soloIdPublico": "Juste ton identifiant PlayStation public. Ni mot de passe, ni jeton, ni autorisation Sony.",
+    "gratisSinLimite": "Gratuit, sans limite de jeux ni de trophées.",
+    "tickerAcabaDePlatinar": "a platiné",
     "platinoMasCercano": "Platine le plus proche",
+    "platinoMasCercanoAlgoritmo": "✨ Calculé selon ta progression et la difficulté de la communauté",
     "trofeosParaElPlatino": "trophées\npour le platine",
     "conseguidos": "{conseguidos} / {total} obtenus",
     "statPlatinosGrupo": "Platines de la communauté",
@@ -220,8 +223,15 @@
     "juegosParadosToggle": "{n} jeux à l'arrêt",
     "sinTocarHaceTiempo": "{porcentaje}% · pas touché depuis un moment",
     "jugadoRecientemente": "Joué récemment",
+    "horasQuincena": "{horas}h ces 2 dernières semaines",
     "todaLaBiblioteca": "Toute la bibliothèque ({juegos})",
-    "sinJuegosVinculados": "Il n'y a aucun jeu sur tes comptes liés. C'est en général que le profil est en privé sur la plateforme."
+    "sinJuegosVinculados": "Il n'y a aucun jeu sur tes comptes liés. C'est en général que le profil est en privé sur la plateforme.",
+    "botDiscordBadge": "Intégration Discord",
+    "botDiscordTitulo": "Apportez Paragon sur votre serveur",
+    "botDiscordDesc": "Affichez vos platines, comparez vos statistiques avec vos amis et recevez des notifications de série directement sur votre canal préféré. Sans quitter Discord.",
+    "botDiscordCmd1": "Affichez votre Card interactive dans le chat",
+    "botDiscordCmd2": "Radar de rivalité avec d'autres membres",
+    "botDiscordCmd3": "Annoncez automatiquement vos conquêtes"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Profil d'exemple",

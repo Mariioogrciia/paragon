@@ -235,10 +235,18 @@ export default async function JuegoGlobalPage({
           columna) no se recortaba a sí misma — empujaba TODA la página a
           scroll horizontal, en vez de scrollear solo la tira por dentro. */}
       <div className="min-w-0 space-y-9">
-        {game.summary && (
+        {/* `game.summary` solo lo trae `getGlobalGame` cuando el juego no
+            tiene NINGUNA fila local (juego de catálogo puro, ver
+            lib/community.ts) — cuando sí la tiene (el caso normal: alguien
+            ya lo tiene vinculado desde PSN/Steam/Xbox/Epic), el resumen
+            rico viene de IGDB en `detalles`, ya pedido más abajo para las
+            capturas/vídeos. Sin este `??`, cualquier juego vinculado desde
+            una plataforma se quedaba sin "Acerca de" aunque IGDB sí lo
+            tuviera. */}
+        {(detalles?.summary ?? game.summary) && (
           <section className="max-w-[820px]">
             <h2 className="mb-2 font-heading text-2xl font-bold">{t("acercaDe")}</h2>
-            <p className="text-lg leading-relaxed text-foreground/85">{game.summary}</p>
+            <p className="text-lg leading-relaxed text-foreground/85">{detalles?.summary ?? game.summary}</p>
           </section>
         )}
 

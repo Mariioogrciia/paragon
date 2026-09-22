@@ -1,6 +1,7 @@
 import { getDb } from "@/db";
 import { users, userTrophies, gameTrophies, userGames, games, leagues, leagueMembers, leagueStandingSnapshots } from "@/db/schema";
-import { eq, and, gte, lte, sql, inArray } from "drizzle-orm";
+import { eq, and, gte, lte, sql, inArray, desc, isNotNull } from "drizzle-orm";
+import type { TrophyGrade } from "@/lib/types";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { areFriends } from "@/lib/profiles";
 import { enviarPush } from "@/lib/webPush";
@@ -66,6 +67,8 @@ export interface LeagueDetail {
   /** Solo se rellena si `requestingUserId` es el dueño — para gestionar quién falta por aceptar. */
   pendingMembers: PendingMemberRow[];
   challenge: LeagueChallenge | null;
+  /** Ver `getLeagueRecentTrophies`. */
+  recentTrophies: LeagueRecentTrophy[];
 }
 
 /**
@@ -88,6 +91,72 @@ export interface LeagueChallenge {
   title: string;
   iconUrl: string | null;
   standings: ChallengeStandingRow[];
+}
+
+/** Un trofeo cualquiera (no solo el reto) conseguido por un miembro de la liga — ver `getLeagueRecentTrophies`. */
+export interface LeagueRecentTrophy {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  image: string | null;
+  trophyName: string;
+  trophyIconUrl: string | null;
+  grade: TrophyGrade | null;
+  gameId: string;
+  gameTitle: string;
+  earnedAt: string;
+}
+
+/**
+ * Los últimos trofeos conseguidos por CUALQUIER miembro de la liga, dentro
+ * de su ventana de puntuación (misma que usan los puntos: desde que se creó
+ * la liga, hasta `endsAt` si la tiene) — para que la liga se sienta viva
+ * entre foto semanal y foto semanal, no solo un número que cambia una vez
+ * a la semana. A diferencia del "reto" (un juego fijo), esto es CUALQUIER
+ * trofeo de CUALQUIER juego que esté jugando cada miembro.
+ */
+async function getLeagueRecentTrophies(
+  memberIds: string[],
+  desde: Date,
+  hasta: Date | null,
+  limite: number,
+): Promise<LeagueRecentTrophy[]> {
+  if (memberIds.length === 0) return [];
+  const db = getDb();
+
+  const condiciones = [
+    eq(userTrophies.earned, true),
+    isNotNull(userTrophies.earnedAt),
+    gte(userTrophies.earnedAt, desde),
+    inArray(userTrophies.userId, memberIds),
+  ];
+  if (hasta) condiciones.push(lte(userTrophies.earnedAt, hasta));
+
+  const rows = await db
+    .select({
+      userId: users.id,
+      handle: users.handle,
+      name: users.name,
+      image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+      trophyName: gameTrophies.name,
+      trophyIconUrl: gameTrophies.iconUrl,
+      grade: gameTrophies.grade,
+      gameId: games.id,
+      gameTitle: games.title,
+      earnedAt: userTrophies.earnedAt,
+    })
+    .from(userTrophies)
+    .innerJoin(users, eq(users.id, userTrophies.userId))
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .innerJoin(
+      gameTrophies,
+      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+    )
+    .where(and(...condiciones))
+    .orderBy(desc(userTrophies.earnedAt))
+    .limit(limite);
+
+  return rows.map((r) => ({ ...r, earnedAt: r.earnedAt!.toISOString() }));
 }
 
 /**
@@ -391,7 +460,7 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
   // ninguna necesita el resultado de la anterior. Solo `missingProfiles`
   // sí depende de `scored` (necesita saber a quién le falta), así que ese
   // se queda fuera del `Promise.all` y se pide después.
-  const [scored, fotoAnterior, challenge] = await Promise.all([
+  const [scored, fotoAnterior, challenge, recentTrophies] = await Promise.all([
     db
       .select({
         userId: users.id,
@@ -416,6 +485,7 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
       .from(leagueStandingSnapshots)
       .where(eq(leagueStandingSnapshots.leagueId, leagueId)),
     league.challengeGameId ? getChallengeStandings(league.challengeGameId, memberIds) : Promise.resolve(null),
+    getLeagueRecentTrophies(memberIds, league.createdAt, league.endsAt, 12),
   ]);
 
   // El INNER JOIN con userTrophies deja fuera a cualquier miembro sin ni un
@@ -471,6 +541,7 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
     standings,
     pendingMembers,
     challenge,
+    recentTrophies,
   };
 }
 

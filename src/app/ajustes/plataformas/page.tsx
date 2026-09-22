@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { signOutAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { SaludSincronizacion } from "@/components/SaludSincronizacion";
@@ -10,7 +10,7 @@ import { saludSincronizacion } from "@/lib/syncHealth";
 import { accountFor, getProfileByUserId, getUserTimezone } from "@/lib/profiles";
 import { PLATFORM_LABEL, type AccountPlatform, type PlataformaVinculable, type PlatformAccount } from "@/lib/types";
 import { getSyncHistory } from "@/lib/syncHistory";
-import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo } from "@/components/ui/PlatformLogos";
+import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo, EpicGamesLogo } from "@/components/ui/PlatformLogos";
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
 import { getTranslations } from "next-intl/server";
 
@@ -22,6 +22,7 @@ const AVATAR_BG: Record<PlataformaVinculable, string> = {
   psn: "linear-gradient(150deg, #2f7ad6, #6b3fd4)",
   steam: "linear-gradient(150deg, #2f7d9d, #1b2838)",
   xbox: "linear-gradient(150deg, #107C10, #16a316)",
+  epic: "linear-gradient(150deg, #313131, #0a0a0a)",
 };
 
 type Traductor = Awaited<ReturnType<typeof getTranslations>>;
@@ -41,8 +42,8 @@ function PlatformSection({
   const sincronizado = account?.syncedAt ? relativeDate(account.syncedAt) : null;
 
   return (
-    <section className="mt-3.5 rounded-[18px] p-6 flex flex-col" style={CARD}>
-      <div className="flex items-center gap-3 mb-4">
+    <section className="mt-3.5 rounded-[16px] p-5 flex flex-col" style={CARD}>
+      <div className="flex items-center gap-3 mb-3">
         <span
           className="font-heading flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-lg font-bold shadow-md text-white"
           style={{ background: AVATAR_BG[platform] }}
@@ -50,6 +51,7 @@ function PlatformSection({
           {platform === "psn" && <PlayStationLogo className="w-5 h-5" />}
           {platform === "steam" && <SteamLogo className="w-5 h-5" />}
           {platform === "xbox" && <XboxLogo className="w-5 h-5" />}
+          {platform === "epic" && <EpicGamesLogo className="w-5 h-5" />}
         </span>
         <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">
           {PLATFORM_LABEL[platform]}
@@ -58,15 +60,19 @@ function PlatformSection({
 
       {account && (
         <div
-          className="mb-4 flex flex-col gap-3 rounded-[14px] p-4"
+          className="mb-3 flex flex-col gap-2.5 rounded-[12px] p-3.5"
           style={{ border: "1px solid var(--border)", background: "var(--background)" }}
         >
           <div className="flex items-center gap-3">
             <span
-              className="font-heading flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[12px] text-lg font-bold"
+              className="font-heading flex h-10 w-10 shrink-0 overflow-hidden items-center justify-center rounded-[10px] text-lg font-bold"
               style={{ background: AVATAR_BG[platform] }}
             >
-              {account.username.charAt(0).toUpperCase()}
+              {account.avatarUrl ? (
+                <img src={account.avatarUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                account.username.charAt(0).toUpperCase()
+              )}
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[0.9375rem] font-semibold" title={account.username}>
@@ -97,7 +103,7 @@ function PlatformSection({
         </div>
       )}
 
-      <div className="mt-auto pt-4">
+      <div className="mt-auto pt-3 border-t border-white/5">
         <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
           {account ? t("ajustesPlataformas.changeAccount") : t("ajustesPlataformas.linkAccount")}
         </label>
@@ -132,6 +138,7 @@ export default async function AjustesPlataformasPage() {
   const psn = accountFor(profile, "psn");
   const steam = accountFor(profile, "steam");
   const xbox = accountFor(profile, "xbox");
+  const epic = accountFor(profile, "epic");
   const carpetas = await listCollections(session.user.id);
   // Las tres en paralelo: son independientes y el pool no se resiente por
   // tres consultas (ver el aviso de conexiones en db/index.ts).
@@ -163,10 +170,16 @@ export default async function AjustesPlataformasPage() {
           <LinkXboxForm current={xbox?.username} />
         </PlatformSection>
 
-        {/* Google Play, Epic Games y Ubisoft Connect se quitaron del todo el
-            11 de septiembre de 2026 — ninguna llegó a tener sincronización
-            real (ver HANDOFF.md), y las pocas cuentas que se habían llegado
-            a vincular no guardaban ningún dato sincronizado de verdad. */}
+        <PlatformSection platform="epic" account={epic} t={t}>
+          <LinkEpicForm current={epic?.username} />
+        </PlatformSection>
+
+        {/* Google Play y Ubisoft Connect se quitaron del todo el 11 de
+            septiembre de 2026 — ninguna llegó a tener sincronización real
+            (ver HANDOFF.md), y las pocas cuentas que se habían llegado a
+            vincular no guardaban ningún dato sincronizado de verdad. Epic
+            volvió el 22 de septiembre de 2026 con un enfoque distinto — ver
+            lib/epic/client.ts. */}
         <section className="mt-3.5 rounded-[18px] p-6 flex flex-col" style={CARD}>
           <div className="flex items-center gap-3 mb-4 opacity-50">
             <span
@@ -194,7 +207,7 @@ export default async function AjustesPlataformasPage() {
         <CollectionManager collections={carpetas} />
       </section>
 
-      {(psn || steam) && (
+      {(psn || steam || epic) && (
         <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
           <h2 className="font-heading mb-4 text-[1.0625rem] font-bold tracking-[0.03em]">
             {t("ajustesPlataformas.sync.title")}

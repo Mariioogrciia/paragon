@@ -123,7 +123,10 @@
     "ctaEmpezarSubtext": "and discover your Paragon Level",
     "ctaVerEjemplo": "See a sample profile",
     "soloIdPublico": "Just your public PlayStation ID. No passwords, no tokens, no permissions from Sony.",
+    "gratisSinLimite": "Free, no limit on games or trophies.",
+    "tickerAcabaDePlatinar": "platinumed",
     "platinoMasCercano": "Closest platinum",
+    "platinoMasCercanoAlgoritmo": "✨ Calculated from your progress and community difficulty",
     "trofeosParaElPlatino": "trophies\nto platinum",
     "conseguidos": "{conseguidos} / {total} earned",
     "statPlatinosGrupo": "Community platinums",
@@ -220,8 +223,15 @@
     "juegosParadosToggle": "{n} stalled games",
     "sinTocarHaceTiempo": "{porcentaje}% · untouched for a while",
     "jugadoRecientemente": "Recently played",
+    "horasQuincena": "{horas}h in the last 2 weeks",
     "todaLaBiblioteca": "Whole library ({juegos})",
-    "sinJuegosVinculados": "There are no games on your linked accounts. It's usually because the profile is set to private on the platform."
+    "sinJuegosVinculados": "There are no games on your linked accounts. It's usually because the profile is set to private on the platform.",
+    "botDiscordBadge": "Discord Integration",
+    "botDiscordTitulo": "Bring Paragon to your server",
+    "botDiscordDesc": "Show off your platinums, compare stats with friends, and get streak notifications directly in your favorite channel. Without leaving Discord.",
+    "botDiscordCmd1": "Show your interactive Card in the chat",
+    "botDiscordCmd2": "Rivalry radar with other members",
+    "botDiscordCmd3": "Announce your conquests automatically"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Sample profile",

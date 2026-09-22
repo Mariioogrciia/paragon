@@ -384,6 +384,14 @@ export const userGames = pgTable(
     lastPlayedAt: timestamp("lastPlayedAt", { mode: "date" }),
     /** Minutos jugados, cuando la plataforma los proporciona. */
     playtimeMinutes: integer("playtimeMinutes"),
+    /**
+     * Minutos jugados en las últimas 2 semanas — solo Steam (`playtime_2weeks`
+     * de `GetOwnedGames`, ver lib/steam/client.ts). Ninguna otra plataforma da
+     * una ventana de tiempo reciente, solo un timestamp de "última vez" —
+     * este campo es lo único real que hay para dar sensación de actividad
+     * viva en "Jugado recientemente" sin inventar sesiones que no existen.
+     */
+    playtimeRecentMinutes: integer("playtimeRecentMinutes"),
     /** Null mientras no hayamos traído el detalle de logros de este juego. */
     trophiesSyncedAt: timestamp("trophiesSyncedAt", { mode: "date" }),
     rating: integer("rating"),
@@ -622,6 +630,7 @@ export const leagues = pgTable("league", {
   durationValue: integer("durationValue"),
   durationUnit: text("durationUnit").$type<"dias" | "semanas" | "meses" | "anios">(),
   endsAt: timestamp("endsAt", { mode: "date" }),
+  awarded: boolean("awarded").notNull().default(false),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
 
@@ -705,6 +714,36 @@ export const userBadges = pgTable(
     earnedAt: timestamp("earnedAt", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.badgeId] })]
+);
+
+/**
+ * Palmarés: premios PERMANENTES por acabar Top 3 en la Liga Mensual global,
+ * o ganar una Liga privada — a diferencia de `userBadges` (un `badgeId` fijo
+ * solo puede tenerse una vez, para siempre), esto sí puede repetirse: la
+ * misma persona puede ganar la Liga Mensual en enero y otra vez en marzo,
+ * cada una con su propia fila. Ver lib/trophyCase.ts, que es quien reparte
+ * esto (desde el propio cron de sincronización, no uno aparte).
+ *
+ * `periodo` es "2026-09" para la Liga Mensual (así "cerrar enero" y "cerrar
+ * marzo" nunca chocan) o el `leagueId` para una Liga privada (una liga solo
+ * se puede ganar una vez, cuando termina). `titulo` se congela en el
+ * momento del premio a propósito: si la liga privada se borra o se
+ * renombra después, el premio ya concedido no debe cambiar ni desaparecer.
+ */
+export const trophyCaseAwards = pgTable(
+  "trophy_case_award",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: text("kind").$type<"liga_mensual" | "liga_privada">().notNull(),
+    rank: integer("rank").notNull(),
+    periodo: text("periodo").notNull(),
+    titulo: text("titulo").notNull(),
+    earnedAt: timestamp("earnedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("trophy_case_award_identity_idx").on(t.userId, t.kind, t.periodo)],
 );
 
 

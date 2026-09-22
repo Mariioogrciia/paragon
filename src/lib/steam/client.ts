@@ -173,6 +173,8 @@ interface OwnedGame {
   appid: number;
   name?: string;
   playtime_forever?: number;
+  /** Solo viene si es mayor que 0 — Steam la omite del todo si no se ha jugado en las últimas 2 semanas. */
+  playtime_2weeks?: number;
   rtime_last_played?: number;
   has_community_visible_stats?: boolean;
 }
@@ -212,6 +214,7 @@ export async function fetchLibrary(steamId: string): Promise<Game[]> {
       definedTotal: 0,
       earnedTotal: 0,
       playtimeMinutes: g.playtime_forever ?? 0,
+      playtimeRecentMinutes: g.playtime_2weeks,
     }))
     .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""));
 }

@@ -12,6 +12,7 @@ import {
   linkPsnAction,
   linkSteamAction,
   linkXboxAction,
+  linkEpicAction,
   updateProfileAction,
   setDiscordDmAction,
   setLeagueChallengeAction,
@@ -171,6 +172,31 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
       </div>
       <Feedback state={state} />
       <PrivacyGuide platform="xbox" />
+    </form>
+  );
+}
+
+export function LinkEpicForm({ current }: { current?: string | null }) {
+  const t = useTranslations("Onboarding");
+  const [state, action] = useActionState(linkEpicAction, EMPTY);
+
+  return (
+    <form action={action}>
+      <div className="flex flex-col gap-2.5 sm:flex-row">
+        <input
+          name="epicProfile"
+          type="text"
+          defaultValue={current ?? ""}
+          placeholder={t("forms.epic.placeholder")}
+          autoComplete="off"
+          spellCheck={false}
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
+          style={FIELD}
+        />
+        <Submit>{current ? t("forms.epic.update") : t("forms.epic.link")}</Submit>
+      </div>
+      <Feedback state={state} />
+      <PrivacyGuide platform="epic" />
     </form>
   );
 }
@@ -430,8 +456,7 @@ export function DiscordDmForm({ enabled, vinculado }: { enabled: boolean; vincul
           style={{ background: enabled ? "var(--accent)" : "var(--surface-2)" }}
         >
           <span
-            className="absolute top-1 h-5 w-5 rounded-full bg-white transition-transform"
-            style={{ transform: enabled ? "translateX(24px)" : "translateX(4px)" }}
+            className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white transition-transform ${enabled ? "translate-x-5" : "translate-x-0"}`}
           />
         </button>
       </form>

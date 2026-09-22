@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, platformAccounts, gameTrophies, leagues } from "@/db/schema";
+import { users, userGames, activities, platformAccounts, gameTrophies, leagues, accounts } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { contieneLenguajeOfensivo, errorSiOfensivo } from "@/lib/contentFilter";
 import { auth, signOut } from "@/auth";
@@ -225,6 +225,13 @@ const PLATFORM_COPY: Record<
     missing: "Escribe tu Gamertag de Xbox.",
     privado: (nombre) => `Perfil privado o no encontrado.`,
   },
+  epic: {
+    field: "epicProfile",
+    missing: "Pega el enlace a tu perfil de Epic Games (o tu ID de cuenta).",
+    privado: (nombre) =>
+      `Perfil ${nombre} encontrado, pero no es público. En la Epic Games Store: tu avatar → ` +
+      `"Mis logros" → "Nivel de privacidad" → "Público".`,
+  },
 };
 
 async function linkPlatform(
@@ -272,11 +279,18 @@ export async function linkXboxAction(
   return linkPlatform("xbox", formData);
 }
 
+export async function linkEpicAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  return linkPlatform("epic", formData);
+}
+
 export async function unlinkAccountAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   const platformInput = String(formData.get("platform") ?? "");
 
-  if (!["psn", "steam", "xbox"].includes(platformInput)) return;
+  if (!["psn", "steam", "xbox", "epic"].includes(platformInput)) return;
 
   await unlinkAccount(userId, platformInput as PlataformaVinculable);
   revalidatePath("/", "layout");
@@ -338,7 +352,7 @@ export async function syncPlatformAction(
 ): Promise<ActionState> {
   const userId = await requireUserId();
   const platformInput = String(formData.get("platform"));
-  if (!["psn", "steam", "xbox"].includes(platformInput)) {
+  if (!["psn", "steam", "xbox", "epic"].includes(platformInput)) {
     return { error: "Plataforma no válida." };
   }
   const platform = platformInput as PlataformaVinculable;
@@ -527,6 +541,40 @@ export async function removeFriendAction(formData: FormData): Promise<void> {
 }
 
 export async function signOutAction(): Promise<void> {
+  await signOut({ redirectTo: "/" });
+}
+
+/**
+ * `ConfirmForm` (mismo componente que ya usa `unlinkAccountAction` para las
+ * cuentas de plataforma) es un formulario "dispara y olvida": no usa
+ * `useActionState` ni enseña nada de lo que la acción devuelva. Por eso esto
+ * es `Promise<void>`, no `ActionState` — un `{ error: ... }` aquí se
+ * perdería en silencio, sin que el usuario viera nunca el aviso. La
+ * comprobación de "no te quedes sin ninguna cuenta" es solo una red de
+ * seguridad del servidor (la página ya oculta el botón cuando solo queda
+ * una cuenta vinculada — ver `userAccounts.length > 1` en
+ * ajustes/seguridad/page.tsx): si de verdad se llega aquí con una sola,
+ * simplemente no se borra nada.
+ */
+export async function unlinkAuthAccountAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const provider = String(formData.get("provider"));
+  const db = getDb();
+
+  const userAccounts = await db.query.accounts.findMany({
+    where: eq(accounts.userId, userId),
+  });
+
+  if (userAccounts.length <= 1) return;
+
+  await db.delete(accounts).where(and(eq(accounts.userId, userId), eq(accounts.provider, provider)));
+  revalidatePath("/ajustes/seguridad");
+}
+
+export async function deleteAccountAction(): Promise<void> {
+  const userId = await requireUserId();
+  const db = getDb();
+  await db.delete(users).where(eq(users.id, userId)); // Cascade borrará perfiles, colecciones, etc.
   await signOut({ redirectTo: "/" });
 }
 

@@ -1,10 +1,11 @@
 import { getLigaMensual } from "@/lib/ligas";
 import { listUserLeagues, listPendingLeagueInvites } from "@/lib/leagues";
+import { getMonthlyLeagueHistory } from "@/lib/trophyCase";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
-import { TrophyIcon } from "@/components/TrophyIcon";
+import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { BackButton } from "@/components/BackButton";
 import { NewLeagueForm } from "@/components/forms/Forms";
 import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
@@ -16,10 +17,11 @@ export const metadata = {
 export default async function LigasPage() {
   const t = await getTranslations("Perfil");
   const session = await auth();
-  const [ranking, misLigas, invitaciones] = await Promise.all([
+  const [ranking, misLigas, invitaciones, historial] = await Promise.all([
     getLigaMensual(),
     session?.user?.id ? listUserLeagues(session.user.id) : Promise.resolve([]),
     session?.user?.id ? listPendingLeagueInvites(session.user.id) : Promise.resolve([]),
+    getMonthlyLeagueHistory(6),
   ]);
 
   const monthName = new Date().toLocaleString("es-ES", { month: "long" });
@@ -142,6 +144,29 @@ export default async function LigasPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {historial.length > 0 && (
+        <div className="mt-10">
+          <h2 className="font-heading text-xl font-bold mb-4">{t("LigasPage.historialTitulo")}</h2>
+          {/* Un ganador ABSOLUTO por mes, nunca Top 3 — mismo criterio que
+              la vitrina del perfil (ver components/TrophyCase.tsx), así que
+              esta lista es siempre una fila por periodo, sin agrupar. */}
+          <div className="flex flex-col gap-2">
+            {historial.map((c) => (
+              <Link
+                key={c.periodo}
+                href={c.handle ? `/u/${c.handle}` : "#"}
+                className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3.5 transition-colors hover:bg-white/5"
+              >
+                <TrophyTile grade="platinum" size={32} />
+                <span className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-muted">{c.titulo}</span>
+                <Avatar src={c.image} name={c.name ?? c.handle ?? "?"} size={28} />
+                <span className="shrink-0 text-sm font-bold">{c.name ?? `@${c.handle}`}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

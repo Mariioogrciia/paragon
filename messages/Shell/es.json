@@ -123,7 +123,10 @@
     "ctaEmpezarSubtext": "y descubre tu Nivel Paragon",
     "ctaVerEjemplo": "Ver un perfil de ejemplo",
     "soloIdPublico": "Solo tu ID público de PlayStation. Ni contraseñas, ni tokens, ni permisos de Sony.",
+    "gratisSinLimite": "Gratis, sin límite de juegos ni de trofeos.",
+    "tickerAcabaDePlatinar": "platinó",
     "platinoMasCercano": "Platino más cercano",
+    "platinoMasCercanoAlgoritmo": "✨ Calculado según tu progreso y la dificultad de la comunidad",
     "trofeosParaElPlatino": "trofeos\npara el platino",
     "conseguidos": "{conseguidos} / {total} conseguidos",
     "statPlatinosGrupo": "Platinos del grupo",
@@ -220,8 +223,15 @@
     "juegosParadosToggle": "{n} juegos parados",
     "sinTocarHaceTiempo": "{porcentaje}% · sin tocar hace tiempo",
     "jugadoRecientemente": "Jugado recientemente",
+    "horasQuincena": "{horas}h esta quincena",
     "todaLaBiblioteca": "Toda la biblioteca ({juegos})",
-    "sinJuegosVinculados": "No hay ningún juego en tus cuentas vinculadas. Suele ser que el perfil está en privado en la plataforma."
+    "sinJuegosVinculados": "No hay ningún juego en tus cuentas vinculadas. Suele ser que el perfil está en privado en la plataforma.",
+    "botDiscordBadge": "Integración Discord",
+    "botDiscordTitulo": "Lleva Paragon a tu servidor",
+    "botDiscordDesc": "Presume de tus platinos, compara estadísticas con tus amigos y recibe notificaciones de racha directamente en tu canal favorito. Sin salir de Discord.",
+    "botDiscordCmd1": "Muestra tu Card interactiva en el chat",
+    "botDiscordCmd2": "Radar de rivalidad con otros miembros",
+    "botDiscordCmd3": "Anuncia tus conquistas automáticamente"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Perfil de ejemplo",

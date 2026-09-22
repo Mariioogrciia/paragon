@@ -3,8 +3,10 @@ import { auth, signIn } from "@/auth";
 import { getDb } from "@/db";
 import { users, accounts } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { signOutAction } from "@/app/actions";
+import { signOutAction, unlinkAuthAccountAction, deleteAccountAction } from "@/app/actions";
 import { getTranslations } from "next-intl/server";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
+import { GoogleLogo, DiscordLogo } from "@/components/ui/PlatformLogos";
 
 const NOMBRE_PROVEEDOR: Record<string, string> = { google: "Google", discord: "Discord" };
 
@@ -71,17 +73,36 @@ export default async function AjustesSeguridadPage({
           {userAccounts.map((acc) => (
             <div key={acc.provider} className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface)] border border-white/5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-bold uppercase">
-                  {acc.provider[0]}
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md"
+                  style={{ background: acc.provider === "google" ? "#ea4335" : acc.provider === "discord" ? "#5865F2" : "var(--surface-2)" }}
+                >
+                  {acc.provider === "google" && <GoogleLogo className="w-4 h-4" />}
+                  {acc.provider === "discord" && <DiscordLogo className="w-5 h-5" />}
+                  {acc.provider !== "google" && acc.provider !== "discord" && acc.provider[0].toUpperCase()}
                 </div>
                 <div>
                   <p className="font-medium capitalize">{acc.provider}</p>
                   <p className="text-xs text-muted">{dbUser.email}</p>
                 </div>
               </div>
-              <span className="text-xs font-semibold text-good uppercase tracking-wider bg-good/10 px-3 py-1 rounded-full border border-good/20">
-                {t("ajustesSeguridad.linkedAccounts.linked")}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[0.6875rem] font-semibold text-good uppercase tracking-wider bg-good/10 px-3 py-1 rounded-full border border-good/20">
+                  {t("ajustesSeguridad.linkedAccounts.linked")}
+                </span>
+                {userAccounts.length > 1 && (
+                  <ConfirmForm
+                    action={unlinkAuthAccountAction}
+                    hidden={{ provider: acc.provider }}
+                    title={t("ajustesSeguridad.confirmUnlink.title", { provider: NOMBRE_PROVEEDOR[acc.provider] ?? acc.provider })}
+                    message={t("ajustesSeguridad.confirmUnlink.message")}
+                    confirmLabel={t("ajustesSeguridad.confirmUnlink.confirmLabel")}
+                    triggerClassName="text-xs font-semibold text-muted hover:text-danger transition-colors"
+                  >
+                    Desvincular
+                  </ConfirmForm>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -105,7 +126,13 @@ export default async function AjustesSeguridadPage({
                   style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
                 >
                   <span className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-bold uppercase">{p.id[0]}</span>
+                    <span 
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md"
+                      style={{ background: p.id === "google" ? "#ea4335" : p.id === "discord" ? "#5865F2" : "var(--surface-2)" }}
+                    >
+                      {p.id === "google" && <GoogleLogo className="w-4 h-4" />}
+                      {p.id === "discord" && <DiscordLogo className="w-5 h-5" />}
+                    </span>
                     {t("ajustesSeguridad.linkedAccounts.linkWith", { provider: NOMBRE_PROVEEDOR[p.id] })}
                   </span>
                   <span className="text-xs font-semibold uppercase tracking-wider text-accent">{t("ajustesSeguridad.linkedAccounts.linkAction")}</span>
@@ -135,11 +162,27 @@ export default async function AjustesSeguridadPage({
         <h2 className="font-semibold mb-4 text-danger">{t("ajustesSeguridad.signOut.title")}</h2>
         <p className="text-sm text-muted mb-6">{t("ajustesSeguridad.signOut.description")}</p>
 
-        <form action={signOutAction}>
-          <button type="submit" className="rounded-xl border border-danger/50 text-danger hover:bg-danger hover:text-white px-6 py-2.5 font-semibold transition-all">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <ConfirmForm
+            action={signOutAction}
+            title="¿Cerrar sesión?"
+            message="Tendrás que volver a identificarte la próxima vez que entres a Paragon."
+            confirmLabel={t("ajustesSeguridad.signOut.button")}
+            triggerClassName="rounded-xl border border-danger/50 text-danger hover:bg-danger hover:text-white px-6 py-2.5 font-semibold transition-all inline-block"
+          >
             {t("ajustesSeguridad.signOut.button")}
-          </button>
-        </form>
+          </ConfirmForm>
+
+          <ConfirmForm
+            action={deleteAccountAction}
+            title="¿Eliminar cuenta definitivamente?"
+            message="Esta acción es IRREVERSIBLE. Se borrarán todos tus datos, perfiles, colecciones y progreso. Tu cuenta no se podrá recuperar."
+            confirmLabel="Eliminar cuenta"
+            triggerClassName="rounded-xl bg-danger text-white px-6 py-2.5 font-semibold transition-all inline-block hover:opacity-90"
+          >
+            Eliminar cuenta
+          </ConfirmForm>
+        </div>
       </section>
     </div>
   );

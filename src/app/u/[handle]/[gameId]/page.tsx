@@ -27,7 +27,8 @@ import { AvisoHitoReservado } from "@/components/AvisoHitoReservado";
 import { dificultadDeJuego } from "@/lib/difficulty";
 import { estimarEta } from "@/lib/eta";
 import { EtaPlatinoCard } from "@/components/EtaPlatino";
-import { HltbCard, AutoSyncHltb } from "@/components/HltbCard";
+import { HltbCard } from "@/components/HltbCard";
+import { AutoSyncHltb } from "@/components/AutoSyncHltb";
 import type { Trophy } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 import { CompartirImagen } from "@/components/CompartirImagen";
@@ -434,7 +435,7 @@ export default async function JuegoPage({
               {t("GameDetailPage.communityRatingHeading")}
             </h2>
             <Link
-              href={`/juego/${encodeURIComponent(game.id)}`}
+              href={`/juego/${encodeURIComponent(game.igdbId ?? game.id)}`}
               className="text-xs font-semibold text-accent hover:underline"
             >
               {t("GameDetailPage.viewAllStatsAndReviews")}

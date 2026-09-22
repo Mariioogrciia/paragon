@@ -10,12 +10,12 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-const platform = (process.argv[2] ?? "psn") as "psn" | "steam" | "xbox";
+const platform = (process.argv[2] ?? "psn") as "psn" | "steam" | "xbox" | "epic";
 const accountId = process.argv[3];
 
-if (!accountId || (platform !== "psn" && platform !== "steam" && platform !== "xbox")) {
+if (!accountId || (platform !== "psn" && platform !== "steam" && platform !== "xbox" && platform !== "epic")) {
   console.error(
-    "Uso: npx tsx scripts/probar-sync.mts <psn|steam|xbox> <accountId de PSN, SteamID64 o XUID de Xbox>",
+    "Uso: npx tsx scripts/probar-sync.mts <psn|steam|xbox|epic> <accountId de PSN, SteamID64, XUID de Xbox o epicAccountId>",
   );
   process.exit(1);
 }

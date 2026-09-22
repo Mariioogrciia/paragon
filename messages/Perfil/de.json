@@ -137,7 +137,8 @@
     "vacio": "Diesen Monat punktet noch niemand. Sei der Erste!",
     "colPos": "Platz",
     "colCazador": "Jäger",
-    "colPuntos": "Punkte"
+    "colPuntos": "Punkte",
+    "historialTitulo": "Champions der letzten Monate"
   },
   "LigaPage": {
     "meta": "Liga - Paragon",
@@ -157,6 +158,8 @@
     "invitacionTexto": "{nombre} hat dich zu dieser Liga eingeladen — nimm an, um die Rangliste zu sehen.",
     "alguien": "Jemand",
     "clasificacionDesde": "Rangliste seit der Erstellung — nur unter den Mitgliedern dieser Liga.",
+    "actividadTitulo": "Letzte Aktivität",
+    "actividadConsiguio": "hat {trofeo} freigeschaltet",
     "colPos": "Platz",
     "colCazador": "Jäger",
     "colPuntos": "Punkte",

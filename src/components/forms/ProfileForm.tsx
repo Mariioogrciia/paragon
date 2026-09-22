@@ -43,6 +43,7 @@ export function ProfileForm({
   juegos = [],
   favoritos = [],
   discordVinculado = false,
+  cuentasVinculadas = [],
 }: {
   user: ProfileFormUser;
   /** Nivel Paragon real del usuario — decide qué marcos puede elegir de
@@ -59,6 +60,8 @@ export function ProfileForm({
   favoritos?: string[];
   /** Si esta cuenta inició sesión con Discord alguna vez — sin esto el bot no tiene a quién escribir. */
   discordVinculado?: boolean;
+  /** Cuentas vinculadas que tienen avatar disponible, para poder elegirlo. */
+  cuentasVinculadas?: { platform: string; avatarUrl: string }[];
 }) {
   const t = useTranslations("Onboarding");
 
@@ -120,6 +123,30 @@ export function ProfileForm({
   const [timezone, setTimezone] = useState(inicial.timezone);
   const [sectionOrderJson, setSectionOrderJson] = useState(inicial.profileSectionOrder);
 
+  // Fuerza el remontado de `ProfileSectionOrderEditor` al restablecer: su
+  // orden es estado interno propio (arrastrable con framer-motion), sembrado
+  // una sola vez de `initialOrder` — cambiar `sectionOrderJson` desde fuera
+  // no reordena su UI, así que hace falta un `key` nuevo para que vuelva a
+  // arrancar desde el valor original.
+  const [resetKey, setResetKey] = useState(0);
+
+  function restablecer() {
+    setHandle(inicial.handle);
+    setFirstName(inicial.firstName);
+    setLastName(inicial.lastName);
+    setStatusText(inicial.statusText);
+    setProfileColor(inicial.profileColor);
+    setTheme(inicial.theme);
+    setLanguage(inicial.language);
+    setTimezone(inicial.timezone);
+    setSectionOrderJson(inicial.profileSectionOrder);
+    setTitulo(user.profileTitle ?? "");
+    setMarco(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
+    setFondoJuegoId(user.profileBackgroundGameId ?? "");
+    setBanner(user.profileBannerUrl);
+    setResetKey((k) => k + 1);
+  }
+
   const hayCambiosSinGuardar =
     handle !== inicial.handle ||
     firstName !== inicial.firstName ||
@@ -133,7 +160,8 @@ export function ProfileForm({
     titulo !== (user.profileTitle ?? "") ||
     marco !== (marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? "")) ||
     fondoJuegoId !== (user.profileBackgroundGameId ?? "") ||
-    banner !== user.profileBannerUrl;
+    banner !== user.profileBannerUrl ||
+    avatar !== user.image;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -197,10 +225,31 @@ export function ProfileForm({
             )}
           </div>
           <div>
-            <label className="cursor-pointer rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-medium text-white hover:bg-[#4752C4] transition-colors">
-              {isUploading ? t("profileForm.avatar.uploading") : t("profileForm.avatar.uploadButton")}
-              <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
-            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="cursor-pointer rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-medium text-white hover:bg-[#4752C4] transition-colors">
+                {isUploading ? t("profileForm.avatar.uploading") : t("profileForm.avatar.uploadButton")}
+                <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
+              </label>
+              
+              {cuentasVinculadas && cuentasVinculadas.length > 0 && (
+                <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+                  <span className="text-xs text-muted mr-1">O usa de:</span>
+                  {cuentasVinculadas.map((acc) => (
+                    <button
+                      key={acc.platform}
+                      type="button"
+                      onClick={() => setAvatar(acc.avatarUrl)}
+                      className={`h-8 w-8 overflow-hidden rounded-full border-2 transition-all hover:scale-110 ${
+                        avatar === acc.avatarUrl ? "border-accent" : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
+                      title={`Usar avatar de ${acc.platform}`}
+                    >
+                      <img src={acc.avatarUrl} alt={acc.platform} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <p className="mt-2 text-xs text-muted">{t("profileForm.avatar.hint")}</p>
           </div>
         </div>
@@ -232,8 +281,9 @@ export function ProfileForm({
         </div>
       </section>
 
-      <form action="/api/profile/update" method="POST" className="flex flex-col gap-8">
+      <form id="profile-form" action="/api/profile/update" method="POST" className="flex flex-col gap-8">
         <input type="hidden" name="profileBannerUrl" value={banner ?? ""} />
+        <input type="hidden" name="image" value={avatar ?? ""} />
         <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
           <h2 className="font-semibold mb-4">{t("profileForm.details.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -298,6 +348,33 @@ export function ProfileForm({
 
         <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
           <h2 className="font-semibold mb-4">{t("profileForm.visual.title")}</h2>
+
+          {/* Previsualización en vivo: marco, título y color se elegían en
+              desplegables sueltos sin ver cómo quedan juntos hasta guardar
+              y visitar tu propio perfil. Aquí se combinan los tres a la vez,
+              con los mismos valores de estado que ya alimentan el formulario
+              — no es una copia, es la misma fuente de verdad. */}
+          <div
+            className="mb-6 flex items-center gap-4 rounded-2xl p-4"
+            style={{ border: `1px solid ${profileColor}55`, background: `linear-gradient(135deg, ${profileColor}22, transparent)` }}
+          >
+            <div className="shrink-0">
+              <AvatarFrame frame={marco}>
+                <Avatar src={avatar} name={user.name ?? "?"} size={56} />
+              </AvatarFrame>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-heading text-base font-bold">{firstName || user.name || t("profileForm.visual.previewFallbackName")}</p>
+              <p className="truncate text-[0.8125rem] font-semibold" style={{ color: profileColor }}>
+                {titulo || t("profileForm.visual.previewFallbackTitle")}
+              </p>
+              {statusText && <p className="mt-0.5 truncate text-xs text-muted">{statusText}</p>}
+            </div>
+            <span className="shrink-0 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wide" style={{ border: "1px solid var(--border)", color: "var(--muted)" }}>
+              {t("profileForm.visual.previewLabel")}
+            </span>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.colorLabel")}</label>
@@ -319,9 +396,11 @@ export function ProfileForm({
                     un hueco fino abajo (el espacio de línea de base) — la foto
                     no llegaba a rellenar el círculo del marco. Avatar ya
                     centra con flex, igual que en el perfil público. */}
-                <AvatarFrame frame={marco}>
-                  <Avatar src={avatar} name={user.name ?? "?"} size={44} />
-                </AvatarFrame>
+                <div className="shrink-0">
+                  <AvatarFrame frame={marco}>
+                    <Avatar src={avatar} name={user.name ?? "?"} size={44} />
+                  </AvatarFrame>
+                </div>
                 <div className="min-w-0 flex-1">
                   <CustomSelect
                     name="profileFrame"
@@ -343,7 +422,7 @@ export function ProfileForm({
 
           <div className="mt-6">
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.sectionOrderLabel")}</label>
-            <ProfileSectionOrderEditor initialOrder={user.profileSectionOrder} onChange={setSectionOrderJson} />
+            <ProfileSectionOrderEditor key={resetKey} initialOrder={user.profileSectionOrder} onChange={setSectionOrderJson} />
           </div>
         </section>
 
@@ -376,17 +455,46 @@ export function ProfileForm({
           </div>
         </section>
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={!hayCambiosSinGuardar}
-            className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all enabled:hover:-translate-y-0.5 enabled:hover:shadow-[0_0_20px_rgb(var(--accent-rgb)_/_40%)] disabled:cursor-not-allowed disabled:opacity-40"
-            title={hayCambiosSinGuardar ? undefined : t("profileForm.noChanges")}
-          >
-            {t("profileForm.saveButton")}
-          </button>
-        </div>
       </form>
+
+      {/* Barra flotante: antes había que bajar hasta el final del formulario
+          (bastante largo) para encontrar el botón de guardar, sin ninguna
+          pista de que hubiera cambios sin guardar hasta llegar ahí. El
+          botón vive fuera del <form> (`form="profile-form"` lo asocia por
+          id) porque esta barra es hermana de todo lo demás, no descendiente
+          del formulario. */}
+      <div
+        aria-hidden={!hayCambiosSinGuardar}
+        className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-4 transition-all duration-300"
+        style={
+          hayCambiosSinGuardar
+            ? { opacity: 1, transform: "translateY(0)", pointerEvents: "auto" }
+            : { opacity: 0, transform: "translateY(16px)", pointerEvents: "none" }
+        }
+      >
+        <div
+          className="flex w-full max-w-2xl items-center justify-between gap-4 rounded-2xl px-5 py-3.5 shadow-2xl"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+        >
+          <p className="text-sm font-semibold text-foreground">{t("profileForm.unsavedChanges")}</p>
+          <div className="flex shrink-0 items-center gap-2.5">
+            <button
+              type="button"
+              onClick={restablecer}
+              className="rounded-xl px-4 py-2.5 text-sm font-semibold text-muted transition-colors hover:text-foreground"
+            >
+              {t("profileForm.resetButton")}
+            </button>
+            <button
+              type="submit"
+              form="profile-form"
+              className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgb(var(--accent-rgb)_/_40%)]"
+            >
+              {t("profileForm.saveButton")}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Fuera del <form> grande a propósito: son dos acciones de servidor
           propias (guardar/probar), y un <form> dentro de otro no es HTML

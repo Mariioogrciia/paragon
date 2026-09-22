@@ -137,7 +137,8 @@
     "vacio": "No hunters scoring this month yet. Be the first!",
     "colPos": "Rank",
     "colCazador": "Hunter",
-    "colPuntos": "Points"
+    "colPuntos": "Points",
+    "historialTitulo": "Champions of past months"
   },
   "LigaPage": {
     "meta": "League - Paragon",
@@ -157,6 +158,8 @@
     "invitacionTexto": "{nombre} invited you to this league — accept it to see the standings.",
     "alguien": "Someone",
     "clasificacionDesde": "Standings since it was created — only among this league's members.",
+    "actividadTitulo": "Recent activity",
+    "actividadConsiguio": "earned {trofeo}",
     "colPos": "Rank",
     "colCazador": "Hunter",
     "colPuntos": "Points",

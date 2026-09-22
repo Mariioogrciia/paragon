@@ -1,15 +1,224 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **21 de septiembre de
-2026** (continuación 21 — Claude Code, sesión larga: la app entera
-traducida a 4 idiomas, media docena de bugs reales de producción
-arreglados, la landing rehecha con datos reales, y un primer filtro de
-contenido ofensivo).
+releer todo el historial. Última actualización: **22-23 de septiembre de
+2026** (continuación 22 — Claude Code: Epic Games vuelve a ser vinculable
+de verdad, un fallo grave de seguridad real en Supabase (RLS) cerrado,
+varios bugs reales de emparejado con IGDB y de la ficha global arreglados,
+palmarés de ligas nuevo, y trabajo hecho EN PARALELO con Antigravity sobre
+los mismos archivos — con una colisión real de la que hay que saber).
+
+**IMPORTANTE para quien retome esto**: al terminar la sesión hay una
+cantidad enorme de cambios **sin commitear** (ver `git status`) — nadie
+pidió commitear durante la sesión, así que sigue todo en el árbol de
+trabajo. Antes de tocar nada, revisar bien qué hay antes de un
+`git add -A` a lo loco.
 
 ---
 
-## Sesión del 21 de septiembre de 2026 (continuación 21) — i18n completo, bugs reales de producción, landing con datos reales, filtro de contenido
+## Sesión del 22-23 de septiembre de 2026 (continuación 22) — Epic Games (de verdad), seguridad crítica en Supabase, IGDB, palmarés de ligas
+
+Sesión con temas muy distintos, la mayoría empezados por peticiones cortas
+del usuario que acabaron destapando problemas más gordos de lo que
+parecían. Resumen ejecutivo: **Epic Games vuelve a estar vinculable**
+(el intento anterior, vía OAuth, nunca leyó logros de nadie — este es un
+camino distinto, ya funcionando), se encontró y cerró un **agujero de
+seguridad real y grave** (31 de 32 tablas de la base expuestas sin
+restricción por la API pública de Supabase, incluida `account` con los
+tokens de Google/Discord), se arregló el emparejado automático con IGDB
+para bastantes más juegos de los que emparejaba antes, y se añadió un
+palmarés permanente de campeones de liga. Detalle de cada cosa abajo.
+
+### Epic Games Store: vinculable otra vez, con un camino nuevo de verdad
+
+El primer intento (commit `4102bc1`, retirado en `43226b0` el 11 de
+septiembre) era vía OAuth "Sign in with Epic" y nunca llegó a sincronizar
+nada real (`resolveEpic` devolvía `legible: false` siempre). Esta vez es
+un camino totalmente distinto: **lectura pública anónima por
+`epicAccountId`**, sin que el usuario autorice nada — el mismo GraphQL
+interno que usa la propia web de Epic (`store.epicgames.com/graphql`,
+"persisted queries" con hash SHA-256, no una API oficial ni documentada).
+
+El camino hasta que funcionó de verdad tuvo varias vueltas, todas
+comprobadas a mano contra la API real antes de dar nada por bueno:
+
+- **Primera trampa**: probar `fetch(url, {credentials:'omit'})` desde la
+  consola del propio navegador parecía demostrar que no hacía falta
+  sesión. Pero un `fetch` normal de Node (lo que usa un Server Action de
+  verdad) se lleva un 403 de Cloudflare (`cf-mitigated: challenge`) por su
+  huella TLS — un navegador real la pasa sin problema, Node no. Mover la
+  llamada al cliente tampoco vale: Epic no manda
+  `Access-Control-Allow-Origin`, así que el propio navegador del usuario
+  bloquearía la respuesta por CORS antes de llegar al código.
+- **La solución**: `got-scraping` (paquete de Apify), que imita la huella
+  TLS/HTTP2 de un navegador real. Nueva capa de riesgo, y hay que saberlo:
+  esto ya no es "leer un endpoint no documentado" (PSN/Xbox), es "esquivar
+  activamente la detección de bots" — si Cloudflare endurece, esto puede
+  romperse sin que cambie ni un hash.
+- **Un problema real de Next, no de Epic**: `got-scraping` (vía
+  `header-generator`) lee sus datos de huella de navegador del disco con
+  una ruta relativa a su propio `node_modules` — el bundler de Next lo
+  rompía (`ENOENT`). Arreglado con `serverExternalPackages: ["got-scraping"]`
+  en `next.config.ts`.
+- **Un bug real mío, no de infraestructura**: `playerProfilePrivate` (la
+  query que trae los logros) a pesar del nombre **no trae**
+  `epicAccountId`/`displayName`/`avatar` — eso sale de una query DISTINTA,
+  `playerProfile`. Confundir las dos hacía que CUALQUIER perfil saliera
+  como "no encontrado" aunque los logros estuvieran ahí mismo. Separado en
+  dos llamadas (`resolveProfile` en `lib/epic/client.ts`).
+- Un icono de GTA V salía como enlace de vídeo
+  (`com.epicgames.video://...`) en vez de imagen — `bestImage()` ahora
+  filtra por `url.startsWith("http")`.
+- **Limitación real de Epic, no arreglable**: Fortnite (y cualquier juego
+  con logros del sistema EOS en vez de la tienda EGS) no aparece ni en tu
+  propio perfil oficial de Epic — comprobado contra la web real. No es un
+  bug nuestro.
+
+Añadido: `src/lib/epic/client.ts` (cliente completo), `epic` de vuelta en
+`PlataformaVinculable` (lib/types.ts), enganchado en `sync.ts`/`profiles.ts`
+igual que Steam (sin desglose por metal, con `epicTrophyXp` para el nivel
+Paragon), formulario en Ajustes → Cuentas de Juegos, logo (`SiEpicgames` de
+react-icons), traducciones en los 4 idiomas.
+
+### Seguridad crítica: RLS desactivado en 31 de 32 tablas de Supabase
+
+El usuario recibió un aviso real de Supabase ("Table publicly accessible",
+"Sensitive data publicly accessible"). Comprobado en la base real: **31 de
+32 tablas** tenían Row-Level Security desactivado, incluida `account` (con
+`access_token`/`refresh_token` de Google y Discord) y `session` — cualquiera
+con la URL del proyecto podía leerlas por la API pública de Supabase
+(PostgREST), sin ninguna restricción.
+
+Antes de tocar nada se comprobó que la app no usa esa API para la base de
+datos (Drizzle va por conexión directa a Postgres; el único uso de
+`supabase-js` es Storage de avatares, con la clave de servicio, que ya
+salta cualquier RLS) — así que activar RLS no podía romper nada de la app.
+Se activó `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` en las 31 tablas, sin
+ninguna política (deniega todo a la API pública por defecto). Verificado
+`/` y `/ligas` respondiendo 200 con normalidad después.
+
+### IGDB: el emparejado automático fallaba mucho más de lo que se veía
+
+Encontrado al investigar por qué la ficha global de un juego (Xbox, Hollow
+Knight) salía pobre en vez de con la ficha rica de IGDB:
+
+- **Causa 1**: PSN/Xbox/Steam devuelven el título CON el subtítulo de
+  edición de la plataforma ("Hollow Knight: **Voidheart Edition**"), y el
+  `search` de IGDB da 0 resultados con eso puesto — a secas sí lo
+  encuentra. `searchGamesWithFallback` (lib/igdb/client.ts) ahora reintenta
+  sin el subtítulo (recorte por `:`/` - `).
+- **Causa 2, más rara**: el símbolo ®/™/© rompe igual la búsqueda —
+  "Call of Duty®" da 0 resultados, "Call of Duty" a secas lo encuentra.
+  Añadida como variante más a probar.
+- **Causa 3, la más sutil**: cuando varios resultados de IGDB comparten
+  título exacto, el código se quedaba con el primero SIN mirar cuál era el
+  bueno — para Hollow Knight, eso significaba coger un port no oficial de
+  PS Vita casi vacío (id 365702, sin historia ni casi nada) en vez del
+  juego real (id 14593, con toda la ficha). Arreglado con prioridad por
+  `category` de IGDB (0 = juego principal gana siempre a port/dlc/mod).
+- **La propia ficha global tenía un bug aparte**: el "Acerca de" solo
+  miraba `game.summary` (que SOLO se rellena cuando el juego no tiene
+  ninguna fila local — el caso raro), nunca `detalles.summary` (los datos
+  ricos de IGDB que la página YA pedía para las capturas/vídeos). Cualquier
+  juego vinculado desde una plataforma se quedaba sin resumen aunque IGDB
+  sí lo tuviera.
+- Reemparejados **94 juegos** contra la base real con la lógica nueva (dos
+  pasadas de `scripts/reintentar-igdb-sin-match.mts`, script nuevo,
+  reutilizable): 70 + 22 (con símbolo) encontraron/corrigieron su `igdbId`,
+  Hollow Knight incluido (cambió de sitio: era el port vacío, ahora es el
+  juego de verdad). Quedan ~15 sin match, casi todos porque no son "un
+  juego" (Minecraft Launcher, DCUO Trophies, capítulos de Dead by Daylight).
+- Bug aparte, encontrado al probar todo esto: `viewAllStatsAndReviews`
+  (`u/[handle]/[gameId]/page.tsx`) enlazaba con el id de plataforma
+  (`psn-123`) en vez de `game.igdbId` — llevaba a una ficha por plataforma
+  en vez de la global. Corregido.
+
+### Palmarés de ligas — y una colisión real con Antigravity
+
+El usuario pidió una vitrina de trofeos para el perfil; ya existía
+(`showcaseTrophies`, completa). Lo que de verdad faltaba, a petición
+propia del usuario: un **Palmarés permanente** — solo el GANADOR ABSOLUTO
+(no Top 3: "si casi cualquiera acaba con una copa, deja de significar
+nada") de la Liga Mensual global o de una Liga privada, con historial
+visible en `/ligas`.
+
+Nueva tabla `trophy_case_award` (userId, kind, rank, periodo, titulo,
+earnedAt — índice único `(userId, kind, periodo)` para que repetir la
+comprobación nunca duplique un premio). Reparto vía
+`cerrarLigaMensualSiToca()`/`cerrarLigasPrivadasVencidas()`
+(`lib/trophyCase.ts`), llamadas desde el PROPIO cron de sync que ya corre
+cada 15 min — a propósito, no un cron nuevo: son comprobaciones baratas e
+idempotentes, y el plan Hobby de Vercel no da crons ilimitados. Ícono
+propio (`TrophyTile` grado platino, no un emoji) en el perfil y en
+`/ligas`.
+
+**Colisión real a media sesión**: mientras se construía esto, Antigravity
+estaba construyendo LO MISMO en paralelo — tabla `championships`,
+componente `ProfilePalmares.tsx`, dos crons nuevos
+(`award-monthly-league`, `award-private-leagues`). Su versión no llegó a
+compilar (`championships` nunca se añadió a `schema.ts`) ni sus crons se
+registraron en `vercel.json`. El usuario decidió quedarse con la versión
+de Claude; se borró la de Antigravity entera. **Lección para la próxima
+sesión**: si algo tarda "demasiado poco" en aparecer ya construido, mirar
+`git status`/el archivo con calma antes de asumir que es tuyo — puede
+haber alguien más tocando el mismo sitio a la vez.
+
+De paso, otro bug real de Antigravity encontrado al arreglar el aviso de
+consola que reportó el usuario en `/ajustes/seguridad`: faltaba
+`accounts` en el import de `@/db/schema` en `actions.ts` (no compilaba en
+absoluto) y `unlinkAuthAccountAction` devolvía un `ActionState` con
+mensaje de error que el `ConfirmForm` que lo usa nunca muestra (es
+"disparar y olvidar", sin `useActionState`) — el aviso de "no puedes
+desvincular tu única cuenta" se habría perdido en silencio. Ajustado al
+mismo patrón que ya usa el desvincular de cuentas de plataforma
+(`Promise<void>`, sin mensaje).
+
+### Otros bugs reales encontrados y arreglados esta sesión
+
+- **`saludSincronizacion` reventaba la página entera de Ajustes →
+  Plataformas** (`operator does not exist: timestamp without time zone <
+  text`) — el driver de Postgres recibía los ISO strings de fecha como
+  `text` dentro de un `case when`, sin que Postgres sepa que van a
+  compararse con una columna de fecha. Arreglado con un `::timestamp`
+  explícito en el `case`. Esto bloqueaba a cualquiera de VER siquiera el
+  formulario de vincular Epic, no solo un aviso cosmético.
+- **`ProfileForm.tsx`**: sin barra flotante de guardado (había que bajar
+  hasta el final del formulario), sin previsualización en vivo del
+  marco/título/color elegidos, y el menú de Ajustes sin estado "activo".
+  Las tres arregladas (`AjustesNav.tsx` nuevo, barra flotante con
+  Restablecer/Guardar en `ProfileForm.tsx`, tarjeta de previsualización
+  combinando avatar+marco+título+color).
+- **Steam ahora da señal de "jugado en las últimas 2 semanas"**
+  (`playtime_2weeks`, no se usaba) — nueva columna
+  `userGames.playtimeRecentMinutes`, pintada como píldora en el carrusel
+  de "Jugado recientemente" del panel. Es lo único real que hay de
+  "actividad reciente": ninguna plataforma da sesiones con inicio/fin de
+  verdad (investigado a fondo antes de construir nada, para no inventar
+  datos).
+- **Ticker "en directo" de la landing** leía de la tabla `activities`
+  (tipo `"platinum"`) que nada inserta todavía — siempre saldría vacío.
+  Cambiado a leer de `userTrophies` (grado platino, ya conseguido), que sí
+  tiene datos reales.
+- **Ligas privadas**: nueva sección "Actividad reciente" en
+  `/ligas/[id]` — cualquier trofeo de cualquier miembro (no solo del reto
+  fijo), para que la liga se note viva entre foto semanal y foto semanal.
+
+### Nota sobre el entorno de pruebas: `tsx` + `"server-only"` da un falso positivo
+
+Descubierto varias veces esta sesión: ejecutar cualquier script con
+`npx tsx` que importe (aunque sea indirectamente) un archivo con
+`import "server-only";` revienta con "This module cannot be imported from
+a Client Component module" — un falso positivo de `tsx`, no un bug real
+(Next con su propio bundler no tiene este problema). No es cosa de esta
+sesión, ya pasaba antes (confirmado con `git stash` contra
+`scripts/probar-sync.mts` sin ningún cambio propio). Para probar contra la
+base real de todos modos: comentar la línea `import "server-only";` a
+mano en los archivos de la cadena de imports, correr el script, y
+restaurarla SIEMPRE después (nunca dejarla comentada). Alternativa más
+limpia cuando hace falta probar contra el servidor de Next de verdad (no
+un script suelto): crear una ruta temporal en `src/app/api/dev/...` que
+llame a la función en cuestión, pedirla con `curl`/el navegador, y
+borrarla en cuanto se confirme.
 
 Sesión muy larga con temas bien distintos. Resumen ejecutivo antes del
 detalle: **la plataforma entera es ahora multi-idioma (ES/EN/DE/FR)**,

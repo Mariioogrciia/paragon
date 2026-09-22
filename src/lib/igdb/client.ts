@@ -135,6 +135,13 @@ interface IgdbGame {
   summary?: string;
   age_ratings?: { organization?: number; rating_category?: number }[];
   alternative_names?: { name: string }[];
+  /**
+   * 0 = juego principal; el resto son variantes (1 dlc, 2 expansión, 8
+   * remake, 9 remaster, 11 port...) — ver el comentario de
+   * `searchGamesWithFallback` más abajo, es lo que evita quedarse con un
+   * port suelto cuando hay varias entradas con el mismo nombre.
+   */
+  category?: number;
 }
 
 /**
@@ -187,6 +194,8 @@ export interface IgdbGameResult {
   /** Nota media en IGDB (0-100), cuando ya hay votos. */
   rating?: number;
   pegi?: string;
+  /** Ver el comentario del mismo campo en `IgdbGame`. */
+  category?: number;
 }
 
 /**
@@ -271,13 +280,14 @@ function formatGame(g: IgdbGame): IgdbGameResult {
     publisher: g.involved_companies?.find((c) => c.publisher)?.company.name,
     summary: g.summary,
     pegi,
+    category: g.category,
   };
 }
 
 const FIELDS =
   "fields name, cover.image_id, first_release_date, release_dates.date, release_dates.human, " +
   "platforms.abbreviation, platforms.name, genres.name, involved_companies.company.name, " +
-  "involved_companies.developer, involved_companies.publisher, summary, age_ratings.organization, age_ratings.rating_category;";
+  "involved_companies.developer, involved_companies.publisher, summary, age_ratings.organization, age_ratings.rating_category, category;";
 
 /**
  * Filtro `platforms.abbreviation = (...)` de APIcalypse, para las páginas de
@@ -399,6 +409,90 @@ export async function searchGames(title: string, limit = 12): Promise<IgdbGameRe
     300,
   );
   return games.map(formatGame);
+}
+
+/**
+ * Prioridad de `category` de IGDB para desempatar cuando varios resultados
+ * comparten el nombre — el juego principal siempre gana, y una remasterización
+ * o edición ampliada (que sí tienen ficha propia con datos ricos) le siguen.
+ * Todo lo demás (dlc, port, mod, episodio...) es sospechoso de ser una
+ * entrada satélite casi vacía, como el port de PS Vita que se coló para
+ * "Hollow Knight" (id 365702, sin storyline ni casi nada, mientras el juego
+ * de verdad es el id 14593) — comprobado a mano el 22 de septiembre de 2026.
+ * `undefined` (IGDB no siempre manda `category`) se trata como si fuera el
+ * juego principal, no como sospechoso.
+ */
+const CATEGORIA_PRIORIDAD: Record<number, number> = {
+  0: 0, // main_game
+  8: 1, // remake
+  9: 1, // remaster
+  10: 1, // expanded_game
+};
+
+function prioridadDe(g: IgdbGameResult): number {
+  if (g.category === undefined) return 0;
+  return CATEGORIA_PRIORIDAD[g.category] ?? 2;
+}
+
+/** Orden estable: solo reordena por prioridad, nunca deshace el orden de relevancia que ya trae IGDB dentro de un mismo grupo. */
+function porPrioridad(resultados: IgdbGameResult[]): IgdbGameResult[] {
+  return resultados
+    .map((r, i) => ({ r, i }))
+    .sort((a, b) => prioridadDe(a.r) - prioridadDe(b.r) || a.i - b.i)
+    .map(({ r }) => r);
+}
+
+/**
+ * Variantes del título a probar, de la más específica a la más limpia —
+ * cada una solo se intenta si la anterior no encontró nada.
+ *
+ * 1. El título tal cual.
+ * 2. Sin el subtítulo de edición de la plataforma ("Hollow Knight:
+ *    Voidheart Edition" -> "Hollow Knight", "Grand Theft Auto V Enhanced"
+ *    ya no tiene ":"/" - " así que se queda igual en este paso).
+ * 3. Sin los símbolos ®/™/© — el `search` de IGDB los trata como
+ *    caracteres de verdad, no como decoración: "Call of Duty®" o
+ *    "Rainbow Six® Siege" dan 0 resultados con el símbolo puesto y lo
+ *    encuentran a la primera sin él, comprobado a mano el 23 de septiembre
+ *    de 2026 contra la API real.
+ * 4. Las dos limpiezas a la vez, para títulos como "Tom Clancy's Rainbow
+ *    Six® Siege" que necesitan ambas.
+ *
+ * Cada variante solo se guarda si de verdad recorta algo — así nunca se
+ * repite la misma búsqueda dos veces.
+ */
+function variantesDe(title: string): string[] {
+  const sinEdicion = title.split(/:| - /)[0].trim();
+  const sinSimbolos = title.replace(/[®™©]/g, "").replace(/\s+/g, " ").trim();
+  const sinNinguno = sinEdicion.replace(/[®™©]/g, "").replace(/\s+/g, " ").trim();
+
+  const variantes = [title, sinEdicion, sinSimbolos, sinNinguno];
+  return [...new Set(variantes.filter((v) => v.length > 0))];
+}
+
+/**
+ * Como `searchGames`, pero reintentando con variantes más limpias del
+ * título si la primera búsqueda no encuentra nada — para el emparejado
+ * automático (`syncIgdbMetadata`/`syncStoreMetadata` en lib/sync.ts), no
+ * para el buscador manual. Ver `variantesDe` para el motivo de cada una.
+ *
+ * Sin esto, cualquier juego con "Edition"/"Enhanced"/"Remastered" o un
+ * símbolo ®/™/© en el nombre se queda con `igdbId: null` para siempre, y
+ * por eso cae en la ficha por-plataforma en vez de la global (ver
+ * `getGlobalGame` en lib/community.ts).
+ */
+export async function searchGamesWithFallback(title: string, limit = 1): Promise<IgdbGameResult[]> {
+  // Se pide más de lo que se va a devolver (`limit`) a propósito: hace falta
+  // ver varios candidatos para poder descartar los que sean port/dlc/mod
+  // cuando el juego de verdad también está en la lista.
+  const CANDIDATOS = Math.max(limit, 8);
+
+  for (const variante of variantesDe(title)) {
+    const resultados = await searchGames(variante, CANDIDATOS);
+    if (resultados.length > 0) return porPrioridad(resultados).slice(0, limit);
+  }
+
+  return [];
 }
 
 /** Un juego concreto por su id de IGDB, para cuando ya se ha elegido en el buscador. */

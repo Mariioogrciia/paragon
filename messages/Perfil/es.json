@@ -137,7 +137,8 @@
     "vacio": "Aún no hay cazadores puntuando este mes. ¡Sé el primero!",
     "colPos": "Pos",
     "colCazador": "Cazador",
-    "colPuntos": "Puntos"
+    "colPuntos": "Puntos",
+    "historialTitulo": "Campeones de meses anteriores"
   },
   "LigaPage": {
     "meta": "Liga - Paragon",
@@ -157,6 +158,8 @@
     "invitacionTexto": "{nombre} te ha invitado a esta liga — acéptala para ver la clasificación.",
     "alguien": "Alguien",
     "clasificacionDesde": "Clasificación desde que se creó — solo entre los miembros de esta liga.",
+    "actividadTitulo": "Actividad reciente",
+    "actividadConsiguio": "consiguió {trofeo}",
     "colPos": "Pos",
     "colCazador": "Cazador",
     "colPuntos": "Puntos",

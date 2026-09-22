@@ -5,6 +5,7 @@ import { and, desc, eq, gte, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { db } from "@/db";
 import {
+  activities,
   friendships,
   gameTrophies,
   games as gamesTable,
@@ -17,10 +18,12 @@ import {
 import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
+import * as epic from "@/lib/epic/client";
 import { PsnProfileNotFoundError } from "@/lib/psn/client";
 import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
 import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
+import { EpicPrivateProfileError, EpicProfileNotFoundError } from "@/lib/epic/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
@@ -421,6 +424,56 @@ export const getRarestTrophiesThisWeek = unstable_cache(
   { revalidate: 300 },
 );
 
+export interface RecentPlatinum {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  gameTitle: string;
+  /** `Date` en tiempo de ejecución de la query, pero llega serializado a string tras pasar por `unstable_cache`. */
+  createdAt: Date | string;
+}
+
+/**
+ * Los últimos trofeos de platino conseguidos en toda la plataforma (de
+ * cualquier usuario, no solo amigos) — para el ticker "en directo" de la
+ * landing. Va directo a `userTrophies` (grado platino, ya conseguido) en
+ * vez de a `activities`: ese tipo "platinum" está en el esquema pero nada
+ * lo inserta todavía, así que siempre saldría vacío.
+ */
+export const getRecentPlatinumActivity = unstable_cache(
+  async (limit: number): Promise<RecentPlatinum[]> => {
+    const rows = await db
+      .select({
+        userId: users.id,
+        handle: users.handle,
+        name: users.name,
+        gameTitle: gamesTable.title,
+        createdAt: userTrophies.earnedAt,
+      })
+      .from(userTrophies)
+      .innerJoin(users, eq(users.id, userTrophies.userId))
+      .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+      .innerJoin(
+        gameTrophies,
+        and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+      )
+      .where(
+        and(
+          eq(userTrophies.earned, true),
+          eq(gameTrophies.grade, "platinum"),
+          isNotNull(users.handle),
+          isNotNull(userTrophies.earnedAt),
+        ),
+      )
+      .orderBy(desc(userTrophies.earnedAt))
+      .limit(limit);
+
+    return rows.map((r) => ({ ...r, createdAt: r.createdAt! }));
+  },
+  ["recent-platinum-activity"],
+  { revalidate: 60 },
+);
+
 export interface TopHunter {
   userId: string;
   handle: string | null;
@@ -525,6 +578,9 @@ export async function linkAccount(
     case "xbox":
       resolved = await resolveXbox(input);
       break;
+    case "epic":
+      resolved = await resolveEpic(input);
+      break;
   }
 
   try {
@@ -623,6 +679,24 @@ async function resolveXbox(input: string): Promise<Resolved> {
     level: null,
     avatarUrl: profile.avatarUrl ?? null,
     legible: await xbl.canReadAchievements(profile.xuid),
+  };
+}
+
+/**
+ * Epic Games — lectura pública sin credencial del servidor, ver
+ * lib/epic/client.ts. `legible` sale directo de `isPublic`: a diferencia de
+ * Steam (perfil + "detalles del juego" son dos ajustes), aquí es un único
+ * nivel de privacidad el que decide si se puede leer.
+ */
+async function resolveEpic(input: string): Promise<Resolved> {
+  const profile = await epic.resolveProfile(input);
+
+  return {
+    accountId: profile.epicAccountId,
+    username: profile.displayName,
+    level: null,
+    avatarUrl: profile.avatarUrl ?? null,
+    legible: profile.isPublic,
   };
 }
 
@@ -796,6 +870,9 @@ export function describePlatformError(error: unknown): string {
   if (error instanceof XblNotConfiguredError) return error.message;
   if (error instanceof XblProfileNotFoundError) return error.message;
 
+  if (error instanceof EpicProfileNotFoundError) return error.message;
+  if (error instanceof EpicPrivateProfileError) return error.message;
+
   if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
 
   return "No se ha podido contactar con la plataforma. Inténtalo en un momento.";
@@ -916,6 +993,7 @@ export const getLibrary = cache(
       progressPercent: userGames.progressPercent,
       lastPlayedAt: userGames.lastPlayedAt,
       playtimeMinutes: userGames.playtimeMinutes,
+      playtimeRecentMinutes: userGames.playtimeRecentMinutes,
       rating: userGames.rating,
       review: userGames.review,
       reviewDate: userGames.reviewDate,
@@ -1015,6 +1093,28 @@ export const getLibrary = cache(
     xboxXpPorJuego.set(t.gameId, (xboxXpPorJuego.get(t.gameId) ?? 0) + trophyScore({ platform: "xbox", xp: t.xp }));
   }
 
+  // Mismo motivo que Xbox: Epic también da XP real por logro.
+  const epicTrofeosGanados = await db
+    .select({ gameId: userTrophies.gameId, xp: gameTrophies.xp })
+    .from(userTrophies)
+    .innerJoin(gamesTable, eq(gamesTable.id, userTrophies.gameId))
+    .innerJoin(
+      gameTrophies,
+      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+    )
+    .where(
+      and(
+        eq(userTrophies.userId, profile.userId),
+        eq(userTrophies.earned, true),
+        eq(gamesTable.platform, "epic"),
+      ),
+    );
+
+  const epicXpPorJuego = new Map<string, number>();
+  for (const t of epicTrofeosGanados) {
+    epicXpPorJuego.set(t.gameId, (epicXpPorJuego.get(t.gameId) ?? 0) + trophyScore({ platform: "epic", xp: t.xp }));
+  }
+
   const games: Game[] = rows.map((r) => ({
     id: r.id,
     platform: r.platform,
@@ -1029,6 +1129,7 @@ export const getLibrary = cache(
     progressPercent: r.progressPercent,
     lastPlayedAt: r.lastPlayedAt?.toISOString(),
     playtimeMinutes: r.playtimeMinutes ?? undefined,
+    playtimeRecentMinutes: r.playtimeRecentMinutes ?? undefined,
     developer: r.developer ?? undefined,
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,
@@ -1037,6 +1138,7 @@ export const getLibrary = cache(
     platinumRarity: r.platinumRarity ?? undefined,
     steamTrophyXp: steamXpPorJuego.get(r.id),
     xboxTrophyXp: xboxXpPorJuego.get(r.id),
+    epicTrophyXp: epicXpPorJuego.get(r.id),
     rating: r.rating ?? undefined,
     review: r.review ?? undefined,
     reviewDate: r.reviewDate?.toISOString() ?? undefined,

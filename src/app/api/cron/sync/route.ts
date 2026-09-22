@@ -6,6 +6,7 @@ import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
 import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
 import { HORAS_CADUCIDAD, HORAS_CADUCIDAD_XBOX } from "@/lib/syncHealth";
+import { cerrarLigaMensualSiToca, cerrarLigasPrivadasVencidas } from "@/lib/trophyCase";
 
 /**
  * Sincronización desatendida.
@@ -359,12 +360,29 @@ export async function GET(request: Request) {
     console.error("[cron-sync] limpieza sync_run", error);
   }
 
+  // Palmarés: cerrar el mes que acaba de terminar y las ligas privadas
+  // vencidas. Ver el comentario grande al principio de lib/trophyCase.ts —
+  // se hace aquí, no en un cron aparte, porque son comprobaciones baratas e
+  // idempotentes (el índice único hace que repetirlas de más no duplique
+  // nada) y el plan Hobby de Vercel no da crons ilimitados. Va siempre,
+  // incluso con `agotado`: no toca ninguna API externa, solo la propia base.
+  let premiosLigaMensual = 0;
+  let premiosLigasPrivadas = 0;
+  try {
+    premiosLigaMensual = await cerrarLigaMensualSiToca();
+    premiosLigasPrivadas = await cerrarLigasPrivadasVencidas();
+  } catch (error) {
+    console.error("[cron-sync] palmarés", error);
+  }
+
   return NextResponse.json({
     sincronizados: resultados.filter((r) => r.error === undefined).length,
     fallidos: resultados.filter((r) => r.error !== undefined).length,
     fichasRellenadas: detalles,
     clasificacionesPegi: clasificados,
     syncRunBorrados: borrados,
+    premiosLigaMensual,
+    premiosLigasPrivadas,
     pendientesPorTiempo: agotado,
     segundos: Math.round((Date.now() - arranque) / 1000),
     resultados,

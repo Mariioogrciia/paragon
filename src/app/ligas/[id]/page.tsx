@@ -9,7 +9,9 @@ import { BackButton } from "@/components/BackButton";
 import { AddLeagueMemberForm, SetLeagueChallengeForm } from "@/components/forms/Forms";
 import { removeLeagueMemberAction, deleteLeagueAction, acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { TrophyPhoto } from "@/components/TrophyList";
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
+import { relativeDate } from "@/lib/design";
 
 export const metadata = {
   title: "Liga - Paragon",
@@ -211,6 +213,36 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
           </tbody>
         </table>
       </div>
+
+      {/* Entre foto semanal y foto semanal (el `movimiento` de arriba) la
+          liga no tenía ninguna señal de vida — solo un número de puntos que
+          cambiaba una vez a la semana. Esto es cualquier trofeo de
+          cualquier miembro, no solo del reto fijo de abajo. */}
+      {league.recentTrophies.length > 0 && (
+        <div className="mb-10">
+          <h2 className="font-heading text-xl font-bold mb-4">{t("LigaPage.actividadTitulo")}</h2>
+          <div className="flex flex-col gap-2">
+            {league.recentTrophies.map((tr, i) => (
+              <div
+                key={`${tr.userId}-${tr.gameId}-${tr.trophyName}-${i}`}
+                className="flex items-center gap-3 rounded-xl p-3 border border-border bg-surface"
+              >
+                <Avatar src={tr.image} name={tr.name ?? tr.handle ?? "?"} size={32} />
+                <TrophyPhoto trophy={{ iconUrl: tr.trophyIconUrl, grade: tr.grade }} size={32} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm">
+                    <span className="font-bold">{tr.name ?? tr.handle ?? t("LigaPage.alguien")}</span>
+                    {" "}
+                    {t("LigaPage.actividadConsiguio", { trofeo: tr.trophyName })}
+                  </p>
+                  <p className="truncate text-xs text-muted">{tr.gameTitle}</p>
+                </div>
+                <span className="shrink-0 text-xs text-muted">{relativeDate(tr.earnedAt)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {isOwner && league.pendingMembers.length > 0 && (
         <div className="mb-10">

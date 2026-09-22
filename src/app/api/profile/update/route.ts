@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     const profileTitle = formData.get("profileTitle") as string | null;
     const profileBackgroundGameId = formData.get("profileBackgroundGameId") as string | null;
     const profileBannerUrl = formData.get("profileBannerUrl") as string | null;
+    const image = formData.get("image") as string | null;
     const profileColor = formData.get("profileColor") as string | null;
     const profileFrameSolicitado = formData.get("profileFrame") as string | null;
     const statusText = formData.get("statusText") as string | null;
@@ -75,6 +76,8 @@ export async function POST(request: Request) {
       profileTitle: profileTitle?.trim().slice(0, 60) || null,
       profileBackgroundGameId: profileBackgroundGameId?.trim() || null,
       profileBannerUrl: profileBannerUrl?.trim() || null,
+      image: image?.trim() || null,
+      ...(image?.trim() ? { avatarPersonalizado: true } : {}),
       profileColor: profileColor?.trim() || null,
       profileFrame,
       statusText: statusText?.trim().slice(0, 100) || null,

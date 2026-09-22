@@ -36,7 +36,8 @@
     "help": {
       "psn": "Your public PlayStation ID, the name you play under. Your trophy profile needs to be public for us to read it.",
       "steam": "Your Steam username, your SteamID64, or your profile URL. On Steam, both \"My Profile\" and \"Game Details\" need to be public.",
-      "xbox": "Your Xbox Gamertag. Syncs your real achievement history via a third-party service (not official from Microsoft) — it can fail or stop working if that service changes."
+      "xbox": "Your Xbox Gamertag. Syncs your real achievement history via a third-party service (not official from Microsoft) — it can fail or stop working if that service changes.",
+      "epic": "The link to your Epic Games profile (or your account ID). It needs to be set to \"Public\" — this isn't an official Epic API, so it can fail or stop working if Epic changes their site."
     },
     "linked": "Linked",
     "private": "Private",
@@ -85,6 +86,11 @@
       "linkWith": "Link with {provider}",
       "linkAction": "Link"
     },
+    "confirmUnlink": {
+      "title": "Unlink {provider}?",
+      "message": "You'll no longer be able to log in to Paragon with this account. If it's the only way left to log in, you won't be able to undo this without linking it again.",
+      "confirmLabel": "Yes, unlink"
+    },
     "export": {
       "title": "Your legacy (Export data)",
       "description": "Download a full copy of your history on the platform in JSON format. Includes your games, trophies earned, reviews, folders, guides created and your sync history. Does not include passwords or tokens.",
@@ -119,6 +125,11 @@
     },
     "xbox": {
       "placeholder": "Your Xbox Gamertag",
+      "update": "Update",
+      "link": "Link"
+    },
+    "epic": {
+      "placeholder": "Link to your Epic Games profile",
       "update": "Update",
       "link": "Link"
     },
@@ -205,6 +216,9 @@
       "themeHint": "How your profile looks to visitors — it doesn't change yours.",
       "frameLabel": "Avatar frame",
       "frameHint": "You're at level {nivel}. Locked frames are discarded even if you pick them.",
+      "previewLabel": "Preview",
+      "previewFallbackName": "Your name",
+      "previewFallbackTitle": "No title yet",
       "bannerLabel": "Platform banner",
       "bannerHint": "Paragon's own artwork, no photos with rights involved. Replaces what you upload above; uploading a new file again overrides it.",
       "sectionOrderLabel": "Section order"
@@ -216,6 +230,8 @@
     },
     "saveButton": "Save changes",
     "noChanges": "No unsaved changes",
+    "unsavedChanges": "You have unsaved changes",
+    "resetButton": "Reset",
     "discordTitle": "Discord",
     "pushTitle": "Browser notifications",
     "frames": {
@@ -275,7 +291,8 @@
     "title": {
       "psn": "Where do I make my PSN profile public?",
       "steam": "Where do I make my Steam profile public?",
-      "xbox": "Where do I make my Xbox history public?"
+      "xbox": "Where do I make my Xbox history public?",
+      "epic": "Where do I make my Epic Games profile public?"
     },
     "steps": {
       "psn": [
@@ -294,6 +311,11 @@
         "On the console or in the Xbox app: your profile → \"Online safety & privacy\" → \"View details & customize\".",
         "Find \"Game history and compare\" (or \"Share content\") and set it to \"Everyone\".",
         "Xbox uses an unofficial third-party service (OpenXBL) to read this — if your profile is already public and it's still not working, it's not your setting, try again later."
+      ],
+      "epic": [
+        "In the Epic Games Store (web or launcher): click your avatar top right → \"My Achievements\".",
+        "Top right of your achievements page, click \"Privacy Level\" and choose \"Public\".",
+        "Copy the link from that same page (it ends in /u/ followed by a code) and paste it here."
       ]
     }
   },
@@ -319,7 +341,7 @@
     "nintendo": "Nintendo",
     "nintendoNote": "Switch games are registered manually in your library — Discover doesn't have its own section for them yet (in development).",
     "epicGames": "Epic Games",
-    "epicGamesNote": "It can no longer be linked on Paragon (it never had real syncing) — and there's no public news source or catalog either: its site blocks even its own official RSS feed.",
+    "epicGamesNote": "Already linkable from Settings → Game Accounts. There's no public news source or catalog yet: its site blocks even its own official RSS feed.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "It can no longer be linked on Paragon (it never had real syncing) — and it has no public news feed either: its site doesn't expose RSS."
   }

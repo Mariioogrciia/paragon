@@ -4,6 +4,13 @@ import type { NextConfig } from "next";
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  // `got-scraping` (lib/epic/client.ts) lee sus datos de huella de navegador
+  // (headers-order.json y similares) del disco con una ruta relativa a su
+  // propio `node_modules` en tiempo de ejecución. Si Next lo empaqueta con
+  // el resto del bundle (lo de siempre), esa ruta deja de existir y revienta
+  // con ENOENT — comprobado a mano el 22 de septiembre de 2026. Con esto se
+  // deja fuera del bundle y se resuelve tal cual desde `node_modules`.
+  serverExternalPackages: ["got-scraping"],
   async redirects() {
     return [
       {

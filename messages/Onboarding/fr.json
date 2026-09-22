@@ -36,7 +36,8 @@
     "help": {
       "psn": "Ton identifiant public PlayStation, le nom sous lequel tu joues. Ton profil de trophées doit être public pour qu'on puisse le lire.",
       "steam": "Ton pseudo Steam, ton SteamID64 ou l'URL de ton profil. Sur Steam, « Mon profil » et « Détails du jeu » doivent être publics.",
-      "xbox": "Ton Gamertag Xbox. Synchronise réellement ton historique de succès via un service tiers (non officiel de Microsoft) — peut échouer ou cesser de fonctionner si ce service change."
+      "xbox": "Ton Gamertag Xbox. Synchronise réellement ton historique de succès via un service tiers (non officiel de Microsoft) — peut échouer ou cesser de fonctionner si ce service change.",
+      "epic": "Le lien vers ton profil Epic Games (ou ton ID de compte). Il doit être en « Public » — ce n'est pas une API officielle d'Epic, donc ça peut échouer ou cesser de fonctionner si Epic change son site."
     },
     "linked": "Relié",
     "private": "Privé",
@@ -85,6 +86,11 @@
       "linkWith": "Relier avec {provider}",
       "linkAction": "Relier"
     },
+    "confirmUnlink": {
+      "title": "Délier {provider} ?",
+      "message": "Tu ne pourras plus te connecter à Paragon avec ce compte. Si c'est le seul moyen de connexion qui te reste, tu ne pourras pas annuler sans le relier à nouveau.",
+      "confirmLabel": "Oui, délier"
+    },
     "export": {
       "title": "Ton héritage (Exporter les données)",
       "description": "Télécharge une copie complète de ton historique sur la plateforme au format JSON. Inclut tes jeux, trophées obtenus, avis, dossiers, guides créés et ton historique de synchronisation. N'inclut ni mots de passe ni jetons.",
@@ -119,6 +125,11 @@
     },
     "xbox": {
       "placeholder": "Ton Gamertag Xbox",
+      "update": "Mettre à jour",
+      "link": "Relier"
+    },
+    "epic": {
+      "placeholder": "Lien vers ton profil Epic Games",
       "update": "Mettre à jour",
       "link": "Relier"
     },
@@ -205,6 +216,9 @@
       "themeHint": "L'apparence de ton profil pour les visiteurs — ça ne change pas le tien.",
       "frameLabel": "Cadre de l'avatar",
       "frameHint": "Tu es au niveau {nivel}. Les cadres verrouillés sont ignorés même si tu les choisis.",
+      "previewLabel": "Aperçu",
+      "previewFallbackName": "Ton nom",
+      "previewFallbackTitle": "Pas encore de titre",
       "bannerLabel": "Bannière par plateforme",
       "bannerHint": "Illustrations propres à Paragon, sans photos soumises à des droits. Remplace ce que tu téléverses au-dessus ; téléverser un nouveau fichier le remplace à nouveau.",
       "sectionOrderLabel": "Ordre des sections"
@@ -216,6 +230,8 @@
     },
     "saveButton": "Enregistrer les modifications",
     "noChanges": "Aucune modification non enregistrée",
+    "unsavedChanges": "Tu as des modifications non enregistrées",
+    "resetButton": "Réinitialiser",
     "discordTitle": "Discord",
     "pushTitle": "Notifications du navigateur",
     "frames": {
@@ -275,7 +291,8 @@
     "title": {
       "psn": "Où rendre mon profil PSN public ?",
       "steam": "Où rendre mon profil Steam public ?",
-      "xbox": "Où rendre mon historique Xbox public ?"
+      "xbox": "Où rendre mon historique Xbox public ?",
+      "epic": "Où rendre mon profil Epic Games public ?"
     },
     "steps": {
       "psn": [
@@ -294,6 +311,11 @@
         "Sur la console ou dans l'app Xbox : ton profil → « Sécurité et confidentialité en ligne » → « Afficher les détails et personnaliser ».",
         "Cherche « Historique de jeu et statistiques » (ou « Partager le contenu ») et mets-le sur « Tout le monde ».",
         "Xbox utilise un service tiers non officiel (OpenXBL) pour lire ceci — si ton profil est déjà public et que ça ne marche toujours pas, ce n'est pas ton réglage, réessaie plus tard."
+      ],
+      "epic": [
+        "Dans l'Epic Games Store (web ou launcher) : clique sur ton avatar en haut à droite → « Mes succès ».",
+        "En haut à droite de ta page de succès, clique sur « Niveau de confidentialité » et choisis « Public ».",
+        "Copie le lien de cette même page (il se termine par /u/ suivi d'un code) et colle-le ici."
       ]
     }
   },
@@ -319,7 +341,7 @@
     "nintendo": "Nintendo",
     "nintendoNote": "Les jeux Switch sont enregistrés manuellement dans ta bibliothèque — Découvrir n'a pas encore de section dédiée pour eux (en développement).",
     "epicGames": "Epic Games",
-    "epicGamesNote": "Ne peut plus être relié sur Paragon (n'a jamais eu de vraie synchronisation) — et il n'y a aucune source d'actualités ou de catalogue public non plus : son site bloque même son propre flux RSS officiel.",
+    "epicGamesNote": "Déjà reliable depuis Paramètres → Comptes de jeu. Il n'y a aucune source d'actualités ou de catalogue public pour l'instant : son site bloque même son propre flux RSS officiel.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "Ne peut plus être relié sur Paragon (n'a jamais eu de vraie synchronisation) — et n'a pas non plus de flux d'actualités public : son site n'expose pas de RSS."
   }

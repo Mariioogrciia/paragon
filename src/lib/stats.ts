@@ -50,7 +50,9 @@ export function esPlatinoEquivalente(
   game: Pick<Game, "earned" | "platform" | "progressPercent">,
 ): boolean {
   if ((game.earned?.platinum ?? 0) > 0) return true;
-  return game.platform === "steam" && game.progressPercent === 100;
+  // Steam y Epic no tienen trofeo de platino propio: el 100% de sus logros
+  // es lo más parecido que hay.
+  return (game.platform === "steam" || game.platform === "epic") && game.progressPercent === 100;
 }
 
 export function gameProgress(game: Game): GameProgress {

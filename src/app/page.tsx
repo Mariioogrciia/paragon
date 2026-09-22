@@ -7,7 +7,7 @@ import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
-import { getLibrary, getProfileByUserId, getGlobalStats, getTopHunters, getRarestTrophiesThisWeek } from "@/lib/profiles";
+import { getLibrary, getProfileByUserId, getGlobalStats, getTopHunters, getRarestTrophiesThisWeek, getRecentPlatinumActivity } from "@/lib/profiles";
 import { Avatar } from "@/components/Avatar";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { gameProgress, summarise } from "@/lib/stats";
@@ -32,7 +32,8 @@ import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { CardBuilder } from "@/components/CardBuilder";
-import { PlayStationLogo, SteamLogo, XboxLogo } from "@/components/ui/PlatformLogos";
+import { PlayStationLogo, SteamLogo, XboxLogo, EpicGamesLogo } from "@/components/ui/PlatformLogos";
+import { LandingThemeSwitcher } from "@/components/LandingThemeSwitcher";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -58,10 +59,19 @@ const SAMPLE_SHELF = [
 
 const FEATURE_KEYS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 
+function haceTiempo(date: Date | string): string {
+  const minutos = Math.max(1, Math.round((Date.now() - new Date(date).getTime()) / 60_000));
+  if (minutos < 60) return `hace ${minutos} min`;
+  const horas = Math.round(minutos / 60);
+  if (horas < 24) return `hace ${horas} h`;
+  return `hace ${Math.round(horas / 24)} d`;
+}
+
 async function Landing() {
   const globalStats = await getGlobalStats();
   const topHunters = await getTopHunters(5);
   const rareTrophies = await getRarestTrophiesThisWeek(6);
+  const recentPlatinums = await getRecentPlatinumActivity(10);
   const t = await getTranslations("Shell.Home");
 
   const FEATURES = FEATURE_KEYS.map((key, i) => ({
@@ -84,6 +94,7 @@ async function Landing() {
               <PlayStationLogo width={13} height={13} aria-label="PlayStation" />
               <SteamLogo width={13} height={13} aria-label="Steam" />
               <XboxLogo width={13} height={13} aria-label="Xbox" />
+              <EpicGamesLogo width={13} height={13} aria-label="Epic Games" />
             </span>
           </span>
 
@@ -138,23 +149,37 @@ async function Landing() {
             </span>
             {t("soloIdPublico")}
           </p>
+          <p className="mt-2 flex items-center gap-2 text-[0.8125rem] text-muted">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-good/15 text-good">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 1 0 0-5C9 2 12 7 12 7z"></path></svg>
+            </span>
+            {t("gratisSinLimite")}
+          </p>
         </div>
 
         <div
           className="relative rounded-[20px] p-[26px]"
           style={{ border: "1px solid #232c3d", background: "linear-gradient(#141b28, #0f141d)", boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)" }}
         >
-          <div className="flex items-center gap-3.5">
-            <span
-              className="flex h-[62px] w-[62px] shrink-0 items-center justify-center rounded-2xl"
-              style={{ background: "linear-gradient(155deg, #cfeaf7, #6fb6d8 55%, #2b5f7d)", boxShadow: "0 0 34px rgba(159, 212, 236, 0.4)" }}
-            >
-              <TrophyIcon grade="platinum" size={34} />
-            </span>
-            <div>
-              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("platinoMasCercano")}</p>
-              <p className="font-heading mt-1 text-[1.375rem] font-bold">Elden Ring</p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3.5">
+              <span
+                className="flex h-[62px] w-[62px] shrink-0 items-center justify-center rounded-2xl"
+                style={{ background: "linear-gradient(155deg, #cfeaf7, #6fb6d8 55%, #2b5f7d)", boxShadow: "0 0 34px rgba(159, 212, 236, 0.4)" }}
+              >
+                <TrophyIcon grade="platinum" size={34} />
+              </span>
+              <div>
+                <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("platinoMasCercano")}</p>
+                <p className="font-heading mt-1 text-[1.375rem] font-bold">Elden Ring</p>
+              </div>
             </div>
+            <span
+              className="hidden shrink-0 rounded-full px-2.5 py-1 text-[0.625rem] font-semibold leading-tight sm:block sm:max-w-[150px]"
+              style={{ background: "rgb(var(--accent-rgb) / 0.1)", border: "1px solid rgb(var(--accent-rgb) / 0.25)", color: "var(--accent-text)" }}
+            >
+              {t("platinoMasCercanoAlgoritmo")}
+            </span>
           </div>
 
           <div className="mt-[22px] flex items-end gap-3">
@@ -201,6 +226,26 @@ async function Landing() {
           </ul>
         </div>
       </section>
+
+      <LandingThemeSwitcher />
+
+      {recentPlatinums.length > 0 && (
+        <div className="relative -mx-4 overflow-hidden px-4 py-2.5 mt-8 sm:mx-0 sm:px-0 sm:mt-12" style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+          <div className="flex w-max items-center gap-8 animate-marquee hover:[animation-play-state:paused]" style={{ animationDuration: "35s" }}>
+            {[...recentPlatinums, ...recentPlatinums].map((p, i) => (
+              <div key={`${p.userId}-${p.gameTitle}-${i}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap text-[0.8125rem]">
+                <TrophyIcon grade="platinum" size={16} />
+                <span className="font-semibold text-platinum">{p.name ?? `@${p.handle}`}</span>
+                <span className="text-muted">{t("tickerAcabaDePlatinar")}</span>
+                <span className="font-semibold">{p.gameTitle}</span>
+                <span className="text-[0.6875rem] text-muted">— {haceTiempo(p.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
+        </div>
+      )}
 
       <section className="grid grid-cols-2 gap-3 pt-2 lg:grid-cols-4">
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
@@ -440,6 +485,67 @@ async function Landing() {
               <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
                 <span className="text-sm font-semibold">{t("comparativaEta")}</span>
                 <span className="text-sm font-bold" style={{ color: "var(--accent-text)" }}>{t("comparativaEtaValor")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pt-[72px]">
+        <div className="relative overflow-hidden rounded-[24px] p-8 sm:p-12" style={{ border: "1px solid #36393f", background: "linear-gradient(145deg, #2f3136, #202225)" }}>
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+            <div>
+              <span className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(88, 101, 242, 0.15)", color: "#5865F2" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+                {t("botDiscordBadge") || "Integración Discord"}
+              </span>
+              <h2 className="font-heading text-[2rem] font-bold leading-tight">
+                {t("botDiscordTitulo") || "Lleva Paragon a tu servidor"}
+              </h2>
+              <p className="mt-4 text-base text-[#b9bbbe]">
+                {t("botDiscordDesc") || "Presume de tus platinos, compara estadísticas con tus amigos y recibe notificaciones de racha directamente en tu canal favorito. Sin salir de Discord."}
+              </p>
+              
+              <ul className="mt-6 space-y-3 text-sm text-[#b9bbbe]">
+                <li className="flex items-center gap-2.5">
+                  <span className="text-[#5865F2] font-semibold">/perfil</span> {t("botDiscordCmd1") || "Muestra tu Card interactiva en el chat"}
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <span className="text-[#5865F2] font-semibold">/comparar</span> {t("botDiscordCmd2") || "Radar de rivalidad con otros miembros"}
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <span className="text-[#5865F2] font-semibold">/platino</span> {t("botDiscordCmd3") || "Anuncia tus conquistas automáticamente"}
+                </li>
+              </ul>
+            </div>
+            
+            <div className="relative rounded-lg p-4 shadow-xl border border-white/5" style={{ background: "#36393f" }}>
+              <div className="flex gap-4">
+                <div className="h-10 w-10 shrink-0 rounded-full bg-[#5865F2] flex items-center justify-center text-white font-bold text-lg">
+                  <TrophyIcon grade="platinum" size={24} />
+                </div>
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-medium text-white">Paragon Bot</span>
+                    <span className="text-[0.625rem] text-white bg-[#5865F2] px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">BOT</span>
+                    <span className="text-xs text-[#72767d]">Hoy a las 16:20</span>
+                  </div>
+                  <p className="text-[#dcddde] text-sm mt-1">¡<span className="font-semibold text-white">@hunter</span> acaba de conseguir el platino de <span className="font-semibold text-white">Elden Ring</span>! 🏆</p>
+                  
+                  <div className="mt-3 rounded border-l-4 border-[#5865F2] bg-[#2f3136] p-4">
+                    <div className="flex gap-4 items-start">
+                      <img src="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" alt="Elden Ring" className="h-24 w-16 rounded object-cover shadow-md" />
+                      <div>
+                        <h4 className="font-bold text-[#00aff4] text-base hover:underline cursor-pointer">Elden Ring</h4>
+                        <p className="text-sm text-[#dcddde] mt-1.5">Rareza comunitaria: <span className="font-semibold text-[#f87171]">4.2%</span> (Ularraro)</p>
+                        <p className="text-xs text-[#b9bbbe] mt-1">Dificultad media: 8/10</p>
+                        <div className="mt-2.5 flex items-center gap-2">
+                           <span className="text-xs font-semibold px-2 py-0.5 rounded bg-surface-2 text-muted border border-border">#Soulsborne</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -743,6 +849,15 @@ export default async function HomePage() {
                       />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                    {!!game.playtimeRecentMinutes && (
+                      <span
+                        className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-bold"
+                        style={{ background: "rgba(0, 0, 0, 0.55)", color: "#4ec98a", backdropFilter: "blur(4px)" }}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-good" style={{ boxShadow: "0 0 6px #4ec98a" }} />
+                        {t("horasQuincena", { horas: (game.playtimeRecentMinutes / 60).toFixed(1) })}
+                      </span>
+                    )}
                     <p
                       className="font-heading relative z-10 translate-y-2 text-[0.9375rem] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[1.0625rem]"
                       style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}

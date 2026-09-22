@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
+import { toPng } from "html-to-image";
 import { TiltCard } from "@/components/TiltCard";
 import { TrophyIcon } from "@/components/TrophyIcon";
 
@@ -25,8 +26,29 @@ export function CardBuilder({ games }: { games: SampleGame[] }) {
   const t = useTranslations("Shell.Home");
   const [nombre, setNombre] = useState("");
   const [juego, setJuego] = useState(games[0]);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const nombreMostrado = nombre.trim() || t("builderNombrePorDefecto");
+
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    setIsExporting(true);
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        style: { transform: "none" }, // Aseguramos que no haya tilt activo
+      });
+      const link = document.createElement("a");
+      link.download = `tarjeta-${nombreMostrado.toLowerCase().replace(/\s+/g, "-")}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error("Error exporting image:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <section className="pt-[72px]">
@@ -69,47 +91,69 @@ export function CardBuilder({ games }: { games: SampleGame[] }) {
               </select>
             </label>
 
-            <a
-              href="/entrar"
-              className="mt-2 inline-flex items-center justify-center rounded-xl px-6 py-3.5 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.5)]"
-              style={{ background: "var(--accent-grad)" }}
-            >
-              {t("builderCTA")}
-            </a>
+            <div className="mt-2 flex gap-3">
+              <a
+                href="/entrar"
+                className="flex-1 inline-flex items-center justify-center rounded-xl px-6 py-3.5 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgb(var(--accent-rgb) / 0.5)]"
+                style={{ background: "var(--accent-grad)" }}
+              >
+                {t("builderCTA")}
+              </a>
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={isExporting}
+                className="inline-flex items-center justify-center rounded-xl px-4 py-3.5 text-[0.9375rem] font-bold transition-all duration-300 hover:bg-white/5 disabled:opacity-50"
+                style={{ border: "1px solid var(--border)" }}
+                title="Descargar imagen (PNG)"
+              >
+                {isExporting ? (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-foreground" />
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" x2="12" y1="15" y2="3"/>
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
-        <TiltCard
-          href="/entrar"
-          className="relative mx-auto w-full max-w-[360px] cursor-pointer overflow-hidden rounded-[22px]"
-          style={{ border: "1px solid #232c3d", background: "linear-gradient(#141b28, #0f141d)", boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)" }}
-        >
-          <div
-            className="relative h-[200px] bg-cover bg-center"
-            style={{ backgroundImage: `url(${juego.cover})` }}
+        <div className="relative mx-auto w-full max-w-[360px]" ref={cardRef}>
+          <TiltCard
+            href="/entrar"
+            className="cursor-pointer overflow-hidden rounded-[22px]"
+            style={{ border: "1px solid #232c3d", background: "linear-gradient(#141b28, #0f141d)", boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)" }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f141d] via-[#0f141d]/20 to-transparent" />
-          </div>
-          <div className="relative -mt-10 p-6">
-            <p className="truncate font-heading text-xl font-bold">{nombreMostrado}</p>
-            <p className="mt-0.5 truncate text-sm text-muted">{juego.title}</p>
+            <div
+              className="relative h-[200px] bg-cover bg-center"
+              style={{ backgroundImage: `url(${juego.cover})` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0f141d] via-[#0f141d]/20 to-transparent" />
+            </div>
+            <div className="relative -mt-10 p-6">
+              <p className="truncate font-heading text-xl font-bold">{nombreMostrado}</p>
+              <p className="mt-0.5 truncate text-sm text-muted">{juego.title}</p>
 
-            <div className="mt-5 flex items-center gap-2.5">
-              <TrophyIcon grade="platinum" size={26} />
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-platinum">{t("builderPlatinoLabel")}</p>
-                <p className="text-[0.6875rem] text-muted">{t("builderPlatinoFecha")}</p>
+              <div className="mt-5 flex items-center gap-2.5">
+                <TrophyIcon grade="platinum" size={26} />
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-platinum">{t("builderPlatinoLabel")}</p>
+                  <p className="text-[0.6875rem] text-muted">{t("builderPlatinoFecha")}</p>
+                </div>
               </div>
-            </div>
 
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-2">
-              <div className="h-full w-full rounded-full" style={{ background: "var(--accent-grad-h)" }} />
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-2">
+                <div className="h-full w-full rounded-full" style={{ background: "var(--accent-grad-h)" }} />
+              </div>
+              <p className="mt-2 text-right text-xs font-bold" style={{ color: "var(--accent-text)" }}>
+                100%
+              </p>
             </div>
-            <p className="mt-2 text-right text-xs font-bold" style={{ color: "var(--accent-text)" }}>
-              100%
-            </p>
-          </div>
-        </TiltCard>
+          </TiltCard>
+        </div>
       </div>
     </section>
   );

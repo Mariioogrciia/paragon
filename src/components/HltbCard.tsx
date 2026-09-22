@@ -1,9 +1,4 @@
-"use client";
-
-import { useEffect, useRef, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { syncHltbAction } from "@/app/actions";
+import { useTranslations } from "next-intl";
 
 /**
  * Horas estimadas por HowLongToBeat — historia y platino/100% por separado
@@ -13,10 +8,10 @@ import { syncHltbAction } from "@/app/actions";
  * cuánto tarda la gente en general, de media — útil incluso antes de
  * empezar el juego.
  */
-export async function HltbCard({ hltb }: { hltb?: { main?: number; mainExtra?: number; completionist?: number } }) {
-  if (!hltb || (hltb.main == null && hltb.completionist == null)) return null;
+export function HltbCard({ hltb }: { hltb?: { main?: number; mainExtra?: number; completionist?: number } }) {
+  const t = useTranslations("Biblioteca");
 
-  const t = await getTranslations("Biblioteca");
+  if (!hltb || (hltb.main == null && hltb.completionist == null)) return null;
 
   return (
     <section className="rounded-[18px] p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
@@ -44,29 +39,4 @@ export async function HltbCard({ hltb }: { hltb?: { main?: number; mainExtra?: n
       </p>
     </section>
   );
-}
-
-/**
- * Dispara la búsqueda en HLTB una sola vez cuando la ficha no tiene dato
- * todavía (`game.hltb` es `undefined` — nunca comprobado). No pinta nada:
- * si encuentra algo, `router.refresh()` vuelve a traer la ficha con el
- * dato ya puesto, sin recargar la página entera. Mismo patrón que
- * `AutoSyncJuego.tsx` para los trofeos.
- */
-export function AutoSyncHltb({ gameId, title }: { gameId: string; title: string }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-  const yaLanzado = useRef(false);
-
-  useEffect(() => {
-    if (yaLanzado.current) return;
-    yaLanzado.current = true;
-
-    startTransition(async () => {
-      await syncHltbAction(gameId, title);
-      router.refresh();
-    });
-  }, [gameId, title, router]);
-
-  return null;
 }

@@ -67,9 +67,14 @@ export async function saludSincronizacion(userId: string): Promise<SaludPlatafor
       total: sql<number>`count(*)::int`,
       sinDetalle: sql<number>`count(*) filter (where ${userGames.trophiesSyncedAt} is null)::int`,
       // Xbox caduca antes que el resto (HORAS_CADUCIDAD_XBOX) — ver el
-      // comentario de esa constante.
+      // comentario de esa constante. El `::timestamp` del `case` es
+      // obligatorio: sin él, Postgres recibe los dos ISO strings como
+      // `text` (el driver no sabe que van a compararse con una columna de
+      // fecha) y revienta con "operator does not exist: timestamp without
+      // time zone < text" — visto en producción el 22 de septiembre de
+      // 2026 al abrir Ajustes → Plataformas.
       caducados: sql<number>`count(*) filter (
-        where ${userGames.trophiesSyncedAt} < case when ${PLATAFORMA} = 'xbox' then ${desdeXbox} else ${desde} end
+        where ${userGames.trophiesSyncedAt} < (case when ${PLATAFORMA} = 'xbox' then ${desdeXbox} else ${desde} end)::timestamp
       )::int`,
     })
     .from(userGames)

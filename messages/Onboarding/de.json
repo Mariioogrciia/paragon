@@ -36,7 +36,8 @@
     "help": {
       "psn": "Deine öffentliche PlayStation-ID, der Name, unter dem du spielst. Dein Trophäenprofil muss öffentlich sein, damit wir es auslesen können.",
       "steam": "Dein Steam-Benutzername, deine SteamID64 oder deine Profil-URL. Bei Steam müssen sowohl \"Mein Profil\" als auch \"Spieldetails\" öffentlich sein.",
-      "xbox": "Dein Xbox-Gamertag. Synchronisiert deinen echten Erfolgsverlauf über einen Drittanbieter-Dienst (nicht offiziell von Microsoft) — kann ausfallen oder aufhören zu funktionieren, wenn sich dieser Dienst ändert."
+      "xbox": "Dein Xbox-Gamertag. Synchronisiert deinen echten Erfolgsverlauf über einen Drittanbieter-Dienst (nicht offiziell von Microsoft) — kann ausfallen oder aufhören zu funktionieren, wenn sich dieser Dienst ändert.",
+      "epic": "Der Link zu deinem Epic Games-Profil (oder deine Account-ID). Muss auf „Öffentlich“ stehen — das ist keine offizielle Epic-API, kann also ausfallen oder aufhören zu funktionieren, wenn Epic ihre Website ändert."
     },
     "linked": "Verknüpft",
     "private": "Privat",
@@ -85,6 +86,11 @@
       "linkWith": "Mit {provider} verknüpfen",
       "linkAction": "Verknüpfen"
     },
+    "confirmUnlink": {
+      "title": "{provider} trennen?",
+      "message": "Du kannst dich dann nicht mehr mit diesem Konto bei Paragon anmelden. Wenn es die einzige verbleibende Anmeldemöglichkeit ist, kannst du das nicht rückgängig machen, ohne es erneut zu verknüpfen.",
+      "confirmLabel": "Ja, trennen"
+    },
     "export": {
       "title": "Dein Vermächtnis (Daten exportieren)",
       "description": "Lade eine vollständige Kopie deines Verlaufs auf der Plattform im JSON-Format herunter. Enthält deine Spiele, erhaltenen Trophäen, Rezensionen, Ordner, erstellten Guides und deinen Synchronisierungsverlauf. Enthält keine Passwörter oder Tokens.",
@@ -119,6 +125,11 @@
     },
     "xbox": {
       "placeholder": "Dein Xbox-Gamertag",
+      "update": "Aktualisieren",
+      "link": "Verknüpfen"
+    },
+    "epic": {
+      "placeholder": "Link zu deinem Epic Games-Profil",
       "update": "Aktualisieren",
       "link": "Verknüpfen"
     },
@@ -205,6 +216,9 @@
       "themeHint": "Wie dein Profil für Besucher aussieht — deins bleibt davon unberührt.",
       "frameLabel": "Avatar-Rahmen",
       "frameHint": "Du bist auf Level {nivel}. Gesperrte Rahmen werden verworfen, auch wenn du sie auswählst.",
+      "previewLabel": "Vorschau",
+      "previewFallbackName": "Dein Name",
+      "previewFallbackTitle": "Noch kein Titel",
       "bannerLabel": "Plattform-Banner",
       "bannerHint": "Eigene Paragon-Grafiken, ohne Fotos mit Rechteproblemen. Ersetzt, was du oben hochlädst; erneutes Hochladen einer Datei ersetzt es wieder.",
       "sectionOrderLabel": "Reihenfolge der Abschnitte"
@@ -216,6 +230,8 @@
     },
     "saveButton": "Änderungen speichern",
     "noChanges": "Keine ungespeicherten Änderungen",
+    "unsavedChanges": "Du hast ungespeicherte Änderungen",
+    "resetButton": "Zurücksetzen",
     "discordTitle": "Discord",
     "pushTitle": "Browser-Benachrichtigungen",
     "frames": {
@@ -275,7 +291,8 @@
     "title": {
       "psn": "Wo stelle ich mein PSN-Profil auf öffentlich?",
       "steam": "Wo stelle ich mein Steam-Profil auf öffentlich?",
-      "xbox": "Wo stelle ich meinen Xbox-Verlauf auf öffentlich?"
+      "xbox": "Wo stelle ich meinen Xbox-Verlauf auf öffentlich?",
+      "epic": "Wo stelle ich mein Epic Games-Profil auf öffentlich?"
     },
     "steps": {
       "psn": [
@@ -294,6 +311,11 @@
         "Auf der Konsole oder in der Xbox-App: dein Profil → „Online-Sicherheit und Datenschutz“ → „Details anzeigen und anpassen“.",
         "Suche „Spielverlauf und -statistiken“ (oder „Inhalte teilen“) und stelle es auf „Alle“.",
         "Xbox nutzt einen inoffiziellen Drittanbieter-Dienst (OpenXBL), um dies auszulesen — wenn dein Profil schon öffentlich ist und es trotzdem nicht funktioniert, liegt es nicht an deiner Einstellung, versuch es später erneut."
+      ],
+      "epic": [
+        "Im Epic Games Store (Web oder Launcher): klick oben rechts auf deinen Avatar → „Meine Erfolge“.",
+        "Oben rechts auf deiner Erfolge-Seite klick auf „Datenschutzstufe“ und wähle „Öffentlich“.",
+        "Kopiere den Link dieser Seite (endet auf /u/ gefolgt von einem Code) und füge ihn hier ein."
       ]
     }
   },
@@ -319,7 +341,7 @@
     "nintendo": "Nintendo",
     "nintendoNote": "Switch-Spiele werden manuell in deiner Bibliothek erfasst — Entdecken hat noch keinen eigenen Bereich dafür (in Entwicklung).",
     "epicGames": "Epic Games",
-    "epicGamesNote": "Kann auf Paragon nicht mehr verknüpft werden (hatte nie eine echte Synchronisierung) — und es gibt auch keine öffentliche Nachrichtenquelle oder Katalog: Die Website blockiert sogar ihren eigenen offiziellen RSS-Feed.",
+    "epicGamesNote": "Kann schon unter Einstellungen → Spielkonten verknüpft werden. Es gibt noch keine öffentliche Nachrichtenquelle oder Katalog: Die Website blockiert sogar ihren eigenen offiziellen RSS-Feed.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "Kann auf Paragon nicht mehr verknüpft werden (hatte nie eine echte Synchronisierung) — und hat auch keinen öffentlichen Nachrichten-Feed: Die Website bietet kein RSS an."
   }

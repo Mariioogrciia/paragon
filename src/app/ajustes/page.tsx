@@ -58,6 +58,7 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
       favoritos={profile?.favorites ?? []}
       juegos={juegosParaFondo}
       discordVinculado={discordVinculado}
+      cuentasVinculadas={profile?.accounts.filter(a => a.avatarUrl).map(a => ({ platform: a.platform, avatarUrl: a.avatarUrl! })) ?? []}
     />
     </>
   );

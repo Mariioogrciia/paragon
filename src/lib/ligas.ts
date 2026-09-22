@@ -11,14 +11,14 @@ export interface LigaUser {
   points: number;
 }
 
-export async function getLigaMensual(): Promise<LigaUser[]> {
+export async function getLigaMensual(mesObjetivo?: Date): Promise<LigaUser[]> {
   const db = getDb();
-  const now = new Date();
+  const targetDate = mesObjetivo || new Date();
   
   // Principio de este mes
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
   // Fin de este mes (técnicamente, principio del siguiente)
-  const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const startOfNextMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 1);
 
   // Expresión SQL para sumar puntos:
   // Platino: 100, Oro: 50, Plata: 25, Bronce: 10, Sin grado (Steam): 10

@@ -9,6 +9,7 @@ import {
   fetchStoreMetadata,
 } from "@/lib/steam/client";
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
+import { fetchAchievements as fetchEpicAchievements, fetchLibrary as fetchEpicLibrary } from "@/lib/epic/client";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
@@ -69,6 +70,14 @@ const STEAM_CONCURRENCY = 6;
  */
 const XBL_DETAIL_LIMIT = 15;
 const XBL_CONCURRENCY = 2;
+
+/**
+ * Epic no tiene un cupo conocido (no es una API oficial con límites
+ * publicados, ver lib/epic/client.ts) — mismos números que Steam por
+ * prudencia, no porque se sepa que hace falta.
+ */
+const EPIC_DETAIL_LIMIT = 40;
+const EPIC_CONCURRENCY = 6;
 
 /**
  * De una lista de `gameId`, cuáles necesitan de verdad que se les vuelva a
@@ -163,6 +172,7 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
           earned: (g.earned as unknown as Record<string, number>) ?? null,
           lastPlayedAt: g.lastPlayedAt ? new Date(g.lastPlayedAt) : null,
           playtimeMinutes: g.playtimeMinutes ?? null,
+          playtimeRecentMinutes: g.playtimeRecentMinutes ?? null,
         })),
       )
       .onConflictDoUpdate({
@@ -173,6 +183,11 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
           earned: sql`coalesce(excluded."earned", ${userGames.earned})`,
           lastPlayedAt: sqlExcluded("lastPlayedAt"),
           playtimeMinutes: sql`coalesce(excluded."playtimeMinutes", ${userGames.playtimeMinutes})`,
+          // A diferencia de `playtimeMinutes` (que solo crece), esta es una
+          // ventana móvil de 2 semanas: se sobrescribe entera en cada
+          // sincronización, incluso a `null` si ya no se ha jugado — lo
+          // contrario (coalesce) dejaría un juego "reciente" para siempre.
+          playtimeRecentMinutes: sqlExcluded("playtimeRecentMinutes"),
         },
       });
   }
@@ -190,21 +205,29 @@ export async function syncLibrary(
   account: SyncAccount,
   opts: { forzarDetalle?: boolean } = {},
 ): Promise<number> {
-  // Google, Epic y Ubisoft no tienen lector propio todavía. Sin esta salida,
-  // "cualquier plataforma que no sea psn/steam/xbox" caía por defecto en el
-  // lector de Steam y le pedía la biblioteca a Steam con, p. ej., un usuario
-  // de Epic — de ahí que su cuenta se vincule con `legible: false` (ver
-  // resolveEpic/resolveUbisoft/resolveGoogle en profiles.ts), lo que ya
+  // Google y Ubisoft no tienen lector propio todavía. Sin esta salida,
+  // "cualquier plataforma que no sea psn/steam/xbox/epic" caía por defecto
+  // en el lector de Steam y le pedía la biblioteca a Steam con, p. ej., un
+  // usuario de Ubisoft — de ahí que su cuenta se vincule con `legible:
+  // false` (ver resolveUbisoft/resolveGoogle en profiles.ts), lo que ya
   // evita llegar aquí. Se deja explícito por si algo cambia esa bandera sin
   // tocar esto.
-  if (account.platform !== "psn" && account.platform !== "steam" && account.platform !== "xbox") return 0;
+  if (
+    account.platform !== "psn" &&
+    account.platform !== "steam" &&
+    account.platform !== "xbox" &&
+    account.platform !== "epic"
+  )
+    return 0;
 
   const library =
     account.platform === "psn"
       ? await fetchPsnLibrary(account.accountId)
       : account.platform === "steam"
         ? await fetchSteamLibrary(account.accountId)
-        : await fetchXblLibrary(account.accountId);
+        : account.platform === "xbox"
+          ? await fetchXblLibrary(account.accountId)
+          : await fetchEpicLibrary(account.accountId);
 
   if (library.length === 0) return 0;
 
@@ -245,6 +268,20 @@ export async function syncLibrary(
       : await soloDesactualizados(userId, recientes.map((g) => g.id), "xbox");
 
     await mapLimit(pendientes, XBL_CONCURRENCY, async (gameId) => {
+      await syncGameTrophies(userId, account, gameId);
+    });
+  }
+
+  if (account.platform === "epic") {
+    // Epic no da `playtimeMinutes` ni `lastPlayedAt` en el resumen — el
+    // único indicio de "esto se ha jugado" que trae la propia llamada de
+    // biblioteca es tener algún logro ya conseguido.
+    const recientes = library.filter((g) => g.earnedTotal > 0).slice(0, EPIC_DETAIL_LIMIT);
+    const pendientes = opts.forzarDetalle
+      ? recientes.map((g) => g.id)
+      : await soloDesactualizados(userId, recientes.map((g) => g.id), "epic");
+
+    await mapLimit(pendientes, EPIC_CONCURRENCY, async (gameId) => {
       await syncGameTrophies(userId, account, gameId);
     });
   }
@@ -391,7 +428,7 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
   let igdbId: number | null = null;
   if (row?.title) {
     try {
-      igdbId = (await searchGames(row.title, 1))[0]?.igdbId ?? null;
+      igdbId = (await searchGamesWithFallback(row.title, 1))[0]?.igdbId ?? null;
     } catch {
       // Sin IGDB no pasa nada: el resto de metadatos de Steam sigue
       // guardándose igual más abajo.
@@ -417,7 +454,7 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
     .where(eq(games.id, gameId));
 }
 
-import { searchGames } from "@/lib/igdb/client";
+import { searchGamesWithFallback } from "@/lib/igdb/client";
 
 async function syncIgdbMetadata(gameId: string, title: string): Promise<void> {
   const [row] = await db
@@ -429,7 +466,7 @@ async function syncIgdbMetadata(gameId: string, title: string): Promise<void> {
   if (row?.syncedAt) return;
 
   try {
-    const results = await searchGames(title, 1);
+    const results = await searchGamesWithFallback(title, 1);
     const metadata = results[0];
     
     // We mark it as synced even if we found nothing, so we don't query IGDB every time.
@@ -536,6 +573,17 @@ export async function syncGameTrophies(
     if (row?.title) {
       await syncIgdbMetadata(gameId, row.title);
     }
+  } else if (platform === "epic") {
+    // El "nativeId" de un juego de Epic es el sandboxId (ver fetchLibrary),
+    // no un id de tienda como el appid de Steam, así que no hay
+    // syncStoreMetadata que valga aquí — se empareja por título en IGDB,
+    // igual que PSN/Xbox.
+    trophies = await fetchEpicAchievements(account.accountId, nativeId);
+
+    const [row] = await db.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1);
+    if (row?.title) {
+      await syncIgdbMetadata(gameId, row.title);
+    }
   } else {
     trophies = await fetchAchievements(account.accountId, nativeId);
     await syncStoreMetadata(gameId, nativeId);
@@ -560,7 +608,7 @@ export async function syncGameTrophies(
   // progreso en la llamada de biblioteca, así que se calcula aquí, con los
   // logros de verdad ya en la mano — igual que definedTotal más abajo.
   const progreso =
-    platform === "steam" || platform === "xbox"
+    platform === "steam" || platform === "xbox" || platform === "epic"
       ? {
           earnedTotal,
           progressPercent: Math.round((earnedTotal / trophies.length) * 100),
@@ -572,7 +620,7 @@ export async function syncGameTrophies(
     .set({ trophiesSyncedAt: new Date(), ...progreso })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
-  if (platform === "steam" || platform === "xbox") {
+  if (platform === "steam" || platform === "xbox" || platform === "epic") {
     await db
       .update(games)
       .set({ definedTotal: trophies.length })

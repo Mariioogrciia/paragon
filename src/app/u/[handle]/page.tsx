@@ -26,6 +26,8 @@ import { ParagonLevelCard } from "@/components/ParagonLevelCard";
 import { ParagonAchievements } from "@/components/ParagonAchievements";
 import { paragonProgress } from "@/lib/level";
 import { ShowcaseTrophies } from "@/components/ShowcaseTrophies";
+import { TrophyCase } from "@/components/TrophyCase";
+import { getUserTrophyCase } from "@/lib/trophyCase";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { PlatformBanner } from "@/components/BannerPresets";
@@ -144,9 +146,10 @@ export default async function PerfilPage({
   ]);
   // Pública igual que el resto de la ficha: se ve tanto en tu propio
   // perfil como en el de cualquiera que lo visite.
-  const [badges, recientes] = await Promise.all([
+  const [badges, recientes, palmares] = await Promise.all([
     getUserBadges(profile.userId),
     ultimosTrofeos(profile.userId),
+    getUserTrophyCase(profile.userId),
   ]);
   const [rachasPerfil, percentilAnio] = games.length > 0
     ? await Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
@@ -266,6 +269,7 @@ export default async function PerfilPage({
             )}
             {profile.profileTitle && <p className="mt-2 text-sm font-semibold text-[rgb(var(--accent-rgb))]">{profile.profileTitle}</p>}
             {badges.length > 0 && <Badges earnedBadges={badges} />}
+            <TrophyCase items={palmares} />
           </div>
 
           <Link
