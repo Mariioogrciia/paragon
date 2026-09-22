@@ -5341,3 +5341,58 @@ restricción pendiente en `push_subscription` sigue sin resolverse (ver
 **CheapShark** (comparador de precios) no necesita clave, pero desde hace
 poco exige un `User-Agent` descriptivo o devuelve un error genérico —
 ya está puesto en `lib/prices.ts`, no hace falta variable de entorno nueva.
+
+---
+
+## Incidente del 22 de septiembre de 2026 (mismo día, después del cierre de la auditoría) — producción caída y restaurada
+
+Justo después de cerrar la sesión de auditoría de arriba, el workflow
+"Sincronización frecuente de trofeos" empezó a fallar con HTTP 500 —
+y no solo el cron: **la web entera** (`/`, cualquier página) devolvía el
+500 genérico de Next, confirmado con `curl` directo contra
+`platinos-nine.vercel.app`, no solo desde CI.
+
+**Diagnóstico** (el MCP de Vercel no tenía permiso para runtime logs —
+403 Forbidden en todas las cuentas/scopes probadas; se usó la Vercel CLI,
+`vercel logs`/`vercel inspect`, autenticada aparte):
+
+```
+Error: Failed to load external module got-scraping-...: Error: ADM-ZIP: Invalid filename
+```
+
+`lib/epic/client.ts` importaba `got-scraping` (declarado en
+`serverExternalPackages`, ver el comentario de `next.config.ts` sobre por
+qué) a **nivel de módulo**. Ese archivo lo importa `lib/profiles.ts`, que
+es universal — prácticamente cualquier página pasa por ahí. Cuando el
+paquete externo falló al cargar en el entorno serverless de Vercel (un
+problema de cómo empaqueta los ficheros de datos de huella de navegador
+de `header-generator`, no de este código), el `import` a nivel de módulo
+se evaluaba SIEMPRE, tirando abajo cualquier petición, no solo la
+sincronización de Epic.
+
+**Primer paso (equivocado pero prudente):** se revirtió toda la sesión de
+auditoría (`f1b7f7c`) pensando que la causa estaba ahí, dado que el fallo
+empezó justo tras esos pushes. **Producción SIGUIÓ caída con el revert
+desplegado** — la prueba de que la causa era otra: el revert es
+byte-idéntico al último commit bueno de antes de la sesión (`7e269a9`).
+
+**Arreglo real** (`71c400d`): `got-scraping` pasa a importarse con
+`import()` dinámico DENTRO de la única función que lo usa
+(`query()`), no arriba del archivo — así solo se carga al sincronizar de
+verdad una cuenta de Epic (la ruta menos transitada de toda la app), y si
+vuelve a fallar en el entorno de Vercel, el `catch` que ya existía en
+`query()` lo absorbe sin tumbar nada más.
+
+Con la causa real arreglada, se recuperó todo el trabajo revertido
+(`b479135`) — no era el problema. Verificado contra producción de verdad
+esta vez (no solo local): `/`, `/clanes` y `/api/cron/sync` responden 200
+con el deployment final.
+
+**Lección para la próxima vez que algo tumbe producción entera:** el MCP
+de Vercel de este entorno no tiene permiso para logs de runtime —
+`get_runtime_logs`/`get_runtime_errors` dan 403 en cualquier team/scope.
+La Vercel CLI (`vercel logs <url-de-deployment>`, `vercel inspect
+<url> --logs`) sí funciona y da el stack trace real — es la vía rápida,
+no perder tiempo reproduciendo en local primero (el bug no se reproducía
+ni en `next dev` ni en `next start` local: solo se manifestaba en el
+empaquetado serverless real de Vercel).
