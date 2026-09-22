@@ -5419,3 +5419,26 @@ en producción tras cada push, no solo local):
 - Migrar las carátulas de la biblioteca a `next/image` sigue sin hacerse:
   mismo motivo que la sesión anterior (hosts dinámicos de PSN/Xbox sin
   poder confirmarlos contra una cuenta real).
+
+---
+
+## Continuación — feed de actividad en Clanes
+
+El usuario pidió meterle "chicha" a `/clanes`, la pestaña más nueva y más
+vacía (solo nombre + XP + lista de miembros). Añadido `getClanActivity()`
+(`lib/clans.ts`) — reutiliza la tabla `activities` que ya alimenta el feed
+de amigos, filtrada por miembros del clan en vez de por amistad, en una
+sola consulta batched. `ClanActivityFeed.tsx` es deliberadamente más
+ligero que el feed de amigos (sin reacciones/comentarios): un escaparate
+de "el clan está vivo", no una segunda bandeja de entrada. La página del
+clan pasa a dos columnas (feed + miembros como sidebar de 320px).
+
+**Sin probar contra un clan con actividad real**: no había ningún clan
+creado todavía en producción (tabla vacía), y crear uno de prueba con
+usuarios reales para probarlo se bloqueó a propósito por el clasificador
+de "modificar recursos compartidos" — correcto, no se debe rellenar la
+base de producción con datos falsos para probar. Verificado en su lugar:
+build real, `next start` local contra `/clanes` (lista vacía, sin error),
+y la consulta reutiliza exactamente el mismo patrón ya probado en
+producción de `getFeed`/`getClanScore`. Cuando exista un clan real con
+miembros con actividad, confirmar visualmente que el feed pinta bien.
