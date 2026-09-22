@@ -45,7 +45,15 @@ export async function getOrComputeAuraColor(gameId: string, coverUrl: string | u
 
 async function calcularColorDominante(url: string): Promise<string | null> {
   try {
-    const res = await fetch(url);
+    // Bug real en producción (23 sept 2026): sin timeout, un CDN lento o
+    // colgado (PSN, Steam) bloqueaba TODA la carga del perfil — visto en
+    // vivo con /u/[handle] tardando 28s+ ("application-code") y acabando
+    // en "The destination stream closed early" (el cliente se rindió antes
+    // de que el servidor terminara). Este `fetch` es la única llamada de
+    // red sin límite de tiempo en todo el camino de esta función — falla
+    // rápido y se cachea como "sin aura" igual que cualquier otro fallo
+    // (checkedAt más abajo), no se reintenta en cada visita.
+    const res = await fetch(url, { signal: AbortSignal.timeout(6_000) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
     // 24x24 basta para un color medio — no hace falta la imagen entera.
