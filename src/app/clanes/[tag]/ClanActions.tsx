@@ -54,7 +54,7 @@ export function ClanActions({ clanId, amIMember, amIOwner }: Props) {
         <button
           onClick={handleJoin}
           disabled={loading}
-          className="rounded-[10px] bg-[var(--accent)] text-[var(--accent-text-contrast)] px-6 py-2.5 font-bold disabled:opacity-50 shadow-[0_0_15px_var(--accent)] hover:shadow-[0_0_25px_var(--accent)] transition-shadow"
+          className="rounded-[10px] bg-accent text-background px-6 py-2.5 font-bold disabled:opacity-50 shadow-[0_0_15px_var(--accent)] hover:shadow-[0_0_25px_var(--accent)] transition-shadow"
         >
           {loading ? "..." : "Unirme a este Clan"}
         </button>

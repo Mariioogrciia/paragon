@@ -15,37 +15,44 @@ export async function TarjetaNoticia({ item, badge }: { item: NewsItem; badge?: 
       href={item.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-[rgb(var(--accent-rgb)/0.5)]"
+      className="group flex flex-col rounded-xl border border-border bg-surface shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-[rgb(var(--accent-rgb)/0.5)]"
     >
-      {item.imageUrl ? (
-        <div
-          className="h-48 w-full bg-cover bg-center border-b border-border transition-transform duration-500 group-hover:scale-105"
-          style={{ backgroundImage: `url(${item.imageUrl})` }}
-        />
-      ) : (
-        <div className="h-48 w-full bg-muted/20 border-b border-border flex items-center justify-center">
-          <span className="text-muted font-heading font-bold text-xl">PARAGON</span>
-        </div>
-      )}
-      <div className="p-5 flex flex-col flex-1">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="text-xs font-semibold text-[rgb(var(--accent-rgb))] uppercase tracking-wider">
-            {formatDistanceToNow(new Date(item.pubDate), { addSuffix: true, locale: dateFnsLocale })}
-          </span>
-          {badge && (
-            <span className="rounded-full bg-[rgb(var(--accent-rgb)/0.15)] px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-[rgb(var(--accent-rgb))]">
-              {badge}
+      {/* overflow-hidden va aquí, no en el <a>: el <a> es quien lleva el
+          hover:shadow-md, y el mismo elemento no puede recortar y proyectar
+          sombra a la vez sin recortarse a sí mismo (misma trampa que
+          TiltCard — ver HANDOFF.md). También es quien de verdad necesita
+          recortar, porque la imagen escala al 105% en hover. */}
+      <div className="flex flex-col flex-1 overflow-hidden rounded-xl">
+        {item.imageUrl ? (
+          <div
+            className="h-48 w-full bg-cover bg-center border-b border-border transition-transform duration-500 group-hover:scale-105"
+            style={{ backgroundImage: `url(${item.imageUrl})` }}
+          />
+        ) : (
+          <div className="h-48 w-full bg-muted/20 border-b border-border flex items-center justify-center">
+            <span className="text-muted font-heading font-bold text-xl">PARAGON</span>
+          </div>
+        )}
+        <div className="p-5 flex flex-col flex-1">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-xs font-semibold text-[rgb(var(--accent-rgb))] uppercase tracking-wider">
+              {formatDistanceToNow(new Date(item.pubDate), { addSuffix: true, locale: dateFnsLocale })}
             </span>
+            {badge && (
+              <span className="rounded-full bg-[rgb(var(--accent-rgb)/0.15)] px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-[rgb(var(--accent-rgb))]">
+                {badge}
+              </span>
+            )}
+          </div>
+          <h3 className="font-bold text-lg leading-snug mb-2 group-hover:text-[rgb(var(--accent-rgb))] transition-colors line-clamp-3">
+            {item.title}
+          </h3>
+          {item.summary && (
+            <p className="text-muted text-sm line-clamp-2 mt-auto">
+              {item.summary.replace(/<[^>]+>/g, '') /* Quitar HTML tags si las hay */}
+            </p>
           )}
         </div>
-        <h3 className="font-bold text-lg leading-snug mb-2 group-hover:text-[rgb(var(--accent-rgb))] transition-colors line-clamp-3">
-          {item.title}
-        </h3>
-        {item.summary && (
-          <p className="text-muted text-sm line-clamp-2 mt-auto">
-            {item.summary.replace(/<[^>]+>/g, '') /* Quitar HTML tags si las hay */}
-          </p>
-        )}
       </div>
     </a>
   );

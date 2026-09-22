@@ -25,7 +25,7 @@ export function ClanCreateForm() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="rounded-[10px] bg-[var(--accent)] px-4 py-2 font-bold text-[var(--accent-text-contrast)]"
+        className="rounded-[10px] bg-accent px-4 py-2 font-bold text-background"
       >
         Crear Clan
       </button>
@@ -92,7 +92,7 @@ export function ClanCreateForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-[10px] bg-[var(--accent)] px-4 py-2 font-bold text-[var(--accent-text-contrast)] disabled:opacity-50"
+                  className="rounded-[10px] bg-accent px-4 py-2 font-bold text-background disabled:opacity-50"
                 >
                   {loading ? "Creando..." : "Crear Clan"}
                 </button>
