@@ -5475,3 +5475,27 @@ verdad (reseña + valoración reales de un miembro real, avatar de Steam,
 carátula de PSN) antes de desplegar. El botón de invitar no se ha podido
 probar visualmente (necesita sesión + amigos reales), pero sigue el
 mismo patrón ya probado de solicitudes de amistad.
+
+---
+
+## Incidente menor — /u/[handle] tardando 30s (23 sept 2026)
+
+El usuario reportó en vivo (log de su propio `next dev`):
+`GET /u/fendetesta 200 in 30.9s (application-code: 28.1s)` seguido de
+`Error: The destination stream closed early` (el cliente se rindió antes
+de que el servidor terminara).
+
+Causa: `calcularColorDominante` (`lib/coverAura.ts`), llamada de forma
+síncrona en el render de `/u/[handle]` para el juego anclado, hacía
+`fetch(coverUrl)` **sin ningún timeout** — la única llamada de red sin
+límite en todo ese camino. Un CDN lento (PSN/Steam) bloqueaba la página
+entera sin tope superior. Arreglado con `AbortSignal.timeout(6_000)`;
+cae en el mismo `catch`/cacheo (`auraColorCheckedAt`) que ya existía para
+cualquier otro fallo, así que no se reintenta en cada visita.
+
+Verificado en producción real: la misma URL pasó de 30.9s a 2.7s tras el
+despliegue.
+
+**Nota para la próxima vez que algo similar tarde mucho**: revisar
+primero cualquier `fetch()` sin `signal`/timeout en el camino de render
+de una página — es el patrón real que ya ha causado esto una vez.
