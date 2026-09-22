@@ -5442,3 +5442,36 @@ build real, `next start` local contra `/clanes` (lista vacía, sin error),
 y la consulta reutiliza exactamente el mismo patrón ya probado en
 producción de `getFeed`/`getClanScore`. Cuando exista un clan real con
 miembros con actividad, confirmar visualmente que el feed pinta bien.
+
+---
+
+## Continuación — ranking e invitaciones en Clanes
+
+El usuario propuso una lista larga de ideas para `/clanes` (ranking
+interno, niveles de clan con recompensas, guerra de clanes en ligas,
+tablón/chat, misiones colectivas, roles expandidos/clanes privados,
+banner/logo/juego insignia — y "algo de invitar"). Implementados los dos
+primeros y el de invitar; el resto queda deliberadamente pendiente —
+mucho para una sola pasada, y varios tocan superficies más sensibles
+(subida de archivos, permisos, un nuevo tipo de liga) que merecen su
+propio diseño en vez de improvisarse encima de esto.
+
+- **Ranking** (`getClanLeaderboard`, sustituye a `getClanScore` — ahora
+  es solo la suma del ranking): una sola consulta batched a
+  `user_trophy` para todo el clan, agrupada en memoria por `userId`.
+  Página del clan con medallas para el top 3.
+- **Invitar** (`clan_invite`, tabla nueva —
+  `scripts/crear-tabla-clan-invites.mts`, ya ejecutada contra
+  producción): solo el líder invita, y solo a amigos suyos. Push (Web
+  Push + FCM, mismo patrón que las solicitudes de amistad) al invitado.
+  Botón "Invitar amigos" en la página del clan; aviso de invitaciones
+  pendientes con aceptar/rechazar en `/clanes`.
+
+**Verificado con datos reales, no inventados**: ya existía un clan real
+en producción (`[FNTR] Fontanero`) creado por el propio usuario mientras
+se trabajaba en esto — se usó para confirmar en `next start` local que
+el ranking, el XP total y el feed de actividad pintan bien con datos de
+verdad (reseña + valoración reales de un miembro real, avatar de Steam,
+carátula de PSN) antes de desplegar. El botón de invitar no se ha podido
+probar visualmente (necesita sesión + amigos reales), pero sigue el
+mismo patrón ya probado de solicitudes de amistad.
