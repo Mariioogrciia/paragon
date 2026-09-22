@@ -1,9 +1,10 @@
 import "server-only";
 import { db } from "@/db";
-import { clans, clanMembers, games, gameTrophies, userTrophies } from "@/db/schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { clans, clanMembers, games, gameTrophies, userTrophies, activities, users } from "@/db/schema";
+import { eq, and, inArray, desc } from "drizzle-orm";
 import { trophyScore } from "./trophyScore";
 import { errorSiOfensivo } from "./contentFilter";
+import { avatarUrlSql } from "./avatarSql";
 import type { TrophyGrade } from "./types";
 
 /**
@@ -168,4 +169,45 @@ export async function getClanScore(clanId: string) {
   }
 
   return totalScore;
+}
+
+/**
+ * Últimas valoraciones/reseñas/platinos/favoritos/altas de juego de los
+ * miembros del clan — mismo origen que el feed de amigos (`lib/feed.ts`,
+ * tabla `activities`), pero filtrado por clan en vez de por amistad, y sin
+ * reacciones/comentarios: es un escaparate de "el clan está vivo", no una
+ * segunda red social dentro de la primera. Una sola consulta para todo el
+ * clan (mismo motivo que `getClanScore`), no una por miembro.
+ */
+export async function getClanActivity(clanId: string, limite = 15) {
+  const memberIds = await db
+    .select({ userId: clanMembers.userId })
+    .from(clanMembers)
+    .where(eq(clanMembers.clanId, clanId));
+
+  if (memberIds.length === 0) return [];
+
+  return db
+    .select({
+      id: activities.id,
+      type: activities.type,
+      rating: activities.rating,
+      createdAt: activities.createdAt,
+      user: {
+        handle: users.handle,
+        name: users.name,
+        image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+      },
+      game: {
+        id: games.id,
+        title: games.title,
+        iconUrl: games.iconUrl,
+      },
+    })
+    .from(activities)
+    .innerJoin(users, eq(activities.userId, users.id))
+    .innerJoin(games, eq(activities.gameId, games.id))
+    .where(inArray(activities.userId, memberIds.map((m) => m.userId)))
+    .orderBy(desc(activities.createdAt))
+    .limit(limite);
 }

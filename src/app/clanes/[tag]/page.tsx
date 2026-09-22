@@ -1,4 +1,4 @@
-import { getClanByTag, getClanScore, getClanMembers } from "@/lib/clans";
+import { getClanByTag, getClanScore, getClanMembers, getClanActivity } from "@/lib/clans";
 import { notFound } from "next/navigation";
 import { ClanActions } from "./ClanActions";
 import { auth } from "@/auth";
@@ -7,19 +7,23 @@ import { users } from "@/db/schema";
 import { inArray } from "drizzle-orm";
 import { Avatar } from "@/components/Avatar";
 import { avatarUrlSql } from "@/lib/avatarSql";
+import { ClanActivityFeed } from "@/components/ClanActivityFeed";
 
 export default async function ClanPage({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params;
   const clan = await getClanByTag(tag);
-  
+
   if (!clan) notFound();
 
   const session = await auth();
   const userId = session?.user?.id;
-  
-  const score = await getClanScore(clan.id);
-  const members = await getClanMembers(clan.id);
-  
+
+  const [score, members, actividad] = await Promise.all([
+    getClanScore(clan.id),
+    getClanMembers(clan.id),
+    getClanActivity(clan.id),
+  ]);
+
   const amIMember = members.some(m => m.userId === userId);
   const amIOwner = clan.ownerId === userId;
 
@@ -68,27 +72,34 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
         )}
       </div>
 
-      <div className="mt-12">
-        <h2 className="font-heading text-2xl font-bold mb-6">Miembros del Clan</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {memberProfiles.map(p => {
-            const membership = members.find(m => m.userId === p.id);
-            return (
-              <a 
-                key={p.id} 
-                href={`/u/${p.handle}`}
-                className="flex items-center gap-4 rounded-xl border border-border bg-surface p-4 hover:border-[var(--accent)] transition-colors"
-              >
-                <Avatar src={p.image} name={p.name ?? p.handle ?? "?"} size={48} />
-                <div>
-                  <p className="font-bold">{p.name || p.handle}</p>
-                  <p className="text-xs text-muted">
-                    {membership?.role === 'owner' ? "🏆 Lider" : "Miembro"}
-                  </p>
-                </div>
-              </a>
-            );
-          })}
+      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="min-w-0">
+          <h2 className="font-heading text-2xl font-bold mb-6">Actividad del Clan</h2>
+          <ClanActivityFeed items={actividad} />
+        </div>
+
+        <div className="min-w-0">
+          <h2 className="font-heading text-2xl font-bold mb-6">Miembros ({members.length})</h2>
+          <div className="grid gap-3">
+            {memberProfiles.map(p => {
+              const membership = members.find(m => m.userId === p.id);
+              return (
+                <a
+                  key={p.id}
+                  href={`/u/${p.handle}`}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3 hover:border-[var(--accent)] transition-colors"
+                >
+                  <Avatar src={p.image} name={p.name ?? p.handle ?? "?"} size={40} />
+                  <div className="min-w-0">
+                    <p className="truncate font-bold">{p.name || p.handle}</p>
+                    <p className="text-xs text-muted">
+                      {membership?.role === 'owner' ? "🏆 Líder" : "Miembro"}
+                    </p>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
