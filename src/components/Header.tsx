@@ -224,7 +224,7 @@ export function Header({
           onClick={() => setMenuAbierto((v) => !v)}
           aria-label={menuAbierto ? t("cerrarMenu") : t("abrirMenu")}
           aria-expanded={menuAbierto}
-          className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground sm:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-foreground sm:hidden"
           style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

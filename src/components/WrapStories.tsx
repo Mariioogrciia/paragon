@@ -149,7 +149,7 @@ export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose:
           type="button"
           aria-label={t("WrapStories.cerrar")}
           onClick={onClose}
-          className="absolute right-3 top-8 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/50"
+          className="absolute right-3 top-8 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/50"
         >
           <X size={18} />
         </button>
