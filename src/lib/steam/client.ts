@@ -161,7 +161,7 @@ export async function resolveProfile(input: string): Promise<ResolvedSteamProfil
  */
 export async function canReadLibrary(steamId: string): Promise<boolean> {
   const owned = await get<{ response: { game_count?: number } }>(
-    `${API}/IPlayerService/GetOwnedGames/v1/?key=${apiKey()}&steamid=${steamId}&include_played_free_games=1`,
+    `${API}/IPlayerService/GetOwnedGames/v1/?key=${apiKey()}&steamid=${steamId}&include_played_free_games=1&skip_unvetted_apps=false`,
   );
 
   return typeof owned?.response?.game_count === "number";
@@ -190,11 +190,18 @@ function headerImage(appid: number): string {
  * Steam no devuelve el porcentaje de logros aquí — habría que pedir los logros
  * juego a juego, que son cientos de llamadas. Los juegos salen a cero y el
  * porcentaje se rellena cuando se sincroniza el detalle (ver sync.ts).
+ *
+ * `skip_unvetted_apps=false`: por defecto Steam OMITE del todo juegos que
+ * marca como "sin revisar" — no es lo mismo que "privado" ni que "F2P", pasa
+ * con juegos indie reales que llevan años en la tienda (confirmado con
+ * HoloCure: sin este parámetro no aparecía en absoluto en `GetOwnedGames`,
+ * pese a tener logros reales y jugados vía `GetPlayerAchievements`). Sin
+ * este flag, esos juegos son invisibles para el sync sin que nada lo avise.
  */
 export async function fetchLibrary(steamId: string): Promise<Game[]> {
   const owned = await get<{ response: { games?: OwnedGame[] } }>(
     `${API}/IPlayerService/GetOwnedGames/v1/?key=${apiKey()}&steamid=${steamId}` +
-      `&include_appinfo=1&include_played_free_games=1`,
+      `&include_appinfo=1&include_played_free_games=1&skip_unvetted_apps=false`,
   );
 
   const list = owned?.response?.games;
