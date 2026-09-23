@@ -5,13 +5,13 @@ import Link from "next/link";
 import { ClanCreateForm } from "./ClanCreateForm";
 import { PendingClanInvites } from "./PendingClanInvites";
 import { auth } from "@/auth";
-import { getPendingInvites } from "@/lib/clans";
+import { getPendingInvites, getUserClan } from "@/lib/clans";
 
 export default async function ClanesPage() {
   const session = await auth();
   const userId = session?.user?.id;
 
-  const [allClanes, invitaciones] = await Promise.all([
+  const [allClanes, invitaciones, miClan] = await Promise.all([
     // Obtener todos los clanes y contar sus miembros
     db
       .select({
@@ -26,6 +26,7 @@ export default async function ClanesPage() {
       .groupBy(clans.id)
       .orderBy(desc(sql`count(${clanMembers.userId})`)),
     userId ? getPendingInvites(userId) : Promise.resolve([]),
+    userId ? getUserClan(userId) : Promise.resolve(null),
   ]);
 
   return (
@@ -35,7 +36,18 @@ export default async function ClanesPage() {
           <h1 className="font-heading text-4xl font-bold uppercase">Clanes de Cazadores</h1>
           <p className="text-muted mt-2">Únete a un clan y suma fuerzas para dominar Paragon.</p>
         </div>
-        {session?.user && <ClanCreateForm />}
+        {session?.user && (
+          miClan ? (
+            <Link
+              href={`/clanes/${miClan.clan.tag.toLowerCase()}`}
+              className="rounded-[10px] border border-border px-4 py-2 font-bold text-muted transition-colors hover:border-[var(--accent)] hover:text-foreground"
+            >
+              Tu clan: [{miClan.clan.tag}] {miClan.clan.name}
+            </Link>
+          ) : (
+            <ClanCreateForm />
+          )
+        )}
       </div>
 
       {invitaciones.length > 0 && <PendingClanInvites invites={invitaciones} />}
