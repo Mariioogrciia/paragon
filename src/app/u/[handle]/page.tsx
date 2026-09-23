@@ -131,6 +131,11 @@ export default async function PerfilPage({
                 ? t("PerfilPage.sinCuentaPropio")
                 : t("PerfilPage.sinCuentaAjeno"))}
         </p>
+        {soloCuentasPrivadas && cuentasPrivadas[0].platform === "steam" && (
+          <p className="mx-auto mt-3 max-w-sm text-xs text-muted">
+            {t("PerfilPage.cuentaPrivadaSteamDetalle")}
+          </p>
+        )}
         {esMio && soloCuentasPrivadas && (
           <Link href="/ajustes/plataformas" className="mt-4 inline-block text-sm font-bold text-[rgb(var(--accent-rgb))] hover:underline">
             {t("PerfilPage.irAAjustesPlataformas")}

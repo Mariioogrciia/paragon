@@ -34,10 +34,16 @@
     "title": "Comptes de jeu",
     "description": "Relie tes plateformes pour synchroniser tes trophées automatiquement.",
     "help": {
-      "psn": "Ton identifiant public PlayStation, le nom sous lequel tu joues. Ton profil de trophées doit être public pour qu'on puisse le lire.",
-      "steam": "Ton pseudo Steam, ton SteamID64 ou l'URL de ton profil. Sur Steam, « Mon profil » et « Détails du jeu » doivent être publics.",
+      "psn": "Ton identifiant public PlayStation, le nom sous lequel tu joues.",
+      "steam": "Ton pseudo Steam, ton SteamID64 ou l'URL de ton profil.",
       "xbox": "Ton Gamertag Xbox. Synchronise réellement ton historique de succès via un service tiers (non officiel de Microsoft) — peut échouer ou cesser de fonctionner si ce service change.",
-      "epic": "Le lien vers ton profil Epic Games (ou ton ID de compte). Il doit être en « Public » — ce n'est pas une API officielle d'Epic, donc ça peut échouer ou cesser de fonctionner si Epic change son site."
+      "epic": "Le lien vers ton profil Epic Games (ou ton ID de compte) — ce n'est pas une API officielle d'Epic, donc ça peut échouer ou cesser de fonctionner si Epic change son site."
+    },
+    "avisoPublico": {
+      "psn": "Ton profil de trophées PSN doit être public, sinon on ne pourra pas lire tes jeux ni tes trophées.",
+      "steam": "Sur Steam, « Mon profil » ET « Détails du jeu » doivent être publics — un seul des deux ne suffit pas.",
+      "xbox": "Ton historique de succès Xbox doit être visible, sinon on ne pourra pas le lire après la liaison.",
+      "epic": "Ton profil Epic Games doit être en « Public », sinon on ne pourra pas lire tes succès."
     },
     "linked": "Relié",
     "private": "Privé",

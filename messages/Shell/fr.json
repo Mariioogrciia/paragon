@@ -112,8 +112,9 @@
     "puesto": " · place n°{puesto}"
   },
   "Home": {
-    "cuentaPrivadaAviso": "Ton compte {plataforma} est lié, mais il est privé — c'est pour ça qu'aucun jeu ni trophée n'apparaît.",
+    "cuentaPrivadaAviso": "Ton compte {plataforma} est lié, mais on ne peut pas lire ta bibliothèque — c'est pour ça qu'aucun jeu ni trophée n'apparaît.",
     "cuentaPrivadaAvisoEnlace": "Rends-le public et resynchronise →",
+    "cuentaPrivadaSteamDetalle": "Sur Steam, DEUX réglages doivent être publics — « Mon profil » et « Détails du jeu » — ton profil peut être public et quand même bloquer la lecture si « Détails du jeu » ne l'est pas.",
     "badge": "PlayStation, Steam et Xbox, unifiés",
     "heroTitleLine1": "Le prochain platine",
     "heroTitleLine2": "n'attend pas.",

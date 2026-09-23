@@ -912,9 +912,14 @@ export default async function HomePage() {
     <div className="space-y-9">
       {cuentaPrivadaSinJuegos && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 px-5 py-4">
-          <p className="text-sm text-foreground">
-            {t("cuentaPrivadaAviso", { plataforma: PLATFORM_LABEL[cuentaPrivadaSinJuegos.platform] })}
-          </p>
+          <div>
+            <p className="text-sm text-foreground">
+              {t("cuentaPrivadaAviso", { plataforma: PLATFORM_LABEL[cuentaPrivadaSinJuegos.platform] })}
+            </p>
+            {cuentaPrivadaSinJuegos.platform === "steam" && (
+              <p className="mt-1 text-xs text-muted">{t("cuentaPrivadaSteamDetalle")}</p>
+            )}
+          </div>
           <Link href="/ajustes/plataformas" className="shrink-0 text-sm font-bold text-[rgb(var(--accent-rgb))] hover:underline">
             {t("cuentaPrivadaAvisoEnlace")}
           </Link>

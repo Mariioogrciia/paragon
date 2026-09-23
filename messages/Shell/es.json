@@ -112,8 +112,9 @@
     "puesto": " · puesto #{puesto}"
   },
   "Home": {
-    "cuentaPrivadaAviso": "Tu cuenta de {plataforma} está vinculada, pero es privada — por eso no aparece ningún juego ni trofeo.",
+    "cuentaPrivadaAviso": "Tu cuenta de {plataforma} está vinculada, pero no podemos leer tu biblioteca — por eso no aparece ningún juego ni trofeo.",
     "cuentaPrivadaAvisoEnlace": "Hazla pública y sincroniza →",
+    "cuentaPrivadaSteamDetalle": "En Steam hacen falta DOS ajustes en público — «Mi perfil» y «Detalles del juego» — el perfil puede estar público y aun así bloquear la lectura si «Detalles del juego» no lo está.",
     "badge": "PlayStation, Steam y Xbox, unificado",
     "heroTitleLine1": "El siguiente platino",
     "heroTitleLine2": "no se espera.",

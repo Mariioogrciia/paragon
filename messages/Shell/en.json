@@ -112,8 +112,9 @@
     "puesto": " · rank #{puesto}"
   },
   "Home": {
-    "cuentaPrivadaAviso": "Your {plataforma} account is linked, but it's private — that's why no games or trophies show up.",
+    "cuentaPrivadaAviso": "Your {plataforma} account is linked, but we can't read your library — that's why no games or trophies show up.",
     "cuentaPrivadaAvisoEnlace": "Make it public and sync →",
+    "cuentaPrivadaSteamDetalle": "Steam needs TWO settings set to public — \"My Profile\" and \"Game Details\" — your profile can be public and still block reading if \"Game Details\" isn't.",
     "badge": "PlayStation, Steam and Xbox, unified",
     "heroTitleLine1": "The next platinum",
     "heroTitleLine2": "doesn't wait.",

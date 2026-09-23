@@ -34,10 +34,16 @@
     "title": "Spielkonten",
     "description": "Verknüpfe deine Plattformen, um deine Trophäen automatisch zu synchronisieren.",
     "help": {
-      "psn": "Deine öffentliche PlayStation-ID, der Name, unter dem du spielst. Dein Trophäenprofil muss öffentlich sein, damit wir es auslesen können.",
-      "steam": "Dein Steam-Benutzername, deine SteamID64 oder deine Profil-URL. Bei Steam müssen sowohl \"Mein Profil\" als auch \"Spieldetails\" öffentlich sein.",
+      "psn": "Deine öffentliche PlayStation-ID, der Name, unter dem du spielst.",
+      "steam": "Dein Steam-Benutzername, deine SteamID64 oder deine Profil-URL.",
       "xbox": "Dein Xbox-Gamertag. Synchronisiert deinen echten Erfolgsverlauf über einen Drittanbieter-Dienst (nicht offiziell von Microsoft) — kann ausfallen oder aufhören zu funktionieren, wenn sich dieser Dienst ändert.",
-      "epic": "Der Link zu deinem Epic Games-Profil (oder deine Account-ID). Muss auf „Öffentlich“ stehen — das ist keine offizielle Epic-API, kann also ausfallen oder aufhören zu funktionieren, wenn Epic ihre Website ändert."
+      "epic": "Der Link zu deinem Epic Games-Profil (oder deine Account-ID) — das ist keine offizielle Epic-API, kann also ausfallen oder aufhören zu funktionieren, wenn Epic ihre Website ändert."
+    },
+    "avisoPublico": {
+      "psn": "Dein PSN-Trophäenprofil muss öffentlich sein, sonst können wir deine Spiele oder Trophäen nicht lesen.",
+      "steam": "Bei Steam müssen sowohl „Mein Profil“ als auch „Spieldetails“ öffentlich sein — nur eines von beiden reicht nicht.",
+      "xbox": "Dein Xbox-Erfolgsverlauf muss sichtbar sein, sonst können wir ihn nach dem Verknüpfen nicht lesen.",
+      "epic": "Dein Epic-Games-Profil muss auf „Öffentlich“ stehen, sonst können wir deine Erfolge nicht lesen."
     },
     "linked": "Verknüpft",
     "private": "Privat",

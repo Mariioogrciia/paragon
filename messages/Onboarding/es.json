@@ -34,10 +34,16 @@
     "title": "Cuentas de Juegos",
     "description": "Vincula tus plataformas para sincronizar tus trofeos automáticamente.",
     "help": {
-      "psn": "Tu ID público de PlayStation, el nombre con el que juegas. Tu perfil de trofeos tiene que estar en público para que podamos leerlo.",
-      "steam": "Tu usuario de Steam, tu SteamID64 o la URL de tu perfil. En Steam, «Mi perfil» y «Detalles del juego» tienen que estar en público.",
+      "psn": "Tu ID público de PlayStation, el nombre con el que juegas.",
+      "steam": "Tu usuario de Steam, tu SteamID64 o la URL de tu perfil.",
       "xbox": "Tu Gamertag de Xbox. Sincroniza de verdad tu historial de logros, vía un servicio de terceros (no oficial de Microsoft) — puede fallar o dejar de funcionar si ese servicio cambia.",
-      "epic": "El enlace a tu perfil de Epic Games (o tu ID de cuenta). Tiene que estar en \"Público\" — no es una API oficial de Epic, así que puede fallar o dejar de funcionar si Epic cambia su web."
+      "epic": "El enlace a tu perfil de Epic Games (o tu ID de cuenta) — no es una API oficial de Epic, así que puede fallar o dejar de funcionar si Epic cambia su web."
+    },
+    "avisoPublico": {
+      "psn": "Tu perfil de trofeos de PSN tiene que estar en público, o no podremos leer tus juegos ni trofeos.",
+      "steam": "En Steam, «Mi perfil» Y «Detalles del juego» tienen que estar en público — con solo uno de los dos no basta.",
+      "xbox": "Tu historial de logros de Xbox tiene que ser visible, o no podremos leerlo tras vincular.",
+      "epic": "Tu perfil de Epic Games tiene que estar en «Público», o no podremos leer tus logros."
     },
     "linked": "Vinculado",
     "private": "Privado",

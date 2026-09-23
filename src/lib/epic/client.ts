@@ -72,28 +72,21 @@ export class EpicPrivateProfileError extends Error {
 }
 
 /**
- * GET contra el GraphQL de Epic devolviendo JSON, con `got-scraping` en vez
- * de `fetch` — ver el aviso de Cloudflare arriba. Mismo `try/catch` de
- * siempre alrededor de la petición (ver el comentario de steam/client.ts:
- * un fallo de red sin capturar aquí tira abajo el botón "Sincronizar" de la
- * cabecera para cualquiera). `got` lanza en vez de devolver un `response.ok`
- * a false, así que aquí el `catch` cubre TANTO el fallo de red como un
- * 4xx/5xx real — a diferencia de Steam/PSN, donde eso son dos pasos.
+ * GET contra el GraphQL de Epic devolviendo JSON, con cabeceras que imitan
+ * un navegador real para pasar el challenge de Cloudflare.
  *
- * `got-scraping` se importa DENTRO de la función, no arriba del todo del
- * archivo — bug real en producción (22 sept 2026): este archivo lo importa
- * `lib/profiles.ts`, que es universal (prácticamente toda página pasa por
- * ahí), así que un `import` estático de `got-scraping` se evaluaba en
- * CUALQUIER carga de página, no solo al sincronizar Epic. Cuando el
- * paquete externo falló en el entorno serverless de Vercel
- * (`Failed to load external module got-scraping-...: Error: ADM-ZIP:
- * Invalid filename` — un problema de cómo Vercel empaqueta sus ficheros de
- * datos de huella de navegador, no de este código), tiró abajo la web
- * ENTERA, no solo Epic. Un `import()` dinámico aquí dentro hace que el
- * módulo solo se cargue cuando de verdad se sincroniza una cuenta de Epic
- * — la ruta menos transitada de toda la app — así que si vuelve a fallar,
- * se queda contenido en el `catch` de abajo en vez de tumbar cualquier
- * página.
+ * Historia: originalmente usaba `got-scraping` (Apify) para imitar la huella
+ * TLS de un navegador, porque Cloudflare bloqueaba el `fetch` de Node con un
+ * 403 (`cf-mitigated: challenge`). Sin embargo, `got-scraping` falla en el
+ * entorno serverless de Vercel con "ADM-ZIP: Invalid filename" — el paquete
+ * guarda sus datos de huellas de navegador en zips que Vercel no despliega
+ * aunque el paquete esté en `serverExternalPackages` (bug confirmado en
+ * producción el 23 de septiembre de 2026 tras múltiples intentos: downgrade
+ * a v3, config de external, import dinámico — todo sin resultado). Se cambia
+ * a `fetch` nativo con cabeceras HTTP que imitan Chrome; si Cloudflare
+ * endurece la detección TLS y vuelve a bloquear, el `catch` de abajo lo
+ * absorbe silenciosamente y Epic simplemente no sincroniza ese ciclo — no
+ * tira abajo ninguna otra plataforma ni la app entera.
  */
 async function query<T>(operationName: string, variables: object, sha256Hash: string): Promise<T | null> {
   const url =
@@ -102,9 +95,28 @@ async function query<T>(operationName: string, variables: object, sha256Hash: st
     `&extensions=${encodeURIComponent(JSON.stringify({ persistedQuery: { version: 1, sha256Hash } }))}`;
 
   try {
-    const { gotScraping } = await import("got-scraping");
-    const response = await gotScraping({ url, responseType: "json", timeout: { request: 15_000 } });
-    return response.body as T;
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Origin": "https://store.epicgames.com",
+        "Referer": "https://store.epicgames.com/",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Ch-Ua": `"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"`,
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": `"Windows"`,
+      },
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      console.error("[epic] query", operationName, response.status, response.statusText);
+      return null;
+    }
+    return (await response.json()) as T;
   } catch (error) {
     console.error("[epic] query", operationName, error);
     return null;

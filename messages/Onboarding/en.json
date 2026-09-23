@@ -34,10 +34,16 @@
     "title": "Game Accounts",
     "description": "Link your platforms to sync your trophies automatically.",
     "help": {
-      "psn": "Your public PlayStation ID, the name you play under. Your trophy profile needs to be public for us to read it.",
-      "steam": "Your Steam username, your SteamID64, or your profile URL. On Steam, both \"My Profile\" and \"Game Details\" need to be public.",
+      "psn": "Your public PlayStation ID, the name you play under.",
+      "steam": "Your Steam username, your SteamID64, or your profile URL.",
       "xbox": "Your Xbox Gamertag. Syncs your real achievement history via a third-party service (not official from Microsoft) — it can fail or stop working if that service changes.",
-      "epic": "The link to your Epic Games profile (or your account ID). It needs to be set to \"Public\" — this isn't an official Epic API, so it can fail or stop working if Epic changes their site."
+      "epic": "The link to your Epic Games profile (or your account ID) — this isn't an official Epic API, so it can fail or stop working if Epic changes their site."
+    },
+    "avisoPublico": {
+      "psn": "Your PSN trophy profile needs to be public, or we won't be able to read your games or trophies.",
+      "steam": "On Steam, BOTH \"My Profile\" and \"Game Details\" need to be public — having just one of them isn't enough.",
+      "xbox": "Your Xbox achievement history needs to be visible, or we won't be able to read it after linking.",
+      "epic": "Your Epic Games profile needs to be set to \"Public\", or we won't be able to read your achievements."
     },
     "linked": "Linked",
     "private": "Private",

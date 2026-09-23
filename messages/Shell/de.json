@@ -112,8 +112,9 @@
     "puesto": " · Platz #{puesto}"
   },
   "Home": {
-    "cuentaPrivadaAviso": "Dein {plataforma}-Konto ist verknüpft, aber privat — deshalb werden keine Spiele oder Trophäen angezeigt.",
+    "cuentaPrivadaAviso": "Dein {plataforma}-Konto ist verknüpft, aber wir können deine Bibliothek nicht lesen — deshalb werden keine Spiele oder Trophäen angezeigt.",
     "cuentaPrivadaAvisoEnlace": "Öffentlich machen und synchronisieren →",
+    "cuentaPrivadaSteamDetalle": "Bei Steam müssen ZWEI Einstellungen auf öffentlich stehen — „Mein Profil“ und „Spieldetails“ — dein Profil kann öffentlich sein und das Lesen trotzdem blockieren, wenn „Spieldetails“ es nicht ist.",
     "badge": "PlayStation, Steam und Xbox, vereint",
     "heroTitleLine1": "Das nächste Platin",
     "heroTitleLine2": "wartet nicht.",

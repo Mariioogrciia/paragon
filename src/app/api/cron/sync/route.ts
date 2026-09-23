@@ -191,7 +191,12 @@ export async function GET(request: Request) {
   let detalles = 0;
 
   if (!agotado) {
-    // ISO string, no un Date crudo — ver el mismo aviso en syncHealth.ts.
+    // ISO string, NO un Date crudo dentro de sql`...` — mismo aviso que en
+    // syncHealth.ts (línea 55): el driver no conoce el tipo de columna en
+    // fragmentos sql crudos, así que lo pasa como `text`, y Postgres
+    // revienta con "operator does not exist: timestamp without time zone < text"
+    // (bug real en producción 23 sept 2026). El `::timestamp` del CASE de
+    // abajo es lo que fuerza el tipo correcto.
     const caducado = new Date(Date.now() - HORAS_CADUCIDAD * 60 * 60 * 1000).toISOString();
     // Xbox caduca antes que el resto — ver HORAS_CADUCIDAD_XBOX en syncHealth.ts.
     const caducadoXbox = new Date(Date.now() - HORAS_CADUCIDAD_XBOX * 60 * 60 * 1000).toISOString();
@@ -230,7 +235,7 @@ export async function GET(request: Request) {
       // un 500 en cada pasada del cron.
       .where(
         sql`${userGames.trophiesSyncedAt} is null
-          or ${userGames.trophiesSyncedAt} < (case when ${games.platform} = 'xbox' then ${caducadoXbox} else ${caducado} end)
+          or ${userGames.trophiesSyncedAt} < (case when ${games.platform} = 'xbox' then ${caducadoXbox} else ${caducado} end)::timestamp
           or coalesce(${userGames.earnedTotal}, 0) > (
           select count(*) from ${userTrophies}
           where ${userTrophies.gameId} = ${userGames.gameId}

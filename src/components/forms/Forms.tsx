@@ -25,6 +25,7 @@ import {
 import type { NavKey } from "@/lib/navPreferences";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { PrivacyGuide } from "@/components/PrivacyGuide";
+import { PublicAccountNotice } from "@/components/PublicAccountNotice";
 
 const EMPTY: ActionState = {};
 
@@ -44,6 +45,10 @@ function Submit({ children }: { children: React.ReactNode }) {
 
 function Feedback({ state }: { state: ActionState }) {
   if (state.error) return <p className="mt-2 text-sm text-danger">{state.error}</p>;
+  // Distinto del error: la cuenta SÍ se vinculó (se guardó), solo que no
+  // pudimos leer su biblioteca — un rojo de "esto ha fallado del todo"
+  // sería inexacto aquí.
+  if (state.warning) return <p className="mt-2 text-sm" style={{ color: "#e2b53e" }}>{state.warning}</p>;
   if (state.success) return <p className="mt-2 text-sm text-good">{state.success}</p>;
   return null;
 }
@@ -109,6 +114,7 @@ export function LinkPsnForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
+      <PublicAccountNotice platform="psn" />
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="onlineId"
@@ -133,6 +139,7 @@ export function LinkSteamForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
+      <PublicAccountNotice platform="steam" />
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="steamId"
@@ -157,6 +164,7 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
+      <PublicAccountNotice platform="xbox" />
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="gamertag"
@@ -182,6 +190,7 @@ export function LinkEpicForm({ current }: { current?: string | null }) {
 
   return (
     <form action={action}>
+      <PublicAccountNotice platform="epic" />
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="epicProfile"

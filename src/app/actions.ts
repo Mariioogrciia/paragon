@@ -54,6 +54,11 @@ import { setHiddenNavItems } from "@/lib/navPreferences";
 
 export interface ActionState {
   error?: string;
+  /** Distinto de `error`: la acción en sí funcionó (p. ej. la cuenta se
+   * vinculó de verdad), pero hay algo que el usuario debería saber — no es
+   * un fallo completo, así que un rojo de "esto no ha funcionado" sería
+   * engañoso. Ver `linkPlatform` (cuenta vinculada pero privada). */
+  warning?: string;
   success?: string;
 }
 
@@ -201,7 +206,14 @@ export async function testPushAction(): Promise<{ ok: boolean; error?: string }>
 
 /* ------------------------------ Cuentas de plataforma ----------------------------- */
 
-/** Qué hay que escribir en cada plataforma, y qué decir cuando no se puede leer. */
+/**
+ * Qué hay que escribir en cada plataforma, y qué decir cuando no se puede
+ * leer. `privado` empieza siempre por "Cuenta vinculada..." a propósito
+ * (pedido explícito del usuario, 23 sept 2026): la cuenta SÍ se guardó
+ * (`linkAccount` la inserta igual aunque no sea legible), así que decir
+ * solo "privado" o "no encontrado" sin más suena a que la vinculación en
+ * sí falló, cuando lo único que falló fue poder leer la biblioteca.
+ */
 const PLATFORM_COPY: Record<
   PlataformaVinculable,
   { field: string; missing: string; privado: (nombre: string) => string }
@@ -210,26 +222,29 @@ const PLATFORM_COPY: Record<
     field: "onlineId",
     missing: "Escribe tu ID de PlayStation.",
     privado: (nombre) =>
-      `Perfil ${nombre} encontrado, pero PlayStation no nos deja leer sus trofeos. ` +
+      `Cuenta vinculada a ${nombre}, pero PlayStation no nos deja leer sus trofeos. ` +
       `Tiene que ser amigo en PSN de la cuenta del servidor, o tener los trofeos en público.`,
   },
   steam: {
     field: "steamId",
     missing: "Escribe tu usuario de Steam, tu SteamID64 o la URL de tu perfil.",
     privado: (nombre) =>
-      `Perfil ${nombre} encontrado, pero es privado. En Steam: Perfil → Editar perfil → ` +
-      `Privacidad, y pon "Mi perfil" y "Detalles del juego" en público.`,
+      `Cuenta vinculada a ${nombre}, pero no podemos leer tu biblioteca. En Steam hacen falta DOS ` +
+      `ajustes en público — Perfil → Editar perfil → Privacidad, y pon "Mi perfil" Y "Detalles del ` +
+      `juego" en público (el perfil puede estar ya público y aun así bloquear la lectura si "Detalles ` +
+      `del juego" no lo está).`,
   },
   xbox: {
     field: "gamertag",
     missing: "Escribe tu Gamertag de Xbox.",
-    privado: (nombre) => `Perfil privado o no encontrado.`,
+    privado: (nombre) =>
+      `Cuenta vinculada a ${nombre}, pero no podemos leer su historial de logros — o el perfil no es público, o Xbox no lo encuentra.`,
   },
   epic: {
     field: "epicProfile",
     missing: "Pega el enlace a tu perfil de Epic Games (o tu ID de cuenta).",
     privado: (nombre) =>
-      `Perfil ${nombre} encontrado, pero no es público. En la Epic Games Store: tu avatar → ` +
+      `Cuenta vinculada a ${nombre}, pero no es público. En la Epic Games Store: tu avatar → ` +
       `"Mis logros" → "Nivel de privacidad" → "Público".`,
   },
 };
@@ -248,7 +263,7 @@ async function linkPlatform(
     const cuenta = await linkAccount(userId, platform, input);
     revalidatePath("/", "layout");
 
-    if (!cuenta.legible) return { error: copy.privado(cuenta.username) };
+    if (!cuenta.legible) return { warning: copy.privado(cuenta.username) };
 
     return {
       success: `Vinculado a ${cuenta.username}: ${cuenta.juegos} juegos importados.`,

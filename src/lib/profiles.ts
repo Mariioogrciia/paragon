@@ -273,7 +273,7 @@ export async function checkAndGrantBadges(userId: string) {
     .select({
       totalGames: sql<number>`count(distinct ${userGames.gameId})`,
       totalReviews: sql<number>`count(${userGames.review})`,
-      totalRpgs: sql<number>`count(*) filter (where ${userGames.progressPercent} > 0 and ${gamesTable.genres}::jsonb ? 'Role-playing (RPG)')`,
+      totalRpgs: sql<number>`count(*) filter (where ${userGames.progressPercent} > 0 and coalesce(${gamesTable.genres}, '[]')::jsonb ? 'Role-playing (RPG)')`,
       totalPlatinums: sql<number>`
         coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
         + count(*) filter (
@@ -625,7 +625,14 @@ export async function linkAccount(
     ? await syncLibrary(userId, { platform, accountId: resolved.accountId })
     : 0;
 
-  await checkAndGrantBadges(userId);
+  // No puede tumbar el flujo de vinculación — un fallo al calcular insignias
+  // (p. ej. géneros nulos en juegos de Steam recién importados) no debe
+  // impedir que la cuenta quede guardada correctamente.
+  try {
+    await checkAndGrantBadges(userId);
+  } catch (error) {
+    console.error("[linkAccount] checkAndGrantBadges", error);
+  }
 
   return { username: resolved.username, legible: resolved.legible, juegos };
 }
@@ -762,7 +769,14 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
     }
   }
 
-  await checkAndGrantBadges(userId);
+  // No puede tumbar la sincronización — mismo motivo que anunciarNivelSiSube
+  // de abajo: que las insignias fallen (p. ej. error de BD, géneros nulos)
+  // no debe dejar al usuario sin su biblioteca actualizada.
+  try {
+    await checkAndGrantBadges(userId);
+  } catch (error) {
+    console.error("[resyncLibraries] checkAndGrantBadges", error);
+  }
 
   // Nunca puede tirar abajo la sincronización — un DM que falla o Discord
   // caído no es motivo para que el usuario se quede sin su biblioteca
