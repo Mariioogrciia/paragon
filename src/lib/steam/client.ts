@@ -207,9 +207,21 @@ export async function fetchLibrary(steamId: string): Promise<Game[]> {
       title: g.name ?? `App ${g.appid}`,
       deviceLabel: "PC",
       iconUrl: headerImage(g.appid),
+      // Bug real en producción (23 sept 2026): Steam a veces omite
+      // `rtime_last_played` para un juego que SÍ se ha jugado hace poco —
+      // visto en vivo con 86 min de `playtime_2weeks` y 8 logros ganados
+      // hace 8 días, pero sin `rtime_last_played` en la respuesta. Sin
+      // fecha, "Jugado recientemente" (que filtra por `lastPlayedAt`
+      // presente — ver EstadisticasCompletas.tsx) lo excluía del todo, no
+      // solo lo ordenaba mal. `playtime_2weeks > 0` es la prueba de que sí
+      // se jugó en los últimos 14 días, así que a falta de la fecha exacta
+      // se usa el momento de la sincronización — mejor aproximación que
+      // desaparecer de la lista.
       lastPlayedAt: g.rtime_last_played
         ? new Date(g.rtime_last_played * 1000).toISOString()
-        : undefined,
+        : (g.playtime_2weeks ?? 0) > 0
+          ? new Date().toISOString()
+          : undefined,
       progressPercent: 0,
       definedTotal: 0,
       earnedTotal: 0,
