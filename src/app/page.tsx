@@ -28,6 +28,7 @@ import { ActivityStats } from "@/components/ActivityStats";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { TrophyRecommendations } from "@/components/TrophyRecommendations";
 import { paragonProgress } from "@/lib/level";
+import { PLATFORM_LABEL } from "@/lib/types";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
 import { esPlatinoEquivalente } from "@/lib/stats";
@@ -602,6 +603,16 @@ export default async function HomePage() {
   const stats = summarise(games);
   const nivelParagon = paragonProgress(games);
 
+  // Mismo bug real que en /u/[handle] (23 sept 2026): con una cuenta
+  // vinculada pero privada (frecuente en Steam: "Detalles del juego" no
+  // está en público aunque el perfil sí), `accounts.length` no es 0, así
+  // que no salta el redirect a /bienvenida — pero tampoco hay ni un solo
+  // juego que enseñar en todo el panel, sin ninguna pista de por qué.
+  const cuentaPrivadaSinJuegos =
+    games.length === 0 && profile.accounts.length > 0 && profile.accounts.every((a) => !a.isPublic)
+      ? profile.accounts[0]
+      : null;
+
   const recientes = games.filter(g => !g.isWishlist).slice(0, 6);
 
   // Detector de Atascos: solo tiene sentido mirarlo si hay un juego anclado
@@ -899,6 +910,17 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-9">
+      {cuentaPrivadaSinJuegos && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 px-5 py-4">
+          <p className="text-sm text-foreground">
+            {t("cuentaPrivadaAviso", { plataforma: PLATFORM_LABEL[cuentaPrivadaSinJuegos.platform] })}
+          </p>
+          <Link href="/ajustes/plataformas" className="shrink-0 text-sm font-bold text-[rgb(var(--accent-rgb))] hover:underline">
+            {t("cuentaPrivadaAvisoEnlace")}
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-end gap-6">
         <div>
           <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-muted">

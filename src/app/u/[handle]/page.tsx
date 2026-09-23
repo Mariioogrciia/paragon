@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { StatTile } from "@/components/StatTile";
 import { getLibrary, getProfileByHandle, getUserBadges, getFriendshipStatus } from "@/lib/profiles";
+import { PLATFORM_LABEL } from "@/lib/types";
 import { FriendRequestButton } from "@/components/FriendRequestButton";
 import { summarise } from "@/lib/stats";
 import { db } from "@/db";
@@ -105,15 +106,36 @@ export default async function PerfilPage({
   // Antes esto cortaba en seco si no había cuenta vinculada. Ya no vale: un
   // perfil puede tener solo juegos añadidos a mano y ninguna cuenta de PSN o
   // Steam, y aun así tiene biblioteca que enseñar.
-  if (profile.accounts.length === 0 && games.length === 0) {
+  //
+  // Bug real reportado por el usuario (23 sept 2026): a una cuenta nueva
+  // (Steam vinculado, pero privado — "Detalles del juego" no está en
+  // público, aunque el perfil sí) no le salía NINGÚN juego ni trofeo, y
+  // este bloque no lo cubría porque `profile.accounts.length` no era 0 —
+  // caía en la biblioteca normal, vacía, sin ninguna explicación de por
+  // qué. El error real ya se explica al vincular (linkPlatform,
+  // actions.ts), pero solo se ve una vez, en ese momento — quien no lo
+  // lea entonces se queda sin ninguna pista después.
+  const cuentasPrivadas = profile.accounts.filter((a) => !a.isPublic);
+  const soloCuentasPrivadas = profile.accounts.length > 0 && cuentasPrivadas.length === profile.accounts.length;
+
+  if ((profile.accounts.length === 0 || soloCuentasPrivadas) && games.length === 0) {
     return (
       <div className="py-16 text-center">
         <h1 className="text-xl font-medium">@{handle}</h1>
         <p className="mt-2 text-sm text-muted">
-          {esMio
-            ? t("PerfilPage.sinCuentaPropio")
-            : t("PerfilPage.sinCuentaAjeno")}
+          {soloCuentasPrivadas
+            ? (esMio
+                ? t("PerfilPage.cuentaPrivadaPropio", { plataforma: PLATFORM_LABEL[cuentasPrivadas[0].platform] })
+                : t("PerfilPage.cuentaPrivadaAjeno"))
+            : (esMio
+                ? t("PerfilPage.sinCuentaPropio")
+                : t("PerfilPage.sinCuentaAjeno"))}
         </p>
+        {esMio && soloCuentasPrivadas && (
+          <Link href="/ajustes/plataformas" className="mt-4 inline-block text-sm font-bold text-[rgb(var(--accent-rgb))] hover:underline">
+            {t("PerfilPage.irAAjustesPlataformas")}
+          </Link>
+        )}
         {esMio && (
           <div className="flex justify-center mt-4 gap-3">
             <ImportLibraryModal />

@@ -112,6 +112,8 @@
     "puesto": " · place n°{puesto}"
   },
   "Home": {
+    "cuentaPrivadaAviso": "Ton compte {plataforma} est lié, mais il est privé — c'est pour ça qu'aucun jeu ni trophée n'apparaît.",
+    "cuentaPrivadaAvisoEnlace": "Rends-le public et resynchronise →",
     "badge": "PlayStation, Steam et Xbox, unifiés",
     "heroTitleLine1": "Le prochain platine",
     "heroTitleLine2": "n'attend pas.",

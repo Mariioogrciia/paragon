@@ -112,6 +112,8 @@
     "puesto": " · Platz #{puesto}"
   },
   "Home": {
+    "cuentaPrivadaAviso": "Dein {plataforma}-Konto ist verknüpft, aber privat — deshalb werden keine Spiele oder Trophäen angezeigt.",
+    "cuentaPrivadaAvisoEnlace": "Öffentlich machen und synchronisieren →",
     "badge": "PlayStation, Steam und Xbox, vereint",
     "heroTitleLine1": "Das nächste Platin",
     "heroTitleLine2": "wartet nicht.",

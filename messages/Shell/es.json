@@ -112,6 +112,8 @@
     "puesto": " · puesto #{puesto}"
   },
   "Home": {
+    "cuentaPrivadaAviso": "Tu cuenta de {plataforma} está vinculada, pero es privada — por eso no aparece ningún juego ni trofeo.",
+    "cuentaPrivadaAvisoEnlace": "Hazla pública y sincroniza →",
     "badge": "PlayStation, Steam y Xbox, unificado",
     "heroTitleLine1": "El siguiente platino",
     "heroTitleLine2": "no se espera.",

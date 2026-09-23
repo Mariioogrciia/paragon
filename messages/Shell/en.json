@@ -112,6 +112,8 @@
     "puesto": " · rank #{puesto}"
   },
   "Home": {
+    "cuentaPrivadaAviso": "Your {plataforma} account is linked, but it's private — that's why no games or trophies show up.",
+    "cuentaPrivadaAvisoEnlace": "Make it public and sync →",
     "badge": "PlayStation, Steam and Xbox, unified",
     "heroTitleLine1": "The next platinum",
     "heroTitleLine2": "doesn't wait.",
