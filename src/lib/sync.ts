@@ -153,7 +153,16 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
         set: {
           title: sqlExcluded("title"),
           deviceLabel: sqlExcluded("deviceLabel"),
-          iconUrl: sqlExcluded("iconUrl"),
+          // `coalesce(actual, nueva)`, NO al revés: la biblioteca de Steam
+          // siempre manda la URL "clásica" (cdn.../steam/apps/<id>/header.jpg),
+          // que en juegos recientes devuelve 404 (Steam los sirve con hash
+          // desde otra ruta — ver headerImage() y syncStoreMetadata() más
+          // abajo, que SÍ trae la buena). Sin este coalesce, cada
+          // sincronización (cada 15 min) volvía a pisar la URL ya arreglada
+          // con la rota de siempre — encontrado de verdad: Battlefield 6 y
+          // otros se "arreglaban" una vez y volvían a salir sin foto en la
+          // siguiente pasada.
+          iconUrl: sql`coalesce(${games.iconUrl}, excluded."iconUrl")`,
           // Steam manda 0 aquí: el total de verdad llega con el detalle, así
           // que no pisamos lo que ya supiéramos con un cero.
           definedTotal: sql`greatest(${games.definedTotal}, excluded."definedTotal")`,
