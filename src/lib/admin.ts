@@ -1,5 +1,5 @@
 import "server-only";
-import { desc, eq, sql, and } from "drizzle-orm";
+import { desc, eq, sql, and, isNotNull } from "drizzle-orm";
 import { db } from "@/db";
 import {
   activities,
@@ -368,6 +368,14 @@ export interface AdminRecentTrophyRow {
  * paso enseña los últimos de cada usuario activo sin tener que entrar
  * perfil por perfil. `id` compuesto (no hay PK propia en user_trophy) para
  * la key de React.
+ *
+ * Bug real (23 sept 2026): sin `isNotNull(earnedAt)`, la columna "Cuándo"
+ * salía vacía en TODAS las filas — Postgres pone los NULL primero en un
+ * `ORDER BY ... DESC` por defecto, así que un `earnedAt DESC` sin filtrar
+ * sacaba justo los trofeos SIN fecha registrada arriba del todo, no los más
+ * recientes de verdad. Un trofeo sin fecha no se puede ordenar por
+ * recencia de todas formas, así que se descarta en vez de intentar
+ * ordenarlo.
  */
 export async function getAdminRecentTrophies(limit = 60): Promise<AdminRecentTrophyRow[]> {
   const rows = await db
@@ -388,7 +396,7 @@ export async function getAdminRecentTrophies(limit = 60): Promise<AdminRecentTro
     .innerJoin(users, eq(users.id, userTrophies.userId))
     .innerJoin(games, eq(games.id, userTrophies.gameId))
     .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
-    .where(eq(userTrophies.earned, true))
+    .where(and(eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt)))
     .orderBy(desc(userTrophies.earnedAt))
     .limit(limit);
 
@@ -414,7 +422,7 @@ export interface AdminUserTrophyRow {
   earnedAt: Date | null;
 }
 
-/** Últimos trofeos de UN usuario en concreto — para la ficha de detalle de admin. */
+/** Últimos trofeos de UN usuario en concreto — para la ficha de detalle de admin. Mismo motivo de `isNotNull` que `getAdminRecentTrophies`. */
 export async function getAdminUserRecentTrophies(userId: string, limit = 20): Promise<AdminUserTrophyRow[]> {
   return db
     .select({
@@ -428,7 +436,7 @@ export async function getAdminUserRecentTrophies(userId: string, limit = 20): Pr
     .from(userTrophies)
     .innerJoin(games, eq(games.id, userTrophies.gameId))
     .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
-    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true)))
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt)))
     .orderBy(desc(userTrophies.earnedAt))
     .limit(limit);
 }
