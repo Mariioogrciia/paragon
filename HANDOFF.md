@@ -5499,3 +5499,41 @@ despliegue.
 **Nota para la próxima vez que algo similar tarde mucho**: revisar
 primero cualquier `fetch()` sin `signal`/timeout en el camino de render
 de una página — es el patrón real que ya ha causado esto una vez.
+
+---
+
+## Cron 500s y errores de Epic/FCM (23 sept 2026, continuación)
+
+Sesión autónoma mientras el usuario estaba fuera — commit `e322ff3`,
+varios bugs reales encontrados y arreglados de una vez:
+
+- **`/api/cron/sync` volvía a dar 500**: `operator does not exist:
+  timestamp without time zone < text` en el `CASE` de
+  `trophiesSyncedAt` — mismo bug de tipos que ya se había arreglado en
+  `syncHealth.ts` el 22 de septiembre, pero no se había replicado aquí.
+  Arreglado con `::timestamp` explícito.
+- **`checkAndGrantBadges` podía tumbar la sincronización entera**: sin
+  `try/catch` en `resyncLibraries`/`linkAccount` (a diferencia de
+  `anunciarNivelSiSube`, que sí lo llevaba), cualquier fallo al calcular
+  insignias cortaba en seco la sincronización de esa cuenta.
+- **`genres` null explotaba el cast a jsonb**: juegos de Steam recién
+  importados pueden tener `genres` null, y `checkAndGrantBadges` hacía
+  un cast directo sin `coalesce`.
+- **`got-scraping` (Epic) definitivamente incompatible con Vercel**:
+  después del fix de import dinámico del 22 de septiembre (que solo
+  evitaba que tumbara TODA la web, no que Epic sincronizara), se probó
+  downgrade de versión, config de `serverExternalPackages` distinta, y
+  el import dinámico — nada funcionó, el error `ADM-ZIP: Invalid
+  filename` persistía en el entorno serverless real de Vercel
+  (nunca reproducible en local). Solución final: se quita `got-scraping`
+  del todo (paquete desinstalado, `serverExternalPackages` limpiado de
+  `next.config.ts`) y `lib/epic/client.ts` pasa a `fetch` nativo con
+  cabeceras que imitan Chrome de verdad (User-Agent, Sec-Fetch-*,
+  Sec-Ch-Ua...) para intentar pasar el challenge de Cloudflare sin
+  depender de un paquete que imite la huella TLS. Si Cloudflare endurece
+  la detección más allá de lo que unas cabeceras HTTP pueden imitar,
+  esto puede volver a fallar — el `catch` ya existente lo absorbe sin
+  tumbar nada más, igual que antes.
+
+Verificado tras el despliegue: `/api/cron/sync` responde 200 con varias
+cuentas sincronizadas y 0 fallos.
