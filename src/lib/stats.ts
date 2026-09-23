@@ -1,6 +1,7 @@
 import { dificultadDesdeRareza, type Dificultad } from "@/lib/difficulty";
 import {
   emptyCounts,
+  PLATFORMS_WITH_METALS,
   type Game,
   type Library,
   type Platform,
@@ -131,6 +132,8 @@ export interface PlayerSummary {
   completadoMedio: number;
   /** Cuántos juegos aporta cada plataforma vinculada. */
   porPlataforma: Partial<Record<Platform, number>>;
+  /** Si hay algún juego de una plataforma que de verdad da oro/plata/bronce. */
+  tieneMetales: boolean;
 }
 
 export function summarise(allGames: Game[]): PlayerSummary {
@@ -170,6 +173,7 @@ export function summarise(allGames: Game[]): PlayerSummary {
             empezados.reduce((n, g) => n + g.progressPercent, 0) / empezados.length,
           ),
     porPlataforma,
+    tieneMetales: games.some((g) => PLATFORMS_WITH_METALS.includes(g.platform)),
   };
 }
 

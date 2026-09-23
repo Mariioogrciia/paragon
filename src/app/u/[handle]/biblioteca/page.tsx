@@ -86,7 +86,7 @@ export default async function BibliotecaPage({
 
       <div className="space-y-9">
         <CollectionProgress collections={carpetas} games={games} handle={handle} />
-        <TrophyCountRow counts={stats.counts} />
+        <TrophyCountRow counts={stats.counts} tieneMetales={stats.tieneMetales} />
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-3.5">
             <h2 className="font-heading text-2xl font-bold">{t("BibliotecaPage.gamesHeading")}</h2>

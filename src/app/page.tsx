@@ -984,6 +984,7 @@ export default async function HomePage() {
                 <TrophyCountRow
                   counts={stats.counts}
                   summary={t("trofeosEnJuegos", { trofeos: stats.trofeos.toLocaleString("es-ES"), juegos: stats.juegos })}
+                  tieneMetales={stats.tieneMetales}
                 />
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2.5fr]">

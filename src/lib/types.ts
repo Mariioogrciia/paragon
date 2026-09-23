@@ -94,6 +94,15 @@ export type TrophyCounts = Record<TrophyGrade, number>;
 
 export const GRADES: TrophyGrade[] = ["platinum", "gold", "silver", "bronze"];
 
+/**
+ * Plataformas cuya API devuelve oro/plata/bronce de verdad (no solo
+ * platino/100%). Steam y Xbox no tienen ese desglose (`grade: undefined`
+ * en sus clientes) — una biblioteca solo de esas dos siempre daría 0 en
+ * las tres, así que `TrophyCountRow` las oculta en vez de enseñarlas a
+ * cero (ver HANDOFF.md).
+ */
+export const PLATFORMS_WITH_METALS: Platform[] = ["psn", "epic"];
+
 export function emptyCounts(): TrophyCounts {
   return { platinum: 0, gold: 0, silver: 0, bronze: 0 };
 }

@@ -9,19 +9,29 @@ import { TrophyIcon } from "./TrophyIcon";
  * platino son casi grises a propósito (es el color del material), así que el
  * color por sí solo no distinguiría uno de otro.
  */
-export function TrophyCountRow({ counts, summary }: { counts: Counts; summary?: string }) {
+export function TrophyCountRow({
+  counts,
+  summary,
+  tieneMetales = true,
+}: {
+  counts: Counts;
+  summary?: string;
+  /** Falso cuando la biblioteca no tiene ningún juego con oro/plata/bronce de verdad (solo Steam/Xbox) — oculta esas tres columnas en vez de enseñarlas siempre a cero. */
+  tieneMetales?: boolean;
+}) {
   const t = useTranslations("Biblioteca");
+  const grades = tieneMetales ? GRADES : GRADES.filter((g) => g === "platinum");
   return (
     <div
       className="flex items-center gap-2.5 rounded-2xl px-5 py-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.08)]"
       style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
     >
       <ul className="flex flex-1 flex-wrap items-center">
-        {GRADES.map((grade, i) => (
+        {grades.map((grade, i) => (
           <li
             key={grade}
             className="flex items-center gap-2.5 pr-[22px]"
-            style={i < GRADES.length - 1 ? { marginRight: 12, borderRight: "1px solid var(--border)" } : undefined}
+            style={i < grades.length - 1 ? { marginRight: 12, borderRight: "1px solid var(--border)" } : undefined}
           >
             <TrophyIcon grade={grade} size={20} />
             <span className="font-heading text-lg font-bold tabular-nums">{counts[grade]}</span>
