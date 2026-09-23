@@ -1,7 +1,15 @@
 import { getDb } from "@/db";
-import { users, userTrophies, gameTrophies } from "@/db/schema";
+import { users, userTrophies, gameTrophies, games } from "@/db/schema";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
+
+/** Misma escala de puntos que `getLigaMensual` — un trofeo suelto, no un resumen. */
+function puntosPorGrado(grade: string | null): number {
+  if (grade === "platinum") return 100;
+  if (grade === "gold") return 50;
+  if (grade === "silver") return 25;
+  return 10;
+}
 
 export interface LigaUser {
   userId: string;
@@ -65,4 +73,53 @@ export async function getLigaMensual(mesObjetivo?: Date): Promise<LigaUser[]> {
     ...r,
     points: Number(r.points ?? 0),
   }));
+}
+
+export interface LigaTrofeoDesglose {
+  gameTitle: string | null;
+  gameIconUrl: string | null;
+  trophyName: string;
+  grade: string | null;
+  points: number;
+  earnedAt: Date | null;
+}
+
+/**
+ * Desglose trofeo a trofeo de la puntuación de un usuario en la Liga
+ * Mensual — misma ventana de fechas y misma fórmula de puntos
+ * (`puntosPorGrado`) que `getLigaMensual`, para que la suma de aquí
+ * cuadre siempre con el número que ya se ve en la clasificación.
+ */
+export async function getLigaMensualDesglose(userId: string, mesObjetivo?: Date): Promise<LigaTrofeoDesglose[]> {
+  const db = getDb();
+  const targetDate = mesObjetivo || new Date();
+
+  const startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+  const startOfNextMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 1);
+
+  const rows = await db
+    .select({
+      gameTitle: games.title,
+      gameIconUrl: games.iconUrl,
+      trophyName: gameTrophies.name,
+      grade: gameTrophies.grade,
+      earnedAt: userTrophies.earnedAt,
+    })
+    .from(userTrophies)
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .innerJoin(
+      gameTrophies,
+      and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
+    )
+    .where(
+      and(
+        eq(userTrophies.userId, userId),
+        eq(userTrophies.earned, true),
+        gte(userTrophies.earnedAt, startOfMonth),
+        lte(userTrophies.earnedAt, startOfNextMonth),
+      ),
+    )
+    .orderBy(desc(userTrophies.earnedAt));
+
+  return rows.map((r) => ({ ...r, points: puntosPorGrado(r.grade) }));
 }

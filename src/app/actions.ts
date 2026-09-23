@@ -39,6 +39,7 @@ import {
 import { toggleReservedMilestone } from "@/lib/milestones";
 import { toggleActivityReaction, addActivityComment } from "@/lib/feed";
 import { createLeague, addLeagueMember, removeLeagueMember, deleteLeague, setLeagueChallenge, acceptLeagueInvite, declineLeagueInvite, NotFriendsError, type LeagueDurationUnit } from "@/lib/leagues";
+import { getLigaMensualDesglose, type LigaTrofeoDesglose } from "@/lib/ligas";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
@@ -1400,6 +1401,17 @@ export async function declineLeagueInviteAction(formData: FormData): Promise<voi
   // segundo caso, quedarse en esa página tras rechazarla ya no tiene nada
   // que enseñar, así que siempre vuelve a la lista.
   redirect("/ligas");
+}
+
+/**
+ * Desglose de puntos de un usuario en la Liga Mensual, para el modal que
+ * se abre al pulsar su fila en la clasificación — solo lectura, sin
+ * requireUserId: la clasificación en sí ya es pública para cualquiera que
+ * visite /ligas, con o sin sesión, así que el desglose no debería ser más
+ * restrictivo que la propia tabla que lo contiene.
+ */
+export async function getLigaMensualDesgloseAction(userId: string): Promise<LigaTrofeoDesglose[]> {
+  return getLigaMensualDesglose(userId);
 }
 
 export async function addLeagueMemberAction(formData: FormData): Promise<void> {

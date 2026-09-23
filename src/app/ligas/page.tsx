@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
+import { LigaMensualFila } from "@/components/LigaMensualFila";
 import { BackButton } from "@/components/BackButton";
 import { NewLeagueForm } from "@/components/forms/Forms";
 import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
@@ -109,38 +110,7 @@ export default async function LigasPage() {
             </thead>
             <tbody>
               {ranking.map((user, index) => (
-                <tr 
-                  key={user.userId} 
-                  className={`border-b border-border transition-colors hover:bg-black/10 ${index < 3 ? 'bg-[rgb(var(--accent-rgb)/0.03)]' : ''}`}
-                >
-                  <td className="p-4 text-center">
-                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${
-                      index === 0 ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' :
-                      index === 1 ? 'bg-gray-400/20 text-gray-400 border border-gray-400/50' :
-                      index === 2 ? 'bg-amber-700/20 text-amber-600 border border-amber-700/50' :
-                      'text-muted bg-surface-2'
-                    }`}>
-                      {index + 1}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar src={user.image} name={user.name ?? user.handle ?? "?"} size={36} />
-                      {user.handle ? (
-                        <Link href={`/u/${user.handle}`} className="font-bold hover:text-[rgb(var(--accent-rgb))] transition-colors">
-                          {user.name ?? `@${user.handle}`}
-                        </Link>
-                      ) : (
-                        <span className="font-bold">{user.name ?? t("LigasPage.alguien")}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-4 text-right">
-                    <span className="font-heading text-xl font-bold text-[rgb(var(--accent-rgb))]">
-                      {user.points.toLocaleString()}
-                    </span>
-                  </td>
-                </tr>
+                <LigaMensualFila key={user.userId} user={user} index={index} />
               ))}
             </tbody>
           </table>
