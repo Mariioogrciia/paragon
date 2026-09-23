@@ -5537,3 +5537,42 @@ varios bugs reales encontrados y arreglados de una vez:
 
 Verificado tras el despliegue: `/api/cron/sync` responde 200 con varias
 cuentas sincronizadas y 0 fallos.
+
+---
+
+## Aviso de "cuenta pública" al vincular + "vinculada, pero sin acceso" (23 sept 2026)
+
+Pedido del usuario tras el caso de anhalian (ver el incidente de arriba
+sobre "no aparecen juegos"): quería el aviso ANTES de vincular, no solo
+después. Y de paso corrigió algo que yo mismo había escrito mal: mi
+primer mensaje decía "tu cuenta es privada" en genérico, y el usuario
+avisó de que Steam le decía que el problema era de "Detalles del juego",
+no del perfil (que sí tenía público) — confirmando en código lo que ya
+decía el comentario de `resolveSteam`: son DOS ajustes distintos, uno no
+implica el otro.
+
+- **`PublicAccountNotice.tsx`** (nuevo): aviso SIEMPRE visible (no
+  colapsado como `PrivacyGuide`, que sigue existiendo aparte con los
+  pasos exactos) encima de cada campo de vinculación (PSN/Steam/Xbox/
+  Epic), explicando que la cuenta tiene que estar en público antes de
+  vincular — no después de descubrir que la biblioteca está vacía.
+- **Mensajes de "cuenta privada" corregidos para ser precisos**: dejaron
+  de decir "es privada" a secas (falso para alguien con el perfil ya
+  público) y pasaron a "no podemos leer tu biblioteca — revisa el ajuste
+  de privacidad", con una frase aparte solo para Steam explicando las DOS
+  casillas («Mi perfil» y «Detalles del juego»). Tocado en tres sitios:
+  el aviso de `/u/[handle]` y `/` (panel) de la sesión anterior, y el
+  mensaje que devuelve `linkPlatform` al vincular.
+- **`ActionState.warning`** (nuevo, en `actions.ts`): antes, vincular una
+  cuenta privada devolvía `error`, aunque la cuenta SÍ se guardaba en la
+  base (`linkAccount` la inserta igual) — un rojo de "esto ha fallado"
+  era falso, la vinculación funcionó, solo falló LEER la biblioteca.
+  `linkPlatform` devuelve ahora `warning` (ámbar, no rojo) con el mensaje
+  empezando siempre por "Cuenta vinculada a {nombre}, pero..." — pedido
+  explícito del usuario. `Feedback` (`Forms.tsx`) sabe pintar los tres
+  estados.
+
+Verificado en el navegador contra `next start` (build de producción)
+señalando la propia cuenta real de anhalian: el texto ya dice "no
+podemos leer su biblioteca" y menciona los dos ajustes de Steam en vez
+de la frase genérica de antes.
