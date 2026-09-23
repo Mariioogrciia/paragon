@@ -1,15 +1,19 @@
 import "server-only";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql, and } from "drizzle-orm";
 import { db } from "@/db";
 import {
   activities,
   games,
+  gameTrophies,
   platformAccounts,
   syncRuns,
   userBadges,
   userGames,
+  userTrophies,
   users,
 } from "@/db/schema";
+import { getLeagueRankings } from "@/lib/leagues";
+import { avatarUrlSql } from "@/lib/avatarSql";
 
 /**
  * "Avisos generados": congelado a mano en 8 (0 en los últimos 7 días) —
@@ -207,12 +211,15 @@ export interface AdminLeagueRow {
   ownerName: string | null;
   ownerHandle: string | null;
   createdAt: Date;
+  endsAt: Date | null;
+  awarded: boolean;
+  challengeGameTitle: string | null;
   members: number;
 }
 
 export async function getAdminLeagues(): Promise<AdminLeagueRow[]> {
-  const { leagues, leagueMembers, users } = await import("@/db/schema");
-  
+  const { leagues, leagueMembers, users, games: gamesTable } = await import("@/db/schema");
+
   const rows = await db
     .select({
       id: leagues.id,
@@ -220,16 +227,274 @@ export async function getAdminLeagues(): Promise<AdminLeagueRow[]> {
       ownerName: users.name,
       ownerHandle: users.handle,
       createdAt: leagues.createdAt,
-      members: sql<number>`count(${leagueMembers.userId})`
+      endsAt: leagues.endsAt,
+      awarded: leagues.awarded,
+      challengeGameTitle: gamesTable.title,
+      members: sql<number>`count(distinct ${leagueMembers.userId})`,
     })
     .from(leagues)
     .innerJoin(users, eq(users.id, leagues.ownerId))
     .leftJoin(leagueMembers, eq(leagueMembers.leagueId, leagues.id))
-    .groupBy(leagues.id, users.name, users.handle, leagues.createdAt)
+    .leftJoin(gamesTable, eq(gamesTable.id, leagues.challengeGameId))
+    .groupBy(leagues.id, users.name, users.handle, leagues.createdAt, leagues.endsAt, leagues.awarded, gamesTable.title)
     .orderBy(desc(leagues.createdAt));
 
   return rows.map(r => ({
     ...r,
     members: Number(r.members)
   }));
+}
+
+export interface AdminLeagueMemberRow {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  status: string;
+  joinedAt: Date;
+  points: number;
+}
+
+export interface AdminLeagueDetail {
+  id: string;
+  name: string;
+  ownerId: string;
+  ownerName: string | null;
+  ownerHandle: string | null;
+  createdAt: Date;
+  endsAt: Date | null;
+  durationValue: number | null;
+  durationUnit: string | null;
+  awarded: boolean;
+  challengeGameTitle: string | null;
+  members: AdminLeagueMemberRow[];
+}
+
+/**
+ * Vista de una liga concreta para admin — a diferencia de
+ * `getLeagueDetail` (lib/leagues.ts), que exige que quien pregunta ya sea
+ * miembro aceptado (privacidad normal entre amigos), aquí no hay ese
+ * filtro: admin ya está gateado por `esDesarrollador` más arriba, y ver
+ * cualquier liga (incluida gente "pending" que nunca aceptó) es
+ * precisamente el punto de la vista de moderación. Reutiliza
+ * `getLeagueRankings` (mismos puntos que ve cualquier miembro) en vez de
+ * recalcular la fórmula de puntuación a mano otra vez.
+ */
+export async function getAdminLeagueDetail(leagueId: string): Promise<AdminLeagueDetail | null> {
+  const { leagues, leagueMembers, users, games: gamesTable } = await import("@/db/schema");
+
+  const [league] = await db.select().from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  if (!league) return null;
+
+  const [ownerRows, memberRows, challengeRows, rankings] = await Promise.all([
+    db.select({ name: users.name, handle: users.handle }).from(users).where(eq(users.id, league.ownerId)).limit(1),
+    db
+      .select({ userId: leagueMembers.userId, status: leagueMembers.status, joinedAt: leagueMembers.joinedAt, handle: users.handle, name: users.name })
+      .from(leagueMembers)
+      .innerJoin(users, eq(users.id, leagueMembers.userId))
+      .where(eq(leagueMembers.leagueId, leagueId)),
+    league.challengeGameId
+      ? db.select({ title: gamesTable.title }).from(gamesTable).where(eq(gamesTable.id, league.challengeGameId)).limit(1)
+      : Promise.resolve([]),
+    getLeagueRankings(leagueId),
+  ]);
+
+  const puntosPorId = new Map(rankings.map((r) => [r.userId, r.points]));
+
+  return {
+    id: league.id,
+    name: league.name,
+    ownerId: league.ownerId,
+    ownerName: ownerRows[0]?.name ?? null,
+    ownerHandle: ownerRows[0]?.handle ?? null,
+    createdAt: league.createdAt,
+    endsAt: league.endsAt,
+    durationValue: league.durationValue,
+    durationUnit: league.durationUnit,
+    awarded: league.awarded,
+    challengeGameTitle: challengeRows[0]?.title ?? null,
+    members: memberRows
+      .map((m) => ({ ...m, points: puntosPorId.get(m.userId) ?? 0 }))
+      .sort((a, b) => b.points - a.points),
+  };
+}
+
+export interface AdminClanRow {
+  id: string;
+  name: string;
+  tag: string;
+  ownerName: string | null;
+  ownerHandle: string | null;
+  createdAt: Date;
+  members: number;
+}
+
+export async function getAdminClans(): Promise<AdminClanRow[]> {
+  const { clans, clanMembers, users: usersTable } = await import("@/db/schema");
+
+  const rows = await db
+    .select({
+      id: clans.id,
+      name: clans.name,
+      tag: clans.tag,
+      ownerName: usersTable.name,
+      ownerHandle: usersTable.handle,
+      createdAt: clans.createdAt,
+      members: sql<number>`count(distinct ${clanMembers.userId})`,
+    })
+    .from(clans)
+    .innerJoin(usersTable, eq(usersTable.id, clans.ownerId))
+    .leftJoin(clanMembers, eq(clanMembers.clanId, clans.id))
+    .groupBy(clans.id, usersTable.name, usersTable.handle, clans.createdAt)
+    .orderBy(desc(clans.createdAt));
+
+  return rows.map((r) => ({ ...r, members: Number(r.members) }));
+}
+
+export interface AdminRecentTrophyRow {
+  id: string;
+  userHandle: string | null;
+  userName: string | null;
+  gameTitle: string | null;
+  gameIconUrl: string | null;
+  trophyName: string;
+  grade: string | null;
+  rarityPercent: number | null;
+  earnedAt: Date | null;
+}
+
+/**
+ * Últimos trofeos conseguidos en TODA la plataforma, no de un usuario — es
+ * lo más parecido a "qué está pasando ahora mismo" que tiene admin, y de
+ * paso enseña los últimos de cada usuario activo sin tener que entrar
+ * perfil por perfil. `id` compuesto (no hay PK propia en user_trophy) para
+ * la key de React.
+ */
+export async function getAdminRecentTrophies(limit = 60): Promise<AdminRecentTrophyRow[]> {
+  const rows = await db
+    .select({
+      userId: userTrophies.userId,
+      gameId: userTrophies.gameId,
+      trophyId: userTrophies.trophyId,
+      userHandle: users.handle,
+      userName: users.name,
+      gameTitle: games.title,
+      gameIconUrl: games.iconUrl,
+      trophyName: gameTrophies.name,
+      grade: gameTrophies.grade,
+      rarityPercent: userTrophies.rarityPercent,
+      earnedAt: userTrophies.earnedAt,
+    })
+    .from(userTrophies)
+    .innerJoin(users, eq(users.id, userTrophies.userId))
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
+    .where(eq(userTrophies.earned, true))
+    .orderBy(desc(userTrophies.earnedAt))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    id: `${r.userId}:${r.gameId}:${r.trophyId}`,
+    userHandle: r.userHandle,
+    userName: r.userName,
+    gameTitle: r.gameTitle,
+    gameIconUrl: r.gameIconUrl,
+    trophyName: r.trophyName,
+    grade: r.grade,
+    rarityPercent: r.rarityPercent,
+    earnedAt: r.earnedAt,
+  }));
+}
+
+export interface AdminUserTrophyRow {
+  gameTitle: string | null;
+  gameIconUrl: string | null;
+  trophyName: string;
+  grade: string | null;
+  rarityPercent: number | null;
+  earnedAt: Date | null;
+}
+
+/** Últimos trofeos de UN usuario en concreto — para la ficha de detalle de admin. */
+export async function getAdminUserRecentTrophies(userId: string, limit = 20): Promise<AdminUserTrophyRow[]> {
+  return db
+    .select({
+      gameTitle: games.title,
+      gameIconUrl: games.iconUrl,
+      trophyName: gameTrophies.name,
+      grade: gameTrophies.grade,
+      rarityPercent: userTrophies.rarityPercent,
+      earnedAt: userTrophies.earnedAt,
+    })
+    .from(userTrophies)
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true)))
+    .orderBy(desc(userTrophies.earnedAt))
+    .limit(limit);
+}
+
+export interface AdminUserDetail {
+  userId: string;
+  handle: string | null;
+  name: string | null;
+  image: string | null;
+  createdAt: Date;
+  cuentas: { platform: string; username: string; isPublic: boolean; lastAttemptedAt: Date | null; syncedAt: Date | null }[];
+  juegos: number;
+  platinos: number;
+  insignias: number;
+}
+
+/** Ficha de un usuario para admin — perfil + cuentas vinculadas, sin sus trofeos (aparte, getAdminUserRecentTrophies). */
+export async function getAdminUserDetail(userId: string): Promise<AdminUserDetail | null> {
+  const [userRow] = await db
+    .select({
+      userId: users.id,
+      handle: users.handle,
+      name: users.name,
+      image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (!userRow) return null;
+
+  const [cuentas, [juegosRow], [insigniasRow]] = await Promise.all([
+    db
+      .select({
+        platform: platformAccounts.platform,
+        username: platformAccounts.username,
+        isPublic: platformAccounts.isPublic,
+        lastAttemptedAt: platformAccounts.lastAttemptedAt,
+        syncedAt: platformAccounts.syncedAt,
+      })
+      .from(platformAccounts)
+      .where(eq(platformAccounts.userId, userId)),
+    db
+      .select({
+        juegos: sql<number>`count(*) filter (where ${userGames.isWishlist} = false)`,
+        platinos: sql<number>`
+          coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
+          + count(*) filter (where ${games.platform} = 'steam' and ${userGames.progressPercent} = 100)
+        `,
+      })
+      .from(userGames)
+      .innerJoin(games, eq(games.id, userGames.gameId))
+      .where(eq(userGames.userId, userId)),
+    db.select({ n: sql<number>`count(*)` }).from(userBadges).where(eq(userBadges.userId, userId)),
+  ]);
+
+  return {
+    userId: userRow.userId,
+    handle: userRow.handle,
+    name: userRow.name,
+    image: userRow.image,
+    createdAt: userRow.createdAt,
+    cuentas,
+    juegos: Number(juegosRow?.juegos ?? 0),
+    platinos: Number(juegosRow?.platinos ?? 0),
+    insignias: Number(insigniasRow?.n ?? 0),
+  };
 }

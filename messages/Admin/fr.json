@@ -4,6 +4,8 @@
   "tabs": {
     "dashboard": "📊 Tableau de bord & Utilisateurs",
     "leagues": "🏆 Ligues",
+    "clans": "🛡️ Clans",
+    "trophies": "🏅 Trophées",
     "system": "⚙️ Système & Modération"
   },
   "dashboard": {

@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getProfileByUserId } from "@/lib/profiles";
-import { getAdminOverview, getAdminUsers, getRecentSyncRuns, getAdminActivities, getAdminLeagues } from "@/lib/admin";
+import { getAdminOverview, getAdminUsers, getRecentSyncRuns, getAdminActivities, getAdminLeagues, getAdminClans, getAdminRecentTrophies } from "@/lib/admin";
 import { PLATFORM_LABEL, type AccountPlatform } from "@/lib/types";
 import { relativeDate } from "@/lib/design";
-import { deleteActivityAction, adminDeleteLeagueAction } from "@/app/actions";
+import { deleteActivityAction, adminDeleteLeagueAction, adminDeleteClanAction } from "@/app/actions";
 import { BackButton } from "@/components/BackButton";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -42,6 +42,8 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
   const [overview, usuarios] =
     currentTab === "dashboard" ? await Promise.all([getAdminOverview(), getAdminUsers()]) : [null, null];
   const leagues = currentTab === "leagues" ? await getAdminLeagues() : null;
+  const clans = currentTab === "clans" ? await getAdminClans() : null;
+  const recentTrophies = currentTab === "trophies" ? await getAdminRecentTrophies(60) : null;
   const [syncRuns, activities] =
     currentTab === "system" ? await Promise.all([getRecentSyncRuns(30), getAdminActivities(50)]) : [null, null];
 
@@ -59,6 +61,8 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
         {[
           { id: "dashboard", label: t("tabs.dashboard") },
           { id: "leagues", label: t("tabs.leagues") },
+          { id: "clans", label: t("tabs.clans") },
+          { id: "trophies", label: t("tabs.trophies") },
           { id: "system", label: t("tabs.system") },
         ].map(tab => (
           <Link
@@ -127,7 +131,11 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                 <tbody>
                   {usuarios.map((u) => (
                     <tr key={u.userId} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
-                      <td className="px-4 py-2.5 font-semibold">{u.handle ? `@${u.handle}` : (u.displayName ?? t("dashboard.table.noName"))}</td>
+                      <td className="px-4 py-2.5 font-semibold">
+                        <Link href={`/admin/usuarios/${u.userId}`} className="hover:text-[rgb(var(--accent-rgb))] hover:underline">
+                          {u.handle ? `@${u.handle}` : (u.displayName ?? t("dashboard.table.noName"))}
+                        </Link>
+                      </td>
                       <td className="px-4 py-2.5 text-muted">
                         {u.cuentas.length === 0 ? t("dashboard.table.noAccounts") : u.cuentas.map((p) => PLATFORM_LABEL[p as AccountPlatform] ?? p).join(", ")}
                       </td>
@@ -159,6 +167,8 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                   <th className="px-4 py-3">{t("leagues.table.league")}</th>
                   <th className="px-4 py-3">{t("leagues.table.creator")}</th>
                   <th className="px-4 py-3">{t("leagues.table.members")}</th>
+                  <th className="px-4 py-3">Reto</th>
+                  <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">{t("leagues.table.created")}</th>
                   <th className="px-4 py-3 text-right">{t("leagues.table.action")}</th>
                 </tr>
@@ -166,7 +176,11 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
               <tbody>
                 {leagues.map((league) => (
                   <tr key={league.id} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
-                    <td className="px-4 py-2.5 font-bold">{league.name}</td>
+                    <td className="px-4 py-2.5 font-bold">
+                      <Link href={`/admin/ligas/${league.id}`} className="hover:text-[rgb(var(--accent-rgb))] hover:underline">
+                        {league.name}
+                      </Link>
+                    </td>
                     <td className="px-4 py-2.5">
                       <div className="flex flex-col">
                         <span>{league.ownerName}</span>
@@ -174,6 +188,16 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                       </div>
                     </td>
                     <td className="px-4 py-2.5 font-semibold text-[rgb(var(--accent-rgb))]">{league.members}</td>
+                    <td className="px-4 py-2.5 text-muted">{league.challengeGameTitle ?? "—"}</td>
+                    <td className="px-4 py-2.5">
+                      {league.awarded ? (
+                        <span className="rounded-full bg-green-500/10 px-2 py-1 text-xs font-bold text-green-500">Premiada</span>
+                      ) : league.endsAt && new Date(league.endsAt) < new Date() ? (
+                        <span className="rounded-full bg-yellow-500/10 px-2 py-1 text-xs font-bold text-yellow-500">Terminada</span>
+                      ) : (
+                        <span className="rounded-full bg-[rgb(var(--accent-rgb))]/10 px-2 py-1 text-xs font-bold text-[rgb(var(--accent-rgb))]">Activa</span>
+                      )}
+                    </td>
                     <td className="px-4 py-2.5 text-muted">{new Date(league.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2.5 text-right">
                       <form action={adminDeleteLeagueAction}>
@@ -187,7 +211,126 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                 ))}
                 {leagues.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-muted">{t("leagues.table.empty")}</td>
+                    <td colSpan={7} className="px-4 py-8 text-center text-muted">{t("leagues.table.empty")}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* TAB: CLANES */}
+      {currentTab === "clans" && clans && (
+        <section className="space-y-6">
+          <div>
+            <h2 className="font-heading mb-1 text-xl font-bold uppercase tracking-wide">Moderación de Clanes</h2>
+            <p className="text-sm text-muted">Gestiona y elimina clanes — {clans.length} en total.</p>
+          </div>
+
+          <div className="overflow-x-auto rounded-[14px]" style={CARD}>
+            <table className="w-full min-w-[600px] text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
+                  <th className="px-4 py-3">Clan</th>
+                  <th className="px-4 py-3">Líder</th>
+                  <th className="px-4 py-3">Miembros</th>
+                  <th className="px-4 py-3">Creado</th>
+                  <th className="px-4 py-3 text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clans.map((clan) => (
+                  <tr key={clan.id} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
+                    <td className="px-4 py-2.5 font-bold">
+                      <Link href={`/clanes/${clan.tag.toLowerCase()}`} className="hover:text-[rgb(var(--accent-rgb))] hover:underline">
+                        [{clan.tag}] {clan.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex flex-col">
+                        <span>{clan.ownerName}</span>
+                        <span className="text-xs text-muted">@{clan.ownerHandle}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5 font-semibold text-[rgb(var(--accent-rgb))]">{clan.members}</td>
+                    <td className="px-4 py-2.5 text-muted">{new Date(clan.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      <form action={adminDeleteClanAction}>
+                        <input type="hidden" name="clanId" value={clan.id} />
+                        <button className="rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white">
+                          Eliminar
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+                {clans.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-muted">Todavía no hay ningún clan.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* TAB: TROFEOS */}
+      {currentTab === "trophies" && recentTrophies && (
+        <section className="space-y-6">
+          <div>
+            <h2 className="font-heading mb-1 text-xl font-bold uppercase tracking-wide">Trofeos recientes</h2>
+            <p className="text-sm text-muted">Lo último conseguido en toda la plataforma, más reciente primero.</p>
+          </div>
+
+          <div className="overflow-x-auto rounded-[14px]" style={CARD}>
+            <table className="w-full min-w-[700px] text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
+                  <th className="px-4 py-3">Usuario</th>
+                  <th className="px-4 py-3">Juego</th>
+                  <th className="px-4 py-3">Trofeo</th>
+                  <th className="px-4 py-3">Rareza</th>
+                  <th className="px-4 py-3">Cuándo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentTrophies.map((tr) => (
+                  <tr key={tr.id} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
+                    <td className="px-4 py-2.5 font-semibold">
+                      {tr.userHandle ? (
+                        <Link href={`/u/${tr.userHandle}`} className="hover:text-[rgb(var(--accent-rgb))] hover:underline">
+                          @{tr.userHandle}
+                        </Link>
+                      ) : (
+                        tr.userName ?? "—"
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-muted max-w-[180px] truncate" title={tr.gameTitle ?? ""}>{tr.gameTitle ?? "—"}</td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-2">
+                        {tr.grade && (
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full"
+                            style={{
+                              background:
+                                tr.grade === "platinum" ? "var(--platinum)" :
+                                tr.grade === "gold" ? "var(--gold)" :
+                                tr.grade === "silver" ? "var(--silver)" : "var(--bronze)",
+                            }}
+                          />
+                        )}
+                        <span className="max-w-[220px] truncate" title={tr.trophyName}>{tr.trophyName}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5 text-muted">{tr.rarityPercent != null ? `${tr.rarityPercent.toFixed(1)}%` : "—"}</td>
+                    <td className="px-4 py-2.5 text-muted">{tr.earnedAt ? relativeDate(tr.earnedAt) : "—"}</td>
+                  </tr>
+                ))}
+                {recentTrophies.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-muted">Todavía no se ha registrado ningún trofeo.</td>
                   </tr>
                 )}
               </tbody>

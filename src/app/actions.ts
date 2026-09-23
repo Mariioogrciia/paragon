@@ -750,6 +750,21 @@ export async function adminDeleteLeagueAction(formData: FormData): Promise<void>
   revalidatePath("/", "layout");
 }
 
+export async function adminDeleteClanAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const profile = await getProfileByUserId(userId);
+  if (!profile?.esDesarrollador) return;
+
+  const clanId = String(formData.get("clanId") ?? "");
+  if (!clanId) return;
+
+  const { clans } = await import("@/db/schema");
+  const database = getDb();
+  await database.delete(clans).where(eq(clans.id, clanId));
+
+  revalidatePath("/", "layout");
+}
+
 /* ---------------------------------- Juegos manuales --------------------------------- */
 
 import { cookies } from "next/headers";
