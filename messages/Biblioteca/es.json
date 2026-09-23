@@ -77,6 +77,12 @@
     "entraParaResponder": "<link>Entra</link> para responder."
   },
   "EnfoquePage": {},
+  "TrophyCountRow": {
+    "logros": "Logros",
+    "tooltipPlatino": "Platinos reales de PSN/Epic, más el 100% de logros en Steam/Xbox: cuenta igual.",
+    "tooltipMetales": "Solo dan oro, plata y bronce las plataformas PSN y Epic.",
+    "tooltipLogros": "Logros sueltos de Steam y Xbox: esas plataformas no clasifican por metal, pero cada uno cuenta aquí."
+  },
   "TrophyIcon": {
     "grade": {
       "bronze": "Bronce",

@@ -95,6 +95,8 @@ export default async function EjemploPage() {
         <TrophyCountRow
           counts={stats.counts}
           summary={t("trofeosEnJuegos", { trofeos: stats.trofeos, juegos: stats.juegos })}
+          tieneMetales={stats.tieneMetales}
+          logrosSinMetal={stats.logrosSinMetal}
         />
 
         {favoritos.length > 0 && (

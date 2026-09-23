@@ -77,6 +77,12 @@
     "entraParaResponder": "<link>Connectez-vous</link> pour répondre."
   },
   "EnfoquePage": {},
+  "TrophyCountRow": {
+    "logros": "Succès",
+    "tooltipPlatino": "Vrais platines de PSN/Epic, plus le 100 % sur Steam/Xbox : ça compte pareil.",
+    "tooltipMetales": "Seuls PSN et Epic distribuent de l'or, de l'argent et du bronze.",
+    "tooltipLogros": "Succès isolés de Steam et Xbox : ces plateformes ne les classent pas par métal, mais chacun compte quand même ici."
+  },
   "TrophyIcon": {
     "grade": {
       "bronze": "Bronze",

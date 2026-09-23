@@ -134,6 +134,13 @@ export interface PlayerSummary {
   porPlataforma: Partial<Record<Platform, number>>;
   /** Si hay algún juego de una plataforma que de verdad da oro/plata/bronce. */
   tieneMetales: boolean;
+  /**
+   * Logros ganados en plataformas sin desglose por metal (Steam, Xbox) — no
+   * están en `counts` (que solo suma metal real) pero tampoco deben
+   * desaparecer sin más: es la cifra que hace visible que esas plataformas
+   * también cuentan, solo que a su manera.
+   */
+  logrosSinMetal: number;
 }
 
 export function summarise(allGames: Game[]): PlayerSummary {
@@ -144,6 +151,7 @@ export function summarise(allGames: Game[]): PlayerSummary {
   const counts = emptyCounts();
   const porPlataforma: Partial<Record<Platform, number>> = {};
   let trofeos = 0;
+  let logrosSinMetal = 0;
 
   for (const g of games) {
     // El desglose por metal solo lo dan las plataformas que los tienen; el
@@ -154,6 +162,10 @@ export function summarise(allGames: Game[]): PlayerSummary {
     counts.gold += g.earned?.gold ?? 0;
     counts.silver += g.earned?.silver ?? 0;
     counts.bronze += g.earned?.bronze ?? 0;
+
+    if (!PLATFORMS_WITH_METALS.includes(g.platform)) {
+      logrosSinMetal += g.earnedTotal;
+    }
 
     trofeos += g.earnedTotal;
     porPlataforma[g.platform] = (porPlataforma[g.platform] ?? 0) + 1;
@@ -174,6 +186,7 @@ export function summarise(allGames: Game[]): PlayerSummary {
           ),
     porPlataforma,
     tieneMetales: games.some((g) => PLATFORMS_WITH_METALS.includes(g.platform)),
+    logrosSinMetal,
   };
 }
 

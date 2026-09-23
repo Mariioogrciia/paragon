@@ -13,14 +13,24 @@ export function TrophyCountRow({
   counts,
   summary,
   tieneMetales = true,
+  logrosSinMetal = 0,
 }: {
   counts: Counts;
   summary?: string;
   /** Falso cuando la biblioteca no tiene ningún juego con oro/plata/bronce de verdad (solo Steam/Xbox) — oculta esas tres columnas en vez de enseñarlas siempre a cero. */
   tieneMetales?: boolean;
+  /** Logros de plataformas sin metal (Steam, Xbox) — ver `logrosSinMetal` en `summarise()` (lib/stats.ts). */
+  logrosSinMetal?: number;
 }) {
   const t = useTranslations("Biblioteca");
   const grades = tieneMetales ? GRADES : GRADES.filter((g) => g === "platinum");
+  // El "de dónde sale esto" de cada cifra, como tooltip nativo (title): el
+  // platino mezcla metal real (PSN/Epic) con el 100% de Steam/Xbox, así que
+  // sin esto no hay forma de saber por qué un platino de Steam cuenta igual
+  // que uno "de verdad".
+  const tooltipDeGrado = (grade: (typeof GRADES)[number]) =>
+    grade === "platinum" ? t("TrophyCountRow.tooltipPlatino") : t("TrophyCountRow.tooltipMetales");
+
   return (
     <div
       className="flex items-center gap-2.5 rounded-2xl px-5 py-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.08)]"
@@ -31,7 +41,8 @@ export function TrophyCountRow({
           <li
             key={grade}
             className="flex items-center gap-2.5 pr-[22px]"
-            style={i < grades.length - 1 ? { marginRight: 12, borderRight: "1px solid var(--border)" } : undefined}
+            title={tooltipDeGrado(grade)}
+            style={i < grades.length - 1 || logrosSinMetal > 0 ? { marginRight: 12, borderRight: "1px solid var(--border)" } : undefined}
           >
             <TrophyIcon grade={grade} size={20} />
             <span className="font-heading text-lg font-bold tabular-nums">{counts[grade]}</span>
@@ -40,6 +51,15 @@ export function TrophyCountRow({
             </span>
           </li>
         ))}
+        {logrosSinMetal > 0 && (
+          <li className="flex items-center gap-2.5 pr-[22px]" title={t("TrophyCountRow.tooltipLogros")}>
+            <TrophyIcon size={20} />
+            <span className="font-heading text-lg font-bold tabular-nums">{logrosSinMetal}</span>
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted">
+              {t("TrophyCountRow.logros")}
+            </span>
+          </li>
+        )}
       </ul>
       {summary && <span className="shrink-0 text-xs text-muted">{summary}</span>}
     </div>

@@ -77,6 +77,12 @@
     "entraParaResponder": "<link>Sign in</link> to reply."
   },
   "EnfoquePage": {},
+  "TrophyCountRow": {
+    "logros": "Achievements",
+    "tooltipPlatino": "Real platinums from PSN/Epic, plus 100% completion on Steam/Xbox: it counts the same.",
+    "tooltipMetales": "Only PSN and Epic hand out gold, silver and bronze.",
+    "tooltipLogros": "Loose achievements from Steam and Xbox: those platforms don't grade by metal, but each one still counts here."
+  },
   "TrophyIcon": {
     "grade": {
       "bronze": "Bronze",

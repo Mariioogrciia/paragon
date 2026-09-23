@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { tileFor } from "@/lib/design";
+import { colorFor, tileFor } from "@/lib/design";
 import type { TrophyGrade } from "@/lib/types";
 import type { TrophyType } from "@/lib/trophyType";
 
@@ -50,12 +50,17 @@ const PSN_PLATINUM = (
   </>
 );
 
+/**
+ * Sin `grade`, es un logro suelto de una plataforma sin metales (Steam,
+ * Xbox) — copa neutra del azul de la casa (`colorFor`), no de bronce: no
+ * vale ni más ni menos que cualquier otro logro de esa plataforma.
+ */
 export function TrophyIcon({
   grade,
   dimmed = false,
   size = 18,
 }: {
-  grade: TrophyGrade;
+  grade?: TrophyGrade;
   dimmed?: boolean;
   size?: number;
 }) {
@@ -67,8 +72,8 @@ export function TrophyIcon({
       viewBox="0 0 24 24"
       fill="none"
       role="img"
-      aria-label={t(`TrophyIcon.grade.${grade}`)}
-      style={{ color: COLORS[grade], opacity: dimmed ? 0.3 : 1 }}
+      aria-label={grade ? t(`TrophyIcon.grade.${grade}`) : t("TrophyIcon.logro")}
+      style={{ color: grade ? COLORS[grade] : colorFor(undefined), opacity: dimmed ? 0.3 : 1 }}
     >
       {grade === "platinum" ? PSN_PLATINUM : PSN_CUP}
     </svg>
