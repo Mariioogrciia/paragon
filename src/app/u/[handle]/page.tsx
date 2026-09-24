@@ -271,7 +271,18 @@ export default async function PerfilPage({
             : "radial-gradient(700px 320px at 25% 0%, rgb(var(--accent-rgb) / 0.18), transparent 70%)",
         }}
       >
-        {presetBanner && <PlatformBanner preset={presetBanner} className="absolute inset-0 z-0 h-full w-full" />}
+        {/*
+          Bug real, reportado con captura: `presetBanner` se calcula solo a
+          partir de `profileBannerUrl`, sin mirar si hay un juego de fondo
+          elegido — así que el SVG del preset se seguía pintando DEBAJO de
+          la carátula del juego (que va al 50% de opacidad), y como el
+          preset es arte vivo y la carátula sale desenfocada y oscurecida,
+          el preset ganaba a simple vista aunque "backgroundImage" ya fuera
+          la carátula correcta. `!juegoDeFondoElegido` es justo lo que
+          faltaba: el juego elegido a propósito gana también aquí, no solo
+          en qué URL se usa.
+        */}
+        {presetBanner && !juegoDeFondoElegido && <PlatformBanner preset={presetBanner} className="absolute inset-0 z-0 h-full w-full" />}
         {backgroundImage && backgroundEsVideo && (
           <video
             src={profile.profileBannerUrl!}
