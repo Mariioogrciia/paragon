@@ -62,12 +62,13 @@ web. `actual`/`mejor`/`diasActivos` son el mismo cálculo que
 `GET /api/mobile/stats` y que el propio Panel (duplicado como dato en los
 tres sitios a propósito, ver la nota en `panel/route.ts`).
 
-## `GET /api/mobile/panel/highlights` — "A un paso del platino" y "Recientes"
+## `GET /api/mobile/panel/highlights` — "A un paso del platino", "Recientes" y "Siguiente trofeo"
 
 ```json
 {
   "nearPlatinum": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
-  "recent": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ]
+  "recent": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
+  "nextTrophies": [ { "gameId": "abc123", "gameTitle": "Elden Ring", "trophyId": "t1", "trophyName": "Maestro de las artes marciales", "detail": "...", "rarityPercent": 18.4, "gameProgress": 74, "iconUrl": "https://...", "grade": "gold" } ]
 }
 ```
 MISMO cálculo que la portada web (`gameProgress()` en `src/lib/stats.ts`),
@@ -76,6 +77,11 @@ no una aproximación aparte — `nearPlatinum` son juegos con platino real
 (máx. 3); `recent` son los últimos jugados, no deseados (máx. 6). Endpoint
 separado de `/api/mobile/panel` a propósito: evita duplicar `gameProgress()`
 en Kotlin y que las dos versiones diverjan con el tiempo.
+
+`nextTrophies` (máx. 4) es el mismo recomendador de "Siguiente trofeo" de
+la portada web (`lib/recommendations.ts`, `TrophyRecommendations.tsx`):
+prioriza juego base sobre DLC, progreso alto y mayor probabilidad real de
+conseguirlo. `rarityPercent`/`grade`/`iconUrl` pueden ser `null`.
 
 ## `GET /api/mobile/library` — Biblioteca
 

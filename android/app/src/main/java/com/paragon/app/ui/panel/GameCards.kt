@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.paragon.app.data.GameProgress
+import com.paragon.app.data.NextTrophy
 import com.paragon.app.ui.common.rememberCoverAuraColor
 import com.paragon.app.ui.theme.*
 
@@ -358,6 +359,79 @@ fun StandardGameCard(
                     )
                 }
             }
+        }
+    }
+}
+
+/** Metal por `grade` ("bronze"/"silver"/"gold"/"platinum"), o `Muted` si es `null` (Steam/Xbox: un logro es un logro y ya). */
+private fun gradeColor(grade: String?): Color = when (grade) {
+    "bronze" -> Bronze
+    "silver" -> Silver
+    "gold" -> Gold
+    "platinum" -> Platinum
+    else -> Muted
+}
+
+/**
+ * Fila de "Siguiente trofeo" — mismo recomendador que la portada web
+ * (TrophyRecommendations.tsx): carátula pequeña, nombre del trofeo, y
+ * "{juego} · {pct}% completado" debajo. Compacta a propósito (no es una
+ * Hero Card): puede haber hasta 4 a la vez y el nombre del trofeo ya ocupa
+ * sitio de sobra.
+ */
+@Composable
+fun NextTrophyCard(trophy: NextTrophy, onClick: () -> Unit = {}) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Surface)
+            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        GameCover(
+            coverUrl = trophy.iconUrl ?: "",
+            title = trophy.trophyName,
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .border(1.dp, gradeColor(trophy.grade).copy(alpha = 0.5f), RoundedCornerShape(10.dp)),
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = trophy.trophyName,
+                color = Foreground,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+            Text(
+                text = "${trophy.gameTitle} · ${trophy.gameProgress}% completado",
+                color = Muted,
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+
+        // Rareza real (si la plataforma la da) antes que el metal: es el
+        // dato que de verdad varía trofeo a trofeo, el metal ya se ve en el
+        // borde de la carátula de arriba.
+        trophy.rarityPercent?.let { rareza ->
+            Text(
+                text = "${"%.1f".format(rareza)}%",
+                color = gradeColor(trophy.grade),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 8.dp),
+            )
         }
     }
 }

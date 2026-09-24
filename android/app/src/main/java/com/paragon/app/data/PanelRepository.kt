@@ -6,6 +6,7 @@ import com.paragon.app.data.local.PanelDao
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.ChooseHandleRequest
 import com.paragon.app.data.network.GameCardDto
+import com.paragon.app.data.network.NextTrophyDto
 import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
 
@@ -75,9 +76,30 @@ sealed class ChooseHandleResult {
     data class Error(val message: String) : ChooseHandleResult()
 }
 
-/** "A un paso del platino" + "Recientes" — ver /api/mobile/panel/highlights, mismo cálculo que la portada web. */
+/**
+ * "Siguiente trofeo" — mismo recomendador que la portada web
+ * (lib/recommendations.ts, TrophyRecommendations.tsx): prioriza juego base
+ * sobre DLC, progreso alto y mayor probabilidad real de conseguirlo.
+ */
+data class NextTrophy(
+    val gameId: String,
+    val gameTitle: String,
+    val trophyId: String,
+    val trophyName: String,
+    val detail: String,
+    val rarityPercent: Double?,
+    val gameProgress: Int,
+    val iconUrl: String?,
+    val grade: String?,
+)
+
+/** "A un paso del platino" + "Recientes" + "Siguiente trofeo" — ver /api/mobile/panel/highlights, mismo cálculo que la portada web. */
 sealed class HighlightsResult {
-    data class Ok(val nearPlatinum: List<GameProgress>, val recent: List<GameProgress>) : HighlightsResult()
+    data class Ok(
+        val nearPlatinum: List<GameProgress>,
+        val recent: List<GameProgress>,
+        val nextTrophies: List<NextTrophy> = emptyList(),
+    ) : HighlightsResult()
     data class Error(val message: String) : HighlightsResult()
 }
 
@@ -88,6 +110,18 @@ private fun GameCardDto.toGameProgress() = GameProgress(
     earnedTrophies = earnedTrophies,
     totalTrophies = totalTrophies,
     percent = percent,
+)
+
+private fun NextTrophyDto.toNextTrophy() = NextTrophy(
+    gameId = gameId,
+    gameTitle = gameTitle,
+    trophyId = trophyId,
+    trophyName = trophyName,
+    detail = detail,
+    rarityPercent = rarityPercent,
+    gameProgress = gameProgress,
+    iconUrl = iconUrl,
+    grade = grade,
 )
 
 class PanelRepository(private val tokenStore: TokenStore? = null, private val panelDao: PanelDao? = null) {
@@ -194,6 +228,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
             HighlightsResult.Ok(
                 nearPlatinum = response.nearPlatinum.map { it.toGameProgress() },
                 recent = response.recent.map { it.toGameProgress() },
+                nextTrophies = response.nextTrophies.map { it.toNextTrophy() },
             )
         } catch (e: HttpException) {
             HighlightsResult.Error("El servidor respondió con un error (${e.code()}).")

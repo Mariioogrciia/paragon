@@ -280,6 +280,35 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
 
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    // Siguiente trofeo — mismo recomendador que la portada web
+                    // (lib/recommendations.ts): ya lo mandaba el backend desde
+                    // hace tiempo (/api/mobile/panel/highlights, campo
+                    // `nextTrophies`), pero el móvil lo descartaba al parsear.
+                    val nextTrophies = (highlights as? HighlightsResult.Ok)?.nextTrophies.orEmpty()
+                    if (nextTrophies.isNotEmpty()) {
+                        Text(
+                            text = "SIGUIENTE TROFEO",
+                            color = Foreground,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
+                            color = Muted,
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            nextTrophies.forEach { trofeo ->
+                                NextTrophyCard(
+                                    trophy = trofeo,
+                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId)) },
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+
                     // Jugado recientemente
                     Text(
                         text = "JUGADO RECIENTEMENTE",
