@@ -543,6 +543,21 @@ de un juego (ver `primeraSincronizacion` en `lib/sync.ts`), y nunca por
 trofeos que no sean platino. Pensado para una celebración en el momento,
 no solo un contador — ver `syncGameTrophies`/`refrescarJuego`.
 
+## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guide` — Guía en vídeo
+
+```json
+{ "videoId": "dQw4w9WgXcQ" }
+```
+`videoId` es `null` si no se encontró ninguno. MISMO dato cacheado que usa
+la web (`TrophyGuideModal.tsx`, columna `game_trophy.guideVideoId` — ver
+`buscarVideoGuiaTrofeo` en `lib/videoGuides.ts`): la primera persona que
+pide la guía de un trofeo (de cualquier plataforma, web o móvil) dispara la
+búsqueda real en YouTube y se guarda; todo el mundo después lee lo ya
+guardado. A diferencia de la web (que incrusta el vídeo en un `<iframe>`),
+el móvil no reproduce nada dentro de la app — abre directamente la app de
+YouTube (o el navegador si no está instalada) en
+`https://www.youtube.com/watch?v={videoId}`. `404` si el trofeo no existe.
+
 ## `GET /api/mobile/compare/{handle}` — Comparar con alguien
 
 ```json

@@ -498,6 +498,18 @@ juego a su plataforma sin esperar al cron. Siempre `200`, nunca 4xx/5xx
 para el caso de error de plataforma: el cliente distingue por el campo
 `error`, igual que la web.
 
+## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guide` — Guía en vídeo
+
+```json
+{ "videoId": "dQw4w9WgXcQ" }
+```
+`videoId` es `null` si no se encontró ninguno. MISMO dato cacheado que usa
+la web — la primera persona que pide la guía de un trofeo (web o móvil)
+dispara la búsqueda real en YouTube y se guarda; el resto lee lo ya
+guardado. El móvil no reproduce nada dentro de la app: abre la app de
+YouTube (o el navegador si no está instalada) en
+`https://www.youtube.com/watch?v={videoId}`. `404` si el trofeo no existe.
+
 ## `GET /api/mobile/compare/{handle}` — Comparar con alguien
 
 ```json

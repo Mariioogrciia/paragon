@@ -44,6 +44,7 @@ data class OkResponse(val ok: Boolean)
 // celebración en el momento en Modo Enfoque/Ficha de juego.
 data class PlatinoNuevoDto(val nombre: String, val iconUrl: String?)
 data class ResyncResponse(val nuevos: Int, val error: String? = null, val platinoNuevo: PlatinoNuevoDto? = null)
+data class TrophyGuideResponse(val videoId: String?)
 
 interface GamesApi {
     /** Ver src/app/api/mobile/games/[gameId]/route.ts en el proyecto Next.js. */
@@ -65,4 +66,8 @@ interface GamesApi {
     /** "¿Ya lo tengo?" de Modo Enfoque — ver games/[gameId]/resync/route.ts. Siempre 200. */
     @POST("api/mobile/games/{gameId}/resync")
     suspend fun resync(@Path("gameId") gameId: String): ResyncResponse
+
+    /** Vídeo de guía cacheado (mismo dato que la web) — ver games/[gameId]/trophies/[trophyId]/guide/route.ts. */
+    @GET("api/mobile/games/{gameId}/trophies/{trophyId}/guide")
+    suspend fun getTrophyGuide(@Path("gameId") gameId: String, @Path("trophyId") trophyId: String): TrophyGuideResponse
 }

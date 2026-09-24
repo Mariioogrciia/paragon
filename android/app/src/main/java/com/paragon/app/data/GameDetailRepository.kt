@@ -279,6 +279,21 @@ class GameDetailRepository(
         }
     }
 
+    /**
+     * Vídeo de guía en YouTube para un trofeo (mismo dato cacheado que la
+     * web, ver GamesApi.kt) — `null` si no se encontró ninguno o si falla la
+     * llamada. Sin caché local: es contenido externo, no un dato de progreso
+     * que haga falta ver sin conexión.
+     */
+    suspend fun getTrophyGuide(gameId: String, trophyId: String): String? {
+        val store = tokenStore ?: return null
+        return try {
+            ApiClient.gamesApi(store).getTrophyGuide(gameId, trophyId).videoId
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     /** "¿Ya lo tengo?" — vuelve a pedir los trofeos de este juego sin esperar al cron. */
     suspend fun resync(gameId: String): ResyncOutcome {
         val store = tokenStore ?: return ResyncOutcome(0, "Sin sesión.")

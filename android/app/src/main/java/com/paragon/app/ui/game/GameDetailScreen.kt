@@ -276,6 +276,7 @@ private fun GameDetailContent(
                 TrophyRow(
                     trophy,
                     game = game,
+                    repository = repository,
                     isStuck = trophy.id in stuckIds,
                     onStuckChange = { nuevo ->
                         stuckIds = if (nuevo) stuckIds + trophy.id else stuckIds - trophy.id
@@ -854,6 +855,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
 private fun TrophyRow(
     trophy: TrophyItem,
     game: GameDetailData,
+    repository: GameDetailRepository,
     isStuck: Boolean,
     onStuckChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -861,6 +863,7 @@ private fun TrophyRow(
     val context = LocalContext.current
     val dao = remember(context) { ParagonDatabase.getDatabase(context).stuckTrophyDao() }
     val coroutineScope = rememberCoroutineScope()
+    var buscandoGuia by remember(trophy.id) { mutableStateOf(false) }
 
     Row(
         modifier = modifier
@@ -940,14 +943,26 @@ private fun TrophyRow(
                 Icon(Icons.Default.Star, contentDescription = "Atascar", tint = if (isStuck) Accent else Muted, modifier = Modifier.size(16.dp))
             }
             IconButton(
+                enabled = !buscandoGuia,
                 onClick = {
-                    val query = android.net.Uri.encode("${game.title} ${trophy.name} trophy guide")
-                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.youtube.com/results?search_query=$query"))
-                    context.startActivity(intent)
+                    buscandoGuia = true
+                    coroutineScope.launch {
+                        // Mismo vídeo cacheado que la web (game_trophy.guideVideoId,
+                        // ver GameDetailRepository.getTrophyGuide) — antes esto
+                        // abría una búsqueda genérica en el navegador sin más,
+                        // sin usar la guía real que la web ya encuentra y guarda.
+                        val videoId = repository.getTrophyGuide(game.id, trophy.id)
+                        buscandoGuia = false
+                        abrirGuiaEnYoutube(context, videoId, game.title, trophy.name)
+                    }
                 },
                 modifier = Modifier.padding(start = 4.dp).size(24.dp)
             ) {
-                Icon(Icons.Default.Search, contentDescription = "Buscar Guía", tint = Accent, modifier = Modifier.size(16.dp))
+                if (buscandoGuia) {
+                    CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
+                } else {
+                    Icon(Icons.Default.Search, contentDescription = "Buscar Guía", tint = Accent, modifier = Modifier.size(16.dp))
+                }
             }
         }
     }
@@ -959,6 +974,31 @@ private fun gradeColor(grade: TrophyGrade?): Color = when (grade) {
     TrophyGrade.SILVER -> Silver
     TrophyGrade.BRONZE -> Bronze
     null -> Muted
+}
+
+/**
+ * Abre la app de YouTube directamente en el vídeo de guía (`vnd...`/paquete
+ * `com.google.android.youtube` a propósito, no solo una URL genérica) — si
+ * no está instalada, cae al navegador con la misma URL. Sin `videoId` (no
+ * se encontró guía cacheada ni en vivo, mismo caso que "Sin vídeo todavía"
+ * en la web), se cae a una búsqueda en la propia app/web de YouTube: mejor
+ * eso que no hacer nada al tocar el botón.
+ */
+private fun abrirGuiaEnYoutube(context: android.content.Context, videoId: String?, gameTitle: String, trophyName: String) {
+    val uri = if (videoId != null) {
+        android.net.Uri.parse("https://www.youtube.com/watch?v=$videoId")
+    } else {
+        val query = android.net.Uri.encode("$gameTitle $trophyName trophy guide")
+        android.net.Uri.parse("https://www.youtube.com/results?search_query=$query")
+    }
+    val appIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri).apply {
+        setPackage("com.google.android.youtube")
+    }
+    try {
+        context.startActivity(appIntent)
+    } catch (e: android.content.ActivityNotFoundException) {
+        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+    }
 }
 
 @Composable
