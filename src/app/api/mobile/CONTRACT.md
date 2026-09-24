@@ -615,6 +615,52 @@ del platino en `/api/mobile/panel/highlights`, amigos en
 `/api/mobile/social`). `eficiencia.ritmoMedioPct` negativo significa más
 lento que la estimación de HowLongToBeat, positivo más rápido.
 
+## `GET /api/mobile/wrap` — Paragon Wrap
+
+```json
+{
+  "playerName": "FENDE21",
+  "esteAnio": 322,
+  "juegosEsteAnio": 20,
+  "topGenre": { "name": "Adventure", "count": 170 },
+  "topGame": { "id": "psn-...", "title": "Fortnite", "iconUrl": "https://...", "horasTotal": 2108.5, "earnedTrophies": 0 },
+  "mejorMes": { "mes": "2021-04", "total": 129 },
+  "rachas": { "actual": 5, "mejor": 17, "diasActivos": 1541, "hoyCuenta": true },
+  "percentil": { "percentil": 8, "totalUsuarios": 120, "miTotal": 96 }
+}
+```
+Mismo dato que las 3 tarjetas del perfil (`ParagonWrap.tsx`) MÁS lo que
+solo tenía sitio en la versión ampliada "Stories" de la web
+(`WrapStories.tsx`): `mejorMes`, `rachas` y `percentil`. Nada de esto es un
+cálculo nuevo (`lib/history.ts`, `lib/wrapPercentile.ts`,
+`generoTop`/`juegoDestacado` en `ParagonWrap.tsx`), solo un único endpoint
+que junta todo para no hacer 4-5 llamadas sueltas.
+
+`topGame` es `null` si la biblioteca está vacía o solo tiene deseados.
+`horasTotal` es 0 si el juego más exprimido se decidió por trofeos, no por
+horas (ninguna plataforma vinculada da tiempo jugado). `mejorMes` es
+`null` sin ningún trofeo con fecha conocida. `percentil` es `null` con
+menos de 20 usuarios reales con algún trofeo este año — con pocos
+usuarios, "estás en el top X%" miente por parecer más grande de lo que
+es, así que directamente no se manda (ver `MIN_USUARIOS_PERCENTIL` en
+`lib/wrapPercentile.ts`), no un dato inventado.
+
+`esteAnio: 0` es el estado "sin historia que contar todavía" — la app
+debería enseñar un único mensaje honesto en vez de simular 7 diapositivas
+vacías (mismo criterio que `WrapStories.tsx` en la web).
+
+## `GET /api/mobile/diet` — Dieta Gamer
+
+```json
+{ "dieta": { "genero": "RPG", "juegos": [ { "gameId": "abc123", "titulo": "Elden Ring" } ], "horasTotales": 180 } }
+```
+`dieta` es `null` la mayoría de las veces — no es un error, es el estado
+normal. Aviso amistoso (nunca un bloqueo) si tus últimos 3 juegos
+TERMINADOS (mismo criterio que `esPlatinoEquivalente`) comparten género Y
+suman más de 150h estimadas (HowLongToBeat) — ver `dietaGamer()` en
+`lib/dietaGamer.ts` para los umbrales exactos. `juegos` son siempre esos 3,
+en orden del más reciente al más antiguo.
+
 ## `POST /api/mobile/games/{gameId}/notes` — Nota privada (Modo Enfoque)
 
 Body: `{ "notes": "..." }` (vacía para borrarla). `{ "ok": true }`. Mismo
@@ -650,6 +696,30 @@ guardado. A diferencia de la web (que incrusta el vídeo en un `<iframe>`),
 el móvil no reproduce nada dentro de la app — abre directamente la app de
 YouTube (o el navegador si no está instalada) en
 `https://www.youtube.com/watch?v={videoId}`. `404` si el trofeo no existe.
+
+## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Guías escritas
+
+```json
+{
+  "guides": [ { "id": "g1", "body": "...", "language": "es", "createdAt": "...", "updatedAt": "...", "authorId": "u1", "authorHandle": "mario", "authorName": "Mario", "authorImage": "https://..." } ],
+  "currentUserId": "u1"
+}
+```
+Apuntes reales de gente de aquí (no un enlace externo, eso es `.../guide`
+de arriba) — una fila por (usuario, juego, trofeo): publicar de nuevo
+actualiza la tuya, nunca duplica. `currentUserId` es quien pregunta, para
+que el cliente sepa cuál de las filas es "la mía" sin comparar handles.
+
+### `POST /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Publicar (o actualizar la tuya)
+
+Body: `{ "body": "..." }`. `400` si viene vacía o pasa de 4000 caracteres
+(el mensaje de error lo dice). El idioma se guarda del propio perfil del
+usuario (`users.language`), no hace falta mandarlo.
+
+### `DELETE /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Borrar la tuya
+
+Sin body. Solo borra la guía DEL QUE LLAMA para ese trofeo — no se puede
+borrar la de otra persona.
 
 ## `GET /api/mobile/compare/{handle}` — Comparar con alguien
 

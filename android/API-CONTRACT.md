@@ -582,6 +582,60 @@ guardado. El móvil no reproduce nada dentro de la app: abre la app de
 YouTube (o el navegador si no está instalada) en
 `https://www.youtube.com/watch?v={videoId}`. `404` si el trofeo no existe.
 
+## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Guías escritas
+
+```json
+{
+  "guides": [ { "id": "g1", "body": "...", "language": "es", "createdAt": "...", "updatedAt": "...", "authorId": "u1", "authorHandle": "mario", "authorName": "Mario", "authorImage": "https://..." } ],
+  "currentUserId": "u1"
+}
+```
+Apuntes reales de gente de aquí, una fila por (usuario, juego, trofeo) —
+publicar de nuevo actualiza la tuya, nunca duplica. `currentUserId` es
+quien pregunta, para saber cuál fila es "la mía".
+
+### `POST .../guides` — Publicar (o actualizar la tuya)
+
+Body: `{ "body": "..." }`. `400` si viene vacía o pasa de 4000 caracteres.
+
+### `DELETE .../guides` — Borrar la tuya
+
+Sin body. Solo borra la del que llama, nunca la de otra persona.
+
+## `GET /api/mobile/wrap` — Paragon Wrap
+
+```json
+{
+  "playerName": "FENDE21",
+  "esteAnio": 322,
+  "juegosEsteAnio": 20,
+  "topGenre": { "name": "Adventure", "count": 170 },
+  "topGame": { "id": "psn-...", "title": "Fortnite", "iconUrl": "https://...", "horasTotal": 2108.5, "earnedTrophies": 0 },
+  "mejorMes": { "mes": "2021-04", "total": 129 },
+  "rachas": { "actual": 5, "mejor": 17, "diasActivos": 1541, "hoyCuenta": true },
+  "percentil": { "percentil": 8, "totalUsuarios": 120, "miTotal": 96 }
+}
+```
+Mismo dato que las 3 tarjetas del perfil web más lo que solo tenía sitio
+en la versión "Stories" ampliada: `mejorMes`, `rachas`, `percentil`.
+`topGame` es `null` si la biblioteca está vacía o solo deseados.
+`horasTotal` es 0 si se decidió por trofeos, no por horas. `mejorMes` es
+`null` sin ningún trofeo con fecha conocida. `percentil` es `null` con
+menos de 20 usuarios reales con algún trofeo este año (con pocos, "top X%"
+miente por parecer más grande de lo que es). `esteAnio: 0` es "sin
+historia que contar todavía" — un único mensaje honesto, no 7
+diapositivas vacías simuladas.
+
+## `GET /api/mobile/diet` — Dieta Gamer
+
+```json
+{ "dieta": { "genero": "RPG", "juegos": [ { "gameId": "abc123", "titulo": "Elden Ring" } ], "horasTotales": 180 } }
+```
+`dieta` es `null` la mayoría de las veces — estado normal, no un error.
+Aviso amistoso si tus últimos 3 juegos TERMINADOS comparten género y suman
+más de 150h estimadas (HowLongToBeat). `juegos` son siempre esos 3, del
+más reciente al más antiguo.
+
 ## `GET /api/mobile/compare/{handle}` — Comparar con alguien
 
 ```json
