@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -277,6 +278,7 @@ private fun GameDetailContent(
                     trophy,
                     game = game,
                     repository = repository,
+                    tokenStore = tokenStore,
                     isStuck = trophy.id in stuckIds,
                     onStuckChange = { nuevo ->
                         stuckIds = if (nuevo) stuckIds + trophy.id else stuckIds - trophy.id
@@ -856,6 +858,7 @@ private fun TrophyRow(
     trophy: TrophyItem,
     game: GameDetailData,
     repository: GameDetailRepository,
+    tokenStore: TokenStore,
     isStuck: Boolean,
     onStuckChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -864,6 +867,7 @@ private fun TrophyRow(
     val dao = remember(context) { ParagonDatabase.getDatabase(context).stuckTrophyDao() }
     val coroutineScope = rememberCoroutineScope()
     var buscandoGuia by remember(trophy.id) { mutableStateOf(false) }
+    var showGuiasEscritas by remember(trophy.id) { mutableStateOf(false) }
 
     Row(
         modifier = modifier
@@ -964,7 +968,23 @@ private fun TrophyRow(
                     Icon(Icons.Default.Search, contentDescription = "Buscar Guía", tint = Accent, modifier = Modifier.size(16.dp))
                 }
             }
+            IconButton(
+                onClick = { showGuiasEscritas = true },
+                modifier = Modifier.padding(start = 4.dp).size(24.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = "Guías escritas", tint = Muted, modifier = Modifier.size(16.dp))
+            }
         }
+    }
+
+    if (showGuiasEscritas) {
+        TrophyGuidesSheet(
+            gameId = game.id,
+            trophyId = trophy.id,
+            trophyName = trophy.name,
+            tokenStore = tokenStore,
+            onDismiss = { showGuiasEscritas = false },
+        )
     }
 }
 

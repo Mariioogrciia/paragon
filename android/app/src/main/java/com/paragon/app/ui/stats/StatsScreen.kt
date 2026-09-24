@@ -32,10 +32,13 @@ import kotlinx.coroutines.launch
 fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit)? = null) {
     val repository = remember(tokenStore) { StatsRepository(tokenStore) }
     val achievementsRepository = remember(tokenStore) { AchievementsRepository(tokenStore) }
+    val dietRepository = remember(tokenStore) { DietRepository(tokenStore) }
     var result by remember { mutableStateOf<StatsResult?>(null) }
-    // Independiente de `result`: un fallo aquí (o tardar más) no debe
+    // Independientes de `result`: un fallo aquí (o tardar más) no debe
     // bloquear el resto de Estadísticas, que ya funcionaba sin esto.
     var achievements by remember { mutableStateOf<AchievementsResult?>(null) }
+    var dieta by remember { mutableStateOf<DietaGamer?>(null) }
+    var showWrap by remember { mutableStateOf(false) }
     val retryCounter = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(retryCounter.value) {
@@ -43,9 +46,11 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
         coroutineScope {
             launch { result = repository.getStats() }
             launch { achievements = achievementsRepository.getAchievements() }
+            launch { dieta = dietRepository.getDiet() }
         }
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
@@ -63,8 +68,11 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
                 color = Foreground,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = if (onBack != null) 0.dp else 16.dp),
+                modifier = Modifier.padding(start = if (onBack != null) 0.dp else 16.dp).weight(1f),
             )
+            IconButton(onClick = { showWrap = true }) {
+                Text("✨", fontSize = 20.sp)
+            }
         }
 
         when (val current = result) {
@@ -81,13 +89,18 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
                     ) { Text("Reintentar") }
                 }
             }
-            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok))
+            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok), dieta)
         }
+    }
+
+    if (showWrap) {
+        com.paragon.app.ui.wrap.WrapStoriesScreen(tokenStore = tokenStore, onClose = { showWrap = false })
+    }
     }
 }
 
 @Composable
-private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?) {
+private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?, dieta: DietaGamer?) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -98,6 +111,7 @@ private fun StatsContent(stats: ParagonStats, handle: String, achievements: Achi
         // reservado cambia de tamaño en el momento.
         contentPadding = PaddingValues(top = 8.dp, bottom = 96.dp),
     ) {
+        dieta?.let { item { DietaGamerCard(it) } }
         item { ParagonScoreCard(stats.paragonScore) }
         item { TrophyDnaCard(stats.trophyDna, stats.estiloDeCaza) }
         item { RachasCard(stats.rachas, stats.historico) }
@@ -528,6 +542,34 @@ private fun BadgesCard(badges: List<Badge>) {
                 }
             }
         }
+    }
+}
+
+/**
+ * "🥗 Tu dieta gamer está muy densa" — aviso amistoso (nunca un bloqueo) si
+ * los últimos 3 juegos terminados comparten género y suman muchas horas.
+ * Ver dietaGamer() en lib/dietaGamer.ts (proyecto Next.js) para los
+ * umbrales exactos. Mismo texto que DietaGamer.tsx en la web.
+ */
+@Composable
+private fun DietaGamerCard(dieta: DietaGamer) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(20.dp))
+            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .padding(20.dp),
+    ) {
+        Text(text = "🥗 Tu dieta gamer está muy densa", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(8.dp))
+        val juegos = dieta.juegos.joinToString(", ") { it.titulo }
+        Text(
+            text = "Tus últimos 3 juegos terminados — $juegos — son todos de ${dieta.genero} y suman más de ${dieta.horasTotales}h. " +
+                "Prueba algo distinto antes de tu próxima gran aventura del mismo tipo — un indie, unas plataformas o un puzle cortito para limpiar el paladar.",
+            color = Muted,
+            fontSize = 13.sp,
+            lineHeight = 19.sp,
+        )
     }
 }
 
