@@ -1,8 +1,12 @@
 package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
+import com.paragon.app.data.local.SimpleCacheDao
+import com.paragon.app.data.local.SimpleCacheEntity
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.StatsResponse
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
 
 /**
@@ -61,7 +65,7 @@ data class ParagonStats(
 )
 
 sealed class StatsResult {
-    data class Ok(val stats: ParagonStats) : StatsResult()
+    data class Ok(val stats: ParagonStats, val fromCache: Boolean = false) : StatsResult()
     data class Error(val message: String) : StatsResult()
 }
 
@@ -95,16 +99,34 @@ private fun StatsResponse.toParagonStats() = ParagonStats(
     ),
 )
 
-class StatsRepository(private val tokenStore: TokenStore? = null) {
+private const val CACHE_KEY = "stats_data"
+private val statsMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+private val paragonStatsAdapter = statsMoshi.adapter(ParagonStats::class.java)
+
+class StatsRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
+    /**
+     * Red primero, caché de respaldo (mismo patrón que Library/Panel/
+     * GameDetail/Feed/Social/Ligas) — encontrado en auditoría: Estadísticas
+     * es una de las 5 pestañas principales pero se quedaba sin ningún
+     * respaldo local, a diferencia de las demás.
+     */
     suspend fun getStats(): StatsResult {
         val store = tokenStore ?: return StatsResult.Error("Sin sesión.")
 
         return try {
-            StatsResult.Ok(ApiClient.statsApi(store).getStats().toParagonStats())
+            val stats = ApiClient.statsApi(store).getStats().toParagonStats()
+            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, paragonStatsAdapter.toJson(stats)))
+            StatsResult.Ok(stats)
         } catch (e: HttpException) {
-            StatsResult.Error("El servidor respondió con un error (${e.code()}).")
+            cachedStats() ?: StatsResult.Error("El servidor respondió con un error (${e.code()}).")
         } catch (e: Exception) {
-            StatsResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedStats() ?: StatsResult.Error(e.message ?: "No se pudo conectar con Paragon.")
         }
+    }
+
+    private suspend fun cachedStats(): StatsResult.Ok? {
+        val json = cacheDao?.get(CACHE_KEY) ?: return null
+        val stats = try { paragonStatsAdapter.fromJson(json) } catch (e: Exception) { null } ?: return null
+        return StatsResult.Ok(stats, fromCache = true)
     }
 }

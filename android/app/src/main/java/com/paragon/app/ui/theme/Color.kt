@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
  * está en automático). Los `val` de abajo son propiedades computadas que
  * leen esto: cualquier Composable que use `Background`, `Foreground`, etc.
  * (los ~20 archivos de pantallas que ya hacían `import ...theme.*`) se
- * (los ~20 archivos de pantallas que ya hacían `import ...theme.*`) se
  * recompone solo con el cambio, sin tener que tocar ni una pantalla más.
  */
 import com.paragon.app.data.theme.PlatformColor

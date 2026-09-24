@@ -30,7 +30,9 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit)? = null) {
-    val repository = remember(tokenStore) { StatsRepository(tokenStore) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
+    val repository = remember(tokenStore, cacheDao) { StatsRepository(tokenStore, cacheDao) }
     val achievementsRepository = remember(tokenStore) { AchievementsRepository(tokenStore) }
     val dietRepository = remember(tokenStore) { DietRepository(tokenStore) }
     var result by remember { mutableStateOf<StatsResult?>(null) }
@@ -89,7 +91,7 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
                     ) { Text("Reintentar") }
                 }
             }
-            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok), dieta)
+            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok), dieta, current.fromCache)
         }
     }
 
@@ -100,7 +102,7 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
 }
 
 @Composable
-private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?, dieta: DietaGamer?) {
+private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?, dieta: DietaGamer?, fromCache: Boolean = false) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -111,6 +113,15 @@ private fun StatsContent(stats: ParagonStats, handle: String, achievements: Achi
         // reservado cambia de tamaño en el momento.
         contentPadding = PaddingValues(top = 8.dp, bottom = 96.dp),
     ) {
+        // Mismo aviso que Biblioteca/Panel/Ficha de juego/Feed cuando se
+        // sirve la caché de respaldo — Estadísticas no lo tenía (hueco real
+        // visto en auditoría: era la única de las 5 pestañas principales
+        // sin ningún respaldo offline).
+        if (fromCache) {
+            item {
+                Text(text = "Sin conexión — mostrando la última copia guardada", color = Muted, fontSize = 11.sp)
+            }
+        }
         dieta?.let { item { DietaGamerCard(it) } }
         item { ParagonScoreCard(stats.paragonScore) }
         item { TrophyDnaCard(stats.trophyDna, stats.estiloDeCaza) }

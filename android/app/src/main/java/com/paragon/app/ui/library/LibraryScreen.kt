@@ -40,6 +40,7 @@ import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.util.rememberShakeListener
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.Search
 
 private val FILTERS = listOf(
     LibraryFilter.TODOS to "Todos",
@@ -51,7 +52,7 @@ private val FILTERS = listOf(
     LibraryFilter.BACKLOG to "Pila Vergüenza",
 )
 
-/** Biblioteca real contra GET /api/mobile/library (LibraryRepository). El botón "Ordenar" sigue sin acción — pendiente. */
+/** Biblioteca real contra GET /api/mobile/library (LibraryRepository). */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun LibraryScreen(
@@ -261,9 +262,22 @@ fun LibraryScreen(
                 }
 
                 if (games.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "Nada por aquí todavía.", color = Muted, fontSize = 14.sp)
-                    }
+                    // Mismo componente que Carpetas/Amigos/Ligas/Comunidad
+                    // (ui/common/EmptyState.kt) — antes esta pantalla se
+                    // quedaba fuera con un `Text` suelto sin icono ni
+                    // contexto, pese a ser una de las 5 pestañas
+                    // principales. Copia distinta según si el hueco es "no
+                    // tienes nada" o "nada con este filtro/búsqueda".
+                    val hayFiltroActivo = searchQuery.isNotBlank() || selectedFilter != 0
+                    com.paragon.app.ui.common.EmptyState(
+                        icon = if (hayFiltroActivo) Icons.Default.Search else Icons.AutoMirrored.Filled.List,
+                        title = if (hayFiltroActivo) "Nada con esos filtros" else "Tu biblioteca está vacía",
+                        description = if (hayFiltroActivo) {
+                            "Prueba a cambiar la búsqueda o el filtro de arriba."
+                        } else {
+                            "En cuanto vincules una cuenta y sincronices, tus juegos aparecerán aquí."
+                        },
+                    )
                 } else {
                     val isList = themeStore.libraryLayout == 1
                     LazyVerticalGrid(

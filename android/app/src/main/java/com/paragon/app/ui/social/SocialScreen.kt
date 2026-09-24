@@ -832,8 +832,14 @@ private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPunto
 // #1 — no el "Gold" de trofeos (Color.kt), que es un color distinto y
 // rompería la consistencia entre las dos pantallas de liga.
 private val PodiumGold get() = com.paragon.app.ui.theme.Platinum
-private val Silver = androidx.compose.ui.graphics.Color(0xFFB9C2CC)
-private val BronzeMedal = androidx.compose.ui.graphics.Color(0xFFC07B4A)
+// `get()`, no `val` fijo (bug real de auditoría): un `val` de nivel de
+// archivo se calcula UNA vez al cargar la clase, así que nunca reaccionaba
+// al cambiar de modo claro/oscuro — y encima "Silver" tapaba silenciosamente
+// al `Silver` de tema (import `ui.theme.*`) con el mismo nombre, así que un
+// futuro cambio del import ni siquiera habría avisado del conflicto.
+// Nombrados "Podium*" para que no vuelva a pasar.
+private val PodiumSilver get() = com.paragon.app.ui.theme.Silver
+private val PodiumBronze get() = com.paragon.app.ui.theme.Bronze
 
 /**
  * Podio para el top 3 — antes las tres primeras filas eran indistinguibles
@@ -872,8 +878,8 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
         if (top3.size > 1) {
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                top3.getOrNull(1)?.let { PodiumSecondaryCard(it, "🥈", Silver, Modifier.weight(1f), onClick) }
-                top3.getOrNull(2)?.let { PodiumSecondaryCard(it, "🥉", BronzeMedal, Modifier.weight(1f), onClick) }
+                top3.getOrNull(1)?.let { PodiumSecondaryCard(it, "🥈", PodiumSilver, Modifier.weight(1f), onClick) }
+                top3.getOrNull(2)?.let { PodiumSecondaryCard(it, "🥉", PodiumBronze, Modifier.weight(1f), onClick) }
             }
         }
     }

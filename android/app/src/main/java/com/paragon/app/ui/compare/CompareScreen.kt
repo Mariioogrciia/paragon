@@ -117,7 +117,17 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
                 CircularProgressIndicator(color = Accent)
             }
             result is CompareResult.Error -> Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-                Text(text = (result as CompareResult.Error).message, color = Muted, fontSize = 14.sp)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = (result as CompareResult.Error).message, color = Muted, fontSize = 14.sp)
+                    // El buscador de arriba se queda con el @handle puesto,
+                    // así que "reintentar" ya era posible tocando
+                    // "Comparar" otra vez — este botón solo lo hace
+                    // explícito, mismo patrón que el resto de pantallas
+                    // con estado de error.
+                    TextButton(onClick = { buscar(handle) }, modifier = Modifier.padding(top = 8.dp)) {
+                        Text("Reintentar", color = Accent, fontWeight = FontWeight.SemiBold)
+                    }
+                }
             }
             result is CompareResult.Ok -> CompareContent((result as CompareResult.Ok).data)
             else -> FriendsPicker(amigos = amigos, onPick = { buscar(it) })

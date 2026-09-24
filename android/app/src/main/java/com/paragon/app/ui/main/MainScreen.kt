@@ -401,7 +401,7 @@ fun MainScreen(
                 CollectionsScreen(navController, tokenStore, onBack = { navController.popBackStack() })
             }
             composable(Screen.StuckTrophies.route) {
-                StuckTrophiesScreen(onBack = { navController.popBackStack() })
+                StuckTrophiesScreen(tokenStore, onBack = { navController.popBackStack() })
             }
             
             // Pantallas de Ajustes

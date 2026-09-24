@@ -30,6 +30,7 @@ import com.paragon.app.data.TrophyGrade
 import com.paragon.app.data.TrophyItem
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.GameSessionEntity
+import com.paragon.app.ui.common.gradeColor
 import com.paragon.app.ui.theme.*
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.draw.clip
@@ -512,14 +513,6 @@ private fun PendingTrophyCard(trofeo: TrophyItem, destacado: Boolean) {
             }
         }
     }
-}
-
-private fun gradeColor(grade: TrophyGrade?): Color = when (grade) {
-    TrophyGrade.PLATINUM -> Platinum
-    TrophyGrade.GOLD -> Gold
-    TrophyGrade.SILVER -> Silver
-    TrophyGrade.BRONZE -> Bronze
-    null -> Muted
 }
 
 /**

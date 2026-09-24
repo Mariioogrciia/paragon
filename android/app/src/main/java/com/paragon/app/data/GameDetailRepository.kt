@@ -307,35 +307,4 @@ class GameDetailRepository(
         }
     }
 
-    /**
-     * Mantenido para pruebas/preview de Compose — las tarjetas de
-     * PanelScreen (Panel sigue con datos mock salvo perfil/stats) usan ids
-     * inventados ("1", "2"...) que no existen en la base real, así que
-     * pulsarlas hoy lleva a getGameDetail() a devolver un 404 real, no un
-     * fallo — eso se arregla cuando el Panel deje de usar recentGames/
-     * nearPlatinum de mentira.
-     */
-    fun getMockGameDetail(gameId: String): GameDetailData {
-        val trophies = listOf(
-            TrophyItem("t1", "Elden Lord", "Consigue uno de los finales del juego.", TrophyGrade.PLATINUM, true, "2026-09-10T07:55:00.000Z", 4.2),
-            TrophyItem("t2", "Portador de la Gran Runa", "Restaura una Gran Runa.", TrophyGrade.GOLD, true, "2026-09-08T20:10:00.000Z", 31.7),
-            TrophyItem("t3", "Maestro de las artes marciales", "Domina las artes del combate.", TrophyGrade.GOLD, false, null, 18.4),
-            TrophyItem("t4", "Coleccionista de hechizos", "Consigue todos los hechizos de Gloria.", TrophyGrade.SILVER, true, "2026-08-30T18:00:00.000Z", 45.9),
-            TrophyItem("t5", "Primer contacto", "Derrota al primer jefe de campo.", TrophyGrade.BRONZE, true, "2026-08-01T12:00:00.000Z", 78.1),
-        )
-        val earned = trophies.count { it.earned }
-
-        return GameDetailData(
-            id = gameId,
-            title = "Elden Ring",
-            coverUrl = "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg",
-            earnedTrophies = earned,
-            totalTrophies = trophies.size,
-            percent = (earned * 100) / trophies.size,
-            isPinned = false,
-            notes = "",
-            playtimeMinutes = 4260,
-            trophies = trophies,
-        )
-    }
 }

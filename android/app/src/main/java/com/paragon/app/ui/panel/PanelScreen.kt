@@ -161,8 +161,8 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                         HeroGameCard(
                             game = game.toGameProgress(),
                             label = "A POR ESTE PLATINO AHORA",
-                            labelColor = MilestoneGoldPanel,
-                            accentColor = MilestoneGoldPanel,
+                            labelColor = Gold,
+                            accentColor = Gold,
                             // A la ficha del juego, no directo a Modo Enfoque —
                             // ese es un modo aparte que se elige a propósito
                             // desde el menú, no algo que se cae encima al
@@ -256,11 +256,21 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                                 }
                             }
                         }
-                        is HighlightsResult.Error -> Text(
-                            text = current.message,
-                            color = Muted,
-                            fontSize = 13.sp,
-                        )
+                        is HighlightsResult.Error -> Column {
+                            Text(
+                                text = current.message,
+                                color = Muted,
+                                fontSize = 13.sp,
+                            )
+                            // Antes solo quedaba el pull-to-refresh de toda
+                            // la pantalla (no evidente para quien no lo
+                            // sepa) para recuperarse de un corte de red —
+                            // ahora hay un botón explícito, igual que el
+                            // resto de pantallas con estado de error.
+                            TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 4.dp)) {
+                                Text("Reintentar", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                            }
+                        }
                         is HighlightsResult.Ok -> {
                             val nearest = current.nearPlatinum.firstOrNull()
                             if (nearest != null) {
@@ -402,8 +412,6 @@ fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
         }
     }
 }
-
-private val MilestoneGoldPanel = Color(0xFFE2B53E)
 
 /** Banner del Cerrojo de Hitos: qué juego está reservado para tu próximo platino en número redondo. */
 @Composable

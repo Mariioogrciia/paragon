@@ -8,6 +8,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,8 +67,9 @@ private data class Slide(val key: String, val background: Brush, val content: @C
 fun WrapStoriesScreen(tokenStore: TokenStore, onClose: () -> Unit) {
     val repository = remember(tokenStore) { WrapRepository(tokenStore) }
     var result by remember { mutableStateOf<WrapResult?>(null) }
+    val retryCounter = remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(Unit) { result = repository.getWrap() }
+    LaunchedEffect(retryCounter.value) { result = repository.getWrap() }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.92f))) {
         when (val current = result) {
@@ -80,6 +82,9 @@ fun WrapStoriesScreen(tokenStore: TokenStore, onClose: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(text = current.message, color = Foreground, fontSize = 14.sp)
+                TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 12.dp)) {
+                    Text("Reintentar", color = Accent, fontWeight = FontWeight.SemiBold)
+                }
             }
             is WrapResult.Ok -> WrapStoriesContent(data = current.data)
         }

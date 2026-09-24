@@ -64,6 +64,8 @@ import com.paragon.app.data.predecirPlatino
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.collections.AddToCollectionSheet
 import com.paragon.app.ui.share.ShareTrophyDialog
+import com.paragon.app.ui.common.gradeColor
+import com.paragon.app.ui.common.gradeLabelEs
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -72,11 +74,6 @@ import kotlinx.coroutines.launch
  * de fondo, barra de progreso general y trofeos agrupados por rareza
  * (Platino > Oro > Plata > Bronce, mismo orden que la web). Datos reales
  * contra GET /api/mobile/games/{gameId} (GameDetailRepository).
- *
- * Ojo: Panel sigue mandando aquí los ids inventados de sus tarjetas mock
- * (recentGames/nearPlatinum) — hasta que esas dejen de ser mock, tocar una
- * tarjeta del Panel aterriza aquí en el estado de error (404 real del
- * backend, "este juego no existe"), no en un fallo de la pantalla.
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -114,12 +111,21 @@ fun GameDetailScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = current.message, color = Foreground, fontSize = 14.sp)
-                Button(
-                    onClick = onBack,
-                    modifier = Modifier.padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                ) {
-                    Text("Volver")
+                Row(modifier = Modifier.padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // El `retryCounter` que dispara el `LaunchedEffect` de
+                    // arriba ya existía — solo faltaba un botón que lo
+                    // usara. Sin esto, un corte de red momentáneo dejaba
+                    // "Volver" como única salida, obligando a salir y
+                    // volver a entrar desde el origen para reintentar.
+                    Button(
+                        onClick = { retryCounter.value += 1 },
+                        colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                    ) {
+                        Text("Reintentar")
+                    }
+                    TextButton(onClick = onBack) {
+                        Text("Volver", color = Foreground)
+                    }
                 }
             }
         }
@@ -455,8 +461,6 @@ private const val MARKER_PADDING_DP = 16
 
 private val FECHA_MES_CORTO = java.text.SimpleDateFormat("MMM yy", java.util.Locale("es", "ES"))
 
-private val MilestoneGold = Color(0xFFE2B53E)
-
 /**
  * Anclar (Modo Enfoque), reservar (Cerrojo de Hitos) y meter en una carpeta
  * — las tres acciones nuevas de la ficha de juego, mismo patrón optimista
@@ -496,7 +500,7 @@ private fun GameActionsRow(
                 else -> "Reservar hito"
             },
             active = reservado,
-            accentColor = MilestoneGold,
+            accentColor = Gold,
             onClick = onToggleReserve,
         )
         ActionChip(
@@ -550,14 +554,6 @@ private data class ResumenDia(
 )
 
 private val GRADOS_EN_ORDEN = listOf(TrophyGrade.PLATINUM, TrophyGrade.GOLD, TrophyGrade.SILVER, TrophyGrade.BRONZE)
-
-private fun gradeLabelEs(grade: TrophyGrade?): String = when (grade) {
-    TrophyGrade.PLATINUM -> "Platino"
-    TrophyGrade.GOLD -> "Oro"
-    TrophyGrade.SILVER -> "Plata"
-    TrophyGrade.BRONZE -> "Bronce"
-    null -> "?"
-}
 
 /**
  * Vista "Cronología": cuándo cayó cada trofeo (eje X) y lo raro que es (eje
@@ -986,14 +982,6 @@ private fun TrophyRow(
             onDismiss = { showGuiasEscritas = false },
         )
     }
-}
-
-private fun gradeColor(grade: TrophyGrade?): Color = when (grade) {
-    TrophyGrade.PLATINUM -> Platinum
-    TrophyGrade.GOLD -> Gold
-    TrophyGrade.SILVER -> Silver
-    TrophyGrade.BRONZE -> Bronze
-    null -> Muted
 }
 
 /**
