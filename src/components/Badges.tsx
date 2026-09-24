@@ -98,7 +98,7 @@ export async function Badges({ earnedBadges }: { earnedBadges: { badgeId: string
         return (
           <div
             key={badge.id}
-            className="group relative flex h-8 w-8 items-center justify-center rounded-full border border-white/10 shadow-sm cursor-help transition-transform hover:scale-110"
+            className="group relative flex h-8 w-8 items-center justify-center rounded-full border border-white/10 shadow-sm cursor-help transition-transform hover:scale-110 hover:z-50"
             style={{ background: badge.bg }}
           >
             <span className="drop-shadow-md text-sm">{badge.icon}</span>
