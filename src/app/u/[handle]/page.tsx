@@ -315,9 +315,17 @@ export default async function PerfilPage({
                 backgroundImage: `url(${backgroundImage})`,
                 ...(fondoEsCaratulaSuelta
                   ? {
-                      filter: "blur(40px) brightness(0.4)",
-                      opacity: 0.5,
-                      transform: "scale(1.1)",
+                      // Reportado: "no aprecio el juego, está demasiado
+                      // difuminado" — con 40px de blur y solo al 50% de
+                      // opacidad, una carátula ya pequeña (pensada para un
+                      // cuadrado de trofeos, no una cabecera ancha) se
+                      // volvía irreconocible. Menos blur y más opacidad:
+                      // sigue sin verse nítida al 100% (es la franja fija
+                      // de arriba, ver el comentario de "franja de alto
+                      // FIJO"), pero ahora sí se distingue qué juego es.
+                      filter: "blur(14px) brightness(0.55)",
+                      opacity: 0.75,
+                      transform: "scale(1.08)",
                     }
                   : {}),
               }}
