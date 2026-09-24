@@ -221,6 +221,16 @@ export default async function PerfilPage({
   // vídeo puesto de antes se intentaba reproducir con la URL de la
   // portada, que no es ningún vídeo.
   const backgroundEsVideo = !juegoDeFondoElegido && Boolean(backgroundImage && profile.profileBannerUrl && /\.(mp4|webm)$/i.test(profile.profileBannerUrl));
+  // `iconUrl` de un juego es la carátula/icono de trofeos (pensado para un
+  // cuadrado pequeño, no una cabecera ancha) — estirada a pantalla completa
+  // SIN desenfoque se ve pixelada de verdad (reportado con captura). El
+  // tratamiento de "fondo ambiental" (blur+oscurecido+zoom, ya existía para
+  // el respaldo silencioso de `games[0]`) tiene que aplicarse en CUALQUIER
+  // caso donde lo que se ve es una carátula suelta, no arte de banner de
+  // verdad — antes solo miraba `!profile.profileBannerUrl`, así que un
+  // juego de fondo elegido a propósito con un banner también puesto se
+  // enseñaba SIN el tratamiento, nítido y sin oscurecer.
+  const fondoEsCaratulaSuelta = Boolean(juegoDeFondoElegido) || !profile.profileBannerUrl;
 
   const customStyle: any = {};
   if (profile.profileColor) {
@@ -262,25 +272,41 @@ export default async function PerfilPage({
         )}
         {backgroundImage && !backgroundEsVideo && (
           <div
-            className={`absolute inset-0 z-0 bg-cover bg-center bg-no-repeat ${profile.profileBannerUrl ? "perfil-banner-parallax" : ""}`}
+            className={`absolute inset-0 z-0 bg-cover bg-center bg-no-repeat ${!fondoEsCaratulaSuelta ? "perfil-banner-parallax" : ""}`}
             style={{
               backgroundImage: `url(${backgroundImage})`,
-              ...(profile.profileBannerUrl
-                ? {}
-                : {
+              ...(fondoEsCaratulaSuelta
+                ? {
                     filter: "blur(40px) brightness(0.4)",
                     opacity: 0.5,
                     transform: "scale(1.1)",
-                  }),
+                  }
+                : {}),
             }}
           />
         )}
-        
+
         {/* Capa de acento sutil encima del blur */}
         {backgroundImage && (
-          <div 
+          <div
             className="absolute inset-0 z-0 mix-blend-overlay"
             style={{ background: "radial-gradient(700px 320px at 25% 0%, rgb(var(--accent-rgb) / 0.3), transparent 80%)" }}
+          />
+        )}
+
+        {/*
+          Velo de contraste: el texto de la cabecera (nombre, handle, título,
+          botones) siempre sale en blanco/claro, pero el fondo puede ser
+          CUALQUIER color — una zona clara de un preset o de una carátula
+          (como la tinta china de este mismo bug reportado) deja el texto
+          casi invisible sin esto. Degradado hacia abajo, donde vive todo el
+          texto, más fuerte que el acento de arriba (que es solo un tinte de
+          color, no pensado para legibilidad).
+        */}
+        {(backgroundImage || presetBanner) && (
+          <div
+            className="absolute inset-0 z-[1] pointer-events-none"
+            style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.75) 100%)" }}
           />
         )}
 

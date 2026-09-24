@@ -146,8 +146,15 @@ function AnilloEstatico({
 }
 
 function Nucleo({ children }: { children: React.ReactNode }) {
+  // `aspect-square`, no confiar en que el contenido salga cuadrado solo:
+  // dentro de un `inline-flex` (el hueco de línea que reserva el navegador
+  // para el descendente de una fuente bajo una imagen) este div salía 100
+  // × 106px en vez de 100 × 100 — nada visible en el recuadro, pero
+  // `border-radius: 50%` sobre un rectángulo no cuadrado da una elipse, no
+  // un círculo, y las esquinas de la foto (siempre cuadrada) asomaban por
+  // fuera del anillo del marco. Bug real, reportado con captura.
   return (
-    <div className="relative z-10 rounded-full overflow-hidden border-4" style={{ borderColor: "var(--background)" }}>
+    <div className="relative z-10 aspect-square rounded-full overflow-hidden border-4" style={{ borderColor: "var(--background)" }}>
       {children}
     </div>
   );
