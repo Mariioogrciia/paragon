@@ -203,10 +203,24 @@ export default async function PerfilPage({
   // Un banner de plataforma (arte propio de Paragon, ver BannerPresets.tsx)
   // viene marcado como "preset:<clave>" en vez de una URL de verdad.
   const presetBanner = bannerPresetKey(profile.profileBannerUrl);
-  const backgroundImage = !presetBanner && (profile.profileBannerUrl || backgroundGame?.iconUrl);
+  // Bug real reportado: con cualquier banner puesto (subido o preset), el
+  // selector "Juego para el fondo" de Ajustes no tenía ningún efecto —
+  // ganaba siempre el banner, sin avisar de nada. Un juego elegido A
+  // PROPÓSITO (profileBackgroundGameId real, no el `games[0]` de último
+  // recurso de la línea de arriba) es la elección más explícita de las
+  // dos, así que gana ella; sin elección explícita, se mantiene el orden
+  // de siempre (banner > portada del primer juego).
+  const juegoDeFondoElegido = Boolean(profile.profileBackgroundGameId) && backgroundGame;
+  const backgroundImage = juegoDeFondoElegido
+    ? backgroundGame?.iconUrl
+    : !presetBanner && (profile.profileBannerUrl || backgroundGame?.iconUrl);
   // Un banner en vídeo se detecta por extensión y se pinta con <video>, no
-  // como background-image (que no sabe reproducir vídeo).
-  const backgroundEsVideo = Boolean(backgroundImage && profile.profileBannerUrl && /\.(mp4|webm)$/i.test(profile.profileBannerUrl));
+  // como background-image (que no sabe reproducir vídeo). Con un juego de
+  // fondo elegido a propósito, `backgroundImage` ya no es el banner (es la
+  // portada del juego) — sin este `!juegoDeFondoElegido`, un banner en
+  // vídeo puesto de antes se intentaba reproducir con la URL de la
+  // portada, que no es ningún vídeo.
+  const backgroundEsVideo = !juegoDeFondoElegido && Boolean(backgroundImage && profile.profileBannerUrl && /\.(mp4|webm)$/i.test(profile.profileBannerUrl));
 
   const customStyle: any = {};
   if (profile.profileColor) {
