@@ -371,6 +371,30 @@ número redondo (#25, #50...). Solo uno a la vez, igual que anclar.
 platinó (el cerrojo se cumplió solo). `numero` se recalcula siempre a
 partir de tus platinos actuales, nunca se guarda un número viejo.
 
+## `GET /api/mobile/achievements` — Palmarés y Badges
+
+```json
+{
+  "badges": [ { "id": "first_blood", "name": "Primera Sangre", "description": "Conseguiste tu primer platino", "earnedAt": "2026-01-01T00:00:00.000Z" } ],
+  "trophyCase": [ { "kind": "liga_mensual", "rank": 1, "titulo": "Liga Mensual · septiembre de 2026", "earnedAt": "2026-09-01T00:00:00.000Z" } ]
+}
+```
+`badges` — insignias por hitos (`checkAndGrantBadges` en lib/profiles.ts,
+se conceden solas al sincronizar): `first_blood`/`cazador`/`experto`/
+`leyenda` (platinos), `coleccionista` (100+ juegos), `critico` (3+
+reseñas), `sociable` (3+ amigos), `rolero` (5+ RPGs), `multiplataforma`
+(PSN+Steam+Xbox sincronizando), `madrugador` (usuario pionero). `name`/
+`description` ya vienen resueltos en español (no una clave de traducción
+— la app Android todavía no tiene i18n, igual que el resto de este
+contrato). Lista de definiciones: `BADGE_DEFINITIONS` en
+components/Badges.tsx.
+
+`trophyCase` — palmarés real: SOLO el ganador absoluto (no Top 3) de la
+Liga Mensual o de una Liga privada cerrada, nunca "casi cualquiera acaba
+con una copa" (ver lib/trophyCase.ts). `kind`: `"liga_mensual"` |
+`"liga_privada"`. Vacío en ambos campos si el usuario no ha ganado nada
+todavía — no es un error, es el estado normal de la mayoría de cuentas.
+
 ## `GET /api/mobile/collections` — Carpetas de juegos
 
 ```json

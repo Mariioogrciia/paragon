@@ -19,6 +19,8 @@ import com.paragon.app.data.*
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.theme.*
 import kotlin.math.roundToInt
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Estadísticas reales contra GET /api/mobile/stats (StatsRepository) — la
@@ -29,12 +31,19 @@ import kotlin.math.roundToInt
 @Composable
 fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit)? = null) {
     val repository = remember(tokenStore) { StatsRepository(tokenStore) }
+    val achievementsRepository = remember(tokenStore) { AchievementsRepository(tokenStore) }
     var result by remember { mutableStateOf<StatsResult?>(null) }
+    // Independiente de `result`: un fallo aquí (o tardar más) no debe
+    // bloquear el resto de Estadísticas, que ya funcionaba sin esto.
+    var achievements by remember { mutableStateOf<AchievementsResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(retryCounter.value) {
         result = null
-        result = repository.getStats()
+        coroutineScope {
+            launch { result = repository.getStats() }
+            launch { achievements = achievementsRepository.getAchievements() }
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
@@ -72,13 +81,13 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
                     ) { Text("Reintentar") }
                 }
             }
-            is StatsResult.Ok -> StatsContent(current.stats, handle)
+            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok))
         }
     }
 }
 
 @Composable
-private fun StatsContent(stats: ParagonStats, handle: String) {
+private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -95,6 +104,10 @@ private fun StatsContent(stats: ParagonStats, handle: String) {
         item { FinancieroCard(stats.financiero, stats.horasTotales) }
         item { EficienciaCard(stats.eficiencia) }
         item { BacklogCard(stats.backlog) }
+        achievements?.let { a ->
+            if (a.trophyCase.isNotEmpty()) item { TrophyCaseCard(a.trophyCase) }
+            if (a.badges.isNotEmpty()) item { BadgesCard(a.badges) }
+        }
         item { HitosCard(stats.hitos) }
         item { GaleriaHitosCard(stats.hitos, handle) }
     }
@@ -451,6 +464,68 @@ private fun BacklogCard(backlog: BacklogStats) {
                 MiniStat(label = "Hasta el final", value = "${backlog.horasHistoriaRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
                 MiniStat(label = "Hasta el platino", value = "${backlog.horasPlatinoRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
                 MiniStat(label = "Juegos contados", value = backlog.juegosContados.toString(), modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+private val ICONO_LIGA = mapOf("liga_mensual" to "🌐", "liga_privada" to "👥")
+
+/**
+ * Palmarés real: SOLO el ganador absoluto (nunca Top 3) de la Liga Mensual
+ * o de una Liga privada cerrada — ver lib/trophyCase.ts en el proyecto
+ * Next.js ("si casi cualquiera acaba con una copa, deja de significar
+ * nada"). Sin tarjeta si está vacío (la mayoría de cuentas, todavía).
+ */
+@Composable
+private fun TrophyCaseCard(trophyCase: List<TrophyCaseAward>) {
+    SectionCard(title = "Palmarés", subtitle = "Ligas que has ganado de verdad") {
+        trophyCase.forEachIndexed { index, award ->
+            if (index > 0) {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = Border)
+                Spacer(Modifier.height(12.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = ICONO_LIGA[award.kind] ?: "🏆", fontSize = 20.sp, modifier = Modifier.padding(end = 12.dp))
+                Column {
+                    Text(text = award.titulo, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = fechaCorta(award.earnedAt), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+            }
+        }
+    }
+}
+
+private val ICONO_BADGE = mapOf(
+    "first_blood" to "🏆",
+    "cazador" to "🎯",
+    "experto" to "⭐",
+    "leyenda" to "👑",
+    "coleccionista" to "📚",
+    "madrugador" to "🌅",
+    "critico" to "✍️",
+    "sociable" to "🤝",
+    "rolero" to "🐉",
+    "multiplataforma" to "🎮",
+)
+
+/** Insignias por hitos (`checkAndGrantBadges`, se conceden solas al sincronizar) — sin tarjeta si no hay ninguna todavía. */
+@Composable
+private fun BadgesCard(badges: List<Badge>) {
+    SectionCard(title = "Badges", subtitle = "Insignias que has ido desbloqueando") {
+        badges.forEachIndexed { index, badge ->
+            if (index > 0) {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = Border)
+                Spacer(Modifier.height(12.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = ICONO_BADGE[badge.id] ?: "🏅", fontSize = 20.sp, modifier = Modifier.padding(end = 12.dp))
+                Column {
+                    Text(text = badge.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = badge.description, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
             }
         }
     }

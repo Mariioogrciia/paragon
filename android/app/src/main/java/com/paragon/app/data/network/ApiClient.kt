@@ -50,6 +50,7 @@ object ApiClient {
     fun usersApi(tokenStore: TokenStore): UsersApi = retrofit(tokenStore).create(UsersApi::class.java)
     fun leaguesApi(tokenStore: TokenStore): LeaguesApi = retrofit(tokenStore).create(LeaguesApi::class.java)
     fun wishlistApi(tokenStore: TokenStore): WishlistApi = retrofit(tokenStore).create(WishlistApi::class.java)
+    fun achievementsApi(tokenStore: TokenStore): AchievementsApi = retrofit(tokenStore).create(AchievementsApi::class.java)
 
     /**
      * Un único Retrofit cacheado para todos los servicios — `.create()` sobre
