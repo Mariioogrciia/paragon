@@ -30,6 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 import com.paragon.app.data.AmigoRow
+import com.paragon.app.data.ClanActionResult
+import com.paragon.app.data.ClanInvite
+import com.paragon.app.data.ClanSummary
+import com.paragon.app.data.ClansRepository
+import com.paragon.app.data.ClansResult
 import com.paragon.app.data.League
 import com.paragon.app.data.LeagueInvite
 import com.paragon.app.data.LeaguesRepository
@@ -50,17 +55,24 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
     val repository = remember(tokenStore, cacheDao) { SocialRepository(tokenStore, cacheDao) }
     val leaguesRepository = remember(tokenStore, cacheDao) { LeaguesRepository(tokenStore, cacheDao) }
+    val clansRepository = remember(tokenStore) { ClansRepository(tokenStore) }
     var result by remember { mutableStateOf<SocialResult?>(null) }
     var leaguesResult by remember { mutableStateOf<LeaguesResult?>(null) }
     var invites by remember { mutableStateOf<List<LeagueInvite>>(emptyList()) }
+    var clansResult by remember { mutableStateOf<ClansResult?>(null) }
+    var clanInvites by remember { mutableStateOf<List<ClanInvite>>(emptyList()) }
     var selectedTab by remember { mutableIntStateOf(0) }
     val retryCounter = remember { mutableIntStateOf(0) }
     val leaguesRefresh = remember { mutableIntStateOf(0) }
+    val clansRefresh = remember { mutableIntStateOf(0) }
     var selectedHandle by remember { mutableStateOf<String?>(null) }
     var selectedLeagueId by remember { mutableStateOf<String?>(null) }
+    var selectedClanTag by remember { mutableStateOf<String?>(null) }
     var showNewLeagueDialog by remember { mutableStateOf(false) }
+    var showNewClanDialog by remember { mutableStateOf(false) }
+    var clanCreateError by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val tabs = listOf("Ligas", "Mis Ligas", "Amigos")
+    val tabs = listOf("Ligas", "Mis Ligas", "Amigos", "Clan")
 
     LaunchedEffect(retryCounter.value) {
         result = null
@@ -70,6 +82,11 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     LaunchedEffect(leaguesRefresh.value) {
         leaguesResult = leaguesRepository.getLeagues()
         invites = leaguesRepository.getInvites()
+    }
+
+    LaunchedEffect(clansRefresh.value) {
+        clansResult = clansRepository.getClans()
+        clanInvites = clansRepository.getInvites()
     }
 
     Column(
@@ -95,7 +112,74 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             }
         }
 
-        if (selectedTab == 1) {
+        if (selectedTab == 3) {
+            when (val current = clansResult) {
+                null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Accent)
+                }
+                is ClansResult.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = current.message, color = Foreground, fontSize = 14.sp)
+                        Button(
+                            onClick = { clansRefresh.value += 1 },
+                            modifier = Modifier.padding(top = 16.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                        ) {
+                            Text("Reintentar")
+                        }
+                    }
+                }
+                is ClansResult.Ok -> LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
+                ) {
+                    if (clanInvites.isNotEmpty()) {
+                        items(clanInvites, key = { it.clanId }) { invite ->
+                            ClanInviteRow(
+                                invite = invite,
+                                onAccept = {
+                                    coroutineScope.launch {
+                                        if (clansRepository.acceptInvite(invite.clanId)) clansRefresh.value += 1
+                                    }
+                                },
+                                onDecline = {
+                                    coroutineScope.launch {
+                                        if (clansRepository.declineInvite(invite.clanId)) clansRefresh.value += 1
+                                    }
+                                },
+                            )
+                        }
+                    }
+                    item {
+                        val miClan = current.myClan
+                        if (miClan != null) {
+                            ClanCard(
+                                title = "TU CLAN",
+                                subtitle = "[${miClan.tag}] ${miClan.name}",
+                                onClick = { selectedClanTag = miClan.tag },
+                            )
+                        } else {
+                            CreateClanHero(onClick = { showNewClanDialog = true })
+                        }
+                    }
+                    if (current.clans.isEmpty()) {
+                        item {
+                            Text(
+                                text = "Todavía no hay ningún clan. ¡Sé el primero en crear uno!",
+                                color = Muted,
+                                fontSize = 13.sp,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
+                    } else {
+                        items(current.clans, key = { it.id }) { clan ->
+                            ClanRowItem(clan, onClick = { selectedClanTag = clan.tag })
+                        }
+                    }
+                }
+            }
+        } else if (selectedTab == 1) {
             when (val current = leaguesResult) {
                 null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Accent)
@@ -266,6 +350,36 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                         if (created != null) {
                             leaguesRefresh.value += 1
                             selectedLeagueId = created.id
+                        }
+                    }
+                },
+            )
+        }
+
+        selectedClanTag?.let { tag ->
+            ClanDetailSheet(
+                tag = tag,
+                tokenStore = tokenStore,
+                onDismiss = { selectedClanTag = null },
+                onChanged = { clansRefresh.value += 1 },
+                onOpenProfile = { handle -> selectedHandle = handle },
+            )
+        }
+
+        if (showNewClanDialog) {
+            NewClanDialog(
+                error = clanCreateError,
+                onDismiss = { showNewClanDialog = false; clanCreateError = null },
+                onCreate = { name, tag, description ->
+                    coroutineScope.launch {
+                        when (val res = clansRepository.createClan(name, tag, description)) {
+                            is ClanActionResult.Ok -> {
+                                showNewClanDialog = false
+                                clanCreateError = null
+                                clansRefresh.value += 1
+                                selectedClanTag = tag.uppercase()
+                            }
+                            is ClanActionResult.Error -> clanCreateError = res.message
                         }
                     }
                 },
@@ -475,6 +589,193 @@ fun LeagueRowItem(league: League, onClick: () -> Unit) {
             )
         }
     }
+}
+
+@Composable
+private fun ClanInviteRow(invite: ClanInvite, onAccept: () -> Unit, onDecline: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(12.dp))
+            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .padding(16.dp),
+    ) {
+        Text("[${invite.clanTag}] ${invite.clanName}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        Text("${invite.invitedByName} te invita a unirte", color = Muted, fontSize = 12.sp)
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                text = "Unirme",
+                color = Accent,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp,
+                modifier = Modifier.clickable(onClick = onAccept),
+            )
+            Text(
+                text = "Rechazar",
+                color = Muted,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp,
+                modifier = Modifier.clickable(onClick = onDecline),
+            )
+        }
+    }
+}
+
+/** "Tu clan" cuando ya perteneces a uno — mismo hueco que ocuparía "Crea tu propio clan", pero llevando directo a la ficha en vez de invitar a crear otro. */
+@Composable
+private fun ClanCard(title: String, subtitle: String, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(16.dp))
+            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(18.dp),
+    ) {
+        Text(title, color = Muted, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
+        Text(subtitle, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp))
+    }
+}
+
+@Composable
+private fun CreateClanHero(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                androidx.compose.ui.graphics.Brush.linearGradient(listOf(AccentSoft, Surface)),
+                RoundedCornerShape(16.dp),
+            )
+            .border(1.dp, Accent.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(18.dp),
+    ) {
+        Text("CREA TU PROPIO CLAN", color = Accent, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 1.sp)
+        Text(
+            "Necesitas ser al menos Nivel 5 de Paragon. Une fuerzas con tu gente y sumad XP juntos.",
+            color = Muted,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Add, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(16.dp))
+            Text("Crear clan", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
+        }
+    }
+}
+
+@Composable
+private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
+    val color = leagueColor(clan.id)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(12.dp))
+            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .clickable { onClick() }
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(color.copy(alpha = 0.16f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(clan.tag.take(2).uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 12.sp)
+        }
+        Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+            Text(text = "[${clan.tag}] ${clan.name}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            if (clan.description.isNotBlank()) {
+                Text(text = clan.description, color = Muted, fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            }
+        }
+        Text(
+            text = "${clan.memberCount} ${if (clan.memberCount == 1) "miembro" else "miembros"}",
+            color = Muted,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+@Composable
+private fun NewClanDialog(error: String?, onDismiss: () -> Unit, onCreate: (String, String, String) -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var tag by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Surface,
+        title = { Text("Nuevo clan", color = Foreground, fontWeight = FontWeight.Bold) },
+        text = {
+            Column {
+                Text(
+                    "Necesitas ser al menos Nivel 5 de Paragon, y no pertenecer ya a otro clan.",
+                    color = Muted,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { if (it.length <= 60) name = it },
+                    placeholder = { Text("Nombre del clan") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Accent,
+                        unfocusedBorderColor = Border,
+                        focusedTextColor = Foreground,
+                        unfocusedTextColor = Foreground,
+                    ),
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = tag,
+                    onValueChange = { if (it.length <= 5) tag = it.uppercase() },
+                    placeholder = { Text("ETIQ (máx. 5)") },
+                    singleLine = true,
+                    modifier = Modifier.width(140.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Accent,
+                        unfocusedBorderColor = Border,
+                        focusedTextColor = Foreground,
+                        unfocusedTextColor = Foreground,
+                    ),
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { if (it.length <= 200) description = it },
+                    placeholder = { Text("Descripción (opcional)") },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 70.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Accent,
+                        unfocusedBorderColor = Border,
+                        focusedTextColor = Foreground,
+                        unfocusedTextColor = Foreground,
+                    ),
+                )
+                if (error != null) {
+                    Text(text = error, color = Danger, fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = name.isNotBlank() && tag.isNotBlank(),
+                onClick = { onCreate(name.trim(), tag.trim(), description.trim()) },
+            ) {
+                Text("Crear", color = Accent, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar", color = Muted) }
+        },
+    )
 }
 
 /**

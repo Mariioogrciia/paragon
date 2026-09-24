@@ -270,6 +270,78 @@ de la app móvil.
 
 Solo el dueño (`403` si no lo eres). Cascada sobre los miembros.
 
+## `GET /api/mobile/clans` — Lista de clanes
+
+```json
+{
+  "clans": [ { "id": "cl_1", "name": "Fontanero", "tag": "FNTR", "description": "...", "memberCount": 2 } ],
+  "myClan": { "tag": "FNTR", "name": "Fontanero", "role": "owner" }
+}
+```
+Todos los clanes, ordenados por nº de miembros (más primero). `myClan` es
+`null` si no perteneces a ninguno. `role`: `"owner"` | `"member"` (el
+esquema contempla `"admin"` para sublíderes, pero no está implementado
+todavía — no construir nada que dependa de él).
+
+### `POST /api/mobile/clans` — Crear un clan
+
+Body: `{ "name": "...", "tag": "...", "description"? }`. Reglas, todas
+comprobadas en el servidor: **Nivel 5 de Paragon** mínimo (`403` si no
+llega), `tag` máximo 5 caracteres (`400`, se guarda en MAYÚSCULAS pase lo
+que pase), no puedes crear uno si ya perteneces a otro (`409` — un usuario
+solo puede estar en un clan a la vez, reforzado con un índice único en
+base de datos), y `name`/`tag`/`description` pasan por el filtro de
+lenguaje ofensivo (`400` con el motivo). El creador entra como `"owner"`.
+
+## `GET /api/mobile/clans/invites` — Invitaciones a clanes pendientes
+
+```json
+{ "invites": [ { "clanId": "cl_1", "clanName": "Fontanero", "clanTag": "FNTR", "invitedByName": "Mario", "invitedByHandle": "mario", "createdAt": "..." } ] }
+```
+Se borran al resolverse (aceptada o rechazada) — sin histórico.
+
+### `POST /api/mobile/clans/invites/{clanId}/accept` — Aceptar
+
+Sin body. `400` si la invitación ya no existe.
+
+### `POST /api/mobile/clans/invites/{clanId}/decline` — Rechazar
+
+Sin body. Borra la invitación.
+
+## `GET /api/mobile/clans/{tag}` — Ficha de un clan
+
+```json
+{
+  "clan": { "id": "cl_1", "tag": "FNTR", "name": "Fontanero", "description": "..." },
+  "score": 75745,
+  "leaderboard": [ { "userId": "u1", "role": "owner", "handle": "fende21", "name": "FENDE21", "image": "https://...", "score": 73550, "trofeos": 4741 } ],
+  "activity": [ { "id": "act_1", "type": "rating", "rating": 5, "createdAt": "...", "user": { "handle": "fende21", "name": "FENDE21", "image": "https://..." }, "game": { "id": "psn-...", "title": "...", "iconUrl": "https://..." } } ],
+  "amIMember": true,
+  "amIOwner": false,
+  "invitables": []
+}
+```
+`404` si el tag no existe. `score` = suma del `leaderboard` (ya ordenado
+de mayor a menor) — "XP total del clan". `activity` (máx. 15) es la
+actividad reciente de los miembros, sin reacciones ni comentarios a
+propósito (escaparate, no una segunda bandeja de entrada); `type` igual
+que en `/feed`. `invitables` viene vacío salvo que `amIOwner: true`.
+
+### `POST /api/mobile/clans/{tag}/join` — Unirse
+
+Sin body. `400` si ya estás en un clan.
+
+### `POST /api/mobile/clans/{tag}/leave` — Abandonar
+
+Sin body. **Si eres el owner, se borra el clan ENTERO** — sin
+transferencia de liderazgo. La app debe confirmarlo con el usuario ANTES
+de llamar aquí, el backend no vuelve a preguntar.
+
+### `POST /api/mobile/clans/{tag}/invite` — Invitar a un amigo
+
+Body: `{ "invitedUserId": "..." }`. Solo el owner, y solo a un amigo suyo
+que no esté ya en un clan (`400` en cualquier otro caso, con el motivo).
+
 ## `GET /api/mobile/users/{handle}` — Ficha de perfil de cualquiera
 
 ```json
