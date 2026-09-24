@@ -199,18 +199,30 @@ export default async function PerfilPage({
     ? await db.select().from(gameTrophies).where(inArray(gameTrophies.trophyId, showcaseTrophyIds))
     : [];
 
-  const backgroundGame = games.find((game) => game.id === profile.profileBackgroundGameId) ?? (games.length > 0 ? games[0] : null);
+  // Ojo: NO conflar "hay backgroundGame" con "se encontró el juego
+  // elegido" — antes de este cambio `backgroundGame` ya caía a `games[0]`
+  // como último recurso, así que un `profileBackgroundGameId` que no
+  // aparece en `games` (biblioteca resincronizada, cuenta desvinculada...)
+  // daba igual un objeto no-null, y el código de más abajo lo trataba como
+  // "elección explícita encontrada" — el fondo se quedaba pegado siempre al
+  // mismo `games[0]`, sin importar qué juego se eligiera de verdad. Bug
+  // real reportado tras el primer arreglo: "elijo otro juego y el fondo no
+  // cambia nunca".
+  const juegoDeFondoEncontrado = profile.profileBackgroundGameId
+    ? games.find((game) => game.id === profile.profileBackgroundGameId)
+    : undefined;
+  const backgroundGame = juegoDeFondoEncontrado ?? (games.length > 0 ? games[0] : null);
   // Un banner de plataforma (arte propio de Paragon, ver BannerPresets.tsx)
   // viene marcado como "preset:<clave>" en vez de una URL de verdad.
   const presetBanner = bannerPresetKey(profile.profileBannerUrl);
   // Bug real reportado: con cualquier banner puesto (subido o preset), el
   // selector "Juego para el fondo" de Ajustes no tenía ningún efecto —
   // ganaba siempre el banner, sin avisar de nada. Un juego elegido A
-  // PROPÓSITO (profileBackgroundGameId real, no el `games[0]` de último
-  // recurso de la línea de arriba) es la elección más explícita de las
-  // dos, así que gana ella; sin elección explícita, se mantiene el orden
-  // de siempre (banner > portada del primer juego).
-  const juegoDeFondoElegido = Boolean(profile.profileBackgroundGameId) && backgroundGame;
+  // PROPÓSITO (encontrado de verdad en la biblioteca, no el `games[0]` de
+  // último recurso) es la elección más explícita de las dos, así que gana
+  // ella; sin elección explícita (o si ya no se encuentra), se mantiene el
+  // orden de siempre (banner > portada del primer juego).
+  const juegoDeFondoElegido = Boolean(juegoDeFondoEncontrado);
   const backgroundImage = juegoDeFondoElegido
     ? backgroundGame?.iconUrl
     : !presetBanner && (profile.profileBannerUrl || backgroundGame?.iconUrl);
