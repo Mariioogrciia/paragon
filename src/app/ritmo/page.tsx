@@ -216,7 +216,7 @@ export default async function RitmoPage({
                 return (
                   <div key={d.dia} className="group relative flex h-full flex-1 flex-col justify-end">
                     {d.total > 0 ? (
-                      <Link href={`/ritmo?mes=${mes}&dia=${d.dia}`} className="block h-full" aria-label={t("dayTooltip", { dia: Number(d.dia.slice(8)), total: d.total })}>
+                      <Link href={`/ritmo?mes=${mes}&dia=${d.dia}`} className="flex h-full flex-col justify-end" aria-label={t("dayTooltip", { dia: Number(d.dia.slice(8)), total: d.total })}>
                         {contenidoBarra}
                       </Link>
                     ) : (
