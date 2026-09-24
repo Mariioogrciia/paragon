@@ -109,7 +109,7 @@ function BarrasNavegables({
 export default async function RitmoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mes?: string; dia?: string }>;
+  searchParams: Promise<{ mes?: string }>;
 }) {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
@@ -118,7 +118,7 @@ export default async function RitmoPage({
   const mesesLargos = t.raw("mesesLargos") as string[];
   const mesesCortos = t.raw("mesesCortos") as string[];
 
-  const { mes: pedido, dia: diaPedido } = await searchParams;
+  const { mes: pedido } = await searchParams;
   const mes = pedido && esMesValido(pedido) ? pedido : mesActual();
 
   const [meses, desglose, trofeosDelMesCompleto, profile] = await Promise.all([
@@ -128,20 +128,11 @@ export default async function RitmoPage({
     getProfileByUserId(session.user.id),
   ]);
 
-  // Día seleccionado dentro del mes — pedido explícito: "estaría bien ver
-  // desglose por día también". Solo válido si es un día real DE ESTE mes
-  // (con el mes de arriba como prefijo): un `dia` de otro mes que se cuela
-  // en la URL (o quedó de antes de cambiar de mes) no filtra nada, para no
-  // enseñar una lista vacía sin explicación.
-  const dia = diaPedido && desglose.porDia.some((d) => d.dia === diaPedido) ? diaPedido : null;
-  const trofeos = dia ? trofeosDelMesCompleto.filter((tr) => tr.earnedAt.startsWith(dia)) : trofeosDelMesCompleto;
-
   const diasActivos = desglose.porDia.filter((d) => d.total > 0).length;
   const mejorDia = desglose.porDia.reduce(
     (a, b) => (b.total > a.total ? b : a),
     desglose.porDia[0] ?? { dia: mes, total: 0 },
   );
-  const maxDia = Math.max(...desglose.porDia.map((d) => d.total), 1);
 
   return (
     <div className="space-y-9">
@@ -177,66 +168,6 @@ export default async function RitmoPage({
             />
             <StatTile value={desglose.porJuego.length} label={t("statGamesTouched")} />
           </div>
-
-          {/* Calendario del mes: una columna por día, los vacíos incluidos.
-              Es lo que explica de dónde sale la racha. Cada barra con
-              trofeos es ahora un enlace — pedido explícito de "ver
-              desglose por día también": antes solo había un tooltip al
-              pasar por encima, sin forma de quedarse mirando solo ese día. */}
-          <section
-            className="rounded-[18px] p-6"
-            style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-          >
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
-                {t("dayByDay")}
-              </h2>
-              {dia && (
-                <Link
-                  href={`/ritmo?mes=${mes}`}
-                  scroll={false}
-                  className="text-[0.6875rem] font-bold uppercase tracking-[0.03em] text-accent hover:underline"
-                >
-                  {t("clearDayFilter")}
-                </Link>
-              )}
-            </div>
-            <div className="flex h-[90px] items-end gap-[3px]">
-              {desglose.porDia.map((d) => {
-                const activo = d.dia === dia;
-                const contenidoBarra = (
-                  <span
-                    className="block rounded-t-[3px] transition-all"
-                    style={{
-                      height: d.total === 0 ? 2 : `max(3px, ${Math.round((d.total / maxDia) * 100)}%)`,
-                      background: d.total === 0 ? "var(--border)" : activo ? "var(--accent)" : "rgb(var(--accent-rgb) / 0.55)",
-                      boxShadow: activo ? "0 0 10px rgb(var(--accent-rgb) / 0.6)" : undefined,
-                    }}
-                  />
-                );
-                return (
-                  <div key={d.dia} className="group relative flex h-full flex-1 flex-col justify-end">
-                    {d.total > 0 ? (
-                      <Link href={`/ritmo?mes=${mes}&dia=${d.dia}`} scroll={false} className="flex h-full flex-col justify-end" aria-label={t("dayTooltip", { dia: Number(d.dia.slice(8)), total: d.total })}>
-                        {contenidoBarra}
-                      </Link>
-                    ) : (
-                      contenidoBarra
-                    )}
-                    <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] group-hover:block"
-                      style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-                    >
-                      {t("dayTooltip", { dia: Number(d.dia.slice(8)), total: d.total })}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-1.5 flex justify-between text-[0.625rem] text-muted">
-              <span>1</span>
-              <span>{desglose.porDia.length}</span>
-            </div>
-          </section>
 
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-[0.9fr_1.1fr]">
             <section
@@ -296,7 +227,7 @@ export default async function RitmoPage({
             </section>
           </div>
 
-          <RitmoTrophyList trofeos={trofeos} />
+          <RitmoTrophyList porDia={desglose.porDia} trofeos={trofeosDelMesCompleto} />
         </>
       )}
     </div>
