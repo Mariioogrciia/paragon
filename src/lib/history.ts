@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games, gameTrophies, userTrophies } from "@/db/schema";
@@ -92,8 +93,12 @@ export interface Rachas {
  * Se traen los días distintos y se recorren en memoria en vez de resolverlo
  * con funciones de ventana en SQL: son unos cientos de filas por persona y el
  * cálculo se lee de un vistazo, que aquí vale más que el microsegundo.
+ *
+ * `cache()`: el layout raíz ya llama a esto para la cabecera, y varias
+ * páginas (p.ej. la portada) lo vuelven a pedir para lo suyo — sin
+ * memoizar, esa segunda llamada era la misma consulta otra vez.
  */
-export async function rachas(userId: string): Promise<Rachas> {
+export const rachas = cache(async (userId: string): Promise<Rachas> => {
   const filas = await db
     .select({ dia: sql<string>`to_char(date(${userTrophies.earnedAt}), 'YYYY-MM-DD')` })
     .from(userTrophies)
@@ -131,7 +136,7 @@ export async function rachas(userId: string): Promise<Rachas> {
   const hoyCuenta = distancia === 0;
 
   return { actual, mejor, diasActivos: dias.length, hoyCuenta };
-}
+});
 
 export interface ResumenHistorico {
   /** Trofeos con fecha conocida: la base real de todo lo de arriba. */

@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -25,7 +26,10 @@ export type NavKey = (typeof NAV_OCULTABLE)[number]["key"];
 
 const CLAVES_VALIDAS = new Set<string>(NAV_OCULTABLE.map((n) => n.key));
 
-export async function getHiddenNavItems(userId: string): Promise<NavKey[]> {
+// El layout raíz ya lo pide para filtrar el menú, y páginas como
+// /ajustes/ocultar lo vuelven a pedir para su propio formulario —
+// `cache()` evita que la segunda sea la misma consulta otra vez.
+export const getHiddenNavItems = cache(async (userId: string): Promise<NavKey[]> => {
   const [row] = await db
     .select({ hiddenNavItems: users.hiddenNavItems })
     .from(users)
@@ -33,7 +37,7 @@ export async function getHiddenNavItems(userId: string): Promise<NavKey[]> {
     .limit(1);
 
   return ((row?.hiddenNavItems ?? []) as string[]).filter((k) => CLAVES_VALIDAS.has(k)) as NavKey[];
-}
+});
 
 /** Reemplaza la lista entera — el formulario de ajustes manda el set completo marcado. */
 export async function setHiddenNavItems(userId: string, items: string[]): Promise<void> {

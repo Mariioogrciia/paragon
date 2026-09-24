@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
@@ -113,7 +114,11 @@ export async function getParagonLevels(
   return new Map([...xpPorUsuario].map(([userId, xp]) => [userId, paragonLevelFromXp(xp)]));
 }
 
-export async function getParagonLevel(userId: string): Promise<ParagonLevel> {
+// El layout raíz ya calcula esto para la cabecera, y páginas como
+// /ajustes lo vuelven a pedir — `cache()` evita repetir la consulta que
+// trae TODOS los trofeos de Steam de la persona (la más pesada de las
+// dos que hace `getParagonLevels`) una segunda vez en la misma petición.
+export const getParagonLevel = cache(async (userId: string): Promise<ParagonLevel> => {
   const niveles = await getParagonLevels([userId]);
   return niveles.get(userId) ?? paragonLevelFromXp(0);
-}
+});
