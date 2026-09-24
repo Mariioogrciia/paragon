@@ -1,3 +1,4 @@
+import { cache } from "react";
 import NextAuth, { type Account } from "next-auth";
 import Discord from "next-auth/providers/discord";
 import Google from "next-auth/providers/google";
@@ -79,7 +80,7 @@ async function vincularLoginASesionActiva(account: Account) {
  * Delegamos en Google y Discord a propósito: así no guardamos contraseñas de
  * nadie, ni tenemos que resolver el "olvidé mi contraseña" ni el 2FA.
  */
-export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
+const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
   adapter: DrizzleAdapter(getDb(), {
     usersTable: users,
     accountsTable: accounts,
@@ -146,3 +147,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
     },
   },
 }));
+
+// `auth()` (estrategia de sesión "database" vía DrizzleAdapter) hace una
+// consulta a la base de datos por llamada — y se llama en el layout raíz Y
+// en casi todas las páginas (48 sitios), así que sin memoizar, una sola
+// carga de página paga esa consulta dos o más veces antes de que empiece
+// ningún fetch propio de la página. `cache()` de React memoiza por
+// petición: da igual cuántos Server Components llamen a `auth()`, la
+// consulta real solo se hace una vez.
+export const auth = cache(uncachedAuth);
+export { handlers, signIn, signOut };
