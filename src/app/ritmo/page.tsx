@@ -194,6 +194,7 @@ export default async function RitmoPage({
               {dia && (
                 <Link
                   href={`/ritmo?mes=${mes}`}
+                  scroll={false}
                   className="text-[0.6875rem] font-bold uppercase tracking-[0.03em] text-accent hover:underline"
                 >
                   {t("clearDayFilter")}
@@ -216,7 +217,7 @@ export default async function RitmoPage({
                 return (
                   <div key={d.dia} className="group relative flex h-full flex-1 flex-col justify-end">
                     {d.total > 0 ? (
-                      <Link href={`/ritmo?mes=${mes}&dia=${d.dia}`} className="flex h-full flex-col justify-end" aria-label={t("dayTooltip", { dia: Number(d.dia.slice(8)), total: d.total })}>
+                      <Link href={`/ritmo?mes=${mes}&dia=${d.dia}`} scroll={false} className="flex h-full flex-col justify-end" aria-label={t("dayTooltip", { dia: Number(d.dia.slice(8)), total: d.total })}>
                         {contenidoBarra}
                       </Link>
                     ) : (
