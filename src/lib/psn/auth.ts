@@ -66,6 +66,28 @@ async function authenticateWithNpsso(npsso: string): Promise<CachedAuth> {
   };
 }
 
+/**
+ * Autentica con el NPSSO de un usuario concreto (no el del servidor) — para
+ * la extensión de navegador: lee la sesión de PSN del propio usuario y nos
+ * la manda una vez, para leer SU biblioteca aunque no sea amigo de la
+ * cuenta maestra. A propósito no se cachea ni se reintenta con refresh
+ * token como el de arriba: vive solo lo que dura esta petición y se
+ * descarta — nunca se guarda un NPSSO ajeno en la base de datos.
+ */
+export async function authenticateWithNpssoEphemeral(npsso: string): Promise<AuthorizationPayload> {
+  let code: string;
+  try {
+    code = await exchangeNpssoForCode(npsso);
+  } catch {
+    throw new PsnAuthError(
+      "PSN no ha aceptado la sesión — vuelve a intentarlo con playstation.com abierto y con la sesión iniciada.",
+    );
+  }
+
+  const tokens = await exchangeCodeForAccessToken(code);
+  return { accessToken: tokens.accessToken };
+}
+
 /** Token válido para llamar a la API, renovándolo si hace falta. */
 export async function getAuthorization(): Promise<AuthorizationPayload> {
   if (cache && cache.expiresAt - SKEW_MS > Date.now()) {

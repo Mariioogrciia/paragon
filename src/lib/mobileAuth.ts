@@ -66,3 +66,24 @@ export async function mintMobileSession(userId: string, sesionPrestada: string):
 export async function revokeMobileSession(token: string): Promise<void> {
   await db.delete(sessions).where(eq(sessions.sessionToken, token));
 }
+
+/**
+ * Token propio para la extensión de navegador (ver /movil/enlazar-extension
+ * y /api/extension/psn-sync) — mismo mecanismo que `mintMobileSession` (una
+ * fila nueva en `session`, Bearer en vez de cookie), pero SIN borrar nada:
+ * a diferencia del móvil, aquí no hay una "sesión prestada" que consumir —
+ * el usuario sigue con su pestaña de Paragon abierta con su cookie normal,
+ * y la extensión vive en un tercer sitio (su propio storage), independiente
+ * de las dos.
+ */
+export async function mintExtensionSession(userId: string): Promise<string> {
+  const token = crypto.randomUUID();
+
+  await db.insert(sessions).values({
+    sessionToken: token,
+    userId,
+    expires: new Date(Date.now() + TREINTA_DIAS_MS),
+  });
+
+  return token;
+}

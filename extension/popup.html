@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Paragon — Sincronizar PSN</title>
+  <style>
+    body {
+      width: 280px;
+      margin: 0;
+      padding: 20px;
+      background: #0a0d13;
+      color: #f1f3f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    h1 {
+      font-size: 15px;
+      margin: 0 0 4px;
+    }
+    p#estado {
+      font-size: 13px;
+      color: #9aa3b2;
+      margin: 0 0 16px;
+      line-height: 1.4;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #635bff;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    button + button {
+      margin-top: 8px;
+    }
+    #btn-desconectar {
+      background: transparent;
+      color: #9aa3b2;
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+  <h1>Paragon</h1>
+  <p id="estado">Comprobando…</p>
+  <button id="btn-conectar" hidden>Conectar con Paragon</button>
+  <button id="btn-sync" hidden>Sincronizar PSN ahora</button>
+  <button id="btn-desconectar" hidden>Desconectar esta extensión</button>
+  <script src="popup.js"></script>
+</body>
+</html>

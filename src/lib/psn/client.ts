@@ -1,4 +1,5 @@
 import {
+  getProfileFromAccountId,
   getProfileFromUserName,
   getTitleTrophies,
   getTitleTrophyGroups,
@@ -6,6 +7,7 @@ import {
   getUserTitles,
   getUserTrophiesEarnedForTitle,
   getUserTrophyProfileSummary,
+  type AuthorizationPayload,
   type TrophyTitle,
   type TrophyCounts as PsnCounts,
 } from "psn-api";
@@ -58,9 +60,9 @@ export async function resolveProfile(onlineId: string): Promise<ResolvedProfile>
   };
 }
 
-async function fetchTrophyLevel(accountId: string): Promise<number | null> {
+async function fetchTrophyLevel(accountId: string, authOverride?: AuthorizationPayload): Promise<number | null> {
   try {
-    const auth = await getAuthorization();
+    const auth = authOverride ?? (await getAuthorization());
     const summary = await getUserTrophyProfileSummary(auth, accountId);
     // PSN devuelve el nivel como texto en unos endpoints y como número en otros.
     const level = Number(summary.trophyLevel);
@@ -68,6 +70,28 @@ async function fetchTrophyLevel(accountId: string): Promise<number | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Perfil de la CUENTA con la que se autentica `auth` — la extensión de
+ * navegador: el usuario nos ha dado su propio token, así que no hace falta
+ * (ni tenemos de antemano) su onlineId, a diferencia de `resolveProfile`.
+ * `"me"` es el valor especial de la API de PSN para "la cuenta autenticada".
+ */
+export async function resolveOwnProfile(auth: AuthorizationPayload): Promise<ResolvedProfile> {
+  const [profile, summary] = await Promise.all([
+    getProfileFromAccountId(auth, "me"),
+    getUserTrophyProfileSummary(auth, "me"),
+  ]);
+
+  const level = Number(summary.trophyLevel);
+
+  return {
+    onlineId: profile.onlineId,
+    accountId: summary.accountId,
+    trophyLevel: Number.isFinite(level) ? level : null,
+    avatarUrl: profile.avatars.at(-1)?.url,
+  };
 }
 
 /**
@@ -170,8 +194,8 @@ interface HorasJugadas {
  * `repartirHoras` quien decide, fila a fila, si hay que sumarlas o
  * repartirlas.
  */
-async function horasJugadas(accountId: string): Promise<Map<string, HorasJugadas[]>> {
-  const auth = await getAuthorization();
+async function horasJugadas(accountId: string, authOverride?: AuthorizationPayload): Promise<Map<string, HorasJugadas[]>> {
+  const auth = authOverride ?? (await getAuthorization());
   const jugados = new Map<string, HorasJugadas[]>();
   const PAGE = 100;
 
@@ -240,8 +264,8 @@ function repartirHoras(fichas: Game[], sesiones: HorasJugadas[]): void {
  * años pasa de 100 juegos con facilidad, pero con un tope duro: si algo va mal
  * en la paginación, preferimos devolver de menos a girar en un bucle infinito.
  */
-export async function fetchLibrary(accountId: string): Promise<Game[]> {
-  const auth = await getAuthorization();
+export async function fetchLibrary(accountId: string, authOverride?: AuthorizationPayload): Promise<Game[]> {
+  const auth = authOverride ?? (await getAuthorization());
   const games: Game[] = [];
 
   let offset = 0;
@@ -261,7 +285,7 @@ export async function fetchLibrary(accountId: string): Promise<Game[]> {
   }
 
   try {
-    const jugados = await horasJugadas(accountId);
+    const jugados = await horasJugadas(accountId, authOverride);
 
     // Agrupar nuestras fichas por el mismo nombre normalizado que usan las
     // horas, para poder repartir sesión a sesión (ver repartirHoras).
@@ -321,8 +345,9 @@ export async function fetchTrophies(
   accountId: string,
   npCommunicationId: string,
   service: "trophy" | "trophy2" = "trophy2",
+  authOverride?: AuthorizationPayload,
 ): Promise<Trophy[]> {
-  const auth = await getAuthorization();
+  const auth = authOverride ?? (await getAuthorization());
 
   // Los títulos que no son de PS5 exigen declarar el servicio explícitamente.
   const options = service === "trophy" ? { npServiceName: "trophy" as const } : {};

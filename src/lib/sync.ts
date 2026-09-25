@@ -3,6 +3,7 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies, syncRuns, users } from "@/db/schema";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
+import type { AuthorizationPayload } from "psn-api";
 import {
   fetchAchievements,
   fetchLibrary as fetchSteamLibrary,
@@ -78,6 +79,19 @@ const XBL_CONCURRENCY = 2;
  */
 const EPIC_DETAIL_LIMIT = 40;
 const EPIC_CONCURRENCY = 6;
+
+/**
+ * Solo se usa cuando `syncLibrary` recibe `psnAuth` (extensión de
+ * navegador, ver linkPsnWithOwnToken): el token del usuario es efímero —
+ * vive lo que dura esta petición y no se guarda — así que el detalle
+ * juego a juego hay que traerlo YA, en la misma pasada, o no se podrá
+ * traer nunca más con el token del servidor (no somos amigos de esta
+ * cuenta). El resto de vinculaciones de PSN no pasan por aquí: siguen
+ * cargando el detalle perezosamente al abrir cada ficha, con el token
+ * maestro (ver getGameDetail en lib/profiles.ts).
+ */
+const PSN_OWN_TOKEN_DETAIL_LIMIT = 40;
+const PSN_OWN_TOKEN_CONCURRENCY = 4;
 
 /**
  * De una lista de `gameId`, cuáles necesitan de verdad que se les vuelva a
@@ -212,7 +226,7 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
 export async function syncLibrary(
   userId: string,
   account: SyncAccount,
-  opts: { forzarDetalle?: boolean } = {},
+  opts: { forzarDetalle?: boolean; psnAuth?: AuthorizationPayload } = {},
 ): Promise<number> {
   // Google y Ubisoft no tienen lector propio todavía. Sin esta salida,
   // "cualquier plataforma que no sea psn/steam/xbox/epic" caía por defecto
@@ -231,7 +245,7 @@ export async function syncLibrary(
 
   const library =
     account.platform === "psn"
-      ? await fetchPsnLibrary(account.accountId)
+      ? await fetchPsnLibrary(account.accountId, opts.psnAuth)
       : account.platform === "steam"
         ? await fetchSteamLibrary(account.accountId)
         : account.platform === "xbox"
@@ -278,6 +292,22 @@ export async function syncLibrary(
 
     await mapLimit(pendientes, XBL_CONCURRENCY, async (gameId) => {
       await syncGameTrophies(userId, account, gameId);
+    });
+  }
+
+  if (account.platform === "psn" && opts.psnAuth) {
+    // Sin `opts.psnAuth` (el caso normal: cuenta amiga de la maestra) el
+    // detalle se sigue trayendo perezoso, como siempre — este bloque es
+    // solo para la sesión efímera de la extensión (ver el comentario de
+    // PSN_OWN_TOKEN_DETAIL_LIMIT).
+    const psnAuth = opts.psnAuth;
+    const recientes = library
+      .slice()
+      .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""))
+      .slice(0, PSN_OWN_TOKEN_DETAIL_LIMIT);
+
+    await mapLimit(recientes, PSN_OWN_TOKEN_CONCURRENCY, async (game) => {
+      await syncGameTrophies(userId, account, game.id, psnAuth);
     });
   }
 
@@ -538,6 +568,10 @@ export async function syncGameTrophies(
   userId: string,
   account: SyncAccount,
   gameId: string,
+  // Solo lo usa el flujo de "sincronizar con mi propia sesión de PSN" (ver
+  // linkPsnWithOwnToken) — el resto de llamadas sigue con el token del
+  // servidor de siempre.
+  psnAuthOverride?: AuthorizationPayload,
 ): Promise<SyncGameTrophiesResult> {
   const { platform, nativeId } = parseGameKey(gameId);
 
@@ -567,6 +601,7 @@ export async function syncGameTrophies(
       account.accountId,
       nativeId,
       row?.service ?? "trophy2",
+      psnAuthOverride,
     );
 
     if (row?.title) {

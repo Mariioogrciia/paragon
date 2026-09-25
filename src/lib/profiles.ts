@@ -20,7 +20,8 @@ import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
 import * as epic from "@/lib/epic/client";
 import { PsnProfileNotFoundError } from "@/lib/psn/client";
-import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
+import { PsnAuthError, PsnNotConfiguredError, authenticateWithNpssoEphemeral } from "@/lib/psn/auth";
+import type { AuthorizationPayload } from "psn-api";
 import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { EpicPrivateProfileError, EpicProfileNotFoundError } from "@/lib/epic/client";
@@ -583,6 +584,42 @@ export async function linkAccount(
       break;
   }
 
+  return finishLinking(userId, platform, resolved);
+}
+
+/**
+ * Vincula PSN con el NPSSO del propio usuario (extensión de navegador, no
+ * el NPSSO del servidor) — para quien no es amigo de la cuenta maestra.
+ * `legible` es siempre `true`: con tu propio token SIEMPRE puedes leer tu
+ * propia cuenta, no hay comprobación de amistad que hacer.
+ *
+ * El token es efímero (ver `authenticateWithNpssoEphemeral`): se usa para
+ * esta vinculación y para traer de golpe el detalle de los juegos más
+ * recientes (`syncLibrary` con `psnAuth`, ver lib/sync.ts) y se descarta —
+ * nunca se guarda en la base de datos.
+ */
+export async function linkPsnWithOwnToken(userId: string, npsso: string): Promise<LinkResult> {
+  const auth = await authenticateWithNpssoEphemeral(npsso);
+  const own = await psn.resolveOwnProfile(auth);
+
+  const resolved: Resolved = {
+    accountId: own.accountId,
+    username: own.onlineId,
+    level: own.trophyLevel,
+    avatarUrl: own.avatarUrl ?? null,
+    legible: true,
+  };
+
+  return finishLinking(userId, "psn", resolved, { psnAuth: auth });
+}
+
+/** El tramo común de vincular una cuenta, sea cual sea la fuente del `Resolved`: guardar la fila, sincronizar la biblioteca y comprobar insignias. */
+async function finishLinking(
+  userId: string,
+  platform: PlataformaVinculable,
+  resolved: Resolved,
+  syncOpts: { psnAuth?: AuthorizationPayload } = {},
+): Promise<LinkResult> {
   try {
     await db
       .insert(platformAccounts)
@@ -622,7 +659,7 @@ export async function linkAccount(
   }
 
   const juegos = resolved.legible
-    ? await syncLibrary(userId, { platform, accountId: resolved.accountId })
+    ? await syncLibrary(userId, { platform, accountId: resolved.accountId }, syncOpts)
     : 0;
 
   // No puede tumbar el flujo de vinculación — un fallo al calcular insignias

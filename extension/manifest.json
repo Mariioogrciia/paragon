@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Paragon — Sincronizar PSN",
+  "description": "Sincroniza tus trofeos de PlayStation con Paragon sin escribir ningún NPSSO a mano — lee tu propia sesión de PSN ya iniciada en este navegador.",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon128.png",
+    "48": "icons/icon128.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://platinos-nine.vercel.app/movil/enlazar-extension*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "https://ca.account.sony.com/*",
+    "https://platinos-nine.vercel.app/*"
+  ],
+  "permissions": ["storage"]
+}
