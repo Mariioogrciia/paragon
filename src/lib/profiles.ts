@@ -1166,6 +1166,33 @@ export const getLibrary = cache(
 });
 
 /**
+ * Solo lo mínimo (id/título/carátula) para el selector visual de "juego
+ * para el fondo" en Ajustes — antes se pedía con `getLibrary`, que trae la
+ * biblioteca entera (más de 20 columnas, subconsulta de rareza por fila,
+ * el backfill de PEGI contra IGDB y las sumas de XP de Steam/Xbox) solo
+ * para quedarse con tres campos. El filtro (sin deseados, con carátula) va
+ * en SQL en vez de en memoria por el mismo motivo.
+ */
+export async function getGamesForBackground(
+  userId: string,
+): Promise<{ id: string; title: string; iconUrl: string }[]> {
+  const rows = await db
+    .select({ id: gamesTable.id, title: gamesTable.title, iconUrl: gamesTable.iconUrl })
+    .from(userGames)
+    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+    .where(
+      and(
+        eq(userGames.userId, userId),
+        eq(userGames.isWishlist, false),
+        isNotNull(gamesTable.iconUrl),
+      ),
+    )
+    .orderBy(desc(userGames.lastPlayedAt));
+
+  return rows.map((r) => ({ id: r.id, title: r.title, iconUrl: r.iconUrl! }));
+}
+
+/**
  * Detalle de un juego.
  *
  * Si nunca hemos traído sus logros, se piden a la plataforma en ese momento y

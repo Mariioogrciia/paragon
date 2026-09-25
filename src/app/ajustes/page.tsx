@@ -5,7 +5,7 @@ import { accounts, users } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { ProfileForm } from "@/components/forms/ProfileForm";
 import { getParagonLevel } from "@/lib/paragonLevel";
-import { getLibrary, getProfileByUserId, getUserBadges } from "@/lib/profiles";
+import { getGamesForBackground, getProfileByUserId, getUserBadges } from "@/lib/profiles";
 
 export default async function AjustesGeneralPage(props: { searchParams: Promise<{ error?: string }> }) {
   const session = await auth();
@@ -20,7 +20,7 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
 
   if (!dbUser) redirect("/entrar");
 
-  const [nivel, badges, profile, discordVinculado] = await Promise.all([
+  const [nivel, badges, profile, discordVinculado, juegosParaFondo] = await Promise.all([
     getParagonLevel(session.user.id),
     getUserBadges(session.user.id),
     getProfileByUserId(session.user.id),
@@ -32,14 +32,10 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
       .where(and(eq(accounts.userId, session.user.id), eq(accounts.provider, "discord")))
       .limit(1)
       .then((rows) => rows.length > 0),
+    // Para el selector visual de "juego para el fondo" — solo id/título/
+    // carátula, filtrados ya en SQL, no la biblioteca entera vía getLibrary.
+    getGamesForBackground(session.user.id),
   ]);
-
-  // Para el selector visual de "juego para el fondo" — solo lo mínimo
-  // (id/título/carátula), no la biblioteca entera con logros y todo.
-  const { games } = profile ? await getLibrary(profile) : { games: [] };
-  const juegosParaFondo = games
-    .filter((g) => !g.isWishlist && g.iconUrl)
-    .map((g) => ({ id: g.id, title: g.title, iconUrl: g.iconUrl! }));
 
   return (
     <>

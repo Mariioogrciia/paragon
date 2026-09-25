@@ -3,6 +3,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { trophyGuides, users } from "@/db/schema";
 import { avatarUrlSql } from "@/lib/avatarSql";
+import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 
 /**
  * Guías escritas de un trofeo concreto — dentro de la plataforma, no un
@@ -63,6 +64,11 @@ export async function upsertTrophyGuide(
   const limpio = body.trim();
   if (limpio.length === 0) throw new TrophyGuideError("Escribe algo antes de publicar.");
   if (limpio.length > MAX_BODY) throw new TrophyGuideError(`Como mucho ${MAX_BODY} caracteres.`);
+  // Texto público que lee cualquiera que abra el trofeo — mismo filtro que
+  // reseñas, notas de clan o nombres de carpeta (lib/contentFilter.ts).
+  if (contieneLenguajeOfensivo(limpio)) {
+    throw new TrophyGuideError("Esa guía no se puede publicar — contiene lenguaje ofensivo. Cámbiala e inténtalo de nuevo.");
+  }
 
   await db
     .insert(trophyGuides)
