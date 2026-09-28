@@ -79,12 +79,12 @@ export default async function RecomendacionesPage() {
               >
                 {g.iconUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={g.iconUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-sm" />
+                  <img loading="lazy" decoding="async" src={g.iconUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-sm" />
                 )}
                 <div className="absolute inset-0" style={{ background: "rgba(0,0,0,.55)" }} />
                 {g.iconUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
+                  <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
                 {g.acquisitionFormat && LABEL_ADQUISICION[g.acquisitionFormat] && (
@@ -158,6 +158,8 @@ export default async function RecomendacionesPage() {
                   {rec.iconUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={rec.iconUrl}
                       alt={rec.title}
                       className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"

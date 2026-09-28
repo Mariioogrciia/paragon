@@ -94,7 +94,7 @@ export function EsportsHub({
                       <div className="flex items-center justify-center gap-4 sm:gap-6 min-w-[280px]">
                         <div className="flex flex-col items-center gap-2 w-[80px]">
                           <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white flex items-center justify-center p-2 border border-border shadow-sm">
-                            <img src={getLogo(match.team1.logo)} alt={match.team1.name} className="max-w-full max-h-full object-contain" />
+                            <img loading="lazy" decoding="async" src={getLogo(match.team1.logo)} alt={match.team1.name} className="max-w-full max-h-full object-contain" />
                           </div>
                           <span className="font-bold text-xs sm:text-sm text-center line-clamp-1 w-full">{match.team1.name}</span>
                         </div>
@@ -107,7 +107,7 @@ export function EsportsHub({
                         
                         <div className="flex flex-col items-center gap-2 w-[80px]">
                           <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white flex items-center justify-center p-2 border border-border shadow-sm">
-                            <img src={getLogo(match.team2.logo)} alt={match.team2.name} className="max-w-full max-h-full object-contain" />
+                            <img loading="lazy" decoding="async" src={getLogo(match.team2.logo)} alt={match.team2.name} className="max-w-full max-h-full object-contain" />
                           </div>
                           <span className="font-bold text-xs sm:text-sm text-center line-clamp-1 w-full">{match.team2.name}</span>
                         </div>
@@ -167,13 +167,13 @@ export function EsportsHub({
                       </div>
                       <div className="flex items-center justify-between font-bold text-sm">
                         <div className="flex items-center gap-2 w-[40%]">
-                          <img src={getLogo(match.team1.logo)} alt="" className="w-5 h-5 object-contain bg-white rounded-sm" />
+                          <img loading="lazy" decoding="async" src={getLogo(match.team1.logo)} alt="" className="w-5 h-5 object-contain bg-white rounded-sm" />
                           <span className="truncate">{match.team1.name}</span>
                         </div>
                         <span className="text-muted/50 text-xs w-[10%] text-center">{t("vs")}</span>
                         <div className="flex items-center justify-end gap-2 w-[40%] text-right">
                           <span className="truncate">{match.team2.name}</span>
-                          <img src={getLogo(match.team2.logo)} alt="" className="w-5 h-5 object-contain bg-white rounded-sm" />
+                          <img loading="lazy" decoding="async" src={getLogo(match.team2.logo)} alt="" className="w-5 h-5 object-contain bg-white rounded-sm" />
                         </div>
                       </div>
                     </div>
@@ -208,14 +208,14 @@ export function EsportsHub({
                       <div className="flex flex-col gap-2 text-sm font-bold">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
-                            <img src={getLogo(res.team1.logo)} alt="" className="w-4 h-4 object-contain bg-white rounded-sm opacity-90" />
+                            <img loading="lazy" decoding="async" src={getLogo(res.team1.logo)} alt="" className="w-4 h-4 object-contain bg-white rounded-sm opacity-90" />
                             <span className={winner1 ? "text-foreground" : "text-muted"}>{res.team1.name}</span>
                           </div>
                           <span className={winner1 ? "text-foreground" : "text-muted"}>{res.team1.score}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
-                            <img src={getLogo(res.team2.logo)} alt="" className="w-4 h-4 object-contain bg-white rounded-sm opacity-90" />
+                            <img loading="lazy" decoding="async" src={getLogo(res.team2.logo)} alt="" className="w-4 h-4 object-contain bg-white rounded-sm opacity-90" />
                             <span className={winner2 ? "text-foreground" : "text-muted"}>{res.team2.name}</span>
                           </div>
                           <span className={winner2 ? "text-foreground" : "text-muted"}>{res.team2.score}</span>

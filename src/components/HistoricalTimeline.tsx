@@ -30,7 +30,7 @@ function Hito({
         {etiqueta}
       </div>
       <div className="flex items-center gap-3">
-        {iconUrl && <img src={iconUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />}
+        {iconUrl && <img loading="lazy" decoding="async" src={iconUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />}
         <p className="min-w-0 truncate text-sm font-bold" title={titulo}>{titulo}</p>
       </div>
       <p className="mt-auto text-[0.8125rem] text-muted">{detalle}</p>

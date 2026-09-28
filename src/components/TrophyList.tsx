@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
 import { clasificarTrofeo, type TrophyType } from "@/lib/trophyType";
@@ -324,6 +324,7 @@ function ViewButton({
 }
 
 function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
+  const idioma = useLocale();
   const t = useTranslations("Biblioteca");
   const oculto = trophy.hidden && !trophy.earned;
   const tipo = clasificarTrofeo(trophy);
@@ -384,7 +385,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
         {puntos !== null && <span className="text-[0.625rem] text-muted">{t("TrophyList.points", { points: puntos })}</span>}
       </span>
       <span className="hidden text-right text-xs text-muted sm:block">
-        {trophy.earnedAt ? relativeDate(trophy.earnedAt) : "—"}
+        {trophy.earnedAt ? relativeDate(trophy.earnedAt, idioma) : "—"}
       </span>
     </li>
   );
@@ -481,6 +482,8 @@ export function TrophyPhoto({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      loading="lazy"
+      decoding="async"
       src={trophy.iconUrl}
       alt=""
       className="shrink-0 object-cover"

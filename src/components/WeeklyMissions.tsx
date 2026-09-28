@@ -3,6 +3,13 @@ import type { WeeklyMission } from "@/lib/missions";
 
 export async function WeeklyMissions({ missions }: { missions: WeeklyMission[] }) {
   const t = await getTranslations("Descubrir.WeeklyMissions");
+  // `title`/`description` vienen en español de lib/missions.ts (así los lee
+  // también la app Android por la API); en la web se traducen por el id del
+  // reto, con el español de siempre como respaldo si falta alguno.
+  const textoReto = (mission: WeeklyMission, campo: "titulo" | "descripcion") => {
+    const clave = `retos.${mission.id.replace(/^weekly-/, "")}.${campo}`;
+    return t.has(clave) ? t(clave) : campo === "titulo" ? mission.title : mission.description;
+  };
   const completadas = missions.filter((mission) => mission.progress >= mission.target).length;
   const xp = missions.filter((mission) => mission.progress >= mission.target).reduce((total, mission) => total + mission.xp, 0);
 
@@ -23,8 +30,8 @@ export async function WeeklyMissions({ missions }: { missions: WeeklyMission[] }
             <div key={mission.id} className="rounded-xl border border-border p-3" style={{ opacity: completada ? 1 : 0.78 }}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-bold">{mission.title}</h3>
-                  <p className="mt-1 text-xs text-muted">{mission.description}</p>
+                  <h3 className="text-sm font-bold">{textoReto(mission, "titulo")}</h3>
+                  <p className="mt-1 text-xs text-muted">{textoReto(mission, "descripcion")}</p>
                 </div>
                 <span className="shrink-0 text-xs font-bold" style={{ color: completada ? "var(--good)" : "var(--accent-text)" }}>
                   {completada ? t("completada") : t("progreso", { actual: Math.min(mission.progress, mission.target), total: mission.target })}

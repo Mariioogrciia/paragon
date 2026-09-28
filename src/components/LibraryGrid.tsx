@@ -306,7 +306,7 @@ export function LibraryGrid({
     return (
       <div key={game.id} className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border hover:bg-surface-2 transition-colors">
         {game.iconUrl ? (
-          <img src={game.iconUrl} className="w-16 h-16 rounded-lg object-cover" alt="" />
+          <img loading="lazy" decoding="async" src={game.iconUrl} className="w-16 h-16 rounded-lg object-cover" alt="" />
         ) : (
           <div className="w-16 h-16 rounded-lg bg-surface-2" />
         )}

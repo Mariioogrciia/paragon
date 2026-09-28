@@ -158,7 +158,7 @@ export default async function RitmoPage({
         </p>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatTile value={desglose.total} label={t("statTrophiesMonth")} />
             <StatTile value={diasActivos} label={t("statActiveDays")} hint={t("statActiveDaysHint", { total: desglose.porDia.length })} />
             <StatTile
@@ -213,7 +213,7 @@ export default async function RitmoPage({
                     className="flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
                   >
                     <span className="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-surface-2">
-                      {j.iconUrl && <img src={j.iconUrl} alt="" className="h-full w-full object-cover" />}
+                      {j.iconUrl && <img loading="lazy" decoding="async" src={j.iconUrl} alt="" className="h-full w-full object-cover" />}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">
                       {j.juego}

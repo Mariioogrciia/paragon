@@ -178,6 +178,56 @@
     "subtitulo": "De petits objectifs pour garder la chasse active.",
     "contador": "{completadas}/{total} · {xp} XP gagnés",
     "completada": "Terminée",
-    "progreso": "{actual}/{total}"
+    "progreso": "{actual}/{total}",
+    "retos": {
+      "trofeos": {
+        "titulo": "Rythme de chasse",
+        "descripcion": "Obtiens 5 trophées cette semaine."
+      },
+      "platino": {
+        "titulo": "Un joyau par semaine",
+        "descripcion": "Obtiens 1 platine cette semaine."
+      },
+      "raros": {
+        "titulo": "Chasseur de raretés",
+        "descripcion": "Obtiens 2 trophées avec 10 % de rareté ou moins."
+      },
+      "ultra-raros": {
+        "titulo": "Ultra rare",
+        "descripcion": "Obtiens 1 trophée avec 5 % de rareté ou moins."
+      },
+      "dias": {
+        "titulo": "Régularité",
+        "descripcion": "Débloque des succès sur 3 jours différents."
+      },
+      "finde": {
+        "titulo": "Session du week-end",
+        "descripcion": "Débloque un succès le samedi ou le dimanche."
+      },
+      "juegos": {
+        "titulo": "Double ration",
+        "descripcion": "Obtiens des trophées dans 2 jeux différents."
+      },
+      "generos": {
+        "titulo": "Explorateur",
+        "descripcion": "Obtiens des trophées dans des jeux de 2 genres différents."
+      },
+      "plataformas": {
+        "titulo": "Multiplateforme",
+        "descripcion": "Obtiens des trophées sur 2 plateformes différentes."
+      },
+      "oro": {
+        "titulo": "Série dorée",
+        "descripcion": "Obtiens 3 trophées d'or."
+      },
+      "plata": {
+        "titulo": "Récolte d'argent",
+        "descripcion": "Obtiens 4 trophées d'argent."
+      },
+      "bronce": {
+        "titulo": "Bronze à gogo",
+        "descripcion": "Obtiens 8 trophées de bronze."
+      }
+    }
   }
 }

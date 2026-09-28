@@ -42,6 +42,7 @@
   "CookieBanner": {
     "ariaLabel": "Aviso de cookies",
     "texto": "Solo usamos la cookie imprescindible para mantener tu sesión iniciada — sin cookies de publicidad, y la analítica de uso que medimos no te identifica ni te sigue. Más detalles en <cookiesLink>Cookies</cookiesLink>.",
+    "textoCorto": "Solo la cookie de sesión: sin publicidad ni rastreo. <cookiesLink>Más info</cookiesLink>",
     "entendido": "Entendido"
   },
   "BackButton": {

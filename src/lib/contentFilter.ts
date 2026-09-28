@@ -35,6 +35,18 @@ const PALABRAS_PROHIBIDAS = [
   "faggot", "fag", "retard", "retarded",
   "nigger", "nigga", "spic", "chink", "kike",
   "whore", "slut", "slutty",
+
+  // Alemán y francés (pendiente anotado en HANDOFF desde la traducción a
+  // cuatro idiomas). Sin acentos, igual que el resto: `normalizar` los
+  // quita antes de comparar. Fuera a propósito palabras que en español o
+  // inglés son normales ("con", "bite"...) para no bloquear textos limpios.
+  "scheisse", "scheiße", "arschloch", "arsch", "wichser", "fotze", "hurensohn",
+  "hure", "schlampe", "missgeburt", "spast", "spasti", "fick dich", "ficken",
+  "drecksau", "mistkerl", "kanake", "neger", "schwuchtel",
+
+  "putain", "pute", "salope", "salopes", "connard", "connards", "connasse",
+  "encule", "encules", "fils de pute", "nique ta mere", "ntm", "tapette",
+  "merde", "batard", "batards", "enfoire", "bougnoule", "ta gueule", "tafiole",
 ];
 
 /**

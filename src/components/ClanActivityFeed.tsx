@@ -66,7 +66,7 @@ export function ClanActivityFeed({ items }: { items: ClanActivityItem[] }) {
           {item.game.iconUrl && (
             <Link href={`/u/${item.user.handle}/${item.game.id}`} className="shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.game.iconUrl} alt="" className="h-10 w-10 rounded-lg object-cover" />
+              <img loading="lazy" decoding="async" src={item.game.iconUrl} alt="" className="h-10 w-10 rounded-lg object-cover" />
             </Link>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { auth } from "@/auth";
 import { GameGrid } from "@/components/GameGrid";
@@ -37,6 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ plataform
 }
 
 export default async function PlataformaPage({ params }: { params: Promise<{ plataforma: string }> }) {
+  const idioma = await getLocale();
   const { plataforma } = await params;
   const info = PLATAFORMAS[plataforma];
   if (!info) notFound();
@@ -194,7 +195,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           {/* eslint-disable-next-line react-hooks/purity -- Server Component: se renderiza una vez por petición, Date.now() es la hora de esa petición. */}
           {psPlus.fecha && Date.now() - new Date(psPlus.fecha).getTime() > 40 * 86_400_000 && (
             <p className="-mt-2 mb-4 text-xs text-muted">
-              {t("psPlusAviso", { fecha: relativeDate(psPlus.fecha) ?? "" })}
+              {t("psPlusAviso", { fecha: relativeDate(psPlus.fecha, idioma) ?? "" })}
             </p>
           )}
           <GameGrid items={psPlus.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
@@ -220,7 +221,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
             ))}
           </div>
           <p className="mt-2 text-[0.6875rem] text-muted">
-            {t("preciosAviso", { fecha: relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl) ?? "" })}
+            {t("preciosAviso", { fecha: relativeDate(PRECIO_PSPLUS_EUR.comprobadoEl, idioma) ?? "" })}
           </p>
         </section>
       )}
@@ -243,7 +244,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               >
                 <div className="relative aspect-video w-full overflow-hidden bg-surface-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={oferta.caratula} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <img loading="lazy" decoding="async" src={oferta.caratula} alt="" className="absolute inset-0 h-full w-full object-cover" />
                   <span className="absolute right-2 top-2 rounded-full bg-good px-2 py-0.5 text-[0.625rem] font-bold text-black">
                     -{oferta.ahorro}%
                   </span>

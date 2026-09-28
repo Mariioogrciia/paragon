@@ -36,14 +36,14 @@ export function StatTile({
           propio contenido y no del hueco que el grid le da, así que una
           etiqueta larga de dos líneas ("Tasa de finalización") hacía esa
           tarjeta más alta que las demás en vez de igualarlas. */}
-      <div className="animate-glint flex h-full flex-col justify-center rounded-[20px] border border-border bg-surface p-6">
+      <div className="animate-glint flex h-full flex-col justify-center rounded-[20px] border border-border bg-surface p-4 sm:p-6">
         <p
-          className="font-heading text-[2.5rem] font-bold leading-none tabular-nums"
+          className="font-heading text-[1.75rem] font-bold leading-none tabular-nums sm:text-[2.5rem]"
           style={accent ? { color: accent } : undefined}
         >
           {value}
         </p>
-        <p className="mt-3 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{label}</p>
+        <p className="mt-3 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted [overflow-wrap:anywhere] sm:text-[0.6875rem] sm:tracking-[0.12em]">{label}</p>
         {hint && <p className="mt-2 text-xs text-muted">{hint}</p>}
       </div>
     </motion.div>

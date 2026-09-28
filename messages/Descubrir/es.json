@@ -178,6 +178,56 @@
     "subtitulo": "Pequeños objetivos para mantener la caza activa.",
     "contador": "{completadas}/{total} · {xp} XP ganados",
     "completada": "Completada",
-    "progreso": "{actual}/{total}"
+    "progreso": "{actual}/{total}",
+    "retos": {
+      "trofeos": {
+        "titulo": "Ritmo de caza",
+        "descripcion": "Consigue 5 trofeos esta semana."
+      },
+      "platino": {
+        "titulo": "Una joya semanal",
+        "descripcion": "Consigue 1 platino esta semana."
+      },
+      "raros": {
+        "titulo": "Cazador de rarezas",
+        "descripcion": "Consigue 2 trofeos con 10% de rareza o menos."
+      },
+      "ultra-raros": {
+        "titulo": "Ultra raro",
+        "descripcion": "Consigue 1 trofeo con 5% de rareza o menos."
+      },
+      "dias": {
+        "titulo": "Constancia",
+        "descripcion": "Consigue logros en 3 días distintos."
+      },
+      "finde": {
+        "titulo": "Sesión de fin de semana",
+        "descripcion": "Consigue algún logro en sábado o domingo."
+      },
+      "juegos": {
+        "titulo": "Doble ración",
+        "descripcion": "Consigue trofeos en 2 juegos distintos."
+      },
+      "generos": {
+        "titulo": "Explorador",
+        "descripcion": "Consigue trofeos en juegos de 2 géneros distintos."
+      },
+      "plataformas": {
+        "titulo": "Multiplataforma",
+        "descripcion": "Consigue trofeos en 2 plataformas distintas."
+      },
+      "oro": {
+        "titulo": "Racha de oro",
+        "descripcion": "Consigue 3 trofeos de oro."
+      },
+      "plata": {
+        "titulo": "Cosecha de plata",
+        "descripcion": "Consigue 4 trofeos de plata."
+      },
+      "bronce": {
+        "titulo": "Bronce a montones",
+        "descripcion": "Consigue 8 trofeos de bronce."
+      }
+    }
   }
 }

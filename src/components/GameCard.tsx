@@ -7,7 +7,7 @@ import { gameProgress } from "@/lib/stats";
 import { ACHIEVEMENT_LABEL, type Game } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 import { Pegi } from "@/components/Pegi";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 /**
  * Tarjeta de juego con carátula grande, a la manera de la biblioteca de la
@@ -35,9 +35,10 @@ export function GameCard({
   href: string;
   hidePinBadge?: boolean;
 }) {
+  const idioma = useLocale();
   const t = useTranslations("Biblioteca.GameCard");
   const progress = gameProgress(game);
-  const played = relativeDate(game.lastPlayedAt);
+  const played = relativeDate(game.lastPlayedAt, idioma);
 
   // Sin casos especiales por título: `game.iconUrl` ya es el dato real
   // (de PSN/Steam para juegos vinculados, de IGDB para los añadidos a mano).
@@ -74,6 +75,8 @@ export function GameCard({
         */}
         {iconUrl && (
           <img
+            loading="lazy"
+            decoding="async"
             src={iconUrl}
             alt=""
             aria-hidden="true"

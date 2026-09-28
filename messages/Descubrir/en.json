@@ -178,6 +178,56 @@
     "subtitulo": "Small goals to keep the hunt going.",
     "contador": "{completadas}/{total} · {xp} XP earned",
     "completada": "Completed",
-    "progreso": "{actual}/{total}"
+    "progreso": "{actual}/{total}",
+    "retos": {
+      "trofeos": {
+        "titulo": "Hunting pace",
+        "descripcion": "Earn 5 trophies this week."
+      },
+      "platino": {
+        "titulo": "A weekly gem",
+        "descripcion": "Earn 1 platinum this week."
+      },
+      "raros": {
+        "titulo": "Rarity hunter",
+        "descripcion": "Earn 2 trophies with 10% rarity or less."
+      },
+      "ultra-raros": {
+        "titulo": "Ultra rare",
+        "descripcion": "Earn 1 trophy with 5% rarity or less."
+      },
+      "dias": {
+        "titulo": "Consistency",
+        "descripcion": "Earn achievements on 3 different days."
+      },
+      "finde": {
+        "titulo": "Weekend session",
+        "descripcion": "Earn any achievement on Saturday or Sunday."
+      },
+      "juegos": {
+        "titulo": "Double helping",
+        "descripcion": "Earn trophies in 2 different games."
+      },
+      "generos": {
+        "titulo": "Explorer",
+        "descripcion": "Earn trophies in games from 2 different genres."
+      },
+      "plataformas": {
+        "titulo": "Cross-platform",
+        "descripcion": "Earn trophies on 2 different platforms."
+      },
+      "oro": {
+        "titulo": "Golden streak",
+        "descripcion": "Earn 3 gold trophies."
+      },
+      "plata": {
+        "titulo": "Silver harvest",
+        "descripcion": "Earn 4 silver trophies."
+      },
+      "bronce": {
+        "titulo": "Bronze galore",
+        "descripcion": "Earn 8 bronze trophies."
+      }
+    }
   }
 }

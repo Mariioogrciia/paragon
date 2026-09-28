@@ -33,7 +33,7 @@ export function RankedList<T extends { igdbId: number; title: string; iconUrl?: 
           >
             {item.iconUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
+              <img loading="lazy" decoding="async" src={item.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
             )}
           </span>
           <div className="min-w-0 flex-1">

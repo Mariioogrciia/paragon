@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { rarity, relativeDate } from "@/lib/design";
 import type { DesgloseMes, TrofeoDelMes } from "@/lib/history";
@@ -24,6 +24,7 @@ export function RitmoTrophyList({
   porDia: DesgloseMes["porDia"];
   trofeos: TrofeoDelMes[];
 }) {
+  const idioma = useLocale();
   const t = useTranslations("Analitica.ritmoPage");
   const [dia, setDia] = useState<string | null>(null);
   const [vista, setVista] = useState<"lista" | "cuadricula">("lista");
@@ -156,7 +157,7 @@ export function RitmoTrophyList({
 
                   <span className="shrink-0 text-right text-[0.6875rem] text-muted">
                     {t("dayShort", { dia: new Date(trofeo.earnedAt).getUTCDate() })}
-                    <span className="block">{relativeDate(trofeo.earnedAt)}</span>
+                    <span className="block">{relativeDate(trofeo.earnedAt, idioma)}</span>
                   </span>
                 </div>
               );

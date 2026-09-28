@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getLigaMensualDesglose } from "@/lib/ligas";
 import { Avatar } from "@/components/Avatar";
@@ -17,6 +17,7 @@ const COLOR_GRADO: Record<string, string> = {
 };
 
 export default async function DesgloseLigaMensualPage({ params }: { params: Promise<{ userId: string }> }) {
+  const idioma = await getLocale();
   const { userId } = await params;
   const t = await getTranslations("Perfil.LigasPage");
 
@@ -64,11 +65,11 @@ export default async function DesgloseLigaMensualPage({ params }: { params: Prom
             <div key={i} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3.5">
               {tr.gameIconUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={tr.gameIconUrl} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover" />
+                <img loading="lazy" decoding="async" src={tr.gameIconUrl} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover" />
               )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{tr.trophyName}</p>
-                <p className="truncate text-xs text-muted">{tr.gameTitle} · {tr.earnedAt ? relativeDate(tr.earnedAt) : "—"}</p>
+                <p className="truncate text-xs text-muted">{tr.gameTitle} · {tr.earnedAt ? relativeDate(tr.earnedAt, idioma) : "—"}</p>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 {tr.grade && (

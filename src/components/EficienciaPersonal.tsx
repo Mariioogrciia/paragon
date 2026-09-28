@@ -10,7 +10,7 @@ function Fila({ g, t }: { g: EficienciaJuego; t: ReturnType<typeof useTranslatio
       className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-surface-2"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
-      {g.iconUrl && <img src={g.iconUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />}
+      {g.iconUrl && <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold" title={g.titulo}>{g.titulo}</p>
         <p className="text-xs text-muted">

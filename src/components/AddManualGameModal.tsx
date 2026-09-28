@@ -190,7 +190,7 @@ export function AddManualGameModal() {
                   >
                     <div className="w-10 h-14 overflow-hidden rounded-md shrink-0 bg-surface-2">
                       {game.coverUrl && (
-                        <img src={game.coverUrl} alt="" className="object-cover w-full h-full" />
+                        <img loading="lazy" decoding="async" src={game.coverUrl} alt="" className="object-cover w-full h-full" />
                       )}
                     </div>
                     <button onClick={() => setPicked(game)} className="min-w-0 flex-1 text-left">
@@ -231,7 +231,7 @@ export function AddManualGameModal() {
             <div className="flex gap-3">
               <div className="w-16 h-24 overflow-hidden rounded-lg shrink-0 bg-surface-2">
                 {picked.coverUrl && (
-                  <img src={picked.coverUrl} alt="" className="object-cover w-full h-full" />
+                  <img loading="lazy" decoding="async" src={picked.coverUrl} alt="" className="object-cover w-full h-full" />
                 )}
               </div>
               <div className="min-w-0">

@@ -52,7 +52,7 @@ export function ComparePairGames({
               >
                 {row.iconUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={row.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <img loading="lazy" decoding="async" src={row.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
                 ) : (
                   <span className="font-heading text-[0.9375rem] font-bold text-white">{monogram(row.title)}</span>
                 )}

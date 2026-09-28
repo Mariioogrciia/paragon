@@ -157,7 +157,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
             >
               <div className="h-[96px] w-[68px] shrink-0 overflow-hidden rounded-lg bg-surface-2 sm:h-[124px] sm:w-[88px]">
                 {game.cover && (
-                  <img src={game.cover} alt="" className="h-full w-full object-cover" />
+                  <img loading="lazy" decoding="async" src={game.cover} alt="" className="h-full w-full object-cover" />
                 )}
               </div>
 
@@ -254,7 +254,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
               <div className="flex gap-4 mb-5">
                 <div className="w-24 h-36 overflow-hidden rounded-lg shrink-0 bg-surface-2">
                   {modalGame.cover && (
-                    <img src={modalGame.cover} alt="" className="object-cover w-full h-full" />
+                    <img loading="lazy" decoding="async" src={modalGame.cover} alt="" className="object-cover w-full h-full" />
                   )}
                 </div>
                 <div className="min-w-0">

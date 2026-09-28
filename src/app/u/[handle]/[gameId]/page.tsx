@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CollectionPicker } from "@/components/Collections";
@@ -90,6 +90,7 @@ export default async function JuegoPage({
 }: {
   params: Promise<{ handle: string; gameId: string }>;
 }) {
+  const idioma = await getLocale();
   const { handle, gameId } = await params;
 
   const t = await getTranslations("Biblioteca");
@@ -102,7 +103,7 @@ export default async function JuegoPage({
 
   const progress = gameProgress(game);
   const siguientes = nextSteps(game.trophies);
-  const played = relativeDate(game.lastPlayedAt);
+  const played = relativeDate(game.lastPlayedAt, idioma);
 
   // Las carpetas son de quien mira, no de quien se mira: solo tiene sentido
   // organizar la biblioteca propia.
@@ -195,7 +196,7 @@ export default async function JuegoPage({
               style={{ background: coverGradient(game.id), boxShadow: "0 20px 50px rgba(0, 0, 0, 0.55)" }}
             >
               {game.iconUrl && (
-                <img src={game.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <img loading="lazy" decoding="async" src={game.iconUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
               )}
             </span>
 

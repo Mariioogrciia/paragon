@@ -83,7 +83,7 @@ export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
       {pruebaActiva ? (
         <div className="flex flex-wrap items-center gap-3.5 rounded-xl p-4" style={{ border: "1px solid rgb(var(--accent-rgb) / 0.3)", background: "rgb(var(--accent-rgb) / 0.06)" }}>
           {juegoElegido!.iconUrl && (
-            <img src={juegoElegido!.iconUrl} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+            <img loading="lazy" decoding="async" src={juegoElegido!.iconUrl} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
           )}
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold uppercase tracking-widest text-muted">{t("SalonDeLaVerguenza.pruebaDeDosHoras")}</p>
@@ -120,7 +120,7 @@ export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
             className="transition-transform hover:-translate-y-0.5"
           >
             {g.iconUrl ? (
-              <img src={g.iconUrl} alt={g.titulo} className="h-11 w-11 rounded-lg object-cover" />
+              <img loading="lazy" decoding="async" src={g.iconUrl} alt={g.titulo} className="h-11 w-11 rounded-lg object-cover" />
             ) : (
               <div className="flex h-11 w-11 items-center justify-center rounded-lg text-[0.625rem] font-bold text-muted" style={{ background: "var(--surface-2)" }}>
                 {g.titulo.slice(0, 2).toUpperCase()}

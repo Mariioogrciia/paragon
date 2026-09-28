@@ -129,6 +129,8 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            loading="lazy"
+            decoding="async"
             src={screenshots[abierta]}
             alt={t("ScreenshotStrip.screenshotAlt", { title, index: abierta + 1 })}
             className="max-h-full max-w-full rounded-lg object-contain"

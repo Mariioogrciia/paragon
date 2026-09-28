@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { CommunityRating } from "@/components/CommunityRating";
@@ -65,6 +65,7 @@ export default async function JuegoGlobalPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const idioma = await getLocale();
   const { id } = await params;
   const gameId = decodeURIComponent(id);
 
@@ -135,15 +136,21 @@ export default async function JuegoGlobalPage({
   const tieneJuego = miGameId !== null;
 
   const t = await getTranslations("Biblioteca.JuegoPage");
+  const locale = await getLocale();
+
+  // Arte de fondo: el artwork de IGDB o, si el juego no tiene, su primera
+  // captura. Antes solo el artwork, y tapado por un velo del 75% que lo
+  // dejaba casi negro — la cabecera parecía vacía (auditoría, 28 sept 2026).
+  const fondoCabecera = detalles?.artworkUrl ?? detalles?.screenshots[0];
 
   return (
     <div className="-mx-4 -mt-9 sm:-mx-7">
       <div
         className="relative overflow-hidden border-b border-border"
         style={
-          detalles?.artworkUrl
+          fondoCabecera
             ? {
-                backgroundImage: `url(${detalles.artworkUrl})`,
+                backgroundImage: `url(${fondoCabecera})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
@@ -152,7 +159,14 @@ export default async function JuegoGlobalPage({
       >
         <div
           className="absolute inset-0"
-          style={{ background: detalles?.artworkUrl ? "rgba(11, 16, 24, 0.75)" : "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))" }}
+          style={{
+            // Degradado y no un velo plano: el arte se ve arriba y se funde
+            // hacia abajo, donde van el logo y los datos, que necesitan fondo
+            // oscuro para leerse.
+            background: fondoCabecera
+              ? "linear-gradient(180deg, rgba(11, 16, 24, 0.35) 0%, rgba(11, 16, 24, 0.7) 55%, rgba(11, 16, 24, 0.96) 100%)"
+              : "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))",
+          }}
         />
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
           <BackButton fallbackHref="/descubrir" dark />
@@ -246,7 +260,10 @@ export default async function JuegoGlobalPage({
         {(detalles?.summary ?? game.summary) && (
           <section className="max-w-[820px]">
             <h2 className="mb-2 font-heading text-2xl font-bold">{t("acercaDe")}</h2>
-            <p className="text-lg leading-relaxed text-foreground/85">{detalles?.summary ?? game.summary}</p>
+            <p className="text-lg leading-relaxed text-foreground/85" lang="en">{detalles?.summary ?? game.summary}</p>
+            {/* IGDB solo da el resumen en inglés — mejor decirlo que dejar un
+                párrafo en otro idioma sin explicación en mitad de la ficha. */}
+            {locale !== "en" && <p className="mt-2 text-xs text-muted">{t("acercaDeFuente")}</p>}
           </section>
         )}
 
@@ -263,7 +280,7 @@ export default async function JuegoGlobalPage({
         {detalles?.languages && <GameLanguages languages={detalles.languages} />}
         {detalles?.dlcs && <GameDlcs dlcs={detalles.dlcs} />}
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile value={stats.owners} label={t("enBiblioteca")} />
           <StatTile value={stats.playing} label={t("jugandoAhora")} />
           <StatTile
@@ -319,7 +336,7 @@ export default async function JuegoGlobalPage({
                         )}
                         {r.rating != null && <Stars value={r.rating} size={12} />}
                         {r.reviewDate && (
-                          <span className="text-xs text-muted">{relativeDate(r.reviewDate)}</span>
+                          <span className="text-xs text-muted">{relativeDate(r.reviewDate, idioma)}</span>
                         )}
                       </div>
                       <p className="mt-2 text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-foreground/85">

@@ -184,7 +184,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
               <div className="relative z-10 h-20 w-14 shrink-0 overflow-hidden rounded-lg bg-surface-2">
                 {ordered[0].iconUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={ordered[0].iconUrl} alt="" className="h-full w-full object-cover" />
+                  <img loading="lazy" decoding="async" src={ordered[0].iconUrl} alt="" className="h-full w-full object-cover" />
                 )}
               </div>
               <div className="relative z-10 min-w-0 flex-1">
@@ -204,7 +204,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
                   <div className="h-12 w-9 shrink-0 overflow-hidden rounded bg-surface-2">
                     {game.iconUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={game.iconUrl} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" decoding="async" src={game.iconUrl} alt="" className="h-full w-full object-cover" />
                     )}
                   </div>
                   <span className="min-w-0 flex-1">

@@ -108,7 +108,7 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
                 <div className="h-14 w-10 shrink-0 overflow-hidden rounded-md" style={{ background: coverGradient(String(game.igdbId)) }}>
                   {game.coverUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={game.coverUrl} alt="" className="h-full w-full object-cover" />
+                    <img loading="lazy" decoding="async" src={game.coverUrl} alt="" className="h-full w-full object-cover" />
                   )}
                 </div>
                 <Link href={`/juego/${game.igdbId}`} className="min-w-0 flex-1">

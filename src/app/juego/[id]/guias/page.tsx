@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { NuevaGuiaForm } from "@/components/NuevaGuiaForm";
@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
  * reseña express y del vídeo de un trofeo suelto).
  */
 export default async function GuiasPage({ params }: { params: Promise<{ id: string }> }) {
+  const idioma = await getLocale();
   const { id } = await params;
   const gameId = decodeURIComponent(id);
 
@@ -79,7 +80,7 @@ export default async function GuiasPage({ params }: { params: Promise<{ id: stri
               <div className="mt-3 flex items-center gap-2.5">
                 <Avatar src={g.authorImage} name={g.authorName ?? g.authorHandle ?? "?"} size={22} />
                 <span className="text-xs font-semibold">{g.authorName ?? `@${g.authorHandle}`}</span>
-                <span className="text-xs text-muted">· {relativeDate(g.createdAt)}</span>
+                <span className="text-xs text-muted">· {relativeDate(g.createdAt, idioma)}</span>
                 <span className="ml-auto text-xs font-bold text-accent">
                   {t("respuestasCount", { count: g.respuestas })}
                 </span>

@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   searchTrophyGuideAction,
   rebuscarVideoGuiaAction,
@@ -351,6 +351,7 @@ function Submit({ children }: { children: React.ReactNode }) {
  * escribir — solo quedan los enlaces de búsqueda de siempre.
  */
 function GuiaEscritaTab({ gameId, gameTitle, trophy, t }: { gameId?: string; gameTitle: string; trophy: Trophy; t: ReturnType<typeof useTranslations> }) {
+  const idioma = useLocale();
   const [datos, setDatos] = useState<{ guides: TrophyGuideRow[]; currentUserId: string | null } | null>(null);
   const [editando, setEditando] = useState(false);
   const [state, action] = useActionState(saveTrophyGuideAction, EMPTY);
@@ -458,7 +459,7 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy, t }: { gameId?: string; gam
                     ) : (
                       <span className="text-[0.8125rem] font-semibold">{g.authorName ?? t("TrophyGuideModal.writtenGuide.someone")}</span>
                     )}
-                    <span className="text-xs text-muted">{relativeDate(g.updatedAt)}</span>
+                    <span className="text-xs text-muted">{relativeDate(g.updatedAt, idioma)}</span>
                   </div>
                   <p className="whitespace-pre-wrap text-sm text-foreground/90">{g.body}</p>
                 </div>

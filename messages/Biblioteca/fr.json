@@ -37,6 +37,7 @@
   "JuegoPage": {
     "verFicha": "Voir ma fiche",
     "acercaDe": "À propos",
+    "acercaDeFuente": "Description fournie par IGDB, disponible uniquement en anglais.",
     "historia": "Histoire",
     "enBiblioteca": "Dans la bibliothèque",
     "jugandoAhora": "En train d'y jouer",

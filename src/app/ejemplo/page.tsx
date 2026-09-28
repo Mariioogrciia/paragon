@@ -8,6 +8,8 @@ import { TrophyCountRow } from "@/components/TrophyCounts";
 import { DEMO_ANIO, DEMO_JUEGOS, DEMO_JUGADOR } from "@/lib/demo";
 import { gameProgress, summarise } from "@/lib/stats";
 import { BackButton } from "@/components/BackButton";
+import { AvatarFrame } from "@/components/AvatarFrame";
+import { PlatformBanner } from "@/components/BannerPresets";
 
 export const metadata = { title: "Perfil de ejemplo · Paragon" };
 
@@ -38,7 +40,18 @@ export default async function EjemploPage() {
             "radial-gradient(700px 320px at 25% 0%, rgb(var(--accent-rgb) / 0.18), transparent 70%)",
         }}
       >
-        <div className="mx-auto max-w-[1240px] px-7 pb-8 pt-8">
+        {/* Banner y marco como un perfil real: es el escaparate de la
+            portada, y sin ellos quedaba más pobre que cualquier perfil de
+            verdad (auditoría, 28 sept 2026). Misma franja y mismo velo de
+            contraste que /u/[handle]. */}
+        <div className="absolute inset-x-0 top-0 z-0 h-[220px] overflow-hidden sm:h-[320px]">
+          <PlatformBanner preset="paragon" className="absolute inset-0 h-full w-full" />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.75) 100%)" }}
+          />
+        </div>
+        <div className="relative z-10 mx-auto max-w-[1240px] px-7 pb-8 pt-8">
           <BackButton fallbackHref="/" dark />
           <div
             className="mb-6 flex flex-wrap items-center gap-3 rounded-xl px-4 py-3"
@@ -63,7 +76,9 @@ export default async function EjemploPage() {
           </div>
 
           <div className="flex flex-wrap items-end gap-5">
-            <Avatar src={null} name={DEMO_JUGADOR.name} size={92} />
+            <AvatarFrame frame="cristal">
+              <Avatar src={null} name={DEMO_JUGADOR.name} size={92} />
+            </AvatarFrame>
 
             <div className="min-w-0">
               <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
@@ -85,7 +100,7 @@ export default async function EjemploPage() {
           juegosEsteAnio={DEMO_ANIO.juegos}
         />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile value={stats.platinos} label={t("platinos")} accent="var(--platinum)" />
           <StatTile value={stats.trofeos} label={t("trofeos")} />
           <StatTile value={stats.juegos} label={t("juegos")} />

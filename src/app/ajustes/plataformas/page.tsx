@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { useLocale } from "next-intl";
 import { auth } from "@/auth";
 import { signOutAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
@@ -39,7 +40,8 @@ function PlatformSection({
   t: Traductor;
   children: React.ReactNode;
 }) {
-  const sincronizado = account?.syncedAt ? relativeDate(account.syncedAt) : null;
+  const idioma = useLocale();
+  const sincronizado = account?.syncedAt ? relativeDate(account.syncedAt, idioma) : null;
 
   return (
     <section className="mt-3.5 rounded-[16px] p-5 flex flex-col" style={CARD}>
@@ -69,7 +71,7 @@ function PlatformSection({
               style={{ background: AVATAR_BG[platform] }}
             >
               {account.avatarUrl ? (
-                <img src={account.avatarUrl} alt="" className="h-full w-full object-cover" />
+                <img loading="lazy" decoding="async" src={account.avatarUrl} alt="" className="h-full w-full object-cover" />
               ) : (
                 account.username.charAt(0).toUpperCase()
               )}

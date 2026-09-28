@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { TrophyPhoto } from "@/components/TrophyList";
 import type { TrofeoReciente } from "@/lib/history";
@@ -12,6 +12,7 @@ import type { TrofeoReciente } from "@/lib/history";
  * lo mismo que ya lo es la biblioteca entera.
  */
 export async function RecentTrophies({ trofeos, handle }: { trofeos: TrofeoReciente[]; handle: string }) {
+  const idioma = await getLocale();
   const tSeccion = await getTranslations("Descubrir.RecentTrophies");
   if (trofeos.length === 0) return null;
 
@@ -28,7 +29,7 @@ export async function RecentTrophies({ trofeos, handle }: { trofeos: TrofeoRecie
             <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg" style={{ background: coverGradient(t.gameId) }}>
               {t.gameIconUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={t.gameIconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
+                <img loading="lazy" decoding="async" src={t.gameIconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
               )}
             </span>
 
@@ -39,7 +40,7 @@ export async function RecentTrophies({ trofeos, handle }: { trofeos: TrofeoRecie
               <p className="truncate text-xs text-muted">{t.juego}</p>
             </div>
 
-            <span className="shrink-0 text-xs font-bold text-muted">{relativeDate(t.earnedAt)}</span>
+            <span className="shrink-0 text-xs font-bold text-muted">{relativeDate(t.earnedAt, idioma)}</span>
           </Link>
         ))}
       </div>

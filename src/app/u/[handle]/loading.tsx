@@ -14,7 +14,7 @@ export default function PerfilLoading() {
       </div>
 
       <div className="mx-auto max-w-[1240px] space-y-9 px-7 pb-24 pt-6">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-[104px] rounded-[18px] bg-surface-2/50" />
           ))}

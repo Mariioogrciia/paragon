@@ -2,7 +2,7 @@ import { getLeagueDetail, getPendingLeagueInvite } from "@/lib/leagues";
 import { listFriends, getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
 import { BackButton } from "@/components/BackButton";
@@ -42,6 +42,7 @@ function textoDuracion(
 }
 
 export default async function LeaguePage({ params }: { params: Promise<{ id: string }> }) {
+  const idioma = await getLocale();
   const t = await getTranslations("Perfil");
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
@@ -237,7 +238,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                   </p>
                   <p className="truncate text-xs text-muted">{tr.gameTitle}</p>
                 </div>
-                <span className="shrink-0 text-xs text-muted">{relativeDate(tr.earnedAt)}</span>
+                <span className="shrink-0 text-xs text-muted">{relativeDate(tr.earnedAt, idioma)}</span>
               </div>
             ))}
           </div>

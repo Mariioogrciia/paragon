@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { coverGradient, relativeDate } from "@/lib/design";
 import type { Game } from "@/lib/types";
 
@@ -9,6 +10,7 @@ import type { Game } from "@/lib/types";
  * `ReleaseGrid`/`RankedList` del resto de la app.
  */
 export function RecentlyPlayed({ games, handle }: { games: Game[]; handle: string }) {
+  const idioma = useLocale();
   return (
     <div className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
       {games.map((g) => (
@@ -20,14 +22,14 @@ export function RecentlyPlayed({ games, handle }: { games: Game[]; handle: strin
           <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg" style={{ background: coverGradient(g.id) }}>
             {g.iconUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
+              <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
             )}
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{g.title}</p>
             <p className="text-xs text-muted">{g.deviceLabel}</p>
           </div>
-          <span className="shrink-0 text-xs font-bold text-muted">{relativeDate(g.lastPlayedAt)}</span>
+          <span className="shrink-0 text-xs font-bold text-muted">{relativeDate(g.lastPlayedAt, idioma)}</span>
         </Link>
       ))}
     </div>

@@ -178,6 +178,56 @@
     "subtitulo": "Kleine Ziele, um die Jagd am Laufen zu halten.",
     "contador": "{completadas}/{total} · {xp} XP erhalten",
     "completada": "Abgeschlossen",
-    "progreso": "{actual}/{total}"
+    "progreso": "{actual}/{total}",
+    "retos": {
+      "trofeos": {
+        "titulo": "Jagdtempo",
+        "descripcion": "Hol dir diese Woche 5 Trophäen."
+      },
+      "platino": {
+        "titulo": "Ein Juwel pro Woche",
+        "descripcion": "Hol dir diese Woche 1 Platin."
+      },
+      "raros": {
+        "titulo": "Seltenheitsjäger",
+        "descripcion": "Hol dir 2 Trophäen mit höchstens 10 % Seltenheit."
+      },
+      "ultra-raros": {
+        "titulo": "Ultraselten",
+        "descripcion": "Hol dir 1 Trophäe mit höchstens 5 % Seltenheit."
+      },
+      "dias": {
+        "titulo": "Beständigkeit",
+        "descripcion": "Schalte an 3 verschiedenen Tagen Erfolge frei."
+      },
+      "finde": {
+        "titulo": "Wochenend-Session",
+        "descripcion": "Schalte am Samstag oder Sonntag einen Erfolg frei."
+      },
+      "juegos": {
+        "titulo": "Doppelte Portion",
+        "descripcion": "Hol dir Trophäen in 2 verschiedenen Spielen."
+      },
+      "generos": {
+        "titulo": "Entdecker",
+        "descripcion": "Hol dir Trophäen in Spielen aus 2 verschiedenen Genres."
+      },
+      "plataformas": {
+        "titulo": "Plattformübergreifend",
+        "descripcion": "Hol dir Trophäen auf 2 verschiedenen Plattformen."
+      },
+      "oro": {
+        "titulo": "Goldene Serie",
+        "descripcion": "Hol dir 3 Gold-Trophäen."
+      },
+      "plata": {
+        "titulo": "Silberernte",
+        "descripcion": "Hol dir 4 Silber-Trophäen."
+      },
+      "bronce": {
+        "titulo": "Bronze satt",
+        "descripcion": "Hol dir 8 Bronze-Trophäen."
+      }
+    }
   }
 }

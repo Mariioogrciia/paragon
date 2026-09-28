@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { RespuestaGuiaForm } from "@/components/RespuestaGuiaForm";
@@ -21,6 +21,7 @@ export default async function GuiaPage({
 }: {
   params: Promise<{ id: string; guideId: string }>;
 }) {
+  const idioma = await getLocale();
   const { id, guideId } = await params;
   const gameId = decodeURIComponent(id);
 
@@ -41,7 +42,7 @@ export default async function GuiaPage({
         <div className="mt-3 flex items-center gap-2.5">
           <Avatar src={guide.authorImage} name={guide.authorName ?? guide.authorHandle ?? "?"} size={28} />
           <span className="text-sm font-semibold">{guide.authorName ?? `@${guide.authorHandle}`}</span>
-          <span className="text-xs text-muted">· {relativeDate(guide.createdAt)}</span>
+          <span className="text-xs text-muted">· {relativeDate(guide.createdAt, idioma)}</span>
 
           {esAutor && (
             <div className="ml-auto">
@@ -75,7 +76,7 @@ export default async function GuiaPage({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold">{r.authorName ?? `@${r.authorHandle}`}</span>
-                  <span className="text-xs text-muted">{relativeDate(r.createdAt)}</span>
+                  <span className="text-xs text-muted">{relativeDate(r.createdAt, idioma)}</span>
                 </div>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/90">{r.body}</p>
               </div>

@@ -58,7 +58,7 @@ export function FiltroEstadoAnimo({ games, handle }: { games: Game[]; handle: st
                   <div className="relative aspect-[3/4] w-full">
                     {g.iconUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
+                      <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="absolute inset-0 h-full w-full object-contain" />
                     )}
                   </div>
                   <p className="truncate px-1 py-1.5 text-[0.6875rem] font-semibold">{g.title}</p>

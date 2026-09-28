@@ -3,7 +3,7 @@
 /**
  * Avatar con iniciales de reserva.
  *
- * Usamos <img> y no next/image porque las URLs vienen de dominios de Sony que
+ * Usamos <img loading="lazy" decoding="async"> y no next/image porque las URLs vienen de dominios de Sony que
  * cambian, y no queremos que un dominio no declarado deje la cara en blanco.
  */
 export function Avatar({
@@ -24,6 +24,8 @@ export function Avatar({
     >
       {src ? (
         <img
+          loading="lazy"
+          decoding="async"
           src={src}
           alt=""
           width={size}

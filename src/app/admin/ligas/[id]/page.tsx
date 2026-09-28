@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { getProfileByUserId } from "@/lib/profiles";
 import { getAdminLeagueDetail } from "@/lib/admin";
@@ -14,6 +15,7 @@ const CARD = { border: "1px solid var(--border)", background: "linear-gradient(v
 const UNIDAD: Record<string, string> = { dias: "días", semanas: "semanas", meses: "meses", anios: "años" };
 
 export default async function AdminLeagueDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const idioma = await getLocale();
   const session = await auth();
   if (!session?.user) redirect("/entrar");
 
@@ -42,7 +44,7 @@ export default async function AdminLeagueDetailPage({ params }: { params: Promis
               liga.ownerName ?? "—"
             )}
             {" · "}
-            {relativeDate(liga.createdAt)}
+            {relativeDate(liga.createdAt, idioma)}
           </p>
         </div>
 
@@ -108,7 +110,7 @@ export default async function AdminLeagueDetailPage({ params }: { params: Promis
                       <span className="text-yellow-500">Pendiente</span>
                     )}
                   </td>
-                  <td className="px-4 py-2.5 text-muted">{relativeDate(m.joinedAt)}</td>
+                  <td className="px-4 py-2.5 text-muted">{relativeDate(m.joinedAt, idioma)}</td>
                   <td className="px-4 py-2.5 text-right font-mono font-bold text-[rgb(var(--accent-rgb))]">
                     {m.status === "accepted" ? m.points.toLocaleString() : "—"}
                   </td>

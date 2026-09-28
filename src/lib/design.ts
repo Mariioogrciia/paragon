@@ -89,7 +89,14 @@ export function monogram(title: string): string {
   return title.slice(0, 2).toUpperCase();
 }
 
-export function relativeDate(input?: string | Date | null): string | null {
+/**
+ * "hoy" / "ayer" / "hace 5 d" en el idioma de la interfaz. Antes devolvía
+ * siempre español (pendiente de i18n anotado en HANDOFF): ahora con
+ * `Intl.RelativeTimeFormat`. En español da exactamente lo mismo que el texto
+ * fijo de antes; en francés/alemán el estilo "narrow" sale raro ("-5 j"),
+ * así que ahí se usa "short" ("il y a 5 j", "vor 5 Tagen").
+ */
+export function relativeDate(input?: string | Date | null, locale = "es"): string | null {
   if (!input) return null;
 
   const date = new Date(input);
@@ -104,11 +111,14 @@ export function relativeDate(input?: string | Date | null): string | null {
   const diffTime = today.getTime() - inputDay.getTime();
   const days = Math.round(diffTime / 86_400_000);
 
-  if (days <= 0) return "hoy";
-  if (days === 1) return "ayer";
-  if (days < 30) return `hace ${days} d`;
-  if (days < 365) return `hace ${Math.floor(days / 30)} m`;
-  return `hace ${Math.floor(days / 365)} a`;
+  const rtf = new Intl.RelativeTimeFormat(locale, {
+    numeric: "auto",
+    style: locale === "es" || locale === "en" ? "narrow" : "short",
+  });
+  if (days <= 0) return rtf.format(0, "day");
+  if (days < 30) return rtf.format(-days, "day");
+  if (days < 365) return rtf.format(-Math.floor(days / 30), "month");
+  return rtf.format(-Math.floor(days / 365), "year");
 }
 
 export interface Rarity {

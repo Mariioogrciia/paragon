@@ -7,7 +7,7 @@ import { relativeDate } from "@/lib/design";
 import { deleteActivityAction, adminDeleteLeagueAction, adminDeleteClanAction } from "@/app/actions";
 import { BackButton } from "@/components/BackButton";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -23,6 +23,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
 }
 
 export default async function AdminPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const idioma = await getLocale();
   const session = await auth();
   if (!session?.user) redirect("/entrar");
 
@@ -82,7 +83,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       {/* TAB: DASHBOARD */}
       {currentTab === "dashboard" && overview && usuarios && (
         <div className="space-y-9">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Stat value={overview.usuarios} label={t("dashboard.stats.users")} />
             <Stat value={`+${overview.usuariosNuevosUltimos7Dias}`} label={t("dashboard.stats.newUsers")} />
             <Stat value={overview.juegosEnCatalogo} label={t("dashboard.stats.catalogGames")} />
@@ -142,7 +143,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                       <td className="px-4 py-2.5">{u.juegos}</td>
                       <td className="px-4 py-2.5">{u.platinos}</td>
                       <td className="px-4 py-2.5">{u.insignias}</td>
-                      <td className="px-4 py-2.5 text-muted">{relativeDate(u.createdAt) ?? "—"}</td>
+                      <td className="px-4 py-2.5 text-muted">{relativeDate(u.createdAt, idioma) ?? "—"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -325,7 +326,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                       </div>
                     </td>
                     <td className="px-4 py-2.5 text-muted">{tr.rarityPercent != null ? `${tr.rarityPercent.toFixed(1)}%` : "—"}</td>
-                    <td className="px-4 py-2.5 text-muted">{tr.earnedAt ? relativeDate(tr.earnedAt) : "—"}</td>
+                    <td className="px-4 py-2.5 text-muted">{tr.earnedAt ? relativeDate(tr.earnedAt, idioma) : "—"}</td>
                   </tr>
                 ))}
                 {recentTrophies.length === 0 && (
@@ -413,7 +414,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                       <td className="px-4 py-2.5 text-muted">{PLATFORM_LABEL[run.platform as AccountPlatform] ?? run.platform}</td>
                       <td className="px-4 py-2.5">{run.games}</td>
                       <td className="px-4 py-2.5 text-green-500 font-bold">+{run.newTrophies}</td>
-                      <td className="px-4 py-2.5 text-muted">{relativeDate(run.createdAt) ?? "—"}</td>
+                      <td className="px-4 py-2.5 text-muted">{relativeDate(run.createdAt, idioma) ?? "—"}</td>
                     </tr>
                   ))}
                   {syncRuns.length === 0 && (
@@ -463,7 +464,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                         <p className="text-sm break-words max-w-[350px]">
                           {a.review ? `"${a.review}"` : <span className="italic text-muted">{t("system.moderation.table.noReview")}</span>}
                         </p>
-                        <p className="text-xs text-muted mt-1">{relativeDate(a.createdAt)}</p>
+                        <p className="text-xs text-muted mt-1">{relativeDate(a.createdAt, idioma)}</p>
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <form action={deleteActivityAction}>

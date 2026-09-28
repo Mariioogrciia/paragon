@@ -42,6 +42,7 @@
   "CookieBanner": {
     "ariaLabel": "Cookie-Hinweis",
     "texto": "Wir verwenden nur das unbedingt nötige Cookie, das dich eingeloggt hält — keine Werbe-Cookies, und die Nutzungsanalyse, die wir erfassen, identifiziert oder verfolgt dich nicht. Mehr Details unter <cookiesLink>Cookies</cookiesLink>.",
+    "textoCorto": "Nur ein Sitzungs-Cookie: keine Werbung, kein Tracking. <cookiesLink>Details</cookiesLink>",
     "entendido": "Verstanden"
   },
   "BackButton": {

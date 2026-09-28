@@ -5650,3 +5650,44 @@ septiembre; cada push a `master` es uno) a ~36 MB cada uno.
 - Por número: lo que de verdad libera los 9 GB es borrar despliegues
   viejos (o una política de retención). Pendiente de confirmación del
   usuario. Y agrupar los pushes: cada push suma ~36 MB (ahora menos).
+
+---
+
+## Segunda auditoría: rendimiento, estética y mejoras (28 sept 2026)
+
+Hecho y subido en un solo push (para no gastar Functions Storage):
+
+- **Región de funciones `fra1`** (`vercel.json`). Las funciones corrían en
+  `iad1` (Washington) y Supabase está en `eu-central-1` (Fráncfort): cada
+  consulta cruzaba el Atlántico dos veces. Los perfiles tardaban 2-2,5 s
+  siempre, aunque la primera respuesta llegaba en 0,25 s. Hobby permite una
+  sola región. Lo que irá un poco más lento es el cron cuando habla con APIs
+  de EE. UU. (PSN, Steam, IGDB) — lo menos importante. `vercel.json` no
+  admite comentarios, por eso la explicación va aquí.
+- **Mensajes de traducción al cliente recortados** (`src/i18n/clientMessages.ts`):
+  antes iban todos (~110 KB) en el HTML de cada página. La lista cubre
+  todo `useTranslations(...)` del código; `npx tsx
+  scripts/comprobar-namespaces-cliente.mts` avisa si falta uno.
+- `loading="lazy"` en 52 imágenes (Descubrir cargaba 84 de golpe). Las de
+  arriba del todo (cabecera, logo del juego, primera del carrusel, banner
+  anclado) siguen normales a propósito.
+- `recharts` eliminado: el radar de /comparar es SVG propio.
+- Móvil: titular de la portada fluido (se salía por la derecha y hacía
+  scroll horizontal), cifras en 2×2 (`StatTile` más compacto en móvil),
+  pestañas del perfil en una fila con scroll, aviso de cookies corto.
+- Ficha de juego: el artwork se ve (degradado en vez de velo del 75%;
+  primera captura si no hay artwork) y aviso de que la descripción de IGDB
+  es en inglés.
+- Perfil de ejemplo con banner y marco.
+- Portada pública: solo nombre de pila (+ @handle) en Muro de la fama,
+  ticker y trofeos raros — `name` es el nombre completo de Google/Discord.
+- `aria-label` en controles de vídeo/carrusel e iconos del pie.
+- i18n: `relativeDate` y el "hace X" de la portada con
+  `Intl.RelativeTimeFormat` (español idéntico a antes); retos semanales
+  traducidos por id (la API móvil sigue devolviendo el español); filtro de
+  lenguaje ofensivo con alemán y francés.
+
+**Sin hacer, con motivo:** onboarding nativo de Android (no se puede
+compilar ni probar aquí) y Pase de Temporada / Vitrinas (piden decisiones
+de producto). Sin probar con sesión iniciada: `/comparar` (radar) se
+comprobó renderizando el componente aparte.

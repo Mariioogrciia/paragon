@@ -26,7 +26,7 @@ export function ReleaseGrid({ items }: { items: IgdbGameResult[] }) {
           >
             {g.coverUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={g.coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <img loading="lazy" decoding="async" src={g.coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
             )}
           </span>
           <div className="min-w-0 flex-1">

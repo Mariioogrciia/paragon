@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { TiltCard } from "@/components/TiltCard";
 import { auth } from "@/auth";
 import { StatTile } from "@/components/StatTile";
@@ -60,15 +60,29 @@ const SAMPLE_SHELF = [
 
 const FEATURE_KEYS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 
-function haceTiempo(date: Date | string): string {
+function haceTiempo(date: Date | string, locale: string): string {
+  // Mismo criterio de estilo que `relativeDate` (lib/design.ts): en francés
+  // y alemán el "narrow" sale raro ("-5 min"), ahí va "short".
+  const rtf = new Intl.RelativeTimeFormat(locale, { style: locale === "es" || locale === "en" ? "narrow" : "short" });
   const minutos = Math.max(1, Math.round((Date.now() - new Date(date).getTime()) / 60_000));
-  if (minutos < 60) return `hace ${minutos} min`;
+  if (minutos < 60) return rtf.format(-minutos, "minute");
   const horas = Math.round(minutos / 60);
-  if (horas < 24) return `hace ${horas} h`;
-  return `hace ${Math.round(horas / 24)} d`;
+  if (horas < 24) return rtf.format(-horas, "hour");
+  return rtf.format(-Math.round(horas / 24), "day");
+}
+
+/**
+ * Nombre que se enseña en la portada pública (sin sesión): solo el de pila.
+ * `name` es el nombre completo que llega de Google/Discord, y la portada la
+ * ve cualquiera — el @handle ya identifica a la persona (auditoría, 28 sept
+ * 2026).
+ */
+function nombrePublico(name: string | null | undefined, handle: string | null | undefined): string {
+  return name?.trim().split(/\s+/)[0] || (handle ? `@${handle}` : "?");
 }
 
 async function Landing() {
+  const idioma = await getLocale();
   // Cuatro consultas independientes entre sí: en paralelo, no en cascada —
   // esta es la página pública más visitada (sin sesión), así que un
   // waterfall aquí pega directo al TTFB de todo el tráfico no autenticado.
@@ -91,7 +105,7 @@ async function Landing() {
       <section className="grid items-center gap-14 py-4 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <span
-            className="inline-flex items-center gap-2.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em]"
+            className="inline-flex max-w-full flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em]"
             style={{ background: "rgb(var(--accent-rgb) / 0.1)", border: "1px solid rgb(var(--accent-rgb) / 0.28)", color: "var(--accent-text)" }}
           >
             <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
@@ -104,7 +118,9 @@ async function Landing() {
             </span>
           </span>
 
-          <h1 className="font-heading mt-5 text-[4.625rem] font-bold uppercase leading-[0.98] tracking-[-0.02em]">
+          {/* Tamaño fluido: a 74px fijos, "SIGUIENTE" no cabía en 375px de
+              ancho y la portada hacía scroll horizontal en móvil. */}
+          <h1 className="font-heading mt-5 text-[clamp(2.75rem,13.5vw,4.625rem)] font-bold uppercase leading-[0.98] tracking-[-0.02em] [overflow-wrap:anywhere]">
             {t("heroTitleLine1")}
             <br />
             <span className="text-gradient">{t("heroTitleLine2")}</span>
@@ -241,10 +257,10 @@ async function Landing() {
             {[...recentPlatinums, ...recentPlatinums].map((p, i) => (
               <div key={`${p.userId}-${p.gameTitle}-${i}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap text-[0.8125rem]">
                 <TrophyIcon grade="platinum" size={16} />
-                <span className="font-semibold text-platinum">{p.name ?? `@${p.handle}`}</span>
+                <span className="font-semibold text-platinum">{nombrePublico(p.name, p.handle)}</span>
                 <span className="text-muted">{t("tickerAcabaDePlatinar")}</span>
                 <span className="font-semibold">{p.gameTitle}</span>
-                <span className="text-[0.6875rem] text-muted">— {haceTiempo(p.createdAt)}</span>
+                <span className="text-[0.6875rem] text-muted">— {haceTiempo(p.createdAt, idioma)}</span>
               </div>
             ))}
           </div>
@@ -289,12 +305,12 @@ async function Landing() {
             </div>
           </div>
 
-          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {topHunters.map((hunter, i) => (
               <Link
                 key={hunter.userId}
                 href={`/u/${hunter.handle}`}
-                className="group relative flex flex-col items-center gap-3 rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1"
+                className="group relative flex flex-col items-center gap-3 rounded-2xl p-4 text-center transition-all duration-300 hover:-translate-y-1 sm:p-6"
                 style={
                   i === 0
                     ? { border: "1px solid rgb(var(--accent-rgb) / 0.4)", background: "linear-gradient(var(--surface), rgb(var(--accent-rgb) / 0.08))", boxShadow: "0 0 30px rgb(var(--accent-rgb) / 0.12)" }
@@ -311,9 +327,9 @@ async function Landing() {
                 >
                   {i + 1}
                 </span>
-                <Avatar src={hunter.image} name={hunter.name ?? hunter.handle ?? "?"} size={64} />
+                <Avatar src={hunter.image} name={nombrePublico(hunter.name, hunter.handle)} size={64} />
                 <div className="min-w-0">
-                  <p className="truncate text-[0.9375rem] font-bold">{hunter.name ?? `@${hunter.handle}`}</p>
+                  <p className="truncate text-[0.9375rem] font-bold">{nombrePublico(hunter.name, hunter.handle)}</p>
                   <p className="truncate text-xs text-muted">@{hunter.handle}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -346,7 +362,7 @@ async function Landing() {
                   <p className="truncate text-[0.9375rem] font-bold">{rt.trophyName}</p>
                   <p className="truncate text-xs text-muted">{rt.gameTitle}</p>
                   <div className="mt-1.5 flex items-center gap-2">
-                    <Avatar src={rt.image} name={rt.name ?? rt.handle ?? "?"} size={18} />
+                    <Avatar src={rt.image} name={nombrePublico(rt.name, rt.handle)} size={18} />
                     <span className="truncate text-[0.6875rem] text-muted">@{rt.handle}</span>
                   </div>
                 </div>
@@ -540,7 +556,7 @@ async function Landing() {
                   
                   <div className="mt-3 rounded border-l-4 border-[#5865F2] bg-[#2f3136] p-4">
                     <div className="flex gap-4 items-start">
-                      <img src="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" alt="Elden Ring" className="h-24 w-16 rounded object-cover shadow-md" />
+                      <img loading="lazy" decoding="async" src="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" alt="Elden Ring" className="h-24 w-16 rounded object-cover shadow-md" />
                       <div>
                         <h4 className="font-bold text-[#00aff4] text-base hover:underline cursor-pointer">Elden Ring</h4>
                         <p className="text-sm text-[#dcddde] mt-1.5">Rareza comunitaria: <span className="font-semibold text-[#f87171]">4.2%</span> (Ularraro)</p>

@@ -40,22 +40,27 @@ export function CookieBanner() {
 
   if (!visible) return null;
 
+  const enlaceCookies = (chunks: React.ReactNode) => (
+    <Link href="/cookies" className="text-accent hover:underline">
+      {chunks}
+    </Link>
+  );
+
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border px-4 py-4 backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border px-4 py-2.5 backdrop-blur sm:py-4"
       style={{ background: "color-mix(in srgb, var(--background) 92%, transparent)" }}
       role="region"
       aria-label={t("ariaLabel")}
     >
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3">
-        <p className="text-[0.8125rem] text-muted">
-          {t.rich("texto", {
-            cookiesLink: (chunks) => (
-              <Link href="/cookies" className="text-accent hover:underline">
-                {chunks}
-              </Link>
-            ),
-          })}
+      {/* En móvil, texto corto y botón en la misma fila: el texto completo
+          ocupaba seis líneas y tapaba una quinta parte de la pantalla. */}
+      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-3 sm:flex-wrap">
+        <p className="text-xs text-muted sm:hidden">
+          {t.rich("textoCorto", { cookiesLink: enlaceCookies })}
+        </p>
+        <p className="hidden text-[0.8125rem] text-muted sm:block">
+          {t.rich("texto", { cookiesLink: enlaceCookies })}
         </p>
         <button
           onClick={aceptar}

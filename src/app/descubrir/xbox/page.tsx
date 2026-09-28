@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { getXboxNews } from "@/lib/xboxNews";
 import { NewsFeed } from "@/components/NewsFeed";
@@ -28,6 +28,7 @@ export const metadata = {
  * noticias.
  */
 export default async function DescubrirXboxPage() {
+  const idioma = await getLocale();
   const t = await getTranslations("Descubrir.XboxPage");
   const session = await auth();
   const userId = session?.user?.id;
@@ -126,7 +127,7 @@ export default async function DescubrirXboxPage() {
               y se dice así para no dar a entender que es un resumen
               mensual cuando no lo es. */}
           <p className="mb-4 text-[0.8125rem] text-muted">
-            {t("gamepassAviso", { fecha: gamePass.fecha ? `(${relativeDate(gamePass.fecha)})` : "" })}
+            {t("gamepassAviso", { fecha: gamePass.fecha ? `(${relativeDate(gamePass.fecha, idioma)})` : "" })}
           </p>
           <GameGrid items={gamePass.juegos} itemKey={(g) => g.igdbId} columns="grid-cols-2 gap-3 sm:grid-cols-4">
             {(g) => <PosterCard game={{ ...g, genres: [] }} fluid />}

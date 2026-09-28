@@ -20,7 +20,7 @@ export async function GameDlcs({ dlcs }: Props) {
             <div className="w-full aspect-[3/4] rounded-lg overflow-hidden border border-border shadow-md bg-muted/20 relative">
               {dlc.coverUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={dlc.coverUrl} alt={dlc.name} className="absolute inset-0 w-full h-full object-cover" />
+                <img loading="lazy" decoding="async" src={dlc.coverUrl} alt={dlc.name} className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center p-4 text-center text-xs text-muted">
                   {t("GameDlcs.noCover")}

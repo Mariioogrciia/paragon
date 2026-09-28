@@ -182,7 +182,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                   {single ? (
                     single.iconUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={single.iconUrl} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" decoding="async" src={single.iconUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <span style={{ color: colorFor(single.grade) }}>{single.grade ? GRADE_LABEL[single.grade][0] : "?"}</span>
                     )
@@ -251,7 +251,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                   >
                     {p.iconUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.iconUrl} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" decoding="async" src={p.iconUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <span style={{ color: colorFor(p.grade) }}>{p.grade ? GRADE_LABEL[p.grade][0] : "?"}</span>
                     )}

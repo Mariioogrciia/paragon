@@ -59,7 +59,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: FeedAc
           return (
             <div key={activity.id} className="flex gap-3 p-3 transition-colors border rounded-xl bg-card hover:bg-accent/5 sm:gap-4 sm:p-4">
               {activity.user.image ? (
-                <img src={activity.user.image} alt="" className="w-10 h-10 shrink-0 rounded-full" />
+                <img loading="lazy" decoding="async" src={activity.user.image} alt="" className="w-10 h-10 shrink-0 rounded-full" />
               ) : (
                 <div className="flex shrink-0 items-center justify-center w-10 h-10 font-bold rounded-full bg-accent/20 text-accent">
                   {activity.user.name?.[0]?.toUpperCase() ?? "?"}
@@ -136,7 +136,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: FeedAc
               
               {activity.game.iconUrl && (
                 <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="shrink-0">
-                  <img src={activity.game.iconUrl} alt="" className="h-10 w-10 rounded-md shadow-sm sm:h-12 sm:w-12" />
+                  <img loading="lazy" decoding="async" src={activity.game.iconUrl} alt="" className="h-10 w-10 rounded-md shadow-sm sm:h-12 sm:w-12" />
                 </Link>
               )}
             </div>

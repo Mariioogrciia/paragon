@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { PlatinoAlAlcance } from "@/lib/backlog";
 import { relativeDate } from "@/lib/design";
 
@@ -8,6 +8,7 @@ import { relativeDate } from "@/lib/design";
  * parados. Ver `platinosAlAlcance()` en lib/backlog.ts para el criterio.
  */
 export async function PlatinosAlAlcance({ juegos }: { juegos: PlatinoAlAlcance[] }) {
+  const idioma = await getLocale();
   const t = await getTranslations("Descubrir.PlatinosAlAlcance");
   if (juegos.length === 0) return null;
 
@@ -20,14 +21,14 @@ export async function PlatinosAlAlcance({ juegos }: { juegos: PlatinoAlAlcance[]
           className="flex items-center gap-3 rounded-xl p-3.5 transition-colors hover:bg-surface-2"
           style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
         >
-          {g.iconUrl && <img src={g.iconUrl} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" />}
+          {g.iconUrl && <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" />}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold" title={g.titulo}>{g.titulo}</p>
             <p className="text-xs text-muted">
               {t("progreso", { percent: g.progressPercent, n: g.trofeosRestantes })}
             </p>
             <p className="text-[0.6875rem] text-muted">
-              {t("sinTocar", { fecha: relativeDate(g.ultimaVez) ?? "" })}
+              {t("sinTocar", { fecha: relativeDate(g.ultimaVez, idioma) ?? "" })}
               {g.horasHltb ? t("horasParaTerminar", { horas: g.horasHltb }) : ""}
             </p>
           </div>

@@ -69,7 +69,7 @@ function GamePicker({ library, name, yaDentro = [] }: { library: Game[]; name: s
               <span className="h-8 w-6 shrink-0 overflow-hidden rounded bg-surface-2">
                 {g.iconUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={g.iconUrl} alt="" className="h-full w-full object-cover" />
+                  <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="h-full w-full object-cover" />
                 )}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm">{g.title}</span>
@@ -264,7 +264,7 @@ function CarpetaCard({ collection, library, otrasCarpetas }: { collection: Colle
                   <span className="h-9 w-7 shrink-0 overflow-hidden rounded bg-surface-2">
                     {g.iconUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={g.iconUrl} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" decoding="async" src={g.iconUrl} alt="" className="h-full w-full object-cover" />
                     )}
                   </span>
                   <Link href={`/juego/${g.igdbId ?? g.id}`} className="min-w-0 flex-1 truncate text-sm font-semibold hover:underline">

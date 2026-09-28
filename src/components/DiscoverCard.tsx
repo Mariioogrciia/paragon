@@ -44,10 +44,12 @@ export function DiscoverCard({
         {game.iconUrl && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={game.iconUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-45 blur-sm" />
+            <img loading="lazy" decoding="async" src={game.iconUrl} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-45 blur-sm" />
             <div className="absolute inset-0" style={{ background: "rgba(0,0,0,.5)" }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
+              loading="lazy"
+              decoding="async"
               src={game.iconUrl}
               alt=""
               className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"

@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { getProfileByUserId } from "@/lib/profiles";
 import { getAdminUserDetail, getAdminUserRecentTrophies } from "@/lib/admin";
@@ -22,6 +23,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
 }
 
 export default async function AdminUserDetailPage({ params }: { params: Promise<{ userId: string }> }) {
+  const idioma = await getLocale();
   const session = await auth();
   if (!session?.user) redirect("/entrar");
 
@@ -55,7 +57,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         <Stat value={detail.juegos} label="Juegos" />
         <Stat value={detail.platinos} label="Platinos" />
         <Stat value={detail.insignias} label="Insignias" />
-        <Stat value={relativeDate(detail.createdAt) ?? "—"} label="Se unió" />
+        <Stat value={relativeDate(detail.createdAt, idioma) ?? "—"} label="Se unió" />
       </div>
 
       <section>
@@ -86,8 +88,8 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                         <span className="text-yellow-500">No</span>
                       )}
                     </td>
-                    <td className="px-4 py-2.5 text-muted">{c.lastAttemptedAt ? relativeDate(c.lastAttemptedAt) : "—"}</td>
-                    <td className="px-4 py-2.5 text-muted">{c.syncedAt ? relativeDate(c.syncedAt) : "—"}</td>
+                    <td className="px-4 py-2.5 text-muted">{c.lastAttemptedAt ? relativeDate(c.lastAttemptedAt, idioma) : "—"}</td>
+                    <td className="px-4 py-2.5 text-muted">{c.syncedAt ? relativeDate(c.syncedAt, idioma) : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -132,7 +134,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                       </div>
                     </td>
                     <td className="px-4 py-2.5 text-muted">{tr.rarityPercent != null ? `${tr.rarityPercent.toFixed(1)}%` : "—"}</td>
-                    <td className="px-4 py-2.5 text-muted">{tr.earnedAt ? relativeDate(tr.earnedAt) : "—"}</td>
+                    <td className="px-4 py-2.5 text-muted">{tr.earnedAt ? relativeDate(tr.earnedAt, idioma) : "—"}</td>
                   </tr>
                 ))}
               </tbody>

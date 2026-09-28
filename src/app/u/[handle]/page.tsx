@@ -456,7 +456,7 @@ export default async function PerfilPage({
             ),
             stats: (
               <div key="stats">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                   <StatTile value={stats.platinos} label={t("PerfilPage.statPlatinos")} accent="var(--platinum)" />
                   <StatTile value={stats.trofeos} label={t("PerfilPage.statTrofeos")} />
                   <StatTile value={stats.juegos} label={t("PerfilPage.statJuegos")} />

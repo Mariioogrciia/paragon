@@ -40,7 +40,10 @@ export function ProfileTabsNav({
   ];
 
   return (
-    <div role="tablist" className="mb-7 flex flex-wrap gap-2 border-b border-border pb-4">
+    // Una sola fila con scroll horizontal en vez de `flex-wrap`: en móvil
+    // "Estadísticas" saltaba sola a una segunda línea. El `pt-1` deja sitio
+    // al `-translate-y` del hover, que el overflow recortaría si no.
+    <div role="tablist" className="-mx-1 mb-7 flex gap-1.5 overflow-x-auto border-b border-border px-1 pb-4 pt-1 [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden">
       {pestanas.map((p) => {
         const activa = pathname === p.href;
         return (
@@ -50,7 +53,7 @@ export function ProfileTabsNav({
             role="tab"
             aria-selected={activa}
             aria-current={activa ? "page" : undefined}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-[0.8125rem] font-bold uppercase tracking-wide transition-all duration-200 hover:-translate-y-0.5"
+            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-bold uppercase transition-all duration-200 hover:-translate-y-0.5 sm:px-4 sm:text-[0.8125rem] sm:tracking-wide"
             style={
               activa
                 ? {
