@@ -66,6 +66,7 @@ export function TrophyGuideModal({
   const [pestaña, setPestaña] = useState<"video" | "guia">("video");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- marca la carga al empezar la petición; la respuesta llega después, asíncrona.
     setLoading(true);
     // gameId/trophy.id dejan que la acción cachee el resultado en
     // game_trophy — sin ellos (juego manual sin gameId real) busca en vivo
@@ -85,7 +86,7 @@ export function TrophyGuideModal({
     setRebuscando(true);
     startTransition(async () => {
       try {
-        const id = await rebuscarVideoGuiaAction(gameId, trophy.id, gameTitle, trophy.name);
+        const id = await rebuscarVideoGuiaAction(gameId, trophy.id);
         setVideoId(id);
       } catch {
         // Sin sesión (requireUserId lanza) u otro fallo — se queda el vídeo
@@ -363,6 +364,7 @@ function GuiaEscritaTab({ gameId, gameTitle, trophy, t }: { gameId?: string; gam
   useEffect(() => {
     if (state.success && gameId) {
       getTrophyGuidesAction(gameId, trophy.id).then(setDatos);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- cierra el formulario cuando la acción de publicar termina bien.
       setEditando(false);
     }
   }, [state.success, gameId, trophy.id]);

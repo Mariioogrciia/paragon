@@ -919,14 +919,9 @@ export async function searchTrophyGuideAction(
  * búsquedas de scraping sin límite — el dato en sí es compartido entre
  * todos, no privado de quien lo pide.
  */
-export async function rebuscarVideoGuiaAction(
-  gameId: string,
-  trophyId: string,
-  gameTitle: string,
-  trophyName: string,
-): Promise<string | null> {
+export async function rebuscarVideoGuiaAction(gameId: string, trophyId: string): Promise<string | null> {
   await requireUserId();
-  return rebuscarVideoGuiaTrofeo(gameId, trophyId, gameTitle, trophyName);
+  return rebuscarVideoGuiaTrofeo(gameId, trophyId);
 }
 
 export async function submitExpressReviewAction(gameId: string, rating: number, review: string) {

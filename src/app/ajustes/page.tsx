@@ -7,6 +7,18 @@ import { ProfileForm } from "@/components/forms/ProfileForm";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getGamesForBackground, getProfileByUserId, getUserBadges } from "@/lib/profiles";
 
+/** Los `?error=` que devuelve /api/profile/update. */
+const ERRORES_PERFIL: Record<string, string> = {
+  contenido_ofensivo:
+    "No se ha guardado nada — algún campo (usuario, nombre, título o estado) contiene lenguaje ofensivo. Cámbialo e inténtalo de nuevo.",
+  handle_invalido:
+    "No se ha guardado nada — el nombre de usuario debe tener entre 3 y 20 caracteres: solo minúsculas, números y guion bajo.",
+  handle_cogido: "No se ha guardado nada — ese nombre de usuario ya está cogido.",
+  datos_invalidos:
+    "No se ha guardado nada — la imagen, el banner, el color o la zona horaria no tienen un formato válido.",
+  update_failed: "No se ha podido guardar. Inténtalo de nuevo en un momento.",
+};
+
 export default async function AjustesGeneralPage(props: { searchParams: Promise<{ error?: string }> }) {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
@@ -39,12 +51,12 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
 
   return (
     <>
-      {error === "contenido_ofensivo" && (
+      {error && ERRORES_PERFIL[error] && (
         <p
           className="mb-4 rounded-lg px-4 py-3 text-sm font-semibold"
           style={{ background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }}
         >
-          No se ha guardado nada — algún campo (nombre, título o estado) contiene lenguaje ofensivo. Cámbialo e inténtalo de nuevo.
+          {ERRORES_PERFIL[error]}
         </p>
       )}
       <ProfileForm

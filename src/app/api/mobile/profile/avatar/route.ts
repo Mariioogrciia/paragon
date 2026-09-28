@@ -3,10 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { createClient } from "@supabase/supabase-js";
-import path from "path";
-
-const EXTENSIONES_PERMITIDAS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+import { subirArchivoPerfil } from "@/lib/uploads";
 
 // Mismo bucket "Avatars" y mismo criterio (`avatarPersonalizado: true`, gana
 // a la de PSN/proveedor de login — ver `resolveAvatarUrl` en lib/profiles.ts)
@@ -14,11 +11,7 @@ const EXTENSIONES_PERMITIDAS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
 // con el token propio de la app (`getMobileUserId`) en vez de la cookie de
 // NextAuth: la Custom Tab del login web no comparte sesión con las llamadas
 // normales de Retrofit, así que /api/upload (que exige `auth()`) no sirve
-// aquí. Sin refactor del route de la web a propósito — es una ruta ya en
-// producción, duplicar estas ~30 líneas es más seguro que tocarla.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseKey);
+// aquí. La subida en sí vive en lib/uploads.ts, compartida con la web.
 
 /** Sube y vincula una foto de perfil nueva desde la app nativa — `multipart/form-data`, campo `file`. */
 export async function POST(req: Request) {
@@ -27,40 +20,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  if (!supabaseUrl || !supabaseKey) {
-    console.error("Faltan las variables de entorno de Supabase Storage.");
-    return NextResponse.json({ error: "Storage no configurado" }, { status: 500 });
-  }
-
   const formData = await req.formData().catch(() => null);
   const file = formData?.get("file") as File | null;
   if (!file) {
     return NextResponse.json({ error: "No se envió ningún archivo" }, { status: 400 });
   }
 
-  const ext = path.extname(file.name).toLowerCase();
-  if (!EXTENSIONES_PERMITIDAS.includes(ext)) {
-    return NextResponse.json({ error: "Formato no admitido" }, { status: 400 });
-  }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const filename = `avatars/${userId}-${Date.now()}${ext}`;
-
-  const { error: uploadError } = await supabase.storage.from("Avatars").upload(filename, buffer, {
-    contentType: file.type,
-    upsert: true,
-  });
-  if (uploadError) {
-    console.error("Error al subir a Supabase:", uploadError);
-    return NextResponse.json({ error: "No se pudo subir la imagen" }, { status: 500 });
-  }
-
-  const { data: publicUrlData } = supabase.storage.from("Avatars").getPublicUrl(filename);
-  const url = publicUrlData.publicUrl;
-
   const db = getDb();
-  await db.update(users).set({ image: url, avatarPersonalizado: true }).where(eq(users.id, userId));
+  const [actual] = await db.select({ image: users.image }).from(users).where(eq(users.id, userId)).limit(1);
 
-  return NextResponse.json({ url });
+  const resultado = await subirArchivoPerfil(userId, file, "avatar", actual?.image ?? null);
+  if ("error" in resultado) {
+    return NextResponse.json({ error: resultado.error }, { status: resultado.status });
+  }
+
+  await db.update(users).set({ image: resultado.url, avatarPersonalizado: true }).where(eq(users.id, userId));
+
+  return NextResponse.json({ url: resultado.url });
 }

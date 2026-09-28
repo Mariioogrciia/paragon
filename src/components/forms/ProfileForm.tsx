@@ -96,6 +96,9 @@ export function ProfileForm({
 
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [banner, setBanner] = useState(user.profileBannerUrl);
+  // Motivo del último rechazo de /api/upload (formato, tamaño...) — antes
+  // un fallo de subida no enseñaba nada, el botón volvía a su estado y ya.
+  const [errorSubida, setErrorSubida] = useState<string | null>(null);
 
   // Resto de campos del formulario grande, controlados solo para poder
   // saber si hay algo distinto de lo guardado — antes "Guardar cambios"
@@ -168,6 +171,7 @@ export function ProfileForm({
     if (!file) return;
 
     setIsUploading(true);
+    setErrorSubida(null);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("kind", "avatar");
@@ -181,6 +185,9 @@ export function ProfileForm({
       const data = await res.json();
       setAvatar(data.url);
       router.refresh();
+    } else {
+      const data = await res.json().catch(() => null);
+      setErrorSubida(data?.error ?? "No se pudo subir el archivo.");
     }
     setIsUploading(false);
   };
@@ -190,6 +197,7 @@ export function ProfileForm({
     if (!file) return;
 
     setIsUploadingBanner(true);
+    setErrorSubida(null);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("kind", "banner");
@@ -203,6 +211,9 @@ export function ProfileForm({
       const data = await res.json();
       setBanner(data.url);
       // Actualizamos el input oculto o directamente dejamos que el form mande la URL (lo haremos con input hidden)
+    } else {
+      const data = await res.json().catch(() => null);
+      setErrorSubida(data?.error ?? "No se pudo subir el archivo.");
     }
     setIsUploadingBanner(false);
   };
@@ -280,6 +291,11 @@ export function ProfileForm({
           </div>
         </div>
       </section>
+      {errorSubida && (
+        <p role="alert" className="-mt-4 text-sm font-semibold text-red-400">
+          {errorSubida}
+        </p>
+      )}
 
       <form id="profile-form" action="/api/profile/update" method="POST" className="flex flex-col gap-8">
         <input type="hidden" name="profileBannerUrl" value={banner ?? ""} />

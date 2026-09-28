@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { gameTrophies } from "@/db/schema";
+import { games, gameTrophies } from "@/db/schema";
 
 /**
  * Vídeo de guía en YouTube para un trofeo — extraído de `app/actions.ts`
@@ -19,6 +19,7 @@ import { gameTrophies } from "@/db/schema";
 export async function buscarCandidatosYouTube(query: string): Promise<string[]> {
   try {
     const res = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
+      signal: AbortSignal.timeout(10_000),
       // Sin esto YouTube a veces sirve una versión reducida de la página
       // sin los datos de vídeo incrustados — comprobado a mano.
       headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
@@ -51,23 +52,35 @@ export async function buscarVideoGuiaTrofeo(
   gameId?: string,
   trophyId?: string,
 ): Promise<string | null> {
+  // Con ids, el texto de la búsqueda sale SIEMPRE de la base, no de lo que
+  // mande quien llama: `searchTrophyGuideAction` no exige sesión (la modal
+  // también la abren visitantes de perfiles públicos), y fiarse de su
+  // `gameTitle`/`trophyName` dejaba a cualquiera elegir qué vídeo se
+  // guardaba para todos en un trofeo aún sin buscar (auditoría, 25 sept 2026).
+  let guardado = false;
   if (gameId && trophyId) {
     const [fila] = await db
-      .select({ guideVideoId: gameTrophies.guideVideoId })
+      .select({ guideVideoId: gameTrophies.guideVideoId, trophyName: gameTrophies.name, gameTitle: games.title })
       .from(gameTrophies)
+      .innerJoin(games, eq(games.id, gameTrophies.gameId))
       .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)))
       .limit(1);
 
-    // "" = ya se buscó y no había nada — no repetir. `null`/fila ausente =
-    // nunca se ha buscado, sigue abajo.
+    // "" = ya se buscó y no había nada — no repetir. `null` = nunca se ha
+    // buscado, sigue abajo.
     if (fila?.guideVideoId === "") return null;
     if (fila?.guideVideoId) return fila.guideVideoId;
+    if (fila) {
+      gameTitle = fila.gameTitle;
+      trophyName = fila.trophyName;
+      guardado = true;
+    }
   }
 
   const candidatos = await buscarCandidatosYouTube(`${gameTitle} ${trophyName} trophy guide`);
   const videoId = candidatos[0] ?? null;
 
-  if (gameId && trophyId) {
+  if (guardado && gameId && trophyId) {
     await db
       .update(gameTrophies)
       .set({ guideVideoId: videoId ?? "" })
@@ -95,16 +108,18 @@ export async function buscarVideoGuiaTrofeo(
 export async function rebuscarVideoGuiaTrofeo(
   gameId: string,
   trophyId: string,
-  gameTitle: string,
-  trophyName: string,
 ): Promise<string | null> {
   const [fila] = await db
-    .select({ guideVideoId: gameTrophies.guideVideoId })
+    .select({ guideVideoId: gameTrophies.guideVideoId, trophyName: gameTrophies.name, gameTitle: games.title })
     .from(gameTrophies)
+    .innerJoin(games, eq(games.id, gameTrophies.gameId))
     .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)))
     .limit(1);
+  // Mismo motivo que en `buscarVideoGuiaTrofeo`: el texto sale de la base.
+  // Sin fila no hay nada que actualizar.
+  if (!fila) return null;
 
-  const candidatos = await buscarCandidatosYouTube(`${gameTitle} ${trophyName} trophy guide`);
+  const candidatos = await buscarCandidatosYouTube(`${fila.gameTitle} ${fila.trophyName} trophy guide`);
   const indiceActual = fila?.guideVideoId ? candidatos.indexOf(fila.guideVideoId) : -1;
   const siguiente = indiceActual === -1 ? candidatos[0] : candidatos[indiceActual + 1];
   const videoId = siguiente ?? null;

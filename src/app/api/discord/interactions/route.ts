@@ -461,11 +461,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Faltan cabeceras de firma." }, { status: 401 });
   }
 
-  const verificado = nacl.sign.detached.verify(
-    Buffer.from(timestamp + body),
-    Buffer.from(signature, "hex"),
-    Buffer.from(publicKey, "hex"),
-  );
+  // `verify` lanza (no devuelve false) con una firma de longitud incorrecta
+  // — sin el try, una cabecera basura daba un 500 en vez de un 401.
+  let verificado = false;
+  try {
+    verificado = nacl.sign.detached.verify(
+      Buffer.from(timestamp + body),
+      Buffer.from(signature, "hex"),
+      Buffer.from(publicKey, "hex"),
+    );
+  } catch {
+    verificado = false;
+  }
   if (!verificado) {
     return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
   }
