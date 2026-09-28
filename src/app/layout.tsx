@@ -14,6 +14,7 @@ import { rachas } from "@/lib/history";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { mensajesCliente } from "@/i18n/clientMessages";
 import "./globals.css";
 
 const barlow = Barlow({
@@ -240,7 +241,7 @@ export default async function RootLayout({
         <ServiceWorkerRegister />
         <NativeAppSetup />
         <Analytics />
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={mensajesCliente(messages)}>
           <CookieBanner />
           <ThemeProvider
             attribute="class"
