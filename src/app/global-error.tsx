@@ -76,6 +76,10 @@ export default function GlobalError({
           >
             Reintentar
           </button>
+          {/* <a> y no <Link> a propósito: global-error sustituye al layout
+              raíz entero, y una recarga completa es justo lo que hace falta
+              para salir de un árbol de React que ha reventado. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/"
             onMouseEnter={() => setHoverInicio(true)}

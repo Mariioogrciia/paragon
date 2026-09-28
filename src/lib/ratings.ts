@@ -20,23 +20,23 @@ import { games } from "@/db/schema";
 
 /** Media y número de votos de un juego. Null si nadie lo ha puntuado. */
 export async function getCommunityRating(gameId: string): Promise<CommunityRating | null> {
-  const isNumeric = /^\d+$/.test(gameId);
+  // Numérico = `igdbId` (todas las versiones del juego); si no, el
+  // `games.id` concreto. Subconsulta en vez de un `innerJoin` condicional,
+  // que obligaba a reasignar el query builder con `as any`.
+  const filtroJuego = /^\d+$/.test(gameId)
+    ? inArray(
+        userGames.gameId,
+        db.select({ id: games.id }).from(games).where(eq(games.igdbId, parseInt(gameId, 10))),
+      )
+    : eq(userGames.gameId, gameId);
 
-  let query = db
+  const query = db
     .select({
       average: avg(userGames.rating),
       votes: count(userGames.rating),
     })
-    .from(userGames);
-
-  if (isNumeric) {
-    const igdbId = parseInt(gameId, 10);
-    query = query
-      .innerJoin(games, eq(games.id, userGames.gameId))
-      .where(and(eq(games.igdbId, igdbId), isNotNull(userGames.rating))) as any;
-  } else {
-    query = query.where(and(eq(userGames.gameId, gameId), isNotNull(userGames.rating))) as any;
-  }
+    .from(userGames)
+    .where(and(filtroJuego, isNotNull(userGames.rating)));
 
   const [row] = await query;
   const votes = Number(row?.votes ?? 0);

@@ -5576,3 +5576,77 @@ Verificado en el navegador contra `next start` (build de producción)
 señalando la propia cuenta real de anhalian: el texto ya dice "no
 podemos leer su biblioteca" y menciona los dos ajustes de Steam en vez
 de la frase genérica de antes.
+
+---
+
+## Auditoría de seguridad y plataforma (25 sept 2026)
+
+Pedida por el usuario ("auditoría de la app y de la plataforma"), y luego
+"todo lo que puedas cambiar, cámbialo".
+
+**PENDIENTE DE EJECUTAR — lo más grave de la auditoría:** en Supabase, 32
+de las 35 tablas de `public` tenían RLS desactivado y los roles `anon`/
+`authenticated` conservaban TODOS los permisos por defecto (SELECT,
+INSERT, UPDATE, DELETE, TRUNCATE) — con la clave `anon`, cualquiera
+habría podido leer `session`/`account` (tokens) o vaciar tablas. La
+clave no aparece en el repo ni en la app Android, así que no era
+explotable hoy, pero Supabase la trata como pública.
+`scripts/activar-rls.mts` lo cierra (RLS sin políticas + REVOKE + default
+privileges). La app no se entera: se conecta como `postgres` (dueño de
+todas las tablas, BYPASSRLS — comprobado). El clasificador de permisos
+bloqueó ejecutarlo contra producción desde la sesión: lo tiene que lanzar
+el usuario (`npx tsx scripts/activar-rls.mts`).
+
+**Arreglado en código:**
+- `/api/profile/update`: el handle se guardaba sin validar (vacío, "/",
+  mayúsculas...) — ahora mismas reglas que `chooseHandleAction`, también
+  pasa por el filtro de lenguaje, y un campo vacío ya no lo borra. Imagen/
+  banner solo http(s) o `preset:`, color `#rrggbb`, zona horaria válida,
+  marco inexistente descartado. Mensajes de error nuevos en `/ajustes`.
+- Guía de vídeo: `searchTrophyGuideAction` (sin sesión, a propósito)
+  aceptaba título/nombre del cliente y cacheaba el resultado para todos —
+  ahora con ids el texto sale de la base (`lib/videoGuides.ts`).
+- Subidas (`lib/uploads.ts`, compartido web + móvil): MIME por extensión
+  (antes el del cliente), firma de bytes, máx. 4 MB, borra la subida
+  anterior del mismo usuario. El formulario ya enseña el motivo del fallo.
+- Cabeceras en `next.config.ts`: X-Frame-Options/frame-ancestors (antes
+  clickjacking posible), nosniff, Referrer-Policy, Permissions-Policy. Sin
+  CSP completa a propósito (ver el comentario allí).
+- `/api/cron/sync` dio un 504 real (60s) a las 10:00 UTC: el presupuesto
+  de 22s solo se miraba ENTRE cuentas. Ahora `conTope()` limita cada
+  cuenta/ficha, y los 24 `fetch()` de `src/lib` llevan
+  `AbortSignal.timeout(10_000)` (antes solo `coverAura` tenía timeout).
+- `/api/arcade/score` daba 500 en producción (ranking del juego de
+  `/offline` roto): alias `u` de `user` incompatible con `avatarUrlSql`.
+- `Planificador`: bucle infinito de `syncHltbAction` mientras la página
+  estaba abierta (array nuevo por render + `revalidatePath`).
+- Discord: firma malformada daba 500 en vez de 401.
+- Lint: 46 errores → 0 (`any` tipados; `react-hooks` revisados uno a uno,
+  eran patrones correctos — excepción puntual con el motivo al lado).
+- `npm audit fix` (sin `--force`). Queda `uuid` bajo `gaxios`: no afecta
+  (gaxios solo usa v4, el fallo es de v3/v5/v6).
+
+**No hecho, con motivo:** rate limiting (no hay Redis/Upstash; en memoria
+no sirve en serverless), y `/movil/enlazar-extension` sigue creando una
+sesión de 30 días por visita sin forma de revocarlas. En el lado del
+usuario: restringir la clave de `android/app/google-services.json` en
+Google Cloud, y considerar despliegues de preview (hoy todo push va
+directo a producción). Nada de esto se ha podido probar con sesión
+iniciada (el navegador de la sesión no tenía login).
+
+### Functions Storage de Vercel al 90% (9,06 GB / 10 GB, mismo día)
+
+Aviso del usuario con captura del panel de uso. Functions Storage = tamaño
+de los bundles de funciones × CADA despliegue que Vercel conserva — no se
+limpia solo. Medido: **249 despliegues conservados** (desde el 4 de
+septiembre; cada push a `master` es uno) a ~36 MB cada uno.
+
+- Por despliegue: `sharp` (libvips) iba dentro de todas las funciones por
+  ser dependencia opcional de Next, aunque solo lo usaba `coverAura.ts`.
+  Ahora `coverAura` decodifica con `jpeg-js`/`pngjs` (comparado contra
+  sharp con carátulas reales: ±6/255 antes del ajuste HSL), `sharp` fuera
+  de `package.json` y `outputFileTracingExcludes` en `next.config.ts`.
+  Traza por función en local: ~19 MB → ~10 MB.
+- Por número: lo que de verdad libera los 9 GB es borrar despliegues
+  viejos (o una política de retención). Pendiente de confirmación del
+  usuario. Y agrupar los pushes: cada push suma ~36 MB (ahora menos).

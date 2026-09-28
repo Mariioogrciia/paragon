@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { getFeed } from "@/lib/feed";
+import type { getFeed } from "@/lib/feed";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { addActivityCommentAction, toggleActivityReactionAction } from "@/app/actions";
@@ -28,7 +28,9 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-export function ActivityFeed({ activities, currentUserId }: { activities: any[], currentUserId: string | null }) {
+type FeedActivity = Awaited<ReturnType<typeof getFeed>>[number];
+
+export function ActivityFeed({ activities, currentUserId }: { activities: FeedActivity[]; currentUserId: string | null }) {
   const t = useTranslations("Analitica.activityFeed");
 
   if (activities.length === 0) {
@@ -122,7 +124,7 @@ export function ActivityFeed({ activities, currentUserId }: { activities: any[],
                 </form>
                 {activity.comments.length > 0 && (
                   <div className="mt-3 space-y-2">
-                    {activity.comments.map((comment: any, index: number) => (
+                    {activity.comments.map((comment, index) => (
                       <div key={index} className="text-xs bg-muted/10 p-2 rounded-lg">
                         <span className="font-semibold">{comment.userName || t("alguien")}</span>: {comment.body}
                         <div className="text-[0.625rem] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}</div>

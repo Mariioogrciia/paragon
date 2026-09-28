@@ -128,6 +128,7 @@ export function useApariencia() {
   // El tema real solo se conoce en el cliente: pintarlo antes daría un desajuste
   // entre lo que renderiza el servidor y lo que ve el navegador.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- el tema guardado solo existe en el cliente: se lee al montar para no romper la hidratación.
     setMontado(true);
     const libreGuardado = localStorage.getItem(CLAVE_ACENTO_LIBRE) ?? "";
     if (libreGuardado) {

@@ -244,7 +244,7 @@ export default async function PerfilPage({
   // enseñaba SIN el tratamiento, nítido y sin oscurecer.
   const fondoEsCaratulaSuelta = Boolean(juegoDeFondoElegido) || !profile.profileBannerUrl;
 
-  const customStyle: any = {};
+  const customStyle: Record<`--${string}`, string> = {};
   if (profile.profileColor) {
     customStyle["--accent"] = profile.profileColor;
     const rgb = hexToRgb(profile.profileColor);

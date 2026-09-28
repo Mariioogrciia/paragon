@@ -23,6 +23,7 @@ export function CookieBanner() {
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente: leerlo al montar evita el desajuste de hidratación.
       if (!localStorage.getItem(CLAVE)) setVisible(true);
     } catch {
       // Almacenamiento bloqueado (privado, política del navegador): no

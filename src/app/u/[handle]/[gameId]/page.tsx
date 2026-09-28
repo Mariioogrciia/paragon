@@ -140,6 +140,7 @@ export default async function JuegoPage({
   //    hacerlo él mismo unas líneas más arriba, de forma bloqueante.
   const HORAS_PARA_REFRESCAR = 6;
   const sincronizadoHace = game.trophiesSyncedAt
+    // eslint-disable-next-line react-hooks/purity -- Server Component: se renderiza una vez por petición, Date.now() es la hora de esa petición.
     ? Date.now() - new Date(game.trophiesSyncedAt).getTime()
     : null;
   const tocaRefrescar =

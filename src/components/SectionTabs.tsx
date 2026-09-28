@@ -33,6 +33,7 @@ export function SectionTabs({ storageKey, tabs }: { storageKey: string; tabs: Se
     try {
       const deUrl = new URLSearchParams(window.location.search).get("tab");
       if (deUrl && tabs.some((t) => t.key === deUrl)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- la URL y localStorage solo existen en el cliente: se leen al montar para no romper la hidratación.
         setActive(deUrl);
         localStorage.setItem(lsKey, deUrl);
         return;

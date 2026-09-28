@@ -45,6 +45,7 @@ export function SalonDeLaVerguenza({ juegos }: { juegos: JuegoSinEmpezar[] }) {
   const t = useTranslations("Perfil");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente: leerlo al montar evita el desajuste de hidratación.
     setPrueba(leerPrueba());
     const t = setInterval(() => setAhora(Date.now()), 1000);
     return () => clearInterval(t);

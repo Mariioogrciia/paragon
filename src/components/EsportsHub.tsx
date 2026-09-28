@@ -150,6 +150,7 @@ export function EsportsHub({
                 filteredUpcoming.map((match) => {
                   const d = new Date(match.date);
                   const isToday = d.toDateString() === new Date().toDateString();
+                  // eslint-disable-next-line react-hooks/purity -- "hoy"/"mañana" dependen de la hora actual a propósito; un desfase de un render no importa.
                   const isTomorrow = d.toDateString() === new Date(Date.now() + 86400000).toDateString();
 
                   let dateString = d.toLocaleDateString(localeTag, { day: "numeric", month: "short" });

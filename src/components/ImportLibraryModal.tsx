@@ -36,7 +36,7 @@ export function ImportLibraryModal() {
       complete: (results) => {
         const parsedGames: ImportedGame[] = [];
 
-        for (const row of results.data as any[]) {
+        for (const row of results.data as Record<string, string | undefined>[]) {
           // Fallback para nombres de columnas comunes en Playnite o exportaciones manuales
           const title = row.Name || row.name || row.Title || row.title || row["Nombre"] || "";
           if (!title) continue;
@@ -89,8 +89,8 @@ export function ImportLibraryModal() {
       
       close();
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || t("importLibraryModal.importError"));
+    } catch (err) {
+      setError((err instanceof Error && err.message) || t("importLibraryModal.importError"));
       setImporting(false);
     }
   }

@@ -66,6 +66,7 @@ export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose:
   const [progress, setProgress] = useState(0);
   const pausedRef = useRef(false);
   const elapsedRef = useRef(0);
+  // eslint-disable-next-line react-hooks/purity -- valor inicial del ref; el efecto de abajo lo reinicia antes de usarlo.
   const lastRef = useRef(Date.now());
 
   const total = slides.length;
@@ -87,6 +88,7 @@ export function WrapStories({ data, onClose }: { data: WrapStoriesData; onClose:
   useEffect(() => {
     elapsedRef.current = 0;
     lastRef.current = Date.now();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia la barra de progreso al cambiar de diapositiva, junto con el bucle de animación que arranca aquí.
     setProgress(0);
     let raf: number;
 

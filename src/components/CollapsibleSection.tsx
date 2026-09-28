@@ -34,6 +34,7 @@ export function CollapsibleSection({
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente: leerlo al montar evita el desajuste de hidratación.
       if (localStorage.getItem(key) === "1") setOpen(true);
     } catch {
       // Privado/sin storage: se queda con defaultOpen, sin romper nada.

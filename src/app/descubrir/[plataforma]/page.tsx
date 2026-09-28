@@ -191,6 +191,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               esto es SIEMPRE el último post real del blog oficial, nunca una
               lista puesta a mano. Si el post tiene más de ~40 días, se avisa
               en vez de dejar que parezca el mes actual sin serlo. */}
+          {/* eslint-disable-next-line react-hooks/purity -- Server Component: se renderiza una vez por petición, Date.now() es la hora de esa petición. */}
           {psPlus.fecha && Date.now() - new Date(psPlus.fecha).getTime() > 40 * 86_400_000 && (
             <p className="-mt-2 mb-4 text-xs text-muted">
               {t("psPlusAviso", { fecha: relativeDate(psPlus.fecha) ?? "" })}

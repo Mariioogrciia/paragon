@@ -1,5 +1,5 @@
 import "server-only";
-import { and, avg, count, eq } from "drizzle-orm";
+import { and, avg, count, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { gameDifficultyVotes } from "@/db/schema";
 
@@ -11,26 +11,29 @@ import { gameDifficultyVotes } from "@/db/schema";
 
 import { games } from "@/db/schema";
 
+/**
+ * Numérico = `igdbId` (todas las versiones del juego); si no, el `games.id`
+ * concreto. Subconsulta en vez de un `innerJoin` condicional, que obligaba a
+ * reasignar el query builder con `as any`.
+ */
+function filtroJuego(gameId: string) {
+  if (!/^\d+$/.test(gameId)) return eq(gameDifficultyVotes.gameId, gameId);
+  return inArray(
+    gameDifficultyVotes.gameId,
+    db.select({ id: games.id }).from(games).where(eq(games.igdbId, parseInt(gameId, 10))),
+  );
+}
+
 export interface DificultadComunidad {
   media: number;
   votos: number;
 }
 
 export async function getDificultadComunidad(gameId: string): Promise<DificultadComunidad | null> {
-  const isNumeric = /^\d+$/.test(gameId);
-
-  let query = db
+  const query = db
     .select({ media: avg(gameDifficultyVotes.value), votos: count(gameDifficultyVotes.value) })
-    .from(gameDifficultyVotes);
-
-  if (isNumeric) {
-    const igdbId = parseInt(gameId, 10);
-    query = query
-      .innerJoin(games, eq(games.id, gameDifficultyVotes.gameId))
-      .where(eq(games.igdbId, igdbId)) as any;
-  } else {
-    query = query.where(eq(gameDifficultyVotes.gameId, gameId)) as any;
-  }
+    .from(gameDifficultyVotes)
+    .where(filtroJuego(gameId));
 
   const [row] = await query;
   const votos = Number(row?.votos ?? 0);
@@ -41,23 +44,11 @@ export async function getDificultadComunidad(gameId: string): Promise<Dificultad
 
 /** El voto que ha puesto un usuario concreto, si ha votado. */
 export async function getMiVoto(userId: string, gameId: string): Promise<number | null> {
-  const isNumeric = /^\d+$/.test(gameId);
-
-  let query = db
+  const query = db
     .select({ value: gameDifficultyVotes.value })
-    .from(gameDifficultyVotes);
-
-  if (isNumeric) {
-    const igdbId = parseInt(gameId, 10);
-    query = query
-      .innerJoin(games, eq(games.id, gameDifficultyVotes.gameId))
-      .where(and(eq(gameDifficultyVotes.userId, userId), eq(games.igdbId, igdbId)))
-      .limit(1) as any;
-  } else {
-    query = query
-      .where(and(eq(gameDifficultyVotes.userId, userId), eq(gameDifficultyVotes.gameId, gameId)))
-      .limit(1) as any;
-  }
+    .from(gameDifficultyVotes)
+    .where(and(eq(gameDifficultyVotes.userId, userId), filtroJuego(gameId)))
+    .limit(1);
 
   const [row] = await query;
   return row?.value ?? null;

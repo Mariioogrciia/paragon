@@ -198,6 +198,7 @@ export function LibraryGrid({
   // Cualquier cambio de filtro devuelve al principio: si no, al filtrar
   // seguiríamos "dentro" de la página 8 de una lista que ya no existe.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- vuelve a la página 1 al cambiar un filtro.
     setPagina(1);
   }, [search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, soloFaltaDlc, collection, sort, sortDir]);
 
@@ -209,6 +210,7 @@ export function LibraryGrid({
   const hayMas = mostrados.length < visible.length;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga la página siguiente cuando el IntersectionObserver ve el final de la lista.
     if (inView && hayMas) setPagina((p) => p + 1);
   }, [inView, hayMas]);
 

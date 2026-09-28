@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, userGames, users } from "@/db/schema";
 import { parseGameKey, type Platform } from "@/lib/types";
@@ -63,7 +63,7 @@ export async function getGlobalGame(gameId: string): Promise<GlobalGame | null> 
 
     if (rows.length > 0) {
       const rep = rows[0];
-      const hasPlatinum = rows.some((r) => Boolean((r.defined as any)?.platinum));
+      const hasPlatinum = rows.some((r) => Boolean(r.defined?.platinum));
       const platforms = [...new Set(rows.map((r) => r.platform))];
       // Capitalize or just use the raw for now (we replace in the UI)
       const deviceLabel = platforms.join(" / ");
@@ -151,27 +151,32 @@ export interface GlobalGameStats {
   platinumed: number;
 }
 
+/**
+ * Filtro de `user_game` para un id de ficha global: numérico = `igdbId`
+ * (todas las versiones de ese juego, una por plataforma), si no, el
+ * `games.id` concreto. Subconsulta en vez del `innerJoin` condicional de
+ * antes, que obligaba a un `as any` para reasignar el query builder.
+ */
+function condicionJuego(gameId: string) {
+  if (!/^\d+$/.test(gameId)) return eq(userGames.gameId, gameId);
+  const igdbId = parseInt(gameId, 10);
+  return inArray(
+    userGames.gameId,
+    db.select({ id: gamesTable.id }).from(gamesTable).where(eq(gamesTable.igdbId, igdbId)),
+  );
+}
+
 /** Cuánta gente lo tiene, lo está jugando y lo ha terminado. */
 export async function getGlobalGameStats(gameId: string): Promise<GlobalGameStats> {
-  const isNumeric = /^\d+$/.test(gameId);
-
-  let query = db
+  const query = db
     .select({
       owners: sql<number>`count(*)`,
       playing: sql<number>`count(*) filter (where ${userGames.progressPercent} > 0 and ${userGames.progressPercent} < 100)`,
       completed: sql<number>`count(*) filter (where ${userGames.progressPercent} = 100)`,
       platinumed: sql<number>`count(*) filter (where cast(${userGames.earned}->>'platinum' as integer) > 0)`,
     })
-    .from(userGames);
-
-  if (isNumeric) {
-    const igdbId = parseInt(gameId, 10);
-    query = query
-      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-      .where(eq(gamesTable.igdbId, igdbId)) as any;
-  } else {
-    query = query.where(eq(userGames.gameId, gameId)) as any;
-  }
+    .from(userGames)
+    .where(condicionJuego(gameId));
 
   const [row] = await query;
 
@@ -253,9 +258,7 @@ export interface GameReview {
 
 /** Todas las reseñas de un juego, de cualquier usuario, no solo del dueño de un perfil. */
 export async function getGameReviews(gameId: string): Promise<GameReview[]> {
-  const isNumeric = /^\d+$/.test(gameId);
-
-  let query = db
+  const query = db
     .select({
       userId: users.id,
       handle: users.handle,
@@ -266,16 +269,8 @@ export async function getGameReviews(gameId: string): Promise<GameReview[]> {
       reviewDate: userGames.reviewDate,
     })
     .from(userGames)
-    .innerJoin(users, eq(users.id, userGames.userId));
-
-  if (isNumeric) {
-    const igdbId = parseInt(gameId, 10);
-    query = query
-      .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-      .where(and(eq(gamesTable.igdbId, igdbId), isNotNull(userGames.review))) as any;
-  } else {
-    query = query.where(and(eq(userGames.gameId, gameId), isNotNull(userGames.review))) as any;
-  }
+    .innerJoin(users, eq(users.id, userGames.userId))
+    .where(and(condicionJuego(gameId), isNotNull(userGames.review)));
 
   const rows = await query.orderBy(desc(userGames.reviewDate));
 
