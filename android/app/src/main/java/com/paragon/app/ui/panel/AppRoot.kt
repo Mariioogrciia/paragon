@@ -1,5 +1,11 @@
 package com.paragon.app.ui.panel
 
+import android.content.Context
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalContext
+import com.paragon.app.data.SettingsRepository
+import com.paragon.app.ui.settings.LinkedAccountsScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -98,7 +104,73 @@ fun AppRoot(
             message = current.message,
             onRetry = { retryCounter.value += 1 },
         )
-        is PanelResult.Ok -> MainScreen(tokenStore, themeStore, current.profile, current.stats, current.racha, current.fromCache)
+        is PanelResult.Ok -> {
+            // Segundo paso del alta (el equivalente nativo de /bienvenida en
+            // la web): sin ningún juego todavía, el panel sale vacío y sin
+            // pista de qué hacer. Se enseña la pantalla de cuentas vinculadas
+            // antes, una vez — "Saltar" se recuerda en este móvil. Con caché
+            // offline no: sin red no se puede vincular nada.
+            val context = LocalContext.current
+            val prefs = remember { context.getSharedPreferences(PREFS_ONBOARDING, Context.MODE_PRIVATE) }
+            var saltado by remember { mutableStateOf(prefs.getBoolean(CLAVE_VINCULAR_SALTADO, false)) }
+            if (current.stats.games == 0 && !current.fromCache && !saltado) {
+                VincularCuentaGate(
+                    tokenStore = tokenStore,
+                    onListo = { retryCounter.value += 1 },
+                    onSaltar = {
+                        prefs.edit().putBoolean(CLAVE_VINCULAR_SALTADO, true).apply()
+                        saltado = true
+                    },
+                )
+            } else {
+                MainScreen(tokenStore, themeStore, current.profile, current.stats, current.racha, current.fromCache)
+            }
+        }
+    }
+}
+
+private const val PREFS_ONBOARDING = "paragon_onboarding"
+private const val CLAVE_VINCULAR_SALTADO = "vincular_saltado"
+
+/**
+ * "Último paso: vincula tu cuenta" — reutiliza LinkedAccountsScreen tal
+ * cual (la misma que Ajustes → Cuentas vinculadas) con una cabecera que
+ * explica el paso y dos salidas: recargar el panel ya con la cuenta, o
+ * saltarlo.
+ */
+@Composable
+private fun VincularCuentaGate(tokenStore: TokenStore, onListo: () -> Unit, onSaltar: () -> Unit) {
+    val settingsRepository = remember(tokenStore) { SettingsRepository(tokenStore) }
+    Column(modifier = Modifier.fillMaxSize().background(Background).statusBarsPadding()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)) {
+            Text(
+                text = "Último paso: vincula tu cuenta",
+                color = Foreground,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "Tus trofeos salen de tu perfil de PlayStation, Steam o Xbox. Vincula al menos uno y en unos minutos tendrás tu biblioteca aquí.",
+                color = Muted,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+            Row(modifier = Modifier.padding(top = 14.dp)) {
+                Button(
+                    onClick = onListo,
+                    colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                ) {
+                    Text("Ya lo he vinculado")
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                TextButton(onClick = onSaltar) {
+                    Text("Saltar por ahora", color = Muted)
+                }
+            }
+        }
+        Box(modifier = Modifier.weight(1f)) {
+            LinkedAccountsScreen(repository = settingsRepository, onBack = onSaltar)
+        }
     }
 }
 
