@@ -1,0 +1,27 @@
+name: Comprobaciones
+
+# Typecheck, lint y tests en cada push a master y en cada PR. No bloquea el
+# despliegue de Vercel (va por su lado), pero avisa por correo de GitHub si
+# algo se rompe — antes no había ninguna comprobación automática.
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit -p .
+      - name: Lint
+        run: npx eslint src
+      - name: Tests
+        run: npm test

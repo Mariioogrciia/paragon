@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test": "vitest run",
+    "test:namespaces": "tsx scripts/comprobar-namespaces-cliente.mts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
@@ -65,6 +67,7 @@
     "simple-icons": "^16.29.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }

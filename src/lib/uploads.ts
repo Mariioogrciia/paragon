@@ -38,7 +38,7 @@ const EXTENSIONES_PERMITIDAS: Record<TipoSubida, string[]> = {
 };
 
 /** ¿Empieza el archivo por la firma que corresponde a su tipo? */
-function firmaCoincide(mime: string, b: Buffer): boolean {
+export function firmaCoincide(mime: string, b: Buffer): boolean {
   const ascii = (inicio: number, fin: number) => b.subarray(inicio, fin).toString("latin1");
   switch (mime) {
     case "image/jpeg":
