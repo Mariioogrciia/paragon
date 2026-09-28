@@ -5774,3 +5774,10 @@ clasificador sí dejó ejecutar un script solo aditivo) y también
 
 Otros: título de pestaña en la página de clan; importes en euros con el
 formato del idioma.
+
+**Actualización (28 sept 2026):** el usuario ejecutó `scripts/activar-rls.mts`.
+Comprobado después: 40 tablas en `public`, 0 sin RLS, 0 permisos de
+`anon`/`authenticated`; producción responde 200 en portada, perfiles, ficha
+de juego, clanes, Descubrir y API. La API REST de Supabase queda cerrada.
+Al crear tablas nuevas, sus scripts ya activan RLS y retiran permisos (y los
+default privileges también quedaron retirados).
