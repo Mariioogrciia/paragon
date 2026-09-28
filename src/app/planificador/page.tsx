@@ -7,6 +7,7 @@ import { Planificador } from "@/components/Planificador";
 import { CarpetasManager } from "@/components/CarpetasManager";
 import { FiltroEstadoAnimo } from "@/components/FiltroEstadoAnimo";
 import { BackButton } from "@/components/BackButton";
+import { getObjetivosFecha, ritmoReciente } from "@/lib/goals";
 
 export const metadata = { title: "Planificador · Paragon" };
 
@@ -19,9 +20,11 @@ export default async function PlanificadorPage() {
 
   const t = await getTranslations("Analitica.planificadorPage");
 
-  const [{ games }, collections] = await Promise.all([
+  const [{ games }, collections, objetivos, ritmo] = await Promise.all([
     getLibrary(profile),
     listCollections(profile.userId),
+    getObjetivosFecha(profile.userId),
+    ritmoReciente(profile.userId).catch(() => null),
   ]);
 
   return (
@@ -32,7 +35,7 @@ export default async function PlanificadorPage() {
         <p className="mt-2 max-w-[650px] text-sm text-muted">{t("subtitle")}</p>
       </div>
       <FiltroEstadoAnimo games={games} handle={profile.handle} />
-      <Planificador collections={collections} library={games} handle={profile.handle} />
+      <Planificador collections={collections} library={games} handle={profile.handle} objetivos={objetivos} ritmo={ritmo} />
       <CarpetasManager collections={collections} library={games} />
     </div>
   );

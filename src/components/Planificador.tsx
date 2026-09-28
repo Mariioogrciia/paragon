@@ -9,6 +9,7 @@ import { coverGradient } from "@/lib/design";
 import { toggleGameCollectionAction, syncHltbAction } from "@/app/actions";
 import type { Collection } from "@/lib/collections";
 import type { Game } from "@/lib/types";
+import { ObjetivoFecha } from "@/components/ObjetivoFecha";
 
 function faltan(game: Game): number {
   return Math.max(0, game.definedTotal - game.earnedTotal);
@@ -38,7 +39,21 @@ function formatHltb(game: Game, t: ReturnType<typeof useTranslations>) {
  * destacado (como "A un paso del platino" del panel, pero sobre esta
  * lista) y quitar del plan sin salir de la página.
  */
-export function Planificador({ collections, library, handle }: { collections: Collection[]; library: Game[]; handle: string }) {
+export function Planificador({
+  collections,
+  library,
+  handle,
+  objetivos: objetivosFecha = {},
+  ritmo = null,
+}: {
+  collections: Collection[];
+  library: Game[];
+  handle: string;
+  /** gameId → fecha objetivo (ISO de día). Ver lib/goals.ts. */
+  objetivos?: Record<string, string>;
+  /** Trofeos al día de los últimos 90 días. */
+  ritmo?: number | null;
+}) {
   const t = useTranslations("Analitica.planificador");
   const ORDENES = useMemo(
     () => [
@@ -199,10 +214,16 @@ export function Planificador({ collections, library, handle }: { collections: Co
               </div>
             </div>
           </TiltCard>
+          {/* Fuera de la tarjeta (que es un enlace entero) para que pulsar
+              la fecha no navegue a la ficha. */}
+          <div className="-mt-2 mb-4 px-1">
+            <ObjetivoFecha gameId={ordered[0].id} fecha={objetivosFecha[ordered[0].id] ?? null} faltan={faltan(ordered[0])} ritmo={ritmo} />
+          </div>
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {ordered.slice(1).map((game) => (
-              <div key={game.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+              <div key={game.id} className="flex flex-col gap-2 rounded-xl border border-border p-3">
+                <div className="flex items-center gap-3">
                 <Link href={`/u/${handle}/${game.id}`} className="flex min-w-0 flex-1 items-center gap-3 hover:opacity-90">
                   <div className="h-12 w-9 shrink-0 overflow-hidden rounded bg-surface-2">
                     {game.iconUrl && (
@@ -222,6 +243,8 @@ export function Planificador({ collections, library, handle }: { collections: Co
                   <input type="hidden" name="gameId" value={game.id} />
                   <button className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-danger">{t("quitar")}</button>
                 </form>
+                </div>
+                <ObjetivoFecha gameId={game.id} fecha={objetivosFecha[game.id] ?? null} faltan={faltan(game)} ritmo={ritmo} />
               </div>
             ))}
           </div>

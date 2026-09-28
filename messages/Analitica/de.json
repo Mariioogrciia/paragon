@@ -27,8 +27,34 @@
     "clearDayFilter": "✕ Ganzen Monat anzeigen",
     "barAriaLabel": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}",
     "nombreMes": "{mes} {anio}",
-    "mesesLargos": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
-    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+    "mesesLargos": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ]
   },
   "planificador": {
     "ordenProximidad": "Am nächsten",
@@ -46,13 +72,36 @@
     "progresoMedio": "durchschnittlicher Fortschritt",
     "siguiente": "Als Nächstes",
     "progresoFaltan": "{pct}% · noch {faltan} Achievements {hltb}",
-    "quitar": "Entfernen"
+    "quitar": "Entfernen",
+    "objetivo": {
+      "fijar": "Zieldatum festlegen",
+      "cancelar": "Abbrechen",
+      "quitar": "Datum entfernen",
+      "antesDe": "Bis {fecha}",
+      "ritmoNecesario": "{porDia} Trophäen/Tag für {dias} Tage",
+      "tuRitmo": "dein Tempo: {ritmo}/Tag",
+      "vencido": "Das Datum ist vorbei",
+      "conseguido": "Geschafft!"
+    }
   },
   "statCharts": {
     "trofeosPorMes": "Trophäen pro Monat",
     "verDetalle": "Details ansehen →",
     "tooltip": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}",
-    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ]
   },
   "statusBadge": {
     "platinado": "Platin",
@@ -93,8 +142,29 @@
     "sinAbandonados": "Keine abgebrochenen Spiele erfasst."
   },
   "activityHeatmap": {
-    "diasSemanaIniciales": ["M", "", "M", "", "F", "", ""],
-    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+    "diasSemanaIniciales": [
+      "M",
+      "",
+      "M",
+      "",
+      "F",
+      "",
+      ""
+    ],
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ],
     "totalTrofeos": "{count, plural, one {# Trophäe erhalten} other {# Trophäen erhalten}} in den letzten 12 Monaten",
     "tooltip": "{count, plural, one {# Trophäe} other {# Trophäen}} · {fecha}",
     "menos": "Weniger",
@@ -155,7 +225,20 @@
     "tooltipPlatinos": "{count, plural, one {# Platin} other {# Platins}}",
     "barAriaLabel": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}. Details ansehen",
     "footer": "Von {conFecha} von {total} Trophäen: Nur die mit erfasstem Datum zählen. Daten kommen hinzu, sobald die Spieldetails synchronisiert werden, und das läuft im Hintergrund von selbst.",
-    "mesesCortos": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ]
   },
   "trophyTree": {
     "aviso": "Gruppiert nach Metall (oder Seltenheit), nicht nach echter Freischaltreihenfolge — weder PSN noch Steam geben an, welche Trophäe welche voraussetzt.",
@@ -177,12 +260,33 @@
     "guiasEscritas": "Geschriebene Guides zu diesem Spiel"
   },
   "hourlyHeatmap": {
-    "dias": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+    "dias": [
+      "So",
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa"
+    ],
     "resumen": "{pct}% deiner Trophäen fallen auf {dia} zwischen {inicio}:00 und {fin}:00 Uhr.",
     "tooltip": "{count, plural, one {# Trophäe} other {# Trophäen}} · {dia} {inicio}-{fin} Uhr"
   },
   "monthlySummary": {
-    "meses": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "meses": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
     "sinTrofeosTitulo": "Diesen Monat noch keine Trophäe",
     "sinTrofeosTexto": "Die erste erscheint hier, sobald du sie holst.",
     "resumenDe": "Zusammenfassung {mes}",

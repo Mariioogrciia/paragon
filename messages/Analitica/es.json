@@ -27,8 +27,34 @@
     "clearDayFilter": "✕ Ver todo el mes",
     "barAriaLabel": "{mes}: {count, plural, one {# trofeo} other {# trofeos}}",
     "nombreMes": "{mes} de {anio}",
-    "mesesLargos": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
-    "mesesCortos": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    "mesesLargos": [
+      "enero",
+      "febrero",
+      "marzo",
+      "abril",
+      "mayo",
+      "junio",
+      "julio",
+      "agosto",
+      "septiembre",
+      "octubre",
+      "noviembre",
+      "diciembre"
+    ],
+    "mesesCortos": [
+      "ene",
+      "feb",
+      "mar",
+      "abr",
+      "may",
+      "jun",
+      "jul",
+      "ago",
+      "sep",
+      "oct",
+      "nov",
+      "dic"
+    ]
   },
   "planificador": {
     "ordenProximidad": "Más cerca",
@@ -46,13 +72,36 @@
     "progresoMedio": "progreso medio",
     "siguiente": "Siguiente",
     "progresoFaltan": "{pct}% · faltan {faltan} logros {hltb}",
-    "quitar": "Quitar"
+    "quitar": "Quitar",
+    "objetivo": {
+      "fijar": "Fijar fecha objetivo",
+      "cancelar": "Cancelar",
+      "quitar": "Quitar fecha",
+      "antesDe": "Antes del {fecha}",
+      "ritmoNecesario": "{porDia} trofeos/día durante {dias} días",
+      "tuRitmo": "tu ritmo: {ritmo}/día",
+      "vencido": "La fecha ya pasó",
+      "conseguido": "¡Conseguido!"
+    }
   },
   "statCharts": {
     "trofeosPorMes": "Trofeos por mes",
     "verDetalle": "Ver el detalle →",
     "tooltip": "{mes}: {count, plural, one {# trofeo} other {# trofeos}}",
-    "mesesCortos": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    "mesesCortos": [
+      "ene",
+      "feb",
+      "mar",
+      "abr",
+      "may",
+      "jun",
+      "jul",
+      "ago",
+      "sep",
+      "oct",
+      "nov",
+      "dic"
+    ]
   },
   "statusBadge": {
     "platinado": "Platinado",
@@ -93,8 +142,29 @@
     "sinAbandonados": "No hay juegos abandonados registrados."
   },
   "activityHeatmap": {
-    "diasSemanaIniciales": ["L", "", "X", "", "V", "", ""],
-    "mesesCortos": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+    "diasSemanaIniciales": [
+      "L",
+      "",
+      "X",
+      "",
+      "V",
+      "",
+      ""
+    ],
+    "mesesCortos": [
+      "ene",
+      "feb",
+      "mar",
+      "abr",
+      "may",
+      "jun",
+      "jul",
+      "ago",
+      "sep",
+      "oct",
+      "nov",
+      "dic"
+    ],
     "totalTrofeos": "{count, plural, one {# trofeo ganado} other {# trofeos ganados}} en los últimos 12 meses",
     "tooltip": "{count, plural, one {# trofeo} other {# trofeos}} · {fecha}",
     "menos": "Menos",
@@ -155,7 +225,20 @@
     "tooltipPlatinos": "{count, plural, one {# platino} other {# platinos}}",
     "barAriaLabel": "{mes}: {count, plural, one {# trofeo} other {# trofeos}}. Ver desglose",
     "footer": "Sobre {conFecha} de {total} trofeos: solo cuentan los que tienen fecha registrada. Las fechas llegan al sincronizar el detalle de cada juego, y eso se completa solo en segundo plano.",
-    "mesesCortos": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    "mesesCortos": [
+      "ene",
+      "feb",
+      "mar",
+      "abr",
+      "may",
+      "jun",
+      "jul",
+      "ago",
+      "sep",
+      "oct",
+      "nov",
+      "dic"
+    ]
   },
   "trophyTree": {
     "aviso": "Agrupado por metal (o rareza), no por orden real de desbloqueo — ni PSN ni Steam dicen qué trofeo requiere a cuál.",
@@ -177,12 +260,33 @@
     "guiasEscritas": "Guías escritas de este juego"
   },
   "hourlyHeatmap": {
-    "dias": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    "dias": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ],
     "resumen": "El {pct}% de tus trofeos caen los {dia} entre las {inicio}:00 y las {fin}:00.",
     "tooltip": "{count, plural, one {# trofeo} other {# trofeos}} · {dia} {inicio}h-{fin}h"
   },
   "monthlySummary": {
-    "meses": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    "meses": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
     "sinTrofeosTitulo": "Todavía ningún trofeo este mes",
     "sinTrofeosTexto": "El primero se enseña aquí en cuanto lo consigas.",
     "resumenDe": "Resumen de {mes}",

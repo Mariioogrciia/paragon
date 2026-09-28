@@ -27,8 +27,34 @@
     "clearDayFilter": "✕ View the whole month",
     "barAriaLabel": "{mes}: {count, plural, one {# trophy} other {# trophies}}",
     "nombreMes": "{mes} {anio}",
-    "mesesLargos": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "mesesCortos": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    "mesesLargos": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ]
   },
   "planificador": {
     "ordenProximidad": "Closest",
@@ -46,13 +72,36 @@
     "progresoMedio": "average progress",
     "siguiente": "Next up",
     "progresoFaltan": "{pct}% · {faltan} achievements left {hltb}",
-    "quitar": "Remove"
+    "quitar": "Remove",
+    "objetivo": {
+      "fijar": "Set a target date",
+      "cancelar": "Cancel",
+      "quitar": "Remove date",
+      "antesDe": "By {fecha}",
+      "ritmoNecesario": "{porDia} trophies/day for {dias} days",
+      "tuRitmo": "your pace: {ritmo}/day",
+      "vencido": "The date has passed",
+      "conseguido": "Done!"
+    }
   },
   "statCharts": {
     "trofeosPorMes": "Trophies by month",
     "verDetalle": "See detail →",
     "tooltip": "{mes}: {count, plural, one {# trophy} other {# trophies}}",
-    "mesesCortos": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ]
   },
   "statusBadge": {
     "platinado": "Platinumed",
@@ -93,8 +142,29 @@
     "sinAbandonados": "No abandoned games recorded."
   },
   "activityHeatmap": {
-    "diasSemanaIniciales": ["M", "", "W", "", "F", "", ""],
-    "mesesCortos": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "diasSemanaIniciales": [
+      "M",
+      "",
+      "W",
+      "",
+      "F",
+      "",
+      ""
+    ],
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
     "totalTrofeos": "{count, plural, one {# trophy earned} other {# trophies earned}} in the last 12 months",
     "tooltip": "{count, plural, one {# trophy} other {# trophies}} · {fecha}",
     "menos": "Less",
@@ -155,7 +225,20 @@
     "tooltipPlatinos": "{count, plural, one {# platinum} other {# platinums}}",
     "barAriaLabel": "{mes}: {count, plural, one {# trophy} other {# trophies}}. See breakdown",
     "footer": "Out of {conFecha} of {total} trophies: only the ones with a recorded date count. Dates arrive once each game's detail is synced, and that finishes on its own in the background.",
-    "mesesCortos": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    "mesesCortos": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ]
   },
   "trophyTree": {
     "aviso": "Grouped by metal (or rarity), not by real unlock order — neither PSN nor Steam say which trophy requires which.",
@@ -177,12 +260,33 @@
     "guiasEscritas": "Written guides for this game"
   },
   "hourlyHeatmap": {
-    "dias": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "dias": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
     "resumen": "{pct}% of your trophies land on {dia} between {inicio}:00 and {fin}:00.",
     "tooltip": "{count, plural, one {# trophy} other {# trophies}} · {dia} {inicio}h-{fin}h"
   },
   "monthlySummary": {
-    "meses": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "meses": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
     "sinTrofeosTitulo": "No trophies this month yet",
     "sinTrofeosTexto": "The first one shows up here as soon as you get it.",
     "resumenDe": "{mes} summary",
