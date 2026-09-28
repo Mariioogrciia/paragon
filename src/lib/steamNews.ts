@@ -32,6 +32,7 @@ function limpiarResumen(html: string | undefined, max = 140): string | null {
 export async function getSteamNews(limit = 6): Promise<SteamNewsItem[]> {
   try {
     const res = await fetch(FEED_URL, {
+      signal: AbortSignal.timeout(10_000),
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 21_600 }, // 6h, igual que el resto de feeds de esta app.
     });

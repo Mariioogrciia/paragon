@@ -46,7 +46,7 @@ async function accessToken(): Promise<string> {
     grant_type: "client_credentials",
   });
 
-  const response = await fetch(`${TWITCH_TOKEN_URL}?${params}`, { method: "POST" });
+  const response = await fetch(`${TWITCH_TOKEN_URL}?${params}`, { signal: AbortSignal.timeout(10_000), method: "POST" });
   if (!response.ok) {
     throw new Error(`Twitch OAuth rechazó las credenciales de IGDB (${response.status}).`);
   }
@@ -101,6 +101,7 @@ async function query<T>(endpoint: string, body: string, revalidate = 21_600): Pr
   let response: Response;
   try {
     response = await fetch(`${IGDB_API}/${endpoint}`, {
+      signal: AbortSignal.timeout(10_000),
       method: "POST",
       headers: {
         "Client-ID": clientId,

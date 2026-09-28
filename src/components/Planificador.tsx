@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Dropdown } from "@/components/Dropdown";
@@ -57,12 +57,24 @@ export function Planificador({ collections, library, handle }: { collections: Co
 
   const carpeta = collections.find((c) => c.id === collectionId);
   // Excluimos los juegos que ya están al 100% (platinados) para que no salgan como "siguiente"
-  const objetivos = carpeta ? jugables.filter((g) => carpeta.gameIds.includes(g.id) && g.progressPercent < 100) : [];
+  const objetivos = useMemo(
+    () => (carpeta ? jugables.filter((g) => carpeta.gameIds.includes(g.id) && g.progressPercent < 100) : []),
+    [carpeta, jugables],
+  );
 
-  // Petición diferida de HLTB
+  // Petición diferida de HLTB — cada juego como mucho UNA vez por visita.
+  // Bug real (auditoría, 25 sept 2026): el efecto dependía de un array nuevo
+  // en cada render, y `syncHltbAction` hace `revalidatePath` → props nuevas
+  // → render → otra tanda de llamadas. Con HLTB sin encontrar nada (ver el
+  // comentario de `hayHltb` más abajo), `hltb` no se rellenaba nunca y el
+  // bucle de server actions duraba mientras la página siguiera abierta.
+  const hltbPedidos = useRef(new Set<string>());
   useEffect(() => {
-    const faltanHltb = objetivos.filter(g => !g.hltb).slice(0, 3);
-    faltanHltb.forEach(g => syncHltbAction(g.id, g.title));
+    const faltanHltb = objetivos.filter((g) => !g.hltb && !hltbPedidos.current.has(g.id)).slice(0, 3);
+    for (const g of faltanHltb) {
+      hltbPedidos.current.add(g.id);
+      syncHltbAction(g.id, g.title);
+    }
   }, [objetivos]);
 
   // ¿Tiene ALGÚN juego un tiempo de HLTB real? La API de HowLongToBeat

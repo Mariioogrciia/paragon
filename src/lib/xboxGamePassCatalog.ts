@@ -54,7 +54,7 @@ async function idsDelCatalogo(plataforma: GamePassPlataforma): Promise<string[]>
   // dos veces lo mismo sin necesidad.
   const res = await fetch(
     `https://catalog.gamepass.com/sigls/v2?id=${SIGL_IDS[plataforma]}&language=${LANGUAGE}&market=${MARKET}`,
-    { cache: "no-store" },
+    { signal: AbortSignal.timeout(10_000), cache: "no-store" },
   );
   if (!res.ok) return [];
 
@@ -96,7 +96,7 @@ async function detallesDelLote(ids: string[]): Promise<GamePassCatalogGame[]> {
   // vuelve a poder ser el de siempre (200, el límite real es la URL).
   const res = await fetch(
     `https://displaycatalog.mp.microsoft.com/v7.0/products?bigIds=${ids.join(",")}&market=${MARKET}&languages=${LANGUAGE}`,
-    { cache: "no-store" },
+    { signal: AbortSignal.timeout(10_000), cache: "no-store" },
   );
   if (!res.ok) return [];
 

@@ -73,10 +73,28 @@ const FALLBACK_MOCK_MATCHES: EsportsMatch[] = [
 const API_KEY = process.env.PANDASCORE_API_KEY;
 const BASE_URL = "https://api.pandascore.co";
 
+/** Lo que se lee de un partido en bruto de PandaScore — todo opcional, es JSON ajeno. */
+interface PandaScoreOpponent {
+  id?: number;
+  name?: string;
+  image_url?: string | null;
+}
+
+interface PandaScoreMatch {
+  id?: number | string;
+  opponents?: { opponent?: PandaScoreOpponent | null }[];
+  streams_list?: { language?: string; main?: boolean; raw_url?: string }[];
+  results?: { team_id?: number; score?: number }[];
+  videogame?: { name?: string };
+  league?: { name?: string };
+  begin_at?: string | null;
+  number_of_games?: number;
+}
+
 /**
  * Normaliza la respuesta bruta de PandaScore en nuestro formato EsportsMatch
  */
-function normalizeMatch(match: any, status: "running" | "upcoming" | "past"): EsportsMatch | null {
+function normalizeMatch(match: PandaScoreMatch | null, status: "running" | "upcoming" | "past"): EsportsMatch | null {
   if (!match || !match.opponents || match.opponents.length !== 2) return null;
   
   const op1 = match.opponents[0].opponent;
@@ -86,14 +104,14 @@ function normalizeMatch(match: any, status: "running" | "upcoming" | "past"): Es
 
   // Buscar stream principal en español o inglés
   const streams = match.streams_list ?? [];
-  const streamUrl = streams.find((s: any) => s.language === "es")?.raw_url 
-                 || streams.find((s: any) => s.main)?.raw_url 
+  const streamUrl = streams.find((s) => s.language === "es")?.raw_url 
+                 || streams.find((s) => s.main)?.raw_url 
                  || streams[0]?.raw_url 
                  || null;
 
   const results = match.results ?? [];
-  const score1 = results.find((r: any) => r.team_id === op1.id)?.score ?? 0;
-  const score2 = results.find((r: any) => r.team_id === op2.id)?.score ?? 0;
+  const score1 = results.find((r) => r.team_id === op1.id)?.score ?? 0;
+  const score2 = results.find((r) => r.team_id === op2.id)?.score ?? 0;
 
   let gameName = match.videogame?.name ?? "Unknown";
   if (gameName === "LoL") gameName = "LoL"; // PandaScore ya devuelve "LoL" u otros nombres, pero aseguramos limpieza
@@ -132,6 +150,7 @@ async function fetchFromPandaScore(endpoint: string, status: "running" | "upcomi
 
   try {
     const res = await fetch(`${BASE_URL}${endpoint}?per_page=${perPage}&sort=${status === "past" ? "-begin_at" : "begin_at"}`, {
+      signal: AbortSignal.timeout(10_000),
       headers: {
         "Authorization": `Bearer ${API_KEY}`,
         "Accept": "application/json"
@@ -148,7 +167,7 @@ async function fetchFromPandaScore(endpoint: string, status: "running" | "upcomi
     if (!Array.isArray(data)) return [];
 
     return data
-      .map(item => normalizeMatch(item, status))
+      .map((item: PandaScoreMatch) => normalizeMatch(item, status))
       .filter((m): m is EsportsMatch => m !== null);
 
   } catch (error) {

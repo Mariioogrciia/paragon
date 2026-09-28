@@ -88,6 +88,7 @@ export interface ComparativaPrecios {
 async function cheapShark<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`https://www.cheapshark.com/api/1.0/${path}`, {
+      signal: AbortSignal.timeout(10_000),
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 21_600 }, // 6h: los precios no cambian minuto a minuto.
     });

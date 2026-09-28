@@ -186,7 +186,7 @@ export async function casiSinJugadoresEnSteam(limit = 8): Promise<(DiscoverGame 
       try {
         const res = await fetch(
           `https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${g.appId}&format=json`,
-          { next: { revalidate: 3600 } },
+          { signal: AbortSignal.timeout(10_000), next: { revalidate: 3600 } },
         );
         if (!res.ok) return null;
         const data = (await res.json()) as { response?: { result?: number; player_count?: number } };

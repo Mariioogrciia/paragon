@@ -202,6 +202,7 @@ async function buscarGuia(titulo: string): Promise<string | null> {
 
 async function buscarEn(consulta: string, objetivo: string): Promise<string | null> {
   const res = await fetch(`${BASE}/?s=${encodeURIComponent(consulta)}`, {
+    signal: AbortSignal.timeout(10_000),
     headers: { "User-Agent": USER_AGENT },
     // Un mes: quién tiene guía y quién no apenas cambia. Es una consulta de
     // catálogo, no de progreso de nadie.
@@ -341,6 +342,7 @@ export async function trofeosPerdiblesDeConEstado(
     if (!guia) return { ok: true, nombres: new Set() };
 
     const res = await fetch(guia, {
+      signal: AbortSignal.timeout(10_000),
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 30 * 86_400 },
     });

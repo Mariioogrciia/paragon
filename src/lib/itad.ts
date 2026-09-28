@@ -25,6 +25,7 @@ async function itadFetch<T>(path: string, params: Record<string, string>): Promi
   const qs = new URLSearchParams({ key, ...params });
   try {
     const res = await fetch(`${API_BASE}${path}?${qs.toString()}`, {
+      signal: AbortSignal.timeout(10_000),
       next: { revalidate: 21_600 }, // 6h, igual que CheapShark: no hace falta más fresco.
     });
     if (!res.ok) return null;

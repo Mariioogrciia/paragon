@@ -44,6 +44,7 @@ function limpiarTexto(texto: string | undefined): string | null {
 export async function getEsportsNews(limit = 6): Promise<EsportsNewsItem[]> {
   try {
     const res = await fetch(FEED_URL, {
+      signal: AbortSignal.timeout(10_000),
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 21_600 }, // 6h, mismo criterio que psNews.ts.
     });

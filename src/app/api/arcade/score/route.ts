@@ -22,6 +22,10 @@ export async function GET() {
   const db = getDb();
   const session = await auth();
 
+  // `user` va sin alias a propósito: `avatarUrlSql` se refiere a la tabla por
+  // su nombre ("user"), y con el alias `u` de antes Postgres daba "invalid
+  // reference to FROM-clause entry" — el ranking entero devolvía 500 en
+  // producción (auditoría, 25 sept 2026).
   const top = await db.execute<{
     userId: string;
     name: string | null;
@@ -29,7 +33,7 @@ export async function GET() {
     avatarUrl: string | null;
     score: number;
   }>(sql`
-    select mejores."userId", u.name, u.handle,
+    select mejores."userId", ${users.name}, ${users.handle},
       ${avatarUrlSql(users.id, users.image, users.avatarPersonalizado)} as "avatarUrl",
       mejores.score
     from (
@@ -38,7 +42,7 @@ export async function GET() {
       where game = ${GAME}
       group by "userId"
     ) mejores
-    join ${users} u on u.id = mejores."userId"
+    join ${users} on ${users.id} = mejores."userId"
     order by mejores.score desc
     limit 10
   `);

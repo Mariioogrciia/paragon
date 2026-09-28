@@ -115,6 +115,26 @@ const PEGI_POR_PASADA = 30;
  */
 const MARGEN_MS = 8_000;
 
+/**
+ * Tope DURO por cuenta/ficha, contado desde el arranque — auditoría del 25
+ * sept 2026, tras un 504 real ("Task timed out after 60 seconds") a las
+ * 10:00 UTC de ese día. `PRESUPUESTO_MS` solo se comprueba ENTRE una cuenta
+ * y la siguiente: si una sola llamada se queda colgada (psn-api no acepta
+ * `signal`, así que no hay forma de ponerle timeout a la petición misma), la
+ * pasada entera esperaba hasta que Vercel la mataba. Con esto, la pasada
+ * abandona esa cuenta (queda para la siguiente) y responde igualmente.
+ */
+const LIMITE_DURO_MS = PRESUPUESTO_MS + 5_000;
+
+function conTope<T>(trabajo: Promise<T>, arranque: number): Promise<T> {
+  const restante = Math.max(arranque + LIMITE_DURO_MS - Date.now(), 0);
+  let temporizador: ReturnType<typeof setTimeout> | undefined;
+  const tope = new Promise<never>((_, rechazar) => {
+    temporizador = setTimeout(() => rechazar(new Error(`sin respuesta tras ${LIMITE_DURO_MS / 1000}s`)), restante);
+  });
+  return Promise.race([trabajo, tope]).finally(() => clearTimeout(temporizador));
+}
+
 export async function GET(request: Request) {
   const secreto = process.env.CRON_SECRET;
 
@@ -172,7 +192,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      const juegos = await resyncLibraries(fila.userId);
+      const juegos = await conTope(resyncLibraries(fila.userId), arranque);
       resultados.push({ userId: fila.userId, juegos });
     } catch (error) {
       // Que una cuenta falle (perfil puesto en privado, PSN caída, token
@@ -283,10 +303,9 @@ export async function GET(request: Request) {
           xboxDetalles++;
         }
 
-        await syncGameTrophies(
-          ficha.userId,
-          { platform: ficha.platform, accountId: ficha.accountId },
-          ficha.gameId,
+        await conTope(
+          syncGameTrophies(ficha.userId, { platform: ficha.platform, accountId: ficha.accountId }, ficha.gameId),
+          arranque,
         );
         detalles++;
       } catch (error) {

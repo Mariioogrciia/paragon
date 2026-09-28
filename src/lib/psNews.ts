@@ -39,6 +39,7 @@ function limpiarResumen(html: string | undefined, max = 140): string | null {
 export async function getPsNews(limit = 6): Promise<PsNewsItem[]> {
   try {
     const res = await fetch(FEED_URL, {
+      signal: AbortSignal.timeout(10_000),
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 21_600 }, // 6h: es un blog, no hace falta al minuto.
     });

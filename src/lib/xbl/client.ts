@@ -70,6 +70,7 @@ async function get<T>(path: string): Promise<T | null> {
   let response: Response;
   try {
     response = await fetch(`${API}${path}`, {
+      signal: AbortSignal.timeout(10_000),
       headers: {
         "X-Authorization": key,
         Accept: "application/json",

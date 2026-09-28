@@ -75,6 +75,7 @@ async function enviarAlCanal(channelId: string, embed: EmbedDiscord): Promise<{ 
 
   try {
     const mensaje = await fetch(`${API_BASE}/channels/${channelId}/messages`, {
+      signal: AbortSignal.timeout(10_000),
       method: "POST",
       headers,
       body: JSON.stringify({ embeds: [embed] }),
@@ -103,6 +104,7 @@ async function enviarDM(discordUserId: string, embed: EmbedDiscord): Promise<{ o
 
   try {
     const canal = await fetch(`${API_BASE}/users/@me/channels`, {
+      signal: AbortSignal.timeout(10_000),
       method: "POST",
       headers,
       body: JSON.stringify({ recipient_id: discordUserId }),
@@ -126,7 +128,7 @@ async function esMiembroDelServidor(guildId: string, discordUserId: string): Pro
   const headers = tokenHeaders();
   if (!headers) return false;
   try {
-    const res = await fetch(`${API_BASE}/guilds/${guildId}/members/${discordUserId}`, { headers });
+    const res = await fetch(`${API_BASE}/guilds/${guildId}/members/${discordUserId}`, { signal: AbortSignal.timeout(10_000), headers });
     return res.ok;
   } catch {
     return false;

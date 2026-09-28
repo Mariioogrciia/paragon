@@ -129,6 +129,7 @@ function mesDelTitulo(titulo: string): string | null {
 export async function getPsPlusMensual(): Promise<PsPlusMensual | null> {
   try {
     const res = await fetch(FEED_URL, {
+      signal: AbortSignal.timeout(10_000),
       headers: { "User-Agent": USER_AGENT },
       next: { revalidate: 21_600 }, // 6h, como el resto de feeds — esto cambia una vez al mes.
     });

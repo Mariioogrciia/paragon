@@ -68,6 +68,7 @@ async function get<T>(url: string, cacheable = false): Promise<T | null> {
   let response: Response;
   try {
     response = await fetch(url, {
+      signal: AbortSignal.timeout(10_000),
       headers: { Accept: "application/json" },
       ...(cacheable ? { next: { revalidate: 86_400 } } : { cache: "no-store" as const }),
     });

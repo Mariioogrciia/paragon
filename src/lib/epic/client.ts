@@ -96,6 +96,7 @@ async function query<T>(operationName: string, variables: object, sha256Hash: st
 
   try {
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(10_000),
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",

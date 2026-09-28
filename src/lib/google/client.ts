@@ -28,6 +28,7 @@ export async function fetchGoogleGames(userId: string): Promise<Game[]> {
   
   try {
     const res = await fetch("https://games.googleapis.com/games/v1/players/me/achievements", {
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Bearer ${token}`,
       },
