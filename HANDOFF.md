@@ -5734,3 +5734,43 @@ la base de producción desde la sesión):
   la cabecera del perfil, que no tenían.
 - Nota sobre el lockfile: npm 10.9 lo reescribe con otro orden; comprobado
   que no cambia ninguna versión (solo añade las 91 de Vitest, todas dev).
+
+---
+
+## Funciones nuevas (28 sept 2026, piloto automático)
+
+Las seis propuestas de la auditoría, en un solo push. **Tablas creadas en
+producción** con `scripts/crear-tablas-funciones-nuevas.mts` (esta vez el
+clasificador sí dejó ejecutar un script solo aditivo) y también
+`crear-tabla-rate-limit.mts` → el limitador de peticiones ya está activo.
+`activar-rls.mts` sigue PENDIENTE (lo lanza el usuario).
+
+1. **Alertas de precio** (`lib/priceAlerts.ts`, `lib/steamPrecio.ts`,
+   `AlertaPrecio.tsx` en la ficha de juego): precio actual de Steam España
+   en euros y "avísame cuando baje de X €". El cron revisa unas pocas por
+   pasada; `debeAvisar` (con tests) evita repetir el aviso durante la misma
+   rebaja. Avisos por `lib/avisos.ts` (Web Push + FCM + DM de Discord).
+   - **Fallo encontrado de paso**: las ofertas de CheapShark se pintaban en
+     "€", pero CheapShark solo da precios de tiendas de EE. UU. en dólares
+     (comprobado contra Steam `cc=us`). Ahora "US$". El histórico de ITAD sí
+     es España/euros.
+2. **Objetivos con fecha** en el Planificador (`lib/goals.ts`,
+   `lib/objetivos.ts` con tests, `ObjetivoFecha.tsx`): trofeos/día que hacen
+   falta frente a tu ritmo real de 90 días.
+3. **Resumen semanal por Discord** (`lib/resumenSemanal.ts`, `lib/semana.ts`
+   con tests de horario de verano/invierno): domingos desde las 18:00 hora
+   de Madrid, solo con DM activado; `notification_log` evita repetirlo.
+4. **Guerra de clanes** (`lib/clanWars.ts`, `GuerraDeClanes.tsx`): el líder
+   reta, el otro líder acepta, 14 días con la puntuación de las ligas; el
+   cron las cierra y avisa. Retos sin contestar caducan a los 7 días. Una
+   guerra abierta por clan como mucho. Hoy solo existe un clan ([FNTR]).
+5. **"Tu progreso"** en la ficha global de juego (`getMiProgreso`).
+6. **Onboarding Android**: el paso del handle YA existía (18-19 sept; la
+   nota "sin construir" de más arriba estaba desactualizada). Añadido el
+   segundo paso: sin juegos, antes del panel se enseña Cuentas vinculadas
+   con "Ya lo he vinculado" / "Saltar por ahora" (recordado en el móvil).
+   Compilado con `./gradlew :app:compileDebugKotlin` (JAVA_HOME = el JBR de
+   Android Studio); no probado en emulador (exige login).
+
+Otros: título de pestaña en la página de clan; importes en euros con el
+formato del idioma.
