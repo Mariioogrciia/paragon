@@ -1,4 +1,5 @@
-import sharp from "sharp";
+import { decode as decodificarJpeg } from "jpeg-js";
+import { PNG } from "pngjs";
 import { db } from "@/db";
 import { games as gamesTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -9,12 +10,19 @@ import { eq } from "drizzle-orm";
  * use el mismo azul de siempre — mismo concepto que ya usa la app Android
  * con `Palette` sobre el bitmap.
  *
- * Se calcula en el SERVIDOR con `sharp`, no en el navegador con
+ * Se calcula en el SERVIDOR, no en el navegador con
  * `<canvas>`: las carátulas vienen de dominios que no controlamos
  * (IGDB/PSN/Steam) y no hay garantía de que se sirvan con cabeceras CORS —
  * sin ellas, `canvas.getImageData()` lanza `SecurityError` en el cliente.
  * Pidiendo la imagen servidor-a-servidor (aquí, con `fetch`) ese problema
  * no existe: CORS es una restricción del navegador, no del servidor.
+ *
+ * Decodificado con `jpeg-js`/`pngjs` (JavaScript puro, <1 MB) y no con
+ * `sharp` (auditoría, 25 sept 2026): `sharp` y sus binarios de libvips se
+ * empaquetaban en TODAS las funciones de Vercel por estar instalado, y el
+ * Functions Storage del plan Hobby estaba al 90% (9 GB / 10 GB). Las
+ * carátulas son PNG (PSN) o JPEG (Steam y el resto); cualquier otro formato
+ * se queda sin aura, igual que una portada rota.
  *
  * Cacheado en `games.auraColor` (una fila por juego, no por usuario) —
  * una carátula no cambia de color nunca, así que se calcula una sola vez
@@ -56,22 +64,27 @@ async function calcularColorDominante(url: string): Promise<string | null> {
     const res = await fetch(url, { signal: AbortSignal.timeout(6_000) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    // 24x24 basta para un color medio — no hace falta la imagen entera.
-    const { data, info } = await sharp(buf)
-      .resize(24, 24, { fit: "inside" })
-      .removeAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
+    const imagen = decodificar(buf);
+    if (!imagen) return null;
 
+    // Media de RGB sobre una rejilla de ~24×24 puntos (lo mismo que hacía el
+    // `resize(24, 24)` de sharp antes, sin recorrer cada píxel). El canal
+    // alfa se ignora, como el `removeAlpha()` de antes.
+    const { width, height, data } = imagen;
+    const pasoX = Math.max(1, Math.floor(width / 24));
+    const pasoY = Math.max(1, Math.floor(height / 24));
     let r = 0;
     let g = 0;
     let b = 0;
     let n = 0;
-    for (let i = 0; i < data.length; i += info.channels) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-      n++;
+    for (let y = 0; y < height; y += pasoY) {
+      for (let x = 0; x < width; x += pasoX) {
+        const i = (y * width + x) * 4;
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        n++;
+      }
     }
     if (n === 0) return null;
     r /= n;
@@ -91,6 +104,20 @@ async function calcularColorDominante(url: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/** RGBA de 8 bits, 4 bytes por píxel — lo que devuelven jpeg-js y pngjs. */
+function decodificar(buf: Buffer): { width: number; height: number; data: Uint8Array } | null {
+  // Por firma, no por extensión de la URL: varias (Xbox) no llevan extensión.
+  if (buf[0] === 0xff && buf[1] === 0xd8) {
+    // Tope de memoria: una carátula es de unos cientos de px; esto solo
+    // corta una imagen absurda antes de reventar la función.
+    return decodificarJpeg(buf, { useTArray: true, maxMemoryUsageInMB: 64 });
+  }
+  if (buf[0] === 0x89 && buf.subarray(1, 4).toString("latin1") === "PNG") {
+    return PNG.sync.read(buf);
+  }
+  return null;
 }
 
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {

@@ -23,6 +23,40 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "shared.akamai.steamstatic.com" },
     ],
   },
+  // `sharp` (libvips nativo, unos 15 MB en Linux) no lo usa ya nuestro
+  // código — `lib/coverAura.ts` decodifica con jpeg-js/pngjs —, pero sigue
+  // instalado como dependencia opcional de Next y el trazado lo metía en
+  // TODAS las funciones. En Vercel el optimizador de `/_next/image` corre en
+  // su propia infraestructura, no dentro de nuestras funciones, así que
+  // aquí no hace falta. Motivo: Functions Storage del plan Hobby al 90%
+  // (9 GB / 10 GB, 25 sept 2026) — son MB × cada despliegue conservado.
+  // Ojo: `next start` en local sí lo necesita para `/_next/image` (lo
+  // encuentra en node_modules igual; esto solo afecta a lo que se sube).
+  outputFileTracingExcludes: {
+    "/**": ["node_modules/sharp/**", "node_modules/@img/**"],
+  },
+  // Cabeceras de seguridad (auditoría del 25 sept 2026): hasta ahora solo
+  // salía el HSTS que pone Vercel. Sin `frame-ancestors`/X-Frame-Options,
+  // cualquier web podía meter Paragon en un iframe invisible y hacer que
+  // alguien con sesión pulsara botones sin saberlo (clickjacking). No hay
+  // CSP completa a propósito: con scripts inline de Next, YouTube, Vercel
+  // Analytics y carátulas de media docena de CDNs, una CSP estricta sin
+  // poder probarla contra todo eso rompería más de lo que protege.
+  // Permissions-Policy no toca `screen-wake-lock` (lo usa el Modo Enfoque).
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
