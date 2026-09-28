@@ -12,7 +12,7 @@ import { paragonProgress } from "@/lib/level";
 import { sharedTrophyLeads } from "@/lib/comparison";
 import { ComparePairGames } from "@/components/ComparePairGames";
 import { BackButton } from "@/components/BackButton";
-import { RivalryRadarLazy } from "@/components/RivalryRadarLazy";
+import { RivalryRadar } from "@/components/RivalryRadar";
 
 const OUTCOME_STYLE = {
   ganas: { bg: "rgba(78, 201, 138, 0.12)", fg: "#4ec98a", border: "rgba(78, 201, 138, 0.3)" },
@@ -186,7 +186,7 @@ export default async function CompararPage({
             Cara a cara
           </span>
         </div>
-        <RivalryRadarLazy
+        <RivalryRadar
           data={radarData}
           userA={{ name: libA.player.name, color: "var(--accent-text)" }}
           userB={{ name: libB.player.name, color: "var(--gold)" }}
