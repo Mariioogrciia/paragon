@@ -326,6 +326,33 @@ export async function anunciarInvitacionLiga(userId: string, leagueName: string,
 }
 
 /**
+ * DM genérico con el mismo criterio que `anunciarInvitacionLiga`
+ * (`discordDmEnabled` + Discord vinculado), para los avisos de
+ * lib/avisos.ts. Nunca lanza. `ruta` es relativa ("/juego/123").
+ */
+export async function enviarDmSiActivo(
+  userId: string,
+  aviso: { titulo: string; texto: string; ruta?: string },
+): Promise<void> {
+  try {
+    const [row] = await db.select({ activado: users.discordDmEnabled }).from(users).where(eq(users.id, userId)).limit(1);
+    if (!row?.activado) return;
+    const discordUserId = await discordUserIdDe(userId);
+    if (!discordUserId) return;
+    const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    await enviarDM(discordUserId, {
+      title: aviso.titulo,
+      description: aviso.texto,
+      url: dominio && aviso.ruta ? `https://${dominio}${aviso.ruta}` : undefined,
+      color: COLOR_GENERICO,
+      footer: { text: "Paragon" },
+    });
+  } catch (error) {
+    console.error("[discord] DM", error);
+  }
+}
+
+/**
  * Nota privada de `/nota` desde Discord — mismo campo (`userGames.notes`)
  * que ya rellena `saveGameNotesAction` desde la web
  * (app/actions.ts), pero sin sesión de por medio: aquí quien escribe ya se

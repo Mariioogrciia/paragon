@@ -2,8 +2,10 @@ import {
   boolean,
   doublePrecision,
   integer,
+  date,
   jsonb,
   pgTable,
+  real,
   primaryKey,
   text,
   timestamp,
@@ -991,4 +993,80 @@ export const rateLimits = pgTable("rate_limit", {
   clave: text("clave").primaryKey(),
   ventana: timestamp("ventana", { mode: "date" }).notNull().defaultNow(),
   cuenta: integer("cuenta").notNull().default(1),
+});
+
+/*
+ * Tablas de las funciones del 28 sept 2026 (alertas de precio, objetivos con
+ * fecha, resumen semanal y guerras de clanes). Creadas con
+ * `scripts/crear-tablas-funciones-nuevas.mts`. Nuevas a propósito — ver el
+ * comentario de ese script.
+ */
+
+/** "Avísame cuando baje de X €" — precio de Steam España (lib/steamPrecio.ts). */
+export const priceAlerts = pgTable(
+  "price_alert",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    steamAppId: text("steamAppId").notNull(),
+    /** Id de la ficha global (/juego/[id]) para el enlace del aviso. */
+    gameId: text("gameId").notNull(),
+    titulo: text("titulo").notNull(),
+    precioObjetivo: real("precioObjetivo").notNull(),
+    creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+    comprobadoAt: timestamp("comprobadoAt", { mode: "date" }),
+    avisadoAt: timestamp("avisadoAt", { mode: "date" }),
+    precioAvisado: real("precioAvisado"),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.steamAppId] })],
+);
+
+/** Objetivo con fecha de un juego del Planificador ("platinar antes del..."). */
+export const gameGoals = pgTable(
+  "game_goal",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    fechaObjetivo: date("fechaObjetivo", { mode: "string" }).notNull(),
+    creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
+);
+
+/** Avisos periódicos ya enviados (p. ej. el resumen semanal), para no repetirlos. */
+export const notificationLog = pgTable(
+  "notification_log",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tipo: text("tipo").notNull(),
+    clave: text("clave").notNull(),
+    enviadoAt: timestamp("enviadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.tipo, t.clave] })],
+);
+
+/** Guerra de clanes: un clan reta a otro, y si acepta compiten hasta fin de mes. */
+export const clanWars = pgTable("clan_war", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  retadorId: text("retadorId")
+    .notNull()
+    .references(() => clans.id, { onDelete: "cascade" }),
+  retadoId: text("retadoId")
+    .notNull()
+    .references(() => clans.id, { onDelete: "cascade" }),
+  /** pendiente → activa → terminada, o pendiente → rechazada. */
+  estado: text("estado").notNull().default("pendiente"),
+  creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+  empiezaAt: timestamp("empiezaAt", { mode: "date" }),
+  terminaAt: timestamp("terminaAt", { mode: "date" }),
+  ganadorId: text("ganadorId"),
+  puntosRetador: integer("puntosRetador"),
+  puntosRetado: integer("puntosRetado"),
 });
