@@ -5,6 +5,8 @@ import { getLibrary } from "@/lib/profiles";
 import { getProfileByUserId } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
 import { revalidatePath } from "next/cache";
+import { GuerraError, responderGuerra, retarClan } from "@/lib/clanWars";
+import { limitar } from "@/lib/rateLimit";
 
 export async function createClanAction(formData: FormData) {
   const session = await auth();
@@ -80,4 +82,34 @@ export async function declineClanInviteAction(clanId: string) {
 
   await declineClanInvite(session.user.id, clanId);
   revalidatePath("/clanes");
+}
+
+/* ---------------------------------- Guerra de clanes --------------------------------- */
+
+/** Ver lib/clanWars.ts. Devuelve el error como texto (los errores de reglas no son fallos). */
+export async function retarClanAction(retadorId: string, retadoId: string): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!(await limitar("comentario", session.user.id))) return { error: "Espera un momento antes de volver a intentarlo." };
+  try {
+    await retarClan(session.user.id, retadorId, retadoId);
+  } catch (e) {
+    if (e instanceof GuerraError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/clanes", "layout");
+  return {};
+}
+
+export async function responderGuerraAction(guerraId: string, aceptar: boolean): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "No autenticado" };
+  try {
+    await responderGuerra(session.user.id, guerraId, aceptar);
+  } catch (e) {
+    if (e instanceof GuerraError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/clanes", "layout");
+  return {};
 }

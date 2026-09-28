@@ -5,8 +5,17 @@ import { InviteFriendsButton } from "./InviteFriendsButton";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { ClanActivityFeed } from "@/components/ClanActivityFeed";
+import { GuerraDeClanes } from "./GuerraDeClanes";
+import { DURACION_DIAS, clanesRetables, getGuerrasDeClan, type GuerraVista } from "@/lib/clanWars";
 
 const MEDALLA: Record<number, string> = { 0: "🥇", 1: "🥈", 2: "🥉" };
+
+/** Sin esto la pestaña decía solo "Paragon" en la página de cualquier clan. */
+export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag } = await params;
+  const clan = await getClanByTag(tag).catch(() => null);
+  return { title: clan ? `[${clan.tag}] ${clan.name} · Paragon` : "Clan no encontrado · Paragon" };
+}
 
 export default async function ClanPage({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params;
@@ -28,6 +37,23 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
 
   // Solo se calcula si hace falta: nadie más lo va a ver.
   const invitables = amIOwner && userId ? await getInvitableFriends(userId, clan.id) : [];
+  // Guerra de clanes (lib/clanWars.ts). Si fallara (p. ej. sin la tabla),
+  // la página del clan se enseña igual, sin la sección.
+  const [guerras, retables] = await Promise.all([
+    getGuerrasDeClan(clan.id).catch(() => null),
+    amIOwner ? clanesRetables(clan.id).catch(() => []) : Promise.resolve([]),
+  ]);
+  const serializar = (g: GuerraVista) => ({
+    id: g.id,
+    estado: g.estado,
+    soyRetador: g.soyRetador,
+    rival: g.rival,
+    terminaAt: g.terminaAt?.toISOString() ?? null,
+    diasRestantes: g.diasRestantes,
+    misPuntos: g.misPuntos,
+    susPuntos: g.susPuntos,
+    gane: g.gane,
+  });
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
@@ -65,6 +91,20 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
           )}
         </div>
       </div>
+
+      {guerras && (
+        <div className="mt-10">
+          <GuerraDeClanes
+            clanId={clan.id}
+            clanTag={clan.tag}
+            soyLider={amIOwner}
+            abierta={guerras.abierta ? serializar(guerras.abierta) : null}
+            historial={guerras.historial.map(serializar)}
+            retables={retables}
+            duracionDias={DURACION_DIAS}
+          />
+        </div>
+      )}
 
       <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
         <div className="min-w-0">
