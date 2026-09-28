@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { isNotNull, sql } from "drizzle-orm";
+import { isNotNull } from "drizzle-orm";
 import { db } from "@/db";
 import { games, users } from "@/db/schema";
 import { dominioPublico } from "@/lib/site";

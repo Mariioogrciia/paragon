@@ -84,7 +84,7 @@ export function AddManualGameModal() {
     return () => {
       if (debounce.current) clearTimeout(debounce.current);
     };
-  }, [query, isOpen]);
+  }, [query, isOpen, t]);
 
   function close() {
     setIsOpen(false);

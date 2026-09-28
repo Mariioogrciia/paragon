@@ -19,7 +19,7 @@ function selectorTrofeo(id: string): string {
 
 export function TrophyTree({
   trophies,
-  platform,
+  platform: _platform,
   onTrophyClick,
 }: {
   trophies: Trophy[];

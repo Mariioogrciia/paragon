@@ -61,8 +61,6 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
     });
   };
 
-  const actual = IDIOMAS.find((i) => i.id === currentLocale) || IDIOMAS[0];
-
   return (
     <div className="relative" ref={panel}>
       {isPending && (

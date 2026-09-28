@@ -1,7 +1,5 @@
-import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { accounts } from "@/db/schema";
-import type { Game, Platform } from "@/lib/types";
+import type { Game } from "@/lib/types";
 
 /**
  * Cliente para interactuar con la Google Play Games Services REST API.
@@ -39,8 +37,8 @@ export async function fetchGoogleGames(userId: string): Promise<Game[]> {
       return [];
     }
 
-    const data = await res.json();
-    
+    await res.json();
+
     // Como Google Play Games solo da logros del juego actual (nuestro app), 
     // y no sabemos qué juego es, y no hay listado de juegos jugados, 
     // retornamos array vacío o creamos un "juego fantasma" si hubieran logros.

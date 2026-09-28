@@ -7,7 +7,7 @@ import { CommunityRating } from "@/components/CommunityRating";
 import { CommunityDifficulty } from "@/components/CommunityDifficulty";
 import { Stars } from "@/components/Stars";
 import { StatTile } from "@/components/StatTile";
-import { coverGradient, relativeDate } from "@/lib/design";
+import { relativeDate } from "@/lib/design";
 import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame, getGameTrophyBreakdown } from "@/lib/community";
 import { getCommunityRating } from "@/lib/ratings";
 import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";

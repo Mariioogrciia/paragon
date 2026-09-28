@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, eq, isNull, or, lt, sql } from "drizzle-orm";
+import { and, eq, isNull, or, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { userGames } from "@/db/schema";
 import type { Platform } from "@/lib/types";

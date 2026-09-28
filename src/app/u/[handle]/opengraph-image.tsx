@@ -129,6 +129,7 @@ export default async function Image({ params }: { params: Promise<{ handle: stri
           {avatarUrl ? (
             <img
               src={avatarUrl}
+              alt=""
               width={140}
               height={140}
               style={{ borderRadius: 32, border: `3px solid ${PLATINO}` }}

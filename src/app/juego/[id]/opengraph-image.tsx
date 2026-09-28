@@ -89,7 +89,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           {/* `contain`, no `cover`: las caratulas de Steam son apaisadas
               (banner) y las de PSN cuadradas. Recortando, las de Steam salian
               partidas por la mitad. */}
-          <img src={caratula} width={420} height={420} style={{ objectFit: "contain" }} />
+          <img src={caratula} alt="" width={420} height={420} style={{ objectFit: "contain" }} />
         </div>
       ) : (
         <div

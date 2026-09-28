@@ -40,12 +40,15 @@ function formatHltb(game: Game, t: ReturnType<typeof useTranslations>) {
  */
 export function Planificador({ collections, library, handle }: { collections: Collection[]; library: Game[]; handle: string }) {
   const t = useTranslations("Analitica.planificador");
-  const ORDENES = [
-    { value: "proximidad", label: t("ordenProximidad") },
-    { value: "progreso", label: t("ordenProgreso") },
-    { value: "horas", label: t("ordenHoras") },
-    { value: "hltb", label: t("ordenHltb") },
-  ];
+  const ORDENES = useMemo(
+    () => [
+      { value: "proximidad", label: t("ordenProximidad") },
+      { value: "progreso", label: t("ordenProgreso") },
+      { value: "horas", label: t("ordenHoras") },
+      { value: "hltb", label: t("ordenHltb") },
+    ],
+    [t],
+  );
   const jugables = useMemo(() => library.filter((g) => !g.isWishlist), [library]);
 
   const [collectionId, setCollectionId] = useState(() => {
@@ -88,7 +91,7 @@ export function Planificador({ collections, library, handle }: { collections: Co
   const hayHltb = objetivos.some((g) => g.hltb?.completionist || g.hltb?.mainExtra || g.hltb?.main);
   const ordenesDisponibles = useMemo(
     () => (hayHltb ? ORDENES : ORDENES.filter((o) => o.value !== "hltb")),
-    [hayHltb],
+    [hayHltb, ORDENES],
   );
 
   const ordered = useMemo(

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { setFavoritesAction } from "@/app/actions";
 import { Game } from "@/lib/types";
-import { TiltCard } from "./TiltCard";
 import { coverGradient } from "@/lib/design";
 
 export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[], currentFavorites: string[] }) {

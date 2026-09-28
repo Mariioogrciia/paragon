@@ -121,7 +121,7 @@ export async function getGameRecommendations(userId: string, limit = 12): Promis
     let gameGenres: string[] = [];
     try {
       gameGenres = JSON.parse(row.genres) || [];
-    } catch (e) {
+    } catch {
       // Ignorar
     }
 
@@ -152,7 +152,7 @@ export async function getGameRecommendations(userId: string, limit = 12): Promis
       let gameGenres: string[] = [];
       try {
         gameGenres = JSON.parse(row.genres) || [];
-      } catch (e) {}
+      } catch {}
 
       recommended.push({
         igdbId: row.igdbId,

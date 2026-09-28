@@ -69,7 +69,7 @@ export function DiscoverSearch({ estaLogueado }: { estaLogueado: boolean }) {
     return () => {
       if (debounce.current) clearTimeout(debounce.current);
     };
-  }, [query]);
+  }, [query, t]);
 
   return (
     <section className="mb-10">

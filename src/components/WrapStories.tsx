@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
-import type { MesConTrofeos, Rachas } from "@/lib/history";
+import type { Rachas } from "@/lib/history";
 import type { PercentilAnio } from "@/lib/wrapPercentile";
 import type { JuegoDestacado } from "@/components/ParagonWrap";
 

@@ -4,8 +4,6 @@ import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";
 import { UpcomingGames } from "@/components/UpcomingGames";
 import { getGamingNews, noticiasDeTuBiblioteca } from "@/lib/rss";
-import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
 import { BackButton } from "@/components/BackButton";
 import { TarjetaNoticia } from "@/components/TarjetaNoticia";
 

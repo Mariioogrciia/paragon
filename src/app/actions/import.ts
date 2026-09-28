@@ -2,12 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
-import { games, userGames, activities } from "@/db/schema";
+import { games, userGames } from "@/db/schema";
 import { auth } from "@/auth";
-import { parseGameKey, type Platform, gameKey } from "@/lib/types";
+import { type Platform, gameKey } from "@/lib/types";
 import { searchGames } from "@/lib/igdb/client";
 import { slugDevice } from "@/lib/manualGames";
-import { eq, and } from "drizzle-orm";
 
 export interface ImportedGame {
   title: string;
@@ -55,7 +54,7 @@ export async function importGamesAction(importedGames: ImportedGame[]) {
       if (results && results.length > 0) {
         igdbData = results[0];
       }
-    } catch (e) {
+    } catch {
       // Ignorar error de IGDB y seguir
     }
 

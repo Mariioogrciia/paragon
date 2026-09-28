@@ -84,7 +84,9 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
   const todos = useMemo(() => colapsarPorDia(puntosTienda), [puntosTienda]);
 
   const dias = useMemo(() => {
-    const spec = RANGOS.find((r) => r.key === rango)!;
+    // RANGO_DIAS (constante del módulo) y no RANGOS: aquí solo hacen falta
+    // los días, no la etiqueta traducida que se recalcula en cada render.
+    const spec = RANGO_DIAS.find((r) => r.key === rango)!;
     if (spec.dias == null || todos.length === 0) return todos;
     const ultimaFecha = new Date(todos[todos.length - 1].fecha).getTime();
     const corte = ultimaFecha - spec.dias * MS_DIA;

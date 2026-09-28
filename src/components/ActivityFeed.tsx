@@ -30,7 +30,7 @@ function RatingStars({ rating }: { rating: number }) {
 
 type FeedActivity = Awaited<ReturnType<typeof getFeed>>[number];
 
-export function ActivityFeed({ activities, currentUserId }: { activities: FeedActivity[]; currentUserId: string | null }) {
+export function ActivityFeed({ activities, currentUserId: _currentUserId }: { activities: FeedActivity[]; currentUserId: string | null }) {
   const t = useTranslations("Analitica.activityFeed");
 
   if (activities.length === 0) {

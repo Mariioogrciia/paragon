@@ -5691,3 +5691,46 @@ Hecho y subido en un solo push (para no gastar Functions Storage):
 compilar ni probar aquí) y Pase de Temporada / Vitrinas (piden decisiones
 de producto). Sin probar con sesión iniciada: `/comparar` (radar) se
 comprobó renderizando el componente aparte.
+
+---
+
+## Tercera pasada, piloto automático (28 sept 2026)
+
+**Pendiente de ejecutar por el usuario** (el clasificador bloquea escribir en
+la base de producción desde la sesión):
+- `npx tsx scripts/activar-rls.mts` — lo más grave, sigue abierto.
+- `npx tsx scripts/crear-tabla-rate-limit.mts` — hasta entonces el
+  limitador deja pasar todo (falla abierto, avisa una vez en los logs).
+
+**Hecho:**
+- `fcm.ts`: import dinámico de `firebase-admin` comiteado (era trabajo del
+  usuario sin comitear). Medido: ~85 ms de carga en local que dejan de
+  pagarse en el arranque en frío de casi todas las funciones.
+- **Limitador de peticiones** (`lib/rateLimit.ts`, tabla `rate_limit`):
+  búsqueda de juegos, guías de vídeo, subidas, comentarios, guías escritas,
+  arcade, extensión PSN y guardado de perfil. No el WAF de Vercel: en Hobby
+  es una sola regla y se configura a mano en el panel.
+- **Sesiones**: "Cerrar sesión en los demás dispositivos" + recuento en
+  Ajustes → Seguridad; el cron borra las sesiones caducadas (las de la app
+  y la extensión se quedaban para siempre).
+- **Tests**: Vitest 3 (el 5 choca con `@types/node` 20), `npm test`, 40
+  tests; workflow `.github/workflows/comprobaciones.yml` (tsc + lint +
+  tests en cada push, no bloquea el despliegue).
+- **Fallos encontrados y arreglados**:
+  - Quitar la nota de un juego guardaba un 0 que contaba como voto de cero
+    estrellas en la media de la comunidad; y se aceptaba cualquier número.
+    Ahora `null` (y se borra del feed) y solo enteros 1-5.
+  - Comentarios del feed sin filtro de lenguaje (web y móvil).
+  - Guías, respuestas, reseñas, notas de juego y clanes sin tope de
+    longitud; etiqueta de clan con cualquier carácter (va en la URL).
+  - Reseña con fecha inválida reventaba la consulta.
+  - Perfil/juego inexistente: hueco vacío entre cabecera y pie (no había
+    `not-found.tsx`). 404 propio traducido.
+- `HANDLE_RE` y el resto de reglas del perfil en `lib/validacionPerfil.ts`
+  (estaban copiadas en tres sitios).
+- Lint: solo quedan los 33 avisos de `<img>` (hosts dinámicos de PSN/Xbox).
+- Nuevo: botón "Compartir" en el perfil (menú nativo o copiar enlace, con
+  plan B si el navegador bloquea el portapapeles). Hover en los botones de
+  la cabecera del perfil, que no tenían.
+- Nota sobre el lockfile: npm 10.9 lo reescribe con otro orden; comprobado
+  que no cambia ninguna versión (solo añade las 91 de Vitest, todas dev).

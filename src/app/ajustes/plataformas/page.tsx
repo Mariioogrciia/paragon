@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { useLocale } from "next-intl";
 import { auth } from "@/auth";
-import { signOutAction, unlinkAccountAction } from "@/app/actions";
+import { unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, ProfileSettingsForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { SaludSincronizacion } from "@/components/SaludSincronizacion";
