@@ -1,6 +1,5 @@
 import "server-only";
-import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getMessaging } from "firebase-admin/messaging";
+import type { App } from "firebase-admin/app";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { fcmTokens } from "@/db/schema";
@@ -22,7 +21,16 @@ import { fcmTokens } from "@/db/schema";
 
 let app: App | null | undefined;
 
-function asegurarApp(): App | null {
+/**
+ * `firebase-admin` (con gRPC, protobuf y google-auth-library detrás) pesa
+ * ~19 MB de dependencias transitivas — nada que se quiera arrastrar a las
+ * decenas de funciones que importan `sync.ts`/`profiles.ts`/`clans.ts` sin
+ * necesitar nunca mandar un push. Un `import()` aquí dentro, en vez de un
+ * `import` normal en la cabecera del fichero, es lo que evita que webpack
+ * lo incluya en el bundle de cada una de esas funciones — solo se carga de
+ * verdad cuando `enviarPushFcm` se ejecuta.
+ */
+async function asegurarApp(): Promise<App | null> {
   if (app !== undefined) return app;
 
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
@@ -32,6 +40,7 @@ function asegurarApp(): App | null {
   }
 
   try {
+    const { cert, getApps, initializeApp } = await import("firebase-admin/app");
     const serviceAccount = JSON.parse(raw);
     app = getApps()[0] ?? initializeApp({ credential: cert(serviceAccount) });
   } catch (error) {
@@ -64,12 +73,13 @@ export async function enviarPushFcm(
   userId: string,
   payload: { title: string; body: string; url?: string; imageUrl?: string },
 ): Promise<void> {
-  const firebaseApp = asegurarApp();
+  const firebaseApp = await asegurarApp();
   if (!firebaseApp) return;
 
   const tokens = await db.select({ token: fcmTokens.token }).from(fcmTokens).where(eq(fcmTokens.userId, userId));
   if (tokens.length === 0) return;
 
+  const { getMessaging } = await import("firebase-admin/messaging");
   const messaging = getMessaging(firebaseApp);
 
   await Promise.all(
