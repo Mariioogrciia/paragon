@@ -8,29 +8,8 @@ import { FRAME_REQUISITOS } from "@/lib/level";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 import { isHandleTaken } from "@/lib/profiles";
-
-const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
-const COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-const IDIOMA_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
-
-function esUrlHttp(valor: string): boolean {
-  if (valor.length > 2048) return false;
-  try {
-    const { protocol } = new URL(valor);
-    return protocol === "https:" || protocol === "http:";
-  } catch {
-    return false;
-  }
-}
-
-function esZonaHoraria(valor: string): boolean {
-  try {
-    new Intl.DateTimeFormat("es-ES", { timeZone: valor });
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { COLOR_RE, HANDLE_RE, IDIOMA_RE, esUrlHttp, esZonaHoraria } from "@/lib/validacionPerfil";
+import { limitar } from "@/lib/rateLimit";
 
 const TEMAS_VALIDOS = ["dark", "light", "oled", "high-contrast"];
 
@@ -39,6 +18,9 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.redirect(new URL("/entrar", request.url));
+    }
+    if (!(await limitar("perfil", session.user.id))) {
+      return NextResponse.redirect(new URL("/ajustes?error=demasiados_intentos", request.url));
     }
 
     const formData = await request.formData();

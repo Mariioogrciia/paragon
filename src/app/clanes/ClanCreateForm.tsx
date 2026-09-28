@@ -44,6 +44,7 @@ export function ClanCreateForm() {
                 <input
                   id="clan-name"
                   name="name"
+                  maxLength={40}
                   type="text"
                   required
                   placeholder="Ej: Cazadores de Sombras"
@@ -70,6 +71,7 @@ export function ClanCreateForm() {
                 <textarea
                   id="clan-description"
                   name="description"
+                  maxLength={300}
                   rows={3}
                   className="mt-1 w-full rounded-xl border border-border bg-surface px-4 py-2"
                 ></textarea>

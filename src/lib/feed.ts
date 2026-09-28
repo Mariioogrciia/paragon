@@ -3,6 +3,7 @@ import { activities, users, games, activityComments, activityReactions, activity
 import { inArray, desc, eq, and, sql } from "drizzle-orm";
 import { listFriends } from "./profiles";
 import { avatarUrlSql } from "@/lib/avatarSql";
+import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 
 /**
  * Reaccionar/quitar reacción a una publicación del Feed — función pura por
@@ -56,9 +57,20 @@ export async function registerActivityView(userId: string, activityId: string): 
  * sobre esto, y `POST /api/mobile/feed/{activityId}/comment` llama directo
  * a lo mismo.
  */
+/** Comentario rechazado por el filtro de lenguaje (lib/contentFilter.ts). */
+export class ComentarioOfensivoError extends Error {
+  constructor() {
+    super("Ese comentario contiene lenguaje ofensivo — cámbialo e inténtalo de nuevo.");
+  }
+}
+
 export async function addActivityComment(userId: string, activityId: string, body: string) {
   const trimmed = body.trim().slice(0, 500);
   if (!trimmed) return null;
+  // Reseñas, guías y perfil ya pasaban por el filtro; los comentarios del
+  // feed no (auditoría, 28 sept 2026). Aquí y no en cada llamada: esto lo
+  // usan tanto la web como /api/mobile.
+  if (contieneLenguajeOfensivo(trimmed)) throw new ComentarioOfensivoError();
 
   const db = getDb();
   const [user] = await db.select({ name: users.name }).from(users).where(eq(users.id, userId)).limit(1);

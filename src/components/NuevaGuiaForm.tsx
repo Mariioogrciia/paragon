@@ -38,6 +38,7 @@ export function NuevaGuiaForm({ gameId }: { gameId: string }) {
       />
       <textarea
         value={texto}
+        maxLength={20000}
         onChange={(e) => setTexto(e.target.value)}
         placeholder={t("NuevaGuiaForm.bodyPlaceholder")}
         className="h-40 w-full resize-none rounded-lg px-3.5 py-2.5 text-sm outline-none"

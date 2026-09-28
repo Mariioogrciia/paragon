@@ -4,17 +4,7 @@ import { cache } from "react";
 import { and, desc, eq, gte, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { db } from "@/db";
-import {
-  activities,
-  friendships,
-  gameTrophies,
-  games as gamesTable,
-  platformAccounts,
-  userGames,
-  userTrophies,
-  users,
-  userBadges,
-} from "@/db/schema";
+import { friendships, gameTrophies, games as gamesTable, platformAccounts, userGames, userTrophies, users, userBadges } from "@/db/schema";
 import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
@@ -991,7 +981,9 @@ export async function refrescarJuego(userId: string, gameId: string): Promise<Re
 export async function saveGameNotes(userId: string, gameId: string, notes: string): Promise<void> {
   await db
     .update(userGames)
-    .set({ notes: notes.trim() || null })
+    // Tope por la misma razón que las guías: sin él, cabía lo que dejara
+    // pasar el cuerpo de la petición.
+    .set({ notes: notes.trim().slice(0, 5_000) || null })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 }
 

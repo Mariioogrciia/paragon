@@ -17,6 +17,7 @@ const ERRORES_PERFIL: Record<string, string> = {
   datos_invalidos:
     "No se ha guardado nada — la imagen, el banner, el color o la zona horaria no tienen un formato válido.",
   update_failed: "No se ha podido guardar. Inténtalo de nuevo en un momento.",
+  demasiados_intentos: "Has guardado muchas veces seguidas. Espera un minuto y vuelve a intentarlo.",
 };
 
 export default async function AjustesGeneralPage(props: { searchParams: Promise<{ error?: string }> }) {

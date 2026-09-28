@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { isHandleTaken, setHandle } from "@/lib/profiles";
+import { HANDLE_RE } from "@/lib/validacionPerfil";
 
 // Misma regla que HANDLE_RE en src/app/actions.ts (chooseHandleAction) —
 // duplicada a propósito, no importada, porque ese archivo es "use server"
 // de la web y no se puede tirar de él desde una API route sin acoplar las
 // dos cosas.
-const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
 
 /**
  * Paso 1 del alta en dos pasos (ver src/app/bienvenida/page.tsx, la versión

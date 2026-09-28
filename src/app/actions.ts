@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, platformAccounts, gameTrophies, leagues, accounts } from "@/db/schema";
+import { users, userGames, activities, platformAccounts, leagues, accounts } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { contieneLenguajeOfensivo, errorSiOfensivo } from "@/lib/contentFilter";
 import { auth, signOut } from "@/auth";
@@ -37,7 +37,7 @@ import {
   unlinkAccount,
 } from "@/lib/profiles";
 import { toggleReservedMilestone } from "@/lib/milestones";
-import { toggleActivityReaction, addActivityComment } from "@/lib/feed";
+import { toggleActivityReaction, addActivityComment, ComentarioOfensivoError } from "@/lib/feed";
 import { createLeague, addLeagueMember, removeLeagueMember, deleteLeague, setLeagueChallenge, acceptLeagueInvite, declineLeagueInvite, NotFriendsError, type LeagueDurationUnit } from "@/lib/leagues";
 import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
@@ -52,6 +52,9 @@ import type { PlataformaVinculable } from "@/lib/types";
 import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 import { setHiddenNavItems } from "@/lib/navPreferences";
+import { COOKIES_SESION, cerrarOtrasSesiones } from "@/lib/mobileAuth";
+import { ipActual, limitar } from "@/lib/rateLimit";
+import { HANDLE_RE } from "@/lib/validacionPerfil";
 
 export interface ActionState {
   error?: string;
@@ -63,7 +66,6 @@ export interface ActionState {
   success?: string;
 }
 
-const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
 
 async function requireUserId(): Promise<string> {
   const session = await auth();
@@ -587,6 +589,18 @@ export async function signOutAction(): Promise<void> {
   await signOut({ redirectTo: "/" });
 }
 
+/** Ver `cerrarOtrasSesiones` en lib/mobileAuth.ts. */
+export async function closeOtherSessionsAction(): Promise<void> {
+  const userId = await requireUserId();
+  const store = await cookies();
+  const tokenActual = COOKIES_SESION.map((nombre) => store.get(nombre)?.value).find(Boolean);
+  // Sin la cookie no se sabe cuál es "esta" sesión: mejor no borrar nada
+  // que cerrar también la del propio navegador sin avisar.
+  if (!tokenActual) return;
+  await cerrarOtrasSesiones(userId, tokenActual);
+  revalidatePath("/ajustes/seguridad");
+}
+
 /**
  * `ConfirmForm` (mismo componente que ya usa `unlinkAccountAction` para las
  * cuentas de plataforma) es un formulario "dispara y olvida": no usa
@@ -621,14 +635,38 @@ export async function deleteAccountAction(): Promise<void> {
   await signOut({ redirectTo: "/" });
 }
 
-export async function rateGameAction(gameId: string, rating: number) {
+/**
+ * Nota de 1 a 5 (entera) o `null` para "sin nota". Auditoría, 28 sept 2026:
+ * antes se guardaba el número tal cual llegara — quitar la nota (RatingStars
+ * manda 0) dejaba un 0 que la media de la comunidad contaba como voto de
+ * cero estrellas, y una petición a mano podía colar un 999 o un -5.
+ */
+function normalizarNota(rating: number): number | null {
+  if (rating === 0) return null;
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) throw new Error("La nota tiene que ser de 1 a 5 estrellas.");
+  return rating;
+}
+
+const RESENA_MAX = 5_000;
+
+export async function rateGameAction(gameId: string, ratingPedido: number) {
   const userId = await requireUserId();
   const db = getDb();
+  const rating = normalizarNota(ratingPedido);
 
   await db
     .update(userGames)
     .set({ rating })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+
+  // Sin nota: fuera también del feed, en vez de quedar "valoró con 0".
+  if (rating === null) {
+    await db
+      .delete(activities)
+      .where(and(eq(activities.userId, userId), eq(activities.gameId, gameId), eq(activities.type, "rating")));
+    revalidatePath("/", "layout");
+    return;
+  }
 
   // Actualiza la actividad de valoración si ya había una para este juego, en
   // vez de insertar otra: `RatingStars` guarda en cada click, así que sin
@@ -662,11 +700,15 @@ export async function writeReviewAction(gameId: string, review: string, dateStr:
   const userId = await requireUserId();
   const db = getDb();
 
+  if (review.length > RESENA_MAX) throw new Error(`La reseña puede tener como mucho ${RESENA_MAX} caracteres.`);
   if (contieneLenguajeOfensivo(review)) {
     throw new Error("Esa reseña contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo.");
   }
 
-  const reviewDate = dateStr ? new Date(dateStr) : null;
+  // Una fecha inválida llegaba a la base como `Invalid Date` y reventaba la
+  // consulta; ahora se ignora (sin fecha) en vez de fallar entera.
+  const fecha = dateStr ? new Date(dateStr) : null;
+  const reviewDate = fecha && !Number.isNaN(fecha.getTime()) ? fecha : null;
 
   await db
     .update(userGames)
@@ -713,6 +755,7 @@ export async function toggleActivityReactionAction(formData: FormData): Promise<
 
 export async function addActivityCommentAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
+  if (!(await limitar("comentario", userId))) return;
   const activityId = String(formData.get("activityId") ?? "");
   // El campo del formulario (ActivityFeed.tsx) se llama "comment", no
   // "body" — leer "body" aquí devolvía siempre null, así que `body` salía
@@ -720,7 +763,13 @@ export async function addActivityCommentAction(formData: FormData): Promise<void
   // insertaba, sin ningún error visible para quien escribía.
   const body = String(formData.get("comment") ?? "");
   if (!activityId) return;
-  await addActivityComment(userId, activityId, body);
+  try {
+    await addActivityComment(userId, activityId, body);
+  } catch (error) {
+    // El formulario del feed es "dispara y olvida" (sin estado de vuelta):
+    // un comentario ofensivo simplemente no se publica.
+    if (!(error instanceof ComentarioOfensivoError)) throw error;
+  }
   revalidatePath("/", "layout");
 }
 
@@ -910,6 +959,10 @@ export async function searchTrophyGuideAction(
   gameId?: string,
   trophyId?: string,
 ) {
+  // Sin sesión a propósito (ver lib/videoGuides.ts), así que el límite va
+  // por usuario si lo hay y si no por IP.
+  const session = await auth();
+  if (!(await limitar("guiaVideo", session?.user?.id ?? await ipActual()))) return null;
   return buscarVideoGuiaTrofeo(gameTitle, trophyName, gameId, trophyId);
 }
 
@@ -920,14 +973,17 @@ export async function searchTrophyGuideAction(
  * todos, no privado de quien lo pide.
  */
 export async function rebuscarVideoGuiaAction(gameId: string, trophyId: string): Promise<string | null> {
-  await requireUserId();
+  const userId = await requireUserId();
+  if (!(await limitar("guiaVideoRebuscar", userId))) return null;
   return rebuscarVideoGuiaTrofeo(gameId, trophyId);
 }
 
-export async function submitExpressReviewAction(gameId: string, rating: number, review: string) {
+export async function submitExpressReviewAction(gameId: string, ratingPedido: number, review: string) {
   const userId = await requireUserId();
   const db = getDb();
+  const rating = normalizarNota(ratingPedido);
 
+  if (review.length > RESENA_MAX) throw new Error(`La reseña puede tener como mucho ${RESENA_MAX} caracteres.`);
   if (contieneLenguajeOfensivo(review)) {
     throw new Error("Esa reseña contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo.");
   }
@@ -1017,13 +1073,23 @@ export async function actualizarContadorManualAction(
 
 /* --------------------------------- Guías escritas --------------------------------- */
 
+const GUIA_MAX_TITULO = 120;
+const GUIA_MAX_TEXTO = 20_000;
+const GUIA_MAX_RESPUESTA = 2_000;
+
 export async function createGuideAction(gameId: string, title: string, body: string): Promise<{ error?: string; id?: string }> {
   const userId = await requireUserId();
+  if (!(await limitar("comentario", userId))) return { error: "Has publicado mucho seguido. Espera un momento." };
 
   const tituloLimpio = title.trim();
   const textoLimpio = body.trim();
   if (!tituloLimpio || !textoLimpio) {
     return { error: "Ponle un título y algo de texto." };
+  }
+  // Sin tope, una guía podía ocupar lo que dejara el cuerpo de la petición
+  // (~1 MB) — y se pinta entera en la página de guías.
+  if (tituloLimpio.length > GUIA_MAX_TITULO || textoLimpio.length > GUIA_MAX_TEXTO) {
+    return { error: `Como mucho ${GUIA_MAX_TITULO} caracteres de título y ${GUIA_MAX_TEXTO} de texto.` };
   }
   if (contieneLenguajeOfensivo(tituloLimpio) || contieneLenguajeOfensivo(textoLimpio)) {
     return { error: "Esa guía contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo." };
@@ -1036,9 +1102,11 @@ export async function createGuideAction(gameId: string, title: string, body: str
 
 export async function replyToGuideAction(guideId: string, gameId: string, body: string): Promise<{ error?: string }> {
   const userId = await requireUserId();
+  if (!(await limitar("comentario", userId))) return { error: "Has respondido mucho seguido. Espera un momento." };
 
   const textoLimpio = body.trim();
   if (!textoLimpio) return { error: "Escribe algo antes de responder." };
+  if (textoLimpio.length > GUIA_MAX_RESPUESTA) return { error: `Como mucho ${GUIA_MAX_RESPUESTA} caracteres.` };
   if (contieneLenguajeOfensivo(textoLimpio)) {
     return { error: "Esa respuesta contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo." };
   }
@@ -1189,7 +1257,7 @@ export async function ponerseAlDiaAction(): Promise<PuestaAlDia> {
 import { syncGameHltb } from "@/lib/hltb";
 
 export async function syncHltbAction(gameId: string, title: string): Promise<void> {
-  const userId = await requireUserId();
+  await requireUserId();
   // Call the HLTB service
   await syncGameHltb(gameId, title);
   revalidatePath("/planificador");

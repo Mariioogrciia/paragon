@@ -14,6 +14,7 @@ export function RespuestaGuiaForm({ guideId, gameId }: { guideId: string; gameId
     <div>
       <textarea
         value={texto}
+        maxLength={2000}
         onChange={(e) => setTexto(e.target.value)}
         placeholder={t("RespuestaGuiaForm.placeholder")}
         className="h-24 w-full resize-none rounded-lg px-3.5 py-2.5 text-sm outline-none"

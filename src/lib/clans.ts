@@ -19,7 +19,16 @@ export async function createClan(
   tag: string,
   description: string
 ) {
-  // Aquí asumo que ya se validó que el usuario es nivel 5 en la ruta de API/Action
+  // El nivel 5 lo comprueban quienes llaman (clanes/actions.ts y
+  // /api/mobile/clans), cada uno con su propio mensaje de error.
+  name = name.trim();
+  tag = tag.trim();
+  description = description.trim();
+  // La etiqueta va en la URL (/clanes/[tag]): un "/" o un espacio la
+  // rompían. Nombre y descripción, con tope (antes sin límite).
+  if (!/^[A-Za-z0-9]{2,5}$/.test(tag)) throw new Error("La etiqueta tiene que tener de 2 a 5 letras o números.");
+  if (name.length < 3 || name.length > 40) throw new Error("El nombre del clan tiene que tener entre 3 y 40 caracteres.");
+  if (description.length > 300) throw new Error("La descripción puede tener como mucho 300 caracteres.");
   const nombreOfensivo = errorSiOfensivo(name);
   if (nombreOfensivo) throw new Error(nombreOfensivo);
   const tagOfensivo = errorSiOfensivo(tag);
