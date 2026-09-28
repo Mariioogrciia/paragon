@@ -7,6 +7,9 @@ import { syncGameTrophies } from "@/lib/sync";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { HORAS_CADUCIDAD, HORAS_CADUCIDAD_XBOX } from "@/lib/syncHealth";
 import { cerrarLigaMensualSiToca, cerrarLigasPrivadasVencidas } from "@/lib/trophyCase";
+import { comprobarAlertasPrecio } from "@/lib/priceAlerts";
+import { enviarResumenesSemanales } from "@/lib/resumenSemanal";
+import { cerrarGuerrasVencidas } from "@/lib/clanWars";
 
 /**
  * Sincronización desatendida.
@@ -373,6 +376,29 @@ export async function GET(request: Request) {
   // crecería para siempre. Un DELETE barato (unos pocos miles de filas hoy),
   // corre siempre, incluso si `agotado` — es independiente del resto y no
   // vale la pena dejarlo para la pasada siguiente.
+  // Alertas de precio (lib/priceAlerts.ts): unas pocas por pasada, con el
+  // tiempo que sobre. Cada una es una llamada a Steam (cacheada 1 h), así
+  // que con el cron cada 10 min cada alerta se revisa varias veces al día.
+  let avisosPrecio = 0;
+  if (!agotado) {
+    try {
+      avisosPrecio = await comprobarAlertasPrecio(arranque + PRESUPUESTO_MS - MARGEN_MS / 2);
+    } catch (error) {
+      console.error("[cron-sync] alertas de precio", error);
+    }
+  }
+
+  // Resumen semanal por Discord (lib/resumenSemanal.ts): solo hace algo los
+  // domingos por la tarde, unos pocos usuarios por pasada.
+  let resumenesSemanales = 0;
+  if (!agotado) {
+    try {
+      resumenesSemanales = await enviarResumenesSemanales(arranque + PRESUPUESTO_MS - MARGEN_MS / 2);
+    } catch (error) {
+      console.error("[cron-sync] resumen semanal", error);
+    }
+  }
+
   const RETENCION_SYNC_RUN_DIAS = 30;
   let borrados = 0;
 
@@ -409,9 +435,14 @@ export async function GET(request: Request) {
   // nada) y el plan Hobby de Vercel no da crons ilimitados. Va siempre,
   // incluso con `agotado`: no toca ninguna API externa, solo la propia base.
   let premiosLigaMensual = 0;
+  let guerrasCerradas = 0;
   let premiosLigasPrivadas = 0;
   try {
     premiosLigaMensual = await cerrarLigaMensualSiToca();
+    guerrasCerradas = await cerrarGuerrasVencidas().catch((error) => {
+      console.error("[cron-sync] guerras de clanes", error);
+      return 0;
+    });
     premiosLigasPrivadas = await cerrarLigasPrivadasVencidas();
   } catch (error) {
     console.error("[cron-sync] palmarés", error);
@@ -423,6 +454,9 @@ export async function GET(request: Request) {
     fichasRellenadas: detalles,
     clasificacionesPegi: clasificados,
     syncRunBorrados: borrados,
+    avisosPrecio,
+    guerrasCerradas,
+    resumenesSemanales,
     premiosLigaMensual,
     premiosLigasPrivadas,
     pendientesPorTiempo: agotado,

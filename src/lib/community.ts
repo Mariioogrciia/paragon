@@ -304,3 +304,52 @@ export async function ownsGame(userId: string, gameId: string): Promise<string |
 
   return row?.specificId ?? null;
 }
+
+export interface MiProgreso {
+  progressPercent: number;
+  earnedTotal: number;
+  definedTotal: number;
+  platinoDefinido: boolean;
+  platinoConseguido: boolean;
+  playtimeMinutes: number | null;
+  lastPlayedAt: Date | null;
+}
+
+/**
+ * Tu progreso en ESTE juego (el id específico que posees, ver `ownsGame`),
+ * para la tarjeta "Tu progreso" de la ficha global — antes solo había un
+ * botón "Ver ficha" sin ningún dato.
+ */
+export async function getMiProgreso(userId: string, gameIdEspecifico: string): Promise<MiProgreso | null> {
+  const [fila] = await db
+    .select({
+      progressPercent: userGames.progressPercent,
+      earnedTotal: userGames.earnedTotal,
+      earned: userGames.earned,
+      playtimeMinutes: userGames.playtimeMinutes,
+      lastPlayedAt: userGames.lastPlayedAt,
+      definedTotal: gamesTable.definedTotal,
+      defined: gamesTable.defined,
+      platform: gamesTable.platform,
+    })
+    .from(userGames)
+    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
+    .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameIdEspecifico)))
+    .limit(1);
+  if (!fila) return null;
+
+  // Steam no tiene platino: el "platino equivalente" es el 100%, igual que
+  // en el resto de la app (lib/stats.ts, esPlatinoEquivalente).
+  const platinoDefinido = fila.platform === "steam" ? fila.definedTotal > 0 : (fila.defined?.platinum ?? 0) > 0;
+  const platinoConseguido = fila.platform === "steam" ? fila.progressPercent === 100 : (fila.earned?.platinum ?? 0) > 0;
+
+  return {
+    progressPercent: fila.progressPercent,
+    earnedTotal: fila.earnedTotal,
+    definedTotal: fila.definedTotal,
+    platinoDefinido,
+    platinoConseguido,
+    playtimeMinutes: fila.playtimeMinutes,
+    lastPlayedAt: fila.lastPlayedAt,
+  };
+}

@@ -53,13 +53,33 @@
     "verSuFicha": "Ver su ficha →",
     "juegosSimilares": "Juegos similares",
     "dondeComprarlo": "Dónde comprarlo",
-    "minimoHistorico": "Mínimo histórico: {precio} €",
+    "minimoHistorico": "Mínimo histórico: {precio} US$",
     "masBarato": "Más barato",
-    "preciosDisclaimer": "Precios vía CheapShark; pueden no incluir región ni impuestos. La oferta de Steam abre su ficha directamente",
+    "preciosDisclaimer": "Precios en dólares de tiendas de EE. UU., vía CheapShark; pueden no incluir impuestos. La oferta de Steam abre su ficha directamente",
     "preciosDisclaimerSufijoCheapShark": "; el resto pasa por la redirección de CheapShark, que es lo único que publica su API.",
     "preciosDisclaimerSufijoSolo": ".",
     "precioTiempo": "Precio a lo largo del tiempo",
-    "historicoViaITAD": "Histórico vía IsThereAnyDeal."
+    "historicoViaITAD": "Histórico vía IsThereAnyDeal.",
+    "miProgreso": {
+      "titulo": "Tu progreso",
+      "trofeos": "{conseguidos} de {total} trofeos",
+      "faltan": "{n, plural, =0 {¡Lo tienes todo!} one {Te falta # trofeo} other {Te faltan # trofeos}}",
+      "platino": "Platino conseguido",
+      "sinPlatino": "Platino pendiente",
+      "horas": "{horas} h jugadas",
+      "ultimaVez": "Última vez: {cuando}"
+    },
+    "alertaPrecio": {
+      "titulo": "Precio en Steam España",
+      "gratis": "No está a la venta en Steam ahora mismo.",
+      "avisame": "Avísame cuando baje de",
+      "guardar": "Crear alerta",
+      "quitar": "Quitar alerta",
+      "activa": "Te avisaremos cuando baje de {precio}.",
+      "conSesion": "Entra para crear una alerta de precio.",
+      "invalido": "Pon un precio entre 0,01 y 999 €.",
+      "ayuda": "Te llega por notificación y, si lo tienes activado, por Discord."
+    }
   },
   "GuiasPage": {
     "titulo": "Guías",

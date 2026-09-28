@@ -55,6 +55,8 @@ import { setHiddenNavItems } from "@/lib/navPreferences";
 import { COOKIES_SESION, cerrarOtrasSesiones } from "@/lib/mobileAuth";
 import { ipActual, limitar } from "@/lib/rateLimit";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
+import { borrarAlertaPrecio, guardarAlertaPrecio } from "@/lib/priceAlerts";
+import { setObjetivoFecha } from "@/lib/goals";
 
 export interface ActionState {
   error?: string;
@@ -1445,4 +1447,44 @@ export async function setLeagueChallengeAction(formData: FormData): Promise<void
 
   await setLeagueChallenge(leagueId, userId, gameId || null);
   revalidatePath(`/ligas/${leagueId}`);
+}
+
+/* ---------------------------------- Alertas de precio --------------------------------- */
+
+/** Ver lib/priceAlerts.ts. `precio` en euros (Steam España). */
+export async function guardarAlertaPrecioAction(
+  steamAppId: string,
+  gameId: string,
+  titulo: string,
+  precio: number,
+): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  if (!/^\d{1,10}$/.test(steamAppId) || !gameId || gameId.length > 100) return { error: "Juego no válido." };
+  if (!Number.isFinite(precio) || precio < 0.01 || precio > 999) return { error: "Pon un precio entre 0,01 y 999 €." };
+  await guardarAlertaPrecio(userId, {
+    steamAppId,
+    gameId,
+    titulo: titulo.trim().slice(0, 120) || "Tu juego",
+    precioObjetivo: Math.round(precio * 100) / 100,
+  });
+  revalidatePath(`/juego/${gameId}`);
+  return {};
+}
+
+export async function borrarAlertaPrecioAction(steamAppId: string, gameId: string): Promise<void> {
+  const userId = await requireUserId();
+  await borrarAlertaPrecio(userId, steamAppId);
+  revalidatePath(`/juego/${gameId}`);
+}
+
+/* ---------------------------------- Objetivos con fecha --------------------------------- */
+
+/** Ver lib/goals.ts. `fecha` en ISO de día ("2026-10-31") o `null` para quitarla. */
+export async function setObjetivoFechaAction(gameId: string, fecha: string | null): Promise<void> {
+  const userId = await requireUserId();
+  if (fecha !== null && (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || Number.isNaN(new Date(fecha).getTime()))) return;
+  // Solo juegos de su propia biblioteca: `ownsGame` con el id específico.
+  if (!(await ownsGame(userId, gameId))) return;
+  await setObjetivoFecha(userId, gameId, fecha);
+  revalidatePath("/planificador");
 }

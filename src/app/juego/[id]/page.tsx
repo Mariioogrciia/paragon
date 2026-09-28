@@ -8,7 +8,7 @@ import { CommunityDifficulty } from "@/components/CommunityDifficulty";
 import { Stars } from "@/components/Stars";
 import { StatTile } from "@/components/StatTile";
 import { relativeDate } from "@/lib/design";
-import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame, getGameTrophyBreakdown } from "@/lib/community";
+import { getGlobalGame, getGlobalGameStats, getGameReviews, ownsGame, getGameTrophyBreakdown, getMiProgreso, type MiProgreso } from "@/lib/community";
 import { getCommunityRating } from "@/lib/ratings";
 import { getDificultadComunidad, getMiVoto } from "@/lib/communityDifficulty";
 import { getProfileByUserId } from "@/lib/profiles";
@@ -33,6 +33,10 @@ import { BackButton } from "@/components/BackButton";
 import { GameWishlistCard } from "@/components/GameWishlistCard";
 import { CollectionPicker } from "@/components/Collections";
 import { listCollections } from "@/lib/collections";
+import { TrophyIcon } from "@/components/TrophyIcon";
+import { AlertaPrecio } from "@/components/AlertaPrecio";
+import { precioSteamEs } from "@/lib/steamPrecio";
+import { getAlertaPrecio } from "@/lib/priceAlerts";
 
 /**
  * La IMAGEN de la tarjeta social la pone sola `opengraph-image.tsx` (misma
@@ -105,13 +109,19 @@ export default async function JuegoGlobalPage({
   // después del Promise.all de arriba, no dentro.
   const steamAppId = game.steamId ?? extraerSteamAppId(detalles?.websites);
 
-  const [precios, historicoPrecios] = await Promise.all([
+  const [precios, historicoPrecios, precioSteam, alertaPrecio] = await Promise.all([
     // Buscamos ofertas si sabemos el ID de Steam
     steamAppId ? comparativaPreciosSteam(steamAppId) : Promise.resolve(null),
     // Histórico de precio a lo largo del tiempo (ITAD) — devuelve [] en
     // silencio si falta ITAD_API_KEY o no hay AppID de Steam, igual que el
     // resto de integraciones opcionales.
     steamAppId ? historicoPreciosSteam(steamAppId) : Promise.resolve([]),
+    // Precio real en euros (Steam España) para la tarjeta de alerta de
+    // precio: el de CheapShark de arriba es en dólares de EE. UU.
+    steamAppId ? precioSteamEs(steamAppId) : Promise.resolve(null),
+    steamAppId && session?.user?.id
+      ? getAlertaPrecio(session.user.id, steamAppId).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   let miFicha: string | null = null;
@@ -120,6 +130,7 @@ export default async function JuegoGlobalPage({
   // numérico y la biblioteca (`/u/[handle]/[gameId]`) espera el namespaced.
   let miGameId: string | null = null;
   let miVotoDificultad: number | null = null;
+  let miProgreso: MiProgreso | null = null;
   // Las carpetas son propias de quien mira, no del juego — solo hace falta
   // pedirlas cuando de verdad hay sesión, igual que el resto de este bloque.
   let carpetas: Awaited<ReturnType<typeof listCollections>> = [];
@@ -132,6 +143,7 @@ export default async function JuegoGlobalPage({
       listCollections(session.user.id),
     ]);
     if (profile?.handle && miGameId) miFicha = `/u/${profile.handle}/${miGameId}`;
+    if (miGameId) miProgreso = await getMiProgreso(session.user.id, miGameId);
   }
   const tieneJuego = miGameId !== null;
 
@@ -371,6 +383,40 @@ export default async function JuegoGlobalPage({
       </div>
 
       <div className="flex flex-col gap-9">
+        {miProgreso && (
+          <div className="flex flex-col gap-3 rounded-2xl p-5" style={{ border: "1px solid rgb(var(--accent-rgb) / 0.35)", background: "linear-gradient(var(--surface), rgb(var(--accent-rgb) / 0.06))" }}>
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 className="font-heading text-lg font-bold">{t("miProgreso.titulo")}</h2>
+              <span className="font-heading text-2xl font-bold tabular-nums">{miProgreso.progressPercent}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-surface-2">
+              <div className="h-full rounded-full" style={{ width: `${miProgreso.progressPercent}%`, background: "var(--accent-grad)" }} />
+            </div>
+            <p className="text-sm">
+              {t("miProgreso.trofeos", { conseguidos: miProgreso.earnedTotal, total: miProgreso.definedTotal })}
+              {" · "}
+              <span className="text-muted">{t("miProgreso.faltan", { n: Math.max(0, miProgreso.definedTotal - miProgreso.earnedTotal) })}</span>
+            </p>
+            {miProgreso.platinoDefinido && (
+              <p className="flex items-center gap-2 text-xs font-bold" style={{ color: miProgreso.platinoConseguido ? "var(--platinum)" : "var(--muted)" }}>
+                <TrophyIcon grade="platinum" size={14} />
+                {miProgreso.platinoConseguido ? t("miProgreso.platino") : t("miProgreso.sinPlatino")}
+              </p>
+            )}
+            {(miProgreso.playtimeMinutes || miProgreso.lastPlayedAt) && (
+              <p className="text-xs text-muted">
+                {miProgreso.playtimeMinutes ? t("miProgreso.horas", { horas: Math.round(miProgreso.playtimeMinutes / 60) }) : null}
+                {miProgreso.playtimeMinutes && miProgreso.lastPlayedAt ? " · " : null}
+                {miProgreso.lastPlayedAt ? t("miProgreso.ultimaVez", { cuando: relativeDate(miProgreso.lastPlayedAt, idioma) ?? "" }) : null}
+              </p>
+            )}
+            {miFicha && (
+              <Link href={miFicha} className="text-xs font-bold uppercase tracking-wide text-accent hover:underline">
+                {t("verFicha")} →
+              </Link>
+            )}
+          </div>
+        )}
         <div className="flex flex-col gap-4 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
           <CommunityRating rating={rating} />
           <div className="h-px w-full bg-border/50" />
@@ -407,6 +453,17 @@ export default async function JuegoGlobalPage({
           />
         )}
 
+        {steamAppId && (
+          <AlertaPrecio
+            steamAppId={steamAppId}
+            gameId={game.id}
+            titulo={game.title}
+            precio={precioSteam}
+            alerta={alertaPrecio?.precioObjetivo ?? null}
+            conSesion={Boolean(session?.user?.id)}
+          />
+        )}
+
         {/* Al final de la columna a propósito: es la última pieza que se
             consulta, no la primera decisión — valoración, dificultad, logros
             y especificaciones van antes. */}
@@ -434,7 +491,11 @@ export default async function JuegoGlobalPage({
                       tener que leer el nombre de cada fila. */}
                   <SiteIcon label={oferta.tienda} size={14} />
                   <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{oferta.tienda}</span>
-                  <span className="shrink-0 font-heading text-sm font-bold">{oferta.precio.toFixed(2)} €</span>
+                  {/* Dólares, no euros: CheapShark solo da precios de tiendas de EE. UU.
+                      (comprobado contra Steam: coinciden con `cc=us`, no con
+                      `cc=es`). Antes se pintaban con "€" y en juegos como The
+                      Witcher 3 (39,99 $ frente a 49,99 €) el precio era falso. */}
+                  <span className="shrink-0 font-heading text-sm font-bold">{oferta.precio.toFixed(2)} US$</span>
                   {i === 0 && (
                     <span
                       className="shrink-0 rounded-full px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-[0.05em]"

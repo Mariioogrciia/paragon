@@ -53,13 +53,33 @@
     "verSuFicha": "Deren Seite ansehen →",
     "juegosSimilares": "Ähnliche Spiele",
     "dondeComprarlo": "Wo man es kaufen kann",
-    "minimoHistorico": "Historisches Tief: {precio} €",
+    "minimoHistorico": "Historisches Tief: {precio} US$",
     "masBarato": "Günstigster Preis",
-    "preciosDisclaimer": "Preise via CheapShark; enthalten möglicherweise keine Region oder Steuern. Das Steam-Angebot öffnet direkt dessen Seite",
+    "preciosDisclaimer": "Preise in US-Dollar aus US-Shops, via CheapShark; eventuell ohne Steuern. Das Steam-Angebot öffnet direkt dessen Seite",
     "preciosDisclaimerSufijoCheapShark": "; der Rest läuft über die Weiterleitung von CheapShark, die einzige, die deren API veröffentlicht.",
     "preciosDisclaimerSufijoSolo": ".",
     "precioTiempo": "Preisverlauf",
-    "historicoViaITAD": "Verlauf via IsThereAnyDeal."
+    "historicoViaITAD": "Verlauf via IsThereAnyDeal.",
+    "miProgreso": {
+      "titulo": "Dein Fortschritt",
+      "trofeos": "{conseguidos} von {total} Trophäen",
+      "faltan": "{n, plural, =0 {Du hast alles!} one {Noch # Trophäe} other {Noch # Trophäen}}",
+      "platino": "Platin erhalten",
+      "sinPlatino": "Platin ausstehend",
+      "horas": "{horas} Std. gespielt",
+      "ultimaVez": "Zuletzt: {cuando}"
+    },
+    "alertaPrecio": {
+      "titulo": "Preis bei Steam Spanien",
+      "gratis": "Derzeit nicht bei Steam erhältlich.",
+      "avisame": "Benachrichtige mich unter",
+      "guardar": "Alarm erstellen",
+      "quitar": "Alarm entfernen",
+      "activa": "Wir melden uns, wenn es unter {precio} fällt.",
+      "conSesion": "Melde dich an, um einen Preisalarm zu erstellen.",
+      "invalido": "Gib einen Preis zwischen 0,01 und 999 € ein.",
+      "ayuda": "Du bekommst eine Benachrichtigung und, falls aktiviert, eine Discord-DM."
+    }
   },
   "GuiasPage": {
     "titulo": "Anleitungen",
