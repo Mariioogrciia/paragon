@@ -19,7 +19,10 @@
     "statCompletadoMedio": "Completado medio",
     "verEstadisticas": "Ver estadísticas completas →",
     "favoritosTitulo": "Juegos Favoritos",
-    "favoritosVacio": "Aún no has fijado tus juegos favoritos."
+    "favoritosVacio": "Aún no has fijado tus juegos favoritos.",
+    "compartir": "Compartir",
+    "enlaceCopiado": "Enlace copiado",
+    "compartirTexto": "Mira el perfil de trofeos de {nombre} en Paragon"
   },
   "EstadisticasPage": {
     "meta": "Estadísticas de @{handle} · Paragon",

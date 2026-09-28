@@ -499,5 +499,12 @@
     "s6": "Pour savoir quelles données personnelles sont traitées et pourquoi, consulte la <privacidadLink>Politique de Confidentialité</privacidadLink> et les <terminosLink>Conditions Générales</terminosLink>.",
     "s6privacidadLink": "Politique de Confidentialité",
     "s6terminosLink": "Conditions Générales"
+  },
+  "NoEncontrado": {
+    "titulo": "Rien par ici",
+    "texto": "Cette page, ce profil ou ce jeu n'existe pas (ou plus). Vérifie le lien, ou essaie plutôt :",
+    "inicio": "Accueil",
+    "descubrir": "Découvrir des jeux",
+    "ejemplo": "Voir un profil d'exemple"
   }
 }

@@ -499,5 +499,12 @@
     "s6": "To see what personal data is processed and why, check the <privacidadLink>Privacy Policy</privacidadLink> and the <terminosLink>Terms and Conditions</terminosLink>.",
     "s6privacidadLink": "Privacy Policy",
     "s6terminosLink": "Terms and Conditions"
+  },
+  "NoEncontrado": {
+    "titulo": "Nothing here",
+    "texto": "That page, profile or game doesn't exist (or no longer does). Check the link, or try one of these:",
+    "inicio": "Go home",
+    "descubrir": "Discover games",
+    "ejemplo": "See a sample profile"
   }
 }

@@ -19,7 +19,10 @@
     "statCompletadoMedio": "Complétion moy.",
     "verEstadisticas": "Voir toutes les stats →",
     "favoritosTitulo": "Jeux favoris",
-    "favoritosVacio": "Tu n'as encore épinglé aucun jeu favori."
+    "favoritosVacio": "Tu n'as encore épinglé aucun jeu favori.",
+    "compartir": "Partager",
+    "enlaceCopiado": "Lien copié",
+    "compartirTexto": "Découvre le profil de trophées de {nombre} sur Paragon"
   },
   "EstadisticasPage": {
     "meta": "Statistiques de @{handle} · Paragon",

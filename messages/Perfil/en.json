@@ -19,7 +19,10 @@
     "statCompletadoMedio": "Avg. completion",
     "verEstadisticas": "See full stats →",
     "favoritosTitulo": "Favorite Games",
-    "favoritosVacio": "You haven't pinned any favorite games yet."
+    "favoritosVacio": "You haven't pinned any favorite games yet.",
+    "compartir": "Share",
+    "enlaceCopiado": "Link copied",
+    "compartirTexto": "Check out {nombre}'s trophy profile on Paragon"
   },
   "EstadisticasPage": {
     "meta": "Stats for @{handle} · Paragon",

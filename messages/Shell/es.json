@@ -499,5 +499,12 @@
     "s6": "Para saber qué datos personales se tratan y con qué finalidad, mira la <privacidadLink>Política de Privacidad</privacidadLink> y los <terminosLink>Términos y Condiciones</terminosLink>.",
     "s6privacidadLink": "Política de Privacidad",
     "s6terminosLink": "Términos y Condiciones"
+  },
+  "NoEncontrado": {
+    "titulo": "Aquí no hay nada",
+    "texto": "Esa página, perfil o juego no existe (o ya no). Revisa el enlace, o sigue por aquí:",
+    "inicio": "Ir al inicio",
+    "descubrir": "Descubrir juegos",
+    "ejemplo": "Ver un perfil de ejemplo"
   }
 }

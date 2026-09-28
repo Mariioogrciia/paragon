@@ -19,7 +19,10 @@
     "statCompletadoMedio": "Ø Abschluss",
     "verEstadisticas": "Alle Statistiken ansehen →",
     "favoritosTitulo": "Lieblingsspiele",
-    "favoritosVacio": "Du hast noch keine Lieblingsspiele festgelegt."
+    "favoritosVacio": "Du hast noch keine Lieblingsspiele festgelegt.",
+    "compartir": "Teilen",
+    "enlaceCopiado": "Link kopiert",
+    "compartirTexto": "Sieh dir das Trophäenprofil von {nombre} auf Paragon an"
   },
   "EstadisticasPage": {
     "meta": "Statistiken von @{handle} · Paragon",

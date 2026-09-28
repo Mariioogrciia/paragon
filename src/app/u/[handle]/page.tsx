@@ -39,6 +39,7 @@ import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
 import { getUserClan } from "@/lib/clans";
+import { CompartirPerfil } from "@/components/CompartirPerfil";
 
 
 function hexToRgb(hex: string) {
@@ -405,16 +406,18 @@ export default async function PerfilPage({
 
           <Link
             href={`/u/${handle}/cv`}
-            className={`${esMio ? "ml-auto" : ""} rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold`}
+            className={`${esMio ? "ml-auto" : ""} rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold transition-all hover:-translate-y-0.5 hover:border-accent hover:text-[var(--accent-text)]`}
             style={{ border: "1px solid var(--border)", color: "var(--foreground)" }}
           >
             {t("PerfilPage.hojaDeServicios")}
           </Link>
 
+          <CompartirPerfil handle={handle} nombre={player.name} />
+
           {!esMio && (
             <Link
               href={`/comparar/${handle}`}
-              className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background"
+              className="rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)]"
               style={{ background: "var(--accent-grad)" }}
             >
               {t("PerfilPage.compararConmigo")}

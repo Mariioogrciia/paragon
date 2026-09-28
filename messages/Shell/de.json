@@ -499,5 +499,12 @@
     "s6": "Um zu erfahren, welche personenbezogenen Daten verarbeitet werden und wofür, sieh dir die <privacidadLink>Datenschutzerklärung</privacidadLink> und die <terminosLink>Allgemeine Geschäftsbedingungen</terminosLink> an.",
     "s6privacidadLink": "Datenschutzerklärung",
     "s6terminosLink": "Allgemeine Geschäftsbedingungen"
+  },
+  "NoEncontrado": {
+    "titulo": "Hier ist nichts",
+    "texto": "Diese Seite, dieses Profil oder Spiel gibt es nicht (mehr). Prüfe den Link oder versuch es hier:",
+    "inicio": "Zur Startseite",
+    "descubrir": "Spiele entdecken",
+    "ejemplo": "Beispielprofil ansehen"
   }
 }
