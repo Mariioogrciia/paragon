@@ -106,6 +106,14 @@
       "title": "Abmelden",
       "description": "Beendet die aktuelle Sitzung in diesem Browser. Du musst dich beim nächsten Mal erneut anmelden.",
       "button": "Abmelden"
+    },
+    "sessions": {
+      "title": "Offene Sitzungen",
+      "description": "{n, plural, =1 {Das ist deine einzige offene Sitzung.} other {Du hast # offene Sitzungen: dieser Browser, andere Browser, die Android-App oder die PSN-Erweiterung.}}",
+      "button": "Auf allen anderen Geräten abmelden",
+      "confirmTitle": "Andere Sitzungen schließen?",
+      "confirmMessage": "Paragon wird in allen anderen Browsern, in der Android-App und in der PSN-Erweiterung abgemeldet. Dieser Browser bleibt angemeldet.",
+      "confirmLabel": "Ja, schließen"
     }
   },
   "forms": {

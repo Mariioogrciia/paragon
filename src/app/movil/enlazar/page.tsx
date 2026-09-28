@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
-import { mintMobileSession } from "@/lib/mobileAuth";
+import { COOKIES_SESION, mintMobileSession } from "@/lib/mobileAuth";
 import { getTranslations } from "next-intl/server";
 
 /**
@@ -10,7 +10,7 @@ import { getTranslations } from "next-intl/server";
  * en la tabla `session` — el nombre cambia entre local (http) y producción
  * (https, con el prefijo `__Secure-`).
  */
-const COOKIE_NAMES = ["__Secure-authjs.session-token", "authjs.session-token"];
+const COOKIE_NAMES = COOKIES_SESION;
 
 /**
  * Puente entre el login (Google/Discord, sin contraseña) y la app nativa de

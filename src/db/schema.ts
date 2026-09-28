@@ -980,3 +980,15 @@ export const clanInvites = pgTable("clan_invite", {
   primaryKey({ columns: [t.clanId, t.invitedUserId] }),
   index("clan_invite_invitedUserId_idx").on(t.invitedUserId),
 ]);
+
+/**
+ * Contadores del limitador de peticiones (lib/rateLimit.ts): una fila por
+ * clave (`<acción>:<usuario o IP>`), ventana fija. Tabla creada con
+ * `scripts/crear-tabla-rate-limit.mts` (SQL explícito, no `db:push`); el
+ * cron borra las filas viejas.
+ */
+export const rateLimits = pgTable("rate_limit", {
+  clave: text("clave").primaryKey(),
+  ventana: timestamp("ventana", { mode: "date" }).notNull().defaultNow(),
+  cuenta: integer("cuenta").notNull().default(1),
+});

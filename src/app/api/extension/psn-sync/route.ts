@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { linkPsnWithOwnToken, PlatformAccountAlreadyLinkedError } from "@/lib/profiles";
 import { PsnAuthError } from "@/lib/psn/auth";
+import { limitar } from "@/lib/rateLimit";
 
 /**
  * Sincroniza PSN con la sesión del propio usuario, leída por la extensión
@@ -21,6 +22,9 @@ export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado — vuelve a conectar la extensión." }, { status: 401 });
+  }
+  if (!(await limitar("psnExtension", userId))) {
+    return NextResponse.json({ error: "Ya has sincronizado hace un momento. Prueba dentro de unos minutos." }, { status: 429 });
   }
 
   const body = await req.json().catch(() => null);

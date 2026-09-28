@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, gt } from "drizzle-orm";
+import { and, count, eq, gt, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 
@@ -86,4 +86,30 @@ export async function mintExtensionSession(userId: string): Promise<string> {
   });
 
   return token;
+}
+
+/** Nombres de la cookie de sesión de Auth.js (con y sin HTTPS). */
+export const COOKIES_SESION = ["__Secure-authjs.session-token", "authjs.session-token"];
+
+/** Sesiones sin caducar de un usuario: navegadores, app Android y extensión. */
+export async function contarSesionesActivas(userId: string): Promise<number> {
+  const [fila] = await db
+    .select({ n: count() })
+    .from(sessions)
+    .where(and(eq(sessions.userId, userId), gt(sessions.expires, new Date())));
+  return Number(fila?.n ?? 0);
+}
+
+/**
+ * "Cerrar sesión en los demás dispositivos": borra todas las filas de
+ * `session` del usuario salvo la de este navegador. Incluye la app Android y
+ * la extensión (tokens propios, ver arriba) — antes no había forma de
+ * revocarlas, y /movil/enlazar-extension crea una nueva en cada visita.
+ */
+export async function cerrarOtrasSesiones(userId: string, tokenActual: string): Promise<number> {
+  const borradas = await db
+    .delete(sessions)
+    .where(and(eq(sessions.userId, userId), ne(sessions.sessionToken, tokenActual)))
+    .returning({ token: sessions.sessionToken });
+  return borradas.length;
 }

@@ -106,6 +106,14 @@
       "title": "Se déconnecter",
       "description": "Ferme la session actuelle sur ce navigateur. Tu devras te reconnecter la prochaine fois.",
       "button": "Se déconnecter"
+    },
+    "sessions": {
+      "title": "Sessions ouvertes",
+      "description": "{n, plural, =1 {C'est ta seule session ouverte.} other {Tu as # sessions ouvertes : ce navigateur, d'autres navigateurs, l'app Android ou l'extension PSN.}}",
+      "button": "Se déconnecter des autres appareils",
+      "confirmTitle": "Fermer les autres sessions ?",
+      "confirmMessage": "Paragon sera déconnecté de tous les autres navigateurs, de l'app Android et de l'extension PSN. Ce navigateur reste connecté.",
+      "confirmLabel": "Oui, les fermer"
     }
   },
   "forms": {

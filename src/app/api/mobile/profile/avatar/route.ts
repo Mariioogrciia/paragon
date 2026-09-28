@@ -4,6 +4,7 @@ import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { subirArchivoPerfil } from "@/lib/uploads";
+import { limitar } from "@/lib/rateLimit";
 
 // Mismo bucket "Avatars" y mismo criterio (`avatarPersonalizado: true`, gana
 // a la de PSN/proveedor de login — ver `resolveAvatarUrl` en lib/profiles.ts)
@@ -18,6 +19,9 @@ export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("subida", userId))) {
+    return NextResponse.json({ error: "Demasiadas subidas seguidas. Prueba dentro de unos minutos." }, { status: 429 });
   }
 
   const formData = await req.formData().catch(() => null);

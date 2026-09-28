@@ -4,6 +4,7 @@ import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { subirArchivoPerfil } from "@/lib/uploads";
+import { limitar } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +13,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const userId = session.user.id;
+    if (!(await limitar("subida", userId))) {
+      return NextResponse.json({ error: "Demasiadas subidas seguidas. Prueba dentro de unos minutos." }, { status: 429 });
+    }
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;

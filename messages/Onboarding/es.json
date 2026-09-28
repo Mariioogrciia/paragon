@@ -106,6 +106,14 @@
       "title": "Cerrar sesión",
       "description": "Cierra la sesión actual en este navegador. Tendrás que volver a autenticarte la próxima vez que entres.",
       "button": "Cerrar sesión"
+    },
+    "sessions": {
+      "title": "Sesiones abiertas",
+      "description": "{n, plural, =1 {Solo tienes esta sesión abierta.} other {Tienes # sesiones abiertas: este navegador, otros navegadores, la app de Android o la extensión de PSN.}}",
+      "button": "Cerrar sesión en los demás dispositivos",
+      "confirmTitle": "¿Cerrar las demás sesiones?",
+      "confirmMessage": "Se cerrará Paragon en todos los demás navegadores, en la app de Android y en la extensión de PSN. Este navegador sigue dentro.",
+      "confirmLabel": "Sí, cerrarlas"
     }
   },
   "forms": {

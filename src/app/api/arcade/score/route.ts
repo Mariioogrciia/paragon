@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/db";
 import { arcadeScores, users } from "@/db/schema";
 import { avatarUrlSql } from "@/lib/avatarSql";
+import { limitar } from "@/lib/rateLimit";
 
 const GAME = "cazador";
 // Tope defensivo, no una promesa de "así de lejos se puede llegar de
@@ -76,6 +77,9 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("arcade", session.user.id))) {
+    return NextResponse.json({ error: "Demasiadas partidas seguidas" }, { status: 429 });
   }
 
   const body = await req.json().catch(() => null);

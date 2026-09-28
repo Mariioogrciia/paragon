@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, platformAccounts, syncRuns, userGames, userTrophies } from "@/db/schema";
+import { games, platformAccounts, rateLimits, sessions, syncRuns, userGames, userTrophies } from "@/db/schema";
 import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
-import { getGame, pegiPorTitulo } from "@/lib/igdb/client";
+import { pegiPorTitulo } from "@/lib/igdb/client";
 import { HORAS_CADUCIDAD, HORAS_CADUCIDAD_XBOX } from "@/lib/syncHealth";
 import { cerrarLigaMensualSiToca, cerrarLigasPrivadasVencidas } from "@/lib/trophyCase";
 
@@ -382,6 +382,24 @@ export async function GET(request: Request) {
     borrados = eliminadas.length;
   } catch (error) {
     console.error("[cron-sync] limpieza sync_run", error);
+  }
+
+  // Sesiones caducadas: Auth.js solo borra una al intentar usarla, así que
+  // los tokens de la app Android y de la extensión que nadie vuelve a usar
+  // (ver lib/mobileAuth.ts) se quedaban en `session` para siempre.
+  try {
+    await db.delete(sessions).where(lt(sessions.expires, new Date()));
+  } catch (error) {
+    console.error("[cron-sync] limpieza session", error);
+  }
+
+  // Contadores del limitador (lib/rateLimit.ts): la ventana más larga es de
+  // 10 minutos, así que lo de hace más de un día ya no cuenta para nada.
+  // Falla en silencio si la tabla aún no existe (scripts/crear-tabla-rate-limit.mts).
+  try {
+    await db.delete(rateLimits).where(lt(rateLimits.ventana, new Date(Date.now() - 24 * 60 * 60 * 1000)));
+  } catch {
+    // Sin tabla todavía: nada que limpiar.
   }
 
   // Palmarés: cerrar el mes que acaba de terminar y las ligas privadas

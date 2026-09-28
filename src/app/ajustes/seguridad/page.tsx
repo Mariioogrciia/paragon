@@ -3,7 +3,8 @@ import { auth, signIn } from "@/auth";
 import { getDb } from "@/db";
 import { users, accounts } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { signOutAction, unlinkAuthAccountAction, deleteAccountAction } from "@/app/actions";
+import { signOutAction, unlinkAuthAccountAction, deleteAccountAction, closeOtherSessionsAction } from "@/app/actions";
+import { contarSesionesActivas } from "@/lib/mobileAuth";
 import { getTranslations } from "next-intl/server";
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
 import { GoogleLogo, DiscordLogo } from "@/components/ui/PlatformLogos";
@@ -27,9 +28,10 @@ export default async function AjustesSeguridadPage({
 
   if (!dbUser) redirect("/entrar");
 
-  const userAccounts = await db.query.accounts.findMany({
-    where: eq(accounts.userId, session.user.id),
-  });
+  const [userAccounts, sesionesActivas] = await Promise.all([
+    db.query.accounts.findMany({ where: eq(accounts.userId, session.user.id) }),
+    contarSesionesActivas(session.user.id),
+  ]);
 
   // Solo se ofrece vincular lo que de verdad está configurado en el
   // servidor (mismo criterio que auth.ts al dar de alta los proveedores) y
@@ -139,6 +141,24 @@ export default async function AjustesSeguridadPage({
                 </button>
               </form>
             ))}
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <h2 className="font-semibold mb-2">{t("ajustesSeguridad.sessions.title")}</h2>
+        <p className="text-sm text-muted">{t("ajustesSeguridad.sessions.description", { n: sesionesActivas })}</p>
+        {sesionesActivas > 1 && (
+          <div className="mt-5">
+            <ConfirmForm
+              action={closeOtherSessionsAction}
+              title={t("ajustesSeguridad.sessions.confirmTitle")}
+              message={t("ajustesSeguridad.sessions.confirmMessage")}
+              confirmLabel={t("ajustesSeguridad.sessions.confirmLabel")}
+              triggerClassName="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-6 py-2.5 font-semibold transition-all hover:border-danger/50 hover:text-danger"
+            >
+              {t("ajustesSeguridad.sessions.button")}
+            </ConfirmForm>
           </div>
         )}
       </section>

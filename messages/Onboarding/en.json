@@ -106,6 +106,14 @@
       "title": "Sign out",
       "description": "Sign out of the current session in this browser. You'll need to sign in again next time.",
       "button": "Sign out"
+    },
+    "sessions": {
+      "title": "Open sessions",
+      "description": "{n, plural, =1 {This is your only open session.} other {You have # open sessions: this browser, other browsers, the Android app or the PSN extension.}}",
+      "button": "Sign out of all other devices",
+      "confirmTitle": "Close the other sessions?",
+      "confirmMessage": "Paragon will be signed out on every other browser, the Android app and the PSN extension. This browser stays signed in.",
+      "confirmLabel": "Yes, close them"
     }
   },
   "forms": {
