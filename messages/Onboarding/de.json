@@ -358,5 +358,12 @@
     "epicGamesNote": "Kann schon unter Einstellungen → Spielkonten verknüpft werden. Es gibt noch keine öffentliche Nachrichtenquelle oder Katalog: Die Website blockiert sogar ihren eigenen offiziellen RSS-Feed.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "Kann auf Paragon nicht mehr verknüpft werden (hatte nie eine echte Synchronisierung) — und hat auch keinen öffentlichen Nachrichten-Feed: Die Website bietet kein RSS an."
+  },
+  "firma": {
+    "titulo": "Deine Signatur",
+    "descripcion": "Ein Bild mit deinem Level, deinen Platins und letzten Trophäen, das sich selbst aktualisiert. Füge es in Foren, deine Twitch-Bio oder Discord ein.",
+    "enlace": "Bild",
+    "copiar": "Kopieren",
+    "obs": "Für Streams: Füge in OBS eine „Browserquelle“ mit dem OBS-Link hinzu (480×120). Sie zeigt dein aktuelles Spiel und deine letzte Trophäe und aktualisiert sich selbst."
   }
 }

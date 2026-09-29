@@ -13,7 +13,9 @@
       "planificador": "Planner",
       "clanes": "Clans",
       "inicio": "Home",
-      "comoFunciona": "How it works"
+      "comoFunciona": "How it works",
+      "sesiones": "Sessions",
+      "temporada": "Season"
     },
     "abrirMenu": "Open menu",
     "cerrarMenu": "Close menu",
@@ -506,5 +508,51 @@
     "inicio": "Go home",
     "descubrir": "Discover games",
     "ejemplo": "See a sample profile"
+  },
+  "Sesiones": {
+    "titulo": "Sessions",
+    "subtitulo": "Online trophies as a group: set up a session for that multiplayer trophy or join someone else's. Everyone gets a reminder an hour before.",
+    "nueva": "Set up a session",
+    "juego": "Game",
+    "trofeo": "Trophy or achievement",
+    "trofeoPlaceholder": "e.g. “Blood Pact” or “Win 10 online matches”",
+    "cuando": "When",
+    "plazas": "Spots (not counting you)",
+    "descripcion": "Details (optional)",
+    "descripcionPlaceholder": "Platform, region, mic, requirements…",
+    "crear": "Publish session",
+    "sinJuegos": "You need a game in your library to set up a session.",
+    "proximas": "Upcoming sessions",
+    "vacio": "No sessions scheduled yet. Set up the first one!",
+    "organiza": "Hosted by {nombre}",
+    "plazasLibres": "{libres, plural, =0 {Full} one {# spot left} other {# spots left}}",
+    "apuntarme": "Join",
+    "salirme": "Leave",
+    "cancelar": "Cancel session",
+    "loTienes": "You own it",
+    "empezada": "In progress",
+    "entra": "Sign in to set up or join sessions."
+  },
+  "Temporada": {
+    "titulo": "Season Pass",
+    "nombre": "Season Q{trimestre} · {anio}",
+    "subtitulo": "Every trophy this season earns points and raises your level. {dias} days left; then it resets and your medal stays in your history.",
+    "tuNivel": "Your level",
+    "puntos": "points",
+    "puesto": "#{puesto} of {total} this season",
+    "maximo": "Max level!",
+    "siguiente": "{faltan} points to level {nivel}",
+    "medallas": {
+      "bronce": "Bronze",
+      "plata": "Silver",
+      "oro": "Gold",
+      "platino": "Platinum"
+    },
+    "nivelN": "Lv. {n}",
+    "reglas": "Platinum 100 points, gold 50, silver 25, everything else 10. One level every {puntos} points.",
+    "ranking": "Season ranking",
+    "vacio": "Nobody has scored this season yet.",
+    "anteriores": "Your past seasons",
+    "chip": "Season: level {n}"
   }
 }

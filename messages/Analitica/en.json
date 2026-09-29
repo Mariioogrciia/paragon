@@ -82,6 +82,21 @@
       "tuRitmo": "your pace: {ritmo}/day",
       "vencido": "The date has passed",
       "conseguido": "Done!"
+    },
+    "coop": {
+      "titulo": "Platinum together",
+      "subtitulo": "Games you and a friend both have in progress. Challenge them to finish it together by a date.",
+      "tu": "You",
+      "conQuien": "With {nombre} · by {fecha}",
+      "cumplido": "Done!",
+      "esperando": "Waiting for them to accept.",
+      "aceptar": "Accept",
+      "rechazar": "Decline",
+      "enComun": "In progress with your friends",
+      "proponer": "Challenge {nombre}",
+      "fecha": "Target date",
+      "enviar": "Send",
+      "cancelar": "Cancel"
     }
   },
   "statCharts": {

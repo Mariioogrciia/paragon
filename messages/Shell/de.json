@@ -13,7 +13,9 @@
       "planificador": "Planer",
       "clanes": "Clans",
       "inicio": "Start",
-      "comoFunciona": "So funktioniert's"
+      "comoFunciona": "So funktioniert's",
+      "sesiones": "Sessions",
+      "temporada": "Saison"
     },
     "abrirMenu": "Menü öffnen",
     "cerrarMenu": "Menü schließen",
@@ -506,5 +508,51 @@
     "inicio": "Zur Startseite",
     "descubrir": "Spiele entdecken",
     "ejemplo": "Beispielprofil ansehen"
+  },
+  "Sesiones": {
+    "titulo": "Sessions",
+    "subtitulo": "Online-Trophäen in der Gruppe: Organisiere eine Runde für diese Multiplayer-Trophäe oder tritt einer bei. Alle bekommen eine Stunde vorher eine Erinnerung.",
+    "nueva": "Session organisieren",
+    "juego": "Spiel",
+    "trofeo": "Trophäe oder Erfolg",
+    "trofeoPlaceholder": "z. B. „Blutpakt“ oder „10 Online-Matches gewinnen“",
+    "cuando": "Wann",
+    "plazas": "Plätze (ohne dich)",
+    "descripcion": "Details (optional)",
+    "descripcionPlaceholder": "Plattform, Region, Mikro, Voraussetzungen…",
+    "crear": "Session veröffentlichen",
+    "sinJuegos": "Du brauchst ein Spiel in deiner Bibliothek, um eine Session zu organisieren.",
+    "proximas": "Kommende Sessions",
+    "vacio": "Noch keine Sessions geplant. Organisiere die erste!",
+    "organiza": "Organisiert von {nombre}",
+    "plazasLibres": "{libres, plural, =0 {Voll} one {# Platz frei} other {# Plätze frei}}",
+    "apuntarme": "Teilnehmen",
+    "salirme": "Verlassen",
+    "cancelar": "Session absagen",
+    "loTienes": "Hast du",
+    "empezada": "Läuft",
+    "entra": "Melde dich an, um Sessions zu organisieren oder beizutreten."
+  },
+  "Temporada": {
+    "titulo": "Season Pass",
+    "nombre": "Saison Q{trimestre} · {anio}",
+    "subtitulo": "Jede Trophäe dieser Saison bringt Punkte und hebt dein Level. Noch {dias} Tage; danach geht es von vorn los und deine Medaille bleibt in deinem Verlauf.",
+    "tuNivel": "Dein Level",
+    "puntos": "Punkte",
+    "puesto": "Platz {puesto} von {total} in dieser Saison",
+    "maximo": "Maximales Level!",
+    "siguiente": "{faltan} Punkte bis Level {nivel}",
+    "medallas": {
+      "bronce": "Bronze",
+      "plata": "Silber",
+      "oro": "Gold",
+      "platino": "Platin"
+    },
+    "nivelN": "Lv. {n}",
+    "reglas": "Platin 100 Punkte, Gold 50, Silber 25, alles andere 10. Ein Level alle {puntos} Punkte.",
+    "ranking": "Saison-Rangliste",
+    "vacio": "Diese Saison hat noch niemand Punkte gesammelt.",
+    "anteriores": "Deine früheren Saisons",
+    "chip": "Saison: Level {n}"
   }
 }

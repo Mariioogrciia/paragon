@@ -13,7 +13,9 @@
       "planificador": "Planificador",
       "clanes": "Clanes",
       "inicio": "Inicio",
-      "comoFunciona": "Cómo funciona"
+      "comoFunciona": "Cómo funciona",
+      "sesiones": "Sesiones",
+      "temporada": "Temporada"
     },
     "abrirMenu": "Abrir menú",
     "cerrarMenu": "Cerrar menú",
@@ -506,5 +508,51 @@
     "inicio": "Ir al inicio",
     "descubrir": "Descubrir juegos",
     "ejemplo": "Ver un perfil de ejemplo"
+  },
+  "Sesiones": {
+    "titulo": "Sesiones",
+    "subtitulo": "Trofeos online en grupo: organiza una partida para ese trofeo multijugador o apúntate a la de otro. Os llega un recordatorio una hora antes.",
+    "nueva": "Organizar una sesión",
+    "juego": "Juego",
+    "trofeo": "Trofeo o logro",
+    "trofeoPlaceholder": "p. ej. «Pacto de sangre» o «Ganar 10 partidas online»",
+    "cuando": "Cuándo",
+    "plazas": "Plazas (sin contarte)",
+    "descripcion": "Detalles (opcional)",
+    "descripcionPlaceholder": "Plataforma, región, micro, requisitos…",
+    "crear": "Publicar sesión",
+    "sinJuegos": "Necesitas algún juego en tu biblioteca para organizar una sesión.",
+    "proximas": "Próximas sesiones",
+    "vacio": "No hay ninguna sesión programada. ¡Organiza la primera!",
+    "organiza": "Organiza {nombre}",
+    "plazasLibres": "{libres, plural, =0 {Completa} one {# plaza libre} other {# plazas libres}}",
+    "apuntarme": "Apuntarme",
+    "salirme": "Salirme",
+    "cancelar": "Cancelar sesión",
+    "loTienes": "Lo tienes",
+    "empezada": "En curso",
+    "entra": "Entra para organizar o apuntarte a sesiones."
+  },
+  "Temporada": {
+    "titulo": "Pase de Temporada",
+    "nombre": "Temporada T{trimestre} · {anio}",
+    "subtitulo": "Cada trofeo de esta temporada suma puntos y sube tu nivel. Quedan {dias} días; luego se empieza de cero y tu medalla queda en tu historial.",
+    "tuNivel": "Tu nivel",
+    "puntos": "puntos",
+    "puesto": "{puesto}º de {total} esta temporada",
+    "maximo": "¡Nivel máximo!",
+    "siguiente": "{faltan} puntos para el nivel {nivel}",
+    "medallas": {
+      "bronce": "Bronce",
+      "plata": "Plata",
+      "oro": "Oro",
+      "platino": "Platino"
+    },
+    "nivelN": "Nv. {n}",
+    "reglas": "Platino 100 puntos, oro 50, plata 25, el resto 10. Un nivel cada {puntos} puntos.",
+    "ranking": "Ranking de la temporada",
+    "vacio": "Todavía nadie ha sumado puntos esta temporada.",
+    "anteriores": "Tus temporadas anteriores",
+    "chip": "Temporada: nivel {n}"
   }
 }

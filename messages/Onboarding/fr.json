@@ -358,5 +358,12 @@
     "epicGamesNote": "Déjà reliable depuis Paramètres → Comptes de jeu. Il n'y a aucune source d'actualités ou de catalogue public pour l'instant : son site bloque même son propre flux RSS officiel.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "Ne peut plus être relié sur Paragon (n'a jamais eu de vraie synchronisation) — et n'a pas non plus de flux d'actualités public : son site n'expose pas de RSS."
+  },
+  "firma": {
+    "titulo": "Ta signature",
+    "descripcion": "Une image avec ton niveau, tes platines et tes derniers trophées qui se met à jour toute seule. Colle-la sur les forums, ta bio Twitch ou Discord.",
+    "enlace": "Image",
+    "copiar": "Copier",
+    "obs": "Pour les streams : dans OBS, ajoute une « Source navigateur » avec le lien OBS (480×120). Elle montre ton jeu actuel et ton dernier trophée, et se met à jour toute seule."
   }
 }

@@ -82,6 +82,21 @@
       "tuRitmo": "ton rythme : {ritmo}/jour",
       "vencido": "La date est passée",
       "conseguido": "Réussi !"
+    },
+    "coop": {
+      "titulo": "Platiner ensemble",
+      "subtitulo": "Des jeux que toi et un ami avez en cours. Propose-lui de les finir tous les deux avant une date.",
+      "tu": "Toi",
+      "conQuien": "Avec {nombre} · avant le {fecha}",
+      "cumplido": "Réussi !",
+      "esperando": "En attente de sa réponse.",
+      "aceptar": "Accepter",
+      "rechazar": "Refuser",
+      "enComun": "En cours avec tes amis",
+      "proponer": "Défier {nombre}",
+      "fecha": "Date cible",
+      "enviar": "Envoyer",
+      "cancelar": "Annuler"
     }
   },
   "statCharts": {

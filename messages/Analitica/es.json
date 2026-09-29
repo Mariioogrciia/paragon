@@ -82,6 +82,21 @@
       "tuRitmo": "tu ritmo: {ritmo}/día",
       "vencido": "La fecha ya pasó",
       "conseguido": "¡Conseguido!"
+    },
+    "coop": {
+      "titulo": "Platinar juntos",
+      "subtitulo": "Juegos que tú y un amigo tenéis a medias. Proponle terminarlo los dos antes de una fecha.",
+      "tu": "Tú",
+      "conQuien": "Con {nombre} · antes del {fecha}",
+      "cumplido": "¡Conseguido!",
+      "esperando": "Esperando a que lo acepte.",
+      "aceptar": "Aceptar",
+      "rechazar": "Rechazar",
+      "enComun": "A medias con tus amigos",
+      "proponer": "Proponer reto a {nombre}",
+      "fecha": "Fecha objetivo",
+      "enviar": "Enviar",
+      "cancelar": "Cancelar"
     }
   },
   "statCharts": {

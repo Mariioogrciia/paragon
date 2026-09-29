@@ -82,6 +82,21 @@
       "tuRitmo": "dein Tempo: {ritmo}/Tag",
       "vencido": "Das Datum ist vorbei",
       "conseguido": "Geschafft!"
+    },
+    "coop": {
+      "titulo": "Gemeinsam platinieren",
+      "subtitulo": "Spiele, die du und ein Freund gerade spielt. Schlag vor, sie gemeinsam bis zu einem Datum abzuschließen.",
+      "tu": "Du",
+      "conQuien": "Mit {nombre} · bis {fecha}",
+      "cumplido": "Geschafft!",
+      "esperando": "Wartet auf Zusage.",
+      "aceptar": "Annehmen",
+      "rechazar": "Ablehnen",
+      "enComun": "Gemeinsam in Arbeit",
+      "proponer": "{nombre} herausfordern",
+      "fecha": "Zieldatum",
+      "enviar": "Senden",
+      "cancelar": "Abbrechen"
     }
   },
   "statCharts": {

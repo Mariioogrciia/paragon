@@ -457,5 +457,22 @@
   },
   "DescargarPdfButton": {
     "descargar": "Als PDF herunterladen"
+  },
+  "Vitrinas": {
+    "titulo": "Profil-Vitrinen",
+    "descripcion": "Benannte Sammlungen auf deinem Profil: ausgewählte Spiele, deine Platins eines Studios oder deine seltensten Trophäen.",
+    "tituloPlaceholder": "z. B. „Meine FromSoftware-Platins“",
+    "tipo": "Art der Vitrine",
+    "tipos": {
+      "manual": "Ausgewählte Spiele",
+      "desarrolladora": "Platins eines Studios",
+      "raros": "Meine seltensten Trophäen (<5 %)"
+    },
+    "estudio": "Studio",
+    "buscar": "In deiner Bibliothek suchen…",
+    "elegidos": "{n} von 6 gewählt",
+    "crear": "Vitrine erstellen",
+    "borrar": "Vitrine löschen",
+    "maximo": "Du hast bereits {n} Vitrinen, das Maximum."
   }
 }

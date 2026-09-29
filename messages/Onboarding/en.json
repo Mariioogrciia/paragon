@@ -358,5 +358,12 @@
     "epicGamesNote": "Already linkable from Settings → Game Accounts. There's no public news source or catalog yet: its site blocks even its own official RSS feed.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "It can no longer be linked on Paragon (it never had real syncing) — and it has no public news feed either: its site doesn't expose RSS."
+  },
+  "firma": {
+    "titulo": "Your signature",
+    "descripcion": "An image with your level, platinums and latest trophies that updates itself. Paste it in forums, your Twitch bio or Discord.",
+    "enlace": "Image",
+    "copiar": "Copy",
+    "obs": "For streams: in OBS add a “Browser source” with the OBS link (480×120). It shows your current game and latest trophy, and updates itself."
   }
 }

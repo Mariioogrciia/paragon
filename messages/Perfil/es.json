@@ -457,5 +457,22 @@
   },
   "DescargarPdfButton": {
     "descargar": "Descargar como PDF"
+  },
+  "Vitrinas": {
+    "titulo": "Vitrinas del perfil",
+    "descripcion": "Colecciones con nombre que se enseñan en tu perfil: juegos elegidos a mano, tus platinos de un estudio o tus trofeos más raros.",
+    "tituloPlaceholder": "p. ej. «Mis platinos de FromSoftware»",
+    "tipo": "Tipo de vitrina",
+    "tipos": {
+      "manual": "Juegos elegidos",
+      "desarrolladora": "Platinos de un estudio",
+      "raros": "Mis trofeos más raros (<5%)"
+    },
+    "estudio": "Estudio",
+    "buscar": "Buscar en tu biblioteca…",
+    "elegidos": "{n} de 6 elegidos",
+    "crear": "Crear vitrina",
+    "borrar": "Borrar vitrina",
+    "maximo": "Ya tienes {n} vitrinas, el máximo."
   }
 }

@@ -358,5 +358,12 @@
     "epicGamesNote": "Ya se puede vincular desde Ajustes → Cuentas de Juegos. No hay ninguna fuente pública de noticias ni catálogo todavía: su web bloquea hasta su propio feed RSS oficial.",
     "ubisoft": "Ubisoft",
     "ubisoftNote": "Ya no se puede vincular en Paragon (nunca tuvo sincronización real) — y tampoco tiene ningún feed de noticias público: su web no expone RSS."
+  },
+  "firma": {
+    "titulo": "Tu firma",
+    "descripcion": "Una imagen con tu nivel, platinos y últimos trofeos que se actualiza sola. Pégala en foros, en la bio de Twitch o en Discord.",
+    "enlace": "Imagen",
+    "copiar": "Copiar",
+    "obs": "Para directos: en OBS añade una «Fuente de navegador» con el enlace de OBS (480×120). Enseña tu juego actual y tu último trofeo, y se actualiza sola."
   }
 }

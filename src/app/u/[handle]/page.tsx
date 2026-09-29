@@ -40,6 +40,9 @@ import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
 import { getUserClan } from "@/lib/clans";
 import { CompartirPerfil } from "@/components/CompartirPerfil";
+import { VitrinasPerfil } from "@/components/VitrinasPerfil";
+import { ChipTemporada } from "@/components/ChipTemporada";
+import { getVitrinas } from "@/lib/vitrinas";
 
 
 function hexToRgb(hex: string) {
@@ -179,10 +182,12 @@ export default async function PerfilPage({
     juegosDelAnio(profile.userId),
     getUserBadges(profile.userId),
   ]);
-  const [recientes, palmares, clanMembership] = await Promise.all([
+  const [recientes, palmares, clanMembership, vitrinas] = await Promise.all([
     ultimosTrofeos(profile.userId),
     getUserTrophyCase(profile.userId),
     getUserClan(profile.userId),
+    // Si la tabla no existiera, el perfil se enseña igual, sin vitrinas.
+    getVitrinas(profile.userId).catch(() => []),
   ]);
   const [[rachasPerfil, percentilAnio], estadoAmistad] = await Promise.all([
     games.length > 0
@@ -402,6 +407,7 @@ export default async function PerfilPage({
             {profile.profileTitle && <p className="mt-2 text-sm font-semibold text-[rgb(var(--accent-rgb))]">{profile.profileTitle}</p>}
             {badges.length > 0 && <Badges earnedBadges={badges} />}
             <TrophyCase items={palmares} />
+            <ChipTemporada userId={profile.userId} />
           </div>
 
           <Link
@@ -502,6 +508,7 @@ export default async function PerfilPage({
                   .filter((item): item is NonNullable<typeof item> => item !== null)}
               />
             ),
+            vitrinas: <VitrinasPerfil key="vitrinas" vitrinas={vitrinas} handle={handle} />,
             favoritos: ((profile.favorites?.length ?? 0) > 0 || esMio) && (
               <section key="favoritos" className="mt-8 mb-4">
                 <div className="flex items-center justify-between mb-4">

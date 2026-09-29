@@ -10,6 +10,10 @@ import { cerrarLigaMensualSiToca, cerrarLigasPrivadasVencidas } from "@/lib/trop
 import { comprobarAlertasPrecio } from "@/lib/priceAlerts";
 import { enviarResumenesSemanales } from "@/lib/resumenSemanal";
 import { cerrarGuerrasVencidas } from "@/lib/clanWars";
+import { avisarAdelantos, avisarLanzamientos, avisarPerdibles } from "@/lib/avisosAutomaticos";
+import { recordarSesiones } from "@/lib/sesiones";
+import { revisarRetosCoop } from "@/lib/coop";
+import { cerrarTemporadaAnteriorSiToca } from "@/lib/temporadas";
 
 /**
  * Sincronización desatendida.
@@ -399,6 +403,28 @@ export async function GET(request: Request) {
     }
   }
 
+  // Avisos automáticos (lib/avisosAutomaticos.ts): perdibles al empezar un
+  // juego, lanzamientos de deseados y adelantos en la liga del mes. Cada
+  // uno en su try: que falle uno no se lleva por delante a los otros.
+  const avisosAuto = { perdibles: 0, lanzamientos: 0, adelantos: 0, sesiones: 0, retosCoop: 0 };
+  if (!agotado) {
+    const limite = arranque + PRESUPUESTO_MS - MARGEN_MS / 2;
+    for (const [clave, tarea] of [
+      ["perdibles", () => avisarPerdibles(limite)],
+      ["lanzamientos", () => avisarLanzamientos(limite)],
+      ["adelantos", () => avisarAdelantos(limite)],
+      ["sesiones", () => recordarSesiones(limite)],
+      ["retosCoop", () => revisarRetosCoop(limite)],
+    ] as const) {
+      if (Date.now() > limite) break;
+      try {
+        avisosAuto[clave] = await tarea();
+      } catch (error) {
+        console.error(`[cron-sync] avisos ${clave}`, error);
+      }
+    }
+  }
+
   const RETENCION_SYNC_RUN_DIAS = 30;
   let borrados = 0;
 
@@ -436,9 +462,14 @@ export async function GET(request: Request) {
   // incluso con `agotado`: no toca ninguna API externa, solo la propia base.
   let premiosLigaMensual = 0;
   let guerrasCerradas = 0;
+  let temporadasCerradas = 0;
   let premiosLigasPrivadas = 0;
   try {
     premiosLigaMensual = await cerrarLigaMensualSiToca();
+    temporadasCerradas = await cerrarTemporadaAnteriorSiToca().catch((error) => {
+      console.error("[cron-sync] temporada", error);
+      return 0;
+    });
     guerrasCerradas = await cerrarGuerrasVencidas().catch((error) => {
       console.error("[cron-sync] guerras de clanes", error);
       return 0;
@@ -455,7 +486,9 @@ export async function GET(request: Request) {
     clasificacionesPegi: clasificados,
     syncRunBorrados: borrados,
     avisosPrecio,
+    avisosAuto,
     guerrasCerradas,
+    temporadasCerradas,
     resumenesSemanales,
     premiosLigaMensual,
     premiosLigasPrivadas,

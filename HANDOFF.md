@@ -5781,3 +5781,43 @@ Comprobado después: 40 tablas en `public`, 0 sin RLS, 0 permisos de
 de juego, clanes, Descubrir y API. La API REST de Supabase queda cerrada.
 Al crear tablas nuevas, sus scripts ya activan RLS y retiran permisos (y los
 default privileges también quedaron retirados).
+
+---
+
+## Tercera tanda de funciones (29 sept 2026)
+
+Tablas nuevas creadas en producción con
+`scripts/crear-tablas-funciones-nuevas-2.mts` (league_position,
+boost_session, boost_participant, coop_challenge, showcase_shelf,
+season_result), todas con RLS.
+
+1. **Aviso de perdibles al empezar un juego** (`lib/avisosAutomaticos.ts`):
+   solo juegos que entran en la biblioteca desde el 29 sept (los de antes
+   tienen todos la fecha de la migración).
+2. **Lanzamiento de deseados** (hoy/mañana), con fechas de IGDB en lote
+   (`fechasLanzamiento`), solo fechas exactas.
+3. **"Te han adelantado en la liga"**: compara con `league_position`, como
+   mucho un aviso al día por persona.
+4. **Firma** `/api/firma/<handle>.png` (600×150, caché 1 h) y 5. **overlay
+   para OBS** `/api/overlay/<handle>` (HTML propio fuera del layout, fondo
+   transparente, `?tema=claro`). Ambos en Ajustes → "Tu firma".
+6. **Sesiones de trofeos online** `/sesiones` (`lib/sesiones.ts`): crear,
+   apuntarse, cancelar, recordatorio 1 h antes por el cron. En el menú "Más".
+7. **Platinar juntos** en el Planificador (`lib/coop.ts`): juegos a medias
+   en común con amigos (por igdbId), reto con fecha, el cron lo cierra.
+8. **Vitrinas temáticas** (`lib/vitrinas.ts`): manual / platinos de un
+   estudio / trofeos <5%; sección "vitrinas" del perfil, editor en Ajustes.
+9. **Pase de Temporada** `/temporada` (`lib/temporada.ts` reglas con tests,
+   `lib/temporadas.ts` datos): trimestres, puntos de liga, nivel cada 250,
+   medallas bronce/plata/oro/platino en 5/15/30/50. Decisiones tomadas por
+   Claude a falta de criterio del usuario — revisables. El cron cierra la
+   anterior; la primera cerrada será la T3 (1 oct 2026), que cuenta desde
+   julio.
+
+**Fallos encontrados de paso:**
+- `missableTrophies` de Black Myth: Wukong guardado con el JSON codificado
+  dos veces → ningún perdible marcado. `lib/perdibles.ts` lo normaliza y la
+  lectura lo repara en la base.
+- Filtro de lenguaje con `\b`: "maricon439", "puta_gg" pasaban. Ahora la
+  frontera es "no letra". **Hay un usuario real con handle `maricon439`** —
+  sin tocar, decisión del usuario.

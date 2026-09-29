@@ -1070,3 +1070,105 @@ export const clanWars = pgTable("clan_war", {
   puntosRetador: integer("puntosRetador"),
   puntosRetado: integer("puntosRetado"),
 });
+
+/* Segunda tanda (29 sept 2026) — `scripts/crear-tablas-funciones-nuevas-2.mts`. */
+
+/** Último puesto conocido en la liga del mes (clave "2026-09"), para "te han adelantado". */
+export const leaguePositions = pgTable(
+  "league_position",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    clave: text("clave").notNull(),
+    puesto: integer("puesto").notNull(),
+    actualizadoAt: timestamp("actualizadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.clave] })],
+);
+
+/** Sesión para conseguir trofeos online en grupo (lib/sesiones.ts). */
+export const boostSessions = pgTable("boost_session", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  hostId: text("hostId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  gameId: text("gameId")
+    .notNull()
+    .references(() => games.id, { onDelete: "cascade" }),
+  trofeo: text("trofeo").notNull(),
+  descripcion: text("descripcion"),
+  fechaHora: timestamp("fechaHora", { mode: "date" }).notNull(),
+  /** Huecos para otros, sin contar a quien la organiza. */
+  plazas: integer("plazas").notNull(),
+  cancelada: boolean("cancelada").notNull().default(false),
+  creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const boostParticipants = pgTable(
+  "boost_participant",
+  {
+    sessionId: text("sessionId")
+      .notNull()
+      .references(() => boostSessions.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    joinedAt: timestamp("joinedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.sessionId, t.userId] })],
+);
+
+/** "Platinar juntos": reto con fecha entre dos amigos sobre el mismo juego (lib/coop.ts). */
+export const coopChallenges = pgTable("coop_challenge", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  creadorId: text("creadorId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  invitadoId: text("invitadoId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  /** Cada uno puede tenerlo en su plataforma: ids de `game` distintos, mismo juego. */
+  gameIdCreador: text("gameIdCreador")
+    .notNull()
+    .references(() => games.id, { onDelete: "cascade" }),
+  gameIdInvitado: text("gameIdInvitado")
+    .notNull()
+    .references(() => games.id, { onDelete: "cascade" }),
+  titulo: text("titulo").notNull(),
+  fechaObjetivo: date("fechaObjetivo", { mode: "string" }).notNull(),
+  /** pendiente → activo, o rechazado. */
+  estado: text("estado").notNull().default("pendiente"),
+  creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+/** Vitrina temática del perfil (lib/vitrinas.ts). */
+export const showcaseShelves = pgTable("showcase_shelf", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  titulo: text("titulo").notNull(),
+  /** "manual" (juegos elegidos), "desarrolladora" (platinos de un estudio) o "raros" (trofeos < 5%). */
+  tipo: text("tipo").notNull(),
+  /** Para "desarrolladora": el nombre del estudio. */
+  filtro: text("filtro"),
+  gameIds: jsonb("gameIds").$type<string[]>(),
+  orden: integer("orden").notNull().default(0),
+  creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+/** Nivel final de cada temporada trimestral (lib/temporadas.ts). */
+export const seasonResults = pgTable(
+  "season_result",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    temporada: text("temporada").notNull(),
+    puntos: integer("puntos").notNull(),
+    nivel: integer("nivel").notNull(),
+    cerradoAt: timestamp("cerradoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.temporada] })],
+);

@@ -994,3 +994,28 @@ export async function matchIgdbGames(
 
   return salida;
 }
+
+/**
+ * Fecha de lanzamiento (inicio del día, UTC) de varios juegos en UNA
+ * consulta — para el aviso "sale hoy/mañana un juego de tu lista de
+ * deseados" (lib/avisosAutomaticos.ts). Solo los que tienen fecha exacta:
+ * IGDB pone el 31 de diciembre cuando solo sabe el año (ver
+ * `precisionOf`), y avisar de un lanzamiento inventado sería peor que no
+ * avisar.
+ */
+export async function fechasLanzamiento(igdbIds: number[]): Promise<Map<number, Date>> {
+  const ids = [...new Set(igdbIds)].filter((id) => Number.isInteger(id) && id > 0).slice(0, 500);
+  if (ids.length === 0) return new Map();
+  const filas = await query<{ id: number; first_release_date?: number; release_dates?: { date?: number; human?: string }[] }>(
+    "games",
+    `fields id, first_release_date, release_dates.date, release_dates.human; where id = (${ids.join(",")}); limit 500;`,
+  );
+  const fechas = new Map<number, Date>();
+  for (const f of filas) {
+    if (!f.first_release_date) continue;
+    const humano = f.release_dates?.find((r) => r.date === f.first_release_date)?.human;
+    if (precisionOf(humano) !== "day") continue;
+    fechas.set(f.id, new Date(f.first_release_date * 1000));
+  }
+  return fechas;
+}

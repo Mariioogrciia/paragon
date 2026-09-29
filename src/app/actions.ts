@@ -57,6 +57,9 @@ import { ipActual, limitar } from "@/lib/rateLimit";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
 import { borrarAlertaPrecio, guardarAlertaPrecio } from "@/lib/priceAlerts";
 import { setObjetivoFecha } from "@/lib/goals";
+import { SesionError, apuntarse, cancelarSesion, crearSesion, salirse } from "@/lib/sesiones";
+import { CoopError, proponerReto, responderReto } from "@/lib/coop";
+import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 
 export interface ActionState {
   error?: string;
@@ -1487,4 +1490,110 @@ export async function setObjetivoFechaAction(gameId: string, fecha: string | nul
   if (!(await ownsGame(userId, gameId))) return;
   await setObjetivoFecha(userId, gameId, fecha);
   revalidatePath("/planificador");
+}
+
+/* ---------------------------------- Sesiones de trofeos online --------------------------------- */
+
+/** Ver lib/sesiones.ts. `fechaHora` en ISO (el navegador convierte su hora local). */
+export async function crearSesionAction(datos: {
+  gameId: string;
+  trofeo: string;
+  descripcion: string;
+  fechaHora: string;
+  plazas: number;
+}): Promise<{ error?: string; id?: string }> {
+  const userId = await requireUserId();
+  if (!(await limitar("comentario", userId))) return { error: "Espera un momento antes de crear otra sesión." };
+  try {
+    const id = await crearSesion(userId, { ...datos, fechaHora: new Date(datos.fechaHora) });
+    revalidatePath("/sesiones");
+    return { id };
+  } catch (e) {
+    if (e instanceof SesionError) return { error: e.message };
+    throw e;
+  }
+}
+
+export async function apuntarseSesionAction(sessionId: string, apuntar: boolean): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  try {
+    if (apuntar) await apuntarse(userId, sessionId);
+    else await salirse(userId, sessionId);
+  } catch (e) {
+    if (e instanceof SesionError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/sesiones");
+  return {};
+}
+
+export async function cancelarSesionAction(sessionId: string): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  try {
+    await cancelarSesion(userId, sessionId);
+  } catch (e) {
+    if (e instanceof SesionError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/sesiones");
+  return {};
+}
+
+/* ---------------------------------- Platinar juntos --------------------------------- */
+
+/** Ver lib/coop.ts. */
+export async function proponerRetoAction(datos: {
+  invitadoId: string;
+  miGameId: string;
+  suGameId: string;
+  fecha: string;
+}): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  if (!(await limitar("comentario", userId))) return { error: "Espera un momento antes de proponer otro reto." };
+  try {
+    await proponerReto(userId, datos);
+  } catch (e) {
+    if (e instanceof CoopError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/planificador");
+  return {};
+}
+
+export async function responderRetoAction(retoId: string, aceptar: boolean): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  try {
+    await responderReto(userId, retoId, aceptar);
+  } catch (e) {
+    if (e instanceof CoopError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/planificador");
+  return {};
+}
+
+/* ---------------------------------- Vitrinas temáticas --------------------------------- */
+
+/** Ver lib/vitrinas.ts. */
+export async function crearVitrinaAction(datos: {
+  titulo: string;
+  tipo: "manual" | "desarrolladora" | "raros";
+  filtro?: string;
+  gameIds?: string[];
+}): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  try {
+    await crearVitrina(userId, datos);
+  } catch (e) {
+    if (e instanceof VitrinaError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/", "layout");
+  return {};
+}
+
+export async function borrarVitrinaAction(id: string): Promise<void> {
+  const userId = await requireUserId();
+  await borrarVitrina(userId, id);
+  revalidatePath("/", "layout");
 }

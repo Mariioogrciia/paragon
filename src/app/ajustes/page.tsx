@@ -1,7 +1,11 @@
+import { EditorVitrinas } from "@/components/EditorVitrinas";
+import { MAX_VITRINAS, estudiosCompletados, getVitrinas } from "@/lib/vitrinas";
+import { headers } from "next/headers";
+import { FirmaCompartible } from "@/components/FirmaCompartible";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getDb } from "@/db";
-import { accounts, users } from "@/db/schema";
+import { accounts, games, userGames, users } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { ProfileForm } from "@/components/forms/ProfileForm";
 import { getParagonLevel } from "@/lib/paragonLevel";
@@ -25,6 +29,12 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
   if (!session?.user) redirect("/entrar");
 
   const { error } = await props.searchParams;
+  // Origen absoluto para los códigos de la firma (se pegan fuera de Paragon).
+  // En producción, el dominio configurado en Vercel (no la cabecera Host de
+  // la petición); en local, lo que diga la cabecera.
+  const cabeceras = await headers();
+  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? cabeceras.get("host") ?? "platinos-nine.vercel.app";
+  const origen = `${host.startsWith("localhost") ? "http" : "https"}://${host}`;
 
   const db = getDb();
   const dbUser = await db.query.users.findFirst({
@@ -32,6 +42,18 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
   });
 
   if (!dbUser) redirect("/entrar");
+
+  // Vitrinas del perfil (lib/vitrinas.ts): si fallara, Ajustes se enseña igual.
+  const [vitrinas, estudios, juegosVitrina] = await Promise.all([
+    getVitrinas(session.user.id).catch(() => []),
+    estudiosCompletados(session.user.id).catch(() => []),
+    db
+      .select({ id: games.id, titulo: games.title })
+      .from(userGames)
+      .innerJoin(games, eq(games.id, userGames.gameId))
+      .where(and(eq(userGames.userId, session.user.id), eq(userGames.isWishlist, false)))
+      .orderBy(games.title),
+  ]);
 
   const [nivel, badges, profile, discordVinculado, juegosParaFondo] = await Promise.all([
     getParagonLevel(session.user.id),
@@ -69,6 +91,15 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
       discordVinculado={discordVinculado}
       cuentasVinculadas={profile?.accounts.filter(a => a.avatarUrl).map(a => ({ platform: a.platform, avatarUrl: a.avatarUrl! })) ?? []}
     />
+      {dbUser.handle && <div className="mt-8"><FirmaCompartible handle={dbUser.handle} origen={origen} /></div>}
+      <div className="mt-8">
+        <EditorVitrinas
+          vitrinas={vitrinas.map((v) => ({ id: v.id, titulo: v.titulo, tipo: v.tipo }))}
+          estudios={estudios}
+          juegos={juegosVitrina}
+          maximo={MAX_VITRINAS}
+        />
+      </div>
     </>
   );
 }

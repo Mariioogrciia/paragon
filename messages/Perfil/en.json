@@ -457,5 +457,22 @@
   },
   "DescargarPdfButton": {
     "descargar": "Download as PDF"
+  },
+  "Vitrinas": {
+    "titulo": "Profile showcases",
+    "descripcion": "Named collections shown on your profile: hand-picked games, your platinums from a studio or your rarest trophies.",
+    "tituloPlaceholder": "e.g. “My FromSoftware platinums”",
+    "tipo": "Showcase type",
+    "tipos": {
+      "manual": "Picked games",
+      "desarrolladora": "Platinums from a studio",
+      "raros": "My rarest trophies (<5%)"
+    },
+    "estudio": "Studio",
+    "buscar": "Search your library…",
+    "elegidos": "{n} of 6 picked",
+    "crear": "Create showcase",
+    "borrar": "Delete showcase",
+    "maximo": "You already have {n} showcases, the maximum."
   }
 }

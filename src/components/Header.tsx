@@ -79,6 +79,18 @@ const NAV_MAS = [
     match: (p: string) => p.startsWith("/clanes"),
     navKey: "clanes",
   },
+  {
+    labelKey: "sesiones",
+    href: "/sesiones",
+    match: (p: string) => p.startsWith("/sesiones"),
+    navKey: "sesiones",
+  },
+  {
+    labelKey: "temporada",
+    href: "/temporada",
+    match: (p: string) => p.startsWith("/temporada"),
+    navKey: "temporada",
+  },
 ] as const;
 
 const LOGGED_OUT_NAV = [

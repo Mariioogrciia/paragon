@@ -58,7 +58,10 @@ const PATRONES = PALABRAS_PROHIBIDAS.map((palabra) => {
   const escapada = palabra.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   // Espacios internos (p. ej. "hijo de puta") ya funcionan tal cual con \b
   // al principio y al final de la frase completa.
-  return new RegExp(`\\b${escapada}\\b`, "i");
+  // Frontera = "no es una letra", no `\b`: con `\b` los números y el guion
+  // bajo cuentan como parte de la palabra, así que "maricon439" o "puta_gg"
+  // pasaban el filtro — visto en un handle real de producción (29 sept 2026).
+  return new RegExp(`(?<![a-zñ])${escapada}(?![a-zñ])`, "i");
 });
 
 function normalizar(texto: string): string {

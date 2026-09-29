@@ -1,4 +1,5 @@
 import "server-only";
+import { normalizarPerdibles } from "@/lib/perdibles";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { and, desc, eq, gte, inArray, isNotNull, or, sql } from "drizzle-orm";
@@ -1295,7 +1296,13 @@ export async function getGameDetail(
 
     const CACHE_MS = 30 * 86_400_000;
     if (cache?.checkedAt && Date.now() - cache.checkedAt.getTime() < CACHE_MS) {
-      return new Set(cache.missableTrophies ?? []);
+      const lista = normalizarPerdibles(cache.missableTrophies);
+      // Autorreparación: si venía mal guardado (texto en vez de lista), se
+      // reescribe bien para que el resto de lecturas no tengan que lidiar.
+      if (!Array.isArray(cache.missableTrophies)) {
+        await db.update(gamesTable).set({ missableTrophies: lista }).where(eq(gamesTable.id, gameId));
+      }
+      return new Set(lista);
     }
 
     const { ok, nombres } = await trofeosPerdiblesDeConEstado(game.title);

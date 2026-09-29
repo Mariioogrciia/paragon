@@ -22,6 +22,7 @@ export const DEFAULT_SECTION_ORDER = [
   "level",
   "achievements",
   "showcase",
+  "vitrinas",
   "favoritos",
 ] as const;
 
@@ -35,6 +36,7 @@ export const SECTION_LABELS: Record<ProfileSectionKey, string> = {
   level: "Nivel Paragon",
   achievements: "Logros",
   showcase: "Vitrina de trofeos",
+  vitrinas: "Vitrinas temáticas",
   favoritos: "Juegos favoritos",
 };
 

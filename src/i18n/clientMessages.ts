@@ -61,6 +61,7 @@ export const NAMESPACES_CLIENTE = [
   "Shell.Home",
   "Shell.HunterGame",
   "Shell.Offline",
+  "Shell.Sesiones",
 ] as const;
 
 export function mensajesCliente(mensajes: AbstractIntlMessages): AbstractIntlMessages {
