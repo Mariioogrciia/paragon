@@ -1,18 +1,30 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **22-23 de septiembre de
-2026** (continuación 22 — Claude Code: Epic Games vuelve a ser vinculable
-de verdad, un fallo grave de seguridad real en Supabase (RLS) cerrado,
-varios bugs reales de emparejado con IGDB y de la ficha global arreglados,
-palmarés de ligas nuevo, y trabajo hecho EN PARALELO con Antigravity sobre
-los mismos archivos — con una colisión real de la que hay que saber).
+releer todo el historial. Última actualización: **29 de septiembre de 2026**.
 
-**IMPORTANTE para quien retome esto**: al terminar la sesión hay una
-cantidad enorme de cambios **sin commitear** (ver `git status`) — nadie
-pidió commitear durante la sesión, así que sigue todo en el árbol de
-trabajo. Antes de tocar nada, revisar bien qué hay antes de un
-`git add -A` a lo loco.
+**Estado actual (29 sept 2026) — léelo antes que nada:**
+- **Todo está commiteado y en `origin/master`** (desplegado en Vercel, región
+  `fra1`). Lo único fuera del repo son `.env.local` y `scratch/`. El aviso de
+  sesiones anteriores sobre "cambios sin commitear" ya no aplica.
+- Las sesiones del **25 al 29 de septiembre** (auditorías y tres tandas de
+  funciones) están documentadas **al final de este archivo**, en orden:
+  auditoría de seguridad/plataforma → Functions Storage → segunda auditoría
+  (rendimiento/estética) → piloto automático → funciones del 28 → RLS
+  activado → tercera tanda de funciones → trofeos ocultos y horas por periodo.
+- **Seguridad**: RLS activado en las 40+ tablas de `public` y sin permisos
+  para `anon`/`authenticated` (comprobado el 28 sept). Cualquier tabla nueva
+  debe crearse con su script en `scripts/` activando RLS igual que los
+  existentes. Limitador de peticiones activo (`lib/rateLimit.ts`).
+- **Calidad**: `npm test` (Vitest, 69 tests), lint sin errores (solo avisos
+  de `<img>` por hosts dinámicos) y workflow `.github/workflows/comprobaciones.yml`.
+- **Vercel Hobby**: cuidado con el Functions Storage (se llenó al 90% por
+  249 despliegues conservados; se borraron el 28 sept). Agrupar los cambios
+  en pocos pushes: cada push es un despliegue.
+- **Pendiente de decisión del usuario**: un usuario real con handle
+  ofensivo (`maricon439`), que el filtro nuevo ya detecta pero no se ha
+  tocado; y las reglas del Pase de Temporada (decididas por Claude, ver
+  `lib/temporada.ts`), revisables.
 
 ---
 
@@ -5135,6 +5147,26 @@ que causó el bug de las horas de PSN la primera vez.
 ---
 
 ## Pendiente
+
+**Actualizado el 29 de septiembre de 2026.** De la lista de abajo ya están
+hechos: i18n de `relativeDate()` y de los retos semanales, filtro de
+lenguaje en alemán y francés, Pase de Temporada, Vitrinas temáticas y las
+notificaciones push (Web Push + FCM, hace tiempo). Sigue pendiente de
+verdad:
+- **Rediseño visual de la landing**: sigue la decisión de no tocar la
+  estética global.
+- **Dominio propio**: no comprado; la app sigue en `platinos-nine.vercel.app`.
+- **Epic no da horas jugadas** por su API: nunca aparecerán en rankings de
+  horas (no es un fallo arreglable desde aquí).
+- **Horas por periodo**: solo hay registro diario desde el 29 sept 2026
+  (`lib/horasPeriodo.ts`); los periodos anteriores a esa fecha no se pueden
+  reconstruir.
+- **Sin probar con sesión iniciada** (el navegador de las sesiones de Claude
+  no tiene login): alertas de precio, objetivos, sesiones online, platinar
+  juntos, vitrinas, guerra de clanes, "ignorar horas", cerrar otras sesiones
+  y el onboarding de Android. Los avisos automáticos del cron tampoco se han
+  visto llegar todavía (el primer resumen semanal: domingo 4 oct, 18:00; el
+  primer cierre de temporada: 1 oct).
 
 **De la sesión del 21 de septiembre (continuación 21), sin cerrar:**
 - **i18n: solo texto de interfaz traducido, no contenido**. Las 42
