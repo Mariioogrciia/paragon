@@ -34,6 +34,8 @@ import { Pegi } from "@/components/Pegi";
 import { CompartirImagen } from "@/components/CompartirImagen";
 import { BackButton } from "@/components/BackButton";
 import { AutoSyncJuego } from "@/components/AutoSyncJuego";
+import { IgnorarHoras } from "@/components/IgnorarHoras";
+import { horasDeLaPlataforma } from "@/lib/horasIgnoradas";
 
 async function ProximoRow({ trophy }: { trophy: Trophy }) {
   const t = await getTranslations("Biblioteca");
@@ -109,6 +111,9 @@ export default async function JuegoPage({
   // organizar la biblioteca propia.
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
+  // Dato original de la plataforma (aunque esté ignorado) para el interruptor
+  // "ignorar horas" — `game.playtimeMinutes` ya viene sin las ignoradas.
+  const horasPlataforma = esMio ? await horasDeLaPlataforma(profile.userId, gameId).catch(() => null) : null;
   const carpetas = esMio ? await listCollections(profile.userId) : [];
   const valoracion = await getCommunityRating(game.id);
 
@@ -481,6 +486,10 @@ export default async function JuegoPage({
         {esMio && <CollectionPicker collections={carpetas} gameId={game.id} />}
 
         {esMio && <GameNotes gameId={game.id} initialNotes={game.notes} />}
+
+        {esMio && horasPlataforma && horasPlataforma.minutos >= 60 && (
+          <IgnorarHoras gameId={game.id} minutos={horasPlataforma.minutos} ignoradas={horasPlataforma.ignoradas} />
+        )}
 
         {esMio && (
           <AcquisitionEditor

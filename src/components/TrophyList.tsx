@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
@@ -47,8 +47,10 @@ function pasaFiltro(trophy: Trophy, activos: Set<Filtro>): boolean {
  * tipo es cada cosa. La cuadrícula es la vitrina: iconos grandes, para mirar
  * lo conseguido. Por eso la que manda por defecto sigue siendo la lista.
  */
+const CLAVE_MOSTRAR_OCULTOS = "platinos:mostrar-ocultos";
+
 export function TrophyList({
-  trophies,
+  trophies: trofeosOriginales,
   gameTitle,
   gameId,
   platform,
@@ -76,6 +78,33 @@ export function TrophyList({
   const [filtros, setFiltros] = useState<Set<Filtro>>(new Set());
   const [ocultarConseguidos, setOcultarConseguidos] = useState(false);
   const [ordenCronologico, setOrdenCronologico] = useState(false);
+  // "Mostrar ocultos": los trofeos ocultos tapan el nombre para no destripar
+  // la trama, pero quien caza trofeos a menudo quiere verlos. Se aplica aquí,
+  // una vez, marcándolos como no ocultos: así lista, cuadrícula, árbol,
+  // cronología y la ficha del trofeo los enseñan sin tocar nada más. Se
+  // recuerda en este navegador (preferencia de quien mira, no del perfil).
+  const [mostrarOcultos, setMostrarOcultos] = useState(false);
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente: leerlo al montar evita el desajuste de hidratación.
+      if (localStorage.getItem(CLAVE_MOSTRAR_OCULTOS) === "1") setMostrarOcultos(true);
+    } catch {
+      // Sin storage: se queda con los ocultos tapados, como siempre.
+    }
+  }, []);
+  function alternarOcultos() {
+    setMostrarOcultos((v) => {
+      try {
+        localStorage.setItem(CLAVE_MOSTRAR_OCULTOS, v ? "0" : "1");
+      } catch {}
+      return !v;
+    });
+  }
+  const trophies = useMemo(
+    () => (mostrarOcultos ? trofeosOriginales.map((t) => (t.hidden ? { ...t, hidden: false } : t)) : trofeosOriginales),
+    [trofeosOriginales, mostrarOcultos],
+  );
+  const hayOcultos = trofeosOriginales.some((t) => t.hidden && !t.earned);
 
   // Qué filtros tienen algo que enseñar en ESTE juego — de nada sirve un
   // chip de "Multijugador" que, al pulsarlo, deja la lista vacía porque el
@@ -192,6 +221,11 @@ export function TrophyList({
             <ToggleChip active={ordenCronologico} onClick={() => setOrdenCronologico((v) => !v)}>
               {t("TrophyList.chronologicalOrder")}
             </ToggleChip>
+            {hayOcultos && (
+              <ToggleChip active={mostrarOcultos} onClick={alternarOcultos}>
+                {t("TrophyList.showHidden")}
+              </ToggleChip>
+            )}
           </div>
         )}
 

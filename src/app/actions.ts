@@ -60,6 +60,7 @@ import { setObjetivoFecha } from "@/lib/goals";
 import { SesionError, apuntarse, cancelarSesion, crearSesion, salirse } from "@/lib/sesiones";
 import { CoopError, proponerReto, responderReto } from "@/lib/coop";
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
+import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
 
 export interface ActionState {
   error?: string;
@@ -1595,5 +1596,15 @@ export async function crearVitrinaAction(datos: {
 export async function borrarVitrinaAction(id: string): Promise<void> {
   const userId = await requireUserId();
   await borrarVitrina(userId, id);
+  revalidatePath("/", "layout");
+}
+
+/* ---------------------------------- Horas ignoradas --------------------------------- */
+
+/** Ver lib/horasIgnoradas.ts. Solo juegos de la propia biblioteca. */
+export async function setHorasIgnoradasAction(gameId: string, ignorar: boolean): Promise<void> {
+  const userId = await requireUserId();
+  if (!(await ownsGame(userId, gameId))) return;
+  await setHorasIgnoradas(userId, gameId, ignorar);
   revalidatePath("/", "layout");
 }

@@ -1172,3 +1172,18 @@ export const seasonResults = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.temporada] })],
 );
+
+/** Juegos cuyas horas ignora el usuario (lib/horasIgnoradas.ts) — `scripts/crear-tabla-horas-ignoradas.mts`. */
+export const playtimeIgnored = pgTable(
+  "playtime_ignored",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
+);

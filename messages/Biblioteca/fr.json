@@ -148,7 +148,8 @@
     "hiddenTrophy": "Trophée caché",
     "missableHint": "Peut être définitivement raté si ce n'est pas fait au bon moment",
     "missable": "Ratable",
-    "points": "{points} pts"
+    "points": "{points} pts",
+    "showHidden": "Afficher les cachés"
   },
   "TrophyCounts": {},
   "GameTrophyBreakdown": {
@@ -525,5 +526,12 @@
     "noResults": "Aucun jeu ne correspond à ces filtres.",
     "groupCount": "{count} jeux",
     "loadingMore": "Chargement d'autres jeux…"
+  },
+  "IgnorarHoras": {
+    "segunPlataforma": "La plateforme indique {horas} h de jeu.",
+    "ignoradas": "Ces {horas} h ne comptent pas dans tes stats.",
+    "explicacion": "PlayStation et Steam attribuent le temps de jeu au compte, pas à la personne : si quelqu'un joue avec ton compte, on dirait que c'est toi.",
+    "ignorar": "Je n'y ai pas joué : ignorer les heures",
+    "volverAContar": "Les recompter"
   }
 }

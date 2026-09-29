@@ -1,4 +1,5 @@
 import "server-only";
+import { getHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { normalizarPerdibles } from "@/lib/perdibles";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
@@ -1159,6 +1160,10 @@ export const getLibrary = cache(
     epicXpPorJuego.set(t.gameId, (epicXpPorJuego.get(t.gameId) ?? 0) + trophyScore({ platform: "epic", xp: t.xp }));
   }
 
+  // Horas que el usuario ha pedido ignorar (lib/horasIgnoradas.ts): fuera de
+  // la biblioteca, así no cuentan en estadísticas, Wrap ni coste por hora.
+  const horasIgnoradas = await getHorasIgnoradas(profile.userId);
+
   const games: Game[] = rows.map((r) => ({
     id: r.id,
     platform: r.platform,
@@ -1172,8 +1177,8 @@ export const getLibrary = cache(
     earned: (r.earned as unknown as Game["earned"]) ?? undefined,
     progressPercent: r.progressPercent,
     lastPlayedAt: r.lastPlayedAt?.toISOString(),
-    playtimeMinutes: r.playtimeMinutes ?? undefined,
-    playtimeRecentMinutes: r.playtimeRecentMinutes ?? undefined,
+    playtimeMinutes: horasIgnoradas.has(r.id) ? undefined : (r.playtimeMinutes ?? undefined),
+    playtimeRecentMinutes: horasIgnoradas.has(r.id) ? undefined : (r.playtimeRecentMinutes ?? undefined),
     developer: r.developer ?? undefined,
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,

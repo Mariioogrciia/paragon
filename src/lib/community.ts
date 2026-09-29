@@ -1,4 +1,5 @@
 import "server-only";
+import { getHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, userGames, users } from "@/db/schema";
@@ -343,13 +344,14 @@ export async function getMiProgreso(userId: string, gameIdEspecifico: string): P
   const platinoDefinido = fila.platform === "steam" ? fila.definedTotal > 0 : (fila.defined?.platinum ?? 0) > 0;
   const platinoConseguido = fila.platform === "steam" ? fila.progressPercent === 100 : (fila.earned?.platinum ?? 0) > 0;
 
+  const ignoradas = await getHorasIgnoradas(userId);
   return {
     progressPercent: fila.progressPercent,
     earnedTotal: fila.earnedTotal,
     definedTotal: fila.definedTotal,
     platinoDefinido,
     platinoConseguido,
-    playtimeMinutes: fila.playtimeMinutes,
+    playtimeMinutes: ignoradas.has(gameIdEspecifico) ? null : fila.playtimeMinutes,
     lastPlayedAt: fila.lastPlayedAt,
   };
 }

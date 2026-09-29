@@ -1,4 +1,5 @@
 import "server-only";
+import { horasNoIgnoradasSql } from "@/lib/horasIgnoradas";
 import { and, asc, desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, gameTrophies, userGames, userTrophies } from "@/db/schema";
@@ -83,7 +84,7 @@ export async function horasPorJuego(userId: string, limit?: number): Promise<{ g
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), isNotNull(userGames.playtimeMinutes)))
+    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), isNotNull(userGames.playtimeMinutes), horasNoIgnoradasSql))
     .groupBy(clave)
     .orderBy(desc(sql`sum(${userGames.playtimeMinutes})`))
     .$dynamic();

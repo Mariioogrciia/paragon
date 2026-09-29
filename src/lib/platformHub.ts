@@ -1,4 +1,5 @@
 import "server-only";
+import { horasNoIgnoradasSql } from "@/lib/horasIgnoradas";
 import { and, desc, eq, gte, isNotNull, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games as gamesTable, userGames } from "@/db/schema";
@@ -82,7 +83,7 @@ export async function mostPlayedOnPlatform(
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(and(eq(gamesTable.platform, plataforma), isNotNull(gamesTable.igdbId), isNotNull(userGames.playtimeMinutes), eq(userGames.isWishlist, false)))
+    .where(and(eq(gamesTable.platform, plataforma), isNotNull(gamesTable.igdbId), isNotNull(userGames.playtimeMinutes), eq(userGames.isWishlist, false), horasNoIgnoradasSql))
     .groupBy(gamesTable.igdbId)
     .having(sql`SUM(${userGames.playtimeMinutes}) > 0`)
     .orderBy(desc(sql`SUM(${userGames.playtimeMinutes})`))
