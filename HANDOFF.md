@@ -5821,3 +5821,35 @@ season_result), todas con RLS.
 - Filtro de lenguaje con `\b`: "maricon439", "puta_gg" pasaban. Ahora la
   frontera es "no letra". **Hay un usuario real con handle `maricon439`** —
   sin tocar, decisión del usuario.
+
+---
+
+## Trofeos ocultos y horas por periodo (29 sept 2026)
+
+**Mostrar ocultos**: interruptor en la lista de trofeos
+(`TrophyList.tsx`), recordado en `localStorage`. Se aplica una vez al
+recibir los trofeos (marcándolos `hidden: false`), así lo respetan lista,
+cuadrícula, árbol, cronología y la ficha del trofeo.
+
+**Horas: la queja real y su causa.** El usuario vio en
+`/u/[handle]/wrap/horas?rango=anio` ("este año") 2.109 h de Fortnite y
+1.715 h de GTA V, que no ha jugado este año.
+- Las cifras SON las que da Sony para esa cuenta (comprobado contra
+  `getUserPlayedGames`: Fortnite PS4 1.828 h / 1.334 sesiones 2017-2022 +
+  PS5 280 h). Son de toda la vida, no de este año.
+- El fallo era de Paragon: con un periodo, `rankingHoras` filtraba los
+  juegos TOCADOS en el periodo (`lastPlayedAt`, aquí la copia de Xbox de
+  Fortnite abierta el 1 ene 2026) pero enseñaba sus horas de SIEMPRE.
+- Arreglo: `playtime_snapshot` (script `crear-tabla-registro-horas.mts`,
+  ya ejecutado, foto inicial de 888 juegos el 29 sept) + `lib/horasPeriodo.ts`.
+  El cron apunta el total de cada juego el día que cambia; las horas de un
+  periodo = total de hoy − total al inicio del periodo. Para periodos que
+  empiezan antes del 29 sept, se cuenta desde el primer registro y la
+  pantalla lo dice (`notaHorasDesdeRegistro`). "Este año" saldrá vacío
+  hasta que se juegue algo: es lo honesto, antes no hay dato.
+- Epic no da horas por API: lo jugado en Epic no puede aparecer.
+- Además, **"ignorar horas"** en la ficha de un juego propio
+  (`playtime_ignored`, `lib/horasIgnoradas.ts`) para horas que la
+  plataforma atribuye a la cuenta pero jugó otra persona. Excluidas en
+  biblioteca, estadísticas (`horasPorJuego`, `horasTotales`), Descubrir y
+  "Tu progreso". El dato de la plataforma no se toca.

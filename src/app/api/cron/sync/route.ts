@@ -14,6 +14,7 @@ import { avisarAdelantos, avisarLanzamientos, avisarPerdibles } from "@/lib/avis
 import { recordarSesiones } from "@/lib/sesiones";
 import { revisarRetosCoop } from "@/lib/coop";
 import { cerrarTemporadaAnteriorSiToca } from "@/lib/temporadas";
+import { registrarHorasDelDia } from "@/lib/horasPeriodo";
 
 /**
  * Sincronización desatendida.
@@ -425,6 +426,15 @@ export async function GET(request: Request) {
     }
   }
 
+  // Registro diario de horas (lib/horasPeriodo.ts): solo inserta los juegos
+  // cuyo total ha cambiado, así que en la mayoría de pasadas no escribe nada.
+  let horasRegistradas = 0;
+  try {
+    horasRegistradas = await registrarHorasDelDia();
+  } catch (error) {
+    console.error("[cron-sync] registro de horas", error);
+  }
+
   const RETENCION_SYNC_RUN_DIAS = 30;
   let borrados = 0;
 
@@ -487,6 +497,7 @@ export async function GET(request: Request) {
     syncRunBorrados: borrados,
     avisosPrecio,
     avisosAuto,
+    horasRegistradas,
     guerrasCerradas,
     temporadasCerradas,
     resumenesSemanales,

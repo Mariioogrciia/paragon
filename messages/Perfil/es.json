@@ -56,10 +56,12 @@
     "pestañaHoras": "Horas",
     "pestañaTrofeos": "Trofeos",
     "pestañaGeneros": "Géneros",
-    "notaHoras": "Las plataformas solo dan el total de horas acumuladas por juego, nunca cuándo se jugaron. El filtro de fecha decide qué juegos entran (si se han tocado en ese periodo); las horas de cada uno siguen siendo las de siempre.",
     "vacio": "No hay datos para este periodo todavía.",
     "unidadHoras": "h",
-    "unidadTrofeos": "trofeos"
+    "unidadTrofeos": "trofeos",
+    "notaHorasTodo": "Horas totales que da cada plataforma por juego, desde siempre.",
+    "notaHorasPeriodo": "Horas jugadas en este periodo, según el registro diario de Paragon.",
+    "notaHorasDesdeRegistro": "Horas jugadas desde el {fecha}, cuando Paragon empezó a registrarlas día a día: las plataformas solo dan el total de cada juego, nunca cuándo se jugó, así que lo anterior no se puede saber."
   },
   "AmigosPage": {
     "meta": "Amigos · Paragon",

@@ -11,6 +11,7 @@ import {
   rankingTrofeosPorJuego,
   type RangoFecha,
 } from "@/lib/personalRankings";
+import { minutosDesde } from "@/lib/horasPeriodo";
 
 const METRICAS = ["horas", "trofeos", "generos"] as const;
 type Metrica = (typeof METRICAS)[number];
@@ -67,9 +68,14 @@ export default async function WrapRankingPage({
   let filas: { clave: string; etiqueta: string; valor: number; iconUrl?: string; href?: string }[] = [];
   let unidad = "";
 
+  // Desde cuándo hay registro diario de horas (solo con periodo): si el
+  // periodo empieza antes, la pantalla avisa de que cuenta desde ahí.
+  let inicioRegistro: Date | null = null;
   if (m === "horas") {
     const { games } = await getLibrary(profile);
-    filas = rankingHoras(games, desde).map((f) => ({
+    const periodo = desde ? await minutosDesde(profile.userId, desde).catch(() => null) : null;
+    inicioRegistro = periodo?.inicioRegistro ?? null;
+    filas = rankingHoras(games, desde, periodo?.minutos ?? new Map()).map((f) => ({
       clave: f.gameId,
       etiqueta: f.titulo,
       valor: f.valor,
@@ -137,7 +143,11 @@ export default async function WrapRankingPage({
 
         {m === "horas" && (
           <p className="mt-3 text-xs text-muted">
-            {t("WrapRankingPage.notaHoras")}
+            {!desde
+              ? t("WrapRankingPage.notaHorasTodo")
+              : inicioRegistro && inicioRegistro > desde
+                ? t("WrapRankingPage.notaHorasDesdeRegistro", { fecha: inicioRegistro.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }) })
+                : t("WrapRankingPage.notaHorasPeriodo")}
           </p>
         )}
       </div>

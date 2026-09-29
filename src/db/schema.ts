@@ -1187,3 +1187,19 @@ export const playtimeIgnored = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
 );
+
+/** Total de horas de cada juego, un registro por día en que cambia (lib/horasPeriodo.ts) — `scripts/crear-tabla-registro-horas.mts`. */
+export const playtimeSnapshots = pgTable(
+  "playtime_snapshot",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    fecha: date("fecha", { mode: "string" }).notNull(),
+    minutos: integer("minutos").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.gameId, t.fecha] })],
+);

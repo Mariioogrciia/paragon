@@ -44,20 +44,20 @@ export interface FilaRankingJuego {
  * Ranking de horas jugadas, sumadas entre plataformas si el mismo juego
  * está en varias (Steam + PSN...), vía `gruposPorTitulo`.
  *
- * OJO: las plataformas solo dan el total acumulado de horas por juego, nunca
- * cuándo se jugaron — así que un "filtro de fecha" no puede recalcular las
- * horas de ese periodo, no existen. Lo que sí es real es filtrar QUÉ juegos
- * entran, por si alguna de sus copias se ha tocado en el periodo
- * (`lastPlayedAt`); las horas que se enseñan siguen siendo las de siempre.
- * Se avisa de esto en la pantalla en vez de fingir una precisión que no hay.
+ * Sin periodo (`desde` null): las horas totales que da cada plataforma.
+ * Con periodo: las horas jugadas EN ese periodo, que salen del registro
+ * diario de Paragon (`minutosPeriodo`, ver lib/horasPeriodo.ts). Antes, con
+ * periodo, se filtraban los juegos tocados en él pero se enseñaban sus horas
+ * de siempre — "este año" ponía 2.109 h de Fortnite acumuladas desde 2017
+ * solo porque se había abierto una vez en enero (queja real, 29 sept 2026).
  */
-export function rankingHoras(games: Game[], desde: Date | null): FilaRankingJuego[] {
-  return gruposPorTitulo(games)
-    .filter((grupo) => grupo.horasTotal > 0)
-    .filter((grupo) => {
-      if (!desde) return true;
-      return grupo.copias.some((g) => g.lastPlayedAt && new Date(g.lastPlayedAt) >= desde);
-    })
+export function rankingHoras(games: Game[], desde: Date | null, minutosPeriodo?: Map<string, number>): FilaRankingJuego[] {
+  const fuente =
+    desde && minutosPeriodo
+      ? games.map((g) => ({ ...g, playtimeMinutes: g.playtimeMinutes === undefined ? undefined : (minutosPeriodo.get(g.id) ?? 0) }))
+      : games;
+  return gruposPorTitulo(fuente)
+    .filter((grupo) => Math.round(grupo.horasTotal) > 0)
     .map((grupo) => ({
       gameId: grupo.principal.id,
       titulo: grupo.principal.title,

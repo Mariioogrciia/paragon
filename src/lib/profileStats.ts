@@ -106,7 +106,7 @@ export async function horasTotales(userId: string): Promise<number> {
   const [row] = await db
     .select({ minutos: sql<number>`coalesce(sum(${userGames.playtimeMinutes}), 0)` })
     .from(userGames)
-    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false)));
+    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), horasNoIgnoradasSql));
 
   return Math.round(Number(row?.minutos ?? 0) / 60);
 }

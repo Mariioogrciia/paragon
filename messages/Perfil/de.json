@@ -56,10 +56,12 @@
     "pestañaHoras": "Stunden",
     "pestañaTrofeos": "Trophäen",
     "pestañaGeneros": "Genres",
-    "notaHoras": "Die Plattformen geben nur die insgesamt angesammelten Stunden pro Spiel an, nie wann gespielt wurde. Der Datumsfilter entscheidet, welche Spiele auftauchen (ob in diesem Zeitraum gespielt wurde); die Stundenzahl jedes Spiels bleibt trotzdem die Gesamtzahl.",
     "vacio": "Für diesen Zeitraum liegen noch keine Daten vor.",
     "unidadHoras": "Std.",
-    "unidadTrofeos": "Trophäen"
+    "unidadTrofeos": "Trophäen",
+    "notaHorasTodo": "Gesamtstunden pro Spiel laut Plattform, seit jeher.",
+    "notaHorasPeriodo": "Gespielte Stunden in diesem Zeitraum, laut Paragons täglicher Aufzeichnung.",
+    "notaHorasDesdeRegistro": "Gespielte Stunden seit {fecha}, als Paragon mit der täglichen Aufzeichnung begann: Plattformen liefern nur die Gesamtzeit pro Spiel, nie wann gespielt wurde – davor lässt es sich nicht wissen."
   },
   "AmigosPage": {
     "meta": "Freunde · Paragon",
