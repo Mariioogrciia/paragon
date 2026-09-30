@@ -212,7 +212,12 @@
       "trofeo": "Congrats",
       "risa": "Haha",
       "sorpresa": "Wow"
-    }
+    },
+    "accionEstado": "posted",
+    "estadoPlaceholder": "What are you hunting? Tell the community…",
+    "publicar": "Post",
+    "publicando": "Posting…",
+    "borrar": "Delete"
   },
   "historicalTimeline": {
     "tuPrimerTrofeo": "Your first trophy",

@@ -14,7 +14,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const feed = await getFeed(userId);
+  // Los estados libres no llevan juego y la app Android todavía no los
+  // sabe pintar (espera `game` siempre): fuera hasta que los soporte.
+  const feed = (await getFeed(userId)).filter((item) => item.type !== "status" && item.game);
 
   return NextResponse.json({
     items: feed.map((item) => ({

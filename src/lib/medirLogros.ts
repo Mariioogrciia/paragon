@@ -59,9 +59,13 @@ export async function medirLogros(userId: string, nivel?: number): Promise<Medid
         (select count(*) from boost_session s
            where s."hostId" = ${userId} and not s.cancelada and s."fechaHora" < now()
              and exists (select 1 from boost_participant p where p."sessionId" = s.id)) as sesiones,
-        (select count(*) from trofeos where local is not null and extract(hour from local) between 2 and 4) as noctambulo,
+        -- Instantes DISTINTOS, no trofeos: una plataforma puede apuntar cientos
+        -- de logros al mismo segundo (importación, sincronización offline) y
+        -- eso no es haber jugado de madrugada ni una maratón (visto: 230
+        -- trofeos de un juego con una sola marca de tiempo).
+        (select count(distinct local) from trofeos where local is not null and extract(hour from local) between 2 and 4) as noctambulo,
         (select coalesce(max(n), 0) from (
-           select count(*) as n from trofeos where local is not null group by date(local)
+           select count(distinct local) as n from trofeos where local is not null group by date(local)
          ) d) as maraton
     `),
     nivel ?? getParagonLevel(userId).then((n) => n.level),

@@ -119,7 +119,8 @@ export async function getFeed(userId: string, { global = false, limite = 50 }: {
     })
     .from(activities)
     .innerJoin(users, eq(activities.userId, users.id))
-    .innerJoin(games, eq(activities.gameId, games.id))
+    // leftJoin: los estados libres ("status") no tienen juego.
+    .leftJoin(games, eq(activities.gameId, games.id))
     .where(
       global
         ? or(eq(users.isPublicProfile, true), eq(activities.userId, userId))

@@ -6,7 +6,7 @@ import { Avatar } from "@/components/Avatar";
 
 type ClanActivityItem = {
   id: string;
-  type: "review" | "rating" | "platinum" | "favorite" | "new_game";
+  type: "review" | "rating" | "platinum" | "favorite" | "new_game" | "status";
   rating: number | null;
   createdAt: Date;
   user: { handle: string | null; name: string | null; image: string | null };
@@ -19,6 +19,8 @@ const ACCION: Record<ClanActivityItem["type"], string> = {
   review: "reseñó",
   favorite: "marcó como favorito",
   new_game: "empezó",
+  // No llega aquí (la consulta del clan exige juego); solo para el tipo.
+  status: "publicó",
 };
 
 /**

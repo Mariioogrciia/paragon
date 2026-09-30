@@ -212,7 +212,12 @@
       "trofeo": "Bravo",
       "risa": "Mdr",
       "sorpresa": "Waouh"
-    }
+    },
+    "accionEstado": "a publié",
+    "estadoPlaceholder": "Que chasses-tu ? Raconte-le à la communauté…",
+    "publicar": "Publier",
+    "publicando": "Publication…",
+    "borrar": "Supprimer"
   },
   "historicalTimeline": {
     "tuPrimerTrofeo": "Ton premier trophée",

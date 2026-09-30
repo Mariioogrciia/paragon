@@ -763,6 +763,35 @@ export async function toggleActivityReactionAction(formData: FormData): Promise<
   revalidatePath("/", "layout");
 }
 
+/**
+ * Estado libre en Comunidad ("¿qué estás cazando?"): una `activity` de tipo
+ * "status" sin juego. Mismo filtro de lenguaje que reseñas y comentarios, y
+ * como mucho 5 cada 10 minutos por persona.
+ */
+export async function publicarEstadoAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId();
+  const texto = String(formData.get("texto") ?? "").trim().slice(0, 280);
+  if (!texto) return { error: "Escribe algo antes de publicar." };
+  const errorOfensivo = errorSiOfensivo(texto);
+  if (errorOfensivo) return { error: errorOfensivo };
+  if (!(await limitar("estado", userId))) return { error: "Has publicado mucho seguido. Espera unos minutos." };
+
+  await getDb().insert(activities).values({ id: crypto.randomUUID(), userId, type: "status", review: texto });
+  revalidatePath("/feed");
+  return { success: "Publicado." };
+}
+
+/** Solo el autor, y solo sus estados (lo demás sale de la actividad real y no se borra desde aquí). */
+export async function borrarEstadoAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const activityId = String(formData.get("activityId") ?? "");
+  if (!activityId) return;
+  await getDb()
+    .delete(activities)
+    .where(and(eq(activities.id, activityId), eq(activities.userId, userId), eq(activities.type, "status")));
+  revalidatePath("/feed");
+}
+
 export async function addActivityCommentAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   if (!(await limitar("comentario", userId))) return;

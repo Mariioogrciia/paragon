@@ -68,6 +68,7 @@ export const LIMITES = {
   guiaVideoRebuscar: [10, 60],
   subida: [10, 600],
   comentario: [20, 60],
+  estado: [5, 600],
   arcade: [30, 60],
   psnExtension: [5, 600],
   perfil: [20, 60],

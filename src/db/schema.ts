@@ -564,10 +564,9 @@ export const activities = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    type: text("type").$type<"review" | "rating" | "platinum" | "favorite" | "new_game">().notNull(),
-    gameId: text("gameId")
-      .notNull()
-      .references(() => games.id, { onDelete: "cascade" }),
+    type: text("type").$type<"review" | "rating" | "platinum" | "favorite" | "new_game" | "status">().notNull(),
+    /** Null solo en los estados libres de Comunidad (tipo "status"). */
+    gameId: text("gameId").references(() => games.id, { onDelete: "cascade" }),
     rating: integer("rating"),
     review: text("review"),
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),

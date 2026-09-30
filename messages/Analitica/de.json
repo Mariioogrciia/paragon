@@ -212,7 +212,12 @@
       "trofeo": "Glückwunsch",
       "risa": "Haha",
       "sorpresa": "Wow"
-    }
+    },
+    "accionEstado": "hat gepostet",
+    "estadoPlaceholder": "Was jagst du gerade? Erzähl es der Community…",
+    "publicar": "Posten",
+    "publicando": "Wird gepostet…",
+    "borrar": "Löschen"
   },
   "historicalTimeline": {
     "tuPrimerTrofeo": "Deine erste Trophäe",

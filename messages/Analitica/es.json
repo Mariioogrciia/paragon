@@ -212,7 +212,12 @@
       "trofeo": "Enhorabuena",
       "risa": "Me parto",
       "sorpresa": "¡Hala!"
-    }
+    },
+    "accionEstado": "publicó",
+    "estadoPlaceholder": "¿Qué estás cazando? Cuéntaselo a la comunidad…",
+    "publicar": "Publicar",
+    "publicando": "Publicando…",
+    "borrar": "Borrar"
   },
   "historicalTimeline": {
     "tuPrimerTrofeo": "Tu primer trofeo",

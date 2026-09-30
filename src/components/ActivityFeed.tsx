@@ -4,7 +4,7 @@ import type { getFeed } from "@/lib/feed";
 import type { Hito } from "@/lib/comunidad";
 import { formatDistanceToNow } from "date-fns";
 import { localeFechas } from "@/lib/localeFechas";
-import { addActivityCommentAction, toggleActivityReactionAction } from "@/app/actions";
+import { addActivityCommentAction, borrarEstadoAction, toggleActivityReactionAction } from "@/app/actions";
 import { REACCIONES } from "@/lib/reacciones";
 import { AchievementIcon } from "@/components/AchievementIcon";
 import { TituloEspecial } from "@/components/TituloEspecial";
@@ -103,7 +103,7 @@ function TarjetaHito({ hito }: { hito: Hito }) {
   );
 }
 
-function TarjetaActividad({ activity }: { activity: FeedActivity }) {
+function TarjetaActividad({ activity, currentUserId }: { activity: FeedActivity; currentUserId: string | null }) {
   const t = useTranslations("Analitica.activityFeed");
   const fechas = localeFechas(useLocale());
   const esPlatino = activity.type === "platinum";
@@ -114,6 +114,7 @@ function TarjetaActividad({ activity }: { activity: FeedActivity }) {
   else if (activity.type === "favorite") actionText = t("accionFavorite");
   else if (activity.type === "platinum") actionText = t("accionPlatinum");
   else if (activity.type === "new_game") actionText = t("accionNewGame");
+  else if (activity.type === "status") actionText = t("accionEstado");
   else actionText = t("accionDefault");
 
   return (
@@ -139,14 +140,20 @@ function TarjetaActividad({ activity }: { activity: FeedActivity }) {
         <div className="text-sm">
           <NombreAutor user={activity.user} />
           <span className="text-muted">{actionText}</span>{" "}
-          <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="font-semibold hover:underline">
-            {activity.game.title}
-          </Link>
+          {activity.game && (
+            <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="font-semibold hover:underline">
+              {activity.game.title}
+            </Link>
+          )}
         </div>
 
         <Hace fecha={activity.createdAt} />
 
         {activity.type === "rating" && activity.rating && <RatingStars rating={activity.rating} />}
+
+        {activity.type === "status" && activity.review && (
+          <p className="mt-2 whitespace-pre-line break-words text-[0.9375rem] leading-relaxed text-foreground">{activity.review}</p>
+        )}
 
         {activity.type === "review" && activity.review && (
           <div className="p-3 mt-3 text-sm italic border-l-2 bg-muted/20 border-accent/50 rounded-r-md text-foreground/80">
@@ -206,7 +213,14 @@ function TarjetaActividad({ activity }: { activity: FeedActivity }) {
         )}
       </div>
 
-      {activity.game.iconUrl && (
+      {activity.type === "status" && activity.user.id === currentUserId && (
+        <form action={borrarEstadoAction} className="shrink-0">
+          <input type="hidden" name="activityId" value={activity.id} />
+          <button className="text-xs font-semibold text-muted transition-colors hover:text-red-400">{t("borrar")}</button>
+        </form>
+      )}
+
+      {activity.game?.iconUrl && (
         <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="shrink-0">
           <img
             loading="lazy"
@@ -229,6 +243,7 @@ function TarjetaActividad({ activity }: { activity: FeedActivity }) {
 export function ActivityFeed({
   activities,
   hitos = [],
+  currentUserId = null,
   sinTitulo = false,
 }: {
   activities: FeedActivity[];
@@ -258,7 +273,7 @@ export function ActivityFeed({
 
       <div className="flex flex-col gap-4">
         {elementos.map((e) =>
-          e.actividad ? <TarjetaActividad key={e.clave} activity={e.actividad} /> : e.hito ? <TarjetaHito key={e.clave} hito={e.hito} /> : null,
+          e.actividad ? <TarjetaActividad key={e.clave} activity={e.actividad} currentUserId={currentUserId ?? null} /> : e.hito ? <TarjetaHito key={e.clave} hito={e.hito} /> : null,
         )}
       </div>
     </div>

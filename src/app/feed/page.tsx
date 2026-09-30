@@ -10,6 +10,7 @@ import { SeccionTabs } from "@/components/SeccionTabs";
 import { TituloEspecial } from "@/components/TituloEspecial";
 import { TrophyIcon } from "@/components/TrophyIcon";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
+import { PublicarEstado } from "@/components/PublicarEstado";
 
 export const metadata = {
   title: "Comunidad - Paragon",
@@ -85,6 +86,7 @@ export default async function GlobalFeedPage({ searchParams }: { searchParams: P
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
+          <PublicarEstado />
           {activities.length > 0 || hitos.length > 0 ? (
             <>
               <ActivityFeed activities={activities} hitos={hitos} currentUserId={userId} sinTitulo />
