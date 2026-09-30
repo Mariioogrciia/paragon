@@ -3,29 +3,39 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **30 de septiembre de 2026**.
 
-**Estado actual (29 sept 2026) — léelo antes que nada:**
-- **Todo está commiteado y en `origin/master`** (desplegado en Vercel, región
-  `fra1`). Lo único fuera del repo son `.env.local` y `scratch/`. El aviso de
-  sesiones anteriores sobre "cambios sin commitear" ya no aplica.
-- Las sesiones del **25 al 29 de septiembre** (auditorías y tres tandas de
-  funciones) están documentadas **al final de este archivo**, en orden:
-  auditoría de seguridad/plataforma → Functions Storage → segunda auditoría
-  (rendimiento/estética) → piloto automático → funciones del 28 → RLS
-  activado → tercera tanda de funciones → trofeos ocultos y horas por periodo.
+**Estado actual (30 sept 2026) — léelo antes que nada:**
+- **Todo está commiteado y en `origin/master`** hasta `4f7295f`, desplegado
+  en Vercel (región `fra1`, todos los despliegues "completed"). Fuera del
+  repo solo quedan `.env.local`, `scratch/` y un cambio local sin subir a
+  propósito en `.claude/launch.json` (ruta del certificado de Avast, que solo
+  existe en el equipo del usuario; ver "Entorno local" al final).
+- Las sesiones del **25 al 30 de septiembre** están **al final de este
+  archivo**, en orden: auditoría de seguridad/plataforma → Functions Storage
+  → segunda auditoría (rendimiento/estética) → piloto automático → funciones
+  del 28 → RLS activado → tercera tanda de funciones → trofeos ocultos y
+  horas por periodo → moderación, logros, niveles y Comunidad (29-30 sept) →
+  cuarta auditoría y lo que vino después (30 sept).
+- **Base de datos**: los cambios de esta última sesión están todos en
+  `scripts/crear-tablas-auditoria-3.mts` (idempotente, ya ejecutado en
+  producción): `mission_completion`, columnas nuevas en `user`
+  (`tituloDesbloqueado`, `apariencia`, `panelOculto`, `avisosDesactivados`,
+  `efectoNombre`) y `activity.gameId` admitiendo null.
 - **Seguridad**: RLS activado en las 40+ tablas de `public` y sin permisos
   para `anon`/`authenticated` (comprobado el 28 sept). Cualquier tabla nueva
   debe crearse con su script en `scripts/` activando RLS igual que los
   existentes. Limitador de peticiones activo (`lib/rateLimit.ts`).
-- **Calidad**: `npm test` (Vitest, 69 tests), lint sin errores (solo avisos
-  de `<img>` por hosts dinámicos) y workflow `.github/workflows/comprobaciones.yml`.
+- **Calidad**: `npm test` (Vitest, 75 tests), lint sin errores (solo avisos
+  de `<img>` por hosts dinámicos), `npx tsx scripts/comprobar-namespaces-cliente.mts`
+  y workflow `.github/workflows/comprobaciones.yml`.
 - **Vercel Hobby**: cuidado con el Functions Storage (se llenó al 90% por
   249 despliegues conservados; se borraron el 28 sept). Agrupar los cambios
-  en pocos pushes: cada push es un despliegue.
-- **Pendiente de decisión del usuario**: el handle `maricon439` (ya se
-  puede cambiar desde `/admin?tab=moderation`); y las reglas del Pase de
-  Temporada (decididas por Claude, ver `lib/temporada.ts`), revisables.
-- La última tanda (moderación, logros, niveles, Comunidad, 29-30 sept) está
-  al final de este archivo.
+  en pocos pushes: cada push es un despliegue. Para saber si un despliegue
+  acabó sin acceso al panel de Vercel: `https://api.github.com/repos/Mariioogrciia/paragon/commits/<sha>/status`
+  (Vercel publica ahí "Deployment has completed").
+- **Pendiente de decisión del usuario**: el handle `maricon439` (se cambia
+  desde `/admin?tab=moderation`); las reglas del Pase de Temporada
+  (decididas por Claude, `lib/temporada.ts`), revisables; y cómo dar
+  ganador a los retos semanales entre amigos (ver el final).
 
 ---
 
@@ -830,6 +840,27 @@ Subido en `cc643de` (despliegue de Vercel correcto).
   locale en nivel, perfil, panel, Comunidad, Temporada, Ligas, Amigos y el
   mapa de actividad.
 - Texto desfasado corregido: "Acéptalo desde el Planificador" → Amigos.
+- **Últimos lanzamientos populares** en Noticias (`popularesRecientes` en
+  igdb/client.ts, `UpcomingGames modo="recientes"`, `/api/games/upcoming?modo=recientes`):
+  lo más seguido (`hypes`) ya salido en los últimos 60 días, del catálogo
+  mundial, no solo de Paragon. "Lanzamientos destacados" (próximos) también
+  es dinámico: IGDB con caché de 6 h.
+- **Brillo del hover cortado**: la regla global de `globals.css` pone un
+  `drop-shadow` de 12px al pasar el ratón por botones y enlaces redondeados,
+  y cualquier fila con `overflow-x-auto` lo recorta (también en vertical).
+  Arreglado dando ~16px de relleno con margen negativo en pestañas
+  (`SeccionTabs`, `ProfileTabsNav`), filtros de eSports y carruseles
+  (`CardCarousel`, `GameVideos`, `GameDlcs`, `ScreenshotStrip`,
+  `HistoricalTimeline`, `FiltroEstadoAnimo`). **Cualquier fila deslizable
+  nueva necesita lo mismo** (`-m-4 p-4` o equivalente).
+- **Horas de Xbox**: `MinutesPlayed` con `POST /player/stats` de OpenXBL
+  (`minutosJugados` en xbl/client.ts), una llamada por tandas de 100 juegos
+  al sincronizar la biblioteca. Solo juegos con dispositivo Xbox/PC: los de
+  Xbox Live en PlayStation o Android ("Minecraft for PlayStation®") se
+  excluyen porque sus horas ya las da su plataforma. La respuesta viene
+  envuelta en `content`. Epic sigue sin dar horas por API.
+
+Commits de esta parte: `1d7f97d`, `13d3942`, `6618a3f`, `6117bdc`.
 
 ### Tanda siguiente (30 sept 2026)
 - **Estados libres en Comunidad** (`PublicarEstado`, `publicarEstadoAction`,
@@ -847,15 +878,38 @@ Subido en `cc643de` (despliegue de Vercel correcto).
 - **Idioma**: ya no quedan `"es-ES"` fijos en pantallas, salvo a propósito
   la imagen OG, la firma (etiquetas en español) y el admin.
 
-**Pendiente:** el menú de Ajustes (`AjustesNav.tsx`) y `NAV_OCULTABLE`/
-`PANEL_OCULTABLE`/`CATEGORIAS_AVISO` tienen etiquetas fijas en español;
-partir `actions.ts` y `profiles.ts`. "Retos semanales entre
-amigos" ya existe como clasificación semanal/mensual en /amigos; darle
-ganador exige decidir contra qué grupo gana cada uno (cada cual tiene
-amigos distintos).
+Commits: `3743b37` (estados + fix de insignias), `4f7295f` (efecto del
+nombre + idioma).
 
-- **Truco para scripts con `server-only`**: `npx tsx --conditions=react-server
+### Pendiente (al cerrar el 30 sept 2026)
+- Etiquetas fijas en español aunque se cambie el idioma: el menú de Ajustes
+  (`AjustesNav.tsx`) y las listas `NAV_OCULTABLE`, `PANEL_OCULTABLE` y
+  `CATEGORIAS_AVISO` (Ajustes → Ocultar y "Qué te avisamos").
+- La app Android no pinta los estados libres de Comunidad (la API móvil los
+  filtra) ni las reacciones con emoji (sigue aplaudiendo).
+- **Retos semanales entre amigos**: ya existe la clasificación semanal y
+  mensual en /amigos; darle ganador exige decidir contra qué grupo gana cada
+  uno (cada cual tiene amigos distintos). Pendiente de que el usuario diga
+  cómo lo quiere.
+- Partir `actions.ts` y `profiles.ts` (~1.700 líneas cada uno): no cambia
+  nada para el usuario; hacerlo cuando haya que tocarlos a fondo.
+- Sin verificar con el ratón encima en el navegador: el arreglo del brillo
+  cortado en carruseles (el usuario estaba usando el panel en ese momento).
+
+### Entorno local (Windows con Avast)
+- Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El
+  servidor de desarrollo lanzado desde la app de Claude no heredaba
+  `NODE_EXTRA_CA_CERTS` y el login fallaba con "Configuration" (fetch
+  failed al pedir el token a Discord/Google). Arreglado en
+  `.claude/launch.json` (`env`), que **no se sube** porque la ruta solo
+  existe en este equipo. Para scripts sueltos con peticiones HTTPS,
+  anteponer `NODE_EXTRA_CA_CERTS="C:\ProgramData\Avast Software\Avast\wscert.pem"`.
+- **Scripts con `server-only`**: `npx tsx --conditions=react-server
   script.mts` carga el módulo vacío de `server-only` (como hace Next), sin
-  tener que comentar el import a mano. En local con Avast, anteponer
-  `NODE_EXTRA_CA_CERTS="C:\ProgramData\Avast Software\Avast\wscert.pem"`
-  a cualquier script que haga peticiones HTTPS.
+  comentar el import a mano como decía la nota antigua.
+- Si el dev server se queda colgado minutos en una consulta trivial, mirar
+  `pg_stat_activity`: una consulta "active" en `ClientRead` es una conexión
+  del pool atascada en el lado de la app. Reiniciar el servidor lo arregla.
+- Los scripts desechables van en `scratch/` (fuera de git), no en el
+  scratchpad del sistema: desde fuera del proyecto no resuelven los
+  paquetes de `node_modules`.
