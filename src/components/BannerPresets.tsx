@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { BANNER_PRESETS, bannerPresetKey, bannerPresetValue, type BannerPresetKey } from "@/lib/bannerPresets";
+import { BANNER_REQUISITOS } from "@/lib/level";
 
 /**
  * Componentes de los banners de plataforma (arte SVG + selector). Las claves
@@ -132,33 +133,47 @@ const ARTE: Record<BannerPresetKey, () => ReactNode> = {
 export function BannerPresetPicker({
   value,
   onChange,
+  nivel = Infinity,
 }: {
   value: string | null | undefined;
   onChange: (value: string) => void;
+  /** Nivel Paragon: los banners de BANNER_REQUISITOS por encima salen bloqueados. */
+  nivel?: number;
 }) {
   const activo = bannerPresetKey(value);
 
   return (
     <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6">
-      {BANNER_PRESETS.map((p) => (
-        <button
-          key={p.key}
-          type="button"
-          onClick={() => onChange(bannerPresetValue(p.key))}
-          aria-pressed={activo === p.key}
-          className="group flex flex-col gap-1.5"
-        >
-          <span
-            className="block h-14 overflow-hidden rounded-lg border-2 transition-transform group-hover:scale-105"
-            style={{ borderColor: activo === p.key ? "var(--accent)" : "var(--border)" }}
+      {BANNER_PRESETS.map((p) => {
+        const requisito = BANNER_REQUISITOS[p.key];
+        const bloqueado = requisito !== undefined && nivel < requisito;
+        return (
+          <button
+            key={p.key}
+            type="button"
+            disabled={bloqueado}
+            onClick={() => onChange(bannerPresetValue(p.key))}
+            aria-pressed={activo === p.key}
+            title={bloqueado ? `Nivel ${requisito}` : undefined}
+            className="group flex flex-col gap-1.5 disabled:cursor-not-allowed"
           >
-            <PlatformBanner preset={p.key} className="h-full w-full" />
-          </span>
-          <span className="text-center text-[0.6875rem] font-semibold text-muted group-hover:text-foreground">
-            {p.label}
-          </span>
-        </button>
-      ))}
+            <span
+              className="relative block h-14 overflow-hidden rounded-lg border-2 transition-transform group-enabled:group-hover:scale-105"
+              style={{ borderColor: activo === p.key ? "var(--accent)" : "var(--border)" }}
+            >
+              <PlatformBanner preset={p.key} className={`h-full w-full ${bloqueado ? "opacity-30 grayscale" : ""}`} />
+              {bloqueado && (
+                <span className="absolute inset-0 flex items-center justify-center text-[0.6875rem] font-bold text-foreground">
+                  🔒 Nv. {requisito}
+                </span>
+              )}
+            </span>
+            <span className="text-center text-[0.6875rem] font-semibold text-muted group-enabled:group-hover:text-foreground">
+              {p.label}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }

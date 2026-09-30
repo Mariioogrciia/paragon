@@ -308,7 +308,8 @@
     "xpTotalLabel": "XP gesamt",
     "xpSourceHeading": "Woher deine XP kommt",
     "xpExplanation": "Jede Trophäe gibt XP je nach Seltenheit: Bronze 10, Silber 25, Gold 50 und Platin 200. Ein abgeschlossenes Spiel gibt 100 XP dazu.",
-    "footerHelp": "Der Kreis oben zeigt, wie weit du im aktuellen Level bist. Öffne diesen Bereich für die Aufschlüsselung und was noch fehlt."
+    "footerHelp": "Der Kreis oben zeigt, wie weit du im aktuellen Level bist. Öffne diesen Bereich für die Aufschlüsselung und was noch fehlt.",
+    "itemMisiones": "Wöchentliche Missionen"
   },
   "ParagonScoreCard": {
     "title": "Paragon Score",
@@ -322,32 +323,8 @@
     "countLabel": "{done}/{total} erreicht",
     "earned": "Erreicht",
     "progressFraction": "{value}/{target}",
-    "items": {
-      "first_blood": {
-        "name": "Erstes Juwel",
-        "description": "Hol dir dein erstes Platin."
-      },
-      "cazador": {
-        "name": "Jäger",
-        "description": "Hol dir 10 Platin-Trophäen."
-      },
-      "experto": {
-        "name": "Experte",
-        "description": "Hol dir 50 Platin-Trophäen."
-      },
-      "leyenda": {
-        "name": "Legende",
-        "description": "Hol dir 100 Platin-Trophäen."
-      },
-      "coleccionista": {
-        "name": "Sammler",
-        "description": "Füge 100 Spiele zu deiner Bibliothek hinzu."
-      },
-      "madrugador": {
-        "name": "Pionier",
-        "description": "Gehöre zu den ersten Nutzern von Paragon."
-      }
-    }
+    "hiddenName": "Verstecktes Abzeichen",
+    "hiddenDescription": "Spiel weiter, um es herauszufinden."
   },
   "ShowcaseTrophies": {
     "heading": "Stolz-Vitrine"
@@ -393,6 +370,66 @@
       "multiplataforma": {
         "name": "Plattformübergreifend",
         "description": "Du hast PlayStation, Steam und Xbox verknüpft und synchronisiert"
+      },
+      "joya_rara": {
+        "name": "Seltenes Juwel",
+        "description": "Hol dir eine Platin, die weniger als 5 % der Spieler haben."
+      },
+      "uno_entre_cien": {
+        "name": "Einer unter hundert",
+        "description": "Hol dir 10 Trophäen, die weniger als 1 % der Spieler haben."
+      },
+      "campeon": {
+        "name": "Champion",
+        "description": "Gewinne eine Liga: die monatliche oder eine private."
+      },
+      "senor_guerra": {
+        "name": "Kriegsherr",
+        "description": "Gewinne einen Clankrieg."
+      },
+      "en_equipo": {
+        "name": "Teamwork",
+        "description": "Schließe eine „Gemeinsam platinieren“-Herausforderung rechtzeitig ab."
+      },
+      "anfitrion": {
+        "name": "Gastgeber",
+        "description": "Organisiere eine Trophäen-Session, der jemand beitritt."
+      },
+      "guia": {
+        "name": "Community-Guide",
+        "description": "Schreibe 3 Trophäen-Guides."
+      },
+      "semana_perfecta": {
+        "name": "Perfekte Woche",
+        "description": "Schließe alle 4 Missionen einer Woche ab."
+      },
+      "incansable": {
+        "name": "Unermüdlich",
+        "description": "Schließe 25 Wochenmissionen ab."
+      },
+      "temporada_oro": {
+        "name": "Goldene Saison",
+        "description": "Erreiche Stufe 30 in einem Saisonpass."
+      },
+      "temporada_platino": {
+        "name": "Platin-Saison",
+        "description": "Erreiche Stufe 50 in einem Saisonpass."
+      },
+      "veterano": {
+        "name": "Veteran",
+        "description": "Erreiche Paragon-Stufe 25."
+      },
+      "maestro": {
+        "name": "Meister",
+        "description": "Erreiche Paragon-Stufe 50."
+      },
+      "noctambulo": {
+        "name": "Nachteule",
+        "description": "Hol dir 10 Trophäen zwischen 2 und 5 Uhr morgens."
+      },
+      "maraton": {
+        "name": "Marathon",
+        "description": "Hol dir 40 Trophäen an einem einzigen Tag."
       }
     }
   },
@@ -437,7 +474,8 @@
   "ProfileTabsNav": {
     "resumen": "Übersicht",
     "biblioteca": "Bibliothek",
-    "estadisticas": "Statistiken"
+    "estadisticas": "Statistiken",
+    "ritmo": "Tempo"
   },
   "ProfileSectionOrderEditor": {
     "ayuda": "Zieh, um die Reihenfolge auf deinem öffentlichen Profil zu ändern."
@@ -476,5 +514,28 @@
     "crear": "Vitrine erstellen",
     "borrar": "Vitrine löschen",
     "maximo": "Du hast bereits {n} Vitrinen, das Maximum."
+  },
+  "Titulos": {
+    "aprendiz": "Jägerlehrling",
+    "rastreador": "Fährtenleser",
+    "veterano": "Jagdveteran",
+    "elite": "Elitejäger",
+    "leyenda_viva": "Lebende Legende",
+    "paragon": "Höchster Paragon",
+    "buscador_joyas": "Juwelensucher",
+    "uno_entre_cien": "Einer unter hundert",
+    "campeon": "Ligachampion",
+    "senor_guerra": "Kriegsherr",
+    "sabio": "Weiser der Community",
+    "perfeccionista": "Perfektionist",
+    "criatura_noche": "Kreatur der Nacht",
+    "maratoniano": "Marathonläufer"
+  },
+  "TituloEspecial": {
+    "label": "Spezialtitel",
+    "ninguno": "Keiner",
+    "nivel": "Stufe {n}",
+    "insignia": "Abzeichen „{nombre}“",
+    "ayuda": "Werden durch Stufenaufstiege und Abzeichen freigeschaltet. Erscheinen neben deinem Namen im Profil und in der Community."
   }
 }

@@ -28,7 +28,9 @@
   },
   "ajustesOcultar": {
     "title": "Ocultar",
-    "description": "Nada de comunidad — esto es solo tuyo. Quita del menú las funciones que no te interesen; siguen ahí para todo el mundo, tú solo dejas de verlas."
+    "description": "Nada de comunidad — esto es solo tuyo. Quita del menú las funciones que no te interesen; siguen ahí para todo el mundo, tú solo dejas de verlas.",
+    "panelTitle": "Secciones del panel",
+    "panelDescription": "Las que marques no salen en tu panel (ni se calculan, así carga antes)."
   },
   "ajustesPlataformas": {
     "title": "Cuentas de Juegos",
@@ -280,7 +282,8 @@
     "styleTitle": "Estilo",
     "styleDescription": "No solo el color — el radio de esquina, la sombra, la tipografía y hasta el fondo cambian según el estilo.",
     "themesTitle": "Temas",
-    "themesDescription": "Combos de un clic: modo + acento + estilo a la vez."
+    "themesDescription": "Combos de un clic: modo + acento + estilo a la vez.",
+    "styleLocked": "Se desbloquea en el nivel {nivel}"
   },
   "themeCustomizer": {
     "label": "Apariencia"

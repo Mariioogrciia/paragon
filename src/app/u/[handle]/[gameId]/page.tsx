@@ -36,6 +36,9 @@ import { BackButton } from "@/components/BackButton";
 import { AutoSyncJuego } from "@/components/AutoSyncJuego";
 import { IgnorarHoras } from "@/components/IgnorarHoras";
 import { horasDeLaPlataforma } from "@/lib/horasIgnoradas";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { games } from "@/db/schema";
 
 async function ProximoRow({ trophy }: { trophy: Trophy }) {
   const t = await getTranslations("Biblioteca");
@@ -85,6 +88,13 @@ async function ProximoRow({ trophy }: { trophy: Trophy }) {
       </div>
     </div>
   );
+}
+
+/** Título de pestaña con el juego: antes salía solo "Paragon" en todas las fichas. */
+export async function generateMetadata({ params }: { params: Promise<{ handle: string; gameId: string }> }) {
+  const { handle, gameId } = await params;
+  const [juego] = await db.select({ title: games.title }).from(games).where(eq(games.id, decodeURIComponent(gameId))).limit(1);
+  return { title: juego ? `${juego.title} · @${handle} · Paragon` : "Paragon" };
 }
 
 export default async function JuegoPage({

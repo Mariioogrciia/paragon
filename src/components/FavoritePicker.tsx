@@ -6,7 +6,7 @@ import { setFavoritesAction } from "@/app/actions";
 import { Game } from "@/lib/types";
 import { coverGradient } from "@/lib/design";
 
-export function FavoritePicker({ allGames, currentFavorites }: { allGames: Game[], currentFavorites: string[] }) {
+export function FavoritePicker({ allGames, currentFavorites }: { allGames: Pick<Game, "id" | "title" | "iconUrl">[], currentFavorites: string[] }) {
   const t = useTranslations("Biblioteca");
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>(currentFavorites || []);

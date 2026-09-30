@@ -1,9 +1,10 @@
 import { getDb } from "@/db";
 import { activities, users, games, activityComments, activityReactions, activityViews } from "@/db/schema";
-import { inArray, desc, eq, and, sql } from "drizzle-orm";
+import { inArray, desc, eq, and, or, sql } from "drizzle-orm";
 import { listFriends } from "./profiles";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
+import { REACCIONES } from "@/lib/reacciones";
 
 /**
  * Reaccionar/quitar reacción a una publicación del Feed — función pura por
@@ -13,22 +14,27 @@ import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
  * directo a lo mismo — sin duplicar la lógica de "insertar o borrar" entre
  * la web y la app móvil.
  */
-export async function toggleActivityReaction(userId: string, activityId: string): Promise<{ reacted: boolean }> {
-  const db = getDb();
-  const [existing] = await db
-    .select({ userId: activityReactions.userId })
-    .from(activityReactions)
-    .where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId)))
-    .limit(1);
+const CLAVES_REACCION = new Set<string>(REACCIONES.map((r) => r.clave));
 
-  if (existing) {
-    await db
-      .delete(activityReactions)
-      .where(and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId)));
+/**
+ * La misma reacción otra vez la quita; otra distinta la cambia. Sin
+ * `reaction` (la app móvil, que solo sabe aplaudir) se comporta como antes.
+ */
+export async function toggleActivityReaction(userId: string, activityId: string, reaction: string = "aplauso"): Promise<{ reacted: boolean }> {
+  const db = getDb();
+  const nueva = CLAVES_REACCION.has(reaction) ? reaction : "aplauso";
+  const donde = and(eq(activityReactions.activityId, activityId), eq(activityReactions.userId, userId));
+  const [existing] = await db.select({ reaction: activityReactions.reaction }).from(activityReactions).where(donde).limit(1);
+
+  if (existing?.reaction === nueva) {
+    await db.delete(activityReactions).where(donde);
     return { reacted: false };
   }
-
-  await db.insert(activityReactions).values({ activityId, userId });
+  if (existing) {
+    await db.update(activityReactions).set({ reaction: nueva }).where(donde);
+    return { reacted: true };
+  }
+  await db.insert(activityReactions).values({ activityId, userId, reaction: nueva });
   return { reacted: true };
 }
 
@@ -80,15 +86,15 @@ export async function addActivityComment(userId: string, activityId: string, bod
   return { activityId, body: trimmed, userName: user?.name ?? "Alguien", createdAt };
 }
 
-export async function getFeed(userId: string) {
+/**
+ * `global`: toda la comunidad con perfil público (pestaña "Todos" de
+ * Comunidad), no solo tú y tus amigos. Sin eso la página se quedaba vacía
+ * para quien aún no tiene amigos en Paragon.
+ */
+export async function getFeed(userId: string, { global = false, limite = 50 }: { global?: boolean; limite?: number } = {}) {
   const db = getDb();
-  
-  const friends = await listFriends(userId);
-  const friendIds = friends.map((f) => f.userId);
-  const userIds = [userId, ...friendIds];
 
-  // inArray crashes in Postgres when given an empty array — guard required.
-  if (userIds.length === 0) return [];
+  const userIds = global ? [] : [userId, ...(await listFriends(userId)).map((f) => f.userId)];
 
   const rows = await db
     .select({
@@ -102,6 +108,7 @@ export async function getFeed(userId: string) {
         handle: users.handle,
         name: users.name,
         image: avatarUrlSql(users.id, users.image, users.avatarPersonalizado),
+        titulo: users.tituloDesbloqueado,
       },
       game: {
         id: games.id,
@@ -114,22 +121,29 @@ export async function getFeed(userId: string) {
     .innerJoin(users, eq(activities.userId, users.id))
     .innerJoin(games, eq(activities.gameId, games.id))
     .where(
-      userIds.length === 1
-        ? eq(activities.userId, userIds[0])
-        : inArray(activities.userId, userIds)
+      global
+        ? or(eq(users.isPublicProfile, true), eq(activities.userId, userId))
+        : userIds.length === 1
+          ? eq(activities.userId, userIds[0])
+          : inArray(activities.userId, userIds)
     )
     .orderBy(desc(activities.createdAt))
-    .limit(50);
+    .limit(limite);
 
-  if (rows.length === 0) return rows.map((row) => ({ ...row, reactions: 0, reacted: false, comments: [], views: 0 }));
+  if (rows.length === 0) return rows.map((row) => ({ ...row, reactions: 0, reacted: false, miReaccion: null as string | null, porReaccion: {} as Record<string, number>, comments: [], views: 0 }));
 
   const activityIds = rows.map((row) => row.id);
   const [reactionRows, commentRows, viewRows] = await Promise.all([
     db
-      .select({ activityId: activityReactions.activityId, total: sql<number>`count(*)`, reacted: sql<number>`count(*) filter (where ${activityReactions.userId} = ${userId})` })
+      .select({
+        activityId: activityReactions.activityId,
+        reaction: activityReactions.reaction,
+        total: sql<number>`count(*)`,
+        mia: sql<number>`count(*) filter (where ${activityReactions.userId} = ${userId})`,
+      })
       .from(activityReactions)
       .where(inArray(activityReactions.activityId, activityIds))
-      .groupBy(activityReactions.activityId),
+      .groupBy(activityReactions.activityId, activityReactions.reaction),
     db
       .select({ activityId: activityComments.activityId, body: activityComments.body, userName: users.name, createdAt: activityComments.createdAt })
       .from(activityComments)
@@ -142,7 +156,14 @@ export async function getFeed(userId: string) {
       .where(inArray(activityViews.activityId, activityIds))
       .groupBy(activityViews.activityId),
   ]);
-  const reactions = new Map(reactionRows.map((row) => [row.activityId, { total: Number(row.total), reacted: Number(row.reacted) > 0 }]));
+  const reactions = new Map<string, { total: number; mia: string | null; porReaccion: Record<string, number> }>();
+  for (const row of reactionRows) {
+    const r = reactions.get(row.activityId) ?? { total: 0, mia: null, porReaccion: {} };
+    r.total += Number(row.total);
+    r.porReaccion[row.reaction] = Number(row.total);
+    if (Number(row.mia) > 0) r.mia = row.reaction;
+    reactions.set(row.activityId, r);
+  }
   const comments = new Map<string, typeof commentRows>(activityIds.map((id) => [id, []]));
   for (const comment of commentRows) comments.get(comment.activityId)?.push(comment);
   const views = new Map(viewRows.map((row) => [row.activityId, Number(row.total)]));
@@ -150,7 +171,9 @@ export async function getFeed(userId: string) {
   return rows.map((row) => ({
     ...row,
     reactions: reactions.get(row.id)?.total ?? 0,
-    reacted: reactions.get(row.id)?.reacted ?? false,
+    reacted: Boolean(reactions.get(row.id)?.mia),
+    miReaccion: reactions.get(row.id)?.mia ?? null,
+    porReaccion: reactions.get(row.id)?.porReaccion ?? {},
     comments: comments.get(row.id) ?? [],
     views: views.get(row.id) ?? 0,
   }));

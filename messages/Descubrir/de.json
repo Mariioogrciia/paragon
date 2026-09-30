@@ -95,7 +95,23 @@
   "FeedPage": {
     "titulo": "Community",
     "subtitulo": "Deine Aktivität und die deiner Freunde.",
-    "vacio": "Hier ist es ziemlich ruhig. Sei der Erste, der etwas teilt!"
+    "vacio": "Hier ist es ziemlich ruhig. Sei der Erste, der etwas teilt!",
+    "verAmigos": "Deine Freunde",
+    "verTodos": "Alle",
+    "subtituloTodos": "Das Neueste von allen mit öffentlichem Profil.",
+    "platinoSemana": "Platin der Woche",
+    "platinoSemanaRareza": "Nur {rareza} % der Spieler haben sie",
+    "cazadoresSemana": "Jäger der Woche",
+    "trofeosN": "{n, plural, one {# Trophäe} other {# Trophäen}}",
+    "tendencias": "Im Trend",
+    "cazandoN": "{n} jagen",
+    "proximasSesiones": "Kommende Sessions",
+    "plazasLibres": "{n, plural, one {# Platz frei} other {# Plätze frei}}",
+    "verTodas": "Alle ansehen",
+    "sinSesiones": "Keine Sessions geplant.",
+    "organizar": "Eine organisieren",
+    "semanaVacia": "Diese Woche noch keine Trophäen in öffentlichen Profilen.",
+    "anadirAmigos": "Freunde hinzufügen"
   },
   "DiscoverSearch": {
     "placeholder": "Nicht in den Empfehlungen dabei? Suche danach — vollständiger IGDB-Katalog…",

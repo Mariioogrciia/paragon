@@ -70,6 +70,12 @@ export const users = pgTable("user", {
   profileColor: text("profileColor"),
   profileFrame: text("profileFrame"),
   statusText: text("statusText"),
+  /** Título especial desbloqueado por nivel o insignia (clave de lib/titulos.ts). */
+  tituloDesbloqueado: text("tituloDesbloqueado"),
+  /** Acento/estilo/tamaño de texto, para que no se queden en un solo navegador (lib/apariencia.ts). */
+  apariencia: jsonb("apariencia").$type<{ acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string }>(),
+  /** Secciones del panel ocultas por el usuario (lib/panelPreferences.ts). */
+  panelOculto: jsonb("panelOculto").$type<string[]>(),
 
   /**
    * Orden de las secciones del perfil público (wrap, stats, nivel, logros,
@@ -1202,4 +1208,20 @@ export const playtimeSnapshots = pgTable(
     minutos: integer("minutos").notNull(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId, t.fecha] })],
+);
+
+/** Misiones semanales cumplidas, con la XP que suman al nivel (lib/missions.ts) — `scripts/crear-tablas-auditoria-3.mts`. */
+export const missionCompletions = pgTable(
+  "mission_completion",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** "2026-W38", la misma clave que elige los retos de la semana. */
+    semana: text("semana").notNull(),
+    misionId: text("misionId").notNull(),
+    xp: integer("xp").notNull(),
+    completadoAt: timestamp("completadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.semana, t.misionId] })],
 );

@@ -5,6 +5,8 @@ import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
 import { MEDALLAS, NIVEL_MAXIMO, PUNTOS_POR_NIVEL, faltanParaSiguiente, medallaDe, temporadaDe } from "@/lib/temporada";
 import { historialTemporadas, rankingTemporada, type FilaTemporada } from "@/lib/temporadas";
+import { SeccionTabs } from "@/components/SeccionTabs";
+import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 
 export const metadata = { title: "Temporada · Paragon" };
 
@@ -12,8 +14,10 @@ export const metadata = { title: "Temporada · Paragon" };
  * Pase de Temporada — reglas en lib/temporada.ts. Tu nivel y el camino de
  * medallas, el ranking de la temporada y tus temporadas anteriores.
  */
-export default async function TemporadaPage() {
+export default async function TemporadaPage({ searchParams }: { searchParams: Promise<{ pagina?: string }> }) {
   const t = await getTranslations("Shell.Temporada");
+  const params = await searchParams;
+  const cuantos = 20 * paginaDe(params.pagina);
   const session = await auth();
   const userId = session?.user?.id ?? null;
 
@@ -35,6 +39,7 @@ export default async function TemporadaPage() {
   return (
     <div className="mx-auto max-w-[900px] space-y-8">
       <BackButton fallbackHref="/" />
+      <SeccionTabs seccion="ligas" />
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent-text)]">
           {t("nombre", { trimestre: temporada.trimestre, anio: temporada.anio })}
@@ -95,7 +100,7 @@ export default async function TemporadaPage() {
           <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">{t("vacio")}</p>
         ) : (
           <div className="grid gap-2">
-            {ranking.slice(0, 20).map((r, i) => {
+            {ranking.slice(0, cuantos).map((r, i) => {
               const m = medallaDe(r.nivel);
               return (
                 <Link
@@ -116,6 +121,7 @@ export default async function TemporadaPage() {
             })}
           </div>
         )}
+        {ranking.length > cuantos && <VerMas href={hrefPagina("/temporada", params, cuantos / 20 + 1)} />}
       </section>
 
       {historial.length > 0 && (

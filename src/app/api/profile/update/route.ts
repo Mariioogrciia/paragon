@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getDb } from "@/db";
-import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getParagonLevel } from "@/lib/paragonLevel";
-import { FRAME_REQUISITOS } from "@/lib/level";
+import { BANNER_REQUISITOS, FRAME_REQUISITOS } from "@/lib/level";
+import { bannerPresetKey } from "@/lib/bannerPresets";
+import { TITULO_POR_CLAVE, tituloDesbloqueado } from "@/lib/titulos";
+import { userBadges, users } from "@/db/schema";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 import { isHandleTaken } from "@/lib/profiles";
@@ -38,6 +40,7 @@ export async function POST(request: Request) {
     const statusText = formData.get("statusText") as string | null;
     const theme = formData.get("theme") as string | null;
     const profileSectionOrderRaw = formData.get("profileSectionOrder") as string | null;
+    const tituloDesbloqueadoSolicitado = formData.get("tituloDesbloqueado") as string | null;
 
     // Bloquea el guardado entero si cualquiera de los campos que otros
     // pueden ver (nombre, título, estado) lleva lenguaje ofensivo — nada
@@ -90,9 +93,20 @@ export async function POST(request: Request) {
     let profileFrame = profileFrameSolicitado?.trim() || null;
     // Un marco que no existe se descarta (antes se guardaba tal cual).
     if (profileFrame && FRAME_REQUISITOS[profileFrame] === undefined) profileFrame = null;
-    if (profileFrame) {
-      const nivel = await getParagonLevel(session.user.id);
-      if (nivel.level < FRAME_REQUISITOS[profileFrame]) profileFrame = null;
+    // Lo mismo para banners de plataforma y títulos especiales: el nivel y
+    // las insignias se miran aquí, no se fían del formulario.
+    const presetBanner = bannerPresetKey(banner);
+    const tituloPedido = tituloDesbloqueadoSolicitado?.trim() ? TITULO_POR_CLAVE.get(tituloDesbloqueadoSolicitado.trim()) : undefined;
+    let bannerFinal = banner;
+    let tituloFinal: string | null = null;
+    if (profileFrame || (presetBanner && BANNER_REQUISITOS[presetBanner] !== undefined) || tituloPedido) {
+      const [nivel, insignias] = await Promise.all([
+        getParagonLevel(session.user.id),
+        getDb().select({ id: userBadges.badgeId }).from(userBadges).where(eq(userBadges.userId, session.user.id)),
+      ]);
+      if (profileFrame && nivel.level < FRAME_REQUISITOS[profileFrame]) profileFrame = null;
+      if (presetBanner && nivel.level < (BANNER_REQUISITOS[presetBanner] ?? 0)) bannerFinal = null;
+      if (tituloPedido && tituloDesbloqueado(tituloPedido, nivel.level, insignias.map((i) => i.id))) tituloFinal = tituloPedido.clave;
     }
 
     let profileSectionOrder: string[] | null = null;
@@ -116,7 +130,8 @@ export async function POST(request: Request) {
       timezone: zona,
       profileTitle: profileTitle?.trim().slice(0, 60) || null,
       profileBackgroundGameId: profileBackgroundGameId?.trim().slice(0, 200) || null,
-      profileBannerUrl: banner,
+      profileBannerUrl: bannerFinal,
+      tituloDesbloqueado: tituloFinal,
       image: imagen,
       ...(imagen ? { avatarPersonalizado: true } : {}),
       profileColor: color,

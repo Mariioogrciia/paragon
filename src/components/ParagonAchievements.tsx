@@ -1,44 +1,23 @@
-import type { Game } from "@/lib/types";
-import { esPlatinoEquivalente } from "@/lib/stats";
 import { AchievementIcon } from "@/components/AchievementIcon";
 import { getTranslations } from "next-intl/server";
+import { LOGROS, logroConseguido, type MedidasLogros } from "@/lib/logros";
 
 /**
- * Cuenta platinos "de verdad": el metal real de PSN + el 100% de Steam
- * (`esPlatinoEquivalente`, lib/stats.ts — la misma fuente que ya usa
- * `checkAndGrantBadges` en lib/profiles.ts para otorgar estas mismas
- * insignias). Antes esto sumaba solo `g.earned?.platinum` (solo PSN): a
- * alguien con muchos 100% de Steam la insignia le salía ya otorgada en la
- * base (el contador de arriba, que sale de ahí) pero la tarjeta seguía
- * enseñando "23/50" en vez de "Conseguido" — el mismo dato, calculado de
- * dos formas distintas que no coincidían.
+ * Todas las insignias del catálogo (lib/logros.ts) con su progreso real.
+ * `medidas` sale de `medirLogros`, lo mismo que decide qué se otorga, así que
+ * la tarjeta y la insignia otorgada no pueden contradecirse. `earnedIds` es la
+ * red de seguridad: lo ya otorgado sigue "Conseguido" aunque un umbral cambie.
  */
-function platinosEquivalentes(games: Game[]): number {
-  return games.filter((g) => !g.isWishlist && esPlatinoEquivalente(g)).length;
-}
-
-const ACHIEVEMENTS = [
-  { id: "first_blood", target: 1, value: platinosEquivalentes, color: "var(--platinum)" },
-  { id: "cazador", target: 10, value: platinosEquivalentes, color: "var(--accent)" },
-  { id: "experto", target: 50, value: platinosEquivalentes, color: "var(--gold)" },
-  { id: "leyenda", target: 100, value: platinosEquivalentes, color: "var(--bronze)" },
-  { id: "coleccionista", target: 100, value: (games: Game[]) => games.filter((g) => !g.isWishlist).length, color: "var(--good)" },
-  { id: "madrugador", target: 1, value: () => 1, color: "var(--accent-2)" },
-] as const;
-
-export async function ParagonAchievements({ games, earnedIds }: { games: Game[]; earnedIds: string[] }) {
+export async function ParagonAchievements({ medidas, earnedIds }: { medidas: MedidasLogros; earnedIds: string[] }) {
   const t = await getTranslations("Perfil");
-  // `earned` se calcula igual aquí que en cada tarjeta (en vivo, con
-  // `earnedIds` como red de seguridad si algún día cambia un umbral y una
-  // insignia ya otorgada dejara de cumplirlo en teoría) — así el contador de
-  // arriba nunca puede desincronizarse de lo que enseñan las tarjetas, que es
-  // justo el bug que había antes.
-  const evaluados = ACHIEVEMENTS.map((achievement) => {
-    const value = achievement.value(games);
-    const earned = value >= achievement.target || earnedIds.includes(achievement.id);
-    return { achievement, value, earned };
-  });
-  const totalConseguidos = evaluados.filter((e) => e.earned).length;
+  const evaluados = LOGROS.map((logro) => ({
+    logro,
+    valor: medidas[logro.metrica],
+    conseguido: earnedIds.includes(logro.id) || logroConseguido(logro, medidas),
+  }))
+    // Conseguidos primero; los ocultos sin conseguir, al final.
+    .sort((a, b) => Number(b.conseguido) - Number(a.conseguido) || Number(Boolean(a.logro.oculto)) - Number(Boolean(b.logro.oculto)));
+  const totalConseguidos = evaluados.filter((e) => e.conseguido).length;
 
   return (
     <section className="rounded-[18px] border border-border bg-surface p-5">
@@ -47,26 +26,42 @@ export async function ParagonAchievements({ games, earnedIds }: { games: Game[];
           <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("ParagonAchievements.heading")}</h2>
           <p className="mt-1 text-sm text-muted">{t("ParagonAchievements.subheading")}</p>
         </div>
-        <span className="text-xs font-semibold text-muted">{t("ParagonAchievements.countLabel", { done: totalConseguidos, total: ACHIEVEMENTS.length })}</span>
+        <span className="text-xs font-semibold text-muted">{t("ParagonAchievements.countLabel", { done: totalConseguidos, total: LOGROS.length })}</span>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {evaluados.map(({ achievement, value, earned }) => {
-          const percent = Math.min(100, Math.round((value / achievement.target) * 100));
+        {evaluados.map(({ logro, valor, conseguido }) => {
+          const secreto = logro.oculto && !conseguido;
+          const percent = Math.min(100, Math.round((valor / logro.objetivo) * 100));
           return (
-            <div key={achievement.id} className="rounded-xl border border-border p-3" style={{ opacity: earned ? 1 : 0.62 }}>
+            <div key={logro.id} className="rounded-xl border border-border p-3" style={{ opacity: conseguido ? 1 : 0.62 }}>
               <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ background: `color-mix(in srgb, ${achievement.color} 18%, transparent)`, color: achievement.color }}>
-                  <AchievementIcon id={achievement.id} size={19} />
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  style={{ background: `color-mix(in srgb, ${logro.color} 18%, transparent)`, color: secreto ? "var(--muted)" : logro.color }}
+                >
+                  <AchievementIcon id={secreto ? "oculto" : logro.id} size={19} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-bold">{t(`ParagonAchievements.items.${achievement.id}.name`)}</h3>
-                    <span className="text-[0.625rem] font-bold uppercase" style={{ color: earned ? "var(--good)" : "var(--muted)" }}>{earned ? t("ParagonAchievements.earned") : t("ParagonAchievements.progressFraction", { value, target: achievement.target })}</span>
+                    <h3 className="text-sm font-bold">{secreto ? t("ParagonAchievements.hiddenName") : t(`Badges.items.${logro.id}.name`)}</h3>
+                    {!secreto && (
+                      <span className="shrink-0 text-[0.625rem] font-bold uppercase" style={{ color: conseguido ? "var(--good)" : "var(--muted)" }}>
+                        {conseguido
+                          ? t("ParagonAchievements.earned")
+                          : t("ParagonAchievements.progressFraction", { value: Math.min(valor, logro.objetivo), target: logro.objetivo })}
+                      </span>
+                    )}
                   </div>
-                  <p className="mt-1 text-xs text-muted">{t(`ParagonAchievements.items.${achievement.id}.description`)}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {secreto ? t("ParagonAchievements.hiddenDescription") : t(`Badges.items.${logro.id}.description`)}
+                  </p>
                 </div>
               </div>
-              {!earned && <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full" style={{ width: `${percent}%`, background: achievement.color }} /></div>}
+              {!conseguido && !secreto && (
+                <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full" style={{ width: `${percent}%`, background: logro.color }} />
+                </div>
+              )}
             </div>
           );
         })}

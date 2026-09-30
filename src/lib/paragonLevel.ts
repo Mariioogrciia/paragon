@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
 import { paragonLevelFromXp, type ParagonLevel } from "@/lib/level";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
+import { xpMisiones } from "@/lib/missions";
 
 /**
  * Nivel Paragon de VARIOS usuarios a la vez, en dos consultas en total —
@@ -25,7 +26,7 @@ export async function getParagonLevels(
 ): Promise<Map<string, ParagonLevel>> {
   if (userIds.length === 0) return new Map();
 
-  const [filas, steamTrofeos, xboxTrofeos] = await Promise.all([
+  const [filas, steamTrofeos, xboxTrofeos, misiones] = await Promise.all([
     db
       .select({
         userId: userGames.userId,
@@ -61,8 +62,11 @@ export async function getParagonLevels(
     // a llegar sincronización real: pesa por el Gamerscore real de cada
     // logro (gameTrophies.xp, el mismo dato que ya usa Paragon Score), no
     // por nada hasta el 100% del juego.
+    // Epic igual que Xbox (XP real de cada logro): paragonProgress
+    // (lib/level.ts) ya lo sumaba y esto no, así que el nivel de la cabecera
+    // salía más bajo que el del perfil para quien tuviera Epic vinculado.
     db
-      .select({ userId: userTrophies.userId, xp: gameTrophies.xp })
+      .select({ userId: userTrophies.userId, xp: gameTrophies.xp, platform: games.platform })
       .from(userTrophies)
       .innerJoin(games, eq(games.id, userTrophies.gameId))
       .innerJoin(
@@ -77,20 +81,21 @@ export async function getParagonLevels(
         and(
           inArray(userTrophies.userId, userIds),
           eq(userTrophies.earned, true),
-          eq(games.platform, "xbox"),
+          inArray(games.platform, ["xbox", "epic"]),
           eq(userGames.isWishlist, false),
         ),
       ),
+    xpMisiones(userIds),
   ]);
 
-  const xpPorUsuario = new Map<string, number>(userIds.map((id) => [id, 0]));
+  const xpPorUsuario = new Map<string, number>(userIds.map((id) => [id, misiones.get(id) ?? 0]));
 
   for (const t of steamTrofeos) {
     xpPorUsuario.set(t.userId, (xpPorUsuario.get(t.userId) ?? 0) + xpSteamPorRareza(t.rarityPercent));
   }
 
   for (const t of xboxTrofeos) {
-    xpPorUsuario.set(t.userId, (xpPorUsuario.get(t.userId) ?? 0) + trophyScore({ platform: "xbox", xp: t.xp }));
+    xpPorUsuario.set(t.userId, (xpPorUsuario.get(t.userId) ?? 0) + trophyScore({ platform: t.platform, xp: t.xp }));
   }
 
   for (const fila of filas) {

@@ -1,17 +1,37 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getProfileByUserId } from "@/lib/profiles";
-import { getAdminOverview, getAdminUsers, getRecentSyncRuns, getAdminActivities, getAdminLeagues, getAdminClans, getAdminRecentTrophies } from "@/lib/admin";
+import { getAdminOverview, getAdminUsers, getRecentSyncRuns, getAdminActivities, getAdminLeagues, getAdminClans, getAdminRecentTrophies, getAdminModeracion, type CampoModerable } from "@/lib/admin";
 import { PLATFORM_LABEL, type AccountPlatform } from "@/lib/types";
 import { relativeDate } from "@/lib/design";
-import { deleteActivityAction, adminDeleteLeagueAction, adminDeleteClanAction } from "@/app/actions";
+import { deleteActivityAction, adminDeleteLeagueAction, adminDeleteClanAction, adminSetHandleAction, adminVaciarCampoAction } from "@/app/actions";
 import { BackButton } from "@/components/BackButton";
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
+import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 
 export const metadata = { title: "Admin · Paragon" };
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
+
+const NOMBRE_CAMPO: Record<CampoModerable, string> = {
+  handle: "@handle",
+  name: "Nombre a mostrar",
+  firstName: "Nombre",
+  lastName: "Apellidos",
+  profileTitle: "Título de perfil",
+  statusText: "Estado",
+};
+
+const HANDLE_MENSAJES: Record<string, { texto: string; ok?: boolean }> = {
+  ok: { texto: "Nombre de usuario cambiado.", ok: true },
+  formato: { texto: "Entre 3 y 20 caracteres, solo minúsculas, números y guion bajo." },
+  cogido: { texto: "Ese nombre de usuario ya está cogido." },
+  ofensivo: { texto: "Ese nombre de usuario también contiene lenguaje ofensivo — prueba con otro." },
+};
+
+const BOTON_PELIGRO =
+  "rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white";
 
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
@@ -33,6 +53,10 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
   const t = await getTranslations("Admin");
   const searchParams = await props.searchParams;
   const currentTab = typeof searchParams.tab === "string" ? searchParams.tab : "dashboard";
+  // Paginación por pestaña (`?pagina=N`, ver VerMas): antes la tabla de
+  // usuarios traía a todo el mundo de golpe y el resto cortaba en seco.
+  const pagina = paginaDe(searchParams.pagina);
+  const masHref = hrefPagina("/admin", searchParams, pagina + 1);
 
   // Solo se piden los datos de la pestaña activa, no las cinco a la vez.
   // El pool de conexiones a la base de datos tiene `max: 5` a propósito
@@ -44,9 +68,11 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
     currentTab === "dashboard" ? await Promise.all([getAdminOverview(), getAdminUsers()]) : [null, null];
   const leagues = currentTab === "leagues" ? await getAdminLeagues() : null;
   const clans = currentTab === "clans" ? await getAdminClans() : null;
-  const recentTrophies = currentTab === "trophies" ? await getAdminRecentTrophies(60) : null;
-  const [syncRuns, activities] =
-    currentTab === "system" ? await Promise.all([getRecentSyncRuns(30), getAdminActivities(50)]) : [null, null];
+  const recentTrophies = currentTab === "trophies" ? await getAdminRecentTrophies(60 * pagina + 1) : null;
+  const syncRuns = currentTab === "system" ? await getRecentSyncRuns(30) : null;
+  const [moderacion, activities] =
+    currentTab === "moderation" ? await Promise.all([getAdminModeracion(), getAdminActivities(30 * pagina + 1)]) : [null, null];
+  const handleMsg = typeof searchParams.handleMsg === "string" ? HANDLE_MENSAJES[searchParams.handleMsg] : null;
 
   return (
     <div className="space-y-9 max-w-[1400px] mx-auto px-4 py-8">
@@ -64,6 +90,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
           { id: "leagues", label: t("tabs.leagues") },
           { id: "clans", label: t("tabs.clans") },
           { id: "trophies", label: t("tabs.trophies") },
+          { id: "moderation", label: t("tabs.moderation") },
           { id: "system", label: t("tabs.system") },
         ].map(tab => (
           <Link
@@ -130,7 +157,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                   </tr>
                 </thead>
                 <tbody>
-                  {usuarios.map((u) => (
+                  {usuarios.slice(0, 50 * pagina).map((u) => (
                     <tr key={u.userId} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
                       <td className="px-4 py-2.5 font-semibold">
                         <Link href={`/admin/usuarios/${u.userId}`} className="hover:text-[rgb(var(--accent-rgb))] hover:underline">
@@ -149,6 +176,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                 </tbody>
               </table>
             </div>
+            {usuarios.length > 50 * pagina && <VerMas href={masHref} />}
           </section>
         </div>
       )}
@@ -297,7 +325,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                 </tr>
               </thead>
               <tbody>
-                {recentTrophies.map((tr) => (
+                {recentTrophies.slice(0, 60 * pagina).map((tr) => (
                   <tr key={tr.id} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
                     <td className="px-4 py-2.5 font-semibold">
                       {tr.userHandle ? (
@@ -337,11 +365,190 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
               </tbody>
             </table>
           </div>
+          {recentTrophies.length > 60 * pagina && <VerMas href={masHref} />}
         </section>
       )}
 
+      {/* TAB: MODERACIÓN */}
+      {currentTab === "moderation" && moderacion && activities && (
+        <div className="space-y-9">
+          <div>
+            <h2 className="font-heading mb-1 text-xl font-bold uppercase tracking-wide">Nombres y textos ofensivos</h2>
+            <p className="text-sm text-muted">
+              Lo que el filtro de lenguaje marca hoy y que ya estaba guardado antes. Crear algo nuevo así ya está bloqueado; esto es para limpiar lo que había.
+            </p>
+          </div>
+
+          {handleMsg && (
+            <p
+              className="rounded-lg px-4 py-3 text-sm font-semibold"
+              style={
+                handleMsg.ok
+                  ? { background: "rgb(34 197 94 / 0.1)", border: "1px solid rgb(34 197 94 / 0.3)", color: "#4ade80" }
+                  : { background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }
+              }
+            >
+              {handleMsg.texto}
+            </p>
+          )}
+
+          <section>
+            <h3 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Usuarios</h3>
+            <div className="overflow-x-auto rounded-[14px]" style={CARD}>
+              <table className="w-full min-w-[700px] text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
+                    <th className="px-4 py-3">Usuario</th>
+                    <th className="px-4 py-3">Campo</th>
+                    <th className="px-4 py-3">Texto</th>
+                    <th className="px-4 py-3 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {moderacion.usuarios.flatMap((u) =>
+                    u.campos.map((c) => (
+                      <tr key={`${u.userId}-${c.campo}`} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
+                        <td className="px-4 py-2.5 font-semibold">
+                          <Link href={`/admin/usuarios/${u.userId}`} className="hover:text-[rgb(var(--accent-rgb))] hover:underline">
+                            {u.handle ? `@${u.handle}` : u.userId.slice(0, 8)}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted">{NOMBRE_CAMPO[c.campo]}</td>
+                        <td className="px-4 py-2.5 max-w-[260px] break-words text-red-400">{c.valor}</td>
+                        <td className="px-4 py-2.5 text-right">
+                          {c.campo === "handle" ? (
+                            <form action={adminSetHandleAction} className="flex items-center justify-end gap-2">
+                              <input type="hidden" name="targetUserId" value={u.userId} />
+                              <input type="hidden" name="volver" value="moderacion" />
+                              <input
+                                name="handle"
+                                required
+                                placeholder="nuevo_handle"
+                                className="w-36 rounded-lg border border-white/10 bg-[var(--surface)] px-3 py-1.5 text-xs focus:border-accent focus:outline-none"
+                              />
+                              <button className={BOTON_PELIGRO}>Cambiar</button>
+                            </form>
+                          ) : (
+                            <form action={adminVaciarCampoAction}>
+                              <input type="hidden" name="targetUserId" value={u.userId} />
+                              <input type="hidden" name="campo" value={c.campo} />
+                              <button className={BOTON_PELIGRO}>Vaciar</button>
+                            </form>
+                          )}
+                        </td>
+                      </tr>
+                    )),
+                  )}
+                  {moderacion.usuarios.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-muted">Ningún usuario con nombres o textos ofensivos.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Clanes y ligas</h3>
+            <div className="overflow-x-auto rounded-[14px]" style={CARD}>
+              <table className="w-full min-w-[600px] text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
+                    <th className="px-4 py-3">Tipo</th>
+                    <th className="px-4 py-3">Texto</th>
+                    <th className="px-4 py-3">Creador</th>
+                    <th className="px-4 py-3 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {moderacion.grupos.map((g) => (
+                    <tr key={`${g.tipo}-${g.id}`} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
+                      <td className="px-4 py-2.5 font-semibold">{g.tipo === "clan" ? "Clan" : "Liga"}</td>
+                      <td className="px-4 py-2.5 max-w-[320px] break-words text-red-400">{g.texto}</td>
+                      <td className="px-4 py-2.5 text-muted">{g.ownerHandle ? `@${g.ownerHandle}` : "—"}</td>
+                      <td className="px-4 py-2.5 text-right">
+                        <form action={g.tipo === "clan" ? adminDeleteClanAction : adminDeleteLeagueAction}>
+                          <input type="hidden" name={g.tipo === "clan" ? "clanId" : "leagueId"} value={g.id} />
+                          <button className={BOTON_PELIGRO}>Eliminar</button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                  {moderacion.grupos.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-muted">Ningún clan ni liga con nombre ofensivo.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.moderation.title")}</h2>
+            <div className="overflow-x-auto rounded-[14px]" style={CARD}>
+              <table className="w-full min-w-[700px] text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
+                    <th className="px-4 py-3">{t("system.moderation.table.author")}</th>
+                    <th className="px-4 py-3">{t("system.moderation.table.game")}</th>
+                    <th className="px-4 py-3">{t("system.moderation.table.content")}</th>
+                    <th className="px-4 py-3 text-right">{t("system.moderation.table.action")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activities.slice(0, 30 * pagina).map((a) => (
+                    <tr key={a.id} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
+                      <td className="px-4 py-2.5 font-semibold">
+                        <div className="flex flex-col">
+                          <span>{a.userName}</span>
+                          <span className="text-xs text-muted">@{a.userHandle ?? "?"}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5 text-muted max-w-[200px] truncate" title={a.gameTitle ?? ""}>
+                        {a.gameTitle ?? "—"}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        {a.rating && (
+                          <div className="flex gap-0.5 text-yellow-500 mb-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < a.rating! ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                              </svg>
+                            ))}
+                          </div>
+                        )}
+                        <p className="text-sm break-words max-w-[350px]">
+                          {a.review ? `"${a.review}"` : <span className="italic text-muted">{t("system.moderation.table.noReview")}</span>}
+                        </p>
+                        <p className="text-xs text-muted mt-1">{relativeDate(a.createdAt, idioma)}</p>
+                      </td>
+                      <td className="px-4 py-2.5 text-right">
+                        <form action={deleteActivityAction}>
+                          <input type="hidden" name="activityId" value={a.id} />
+                          <button className="rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white">
+                            {t("system.moderation.table.delete")}
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                  {activities.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-muted">{t("system.moderation.table.empty")}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {activities.length > 30 * pagina && <VerMas href={masHref} />}
+          </section>
+        </div>
+      )}
+
       {/* TAB: SISTEMA */}
-      {currentTab === "system" && syncRuns && activities && (
+      {currentTab === "system" && syncRuns && (
         <div className="space-y-9">
           
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -420,65 +627,6 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                   {syncRuns.length === 0 && (
                     <tr>
                       <td colSpan={5} className="px-4 py-8 text-center text-muted">{t("system.recentSyncs.table.empty")}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.moderation.title")}</h2>
-            <div className="overflow-x-auto rounded-[14px]" style={CARD}>
-              <table className="w-full min-w-[700px] text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">
-                    <th className="px-4 py-3">{t("system.moderation.table.author")}</th>
-                    <th className="px-4 py-3">{t("system.moderation.table.game")}</th>
-                    <th className="px-4 py-3">{t("system.moderation.table.content")}</th>
-                    <th className="px-4 py-3 text-right">{t("system.moderation.table.action")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activities.map((a) => (
-                    <tr key={a.id} className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
-                      <td className="px-4 py-2.5 font-semibold">
-                        <div className="flex flex-col">
-                          <span>{a.userName}</span>
-                          <span className="text-xs text-muted">@{a.userHandle ?? "?"}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2.5 text-muted max-w-[200px] truncate" title={a.gameTitle ?? ""}>
-                        {a.gameTitle ?? "—"}
-                      </td>
-                      <td className="px-4 py-2.5">
-                        {a.rating && (
-                          <div className="flex gap-0.5 text-yellow-500 mb-1">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < a.rating! ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                              </svg>
-                            ))}
-                          </div>
-                        )}
-                        <p className="text-sm break-words max-w-[350px]">
-                          {a.review ? `"${a.review}"` : <span className="italic text-muted">{t("system.moderation.table.noReview")}</span>}
-                        </p>
-                        <p className="text-xs text-muted mt-1">{relativeDate(a.createdAt, idioma)}</p>
-                      </td>
-                      <td className="px-4 py-2.5 text-right">
-                        <form action={deleteActivityAction}>
-                          <input type="hidden" name="activityId" value={a.id} />
-                          <button className="rounded bg-red-500/10 text-red-500 px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-500 hover:text-white">
-                            {t("system.moderation.table.delete")}
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  ))}
-                  {activities.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-muted">{t("system.moderation.table.empty")}</td>
                     </tr>
                   )}
                 </tbody>

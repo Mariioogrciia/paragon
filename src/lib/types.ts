@@ -277,4 +277,6 @@ export interface Player {
 export interface Library {
   player: Player;
   games: Game[];
+  /** XP de misiones semanales cumplidas: se pasa a `paragonProgress` junto a `games`. */
+  xpMisiones?: number;
 }

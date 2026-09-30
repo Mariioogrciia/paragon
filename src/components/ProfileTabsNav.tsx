@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -24,26 +25,43 @@ import { useTranslations } from "next-intl";
 export function ProfileTabsNav({
   handle,
   juegos,
+  esMio = false,
 }: {
   handle: string;
   /** Contador junto a "Biblioteca", como el que tenían las pestañas. */
   juegos?: number;
+  /** En tu propio perfil sale también "Ritmo" (/ritmo, solo tuyo), que antes no estaba en ningún menú. */
+  esMio?: boolean;
 }) {
   const pathname = usePathname();
   const base = `/u/${handle}`;
+  // Difuminado a la derecha solo mientras queden pestañas fuera de la vista
+  // (en móvil "Ritmo" quedaba cortada sin ninguna pista de que se desliza).
+  const barra = useRef<HTMLDivElement>(null);
+  const [hayMas, setHayMas] = useState(false);
+  const medir = useCallback(() => {
+    const el = barra.current;
+    if (el) setHayMas(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+  useEffect(() => {
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, [medir]);
   const t = useTranslations("Perfil");
 
   const pestanas = [
     { label: t("ProfileTabsNav.resumen"), href: base },
     { label: t("ProfileTabsNav.biblioteca"), href: `${base}/biblioteca`, badge: juegos },
     { label: t("ProfileTabsNav.estadisticas"), href: `${base}/estadisticas` },
+    ...(esMio ? [{ label: t("ProfileTabsNav.ritmo"), href: "/ritmo" }] : []),
   ];
 
   return (
     // Una sola fila con scroll horizontal en vez de `flex-wrap`: en móvil
     // "Estadísticas" saltaba sola a una segunda línea. El `pt-1` deja sitio
     // al `-translate-y` del hover, que el overflow recortaría si no.
-    <div role="tablist" className="-mx-1 mb-7 flex gap-1.5 overflow-x-auto border-b border-border px-1 pb-4 pt-1 [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden">
+    <div ref={barra} onScroll={medir} role="tablist" className={`-mx-1 mb-7 flex gap-1.5 overflow-x-auto border-b border-border px-1 pb-4 pt-1 [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden${hayMas ? " [mask-image:linear-gradient(to_right,black_80%,transparent)]" : ""}`}>
       {pestanas.map((p) => {
         const activa = pathname === p.href;
         return (

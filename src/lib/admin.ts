@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { getLeagueRankings } from "@/lib/leagues";
 import { avatarUrlSql } from "@/lib/avatarSql";
+import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 
 /**
  * "Avisos generados": congelado a mano en 8 (0 en los últimos 7 días) —
@@ -168,6 +169,74 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
     platinos: Number(juegosMap.get(f.userId)?.platinos ?? 0),
     insignias: insigniasMap.get(f.userId) ?? 0,
   }));
+}
+
+export type CampoModerable = "handle" | "name" | "firstName" | "lastName" | "profileTitle" | "statusText";
+
+export interface AdminModeracionUsuario {
+  userId: string;
+  handle: string | null;
+  campos: { campo: CampoModerable; valor: string }[];
+}
+
+export interface AdminModeracionGrupo {
+  tipo: "clan" | "liga";
+  id: string;
+  texto: string;
+  ownerHandle: string | null;
+}
+
+/**
+ * Todo lo visible para otros que el filtro de lenguaje marca HOY y que se
+ * guardó antes de que el filtro lo detectara (o por una vía que no lo
+ * pasaba). Se filtra en memoria con el mismo `contieneLenguajeOfensivo` que
+ * bloquea los textos nuevos: las listas son de cientos de filas, no de
+ * millones, y así no hay una segunda copia de las reglas en SQL.
+ */
+export async function getAdminModeracion(): Promise<{ usuarios: AdminModeracionUsuario[]; grupos: AdminModeracionGrupo[] }> {
+  const { clans, leagues } = await import("@/db/schema");
+  const [filasUsuarios, filasClanes, filasLigas] = await Promise.all([
+    db
+      .select({
+        userId: users.id,
+        handle: users.handle,
+        name: users.name,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileTitle: users.profileTitle,
+        statusText: users.statusText,
+      })
+      .from(users),
+    db
+      .select({ id: clans.id, name: clans.name, tag: clans.tag, description: clans.description, ownerHandle: users.handle })
+      .from(clans)
+      .leftJoin(users, eq(users.id, clans.ownerId)),
+    db
+      .select({ id: leagues.id, name: leagues.name, ownerHandle: users.handle })
+      .from(leagues)
+      .leftJoin(users, eq(users.id, leagues.ownerId)),
+  ]);
+
+  const CAMPOS: CampoModerable[] = ["handle", "name", "firstName", "lastName", "profileTitle", "statusText"];
+  const usuarios: AdminModeracionUsuario[] = [];
+  for (const u of filasUsuarios) {
+    const campos = CAMPOS.flatMap((campo) => {
+      const valor = u[campo];
+      return valor && contieneLenguajeOfensivo(valor) ? [{ campo, valor }] : [];
+    });
+    if (campos.length > 0) usuarios.push({ userId: u.userId, handle: u.handle, campos });
+  }
+
+  const grupos: AdminModeracionGrupo[] = [
+    ...filasClanes
+      .filter((c) => [c.name, c.tag, c.description].some((t) => t && contieneLenguajeOfensivo(t)))
+      .map((c) => ({ tipo: "clan" as const, id: c.id, texto: `[${c.tag}] ${c.name}${c.description ? ` — ${c.description}` : ""}`, ownerHandle: c.ownerHandle })),
+    ...filasLigas
+      .filter((l) => contieneLenguajeOfensivo(l.name))
+      .map((l) => ({ tipo: "liga" as const, id: l.id, texto: l.name, ownerHandle: l.ownerHandle })),
+  ];
+
+  return { usuarios, grupos };
 }
 
 export interface AdminActivityRow {

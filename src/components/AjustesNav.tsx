@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const ITEMS = [
   { href: "/ajustes", label: "General" },
   { href: "/ajustes/apariencia", label: "Apariencia" },
+  { href: "/ajustes/escaparate", label: "Vitrinas y firma" },
   { href: "/ajustes/seguridad", label: "Inicio de sesión y seguridad" },
   { href: "/ajustes/plataformas", label: "Cuentas de Juegos" },
   { href: "/ajustes/ocultar", label: "Ocultar" },

@@ -39,8 +39,8 @@ export async function GET(
   const [libA, libB] = await Promise.all([getLibrary(mio), getLibrary(suyo)]);
   const statsA = summarise(libA.games);
   const statsB = summarise(libB.games);
-  const nivelA = paragonProgress(libA.games);
-  const nivelB = paragonProgress(libB.games);
+  const nivelA = paragonProgress(libA.games, libA.xpMisiones);
+  const nivelB = paragonProgress(libB.games, libB.xpMisiones);
   const comunes = sharedGames([libA, libB]);
 
   // Mismo criterio que la etiqueta "Vas ganando"/"Vas perdiendo"/"Empate"

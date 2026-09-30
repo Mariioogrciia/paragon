@@ -51,8 +51,8 @@ export default async function CompararPage({
   const statsA = summarise(libA.games);
   const statsB = summarise(libB.games);
   const comunes = sharedGames([libA, libB]);
-  const nivelA = paragonProgress(libA.games);
-  const nivelB = paragonProgress(libB.games);
+  const nivelA = paragonProgress(libA.games, libA.xpMisiones);
+  const nivelB = paragonProgress(libB.games, libB.xpMisiones);
   // "Quién llegó antes" es la pieza más pesada de esta página (JOIN sobre
   // user_trophy + game_trophy) y la única cosa aquí que no tiene ya la app
   // móvil de respaldo — si falla, que se quede vacía esta sección en vez de

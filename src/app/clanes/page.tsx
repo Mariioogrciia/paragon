@@ -5,7 +5,8 @@ import Link from "next/link";
 import { ClanCreateForm } from "./ClanCreateForm";
 import { PendingClanInvites } from "./PendingClanInvites";
 import { auth } from "@/auth";
-import { getPendingInvites, getUserClan } from "@/lib/clans";
+import { getPendingInvites, getUserClan } from "@/lib/clans";
+import { SeccionTabs } from "@/components/SeccionTabs";
 
 export default async function ClanesPage() {
   const session = await auth();
@@ -31,6 +32,7 @@ export default async function ClanesPage() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
+      <SeccionTabs seccion="comunidad" />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-heading text-4xl font-bold uppercase">Clanes de Cazadores</h1>

@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import type { CeldaHoraria } from "@/lib/profileStats";
+import { TooltipDelegado } from "@/components/TooltipDelegado";
 
 // De 3 en 3 horas: 24 columnas por hora exacta eran demasiado finas para
 // leerse en móvil, y la caza de trofeos no se decide minuto a minuto.
@@ -82,41 +83,26 @@ export function HourlyHeatmap({ celdas }: { celdas: CeldaHoraria[] }) {
               </span>
             ))}
           </div>
-          <div className="flex flex-col gap-[3px]">
+          <TooltipDelegado className="flex flex-col gap-[3px]">
             {matriz.map((fila, dow) => (
               <div key={dow} className="flex gap-[3px]">
                 {fila.map((valor, franja) => (
-                  <div key={franja} className="group/celda relative h-[18px] flex-1">
-                    <div
-                      className="h-[18px] w-full rounded-[3px]"
-                      style={{
-                        background: nivel(valor, max) === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${OPACIDAD_POR_NIVEL[nivel(valor, max)]})`,
-                      }}
-                    />
-                    {valor > 0 && (
-                      <div
-                        className={`pointer-events-none absolute bottom-full z-20 mb-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/celda:opacity-100 ${
-                          // Centrado siempre se salía del borde en las columnas
-                          // de los extremos, y `overflow-x-auto` del
-                          // contenedor lo recortaba por el lateral — las
-                          // primeras/últimas columnas anclan al borde de su
-                          // propia celda en vez de centrarse.
-                          franja === 0
-                            ? "left-0"
-                            : franja === FRANJAS.length - 1
-                              ? "right-0"
-                              : "left-1/2 -translate-x-1/2"
-                        }`}
-                        style={{ background: "var(--foreground)", color: "var(--background)" }}
-                      >
-                        {t("tooltip", { count: valor, dia: DIAS[dow], inicio: String(FRANJAS[franja]).padStart(2, "0"), fin: String((FRANJAS[franja] + 3) % 24).padStart(2, "0") })}
-                      </div>
-                    )}
-                  </div>
+                  <div
+                    key={franja}
+                    className="h-[18px] flex-1 rounded-[3px] hover:outline hover:outline-1 hover:outline-[var(--foreground)]"
+                    style={{
+                      background: nivel(valor, max) === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${OPACIDAD_POR_NIVEL[nivel(valor, max)]})`,
+                    }}
+                    data-t={
+                      valor > 0
+                        ? t("tooltip", { count: valor, dia: DIAS[dow], inicio: String(FRANJAS[franja]).padStart(2, "0"), fin: String((FRANJAS[franja] + 3) % 24).padStart(2, "0") })
+                        : undefined
+                    }
+                  />
                 ))}
               </div>
             ))}
-          </div>
+          </TooltipDelegado>
         </div>
       </div>
     </div>

@@ -308,7 +308,8 @@
     "xpTotalLabel": "XP total",
     "xpSourceHeading": "De dónde sale tu XP",
     "xpExplanation": "Cada trofeo aporta XP según su rareza: bronce 10, plata 25, oro 50 y platino 200. Completar un juego añade 100 XP.",
-    "footerHelp": "El círculo superior muestra cuánto has avanzado dentro del nivel actual. Abre esta sección para consultar el desglose y lo que te falta."
+    "footerHelp": "El círculo superior muestra cuánto has avanzado dentro del nivel actual. Abre esta sección para consultar el desglose y lo que te falta.",
+    "itemMisiones": "Misiones semanales"
   },
   "ParagonScoreCard": {
     "title": "Paragon Score",
@@ -322,32 +323,8 @@
     "countLabel": "{done}/{total} conseguidos",
     "earned": "Conseguido",
     "progressFraction": "{value}/{target}",
-    "items": {
-      "first_blood": {
-        "name": "Primera joya",
-        "description": "Consigue tu primer platino."
-      },
-      "cazador": {
-        "name": "Cazador",
-        "description": "Consigue 10 platinos."
-      },
-      "experto": {
-        "name": "Experto",
-        "description": "Consigue 50 platinos."
-      },
-      "leyenda": {
-        "name": "Leyenda",
-        "description": "Consigue 100 platinos."
-      },
-      "coleccionista": {
-        "name": "Coleccionista",
-        "description": "Añade 100 juegos a tu biblioteca."
-      },
-      "madrugador": {
-        "name": "Pionero",
-        "description": "Forma parte de los primeros usuarios de Paragon."
-      }
-    }
+    "hiddenName": "Logro oculto",
+    "hiddenDescription": "Sigue jugando para descubrirlo."
   },
   "ShowcaseTrophies": {
     "heading": "Vitrina de Orgullo"
@@ -393,6 +370,66 @@
       "multiplataforma": {
         "name": "Multiplataforma",
         "description": "Tienes PlayStation, Steam y Xbox vinculados y sincronizando"
+      },
+      "joya_rara": {
+        "name": "Joya rara",
+        "description": "Consigue un platino que tiene menos del 5 % de los jugadores."
+      },
+      "uno_entre_cien": {
+        "name": "Uno entre cien",
+        "description": "Consigue 10 trofeos que tiene menos del 1 % de los jugadores."
+      },
+      "campeon": {
+        "name": "Campeón",
+        "description": "Gana una liga: la mensual o una privada."
+      },
+      "senor_guerra": {
+        "name": "Señor de la guerra",
+        "description": "Gana una guerra de clanes."
+      },
+      "en_equipo": {
+        "name": "En equipo",
+        "description": "Cumple a tiempo un reto de Platinar juntos."
+      },
+      "anfitrion": {
+        "name": "Anfitrión",
+        "description": "Organiza una sesión de trofeos a la que se apunte alguien."
+      },
+      "guia": {
+        "name": "Guía de la comunidad",
+        "description": "Escribe 3 guías de trofeos."
+      },
+      "semana_perfecta": {
+        "name": "Semana perfecta",
+        "description": "Completa las 4 misiones de una semana."
+      },
+      "incansable": {
+        "name": "Incansable",
+        "description": "Completa 25 misiones semanales."
+      },
+      "temporada_oro": {
+        "name": "Temporada de oro",
+        "description": "Llega al nivel 30 en un Pase de Temporada."
+      },
+      "temporada_platino": {
+        "name": "Temporada de platino",
+        "description": "Llega al nivel 50 en un Pase de Temporada."
+      },
+      "veterano": {
+        "name": "Veterano",
+        "description": "Llega al nivel Paragon 25."
+      },
+      "maestro": {
+        "name": "Maestro",
+        "description": "Llega al nivel Paragon 50."
+      },
+      "noctambulo": {
+        "name": "Noctámbulo",
+        "description": "Consigue 10 trofeos entre las 2 y las 5 de la madrugada."
+      },
+      "maraton": {
+        "name": "Maratón",
+        "description": "Consigue 40 trofeos en un solo día."
       }
     }
   },
@@ -437,7 +474,8 @@
   "ProfileTabsNav": {
     "resumen": "Resumen",
     "biblioteca": "Biblioteca",
-    "estadisticas": "Estadísticas"
+    "estadisticas": "Estadísticas",
+    "ritmo": "Ritmo"
   },
   "ProfileSectionOrderEditor": {
     "ayuda": "Arrastra para cambiar el orden en que se ven en tu perfil público."
@@ -476,5 +514,28 @@
     "crear": "Crear vitrina",
     "borrar": "Borrar vitrina",
     "maximo": "Ya tienes {n} vitrinas, el máximo."
+  },
+  "Titulos": {
+    "aprendiz": "Aprendiz de cazador",
+    "rastreador": "Rastreador",
+    "veterano": "Veterano de la caza",
+    "elite": "Cazador de élite",
+    "leyenda_viva": "Leyenda viva",
+    "paragon": "Paragon supremo",
+    "buscador_joyas": "Buscador de joyas",
+    "uno_entre_cien": "Uno entre cien",
+    "campeon": "Campeón de liga",
+    "senor_guerra": "Señor de la guerra",
+    "sabio": "Sabio de la comunidad",
+    "perfeccionista": "Perfeccionista",
+    "criatura_noche": "Criatura de la noche",
+    "maratoniano": "Maratoniano"
+  },
+  "TituloEspecial": {
+    "label": "Título especial",
+    "ninguno": "Ninguno",
+    "nivel": "Nivel {n}",
+    "insignia": "Insignia «{nombre}»",
+    "ayuda": "Se desbloquean subiendo de nivel y consiguiendo insignias. Salen junto a tu nombre en el perfil y en Comunidad."
   }
 }

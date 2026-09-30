@@ -1,88 +1,29 @@
-import React from "react";
-import { TrophyIcon } from "./TrophyIcon";
 import { AchievementIcon } from "./AchievementIcon";
 import { getTranslations } from "next-intl/server";
+import { LOGROS } from "@/lib/logros";
+import textosEs from "../../messages/Perfil/es.json";
 
 type BadgeDef = {
   id: string;
   name: string;
   description: string;
-  icon: string | React.ReactNode;
   bg: string;
 };
 
-export const BADGE_DEFINITIONS: Record<string, BadgeDef> = {
-  "first_blood": {
-    id: "first_blood",
-    name: "Primera Sangre",
-    description: "Conseguiste tu primer platino",
-    icon: <TrophyIcon grade="platinum" size={16} />,
-    bg: "linear-gradient(135deg, #2b5f7d, #cfeaf7)",
-  },
-  "cazador": {
-    id: "cazador",
-    name: "Cazador",
-    description: "Has conseguido 10 platinos",
-    icon: <AchievementIcon id="cazador" size={16} />,
-    bg: "linear-gradient(135deg, #1f2937, #4b5563)",
-  },
-  "experto": {
-    id: "experto",
-    name: "Experto",
-    description: "Has conseguido 50 platinos",
-    icon: <AchievementIcon id="experto" size={16} />,
-    bg: "linear-gradient(135deg, #7f1d1d, #ef4444)",
-  },
-  "leyenda": {
-    id: "leyenda",
-    name: "Leyenda",
-    description: "Has conseguido 100 platinos",
-    icon: <AchievementIcon id="leyenda" size={16} />,
-    bg: "linear-gradient(135deg, #78350f, #fbbf24)",
-  },
-  "coleccionista": {
-    id: "coleccionista",
-    name: "Coleccionista",
-    description: "Tienes más de 100 juegos en tu biblioteca",
-    icon: <AchievementIcon id="coleccionista" size={16} />,
-    bg: "linear-gradient(135deg, #064e3b, #10b981)",
-  },
-  "madrugador": {
-    id: "madrugador",
-    name: "Madrugador",
-    description: "Usuario pionero de Paragon",
-    icon: <AchievementIcon id="madrugador" size={16} />,
-    bg: "linear-gradient(135deg, #4c1d95, #8b5cf6)",
-  },
-  "critico": {
-    id: "critico",
-    name: "Crítico",
-    description: "Has escrito al menos 3 reseñas",
-    icon: <AchievementIcon id="critico" size={16} />,
-    bg: "linear-gradient(135deg, #be123c, #f43f5e)",
-  },
-  "sociable": {
-    id: "sociable",
-    name: "Sociable",
-    description: "Tienes al menos 3 amigos",
-    icon: <AchievementIcon id="sociable" size={16} />,
-    bg: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
-  },
-  "rolero": {
-    id: "rolero",
-    name: "Rolero",
-    description: "Has jugado 5 juegos de RPG",
-    icon: <AchievementIcon id="rolero" size={16} />,
-    bg: "linear-gradient(135deg, #047857, #10b981)",
-  },
-  "multiplataforma": {
-    id: "multiplataforma",
-    name: "Multiplataforma",
-    description: "Tienes PlayStation, Steam y Xbox vinculados y sincronizando",
-    icon: <AchievementIcon id="multiplataforma" size={16} />,
-    bg: "linear-gradient(135deg, #1e3a8a, #6366f1)",
-  },
-};
+/**
+ * Nombre/descripción en español resueltos (no claves de traducción) para
+ * quien no pasa por next-intl: la API móvil (`/api/mobile/achievements`) y
+ * las sugerencias de título de `ProfileForm`. Sale del catálogo único
+ * (lib/logros.ts) y de los mismos textos que la web.
+ */
+const TEXTOS = textosEs.Badges.items as Record<string, { name: string; description: string }>;
+
+export const BADGE_DEFINITIONS: Record<string, BadgeDef> = Object.fromEntries(
+  LOGROS.map((logro) => [
+    logro.id,
+    { id: logro.id, name: TEXTOS[logro.id]?.name ?? logro.id, description: TEXTOS[logro.id]?.description ?? "", bg: logro.bg },
+  ]),
+);
 
 export async function Badges({ earnedBadges }: { earnedBadges: { badgeId: string, earnedAt: Date }[] }) {
   if (earnedBadges.length === 0) return null;
@@ -101,9 +42,10 @@ export async function Badges({ earnedBadges }: { earnedBadges: { badgeId: string
             className="group relative flex h-8 w-8 items-center justify-center rounded-full border border-white/10 shadow-sm cursor-help transition-transform hover:scale-110 hover:z-50"
             style={{ background: badge.bg }}
           >
-            <span className="drop-shadow-md text-sm">{badge.icon}</span>
+            <span className="drop-shadow-md text-sm text-white">
+              <AchievementIcon id={badge.id} size={16} />
+            </span>
 
-            {/* Tooltip */}
             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg px-3 py-2 shadow-xl group-hover:block"
                  style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
               <p className="text-[0.8125rem] font-bold text-foreground">{t(`Badges.items.${badge.id}.name`)}</p>

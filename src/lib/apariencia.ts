@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { guardarAparienciaAction } from "@/app/actions";
+import { ESTILO_REQUISITOS } from "@/lib/level";
 
 /**
  * Estado y lógica de personalización (modo, acento, estilo), compartidos
@@ -117,7 +119,64 @@ function aplicarEstilo(clase: string) {
   if (clase) html.classList.add(clase);
 }
 
-export function useApariencia() {
+export interface AparienciaGuardada {
+  acento?: string;
+  acentoLibre?: string;
+  estilo?: string;
+  tamanoTexto?: string;
+}
+
+/** Nivel mínimo del estilo, o `null` si es libre (ver ESTILO_REQUISITOS en lib/level.ts). */
+export function nivelDeEstilo(valor: string): number | null {
+  return ESTILO_REQUISITOS[valor] ?? null;
+}
+
+function leerLocal(): AparienciaGuardada {
+  return {
+    acento: localStorage.getItem(CLAVE_ACENTO) ?? "",
+    acentoLibre: localStorage.getItem(CLAVE_ACENTO_LIBRE) ?? "",
+    estilo: localStorage.getItem(CLAVE_ESTILO) ?? "",
+    tamanoTexto: localStorage.getItem(CLAVE_TEXTO) ?? "",
+  };
+}
+
+function escribirLocal(clave: string, valor: string | undefined) {
+  if (valor) localStorage.setItem(clave, valor);
+  else localStorage.removeItem(clave);
+}
+
+/**
+ * Al cargar cualquier página con sesión (SincronizarApariencia, layout):
+ * lo guardado en la cuenta manda sobre este navegador, así un móvil nuevo
+ * sale ya con el acento y estilo de siempre. Un estilo por encima del nivel
+ * se quita (p. ej. si se eligió antes de que existiera el requisito).
+ */
+export function aplicarAparienciaGuardada(guardada: AparienciaGuardada | null, nivel: number) {
+  try {
+    const actual = leerLocal();
+    const deseada = guardada ?? actual;
+    const requisito = nivelDeEstilo(deseada.estilo ?? "");
+    const estilo = requisito !== null && nivel < requisito ? "" : (deseada.estilo ?? "");
+    const final = { ...deseada, estilo };
+    if (JSON.stringify(final) === JSON.stringify(actual)) return;
+    escribirLocal(CLAVE_ACENTO, final.acento);
+    escribirLocal(CLAVE_ACENTO_LIBRE, final.acentoLibre);
+    escribirLocal(CLAVE_ESTILO, final.estilo);
+    escribirLocal(CLAVE_TEXTO, final.tamanoTexto);
+    if (final.acentoLibre) aplicarAcentoLibre(final.acentoLibre);
+    else aplicarAcento(final.acento ?? "");
+    aplicarEstilo(final.estilo);
+    aplicarTamanoTexto(final.tamanoTexto ?? "");
+  } catch {
+    // Sin localStorage (modo privado estricto): se queda como esté.
+  }
+}
+
+/**
+ * `sincronizar`: guardar cada cambio en la cuenta (solo con sesión; la
+ * portada pública usa el selector sin guardar nada).
+ */
+export function useApariencia({ sincronizar = false }: { sincronizar?: boolean } = {}) {
   const { theme, setTheme } = useTheme();
   const [acento, setAcento] = useState("");
   const [acentoLibre, setAcentoLibre] = useState("");
@@ -146,12 +205,17 @@ export function useApariencia() {
     setTamanoTexto(localStorage.getItem(CLAVE_TEXTO) ?? "");
   }, []);
 
+  function persistir() {
+    if (sincronizar) guardarAparienciaAction(leerLocal()).catch(() => undefined);
+  }
+
   function elegirAcento(valor: string) {
     setAcento(valor);
     setAcentoLibre("");
     aplicarAcento(valor);
     localStorage.setItem(CLAVE_ACENTO, valor);
     localStorage.removeItem(CLAVE_ACENTO_LIBRE);
+    persistir();
   }
 
   function elegirAcentoLibre(hex: string) {
@@ -160,6 +224,7 @@ export function useApariencia() {
     aplicarAcentoLibre(hex);
     localStorage.setItem(CLAVE_ACENTO_LIBRE, hex);
     localStorage.removeItem(CLAVE_ACENTO);
+    persistir();
   }
 
   function elegirEstilo(valor: string) {
@@ -167,6 +232,7 @@ export function useApariencia() {
     aplicarEstilo(valor);
     if (valor) localStorage.setItem(CLAVE_ESTILO, valor);
     else localStorage.removeItem(CLAVE_ESTILO);
+    persistir();
   }
 
   function elegirTamanoTexto(valor: string) {
@@ -174,6 +240,7 @@ export function useApariencia() {
     aplicarTamanoTexto(valor);
     if (valor) localStorage.setItem(CLAVE_TEXTO, valor);
     else localStorage.removeItem(CLAVE_TEXTO);
+    persistir();
   }
 
   function elegirTema(t: (typeof TEMAS)[number]) {

@@ -5,7 +5,20 @@ const ITEMS = [
   { key: "trofeos", color: "var(--accent)" },
   { key: "platinos", color: "var(--platinum)" },
   { key: "juegosCompletados", color: "var(--gold)" },
+  { key: "misiones", color: "var(--good)" },
 ] as const;
+
+/** Donut con un tramo por cada fuente de XP, en el orden de ITEMS. */
+function gradienteFuentes(breakdown: ParagonProgress["breakdown"]): string {
+  const total = Math.max(breakdown.total, 1);
+  let acumulado = 0;
+  const tramos = ITEMS.map((item) => {
+    const inicio = Math.round((acumulado / total) * 360);
+    acumulado += breakdown[item.key];
+    return `${item.color} ${inicio}deg ${Math.round((acumulado / total) * 360)}deg`;
+  });
+  return `conic-gradient(${tramos.join(", ")})`;
+}
 
 export async function ParagonLevelCard({ progress }: { progress: ParagonProgress }) {
   const t = await getTranslations("Perfil");
@@ -15,6 +28,7 @@ export async function ParagonLevelCard({ progress }: { progress: ParagonProgress
     trofeos: t("ParagonLevelCard.itemTrofeos"),
     platinos: t("ParagonLevelCard.itemPlatinos"),
     juegosCompletados: t("ParagonLevelCard.itemJuegosCompletados"),
+    misiones: t("ParagonLevelCard.itemMisiones"),
   };
 
   return (
@@ -51,7 +65,7 @@ export async function ParagonLevelCard({ progress }: { progress: ParagonProgress
           <div
             className="mx-auto flex h-[124px] w-[124px] items-center justify-center rounded-full"
             style={{
-              background: `conic-gradient(var(--accent) 0deg ${Math.round((progress.breakdown.trofeos / Math.max(progress.breakdown.total, 1)) * 360)}deg, var(--platinum) ${Math.round((progress.breakdown.trofeos / Math.max(progress.breakdown.total, 1)) * 360)}deg ${Math.round(((progress.breakdown.trofeos + progress.breakdown.platinos) / Math.max(progress.breakdown.total, 1)) * 360)}deg, var(--gold) ${Math.round(((progress.breakdown.trofeos + progress.breakdown.platinos) / Math.max(progress.breakdown.total, 1)) * 360)}deg 360deg)`,
+              background: gradienteFuentes(progress.breakdown),
             }}
           >
             <span className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-surface text-center">

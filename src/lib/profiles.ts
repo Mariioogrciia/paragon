@@ -1,5 +1,8 @@
 import "server-only";
 import { getHorasIgnoradas } from "@/lib/horasIgnoradas";
+import { getWeeklyMissions, xpMisiones } from "@/lib/missions";
+import { LOGROS, logroConseguido } from "@/lib/logros";
+import { medirLogros } from "@/lib/medirLogros";
 import { normalizarPerdibles } from "@/lib/perdibles";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
@@ -53,6 +56,10 @@ export interface ProfileRow {
   profileColor?: string | null;
   profileFrame?: string | null;
   statusText?: string | null;
+  /** Título especial desbloqueado (lib/titulos.ts). */
+  tituloDesbloqueado?: string | null;
+  /** Acento/estilo/tamaño de texto guardados en la cuenta (lib/apariencia.ts). */
+  apariencia?: { acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string } | null;
   /** Modo de tema (dark/light/oled/high-contrast) aplicado solo al contenedor
    * del perfil público — no afecta al resto de la app ni al visitante. */
   theme?: string | null;
@@ -147,6 +154,8 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       profileColor: users.profileColor,
       profileFrame: users.profileFrame,
       statusText: users.statusText,
+      tituloDesbloqueado: users.tituloDesbloqueado,
+      apariencia: users.apariencia,
       theme: users.theme,
       profileSectionOrder: users.profileSectionOrder,
       email: users.email,
@@ -254,67 +263,21 @@ export async function grantBadge(userId: string, badgeId: string) {
     .onConflictDoNothing();
 }
 
+/**
+ * Otorga toda insignia de lib/logros.ts cuyo requisito ya se cumple. Antes
+ * apunta las misiones semanales cumplidas (lib/missions.ts): esto corre en
+ * cada sincronización del cron, así que lo cumplido queda guardado aunque la
+ * persona no abra el panel esa semana.
+ */
 export async function checkAndGrantBadges(userId: string) {
-  // Give "madrugador" to everyone for now (early adopters)
-  await grantBadge(userId, "madrugador");
-
-  // Un 100% de Steam cuenta como platino (ver esPlatinoEquivalente en
-  // lib/stats.ts): Steam no tiene trofeo de platino que sumar, así que sin
-  // este `+ count(...)` esas insignias nunca las conseguiría nadie que solo
-  // jugara ahí.
-  const result = await db
-    .select({
-      totalGames: sql<number>`count(distinct ${userGames.gameId})`,
-      totalReviews: sql<number>`count(${userGames.review})`,
-      totalRpgs: sql<number>`count(*) filter (where ${userGames.progressPercent} > 0 and coalesce(${gamesTable.genres}, '[]')::jsonb ? 'Role-playing (RPG)')`,
-      totalPlatinums: sql<number>`
-        coalesce(sum(CAST(${userGames.earned}->>'platinum' AS INTEGER)), 0)
-        + count(*) filter (
-          where ${gamesTable.platform} = 'steam' and ${userGames.progressPercent} = 100
-        )
-      `,
-    })
-    .from(userGames)
-    .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false)));
-
-  const platinums = Number(result[0]?.totalPlatinums ?? 0);
-  const games = Number(result[0]?.totalGames ?? 0);
-  const reviews = Number(result[0]?.totalReviews ?? 0);
-  const rpgs = Number(result[0]?.totalRpgs ?? 0);
-
-  const friendsResult = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(friendships)
-    .where(and(eq(friendships.status, "accepted"), or(eq(friendships.requesterId, userId), eq(friendships.addresseeId, userId))));
-  const friends = Number(friendsResult[0]?.count ?? 0);
-
-  // "Multiplataforma": las 3 plataformas que de verdad sincronizan
-  // (`isPublic: true` — no basta con haberla vinculado, PSN/Steam pueden
-  // quedarse en "Privado" si el perfil no es legible). Google/Epic/Ubisoft
-  // se quedan fuera a propósito: hoy ninguna sincroniza biblioteca de verdad.
-  const plataformasResult = await db
-    .select({ platform: platformAccounts.platform })
-    .from(platformAccounts)
-    .where(
-      and(
-        eq(platformAccounts.userId, userId),
-        eq(platformAccounts.isPublic, true),
-        sql`${platformAccounts.platform} in ('psn', 'steam', 'xbox')`,
-      ),
-    );
-  const plataformasReales = new Set(plataformasResult.map((p) => p.platform)).size;
-
-  if (platinums >= 1) await grantBadge(userId, "first_blood");
-  if (platinums >= 10) await grantBadge(userId, "cazador");
-  if (platinums >= 50) await grantBadge(userId, "experto");
-  if (platinums >= 100) await grantBadge(userId, "leyenda");
-
-  if (games >= 100) await grantBadge(userId, "coleccionista");
-  if (reviews >= 3) await grantBadge(userId, "critico");
-  if (friends >= 3) await grantBadge(userId, "sociable");
-  if (plataformasReales >= 3) await grantBadge(userId, "multiplataforma");
-  if (rpgs >= 5) await grantBadge(userId, "rolero");
+  await getWeeklyMissions(userId).catch((error) => console.error("[insignias] misiones", error));
+  const medidas = await medirLogros(userId);
+  const conseguidas = LOGROS.filter((logro) => logroConseguido(logro, medidas));
+  if (conseguidas.length === 0) return;
+  await db
+    .insert(userBadges)
+    .values(conseguidas.map((logro) => ({ userId, badgeId: logro.id })))
+    .onConflictDoNothing();
 }
 
 /**
@@ -1162,7 +1125,10 @@ export const getLibrary = cache(
 
   // Horas que el usuario ha pedido ignorar (lib/horasIgnoradas.ts): fuera de
   // la biblioteca, así no cuentan en estadísticas, Wrap ni coste por hora.
-  const horasIgnoradas = await getHorasIgnoradas(profile.userId);
+  const [horasIgnoradas, xpMisionesPorUsuario] = await Promise.all([
+    getHorasIgnoradas(profile.userId),
+    xpMisiones([profile.userId]),
+  ]);
 
   const games: Game[] = rows.map((r) => ({
     id: r.id,
@@ -1197,7 +1163,7 @@ export const getLibrary = cache(
     pricePaid: r.pricePaid ?? undefined,
   }));
 
-  return { player: toPlayer(profile), games };
+  return { player: toPlayer(profile), games, xpMisiones: xpMisionesPorUsuario.get(profile.userId) ?? 0 };
 });
 
 /**

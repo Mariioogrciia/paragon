@@ -64,8 +64,8 @@ export async function POST(req: Request) {
   if (!profile) {
     return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
   }
-  const { games } = await getLibrary(profile);
-  const nivel = paragonProgress(games).level;
+  const { games, xpMisiones } = await getLibrary(profile);
+  const nivel = paragonProgress(games, xpMisiones).level;
   if (nivel < 5) {
     return NextResponse.json({ error: "Necesitas ser al menos Nivel 5 de Paragon para crear un clan." }, { status: 403 });
   }

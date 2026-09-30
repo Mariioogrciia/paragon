@@ -82,7 +82,7 @@ export default async function BibliotecaPage({
       </p>
       <h1 className="mb-6 font-heading text-3xl font-bold uppercase tracking-wide">{t("BibliotecaPage.title")}</h1>
 
-      <ProfileTabsNav handle={handle} juegos={stats.juegos} />
+      <ProfileTabsNav handle={handle} juegos={stats.juegos} esMio={esMio} />
 
       <div className="space-y-9">
         <CollectionProgress collections={carpetas} games={games} handle={handle} />
@@ -91,7 +91,9 @@ export default async function BibliotecaPage({
           <div className="mb-4 flex flex-wrap items-center gap-3.5">
             <h2 className="font-heading text-2xl font-bold">{t("BibliotecaPage.gamesHeading")}</h2>
             <span className="text-[0.8125rem] text-muted">
-              {t("BibliotecaPage.gamesCount", { count: games.length })}
+              {/* Mismo número que la pestaña (sin deseados); los deseados, aparte. */}
+              {t("BibliotecaPage.gamesCount", { count: stats.juegos })}
+              {games.length > stats.juegos && ` · ${t("BibliotecaPage.wishlistCount", { count: games.length - stats.juegos })}`}
             </span>
           </div>
 

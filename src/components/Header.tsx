@@ -30,20 +30,22 @@ const NAV_PRINCIPAL = [
   {
     labelKey: "comunidad",
     href: "/feed",
-    match: (p: string) => p.startsWith("/feed"),
+    // Sesiones y Clanes viven ahora dentro de Comunidad (pestañas, ver SeccionTabs).
+    match: (p: string) => p.startsWith("/feed") || p.startsWith("/sesiones") || p.startsWith("/clanes"),
     navKey: "feed",
   },
   {
     labelKey: "ligas",
     href: "/ligas",
-    match: (p: string) => p.startsWith("/ligas"),
+    // El Pase de Temporada usa los mismos puntos: pestaña dentro de Ligas.
+    match: (p: string) => p.startsWith("/ligas") || p.startsWith("/temporada"),
     navKey: "ligas",
   },
   {
     labelKey: "amigos",
     href: "/amigos",
     match: (p: string) =>
-      p.startsWith("/amigos") || p.startsWith("/comparar") || p.startsWith("/rankings"),
+      p.startsWith("/amigos") || p.startsWith("/comparar"),
     navKey: "amigos",
   },
 ] as const;
@@ -72,24 +74,6 @@ const NAV_MAS = [
     href: "/planificador",
     match: (p: string) => p.startsWith("/planificador"),
     navKey: "planificador",
-  },
-  {
-    labelKey: "clanes",
-    href: "/clanes",
-    match: (p: string) => p.startsWith("/clanes"),
-    navKey: "clanes",
-  },
-  {
-    labelKey: "sesiones",
-    href: "/sesiones",
-    match: (p: string) => p.startsWith("/sesiones"),
-    navKey: "sesiones",
-  },
-  {
-    labelKey: "temporada",
-    href: "/temporada",
-    match: (p: string) => p.startsWith("/temporada"),
-    navKey: "temporada",
   },
 ] as const;
 
@@ -236,7 +220,7 @@ export function Header({
           onClick={() => setMenuAbierto((v) => !v)}
           aria-label={menuAbierto ? t("cerrarMenu") : t("abrirMenu")}
           aria-expanded={menuAbierto}
-          className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-foreground sm:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-foreground lg:hidden"
           style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -248,7 +232,7 @@ export function Header({
           </svg>
         </button>
 
-        <nav className="hidden items-center gap-1 sm:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {(user?.handle ? navPrincipalVisible : LOGGED_OUT_NAV).map((item) => {
             const href = typeof item.href === "function" ? item.href(user?.handle ?? "") : item.href;
             const active = item.match(pathname);
@@ -371,7 +355,7 @@ export function Header({
 
       {menuAbierto && (
         <nav
-          className="border-t border-border px-3.5 py-3 sm:hidden"
+          className="border-t border-border px-3.5 py-3 lg:hidden"
           style={{ background: "var(--background)" }}
         >
           <div className="flex flex-col gap-1">

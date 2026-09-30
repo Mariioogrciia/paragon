@@ -102,9 +102,9 @@ export default async function Image({ params }: { params: Promise<{ handle: stri
     );
   }
 
-  const { player, games } = await getLibrary(profile);
+  const { player, games, xpMisiones } = await getLibrary(profile);
   const stats = summarise(games);
-  const nivel = paragonProgress(games);
+  const nivel = paragonProgress(games, xpMisiones);
   const avatarUrl = urlAbsolutaParaOg(player.avatarUrl);
   const nombre = profile.displayName ?? player.name ?? handle;
 

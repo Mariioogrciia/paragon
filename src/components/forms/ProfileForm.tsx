@@ -8,6 +8,7 @@ import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEdito
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
 import { FRAME_REQUISITOS } from "@/lib/level";
+import { TITULOS, TITULO_POR_CLAVE, tituloDesbloqueado } from "@/lib/titulos";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
@@ -31,6 +32,7 @@ interface ProfileFormUser {
   profileColor?: string | null;
   profileFrame?: string | null;
   statusText?: string | null;
+  tituloDesbloqueado?: string | null;
   theme?: string | null;
   profileSectionOrder?: string[] | null;
   discordDmEnabled?: boolean;
@@ -64,6 +66,7 @@ export function ProfileForm({
   cuentasVinculadas?: { platform: string; avatarUrl: string }[];
 }) {
   const t = useTranslations("Onboarding");
+  const tp = useTranslations("Perfil");
 
   const FRAMES = [
     { value: "", label: t("profileForm.frames.none") },
@@ -83,6 +86,11 @@ export function ProfileForm({
   ];
 
   const [titulo, setTitulo] = useState(user.profileTitle ?? "");
+  const tituloEspecialValido = (clave: string | null | undefined) => {
+    const encontrado = clave ? TITULO_POR_CLAVE.get(clave) : undefined;
+    return encontrado && tituloDesbloqueado(encontrado, nivel, badges) ? encontrado.clave : "";
+  };
+  const [tituloEspecial, setTituloEspecial] = useState(tituloEspecialValido(user.tituloDesbloqueado));
   const marcoBloqueado = (v: string) => FRAME_REQUISITOS[v] !== undefined && nivel < FRAME_REQUISITOS[v];
   const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
   const [fondoJuegoId, setFondoJuegoId] = useState(user.profileBackgroundGameId ?? "");
@@ -144,6 +152,7 @@ export function ProfileForm({
     setTimezone(inicial.timezone);
     setSectionOrderJson(inicial.profileSectionOrder);
     setTitulo(user.profileTitle ?? "");
+    setTituloEspecial(tituloEspecialValido(user.tituloDesbloqueado));
     setMarco(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
     setFondoJuegoId(user.profileBackgroundGameId ?? "");
     setBanner(user.profileBannerUrl);
@@ -161,6 +170,7 @@ export function ProfileForm({
     timezone !== inicial.timezone ||
     sectionOrderJson !== inicial.profileSectionOrder ||
     titulo !== (user.profileTitle ?? "") ||
+    tituloEspecial !== tituloEspecialValido(user.tituloDesbloqueado) ||
     marco !== (marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? "")) ||
     fondoJuegoId !== (user.profileBackgroundGameId ?? "") ||
     banner !== user.profileBannerUrl ||
@@ -342,7 +352,48 @@ export function ProfileForm({
                       {t}
                     </button>
                   ))}
+                  <div className="mt-4">
+                <input type="hidden" name="tituloDesbloqueado" value={tituloEspecial} />
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted">{tp("TituloEspecial.label")}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setTituloEspecial("")}
+                    aria-pressed={tituloEspecial === ""}
+                    className="rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold transition-colors hover:text-foreground"
+                    style={{ border: `1px solid ${tituloEspecial === "" ? "var(--accent)" : "var(--border)"}`, color: "var(--muted)" }}
+                  >
+                    {tp("TituloEspecial.ninguno")}
+                  </button>
+                  {TITULOS.map((tit) => {
+                    const libre = tituloDesbloqueado(tit, nivel, badges);
+                    const requisito = "nivel" in tit.requisito
+                      ? tp("TituloEspecial.nivel", { n: tit.requisito.nivel })
+                      : tp("TituloEspecial.insignia", { nombre: tp(`Badges.items.${tit.requisito.insignia}.name`) });
+                    return (
+                      <button
+                        key={tit.clave}
+                        type="button"
+                        disabled={!libre}
+                        onClick={() => setTituloEspecial(tit.clave)}
+                        aria-pressed={tituloEspecial === tit.clave}
+                        title={libre ? undefined : requisito}
+                        className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-wide transition-opacity enabled:hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-35"
+                        style={{
+                          color: tit.color,
+                          border: `1px solid ${tituloEspecial === tit.clave ? tit.color : `color-mix(in srgb, ${tit.color} 35%, transparent)`}`,
+                          background: tituloEspecial === tit.clave ? `color-mix(in srgb, ${tit.color} 16%, transparent)` : "transparent",
+                        }}
+                      >
+                        {libre ? "" : "🔒 "}
+                        {tp(`Titulos.${tit.clave}`)}
+                      </button>
+                    );
+                  })}
                 </div>
+                <p className="mt-1.5 text-xs text-muted">{tp("TituloEspecial.ayuda")}</p>
+              </div>
+            </div>
               )}
             </div>
             <div>
@@ -432,7 +483,7 @@ export function ProfileForm({
 
           <div className="mt-6">
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.bannerLabel")}</label>
-            <BannerPresetPicker value={banner} onChange={setBanner} />
+            <BannerPresetPicker value={banner} onChange={setBanner} nivel={nivel} />
             <p className="mt-1.5 text-xs text-muted">{t("profileForm.visual.bannerHint")}</p>
           </div>
 

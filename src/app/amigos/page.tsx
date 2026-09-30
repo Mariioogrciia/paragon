@@ -16,7 +16,9 @@ import { paragonLevelFromXp } from "@/lib/level";
 import { clasificacionAmigos, getPeriodRankings } from "@/lib/rankings";
 import { BackButton } from "@/components/BackButton";
 import { PLATFORM_LABEL } from "@/lib/types";
-import { ConfirmForm } from "@/components/ui/ConfirmForm";
+import { ConfirmForm } from "@/components/ui/ConfirmForm";
+import { juegosEnComun, misRetos } from "@/lib/coop";
+import { PlatinarJuntos } from "@/components/PlatinarJuntos";
 
 export const metadata = { title: "Amigos · Paragon" };
 
@@ -50,6 +52,12 @@ export default async function AmigosPage() {
     clasificacionAmigos(contendientes),
     getParagonLevels(contendientes),
     getPeriodRankings(contendientes),
+  ]);
+  // "Platinar juntos" solo tiene sentido con amigos: vivía en el
+  // Planificador, lejos de ellos. Si la tabla fallara, la página sale igual.
+  const [retos, comunes] = await Promise.all([
+    misRetos(session.user.id).catch(() => []),
+    juegosEnComun(session.user.id).catch(() => []),
   ]);
 
   const ranking = filasClasificacion
@@ -321,6 +329,8 @@ export default async function AmigosPage() {
           </button>
         </section>
       )}
+
+      {amigos.length > 0 && <PlatinarJuntos retos={retos} comunes={comunes} />}
     </div>
   );
 }

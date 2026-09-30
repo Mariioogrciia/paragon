@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { gameTrophies, games, userGames, userTrophies, syncRuns, users } from "@/db/schema";
+import { activities, gameTrophies, games, userGames, userTrophies, syncRuns, users } from "@/db/schema";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
 import type { AuthorizationPayload } from "psn-api";
 import {
@@ -735,6 +735,14 @@ export async function syncGameTrophies(
         .update(userGames)
         .set({ pinnedAt: null })
         .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+      // Al feed de Comunidad, para que los amigos puedan aplaudirlo y
+      // comentarlo. Id fijo por persona y juego: un platino solo se
+      // anuncia una vez (y cuadra con scripts/crear-tablas-auditoria-3.mts).
+      await db
+        .insert(activities)
+        .values({ id: `plat-${userId}-${gameId}`, userId, type: "platinum", gameId })
+        .onConflictDoNothing()
+        .catch((error) => console.error("[sync] actividad de platino", error));
     }
   }
 

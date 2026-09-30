@@ -17,9 +17,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
   }
 
-  const [{ games }, racha] = await Promise.all([getLibrary(profile), rachas(userId)]);
+  const [{ games, xpMisiones }, racha] = await Promise.all([getLibrary(profile), rachas(userId)]);
   const stats = summarise(games);
-  const nivel = paragonProgress(games);
+  const nivel = paragonProgress(games, xpMisiones);
   const psn = profile.accounts.find((a) => a.platform === "psn");
 
   return NextResponse.json({

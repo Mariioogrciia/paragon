@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, useApariencia } from "@/lib/apariencia";
+import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, nivelDeEstilo, useApariencia } from "@/lib/apariencia";
 
 /**
  * Panel de apariencia de verdad, para /ajustes/apariencia. Antes esto vivía
@@ -10,7 +10,7 @@ import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, useApariencia } from "@/
  * de 224px, así que se trasladó aquí. El icono de la navbar ahora es solo un
  * enlace a esta página.
  */
-export function AppearanceSettings() {
+export function AppearanceSettings({ nivel }: { nivel: number }) {
   const t = useTranslations("Onboarding");
   const {
     montado,
@@ -25,7 +25,7 @@ export function AppearanceSettings() {
     elegirEstilo,
     elegirTamanoTexto,
     elegirTema,
-  } = useApariencia();
+  } = useApariencia({ sincronizar: true });
 
   if (!montado) return null;
 
@@ -129,22 +129,29 @@ export function AppearanceSettings() {
           {t("appearanceSettings.styleDescription")}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {ESTILOS.map((e) => (
-            <button
-              key={e.value || "clasico"}
-              onClick={() => elegirEstilo(e.value)}
-              title={e.desc}
-              className="rounded-xl px-3 py-3 text-left text-sm font-semibold transition-colors"
-              style={
-                estilo === e.value
-                  ? { background: "var(--accent)", color: "#061021" }
-                  : { background: "var(--surface-2)", color: "var(--muted)" }
-              }
-            >
-              {e.label}
-              <span className="mt-0.5 block text-[0.6875rem] font-normal opacity-80">{e.desc}</span>
-            </button>
-          ))}
+          {ESTILOS.map((e) => {
+            const requisito = nivelDeEstilo(e.value);
+            const bloqueado = requisito !== null && nivel < requisito;
+            return (
+              <button
+                key={e.value || "clasico"}
+                onClick={() => elegirEstilo(e.value)}
+                disabled={bloqueado}
+                title={e.desc}
+                className="rounded-xl px-3 py-3 text-left text-sm font-semibold transition-colors enabled:hover:text-foreground enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                style={
+                  estilo === e.value
+                    ? { background: "var(--accent)", color: "#061021" }
+                    : { background: "var(--surface-2)", color: "var(--muted)" }
+                }
+              >
+                {bloqueado ? `🔒 ${e.label}` : e.label}
+                <span className="mt-0.5 block text-[0.6875rem] font-normal opacity-80">
+                  {bloqueado ? t("appearanceSettings.styleLocked", { nivel: requisito }) : e.desc}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 

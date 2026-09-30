@@ -35,6 +35,7 @@ import { esPlatinoEquivalente } from "@/lib/stats";
 import { CardBuilder } from "@/components/CardBuilder";
 import { PlayStationLogo, SteamLogo, XboxLogo, EpicGamesLogo } from "@/components/ui/PlatformLogos";
 import { LandingThemeSwitcher } from "@/components/LandingThemeSwitcher";
+import { getPanelOculto, type SeccionPanel } from "@/lib/panelPreferences";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -615,9 +616,9 @@ export default async function HomePage() {
   const profile = await getProfileByUserId(session.user.id);
   if (!profile?.handle || profile.accounts.length === 0) redirect("/bienvenida");
 
-  const { player, games } = await getLibrary(profile);
+  const { player, games, xpMisiones } = await getLibrary(profile);
   const stats = summarise(games);
-  const nivelParagon = paragonProgress(games);
+  const nivelParagon = paragonProgress(games, xpMisiones);
 
   // Mismo bug real que en /u/[handle] (23 sept 2026): con una cuenta
   // vinculada pero privada (frecuente en Steam: "Detalles del juego" no
@@ -635,16 +636,22 @@ export default async function HomePage() {
   // Y todavía no está platinado/100% (un juego ya terminado no se "atasca").
   const juegoAnclado = games.find((g) => g.isPinned && !esPlatinoEquivalente(g)) ?? null;
 
+  // Secciones ocultas por el usuario (Ajustes → Ocultar): ni se pintan ni
+  // se piden sus datos.
+  const oculto = await getPanelOculto(session.user.id).catch(() => new Set<SeccionPanel>());
+  const ver = (s: SeccionPanel) => !oculto.has(s);
+  const nada = <T,>(v: T) => Promise.resolve(v);
+
   const [mesesHistorico, rachasUsuario, resumen, wishlistIds, misiones, recomendaciones, efemerides, diasAtascado, feed] = await Promise.all([
-    trofeosPorMes(session.user.id),
-    rachas(session.user.id),
-    resumenHistorico(session.user.id),
-    getWishlistIgdbIds(session.user.id),
-    getWeeklyMissions(session.user.id),
-    getTrophyRecommendations(session.user.id),
-    talDiaComoHoy(session.user.id),
+    ver("ritmo") ? trofeosPorMes(session.user.id) : nada([]),
+    ver("ritmo") ? rachas(session.user.id) : nada(null),
+    ver("ritmo") ? resumenHistorico(session.user.id) : nada(null),
+    ver("lanzamientos") ? getWishlistIgdbIds(session.user.id) : nada([]),
+    ver("misiones") ? getWeeklyMissions(session.user.id) : nada([]),
+    ver("recomendaciones") ? getTrophyRecommendations(session.user.id) : nada([]),
+    ver("talDia") ? talDiaComoHoy(session.user.id) : nada([]),
     juegoAnclado ? diasSinAvance(session.user.id, juegoAnclado.id) : Promise.resolve(null),
-    getFeed(session.user.id),
+    ver("actividad") ? getFeed(session.user.id, { limite: 15 }) : nada([]),
   ]);
 
   const UMBRAL_ATASCO = 5;
@@ -971,9 +978,11 @@ export default async function HomePage() {
             label: t("tabResumen"),
             content: (
               <>
-                <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+                {/* En móvil: platinos a lo ancho y las otras tres en una fila
+                    (antes una tarjeta por fila: cuatro números, una pantalla). */}
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                   <div
-                    className="relative overflow-hidden rounded-[20px] p-6"
+                    className="relative col-span-3 overflow-hidden rounded-[20px] p-5 sm:p-6 lg:col-span-1"
                     style={{
                       border: "1px solid var(--border)",
                       background:
@@ -985,7 +994,7 @@ export default async function HomePage() {
                       <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]">{t("platinos")}</p>
                     </div>
                     <p
-                      className="font-heading mt-2.5 text-[6rem] font-bold leading-[0.85]"
+                      className="font-heading mt-2.5 text-[4.5rem] font-bold leading-[0.85] sm:text-[6rem]"
                       style={{ color: "#dff0f8", textShadow: "0 0 40px rgba(159, 212, 236, 0.35)" }}
                     >
                       {stats.platinos}
@@ -1004,25 +1013,34 @@ export default async function HomePage() {
                   logrosSinMetal={stats.logrosSinMetal}
                 />
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2.5fr]">
-                  <div className="h-full">
-                    <MonthlySummary meses={mesesHistorico} />
+                {rachasUsuario && resumen && (
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2.5fr]">
+                    <div className="h-full">
+                      <MonthlySummary meses={mesesHistorico} />
+                    </div>
+                    <TrophyHistory
+                      meses={mesesHistorico}
+                      rachas={rachasUsuario}
+                      resumen={resumen}
+                      totalPerfil={stats.trofeos}
+                    />
                   </div>
-                  <TrophyHistory
-                    meses={mesesHistorico}
-                    rachas={rachasUsuario}
-                    resumen={resumen}
-                    totalPerfil={stats.trofeos}
-                  />
-                </div>
+                )}
 
-                <WeeklyMissions missions={misiones} />
+                {ver("misiones") && <WeeklyMissions missions={misiones} />}
                 {mostrarAtasco && juegoAnclado && (
                   <AvisoAtasco gameId={juegoAnclado.id} titulo={juegoAnclado.title} dias={diasAtascado!} handle={profile.handle} />
                 )}
-                <TalDiaComoHoy efemerides={efemerides} handle={profile.handle} />
-                <ActivityStats games={games} now={now} />
-                <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />
+                {ver("talDia") && <TalDiaComoHoy efemerides={efemerides} handle={profile.handle} />}
+                {ver("estadisticas") && <ActivityStats games={games} now={now} />}
+                {ver("recomendaciones") && (
+                  <TrophyRecommendations recommendations={recomendaciones} handle={profile.handle} showcaseTrophies={profile.showcaseTrophies ?? []} />
+                )}
+                <p className="text-center text-xs text-muted">
+                  <Link href="/ajustes/ocultar" className="hover:text-foreground hover:underline">
+                    {t("personalizarPanel")}
+                  </Link>
+                </p>
               </>
             ),
           },
@@ -1031,13 +1049,20 @@ export default async function HomePage() {
             label: t("tabActividad"),
             content: (
               <>
-                {nearPlatinumSection}
-                {abandonadosSection}
-                <UpcomingGames wishlistedIgdbIds={wishlistIds} />
-                {recientesSection}
-                <section>
-                  <ActivityFeed activities={feed} currentUserId={session.user.id} />
-                </section>
+                {ver("aUnPaso") && nearPlatinumSection}
+                {ver("parados") && abandonadosSection}
+                {ver("lanzamientos") && <UpcomingGames wishlistedIgdbIds={wishlistIds} />}
+                {ver("recientes") && recientesSection}
+                {ver("actividad") && (
+                  <section>
+                    <ActivityFeed activities={feed} currentUserId={session.user.id} />
+                    <p className="mt-3 text-right">
+                      <Link href="/feed" className="text-xs font-bold uppercase tracking-wide text-accent hover:underline">
+                        {t("verComunidad")}
+                      </Link>
+                    </p>
+                  </section>
+                )}
               </>
             ),
           },

@@ -3,7 +3,8 @@
     "breadcrumb": "Library",
     "title": "Library",
     "gamesHeading": "Games",
-    "gamesCount": "{count, plural, one {# game} other {# games}} · newest first"
+    "gamesCount": "{count, plural, one {# game} other {# games}} · newest first",
+    "wishlistCount": "{count, plural, one {# wishlisted} other {# wishlisted}}"
   },
   "GameDetailPage": {
     "backLabel": "@{handle}'s library",

@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { StatTile } from "@/components/StatTile";
 import { BackButton } from "@/components/BackButton";
+import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { gradeLabel, TrophyTile } from "@/components/TrophyIcon";
 import { RitmoTrophyList } from "@/components/RitmoTrophyList";
 import { colorFor } from "@/lib/design";
@@ -149,6 +150,8 @@ export default async function RitmoPage({
               t("helpOutOfRange")}
         </p>
       </div>
+
+      {profile?.handle && <ProfileTabsNav handle={profile.handle} esMio />}
 
       <BarrasNavegables meses={meses} seleccionado={mes} mesesCortos={mesesCortos} t={t} />
 

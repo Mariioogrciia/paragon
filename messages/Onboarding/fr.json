@@ -28,7 +28,9 @@
   },
   "ajustesOcultar": {
     "title": "Masquer",
-    "description": "Rien à voir avec la communauté — c'est uniquement pour toi. Retire du menu les fonctions qui ne t'intéressent pas ; elles restent visibles pour tout le monde, toi seul arrêtes de les voir."
+    "description": "Rien à voir avec la communauté — c'est uniquement pour toi. Retire du menu les fonctions qui ne t'intéressent pas ; elles restent visibles pour tout le monde, toi seul arrêtes de les voir.",
+    "panelTitle": "Sections du tableau de bord",
+    "panelDescription": "Celles que tu coches n’apparaissent pas (et ne sont pas calculées, ça charge plus vite)."
   },
   "ajustesPlataformas": {
     "title": "Comptes de jeu",
@@ -280,7 +282,8 @@
     "styleTitle": "Style",
     "styleDescription": "Pas seulement la couleur — le rayon des coins, l'ombre, la typographie et même le fond changent selon le style.",
     "themesTitle": "Thèmes",
-    "themesDescription": "Combos en un clic : mode + accent + style en même temps."
+    "themesDescription": "Combos en un clic : mode + accent + style en même temps.",
+    "styleLocked": "Se débloque au niveau {nivel}"
   },
   "themeCustomizer": {
     "label": "Apparence"

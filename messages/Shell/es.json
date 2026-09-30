@@ -15,7 +15,8 @@
       "inicio": "Inicio",
       "comoFunciona": "Cómo funciona",
       "sesiones": "Sesiones",
-      "temporada": "Temporada"
+      "temporada": "Temporada",
+      "actividad": "Actividad"
     },
     "abrirMenu": "Abrir menú",
     "cerrarMenu": "Cerrar menú",
@@ -238,7 +239,9 @@
     "botDiscordDesc": "Presume de tus platinos, compara estadísticas con tus amigos y recibe notificaciones de racha directamente en tu canal favorito. Sin salir de Discord.",
     "botDiscordCmd1": "Muestra tu Card interactiva en el chat",
     "botDiscordCmd2": "Radar de rivalidad con otros miembros",
-    "botDiscordCmd3": "Anuncia tus conquistas automáticamente"
+    "botDiscordCmd3": "Anuncia tus conquistas automáticamente",
+    "personalizarPanel": "Personalizar qué sale en el panel",
+    "verComunidad": "Ver todo en Comunidad →"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Perfil de ejemplo",
@@ -554,5 +557,8 @@
     "vacio": "Todavía nadie ha sumado puntos esta temporada.",
     "anteriores": "Tus temporadas anteriores",
     "chip": "Temporada: nivel {n}"
+  },
+  "Paginacion": {
+    "verMas": "Ver más"
   }
 }

@@ -21,9 +21,9 @@ export async function GET(
     return NextResponse.json({ error: "No existe ese usuario" }, { status: 404 });
   }
 
-  const { games } = await getLibrary(profile);
+  const { games, xpMisiones } = await getLibrary(profile);
   const stats = summarise(games);
-  const nivel = paragonProgress(games);
+  const nivel = paragonProgress(games, xpMisiones);
 
   // Tomamos los últimos jugados (sin wishlist)
   const recent = games.filter((g) => !g.isWishlist).slice(0, 3);

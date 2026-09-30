@@ -541,17 +541,20 @@ export function SyncPlatformForm({ platform, label }: { platform: string; label:
  * cabecera. Se manda el set entero marcado (no hay "guardar uno a uno") —
  * `setHiddenNavItemsAction` reemplaza la lista completa en cada envío.
  */
+/** Lista de casillas "ocultar X": menú (por defecto) o secciones del panel (`action`). */
 export function HiddenNavForm({
   opciones,
   ocultas,
+  action = setHiddenNavItemsAction,
 }: {
-  opciones: readonly { key: NavKey; label: string }[];
+  opciones: readonly { key: NavKey | string; label: string }[];
   ocultas: string[];
+  action?: (formData: FormData) => Promise<void>;
 }) {
   const t = useTranslations("Onboarding");
 
   return (
-    <form action={setHiddenNavItemsAction} className="flex flex-col gap-1">
+    <form action={action} className="flex flex-col gap-1">
       {opciones.map((opcion) => (
         <label
           key={opcion.key}

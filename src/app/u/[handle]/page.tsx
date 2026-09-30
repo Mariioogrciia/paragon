@@ -26,6 +26,8 @@ import { Badges } from "@/components/Badges";
 import { Pegi } from "@/components/Pegi";
 import { ParagonLevelCard } from "@/components/ParagonLevelCard";
 import { ParagonAchievements } from "@/components/ParagonAchievements";
+import { medirLogros } from "@/lib/medirLogros";
+import { historialTemporadas } from "@/lib/temporadas";
 import { paragonProgress } from "@/lib/level";
 import { ShowcaseTrophies } from "@/components/ShowcaseTrophies";
 import { TrophyCase } from "@/components/TrophyCase";
@@ -42,6 +44,8 @@ import { getUserClan } from "@/lib/clans";
 import { CompartirPerfil } from "@/components/CompartirPerfil";
 import { VitrinasPerfil } from "@/components/VitrinasPerfil";
 import { ChipTemporada } from "@/components/ChipTemporada";
+import { MedallasTemporada } from "@/components/MedallasTemporada";
+import { TituloEspecial } from "@/components/TituloEspecial";
 import { getVitrinas } from "@/lib/vitrinas";
 
 
@@ -105,7 +109,7 @@ export default async function PerfilPage({
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
 
-  const { player, games } = await getLibrary(profile);
+  const { player, games, xpMisiones } = await getLibrary(profile);
 
   // Antes esto cortaba en seco si no había cuenta vinculada. Ya no vale: un
   // perfil puede tener solo juegos añadidos a mano y ninguna cuenta de PSN o
@@ -155,7 +159,7 @@ export default async function PerfilPage({
     );
   }
   const stats = summarise(games);
-  const nivelParagon = paragonProgress(games);
+  const nivelParagon = paragonProgress(games, xpMisiones);
   // Paralelizado EN TANDAS DE 3, no todo de golpe — y esto tiene historia.
   //
   // El 6 de septiembre de 2026 se intentó un `Promise.all` con las cinco
@@ -198,6 +202,11 @@ export default async function PerfilPage({
     !esMio && session?.user?.id
       ? getFriendshipStatus(session.user.id, profile.userId)
       : Promise.resolve("ninguna" as const),
+  ]);
+
+  const [medidasLogros, temporadasCerradas] = await Promise.all([
+    medirLogros(profile.userId, nivelParagon.level),
+    historialTemporadas(profile.userId).catch(() => []),
   ]);
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
@@ -394,6 +403,7 @@ export default async function PerfilPage({
                   {t("PerfilPage.desarrolladorBadge")}
                 </span>
               )}
+              <TituloEspecial clave={profile.tituloDesbloqueado} />
             </div>
             <p className="mt-2 text-sm text-muted">
               @{handle}
@@ -408,6 +418,7 @@ export default async function PerfilPage({
             {badges.length > 0 && <Badges earnedBadges={badges} />}
             <TrophyCase items={palmares} />
             <ChipTemporada userId={profile.userId} />
+            <MedallasTemporada historial={temporadasCerradas} />
           </div>
 
           <Link
@@ -479,7 +490,7 @@ export default async function PerfilPage({
             recientes: recientes.length > 0 && <RecentTrophies key="recientes" trofeos={recientes} handle={handle} />,
             level: <ParagonLevelCard key="level" progress={nivelParagon} />,
             achievements: (
-              <ParagonAchievements key="achievements" games={games} earnedIds={badges.map((badge) => badge.badgeId)} />
+              <ParagonAchievements key="achievements" medidas={medidasLogros} earnedIds={badges.map((badge) => badge.badgeId)} />
             ),
             showcase: (
               <ShowcaseTrophies
@@ -513,7 +524,8 @@ export default async function PerfilPage({
               <section key="favoritos" className="mt-8 mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-heading text-xl font-bold uppercase tracking-wide text-muted">{t("PerfilPage.favoritosTitulo")}</h2>
-                  {esMio && <FavoritePicker allGames={games} currentFavorites={profile.favorites ?? []} />}
+                  {/* Solo lo que pinta el selector: con la biblioteca entera el perfil mandaba ~300 KB de más. */}
+                  {esMio && <FavoritePicker allGames={games.map((g) => ({ id: g.id, title: g.title, iconUrl: g.iconUrl }))} currentFavorites={profile.favorites ?? []} />}
                 </div>
 
                 {(profile.favorites?.length ?? 0) > 0 ? (
@@ -577,7 +589,7 @@ export default async function PerfilPage({
 
           return (
             <>
-              <ProfileTabsNav handle={handle} juegos={stats.juegos} />
+              <ProfileTabsNav handle={handle} juegos={stats.juegos} esMio={esMio} />
               <div className="space-y-9">{resumenNodos}</div>
             </>
           );

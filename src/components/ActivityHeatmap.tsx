@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import type { DiaActividad } from "@/lib/profileStats";
+import { TooltipDelegado } from "@/components/TooltipDelegado";
 
 /**
  * Mapa de actividad estilo GitHub — un cuadrito por día, más intenso cuanto
@@ -9,10 +10,9 @@ import type { DiaActividad } from "@/lib/profileStats";
  * sesiones real.
  *
  * Semanas de lunes a domingo (convención española, no la de GitHub que
- * empieza en domingo). El detalle de cada día es un tooltip propio (CSS
- * puro, `group-hover`, sin JS) — el `title` nativo del navegador tarda en
- * aparecer y es minúsculo, así que no se notaba que hubiera nada al pasar
- * el ratón.
+ * empieza en domingo). El detalle de cada día es un tooltip propio
+ * (TooltipDelegado) — el `title` nativo del navegador tarda en aparecer y
+ * es minúsculo, así que no se notaba que hubiera nada al pasar el ratón.
  */
 function nivel(trofeos: number): number {
   if (trofeos === 0) return 0;
@@ -81,38 +81,31 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
               </span>
             ))}
           </div>
-          <div className="flex gap-[3px]">
-            {semanas.map((semana, i) => (
-              <div key={i} className="flex flex-col gap-[3px]">
-                {semana.map((d, j) =>
+          {/* Un solo SVG con un <rect> por día y UN tooltip compartido
+              (TooltipDelegado): antes eran dos <div> por día más su tooltip
+              oculto, ~300 KB de HTML en la página de estadísticas. */}
+          <TooltipDelegado>
+            <svg width={semanas.length * 14 - 3} height={7 * 14 - 3} className="block" role="img" aria-label={t("totalTrofeos", { count: total })}>
+              <style>{`.hm{rx:2px;fill:var(--surface-2)}.hm:hover{stroke:var(--foreground);stroke-width:1px}${OPACIDAD_POR_NIVEL.slice(1)
+                .map((op, n) => `.hm${n + 1}{fill:rgb(var(--accent-rgb) / ${op})}`)
+                .join("")}`}</style>
+              {semanas.map((semana, i) =>
+                semana.map((d, j) =>
                   d ? (
-                    <div key={j} className="group/dia relative h-[11px] w-[11px]">
-                      <div
-                        className="h-[11px] w-[11px] rounded-[2px]"
-                        style={{
-                          background: nivel(d.trofeos) === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${OPACIDAD_POR_NIVEL[nivel(d.trofeos)]})`,
-                        }}
-                      />
-                      <div
-                        className={`pointer-events-none absolute bottom-full z-20 mb-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[0.6875rem] font-semibold opacity-0 shadow-lg transition-opacity group-hover/dia:opacity-100 ${
-                          // Centrado se salía por el lateral en las primeras/
-                          // últimas semanas, y `overflow-x-auto` lo recortaba
-                          // — ancladas al borde de su propia celda en las
-                          // primeras 8 semanas para que el texto largo no desborde.
-                          i < 8 ? "left-0" : i > semanas.length - 8 ? "right-0" : "left-1/2 -translate-x-1/2"
-                        }`}
-                        style={{ background: "var(--foreground)", color: "var(--background)" }}
-                      >
-                        {t("tooltip", { count: d.trofeos, fecha: fechaLarga(d.dia) })}
-                      </div>
-                    </div>
-                  ) : (
-                    <div key={j} className="h-[11px] w-[11px]" />
-                  ),
-                )}
-              </div>
-            ))}
-          </div>
+                    <rect
+                      key={`${i}-${j}`}
+                      x={i * 14}
+                      y={j * 14}
+                      width={11}
+                      height={11}
+                      className={nivel(d.trofeos) === 0 ? "hm" : `hm hm${nivel(d.trofeos)}`}
+                      data-t={t("tooltip", { count: d.trofeos, fecha: fechaLarga(d.dia) })}
+                    />
+                  ) : null,
+                ),
+              )}
+            </svg>
+          </TooltipDelegado>
         </div>
       </div>
       <div className="mt-3 flex items-center justify-end gap-1.5 text-[0.625rem] text-muted">

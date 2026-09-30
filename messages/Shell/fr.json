@@ -15,7 +15,8 @@
       "inicio": "Accueil",
       "comoFunciona": "Comment ça marche",
       "sesiones": "Sessions",
-      "temporada": "Saison"
+      "temporada": "Saison",
+      "actividad": "Activité"
     },
     "abrirMenu": "Ouvrir le menu",
     "cerrarMenu": "Fermer le menu",
@@ -238,7 +239,9 @@
     "botDiscordDesc": "Affichez vos platines, comparez vos statistiques avec vos amis et recevez des notifications de série directement sur votre canal préféré. Sans quitter Discord.",
     "botDiscordCmd1": "Affichez votre Card interactive dans le chat",
     "botDiscordCmd2": "Radar de rivalité avec d'autres membres",
-    "botDiscordCmd3": "Annoncez automatiquement vos conquêtes"
+    "botDiscordCmd3": "Annoncez automatiquement vos conquêtes",
+    "personalizarPanel": "Choisir ce qui s’affiche sur le tableau de bord",
+    "verComunidad": "Tout voir dans la Communauté →"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Profil d'exemple",
@@ -554,5 +557,8 @@
     "vacio": "Personne n'a encore marqué de points cette saison.",
     "anteriores": "Tes saisons précédentes",
     "chip": "Saison : niveau {n}"
+  },
+  "Paginacion": {
+    "verMas": "Voir plus"
   }
 }

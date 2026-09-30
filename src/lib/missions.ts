@@ -1,7 +1,7 @@
 import "server-only";
-import { and, eq, gte, isNotNull, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, gameTrophies, userTrophies } from "@/db/schema";
+import { games, gameTrophies, missionCompletions, userTrophies } from "@/db/schema";
 
 export interface WeeklyMission {
   id: string;
@@ -163,7 +163,7 @@ export async function getWeeklyMissions(userId: string): Promise<WeeklyMission[]
     bronce: filas.filter((f) => f.grade === "bronze").length,
   };
 
-  return retosDeLaSemana(hoy).map((plantilla) => ({
+  const misiones = retosDeLaSemana(hoy).map((plantilla) => ({
     id: `weekly-${plantilla.id}`,
     title: plantilla.title,
     description: plantilla.description,
@@ -171,4 +171,31 @@ export async function getWeeklyMissions(userId: string): Promise<WeeklyMission[]
     target: plantilla.target,
     xp: plantilla.xp,
   }));
+
+  // Se apunta aquí (panel y cron, ver checkAndGrantBadges) y no en un cron
+  // aparte: las misiones solo se pueden medir con los trofeos de la semana en
+  // curso, así que lo cumplido se guarda antes de que la semana cambie.
+  const cumplidas = misiones.filter((m) => m.progress >= m.target);
+  if (cumplidas.length > 0) {
+    const semana = claveDeSemana(hoy);
+    await db
+      .insert(missionCompletions)
+      .values(cumplidas.map((m) => ({ userId, semana, misionId: m.id, xp: m.xp })))
+      .onConflictDoNothing()
+      .catch(() => undefined);
+  }
+
+  return misiones;
+}
+
+/** XP total de misiones cumplidas por usuario — suma al nivel Paragon (lib/level.ts). */
+export async function xpMisiones(userIds: string[]): Promise<Map<string, number>> {
+  if (userIds.length === 0) return new Map();
+  const filas = await db
+    .select({ userId: missionCompletions.userId, xp: sql<number>`sum(${missionCompletions.xp})` })
+    .from(missionCompletions)
+    .where(inArray(missionCompletions.userId, userIds))
+    .groupBy(missionCompletions.userId)
+    .catch(() => []);
+  return new Map(filas.map((f) => [f.userId, Number(f.xp)]));
 }

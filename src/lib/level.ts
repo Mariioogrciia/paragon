@@ -24,6 +24,25 @@ export const FRAME_REQUISITOS: Record<string, number> = {
   cristal: 150,
 };
 
+/**
+ * Estilos de interfaz (lib/apariencia.ts) que se desbloquean por nivel. Los
+ * de siempre (Clásico, Terminal, Vidrio, Brutalista) siguen libres: esto
+ * añade algo que ganar sin quitarle a nadie lo básico. Se comprueba en el
+ * cliente (selector) y al guardar (`guardarAparienciaAction`).
+ */
+export const ESTILO_REQUISITOS: Record<string, number> = {
+  "estilo-ps5": 10,
+  "estilo-xbox": 10,
+  "estilo-steam": 20,
+  "estilo-switch": 20,
+};
+
+/** Banners de plataforma (lib/bannerPresets.ts) con nivel mínimo, igual que los marcos. */
+export const BANNER_REQUISITOS: Record<string, number> = {
+  retro: 15,
+  paragon: 30,
+};
+
 export interface ParagonLevel {
   level: number;
   xp: number;
@@ -38,6 +57,8 @@ export interface ParagonXpBreakdown {
   trofeos: number;
   platinos: number;
   juegosCompletados: number;
+  /** XP de misiones semanales cumplidas (lib/missions.ts). */
+  misiones: number;
   total: number;
 }
 
@@ -69,7 +90,7 @@ export function paragonLevelFromXp(xp: number): ParagonLevel {
   };
 }
 
-export function paragonProgress(games: Game[]): ParagonProgress {
+export function paragonProgress(games: Game[], xpMisiones = 0): ParagonProgress {
   const earned: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 };
   let juegosCompletados = 0;
   // Steam no tiene jerarquía de metales (`game.earned` se queda a null, ver
@@ -124,7 +145,7 @@ export function paragonProgress(games: Game[]): ParagonProgress {
   // cualquiera con algún platino, y el propio donut de abajo — que reparte
   // sus 360° entre trofeos/platinos/completados sobre este total — se
   // quedaba corto de espacio para el tramo de platinos.
-  const total = trofeos + platinos + completados;
+  const total = trofeos + platinos + completados + xpMisiones;
 
   return {
     ...paragonLevelFromXp(total),
@@ -132,6 +153,7 @@ export function paragonProgress(games: Game[]): ParagonProgress {
       trofeos,
       platinos,
       juegosCompletados: completados,
+      misiones: xpMisiones,
       total,
     },
   };

@@ -5,6 +5,7 @@ import type { Session } from "next-auth";
 import Script from "next/script";
 import { Barlow, Chakra_Petch, JetBrains_Mono } from "next/font/google";
 import { auth } from "@/auth";
+import { SincronizarApariencia } from "@/components/SincronizarApariencia";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
@@ -249,6 +250,9 @@ export default async function RootLayout({
             enableSystem
             themes={["dark", "light", "oled", "high-contrast"]}
           >
+            {sessionUser && profile && (
+              <SincronizarApariencia guardada={profile.apariencia ?? null} nivel={nivelParagon?.level ?? 1} />
+            )}
             <Header user={headerUser} navOculta={navOculta} locale={locale} />
             {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
                 56px de los 375 de un movil (un 15% del ancho) antes de que las

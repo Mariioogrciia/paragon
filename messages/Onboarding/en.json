@@ -28,7 +28,9 @@
   },
   "ajustesOcultar": {
     "title": "Hide",
-    "description": "Nothing to do with community — this is just for you. Remove features you're not interested in from the menu; they're still there for everyone else, you just stop seeing them."
+    "description": "Nothing to do with community — this is just for you. Remove features you're not interested in from the menu; they're still there for everyone else, you just stop seeing them.",
+    "panelTitle": "Dashboard sections",
+    "panelDescription": "The ones you tick won’t appear on your dashboard (nor be calculated, so it loads faster)."
   },
   "ajustesPlataformas": {
     "title": "Game Accounts",
@@ -280,7 +282,8 @@
     "styleTitle": "Style",
     "styleDescription": "Not just the color — corner radius, shadow, typography and even the background change depending on the style.",
     "themesTitle": "Themes",
-    "themesDescription": "One-click combos: mode + accent + style all at once."
+    "themesDescription": "One-click combos: mode + accent + style all at once.",
+    "styleLocked": "Unlocks at level {nivel}"
   },
   "themeCustomizer": {
     "label": "Appearance"

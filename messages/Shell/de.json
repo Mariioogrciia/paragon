@@ -15,7 +15,8 @@
       "inicio": "Start",
       "comoFunciona": "So funktioniert's",
       "sesiones": "Sessions",
-      "temporada": "Saison"
+      "temporada": "Saison",
+      "actividad": "Aktivität"
     },
     "abrirMenu": "Menü öffnen",
     "cerrarMenu": "Menü schließen",
@@ -238,7 +239,9 @@
     "botDiscordDesc": "Zeige deine Platin-Trophäen, vergleiche Statistiken mit Freunden und erhalte Streak-Benachrichtigungen direkt in deinem Lieblingskanal. Ohne Discord zu verlassen.",
     "botDiscordCmd1": "Zeige deine interaktive Card im Chat",
     "botDiscordCmd2": "Rivalitätsradar mit anderen Mitgliedern",
-    "botDiscordCmd3": "Kündige deine Eroberungen automatisch an"
+    "botDiscordCmd3": "Kündige deine Eroberungen automatisch an",
+    "personalizarPanel": "Anpassen, was im Dashboard erscheint",
+    "verComunidad": "Alles in der Community ansehen →"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Beispielprofil",
@@ -554,5 +557,8 @@
     "vacio": "Diese Saison hat noch niemand Punkte gesammelt.",
     "anteriores": "Deine früheren Saisons",
     "chip": "Saison: Level {n}"
+  },
+  "Paginacion": {
+    "verMas": "Mehr anzeigen"
   }
 }

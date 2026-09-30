@@ -52,6 +52,7 @@ import type { PlataformaVinculable } from "@/lib/types";
 import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 import { setHiddenNavItems } from "@/lib/navPreferences";
+import { setPanelOculto } from "@/lib/panelPreferences";
 import { COOKIES_SESION, cerrarOtrasSesiones } from "@/lib/mobileAuth";
 import { ipActual, limitar } from "@/lib/rateLimit";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
@@ -61,6 +62,8 @@ import { SesionError, apuntarse, cancelarSesion, crearSesion, salirse } from "@/
 import { CoopError, proponerReto, responderReto } from "@/lib/coop";
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
+import { getParagonLevel } from "@/lib/paragonLevel";
+import { ESTILO_REQUISITOS } from "@/lib/level";
 
 export interface ActionState {
   error?: string;
@@ -755,7 +758,7 @@ export async function toggleActivityReactionAction(formData: FormData): Promise<
   const userId = await requireUserId();
   const activityId = String(formData.get("activityId") ?? "");
   if (!activityId) return;
-  await toggleActivityReaction(userId, activityId);
+  await toggleActivityReaction(userId, activityId, String(formData.get("reaction") ?? "aplauso"));
   revalidatePath("/", "layout");
 }
 
@@ -833,6 +836,52 @@ export async function adminDeleteClanAction(formData: FormData): Promise<void> {
   const database = getDb();
   await database.delete(clans).where(eq(clans.id, clanId));
 
+  revalidatePath("/", "layout");
+}
+
+/**
+ * Forzar el @handle de OTRO usuario, solo para el admin (`esDesarrollador`).
+ * Pensado para el caso real de handles ofensivos creados antes de que el
+ * filtro los detectara (p. ej. `maricon439`, 29 sept 2026): el filtro ya
+ * bloquea que se creen nuevos, pero no toca los que ya existen — esto le da
+ * al admin una forma de corregirlos sin tener que tocar la base a mano.
+ */
+export async function adminSetHandleAction(formData: FormData): Promise<void> {
+  const adminUserId = await requireUserId();
+  const adminProfile = await getProfileByUserId(adminUserId);
+  if (!adminProfile?.esDesarrollador) return;
+
+  const targetUserId = String(formData.get("targetUserId") ?? "");
+  const handle = String(formData.get("handle") ?? "").trim().toLowerCase();
+  if (!targetUserId) return;
+  const volver = (msg: string) =>
+    formData.get("volver") === "moderacion"
+      ? `/admin?tab=moderation&handleMsg=${msg}`
+      : `/admin/usuarios/${targetUserId}?handleMsg=${msg}`;
+
+  if (!HANDLE_RE.test(handle)) redirect(volver("formato"));
+  if (await isHandleTaken(handle, targetUserId)) redirect(volver("cogido"));
+  if (contieneLenguajeOfensivo(handle)) redirect(volver("ofensivo"));
+
+  await setHandle(targetUserId, handle);
+  revalidatePath("/", "layout");
+  redirect(volver("ok"));
+}
+
+const CAMPOS_VACIABLES = ["name", "firstName", "lastName", "profileTitle", "statusText"] as const;
+
+/** Moderación: vacía un texto libre ofensivo de otro usuario (el handle no, ese se cambia). */
+export async function adminVaciarCampoAction(formData: FormData): Promise<void> {
+  const adminUserId = await requireUserId();
+  const adminProfile = await getProfileByUserId(adminUserId);
+  if (!adminProfile?.esDesarrollador) return;
+
+  const targetUserId = String(formData.get("targetUserId") ?? "");
+  const campo = String(formData.get("campo") ?? "") as (typeof CAMPOS_VACIABLES)[number];
+  if (!targetUserId || !CAMPOS_VACIABLES.includes(campo)) return;
+
+  const database = getDb();
+  await database.update(users).set({ [campo]: null }).where(eq(users.id, targetUserId));
   revalidatePath("/", "layout");
 }
 
@@ -921,6 +970,12 @@ export async function setHiddenNavItemsAction(formData: FormData): Promise<void>
   const items = formData.getAll("navKey").map(String);
   await setHiddenNavItems(userId, items);
   revalidatePath("/", "layout");
+}
+
+export async function setPanelOcultoAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  await setPanelOculto(userId, formData.getAll("navKey").map(String));
+  revalidatePath("/");
 }
 
 /* ---------------------------------- Modo enfoque --------------------------------- */
@@ -1557,7 +1612,7 @@ export async function proponerRetoAction(datos: {
     if (e instanceof CoopError) return { error: e.message };
     throw e;
   }
-  revalidatePath("/planificador");
+  revalidatePath("/amigos");
   return {};
 }
 
@@ -1569,7 +1624,7 @@ export async function responderRetoAction(retoId: string, aceptar: boolean): Pro
     if (e instanceof CoopError) return { error: e.message };
     throw e;
   }
-  revalidatePath("/planificador");
+  revalidatePath("/amigos");
   return {};
 }
 
@@ -1607,4 +1662,31 @@ export async function setHorasIgnoradasAction(gameId: string, ignorar: boolean):
   if (!(await ownsGame(userId, gameId))) return;
   await setHorasIgnoradas(userId, gameId, ignorar);
   revalidatePath("/", "layout");
+}
+
+/* ------------------------------ Apariencia ------------------------------ */
+
+const TAMANOS_TEXTO_VALIDOS = ["", "grande", "enorme", "pequeno"];
+
+/**
+ * Guarda acento/estilo/tamaño de texto en la cuenta (antes solo vivían en el
+ * localStorage de un navegador). Sin sesión no hace nada — y a propósito no
+ * usa `requireUserId`, que redirige: esto se llama "disparar y olvidar" desde
+ * el selector y una redirección ahí sacaría a la persona de la página.
+ */
+export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string }): Promise<void> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return;
+
+  const acento = /^(accent-[a-z]+)?$/.test(ap.acento ?? "") ? (ap.acento ?? "") : "";
+  const acentoLibre = /^(#[0-9a-f]{6})?$/i.test(ap.acentoLibre ?? "") ? (ap.acentoLibre ?? "") : "";
+  let estilo = /^(estilo-[a-z0-9]+)?$/.test(ap.estilo ?? "") ? (ap.estilo ?? "") : "";
+  const tamanoTexto = TAMANOS_TEXTO_VALIDOS.includes(ap.tamanoTexto ?? "") ? (ap.tamanoTexto ?? "") : "";
+  if (estilo && ESTILO_REQUISITOS[estilo] !== undefined) {
+    const nivel = await getParagonLevel(userId);
+    if (nivel.level < ESTILO_REQUISITOS[estilo]) estilo = "";
+  }
+
+  await getDb().update(users).set({ apariencia: { acento, acentoLibre, estilo, tamanoTexto } }).where(eq(users.id, userId));
 }

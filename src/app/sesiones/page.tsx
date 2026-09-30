@@ -8,6 +8,7 @@ import { BackButton } from "@/components/BackButton";
 import { listarSesiones, type SesionVista } from "@/lib/sesiones";
 import { AccionesSesion } from "./AccionesSesion";
 import { NuevaSesion } from "./NuevaSesion";
+import { SeccionTabs } from "@/components/SeccionTabs";
 
 export const metadata = { title: "Sesiones · Paragon" };
 
@@ -38,6 +39,7 @@ export default async function SesionesPage() {
   return (
     <div className="mx-auto max-w-[900px] space-y-8">
       <BackButton fallbackHref="/" />
+      <SeccionTabs seccion="comunidad" />
       <div>
         <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">{t("titulo")}</h1>
         <p className="mt-2 max-w-[650px] text-sm text-muted">{t("subtitulo")}</p>

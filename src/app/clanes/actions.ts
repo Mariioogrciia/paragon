@@ -22,8 +22,8 @@ export async function createClanAction(formData: FormData) {
   // Requisito: Nivel 5
   const profile = await getProfileByUserId(session.user.id);
   if (!profile) throw new Error("Perfil no encontrado");
-  const { games } = await getLibrary(profile);
-  const nivel = paragonProgress(games).level;
+  const { games, xpMisiones } = await getLibrary(profile);
+  const nivel = paragonProgress(games, xpMisiones).level;
 
   if (nivel < 5) {
     throw new Error("Necesitas ser al menos Nivel 5 de Paragon para crear un clan.");

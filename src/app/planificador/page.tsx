@@ -8,8 +8,6 @@ import { CarpetasManager } from "@/components/CarpetasManager";
 import { FiltroEstadoAnimo } from "@/components/FiltroEstadoAnimo";
 import { BackButton } from "@/components/BackButton";
 import { getObjetivosFecha, ritmoReciente } from "@/lib/goals";
-import { juegosEnComun, misRetos } from "@/lib/coop";
-import { PlatinarJuntos } from "@/components/PlatinarJuntos";
 
 export const metadata = { title: "Planificador · Paragon" };
 
@@ -22,13 +20,11 @@ export default async function PlanificadorPage() {
 
   const t = await getTranslations("Analitica.planificadorPage");
 
-  const [{ games }, collections, objetivos, ritmo, retos, comunes] = await Promise.all([
+  const [{ games }, collections, objetivos, ritmo] = await Promise.all([
     getLibrary(profile),
     listCollections(profile.userId),
     getObjetivosFecha(profile.userId),
     ritmoReciente(profile.userId).catch(() => null),
-    misRetos(profile.userId).catch(() => []),
-    juegosEnComun(profile.userId).catch(() => []),
   ]);
 
   return (
@@ -40,7 +36,6 @@ export default async function PlanificadorPage() {
       </div>
       <FiltroEstadoAnimo games={games} handle={profile.handle} />
       <Planificador collections={collections} library={games} handle={profile.handle} objetivos={objetivos} ritmo={ritmo} />
-      <PlatinarJuntos retos={retos} comunes={comunes} />
       <CarpetasManager collections={collections} library={games} />
     </div>
   );

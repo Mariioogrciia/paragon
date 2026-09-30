@@ -28,7 +28,9 @@
   },
   "ajustesOcultar": {
     "title": "Ausblenden",
-    "description": "Nichts mit der Community zu tun — das ist nur für dich. Entferne Funktionen, die dich nicht interessieren, aus dem Menü; sie bleiben für alle anderen sichtbar, nur du siehst sie nicht mehr."
+    "description": "Nichts mit der Community zu tun — das ist nur für dich. Entferne Funktionen, die dich nicht interessieren, aus dem Menü; sie bleiben für alle anderen sichtbar, nur du siehst sie nicht mehr.",
+    "panelTitle": "Bereiche des Dashboards",
+    "panelDescription": "Markierte Bereiche erscheinen nicht im Dashboard (und werden nicht berechnet, es lädt schneller)."
   },
   "ajustesPlataformas": {
     "title": "Spielkonten",
@@ -280,7 +282,8 @@
     "styleTitle": "Stil",
     "styleDescription": "Nicht nur die Farbe — Eckenradius, Schatten, Typografie und sogar der Hintergrund ändern sich je nach Stil.",
     "themesTitle": "Themes",
-    "themesDescription": "Ein-Klick-Kombinationen: Modus + Akzent + Stil auf einmal."
+    "themesDescription": "Ein-Klick-Kombinationen: Modus + Akzent + Stil auf einmal.",
+    "styleLocked": "Wird ab Stufe {nivel} freigeschaltet"
   },
   "themeCustomizer": {
     "label": "Erscheinungsbild"

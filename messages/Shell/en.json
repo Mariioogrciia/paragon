@@ -15,7 +15,8 @@
       "inicio": "Home",
       "comoFunciona": "How it works",
       "sesiones": "Sessions",
-      "temporada": "Season"
+      "temporada": "Season",
+      "actividad": "Activity"
     },
     "abrirMenu": "Open menu",
     "cerrarMenu": "Close menu",
@@ -238,7 +239,9 @@
     "botDiscordDesc": "Show off your platinums, compare stats with friends, and get streak notifications directly in your favorite channel. Without leaving Discord.",
     "botDiscordCmd1": "Show your interactive Card in the chat",
     "botDiscordCmd2": "Rivalry radar with other members",
-    "botDiscordCmd3": "Announce your conquests automatically"
+    "botDiscordCmd3": "Announce your conquests automatically",
+    "personalizarPanel": "Choose what shows on your dashboard",
+    "verComunidad": "See everything in Community →"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Sample profile",
@@ -554,5 +557,8 @@
     "vacio": "Nobody has scored this season yet.",
     "anteriores": "Your past seasons",
     "chip": "Season: level {n}"
+  },
+  "Paginacion": {
+    "verMas": "Show more"
   }
 }

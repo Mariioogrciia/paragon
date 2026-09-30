@@ -3,10 +3,12 @@ import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { getProfileByUserId } from "@/lib/profiles";
 import { getAdminUserDetail, getAdminUserRecentTrophies } from "@/lib/admin";
+import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 import { PLATFORM_LABEL, type AccountPlatform } from "@/lib/types";
 import { relativeDate } from "@/lib/design";
 import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
+import { adminSetHandleAction } from "@/app/actions";
 import Link from "next/link";
 
 export const metadata = { title: "Usuario · Admin · Paragon" };
@@ -22,7 +24,20 @@ function Stat({ value, label }: { value: string | number; label: string }) {
   );
 }
 
-export default async function AdminUserDetailPage({ params }: { params: Promise<{ userId: string }> }) {
+const HANDLE_MENSAJES: Record<string, { texto: string; ok?: boolean }> = {
+  ok: { texto: "Nombre de usuario cambiado.", ok: true },
+  formato: { texto: "Entre 3 y 20 caracteres, solo minúsculas, números y guion bajo." },
+  cogido: { texto: "Ese nombre de usuario ya está cogido." },
+  ofensivo: { texto: "Ese nombre de usuario también contiene lenguaje ofensivo — prueba con otro." },
+};
+
+export default async function AdminUserDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ userId: string }>;
+  searchParams: Promise<{ handleMsg?: string }>;
+}) {
   const idioma = await getLocale();
   const session = await auth();
   if (!session?.user) redirect("/entrar");
@@ -31,11 +46,14 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   if (!profile?.esDesarrollador) redirect("/");
 
   const { userId } = await params;
+  const { handleMsg } = await searchParams;
 
   const detail = await getAdminUserDetail(userId);
   if (!detail) notFound();
 
   const trofeos = await getAdminUserRecentTrophies(userId, 20);
+  const handleOfensivo = detail.handle ? contieneLenguajeOfensivo(detail.handle) : false;
+  const mensaje = handleMsg ? HANDLE_MENSAJES[handleMsg] : null;
 
   return (
     <div className="space-y-9 max-w-[1000px] mx-auto px-4 py-8">
@@ -52,6 +70,47 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           )}
         </div>
       </div>
+
+      {handleOfensivo && (
+        <p
+          className="rounded-lg px-4 py-3 text-sm font-semibold"
+          style={{ background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }}
+        >
+          Este @handle contiene lenguaje ofensivo. Cámbialo abajo — el usuario no puede volver a ponerse este mismo, el filtro ya lo bloquea.
+        </p>
+      )}
+
+      <section>
+        <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Nombre de usuario</h2>
+        {mensaje && (
+          <p
+            className="mb-3 rounded-lg px-4 py-3 text-sm font-semibold"
+            style={
+              mensaje.ok
+                ? { background: "rgb(34 197 94 / 0.1)", border: "1px solid rgb(34 197 94 / 0.3)", color: "#4ade80" }
+                : { background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }
+            }
+          >
+            {mensaje.texto}
+          </p>
+        )}
+        <form action={adminSetHandleAction} className="flex flex-wrap items-center gap-3">
+          <input type="hidden" name="targetUserId" value={userId} />
+          <span className="text-sm text-muted">@</span>
+          <input
+            name="handle"
+            defaultValue={detail.handle ?? ""}
+            required
+            className="rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-2.5 text-sm focus:border-accent focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded-xl bg-[rgb(var(--accent-rgb))] px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--accent-text)]"
+          >
+            Forzar cambio
+          </button>
+        </form>
+      </section>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat value={detail.juegos} label="Juegos" />

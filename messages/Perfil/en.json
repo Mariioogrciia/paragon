@@ -308,7 +308,8 @@
     "xpTotalLabel": "Total XP",
     "xpSourceHeading": "Where your XP comes from",
     "xpExplanation": "Each trophy gives XP based on its rarity: bronze 10, silver 25, gold 50, and platinum 200. Completing a game adds 100 XP.",
-    "footerHelp": "The circle above shows how far you've progressed within your current level. Open this section to see the breakdown and what's left."
+    "footerHelp": "The circle above shows how far you've progressed within your current level. Open this section to see the breakdown and what's left.",
+    "itemMisiones": "Weekly missions"
   },
   "ParagonScoreCard": {
     "title": "Paragon Score",
@@ -322,32 +323,8 @@
     "countLabel": "{done}/{total} earned",
     "earned": "Earned",
     "progressFraction": "{value}/{target}",
-    "items": {
-      "first_blood": {
-        "name": "First Gem",
-        "description": "Earn your first platinum."
-      },
-      "cazador": {
-        "name": "Hunter",
-        "description": "Earn 10 platinums."
-      },
-      "experto": {
-        "name": "Expert",
-        "description": "Earn 50 platinums."
-      },
-      "leyenda": {
-        "name": "Legend",
-        "description": "Earn 100 platinums."
-      },
-      "coleccionista": {
-        "name": "Collector",
-        "description": "Add 100 games to your library."
-      },
-      "madrugador": {
-        "name": "Pioneer",
-        "description": "Be one of Paragon's earliest users."
-      }
-    }
+    "hiddenName": "Hidden achievement",
+    "hiddenDescription": "Keep playing to find out."
   },
   "ShowcaseTrophies": {
     "heading": "Pride Showcase"
@@ -393,6 +370,66 @@
       "multiplataforma": {
         "name": "Cross-Platform",
         "description": "You have PlayStation, Steam, and Xbox linked and syncing"
+      },
+      "joya_rara": {
+        "name": "Rare gem",
+        "description": "Earn a platinum held by less than 5% of players."
+      },
+      "uno_entre_cien": {
+        "name": "One in a hundred",
+        "description": "Earn 10 trophies held by less than 1% of players."
+      },
+      "campeon": {
+        "name": "Champion",
+        "description": "Win a league: the monthly one or a private one."
+      },
+      "senor_guerra": {
+        "name": "Warlord",
+        "description": "Win a clan war."
+      },
+      "en_equipo": {
+        "name": "Teamwork",
+        "description": "Complete a Platinum Together challenge on time."
+      },
+      "anfitrion": {
+        "name": "Host",
+        "description": "Host a trophy session that someone joins."
+      },
+      "guia": {
+        "name": "Community guide",
+        "description": "Write 3 trophy guides."
+      },
+      "semana_perfecta": {
+        "name": "Perfect week",
+        "description": "Complete all 4 missions in a week."
+      },
+      "incansable": {
+        "name": "Tireless",
+        "description": "Complete 25 weekly missions."
+      },
+      "temporada_oro": {
+        "name": "Golden season",
+        "description": "Reach level 30 in a Season Pass."
+      },
+      "temporada_platino": {
+        "name": "Platinum season",
+        "description": "Reach level 50 in a Season Pass."
+      },
+      "veterano": {
+        "name": "Veteran",
+        "description": "Reach Paragon level 25."
+      },
+      "maestro": {
+        "name": "Master",
+        "description": "Reach Paragon level 50."
+      },
+      "noctambulo": {
+        "name": "Night owl",
+        "description": "Earn 10 trophies between 2 and 5 a.m."
+      },
+      "maraton": {
+        "name": "Marathon",
+        "description": "Earn 40 trophies in a single day."
       }
     }
   },
@@ -437,7 +474,8 @@
   "ProfileTabsNav": {
     "resumen": "Overview",
     "biblioteca": "Library",
-    "estadisticas": "Stats"
+    "estadisticas": "Stats",
+    "ritmo": "Pace"
   },
   "ProfileSectionOrderEditor": {
     "ayuda": "Drag to change the order they show up on your public profile."
@@ -476,5 +514,28 @@
     "crear": "Create showcase",
     "borrar": "Delete showcase",
     "maximo": "You already have {n} showcases, the maximum."
+  },
+  "Titulos": {
+    "aprendiz": "Apprentice hunter",
+    "rastreador": "Tracker",
+    "veterano": "Hunt veteran",
+    "elite": "Elite hunter",
+    "leyenda_viva": "Living legend",
+    "paragon": "Supreme Paragon",
+    "buscador_joyas": "Gem seeker",
+    "uno_entre_cien": "One in a hundred",
+    "campeon": "League champion",
+    "senor_guerra": "Warlord",
+    "sabio": "Community sage",
+    "perfeccionista": "Perfectionist",
+    "criatura_noche": "Creature of the night",
+    "maratoniano": "Marathoner"
+  },
+  "TituloEspecial": {
+    "label": "Special title",
+    "ninguno": "None",
+    "nivel": "Level {n}",
+    "insignia": "Badge “{nombre}”",
+    "ayuda": "Unlocked by levelling up and earning badges. Shown next to your name on your profile and in Community."
   }
 }

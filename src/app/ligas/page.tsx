@@ -9,14 +9,18 @@ import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
 import { LigaMensualFila } from "@/components/LigaMensualFila";
 import { BackButton } from "@/components/BackButton";
 import { NewLeagueForm } from "@/components/forms/Forms";
-import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
+import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
+import { SeccionTabs } from "@/components/SeccionTabs";
+import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 
 export const metadata = {
   title: "Liga Mensual - Paragon",
 };
 
-export default async function LigasPage() {
+export default async function LigasPage({ searchParams }: { searchParams: Promise<{ pagina?: string }> }) {
   const t = await getTranslations("Perfil");
+  const params = await searchParams;
+  const cuantos = 25 * paginaDe(params.pagina);
   const session = await auth();
   const [ranking, misLigas, invitaciones, historial] = await Promise.all([
     getLigaMensual(),
@@ -31,6 +35,7 @@ export default async function LigasPage() {
   return (
     <div className="mx-auto max-w-[800px] px-7 py-12">
       <BackButton fallbackHref="/" />
+      <SeccionTabs seccion="ligas" />
 
       {session?.user?.id && invitaciones.length > 0 && (
         <div className="mb-8">
@@ -109,13 +114,14 @@ export default async function LigasPage() {
               </tr>
             </thead>
             <tbody>
-              {ranking.map((user, index) => (
+              {ranking.slice(0, cuantos).map((user, index) => (
                 <LigaMensualFila key={user.userId} user={user} index={index} />
               ))}
             </tbody>
           </table>
         </div>
       )}
+      {ranking.length > cuantos && <VerMas href={hrefPagina("/ligas", params, cuantos / 25 + 1)} />}
 
       {historial.length > 0 && (
         <div className="mt-10">

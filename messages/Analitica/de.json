@@ -200,7 +200,19 @@
     "comentarios": "{count, plural, one {# Kommentar} other {# Kommentare}}",
     "comentarioPlaceholder": "Kommentar hinzufügen...",
     "enviar": "Senden",
-    "alguien": "Jemand"
+    "alguien": "Jemand",
+    "hitoCampeon": "hat {titulo} gewonnen",
+    "platinoEtiqueta": "Platin",
+    "felicitar": "Gratulieren",
+    "hitoInsignias": "{n, plural, one {hat das Abzeichen verdient:} other {hat die Abzeichen verdient:}}",
+    "y": "und",
+    "reaccion": {
+      "aplauso": "Applaudieren",
+      "fuego": "Stark",
+      "trofeo": "Glückwunsch",
+      "risa": "Haha",
+      "sorpresa": "Wow"
+    }
   },
   "historicalTimeline": {
     "tuPrimerTrofeo": "Deine erste Trophäe",

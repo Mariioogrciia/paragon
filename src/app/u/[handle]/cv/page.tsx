@@ -34,11 +34,11 @@ export default async function HojaDeServiciosPage({
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
 
-  const { player, games } = await getLibrary(profile);
+  const { player, games, xpMisiones } = await getLibrary(profile);
   if (games.length === 0) notFound();
 
   const stats = summarise(games);
-  const nivel = paragonProgress(games);
+  const nivel = paragonProgress(games, xpMisiones);
   const badges = await getUserBadges(profile.userId);
 
   const horas = Math.round(
