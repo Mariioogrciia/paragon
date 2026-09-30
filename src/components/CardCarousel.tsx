@@ -24,7 +24,7 @@ export function CardCarousel({ children }: { children: React.ReactNode }) {
     <div className="group/carousel relative">
       <div
         ref={ref}
-        className="flex gap-3 overflow-x-auto scroll-smooth pb-1"
+        className="-m-4 flex gap-3 overflow-x-auto scroll-smooth p-4"
         style={{ scrollbarWidth: "none" }}
       >
         {children}

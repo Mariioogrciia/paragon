@@ -30,9 +30,10 @@ export function SeccionTabs({ seccion }: { seccion: keyof typeof SECCIONES }) {
   const pathname = usePathname();
   const t = useTranslations("Shell.Header");
   return (
-    // `overflow-x-auto` también recorta en vertical: el relleno deja sitio al
-    // brillo y al `-translate-y` del hover, y el margen negativo lo compensa.
-    <nav className="-mx-3 -mt-2 mb-6 flex gap-1.5 overflow-x-auto border-b border-border px-3 pb-3 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    // `overflow-x-auto` también recorta en vertical: el brillo del hover
+    // (drop-shadow de 12px, globals.css) necesita ~16px libres alrededor, que
+    // da el relleno; el margen negativo lo compensa para no mover nada.
+    <nav className="-mx-4 -mt-4 mb-6 flex gap-1.5 overflow-x-auto border-b border-border px-4 pb-4 pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {SECCIONES[seccion].map((item) => {
         const activa = item.match(pathname);
         return (

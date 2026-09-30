@@ -50,7 +50,7 @@ export function GameVideos({ videos }: Props) {
 
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x"
+        className="-mx-4 -mt-4 flex gap-4 overflow-x-auto px-4 pb-4 pt-4 scrollbar-hide snap-x scroll-px-4"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {videos.map((v) => (

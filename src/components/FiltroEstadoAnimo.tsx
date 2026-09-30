@@ -47,7 +47,7 @@ export function FiltroEstadoAnimo({ games, handle }: { games: Game[]; handle: st
           {resultado.length === 0 ? (
             <p className="text-sm text-muted">{t("FiltroEstadoAnimo.empty")}</p>
           ) : (
-            <div className="flex gap-3 overflow-x-auto pb-1">
+            <div className="-m-4 flex gap-3 overflow-x-auto p-4">
               {resultado.map((g) => (
                 <Link
                   key={g.id}

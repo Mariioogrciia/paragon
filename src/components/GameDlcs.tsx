@@ -13,7 +13,7 @@ export async function GameDlcs({ dlcs }: Props) {
   return (
     <div className="mt-12">
       <h2 className="text-xl font-bold mb-4">{t("GameDlcs.title")}</h2>
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+      <div className="-mx-4 -mt-4 flex gap-4 overflow-x-auto px-4 pb-4 pt-4 scrollbar-hide snap-x scroll-px-4">
         {dlcs.map((dlc) => (
           <div key={dlc.name} className="w-[180px] shrink-0 snap-start flex flex-col gap-2">
             <div className="w-full aspect-[3/4] rounded-lg overflow-hidden border border-border shadow-md bg-muted/20 relative">

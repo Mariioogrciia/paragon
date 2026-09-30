@@ -65,7 +65,7 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
   if (!primerTrofeo && !primerPlatino && !trofeoMasRaro && !platinoAnejo && !rachaMasLarga) return null;
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-2">
+    <div className="-m-4 flex gap-4 overflow-x-auto p-4">
       {primerTrofeo && (
         <Hito
           icono={primerTrofeo.grade ? ICONO_GRADO[primerTrofeo.grade] : "🎮"}

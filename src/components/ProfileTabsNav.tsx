@@ -61,7 +61,7 @@ export function ProfileTabsNav({
     // Una sola fila con scroll horizontal en vez de `flex-wrap`: en móvil
     // "Estadísticas" saltaba sola a una segunda línea. El `pt-1` deja sitio
     // al `-translate-y` del hover, que el overflow recortaría si no.
-    <div ref={barra} onScroll={medir} role="tablist" className={`-mx-1 mb-7 flex gap-1.5 overflow-x-auto border-b border-border px-1 pb-4 pt-1 [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden${hayMas ? " [mask-image:linear-gradient(to_right,black_80%,transparent)]" : ""}`}>
+    <div ref={barra} onScroll={medir} role="tablist" className={`-mx-4 -mt-4 mb-7 flex gap-1.5 overflow-x-auto border-b border-border px-4 pb-4 pt-4 [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden${hayMas ? " [mask-image:linear-gradient(to_right,black_80%,transparent)]" : ""}`}>
       {pestanas.map((p) => {
         const activa = pathname === p.href;
         return (

@@ -35,7 +35,7 @@ export function EsportsHub({
     <div className="flex flex-col gap-8">
       
       {/* Filtros por Juego */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="-mx-4 -mt-4 flex items-center gap-2 overflow-x-auto scrollbar-hide px-4 pb-4 pt-4">
         <span className="text-sm font-bold text-muted mr-2 shrink-0">{t("filtrarPor")}</span>
         <button
           onClick={() => setFilter("Todos")}

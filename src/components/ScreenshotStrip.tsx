@@ -69,7 +69,7 @@ export function ScreenshotStrip({ screenshots, title }: { screenshots: string[];
           </div>
         )}
       </div>
-      <div ref={scrollRef} className="-mx-1 flex gap-3 overflow-x-auto px-1 py-1" style={{ scrollbarWidth: "none" }}>
+      <div ref={scrollRef} className="-m-4 flex gap-3 overflow-x-auto p-4" style={{ scrollbarWidth: "none" }}>
         {screenshots.map((src, i) => (
           <button
             key={src}
