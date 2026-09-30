@@ -50,8 +50,9 @@ export default async function NoticiasPage() {
         <p className="text-muted">{t("subtitulo")}</p>
       </div>
 
-      <div className="mb-16">
+      <div className="mb-16 flex flex-col gap-6">
         <UpcomingGames wishlistedIgdbIds={wishlistIds} />
+        <UpcomingGames wishlistedIgdbIds={wishlistIds} modo="recientes" />
       </div>
 
       {noticiasPropias.length > 0 && (

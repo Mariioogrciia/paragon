@@ -156,7 +156,13 @@
     "catalogoIgdb": "IGDB-Katalog",
     "expectacion": "/100 Erwartung",
     "sinopsis": "Zusammenfassung",
-    "sinDescripcion": "Keine Beschreibung verfügbar."
+    "sinDescripcion": "Keine Beschreibung verfügbar.",
+    "tituloRecientes": "Beliebte Neuerscheinungen",
+    "badgePopulares": "Beliebt",
+    "salioHoy": "Heute erschienen",
+    "salioAyer": "Gestern erschienen",
+    "haceDias": "Vor {n} Tagen",
+    "valoracion": "/100 Bewertung"
   },
   "GamePassCatalog": {
     "consolaTab": "Konsole ({n})",

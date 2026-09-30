@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { IgdbNotConfiguredError, upcomingGames, releaseLabelEs } from "@/lib/igdb/client";
+import { IgdbNotConfiguredError, popularesRecientes, upcomingGames, releaseLabelEs } from "@/lib/igdb/client";
 
-export async function GET() {
+/** `?modo=recientes`: ya salidos y populares (Noticias); por defecto, los próximos. */
+export async function GET(req: Request) {
   try {
-    const games = await upcomingGames(8);
+    const recientes = new URL(req.url).searchParams.get("modo") === "recientes";
+    const games = recientes ? await popularesRecientes(8) : await upcomingGames(8);
 
     return NextResponse.json(
       games.map((g) => ({

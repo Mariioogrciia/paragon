@@ -340,6 +340,22 @@ export async function recentReleases(limit = 12, plataforma?: keyof typeof ABREV
 }
 
 /**
+ * "Últimos lanzamientos populares" de Noticias: lo más seguido del mundo que
+ * ya ha salido en los últimos 60 días, no solo lo que hay en Paragon.
+ * `hypes` (gente que lo siguió en IGDB) es la mejor medida de tirón que da
+ * el catálogo; la nota de crítica tarda semanas en llegar.
+ */
+export async function popularesRecientes(limit = 8): Promise<IgdbGameResult[]> {
+  const now = ahoraRedondeado();
+  const desde = now - 60 * 86_400;
+  const games = await query<IgdbGame>(
+    "games",
+    `${FIELDS} where first_release_date > ${desde} & first_release_date <= ${now} & cover != null & hypes != null; sort hypes desc; limit ${limit};`,
+  );
+  return games.map(formatGame);
+}
+
+/**
  * Cabecera de Descubrir: solo lanzamientos YA SALIDOS (no próximos —
  * anunciar como destacado un juego que todavía no existe se queda raro en
  * la pieza más grande de la página) y con un filtro de calidad algo más

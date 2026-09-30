@@ -47,7 +47,21 @@ function cuentaAtras(game: UpcomingGame, t: ReturnType<typeof useTranslations>):
   return meses === 1 ? t("enUnMes") : t("enMeses", { n: meses });
 }
 
-export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: number[] }) {
+/** Cuánto hace que salió (modo "recientes"). */
+function haceCuanto(game: UpcomingGame, t: ReturnType<typeof useTranslations>): string | null {
+  if (!game.releaseDate) return null;
+  const dias = Math.floor((Date.now() - new Date(game.releaseDate).getTime()) / 86_400_000);
+  if (dias < 0) return null;
+  if (dias === 0) return t("salioHoy");
+  if (dias === 1) return t("salioAyer");
+  return t("haceDias", { n: dias });
+}
+
+/**
+ * `modo="recientes"`: lo más popular ya salido (Noticias), en vez de lo
+ * próximo. Misma tarjeta y mismo botón de deseados.
+ */
+export function UpcomingGames({ wishlistedIgdbIds = [], modo = "proximos" }: { wishlistedIgdbIds?: number[]; modo?: "proximos" | "recientes" }) {
   const t = useTranslations("Descubrir.UpcomingGames");
   const router = useRouter();
   const [games, setGames] = useState<UpcomingGame[]>([]);
@@ -71,7 +85,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
 
     async function traer() {
       try {
-        const res = await fetch("/api/games/upcoming");
+        const res = await fetch(modo === "recientes" ? "/api/games/upcoming?modo=recientes" : "/api/games/upcoming");
         const data = await res.json();
         if (vivo) setGames(data);
       } catch {
@@ -93,7 +107,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
       clearInterval(cadaRato);
       document.removeEventListener("visibilitychange", alVolver);
     };
-  }, []);
+  }, [modo]);
 
   if (loading) {
     return (
@@ -136,16 +150,16 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
           panel por la derecha. */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-heading min-w-0 text-lg font-bold uppercase tracking-wide">
-          {t("titulo")}
+          {modo === "recientes" ? t("tituloRecientes") : t("titulo")}
         </h2>
         <span className="shrink-0 rounded-md bg-accent/10 px-2 py-1 text-xs font-semibold uppercase text-accent">
-          {t("badgeTendencias")}
+          {modo === "recientes" ? t("badgePopulares") : t("badgeTendencias")}
         </span>
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {games.map((game) => {
-          const falta = cuentaAtras(game, t);
+          const falta = modo === "recientes" ? haceCuanto(game, t) : cuentaAtras(game, t);
           const estudio = game.developer ?? game.publisher;
           const isWishlisted = wishlistedIgdbIds.includes(game.igdbId);
 
@@ -287,7 +301,7 @@ export function UpcomingGames({ wishlistedIgdbIds = [] }: { wishlistedIgdbIds?: 
                   {modalGame.rating != null && (
                     <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold">
                       <span className="text-accent-2">★</span>
-                      <span>{modalGame.rating}{t("expectacion")}</span>
+                      <span>{modalGame.rating}{modo === "recientes" ? t("valoracion") : t("expectacion")}</span>
                     </div>
                   )}
                 </div>
