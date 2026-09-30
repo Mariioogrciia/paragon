@@ -478,7 +478,18 @@
     "ritmo": "Pace"
   },
   "ProfileSectionOrderEditor": {
-    "ayuda": "Drag to change the order they show up on your public profile."
+    "ayuda": "Drag to change the order they show up on your public profile.",
+    "labels": {
+      "wrap": "Year in Review (Wrap)",
+      "stats": "Quick stats",
+      "recientes": "Latest trophies",
+      "palmares": "League standings",
+      "level": "Paragon level",
+      "achievements": "Achievements",
+      "showcase": "Trophy showcase",
+      "vitrinas": "Themed showcases",
+      "favoritos": "Favorite games"
+    }
   },
   "SalonDeLaVerguenza": {
     "pendientes": "{count, plural, one {# game waiting.} other {# games waiting.}}",

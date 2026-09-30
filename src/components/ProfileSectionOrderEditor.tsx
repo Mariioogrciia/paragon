@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Reorder } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { SECTION_LABELS, normalizeSectionOrder, type ProfileSectionKey } from "@/lib/profileSections";
+import { normalizeSectionOrder, type ProfileSectionKey } from "@/lib/profileSections";
 
 /**
  * Editor de orden de secciones del perfil público, arrastrable. Vuelca el
@@ -47,7 +47,7 @@ export function ProfileSectionOrderEditor({
               <circle cx="15" cy="12" r="1.2" fill="currentColor" />
               <circle cx="15" cy="18" r="1.2" fill="currentColor" />
             </svg>
-            {SECTION_LABELS[key]}
+            {t(`ProfileSectionOrderEditor.labels.${key}`)}
           </Reorder.Item>
         ))}
       </Reorder.Group>

@@ -478,7 +478,18 @@
     "ritmo": "Tempo"
   },
   "ProfileSectionOrderEditor": {
-    "ayuda": "Zieh, um die Reihenfolge auf deinem öffentlichen Profil zu ändern."
+    "ayuda": "Zieh, um die Reihenfolge auf deinem öffentlichen Profil zu ändern.",
+    "labels": {
+      "wrap": "Jahresrückblick (Wrap)",
+      "stats": "Kurzstatistik",
+      "recientes": "Letzte Trophäen",
+      "palmares": "Liga-Tabelle",
+      "level": "Paragon-Level",
+      "achievements": "Erfolge",
+      "showcase": "Trophäenvitrine",
+      "vitrinas": "Themenvitrinen",
+      "favoritos": "Lieblingsspiele"
+    }
   },
   "SalonDeLaVerguenza": {
     "pendientes": "{count, plural, one {# Spiel wartet.} other {# Spiele warten.}}",

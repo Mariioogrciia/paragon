@@ -1,4 +1,12 @@
 {
+  "ajustesErrores": {
+    "contenido_ofensivo": "Nichts wurde gespeichert — ein Feld (Benutzername, Name, Titel oder Status) enthält anstößige Sprache. Ändere es und versuche es erneut.",
+    "handle_invalido": "Nichts wurde gespeichert — der Benutzername muss 3 bis 20 Zeichen haben: nur Kleinbuchstaben, Zahlen und Unterstrich.",
+    "handle_cogido": "Nichts wurde gespeichert — dieser Benutzername ist schon vergeben.",
+    "datos_invalidos": "Nichts wurde gespeichert — Bild, Banner, Farbe oder Zeitzone haben kein gültiges Format.",
+    "update_failed": "Konnte nicht gespeichert werden. Versuch es gleich noch einmal.",
+    "demasiados_intentos": "Du hast zu oft hintereinander gespeichert. Warte eine Minute und versuch es erneut."
+  },
   "ajustesNav": {
     "general": "Allgemein",
     "apariencia": "Erscheinungsbild",

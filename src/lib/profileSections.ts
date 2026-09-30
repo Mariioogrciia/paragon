@@ -28,18 +28,6 @@ export const DEFAULT_SECTION_ORDER = [
 
 export type ProfileSectionKey = (typeof DEFAULT_SECTION_ORDER)[number];
 
-export const SECTION_LABELS: Record<ProfileSectionKey, string> = {
-  wrap: "Resumen del año (Wrap)",
-  stats: "Estadísticas rápidas",
-  recientes: "Últimos trofeos",
-  palmares: "Palmarés de Ligas",
-  level: "Nivel Paragon",
-  achievements: "Logros",
-  showcase: "Vitrina de trofeos",
-  vitrinas: "Vitrinas temáticas",
-  favoritos: "Juegos favoritos",
-};
-
 /** Normaliza un orden guardado: solo claves válidas, sin duplicados, con
  * cualquier clave que falte añadida al final en el orden por defecto. */
 export function normalizeSectionOrder(order: string[] | null | undefined): ProfileSectionKey[] {

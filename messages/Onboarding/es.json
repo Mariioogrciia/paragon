@@ -1,4 +1,12 @@
 {
+  "ajustesErrores": {
+    "contenido_ofensivo": "No se ha guardado nada — algún campo (usuario, nombre, título o estado) contiene lenguaje ofensivo. Cámbialo e inténtalo de nuevo.",
+    "handle_invalido": "No se ha guardado nada — el nombre de usuario debe tener entre 3 y 20 caracteres: solo minúsculas, números y guion bajo.",
+    "handle_cogido": "No se ha guardado nada — ese nombre de usuario ya está cogido.",
+    "datos_invalidos": "No se ha guardado nada — la imagen, el banner, el color o la zona horaria no tienen un formato válido.",
+    "update_failed": "No se ha podido guardar. Inténtalo de nuevo en un momento.",
+    "demasiados_intentos": "Has guardado muchas veces seguidas. Espera un minuto y vuelve a intentarlo."
+  },
   "ajustesNav": {
     "general": "General",
     "apariencia": "Apariencia",

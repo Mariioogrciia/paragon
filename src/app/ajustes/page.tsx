@@ -10,18 +10,15 @@ import { getParagonLevel } from "@/lib/paragonLevel";
 import { getGamesForBackground, getProfileByUserId, getUserBadges } from "@/lib/profiles";
 import { getTranslations } from "next-intl/server";
 
-/** Los `?error=` que devuelve /api/profile/update. */
-const ERRORES_PERFIL: Record<string, string> = {
-  contenido_ofensivo:
-    "No se ha guardado nada — algún campo (usuario, nombre, título o estado) contiene lenguaje ofensivo. Cámbialo e inténtalo de nuevo.",
-  handle_invalido:
-    "No se ha guardado nada — el nombre de usuario debe tener entre 3 y 20 caracteres: solo minúsculas, números y guion bajo.",
-  handle_cogido: "No se ha guardado nada — ese nombre de usuario ya está cogido.",
-  datos_invalidos:
-    "No se ha guardado nada — la imagen, el banner, el color o la zona horaria no tienen un formato válido.",
-  update_failed: "No se ha podido guardar. Inténtalo de nuevo en un momento.",
-  demasiados_intentos: "Has guardado muchas veces seguidas. Espera un minuto y vuelve a intentarlo.",
-};
+/** Los `?error=` que devuelve /api/profile/update — texto en ajustesErrores.*, namespace Onboarding. */
+const CLAVES_ERROR_PERFIL = [
+  "contenido_ofensivo",
+  "handle_invalido",
+  "handle_cogido",
+  "datos_invalidos",
+  "update_failed",
+  "demasiados_intentos",
+] as const;
 
 export default async function AjustesGeneralPage(props: { searchParams: Promise<{ error?: string }> }) {
   const session = await auth();
@@ -59,15 +56,16 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
   // lleva esa constante (ese solo sirve de comentario para quien lea el código).
   const t = await getTranslations("Onboarding");
   const categoriasTraducidas = CATEGORIAS_AVISO.map((c) => ({ clave: c.clave, label: t(`categoriaAviso.${c.clave}`) }));
+  const errorValido = (CLAVES_ERROR_PERFIL as readonly string[]).includes(error ?? "");
 
   return (
     <>
-      {error && ERRORES_PERFIL[error] && (
+      {errorValido && (
         <p
           className="mb-4 rounded-lg px-4 py-3 text-sm font-semibold"
           style={{ background: "rgb(239 68 68 / 0.1)", border: "1px solid rgb(239 68 68 / 0.3)", color: "#f87171" }}
         >
-          {ERRORES_PERFIL[error]}
+          {t(`ajustesErrores.${error}`)}
         </p>
       )}
       <ProfileForm

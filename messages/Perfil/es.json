@@ -478,7 +478,18 @@
     "ritmo": "Ritmo"
   },
   "ProfileSectionOrderEditor": {
-    "ayuda": "Arrastra para cambiar el orden en que se ven en tu perfil público."
+    "ayuda": "Arrastra para cambiar el orden en que se ven en tu perfil público.",
+    "labels": {
+      "wrap": "Resumen del año (Wrap)",
+      "stats": "Estadísticas rápidas",
+      "recientes": "Últimos trofeos",
+      "palmares": "Palmarés de Ligas",
+      "level": "Nivel Paragon",
+      "achievements": "Logros",
+      "showcase": "Vitrina de trofeos",
+      "vitrinas": "Vitrinas temáticas",
+      "favoritos": "Juegos favoritos"
+    }
   },
   "SalonDeLaVerguenza": {
     "pendientes": "{count, plural, one {# juego esperando.} other {# juegos esperando.}}",

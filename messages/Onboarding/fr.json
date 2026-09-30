@@ -1,4 +1,12 @@
 {
+  "ajustesErrores": {
+    "contenido_ofensivo": "Rien n'a été enregistré — un champ (pseudo, nom, titre ou statut) contient un langage offensant. Modifie-le et réessaie.",
+    "handle_invalido": "Rien n'a été enregistré — le pseudo doit faire entre 3 et 20 caractères : minuscules, chiffres et underscore uniquement.",
+    "handle_cogido": "Rien n'a été enregistré — ce pseudo est déjà pris.",
+    "datos_invalidos": "Rien n'a été enregistré — l'image, la bannière, la couleur ou le fuseau horaire ne sont pas dans un format valide.",
+    "update_failed": "Impossible d'enregistrer. Réessaie dans un instant.",
+    "demasiados_intentos": "Tu as enregistré plusieurs fois de suite. Attends une minute et réessaie."
+  },
   "ajustesNav": {
     "general": "Général",
     "apariencia": "Apparence",

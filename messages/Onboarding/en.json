@@ -1,4 +1,12 @@
 {
+  "ajustesErrores": {
+    "contenido_ofensivo": "Nothing was saved — a field (username, name, title or status) contains offensive language. Change it and try again.",
+    "handle_invalido": "Nothing was saved — the username must be 3 to 20 characters: lowercase letters, numbers and underscore only.",
+    "handle_cogido": "Nothing was saved — that username is already taken.",
+    "datos_invalidos": "Nothing was saved — the image, banner, color or time zone aren't in a valid format.",
+    "update_failed": "Couldn't save. Try again in a moment.",
+    "demasiados_intentos": "You've saved many times in a row. Wait a minute and try again."
+  },
   "ajustesNav": {
     "general": "General",
     "apariencia": "Appearance",

@@ -4,13 +4,13 @@ Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **30 de septiembre de 2026**.
 
 **Estado actual (30 sept 2026) — léelo antes que nada:**
-- **`origin/master` está en `4f7295f`**; hay una sesión más encima **sin
-  commitear todavía** (i18n de Ajustes, estados/reacciones en Android,
-  arreglos en `/ajustes/plataformas` — ver "Sesión siguiente" más abajo).
-  Revisar y commitear/subir antes de dar por buena esta línea. Fuera del
-  repo solo quedan `.env.local`, `scratch/` y un cambio local sin subir a
-  propósito en `.claude/launch.json` (ruta del certificado de Avast, que solo
-  existe en el equipo del usuario; ver "Entorno local" al final).
+- **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
+  estados/reacciones en Android, arreglos en `/ajustes/plataformas`, orden
+  de secciones del perfil y errores de `/api/profile/update` traducidos —
+  ver "Sesión siguiente" más abajo). Fuera del repo solo quedan
+  `.env.local`, `scratch/` y un cambio local sin subir a propósito en
+  `.claude/launch.json` (ruta del certificado de Avast, que solo existe en
+  el equipo del usuario; ver "Entorno local" al final).
 - Las sesiones del **25 al 30 de septiembre** están **al final de este
   archivo**, en orden: auditoría de seguridad/plataforma → Functions Storage
   → segunda auditoría (rendimiento/estética) → piloto automático → funciones
@@ -898,16 +898,9 @@ nombre + idioma).
   fuera otra vez en la sesión siguiente a propósito — refactor grande y
   arriesgado sin beneficio visible, mejor cuando haya que tocarlos por otro
   motivo.
-- Otro hueco de i18n encontrado de paso (no arreglado, mismo patrón que el
-  de arriba): `REIHENFOLGE DER ABSCHNITTE` (orden de secciones del perfil,
-  en Ajustes → General) ya traduce el título, pero los nombres de las
-  secciones arrastrables ("Resumen del año (Wrap)", "Estadísticas rápidas"…)
-  siguen en español en cualquier idioma — mismo sitio que
-  `ProfileSectionOrderEditor.tsx`/`lib/profileSections.ts`.
-- `ERRORES_PERFIL` en `ajustes/page.tsx` (los `?error=` de
-  `/api/profile/update`: handle inválido, contenido ofensivo…) también están
-  fijos en español — no se tocó porque no estaba en la lista pedida, mismo
-  arreglo que el resto si se retoma.
+- ~~Orden de secciones del perfil (`ProfileSectionOrderEditor.tsx`) y
+  `ERRORES_PERFIL` de `ajustes/page.tsx`~~ → hechos, ver "Sesión siguiente"
+  más abajo.
 
 ---
 
@@ -1006,6 +999,24 @@ son de `.claude/worktrees/<otro-worktree>/.next/build/...` — build de OTRA
 sesión que quedó dentro del repo y que ESLint recorre igualmente; no son de
 este trabajo, no se tocó esa carpeta), `comprobar-namespaces-cliente.mts`
 OK, `compileDebugKotlin` OK.
+
+**Los dos huecos de i18n que se habían dejado fuera, arreglados a
+continuación (mismo pedido, "adelante con las pendientes"):**
+- **Orden de secciones del perfil** (Ajustes → General): los 9 nombres
+  arrastrables ("Resumen del año (Wrap)", "Estadísticas rápidas"…) vivían en
+  `SECTION_LABELS` (`lib/profileSections.ts`) fijos en español.
+  `ProfileSectionOrderEditor.tsx` ya tenía `useTranslations("Perfil")` para
+  su texto de ayuda — ahora también para las etiquetas
+  (`ProfileSectionOrderEditor.labels.*`, 4 idiomas). `SECTION_LABELS` se
+  quitó del todo (nada más lo usaba).
+- **`ERRORES_PERFIL`** (los `?error=` de `/api/profile/update`: handle
+  inválido, contenido ofensivo, demasiados intentos…) en
+  `ajustes/page.tsx`: el diccionario en español se sustituyó por una lista
+  de claves válidas y el texto sale de `ajustesErrores.*` (namespace
+  `Onboarding`, 4 idiomas).
+
+Probado a mano cambiando a francés: orden de secciones y el aviso de error
+(`?error=handle_invalido`) salen ya en francés.
 
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El
