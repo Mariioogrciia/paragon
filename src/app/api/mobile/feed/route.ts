@@ -6,7 +6,9 @@ import { getFeed } from "@/lib/feed";
  * Muro de actividad (propia + amigos) para FeedScreen (Android) — mismo
  * `getFeed` que usa la portada web, ya limitado a 50 y ordenado por fecha.
  * `activities.type` (src/db/schema.ts) es uno de:
- * "review" | "rating" | "platinum" | "favorite" | "new_game".
+ * "review" | "rating" | "platinum" | "favorite" | "new_game" | "status".
+ * Desde el 30 sept 2026 la app ya sabe pintar estados libres (sin juego,
+ * `game: null`) y reacciones con emoji (`miReaccion`) — antes se filtraban.
  */
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
@@ -14,9 +16,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  // Los estados libres no llevan juego y la app Android todavía no los
-  // sabe pintar (espera `game` siempre): fuera hasta que los soporte.
-  const feed = (await getFeed(userId)).filter((item) => item.type !== "status" && item.game);
+  const feed = await getFeed(userId);
 
   return NextResponse.json({
     items: feed.map((item) => ({
@@ -26,9 +26,10 @@ export async function GET(req: Request) {
       review: item.review ?? null,
       createdAt: item.createdAt,
       user: item.user,
-      game: item.game,
+      game: item.game ?? null,
       reactions: item.reactions,
       reacted: item.reacted,
+      miReaccion: item.miReaccion,
       comments: item.comments,
       views: item.views,
     })),

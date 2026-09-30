@@ -7,6 +7,7 @@ import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.FeedCommentDto
 import com.paragon.app.data.network.FeedItemDto
 import com.paragon.app.data.network.NewCommentRequest
+import com.paragon.app.data.network.ReactRequest
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -18,6 +19,17 @@ import java.util.TimeZone
 /** Un comentario ya existente en una publicación — de momento solo lectura, no hay POST desde la app todavía. */
 data class FeedComment(val body: String, val userName: String, val timeAgo: String)
 
+/** Reacciones del feed — mismas 5 y mismo orden que `lib/reacciones.ts` en la web. */
+data class Reaccion(val clave: String, val emoji: String)
+val REACCIONES = listOf(
+    Reaccion("aplauso", "👏"),
+    Reaccion("fuego", "🔥"),
+    Reaccion("trofeo", "🏆"),
+    Reaccion("risa", "😂"),
+    Reaccion("sorpresa", "😮"),
+)
+fun emojiDeReaccion(clave: String?): String = REACCIONES.find { it.clave == clave }?.emoji ?: REACCIONES[0].emoji
+
 /** Actividad propia + amigos (FeedScreen) — ver GET /api/mobile/feed en API-CONTRACT.md. */
 data class FeedItem(
     val id: String,
@@ -25,9 +37,12 @@ data class FeedItem(
     val rating: Int?,
     val review: String?,
     val userName: String,
-    val gameTitle: String,
+    // Nulo para los estados libres ("status"): no llevan juego.
+    val gameTitle: String?,
     val reactions: Int,
     val reacted: Boolean,
+    // Con cuál de las 5 reacciones (ver REACCIONES); null si no ha reaccionado.
+    val miReaccion: String?,
     val timeAgo: String,
     val userHandle: String,
     val comments: List<FeedComment> = emptyList(),
@@ -39,14 +54,15 @@ sealed class FeedResult {
     data class Error(val message: String) : FeedResult()
 }
 
-/** "type" de activities (src/db/schema.ts) → frase en español, mismo criterio que la web. */
+/** "type" de activities (src/db/schema.ts) → frase en español, mismo criterio que la web. "status" no lleva frase: el propio texto (item.review) ya lo es. */
 fun mensajeFeed(item: FeedItem): String = when (item.type) {
     "platinum" -> "Ha conseguido el Platino en ${item.gameTitle}."
     "new_game" -> "Ha empezado a jugar a ${item.gameTitle}."
     "review" -> "Ha escrito una reseña de ${item.gameTitle}."
     "rating" -> "Ha valorado ${item.gameTitle}" + (item.rating?.let { " con $it/10." } ?: ".")
     "favorite" -> "Ha marcado ${item.gameTitle} como favorito."
-    else -> "Ha hecho algo en ${item.gameTitle}."
+    "status" -> ""
+    else -> item.gameTitle?.let { "Ha hecho algo en $it." } ?: "Ha hecho algo."
 }
 
 // minSdk 24 no tiene java.time sin desugaring — SimpleDateFormat/Date sí
@@ -77,9 +93,10 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     rating = rating,
     review = review,
     userName = user.name ?: user.handle ?: "Alguien",
-    gameTitle = game.title,
+    gameTitle = game?.title,
     reactions = reactions,
     reacted = reacted,
+    miReaccion = miReaccion,
     timeAgo = relativeTimeEs(createdAt),
     userHandle = user.handle ?: "",
     comments = comments.map { it.toFeedComment() },
@@ -121,11 +138,17 @@ class FeedRepository(private val tokenStore: TokenStore? = null, private val cac
         return FeedResult.Ok(items, fromCache = true)
     }
 
-    /** Alterna la reacción a una publicación — `null` si falla la llamada (quien la usa ya pinta en optimista antes). */
-    suspend fun toggleReaction(activityId: String): Boolean? {
+    /**
+     * Alterna la reacción a una publicación — `reaction` es una clave de
+     * REACCIONES ("aplauso" si no se especifica). La misma otra vez la
+     * quita; otra distinta la cambia (ver `toggleActivityReaction` en
+     * lib/feed.ts, mismo comportamiento). `null` si falla la llamada (quien
+     * la usa ya pinta en optimista antes).
+     */
+    suspend fun toggleReaction(activityId: String, reaction: String = "aplauso"): Boolean? {
         val store = tokenStore ?: return null
         return try {
-            ApiClient.feedApi(store).react(activityId).reacted
+            ApiClient.feedApi(store).react(activityId, ReactRequest(reaction)).reacted
         } catch (e: Exception) {
             null
         }

@@ -116,26 +116,36 @@ como campo aparte.
   "createdAt": "2026-09-15T20:00:00.000Z",
   "user": { "id": "u1", "handle": "mario", "name": "Mario", "image": "https://..." },
   "game": { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "deviceLabel": "PS5" },
-  "reactions": 3, "reacted": false,
+  "reactions": 3, "reacted": false, "miReaccion": null,
   "comments": [ { "activityId": "act_1", "body": "GG", "userName": "Ana", "createdAt": "..." } ],
   "views": 12
 } ] }
 ```
-`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`.
-Máximo 50 elementos, ya ordenados por fecha descendente. `views`: número de
-usuarios distintos que han visto la publicación (tabla `activity_view`, PK
-compuesta por actividad+usuario — no cuenta visitas repetidas de la misma
-persona).
+`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game" | "status"`.
+`"status"` es un estado libre publicado desde Comunidad: **`game` viene
+`null`** y el texto vive en `review` (no es una cita sobre un juego, es la
+publicación entera). Soportado por la app desde el 30 sept 2026 — antes se
+filtraban en el propio endpoint porque la app esperaba `game` siempre.
+`miReaccion` es la clave de con cuál de las 5 reacciones ha reaccionado esta
+cuenta (`"aplauso" | "fuego" | "trofeo" | "risa" | "sorpresa"`, ver
+`lib/reacciones.ts`), o `null` si ninguna. Máximo 50 elementos, ya ordenados
+por fecha descendente. `views`: número de usuarios distintos que han visto
+la publicación (tabla `activity_view`, PK compuesta por actividad+usuario —
+no cuenta visitas repetidas de la misma persona).
 
 ## `POST /api/mobile/feed/{activityId}/react` — Reaccionar/quitar reacción
 
+Body: `{ "reaction": "fuego" }` (opcional — sin él, o con una clave que no
+es una de las 5, cae en `"aplauso"`, mismo comportamiento que antes del 30
+sept 2026).
 ```json
 { "reacted": true }
 ```
-Alterna: si ya habías reaccionado, la quita y devuelve `false`. Mismo
-`toggleActivityReactionAction` que la web (botón de aplauso) — pensado para
-el doble toque en una tarjeta del Feed (idea #13 del brainstorm de v1.0),
-no hay un endpoint aparte para "quitar" solamente.
+Alterna: la misma reacción otra vez la quita (`"reacted": false`); una
+distinta a la que ya tenías la cambia sin tocar el contador total. Mismo
+`toggleActivityReactionAction` que la web — pensado también para el doble
+toque en una tarjeta del Feed (idea #13 del brainstorm de v1.0, reacciona
+con `"aplauso"`), no hay un endpoint aparte para "quitar" solamente.
 
 ## `POST /api/mobile/feed/{activityId}/view` — Registrar visualización
 

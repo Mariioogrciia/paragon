@@ -4,8 +4,10 @@ Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **30 de septiembre de 2026**.
 
 **Estado actual (30 sept 2026) — léelo antes que nada:**
-- **Todo está commiteado y en `origin/master`** hasta `4f7295f`, desplegado
-  en Vercel (región `fra1`, todos los despliegues "completed"). Fuera del
+- **`origin/master` está en `4f7295f`**; hay una sesión más encima **sin
+  commitear todavía** (i18n de Ajustes, estados/reacciones en Android,
+  arreglos en `/ajustes/plataformas` — ver "Sesión siguiente" más abajo).
+  Revisar y commitear/subir antes de dar por buena esta línea. Fuera del
   repo solo quedan `.env.local`, `scratch/` y un cambio local sin subir a
   propósito en `.claude/launch.json` (ruta del certificado de Avast, que solo
   existe en el equipo del usuario; ver "Entorno local" al final).
@@ -882,19 +884,128 @@ Commits: `3743b37` (estados + fix de insignias), `4f7295f` (efecto del
 nombre + idioma).
 
 ### Pendiente (al cerrar el 30 sept 2026)
-- Etiquetas fijas en español aunque se cambie el idioma: el menú de Ajustes
-  (`AjustesNav.tsx`) y las listas `NAV_OCULTABLE`, `PANEL_OCULTABLE` y
-  `CATEGORIAS_AVISO` (Ajustes → Ocultar y "Qué te avisamos").
-- La app Android no pinta los estados libres de Comunidad (la API móvil los
-  filtra) ni las reacciones con emoji (sigue aplaudiendo).
+- ~~Etiquetas fijas en español aunque se cambie el idioma: el menú de
+  Ajustes (`AjustesNav.tsx`) y las listas `NAV_OCULTABLE`, `PANEL_OCULTABLE`
+  y `CATEGORIAS_AVISO`~~ → hecho, ver la sesión siguiente.
+- ~~La app Android no pinta los estados libres de Comunidad ni las
+  reacciones con emoji~~ → hecho, ver la sesión siguiente.
 - **Retos semanales entre amigos**: ya existe la clasificación semanal y
   mensual en /amigos; darle ganador exige decidir contra qué grupo gana cada
   uno (cada cual tiene amigos distintos). Pendiente de que el usuario diga
   cómo lo quiere.
 - Partir `actions.ts` y `profiles.ts` (~1.700 líneas cada uno): no cambia
-  nada para el usuario; hacerlo cuando haya que tocarlos a fondo.
-- Sin verificar con el ratón encima en el navegador: el arreglo del brillo
-  cortado en carruseles (el usuario estaba usando el panel en ese momento).
+  nada para el usuario; hacerlo cuando haya que tocarlos a fondo. Se dejó
+  fuera otra vez en la sesión siguiente a propósito — refactor grande y
+  arriesgado sin beneficio visible, mejor cuando haya que tocarlos por otro
+  motivo.
+- Otro hueco de i18n encontrado de paso (no arreglado, mismo patrón que el
+  de arriba): `REIHENFOLGE DER ABSCHNITTE` (orden de secciones del perfil,
+  en Ajustes → General) ya traduce el título, pero los nombres de las
+  secciones arrastrables ("Resumen del año (Wrap)", "Estadísticas rápidas"…)
+  siguen en español en cualquier idioma — mismo sitio que
+  `ProfileSectionOrderEditor.tsx`/`lib/profileSections.ts`.
+- `ERRORES_PERFIL` en `ajustes/page.tsx` (los `?error=` de
+  `/api/profile/update`: handle inválido, contenido ofensivo…) también están
+  fijos en español — no se tocó porque no estaba en la lista pedida, mismo
+  arreglo que el resto si se retoma.
+
+---
+
+## Sesión siguiente (30 sept 2026, continuación — pendientes + cuentas de juego)
+
+Lo pedido: seguir con la lista de "Pendiente" de arriba y luego una tanda
+sobre `/ajustes/plataformas` (captura adjunta del usuario) — dominio propio,
+"regional settings", las 4 plataformas en una fila y un aviso roto en
+pantalla. Hecho sin commitear todavía (revisar antes de subir, ver abajo).
+
+**i18n de Ajustes (punto 1 de la lista):** `AjustesNav.tsx` y las listas
+`NAV_OCULTABLE`/`PANEL_OCULTABLE`/`CATEGORIAS_AVISO`
+(navPreferences.ts/panelPreferences.ts/avisosPreferencias.ts) llevaban el
+`label` en español a pelo, y los componentes que los pintan
+(`HiddenNavForm`, `PreferenciasAvisos`) lo usaban tal cual sin pasar por
+`useTranslations`. Las claves (`key`/`clave`) siguen siendo la fuente de la
+verdad en esos archivos — solo se les quitó el peso de decidir el texto
+visible: ahora `/ajustes/ocultar/page.tsx` y `/ajustes/page.tsx` traducen
+cada clave (`navOcultable.*`, `panelOcultable.*`, `categoriaAviso.*`,
+`ajustesNav.*`, namespace `Onboarding`, 4 idiomas) antes de pasarlas a los
+componentes de cliente. Probado a mano cambiando el idioma en el navegador
+(inglés y alemán) en `/ajustes` y `/ajustes/ocultar`.
+
+**Android: estados libres y reacciones con emoji (punto 2 de la lista).**
+`GET /api/mobile/feed` ya no filtra `type === "status"` ni exige `game`
+(era `game: null` en la fila desde siempre, `getFeed` ya hacía `leftJoin`);
+ahora manda también `miReaccion` (con qué emoji reaccionó esta cuenta).
+`POST .../react` acepta `{ "reaction": "fuego" }` en el body — opcional,
+sin ella cae en `"aplauso"` igual que antes, así que una app vieja sigue
+funcionando igual. En Android: `FeedItemDto.game` pasa a nullable,
+`FeedItem.gameTitle` también, `mensajeFeed()` tiene una rama `"status"` que
+no usa el juego (el texto de la publicación es `item.review`, no una cita
+sobre un juego). Reacciones: `REACCIONES` (mismos 5 emoji que
+`lib/reacciones.ts`) vive ahora también en Kotlin
+(`FeedRepository.kt`); `ReactionBadge` nuevo en `FeedScreen.kt` pinta el
+emoji elegido en vez de un corazón genérico, y un toque sin reaccionar
+todavía abre una fila de 5 emoji para elegir (toggleReaction ahora acepta
+la clave). El doble toque de toda la vida sigue reaccionando con "aplauso"
+directo, sin abrir el selector. Documentado en `android/API-CONTRACT.md`.
+Compilado con `JAVA_HOME="C:\Program Files\Android Studio\jbr"
+./gradlew :app:compileDebugKotlin` (BUILD SUCCESSFUL) — **no probado en
+emulador**, mismo motivo de siempre (exige login).
+
+**Descartado a propósito:** partir `actions.ts`/`profiles.ts` — sigue sin
+tocarse, ver el punto de la lista de arriba.
+
+**`/ajustes/plataformas` (captura del usuario):**
+- **Las 4 plataformas vinculables en una sola fila** en vez de 3+2:
+  `grid-cols-3` → `grid-cols-4` en pantallas grandes
+  ([page.tsx](src/app/ajustes/plataformas/page.tsx)). Nintendo Switch (el
+  cajón "aún no soportado") se queda solo en su propia fila debajo.
+- **El aviso roto de la captura** ("Onboarding.avisoPublico.psn" en vez de
+  texto): `PublicAccountNotice.tsx` pedía la clave `avisoPublico.<plataforma>`
+  al namespace `Onboarding`, pero esa clave **no existía en ningún idioma**
+  — next-intl, sin traducción, devuelve la clave tal cual en vez de fallar
+  fuerte. Pasaba siempre, en las 4 plataformas, cada vez que alguien abría
+  el formulario de vincular/cambiar cuenta — no es un caso raro, es el
+  aviso "tu perfil tiene que estar en público" que se ve nada más entrar.
+  Añadida la traducción en los 4 idiomas.
+- **"Regional settings" (Ajustes → General):** llevaba un desplegable de
+  idioma (`t("profileForm.regional.languageLabel")`) que era un duplicado
+  roto del selector de idioma de verdad (`LanguageSwitcher.tsx` en la
+  cabecera, que sí actualiza la cookie `NEXT_LOCALE` y `users.language`).
+  Este otro: solo ofrecía "Español"/"English" (ni alemán ni francés, de los
+  4 que hay de verdad) y, más grave, **`/api/profile/update` reescribía
+  `users.language` a `"es-ES"` en CADA guardado del perfil grande** (nombre,
+  avatar, tema, lo que sea) si el campo no llegaba con el formato exacto que
+  esperaba — así que guardar cualquier cosa en el perfil grande podía
+  deshacer en silencio un cambio de idioma a alemán/francés hecho segundos
+  antes desde la cabecera. Quitado el campo entero (`ProfileForm.tsx`,
+  `/api/profile/update/route.ts`): "Regional settings" ahora solo tiene
+  zona horaria, que es lo único que no duplicaba nada. El idioma se sigue
+  cambiando solo desde `LanguageSwitcher`.
+- **Dominio propio**: el usuario comentó "habría que ir pensando en
+  lanzarla con dominio" — sigue sin comprar, la app sigue en
+  `platinos-nine.vercel.app` (ver "Pendiente" más arriba, viene de antes).
+  No se ha hecho nada al respecto esta sesión, es una decisión/compra del
+  usuario, no código.
+
+**Comprobado con el ratón en el navegador (pendiente suelto de la sesión
+anterior):** el brillo de hover en carruseles y pestañas. Se pudo probar de
+verdad esta vez (`/descubrir`, fila "New Releases" de `CardCarousel`, y
+`ProfileTabsNav` en `/u/<handle>`) conectando el navegador de la sesión al
+`next dev` que el usuario ya tenía corriendo en `localhost:3000` (dos
+sesiones de Claude no pueden compartir el mismo `next dev`, pero sí pueden
+apuntar al mismo puerto desde el navegador). Confirmado: el resplandor sale
+completo en los dos casos, sin recortarse arriba/abajo. No se repasó cada
+carrusel uno por uno (`GameVideos`, `GameDlcs`, `ScreenshotStrip`,
+`HistoricalTimeline`, `FiltroEstadoAnimo`, filtros de eSports) — llevan el
+mismo arreglo (`-m-4 p-4`) que los dos probados, así que es la misma regla
+aplicada igual, pero no se vieron uno a uno con el ratón encima.
+
+**Calidad:** `npx tsc --noEmit` limpio, `npm test` 75/75, lint limpio en
+todo lo tocado (los ~700 "errores" que saca `npm run lint` en esta sesión
+son de `.claude/worktrees/<otro-worktree>/.next/build/...` — build de OTRA
+sesión que quedó dentro del repo y que ESLint recorre igualmente; no son de
+este trabajo, no se tocó esa carpeta), `comprobar-namespaces-cliente.mts`
+OK, `compileDebugKotlin` OK.
 
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El

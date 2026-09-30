@@ -1,4 +1,46 @@
 {
+  "ajustesNav": {
+    "general": "Général",
+    "apariencia": "Apparence",
+    "escaparate": "Vitrines et signature",
+    "seguridad": "Connexion et sécurité",
+    "plataformas": "Comptes de jeu",
+    "ocultar": "Masquer"
+  },
+  "navOcultable": {
+    "feed": "Communauté",
+    "ligas": "Ligues",
+    "amigos": "Amis",
+    "descubrir": "Découvrir",
+    "planificador": "Planificateur"
+  },
+  "panelOcultable": {
+    "ritmo": "Ton rythme (résumé du mois et graphique)",
+    "misiones": "Missions hebdomadaires",
+    "talDia": "Ce jour-là",
+    "estadisticas": "Activité et statistiques",
+    "recomendaciones": "Prochain trophée",
+    "aUnPaso": "À un pas du platine",
+    "parados": "Jeux à l'arrêt",
+    "lanzamientos": "Prochaines sorties",
+    "recientes": "Joué récemment",
+    "actividad": "Activité récente"
+  },
+  "categoriaAviso": {
+    "trofeos": "Nouveaux trophées et platines",
+    "perdibles": "Trophées manquables au début d'un jeu",
+    "lanzamientos": "Sorties de ta liste de souhaits",
+    "precios": "Alertes de prix",
+    "ligas": "Ligues, saison et guerres de clans",
+    "social": "Sessions et défis Platiner ensemble",
+    "resumen": "Résumé hebdomadaire par Discord"
+  },
+  "avisoPublico": {
+    "psn": "Ton profil de trophées PSN doit être public pour qu'on puisse le lire — s'il est privé, ta bibliothèque restera vide.",
+    "steam": "Ton profil Steam doit être public, et « Détails du jeu » aussi — sans ce second réglage, ta bibliothèque reste vide même si le profil est déjà public.",
+    "xbox": "Ton historique de succès Xbox doit être public pour qu'on puisse le lire — s'il est privé, ta bibliothèque restera vide.",
+    "epic": "Ton profil de succès Epic Games doit être public pour qu'on puisse le lire — s'il est privé, ta bibliothèque restera vide."
+  },
   "bienvenida": {
     "title": "On va te préparer",
     "subtitle": "Deux étapes et c'est fini.",

@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const ITEMS = [
-  { href: "/ajustes", label: "General" },
-  { href: "/ajustes/apariencia", label: "Apariencia" },
-  { href: "/ajustes/escaparate", label: "Vitrinas y firma" },
-  { href: "/ajustes/seguridad", label: "Inicio de sesión y seguridad" },
-  { href: "/ajustes/plataformas", label: "Cuentas de Juegos" },
-  { href: "/ajustes/ocultar", label: "Ocultar" },
-];
+  { href: "/ajustes", clave: "general" },
+  { href: "/ajustes/apariencia", clave: "apariencia" },
+  { href: "/ajustes/escaparate", clave: "escaparate" },
+  { href: "/ajustes/seguridad", clave: "seguridad" },
+  { href: "/ajustes/plataformas", clave: "plataformas" },
+  { href: "/ajustes/ocultar", clave: "ocultar" },
+] as const;
 
 /**
  * Extraído de `ajustes/layout.tsx` (que es un Server Component, por la
@@ -26,6 +27,7 @@ const ITEMS = [
  */
 export function AjustesNav() {
   const pathname = usePathname();
+  const t = useTranslations("Onboarding");
 
   return (
     <nav className="flex flex-col gap-1">
@@ -44,7 +46,7 @@ export function AjustesNav() {
             }
             style={activo ? { background: "rgba(255, 255, 255, 0.1)", borderColor: "var(--accent)" } : undefined}
           >
-            {item.label}
+            {t(`ajustesNav.${item.clave}`)}
           </Link>
         );
       })}

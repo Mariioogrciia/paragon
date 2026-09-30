@@ -8,6 +8,7 @@ import { PreferenciasAvisos } from "@/components/PreferenciasAvisos";
 import { CATEGORIAS_AVISO, getAvisosDesactivados } from "@/lib/avisosPreferencias";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getGamesForBackground, getProfileByUserId, getUserBadges } from "@/lib/profiles";
+import { getTranslations } from "next-intl/server";
 
 /** Los `?error=` que devuelve /api/profile/update. */
 const ERRORES_PERFIL: Record<string, string> = {
@@ -53,6 +54,12 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
     getAvisosDesactivados(session.user.id).catch(() => new Set<string>()),
   ]);
 
+  // Las claves son la fuente de la verdad (avisosPreferencias.ts); el texto
+  // que se ve sale siempre de la traducción, no del `label` en español que
+  // lleva esa constante (ese solo sirve de comentario para quien lea el código).
+  const t = await getTranslations("Onboarding");
+  const categoriasTraducidas = CATEGORIAS_AVISO.map((c) => ({ clave: c.clave, label: t(`categoriaAviso.${c.clave}`) }));
+
   return (
     <>
       {error && ERRORES_PERFIL[error] && (
@@ -73,7 +80,7 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
       cuentasVinculadas={profile?.accounts.filter(a => a.avatarUrl).map(a => ({ platform: a.platform, avatarUrl: a.avatarUrl! })) ?? []}
     />
       <div className="mt-8">
-        <PreferenciasAvisos categorias={CATEGORIAS_AVISO} desactivadas={[...avisosOff]} />
+        <PreferenciasAvisos categorias={categoriasTraducidas} desactivadas={[...avisosOff]} />
       </div>
     </>
   );

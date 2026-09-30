@@ -15,6 +15,12 @@ export default async function AjustesOcultarPage() {
   const [ocultas, panelOculto] = await Promise.all([getHiddenNavItems(session.user.id), getPanelOculto(session.user.id)]);
   const t = await getTranslations("Onboarding");
 
+  // Las claves son la fuente de la verdad (navPreferences.ts/panelPreferences.ts);
+  // el texto que se ve sale siempre de la traducción, no del `label` en español
+  // que llevan esas constantes (ese solo sirve de comentario para quien lea el código).
+  const navTraducido = NAV_OCULTABLE.map((n) => ({ key: n.key, label: t(`navOcultable.${n.key}`) }));
+  const panelTraducido = PANEL_OCULTABLE.map((s) => ({ key: s.key, label: t(`panelOcultable.${s.key}`) }));
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -24,13 +30,13 @@ export default async function AjustesOcultarPage() {
         </p>
       </div>
 
-      <HiddenNavForm opciones={NAV_OCULTABLE} ocultas={ocultas} />
+      <HiddenNavForm opciones={navTraducido} ocultas={ocultas} />
 
       <div className="mt-4">
         <h2 className="text-lg font-bold mb-2">{t("ajustesOcultar.panelTitle")}</h2>
         <p className="text-sm text-muted">{t("ajustesOcultar.panelDescription")}</p>
       </div>
-      <HiddenNavForm opciones={PANEL_OCULTABLE} ocultas={[...panelOculto]} action={setPanelOcultoAction} />
+      <HiddenNavForm opciones={panelTraducido} ocultas={[...panelOculto]} action={setPanelOcultoAction} />
     </div>
   );
 }

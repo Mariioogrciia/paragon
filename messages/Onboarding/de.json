@@ -1,4 +1,46 @@
 {
+  "ajustesNav": {
+    "general": "Allgemein",
+    "apariencia": "Erscheinungsbild",
+    "escaparate": "Vitrinen und Signatur",
+    "seguridad": "Anmeldung und Sicherheit",
+    "plataformas": "Spielekonten",
+    "ocultar": "Ausblenden"
+  },
+  "navOcultable": {
+    "feed": "Community",
+    "ligas": "Ligen",
+    "amigos": "Freunde",
+    "descubrir": "Entdecken",
+    "planificador": "Planer"
+  },
+  "panelOcultable": {
+    "ritmo": "Dein Tempo (Monatsübersicht und Diagramm)",
+    "misiones": "Wöchentliche Missionen",
+    "talDia": "An diesem Tag",
+    "estadisticas": "Aktivität und Statistiken",
+    "recomendaciones": "Nächste Trophäe",
+    "aUnPaso": "Einen Schritt vor der Platin-Trophäe",
+    "parados": "Stillstehende Spiele",
+    "lanzamientos": "Bevorstehende Veröffentlichungen",
+    "recientes": "Kürzlich gespielt",
+    "actividad": "Letzte Aktivität"
+  },
+  "categoriaAviso": {
+    "trofeos": "Neue Trophäen und Platin",
+    "perdibles": "Verpassbare Trophäen beim Spielstart",
+    "lanzamientos": "Veröffentlichungen aus deiner Wunschliste",
+    "precios": "Preisalarme",
+    "ligas": "Ligen, Saison und Clankriege",
+    "social": "Gemeinsame Sitzungen und Herausforderungen",
+    "resumen": "Wöchentliche Discord-Zusammenfassung"
+  },
+  "avisoPublico": {
+    "psn": "Dein PSN-Trophäenprofil muss öffentlich sein, damit wir es lesen können — ist es privat, bleibt deine Bibliothek leer.",
+    "steam": "Dein Steam-Profil muss öffentlich sein, und „Details zum Spiel“ ebenfalls — ohne diese zweite Einstellung bleibt deine Bibliothek leer, selbst wenn das Profil öffentlich ist.",
+    "xbox": "Dein Xbox-Erfolgsverlauf muss öffentlich sein, damit wir ihn lesen können — ist er privat, bleibt deine Bibliothek leer.",
+    "epic": "Dein Epic-Games-Erfolgsprofil muss öffentlich sein, damit wir es lesen können — ist es privat, bleibt deine Bibliothek leer."
+  },
   "bienvenida": {
     "title": "Machen wir dich startklar",
     "subtitle": "Zwei Schritte, dann bist du fertig.",

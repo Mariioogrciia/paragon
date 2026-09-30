@@ -1,4 +1,46 @@
 {
+  "ajustesNav": {
+    "general": "General",
+    "apariencia": "Apariencia",
+    "escaparate": "Vitrinas y firma",
+    "seguridad": "Inicio de sesión y seguridad",
+    "plataformas": "Cuentas de Juegos",
+    "ocultar": "Ocultar"
+  },
+  "navOcultable": {
+    "feed": "Comunidad",
+    "ligas": "Ligas",
+    "amigos": "Amigos",
+    "descubrir": "Descubrir",
+    "planificador": "Planificador"
+  },
+  "panelOcultable": {
+    "ritmo": "Tu ritmo (resumen del mes y gráfica)",
+    "misiones": "Misiones semanales",
+    "talDia": "Tal día como hoy",
+    "estadisticas": "Actividad y estadísticas",
+    "recomendaciones": "Siguiente trofeo",
+    "aUnPaso": "A un paso del platino",
+    "parados": "Juegos parados",
+    "lanzamientos": "Próximos lanzamientos",
+    "recientes": "Jugado recientemente",
+    "actividad": "Actividad reciente"
+  },
+  "categoriaAviso": {
+    "trofeos": "Trofeos y platinos nuevos",
+    "perdibles": "Trofeos perdibles al empezar un juego",
+    "lanzamientos": "Lanzamientos de tu lista de deseados",
+    "precios": "Alertas de precio",
+    "ligas": "Ligas, temporada y guerras de clanes",
+    "social": "Sesiones y retos de Platinar juntos",
+    "resumen": "Resumen semanal por Discord"
+  },
+  "avisoPublico": {
+    "psn": "Tu perfil de trofeos tiene que estar en público para que podamos leerlo — si está en privado, tu biblioteca se quedará vacía.",
+    "steam": "Tu perfil de Steam tiene que estar en público, y «Detalles del juego» también — sin ese segundo ajuste, tu biblioteca se quedará vacía aunque el perfil ya sea público.",
+    "xbox": "Tu historial de logros de Xbox tiene que estar en público para que podamos leerlo — si está en privado, tu biblioteca se quedará vacía.",
+    "epic": "Tu perfil de logros de Epic Games tiene que estar en público para que podamos leerlo — si está en privado, tu biblioteca se quedará vacía."
+  },
   "bienvenida": {
     "title": "Vamos a dejarte listo",
     "subtitle": "Dos pasos y ya está.",

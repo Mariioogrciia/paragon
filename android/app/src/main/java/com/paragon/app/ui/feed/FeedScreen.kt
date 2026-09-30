@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.RemoveRedEye
@@ -50,6 +49,8 @@ import com.paragon.app.data.FeedRepository
 import com.paragon.app.data.FeedResult
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.mensajeFeed
+import com.paragon.app.data.REACCIONES
+import com.paragon.app.data.emojiDeReaccion
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -172,26 +173,38 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
 @Composable
 fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit) {
     var reacted by remember(item.id) { mutableStateOf(item.reacted) }
+    var miReaccion by remember(item.id) { mutableStateOf(item.miReaccion) }
     var reactionCount by remember(item.id) { mutableIntStateOf(item.reactions) }
     var viewCount by remember(item.id) { mutableIntStateOf(item.views) }
     var comments by remember(item.id) { mutableStateOf(item.comments) }
     var showCommentInput by remember(item.id) { mutableStateOf(false) }
+    var showReactionPicker by remember(item.id) { mutableStateOf(false) }
     var commentText by remember(item.id) { mutableStateOf("") }
     var isSendingComment by remember(item.id) { mutableStateOf(false) }
     var showBurst by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
 
-    fun toggleReaction() {
+    /** La misma reacción otra vez la quita; otra distinta la cambia — mismo criterio que `toggleActivityReaction` (lib/feed.ts). */
+    fun toggleReaction(reaction: String = "aplauso") {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        val nuevoEstado = !reacted
-        reacted = nuevoEstado
-        reactionCount += if (nuevoEstado) 1 else -1
-        showBurst = nuevoEstado
+        showReactionPicker = false
+        val quitando = reacted && miReaccion == reaction
+        if (quitando) {
+            reacted = false
+            miReaccion = null
+            reactionCount -= 1
+        } else {
+            if (!reacted) reactionCount += 1
+            reacted = true
+            miReaccion = reaction
+        }
+        showBurst = !quitando
         coroutineScope.launch {
-            val real = repository.toggleReaction(item.id)
-            if (real != null) {
-                reacted = real
+            val real = repository.toggleReaction(item.id, reaction)
+            if (real == false) {
+                reacted = false
+                miReaccion = null
             }
         }
     }
@@ -241,14 +254,19 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                 Text(text = item.timeAgo, color = Muted, fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = mensajeFeed(item), color = Foreground, fontSize = 14.sp)
-            if (!item.review.isNullOrBlank()) {
-                Text(
-                    text = "\"${item.review}\"",
-                    color = Muted,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 6.dp),
-                )
+            if (item.type == "status") {
+                // Estado libre: el texto (item.review) ES la publicación, no una cita sobre un juego.
+                Text(text = item.review ?: "", color = Foreground, fontSize = 14.sp)
+            } else {
+                Text(text = mensajeFeed(item), color = Foreground, fontSize = 14.sp)
+                if (!item.review.isNullOrBlank()) {
+                    Text(
+                        text = "\"${item.review}\"",
+                        color = Muted,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(top = 6.dp),
+                    )
+                }
             }
             Row(
                 modifier = Modifier
@@ -256,11 +274,12 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                     .padding(top = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                CountBadge(
-                    icon = if (reacted) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                ReactionBadge(
+                    reacted = reacted,
+                    miReaccion = miReaccion,
                     count = reactionCount,
-                    tint = if (reacted) Danger else Muted,
-                    onClick = { toggleReaction() },
+                    // Ya reaccionado: un toque la quita directo. Sin reaccionar: abre el selector de emoji.
+                    onClick = { if (reacted) toggleReaction(miReaccion ?: "aplauso") else showReactionPicker = !showReactionPicker },
                 )
                 CountBadge(
                     icon = Icons.Default.ChatBubbleOutline,
@@ -273,6 +292,22 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                     count = viewCount,
                     tint = Muted,
                 )
+            }
+            if (showReactionPicker) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(18.dp),
+                ) {
+                    REACCIONES.forEach { r ->
+                        Text(
+                            text = r.emoji,
+                            fontSize = 22.sp,
+                            modifier = Modifier.clickable { toggleReaction(r.clave) },
+                        )
+                    }
+                }
             }
             if (showCommentInput) {
                 Row(
@@ -357,12 +392,7 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
             enter = scaleIn(animationSpec = tween(200)) + fadeIn(animationSpec = tween(150)),
             exit = scaleOut(animationSpec = tween(250)) + fadeOut(animationSpec = tween(250)),
         ) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = null,
-                tint = Danger,
-                modifier = Modifier.size(72.dp),
-            )
+            Text(text = emojiDeReaccion(miReaccion), fontSize = 56.sp)
         }
     }
 }
@@ -386,5 +416,31 @@ private fun CountBadge(
         Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
         Spacer(modifier = Modifier.width(4.dp))
         Text(text = count.toString(), color = tint, fontSize = 12.sp)
+    }
+}
+
+/**
+ * Badge de reacciones (👏🔥🏆😂😮): un corazón vacío sin reaccionar, o el
+ * emoji elegido una vez reaccionado — distinto de `CountBadge` porque su
+ * icono no es un `ImageVector`, es texto.
+ */
+@Composable
+private fun ReactionBadge(
+    reacted: Boolean,
+    miReaccion: String?,
+    count: Int,
+    onClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable(onClick = onClick),
+    ) {
+        if (reacted) {
+            Text(text = emojiDeReaccion(miReaccion), fontSize = 15.sp)
+        } else {
+            Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = null, tint = Muted, modifier = Modifier.size(16.dp))
+        }
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = count.toString(), color = if (reacted) Foreground else Muted, fontSize = 12.sp)
     }
 }

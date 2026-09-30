@@ -1,4 +1,46 @@
 {
+  "ajustesNav": {
+    "general": "General",
+    "apariencia": "Appearance",
+    "escaparate": "Showcases and signature",
+    "seguridad": "Login and security",
+    "plataformas": "Game Accounts",
+    "ocultar": "Hide"
+  },
+  "navOcultable": {
+    "feed": "Community",
+    "ligas": "Leagues",
+    "amigos": "Friends",
+    "descubrir": "Discover",
+    "planificador": "Planner"
+  },
+  "panelOcultable": {
+    "ritmo": "Your pace (month summary and chart)",
+    "misiones": "Weekly missions",
+    "talDia": "On this day",
+    "estadisticas": "Activity and stats",
+    "recomendaciones": "Next trophy",
+    "aUnPaso": "One step from the platinum",
+    "parados": "Stalled games",
+    "lanzamientos": "Upcoming releases",
+    "recientes": "Recently played",
+    "actividad": "Recent activity"
+  },
+  "categoriaAviso": {
+    "trofeos": "New trophies and platinums",
+    "perdibles": "Missable trophies when you start a game",
+    "lanzamientos": "Releases from your wishlist",
+    "precios": "Price alerts",
+    "ligas": "Leagues, season and clan wars",
+    "social": "Play-together sessions and challenges",
+    "resumen": "Weekly Discord summary"
+  },
+  "avisoPublico": {
+    "psn": "Your PSN trophy profile has to be public for us to read it — if it's private, your library will show up empty.",
+    "steam": "Your Steam profile has to be public, and \"Game details\" too — without that second setting, your library stays empty even if the profile itself is public.",
+    "xbox": "Your Xbox achievement history has to be public for us to read it — if it's private, your library will show up empty.",
+    "epic": "Your Epic Games achievement profile has to be public for us to read it — if it's private, your library will show up empty."
+  },
   "bienvenida": {
     "title": "Let's get you set up",
     "subtitle": "Two steps and you're done.",

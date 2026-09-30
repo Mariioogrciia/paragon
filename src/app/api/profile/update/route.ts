@@ -11,7 +11,7 @@ import { userBadges, users } from "@/db/schema";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 import { isHandleTaken } from "@/lib/profiles";
-import { COLOR_RE, HANDLE_RE, IDIOMA_RE, esUrlHttp, esZonaHoraria } from "@/lib/validacionPerfil";
+import { COLOR_RE, HANDLE_RE, esUrlHttp, esZonaHoraria } from "@/lib/validacionPerfil";
 import { limitar } from "@/lib/rateLimit";
 
 const TEMAS_VALIDOS = ["dark", "light", "oled", "high-contrast"];
@@ -30,7 +30,6 @@ export async function POST(request: Request) {
     const handle = formData.get("handle") as string | null;
     const firstName = formData.get("firstName") as string | null;
     const lastName = formData.get("lastName") as string | null;
-    const language = formData.get("language") as string | null;
     const timezone = formData.get("timezone") as string | null;
     const profileTitle = formData.get("profileTitle") as string | null;
     const profileBackgroundGameId = formData.get("profileBackgroundGameId") as string | null;
@@ -131,7 +130,6 @@ export async function POST(request: Request) {
       ...(handleNormalizado ? { handle: handleNormalizado } : {}),
       firstName: firstName?.trim().slice(0, 50) || null,
       lastName: lastName?.trim().slice(0, 50) || null,
-      language: language && IDIOMA_RE.test(language) ? language : "es-ES",
       timezone: zona,
       profileTitle: profileTitle?.trim().slice(0, 60) || null,
       profileBackgroundGameId: profileBackgroundGameId?.trim().slice(0, 200) || null,

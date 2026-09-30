@@ -25,7 +25,6 @@ interface ProfileFormUser {
   email: string | null;
   firstName: string | null;
   lastName: string | null;
-  language: string | null;
   timezone: string | null;
   profileTitle?: string | null;
   profileBackgroundGameId?: string | null;
@@ -129,7 +128,6 @@ export function ProfileForm({
     statusText: user.statusText ?? "",
     profileColor: user.profileColor ?? "#3b82f6",
     theme: user.theme ?? "dark",
-    language: user.language ?? "es-ES",
     timezone: user.timezone ?? "Europe/Madrid",
     profileSectionOrder: JSON.stringify(normalizeSectionOrder(user.profileSectionOrder)),
   }))[0];
@@ -140,7 +138,6 @@ export function ProfileForm({
   const [statusText, setStatusText] = useState(inicial.statusText);
   const [profileColor, setProfileColor] = useState(inicial.profileColor);
   const [theme, setTheme] = useState(inicial.theme);
-  const [language, setLanguage] = useState(inicial.language);
   const [timezone, setTimezone] = useState(inicial.timezone);
   const [sectionOrderJson, setSectionOrderJson] = useState(inicial.profileSectionOrder);
 
@@ -158,7 +155,6 @@ export function ProfileForm({
     setStatusText(inicial.statusText);
     setProfileColor(inicial.profileColor);
     setTheme(inicial.theme);
-    setLanguage(inicial.language);
     setTimezone(inicial.timezone);
     setSectionOrderJson(inicial.profileSectionOrder);
     setTitulo(user.profileTitle ?? "");
@@ -177,7 +173,6 @@ export function ProfileForm({
     statusText !== inicial.statusText ||
     profileColor !== inicial.profileColor ||
     theme !== inicial.theme ||
-    language !== inicial.language ||
     timezone !== inicial.timezone ||
     sectionOrderJson !== inicial.profileSectionOrder ||
     titulo !== (user.profileTitle ?? "") ||
@@ -546,30 +541,16 @@ export function ProfileForm({
 
         <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
           <h2 className="font-semibold mb-4">{t("profileForm.regional.title")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.languageLabel")}</label>
-              <CustomSelect
-                name="language"
-                value={language}
-                onChange={setLanguage}
-                options={[
-                  { value: "es-ES", label: "Español" },
-                  { value: "en-US", label: "English" },
-                ]}
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.timezoneLabel")}</label>
-              <CustomSelect
-                name="timezone"
-                value={timezone}
-                onChange={setTimezone}
-                options={[
-                  { value: "Europe/Madrid", label: "(GMT+01:00) Madrid" },
-                ]}
-              />
-            </div>
+          <div className="max-w-sm">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.timezoneLabel")}</label>
+            <CustomSelect
+              name="timezone"
+              value={timezone}
+              onChange={setTimezone}
+              options={[
+                { value: "Europe/Madrid", label: "(GMT+01:00) Madrid" },
+              ]}
+            />
           </div>
         </section>
 

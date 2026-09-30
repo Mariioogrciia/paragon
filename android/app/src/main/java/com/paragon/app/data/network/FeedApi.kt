@@ -18,9 +18,12 @@ data class FeedItemDto(
     val review: String?,
     val createdAt: String,
     val user: FeedUserDto,
-    val game: FeedGameDto,
+    // Nulo para los estados libres ("status"): no llevan juego.
+    val game: FeedGameDto?,
     val reactions: Int,
     val reacted: Boolean,
+    // Con cuál de los 5 emojis reaccionó esta cuenta (ver REACCIONES); null si ninguno.
+    val miReaccion: String? = null,
     val comments: List<FeedCommentDto> = emptyList(),
     val views: Int = 0,
 )
@@ -28,6 +31,8 @@ data class FeedItemDto(
 data class FeedResponse(val items: List<FeedItemDto>)
 
 data class ReactResponse(val reacted: Boolean)
+
+data class ReactRequest(val reaction: String)
 
 data class ViewResponse(val isNew: Boolean)
 
@@ -38,9 +43,9 @@ interface FeedApi {
     @GET("api/mobile/feed")
     suspend fun getFeed(): FeedResponse
 
-    /** Alterna la reacción a una publicación — ver .../feed/{activityId}/react/route.ts. */
+    /** Alterna la reacción a una publicación (👏🔥🏆😂😮) — ver .../feed/{activityId}/react/route.ts. */
     @POST("api/mobile/feed/{activityId}/react")
-    suspend fun react(@Path("activityId") activityId: String): ReactResponse
+    suspend fun react(@Path("activityId") activityId: String, @Body request: ReactRequest): ReactResponse
 
     /** Registra que se ha visto una publicación — ver .../feed/{activityId}/view/route.ts. */
     @POST("api/mobile/feed/{activityId}/view")
