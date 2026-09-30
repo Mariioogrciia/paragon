@@ -248,6 +248,27 @@
   --accent-2: #fcd34d;
 }
 
+/* Paletas completas (30 sept 2026): además del acento, en modo oscuro cambian
+   el fondo y las superficies. En claro, OLED y contraste solo el acento, para
+   no pisar lo que esos modos existen para hacer. */
+.accent-laton { --accent-rgb: 201 162 74; --accent-2: #f0dc9c; }
+.dark.accent-laton { --background: #0b1120; --surface: #121b2e; --surface-2: #1b2740; --border: #26334d; }
+
+.accent-carreras { --accent-rgb: 255 106 0; --accent-2: #e8ff3a; }
+.dark.accent-carreras { --background: #121416; --surface: #1a1d21; --surface-2: #24282d; --border: #30353c; }
+
+.accent-salidas { --accent-rgb: 255 207 58; --accent-2: #fff1b8; }
+.dark.accent-salidas { --background: #0a0c10; --surface: #13161c; --surface-2: #1d2129; --border: #2a303a; }
+
+.accent-datos { --accent-rgb: 240 244 250; --accent-2: #ffffff; }
+.dark.accent-datos { --background: #000000; --surface: #0b0b0b; --surface-2: #171717; --border: #2e2e2e; --muted: #b4b4b4; }
+
+.accent-fosforo { --accent-rgb: 51 255 102; --accent-2: #c8ffd6; }
+.dark.accent-fosforo { --background: #020a04; --surface: #07140a; --surface-2: #0e2013; --border: #173420; }
+
+.accent-inmersion { --accent-rgb: 63 208 224; --accent-2: #c9f3f8; }
+.dark.accent-inmersion { --background: #04121f; --surface: #0a1c2e; --surface-2: #11283f; --border: #1b3753; }
+
 /* El acento en claro es más saturado: los pasteles de arriba, pensados para
    fondo oscuro, se lavan sobre blanco. */
 .light {
@@ -260,6 +281,12 @@
 .light.accent-red { --accent-rgb: 220 38 38; }
 .light.accent-green { --accent-rgb: 5 150 105; }
 .light.accent-orange { --accent-rgb: 217 119 6; }
+.light.accent-laton { --accent-rgb: 146 110 30; }
+.light.accent-carreras { --accent-rgb: 214 80 0; }
+.light.accent-salidas { --accent-rgb: 161 118 0; }
+.light.accent-datos { --accent-rgb: 17 17 17; }
+.light.accent-fosforo { --accent-rgb: 10 140 50; }
+.light.accent-inmersion { --accent-rgb: 8 128 150; }
 
 @theme inline {
   --color-background: var(--background);
@@ -636,4 +663,77 @@ h3,
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* --- Ligas y Clanes: "torre de tiempos" (30 sept 2026) ---------------------
+   Cada cazador/clan lleva una librea fija (lib/librea.ts); el puesto va como
+   dorsal en una placa inclinada y las cifras en tabulares. Solo en Ligas y
+   Clanes: en biblioteca o guías este aire de competición cansaría. */
+.carreras-dorsal {
+  display: inline-flex;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  transform: skewX(-12deg);
+  background: var(--librea);
+  color: var(--librea-tinta);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 6px 14px -8px var(--librea);
+}
+.carreras-dorsal > span { display: inline-block; transform: skewX(12deg); }
+.carreras-dorsal-grande { min-width: 4.5rem; padding: 0.45rem 1rem; font-size: 1.5rem; }
+
+.carreras-titulo { display: inline-block; transform: skewX(-8deg); }
+
+/* Fila de la torre: al pasar, un barrido de izquierda a derecha en la librea. */
+.carreras-fila {
+  position: relative;
+  background-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--librea, var(--accent)) 14%, transparent) 50%, transparent);
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  background-repeat: no-repeat;
+  transition: background-position 600ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms;
+}
+.carreras-fila:hover { background-position: -100% 0; background-color: rgb(var(--accent-rgb) / 0.04); }
+
+.carreras-cifra { font-family: var(--font-heading); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Banda de librea bajo la cabecera de un clan: dos colores en diagonal. */
+.carreras-banda {
+  height: 6px;
+  background: repeating-linear-gradient(-60deg, var(--librea) 0 18px, var(--librea-tinta) 18px 22px);
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carreras-fila { transition: none; }
+}
+
+/* Aviso de "trofeo desbloqueado" (TrofeoDesbloqueado.tsx): sube desde abajo
+   con un destello en el icono, como el de la consola. */
+.trofeo-aviso {
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-color: rgb(var(--accent-rgb) / 0.35);
+  box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.03) inset;
+  backdrop-filter: blur(10px);
+  animation: trofeo-aviso-sube 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.trofeo-aviso-icono { border-radius: 14px; animation: trofeo-aviso-destello 1.2s 300ms ease-out both; }
+@keyframes trofeo-aviso-sube {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes trofeo-aviso-destello {
+  0% { box-shadow: 0 0 0 0 rgb(var(--accent-rgb) / 0); }
+  30% { box-shadow: 0 0 22px 4px rgb(var(--accent-rgb) / 0.55); }
+  100% { box-shadow: 0 0 0 0 rgb(var(--accent-rgb) / 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trofeo-aviso, .trofeo-aviso-icono { animation: none; }
 }

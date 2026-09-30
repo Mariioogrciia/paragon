@@ -330,7 +330,7 @@
     "modeTitle": "Mode",
     "textSizeTitle": "Text size",
     "textSizeDescription": "Affects the whole app. If your browser or phone already has larger text, \"Normal\" respects that setting of yours.",
-    "accentTitle": "Accent",
+    "accentTitle": "Accent and palette",
     "freeColor": "Custom color",
     "styleTitle": "Style",
     "styleDescription": "Not just the color — corner radius, shadow, typography and even the background change depending on the style.",
@@ -425,5 +425,10 @@
   "avisos": {
     "titulo": "What we notify you about",
     "descripcion": "Via browser, app and Discord. Invitations and friend requests always arrive."
+  },
+  "trofeoDesbloqueado": {
+    "titulo": "Trophy unlocked",
+    "cerrar": "Close",
+    "mas": "{n, plural, one {+# more new trophy} other {+# more new trophies}}"
   }
 }

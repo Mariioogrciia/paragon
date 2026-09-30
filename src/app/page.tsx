@@ -111,7 +111,7 @@ async function Landing() {
         <div className="landing-hero-halo pointer-events-none absolute inset-x-0 -top-24 bottom-0 -z-10 [mask-image:linear-gradient(90deg,transparent,black_18%,black_82%,transparent)]" aria-hidden="true" />
 
         <h1 className="font-heading mx-auto max-w-[20ch] text-[clamp(2.5rem,9vw,5rem)] font-bold uppercase leading-[0.95] tracking-[-0.025em] [overflow-wrap:anywhere]">
-          {t("heroTitleLine1")} <span className="text-platinum">{t("heroTitleLine2")}</span>
+          {t("heroTitleLine1")} <span className="text-[var(--accent-text)]">{t("heroTitleLine2")}</span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-[60ch] text-base leading-relaxed text-muted sm:text-lg">{t("heroDescription")}</p>
@@ -518,12 +518,10 @@ export default async function HomePage() {
 
             {/* Info a la derecha */}
             <div className="relative z-10 flex flex-col justify-center flex-1 w-full text-center sm:text-left">
-              <div className="inline-block mb-3 px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-widest bg-accent/20 text-accent-text border border-accent/30 w-fit mx-auto sm:mx-0">
-                {t("siguientePlatino")}
-              </div>
-              <h3 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-2" style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}>
+              <h3 className="font-heading text-3xl sm:text-4xl font-bold text-foreground">
                 {nearPlatinum[0].game.title}
               </h3>
+              <p className="mb-2 mt-1 text-sm font-semibold text-[var(--accent-text)]">{t("siguientePlatino")}</p>
 
               <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4">
                 <div className="flex items-end gap-3">
@@ -552,7 +550,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#0a0d13] via-[#0a0d13]/80 to-transparent opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-background via-background/80 to-transparent opacity-90" />
           </div>
         </TiltCard>
 
@@ -575,10 +573,10 @@ export default async function HomePage() {
                     className="absolute inset-0 bg-cover bg-center"
                     style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/50 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
                   <p
-                    className="font-heading relative z-10 translate-y-1 text-lg font-bold text-white transition-transform duration-300 group-hover:translate-y-0"
-                    style={{ textShadow: "0 2px 14px rgba(0, 0, 0, 0.9)" }}
+                    className="font-heading relative z-10 translate-y-1 text-lg font-bold text-foreground transition-transform duration-300 group-hover:translate-y-0"
+                    style={{ textShadow: "0 1px 10px var(--background)" }}
                   >
                     {game.title}
                   </p>
@@ -692,7 +690,7 @@ export default async function HomePage() {
                         style={{ backgroundImage: `url(${game.iconUrl})`, margin: '10% 10% 30% 10%' }}
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
                     {!!game.playtimeRecentMinutes && (
                       <span
                         className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-bold"
@@ -703,8 +701,8 @@ export default async function HomePage() {
                       </span>
                     )}
                     <p
-                      className="font-heading relative z-10 translate-y-2 text-[0.9375rem] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[1.0625rem]"
-                      style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
+                      className="font-heading relative z-10 translate-y-2 text-[0.9375rem] font-bold leading-tight text-foreground transition-transform duration-300 group-hover:translate-y-0 sm:text-[1.0625rem]"
+                      style={{ textShadow: "0 1px 10px var(--background)" }}
                     >
                       {game.title}
                     </p>
@@ -755,15 +753,15 @@ export default async function HomePage() {
       )}
 
       <div className="flex flex-wrap items-end gap-6">
-        <div>
-          <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-muted">
-            <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
+        <div className="min-w-0">
+          <h1 className="font-heading text-[clamp(2rem,6vw,2.625rem)] font-bold uppercase leading-none tracking-tight">
+            {t("hola", { nombre: player.name })}
+          </h1>
+          <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+            <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-good" aria-hidden="true" />
             {player.accounts.map((a) => a.username).join(" · ")}
             {t("nivelParagon", { nivel: nivelParagon.level })}
           </p>
-          <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none tracking-tight">
-            {t("hola", { nombre: player.name })}
-          </h1>
         </div>
 
         <Link
@@ -791,7 +789,7 @@ export default async function HomePage() {
                     style={{
                       border: "1px solid var(--border)",
                       background:
-                        "radial-gradient(400px 200px at 80% 0%, rgba(159, 212, 236, 0.22), transparent 70%), linear-gradient(165deg, #14202c, #0d131c)",
+                        "radial-gradient(400px 200px at 80% 0%, rgb(var(--accent-rgb) / 0.2), transparent 70%), linear-gradient(165deg, var(--surface-2), var(--surface))",
                     }}
                   >
                     <div className="flex items-center gap-2.5 text-platinum">

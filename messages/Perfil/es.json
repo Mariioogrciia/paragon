@@ -150,7 +150,9 @@
     "colPos": "Pos",
     "colCazador": "Cazador",
     "colPuntos": "Puntos",
-    "historialTitulo": "Campeones de meses anteriores"
+    "historialTitulo": "Campeones de meses anteriores",
+    "colDif": "Dif.",
+    "lider": "Líder"
   },
   "LigaPage": {
     "meta": "Liga - Paragon",
@@ -204,7 +206,9 @@
     "salirMensaje": "Dejarás de aparecer en la clasificación de \"{nombre}\" — el dueño tendría que volver a invitarte para que entres otra vez.",
     "salirConfirmar": "Sí, salir",
     "salirDeLaLiga": "Salir de esta liga",
-    "amigo": "Amigo"
+    "amigo": "Amigo",
+    "colDif": "Dif.",
+    "lider": "Líder"
   },
   "FriendsLeaderboard": {
     "sinAmigos": "Todavía no tienes amigos añadidos — en cuanto tengas alguno, aquí sale cómo os comparáis.",
@@ -593,5 +597,22 @@
       "espera": "Espera un momento antes de lanzar otro reto.",
       "generico": "No se ha podido completar. Inténtalo de nuevo."
     }
+  },
+  "ClanesPage": {
+    "titulo": "Clanes de cazadores",
+    "descripcion": "Únete a un clan y suma fuerzas para dominar Paragon.",
+    "tuClan": "Tu clan: [{tag}] {nombre}",
+    "miembros": "{n, plural, one {# miembro} other {# miembros}}",
+    "vacio": "Todavía no hay ningún clan. ¡Sé el primero en crear uno!"
+  },
+  "ClanPage": {
+    "noEncontrado": "Clan no encontrado",
+    "xpTotal": "XP total del clan",
+    "miembros": "Miembros",
+    "actividad": "Actividad del clan",
+    "ranking": "Clasificación ({n})",
+    "lider": "Líder",
+    "miembro": "Miembro",
+    "trofeos": "{n} trofeos"
   }
 }

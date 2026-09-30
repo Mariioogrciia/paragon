@@ -12,6 +12,13 @@ colors:
   accent-2: "#d7eef8"
   accent-light: "rgb(22 110 150)"
   accent-blue: "rgb(74 158 255)"
+  accent-laton: "rgb(201 162 74)"
+  accent-carreras: "rgb(255 106 0)"
+  accent-carreras-2: "#e8ff3a"
+  accent-salidas: "rgb(255 207 58)"
+  accent-datos: "rgb(240 244 250)"
+  accent-fosforo: "rgb(51 255 102)"
+  accent-inmersion: "rgb(63 208 224)"
   good: "#4ec98a"
   danger: "#ff6b6b"
   bronze: "#c07b4a"
@@ -123,6 +130,18 @@ components:
     backgroundColor: "{colors.surface-2}"
     rounded: "{rounded.full}"
     height: "4px"
+  dorsal:
+    typography: "{typography.title}"
+    padding: "4px 10px"
+  dorsal-large:
+    padding: "7px 16px"
+    width: "72px"
+  toast-trophy:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.2xl}"
+    padding: "12px 8px 12px 12px"
+    width: "384px"
 ---
 
 # Design System: Paragon
@@ -133,7 +152,7 @@ components:
 
 Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13), surfaces one step up, and the only strong light falling on the things a hunter earned. The brand accent is platinum itself, the colour of the trophy being chased, so the interface glows in the same pale ice-blue the platinum trophy does. Everything else stays quiet: muted blue-grey text, hairline borders, flat tonal cards. Light is used as a material, not as decoration: a soft halo leaks from the top-left of every page, the landing's vitrine lights each trophy from above, and hovering anything clickable makes it glow in the accent.
 
-The system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.
+The system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange, six full palettes and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.
 
 Density is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels and trophies-remaining are set big in the display face, often in platinum.
 
@@ -144,6 +163,7 @@ Density is medium: a hunter's dashboard is data-rich, so type is compact (13px s
 - Trophy grade colours (bronze, silver, gold, platinum) are semantic and never repurposed.
 - Every clickable glows on hover, enforced globally.
 - User-selectable mode, accent and style axes; components stay token-bound so all three work.
+- Competition pages (Ligas, Clanes) wear a scoped race-timing world: livery dorsals, skews, tabular figures.
 
 ## Colors
 
@@ -155,6 +175,20 @@ A cool, near-monochrome night palette in which platinum is the single brand ligh
 - **Accent text** (`--accent-text`): not a separate hue but the accent mixed 55% with white on dark (75% with black in light mode, 30% with white in high contrast). Use it for any accent-coloured text, links and percentages; raw `accent` is for fills and strokes.
 - **Steel Platinum** (`accent-light`): the accent in light mode. Pastel ice-blue washes out on white, so light mode swaps the channel to a saturated blue steel.
 - **Legacy Blue** (`accent-blue`): the previous brand blue, kept as the `.accent-blue` preset. Each preset has a stronger light-mode variant.
+
+### Full palettes (accent axis)
+Six presets on the same accent axis that, in dark mode only, also repaint the ground. Each sets `--accent-rgb` and `--accent-2`; the `.dark.accent-*` rule additionally replaces `--background`, `--surface`, `--surface-2` and `--border`. Light, OLED and high contrast keep their own grounds and take only a darker light-mode accent (`.light.accent-*`), because those modes exist for a reason the palette must not override. Platinum stays the default.
+- **Service Brass** (`accent-laton`, "Hoja de servicio"): brass on a deep navy ground (#0b1120 / #121b2e / #1b2740 / #26334d); `accent-2` #f0dc9c. Light: rgb(146 110 30).
+- **Race Orange** (`accent-carreras`, "Liga de carreras"): safety orange with acid yellow (`accent-carreras-2`) as the gradient's light end, on graphite (#121416 / #1a1d21 / #24282d / #30353c). Light: rgb(214 80 0).
+- **Departure Amber** (`accent-salidas`, "Panel de salidas"): split-flap amber on near-black (#0a0c10 / #13161c / #1d2129 / #2a303a); `accent-2` #fff1b8. Light: rgb(161 118 0).
+- **Data White** (`accent-datos`, "Datos"): a near-white accent on pure black (#000000 / #0b0b0b / #171717 / #2e2e2e) with `muted` lifted to #b4b4b4; `accent-2` #ffffff. Light: rgb(17 17 17). Text on its fills is still `background`, so the Dark Text on Light Rule holds.
+- **Phosphor** (`accent-fosforo`, "Fósforo"): terminal green on green-black (#020a04 / #07140a / #0e2013 / #173420); `accent-2` #c8ffd6. Light: rgb(10 140 50).
+- **Immersion Cyan** (`accent-inmersion`, "Inmersión"): cyan on deep ocean (#04121f / #0a1c2e / #11283f / #1b3753); `accent-2` #c9f3f8. Light: rgb(8 128 150).
+
+The picker swatch for a full palette is split diagonally, half ground and half accent (`linear-gradient(135deg, ground 50%, accent 50%)`), so the user sees both halves of what they are choosing.
+
+### Livery (Ligas and Clanes only)
+A fixed list of ten plate/ink pairs in `src/lib/librea.ts` (orange #ff6a00, acid #e8ff3a, cyan #00b8ff, rose #ff2d55, green #35e36b, violet #b46bff, yellow #ffd60a, paper #f4f6fa, platinum #7cc4e4, red #ff3b30, each with an ink chosen to read on it). A hunter's or clan's livery is picked deterministically by an FNV hash of the user id or upper-cased clan tag, so the same competitor wears the same colours in every standings table. Livery colours are identity marks, not accents: they never tint anything outside the Carreras world (see Components).
 
 ### Tertiary (trophy grades)
 - **Platinum** (`platinum`), **Gold** (`gold`), **Silver** (`silver`), **Bronze** (`bronze`): the four trophy metals. They colour trophy icons, grade-specific rarity figures, platinum counts and the first-place hunter's card (gold tint at 8% fill, 45% border). They mean grade, and only grade.
@@ -179,6 +213,10 @@ A cool, near-monochrome night palette in which platinum is the single brand ligh
 
 **The Dark Text on Light Rule.** Text on an accent fill is `background` (dark), never white. Accent presets are chosen so that pairing reads.
 
+**The Ground Belongs to the Mode Rule.** A palette may repaint the ground only in dark mode. Light, OLED and high contrast keep their grounds under every accent; a new full palette adds a `.dark.accent-x` ground block and a `.light.accent-x` darker accent, never a ground rule for the other modes.
+
+**The Theme Scrim Rule.** Image scrims fade to the theme ground (`from-background`), and text over covers uses `foreground`. A literal #0a0d13 scrim or white text over a cover breaks light mode and every full palette.
+
 ## Typography
 
 **Display Font:** Chakra Petch (500, 600, 700), falling back to Barlow
@@ -200,6 +238,10 @@ A cool, near-monochrome night palette in which platinum is the single brand ligh
 **The Headings Wear the Plate Rule.** `h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`.
 
 **The rem-Only Rule.** Text sizes are in rem, never px: the user's text-size setting (87.5–125%) scales the root, and px sizes ignore it.
+
+**The Subtitle Below Rule.** A heading carries no small label above it. Context that used to sit over a title (the dashboard's section labels) goes below it as a muted subtitle.
+
+**The Solid Headline Rule.** Headlines are solid colour. Gradient text is not used anywhere in the app (the 404 was the last user and has been changed); the `text-gradient` utility still exists in `globals.css` but must not be reached for.
 
 ## Layout
 
@@ -271,6 +313,18 @@ The landing's first-viewport story. Four platform columns (PlayStation #2f7ad6, 
 ### Landing: Museum-Cartel Vitrine (signature)
 The community's rarest trophies of the week, displayed like museum objects. Each exhibit is a link: a **niche** (112px, 144px from `sm`) lit from above by `radial-gradient(70% 90% at 50% 0%, rgb(159 212 236 / 0.16), transparent 70%)` holding the 72px trophy photo, then a **cartel** below a hairline: trophy name (display face, 15px bold, truncated), game (12px muted), rarity (11px bold `accent-text`), hunter and time (11px muted). A **shelf plank** runs under each exhibit: 8px tall, gradient from a whitened border tone to `surface-2`, with `0 10px 24px -12px rgb(0 0 0 / 0.7)`. On hover the exhibit's background fills with `surface` and the trophy rises 4px. Only complete rows render (2 per row on mobile, 3 from `sm`). When no rare trophies exist, a single **shelf** panel (`surface` with a 5% platinum top-light and a 3px inset darker bottom edge) lists recent platinums instead.
 
+### Trofeo desbloqueado toast (signature)
+The console's trophy pop-up, for every platform. When a sync (`syncNowAction` / `syncPlatformAction`) returns new trophies, up to three cards stack at the bottom centre of the viewport (20px from the bottom, 8px apart, max 384px wide), each following the previous by 140ms. A card is `surface` at 92% with a 10px backdrop blur, a 16px radius, an accent border at 35%, and `0 18px 40px -16px rgb(0 0 0 / 0.7)` under a faint inset highlight. Inside: the real 48px trophy photo in a 14px-radius tile, then the "Trofeo desbloqueado" line (11px bold `accent-text`, the console's own notification wording, specific to this toast), the trophy name (display face, 15px bold, truncated) and the game (12px muted). Only the first card carries the close button (15px icon, 8px radius, hover fill `surface-2`). If more arrived than are shown, a fully rounded bordered "+N" chip follows. Motion: each card rises 18px from 97% scale in 520ms (`cubic-bezier(0.16, 1, 0.3, 1)`); 300ms later the photo flashes once with an accent halo (`0 0 22px 4px` at 55%, 1.2s ease-out, then gone). The whole stack dismisses itself after 7s. Under reduced motion both animations are removed and the cards simply appear. It is a `role="status"` polite live region.
+
+### Carreras world: Ligas and Clanes (scoped signature)
+Competition pages read like a race timing tower. This world lives only on `/ligas`, `/ligas/[id]`, the monthly league rows, `/clanes` and `/clanes/[tag]`.
+- **Dorsal:** position as "P1", "P2"… (or a clan tag) on a plate skewed −12deg, filled with the competitor's livery and set in its ink: display face, 14px bold, 0.02em tracking, tabular figures, min 44px wide, `0 6px 14px -8px` shadow in the livery colour. The text inside is counter-skewed upright. The large variant (clan header) is 24px text, min 72px wide.
+- **Skewed titles:** the page title's text (not its box) is skewed −8deg, uppercase display face.
+- **Figures:** points, scores and counts use the display face bold with tabular figures; the leading figure takes `accent-text`.
+- **Gap to leader:** standings end with a muted tabular column showing the deficit to P1 as "−N" (a true minus sign); P1 shows the translated "leader" word.
+- **Row streak:** each standings row carries its competitor's livery as `--librea`; on hover a 14% livery band sweeps left to right across the row (600ms, `cubic-bezier(0.16, 1, 0.3, 1)`) over a 4% accent fill. Reduced motion removes the sweep transition.
+- **Livery band:** under a clan's header, a 6px fully rounded band of repeating −60deg stripes (18px livery, 4px ink) at 85% opacity.
+
 ### Landing: Stepped Route Rail (signature)
 A numbered vertical route: 40px circular markers with a 2px accent border, `background` fill and `accent-text` numerals in the display face, joined by a 2px rail that fades from `accent` to accent at 10% (drawn behind the markers at 19px from the left). Steps gap 28px; title in the display face at 18px, body 14px muted at 52ch. Beside it at `lg`, a sticky 24px-radius example panel shows the next trophies in 12px-radius rows on `background`, with rarity figures in their grade colour.
 
@@ -287,6 +341,10 @@ A numbered vertical route: 40px circular markers with a 2px accent border, `back
 - **Do** honour `prefers-reduced-motion` by stopping animations outright and painting the final state from the start.
 - **Do** prefix surface-scoped CSS in `globals.css` (for example `landing-`), because the stylesheet is global to the whole app.
 - **Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them.
+- **Do** give a new full palette both a `.dark.accent-x` block (accent plus the four ground tokens) and a `.light.accent-x` darker accent, and a half-ground/half-accent swatch.
+- **Do** fade image scrims to `from-background` and set text over covers in `foreground`.
+- **Do** put a heading's context below it as a muted subtitle.
+- **Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas and Clanes.
 
 ### Don't:
 - **Don't** write literal accent colours such as `rgba(74, 158, 255, .14)`; they freeze one accent and one mode.
@@ -294,6 +352,10 @@ A numbered vertical route: 40px circular markers with a 2px accent border, `back
 - **Don't** put white text on an accent fill; use `background`.
 - **Don't** set text sizes in px; they ignore the user's text-size setting.
 - **Don't** put `overflow: hidden` on the element that owns a hover glow or shadow.
-- **Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) in new components; use `from-background` so light mode and OLED stay coherent.
+- **Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) or white text over covers; use `from-background` and `foreground` so light mode, OLED and the full palettes stay coherent.
+- **Don't** put eyebrow or kicker labels above headings.
+- **Don't** use gradient text; `text-gradient` is a leftover utility, not part of the system.
+- **Don't** bring the Carreras world (dorsals, livery colours, skews, livery streaks) into the library, guides or the dashboard; its competitive energy tires everywhere else.
+- **Don't** let a full palette repaint the ground in light, OLED or high-contrast mode.
 - **Don't** use platform brand colours outside platform-identity contexts.
 - **Don't** invent testimonials, user counts or figures; landing proof comes from the live database queries only.

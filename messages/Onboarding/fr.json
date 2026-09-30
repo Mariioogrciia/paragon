@@ -330,7 +330,7 @@
     "modeTitle": "Mode",
     "textSizeTitle": "Taille du texte",
     "textSizeDescription": "Affecte toute l'application. Si ton navigateur ou ton téléphone a déjà un texte plus grand, « Normal » respecte ce réglage.",
-    "accentTitle": "Accent",
+    "accentTitle": "Accent et palette",
     "freeColor": "Couleur libre",
     "styleTitle": "Style",
     "styleDescription": "Pas seulement la couleur — le rayon des coins, l'ombre, la typographie et même le fond changent selon le style.",
@@ -425,5 +425,10 @@
   "avisos": {
     "titulo": "Ce dont on te prévient",
     "descripcion": "Par navigateur, appli et Discord. Les invitations et demandes d’amis arrivent toujours."
+  },
+  "trofeoDesbloqueado": {
+    "titulo": "Trophée débloqué",
+    "cerrar": "Fermer",
+    "mas": "{n, plural, one {+# nouveau trophée} other {+# nouveaux trophées}}"
   }
 }

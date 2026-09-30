@@ -33,6 +33,13 @@ export const ACENTOS = [
   { value: "accent-red", label: "Rojo", color: "#ef4444" },
   { value: "accent-green", label: "Verde", color: "#10b981" },
   { value: "accent-orange", label: "Naranja", color: "#f59e0b" },
+  // Paletas completas: el círculo enseña el fondo (mitad) y el acento (mitad).
+  { value: "accent-laton", label: "Hoja de servicio", color: "linear-gradient(135deg, #0b1120 50%, #c9a24a 50%)" },
+  { value: "accent-carreras", label: "Liga de carreras", color: "linear-gradient(135deg, #1a1d21 50%, #ff6a00 50%)" },
+  { value: "accent-salidas", label: "Panel de salidas", color: "linear-gradient(135deg, #13161c 50%, #ffcf3a 50%)" },
+  { value: "accent-datos", label: "Datos", color: "linear-gradient(135deg, #000000 50%, #f0f4fa 50%)" },
+  { value: "accent-fosforo", label: "Fósforo", color: "linear-gradient(135deg, #020a04 50%, #33ff66 50%)" },
+  { value: "accent-inmersion", label: "Inmersión", color: "linear-gradient(135deg, #04121f 50%, #3fd0e0 50%)" },
 ] as const;
 
 export const ESTILOS = [

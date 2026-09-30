@@ -330,7 +330,7 @@
     "modeTitle": "Modo",
     "textSizeTitle": "Tamaño del texto",
     "textSizeDescription": "Afecta a toda la aplicación. Si ya tienes el navegador o el móvil con la letra más grande, «Normal» respeta ese ajuste tuyo.",
-    "accentTitle": "Acento",
+    "accentTitle": "Acento y paleta",
     "freeColor": "Color libre",
     "styleTitle": "Estilo",
     "styleDescription": "No solo el color — el radio de esquina, la sombra, la tipografía y hasta el fondo cambian según el estilo.",
@@ -425,5 +425,10 @@
   "avisos": {
     "titulo": "Qué te avisamos",
     "descripcion": "Por navegador, app y Discord. Las invitaciones y solicitudes de amistad llegan siempre."
+  },
+  "trofeoDesbloqueado": {
+    "titulo": "Trofeo desbloqueado",
+    "cerrar": "Cerrar",
+    "mas": "{n, plural, one {+# trofeo nuevo más} other {+# trofeos nuevos más}}"
   }
 }

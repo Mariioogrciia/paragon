@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { users, userGames, activities, platformAccounts, leagues, accounts } from "@/db/schema";
+import { users, userGames, activities, platformAccounts, leagues, accounts, userTrophies, gameTrophies, games } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { contieneLenguajeOfensivo, errorSiOfensivo } from "@/lib/contentFilter";
 import { auth, signOut } from "@/auth";
@@ -75,6 +75,38 @@ export interface ActionState {
    * engañoso. Ver `linkPlatform` (cuenta vinculada pero privada). */
   warning?: string;
   success?: string;
+  /** Trofeos que ha traído una sincronización, para el aviso de "trofeo desbloqueado". */
+  trofeos?: TrofeoDesbloqueado[];
+  /** Cuántos trofeos nuevos trajo en total (el aviso enseña como mucho 3). */
+  nuevos?: number;
+}
+
+export interface TrofeoDesbloqueado {
+  nombre: string;
+  juego: string;
+  icono: string | null;
+  grado: string | null;
+}
+
+async function contarTrofeos(userId: string): Promise<number> {
+  const [fila] = await getDb()
+    .select({ n: sql<number>`count(*)::int` })
+    .from(userTrophies)
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true)));
+  return Number(fila?.n ?? 0);
+}
+
+/** Los `cuantos` trofeos más recientes (por fecha real de la plataforma), como mucho 3 para el aviso. */
+async function ultimosTrofeos(userId: string, cuantos: number): Promise<TrofeoDesbloqueado[]> {
+  if (cuantos <= 0) return [];
+  return getDb()
+    .select({ nombre: gameTrophies.name, juego: games.title, icono: gameTrophies.iconUrl, grado: gameTrophies.grade })
+    .from(userTrophies)
+    .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true)))
+    .orderBy(sql`${userTrophies.earnedAt} desc nulls last`)
+    .limit(Math.min(cuantos, 3));
 }
 
 
@@ -370,9 +402,12 @@ export async function syncNowAction(
   const espera = esperaRestante(await ultimaSincronizacion(userId));
   if (espera) return espera;
 
+  const antes = await contarTrofeos(userId);
   await resyncLibraries(userId, { forzarDetalle: true });
+  const nuevos = Math.max(0, (await contarTrofeos(userId)) - antes);
+  const trofeos = await ultimosTrofeos(userId, nuevos);
   revalidatePath("/", "layout");
-  return { success: "Sincronizado." };
+  return { success: "Sincronizado.", trofeos, nuevos };
 }
 
 export async function syncPlatformAction(
@@ -389,9 +424,12 @@ export async function syncPlatformAction(
   const espera = esperaRestante(await ultimaSincronizacion(userId, platform));
   if (espera) return espera;
 
+  const antes = await contarTrofeos(userId);
   await resyncPlatform(userId, platform);
+  const nuevos = Math.max(0, (await contarTrofeos(userId)) - antes);
+  const trofeos = await ultimosTrofeos(userId, nuevos);
   revalidatePath("/", "layout");
-  return { success: "Sincronizado." };
+  return { success: "Sincronizado.", trofeos, nuevos };
 }
 
 /* ------------------------------------ Carpetas ----------------------------------- */

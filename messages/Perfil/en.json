@@ -150,7 +150,9 @@
     "colPos": "Rank",
     "colCazador": "Hunter",
     "colPuntos": "Points",
-    "historialTitulo": "Champions of past months"
+    "historialTitulo": "Champions of past months",
+    "colDif": "Gap",
+    "lider": "Leader"
   },
   "LigaPage": {
     "meta": "League - Paragon",
@@ -204,7 +206,9 @@
     "salirMensaje": "You'll stop appearing in \"{nombre}\"'s standings — the owner would have to invite you again to rejoin.",
     "salirConfirmar": "Yes, leave",
     "salirDeLaLiga": "Leave this league",
-    "amigo": "Friend"
+    "amigo": "Friend",
+    "colDif": "Gap",
+    "lider": "Leader"
   },
   "FriendsLeaderboard": {
     "sinAmigos": "You don't have any friends added yet — once you do, here's how you'll stack up against them.",
@@ -593,5 +597,22 @@
       "espera": "Wait a moment before starting another challenge.",
       "generico": "Couldn't complete that. Try again."
     }
+  },
+  "ClanesPage": {
+    "titulo": "Hunter clans",
+    "descripcion": "Join a clan and team up to rule Paragon.",
+    "tuClan": "Your clan: [{tag}] {nombre}",
+    "miembros": "{n, plural, one {# member} other {# members}}",
+    "vacio": "No clans yet. Be the first to create one!"
+  },
+  "ClanPage": {
+    "noEncontrado": "Clan not found",
+    "xpTotal": "Clan total XP",
+    "miembros": "Members",
+    "actividad": "Clan activity",
+    "ranking": "Standings ({n})",
+    "lider": "Leader",
+    "miembro": "Member",
+    "trofeos": "{n} trophies"
   }
 }

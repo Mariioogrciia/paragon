@@ -18,7 +18,7 @@ export default async function NoEncontrado() {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
-      <p className="font-heading text-[clamp(4rem,20vw,7rem)] font-bold leading-none text-gradient">404</p>
+      <p className="font-heading text-[clamp(4rem,20vw,7rem)] font-bold leading-none text-[var(--accent-text)]">404</p>
       <h1 className="font-heading mt-4 text-3xl font-bold uppercase">{t("titulo")}</h1>
       <p className="mt-3 max-w-md text-muted">{t("texto")}</p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-30T21:30:02.691Z",
+  "generatedAt": "2026-09-30T21:48:36.000Z",
   "title": "Design System: Paragon",
   "extensions": {
     "colorMeta": {
@@ -152,6 +152,111 @@
           "#70b2ff",
           "#add3ff",
           "#e5f1ff"
+        ]
+      },
+      "accent-laton": {
+        "role": "primary",
+        "displayName": "Service Brass (Hoja de servicio palette)",
+        "canonical": "rgb(201 162 74)",
+        "tonalRamp": [
+          "#3b2e12",
+          "#66501e",
+          "#91722b",
+          "#bd9438",
+          "#d0ae62",
+          "#dec691",
+          "#ecdfc0",
+          "#f9f5eb"
+        ]
+      },
+      "accent-carreras": {
+        "role": "primary",
+        "displayName": "Race Orange (Liga de carreras palette)",
+        "canonical": "rgb(255 106 0)",
+        "tonalRamp": [
+          "#4c2000",
+          "#853700",
+          "#bd4e00",
+          "#f56600",
+          "#ff8833",
+          "#ffac70",
+          "#ffcfad",
+          "#fff0e5"
+        ]
+      },
+      "accent-carreras-2": {
+        "role": "primary",
+        "displayName": "Acid Yellow (Liga de carreras gradient end)",
+        "canonical": "#e8ff3a",
+        "tonalRamp": [
+          "#444c00",
+          "#758500",
+          "#a7bd00",
+          "#d8f500",
+          "#e7ff33",
+          "#eeff70",
+          "#f5ffad",
+          "#fcffe5"
+        ]
+      },
+      "accent-salidas": {
+        "role": "primary",
+        "displayName": "Departure Amber (Panel de salidas palette)",
+        "canonical": "rgb(255 207 58)",
+        "tonalRamp": [
+          "#4c3a00",
+          "#856400",
+          "#bd8f00",
+          "#f5b900",
+          "#ffcd33",
+          "#ffdc70",
+          "#ffebad",
+          "#fff9e5"
+        ]
+      },
+      "accent-datos": {
+        "role": "primary",
+        "displayName": "Data White (Datos palette)",
+        "canonical": "rgb(240 244 250)",
+        "tonalRamp": [
+          "#132239",
+          "#213c63",
+          "#2f558e",
+          "#3d6eb8",
+          "#668fcc",
+          "#94b0db",
+          "#c2d2eb",
+          "#ecf1f9"
+        ]
+      },
+      "accent-fosforo": {
+        "role": "primary",
+        "displayName": "Phosphor (Fósforo palette)",
+        "canonical": "rgb(51 255 102)",
+        "tonalRamp": [
+          "#004c13",
+          "#008521",
+          "#00bd2f",
+          "#00f53d",
+          "#33ff66",
+          "#70ff94",
+          "#adffc2",
+          "#e5ffec"
+        ]
+      },
+      "accent-inmersion": {
+        "role": "primary",
+        "displayName": "Immersion Cyan (Inmersión palette)",
+        "canonical": "rgb(63 208 224)",
+        "tonalRamp": [
+          "#0b3c42",
+          "#126972",
+          "#1a95a2",
+          "#22c1d3",
+          "#4fd4e3",
+          "#84e1eb",
+          "#b9eef4",
+          "#e9fafb"
         ]
       },
       "good": {
@@ -335,6 +440,21 @@
         "name": "shelf-plank",
         "value": "0 10px 24px -12px rgb(0 0 0 / 0.7)",
         "purpose": "The plank under each landing vitrine exhibit."
+      },
+      {
+        "name": "dorsal-drop",
+        "value": "0 6px 14px -8px var(--librea)",
+        "purpose": "Under a livery dorsal plate (Carreras world only)."
+      },
+      {
+        "name": "toast-drop",
+        "value": "0 18px 40px -16px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.03) inset",
+        "purpose": "Trofeo desbloqueado toast card."
+      },
+      {
+        "name": "trophy-flash",
+        "value": "0 0 22px 4px rgb(var(--accent-rgb) / 0.55)",
+        "purpose": "One-time peak of the toast icon's accent flash."
       }
     ],
     "motion": [
@@ -362,6 +482,26 @@
         "name": "marquee",
         "value": "40s linear infinite",
         "purpose": "Ticker rows; pauses on hover; stops under reduced motion."
+      },
+      {
+        "name": "toast-rise",
+        "value": "520ms cubic-bezier(0.16, 1, 0.3, 1), 140ms stagger",
+        "purpose": "Trofeo desbloqueado cards rise 18px from 97% scale; removed under reduced motion."
+      },
+      {
+        "name": "toast-flash",
+        "value": "1.2s ease-out, 300ms delay, once",
+        "purpose": "Accent halo flash on the toast's trophy photo; removed under reduced motion."
+      },
+      {
+        "name": "toast-dismiss",
+        "value": "7000ms",
+        "purpose": "Auto-dismiss of the toast stack."
+      },
+      {
+        "name": "livery-streak",
+        "value": "background-position 600ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Left-to-right livery sweep on Carreras standings rows; transition removed under reduced motion."
       }
     ],
     "breakpoints": [
@@ -398,6 +538,21 @@
         "name": "vitrine-niche",
         "value": "radial-gradient(70% 90% at 50% 0%, rgb(159 212 236 / 0.16), transparent 70%)",
         "purpose": "Top light above each exhibit trophy."
+      },
+      {
+        "name": "livery-streak",
+        "value": "linear-gradient(90deg, transparent, color-mix(in srgb, var(--librea, var(--accent)) 14%, transparent) 50%, transparent) / 200% 100%",
+        "purpose": "Standings row hover sweep (Carreras world)."
+      },
+      {
+        "name": "livery-band",
+        "value": "repeating-linear-gradient(-60deg, var(--librea) 0 18px, var(--librea-tinta) 18px 22px)",
+        "purpose": "6px stripe band under a clan header, 85% opacity."
+      },
+      {
+        "name": "palette-swatch",
+        "value": "linear-gradient(135deg, <ground> 50%, <accent> 50%)",
+        "purpose": "Picker swatch for full palettes."
       }
     ],
     "themeAxes": {
@@ -414,6 +569,12 @@
         ".accent-red",
         ".accent-green",
         ".accent-orange",
+        ".accent-laton (full palette)",
+        ".accent-carreras (full palette)",
+        ".accent-salidas (full palette)",
+        ".accent-datos (full palette)",
+        ".accent-fosforo (full palette)",
+        ".accent-inmersion (full palette)",
         "free colour via inline --accent-rgb"
       ],
       "styles": [
@@ -427,6 +588,138 @@
         ".estilo-switch"
       ],
       "source": "src/lib/apariencia.ts, src/app/globals.css"
+    },
+    "fullPalettes": {
+      "note": "Dark mode only (.dark.accent-*) repaints the ground; light/OLED/high-contrast keep their grounds and take the .light.accent-* accent. Swatch: linear-gradient(135deg, ground 50%, accent 50%).",
+      "palettes": [
+        {
+          "class": "accent-laton",
+          "label": "Hoja de servicio",
+          "accentRgb": "201 162 74",
+          "accent2": "#f0dc9c",
+          "darkGround": {
+            "background": "#0b1120",
+            "surface": "#121b2e",
+            "surface-2": "#1b2740",
+            "border": "#26334d"
+          },
+          "lightAccentRgb": "146 110 30"
+        },
+        {
+          "class": "accent-carreras",
+          "label": "Liga de carreras",
+          "accentRgb": "255 106 0",
+          "accent2": "#e8ff3a",
+          "darkGround": {
+            "background": "#121416",
+            "surface": "#1a1d21",
+            "surface-2": "#24282d",
+            "border": "#30353c"
+          },
+          "lightAccentRgb": "214 80 0"
+        },
+        {
+          "class": "accent-salidas",
+          "label": "Panel de salidas",
+          "accentRgb": "255 207 58",
+          "accent2": "#fff1b8",
+          "darkGround": {
+            "background": "#0a0c10",
+            "surface": "#13161c",
+            "surface-2": "#1d2129",
+            "border": "#2a303a"
+          },
+          "lightAccentRgb": "161 118 0"
+        },
+        {
+          "class": "accent-datos",
+          "label": "Datos",
+          "accentRgb": "240 244 250",
+          "accent2": "#ffffff",
+          "darkGround": {
+            "background": "#000000",
+            "surface": "#0b0b0b",
+            "surface-2": "#171717",
+            "border": "#2e2e2e",
+            "muted": "#b4b4b4"
+          },
+          "lightAccentRgb": "17 17 17"
+        },
+        {
+          "class": "accent-fosforo",
+          "label": "Fósforo",
+          "accentRgb": "51 255 102",
+          "accent2": "#c8ffd6",
+          "darkGround": {
+            "background": "#020a04",
+            "surface": "#07140a",
+            "surface-2": "#0e2013",
+            "border": "#173420"
+          },
+          "lightAccentRgb": "10 140 50"
+        },
+        {
+          "class": "accent-inmersion",
+          "label": "Inmersión",
+          "accentRgb": "63 208 224",
+          "accent2": "#c9f3f8",
+          "darkGround": {
+            "background": "#04121f",
+            "surface": "#0a1c2e",
+            "surface-2": "#11283f",
+            "border": "#1b3753"
+          },
+          "lightAccentRgb": "8 128 150"
+        }
+      ],
+      "source": "src/app/globals.css (Paletas completas), src/lib/apariencia.ts ACENTOS"
+    },
+    "livery": {
+      "scope": "Ligas and Clanes only",
+      "selection": "FNV-1a hash of user id or upper-cased clan tag, modulo 10",
+      "pairs": [
+        {
+          "plate": "#ff6a00",
+          "ink": "#111111"
+        },
+        {
+          "plate": "#e8ff3a",
+          "ink": "#111111"
+        },
+        {
+          "plate": "#00b8ff",
+          "ink": "#04121f"
+        },
+        {
+          "plate": "#ff2d55",
+          "ink": "#ffffff"
+        },
+        {
+          "plate": "#35e36b",
+          "ink": "#062010"
+        },
+        {
+          "plate": "#b46bff",
+          "ink": "#ffffff"
+        },
+        {
+          "plate": "#ffd60a",
+          "ink": "#111111"
+        },
+        {
+          "plate": "#f4f6fa",
+          "ink": "#111111"
+        },
+        {
+          "plate": "#7cc4e4",
+          "ink": "#0c1220"
+        },
+        {
+          "plate": "#ff3b30",
+          "ink": "#ffffff"
+        }
+      ],
+      "source": "src/lib/librea.ts"
     }
   },
   "components": [
@@ -501,18 +794,35 @@
       "description": "Landing signature: numbered steps joined by a fading accent rail.",
       "html": "<ol class=\"ds-route\"><li><span class=\"ds-step\">1</span><div><h3>Link your accounts</h3><p>Just your public ID.</p></div></li><li><span class=\"ds-step\">2</span><div><h3>See your closest platinum</h3><p>Sorted by what is left.</p></div></li></ol>",
       "css": ".ds-route{position:relative;display:grid;gap:28px;margin:0;padding:0;list-style:none;color:var(--foreground,#e9eef7)}.ds-route::before{content:'';position:absolute;left:19px;top:12px;bottom:12px;width:2px;background:linear-gradient(rgb(124 196 228),rgb(124 196 228 / 0.1))}.ds-route li{position:relative;display:flex;gap:20px}.ds-step{position:relative;z-index:1;display:flex;width:40px;height:40px;flex-shrink:0;align-items:center;justify-content:center;border-radius:9999px;border:2px solid rgb(124 196 228);background:var(--background,#0a0d13);font:700 0.875rem 'Chakra Petch',sans-serif;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-route h3{margin:6px 0 0;font:700 1.125rem/1.25 'Chakra Petch',Barlow,sans-serif}.ds-route p{margin:6px 0 0;font:400 0.875rem/1.625 Barlow,sans-serif;color:var(--muted,#a7b0c0)}"
+    },
+    {
+      "name": "Trofeo Desbloqueado Toast",
+      "kind": "custom",
+      "refersTo": "toast-trophy",
+      "description": "Signature: console-style trophy pop-up after a sync with new trophies; rises, flashes once, auto-dismisses in 7s.",
+      "html": "<div class=\"ds-toast-stack\"><div class=\"ds-toast\"><span class=\"ds-toast-icon\"></span><span class=\"ds-toast-text\"><span class=\"ds-toast-kind\">Trophy unlocked</span><span class=\"ds-toast-name\">Ready for Commitment</span><span class=\"ds-toast-game\">God of War Ragnarok</span></span><button class=\"ds-toast-close\" aria-label=\"Close\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M18 6 6 18M6 6l12 12\"/></svg></button></div><span class=\"ds-toast-more\">+2 more</span></div>",
+      "css": ".ds-toast-stack{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px}.ds-toast{display:flex;align-items:center;gap:14px;width:100%;max-width:384px;padding:12px 8px 12px 12px;border-radius:16px;border:1px solid rgb(124 196 228 / 0.35);background:color-mix(in srgb,var(--surface,#10151f) 92%,transparent);backdrop-filter:blur(10px);box-shadow:0 18px 40px -16px rgb(0 0 0 / 0.7),0 0 0 1px rgb(255 255 255 / 0.03) inset;color:var(--foreground,#e9eef7);animation:ds-toast-rise 520ms cubic-bezier(0.16,1,0.3,1) both}.ds-toast-icon{width:48px;height:48px;flex-shrink:0;border-radius:14px;background:linear-gradient(160deg,#eaf5fb,#9fd4ec);animation:ds-toast-flash 1.2s 300ms ease-out both}.ds-toast-text{min-width:0;flex:1}.ds-toast-kind{display:block;font:700 0.6875rem Barlow,sans-serif;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-toast-name{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 0.9375rem 'Chakra Petch',Barlow,sans-serif}.ds-toast-game{display:block;font:400 0.75rem Barlow,sans-serif;color:var(--muted,#a7b0c0)}.ds-toast-close{align-self:flex-start;padding:6px;border:0;border-radius:8px;background:transparent;color:var(--muted,#a7b0c0);cursor:pointer;transition:background-color .15s,color .15s,filter .15s}.ds-toast-close:hover{background:var(--surface-2,#1b2330);color:var(--foreground,#e9eef7);filter:drop-shadow(0 0 12px rgb(124 196 228 / 0.5))}.ds-toast-close:focus-visible{outline:2px solid rgb(124 196 228);outline-offset:2px}.ds-toast-more{padding:4px 12px;border-radius:9999px;border:1px solid rgb(124 196 228 / 0.35);background:color-mix(in srgb,var(--surface,#10151f) 92%,transparent);font:600 0.75rem Barlow,sans-serif;color:var(--muted,#a7b0c0)}@keyframes ds-toast-rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}@keyframes ds-toast-flash{0%{box-shadow:0 0 0 0 rgb(124 196 228 / 0)}30%{box-shadow:0 0 22px 4px rgb(124 196 228 / 0.55)}100%{box-shadow:0 0 0 0 rgb(124 196 228 / 0)}}@media (prefers-reduced-motion:reduce){.ds-toast,.ds-toast-icon{animation:none}}"
+    },
+    {
+      "name": "Carreras Standings Row",
+      "kind": "custom",
+      "refersTo": "dorsal",
+      "description": "Ligas/Clanes only: livery P# dorsal on a skewed plate, tabular figures, gap to leader, left-to-right livery streak on hover.",
+      "html": "<div class=\"ds-tower\"><h3 class=\"ds-tower-title\"><span>September 2026 league</span></h3><div class=\"ds-row\" style=\"--librea:#ff6a00\"><span class=\"ds-dorsal\" style=\"--librea:#ff6a00;--librea-tinta:#111\"><span>P1</span></span><span class=\"ds-row-name\">kratos_main</span><span class=\"ds-fig ds-fig-pts\">4,820</span><span class=\"ds-fig ds-fig-gap\">Leader</span></div><div class=\"ds-row\" style=\"--librea:#00b8ff\"><span class=\"ds-dorsal\" style=\"--librea:#00b8ff;--librea-tinta:#04121f\"><span>P2</span></span><span class=\"ds-row-name\">hollow_hunter</span><span class=\"ds-fig ds-fig-pts\">4,310</span><span class=\"ds-fig ds-fig-gap\">−510</span></div><div class=\"ds-band\" style=\"--librea:#ff6a00;--librea-tinta:#111\"></div></div>",
+      "css": ".ds-tower{max-width:32rem;color:var(--foreground,#e9eef7)}.ds-tower-title{margin:0 0 12px;font:700 1.5rem 'Chakra Petch',Barlow,sans-serif;text-transform:uppercase}.ds-tower-title>span{display:inline-block;transform:skewX(-8deg)}.ds-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border,#212a38);cursor:pointer;background-image:linear-gradient(90deg,transparent,color-mix(in srgb,var(--librea) 14%,transparent) 50%,transparent);background-size:200% 100%;background-position:200% 0;background-repeat:no-repeat;transition:background-position 600ms cubic-bezier(0.16,1,0.3,1),background-color 200ms}.ds-row:hover{background-position:-100% 0;background-color:rgb(124 196 228 / 0.04)}.ds-dorsal{display:inline-flex;min-width:2.75rem;align-items:center;justify-content:center;padding:0.25rem 0.6rem;transform:skewX(-12deg);background:var(--librea);color:var(--librea-tinta);font:700 0.875rem/1.1 'Chakra Petch',Barlow,sans-serif;letter-spacing:.02em;font-variant-numeric:tabular-nums;box-shadow:0 6px 14px -8px var(--librea)}.ds-dorsal>span{display:inline-block;transform:skewX(12deg)}.ds-row-name{flex:1;min-width:0;font:600 0.8125rem Barlow,sans-serif}.ds-fig{font-family:'Chakra Petch',Barlow,sans-serif;font-weight:700;font-variant-numeric:tabular-nums}.ds-fig-pts{font-size:1.25rem;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-fig-gap{width:4.5rem;text-align:right;font-size:0.875rem;color:var(--muted,#a7b0c0)}.ds-band{margin-top:24px;height:6px;border-radius:9999px;opacity:.85;background:repeating-linear-gradient(-60deg,var(--librea) 0 18px,var(--librea-tinta) 18px 22px)}@media (prefers-reduced-motion:reduce){.ds-row{transition:none}}"
     }
   ],
   "narrative": {
     "northStar": "The Night Trophy Room",
-    "overview": "Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13), surfaces one step up, and the only strong light falling on the things a hunter earned. The brand accent is platinum itself, the colour of the trophy being chased, so the interface glows in the same pale ice-blue the platinum trophy does. Everything else stays quiet: muted blue-grey text, hairline borders, flat tonal cards. Light is used as a material, not as decoration: a soft halo leaks from the top-left of every page, the landing's vitrine lights each trophy from above, and hovering anything clickable makes it glow in the accent.\n\nThe system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.\n\nDensity is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels and trophies-remaining are set big in the display face, often in platinum.",
+    "overview": "Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13), surfaces one step up, and the only strong light falling on the things a hunter earned. The brand accent is platinum itself, the colour of the trophy being chased, so the interface glows in the same pale ice-blue the platinum trophy does. Everything else stays quiet: muted blue-grey text, hairline borders, flat tonal cards. Light is used as a material, not as decoration: a soft halo leaks from the top-left of every page, the landing's vitrine lights each trophy from above, and hovering anything clickable makes it glow in the accent.\n\nThe system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange, six full palettes and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.\n\nDensity is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels and trophies-remaining are set big in the display face, often in platinum.",
     "keyCharacteristics": [
       "Night navy base with tonal layering (background, surface, surface-2) instead of heavy shadows.",
       "Platinum accent, derived everywhere from one RGB channel variable.",
       "Chakra Petch (condensed, technical) for headings and numerals; Barlow for everything read.",
       "Trophy grade colours (bronze, silver, gold, platinum) are semantic and never repurposed.",
       "Every clickable glows on hover, enforced globally.",
-      "User-selectable mode, accent and style axes; components stay token-bound so all three work."
+      "User-selectable mode, accent and style axes; components stay token-bound so all three work.",
+      "Competition pages (Ligas, Clanes) wear a scoped race-timing world: livery dorsals, skews, tabular figures."
     ],
     "rules": [
       {
@@ -531,6 +841,16 @@
         "section": "colors"
       },
       {
+        "name": "The Ground Belongs to the Mode Rule",
+        "body": "A palette may repaint the ground only in dark mode. Light, OLED and high contrast keep their grounds under every accent; a new full palette adds a `.dark.accent-x` ground block and a `.light.accent-x` darker accent, never a ground rule for the other modes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Theme Scrim Rule",
+        "body": "Image scrims fade to the theme ground (`from-background`), and text over covers uses `foreground`. A literal #0a0d13 scrim or white text over a cover breaks light mode and every full palette.",
+        "section": "colors"
+      },
+      {
         "name": "The Headings Wear the Plate Rule",
         "body": "`h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`.",
         "section": "typography"
@@ -538,6 +858,16 @@
       {
         "name": "The rem-Only Rule",
         "body": "Text sizes are in rem, never px: the user's text-size setting (87.5–125%) scales the root, and px sizes ignore it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Subtitle Below Rule",
+        "body": "A heading carries no small label above it. Context that used to sit over a title (the dashboard's section labels) goes below it as a muted subtitle.",
+        "section": "typography"
+      },
+      {
+        "name": "The Solid Headline Rule",
+        "body": "Headlines are solid colour. Gradient text is not used anywhere in the app (the 404 was the last user and has been changed); the `text-gradient` utility still exists in `globals.css` but must not be reached for.",
         "section": "typography"
       },
       {
@@ -571,7 +901,11 @@
       "**Do** show real data only; any synthetic block carries the translated \"Ejemplo\" chip.",
       "**Do** honour `prefers-reduced-motion` by stopping animations outright and painting the final state from the start.",
       "**Do** prefix surface-scoped CSS in `globals.css` (for example `landing-`), because the stylesheet is global to the whole app.",
-      "**Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them."
+      "**Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them.",
+      "**Do** give a new full palette both a `.dark.accent-x` block (accent plus the four ground tokens) and a `.light.accent-x` darker accent, and a half-ground/half-accent swatch.",
+      "**Do** fade image scrims to `from-background` and set text over covers in `foreground`.",
+      "**Do** put a heading's context below it as a muted subtitle.",
+      "**Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas and Clanes."
     ],
     "donts": [
       "**Don't** write literal accent colours such as `rgba(74, 158, 255, .14)`; they freeze one accent and one mode.",
@@ -579,7 +913,11 @@
       "**Don't** put white text on an accent fill; use `background`.",
       "**Don't** set text sizes in px; they ignore the user's text-size setting.",
       "**Don't** put `overflow: hidden` on the element that owns a hover glow or shadow.",
-      "**Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) in new components; use `from-background` so light mode and OLED stay coherent.",
+      "**Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) or white text over covers; use `from-background` and `foreground` so light mode, OLED and the full palettes stay coherent.",
+      "**Don't** put eyebrow or kicker labels above headings.",
+      "**Don't** use gradient text; `text-gradient` is a leftover utility, not part of the system.",
+      "**Don't** bring the Carreras world (dorsals, livery colours, skews, livery streaks) into the library, guides or the dashboard; its competitive energy tires everywhere else.",
+      "**Don't** let a full palette repaint the ground in light, OLED or high-contrast mode.",
       "**Don't** use platform brand colours outside platform-identity contexts.",
       "**Don't** invent testimonials, user counts or figures; landing proof comes from the live database queries only."
     ]

@@ -12,6 +12,9 @@ import { TrophyIcon } from "@/components/TrophyIcon";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
 import { relativeDate } from "@/lib/design";
+import { Dorsal } from "@/components/carreras/Dorsal";
+import { libreaDe } from "@/lib/librea";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export const metadata = {
   title: "Liga - Paragon",
@@ -112,104 +115,80 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
       <BackButton fallbackHref="/ligas" />
 
       <div className="mb-8">
-        <h1 className="font-heading text-3xl font-bold mb-2">{league.name}</h1>
+        <h1 className="font-heading mb-2 text-[clamp(1.75rem,5vw,2.5rem)] font-bold uppercase leading-tight">
+          <span className="carreras-titulo">{league.name}</span>
+        </h1>
         <p className="text-muted">{t("LigaPage.clasificacionDesde")}</p>
         <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt, t, idioma)}</p>
       </div>
 
-      <div className="bg-surface border border-border rounded-[18px] overflow-hidden shadow-sm mb-10">
-        <table className="w-full text-left border-collapse">
+      <div className="mb-10 overflow-x-auto rounded-[18px] border border-border bg-surface">
+        <table className="w-full min-w-[480px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-border bg-black/20 text-xs font-bold uppercase tracking-wider text-muted">
-              <th className="p-4 w-16 text-center">{t("LigaPage.colPos")}</th>
-              <th className="p-4">{t("LigaPage.colCazador")}</th>
-              <th className="p-4 text-right">{t("LigaPage.colPuntos")}</th>
-              {isOwner && <th className="p-4 w-20" />}
+            <tr className="border-b border-border text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">
+              <th className="w-20 py-3 pl-4 pr-2">{t("LigaPage.colPos")}</th>
+              <th className="px-2 py-3">{t("LigaPage.colCazador")}</th>
+              <th className="px-2 py-3 text-right">{t("LigaPage.colPuntos")}</th>
+              <th className="w-24 py-3 pl-2 pr-4 text-right">{t("LigaPage.colDif")}</th>
+              {isOwner && <th className="w-20 p-3" />}
             </tr>
           </thead>
           <tbody>
             {league.standings.map((member, index) => {
-              // El primer puesto se trata distinto a propósito — antes
-              // todas las filas eran idénticas salvo el número, y era el
-              // puesto que más intensidad competitiva merecía.
-              const esPrimero = index === 0;
+              const nombre = member.name ?? (member.handle ? `@${member.handle}` : t("LigaPage.alguien"));
               return (
-                <tr key={member.userId} className="border-b border-border" style={esPrimero ? { background: "rgba(226, 181, 62, 0.08)" } : undefined}>
-                  <td className="p-4 text-center">
-                    <span
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm"
-                      style={
-                        esPrimero
-                          ? { color: "#e2b53e", background: "rgba(226, 181, 62, 0.18)", border: "1px solid rgba(226, 181, 62, 0.5)" }
-                          : { color: "var(--muted)", background: "var(--surface-2)" }
-                      }
-                    >
-                      {index + 1}
-                    </span>
+                <tr key={member.userId} className="carreras-fila border-b border-border" style={{ ["--librea" as string]: libreaDe(member.userId).fondo }}>
+                  <td className="py-3 pl-4 pr-2">
+                    <Dorsal id={member.userId} texto={`P${index + 1}`} />
                   </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div style={esPrimero ? { borderRadius: "9999px", border: "2px solid #e2b53e" } : undefined}>
-                        <Avatar src={member.image} name={member.name ?? member.handle ?? "?"} size={esPrimero ? 40 : 36} />
-                      </div>
+                  <td className="px-2 py-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar src={member.image} name={nombre} size={34} />
                       {member.handle ? (
-                        <Link href={`/u/${member.handle}`} className="font-bold hover:text-[rgb(var(--accent-rgb))] transition-colors">
-                          {member.name ?? `@${member.handle}`}
+                        <Link href={`/u/${member.handle}`} className="truncate rounded font-heading text-[0.9375rem] font-bold uppercase tracking-wide transition-colors hover:text-[var(--accent-text)]">
+                          {nombre}
                         </Link>
                       ) : (
-                        <span className="font-bold">{member.name ?? t("LigaPage.alguien")}</span>
+                        <span className="truncate font-heading text-[0.9375rem] font-bold uppercase tracking-wide">{nombre}</span>
                       )}
                       {member.userId === league.ownerId && (
-                        <span className="text-[0.625rem] font-bold uppercase tracking-wide text-muted">{t("LigaPage.dueño")}</span>
+                        <span className="shrink-0 text-[0.625rem] font-bold uppercase tracking-wide text-muted">{t("LigaPage.dueño")}</span>
                       )}
-                      {/* `movimiento` sale de la foto semanal del cron
-                          (/api/cron/league-snapshot) — null hasta que
-                          corra una vez para esta liga, o para alguien
-                          recién unido. 0 sí se enseña (te has mantenido). */}
+                      {/* `movimiento` sale de la foto semanal del cron (/api/cron/league-snapshot):
+                          null hasta que corra para esta liga o para alguien recién unido. */}
                       {member.movimiento != null && member.movimiento !== 0 && (
-                        <span
-                          className="inline-flex items-center gap-0.5 text-[0.6875rem] font-bold"
-                          style={{ color: member.movimiento > 0 ? "#45d483" : "#ff6b6b" }}
-                        >
-                          {member.movimiento > 0 ? "▲" : "▼"} {Math.abs(member.movimiento)}
+                        <span className="inline-flex shrink-0 items-center text-[0.6875rem] font-bold tabular-nums" style={{ color: member.movimiento > 0 ? "#45d483" : "#ff6b6b" }}>
+                          {member.movimiento > 0 ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
+                          {Math.abs(member.movimiento)}
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="p-4 text-right">
-                    <span
-                      className="font-heading text-xl font-bold"
-                      style={{ color: esPrimero ? "#e2b53e" : "rgb(var(--accent-rgb))" }}
-                    >
-                      {member.points.toLocaleString()}
+                  <td className="px-2 py-3 text-right">
+                    <span className="carreras-cifra text-xl text-[var(--accent-text)]">{member.points.toLocaleString(idioma)}</span>
+                  </td>
+                  <td className="py-3 pl-2 pr-4 text-right">
+                    <span className="carreras-cifra text-sm text-muted">
+                      {index === 0 ? t("LigaPage.lider") : `−${(league.standings[0].points - member.points).toLocaleString(idioma)}`}
                     </span>
-                    {/* Dato nuevo, calculado de la propia lista ya
-                        ordenada (sin tocar la API) — antes no había
-                        ninguna pista de cuánto falta para el puesto de
-                        arriba, solo el número de puntos de cada uno. */}
-                    {index > 0 && league.standings[index - 1].points > member.points && (
-                      <p className="mt-0.5 text-[0.6875rem] text-muted">
-                        {t("LigaPage.paraSubir", { n: (league.standings[index - 1].points - member.points).toLocaleString() })}
-                      </p>
-                    )}
                   </td>
-                {isOwner && (
-                  <td className="p-4 text-right">
-                    {member.userId !== league.ownerId && (
-                      <ConfirmForm
-                        action={removeLeagueMemberAction}
-                        hidden={{ leagueId: league.id, targetUserId: member.userId }}
-                        title={t("LigaPage.quitarLiga")}
-                        message={t("LigaPage.quitarLigaMensaje", { nombre: member.name ?? member.handle ?? t("LigaPage.alguien") })}
-                        confirmLabel={t("LigaPage.quitarConfirmar")}
-                        triggerClassName="text-xs font-semibold text-muted hover:text-danger"
-                      >
-                        {t("LigaPage.quitar")}
-                      </ConfirmForm>
-                    )}
-                  </td>
-                )}
-              </tr>
+                  {isOwner && (
+                    <td className="p-3 text-right">
+                      {member.userId !== league.ownerId && (
+                        <ConfirmForm
+                          action={removeLeagueMemberAction}
+                          hidden={{ leagueId: league.id, targetUserId: member.userId }}
+                          title={t("LigaPage.quitarLiga")}
+                          message={t("LigaPage.quitarLigaMensaje", { nombre: member.name ?? member.handle ?? t("LigaPage.alguien") })}
+                          confirmLabel={t("LigaPage.quitarConfirmar")}
+                          triggerClassName="text-xs font-semibold text-muted hover:text-danger"
+                        >
+                          {t("LigaPage.quitar")}
+                        </ConfirmForm>
+                      )}
+                    </td>
+                  )}
+                </tr>
               );
             })}
           </tbody>

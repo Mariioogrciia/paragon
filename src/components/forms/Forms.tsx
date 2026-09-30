@@ -26,6 +26,7 @@ import type { NavKey } from "@/lib/navPreferences";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { PrivacyGuide } from "@/components/PrivacyGuide";
 import { PublicAccountNotice } from "@/components/PublicAccountNotice";
+import { TrofeoDesbloqueadoAviso } from "@/components/TrofeoDesbloqueado";
 
 const EMPTY: ActionState = {};
 
@@ -509,6 +510,7 @@ export function SyncNowForm() {
     <form action={action}>
       <SyncSubmit />
       <Feedback state={state} />
+      {state.trofeos && state.trofeos.length > 0 && <TrofeoDesbloqueadoAviso key={state.trofeos.map((t) => t.nombre).join("|")} trofeos={state.trofeos} nuevos={state.nuevos ?? state.trofeos.length} />}
     </form>
   );
 }
@@ -532,6 +534,7 @@ export function SyncPlatformForm({ platform, label }: { platform: string; label:
       <input type="hidden" name="platform" value={platform} />
       <SyncPlatformSubmit label={label} />
       <Feedback state={state} />
+      {state.trofeos && state.trofeos.length > 0 && <TrofeoDesbloqueadoAviso key={state.trofeos.map((t) => t.nombre).join("|")} trofeos={state.trofeos} nuevos={state.nuevos ?? state.trofeos.length} />}
     </form>
   );
 }

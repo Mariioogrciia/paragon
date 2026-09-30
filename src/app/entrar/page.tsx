@@ -61,7 +61,7 @@ export default async function EntrarPage({
         className="hidden flex-col p-11 lg:flex"
         style={{
           background:
-            "radial-gradient(700px 400px at 20% 10%, rgb(var(--accent-rgb) / 0.18), transparent 70%), linear-gradient(170deg, #101724, #0a0d13)",
+            "radial-gradient(700px 400px at 20% 10%, rgb(var(--accent-rgb) / 0.18), transparent 70%), linear-gradient(170deg, var(--surface), var(--background))",
         }}
       >
         <div className="mt-auto">

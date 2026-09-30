@@ -5,11 +5,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
-import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
+import { TrophyTile } from "@/components/TrophyIcon";
 import { LigaMensualFila } from "@/components/LigaMensualFila";
 import { BackButton } from "@/components/BackButton";
 import { NewLeagueForm } from "@/components/forms/Forms";
-import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
+import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
+
 import { SeccionTabs } from "@/components/SeccionTabs";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 
@@ -93,9 +94,8 @@ export default async function LigasPage({ searchParams }: { searchParams: Promis
       )}
 
       <div className="mb-8">
-        <h1 className="font-heading text-3xl font-bold mb-2 uppercase tracking-wide flex items-center gap-2 text-[rgb(var(--accent-rgb))]">
-          <TrophyIcon grade="platinum" size={32} />
-          {t("LigasPage.tituloLiga", { mes: monthName, anio: year })}
+        <h1 className="font-heading mb-2 text-[clamp(1.75rem,5vw,2.5rem)] font-bold uppercase leading-tight">
+          <span className="carreras-titulo">{t("LigasPage.tituloLiga", { mes: monthName, anio: year })}</span>
         </h1>
         <p className="text-muted">{t("LigasPage.descripcion")}</p>
       </div>
@@ -105,18 +105,19 @@ export default async function LigasPage({ searchParams }: { searchParams: Promis
           {t("LigasPage.vacio")}
         </div>
       ) : (
-        <div className="bg-surface border border-border rounded-[18px] overflow-hidden shadow-sm">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto rounded-[18px] border border-border bg-surface">
+          <table className="w-full min-w-[480px] border-collapse text-left">
             <thead>
-              <tr className="border-b border-border bg-black/20 text-xs font-bold uppercase tracking-wider text-muted">
-                <th className="p-4 w-16 text-center">{t("LigasPage.colPos")}</th>
-                <th className="p-4">{t("LigasPage.colCazador")}</th>
-                <th className="p-4 text-right">{t("LigasPage.colPuntos")}</th>
+              <tr className="border-b border-border text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">
+                <th className="w-20 py-3 pl-4 pr-2">{t("LigasPage.colPos")}</th>
+                <th className="px-2 py-3">{t("LigasPage.colCazador")}</th>
+                <th className="px-2 py-3 text-right">{t("LigasPage.colPuntos")}</th>
+                <th className="w-24 py-3 pl-2 pr-4 text-right">{t("LigasPage.colDif")}</th>
               </tr>
             </thead>
             <tbody>
               {ranking.slice(0, cuantos).map((user, index) => (
-                <LigaMensualFila key={user.userId} user={user} index={index} />
+                <LigaMensualFila key={user.userId} user={user} index={index} puntosLider={ranking[0].points} />
               ))}
             </tbody>
           </table>

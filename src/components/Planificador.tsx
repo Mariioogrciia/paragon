@@ -198,7 +198,7 @@ export function Planificador({
                   style={{ backgroundImage: `url(${ordered[0].iconUrl})` }}
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0a0d13]/90 via-[#0a0d13]/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
               <div className="relative z-10 h-20 w-14 shrink-0 overflow-hidden rounded-lg bg-surface-2">
                 {ordered[0].iconUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -207,8 +207,8 @@ export function Planificador({
               </div>
               <div className="relative z-10 min-w-0 flex-1">
                 <p className="text-[0.625rem] font-bold uppercase tracking-[0.12em] text-accent">{t("siguiente")}</p>
-                <p className="truncate text-lg font-bold text-white">{ordered[0].title}</p>
-                <p className="text-xs text-white/70">
+                <p className="truncate text-lg font-bold text-foreground">{ordered[0].title}</p>
+                <p className="text-xs text-muted">
                   {t("progresoFaltan", { pct: ordered[0].progressPercent, faltan: faltan(ordered[0]), hltb: formatHltb(ordered[0], t) ? `· ${formatHltb(ordered[0], t)}` : "" })}
                 </p>
               </div>

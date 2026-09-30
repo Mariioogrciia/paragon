@@ -1076,6 +1076,38 @@ platino compartible se da por buena; paleta **platino para toda la app**.
   375 812 <salida.png> 1 1` (emulación CDP; Chrome sin interfaz no baja de
   ~500 px de ventana y recorta).
 
+## Cuarta tanda del 30 sept 2026: paletas, Ligas/Clanes "carreras" y aviso de trofeo
+
+Ronda de dirección visual de la plataforma (skill impeccable). El usuario
+eligió: poder elegir **todas las paletas**, estilo **"liga de carreras" solo
+en Ligas y Clanes**, y seguir la recomendación de Claude para el resto
+(pulir el mundo actual "pantalla de trofeos de consola").
+
+- **Paletas completas** en Apariencia (mismo eje que el acento): Hoja de
+  servicio (latón), Liga de carreras (naranja + amarillo ácido), Panel de
+  salidas (ámbar), Datos (blanco y negro), Fósforo (verde) e Inmersión
+  (cian). En modo oscuro cambian también fondo y superficies
+  (`.dark.accent-*`); en claro/OLED/contraste solo el acento. Platino sigue
+  por defecto y Azul como opción.
+- **Ligas y Clanes = torre de tiempos** (`lib/librea.ts`,
+  `components/carreras/Dorsal.tsx`, clases `.carreras-*`): librea fija por
+  usuario/clan, puesto como dorsal "P1" en placa inclinada, diferencia con
+  el líder, barrido al pasar el ratón, banda de librea bajo la cabecera del
+  clan. Las páginas de clanes estaban en español fijo y con una clase de
+  color rota (`bg-[var(--accent-rgb)]/10`): traducidas y arregladas.
+- **Aviso "trofeo desbloqueado"** (`components/TrofeoDesbloqueado.tsx`):
+  al sincronizar desde la web, si llegan trofeos nuevos, suben hasta 3
+  tarjetas con la foto real y "+N". `syncNowAction`/`syncPlatformAction`
+  devuelven `trofeos` y `nuevos`. **Sin probar con una sincronización real**
+  (sin sesión en el navegador); se probó el componente montado aparte.
+- **Pulido**: los velos sobre carátulas eran `#0a0d13` fijo con título
+  blanco — en modo claro salía texto blanco sobre blanco o velo negro; ahora
+  van con `background`/`foreground` del tema (portada con sesión y
+  Planificador). Fuera las etiquetas en mayúsculas encima de títulos en el
+  panel (pasan a subtítulo) y el texto con degradado del 404.
+- "Crea tu primera tarjeta" (landing): marco del acento y recorte en el hijo
+  interior (antes dejaba dos rayas sueltas del brillo).
+
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El
   servidor de desarrollo lanzado desde la app de Claude no heredaba

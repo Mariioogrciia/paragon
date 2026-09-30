@@ -150,7 +150,9 @@
     "colPos": "Rang",
     "colCazador": "Chasseur",
     "colPuntos": "Points",
-    "historialTitulo": "Champions des mois précédents"
+    "historialTitulo": "Champions des mois précédents",
+    "colDif": "Écart",
+    "lider": "Leader"
   },
   "LigaPage": {
     "meta": "Ligue - Paragon",
@@ -204,7 +206,9 @@
     "salirMensaje": "Tu n'apparaîtras plus dans le classement de « {nombre} » — le propriétaire devrait t'inviter à nouveau pour que tu la rejoignes.",
     "salirConfirmar": "Oui, quitter",
     "salirDeLaLiga": "Quitter cette ligue",
-    "amigo": "Ami"
+    "amigo": "Ami",
+    "colDif": "Écart",
+    "lider": "Leader"
   },
   "FriendsLeaderboard": {
     "sinAmigos": "Tu n'as encore ajouté aucun ami — dès que tu en auras, tu verras ici comment vous vous comparez.",
@@ -593,5 +597,22 @@
       "espera": "Attends un instant avant de lancer un autre défi.",
       "generico": "Impossible de terminer. Réessaie."
     }
+  },
+  "ClanesPage": {
+    "titulo": "Clans de chasseurs",
+    "descripcion": "Rejoins un clan et unissez vos forces pour dominer Paragon.",
+    "tuClan": "Ton clan : [{tag}] {nombre}",
+    "miembros": "{n, plural, one {# membre} other {# membres}}",
+    "vacio": "Aucun clan pour l'instant. Sois le premier à en créer un !"
+  },
+  "ClanPage": {
+    "noEncontrado": "Clan introuvable",
+    "xpTotal": "XP total du clan",
+    "miembros": "Membres",
+    "actividad": "Activité du clan",
+    "ranking": "Classement ({n})",
+    "lider": "Chef",
+    "miembro": "Membre",
+    "trofeos": "{n} trophées"
   }
 }
