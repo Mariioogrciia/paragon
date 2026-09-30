@@ -1,0 +1,587 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-30T21:30:02.691Z",
+  "title": "Design System: Paragon",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Night Floor",
+        "canonical": "#0a0d13",
+        "tonalRamp": [
+          "#1a2232",
+          "#2e3b57",
+          "#41557c",
+          "#546ea0",
+          "#798eb9",
+          "#a1b0ce",
+          "#cad2e3",
+          "#eef1f6"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Vitrine",
+        "canonical": "#10151f",
+        "tonalRamp": [
+          "#1a2232",
+          "#2d3b57",
+          "#40547c",
+          "#536da1",
+          "#788eba",
+          "#a1b0ce",
+          "#c9d2e3",
+          "#eef1f6"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Shelf",
+        "canonical": "#1b2330",
+        "tonalRamp": [
+          "#1c2431",
+          "#303e55",
+          "#445879",
+          "#58729d",
+          "#7c92b6",
+          "#a4b3cc",
+          "#cbd3e2",
+          "#eff1f6"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#212a38",
+        "tonalRamp": [
+          "#1c2430",
+          "#313f53",
+          "#465977",
+          "#5b749a",
+          "#7f93b3",
+          "#a5b4ca",
+          "#ccd4e1",
+          "#eff2f6"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Moonlight",
+        "canonical": "#e9eef7",
+        "tonalRamp": [
+          "#142138",
+          "#233961",
+          "#32528a",
+          "#416ab4",
+          "#698bc9",
+          "#96aed9",
+          "#c3d1e9",
+          "#ecf1f8"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Dusk Grey",
+        "canonical": "#a7b0c0",
+        "tonalRamp": [
+          "#20242d",
+          "#373f4d",
+          "#4f5a6e",
+          "#66758f",
+          "#8894aa",
+          "#acb4c3",
+          "#cfd4dd",
+          "#f0f2f4"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Platinum Ice",
+        "canonical": "rgb(124 196 228)",
+        "tonalRamp": [
+          "#0d303f",
+          "#17536e",
+          "#20769c",
+          "#2a99cb",
+          "#56b3dc",
+          "#89cae7",
+          "#bbe1f1",
+          "#eaf5fb"
+        ]
+      },
+      "accent-2": {
+        "role": "primary",
+        "displayName": "Frost Highlight",
+        "canonical": "#d7eef8",
+        "tonalRamp": [
+          "#0b3141",
+          "#145571",
+          "#1c78a1",
+          "#249cd0",
+          "#51b5e1",
+          "#85cbea",
+          "#bae1f3",
+          "#e9f6fb"
+        ]
+      },
+      "accent-light": {
+        "role": "primary",
+        "displayName": "Steel Platinum (light mode)",
+        "canonical": "rgb(22 110 150)",
+        "tonalRamp": [
+          "#0a3143",
+          "#115574",
+          "#1879a5",
+          "#1f9dd5",
+          "#4db5e5",
+          "#82cced",
+          "#b8e2f5",
+          "#e9f6fc"
+        ]
+      },
+      "accent-blue": {
+        "role": "primary",
+        "displayName": "Legacy Blue (.accent-blue preset)",
+        "canonical": "rgb(74 158 255)",
+        "tonalRamp": [
+          "#00244d",
+          "#003e85",
+          "#0058bd",
+          "#0072f5",
+          "#3392ff",
+          "#70b2ff",
+          "#add3ff",
+          "#e5f1ff"
+        ]
+      },
+      "good": {
+        "role": "semantic",
+        "displayName": "Signal Green",
+        "canonical": "#4ec98a",
+        "tonalRamp": [
+          "#123b26",
+          "#1f6641",
+          "#2c915d",
+          "#39bc79",
+          "#63cf98",
+          "#92deb7",
+          "#c0ecd6",
+          "#ebf9f2"
+        ]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Alarm Coral",
+        "canonical": "#ff6b6b",
+        "tonalRamp": [
+          "#4d0000",
+          "#850000",
+          "#bd0000",
+          "#f50000",
+          "#ff3333",
+          "#ff7070",
+          "#ffadad",
+          "#ffe5e5"
+        ]
+      },
+      "bronze": {
+        "role": "tertiary",
+        "displayName": "Bronze",
+        "canonical": "#c07b4a",
+        "tonalRamp": [
+          "#392314",
+          "#623d22",
+          "#8c5731",
+          "#b6703f",
+          "#ca9168",
+          "#dab295",
+          "#ead3c2",
+          "#f8f1ec"
+        ]
+      },
+      "silver": {
+        "role": "tertiary",
+        "displayName": "Silver",
+        "canonical": "#b9c2cc",
+        "tonalRamp": [
+          "#20262c",
+          "#38424d",
+          "#505e6d",
+          "#67798e",
+          "#8998a9",
+          "#acb7c3",
+          "#d0d6dd",
+          "#f0f2f4"
+        ]
+      },
+      "gold": {
+        "role": "tertiary",
+        "displayName": "Gold",
+        "canonical": "#e2b53e",
+        "tonalRamp": [
+          "#43330a",
+          "#735811",
+          "#a47e19",
+          "#d5a320",
+          "#e4bb4e",
+          "#eccf83",
+          "#f4e4b8",
+          "#fcf7e9"
+        ]
+      },
+      "platinum": {
+        "role": "tertiary",
+        "displayName": "Platinum",
+        "canonical": "#9fd4ec",
+        "tonalRamp": [
+          "#0d3040",
+          "#16536f",
+          "#1f769e",
+          "#2899cc",
+          "#55b3dd",
+          "#88cae7",
+          "#bbe0f2",
+          "#eaf5fb"
+        ]
+      },
+      "light-background": {
+        "role": "neutral",
+        "displayName": "Paper (light mode page)",
+        "canonical": "#f4f6fa",
+        "tonalRamp": [
+          "#182135",
+          "#293a5b",
+          "#3b5382",
+          "#4d6ba8",
+          "#738cbf",
+          "#9dafd2",
+          "#c7d1e5",
+          "#edf1f7"
+        ]
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Paper (light mode card)",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#262626",
+          "#424242",
+          "#5e5e5e",
+          "#7a7a7a",
+          "#999999",
+          "#b8b8b8",
+          "#d6d6d6",
+          "#f2f2f2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero headline only; uppercase, one phrase may turn platinum."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing section titles, uppercase; app page titles use the face at 2.625rem."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, game and trophy names, step titles."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Levels, counts and trophies remaining, tabular, often platinum; 1.875rem to 6rem."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs, muted, max 60ch."
+      },
+      "body-sm": {
+        "displayName": "Body small",
+        "purpose": "List rows, nav links, button labels."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Chips, metadata, rarity figures, stat labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hover-glow",
+        "value": "drop-shadow(0 0 12px rgb(var(--accent-rgb) / 0.5))",
+        "purpose": "filter applied globally on hover to buttons, rounded links and cursor-pointer elements."
+      },
+      {
+        "name": "accent-lift",
+        "value": "0 14px 32px -12px rgb(var(--accent-rgb) / 0.7)",
+        "purpose": "Under primary gradient buttons."
+      },
+      {
+        "name": "paragon-aura",
+        "value": "0 28px 60px -24px rgb(var(--accent-rgb) / 0.45), 0 2px 0 rgb(255 255 255 / 0.03) inset",
+        "purpose": "The unified Paragon profile card."
+      },
+      {
+        "name": "panel-drop",
+        "value": "0 24px 50px -28px rgb(0 0 0 / 0.6)",
+        "purpose": "Neutral feature panels."
+      },
+      {
+        "name": "card-hover-drop",
+        "value": "0 30px 60px -15px rgba(0,0,0,0.8)",
+        "purpose": "Game cards on hover, with tilt."
+      },
+      {
+        "name": "shelf-plank",
+        "value": "0 10px 24px -12px rgb(0 0 0 / 0.7)",
+        "purpose": "The plank under each landing vitrine exhibit."
+      }
+    ],
+    "motion": [
+      {
+        "name": "hover",
+        "value": "transform 0.15s ease, filter 0.15s ease",
+        "purpose": "Global hover glow and 1px lift."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Landing convergence: column borders (700ms), Paragon aura (1.6s), level ring fill (1.8s)."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Glint sweep and SVG path travel."
+      },
+      {
+        "name": "card-transition",
+        "value": "all 300ms",
+        "purpose": "Button and card hover transitions (translate, border, brightness)."
+      },
+      {
+        "name": "marquee",
+        "value": "40s linear infinite",
+        "purpose": "Ticker rows; pauses on hover; stops under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "container",
+        "value": "1240px"
+      }
+    ],
+    "gradients": [
+      {
+        "name": "accent-grad",
+        "value": "linear-gradient(160deg, var(--accent-2), var(--accent))",
+        "purpose": "Primary button fill."
+      },
+      {
+        "name": "accent-grad-h",
+        "value": "linear-gradient(90deg, var(--accent), var(--accent-2))",
+        "purpose": "Progress bar fill."
+      },
+      {
+        "name": "page-halo",
+        "value": "radial-gradient(1200px 600px at 15% -10%, var(--glow), var(--background) 60%) fixed",
+        "purpose": "Body background in every mode."
+      },
+      {
+        "name": "vitrine-niche",
+        "value": "radial-gradient(70% 90% at 50% 0%, rgb(159 212 236 / 0.16), transparent 70%)",
+        "purpose": "Top light above each exhibit trophy."
+      }
+    ],
+    "themeAxes": {
+      "modes": [
+        "dark (default)",
+        "light",
+        ".oled",
+        ".high-contrast"
+      ],
+      "accents": [
+        "platinum (default)",
+        ".accent-blue",
+        ".accent-violet",
+        ".accent-red",
+        ".accent-green",
+        ".accent-orange",
+        "free colour via inline --accent-rgb"
+      ],
+      "styles": [
+        "classic (default)",
+        ".estilo-terminal",
+        ".estilo-vidrio",
+        ".estilo-brutalista",
+        ".estilo-ps5",
+        ".estilo-xbox",
+        ".estilo-steam",
+        ".estilo-switch"
+      ],
+      "source": "src/lib/apariencia.ts, src/app/globals.css"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call to action: brand gradient, dark text, accent lift.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\"><span class=\"ds-btn-primary-main\">Create your profile</span><span class=\"ds-btn-primary-sub\">Just your public ID</span></a>",
+      "css": ".ds-btn-primary{display:inline-flex;flex-direction:column;align-items:center;padding:12px 28px;border-radius:12px;background:var(--accent-grad,linear-gradient(160deg,#d7eef8,rgb(124 196 228)));box-shadow:0 14px 32px -12px rgb(124 196 228 / 0.7);color:var(--background,#0a0d13);text-decoration:none;font-family:Barlow,ui-sans-serif,sans-serif;transition:transform 300ms,filter 300ms}.ds-btn-primary-main{font-size:0.9375rem;font-weight:700}.ds-btn-primary-sub{margin-top:2px;font-size:0.6875rem;font-weight:600;opacity:.8}.ds-btn-primary:hover{transform:translateY(-2px);filter:brightness(1.1) drop-shadow(0 0 12px rgb(124 196 228 / 0.5))}.ds-btn-primary:focus-visible{outline:2px solid rgb(124 196 228);outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Surface button with hairline border; steps to surface-2 on hover.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-btn-secondary-icon\"><path d=\"M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>See an example</a>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:16px 24px;border-radius:12px;border:1px solid var(--border,#212a38);background:var(--surface,#10151f);color:var(--foreground,#e9eef7);font:600 0.9375rem Barlow,ui-sans-serif,sans-serif;text-decoration:none;transition:all 300ms}.ds-btn-secondary-icon{color:var(--muted,#a7b0c0)}.ds-btn-secondary:hover{transform:translateY(-2px);background:var(--surface-2,#1b2330);border-color:rgb(124 196 228 / 0.5);filter:drop-shadow(0 0 12px rgb(124 196 228 / 0.5))}.ds-btn-secondary:focus-visible{outline:2px solid rgb(124 196 228);outline-offset:3px}"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Header navigation link; brightens with an accent glow on hover.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">Library</a><a class=\"ds-nav-link\" href=\"#\">Leagues</a><a class=\"ds-nav-link\" href=\"#\">Clans</a></nav>",
+      "css": ".ds-nav{display:flex;gap:4px;padding:12px 16px;background:var(--surface,#10151f);border-bottom:1px solid var(--border,#212a38)}.ds-nav-link{padding:6px 14px;border-radius:8px;color:var(--muted,#a7b0c0);font:600 0.8125rem Barlow,ui-sans-serif,sans-serif;letter-spacing:.04em;text-decoration:none;transition:all 300ms}.ds-nav-link:hover{color:#fff;box-shadow:0 0 15px rgb(124 196 228 / 0.2)}.ds-nav-link:focus-visible{outline:2px solid rgb(124 196 228);outline-offset:2px}"
+    },
+    {
+      "name": "Chips",
+      "kind": "chip",
+      "refersTo": "chip-accent",
+      "description": "Accent chip for highlights; outlined Example chip required on synthetic blocks.",
+      "html": "<div class=\"ds-chips\"><span class=\"ds-chip-accent\">Rarest</span><span class=\"ds-chip-example\">Example</span></div>",
+      "css": ".ds-chips{display:flex;gap:8px}.ds-chip-accent{padding:2px 8px;border-radius:9999px;background:rgb(124 196 228 / 0.14);color:color-mix(in srgb,rgb(124 196 228) 55%,white);font:700 0.625rem Barlow,ui-sans-serif,sans-serif}.ds-chip-example{padding:2px 10px;border-radius:9999px;border:1px solid var(--border,#212a38);color:var(--muted,#a7b0c0);font:600 0.6875rem Barlow,ui-sans-serif,sans-serif}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Inset field on the page colour with a hairline border.",
+      "html": "<input class=\"ds-input\" placeholder=\"0.00\" />",
+      "css": ".ds-input{width:120px;padding:6px 10px;border-radius:8px;border:1px solid var(--border,#212a38);background:var(--background,#0a0d13);color:var(--foreground,#e9eef7);font:600 0.875rem Barlow,ui-sans-serif,sans-serif;outline:none}.ds-input:hover{border-color:rgb(124 196 228 / 0.32)}.ds-input:focus-visible{outline:2px solid rgb(124 196 228);outline-offset:1px}"
+    },
+    {
+      "name": "Game Progress Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Surface card with display-face numeral in platinum and a gradient progress bar.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-title\">Hollow Knight</p><div class=\"ds-card-row\"><span class=\"ds-card-num\">24</span><span class=\"ds-card-label\">REMAINING</span><span class=\"ds-card-pct\">62%</span></div><div class=\"ds-track\"><div class=\"ds-fill\" style=\"width:62%\"></div></div></div>",
+      "css": ".ds-card{width:260px;padding:20px;border-radius:20px;border:1px solid var(--border,#212a38);background:var(--surface,#10151f);color:var(--foreground,#e9eef7);cursor:pointer;transition:transform .15s ease,filter .15s ease}.ds-card:hover{transform:translateY(-1px);filter:drop-shadow(0 0 12px rgb(124 196 228 / 0.5))}.ds-card-title{margin:0 0 12px;font:700 1.125rem 'Chakra Petch',Barlow,sans-serif}.ds-card-row{display:flex;align-items:flex-end;gap:10px}.ds-card-num{font:700 1.875rem/0.9 'Chakra Petch',Barlow,sans-serif;color:#9fd4ec;font-variant-numeric:tabular-nums}.ds-card-label{padding-bottom:4px;font:700 0.625rem Barlow,sans-serif;letter-spacing:.1em;color:var(--muted,#a7b0c0)}.ds-card-pct{margin-left:auto;font:700 0.875rem Barlow,sans-serif;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-track{margin-top:12px;height:4px;border-radius:9999px;background:var(--surface-2,#1b2330);overflow:hidden}.ds-fill{height:100%;border-radius:9999px;background:linear-gradient(90deg,rgb(124 196 228),#d7eef8)}"
+    },
+    {
+      "name": "Paragon Card with Level Ring",
+      "kind": "custom",
+      "refersTo": "panel-feature",
+      "description": "Landing signature: the unified profile card with gradient level ring and aura.",
+      "html": "<div class=\"ds-paragon\"><div class=\"ds-ring\"><svg viewBox=\"0 0 96 96\"><defs><linearGradient id=\"dsg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0%\" stop-color=\"#d7eef8\"/><stop offset=\"100%\" stop-color=\"rgb(124 196 228)\"/></linearGradient></defs><circle cx=\"48\" cy=\"48\" r=\"40\" fill=\"none\" stroke=\"#1b2330\" stroke-width=\"7\"/><circle cx=\"48\" cy=\"48\" r=\"40\" fill=\"none\" stroke=\"url(#dsg)\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-dasharray=\"251.3\" stroke-dashoffset=\"95.5\"/></svg><span class=\"ds-ring-num\">42</span></div><div><p class=\"ds-paragon-title\">Paragon level</p><p class=\"ds-paragon-sub\">400 trophies across 4 platforms</p></div></div>",
+      "css": ".ds-paragon{display:flex;align-items:center;gap:20px;max-width:36rem;padding:28px;border-radius:24px;border:1px solid rgb(124 196 228 / 0.35);background:var(--surface,#10151f);box-shadow:0 28px 60px -24px rgb(124 196 228 / 0.45),inset 0 2px 0 rgb(255 255 255 / 0.03);color:var(--foreground,#e9eef7)}.ds-ring{position:relative;width:96px;height:96px;flex-shrink:0}.ds-ring svg{width:100%;height:100%;transform:rotate(-90deg)}.ds-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 2.125rem 'Chakra Petch',Barlow,sans-serif;font-variant-numeric:tabular-nums}.ds-paragon-title{margin:0;font:700 0.875rem Barlow,sans-serif}.ds-paragon-sub{margin:4px 0 0;font:400 0.75rem Barlow,sans-serif;color:var(--muted,#a7b0c0)}"
+    },
+    {
+      "name": "Vitrine Cartel",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Landing signature: trophy in a top-lit niche, museum cartel, shelf plank.",
+      "html": "<div class=\"ds-exhibit\"><a class=\"ds-cartel\" href=\"#\"><span class=\"ds-niche\"><span class=\"ds-trophy\"></span></span><span class=\"ds-cartel-text\"><span class=\"ds-cartel-name\">Ready for Commitment</span><span class=\"ds-cartel-game\">God of War Ragnarok</span><span class=\"ds-cartel-rare\">0.8% of hunters</span></span></a><div class=\"ds-plank\"></div></div>",
+      "css": ".ds-exhibit{width:200px}.ds-cartel{display:block;padding:8px;border-radius:12px;color:var(--foreground,#e9eef7);text-decoration:none;transition:background-color 200ms}.ds-cartel:hover{background:var(--surface,#10151f)}.ds-niche{display:flex;height:144px;align-items:flex-end;justify-content:center;padding-bottom:12px;border-radius:12px 12px 0 0;background:radial-gradient(70% 90% at 50% 0%,rgb(159 212 236 / 0.16),transparent 70%)}.ds-trophy{width:72px;height:72px;border-radius:12px;background:linear-gradient(160deg,#f4e4b8,#e2b53e);transition:transform 300ms}.ds-cartel:hover .ds-trophy{transform:translateY(-4px)}.ds-cartel-text{display:block;padding-top:12px;border-top:1px solid var(--border,#212a38)}.ds-cartel-name{display:block;font:700 0.9375rem 'Chakra Petch',Barlow,sans-serif}.ds-cartel-game{display:block;margin-top:2px;font:400 0.75rem Barlow,sans-serif;color:var(--muted,#a7b0c0)}.ds-cartel-rare{display:block;margin-top:8px;font:700 0.6875rem Barlow,sans-serif;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-plank{margin-top:8px;height:8px;background:linear-gradient(180deg,color-mix(in srgb,#212a38 70%,white 8%),#1b2330);box-shadow:0 10px 24px -12px rgb(0 0 0 / 0.7)}"
+    },
+    {
+      "name": "Route Rail",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Landing signature: numbered steps joined by a fading accent rail.",
+      "html": "<ol class=\"ds-route\"><li><span class=\"ds-step\">1</span><div><h3>Link your accounts</h3><p>Just your public ID.</p></div></li><li><span class=\"ds-step\">2</span><div><h3>See your closest platinum</h3><p>Sorted by what is left.</p></div></li></ol>",
+      "css": ".ds-route{position:relative;display:grid;gap:28px;margin:0;padding:0;list-style:none;color:var(--foreground,#e9eef7)}.ds-route::before{content:'';position:absolute;left:19px;top:12px;bottom:12px;width:2px;background:linear-gradient(rgb(124 196 228),rgb(124 196 228 / 0.1))}.ds-route li{position:relative;display:flex;gap:20px}.ds-step{position:relative;z-index:1;display:flex;width:40px;height:40px;flex-shrink:0;align-items:center;justify-content:center;border-radius:9999px;border:2px solid rgb(124 196 228);background:var(--background,#0a0d13);font:700 0.875rem 'Chakra Petch',sans-serif;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-route h3{margin:6px 0 0;font:700 1.125rem/1.25 'Chakra Petch',Barlow,sans-serif}.ds-route p{margin:6px 0 0;font:400 0.875rem/1.625 Barlow,sans-serif;color:var(--muted,#a7b0c0)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Trophy Room",
+    "overview": "Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13), surfaces one step up, and the only strong light falling on the things a hunter earned. The brand accent is platinum itself, the colour of the trophy being chased, so the interface glows in the same pale ice-blue the platinum trophy does. Everything else stays quiet: muted blue-grey text, hairline borders, flat tonal cards. Light is used as a material, not as decoration: a soft halo leaks from the top-left of every page, the landing's vitrine lights each trophy from above, and hovering anything clickable makes it glow in the accent.\n\nThe system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.\n\nDensity is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels and trophies-remaining are set big in the display face, often in platinum.",
+    "keyCharacteristics": [
+      "Night navy base with tonal layering (background, surface, surface-2) instead of heavy shadows.",
+      "Platinum accent, derived everywhere from one RGB channel variable.",
+      "Chakra Petch (condensed, technical) for headings and numerals; Barlow for everything read.",
+      "Trophy grade colours (bronze, silver, gold, platinum) are semantic and never repurposed.",
+      "Every clickable glows on hover, enforced globally.",
+      "User-selectable mode, accent and style axes; components stay token-bound so all three work."
+    ],
+    "rules": [
+      {
+        "name": "The One Channel Rule",
+        "body": "Every accent tint is `rgb(var(--accent-rgb) / alpha)` or one of the derived `--accent-*` variables. A literal `rgba(124,196,228,…)` breaks every other accent and every other mode.",
+        "section": "colors"
+      },
+      {
+        "name": "The Metals Mean Grade Rule",
+        "body": "Bronze, silver, gold and platinum are only for trophy grade and rank. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark Text on Light Rule",
+        "body": "Text on an accent fill is `background` (dark), never white. Accent presets are chosen so that pairing reads.",
+        "section": "colors"
+      },
+      {
+        "name": "The Headings Wear the Plate Rule",
+        "body": "`h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`.",
+        "section": "typography"
+      },
+      {
+        "name": "The rem-Only Rule",
+        "body": "Text sizes are in rem, never px: the user's text-size setting (87.5–125%) scales the root, and px sizes ignore it.",
+        "section": "typography"
+      },
+      {
+        "name": "The min-w-0 Rule",
+        "body": "Any grid or flex child that can contain truncating text gets `min-w-0`. A `1fr` or `auto` track defaults to min-content width, so a long title silently widens the column and breaks the grid instead of truncating.",
+        "section": "layout"
+      },
+      {
+        "name": "The Bleed-for-Glow Rule",
+        "body": "A horizontally scrolling or marquee row is wrapped as `-mx-4 px-4` (negative margin plus matching padding) so the hover glow and lift of its children have room and are not clipped by the row's `overflow-hidden`. Edge fades are 64px gradients from `background` to transparent.",
+        "section": "layout"
+      },
+      {
+        "name": "The Clip Inside Rule",
+        "body": "Never put `overflow: hidden` on the element that owns a hover shadow or drop-shadow glow; clip an inner layer instead.",
+        "section": "layout"
+      },
+      {
+        "name": "The Light Answers Touch Rule",
+        "body": "Surfaces are flat at rest; the accent glow appears only in response to hover or as the aura of a single hero object per view.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** derive every accent tint from `--accent-rgb` or the `--accent-soft`, `--accent-line`, `--accent-glow`, `--accent-text`, `--accent-grad` and `--accent-grad-h` variables.",
+      "**Do** give every clickable control a visible hover state. The global rule covers `button`, rounded `a` and `cursor-pointer` elements (glow plus 1px lift); an element with its own `hover:scale-*` or `hover:-translate-*` keeps its own lift and still gets the glow.",
+      "**Do** keep global hover and style-axis CSS outside `@layer` so it beats Tailwind utilities without `!important`.",
+      "**Do** add `min-w-0` to grid and flex children that hold truncating text.",
+      "**Do** wrap horizontally scrolling rows in `-mx-4 px-4` so hover glows are not clipped.",
+      "**Do** route all copy through next-intl (es, en, de, fr); no literal UI strings in components.",
+      "**Do** show real data only; any synthetic block carries the translated \"Ejemplo\" chip.",
+      "**Do** honour `prefers-reduced-motion` by stopping animations outright and painting the final state from the start.",
+      "**Do** prefix surface-scoped CSS in `globals.css` (for example `landing-`), because the stylesheet is global to the whole app.",
+      "**Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them."
+    ],
+    "donts": [
+      "**Don't** write literal accent colours such as `rgba(74, 158, 255, .14)`; they freeze one accent and one mode.",
+      "**Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade and rank.",
+      "**Don't** put white text on an accent fill; use `background`.",
+      "**Don't** set text sizes in px; they ignore the user's text-size setting.",
+      "**Don't** put `overflow: hidden` on the element that owns a hover glow or shadow.",
+      "**Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) in new components; use `from-background` so light mode and OLED stay coherent.",
+      "**Don't** use platform brand colours outside platform-identity contexts.",
+      "**Don't** invent testimonials, user counts or figures; landing proof comes from the live database queries only."
+    ]
+  }
+}

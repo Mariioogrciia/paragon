@@ -20,7 +20,7 @@ export function LandingThemeSwitcher() {
   return (
     <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
       <p className="text-[0.8125rem] font-semibold text-muted">{t("temaTitulo")}</p>
-      <div className="grid w-full max-w-sm grid-cols-4 gap-1.5 sm:flex sm:w-auto sm:max-w-none sm:gap-2">
+      <div className="grid w-full max-w-xs grid-cols-2 gap-1.5 sm:flex sm:w-auto sm:max-w-none sm:gap-2">
         {DEMO_STYLES.map((s) => {
           const activo = estilo === s.id;
           return (
@@ -29,7 +29,7 @@ export function LandingThemeSwitcher() {
               type="button"
               aria-pressed={activo}
               onClick={() => elegirEstilo(s.id)}
-              className={`truncate px-1.5 py-1.5 text-xs font-bold sm:px-3.5 sm:text-[0.8125rem] transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-rgb)/0.6)] ${s.muestra}`}
+              className={`px-2 py-1.5 text-xs font-bold sm:px-3.5 sm:text-[0.8125rem] transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-rgb)/0.6)] ${s.muestra}`}
               style={
                 activo
                   ? { background: "var(--accent)", color: "var(--background)", border: "1px solid var(--accent)" }

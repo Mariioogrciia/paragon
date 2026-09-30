@@ -6,7 +6,7 @@ import { medirLogros } from "@/lib/medirLogros";
 import { normalizarPerdibles } from "@/lib/perdibles";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { and, desc, eq, gte, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { db } from "@/db";
 import { friendships, gameTrophies, games as gamesTable, platformAccounts, userGames, userTrophies, users, userBadges } from "@/db/schema";
@@ -372,6 +372,8 @@ export const getRarestTrophiesThisWeek = unstable_cache(
           isNotNull(userTrophies.rarityPercent),
           isNotNull(userTrophies.earnedAt),
           gte(userTrophies.earnedAt, desde),
+          // Es la vitrina de los raros: un 80 % no lo es, aunque sea lo más raro de la semana.
+          lte(userTrophies.rarityPercent, 15),
         ),
       )
       .orderBy(sql`${userTrophies.rarityPercent} asc`)
@@ -392,7 +394,7 @@ export const getRarestTrophiesThisWeek = unstable_cache(
     }
     return elegidos.map((r) => ({ ...r, rarityPercent: Number(r.rarityPercent ?? 0), earnedAt: r.earnedAt! }));
   },
-  ["rarest-trophies-week"],
+  ["rarest-trophies-week-v2"],
   { revalidate: 300 },
 );
 

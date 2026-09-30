@@ -34,10 +34,13 @@ releer todo el historial. Última actualización: **30 de septiembre de 2026**.
   en pocos pushes: cada push es un despliegue. Para saber si un despliegue
   acabó sin acceso al panel de Vercel: `https://api.github.com/repos/Mariioogrciia/paragon/commits/<sha>/status`
   (Vercel publica ahí "Deployment has completed").
-- **Pendiente de decisión del usuario**: el handle `maricon439` (se cambia
-  desde `/admin?tab=moderation`); las reglas del Pase de Temporada
-  (decididas por Claude, `lib/temporada.ts`), revisables; y cómo dar
-  ganador a los retos semanales entre amigos (ver el final).
+- **Pendiente de decisión del usuario**: solo las reglas del Pase de
+  Temporada (decididas por Claude, `lib/temporada.ts`), revisables. El
+  handle `maricon439` ya es `@mojaso` (decisión del usuario, 30 sept) y los
+  retos entre amigos ya existen (ver "Tercera tanda del 30 sept" al final).
+- **Diseño**: `PRODUCT.md` (verdad de producto) y `DESIGN.md` (sistema
+  visual, escrito desde lo construido) en la raíz. Leerlos antes de tocar
+  la interfaz. Acento por defecto: **platino** desde el 30 sept.
 
 ---
 
@@ -1017,6 +1020,61 @@ continuación (mismo pedido, "adelante con las pendientes"):**
 
 Probado a mano cambiando a francés: orden de secciones y el aviso de error
 (`?error=handle_invalido`) salen ya en francés.
+
+## Tercera tanda del 30 sept 2026 ("haz todo lo que puedas")
+
+Decisiones del usuario en esta tanda: retos entre amigos = **ganador por
+reto** (grupo cerrado de invitados); `@maricon439` → **`@mojaso`** (hecho
+desde `/admin/usuarios/<id>`); **rediseñar la landing**; la tarjeta de
+platino compartible se da por buena; paleta **platino para toda la app**.
+
+- **Retos entre amigos** (`lib/retosAmigos.ts`, reglas puras en
+  `lib/retosAmigosReglas.ts` con tests, `RetosAmigos.tsx` en /amigos):
+  quien crea invita a 1-8 amigos para 7/14/30 días; gana quien más trofeos
+  consiga (por `earnedAt`) entre los que aceptan; empate compartido; a cero
+  no gana nadie; máx. 3 abiertos por persona. El cron los cierra 12 h
+  después del fin (margen para la sincronización diaria) y avisa. Tablas
+  `friend_challenge` y `friend_challenge_participant`
+  (`scripts/crear-tablas-retos-amigos.mts`, **ya ejecutado**, con RLS).
+  Errores devueltos como código y traducidos en `Perfil.RetosAmigos.errores`.
+  **Sin probar con sesión** (la del navegador se perdió): solo se validaron
+  las consultas de lectura contra la base.
+- **Service Worker** (`public/sw.js`): guardaba solo el HTML de `/offline`
+  (sin CSS/JS → sin estilos y sin minijuego offline). Ahora guarda también
+  sus chunks y fuentes, se registra como `/sw.js?v=<commit>` (se reinstala
+  en cada despliegue, `NEXT_PUBLIC_BUILD_ID` en next.config.ts), borra
+  cachés viejas y no guarda la cabecera con sesión. **Trampa encontrada**:
+  con "caché primero" para `/_next/static`, en `next dev` (nombres sin hash)
+  servía el CSS de hace una hora — ahora es red primero y en desarrollo no
+  se registra (y desregistra el que hubiera). Si en local los estilos "no
+  se actualizan", mirar Application → Service Workers.
+- **Landing rediseñada** (flujo de la skill impeccable, revisión
+  independiente con veredicto *ship*): cuatro bibliotecas de ejemplo
+  (PSN/Steam/Xbox/Epic) que se funden en un perfil con anillo de nivel
+  (`components/landing/Convergencia.tsx`, animación SVG + contador, estático
+  con movimiento reducido), vitrina de trofeos raros reales como cartelas
+  (≤15 % de rareza, uno por juego, dos por cazador — `getRarestTrophiesThisWeek`),
+  la caza en 4 pasos con trofeos reales de God of War Ragnarök, cinta de
+  platinos solo de los últimos 30 días y solo con 4+. Textos en
+  `Shell.Home.landing` (4 idiomas). CSS con prefijo `landing-` al final de
+  globals.css. Se quitaron las cifras de relleno inventadas ("87", "4.312"…)
+  que salían si la base daba 0. Brief y contrato en
+  `.impeccable/surfaces/src-app-page-tsx.md`.
+- **Paleta platino** (globals.css): `--accent-rgb: 124 196 228` por defecto
+  (claro: 22 110 150); el azul de antes queda como `.accent-blue` en
+  Apariencia. Fila "tú" de Amigos/Comparar pasada al acento.
+- **Fotos de logros de Steam rotas**: la API devuelve iconos en
+  `steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/…`, que da 404
+  para juegos recientes. `iconoLogroSteam()` (steam/client.ts) los pasa a
+  `shared.akamai.steamstatic.com/community_assets/images/apps/…`, y
+  `scripts/migrar-iconos-steam.mts --aplicar` migró las 10.065 URLs
+  guardadas (**ya ejecutado**). `TrophyPhoto` cae al icono del metal si una
+  foto falla.
+- Pie de página: los enlaces desbordaban a 375 px en toda la web (sin
+  `flex-wrap`).
+- Capturas de revisión fiables a 375 px: `node scripts/captura.mjs <url>
+  375 812 <salida.png> 1 1` (emulación CDP; Chrome sin interfaz no baja de
+  ~500 px de ventana y recorta).
 
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El

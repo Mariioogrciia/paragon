@@ -124,33 +124,43 @@ export function CardBuilder({ games }: { games: SampleGame[] }) {
         <div className="relative mx-auto w-full max-w-[360px]" ref={cardRef}>
           <TiltCard
             href="/entrar"
-            className="cursor-pointer overflow-hidden rounded-[22px]"
-            style={{ border: "1px solid #232c3d", background: "linear-gradient(#141b28, #0f141d)", boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)" }}
+            className="block rounded-[22px] border"
+            innerClassName="relative overflow-hidden rounded-[22px]"
+            style={{
+              borderColor: "rgb(var(--accent-rgb) / 0.4)",
+              background: "var(--surface)",
+              boxShadow: "0 28px 60px -26px rgb(var(--accent-rgb) / 0.55)",
+            }}
           >
-            <div
-              className="relative h-[200px] bg-cover bg-center"
-              style={{ backgroundImage: `url(${juego.cover})` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0f141d] via-[#0f141d]/20 to-transparent" />
+            <div className="relative aspect-[16/10] bg-cover bg-center" style={{ backgroundImage: `url(${juego.cover})` }}>
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--surface) 2%, transparent 55%)" }} />
+              <span
+                className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-wide"
+                style={{ background: "rgb(0 0 0 / 0.55)", color: "var(--platinum)", backdropFilter: "blur(6px)" }}
+              >
+                <TrophyIcon grade="platinum" size={14} />
+                {t("builderPlatinoLabel")}
+              </span>
             </div>
-            <div className="relative -mt-10 p-6">
-              <p className="truncate font-heading text-xl font-bold">{nombreMostrado}</p>
-              <p className="mt-0.5 truncate text-sm text-muted">{juego.title}</p>
+            <div className="relative px-6 pb-6 pt-1">
+              <p className="truncate font-heading text-2xl font-bold leading-tight">{nombreMostrado}</p>
+              <p className="mt-1 truncate text-sm text-muted">{juego.title}</p>
 
-              <div className="mt-5 flex items-center gap-2.5">
-                <TrophyIcon grade="platinum" size={26} />
+              <div className="mt-5 flex items-end justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-platinum">{t("builderPlatinoLabel")}</p>
-                  <p className="text-[0.6875rem] text-muted">{t("builderPlatinoFecha")}</p>
+                  <p className="text-[0.6875rem] font-semibold text-muted">{t("builderPlatinoFecha")}</p>
+                  <p className="font-heading text-lg font-bold text-platinum">100%</p>
                 </div>
+                <span
+                  className="flex h-11 w-11 items-center justify-center rounded-full"
+                  style={{ background: "radial-gradient(circle at 35% 30%, #eaf6fc, #9fd4ec 45%, #4d8fae)", boxShadow: "0 6px 18px -6px rgb(159 212 236 / 0.8)" }}
+                >
+                  <TrophyIcon grade="platinum" size={22} />
+                </span>
               </div>
-
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-2">
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--surface-2)]">
                 <div className="h-full w-full rounded-full" style={{ background: "var(--accent-grad-h)" }} />
               </div>
-              <p className="mt-2 text-right text-xs font-bold" style={{ color: "var(--accent-text)" }}>
-                100%
-              </p>
             </div>
           </TiltCard>
         </div>

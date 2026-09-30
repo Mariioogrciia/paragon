@@ -219,7 +219,7 @@ export function Convergencia({ cazadores = [] }: { cazadores?: { id: string; nom
             <img src="https://psnobj.prod.dl.playstation.net/psnobj/NPWR22392_00/2e8a3bfb-6da4-4133-b2ca-2b8c5042ed09.png" alt="" width={44} height={44} loading="lazy" className="shrink-0 rounded-xl object-cover" />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-muted">{t("platinoMasCercano")}</p>
-              <p className="font-heading truncate text-lg font-bold">God of War Ragnarök</p>
+              <p className="font-heading text-lg font-bold leading-tight [text-wrap:balance]">{"God of War Ragnarök"}</p>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--surface-2)]">
                 <div className="h-full w-[79%] rounded-full" style={{ background: "#2f7ad6" }} />
               </div>
