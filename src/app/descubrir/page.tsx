@@ -13,6 +13,7 @@ import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
 import { novedades as getNovedades, destacadosRecientes, releaseLabelEs, IgdbNotConfiguredError } from "@/lib/igdb/client";
 import { BackButton } from "@/components/BackButton";
+import { SeccionTabs } from "@/components/SeccionTabs";
 
 export const metadata = {
   title: "Descubrir · Paragon",
@@ -59,6 +60,7 @@ export default async function DescubrirPage() {
 
   return (
     <div>
+      <SeccionTabs seccion="descubrir" />
       {/* Las listas de juegos son de servidor: sin esto habria que
           recargar a mano para ver un lanzamiento nuevo. */}
       <RefrescoAutomatico />

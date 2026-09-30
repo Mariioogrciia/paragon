@@ -7,7 +7,7 @@ import { CustomSelect } from "@/components/ui/CustomSelect";
 import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEditor";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
-import { FRAME_REQUISITOS } from "@/lib/level";
+import { marcoDisponible } from "@/lib/level";
 import { TITULOS, TITULO_POR_CLAVE, tituloDesbloqueado } from "@/lib/titulos";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { Avatar } from "@/components/Avatar";
@@ -76,6 +76,9 @@ export function ProfileForm({
     { value: "platinum", label: t("profileForm.frames.platinum") },
     { value: "fire", label: t("profileForm.frames.fire") },
     { value: "cristal", label: t("profileForm.frames.cristal") },
+    { value: "laurel", label: t("profileForm.frames.laurel") },
+    { value: "aurora", label: t("profileForm.frames.aurora") },
+    { value: "eclipse", label: t("profileForm.frames.eclipse") },
   ];
 
   const TEMAS_PERFIL = [
@@ -91,7 +94,7 @@ export function ProfileForm({
     return encontrado && tituloDesbloqueado(encontrado, nivel, badges) ? encontrado.clave : "";
   };
   const [tituloEspecial, setTituloEspecial] = useState(tituloEspecialValido(user.tituloDesbloqueado));
-  const marcoBloqueado = (v: string) => FRAME_REQUISITOS[v] !== undefined && nivel < FRAME_REQUISITOS[v];
+  const marcoBloqueado = (v: string) => v !== "" && !marcoDisponible(v, nivel, badges);
   const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
   const [fondoJuegoId, setFondoJuegoId] = useState(user.profileBackgroundGameId ?? "");
   const titulosSugeridos = badges

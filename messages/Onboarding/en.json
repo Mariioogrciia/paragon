@@ -257,7 +257,10 @@
       "circuito": "Circuit Frame (Level 25+)",
       "platinum": "Platinum Frame (Level 50+)",
       "fire": "Fire Frame (Level 100+)",
-      "cristal": "Crystal Frame (Level 150+)"
+      "cristal": "Crystal Frame (Level 150+)",
+      "laurel": "Laurel (Champion badge)",
+      "aurora": "Aurora (Golden season badge)",
+      "eclipse": "Eclipse (hidden badge)"
     },
     "themes": {
       "dark": "Dark",
@@ -368,5 +371,9 @@
     "enlace": "Image",
     "copiar": "Copy",
     "obs": "For streams: in OBS add a “Browser source” with the OBS link (480×120). It shows your current game and latest trophy, and updates itself."
+  },
+  "avisos": {
+    "titulo": "What we notify you about",
+    "descripcion": "Via browser, app and Discord. Invitations and friend requests always arrive."
   }
 }

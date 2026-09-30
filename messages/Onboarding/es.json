@@ -257,7 +257,10 @@
       "circuito": "Marco Circuito (Nivel 25+)",
       "platinum": "Marco Platino (Nivel 50+)",
       "fire": "Marco Fuego (Nivel 100+)",
-      "cristal": "Marco Cristal (Nivel 150+)"
+      "cristal": "Marco Cristal (Nivel 150+)",
+      "laurel": "Laurel (insignia Campeón)",
+      "aurora": "Aurora (insignia Temporada de oro)",
+      "eclipse": "Eclipse (insignia oculta)"
     },
     "themes": {
       "dark": "Oscuro",
@@ -368,5 +371,9 @@
     "enlace": "Imagen",
     "copiar": "Copiar",
     "obs": "Para directos: en OBS añade una «Fuente de navegador» con el enlace de OBS (480×120). Enseña tu juego actual y tu último trofeo, y se actualiza sola."
+  },
+  "avisos": {
+    "titulo": "Qué te avisamos",
+    "descripcion": "Por navegador, app y Discord. Las invitaciones y solicitudes de amistad llegan siempre."
   }
 }

@@ -276,7 +276,7 @@ async function Landing() {
           <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statPlatinosGrupo")}</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString("es-ES") : "4.312"}</p>
+          <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString(idioma) : "4.312"}</p>
           <p className="mt-2.5 flex items-center gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-good opacity-75"></span>
@@ -286,7 +286,7 @@ async function Landing() {
           </p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString("es-ES") : "214"}</p>
+          <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString(idioma) : "214"}</p>
           <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statJuegosRastreados")}</p>
         </div>
         <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
@@ -612,6 +612,7 @@ export default async function HomePage() {
   if (!session?.user) return <Landing />;
 
   const t = await getTranslations("Shell.Home");
+  const idioma = await getLocale();
 
   const profile = await getProfileByUserId(session.user.id);
   if (!profile?.handle || profile.accounts.length === 0) redirect("/bienvenida");
@@ -1008,7 +1009,7 @@ export default async function HomePage() {
 
                 <TrophyCountRow
                   counts={stats.counts}
-                  summary={t("trofeosEnJuegos", { trofeos: stats.trofeos.toLocaleString("es-ES"), juegos: stats.juegos })}
+                  summary={t("trofeosEnJuegos", { trofeos: stats.trofeos.toLocaleString(idioma), juegos: stats.juegos })}
                   tieneMetales={stats.tieneMetales}
                   logrosSinMetal={stats.logrosSinMetal}
                 />

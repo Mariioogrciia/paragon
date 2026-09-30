@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { acceptFriendAction, removeFriendAction } from "@/app/actions";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
@@ -27,6 +27,7 @@ const POS_GOLD = "linear-gradient(150deg, #f7e3a8, #c39a2a)";
 
 export default async function AmigosPage() {
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
   const session = await auth();
   if (!session?.user) redirect("/entrar");
 
@@ -182,7 +183,7 @@ export default async function AmigosPage() {
                   {r.handle && (
                     <p className="mt-0.5 text-xs text-muted">
                       @{r.handle}
-                      {t("AmigosPage.nivelXp", { nivel: r.paragon.level, xp: r.paragon.xp.toLocaleString("es-ES") })}
+                      {t("AmigosPage.nivelXp", { nivel: r.paragon.level, xp: r.paragon.xp.toLocaleString(locale) })}
                     </p>
                   )}
                 </div>
@@ -195,7 +196,7 @@ export default async function AmigosPage() {
                   <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statPlatinos")}</p>
                 </div>
                 <div>
-                  <p className="text-[1.0625rem] font-semibold">{r.stats.trofeos.toLocaleString("es-ES")}</p>
+                  <p className="text-[1.0625rem] font-semibold">{r.stats.trofeos.toLocaleString(locale)}</p>
                   <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statTrofeos")}</p>
                 </div>
                 <div>

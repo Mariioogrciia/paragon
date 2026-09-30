@@ -168,7 +168,7 @@ export async function apuntarse(userId: string, sessionId: string): Promise<void
     titulo: `🎮 ${nombre} se apunta a tu sesión`,
     texto: `«${s.trofeo}» — ${Number(n) + 1} de ${s.plazas} plazas cubiertas.`,
     ruta: `/sesiones#${s.id}`,
-  });
+  }, "social");
 }
 
 export async function salirse(userId: string, sessionId: string): Promise<void> {
@@ -220,7 +220,7 @@ export async function recordarSesiones(hasta: number): Promise<number> {
         titulo: `⏰ Sesión en ${minutos} min: ${s.titulo}`,
         texto: `«${s.trofeo}» con ${apuntados.length + 1} personas.`,
         ruta: `/sesiones#${s.id}`,
-      });
+      }, "social");
       enviados++;
     }
   }

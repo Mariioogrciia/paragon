@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { useLocale } from "next-intl";
+import { localeFechas } from "@/lib/localeFechas";
 import { Avatar } from "@/components/Avatar";
 
 type ClanActivityItem = {
@@ -28,6 +29,7 @@ const ACCION: Record<ClanActivityItem["type"], string> = {
  * feed de amigos de siempre sigue siendo el sitio.
  */
 export function ClanActivityFeed({ items }: { items: ClanActivityItem[] }) {
+  const fechas = localeFechas(useLocale());
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
@@ -59,7 +61,7 @@ export function ClanActivityFeed({ items }: { items: ClanActivityItem[] }) {
               )}
             </p>
             <p className="text-[0.6875rem] text-muted">
-              {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: es })}
+              {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: fechas })}
             </p>
           </div>
 

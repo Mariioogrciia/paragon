@@ -76,6 +76,8 @@ export const users = pgTable("user", {
   apariencia: jsonb("apariencia").$type<{ acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string }>(),
   /** Secciones del panel ocultas por el usuario (lib/panelPreferences.ts). */
   panelOculto: jsonb("panelOculto").$type<string[]>(),
+  /** Categorías de aviso apagadas por el usuario (lib/avisosPreferencias.ts). */
+  avisosDesactivados: jsonb("avisosDesactivados").$type<string[]>(),
 
   /**
    * Orden de las secciones del perfil público (wrap, stats, nivel, logros,

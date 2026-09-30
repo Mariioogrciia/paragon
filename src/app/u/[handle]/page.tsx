@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { StatTile } from "@/components/StatTile";
@@ -70,7 +70,7 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  const t = await getTranslations("Perfil");
+  const [t, locale] = await Promise.all([getTranslations("Perfil"), getLocale()]);
   const profile = await getProfileByHandle(handle);
   if (!profile) return { title: t("PerfilPage.metaNoEncontrado") };
 
@@ -82,9 +82,9 @@ export async function generateMetadata({
     games.length === 0
       ? t("PerfilPage.metaDescripcionVacia", { nombre })
       : t("PerfilPage.metaDescripcionStats", {
-          trofeos: stats.trofeos.toLocaleString("es-ES"),
-          platinos: stats.platinos.toLocaleString("es-ES"),
-          juegos: stats.juegos.toLocaleString("es-ES"),
+          trofeos: stats.trofeos.toLocaleString(locale),
+          platinos: stats.platinos.toLocaleString(locale),
+          juegos: stats.juegos.toLocaleString(locale),
         });
 
   return {

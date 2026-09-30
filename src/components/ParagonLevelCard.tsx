@@ -1,5 +1,5 @@
 import type { ParagonProgress } from "@/lib/level";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 const ITEMS = [
   { key: "trofeos", color: "var(--accent)" },
@@ -22,6 +22,7 @@ function gradienteFuentes(breakdown: ParagonProgress["breakdown"]): string {
 
 export async function ParagonLevelCard({ progress }: { progress: ParagonProgress }) {
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
   const percent = progress.progreso / 100;
   const degrees = Math.round(percent * 360);
   const ITEM_LABELS: Record<(typeof ITEMS)[number]["key"], string> = {
@@ -46,7 +47,7 @@ export async function ParagonLevelCard({ progress }: { progress: ParagonProgress
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-heading text-lg font-bold uppercase tracking-wide">{t("ParagonLevelCard.title")}</h2>
-            <span className="text-xs font-semibold text-muted">{t("ParagonLevelCard.xpCompact", { xp: progress.xp.toLocaleString("es-ES") })}</span>
+            <span className="text-xs font-semibold text-muted">{t("ParagonLevelCard.xpCompact", { xp: progress.xp.toLocaleString(locale) })}</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2">
             <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${progress.progreso}%` }} />
@@ -54,7 +55,7 @@ export async function ParagonLevelCard({ progress }: { progress: ParagonProgress
           <p className="mt-2 text-xs text-muted">
             {progress.restante === 0
               ? t("ParagonLevelCard.maxLevelReached")
-              : t("ParagonLevelCard.xpToNextLevel", { xp: progress.restante.toLocaleString("es-ES"), level: progress.siguienteNivel })}
+              : t("ParagonLevelCard.xpToNextLevel", { xp: progress.restante.toLocaleString(locale), level: progress.siguienteNivel })}
           </p>
         </div>
         <span className="text-muted transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
@@ -69,7 +70,7 @@ export async function ParagonLevelCard({ progress }: { progress: ParagonProgress
             }}
           >
             <span className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-surface text-center">
-              <span className="font-heading text-xl font-bold">{progress.xp.toLocaleString("es-ES")}<small className="block text-[0.5625rem] uppercase tracking-wider text-muted">{t("ParagonLevelCard.xpTotalLabel")}</small></span>
+              <span className="font-heading text-xl font-bold">{progress.xp.toLocaleString(locale)}<small className="block text-[0.5625rem] uppercase tracking-wider text-muted">{t("ParagonLevelCard.xpTotalLabel")}</small></span>
             </span>
           </div>
           <div className="space-y-2">
@@ -77,7 +78,7 @@ export async function ParagonLevelCard({ progress }: { progress: ParagonProgress
             {ITEMS.map((item) => (
               <div key={item.key} className="flex items-center justify-between gap-3 text-sm">
                 <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full" style={{ background: item.color }} />{ITEM_LABELS[item.key]}</span>
-                <strong>{t("ParagonLevelCard.xpCompact", { xp: progress.breakdown[item.key].toLocaleString("es-ES") })}</strong>
+                <strong>{t("ParagonLevelCard.xpCompact", { xp: progress.breakdown[item.key].toLocaleString(locale) })}</strong>
               </div>
             ))}
             <p className="pt-2 text-xs leading-relaxed text-muted">{t("ParagonLevelCard.xpExplanation")}</p>

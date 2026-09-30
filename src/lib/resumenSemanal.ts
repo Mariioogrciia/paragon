@@ -30,6 +30,8 @@ export async function enviarResumenesSemanales(hasta: number, ahora = new Date()
     .where(
       and(
         eq(users.discordDmEnabled, true),
+        // Quien apagó "Resumen semanal" en Ajustes (lib/avisosPreferencias.ts).
+        sql`not coalesce(${users.avisosDesactivados}, '[]'::jsonb) ? 'resumen'`,
         sql`not exists (select 1 from ${notificationLog} n where n."userId" = ${users.id} and n.tipo = ${TIPO} and n.clave = ${clave})`,
       ),
     )

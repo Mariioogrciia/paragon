@@ -117,7 +117,52 @@ const RENDERERS: Record<string, (children: React.ReactNode) => React.ReactNode> 
       <Nucleo>{children}</Nucleo>
     </div>
   ),
+  // Los tres de abajo no se ganan por nivel sino con una insignia
+  // (FRAME_INSIGNIA en lib/level.ts): el nivel alto es casi inalcanzable
+  // y así hay marcos que se consiguen jugando de otra forma.
+  laurel: (children) => (
+    <AnilloGiratorio
+      fondo="conic-gradient(from 0deg, #fde047, #a16207 25%, #fde047 50%, #a16207 75%, #fde047)"
+      brillo="0 0 16px rgba(253, 224, 71, 0.55)"
+      segundos={5}
+    >
+      {children}
+    </AnilloGiratorio>
+  ),
+  aurora: (children) => (
+    <AnilloGiratorio
+      fondo="conic-gradient(from 0deg, #22d3ee, #a78bfa, #f472b6, #fbbf24, #34d399, #22d3ee)"
+      brillo="0 0 20px rgba(167, 139, 250, 0.55)"
+      segundos={3.5}
+    >
+      {children}
+    </AnilloGiratorio>
+  ),
+  eclipse: (children) => (
+    <AnilloGiratorio
+      fondo="conic-gradient(from 0deg, #0f172a 0%, #0f172a 55%, #818cf8 75%, #e0e7ff 82%, #0f172a 95%)"
+      brillo="0 0 18px rgba(129, 140, 248, 0.5)"
+      segundos={7}
+    >
+      {children}
+    </AnilloGiratorio>
+  ),
 };
+
+/** Anillo con un degradado cónico girando por dentro (el giro va en una capa aparte para no pisar su `scale`). */
+function AnilloGiratorio({ fondo, brillo, segundos, children }: { fondo: string; brillo: string; segundos: number; children: React.ReactNode }) {
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <div className="absolute inset-0 z-0 overflow-hidden rounded-full" style={{ transform: "scale(1.18)", boxShadow: brillo }}>
+        <div
+          className="absolute -inset-1/4 avatar-frame-motion"
+          style={{ background: fondo, animation: `frame-spin ${segundos}s linear infinite` }}
+        />
+      </div>
+      <Nucleo>{children}</Nucleo>
+    </div>
+  );
+}
 
 function AnilloEstatico({
   start,

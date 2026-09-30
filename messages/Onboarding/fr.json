@@ -257,7 +257,10 @@
       "circuito": "Cadre Circuit (Niveau 25+)",
       "platinum": "Cadre Platine (Niveau 50+)",
       "fire": "Cadre Feu (Niveau 100+)",
-      "cristal": "Cadre Cristal (Niveau 150+)"
+      "cristal": "Cadre Cristal (Niveau 150+)",
+      "laurel": "Laurier (badge Champion)",
+      "aurora": "Aurore (badge Saison en or)",
+      "eclipse": "Éclipse (badge caché)"
     },
     "themes": {
       "dark": "Sombre",
@@ -368,5 +371,9 @@
     "enlace": "Image",
     "copiar": "Copier",
     "obs": "Pour les streams : dans OBS, ajoute une « Source navigateur » avec le lien OBS (480×120). Elle montre ton jeu actuel et ton dernier trophée, et se met à jour toute seule."
+  },
+  "avisos": {
+    "titulo": "Ce dont on te prévient",
+    "descripcion": "Par navigateur, appli et Discord. Les invitations et demandes d’amis arrivent toujours."
   }
 }

@@ -808,9 +808,29 @@ para añadir `user.panelOculto`.
   (Postgres espera al cliente, no ejecuta). Si vuelve a pasar en
   producción, mirar `pg_stat_activity`.
 
-**Pendiente (propuesto, sin hacer):** ~60 formatos `"es-ES"` y 4 fechas con
-locale español fijo pese a los 4 idiomas; marcos animados para niveles
-altos; colores de perfil desbloqueables; avisos por categoría; estado libre
-en Comunidad; retos semanales entre amigos; partir `actions.ts` y
-`profiles.ts` (~1.700 líneas cada uno); juntar Descubrir/Noticias/eSports
-en una sección con pestañas.
+Subido en `cc643de` (despliegue de Vercel correcto).
+
+### Después del push (30 sept 2026)
+- **Descubrir con pestañas** (Descubrir · Noticias · eSports): fuera de
+  "Más" y de `NAV_OCULTABLE` Noticias y eSports.
+- **Avisos por categoría** (`lib/avisosPreferencias.ts`, columna
+  `user.avisosDesactivados`, formulario en Ajustes → General):
+  `avisarUsuario(userId, aviso, categoria?)` no avisa si está apagada; el
+  push de trofeos de `sync.ts` y el resumen semanal también lo miran. Las
+  invitaciones, propuestas de reto, retos de guerra y cancelaciones no
+  llevan categoría: siempre llegan.
+- **Marcos por insignia** (`FRAME_INSIGNIA` y `marcoDisponible` en
+  lib/level.ts): Laurel (Campeón), Aurora (Temporada de oro), Eclipse
+  (Noctámbulo), anillos cónicos girando (`AnilloGiratorio`).
+- **Idioma en fechas y números**: fechas relativas con el idioma de la app
+  (`lib/localeFechas.ts`) en Comunidad, Clanes y DLC; números con el
+  locale en nivel, perfil, panel, Comunidad, Temporada, Ligas, Amigos y el
+  mapa de actividad.
+- Texto desfasado corregido: "Acéptalo desde el Planificador" → Amigos.
+
+**Pendiente:** ~25 `"es-ES"` secundarios (CV, OG image, eSports, precios,
+calculadora...); colores de perfil desbloqueables; estado libre en
+Comunidad; partir `actions.ts` y `profiles.ts`. "Retos semanales entre
+amigos" ya existe como clasificación semanal/mensual en /amigos; darle
+ganador exige decidir contra qué grupo gana cada uno (cada cual tiene
+amigos distintos).

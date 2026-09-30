@@ -53,6 +53,7 @@ import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/dis
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 import { setHiddenNavItems } from "@/lib/navPreferences";
 import { setPanelOculto } from "@/lib/panelPreferences";
+import { setAvisosActivos } from "@/lib/avisosPreferencias";
 import { COOKIES_SESION, cerrarOtrasSesiones } from "@/lib/mobileAuth";
 import { ipActual, limitar } from "@/lib/rateLimit";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
@@ -970,6 +971,12 @@ export async function setHiddenNavItemsAction(formData: FormData): Promise<void>
   const items = formData.getAll("navKey").map(String);
   await setHiddenNavItems(userId, items);
   revalidatePath("/", "layout");
+}
+
+export async function setAvisosActivosAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  await setAvisosActivos(userId, formData.getAll("categoria").map(String));
+  revalidatePath("/ajustes");
 }
 
 export async function setPanelOcultoAction(formData: FormData): Promise<void> {

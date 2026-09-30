@@ -4,6 +4,8 @@ import { getDb } from "@/db";
 import { accounts, users } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { ProfileForm } from "@/components/forms/ProfileForm";
+import { PreferenciasAvisos } from "@/components/PreferenciasAvisos";
+import { CATEGORIAS_AVISO, getAvisosDesactivados } from "@/lib/avisosPreferencias";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getGamesForBackground, getProfileByUserId, getUserBadges } from "@/lib/profiles";
 
@@ -33,7 +35,7 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
 
   if (!dbUser) redirect("/entrar");
 
-  const [nivel, badges, profile, discordVinculado, juegosParaFondo] = await Promise.all([
+  const [nivel, badges, profile, discordVinculado, juegosParaFondo, avisosOff] = await Promise.all([
     getParagonLevel(session.user.id),
     getUserBadges(session.user.id),
     getProfileByUserId(session.user.id),
@@ -48,6 +50,7 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
     // Para el selector visual de "juego para el fondo" — solo id/título/
     // carátula, filtrados ya en SQL, no la biblioteca entera vía getLibrary.
     getGamesForBackground(session.user.id),
+    getAvisosDesactivados(session.user.id).catch(() => new Set<string>()),
   ]);
 
   return (
@@ -69,6 +72,9 @@ export default async function AjustesGeneralPage(props: { searchParams: Promise<
       discordVinculado={discordVinculado}
       cuentasVinculadas={profile?.accounts.filter(a => a.avatarUrl).map(a => ({ platform: a.platform, avatarUrl: a.avatarUrl! })) ?? []}
     />
+      <div className="mt-8">
+        <PreferenciasAvisos categorias={CATEGORIAS_AVISO} desactivadas={[...avisosOff]} />
+      </div>
     </>
   );
 }

@@ -11,6 +11,8 @@
  *     en el localStorage del navegador (lib/apariencia.ts).
  *   - `user.panelOculto`: secciones del panel que cada uno oculta
  *     (lib/panelPreferences.ts).
+ *   - `user.avisosDesactivados`: categorías de aviso que cada uno apaga
+ *     (lib/avisosPreferencias.ts).
  *   - Relleno de `activity` tipo "platinum" con los platinos de los últimos
  *     60 días: desde ahora la sincronización los apunta sola (lib/sync.ts),
  *     con el mismo id determinista, así que repetir el script no duplica.
@@ -44,7 +46,8 @@ async function main() {
     await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "tituloDesbloqueado" text`);
     await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "apariencia" jsonb`);
     await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "panelOculto" jsonb`);
-    console.log("OK: user.tituloDesbloqueado, user.apariencia, user.panelOculto");
+    await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "avisosDesactivados" jsonb`);
+    console.log("OK: user.tituloDesbloqueado, user.apariencia, user.panelOculto, user.avisosDesactivados");
 
     const filas = await sql.unsafe(`
       INSERT INTO "activity" ("id", "userId", "type", "gameId", "createdAt")

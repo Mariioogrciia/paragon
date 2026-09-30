@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { DiaActividad } from "@/lib/profileStats";
 import { TooltipDelegado } from "@/components/TooltipDelegado";
 
@@ -24,13 +24,14 @@ function nivel(trofeos: number): number {
 
 const OPACIDAD_POR_NIVEL = [0, 0.25, 0.45, 0.7, 1];
 
-function fechaLarga(iso: string): string {
+function fechaLarga(iso: string, locale: string): string {
   const [anio, mes, dia] = iso.split("-").map(Number);
-  return new Date(Date.UTC(anio, mes - 1, dia)).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  return new Date(Date.UTC(anio, mes - 1, dia)).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 }
 
 export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
   const t = useTranslations("Analitica.activityHeatmap");
+  const locale = useLocale();
   const DIAS_SEMANA = t.raw("diasSemanaIniciales") as string[];
   const MESES = t.raw("mesesCortos") as string[];
 
@@ -99,7 +100,7 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
                       width={11}
                       height={11}
                       className={nivel(d.trofeos) === 0 ? "hm" : `hm hm${nivel(d.trofeos)}`}
-                      data-t={t("tooltip", { count: d.trofeos, fecha: fechaLarga(d.dia) })}
+                      data-t={t("tooltip", { count: d.trofeos, fecha: fechaLarga(d.dia, locale) })}
                     />
                   ) : null,
                 ),

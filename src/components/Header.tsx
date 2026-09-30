@@ -54,20 +54,9 @@ const NAV_MAS = [
   {
     labelKey: "descubrir",
     href: "/descubrir",
-    match: (p: string) => p.startsWith("/descubrir"),
+    // Noticias y eSports son pestañas de Descubrir (SeccionTabs).
+    match: (p: string) => p.startsWith("/descubrir") || p.startsWith("/noticias") || p.startsWith("/esports"),
     navKey: "descubrir",
-  },
-  {
-    labelKey: "noticias",
-    href: "/noticias",
-    match: (p: string) => p.startsWith("/noticias"),
-    navKey: "noticias",
-  },
-  {
-    labelKey: "esports",
-    href: "/esports",
-    match: (p: string) => p.startsWith("/esports"),
-    navKey: "esports",
   },
   {
     labelKey: "planificador",

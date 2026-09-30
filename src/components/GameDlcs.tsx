@@ -1,6 +1,4 @@
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 interface Props {
   dlcs: { name: string; coverUrl?: string; releaseDate?: string }[];
@@ -10,6 +8,7 @@ export async function GameDlcs({ dlcs }: Props) {
   if (dlcs.length === 0) return null;
 
   const t = await getTranslations("Biblioteca");
+  const locale = await getLocale();
 
   return (
     <div className="mt-12">
@@ -31,7 +30,7 @@ export async function GameDlcs({ dlcs }: Props) {
               <span className="font-bold text-sm truncate" title={dlc.name}>{dlc.name}</span>
               {dlc.releaseDate && (
                 <span className="text-xs text-muted capitalize">
-                  {format(new Date(dlc.releaseDate), "d 'de' MMMM", { locale: es })}...
+                  {new Date(dlc.releaseDate).toLocaleDateString(locale, { day: "numeric", month: "long" })}...
                 </span>
               )}
             </div>

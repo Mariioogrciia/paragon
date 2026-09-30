@@ -70,7 +70,7 @@ async function guerraAbierta(clanId: string) {
 
 async function avisarMiembros(clanId: string, aviso: { titulo: string; texto: string; ruta?: string }) {
   const miembros = await db.select({ userId: clanMembers.userId }).from(clanMembers).where(eq(clanMembers.clanId, clanId));
-  await Promise.all(miembros.map((m) => avisarUsuario(m.userId, aviso)));
+  await Promise.all(miembros.map((m) => avisarUsuario(m.userId, aviso, "ligas")));
 }
 
 export async function retarClan(userId: string, retadorId: string, retadoId: string): Promise<void> {

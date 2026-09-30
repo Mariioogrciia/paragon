@@ -290,7 +290,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
                   </div>
                   {member.hasPlatinum ? (
                     <span className="text-xs font-bold text-[rgb(var(--accent-rgb))]">
-                      {t("LigaPage.retoPlatino", { fecha: new Date(member.platinumAt!).toLocaleDateString("es-ES") })}
+                      {t("LigaPage.retoPlatino", { fecha: new Date(member.platinumAt!).toLocaleDateString(idioma) })}
                     </span>
                   ) : (
                     <span className="text-xs text-muted">{member.progressPercent}%</span>

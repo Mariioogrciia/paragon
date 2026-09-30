@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
@@ -16,6 +16,7 @@ export const metadata = { title: "Temporada · Paragon" };
  */
 export default async function TemporadaPage({ searchParams }: { searchParams: Promise<{ pagina?: string }> }) {
   const t = await getTranslations("Shell.Temporada");
+  const locale = await getLocale();
   const params = await searchParams;
   const cuantos = 20 * paginaDe(params.pagina);
   const session = await auth();
@@ -60,7 +61,7 @@ export default async function TemporadaPage({ searchParams }: { searchParams: Pr
             </div>
             <div className="text-right text-sm text-muted">
               <p>
-                <strong className="text-foreground">{puntos.toLocaleString("es-ES")}</strong> {t("puntos")}
+                <strong className="text-foreground">{puntos.toLocaleString(locale)}</strong> {t("puntos")}
               </p>
               {puesto && <p>{t("puesto", { puesto, total: ranking.length })}</p>}
             </div>
@@ -115,7 +116,7 @@ export default async function TemporadaPage({ searchParams }: { searchParams: Pr
                   <span className="text-sm text-muted">
                     {t("nivelN", { n: r.nivel })} {m?.emoji}
                   </span>
-                  <span className="w-20 text-right font-mono text-sm font-bold text-[var(--accent-text)]">{r.puntos.toLocaleString("es-ES")}</span>
+                  <span className="w-20 text-right font-mono text-sm font-bold text-[var(--accent-text)]">{r.puntos.toLocaleString(locale)}</span>
                 </Link>
               );
             })}

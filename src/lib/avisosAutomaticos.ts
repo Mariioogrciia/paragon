@@ -75,7 +75,7 @@ export async function avisarPerdibles(hasta: number, maximo = 10): Promise<numbe
         titulo: `⚠️ ${c.titulo} tiene ${lista.length} trofeo${lista.length === 1 ? "" : "s"} perdible${lista.length === 1 ? "" : "s"}`,
         texto: `Míralos antes de avanzar: ${primeros}${lista.length > 3 ? "…" : ""}`,
         ruta: c.handle ? `/u/${c.handle}/${c.gameId}` : undefined,
-      });
+      }, "perdibles");
       enviados++;
     }
     // Se apunta también si al final la lista estaba vacía: no hay nada que
@@ -110,7 +110,7 @@ export async function avisarLanzamientos(hasta: number, ahora = new Date()): Pro
       titulo: dias === 0 ? `🎮 ¡${d.titulo} sale hoy!` : `🎮 ${d.titulo} sale mañana`,
       texto: "Está en tu lista de deseados de Paragon.",
       ruta: `/juego/${encodeURIComponent(d.igdbId ? String(d.igdbId) : d.gameId)}`,
-    });
+    }, "lanzamientos");
     await apuntar(d.userId, "lanzamiento", d.gameId);
     enviados++;
   }
@@ -156,7 +156,7 @@ export async function avisarAdelantos(hasta: number, ahora = new Date()): Promis
       titulo: `📉 ${nombre} te ha adelantado en la liga`,
       texto: `Ahora vas ${ahoraPuesto}º de ${liga.length} en la liga del mes (${adelantador.points - yo.points} puntos por detrás).`,
       ruta: "/ligas",
-    });
+    }, "ligas");
     await apuntar(yo.userId, "adelanto", dia);
     enviados++;
   }

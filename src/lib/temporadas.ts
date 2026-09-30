@@ -97,7 +97,7 @@ export async function cerrarTemporadaAnteriorSiToca(ahora = new Date()): Promise
           titulo: medalla ? `${medalla.emoji} Temporada ${nombre} cerrada: nivel ${r.nivel}` : `Temporada ${nombre} cerrada`,
           texto: `${r.puntos} puntos · ${i + 1}º de ${ranking.length}. Empieza una temporada nueva, desde cero.`,
           ruta: "/temporada",
-        });
+        }, "ligas");
       }),
   );
   return insertadas.length;

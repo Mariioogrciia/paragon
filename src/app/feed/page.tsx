@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { getFeed } from "@/lib/feed";
 import { getDestacadosSemana, getHitos, type DestacadosSemana } from "@/lib/comunidad";
@@ -27,6 +27,7 @@ const POR_PAGINA = 20;
  */
 export default async function GlobalFeedPage({ searchParams }: { searchParams: Promise<{ ver?: string; pagina?: string }> }) {
   const t = await getTranslations("Descubrir.FeedPage");
+  const locale = await getLocale();
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
   const userId = session.user.id;
@@ -106,7 +107,7 @@ export default async function GlobalFeedPage({ searchParams }: { searchParams: P
           )}
         </div>
 
-        {destacados && <BarraSemana destacados={destacados} t={t} />}
+        {destacados && <BarraSemana destacados={destacados} t={t} locale={locale} />}
       </div>
     </div>
   );
@@ -127,7 +128,7 @@ function Autor({ user }: { user: { handle: string | null; name: string | null; i
   );
 }
 
-function BarraSemana({ destacados, t }: { destacados: DestacadosSemana; t: Awaited<ReturnType<typeof getTranslations>> }) {
+function BarraSemana({ destacados, t, locale }: { destacados: DestacadosSemana; t: Awaited<ReturnType<typeof getTranslations>>; locale: string }) {
   const { platino, cazadores, tendencias, sesiones } = destacados;
   return (
     // En móvil va ARRIBA, como tira deslizable: debajo quedaba tras 20
@@ -149,7 +150,7 @@ function BarraSemana({ destacados, t }: { destacados: DestacadosSemana; t: Await
             <div className="min-w-0">
               <p className="truncate font-bold group-hover:underline">{platino.juego}</p>
               {platino.rareza !== null && (
-                <p className="text-xs text-muted">{t("platinoSemanaRareza", { rareza: platino.rareza.toLocaleString("es-ES", { maximumFractionDigits: 1 }) })}</p>
+                <p className="text-xs text-muted">{t("platinoSemanaRareza", { rareza: platino.rareza.toLocaleString(locale, { maximumFractionDigits: 1 }) })}</p>
               )}
             </div>
           </Link>
@@ -225,7 +226,7 @@ function BarraSemana({ destacados, t }: { destacados: DestacadosSemana; t: Await
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold group-hover:underline">{s.trofeo}</p>
                     <p className="truncate text-xs text-muted">
-                      {s.juego} · {s.fechaHora.toLocaleString("es-ES", { weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })}
+                      {s.juego} · {s.fechaHora.toLocaleString(locale, { weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })}
                     </p>
                   </div>
                   <span className="shrink-0 text-[0.6875rem] font-bold text-muted">{t("plazasLibres", { n: s.plazasLibres })}</span>

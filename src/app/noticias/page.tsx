@@ -6,6 +6,7 @@ import { UpcomingGames } from "@/components/UpcomingGames";
 import { getGamingNews, noticiasDeTuBiblioteca } from "@/lib/rss";
 import { BackButton } from "@/components/BackButton";
 import { TarjetaNoticia } from "@/components/TarjetaNoticia";
+import { SeccionTabs } from "@/components/SeccionTabs";
 
 export const metadata = {
   title: "Noticias y Lanzamientos - Paragon",
@@ -43,6 +44,7 @@ export default async function NoticiasPage() {
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
       <BackButton fallbackHref="/" />
+      <SeccionTabs seccion="descubrir" />
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2">{t("titulo")}</h1>
         <p className="text-muted">{t("subtitulo")}</p>

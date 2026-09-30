@@ -257,7 +257,10 @@
       "circuito": "Schaltkreis-Rahmen (Level 25+)",
       "platinum": "Platin-Rahmen (Level 50+)",
       "fire": "Feuer-Rahmen (Level 100+)",
-      "cristal": "Kristall-Rahmen (Level 150+)"
+      "cristal": "Kristall-Rahmen (Level 150+)",
+      "laurel": "Lorbeer (Abzeichen Champion)",
+      "aurora": "Aurora (Abzeichen Goldene Saison)",
+      "eclipse": "Eklipse (verstecktes Abzeichen)"
     },
     "themes": {
       "dark": "Dunkel",
@@ -368,5 +371,9 @@
     "enlace": "Bild",
     "copiar": "Kopieren",
     "obs": "Für Streams: Füge in OBS eine „Browserquelle“ mit dem OBS-Link hinzu (480×120). Sie zeigt dein aktuelles Spiel und deine letzte Trophäe und aktualisiert sich selbst."
+  },
+  "avisos": {
+    "titulo": "Worüber wir dich benachrichtigen",
+    "descripcion": "Über Browser, App und Discord. Einladungen und Freundschaftsanfragen kommen immer an."
   }
 }

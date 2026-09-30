@@ -1,7 +1,7 @@
 import { getLigaMensual } from "@/lib/ligas";
 import { listUserLeagues, listPendingLeagueInvites } from "@/lib/leagues";
 import { getMonthlyLeagueHistory } from "@/lib/trophyCase";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import Link from "next/link";
@@ -19,6 +19,7 @@ export const metadata = {
 
 export default async function LigasPage({ searchParams }: { searchParams: Promise<{ pagina?: string }> }) {
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
   const params = await searchParams;
   const cuantos = 25 * paginaDe(params.pagina);
   const session = await auth();
@@ -29,7 +30,7 @@ export default async function LigasPage({ searchParams }: { searchParams: Promis
     getMonthlyLeagueHistory(6),
   ]);
 
-  const monthName = new Date().toLocaleString("es-ES", { month: "long" });
+  const monthName = new Date().toLocaleString(locale, { month: "long" });
   const year = new Date().getFullYear();
 
   return (

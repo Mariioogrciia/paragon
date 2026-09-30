@@ -88,7 +88,7 @@ export async function comprobarAlertasPrecio(hasta: number, maximo = 10): Promis
         titulo: `💸 ${alerta.titulo} a ${eur(precio.final)}`,
         texto: `Ha bajado de tu objetivo de ${eur(alerta.precioObjetivo)} en Steam${rebaja}.`,
         ruta: `/juego/${encodeURIComponent(alerta.gameId)}`,
-      });
+      }, "precios");
       await db.update(priceAlerts).set({ comprobadoAt: ahora, avisadoAt: ahora, precioAvisado: precio.final }).where(clave);
       avisos++;
     } else {

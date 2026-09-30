@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { getFeed } from "@/lib/feed";
 import type { Hito } from "@/lib/comunidad";
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { localeFechas } from "@/lib/localeFechas";
 import { addActivityCommentAction, toggleActivityReactionAction } from "@/app/actions";
 import { REACCIONES } from "@/lib/reacciones";
 import { AchievementIcon } from "@/components/AchievementIcon";
@@ -63,7 +63,8 @@ function NombreAutor({ user }: { user: Autor }) {
 }
 
 function Hace({ fecha }: { fecha: Date }) {
-  return <div className="mt-0.5 text-xs text-muted/60">{formatDistanceToNow(new Date(fecha), { addSuffix: true, locale: es })}</div>;
+  const locale = localeFechas(useLocale());
+  return <div className="mt-0.5 text-xs text-muted/60">{formatDistanceToNow(new Date(fecha), { addSuffix: true, locale })}</div>;
 }
 
 function TarjetaHito({ hito }: { hito: Hito }) {
@@ -104,6 +105,7 @@ function TarjetaHito({ hito }: { hito: Hito }) {
 
 function TarjetaActividad({ activity }: { activity: FeedActivity }) {
   const t = useTranslations("Analitica.activityFeed");
+  const fechas = localeFechas(useLocale());
   const esPlatino = activity.type === "platinum";
 
   let actionText = "";
@@ -197,7 +199,7 @@ function TarjetaActividad({ activity }: { activity: FeedActivity }) {
             {activity.comments.map((comment, index) => (
               <div key={index} className="text-xs bg-muted/10 p-2 rounded-lg">
                 <span className="font-semibold">{comment.userName || t("alguien")}</span>: {comment.body}
-                <div className="text-[0.625rem] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}</div>
+                <div className="text-[0.625rem] text-muted/60 mt-0.5">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: fechas })}</div>
               </div>
             ))}
           </div>

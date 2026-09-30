@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import type { StatsAmigo } from "@/lib/profileStats";
 
@@ -11,6 +11,7 @@ import type { StatsAmigo } from "@/lib/profileStats";
  */
 export async function FriendsLeaderboard({ personas, propioUserId }: { personas: StatsAmigo[]; propioUserId: string }) {
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
 
   if (personas.length <= 1) {
     return (
@@ -44,8 +45,8 @@ export async function FriendsLeaderboard({ personas, propioUserId }: { personas:
                 {esYo && <span className="ml-1.5 text-xs font-normal text-accent">({t("FriendsLeaderboard.tu")})</span>}
               </span>
             </span>
-            <span className="text-right text-sm font-bold">{p.horas.toLocaleString("es-ES")}</span>
-            <span className="text-right text-sm font-bold">{p.trofeos.toLocaleString("es-ES")}</span>
+            <span className="text-right text-sm font-bold">{p.horas.toLocaleString(locale)}</span>
+            <span className="text-right text-sm font-bold">{p.trofeos.toLocaleString(locale)}</span>
             <span className="text-right text-sm font-bold" style={{ color: "var(--platinum)" }}>{p.platinos}</span>
           </Link>
         );

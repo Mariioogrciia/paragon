@@ -14,6 +14,11 @@ const SECCIONES = {
     { labelKey: "ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
     { labelKey: "temporada", href: "/temporada", match: (p: string) => p.startsWith("/temporada") },
   ],
+  descubrir: [
+    { labelKey: "descubrir", href: "/descubrir", match: (p: string) => p.startsWith("/descubrir") },
+    { labelKey: "noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
+    { labelKey: "esports", href: "/esports", match: (p: string) => p.startsWith("/esports") },
+  ],
   comunidad: [
     { labelKey: "actividad", href: "/feed", match: (p: string) => p.startsWith("/feed") },
     { labelKey: "sesiones", href: "/sesiones", match: (p: string) => p.startsWith("/sesiones") },

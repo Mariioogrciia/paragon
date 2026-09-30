@@ -2,6 +2,7 @@ import "server-only";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
 import { enviarDmSiActivo } from "@/lib/discordBot";
+import { avisoPermitido, type CategoriaAviso } from "@/lib/avisosPreferencias";
 
 /**
  * Avisar a un usuario por todo lo que tenga activado: Web Push (navegador o
@@ -10,7 +11,12 @@ import { enviarDmSiActivo } from "@/lib/discordBot";
  * un solo sitio para las alertas de precio, el resumen semanal y las
  * guerras de clanes. Nunca lanza: un canal caído no tumba a los demás.
  */
-export async function avisarUsuario(userId: string, aviso: { titulo: string; texto: string; ruta?: string }): Promise<void> {
+export async function avisarUsuario(
+  userId: string,
+  aviso: { titulo: string; texto: string; ruta?: string },
+  categoria?: CategoriaAviso,
+): Promise<void> {
+  if (categoria && !(await avisoPermitido(userId, categoria))) return;
   const push = { title: aviso.titulo, body: aviso.texto, url: aviso.ruta };
   const resultados = await Promise.allSettled([
     enviarPush(userId, push),

@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { getDb } from "@/db";
 import { eq } from "drizzle-orm";
 import { getParagonLevel } from "@/lib/paragonLevel";
-import { BANNER_REQUISITOS, FRAME_REQUISITOS } from "@/lib/level";
+import { BANNER_REQUISITOS, FRAME_INSIGNIA, FRAME_REQUISITOS, marcoDisponible } from "@/lib/level";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { TITULO_POR_CLAVE, tituloDesbloqueado } from "@/lib/titulos";
 import { userBadges, users } from "@/db/schema";
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     // lo que mande el formulario.
     let profileFrame = profileFrameSolicitado?.trim() || null;
     // Un marco que no existe se descarta (antes se guardaba tal cual).
-    if (profileFrame && FRAME_REQUISITOS[profileFrame] === undefined) profileFrame = null;
+    if (profileFrame && FRAME_REQUISITOS[profileFrame] === undefined && FRAME_INSIGNIA[profileFrame] === undefined) profileFrame = null;
     // Lo mismo para banners de plataforma y títulos especiales: el nivel y
     // las insignias se miran aquí, no se fían del formulario.
     const presetBanner = bannerPresetKey(banner);
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         getParagonLevel(session.user.id),
         getDb().select({ id: userBadges.badgeId }).from(userBadges).where(eq(userBadges.userId, session.user.id)),
       ]);
-      if (profileFrame && nivel.level < FRAME_REQUISITOS[profileFrame]) profileFrame = null;
+      if (profileFrame && !marcoDisponible(profileFrame, nivel.level, insignias.map((i) => i.id))) profileFrame = null;
       if (presetBanner && nivel.level < (BANNER_REQUISITOS[presetBanner] ?? 0)) bannerFinal = null;
       if (tituloPedido && tituloDesbloqueado(tituloPedido, nivel.level, insignias.map((i) => i.id))) tituloFinal = tituloPedido.clave;
     }

@@ -2,6 +2,7 @@ import "server-only";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { activities, gameTrophies, games, userGames, userTrophies, syncRuns, users } from "@/db/schema";
+import { avisoPermitido } from "@/lib/avisosPreferencias";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
 import type { AuthorizationPayload } from "psn-api";
 import {
@@ -719,10 +720,14 @@ export async function syncGameTrophies(
     // app nativa (Android); `enviarPush` es Web Push (navegador/PWA) — un
     // usuario puede tener las dos suscripciones a la vez, de ahí mandar por
     // los dos canales, mismo patrón que ya usa sendFriendRequest.
-    await Promise.all([
-      enviarPush(userId, { ...aviso, icon: info?.iconUrl ?? undefined }),
-      enviarPushFcm(userId, { ...aviso, imageUrl: info?.iconUrl ?? undefined }),
-    ]);
+    // Categoría "trofeos" (Ajustes → Avisos): quien la apaga deja de recibir
+    // este push; el DM de Discord de logros tiene su propio interruptor.
+    if (await avisoPermitido(userId, "trofeos")) {
+      await Promise.all([
+        enviarPush(userId, { ...aviso, icon: info?.iconUrl ?? undefined }),
+        enviarPushFcm(userId, { ...aviso, imageUrl: info?.iconUrl ?? undefined }),
+      ]);
+    }
 
     // Se acaba de conseguir DE VERDAD (no es la primera sincronización, ver
     // `primeraSincronizacion` arriba) — si este era el juego anclado como

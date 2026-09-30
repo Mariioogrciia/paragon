@@ -16,8 +16,6 @@ export const NAV_OCULTABLE = [
   { key: "ligas", label: "Ligas" },
   { key: "amigos", label: "Amigos" },
   { key: "descubrir", label: "Descubrir" },
-  { key: "noticias", label: "Noticias" },
-  { key: "esports", label: "eSports" },
   { key: "planificador", label: "Planificador" },
 ] as const;
 

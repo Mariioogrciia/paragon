@@ -25,6 +25,24 @@ export const FRAME_REQUISITOS: Record<string, number> = {
 };
 
 /**
+ * Marcos que no dependen del nivel sino de una insignia (lib/logros.ts): el
+ * nivel 100 o 150 queda lejísimos (millones de XP) y así hay marcos que se
+ * ganan de otras formas. Comprobados igual que los de nivel.
+ */
+export const FRAME_INSIGNIA: Record<string, string> = {
+  laurel: "campeon",
+  aurora: "temporada_oro",
+  eclipse: "noctambulo",
+};
+
+/** `true` si ese marco se puede usar con este nivel e insignias (o no existe requisito). */
+export function marcoDisponible(marco: string, nivel: number, insignias: string[]): boolean {
+  if (FRAME_REQUISITOS[marco] !== undefined) return nivel >= FRAME_REQUISITOS[marco];
+  if (FRAME_INSIGNIA[marco] !== undefined) return insignias.includes(FRAME_INSIGNIA[marco]);
+  return false;
+}
+
+/**
  * Estilos de interfaz (lib/apariencia.ts) que se desbloquean por nivel. Los
  * de siempre (Clásico, Terminal, Vidrio, Brutalista) siguen libres: esto
  * añade algo que ganar sin quitarle a nadie lo básico. Se comprueba en el

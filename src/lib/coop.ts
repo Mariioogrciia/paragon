@@ -117,7 +117,7 @@ export async function proponerReto(
   const [yo] = await db.select({ name: users.name, handle: users.handle }).from(users).where(eq(users.id, creadorId)).limit(1);
   await avisarUsuario(datos.invitadoId, {
     titulo: `🤝 ${nombreCorto(yo?.name ?? null, yo?.handle ?? null)} te propone platinar juntos`,
-    texto: `${comun.titulo} antes del ${new Date(`${datos.fecha}T12:00:00Z`).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}. Acéptalo desde el Planificador.`,
+    texto: `${comun.titulo} antes del ${new Date(`${datos.fecha}T12:00:00Z`).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}. Acéptalo desde Amigos.`,
     ruta: "/amigos",
   });
 }
@@ -131,7 +131,7 @@ export async function responderReto(userId: string, retoId: string, aceptar: boo
       titulo: "🤝 Reto aceptado",
       texto: `A por ${reto.titulo} los dos antes del ${reto.fechaObjetivo}.`,
       ruta: "/amigos",
-    });
+    }, "social");
   }
 }
 
@@ -212,7 +212,7 @@ export async function revisarRetosCoop(hasta: number): Promise<number> {
     const aviso = completados
       ? { titulo: `🏆 ¡Reto conseguido: ${r.titulo}!`, texto: "Lo habéis terminado los dos a tiempo." }
       : { titulo: `⌛ Se acabó el plazo de ${r.titulo}`, texto: "El reto conjunto ha vencido. ¿Otro intento?" };
-    await Promise.all([r.creadorId, r.invitadoId].map((uid) => avisarUsuario(uid, { ...aviso, ruta: "/amigos" })));
+    await Promise.all([r.creadorId, r.invitadoId].map((uid) => avisarUsuario(uid, { ...aviso, ruta: "/amigos" }, "social")));
     cerrados++;
   }
   return cerrados;

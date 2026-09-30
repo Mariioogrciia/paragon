@@ -5,6 +5,7 @@ import { getEsportsNews } from "@/lib/esportsNews";
 import { TarjetaNoticia } from "@/components/TarjetaNoticia";
 import { getAllPandaScoreMatches } from "@/lib/pandascore";
 import type { NewsItem } from "@/lib/rss";
+import { SeccionTabs } from "@/components/SeccionTabs";
 
 export const metadata = {
   title: "eSports - Paragon",
@@ -29,6 +30,7 @@ export default async function EsportsPage() {
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
       <BackButton fallbackHref="/" />
+      <SeccionTabs seccion="descubrir" />
       <div className="mb-8 flex flex-col gap-8">
         <div>
           <h1 className="font-heading text-3xl font-bold mb-2">{t("titulo")}</h1>
