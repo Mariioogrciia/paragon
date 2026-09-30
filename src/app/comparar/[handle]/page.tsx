@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import {
@@ -27,6 +27,7 @@ export default async function CompararPage({
 }) {
   const { handle } = await params;
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
 
   const session = await auth();
   if (!session?.user) redirect("/entrar");
@@ -167,7 +168,7 @@ export default async function CompararPage({
                 <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">{t("CompararPage.statPlatinos")}</p>
               </div>
               <div>
-                <p className="font-heading text-4xl font-bold leading-none">{stats.trofeos.toLocaleString("es-ES")}</p>
+                <p className="font-heading text-4xl font-bold leading-none">{stats.trofeos.toLocaleString(locale)}</p>
                 <p className="mt-2 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted">{t("CompararPage.statTrofeos")}</p>
               </div>
               <div>
@@ -201,7 +202,7 @@ export default async function CompararPage({
               <span className="font-heading text-2xl font-bold" style={{ color: player.color }}>{t("CompararPage.nivelAbreviado", { nivel: player.level.level })}</span>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full" style={{ width: `${player.level.progreso}%`, background: player.color }} /></div>
-            <p className="mt-2 text-xs text-muted">{t("CompararPage.xpParaNivel", { xp: player.level.xp.toLocaleString("es-ES"), restante: player.level.restante.toLocaleString("es-ES"), siguiente: player.level.siguienteNivel })}</p>
+            <p className="mt-2 text-xs text-muted">{t("CompararPage.xpParaNivel", { xp: player.level.xp.toLocaleString(locale), restante: player.level.restante.toLocaleString(locale), siguiente: player.level.siguienteNivel })}</p>
           </div>
         ))}
       </section>

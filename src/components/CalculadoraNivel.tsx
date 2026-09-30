@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { calcularObjetivoNivel } from "@/lib/calculadoraNivel";
 
 /**
@@ -11,6 +11,7 @@ import { calcularObjetivoNivel } from "@/lib/calculadoraNivel";
  */
 export function CalculadoraNivel({ nivelActual, xpActual }: { nivelActual: number; xpActual: number }) {
   const t = useTranslations("Analitica.calculadoraNivel");
+  const locale = useLocale();
   const [objetivo, setObjetivo] = useState(String(nivelActual + 10));
   const nivelObjetivo = Number(objetivo);
   const valido = Number.isFinite(nivelObjetivo) && nivelObjetivo > 0;
@@ -44,14 +45,14 @@ export function CalculadoraNivel({ nivelActual, xpActual }: { nivelActual: numbe
       ) : (
         <div>
           <p className="mb-3 text-sm">
-            {t.rich("teFaltan", { xp: resultado!.xpFaltante.toLocaleString("es-ES"), strong: (chunks) => <span className="font-heading text-xl font-bold text-accent-text">{chunks}</span> })}
+            {t.rich("teFaltan", { xp: resultado!.xpFaltante.toLocaleString(locale), strong: (chunks) => <span className="font-heading text-xl font-bold text-accent-text">{chunks}</span> })}
           </p>
           <p className="mb-1.5 text-xs font-bold uppercase tracking-widest text-muted">
             {t("orientativo")}
           </p>
           <ul className="text-xs text-muted">
             {resultado!.equivalencias.map((e) => (
-              <li key={e.label}>{t("equivalencia", { cantidad: e.cantidad.toLocaleString("es-ES"), label: e.label })}</li>
+              <li key={e.label}>{t("equivalencia", { cantidad: e.cantidad.toLocaleString(locale), label: e.label })}</li>
             ))}
           </ul>
         </div>

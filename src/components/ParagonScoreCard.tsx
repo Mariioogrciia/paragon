@@ -1,6 +1,6 @@
 import { PLATFORM_LABEL, type Platform } from "@/lib/types";
 import type { ParagonScoreBreakdown } from "@/lib/paragonScore";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 /**
  * "Paragon Score" — puntuación unificada entre plataformas (lib/paragonScore.ts).
@@ -13,6 +13,7 @@ export async function ParagonScoreCard({ score }: { score: ParagonScoreBreakdown
   if (score.total === 0) return null;
 
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
   const max = Math.max(...score.porPlataforma.map((p) => p.puntos), 1);
 
   return (
@@ -23,7 +24,7 @@ export async function ParagonScoreCard({ score }: { score: ParagonScoreBreakdown
       </div>
 
       <p className="font-heading text-4xl font-bold tabular-nums" style={{ color: "var(--accent-text)" }}>
-        {score.total.toLocaleString("es-ES")}
+        {score.total.toLocaleString(locale)}
       </p>
 
       <div className="mt-5 flex flex-col gap-3">
@@ -32,7 +33,7 @@ export async function ParagonScoreCard({ score }: { score: ParagonScoreBreakdown
             <div className="mb-1 flex items-baseline justify-between text-xs">
               <span className="font-semibold text-foreground">{PLATFORM_LABEL[p.platform as Platform] ?? p.platform}</span>
               <span className="text-muted">
-                {t("ParagonScoreCard.platformStats", { puntos: p.puntos.toLocaleString("es-ES"), count: p.trofeos })}
+                {t("ParagonScoreCard.platformStats", { puntos: p.puntos.toLocaleString(locale), count: p.trofeos })}
               </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--surface-2)" }}>

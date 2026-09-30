@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { refrescarJuegoAction, saveGameNotesAction } from "@/app/actions";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";
 import { TrophyPhoto } from "@/components/TrophyList";
@@ -51,6 +51,7 @@ export function FocusMode({
   oraculo?: Prevision | null;
 }) {
   const t = useTranslations("Biblioteca.FocusMode");
+  const locale = useLocale();
   const router = useRouter();
   const [pendiente, startTransition] = useTransition();
   const [aviso, setAviso] = useState<string | null>(null);
@@ -230,7 +231,7 @@ export function FocusMode({
           <p className="mt-2 text-[0.8125rem] text-white/50">
             {t.rich("oraculo", {
               strong: (chunks) => <span className="font-semibold text-white/80">{chunks}</span>,
-              fecha: new Date(oraculo.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "long" }),
+              fecha: new Date(oraculo.fecha).toLocaleDateString(locale, { day: "numeric", month: "long" }),
               semanas: oraculo.semanas,
             })}
           </p>

@@ -1,11 +1,11 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { EtaPlatino } from "@/lib/eta";
 
-const FORMATO_FECHA = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric" });
 
 /** Cuándo, a tu ritmo de los últimos 30 días, tocarías el platino/100%. */
 export async function EtaPlatinoCard({ eta, esMio }: { eta: EtaPlatino; esMio: boolean }) {
   const t = await getTranslations("Biblioteca");
+  const locale = await getLocale();
   const pronoun = esMio ? "mine" : "theirs";
   const rate =
     eta.ritmoDiario >= 1
@@ -21,9 +21,9 @@ export async function EtaPlatinoCard({ eta, esMio }: { eta: EtaPlatino; esMio: b
         {t("EtaPlatino.heading")}
       </h2>
       <div className="flex flex-wrap items-baseline gap-3">
-        <p className="font-heading text-2xl font-bold">{FORMATO_FECHA.format(eta.fecha)}</p>
+        <p className="font-heading text-2xl font-bold">{new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(eta.fecha)}</p>
         <span className="text-[0.8125rem] text-muted">
-          {eta.diasRestantes === 1 ? t("EtaPlatino.tomorrow") : t("EtaPlatino.inDays", { days: eta.diasRestantes.toLocaleString("es-ES") })}
+          {eta.diasRestantes === 1 ? t("EtaPlatino.tomorrow") : t("EtaPlatino.inDays", { days: eta.diasRestantes.toLocaleString(locale) })}
         </span>
       </div>
       <p className="mt-3 text-[0.6875rem] leading-relaxed text-muted">

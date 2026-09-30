@@ -537,5 +537,13 @@
     "nivel": "Nivel {n}",
     "insignia": "Insignia «{nombre}»",
     "ayuda": "Se desbloquean subiendo de nivel y consiguiendo insignias. Salen junto a tu nombre en el perfil y en Comunidad."
+  },
+  "EfectosNombre": {
+    "label": "Efecto del nombre",
+    "dorado": "Dorado",
+    "aurora": "Aurora",
+    "platino": "Platino",
+    "neon": "Neón",
+    "ayuda": "Tu nombre con un brillo animado en el perfil. Se ganan con insignias o nivel."
   }
 }

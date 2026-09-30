@@ -6,6 +6,7 @@ import { getParagonLevel } from "@/lib/paragonLevel";
 import { BANNER_REQUISITOS, FRAME_INSIGNIA, FRAME_REQUISITOS, marcoDisponible } from "@/lib/level";
 import { bannerPresetKey } from "@/lib/bannerPresets";
 import { TITULO_POR_CLAVE, tituloDesbloqueado } from "@/lib/titulos";
+import { EFECTO_POR_CLAVE, efectoDisponible } from "@/lib/efectosNombre";
 import { userBadges, users } from "@/db/schema";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
     const theme = formData.get("theme") as string | null;
     const profileSectionOrderRaw = formData.get("profileSectionOrder") as string | null;
     const tituloDesbloqueadoSolicitado = formData.get("tituloDesbloqueado") as string | null;
+    const efectoNombreSolicitado = formData.get("efectoNombre") as string | null;
 
     // Bloquea el guardado entero si cualquiera de los campos que otros
     // pueden ver (nombre, título, estado) lleva lenguaje ofensivo — nada
@@ -99,7 +101,9 @@ export async function POST(request: Request) {
     const tituloPedido = tituloDesbloqueadoSolicitado?.trim() ? TITULO_POR_CLAVE.get(tituloDesbloqueadoSolicitado.trim()) : undefined;
     let bannerFinal = banner;
     let tituloFinal: string | null = null;
-    if (profileFrame || (presetBanner && BANNER_REQUISITOS[presetBanner] !== undefined) || tituloPedido) {
+    const efectoPedido = efectoNombreSolicitado?.trim() ? EFECTO_POR_CLAVE.get(efectoNombreSolicitado.trim()) : undefined;
+    let efectoFinal: string | null = null;
+    if (profileFrame || (presetBanner && BANNER_REQUISITOS[presetBanner] !== undefined) || tituloPedido || efectoPedido) {
       const [nivel, insignias] = await Promise.all([
         getParagonLevel(session.user.id),
         getDb().select({ id: userBadges.badgeId }).from(userBadges).where(eq(userBadges.userId, session.user.id)),
@@ -107,6 +111,7 @@ export async function POST(request: Request) {
       if (profileFrame && !marcoDisponible(profileFrame, nivel.level, insignias.map((i) => i.id))) profileFrame = null;
       if (presetBanner && nivel.level < (BANNER_REQUISITOS[presetBanner] ?? 0)) bannerFinal = null;
       if (tituloPedido && tituloDesbloqueado(tituloPedido, nivel.level, insignias.map((i) => i.id))) tituloFinal = tituloPedido.clave;
+      if (efectoPedido && efectoDisponible(efectoPedido, nivel.level, insignias.map((i) => i.id))) efectoFinal = efectoPedido.clave;
     }
 
     let profileSectionOrder: string[] | null = null;
@@ -132,6 +137,7 @@ export async function POST(request: Request) {
       profileBackgroundGameId: profileBackgroundGameId?.trim().slice(0, 200) || null,
       profileBannerUrl: bannerFinal,
       tituloDesbloqueado: tituloFinal,
+      efectoNombre: efectoFinal,
       image: imagen,
       ...(imagen ? { avatarPersonalizado: true } : {}),
       profileColor: color,

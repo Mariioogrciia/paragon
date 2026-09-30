@@ -541,3 +541,19 @@ h3,
   }
 }
 
+
+/* Efecto de nombre del perfil (lib/efectosNombre.ts): degradado que se desplaza. */
+@keyframes nombre-brillo {
+  from { background-position: 0% 50%; }
+  to { background-position: 200% 50%; }
+}
+.nombre-efecto {
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: nombre-brillo 4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nombre-efecto { animation: none; }
+}

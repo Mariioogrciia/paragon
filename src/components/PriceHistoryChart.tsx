@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import type { PuntoPrecio } from "@/lib/itad";
 
@@ -65,6 +65,7 @@ const MS_DIA = 86_400_000;
 
 export function PriceHistoryChart({ puntos, compact = false }: Props) {
   const t = useTranslations("Analitica.priceHistoryChart");
+  const locale = useLocale();
   const RANGOS: { key: RangoKey; label: string; dias: number | null }[] = RANGO_DIAS.map((r) => ({
     ...r,
     label: t(r.key === "7d" ? "rango7d" : r.key === "1m" ? "rango1m" : r.key === "3m" ? "rango3m" : r.key === "1a" ? "rango1a" : "rangoTodo"),
@@ -149,12 +150,12 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
   const spanDias = (new Date(dias[dias.length - 1].fecha).getTime() - new Date(dias[0].fecha).getTime()) / MS_DIA;
   const formatoFecha = (iso: string) => {
     const d = new Date(iso);
-    if (spanDias > 540) return d.toLocaleDateString("es-ES", { year: "numeric" });
-    if (spanDias > 60) return d.toLocaleDateString("es-ES", { month: "short", year: "2-digit" });
-    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
+    if (spanDias > 540) return d.toLocaleDateString(locale, { year: "numeric" });
+    if (spanDias > 60) return d.toLocaleDateString(locale, { month: "short", year: "2-digit" });
+    return d.toLocaleDateString(locale, { day: "2-digit", month: "short" });
   };
   const formatoTooltip = (iso: string) =>
-    new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+    new Date(iso).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" });
 
   const nTicks = Math.min(N_TICKS, dias.length);
   const ticks = Array.from({ length: nTicks }, (_, i) => {

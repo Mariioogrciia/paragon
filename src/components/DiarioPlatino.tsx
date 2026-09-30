@@ -1,8 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { DiarioPlatino as Diario } from "@/lib/diarioPlatino";
 
-function fechaLarga(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+function fechaLarga(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 }
 
 /**
@@ -14,6 +14,7 @@ function fechaLarga(iso: string): string {
  */
 export async function DiarioPlatino({ diario, titulo }: { diario: Diario; titulo: string }) {
   const t = await getTranslations("Biblioteca.DiarioPlatino");
+  const locale = await getLocale();
   const strong = (chunks: React.ReactNode) => <span className="font-semibold text-foreground">{chunks}</span>;
   const italic = (chunks: React.ReactNode) => <span className="italic">{chunks}</span>;
 
@@ -30,7 +31,7 @@ export async function DiarioPlatino({ diario, titulo }: { diario: Diario; titulo
             strong,
             italic,
             titulo,
-            fecha: fechaLarga(diario.primeraFecha),
+            fecha: fechaLarga(diario.primeraFecha, locale),
             primerTrofeo: diario.primerTrofeo,
           })}
         </p>
@@ -57,7 +58,7 @@ export async function DiarioPlatino({ diario, titulo }: { diario: Diario; titulo
         <p>
           {t.rich("final", {
             strong,
-            fecha: fechaLarga(diario.fechaPlatino),
+            fecha: fechaLarga(diario.fechaPlatino, locale),
             dias: diario.diasTotales,
           })}
         </p>

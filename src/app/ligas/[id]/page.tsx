@@ -24,9 +24,10 @@ function textoDuracion(
   unit: string | null,
   endsAt: string | null,
   t: Awaited<ReturnType<typeof getTranslations>>,
+  locale: string,
 ): string {
   if (!endsAt) return t("LigaPage.sinFechaFin");
-  const fecha = new Date(endsAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+  const fecha = new Date(endsAt).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
   if (value && unit && (UNIDADES as readonly string[]).includes(unit)) {
     const claves: Record<(typeof UNIDADES)[number], [string, string]> = {
       dias: ["unidadDia", "unidadDias"],
@@ -113,7 +114,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
       <div className="mb-8">
         <h1 className="font-heading text-3xl font-bold mb-2">{league.name}</h1>
         <p className="text-muted">{t("LigaPage.clasificacionDesde")}</p>
-        <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt, t)}</p>
+        <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt, t, idioma)}</p>
       </div>
 
       <div className="bg-surface border border-border rounded-[18px] overflow-hidden shadow-sm mb-10">

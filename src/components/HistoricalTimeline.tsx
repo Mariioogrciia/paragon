@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { HitosHistoricos } from "@/lib/profileStats";
 
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
-function fechaCorta(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+function fechaCorta(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 }
 
 function Hito({
@@ -60,6 +60,7 @@ const ICONO_GRADO: Record<string, string> = {
 
 export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
   const t = useTranslations("Analitica.historicalTimeline");
+  const locale = useLocale();
   const { primerTrofeo, primerPlatino, trofeoMasRaro, platinoAnejo, rachaMasLarga } = hitos;
 
   if (!primerTrofeo && !primerPlatino && !trofeoMasRaro && !platinoAnejo && !rachaMasLarga) return null;
@@ -72,7 +73,7 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
           etiqueta={t("tuPrimerTrofeo")}
           titulo={primerTrofeo.nombre}
           iconUrl={primerTrofeo.iconUrl}
-          detalle={`${fechaCorta(primerTrofeo.fecha)} · ${primerTrofeo.tituloJuego}`}
+          detalle={`${fechaCorta(primerTrofeo.fecha, locale)} · ${primerTrofeo.tituloJuego}`}
           href={`/juego/${primerTrofeo.gameId}`}
         />
       )}
@@ -83,7 +84,7 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
           etiqueta={t("tuPrimerPlatino")}
           titulo={primerPlatino.titulo}
           iconUrl={primerPlatino.iconUrl}
-          detalle={fechaCorta(primerPlatino.fecha)}
+          detalle={fechaCorta(primerPlatino.fecha, locale)}
           href={`/juego/${primerPlatino.gameId}`}
         />
       )}
@@ -120,7 +121,7 @@ export function HistoricalTimeline({ hitos }: { hitos: HitosHistoricos }) {
           etiqueta={t("tuRachaMasLarga")}
           titulo={t("diasSeguidos", { count: rachaMasLarga.dias })}
           iconUrl={null}
-          detalle={t("rachaDetalle", { desde: fechaCorta(rachaMasLarga.desde), hasta: fechaCorta(rachaMasLarga.hasta) })}
+          detalle={t("rachaDetalle", { desde: fechaCorta(rachaMasLarga.desde, locale), hasta: fechaCorta(rachaMasLarga.hasta, locale) })}
         />
       )}
     </div>

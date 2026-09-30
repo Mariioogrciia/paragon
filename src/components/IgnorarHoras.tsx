@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { EyeOff, RotateCcw } from "lucide-react";
 import { setHorasIgnoradasAction } from "@/app/actions";
 
@@ -12,9 +12,10 @@ import { setHorasIgnoradasAction } from "@/app/actions";
  */
 export function IgnorarHoras({ gameId, minutos, ignoradas: inicial }: { gameId: string; minutos: number; ignoradas: boolean }) {
   const t = useTranslations("Biblioteca.IgnorarHoras");
+  const locale = useLocale();
   const [ignoradas, setIgnoradas] = useState(inicial);
   const [pendiente, startTransition] = useTransition();
-  const horas = Math.round(minutos / 60).toLocaleString("es-ES");
+  const horas = Math.round(minutos / 60).toLocaleString(locale);
 
   function alternar() {
     const nuevo = !ignoradas;

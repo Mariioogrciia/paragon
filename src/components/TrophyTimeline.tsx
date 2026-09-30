@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { colorFor } from "@/lib/design";
 import { GRADES, type Trophy, type TrophyGrade } from "@/lib/types";
 
@@ -16,8 +16,8 @@ const MONTH_LABEL_HEIGHT_PX = 20;
  * justo en el borde. */
 const MARKER_PADDING_PX = 16;
 
-function formatFecha(millis: number): string {
-  return new Date(millis).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+function formatFecha(millis: number, locale: string): string {
+  return new Date(millis).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 }
 
 /**
@@ -44,6 +44,7 @@ function formatFecha(millis: number): string {
  */
 export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   const t = useTranslations("Analitica.trophyTimeline");
+  const locale = useLocale();
   const GRADE_LABEL: Record<TrophyGrade, string> = { platinum: t("platino"), gold: t("oro"), silver: t("plata"), bronze: t("bronce") };
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [popupDia, setPopupDia] = useState<string | null>(null);
@@ -107,7 +108,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
     fracUltimaEtiqueta = frac;
     etiquetasMes.push({
       frac,
-      texto: new Date(`${dia}T00:00:00Z`).toLocaleDateString("es-ES", { month: "short", year: "2-digit" }),
+      texto: new Date(`${dia}T00:00:00Z`).toLocaleDateString(locale, { month: "short", year: "2-digit" }),
     });
   });
 
@@ -198,7 +199,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                   >
                     <p className="text-xs font-bold">{single.name}</p>
                     <p className="mt-0.5 text-[0.6875rem] text-muted">
-                      {formatFecha(single.fechaMillis)} · {single.rarityPercent.toFixed(1)}%
+                      {formatFecha(single.fechaMillis, locale)} · {single.rarityPercent.toFixed(1)}%
                     </p>
                   </div>
                 )}
@@ -232,7 +233,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
           >
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-bold">
-                {t("popupTitulo", { fecha: formatFecha(grupoPopup[0].fechaMillis), count: grupoPopup.length })}
+                {t("popupTitulo", { fecha: formatFecha(grupoPopup[0].fechaMillis, locale), count: grupoPopup.length })}
               </p>
               <button
                 type="button"

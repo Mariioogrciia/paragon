@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import { Badges } from "@/components/Badges";
 import { DescargarPdfButton } from "@/components/DescargarPdfButton";
@@ -30,6 +30,7 @@ export default async function HojaDeServiciosPage({
 }) {
   const { handle } = await params;
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
 
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
@@ -80,7 +81,7 @@ export default async function HojaDeServiciosPage({
         <div className="shrink-0 text-right">
           <p className="font-heading text-2xl font-bold">{t("CvPage.nivel", { nivel: nivel.level })}</p>
           <p className="text-xs text-muted print:text-black/60">
-            {t("CvPage.xpParagon", { xp: nivel.xp.toLocaleString("es-ES") })}
+            {t("CvPage.xpParagon", { xp: nivel.xp.toLocaleString(locale) })}
           </p>
         </div>
       </header>
@@ -90,7 +91,7 @@ export default async function HojaDeServiciosPage({
           { valor: stats.platinos, etiqueta: t("CvPage.statPlatinos") },
           { valor: stats.trofeos, etiqueta: t("CvPage.statTrofeos") },
           { valor: stats.juegos, etiqueta: t("CvPage.statJuegos") },
-          { valor: horas > 0 ? t("CvPage.horas", { horas: horas.toLocaleString("es-ES") }) : "—", etiqueta: t("CvPage.statJugadas") },
+          { valor: horas > 0 ? t("CvPage.horas", { horas: horas.toLocaleString(locale) }) : "—", etiqueta: t("CvPage.statJugadas") },
         ].map((item) => (
           <div
             key={item.etiqueta}

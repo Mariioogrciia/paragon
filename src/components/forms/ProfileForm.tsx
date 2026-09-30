@@ -9,6 +9,7 @@ import { normalizeSectionOrder } from "@/lib/profileSections";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
 import { marcoDisponible } from "@/lib/level";
 import { TITULOS, TITULO_POR_CLAVE, tituloDesbloqueado } from "@/lib/titulos";
+import { EFECTOS_NOMBRE, EFECTO_POR_CLAVE, efectoDisponible } from "@/lib/efectosNombre";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
@@ -33,6 +34,7 @@ interface ProfileFormUser {
   profileFrame?: string | null;
   statusText?: string | null;
   tituloDesbloqueado?: string | null;
+  efectoNombre?: string | null;
   theme?: string | null;
   profileSectionOrder?: string[] | null;
   discordDmEnabled?: boolean;
@@ -94,6 +96,11 @@ export function ProfileForm({
     return encontrado && tituloDesbloqueado(encontrado, nivel, badges) ? encontrado.clave : "";
   };
   const [tituloEspecial, setTituloEspecial] = useState(tituloEspecialValido(user.tituloDesbloqueado));
+  const efectoValido = (clave: string | null | undefined) => {
+    const e = clave ? EFECTO_POR_CLAVE.get(clave) : undefined;
+    return e && efectoDisponible(e, nivel, badges) ? e.clave : "";
+  };
+  const [efecto, setEfecto] = useState(efectoValido(user.efectoNombre));
   const marcoBloqueado = (v: string) => v !== "" && !marcoDisponible(v, nivel, badges);
   const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
   const [fondoJuegoId, setFondoJuegoId] = useState(user.profileBackgroundGameId ?? "");
@@ -156,6 +163,7 @@ export function ProfileForm({
     setSectionOrderJson(inicial.profileSectionOrder);
     setTitulo(user.profileTitle ?? "");
     setTituloEspecial(tituloEspecialValido(user.tituloDesbloqueado));
+    setEfecto(efectoValido(user.efectoNombre));
     setMarco(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
     setFondoJuegoId(user.profileBackgroundGameId ?? "");
     setBanner(user.profileBannerUrl);
@@ -174,6 +182,7 @@ export function ProfileForm({
     sectionOrderJson !== inicial.profileSectionOrder ||
     titulo !== (user.profileTitle ?? "") ||
     tituloEspecial !== tituloEspecialValido(user.tituloDesbloqueado) ||
+    efecto !== efectoValido(user.efectoNombre) ||
     marco !== (marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? "")) ||
     fondoJuegoId !== (user.profileBackgroundGameId ?? "") ||
     banner !== user.profileBannerUrl ||
@@ -395,6 +404,45 @@ export function ProfileForm({
                   })}
                 </div>
                 <p className="mt-1.5 text-xs text-muted">{tp("TituloEspecial.ayuda")}</p>
+              </div>
+              <div className="mt-4">
+                <input type="hidden" name="efectoNombre" value={efecto} />
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted">{tp("EfectosNombre.label")}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setEfecto("")}
+                    aria-pressed={efecto === ""}
+                    className="rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold transition-colors hover:text-foreground"
+                    style={{ border: `1px solid ${efecto === "" ? "var(--accent)" : "var(--border)"}`, color: "var(--muted)" }}
+                  >
+                    {tp("TituloEspecial.ninguno")}
+                  </button>
+                  {EFECTOS_NOMBRE.map((e) => {
+                    const libre = efectoDisponible(e, nivel, badges);
+                    const requisito = "nivel" in e.requisito
+                      ? tp("TituloEspecial.nivel", { n: e.requisito.nivel })
+                      : tp("TituloEspecial.insignia", { nombre: tp(`Badges.items.${e.requisito.insignia}.name`) });
+                    return (
+                      <button
+                        key={e.clave}
+                        type="button"
+                        disabled={!libre}
+                        onClick={() => setEfecto(e.clave)}
+                        aria-pressed={efecto === e.clave}
+                        title={libre ? undefined : requisito}
+                        className="rounded-full px-3 py-1 text-[0.75rem] font-bold transition-opacity enabled:hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-35"
+                        style={{ border: `1px solid ${efecto === e.clave ? "var(--accent)" : "var(--border)"}` }}
+                      >
+                        {libre ? "" : "🔒 "}
+                        <span className="nombre-efecto" style={{ backgroundImage: e.degradado }}>
+                          {tp(`EfectosNombre.${e.clave}`)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-1.5 text-xs text-muted">{tp("EfectosNombre.ayuda")}</p>
               </div>
             </div>
               )}

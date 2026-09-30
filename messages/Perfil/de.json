@@ -537,5 +537,13 @@
     "nivel": "Stufe {n}",
     "insignia": "Abzeichen „{nombre}“",
     "ayuda": "Werden durch Stufenaufstiege und Abzeichen freigeschaltet. Erscheinen neben deinem Namen im Profil und in der Community."
+  },
+  "EfectosNombre": {
+    "label": "Namenseffekt",
+    "dorado": "Golden",
+    "aurora": "Aurora",
+    "platino": "Platin",
+    "neon": "Neon",
+    "ayuda": "Dein Name mit animiertem Glanz im Profil. Wird mit Abzeichen oder Stufe verdient."
   }
 }

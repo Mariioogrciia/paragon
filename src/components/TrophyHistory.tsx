@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { StatTile } from "@/components/StatTile";
 import type { MesConTrofeos, Rachas, ResumenHistorico } from "@/lib/history";
 
@@ -40,6 +40,7 @@ export function TrophyHistory({
   totalPerfil: number;
 }) {
   const t = useTranslations("Analitica.trophyHistory");
+  const locale = useLocale();
   const mesesCortos = t.raw("mesesCortos") as string[];
 
   if (resumen.conFecha === 0) {
@@ -191,7 +192,7 @@ export function TrophyHistory({
         </div>
 
         <p className="mt-4 text-[0.6875rem] text-muted">
-          {t("footer", { conFecha: resumen.conFecha.toLocaleString("es-ES"), total: totalPerfil.toLocaleString("es-ES") })}
+          {t("footer", { conFecha: resumen.conFecha.toLocaleString(locale), total: totalPerfil.toLocaleString(locale) })}
         </p>
       </div>
     </section>

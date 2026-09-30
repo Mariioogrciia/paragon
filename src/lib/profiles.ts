@@ -58,6 +58,8 @@ export interface ProfileRow {
   statusText?: string | null;
   /** Título especial desbloqueado (lib/titulos.ts). */
   tituloDesbloqueado?: string | null;
+  /** Efecto animado del nombre (lib/efectosNombre.ts). */
+  efectoNombre?: string | null;
   /** Acento/estilo/tamaño de texto guardados en la cuenta (lib/apariencia.ts). */
   apariencia?: { acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string } | null;
   /** Modo de tema (dark/light/oled/high-contrast) aplicado solo al contenedor
@@ -155,6 +157,7 @@ async function selectProfile(where: ReturnType<typeof eq>): Promise<ProfileRow |
       profileFrame: users.profileFrame,
       statusText: users.statusText,
       tituloDesbloqueado: users.tituloDesbloqueado,
+      efectoNombre: users.efectoNombre,
       apariencia: users.apariencia,
       theme: users.theme,
       profileSectionOrder: users.profileSectionOrder,

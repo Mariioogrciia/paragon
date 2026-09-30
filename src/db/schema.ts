@@ -78,6 +78,8 @@ export const users = pgTable("user", {
   panelOculto: jsonb("panelOculto").$type<string[]>(),
   /** Categorías de aviso apagadas por el usuario (lib/avisosPreferencias.ts). */
   avisosDesactivados: jsonb("avisosDesactivados").$type<string[]>(),
+  /** Efecto animado del nombre en el perfil (lib/efectosNombre.ts). */
+  efectoNombre: text("efectoNombre"),
 
   /**
    * Orden de las secciones del perfil público (wrap, stats, nivel, logros,

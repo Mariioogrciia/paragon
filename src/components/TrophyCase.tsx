@@ -1,3 +1,4 @@
+import { useLocale } from "next-intl";
 import type { TrophyCaseAward } from "@/lib/trophyCase";
 import { TrophyTile } from "@/components/TrophyIcon";
 
@@ -12,6 +13,7 @@ import { TrophyTile } from "@/components/TrophyIcon";
  * alto que hay", no un icono importado de fuera.
  */
 export function TrophyCase({ items }: { items: TrophyCaseAward[] }) {
+  const locale = useLocale();
   if (items.length === 0) return null;
 
   return (
@@ -19,7 +21,7 @@ export function TrophyCase({ items }: { items: TrophyCaseAward[] }) {
       {items.map((award, i) => (
         <span
           key={`${award.kind}-${award.titulo}-${i}`}
-          title={new Date(award.earnedAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+          title={new Date(award.earnedAt).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}
           className="inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-xs font-bold"
           style={{ background: "rgba(159, 212, 236, 0.1)", border: "1px solid rgba(159, 212, 236, 0.35)", color: "var(--platinum)" }}
         >

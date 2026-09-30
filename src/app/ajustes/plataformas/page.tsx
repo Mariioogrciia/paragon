@@ -13,7 +13,7 @@ import { PLATFORM_LABEL, type AccountPlatform, type PlataformaVinculable, type P
 import { getSyncHistory } from "@/lib/syncHistory";
 import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo, EpicGamesLogo } from "@/components/ui/PlatformLogos";
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export const metadata = { title: "Ajustes · Paragon" };
 
@@ -151,6 +151,7 @@ export default async function AjustesPlataformasPage() {
   ]);
 
   const t = await getTranslations("Onboarding");
+  const locale = await getLocale();
 
   return (
     <div className="flex flex-col gap-8">
@@ -256,7 +257,7 @@ export default async function AjustesPlataformasPage() {
                   {t("ajustesPlataformas.history.row", {
                     games: run.games,
                     newTrophies: run.newTrophies,
-                    date: run.createdAt.toLocaleString("es-ES", { timeZone: tz }),
+                    date: run.createdAt.toLocaleString(locale, { timeZone: tz }),
                   })}
                 </span>
               </div>

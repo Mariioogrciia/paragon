@@ -46,6 +46,7 @@ import { VitrinasPerfil } from "@/components/VitrinasPerfil";
 import { ChipTemporada } from "@/components/ChipTemporada";
 import { MedallasTemporada } from "@/components/MedallasTemporada";
 import { TituloEspecial } from "@/components/TituloEspecial";
+import { EFECTO_POR_CLAVE } from "@/lib/efectosNombre";
 import { getVitrinas } from "@/lib/vitrinas";
 
 
@@ -204,6 +205,7 @@ export default async function PerfilPage({
       : Promise.resolve("ninguna" as const),
   ]);
 
+  const efectoNombre = profile.efectoNombre ? EFECTO_POR_CLAVE.get(profile.efectoNombre) : undefined;
   const [medidasLogros, temporadasCerradas] = await Promise.all([
     medirLogros(profile.userId, nivelParagon.level),
     historialTemporadas(profile.userId).catch(() => []),
@@ -388,7 +390,13 @@ export default async function PerfilPage({
                     [{clanMembership.clan.tag}]
                   </Link>
                 )}
-                {profile.displayName ?? `@${handle}`}
+                {efectoNombre ? (
+                  <span className="nombre-efecto" style={{ backgroundImage: efectoNombre.degradado }}>
+                    {profile.displayName ?? `@${handle}`}
+                  </span>
+                ) : (
+                  profile.displayName ?? `@${handle}`
+                )}
               </h1>
               {profile.esDesarrollador && (
                 <span

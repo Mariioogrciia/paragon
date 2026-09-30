@@ -20,6 +20,7 @@ export default async function DesgloseLigaMensualPage({ params }: { params: Prom
   const idioma = await getLocale();
   const { userId } = await params;
   const t = await getTranslations("Perfil.LigasPage");
+  const locale = await getLocale();
 
   const profile = await getProfileByUserId(userId);
   if (!profile) notFound();
@@ -27,7 +28,7 @@ export default async function DesgloseLigaMensualPage({ params }: { params: Prom
   const desglose = await getLigaMensualDesglose(userId);
   const totalPuntos = desglose.reduce((sum, tr) => sum + tr.points, 0);
 
-  const monthName = new Date().toLocaleString("es-ES", { month: "long" });
+  const monthName = new Date().toLocaleString(locale, { month: "long" });
   const year = new Date().getFullYear();
 
   return (

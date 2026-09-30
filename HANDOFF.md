@@ -831,9 +831,25 @@ Subido en `cc643de` (despliegue de Vercel correcto).
   mapa de actividad.
 - Texto desfasado corregido: "Acéptalo desde el Planificador" → Amigos.
 
-**Pendiente:** ~25 `"es-ES"` secundarios (CV, OG image, eSports, precios,
-calculadora...); colores de perfil desbloqueables; estado libre en
-Comunidad; partir `actions.ts` y `profiles.ts`. "Retos semanales entre
+### Tanda siguiente (30 sept 2026)
+- **Estados libres en Comunidad** (`PublicarEstado`, `publicarEstadoAction`,
+  `borrarEstadoAction`): `activity` tipo "status" sin juego
+  (`activity.gameId` ya admite null; `getFeed` hace leftJoin). Filtro de
+  lenguaje, límite `estado` (5 cada 10 min), el autor puede borrarlos. La
+  API móvil los filtra: la app Android espera `game` siempre.
+- **Maratón/Noctámbulo** contaban trofeos y una importación con 230 logros
+  en el mismo segundo los daba: ahora cuentan instantes distintos. Maratón
+  retirada a ethann19 y anhalian (no lo cumplían con la regla buena).
+- **Efecto del nombre** (`lib/efectosNombre.ts`, `user.efectoNombre`,
+  clase `.nombre-efecto` en globals.css): degradado animado ganado por
+  insignia o nivel (Dorado, Aurora, Platino, Neón), en lugar de "colores
+  desbloqueables", que no tenían sentido con el color libre.
+- **Idioma**: ya no quedan `"es-ES"` fijos en pantallas, salvo a propósito
+  la imagen OG, la firma (etiquetas en español) y el admin.
+
+**Pendiente:** el menú de Ajustes (`AjustesNav.tsx`) y `NAV_OCULTABLE`/
+`PANEL_OCULTABLE`/`CATEGORIAS_AVISO` tienen etiquetas fijas en español;
+partir `actions.ts` y `profiles.ts`. "Retos semanales entre
 amigos" ya existe como clasificación semanal/mensual en /amigos; darle
 ganador exige decidir contra qué grupo gana cada uno (cada cual tiene
 amigos distintos).

@@ -537,5 +537,13 @@
     "nivel": "Niveau {n}",
     "insignia": "Badge « {nombre} »",
     "ayuda": "Se débloquent en montant de niveau et en gagnant des badges. Affichés à côté de ton nom sur ton profil et dans la Communauté."
+  },
+  "EfectosNombre": {
+    "label": "Effet du nom",
+    "dorado": "Doré",
+    "aurora": "Aurore",
+    "platino": "Platine",
+    "neon": "Néon",
+    "ayuda": "Ton nom avec un éclat animé sur ton profil. S’obtient avec des badges ou le niveau."
   }
 }

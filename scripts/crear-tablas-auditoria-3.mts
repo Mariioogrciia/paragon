@@ -13,6 +13,8 @@
  *     (lib/panelPreferences.ts).
  *   - `user.avisosDesactivados`: categorías de aviso que cada uno apaga
  *     (lib/avisosPreferencias.ts).
+ *   - `user.efectoNombre`: efecto animado del nombre en el perfil, ganado
+ *     con insignias o nivel (lib/efectosNombre.ts).
  *   - `activity.gameId` pasa a admitir null: los estados libres de Comunidad
  *     (tipo "status") no van ligados a ningún juego.
  *   - Relleno de `activity` tipo "platinum" con los platinos de los últimos
@@ -49,6 +51,7 @@ async function main() {
     await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "apariencia" jsonb`);
     await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "panelOculto" jsonb`);
     await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "avisosDesactivados" jsonb`);
+    await sql.unsafe(`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS "efectoNombre" text`);
     // Estados libres en Comunidad (tipo "status"): no van ligados a un juego.
     await sql.unsafe(`ALTER TABLE "activity" ALTER COLUMN "gameId" DROP NOT NULL`);
     console.log("OK: user.tituloDesbloqueado, user.apariencia, user.panelOculto, user.avisosDesactivados");

@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 /**
  * "Si juntaras todas tus horas jugadas seguidas, sin parar, serían X días"
@@ -50,6 +50,7 @@ function hito(dias: number): string {
 
 export function PlaytimeComparison({ horasTotales }: { horasTotales: number }) {
   const t = useTranslations("Analitica.playtimeComparison");
+  const locale = useLocale();
   if (horasTotales === 0) return null;
 
   const dias = horasTotales / 24;
@@ -59,7 +60,7 @@ export function PlaytimeComparison({ horasTotales }: { horasTotales: number }) {
     <div className="rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
       <h3 className="mb-1 font-heading text-sm font-bold uppercase tracking-wide">{t("titulo")}</h3>
       <p className="mb-4 text-xs text-muted">
-        {t("subtitulo", { horas: horasTotales.toLocaleString("es-ES") })}
+        {t("subtitulo", { horas: horasTotales.toLocaleString(locale) })}
       </p>
       <p className="font-heading text-3xl font-bold text-accent">
         {t("dias", { count: diasRedondeado })}

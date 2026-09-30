@@ -537,5 +537,13 @@
     "nivel": "Level {n}",
     "insignia": "Badge “{nombre}”",
     "ayuda": "Unlocked by levelling up and earning badges. Shown next to your name on your profile and in Community."
+  },
+  "EfectosNombre": {
+    "label": "Name effect",
+    "dorado": "Golden",
+    "aurora": "Aurora",
+    "platino": "Platinum",
+    "neon": "Neon",
+    "ayuda": "Your name with an animated shine on your profile. Earned with badges or level."
   }
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
@@ -43,6 +43,7 @@ export default async function WrapRankingPage({
   if (!METRICAS.includes(metrica as Metrica)) notFound();
   const m = metrica as Metrica;
   const t = await getTranslations("Perfil");
+  const locale = await getLocale();
 
   const TITULO: Record<Metrica, string> = {
     horas: t("WrapRankingPage.tituloHoras"),
@@ -146,7 +147,7 @@ export default async function WrapRankingPage({
             {!desde
               ? t("WrapRankingPage.notaHorasTodo")
               : inicioRegistro && inicioRegistro > desde
-                ? t("WrapRankingPage.notaHorasDesdeRegistro", { fecha: inicioRegistro.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }) })
+                ? t("WrapRankingPage.notaHorasDesdeRegistro", { fecha: inicioRegistro.toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }) })
                 : t("WrapRankingPage.notaHorasPeriodo")}
           </p>
         )}
@@ -188,7 +189,7 @@ export default async function WrapRankingPage({
               </div>
 
               <span className="shrink-0 font-heading text-sm font-bold">
-                {f.valor.toLocaleString("es-ES")} {unidad}
+                {f.valor.toLocaleString(locale)} {unidad}
               </span>
             </li>
           ))}

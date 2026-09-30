@@ -1,8 +1,10 @@
+import { useLocale } from "next-intl";
 import Link from "next/link";
 import type { Vitrina } from "@/lib/vitrinas";
 
 /** Vitrinas temáticas en el perfil — ver lib/vitrinas.ts. Sin vitrinas (o vacías), no pinta nada. */
 export function VitrinasPerfil({ vitrinas, handle }: { vitrinas: Vitrina[]; handle: string }) {
+  const locale = useLocale();
   const conItems = vitrinas.filter((v) => v.items.length > 0);
   if (conItems.length === 0) return null;
 
@@ -27,7 +29,7 @@ export function VitrinasPerfil({ vitrinas, handle }: { vitrinas: Vitrina[]; hand
                 <div className="p-2">
                   <p className="truncate text-xs font-bold">{item.titulo}</p>
                   <p className="truncate text-[0.6875rem] text-muted">
-                    {item.rareza !== null ? `${item.rareza.toLocaleString("es-ES", { maximumFractionDigits: 1 })}% · ${item.subtitulo}` : item.subtitulo}
+                    {item.rareza !== null ? `${item.rareza.toLocaleString(locale, { maximumFractionDigits: 1 })}% · ${item.subtitulo}` : item.subtitulo}
                   </p>
                 </div>
               </Link>
