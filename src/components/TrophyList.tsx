@@ -511,7 +511,10 @@ export function TrophyPhoto({
   trophy: { iconUrl?: string | null; grade?: TrophyGrade | null };
   size: number;
 }) {
-  if (!trophy.iconUrl) return <TrophyTile grade={trophy.grade ?? undefined} size={size} />;
+  // Una URL que ya no existe (pasó con iconos de Steam, 30 sept 2026) pintaba
+  // la imagen rota del navegador; mejor el icono del metal.
+  const [rota, setRota] = useState(false);
+  if (!trophy.iconUrl || rota) return <TrophyTile grade={trophy.grade ?? undefined} size={size} />;
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -519,6 +522,7 @@ export function TrophyPhoto({
       loading="lazy"
       decoding="async"
       src={trophy.iconUrl}
+      onError={() => setRota(true)}
       alt=""
       className="shrink-0 object-cover"
       style={{ width: size, height: size, borderRadius: Math.round(size * 0.27) }}

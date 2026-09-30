@@ -65,15 +65,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Chunks con hash: inmutables, así que la copia guardada vale siempre. Solo
-  // se sirven de caché los que guardó la instalación; el resto va a la red.
+  // Red primero y la copia guardada solo sin conexión: con caché primero, en
+  // `next dev` (nombres de chunk sin hash) se servía el CSS de hace una hora.
   const url = new URL(request.url);
   if (request.method === 'GET' && url.origin === self.location.origin && url.pathname.startsWith('/_next/static/')) {
     event.respondWith(
       (async () => {
-        const cache = await caches.open(CACHE_NAME);
-        const guardado = await cache.match(request, { ignoreSearch: true });
-        return guardado || fetch(request);
+        try {
+          return await fetch(request);
+        } catch (error) {
+          const guardado = await (await caches.open(CACHE_NAME)).match(request, { ignoreSearch: true });
+          if (guardado) return guardado;
+          throw error;
+        }
       })(),
     );
   }

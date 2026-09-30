@@ -160,7 +160,7 @@ export default async function AmigosPage() {
                 className="grid grid-cols-[34px_44px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[44px_52px_1fr_92px_92px_92px_200px] sm:gap-4"
                 style={
                   r.esMio
-                    ? { border: "1px solid #2f5a8f", background: "linear-gradient(160deg, #14243a, #0e141e)" }
+                    ? { border: "1px solid rgb(var(--accent-rgb) / 0.45)", background: "linear-gradient(160deg, rgb(var(--accent-rgb) / 0.14), var(--surface))" }
                     : { border: "1px solid var(--border)", background: "var(--surface)" }
                 }
               >

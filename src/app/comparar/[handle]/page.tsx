@@ -140,7 +140,7 @@ export default async function CompararPage({
             className="rounded-[20px] p-6"
             style={
               leader
-                ? { border: "1px solid #2f5a8f", background: "linear-gradient(165deg, #14243a, #0d131c)" }
+                ? { border: "1px solid rgb(var(--accent-rgb) / 0.45)", background: "linear-gradient(160deg, rgb(var(--accent-rgb) / 0.14), var(--surface))" }
                 : { border: "1px solid var(--border)", background: "var(--surface)" }
             }
           >

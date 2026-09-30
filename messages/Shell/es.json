@@ -241,7 +241,50 @@
     "botDiscordCmd2": "Radar de rivalidad con otros miembros",
     "botDiscordCmd3": "Anuncia tus conquistas automáticamente",
     "personalizarPanel": "Personalizar qué sale en el panel",
-    "verComunidad": "Ver todo en Comunidad →"
+    "verComunidad": "Ver todo en Comunidad →",
+    "landing": {
+      "ejemplo": "Ejemplo",
+      "convergenciaTitulo": "Cuatro listas de trofeos. Un solo cazador.",
+      "convergenciaTexto": "Tus trofeos de PlayStation y tus logros de Steam, Xbox y Epic viven en cuatro apps que no se hablan. Paragon los junta en un perfil, un nivel y un único platino más cercano.",
+      "nivelParagon": "Nivel Paragon",
+      "trofeosEnPlataformas": "{n} trofeos · 4 plataformas",
+      "tu": "Tú",
+      "vitrinaVacia": "Esta semana todavía no hay trofeos raros cazados. Estos son los últimos platinos:",
+      "cartelaRareza": "{percent} % del mundo",
+      "cartelaPor": "por @{handle}",
+      "statsLinea": "{trofeos} trofeos contados en {juegos} juegos, y {platinos} platinos entre todos.",
+      "rutaTitulo": "La caza, paso a paso",
+      "rutaDescripcion": "Lo que pasa desde que dices quién eres hasta que subes en la liga.",
+      "pasos": {
+        "p1": {
+          "titulo": "Di quién eres",
+          "cuerpo": "Tu ID público de PlayStation, tu usuario de Steam, tu Gamertag o tu perfil de Epic. Ni contraseñas, ni tokens, ni permisos."
+        },
+        "p2": {
+          "titulo": "Te decimos a por qué ir",
+          "cuerpo": "El platino que tienes más a mano, la ruta más corta hasta él y los trofeos perdibles antes de que se te escapen."
+        },
+        "p3": {
+          "titulo": "Mírate contra tus amigos",
+          "cuerpo": "Juego a juego, barra contra barra. Retos con plazo, platinar juntos y quién va por delante esta semana."
+        },
+        "p4": {
+          "titulo": "Compite cada mes",
+          "cuerpo": "Liga mensual, temporadas, clanes y guerras de clanes. El día 1 todo el mundo vuelve a empezar de cero."
+        }
+      },
+      "temaTitulo": "Cámbiala a tu gusto: prueba un estilo",
+      "temas": {
+        "clasico": "Clásico",
+        "brutalista": "Brutalista",
+        "consola": "Consola",
+        "hacker": "Terminal"
+      },
+      "discordHora": "Hoy a las 16:20",
+      "discordAnuncio": "acaba de conseguir el platino de",
+      "discordRareza": "Rareza en la comunidad",
+      "discordDificultad": "Dificultad media: {n}/10"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Perfil de ejemplo",

@@ -1,40 +1,45 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useApariencia } from "@/lib/apariencia";
 
+// Una muestra del propio estilo en el botón (esquina, borde, fuente) en vez de un emoji.
+const DEMO_STYLES = [
+  { id: "", clave: "clasico", muestra: "rounded-lg" },
+  { id: "estilo-brutalista", clave: "brutalista", muestra: "rounded-none uppercase" },
+  { id: "estilo-ps5", clave: "consola", muestra: "rounded-full" },
+  { id: "estilo-terminal", clave: "hacker", muestra: "rounded-sm font-mono" },
+] as const;
+
 export function LandingThemeSwitcher() {
+  const t = useTranslations("Shell.Home.landing");
   const { elegirEstilo, estilo, montado } = useApariencia();
 
   if (!montado) return null;
 
-  const DEMO_STYLES = [
-    { id: "", label: "Clásico", icon: "🎮" },
-    { id: "estilo-brutalista", label: "Brutalista", icon: "🧱" },
-    { id: "estilo-ps5", label: "Consola", icon: "🌊" },
-    { id: "estilo-terminal", label: "Hacker", icon: "💻" },
-  ];
-
   return (
-    <div className="mt-14 rounded-2xl p-6 text-center" style={{ border: "1px solid rgb(var(--accent-rgb) / 0.15)", background: "linear-gradient(rgba(255,255,255,0.02), transparent)" }}>
-      <p className="mb-5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
-        Personalización total. Cambia la web a tu gusto.
-      </p>
-      <div className="flex flex-wrap justify-center gap-3">
-        {DEMO_STYLES.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => elegirEstilo(s.id)}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-300 hover:-translate-y-1"
-            style={
-              estilo === s.id
-                ? { background: "var(--accent)", color: "#061021", boxShadow: "0 8px 24px rgb(var(--accent-rgb) / 0.4)" }
-                : { background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--muted)" }
-            }
-          >
-            <span aria-hidden="true" className="opacity-80">{s.icon}</span>
-            {s.label}
-          </button>
-        ))}
+    <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <p className="text-[0.8125rem] font-semibold text-muted">{t("temaTitulo")}</p>
+      <div className="grid w-full max-w-sm grid-cols-4 gap-1.5 sm:flex sm:w-auto sm:max-w-none sm:gap-2">
+        {DEMO_STYLES.map((s) => {
+          const activo = estilo === s.id;
+          return (
+            <button
+              key={s.clave}
+              type="button"
+              aria-pressed={activo}
+              onClick={() => elegirEstilo(s.id)}
+              className={`truncate px-1.5 py-1.5 text-xs font-bold sm:px-3.5 sm:text-[0.8125rem] transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-rgb)/0.6)] ${s.muestra}`}
+              style={
+                activo
+                  ? { background: "var(--accent)", color: "var(--background)", border: "1px solid var(--accent)" }
+                  : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--foreground)" }
+              }
+            >
+              {t(`temas.${s.clave}`)}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

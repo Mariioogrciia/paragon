@@ -27,7 +27,8 @@ export const MODOS = [
 ] as const;
 
 export const ACENTOS = [
-  { value: "", label: "Azul", color: "var(--accent)" },
+  { value: "", label: "Platino", color: "#7cc4e4" },
+  { value: "accent-blue", label: "Azul", color: "#4a9eff" },
   { value: "accent-violet", label: "Morado", color: "#8b5cf6" },
   { value: "accent-red", label: "Rojo", color: "#ef4444" },
   { value: "accent-green", label: "Verde", color: "#10b981" },

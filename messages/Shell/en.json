@@ -241,7 +241,50 @@
     "botDiscordCmd2": "Rivalry radar with other members",
     "botDiscordCmd3": "Announce your conquests automatically",
     "personalizarPanel": "Choose what shows on your dashboard",
-    "verComunidad": "See everything in Community →"
+    "verComunidad": "See everything in Community →",
+    "landing": {
+      "ejemplo": "Example",
+      "convergenciaTitulo": "Four trophy lists. One hunter.",
+      "convergenciaTexto": "Your PlayStation trophies and your Steam, Xbox and Epic achievements live in four apps that never talk. Paragon merges them into one profile, one level and one closest platinum.",
+      "nivelParagon": "Paragon level",
+      "trofeosEnPlataformas": "{n} trophies · 4 platforms",
+      "tu": "You",
+      "vitrinaVacia": "No rare trophies hunted yet this week. Here are the latest platinums:",
+      "cartelaRareza": "{percent}% of the world",
+      "cartelaPor": "by @{handle}",
+      "statsLinea": "{trofeos} trophies counted across {juegos} games, and {platinos} platinums between us.",
+      "rutaTitulo": "The hunt, step by step",
+      "rutaDescripcion": "What happens from the moment you say who you are until you climb the league.",
+      "pasos": {
+        "p1": {
+          "titulo": "Say who you are",
+          "cuerpo": "Your public PlayStation ID, Steam username, Gamertag or Epic profile. No passwords, no tokens, no permissions."
+        },
+        "p2": {
+          "titulo": "We tell you what to go for",
+          "cuerpo": "The platinum closest to hand, the shortest route to it and the missable trophies before they slip away."
+        },
+        "p3": {
+          "titulo": "Measure up against friends",
+          "cuerpo": "Game by game, bar against bar. Timed challenges, platinum together and who's ahead this week."
+        },
+        "p4": {
+          "titulo": "Compete every month",
+          "cuerpo": "Monthly league, seasons, clans and clan wars. On day 1 everyone starts again from zero."
+        }
+      },
+      "temaTitulo": "Make it yours: try a style",
+      "temas": {
+        "clasico": "Classic",
+        "brutalista": "Brutalist",
+        "consola": "Console",
+        "hacker": "Terminal"
+      },
+      "discordHora": "Today at 4:20 PM",
+      "discordAnuncio": "just earned the platinum for",
+      "discordRareza": "Community rarity",
+      "discordDificultad": "Average difficulty: {n}/10"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Sample profile",

@@ -6,6 +6,13 @@ export function ServiceWorkerRegister() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
+    // En desarrollo no: una copia offline de chunks que cambian a cada guardado solo estorba.
+    if (process.env.NODE_ENV !== "production") {
+      navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister()));
+      caches?.keys().then((claves) => claves.forEach((c) => caches.delete(c)));
+      return;
+    }
+
     // `?v=` distinto en cada despliegue: el navegador lo trata como un script
     // nuevo, reinstala y vuelve a guardar la página offline con sus chunks.
     const registrar = () => {

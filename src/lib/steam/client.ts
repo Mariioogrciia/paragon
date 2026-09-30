@@ -241,6 +241,20 @@ export async function fetchLibrary(steamId: string): Promise<Game[]> {
 
 /* --------------------------------- Logros --------------------------------- */
 
+/**
+ * La API de Steam sigue devolviendo los iconos de logro en
+ * `steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/...`, y esa ruta
+ * da 404 para los juegos recientes (salían sin foto en la vitrina, 30 sept
+ * 2026). `shared.akamai.steamstatic.com/community_assets/...` sirve los
+ * mismos ficheros para juegos nuevos y viejos.
+ */
+export function iconoLogroSteam(url: string | undefined): string | undefined {
+  return url?.replace(
+    /^https?:\/\/steamcdn-a\.akamaihd\.net\/steamcommunity\/public\/images\/apps\//,
+    "https://shared.akamai.steamstatic.com/community_assets/images/apps/",
+  );
+}
+
 interface SchemaAchievement {
   name: string;
   displayName?: string;
@@ -318,7 +332,7 @@ export async function fetchAchievements(
       rarityPercent: rarityByName.get(definition.name),
       hidden: definition.hidden === 1,
       // El icono gris es el del logro sin conseguir: así se ve la diferencia.
-      iconUrl: earned ? definition.icon : (definition.icongray ?? definition.icon),
+      iconUrl: iconoLogroSteam(earned ? definition.icon : (definition.icongray ?? definition.icon)),
     };
   });
 }

@@ -5,7 +5,7 @@ import { TiltCard } from "@/components/TiltCard";
 import { auth } from "@/auth";
 import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
-import { TrophyIcon, TrophyTile } from "@/components/TrophyIcon";
+import { TrophyIcon } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByUserId, getGlobalStats, getTopHunters, getRarestTrophiesThisWeek, getRecentPlatinumActivity } from "@/lib/profiles";
 import { Avatar } from "@/components/Avatar";
@@ -33,8 +33,9 @@ import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { SectionTabs } from "@/components/SectionTabs";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { CardBuilder } from "@/components/CardBuilder";
-import { PlayStationLogo, SteamLogo, XboxLogo, EpicGamesLogo } from "@/components/ui/PlatformLogos";
 import { LandingThemeSwitcher } from "@/components/LandingThemeSwitcher";
+import { Convergencia } from "@/components/landing/Convergencia";
+import { ArrowRight, Eye, Gift, Route, ShieldCheck } from "lucide-react";
 import { getPanelOculto, type SeccionPanel } from "@/lib/panelPreferences";
 
 const GRADE_ACCENT = {
@@ -44,10 +45,14 @@ const GRADE_ACCENT = {
   bronze: "#c07b4a",
 } as const;
 
+// Ejemplo con trofeos reales de God of War Ragnarök (nombre, metal, foto y
+// rareza tal cual están en la base): los más a mano primero. Antes eran
+// nombres inventados con una copa genérica en vez de la foto del trofeo.
+const PSN_GOWR = "https://psnobj.prod.dl.playstation.net/psnobj/NPWR22392_00";
 const SAMPLE_NEXT = [
-  { name: "Maestro de las artes marciales", rarity: "18,4%", grade: "gold" as const },
-  { name: "Coleccionista de hechizos", rarity: "31,7%", grade: "silver" as const },
-  { name: "Portador de la Gran Runa", rarity: "48,9%", grade: "bronze" as const },
+  { name: "Spartan Ways", rarity: 44.0, grade: "silver" as const, icon: `${PSN_GOWR}/151b65f4-414a-42b6-a583-ffe985f6ad35.png` },
+  { name: "Phalanx", rarity: 19.0, grade: "silver" as const, icon: `${PSN_GOWR}/b94e7ff1-31f2-4fd1-8612-e1f16597daba.png` },
+  { name: "Ready for Commitment", rarity: 14.5, grade: "gold" as const, icon: `${PSN_GOWR}/eca08e73-0f8b-4975-90e6-61d01c28eee8.png` },
 ];
 
 const SAMPLE_SHELF = [
@@ -58,8 +63,6 @@ const SAMPLE_SHELF = [
   { title: "Hollow Knight", pct: 63, ratio: "39/63", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/cobfzp.jpg" },
   { title: "Ghost of Tsushima", pct: 100, ratio: "55/55", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co2crj.jpg" },
 ];
-
-const FEATURE_KEYS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"] as const;
 
 function haceTiempo(date: Date | string, locale: string): string {
   // Mismo criterio de estilo que `relativeDate` (lib/design.ts): en francés
@@ -95,154 +98,198 @@ async function Landing() {
     getTranslations("Shell.Home"),
   ]);
 
-  const FEATURES = FEATURE_KEYS.map((key, i) => ({
-    num: String(i + 1).padStart(2, "0"),
-    title: t(`features.${key}.titulo`),
-    body: t(`features.${key}.cuerpo`),
+  const pasos = (["p1", "p2", "p3", "p4"] as const).map((clave) => ({
+    clave,
+    titulo: t(`landing.pasos.${clave}.titulo`),
+    cuerpo: t(`landing.pasos.${clave}.cuerpo`),
   }));
+  // De tres en tres: cada balda de la vitrina.
+  const baldas = [rareTrophies.slice(0, 3), rareTrophies.slice(3, 6)].filter((b) => b.length > 0);
+  const numero = (n: number) => n.toLocaleString(idioma);
 
   return (
     <div>
-      <section className="grid items-center gap-14 py-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <div>
-          <span
-            className="inline-flex max-w-full flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em]"
-            style={{ background: "rgb(var(--accent-rgb) / 0.1)", border: "1px solid rgb(var(--accent-rgb) / 0.28)", color: "var(--accent-text)" }}
+      <section className="relative pt-6 text-center sm:pt-10">
+        <div className="landing-hero-halo pointer-events-none absolute inset-x-0 -top-24 bottom-0 -z-10 [mask-image:linear-gradient(90deg,transparent,black_18%,black_82%,transparent)]" aria-hidden="true" />
+
+        <h1 className="font-heading mx-auto max-w-[20ch] text-[clamp(2.5rem,9vw,5rem)] font-bold uppercase leading-[0.95] tracking-[-0.025em] [overflow-wrap:anywhere]">
+          {t("heroTitleLine1")} <span className="text-platinum">{t("heroTitleLine2")}</span>
+        </h1>
+
+        <p className="mx-auto mt-6 max-w-[60ch] text-base leading-relaxed text-muted sm:text-lg">{t("heroDescription")}</p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/entrar"
+            className="flex flex-col items-center rounded-xl px-7 py-3 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+            style={{ background: "var(--accent-grad)", boxShadow: "0 14px 32px -12px rgb(var(--accent-rgb) / 0.7)" }}
           >
-            <span className="h-[7px] w-[7px] rounded-full bg-good" style={{ boxShadow: "0 0 10px #4ec98a" }} />
-            {t("badge")}
-            <span className="ml-1 flex items-center gap-1.5 border-l pl-2" style={{ borderColor: "rgb(var(--accent-rgb) / 0.3)" }}>
-              <PlayStationLogo width={13} height={13} aria-label="PlayStation" />
-              <SteamLogo width={13} height={13} aria-label="Steam" />
-              <XboxLogo width={13} height={13} aria-label="Xbox" />
-              <EpicGamesLogo width={13} height={13} aria-label="Epic Games" />
-            </span>
-          </span>
-
-          {/* Tamaño fluido: a 74px fijos, "SIGUIENTE" no cabía en 375px de
-              ancho y la portada hacía scroll horizontal en móvil. */}
-          <h1 className="font-heading mt-5 text-[clamp(2.75rem,13.5vw,4.625rem)] font-bold uppercase leading-[0.98] tracking-[-0.02em] [overflow-wrap:anywhere]">
-            {t("heroTitleLine1")}
-            <br />
-            <span className="text-gradient">{t("heroTitleLine2")}</span>
-          </h1>
-
-          <p className="mt-6 max-w-[540px] text-lg leading-relaxed text-muted">
-            {t("heroDescription")}
-          </p>
-          <p className="mt-2.5 max-w-[540px] text-base leading-relaxed" style={{ color: "var(--accent-text)" }}>
-            {t("heroDescripcionSocial")}
-          </p>
-
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Link
-              href="/entrar"
-              className="flex flex-col items-center justify-center rounded-xl px-6 py-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
-              style={{ background: "var(--accent-grad)", boxShadow: "0 12px 34px rgb(var(--accent-rgb) / 0.3)" }}
-            >
-              <span className="text-[0.9375rem] font-bold text-background">{t("ctaEmpezar")}</span>
-              <span className="mt-0.5 text-[0.625rem] font-bold tracking-wide text-background opacity-80">{t("ctaEmpezarSubtext")}</span>
-            </Link>
-            <Link
-              href="/ejemplo"
-              className="flex items-center gap-2 rounded-xl px-[22px] py-4 text-[0.9375rem] font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#dbe5f2" }}
-            >
-              <span aria-hidden="true" className="text-base opacity-70">👁️</span>
-              {t("ctaVerEjemplo")}
-            </Link>
-          </div>
-
-          {topHunters.length > 0 && (
-            <div className="mt-6 flex items-center gap-3">
-              <div className="flex -space-x-3">
-                {topHunters.slice(0, 5).map((hunter) => (
-                  <span key={hunter.userId} className="block rounded-full" style={{ border: "2px solid var(--background)" }}>
-                    <Avatar src={hunter.image} name={hunter.name ?? hunter.handle ?? "?"} size={34} />
-                  </span>
-                ))}
-              </div>
-              <p className="text-[0.8125rem] font-semibold text-muted">{t("socialProofTexto")}</p>
-            </div>
-          )}
-
-          <p className="mt-[18px] flex items-center gap-2 text-[0.8125rem] text-muted">
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-good/15 text-good">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
-            </span>
-            {t("soloIdPublico")}
-          </p>
-          <p className="mt-2 flex items-center gap-2 text-[0.8125rem] text-muted">
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-good/15 text-good">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 1 0 0-5C9 2 12 7 12 7z"></path></svg>
-            </span>
-            {t("gratisSinLimite")}
-          </p>
+            <span className="text-[0.9375rem] font-bold text-background">{t("ctaEmpezar")}</span>
+            <span className="mt-0.5 text-[0.6875rem] font-semibold text-background/80">{t("ctaEmpezarSubtext")}</span>
+          </Link>
+          <Link
+            href="/ejemplo"
+            className="flex items-center gap-2 rounded-xl border border-border bg-[var(--surface)] px-6 py-4 text-[0.9375rem] font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:bg-[var(--surface-2)]"
+          >
+            <Eye size={17} className="text-muted" aria-hidden="true" />
+            {t("ctaVerEjemplo")}
+          </Link>
         </div>
 
-        <div
-          className="relative rounded-[20px] p-[26px]"
-          style={{ border: "1px solid #232c3d", background: "linear-gradient(#141b28, #0f141d)", boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)" }}
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3.5">
-              <span
-                className="flex h-[62px] w-[62px] shrink-0 items-center justify-center rounded-2xl"
-                style={{ background: "linear-gradient(155deg, #cfeaf7, #6fb6d8 55%, #2b5f7d)", boxShadow: "0 0 34px rgba(159, 212, 236, 0.4)" }}
-              >
-                <TrophyIcon grade="platinum" size={34} />
-              </span>
-              <div>
-                <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("platinoMasCercano")}</p>
-                <p className="font-heading mt-1 text-[1.375rem] font-bold">Elden Ring</p>
+        <ul className="mx-auto mt-6 flex w-fit max-w-full flex-col items-start gap-2 text-[0.8125rem] text-muted sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6">
+          <li className="flex max-w-[34rem] items-start gap-2 text-left sm:items-center">
+            <ShieldCheck size={15} className="mt-0.5 shrink-0 text-good sm:mt-0" aria-hidden="true" />
+            {t("soloIdPublico")}
+          </li>
+          <li className="flex max-w-[34rem] items-start gap-2 text-left sm:items-center">
+            <Gift size={15} className="mt-0.5 shrink-0 text-good sm:mt-0" aria-hidden="true" />
+            {t("gratisSinLimite")}
+          </li>
+        </ul>
+
+      </section>
+
+      <Convergencia cazadores={topHunters.slice(0, 5).map((h) => ({ id: h.userId, nombre: nombrePublico(h.name, h.handle), imagen: h.image }))} />
+
+      {recentPlatinums.length >= 4 && (
+        <div className="relative -mx-4 mt-20 overflow-hidden border-y border-border px-4 py-3 sm:mx-0 sm:px-0">
+          <div className="flex w-max items-center gap-10 animate-marquee hover:[animation-play-state:paused]" style={{ animationDuration: "40s" }}>
+            {[...recentPlatinums, ...recentPlatinums].map((p, i) => (
+              <div key={`${p.userId}-${p.gameTitle}-${i}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap text-[0.8125rem]" aria-hidden={i >= recentPlatinums.length || undefined}>
+                <TrophyIcon grade="platinum" size={16} />
+                <span className="font-semibold text-platinum">{nombrePublico(p.name, p.handle)}</span>
+                <span className="text-muted">{t("tickerAcabaDePlatinar")}</span>
+                <span className="font-semibold">{p.gameTitle}</span>
+                <span className="text-[0.6875rem] text-muted">· {haceTiempo(p.createdAt, idioma)}</span>
               </div>
+            ))}
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
+        </div>
+      )}
+
+      <section className="pt-20 sm:pt-24" aria-labelledby="vitrina-titulo">
+        <div className="max-w-[46rem]">
+          <h2 id="vitrina-titulo" className="font-heading text-[clamp(1.875rem,5vw,2.75rem)] font-bold uppercase leading-[1.05] tracking-[-0.015em]">
+            {t("rarosTitulo")}
+          </h2>
+          <p className="mt-3 max-w-[60ch] text-base leading-relaxed text-muted">{t("rarosDescripcion")}</p>
+          {globalStats.trofeos > 0 && globalStats.juegos > 0 && (
+            <p className="mt-2 text-sm text-muted">
+              {t("landing.statsLinea", {
+                trofeos: numero(globalStats.trofeos),
+                juegos: numero(globalStats.juegos),
+                platinos: numero(globalStats.platinos),
+              })}
+            </p>
+          )}
+        </div>
+
+        {baldas.length > 0 ? (
+          <div className="mt-10 grid gap-10">
+            {baldas.map((balda, b) => (
+              <div key={b}>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-8">
+                  {balda.map((rt, i) => (
+                    <Link key={`${rt.userId}-${rt.gameId}-${i}`} href={`/u/${rt.handle}`} className="group block rounded-xl p-2 transition-colors duration-200 hover:bg-[var(--surface)]">
+                      <span className="landing-nicho flex h-28 items-end justify-center rounded-t-xl pb-3 sm:h-36">
+                        <span className="transition-transform duration-300 group-hover:-translate-y-1">
+                          <TrophyPhoto trophy={{ iconUrl: rt.trophyIconUrl, grade: rt.grade }} size={72} />
+                        </span>
+                      </span>
+                      <span className="block border-t border-[var(--border)] pt-3">
+                        <span className="block truncate font-heading text-[0.9375rem] font-bold">{rt.trophyName}</span>
+                        <span className="mt-0.5 block truncate text-xs text-muted">{rt.gameTitle}</span>
+                        <span className="mt-2 block text-[0.6875rem] font-bold tabular-nums text-[var(--accent-text)]">
+                          {t("landing.cartelaRareza", { percent: rt.rarityPercent.toLocaleString(idioma, { maximumFractionDigits: 1 }) })}
+                        </span>
+                        <span className="mt-0.5 block truncate text-[0.6875rem] text-muted">
+                          {t("landing.cartelaPor", { handle: rt.handle ?? "?" })} · {haceTiempo(rt.earnedAt, idioma)}
+                        </span>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+                <div className="landing-repisa mt-2 h-2 rounded-full" aria-hidden="true" />
+              </div>
+            ))}
+          </div>
+        ) : recentPlatinums.length > 0 ? (
+          <div className="mt-8">
+            <p className="text-sm text-muted">{t("landing.vitrinaVacia")}</p>
+            <div className="landing-balda mt-3 grid grid-cols-1 gap-2 rounded-2xl border border-border p-3 sm:grid-cols-3">
+              {recentPlatinums.slice(0, 6).map((p, i) => (
+                <Link
+                  key={`${p.userId}-${p.gameTitle}-${i}`}
+                  href={p.handle ? `/u/${p.handle}` : "/"}
+                  className="flex items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-[var(--surface-2)]"
+                >
+                  <TrophyIcon grade="platinum" size={36} />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-bold">{p.gameTitle}</span>
+                    <span className="block truncate text-xs text-muted">
+                      {nombrePublico(p.name, p.handle)} · {haceTiempo(p.createdAt, idioma)}
+                    </span>
+                  </span>
+                </Link>
+              ))}
             </div>
-            <span
-              className="hidden shrink-0 rounded-full px-2.5 py-1 text-[0.625rem] font-semibold leading-tight sm:block sm:max-w-[150px]"
-              style={{ background: "rgb(var(--accent-rgb) / 0.1)", border: "1px solid rgb(var(--accent-rgb) / 0.25)", color: "var(--accent-text)" }}
-            >
-              {t("platinoMasCercanoAlgoritmo")}
-            </span>
           </div>
+        ) : null}
+      </section>
 
-          <div className="mt-[22px] flex items-end gap-3">
-            <span className="font-heading text-[4.25rem] font-bold leading-[0.85] text-platinum">10</span>
-            <span className="pb-2 text-[0.8125rem] font-semibold text-muted whitespace-pre-line">
-              {t("trofeosParaElPlatino")}
-            </span>
-          </div>
+      <section className="grid grid-cols-1 gap-10 pt-20 sm:pt-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-start" aria-labelledby="ruta-titulo">
+        <div className="min-w-0">
+          <h2 id="ruta-titulo" className="font-heading text-[clamp(1.875rem,5vw,2.75rem)] font-bold uppercase leading-[1.05] tracking-[-0.015em]">
+            {t("landing.rutaTitulo")}
+          </h2>
+          <p className="mt-3 max-w-[60ch] text-base leading-relaxed text-muted">{t("landing.rutaDescripcion")}</p>
 
-          <div className="mt-[18px] h-2.5 overflow-hidden rounded-full bg-surface-2">
-            <div className="h-full rounded-full" style={{ width: "74%", background: "var(--accent-grad-h)" }} />
+          <ol className="landing-ruta relative mt-8 grid gap-7">
+            {pasos.map((paso, i) => (
+              <li key={paso.clave} className="relative flex gap-5">
+                <span className="font-heading relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[var(--accent)] bg-background text-sm font-bold text-[var(--accent-text)]">
+                  {i + 1}
+                </span>
+                <div className="pt-1.5">
+                  <h3 className="font-heading text-lg font-bold leading-tight">{paso.titulo}</h3>
+                  <p className="mt-1.5 max-w-[52ch] text-sm leading-relaxed text-muted">{paso.cuerpo}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <Link href="/como-funciona" className="mt-8 inline-flex items-center gap-1.5 rounded-md px-1 text-sm font-bold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)] hover:underline">
+            {t("verTodoComoFunciona").replace(/\s*→\s*$/, "")}
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div className="relative min-w-0 rounded-3xl border border-border bg-[var(--surface)] p-5 sm:p-6 lg:sticky lg:top-24" style={{ boxShadow: "0 24px 50px -28px rgb(0 0 0 / 0.6)" }}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold text-muted">{t("platinoMasCercano")}</p>
+              <p className="font-heading mt-1 text-xl font-bold">God of War Ragnarök</p>
+            </div>
+            <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 text-[0.6875rem] font-semibold text-muted">{t("landing.ejemplo")}</span>
           </div>
-          <div className="mt-2.5 flex justify-between text-xs text-muted">
-            <span>{t("conseguidos", { conseguidos: 32, total: 42 })}</span>
-            <span className="font-bold" style={{ color: "var(--accent-text)" }}>74%</span>
-          </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-[0.6875rem] font-semibold" style={{ color: "var(--accent-text)" }}>
-            <span aria-hidden="true">↳</span>
+          <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-text)]">
+            <Route size={14} aria-hidden="true" />
             {t("calloutRuta")}
           </p>
-
-          <ul className="mt-6 space-y-2">
+          <ul className="mt-4 grid grid-cols-1 gap-2">
             {SAMPLE_NEXT.map((s, i) => (
-              <li
-                key={s.name}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5"
-                style={{ background: "#121824", border: "1px solid #1e2634" }}
-              >
-                <TrophyTile grade={s.grade} size={30} />
+              <li key={s.name} className="flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5">
+                <TrophyPhoto trophy={{ iconUrl: s.icon, grade: s.grade }} size={34} />
                 <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">{s.name}</span>
                 {i === 0 && (
-                  <span
-                    className="hidden shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide sm:flex"
-                    style={{ background: "rgb(var(--accent-rgb) / 0.14)", color: "var(--accent-text)" }}
-                  >
+                  <span className="hidden shrink-0 rounded-full bg-[rgb(var(--accent-rgb)/0.14)] px-2 py-0.5 text-[0.625rem] font-bold text-[var(--accent-text)] sm:inline">
                     {t("calloutRareza")}
                   </span>
                 )}
-                <span className="shrink-0 text-xs font-bold" style={{ color: GRADE_ACCENT[s.grade] }}>
-                  {s.rarity}
+                <span className="shrink-0 text-xs font-bold tabular-nums" style={{ color: GRADE_ACCENT[s.grade] }}>
+                  {s.rarity.toLocaleString(idioma, { minimumFractionDigits: 1 })} %
                 </span>
               </li>
             ))}
@@ -252,319 +299,83 @@ async function Landing() {
 
       <LandingThemeSwitcher />
 
-      {recentPlatinums.length > 0 && (
-        <div className="relative -mx-4 overflow-hidden px-4 py-2.5 mt-8 sm:mx-0 sm:px-0 sm:mt-12" style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-          <div className="flex w-max items-center gap-8 animate-marquee hover:[animation-play-state:paused]" style={{ animationDuration: "35s" }}>
-            {[...recentPlatinums, ...recentPlatinums].map((p, i) => (
-              <div key={`${p.userId}-${p.gameTitle}-${i}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap text-[0.8125rem]">
-                <TrophyIcon grade="platinum" size={16} />
-                <span className="font-semibold text-platinum">{nombrePublico(p.name, p.handle)}</span>
-                <span className="text-muted">{t("tickerAcabaDePlatinar")}</span>
-                <span className="font-semibold">{p.gameTitle}</span>
-                <span className="text-[0.6875rem] text-muted">— {haceTiempo(p.createdAt, idioma)}</span>
-              </div>
-            ))}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
-        </div>
-      )}
-
-      <section className="grid grid-cols-2 gap-3 pt-2 lg:grid-cols-4">
-        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.15)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="font-heading text-4xl font-bold leading-none text-platinum">{globalStats.platinos > 0 ? globalStats.platinos : "87"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statPlatinosGrupo")}</p>
-        </div>
-        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="font-heading text-4xl font-bold leading-none">{globalStats.trofeos > 0 ? globalStats.trofeos.toLocaleString(idioma) : "4.312"}</p>
-          <p className="mt-2.5 flex items-center gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-good opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-good"></span>
-            </span>
-            {t("statTrofeosContados")}
-          </p>
-        </div>
-        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="font-heading text-4xl font-bold leading-none">{globalStats.juegos > 0 ? globalStats.juegos.toLocaleString(idioma) : "214"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statJuegosRastreados")}</p>
-        </div>
-        <div className="rounded-2xl p-[22px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-          <p className="font-heading text-4xl font-bold leading-none">{globalStats.completadoMedio > 0 ? `${globalStats.completadoMedio}%` : "68%"}</p>
-          <p className="mt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">{t("statCompletadoMedio")}</p>
-        </div>
-      </section>
-
       {topHunters.length > 0 && (
-        <section className="pt-[72px]">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
-                {t("muroFamaTitulo")}
-              </h2>
-              <p className="mt-2 max-w-[560px] text-base text-muted">{t("muroFamaDescripcion")}</p>
-            </div>
-          </div>
+        <section className="pt-20 sm:pt-24" aria-labelledby="fama-titulo">
+          <h2 id="fama-titulo" className="font-heading text-[clamp(1.875rem,5vw,2.75rem)] font-bold uppercase leading-[1.05] tracking-[-0.015em]">
+            {t("muroFamaTitulo")}
+          </h2>
+          <p className="mt-3 max-w-[60ch] text-base text-muted">{t("muroFamaDescripcion")}</p>
 
-          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <ol className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {topHunters.map((hunter, i) => (
-              <Link
-                key={hunter.userId}
-                href={`/u/${hunter.handle}`}
-                className="group relative flex flex-col items-center gap-3 rounded-2xl p-4 text-center transition-all duration-300 hover:-translate-y-1 sm:p-6"
-                style={
-                  i === 0
-                    ? { border: "1px solid rgb(var(--accent-rgb) / 0.4)", background: "linear-gradient(var(--surface), rgb(var(--accent-rgb) / 0.08))", boxShadow: "0 0 30px rgb(var(--accent-rgb) / 0.12)" }
-                    : { border: "1px solid var(--border)", background: "var(--surface)" }
-                }
-              >
-                <span
-                  className="font-heading absolute left-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-[0.6875rem] font-bold"
+              <li key={hunter.userId} className="[&:last-child:nth-child(odd)]:col-span-2 sm:[&:last-child:nth-child(odd)]:col-span-1">
+                <Link
+                  href={`/u/${hunter.handle}`}
+                  className="group relative flex h-full flex-col items-center gap-3 rounded-2xl border p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-[rgb(var(--accent-rgb)/0.5)]"
                   style={
                     i === 0
-                      ? { background: "var(--accent-grad)", color: "#061021" }
-                      : { background: "var(--surface-2)", color: "var(--muted)" }
+                      ? { borderColor: "rgb(226 181 62 / 0.45)", background: "linear-gradient(180deg, rgb(226 181 62 / 0.08), var(--surface) 60%)" }
+                      : { borderColor: "var(--border)", background: "var(--surface)" }
                   }
                 >
-                  {i + 1}
-                </span>
-                <Avatar src={hunter.image} name={nombrePublico(hunter.name, hunter.handle)} size={64} />
-                <div className="min-w-0">
-                  <p className="truncate text-[0.9375rem] font-bold">{nombrePublico(hunter.name, hunter.handle)}</p>
-                  <p className="truncate text-xs text-muted">@{hunter.handle}</p>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <TrophyIcon grade="platinum" size={16} />
-                  <span className="font-heading text-lg font-bold text-platinum">{hunter.platinos}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {rareTrophies.length > 0 && (
-        <section className="pt-[72px]">
-          <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
-            {t("rarosTitulo")}
-          </h2>
-          <p className="mt-2 max-w-[560px] text-base text-muted">{t("rarosDescripcion")}</p>
-
-          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {rareTrophies.map((rt, i) => (
-              <Link
-                key={`${rt.userId}-${rt.gameId}-${i}`}
-                href={`/u/${rt.handle}`}
-                className="flex items-center gap-3.5 rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-              >
-                <TrophyPhoto trophy={{ iconUrl: rt.trophyIconUrl, grade: rt.grade }} size={48} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[0.9375rem] font-bold">{rt.trophyName}</p>
-                  <p className="truncate text-xs text-muted">{rt.gameTitle}</p>
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <Avatar src={rt.image} name={nombrePublico(rt.name, rt.handle)} size={18} />
-                    <span className="truncate text-[0.6875rem] text-muted">@{rt.handle}</span>
-                  </div>
-                </div>
-                <span
-                  className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold"
-                  style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
-                >
-                  {t("rarosPorcentaje", { percent: rt.rarityPercent.toFixed(1) })}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section id="biblioteca" className="pt-[72px]">
-        <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
-          {t("bibliotecaTitulo")}
-        </h2>
-        <p className="mb-6 mt-2 max-w-[620px] text-base text-muted">
-          {t("bibliotecaDescripcion")}
-        </p>
-
-        <div className="relative -mx-4 overflow-hidden px-4 sm:mx-0 sm:px-0">
-          <div className="flex w-max gap-4 animate-marquee hover:[animation-play-state:paused]">
-            {[...SAMPLE_SHELF, ...SAMPLE_SHELF, ...SAMPLE_SHELF].map((g, i) => (
-              <TiltCard
-                key={`${g.title}-${i}`}
-                href="#biblioteca"
-                className="group relative w-[160px] shrink-0 cursor-pointer overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] sm:w-[220px]"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-              >
-                <div
-                  className="relative flex aspect-[3/4] items-end p-4 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${g.cover})` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0d13] via-[#0a0d13]/40 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
-                  <p
-                    className="font-heading relative z-10 translate-y-2 text-[0.9375rem] font-bold leading-tight text-white transition-transform duration-300 group-hover:translate-y-0 sm:text-[1.0625rem]"
-                    style={{ textShadow: "0 2px 16px rgba(0, 0, 0, 0.9)" }}
+                  <span
+                    className="font-heading absolute left-3 top-3 text-sm font-bold tabular-nums"
+                    style={{ color: i === 0 ? "#e2b53e" : "var(--muted)" }}
                   >
-                    {g.title}
-                  </p>
-                </div>
-                <div className="relative z-10 bg-[var(--surface)] p-4 pt-1">
-                  <div className="h-[5px] overflow-hidden rounded-full bg-surface-2">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${g.pct}%`, background: "var(--accent-grad-h)" }}
-                    />
-                  </div>
-                  <div className="mt-2.5 flex justify-between text-[0.75rem] font-medium text-muted">
-                    <span className="font-bold" style={{ color: "var(--accent-text)" }}>{g.pct}%</span>
-                    <span>{g.ratio}</span>
-                  </div>
-                </div>
-              </TiltCard>
+                    {i + 1}
+                  </span>
+                  <Avatar src={hunter.image} name={nombrePublico(hunter.name, hunter.handle)} size={60} />
+                  <span className="min-w-0 max-w-full">
+                    <span className="block truncate text-[0.9375rem] font-bold">{nombrePublico(hunter.name, hunter.handle)}</span>
+                    <span className="block truncate text-xs text-muted">@{hunter.handle}</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <TrophyIcon grade="platinum" size={16} />
+                    <span className="font-heading text-lg font-bold tabular-nums text-platinum">{hunter.platinos}</span>
+                  </span>
+                </Link>
+              </li>
             ))}
-          </div>
-          {/* Sombra lateral para difuminar los bordes del marquee */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
-        </div>
+          </ol>
+        </section>
+      )}
 
-        <div className="mt-[72px]">
-          <h2 className="font-heading text-[1.875rem] font-bold uppercase leading-tight tracking-[-0.01em] text-center mb-8">
-            {t("comoFuncionaTitulo")}
-          </h2>
-          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f) => (
-              <div
-                key={f.num}
-                className="rounded-[18px] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgb(var(--accent-rgb) / 0.08)]"
-                style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
-              >
-                <span
-                  className="font-heading inline-flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[0.8125rem] font-bold"
-                  style={{ background: "rgb(var(--accent-rgb) / 0.12)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
-                >
-                  {f.num}
-                </span>
-                <h3 className="font-heading mt-4 text-[1.0625rem] font-bold leading-tight">{f.title}</h3>
-                <p className="mt-2.5 text-[0.8125rem] leading-relaxed text-muted">{f.body}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/como-funciona" className="text-sm font-bold uppercase tracking-wide text-accent hover:underline">
-              {t("verTodoComoFunciona")}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="pt-[72px]">
-        <h2 className="font-heading text-[2.125rem] font-bold uppercase leading-tight tracking-[-0.01em]">
-          {t("comparativaTitulo")}
-        </h2>
-        <p className="mt-2 max-w-[560px] text-base text-muted">{t("comparativaDescripcion")}</p>
-
-        <div className="mt-7 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-[20px] p-7 opacity-80 grayscale" style={{ border: "1px solid #2a2f38", background: "#181b20" }}>
-            <p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-[#8a8f98]">{t("comparativaAntesTitulo")}</p>
-            <div className="mt-5 space-y-2">
-              {["t1", "t2", "t3", "t4"].map((key) => (
-                <div key={key} className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ background: "#20242b" }}>
-                  <span className="h-7 w-7 shrink-0 rounded-full" style={{ background: "#3a3f47" }} />
-                  <span className="truncate text-sm text-[#a8adb5]">{t(`comparativaAntesItem.${key}`)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div
-            className="relative overflow-hidden rounded-[20px] p-7"
-            style={{ border: "1px solid rgb(var(--accent-rgb) / 0.35)", background: "linear-gradient(var(--surface), rgb(var(--accent-rgb) / 0.06))", boxShadow: "0 0 40px rgb(var(--accent-rgb) / 0.1)" }}
-          >
-            <p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent-text)" }}>
-              {t("comparativaDespuesTitulo")}
-            </p>
-            <div className="mt-5 space-y-2">
-              <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-                <TrophyIcon grade="gold" size={28} />
-                <div className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{t("comparativaAntesItem.t1")}</span>
-                  <span className="block text-xs" style={{ color: "var(--accent-text)" }}>{t("comparativaRareza", { percent: "6.2" })}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-                <TrophyIcon grade="silver" size={28} />
-                <div className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{t("comparativaAntesItem.t2")}</span>
-                  <span className="block text-xs" style={{ color: "var(--accent-text)" }}>{t("comparativaRareza", { percent: "22.8" })}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-                <span className="text-sm font-semibold">{t("comparativaDificultad")}</span>
-                <span className="rounded-full px-2.5 py-1 text-[0.6875rem] font-bold" style={{ background: "rgb(239 68 68 / 0.15)", color: "#f87171" }}>
-                  {t("comparativaDificultadValor")}
-                </span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-                <span className="text-sm font-semibold">{t("comparativaEta")}</span>
-                <span className="text-sm font-bold" style={{ color: "var(--accent-text)" }}>{t("comparativaEtaValor")}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pt-[72px]">
-        <div className="relative overflow-hidden rounded-[24px] p-8 sm:p-12" style={{ border: "1px solid #36393f", background: "linear-gradient(145deg, #2f3136, #202225)" }}>
+      <section className="pt-20 sm:pt-24">
+        <div className="relative overflow-hidden rounded-3xl p-7 sm:p-12" style={{ border: "1px solid #36393f", background: "linear-gradient(145deg, #2f3136, #202225)" }}>
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
-              <span className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider" style={{ background: "rgba(88, 101, 242, 0.15)", color: "#5865F2" }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
-                {t("botDiscordBadge") || "Integración Discord"}
-              </span>
-              <h2 className="font-heading text-[2rem] font-bold leading-tight">
-                {t("botDiscordTitulo") || "Lleva Paragon a tu servidor"}
-              </h2>
-              <p className="mt-4 text-base text-[#b9bbbe]">
-                {t("botDiscordDesc") || "Presume de tus platinos, compara estadísticas con tus amigos y recibe notificaciones de racha directamente en tu canal favorito. Sin salir de Discord."}
-              </p>
-              
-              <ul className="mt-6 space-y-3 text-sm text-[#b9bbbe]">
-                <li className="flex items-center gap-2.5">
-                  <span className="text-[#5865F2] font-semibold">/perfil</span> {t("botDiscordCmd1") || "Muestra tu Card interactiva en el chat"}
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <span className="text-[#5865F2] font-semibold">/comparar</span> {t("botDiscordCmd2") || "Radar de rivalidad con otros miembros"}
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <span className="text-[#5865F2] font-semibold">/platino</span> {t("botDiscordCmd3") || "Anuncia tus conquistas automáticamente"}
-                </li>
+              <h2 className="font-heading text-[clamp(1.625rem,4vw,2rem)] font-bold leading-tight text-white">{t("botDiscordTitulo")}</h2>
+              <p className="mt-4 max-w-[55ch] text-base text-[#c4c6ca]">{t("botDiscordDesc")}</p>
+              <ul className="mt-6 space-y-3 text-sm text-[#c4c6ca]">
+                <li className="flex flex-wrap items-baseline gap-x-2.5"><code className="font-semibold text-[#8b95f5]">/perfil</code> {t("botDiscordCmd1")}</li>
+                <li className="flex flex-wrap items-baseline gap-x-2.5"><code className="font-semibold text-[#8b95f5]">/comparar</code> {t("botDiscordCmd2")}</li>
+                <li className="flex flex-wrap items-baseline gap-x-2.5"><code className="font-semibold text-[#8b95f5]">/platino</code> {t("botDiscordCmd3")}</li>
               </ul>
             </div>
-            
-            <div className="relative rounded-lg p-4 shadow-xl border border-white/5" style={{ background: "#36393f" }}>
+
+            <div className="relative rounded-lg border border-white/5 p-4 shadow-xl" style={{ background: "#36393f" }} aria-hidden="true">
               <div className="flex gap-4">
-                <div className="h-10 w-10 shrink-0 rounded-full bg-[#5865F2] flex items-center justify-center text-white font-bold text-lg">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#5865F2]">
                   <TrophyIcon grade="platinum" size={24} />
                 </div>
-                <div>
-                  <div className="flex items-baseline gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-2">
                     <span className="font-medium text-white">Paragon Bot</span>
-                    <span className="text-[0.625rem] text-white bg-[#5865F2] px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">BOT</span>
-                    <span className="text-xs text-[#72767d]">Hoy a las 16:20</span>
+                    <span className="rounded bg-[#5865F2] px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-white">BOT</span>
+                    <span className="text-xs text-[#a3a6aa]">{t("landing.discordHora")}</span>
                   </div>
-                  <p className="text-[#dcddde] text-sm mt-1">¡<span className="font-semibold text-white">@hunter</span> acaba de conseguir el platino de <span className="font-semibold text-white">Elden Ring</span>! 🏆</p>
-                  
+                  <p className="mt-1 text-sm text-[#dcddde]">
+                    <span className="font-semibold text-white">@hunter</span> {t("landing.discordAnuncio")} <span className="font-semibold text-white">Elden Ring</span>
+                  </p>
                   <div className="mt-3 rounded border-l-4 border-[#5865F2] bg-[#2f3136] p-4">
-                    <div className="flex gap-4 items-start">
-                      <img loading="lazy" decoding="async" src="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" alt="Elden Ring" className="h-24 w-16 rounded object-cover shadow-md" />
+                    <div className="flex items-start gap-4">
+                      <img loading="lazy" decoding="async" src="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" alt="" className="h-24 w-16 rounded object-cover shadow-md" />
                       <div>
-                        <h4 className="font-bold text-[#00aff4] text-base hover:underline cursor-pointer">Elden Ring</h4>
-                        <p className="text-sm text-[#dcddde] mt-1.5">Rareza comunitaria: <span className="font-semibold text-[#f87171]">4.2%</span> (Ularraro)</p>
-                        <p className="text-xs text-[#b9bbbe] mt-1">Dificultad media: 8/10</p>
-                        <div className="mt-2.5 flex items-center gap-2">
-                           <span className="text-xs font-semibold px-2 py-0.5 rounded bg-surface-2 text-muted border border-border">#Soulsborne</span>
-                        </div>
+                        <p className="text-base font-bold text-[#00aff4]">Elden Ring</p>
+                        <p className="mt-1.5 text-sm text-[#dcddde]">
+                          {t("landing.discordRareza")}: <span className="font-semibold text-[#f87171]">4,2 %</span>
+                        </p>
+                        <p className="mt-1 text-xs text-[#b9bbbe]">{t("landing.discordDificultad", { n: 8 })}</p>
                       </div>
                     </div>
                   </div>
@@ -577,23 +388,16 @@ async function Landing() {
 
       <CardBuilder games={SAMPLE_SHELF} />
 
-      <section className="py-[72px]">
-        <div
-          className="relative overflow-hidden rounded-[24px] p-12 sm:p-16"
-          style={{
-            border: "1px solid #26364d",
-            background:
-              "radial-gradient(600px 300px at 20% 0%, rgb(var(--accent-rgb) / 0.22), transparent 70%), linear-gradient(160deg, #101a2b, #0b0f17)",
-          }}
-        >
-          <h2 className="font-heading max-w-[640px] text-[3.25rem] font-bold uppercase leading-none tracking-[-0.02em]">
+      <section className="py-20 sm:py-24">
+        <div className="relative overflow-hidden rounded-3xl border border-[rgb(var(--accent-rgb)/0.35)] px-7 py-12 text-center sm:px-16 sm:py-16" style={{ background: "linear-gradient(180deg, rgb(var(--accent-rgb) / 0.14), var(--surface) 70%)" }}>
+          <h2 className="font-heading mx-auto max-w-[18ch] text-[clamp(2.25rem,7vw,3.75rem)] font-bold uppercase leading-[0.98] tracking-[-0.02em] [text-wrap:balance]">
             {t("ctaFinalTitulo")}
           </h2>
-          <div className="mt-[30px] flex flex-wrap items-center gap-[18px]">
+          <div className="mt-8 flex flex-col items-center gap-3">
             <Link
               href="/entrar"
-              className="rounded-xl px-[26px] py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgb(var(--accent-rgb) / 0.6)]"
-              style={{ background: "var(--accent-grad)", boxShadow: "0 14px 40px rgb(var(--accent-rgb) / 0.35)" }}
+              className="rounded-xl px-8 py-4 text-[0.9375rem] font-bold text-background transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+              style={{ background: "var(--accent-grad)", boxShadow: "0 14px 32px -12px rgb(var(--accent-rgb) / 0.7)" }}
             >
               {t("ctaFinalBoton")}
             </Link>

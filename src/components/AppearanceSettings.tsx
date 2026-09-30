@@ -114,7 +114,7 @@ export function AppearanceSettings({ nivel }: { nivel: number }) {
           >
             <input
               type="color"
-              value={acentoLibre || "#4a9eff"}
+              value={acentoLibre || "#7cc4e4"}
               onChange={(e) => elegirAcentoLibre(e.target.value)}
               className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             />

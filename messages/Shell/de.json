@@ -241,7 +241,50 @@
     "botDiscordCmd2": "Rivalitätsradar mit anderen Mitgliedern",
     "botDiscordCmd3": "Kündige deine Eroberungen automatisch an",
     "personalizarPanel": "Anpassen, was im Dashboard erscheint",
-    "verComunidad": "Alles in der Community ansehen →"
+    "verComunidad": "Alles in der Community ansehen →",
+    "landing": {
+      "ejemplo": "Beispiel",
+      "convergenciaTitulo": "Vier Trophäenlisten. Ein Jäger.",
+      "convergenciaTexto": "Deine PlayStation-Trophäen und deine Erfolge auf Steam, Xbox und Epic leben in vier Apps, die nicht miteinander reden. Paragon führt sie zu einem Profil, einem Level und einer nächsten Platin zusammen.",
+      "nivelParagon": "Paragon-Level",
+      "trofeosEnPlataformas": "{n} Trophäen · 4 Plattformen",
+      "tu": "Du",
+      "vitrinaVacia": "Diese Woche wurden noch keine seltenen Trophäen gejagt. Hier die letzten Platins:",
+      "cartelaRareza": "{percent} % der Welt",
+      "cartelaPor": "von @{handle}",
+      "statsLinea": "{trofeos} gezählte Trophäen in {juegos} Spielen und {platinos} Platins insgesamt.",
+      "rutaTitulo": "Die Jagd, Schritt für Schritt",
+      "rutaDescripcion": "Was passiert, von dem Moment, in dem du sagst, wer du bist, bis du in der Liga aufsteigst.",
+      "pasos": {
+        "p1": {
+          "titulo": "Sag, wer du bist",
+          "cuerpo": "Deine öffentliche PlayStation-ID, dein Steam-Name, dein Gamertag oder dein Epic-Profil. Keine Passwörter, keine Tokens, keine Berechtigungen."
+        },
+        "p2": {
+          "titulo": "Wir sagen dir, worauf du gehen sollst",
+          "cuerpo": "Die Platin, die dir am nächsten ist, der kürzeste Weg dorthin und die verpassbaren Trophäen, bevor sie dir entgehen."
+        },
+        "p3": {
+          "titulo": "Miss dich mit deinen Freunden",
+          "cuerpo": "Spiel für Spiel, Balken gegen Balken. Herausforderungen mit Frist, gemeinsam platinieren und wer diese Woche vorne liegt."
+        },
+        "p4": {
+          "titulo": "Tritt jeden Monat an",
+          "cuerpo": "Monatsliga, Saisons, Clans und Clankriege. Am 1. fangen alle wieder bei null an."
+        }
+      },
+      "temaTitulo": "Mach sie zu deiner: probier einen Stil",
+      "temas": {
+        "clasico": "Klassisch",
+        "brutalista": "Brutalistisch",
+        "consola": "Konsole",
+        "hacker": "Terminal"
+      },
+      "discordHora": "Heute um 16:20",
+      "discordAnuncio": "hat gerade die Platin geholt in",
+      "discordRareza": "Seltenheit in der Community",
+      "discordDificultad": "Durchschnittliche Schwierigkeit: {n}/10"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Beispielprofil",

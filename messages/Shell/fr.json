@@ -241,7 +241,50 @@
     "botDiscordCmd2": "Radar de rivalité avec d'autres membres",
     "botDiscordCmd3": "Annoncez automatiquement vos conquêtes",
     "personalizarPanel": "Choisir ce qui s’affiche sur le tableau de bord",
-    "verComunidad": "Tout voir dans la Communauté →"
+    "verComunidad": "Tout voir dans la Communauté →",
+    "landing": {
+      "ejemplo": "Exemple",
+      "convergenciaTitulo": "Quatre listes de trophées. Un seul chasseur.",
+      "convergenciaTexto": "Tes trophées PlayStation et tes succès Steam, Xbox et Epic vivent dans quatre applis qui ne se parlent pas. Paragon les réunit en un profil, un niveau et un seul platine le plus proche.",
+      "nivelParagon": "Niveau Paragon",
+      "trofeosEnPlataformas": "{n} trophées · 4 plateformes",
+      "tu": "Toi",
+      "vitrinaVacia": "Aucun trophée rare chassé cette semaine pour l'instant. Voici les derniers platines :",
+      "cartelaRareza": "{percent} % du monde",
+      "cartelaPor": "par @{handle}",
+      "statsLinea": "{trofeos} trophées comptés sur {juegos} jeux, et {platinos} platines au total.",
+      "rutaTitulo": "La chasse, étape par étape",
+      "rutaDescripcion": "Ce qui se passe entre le moment où tu dis qui tu es et celui où tu grimpes dans la ligue.",
+      "pasos": {
+        "p1": {
+          "titulo": "Dis qui tu es",
+          "cuerpo": "Ton ID PlayStation public, ton pseudo Steam, ton Gamertag ou ton profil Epic. Ni mot de passe, ni jeton, ni autorisation."
+        },
+        "p2": {
+          "titulo": "On te dit quoi viser",
+          "cuerpo": "Le platine le plus à portée, le chemin le plus court pour y arriver et les trophées manquables avant qu'ils ne t'échappent."
+        },
+        "p3": {
+          "titulo": "Mesure-toi à tes amis",
+          "cuerpo": "Jeu par jeu, barre contre barre. Défis avec échéance, platiner ensemble et qui mène cette semaine."
+        },
+        "p4": {
+          "titulo": "Affronte-les chaque mois",
+          "cuerpo": "Ligue mensuelle, saisons, clans et guerres de clans. Le 1er, tout le monde repart de zéro."
+        }
+      },
+      "temaTitulo": "À ton goût : essaie un style",
+      "temas": {
+        "clasico": "Classique",
+        "brutalista": "Brutaliste",
+        "consola": "Console",
+        "hacker": "Terminal"
+      },
+      "discordHora": "Aujourd'hui à 16:20",
+      "discordAnuncio": "vient d'obtenir le platine de",
+      "discordRareza": "Rareté dans la communauté",
+      "discordDificultad": "Difficulté moyenne : {n}/10"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Profil d'exemple",

@@ -14,9 +14,11 @@
      iban a pelo como rgba(74, 158, 255, .14) por toda la app, y por eso
      cambiar de acento "no cambiaba casi nada": solo se movían dos o tres
      botones. */
-  --accent-rgb: 74 158 255;
+  /* Platino (30 sept 2026): la marca es la del trofeo que se persigue. El
+     azul de antes sigue disponible como `.accent-blue`. */
+  --accent-rgb: 124 196 228;
   --accent: rgb(var(--accent-rgb));
-  --accent-2: #9fd4ec;
+  --accent-2: #d7eef8;
   --good: #4ec98a;
   --danger: #ff6b6b;
 
@@ -221,6 +223,11 @@
  * color cualquiera es facilísimo acabar con texto ilegible sobre    *
  * los botones, que van con texto oscuro encima del acento.          *
  * ---------------------------------------------------------------- */
+.accent-blue {
+  --accent-rgb: 74 158 255;
+  --accent-2: #9fd4ec;
+}
+
 .accent-violet {
   --accent-rgb: 139 92 246;
   --accent-2: #c4b5fd;
@@ -244,9 +251,11 @@
 /* El acento en claro es más saturado: los pasteles de arriba, pensados para
    fondo oscuro, se lavan sobre blanco. */
 .light {
-  --accent-rgb: 37 99 235;
+  /* Platino en claro: acero azulado, el pastel se pierde sobre blanco. */
+  --accent-rgb: 22 110 150;
 }
 
+.light.accent-blue { --accent-rgb: 37 99 235; }
 .light.accent-violet { --accent-rgb: 124 58 237; }
 .light.accent-red { --accent-rgb: 220 38 38; }
 .light.accent-green { --accent-rgb: 5 150 105; }
@@ -556,4 +565,75 @@ h3,
 }
 @media (prefers-reduced-motion: reduce) {
   .nombre-efecto { animation: none; }
+}
+
+/* --- Portada pública (src/app/page.tsx → Landing, components/landing/*) ---
+   Todo va con prefijo `landing-`: globals.css es de toda la app y el
+   rediseño de la portada (30 sept 2026) no debe tocar nada más. */
+.landing-hero-halo {
+  background:
+    radial-gradient(60% 55% at 50% 0%, rgb(var(--accent-rgb) / 0.16), transparent 70%),
+    radial-gradient(40% 40% at 85% 30%, rgb(159 212 236 / 0.07), transparent 70%);
+}
+
+.landing-columna {
+  transition: border-color 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.landing-columna[data-fundiendo] {
+  border-color: color-mix(in srgb, var(--plataforma) 45%, var(--border));
+}
+
+.landing-perfil {
+  background: var(--surface);
+  border-color: rgb(var(--accent-rgb) / 0.35);
+  box-shadow: 0 28px 60px -24px rgb(var(--accent-rgb) / 0.45), 0 2px 0 rgb(255 255 255 / 0.03) inset;
+}
+.landing-perfil[data-fundiendo] {
+  animation: landing-perfil-llega 1.6s 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes landing-perfil-llega {
+  0% { box-shadow: 0 28px 60px -24px rgb(var(--accent-rgb) / 0.45); }
+  35% { box-shadow: 0 28px 80px -18px rgb(var(--accent-rgb) / 0.8); }
+  100% { box-shadow: 0 28px 60px -24px rgb(var(--accent-rgb) / 0.45), 0 2px 0 rgb(255 255 255 / 0.03) inset; }
+}
+
+.landing-perfil[data-fundiendo] .landing-anillo {
+  animation: landing-anillo 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes landing-anillo { from { stroke-dashoffset: var(--anillo-vacio); } }
+
+/* Vitrina: cada balda es una repisa con luz desde arriba. */
+.landing-balda {
+  background: linear-gradient(180deg, rgb(159 212 236 / 0.05), transparent 45%), var(--surface);
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+
+/* Cartela de la vitrina: nicho con luz cenital sobre el trofeo, y una repisa
+   bajo cada fila. */
+.landing-nicho {
+  background: radial-gradient(70% 90% at 50% 0%, rgb(159 212 236 / 0.16), transparent 70%);
+}
+.landing-repisa {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--border) 70%, white 8%), var(--surface-2));
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.7);
+}
+
+/* Ruta de la caza: la línea que une los pasos. */
+.landing-ruta::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background: linear-gradient(var(--accent), rgb(var(--accent-rgb) / 0.1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-columna,
+  .landing-perfil[data-fundiendo],
+  .landing-perfil[data-fundiendo] .landing-anillo {
+    animation: none !important;
+    transition: none !important;
+  }
 }

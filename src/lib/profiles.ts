@@ -375,9 +375,22 @@ export const getRarestTrophiesThisWeek = unstable_cache(
         ),
       )
       .orderBy(sql`${userTrophies.rarityPercent} asc`)
-      .limit(limit);
+      .limit(limit * 10);
 
-    return rows.map((r) => ({ ...r, rarityPercent: Number(r.rarityPercent ?? 0), earnedAt: r.earnedAt! }));
+    // Variedad: como mucho uno por juego y dos por cazador. Sin esto, una
+    // sola partida a Hollow Knight de una sola persona llenaba la vitrina
+    // entera y la "prueba de comunidad" era la semana de un usuario.
+    const porJuego = new Set<string>();
+    const porCazador = new Map<string, number>();
+    const elegidos: typeof rows = [];
+    for (const r of rows) {
+      if (elegidos.length >= limit) break;
+      if (porJuego.has(r.gameId) || (porCazador.get(r.userId) ?? 0) >= 2) continue;
+      porJuego.add(r.gameId);
+      porCazador.set(r.userId, (porCazador.get(r.userId) ?? 0) + 1);
+      elegidos.push(r);
+    }
+    return elegidos.map((r) => ({ ...r, rarityPercent: Number(r.rarityPercent ?? 0), earnedAt: r.earnedAt! }));
   },
   ["rarest-trophies-week"],
   { revalidate: 300 },
@@ -422,6 +435,8 @@ export const getRecentPlatinumActivity = unstable_cache(
           eq(gameTrophies.grade, "platinum"),
           isNotNull(users.handle),
           isNotNull(userTrophies.earnedAt),
+          // Es una cinta "en directo": un platino de hace ocho meses no lo es.
+          gte(userTrophies.earnedAt, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
         ),
       )
       .orderBy(desc(userTrophies.earnedAt))

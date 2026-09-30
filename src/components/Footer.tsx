@@ -17,7 +17,7 @@ export function Footer() {
           </span>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <Link
             href="/como-funciona"
             className="font-medium text-muted hover:text-foreground transition-colors"
