@@ -1151,6 +1151,39 @@ export const coopChallenges = pgTable("coop_challenge", {
   creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
 });
 
+/** Reto entre amigos: gana quien más trofeos consiga entre los que aceptan (lib/retosAmigos.ts). */
+export const friendChallenges = pgTable("friend_challenge", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  creadorId: text("creadorId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  titulo: text("titulo"),
+  inicio: timestamp("inicio", { mode: "date" }).notNull(),
+  fin: timestamp("fin", { mode: "date" }).notNull(),
+  /** activo → terminado, o cancelado (nadie aceptó / lo anuló quien lo creó). */
+  estado: text("estado").notNull().default("activo"),
+  creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+/** Quién está en cada reto (quien lo crea entra ya como "aceptado"). */
+export const friendChallengeParticipants = pgTable(
+  "friend_challenge_participant",
+  {
+    challengeId: text("challengeId")
+      .notNull()
+      .references(() => friendChallenges.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** pendiente → aceptado | rechazado. */
+    estado: text("estado").notNull().default("pendiente"),
+    /** Trofeos conseguidos en el reto, apuntados al cerrarse. */
+    resultado: integer("resultado"),
+    ganador: boolean("ganador").notNull().default(false),
+  },
+  (t) => [primaryKey({ columns: [t.challengeId, t.userId] })],
+);
+
 /** Vitrina temática del perfil (lib/vitrinas.ts). */
 export const showcaseShelves = pgTable("showcase_shelf", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),

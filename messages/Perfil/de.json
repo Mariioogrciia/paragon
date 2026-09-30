@@ -556,5 +556,42 @@
     "platino": "Platin",
     "neon": "Neon",
     "ayuda": "Dein Name mit animiertem Glanz im Profil. Wird mit Abzeichen oder Stufe verdient."
+  },
+  "RetosAmigos": {
+    "titulo": "Herausforderungen unter Freunden",
+    "subtitulo": "Fordere beliebige Freunde heraus: Wer im Zeitraum die meisten Trophäen holt, gewinnt – unter denen, die annehmen.",
+    "nuevo": "Neue Herausforderung",
+    "aQuien": "Wen forderst du heraus? (bis zu {max})",
+    "duracion": "Dauer",
+    "dias": "{n} Tage",
+    "nombreOpcional": "Name (optional)",
+    "nombrePlaceholder": "z. B. Platin-Woche",
+    "reglas": "Es zählen Trophäen und Erfolge jeder Plattform, die ab jetzt bis zum Ende freigeschaltet werden. Das Ergebnis steht nach der nächsten täglichen Synchronisierung fest.",
+    "enviar": "Herausforderung starten",
+    "cancelar": "Abbrechen",
+    "vacio": "Du hast keine laufenden Herausforderungen. Starte eine und lass die Jagd beginnen.",
+    "sinNombre": "Trophäen-Herausforderung",
+    "quedan": "{n, plural, one {Noch # Tag} other {Noch # Tage}}",
+    "cerrando": "Ergebnis wird ermittelt…",
+    "terminado": "Beendet am {fecha}",
+    "tu": "Du",
+    "ganador": "Sieger",
+    "sinResponder": "Noch keine Antwort: {nombres}",
+    "aceptar": "Annehmen",
+    "rechazar": "Ablehnen",
+    "anular": "Herausforderung abbrechen",
+    "errores": {
+      "duracion": "Wähle eine gültige Dauer.",
+      "sinInvitados": "Wähle mindestens einen Freund.",
+      "demasiados": "Zu viele Teilnehmer für eine Herausforderung.",
+      "ofensivo": "Dieser Name enthält anstößige Sprache.",
+      "noAmigo": "Du kannst nur deine Freunde herausfordern.",
+      "limite": "Du hast schon 3 laufende Herausforderungen. Warte, bis eine endet.",
+      "cerrado": "Diese Herausforderung ist schon vorbei.",
+      "yaRespondido": "Du hast darauf schon geantwortet.",
+      "noCreador": "Nur wer sie erstellt hat, kann sie abbrechen.",
+      "espera": "Warte kurz, bevor du eine weitere Herausforderung startest.",
+      "generico": "Das hat nicht geklappt. Versuch es noch einmal."
+    }
   }
 }

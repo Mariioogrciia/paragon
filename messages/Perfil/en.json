@@ -556,5 +556,42 @@
     "platino": "Platinum",
     "neon": "Neon",
     "ayuda": "Your name with an animated shine on your profile. Earned with badges or level."
+  },
+  "RetosAmigos": {
+    "titulo": "Friend challenges",
+    "subtitulo": "Challenge any friends you like: whoever earns the most trophies in the time limit wins, among those who accept.",
+    "nuevo": "New challenge",
+    "aQuien": "Who are you challenging? (up to {max})",
+    "duracion": "Duration",
+    "dias": "{n} days",
+    "nombreOpcional": "Name (optional)",
+    "nombrePlaceholder": "e.g. Platinum week",
+    "reglas": "Trophies and achievements from any platform earned from now until the end count. The result is settled with the next daily sync after that.",
+    "enviar": "Start challenge",
+    "cancelar": "Cancel",
+    "vacio": "You have no challenges running. Start one and let the hunt begin.",
+    "sinNombre": "Trophy challenge",
+    "quedan": "{n, plural, one {# day left} other {# days left}}",
+    "cerrando": "Settling results…",
+    "terminado": "Ended {fecha}",
+    "tu": "You",
+    "ganador": "Winner",
+    "sinResponder": "No answer yet: {nombres}",
+    "aceptar": "Accept",
+    "rechazar": "Decline",
+    "anular": "Cancel challenge",
+    "errores": {
+      "duracion": "Pick a valid duration.",
+      "sinInvitados": "Pick at least one friend.",
+      "demasiados": "Too many people for a single challenge.",
+      "ofensivo": "That name contains offensive language.",
+      "noAmigo": "You can only challenge your friends.",
+      "limite": "You already have 3 challenges running. Wait for one to end.",
+      "cerrado": "That challenge has already ended.",
+      "yaRespondido": "You already answered that challenge.",
+      "noCreador": "Only the person who created it can cancel it.",
+      "espera": "Wait a moment before starting another challenge.",
+      "generico": "Couldn't complete that. Try again."
+    }
   }
 }

@@ -1,51 +1,80 @@
-const CACHE_NAME = 'paragon-offline-v1';
+// Se registra como /sw.js?v=<commit> (ServiceWorkerRegister.tsx): cada
+// despliegue es un script "nuevo" para el navegador, así que se reinstala y
+// vuelve a guardar la página offline con los chunks de ESE despliegue.
+const CACHE_NAME = 'paragon-offline-v2';
 const OFFLINE_URL = '/offline';
+const ASSET_RE = /\/_next\/static\/[^"'\s)\\]+/g;
+
+async function cachearPaginaOffline() {
+  const cache = await caches.open(CACHE_NAME);
+  // Sin cookies: la copia offline no debe llevar la cabecera con el nombre y
+  // la foto de quien estaba conectado al instalarse.
+  const respuesta = await fetch(new Request(OFFLINE_URL, { cache: 'reload', credentials: 'omit' }));
+  if (!respuesta.ok) throw new Error('offline ' + respuesta.status);
+  const html = await respuesta.clone().text();
+  await cache.put(OFFLINE_URL, respuesta);
+
+  // Sin su CSS y sus chunks, la página offline salía sin estilos y el
+  // minijuego no arrancaba: solo se guardaba el HTML.
+  const assets = new Set(html.match(ASSET_RE) || []);
+  const css = [...assets].filter((u) => u.endsWith('.css'));
+  await Promise.allSettled(
+    css.map(async (u) => {
+      const r = await fetch(u);
+      const texto = await r.text();
+      for (const fuente of texto.match(ASSET_RE) || []) assets.add(fuente);
+    }),
+  );
+  await Promise.allSettled([...assets].map((u) => cache.add(u)));
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      // Solo cacheamos la ruta offline y el logo (opcional)
-      await cache.add(new Request(OFFLINE_URL, { cache: 'reload' }));
-    })()
-  );
-  // Fuerza al Service Worker a tomar control inmediatamente
-  self.skipWaiting();
+  event.waitUntil(cachearPaginaOffline().then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      // Activa el nuevo Service Worker para todas las pestañas
+      const nombres = await caches.keys();
+      await Promise.all(nombres.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n)));
       if ('navigationPreload' in self.registration) {
         await self.registration.navigationPreload.enable();
       }
-    })()
+      await self.clients.claim();
+    })(),
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Solo nos importan las peticiones de navegación (cuando cargas una página)
-  if (event.request.mode === 'navigate') {
+  const { request } = event;
+
+  if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
         try {
           const preloadResponse = await event.preloadResponse;
-          if (preloadResponse) {
-            return preloadResponse;
-          }
-
-          // Intenta cargar por red primero
-          const networkResponse = await fetch(event.request);
-          return networkResponse;
+          if (preloadResponse) return preloadResponse;
+          return await fetch(request);
         } catch (error) {
-          // Si falla la red, devuelve la página offline de la caché
           const cache = await caches.open(CACHE_NAME);
           const cachedResponse = await cache.match(OFFLINE_URL);
           return cachedResponse || new Response('Offline', { status: 503, statusText: 'Offline' });
         }
-      })()
+      })(),
+    );
+    return;
+  }
+
+  // Chunks con hash: inmutables, así que la copia guardada vale siempre. Solo
+  // se sirven de caché los que guardó la instalación; el resto va a la red.
+  const url = new URL(request.url);
+  if (request.method === 'GET' && url.origin === self.location.origin && url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const guardado = await cache.match(request, { ignoreSearch: true });
+        return guardado || fetch(request);
+      })(),
     );
   }
 });
@@ -69,7 +98,7 @@ self.addEventListener('push', (event) => {
       icon: datos.icon || '/logo.jpg',
       badge: '/logo.jpg',
       data: { url: datos.url || '/' },
-    })
+    }),
   );
 });
 
@@ -88,6 +117,6 @@ self.addEventListener('notificationclick', (event) => {
         return;
       }
       await self.clients.openWindow(url);
-    })()
+    })(),
   );
 });

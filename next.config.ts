@@ -4,6 +4,11 @@ import type { NextConfig } from "next";
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  // Versión del Service Worker (`/sw.js?v=`, ver ServiceWorkerRegister.tsx):
+  // un valor por despliegue para que se reinstale y renueve la copia offline.
+  env: {
+    NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) ?? "dev",
+  },
   // Dominios conocidos de carátulas/capturas externas para poder usar
   // next/image en vez de <img> a pelo (auditoría de rendimiento, 22 sept
   // 2026): IGDB y Steam están fijos en nuestro propio código, así que se

@@ -61,6 +61,7 @@ import { borrarAlertaPrecio, guardarAlertaPrecio } from "@/lib/priceAlerts";
 import { setObjetivoFecha } from "@/lib/goals";
 import { SesionError, apuntarse, cancelarSesion, crearSesion, salirse } from "@/lib/sesiones";
 import { CoopError, proponerReto, responderReto } from "@/lib/coop";
+import { RetoAmigosError, cancelarRetoAmigos, crearRetoAmigos, responderRetoAmigos } from "@/lib/retosAmigos";
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { getParagonLevel } from "@/lib/paragonLevel";
@@ -1658,6 +1659,46 @@ export async function responderRetoAction(retoId: string, aceptar: boolean): Pro
     await responderReto(userId, retoId, aceptar);
   } catch (e) {
     if (e instanceof CoopError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/amigos");
+  return {};
+}
+
+/* ---------------------------------- Retos entre amigos --------------------------------- */
+
+/** Ver lib/retosAmigos.ts. `error` es un código: el texto lo pone la interfaz. */
+export async function crearRetoAmigosAction(datos: { invitados: string[]; dias: number; titulo?: string }): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  if (!(await limitar("comentario", userId))) return { error: "espera" };
+  try {
+    await crearRetoAmigos(userId, datos);
+  } catch (e) {
+    if (e instanceof RetoAmigosError) return { error: e.codigo };
+    throw e;
+  }
+  revalidatePath("/amigos");
+  return {};
+}
+
+export async function responderRetoAmigosAction(challengeId: string, aceptar: boolean): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  try {
+    await responderRetoAmigos(userId, challengeId, aceptar);
+  } catch (e) {
+    if (e instanceof RetoAmigosError) return { error: e.codigo };
+    throw e;
+  }
+  revalidatePath("/amigos");
+  return {};
+}
+
+export async function cancelarRetoAmigosAction(challengeId: string): Promise<{ error?: string }> {
+  const userId = await requireUserId();
+  try {
+    await cancelarRetoAmigos(userId, challengeId);
+  } catch (e) {
+    if (e instanceof RetoAmigosError) return { error: e.codigo };
     throw e;
   }
   revalidatePath("/amigos");

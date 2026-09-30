@@ -556,5 +556,42 @@
     "platino": "Platine",
     "neon": "Néon",
     "ayuda": "Ton nom avec un éclat animé sur ton profil. S’obtient avec des badges ou le niveau."
+  },
+  "RetosAmigos": {
+    "titulo": "Défis entre amis",
+    "subtitulo": "Défie les amis que tu veux : celui qui obtient le plus de trophées dans le délai gagne, parmi ceux qui acceptent.",
+    "nuevo": "Nouveau défi",
+    "aQuien": "Qui défies-tu ? (jusqu'à {max})",
+    "duracion": "Durée",
+    "dias": "{n} jours",
+    "nombreOpcional": "Nom (facultatif)",
+    "nombrePlaceholder": "ex. Semaine des platines",
+    "reglas": "Comptent les trophées et succès de toute plateforme obtenus d'ici la fin. Le résultat est arrêté à la synchronisation quotidienne suivante.",
+    "enviar": "Lancer le défi",
+    "cancelar": "Annuler",
+    "vacio": "Tu n'as aucun défi en cours. Lances-en un et que la chasse commence.",
+    "sinNombre": "Défi de trophées",
+    "quedan": "{n, plural, one {Plus que # jour} other {Plus que # jours}}",
+    "cerrando": "Résultats en cours…",
+    "terminado": "Terminé le {fecha}",
+    "tu": "Toi",
+    "ganador": "Gagnant",
+    "sinResponder": "Sans réponse : {nombres}",
+    "aceptar": "Accepter",
+    "rechazar": "Refuser",
+    "anular": "Annuler le défi",
+    "errores": {
+      "duracion": "Choisis une durée valide.",
+      "sinInvitados": "Choisis au moins un ami.",
+      "demasiados": "Trop de monde pour un seul défi.",
+      "ofensivo": "Ce nom contient un langage offensant.",
+      "noAmigo": "Tu ne peux défier que tes amis.",
+      "limite": "Tu as déjà 3 défis en cours. Attends qu'un se termine.",
+      "cerrado": "Ce défi est déjà terminé.",
+      "yaRespondido": "Tu as déjà répondu à ce défi.",
+      "noCreador": "Seule la personne qui l'a créé peut l'annuler.",
+      "espera": "Attends un instant avant de lancer un autre défi.",
+      "generico": "Impossible de terminer. Réessaie."
+    }
   }
 }

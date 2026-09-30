@@ -13,6 +13,7 @@ import { cerrarGuerrasVencidas } from "@/lib/clanWars";
 import { avisarAdelantos, avisarLanzamientos, avisarPerdibles } from "@/lib/avisosAutomaticos";
 import { recordarSesiones } from "@/lib/sesiones";
 import { revisarRetosCoop } from "@/lib/coop";
+import { cerrarRetosAmigos } from "@/lib/retosAmigos";
 import { cerrarTemporadaAnteriorSiToca } from "@/lib/temporadas";
 import { registrarHorasDelDia } from "@/lib/horasPeriodo";
 
@@ -407,7 +408,7 @@ export async function GET(request: Request) {
   // Avisos automáticos (lib/avisosAutomaticos.ts): perdibles al empezar un
   // juego, lanzamientos de deseados y adelantos en la liga del mes. Cada
   // uno en su try: que falle uno no se lleva por delante a los otros.
-  const avisosAuto = { perdibles: 0, lanzamientos: 0, adelantos: 0, sesiones: 0, retosCoop: 0 };
+  const avisosAuto = { perdibles: 0, lanzamientos: 0, adelantos: 0, sesiones: 0, retosCoop: 0, retosAmigos: 0 };
   if (!agotado) {
     const limite = arranque + PRESUPUESTO_MS - MARGEN_MS / 2;
     for (const [clave, tarea] of [
@@ -416,6 +417,7 @@ export async function GET(request: Request) {
       ["adelantos", () => avisarAdelantos(limite)],
       ["sesiones", () => recordarSesiones(limite)],
       ["retosCoop", () => revisarRetosCoop(limite)],
+      ["retosAmigos", () => cerrarRetosAmigos(limite)],
     ] as const) {
       if (Date.now() > limite) break;
       try {

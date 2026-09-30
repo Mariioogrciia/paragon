@@ -556,5 +556,42 @@
     "platino": "Platino",
     "neon": "Neón",
     "ayuda": "Tu nombre con un brillo animado en el perfil. Se ganan con insignias o nivel."
+  },
+  "RetosAmigos": {
+    "titulo": "Retos entre amigos",
+    "subtitulo": "Reta a los amigos que quieras: gana quien más trofeos consiga en el plazo, entre los que acepten.",
+    "nuevo": "Nuevo reto",
+    "aQuien": "¿A quién retas? (hasta {max})",
+    "duracion": "Duración",
+    "dias": "{n} días",
+    "nombreOpcional": "Nombre (opcional)",
+    "nombrePlaceholder": "p. ej. Semana de platinos",
+    "reglas": "Cuentan los trofeos y logros de cualquier plataforma conseguidos desde ahora hasta el final. El resultado se cierra con la sincronización diaria de después.",
+    "enviar": "Lanzar reto",
+    "cancelar": "Cancelar",
+    "vacio": "No tienes retos en marcha. Lanza uno y que empiece la caza.",
+    "sinNombre": "Reto de trofeos",
+    "quedan": "{n, plural, one {Queda # día} other {Quedan # días}}",
+    "cerrando": "Cerrando resultados…",
+    "terminado": "Terminó el {fecha}",
+    "tu": "Tú",
+    "ganador": "Ganador",
+    "sinResponder": "Sin responder: {nombres}",
+    "aceptar": "Aceptar",
+    "rechazar": "Rechazar",
+    "anular": "Anular reto",
+    "errores": {
+      "duracion": "Elige una duración válida.",
+      "sinInvitados": "Elige al menos a un amigo.",
+      "demasiados": "Demasiados invitados para un solo reto.",
+      "ofensivo": "Ese nombre contiene lenguaje ofensivo.",
+      "noAmigo": "Solo puedes retar a tus amigos.",
+      "limite": "Ya tienes 3 retos en marcha. Espera a que acabe alguno.",
+      "cerrado": "Ese reto ya ha terminado.",
+      "yaRespondido": "Ya respondiste a ese reto.",
+      "noCreador": "Solo quien lo creó puede anularlo.",
+      "espera": "Espera un momento antes de lanzar otro reto.",
+      "generico": "No se ha podido completar. Inténtalo de nuevo."
+    }
   }
 }
