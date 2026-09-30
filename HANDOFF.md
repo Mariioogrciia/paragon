@@ -199,7 +199,10 @@ verdad:
   estética global.
 - **Dominio propio**: no comprado; la app sigue en `platinos-nine.vercel.app`.
 - **Epic no da horas jugadas** por su API: nunca aparecerán en rankings de
-  horas (no es un fallo arreglable desde aquí).
+  horas (no es un fallo arreglable desde aquí). **Xbox sí** desde el 30
+  sept 2026: `MinutesPlayed` por `POST /player/stats` de OpenXBL
+  (`minutosJugados` en xbl/client.ts), solo para juegos de Xbox/PC — los
+  de Xbox Live en PlayStation/Android se excluyen para no duplicar horas.
 - **Horas por periodo**: solo hay registro diario desde el 29 sept 2026
   (`lib/horasPeriodo.ts`); los periodos anteriores a esa fecha no se pueden
   reconstruir.
@@ -834,3 +837,9 @@ Comunidad; partir `actions.ts` y `profiles.ts`. "Retos semanales entre
 amigos" ya existe como clasificación semanal/mensual en /amigos; darle
 ganador exige decidir contra qué grupo gana cada uno (cada cual tiene
 amigos distintos).
+
+- **Truco para scripts con `server-only`**: `npx tsx --conditions=react-server
+  script.mts` carga el módulo vacío de `server-only` (como hace Next), sin
+  tener que comentar el import a mano. En local con Avast, anteponer
+  `NODE_EXTRA_CA_CERTS="C:\ProgramData\Avast Software\Avast\wscert.pem"`
+  a cualquier script que haga peticiones HTTPS.

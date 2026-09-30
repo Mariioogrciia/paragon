@@ -186,6 +186,11 @@ export async function fetchLibrary(xuid: string): Promise<Game[]> {
   const titles = data?.content?.titles;
   if (!titles) return [];
 
+  const minutos = await minutosJugados(
+    xuid,
+    titles.filter((t) => esDeXboxOPc(t.devices)).map((t) => t.titleId),
+  );
+
   return titles
     .map((t) => ({
       id: gameKey("xbox", t.titleId),
@@ -194,11 +199,56 @@ export async function fetchLibrary(xuid: string): Promise<Game[]> {
       deviceLabel: deviceLabelFor(t.devices),
       iconUrl: t.displayImage,
       lastPlayedAt: t.titleHistory?.lastTimePlayed,
+      playtimeMinutes: minutos.get(t.titleId),
       progressPercent: 0,
       definedTotal: 0,
       earnedTotal: 0,
     }))
     .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""));
+}
+
+/**
+ * Solo juegos de Xbox o PC. Los que usan Xbox Live en otras plataformas
+ * ("Minecraft for PlayStation®", "for Android") salen en el historial de
+ * Xbox, pero sus horas son de esa otra consola: PSN ya las da por su lado y
+ * contarlas aquí las duplicaría.
+ */
+function esDeXboxOPc(devices: string[] | undefined): boolean {
+  return (devices ?? []).some((d) => ["XboxSeries", "XboxOne", "Xbox360", "PC", "Win32"].includes(d));
+}
+
+/**
+ * Horas por juego: `MinutesPlayed` del servicio de estadísticas de Xbox
+ * (`POST /player/stats` de OpenXBL), una sola llamada por tandas de 100
+ * juegos. Hasta el 30 sept 2026 Xbox no enseñaba horas en Paragon porque
+ * solo se pedía el historial de logros. Si falla, sin horas (como antes).
+ */
+async function minutosJugados(xuid: string, titleIds: string[]): Promise<Map<string, number>> {
+  const minutos = new Map<string, number>();
+  for (let i = 0; i < titleIds.length; i += 100) {
+    const tanda = titleIds.slice(i, i + 100);
+    try {
+      const response = await fetch(`${API}/player/stats`, {
+        method: "POST",
+        signal: AbortSignal.timeout(10_000),
+        headers: { "X-Authorization": apiKey(), Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ xuids: [xuid], stats: tanda.map((titleId) => ({ name: "MinutesPlayed", titleId })) }),
+        cache: "no-store",
+      });
+      if (!response.ok) continue;
+      // Viene envuelto en `content` (comprobado contra la API real).
+      const data = (await response.json()) as {
+        content?: { statlistscollection?: { stats?: { titleid?: string; value?: string }[] }[] };
+      };
+      for (const s of data.content?.statlistscollection?.[0]?.stats ?? []) {
+        const valor = Number(s.value);
+        if (s.titleid && Number.isFinite(valor) && valor > 0) minutos.set(s.titleid, Math.round(valor));
+      }
+    } catch (error) {
+      console.error("[xbl] minutos jugados", error);
+    }
+  }
+  return minutos;
 }
 
 /* --------------------------------- Logros --------------------------------- */
