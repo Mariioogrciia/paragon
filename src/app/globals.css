@@ -839,3 +839,20 @@ h3,
 }
 @media (max-width: 639px) { .lomo { width: 44px; } }
 @media (prefers-reduced-motion: reduce) { .lomo { transition: none; } }
+
+/* --- Descubrir: matriz dificultad × horas (MatrizDificultad.tsx) -------- */
+.matriz-plano {
+  background:
+    linear-gradient(135deg, rgb(78 201 138 / 0.07), transparent 45%, transparent 55%, rgb(255 107 107 / 0.08)),
+    var(--surface);
+}
+.matriz-punto {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  box-shadow: 0 0 0 1.5px var(--background), 0 4px 10px -4px rgb(0 0 0 / 0.7);
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms;
+}
+.matriz-punto:hover, .matriz-punto:focus-visible { transform: translate(-50%, 50%) scale(1.8); z-index: 30; opacity: 1 !important; }
+@media (max-width: 639px) { .matriz-punto { width: 20px; height: 20px; } }

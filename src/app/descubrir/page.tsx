@@ -2,7 +2,8 @@ import { auth } from "@/auth";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
-import { getTrendingGames, getHiddenGems } from "@/lib/discover";
+import { getTrendingGames, getHiddenGems, getMatrizDescubrir } from "@/lib/discover";
+import { MatrizDificultad } from "@/components/MatrizDificultad";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { DiscoverSearch } from "@/components/DiscoverSearch";
 import { DiscoverCard, FilaHorizontal } from "@/components/DiscoverCard";
@@ -27,7 +28,7 @@ export default async function DescubrirPage() {
   // Tendencias, Joyas Ocultas y Próximos lanzamientos son iguales para
   // todo el mundo — no hace falta sesión para verlos, solo para añadir a
   // Deseados desde ahí (el propio botón de cada pieza ya lo comprueba).
-  const [tendencias, joyas, wishlistIds, novedades, destacados] = await Promise.all([
+  const [tendencias, joyas, wishlistIds, novedades, destacados, matriz] = await Promise.all([
     getTrendingGames(),
     getHiddenGems(),
     userId ? getWishlistIgdbIds(userId) : Promise.resolve([]),
@@ -46,6 +47,7 @@ export default async function DescubrirPage() {
       if (!(e instanceof IgdbNotConfiguredError)) console.error("[descubrir-destacados]", e);
       return [];
     }),
+    getMatrizDescubrir().catch(() => []),
   ]);
 
   const hero = destacados.map((g) => ({
@@ -75,6 +77,8 @@ export default async function DescubrirPage() {
       <DiscoverSearch estaLogueado={Boolean(userId)} />
 
       <PlatformTiles />
+
+      <MatrizDificultad puntos={matriz} />
 
       {/* Multiplataforma: agrupa por igdbId, no por games.id — el mismo
           juego en PSN y Steam cuenta como uno para "cuánta gente lo tiene",

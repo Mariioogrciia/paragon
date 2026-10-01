@@ -45,6 +45,7 @@ export const NAMESPACES_CLIENTE = [
   "Biblioteca",
   "Descubrir.CardCarousel",
   "Descubrir.DiscoverSearch",
+  "Descubrir.DescubrirPage.matriz",
   "Descubrir.EsportsHub",
   "Descubrir.GamePassCatalog",
   "Descubrir.HeroCarousel",

@@ -8,7 +8,22 @@
     "joyasOcultas": "Versteckte Perlen",
     "joyasOcultasDescripcion": "Top bewertet, aber fast niemand hat es bisher.",
     "recomendacionesLogueado": "Deine persönlichen Empfehlungen haben jetzt einen eigenen Bereich — <link>hier ansehen</link>.",
-    "recomendacionesInvitado": "<link>Melde dich an</link>, um Empfehlungen aus deiner eigenen Bibliothek zu sehen — nach Genre und allgemein."
+    "recomendacionesInvitado": "<link>Melde dich an</link>, um Empfehlungen aus deiner eigenen Bibliothek zu sehen — nach Genre und allgemein.",
+    "matriz": {
+      "titulo": "Wähle deine nächste Platin",
+      "descripcion": "Die Spiele der Community, nach Schwierigkeit der Platin (wie viele sie holen) und den Stunden, die Paragon-Jäger investieren. Tippe auf einen Bereich, um seine Spiele zu sehen.",
+      "ejeX": "Leichter → schwerer (Platin-Seltenheit)",
+      "ejeY": "↑ Mehr Stunden",
+      "cuadrantes": {
+        "facilCorto": "Schnell und machbar",
+        "facilLargo": "Lang, aber machbar",
+        "dificilCorto": "Kurz, aber hart",
+        "dificilLargo": "Für Mutige"
+      },
+      "tooltip": "{titulo} · Platin {rareza} % · {horas} Std.",
+      "fila": "Platin {rareza} % · Ø {horas} Std.",
+      "vacio": "Noch keine Spiele in diesem Bereich."
+    }
   },
   "PlataformaPage": {
     "breadcrumb": "Entdecken",

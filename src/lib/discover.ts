@@ -297,3 +297,46 @@ export async function getRecommendationsByGenre(
     }))
     .filter((tira) => tira.juegos.length > 0);
 }
+
+export interface PuntoMatriz {
+  id: string;
+  titulo: string;
+  icono: string | null;
+  /** % de jugadores (de la plataforma) con el platino: menos = más difícil. */
+  rareza: number;
+  /** Media de horas jugadas por los usuarios de Paragon que lo tienen. */
+  horas: number;
+}
+
+/**
+ * Matriz dificultad × horas de Descubrir, con datos reales de la comunidad:
+ * la dificultad sale de la rareza del platino (lo que dan PSN/Steam/Xbox) y las
+ * horas, de la media de lo jugado por los usuarios de Paragon que lo tienen.
+ * HowLongToBeat solo cubre ~20 juegos de la base: no sirve para esto.
+ */
+export const getMatrizDescubrir = unstable_cache(
+  async (): Promise<PuntoMatriz[]> => {
+    const filas = await db.execute<{ id: string; titulo: string; icono: string | null; rareza: number; horas: number }>(sql`
+      with plat as (
+        select gt."gameId", avg(ut."rarityPercent")::float rareza
+        from ${gameTrophies} gt
+        join ${userTrophies} ut on ut."gameId" = gt."gameId" and ut."trophyId" = gt."trophyId"
+        where gt.grade = 'platinum' and ut."rarityPercent" is not null
+        group by gt."gameId"
+      ),
+      horas as (
+        select "gameId", (avg("playtimeMinutes") / 60.0)::float horas
+        from ${userGames} where "playtimeMinutes" > 0 and "isWishlist" = false
+        group by "gameId"
+      )
+      select g.id, g.title titulo, g."iconUrl" icono, p.rareza, h.horas
+      from plat p join horas h on h."gameId" = p."gameId" join ${gamesTable} g on g.id = p."gameId"
+      where h.horas >= 0.5
+      order by h.horas desc
+      limit 300
+    `);
+    return [...filas].map((f) => ({ ...f, rareza: Number(f.rareza), horas: Number(f.horas) }));
+  },
+  ["matriz-descubrir"],
+  { revalidate: 3600 },
+);

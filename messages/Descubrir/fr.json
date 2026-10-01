@@ -8,7 +8,22 @@
     "joyasOcultas": "Pépites cachées",
     "joyasOcultasDescripcion": "Note excellente, mais presque personne ne l'a encore.",
     "recomendacionesLogueado": "Tes recommandations personnalisées ont maintenant leur propre section — <link>découvre-les ici</link>.",
-    "recomendacionesInvitado": "<link>Connecte-toi</link> pour voir des recommandations basées sur ta propre bibliothèque — par genre, et en général."
+    "recomendacionesInvitado": "<link>Connecte-toi</link> pour voir des recommandations basées sur ta propre bibliothèque — par genre, et en général.",
+    "matriz": {
+      "titulo": "Choisis ton prochain platine",
+      "descripcion": "Les jeux de la communauté, selon la difficulté de leur platine (combien de joueurs l'obtiennent) et les heures qu'y passent les chasseurs de Paragon. Touche une zone pour voir ses jeux.",
+      "ejeX": "Plus facile → plus difficile (rareté du platine)",
+      "ejeY": "↑ Plus d'heures",
+      "cuadrantes": {
+        "facilCorto": "Rapide et accessible",
+        "facilLargo": "Long mais accessible",
+        "dificilCorto": "Court mais dur",
+        "dificilLargo": "Pour les courageux"
+      },
+      "tooltip": "{titulo} · platine {rareza} % · {horas} h",
+      "fila": "Platine {rareza} % · {horas} h en moyenne",
+      "vacio": "Pas encore de jeux dans cette zone."
+    }
   },
   "PlataformaPage": {
     "breadcrumb": "Découvrir",

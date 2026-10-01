@@ -8,7 +8,22 @@
     "joyasOcultas": "Hidden gems",
     "joyasOcultasDescripcion": "Sky-high rating, but almost nobody has it yet.",
     "recomendacionesLogueado": "Your personalized recommendations now have their own section — <link>check them out here</link>.",
-    "recomendacionesInvitado": "<link>Sign in</link> to see recommendations built from your own library — by genre, and overall."
+    "recomendacionesInvitado": "<link>Sign in</link> to see recommendations built from your own library — by genre, and overall.",
+    "matriz": {
+      "titulo": "Pick your next platinum",
+      "descripcion": "Games the community owns, by how hard their platinum is (how many people get it) and how many hours Paragon hunters put in. Tap an area to see its games.",
+      "ejeX": "Easier → harder (platinum rarity)",
+      "ejeY": "↑ More hours",
+      "cuadrantes": {
+        "facilCorto": "Quick and doable",
+        "facilLargo": "Long but doable",
+        "dificilCorto": "Short but tough",
+        "dificilLargo": "For the brave"
+      },
+      "tooltip": "{titulo} · platinum {rareza}% · {horas} h",
+      "fila": "Platinum {rareza}% · {horas} h average",
+      "vacio": "No games in this area yet."
+    }
   },
   "PlataformaPage": {
     "breadcrumb": "Discover",
