@@ -51,7 +51,16 @@ function IconoPlataforma({ platforms }: { platforms: string[] }) {
  * un resplandor de neón. La plataforma sale como chip propio con icono, no
  * mezclada con los géneros.
  */
-export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGame[]; wishlistedIgdbIds?: number[] }) {
+export function HeroCarousel({
+  items,
+  wishlistedIgdbIds = [],
+  numerado = false,
+}: {
+  items: HeroGame[];
+  wishlistedIgdbIds?: number[];
+  /** Lista de éxitos (Descubrir): el puesto de cada destacado como numeral grande. */
+  numerado?: boolean;
+}) {
   const t = useTranslations("Descubrir.HeroCarousel");
   const [i, setI] = useState(0);
   const [pausado, setPausado] = useState(false);
@@ -99,6 +108,12 @@ export function HeroCarousel({ items, wishlistedIgdbIds = [] }: { items: HeroGam
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={g.coverUrl} alt="" className="h-full w-full object-contain" />
           </div>
+        )}
+
+        {numerado && (
+          <span className="exitos-numeral-hero" aria-label={t("puesto", { n: i + 1 })}>
+            {String(i + 1).padStart(2, "0")}
+          </span>
         )}
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-3 text-white sm:px-6">

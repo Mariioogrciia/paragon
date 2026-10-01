@@ -6,6 +6,7 @@ import { UpcomingGames } from "@/components/UpcomingGames";
 import { getGamingNews, noticiasDeTuBiblioteca } from "@/lib/rss";
 import { BackButton } from "@/components/BackButton";
 import { TarjetaNoticia } from "@/components/TarjetaNoticia";
+import { TeletipoNoticias } from "@/components/TeletipoNoticias";
 import { SeccionTabs } from "@/components/SeccionTabs";
 
 export const metadata = {
@@ -41,52 +42,50 @@ export default async function NoticiasPage() {
   const news = newsPool.slice(0, 12);
   const noticiasPropias = session?.user?.id ? noticiasDeTuBiblioteca(newsPool, titulosPropios) : [];
 
+  // Panel de salidas (rediseño del 1 oct 2026): mismas cuatro secciones.
+  // Próximas salidas a lo ancho con "recién llegados" al lado; las noticias
+  // de tus juegos siguen como tarjetas destacadas y el resto pasa a
+  // teletipo.
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
       <BackButton fallbackHref="/" />
       <SeccionTabs seccion="descubrir" />
       <div className="mb-8">
-        <h1 className="font-heading text-3xl font-bold mb-2">{t("titulo")}</h1>
+        <h1 className="font-heading mb-2 text-[clamp(2rem,6vw,2.625rem)] font-bold uppercase leading-none">{t("titulo")}</h1>
         <p className="text-muted">{t("subtitulo")}</p>
       </div>
 
-      <div className="mb-16 flex flex-col gap-6">
-        <UpcomingGames wishlistedIgdbIds={wishlistIds} />
-        <UpcomingGames wishlistedIgdbIds={wishlistIds} modo="recientes" />
+      <div className="mb-14 grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <UpcomingGames wishlistedIgdbIds={wishlistIds} variante="panel" />
+        <UpcomingGames wishlistedIgdbIds={wishlistIds} modo="recientes" variante="panel" compacto />
       </div>
 
       {noticiasPropias.length > 0 && (
-        <div className="mb-16">
-          <div className="mb-8">
-            <h2 className="font-heading text-3xl font-bold mb-2">{t("noticiasPropiasTitulo")}</h2>
-            <p className="text-muted">{t("noticiasPropiasDescripcion")}</p>
+        <section className="mb-14">
+          <div className="mb-6">
+            <h2 className="font-heading mb-1.5 text-2xl font-bold">{t("noticiasPropiasTitulo")}</h2>
+            <p className="text-sm text-muted">{t("noticiasPropiasDescripcion")}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {noticiasPropias.map((item) => (
               <TarjetaNoticia key={item.id} item={item} badge={item.juego} />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-
-
-      <div className="mb-8">
-        <h2 className="font-heading text-3xl font-bold mb-2">{t("ultimasNoticiasTitulo")}</h2>
-        <p className="text-muted">{t("ultimasNoticiasDescripcion")}</p>
-      </div>
-
-      {news.length === 0 ? (
-        <div className="p-8 text-center border border-dashed rounded-xl border-border bg-surface text-muted text-sm">
-          {t("sinNoticias")}
+      <section>
+        <div className="mb-6">
+          <h2 className="font-heading mb-1.5 text-2xl font-bold">{t("ultimasNoticiasTitulo")}</h2>
+          <p className="text-sm text-muted">{t("ultimasNoticiasDescripcion")}</p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {news.map((item) => (
-            <TarjetaNoticia key={item.id} item={item} />
-          ))}
-        </div>
-      )}
+
+        {news.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center text-sm text-muted">{t("sinNoticias")}</div>
+        ) : (
+          <TeletipoNoticias items={news} />
+        )}
+      </section>
     </div>
   );
 }

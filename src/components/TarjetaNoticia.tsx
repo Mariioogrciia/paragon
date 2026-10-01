@@ -29,22 +29,22 @@ export async function TarjetaNoticia({ item, badge }: { item: NewsItem; badge?: 
             style={{ backgroundImage: `url(${item.imageUrl})` }}
           />
         ) : (
-          <div className="h-48 w-full bg-muted/20 border-b border-border flex items-center justify-center">
+          <div className="h-48 w-full bg-[var(--surface-2)] border-b border-border flex items-center justify-center">
             <span className="text-muted font-heading font-bold text-xl">PARAGON</span>
           </div>
         )}
         <div className="p-5 flex flex-col flex-1">
           <div className="mb-2 flex items-center gap-2">
-            <span className="text-xs font-semibold text-[rgb(var(--accent-rgb))] uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[var(--accent-text)] uppercase tracking-wider">
               {formatDistanceToNow(new Date(item.pubDate), { addSuffix: true, locale: dateFnsLocale })}
             </span>
             {badge && (
-              <span className="rounded-full bg-[rgb(var(--accent-rgb)/0.15)] px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-[rgb(var(--accent-rgb))]">
+              <span className="rounded-full bg-[rgb(var(--accent-rgb)/0.15)] px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-[var(--accent-text)]">
                 {badge}
               </span>
             )}
           </div>
-          <h3 className="font-bold text-lg leading-snug mb-2 group-hover:text-[rgb(var(--accent-rgb))] transition-colors line-clamp-3">
+          <h3 className="font-bold text-lg leading-snug mb-2 group-hover:text-[var(--accent-text)] transition-colors line-clamp-3">
             {item.title}
           </h3>
           {item.summary && (

@@ -23,7 +23,14 @@
       "tooltip": "{titulo} · Platin {rareza} % · {horas} Std.",
       "fila": "Platin {rareza} % · Ø {horas} Std.",
       "vacio": "Noch keine Spiele in diesem Bereich."
-    }
+    },
+    "nuevasEntradas": "Neueinsteiger",
+    "nuevasEntradasDesc": "Gerade erschienen oder kurz davor, nach Hype.",
+    "top": "Community-Top",
+    "topDesc": "Was die meisten Jäger in den letzten 30 Tagen angefangen haben.",
+    "cazadoresNuevos": "{n, plural, one {# neuer Jäger} other {# neue Jäger}}",
+    "votos": "{n, plural, one {# Stimme} other {# Stimmen}}",
+    "joyasNota": "Durchschnittsnote"
   },
   "PlataformaPage": {
     "breadcrumb": "Entdecken",
@@ -177,7 +184,12 @@
     "salioHoy": "Heute erschienen",
     "salioAyer": "Gestern erschienen",
     "haceDias": "Vor {n} Tagen",
-    "valoracion": "/100 Bewertung"
+    "valoracion": "/100 Bewertung",
+    "colFecha": "Datum",
+    "colJuego": "Spiel",
+    "colPlataformas": "Plattformen",
+    "colEstado": "Status",
+    "porConfirmar": "Noch offen"
   },
   "GamePassCatalog": {
     "consolaTab": "Konsole ({n})",
@@ -196,7 +208,9 @@
     "verFicha": "Seite ansehen",
     "anadiendo": "Wird hinzugefügt…",
     "botonDeseadosAnadido": "✓ <hide>Auf der </hide>Wunschliste",
-    "botonDeseadosAnadir": "+ <hide>Zur </hide>Wunschliste"
+    "botonDeseadosAnadir": "+ <hide>Zur </hide>Wunschliste",
+    "puesto": "Nr. {n}",
+    "destacados": "Aktuelle Highlights"
   },
   "CardCarousel": {
     "anterior": "Zurück",

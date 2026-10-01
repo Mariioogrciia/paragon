@@ -23,7 +23,14 @@
       "tooltip": "{titulo} · platino {rareza} % · {horas} h",
       "fila": "Platino {rareza} % · {horas} h de media",
       "vacio": "No hay juegos en esta zona todavía."
-    }
+    },
+    "nuevasEntradas": "Nuevas entradas",
+    "nuevasEntradasDesc": "Recién salidos o a punto de salir, por expectación.",
+    "top": "Top de la comunidad",
+    "topDesc": "Lo que más cazadores han empezado en los últimos 30 días.",
+    "cazadoresNuevos": "{n, plural, one {# cazador nuevo} other {# cazadores nuevos}}",
+    "votos": "{n, plural, one {# voto} other {# votos}}",
+    "joyasNota": "Nota media"
   },
   "PlataformaPage": {
     "breadcrumb": "Descubrir",
@@ -177,7 +184,12 @@
     "salioHoy": "Salió hoy",
     "salioAyer": "Salió ayer",
     "haceDias": "Hace {n} días",
-    "valoracion": "/100 valoración"
+    "valoracion": "/100 valoración",
+    "colFecha": "Fecha",
+    "colJuego": "Juego",
+    "colPlataformas": "Plataformas",
+    "colEstado": "Estado",
+    "porConfirmar": "Por confirmar"
   },
   "GamePassCatalog": {
     "consolaTab": "Consola ({n})",
@@ -196,7 +208,9 @@
     "verFicha": "Ver ficha",
     "anadiendo": "Añadiendo…",
     "botonDeseadosAnadido": "✓ <hide>En </hide>Deseados",
-    "botonDeseadosAnadir": "+ <hide>Añadir a </hide>Deseados"
+    "botonDeseadosAnadir": "+ <hide>Añadir a </hide>Deseados",
+    "puesto": "Nº {n}",
+    "destacados": "Destacados recientes"
   },
   "CardCarousel": {
     "anterior": "Anterior",

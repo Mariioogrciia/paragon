@@ -3,8 +3,9 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { addToWishlistAction } from "@/app/actions";
 import { Pegi } from "@/components/Pegi";
 
@@ -47,6 +48,12 @@ function cuentaAtras(game: UpcomingGame, t: ReturnType<typeof useTranslations>):
   return meses === 1 ? t("enUnMes") : t("enMeses", { n: meses });
 }
 
+/** Para resaltar en ámbar lo que sale ya (panel de salidas). */
+function saleEnMenosDeUnMes(game: UpcomingGame): boolean {
+  if (game.releasePrecision !== "day" || !game.releaseDate) return false;
+  return new Date(game.releaseDate).getTime() - Date.now() < 30 * 86_400_000;
+}
+
 /** Cuánto hace que salió (modo "recientes"). */
 function haceCuanto(game: UpcomingGame, t: ReturnType<typeof useTranslations>): string | null {
   if (!game.releaseDate) return null;
@@ -61,7 +68,19 @@ function haceCuanto(game: UpcomingGame, t: ReturnType<typeof useTranslations>): 
  * `modo="recientes"`: lo más popular ya salido (Noticias), en vez de lo
  * próximo. Misma tarjeta y mismo botón de deseados.
  */
-export function UpcomingGames({ wishlistedIgdbIds = [], modo = "proximos" }: { wishlistedIgdbIds?: number[]; modo?: "proximos" | "recientes" }) {
+export function UpcomingGames({
+  wishlistedIgdbIds = [],
+  modo = "proximos",
+  variante = "tarjetas",
+  compacto = false,
+}: {
+  wishlistedIgdbIds?: number[];
+  modo?: "proximos" | "recientes";
+  /** "panel": panel de salidas de aeropuerto (Noticias). "tarjetas": la de siempre (Panel). */
+  variante?: "tarjetas" | "panel";
+  /** Solo con `variante="panel"`: filas cortas para la columna estrecha. */
+  compacto?: boolean;
+}) {
   const t = useTranslations("Descubrir.UpcomingGames");
   const router = useRouter();
   const [games, setGames] = useState<UpcomingGame[]>([]);
@@ -109,6 +128,17 @@ export function UpcomingGames({ wishlistedIgdbIds = [], modo = "proximos" }: { w
     };
   }, [modo]);
 
+  if (loading && variante === "panel") {
+    return (
+      <div className="salidas salidas-tablero h-full p-5" aria-busy="true">
+        <div className="mb-4 h-5 w-48 rounded bg-surface-2 animate-pulse" />
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="mb-2 h-12 rounded bg-surface-2/60 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="rounded-[18px] border border-border bg-surface p-6">
@@ -142,6 +172,10 @@ export function UpcomingGames({ wishlistedIgdbIds = [], modo = "proximos" }: { w
   }
 
   if (games.length === 0) return null;
+
+  if (variante === "panel") {
+    return <PanelSalidas games={games} modo={modo} compacto={compacto} wishlistedIgdbIds={wishlistedIgdbIds} />;
+  }
 
   return (
     <div className="rounded-[18px] border border-border bg-surface p-6">
@@ -349,6 +383,120 @@ export function UpcomingGames({ wishlistedIgdbIds = [], modo = "proximos" }: { w
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Panel de salidas (Noticias, rediseño del 1 oct 2026): cada lanzamiento es
+ * un vuelo. La fecha va en letras de paleta (una casilla por carácter) y el
+ * estado es la cuenta atrás de siempre; los títulos, en letra normal para
+ * que se lean. Misma información y mismas acciones que la tarjeta: ficha
+ * del juego al pulsar la fila y botón de deseados.
+ */
+function PanelSalidas({
+  games,
+  modo,
+  compacto,
+  wishlistedIgdbIds,
+}: {
+  games: UpcomingGame[];
+  modo: "proximos" | "recientes";
+  compacto: boolean;
+  wishlistedIgdbIds: number[];
+}) {
+  const t = useTranslations("Descubrir.UpcomingGames");
+  const locale = useLocale();
+  const router = useRouter();
+
+  const fecha = (game: UpcomingGame): string => {
+    if (game.releasePrecision === "day" && game.releaseDate) {
+      const d = new Date(game.releaseDate);
+      const dia = String(d.getUTCDate()).padStart(2, "0");
+      const mes = d.toLocaleDateString(locale, { month: "short", timeZone: "UTC" }).replace(".", "").slice(0, 3).toUpperCase();
+      return compacto ? `${dia} ${mes}` : `${dia} ${mes} ${String(d.getUTCFullYear()).slice(2)}`;
+    }
+    return game.releaseLabel.toUpperCase();
+  };
+
+  return (
+    <section className="salidas salidas-tablero h-full" aria-label={modo === "recientes" ? t("tituloRecientes") : t("titulo")}>
+      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] px-5 py-4">
+        <h2 className="salidas-rotulo">{modo === "recientes" ? t("tituloRecientes") : t("titulo")}</h2>
+        <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-muted">
+          {modo === "recientes" ? t("badgePopulares") : t("badgeTendencias")}
+        </span>
+      </header>
+
+      {!compacto && (
+        <div className="salidas-fila salidas-cabecera" aria-hidden="true">
+          <span>{t("colFecha")}</span>
+          <span className="col-span-2">{t("colJuego")}</span>
+          <span className="text-right">{t("colEstado")}</span>
+        </div>
+      )}
+
+      <ol>
+        {games.map((game) => {
+          const falta = modo === "recientes" ? haceCuanto(game, t) : cuentaAtras(game, t);
+          const estudio = game.developer ?? game.publisher;
+          const pronto = modo === "proximos" && saleEnMenosDeUnMes(game);
+          return (
+            <li
+              key={game.id}
+              className={compacto ? "salidas-fila salidas-fila-compacta" : "salidas-fila"}
+              onClick={() => router.push(`/juego/${game.igdbId}`)}
+            >
+              <span className="salidas-paleta" aria-label={game.releaseLabel}>
+                {[...fecha(game)].map((c, i) => (
+                  <span key={i} className={c === " " ? "salidas-hueco" : "salidas-letra"} aria-hidden="true">
+                    {c === " " ? "" : c}
+                  </span>
+                ))}
+              </span>
+
+              <span className="salidas-portada">
+                {game.cover && <img loading="lazy" decoding="async" src={game.cover} alt="" className="h-full w-full object-cover" />}
+              </span>
+
+              <span className="min-w-0">
+                <Link
+                  href={`/juego/${game.igdbId}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="block truncate text-[0.9375rem] font-semibold hover:text-[var(--accent-text)]"
+                >
+                  {game.title}
+                </Link>
+                <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[0.6875rem] text-muted">
+                  <span className="truncate">{[estudio, game.genres[0]].filter(Boolean).join(" · ")}</span>
+                  {game.pegi && <Pegi edad={game.pegi} />}
+                </span>
+                {!compacto && game.platforms.length > 0 && (
+                  <span className="mt-1.5 flex flex-wrap gap-1" aria-label={t("colPlataformas")}>
+                    {game.platforms.slice(0, 4).map((p) => (
+                      <span key={p} className="rounded-sm border border-[var(--border)] px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase text-muted">
+                        {p}
+                      </span>
+                    ))}
+                  </span>
+                )}
+                {!compacto && game.summary && <span className="mt-1.5 hidden text-[0.75rem] text-muted line-clamp-1 2xl:block">{game.summary}</span>}
+              </span>
+
+              <span className="salidas-lado">
+                <span className="salidas-estado" data-pronto={pronto || undefined} data-llegado={modo === "recientes" || undefined}>
+                  {falta ?? t("porConfirmar")}
+                </span>
+                <span onClick={(e) => e.stopPropagation()}>
+                  <WishlistButton game={game} initiallyAdded={wishlistedIgdbIds.includes(game.igdbId)} />
+                </span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+
+      <p className="border-t border-[var(--border)] px-5 py-3 text-[0.6875rem] text-muted">{t("avisoIgdb")}</p>
+    </section>
   );
 }
 

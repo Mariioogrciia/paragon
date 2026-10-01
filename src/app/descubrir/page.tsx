@@ -6,12 +6,9 @@ import { getTrendingGames, getHiddenGems, getMatrizDescubrir } from "@/lib/disco
 import { MatrizDificultad } from "@/components/MatrizDificultad";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { DiscoverSearch } from "@/components/DiscoverSearch";
-import { DiscoverCard, FilaHorizontal } from "@/components/DiscoverCard";
-import { GameGrid } from "@/components/GameGrid";
 import { PlatformTiles } from "@/components/PlatformTiles";
 import { HeroCarousel } from "@/components/HeroCarousel";
-import { CardCarousel } from "@/components/CardCarousel";
-import { PosterCard } from "@/components/PosterCard";
+import { JoyasConNota, NuevasEntradas, TopComunidad } from "@/components/descubrir/Exitos";
 import { novedades as getNovedades, destacadosRecientes, releaseLabelEs, IgdbNotConfiguredError } from "@/lib/igdb/client";
 import { BackButton } from "@/components/BackButton";
 import { SeccionTabs } from "@/components/SeccionTabs";
@@ -72,81 +69,41 @@ export default async function DescubrirPage() {
         <p className="mt-2 text-lg text-muted">{t("subtitulo")}</p>
       </div>
 
-      <HeroCarousel items={hero} wishlistedIgdbIds={wishlistIds} />
-
+      {/* Lista de éxitos (rediseño del 1 oct 2026): mismas secciones, en
+          listas numeradas. Buscador y plataformas arriba; los destacados
+          como "número 1"; tendencias, novedades y joyas como listas. */}
       <DiscoverSearch estaLogueado={Boolean(userId)} />
 
       <PlatformTiles />
 
-      <MatrizDificultad puntos={matriz} />
+      {hero.length > 0 && (
+        <div className="mt-10">
+          <HeroCarousel items={hero} wishlistedIgdbIds={wishlistIds} numerado />
+        </div>
+      )}
 
       {/* Multiplataforma: agrupa por igdbId, no por games.id — el mismo
           juego en PSN y Steam cuenta como uno para "cuánta gente lo tiene",
           así que no tiene una sola plataforma que ponerle en la cabecera.
           Ver el comentario de lib/discover.ts. */}
-      <div id="multiplataforma" className="mb-10 mt-16 scroll-mt-24">
-        <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">{t("multiplataforma")}</p>
+      <div id="multiplataforma" className="mb-16 mt-4 grid scroll-mt-24 gap-14">
+        <TopComunidad items={tendencias} />
 
-        {novedades.length > 0 && (
-          <section className="mb-8">
-            <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("novedades")}</h2>
-            <CardCarousel>
-              {novedades.map((g) => (
-                <PosterCard
-                  key={g.igdbId}
-                  game={{ igdbId: g.igdbId, title: g.title, iconUrl: g.coverUrl, genres: g.genres }}
-                  badge={
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
-                      {releaseLabelEs(g.releaseDate, g.releasePrecision)}
-                    </span>
-                  }
-                />
-              ))}
-            </CardCarousel>
-          </section>
-        )}
+        <NuevasEntradas
+          items={novedades.map((g) => ({
+            igdbId: g.igdbId,
+            title: g.title,
+            iconUrl: g.coverUrl,
+            genres: g.genres,
+            etiqueta: releaseLabelEs(g.releaseDate, g.releasePrecision),
+          }))}
+        />
+      </div>
 
-        {tendencias.length > 0 && (
-          <section className="mb-8">
-            <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              {t("tendencias")}
-            </h2>
-            <FilaHorizontal items={tendencias} itemKey={(g) => g.igdbId}>
-              {(g) => (
-                <DiscoverCard
-                  game={g}
-                  esquina={
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
-                      +{g.recientes}
-                    </span>
-                  }
-                />
-              )}
-            </FilaHorizontal>
-          </section>
-        )}
+      <MatrizDificultad puntos={matriz} />
 
-        {joyas.length > 0 && (
-          <section>
-            <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-              {t("joyasOcultas")}
-            </h2>
-            <p className="mb-4 text-sm text-muted">{t("joyasOcultasDescripcion")}</p>
-            <GameGrid items={joyas} itemKey={(g) => g.igdbId}>
-              {(g) => (
-                <DiscoverCard
-                  game={g}
-                  fluid
-                  esquina={
-                    <span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-yellow-400 backdrop-blur-sm">
-                      ★ {g.notaMedia}
-                    </span>
-                  }
-                />
-              )}
-            </GameGrid>
-          </section>
-        )}
+      <div className="mb-16 mt-16">
+        <JoyasConNota items={joyas} />
       </div>
 
       {/* "Ofertas en Steam" vivía aquí duplicada con /descubrir/steam,

@@ -112,7 +112,7 @@ export function MatrizDificultad({ puntos }: { puntos: PuntoMatriz[] }) {
           {lista.length === 0 ? (
             <p className="mt-3 text-sm text-muted">{t("vacio")}</p>
           ) : (
-            <ul className="mt-3 grid gap-1">
+            <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1">
               {lista.map((p) => (
                 <li key={p.id}>
                   <Link href={`/juego/${p.id}`} className="flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-[var(--surface-2)]">

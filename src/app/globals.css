@@ -1097,3 +1097,201 @@ h3,
 .paleta-juego { padding: 4px; outline: 2px solid transparent; outline-offset: 0; transition: outline-color 150ms, background-color 150ms; }
 .paleta-juego:hover { background: var(--surface-2); }
 .paleta-juego[data-activo] { outline-color: var(--accent); }
+
+/* --- Noticias: panel de salidas (UpcomingGames variante="panel", TeletipoNoticias) */
+/* Isla oscura como el marcador de Amigos: un panel de aeropuerto es negro
+   también en modo claro. Ámbar de paleta solo en fechas y estados. */
+.salidas {
+  --background: #0a0c10;
+  --surface: #101318;
+  --surface-2: #1b1f27;
+  --border: #252a33;
+  --foreground: #eef1f6;
+  --muted: #9aa3b2;
+  --accent-text: color-mix(in srgb, var(--accent) 45%, white);
+  --salidas-ambar: #ffcf3a;
+  color: var(--foreground);
+}
+.salidas-tablero {
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid #2a2f38;
+  background: linear-gradient(180deg, #0f1217, #090b0e);
+  box-shadow: inset 0 0 0 4px #0a0c10, inset 0 0 0 5px #1a1e25, 0 18px 40px -24px rgb(0 0 0 / 0.8);
+}
+.salidas-rotulo {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--salidas-ambar);
+}
+.salidas-fila {
+  display: grid;
+  grid-template-columns: auto 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+.salidas-fila:hover { background: rgb(255 207 58 / 0.05); }
+.salidas-fila:last-child { border-bottom: 0; }
+.salidas-cabecera {
+  display: none;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  cursor: default;
+}
+.salidas-cabecera:hover { background: none; }
+.salidas-paleta { display: inline-flex; gap: 2px; }
+.salidas-letra, .salidas-hueco {
+  display: inline-flex;
+  width: 1.05rem;
+  height: 1.55rem;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.salidas-letra {
+  position: relative;
+  border-radius: 3px;
+  color: var(--salidas-ambar);
+  background: linear-gradient(180deg, #1c2028 0 49%, #0b0d11 49% 51%, #171a21 51% 100%);
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.6);
+}
+.salidas-hueco { width: 0.35rem; }
+.salidas-portada { display: block; width: 40px; height: 54px; overflow: hidden; border-radius: 4px; background: var(--surface-2); }
+.salidas-lado { grid-column: 2 / 4; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.875rem; }
+.salidas-estado {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.salidas-estado[data-pronto] { color: var(--salidas-ambar); }
+.salidas-estado[data-llegado] { color: #4ec98a; }
+/* Móvil: la fecha va en su propia línea, encima de carátula y título. */
+@media (max-width: 767px) {
+  .salidas-fila:not(.salidas-fila-compacta) { grid-template-columns: 40px minmax(0, 1fr); }
+  .salidas-fila:not(.salidas-fila-compacta) .salidas-paleta { grid-column: 1 / -1; }
+  .salidas-fila:not(.salidas-fila-compacta) .salidas-lado { grid-column: 2 / -1; }
+}
+.salidas-fila-compacta .salidas-letra { width: 0.95rem; height: 1.4rem; font-size: 0.75rem; }
+.salidas-fila-compacta .salidas-portada { width: 34px; height: 46px; }
+@media (min-width: 768px) {
+  .salidas-fila:not(.salidas-fila-compacta) { grid-template-columns: minmax(9.25rem, auto) 40px minmax(0, 1fr) 8.5rem; }
+  .salidas-cabecera { display: grid; }
+  .salidas-fila:not(.salidas-fila-compacta) .salidas-lado { grid-column: auto; flex-direction: column; align-items: flex-end; text-align: right; }
+}
+
+/* Teletipo: hora en ámbar, titular, foto pequeña a la derecha. */
+.teletipo-fila {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr) 72px;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem 1.25rem;
+  transition: background-color 150ms;
+}
+.teletipo-fila:hover { background: rgb(255 207 58 / 0.05); }
+.teletipo-hora {
+  padding-top: 0.125rem;
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  color: var(--salidas-ambar);
+}
+.teletipo-foto { display: block; width: 72px; height: 48px; border-radius: 6px; background: var(--surface-2) center / cover; }
+@media (min-width: 768px) {
+  .teletipo-fila { grid-template-columns: 5rem minmax(0, 1fr) 120px; padding: 1rem 1.5rem; }
+  .teletipo-foto { width: 120px; height: 68px; }
+}
+
+/* --- Descubrir: lista de éxitos (components/descubrir/Exitos.tsx) -------- */
+/* El puesto es el protagonista: numerales enormes de contorno; los tres
+   primeros con el metal de su puesto (oro, plata, bronce = rango). */
+.exitos-caratula { display: block; flex-shrink: 0; overflow: hidden; border-radius: 6px; background: var(--surface-2); box-shadow: 0 6px 14px -8px rgb(0 0 0 / 0.7); }
+.exitos-numeral {
+  font-family: var(--font-heading);
+  font-size: 3.25rem;
+  font-weight: 700;
+  line-height: 0.85;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--foreground) 45%, transparent);
+  transition: color 200ms, -webkit-text-stroke-color 200ms;
+}
+.exitos-numeral-chico { font-size: 1.75rem; -webkit-text-stroke-width: 1px; }
+.exitos-fila[data-podio="1"] .exitos-numeral { color: var(--gold); -webkit-text-stroke-color: var(--gold); }
+.exitos-fila[data-podio="2"] .exitos-numeral { color: var(--silver); -webkit-text-stroke-color: var(--silver); }
+.exitos-fila[data-podio="3"] .exitos-numeral { color: var(--bronze); -webkit-text-stroke-color: var(--bronze); }
+.exitos-fila:hover .exitos-numeral, .exitos-entrada:hover .exitos-numeral { -webkit-text-stroke-color: var(--accent-text); }
+
+.exitos-top { display: grid; gap: 0 2rem; border-top: 1px solid var(--border); }
+@media (min-width: 900px) { .exitos-top { grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(var(--filas, 6), auto); } }
+.exitos-top > li { border-bottom: 1px solid var(--border); }
+.exitos-fila {
+  display: grid;
+  grid-template-columns: 4.5rem 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 0.5rem;
+  transition: background-color 150ms;
+}
+.exitos-fila:hover { background: var(--surface); }
+
+.exitos-nuevas, .exitos-joyas { display: grid; gap: 0.25rem 1.5rem; }
+@media (min-width: 640px) { .exitos-nuevas, .exitos-joyas { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .exitos-nuevas, .exitos-joyas { grid-template-columns: 1fr 1fr 1fr; } }
+.exitos-entrada {
+  display: grid;
+  grid-template-columns: 2.5rem 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  transition: background-color 150ms;
+}
+.exitos-joyas .exitos-entrada { grid-template-columns: 40px minmax(0, 1fr) auto; }
+.exitos-entrada:hover { background: var(--surface); }
+.exitos-nota {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-heading);
+  font-size: 1.375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+
+/* Destacados como "número 1": el puesto, enorme y de contorno, al fondo. */
+.exitos-numeral-hero {
+  position: absolute;
+  right: 1.25rem;
+  bottom: -0.75rem;
+  z-index: 5;
+  pointer-events: none;
+  font-family: var(--font-heading);
+  font-size: clamp(6rem, 16vw, 11rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 2px rgb(255 255 255 / 0.22);
+}

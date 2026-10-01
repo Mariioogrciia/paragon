@@ -23,7 +23,14 @@
       "tooltip": "{titulo} · platinum {rareza}% · {horas} h",
       "fila": "Platinum {rareza}% · {horas} h average",
       "vacio": "No games in this area yet."
-    }
+    },
+    "nuevasEntradas": "New entries",
+    "nuevasEntradasDesc": "Just out or about to land, by hype.",
+    "top": "Community top",
+    "topDesc": "What the most hunters have started in the last 30 days.",
+    "cazadoresNuevos": "{n, plural, one {# new hunter} other {# new hunters}}",
+    "votos": "{n, plural, one {# vote} other {# votes}}",
+    "joyasNota": "Average score"
   },
   "PlataformaPage": {
     "breadcrumb": "Discover",
@@ -177,7 +184,12 @@
     "salioHoy": "Out today",
     "salioAyer": "Out yesterday",
     "haceDias": "{n} days ago",
-    "valoracion": "/100 rating"
+    "valoracion": "/100 rating",
+    "colFecha": "Date",
+    "colJuego": "Game",
+    "colPlataformas": "Platforms",
+    "colEstado": "Status",
+    "porConfirmar": "TBC"
   },
   "GamePassCatalog": {
     "consolaTab": "Console ({n})",
@@ -196,7 +208,9 @@
     "verFicha": "View page",
     "anadiendo": "Adding…",
     "botonDeseadosAnadido": "✓ <hide>On </hide>Wishlist",
-    "botonDeseadosAnadir": "+ <hide>Add to </hide>Wishlist"
+    "botonDeseadosAnadir": "+ <hide>Add to </hide>Wishlist",
+    "puesto": "No. {n}",
+    "destacados": "Recent highlights"
   },
   "CardCarousel": {
     "anterior": "Previous",
