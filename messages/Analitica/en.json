@@ -183,7 +183,8 @@
     "totalTrofeos": "{count, plural, one {# trophy earned} other {# trophies earned}} in the last 12 months",
     "tooltip": "{count, plural, one {# trophy} other {# trophies}} · {fecha}",
     "menos": "Less",
-    "mas": "More"
+    "mas": "More",
+    "titulo": "Your year in trophies"
   },
   "activityFeed": {
     "sinActividad": "No recent activity.",

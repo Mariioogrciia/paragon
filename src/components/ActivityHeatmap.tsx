@@ -23,13 +23,15 @@ function nivel(trofeos: number): number {
 }
 
 const OPACIDAD_POR_NIVEL = [0, 0.25, 0.45, 0.7, 1];
+// Versión protagonista: la intensidad sube por metales, como los trofeos.
+const METAL_POR_NIVEL = ["", "#c07b4a", "#b9c2cc", "#e2b53e", "#9fd4ec"];
 
 function fechaLarga(iso: string, locale: string): string {
   const [anio, mes, dia] = iso.split("-").map(Number);
   return new Date(Date.UTC(anio, mes - 1, dia)).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 }
 
-export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
+export function ActivityHeatmap({ dias, grande = false }: { dias: DiaActividad[]; grande?: boolean }) {
   const t = useTranslations("Analitica.activityHeatmap");
   const locale = useLocale();
   const DIAS_SEMANA = t.raw("diasSemanaIniciales") as string[];
@@ -65,19 +67,26 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
     // también recorta en vertical, y el tooltip de cada día (que sale hacia
     // arriba) se veía cortado por el borde de la tarjeta.
     <div className="overflow-x-auto pt-8 -mt-8">
-      <div className="mb-2 flex items-baseline justify-between">
-        <p className="text-sm font-semibold">{t("totalTrofeos", { count: total })}</p>
-      </div>
-      <div className="inline-flex gap-2">
-        <div className="flex flex-col gap-[3px] pt-4 text-[0.625rem] font-semibold text-muted">
+      {grande ? (
+        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-heading text-[clamp(1.5rem,4vw,2.25rem)] font-bold uppercase leading-tight">{t("titulo")}</h2>
+          <p className="carreras-cifra text-lg text-[var(--accent-text)]">{t("totalTrofeos", { count: total })}</p>
+        </div>
+      ) : (
+        <div className="mb-2 flex items-baseline justify-between">
+          <p className="text-sm font-semibold">{t("totalTrofeos", { count: total })}</p>
+        </div>
+      )}
+      <div className={grande ? "flex min-w-[640px] gap-2" : "inline-flex gap-2"}>
+        <div className={`flex flex-col pt-4 text-[0.625rem] font-semibold text-muted ${grande ? "" : "gap-[3px]"}`}>
           {DIAS_SEMANA.map((d, i) => (
-            <span key={i} className="flex h-[11px] items-center">{d}</span>
+            <span key={i} className={grande ? "flex flex-1 items-center" : "flex h-[11px] items-center"}>{d}</span>
           ))}
         </div>
-        <div>
-          <div className="relative mb-1 h-3" style={{ width: semanas.length * 14 }}>
+        <div className={grande ? "min-w-0 flex-1" : undefined}>
+          <div className="relative mb-1 h-3" style={grande ? undefined : { width: semanas.length * 14 }}>
             {etiquetasMes.map((m) => (
-              <span key={m.semana} className="absolute text-[0.625rem] font-semibold text-muted" style={{ left: m.semana * 14 }}>
+              <span key={m.semana} className="absolute text-[0.625rem] font-semibold text-muted" style={{ left: grande ? `${(m.semana / semanas.length) * 100}%` : m.semana * 14 }}>
                 {m.texto}
               </span>
             ))}
@@ -86,9 +95,17 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
               (TooltipDelegado): antes eran dos <div> por día más su tooltip
               oculto, ~300 KB de HTML en la página de estadísticas. */}
           <TooltipDelegado>
-            <svg width={semanas.length * 14 - 3} height={7 * 14 - 3} className="block" role="img" aria-label={t("totalTrofeos", { count: total })}>
-              <style>{`.hm{rx:2px;fill:var(--surface-2)}.hm:hover{stroke:var(--foreground);stroke-width:1px}${OPACIDAD_POR_NIVEL.slice(1)
-                .map((op, n) => `.hm${n + 1}{fill:rgb(var(--accent-rgb) / ${op})}`)
+            <svg
+              {...(grande
+                ? { viewBox: `0 0 ${semanas.length * 14 - 3} ${7 * 14 - 3}`, width: "100%" }
+                : { width: semanas.length * 14 - 3, height: 7 * 14 - 3 })}
+              className="block"
+              role="img"
+              aria-label={t("totalTrofeos", { count: total })}
+            >
+              <style>{`.hm{rx:2px;fill:var(--surface-2)}.hm:hover{stroke:var(--foreground);stroke-width:1px}${(grande ? METAL_POR_NIVEL : OPACIDAD_POR_NIVEL)
+                .slice(1)
+                .map((v, n) => `.hm${n + 1}{fill:${grande ? v : `rgb(var(--accent-rgb) / ${v})`}}`)
                 .join("")}`}</style>
               {semanas.map((semana, i) =>
                 semana.map((d, j) =>
@@ -112,7 +129,11 @@ export function ActivityHeatmap({ dias }: { dias: DiaActividad[] }) {
       <div className="mt-3 flex items-center justify-end gap-1.5 text-[0.625rem] text-muted">
         <span>{t("menos")}</span>
         {OPACIDAD_POR_NIVEL.map((op, i) => (
-          <div key={i} className="h-[11px] w-[11px] rounded-[2px]" style={{ background: op === 0 ? "var(--surface-2)" : `rgb(var(--accent-rgb) / ${op})` }} />
+          <div
+            key={i}
+            className="h-[11px] w-[11px] rounded-[2px]"
+            style={{ background: op === 0 ? "var(--surface-2)" : grande ? METAL_POR_NIVEL[i] : `rgb(var(--accent-rgb) / ${op})` }}
+          />
         ))}
         <span>{t("mas")}</span>
       </div>

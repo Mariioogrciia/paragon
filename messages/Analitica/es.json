@@ -183,7 +183,8 @@
     "totalTrofeos": "{count, plural, one {# trofeo ganado} other {# trofeos ganados}} en los últimos 12 meses",
     "tooltip": "{count, plural, one {# trofeo} other {# trofeos}} · {fecha}",
     "menos": "Menos",
-    "mas": "Más"
+    "mas": "Más",
+    "titulo": "Tu año en trofeos"
   },
   "activityFeed": {
     "sinActividad": "No hay actividad reciente.",

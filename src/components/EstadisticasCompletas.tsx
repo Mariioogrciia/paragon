@@ -88,6 +88,10 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
 
   return (
     <div>
+      <section className="mb-8 rounded-2xl p-5 sm:p-7" style={{ border: "1px solid var(--border)", background: "linear-gradient(180deg, var(--surface-2), var(--surface))" }}>
+        <ActivityHeatmap dias={dias} grande />
+      </section>
+
       <ParagonScoreCard score={paragonScore} />
 
       {esMio && nivelParagon && (
@@ -108,9 +112,6 @@ export async function EstadisticasCompletas({ handle }: { handle: string }) {
         </section>
       )}
 
-      <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
-        <ActivityHeatmap dias={dias} />
-      </section>
 
       {celdasHorarias.some((c) => c.trofeos > 0) && (
         <section className="mb-8 rounded-2xl p-5" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
