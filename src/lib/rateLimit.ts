@@ -71,6 +71,7 @@ export const LIMITES = {
   estado: [5, 600],
   arcade: [30, 60],
   psnExtension: [5, 600],
+  epicExtension: [5, 600],
   perfil: [20, 60],
 } as const satisfies Record<string, readonly [number, number]>;
 

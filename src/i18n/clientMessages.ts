@@ -19,6 +19,7 @@ import type { AbstractIntlMessages } from "next-intl";
  * `npx tsx scripts/comprobar-namespaces-cliente.mts` lo detecta.
  */
 export const NAMESPACES_CLIENTE = [
+  "Shell.Declarado",
   "Analitica.activityFeed",
   "Analitica.activityHeatmap",
   "Analitica.activityStats",

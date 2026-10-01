@@ -135,6 +135,14 @@
     "history": {
       "title": "Synchronisierungsverlauf",
       "row": "{games} Spiele · {newTrophies} neue Trophäen · {date}"
+    },
+    "epicExt": {
+      "titulo": "Epic mit der Paragon-Erweiterung verknüpfen",
+      "paso1": "Installiere die Paragon-Erweiterung in deinem Browser und verbinde sie mit deinem Konto.",
+      "paso2": "Melde dich im Epic Games Store an und öffne deinen Avatar → „Meine Erfolge“ (die Adresse endet auf /u/ und einem Code).",
+      "paso3": "Klicke auf das Erweiterungssymbol → „Epic jetzt synchronisieren“. Wiederhole das, wenn du aktualisieren willst.",
+      "conectar": "Erweiterung verbinden",
+      "formulario": "Mit meinem Profil-Link versuchen (Epic blockiert das meist)"
     }
   },
   "ajustesSeguridad": {

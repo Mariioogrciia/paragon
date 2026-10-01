@@ -23,6 +23,8 @@ import { PLATFORM_LABEL, type Game, type Platform } from "@/lib/types";
 import { Pegi } from "@/components/Pegi";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
+import { MarcaDeclarado } from "@/components/MarcaDeclarado";
+import { esDeclarada } from "@/lib/declarado";
 
 const STATUS_KEYS: { key: string; value: GameStatus | "todos" }[] = [
   { key: "status.todos", value: "todos" },
@@ -363,7 +365,8 @@ export function LibraryGrid({
         <div className="flex-1 min-w-0">
           <a href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`} className="font-bold text-lg hover:text-accent truncate block">{game.title}</a>
           <p className="text-xs text-muted mt-1">
-            {game.deviceLabel} · {t("listPercentCompleted", { percent: game.progressPercent })}
+            {game.deviceLabel}
+            {esDeclarada(game.platform) && <MarcaDeclarado />} · {t("listPercentCompleted", { percent: game.progressPercent })}
           </p>
           {game.pegi && <div className="mt-1"><Pegi edad={game.pegi} /></div>}
         </div>
@@ -499,6 +502,7 @@ export function LibraryGrid({
                   className="flex-1 flex justify-center text-center"
                 >
                   {t("platformCount", { label: PLATFORM_LABEL[p.value as Platform], count: conteoPlataformas.porPlataforma.get(p.value) ?? 0 })}
+                  {esDeclarada(p.value) && <MarcaDeclarado />}
                 </Pill>
               ))}
             </div>

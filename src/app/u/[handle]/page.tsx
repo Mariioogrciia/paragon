@@ -49,6 +49,8 @@ import { TituloEspecial } from "@/components/TituloEspecial";
 import { EFECTO_POR_CLAVE } from "@/lib/efectosNombre";
 import { CartaHolo } from "@/components/CartaHolo";
 import { getVitrinas } from "@/lib/vitrinas";
+import { MarcaDeclarado } from "@/components/MarcaDeclarado";
+import { esDeclarada } from "@/lib/declarado";
 
 
 function hexToRgb(hex: string) {
@@ -442,7 +444,17 @@ export default async function PerfilPage({
                 </Link>
               )}
             </div>
-            {player.accounts.length > 0 && <p className="mt-2 text-sm text-muted">{player.accounts.map((a) => a.username).join(" · ")}</p>}
+            {player.accounts.length > 0 && (
+              <p className="mt-2 text-sm text-muted">
+                {player.accounts.map((a, i) => (
+                  <span key={`${a.platform}-${a.username}`}>
+                    {i > 0 && " · "}
+                    {a.username}
+                    {esDeclarada(a.platform) && <MarcaDeclarado />}
+                  </span>
+                ))}
+              </p>
+            )}
             {profile.statusText && (
               <p className="mt-2 text-sm italic opacity-80" style={{ color: "var(--foreground)" }}>
                 &quot;{profile.statusText}&quot;

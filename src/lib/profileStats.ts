@@ -2,6 +2,7 @@ import "server-only";
 import { horasNoIgnoradasSql } from "@/lib/horasIgnoradas";
 import { and, asc, desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { games as gamesTable, gameTrophies, userGames, userTrophies } from "@/db/schema";
 import { listFriends, getProfileByUserId, getUserTimezone, resolveAvatarUrl } from "@/lib/profiles";
 
@@ -173,7 +174,8 @@ export async function estadisticasAmigos(userId: string): Promise<StatsAmigo[]> 
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(inArray(userGames.userId, ids))
+    // Comparativa entre amigos: el progreso declarado (Epic) no cuenta, lib/declarado.ts.
+    .where(and(inArray(userGames.userId, ids), ...noDeclaradoPorId(userGames.gameId)))
     .groupBy(userGames.userId);
 
   const statsPorId = new Map(filas.map((f) => [f.userId, f]));

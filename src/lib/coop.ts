@@ -1,6 +1,7 @@
 import "server-only";
 import { and, eq, gt, inArray, lt, or } from "drizzle-orm";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { coopChallenges, games, userGames, users } from "@/db/schema";
 import { avisarUsuario } from "@/lib/avisos";
 import { listFriends } from "@/lib/profiles";
@@ -48,6 +49,8 @@ export async function juegosEnComun(userId: string, maximo = 12): Promise<JuegoE
         eq(userGames.isWishlist, false),
         gt(userGames.progressPercent, 0),
         lt(userGames.progressPercent, 100),
+        // Platinar juntos puntúa un reto: el progreso declarado (Epic) no entra, lib/declarado.ts.
+        ...noDeclaradoPorId(userGames.gameId),
       ),
     );
 

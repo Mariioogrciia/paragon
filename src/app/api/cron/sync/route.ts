@@ -263,14 +263,14 @@ export async function GET(request: Request) {
       // con columnas en camelCase entrecomilladas, y la consulta reventaba con
       // un 500 en cada pasada del cron.
       .where(
-        sql`${userGames.trophiesSyncedAt} is null
+        sql`${games.platform} <> 'epic' and (${userGames.trophiesSyncedAt} is null
           or ${userGames.trophiesSyncedAt} < (case when ${games.platform} = 'xbox' then ${caducadoXbox} else ${caducado} end)::timestamp
           or coalesce(${userGames.earnedTotal}, 0) > (
           select count(*) from ${userTrophies}
           where ${userTrophies.gameId} = ${userGames.gameId}
             and ${userTrophies.userId} = ${userGames.userId}
             and ${userTrophies.earned} = true
-        )`,
+        ))`,
       )
       // Bug real encontrado en vivo (18 sept 2026): esta cola es GLOBAL
       // (todos los usuarios a la vez) y ordenaba solo por antigüedad — con

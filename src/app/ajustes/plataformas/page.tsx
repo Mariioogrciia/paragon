@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ShieldQuestion } from "lucide-react";
 import { useLocale } from "next-intl";
 import { auth } from "@/auth";
 import { unlinkAccountAction } from "@/app/actions";
@@ -89,7 +91,8 @@ function PlatformSection({
               </div>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-              <SyncPlatformForm platform={platform} label={PLATFORM_LABEL[platform]} />
+              {/* Epic no se sincroniza desde el servidor (lo bloquea): solo con la extensión. */}
+              {platform !== "epic" && <SyncPlatformForm platform={platform} label={PLATFORM_LABEL[platform]} />}
               <ConfirmForm
                 action={unlinkAccountAction}
                 hidden={{ platform }}
@@ -137,7 +140,28 @@ export default async function AjustesPlataformasPage() {
   ]);
 
   const t = await getTranslations("Onboarding");
+  const tDeclarado = await getTranslations("Shell.Declarado");
   const locale = await getLocale();
+
+  // Epic bloquea las lecturas desde el servidor (antibots): se sincroniza con
+  // la extensión del navegador y el progreso es declarado (lib/declarado.ts).
+  const avisoEpic = (
+    <div className="mb-4 rounded-xl border border-border bg-[var(--surface-2)] p-4">
+      <p className="font-heading text-sm font-bold">{t("ajustesPlataformas.epicExt.titulo")}</p>
+      <ol className="mt-2 list-decimal space-y-1 pl-5 text-[0.8125rem] text-muted">
+        <li>{t("ajustesPlataformas.epicExt.paso1")}</li>
+        <li>{t("ajustesPlataformas.epicExt.paso2")}</li>
+        <li>{t("ajustesPlataformas.epicExt.paso3")}</li>
+      </ol>
+      <Link href="/movil/enlazar-extension" className="mt-3 inline-block rounded-md px-1 text-[0.8125rem] font-bold text-[var(--accent-text)] hover:bg-[var(--accent-soft)] hover:underline">
+        {t("ajustesPlataformas.epicExt.conectar")} →
+      </Link>
+      <p className="mt-3 flex items-start gap-2 text-xs text-muted">
+        <ShieldQuestion size={14} className="mt-0.5 shrink-0 text-[var(--gold)]" aria-hidden="true" />
+        {tDeclarado("aviso")}
+      </p>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -160,7 +184,15 @@ export default async function AjustesPlataformasPage() {
         </PlatformSection>
 
         <PlatformSection platform="epic" account={epic} t={t}>
-          <LinkEpicForm current={epic?.username} sinAviso={epic?.isPublic === true} />
+          {avisoEpic}
+          <details className="group">
+            <summary className="cursor-pointer rounded-md px-1 py-1 text-[0.8125rem] font-semibold text-muted hover:bg-[var(--surface-2)] hover:text-foreground">
+              {t("ajustesPlataformas.epicExt.formulario")}
+            </summary>
+            <div className="mt-3">
+              <LinkEpicForm current={epic?.username} sinAviso={epic?.isPublic === true} />
+            </div>
+          </details>
         </PlatformSection>
 
         {/* Google Play y Ubisoft Connect se quitaron del todo el 11 de

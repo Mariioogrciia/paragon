@@ -20,6 +20,8 @@ import type { AuthorizationPayload } from "psn-api";
 import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { EpicPrivateProfileError, EpicProfileNotFoundError, EpicUnavailableError } from "@/lib/epic/client";
+import type { EpicDatosExtension } from "@/lib/epic/extensionData";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
@@ -306,7 +308,8 @@ export const getGlobalStats = unstable_cache(
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(eq(userGames.isWishlist, false));
+    // Progreso declarado (Epic) no cuenta en cifras públicas: lib/declarado.ts.
+    .where(and(eq(userGames.isWishlist, false), ...noDeclaradoPorId(userGames.gameId)));
 
   const row = result[0];
   return {
@@ -368,6 +371,8 @@ export const getRarestTrophiesThisWeek = unstable_cache(
         and(
           eq(userTrophies.earned, true),
           eq(gameTrophies.hidden, false),
+          // Progreso declarado (Epic) no entra en la vitrina pública: lib/declarado.ts.
+          ...noDeclaradoPorId(userTrophies.gameId),
           isNotNull(users.handle),
           isNotNull(userTrophies.rarityPercent),
           isNotNull(userTrophies.earnedAt),
@@ -435,6 +440,7 @@ export const getRecentPlatinumActivity = unstable_cache(
         and(
           eq(userTrophies.earned, true),
           eq(gameTrophies.grade, "platinum"),
+          ...noDeclaradoPorId(userTrophies.gameId),
           isNotNull(users.handle),
           isNotNull(userTrophies.earnedAt),
           // Es una cinta "en directo": un platino de hace ocho meses no lo es.
@@ -485,7 +491,7 @@ export const getTopHunters = unstable_cache(
       .from(userGames)
       .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
       .innerJoin(users, eq(users.id, userGames.userId))
-      .where(and(eq(userGames.isWishlist, false), isNotNull(users.handle)))
+      .where(and(eq(userGames.isWishlist, false), isNotNull(users.handle), ...noDeclaradoPorId(userGames.gameId)))
       .groupBy(users.id)
       .orderBy(desc(platinosSql))
       .limit(limit);
@@ -588,12 +594,30 @@ export async function linkPsnWithOwnToken(userId: string, npsso: string): Promis
   return finishLinking(userId, "psn", resolved, { psnAuth: auth });
 }
 
+/**
+ * Vincula (o resincroniza) Epic con los datos que ha leído la extensión del
+ * navegador desde la sesión del propio usuario — ver extension/epic.js y
+ * lib/epic/extensionData.ts. Epic bloquea las consultas desde el servidor
+ * (antibots), así que esta es hoy la única vía de lectura; el resto del
+ * flujo (guardar cuenta, biblioteca, logros, insignias) es el de siempre.
+ */
+export async function linkEpicWithExtension(userId: string, datos: EpicDatosExtension): Promise<LinkResult> {
+  const resolved: Resolved = {
+    accountId: datos.epicAccountId,
+    username: datos.displayName,
+    level: null,
+    avatarUrl: datos.avatarUrl,
+    legible: true,
+  };
+  return finishLinking(userId, "epic", resolved, { epicDatos: datos });
+}
+
 /** El tramo común de vincular una cuenta, sea cual sea la fuente del `Resolved`: guardar la fila, sincronizar la biblioteca y comprobar insignias. */
 async function finishLinking(
   userId: string,
   platform: PlataformaVinculable,
   resolved: Resolved,
-  syncOpts: { psnAuth?: AuthorizationPayload } = {},
+  syncOpts: { psnAuth?: AuthorizationPayload; epicDatos?: EpicDatosExtension } = {},
 ): Promise<LinkResult> {
   try {
     await db
@@ -736,6 +760,11 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
 
   for (const account of profile.accounts) {
     if (!account.isPublic) continue;
+
+    // Epic bloquea las lecturas desde el servidor (antibots, 1 oct 2026):
+    // solo se actualiza con la extensión del navegador (linkEpicWithExtension).
+    // Intentarlo aquí no traería nada y marcaría "sincronizado" en falso.
+    if (account.platform === "epic") continue;
 
     // Cada cuenta va en su propio try/catch a propósito (7 sept 2026, bug
     // real en producción): antes, un fallo de red al pedir la biblioteca de

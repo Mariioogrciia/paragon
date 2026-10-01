@@ -331,8 +331,8 @@
       "b1t": "PlayStation, Steam and Xbox",
       "b1href": "Link an account →",
       "b1": "You type your public identifier (your PSN ID, your SteamID64/profile URL, or your Gamertag) — never a password, there isn't even a field for it. On PSN your trophy profile has to be public; on Steam you need two settings public at once (\"My profile\" and \"Game details\"). Xbox uses an unofficial third-party service (OpenXBL) — it can break if that service changes, it doesn't depend on Microsoft.",
-      "b2t": "Which platforms can't be linked yet",
-      "b2": "Epic Games, Google Play and Ubisoft Connect have been removed from the selector — none of them currently has a real way in (a documented public API) to read third-party trophies. It's not a Paragon limitation, it's that those platforms don't allow it without reverse-engineering their internal API.",
+      "b2t": "Epic Games: with the browser extension",
+      "b2": "Epic blocks reads from servers, so it syncs through the Paragon extension from your own browser (Settings → Game accounts → Epic). Because Paragon cannot verify that data, Epic progress is shown as “declared”: it earns no XP and does not count in rankings, leagues or seasons. Google Play and Ubisoft Connect cannot be linked: they have no public way to read third-party trophies.",
       "b3t": "Automatic sync",
       "b3": "A cron job goes through linked accounts and pulls in what's new on its own, without you having to log in. On top of that, every time you open a game's page it checks whether it needs refreshing.",
       "b4t": "Sync now",
@@ -608,5 +608,10 @@
   },
   "Paginacion": {
     "verMas": "Show more"
+  },
+  "Declarado": {
+    "etiqueta": "Locally declared progress",
+    "explicacion": "It is sent by your browser and Paragon cannot verify it, so it earns no points and does not count in rankings, leagues or seasons.",
+    "aviso": "Epic blocks reads from servers. It syncs through the Paragon extension from your own browser, and progress is shown as declared: it earns no XP and does not count in rankings, leagues or seasons."
   }
 }

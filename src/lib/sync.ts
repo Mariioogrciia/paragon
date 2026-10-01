@@ -11,7 +11,13 @@ import {
   fetchStoreMetadata,
 } from "@/lib/steam/client";
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
-import { fetchAchievements as fetchEpicAchievements, fetchLibrary as fetchEpicLibrary } from "@/lib/epic/client";
+import {
+  fetchAchievements as fetchEpicAchievements,
+  fetchLibrary as fetchEpicLibrary,
+  bibliotecaDesdeResumenes,
+  logrosDesdeDatos,
+} from "@/lib/epic/client";
+import type { EpicDatosExtension } from "@/lib/epic/extensionData";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
@@ -227,7 +233,12 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
 export async function syncLibrary(
   userId: string,
   account: SyncAccount,
-  opts: { forzarDetalle?: boolean; psnAuth?: AuthorizationPayload } = {},
+  opts: {
+    forzarDetalle?: boolean;
+    psnAuth?: AuthorizationPayload;
+    /** Epic leído por la extensión del navegador: se usa esto en vez de consultar a Epic desde el servidor (que Epic bloquea). */
+    epicDatos?: EpicDatosExtension;
+  } = {},
 ): Promise<number> {
   // Google y Ubisoft no tienen lector propio todavía. Sin esta salida,
   // "cualquier plataforma que no sea psn/steam/xbox/epic" caía por defecto
@@ -251,7 +262,9 @@ export async function syncLibrary(
         ? await fetchSteamLibrary(account.accountId)
         : account.platform === "xbox"
           ? await fetchXblLibrary(account.accountId)
-          : await fetchEpicLibrary(account.accountId);
+          : opts.epicDatos
+            ? bibliotecaDesdeResumenes(opts.epicDatos.resumenes)
+            : await fetchEpicLibrary(account.accountId);
 
   if (library.length === 0) return 0;
 
@@ -317,12 +330,17 @@ export async function syncLibrary(
     // único indicio de "esto se ha jugado" que trae la propia llamada de
     // biblioteca es tener algún logro ya conseguido.
     const recientes = library.filter((g) => g.earnedTotal > 0).slice(0, EPIC_DETAIL_LIMIT);
-    const pendientes = opts.forzarDetalle
-      ? recientes.map((g) => g.id)
-      : await soloDesactualizados(userId, recientes.map((g) => g.id), "epic");
+    // Con datos de la extensión, el detalle son los juegos que ya vienen en
+    // el envío (los frescos que acaba de leer el navegador): ni se consulta
+    // a Epic ni se mira la caducidad.
+    const pendientes = opts.epicDatos
+      ? library.map((g) => g.id).filter((id) => opts.epicDatos!.detalles.has(parseGameKey(id).nativeId))
+      : opts.forzarDetalle
+        ? recientes.map((g) => g.id)
+        : await soloDesactualizados(userId, recientes.map((g) => g.id), "epic");
 
     await mapLimit(pendientes, EPIC_CONCURRENCY, async (gameId) => {
-      await syncGameTrophies(userId, account, gameId);
+      await syncGameTrophies(userId, account, gameId, undefined, opts.epicDatos);
     });
   }
 
@@ -573,6 +591,9 @@ export async function syncGameTrophies(
   // linkPsnWithOwnToken) — el resto de llamadas sigue con el token del
   // servidor de siempre.
   psnAuthOverride?: AuthorizationPayload,
+  // Solo en el flujo de Epic con la extensión del navegador (ver
+  // linkEpicWithExtension): los logros salen de lo que envió el navegador.
+  epicDatos?: EpicDatosExtension,
 ): Promise<SyncGameTrophiesResult> {
   const { platform, nativeId } = parseGameKey(gameId);
 
@@ -623,7 +644,12 @@ export async function syncGameTrophies(
     // no un id de tienda como el appid de Steam, así que no hay
     // syncStoreMetadata que valga aquí — se empareja por título en IGDB,
     // igual que PSN/Xbox.
-    trophies = await fetchEpicAchievements(account.accountId, nativeId);
+    const delNavegador = epicDatos?.detalles.get(nativeId);
+    trophies = epicDatos
+      ? delNavegador
+        ? logrosDesdeDatos(delNavegador.catalogo, delNavegador.jugador)
+        : []
+      : await fetchEpicAchievements(account.accountId, nativeId);
 
     const [row] = await db.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1);
     if (row?.title) {

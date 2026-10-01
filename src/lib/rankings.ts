@@ -1,9 +1,10 @@
 import "server-only";
-import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { games, platformAccounts, userGames, userTrophies, users } from "@/db/schema";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { esPlatinoEquivalente } from "@/lib/stats";
+import { PLATAFORMAS_DECLARADAS, esDeclarada } from "@/lib/declarado";
 import type { Game } from "@/lib/types";
 
 export interface ActivityRanking {
@@ -31,7 +32,9 @@ async function rankingDesde(userIds: string[], desde: Date): Promise<ActivityRan
     .select({ userId: userTrophies.userId, name: users.name, handle: users.handle, total: sql<number>`count(*)` })
     .from(userTrophies)
     .innerJoin(users, eq(users.id, userTrophies.userId))
-    .where(and(inArray(userTrophies.userId, userIds), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, desde)))
+    .innerJoin(games, eq(games.id, userTrophies.gameId))
+    // Progreso declarado (Epic) no entra en clasificaciones: lib/declarado.ts.
+    .where(and(inArray(userTrophies.userId, userIds), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, desde), notInArray(games.platform, [...PLATAFORMAS_DECLARADAS])))
     .groupBy(userTrophies.userId, users.name, users.handle)
     .orderBy(desc(sql`count(*)`));
   return rows.map((row) => ({ ...row, total: Number(row.total) }));
@@ -133,6 +136,7 @@ export async function clasificacionAmigos(userIds: string[]): Promise<FilaClasif
   for (const fila of filas) {
     const acc = porUsuario.get(fila.userId);
     if (!acc || fila.isWishlist) continue;
+    if (esDeclarada(fila.platform)) continue;
 
     acc.juegos += 1;
     acc.trofeos += fila.earnedTotal;

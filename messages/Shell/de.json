@@ -331,8 +331,8 @@
       "b1t": "PlayStation, Steam und Xbox",
       "b1href": "Konto verknüpfen →",
       "b1": "Du gibst deine öffentliche Kennung ein (deine PSN-ID, deine SteamID64/Profil-URL oder deinen Gamertag) — nie ein Passwort, dafür gibt es nicht mal ein Feld. Bei PSN muss das Trophäenprofil öffentlich sein; bei Steam braucht es zwei gleichzeitig öffentliche Einstellungen („Mein Profil“ und „Spieldetails“). Xbox nutzt einen inoffiziellen Drittanbieter-Dienst (OpenXBL) — kann ausfallen, wenn sich dieser Dienst ändert, hängt nicht von Microsoft ab.",
-      "b2t": "Welche Plattformen sich noch NICHT verknüpfen lassen",
-      "b2": "Epic Games, Google Play und Ubisoft Connect wurden aus der Auswahl entfernt — keine davon bietet derzeit einen echten Weg (eine dokumentierte öffentliche API), um fremde Trophäen zu lesen. Das ist keine Einschränkung von Paragon, sondern diese Plattformen erlauben es nicht ohne Reverse-Engineering ihrer internen API.",
+      "b2t": "Epic Games: mit der Browser-Erweiterung",
+      "b2": "Epic blockiert Abfragen von Servern, daher läuft die Synchronisierung über die Paragon-Erweiterung in deinem eigenen Browser (Einstellungen → Spielkonten → Epic). Da Paragon diese Daten nicht prüfen kann, gilt der Epic-Fortschritt als „angegeben“: kein XP und keine Wertung in Ranglisten, Ligen oder Saisons. Google Play und Ubisoft Connect lassen sich nicht verknüpfen: Es gibt keinen öffentlichen Weg, Fremd-Trophäen zu lesen.",
       "b3t": "Automatische Synchronisation",
       "b3": "Ein Cron-Job geht die verknüpften Konten durch und holt von selbst Neues, ohne dass du dich einloggen musst. Zusätzlich wird bei jedem Öffnen einer Spielseite geprüft, ob eine Aktualisierung nötig ist.",
       "b4t": "Jetzt synchronisieren",
@@ -608,5 +608,10 @@
   },
   "Paginacion": {
     "verMas": "Mehr anzeigen"
+  },
+  "Declarado": {
+    "etiqueta": "Lokal angegebener Fortschritt",
+    "explicacion": "Er wird von deinem Browser gesendet und Paragon kann ihn nicht prüfen – deshalb gibt er keine Punkte und zählt nicht in Ranglisten, Ligen oder Saisons.",
+    "aviso": "Epic blockiert Abfragen von Servern. Die Synchronisierung läuft über die Paragon-Erweiterung in deinem eigenen Browser, der Fortschritt gilt als angegeben: kein XP, keine Wertung in Ranglisten, Ligen oder Saisons."
   }
 }

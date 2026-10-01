@@ -1,6 +1,7 @@
 import "server-only";
 import { and, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { games, gameTrophies, missionCompletions, userTrophies } from "@/db/schema";
 
 export interface WeeklyMission {
@@ -139,6 +140,8 @@ export async function getWeeklyMissions(userId: string): Promise<WeeklyMission[]
         eq(userTrophies.earned, true),
         isNotNull(userTrophies.earnedAt),
         gte(userTrophies.earnedAt, desde),
+        // Progreso declarado (Epic) no cuenta para los retos (dan XP): lib/declarado.ts.
+        ...noDeclaradoPorId(userTrophies.gameId),
       ),
     );
 

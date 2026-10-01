@@ -1,4 +1,4 @@
-# Paragon — extensión de sincronización de PSN
+# Paragon — extensión de sincronización de PSN y Epic
 
 Resuelve el bloqueo de "solo entran amigos de la cuenta maestra" (ver
 `ROADMAP.md` §0 y `HALLAZGOS.md` §1) sin pedirle a nadie que copie su NPSSO
@@ -62,3 +62,32 @@ que tiene el mismo valor por el mismo motivo).
   siendo un uso no oficial de la sesión de PSN.
 - Versión para Firefox (el manifest de arriba es MV3, que Firefox también
   soporta desde 2023, pero no se ha probado ahí).
+
+
+## Epic Games (desde la versión 1.1.0)
+
+Epic bloquea con su protección antibots (Cloudflare) las consultas que hace
+el servidor de Paragon (403, `cf-mitigated: challenge`, comprobado el 1 oct
+2026), pero no las de un navegador de verdad con la sesión del usuario. Por
+eso `epic.js` corre en `store.epicgames.com`, hace desde ahí las mismas
+consultas GraphQL que la propia página de "Mis logros" y entrega el
+resultado a `POST /api/extension/epic-sync`. **No esquiva ninguna
+protección**: es el navegador de la persona consultando su propio perfil.
+
+Cómo se usa: abrir en `store.epicgames.com` el avatar → "Mis logros" (la URL
+acaba en `/u/<id de 32 caracteres>`), pulsar el icono de la extensión →
+"Sincronizar Epic ahora".
+
+- **Progreso declarado.** El servidor no puede comprobar esos datos (con PSN
+  la extensión manda una credencial y el servidor lee él mismo). Por eso lo
+  de Epic NO puntúa: ni nivel Paragon, ni clasificaciones, ligas, clanes,
+  temporadas, retos ni insignias (ver `src/lib/declarado.ts`), y se marca en
+  la interfaz como "Progreso declarado localmente".
+- **Validación.** El servidor normaliza todo campo a campo, con topes de
+  tamaño y solo imágenes de dominios de Epic (`src/lib/epic/extensionData.ts`).
+- **Solo se actualiza al sincronizar a mano**: el cron del servidor no puede
+  leer Epic y lo salta.
+- Si Epic cambia los hashes de sus "persisted queries", hay que actualizarlos
+  en `epic.js` y en `src/lib/epic/client.ts`.
+- Recargar las pestañas de Epic abiertas antes de instalar/actualizar la
+  extensión, para que tengan `epic.js`.

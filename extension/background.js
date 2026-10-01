@@ -23,6 +23,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "SYNC_EPIC") {
+    sincronizarEpic()
+      .then(sendResponse)
+      .catch((error) => sendResponse({ error: String(error?.message ?? error) }));
+    return true;
+  }
+
   if (message?.type === "DESCONECTAR") {
     chrome.storage.local.remove("paragonToken").then(() => sendResponse({ ok: true }));
     return true;
@@ -83,6 +90,49 @@ async function sincronizarPsn() {
     // 401: el token de la extensión ya no vale (se revocó desde Paragon o
     // caducó) — se borra solo para que el popup vuelva a pedir conectar,
     // en vez de fallar en silencio para siempre.
+    if (respuesta.status === 401) await chrome.storage.local.remove("paragonToken");
+    return { error: resultado?.error ?? `Error del servidor (${respuesta.status})` };
+  }
+
+  return resultado;
+}
+
+/**
+ * Epic: lo lee el script de la propia página de Epic (epic.js, en
+ * store.epicgames.com) con la sesión del usuario, porque Epic bloquea las
+ * consultas desde el servidor de Paragon. Aquí solo se busca esa pestaña
+ * ("Mis logros", /u/<id>), se le pide que lea y se envía el resultado.
+ */
+async function sincronizarEpic() {
+  const { paragonToken } = await chrome.storage.local.get("paragonToken");
+  if (!paragonToken) return { error: "no-conectado" };
+
+  const pestanas = await chrome.tabs.query({ url: "https://store.epicgames.com/*" });
+  const deLogros = pestanas.filter((p) => /\/u\/[0-9a-f]{32}/i.test(p.url ?? ""));
+  if (deLogros.length === 0) return { error: "abre-mis-logros-de-epic" };
+  const pestana = deLogros.find((p) => p.active) ?? deLogros[0];
+
+  let lectura;
+  try {
+    lectura = await chrome.tabs.sendMessage(pestana.id, { type: "EPIC_LEER" });
+  } catch {
+    // La pestaña estaba abierta antes de instalar/actualizar la extensión: no tiene el script.
+    return { error: "recarga-la-pagina-de-epic" };
+  }
+  if (!lectura || lectura.error) return { error: lectura?.error ?? "epic-no-responde" };
+
+  const respuesta = await fetch(`${BASE_URL}/api/extension/epic-sync`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${paragonToken}`,
+    },
+    body: JSON.stringify(lectura.datos),
+  });
+
+  const resultado = await respuesta.json().catch(() => null);
+
+  if (!respuesta.ok) {
     if (respuesta.status === 401) await chrome.storage.local.remove("paragonToken");
     return { error: resultado?.error ?? `Error del servidor (${respuesta.status})` };
   }

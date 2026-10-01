@@ -1167,6 +1167,56 @@ o sale la clave en crudo; `npx tsx scripts/comprobar-namespaces-cliente.mts`
 lo detecta. Y los porcentajes calculados en `style` de un componente de
 cliente hay que redondearlos (`toFixed`) o hay desajuste de hidratación.
 
+## Epic Games: extensión del navegador y progreso declarado (1 oct 2026)
+
+**Qué pasó.** Al vincular Epic con un enlace válido salía "no encuentra ningún
+perfil". Causa real: Epic (Cloudflare) devuelve 403 `cf-mitigated: challenge`
+a las consultas del servidor (las dos que hacen falta), y cualquier fallo se
+convertía en "perfil no encontrado". Un navegador de verdad sí pasa (probado
+con la cuenta del usuario). Decisión: NO se intenta esquivar la protección
+antibots (ni imitar huellas TLS ni nada parecido); la lectura la hace el
+navegador del propio usuario.
+
+**Qué se hizo.**
+- `extension/epic.js` (content script en store.epicgames.com) hace las mismas
+  consultas GraphQL que la página de "Mis logros" y `background.js`/`popup.js`
+  lo envían a `POST /api/extension/epic-sync` (Bearer de la extensión, límite
+  `epicExtension` 5 por 10 min, tope 4 MB). Probado con datos reales
+  (Rocket League 53/88, Hogwarts Legacy 7/45, ~100 KB). Extensión v1.1.0.
+- `src/lib/epic/extensionData.ts` valida/normaliza todo lo que llega (topes,
+  formas, imágenes solo de dominios de Epic); `client.ts` expone los
+  mapeadores puros (`bibliotecaDesdeResumenes`, `logrosDesdeDatos`);
+  `sync.ts` acepta `epicDatos` y `linkEpicWithExtension` (profiles.ts) lo
+  guarda con el flujo de siempre.
+- Al vincular por enlace (formulario), un bloqueo de Epic da
+  `EpicUnavailableError` (mensaje honesto) en vez de "no encuentro tu perfil".
+- El servidor ya no resincroniza Epic: `resyncLibraries` lo salta y la cola
+  de detalle del cron excluye `epic` (no puede leerlo y marcaría "sincronizado"
+  en falso). Solo se actualiza al pulsar "Sincronizar Epic ahora" en la
+  extensión. Si Epic algún día quita el bloqueo, quitar esas dos exclusiones.
+
+**Progreso declarado (decisión del usuario).** El servidor no puede comprobar
+esos datos, así que lo de Epic NO puntúa en ningún sitio. Lista única en
+`src/lib/declarado.ts` (`PLATAFORMAS_DECLARADAS`) + helper SQL
+`src/lib/declaradoSql.ts` (`noDeclaradoPorId`, por el prefijo `epic-` del id de
+juego). Excluido en: nivel Paragon (`level.ts`, `paragonLevel.ts`), 100 % como
+platino (`esPlatinoEquivalente`), Paragon Score, clasificación de amigos y
+rankings semanal/mensual (`rankings.ts`), comparativa de amigos
+(`profileStats`), ligas y retos de liga (`leagues.ts`), clanes, temporadas,
+retos semanales (`missions.ts`), retos entre amigos, "platinar juntos"
+(`coop.ts`), insignias (`medirLogros.ts`), cifras públicas de la portada
+(`getGlobalStats`, `getTopHunters`, trofeos raros, platinos recientes). SÍ se
+ve en biblioteca/ficha/estadísticas del propio usuario con la marca
+`MarcaDeclarado` ("Progreso declarado localmente", icono con tooltip).
+**Si se añade otro sitio que puntúe o clasifique, usar `noDeclaradoPorId` /
+`esDeclarada`.** Pendiente de comprobar a mano: la app de Android (APIs
+`/api/mobile/*`) usa las mismas funciones, pero no se ha probado allí.
+
+**Límites.** La extensión no está publicada en ninguna tienda (instalación
+manual en modo desarrollador, ver `extension/README.md`); el cron no puede
+refrescar Epic; los datos los manda el cliente y no se pueden verificar
+(de ahí lo de declarado). Tests: `tests/epicExtension.test.ts` (13).
+
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El
   servidor de desarrollo lanzado desde la app de Claude no heredaba

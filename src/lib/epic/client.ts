@@ -167,7 +167,7 @@ function parseInput(input: string): string {
   throw new EpicProfileNotFoundError(input);
 }
 
-interface AchievementsSummaryEntry {
+export interface AchievementsSummaryEntry {
   totalUnlocked: number;
   totalXP: number;
   sandboxId: string;
@@ -274,7 +274,16 @@ export async function fetchLibrary(epicAccountId: string): Promise<Game[]> {
   const profile = await fetchProfilePrivate(epicAccountId);
   const entries = profile?.achievementsSummaries?.data;
   if (!entries) return [];
+  return bibliotecaDesdeResumenes(entries);
+}
 
+/**
+ * De los resúmenes de logros por juego al formato de biblioteca de Paragon.
+ * Pura y compartida: la usa `fetchLibrary` (consulta desde el servidor) y la
+ * ruta de la extensión del navegador, que manda esos mismos resúmenes
+ * leídos desde la sesión del propio usuario (ver extension/epic.js).
+ */
+export function bibliotecaDesdeResumenes(entries: AchievementsSummaryEntry[]): Game[] {
   return entries
     // Sin nombre de producto no hay nada que enseñar: sandboxes huérfanos
     // (vistos en pruebas reales) sin oferta de tienda asociada.
@@ -310,7 +319,7 @@ async function fetchProductId(sandboxId: string): Promise<string | null> {
   return json?.data?.Product?.sandbox?.productId ?? null;
 }
 
-interface CatalogAchievement {
+export interface CatalogAchievement {
   name: string;
   hidden: boolean;
   unlockedDisplayName: string;
@@ -338,7 +347,7 @@ async function fetchCatalog(sandboxId: string): Promise<Map<string, CatalogAchie
   return new Map(list.map((a) => [a.achievement.name, a.achievement]));
 }
 
-interface PlayerAchievementEntry {
+export interface PlayerAchievementEntry {
   achievementName: string;
   unlocked: boolean;
   unlockDate?: string;
@@ -384,6 +393,11 @@ export async function fetchAchievements(epicAccountId: string, sandboxId: string
     fetchPlayerAchievements(epicAccountId, productId),
   ]);
 
+  return logrosDesdeDatos(catalog, playerAchievements);
+}
+
+/** Cruza el catálogo del juego con el estado del jugador. Pura, compartida con la extensión (ver `bibliotecaDesdeResumenes`). */
+export function logrosDesdeDatos(catalog: Map<string, CatalogAchievement>, playerAchievements: PlayerAchievementEntry[]): Trophy[] {
   if (catalog.size === 0) return [];
 
   const stateByName = new Map(playerAchievements.map((p) => [p.achievementName, p]));

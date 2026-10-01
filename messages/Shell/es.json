@@ -331,8 +331,8 @@
       "b1t": "PlayStation, Steam y Xbox",
       "b1href": "Vincular una cuenta →",
       "b1": "Escribes tu identificador público (tu ID de PSN, tu SteamID64/URL de perfil, o tu Gamertag) — nunca una contraseña, no hay ni campo para eso. En PSN el perfil de trofeos tiene que ser público; en Steam hacen falta dos ajustes en público a la vez (“Mi perfil” y “Detalles del juego”). Xbox usa un servicio de terceros no oficial (OpenXBL) — puede fallar si ese servicio cambia, no depende de Microsoft.",
-      "b2t": "Qué plataformas NO se pueden vincular todavía",
-      "b2": "Epic Games, Google Play y Ubisoft Connect se han quitado del selector — ninguna tiene hoy una vía real (API pública documentada) para leer trofeos de terceros. No es una limitación de Paragon, es que esas plataformas no lo permiten sin ingeniería inversa de su API interna.",
+      "b2t": "Epic Games: con la extensión del navegador",
+      "b2": "Epic bloquea las lecturas desde servidores, así que se sincroniza con la extensión de Paragon desde tu propio navegador (Ajustes → Cuentas de Juegos → Epic). Como Paragon no puede comprobar esos datos, el progreso de Epic se muestra como «declarado»: no suma XP ni cuenta en rankings, ligas o temporadas. Google Play y Ubisoft Connect no se pueden vincular: no tienen una vía pública para leer trofeos de terceros.",
       "b3t": "Sincronización automática",
       "b3": "Un cron recorre las cuentas vinculadas y trae lo nuevo solo, sin que tengas que entrar. Además, cada vez que abres la ficha de un juego se comprueba si hace falta refrescarlo.",
       "b4t": "Sincronizar ahora",
@@ -608,5 +608,10 @@
   },
   "Paginacion": {
     "verMas": "Ver más"
+  },
+  "Declarado": {
+    "etiqueta": "Progreso declarado localmente",
+    "explicacion": "Lo envía tu navegador y Paragon no puede comprobarlo, así que no suma puntos ni cuenta en rankings, ligas o temporadas.",
+    "aviso": "Epic bloquea las lecturas desde servidores. Se sincroniza con la extensión de Paragon desde tu propio navegador, y el progreso se muestra como declarado: no suma XP ni cuenta en rankings, ligas o temporadas."
   }
 }

@@ -1,3 +1,4 @@
+import { esDeclarada } from "@/lib/declarado";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import type { Game, TrophyCounts } from "@/lib/types";
 
@@ -133,6 +134,8 @@ export function paragonProgress(games: Game[], xpMisiones = 0): ParagonProgress 
 
   for (const game of games) {
     if (game.isWishlist) continue;
+    // Progreso declarado (Epic): no suma XP de ningún tipo, ver lib/declarado.ts.
+    if (esDeclarada(game.platform)) continue;
     for (const grade of ["bronze", "silver", "gold"] as const) {
       earned[grade] += game.earned?.[grade] ?? 0;
     }

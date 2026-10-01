@@ -1,6 +1,7 @@
 import "server-only";
 import { and, desc, eq, gte, inArray, lte, ne, or, sql } from "drizzle-orm";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { friendChallengeParticipants, friendChallenges, userTrophies, users } from "@/db/schema";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { avisarUsuario } from "@/lib/avisos";
@@ -117,7 +118,8 @@ async function trofeosEntre(userIds: string[], desde: Date, hasta: Date): Promis
   const filas = await db
     .select({ userId: userTrophies.userId, total: sql<number>`count(*)::int` })
     .from(userTrophies)
-    .where(and(inArray(userTrophies.userId, userIds), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, desde), lte(userTrophies.earnedAt, hasta)))
+    // Progreso declarado (Epic) no cuenta en retos entre amigos: lib/declarado.ts.
+    .where(and(inArray(userTrophies.userId, userIds), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, desde), lte(userTrophies.earnedAt, hasta), ...noDeclaradoPorId(userTrophies.gameId)))
     .groupBy(userTrophies.userId);
   return new Map(filas.map((f) => [f.userId, Number(f.total)]));
 }

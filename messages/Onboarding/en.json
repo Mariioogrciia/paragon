@@ -135,6 +135,14 @@
     "history": {
       "title": "Sync history",
       "row": "{games} games · {newTrophies} new trophies · {date}"
+    },
+    "epicExt": {
+      "titulo": "Link Epic with the Paragon extension",
+      "paso1": "Install the Paragon extension in your browser and connect it to your account.",
+      "paso2": "Sign in to the Epic Games Store and open your avatar → “My achievements” (the address ends in /u/ and a code).",
+      "paso3": "Click the extension icon → “Sync Epic now”. Repeat whenever you want to update.",
+      "conectar": "Connect the extension",
+      "formulario": "Try with my profile link (Epic usually blocks it)"
     }
   },
   "ajustesSeguridad": {

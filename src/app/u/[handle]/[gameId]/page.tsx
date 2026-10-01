@@ -39,6 +39,8 @@ import { horasDeLaPlataforma } from "@/lib/horasIgnoradas";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { games } from "@/db/schema";
+import { MarcaDeclarado } from "@/components/MarcaDeclarado";
+import { esDeclarada } from "@/lib/declarado";
 
 async function ProximoRow({ trophy }: { trophy: Trophy }) {
   const t = await getTranslations("Biblioteca");
@@ -222,6 +224,7 @@ export default async function JuegoPage({
                   style={{ background: "rgb(var(--accent-rgb) / 0.14)", border: "1px solid rgb(var(--accent-rgb) / 0.3)", color: "var(--accent-text)" }}
                 >
                   {game.deviceLabel}
+                  {esDeclarada(game.platform) && <MarcaDeclarado />}
                 </span>
                 {game.pegi && <Pegi edad={game.pegi} size="md" />}
                 {played && t("GameDetailPage.playedAgo", { played })}

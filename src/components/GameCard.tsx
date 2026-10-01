@@ -8,6 +8,8 @@ import { ACHIEVEMENT_LABEL, type Game } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 import { Pegi } from "@/components/Pegi";
 import { useTranslations, useLocale } from "next-intl";
+import { MarcaDeclarado } from "@/components/MarcaDeclarado";
+import { esDeclarada } from "@/lib/declarado";
 
 /**
  * Tarjeta de juego con carátula grande, a la manera de la biblioteca de la
@@ -133,6 +135,7 @@ export function GameCard({
         <div className="flex items-center justify-between text-xs text-muted">
           <span>
             {game.deviceLabel}
+            {esDeclarada(game.platform) && <MarcaDeclarado />}
             {played && ` · ${played}`}
           </span>
           <span>

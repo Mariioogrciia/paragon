@@ -1,5 +1,6 @@
 import "server-only";
 import { sql } from "drizzle-orm";
+import { SQL_NO_DECLARADA } from "@/lib/declarado";
 import { db } from "@/db";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import type { MedidasLogros } from "@/lib/logros";
@@ -23,12 +24,15 @@ export async function medirLogros(userId: string, nivel?: number): Promise<Medid
         select ug."gameId", ug.earned, ug."progressPercent", ug.review, g.platform, g.genres
         from user_game ug join game g on g.id = ug."gameId"
         where ug."userId" = ${userId} and not ug."isWishlist"
+          -- Progreso declarado (Epic) no cuenta para insignias: lib/declarado.ts.
+          and g.platform not in (${sql.raw(SQL_NO_DECLARADA)})
       ),
       trofeos as (
         select ut."gameId", ut."trophyId", ut."rarityPercent",
           (ut."earnedAt" at time zone 'UTC') at time zone (select tz from zona) as local
         from user_trophy ut
         where ut."userId" = ${userId} and ut.earned
+          and split_part(ut."gameId", '-', 1) not in (${sql.raw(SQL_NO_DECLARADA)})
       )
       select
         (select coalesce(sum(cast(earned->>'platinum' as integer)), 0)

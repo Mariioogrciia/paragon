@@ -6,6 +6,7 @@ import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
 import { paragonLevelFromXp, type ParagonLevel } from "@/lib/level";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { xpMisiones } from "@/lib/missions";
+import { esDeclarada } from "@/lib/declarado";
 
 /**
  * Nivel Paragon de VARIOS usuarios a la vez, en dos consultas en total —
@@ -81,7 +82,8 @@ export async function getParagonLevels(
         and(
           inArray(userTrophies.userId, userIds),
           eq(userTrophies.earned, true),
-          inArray(games.platform, ["xbox", "epic"]),
+          // Epic es progreso declarado: no puntúa (lib/declarado.ts).
+          inArray(games.platform, ["xbox"]),
           eq(userGames.isWishlist, false),
         ),
       ),
@@ -100,6 +102,7 @@ export async function getParagonLevels(
 
   for (const fila of filas) {
     if (fila.isWishlist) continue;
+    if (esDeclarada(fila.platform)) continue;
 
     const earned = (fila.earned as Record<string, number> | null) ?? {};
     let xp = (earned.bronze ?? 0) * 10 + (earned.silver ?? 0) * 25 + (earned.gold ?? 0) * 50;

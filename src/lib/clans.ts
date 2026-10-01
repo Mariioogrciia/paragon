@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { clans, clanMembers, clanInvites, games, gameTrophies, userTrophies, activities, users } from "@/db/schema";
 import { eq, and, inArray, desc } from "drizzle-orm";
 import { trophyScore } from "./trophyScore";
@@ -176,7 +177,8 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
         gameTrophies,
         and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
       )
-      .where(and(inArray(userTrophies.userId, memberIds), eq(userTrophies.earned, true))),
+      // Progreso declarado (Epic) no puntúa para el clan: lib/declarado.ts.
+      .where(and(inArray(userTrophies.userId, memberIds), eq(userTrophies.earned, true), ...noDeclaradoPorId(userTrophies.gameId))),
     db
       .select({
         id: users.id,

@@ -7,6 +7,8 @@ import { areFriends } from "@/lib/profiles";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
 import { anunciarInvitacionLiga } from "@/lib/discordBot";
+import { esDeclarada } from "@/lib/declarado";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 
 /**
  * Ligas creadas por un usuario, solo entre amigos — distintas de la "Liga
@@ -129,6 +131,7 @@ async function getLeagueRecentTrophies(
     isNotNull(userTrophies.earnedAt),
     gte(userTrophies.earnedAt, desde),
     inArray(userTrophies.userId, memberIds),
+    ...noDeclaradoPorId(userTrophies.gameId),
   ];
   if (hasta) condiciones.push(lte(userTrophies.earnedAt, hasta));
 
@@ -183,6 +186,8 @@ export async function getLeagueRankings(leagueId: string): Promise<{ userId: str
     eq(userTrophies.earned, true),
     gte(userTrophies.earnedAt, league.createdAt),
     inArray(userTrophies.userId, memberIds),
+    // Progreso declarado (Epic) no puntúa en ligas: lib/declarado.ts.
+    ...noDeclaradoPorId(userTrophies.gameId),
   ];
   if (league.endsAt) scoreConditions.push(lte(userTrophies.earnedAt, league.endsAt));
 
@@ -347,6 +352,8 @@ async function getChallengeStandings(gameId: string, memberIds: string[]): Promi
     .where(eq(games.id, gameId))
     .limit(1);
   if (!game) return null;
+  // Un reto sobre un juego de progreso declarado (Epic) no clasifica a nadie.
+  if (esDeclarada(game.platform)) return null;
 
   const progressRows = await db
     .select({
@@ -452,6 +459,8 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
     eq(userTrophies.earned, true),
     gte(userTrophies.earnedAt, league.createdAt),
     inArray(userTrophies.userId, memberIds),
+    // Progreso declarado (Epic) no puntúa en ligas: lib/declarado.ts.
+    ...noDeclaradoPorId(userTrophies.gameId),
   ];
   if (league.endsAt) scoreConditions.push(lte(userTrophies.earnedAt, league.endsAt));
 

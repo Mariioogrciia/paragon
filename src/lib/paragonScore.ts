@@ -1,6 +1,7 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { gameTrophies, games, userTrophies } from "@/db/schema";
 import { trophyScore } from "@/lib/trophyScore";
 import type { TrophyGrade } from "@/lib/types";
@@ -70,7 +71,8 @@ export async function getParagonScore(userId: string): Promise<ParagonScoreBreak
       gameTrophies,
       and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)),
     )
-    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true)));
+    // Progreso declarado (Epic) no puntúa: lib/declarado.ts.
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), ...noDeclaradoPorId(userTrophies.gameId)));
 
   const porPlataforma = new Map<string, { puntos: number; trofeos: number }>();
 

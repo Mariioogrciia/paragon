@@ -1,6 +1,7 @@
 import "server-only";
 import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
+import { noDeclaradoPorId } from "@/lib/declaradoSql";
 import { gameTrophies, seasonResults, userTrophies, users } from "@/db/schema";
 import { avatarUrlSql } from "@/lib/avatarSql";
 import { avisarUsuario } from "@/lib/avisos";
@@ -46,7 +47,8 @@ export async function rankingTemporada(t: Temporada): Promise<FilaTemporada[]> {
     .from(userTrophies)
     .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
     .innerJoin(users, eq(users.id, userTrophies.userId))
-    .where(and(eq(userTrophies.earned, true), gte(userTrophies.earnedAt, t.inicio), lt(userTrophies.earnedAt, t.fin)))
+    // Progreso declarado (Epic) no puntúa en temporadas: lib/declarado.ts.
+    .where(and(eq(userTrophies.earned, true), gte(userTrophies.earnedAt, t.inicio), lt(userTrophies.earnedAt, t.fin), ...noDeclaradoPorId(userTrophies.gameId)))
     .groupBy(userTrophies.userId, users.handle, users.name, users.id, users.image, users.avatarPersonalizado)
     .orderBy(desc(puntosSql));
   return filas.map((f) => ({ ...f, puntos: Number(f.puntos), nivel: nivelDe(Number(f.puntos)) }));
@@ -109,6 +111,6 @@ export async function puntosUsuarioTemporada(userId: string, t: Temporada): Prom
     .select({ puntos: puntosSql })
     .from(userTrophies)
     .innerJoin(gameTrophies, and(eq(gameTrophies.gameId, userTrophies.gameId), eq(gameTrophies.trophyId, userTrophies.trophyId)))
-    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, t.inicio), lt(userTrophies.earnedAt, t.fin)));
+    .where(and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), gte(userTrophies.earnedAt, t.inicio), lt(userTrophies.earnedAt, t.fin), ...noDeclaradoPorId(userTrophies.gameId)));
   return Number(fila?.puntos ?? 0);
 }
