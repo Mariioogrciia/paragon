@@ -469,7 +469,8 @@
       "b7href": "Ir a seguridad →",
       "b7ConLink": "Descarga en JSON todo lo que Paragon sabe de ti, desde Ajustes → Inicio de sesión y seguridad. Para eliminar tu cuenta del todo, de momento se pide por correo — ver <privacidad>Privacidad</privacidad>."
     },
-    "comandoPrefijo": "/{nombre}"
+    "comandoPrefijo": "/{nombre}",
+    "indice": "Índice"
   },
   "Privacidad": {
     "titulo": "Política de Privacidad",

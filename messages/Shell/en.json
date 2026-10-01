@@ -469,7 +469,8 @@
       "b7href": "Go to security →",
       "b7ConLink": "Download a JSON of everything Paragon knows about you, from Settings → Login and Security. To delete your account entirely, that's currently handled by email — see <privacidad>Privacy</privacidad>."
     },
-    "comandoPrefijo": "/{nombre}"
+    "comandoPrefijo": "/{nombre}",
+    "indice": "Contents"
   },
   "Privacidad": {
     "titulo": "Privacy Policy",

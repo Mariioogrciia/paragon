@@ -469,7 +469,8 @@
       "b7href": "Zur Sicherheit →",
       "b7ConLink": "Lade als JSON alles herunter, was Paragon über dich weiß, unter Einstellungen → Anmeldung und Sicherheit. Um dein Konto komplett zu löschen, geht das derzeit per E-Mail — siehe <privacidad>Datenschutz</privacidad>."
     },
-    "comandoPrefijo": "/{nombre}"
+    "comandoPrefijo": "/{nombre}",
+    "indice": "Inhalt"
   },
   "Privacidad": {
     "titulo": "Datenschutzerklärung",

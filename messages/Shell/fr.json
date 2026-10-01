@@ -469,7 +469,8 @@
       "b7href": "Aller à la sécurité →",
       "b7ConLink": "Télécharge en JSON tout ce que Paragon sait de toi, depuis Paramètres → Connexion et sécurité. Pour supprimer complètement ton compte, ça se fait pour l'instant par e-mail — voir <privacidad>Confidentialité</privacidad>."
     },
-    "comandoPrefijo": "/{nombre}"
+    "comandoPrefijo": "/{nombre}",
+    "indice": "Sommaire"
   },
   "Privacidad": {
     "titulo": "Politique de Confidentialité",
