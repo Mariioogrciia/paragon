@@ -22,7 +22,8 @@
     "favoritosVacio": "Aún no has fijado tus juegos favoritos.",
     "compartir": "Compartir",
     "enlaceCopiado": "Enlace copiado",
-    "compartirTexto": "Mira el perfil de trofeos de {nombre} en Paragon"
+    "compartirTexto": "Mira el perfil de trofeos de {nombre} en Paragon",
+    "cartaNivel": "Nivel {n}"
   },
   "EstadisticasPage": {
     "meta": "Estadísticas de @{handle} · Paragon",

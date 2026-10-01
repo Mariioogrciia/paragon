@@ -737,3 +737,37 @@ h3,
 @media (prefers-reduced-motion: reduce) {
   .trofeo-aviso, .trofeo-aviso-icono { animation: none; }
 }
+
+/* --- Perfil: carta holográfica (CartaHolo.tsx) ---------------------------- */
+.carta-holo {
+  --mx: 30%; --my: 20%; --rx: 0deg; --ry: 0deg;
+  position: relative;
+  border-radius: 22px;
+  padding: 1px;
+  background: linear-gradient(150deg, rgb(var(--accent-rgb) / 0.8), rgb(var(--accent-rgb) / 0.15) 40%, var(--accent-2) 70%, rgb(var(--accent-rgb) / 0.4));
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 30px 60px -28px rgb(var(--accent-rgb) / 0.55), 0 12px 24px -12px rgb(0 0 0 / 0.6);
+}
+.carta-holo-cara {
+  position: relative;
+  overflow: hidden;
+  border-radius: 21px;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface) 55%);
+}
+/* El foil: un degradado iridiscente que se mueve con el puntero. */
+.carta-holo-cara::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgb(255 255 255 / 0.22), transparent 42%),
+    linear-gradient(115deg, transparent 25%, rgb(159 212 236 / 0.18) 38%, rgb(255 214 170 / 0.14) 46%, rgb(196 181 253 / 0.16) 54%, transparent 68%);
+  background-size: 100% 100%, 220% 220%;
+  background-position: 0 0, var(--mx) var(--my);
+  mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: reduce) {
+  .carta-holo { transform: none; transition: none; }
+}

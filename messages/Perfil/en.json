@@ -22,7 +22,8 @@
     "favoritosVacio": "You haven't pinned any favorite games yet.",
     "compartir": "Share",
     "enlaceCopiado": "Link copied",
-    "compartirTexto": "Check out {nombre}'s trophy profile on Paragon"
+    "compartirTexto": "Check out {nombre}'s trophy profile on Paragon",
+    "cartaNivel": "Level {n}"
   },
   "EstadisticasPage": {
     "meta": "Stats for @{handle} · Paragon",

@@ -22,7 +22,8 @@
     "favoritosVacio": "Tu n'as encore épinglé aucun jeu favori.",
     "compartir": "Partager",
     "enlaceCopiado": "Lien copié",
-    "compartirTexto": "Découvre le profil de trophées de {nombre} sur Paragon"
+    "compartirTexto": "Découvre le profil de trophées de {nombre} sur Paragon",
+    "cartaNivel": "Niveau {n}"
   },
   "EstadisticasPage": {
     "meta": "Statistiques de @{handle} · Paragon",
