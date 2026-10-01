@@ -6,7 +6,7 @@ import { PsnProfileNotFoundError } from "@/lib/psn/client";
 import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
 import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
-import { EpicPrivateProfileError, EpicProfileNotFoundError } from "@/lib/epic/client";
+import { EpicPrivateProfileError, EpicProfileNotFoundError, EpicUnavailableError } from "@/lib/epic/client";
 
 const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic"];
 
@@ -26,6 +26,7 @@ function describeError(error: unknown): string {
   if (error instanceof XblProfileNotFoundError) return error.message;
   if (error instanceof EpicProfileNotFoundError) return error.message;
   if (error instanceof EpicPrivateProfileError) return error.message;
+  if (error instanceof EpicUnavailableError) return error.message;
   if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
   return "No se ha podido contactar con la plataforma. Inténtalo en un momento.";
 }

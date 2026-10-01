@@ -19,7 +19,7 @@ import { PsnAuthError, PsnNotConfiguredError, authenticateWithNpssoEphemeral } f
 import type { AuthorizationPayload } from "psn-api";
 import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
-import { EpicPrivateProfileError, EpicProfileNotFoundError } from "@/lib/epic/client";
+import { EpicPrivateProfileError, EpicProfileNotFoundError, EpicUnavailableError } from "@/lib/epic/client";
 import { pegiPorTitulo } from "@/lib/igdb/client";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
@@ -898,6 +898,7 @@ export function describePlatformError(error: unknown): string {
 
   if (error instanceof EpicProfileNotFoundError) return error.message;
   if (error instanceof EpicPrivateProfileError) return error.message;
+  if (error instanceof EpicUnavailableError) return error.message;
 
   if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
 

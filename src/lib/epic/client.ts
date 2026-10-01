@@ -72,6 +72,24 @@ export class EpicPrivateProfileError extends Error {
 }
 
 /**
+ * Epic (Cloudflare) está rechazando las consultas automáticas: no es culpa
+ * del enlace que ha pegado el usuario. Antes este caso caía en
+ * EpicProfileNotFoundError y el mensaje decía "no encuentra ningún perfil"
+ * con un enlace perfectamente válido (visto el 1 oct 2026: 403 con
+ * `cf-mitigated: challenge` en las dos consultas). No se intenta esquivar
+ * esa protección: se dice la verdad y se reintenta más tarde.
+ */
+export class EpicUnavailableError extends Error {
+  constructor() {
+    super(
+      "Epic Games está bloqueando ahora mismo las consultas automáticas (su protección antibots), " +
+        "así que no podemos leer tu perfil. Tu enlace está bien: inténtalo más tarde.",
+    );
+    this.name = "EpicUnavailableError";
+  }
+}
+
+/**
  * GET contra el GraphQL de Epic devolviendo JSON, con cabeceras que imitan
  * un navegador real para pasar el challenge de Cloudflare.
  *
@@ -88,7 +106,13 @@ export class EpicPrivateProfileError extends Error {
  * absorbe silenciosamente y Epic simplemente no sincroniza ese ciclo — no
  * tira abajo ninguna otra plataforma ni la app entera.
  */
-async function query<T>(operationName: string, variables: object, sha256Hash: string): Promise<T | null> {
+async function query<T>(
+  operationName: string,
+  variables: object,
+  sha256Hash: string,
+  /** Al vincular: si Epic bloquea o no responde, se lanza EpicUnavailableError en vez de devolver null. */
+  lanzarSiFalla = false,
+): Promise<T | null> {
   const url =
     `${GRAPHQL}?operationName=${operationName}` +
     `&variables=${encodeURIComponent(JSON.stringify(variables))}` +
@@ -114,12 +138,15 @@ async function query<T>(operationName: string, variables: object, sha256Hash: st
       cache: "no-store",
     });
     if (!response.ok) {
-      console.error("[epic] query", operationName, response.status, response.statusText);
+      console.error("[epic] query", operationName, response.status, response.statusText, response.headers.get("cf-mitigated") ?? "");
+      if (lanzarSiFalla) throw new EpicUnavailableError();
       return null;
     }
     return (await response.json()) as T;
   } catch (error) {
+    if (error instanceof EpicUnavailableError) throw error;
     console.error("[epic] query", operationName, error);
+    if (lanzarSiFalla) throw new EpicUnavailableError();
     return null;
   }
 }
@@ -156,11 +183,12 @@ interface PlayerProfilePrivate {
   };
 }
 
-async function fetchProfilePrivate(epicAccountId: string): Promise<PlayerProfilePrivate | null> {
+async function fetchProfilePrivate(epicAccountId: string, lanzarSiFalla = false): Promise<PlayerProfilePrivate | null> {
   const json = await query<{ data?: { PlayerProfile?: { playerProfile?: PlayerProfilePrivate } } }>(
     "playerProfilePrivate",
     { epicAccountId, locale: "es-ES", page: 1, accountId: epicAccountId },
     HASH.playerProfilePrivate,
+    lanzarSiFalla,
   );
   return json?.data?.PlayerProfile?.playerProfile ?? null;
 }
@@ -179,11 +207,12 @@ interface PlayerProfileBasic {
  * cualquier perfil salía como "no encontrado" aunque los logros estuvieran
  * ahí mismo, un piso más abajo en la respuesta.
  */
-async function fetchProfileBasic(epicAccountId: string): Promise<PlayerProfileBasic | null> {
+async function fetchProfileBasic(epicAccountId: string, lanzarSiFalla = false): Promise<PlayerProfileBasic | null> {
   const json = await query<{ data?: { PlayerProfile?: { playerProfile?: PlayerProfileBasic } } }>(
     "playerProfile",
     { epicAccountId },
     HASH.playerProfile,
+    lanzarSiFalla,
   );
   return json?.data?.PlayerProfile?.playerProfile ?? null;
 }
@@ -206,7 +235,9 @@ export interface ResolvedEpicProfile {
 export async function resolveProfile(input: string): Promise<ResolvedEpicProfile> {
   const epicAccountId = parseInput(input);
 
-  const [basic, priv] = await Promise.all([fetchProfileBasic(epicAccountId), fetchProfilePrivate(epicAccountId)]);
+  // Al vincular, un bloqueo de Epic se dice tal cual (EpicUnavailableError)
+  // en vez de hacerlo pasar por "no encuentro tu perfil".
+  const [basic, priv] = await Promise.all([fetchProfileBasic(epicAccountId, true), fetchProfilePrivate(epicAccountId, true)]);
   if (!basic?.epicAccountId) throw new EpicProfileNotFoundError(input);
 
   return {
