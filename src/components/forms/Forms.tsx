@@ -109,13 +109,13 @@ export function HandleForm({ current, hasImage }: { current?: string | null, has
   );
 }
 
-export function LinkPsnForm({ current }: { current?: string | null }) {
+export function LinkPsnForm({ current, sinAviso = false }: { current?: string | null; /** Ajustes, con la cuenta ya pública: el aviso de "perfil público" sobra. */ sinAviso?: boolean }) {
   const t = useTranslations("Onboarding");
   const [state, action] = useActionState(linkPsnAction, EMPTY);
 
   return (
     <form action={action}>
-      <PublicAccountNotice platform="psn" />
+      {!sinAviso && <PublicAccountNotice platform="psn" />}
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="onlineId"
@@ -134,13 +134,13 @@ export function LinkPsnForm({ current }: { current?: string | null }) {
   );
 }
 
-export function LinkSteamForm({ current }: { current?: string | null }) {
+export function LinkSteamForm({ current, sinAviso = false }: { current?: string | null; /** Ajustes, con la cuenta ya pública: el aviso de "perfil público" sobra. */ sinAviso?: boolean }) {
   const t = useTranslations("Onboarding");
   const [state, action] = useActionState(linkSteamAction, EMPTY);
 
   return (
     <form action={action}>
-      <PublicAccountNotice platform="steam" />
+      {!sinAviso && <PublicAccountNotice platform="steam" />}
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="steamId"
@@ -159,13 +159,13 @@ export function LinkSteamForm({ current }: { current?: string | null }) {
   );
 }
 
-export function LinkXboxForm({ current }: { current?: string | null }) {
+export function LinkXboxForm({ current, sinAviso = false }: { current?: string | null; /** Ajustes, con la cuenta ya pública: el aviso de "perfil público" sobra. */ sinAviso?: boolean }) {
   const t = useTranslations("Onboarding");
   const [state, action] = useActionState(linkXboxAction, EMPTY);
 
   return (
     <form action={action}>
-      <PublicAccountNotice platform="xbox" />
+      {!sinAviso && <PublicAccountNotice platform="xbox" />}
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="gamertag"
@@ -185,13 +185,13 @@ export function LinkXboxForm({ current }: { current?: string | null }) {
   );
 }
 
-export function LinkEpicForm({ current }: { current?: string | null }) {
+export function LinkEpicForm({ current, sinAviso = false }: { current?: string | null; /** Ajustes, con la cuenta ya pública: el aviso de "perfil público" sobra. */ sinAviso?: boolean }) {
   const t = useTranslations("Onboarding");
   const [state, action] = useActionState(linkEpicAction, EMPTY);
 
   return (
     <form action={action}>
-      <PublicAccountNotice platform="epic" />
+      {!sinAviso && <PublicAccountNotice platform="epic" />}
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           name="epicProfile"

@@ -17,7 +17,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 export const metadata = { title: "Ajustes · Paragon" };
 
-const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
 
 const AVATAR_BG: Record<PlataformaVinculable, string> = {
   psn: "linear-gradient(150deg, #2f7ad6, #6b3fd4)",
@@ -28,7 +27,12 @@ const AVATAR_BG: Record<PlataformaVinculable, string> = {
 
 type Traductor = Awaited<ReturnType<typeof getTranslations>>;
 
-/** Ficha de una plataforma: vinculada o no, siempre con su formulario debajo. */
+/**
+ * Fila de una plataforma (rediseño del 1 oct 2026): a la izquierda quién
+ * eres ahí (cuenta, estado, sincronizar, desvincular); a la derecha cambiar
+ * de cuenta con el campo a lo ancho. Antes eran cuatro columnas estrechas
+ * donde el nombre de cuenta se quedaba en "MaR" y nada cuadraba en altura.
+ */
 function PlatformSection({
   platform,
   account,
@@ -44,89 +48,71 @@ function PlatformSection({
   const sincronizado = account?.syncedAt ? relativeDate(account.syncedAt, idioma) : null;
 
   return (
-    <section className="mt-3.5 rounded-[16px] p-5 flex flex-col" style={CARD}>
-      <div className="flex items-center gap-3 mb-3">
-        <span
-          className="font-heading flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-lg font-bold shadow-md text-white"
-          style={{ background: AVATAR_BG[platform] }}
-        >
-          {platform === "psn" && <PlayStationLogo className="w-5 h-5" />}
-          {platform === "steam" && <SteamLogo className="w-5 h-5" />}
-          {platform === "xbox" && <XboxLogo className="w-5 h-5" />}
-          {platform === "epic" && <EpicGamesLogo className="w-5 h-5" />}
-        </span>
-        <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">
-          {PLATFORM_LABEL[platform]}
-        </h2>
-      </div>
-
-      {account && (
-        <div
-          className="mb-3 flex flex-col gap-2.5 rounded-[12px] p-3.5"
-          style={{ border: "1px solid var(--border)", background: "var(--background)" }}
-        >
-          <div className="flex items-center gap-3">
-            <span
-              className="font-heading flex h-10 w-10 shrink-0 overflow-hidden items-center justify-center rounded-[10px] text-lg font-bold"
-              style={{ background: AVATAR_BG[platform] }}
-            >
-              {account.avatarUrl ? (
-                <img loading="lazy" decoding="async" src={account.avatarUrl} alt="" className="h-full w-full object-cover" />
-              ) : (
-                account.username.charAt(0).toUpperCase()
-              )}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[0.9375rem] font-semibold" title={account.username}>
-                {account.username}
-              </p>
-            </div>
-            <span
-              className="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-[0.08em]"
-              style={
-                account.isPublic
-                  ? { background: "rgba(78, 201, 138, 0.12)", border: "1px solid rgba(78, 201, 138, 0.3)", color: "#4ec98a" }
-                  : { background: "rgba(226, 181, 62, 0.12)", border: "1px solid rgba(226, 181, 62, 0.3)", color: "#e2b53e" }
-              }
-            >
-              <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ background: account.isPublic ? "#4ec98a" : "#e2b53e" }}
-              />
+    <section className="cuenta-fila" aria-labelledby={`cuenta-${platform}`}>
+      <div className="cuenta-identidad">
+        <div className="flex items-center gap-3">
+          <span className="cuenta-logo" style={{ background: AVATAR_BG[platform] }}>
+            {platform === "psn" && <PlayStationLogo className="h-5 w-5" />}
+            {platform === "steam" && <SteamLogo className="h-5 w-5" />}
+            {platform === "xbox" && <XboxLogo className="h-5 w-5" />}
+            {platform === "epic" && <EpicGamesLogo className="h-5 w-5" />}
+          </span>
+          <h2 id={`cuenta-${platform}`} className="font-heading text-lg font-bold">
+            {PLATFORM_LABEL[platform]}
+          </h2>
+          {account && (
+            <span className="cuenta-estado ml-auto" data-privada={!account.isPublic || undefined}>
+              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
               {account.isPublic ? t("ajustesPlataformas.linked") : t("ajustesPlataformas.private")}
             </span>
-          </div>
-
-          <p className="text-xs text-muted leading-relaxed">
-            {account.level !== null ? t("ajustesPlataformas.levelLabel", { level: account.level }) : t("ajustesPlataformas.accountLinked")}
-            {sincronizado && t("ajustesPlataformas.syncedAt", { date: sincronizado })}
-          </p>
-          <SyncPlatformForm platform={platform} label={PLATFORM_LABEL[platform]} />
+          )}
         </div>
-      )}
 
-      <div className="mt-auto pt-3 border-t border-white/5">
-        <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-          {account ? t("ajustesPlataformas.changeAccount") : t("ajustesPlataformas.linkAccount")}
-        </label>
-        {children}
-
-        <p className="mt-2 text-xs text-muted">{t(`ajustesPlataformas.help.${platform}`)}</p>
-
-        {account && (
-          <div className="mt-4">
-            <ConfirmForm
-              action={unlinkAccountAction}
-              hidden={{ platform }}
-              title={t("ajustesPlataformas.confirmUnlink.title", { platform: PLATFORM_LABEL[platform] })}
-              message={t("ajustesPlataformas.confirmUnlink.message")}
-              confirmLabel={t("ajustesPlataformas.confirmUnlink.confirmLabel")}
-              triggerClassName="text-[0.8125rem] font-semibold text-muted hover:text-danger"
-            >
-              {t("ajustesPlataformas.confirmUnlink.trigger", { platform: PLATFORM_LABEL[platform] })}
-            </ConfirmForm>
-          </div>
+        {account ? (
+          <>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="cuenta-avatar" style={{ background: AVATAR_BG[platform] }}>
+                {account.avatarUrl ? (
+                  <img loading="lazy" decoding="async" src={account.avatarUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  account.username.charAt(0).toUpperCase()
+                )}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-[0.9375rem] font-semibold" title={account.username}>
+                  {account.username}
+                </p>
+                <p className="text-xs text-muted">
+                  {account.level !== null ? t("ajustesPlataformas.levelLabel", { level: account.level }) : t("ajustesPlataformas.accountLinked")}
+                  {sincronizado && t("ajustesPlataformas.syncedAt", { date: sincronizado })}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <SyncPlatformForm platform={platform} label={PLATFORM_LABEL[platform]} />
+              <ConfirmForm
+                action={unlinkAccountAction}
+                hidden={{ platform }}
+                title={t("ajustesPlataformas.confirmUnlink.title", { platform: PLATFORM_LABEL[platform] })}
+                message={t("ajustesPlataformas.confirmUnlink.message")}
+                confirmLabel={t("ajustesPlataformas.confirmUnlink.confirmLabel")}
+                triggerClassName="rounded-md px-1 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-danger"
+              >
+                {t("ajustesPlataformas.confirmUnlink.trigger", { platform: PLATFORM_LABEL[platform] })}
+              </ConfirmForm>
+            </div>
+          </>
+        ) : (
+          <p className="mt-3 text-[0.8125rem] text-muted">{t(`ajustesPlataformas.help.${platform}`)}</p>
         )}
+      </div>
+
+      <div className="cuenta-formulario">
+        <p className="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
+          {account ? t("ajustesPlataformas.changeAccount") : t("ajustesPlataformas.linkAccount")}
+        </p>
+        {children}
+        {account && <p className="mt-2 text-xs text-muted">{t(`ajustesPlataformas.help.${platform}`)}</p>}
       </div>
     </section>
   );
@@ -160,49 +146,39 @@ export default async function AjustesPlataformasPage() {
         <p className="text-sm text-muted">{t("ajustesPlataformas.description")}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="cuentas-lista">
         <PlatformSection platform="psn" account={psn} t={t}>
-          <LinkPsnForm current={psn?.username} />
+          <LinkPsnForm current={psn?.username} sinAviso={psn?.isPublic === true} />
         </PlatformSection>
 
         <PlatformSection platform="steam" account={steam} t={t}>
-          <LinkSteamForm current={steam?.username} />
+          <LinkSteamForm current={steam?.username} sinAviso={steam?.isPublic === true} />
         </PlatformSection>
 
         <PlatformSection platform="xbox" account={xbox} t={t}>
-          <LinkXboxForm current={xbox?.username} />
+          <LinkXboxForm current={xbox?.username} sinAviso={xbox?.isPublic === true} />
         </PlatformSection>
 
         <PlatformSection platform="epic" account={epic} t={t}>
-          <LinkEpicForm current={epic?.username} />
+          <LinkEpicForm current={epic?.username} sinAviso={epic?.isPublic === true} />
         </PlatformSection>
 
         {/* Google Play y Ubisoft Connect se quitaron del todo el 11 de
             septiembre de 2026 — ninguna llegó a tener sincronización real
-            (ver HANDOFF.md), y las pocas cuentas que se habían llegado a
-            vincular no guardaban ningún dato sincronizado de verdad. Epic
-            volvió el 22 de septiembre de 2026 con un enfoque distinto — ver
-            lib/epic/client.ts. */}
-        <section className="mt-3.5 rounded-[18px] p-6 flex flex-col" style={CARD}>
-          <div className="flex items-center gap-3 mb-4 opacity-50">
-            <span
-              className="font-heading flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] shadow-md text-white"
-              style={{ background: "linear-gradient(150deg, #E60012, #a8000d)" }}
-            >
-              <NintendoLogo className="w-5 h-5" />
-            </span>
-            <h2 className="font-heading text-[1.0625rem] font-bold tracking-[0.03em]">{t("ajustesPlataformas.nintendo.title")}</h2>
-          </div>
-          <div className="mt-auto pt-4 border-t border-white/5">
-            <p className="text-xs text-muted mb-2 font-semibold text-danger">{t("ajustesPlataformas.nintendo.badge")}</p>
-            <p className="text-xs text-muted">
-              {t("ajustesPlataformas.nintendo.description")}
-            </p>
-          </div>
-        </section>
+            (ver HANDOFF.md). Epic volvió el 22 de septiembre de 2026 con un
+            enfoque distinto — ver lib/epic/client.ts. Nintendo no se puede
+            vincular: una línea al final, sin ocupar una ficha entera. */}
+        <div className="flex items-start gap-3 px-1 pt-1">
+          <span className="cuenta-logo opacity-60" style={{ background: "linear-gradient(150deg, #E60012, #a8000d)" }}>
+            <NintendoLogo className="h-5 w-5" />
+          </span>
+          <p className="text-[0.8125rem] text-muted">
+            <span className="font-semibold text-foreground">{t("ajustesPlataformas.nintendo.title")}</span> · {t("ajustesPlataformas.nintendo.badge")}. {t("ajustesPlataformas.nintendo.description")}
+          </p>
+        </div>
       </div>
 
-      <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
+      <section className="ajustes-grupo">
         <h2 className="font-heading mb-1 text-[1.0625rem] font-bold tracking-[0.03em]">{t("ajustesPlataformas.collections.title")}</h2>
         <p className="mb-4 text-[0.8125rem] text-muted">
           {t("ajustesPlataformas.collections.description")}
@@ -211,7 +187,7 @@ export default async function AjustesPlataformasPage() {
       </section>
 
       {(psn || steam || epic) && (
-        <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
+        <section className="ajustes-grupo">
           <h2 className="font-heading mb-4 text-[1.0625rem] font-bold tracking-[0.03em]">
             {t("ajustesPlataformas.sync.title")}
           </h2>
@@ -234,7 +210,7 @@ export default async function AjustesPlataformasPage() {
       )}
 
       {salud.length > 0 && (
-        <section className="mt-3.5 rounded-[18px] p-6" style={CARD}>
+        <section className="ajustes-grupo">
           <h2 className="font-heading mb-1 text-[1.0625rem] font-bold tracking-[0.03em]">
             {t("ajustesPlataformas.health.title")}
           </h2>
@@ -247,7 +223,7 @@ export default async function AjustesPlataformasPage() {
       )}
 
       {historial.length > 0 && (
-        <section className="rounded-[18px] p-6" style={CARD}>
+        <section className="ajustes-grupo">
           <h2 className="font-heading mb-4 text-[1.0625rem] font-bold tracking-[0.03em]">{t("ajustesPlataformas.history.title")}</h2>
           <div className="space-y-2">
             {historial.map((run) => (
