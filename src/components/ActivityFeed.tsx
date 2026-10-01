@@ -117,9 +117,11 @@ function TarjetaActividad({ activity, currentUserId }: { activity: FeedActivity;
   else if (activity.type === "status") actionText = t("accionEstado");
   else actionText = t("accionDefault");
 
+  const portada = esPlatino ? activity.game?.iconUrl : null;
+
   return (
     <div
-      className="flex gap-3 p-3 transition-colors border rounded-xl bg-card hover:bg-accent/5 sm:gap-4 sm:p-4"
+      className="muro-tarjeta overflow-hidden border rounded-xl bg-card transition-colors hover:bg-accent/5"
       style={
         esPlatino
           ? {
@@ -129,10 +131,19 @@ function TarjetaActividad({ activity, currentUserId }: { activity: FeedActivity;
           : undefined
       }
     >
+      {portada && activity.game && (
+        <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="muro-portada relative block h-36 sm:h-44" style={{ backgroundImage: `url(${portada})` }}>
+          <span className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--card, var(--surface)) 4%, transparent 70%)" }} />
+          <span className="absolute bottom-3 left-4 flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "rgb(0 0 0 / 0.55)", color: "var(--platinum)", backdropFilter: "blur(6px)" }}>
+            <TrophyIcon grade="platinum" size={14} /> {t("platinoEtiqueta")}
+          </span>
+        </Link>
+      )}
+      <div className="flex gap-3 p-3 sm:gap-4 sm:p-4">
       <AvatarAutor user={activity.user} />
 
       <div className="min-w-0 flex-1">
-        {esPlatino && (
+        {esPlatino && !portada && (
           <span className="mb-1 inline-flex items-center gap-1 text-[0.625rem] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--platinum)" }}>
             <TrophyIcon grade="platinum" size={12} /> {t("platinoEtiqueta")}
           </span>
@@ -220,7 +231,7 @@ function TarjetaActividad({ activity, currentUserId }: { activity: FeedActivity;
         </form>
       )}
 
-      {activity.game?.iconUrl && (
+      {activity.game?.iconUrl && !portada && (
         <Link href={`/u/${activity.user.handle}/${activity.game.id}`} className="shrink-0">
           <img
             loading="lazy"
@@ -231,6 +242,7 @@ function TarjetaActividad({ activity, currentUserId }: { activity: FeedActivity;
           />
         </Link>
       )}
+      </div>
     </div>
   );
 }
@@ -245,11 +257,14 @@ export function ActivityFeed({
   hitos = [],
   currentUserId = null,
   sinTitulo = false,
+  muro = false,
 }: {
   activities: FeedActivity[];
   hitos?: Hito[];
   currentUserId?: string | null;
   sinTitulo?: boolean;
+  /** Comunidad: dos columnas de alturas distintas (muro de logros). */
+  muro?: boolean;
 }) {
   const t = useTranslations("Analitica.activityFeed");
 
@@ -271,7 +286,7 @@ export function ActivityFeed({
     <div className={`flex flex-col gap-6 ${sinTitulo ? "" : "mt-8"}`}>
       {!sinTitulo && <h2 className="text-xl font-bold tracking-tight">{t("titulo")}</h2>}
 
-      <div className="flex flex-col gap-4">
+      <div className={muro ? "muro-columnas" : "flex flex-col gap-4"}>
         {elementos.map((e) =>
           e.actividad ? <TarjetaActividad key={e.clave} activity={e.actividad} currentUserId={currentUserId ?? null} /> : e.hito ? <TarjetaHito key={e.clave} hito={e.hito} /> : null,
         )}

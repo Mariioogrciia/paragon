@@ -3,7 +3,10 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **30 de septiembre de 2026**.
 
-**Estado actual (30 sept 2026) — léelo antes que nada:**
+**Estado actual (1 oct 2026) — léelo antes que nada:** hay un rediseño de
+toda la plataforma a medias — ver "REDISEÑO DE TODA LA PLATAFORMA" al final.
+
+**Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
   estados/reacciones en Android, arreglos en `/ajustes/plataformas`, orden
   de secciones del perfil y errores de `/api/profile/update` traducidos —
@@ -1107,6 +1110,47 @@ en Ligas y Clanes**, y seguir la recomendación de Claude para el resto
   panel (pasan a subtítulo) y el texto con degradado del 404.
 - "Crea tu primera tarjeta" (landing): marco del acento y recorte en el hijo
   interior (antes dejaba dos rayas sueltas del brillo).
+
+## REDISEÑO DE TODA LA PLATAFORMA — EN CURSO (1 oct 2026) · LEER PRIMERO
+
+El usuario pidió un rediseño visual de toda la plataforma **sin quitar ni
+cambiar ninguna funcionalidad** ("las funcionalidades las mismas, solo
+nuevos diseños"). Se eligió sección a sección con la skill `impeccable`
+(página de decisión, rondas en `.impeccable/rondas/*.json`, respuestas en
+`.impeccable/rondas/respuestas.txt`). Elecciones del usuario:
+
+| Sección | Diseño elegido | Estado |
+|---|---|---|
+| Perfil | Carta holográfica | **Hecho** (`CartaHolo.tsx`, cabecera de `u/[handle]/page.tsx`) |
+| Ficha de juego | Guía de estrategia | **Hecho** (vista lista de `TrophyList.tsx`: capítulos, casillas, margen, perdibles) |
+| Biblioteca | Lomos de caja | **Hecho** (vista "lomos" por defecto en `LibraryGrid.tsx`) |
+| Estadísticas | Calendario de calor protagonista | **Hecho** (`ActivityHeatmap` con `grande`, escala de metales) |
+| Descubrir | Matriz dificultad × horas | **Hecho** (`MatrizDificultad.tsx`, `getMatrizDescubrir` en lib/discover.ts; datos reales: rareza del platino × horas medias de usuarios) |
+| Comunidad | Muro de logros | **Hecho, sin verificar del todo**: dos columnas (`muro` en `ActivityFeed`), platinos con banner de portada — el banner no se vio con datos (no había platinos en la muestra) |
+| Panel | Cabina de widgets | **Pendiente** (diseño: las secciones del panel como módulos/baldosas de cabina; NO añadir arrastrar si cambia funciones) |
+| Amigos | Marcador de estadio | **Pendiente** (mismas secciones de /amigos; clasificación como marcador LED con cifras grandes, tu fila encendida) |
+| Ajustes | Panel de control refinado | **Pendiente** (mismos ajustes; menú lateral fijo, grupos claros, mini vista previa en vivo en Apariencia/perfil) |
+| Paletas | Paleta de tu juego favorito | **Pendiente** (opción en Apariencia que tiñe la app con el color de la carátula del favorito; ya existe `lib/coverAura.ts`; corregir contraste) |
+
+Ya hecho antes (30 sept): paleta platino por defecto + 6 paletas completas,
+Ligas y Clanes como torre de tiempos ("carreras"), aviso "trofeo
+desbloqueado", landing nueva. DESIGN.md documenta el sistema hasta antes de
+este rediseño por secciones: **al terminar las 4 pendientes, relanzar el
+documentador** (`impeccable-documenter`) para que recoja carta, guía, lomos,
+calendario, matriz y muro.
+
+Verificación: sin sesión en el navegador de Claude; las páginas públicas
+(perfil, ficha, biblioteca, estadísticas, Descubrir) se comprobaron con
+`node scripts/captura.mjs <url> 1440 900 <png> 1 1` (y 375 812). Comunidad,
+Panel, Amigos y Ajustes exigen sesión: pedir al usuario que inicie sesión en
+el panel del navegador para verificarlas, o montar una página temporal con
+datos reales (como se hizo con el muro) y borrarla después.
+
+**Trampa nueva de esta tanda**: un componente de cliente con
+`useTranslations("X.Y.z")` necesita "X.Y.z" en `src/i18n/clientMessages.ts`
+o sale la clave en crudo; `npx tsx scripts/comprobar-namespaces-cliente.mts`
+lo detecta. Y los porcentajes calculados en `style` de un componente de
+cliente hay que redondearlos (`toFixed`) o hay desajuste de hidratación.
 
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El

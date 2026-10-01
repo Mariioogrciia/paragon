@@ -856,3 +856,9 @@ h3,
 }
 .matriz-punto:hover, .matriz-punto:focus-visible { transform: translate(-50%, 50%) scale(1.8); z-index: 30; opacity: 1 !important; }
 @media (max-width: 639px) { .matriz-punto { width: 20px; height: 20px; } }
+
+/* --- Comunidad: muro de logros (ActivityFeed con `muro`) ------------------ */
+.muro-columnas { columns: 1; column-gap: 1rem; }
+@media (min-width: 768px) { .muro-columnas { columns: 2; } }
+.muro-columnas > * { break-inside: avoid; margin-bottom: 1rem; }
+.muro-portada { background-size: cover; background-position: center; }

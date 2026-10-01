@@ -89,7 +89,7 @@ export default async function GlobalFeedPage({ searchParams }: { searchParams: P
           <PublicarEstado />
           {activities.length > 0 || hitos.length > 0 ? (
             <>
-              <ActivityFeed activities={activities} hitos={hitos} currentUserId={userId} sinTitulo />
+              <ActivityFeed activities={activities} hitos={hitos} currentUserId={userId} sinTitulo muro />
               {hayMas && <VerMas href={hrefPagina("/feed", params, pagina + 1)} />}
             </>
           ) : (
