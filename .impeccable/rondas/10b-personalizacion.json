@@ -1,0 +1,160 @@
+{
+  "title": "Personalización (10/10) · otra tanda",
+  "question": "Mismos ajustes que hoy (apariencia, ocultar, privacidad, cómo se ve tu perfil); solo cambia el diseño.",
+  "options": [
+    {
+      "id": "refinado",
+      "label": "Panel de control refinado",
+      "kicker": "THE ROLL",
+      "thesis": "Los mismos ajustes (General, Apariencia, Vitrinas y firma, Seguridad, Cuentas, Ocultar) con menú lateral fijo, grupos con título claro y vista previa pequeña junto a cada cambio visual.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "menú lateral con icono",
+        "grupos con separador",
+        "mini vista previa al lado"
+      ],
+      "viewport": "Menú lateral a la izquierda; a la derecha el grupo activo con sus opciones y, en Apariencia/perfil, una vista previa pequeña que cambia al momento.",
+      "risk": "Es la evolución natural de lo que hay: ordenado y claro, poco espectacular.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "menú de ajustes",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 10
+          },
+          {
+            "label": "grupo de opciones",
+            "x": 3,
+            "y": 0,
+            "w": 6,
+            "h": 10,
+            "accent": true
+          },
+          {
+            "label": "vista previa",
+            "x": 9,
+            "y": 0,
+            "w": 3,
+            "h": 5,
+            "accent": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "interruptores",
+      "label": "Tablero de interruptores",
+      "thesis": "Los ajustes como un panel físico: interruptores y selectores grandes agrupados por zonas (apariencia, privacidad, qué se oculta, avisos), todo a la vista.",
+      "palette": [
+        "#0c0f14",
+        "#161b23",
+        "#7cc4e4",
+        "#ffcf3a",
+        "#4ec98a"
+      ],
+      "materials": [
+        "interruptores grandes con estado",
+        "zonas con placa de título",
+        "luz de estado encendido/apagado"
+      ],
+      "viewport": "Una rejilla de zonas: cada zona una placa con sus interruptores; el estado se lee de un vistazo por las luces.",
+      "risk": "Con muchos ajustes la rejilla es larga; hay que agrupar muy bien.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "apariencia",
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "privacidad del perfil",
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "ocultar",
+            "x": 0,
+            "y": 5,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "label": "avisos",
+            "x": 6,
+            "y": 5,
+            "w": 6,
+            "h": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "taquilla",
+      "label": "Taquilla de personalización",
+      "thesis": "Lo visual del perfil (marcos, banners, títulos, efectos del nombre, paletas) como objetos en una taquilla: los desbloqueados a la vista, los bloqueados con candado y nivel necesario.",
+      "palette": [
+        "#0a0d13",
+        "#141b28",
+        "#7cc4e4",
+        "#e2b53e",
+        "#c07b4a"
+      ],
+      "materials": [
+        "objetos en casillas",
+        "candado con nivel",
+        "perfil en vivo al lado"
+      ],
+      "viewport": "A la izquierda la taquilla con pestañas por tipo de objeto; a la derecha tu perfil en vivo con lo que te pones. Seguridad, privacidad y Ocultar siguen en su menú, con el mismo estilo.",
+      "risk": "Solo transforma la parte de apariencia; el resto de ajustes se restyla sin tanta metáfora.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "pestañas: marcos, banners, títulos, efectos, paletas",
+            "x": 0,
+            "y": 0,
+            "w": 7,
+            "h": 1
+          },
+          {
+            "label": "taquilla de objetos",
+            "x": 0,
+            "y": 1,
+            "w": 7,
+            "h": 9,
+            "accent": true
+          },
+          {
+            "label": "tu perfil en vivo",
+            "x": 7,
+            "y": 0,
+            "w": 5,
+            "h": 10,
+            "accent": true
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true
+}

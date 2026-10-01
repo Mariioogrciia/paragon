@@ -1,0 +1,107 @@
+{
+  "title": "Mundo visual de toda la plataforma",
+  "question": "El reparto asignó 'Hoja de servicio'. Quédatela, elige otra, o pide otra tanda. En todas se mantiene tu paleta platino.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Hoja de servicio",
+      "kicker": "THE ROLL",
+      "lineage": "pasadores de condecoraciones, hojas de servicio y galones",
+      "thesis": "Cada cazador tiene un expediente: las insignias son pasadores de colores, el nivel son galones y cada platino una medalla acuñada.",
+      "palette": ["#0c1220", "#152036", "#7cc4e4", "#e2b53e", "#c07b4a", "#e9eef7"],
+      "materials": ["cinta de condecoración a rayas", "metal acuñado (platino, oro, plata, bronce)", "ficha con campos sellados"],
+      "viewport": "Perfil: cabecera como hoja de servicio (nombre, rango en galones, fecha de alta), debajo el pasador con todas las insignias reales como cintas a rayas, y a la derecha las medallas de platino acuñadas.",
+      "risk": "Si se hace literal suena a cuartel; tiene que leerse como condecoración deportiva, no militar.",
+      "raised": [
+        { "from": "challenger-ikeda", "raise": "Las cifras siempre en figuras tabulares y las tablas densas se permiten: la hoja es un documento de datos, no un póster." },
+        { "from": "challenger-phosphor", "raise": "Los eventos del sistema (sincronizado, trofeo nuevo) se anotan como líneas fechadas de un registro de servicio, no como avisos flotantes." }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Pantalla de trofeos de consola",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "listas de trofeos de PS5/Xbox y el aviso de 'trofeo desbloqueado'",
+      "thesis": "La plataforma habla el idioma que el cazador ya conoce de su consola, pero unificado: el aviso de trofeo desbloqueado es la firma de toda la app.",
+      "palette": ["#070a12", "#111827", "#7cc4e4", "#d7eef8", "#e2b53e"],
+      "materials": ["paneles oscuros con profundidad de consola", "iconos metálicos por grado", "barra de progreso fina"],
+      "viewport": "Panel: el platino más cercano a pantalla completa como en la consola, con la lista de trofeos que faltan en filas grandes y el aviso de trofeo desbloqueado como pieza animada.",
+      "risk": "Es la dirección más cercana a lo que ya hay y a lo que haría cualquiera en esta categoría: familiar y eficaz, poco sorprendente."
+    },
+    {
+      "id": "challenger-racing",
+      "label": "Liga de carreras",
+      "verdict": "competitive",
+      "lineage": "identidades de liga de carreras con libreas de equipo",
+      "thesis": "Ligas, clanes y temporadas como escuderías: cada clan tiene su librea y la clasificación corre de izquierda a derecha.",
+      "palette": ["#1c1f24", "#ff6a00", "#e8ff3a", "#7cc4e4", "#ffffff"],
+      "materials": ["calcomanías de patrocinador", "números de dorsal enormes", "gris de asfalto mate"],
+      "viewport": "Ligas: tabla como torre de tiempos con los clanes en sus colores y la posición en números de dorsal.",
+      "case": "Encaja con ligas, clanes y temporadas y los gamers lo reconocen; pierde claridad en biblioteca y guías, que no son competición.",
+      "risk": "Ruidosa para pantallas de uso diario como la biblioteca.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-antialiased-racing-league-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-antialiased-racing-league.webp"
+    },
+    {
+      "id": "challenger-gate",
+      "label": "Panel de salidas",
+      "verdict": "competitive",
+      "lineage": "tarjeta de embarque y panel de salidas del aeropuerto",
+      "thesis": "Los rankings se reordenan en vivo como un panel de salidas: la fila que cambia se mueve y se queda iluminada hasta que la ves.",
+      "palette": ["#0a0d13", "#1a2230", "#7cc4e4", "#ffcf3a", "#e9eef7"],
+      "materials": ["columnas fijas con figuras tabulares", "segmentos de tarjeta de embarque", "un único color de alerta para cambios"],
+      "viewport": "Amigos/Ligas: clasificación como panel de salidas que reordena filas al sincronizar; tu perfil como tarjeta de embarque segmentada.",
+      "case": "Muy claro para clasificaciones y cambios; el cazador no se identifica con aeropuertos.",
+      "risk": "Fría y utilitaria fuera de las clasificaciones.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board.webp"
+    },
+    {
+      "id": "challenger-ikeda",
+      "label": "Campo de datos",
+      "verdict": "declined",
+      "lineage": "instalaciones de datos en blanco y negro",
+      "palette": ["#000000", "#ffffff"],
+      "materials": ["barras finas", "numerales monoespaciados"],
+      "case": "Pierde en los dos ejes: sin color no hay metales de trofeo ni plataformas.",
+      "kept": "Disciplina de datos: figuras tabulares y densidad sin miedo.",
+      "risk": "Ilegible como app de uso diario.",
+      "hero": "https://impeccable.style/worlds/cards/ikeda-datamatics-hero.webp"
+    },
+    {
+      "id": "challenger-phosphor",
+      "label": "Terminal de fósforo",
+      "verdict": "declined",
+      "lineage": "terminales de fósforo verde",
+      "palette": ["#020a04", "#33ff66"],
+      "materials": ["brillo de fósforo", "cursor que respira"],
+      "case": "Ya existe como estilo 'Terminal' elegible; como mundo por defecto pierde claridad.",
+      "kept": "Los eventos del sistema se escriben como registro fechado.",
+      "risk": "Nicho.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-phosphor-terminal-midnight-hero.webp"
+    },
+    {
+      "id": "challenger-dive",
+      "label": "Inmersión profunda",
+      "verdict": "declined",
+      "lineage": "perfil de inmersión técnica",
+      "palette": ["#04121f", "#3fd0e0", "#f4f7fa"],
+      "materials": ["eje vertical de profundidad", "nieve marina"],
+      "case": "Metáfora ajena al cazador de trofeos.",
+      "kept": "Un único eje vertical que ordena el progreso.",
+      "risk": "Decorativa.",
+      "hero": "https://impeccable.style/worlds/cards/rivers-tides-ocean-depths-mesophotic-deep-dive-hero.webp"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "canon": true,
+  "canonCard": {
+    "label": "El estándar del sector",
+    "thesis": "Lo que hacen PSNProfiles o TrueAchievements, ejecutado impecable: tablas limpias, mucha información, cero sorpresa.",
+    "palette": ["#0f1115", "#1b1f27", "#7cc4e4", "#e9eef7"],
+    "materials": ["rejilla limpia", "tablas densas", "carátulas"],
+    "viewport": "Perfil: cabecera compacta con estadísticas y debajo tablas de juegos y trofeos ordenables.",
+    "risk": "Indistinguible de la competencia a propósito."
+  },
+  "steer": true
+}

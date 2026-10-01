@@ -1,0 +1,144 @@
+{
+  "title": "Descubrir (6/10)",
+  "question": "Buscar el siguiente juego. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "matriz",
+      "label": "Matriz dificultad × horas",
+      "thesis": "Los juegos colocados en un plano: fácil a difícil, corto a largo. Eliges tu hueco.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "plano con cuadrantes",
+        "carátulas como puntos",
+        "filtros por plataforma"
+      ],
+      "viewport": "El plano ocupa el centro; tocas una zona y sale la lista de juegos de ese cuadrante.",
+      "risk": "Necesita datos de dificultad y horas de muchos juegos.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "filtros",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "plano dificultad × horas",
+            "x": 0,
+            "y": 1,
+            "w": 8,
+            "h": 9,
+            "accent": true
+          },
+          {
+            "label": "juegos del cuadrante",
+            "x": 8,
+            "y": 1,
+            "w": 4,
+            "h": 9
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "test",
+      "label": "Test de cazador",
+      "thesis": "Cinco preguntas rápidas y te recomienda juegos según cómo cazas.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "preguntas a pantalla completa",
+        "perfil de cazador resultante",
+        "recomendaciones"
+      ],
+      "viewport": "Una pregunta grande cada vez; al final tu 'tipo de cazador' y sus juegos.",
+      "risk": "Es un paso más antes de ver juegos.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "pregunta",
+            "x": 2,
+            "y": 1,
+            "w": 8,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "opciones",
+            "x": 2,
+            "y": 6,
+            "w": 8,
+            "h": 2
+          },
+          {
+            "label": "progreso",
+            "x": 2,
+            "y": 8,
+            "w": 8,
+            "h": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruleta",
+      "label": "Ruleta",
+      "thesis": "Una ruleta con tu lista de deseados y pendientes que elige por ti el siguiente.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "ruleta con carátulas",
+        "filtros de duración",
+        "animación de giro"
+      ],
+      "viewport": "La ruleta centrada; debajo el resultado con por qué te lo recomienda.",
+      "risk": "Divertida pero poco seria como pantalla principal.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "ruleta",
+            "x": 3,
+            "y": 1,
+            "w": 6,
+            "h": 6,
+            "accent": true
+          },
+          {
+            "label": "resultado",
+            "x": 2,
+            "y": 7,
+            "w": 8,
+            "h": 3
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

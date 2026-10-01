@@ -1,0 +1,152 @@
+{
+  "title": "Amigos (8/10)",
+  "question": "Tu gente. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "lobby",
+      "label": "Lobby",
+      "thesis": "Como el lobby de una consola: quién está conectado, a qué juega y qué acaba de sacar.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "avatares con estado",
+        "juego actual",
+        "invitar a sesión"
+      ],
+      "viewport": "Rejilla de amigos con su estado y juego; arriba los que están jugando ahora.",
+      "risk": "Necesita saber quién está 'conectado' (hoy solo sabemos su última actividad).",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "jugando ahora",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "amigos",
+            "x": 0,
+            "y": 3,
+            "w": 8,
+            "h": 7
+          },
+          {
+            "label": "retos y clasificación",
+            "x": 8,
+            "y": 3,
+            "w": 4,
+            "h": 7
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "duelo",
+      "label": "Cara a cara",
+      "thesis": "Eliges un amigo y la pantalla se parte en dos: tú contra él, juego a juego.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "pantalla partida",
+        "barras enfrentadas",
+        "marcador"
+      ],
+      "viewport": "Tú a la izquierda, tu amigo a la derecha, y entre ambos los juegos en común con barras enfrentadas.",
+      "risk": "Solo compara de uno en uno.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "tú",
+            "x": 0,
+            "y": 0,
+            "w": 5,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "vs",
+            "x": 5,
+            "y": 0,
+            "w": 2,
+            "h": 3
+          },
+          {
+            "label": "amigo",
+            "x": 7,
+            "y": 0,
+            "w": 5,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "juegos en común",
+            "x": 0,
+            "y": 3,
+            "w": 12,
+            "h": 7
+          }
+        ]
+      }
+    },
+    {
+      "id": "grafo",
+      "label": "Mapa de rivalidades",
+      "thesis": "Un grafo de quién adelanta a quién: flechas entre amigos según la liga de la semana.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "nodos con avatar",
+        "flechas de adelantamiento",
+        "grosor por puntos"
+      ],
+      "viewport": "El grafo en el centro; tocas un amigo y ves vuestra rivalidad.",
+      "risk": "Con pocos amigos el grafo es pobre.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "grafo",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 10,
+            "accent": true
+          },
+          {
+            "label": "rivalidad elegida",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 10
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

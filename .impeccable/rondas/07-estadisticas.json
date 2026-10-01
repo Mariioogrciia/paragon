@@ -1,0 +1,158 @@
+{
+  "title": "Estadísticas y Wrap (7/10)",
+  "question": "Tus números. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "calendario",
+      "label": "Calendario de calor",
+      "thesis": "Un año de actividad como calendario de calor: cada día su color según trofeos.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "casillas por día",
+        "escala de metal",
+        "resumen del mes"
+      ],
+      "viewport": "El calendario a lo ancho arriba; debajo, al tocar un día, lo que conseguiste.",
+      "risk": "Ya hay un mapa de actividad; tendría que ser el protagonista de verdad.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "calendario del año",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "día elegido",
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "resumen",
+            "x": 6,
+            "y": 4,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "gráficas",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 3
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "datos",
+      "label": "Datos en blanco y negro",
+      "thesis": "Todo en blanco y negro puro con un solo color para lo tuyo; trazos finos y números monoespaciados.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "barras finas",
+        "tipografía de datos",
+        "un único color de acento"
+      ],
+      "viewport": "Cifras enormes arriba; debajo gráficas de trazo fino y tablas.",
+      "risk": "Muy seca si no se cuida el ritmo.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cifras grandes",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "gráfica",
+            "x": 0,
+            "y": 3,
+            "w": 8,
+            "h": 4
+          },
+          {
+            "label": "tabla",
+            "x": 8,
+            "y": 3,
+            "w": 4,
+            "h": 7
+          },
+          {
+            "label": "gráfica",
+            "x": 0,
+            "y": 7,
+            "w": 8,
+            "h": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "arbol",
+      "label": "Árbol de géneros",
+      "thesis": "Tus géneros y juegos como un árbol: las ramas más gruesas son lo que más juegas.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "ramas por género",
+        "hojas por juego",
+        "grosor por horas"
+      ],
+      "viewport": "El árbol ocupa la pantalla; tocas una rama y ves sus juegos y cifras.",
+      "risk": "Llamativo pero difícil de comparar números exactos.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "árbol",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 10,
+            "accent": true
+          },
+          {
+            "label": "rama elegida",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 10
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

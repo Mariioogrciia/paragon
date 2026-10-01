@@ -1,0 +1,168 @@
+{
+  "title": "Noticias (11/12)",
+  "question": "Mismas secciones (próximos lanzamientos, recién salidos, noticias de tus juegos, últimas noticias); solo cambia el diseño. Elige uno.",
+  "options": [
+    {
+      "id": "salidas",
+      "label": "Panel de salidas",
+      "thesis": "Los lanzamientos como el panel de un aeropuerto: cada juego es un vuelo con su fecha y estado; las noticias, un teletipo.",
+      "palette": [
+        "#0a0c10",
+        "#13161c",
+        "#ffcf3a",
+        "#e9eef7",
+        "#7cc4e4"
+      ],
+      "materials": [
+        "filas de panel con letras de paleta",
+        "estado: en hora / retrasado / salido",
+        "teletipo de titulares"
+      ],
+      "viewport": "Arriba el panel de 'Próximas salidas' a lo ancho y 'Recién llegados' al lado; debajo las noticias de tus juegos destacadas y el resto como teletipo con hora y fuente.",
+      "risk": "Las letras de paleta solo en fechas y estados; los títulos largos de juego se leen en letra normal.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "próximas salidas",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "recién llegados",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 4
+          },
+          {
+            "label": "noticias de tus juegos",
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "teletipo de últimas noticias",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 3
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "portada",
+      "label": "Portada de periódico",
+      "thesis": "Una portada de diario de cazadores: la noticia principal a lo grande, columnas con filetes y una agenda de lanzamientos en el lateral.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "cabecera de cabecera de diario",
+        "columnas y filetes",
+        "agenda lateral"
+      ],
+      "viewport": "Noticia principal con imagen grande a la izquierda, agenda de lanzamientos en la columna derecha; debajo 'De tus juegos' como sección propia y el resto en columnas.",
+      "risk": "Con noticias sin imagen buena la portada pierde fuerza; necesita un estado sin foto digno.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "noticia principal",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "agenda de lanzamientos",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 7
+          },
+          {
+            "label": "de tus juegos",
+            "x": 0,
+            "y": 4,
+            "w": 8,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "últimas noticias en columnas",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "calendario",
+      "label": "Calendario de lanzamientos",
+      "thesis": "Los lanzamientos colocados en una línea de tiempo por semanas y meses; las noticias, un río a la derecha.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "línea de tiempo con hoy marcado",
+        "carátulas colgadas de su fecha",
+        "río de noticias"
+      ],
+      "viewport": "Línea de tiempo horizontal arriba (lo ya salido a la izquierda de 'hoy', lo próximo a la derecha); debajo, noticias de tus juegos y últimas en dos columnas.",
+      "risk": "Con muchas fechas juntas se amontona; agrupa por semana.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "línea de tiempo: salidos | hoy | próximos",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "noticias de tus juegos",
+            "x": 0,
+            "y": 4,
+            "w": 5,
+            "h": 6,
+            "accent": true
+          },
+          {
+            "label": "últimas noticias",
+            "x": 5,
+            "y": 4,
+            "w": 7,
+            "h": 6
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

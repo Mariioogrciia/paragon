@@ -1,0 +1,97 @@
+
+/* --- Cómo funciona: manual de instrucciones (1 oct 2026) ----------------- */
+/* Índice fijo a la izquierda (tira con scroll arriba en móvil) y capítulos
+   seguidos; apartados como texto de manual, sin tarjetas. */
+.manual { display: grid; gap: 1.5rem; }
+@media (min-width: 1024px) { .manual { grid-template-columns: 14rem minmax(0, 1fr); gap: 3.5rem; align-items: start; } }
+
+.manual-indice {
+  position: sticky;
+  top: 4.5rem;
+  z-index: 20;
+  margin: 0 -1rem;
+  padding: 0.5rem 1rem;
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.manual-indice ol { display: flex; gap: 0.25rem; overflow-x: auto; scrollbar-width: none; }
+.manual-indice ol::-webkit-scrollbar { display: none; }
+.manual-indice-rotulo { display: none; }
+.manual-indice-enlace {
+  display: flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--muted);
+  transition: color 150ms, background-color 150ms;
+}
+.manual-indice-enlace:hover { color: var(--foreground); background: var(--surface-2); }
+.manual-indice-enlace[aria-current] { color: var(--foreground); background: var(--accent-soft); }
+.manual-indice-num { font-family: var(--font-heading); font-size: 0.6875rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--muted); }
+.manual-indice-enlace[aria-current] .manual-indice-num { color: var(--accent-text); }
+@media (min-width: 1024px) {
+  .manual-indice { top: 6rem; margin: 0; padding: 0; background: none; backdrop-filter: none; border: 0; }
+  .manual-indice-rotulo {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  .manual-indice ol { flex-direction: column; gap: 2px; overflow: visible; border-left: 1px solid var(--border); }
+  .manual-indice-enlace { margin-left: -1px; border-left: 2px solid transparent; border-radius: 0 6px 6px 0; padding: 0.5rem 0.875rem; white-space: normal; }
+  .manual-indice-enlace[aria-current] { border-left-color: var(--accent); }
+}
+
+.manual-capitulo { scroll-margin-top: 7rem; padding: 2.5rem 0 1rem; border-top: 1px solid var(--border); }
+.manual-capitulo:first-child { border-top: 0; padding-top: 0.5rem; }
+.manual-portadilla { display: flex; align-items: center; gap: 0.875rem; margin-bottom: 1.75rem; }
+.manual-num {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--accent-text) 70%, transparent);
+}
+
+.manual-apartados { display: grid; gap: 1.75rem 3rem; }
+@media (min-width: 768px) { .manual-apartados { grid-template-columns: 1fr 1fr; } }
+.manual-apartado { max-width: 62ch; }
+.manual-apartado-titulo { margin-bottom: 0.375rem; font-family: var(--font-barlow), sans-serif; font-size: 1.0625rem; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--foreground); }
+.manual-ir {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.125rem 0.25rem;
+  margin-left: -0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--accent-text);
+  transition: background-color 150ms;
+}
+.manual-ir:hover { background: var(--accent-soft); text-decoration: underline; }
+
+/* Comandos de Discord como botón de mando. */
+.manual-mando {
+  display: inline-block;
+  margin: 0.125rem 0.25rem 0.125rem 0;
+  padding: 0.0625rem 0.5rem;
+  border: 1px solid var(--border);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--foreground);
+  background: var(--surface-2);
+}
+.manual-apartado ul { display: grid; gap: 0.5rem; }

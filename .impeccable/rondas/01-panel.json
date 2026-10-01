@@ -1,0 +1,224 @@
+{
+  "title": "Panel (1/10)",
+  "question": "Lo primero que ves al entrar. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "constelacion",
+      "label": "Constelación",
+      "thesis": "Tu biblioteca como un cielo: cada juego es una estrella que brilla más cuanto más cerca estás del platino.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "estrellas con halo por metal",
+        "líneas entre juegos del mismo estudio",
+        "fondo nocturno"
+      ],
+      "viewport": "El cielo ocupa la pantalla; la estrella más brillante (tu platino más cercano) está en el centro con su tarjeta abierta al lado.",
+      "risk": "Bonito pero menos directo para leer números; necesita una lista alternativa.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "cielo de juegos",
+            "x": 0,
+            "y": 1,
+            "w": 8,
+            "h": 7,
+            "accent": true
+          },
+          {
+            "label": "tarjeta del juego elegido",
+            "x": 8,
+            "y": 1,
+            "w": 4,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "liga y retos",
+            "x": 8,
+            "y": 6,
+            "w": 4,
+            "h": 2
+          },
+          {
+            "label": "actividad reciente",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "cabina",
+      "label": "Cabina de widgets",
+      "thesis": "Un panel de módulos que ordenas y redimensionas: cada cazador monta el suyo.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "módulos con asa de arrastre",
+        "rejilla visible al editar",
+        "tamaños S/M/L"
+      ],
+      "viewport": "Rejilla de módulos: siguiente platino grande, liga, retos, racha y lanzamientos; botón 'Editar panel'.",
+      "risk": "Si nadie lo personaliza, el orden por defecto tiene que ser muy bueno.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "siguiente platino (L)",
+            "x": 0,
+            "y": 1,
+            "w": 8,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "liga (S)",
+            "x": 8,
+            "y": 1,
+            "w": 4,
+            "h": 2
+          },
+          {
+            "label": "racha (S)",
+            "x": 8,
+            "y": 3,
+            "w": 4,
+            "h": 2
+          },
+          {
+            "label": "retos (M)",
+            "x": 0,
+            "y": 5,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "lanzamientos (M)",
+            "x": 6,
+            "y": 5,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "editar panel",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "mision",
+      "label": "Misión del día",
+      "thesis": "Arriba, tres objetivos concretos para hoy calculados de tu biblioteca y tus rivales.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "tres casillas grandes con progreso",
+        "sello al completar",
+        "el resto del panel debajo"
+      ],
+      "viewport": "Tres misiones de hoy en fila ('2 trofeos de God of War', 'adelanta a Israel', 'mantén la racha'), debajo el panel de siempre.",
+      "risk": "Si las misiones son genéricas se ignoran; tienen que salir de tus datos reales.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "misión 1",
+            "x": 0,
+            "y": 1,
+            "w": 4,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "misión 2",
+            "x": 4,
+            "y": 1,
+            "w": 4,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "misión 3",
+            "x": 8,
+            "y": 1,
+            "w": 4,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "siguiente platino",
+            "x": 0,
+            "y": 4,
+            "w": 7,
+            "h": 4
+          },
+          {
+            "label": "liga",
+            "x": 7,
+            "y": 4,
+            "w": 5,
+            "h": 4
+          },
+          {
+            "label": "actividad",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

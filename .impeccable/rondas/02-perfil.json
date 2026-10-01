@@ -1,0 +1,180 @@
+{
+  "title": "Perfil (2/10)",
+  "question": "Tu página pública. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "carta",
+      "label": "Carta holográfica",
+      "thesis": "Tu perfil es una carta coleccionable con brillo que se gira: delante lo que presumes, detrás los números.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "foil holográfico platino",
+        "borde por nivel",
+        "reverso con estadísticas"
+      ],
+      "viewport": "Carta grande centrada que gira con el ratón; al lado tus platinos recientes y la vitrina.",
+      "risk": "El giro no puede esconder la información: el reverso también tiene que leerse sin girar en móvil.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "carta (anverso/reverso)",
+            "x": 3,
+            "y": 1,
+            "w": 6,
+            "h": 6,
+            "accent": true
+          },
+          {
+            "label": "platinos recientes",
+            "x": 0,
+            "y": 7,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "insignias",
+            "x": 6,
+            "y": 7,
+            "w": 6,
+            "h": 3
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "linea",
+      "label": "Línea de vida",
+      "thesis": "Toda tu carrera de cazador en una cronología vertical: primer trofeo, cada platino, récords, ligas ganadas.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "eje vertical con años",
+        "hitos grandes y pequeños",
+        "saltos de año marcados"
+      ],
+      "viewport": "Cabecera compacta con nivel y cifras; debajo, la línea con los hitos alternando a los lados.",
+      "risk": "Con poca historia queda corta; necesita buen estado vacío.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera + cifras",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "eje",
+            "x": 5,
+            "y": 2,
+            "w": 2,
+            "h": 8
+          },
+          {
+            "label": "hito",
+            "x": 0,
+            "y": 3,
+            "w": 5,
+            "h": 2
+          },
+          {
+            "label": "hito",
+            "x": 7,
+            "y": 5,
+            "w": 5,
+            "h": 2
+          },
+          {
+            "label": "hito",
+            "x": 0,
+            "y": 7,
+            "w": 5,
+            "h": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "vitrina",
+      "label": "Vitrina de coleccionista",
+      "thesis": "Tus platinos como medallas acuñadas en estantes iluminados; las insignias en cajas expositoras.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "medallas de metal con relieve",
+        "estantes con luz cenital",
+        "cartelas con fecha"
+      ],
+      "viewport": "Nombre y nivel arriba; la vitrina ocupa el centro con las medallas; debajo las insignias.",
+      "risk": "Muchos platinos = muchos estantes; necesita agrupar por año o plataforma.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "estante de medallas",
+            "x": 0,
+            "y": 2,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "estante de medallas",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "insignias en cajas",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 3
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

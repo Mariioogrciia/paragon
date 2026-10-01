@@ -1,0 +1,140 @@
+{
+  "title": "Paletas (9/10)",
+  "question": "Colores de toda la app (además de las 6 ya añadidas). Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "portada",
+      "label": "Paleta de tu juego favorito",
+      "thesis": "La app toma los colores de la carátula de tu juego favorito (ya tenemos el extractor de color de carátulas).",
+      "palette": [
+        "#1a0f0a",
+        "#c2410c",
+        "#fcd34d",
+        "#0f172a"
+      ],
+      "materials": [
+        "color sacado de la carátula",
+        "acento y fondo derivados",
+        "cambia al cambiar de favorito"
+      ],
+      "viewport": "En Apariencia, 'Desde mi juego': eliges el juego y ves la app teñida de sus colores.",
+      "risk": "Algunas carátulas dan colores con poco contraste; hay que corregirlos automáticamente.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "selector de juego",
+            "x": 0,
+            "y": 0,
+            "w": 4,
+            "h": 10
+          },
+          {
+            "label": "vista previa de la app",
+            "x": 4,
+            "y": 0,
+            "w": 8,
+            "h": 10,
+            "accent": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "plataforma",
+      "label": "Paletas por plataforma",
+      "thesis": "Cuatro paletas oficiosas: PlayStation (azul), Xbox (verde), Steam (pizarra), Nintendo (rojo) con su fondo propio.",
+      "palette": [
+        "#0b1a3a",
+        "#107c10",
+        "#1b2838",
+        "#e60012"
+      ],
+      "materials": [
+        "colores de marca suavizados",
+        "fondo de cada plataforma",
+        "logo discreto"
+      ],
+      "viewport": "Muestras grandes en Apariencia con el nombre de cada plataforma.",
+      "risk": "Hay que no copiar la marca tal cual (derechos y parecido).",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "PlayStation",
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "Xbox",
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "label": "Steam",
+            "x": 0,
+            "y": 5,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "label": "Nintendo",
+            "x": 6,
+            "y": 5,
+            "w": 6,
+            "h": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "temporada",
+      "label": "Paleta de temporada",
+      "thesis": "Cada temporada del Pase trae su paleta (invierno, primavera…) y quien gana medalla la conserva.",
+      "palette": [
+        "#0c1624",
+        "#8ecae6",
+        "#ffb703",
+        "#fb8500"
+      ],
+      "materials": [
+        "paleta por trimestre",
+        "desbloqueo por medalla",
+        "fondo con motivo"
+      ],
+      "viewport": "En Temporada ves la paleta del trimestre; al ganar medalla aparece en Apariencia.",
+      "risk": "Hay que diseñar una por trimestre.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "paleta de la temporada",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "paletas ganadas",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 5
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

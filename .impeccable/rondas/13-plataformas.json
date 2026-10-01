@@ -1,0 +1,210 @@
+{
+  "title": "Páginas de plataforma (13)",
+  "question": "PlayStation, Xbox, Steam y Epic: mismas secciones y datos (noticias, recomendados, tendencia, más jugados, lanzamientos, PS Plus, ofertas y jugadores de Steam, Game Pass, gratis de Epic); solo cambia el diseño. Elige uno.",
+  "options": [
+    {
+      "id": "consola",
+      "label": "Cada una en su casa",
+      "thesis": "Cada página se viste con el idioma de su plataforma sin copiarlo: PlayStation como la pantalla de inicio de la consola (fila de baldosas sobre arte a pantalla completa), Xbox como su panel de mosaicos, Steam como su tienda de cápsulas, Epic como su escaparate negro de portadas grandes.",
+      "palette": [
+        "#00439c",
+        "#107c10",
+        "#1b2838",
+        "#121212",
+        "#e9eef7"
+      ],
+      "materials": [
+        "arte de fondo del juego elegido",
+        "baldosas/mosaicos/cápsulas según plataforma",
+        "color de marca como luz, no como pintura"
+      ],
+      "viewport": "Arriba, el juego destacado de esa plataforma a pantalla completa con una fila de baldosas para cambiarlo; debajo, sus secciones (noticias, tendencia, más jugados, lanzamientos y lo propio: PS Plus, ofertas, Game Pass, gratis) en el formato de esa casa.",
+      "risk": "Cuatro diseños distintos que mantener; hay que evocar, nunca imitar marcas y logotipos al detalle.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "arte del destacado a pantalla completa",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "fila de baldosas",
+            "x": 0,
+            "y": 3,
+            "w": 12,
+            "h": 1,
+            "accent": true
+          },
+          {
+            "label": "lo propio (PS Plus / ofertas / Game Pass / gratis)",
+            "x": 0,
+            "y": 4,
+            "w": 7,
+            "h": 3
+          },
+          {
+            "label": "tendencia y más jugados",
+            "x": 7,
+            "y": 4,
+            "w": 5,
+            "h": 3
+          },
+          {
+            "label": "noticias",
+            "x": 0,
+            "y": 7,
+            "w": 7,
+            "h": 3
+          },
+          {
+            "label": "lanzamientos",
+            "x": 7,
+            "y": 7,
+            "w": 5,
+            "h": 3
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "tablero",
+      "label": "Tablero de la plataforma",
+      "thesis": "Las cuatro páginas comparten un mismo tablero de control, cada una con su color: arriba las cifras de la comunidad en esa plataforma (cazadores, horas, platinos del mes) y debajo módulos como en la cabina del Panel.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "cifras grandes de la comunidad",
+        "módulos con bisel",
+        "color de marca en filetes y cifras"
+      ],
+      "viewport": "Banda con logo y tres cifras reales de Paragon en esa plataforma; debajo, rejilla de módulos: lo propio de la plataforma grande, tendencia, más jugados, lanzamientos y noticias.",
+      "risk": "Las cifras dependen de la actividad real: con pocos usuarios en Epic o Xbox quedarán bajas.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "banda + cifras de la comunidad",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "lo propio de la plataforma",
+            "x": 0,
+            "y": 2,
+            "w": 8,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "tendencia",
+            "x": 8,
+            "y": 2,
+            "w": 4,
+            "h": 4
+          },
+          {
+            "label": "más jugados",
+            "x": 0,
+            "y": 6,
+            "w": 4,
+            "h": 4
+          },
+          {
+            "label": "lanzamientos",
+            "x": 4,
+            "y": 6,
+            "w": 4,
+            "h": 4
+          },
+          {
+            "label": "noticias",
+            "x": 8,
+            "y": 6,
+            "w": 4,
+            "h": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "revista",
+      "label": "Número especial de revista",
+      "thesis": "Cada plataforma es un número especial de revista: portada con su color y titular, sumario, y las secciones como reportajes a doble página.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "portada a todo color",
+        "sumario numerado",
+        "reportajes con titular grande"
+      ],
+      "viewport": "Portada con el color y el logo de la plataforma y el titular del mes (la noticia principal); al lado el sumario; debajo, reportajes: lo propio (PS Plus, ofertas...), tendencia, más jugados y lanzamientos.",
+      "risk": "Más lectura que exploración; las listas largas quedan mejor como tabla que como reportaje.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "portada",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "sumario",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 5
+          },
+          {
+            "label": "reportaje: lo propio",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "tendencia",
+            "x": 0,
+            "y": 7,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "más jugados + lanzamientos",
+            "x": 6,
+            "y": 7,
+            "w": 6,
+            "h": 3
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

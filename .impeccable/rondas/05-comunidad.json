@@ -1,0 +1,173 @@
+{
+  "title": "Comunidad (5/10)",
+  "question": "Lo que hace la gente. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "stories",
+      "label": "Stories",
+      "thesis": "Arriba, círculos por persona con sus hitos del día; tocas y pasan como historias.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "círculos con anillo del metal",
+        "pantallas a pantalla completa",
+        "barra de progreso de historias"
+      ],
+      "viewport": "Fila de stories arriba; debajo el feed de siempre.",
+      "risk": "Formato muy de redes; puede sentirse ajeno.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "stories",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "feed",
+            "x": 0,
+            "y": 2,
+            "w": 8,
+            "h": 8
+          },
+          {
+            "label": "destacados",
+            "x": 8,
+            "y": 2,
+            "w": 4,
+            "h": 8
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "radio",
+      "label": "En directo",
+      "thesis": "La comunidad como una emisión en vivo: lo que pasa ahora entra por arriba con su hora.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "marca 'en directo'",
+        "entradas con hora",
+        "contador de actividad"
+      ],
+      "viewport": "Columna central que se va llenando sola; a la derecha quién está jugando ahora.",
+      "risk": "Con poca actividad se ve vacía.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "en directo",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 10,
+            "accent": true
+          },
+          {
+            "label": "jugando ahora",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 5
+          },
+          {
+            "label": "tendencias",
+            "x": 8,
+            "y": 5,
+            "w": 4,
+            "h": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "muro",
+      "label": "Muro de logros",
+      "thesis": "Los platinos grandes y a todo color; lo pequeño agrupado por persona y día.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "tarjetas grandes para platinos",
+        "resúmenes compactos",
+        "reacciones flotando"
+      ],
+      "viewport": "Rejilla tipo muro con platinos grandes y resúmenes pequeños intercalados.",
+      "risk": "Mezclar tamaños exige buen orden para que no parezca desordenado.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "platino grande",
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "resumen",
+            "x": 6,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "label": "resumen",
+            "x": 9,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "label": "platino grande",
+            "x": 6,
+            "y": 2,
+            "w": 6,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "resúmenes",
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "más",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 3
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

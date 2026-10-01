@@ -1,0 +1,195 @@
+{
+  "title": "Descubrir (12/12)",
+  "question": "El resto de Descubrir (destacados, buscador, plataformas, novedades, tendencias, joyas ocultas, recomendaciones), con la matriz ya hecha. Solo cambia el diseño.",
+  "options": [
+    {
+      "id": "lista",
+      "label": "Lista de éxitos",
+      "thesis": "Descubrir como las listas de éxitos: el número 1 en portada, las tendencias como Top 10 con cifras enormes y flechas de subida, las novedades como 'nuevas entradas'.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "numerales gigantes de posición",
+        "flecha y +N de jugadores esta semana",
+        "carátula junto a su puesto"
+      ],
+      "viewport": "Destacado grande como 'número 1'; Top 10 de tendencias en dos columnas con números enormes; novedades y joyas como listas secundarias; buscador y plataformas arriba compactos.",
+      "risk": "Los números grandes ocupan sitio: en móvil el Top pasa a una columna.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "buscador + plataformas",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "número 1 (destacado)",
+            "x": 0,
+            "y": 1,
+            "w": 7,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "nuevas entradas",
+            "x": 7,
+            "y": 1,
+            "w": 5,
+            "h": 4
+          },
+          {
+            "label": "top 10 tendencias",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "joyas ocultas",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "revista",
+      "label": "Revista de portada",
+      "thesis": "Una revista de videojuegos: portada con el destacado, índice de plataformas, reportajes por sección y 'Joyas' como reseñas con nota.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "portada con titular grande",
+        "índice numerado",
+        "notas como sello de reseña"
+      ],
+      "viewport": "Portada a pantalla con el destacado y su titular; al lado el índice (plataformas); debajo secciones con cabecera de revista y las joyas con su nota en sello.",
+      "risk": "Más lectura que exploración: hay que cuidar que se pueda curiosear rápido.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "portada (destacado)",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "índice de plataformas",
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 5
+          },
+          {
+            "label": "novedades",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "tendencias",
+            "x": 0,
+            "y": 7,
+            "w": 6,
+            "h": 3
+          },
+          {
+            "label": "joyas con nota",
+            "x": 6,
+            "y": 7,
+            "w": 6,
+            "h": 3,
+            "accent": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "escaparate",
+      "label": "Escaparate de tienda",
+      "thesis": "Como el escaparate de una tienda nocturna: carátulas en vitrinas iluminadas, pasillos por plataforma y etiquetas de precio que dicen por qué mirarlo.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "vitrinas con luz cenital",
+        "pasillos por plataforma",
+        "etiquetas colgantes (+N jugadores, ★ nota)"
+      ],
+      "viewport": "Destacado en el escaparate principal; cada fila es una balda iluminada (novedades, tendencias, joyas); las plataformas son los pasillos arriba.",
+      "risk": "Es la más cercana a lo que hay: mejora clara, menos sorpresa.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "pasillos (plataformas) + buscador",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "escaparate principal",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 4,
+            "accent": true
+          },
+          {
+            "label": "balda novedades",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "balda tendencias",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "balda joyas",
+            "x": 0,
+            "y": 9,
+            "w": 12,
+            "h": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

@@ -1,0 +1,77 @@
+{
+  "title": "Estructura de la nueva landing",
+  "question": "El estilo de la app se queda; lo que cambia es cómo cuenta la portada lo que es Paragon. Elige una estructura (o pide otra tanda).",
+  "options": [
+    {
+      "id": "vitrina",
+      "label": "La vitrina de la comunidad",
+      "kicker": "THE ROLL",
+      "thesis": "La portada es una vitrina iluminada con los trofeos más raros que la comunidad ha conseguido esta semana: datos reales, no un mockup.",
+      "palette": ["#0b0f17", "#141b28", "#9fd4ec", "#e2b53e", "#4a9eff"],
+      "materials": ["vitrina de cristal oscuro con baldas", "iconos reales de trofeos", "etiquetas de rareza como cartelas de museo"],
+      "viewport": "Titular corto a la izquierda con los dos botones; a la derecha, tres baldas con los trofeos más raros de la semana (icono, % de rareza, quién lo sacó). Debajo, la cinta de platinos recientes.",
+      "risk": "Si la semana tiene pocos trofeos raros, la vitrina se queda medio vacía; necesita un relleno digno con los platinos recientes.",
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "cabecera", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "titular + CTA", "x": 0, "y": 1, "w": 5, "h": 4, "accent": true },
+          { "label": "vitrina: 3 baldas de trofeos raros reales", "x": 5, "y": 1, "w": 7, "h": 4, "accent": true },
+          { "label": "cinta de platinos recientes", "x": 0, "y": 5, "w": 12, "h": 1 },
+          { "label": "muro de la fama (top cazadores)", "x": 0, "y": 6, "w": 12, "h": 2 },
+          { "label": "cómo funciona en 3 pasos", "x": 0, "y": 8, "w": 8, "h": 2 },
+          { "label": "CTA final", "x": 8, "y": 8, "w": 4, "h": 2, "accent": true }
+        ]
+      }
+    },
+    {
+      "id": "antes-despues",
+      "label": "Cuatro apps contra una",
+      "thesis": "La primera pantalla enseña el problema y la solución a la vez: cuatro perfiles sueltos (PSN, Steam, Xbox, Epic) que, al hacer scroll, se funden en un solo perfil y un solo nivel Paragon.",
+      "palette": ["#0b0f17", "#1b2838", "#107c10", "#2f7ad6", "#9fd4ec"],
+      "materials": ["cuatro fichas con el color de cada plataforma", "animación de fusión en una tarjeta de perfil", "anillo de nivel"],
+      "viewport": "Titular arriba centrado; debajo, cuatro columnas de plataforma con sus logros sueltos; al bajar, las columnas convergen en una tarjeta de perfil Paragon con el nivel y el platino más cercano.",
+      "risk": "La animación de fusión es la pieza que lo sostiene todo: si se queda en una transición genérica, parece otra comparativa de tabla.",
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "cabecera", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "titular + CTA centrados", "x": 2, "y": 1, "w": 8, "h": 2, "accent": true },
+          { "label": "PSN", "x": 0, "y": 3, "w": 3, "h": 2 },
+          { "label": "Steam", "x": 3, "y": 3, "w": 3, "h": 2 },
+          { "label": "Xbox", "x": 6, "y": 3, "w": 3, "h": 2 },
+          { "label": "Epic", "x": 9, "y": 3, "w": 3, "h": 2 },
+          { "label": "se funden: perfil Paragon unificado", "x": 3, "y": 5, "w": 6, "h": 2, "accent": true },
+          { "label": "social: ligas, clanes, retos", "x": 0, "y": 7, "w": 6, "h": 2 },
+          { "label": "te dice qué hacer", "x": 6, "y": 7, "w": 6, "h": 2 },
+          { "label": "CTA final", "x": 0, "y": 9, "w": 12, "h": 1, "accent": true }
+        ]
+      }
+    },
+    {
+      "id": "siguiente-platino",
+      "label": "La ruta al siguiente platino",
+      "thesis": "La página entera es una cacería: arranca con 'te faltan 10 trofeos para el platino' y cada sección es el siguiente paso (vincular, ruta, perdibles, rivales, liga).",
+      "palette": ["#0b0f17", "#141b28", "#4a9eff", "#9fd4ec", "#4ec98a"],
+      "materials": ["tarjeta de progreso grande con contador", "línea de ruta que baja por la página", "checkpoints numerados"],
+      "viewport": "A la izquierda, el titular; a la derecha, a tamaño grande, la tarjeta 'platino más cercano' con el contador de trofeos restantes y la barra; de ella sale una línea que baja y conecta todas las secciones.",
+      "risk": "Es la más cercana a la portada actual; el riesgo es que parezca un repaso y no un cambio.",
+      "wireframe": {
+        "cols": 12, "rows": 10,
+        "regions": [
+          { "label": "cabecera", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "titular + CTA", "x": 0, "y": 1, "w": 6, "h": 3, "accent": true },
+          { "label": "platino más cercano (contador grande)", "x": 6, "y": 1, "w": 6, "h": 3, "accent": true },
+          { "label": "1 · vincula sin contraseñas", "x": 1, "y": 4, "w": 10, "h": 1 },
+          { "label": "2 · ruta y perdibles", "x": 1, "y": 5, "w": 10, "h": 1 },
+          { "label": "3 · tus rivales (muro de la fama)", "x": 1, "y": 6, "w": 10, "h": 1 },
+          { "label": "4 · ligas, clanes y retos", "x": 1, "y": 7, "w": 10, "h": 1 },
+          { "label": "FAQ", "x": 0, "y": 8, "w": 12, "h": 1 },
+          { "label": "CTA final", "x": 0, "y": 9, "w": 12, "h": 1, "accent": true }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true
+}

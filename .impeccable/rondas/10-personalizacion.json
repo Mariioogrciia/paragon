@@ -1,0 +1,136 @@
+{
+  "title": "Personalización (10/10)",
+  "question": "Lo que cada usuario puede ajustar. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "densidad",
+      "label": "Densidad y disposición",
+      "thesis": "Cómoda o compacta, orden de pestañas y panel por módulos: cada uno la app a su ritmo.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "interruptor cómoda/compacta",
+        "pestañas arrastrables",
+        "módulos del panel"
+      ],
+      "viewport": "En Apariencia, vista previa en vivo mientras cambias densidad y orden.",
+      "risk": "Más combinaciones que probar en cada pantalla.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "opciones",
+            "x": 0,
+            "y": 0,
+            "w": 4,
+            "h": 10
+          },
+          {
+            "label": "vista previa en vivo",
+            "x": 4,
+            "y": 0,
+            "w": 8,
+            "h": 10,
+            "accent": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "ambiente",
+      "label": "Ambiente",
+      "thesis": "Fondo con el artwork del juego que estás jugando, tema automático día/noche y sonido opcional al desbloquear.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "artwork difuminado de fondo",
+        "cambio automático por hora",
+        "sonido de trofeo"
+      ],
+      "viewport": "Tres interruptores grandes con su vista previa.",
+      "risk": "El fondo con artwork puede restar legibilidad; va muy difuminado.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "fondo con artwork",
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 5,
+            "accent": true
+          },
+          {
+            "label": "día/noche",
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "label": "sonido",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "identidad",
+      "label": "Identidad del perfil",
+      "thesis": "Tu perfil más tuyo: carta con foil por nivel, marco animado, efecto del nombre y una canción o vídeo de fondo.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "foil por nivel",
+        "marcos y efectos ya existentes",
+        "fondo animado"
+      ],
+      "viewport": "Editor del perfil con la carta en grande que cambia al momento.",
+      "risk": "Cuidado con perfiles recargados; poner límites.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "editor",
+            "x": 0,
+            "y": 0,
+            "w": 5,
+            "h": 10
+          },
+          {
+            "label": "carta/perfil en vivo",
+            "x": 5,
+            "y": 0,
+            "w": 7,
+            "h": 10,
+            "accent": true
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": false
+}

@@ -5,6 +5,9 @@
       "name": "dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\ProgramData\\Avast Software\\Avast\\wscert.pem"
+      },
       "port": 3000
     }
   ]

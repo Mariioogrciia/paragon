@@ -1,0 +1,166 @@
+{
+  "title": "Biblioteca (3/10)",
+  "question": "Todos tus juegos. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "lomos",
+      "label": "Lomos de caja",
+      "thesis": "Una estantería de lomos verticales como cajas de juego: altura según horas, color según el metal alcanzado.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "lomos con el logo del juego",
+        "franja de metal",
+        "caja que sale al tocarla"
+      ],
+      "viewport": "Estantería a lo ancho con los lomos ordenados; al tocar uno sale la caja con su progreso.",
+      "risk": "Los lomos estrechos cuestan de leer en móvil: allí pasan a filas.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "filtros",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "estante de lomos",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "estante de lomos",
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "caja abierta del juego",
+            "x": 3,
+            "y": 7,
+            "w": 6,
+            "h": 3
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "estantes",
+      "label": "Estantes por estado",
+      "thesis": "Carátulas agrupadas en baldas: casi platino, a medias, empezados, parados y platinados.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "carátulas con barra de progreso",
+        "baldas con título",
+        "desplazamiento horizontal"
+      ],
+      "viewport": "Una balda por estado, la de 'casi platino' la primera; cada balda se desliza en horizontal.",
+      "risk": "Con muchos juegos por estado, las baldas largas esconden cosas.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "filtros",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "casi platino",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "a medias",
+            "x": 0,
+            "y": 3,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "empezados",
+            "x": 0,
+            "y": 5,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "platinados",
+            "x": 0,
+            "y": 7,
+            "w": 12,
+            "h": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "tabla",
+      "label": "Tabla densa",
+      "thesis": "Una hoja de datos ordenable y filtrable para ver toda la biblioteca de golpe.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "columnas fijas",
+        "cifras tabulares",
+        "barras de progreso finas"
+      ],
+      "viewport": "Tabla a lo ancho con carátula pequeña, progreso, horas, rareza y plataforma; filtros arriba.",
+      "risk": "Fría: pierde las carátulas como protagonistas.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "filtros y columnas",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "tabla",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 9,
+            "accent": true
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

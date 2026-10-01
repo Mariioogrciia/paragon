@@ -1,0 +1,10 @@
+import { config } from "dotenv";
+config({ path: ".env.local" });
+const { misRetosAmigos, cerrarRetosAmigos } = await import("../src/lib/retosAmigos");
+const { db } = await import("../src/db");
+const { users } = await import("../src/db/schema");
+const { eq } = await import("drizzle-orm");
+const [yo] = await db.select({ id: users.id }).from(users).where(eq(users.handle, "fende21")).limit(1);
+console.log("misRetosAmigos:", JSON.stringify(await misRetosAmigos(yo.id)));
+console.log("cerrarRetosAmigos (sin retos activos, no escribe):", await cerrarRetosAmigos(Date.now() + 10_000));
+process.exit(0);

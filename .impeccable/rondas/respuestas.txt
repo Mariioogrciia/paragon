@@ -1,0 +1,16 @@
+panel: cabina
+02-perfil: ANSWER: {"optionId":"carta","steer":"","followup":true}
+03-biblioteca: ANSWER: {"optionId":"lomos","steer":"","followup":true}
+04-juego: ANSWER: {"optionId":"guia","steer":"","followup":true}
+05-comunidad: ANSWER: {"optionId":"muro","steer":"","followup":true}
+06-descubrir: ANSWER: {"optionId":"matriz","steer":"","followup":true}
+07-estadisticas: ANSWER: {"optionId":"calendario","steer":"","followup":true}
+08-amigos: ANSWER: {"optionId":"reroll","steer":"No quiero quitar funcionalidades, esto ya esta, simplemente quiero cambio de diseño "}
+08b-amigos: ANSWER: {"optionId":"marcador","steer":"","followup":true}
+09-paletas: ANSWER: {"optionId":"portada","steer":"","followup":true}
+10-personalizacion: ANSWER: {"optionId":"reroll","steer":"Debe personalizar apariencia, cosas que pueda ocultar, su privacidad de perfil, como se ve su perfil etc, lo q ue hay ahora"}
+ANSWER: {"optionId":"refinado","steer":""}
+11-noticias: ANSWER: {"optionId":"salidas","steer":""}
+12-descubrir: ANSWER: {"optionId":"lista","steer":""}
+13-plataformas: ANSWER: {"optionId":"consola","steer":""}
+14-como-funciona: ANSWER: {"optionId":"manual","steer":""}

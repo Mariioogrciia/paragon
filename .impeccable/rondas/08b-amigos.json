@@ -1,0 +1,235 @@
+{
+  "title": "Amigos (8/10) · otra tanda",
+  "question": "Misma pantalla y mismas funciones; solo cambia el diseño. Elige uno.",
+  "options": [
+    {
+      "id": "marcador",
+      "label": "Marcador de estadio",
+      "kicker": "THE ROLL",
+      "thesis": "La clasificación como el marcador luminoso de un estadio: cifras grandes en LED, tu fila encendida, los demás bloques con el mismo lenguaje.",
+      "palette": [
+        "#050608",
+        "#0f1216",
+        "#7cc4e4",
+        "#ffcf3a",
+        "#e9eef7"
+      ],
+      "materials": [
+        "cifras de puntos luminosos",
+        "paneles negros con marco",
+        "tu fila iluminada"
+      ],
+      "viewport": "Arriba añadir amigo y solicitudes; el marcador de clasificación a lo ancho; debajo semanal/mensual como marcadores pequeños, y el resto (lista, retos, platinar juntos) en paneles del mismo estilo.",
+      "risk": "Si las cifras LED se abusan, cuesta leer los textos: solo en números.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "añadir amigo + solicitudes",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "clasificación",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "semanal",
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "mensual",
+            "x": 6,
+            "y": 4,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "tus amigos + comparar",
+            "x": 0,
+            "y": 6,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "retos entre amigos",
+            "x": 6,
+            "y": 6,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "platinar juntos",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "hoja",
+      "label": "Hoja de liga deportiva",
+      "thesis": "Como la tabla de una liga de fútbol en el periódico: podio arriba, tabla con posición, puntos y tendencia, secciones con cabecera de sección deportiva.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#e2b53e",
+        "#b9c2cc"
+      ],
+      "materials": [
+        "podio de tres",
+        "tabla con tendencia ▲▼ dibujada",
+        "cabeceras de sección"
+      ],
+      "viewport": "Podio de los tres primeros arriba de la clasificación; semanal y mensual como tablas pequeñas; lista de amigos con su racha.",
+      "risk": "La más cercana a lo que hay: cambio notable pero no radical.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "añadir amigo + solicitudes",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "clasificación",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "semanal",
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "mensual",
+            "x": 6,
+            "y": 4,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "tus amigos + comparar",
+            "x": 0,
+            "y": 6,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "retos entre amigos",
+            "x": 6,
+            "y": 6,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "platinar juntos",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "pizarra",
+      "label": "Pizarra de vestuario",
+      "thesis": "Tu grupo de amigos como la pizarra del vestuario: tiza, flechas y nombres escritos; retos y platinar juntos como jugadas dibujadas.",
+      "palette": [
+        "#16211b",
+        "#1f2c24",
+        "#e9eef7",
+        "#ffcf3a",
+        "#7cc4e4"
+      ],
+      "materials": [
+        "textura de pizarra",
+        "trazo de tiza",
+        "flechas a mano"
+      ],
+      "viewport": "Mismas secciones sobre fondo de pizarra: clasificación como lista escrita, retos como jugadas con flechas entre avatares.",
+      "risk": "Estilo muy marcado; la letra de tiza solo en títulos para no perder legibilidad.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "añadir amigo + solicitudes",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "clasificación",
+            "x": 0,
+            "y": 1,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "semanal",
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "mensual",
+            "x": 6,
+            "y": 4,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "tus amigos + comparar",
+            "x": 0,
+            "y": 6,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "retos entre amigos",
+            "x": 6,
+            "y": 6,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "label": "platinar juntos",
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 2
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

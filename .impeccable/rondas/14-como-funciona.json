@@ -1,0 +1,165 @@
+{
+  "title": "Cómo funciona (14)",
+  "question": "Mismo contenido (vincular, trofeos, estadísticas, backlog, comunidad, planificador, avisos y Discord, perfil); solo cambia el diseño. Elige uno.",
+  "options": [
+    {
+      "id": "manual",
+      "label": "Manual de instrucciones",
+      "thesis": "Como el librito que venía dentro de la caja del juego: un índice fijo a la izquierda y los ocho capítulos seguidos, para leer de corrido o saltar a uno.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "índice lateral fijo con el capítulo activo",
+        "capítulos con portadilla",
+        "comandos de Discord como botones de mando"
+      ],
+      "viewport": "Índice a la izquierda (Vincular, Trofeos, Estadísticas...) que se marca al bajar; a la derecha cada capítulo con su título grande y sus apartados como párrafos con un icono, no tarjetas.",
+      "risk": "Página larga: el índice fijo tiene que funcionar bien en móvil (pasa a una tira arriba).",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "índice fijo",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 10
+          },
+          {
+            "label": "capítulo: portadilla",
+            "x": 3,
+            "y": 0,
+            "w": 9,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "apartados del capítulo",
+            "x": 3,
+            "y": 2,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "label": "siguiente capítulo",
+            "x": 3,
+            "y": 6,
+            "w": 9,
+            "h": 4
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "ruta",
+      "label": "Ruta del cazador",
+      "thesis": "Cómo funciona contado como el recorrido de un cazador: de vincular la cuenta a competir en ligas, en etapas unidas por una línea, como la caza en 4 pasos de la portada.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "línea de ruta que une las etapas",
+        "etapa con número y estado",
+        "atajo a la pantalla de cada cosa"
+      ],
+      "viewport": "Una línea vertical recorre las ocho etapas; cada una se despliega con sus apartados y un botón para ir a esa parte de la app.",
+      "risk": "Algunas partes (notificaciones, perfil) no son una etapa sino ajustes: encajan peor en un recorrido.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "etapa 1 abierta",
+            "x": 1,
+            "y": 1,
+            "w": 11,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "etapas siguientes",
+            "x": 1,
+            "y": 4,
+            "w": 11,
+            "h": 6
+          },
+          {
+            "label": "línea de ruta",
+            "x": 0,
+            "y": 1,
+            "w": 1,
+            "h": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "ayuda",
+      "label": "Centro de ayuda",
+      "thesis": "Un centro de ayuda con buscador: escribes lo que buscas y filtra todos los apartados de golpe; las categorías son pestañas y cada respuesta se abre como acordeón.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "buscador grande arriba",
+        "categorías como chips",
+        "preguntas que se despliegan"
+      ],
+      "viewport": "Buscador centrado arriba; debajo las ocho categorías como chips y la lista de apartados en acordeón, con el enlace a la pantalla dentro de cada uno.",
+      "risk": "Añade el buscador (filtro en el propio navegador, sin cambiar contenidos); en acordeón se lee menos de un vistazo.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "buscador",
+            "x": 2,
+            "y": 0,
+            "w": 8,
+            "h": 2,
+            "accent": true
+          },
+          {
+            "label": "categorías",
+            "x": 0,
+            "y": 2,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "label": "apartados en acordeón",
+            "x": 1,
+            "y": 3,
+            "w": 10,
+            "h": 7
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}

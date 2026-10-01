@@ -1,0 +1,159 @@
+{
+  "title": "Ficha de juego (4/10)",
+  "question": "La página de cada juego. Elige una estructura, o pide otra tanda.",
+  "options": [
+    {
+      "id": "guia",
+      "label": "Guía de estrategia",
+      "thesis": "Como una guía impresa: checklist por capítulos, perdibles en rojo, notas al margen y casillas que se tachan.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "papel de guía con márgenes",
+        "casillas de verificación",
+        "notas al margen"
+      ],
+      "viewport": "Portada del juego arriba; debajo la checklist por capítulos con los perdibles marcados y tus notas al lado.",
+      "risk": "Tiene que seguir pareciendo la app y no un PDF.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "portada del juego",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 3
+          },
+          {
+            "label": "capítulos",
+            "x": 0,
+            "y": 3,
+            "w": 3,
+            "h": 7
+          },
+          {
+            "label": "checklist de trofeos",
+            "x": 3,
+            "y": 3,
+            "w": 6,
+            "h": 7,
+            "accent": true
+          },
+          {
+            "label": "notas al margen",
+            "x": 9,
+            "y": 3,
+            "w": 3,
+            "h": 7
+          }
+        ]
+      },
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "consola",
+      "label": "Lista estilo consola",
+      "thesis": "Filas grandes con la foto de cada trofeo, rareza como barra, perdibles marcados y la ruta óptima uniendo los trofeos.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "fila grande por trofeo",
+        "barra de rareza",
+        "línea de ruta"
+      ],
+      "viewport": "Artwork del juego de fondo arriba con tu progreso; debajo la lista grande estilo PS5.",
+      "risk": "Es la más cercana a lo que hay ahora.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "artwork + progreso",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 3,
+            "accent": true
+          },
+          {
+            "label": "lista de trofeos",
+            "x": 0,
+            "y": 3,
+            "w": 8,
+            "h": 7,
+            "accent": true
+          },
+          {
+            "label": "ruta y perdibles",
+            "x": 8,
+            "y": 3,
+            "w": 4,
+            "h": 7
+          }
+        ]
+      }
+    },
+    {
+      "id": "mapa",
+      "label": "Mapa de ruta",
+      "thesis": "Los trofeos como nodos de un mapa conectados en el orden recomendado.",
+      "palette": [
+        "#0a0d13",
+        "#10151f",
+        "#7cc4e4",
+        "#d7eef8",
+        "#e2b53e"
+      ],
+      "materials": [
+        "nodos por metal",
+        "caminos entre trofeos",
+        "zonas bloqueadas"
+      ],
+      "viewport": "El mapa ocupa el centro; ves por dónde vas y qué se bloquea si te saltas un perdible.",
+      "risk": "Hay juegos sin orden claro; ahí el mapa aporta poco.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          {
+            "label": "cabecera del juego",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 2
+          },
+          {
+            "label": "mapa de nodos",
+            "x": 0,
+            "y": 2,
+            "w": 9,
+            "h": 8,
+            "accent": true
+          },
+          {
+            "label": "trofeo seleccionado",
+            "x": 9,
+            "y": 2,
+            "w": 3,
+            "h": 8
+          }
+        ]
+      }
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "followup": true
+}
