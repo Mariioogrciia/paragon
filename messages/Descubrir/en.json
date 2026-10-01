@@ -64,7 +64,9 @@
     "epicGratisPronto": "Coming soon",
     "epicHasta": "Until {fecha}",
     "epicDesde": "From {fecha}",
-    "tendenciaDescripcion": "What the most hunters have played on {plataforma} in the last 30 days."
+    "tendenciaDescripcion": "What the most hunters have played on {plataforma} in the last 30 days.",
+    "badgeEpic": "Press · via Google News",
+    "avisoEpicIgdb": "PC releases: IGDB does not tell stores apart, so some may not be on the Epic Games Store."
   },
   "RecomendacionesPage": {
     "titulo": "Recommendations",

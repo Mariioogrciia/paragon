@@ -64,7 +64,9 @@
     "epicGratisPronto": "Bientôt",
     "epicHasta": "Jusqu’au {fecha}",
     "epicDesde": "À partir du {fecha}",
-    "tendenciaDescripcion": "Ce à quoi le plus de chasseurs ont joué sur {plataforma} ces 30 derniers jours."
+    "tendenciaDescripcion": "Ce à quoi le plus de chasseurs ont joué sur {plataforma} ces 30 derniers jours.",
+    "badgeEpic": "Presse · via Google News",
+    "avisoEpicIgdb": "Sorties PC : IGDB ne distingue pas les boutiques, certaines peuvent donc ne pas être sur l’Epic Games Store."
   },
   "RecomendacionesPage": {
     "titulo": "Recommandations",

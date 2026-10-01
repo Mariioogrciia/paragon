@@ -64,7 +64,9 @@
     "epicGratisPronto": "Demnächst",
     "epicHasta": "Bis {fecha}",
     "epicDesde": "Ab {fecha}",
-    "tendenciaDescripcion": "Was die meisten Jäger in den letzten 30 Tagen auf {plataforma} gespielt haben."
+    "tendenciaDescripcion": "Was die meisten Jäger in den letzten 30 Tagen auf {plataforma} gespielt haben.",
+    "badgeEpic": "Presse · über Google News",
+    "avisoEpicIgdb": "PC-Veröffentlichungen: IGDB unterscheidet keine Stores, einige gibt es daher evtl. nicht im Epic Games Store."
   },
   "RecomendacionesPage": {
     "titulo": "Empfehlungen",

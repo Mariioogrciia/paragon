@@ -12,6 +12,7 @@ import Link from "next/link";
 import { DestacadoCasa, type Casa, type JuegoDestacado } from "@/components/descubrir/DestacadoCasa";
 import { TopComunidad } from "@/components/descubrir/Exitos";
 import { getEpicGratis } from "@/lib/epicGratis";
+import { getEpicNews } from "@/lib/epicNews";
 import { BackButton } from "@/components/BackButton";
 import {
   trendingOnPlatform,
@@ -59,15 +60,15 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
     trendingOnPlatform(info.hubKey),
     mostPlayedOnPlatform(info.hubKey),
     recommendationsOnPlatform(userId ?? null, info.hubKey),
-    // IGDB no distingue tiendas de PC: Epic no tiene lanzamientos propios.
-    esEpic ? Promise.resolve([]) : upcomingGames(8, plataforma as "playstation" | "steam").catch((e) => {
+    // IGDB no distingue tiendas de PC: Epic usa los lanzamientos de PC (con aviso).
+    upcomingGames(8, esPlaystation ? "playstation" : "steam").catch((e) => {
       if (!(e instanceof IgdbNotConfiguredError)) console.error("[plataforma-upcoming]", e);
       return [];
     }),
     // Mismo límite que upcomingGames (8): dos columnas una al lado de la
     // otra con listas de tamaños distintos se ven descuadradas, una mucho
     // más larga que la otra.
-    esEpic ? Promise.resolve([]) : recentReleases(8, plataforma as "playstation" | "steam").catch((e) => {
+    recentReleases(8, esPlaystation ? "playstation" : "steam").catch((e) => {
       if (!(e instanceof IgdbNotConfiguredError)) console.error("[plataforma-recent]", e);
       return [];
     }),
@@ -77,7 +78,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
     // Noticias propias de esta plataforma — no las generales de /noticias.
     // Solo tiene sentido en su propia página: mezclarlas en el resto de
     // Descubrir volvería a juntar cosas de plataformas distintas otra vez.
-    esSteam ? getSteamNews() : esPlaystation ? getPsNews() : Promise.resolve([]),
+    esSteam ? getSteamNews() : esPlaystation ? getPsNews() : getEpicNews(),
     esEpic ? getEpicGratis() : Promise.resolve({ ahora: [], proximos: [] }),
   ]);
   const fechaCorta = (iso: string) =>
@@ -270,11 +271,22 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               </div>
             </section>
           )}
+          {esSteam && jugadoresBajos.length > 0 && (
+            <section className="mb-12">
+              <h2 className="mb-1 font-heading text-2xl font-bold uppercase">
+                {t("jugadoresBajosTitulo")}
+              </h2>
+              <p className="mb-4 text-sm text-muted">
+                {t("jugadoresBajosDescripcion")}
+              </p>
+              <RankedList items={jugadoresBajos} value={(g) => g.jugandoAhora} valueLabel={(g) => t("jugandoAhora", { n: g.jugandoAhora })} />
+            </section>
+          )}
           {noticias.length > 0 && (
             <div className="mb-12">
               <NewsFeed
                 titulo={t("noticiasTitulo", { plataforma: info.label })}
-                badge={esSteam ? t("badgeSteam") : t("badgePlaystation")}
+                badge={esSteam ? t("badgeSteam") : esEpic ? t("badgeEpic") : t("badgePlaystation")}
                 items={noticias}
               />
             </div>
@@ -290,32 +302,6 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
                 ))}
               </CardCarousel>
             </section>
-          )}
-          {(proximos.length > 0 || recientes.length > 0) && (
-            <div className="mb-10">
-              {esSteam && (
-                <p className="mb-4 text-sm text-muted">{t("avisoSteamIgdb")}</p>
-              )}
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {proximos.length > 0 && (
-                  <section>
-                    <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
-                      {t("proximosLanzamientos")}
-                    </h2>
-                    <ReleaseGrid items={proximos} />
-                  </section>
-                )}
-
-                {recientes.length > 0 && (
-                  <section>
-                    <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
-                      {t("ultimosLanzamientos")}
-                    </h2>
-                    <ReleaseGrid items={recientes} />
-                  </section>
-                )}
-              </div>
-            </div>
           )}
         </div>
         <div className="casa-columna">
@@ -333,17 +319,6 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               <RankedList items={masJugados} value={(g) => g.horas} valueLabel={(g) => `${g.horas} h`} />
             </section>
           )}
-          {esSteam && jugadoresBajos.length > 0 && (
-            <section className="mb-12">
-              <h2 className="mb-1 font-heading text-2xl font-bold uppercase">
-                {t("jugadoresBajosTitulo")}
-              </h2>
-              <p className="mb-4 text-sm text-muted">
-                {t("jugadoresBajosDescripcion")}
-              </p>
-              <RankedList items={jugadoresBajos} value={(g) => g.jugandoAhora} valueLabel={(g) => t("jugandoAhora", { n: g.jugandoAhora })} />
-            </section>
-          )}
           {esPlaystation && (
             <p className="rounded-xl border border-border bg-surface px-4 py-6 text-center text-sm text-muted">
               {t("avisoNoSteam")}
@@ -351,6 +326,31 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           )}
         </div>
       </div>
+
+      {(proximos.length > 0 || recientes.length > 0) && (
+        <section className="casa-lanzamientos">
+          {(esSteam || esEpic) && <p className="mb-5 text-sm text-muted">{esEpic ? t("avisoEpicIgdb") : t("avisoSteamIgdb")}</p>}
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+            {proximos.length > 0 && (
+              <section>
+                <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
+                  {t("proximosLanzamientos")}
+                </h2>
+                <ReleaseGrid items={proximos} />
+              </section>
+            )}
+
+            {recientes.length > 0 && (
+              <section>
+                <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
+                  {t("ultimosLanzamientos")}
+                </h2>
+                <ReleaseGrid items={recientes} />
+              </section>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
