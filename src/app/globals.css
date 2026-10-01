@@ -1341,3 +1341,144 @@ h3,
   transition: background-color 150ms;
 }
 .noticia-fila:hover { background: var(--surface-2); }
+
+/* --- Páginas de plataforma: "cada una en su casa" (1 oct 2026) ----------- */
+/* La página entera toma la paleta de su plataforma redefiniendo los tokens,
+   así que todos los componentes de dentro (rankings, carátulas, noticias)
+   se repintan sin tocarlos. Se evoca cada plataforma, no se copia: colores y
+   composición, nunca su interfaz ni sus logotipos al detalle. El fondo
+   llega a los bordes de la ventana con box-shadow + clip-path (sin 100vw,
+   que en Windows mete scroll horizontal por la barra de desplazamiento). */
+.casa {
+  --accent: rgb(var(--accent-rgb));
+  --accent-soft: rgb(var(--accent-rgb) / 0.16);
+  --accent-line: rgb(var(--accent-rgb) / 0.4);
+  --accent-glow: rgb(var(--accent-rgb) / 0.45);
+  --accent-text: color-mix(in srgb, var(--accent) 55%, white);
+  --accent-grad: linear-gradient(160deg, var(--accent-2), var(--accent));
+  --accent-grad-h: linear-gradient(90deg, var(--accent), var(--accent-2));
+  position: relative;
+  margin-top: -2.25rem;
+  margin-bottom: -2.25rem;
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+  color: var(--foreground);
+  background: var(--background);
+  box-shadow: 0 0 0 100vmax var(--background);
+  clip-path: inset(0 -100vmax);
+}
+.casa-ps {
+  --background: #071226; --surface: #0d1d3a; --surface-2: #15294f; --border: #20376a;
+  --foreground: #f2f6ff; --muted: #a9b8d6; --accent-rgb: 0 112 209; --accent-2: #6db3ff;
+}
+.casa-xbox {
+  --background: #0e0f0e; --surface: #181a18; --surface-2: #232623; --border: #2f332f;
+  --foreground: #f1f4f1; --muted: #a9b0a9; --accent-rgb: 16 124 16; --accent-2: #5edc4a;
+}
+.casa-xbox { --accent-text: #6be05a; }
+.casa-steam {
+  --background: #1b2838; --surface: #16202d; --surface-2: #2a475e; --border: #2f4a63;
+  --foreground: #e3ebf2; --muted: #8f98a0; --accent-rgb: 102 192 244; --accent-2: #c6e6f8;
+}
+.casa-epic {
+  --background: #101014; --surface: #18181c; --surface-2: #26262c; --border: #303036;
+  --foreground: #ffffff; --muted: #a8a8ad; --accent-rgb: 38 187 255; --accent-2: #bde9ff;
+}
+.casa-xbox [class*="rounded"] { border-radius: 6px; }
+.casa-steam [class*="rounded"] { border-radius: 4px; }
+.casa-epic [class*="rounded"] { border-radius: 12px; }
+
+/* Barra superior de la casa: logo, nombre y migas, ligera. */
+.casa-barra { display: flex; align-items: center; gap: 0.875rem; margin: 0.75rem 0 1.25rem; }
+.casa-barra-logo { display: flex; height: 2.5rem; width: 2.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 10px; background: var(--accent); }
+.casa-barra-logo img { filter: brightness(0) invert(1); }
+.casa-epic .casa-barra-logo { background: #2a2a2e; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2); }
+
+/* Títulos por casa. */
+.casa-ps h1, .casa-ps h2 { font-family: var(--font-barlow), sans-serif; font-weight: 300; text-transform: none; letter-spacing: 0.01em; }
+.casa-steam h2 { font-family: var(--font-barlow), sans-serif; font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.08em; color: #fff; }
+.casa-epic h1, .casa-epic h2 { text-transform: none; font-family: var(--font-barlow), sans-serif; font-weight: 700; }
+
+/* Destacado común */
+.casa-destacado { position: relative; margin-bottom: 2.75rem; }
+.casa-arte { position: absolute; inset: 0; height: 100%; width: 100%; object-fit: cover; animation: casa-entra 600ms cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes casa-entra { from { opacity: 0; transform: scale(1.03); } }
+.casa-velo { position: absolute; inset: 0; background: linear-gradient(0deg, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.15) 55%, rgb(0 0 0 / 0.35)); }
+.casa-titulo { font-family: var(--font-heading); font-size: clamp(1.75rem, 4.5vw, 3rem); font-weight: 700; line-height: 1; color: #fff; text-wrap: balance; }
+.casa-boton {
+  display: inline-flex; align-items: center; border-radius: 999px; padding: 0.625rem 1.5rem;
+  font-size: 0.875rem; font-weight: 700; color: #0b0b0b; background: #fff;
+  transition: transform 150ms, background-color 150ms;
+}
+.casa-boton:hover { background: var(--accent-2); transform: translateY(-1px); }
+.casa-flechas { display: flex; gap: 0.375rem; }
+.casa-flechas button {
+  display: flex; height: 2.25rem; width: 2.25rem; align-items: center; justify-content: center; border-radius: 999px;
+  color: #fff; background: rgb(255 255 255 / 0.12); transition: background-color 150ms;
+}
+.casa-flechas button:hover { background: rgb(255 255 255 / 0.28); }
+.casa-flechas-sueltas { position: absolute; right: 1rem; bottom: 1rem; z-index: 20; }
+@media (prefers-reduced-motion: reduce) { .casa-arte { animation: none; } }
+
+/* PlayStation: arte a sangre y baldosas arriba. */
+.casa-ps-escena { position: relative; min-height: 28rem; overflow: hidden; border-radius: 20px; }
+.casa-ps-escena .casa-titulo { font-family: var(--font-barlow), sans-serif; font-weight: 300; letter-spacing: -0.01em; }
+.casa-ps-baldosas { display: flex; align-items: flex-start; gap: 0.625rem; overflow-x: auto; padding: 0.25rem; scrollbar-width: none; }
+.casa-ps-baldosa {
+  height: 3.5rem; width: 3.5rem; flex-shrink: 0; overflow: hidden; border-radius: 12px;
+  outline: 2px solid transparent; outline-offset: 2px; opacity: 0.75;
+  transition: width 250ms cubic-bezier(0.16, 1, 0.3, 1), height 250ms cubic-bezier(0.16, 1, 0.3, 1), opacity 150ms, outline-color 150ms;
+}
+.casa-ps-baldosa img, .casa-ps-baldosa span { display: block; height: 100%; width: 100%; object-fit: cover; background: var(--surface-2); }
+.casa-ps-baldosa:hover { opacity: 1; outline-color: rgb(255 255 255 / 0.5); }
+.casa-ps-baldosa[data-activa] { height: 5.5rem; width: 5.5rem; opacity: 1; outline-color: #fff; }
+
+/* Xbox: mosaico. */
+.casa-xbox-mosaico { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+@media (min-width: 768px) { .casa-xbox-mosaico { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 9rem; } }
+.casa-xbox-grande { position: relative; display: flex; min-height: 16rem; overflow: hidden; border-radius: 6px; grid-column: 1 / -1; outline: 3px solid transparent; transition: outline-color 150ms; }
+@media (min-width: 768px) { .casa-xbox-grande { grid-column: span 4; grid-row: span 2; min-height: 0; } }
+.casa-xbox-grande:hover { outline-color: var(--accent-text); }
+.casa-xbox-cuadro { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 6px; background: var(--surface-2); outline: 3px solid transparent; transition: outline-color 150ms; }
+@media (min-width: 768px) { .casa-xbox-cuadro { aspect-ratio: auto; } }
+.casa-xbox-cuadro img { height: 100%; width: 100%; object-fit: cover; }
+.casa-xbox-cuadro:hover { outline-color: var(--accent-text); }
+.casa-xbox-cuadro-titulo { position: absolute; inset: auto 0 0 0; padding: 1.5rem 0.5rem 0.375rem; font-size: 0.6875rem; font-weight: 700; color: #fff; text-align: left; background: linear-gradient(0deg, rgb(0 0 0 / 0.85), transparent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Steam: cápsula principal + columna lateral. */
+.casa-steam-capsula { display: grid; overflow: hidden; border-radius: 4px; background: #0f1922; box-shadow: 0 0 18px rgb(0 0 0 / 0.6); }
+@media (min-width: 900px) { .casa-steam-capsula { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); } }
+.casa-steam-principal { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; }
+.casa-steam-lado { display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; background: linear-gradient(180deg, #2a3f5a, #0f1922); }
+.casa-steam-lado .casa-titulo { font-family: var(--font-barlow), sans-serif; font-size: 1.5rem; font-weight: 600; }
+.casa-steam-miniaturas { display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; }
+.casa-steam-miniaturas button { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 2px; opacity: 0.6; outline: 1px solid transparent; transition: opacity 150ms, outline-color 150ms; }
+.casa-steam-miniaturas button:hover, .casa-steam-miniaturas button[data-activa] { opacity: 1; outline-color: #66c0f4; }
+.casa-steam-miniaturas img { height: 100%; width: 100%; object-fit: cover; }
+.casa-steam-puntos { display: flex; justify-content: center; gap: 0.375rem; padding: 0.625rem; grid-column: 1 / -1; background: #0f1922; }
+.casa-steam-puntos span { height: 0.5625rem; width: 0.9375rem; border-radius: 2px; background: rgb(255 255 255 / 0.2); }
+.casa-steam-puntos span[data-activa] { background: rgb(255 255 255 / 0.6); }
+.casa-steam .casa-boton { border-radius: 2px; color: #d2efa9; background: linear-gradient(90deg, #75b022, #588a1b); }
+.casa-steam .casa-boton:hover { color: #fff; background: linear-gradient(90deg, #8ed629, #6aa621); }
+
+/* Epic: banner con lista a la derecha. */
+.casa-epic-escaparate { display: grid; gap: 1rem; }
+@media (min-width: 1024px) { .casa-epic-escaparate { grid-template-columns: minmax(0, 1fr) 15rem; } }
+.casa-epic-banner { position: relative; display: flex; min-height: 26rem; overflow: hidden; border-radius: 16px; }
+.casa-epic-lista { display: flex; gap: 0.375rem; overflow-x: auto; scrollbar-width: none; }
+@media (min-width: 1024px) { .casa-epic-lista { flex-direction: column; overflow: visible; } }
+.casa-epic-lista button {
+  display: flex; width: 100%; min-width: 12rem; align-items: center; gap: 0.75rem; border-radius: 12px; padding: 0.5rem;
+  text-align: left; font-size: 0.8125rem; font-weight: 600; color: var(--muted); transition: background-color 150ms, color 150ms;
+}
+.casa-epic-lista button img, .casa-epic-lista button > span:first-child { height: 3.5rem; width: 2.75rem; flex-shrink: 0; border-radius: 6px; object-fit: cover; background: var(--surface-2); }
+.casa-epic-lista button:hover { background: var(--surface); color: #fff; }
+.casa-epic-lista button[data-activa] { background: var(--surface-2); color: #fff; }
+
+/* Cuerpo: lo propio a la izquierda, rankings a la derecha. */
+.casa-cuerpo { display: grid; gap: 3rem 2.5rem; }
+@media (min-width: 1024px) { .casa-cuerpo:not([data-unica]) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+.casa-columna { display: flex; min-width: 0; flex-direction: column; gap: 3rem; }
+.casa-columna > * { margin: 0 !important; }
+.casa .exitos-top { grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; grid-template-rows: none; }
+@media (max-width: 1023px) { .casa-destacado-epic .casa-flechas-sueltas { display: none; } }

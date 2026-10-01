@@ -18,6 +18,8 @@ const URL_EPIC = "https://store-site-backend-static.ak.epicgames.com/freeGamesPr
 export interface JuegoGratisEpic {
   titulo: string;
   imagen: string | null;
+  /** Apaisada, para el banner del destacado. */
+  imagenAncha: string | null;
   url: string;
   inicio: string;
   fin: string;
@@ -44,9 +46,11 @@ interface Elemento {
 function aJuego(e: Elemento, o: Oferta): JuegoGratisEpic {
   const slug = (e.offerMappings?.[0]?.pageSlug || e.catalogNs?.mappings?.[0]?.pageSlug || e.productSlug || "").replace(/\/home$/, "");
   const imagen = e.keyImages?.find((k) => k.type === "OfferImageTall")?.url ?? e.keyImages?.find((k) => k.type === "Thumbnail")?.url ?? null;
+  const imagenAncha = e.keyImages?.find((k) => k.type === "OfferImageWide")?.url ?? e.keyImages?.find((k) => k.type === "featuredMedia")?.url ?? null;
   return {
     titulo: e.title,
     imagen,
+    imagenAncha,
     url: slug ? `https://store.epicgames.com/es-ES/p/${slug}` : "https://store.epicgames.com/es-ES/free-games",
     inicio: o.startDate,
     fin: o.endDate,

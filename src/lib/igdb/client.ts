@@ -1035,3 +1035,26 @@ export async function fechasLanzamiento(igdbIds: number[]): Promise<Map<number, 
   }
   return fechas;
 }
+
+/**
+ * Arte grande de varios juegos en UNA consulta — para el destacado a
+ * pantalla completa de las páginas de plataforma ("cada una en su casa",
+ * 1 oct 2026). Artwork si lo hay (es arte promocional sin texto); si no, la
+ * primera captura. Una sola cláusula `fields` (ver la trampa de IGDB en
+ * HANDOFF: dos `fields` descartan parte de lo pedido en silencio).
+ */
+export async function artesPorIgdb(igdbIds: number[]): Promise<Map<number, string>> {
+  const ids = [...new Set(igdbIds)].filter((id) => Number.isInteger(id) && id > 0).slice(0, 100);
+  if (ids.length === 0) return new Map();
+  const filas = await query<{ id: number; artworks?: { image_id: string }[]; screenshots?: { image_id: string }[] }>(
+    "games",
+    `fields id, artworks.image_id, screenshots.image_id; where id = (${ids.join(",")}); limit 100;`,
+    86_400,
+  );
+  const artes = new Map<number, string>();
+  for (const f of filas) {
+    const imagen = f.artworks?.[0]?.image_id ?? f.screenshots?.[0]?.image_id;
+    if (imagen) artes.set(f.id, `https://images.igdb.com/igdb/image/upload/t_1080p/${imagen}.jpg`);
+  }
+  return artes;
+}
