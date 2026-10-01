@@ -526,7 +526,8 @@
     "agruparPorEmpresa": "Grouper par éditeur",
     "noResults": "Aucun jeu ne correspond à ces filtres.",
     "groupCount": "{count} jeux",
-    "loadingMore": "Chargement d'autres jeux…"
+    "loadingMore": "Chargement d'autres jeux…",
+    "viewSpines": "Tranches"
   },
   "IgnorarHoras": {
     "segunPlataforma": "La plateforme indique {horas} h de jeu.",

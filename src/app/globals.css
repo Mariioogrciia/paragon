@@ -795,3 +795,47 @@ h3,
   font-size: 0.6875rem; font-weight: 700; color: #ff6b6b;
   font-style: italic; letter-spacing: 0.02em;
 }
+
+/* --- Biblioteca: lomos de caja (LibraryGrid, vista "lomos") -------------- */
+.lomo-hueco { display: flex; flex-direction: column; justify-content: flex-end; padding: 0 3px; }
+.lomo {
+  position: relative;
+  display: flex;
+  width: 52px;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 4px 4px 2px 2px;
+  /* El lomo es un objeto con su propio arte: velo oscuro fijo para leer el título. */
+  background: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.78)), var(--portada) center / cover;
+  box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.12), inset -2px 0 0 rgb(0 0 0 / 0.35);
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms;
+}
+.lomo:hover, .lomo:focus-visible {
+  transform: translateY(-12px);
+  box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.12), 0 14px 22px -10px var(--metal);
+}
+.lomo-franja { height: 10px; width: 100%; flex-shrink: 0; background: var(--metal); }
+.lomo-titulo {
+  flex: 1;
+  margin: 10px 0 6px;
+  overflow: hidden;
+  writing-mode: vertical-rl;
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f4f6fa;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lomo-pct { margin-bottom: 8px; font-size: 0.625rem; font-weight: 700; color: var(--metal); font-variant-numeric: tabular-nums; }
+.lomo-balda {
+  height: 8px;
+  margin: 0 -3px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--border) 70%, white 8%), var(--surface-2));
+  box-shadow: 0 10px 18px -10px rgb(0 0 0 / 0.75);
+}
+@media (max-width: 639px) { .lomo { width: 44px; } }
+@media (prefers-reduced-motion: reduce) { .lomo { transition: none; } }

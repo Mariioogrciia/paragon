@@ -145,7 +145,7 @@ export function LibraryGrid({
   const [collection, setCollection] = useState("");
   const [sort, setSort] = useState<SortKey>(initialSort ?? "reciente");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [view, setView] = useState<"grid" | "list" | "mosaic">("grid");
+  const [view, setView] = useState<"lomos" | "grid" | "list" | "mosaic">("lomos");
   const [agrupar, setAgrupar] = useState(false);
 
   const facets = useMemo(() => libraryFacets(games), [games]);
@@ -246,6 +246,29 @@ export function LibraryGrid({
   ].filter(Boolean).length;
 
   const renderGame = (game: Game) => {
+    if (view === "lomos") {
+      // Lomo de caja: alto según horas jugadas, franja del metal alcanzado.
+      const pct = game.progressPercent ?? 0;
+      const metal = pct >= 100 ? "#9fd4ec" : pct >= 75 ? "#e2b53e" : pct >= 40 ? "#b9c2cc" : pct > 0 ? "#c07b4a" : "var(--border)";
+      const horas = (game.playtimeMinutes ?? 0) / 60;
+      const alto = Math.round(Math.min(300, 170 + Math.sqrt(horas) * 9));
+      return (
+        <div key={game.id} className="lomo-hueco">
+          <a
+            href={game.isWishlist ? `/juego/${game.id}` : `/u/${handle}/${game.id}`}
+            className="lomo"
+            style={{ height: alto, ["--metal" as string]: metal, ...(game.iconUrl ? { ["--portada" as string]: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }) }}
+            title={`${game.title} · ${pct}%`}
+          >
+            <span className="lomo-franja" aria-hidden="true" />
+            <span className="lomo-titulo">{game.title}</span>
+            <span className="lomo-pct">{pct}%</span>
+          </a>
+          <div className="lomo-balda" aria-hidden="true" />
+        </div>
+      );
+    }
+
     if (view === "grid") {
       // `PinGameButton` va FUERA de `GameCard` a propósito, no en una de sus
       // esquinas: toda la tarjeta es un `<Link>` (`TiltCard`) y un control
@@ -381,6 +404,9 @@ export function LibraryGrid({
           </button>
 
           <div className="flex gap-1 rounded-[9px] p-1 shrink-0" style={FIELD}>
+            <button onClick={() => setView("lomos")} title={t("viewSpines")} aria-label={t("viewSpines")} aria-pressed={view === "lomos"} className={`p-1.5 rounded-md transition-colors ${view === "lomos" ? "bg-accent text-background" : "text-muted hover:text-foreground"}`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="4" height="16" /><rect x="9" y="7" width="4" height="13" /><path d="m15.5 6.5 3.9-1 3.1 13.6-3.9 1z" /></svg>
+            </button>
             <button onClick={() => setView("grid")} className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-accent text-background" : "text-muted hover:text-foreground"}`}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </button>
@@ -687,7 +713,7 @@ export function LibraryGrid({
                 <h3 className="font-heading text-lg font-bold">{empresa}</h3>
                 <span className="text-xs text-muted">{t("groupCount", { count: juegos.length })}</span>
               </div>
-              <div className={view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}>
+              <div className={view === "lomos" ? "flex flex-wrap items-end gap-y-8" : view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}>
                 {juegos.map(renderGame)}
               </div>
             </section>
@@ -697,7 +723,7 @@ export function LibraryGrid({
         <>
           <motion.div
             layout
-            className={view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}
+            className={view === "lomos" ? "flex flex-wrap items-end gap-y-8" : view === "list" ? "flex flex-col gap-2" : (view === "mosaic" ? "grid gap-3 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-4")}
           >
             {/*
               Antes esto iba envuelto en `AnimatePresence mode="popLayout"`

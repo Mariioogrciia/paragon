@@ -526,7 +526,8 @@
     "agruparPorEmpresa": "Agrupar por empresa",
     "noResults": "Ningún juego con esos filtros.",
     "groupCount": "{count} juegos",
-    "loadingMore": "Cargando más juegos…"
+    "loadingMore": "Cargando más juegos…",
+    "viewSpines": "Lomos"
   },
   "IgnorarHoras": {
     "segunPlataforma": "La plataforma dice que has jugado {horas} h.",

@@ -526,7 +526,8 @@
     "agruparPorEmpresa": "Nach Publisher gruppieren",
     "noResults": "Kein Spiel entspricht diesen Filtern.",
     "groupCount": "{count} Spiele",
-    "loadingMore": "Weitere Spiele werden geladen…"
+    "loadingMore": "Weitere Spiele werden geladen…",
+    "viewSpines": "Buchrücken"
   },
   "IgnorarHoras": {
     "segunPlataforma": "Laut Plattform hast du {horas} Std. gespielt.",
