@@ -156,7 +156,7 @@ export default async function AjustesPlataformasPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-bold mb-2">{t("ajustesPlataformas.title")}</h1>
+        <h1 className="font-heading text-2xl font-bold mb-2">{t("ajustesPlataformas.title")}</h1>
         <p className="text-sm text-muted">{t("ajustesPlataformas.description")}</p>
       </div>
 

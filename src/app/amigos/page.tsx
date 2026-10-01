@@ -25,8 +25,6 @@ import { RetosAmigos } from "@/components/RetosAmigos";
 
 export const metadata = { title: "Amigos · Paragon" };
 
-const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
-const POS_GOLD = "linear-gradient(150deg, #f7e3a8, #c39a2a)";
 
 export default async function AmigosPage() {
   const t = await getTranslations("Perfil");
@@ -83,27 +81,33 @@ export default async function AmigosPage() {
     }))
     .sort((a, b) => b.paragon.xp - a.paragon.xp);
 
+  // Marcador de estadio (rediseño del 1 oct 2026): mismas secciones y
+  // acciones que antes; los bloques son paneles negros de marcador
+  // (`.marcador`, una isla oscura que redefine los tokens) y las cifras van
+  // en puntos luminosos solo cuando son números.
+  const periodosMarcador = [
+    { title: t("AmigosPage.periodoSemanal"), rows: periodos.semanal },
+    { title: t("AmigosPage.periodoMensual"), rows: periodos.mensual },
+  ];
+
   return (
     <div>
       <BackButton fallbackHref="/" />
-      <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">{t("AmigosPage.titulo")}</h1>
-      <p className="mt-2.5 text-[0.9375rem] text-muted">
-        {t("AmigosPage.subtitulo")}
-      </p>
+      <h1 className="font-heading text-[clamp(2rem,6vw,2.625rem)] font-bold uppercase leading-none">{t("AmigosPage.titulo")}</h1>
+      <p className="mt-2.5 text-[0.9375rem] text-muted">{t("AmigosPage.subtitulo")}</p>
 
-      <div className="mt-7 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_400px]">
-        <section className="rounded-[18px] p-[22px]" style={CARD}>
-          <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">{t("AmigosPage.añadirTitulo")}</h2>
+      <div className={`mt-7 grid grid-cols-1 gap-4 ${pendientes.length > 0 ? "lg:grid-cols-[1fr_420px]" : ""}`}>
+        <section className="marcador marcador-panel p-[22px]">
+          <h2 className="marcador-rotulo mb-3.5">{t("AmigosPage.añadirTitulo")}</h2>
           <AddFriendForm />
-          <p className="mt-3 text-[0.8125rem] text-muted">
-            {t("AmigosPage.añadirAyuda")}
-          </p>
+          <p className="mt-3 text-[0.8125rem] text-muted">{t("AmigosPage.añadirAyuda")}</p>
         </section>
 
         {pendientes.length > 0 && (
-          <section className="rounded-[18px] p-[22px]" style={CARD}>
-            <h2 className="font-heading mb-3.5 text-[1.0625rem] font-bold tracking-[0.03em]">
-              {t("AmigosPage.solicitudesTitulo")} <span className="text-accent">{pendientes.length}</span>
+          <section className="marcador marcador-panel p-[22px]">
+            <h2 className="marcador-rotulo mb-3.5 flex items-center gap-2.5">
+              {t("AmigosPage.solicitudesTitulo")}
+              <span className="marcador-led text-2xl leading-none">{pendientes.length}</span>
             </h2>
 
             <ul className="space-y-3">
@@ -120,7 +124,7 @@ export default async function AmigosPage() {
                   <form action={acceptFriendAction}>
                     <input type="hidden" name="requesterId" value={p.userId} />
                     <button
-                      className="rounded-[9px] px-3.5 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
+                      className="rounded-[9px] px-3.5 py-2 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)]"
                       style={{ background: "var(--accent-grad)" }}
                     >
                       {t("AmigosPage.aceptar")}
@@ -129,7 +133,7 @@ export default async function AmigosPage() {
 
                   <form action={removeFriendAction}>
                     <input type="hidden" name="friendId" value={p.userId} />
-                    <button className="text-[0.8125rem] font-semibold text-muted hover:text-foreground">
+                    <button className="rounded-md px-1.5 py-1 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-foreground">
                       {t("AmigosPage.rechazar")}
                     </button>
                   </form>
@@ -140,215 +144,234 @@ export default async function AmigosPage() {
         )}
       </div>
 
-      <section className="mt-9">
-        <div className="mb-4 flex items-baseline gap-3.5">
-          <h2 className="font-heading text-2xl font-bold">{t("AmigosPage.clasificacionTitulo")}</h2>
+      <section className="marcador marcador-panel mt-6 overflow-hidden" aria-labelledby="marcador-clasificacion">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-[var(--border)] px-5 py-4 sm:px-6">
+          <h2 id="marcador-clasificacion" className="marcador-rotulo text-lg">{t("AmigosPage.clasificacionTitulo")}</h2>
           <span className="text-[0.8125rem] text-muted">
             {t("AmigosPage.clasificacionSubtitulo", { n: ranking.length - (tengoCuenta ? 1 : 0) })}
           </span>
         </div>
 
         {ranking.length === 0 ? (
-          <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">
-            {t("AmigosPage.clasificacionVacia")}
-          </p>
+          <p className="px-5 py-10 text-center text-sm text-muted">{t("AmigosPage.clasificacionVacia")}</p>
         ) : (
-          <div className="grid gap-2.5">
-            {ranking.map((r, i) => (
-              <div
-                key={r.userId}
-                className="grid grid-cols-[34px_44px_1fr] items-center gap-4 rounded-2xl p-4 sm:grid-cols-[44px_52px_1fr_92px_92px_92px_200px] sm:gap-4"
-                style={
-                  r.esMio
-                    ? { border: "1px solid rgb(var(--accent-rgb) / 0.45)", background: "linear-gradient(160deg, rgb(var(--accent-rgb) / 0.14), var(--surface))" }
-                    : { border: "1px solid var(--border)", background: "var(--surface)" }
-                }
-              >
-                <span
-                  className="font-heading flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold"
-                  style={
-                    i === 0
-                      ? { background: POS_GOLD, color: "#3a2a08" }
-                      : r.esMio
-                        ? { background: "rgb(var(--accent-rgb) / 0.18)", color: "var(--accent-text)" }
-                        : { background: "var(--surface-2)", color: "var(--muted)" }
-                  }
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+          <>
+            <div className="marcador-fila marcador-cabecera" aria-hidden="true">
+              <span>{t("AmigosPage.colPos")}</span>
+              <span className="col-span-2">{t("AmigosPage.colJugador")}</span>
+              <span className="text-right">{t("AmigosPage.colXp")}</span>
+              <span className="text-right">{t("AmigosPage.statPlatinos")}</span>
+              <span className="text-right">{t("AmigosPage.statTrofeos")}</span>
+              <span className="text-right">{t("AmigosPage.statMedio")}</span>
+              <span />
+            </div>
+            <ol>
+              {ranking.map((r, i) => (
+                <li key={r.userId} className="marcador-fila" data-mio={r.esMio || undefined}>
+                  <span className={`marcador-led text-[1.75rem] leading-none sm:text-[2rem] ${i === 0 ? "marcador-led-oro" : ""}`}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
 
-                <Avatar src={r.avatarUrl} name={r.name} size={52} />
+                  <Avatar src={r.avatarUrl} name={r.name} size={44} />
 
-                <div className="col-span-2 min-w-0 sm:col-span-1">
-                  <p className="truncate text-[0.9375rem] font-semibold">
-                    {r.name}
-                    {r.esMio && t("AmigosPage.tu")}
-                  </p>
-                  {r.handle && (
-                    <p className="mt-0.5 text-xs text-muted">
-                      @{r.handle}
-                      {t("AmigosPage.nivelXp", { nivel: r.paragon.level, xp: r.paragon.xp.toLocaleString(locale) })}
+                  <div className="min-w-0">
+                    <p className="flex min-w-0 items-center gap-2 text-[0.9375rem] font-semibold">
+                      <span className="truncate">{r.name}</span>
+                      {r.esMio && <span className="marcador-tu shrink-0">{t("AmigosPage.tuEtiqueta")}</span>}
                     </p>
-                  )}
-                </div>
-
-                <div>
-                  <p className="font-heading flex items-center gap-1.5 text-xl font-bold text-platinum">
-                    <TrophyIcon grade="platinum" size={15} />
-                    {r.stats.platinos}
-                  </p>
-                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statPlatinos")}</p>
-                </div>
-                <div>
-                  <p className="text-[1.0625rem] font-semibold">{r.stats.trofeos.toLocaleString(locale)}</p>
-                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statTrofeos")}</p>
-                </div>
-                <div>
-                  <p className="text-[1.0625rem] font-semibold">{r.stats.completadoMedio}%</p>
-                  <p className="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] text-muted">{t("AmigosPage.statMedio")}</p>
-                </div>
-
-                {!r.esMio && r.handle && (
-                  <div className="col-span-3 flex justify-end gap-2 sm:col-span-1">
-                    <Link
-                      href={`/comparar/${r.handle}`}
-                      className="rounded-[9px] border border-[var(--border)] bg-[#151d29] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)]"
-                    >
-                      {t("AmigosPage.comparar")}
-                    </Link>
-                    <Link
-                      href={`/u/${r.handle}`}
-                      className="px-1 py-2 text-[0.8125rem] font-semibold text-muted hover:text-foreground"
-                    >
-                      {t("AmigosPage.perfil")}
-                    </Link>
+                    {r.handle && (
+                      <p className="mt-0.5 truncate text-xs text-muted">
+                        @{r.handle} · {t("AmigosPage.solicitudNivel", { nivel: r.paragon.level })}
+                      </p>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+
+                  <div className="marcador-cifras">
+                    <span className="marcador-dato">
+                      <span className="marcador-led text-[1.125rem] leading-none sm:text-[1.625rem]">{r.paragon.xp.toLocaleString(locale)}</span>
+                      <span className="marcador-etiqueta sm:hidden">{t("AmigosPage.colXp")}</span>
+                    </span>
+                    <span className="marcador-dato">
+                      <span className="marcador-led marcador-led-platino flex items-center gap-1.5 text-[1.125rem] leading-none sm:text-[1.625rem]">
+                        {r.stats.platinos}
+                      </span>
+                      <span className="marcador-etiqueta flex items-center gap-1 sm:hidden">
+                        <TrophyIcon grade="platinum" size={11} /> {t("AmigosPage.statPlatinos")}
+                      </span>
+                    </span>
+                    <span className="marcador-dato">
+                      <span className="font-heading text-[1.0625rem] font-bold tabular-nums">{r.stats.trofeos.toLocaleString(locale)}</span>
+                      <span className="marcador-etiqueta sm:hidden">{t("AmigosPage.statTrofeos")}</span>
+                    </span>
+                    <span className="marcador-dato">
+                      <span className="font-heading text-[1.0625rem] font-bold tabular-nums">{r.stats.completadoMedio}%</span>
+                      <span className="marcador-etiqueta sm:hidden">{t("AmigosPage.statMedio")}</span>
+                    </span>
+                  </div>
+
+                  <div className="marcador-acciones">
+                    {!r.esMio && r.handle && (
+                      <>
+                        <Link
+                          href={`/comparar/${r.handle}`}
+                          className="rounded-[9px] border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--accent-text)] transition-colors hover:border-[rgb(var(--accent-rgb)/0.5)]"
+                        >
+                          {t("AmigosPage.comparar")}
+                        </Link>
+                        <Link
+                          href={`/u/${r.handle}`}
+                          className="rounded-md px-1.5 py-2 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-foreground"
+                        >
+                          {t("AmigosPage.perfil")}
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <p className="border-t border-[var(--border)] px-5 py-2.5 text-right text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-muted sm:px-6">
+              {t("AmigosPage.marcadorPie")}
+            </p>
+          </>
         )}
       </section>
 
-      <section className="mt-9 grid grid-cols-1 gap-3 lg:grid-cols-2">
-        {[{ title: t("AmigosPage.periodoSemanal"), rows: periodos.semanal }, { title: t("AmigosPage.periodoMensual"), rows: periodos.mensual }].map((periodo) => (
-          <div key={periodo.title} className="rounded-[18px] border border-border bg-surface p-5">
-            <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{periodo.title}</h2>
-            {periodo.rows.length === 0 ? <p className="text-sm text-muted">{t("AmigosPage.periodoVacio")}</p> : <ol className="space-y-2">{periodo.rows.map((row, index) => <li key={row.userId} className="flex items-center gap-3 text-sm"><span className="w-6 text-xs font-bold text-muted">{index + 1}</span><span className="min-w-0 flex-1 truncate font-semibold">{row.name ?? `@${row.handle ?? "usuario"}`}</span><span className="font-heading font-bold text-accent">{t("AmigosPage.periodoTrofeos", { n: row.total })}</span></li>)}</ol>}
+      <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {periodosMarcador.map((periodo) => (
+          <div key={periodo.title} className="marcador marcador-panel p-5">
+            <h2 className="marcador-rotulo mb-3">{periodo.title}</h2>
+            {periodo.rows.length === 0 ? (
+              <p className="text-sm text-muted">{t("AmigosPage.periodoVacio")}</p>
+            ) : (
+              <ol className="divide-y divide-[var(--border)]">
+                {periodo.rows.map((row, index) => (
+                  <li key={row.userId} className="flex items-center gap-3 py-2 text-sm">
+                    <span className={`marcador-led w-8 text-lg leading-none ${index === 0 ? "marcador-led-oro" : ""}`}>{String(index + 1).padStart(2, "0")}</span>
+                    <span className="min-w-0 flex-1 truncate font-semibold">{row.name ?? `@${row.handle ?? "usuario"}`}</span>
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="marcador-led text-xl leading-none">{row.total}</span>
+                      <span className="marcador-etiqueta">{t("AmigosPage.statTrofeos")}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
           </div>
         ))}
       </section>
 
       {amigos.length > 0 && (
-        <section className="mt-9">
-          <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="font-heading text-2xl font-bold">{t("AmigosPage.tusAmigosTitulo")}</h2>
-            <p className="text-[0.8125rem] text-muted">
-              {t("AmigosPage.tusAmigosAyuda")}
-            </p>
-          </div>
+        <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+          <section className="marcador marcador-panel p-5">
+            <div className="mb-3.5">
+              <h2 className="marcador-rotulo">{t("AmigosPage.tusAmigosTitulo")}</h2>
+              <p className="mt-1 text-[0.8125rem] text-muted">{t("AmigosPage.tusAmigosAyuda")}</p>
+            </div>
 
-          {/*
-            Formulario GET, pero SIN envolver la lista: cada casilla se
-            asocia con `form="comparar-grupo"` en vez de ser descendiente de
-            este `<form>`, porque cada fila también tiene su propio
-            formulario pequeño para "Quitar" (`removeFriendAction`), y HTML
-            no admite formularios anidados. El atributo `form` en el input
-            es justo lo que existe para este caso: lo suma a la petición de
-            un formulario que no es su ancestro.
+            {/*
+              Formulario GET, pero SIN envolver la lista: cada casilla se
+              asocia con `form="comparar-grupo"` en vez de ser descendiente de
+              este `<form>`, porque cada fila también tiene su propio
+              formulario pequeño para "Quitar" (`removeFriendAction`), y HTML
+              no admite formularios anidados. El atributo `form` en el input
+              es justo lo que existe para este caso: lo suma a la petición de
+              un formulario que no es su ancestro.
 
-            Con una sola casilla marcada, /comparar redirige a la
-            comparativa 1 a 1 de siempre; con dos o más, a la de grupo.
-          */}
-          <form id="comparar-grupo" action="/comparar" method="get" />
+              Con una sola casilla marcada, /comparar redirige a la
+              comparativa 1 a 1 de siempre; con dos o más, a la de grupo.
+            */}
+            <form id="comparar-grupo" action="/comparar" method="get" />
 
-          <ul className="overflow-hidden rounded-[18px] border border-border bg-surface">
-            {amigos.map((a) => (
-              <li
-                key={a.userId}
-                className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-0"
-              >
-                {a.handle && (
-                  <input
-                    type="checkbox"
-                    form="comparar-grupo"
-                    name="con"
-                    value={a.handle}
-                    className="h-4 w-4 shrink-0 accent-accent"
-                    aria-label={t("AmigosPage.checkboxAria", { handle: a.handle })}
-                  />
-                )}
-
-                <Avatar src={a.avatarUrl ?? a.image} name={a.handle ?? "?"} />
-
-                <div className="min-w-0 flex-1">
-                  <Link
-                    href={`/u/${a.handle}`}
-                    // `block`: `truncate` (overflow-hidden + ellipsis +
-                    // nowrap) NO recorta en un elemento inline, y un <a> lo
-                    // es por defecto. Sin esto un nombre largo se salia de la
-                    // tarjeta (medido: 42px fuera con "Mario Garcia Romero").
-                    className="block truncate text-sm hover:text-accent"
-                  >
-                    {a.displayName ?? `@${a.handle}`}
-                  </Link>
-                  <p className="text-xs text-muted">
-                    @{a.handle}
-                    {a.trophyLevel !== null && t("AmigosPage.amigoNivel", { nivel: a.trophyLevel })}
-                  </p>
-                  {a.accounts.length > 0 && (
-                    <p className="mt-0.5 truncate text-[0.6875rem] text-muted/80">
-                      {a.accounts.map((acc) => `${PLATFORM_LABEL[acc.platform]}: ${acc.username}`).join(" · ")}
-                    </p>
+            <ul className="divide-y divide-[var(--border)]">
+              {amigos.map((a) => (
+                <li key={a.userId} className="flex items-center gap-3 py-3">
+                  {a.handle && (
+                    <input
+                      type="checkbox"
+                      form="comparar-grupo"
+                      name="con"
+                      value={a.handle}
+                      className="h-4 w-4 shrink-0 accent-accent"
+                      aria-label={t("AmigosPage.checkboxAria", { handle: a.handle })}
+                    />
                   )}
-                </div>
 
-                <Link
-                  href={`/comparar/${a.handle}`}
-                  className="rounded-lg border border-border px-3 py-1.5 text-sm hover:border-accent/50"
-                >
-                  {t("AmigosPage.comparar")}
-                </Link>
+                  <Avatar src={a.avatarUrl ?? a.image} name={a.handle ?? "?"} />
 
-                <ConfirmForm
-                  action={removeFriendAction}
-                  hidden={{ friendId: a.userId }}
-                  title={t("AmigosPage.quitarTitulo")}
-                  message={t("AmigosPage.quitarMensaje", { nombre: a.displayName ?? `@${a.handle}` })}
-                  confirmLabel={t("AmigosPage.quitarConfirmar")}
-                  triggerClassName="text-sm text-muted hover:text-danger"
-                >
-                  {t("AmigosPage.quitar")}
-                </ConfirmForm>
-              </li>
-            ))}
-          </ul>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/u/${a.handle}`}
+                      // `block`: `truncate` (overflow-hidden + ellipsis +
+                      // nowrap) NO recorta en un elemento inline, y un <a> lo
+                      // es por defecto. Sin esto un nombre largo se salia de la
+                      // tarjeta (medido: 42px fuera con "Mario Garcia Romero").
+                      className="block truncate text-sm font-semibold hover:text-[var(--accent-text)]"
+                    >
+                      {a.displayName ?? `@${a.handle}`}
+                    </Link>
+                    <p className="text-xs text-muted">
+                      @{a.handle}
+                      {a.trophyLevel !== null && t("AmigosPage.amigoNivel", { nivel: a.trophyLevel })}
+                    </p>
+                    {a.accounts.length > 0 && (
+                      <p className="mt-0.5 truncate text-[0.6875rem] text-muted/80">
+                        {a.accounts.map((acc) => `${PLATFORM_LABEL[acc.platform]}: ${acc.username}`).join(" · ")}
+                      </p>
+                    )}
+                  </div>
 
-          <button
-            type="submit"
-            form="comparar-grupo"
-            className="mt-3 rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb) / 0.4)]"
-            style={{ background: "var(--accent-grad)" }}
-          >
-            {t("AmigosPage.compararSeleccionados")}
-          </button>
-        </section>
+                  <Link
+                    href={`/comparar/${a.handle}`}
+                    className="rounded-lg border border-border px-3 py-1.5 text-sm transition-colors hover:border-[rgb(var(--accent-rgb)/0.5)] hover:bg-[var(--surface-2)]"
+                  >
+                    {t("AmigosPage.comparar")}
+                  </Link>
+
+                  <ConfirmForm
+                    action={removeFriendAction}
+                    hidden={{ friendId: a.userId }}
+                    title={t("AmigosPage.quitarTitulo")}
+                    message={t("AmigosPage.quitarMensaje", { nombre: a.displayName ?? `@${a.handle}` })}
+                    confirmLabel={t("AmigosPage.quitarConfirmar")}
+                    triggerClassName="rounded-md px-1.5 py-1 text-sm text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-danger"
+                  >
+                    {t("AmigosPage.quitar")}
+                  </ConfirmForm>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              type="submit"
+              form="comparar-grupo"
+              className="mt-3 rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)]"
+              style={{ background: "var(--accent-grad)" }}
+            >
+              {t("AmigosPage.compararSeleccionados")}
+            </button>
+          </section>
+
+          <div className="marcador marcador-envoltura">
+            <RetosAmigos
+              retos={retosAmigos}
+              miId={session.user.id}
+              amigos={amigos.map((a) => ({
+                userId: a.userId,
+                nombre: a.displayName?.trim().split(/\s+/)[0] || `@${a.handle ?? "?"}`,
+                handle: a.handle,
+                avatar: a.avatarUrl ?? a.image,
+              }))}
+            />
+          </div>
+        </div>
       )}
 
       {amigos.length > 0 && (
-        <RetosAmigos
-          retos={retosAmigos}
-          miId={session.user.id}
-          amigos={amigos.map((a) => ({
-            userId: a.userId,
-            nombre: a.displayName?.trim().split(/\s+/)[0] || `@${a.handle ?? "?"}`,
-            handle: a.handle,
-            avatar: a.avatarUrl ?? a.image,
-          }))}
-        />
+        <div className="marcador marcador-envoltura mt-6">
+          <PlatinarJuntos retos={retos} comunes={comunes} />
+        </div>
       )}
-
-      {amigos.length > 0 && <PlatinarJuntos retos={retos} comunes={comunes} />}
     </div>
   );
 }

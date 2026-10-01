@@ -23,7 +23,7 @@ function Guardar() {
 export function PreferenciasAvisos({ categorias, desactivadas }: { categorias: readonly { clave: string; label: string }[]; desactivadas: string[] }) {
   const t = useTranslations("Onboarding");
   return (
-    <section className="rounded-[18px] border border-white/10 bg-surface-2/30 p-6">
+    <section className="ajustes-grupo">
       <h2 className="mb-1 font-semibold">{t("avisos.titulo")}</h2>
       <p className="mb-4 text-xs text-muted">{t("avisos.descripcion")}</p>
       <form action={setAvisosActivosAction} className="flex flex-col gap-1">

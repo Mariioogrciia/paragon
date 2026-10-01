@@ -48,7 +48,7 @@ export default async function AjustesSeguridadPage({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-bold mb-2">{t("ajustesSeguridad.title")}</h1>
+        <h1 className="font-heading text-2xl font-bold mb-2">{t("ajustesSeguridad.title")}</h1>
         <p className="text-sm text-muted">{t("ajustesSeguridad.description")}</p>
       </div>
 
@@ -69,7 +69,7 @@ export default async function AjustesSeguridadPage({
         </p>
       )}
 
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-4">{t("ajustesSeguridad.linkedAccounts.title")}</h2>
         <div className="flex flex-col gap-4">
           {userAccounts.map((acc) => (
@@ -145,7 +145,7 @@ export default async function AjustesSeguridadPage({
         )}
       </section>
 
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-2">{t("ajustesSeguridad.sessions.title")}</h2>
         <p className="text-sm text-muted">{t("ajustesSeguridad.sessions.description", { n: sesionesActivas })}</p>
         {sesionesActivas > 1 && (
@@ -163,7 +163,7 @@ export default async function AjustesSeguridadPage({
         )}
       </section>
 
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-4">{t("ajustesSeguridad.export.title")}</h2>
         <p className="text-sm text-muted mb-6">
           {t("ajustesSeguridad.export.description")}

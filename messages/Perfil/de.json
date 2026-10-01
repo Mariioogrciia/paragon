@@ -97,7 +97,12 @@
     "quitarMensaje": "{nombre} sieht deine Aktivität nicht mehr, und du müsstest eine neue Freundschaftsanfrage senden, um die Person wieder hinzuzufügen.",
     "quitarConfirmar": "Ja, entfernen",
     "quitar": "Entfernen",
-    "compararSeleccionados": "Auswahl vergleichen"
+    "compararSeleccionados": "Auswahl vergleichen",
+    "colPos": "Pl.",
+    "colJugador": "Jäger",
+    "colXp": "XP",
+    "tuEtiqueta": "Du",
+    "marcadorPie": "Nach Paragon-XP sortiert"
   },
   "CompararGrupoPage": {
     "meta": "Gruppenvergleich · Paragon",

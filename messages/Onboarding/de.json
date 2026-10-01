@@ -13,7 +13,11 @@
     "escaparate": "Vitrinen und Signatur",
     "seguridad": "Anmeldung und Sicherheit",
     "plataformas": "Spielekonten",
-    "ocultar": "Ausblenden"
+    "ocultar": "Ausblenden",
+    "titulo": "Einstellungen",
+    "grupoPerfil": "Dein Profil",
+    "grupoCuenta": "Konto",
+    "grupoPanel": "Dashboard und Menü"
   },
   "navOcultable": {
     "feed": "Community",
@@ -80,7 +84,8 @@
     "title": "Ausblenden",
     "description": "Nichts mit der Community zu tun — das ist nur für dich. Entferne Funktionen, die dich nicht interessieren, aus dem Menü; sie bleiben für alle anderen sichtbar, nur du siehst sie nicht mehr.",
     "panelTitle": "Bereiche des Dashboards",
-    "panelDescription": "Markierte Bereiche erscheinen nicht im Dashboard (und werden nicht berechnet, es lädt schneller)."
+    "panelDescription": "Markierte Bereiche erscheinen nicht im Dashboard (und werden nicht berechnet, es lädt schneller).",
+    "navTitle": "Navigationsmenü"
   },
   "ajustesPlataformas": {
     "title": "Spielkonten",
@@ -322,7 +327,9 @@
       "empty": "Noch keine Spiele in deiner Bibliothek.",
       "autoTitle": "Automatisch (das neueste)",
       "auto": "Auto"
-    }
+    },
+    "previewTitle": "So sehen dich andere",
+    "previewHint": "Aktualisiert sich beim Bearbeiten; gespeichert wird mit Speichern."
   },
   "appearanceSettings": {
     "title": "Erscheinungsbild",
@@ -336,7 +343,16 @@
     "styleDescription": "Nicht nur die Farbe — Eckenradius, Schatten, Typografie und sogar der Hintergrund ändern sich je nach Stil.",
     "themesTitle": "Themes",
     "themesDescription": "Ein-Klick-Kombinationen: Modus + Akzent + Stil auf einmal.",
-    "styleLocked": "Wird ab Stufe {nivel} freigeschaltet"
+    "styleLocked": "Wird ab Stufe {nivel} freigeschaltet",
+    "gameTitle": "Aus deinem Spiel",
+    "gameDescription": "Die ganze App übernimmt die Farbe des Covers des gewählten Spiels. Ist die Farbe schlecht lesbar, wird sie automatisch korrigiert.",
+    "gameEmpty": "Sobald du Spiele mit Cover in deiner Bibliothek hast, kannst du hier eines wählen.",
+    "gameFavorite": "Favorit",
+    "previewTitle": "Vorschau",
+    "previewHint": "Ändert sich sofort mit deiner Auswahl.",
+    "previewNext": "Nächste Platin-Trophäe",
+    "previewLeft": "{n} Trophäen bis Platin",
+    "previewButton": "Route ansehen"
   },
   "themeCustomizer": {
     "label": "Erscheinungsbild"

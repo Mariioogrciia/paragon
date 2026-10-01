@@ -13,7 +13,11 @@
     "escaparate": "Vitrines et signature",
     "seguridad": "Connexion et sécurité",
     "plataformas": "Comptes de jeu",
-    "ocultar": "Masquer"
+    "ocultar": "Masquer",
+    "titulo": "Réglages",
+    "grupoPerfil": "Ton profil",
+    "grupoCuenta": "Compte",
+    "grupoPanel": "Tableau de bord et menu"
   },
   "navOcultable": {
     "feed": "Communauté",
@@ -80,7 +84,8 @@
     "title": "Masquer",
     "description": "Rien à voir avec la communauté — c'est uniquement pour toi. Retire du menu les fonctions qui ne t'intéressent pas ; elles restent visibles pour tout le monde, toi seul arrêtes de les voir.",
     "panelTitle": "Sections du tableau de bord",
-    "panelDescription": "Celles que tu coches n’apparaissent pas (et ne sont pas calculées, ça charge plus vite)."
+    "panelDescription": "Celles que tu coches n’apparaissent pas (et ne sont pas calculées, ça charge plus vite).",
+    "navTitle": "Menu de navigation"
   },
   "ajustesPlataformas": {
     "title": "Comptes de jeu",
@@ -322,7 +327,9 @@
       "empty": "Encore aucun jeu dans ta bibliothèque.",
       "autoTitle": "Automatique (le plus récent)",
       "auto": "Auto"
-    }
+    },
+    "previewTitle": "Ce que voient les autres",
+    "previewHint": "Se met à jour pendant l’édition ; enregistré avec Enregistrer."
   },
   "appearanceSettings": {
     "title": "Apparence",
@@ -336,7 +343,16 @@
     "styleDescription": "Pas seulement la couleur — le rayon des coins, l'ombre, la typographie et même le fond changent selon le style.",
     "themesTitle": "Thèmes",
     "themesDescription": "Combos en un clic : mode + accent + style en même temps.",
-    "styleLocked": "Se débloque au niveau {nivel}"
+    "styleLocked": "Se débloque au niveau {nivel}",
+    "gameTitle": "Depuis ton jeu",
+    "gameDescription": "Toute l’appli prend la couleur de la jaquette du jeu choisi. Si cette couleur se lit mal, elle est corrigée automatiquement.",
+    "gameEmpty": "Quand tu auras des jeux avec jaquette dans ta bibliothèque, tu pourras en choisir un ici.",
+    "gameFavorite": "Favori",
+    "previewTitle": "Aperçu",
+    "previewHint": "Change instantanément selon ton choix.",
+    "previewNext": "Prochain platine",
+    "previewLeft": "{n} trophées avant le platine",
+    "previewButton": "Voir le parcours"
   },
   "themeCustomizer": {
     "label": "Apparence"

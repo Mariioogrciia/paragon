@@ -97,7 +97,12 @@
     "quitarMensaje": "{nombre} will stop seeing your activity, and you'd have to send another friend request to add them again.",
     "quitarConfirmar": "Yes, remove",
     "quitar": "Remove",
-    "compararSeleccionados": "Compare selected"
+    "compararSeleccionados": "Compare selected",
+    "colPos": "Pos",
+    "colJugador": "Hunter",
+    "colXp": "XP",
+    "tuEtiqueta": "You",
+    "marcadorPie": "Ranked by Paragon XP"
   },
   "CompararGrupoPage": {
     "meta": "Group comparison · Paragon",

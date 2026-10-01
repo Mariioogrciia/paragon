@@ -1789,13 +1789,19 @@ const TAMANOS_TEXTO_VALIDOS = ["", "grande", "enorme", "pequeno"];
  * usa `requireUserId`, que redirige: esto se llama "disparar y olvidar" desde
  * el selector y una redirección ahí sacaría a la persona de la página.
  */
-export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string }): Promise<void> {
+export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre?: string; acentoJuego?: { id: string; color: string }; estilo?: string; tamanoTexto?: string }): Promise<void> {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return;
 
   const acento = /^(accent-[a-z]+)?$/.test(ap.acento ?? "") ? (ap.acento ?? "") : "";
   const acentoLibre = /^(#[0-9a-f]{6})?$/i.test(ap.acentoLibre ?? "") ? (ap.acentoLibre ?? "") : "";
+  // Paleta "desde tu juego": id del juego (solo para marcar cuál está
+  // elegido) y el color de su carátula; la paleta se recalcula al cargar.
+  const acentoJuego =
+    ap.acentoJuego && /^[\w:.-]{1,120}$/.test(ap.acentoJuego.id) && /^#[0-9a-f]{6}$/i.test(ap.acentoJuego.color)
+      ? { id: ap.acentoJuego.id, color: ap.acentoJuego.color }
+      : undefined;
   let estilo = /^(estilo-[a-z0-9]+)?$/.test(ap.estilo ?? "") ? (ap.estilo ?? "") : "";
   const tamanoTexto = TAMANOS_TEXTO_VALIDOS.includes(ap.tamanoTexto ?? "") ? (ap.tamanoTexto ?? "") : "";
   if (estilo && ESTILO_REQUISITOS[estilo] !== undefined) {
@@ -1803,5 +1809,5 @@ export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre
     if (nivel.level < ESTILO_REQUISITOS[estilo]) estilo = "";
   }
 
-  await getDb().update(users).set({ apariencia: { acento, acentoLibre, estilo, tamanoTexto } }).where(eq(users.id, userId));
+  await getDb().update(users).set({ apariencia: { acento, acentoLibre, ...(acentoJuego ? { acentoJuego } : {}), estilo, tamanoTexto } }).where(eq(users.id, userId));
 }

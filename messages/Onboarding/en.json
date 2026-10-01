@@ -13,7 +13,11 @@
     "escaparate": "Showcases and signature",
     "seguridad": "Login and security",
     "plataformas": "Game Accounts",
-    "ocultar": "Hide"
+    "ocultar": "Hide",
+    "titulo": "Settings",
+    "grupoPerfil": "Your profile",
+    "grupoCuenta": "Account",
+    "grupoPanel": "Dashboard and menu"
   },
   "navOcultable": {
     "feed": "Community",
@@ -80,7 +84,8 @@
     "title": "Hide",
     "description": "Nothing to do with community — this is just for you. Remove features you're not interested in from the menu; they're still there for everyone else, you just stop seeing them.",
     "panelTitle": "Dashboard sections",
-    "panelDescription": "The ones you tick won’t appear on your dashboard (nor be calculated, so it loads faster)."
+    "panelDescription": "The ones you tick won’t appear on your dashboard (nor be calculated, so it loads faster).",
+    "navTitle": "Navigation menu"
   },
   "ajustesPlataformas": {
     "title": "Game Accounts",
@@ -322,7 +327,9 @@
       "empty": "No games in your library yet.",
       "autoTitle": "Automatic (most recent)",
       "auto": "Auto"
-    }
+    },
+    "previewTitle": "How others see you",
+    "previewHint": "Updates as you edit; saved when you press Save."
   },
   "appearanceSettings": {
     "title": "Appearance",
@@ -336,7 +343,16 @@
     "styleDescription": "Not just the color — corner radius, shadow, typography and even the background change depending on the style.",
     "themesTitle": "Themes",
     "themesDescription": "One-click combos: mode + accent + style all at once.",
-    "styleLocked": "Unlocks at level {nivel}"
+    "styleLocked": "Unlocks at level {nivel}",
+    "gameTitle": "From your game",
+    "gameDescription": "The whole app takes the colour of the cover of the game you pick. If that colour is hard to read, it is corrected automatically.",
+    "gameEmpty": "Once you have games with covers in your library, you can pick one here.",
+    "gameFavorite": "Favourite",
+    "previewTitle": "Preview",
+    "previewHint": "Updates instantly with what you pick.",
+    "previewNext": "Next platinum",
+    "previewLeft": "{n} trophies to the platinum",
+    "previewButton": "See route"
   },
   "themeCustomizer": {
     "label": "Appearance"

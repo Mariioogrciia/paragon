@@ -284,7 +284,11 @@
       "discordAnuncio": "vient d'obtenir le platine de",
       "discordRareza": "Rareté dans la communauté",
       "discordDificultad": "Difficulté moyenne : {n}/10"
-    }
+    },
+    "editarPanel": "Modifier le tableau de bord",
+    "lecturas": "Relevés",
+    "cabinaPie": "{n, plural, =0 {Tous les modules affichés} one {# module masqué} other {# modules masqués}}",
+    "cabinaPieAccion": "Choisis les modules à afficher"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Profil d'exemple",

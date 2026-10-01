@@ -288,6 +288,14 @@
 .light.accent-fosforo { --accent-rgb: 10 140 50; }
 .light.accent-inmersion { --accent-rgb: 8 128 150; }
 
+/* Paleta "desde tu juego" (1 oct 2026): las variables --juego-* las escribe
+   lib/apariencia.ts en el <html> a partir del color de la carátula, ya
+   corregidas de contraste (lib/paletaJuego.ts). Mismo reparto que las
+   paletas completas: suelo solo en oscuro, acento propio en claro. */
+.accent-juego { --accent-rgb: var(--juego-rgb); --accent-2: var(--juego-2); }
+.dark.accent-juego { --background: var(--juego-bg); --surface: var(--juego-surface); --surface-2: var(--juego-surface-2); --border: var(--juego-border); }
+.light.accent-juego { --accent-rgb: var(--juego-rgb-claro); --accent-2: color-mix(in srgb, var(--accent) 55%, white); }
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -862,3 +870,226 @@ h3,
 @media (min-width: 768px) { .muro-columnas { columns: 2; } }
 .muro-columnas > * { break-inside: avoid; margin-bottom: 1rem; }
 .muro-portada { background-size: cover; background-position: center; }
+
+/* --- Panel: cabina de widgets (src/app/page.tsx, con sesión) ------------- */
+/* Rejilla de 12 columnas; cada módulo va montado en un bisel con cuatro
+   esquinas en el acento, como un instrumento atornillado al panel. */
+.cabina {
+  --cabina-hueco: 1.25rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cabina-hueco);
+}
+@media (min-width: 1024px) {
+  .cabina { grid-template-columns: repeat(12, minmax(0, 1fr)); --cabina-hueco: 1.5rem; }
+}
+.cabina-pila { display: grid; gap: var(--cabina-hueco); min-width: 0; }
+@media (min-width: 640px) and (max-width: 1023px) { .cabina-pila { grid-template-columns: 1fr 1fr; } }
+.cabina-celda { position: relative; min-width: 0; }
+.cabina-celda:empty { display: none; }
+.cabina-celda > :first-child { height: 100%; }
+.cabina-celda::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+  --l: rgb(var(--accent-rgb) / 0.4);
+  background:
+    linear-gradient(var(--l), var(--l)) top left / 12px 1.5px,
+    linear-gradient(var(--l), var(--l)) top left / 1.5px 12px,
+    linear-gradient(var(--l), var(--l)) top right / 12px 1.5px,
+    linear-gradient(var(--l), var(--l)) top right / 1.5px 12px,
+    linear-gradient(var(--l), var(--l)) bottom left / 12px 1.5px,
+    linear-gradient(var(--l), var(--l)) bottom left / 1.5px 12px,
+    linear-gradient(var(--l), var(--l)) bottom right / 12px 1.5px,
+    linear-gradient(var(--l), var(--l)) bottom right / 1.5px 12px;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  transition: opacity 200ms, inset 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cabina-celda:hover::before { opacity: 1; inset: -8px; }
+.cabina-cifra { color: color-mix(in srgb, var(--accent-2) 70%, var(--foreground)); text-shadow: 0 0 40px rgb(var(--accent-rgb) / 0.35); }
+/* Pie "editar panel": la rejilla de la cabina se ve en él, como al editar. */
+.cabina-editar {
+  border: 1px dashed rgb(var(--accent-rgb) / 0.35);
+  background:
+    linear-gradient(rgb(var(--accent-rgb) / 0.07) 1px, transparent 1px) 0 0 / 100% 14px,
+    linear-gradient(90deg, rgb(var(--accent-rgb) / 0.07) 1px, transparent 1px) 0 0 / calc(100% / 12) 100%,
+    var(--surface);
+  transition: border-color 200ms, background-color 200ms;
+}
+.cabina-editar:hover { border-color: rgb(var(--accent-rgb) / 0.7); }
+@media (prefers-reduced-motion: reduce) { .cabina-celda::before { transition: none; } }
+
+/* --- Amigos: marcador de estadio (src/app/amigos/page.tsx) --------------- */
+/* Isla oscura: un marcador es negro aunque la app esté en modo claro, así
+   que redefine los tokens y todo lo de dentro (formularios, RetosAmigos,
+   PlatinarJuntos) se pinta en su paleta sin tocar esos componentes. */
+.marcador {
+  --background: #050608;
+  --surface: #0b0d10;
+  --surface-2: #171b21;
+  --border: #232830;
+  --foreground: #e9eef7;
+  --muted: #9aa3b2;
+  --accent-text: color-mix(in srgb, var(--accent) 45%, white);
+  --marcador-ambar: #ffcf3a;
+  color: var(--foreground);
+}
+.light .marcador {
+  --accent-2: color-mix(in srgb, var(--accent) 35%, white);
+  --accent-grad: linear-gradient(160deg, var(--accent-2), color-mix(in srgb, var(--accent) 65%, white));
+}
+.marcador-panel,
+.marcador-envoltura > section {
+  margin-top: 0;
+  border-radius: 14px;
+  border: 1px solid #2c323b;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.035) 1px, transparent 1.4px) 0 0 / 6px 6px,
+    linear-gradient(180deg, #0d1014, #07090b);
+  box-shadow: inset 0 0 0 4px #050608, inset 0 0 0 5px #1a1e24, 0 18px 40px -24px rgb(0 0 0 / 0.8);
+}
+.marcador-envoltura > section { padding: 1.5rem; }
+.marcador-rotulo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--marcador-ambar);
+}
+/* Cifras de puntos luminosos: la máscara convierte el trazo en una rejilla
+   de LED y la sombra hace de halo. Solo números (ver riesgo del diseño). */
+.marcador-led {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+  text-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.55);
+  -webkit-mask-image: radial-gradient(circle, #000 62%, transparent 72%);
+  mask-image: radial-gradient(circle, #000 62%, transparent 72%);
+  -webkit-mask-size: 3px 3px;
+  mask-size: 3px 3px;
+}
+.marcador-led-oro { color: var(--marcador-ambar); text-shadow: 0 0 12px rgb(255 207 58 / 0.55); }
+.marcador-led-platino { color: #dff0f8; text-shadow: 0 0 12px rgb(159 212 236 / 0.55); }
+.marcador-etiqueta { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.marcador-tu {
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--background);
+  background: var(--accent-text);
+}
+
+.marcador-fila {
+  display: grid;
+  grid-template-columns: 2.75rem 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 150ms;
+}
+.marcador-fila:hover { background: rgb(255 255 255 / 0.025); }
+.marcador-fila[data-mio] {
+  background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0.2), rgb(var(--accent-rgb) / 0.05) 60%, transparent);
+  box-shadow: inset 3px 0 0 var(--accent-text);
+}
+.marcador-cabecera {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+.marcador-cabecera:hover { background: none; }
+.marcador-cabecera { display: none; }
+.marcador-cifras { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
+.marcador-dato { display: flex; flex-direction: column; gap: 0.25rem; }
+.marcador-acciones { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 0.5rem; }
+.marcador-acciones:empty { display: none; }
+@media (min-width: 640px) {
+  .marcador-fila { grid-template-columns: 3.5rem 44px minmax(0, 1fr) 7rem 5.5rem 6rem 4.5rem 11rem; padding: 0.875rem 1.5rem; }
+  .marcador-cabecera { display: grid; }
+  .marcador-cifras { display: contents; }
+  .marcador-dato { align-items: flex-end; }
+  .marcador-acciones { grid-column: auto; }
+  .marcador-acciones:empty { display: block; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .marcador-fila { grid-template-columns: 3rem 40px minmax(0, 1fr) 5.5rem 4.5rem 5rem 4rem; }
+  .marcador-acciones { grid-column: 3 / -1; }
+  .marcador-cabecera > :last-child { display: none; }
+}
+
+/* --- Ajustes: panel de control refinado (ajustes/layout.tsx, AjustesNav) -- */
+/* Móvil: tira horizontal con scroll. Desde md: menú lateral fijo por grupos. */
+.ajustes-nav { display: flex; gap: 0.25rem; overflow-x: auto; margin: 0 -1rem; padding: 0 1rem 0.5rem; scrollbar-width: none; }
+.ajustes-nav::-webkit-scrollbar { display: none; }
+.ajustes-nav-grupo { display: contents; }
+.ajustes-nav-rotulo { display: none; }
+.ajustes-nav-enlace {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  transition: background-color 150ms, color 150ms;
+}
+.ajustes-nav-enlace:hover { background: var(--surface-2); color: var(--foreground); }
+.ajustes-nav-enlace[aria-current="page"] {
+  color: var(--foreground);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+.ajustes-nav-enlace[aria-current="page"] svg { color: var(--accent-text); }
+@media (min-width: 768px) {
+  .ajustes-nav { display: block; overflow: visible; margin: 0; padding: 0; }
+  .ajustes-nav-grupo { display: flex; flex-direction: column; gap: 2px; }
+  .ajustes-nav-grupo + .ajustes-nav-grupo { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+  .ajustes-nav-rotulo {
+    display: block;
+    margin: 0 0 0.375rem 0.875rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .ajustes-nav-enlace { border: 0; box-shadow: inset 2px 0 0 transparent; }
+  .ajustes-nav-enlace[aria-current="page"] { box-shadow: inset 2px 0 0 var(--accent); }
+}
+
+/* Un grupo de opciones: título claro y una línea encima, sin tarjeta. */
+/* Solo relleno arriba: los contenedores ya separan con `gap`. */
+.ajustes-grupo { padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.ajustes-grupo > h2 { margin-bottom: 1rem; font-family: var(--font-heading); font-size: 1.0625rem; font-weight: 700; letter-spacing: 0.01em; }
+.ajustes-grupo > h2:has(+ .ajustes-ayuda), .ajustes-grupo > h2:has(+ p) { margin-bottom: 0.25rem; }
+.ajustes-ayuda { margin-bottom: 1rem; font-size: 0.8125rem; color: var(--muted); max-width: 62ch; }
+
+/* Opciones + vista previa fija a la derecha (Apariencia, General). */
+/* Por debajo de 1280 px no cabe al lado; ahí la propia página ya es la
+   vista previa (los cambios se aplican al momento), así que se oculta. */
+.ajustes-con-vista { display: grid; gap: 1.5rem; }
+.ajustes-vista { display: none; }
+@media (min-width: 1280px) {
+  .ajustes-con-vista { grid-template-columns: minmax(0, 1fr) 17rem; gap: 2.5rem; align-items: start; }
+  .ajustes-vista { display: block; position: sticky; top: 6rem; }
+}
+.ajustes-vista-rotulo { margin-bottom: 0.625rem; font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+
+.paleta-juego { padding: 4px; outline: 2px solid transparent; outline-offset: 0; transition: outline-color 150ms, background-color 150ms; }
+.paleta-juego:hover { background: var(--surface-2); }
+.paleta-juego[data-activo] { outline-color: var(--accent); }

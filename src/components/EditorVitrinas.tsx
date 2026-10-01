@@ -52,7 +52,7 @@ export function EditorVitrinas({
   const campo = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm focus:border-accent focus:outline-none";
 
   return (
-    <section className="rounded-[18px] border border-white/10 bg-surface-2/30 p-6">
+    <section className="ajustes-grupo">
       <h2 className="mb-1 font-semibold">{t("titulo")}</h2>
       <p className="mb-4 text-sm text-muted">{t("descripcion")}</p>
 

@@ -35,7 +35,7 @@ export function FirmaCompartible({ handle, origen }: { handle: string; origen: s
   }
 
   return (
-    <section className="rounded-[18px] border border-white/10 bg-surface-2/30 p-6">
+    <section className="ajustes-grupo">
       <h2 className="mb-1 font-semibold">{t("titulo")}</h2>
       <p className="mb-4 text-sm text-muted">{t("descripcion")}</p>
       {/* eslint-disable-next-line @next/next/no-img-element -- imagen generada por nuestra propia ruta, con su propia caché */}

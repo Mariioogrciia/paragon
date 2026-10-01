@@ -3,53 +3,68 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { EyeOff, Gamepad2, Palette, ShieldCheck, Sparkles, UserRound, type LucideIcon } from "lucide-react";
 
-const ITEMS = [
-  { href: "/ajustes", clave: "general" },
-  { href: "/ajustes/apariencia", clave: "apariencia" },
-  { href: "/ajustes/escaparate", clave: "escaparate" },
-  { href: "/ajustes/seguridad", clave: "seguridad" },
-  { href: "/ajustes/plataformas", clave: "plataformas" },
-  { href: "/ajustes/ocultar", clave: "ocultar" },
-] as const;
+const GRUPOS: { clave: "grupoPerfil" | "grupoCuenta" | "grupoPanel"; items: { href: string; clave: string; icono: LucideIcon }[] }[] = [
+  {
+    clave: "grupoPerfil",
+    items: [
+      { href: "/ajustes", clave: "general", icono: UserRound },
+      { href: "/ajustes/apariencia", clave: "apariencia", icono: Palette },
+      { href: "/ajustes/escaparate", clave: "escaparate", icono: Sparkles },
+    ],
+  },
+  {
+    clave: "grupoCuenta",
+    items: [
+      { href: "/ajustes/seguridad", clave: "seguridad", icono: ShieldCheck },
+      { href: "/ajustes/plataformas", clave: "plataformas", icono: Gamepad2 },
+    ],
+  },
+  {
+    clave: "grupoPanel",
+    items: [{ href: "/ajustes/ocultar", clave: "ocultar", icono: EyeOff }],
+  },
+];
 
 /**
  * Extraído de `ajustes/layout.tsx` (que es un Server Component, por la
  * llamada a `auth()`) porque saber en qué sección estás requiere
- * `usePathname()`, que solo existe en cliente. Antes los 5 enlaces tenían
- * exactamente el mismo estilo siempre — sin marcar cuál era la sección
- * activa, la única pista de dónde estabas era el contenido de la derecha.
+ * `usePathname()`, que solo existe en cliente.
  *
  * `/ajustes` necesita comparación EXACTA, no `startsWith` como el resto:
- * es el prefijo de todas las demás rutas de este menú, así que con
- * `startsWith` se habría quedado marcado como "activo" en cualquier otra
- * sección.
+ * es el prefijo de todas las demás rutas de este menú.
+ *
+ * Panel de control refinado (1 oct 2026): mismas seis secciones, ahora con
+ * icono y agrupadas. En móvil es una tira horizontal con scroll; desde `md`,
+ * menú lateral fijo.
  */
 export function AjustesNav() {
   const pathname = usePathname();
   const t = useTranslations("Onboarding");
 
   return (
-    <nav className="flex flex-col gap-1">
-      {ITEMS.map((item) => {
-        const activo = item.href === "/ajustes" ? pathname === item.href : pathname.startsWith(item.href);
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={activo ? "page" : undefined}
-            className={
-              activo
-                ? "flex items-center gap-3 rounded-lg border-l-2 px-4 py-3 text-sm font-medium text-foreground transition-colors"
-                : "flex items-center gap-3 rounded-lg border-l-2 border-transparent px-4 py-3 text-sm font-medium text-muted transition-colors hover:bg-white/5 hover:text-foreground"
-            }
-            style={activo ? { background: "rgba(255, 255, 255, 0.1)", borderColor: "var(--accent)" } : undefined}
-          >
-            {t(`ajustesNav.${item.clave}`)}
-          </Link>
-        );
-      })}
+    <nav aria-label={t("ajustesNav.titulo")} className="ajustes-nav">
+      {GRUPOS.map((grupo) => (
+        <div key={grupo.clave} className="ajustes-nav-grupo">
+          <p className="ajustes-nav-rotulo">{t(`ajustesNav.${grupo.clave}`)}</p>
+          {grupo.items.map((item) => {
+            const activo = item.href === "/ajustes" ? pathname === item.href : pathname.startsWith(item.href);
+            const Icono = item.icono;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={activo ? "page" : undefined}
+                className="ajustes-nav-enlace rounded-lg"
+              >
+                <Icono size={16} aria-hidden="true" className="shrink-0" />
+                {t(`ajustesNav.${item.clave}`)}
+              </Link>
+            );
+          })}
+        </div>
+      ))}
     </nav>
   );
 }

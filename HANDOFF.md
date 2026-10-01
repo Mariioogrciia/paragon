@@ -3,8 +3,10 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **30 de septiembre de 2026**.
 
-**Estado actual (1 oct 2026) — léelo antes que nada:** hay un rediseño de
-toda la plataforma a medias — ver "REDISEÑO DE TODA LA PLATAFORMA" al final.
+**Estado actual (1 oct 2026, tarde) — léelo antes que nada:** el rediseño
+de toda la plataforma por secciones está **terminado** (las 10) — ver
+"REDISEÑO DE TODA LA PLATAFORMA" al final. Queda relanzar el documentador
+para `DESIGN.md`.
 
 **Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
@@ -1111,7 +1113,7 @@ en Ligas y Clanes**, y seguir la recomendación de Claude para el resto
 - "Crea tu primera tarjeta" (landing): marco del acento y recorte en el hijo
   interior (antes dejaba dos rayas sueltas del brillo).
 
-## REDISEÑO DE TODA LA PLATAFORMA — EN CURSO (1 oct 2026) · LEER PRIMERO
+## REDISEÑO DE TODA LA PLATAFORMA — TERMINADO (1 oct 2026) · LEER PRIMERO
 
 El usuario pidió un rediseño visual de toda la plataforma **sin quitar ni
 cambiar ninguna funcionalidad** ("las funcionalidades las mismas, solo
@@ -1127,17 +1129,24 @@ nuevos diseños"). Se eligió sección a sección con la skill `impeccable`
 | Estadísticas | Calendario de calor protagonista | **Hecho** (`ActivityHeatmap` con `grande`, escala de metales) |
 | Descubrir | Matriz dificultad × horas | **Hecho** (`MatrizDificultad.tsx`, `getMatrizDescubrir` en lib/discover.ts; datos reales: rareza del platino × horas medias de usuarios) |
 | Comunidad | Muro de logros | **Hecho, sin verificar del todo**: dos columnas (`muro` en `ActivityFeed`), platinos con banner de portada — el banner no se vio con datos (no había platinos en la muestra) |
-| Panel | Cabina de widgets | **Pendiente** (diseño: las secciones del panel como módulos/baldosas de cabina; NO añadir arrastrar si cambia funciones) |
-| Amigos | Marcador de estadio | **Pendiente** (mismas secciones de /amigos; clasificación como marcador LED con cifras grandes, tu fila encendida) |
-| Ajustes | Panel de control refinado | **Pendiente** (mismos ajustes; menú lateral fijo, grupos claros, mini vista previa en vivo en Apariencia/perfil) |
-| Paletas | Paleta de tu juego favorito | **Pendiente** (opción en Apariencia que tiñe la app con el color de la carátula del favorito; ya existe `lib/coverAura.ts`; corregir contraste) |
+| Panel | Cabina de widgets | **Hecho** (`src/app/page.tsx` con sesión, clases `.cabina-*`): sin pestañas; rejilla de 12 columnas con bisel de esquinas en cada módulo, "siguiente platino" grande + platinos + lecturas, parejas de media anchura que pasan a ancho completo si falta una, pie "Editar panel" → /ajustes/ocultar. Sin arrastrar a propósito |
+| Amigos | Marcador de estadio | **Hecho** (`amigos/page.tsx`, clases `.marcador-*`): isla oscura que redefine los tokens (también en modo claro), cifras LED con máscara de puntos solo en números, tu fila encendida, RetosAmigos/PlatinarJuntos dentro del mismo marco |
+| Ajustes | Panel de control refinado | **Hecho** (`AjustesNav` con iconos y grupos, `.ajustes-*`): grupos con línea en vez de tarjetas, tira con scroll en móvil; vista previa fija desde 1280 px en Apariencia (mini app) y General ("Así te ven", lee el estado del formulario) |
+| Paletas | Paleta de tu juego favorito | **Hecho** ("Desde tu juego" en Apariencia): `lib/paletaJuego.ts` (con tests) saca acento claro/oscuro y suelo del `auraColor` de la carátula y fuerza contraste ≥5:1; clase `.accent-juego` + variables `--juego-*` en el `<html>`, guardado en `apariencia.acentoJuego` y reaplicado por el script anti-parpadeo. Probado por el usuario con una carátula real |
 
 Ya hecho antes (30 sept): paleta platino por defecto + 6 paletas completas,
 Ligas y Clanes como torre de tiempos ("carreras"), aviso "trofeo
 desbloqueado", landing nueva. DESIGN.md documenta el sistema hasta antes de
-este rediseño por secciones: **al terminar las 4 pendientes, relanzar el
-documentador** (`impeccable-documenter`) para que recoja carta, guía, lomos,
-calendario, matriz y muro.
+este rediseño por secciones: **pendiente relanzar el documentador**
+(`impeccable-documenter`) para que recoja carta, guía, lomos, calendario,
+matriz, muro, cabina, marcador, ajustes y paleta de juego.
+
+Verificado el 1 oct (tarde): panel con datos reales de fende21 (1440 px),
+Amigos y Ajustes con la sesión del usuario en el navegador del panel, en
+1440/1280 y 375 px (sin scroll horizontal). Trampa vista de nuevo: una regla
+de `globals.css` sin `@layer` (p. ej. `.marcador-fila { display: grid }`)
+le gana a `hidden` de Tailwind — para ocultar en móvil, hacerlo en el propio
+CSS, no con utilidades.
 
 Verificación: sin sesión en el navegador de Claude; las páginas públicas
 (perfil, ficha, biblioteca, estadísticas, Descubrir) se comprobaron con

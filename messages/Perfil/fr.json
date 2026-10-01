@@ -97,7 +97,12 @@
     "quitarMensaje": "{nombre} ne verra plus ton activité, et tu devrais lui renvoyer une demande d'ami pour le/la rajouter.",
     "quitarConfirmar": "Oui, retirer",
     "quitar": "Retirer",
-    "compararSeleccionados": "Comparer la sélection"
+    "compararSeleccionados": "Comparer la sélection",
+    "colPos": "Pos",
+    "colJugador": "Chasseur",
+    "colXp": "XP",
+    "tuEtiqueta": "Toi",
+    "marcadorPie": "Classé par XP Paragon"
   },
   "CompararGrupoPage": {
     "meta": "Comparaison de groupe · Paragon",

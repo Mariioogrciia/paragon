@@ -24,19 +24,22 @@ export default async function AjustesOcultarPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-bold mb-2">{t("ajustesOcultar.title")}</h1>
+        <h1 className="font-heading text-2xl font-bold mb-2">{t("ajustesOcultar.title")}</h1>
         <p className="text-sm text-muted">
           {t("ajustesOcultar.description")}
         </p>
       </div>
 
-      <HiddenNavForm opciones={navTraducido} ocultas={ocultas} />
+      <section className="ajustes-grupo">
+        <h2>{t("ajustesOcultar.navTitle")}</h2>
+        <HiddenNavForm opciones={navTraducido} ocultas={ocultas} />
+      </section>
 
-      <div className="mt-4">
-        <h2 className="text-lg font-bold mb-2">{t("ajustesOcultar.panelTitle")}</h2>
-        <p className="text-sm text-muted">{t("ajustesOcultar.panelDescription")}</p>
-      </div>
-      <HiddenNavForm opciones={panelTraducido} ocultas={[...panelOculto]} action={setPanelOcultoAction} />
+      <section className="ajustes-grupo">
+        <h2>{t("ajustesOcultar.panelTitle")}</h2>
+        <p className="ajustes-ayuda">{t("ajustesOcultar.panelDescription")}</p>
+        <HiddenNavForm opciones={panelTraducido} ocultas={[...panelOculto]} action={setPanelOcultoAction} />
+      </section>
     </div>
   );
 }

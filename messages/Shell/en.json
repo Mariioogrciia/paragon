@@ -284,7 +284,11 @@
       "discordAnuncio": "just earned the platinum for",
       "discordRareza": "Community rarity",
       "discordDificultad": "Average difficulty: {n}/10"
-    }
+    },
+    "editarPanel": "Edit dashboard",
+    "lecturas": "Readouts",
+    "cabinaPie": "{n, plural, =0 {Every module on display} one {# module hidden} other {# modules hidden}}",
+    "cabinaPieAccion": "Choose which modules you see"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Sample profile",

@@ -73,7 +73,7 @@ export const users = pgTable("user", {
   /** Título especial desbloqueado por nivel o insignia (clave de lib/titulos.ts). */
   tituloDesbloqueado: text("tituloDesbloqueado"),
   /** Acento/estilo/tamaño de texto, para que no se queden en un solo navegador (lib/apariencia.ts). */
-  apariencia: jsonb("apariencia").$type<{ acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string }>(),
+  apariencia: jsonb("apariencia").$type<{ acento?: string; acentoLibre?: string; acentoJuego?: { id: string; color: string }; estilo?: string; tamanoTexto?: string }>(),
   /** Secciones del panel ocultas por el usuario (lib/panelPreferences.ts). */
   panelOculto: jsonb("panelOculto").$type<string[]>(),
   /** Categorías de aviso apagadas por el usuario (lib/avisosPreferencias.ts). */

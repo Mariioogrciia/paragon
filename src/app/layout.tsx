@@ -215,7 +215,11 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `try{
               var libre=localStorage.getItem("platinos:acento-libre");
-              if(libre){
+              var juego=JSON.parse(localStorage.getItem("platinos:acento-juego")||"null");
+              if(juego&&juego.vars){
+                for(var k in juego.vars) if(/^--juego-/.test(k)) document.documentElement.style.setProperty(k, juego.vars[k]);
+                document.documentElement.classList.add("accent-juego");
+              } else if(libre){
                 var m=/^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(libre);
                 if(m){
                   document.documentElement.style.setProperty("--accent-rgb", parseInt(m[1],16)+" "+parseInt(m[2],16)+" "+parseInt(m[3],16));

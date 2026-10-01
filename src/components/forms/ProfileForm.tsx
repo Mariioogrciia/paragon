@@ -235,17 +235,22 @@ export function ProfileForm({
     setIsUploadingBanner(false);
   };
 
+  const nombreVista = `${firstName} ${lastName}`.trim() || user.name || `@${handle}`;
+  const efectoVista = efecto ? EFECTO_POR_CLAVE.get(efecto) : undefined;
+  const presetVista = bannerPresetKey(banner);
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="ajustes-con-vista">
+    <div className="flex min-w-0 flex-col gap-8">
       <div>
-        <h1 className="text-xl font-bold mb-2">{t("profileForm.title")}</h1>
+        <h1 className="font-heading text-2xl font-bold mb-2">{t("profileForm.title")}</h1>
         <p className="text-sm text-muted">{t("profileForm.description")}</p>
       </div>
 
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-4">{t("profileForm.avatar.title")}</h2>
         <div className="flex items-center gap-6">
-          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-surface-2 border border-white/10 flex items-center justify-center">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-surface-2 border border-border flex items-center justify-center">
             {avatar ? (
               <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
             ) : (
@@ -260,7 +265,7 @@ export function ProfileForm({
               </label>
               
               {cuentasVinculadas && cuentasVinculadas.length > 0 && (
-                <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+                <div className="flex items-center gap-2 border-l border-border pl-3">
                   <span className="text-xs text-muted mr-1">O usa de:</span>
                   {cuentasVinculadas.map((acc) => (
                     <button
@@ -283,10 +288,10 @@ export function ProfileForm({
         </div>
       </section>
 
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-4">{t("profileForm.banner.title")}</h2>
         <div className="flex flex-col gap-4">
-          <div className="h-32 w-full shrink-0 overflow-hidden rounded-xl bg-surface-2 border border-white/10 flex items-center justify-center">
+          <div className="h-32 w-full shrink-0 overflow-hidden rounded-xl bg-surface-2 border border-border flex items-center justify-center">
             {bannerPresetKey(banner) ? (
               <PlatformBanner preset={bannerPresetKey(banner)!} className="h-full w-full" />
             ) : banner ? (
@@ -317,24 +322,24 @@ export function ProfileForm({
       <form id="profile-form" action="/api/profile/update" method="POST" className="flex flex-col gap-8">
         <input type="hidden" name="profileBannerUrl" value={banner ?? ""} />
         <input type="hidden" name="image" value={avatar ?? ""} />
-        <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <section className="ajustes-grupo">
           <h2 className="font-semibold mb-4">{t("profileForm.details.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.usernameLabel")}</label>
-              <input name="handle" value={handle} onChange={(e) => setHandle(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="handle" value={handle} onChange={(e) => setHandle(e.target.value)} className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.emailLabel")}</label>
-              <input name="email" defaultValue={user.email ?? ""} disabled className="w-full rounded-xl border border-white/10 bg-[var(--surface)]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
+              <input name="email" defaultValue={user.email ?? ""} disabled className="w-full rounded-xl border border-border bg-[var(--surface)]/50 px-4 py-3 text-sm text-muted cursor-not-allowed focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.firstNameLabel")}</label>
-              <input name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.lastNameLabel")}</label>
-              <input name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.profileTitleLabel")}</label>
@@ -344,7 +349,7 @@ export function ProfileForm({
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
                 placeholder={t("profileForm.details.profileTitlePlaceholder")}
-                className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none"
+                className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none"
               />
               {titulosSugeridos.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -454,12 +459,12 @@ export function ProfileForm({
             </div>
             <div className="md:col-span-2">
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.statusLabel")}</label>
-              <input name="statusText" maxLength={100} value={statusText} onChange={(e) => setStatusText(e.target.value)} placeholder={t("profileForm.details.statusPlaceholder")} className="w-full rounded-xl border border-white/10 bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
+              <input name="statusText" maxLength={100} value={statusText} onChange={(e) => setStatusText(e.target.value)} placeholder={t("profileForm.details.statusPlaceholder")} className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
           </div>
         </section>
 
-        <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <section className="ajustes-grupo">
           <h2 className="font-semibold mb-4">{t("profileForm.visual.title")}</h2>
 
           {/* Previsualización en vivo: marco, título y color se elegían en
@@ -539,7 +544,7 @@ export function ProfileForm({
           </div>
         </section>
 
-        <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+        <section className="ajustes-grupo">
           <h2 className="font-semibold mb-4">{t("profileForm.regional.title")}</h2>
           <div className="max-w-sm">
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.timezoneLabel")}</label>
@@ -598,15 +603,53 @@ export function ProfileForm({
       {/* Fuera del <form> grande a propósito: son dos acciones de servidor
           propias (guardar/probar), y un <form> dentro de otro no es HTML
           válido — el navegador ignora el anidado y rompe el envío. */}
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-4">{t("profileForm.discordTitle")}</h2>
         <DiscordDmForm enabled={user.discordDmEnabled ?? false} vinculado={discordVinculado} />
       </section>
 
-      <section className="rounded-[18px] p-6 border border-white/10 bg-surface-2/30">
+      <section className="ajustes-grupo">
         <h2 className="font-semibold mb-4">{t("profileForm.pushTitle")}</h2>
         <PushToggle />
       </section>
+    </div>
+
+      {/* Vista previa del perfil: lee el estado del formulario, así cambia
+          mientras se edita (antes había que guardar e ir al perfil). */}
+      <aside className="ajustes-vista" aria-label={t("profileForm.previewTitle")}>
+        <p className="ajustes-vista-rotulo">{t("profileForm.previewTitle")}</p>
+        <div className="overflow-hidden rounded-[18px] border border-[var(--border)] bg-[var(--surface)]">
+          <div className="relative h-20 overflow-hidden" style={{ background: `linear-gradient(135deg, ${profileColor}, var(--surface-2))` }}>
+            {presetVista ? (
+              <PlatformBanner preset={presetVista} className="h-full w-full" />
+            ) : banner && !/\.(mp4|webm)$/i.test(banner) ? (
+              <img src={banner} alt="" className="h-full w-full object-cover" />
+            ) : null}
+          </div>
+          <div className="px-4 pb-4">
+            <div className="-mt-8 w-fit rounded-full ring-4 ring-[var(--surface)]">
+              <AvatarFrame frame={marco}>
+                <Avatar src={avatar ?? undefined} name={nombreVista} size={60} />
+              </AvatarFrame>
+            </div>
+            <p className="font-heading mt-2 truncate text-lg font-bold leading-tight">
+              {efectoVista ? (
+                <span className="nombre-efecto" style={{ backgroundImage: efectoVista.degradado }}>{nombreVista}</span>
+              ) : (
+                nombreVista
+              )}
+            </p>
+            <p className="truncate text-xs text-muted">@{handle || "…"}</p>
+            {titulo && (
+              <p className="mt-2 w-fit max-w-full truncate rounded-full px-2 py-0.5 text-[0.6875rem] font-bold" style={{ background: "var(--accent-soft)", color: "var(--accent-text)" }}>
+                {titulo}
+              </p>
+            )}
+            {statusText && <p className="mt-2 line-clamp-2 text-xs text-muted">“{statusText}”</p>}
+          </div>
+        </div>
+        <p className="mt-2.5 text-xs text-muted">{t("profileForm.previewHint")}</p>
+      </aside>
     </div>
   );
 }

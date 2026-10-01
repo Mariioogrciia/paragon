@@ -97,7 +97,12 @@
     "quitarMensaje": "{nombre} dejará de ver tu actividad y tendrías que volver a mandarle una solicitud para añadirle otra vez.",
     "quitarConfirmar": "Sí, quitar",
     "quitar": "Quitar",
-    "compararSeleccionados": "Comparar seleccionados"
+    "compararSeleccionados": "Comparar seleccionados",
+    "colPos": "Pos",
+    "colJugador": "Cazador",
+    "colXp": "XP",
+    "tuEtiqueta": "Tú",
+    "marcadorPie": "Ordenado por XP Paragon"
   },
   "CompararGrupoPage": {
     "meta": "Comparar en grupo · Paragon",
