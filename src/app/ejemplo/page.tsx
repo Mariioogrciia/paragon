@@ -5,13 +5,18 @@ import { GameCard } from "@/components/GameCard";
 import { ParagonWrap } from "@/components/ParagonWrap";
 import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
-import { DEMO_ANIO, DEMO_JUEGOS, DEMO_JUGADOR } from "@/lib/demo";
+import { DEMO_ANIO, DEMO_HANDLE, DEMO_JUEGOS, DEMO_JUGADOR } from "@/lib/demo";
+import { CartaHolo } from "@/components/CartaHolo";
+import { Badges } from "@/components/Badges";
+import { coverGradient } from "@/lib/design";
 import { gameProgress, summarise } from "@/lib/stats";
 import { BackButton } from "@/components/BackButton";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { PlatformBanner } from "@/components/BannerPresets";
 
 export const metadata = { title: "Perfil de ejemplo · Paragon" };
+
+const DEMO_INSIGNIAS = ["first_blood", "cazador", "multiplataforma", "rolero", "joya_rara"].map((badgeId) => ({ badgeId, earnedAt: new Date("2026-09-01") }));
 
 /**
  * El perfil de ejemplo de la portada.
@@ -75,19 +80,46 @@ export default async function EjemploPage() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-end gap-5">
-            <AvatarFrame frame="cristal">
-              <Avatar src={null} name={DEMO_JUGADOR.name} size={92} />
-            </AvatarFrame>
+          {/* Misma cabecera que /u/[handle] desde el rediseño (1 oct 2026):
+              la carta holográfica con avatar, nivel y las cuatro cifras. */}
+          <div className="flex flex-col gap-6 md:flex-row md:items-end">
+            <CartaHolo className="mx-auto w-full max-w-[300px] shrink-0 md:mx-0">
+              <Link href="/entrar" className="carta-holo-cara block px-5 pb-5 pt-4" aria-label={t("crearElMio")}>
+                <span className="flex items-center justify-between text-[0.6875rem] font-bold">
+                  <span className="text-[var(--accent-text)]">PARAGON</span>
+                  <span className="carreras-cifra rounded-full border border-[rgb(var(--accent-rgb)/0.4)] px-2 py-0.5 text-[var(--accent-text)]">
+                    {t("nivel", { nivel: DEMO_JUGADOR.trophyLevel ?? 0 })}
+                  </span>
+                </span>
+                <span className="mt-4 flex justify-center">
+                  <AvatarFrame frame="cristal">
+                    <Avatar src={null} name={DEMO_JUGADOR.name} size={104} />
+                  </AvatarFrame>
+                </span>
+                <span className="mt-4 block text-center">
+                  <span className="block truncate font-heading text-2xl font-bold uppercase leading-tight">{DEMO_JUGADOR.name}</span>
+                  <span className="mt-1 block truncate text-xs text-muted">@{DEMO_HANDLE}</span>
+                </span>
+                <span className="mt-4 grid grid-cols-4 gap-1 border-t border-[var(--border)] pt-3 text-center">
+                  {[
+                    { v: stats.platinos, l: t("platinos"), c: "var(--platinum)" },
+                    { v: stats.trofeos, l: t("trofeos") },
+                    { v: stats.juegos, l: t("juegos") },
+                    { v: `${stats.completadoMedio}%`, l: t("completadoMedio") },
+                  ].map((s) => (
+                    <span key={s.l} className="min-w-0">
+                      <span className="carreras-cifra block text-lg leading-none" style={s.c ? { color: s.c } : undefined}>{s.v}</span>
+                      <span className="mt-1 block text-[0.625rem] font-semibold leading-tight text-muted">{s.l}</span>
+                    </span>
+                  ))}
+                </span>
+              </Link>
+            </CartaHolo>
 
-            <div className="min-w-0">
-              <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">
-                {DEMO_JUGADOR.name}
-              </h1>
-              <p className="mt-2 text-sm text-muted">{t("plataformasDemo")}</p>
-              <p className="mt-3 text-[0.8125rem] font-bold tracking-[0.06em] text-accent-2">
-                {t("nivel", { nivel: DEMO_JUGADOR.trophyLevel ?? 0 })}
-              </p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-muted">{t("plataformasDemo")}</p>
+              {/* Insignias como en un perfil real (ids reales de lib/logros). */}
+              <Badges earnedBadges={DEMO_INSIGNIAS} />
             </div>
           </div>
         </div>
@@ -135,12 +167,32 @@ export default async function EjemploPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Lomos de caja, la vista por defecto de la biblioteca: mismo
+              cálculo que LibraryGrid (alto según horas, franja del metal
+              alcanzado). Llevan a registrarse: aquí no hay fichas reales. */}
+          <div className="flex flex-wrap items-end gap-y-8">
             {[...DEMO_JUEGOS]
               .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""))
-              .map((game) => (
-                <GameCard key={game.id} game={game} href="/entrar" />
-              ))}
+              .map((game) => {
+                const pct = game.progressPercent ?? 0;
+                const metal = pct >= 100 ? "#9fd4ec" : pct >= 75 ? "#e2b53e" : pct >= 40 ? "#b9c2cc" : pct > 0 ? "#c07b4a" : "var(--border)";
+                const alto = Math.round(Math.min(300, 170 + Math.sqrt((game.playtimeMinutes ?? 0) / 60) * 9));
+                return (
+                  <div key={game.id} className="lomo-hueco">
+                    <Link
+                      href="/entrar"
+                      className="lomo"
+                      style={{ height: alto, ["--metal" as string]: metal, ...(game.iconUrl ? { ["--portada" as string]: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }) }}
+                      title={`${game.title} · ${pct}%`}
+                    >
+                      <span className="lomo-franja" aria-hidden="true" />
+                      <span className="lomo-titulo">{game.title}</span>
+                      <span className="lomo-pct">{pct}%</span>
+                    </Link>
+                    <div className="lomo-balda" aria-hidden="true" />
+                  </div>
+                );
+              })}
           </div>
         </section>
 

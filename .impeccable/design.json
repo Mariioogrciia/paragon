@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-30T21:48:36.000Z",
+  "generatedAt": "2026-10-01T14:16:25.963Z",
   "title": "Design System: Paragon",
   "extensions": {
     "colorMeta": {
@@ -378,6 +378,126 @@
           "#d6d6d6",
           "#f2f2f2"
         ]
+      },
+      "flap-amber": {
+        "role": "semantic",
+        "displayName": "Flap Amber",
+        "canonical": "#ffcf3a",
+        "tonalRamp": [
+          "#211b08",
+          "#524314",
+          "#836b21",
+          "#b4932d",
+          "#d4b554",
+          "#e2ce8d",
+          "#f0e5c2",
+          "#faf6eb"
+        ]
+      },
+      "flap-amber-light": {
+        "role": "semantic",
+        "displayName": "Flap Amber (light mode)",
+        "canonical": "#a16207",
+        "tonalRamp": [
+          "#211708",
+          "#523914",
+          "#835b21",
+          "#b47c2d",
+          "#d4a054",
+          "#e2bf8d",
+          "#f0ddc2",
+          "#faf4eb"
+        ]
+      },
+      "flap-tile": {
+        "role": "neutral",
+        "displayName": "Flap Tile",
+        "canonical": "#1c2028",
+        "tonalRamp": [
+          "#111318",
+          "#2a303c",
+          "#434d60",
+          "#5c6a84",
+          "#818ea7",
+          "#abb3c4",
+          "#d2d7e0",
+          "#f0f2f5"
+        ]
+      },
+      "spine-ink": {
+        "role": "neutral",
+        "displayName": "Spine Ink",
+        "canonical": "#f4f6fa",
+        "tonalRamp": [
+          "#0d121c",
+          "#202d46",
+          "#334770",
+          "#46629a",
+          "#6c87bc",
+          "#9dafd2",
+          "#cad4e7",
+          "#edf1f7"
+        ]
+      },
+      "brand-playstation": {
+        "role": "secondary",
+        "displayName": "PlayStation Brand",
+        "canonical": "#0070d1",
+        "tonalRamp": [
+          "#081521",
+          "#143552",
+          "#215583",
+          "#2d75b4",
+          "#5499d4",
+          "#8dbbe2",
+          "#c2daf0",
+          "#ebf3fa"
+        ]
+      },
+      "brand-xbox": {
+        "role": "secondary",
+        "displayName": "Xbox Brand",
+        "canonical": "#107c10",
+        "tonalRamp": [
+          "#082108",
+          "#145214",
+          "#218321",
+          "#2db42d",
+          "#54d454",
+          "#8de28d",
+          "#c2f0c2",
+          "#ebfaeb"
+        ]
+      },
+      "brand-steam": {
+        "role": "secondary",
+        "displayName": "Steam Brand",
+        "canonical": "#1b2838",
+        "tonalRamp": [
+          "#0d141c",
+          "#213145",
+          "#354f6e",
+          "#496c97",
+          "#6e90b9",
+          "#9fb5d1",
+          "#cbd7e6",
+          "#eef2f7"
+        ]
+      },
+      "brand-epic": {
+        "role": "secondary",
+        "displayName": "Epic Brand",
+        "canonical": "#2a2a2a",
+        "tonalRamp": [
+          "#141414",
+          "#333333",
+          "#525252",
+          "#707070",
+          "#949494",
+          "#b8b8b8",
+          "#d9d9d9",
+          "#f2f2f2"
+        ]
       }
     },
     "typographyMeta": {
@@ -408,6 +528,42 @@
       "label": {
         "displayName": "Label",
         "purpose": "Chips, metadata, rarity figures, stat labels."
+      },
+      "page-title": {
+        "displayName": "Page Title",
+        "purpose": "App page titles, uppercase."
+      },
+      "section-headline": {
+        "displayName": "Section Headline",
+        "purpose": "Protagonist section of a redesigned page (heat calendar, difficulty matrix)."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Settings group headings, compact card titles."
+      },
+      "rank-numeral": {
+        "displayName": "Rank Numeral",
+        "purpose": "Outline position numbers in the hit list; podium filled in its metal. Variants 2.25rem and 1.75rem; hero clamp(6rem,16vw,11rem)."
+      },
+      "body-md": {
+        "displayName": "Body Medium",
+        "purpose": "Primary button text, cartel and toast trophy names, emphasised row titles (0.9375rem)."
+      },
+      "body-ui": {
+        "displayName": "Body UI",
+        "purpose": "Inputs, settings nav links, house button."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Secondary row lines, departures status."
+      },
+      "label-sm": {
+        "displayName": "Label Small",
+        "purpose": "Board column headers, stat captions, heatmap axes, the you tag, spine percentages (0.625rem)."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Genre/platform tags, small title badges, compact chart ticks (0.5625rem). Floor of the scale."
       }
     },
     "shadows": [
@@ -455,6 +611,31 @@
         "name": "trophy-flash",
         "value": "0 0 22px 4px rgb(var(--accent-rgb) / 0.55)",
         "purpose": "One-time peak of the toast icon's accent flash."
+      },
+      {
+        "name": "holo-aura",
+        "value": "0 30px 60px -28px rgb(var(--accent-rgb) / 0.55), 0 12px 24px -12px rgb(0 0 0 / 0.6)",
+        "purpose": "Profile holographic card."
+      },
+      {
+        "name": "board-bezel",
+        "value": "inset 0 0 0 4px color-mix(in srgb, var(--background) 70%, black), inset 0 0 0 5px var(--border), 0 18px 40px -24px rgb(0 0 0 / 0.8)",
+        "purpose": "Scoreboard and departures board; light mode uses surface for the ring and a 25% drop."
+      },
+      {
+        "name": "spine-lift",
+        "value": "0 14px 22px -10px var(--metal)",
+        "purpose": "Box spine pulled from the shelf, in its grade metal."
+      },
+      {
+        "name": "led-glow",
+        "value": "text-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.55)",
+        "purpose": "Scoreboard LED figures (with a 3px radial dot mask). Figures only."
+      },
+      {
+        "name": "cabina-numeral-glow",
+        "value": "text-shadow: 0 0 40px rgb(var(--accent-rgb) / 0.35)",
+        "purpose": "Cockpit headline figure."
       }
     ],
     "motion": [
@@ -502,6 +683,36 @@
         "name": "livery-streak",
         "value": "background-position 600ms cubic-bezier(0.16, 1, 0.3, 1)",
         "purpose": "Left-to-right livery sweep on Carreras standings rows; transition removed under reduced motion."
+      },
+      {
+        "name": "holo-tilt",
+        "value": "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Holo card tilt (max 8deg x 10deg, perspective 900px) following a mouse pointer; still on touch and reduced motion."
+      },
+      {
+        "name": "spine-pull",
+        "value": "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms",
+        "purpose": "Box spine rises 12px on hover/focus."
+      },
+      {
+        "name": "cabina-bracket",
+        "value": "opacity 200ms, inset 200ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Cockpit corner brackets brighten and move from 6px to 8px out on hover."
+      },
+      {
+        "name": "casa-art-enter",
+        "value": "600ms cubic-bezier(0.16, 1, 0.3, 1), from opacity 0 scale 1.03",
+        "purpose": "Platform house hero art entrance."
+      },
+      {
+        "name": "casa-autoadvance",
+        "value": "8s",
+        "purpose": "House hero advances unless hovered or reduced motion."
+      },
+      {
+        "name": "list-row-hover",
+        "value": "background-color 150ms",
+        "purpose": "Rows in boards, rankings, guide, ticker: fill only; .fila-lista cancels the global glow inside cards."
       }
     ],
     "breakpoints": [
@@ -510,12 +721,23 @@
         "value": "640px"
       },
       {
+        "name": "md",
+        "value": "768px",
+        "purpose": "Settings sidebar, community wall 2 columns, boards full table."
+      },
+      {
+        "name": "hit-list",
+        "value": "900px",
+        "purpose": "Hit list two columns, Steam capsule split."
+      },
+      {
         "name": "lg",
         "value": "1024px"
       },
       {
-        "name": "container",
-        "value": "1240px"
+        "name": "xl",
+        "value": "1280px",
+        "purpose": "Settings live preview beside options."
       }
     ],
     "gradients": [
@@ -553,6 +775,41 @@
         "name": "palette-swatch",
         "value": "linear-gradient(135deg, <ground> 50%, <accent> 50%)",
         "purpose": "Picker swatch for full palettes."
+      },
+      {
+        "name": "holo-frame",
+        "value": "linear-gradient(150deg, rgb(var(--accent-rgb) / 0.8), rgb(var(--accent-rgb) / 0.15) 40%, var(--accent-2) 70%, rgb(var(--accent-rgb) / 0.4))",
+        "purpose": "1px frame of the holo card."
+      },
+      {
+        "name": "holo-foil",
+        "value": "radial-gradient(circle at var(--mx) var(--my), rgb(255 255 255 / 0.22), transparent 42%), linear-gradient(115deg, transparent 25%, rgb(159 212 236 / 0.18) 38%, rgb(255 214 170 / 0.14) 46%, rgb(196 181 253 / 0.16) 54%, transparent 68%)",
+        "purpose": "Foil layer, mix-blend-mode screen."
+      },
+      {
+        "name": "matrix-plane",
+        "value": "linear-gradient(135deg, rgb(78 201 138 / 0.07), transparent 45%, transparent 55%, rgb(255 107 107 / 0.08)), var(--surface)",
+        "purpose": "Difficulty x hours plane: easy/short good, hard/long danger."
+      },
+      {
+        "name": "board-ground",
+        "value": "radial-gradient(circle, rgb(255 255 255 / 0.035) 1px, transparent 1.4px) 0 0 / 6px 6px, linear-gradient(180deg, color-mix(in srgb, var(--surface) 80%, black), color-mix(in srgb, var(--background) 75%, black))",
+        "purpose": "Scoreboard (with dot grid) and departures board (without), from theme tokens."
+      },
+      {
+        "name": "spine-veil",
+        "value": "linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.78)), var(--portada) center / cover",
+        "purpose": "Box spine: fixed dark veil over its own cover art."
+      },
+      {
+        "name": "flap-tile",
+        "value": "linear-gradient(180deg, #1c2028 0 49%, #0b0d11 49% 51%, #171a21 51% 100%)",
+        "purpose": "Split-flap date tile, dark in every mode."
+      },
+      {
+        "name": "brand-tile",
+        "value": "linear-gradient(150deg, <brand>, color-mix(in srgb, <brand> 55%, black))",
+        "purpose": "Discover platform access tiles."
       }
     ],
     "themeAxes": {
@@ -720,6 +977,102 @@
         }
       ],
       "source": "src/lib/librea.ts"
+    },
+    "gamePalette": {
+      "class": "accent-juego",
+      "source": "src/lib/paletaJuego.ts, globals.css .accent-juego",
+      "variables": [
+        "--juego-rgb",
+        "--juego-rgb-claro",
+        "--juego-2",
+        "--juego-bg",
+        "--juego-surface",
+        "--juego-surface-2",
+        "--juego-border"
+      ],
+      "derivation": "Hue of games.auraColor. Ground L 5.5/8.5/13/19%, sat capped 30%. Greys kept (s<0.12), else s>=0.55. Dark accent lightened to >=5:1 vs surface; light accent darkened to >=5:1 vs white; accent-2 L>=86%.",
+      "split": "Ground only in .dark; .light takes --juego-rgb-claro."
+    },
+    "platformHouses": {
+      "scope": "/descubrir/playstation, /xbox, /steam, /epic (.casa wrapper, always dark)",
+      "source": "src/app/globals.css .casa*, components/descubrir/DestacadoCasa.tsx",
+      "bleed": "box-shadow 0 0 0 100vmax var(--background) + clip-path inset(0 -100vmax); never 100vw",
+      "houses": {
+        "ps": {
+          "background": "#071226",
+          "surface": "#0d1d3a",
+          "surface-2": "#15294f",
+          "border": "#20376a",
+          "foreground": "#f2f6ff",
+          "muted": "#a9b8d6",
+          "accentRgb": "0 112 209",
+          "accent2": "#6db3ff",
+          "hero": "Full-bleed art scene, tile row on top (56px, active 88px)",
+          "headings": "Barlow, no uppercase"
+        },
+        "xbox": {
+          "background": "#0e0f0e",
+          "surface": "#181a18",
+          "surface-2": "#232623",
+          "border": "#2f332f",
+          "foreground": "#f1f4f1",
+          "muted": "#a9b0a9",
+          "accentRgb": "16 124 16",
+          "accent2": "#5edc4a",
+          "accentText": "#6be05a",
+          "radius": "6px",
+          "hero": "Mosaic 1 large (4x2) + 4 squares, 6 columns from md"
+        },
+        "steam": {
+          "background": "#1b2838",
+          "surface": "#16202d",
+          "surface-2": "#2a475e",
+          "border": "#2f4a63",
+          "foreground": "#e3ebf2",
+          "muted": "#8f98a0",
+          "accentRgb": "102 192 244",
+          "accent2": "#c6e6f8",
+          "radius": "4px",
+          "hero": "Capsule 1.7fr + side column of 2x2 thumbnails, green gradient button"
+        },
+        "epic": {
+          "background": "#101014",
+          "surface": "#18181c",
+          "surface-2": "#26262c",
+          "border": "#303036",
+          "foreground": "#ffffff",
+          "muted": "#a8a8ad",
+          "accentRgb": "38 187 255",
+          "accent2": "#bde9ff",
+          "radius": "12px",
+          "hero": "Banner + 15rem game list on the right from lg"
+        }
+      },
+      "body": "Two columns from lg (7fr own | 5fr rankings); one when no rankings; releases full width below."
+    },
+    "brandMarks": {
+      "source": "components/PlatformTiles.tsx",
+      "tiles": {
+        "playstation": "#0070d1",
+        "xbox": "#107c10",
+        "steam": "#1b2838",
+        "epic": "#2a2a2a"
+      },
+      "logo": "filter: brightness(0) invert(1) on brand fills",
+      "rule": "Platform brand colours only in platform-identity contexts."
+    },
+    "sectionMetaphors": {
+      "perfil": "Holographic card",
+      "juego": "Strategy guide",
+      "biblioteca": "Box spines",
+      "estadisticas": "Heat calendar protagonist",
+      "descubrir": "Difficulty x hours matrix + hit list",
+      "comunidad": "Wall of achievements",
+      "panel": "Cockpit of widgets",
+      "amigos": "Stadium scoreboard",
+      "noticias": "Departures board + wire ticker",
+      "ajustes": "Refined control panel",
+      "plataformas": "Each in its own house"
     }
   },
   "components": [
@@ -810,19 +1163,81 @@
       "description": "Ligas/Clanes only: livery P# dorsal on a skewed plate, tabular figures, gap to leader, left-to-right livery streak on hover.",
       "html": "<div class=\"ds-tower\"><h3 class=\"ds-tower-title\"><span>September 2026 league</span></h3><div class=\"ds-row\" style=\"--librea:#ff6a00\"><span class=\"ds-dorsal\" style=\"--librea:#ff6a00;--librea-tinta:#111\"><span>P1</span></span><span class=\"ds-row-name\">kratos_main</span><span class=\"ds-fig ds-fig-pts\">4,820</span><span class=\"ds-fig ds-fig-gap\">Leader</span></div><div class=\"ds-row\" style=\"--librea:#00b8ff\"><span class=\"ds-dorsal\" style=\"--librea:#00b8ff;--librea-tinta:#04121f\"><span>P2</span></span><span class=\"ds-row-name\">hollow_hunter</span><span class=\"ds-fig ds-fig-pts\">4,310</span><span class=\"ds-fig ds-fig-gap\">−510</span></div><div class=\"ds-band\" style=\"--librea:#ff6a00;--librea-tinta:#111\"></div></div>",
       "css": ".ds-tower{max-width:32rem;color:var(--foreground,#e9eef7)}.ds-tower-title{margin:0 0 12px;font:700 1.5rem 'Chakra Petch',Barlow,sans-serif;text-transform:uppercase}.ds-tower-title>span{display:inline-block;transform:skewX(-8deg)}.ds-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border,#212a38);cursor:pointer;background-image:linear-gradient(90deg,transparent,color-mix(in srgb,var(--librea) 14%,transparent) 50%,transparent);background-size:200% 100%;background-position:200% 0;background-repeat:no-repeat;transition:background-position 600ms cubic-bezier(0.16,1,0.3,1),background-color 200ms}.ds-row:hover{background-position:-100% 0;background-color:rgb(124 196 228 / 0.04)}.ds-dorsal{display:inline-flex;min-width:2.75rem;align-items:center;justify-content:center;padding:0.25rem 0.6rem;transform:skewX(-12deg);background:var(--librea);color:var(--librea-tinta);font:700 0.875rem/1.1 'Chakra Petch',Barlow,sans-serif;letter-spacing:.02em;font-variant-numeric:tabular-nums;box-shadow:0 6px 14px -8px var(--librea)}.ds-dorsal>span{display:inline-block;transform:skewX(12deg)}.ds-row-name{flex:1;min-width:0;font:600 0.8125rem Barlow,sans-serif}.ds-fig{font-family:'Chakra Petch',Barlow,sans-serif;font-weight:700;font-variant-numeric:tabular-nums}.ds-fig-pts{font-size:1.25rem;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-fig-gap{width:4.5rem;text-align:right;font-size:0.875rem;color:var(--muted,#a7b0c0)}.ds-band{margin-top:24px;height:6px;border-radius:9999px;opacity:.85;background:repeating-linear-gradient(-60deg,var(--librea) 0 18px,var(--librea-tinta) 18px 22px)}@media (prefers-reduced-motion:reduce){.ds-row{transition:none}}"
+    },
+    {
+      "name": "Holo Card",
+      "kind": "custom",
+      "refersTo": "holo-card",
+      "description": "Profile collectible card: gradient frame, foil following the pointer, tilt.",
+      "html": "<div class=\"ds-holo\"><div class=\"ds-holo-face\"><div class=\"ds-holo-top\"><span>PARAGON</span><span class=\"ds-holo-lvl\">LV 42</span></div><div class=\"ds-holo-av\"></div><div class=\"ds-holo-name\">kratos_main</div><div class=\"ds-holo-handle\">@kratos</div><div class=\"ds-holo-stats\"><span><b style=\"color:#9fd4ec\">38</b><i>Platinums</i></span><span><b>2,904</b><i>Trophies</i></span><span><b>211</b><i>Games</i></span><span><b>64%</b><i>Avg</i></span></div></div></div>",
+      "css": ".ds-holo{width:260px;padding:1px;border-radius:22px;background:linear-gradient(150deg,rgb(124 196 228/.8),rgb(124 196 228/.15) 40%,#d7eef8 70%,rgb(124 196 228/.4));box-shadow:0 30px 60px -28px rgb(124 196 228/.55),0 12px 24px -12px rgb(0 0 0/.6);font-family:Barlow,sans-serif;color:#e9eef7}.ds-holo-face{position:relative;overflow:hidden;border-radius:21px;padding:16px 20px 20px;background:linear-gradient(180deg,#1b2330,#10151f 55%)}.ds-holo-face::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,rgb(159 212 236/.18) 38%,rgb(255 214 170/.14) 46%,rgb(196 181 253/.16) 54%,transparent 68%);mix-blend-mode:screen;pointer-events:none}.ds-holo-top{display:flex;justify-content:space-between;font-size:.6875rem;font-weight:700;color:#bde1f1}.ds-holo-lvl{border:1px solid rgb(124 196 228/.4);border-radius:999px;padding:1px 8px}.ds-holo-av{width:88px;height:88px;margin:16px auto;border-radius:50%;background:#1b2330;border:2px solid #7cc4e4}.ds-holo-name{text-align:center;font:700 1.5rem 'Chakra Petch',Barlow,sans-serif;text-transform:uppercase}.ds-holo-handle{text-align:center;font-size:.75rem;color:#a7b0c0}.ds-holo-stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:16px;padding-top:12px;border-top:1px solid #212a38;text-align:center}.ds-holo-stats b{display:block;font:700 1.125rem 'Chakra Petch',sans-serif}.ds-holo-stats i{font-style:normal;font-size:.625rem;color:#a7b0c0}"
+    },
+    {
+      "name": "Strategy Guide Row",
+      "kind": "custom",
+      "refersTo": "guide-list",
+      "description": "Trophy list as a strategy guide: chapter heading, dashed rows, checkbox, margin with missable note.",
+      "html": "<div class=\"ds-guide\"><h3><span>Chapter 1: The Wilds</span><span>3/12</span></h3><ul><li data-done><span class=\"ds-chk\">&#10003;</span><span class=\"ds-gname\">Into the Fog</span><span class=\"ds-gmar\">Bronze &middot; 15</span></li><li><span class=\"ds-chk\"></span><span class=\"ds-gname\">Last Light</span><span class=\"ds-gmar\"><em>Missable</em>Gold &middot; 90</span></li></ul></div>",
+      "css": ".ds-guide{max-width:34rem;font-family:Barlow,sans-serif;color:#e9eef7}.ds-guide h3{display:flex;justify-content:space-between;margin:0 0 12px;padding:0 4px 8px;border-bottom:2px solid #212a38;font:700 1.125rem 'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.04em}.ds-guide h3 span:last-child{font-size:.875rem;color:#a7b0c0}.ds-guide ul{list-style:none;margin:0;padding:0;border:1px solid #212a38;border-radius:14px;background:linear-gradient(90deg,transparent calc(100% - 172px),#212a3899 calc(100% - 172px),#212a3899 calc(100% - 171px),transparent calc(100% - 171px)),#10151f}.ds-guide li{display:grid;grid-template-columns:22px 1fr 150px;gap:16px;align-items:center;padding:14px 12px;border-bottom:1px dashed #212a38}.ds-guide li:last-child{border:0}.ds-guide li:hover{background:rgb(124 196 228/.05)}.ds-chk{display:flex;width:20px;height:20px;align-items:center;justify-content:center;border:2px solid #a7b0c0;border-radius:4px;color:#0a0d13;font-size:12px}.ds-guide li[data-done] .ds-chk{background:#7cc4e4;border-color:#7cc4e4}.ds-guide li[data-done] .ds-gname{opacity:.55}.ds-gmar{padding-left:14px;font-size:.75rem;color:#a7b0c0}.ds-gmar em{display:block;font-size:.6875rem;font-weight:700;color:#ff6b6b}"
+    },
+    {
+      "name": "Box Spine Shelf",
+      "kind": "custom",
+      "refersTo": "box-spine",
+      "description": "Library spines: cover under dark veil, metal stripe and percentage, vertical title, shelf plank.",
+      "html": "<div class=\"ds-shelf\"><a class=\"ds-spine\" style=\"--metal:#9fd4ec\"><i></i><b>Elden Ring</b><u>100%</u></a><a class=\"ds-spine\" style=\"--metal:#e2b53e\"><i></i><b>Hollow Knight</b><u>78%</u></a><a class=\"ds-spine\" style=\"--metal:#c07b4a\"><i></i><b>Hades</b><u>21%</u></a></div><div class=\"ds-plank\"></div>",
+      "css": ".ds-shelf{display:flex;gap:6px;align-items:flex-end;height:220px;padding:0 3px}.ds-spine{display:flex;flex-direction:column;align-items:center;width:52px;height:200px;overflow:hidden;border-radius:4px 4px 2px 2px;background:linear-gradient(rgb(0 0 0/.5),rgb(0 0 0/.78)),#3b4a63;box-shadow:inset 1px 0 0 rgb(255 255 255/.12),inset -2px 0 0 rgb(0 0 0/.35);transition:transform 260ms cubic-bezier(.16,1,.3,1),box-shadow 260ms;cursor:pointer}.ds-spine:hover{transform:translateY(-12px);box-shadow:inset 1px 0 0 rgb(255 255 255/.12),0 14px 22px -10px var(--metal)}.ds-spine i{height:10px;width:100%;background:var(--metal)}.ds-spine b{flex:1;margin:10px 0 6px;writing-mode:vertical-rl;font:700 .8125rem 'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.04em;color:#f4f6fa;white-space:nowrap}.ds-spine u{text-decoration:none;margin-bottom:8px;font:700 .625rem Barlow,sans-serif;color:var(--metal)}.ds-plank{height:8px;width:180px;background:linear-gradient(180deg,#3a4250,#1b2330);box-shadow:0 10px 18px -10px rgb(0 0 0/.75)}"
+    },
+    {
+      "name": "Hit List Row",
+      "kind": "custom",
+      "refersTo": "rank-row",
+      "description": "Outline rank numerals; podium filled in gold/silver/bronze; hairline rows.",
+      "html": "<ol class=\"ds-hits\"><li data-p=\"1\"><span class=\"ds-num\">1</span><span class=\"ds-cov\"></span><span>Astro Bot<small>412 playing</small></span></li><li data-p=\"2\"><span class=\"ds-num\">2</span><span class=\"ds-cov\"></span><span>Elden Ring<small>388 playing</small></span></li><li><span class=\"ds-num\">4</span><span class=\"ds-cov\"></span><span>Hades II<small>201 playing</small></span></li></ol>",
+      "css": ".ds-hits{list-style:none;margin:0;padding:0;max-width:28rem;border-top:1px solid #212a38;font-family:Barlow,sans-serif;color:#e9eef7}.ds-hits li{display:grid;grid-template-columns:4.5rem 52px 1fr;gap:16px;align-items:center;padding:14px 8px;border-bottom:1px solid #212a38}.ds-hits li:hover{background:#10151f}.ds-hits small{display:block;font-size:.75rem;color:#a7b0c0}.ds-num{font:700 3.25rem/.85 'Chakra Petch',sans-serif;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.5px rgb(233 238 247/.45)}.ds-hits li[data-p='1'] .ds-num{color:#e2b53e;-webkit-text-stroke-color:#e2b53e}.ds-hits li[data-p='2'] .ds-num{color:#b9c2cc;-webkit-text-stroke-color:#b9c2cc}.ds-hits li:hover .ds-num{-webkit-text-stroke-color:#bde1f1}.ds-cov{width:52px;height:52px;border-radius:6px;background:#1b2330}"
+    },
+    {
+      "name": "Departures Board",
+      "kind": "custom",
+      "refersTo": "departures-board",
+      "description": "Split-flap dates in flap amber, theme-ground board with bezel, countdown status.",
+      "html": "<div class=\"ds-board\"><div class=\"ds-brow\"><span class=\"ds-flap\"><b>1</b><b>4</b><i></i><b>N</b><b>O</b><b>V</b></span><span class=\"ds-bcov\"></span><span>Death Stranding 2</span><span class=\"ds-st\" data-soon>In 12 days</span></div><div class=\"ds-brow\"><span class=\"ds-flap\"><b>0</b><b>3</b><i></i><b>F</b><b>E</b><b>B</b></span><span class=\"ds-bcov\"></span><span>Marvel 1943</span><span class=\"ds-st\">In 4 months</span></div></div>",
+      "css": ".ds-board{max-width:36rem;overflow:hidden;border-radius:14px;border:1px solid #212a38;background:linear-gradient(180deg,#0d1119,#07090e);box-shadow:inset 0 0 0 4px #07090d,inset 0 0 0 5px #212a38,0 18px 40px -24px rgb(0 0 0/.8);font-family:Barlow,sans-serif;color:#e9eef7}.ds-brow{display:grid;grid-template-columns:auto 40px 1fr auto;gap:14px;align-items:center;padding:12px 20px;border-bottom:1px solid #212a38}.ds-brow:hover{background:rgb(124 196 228/.06)}.ds-flap{display:inline-flex;gap:2px}.ds-flap b{display:inline-flex;width:1.05rem;height:1.55rem;align-items:center;justify-content:center;border-radius:3px;font:700 .8125rem 'Chakra Petch',sans-serif;color:#ffcf3a;background:linear-gradient(180deg,#1c2028 0 49%,#0b0d11 49% 51%,#171a21 51% 100%)}.ds-flap i{width:.35rem}.ds-bcov{width:40px;height:54px;border-radius:4px;background:#1b2330}.ds-st{font:700 .75rem 'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#a7b0c0}.ds-st[data-soon]{color:#ffcf3a}"
+    },
+    {
+      "name": "Stadium Scoreboard Row",
+      "kind": "custom",
+      "refersTo": "scoreboard-row",
+      "description": "Theme-following scoreboard: LED figures (numbers only), your row lit, gold only for P1.",
+      "html": "<div class=\"ds-score\"><div class=\"ds-rot\">Friends</div><div class=\"ds-srow\"><span class=\"ds-led ds-gold\">1</span><span class=\"ds-sav\"></span><span>hollow_hunter</span><span class=\"ds-led\">4,310</span></div><div class=\"ds-srow\" data-me><span class=\"ds-led\">2</span><span class=\"ds-sav\"></span><span>kratos_main <em>You</em></span><span class=\"ds-led\">4,120</span></div></div>",
+      "css": ".ds-score{max-width:34rem;border-radius:14px;border:1px solid #212a38;padding:24px 0 0;background:radial-gradient(circle,rgb(255 255 255/.035) 1px,transparent 1.4px) 0 0/6px 6px,linear-gradient(180deg,#0d1119,#07090e);box-shadow:inset 0 0 0 4px #07090d,inset 0 0 0 5px #212a38;font-family:Barlow,sans-serif;color:#e9eef7}.ds-rot{padding:0 24px 12px;font:700 1rem 'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.14em;color:#bde1f1}.ds-srow{display:grid;grid-template-columns:3.5rem 44px 1fr 6rem;gap:16px;align-items:center;padding:14px 24px;border-top:1px solid #212a38}.ds-srow[data-me]{background:linear-gradient(90deg,rgb(124 196 228/.2),rgb(124 196 228/.05) 60%,transparent);box-shadow:inset 3px 0 0 #bde1f1}.ds-sav{width:44px;height:44px;border-radius:50%;background:#1b2330}.ds-led{font:700 1.75rem 'Chakra Petch',sans-serif;font-variant-numeric:tabular-nums;color:#bde1f1;text-shadow:0 0 12px rgb(124 196 228/.55);-webkit-mask:radial-gradient(circle,#000 62%,transparent 72%) 0 0/3px 3px;mask:radial-gradient(circle,#000 62%,transparent 72%) 0 0/3px 3px}.ds-gold{color:#e2b53e;text-shadow:0 0 12px rgb(226 181 62/.55)}.ds-srow em{font-style:normal;margin-left:6px;padding:1px 6px;border-radius:4px;font-size:.625rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#0a0d13;background:#bde1f1}"
+    },
+    {
+      "name": "Cockpit Module",
+      "kind": "custom",
+      "refersTo": "cabina-edit",
+      "description": "Dashboard module mounted in accent corner brackets; edit footer showing the 12-column grid.",
+      "html": "<div class=\"ds-cab\"><div class=\"ds-cell\"><div class=\"ds-mod\"><div class=\"ds-cif\">38</div><div class=\"ds-mut\">Platinums</div></div></div><div class=\"ds-edit\"><span>2 modules hidden</span><a>Edit panel</a></div></div>",
+      "css": ".ds-cab{display:grid;gap:24px;max-width:30rem;font-family:Barlow,sans-serif;color:#e9eef7}.ds-cell{position:relative}.ds-cell::before{content:'';position:absolute;inset:-6px;pointer-events:none;--l:rgb(124 196 228/.4);background:linear-gradient(var(--l),var(--l)) top left/12px 1.5px,linear-gradient(var(--l),var(--l)) top left/1.5px 12px,linear-gradient(var(--l),var(--l)) top right/12px 1.5px,linear-gradient(var(--l),var(--l)) top right/1.5px 12px,linear-gradient(var(--l),var(--l)) bottom left/12px 1.5px,linear-gradient(var(--l),var(--l)) bottom left/1.5px 12px,linear-gradient(var(--l),var(--l)) bottom right/12px 1.5px,linear-gradient(var(--l),var(--l)) bottom right/1.5px 12px;background-repeat:no-repeat;opacity:.7;transition:opacity 200ms,inset 200ms cubic-bezier(.16,1,.3,1)}.ds-cell:hover::before{opacity:1;inset:-8px}.ds-mod{padding:24px;border:1px solid #212a38;border-radius:20px;background:#10151f}.ds-cif{font:700 4.5rem/.85 'Chakra Petch',sans-serif;color:#dde8f4;text-shadow:0 0 40px rgb(124 196 228/.35)}.ds-mut{font-size:.8125rem;color:#a7b0c0}.ds-edit{display:flex;justify-content:space-between;padding:16px 20px;border-radius:20px;border:1px dashed rgb(124 196 228/.35);background:linear-gradient(rgb(124 196 228/.07) 1px,transparent 1px) 0 0/100% 14px,linear-gradient(90deg,rgb(124 196 228/.07) 1px,transparent 1px) 0 0/calc(100%/12) 100%,#10151f;font-size:.8125rem;color:#a7b0c0}.ds-edit:hover{border-color:rgb(124 196 228/.7)}.ds-edit a{color:#bde1f1;font-weight:700}"
     }
   ],
   "narrative": {
     "northStar": "The Night Trophy Room",
-    "overview": "Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13), surfaces one step up, and the only strong light falling on the things a hunter earned. The brand accent is platinum itself, the colour of the trophy being chased, so the interface glows in the same pale ice-blue the platinum trophy does. Everything else stays quiet: muted blue-grey text, hairline borders, flat tonal cards. Light is used as a material, not as decoration: a soft halo leaks from the top-left of every page, the landing's vitrine lights each trophy from above, and hovering anything clickable makes it glow in the accent.\n\nThe system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange, six full palettes and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.\n\nDensity is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels and trophies-remaining are set big in the display face, often in platinum.",
+    "overview": [
+      "Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13), surfaces one step up, and the only strong light falling on the things a hunter earned. The brand accent is platinum itself, the colour of the trophy being chased, so the interface glows in the same pale ice-blue the platinum trophy does. Everything else stays quiet: muted blue-grey text, hairline borders, flat tonal cards. Light is used as a material, not as decoration: a soft halo leaks from the top-left of every page, the landing's vitrine lights each trophy from above, and hovering anything clickable makes it glow in the accent.",
+      "The system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange, six full palettes, a palette taken from a chosen game's cover, and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.",
+      "Since the October 2026 redesign each section of the platform carries its own **room metaphor**, all built on the same tokens: the profile is a holographic collectible card, a game's trophy list is a strategy guide, the library is a shelf of box spines, statistics lead with a heat calendar, Discover is a difficulty-by-hours matrix plus a music-chart \"hit list\", the community is a wall of achievements, the dashboard is a cockpit of bolted-in instruments, friends are a stadium scoreboard, news is a departures board with a wire ticker, settings are a refined control panel, and each platform page lives \"in its own house\". A metaphor shapes composition and one signature detail; it never brings its own palette, except where noted (platform houses, the split-flap amber).",
+      "Density is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels, ranks and trophies-remaining are set big in the display face, often in platinum or the accent."
+    ],
     "keyCharacteristics": [
       "Night navy base with tonal layering (background, surface, surface-2) instead of heavy shadows.",
       "Platinum accent, derived everywhere from one RGB channel variable.",
       "Chakra Petch (condensed, technical) for headings and numerals; Barlow for everything read.",
-      "Trophy grade colours (bronze, silver, gold, platinum) are semantic and never repurposed.",
-      "Every clickable glows on hover, enforced globally.",
+      "Trophy grade colours (bronze, silver, gold, platinum) are semantic: grade and rank, never decoration.",
+      "Every clickable glows on hover, enforced globally, except list rows inside a card.",
       "User-selectable mode, accent and style axes; components stay token-bound so all three work.",
-      "Competition pages (Ligas, Clanes) wear a scoped race-timing world: livery dorsals, skews, tabular figures."
+      "One room metaphor per section, expressed through composition and a single signature detail.",
+      "Competition pages (Ligas, Clanes) wear a scoped race-timing world; platform pages wear their platform's house palette."
     ],
     "rules": [
       {
@@ -832,32 +1247,47 @@
       },
       {
         "name": "The Metals Mean Grade Rule",
-        "body": "Bronze, silver, gold and platinum are only for trophy grade and rank. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.",
+        "body": "Bronze, silver, gold and platinum are only for trophy grade and rank (podiums, first place, a game's best grade) and the heat calendar's metal ladder, which counts trophies. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.",
         "section": "colors"
       },
       {
         "name": "The Dark Text on Light Rule",
-        "body": "Text on an accent fill is `background` (dark), never white. Accent presets are chosen so that pairing reads.",
+        "body": "Text on an accent fill is `background` (dark), never white. Accent presets, and the game palette's contrast correction, are chosen so that pairing reads.",
         "section": "colors"
       },
       {
         "name": "The Ground Belongs to the Mode Rule",
-        "body": "A palette may repaint the ground only in dark mode. Light, OLED and high contrast keep their grounds under every accent; a new full palette adds a `.dark.accent-x` ground block and a `.light.accent-x` darker accent, never a ground rule for the other modes.",
+        "body": "A palette may repaint the ground only in dark mode. Light, OLED and high contrast keep their grounds under every accent; a new full palette adds a `.dark.accent-x` ground block and a `.light.accent-x` darker accent, never a ground rule for the other modes. The game palette follows the same split.",
         "section": "colors"
       },
       {
         "name": "The Theme Scrim Rule",
-        "body": "Image scrims fade to the theme ground (`from-background`), and text over covers uses `foreground`. A literal #0a0d13 scrim or white text over a cover breaks light mode and every full palette.",
+        "body": "Image scrims fade to the theme ground (`from-background`), and text over covers uses `foreground`. A literal #0a0d13 scrim or white text over a cover breaks light mode and every full palette. Two scoped exceptions: inside a platform house (always dark), hero art takes a black veil and white text; and a physical object that carries its own art (a box spine) keeps a fixed dark veil and `spine-ink`.",
+        "section": "colors"
+      },
+      {
+        "name": "The Brand Lives at Home Rule",
+        "body": "Platform brand colours appear only in platform-identity contexts: the platform houses, the Discover platform tiles, platform logo tiles and the landing's convergence columns. They never tint generic UI.",
+        "section": "colors"
+      },
+      {
+        "name": "The Board Follows the Theme Rule",
+        "body": "The scoreboard and the departures board are built from the theme's own ground (surface and background darkened with black, a 4px inset ring and a dotted lamp grid) and its accent; they are not fixed-colour islands. The only fixed colour they keep is the flap amber, and only on the flap letters, the ticker time and the soon status.",
         "section": "colors"
       },
       {
         "name": "The Headings Wear the Plate Rule",
-        "body": "`h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`.",
+        "body": "`h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`. The only exception is inside a platform house, where headings evoke the platform's own voice: PlayStation in Barlow at its lightest loaded weight, no uppercase, Steam's section headings in Barlow 600 at 0.9375rem with 0.08em tracking, Epic in Barlow 700 sentence case.",
         "section": "typography"
       },
       {
         "name": "The rem-Only Rule",
-        "body": "Text sizes are in rem, never px: the user's text-size setting (87.5–125%) scales the root, and px sizes ignore it.",
+        "body": "Text sizes are in rem, never px: the user's text-size setting (87.5–125%) scales the root, and px sizes ignore it. Off-Tailwind sizes are limited to the steps in the frontmatter (0.5625, 0.625, 0.6875, 0.8125, 0.9375, 1.0625, 2.625rem and the component numerals); do not invent new in-between steps.",
+        "section": "typography"
+      },
+      {
+        "name": "The LED Is for Numbers Rule",
+        "body": "The scoreboard's dot-matrix LED treatment (a 3px radial mask that turns the stroke into lamps, plus a 12px glow) applies only to figures. Names and labels stay in plain type, because masked letters stop being legible.",
         "section": "typography"
       },
       {
@@ -867,7 +1297,7 @@
       },
       {
         "name": "The Solid Headline Rule",
-        "body": "Headlines are solid colour. Gradient text is not used anywhere in the app (the 404 was the last user and has been changed); the `text-gradient` utility still exists in `globals.css` but must not be reached for.",
+        "body": "Headlines are solid colour. Gradient text is not used anywhere in the app; the `text-gradient` utility still exists in `globals.css` but must not be reached for. (The profile name effect is a user-chosen cosmetic, not a headline style.)",
         "section": "typography"
       },
       {
@@ -886,39 +1316,57 @@
         "section": "layout"
       },
       {
+        "name": "The Unlayered CSS Wins Rule",
+        "body": "Component CSS in `globals.css` sits outside `@layer`, so it beats any Tailwind utility on the same element: a `.marcador-fila { display: grid }` overrides a `hidden` class. To hide or change display per breakpoint on an element that has a `globals.css` display rule, do it in that CSS with a media query, never with utilities.",
+        "section": "layout"
+      },
+      {
         "name": "The Light Answers Touch Rule",
         "body": "Surfaces are flat at rest; the accent glow appears only in response to hover or as the aura of a single hero object per view.",
-        "section": "elevation"
+        "section": "elevation-depth"
+      },
+      {
+        "name": "The No-rounded-on-Thumbnails Rule",
+        "body": "A small landscape thumbnail whose shape matters (the matrix list's 64×36 PSN-style icon) takes its radius from its own CSS class and no `rounded` class, because the Glass style forces 22px on anything carrying one and turns it into a circle.",
+        "section": "shapes"
       }
     ],
     "dos": [
       "**Do** derive every accent tint from `--accent-rgb` or the `--accent-soft`, `--accent-line`, `--accent-glow`, `--accent-text`, `--accent-grad` and `--accent-grad-h` variables.",
       "**Do** give every clickable control a visible hover state. The global rule covers `button`, rounded `a` and `cursor-pointer` elements (glow plus 1px lift); an element with its own `hover:scale-*` or `hover:-translate-*` keeps its own lift and still gets the glow.",
-      "**Do** keep global hover and style-axis CSS outside `@layer` so it beats Tailwind utilities without `!important`.",
+      "**Do** mark list rows inside a card with `.fila-lista` and give them a background-fill hover instead of the global glow.",
+      "**Do** keep global hover and style-axis CSS outside `@layer` so it beats Tailwind utilities without `!important`, and handle per-breakpoint display of those elements in the same CSS, not with `hidden`/`sm:block` utilities.",
       "**Do** add `min-w-0` to grid and flex children that hold truncating text.",
       "**Do** wrap horizontally scrolling rows in `-mx-4 px-4` so hover glows are not clipped.",
       "**Do** route all copy through next-intl (es, en, de, fr); no literal UI strings in components.",
       "**Do** show real data only; any synthetic block carries the translated \"Ejemplo\" chip.",
       "**Do** honour `prefers-reduced-motion` by stopping animations outright and painting the final state from the start.",
-      "**Do** prefix surface-scoped CSS in `globals.css` (for example `landing-`), because the stylesheet is global to the whole app.",
-      "**Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them.",
+      "**Do** prefix surface-scoped CSS in `globals.css` (`landing-`, `guia-`, `lomo-`, `matriz-`, `exitos-`, `cabina-`, `marcador-`, `salidas-`, `ajustes-`, `casa-`), because the stylesheet is global to the whole app.",
+      "**Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them, except on small shape-critical thumbnails.",
       "**Do** give a new full palette both a `.dark.accent-x` block (accent plus the four ground tokens) and a `.light.accent-x` darker accent, and a half-ground/half-accent swatch.",
-      "**Do** fade image scrims to `from-background` and set text over covers in `foreground`.",
+      "**Do** correct any computed accent to at least 5:1 contrast against its own surface (dark) and white (light) before applying it, as `lib/paletaJuego.ts` does.",
+      "**Do** build a new section-scoped world by redefining the theme tokens on a wrapper (as the platform houses do) so existing components repaint untouched.",
+      "**Do** fade image scrims to `from-background` and set text over covers in `foreground`, outside the always-dark houses and own-art objects.",
       "**Do** put a heading's context below it as a muted subtitle.",
-      "**Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas and Clanes."
+      "**Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas and Clanes.",
+      "**Do** use only the type steps in the frontmatter, including the off-Tailwind ones (0.5625, 0.625, 0.6875, 0.8125, 0.9375, 1.0625rem)."
     ],
     "donts": [
       "**Don't** write literal accent colours such as `rgba(74, 158, 255, .14)`; they freeze one accent and one mode.",
-      "**Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade and rank.",
+      "**Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade, rank and the heat calendar's metal ladder.",
       "**Don't** put white text on an accent fill; use `background`.",
       "**Don't** set text sizes in px; they ignore the user's text-size setting.",
       "**Don't** put `overflow: hidden` on the element that owns a hover glow or shadow.",
-      "**Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) or white text over covers; use `from-background` and `foreground` so light mode, OLED and the full palettes stay coherent.",
+      "**Don't** hard-code dark hex overlays (such as `#0a0d13` gradients) or white text over covers in theme-following surfaces; use `from-background` and `foreground` so light mode, OLED and the full palettes stay coherent.",
       "**Don't** put eyebrow or kicker labels above headings.",
       "**Don't** use gradient text; `text-gradient` is a leftover utility, not part of the system.",
       "**Don't** bring the Carreras world (dorsals, livery colours, skews, livery streaks) into the library, guides or the dashboard; its competitive energy tires everywhere else.",
       "**Don't** let a full palette repaint the ground in light, OLED or high-contrast mode.",
       "**Don't** use platform brand colours outside platform-identity contexts.",
+      "**Don't** make the scoreboard or departures board a fixed-colour island; only the flap letters keep their amber.",
+      "**Don't** apply the LED dot mask to words; it is for figures only.",
+      "**Don't** copy a platform's real interface or detailed logotypes inside its house; evoke it through palette and composition.",
+      "**Don't** use `100vw` for full-bleed backgrounds; use the 100vmax shadow plus `clip-path` pattern.",
       "**Don't** invent testimonials, user counts or figures; landing proof comes from the live database queries only."
     ]
   }

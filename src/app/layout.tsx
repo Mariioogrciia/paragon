@@ -20,7 +20,8 @@ import "./globals.css";
 
 const barlow = Barlow({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  // 300: la página de PlayStation ("cada una en su casa") usa Barlow ligera.
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-barlow",
 });
 

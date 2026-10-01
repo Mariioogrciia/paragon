@@ -1286,36 +1286,9 @@ h3,
    12 px se salía por los bordes de la tarjeta. Sin resplandor ni salto. */
 .fila-lista:hover { filter: none !important; transform: none !important; }
 
-/* --- Páginas de plataforma (CabeceraPlataforma, RankedList, NewsFeed) ---- */
-/* Banda con el color de la marca: es contexto de identidad de plataforma,
-   el único sitio (con los accesos de Descubrir) donde viven esos colores. */
-.plataforma-banda {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  overflow: hidden;
-  border-radius: 20px;
-  padding: 1.75rem 1.5rem;
-  background:
-    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--marca) 100%, white 12%), transparent 60%),
-    linear-gradient(120deg, var(--marca), color-mix(in srgb, var(--marca) 45%, black));
-  box-shadow: 0 24px 50px -30px var(--marca);
-}
-.plataforma-logo {
-  display: flex;
-  height: 4rem;
-  width: 4rem;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  background: rgb(255 255 255 / 0.12);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
-}
-/* Los logos son SVG de color: en la banda (y en los accesos) van en blanco. */
-.plataforma-logo img, .acceso-plataforma img, .logo-blanco img { filter: brightness(0) invert(1); }
-@media (min-width: 640px) { .plataforma-banda { padding: 2.25rem 2rem; } .plataforma-logo { height: 5rem; width: 5rem; } }
+/* --- Rankings y noticias de las páginas de plataforma (RankedList, NewsFeed) */
+/* Los logos de plataforma en blanco sobre su color de marca. */
+.acceso-plataforma img, .logo-blanco img { filter: brightness(0) invert(1); }
 
 .exitos-ranking { border-top: 1px solid var(--border); }
 .exitos-ranking > li { border-bottom: 1px solid var(--border); }
