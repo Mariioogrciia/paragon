@@ -84,7 +84,7 @@ export default async function DescubrirPage() {
           juego en PSN y Steam cuenta como uno para "cuánta gente lo tiene",
           así que no tiene una sola plataforma que ponerle en la cabecera.
           Ver el comentario de lib/discover.ts. */}
-      <div id="multiplataforma" className="mb-10 scroll-mt-24">
+      <div id="multiplataforma" className="mb-10 mt-16 scroll-mt-24">
         <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">{t("multiplataforma")}</p>
 
         {novedades.length > 0 && (

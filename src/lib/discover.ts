@@ -316,7 +316,7 @@ export interface PuntoMatriz {
  */
 export const getMatrizDescubrir = unstable_cache(
   async (): Promise<PuntoMatriz[]> => {
-    const filas = await db.execute<{ id: string; titulo: string; icono: string | null; rareza: number; horas: number }>(sql`
+    const filas = await db.execute<{ id: string; titulo: string; icono: string | null; igdb: number | null; rareza: number; horas: number; n: number }>(sql`
       with plat as (
         select gt."gameId", avg(ut."rarityPercent")::float rareza
         from ${gameTrophies} gt
@@ -325,18 +325,36 @@ export const getMatrizDescubrir = unstable_cache(
         group by gt."gameId"
       ),
       horas as (
-        select "gameId", (avg("playtimeMinutes") / 60.0)::float horas
+        select "gameId", (avg("playtimeMinutes") / 60.0)::float horas, count(*)::int n
         from ${userGames} where "playtimeMinutes" > 0 and "isWishlist" = false
         group by "gameId"
       )
-      select g.id, g.title titulo, g."iconUrl" icono, p.rareza, h.horas
+      select g.id, g.title titulo, g."iconUrl" icono, g."igdbId" igdb, p.rareza, h.horas, h.n
       from plat p join horas h on h."gameId" = p."gameId" join ${gamesTable} g on g.id = p."gameId"
       where h.horas >= 0.5
       order by h.horas desc
       limit 300
     `);
-    return [...filas].map((f) => ({ ...f, rareza: Number(f.rareza), horas: Number(f.horas) }));
+    // El mismo juego en PS4 y PS5 son dos fichas (games.id distinto): se
+    // juntan en un punto por igdbId (o título), con la ficha de más jugadores
+    // como enlace y las horas medias ponderadas por jugadores.
+    const grupos = new Map<string, { id: string; titulo: string; icono: string | null; rareza: number; horas: number; n: number; nRareza: number }>();
+    for (const f of filas) {
+      const clave = f.igdb != null ? `igdb:${f.igdb}` : `t:${f.titulo.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "")}`;
+      const n = Number(f.n) || 1;
+      const g = grupos.get(clave);
+      if (!g) {
+        grupos.set(clave, { id: f.id, titulo: f.titulo, icono: f.icono, rareza: Number(f.rareza), horas: Number(f.horas), n, nRareza: 1 });
+        continue;
+      }
+      if (n > g.n) Object.assign(g, { id: f.id, titulo: f.titulo, icono: f.icono ?? g.icono });
+      g.horas = (g.horas * g.n + Number(f.horas) * n) / (g.n + n);
+      g.rareza = (g.rareza * g.nRareza + Number(f.rareza)) / (g.nRareza + 1);
+      g.n += n;
+      g.nRareza += 1;
+    }
+    return [...grupos.values()].map(({ id, titulo, icono, rareza, horas }) => ({ id, titulo, icono, rareza, horas }));
   },
-  ["matriz-descubrir"],
+  ["matriz-descubrir-2"],
   { revalidate: 3600 },
 );

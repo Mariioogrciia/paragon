@@ -864,6 +864,10 @@ h3,
 }
 .matriz-punto:hover, .matriz-punto:focus-visible { transform: translate(-50%, 50%) scale(1.8); z-index: 30; opacity: 1 !important; }
 @media (max-width: 639px) { .matriz-punto { width: 20px; height: 20px; } }
+/* Miniatura de la lista: apaisada como el icono de PSN (320×176), para no
+   cortar el logo. Sin clase "rounded" a propósito: el estilo Vidrio fuerza
+   22 px a todo lo que la lleve y la convertía en un círculo. */
+.matriz-mini { display: block; flex-shrink: 0; width: 64px; height: 36px; border-radius: 6px; background: var(--surface-2); }
 
 /* --- Comunidad: muro de logros (ActivityFeed con `muro`) ------------------ */
 .muro-columnas { columns: 1; column-gap: 1rem; }

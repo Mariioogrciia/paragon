@@ -49,9 +49,13 @@ export function MatrizDificultad({ puntos }: { puntos: PuntoMatriz[] }) {
 
   const lista = puntos
     .filter((p) => cuadranteDe(p) === elegido)
+    // Lo más asequible primero también en los difíciles: ordenar al revés
+    // llena la lista de FIFA/Fortnite al 0,1 % (el suelo de PSN), juegos que
+    // casi nadie platina, no retos que alguien se vaya a proponer.
     .sort((a, b) => b.rareza - a.rareza)
     .slice(0, 12);
-  const num = (n: number) => n.toLocaleString(locale, { maximumFractionDigits: n < 10 ? 1 : 0 });
+  // Siempre un decimal por debajo de 10 ("1,0 %", no "1 %" junto a "1,4 %").
+  const num = (n: number) => n.toLocaleString(locale, n < 10 ? { minimumFractionDigits: 1, maximumFractionDigits: 1 } : { maximumFractionDigits: 0 });
 
   return (
     <section className="mt-16" aria-labelledby="matriz-titulo">
@@ -114,9 +118,9 @@ export function MatrizDificultad({ puntos }: { puntos: PuntoMatriz[] }) {
                   <Link href={`/juego/${p.id}`} className="flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-[var(--surface-2)]">
                     {p.icono ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.icono} alt="" loading="lazy" className="h-9 w-9 shrink-0 rounded-md object-cover" />
+                      <img src={p.icono} alt="" loading="lazy" className="matriz-mini object-cover" />
                     ) : (
-                      <span className="h-9 w-9 shrink-0 rounded-md bg-[var(--surface-2)]" />
+                      <span className="matriz-mini bg-[var(--surface-2)]" />
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold">{p.titulo}</span>
