@@ -771,3 +771,27 @@ h3,
 @media (prefers-reduced-motion: reduce) {
   .carta-holo { transform: none; transition: none; }
 }
+
+/* --- Ficha de juego: lista de trofeos como guía de estrategia ------------- */
+.guia-lista {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(90deg, transparent calc(100% - 172px), color-mix(in srgb, var(--border) 60%, transparent) calc(100% - 172px), color-mix(in srgb, var(--border) 60%, transparent) calc(100% - 171px), transparent calc(100% - 171px)),
+    var(--surface);
+}
+@media (max-width: 639px) { .guia-lista { background: var(--surface); } }
+.guia-fila { border-bottom: 1px dashed var(--border); transition: background-color 150ms; }
+.guia-fila:last-child { border-bottom: 0; }
+.guia-fila:hover { background: rgb(var(--accent-rgb) / 0.05); }
+.guia-fila[data-hecho] .guia-nombre, .guia-fila[data-hecho] img { opacity: 0.55; }
+.guia-casilla {
+  display: flex; height: 20px; width: 20px; align-items: center; justify-content: center;
+  border: 2px solid var(--muted); border-radius: 4px; color: var(--background);
+}
+.guia-fila[data-hecho] .guia-casilla { background: var(--accent); border-color: var(--accent); }
+.guia-margen { padding-left: 14px; }
+.guia-perdible {
+  font-size: 0.6875rem; font-weight: 700; color: #ff6b6b;
+  font-style: italic; letter-spacing: 0.02em;
+}

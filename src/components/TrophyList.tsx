@@ -280,17 +280,20 @@ export function TrophyList({
         <div className="space-y-8">
           {groupList.map((g) => (
             <div key={g.name} className="space-y-3">
-              {groups.size > 1 && (
-                <h3 className="px-4 text-xs font-bold uppercase tracking-[0.15em] text-muted sm:px-0">
-                  {g.name}
+              {(groups.size > 1 || view === "lista") && (
+                <h3 className="flex items-baseline gap-3 border-b-2 border-[var(--border)] px-1 pb-2 font-heading text-lg font-bold uppercase tracking-wide">
+                  <span className="min-w-0 flex-1 truncate">{g.name}</span>
+                  <span className="carreras-cifra shrink-0 text-sm text-muted">
+                    {g.trophies.filter((x) => x.earned).length}/{g.trophies.length}
+                  </span>
                 </h3>
               )}
               {view === "lista" ? (
-                <div className="divide-y divide-border rounded-xl border border-border bg-surface-2 px-3 sm:px-4">
+                <ul className="guia-lista">
                   {g.trophies.map((t) => (
                     <FilaLista key={t.id} trophy={t} platform={platform} onClick={() => setActiveTrophy(t)} />
                   ))}
-                </div>
+                </ul>
               ) : (
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:gap-3">
                   {g.trophies.map((t) => (
@@ -369,57 +372,46 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
   return (
     <li
       onClick={onClick}
-      className="grid grid-cols-[48px_1fr] items-center gap-4 border-b border-border px-4 py-3.5 last:border-0 sm:grid-cols-[48px_1fr_100px_90px] sm:gap-[18px] sm:px-[18px] cursor-pointer hover:bg-white/5 transition-colors"
-      style={{ opacity: trophy.earned ? 1 : 0.42 }}
+      className="guia-fila grid cursor-pointer grid-cols-[22px_40px_1fr] items-start gap-3 px-2 py-3.5 sm:grid-cols-[22px_44px_1fr_150px] sm:gap-4 sm:px-3"
+      data-hecho={trophy.earned || undefined}
     >
-      <TrophyPhoto trophy={trophy} size={48} />
+      {/* La casilla de la guía: marcada si ya lo tienes. */}
+      <span className="guia-casilla mt-3" aria-hidden="true">
+        {trophy.earned && (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        )}
+      </span>
+      <TrophyPhoto trophy={trophy} size={44} />
 
       <div className="min-w-0">
-        <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold">
-          {oculto ? t("TrophyList.hiddenTrophy") : trophy.name}
+        <p className="flex flex-wrap items-center gap-1.5 text-[0.9375rem] font-semibold">
+          <span className="guia-nombre">{oculto ? t("TrophyList.hiddenTrophy") : trophy.name}</span>
           {tipo && (
             <span className="flex items-center justify-center text-muted">
               <TrophyTypeIcon tipo={tipo} />
             </span>
           )}
-          {trophy.isMissable && (
-            <span
-              className="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-[0.03em]"
-              style={{ background: "rgba(226, 181, 62, 0.14)", color: "#e2b53e", border: "1px solid rgba(226, 181, 62, 0.3)" }}
-              title={t("TrophyList.missableHint")}
-            >
-              {/* Un tick, no un triángulo de aviso: no es un peligro, es un
-                  aviso de "atento, esto tiene ventana" — mismo lenguaje que
-                  una casilla marcada. */}
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-              {t("TrophyList.missable")}
-            </span>
-          )}
         </p>
-        {/* El NOMBRE de un trofeo oculto se queda tapado a propósito (a
-            veces desvela algo de la trama él solo), pero la plataforma SÍ da
-            la descripción de qué hay que hacer para conseguirlo — antes se
-            tapaba también sin necesidad, dejando "Trofeo oculto" sin ninguna
-            pista de qué hacer. Ya se enseñaba igualmente al abrir la guía
-            del trofeo (TrophyGuideModal), esto solo lo hace consistente. */}
-        {trophy.detail && (
-          <p className="mt-1 text-[0.8125rem] text-muted">{trophy.detail}</p>
+        {/* El NOMBRE de un trofeo oculto se tapa (a veces desvela trama), pero
+            la descripción de qué hacer sí se enseña, igual que en la guía. */}
+        {trophy.detail && <p className="mt-1 text-[0.8125rem] leading-relaxed text-muted">{trophy.detail}</p>}
+        {trophy.isMissable && (
+          <p className="guia-perdible mt-2 sm:hidden" title={t("TrophyList.missableHint")}>{t("TrophyList.missable")}</p>
         )}
       </div>
 
-      <span className="hidden sm:block">
-        <span
-          className="block text-[0.6875rem] font-bold uppercase tracking-[0.1em]"
-          style={{ color: colorFor(trophy.grade) }}
-        >
+      {/* Margen de la guía: perdible, metal, puntos y fecha. */}
+      <span className="guia-margen hidden sm:block">
+        {trophy.isMissable && (
+          <span className="guia-perdible mb-1.5 block" title={t("TrophyList.missableHint")}>{t("TrophyList.missable")}</span>
+        )}
+        <span className="block text-[0.6875rem] font-bold uppercase tracking-[0.1em]" style={{ color: colorFor(trophy.grade) }}>
           {gradeLabel(trophy.grade, t)}
         </span>
-        {puntos !== null && <span className="text-[0.625rem] text-muted">{t("TrophyList.points", { points: puntos })}</span>}
-      </span>
-      <span className="hidden text-right text-xs text-muted sm:block">
-        {trophy.earnedAt ? relativeDate(trophy.earnedAt, idioma) : "—"}
+        {puntos !== null && <span className="block text-[0.6875rem] text-muted">{t("TrophyList.points", { points: puntos })}</span>}
+        <span className="mt-1 block text-[0.6875rem] text-muted">{trophy.earnedAt ? relativeDate(trophy.earnedAt, idioma) : "—"}</span>
       </span>
     </li>
   );
