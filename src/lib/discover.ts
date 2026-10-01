@@ -66,10 +66,14 @@ export const getTrendingGames = unstable_cache(
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(and(isNotNull(gamesTable.igdbId), gte(userGames.createdAt, desde)))
+    // "Más jugado recientemente" (1 oct 2026, petición del usuario): cuenta
+    // los cazadores que lo han JUGADO en el periodo (`lastPlayedAt`), no los
+    // que lo han añadido (`createdAt`). Desempata por minutos recientes
+    // (solo los da Steam, últimas dos semanas).
+    .where(and(isNotNull(gamesTable.igdbId), eq(userGames.isWishlist, false), gte(userGames.lastPlayedAt, desde)))
     .groupBy(gamesTable.igdbId)
     .having(sql`COUNT(DISTINCT ${userGames.userId}) > 0`)
-    .orderBy(desc(sql`COUNT(DISTINCT ${userGames.userId})`))
+    .orderBy(desc(sql`COUNT(DISTINCT ${userGames.userId})`), desc(sql`COALESCE(SUM(${userGames.playtimeRecentMinutes}), 0)`))
     .limit(limit);
 
   return rows
@@ -82,7 +86,7 @@ export const getTrendingGames = unstable_cache(
       recientes: Number(r.recientes),
     }));
   },
-  ["trending-games"],
+  ["trending-games-jugados"],
   { revalidate: 300 },
 );
 

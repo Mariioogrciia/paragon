@@ -30,21 +30,30 @@ function Caratula({ juego, ancho, alto }: { juego: Juego; ancho: number; alto: n
 const puesto = (i: number) => String(i + 1).padStart(2, "0");
 
 /** Tendencias: lo que más cazadores han empezado en 30 días, con su cifra. */
-export async function TopComunidad({ items }: { items: (Juego & { recientes: number })[] }) {
+export async function TopComunidad({
+  items,
+  titulo,
+  descripcion,
+}: {
+  items: (Juego & { recientes: number })[];
+  /** Por defecto, los de la portada de Descubrir; las páginas de plataforma ponen los suyos. */
+  titulo?: string;
+  descripcion?: string;
+}) {
   const t = await getTranslations("Descubrir.DescubrirPage");
   if (items.length === 0) return null;
   return (
     <section aria-labelledby="exitos-top">
       <div className="mb-5">
         <h2 id="exitos-top" className="font-heading text-[clamp(1.5rem,4vw,2.25rem)] font-bold uppercase leading-tight">
-          {t("top")}
+          {titulo ?? t("top")}
         </h2>
-        <p className="mt-1.5 text-sm text-muted">{t("topDesc")}</p>
+        <p className="mt-1.5 text-sm text-muted">{descripcion ?? t("topDesc")}</p>
       </div>
       <ol className="exitos-top" style={{ "--filas": Math.ceil(items.length / 2) } as React.CSSProperties}>
         {items.map((g, i) => (
           <li key={g.igdbId}>
-            <Link href={`/juego/${g.igdbId}`} className="exitos-fila group rounded-xl" data-podio={i < 3 ? i + 1 : undefined}>
+            <Link href={`/juego/${g.igdbId}`} className="exitos-fila fila-lista group rounded-xl" data-podio={i < 3 ? i + 1 : undefined}>
               <span className="exitos-numeral" aria-label={`#${i + 1}`}>
                 {puesto(i)}
               </span>
@@ -80,7 +89,7 @@ export async function NuevasEntradas({ items }: { items: (Juego & { etiqueta: st
       <ol className="exitos-nuevas">
         {items.map((g, i) => (
           <li key={g.igdbId}>
-            <Link href={`/juego/${g.igdbId}`} className="exitos-entrada group rounded-xl">
+            <Link href={`/juego/${g.igdbId}`} className="exitos-entrada fila-lista group rounded-xl">
               <span className="exitos-numeral exitos-numeral-chico">{puesto(i)}</span>
               <Caratula juego={g} ancho={40} alto={54} />
               <span className="min-w-0">
@@ -113,7 +122,7 @@ export async function JoyasConNota({ items }: { items: (Juego & { notaMedia: num
       <ol className="exitos-joyas">
         {items.map((g) => (
           <li key={g.igdbId}>
-            <Link href={`/juego/${g.igdbId}`} className="exitos-entrada group rounded-xl">
+            <Link href={`/juego/${g.igdbId}`} className="exitos-entrada fila-lista group rounded-xl">
               <Caratula juego={g} ancho={40} alto={54} />
               <span className="min-w-0">
                 <span className="block truncate text-sm font-semibold transition-colors group-hover:text-[var(--accent-text)]">{g.title}</span>

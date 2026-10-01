@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { auth } from "@/auth";
@@ -8,7 +7,10 @@ import { RankedList } from "@/components/RankedList";
 import { ReleaseGrid } from "@/components/ReleaseGrid";
 import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
-import { PlayStationIcon, SteamIcon } from "@/lib/platformIcons";
+import { PlayStationIcon, SteamIcon, EpicGamesIcon } from "@/lib/platformIcons";
+import { CabeceraPlataforma } from "@/components/descubrir/CabeceraPlataforma";
+import { TopComunidad } from "@/components/descubrir/Exitos";
+import { getEpicGratis } from "@/lib/epicGratis";
 import { BackButton } from "@/components/BackButton";
 import {
   trendingOnPlatform,
@@ -26,8 +28,11 @@ import { NewsFeed } from "@/components/NewsFeed";
 import { relativeDate } from "@/lib/design";
 
 const PLATAFORMAS: Record<string, { label: string; hubKey: PlataformaHub; color: string; icon: React.ReactNode }> = {
-  playstation: { label: "PlayStation", hubKey: "psn", color: "#0f3d8a", icon: <PlayStationIcon size={26} /> },
-  steam: { label: "Steam", hubKey: "steam", color: "#1b2838", icon: <SteamIcon size={26} /> },
+  playstation: { label: "PlayStation", hubKey: "psn", color: "#0070d1", icon: <PlayStationIcon size={40} /> },
+  steam: { label: "Steam", hubKey: "steam", color: "#1b2838", icon: <SteamIcon size={38} /> },
+  // Epic (1 oct 2026): sincroniza biblioteca, así que tiene página. No da
+  // horas ni noticias públicas; lo propio de Epic son sus juegos gratis.
+  epic: { label: "Epic Games", hubKey: "epic", color: "#2a2a2a", icon: <EpicGamesIcon size={38} /> },
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ plataforma: string }> }) {
@@ -46,30 +51,36 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
   const session = await auth();
   const userId = session?.user?.id;
   const esSteam = plataforma === "steam";
+  const esEpic = plataforma === "epic";
+  const esPlaystation = plataforma === "playstation";
 
-  const [tendencia, masJugados, recomendados, proximos, recientes, ofertas, psPlus, jugadoresBajos, noticias] = await Promise.all([
+  const [tendencia, masJugados, recomendados, proximos, recientes, ofertas, psPlus, jugadoresBajos, noticias, epicGratis] = await Promise.all([
     trendingOnPlatform(info.hubKey),
     mostPlayedOnPlatform(info.hubKey),
     recommendationsOnPlatform(userId ?? null, info.hubKey),
-    upcomingGames(8, plataforma as "playstation" | "steam").catch((e) => {
+    // IGDB no distingue tiendas de PC: Epic no tiene lanzamientos propios.
+    esEpic ? Promise.resolve([]) : upcomingGames(8, plataforma as "playstation" | "steam").catch((e) => {
       if (!(e instanceof IgdbNotConfiguredError)) console.error("[plataforma-upcoming]", e);
       return [];
     }),
     // Mismo límite que upcomingGames (8): dos columnas una al lado de la
     // otra con listas de tamaños distintos se ven descuadradas, una mucho
     // más larga que la otra.
-    recentReleases(8, plataforma as "playstation" | "steam").catch((e) => {
+    esEpic ? Promise.resolve([]) : recentReleases(8, plataforma as "playstation" | "steam").catch((e) => {
       if (!(e instanceof IgdbNotConfiguredError)) console.error("[plataforma-recent]", e);
       return [];
     }),
     esSteam ? ofertasSteam() : Promise.resolve([]),
-    !esSteam ? getPsPlusMensual() : Promise.resolve(null),
+    esPlaystation ? getPsPlusMensual() : Promise.resolve(null),
     esSteam ? casiSinJugadoresEnSteam() : Promise.resolve([]),
     // Noticias propias de esta plataforma — no las generales de /noticias.
     // Solo tiene sentido en su propia página: mezclarlas en el resto de
     // Descubrir volvería a juntar cosas de plataformas distintas otra vez.
-    esSteam ? getSteamNews() : getPsNews(),
+    esSteam ? getSteamNews() : esPlaystation ? getPsNews() : Promise.resolve([]),
+    esEpic ? getEpicGratis() : Promise.resolve({ ahora: [], proximos: [] }),
   ]);
+  const fechaCorta = (iso: string) =>
+    new Date(iso).toLocaleDateString(idioma, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" });
 
   return (
     <div>
@@ -77,23 +88,48 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           recargar a mano para ver un lanzamiento nuevo. */}
       <RefrescoAutomatico />
       <BackButton fallbackHref="/descubrir" />
-      <div className="mb-6 flex items-center gap-3">
-        <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white"
-          style={{ background: info.color }}
-        >
-          {info.icon}
-        </span>
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-muted">
-            <Link href="/descubrir" className="hover:underline">{t("breadcrumb")}</Link> / {info.label}
-          </p>
-          <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">{info.label}</h1>
-        </div>
-      </div>
+      <CabeceraPlataforma nombre={info.label} color={info.color} icono={info.icon} migas={t("breadcrumb")} />
+
+      {esEpic && (epicGratis.ahora.length > 0 || epicGratis.proximos.length > 0) && (
+        <section className="mb-12">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-heading text-2xl font-bold uppercase">{t("epicGratisTitulo")}</h2>
+            <a
+              href="https://store.epicgames.com/es-ES/free-games"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="rounded-md px-1 text-xs font-bold uppercase tracking-wide text-[var(--accent-text)] hover:underline"
+            >
+              {t("epicVerTienda")}
+            </a>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {[...epicGratis.ahora.map((j) => ({ ...j, ya: true })), ...epicGratis.proximos.map((j) => ({ ...j, ya: false }))].map((j) => (
+              <a key={j.url + j.inicio} href={j.url} target="_blank" rel="noopener noreferrer nofollow" className="group block rounded-xl">
+                <span className="relative block aspect-[3/4] overflow-hidden rounded-xl bg-[var(--surface-2)]">
+                  {j.imagen && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={j.imagen} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                  )}
+                  <span
+                    className="absolute left-2 top-2 rounded-md px-2 py-0.5 text-[0.6875rem] font-bold uppercase"
+                    style={j.ya ? { background: "var(--accent)", color: "var(--background)" } : { background: "rgb(0 0 0 / 0.7)", color: "#fff" }}
+                  >
+                    {j.ya ? t("epicGratisAhora") : t("epicGratisPronto")}
+                  </span>
+                </span>
+                <span className="mt-2 block truncate text-sm font-semibold transition-colors group-hover:text-[var(--accent-text)]">{j.titulo}</span>
+                <span className="block text-xs text-muted">
+                  {j.ya ? t("epicHasta", { fecha: fechaCorta(j.fin) }) : t("epicDesde", { fecha: fechaCorta(j.inicio) })}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {noticias.length > 0 && (
-        <div className="mb-10">
+        <div className="mb-12">
           <NewsFeed
             titulo={t("noticiasTitulo", { plataforma: info.label })}
             badge={esSteam ? t("badgeSteam") : t("badgePlaystation")}
@@ -103,8 +139,8 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       )}
 
       {recomendados.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
+        <section className="mb-12">
+          <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
             {userId ? t("recomendadoPara", { plataforma: info.label }) : t("popularEn", { plataforma: info.label })}
           </h2>
           <CardCarousel>
@@ -116,29 +152,14 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       )}
 
       {tendencia.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
-            {t("tendenciaEnParagon")}
-          </h2>
-          <CardCarousel>
-            {tendencia.map((g) => (
-              <PosterCard
-                key={g.igdbId}
-                game={g}
-                badge={
-                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
-                    +{g.recientes}
-                  </span>
-                }
-              />
-            ))}
-          </CardCarousel>
-        </section>
+        <div className="mb-12">
+          <TopComunidad items={tendencia} titulo={t("tendenciaEnParagon")} descripcion={t("tendenciaDescripcion", { plataforma: info.label })} />
+        </div>
       )}
 
       {masJugados.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
+        <section className="mb-12">
+          <h2 className="mb-1 font-heading text-2xl font-bold uppercase">
             {t("masJugados")}
           </h2>
           <p className="mb-4 text-sm text-muted">{t("masJugadosDescripcion", { plataforma: info.label })}</p>
@@ -154,7 +175,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {proximos.length > 0 && (
               <section>
-                <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
+                <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
                   {t("proximosLanzamientos")}
                 </h2>
                 <ReleaseGrid items={proximos} />
@@ -163,7 +184,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
 
             {recientes.length > 0 && (
               <section>
-                <h2 className="mb-4 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
+                <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
                   {t("ultimosLanzamientos")}
                 </h2>
                 <ReleaseGrid items={recientes} />
@@ -174,9 +195,9 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       )}
 
       {psPlus && psPlus.juegos.length > 0 && (
-        <section className="mb-10">
+        <section className="mb-12">
           <div className="mb-4 flex flex-wrap items-baseline gap-3">
-            <h2 className="flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
+            <h2 className="font-heading text-2xl font-bold uppercase">
               {psPlus.mes ? t("psPlusTituloConMes", { mes: psPlus.mes }) : t("psPlusTituloSinMes")}
             </h2>
             <a
@@ -227,8 +248,8 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       )}
 
       {esSteam && ofertas.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
+        <section className="mb-12">
+          <h2 className="mb-1 font-heading text-2xl font-bold uppercase">
             {t("ofertasSteam")}
           </h2>
           <p className="mb-4 text-sm text-muted">{t("viaCheapshark")}</p>
@@ -263,8 +284,8 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
       )}
 
       {esSteam && jugadoresBajos.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-1 flex items-center gap-2 font-heading text-xl font-bold uppercase tracking-wide">
+        <section className="mb-12">
+          <h2 className="mb-1 font-heading text-2xl font-bold uppercase">
             {t("jugadoresBajosTitulo")}
           </h2>
           <p className="mb-4 text-sm text-muted">
@@ -274,7 +295,7 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
         </section>
       )}
 
-      {!esSteam && (
+      {esPlaystation && (
         <p className="rounded-xl border border-border bg-surface px-4 py-6 text-center text-sm text-muted">
           {t("avisoNoSteam")}
         </p>

@@ -27,8 +27,8 @@
     "nuevasEntradas": "New entries",
     "nuevasEntradasDesc": "Just out or about to land, by hype.",
     "top": "Community top",
-    "topDesc": "What the most hunters have started in the last 30 days.",
-    "cazadoresNuevos": "{n, plural, one {# new hunter} other {# new hunters}}",
+    "topDesc": "What the most hunters have played in the last 30 days.",
+    "cazadoresNuevos": "{n, plural, one {# hunter playing} other {# hunters playing}}",
     "votos": "{n, plural, one {# vote} other {# votes}}",
     "joyasNota": "Average score"
   },
@@ -57,7 +57,14 @@
     "jugadoresBajosTitulo": "Barely any players right now",
     "jugadoresBajosDescripcion": "Steam's public counter, live — only for the Steam games already cataloged here, not a sweep of all of Steam.",
     "avisoNoSteam": "Sony doesn't publish how many people are playing a title right now (or PS Store deals) — unlike Steam, there's no public source for either of those two figures, so they don't appear here.",
-    "jugandoAhora": "{n} playing"
+    "jugandoAhora": "{n} playing",
+    "epicGratisTitulo": "Free on the Epic Games Store",
+    "epicVerTienda": "See in store →",
+    "epicGratisAhora": "Free now",
+    "epicGratisPronto": "Coming soon",
+    "epicHasta": "Until {fecha}",
+    "epicDesde": "From {fecha}",
+    "tendenciaDescripcion": "What the most hunters have played on {plataforma} in the last 30 days."
   },
   "RecomendacionesPage": {
     "titulo": "Recommendations",
@@ -90,7 +97,8 @@
     "gamepassAviso": "The latest batch Xbox has announced {fecha} — Game Pass adds games several times a month, this isn't the full catalog.",
     "noticiasTitulo": "Xbox news",
     "noticiasBadge": "Xbox Wire",
-    "sinNoticias": "The news couldn't be loaded right now. Try again later."
+    "sinNoticias": "The news couldn't be loaded right now. Try again later.",
+    "tendenciaDescripcion": "What the most hunters have played on Xbox in the last 30 days."
   },
   "GamePassCatalogoPage": {
     "breadcrumbDescubrir": "Discover",

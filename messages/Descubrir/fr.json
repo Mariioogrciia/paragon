@@ -27,8 +27,8 @@
     "nuevasEntradas": "Nouvelles entrées",
     "nuevasEntradasDesc": "Tout juste sortis ou sur le point de sortir, par attente.",
     "top": "Top de la communauté",
-    "topDesc": "Ce que le plus de chasseurs ont commencé ces 30 derniers jours.",
-    "cazadoresNuevos": "{n, plural, one {# nouveau chasseur} other {# nouveaux chasseurs}}",
+    "topDesc": "Ce à quoi le plus de chasseurs ont joué ces 30 derniers jours.",
+    "cazadoresNuevos": "{n, plural, one {# chasseur y joue} other {# chasseurs y jouent}}",
     "votos": "{n, plural, one {# vote} other {# votes}}",
     "joyasNota": "Note moyenne"
   },
@@ -57,7 +57,14 @@
     "jugadoresBajosTitulo": "Presque aucun joueur en ce moment",
     "jugadoresBajosDescripcion": "Compteur public de Steam, en direct — uniquement pour les jeux Steam déjà catalogués ici, pas un balayage de tout Steam.",
     "avisoNoSteam": "Sony ne publie pas combien de personnes jouent à un titre en ce moment (ni les offres du PS Store) — contrairement à Steam, il n'existe pas de source publique pour ces deux données, donc elles n'apparaissent pas ici.",
-    "jugandoAhora": "{n} en train de jouer"
+    "jugandoAhora": "{n} en train de jouer",
+    "epicGratisTitulo": "Gratuit sur l’Epic Games Store",
+    "epicVerTienda": "Voir dans la boutique →",
+    "epicGratisAhora": "Gratuit maintenant",
+    "epicGratisPronto": "Bientôt",
+    "epicHasta": "Jusqu’au {fecha}",
+    "epicDesde": "À partir du {fecha}",
+    "tendenciaDescripcion": "Ce à quoi le plus de chasseurs ont joué sur {plataforma} ces 30 derniers jours."
   },
   "RecomendacionesPage": {
     "titulo": "Recommandations",
@@ -90,7 +97,8 @@
     "gamepassAviso": "La dernière vague annoncée par Xbox {fecha} — le Game Pass ajoute des jeux plusieurs fois par mois, ce n'est pas le catalogue complet.",
     "noticiasTitulo": "Actus Xbox",
     "noticiasBadge": "Xbox Wire",
-    "sinNoticias": "Impossible de charger les actus pour le moment. Réessaie plus tard."
+    "sinNoticias": "Impossible de charger les actus pour le moment. Réessaie plus tard.",
+    "tendenciaDescripcion": "Ce à quoi le plus de chasseurs ont joué sur Xbox ces 30 derniers jours."
   },
   "GamePassCatalogoPage": {
     "breadcrumbDescubrir": "Découvrir",

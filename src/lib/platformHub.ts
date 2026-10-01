@@ -17,7 +17,7 @@ import type { DiscoverGame } from "@/lib/discover";
  * "psn" es el valor real de `games.platform`; la URL y el resto de la UI
  * dicen "playstation", que es más reconocible.
  */
-export type PlataformaHub = "psn" | "steam" | "xbox";
+export type PlataformaHub = "psn" | "steam" | "xbox" | "epic";
 
 function parseGenres(raw: string | null): string[] {
   if (!raw) return [];
@@ -46,10 +46,11 @@ export async function trendingOnPlatform(
     })
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
-    .where(and(eq(gamesTable.platform, plataforma), isNotNull(gamesTable.igdbId), gte(userGames.createdAt, desde)))
+    // Jugado en el periodo, no añadido (mismo criterio que getTrendingGames).
+    .where(and(eq(gamesTable.platform, plataforma), isNotNull(gamesTable.igdbId), eq(userGames.isWishlist, false), gte(userGames.lastPlayedAt, desde)))
     .groupBy(gamesTable.igdbId)
     .having(sql`COUNT(DISTINCT ${userGames.userId}) > 0`)
-    .orderBy(desc(sql`COUNT(DISTINCT ${userGames.userId})`))
+    .orderBy(desc(sql`COUNT(DISTINCT ${userGames.userId})`), desc(sql`COALESCE(SUM(${userGames.playtimeRecentMinutes}), 0)`))
     .limit(limit);
 
   return rows

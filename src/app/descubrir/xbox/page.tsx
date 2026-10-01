@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import { getXboxNews } from "@/lib/xboxNews";
 import { NewsFeed } from "@/components/NewsFeed";
 import { XboxIcon } from "@/lib/platformIcons";
+import { CabeceraPlataforma } from "@/components/descubrir/CabeceraPlataforma";
+import { TopComunidad } from "@/components/descubrir/Exitos";
 import { BackButton } from "@/components/BackButton";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { CardCarousel } from "@/components/CardCarousel";
@@ -45,24 +47,11 @@ export default async function DescubrirXboxPage() {
     <div>
       <RefrescoAutomatico />
       <BackButton fallbackHref="/descubrir" />
-      <div className="mb-6 flex items-center gap-3">
-        <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white"
-          style={{ background: "#107C10" }}
-        >
-          <XboxIcon size={26} />
-        </span>
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-muted">
-            <Link href="/descubrir" className="hover:underline">{t("breadcrumb")}</Link> / Xbox
-          </p>
-          <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">{t("titulo")}</h1>
-        </div>
-      </div>
+      <CabeceraPlataforma nombre={t("titulo")} color="#107c10" icono={<XboxIcon size={38} />} migas={t("breadcrumb")} />
 
       {recomendados.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">
+        <section className="mb-12">
+          <h2 className="mb-4 font-heading text-2xl font-bold uppercase">
             {userId ? t("recomendadoPara") : t("popularEn")}
           </h2>
           <CardCarousel>
@@ -74,33 +63,20 @@ export default async function DescubrirXboxPage() {
       )}
 
       {tendencia.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 font-heading text-xl font-bold uppercase tracking-wide">{t("tendenciaEnParagon")}</h2>
-          <CardCarousel>
-            {tendencia.map((g) => (
-              <PosterCard
-                key={g.igdbId}
-                game={g}
-                badge={
-                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[0.625rem] font-bold text-white backdrop-blur-sm">
-                    +{g.recientes}
-                  </span>
-                }
-              />
-            ))}
-          </CardCarousel>
-        </section>
+        <div className="mb-12">
+          <TopComunidad items={tendencia} titulo={t("tendenciaEnParagon")} descripcion={t("tendenciaDescripcion")} />
+        </div>
       )}
 
       {masJugados.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-1 font-heading text-xl font-bold uppercase tracking-wide">{t("masJugados")}</h2>
+        <section className="mb-12">
+          <h2 className="mb-1 font-heading text-2xl font-bold uppercase">{t("masJugados")}</h2>
           <p className="mb-4 text-sm text-muted">{t("masJugadosDescripcion")}</p>
           <RankedList items={masJugados} value={(g) => g.horas} valueLabel={(g) => `${g.horas} h`} />
         </section>
       )}
 
-      <section className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl px-5 py-4" style={{ border: "1px solid var(--border)", background: "var(--surface)" }}>
+      <section className="mb-12 flex flex-wrap items-center justify-between gap-3 rounded-xl px-5 py-4" style={{ border: "1px solid color-mix(in srgb, #107c10 45%, var(--border))", background: "linear-gradient(120deg, color-mix(in srgb, #107c10 16%, var(--surface)), var(--surface))" }}>
         <div>
           <h2 className="font-heading text-lg font-bold uppercase tracking-wide">{t("gamepassTitulo")}</h2>
           <p className="text-sm text-muted">{t("gamepassDescripcion")}</p>
@@ -115,9 +91,9 @@ export default async function DescubrirXboxPage() {
       </section>
 
       {gamePass && gamePass.juegos.length > 0 && (
-        <section className="mb-10">
+        <section className="mb-12">
           <div className="mb-1 flex flex-wrap items-baseline gap-3">
-            <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("recienLlegados")}</h2>
+            <h2 className="font-heading text-2xl font-bold uppercase">{t("recienLlegados")}</h2>
             <a href={gamePass.link} target="_blank" rel="noopener noreferrer nofollow" className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline">
               {t("verAnuncio")}
             </a>

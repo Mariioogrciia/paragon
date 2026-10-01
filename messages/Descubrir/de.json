@@ -27,8 +27,8 @@
     "nuevasEntradas": "Neueinsteiger",
     "nuevasEntradasDesc": "Gerade erschienen oder kurz davor, nach Hype.",
     "top": "Community-Top",
-    "topDesc": "Was die meisten Jäger in den letzten 30 Tagen angefangen haben.",
-    "cazadoresNuevos": "{n, plural, one {# neuer Jäger} other {# neue Jäger}}",
+    "topDesc": "Was die meisten Jäger in den letzten 30 Tagen gespielt haben.",
+    "cazadoresNuevos": "{n, plural, one {# Jäger spielt es} other {# Jäger spielen es}}",
     "votos": "{n, plural, one {# Stimme} other {# Stimmen}}",
     "joyasNota": "Durchschnittsnote"
   },
@@ -57,7 +57,14 @@
     "jugadoresBajosTitulo": "Gerade fast keine Spieler",
     "jugadoresBajosDescripcion": "Steams öffentlicher Zähler, live — nur für die hier bereits katalogisierten Steam-Spiele, kein Rundumschlag über ganz Steam.",
     "avisoNoSteam": "Sony veröffentlicht nicht, wie viele Leute einen Titel gerade spielen (oder PS-Store-Angebote) — anders als bei Steam gibt es für diese beiden Werte keine öffentliche Quelle, deshalb erscheinen sie hier nicht.",
-    "jugandoAhora": "{n} spielen gerade"
+    "jugandoAhora": "{n} spielen gerade",
+    "epicGratisTitulo": "Gratis im Epic Games Store",
+    "epicVerTienda": "Im Store ansehen →",
+    "epicGratisAhora": "Jetzt gratis",
+    "epicGratisPronto": "Demnächst",
+    "epicHasta": "Bis {fecha}",
+    "epicDesde": "Ab {fecha}",
+    "tendenciaDescripcion": "Was die meisten Jäger in den letzten 30 Tagen auf {plataforma} gespielt haben."
   },
   "RecomendacionesPage": {
     "titulo": "Empfehlungen",
@@ -90,7 +97,8 @@
     "gamepassAviso": "Die letzte von Xbox angekündigte Runde {fecha} — Game Pass fügt mehrmals im Monat Spiele hinzu, das ist nicht der komplette Katalog.",
     "noticiasTitulo": "Xbox-News",
     "noticiasBadge": "Xbox Wire",
-    "sinNoticias": "Die News konnten gerade nicht geladen werden. Versuch es später noch mal."
+    "sinNoticias": "Die News konnten gerade nicht geladen werden. Versuch es später noch mal.",
+    "tendenciaDescripcion": "Was die meisten Jäger in den letzten 30 Tagen auf Xbox gespielt haben."
   },
   "GamePassCatalogoPage": {
     "breadcrumbDescubrir": "Entdecken",

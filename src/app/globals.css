@@ -926,33 +926,25 @@ h3,
 @media (prefers-reduced-motion: reduce) { .cabina-celda::before { transition: none; } }
 
 /* --- Amigos: marcador de estadio (src/app/amigos/page.tsx) --------------- */
-/* Isla oscura: un marcador es negro aunque la app esté en modo claro, así
-   que redefine los tokens y todo lo de dentro (formularios, RetosAmigos,
-   PlatinarJuntos) se pinta en su paleta sin tocar esos componentes. */
-.marcador {
-  --background: #050608;
-  --surface: #0b0d10;
-  --surface-2: #171b21;
-  --border: #232830;
-  --foreground: #e9eef7;
-  --muted: #9aa3b2;
-  --accent-text: color-mix(in srgb, var(--accent) 45%, white);
-  --marcador-ambar: #ffcf3a;
-  color: var(--foreground);
-}
-.light .marcador {
-  --accent-2: color-mix(in srgb, var(--accent) 35%, white);
-  --accent-grad: linear-gradient(160deg, var(--accent-2), color-mix(in srgb, var(--accent) 65%, white));
-}
+/* El marcador sigue el tema del usuario (1 oct, tarde): antes era una isla
+   negra con ámbar fijo y desentonaba con las paletas completas y el color
+   "desde tu juego". Ahora el panel es la superficie del tema oscurecida y
+   los rótulos y cifras van en el acento; en claro, la superficie tal cual. */
+.marcador { --marcador-ambar: var(--accent-text); }
 .marcador-panel,
 .marcador-envoltura > section {
   margin-top: 0;
   border-radius: 14px;
-  border: 1px solid #2c323b;
+  border: 1px solid var(--border);
   background:
     radial-gradient(circle, rgb(255 255 255 / 0.035) 1px, transparent 1.4px) 0 0 / 6px 6px,
-    linear-gradient(180deg, #0d1014, #07090b);
-  box-shadow: inset 0 0 0 4px #050608, inset 0 0 0 5px #1a1e24, 0 18px 40px -24px rgb(0 0 0 / 0.8);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 80%, black), color-mix(in srgb, var(--background) 75%, black));
+  box-shadow: inset 0 0 0 4px color-mix(in srgb, var(--background) 70%, black), inset 0 0 0 5px var(--border), 0 18px 40px -24px rgb(0 0 0 / 0.8);
+}
+.light .marcador-panel,
+.light .marcador-envoltura > section {
+  background: radial-gradient(circle, rgb(0 0 0 / 0.04) 1px, transparent 1.4px) 0 0 / 6px 6px, var(--surface);
+  box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--border), 0 18px 40px -28px rgb(0 0 0 / 0.25);
 }
 .marcador-envoltura > section { padding: 1.5rem; }
 .marcador-rotulo {
@@ -976,8 +968,8 @@ h3,
   -webkit-mask-size: 3px 3px;
   mask-size: 3px 3px;
 }
-.marcador-led-oro { color: var(--marcador-ambar); text-shadow: 0 0 12px rgb(255 207 58 / 0.55); }
-.marcador-led-platino { color: #dff0f8; text-shadow: 0 0 12px rgb(159 212 236 / 0.55); }
+.marcador-led-oro { color: var(--gold); text-shadow: 0 0 12px rgb(226 181 62 / 0.55); }
+.marcador-led-platino { color: var(--platinum); text-shadow: 0 0 12px rgb(159 212 236 / 0.45); }
 .marcador-etiqueta { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
 .marcador-tu {
   border-radius: 4px;
@@ -1099,33 +1091,25 @@ h3,
 .paleta-juego[data-activo] { outline-color: var(--accent); }
 
 /* --- Noticias: panel de salidas (UpcomingGames variante="panel", TeletipoNoticias) */
-/* Isla oscura como el marcador de Amigos: un panel de aeropuerto es negro
-   también en modo claro. Ámbar de paleta solo en fechas y estados. */
-.salidas {
-  --background: #0a0c10;
-  --surface: #101318;
-  --surface-2: #1b1f27;
-  --border: #252a33;
-  --foreground: #eef1f6;
-  --muted: #9aa3b2;
-  --accent-text: color-mix(in srgb, var(--accent) 45%, white);
-  --salidas-ambar: #ffcf3a;
-  color: var(--foreground);
-}
+/* El tablero toma el suelo del tema (como el marcador de Amigos); el ámbar
+   de paleta queda solo en las letras de la fecha y la hora del teletipo. */
+.salidas { --salidas-ambar: #ffcf3a; }
+.light .salidas { --salidas-ambar: #a16207; }
 .salidas-tablero {
   overflow: hidden;
   border-radius: 14px;
-  border: 1px solid #2a2f38;
-  background: linear-gradient(180deg, #0f1217, #090b0e);
-  box-shadow: inset 0 0 0 4px #0a0c10, inset 0 0 0 5px #1a1e25, 0 18px 40px -24px rgb(0 0 0 / 0.8);
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 80%, black), color-mix(in srgb, var(--background) 75%, black));
+  box-shadow: inset 0 0 0 4px color-mix(in srgb, var(--background) 70%, black), inset 0 0 0 5px var(--border), 0 18px 40px -24px rgb(0 0 0 / 0.8);
 }
+.light .salidas-tablero { background: var(--surface); box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--border); }
 .salidas-rotulo {
   font-family: var(--font-heading);
   font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--salidas-ambar);
+  color: var(--accent-text);
 }
 .salidas-fila {
   display: grid;
@@ -1137,7 +1121,7 @@ h3,
   cursor: pointer;
   transition: background-color 150ms;
 }
-.salidas-fila:hover { background: rgb(255 207 58 / 0.05); }
+.salidas-fila:hover { background: rgb(var(--accent-rgb) / 0.06); }
 .salidas-fila:last-child { border-bottom: 0; }
 .salidas-cabecera {
   display: none;
@@ -1166,8 +1150,9 @@ h3,
 .salidas-letra {
   position: relative;
   border-radius: 3px;
-  color: var(--salidas-ambar);
+  color: #ffcf3a;
   background: linear-gradient(180deg, #1c2028 0 49%, #0b0d11 49% 51%, #171a21 51% 100%);
+  /* La casilla de paleta es siempre oscura (es un objeto), también en claro. */
   box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.6);
 }
 .salidas-hueco { width: 0.35rem; }
@@ -1206,7 +1191,7 @@ h3,
   padding: 1rem 1.25rem;
   transition: background-color 150ms;
 }
-.teletipo-fila:hover { background: rgb(255 207 58 / 0.05); }
+.teletipo-fila:hover { background: rgb(var(--accent-rgb) / 0.06); }
 .teletipo-hora {
   padding-top: 0.125rem;
   font-family: var(--font-heading);
@@ -1295,3 +1280,64 @@ h3,
   color: transparent;
   -webkit-text-stroke: 2px rgb(255 255 255 / 0.22);
 }
+
+/* Filas de lista dentro de una tarjeta (lista de la matriz, Top de la
+   comunidad...): ya marcan el hover con fondo, y el resplandor global de
+   12 px se salía por los bordes de la tarjeta. Sin resplandor ni salto. */
+.fila-lista:hover { filter: none !important; transform: none !important; }
+
+/* --- Páginas de plataforma (CabeceraPlataforma, RankedList, NewsFeed) ---- */
+/* Banda con el color de la marca: es contexto de identidad de plataforma,
+   el único sitio (con los accesos de Descubrir) donde viven esos colores. */
+.plataforma-banda {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--marca) 100%, white 12%), transparent 60%),
+    linear-gradient(120deg, var(--marca), color-mix(in srgb, var(--marca) 45%, black));
+  box-shadow: 0 24px 50px -30px var(--marca);
+}
+.plataforma-logo {
+  display: flex;
+  height: 4rem;
+  width: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+/* Los logos son SVG de color: en la banda (y en los accesos) van en blanco. */
+.plataforma-logo img, .acceso-plataforma img, .logo-blanco img { filter: brightness(0) invert(1); }
+@media (min-width: 640px) { .plataforma-banda { padding: 2.25rem 2rem; } .plataforma-logo { height: 5rem; width: 5rem; } }
+
+.exitos-ranking { border-top: 1px solid var(--border); }
+.exitos-ranking > li { border-bottom: 1px solid var(--border); }
+.exitos-fila-ranking {
+  display: grid;
+  grid-template-columns: 3.25rem 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.625rem 0.5rem;
+  transition: background-color 150ms;
+}
+.exitos-fila-ranking:hover { background: var(--surface); }
+.exitos-numeral-medio { font-size: 2.25rem; -webkit-text-stroke-width: 1.25px; }
+.exitos-fila-ranking[data-podio="1"] .exitos-numeral { color: var(--gold); -webkit-text-stroke-color: var(--gold); }
+.exitos-fila-ranking[data-podio="2"] .exitos-numeral { color: var(--silver); -webkit-text-stroke-color: var(--silver); }
+.exitos-fila-ranking[data-podio="3"] .exitos-numeral { color: var(--bronze); -webkit-text-stroke-color: var(--bronze); }
+
+.noticia-fila {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  transition: background-color 150ms;
+}
+.noticia-fila:hover { background: var(--surface-2); }

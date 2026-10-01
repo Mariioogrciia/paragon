@@ -125,14 +125,14 @@ export function HeroCarousel({
                 una linea de movil y partia la fila en dos, descuadrando el
                 alto de la pieza). */}
             {g.platforms.length === 1 ? (
-              <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 text-[0.6875rem] font-bold backdrop-blur-sm">
+              <span className="logo-blanco flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 text-[0.6875rem] font-bold backdrop-blur-sm">
                 <IconoPlataforma platforms={[g.platforms[0]]} />
                 {g.platforms[0]}
               </span>
             ) : (
               g.platforms.length > 0 && (
                 <span
-                  className="flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 backdrop-blur-sm"
+                  className="logo-blanco flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-2 py-1 backdrop-blur-sm"
                   title={g.platforms.join(" · ")}
                 >
                   {/* Un icono por FAMILIA, sin repetir: "PS4" y "PS5" son dos

@@ -27,8 +27,8 @@
     "nuevasEntradas": "Nuevas entradas",
     "nuevasEntradasDesc": "Recién salidos o a punto de salir, por expectación.",
     "top": "Top de la comunidad",
-    "topDesc": "Lo que más cazadores han empezado en los últimos 30 días.",
-    "cazadoresNuevos": "{n, plural, one {# cazador nuevo} other {# cazadores nuevos}}",
+    "topDesc": "Lo que más cazadores han jugado en los últimos 30 días.",
+    "cazadoresNuevos": "{n, plural, one {# cazador jugándolo} other {# cazadores jugándolo}}",
     "votos": "{n, plural, one {# voto} other {# votos}}",
     "joyasNota": "Nota media"
   },
@@ -57,7 +57,14 @@
     "jugadoresBajosTitulo": "Casi sin jugadores ahora mismo",
     "jugadoresBajosDescripcion": "Contador público de Steam, en vivo — solo de los juegos de Steam que ya hay catalogados aquí, no un barrido de todo Steam.",
     "avisoNoSteam": "Sony no publica cuánta gente juega cada título ahora mismo (ni ofertas de PS Store) — a diferencia de Steam, no hay fuente pública para esos dos datos, así que no aparecen aquí.",
-    "jugandoAhora": "{n} jugando"
+    "jugandoAhora": "{n} jugando",
+    "epicGratisTitulo": "Gratis en Epic Games Store",
+    "epicVerTienda": "Ver en la tienda →",
+    "epicGratisAhora": "Gratis ahora",
+    "epicGratisPronto": "Próximamente",
+    "epicHasta": "Hasta el {fecha}",
+    "epicDesde": "Desde el {fecha}",
+    "tendenciaDescripcion": "Lo que más cazadores han jugado en {plataforma} en los últimos 30 días."
   },
   "RecomendacionesPage": {
     "titulo": "Recomendaciones",
@@ -90,7 +97,8 @@
     "gamepassAviso": "La última tanda que ha anunciado Xbox {fecha} — Game Pass añade juegos varias veces al mes, esto no es el catálogo entero.",
     "noticiasTitulo": "Noticias de Xbox",
     "noticiasBadge": "Xbox Wire",
-    "sinNoticias": "No se han podido cargar las noticias ahora mismo. Prueba más tarde."
+    "sinNoticias": "No se han podido cargar las noticias ahora mismo. Prueba más tarde.",
+    "tendenciaDescripcion": "Lo que más cazadores han jugado en Xbox en los últimos 30 días."
   },
   "GamePassCatalogoPage": {
     "breadcrumbDescubrir": "Descubrir",
