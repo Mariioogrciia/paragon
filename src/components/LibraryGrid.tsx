@@ -173,6 +173,33 @@ export function LibraryGrid({
     });
   }, [games, collections, collection, search, status, platform, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, soloFaltaDlc, sort, sortDir]);
 
+  // Número de cada pestaña de plataforma = lo que saldría al pulsarla con
+  // los DEMÁS filtros que haya puestos (estado, carpeta, búsqueda...). Antes
+  // contaba la biblioteca entera: "Steam (16)" y, al pulsar, "5 resultados"
+  // porque había un filtro de estado activo (1 oct 2026).
+  const conteoPlataformas = useMemo(() => {
+    const carpeta = collections.find((c) => c.id === collection);
+    const base = carpeta ? games.filter((g) => carpeta.gameIds.includes(g.id)) : games;
+    const sinPlataforma = filterGames(base, {
+      search,
+      status,
+      platform: "todas",
+      publisher: publisher || undefined,
+      genre: genre || undefined,
+      pegi: pegi || undefined,
+      dificultad: dificultad || undefined,
+      horas: horas || undefined,
+      acquisitionFormat: acquisitionFormat || undefined,
+      porAmortizar: porAmortizar || undefined,
+      soloFaltaDlc: soloFaltaDlc || undefined,
+      sort,
+      sortDir,
+    });
+    const cuenta = new Map<string, number>();
+    for (const g of sinPlataforma) cuenta.set(g.platform, (cuenta.get(g.platform) ?? 0) + 1);
+    return { porPlataforma: cuenta, total: sinPlataforma.length };
+  }, [games, collections, collection, search, status, publisher, genre, pegi, dificultad, horas, acquisitionFormat, porAmortizar, soloFaltaDlc, sort, sortDir]);
+
   const grupos = useMemo(() => {
     if (!agrupar) return null;
 
@@ -471,7 +498,7 @@ export function LibraryGrid({
                   onClick={() => setPlatform(p.value as Platform)}
                   className="flex-1 flex justify-center text-center"
                 >
-                  {t("platformCount", { label: PLATFORM_LABEL[p.value as Platform], count: p.count })}
+                  {t("platformCount", { label: PLATFORM_LABEL[p.value as Platform], count: conteoPlataformas.porPlataforma.get(p.value) ?? 0 })}
                 </Pill>
               ))}
             </div>
