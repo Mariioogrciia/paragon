@@ -43,7 +43,8 @@ import { syncGameTrophies } from "@/lib/sync";
 import { parseGameKey } from "@/lib/types";
 import { addManualGame, setManualGameCompleted } from "@/lib/manualGames";
 import { createGuide, deleteGuide, replyToGuide } from "@/lib/guides";
-import { buscarVideoGuiaTrofeo, rebuscarVideoGuiaTrofeo } from "@/lib/videoGuides";
+import { buscarVideoGuiaTrofeo, rebuscarVideoGuiaTrofeo, videosGuiaTrofeo, videosGuiaConTexto } from "@/lib/videoGuides";
+import { idiomaActual } from "@/lib/trofeosIdioma";
 import { upsertTrophyGuide, deleteTrophyGuide, listTrophyGuides, TrophyGuideError, type TrophyGuideRow } from "@/lib/trophyGuides";
 import { ownsGame } from "@/lib/community";
 import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
@@ -1100,6 +1101,40 @@ export async function searchTrophyGuideAction(
   const session = await auth();
   if (!(await limitar("guiaVideo", session?.user?.id ?? await ipActual()))) return null;
   return buscarVideoGuiaTrofeo(gameTitle, trophyName, gameId, trophyId);
+}
+
+/**
+ * Vídeos de guía en el idioma de la interfaz (varios, no uno), cacheados por
+ * trofeo e idioma — ver `videosGuiaTrofeo` en lib/videoGuides.ts. Sin sesión
+ * a propósito, igual que `searchTrophyGuideAction`: la modal también la abren
+ * visitantes de perfiles públicos.
+ */
+export async function videosGuiaAction(gameId: string, trophyId: string): Promise<string[]> {
+  const session = await auth();
+  if (!(await limitar("guiaVideo", session?.user?.id ?? (await ipActual())))) return [];
+  return videosGuiaTrofeo(gameId, trophyId, await idiomaActual());
+}
+
+/**
+ * "¿Qué te falta?": búsqueda de vídeos con el texto de la persona. Pide
+ * sesión (cada búsqueda va a YouTube) y límite propio; el texto pasa el
+ * filtro de lenguaje y no se guarda en ningún sitio.
+ */
+export async function videosGuiaTextoAction(
+  gameId: string,
+  trophyId: string,
+  texto: string,
+): Promise<{ videos: string[]; error?: "limite" | "ofensivo" | "vacio" | "sesion" }> {
+  // Sin `requireUserId()`: ese redirige a /entrar, y desde una modal es mejor
+  // un aviso dentro de la propia modal que sacar a la persona de la ficha.
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return { videos: [], error: "sesion" };
+  const limpio = texto.trim();
+  if (!limpio) return { videos: [], error: "vacio" };
+  if (contieneLenguajeOfensivo(limpio)) return { videos: [], error: "ofensivo" };
+  if (!(await limitar("guiaVideoTexto", userId))) return { videos: [], error: "limite" };
+  return { videos: await videosGuiaConTexto(gameId, trophyId, limpio, await idiomaActual()) };
 }
 
 /**

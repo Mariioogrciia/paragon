@@ -402,3 +402,43 @@ export async function fetchTrophies(
     };
   });
 }
+
+/**
+ * Nombre y descripción de los trofeos de un título (y el nombre de cada
+ * grupo/DLC) en un idioma de PSN — para las traducciones por idioma de
+ * lib/trofeosIdioma.ts. PSN separa la definición del estado del jugador, y
+ * la definición es común a todos: no hace falta ninguna cuenta concreta,
+ * basta el token del servidor. `Accept-Language` es lo que elige el idioma.
+ */
+export async function fetchDefinicionesPsn(
+  npCommunicationId: string,
+  service: "trophy" | "trophy2",
+  idioma: string,
+): Promise<{ trophyId: string; name: string; detail: string; groupName?: string }[]> {
+  const auth = await getAuthorization();
+  const headerOverrides = { "Accept-Language": idioma };
+  const options =
+    service === "trophy" ? { npServiceName: "trophy" as const, headerOverrides } : { headerOverrides };
+
+  const definitions = await getTitleTrophies(auth, npCommunicationId, "all", options);
+
+  const nombreDeGrupo = new Map<string, string>();
+  if (definitions.hasTrophyGroups) {
+    try {
+      const grupos = await getTitleTrophyGroups(auth, npCommunicationId, options);
+      for (const g of grupos.trophyGroups) nombreDeGrupo.set(g.trophyGroupId, g.trophyGroupName);
+    } catch {
+      // Sin nombres de grupo: los trofeos se traducen igual.
+    }
+  }
+
+  return definitions.trophies.map((d) => {
+    const grupo = (d as { trophyGroupId?: string }).trophyGroupId ?? "default";
+    return {
+      trophyId: String(d.trophyId),
+      name: d.trophyName ?? "",
+      detail: d.trophyDetail ?? "",
+      groupName: nombreDeGrupo.get(grupo),
+    };
+  });
+}

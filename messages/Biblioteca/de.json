@@ -305,7 +305,20 @@
       "searchElsewhere": "Lieber woanders suchen? Öffnet sich in einem neuen Tab.",
       "searchTerm": "Trophäenanleitung",
       "searchOn": "Auf {site} suchen"
-    }
+    },
+    "nextVideo": "Nächstes Video",
+    "videoN": "Video {n}",
+    "missingLabel": "Was fehlt dir noch?",
+    "missingHelp": "Schreib, was du nicht findest, und ich suche Videos in deiner Sprache.",
+    "missingPlaceholder": "z. B. die letzte Reliquie, Schneegebiet",
+    "missingButton": "Suchen",
+    "missingSearching": "Suche läuft…",
+    "missingResults": "Ergebnisse für „{texto}“",
+    "backToGeneral": "Zurück zur allgemeinen Suche",
+    "needLogin": "Melde dich an, um mit eigenem Text zu suchen.",
+    "offensive": "Dieser Text enthält anstößige Sprache.",
+    "limit": "Zu viele Suchen hintereinander. Versuche es in ein paar Minuten erneut.",
+    "noResultsText": "Keine Videos zu diesem Text gefunden. Versuche andere Wörter."
   },
   "GameGuideLink": {
     "searchQuery": "{title} komplette Anleitung beste Waffen und Rüstung",

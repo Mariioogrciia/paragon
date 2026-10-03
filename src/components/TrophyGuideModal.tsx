@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import {
   searchTrophyGuideAction,
-  rebuscarVideoGuiaAction,
+  videosGuiaAction,
+  videosGuiaTextoAction,
   pinTrophyAction,
   getTrophyGuidesAction,
   saveTrophyGuideAction,
@@ -60,42 +61,80 @@ export function TrophyGuideModal({
 }) {
   const t = useTranslations("Biblioteca");
   const [isPending, startTransition] = useTransition();
-  const [videoId, setVideoId] = useState<string | null>(null);
+  const [videos, setVideos] = useState<string[]>([]);
+  const [indice, setIndice] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [rebuscando, setRebuscando] = useState(false);
   const [pestaña, setPestaña] = useState<"video" | "guia">("video");
+  // "¿Qué te falta?": búsqueda con el texto de la persona (no se guarda).
+  const [textoInput, setTextoInput] = useState("");
+  const [textoActivo, setTextoActivo] = useState<string | null>(null);
+  const [errorTexto, setErrorTexto] = useState<string | null>(null);
+  const [sinResultadosTexto, setSinResultadosTexto] = useState(false);
+
+  async function cargarGenerales() {
+    setLoading(true);
+    // Con gameId: varios vídeos en el idioma de la interfaz, cacheados por
+    // trofeo e idioma. Sin él (juego manual sin id real) se busca uno en vivo.
+    const ids = gameId
+      ? await videosGuiaAction(gameId, trophy.id)
+      : await searchTrophyGuideAction(gameTitle, trophy.name, gameId, trophy.id).then((id) => (id ? [id] : []));
+    setVideos(ids);
+    setIndice(0);
+    setLoading(false);
+  }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- marca la carga al empezar la petición; la respuesta llega después, asíncrona.
-    setLoading(true);
-    // gameId/trophy.id dejan que la acción cachee el resultado en
-    // game_trophy — sin ellos (juego manual sin gameId real) busca en vivo
-    // igual, solo que sin guardar para la próxima vez.
-    searchTrophyGuideAction(gameTitle, trophy.name, gameId, trophy.id).then((id) => {
-      setVideoId(id);
-      setLoading(false);
-    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial al abrir el modal; la respuesta llega después, asíncrona.
+    cargarGenerales();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al abrir (o cambiar de trofeo), no con cada render de cargarGenerales.
   }, [gameTitle, trophy.name, gameId, trophy.id]);
 
-  // "Buscar otro" — el vídeo cacheado puede no ser el correcto (la caché
-  // guarda "el primero" de esta misma sesión, no una comprobación de que
-  // sea el trofeo de verdad). Solo tiene sentido con `gameId` real: sin él
-  // no hay dónde guardar el resultado, y `rebuscarVideoGuiaAction` lo exige.
-  function buscarOtro() {
-    if (!gameId) return;
-    setRebuscando(true);
+  function buscarConTexto(e: React.FormEvent) {
+    e.preventDefault();
+    const texto = textoInput.trim();
+    if (!texto || !gameId) return;
+    setErrorTexto(null);
+    setSinResultadosTexto(false);
+    setLoading(true);
     startTransition(async () => {
       try {
-        const id = await rebuscarVideoGuiaAction(gameId, trophy.id);
-        setVideoId(id);
+        const r = await videosGuiaTextoAction(gameId, trophy.id, texto);
+        if (r.error) {
+          setErrorTexto(
+            r.error === "ofensivo"
+              ? t("TrophyGuideModal.offensive")
+              : r.error === "limite"
+                ? t("TrophyGuideModal.limit")
+                : r.error === "sesion"
+                  ? t("TrophyGuideModal.needLogin")
+                  : null,
+          );
+        } else {
+          setVideos(r.videos);
+          setIndice(0);
+          setTextoActivo(texto);
+          setSinResultadosTexto(r.videos.length === 0);
+        }
       } catch {
-        // Sin sesión (requireUserId lanza) u otro fallo — se queda el vídeo
-        // que ya había, sin romper el modal.
+        // `requireUserId` lanza sin sesión.
+        setErrorTexto(t("TrophyGuideModal.needLogin"));
       } finally {
-        setRebuscando(false);
+        setLoading(false);
       }
     });
   }
+
+  function volverALaGeneral() {
+    setTextoActivo(null);
+    setTextoInput("");
+    setSinResultadosTexto(false);
+    setErrorTexto(null);
+    startTransition(() => {
+      cargarGenerales();
+    });
+  }
+
+  const videoId = videos[indice] ?? null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -175,46 +214,99 @@ export function TrophyGuideModal({
         </div>
 
         {pestaña === "video" ? (
-          <div className="relative aspect-video w-full bg-black">
-            {loading || rebuscando ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-current border-t-transparent" />
-                <p className="text-sm">{rebuscando ? t("TrophyGuideModal.searchingAnother") : t("TrophyGuideModal.searchingBest")}</p>
-              </div>
-            ) : videoId ? (
-              <iframe
-                className="absolute inset-0 h-full w-full border-0"
-                src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted p-8 text-center">
-                <p className="text-lg mb-2">{t("TrophyGuideModal.noVideoFound")}</p>
-                <p className="text-sm">{t("TrophyGuideModal.noVideoFoundDetail")}</p>
+          <>
+            <div className="relative aspect-video w-full bg-black">
+              {loading ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-current border-t-transparent" />
+                  <p className="text-sm">{textoActivo !== null || isPending ? t("TrophyGuideModal.missingSearching") : t("TrophyGuideModal.searchingBest")}</p>
+                </div>
+              ) : videoId ? (
+                <iframe
+                  key={videoId}
+                  className="absolute inset-0 h-full w-full border-0"
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-muted">
+                  <p className="mb-2 text-lg">{sinResultadosTexto ? t("TrophyGuideModal.noResultsText") : t("TrophyGuideModal.noVideoFound")}</p>
+                  {!sinResultadosTexto && <p className="text-sm">{t("TrophyGuideModal.noVideoFoundDetail")}</p>}
+                </div>
+              )}
+
+              {videos.length > 1 && !loading && (
+                <button
+                  onClick={() => setIndice((i) => (i + 1) % videos.length)}
+                  className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-black/80"
+                  style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(6px)" }}
+                  title={t("TrophyGuideModal.wrongVideoHint")}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 4l10 8-10 8V4zM19 5v14" />
+                  </svg>
+                  {t("TrophyGuideModal.nextVideo")}
+                </button>
+              )}
+            </div>
+
+            {videos.length > 1 && !loading && (
+              <div className="flex gap-2 overflow-x-auto border-b border-border px-6 py-3" role="tablist">
+                {videos.map((id, n) => (
+                  <button
+                    key={id}
+                    role="tab"
+                    aria-selected={n === indice}
+                    aria-label={t("TrophyGuideModal.videoN", { n: n + 1 })}
+                    onClick={() => setIndice(n)}
+                    className="relative h-14 w-24 shrink-0 overflow-hidden rounded-md transition-opacity hover:opacity-100"
+                    style={{ opacity: n === indice ? 1 : 0.6, outline: n === indice ? "2px solid var(--accent)" : "none", outlineOffset: 1 }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`https://i.ytimg.com/vi/${id}/mqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+                  </button>
+                ))}
               </div>
             )}
 
-            {/* Solo en tu propia ficha: el vídeo es una búsqueda automática,
-                no una comprobación humana de que sea el trofeo correcto —
-                sin este botón, un acierto malo de la primera búsqueda se
-                queda cacheado mal para todo el mundo, para siempre. */}
-            {esMio && gameId && !loading && !rebuscando && (
-              <button
-                onClick={buscarOtro}
-                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-black/80"
-                style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(6px)" }}
-                title={videoId ? t("TrophyGuideModal.wrongVideoHint") : t("TrophyGuideModal.searchAgain")}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 4v6h-6" />
-                  <path d="M1 20v-6h6" />
-                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                </svg>
-                {videoId ? t("TrophyGuideModal.wrongVideoButton") : t("TrophyGuideModal.searchAgain")}
-              </button>
+            {gameId && (
+              <form onSubmit={buscarConTexto} className="border-b border-border px-6 py-3">
+                <label htmlFor="guia-que-falta" className="text-[0.8125rem] font-bold">
+                  {t("TrophyGuideModal.missingLabel")}
+                </label>
+                <p className="text-xs text-muted">{t("TrophyGuideModal.missingHelp")}</p>
+                <div className="mt-2 flex gap-2">
+                  <input
+                    id="guia-que-falta"
+                    value={textoInput}
+                    onChange={(e) => setTextoInput(e.target.value)}
+                    maxLength={80}
+                    placeholder={t("TrophyGuideModal.missingPlaceholder")}
+                    autoComplete="off"
+                    className="min-w-0 flex-1 rounded-lg border border-border bg-[var(--surface)] px-3 py-2 text-sm outline-none placeholder:text-muted focus:border-accent"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isPending || !textoInput.trim()}
+                    className="rounded-lg px-4 py-2 text-[0.8125rem] font-bold text-background transition-all hover:brightness-110 disabled:opacity-50"
+                    style={{ background: "var(--accent-grad)" }}
+                  >
+                    {isPending ? t("TrophyGuideModal.missingSearching") : t("TrophyGuideModal.missingButton")}
+                  </button>
+                </div>
+                {errorTexto && <p role="alert" className="mt-2 text-xs font-semibold text-danger">{errorTexto}</p>}
+                {textoActivo !== null && (
+                  <p className="mt-2 flex flex-wrap items-center gap-x-3 text-xs text-muted">
+                    <span>{t("TrophyGuideModal.missingResults", { texto: textoActivo })}</span>
+                    <button type="button" onClick={volverALaGeneral} className="rounded-md px-1 font-semibold text-[var(--accent-text)] hover:bg-[var(--accent-soft)] hover:underline">
+                      {t("TrophyGuideModal.backToGeneral")}
+                    </button>
+                  </p>
+                )}
+              </form>
             )}
-          </div>
+          </>
         ) : (
           <GuiaEscritaTab gameId={gameId} gameTitle={gameTitle} trophy={trophy} t={t} />
         )}

@@ -1,7 +1,8 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { games, gameTrophies } from "@/db/schema";
+import { games, gameTrophies, gameTrophyI18n, trophyGuideVideos } from "@/db/schema";
+import { BUSQUEDA_VIDEO, type Idioma } from "@/lib/idiomasTrofeo";
 
 /**
  * Vídeo de guía en YouTube para un trofeo — extraído de `app/actions.ts`
@@ -16,13 +17,19 @@ import { games, gameTrophies } from "@/db/schema";
  * duplicados) — no solo el primero, para que `rebuscarVideoGuiaTrofeo`
  * pueda ofrecer "el siguiente" cuando el primero no era el correcto.
  */
-export async function buscarCandidatosYouTube(query: string): Promise<string[]> {
+export async function buscarCandidatosYouTube(query: string, idioma?: Idioma): Promise<string[]> {
   try {
-    const res = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
+    // `hl`/`gl` (idioma y región de la página de resultados): sin ellos los
+    // vídeos salen en el idioma del servidor, no en el de quien busca.
+    const region = idioma ? `&hl=${BUSQUEDA_VIDEO[idioma].hl}&gl=${BUSQUEDA_VIDEO[idioma].gl}` : "";
+    const res = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}${region}`, {
       signal: AbortSignal.timeout(10_000),
       // Sin esto YouTube a veces sirve una versión reducida de la página
       // sin los datos de vídeo incrustados — comprobado a mano.
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        ...(idioma ? { "Accept-Language": `${BUSQUEDA_VIDEO[idioma].hl}-${BUSQUEDA_VIDEO[idioma].gl},${BUSQUEDA_VIDEO[idioma].hl};q=0.9` } : {}),
+      },
     });
     if (!res.ok) return [];
     const html = await res.text();
@@ -130,4 +137,87 @@ export async function rebuscarVideoGuiaTrofeo(
     .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)));
 
   return videoId;
+}
+
+
+/* ----------------- Vídeos en el idioma de la interfaz (1 oct 2026) ---------------- */
+
+const DIA = 86_400_000;
+const MAX_VIDEOS = 8;
+export const MAX_TEXTO_BUSQUEDA = 80;
+
+/**
+ * Qué se busca, siempre sacado de la base (nunca del cliente, por el mismo
+ * motivo que en `buscarVideoGuiaTrofeo`): título del juego y nombre del
+ * trofeo en el idioma pedido si hay traducción guardada
+ * (lib/trofeosIdioma.ts), y si no, el original.
+ */
+async function textoDeBusqueda(gameId: string, trophyId: string, idioma: Idioma): Promise<{ juego: string; trofeo: string } | null> {
+  const [fila] = await db
+    .select({ trophyName: gameTrophies.name, gameTitle: games.title })
+    .from(gameTrophies)
+    .innerJoin(games, eq(games.id, gameTrophies.gameId))
+    .where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId)))
+    .limit(1);
+  if (!fila) return null;
+  const [tr] = await db
+    .select({ name: gameTrophyI18n.name })
+    .from(gameTrophyI18n)
+    .where(and(eq(gameTrophyI18n.gameId, gameId), eq(gameTrophyI18n.trophyId, trophyId), eq(gameTrophyI18n.lang, idioma)))
+    .limit(1);
+  return { juego: fila.gameTitle, trofeo: tr?.name ?? fila.trophyName };
+}
+
+/**
+ * Hasta 8 vídeos de guía para un trofeo, buscados en el idioma pedido y
+ * cacheados por (juego, trofeo, idioma): la primera persona que lo abre en
+ * ese idioma dispara la búsqueda, las demás leen lo guardado. Con
+ * resultados dura 90 días; sin ninguno, 2 días (para reintentar pronto).
+ */
+export async function videosGuiaTrofeo(gameId: string, trophyId: string, idioma: Idioma): Promise<string[]> {
+  const [guardado] = await db
+    .select()
+    .from(trophyGuideVideos)
+    .where(and(eq(trophyGuideVideos.gameId, gameId), eq(trophyGuideVideos.trophyId, trophyId), eq(trophyGuideVideos.lang, idioma)))
+    .limit(1);
+  if (guardado) {
+    const edad = Date.now() - guardado.checkedAt.getTime();
+    if (guardado.videoIds.length > 0 ? edad < 90 * DIA : edad < 2 * DIA) return guardado.videoIds;
+  }
+
+  const texto = await textoDeBusqueda(gameId, trophyId, idioma);
+  if (!texto) return [];
+
+  let ids = (await buscarCandidatosYouTube(`${texto.juego} ${texto.trofeo} ${BUSQUEDA_VIDEO[idioma].guia}`, idioma)).slice(0, MAX_VIDEOS);
+
+  // El vídeo único que ya estaba guardado de antes se conserva como primera
+  // opción en inglés (era una búsqueda "trophy guide", justo ese idioma).
+  if (idioma === "en") {
+    const [antiguo] = await db.select({ id: gameTrophies.guideVideoId }).from(gameTrophies).where(and(eq(gameTrophies.gameId, gameId), eq(gameTrophies.trophyId, trophyId))).limit(1);
+    if (antiguo?.id && !ids.includes(antiguo.id)) ids = [antiguo.id, ...ids].slice(0, MAX_VIDEOS);
+  }
+
+  await db
+    .insert(trophyGuideVideos)
+    .values({ gameId, trophyId, lang: idioma, videoIds: ids, checkedAt: new Date() })
+    .onConflictDoUpdate({
+      target: [trophyGuideVideos.gameId, trophyGuideVideos.trophyId, trophyGuideVideos.lang],
+      set: { videoIds: ids, checkedAt: new Date() },
+    });
+  return ids;
+}
+
+/**
+ * "¿Qué te falta?": la misma búsqueda más lo que escribe la persona ("la
+ * última reliquia, zona nevada"). NO se guarda: el texto es de quien lo
+ * escribe y cachearlo dejaría a cualquiera decidir qué vídeo ven los demás
+ * (el mismo agujero que se cerró en la auditoría del 25 sept 2026). El
+ * texto ya debe venir validado (longitud, lenguaje) de quien llama.
+ */
+export async function videosGuiaConTexto(gameId: string, trophyId: string, textoLibre: string, idioma: Idioma): Promise<string[]> {
+  const extra = textoLibre.replace(/[ -]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_TEXTO_BUSQUEDA);
+  if (!extra) return [];
+  const texto = await textoDeBusqueda(gameId, trophyId, idioma);
+  if (!texto) return [];
+  return (await buscarCandidatosYouTube(`${texto.juego} ${texto.trofeo} ${extra} ${BUSQUEDA_VIDEO[idioma].guia}`, idioma)).slice(0, MAX_VIDEOS);
 }

@@ -879,6 +879,56 @@ export const trophyGuides = pgTable(
 );
 
 /* ------------------------------------------------------------------ *
+ * Trofeos en el idioma de cada persona (1 oct 2026).                  *
+ *                                                                     *
+ * `game_trophy.name/detail` guarda UN idioma por juego (el de la      *
+ * primera sincronización: PSN y Xbox en inglés, Steam y Epic en       *
+ * español). Aquí se guarda lo que la propia plataforma devuelve al    *
+ * pedírselo en otro idioma, la primera vez que alguien con ese idioma *
+ * abre el juego. Nada de traducción automática. Ver                   *
+ * lib/trofeosIdioma.ts. Creadas con                                   *
+ * scripts/crear-tablas-traducciones-trofeo.mts (RLS activado).        *
+ * ------------------------------------------------------------------ */
+export const gameTrophyI18n = pgTable(
+  "game_trophy_i18n",
+  {
+    gameId: text("gameId").notNull().references(() => games.id, { onDelete: "cascade" }),
+    trophyId: text("trophyId").notNull(),
+    /** es | en | de | fr */
+    lang: text("lang").notNull(),
+    name: text("name").notNull(),
+    detail: text("detail").notNull().default(""),
+    groupName: text("groupName"),
+  },
+  (t) => [primaryKey({ columns: [t.gameId, t.trophyId, t.lang] })],
+);
+
+/** Qué (juego, idioma) ya se pidió a la plataforma y cuántos trofeos devolvió: evita repetir la petición en cada visita. */
+export const gameTrophyI18nEstado = pgTable(
+  "game_trophy_i18n_estado",
+  {
+    gameId: text("gameId").notNull().references(() => games.id, { onDelete: "cascade" }),
+    lang: text("lang").notNull(),
+    checkedAt: timestamp("checkedAt", { mode: "date" }).notNull().defaultNow(),
+    found: integer("found").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.gameId, t.lang] })],
+);
+
+/** Candidatos de vídeo de guía por trofeo e idioma (búsqueda general; la que lleva texto libre del usuario no se guarda). */
+export const trophyGuideVideos = pgTable(
+  "trophy_guide_video",
+  {
+    gameId: text("gameId").notNull().references(() => games.id, { onDelete: "cascade" }),
+    trophyId: text("trophyId").notNull(),
+    lang: text("lang").notNull(),
+    videoIds: jsonb("videoIds").$type<string[]>().notNull().default([]),
+    checkedAt: timestamp("checkedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.gameId, t.trophyId, t.lang] })],
+);
+
+/* ------------------------------------------------------------------ *
  * Suscripciones a notificaciones push (Web Push / VAPID).             *
  *                                                                     *
  * Una fila por navegador suscrito, no por usuario: quien tiene            *

@@ -305,7 +305,20 @@
       "searchElsewhere": "¿Prefieres buscarla fuera? Se abre en una pestaña nueva.",
       "searchTerm": "guía trofeo",
       "searchOn": "Buscar en {site}"
-    }
+    },
+    "nextVideo": "Siguiente vídeo",
+    "videoN": "Vídeo {n}",
+    "missingLabel": "¿Qué te falta?",
+    "missingHelp": "Escribe lo que no encuentras y busco vídeos en tu idioma.",
+    "missingPlaceholder": "p. ej. la última reliquia, zona nevada",
+    "missingButton": "Buscar",
+    "missingSearching": "Buscando…",
+    "missingResults": "Resultados para «{texto}»",
+    "backToGeneral": "Volver a la búsqueda general",
+    "needLogin": "Inicia sesión para buscar con tu propio texto.",
+    "offensive": "Ese texto contiene lenguaje ofensivo.",
+    "limit": "Demasiadas búsquedas seguidas. Prueba en unos minutos.",
+    "noResultsText": "No he encontrado vídeos con ese texto. Prueba con otras palabras."
   },
   "GameGuideLink": {
     "searchQuery": "{title} guía completa mejores armas y armadura",

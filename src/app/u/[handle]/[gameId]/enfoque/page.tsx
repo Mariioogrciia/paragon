@@ -4,6 +4,7 @@ import { FocusMode } from "@/components/FocusMode";
 import { getGameDetail, getProfileByHandle } from "@/lib/profiles";
 import { gameProgress, nextSteps } from "@/lib/stats";
 import { ritmoSemanal, prevision } from "@/lib/history";
+import { idiomaActual } from "@/lib/trofeosIdioma";
 
 export const metadata = { title: "Modo enfoque · Paragon" };
 
@@ -37,7 +38,7 @@ export default async function EnfoquePage({
   const session = await auth();
   if (session?.user?.id !== profile.userId) redirect(`/u/${handle}/${gameId}`);
 
-  const game = await getGameDetail(profile, gameId);
+  const game = await getGameDetail(profile, gameId, await idiomaActual());
   if (!game) notFound();
 
   const progreso = gameProgress(game);

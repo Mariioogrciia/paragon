@@ -419,8 +419,9 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
 
 function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
   const t = useTranslations("Biblioteca");
+  const idioma = useLocale();
   const oculto = trophy.hidden && !trophy.earned;
-  const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
+  const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent, idioma) : null;
   const tipo = clasificarTrofeo(trophy);
   const puntos = platform
     ? trophyScore({ platform, grade: trophy.grade, xp: trophy.xp, rarityPercent: trophy.rarityPercent })

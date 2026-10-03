@@ -3,6 +3,8 @@ import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
 import type { TrophyGrade } from "@/lib/types";
+import { traduccionesEnCache } from "@/lib/trofeosIdioma";
+import type { Idioma } from "@/lib/idiomasTrofeo";
 
 export interface TrophyRecommendation {
   gameId: string;
@@ -19,7 +21,7 @@ export interface TrophyRecommendation {
   grade: TrophyGrade | null;
 }
 
-export async function getTrophyRecommendations(userId: string, limit = 6): Promise<TrophyRecommendation[]> {
+export async function getTrophyRecommendations(userId: string, limit = 6, idioma?: Idioma): Promise<TrophyRecommendation[]> {
   const rows = await db
     .select({
       gameId: userTrophies.gameId,
@@ -49,12 +51,20 @@ export async function getTrophyRecommendations(userId: string, limit = 6): Promi
     )
     .limit(limit);
 
-  return rows.map((row) => ({
-    ...row,
-    rarityPercent: row.rarityPercent === null ? null : Number(row.rarityPercent),
-    iconUrl: row.iconUrl ?? null,
-    grade: row.grade ?? null,
-  }));
+  // Solo lo ya guardado: la traducción se trae al abrir la ficha del juego (lib/trofeosIdioma.ts).
+  const tr = idioma ? await traduccionesEnCache(rows.map((r) => ({ gameId: r.gameId, trophyId: r.trophyId })), idioma).catch(() => null) : null;
+
+  return rows.map((row) => {
+    const t = tr?.get(`${row.gameId}:${row.trophyId}`);
+    return {
+      ...row,
+      trophyName: t?.name ?? row.trophyName,
+      detail: t?.detail ?? row.detail,
+      rarityPercent: row.rarityPercent === null ? null : Number(row.rarityPercent),
+      iconUrl: row.iconUrl ?? null,
+      grade: row.grade ?? null,
+    };
+  });
 }
 
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";

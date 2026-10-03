@@ -305,7 +305,20 @@
       "searchElsewhere": "Prefer to search elsewhere? Opens in a new tab.",
       "searchTerm": "trophy guide",
       "searchOn": "Search on {site}"
-    }
+    },
+    "nextVideo": "Next video",
+    "videoN": "Video {n}",
+    "missingLabel": "What are you missing?",
+    "missingHelp": "Type what you cannot find and I will look for videos in your language.",
+    "missingPlaceholder": "e.g. the last relic, snowy area",
+    "missingButton": "Search",
+    "missingSearching": "Searching…",
+    "missingResults": "Results for “{texto}”",
+    "backToGeneral": "Back to the general search",
+    "needLogin": "Sign in to search with your own text.",
+    "offensive": "That text contains offensive language.",
+    "limit": "Too many searches in a row. Try again in a few minutes.",
+    "noResultsText": "No videos found for that text. Try different words."
   },
   "GameGuideLink": {
     "searchQuery": "{title} complete guide best weapons and armor",

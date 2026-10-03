@@ -305,7 +305,20 @@
       "searchElsewhere": "Vous préférez chercher ailleurs ? S'ouvre dans un nouvel onglet.",
       "searchTerm": "soluce trophée",
       "searchOn": "Chercher sur {site}"
-    }
+    },
+    "nextVideo": "Vidéo suivante",
+    "videoN": "Vidéo {n}",
+    "missingLabel": "Que te manque-t-il ?",
+    "missingHelp": "Écris ce que tu ne trouves pas et je cherche des vidéos dans ta langue.",
+    "missingPlaceholder": "p. ex. la dernière relique, zone enneigée",
+    "missingButton": "Chercher",
+    "missingSearching": "Recherche…",
+    "missingResults": "Résultats pour « {texto} »",
+    "backToGeneral": "Retour à la recherche générale",
+    "needLogin": "Connecte-toi pour chercher avec ton propre texte.",
+    "offensive": "Ce texte contient un langage offensant.",
+    "limit": "Trop de recherches d’affilée. Réessaie dans quelques minutes.",
+    "noResultsText": "Aucune vidéo trouvée pour ce texte. Essaie d’autres mots."
   },
   "GameGuideLink": {
     "searchQuery": "{title} soluce complète meilleures armes et armure",

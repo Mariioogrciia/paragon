@@ -1217,6 +1217,43 @@ manual en modo desarrollador, ver `extension/README.md`); el cron no puede
 refrescar Epic; los datos los manda el cliente y no se pueden verificar
 (de ahí lo de declarado). Tests: `tests/epicExtension.test.ts` (13).
 
+## Trofeos en tu idioma y guías en vídeo por idioma (3 oct 2026)
+
+**Idioma de los nombres.** `game_trophy.name/detail` guarda UN idioma por
+juego (idioma base, comprobado en la base: **PSN y Xbox en inglés, Steam y
+Epic en español**, ver `lib/idiomasTrofeo.ts`). Ahora, al abrir la ficha de un
+juego, `lib/trofeosIdioma.ts` pide a la propia plataforma los nombres en el
+idioma de la interfaz (es/en/de/fr) y los guarda en `game_trophy_i18n`
+(+ `game_trophy_i18n_estado` para no repetir la petición; se reintenta cada
+semana si la plataforma no localizó todo). **Sin traducción automática**: si la
+plataforma no tiene el juego localizado (aprox. la mitad de Steam/Xbox), se
+queda en el idioma base. Verificado contra las APIs reales: PSN
+(`Accept-Language`, 100 %), Steam (`l=`), Xbox/OpenXBL (`Accept-Language`).
+Epic y manuales no se traducen (Epic solo se lee desde la extensión).
+- `getGameDetail(profile, gameId, idioma?)`: con `idioma` traduce; sin él, como
+  antes (la API móvil y el bot de Discord no lo pasan: siguen igual).
+  `Trophy.nombreOriginal` conserva el original porque **`isMissable` empareja
+  por el nombre ORIGINAL en inglés (PowerPyx)**: no sustituir `r.name` antes.
+- Listas (siguiente trofeo, recientes del perfil) solo leen lo ya guardado
+  (`traduccionesEnCache`), sin llamar a ninguna plataforma.
+- Xbox necesita el xuid de alguien con el juego (el dueño de la ficha): gasta
+  del cupo de OpenXBL (150/h) la primera vez por juego e idioma.
+- Etiquetas «Ultra raro / Muy raro…» ya salen en el idioma (`rarity(p, idioma)`).
+
+**Guías en vídeo.** `videosGuiaTrofeo` (varios, no uno) busca en YouTube con
+`hl/gl` del idioma, con el nombre del trofeo en ese idioma + «guía/guide/
+Anleitung», y cachea en `trophy_guide_video` por trofeo e idioma (90 días; 2 si
+no hubo resultados). El modal (`TrophyGuideModal`) muestra el vídeo, miniaturas,
+«Siguiente vídeo» y la caja **«¿Qué te falta?»** (`videosGuiaTextoAction`:
+texto libre + juego + trofeo; pide sesión, límite `guiaVideoTexto` 8/5 min,
+filtro de lenguaje, **no se guarda** — mismo motivo que la auditoría del 25
+sept). Sigue sin existir forma de saber QUÉ objeto concreto falta: ninguna
+plataforma lo da (solo PSN a veces da el progreso 35/36). Pendiente, si se
+quiere: listas de coleccionables escritas por la comunidad, y la API oficial de
+YouTube (filtra mejor por idioma pero pide clave y tiene cuota ~100 búsquedas
+nuevas/día) en lugar de leer el HTML. Tablas creadas con
+`scripts/crear-tablas-traducciones-trofeo.mts` (ya ejecutado, RLS activado).
+
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El
   servidor de desarrollo lanzado desde la app de Claude no heredaba

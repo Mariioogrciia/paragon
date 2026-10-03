@@ -51,6 +51,7 @@ import { CartaHolo } from "@/components/CartaHolo";
 import { getVitrinas } from "@/lib/vitrinas";
 import { MarcaDeclarado } from "@/components/MarcaDeclarado";
 import { esDeclarada } from "@/lib/declarado";
+import { idiomaActual } from "@/lib/trofeosIdioma";
 
 
 function hexToRgb(hex: string) {
@@ -191,7 +192,7 @@ export default async function PerfilPage({
     getUserBadges(profile.userId),
   ]);
   const [recientes, palmares, clanMembership, vitrinas] = await Promise.all([
-    ultimosTrofeos(profile.userId),
+    ultimosTrofeos(profile.userId, 8, await idiomaActual()),
     getUserTrophyCase(profile.userId),
     getUserClan(profile.userId),
     // Si la tabla no existiera, el perfil se enseña igual, sin vitrinas.

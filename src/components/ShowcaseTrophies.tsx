@@ -3,7 +3,7 @@ import { gradeLabel, TrophyIcon } from "./TrophyIcon";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { colorFor, rarity } from "@/lib/design";
 import { TiltCard } from "@/components/TiltCard";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export async function ShowcaseTrophies({
   items,
@@ -15,6 +15,7 @@ export async function ShowcaseTrophies({
   if (items.length === 0) return null;
 
   const t = await getTranslations("Perfil");
+  const idioma = await getLocale();
 
   return (
     <section className="mt-8 mb-4">
@@ -25,7 +26,7 @@ export async function ShowcaseTrophies({
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {items.map(({ game, trophy }) => {
-          const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
+          const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent, idioma) : null;
           
           return (
             <TiltCard 

@@ -246,7 +246,7 @@ export function FocusMode({
           // mano. En pantalla grande, los tres a la vez y sin scroll.
           <ol className="mt-6 flex-1 space-y-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-3 lg:space-y-0">
             {trofeos.map((trofeo, i) => {
-              const r = trofeo.rarityPercent !== undefined ? rarity(trofeo.rarityPercent) : null;
+              const r = trofeo.rarityPercent !== undefined ? rarity(trofeo.rarityPercent, locale) : null;
 
               return (
                 <li

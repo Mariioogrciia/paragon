@@ -131,9 +131,18 @@ export interface Rarity {
  * Etiqueta de rareza a partir del % de jugadores que tiene el trofeo.
  * Los cortes son los mismos que usa el resto del sitio para "raro".
  */
-export function rarity(percent: number): Rarity {
-  if (percent < 5) return { label: "Ultra raro", bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e" };
-  if (percent < 20) return { label: "Muy raro", bg: "rgba(159, 212, 236, 0.14)", fg: "#9fd4ec" };
-  if (percent < 40) return { label: "Raro", bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff" };
-  return { label: "Común", bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)" };
+export function rarity(percent: number, idioma: string = "es"): Rarity {
+  const e = ETIQUETAS_RAREZA[idioma] ?? ETIQUETAS_RAREZA.es;
+  if (percent < 5) return { label: e[0], bg: "rgba(226, 181, 62, 0.14)", fg: "#e2b53e" };
+  if (percent < 20) return { label: e[1], bg: "rgba(159, 212, 236, 0.14)", fg: "#9fd4ec" };
+  if (percent < 40) return { label: e[2], bg: "rgb(var(--accent-rgb) / 0.14)", fg: "#7ab8ff" };
+  return { label: e[3], bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)" };
 }
+
+/** Ultra raro / Muy raro / Raro / Común en cada idioma de la interfaz (antes siempre en español). */
+const ETIQUETAS_RAREZA: Record<string, [string, string, string, string]> = {
+  es: ["Ultra raro", "Muy raro", "Raro", "Común"],
+  en: ["Ultra rare", "Very rare", "Rare", "Common"],
+  de: ["Ultra selten", "Sehr selten", "Selten", "Häufig"],
+  fr: ["Ultra rare", "Très rare", "Rare", "Commun"],
+};

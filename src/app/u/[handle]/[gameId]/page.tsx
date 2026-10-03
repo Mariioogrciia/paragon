@@ -41,10 +41,11 @@ import { db } from "@/db";
 import { games } from "@/db/schema";
 import { MarcaDeclarado } from "@/components/MarcaDeclarado";
 import { esDeclarada } from "@/lib/declarado";
+import { idiomaActual } from "@/lib/trofeosIdioma";
 
 async function ProximoRow({ trophy }: { trophy: Trophy }) {
   const t = await getTranslations("Biblioteca");
-  const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent) : null;
+  const r = trophy.rarityPercent !== undefined ? rarity(trophy.rarityPercent, await getLocale()) : null;
 
   return (
     <div
@@ -112,7 +113,7 @@ export default async function JuegoPage({
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
 
-  const game = await getGameDetail(profile, gameId);
+  const game = await getGameDetail(profile, gameId, await idiomaActual());
   if (!game) notFound();
 
   const progress = gameProgress(game);

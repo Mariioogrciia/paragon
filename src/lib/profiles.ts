@@ -29,6 +29,8 @@ import { syncGameTrophies, syncLibrary, type PlatinoNuevo } from "@/lib/sync";
 import { anunciarNivelSiSube } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
+import { traducirTrofeos, type TrofeoTraducido } from "@/lib/trofeosIdioma";
+import type { Idioma } from "@/lib/idiomasTrofeo";
 import {
   type AccountPlatform,
   type Game,
@@ -1253,6 +1255,8 @@ export async function getGamesForBackground(
 export async function getGameDetail(
   profile: ProfileRow,
   gameId: string,
+  /** Idioma de la interfaz: si se pasa, nombres y descripciones salen en él cuando la plataforma los tiene (lib/trofeosIdioma.ts). Sin él, como se guardaron. */
+  idioma?: Idioma,
 ): Promise<GameDetail | null> {
   const { games } = await getLibrary(profile);
   const game = games.find((g) => g.id === gameId);
@@ -1384,10 +1388,19 @@ export async function getGameDetail(
   // que esperar ahora no añade tiempo si la base tarda más (el caso normal).
   const nombresPerdibles = await perdiblesPromesa;
 
-  const trophies: Trophy[] = rows.map((r) => ({
+  const traducciones = idioma
+    ? await traducirTrofeos(gameId, idioma, { xboxAccountId: game.platform === "xbox" ? account?.accountId : undefined }).catch(() => new Map<string, TrofeoTraducido>())
+    : new Map<string, TrofeoTraducido>();
+
+  const trophies: Trophy[] = rows.map((r) => {
+    const tr = traducciones.get(r.trophyId);
+    return {
     id: r.trophyId,
-    name: r.name,
-    detail: r.detail,
+    // Traducido si la plataforma lo tiene en este idioma; el original se
+    // conserva aparte (isMissable de abajo empareja por el original).
+    name: tr?.name ?? r.name,
+    nombreOriginal: tr ? r.name : undefined,
+    detail: tr?.detail ?? r.detail,
     grade: r.grade ?? undefined,
     hidden: r.hidden,
     iconUrl: r.iconUrl ?? undefined,
@@ -1401,7 +1414,7 @@ export async function getGameDetail(
     // Sin esto, la agrupación por DLC de TrophyList no recibía nada y metía
     // todos los trofeos en "Juego Base".
     groupId: r.groupId ?? "default",
-    groupName: r.groupName ?? undefined,
+    groupName: tr?.groupName ?? r.groupName ?? undefined,
     xp: r.xp ?? undefined,
     earned: r.earned ?? false,
     earnedAt: r.earnedAt?.toISOString(),
@@ -1414,7 +1427,8 @@ export async function getGameDetail(
       r.manualProgressTarget != null
         ? { current: r.manualProgressCurrent ?? 0, target: r.manualProgressTarget }
         : undefined,
-  }));
+    };
+  });
 
   // El progreso (y la fecha de sincronización) pueden haber cambiado al
   // sincronizar justo arriba, así que se releen en vez de reusar `estado`.

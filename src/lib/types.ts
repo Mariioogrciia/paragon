@@ -126,6 +126,12 @@ export interface Trophy {
   iconUrl?: string;
   isMissable?: boolean;
   /**
+   * Nombre tal como está guardado (idioma base de la plataforma) cuando
+   * `name`/`detail` se han traducido al idioma de la interfaz
+   * (lib/trofeosIdioma.ts). Solo se rellena si hay traducción.
+   */
+  nombreOriginal?: string;
+  /**
    * Hitos parciales ("31 de 48 cuervos"). Solo algunos juegos de PS5 los
    * exponen, y aun así PSN no siempre devuelve el valor actual — ver psn.ts.
    */

@@ -385,3 +385,24 @@ export async function fetchStoreMetadata(appId: string): Promise<StoreMetadata |
     headerImage: entry.data.header_image,
   };
 }
+
+/**
+ * Nombre y descripción de los logros de un juego en un idioma de Steam
+ * (`l=spanish|english|german|french`), sin estado del jugador: para las
+ * traducciones por idioma de lib/trofeosIdioma.ts. Una sola llamada.
+ */
+export async function fetchDefinicionesSteam(
+  appId: string,
+  idioma: string,
+): Promise<{ trophyId: string; name: string; detail: string }[]> {
+  const key = apiKey();
+  const schema = await get<{ game?: { availableGameStats?: { achievements?: SchemaAchievement[] } } }>(
+    `${API}/ISteamUserStats/GetSchemaForGame/v2/?key=${key}&appid=${appId}&l=${encodeURIComponent(idioma)}`,
+    true,
+  );
+  return (schema?.game?.availableGameStats?.achievements ?? []).map((d) => ({
+    trophyId: d.name,
+    name: d.displayName || d.name,
+    detail: d.description ?? "",
+  }));
+}

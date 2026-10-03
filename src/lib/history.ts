@@ -5,6 +5,8 @@ import { db } from "@/db";
 import { games, gameTrophies, userTrophies } from "@/db/schema";
 import { getUserTimezone } from "@/lib/profiles";
 import type { TrophyGrade } from "@/lib/types";
+import { traduccionesEnCache } from "@/lib/trofeosIdioma";
+import type { Idioma } from "@/lib/idiomasTrofeo";
 
 /**
  * Histórico de trofeos.
@@ -236,7 +238,7 @@ export interface TrofeoReciente extends TrofeoDelMes {
  * origen que `trofeosDelMes` (earnedAt de user_trophy), solo que sin
  * filtrar por mes: la foto más reciente, sin más.
  */
-export async function ultimosTrofeos(userId: string, limite = 8): Promise<TrofeoReciente[]> {
+export async function ultimosTrofeos(userId: string, limite = 8, idioma?: Idioma): Promise<TrofeoReciente[]> {
   const filas = await db
     .select({
       gameId: userTrophies.gameId,
@@ -269,18 +271,25 @@ export async function ultimosTrofeos(userId: string, limite = 8): Promise<Trofeo
     .orderBy(desc(userTrophies.earnedAt))
     .limit(limite);
 
-  return filas.map((f) => ({
-    gameId: f.gameId,
-    juego: f.juego,
-    gameIconUrl: f.gameIconUrl ?? null,
-    trophyId: f.trophyId,
-    nombre: f.nombre ?? "Trofeo",
-    detalle: f.detalle ?? "",
-    grade: f.grade ?? null,
-    iconUrl: f.iconUrl ?? null,
-    earnedAt: f.earnedAt!.toISOString(),
-    rarityPercent: f.rarityPercent ?? null,
-  }));
+  // Solo lo ya guardado (sin llamar a ninguna plataforma): la traducción se
+  // trae al abrir la ficha del juego, ver lib/trofeosIdioma.ts.
+  const tr = idioma ? await traduccionesEnCache(filas.map((f) => ({ gameId: f.gameId, trophyId: f.trophyId })), idioma).catch(() => null) : null;
+
+  return filas.map((f) => {
+    const t = tr?.get(`${f.gameId}:${f.trophyId}`);
+    return {
+      gameId: f.gameId,
+      juego: f.juego,
+      gameIconUrl: f.gameIconUrl ?? null,
+      trophyId: f.trophyId,
+      nombre: t?.name ?? f.nombre ?? "Trofeo",
+      detalle: t?.detail ?? f.detalle ?? "",
+      grade: f.grade ?? null,
+      iconUrl: f.iconUrl ?? null,
+      earnedAt: f.earnedAt!.toISOString(),
+      rarityPercent: f.rarityPercent ?? null,
+    };
+  });
 }
 
 export async function trofeosDelMes(userId: string, mes: string): Promise<TrofeoDelMes[]> {

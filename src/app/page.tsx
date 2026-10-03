@@ -36,6 +36,7 @@ import { LandingThemeSwitcher } from "@/components/LandingThemeSwitcher";
 import { Convergencia } from "@/components/landing/Convergencia";
 import { ArrowRight, Eye, Gift, Route, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import { getPanelOculto, type SeccionPanel } from "@/lib/panelPreferences";
+import { idiomaActual } from "@/lib/trofeosIdioma";
 
 const GRADE_ACCENT = {
   platinum: "#9fd4ec",
@@ -452,7 +453,7 @@ export default async function HomePage() {
     ver("ritmo") ? resumenHistorico(session.user.id) : nada(null),
     ver("lanzamientos") ? getWishlistIgdbIds(session.user.id) : nada([]),
     ver("misiones") ? getWeeklyMissions(session.user.id) : nada([]),
-    ver("recomendaciones") ? getTrophyRecommendations(session.user.id) : nada([]),
+    ver("recomendaciones") ? getTrophyRecommendations(session.user.id, 6, await idiomaActual()) : nada([]),
     ver("talDia") ? talDiaComoHoy(session.user.id) : nada([]),
     juegoAnclado ? diasSinAvance(session.user.id, juegoAnclado.id) : Promise.resolve(null),
     ver("actividad") ? getFeed(session.user.id, { limite: 15 }) : nada([]),

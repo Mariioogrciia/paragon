@@ -65,7 +65,7 @@ function apiKey(): string {
  * `RootLayout`/`global-error.tsx`. Aquí se degrada igual que un `!ok`: sin
  * datos de Xbox esta vez, no sin app.
  */
-async function get<T>(path: string): Promise<T | null> {
+async function get<T>(path: string, idioma = "en-US"): Promise<T | null> {
   const key = apiKey();
   let response: Response;
   try {
@@ -76,7 +76,9 @@ async function get<T>(path: string): Promise<T | null> {
         Accept: "application/json",
         // Sin esto, los endpoints de logros devuelven 400 — comprobado contra
         // la API real, no está en ninguna documentación pública.
-        "Accept-Language": "en-US",
+        // `idioma` solo cambia al pedir los trofeos en otro idioma de la
+        // interfaz (lib/trofeosIdioma.ts); la sincronización sigue en en-US.
+        "Accept-Language": idioma,
       },
       cache: "no-store",
     });
@@ -282,14 +284,14 @@ interface AchievementsResponse {
  * mientras exista, con un tope de seguridad para no quedarse pillado si la
  * API cambiara de forma.
  */
-export async function fetchAchievements(xuid: string, titleId: string): Promise<Trophy[]> {
+export async function fetchAchievements(xuid: string, titleId: string, idioma = "en-US"): Promise<Trophy[]> {
   const todos: XblAchievement[] = [];
   let token: string | null = null;
   let paginas = 0;
 
   for (;;) {
     const qs: string = token ? `?continuationToken=${encodeURIComponent(token)}` : "";
-    const data = await get<AchievementsResponse>(`/achievements/player/${xuid}/${titleId}${qs}`);
+    const data = await get<AchievementsResponse>(`/achievements/player/${xuid}/${titleId}${qs}`, idioma);
     const pagina = data?.content?.achievements ?? [];
     todos.push(...pagina);
     token = data?.content?.pagingInfo?.continuationToken ?? null;

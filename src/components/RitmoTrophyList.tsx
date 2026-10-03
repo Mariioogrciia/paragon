@@ -128,7 +128,7 @@ export function RitmoTrophyList({
         {vista === "lista" ? (
           <div className="space-y-2">
             {trofeos.map((trofeo) => {
-              const r = trofeo.rarityPercent !== null ? rarity(trofeo.rarityPercent) : null;
+              const r = trofeo.rarityPercent !== null ? rarity(trofeo.rarityPercent, idioma) : null;
 
               return (
                 <div
