@@ -1,12 +1,44 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **30 de septiembre de 2026**.
+releer todo el historial. Última actualización: **4 de octubre de 2026**.
 
-**Estado actual (1 oct 2026, tarde) — léelo antes que nada:** el rediseño
-de toda la plataforma por secciones está **terminado** (las 10) — ver
-"REDISEÑO DE TODA LA PLATAFORMA" al final. Queda relanzar el documentador
-para `DESIGN.md`.
+**Estado actual (4 oct 2026) — léelo antes que nada:**
+- **Rediseño de toda la plataforma: terminado** (las 10 secciones, más
+  Noticias, Descubrir y sus páginas de plataforma, Cómo funciona, Cuentas de
+  juegos y el perfil de ejemplo). `DESIGN.md` y su sidecar ya recogen todo
+  (documentador relanzado el 1 oct). Detalle en "REDISEÑO DE TODA LA
+  PLATAFORMA".
+- **Epic Games**: el servidor ya no puede leerlo (Cloudflare, 403); se
+  sincroniza con la extensión del navegador (v1.1.0) y su progreso es
+  **declarado** (no puntúa en nada). Ver "Epic Games: extensión del
+  navegador y progreso declarado". Si se añade algo que puntúe o clasifique,
+  usar `noDeclaradoPorId`/`esDeclarada`.
+- **Trofeos en tu idioma + guías en vídeo por idioma** (3 oct): ver "Trofeos
+  en tu idioma y guías en vídeo por idioma". Tablas nuevas ya creadas en
+  producción (`scripts/crear-tablas-traducciones-trofeo.mts`).
+- **Git**: `master` está **un commit por delante de `origin`** (el de
+  idiomas, `7e18cfd`), sin subir a la espera de que el usuario lo pida.
+  Fuera del repo siguen `.env.local`, `scratch/`, `.impeccable/` (rondas de
+  diseño y respuestas, nunca subidas) y el cambio local de
+  `.claude/launch.json` (ruta del certificado de Avast).
+- **Verificación**: `npx tsc --noEmit`, `npx eslint src` (0 errores, 41 avisos
+  de `<img>`), `npm test` (117 tests) y
+  `npx tsx scripts/comprobar-namespaces-cliente.mts`.
+- **Pendiente / sin probar**:
+  - La extensión no está instalada de verdad en Chrome (solo probado el
+    script de lectura en una página real de Epic) y no está en ninguna
+    tienda: instalación manual en modo desarrollador.
+  - La app de Android no se ha probado con lo de Epic declarado ni con los
+    idiomas (la API móvil no traduce trofeos a propósito).
+  - Lista de coleccionables para trofeos de "consigue todos" (ninguna
+    plataforma dice qué objeto falta); API oficial de YouTube (necesita
+    clave) si se quiere filtrar mejor por idioma.
+- **Trampas nuevas de estas tandas** (ya detalladas abajo): CSS sin `@layer`
+  gana a utilidades de Tailwind como `hidden`; `isMissable` empareja por el
+  nombre ORIGINAL en inglés (no sustituir antes de calcularlo); el servidor
+  de desarrollo y la sesión del navegador del panel se pierden al reiniciar
+  (pedir login de nuevo para verificar pantallas con sesión).
 
 **Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
