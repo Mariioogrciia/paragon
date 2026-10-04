@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { isHandleTaken, setHandle } from "@/lib/profiles";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
+import { errorMovil } from "@/lib/mensajesApi";
 
 // Misma regla que HANDLE_RE en src/app/actions.ts (chooseHandleAction) —
 // duplicada a propósito, no importada, porque ese archivo es "use server"
@@ -19,24 +20,21 @@ import { HANDLE_RE } from "@/lib/validacionPerfil";
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("perfil", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const body = await req.json().catch(() => null);
   const handle = String(body?.handle ?? "").trim().toLowerCase();
 
   if (!HANDLE_RE.test(handle)) {
-    return NextResponse.json(
-      { error: "Entre 3 y 20 caracteres, solo minúsculas, números y guion bajo." },
-      { status: 400 },
-    );
+    return errorMovil(req, "Entre 3 y 20 caracteres, solo minúsculas, números y guion bajo.", 400);
   }
 
   if (await isHandleTaken(handle, userId)) {
-    return NextResponse.json({ error: "Ese nombre de usuario ya está cogido." }, { status: 409 });
+    return errorMovil(req, "Ese nombre de usuario ya está cogido.", 409);
   }
 
   await setHandle(userId, handle);

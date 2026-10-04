@@ -8,12 +8,13 @@ import { createClan, getUserClan } from "@/lib/clans";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Todos los clanes con su nº de miembros (más miembros primero), + el clan del usuario si tiene uno — misma query que /clanes (web). */
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const [allClans, miClan] = await Promise.all([
@@ -47,10 +48,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("comentario", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const body = await req.json().catch(() => null);
@@ -59,31 +60,31 @@ export async function POST(req: Request) {
   const description = typeof body?.description === "string" ? body.description.trim() : "";
 
   if (!name || !tag) {
-    return NextResponse.json({ error: "Nombre y etiqueta requeridos" }, { status: 400 });
+    return errorMovil(req, "Nombre y etiqueta requeridos", 400);
   }
   if (tag.length > 5) {
-    return NextResponse.json({ error: "La etiqueta debe tener 5 caracteres máximo" }, { status: 400 });
+    return errorMovil(req, "La etiqueta debe tener 5 caracteres máximo", 400);
   }
 
   const profile = await getProfileByUserId(userId);
   if (!profile) {
-    return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
+    return errorMovil(req, "Perfil no encontrado", 404);
   }
   const { games, xpMisiones } = await getLibrary(profile);
   const nivel = paragonProgress(games, xpMisiones).level;
   if (nivel < 5) {
-    return NextResponse.json({ error: "Necesitas ser al menos Nivel 5 de Paragon para crear un clan." }, { status: 403 });
+    return errorMovil(req, "Necesitas ser al menos Nivel 5 de Paragon para crear un clan.", 403);
   }
 
   const existing = await getUserClan(userId);
   if (existing) {
-    return NextResponse.json({ error: "Ya perteneces a un clan. Abandónalo primero." }, { status: 409 });
+    return errorMovil(req, "Ya perteneces a un clan. Abandónalo primero.", 409);
   }
 
   try {
     const clan = await createClan(userId, name, tag, description);
     return NextResponse.json(clan);
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "No se pudo crear el clan." }, { status: 400 });
+    return errorMovil(req, e instanceof Error ? e.message : "No se pudo crear el clan.", 400);
   }
 }

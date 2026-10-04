@@ -4,6 +4,7 @@ import { limitar } from "@/lib/rateLimit";
 import { getLibrary, getProfileByHandle, getProfileByUserId } from "@/lib/profiles";
 import { sharedGames, summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Comparativa 1 a 1 — versión CURADA del `/comparar/[handle]` de la web:
@@ -17,10 +18,10 @@ export async function GET(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("perfil", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { handle } = await params;
@@ -31,13 +32,13 @@ export async function GET(
   ]);
 
   if (!suyo) {
-    return NextResponse.json({ error: "No existe ese usuario" }, { status: 404 });
+    return errorMovil(req, "No existe ese usuario", 404);
   }
   if (!mio?.handle) {
-    return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
+    return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
   if (suyo.accounts.length === 0) {
-    return NextResponse.json({ error: `@${handle} todavía no ha vinculado ninguna cuenta.` }, { status: 409 });
+    return errorMovil(req, `@${handle} todavía no ha vinculado ninguna cuenta.`, 409);
   }
 
   const [libA, libB] = await Promise.all([getLibrary(mio), getLibrary(suyo)]);

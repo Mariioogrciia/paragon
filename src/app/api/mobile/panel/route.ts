@@ -5,17 +5,18 @@ import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { rachas } from "@/lib/history";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Datos de la pantalla de Panel nativa (Android/Compose). Mismo cálculo que la portada web (`app/page.tsx`), reempaquetado en JSON. */
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const profile = await getProfileByUserId(userId);
   if (!profile?.handle) {
-    return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
+    return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
 
   const [{ games, xpMisiones }, racha] = await Promise.all([getLibrary(profile), rachas(userId)]);

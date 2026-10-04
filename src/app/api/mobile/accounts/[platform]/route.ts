@@ -8,6 +8,7 @@ import { PsnAuthError, PsnNotConfiguredError } from "@/lib/psn/auth";
 import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFoundError } from "@/lib/steam/client";
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { EpicPrivateProfileError, EpicProfileNotFoundError, EpicUnavailableError } from "@/lib/epic/client";
+import { errorMovil } from "@/lib/mensajesApi";
 
 const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic"];
 
@@ -39,21 +40,21 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("vincularCuenta", userId))) {
-    return NextResponse.json({ error: "Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos." }, { status: 429 });
+    return errorMovil(req, "Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.", 429);
   }
 
   const { platform } = await params;
   if (!esPlataformaVinculable(platform)) {
-    return NextResponse.json({ error: "Plataforma no válida" }, { status: 400 });
+    return errorMovil(req, "Plataforma no válida", 400);
   }
 
   const body = await req.json().catch(() => null);
   const input = typeof body?.input === "string" ? body.input.trim() : "";
   if (!input) {
-    return NextResponse.json({ error: "Falta el identificador de la cuenta" }, { status: 400 });
+    return errorMovil(req, "Falta el identificador de la cuenta", 400);
   }
 
   try {
@@ -64,7 +65,7 @@ export async function POST(
       juegos: cuenta.juegos,
     });
   } catch (error) {
-    return NextResponse.json({ error: describeError(error) }, { status: 422 });
+    return errorMovil(req, describeError(error), 422);
   }
 }
 
@@ -74,15 +75,15 @@ export async function DELETE(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("perfil", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { platform } = await params;
   if (!esPlataformaVinculable(platform)) {
-    return NextResponse.json({ error: "Plataforma no válida" }, { status: 400 });
+    return errorMovil(req, "Plataforma no válida", 400);
   }
 
   await unlinkAccount(userId, platform);

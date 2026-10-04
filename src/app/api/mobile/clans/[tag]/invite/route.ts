@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { getClanByTag, inviteToClan } from "@/lib/clans";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Invita a un amigo al clan — `{ "invitedUserId": "..." }`. `inviteToClan`
@@ -11,28 +12,28 @@ import { getClanByTag, inviteToClan } from "@/lib/clans";
 export async function POST(req: Request, { params }: { params: Promise<{ tag: string }> }) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("comentario", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { tag } = await params;
   const clan = await getClanByTag(tag);
   if (!clan) {
-    return NextResponse.json({ error: "Clan no encontrado" }, { status: 404 });
+    return errorMovil(req, "Clan no encontrado", 404);
   }
 
   const body = await req.json().catch(() => null);
   const invitedUserId = typeof body?.invitedUserId === "string" ? body.invitedUserId : "";
   if (!invitedUserId) {
-    return NextResponse.json({ error: "Falta invitedUserId" }, { status: 400 });
+    return errorMovil(req, "Falta invitedUserId", 400);
   }
 
   try {
     await inviteToClan(clan.id, userId, invitedUserId);
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "No se pudo invitar." }, { status: 400 });
+    return errorMovil(req, e instanceof Error ? e.message : "No se pudo invitar.", 400);
   }
 }

@@ -6,6 +6,7 @@ import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import type { Game } from "@/lib/types";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * "A un paso del platino" y "Jugado recientemente" del Panel (Android) —
@@ -28,12 +29,12 @@ function toCard(game: Game) {
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const profile = await getProfileByUserId(userId);
   if (!profile?.handle) {
-    return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
+    return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
 
   const [{ games }, recomendaciones] = await Promise.all([

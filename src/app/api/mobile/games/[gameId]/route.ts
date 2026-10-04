@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getGameDetail, getProfileByUserId } from "@/lib/profiles";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Ficha de un juego para GameDetailScreen (Android) — mismo `getGameDetail`
@@ -15,18 +16,18 @@ export async function GET(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const profile = await getProfileByUserId(userId);
   if (!profile?.handle) {
-    return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
+    return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
 
   const { gameId } = await params;
   const detail = await getGameDetail(profile, gameId, idiomaDeCabecera(req.headers.get("accept-language")));
   if (!detail) {
-    return NextResponse.json({ error: "Juego no encontrado" }, { status: 404 });
+    return errorMovil(req, "Juego no encontrado", 404);
   }
 
   return NextResponse.json({ game: detail });

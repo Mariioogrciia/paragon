@@ -4,6 +4,7 @@ import { getProfileByUserId, getUserBadges } from "@/lib/profiles";
 import { getUserTrophyCase } from "@/lib/trophyCase";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Palmarés (ligas ganadas) + Badges/insignias del usuario — nada de esto
@@ -19,12 +20,12 @@ import { jsonConEtag } from "@/lib/etag";
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const profile = await getProfileByUserId(userId);
   if (!profile?.handle) {
-    return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
+    return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
 
   const [badgeRows, trophyCase] = await Promise.all([

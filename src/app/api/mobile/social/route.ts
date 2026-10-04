@@ -4,6 +4,7 @@ import { listFriends } from "@/lib/profiles";
 import { clasificacionAmigos } from "@/lib/rankings";
 import { getLigaMensual } from "@/lib/ligas";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Datos de SocialScreen (Android): las dos pestañas del plan, "Amigos" y
@@ -18,7 +19,7 @@ import { jsonConEtag } from "@/lib/etag";
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const friends = await listFriends(userId);

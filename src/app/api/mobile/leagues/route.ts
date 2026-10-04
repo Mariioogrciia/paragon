@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { createLeague, listUserLeagues, type LeagueDurationUnit } from "@/lib/leagues";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 const UNIDADES_DURACION: LeagueDurationUnit[] = ["dias", "semanas", "meses", "anios"];
 
@@ -10,7 +11,7 @@ const UNIDADES_DURACION: LeagueDurationUnit[] = ["dias", "semanas", "meses", "an
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const leagues = await listUserLeagues(userId);
@@ -21,10 +22,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("comentario", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const body = await req.json().catch(() => null);
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
 
   const league = await createLeague(userId, name, duration);
   if (!league) {
-    return NextResponse.json({ error: "Ponle un nombre a la liga." }, { status: 400 });
+    return errorMovil(req, "Ponle un nombre a la liga.", 400);
   }
 
   return NextResponse.json(league);

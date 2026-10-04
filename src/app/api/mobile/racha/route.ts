@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { rachas } from "@/lib/history";
 import { actividadPorDia } from "@/lib/profileStats";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Detalle de la racha diaria, para la pantalla dedicada que se abre al
@@ -15,7 +16,7 @@ import { jsonConEtag } from "@/lib/etag";
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const [racha, dias] = await Promise.all([rachas(userId), actividadPorDia(userId, 35)]);

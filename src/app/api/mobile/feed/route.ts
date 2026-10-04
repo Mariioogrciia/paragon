@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getFeed } from "@/lib/feed";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Muro de actividad (propia + amigos) para FeedScreen (Android) — mismo
@@ -14,7 +15,7 @@ import { jsonConEtag } from "@/lib/etag";
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const feed = await getFeed(userId);

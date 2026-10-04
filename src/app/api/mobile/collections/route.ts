@@ -3,12 +3,13 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { createCollection, CollectionNameError, listCollections } from "@/lib/collections";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Carpetas de juegos (colecciones) del usuario. */
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const collections = await listCollections(userId);
@@ -19,10 +20,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("perfil", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const body = await req.json().catch(() => null);
@@ -33,6 +34,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ id });
   } catch (error) {
     const message = error instanceof CollectionNameError ? error.message : "No se pudo crear la carpeta.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorMovil(req, message, 400);
   }
 }

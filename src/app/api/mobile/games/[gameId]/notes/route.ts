@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { saveGameNotes } from "@/lib/profiles";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Guarda (o borra, si llega vacía) la nota privada de este juego — scratchpad de Modo Enfoque. Body: `{ "notes": "..." }`. */
 export async function POST(
@@ -10,10 +11,10 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("perfil", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { gameId } = await params;

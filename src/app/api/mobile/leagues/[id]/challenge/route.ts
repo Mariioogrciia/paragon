@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { setLeagueChallenge } from "@/lib/leagues";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Fija (o quita, con `gameId: null`) el juego de reto de la liga — `{ "gameId": "..." | null }`. Solo el dueño. */
 export async function POST(
@@ -10,10 +11,10 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("comentario", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { id } = await params;
@@ -22,7 +23,7 @@ export async function POST(
 
   const ok = await setLeagueChallenge(id, userId, gameId);
   if (!ok) {
-    return NextResponse.json({ error: "Solo el dueño puede cambiar el reto." }, { status: 403 });
+    return errorMovil(req, "Solo el dueño puede cambiar el reto.", 403);
   }
 
   return NextResponse.json({ ok: true });

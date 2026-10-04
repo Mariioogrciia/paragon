@@ -1426,6 +1426,7 @@ export async function ponerseAlDiaAction(): Promise<PuestaAlDia> {
 /* ---------------------------------- Time to Beat (HLTB) --------------------------------- */
 
 import { syncGameHltb } from "@/lib/hltb";
+import { guardarAparienciaCuenta, normalizarApariencia } from "@/lib/aparienciaCuenta";
 
 export async function syncHltbAction(gameId: string, title: string): Promise<void> {
   await requireUserId();
@@ -1816,8 +1817,6 @@ export async function setHorasIgnoradasAction(gameId: string, ignorar: boolean):
 
 /* ------------------------------ Apariencia ------------------------------ */
 
-const TAMANOS_TEXTO_VALIDOS = ["", "grande", "enorme", "pequeno"];
-
 /**
  * Guarda acento/estilo/tamaño de texto en la cuenta (antes solo vivían en el
  * localStorage de un navegador). Sin sesión no hace nada — y a propósito no
@@ -1828,21 +1827,6 @@ export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return;
-
-  const acento = /^(accent-[a-z]+)?$/.test(ap.acento ?? "") ? (ap.acento ?? "") : "";
-  const acentoLibre = /^(#[0-9a-f]{6})?$/i.test(ap.acentoLibre ?? "") ? (ap.acentoLibre ?? "") : "";
-  // Paleta "desde tu juego": id del juego (solo para marcar cuál está
-  // elegido) y el color de su carátula; la paleta se recalcula al cargar.
-  const acentoJuego =
-    ap.acentoJuego && /^[\w:.-]{1,120}$/.test(ap.acentoJuego.id) && /^#[0-9a-f]{6}$/i.test(ap.acentoJuego.color)
-      ? { id: ap.acentoJuego.id, color: ap.acentoJuego.color }
-      : undefined;
-  let estilo = /^(estilo-[a-z0-9]+)?$/.test(ap.estilo ?? "") ? (ap.estilo ?? "") : "";
-  const tamanoTexto = TAMANOS_TEXTO_VALIDOS.includes(ap.tamanoTexto ?? "") ? (ap.tamanoTexto ?? "") : "";
-  if (estilo && ESTILO_REQUISITOS[estilo] !== undefined) {
-    const nivel = await getParagonLevel(userId);
-    if (nivel.level < ESTILO_REQUISITOS[estilo]) estilo = "";
-  }
-
-  await getDb().update(users).set({ apariencia: { acento, acentoLibre, ...(acentoJuego ? { acentoJuego } : {}), estilo, tamanoTexto } }).where(eq(users.id, userId));
+  // Misma validación que la app Android (lib/aparienciaCuenta.ts).
+  await guardarAparienciaCuenta(userId, await normalizarApariencia(userId, ap));
 }

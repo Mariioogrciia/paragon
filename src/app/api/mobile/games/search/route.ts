@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { searchGames } from "@/lib/igdb/client";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Busca en el catálogo de IGDB — pensado para "Añadir a Paragon" desde el
@@ -13,10 +14,10 @@ import { searchGames } from "@/lib/igdb/client";
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("busquedaJuegos", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { searchParams } = new URL(req.url);

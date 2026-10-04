@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { addManualGame } from "@/lib/manualGames";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Añade un juego elegido de `GET /api/mobile/games/search` a la lista de
@@ -13,17 +14,17 @@ import { addManualGame } from "@/lib/manualGames";
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("perfil", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const body = await req.json().catch(() => null);
   const igdbId = Number(body?.igdbId);
   const title = String(body?.title ?? "").trim();
   if (!title || !Number.isFinite(igdbId)) {
-    return NextResponse.json({ error: "Elige un juego de los resultados." }, { status: 400 });
+    return errorMovil(req, "Elige un juego de los resultados.", 400);
   }
 
   const gameId = await addManualGame(

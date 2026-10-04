@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { removeLeagueMember } from "@/lib/leagues";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Salir de una liga uno mismo — igual que DELETE .../members/{userId} con tu
@@ -14,13 +15,13 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { id } = await params;
   const ok = await removeLeagueMember(id, userId, userId);
   if (!ok) {
-    return NextResponse.json({ error: "No se pudo salir de la liga." }, { status: 403 });
+    return errorMovil(req, "No se pudo salir de la liga.", 403);
   }
 
   return NextResponse.json({ ok: true });

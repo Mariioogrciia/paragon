@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { registerActivityView } from "@/lib/feed";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Registra una visualización de una publicación del Feed — idempotente, ver activity_view en db/schema.ts. */
 export async function POST(
@@ -9,7 +10,7 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { activityId } = await params;

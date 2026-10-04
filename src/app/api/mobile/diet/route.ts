@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { dietaGamer } from "@/lib/dietaGamer";
 import { jsonConEtag } from "@/lib/etag";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * "Dieta Gamer" — aviso amistoso si tus últimos 3 juegos terminados
@@ -13,12 +14,12 @@ import { jsonConEtag } from "@/lib/etag";
 export async function GET(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const profile = await getProfileByUserId(userId);
   if (!profile?.handle) {
-    return NextResponse.json({ error: "Perfil sin terminar de configurar" }, { status: 409 });
+    return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
 
   const { games } = await getLibrary(profile);

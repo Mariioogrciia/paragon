@@ -5,6 +5,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { subirArchivoPerfil } from "@/lib/uploads";
 import { limitar } from "@/lib/rateLimit";
+import { errorMovil } from "@/lib/mensajesApi";
 
 // Mismo bucket "Avatars" y mismo criterio (`avatarPersonalizado: true`, gana
 // a la de PSN/proveedor de login — ver `resolveAvatarUrl` en lib/profiles.ts)
@@ -18,16 +19,16 @@ import { limitar } from "@/lib/rateLimit";
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("subida", userId))) {
-    return NextResponse.json({ error: "Demasiadas subidas seguidas. Prueba dentro de unos minutos." }, { status: 429 });
+    return errorMovil(req, "Demasiadas subidas seguidas. Prueba dentro de unos minutos.", 429);
   }
 
   const formData = await req.formData().catch(() => null);
   const file = formData?.get("file") as File | null;
   if (!file) {
-    return NextResponse.json({ error: "No se envió ningún archivo" }, { status: 400 });
+    return errorMovil(req, "No se envió ningún archivo", 400);
   }
 
   const db = getDb();
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
 
   const resultado = await subirArchivoPerfil(userId, file, "avatar", actual?.image ?? null);
   if ("error" in resultado) {
-    return NextResponse.json({ error: resultado.error }, { status: resultado.status });
+    return errorMovil(req, resultado.error, resultado.status);
   }
 
   await db.update(users).set({ image: resultado.url, avatarPersonalizado: true }).where(eq(users.id, userId));

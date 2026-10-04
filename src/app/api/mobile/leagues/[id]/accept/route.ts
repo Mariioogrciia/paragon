@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { acceptLeagueInvite } from "@/lib/leagues";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Acepta una invitación a una liga — a partir de aquí sí cuenta en la clasificación. */
 export async function POST(
@@ -9,13 +10,13 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { id } = await params;
   const ok = await acceptLeagueInvite(id, userId);
   if (!ok) {
-    return NextResponse.json({ error: "No hay ninguna invitación pendiente a esa liga." }, { status: 404 });
+    return errorMovil(req, "No hay ninguna invitación pendiente a esa liga.", 404);
   }
 
   return NextResponse.json({ ok: true });

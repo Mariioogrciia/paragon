@@ -5,6 +5,7 @@ import { users } from "@/db/schema";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { listTrophyGuides, upsertTrophyGuide, deleteTrophyGuide, TrophyGuideError } from "@/lib/trophyGuides";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Guías escritas de un trofeo — apuntes reales de gente de aquí, no un
@@ -19,7 +20,7 @@ export async function GET(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { gameId, trophyId } = await params;
@@ -34,10 +35,10 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("comentario", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { gameId, trophyId } = await params;
@@ -52,7 +53,7 @@ export async function POST(
     return NextResponse.json({ ok: true });
   } catch (e) {
     const message = e instanceof TrophyGuideError ? e.message : "No se ha podido guardar la guía.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorMovil(req, message, 400);
   }
 }
 
@@ -63,7 +64,7 @@ export async function DELETE(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { gameId, trophyId } = await params;

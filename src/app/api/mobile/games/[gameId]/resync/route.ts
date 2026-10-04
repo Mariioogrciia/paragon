@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { refrescarJuego } from "@/lib/profiles";
+import { errorMovil } from "@/lib/mensajesApi";
+import { traducirMensaje } from "@/lib/mensajesApi";
+import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 
 /**
  * "¿Ya lo tengo?" de Modo Enfoque — vuelve a pedir los trofeos de ESTE
@@ -16,13 +19,14 @@ export async function POST(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("resync", userId))) {
-    return NextResponse.json({ error: "Has comprobado este juego muchas veces seguidas. Espera unos minutos." }, { status: 429 });
+    return errorMovil(req, "Has comprobado este juego muchas veces seguidas. Espera unos minutos.", 429);
   }
 
   const { gameId } = await params;
   const resultado = await refrescarJuego(userId, gameId);
-  return NextResponse.json(resultado);
+  const idioma = idiomaDeCabecera(req.headers.get("accept-language"));
+  return NextResponse.json(resultado.error ? { ...resultado, error: traducirMensaje(resultado.error, idioma) } : resultado);
 }

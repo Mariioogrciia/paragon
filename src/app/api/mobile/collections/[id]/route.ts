@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { CollectionNameError, deleteCollection, renameCollection } from "@/lib/collections";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /** Renombra una carpeta — `{ "name": "..." }`. */
 export async function PATCH(
@@ -9,7 +10,7 @@ export async function PATCH(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { id } = await params;
@@ -21,7 +22,7 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof CollectionNameError ? error.message : "No se pudo renombrar la carpeta.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorMovil(req, message, 400);
   }
 }
 
@@ -31,7 +32,7 @@ export async function DELETE(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { id } = await params;

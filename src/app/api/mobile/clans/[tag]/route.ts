@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends } from "@/lib/clans";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Ficha de un clan — mismo dato que `/clanes/[tag]` (web): clan +
@@ -13,13 +14,13 @@ import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends 
 export async function GET(req: Request, { params }: { params: Promise<{ tag: string }> }) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
 
   const { tag } = await params;
   const clan = await getClanByTag(tag);
   if (!clan) {
-    return NextResponse.json({ error: "Clan no encontrado" }, { status: 404 });
+    return errorMovil(req, "Clan no encontrado", 404);
   }
 
   const [leaderboard, actividad] = await Promise.all([

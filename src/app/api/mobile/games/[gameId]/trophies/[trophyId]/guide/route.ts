@@ -5,6 +5,7 @@ import { games, gameTrophies } from "@/db/schema";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { buscarVideoGuiaTrofeo } from "@/lib/videoGuides";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Vídeo de guía de YouTube para un trofeo — mismo dato cacheado que usa la
@@ -18,10 +19,10 @@ export async function GET(
 ) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("guiaVideo", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { gameId, trophyId } = await params;
@@ -34,7 +35,7 @@ export async function GET(
     .limit(1);
 
   if (!game || !trophy) {
-    return NextResponse.json({ error: "Trofeo no encontrado" }, { status: 404 });
+    return errorMovil(req, "Trofeo no encontrado", 404);
   }
 
   const videoId = await buscarVideoGuiaTrofeo(game.title, trophy.name, gameId, trophyId);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { guardarTokenFcm } from "@/lib/fcm";
+import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Registra (o reasigna) el token de Firebase Cloud Messaging de este
@@ -11,17 +12,17 @@ import { guardarTokenFcm } from "@/lib/fcm";
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return errorMovil(req, "No autenticado", 401);
   }
   if (!(await limitar("pushToken", userId))) {
-    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const body = await req.json().catch(() => null);
   const token = typeof body?.token === "string" ? body.token.trim() : "";
   // Los tokens de FCM rondan los 150-200 caracteres; nada de basura enorme en la tabla.
   if (!token || token.length > 4096 || /\s/.test(token)) {
-    return NextResponse.json({ error: "Falta el token" }, { status: 400 });
+    return errorMovil(req, "Falta el token", 400);
   }
 
   await guardarTokenFcm(userId, token);
