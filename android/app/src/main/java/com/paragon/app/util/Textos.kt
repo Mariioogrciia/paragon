@@ -1,5 +1,6 @@
 package com.paragon.app.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.StringRes
 
@@ -10,6 +11,9 @@ import androidx.annotation.StringRes
  * Se inicializa en ParagonApplication.onCreate.
  */
 object Textos {
+    // Es el contexto de la APLICACIÓN (vive lo mismo que el proceso), no el
+    // de una Activity: aquí no hay fuga posible.
+    @SuppressLint("StaticFieldLeak")
     private lateinit var app: Context
 
     fun init(context: Context) {

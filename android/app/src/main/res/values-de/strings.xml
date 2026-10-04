@@ -244,7 +244,7 @@
     <string name="enfoque_iniciar">⏱️ Zeit messen</string>
     <string name="enfoque_nada_nuevo">Noch nichts Neues</string>
     <string name="enfoque_nota_offline">Auf dem Handy gespeichert — wird synchronisiert, sobald du wieder online bist</string>
-    <string name="enfoque_nota_ph">Private Notiz (ein Spindcode, wo du aufgehört hast...)</string>
+    <string name="enfoque_nota_ph">Private Notiz (ein Spindcode, wo du aufgehört hast…)</string>
     <string name="enfoque_nuevos_1">" — %1$s neue Trophäe"</string>
     <string name="enfoque_nuevos_n">" — %1$s neue Trophäen"</string>
     <string name="enfoque_otra_sesion">Du hast eine aktive Sitzung in %1$s</string>
@@ -268,7 +268,7 @@
     <string name="feed_a11y_reaccionado">%1$s Reaktionen. Du hast reagiert; tippen zum Ändern</string>
     <string name="feed_a11y_reaccionar">%1$s Reaktionen. Reagieren</string>
     <string name="feed_a11y_vistas">Von %1$s Personen gesehen</string>
-    <string name="feed_comentar_ph">Kommentar schreiben...</string>
+    <string name="feed_comentar_ph">Kommentar schreiben…</string>
     <string name="feed_favorito">Hat %1$s favorisiert.</string>
     <string name="feed_nota">" mit %1$s/10."</string>
     <string name="feed_nuevo">Hat mit %1$s angefangen.</string>
@@ -296,8 +296,8 @@
     <string name="ficha_horas">%1$s h gespielt</string>
     <string name="ficha_lista">Liste</string>
     <string name="ficha_notas">PRIVATE NOTIZEN</string>
-    <string name="ficha_notas_anadir">Persönliche Notiz hinzufügen...</string>
-    <string name="ficha_notas_ph">Notizen, Codes, Farming-Routen...</string>
+    <string name="ficha_notas_anadir">Persönliche Notiz hinzufügen…</string>
+    <string name="ficha_notas_ph">Notizen, Codes, Farming-Routen…</string>
     <string name="ficha_objetivo_actual">Aktuelles Ziel</string>
     <string name="ficha_prediccion">🔮 In diesem Tempo hast du sie am %1$s</string>
     <string name="ficha_progreso">%1$s/%2$s Trophäen · %3$s %%</string>
@@ -316,7 +316,7 @@
     <string name="guia_busqueda_video">%1$s %2$s Trophäe Guide</string>
     <string name="guias_borrar_texto">Er verschwindet für alle, nicht nur für dich.</string>
     <string name="guias_borrar_titulo">Deinen Guide löschen?</string>
-    <string name="guias_ph">Schreib auf, wie man sie bekommt, Routen, Codes...</string>
+    <string name="guias_ph">Schreib auf, wie man sie bekommt, Routen, Codes…</string>
     <string name="guias_tu_guia">DEIN GUIDE</string>
     <string name="guias_vacio">Für diese Trophäe gibt es noch keinen schriftlichen Guide.</string>
     <string name="liga_borrar">Diese Liga löschen</string>
@@ -355,7 +355,7 @@
     <string name="login_google">Weiter mit Google</string>
     <string name="login_lema">Die nächste Platin wartet nicht.</string>
     <string name="login_sin_contrasenas">Wir speichern keine Passwörter: die Anmeldung übernimmt dein Anbieter.</string>
-    <string name="main_buscar_ph">Spiel suchen...</string>
+    <string name="main_buscar_ph">Spiel suchen…</string>
     <string name="main_cerrar_busqueda">Suche schließen</string>
     <string name="main_racha">%1$s-Tage-Serie</string>
     <string name="main_sin_racha">Keine aktive Serie</string>

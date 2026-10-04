@@ -1458,10 +1458,10 @@
   "fr": "Enregistrée sur le téléphone — elle se synchronisera au retour de la connexion"
  },
  "enfoque_nota_ph": {
-  "de": "Private Notiz (ein Spindcode, wo du aufgehört hast...)",
-  "en": "Private note (a locker code, where you left off...)",
-  "es": "Nota privada (código de una taquilla, dónde te quedaste...)",
-  "fr": "Note privée (code d'un casier, où tu t'es arrêté...)"
+  "de": "Private Notiz (ein Spindcode, wo du aufgehört hast…)",
+  "en": "Private note (a locker code, where you left off…)",
+  "es": "Nota privada (código de una taquilla, dónde te quedaste…)",
+  "fr": "Note privée (code d'un casier, où tu t'es arrêté…)"
  },
  "enfoque_nuevos_1": {
   "de": " — {0} neue Trophäe",
@@ -1602,10 +1602,10 @@
   "fr": "Vu par {0} personnes"
  },
  "feed_comentar_ph": {
-  "de": "Kommentar schreiben...",
-  "en": "Add a comment...",
-  "es": "Añadir un comentario...",
-  "fr": "Ajouter un commentaire..."
+  "de": "Kommentar schreiben…",
+  "en": "Add a comment…",
+  "es": "Añadir un comentario…",
+  "fr": "Ajouter un commentaire…"
  },
  "feed_favorito": {
   "de": "Hat {0} favorisiert.",
@@ -1770,16 +1770,16 @@
   "fr": "NOTES PRIVÉES"
  },
  "ficha_notas_anadir": {
-  "de": "Persönliche Notiz hinzufügen...",
-  "en": "Add a personal note...",
-  "es": "Añadir nota personal...",
-  "fr": "Ajouter une note perso..."
+  "de": "Persönliche Notiz hinzufügen…",
+  "en": "Add a personal note…",
+  "es": "Añadir nota personal…",
+  "fr": "Ajouter une note perso…"
  },
  "ficha_notas_ph": {
-  "de": "Notizen, Codes, Farming-Routen...",
-  "en": "Notes, codes, farming routes...",
-  "es": "Apuntes, códigos, rutas de farmeo...",
-  "fr": "Notes, codes, itinéraires de farm..."
+  "de": "Notizen, Codes, Farming-Routen…",
+  "en": "Notes, codes, farming routes…",
+  "es": "Apuntes, códigos, rutas de farmeo…",
+  "fr": "Notes, codes, itinéraires de farm…"
  },
  "ficha_objetivo_actual": {
   "de": "Aktuelles Ziel",
@@ -1890,10 +1890,10 @@
   "fr": "Supprimer ton guide ?"
  },
  "guias_ph": {
-  "de": "Schreib auf, wie man sie bekommt, Routen, Codes...",
-  "en": "Write how to get it, routes, codes...",
-  "es": "Apunta cómo se consigue, rutas, códigos...",
-  "fr": "Note comment l'obtenir, itinéraires, codes..."
+  "de": "Schreib auf, wie man sie bekommt, Routen, Codes…",
+  "en": "Write how to get it, routes, codes…",
+  "es": "Apunta cómo se consigue, rutas, códigos…",
+  "fr": "Note comment l'obtenir, itinéraires, codes…"
  },
  "guias_tu_guia": {
   "de": "DEIN GUIDE",
@@ -2124,10 +2124,10 @@
   "fr": "Nous ne stockons aucun mot de passe : ton fournisseur gère la connexion."
  },
  "main_buscar_ph": {
-  "de": "Spiel suchen...",
-  "en": "Search game...",
-  "es": "Buscar juego...",
-  "fr": "Chercher un jeu..."
+  "de": "Spiel suchen…",
+  "en": "Search game…",
+  "es": "Buscar juego…",
+  "fr": "Chercher un jeu…"
  },
  "main_cerrar_busqueda": {
   "de": "Suche schließen",

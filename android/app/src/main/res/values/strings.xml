@@ -248,7 +248,7 @@
     <string name="enfoque_iniciar">⏱️ Iniciar seguimiento</string>
     <string name="enfoque_nada_nuevo">Nada nuevo todavía</string>
     <string name="enfoque_nota_offline">Guardada en el móvil — se sincronizará cuando vuelva la conexión</string>
-    <string name="enfoque_nota_ph">Nota privada (código de una taquilla, dónde te quedaste...)</string>
+    <string name="enfoque_nota_ph">Nota privada (código de una taquilla, dónde te quedaste…)</string>
     <string name="enfoque_nuevos_1">" — %1$s trofeo nuevo"</string>
     <string name="enfoque_nuevos_n">" — %1$s trofeos nuevos"</string>
     <string name="enfoque_otra_sesion">Tienes una sesión activa en %1$s</string>
@@ -272,7 +272,7 @@
     <string name="feed_a11y_reaccionado">%1$s reacciones. Has reaccionado; toca para cambiar</string>
     <string name="feed_a11y_reaccionar">%1$s reacciones. Reaccionar</string>
     <string name="feed_a11y_vistas">Visto por %1$s personas</string>
-    <string name="feed_comentar_ph">Añadir un comentario...</string>
+    <string name="feed_comentar_ph">Añadir un comentario…</string>
     <string name="feed_favorito">Ha marcado %1$s como favorito.</string>
     <string name="feed_nota">" con %1$s/10."</string>
     <string name="feed_nuevo">Ha empezado a jugar a %1$s.</string>
@@ -300,8 +300,8 @@
     <string name="ficha_horas">%1$sh jugadas</string>
     <string name="ficha_lista">Lista</string>
     <string name="ficha_notas">NOTAS PRIVADAS</string>
-    <string name="ficha_notas_anadir">Añadir nota personal...</string>
-    <string name="ficha_notas_ph">Apuntes, códigos, rutas de farmeo...</string>
+    <string name="ficha_notas_anadir">Añadir nota personal…</string>
+    <string name="ficha_notas_ph">Apuntes, códigos, rutas de farmeo…</string>
     <string name="ficha_objetivo_actual">Objetivo actual</string>
     <string name="ficha_prediccion">🔮 A este ritmo, lo tienes el %1$s</string>
     <string name="ficha_progreso">%1$s/%2$s trofeos · %3$s%%</string>
@@ -320,7 +320,7 @@
     <string name="guia_busqueda_video">%1$s %2$s guía trofeo</string>
     <string name="guias_borrar_texto">Desaparece para todo el mundo que la vea, no solo para ti.</string>
     <string name="guias_borrar_titulo">¿Borrar tu guía?</string>
-    <string name="guias_ph">Apunta cómo se consigue, rutas, códigos...</string>
+    <string name="guias_ph">Apunta cómo se consigue, rutas, códigos…</string>
     <string name="guias_tu_guia">TU GUÍA</string>
     <string name="guias_vacio">Todavía no hay ninguna guía escrita para este trofeo.</string>
     <string name="liga_borrar">Borrar esta liga</string>
@@ -359,7 +359,7 @@
     <string name="login_google">Continuar con Google</string>
     <string name="login_lema">El siguiente platino no se espera.</string>
     <string name="login_sin_contrasenas">No guardamos contraseñas: el acceso lo lleva tu proveedor.</string>
-    <string name="main_buscar_ph">Buscar juego...</string>
+    <string name="main_buscar_ph">Buscar juego…</string>
     <string name="main_cerrar_busqueda">Cerrar búsqueda</string>
     <string name="main_racha">Racha de %1$s días</string>
     <string name="main_sin_racha">Sin racha activa</string>
