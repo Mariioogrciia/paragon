@@ -25,14 +25,17 @@ import androidx.glance.unit.ColorProvider
 import com.paragon.app.ComposeMainActivity
 import com.paragon.app.R
 import com.paragon.app.util.Textos
+import androidx.glance.color.ColorProvider as DayNightColorProvider
 
-// Mismos valores de DarkAccent/DarkMuted/DarkGold de ui/theme/Color.kt — un
-// widget de Glance no puede leer `isDarkTheme` (vive fuera de la jerarquía
-// de Compose de la app, en su propio proceso de RemoteViews), así que se
-// fija en oscuro siempre, coherente con el tema por defecto de la app.
-private val WidgetBackground = Color(0xFF0C0C0C)
-private val WidgetAccent = Color(0xFFB026FF)
-private val WidgetMuted = Color(0xFFA0A0A0)
+// Un widget de Glance no puede leer el tema de la app (vive en el proceso del
+// launcher, como RemoteViews), pero sí el modo claro/oscuro del sistema con
+// ColorProvider(day, night) — antes estaba fijo en oscuro y desentonaba en
+// una pantalla de inicio clara. Mismos valores que el tema Paragon de
+// ui/theme/Color.kt (Light*/Dark*).
+private val WidgetBackground = DayNightColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF0C0C0C))
+private val WidgetAccent = DayNightColorProvider(day = Color(0xFF1D6FE0), night = Color(0xFFB026FF))
+private val WidgetMuted = DayNightColorProvider(day = Color(0xFF5B6472), night = Color(0xFFA0A0A0))
+private val WidgetPista = DayNightColorProvider(day = Color(0xFFEBEDF1), night = Color(0xFF262626))
 
 class PinnedGameWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -59,29 +62,29 @@ class PinnedGameWidget : GlanceAppWidget() {
                 if (pinnedGame != null) {
                     Text(
                         text = Textos.t(R.string.widget_objetivo, pinnedGame.title),
-                        style = TextStyle(color = ColorProvider(WidgetAccent)),
+                        style = TextStyle(color = WidgetAccent),
                         maxLines = 2,
                     )
                     Spacer(modifier = GlanceModifier.height(8.dp))
                     LinearProgressIndicator(
                         progress = pinnedGame.progressPercent / 100f,
                         modifier = GlanceModifier.fillMaxWidth(),
-                        color = ColorProvider(WidgetAccent),
-                        backgroundColor = ColorProvider(Color(0xFF262626)),
+                        color = WidgetAccent,
+                        backgroundColor = WidgetPista,
                     )
                     Spacer(modifier = GlanceModifier.height(6.dp))
                     Text(
                         text = Textos.t(R.string.ficha_progreso, pinnedGame.earnedTotal, pinnedGame.definedTotal, pinnedGame.progressPercent),
-                        style = TextStyle(color = ColorProvider(WidgetMuted)),
+                        style = TextStyle(color = WidgetMuted),
                     )
                 } else {
                     Text(
                         text = Textos.t(R.string.widget_sin_objetivo),
-                        style = TextStyle(color = ColorProvider(WidgetAccent))
+                        style = TextStyle(color = WidgetAccent)
                     )
                     Text(
                         text = Textos.t(R.string.widget_sin_objetivo_sub),
-                        style = TextStyle(color = ColorProvider(WidgetMuted))
+                        style = TextStyle(color = WidgetMuted)
                     )
                 }
             }

@@ -55,6 +55,9 @@ import coil3.compose.AsyncImage
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.ui.theme.Surface2
+import com.paragon.app.ui.theme.Surface
+import com.paragon.app.ui.theme.Foreground
 
 /**
  * `userProfile`/`globalStats` ya son reales (bajan desde AppRoot vía
@@ -368,10 +371,9 @@ fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
             .fillMaxWidth()
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF14202C),
-                        Color(0xFF0D131C)
-                    )
+                    // Del tema activo (antes azul noche fijo, que en modo claro o con
+                    // el tema de Xbox/Steam quedaba como un parche de otro sitio).
+                    colors = listOf(Surface2, Surface)
                 ),
                 shape = RoundedCornerShape(20.dp)
             )
@@ -401,7 +403,7 @@ fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
             )
             Text(
                 text = value.toString(),
-                color = Color(0xFFDFF0F8),
+                color = Foreground,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp)

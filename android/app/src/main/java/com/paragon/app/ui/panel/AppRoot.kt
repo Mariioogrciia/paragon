@@ -65,6 +65,8 @@ import com.paragon.app.ui.theme.Silver
 import com.paragon.app.ui.theme.Surface as SurfaceColor
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.ui.theme.MarcaGoogle
+import com.paragon.app.ui.theme.MarcaDiscord
 
 /**
  * Puerta de entrada real antes de `MainScreen` (el NavHost + BottomBar de
@@ -185,8 +187,6 @@ private fun LoadingGate() {
     }
 }
 
-private val GoogleBlue = Color(0xFF4285F4)
-private val DiscordBlurple = Color(0xFF5865F2)
 
 /**
  * Un botón por proveedor — cada uno abre la Custom Tab directa a
@@ -254,14 +254,14 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
             ProviderButton(
                 label = stringResource(R.string.login_google),
                 iconRes = R.drawable.ic_google,
-                accentColor = GoogleBlue,
+                accentColor = MarcaGoogle,
                 onClick = { onLogin("google") },
             )
             Spacer(Modifier.height(12.dp))
             ProviderButton(
                 label = stringResource(R.string.login_discord),
                 iconRes = R.drawable.ic_discord,
-                accentColor = DiscordBlurple,
+                accentColor = MarcaDiscord,
                 onClick = { onLogin("discord") },
             )
 

@@ -36,19 +36,19 @@ import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import com.paragon.app.util.Textos
+import com.paragon.app.ui.theme.MarcaPlayStation
+import com.paragon.app.ui.theme.MarcaXbox
+import com.paragon.app.ui.theme.MarcaSteam
 
 // Colores de marca reales por plataforma — antes cada fila era el mismo
 // texto plano en mayúsculas sin nada que las distinguiera a simple vista
 // (mismo criterio que GoogleBlue/DiscordBlurple en AppRoot.kt: la marca
 // manda aquí, no el acento activo de la app).
-private val PsBlue = Color(0xFF0070D1)
-private val XboxGreen = Color(0xFF107C10)
-private val SteamBlue = Color(0xFF66C0F4)
 
 private fun platformBrandColor(platform: String): Color = when (platform) {
-    "psn" -> PsBlue
-    "xbox" -> XboxGreen
-    "steam" -> SteamBlue
+    "psn" -> MarcaPlayStation
+    "xbox" -> MarcaXbox
+    "steam" -> MarcaSteam
     "epic" -> Foreground
     else -> Accent
 }

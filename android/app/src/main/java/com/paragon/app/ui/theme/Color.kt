@@ -215,3 +215,14 @@ val Platinum: Color get() = if (isDarkTheme) DarkPlatinum else LightPlatinum
 // Utility
 val Good: Color get() = if (isDarkTheme) DarkGood else LightGood
 val Danger: Color get() = if (isDarkTheme) DarkDanger else LightDanger
+
+/**
+ * Colores de marca de terceros (auditoría, 4 oct 2026): antes repetidos a
+ * mano en Cuentas vinculadas y en el login. No cambian con el tema a
+ * propósito — son la identidad de cada plataforma, no del tema de Paragon.
+ */
+val MarcaPlayStation = Color(0xFF0070D1)
+val MarcaXbox = Color(0xFF107C10)
+val MarcaSteam = Color(0xFF66C0F4)
+val MarcaGoogle = Color(0xFF4285F4)
+val MarcaDiscord = Color(0xFF5865F2)
