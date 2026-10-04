@@ -17,8 +17,13 @@ releer todo el historial. Última actualización: **4 de octubre de 2026**.
 - **Trofeos en tu idioma + guías en vídeo por idioma** (3 oct): ver "Trofeos
   en tu idioma y guías en vídeo por idioma". Tablas nuevas ya creadas en
   producción (`scripts/crear-tablas-traducciones-trofeo.mts`).
-- **Git**: `master` está **un commit por delante de `origin`** (el de
-  idiomas, `7e18cfd`), sin subir a la espera de que el usuario lo pida.
+- **App Android: auditoría Impeccable + arreglos (4 oct, tarde)** — ver
+  "Auditoría de la app Android" al final. Seguridad del login, app en
+  es/en/de/fr, rail en tablet, accesibilidad, esqueletos, ETag/304.
+- **Git**: `master` va **varios commits por delante de `origin`** (idiomas
+  web + toda la tanda de Android), sin subir a la espera de que el usuario
+  lo pida. **Ojo al subir**: el login nuevo de la app exige servidor Y APK
+  nuevos a la vez (ver la sección de Android).
   Fuera del repo siguen `.env.local`, `scratch/`, `.impeccable/` (rondas de
   diseño y respuestas, nunca subidas) y el cambio local de
   `.claude/launch.json` (ruta del certificado de Avast).
@@ -29,8 +34,8 @@ releer todo el historial. Última actualización: **4 de octubre de 2026**.
   - La extensión no está instalada de verdad en Chrome (solo probado el
     script de lectura en una página real de Epic) y no está en ninguna
     tienda: instalación manual en modo desarrollador.
-  - La app de Android no se ha probado con lo de Epic declarado ni con los
-    idiomas (la API móvil no traduce trofeos a propósito).
+  - La app de Android, con sesión iniciada: no se ha podido probar en el
+    emulador (exige una cuenta real de Google/Discord). Solo el login.
   - Lista de coleccionables para trofeos de "consigue todos" (ninguna
     plataforma dice qué objeto falta); API oficial de YouTube (necesita
     clave) si se quiere filtrar mejor por idioma.
@@ -1303,3 +1308,78 @@ nuevas/día) en lugar de leer el HTML. Tablas creadas con
 - Los scripts desechables van en `scratch/` (fuera de git), no en el
   scratchpad del sistema: desde fuera del proyecto no resuelven los
   paquetes de `node_modules`.
+
+---
+
+## Auditoría de la app Android (4 oct 2026)
+
+Auditoría con Impeccable (`audit` nativo de Android): **10/20 al empezar**
+(accesibilidad 2, rendimiento 2, tema 3, conformidad 2, adaptividad 1), más
+fallos de seguridad del backend móvil. Arreglado todo, en orden, en estos
+commits:
+
+1. **Seguridad** (`13dfe34`):
+   - El enlace `paragon://auth` llevaba el token en claro. Ahora la app
+     genera una clave de 32 bytes por login (`?k=` en
+     `/movil/entrar/{provider}`) y `/movil/enlazar` devuelve el token
+     cifrado con AES-256-GCM (`?c=`; `src/lib/enlaceMovil.ts` +
+     `EnlaceSeguro.kt`). Ni otra app que registre `paragon://` lo lee, ni un
+     enlace fabricado te mete en otra cuenta (probado en el emulador: se
+     ignora). Sin `k` (APK antigua), la página pide actualizar la app.
+   - El logout desasocia el token de FCM (body `fcmToken`) y lo borra en
+     Firebase.
+   - Límites de peticiones en las rutas de `/api/mobile` que escriben o
+     llaman fuera (`vincularCuenta`, `resync`, `pushToken`, `reaccion` +
+     los existentes).
+   - La sesión se excluye de las copias de seguridad
+     (`backup_rules`/`data_extraction_rules`).
+   - Epic aparece en Cuentas (declarado, `appLinkable: false`) y en la
+     ficha.
+   - La ficha y "Siguiente trofeo" usan el idioma del teléfono
+     (`Accept-Language` → `idiomaDeCabecera`).
+   - `CONTRACT.md` unificado con su copia de `android/`.
+2. **Traducción** (`bf17e18`):
+   - 538 textos en `android/i18n/textos.json` → `strings.xml` es/en/de/fr
+     (`node android/i18n/generar.mjs`), con `Textos.t()` fuera de Compose.
+   - Fechas en el formato del teléfono e idioma por app en Android 13+.
+   - Los errores de red ya no enseñan el mensaje técnico de la excepción.
+3. **Adaptación** (`0de79f7`):
+   - Gesto de atrás predictivo, con `BackHandler` en la ruleta y en el
+     Wrap.
+   - Rail lateral y contenido de 840 dp a partir de 600 dp de ancho.
+   - `imePadding`.
+   - Botones de 24-40 dp pasados a 48.
+   - Etiquetas de TalkBack en reacciones, comentarios y vistas; el pulso
+     de la racha respeta "quitar animaciones".
+4. **Rendimiento** (`cea450a`):
+   - Esqueletos de carga.
+   - ETag + `private, no-cache` en 13 GET grandes (`src/lib/etag.ts`) y
+     caché HTTP de 10 MB en OkHttp (vaciada al cerrar sesión).
+   - `PanelSyncWorker` cada 3 h y sin batería baja (antes cada 15 min).
+5. **Colores** (`a6176ce`): marcas en el tema, tarjeta de platinos con el
+   tema activo, widget día/noche. Siguen fijos a propósito: Wrap, Modo
+   Enfoque y la paleta de ligas.
+6. **Pulido** (`dbc25db`): lint sin errores ni fallos de traducción o
+   formato.
+
+**Verificado:**
+- `compileDebugKotlin`, `assembleDebug` y `lintDebug` (0 errores).
+- tsc, eslint y `npm test` (124 tests; nuevos: `enlaceMovil`, `etag`).
+- En el emulador (Pixel 7a, API 35): login en es/en/de y enlaces falsos
+  ignorados.
+
+**Sin probar:** todas las pantallas con sesión iniciada, porque exigen una
+cuenta real. Tampoco el rail en tablet ni el teclado con un campo abierto.
+
+**Al subir (`git push`):**
+- El servidor nuevo deja de dar token a las APK viejas: hay que instalar la
+  APK nueva a la vez.
+- Las APK antiguas seguirán funcionando mientras no caduque su sesión
+  (Bearer intacto), pero no podrán volver a iniciar sesión.
+
+**Pendiente:**
+- Los mensajes de error que vienen del servidor (`error` del JSON:
+  límites, vincular cuenta...) siguen en español.
+- `release` sin `minifyEnabled` (R8 necesita reglas para Moshi/Retrofit y
+  probar un APK release).
+- `versionCode` sigue en 1.

@@ -30,6 +30,26 @@ Reglas de base (ya acordadas, no reabrir sin decirlo el usuario):
 
 ---
 
+## Reglas nuevas tras la auditoría de la app (4 oct 2026) — LEER ANTES DE TOCAR UI
+
+- **Ningún texto visible a mano en Kotlin.** La app está en es/en/de/fr. Los
+  textos viven en `android/i18n/textos.json` (los 4 idiomas juntos) y se
+  generan los `res/values*/strings.xml` con `node android/i18n/generar.mjs`
+  (desde la raíz del repo). Huecos como `{0}`, `{1}`. En Compose:
+  `stringResource(R.string.x, a)`; fuera de Compose (repositorios, widget,
+  push): `Textos.t(R.string.x, a)`. No editar los strings.xml a mano.
+- Fechas con el formato del teléfono (`DateFormat.getDateInstance`), nunca
+  `Locale("es", "ES")` fijo.
+- Login: el enlace `paragon://auth` ahora lleva el token CIFRADO (`?c=`), con
+  una clave que la app genera en cada login (`EnlaceSeguro.kt`). Para abrir
+  el login usar siempre `EnlaceSeguro.abrirLogin(...)`.
+- Botones de 48 dp mínimo; iconos que son botón, con `contentDescription`.
+- Cargas con `EsqueletoLista`/`EsqueletoFicha`/`EsqueletoTarjetas`
+  (`ui/common/Esqueleto.kt`), no con un spinner a pantalla completa.
+- Ventana de 600 dp o más: `MainScreen` pone rail lateral y limita el
+  contenido a 840 dp. Overlays a pantalla completa propios: `BackHandler`.
+- Colores de marca en `ui/theme/Color.kt` (`MarcaPlayStation`...), no a mano.
+
 ## Estado (16 de septiembre de 2026) — paridad básica con la web alcanzada
 
 **Las 7 pantallas + login, todas con datos reales de punta a punta:**
