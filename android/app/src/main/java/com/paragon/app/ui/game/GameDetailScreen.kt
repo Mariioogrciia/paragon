@@ -399,6 +399,16 @@ private fun GameDetailHero(
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 6.dp, bottom = 12.dp),
                 )
+                if (game.id.startsWith("epic-")) {
+                    // Mismo aviso que MarcaDeclarado en la web: Epic solo se lee
+                    // desde la extensión del navegador y no se puede comprobar.
+                    Text(
+                        text = "Progreso declarado · no puntúa en niveles ni rankings",
+                        color = Muted,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

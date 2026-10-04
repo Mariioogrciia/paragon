@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
@@ -11,6 +12,9 @@ export async function GET(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("perfil", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const { handle } = await params;

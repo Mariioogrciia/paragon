@@ -16,17 +16,33 @@ Un único login real: Google o Discord (no hay contraseña, ver `src/auth.ts`).
    (`androidx.browser`) — ese route (`src/app/movil/entrar/[provider]/route.ts`)
    llama a `signIn()` directo, SIN pasar por la página web `/entrar` de por
    medio. `AppRoot.LoginGate` en Android ya tiene un botón por proveedor.
-2. Tras el login, Google/Discord vuelve a `/movil/enlazar`, que redirige a
-   `paragon://auth?token=<sessionToken>` — un intent-filter en
-   `ComposeMainActivity` lo captura.
-3. Guardar `token` (ver `TokenStore.kt`) y mandarlo en cada llamada como:
-   `Authorization: Bearer <token>`
+   **Desde el 4 oct 2026 con `?k=<clave>`**: 32 bytes aleatorios en base64url
+   sin relleno (43 caracteres), nuevos en cada login y guardados en la app
+   (`EnlaceSeguro.kt`).
+2. Tras el login, Google/Discord vuelve a `/movil/enlazar?k=...`, que
+   redirige a `paragon://auth?c=<token cifrado>` — un intent-filter en
+   `ComposeMainActivity` lo captura. `c` = base64url(iv[12] | cifrado |
+   etiqueta[16]) con AES-256-GCM y la clave `k` (`lib/enlaceMovil.ts`). Sin
+   `k` (app antigua) la página pide actualizar la app y no entrega token.
+   La app ignora cualquier enlace que no descifre con su clave pendiente:
+   así ni otra app que intercepte `paragon://` lee el token, ni un enlace
+   fabricado puede meterte en la cuenta de otro.
+3. Guardar el token descifrado (ver `TokenStore.kt`) y mandarlo en cada
+   llamada como: `Authorization: Bearer <token>`. La app manda también
+   `Accept-Language` con el idioma del teléfono: la ficha de juego y
+   "Siguiente trofeo" devuelven los trofeos en ese idioma si la plataforma
+   lo tiene (es/en/de/fr; si no, el idioma base).
 4. Si cualquier endpoint responde **401**, el token ha caducado o se cerró
    sesión en la web — borrar el token guardado y volver a pedir login.
    (`PanelRepository.kt` ya hace esto.)
 
 Todos los endpoints de abajo exigen ese header. Sin él, o con un token no
 válido: `401 { "error": "No autenticado" }`.
+
+**`429 { "error": "..." }`**: las rutas que escriben o llaman a servicios
+externos (vincular, resync, búsqueda, guías, notas, ligas, clanes,
+carpetas, reacciones, push-token...) tienen límite de peticiones por
+usuario (`lib/rateLimit.ts`). Enseñar el `error` tal cual.
 
 ## `GET /api/mobile/panel` — Dashboard
 
@@ -127,26 +143,36 @@ como campo aparte.
   "createdAt": "2026-09-15T20:00:00.000Z",
   "user": { "id": "u1", "handle": "mario", "name": "Mario", "image": "https://..." },
   "game": { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "deviceLabel": "PS5" },
-  "reactions": 3, "reacted": false,
+  "reactions": 3, "reacted": false, "miReaccion": null,
   "comments": [ { "activityId": "act_1", "body": "GG", "userName": "Ana", "createdAt": "..." } ],
   "views": 12
 } ] }
 ```
-`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`.
-Máximo 50 elementos, ya ordenados por fecha descendente. `views`: número de
-usuarios distintos que han visto la publicación (tabla `activity_view`, PK
-compuesta por actividad+usuario — no cuenta visitas repetidas de la misma
-persona).
+`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game" | "status"`.
+`"status"` es un estado libre publicado desde Comunidad: **`game` viene
+`null`** y el texto vive en `review` (no es una cita sobre un juego, es la
+publicación entera). Soportado por la app desde el 30 sept 2026 — antes se
+filtraban en el propio endpoint porque la app esperaba `game` siempre.
+`miReaccion` es la clave de con cuál de las 5 reacciones ha reaccionado esta
+cuenta (`"aplauso" | "fuego" | "trofeo" | "risa" | "sorpresa"`, ver
+`lib/reacciones.ts`), o `null` si ninguna. Máximo 50 elementos, ya ordenados
+por fecha descendente. `views`: número de usuarios distintos que han visto
+la publicación (tabla `activity_view`, PK compuesta por actividad+usuario —
+no cuenta visitas repetidas de la misma persona).
 
 ## `POST /api/mobile/feed/{activityId}/react` — Reaccionar/quitar reacción
 
+Body: `{ "reaction": "fuego" }` (opcional — sin él, o con una clave que no
+es una de las 5, cae en `"aplauso"`, mismo comportamiento que antes del 30
+sept 2026).
 ```json
 { "reacted": true }
 ```
-Alterna: si ya habías reaccionado, la quita y devuelve `false`. Mismo
-`toggleActivityReactionAction` que la web (botón de aplauso) — pensado para
-el doble toque en una tarjeta del Feed (idea #13 del brainstorm de v1.0),
-no hay un endpoint aparte para "quitar" solamente.
+Alterna: la misma reacción otra vez la quita (`"reacted": false`); una
+distinta a la que ya tenías la cambia sin tocar el contador total. Mismo
+`toggleActivityReactionAction` que la web — pensado también para el doble
+toque en una tarjeta del Feed (idea #13 del brainstorm de v1.0, reacciona
+con `"aplauso"`), no hay un endpoint aparte para "quitar" solamente.
 
 ## `POST /api/mobile/feed/{activityId}/view` — Registrar visualización
 
@@ -526,7 +552,8 @@ hay 404 aparte — el resultado que le importa al cliente es el mismo).
   "platforms": [
     { "platform": "psn", "linked": true, "username": "mario_psn", "level": 245 },
     { "platform": "steam", "linked": false, "username": null, "level": null },
-    { "platform": "xbox", "linked": false, "username": null, "level": null }
+    { "platform": "xbox", "linked": false, "username": null, "level": null },
+    { "platform": "epic", "linked": false, "username": null, "level": null, "declared": true, "appLinkable": false }
   ]
 }
 ```
@@ -536,6 +563,12 @@ revienta al pulsarlo. Para **vincular** Google/Discord no hay un POST
 aquí: se reabre `/movil/entrar/{provider}` (el mismo route del login) con
 sesión activa — la Custom Tab comparte cookies con Chrome, así que
 `signIn()` detecta la sesión y VINCULA en vez de crear una cuenta nueva.
+
+Todas las plataformas traen `declared` y `appLinkable`. **Epic**:
+`declared: true` (su progreso se ve pero no puntúa en nada, ver
+`lib/declarado.ts`) y `appLinkable: false` (Epic bloquea al servidor; se
+vincula y sincroniza con la extensión del navegador, no desde la app). Los
+juegos de Epic llegan en la biblioteca con `platform: "epic"`.
 
 ## `POST /api/mobile/accounts/{platform}` — Vincular PSN/Steam/Xbox
 
@@ -583,7 +616,9 @@ igual que el resto de `/api/mobile/*`, con el Bearer token).
 
 ## `POST /api/mobile/logout` — Cerrar sesión SOLO en este móvil
 
-Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
+Body opcional: `{ "fcmToken": "..." }` — el token de FCM de este teléfono,
+que se desasocia de la cuenta (si es suyo) para que deje de recibir sus
+avisos. `{ "ok": true }` siempre — ver `mintMobileSession`/
 `revokeMobileSession` en `lib/mobileAuth.ts`.
 
 ## `GET /api/mobile/stats` — Estadísticas

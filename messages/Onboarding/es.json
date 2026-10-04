@@ -78,6 +78,10 @@
       "title": "Enlazando con la app…",
       "description": "Si no vuelves a la app automáticamente, pulsa el enlace.",
       "openApp": "Abrir Paragon"
+    },
+    "actualizar": {
+      "title": "Actualiza la app de Paragon",
+      "description": "Esta versión de la app ya no puede iniciar sesión de forma segura. Instala la última versión y vuelve a entrar desde ella."
     }
   },
   "ajustesOcultar": {

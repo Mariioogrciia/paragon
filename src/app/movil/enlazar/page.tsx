@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { COOKIES_SESION, mintMobileSession } from "@/lib/mobileAuth";
+import { cifrarParaApp, claveDeEnlaceValida } from "@/lib/enlaceMovil";
 import { getTranslations } from "next-intl/server";
 
 /**
@@ -30,9 +31,11 @@ const COOKIE_NAMES = COOKIES_SESION;
  * abajo es solo una red de seguridad para quien llegue aquí sin sesión por
  * algún otro camino (token caducado, cookie borrada a mano...).
  */
-export default async function EnlazarMovilPage() {
+export default async function EnlazarMovilPage({ searchParams }: { searchParams: Promise<{ k?: string }> }) {
+  const { k } = await searchParams;
+  const vuelta = claveDeEnlaceValida(k) ? `/movil/enlazar?k=${k}` : "/movil/enlazar";
   const session = await auth();
-  if (!session?.user) redirect("/entrar?callbackUrl=/movil/enlazar");
+  if (!session?.user) redirect(`/entrar?callbackUrl=${encodeURIComponent(vuelta)}`);
 
   const store = await cookies();
   const sesionPrestada = COOKIE_NAMES.map((name) => store.get(name)?.value).find(Boolean);
@@ -50,8 +53,19 @@ export default async function EnlazarMovilPage() {
     );
   }
 
+  // Sin clave = app antigua que todavía espera el token en claro: ya no se
+  // le da (ver lib/enlaceMovil.ts). Se comprueba ANTES de gastar la sesión.
+  if (!claveDeEnlaceValida(k)) {
+    return (
+      <main className="mx-auto max-w-md px-6 py-16 text-center">
+        <h1 className="font-heading text-xl font-bold">{t("movilEnlazar.actualizar.title")}</h1>
+        <p className="mt-3 text-sm text-muted">{t("movilEnlazar.actualizar.description")}</p>
+      </main>
+    );
+  }
+
   const token = await mintMobileSession(session.user.id, sesionPrestada);
-  const deepLink = `paragon://auth?token=${encodeURIComponent(token)}`;
+  const deepLink = `paragon://auth?c=${cifrarParaApp(token, k)}`;
 
   return (
     <main className="mx-auto max-w-md px-6 py-16 text-center">

@@ -422,6 +422,13 @@ fun MainScreen(
                         coroutineScope.launch {
                             PanelRepository(tokenStore).logout()
                             tokenStore.clear()
+                            // Y el propio token de FCM se invalida en Firebase:
+                            // aunque la llamada de arriba fallara sin red, ese
+                            // token ya no puede recibir nada de esta cuenta.
+                            tokenStore.fcmToken = null
+                            if (com.google.firebase.FirebaseApp.getApps(context).isNotEmpty()) {
+                                com.google.firebase.messaging.FirebaseMessaging.getInstance().deleteToken()
+                            }
                             (context as? ComposeMainActivity)?.recreate()
                         }
                     }

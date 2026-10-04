@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { gameProgress } from "@/lib/stats";
 import { getTrophyRecommendations } from "@/lib/recommendations";
+import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import type { Game } from "@/lib/types";
 
 /**
@@ -40,7 +41,7 @@ export async function GET(req: Request) {
     // nunca había llegado al móvil. Mismo cálculo, no una aproximación
     // aparte (prioriza juego base sobre DLC, progreso alto y mayor
     // probabilidad real de conseguirlo — ver lib/recommendations.ts).
-    getTrophyRecommendations(userId, 4),
+    getTrophyRecommendations(userId, 4, idiomaDeCabecera(req.headers.get("accept-language"))),
   ]);
 
   // getLibrary ya devuelve los juegos ordenados por lastPlayedAt desc

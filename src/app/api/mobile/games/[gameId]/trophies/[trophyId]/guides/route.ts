@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { listTrophyGuides, upsertTrophyGuide, deleteTrophyGuide, TrophyGuideError } from "@/lib/trophyGuides";
 
 /**
@@ -34,6 +35,9 @@ export async function POST(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("comentario", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const { gameId, trophyId } = await params;

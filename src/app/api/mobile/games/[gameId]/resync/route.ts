@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { refrescarJuego } from "@/lib/profiles";
 
 /**
@@ -16,6 +17,9 @@ export async function POST(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("resync", userId))) {
+    return NextResponse.json({ error: "Has comprobado este juego muchas veces seguidas. Espera unos minutos." }, { status: 429 });
   }
 
   const { gameId } = await params;

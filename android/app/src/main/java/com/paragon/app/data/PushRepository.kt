@@ -10,6 +10,7 @@ class PushRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return
         try {
             ApiClient.pushTokenApi(store).registerToken(PushTokenRequest(token))
+            store.fcmToken = token
         } catch (e: Exception) {
             // Sin conexión o servidor caído: Firebase reintenta darnos el
             // mismo token más adelante (onNewToken no vuelve a saltar solo),

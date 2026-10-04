@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getGameDetail, getProfileByUserId } from "@/lib/profiles";
+import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 
 /**
  * Ficha de un juego para GameDetailScreen (Android) — mismo `getGameDetail`
@@ -23,7 +24,7 @@ export async function GET(
   }
 
   const { gameId } = await params;
-  const detail = await getGameDetail(profile, gameId);
+  const detail = await getGameDetail(profile, gameId, idiomaDeCabecera(req.headers.get("accept-language")));
   if (!detail) {
     return NextResponse.json({ error: "Juego no encontrado" }, { status: 404 });
   }

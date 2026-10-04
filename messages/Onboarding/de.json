@@ -78,6 +78,10 @@
       "title": "Verknüpfung mit der App…",
       "description": "Falls du nicht automatisch zur App zurückkehrst, tippe auf den Link.",
       "openApp": "Paragon öffnen"
+    },
+    "actualizar": {
+      "title": "Aktualisiere die Paragon-App",
+      "description": "Diese App-Version kann sich nicht mehr sicher anmelden. Installiere die neueste Version und melde dich dort erneut an."
     }
   },
   "ajustesOcultar": {

@@ -18,14 +18,13 @@ const val BASE_URL = "https://platinos-nine.vercel.app/"
 private class AuthInterceptor(private val tokenStore: TokenStore) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val token = tokenStore.token
-        val request = if (token != null) {
-            chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-        } else {
-            chain.request()
-        }
-        return chain.proceed(request)
+        val builder = chain.request().newBuilder()
+            // Idioma del teléfono: el servidor devuelve los nombres de los
+            // trofeos en ese idioma si la plataforma los tiene (ver
+            // idiomaDeCabecera en lib/idiomasTrofeo.ts).
+            .header("Accept-Language", java.util.Locale.getDefault().toLanguageTag())
+        if (token != null) builder.addHeader("Authorization", "Bearer $token")
+        return chain.proceed(builder.build())
     }
 }
 

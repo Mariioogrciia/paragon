@@ -78,6 +78,10 @@
       "title": "Linking with the app…",
       "description": "If you're not taken back to the app automatically, tap the link.",
       "openApp": "Open Paragon"
+    },
+    "actualizar": {
+      "title": "Update the Paragon app",
+      "description": "This version of the app can no longer sign in securely. Install the latest version and sign in again from it."
     }
   },
   "ajustesOcultar": {

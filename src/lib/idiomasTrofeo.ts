@@ -10,6 +10,18 @@ export function esIdioma(valor: unknown): valor is Idioma {
 }
 
 /**
+ * Idioma de una petición de la app Android (`Accept-Language` con el idioma
+ * del teléfono, ver ApiClient.kt). Primer idioma que tengamos; si no, `es`.
+ */
+export function idiomaDeCabecera(cabecera: string | null): Idioma {
+  for (const parte of (cabecera ?? "").split(",")) {
+    const codigo = parte.split(";")[0].trim().slice(0, 2).toLowerCase();
+    if (esIdioma(codigo)) return codigo;
+  }
+  return "es";
+}
+
+/**
  * Idioma en el que ya está guardado `game_trophy.name/detail` de cada
  * plataforma (comprobado en la base el 1 oct 2026): el servidor sincroniza
  * PSN y Xbox en inglés, Steam y Epic en español.

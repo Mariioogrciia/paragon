@@ -1,7 +1,5 @@
 package com.paragon.app.ui.settings
 
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,7 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.paragon.app.R
 import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.SettingsResult
-import com.paragon.app.data.network.BASE_URL
+import com.paragon.app.data.auth.EnlaceSeguro
+import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.LinkedAccountsResponse
 import com.paragon.app.data.network.OauthAccountDto
 import com.paragon.app.data.network.PlatformAccountDto
@@ -48,6 +47,7 @@ private fun platformBrandColor(platform: String): Color = when (platform) {
     "psn" -> PsBlue
     "xbox" -> XboxGreen
     "steam" -> SteamBlue
+    "epic" -> Foreground
     else -> Accent
 }
 
@@ -55,6 +55,7 @@ private fun platformLabel(platform: String): String = when (platform) {
     "psn" -> "PlayStation"
     "xbox" -> "Xbox"
     "steam" -> "Steam"
+    "epic" -> "Epic Games"
     else -> platform.uppercase()
 }
 
@@ -70,6 +71,7 @@ private fun platformIconRes(platform: String): Int? = when (platform) {
     "psn" -> R.drawable.ic_playstation
     "xbox" -> R.drawable.ic_xbox
     "steam" -> R.drawable.ic_steam
+    "epic" -> R.drawable.ic_epic
     else -> null
 }
 
@@ -203,11 +205,8 @@ fun LinkedAccountsScreen(
                     OauthItem(
                         oauth = oauth,
                         onLinkRequested = {
-                            // Linkeamos usando CustomTab para Google/Discord
-                            val loginUrl = Uri.parse(BASE_URL).buildUpon()
-                                .appendEncodedPath("movil/entrar/${oauth.provider}")
-                                .build()
-                            CustomTabsIntent.Builder().build().launchUrl(context, loginUrl)
+                            // Mismo login por Custom Tab, con su clave de un solo uso (ver EnlaceSeguro).
+                            EnlaceSeguro.abrirLogin(context, TokenStore(context.applicationContext), oauth.provider)
                         }
                     )
                 }
@@ -320,7 +319,8 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                         Icon(
                             painter = painterResource(iconRes),
                             contentDescription = null,
-                            tint = Color.Unspecified,
+                            // El logo de Epic es monocromo: sigue al color del texto (claro/oscuro).
+                            tint = if (platform.platform == "epic") Foreground else Color.Unspecified,
                             modifier = Modifier.size(18.dp),
                         )
                     } else {
@@ -332,6 +332,10 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     if (platform.linked) {
                         Text(text = platform.username ?: "Vinculado", color = Muted, fontSize = 13.sp)
                     }
+                    if (platform.declared) {
+                        // Igual que MarcaDeclarado en la web: se ve, pero no puntúa.
+                        Text(text = "Progreso declarado · no puntúa", color = Muted, fontSize = 12.sp)
+                    }
                 }
             }
             if (platform.linked) {
@@ -342,7 +346,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = "Desvincular", tint = Danger, modifier = Modifier.size(18.dp))
                 }
-            } else {
+            } else if (platform.appLinkable) {
                 if (!isLinking) {
                     Button(
                         onClick = { isLinking = true },
@@ -355,6 +359,15 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     }
                 }
             }
+        }
+
+        if (!platform.linked && !platform.appLinkable) {
+            Text(
+                text = "Epic bloquea las consultas de los servidores, así que se vincula desde el ordenador con la extensión de Paragon para el navegador: abre tu página de logros de Epic y pulsa Sincronizar.",
+                color = Muted,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 10.dp),
+            )
         }
 
         if (isLinking && !platform.linked) {

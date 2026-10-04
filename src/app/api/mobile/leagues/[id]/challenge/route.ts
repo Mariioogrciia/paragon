@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { setLeagueChallenge } from "@/lib/leagues";
 
 /** Fija (o quita, con `gameId: null`) el juego de reto de la liga — `{ "gameId": "..." | null }`. Solo el dueño. */
@@ -10,6 +11,9 @@ export async function POST(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("comentario", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const { id } = await params;

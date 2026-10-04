@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { getClanByTag, inviteToClan } from "@/lib/clans";
 
 /**
@@ -11,6 +12,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ tag: st
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("comentario", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const { tag } = await params;

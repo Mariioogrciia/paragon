@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "@/db";
 import { games, gameTrophies } from "@/db/schema";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { buscarVideoGuiaTrofeo } from "@/lib/videoGuides";
 
 /**
@@ -18,6 +19,9 @@ export async function GET(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("guiaVideo", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const { gameId, trophyId } = await params;

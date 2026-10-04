@@ -3,6 +3,7 @@ import { sql, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { clans, clanMembers } from "@/db/schema";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { createClan, getUserClan } from "@/lib/clans";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
@@ -46,6 +47,9 @@ export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("comentario", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const body = await req.json().catch(() => null);

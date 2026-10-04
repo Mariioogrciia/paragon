@@ -6,6 +6,7 @@ import com.paragon.app.data.local.PanelDao
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.ChooseHandleRequest
 import com.paragon.app.data.network.GameCardDto
+import com.paragon.app.data.network.LogoutRequest
 import com.paragon.app.data.network.NextTrophyDto
 import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
@@ -248,7 +249,9 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
     suspend fun logout() {
         val store = tokenStore ?: return
         try {
-            ApiClient.logoutApi(store).logout()
+            // Con el token de FCM: el servidor lo desasocia de la cuenta y
+            // este teléfono deja de recibir sus avisos (auditoría, 4 oct 2026).
+            ApiClient.logoutApi(store).logout(LogoutRequest(store.fcmToken))
         } catch (e: Exception) {
             // Sin conexión o servidor caído: la sesión del móvil puede
             // quedar viva en el servidor hasta que caduque sola, pero

@@ -16,11 +16,22 @@ Un único login real: Google o Discord (no hay contraseña, ver `src/auth.ts`).
    (`androidx.browser`) — ese route (`src/app/movil/entrar/[provider]/route.ts`)
    llama a `signIn()` directo, SIN pasar por la página web `/entrar` de por
    medio. `AppRoot.LoginGate` en Android ya tiene un botón por proveedor.
-2. Tras el login, Google/Discord vuelve a `/movil/enlazar`, que redirige a
-   `paragon://auth?token=<sessionToken>` — un intent-filter en
-   `ComposeMainActivity` lo captura.
-3. Guardar `token` (ver `TokenStore.kt`) y mandarlo en cada llamada como:
-   `Authorization: Bearer <token>`
+   **Desde el 4 oct 2026 con `?k=<clave>`**: 32 bytes aleatorios en base64url
+   sin relleno (43 caracteres), nuevos en cada login y guardados en la app
+   (`EnlaceSeguro.kt`).
+2. Tras el login, Google/Discord vuelve a `/movil/enlazar?k=...`, que
+   redirige a `paragon://auth?c=<token cifrado>` — un intent-filter en
+   `ComposeMainActivity` lo captura. `c` = base64url(iv[12] | cifrado |
+   etiqueta[16]) con AES-256-GCM y la clave `k` (`lib/enlaceMovil.ts`). Sin
+   `k` (app antigua) la página pide actualizar la app y no entrega token.
+   La app ignora cualquier enlace que no descifre con su clave pendiente:
+   así ni otra app que intercepte `paragon://` lee el token, ni un enlace
+   fabricado puede meterte en la cuenta de otro.
+3. Guardar el token descifrado (ver `TokenStore.kt`) y mandarlo en cada
+   llamada como: `Authorization: Bearer <token>`. La app manda también
+   `Accept-Language` con el idioma del teléfono: la ficha de juego y
+   "Siguiente trofeo" devuelven los trofeos en ese idioma si la plataforma
+   lo tiene (es/en/de/fr; si no, el idioma base).
 4. Si cualquier endpoint responde **401**, el token ha caducado o se cerró
    sesión en la web — borrar el token guardado y volver a pedir login.
    (`PanelRepository.kt` ya hace esto.)
@@ -28,12 +39,17 @@ Un único login real: Google o Discord (no hay contraseña, ver `src/auth.ts`).
 Todos los endpoints de abajo exigen ese header. Sin él, o con un token no
 válido: `401 { "error": "No autenticado" }`.
 
+**`429 { "error": "..." }`**: las rutas que escriben o llaman a servicios
+externos (vincular, resync, búsqueda, guías, notas, ligas, clanes,
+carpetas, reacciones, push-token...) tienen límite de peticiones por
+usuario (`lib/rateLimit.ts`). Enseñar el `error` tal cual.
+
 ## `GET /api/mobile/panel` — Dashboard
 
 ```json
 {
   "profile": { "handle": "mario", "name": "Mario", "level": 14, "psnId": "mario_psn", "image": "https://..." },
-  "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68 },
+  "stats": { "platinums": 87, "trophies": 4312, "games": 214, "completionRate": 68, "gold": 214, "silver": 890, "bronze": 3121 },
   "racha": { "actual": 4, "mejor": 12 }
 }
 ```
@@ -46,6 +62,13 @@ mano > PSN > cualquier otra cuenta vinculada > la del proveedor de login) —
 solo como dato (no como función) para que el icono de racha de la cabecera
 no obligue a pedir todo el endpoint de Estadísticas en cada apertura de la
 app; `actual` es 0 si no se ha sacado ningún trofeo hoy o ayer.
+
+**`409` "Perfil sin terminar de configurar"**: login nuevo (Google/Discord)
+que todavía no tiene `handle` — el equivalente móvil de que la web te mande
+a `/bienvenida`. Se arregla con `POST /api/mobile/profile/handle` (ver más
+abajo); la app tiene que enseñar una pantalla para elegirlo en vez de
+tratarlo como un error genérico con "Reintentar" (ese botón repite la misma
+petición para siempre, nunca se arregla solo).
 
 ## `GET /api/mobile/racha` — Detalle de la racha diaria
 
@@ -68,7 +91,9 @@ tres sitios a propósito, ver la nota en `panel/route.ts`).
 {
   "nearPlatinum": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
   "recent": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
-  "nextTrophies": [ { "gameId": "abc123", "gameTitle": "Elden Ring", "trophyId": "t1", "trophyName": "Maestro de las artes marciales", "detail": "...", "rarityPercent": 18.4, "gameProgress": 74, "iconUrl": "https://...", "grade": "gold" } ]
+  "nextTrophies": [
+    { "gameId": "abc123", "gameTitle": "Elden Ring", "trophyId": "t1", "trophyName": "Maestro de las artes marciales", "detail": "...", "rarityPercent": 18.4, "gameProgress": 74, "iconUrl": "https://...", "grade": "gold" }
+  ]
 }
 ```
 MISMO cálculo que la portada web (`gameProgress()` en `src/lib/stats.ts`),
@@ -78,10 +103,12 @@ no una aproximación aparte — `nearPlatinum` son juegos con platino real
 separado de `/api/mobile/panel` a propósito: evita duplicar `gameProgress()`
 en Kotlin y que las dos versiones diverjan con el tiempo.
 
-`nextTrophies` (máx. 4) es el mismo recomendador de "Siguiente trofeo" de
-la portada web (`lib/recommendations.ts`, `TrophyRecommendations.tsx`):
-prioriza juego base sobre DLC, progreso alto y mayor probabilidad real de
-conseguirlo. `rarityPercent`/`grade`/`iconUrl` pueden ser `null`.
+`nextTrophies` es "Siguiente trofeo" (`getTrophyRecommendations()` en
+`lib/recommendations.ts`, máx. 4 para el móvil) — MISMA prioridad que la
+web ("Siguiente trofeo" en `app/page.tsx`): primero el juego BASE (el
+platino nunca depende del DLC), luego progreso alto, luego mayor
+probabilidad real de conseguirlo (`rarityPercent` más alto = menos raro).
+`rarityPercent`/`grade`/`iconUrl` pueden ser `null`.
 
 ## `GET /api/mobile/library` — Biblioteca
 
@@ -228,7 +255,7 @@ aceptado la invitación no tiene sentido — para eso está `/accept`).
 {
   "id": "lg_1", "name": "Los de siempre", "ownerId": "u1", "isOwner": true,
   "durationValue": 3, "durationUnit": "meses", "endsAt": "2026-12-17T00:00:00.000Z",
-  "standings": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "points": 250 } ],
+  "standings": [ { "userId": "u1", "handle": "mario", "name": "Mario", "image": "...", "points": 250, "movimiento": 2 } ],
   "pendingMembers": [ { "userId": "u4", "handle": "ana2", "name": "Ana", "image": "..." } ],
   "challenge": {
     "gameId": "abc123", "title": "Elden Ring", "iconUrl": "https://...",
@@ -248,6 +275,12 @@ quien ya ha cazado algo. `pendingMembers` viene vacío salvo que
 antes al platino (o al 100% en Steam, que no tiene grado "platinum" propio
 — ver `esPlatinoEquivalente`), y luego por `progressPercent` para quien
 todavía no lo tiene.
+
+`movimiento` (en el `standings` de arriba, no en el del reto) son puestos
+ganados (positivo) o perdidos (negativo) desde la última foto semanal —
+`null` si el cron `/api/cron/league-snapshot` no ha corrido todavía para
+esta liga, o si el miembro se unió después de la última foto. Ver
+`getLeagueRankings`/`leagueStandingSnapshots` en `lib/leagues.ts`.
 
 ### `POST /api/mobile/leagues/{id}/challenge` — Fijar el juego de reto
 
@@ -288,35 +321,47 @@ Solo el dueño (`403` si no lo eres). Cascada sobre los miembros.
   "myClan": { "tag": "FNTR", "name": "Fontanero", "role": "owner" }
 }
 ```
-Todos los clanes, ordenados por nº de miembros (más primero). `myClan` es
-`null` si no perteneces a ninguno. `role`: `"owner"` | `"member"` (el
-esquema contempla `"admin"` para sublíderes, pero no está implementado
-todavía — no construir nada que dependa de él).
+Todos los clanes que existen, ordenados por nº de miembros (más primero) —
+mismo dato que `/clanes` (web). `myClan` es `null` si el usuario no
+pertenece a ninguno. `role`: `"owner"` | `"member"` (el esquema contempla
+`"admin"` para sublíderes, pero no está implementado todavía en ningún
+sitio — no construir nada que dependa de él).
 
 ### `POST /api/mobile/clans` — Crear un clan
 
-Body: `{ "name": "...", "tag": "...", "description"? }`. Reglas, todas
-comprobadas en el servidor: **Nivel 5 de Paragon** mínimo (`403` si no
-llega), `tag` máximo 5 caracteres (`400`, se guarda en MAYÚSCULAS pase lo
-que pase), no puedes crear uno si ya perteneces a otro (`409` — un usuario
-solo puede estar en un clan a la vez, reforzado con un índice único en
-base de datos), y `name`/`tag`/`description` pasan por el filtro de
-lenguaje ofensivo (`400` con el motivo). El creador entra como `"owner"`.
+Body: `{ "name": "...", "tag": "...", "description"? }`. Mismas reglas que
+la web (`createClanAction`), todas comprobadas en el servidor, no solo en
+el cliente:
+- **Nivel 5 de Paragon** mínimo (`paragonProgress` sobre la biblioteca del
+  usuario) — `403` si no llega.
+- `tag`: máximo 5 caracteres — `400` si se pasa. Se guarda siempre en
+  MAYÚSCULAS (`tag.toUpperCase()`), da igual cómo lo mande el cliente.
+- No puedes crear uno si ya perteneces a otro (el tuyo o cualquiera) —
+  `409`. **Un usuario solo puede estar en un clan a la vez**, reforzado
+  también con un índice único en base de datos (protege contra doble clic
+  incluso en condición de carrera).
+- `name`/`tag`/`description` pasan por el filtro de lenguaje ofensivo
+  (`errorSiOfensivo`) — `400` con el motivo si algo no pasa.
+
+El creador entra automáticamente como `"owner"`.
 
 ## `GET /api/mobile/clans/invites` — Invitaciones a clanes pendientes
 
 ```json
 { "invites": [ { "clanId": "cl_1", "clanName": "Fontanero", "clanTag": "FNTR", "invitedByName": "Mario", "invitedByHandle": "mario", "createdAt": "..." } ] }
 ```
-Se borran al resolverse (aceptada o rechazada) — sin histórico.
+Las invitaciones **se borran al resolverse** (aceptada o rechazada) — no
+hay histórico, es un buzón de pendientes.
 
 ### `POST /api/mobile/clans/invites/{clanId}/accept` — Aceptar
 
-Sin body. `400` si la invitación ya no existe.
+Sin body. `400` si la invitación ya no existe, o si por alguna razón ya
+estás en otro clan (no debería pasar en el flujo normal, pero el backend
+lo comprueba igual).
 
 ### `POST /api/mobile/clans/invites/{clanId}/decline` — Rechazar
 
-Sin body. Borra la invitación.
+Sin body. Simplemente borra la invitación.
 
 ## `GET /api/mobile/clans/{tag}` — Ficha de un clan
 
@@ -331,26 +376,35 @@ Sin body. Borra la invitación.
   "invitables": []
 }
 ```
-`404` si el tag no existe. `score` = suma del `leaderboard` (ya ordenado
-de mayor a menor) — "XP total del clan". `activity` (máx. 15) es la
-actividad reciente de los miembros, sin reacciones ni comentarios a
-propósito (escaparate, no una segunda bandeja de entrada); `type` igual
-que en `/feed`. `invitables` viene vacío salvo que `amIOwner: true`.
+`404` si el tag no existe. `score` es la suma del Paragon Score (misma
+fórmula unificada entre plataformas que el resto de la app) de todo el
+`leaderboard`, ya ordenado de mayor a menor — "XP total del clan".
+`activity` es la actividad reciente de los miembros (máx. 15): **sin
+reacciones, comentarios ni contador de vistas a propósito** — es un
+escaparate de que el clan está vivo, no una segunda bandeja de entrada;
+`type`: `"review" | "rating" | "platinum" | "favorite" | "new_game"`,
+mismo significado que en `/feed`. `invitables` (amigos que se pueden
+invitar ahora mismo: ni ya están en un clan, ni ya invitados a este) viene
+vacío salvo que `amIOwner: true` — nadie más lo necesita.
 
 ### `POST /api/mobile/clans/{tag}/join` — Unirse
 
-Sin body. `400` si ya estás en un clan.
+Sin body. `400` si ya estás en un clan (el tuyo o cualquier otro).
 
 ### `POST /api/mobile/clans/{tag}/leave` — Abandonar
 
-Sin body. **Si eres el owner, se borra el clan ENTERO** — sin
-transferencia de liderazgo. La app debe confirmarlo con el usuario ANTES
-de llamar aquí, el backend no vuelve a preguntar.
+Sin body. **Si eres el owner, se borra el clan ENTERO** (miembros e
+invitaciones en cascada) — no hay transferencia de liderazgo, es una
+simplificación deliberada de `lib/clans.ts`. La app debe confirmarlo con
+el usuario ANTES de llamar aquí (mismo `confirm()` que hace la web) — el
+backend no vuelve a preguntar.
 
 ### `POST /api/mobile/clans/{tag}/invite` — Invitar a un amigo
 
-Body: `{ "invitedUserId": "..." }`. Solo el owner, y solo a un amigo suyo
-que no esté ya en un clan (`400` en cualquier otro caso, con el motivo).
+Body: `{ "invitedUserId": "..." }`. Solo el owner puede invitar (`400` si
+no lo eres — el mensaje de error lo explica), y solo a alguien que ya sea
+tu amigo (no cualquier usuario) y que no esté ya en un clan. `400` también
+si ya le habías invitado a este mismo clan.
 
 ## `GET /api/mobile/users/{handle}` — Ficha de perfil de cualquiera
 
@@ -444,15 +498,21 @@ partir de tus platinos actuales, nunca se guarda un número viejo.
   "trophyCase": [ { "kind": "liga_mensual", "rank": 1, "titulo": "Liga Mensual · septiembre de 2026", "earnedAt": "2026-09-01T00:00:00.000Z" } ]
 }
 ```
-`badges` — insignias por hitos, se conceden solas al sincronizar:
-`first_blood`/`cazador`/`experto`/`leyenda` (platinos), `coleccionista`
-(100+ juegos), `critico` (3+ reseñas), `sociable` (3+ amigos), `rolero`
-(5+ RPGs), `multiplataforma` (PSN+Steam+Xbox sincronizando),
-`madrugador` (usuario pionero). `name`/`description` ya vienen resueltos
-en español (no una clave de traducción). `trophyCase` — SOLO el ganador
-absoluto (no Top 3) de la Liga Mensual o de una Liga privada cerrada.
-`kind`: `"liga_mensual"` | `"liga_privada"`. Vacío en ambos si el usuario
-no ha ganado nada todavía — no es un error.
+`badges` — insignias por hitos (`checkAndGrantBadges` en lib/profiles.ts,
+se conceden solas al sincronizar): `first_blood`/`cazador`/`experto`/
+`leyenda` (platinos), `coleccionista` (100+ juegos), `critico` (3+
+reseñas), `sociable` (3+ amigos), `rolero` (5+ RPGs), `multiplataforma`
+(PSN+Steam+Xbox sincronizando), `madrugador` (usuario pionero). `name`/
+`description` ya vienen resueltos en español (no una clave de traducción
+— la app Android todavía no tiene i18n, igual que el resto de este
+contrato). Lista de definiciones: `BADGE_DEFINITIONS` en
+components/Badges.tsx.
+
+`trophyCase` — palmarés real: SOLO el ganador absoluto (no Top 3) de la
+Liga Mensual o de una Liga privada cerrada, nunca "casi cualquiera acaba
+con una copa" (ver lib/trophyCase.ts). `kind`: `"liga_mensual"` |
+`"liga_privada"`. Vacío en ambos campos si el usuario no ha ganado nada
+todavía — no es un error, es el estado normal de la mayoría de cuentas.
 
 ## `GET /api/mobile/collections` — Carpetas de juegos
 
@@ -492,7 +552,8 @@ hay 404 aparte — el resultado que le importa al cliente es el mismo).
   "platforms": [
     { "platform": "psn", "linked": true, "username": "mario_psn", "level": 245 },
     { "platform": "steam", "linked": false, "username": null, "level": null },
-    { "platform": "xbox", "linked": false, "username": null, "level": null }
+    { "platform": "xbox", "linked": false, "username": null, "level": null },
+    { "platform": "epic", "linked": false, "username": null, "level": null, "declared": true, "appLinkable": false }
   ]
 }
 ```
@@ -502,6 +563,12 @@ revienta al pulsarlo. Para **vincular** Google/Discord no hay un POST
 aquí: se reabre `/movil/entrar/{provider}` (el mismo route del login) con
 sesión activa — la Custom Tab comparte cookies con Chrome, así que
 `signIn()` detecta la sesión y VINCULA en vez de crear una cuenta nueva.
+
+Todas las plataformas traen `declared` y `appLinkable`. **Epic**:
+`declared: true` (su progreso se ve pero no puntúa en nada, ver
+`lib/declarado.ts`) y `appLinkable: false` (Epic bloquea al servidor; se
+vincula y sincroniza con la extensión del navegador, no desde la app). Los
+juegos de Epic llegan en la biblioteca con `platform: "epic"`.
 
 ## `POST /api/mobile/accounts/{platform}` — Vincular PSN/Steam/Xbox
 
@@ -520,6 +587,15 @@ y demás, ver `src/lib/profiles.ts`).
 ## `DELETE /api/mobile/accounts/{platform}` — Desvincular PSN/Steam/Xbox
 
 `{ "ok": true }`. Borra la cuenta vinculada, no los juegos ya importados.
+
+## `POST /api/mobile/profile/handle` — Elegir nombre de usuario (alta nueva)
+
+Body: `{ "handle": "mario_gg" }`. `{ "ok": true, "handle": "mario_gg" }` o
+`400` (formato: 3-20 caracteres, minúsculas/números/guion bajo) / `409`
+(ya cogido). Paso 1 del alta — equivalente móvil de `HandleForm` en
+`src/app/bienvenida/page.tsx`. Sin esto, un login nuevo se queda en bucle
+contra el `409` de `GET /api/mobile/panel` sin ningún sitio desde el que
+arreglarlo.
 
 ## `POST /api/mobile/profile` — Ajustes del perfil
 
@@ -540,7 +616,9 @@ igual que el resto de `/api/mobile/*`, con el Bearer token).
 
 ## `POST /api/mobile/logout` — Cerrar sesión SOLO en este móvil
 
-Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
+Body opcional: `{ "fcmToken": "..." }` — el token de FCM de este teléfono,
+que se desasocia de la cuenta (si es suyo) para que deje de recibir sus
+avisos. `{ "ok": true }` siempre — ver `mintMobileSession`/
 `revokeMobileSession` en `lib/mobileAuth.ts`.
 
 ## `GET /api/mobile/stats` — Estadísticas
@@ -549,6 +627,7 @@ Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
 {
   "paragonScore": { "total": 12450, "porPlataforma": [ { "platform": "psn", "puntos": 8000, "trofeos": 1200 } ] },
   "trophyDna": { "ejes": [ { "key": "rpg", "label": "RPG", "valor": 100, "trofeos": 800 } ], "arquetipo": "El Completista" },
+  "estiloDeCaza": { "nombre": "El Maratonista", "descripcion": "Pocos juegos, pero te los agotas de verdad..." },
   "rachas": { "actual": 4, "mejor": 12, "diasActivos": 88 },
   "historico": { "conFecha": 4200, "esteAnio": 900, "mejorMes": { "mes": "2026-03", "total": 210 } },
   "financiero": { "totalGastado": 1200, "totalHoras": 800, "costeHoraMedio": 1.5, "juegosConDatos": 40 },
@@ -557,6 +636,12 @@ Sin body. `{ "ok": true }` siempre — ver `mintMobileSession`/
   "horasTotales": 14280
 }
 ```
+`estiloDeCaza` es distinto de `trophyDna.arquetipo` (ese es de GÉNERO, qué
+juegas) — mide CÓMO cazas trofeos (terminas lo que empiezas, abarcas mucho,
+te quedas en pocos sitios...), ver `calcularEstiloDeCaza` en
+`lib/trophyDna.ts`. `null` con menos de 3 juegos con progreso real, o si no
+encaja claramente en ninguna categoría — no se fuerza una etiqueta sin base.
+
 Versión CURADA para el móvil, no las ~15 piezas de
 `EstadisticasCompletas.tsx` (heatmaps de calendario/horas, salón de la
 vergüenza, comparador con amigos, gráficas de barras...) — esas son mejor
@@ -564,53 +649,6 @@ en pantalla grande o ya están cubiertas en otro sitio (recientes/a un paso
 del platino en `/api/mobile/panel/highlights`, amigos en
 `/api/mobile/social`). `eficiencia.ritmoMedioPct` negativo significa más
 lento que la estimación de HowLongToBeat, positivo más rápido.
-
-## `POST /api/mobile/games/{gameId}/notes` — Nota privada (Modo Enfoque)
-
-Body: `{ "notes": "..." }` (vacía para borrarla). `{ "ok": true }`. Mismo
-campo que usa `/nota` del bot de Discord.
-
-## `POST /api/mobile/games/{gameId}/resync` — "¿Ya lo tengo?" (Modo Enfoque)
-
-```json
-{ "nuevos": 2 }
-```
-o `{ "nuevos": 0, "error": "..." }` — vuelve a pedir los trofeos de ESTE
-juego a su plataforma sin esperar al cron. Siempre `200`, nunca 4xx/5xx
-para el caso de error de plataforma: el cliente distingue por el campo
-`error`, igual que la web.
-
-## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guide` — Guía en vídeo
-
-```json
-{ "videoId": "dQw4w9WgXcQ" }
-```
-`videoId` es `null` si no se encontró ninguno. MISMO dato cacheado que usa
-la web — la primera persona que pide la guía de un trofeo (web o móvil)
-dispara la búsqueda real en YouTube y se guarda; el resto lee lo ya
-guardado. El móvil no reproduce nada dentro de la app: abre la app de
-YouTube (o el navegador si no está instalada) en
-`https://www.youtube.com/watch?v={videoId}`. `404` si el trofeo no existe.
-
-## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Guías escritas
-
-```json
-{
-  "guides": [ { "id": "g1", "body": "...", "language": "es", "createdAt": "...", "updatedAt": "...", "authorId": "u1", "authorHandle": "mario", "authorName": "Mario", "authorImage": "https://..." } ],
-  "currentUserId": "u1"
-}
-```
-Apuntes reales de gente de aquí, una fila por (usuario, juego, trofeo) —
-publicar de nuevo actualiza la tuya, nunca duplica. `currentUserId` es
-quien pregunta, para saber cuál fila es "la mía".
-
-### `POST .../guides` — Publicar (o actualizar la tuya)
-
-Body: `{ "body": "..." }`. `400` si viene vacía o pasa de 4000 caracteres.
-
-### `DELETE .../guides` — Borrar la tuya
-
-Sin body. Solo borra la del que llama, nunca la de otra persona.
 
 ## `GET /api/mobile/wrap` — Paragon Wrap
 
@@ -626,32 +664,105 @@ Sin body. Solo borra la del que llama, nunca la de otra persona.
   "percentil": { "percentil": 8, "totalUsuarios": 120, "miTotal": 96 }
 }
 ```
-Mismo dato que las 3 tarjetas del perfil web más lo que solo tenía sitio
-en la versión "Stories" ampliada: `mejorMes`, `rachas`, `percentil`.
-`topGame` es `null` si la biblioteca está vacía o solo deseados.
-`horasTotal` es 0 si se decidió por trofeos, no por horas. `mejorMes` es
+Mismo dato que las 3 tarjetas del perfil (`ParagonWrap.tsx`) MÁS lo que
+solo tenía sitio en la versión ampliada "Stories" de la web
+(`WrapStories.tsx`): `mejorMes`, `rachas` y `percentil`. Nada de esto es un
+cálculo nuevo (`lib/history.ts`, `lib/wrapPercentile.ts`,
+`generoTop`/`juegoDestacado` en `ParagonWrap.tsx`), solo un único endpoint
+que junta todo para no hacer 4-5 llamadas sueltas.
+
+`topGame` es `null` si la biblioteca está vacía o solo tiene deseados.
+`horasTotal` es 0 si el juego más exprimido se decidió por trofeos, no por
+horas (ninguna plataforma vinculada da tiempo jugado). `mejorMes` es
 `null` sin ningún trofeo con fecha conocida. `percentil` es `null` con
-menos de 20 usuarios reales con algún trofeo este año (con pocos, "top X%"
-miente por parecer más grande de lo que es). `esteAnio: 0` es "sin
-historia que contar todavía" — un único mensaje honesto, no 7
-diapositivas vacías simuladas.
+menos de 20 usuarios reales con algún trofeo este año — con pocos
+usuarios, "estás en el top X%" miente por parecer más grande de lo que
+es, así que directamente no se manda (ver `MIN_USUARIOS_PERCENTIL` en
+`lib/wrapPercentile.ts`), no un dato inventado.
+
+`esteAnio: 0` es el estado "sin historia que contar todavía" — la app
+debería enseñar un único mensaje honesto en vez de simular 7 diapositivas
+vacías (mismo criterio que `WrapStories.tsx` en la web).
 
 ## `GET /api/mobile/diet` — Dieta Gamer
 
 ```json
 { "dieta": { "genero": "RPG", "juegos": [ { "gameId": "abc123", "titulo": "Elden Ring" } ], "horasTotales": 180 } }
 ```
-`dieta` es `null` la mayoría de las veces — estado normal, no un error.
-Aviso amistoso si tus últimos 3 juegos TERMINADOS comparten género y suman
-más de 150h estimadas (HowLongToBeat). `juegos` son siempre esos 3, del
-más reciente al más antiguo.
+`dieta` es `null` la mayoría de las veces — no es un error, es el estado
+normal. Aviso amistoso (nunca un bloqueo) si tus últimos 3 juegos
+TERMINADOS (mismo criterio que `esPlatinoEquivalente`) comparten género Y
+suman más de 150h estimadas (HowLongToBeat) — ver `dietaGamer()` en
+`lib/dietaGamer.ts` para los umbrales exactos. `juegos` son siempre esos 3,
+en orden del más reciente al más antiguo.
+
+## `POST /api/mobile/games/{gameId}/notes` — Nota privada (Modo Enfoque)
+
+Body: `{ "notes": "..." }` (vacía para borrarla). `{ "ok": true }`. Mismo
+campo que usa `/nota` del bot de Discord.
+
+## `POST /api/mobile/games/{gameId}/resync` — "¿Ya lo tengo?" (Modo Enfoque)
+
+```json
+{ "nuevos": 2, "platinoNuevo": { "nombre": "Maestro de las artes marciales", "iconUrl": "https://..." } }
+```
+o `{ "nuevos": 0, "error": "..." }` — vuelve a pedir los trofeos de ESTE
+juego a su plataforma sin esperar al cron. Siempre `200`, nunca 4xx/5xx
+para el caso de error de plataforma: el cliente distingue por el campo
+`error`, igual que la web.
+
+`platinoNuevo` viene `null` (u omitido) salvo que ESTA llamada haya
+descubierto un platino de verdad nuevo — no en la primera sincronización
+de un juego (ver `primeraSincronizacion` en `lib/sync.ts`), y nunca por
+trofeos que no sean platino. Pensado para una celebración en el momento,
+no solo un contador — ver `syncGameTrophies`/`refrescarJuego`.
+
+## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guide` — Guía en vídeo
+
+```json
+{ "videoId": "dQw4w9WgXcQ" }
+```
+`videoId` es `null` si no se encontró ninguno. MISMO dato cacheado que usa
+la web (`TrophyGuideModal.tsx`, columna `game_trophy.guideVideoId` — ver
+`buscarVideoGuiaTrofeo` en `lib/videoGuides.ts`): la primera persona que
+pide la guía de un trofeo (de cualquier plataforma, web o móvil) dispara la
+búsqueda real en YouTube y se guarda; todo el mundo después lee lo ya
+guardado. A diferencia de la web (que incrusta el vídeo en un `<iframe>`),
+el móvil no reproduce nada dentro de la app — abre directamente la app de
+YouTube (o el navegador si no está instalada) en
+`https://www.youtube.com/watch?v={videoId}`. `404` si el trofeo no existe.
+
+## `GET /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Guías escritas
+
+```json
+{
+  "guides": [ { "id": "g1", "body": "...", "language": "es", "createdAt": "...", "updatedAt": "...", "authorId": "u1", "authorHandle": "mario", "authorName": "Mario", "authorImage": "https://..." } ],
+  "currentUserId": "u1"
+}
+```
+Apuntes reales de gente de aquí (no un enlace externo, eso es `.../guide`
+de arriba) — una fila por (usuario, juego, trofeo): publicar de nuevo
+actualiza la tuya, nunca duplica. `currentUserId` es quien pregunta, para
+que el cliente sepa cuál de las filas es "la mía" sin comparar handles.
+
+### `POST /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Publicar (o actualizar la tuya)
+
+Body: `{ "body": "..." }`. `400` si viene vacía o pasa de 4000 caracteres
+(el mensaje de error lo dice). El idioma se guarda del propio perfil del
+usuario (`users.language`), no hace falta mandarlo.
+
+### `DELETE /api/mobile/games/{gameId}/trophies/{trophyId}/guides` — Borrar la tuya
+
+Sin body. Solo borra la guía DEL QUE LLAMA para ese trofeo — no se puede
+borrar la de otra persona.
 
 ## `GET /api/mobile/compare/{handle}` — Comparar con alguien
 
 ```json
 {
-  "me": { "name": "Mario", "level": 17, "platinos": 24, "trofeos": 4655, "juegos": 290 },
-  "them": { "name": "Ana", "level": 12, "platinos": 10, "trofeos": 1200, "juegos": 80 },
+  "resultado": "gano",
+  "me": { "name": "Mario", "avatarUrl": "https://...", "level": 17, "platinos": 24, "trofeos": 4655, "juegos": 290 },
+  "them": { "name": "Ana", "avatarUrl": null, "level": 12, "platinos": 10, "trofeos": 1200, "juegos": 80 },
   "sharedGames": [ { "id": "abc123", "title": "Elden Ring", "iconUrl": "https://...", "myPercent": 74, "theirPercent": 40, "myHours": 32, "theirHours": 10 } ]
 }
 ```
@@ -661,7 +772,10 @@ persona no tiene ninguna cuenta vinculada (nada que comparar). Versión
 CURADA: sin la carrera trofeo a trofeo ("quién lo sacó antes",
 `sharedTrophyLeads` en la web) — la pieza más pesada y la que menos aporta
 en una pantalla pequeña. `myHours`/`theirHours` pueden ser `null` si la
-plataforma no da tiempo jugado (Xbox, o Steam sin ese dato).
+plataforma no da tiempo jugado (Xbox, o Steam sin ese dato). `resultado`
+es `"gano"`/`"pierdo"`/`"empate"`, por platinos — mismo criterio que la
+etiqueta "Vas ganando" de la web (`comparar/[handle]/page.tsx`).
+`avatarUrl` puede ser `null` si esa persona no tiene foto.
 
 ## `POST /api/mobile/push-token` — Notificaciones push nativas (FCM)
 

@@ -19,7 +19,11 @@ data class PlatformAccountDto(
     val platform: String,
     val linked: Boolean,
     val username: String?,
-    val level: Int?
+    val level: Int?,
+    /** Epic: progreso declarado, no puntúa (ver lib/declarado.ts en el servidor). */
+    val declared: Boolean = false,
+    /** Epic no se puede vincular desde el móvil, solo con la extensión del navegador. */
+    val appLinkable: Boolean = true,
 )
 
 data class LinkedAccountsResponse(

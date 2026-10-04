@@ -78,6 +78,10 @@
       "title": "Connexion à l'application…",
       "description": "Si tu ne reviens pas automatiquement à l'application, appuie sur le lien.",
       "openApp": "Ouvrir Paragon"
+    },
+    "actualizar": {
+      "title": "Mets à jour l'app Paragon",
+      "description": "Cette version de l'app ne peut plus se connecter de façon sécurisée. Installe la dernière version et reconnecte-toi depuis celle-ci."
     }
   },
   "ajustesOcultar": {

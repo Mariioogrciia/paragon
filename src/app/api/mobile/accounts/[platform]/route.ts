@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { linkAccount, PlatformAccountAlreadyLinkedError, unlinkAccount } from "@/lib/profiles";
 import type { PlataformaVinculable } from "@/lib/types";
 import { PsnProfileNotFoundError } from "@/lib/psn/client";
@@ -40,6 +41,9 @@ export async function POST(
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
+  if (!(await limitar("vincularCuenta", userId))) {
+    return NextResponse.json({ error: "Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos." }, { status: 429 });
+  }
 
   const { platform } = await params;
   if (!esPlataformaVinculable(platform)) {
@@ -71,6 +75,9 @@ export async function DELETE(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+  if (!(await limitar("perfil", userId))) {
+    return NextResponse.json({ error: "Demasiadas peticiones seguidas. Espera un momento." }, { status: 429 });
   }
 
   const { platform } = await params;

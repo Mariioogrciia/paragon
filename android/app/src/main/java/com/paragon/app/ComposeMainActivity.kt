@@ -10,7 +10,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -19,8 +18,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 import com.paragon.app.data.PushRepository
+import com.paragon.app.data.auth.EnlaceSeguro
 import com.paragon.app.data.auth.TokenStore
-import com.paragon.app.data.network.BASE_URL
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.panel.AppRoot
 import com.paragon.app.ui.theme.ParagonTheme
@@ -101,8 +100,10 @@ class ComposeMainActivity : ComponentActivity() {
     private fun handleDeepLink(intent: Intent?) {
         val data: Uri? = intent?.data
         if (data?.scheme == "paragon" && data.host == "auth") {
-            val token = data.getQueryParameter("token")
-            if (!token.isNullOrBlank()) {
+            // Token cifrado con la clave de este login (ver EnlaceSeguro): un
+            // enlace que no venga de nuestro login en curso se ignora.
+            val token = EnlaceSeguro.tokenDelEnlace(tokenStore, data.getQueryParameter("c"))
+            if (token != null) {
                 tokenStore.token = token
                 refreshTrigger.value += 1
                 // Recién logueado: registrar YA el token de FCM que ya
@@ -144,9 +145,6 @@ class ComposeMainActivity : ComponentActivity() {
      * ya mismo a la pantalla real de Google/Discord.
      */
     private fun openLogin(provider: String) {
-        val loginUrl = Uri.parse(BASE_URL).buildUpon()
-            .appendEncodedPath("movil/entrar/$provider")
-            .build()
-        CustomTabsIntent.Builder().build().launchUrl(this, loginUrl)
+        EnlaceSeguro.abrirLogin(this, tokenStore, provider)
     }
 }

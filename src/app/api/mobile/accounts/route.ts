@@ -5,8 +5,13 @@ import { accounts } from "@/db/schema";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getProfileByUserId } from "@/lib/profiles";
 import type { PlataformaVinculable } from "@/lib/types";
+import { esDeclarada } from "@/lib/declarado";
 
-const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox"];
+// Epic va aparte en la app (auditoría, 4 oct 2026): se ve, pero NO se puede
+// vincular desde el móvil — su web bloquea al servidor y solo la extensión
+// del navegador puede leerla (`appLinkable: false`). Su progreso es
+// declarado: no puntúa en nada (`declared`, ver lib/declarado.ts).
+const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic"];
 
 /**
  * Qué cuentas están vinculadas (para la pantalla "Vincular cuentas"). Los
@@ -41,9 +46,10 @@ export async function GET(req: Request) {
 
   const platforms = PLATAFORMAS.map((platform) => {
     const cuenta = profile.accounts.find((a) => a.platform === platform);
+    const extra = { declared: esDeclarada(platform), appLinkable: platform !== "epic" };
     return cuenta
-      ? { platform, linked: true, username: cuenta.username, level: cuenta.level }
-      : { platform, linked: false, username: null, level: null };
+      ? { platform, linked: true, username: cuenta.username, level: cuenta.level, ...extra }
+      : { platform, linked: false, username: null, level: null, ...extra };
   });
 
   return NextResponse.json({ oauth, platforms });
