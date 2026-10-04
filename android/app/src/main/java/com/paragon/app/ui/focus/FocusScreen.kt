@@ -39,6 +39,9 @@ import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 private val FocoNegro = Color(0xFF000000)
 
@@ -113,7 +116,7 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = current.message, color = Color.White, fontSize = 14.sp)
                         TextButton(onClick = { retryCounter.value += 1 }) {
-                            Text("Reintentar", color = Color.White)
+                            Text(stringResource(R.string.comun_reintentar), color = Color.White)
                         }
                     }
                 }
@@ -143,30 +146,30 @@ private fun EmptyFocusState(onBack: () -> Unit, sessionRepository: GameSessionRe
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "MODO ENFOQUE",
+            text = stringResource(R.string.enfoque_titulo),
             color = Color.White.copy(alpha = 0.4f),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 2.sp,
         )
         Text(
-            text = "Ancla un juego para verlo aquí.",
+            text = stringResource(R.string.enfoque_vacio),
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
         )
         Text(
-            text = "Abre la ficha de un juego y toca el icono de anclar — se convierte en tu objetivo actual.",
+            text = stringResource(R.string.enfoque_vacio_sub),
             color = Color.White.copy(alpha = 0.6f),
             fontSize = 13.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
         TextButton(onClick = { mostrarDiario = true }, modifier = Modifier.padding(top = 24.dp)) {
-            Text("Ver tu diario de sesiones", color = Color.White.copy(alpha = 0.6f))
+            Text(stringResource(R.string.enfoque_ver_diario), color = Color.White.copy(alpha = 0.6f))
         }
         TextButton(onClick = onBack) {
-            Text("Volver", color = Color.White)
+            Text(stringResource(R.string.comun_volver), color = Color.White)
         }
     }
 
@@ -231,7 +234,7 @@ private fun FocusContent(
         Row(verticalAlignment = Alignment.Top) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "MODO ENFOQUE",
+                    text = stringResource(R.string.enfoque_titulo),
                     color = Color.White.copy(alpha = 0.4f),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
@@ -247,7 +250,7 @@ private fun FocusContent(
                 )
                 if (fromCache) {
                     Text(
-                        text = "Sin conexión — mostrando la última copia guardada",
+                        text = stringResource(R.string.comun_sin_conexion_copia),
                         color = Color.White.copy(alpha = 0.5f),
                         fontSize = 11.sp,
                         modifier = Modifier.padding(top = 4.dp),
@@ -255,10 +258,10 @@ private fun FocusContent(
                 }
             }
             TextButton(onClick = { mostrarDiario = true }) {
-                Text("Diario", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text(stringResource(R.string.enfoque_diario), color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
             }
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Salir del modo enfoque", tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.enfoque_salir), tint = Color.White)
             }
         }
 
@@ -310,7 +313,7 @@ private fun FocusContent(
 
         if (pendientes.isEmpty()) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                Text(text = "No queda ningún trofeo pendiente aquí. Está hecho.", color = Color.White.copy(alpha = 0.6f), fontSize = 15.sp)
+                Text(text = stringResource(R.string.enfoque_hecho), color = Color.White.copy(alpha = 0.6f), fontSize = 15.sp)
             }
         } else {
             Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -327,7 +330,7 @@ private fun FocusContent(
             modifier = Modifier.fillMaxWidth(),
             minLines = 2,
             maxLines = 3,
-            placeholder = { Text("Nota privada (código de una taquilla, dónde te quedaste...)", color = Color.White.copy(alpha = 0.35f), fontSize = 13.sp) },
+            placeholder = { Text(stringResource(R.string.enfoque_nota_ph), color = Color.White.copy(alpha = 0.35f), fontSize = 13.sp) },
             textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 14.sp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White.copy(alpha = 0.3f),
@@ -340,7 +343,7 @@ private fun FocusContent(
         )
         if (notaEncolada) {
             Text(
-                text = "Guardada en el móvil — se sincronizará cuando vuelva la conexión",
+                text = stringResource(R.string.enfoque_nota_offline),
                 color = Color.White.copy(alpha = 0.5f),
                 fontSize = 11.sp,
                 modifier = Modifier.padding(top = 4.dp),
@@ -355,8 +358,8 @@ private fun FocusContent(
 
         ultimaSesion?.let { sesion ->
             Text(
-                text = "Sesión guardada: ${formatearDuracion(sesion.endMillis - sesion.startMillis)}" +
-                    if (sesion.trofeosConseguidos > 0) " — ${sesion.trofeosConseguidos} ${if (sesion.trofeosConseguidos == 1) "trofeo" else "trofeos"} nuevos" else "",
+                text = stringResource(R.string.enfoque_sesion_guardada, formatearDuracion(sesion.endMillis - sesion.startMillis)) +
+                    if (sesion.trofeosConseguidos > 0) stringResource(if (sesion.trofeosConseguidos == 1) R.string.enfoque_nuevos_1 else R.string.enfoque_nuevos_n, sesion.trofeosConseguidos) else "",
                 color = Color.White.copy(alpha = 0.6f),
                 fontSize = 12.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -373,8 +376,8 @@ private fun FocusContent(
                     comprobando = false
                     aviso = when {
                         outcome.error != null -> outcome.error
-                        outcome.nuevos > 0 -> "¡${outcome.nuevos} ${if (outcome.nuevos == 1) "trofeo nuevo" else "trofeos nuevos"}!"
-                        else -> "Nada nuevo todavía"
+                        outcome.nuevos > 0 -> Textos.t(if (outcome.nuevos == 1) R.string.enfoque_aviso_1 else R.string.enfoque_aviso_n, outcome.nuevos)
+                        else -> Textos.t(R.string.enfoque_nada_nuevo)
                     }
                     // Celebración EN EL MOMENTO, no solo el aviso de arriba —
                     // solo cuando de verdad se acaba de descubrir un platino
@@ -389,7 +392,7 @@ private fun FocusContent(
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black, disabledContainerColor = Color.White.copy(alpha = 0.6f)),
         ) {
-            Text(text = if (comprobando) "Comprobando…" else "¿Ya lo tengo?", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(text = if (comprobando) stringResource(R.string.enfoque_comprobando) else stringResource(R.string.enfoque_ya_lo_tengo), fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
     }
 
@@ -452,7 +455,7 @@ private fun PlatinoCelebracion(platino: PlatinoNuevo) {
             }
             Spacer(Modifier.height(16.dp))
             Text(
-                text = "PLATINO DESBLOQUEADO",
+                text = stringResource(R.string.enfoque_platino),
                 color = Platinum,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
@@ -509,14 +512,14 @@ private fun PendingTrophyCard(trofeo: TrophyItem, destacado: Boolean) {
                 Text(text = trofeo.detail, color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
             }
             trofeo.rarityPercent?.let {
-                Text(text = "${it}% de jugadores lo tienen", color = Color.White.copy(alpha = 0.5f), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+                Text(text = stringResource(R.string.enfoque_rareza, it), color = Color.White.copy(alpha = 0.5f), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
 }
 
 /**
- * "Iniciar sesión" te sientas a jugar de verdad → "Detener sesión" cuando
+ * "Iniciar sesión" te sientas a jugar de verdad → stringResource(R.string.enfoque_detener) cuando
  * paras, y queda anotado en el Diario. Un solo botón según haya o no una
  * sesión activa — nunca los dos a la vez, no hace falta un tercer estado.
  */
@@ -551,12 +554,12 @@ private fun SessionTimerCard(
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.9f), contentColor = Color.Black),
             ) {
-                Text("Detener sesión", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.enfoque_detener), fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         } else {
             if (hayOtraSesionActiva) {
                 Text(
-                    text = "Tienes una sesión activa en $otraSesionTitulo",
+                    text = stringResource(R.string.enfoque_otra_sesion, otraSesionTitulo ?: ""),
                     color = Color.White.copy(alpha = 0.6f),
                     fontSize = 12.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -569,7 +572,7 @@ private fun SessionTimerCard(
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
                 ) {
-                    Text("Detener esa sesión", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.enfoque_detener_esa), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Button(
@@ -583,7 +586,7 @@ private fun SessionTimerCard(
                     // arrancaba el juego de verdad, que no puede — esto
                     // solo arranca el cronómetro de seguimiento mientras
                     // juegas en la consola/PC de verdad.
-                    Text("⏱️ Iniciar seguimiento", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.enfoque_iniciar), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -603,9 +606,9 @@ private fun DiarioDialog(sessionRepository: GameSessionRepository, onDismiss: ()
                 .background(Color(0xFF111111), RoundedCornerShape(20.dp))
                 .padding(20.dp),
         ) {
-            Text("TU DIARIO", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.enfoque_tu_diario), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Text(
-                "Cuánto tiempo de verdad le dedicas a cada platino",
+                stringResource(R.string.enfoque_diario_sub),
                 color = Color.White.copy(alpha = 0.5f),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 2.dp, bottom = 16.dp),
@@ -616,7 +619,7 @@ private fun DiarioDialog(sessionRepository: GameSessionRepository, onDismiss: ()
                     CircularProgressIndicator(color = Color.White)
                 }
                 current.isEmpty() -> Text(
-                    "Sin sesiones registradas todavía — inicia una desde Modo Enfoque.",
+                    stringResource(R.string.enfoque_diario_vacio),
                     color = Color.White.copy(alpha = 0.6f),
                     fontSize = 13.sp,
                 )
@@ -633,8 +636,8 @@ private fun DiarioDialog(sessionRepository: GameSessionRepository, onDismiss: ()
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
-                                text = "${formatearDuracion(sesion.endMillis - sesion.startMillis)} jugando a ${sesion.gameTitle}" +
-                                    if (sesion.trofeosConseguidos > 0) ". Conseguidos ${sesion.trofeosConseguidos} ${if (sesion.trofeosConseguidos == 1) "trofeo" else "trofeos"}." else ".",
+                                text = stringResource(R.string.enfoque_diario_linea, formatearDuracion(sesion.endMillis - sesion.startMillis), sesion.gameTitle) +
+                                    if (sesion.trofeosConseguidos > 0) stringResource(if (sesion.trofeosConseguidos == 1) R.string.enfoque_diario_conseguidos_1 else R.string.enfoque_diario_conseguidos_n, sesion.trofeosConseguidos) else ".",
                                 color = Color.White,
                                 fontSize = 14.sp,
                             )
@@ -643,7 +646,7 @@ private fun DiarioDialog(sessionRepository: GameSessionRepository, onDismiss: ()
                 }
             }
             TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End).padding(top = 12.dp)) {
-                Text("Cerrar", color = Color.White.copy(alpha = 0.7f))
+                Text(stringResource(R.string.comun_cerrar), color = Color.White.copy(alpha = 0.7f))
             }
         }
     }
@@ -669,7 +672,7 @@ private fun formatearDuracion(millis: Long): String {
     return if (horas > 0) "${horas}h ${minutos}m" else "${minutos}m"
 }
 
-private val FORMATO_FECHA_DIARIO = java.text.SimpleDateFormat("EEEE d 'de' MMMM", java.util.Locale("es", "ES"))
+private val FORMATO_FECHA_DIARIO get() = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(java.util.Locale.getDefault(), "EEEEdMMMM"), java.util.Locale.getDefault())
 
 private fun formatearFechaDiario(millis: Long): String {
     val texto = FORMATO_FECHA_DIARIO.format(java.util.Date(millis))

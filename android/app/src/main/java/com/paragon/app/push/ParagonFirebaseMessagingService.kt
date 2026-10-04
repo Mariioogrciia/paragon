@@ -24,6 +24,7 @@ import com.paragon.app.data.auth.TokenStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.paragon.app.util.Textos
 
 /**
  * Recibe los avisos de Firebase Cloud Messaging (solicitud de amistad,
@@ -88,7 +89,7 @@ class ParagonFirebaseMessagingService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Avisos de Paragon", NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(channelId, Textos.t(R.string.push_canal), NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
 

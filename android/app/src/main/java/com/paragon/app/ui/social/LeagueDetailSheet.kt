@@ -46,6 +46,9 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.common.ConfirmDialog
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 /**
  * Clasificación de una liga propia (solo con amigos, a diferencia de la
@@ -158,7 +161,7 @@ private fun LeagueDetailContent(
     var confirm by remember { mutableStateOf<PendingConfirm?>(null) }
 
     Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-    Text(text = "Clasificación desde que se creó — solo entre los miembros de esta liga.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+    Text(text = stringResource(R.string.liga_clasif_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
     Text(text = textoDuracion(detail.durationValue, detail.durationUnit, detail.endsAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(bottom = 16.dp))
 
     detail.standings.forEachIndexed { index, member ->
@@ -171,31 +174,31 @@ private fun LeagueDetailContent(
             TextButton(
                 onClick = {
                     confirm = PendingConfirm(
-                        title = "¿Quitar de la liga?",
-                        message = "${member.name} dejará de aparecer en la clasificación.",
-                        confirmLabel = "Sí, quitar",
+                        title = Textos.t(R.string.liga_quitar_titulo),
+                        message = Textos.t(R.string.liga_quitar_texto, member.name),
+                        confirmLabel = Textos.t(R.string.liga_quitar_si),
                         onConfirm = { onRemove(member.userId) },
                     )
                 },
                 modifier = Modifier.padding(start = 8.dp),
             ) {
-                Text("Quitar de la liga", color = Danger, fontSize = 12.sp)
+                Text(stringResource(R.string.liga_quitar), color = Danger, fontSize = 12.sp)
             }
         }
     }
 
     if (detail.isOwner && detail.pendingMembers.isNotEmpty()) {
         Spacer(Modifier.height(16.dp))
-        Text(text = "INVITACIONES SIN RESPONDER", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = stringResource(R.string.liga_invitaciones), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Spacer(Modifier.height(8.dp))
         detail.pendingMembers.forEach { pending ->
             PendingMemberRow(
                 pending,
                 onCancel = {
                     confirm = PendingConfirm(
-                        title = "¿Cancelar la invitación?",
-                        message = "${pending.name} ya no podrá aceptarla.",
-                        confirmLabel = "Sí, cancelar",
+                        title = Textos.t(R.string.liga_cancelar_inv_titulo),
+                        message = Textos.t(R.string.liga_cancelar_inv_texto, pending.name),
+                        confirmLabel = Textos.t(R.string.liga_cancelar_inv_si),
                         onConfirm = { onRemove(pending.userId) },
                     )
                 },
@@ -206,38 +209,38 @@ private fun LeagueDetailContent(
     Spacer(Modifier.height(16.dp))
     HorizontalDivider(color = Border)
     Spacer(Modifier.height(16.dp))
-    Text(text = "RETO", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+    Text(text = stringResource(R.string.liga_reto), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
     Spacer(Modifier.height(8.dp))
 
     val challenge = detail.challenge
     if (challenge != null) {
-        Text(text = "A ver quién le pilla antes el platino a ${challenge.title}.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = stringResource(R.string.liga_reto_texto, challenge.title), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 10.dp))
         challenge.standings.forEachIndexed { index, member ->
             ChallengeStandingRow(member, index + 1)
         }
         if (detail.isOwner) {
             Row(modifier = Modifier.padding(top = 4.dp)) {
-                TextButton(onClick = onPickChallenge) { Text("Cambiar", color = Accent, fontSize = 12.sp) }
-                TextButton(onClick = onClearChallenge) { Text("Quitar reto", color = Danger, fontSize = 12.sp) }
+                TextButton(onClick = onPickChallenge) { Text(stringResource(R.string.comun_cambiar), color = Accent, fontSize = 12.sp) }
+                TextButton(onClick = onClearChallenge) { Text(stringResource(R.string.liga_quitar_reto), color = Danger, fontSize = 12.sp) }
             }
         }
     } else if (detail.isOwner) {
-        Text(text = "Elige un juego de tu biblioteca para picaros a ver quién lo platina antes.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(bottom = 8.dp))
+        Text(text = stringResource(R.string.liga_reto_elige), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(bottom = 8.dp))
         TextButton(onClick = onPickChallenge) {
-            Text("Elegir juego de reto", color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.liga_reto_elegir), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     } else {
-        Text(text = "Sin reto todavía — el dueño de la liga puede elegir un juego para picarse.", color = Muted, fontSize = 13.sp)
+        Text(text = stringResource(R.string.liga_sin_reto), color = Muted, fontSize = 13.sp)
     }
 
     if (detail.isOwner) {
         Spacer(Modifier.height(16.dp))
         HorizontalDivider(color = Border)
         Spacer(Modifier.height(16.dp))
-        Text(text = "INVITAR A UN AMIGO", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = stringResource(R.string.liga_invitar_amigo), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Spacer(Modifier.height(8.dp))
         if (amigosDisponibles.isEmpty()) {
-            Text(text = "Ya están todos tus amigos disponibles en esta liga.", color = Muted, fontSize = 13.sp)
+            Text(text = stringResource(R.string.liga_todos_dentro), color = Muted, fontSize = 13.sp)
         } else {
             LazyColumn(modifier = Modifier.heightIn(max = 220.dp)) {
                 items(amigosDisponibles, key = { it.userId }) { amigo ->
@@ -250,7 +253,7 @@ private fun LeagueDetailContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(text = amigo.name, color = Foreground, fontSize = 14.sp)
-                        Text(text = "Invitar", color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = stringResource(R.string.comun_invitar), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -260,28 +263,28 @@ private fun LeagueDetailContent(
         TextButton(
             onClick = {
                 confirm = PendingConfirm(
-                    title = "¿Borrar esta liga?",
-                    message = "\"${detail.name}\" desaparece para todos sus miembros, con su clasificación y su reto. No se puede deshacer.",
-                    confirmLabel = "Sí, borrar",
+                    title = Textos.t(R.string.liga_borrar_titulo),
+                    message = Textos.t(R.string.liga_borrar_texto, detail.name),
+                    confirmLabel = Textos.t(R.string.comun_si_borrar),
                     onConfirm = onDelete,
                 )
             },
         ) {
-            Text("Borrar esta liga", color = Danger, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.liga_borrar), color = Danger, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     } else {
         Spacer(Modifier.height(20.dp))
         TextButton(
             onClick = {
                 confirm = PendingConfirm(
-                    title = "¿Salir de esta liga?",
-                    message = "Dejarás de aparecer en la clasificación de \"${detail.name}\" — el dueño tendría que volver a invitarte para que entres otra vez.",
-                    confirmLabel = "Sí, salir",
+                    title = Textos.t(R.string.liga_salir_titulo),
+                    message = Textos.t(R.string.liga_salir_texto, detail.name),
+                    confirmLabel = Textos.t(R.string.liga_salir_si),
                     onConfirm = onLeave,
                 )
             },
         ) {
-            Text("Salir de esta liga", color = Danger, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.liga_salir), color = Danger, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 
@@ -297,29 +300,29 @@ private fun LeagueDetailContent(
 }
 
 private val ETIQUETA_UNIDAD = mapOf(
-    "dias" to ("día" to "días"),
-    "semanas" to ("semana" to "semanas"),
-    "meses" to ("mes" to "meses"),
-    "anios" to ("año" to "años"),
+    "dias" to (R.string.duracion_dias_1 to R.string.duracion_dias_n),
+    "semanas" to (R.string.duracion_semanas_1 to R.string.duracion_semanas_n),
+    "meses" to (R.string.duracion_meses_1 to R.string.duracion_meses_n),
+    "anios" to (R.string.duracion_anios_1 to R.string.duracion_anios_n),
 )
 
 private fun textoDuracion(value: Int?, unit: String?, endsAt: String?): String {
-    if (endsAt == null) return "Sin fecha de fin."
+    if (endsAt == null) return Textos.t(R.string.liga_sin_fin)
     val fecha = try {
         java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
             .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
             .parse(endsAt)
-            ?.let { java.text.SimpleDateFormat("d 'de' MMMM 'de' yyyy", java.util.Locale("es", "ES")).format(it) }
+            ?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG).format(it) }
     } catch (e: Exception) {
         null
-    } ?: return "Con fecha de fin."
+    } ?: return Textos.t(R.string.liga_con_fin)
 
     val etiqueta = unit?.let { ETIQUETA_UNIDAD[it] }
     return if (value != null && etiqueta != null) {
         val (singular, plural) = etiqueta
-        "$value ${if (value == 1) singular else plural} — termina el $fecha."
+        Textos.t(R.string.liga_duracion_termina, Textos.t(if (value == 1) singular else plural, value), fecha)
     } else {
-        "Termina el $fecha."
+        Textos.t(R.string.liga_termina_el, fecha)
     }
 }
 
@@ -335,10 +338,10 @@ private fun PendingMemberRow(member: PendingMember, onCancel: () -> Unit) {
     ) {
         Column {
             Text(text = member.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-            Text(text = "esperando respuesta", color = Muted, fontSize = 11.sp)
+            Text(text = stringResource(R.string.liga_esperando), color = Muted, fontSize = 11.sp)
         }
         TextButton(onClick = onCancel) {
-            Text("Cancelar", color = Muted, fontSize = 12.sp)
+            Text(stringResource(R.string.comun_cancelar), color = Muted, fontSize = 12.sp)
         }
     }
     Spacer(Modifier.height(8.dp))
@@ -391,7 +394,7 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
             }
             Spacer(Modifier.width(10.dp))
             Text(
-                text = "${position}º  ${member.name}",
+                text = stringResource(R.string.liga_posicion, position, member.name),
                 color = if (esPrimero) Platinum else Foreground,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
@@ -410,7 +413,7 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
             }
         }
         Text(
-            text = "${member.points} pts",
+            text = stringResource(R.string.comun_pts, member.points),
             color = Platinum,
             fontWeight = FontWeight.Bold,
             fontSize = if (esPrimero) 16.sp else 14.sp,
@@ -421,7 +424,7 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
     // de arriba, solo el número de puntos de cada uno por separado.
     if (puntosParaSubir != null && puntosParaSubir > 0) {
         Text(
-            text = "$puntosParaSubir pts para superar al puesto de arriba",
+            text = stringResource(R.string.liga_para_subir, puntosParaSubir),
             color = Muted,
             fontSize = 11.sp,
             modifier = Modifier.padding(top = 4.dp, start = 40.dp),
@@ -441,9 +444,9 @@ private fun ChallengeStandingRow(member: ChallengeStanding, position: Int) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = "${position}º  ${member.name}", color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text(text = stringResource(R.string.liga_posicion, position, member.name), color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
         if (member.hasPlatinum) {
-            Text(text = "Platino", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            Text(text = stringResource(R.string.grado_platino), color = Platinum, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         } else {
             Text(text = "${member.progressPercent}%", color = Muted, fontSize = 13.sp)
         }
@@ -465,7 +468,7 @@ private fun GamePickerDialog(tokenStore: TokenStore, onDismiss: () -> Unit, onPi
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Surface,
-        title = { Text("Elegir juego de reto", color = Foreground, fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.liga_reto_elegir), color = Foreground, fontWeight = FontWeight.Bold) },
         text = {
             when (val current = result) {
                 null -> Box(modifier = Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
@@ -481,7 +484,7 @@ private fun GamePickerDialog(tokenStore: TokenStore, onDismiss: () -> Unit, onPi
                         androidx.compose.material3.OutlinedTextField(
                             value = search,
                             onValueChange = { search = it },
-                            placeholder = { Text("Buscar…", fontSize = 13.sp) },
+                            placeholder = { Text(stringResource(R.string.comun_buscar), fontSize = 13.sp) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                             colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
@@ -516,7 +519,7 @@ private fun GamePickerDialog(tokenStore: TokenStore, onDismiss: () -> Unit, onPi
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = Muted) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.comun_cancelar), color = Muted) }
         },
     )
 }

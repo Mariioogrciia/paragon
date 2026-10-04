@@ -6,6 +6,8 @@ import com.paragon.app.data.network.InviteToClanRequest
 import com.paragon.app.data.network.NewClanRequest
 import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
+import com.paragon.app.R
+import com.paragon.app.util.Textos
 
 /** Un clan en la lista general — ver GET /api/mobile/clans. */
 data class ClanSummary(val id: String, val name: String, val tag: String, val description: String, val memberCount: Int)
@@ -53,7 +55,7 @@ sealed class ClanActionResult {
 
 class ClansRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getClans(): ClansResult {
-        val store = tokenStore ?: return ClansResult.Error("Sin sesión.")
+        val store = tokenStore ?: return ClansResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             val response = ApiClient.clansApi(store).getClans()
             ClansResult.Ok(
@@ -61,7 +63,7 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
                 myClan = response.myClan?.let { MyClan(it.tag, it.name, it.role) },
             )
         } catch (e: Exception) {
-            ClansResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            ClansResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
@@ -70,7 +72,7 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return emptyList()
         return try {
             ApiClient.clansApi(store).getInvites().invites.map {
-                ClanInvite(it.clanId, it.clanTag, it.clanName, it.invitedByName ?: it.invitedByHandle ?: "Alguien")
+                ClanInvite(it.clanId, it.clanTag, it.clanName, it.invitedByName ?: it.invitedByHandle ?: Textos.t(R.string.comun_alguien))
             }
         } catch (e: Exception) {
             emptyList()
@@ -104,19 +106,19 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
      * que adivinar por qué falló.
      */
     suspend fun createClan(name: String, tag: String, description: String): ClanActionResult {
-        val store = tokenStore ?: return ClanActionResult.Error("Sin sesión.")
+        val store = tokenStore ?: return ClanActionResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.clansApi(store).createClan(NewClanRequest(name, tag, description))
             ClanActionResult.Ok
         } catch (e: HttpException) {
-            ClanActionResult.Error(e.paragonErrorMessage() ?: "No se pudo crear el clan.")
+            ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.clan_err_crear))
         } catch (e: Exception) {
-            ClanActionResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            ClanActionResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
     suspend fun getClanDetail(tag: String): ClanDetailResult {
-        val store = tokenStore ?: return ClanDetailResult.Error("Sin sesión.")
+        val store = tokenStore ?: return ClanDetailResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             val dto = ApiClient.clansApi(store).getClanDetail(tag)
             ClanDetailResult.Ok(
@@ -127,33 +129,33 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
                     description = dto.clan.description,
                     score = dto.score,
                     leaderboard = dto.leaderboard.map {
-                        ClanMember(it.userId, it.role, it.handle, it.name ?: it.handle ?: "Alguien", it.image, it.score, it.trofeos)
+                        ClanMember(it.userId, it.role, it.handle, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien), it.image, it.score, it.trofeos)
                     },
                     activity = dto.activity.map {
-                        ClanActivityItem(it.id, it.type, it.rating, it.createdAt, it.user.name ?: it.user.handle ?: "Alguien", it.game.title)
+                        ClanActivityItem(it.id, it.type, it.rating, it.createdAt, it.user.name ?: it.user.handle ?: Textos.t(R.string.comun_alguien), it.game.title)
                     },
                     amIMember = dto.amIMember,
                     amIOwner = dto.amIOwner,
-                    invitables = dto.invitables.map { InvitableFriend(it.userId, it.displayName ?: it.handle ?: "Alguien") },
+                    invitables = dto.invitables.map { InvitableFriend(it.userId, it.displayName ?: it.handle ?: Textos.t(R.string.comun_alguien)) },
                 ),
             )
         } catch (e: HttpException) {
-            val message = if (e.code() == 404) "Este clan no existe." else "El servidor respondió con un error (${e.code()})."
+            val message = if (e.code() == 404) Textos.t(R.string.clan_err_no_existe) else Textos.t(R.string.error_servidor, e.code())
             ClanDetailResult.Error(message)
         } catch (e: Exception) {
-            ClanDetailResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            ClanDetailResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
     suspend fun joinClan(tag: String): ClanActionResult {
-        val store = tokenStore ?: return ClanActionResult.Error("Sin sesión.")
+        val store = tokenStore ?: return ClanActionResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.clansApi(store).joinClan(tag)
             ClanActionResult.Ok
         } catch (e: HttpException) {
-            ClanActionResult.Error(e.paragonErrorMessage() ?: "No se pudo unir al clan.")
+            ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.clan_err_unir))
         } catch (e: Exception) {
-            ClanActionResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            ClanActionResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
@@ -169,24 +171,24 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
     }
 
     suspend fun inviteToClan(tag: String, userId: String): ClanActionResult {
-        val store = tokenStore ?: return ClanActionResult.Error("Sin sesión.")
+        val store = tokenStore ?: return ClanActionResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.clansApi(store).inviteToClan(tag, InviteToClanRequest(userId))
             ClanActionResult.Ok
         } catch (e: HttpException) {
-            ClanActionResult.Error(e.paragonErrorMessage() ?: "No se pudo invitar.")
+            ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.clan_err_invitar))
         } catch (e: Exception) {
-            ClanActionResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            ClanActionResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 }
 
 /** "type" de la actividad de clan (mismo origen que `activities`, ver `mensajeFeed` en FeedRepository.kt) → frase en español. */
 fun mensajeClanActividad(item: ClanActivityItem): String = when (item.type) {
-    "platinum" -> "consiguió el Platino en ${item.gameTitle}"
-    "new_game" -> "empezó a jugar a ${item.gameTitle}"
-    "review" -> "escribió una reseña de ${item.gameTitle}"
-    "rating" -> "valoró ${item.gameTitle}" + (item.rating?.let { " con $it/10" } ?: "")
-    "favorite" -> "marcó ${item.gameTitle} como favorito"
-    else -> "hizo algo en ${item.gameTitle}"
+    "platinum" -> Textos.t(R.string.clan_act_platino, item.gameTitle)
+    "new_game" -> Textos.t(R.string.clan_act_nuevo, item.gameTitle)
+    "review" -> Textos.t(R.string.clan_act_resena, item.gameTitle)
+    "rating" -> Textos.t(R.string.clan_act_valoro, item.gameTitle) + (item.rating?.let { Textos.t(R.string.clan_act_nota, it) } ?: "")
+    "favorite" -> Textos.t(R.string.clan_act_favorito, item.gameTitle)
+    else -> Textos.t(R.string.clan_act_otro, item.gameTitle)
 }

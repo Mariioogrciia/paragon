@@ -34,6 +34,8 @@ import com.paragon.app.data.LibraryGame
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * "Agitar para jugar" (idea de Antigravity): al agitar el móvil en la
@@ -82,7 +84,7 @@ fun ShakeRouletteOverlay(
                 .padding(28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "¿A QUÉ JUGAMOS?", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+            Text(text = stringResource(R.string.ruleta_titulo), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
             Spacer(Modifier.height(16.dp))
 
             if (shown.coverUrl.isNotBlank()) {
@@ -111,10 +113,10 @@ fun ShakeRouletteOverlay(
                     colors = ButtonDefaults.buttonColors(containerColor = Accent),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Empezarlo", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.ruleta_empezar), fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(8.dp))
-                TextButton(onClick = onDismiss) { Text("Cerrar", color = Muted) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.comun_cerrar), color = Muted) }
             }
         }
     }

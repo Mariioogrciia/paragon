@@ -68,6 +68,9 @@ import com.paragon.app.ui.common.gradeColor
 import com.paragon.app.ui.common.gradeLabelEs
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 /**
  * Ficha de juego (plan sección 2.4) — cabecera hero con portada difuminada
@@ -115,16 +118,16 @@ fun GameDetailScreen(
                     // El `retryCounter` que dispara el `LaunchedEffect` de
                     // arriba ya existía — solo faltaba un botón que lo
                     // usara. Sin esto, un corte de red momentáneo dejaba
-                    // "Volver" como única salida, obligando a salir y
+                    // stringResource(R.string.comun_volver) como única salida, obligando a salir y
                     // volver a entrar desde el origen para reintentar.
                     Button(
                         onClick = { retryCounter.value += 1 },
                         colors = ButtonDefaults.buttonColors(containerColor = Accent),
                     ) {
-                        Text("Reintentar")
+                        Text(stringResource(R.string.comun_reintentar))
                     }
                     TextButton(onClick = onBack) {
-                        Text("Volver", color = Foreground)
+                        Text(stringResource(R.string.comun_volver), color = Foreground)
                     }
                 }
             }
@@ -178,7 +181,7 @@ private fun GameDetailContent(
     // "Platino conseguido" real (mismo criterio que el filtro "Platinados"
     // de Biblioteca en HANDOFF.md: earned.platinum > 0, no percent == 100 —
     // un juego sin trofeo de Platino definido nunca debería ofrecer
-    // "Compartir Platino" aunque esté al 100%).
+    // stringResource(R.string.ficha_compartir_platino) aunque esté al 100%).
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
     val prediccion = remember(game.trophies) { predecirPlatino(game.trophies) }
     var vistaCronologica by remember { mutableStateOf(false) }
@@ -269,8 +272,8 @@ private fun GameDetailContent(
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                FilterChip(selected = vistaCronologica == false, onClick = { vistaCronologica = false }, label = { Text("Lista") })
-                FilterChip(selected = vistaCronologica == true, onClick = { vistaCronologica = true }, label = { Text("Cronología") })
+                FilterChip(selected = vistaCronologica == false, onClick = { vistaCronologica = false }, label = { Text(stringResource(R.string.ficha_lista)) })
+                FilterChip(selected = vistaCronologica == true, onClick = { vistaCronologica = true }, label = { Text(stringResource(R.string.ficha_cronologia)) })
             }
         }
 
@@ -350,7 +353,7 @@ private fun GameDetailHero(
                 .background(Brush.verticalGradient(colors = listOf(Color.Transparent, Background)))
         )
         IconButton(onClick = onBack, modifier = Modifier.padding(12.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Foreground)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_volver), tint = Foreground)
         }
         Row(
             modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -387,14 +390,14 @@ private fun GameDetailHero(
                 )
                 if (fromCache) {
                     Text(
-                        text = "Sin conexión — mostrando la última copia guardada",
+                        text = stringResource(R.string.comun_sin_conexion_copia),
                         color = Muted,
                         fontSize = 11.sp,
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
                 Text(
-                    text = "${game.earnedTrophies}/${game.totalTrophies} trofeos · ${game.percent}%",
+                    text = stringResource(R.string.ficha_progreso, game.earnedTrophies, game.totalTrophies, game.percent),
                     color = Muted,
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 6.dp, bottom = 12.dp),
@@ -403,7 +406,7 @@ private fun GameDetailHero(
                     // Mismo aviso que MarcaDeclarado en la web: Epic solo se lee
                     // desde la extensión del navegador y no se puede comprobar.
                     Text(
-                        text = "Progreso declarado · no puntúa en niveles ni rankings",
+                        text = stringResource(R.string.ficha_declarado),
                         color = Muted,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(bottom = 10.dp),
@@ -429,7 +432,7 @@ private fun GameDetailHero(
                 // cuentas recién vinculadas sin sincronizar del todo).
                 game.playtimeMinutes?.let { minutos ->
                     Text(
-                        text = "${minutos / 60}h jugadas",
+                        text = stringResource(R.string.ficha_horas, minutos / 60),
                         color = Muted,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 8.dp),
@@ -437,7 +440,7 @@ private fun GameDetailHero(
                 }
                 prediccion?.let {
                     Text(
-                        text = "🔮 A este ritmo, lo tienes el ${fechaPrediccion(it.fechaMillis)}",
+                        text = stringResource(R.string.ficha_prediccion, fechaPrediccion(it.fechaMillis)),
                         color = Muted,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp),
@@ -448,14 +451,15 @@ private fun GameDetailHero(
     }
 }
 
-private val FECHA_PREDICCION_FORMAT = java.text.SimpleDateFormat("EEEE d 'de' MMMM", java.util.Locale("es", "ES"))
+// Formatos de fecha del idioma del teléfono (antes fijos en español).
+private val FECHA_PREDICCION_FORMAT get() = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(java.util.Locale.getDefault(), "EEEEdMMMM"), java.util.Locale.getDefault())
 
 private fun fechaPrediccion(millis: Long): String = FECHA_PREDICCION_FORMAT.format(java.util.Date(millis))
 
 private val FECHA_ISO_GAME_DETAIL = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
     timeZone = java.util.TimeZone.getTimeZone("UTC")
 }
-private val FECHA_CORTA_TIMELINE = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale("es", "ES"))
+private val FECHA_CORTA_TIMELINE get() = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM)
 private val FECHA_DIA_KEY = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).apply {
     timeZone = java.util.TimeZone.getTimeZone("UTC")
 }
@@ -469,7 +473,7 @@ private fun fechaCortaTimeline(iso: String): String =
  * justo en el borde. Mismo criterio que MARKER_PADDING_PX en TrophyTimeline.tsx. */
 private const val MARKER_PADDING_DP = 16
 
-private val FECHA_MES_CORTO = java.text.SimpleDateFormat("MMM yy", java.util.Locale("es", "ES"))
+private val FECHA_MES_CORTO get() = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(java.util.Locale.getDefault(), "MMMyy"), java.util.Locale.getDefault())
 
 /**
  * Anclar (Modo Enfoque), reservar (Cerrojo de Hitos) y meter en una carpeta
@@ -497,24 +501,24 @@ private fun GameActionsRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         ActionChip(
-            label = if (pinned) "Objetivo actual" else "Anclar objetivo",
+            label = if (pinned) stringResource(R.string.ficha_objetivo_actual) else stringResource(R.string.ficha_anclar),
             active = pinned,
             accentColor = dynamicColor,
             onClick = onTogglePin,
         )
         ActionChip(
             label = when {
-                reservado && numeroHito != null -> "Reservado para el #$numeroHito"
-                reservado -> "Reservado"
-                numeroHito != null -> "Reservar para el #$numeroHito"
-                else -> "Reservar hito"
+                reservado && numeroHito != null -> stringResource(R.string.ficha_reservado_n, numeroHito)
+                reservado -> stringResource(R.string.ficha_reservado)
+                numeroHito != null -> stringResource(R.string.ficha_reservar_n, numeroHito)
+                else -> stringResource(R.string.ficha_reservar)
             },
             active = reservado,
             accentColor = Gold,
             onClick = onToggleReserve,
         )
         ActionChip(
-            label = "Carpetas",
+            label = stringResource(R.string.nav_carpetas),
             active = false,
             accentColor = dynamicColor,
             onClick = onOpenCollections,
@@ -525,7 +529,7 @@ private fun GameActionsRow(
         // esta función (idea #20 del brainstorm de v1.0).
         if (platinoConseguido) {
             ActionChip(
-                label = "Compartir Platino",
+                label = stringResource(R.string.ficha_compartir_platino),
                 active = true,
                 accentColor = Platinum,
                 onClick = onShare,
@@ -566,7 +570,7 @@ private data class ResumenDia(
 private val GRADOS_EN_ORDEN = listOf(TrophyGrade.PLATINUM, TrophyGrade.GOLD, TrophyGrade.SILVER, TrophyGrade.BRONZE)
 
 /**
- * Vista "Cronología": cuándo cayó cada trofeo (eje X) y lo raro que es (eje
+ * Vista stringResource(R.string.ficha_cronologia): cuándo cayó cada trofeo (eje X) y lo raro que es (eje
  * Y, el % real — 0% arriba del todo, más raro, 100% abajo), con la foto
  * real del trofeo, no un icono genérico. Mismo cálculo que TrophyTimeline.tsx
  * en la web — solo cuenta lo que tiene `earnedAt` Y `rarityPercent` reales.
@@ -598,7 +602,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
 
     if (puntos.size < 2) {
         Text(
-            text = "Hacen falta al menos dos trofeos con fecha y rareza registradas para dibujar la gráfica.",
+            text = stringResource(R.string.ficha_grafica_vacia),
             color = Muted,
             fontSize = 13.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -780,7 +784,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                     Text(text = p.trofeo.detail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                 }
                 Text(
-                    text = "${fechaCortaTimeline(p.trofeo.earnedAt!!)} · ${p.trofeo.rarityPercent}%",
+                    text = stringResource(R.string.ficha_fecha_rareza, fechaCortaTimeline(p.trofeo.earnedAt!!), p.trofeo.rarityPercent ?: "?"),
                     color = Muted,
                     fontSize = 11.sp,
                     modifier = Modifier.padding(top = 4.dp),
@@ -796,7 +800,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
             containerColor = Surface,
             title = {
                 Text(
-                    text = "${fechaCortaTimeline(grupoPopup.first().trofeo.earnedAt!!)} · ${grupoPopup.size} trofeos",
+                    text = stringResource(R.string.ficha_fecha_trofeos, fechaCortaTimeline(grupoPopup.first().trofeo.earnedAt!!), grupoPopup.size),
                     color = Foreground,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -841,7 +845,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(p.trofeo.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                                 Text(
-                                    "${gradeLabelEs(p.trofeo.grade)} · ${p.trofeo.rarityPercent}%",
+                                    stringResource(R.string.ficha_grado_rareza, gradeLabelEs(p.trofeo.grade), p.trofeo.rarityPercent ?: "?"),
                                     color = Muted,
                                     fontSize = 11.sp,
                                 )
@@ -852,7 +856,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
             },
             confirmButton = {
                 TextButton(onClick = { diaPopup = null }) {
-                    Text("Cerrar", color = Accent, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.comun_cerrar), color = Accent, fontWeight = FontWeight.Bold)
                 }
             },
         )
@@ -950,7 +954,7 @@ private fun TrophyRow(
                 },
                 modifier = Modifier.padding(start = 4.dp).size(24.dp)
             ) {
-                Icon(Icons.Default.Star, contentDescription = "Atascar", tint = if (isStuck) Accent else Muted, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Star, contentDescription = stringResource(R.string.ficha_atascar), tint = if (isStuck) Accent else Muted, modifier = Modifier.size(16.dp))
             }
             IconButton(
                 enabled = !buscandoGuia,
@@ -971,14 +975,14 @@ private fun TrophyRow(
                 if (buscandoGuia) {
                     CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
                 } else {
-                    Icon(Icons.Default.Search, contentDescription = "Buscar Guía", tint = Accent, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.ficha_buscar_guia), tint = Accent, modifier = Modifier.size(16.dp))
                 }
             }
             IconButton(
                 onClick = { showGuiasEscritas = true },
                 modifier = Modifier.padding(start = 4.dp).size(24.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = "Guías escritas", tint = Muted, modifier = Modifier.size(16.dp))
+                Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = stringResource(R.string.ficha_guias_escritas), tint = Muted, modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -1006,7 +1010,7 @@ private fun abrirGuiaEnYoutube(context: android.content.Context, videoId: String
     val uri = if (videoId != null) {
         android.net.Uri.parse("https://www.youtube.com/watch?v=$videoId")
     } else {
-        val query = android.net.Uri.encode("$gameTitle $trophyName trophy guide")
+        val query = android.net.Uri.encode(Textos.t(R.string.guia_busqueda_video, gameTitle, trophyName))
         android.net.Uri.parse("https://www.youtube.com/results?search_query=$query")
     }
     val appIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri).apply {
@@ -1034,17 +1038,17 @@ private fun NotesSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("NOTAS PRIVADAS", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.ficha_notas), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             if (isEditing) {
                 TextButton(onClick = { 
                     isEditing = false
                     onSaveNotes(notes)
                 }) {
-                    Text("Guardar", color = dynamicColor, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text(stringResource(R.string.comun_guardar), color = dynamicColor, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 }
             } else if (notes.isNotBlank()) {
                 TextButton(onClick = { isEditing = true }) {
-                    Text("Editar", color = Muted, fontSize = 13.sp)
+                    Text(stringResource(R.string.comun_editar), color = Muted, fontSize = 13.sp)
                 }
             }
         }
@@ -1053,7 +1057,7 @@ private fun NotesSection(
             androidx.compose.material3.OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                placeholder = { Text("Apuntes, códigos, rutas de farmeo...", color = Muted, fontSize = 14.sp) },
+                placeholder = { Text(stringResource(R.string.ficha_notas_ph), color = Muted, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
                 colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = dynamicColor,
@@ -1073,7 +1077,7 @@ private fun NotesSection(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Añadir nota personal...", color = Muted, fontSize = 14.sp)
+                    Text(stringResource(R.string.ficha_notas_anadir), color = Muted, fontSize = 14.sp)
                 }
             } else {
                 Text(

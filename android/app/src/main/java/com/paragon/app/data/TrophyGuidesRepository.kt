@@ -4,6 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.SaveTrophyGuideRequest
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Guía escrita de un trofeo — apuntes reales de la comunidad, distinto del vídeo de YouTube (ver GameDetailRepository.getTrophyGuide). Una fila por (usuario, juego, trofeo). */
 data class TrophyGuideRow(
@@ -24,7 +26,7 @@ sealed class TrophyGuidesResult {
 
 class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getGuides(gameId: String, trophyId: String): TrophyGuidesResult {
-        val store = tokenStore ?: return TrophyGuidesResult.Error("Sin sesión.")
+        val store = tokenStore ?: return TrophyGuidesResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             val response = ApiClient.trophyGuidesApi(store).getGuides(gameId, trophyId)
             TrophyGuidesResult.Ok(
@@ -32,20 +34,20 @@ class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
                 currentUserId = response.currentUserId,
             )
         } catch (e: Exception) {
-            TrophyGuidesResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            TrophyGuidesResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
     /** `null` si se publicó bien; el mensaje de error si no (vacía, o pasa de 4000 caracteres). */
     suspend fun saveGuide(gameId: String, trophyId: String, body: String): String? {
-        val store = tokenStore ?: return "Sin sesión."
+        val store = tokenStore ?: return Textos.t(R.string.error_sin_sesion)
         return try {
             ApiClient.trophyGuidesApi(store).saveGuide(gameId, trophyId, SaveTrophyGuideRequest(body))
             null
         } catch (e: HttpException) {
-            e.message ?: "No se ha podido guardar la guía."
+            Textos.t(R.string.error_guardar_guia)
         } catch (e: Exception) {
-            e.message ?: "No se pudo conectar con Paragon."
+            Textos.t(R.string.error_conexion)
         }
     }
 

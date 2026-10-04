@@ -56,6 +56,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 import com.paragon.app.data.theme.ThemeStore
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,7 +96,7 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                 .padding(horizontal = 24.dp)
         ) {
         Text(
-            text = "COMUNIDAD",
+            text = stringResource(R.string.feed_titulo),
             color = Foreground,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
@@ -103,7 +105,7 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
 
         if ((result as? FeedResult.Ok)?.fromCache == true) {
             Text(
-                text = "Sin conexión — mostrando la última copia guardada",
+                text = stringResource(R.string.comun_sin_conexion_copia),
                 color = Muted,
                 fontSize = 11.sp,
                 modifier = Modifier.padding(bottom = 24.dp),
@@ -126,7 +128,7 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                         modifier = Modifier.padding(top = 16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Accent),
                     ) {
-                        Text("Reintentar")
+                        Text(stringResource(R.string.comun_reintentar))
                     }
                 }
             }
@@ -134,8 +136,8 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                 if (current.items.isEmpty()) {
                     com.paragon.app.ui.common.EmptyState(
                         icon = Icons.Default.Groups,
-                        title = "Sin actividad todavía",
-                        description = "La tuya y la de tus amigos aparecerá aquí — platinos, reseñas, juegos nuevos.",
+                        title = stringResource(R.string.feed_vacio),
+                        description = stringResource(R.string.feed_vacio_sub),
                     )
                 } else {
                     LazyColumn(
@@ -319,7 +321,7 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                     androidx.compose.material3.TextField(
                         value = commentText,
                         onValueChange = { commentText = it },
-                        placeholder = { Text("Añadir un comentario...", color = Muted, fontSize = 13.sp) },
+                        placeholder = { Text(stringResource(R.string.feed_comentar_ph), color = Muted, fontSize = 13.sp) },
                         singleLine = true,
                         enabled = !isSendingComment,
                         colors = androidx.compose.material3.TextFieldDefaults.colors(
@@ -348,7 +350,7 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                             }
                         },
                     ) {
-                        Text("Enviar", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Text(stringResource(R.string.comun_enviar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     }
                 }
             }
@@ -376,7 +378,7 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                     }
                     if (comments.size > 2) {
                         Text(
-                            text = "Ver los ${comments.size} comentarios",
+                            text = stringResource(R.string.feed_ver_comentarios, comments.size),
                             color = Muted,
                             fontSize = 11.sp,
                             modifier = Modifier.padding(top = 2.dp),

@@ -12,6 +12,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 sealed class SettingsResult<out T> {
     data class Ok<T>(val data: T) : SettingsResult<T>()
@@ -24,9 +26,9 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             val response = ApiClient.settingsApi(tokenStore).getLinkedAccounts()
             SettingsResult.Ok(response)
         } catch (e: HttpException) {
-            SettingsResult.Error(e.paragonErrorMessage() ?: "Error al cargar cuentas (${e.code()}).")
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.ajustes_err_cuentas, e.code()))
         } catch (e: Exception) {
-            SettingsResult.Error(e.message ?: "Error de red.")
+            SettingsResult.Error(Textos.t(R.string.error_red))
         }
     }
 
@@ -42,9 +44,9 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             ApiClient.settingsApi(tokenStore).linkPlatform(platform, LinkPlatformRequest(username))
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
-            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor_corto, e.code()))
         } catch (e: Exception) {
-            SettingsResult.Error(e.message ?: "Error de red.")
+            SettingsResult.Error(Textos.t(R.string.error_red))
         }
     }
 
@@ -53,9 +55,9 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             ApiClient.settingsApi(tokenStore).unlinkPlatform(platform)
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
-            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor_corto, e.code()))
         } catch (e: Exception) {
-            SettingsResult.Error(e.message ?: "Error de red.")
+            SettingsResult.Error(Textos.t(R.string.error_red))
         }
     }
 
@@ -64,9 +66,9 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             ApiClient.settingsApi(tokenStore).updateProfile(UpdateProfileRequest(name, image))
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
-            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor_corto, e.code()))
         } catch (e: Exception) {
-            SettingsResult.Error(e.message ?: "Error de red.")
+            SettingsResult.Error(Textos.t(R.string.error_red))
         }
     }
 
@@ -81,7 +83,7 @@ class SettingsRepository(private val tokenStore: TokenStore) {
         return try {
             val resolver = context.contentResolver
             val bytes = resolver.openInputStream(uri)?.use { it.readBytes() }
-                ?: return SettingsResult.Error("No se pudo leer la imagen.")
+                ?: return SettingsResult.Error(Textos.t(R.string.ajustes_err_leer_imagen))
             val mimeType = resolver.getType(uri) ?: "image/jpeg"
             val extension = when (mimeType) {
                 "image/png" -> "png"
@@ -96,12 +98,12 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             if (response.url != null) {
                 SettingsResult.Ok(response.url)
             } else {
-                SettingsResult.Error(response.error ?: "No se pudo subir la imagen.")
+                SettingsResult.Error(response.error ?: Textos.t(R.string.ajustes_err_subir_imagen))
             }
         } catch (e: HttpException) {
-            SettingsResult.Error(e.paragonErrorMessage() ?: "Error del servidor (${e.code()}).")
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor_corto, e.code()))
         } catch (e: Exception) {
-            SettingsResult.Error(e.message ?: "Error de red.")
+            SettingsResult.Error(Textos.t(R.string.error_red))
         }
     }
 }

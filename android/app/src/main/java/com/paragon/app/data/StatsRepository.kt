@@ -8,6 +8,8 @@ import com.paragon.app.data.network.StatsResponse
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /**
  * Estadísticas (StatsScreen) — versión curada para móvil de GET
@@ -111,16 +113,16 @@ class StatsRepository(private val tokenStore: TokenStore? = null, private val ca
      * respaldo local, a diferencia de las demás.
      */
     suspend fun getStats(): StatsResult {
-        val store = tokenStore ?: return StatsResult.Error("Sin sesión.")
+        val store = tokenStore ?: return StatsResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val stats = ApiClient.statsApi(store).getStats().toParagonStats()
             cacheDao?.put(SimpleCacheEntity(CACHE_KEY, paragonStatsAdapter.toJson(stats)))
             StatsResult.Ok(stats)
         } catch (e: HttpException) {
-            cachedStats() ?: StatsResult.Error("El servidor respondió con un error (${e.code()}).")
+            cachedStats() ?: StatsResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            cachedStats() ?: StatsResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedStats() ?: StatsResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 

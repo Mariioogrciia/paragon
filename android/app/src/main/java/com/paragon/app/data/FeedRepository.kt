@@ -15,6 +15,8 @@ import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Un comentario ya existente en una publicación — de momento solo lectura, no hay POST desde la app todavía. */
 data class FeedComment(val body: String, val userName: String, val timeAgo: String)
@@ -56,13 +58,13 @@ sealed class FeedResult {
 
 /** "type" de activities (src/db/schema.ts) → frase en español, mismo criterio que la web. "status" no lleva frase: el propio texto (item.review) ya lo es. */
 fun mensajeFeed(item: FeedItem): String = when (item.type) {
-    "platinum" -> "Ha conseguido el Platino en ${item.gameTitle}."
-    "new_game" -> "Ha empezado a jugar a ${item.gameTitle}."
-    "review" -> "Ha escrito una reseña de ${item.gameTitle}."
-    "rating" -> "Ha valorado ${item.gameTitle}" + (item.rating?.let { " con $it/10." } ?: ".")
-    "favorite" -> "Ha marcado ${item.gameTitle} como favorito."
+    "platinum" -> Textos.t(R.string.feed_platino, item.gameTitle ?: "")
+    "new_game" -> Textos.t(R.string.feed_nuevo, item.gameTitle ?: "")
+    "review" -> Textos.t(R.string.feed_resena, item.gameTitle ?: "")
+    "rating" -> Textos.t(R.string.feed_valoro, item.gameTitle ?: "") + (item.rating?.let { Textos.t(R.string.feed_nota, it) } ?: ".")
+    "favorite" -> Textos.t(R.string.feed_favorito, item.gameTitle ?: "")
     "status" -> ""
-    else -> item.gameTitle?.let { "Ha hecho algo en $it." } ?: "Ha hecho algo."
+    else -> item.gameTitle?.let { Textos.t(R.string.feed_otro, it) } ?: Textos.t(R.string.feed_otro_sin)
 }
 
 // minSdk 24 no tiene java.time sin desugaring — SimpleDateFormat/Date sí
@@ -80,10 +82,10 @@ private fun relativeTimeEs(iso: String): String {
 
     val diffMinutes = (System.currentTimeMillis() - millis) / 60_000
     return when {
-        diffMinutes < 1 -> "ahora mismo"
-        diffMinutes < 60 -> "hace ${diffMinutes}min"
-        diffMinutes < 60 * 24 -> "hace ${diffMinutes / 60}h"
-        else -> "hace ${diffMinutes / (60 * 24)}d"
+        diffMinutes < 1 -> Textos.t(R.string.tiempo_ahora)
+        diffMinutes < 60 -> Textos.t(R.string.tiempo_min, diffMinutes)
+        diffMinutes < 60 * 24 -> Textos.t(R.string.tiempo_h, diffMinutes / 60)
+        else -> Textos.t(R.string.tiempo_d, diffMinutes / (60 * 24))
     }
 }
 
@@ -92,7 +94,7 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     type = type,
     rating = rating,
     review = review,
-    userName = user.name ?: user.handle ?: "Alguien",
+    userName = user.name ?: user.handle ?: Textos.t(R.string.comun_alguien),
     gameTitle = game?.title,
     reactions = reactions,
     reacted = reacted,
@@ -118,7 +120,7 @@ private val feedListAdapter = feedMoshi.adapter<List<FeedItem>>(
 class FeedRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
     /** Red primero, caché de respaldo (mismo patrón que Library/Panel/GameDetail) — Comunidad se quedaba en blanco sin conexión. */
     suspend fun getFeed(): FeedResult {
-        val store = tokenStore ?: return FeedResult.Error("Sin sesión.")
+        val store = tokenStore ?: return FeedResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.feedApi(store).getFeed()
@@ -126,9 +128,9 @@ class FeedRepository(private val tokenStore: TokenStore? = null, private val cac
             cacheDao?.put(SimpleCacheEntity(CACHE_KEY, feedListAdapter.toJson(items)))
             FeedResult.Ok(items)
         } catch (e: HttpException) {
-            cachedFeed() ?: FeedResult.Error("El servidor respondió con un error (${e.code()}).")
+            cachedFeed() ?: FeedResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            cachedFeed() ?: FeedResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedFeed() ?: FeedResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 

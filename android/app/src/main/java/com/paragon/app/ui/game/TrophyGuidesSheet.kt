@@ -38,11 +38,14 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.common.ConfirmDialog
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.util.Textos
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 private val FECHA_ISO_GUIDES = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
     timeZone = java.util.TimeZone.getTimeZone("UTC")
 }
-private val FECHA_CORTA_GUIDES = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale("es", "ES"))
+private val FECHA_CORTA_GUIDES get() = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM)
 
 private fun fechaCortaGuia(iso: String): String =
     try { FECHA_CORTA_GUIDES.format(FECHA_ISO_GUIDES.parse(iso)!!) } catch (e: Exception) { "" }
@@ -81,7 +84,7 @@ fun TrophyGuidesSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
-            Text(text = "Guías escritas", color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.ficha_guias_escritas), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Text(text = trophyName, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp, bottom = 16.dp))
 
             when (val current = result) {
@@ -94,7 +97,7 @@ fun TrophyGuidesSheet(
                     val deOtros = current.guides.filter { it.id != mia?.id }
 
                     if (current.guides.isEmpty()) {
-                        Text(text = "Todavía no hay ninguna guía escrita para este trofeo.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(bottom = 12.dp))
+                        Text(text = stringResource(R.string.guias_vacio), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(bottom = 12.dp))
                     }
 
                     if (mia != null && !editando) {
@@ -106,13 +109,13 @@ fun TrophyGuidesSheet(
                                 .padding(14.dp),
                         ) {
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(text = "TU GUÍA", color = Accent, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                                Text(text = stringResource(R.string.guias_tu_guia), color = Accent, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                                 Row {
                                     TextButton(onClick = { texto = mia.body; editando = true }) {
-                                        Text("Editar", color = Muted, fontSize = 12.sp)
+                                        Text(stringResource(R.string.comun_editar), color = Muted, fontSize = 12.sp)
                                     }
                                     TextButton(onClick = { confirmDelete = true }) {
-                                        Text("Borrar", color = Danger, fontSize = 12.sp)
+                                        Text(stringResource(R.string.comun_borrar), color = Danger, fontSize = 12.sp)
                                     }
                                 }
                             }
@@ -123,7 +126,7 @@ fun TrophyGuidesSheet(
                         OutlinedTextField(
                             value = texto,
                             onValueChange = { if (it.length <= MAX_BODY) texto = it },
-                            placeholder = { Text("Apunta cómo se consigue, rutas, códigos...", color = Muted, fontSize = 13.sp) },
+                            placeholder = { Text(stringResource(R.string.guias_ph), color = Muted, fontSize = 13.sp) },
                             modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Accent,
@@ -150,11 +153,11 @@ fun TrophyGuidesSheet(
                                     }
                                 },
                             ) {
-                                Text(if (mia != null) "Guardar cambios" else "Publicar", color = Accent, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(if (mia != null) stringResource(R.string.comun_guardar_cambios) else stringResource(R.string.comun_publicar), color = Accent, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                             if (editando) {
                                 TextButton(onClick = { editando = false; error = null }) {
-                                    Text("Cancelar", color = Muted, fontSize = 13.sp)
+                                    Text(stringResource(R.string.comun_cancelar), color = Muted, fontSize = 13.sp)
                                 }
                             }
                         }
@@ -176,9 +179,9 @@ fun TrophyGuidesSheet(
 
     if (confirmDelete) {
         ConfirmDialog(
-            title = "¿Borrar tu guía?",
-            message = "Desaparece para todo el mundo que la vea, no solo para ti.",
-            confirmLabel = "Sí, borrar",
+            title = stringResource(R.string.guias_borrar_titulo),
+            message = stringResource(R.string.guias_borrar_texto),
+            confirmLabel = stringResource(R.string.comun_si_borrar),
             onConfirm = {
                 confirmDelete = false
                 scope.launch {
@@ -207,7 +210,7 @@ private fun TrophyGuideRowItem(guide: TrophyGuideRow) {
                 }
             }
             Spacer(Modifier.width(8.dp))
-            Text(text = guide.authorName ?: guide.authorHandle ?: "Alguien", color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = guide.authorName ?: guide.authorHandle ?: Textos.t(R.string.comun_alguien), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.width(6.dp))
             Text(text = fechaCortaGuia(guide.updatedAt), color = Muted, fontSize = 11.sp)
         }

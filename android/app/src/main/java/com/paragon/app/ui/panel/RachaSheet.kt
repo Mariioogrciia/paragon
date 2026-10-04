@@ -34,6 +34,8 @@ import com.paragon.app.data.RachaDetalleResult
 import com.paragon.app.data.RachaRepository
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.theme.*
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Pantalla dedicada a la racha (pedido explícito del usuario: ni el resumen
@@ -82,20 +84,20 @@ private fun RachaContent(detalle: RachaDetalle) {
         // hacer con él.
         if (viva) {
             Text(
-                text = "${detalle.actual} ${if (detalle.actual == 1) "día" else "días"}",
+                text = stringResource(if (detalle.actual == 1) R.string.duracion_dias_1 else R.string.duracion_dias_n, detalle.actual),
                 color = Gold,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 4.dp),
             )
             Text(
-                text = "Racha activa — sigue así",
+                text = stringResource(R.string.racha_activa),
                 color = Muted,
                 fontSize = 13.sp,
             )
         } else {
             Text(
-                text = "Tu próxima racha empieza hoy",
+                text = stringResource(R.string.racha_hoy),
                 color = Foreground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -103,7 +105,7 @@ private fun RachaContent(detalle: RachaDetalle) {
                 modifier = Modifier.padding(top = 8.dp),
             )
             Text(
-                text = "Completa un trofeo para activarla",
+                text = stringResource(R.string.racha_activar),
                 color = Muted,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 2.dp),
@@ -113,14 +115,14 @@ private fun RachaContent(detalle: RachaDetalle) {
         Spacer(Modifier.height(20.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            MiniStatRacha(label = "Mejor racha", value = "${detalle.mejor}d", modifier = Modifier.weight(1f))
-            MiniStatRacha(label = "Días activos", value = detalle.diasActivos.toString(), modifier = Modifier.weight(1f))
+            MiniStatRacha(label = stringResource(R.string.stats_mejor_racha), value = "${detalle.mejor}d", modifier = Modifier.weight(1f))
+            MiniStatRacha(label = stringResource(R.string.stats_dias_activos), value = detalle.diasActivos.toString(), modifier = Modifier.weight(1f))
         }
 
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = "ÚLTIMAS 5 SEMANAS",
+            text = stringResource(R.string.racha_semanas),
             color = Muted,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,

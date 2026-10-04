@@ -34,6 +34,8 @@ import com.paragon.app.data.network.OauthAccountDto
 import com.paragon.app.data.network.PlatformAccountDto
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 // Colores de marca reales por plataforma — antes cada fila era el mismo
 // texto plano en mayúsculas sin nada que las distinguiera a simple vista
@@ -76,17 +78,17 @@ private fun platformIconRes(platform: String): Int? = when (platform) {
 }
 
 private fun platformPlaceholder(platform: String): String = when (platform) {
-    "psn" -> "Tu Online ID de PSN"
-    "xbox" -> "Tu Gamertag"
-    "steam" -> "Usuario, SteamID64 o URL del perfil"
-    else -> "ID Público / Gamertag"
+    "psn" -> Textos.t(R.string.cuentas_ph_psn)
+    "xbox" -> Textos.t(R.string.cuentas_ph_xbox)
+    "steam" -> Textos.t(R.string.cuentas_ph_steam)
+    else -> Textos.t(R.string.cuentas_ph_otro)
 }
 
 private fun platformPrivacyTitle(platform: String): String = when (platform) {
-    "psn" -> "¿Dónde pongo mi perfil de PSN en público?"
-    "steam" -> "¿Dónde pongo mi perfil de Steam en público?"
-    "xbox" -> "¿Dónde pongo mi historial de Xbox en público?"
-    else -> "¿Cómo lo pongo en público?"
+    "psn" -> Textos.t(R.string.cuentas_priv_psn)
+    "steam" -> Textos.t(R.string.cuentas_priv_steam)
+    "xbox" -> Textos.t(R.string.cuentas_priv_xbox)
+    else -> Textos.t(R.string.cuentas_priv_otro)
 }
 
 /**
@@ -98,21 +100,21 @@ private fun platformPrivacyTitle(platform: String): String = when (platform) {
  */
 private fun platformPrivacySteps(platform: String): List<String> = when (platform) {
     "psn" -> listOf(
-        "Desde la consola (PS5/PS4): Ajustes → Usuarios y cuentas → Privacidad → Personalizar.",
-        "Busca \"Nivel de trofeos, juegos y vitrinas\" (o \"Trofeos\") y ponlo en \"Cualquiera\" / \"Todo el mundo\".",
-        "Desde el móvil: app de PlayStation → tu perfil → icono de ajustes → Privacidad de la cuenta → Trofeos.",
-        "El cambio es inmediato — no hace falta reiniciar sesión.",
+        Textos.t(R.string.cuentas_psn_1),
+        Textos.t(R.string.cuentas_psn_2),
+        Textos.t(R.string.cuentas_psn_3),
+        Textos.t(R.string.cuentas_psn_4),
     )
     "steam" -> listOf(
-        "En tu perfil de Steam (web o cliente) → \"Editar perfil\" → \"Ajustes de privacidad\".",
-        "Pon \"Detalles de mi perfil\" en Público.",
-        "El que casi todo el mundo se salta: pon \"Detalles del juego\" TAMBIÉN en Público — sin él, Steam no deja leer tu biblioteca.",
-        "Pulsa \"Guardar cambios\" al final de la página.",
+        Textos.t(R.string.cuentas_steam_1),
+        Textos.t(R.string.cuentas_steam_2),
+        Textos.t(R.string.cuentas_steam_3),
+        Textos.t(R.string.cuentas_steam_4),
     )
     "xbox" -> listOf(
-        "En la consola o la app Xbox: tu perfil → \"Privacidad y seguridad en línea\" → \"Ver detalles y personalizar\".",
-        "Busca \"Historial de juego y estadísticas\" y ponlo en \"Todos\".",
-        "Xbox usa un servicio de terceros no oficial — si ya es público y sigue sin funcionar, prueba de nuevo más tarde.",
+        Textos.t(R.string.cuentas_xbox_1),
+        Textos.t(R.string.cuentas_xbox_2),
+        Textos.t(R.string.cuentas_xbox_3),
     )
     else -> emptyList()
 }
@@ -161,10 +163,10 @@ fun LinkedAccountsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = Foreground)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_atras), tint = Foreground)
                 }
                 Text(
-                    text = "Cuentas Vinculadas",
+                    text = stringResource(R.string.cuentas_titulo),
                     color = Foreground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -183,7 +185,7 @@ fun LinkedAccountsScreen(
                     Text(text = errorMessage!!, color = Danger)
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { loadAccounts() }, colors = ButtonDefaults.buttonColors(containerColor = Accent)) {
-                        Text("Reintentar")
+                        Text(stringResource(R.string.comun_reintentar))
                     }
                 }
             }
@@ -197,7 +199,7 @@ fun LinkedAccountsScreen(
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
                 item {
-                    Text("INICIO DE SESIÓN (OAUTH)", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    Text(stringResource(R.string.cuentas_seccion_login), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
@@ -213,9 +215,9 @@ fun LinkedAccountsScreen(
 
                 item {
                     Spacer(modifier = Modifier.height(28.dp))
-                    Text("PLATAFORMAS DE JUEGO", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    Text(stringResource(R.string.cuentas_seccion_plataformas), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     Text(
-                        text = "De aquí salen tus trofeos y logros reales.",
+                        text = stringResource(R.string.cuentas_plataformas_sub),
                         color = Muted,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 2.dp),
@@ -270,7 +272,7 @@ fun OauthItem(oauth: OauthAccountDto, onLinkRequested: () -> Unit) {
         if (oauth.linked) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Good, modifier = Modifier.size(16.dp))
-                Text(text = "Vinculada", color = Good, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 6.dp))
+                Text(text = stringResource(R.string.cuentas_vinculada), color = Good, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 6.dp))
             }
         } else {
             Button(
@@ -280,7 +282,7 @@ fun OauthItem(oauth: OauthAccountDto, onLinkRequested: () -> Unit) {
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                 modifier = Modifier.height(34.dp)
             ) {
-                Text("Vincular", fontSize = 12.sp, color = Foreground, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.cuentas_vincular), fontSize = 12.sp, color = Foreground, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -330,11 +332,11 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(text = platformLabel(platform.platform), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     if (platform.linked) {
-                        Text(text = platform.username ?: "Vinculado", color = Muted, fontSize = 13.sp)
+                        Text(text = platform.username ?: stringResource(R.string.cuentas_vinculado), color = Muted, fontSize = 13.sp)
                     }
                     if (platform.declared) {
                         // Igual que MarcaDeclarado en la web: se ve, pero no puntúa.
-                        Text(text = "Progreso declarado · no puntúa", color = Muted, fontSize = 12.sp)
+                        Text(text = stringResource(R.string.cuentas_declarado), color = Muted, fontSize = 12.sp)
                     }
                 }
             }
@@ -344,7 +346,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     enabled = !isProcessing,
                     modifier = Modifier.size(34.dp),
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Desvincular", tint = Danger, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cuentas_desvincular), tint = Danger, modifier = Modifier.size(18.dp))
                 }
             } else if (platform.appLinkable) {
                 if (!isLinking) {
@@ -355,7 +357,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         modifier = Modifier.height(34.dp)
                     ) {
-                        Text("Vincular", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        Text(stringResource(R.string.cuentas_vincular), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                     }
                 }
             }
@@ -363,7 +365,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
 
         if (!platform.linked && !platform.appLinkable) {
             Text(
-                text = "Epic bloquea las consultas de los servidores, así que se vincula desde el ordenador con la extensión de Paragon para el navegador: abre tu página de logros de Epic y pulsa Sincronizar.",
+                text = stringResource(R.string.cuentas_epic_extension),
                 color = Muted,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 10.dp),
@@ -400,7 +402,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
             Spacer(modifier = Modifier.height(10.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = { isLinking = false; errorMsg = null }, enabled = !isProcessing) {
-                    Text("Cancelar", color = Muted)
+                    Text(stringResource(R.string.comun_cancelar), color = Muted)
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Button(
@@ -423,7 +425,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     if (isProcessing) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
                     } else {
-                        Text("Conectar", color = Color.White, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.cuentas_conectar), color = Color.White, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -432,9 +434,9 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
 
     if (showUnlinkConfirm) {
         com.paragon.app.ui.common.ConfirmDialog(
-            title = "¿Desvincular ${platform.platform.uppercase()}?",
-            message = "Tu progreso y trofeos ya guardados se quedan tal cual, pero deja de sincronizarse hasta que vuelvas a vincular la cuenta.",
-            confirmLabel = "Sí, desvincular",
+            title = stringResource(R.string.cuentas_desvincular_titulo, platformLabel(platform.platform)),
+            message = stringResource(R.string.cuentas_desvincular_texto),
+            confirmLabel = stringResource(R.string.cuentas_desvincular_si),
             onConfirm = {
                 scope.launch {
                     isProcessing = true

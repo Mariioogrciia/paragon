@@ -7,6 +7,8 @@ import com.paragon.app.ui.theme.Gold
 import com.paragon.app.ui.theme.Muted
 import com.paragon.app.ui.theme.Platinum
 import com.paragon.app.ui.theme.Silver
+import com.paragon.app.R
+import com.paragon.app.util.Textos
 
 /**
  * Color y etiqueta en español de un metal — antes duplicado literalmente
@@ -23,9 +25,9 @@ fun gradeColor(grade: TrophyGrade?): Color = when (grade) {
 }
 
 fun gradeLabelEs(grade: TrophyGrade?): String = when (grade) {
-    TrophyGrade.PLATINUM -> "Platino"
-    TrophyGrade.GOLD -> "Oro"
-    TrophyGrade.SILVER -> "Plata"
-    TrophyGrade.BRONZE -> "Bronce"
+    TrophyGrade.PLATINUM -> Textos.t(R.string.grado_platino)
+    TrophyGrade.GOLD -> Textos.t(R.string.grado_oro)
+    TrophyGrade.SILVER -> Textos.t(R.string.grado_plata)
+    TrophyGrade.BRONZE -> Textos.t(R.string.grado_bronce)
     null -> "?"
 }

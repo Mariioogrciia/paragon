@@ -42,6 +42,9 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.UserProfileDto
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -150,10 +153,10 @@ private fun ringColorForLevel(level: Int): Color = when {
 }
 
 private fun archetypeForLevel(level: Int): String = when {
-    level >= 50 -> "Élite"
-    level >= 25 -> "Veterano"
-    level >= 10 -> "Cazador"
-    else -> "Explorador"
+    level >= 50 -> Textos.t(R.string.arquetipo_elite)
+    level >= 25 -> Textos.t(R.string.arquetipo_veterano)
+    level >= 10 -> Textos.t(R.string.arquetipo_cazador)
+    else -> Textos.t(R.string.arquetipo_explorador)
 }
 
 @Composable
@@ -190,12 +193,12 @@ private fun ProfileContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("PERFIL DE JUGADOR", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.perfil_titulo), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             IconButton(
                 onClick = onDismiss,
                 modifier = Modifier.size(40.dp).background(Background.copy(alpha = 0.5f), CircleShape)
             ) {
-                Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Foreground)
+                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.comun_cerrar), tint = Foreground)
             }
         }
 
@@ -227,7 +230,7 @@ private fun ProfileContent(
             Text(profile.name, color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Text("@${profile.handle}", color = Muted, fontSize = 14.sp)
             Text(
-                "Nivel Paragon ${profile.level} · ${archetypeForLevel(profile.level)}",
+                stringResource(R.string.perfil_nivel_arquetipo, profile.level, archetypeForLevel(profile.level)),
                 color = ringColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -236,7 +239,7 @@ private fun ProfileContent(
 
             if (profile.accounts.isNotEmpty()) {
                 Text(
-                    text = profile.accounts.joinToString(" · ") { it.platform.uppercase() } + " conectado" + (if (profile.accounts.size > 1) "s" else ""),
+                    text = stringResource(if (profile.accounts.size > 1) R.string.perfil_conectado_n else R.string.perfil_conectado_1, profile.accounts.joinToString(" · ") { it.platform.uppercase() }),
                     color = Muted,
                     fontSize = 11.sp,
                     modifier = Modifier.padding(top = 4.dp),
@@ -249,9 +252,9 @@ private fun ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                StatItem("Nivel", profile.level.toString())
-                StatItem("Platinos", profile.platinos.toString())
-                StatItem("Trofeos", profile.trofeos.toString())
+                StatItem(stringResource(R.string.comun_nivel), profile.level.toString())
+                StatItem(stringResource(R.string.comun_platinos), profile.platinos.toString())
+                StatItem(stringResource(R.string.comun_trofeos), profile.trofeos.toString())
             }
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -272,7 +275,7 @@ private fun ProfileContent(
                         .background(Brush.linearGradient(listOf(Accent, dominantColor ?: Color(0xFF7657FF))), RoundedCornerShape(14.dp)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("⚔ Comparar trofeos", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(stringResource(R.string.perfil_comparar), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
 
@@ -292,7 +295,7 @@ private fun ProfileContent(
                     Icon(Icons.Default.Star, contentDescription = null, tint = Platinum, modifier = Modifier.size(15.dp))
                     Spacer(Modifier.width(6.dp))
                 }
-                Text(if (isRival) "Rival principal" else "Fijar como rival principal", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(if (isRival) stringResource(R.string.perfil_rival) else stringResource(R.string.perfil_fijar_rival), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -304,7 +307,7 @@ private fun ProfileContent(
 
             if (profile.recentGames.isNotEmpty()) {
                 Text(
-                    "JUEGOS RECIENTES",
+                    stringResource(R.string.perfil_recientes),
                     color = Muted,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
@@ -332,8 +335,8 @@ private fun ProfileContent(
 @Composable
 private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
     val filas = listOf(
-        Triple("Platinos", myStats.platinums, their.platinos),
-        Triple("Trofeos", myStats.trophies, their.trofeos),
+        Triple(stringResource(R.string.comun_platinos), myStats.platinums, their.platinos),
+        Triple(stringResource(R.string.comun_trofeos), myStats.trophies, their.trofeos),
     )
     val voyGanando = filas.count { (_, yo, ellos) -> yo > ellos }
 
@@ -344,10 +347,10 @@ private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
             .border(1.dp, Border, RoundedCornerShape(16.dp))
             .padding(18.dp)
     ) {
-        Text("RIVALIDAD", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(stringResource(R.string.perfil_rivalidad), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Spacer(Modifier.height(4.dp))
         Text(
-            text = "Vas por delante en $voyGanando de ${filas.size} categorías" + if (voyGanando == filas.size) " — les llevas ventaja en todo." else ".",
+            text = stringResource(R.string.perfil_ventaja, voyGanando, filas.size) + if (voyGanando == filas.size) stringResource(R.string.perfil_ventaja_todo) else ".",
             color = if (voyGanando > filas.size / 2) Good else Muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
@@ -356,8 +359,8 @@ private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
         filas.forEach { (label, yo, ellos) ->
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(label, color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(70.dp))
-                Text("Tú $yo", color = if (yo >= ellos) Good else Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text("Ellos $ellos", color = if (ellos > yo) Danger else Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.perfil_tu, yo), color = if (yo >= ellos) Good else Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.perfil_ellos, ellos), color = if (ellos > yo) Danger else Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -389,7 +392,7 @@ private fun RecentGameCard(game: com.paragon.app.data.network.RecentGameDto) {
         }
         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
             Text(game.title, color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 2)
-            Text("${game.percent}% completado", color = Platinum, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
+            Text(stringResource(R.string.comun_completado, game.percent), color = Platinum, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
         }
     }
 }

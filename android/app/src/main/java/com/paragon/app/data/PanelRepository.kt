@@ -10,6 +10,8 @@ import com.paragon.app.data.network.LogoutRequest
 import com.paragon.app.data.network.NextTrophyDto
 import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 data class UserProfile(
     val handle: String,
@@ -191,23 +193,23 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 // solo reintentando, así que no se mira la caché: hace falta
                 // la pantalla de onboarding.
                 409 -> PanelResult.NeedsOnboarding
-                else -> cachedPanel() ?: PanelResult.Error("El servidor respondió con un error (${e.code()}).")
+                else -> cachedPanel() ?: PanelResult.Error(Textos.t(R.string.error_servidor, e.code()))
             }
         } catch (e: Exception) {
-            cachedPanel() ?: PanelResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedPanel() ?: PanelResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
     /** Paso 1 del alta — ver POST /api/mobile/profile/handle. */
     suspend fun chooseHandle(handle: String): ChooseHandleResult {
-        val store = tokenStore ?: return ChooseHandleResult.Error("Sin sesión.")
+        val store = tokenStore ?: return ChooseHandleResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.settingsApi(store).chooseHandle(ChooseHandleRequest(handle))
             ChooseHandleResult.Ok
         } catch (e: HttpException) {
-            ChooseHandleResult.Error(e.paragonErrorMessage() ?: "El servidor respondió con un error (${e.code()}).")
+            ChooseHandleResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            ChooseHandleResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            ChooseHandleResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
@@ -222,7 +224,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
     }
 
     suspend fun getHighlights(): HighlightsResult {
-        val store = tokenStore ?: return HighlightsResult.Error("Sin sesión.")
+        val store = tokenStore ?: return HighlightsResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.highlightsApi(store).getHighlights()
@@ -232,9 +234,9 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 nextTrophies = response.nextTrophies.map { it.toNextTrophy() },
             )
         } catch (e: HttpException) {
-            HighlightsResult.Error("El servidor respondió con un error (${e.code()}).")
+            HighlightsResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            HighlightsResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            HighlightsResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 

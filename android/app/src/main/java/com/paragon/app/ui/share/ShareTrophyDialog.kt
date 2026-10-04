@@ -33,6 +33,8 @@ import com.paragon.app.ui.theme.Muted
 import com.paragon.app.ui.theme.Surface
 import com.paragon.app.util.shareBitmapAsImage
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Preview + captura de la tarjeta de Platino (ver `TrophyShareCard.kt`) para
@@ -50,7 +52,7 @@ fun ShareTrophyDialog(
     handle: String,
     earnedTrophies: Int? = null,
     totalTrophies: Int? = null,
-    badge: String = "PLATINO",
+    badge: String = stringResource(R.string.comparte_badge_platino),
     subtitle: String? = null,
     onDismiss: () -> Unit,
 ) {
@@ -100,11 +102,11 @@ fun ShareTrophyDialog(
             ) {
                 Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Compartir")
+                Text(stringResource(R.string.comun_compartir))
             }
 
             TextButton(onClick = onDismiss, modifier = Modifier.padding(top = 4.dp)) {
-                Text("Cerrar", color = Muted)
+                Text(stringResource(R.string.comun_cerrar), color = Muted)
             }
         }
     }

@@ -33,6 +33,8 @@ import com.paragon.app.data.SocialResult
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Comparar con cualquier perfil público (no hace falta que sea amigo) contra
@@ -79,9 +81,9 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Foreground)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_volver), tint = Foreground)
             }
-            Text(text = "COMPARAR", color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.comparar_titulo), color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         }
 
         Row(
@@ -92,7 +94,7 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
                 value = handle,
                 onValueChange = { handle = it },
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("@handle de alguien", color = Muted) },
+                placeholder = { Text(stringResource(R.string.comparar_ph), color = Muted) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Surface,
@@ -108,7 +110,7 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
             )
             Spacer(Modifier.width(12.dp))
             Button(onClick = { buscar(handle) }, colors = ButtonDefaults.buttonColors(containerColor = Accent)) {
-                Text("Comparar")
+                Text(stringResource(R.string.nav_comparar))
             }
         }
 
@@ -121,11 +123,11 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
                     Text(text = (result as CompareResult.Error).message, color = Muted, fontSize = 14.sp)
                     // El buscador de arriba se queda con el @handle puesto,
                     // así que "reintentar" ya era posible tocando
-                    // "Comparar" otra vez — este botón solo lo hace
+                    // stringResource(R.string.nav_comparar) otra vez — este botón solo lo hace
                     // explícito, mismo patrón que el resto de pantallas
                     // con estado de error.
                     TextButton(onClick = { buscar(handle) }, modifier = Modifier.padding(top = 8.dp)) {
-                        Text("Reintentar", color = Accent, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -147,7 +149,7 @@ private fun FriendsPicker(amigos: List<AmigoRow>, onPick: (String) -> Unit) {
     ) {
         item {
             Text(
-                text = "TUS AMIGOS",
+                text = stringResource(R.string.comparar_amigos),
                 color = Muted,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
@@ -158,7 +160,7 @@ private fun FriendsPicker(amigos: List<AmigoRow>, onPick: (String) -> Unit) {
         if (conHandle.isEmpty()) {
             item {
                 Text(
-                    text = "Todavía no tienes amigos con perfil público para comparar de un toque — busca cualquier @handle arriba.",
+                    text = stringResource(R.string.comparar_sin_amigos),
                     color = Muted,
                     fontSize = 13.sp,
                 )
@@ -175,9 +177,9 @@ private fun FriendsPicker(amigos: List<AmigoRow>, onPick: (String) -> Unit) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = amigo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                        Text(text = "@${amigo.handle} · Nivel ${amigo.level}", color = Muted, fontSize = 12.sp)
+                        Text(text = stringResource(R.string.comparar_handle_nivel, amigo.handle ?: "", amigo.level), color = Muted, fontSize = 12.sp)
                     }
-                    Text(text = "${amigo.platinos} platinos", color = Platinum, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.comun_n_platinos, amigo.platinos), color = Platinum, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -194,7 +196,7 @@ private fun CompareContent(data: CompareData) {
         item { CompareSummary(data.me, data.them, data.resultado) }
         item {
             Text(
-                text = "JUEGOS EN COMÚN (${data.sharedGames.size})",
+                text = stringResource(R.string.comparar_en_comun, data.sharedGames.size),
                 color = Foreground,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
@@ -202,7 +204,7 @@ private fun CompareContent(data: CompareData) {
             )
         }
         if (data.sharedGames.isEmpty()) {
-            item { Text(text = "Ningún juego en común todavía.", color = Muted, fontSize = 13.sp) }
+            item { Text(text = stringResource(R.string.comparar_sin_comun), color = Muted, fontSize = 13.sp) }
         } else {
             items(data.sharedGames, key = { it.id }) { SharedGameRow(it) }
         }
@@ -212,7 +214,7 @@ private fun CompareContent(data: CompareData) {
 /**
  * Antes esto era solo texto (nombre/nivel/platinos), sin foto ni ninguna
  * lectura de "quién va ganando" — la web ya tenía las dos cosas
- * (`comparar/[handle]/page.tsx`: `Avatar` + etiqueta "Vas ganando"), esto
+ * (`comparar/[handle]/page.tsx`: `Avatar` + etiqueta stringResource(R.string.comparar_ganando)), esto
  * las trae aquí con el mismo criterio (por platinos).
  */
 @Composable
@@ -225,15 +227,15 @@ private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: Compar
             .padding(20.dp),
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            CompareColumn(label = "TÚ", side = me, destacado = resultado == CompareResultado.GANO)
+            CompareColumn(label = stringResource(R.string.comparar_tu), side = me, destacado = resultado == CompareResultado.GANO)
             Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(Border))
-            CompareColumn(label = "ELLOS", side = them, destacado = resultado == CompareResultado.PIERDO)
+            CompareColumn(label = stringResource(R.string.comparar_ellos), side = them, destacado = resultado == CompareResultado.PIERDO)
         }
         Spacer(Modifier.height(16.dp))
         val (texto, color) = when (resultado) {
-            CompareResultado.GANO -> "Vas ganando" to Good
-            CompareResultado.PIERDO -> "Vas perdiendo" to Danger
-            CompareResultado.EMPATE -> "Empate a platinos" to Muted
+            CompareResultado.GANO -> stringResource(R.string.comparar_ganando) to Good
+            CompareResultado.PIERDO -> stringResource(R.string.comparar_perdiendo) to Danger
+            CompareResultado.EMPATE -> stringResource(R.string.comparar_empate) to Muted
         }
         Text(
             text = texto,
@@ -273,12 +275,12 @@ private fun RowScope.CompareColumn(label: String, side: CompareSide, destacado: 
         Spacer(Modifier.height(8.dp))
         Text(text = label, color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Text(text = side.name, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-        Text(text = "Nivel ${side.level}", color = Muted, fontSize = 12.sp)
+        Text(text = stringResource(R.string.comun_nivel_n, side.level), color = Muted, fontSize = 12.sp)
         Spacer(Modifier.height(10.dp))
         Text(text = side.platinos.toString(), color = Platinum, fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Text(text = "platinos", color = Muted, fontSize = 11.sp)
         Spacer(Modifier.height(6.dp))
-        Text(text = "${side.trofeos} trofeos · ${side.juegos} juegos", color = Muted, fontSize = 11.sp)
+        Text(text = stringResource(R.string.comparar_trofeos_juegos, side.trofeos, side.juegos), color = Muted, fontSize = 11.sp)
     }
 }
 
@@ -301,13 +303,13 @@ private fun SharedGameRow(game: SharedGame) {
             Text(text = game.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             Row(modifier = Modifier.padding(top = 4.dp)) {
                 Text(
-                    text = "Tú ${game.myPercent}%${if (game.myPercent >= 100) " ✓" else ""}",
+                    text = stringResource(R.string.comparar_tu_pct, game.myPercent, if (game.myPercent >= 100) " ✓" else ""),
                     color = if (game.myPercent >= 100) Good else Accent2,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "  ·  Ellos ${game.theirPercent}%${if (game.theirPercent >= 100) " ✓" else ""}",
+                    text = stringResource(R.string.comparar_ellos_pct, game.theirPercent, if (game.theirPercent >= 100) " ✓" else ""),
                     color = if (game.theirPercent >= 100) Good else Muted,
                     fontSize = 12.sp,
                 )

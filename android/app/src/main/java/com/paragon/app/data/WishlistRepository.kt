@@ -4,6 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.AddWishlistRequest
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.GameSearchResultDto
+import com.paragon.app.R
+import com.paragon.app.util.Textos
 
 /** Un resultado de búsqueda en el catálogo (IGDB) — "Añadir a Paragon" desde el Sharesheet. */
 data class GameSearchResult(
@@ -28,7 +30,7 @@ class WishlistRepository(private val tokenStore: TokenStore? = null) {
         }
     }
 
-    /** "Deseados" fijo como dispositivo — igual que el valor por defecto de `addToWishlistAction` en la web, no hay catálogo de dispositivos que elegir aquí. */
+    /** Textos.t(R.string.comun_deseados) fijo como dispositivo — igual que el valor por defecto de `addToWishlistAction` en la web, no hay catálogo de dispositivos que elegir aquí. */
     suspend fun addToWishlist(game: GameSearchResult): Boolean {
         val store = tokenStore ?: return false
         return try {
@@ -41,7 +43,7 @@ class WishlistRepository(private val tokenStore: TokenStore? = null) {
                     genres = game.genres,
                     developer = game.developer,
                     publisher = game.publisher,
-                    deviceLabel = "Deseados",
+                    deviceLabel = Textos.t(R.string.comun_deseados),
                 ),
             )
             true

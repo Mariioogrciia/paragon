@@ -21,6 +21,8 @@ import com.paragon.app.ui.theme.*
 import kotlin.math.roundToInt
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Estadísticas reales contra GET /api/mobile/stats (StatsRepository) — la
@@ -60,13 +62,13 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
         ) {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Foreground)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_volver), tint = Foreground)
                 }
             } else {
                 Spacer(Modifier.width(16.dp))
             }
             Text(
-                text = "ESTADÍSTICAS",
+                text = stringResource(R.string.stats_titulo),
                 color = Foreground,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -88,7 +90,7 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
                         onClick = { retryCounter.value += 1 },
                         modifier = Modifier.padding(top = 16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                    ) { Text("Reintentar") }
+                    ) { Text(stringResource(R.string.comun_reintentar)) }
                 }
             }
             is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok), dieta, current.fromCache)
@@ -119,7 +121,7 @@ private fun StatsContent(stats: ParagonStats, handle: String, achievements: Achi
         // sin ningún respaldo offline).
         if (fromCache) {
             item {
-                Text(text = "Sin conexión — mostrando la última copia guardada", color = Muted, fontSize = 11.sp)
+                Text(text = stringResource(R.string.comun_sin_conexion_copia), color = Muted, fontSize = 11.sp)
             }
         }
         dieta?.let { item { DietaGamerCard(it) } }
@@ -141,7 +143,8 @@ private fun StatsContent(stats: ParagonStats, handle: String, achievements: Achi
 private val FECHA_ISO = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
     timeZone = java.util.TimeZone.getTimeZone("UTC")
 }
-private val FECHA_CORTA = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale("es", "ES"))
+// Formato de fecha del idioma del teléfono (antes fijo en español).
+private val FECHA_CORTA get() = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM)
 
 private fun fechaCorta(iso: String): String =
     try { FECHA_CORTA.format(FECHA_ISO.parse(iso)!!) } catch (e: Exception) { iso }
@@ -158,29 +161,29 @@ private val ICONO_GRADO = mapOf("bronze" to "🥉", "silver" to "🥈", "gold" t
 private fun HitosCard(hitos: HitosStats) {
     val filas = buildList {
         hitos.primerTrofeo?.let {
-            add(Triple(ICONO_GRADO[it.grade] ?: "🎮", "Tu primer trofeo", "${it.nombre} · ${it.tituloJuego} · ${fechaCorta(it.fecha)}"))
+            add(Triple(ICONO_GRADO[it.grade] ?: "🎮", stringResource(R.string.stats_primer_trofeo), stringResource(R.string.stats_hito_3, it.nombre, it.tituloJuego, fechaCorta(it.fecha))))
         }
         hitos.primerPlatino?.let {
-            add(Triple("🏆", "Tu primer platino", "${it.titulo} · ${fechaCorta(it.fecha)}"))
+            add(Triple("🏆", stringResource(R.string.stats_primer_platino), stringResource(R.string.comun_a_b, it.titulo, fechaCorta(it.fecha))))
         }
         hitos.trofeoMasRaro?.let {
-            add(Triple("💎", "Tu trofeo más raro", "${it.nombre} · ${"%.1f".format(it.rarityPercent)}% lo tiene · ${it.tituloJuego}"))
+            add(Triple("💎", stringResource(R.string.stats_mas_raro), stringResource(R.string.stats_mas_raro_det, it.nombre, "%.1f".format(it.rarityPercent), it.tituloJuego)))
         }
         hitos.platinoAnejo?.takeIf { it.dias >= 30 }?.let {
             val texto = if (it.dias >= 365) {
-                "${it.dias / 365} años y ${(it.dias % 365) / 30} meses en caer"
+                stringResource(R.string.stats_anejo_anios, it.dias / 365, (it.dias % 365) / 30)
             } else {
-                "${it.dias / 30} meses en caer"
+                stringResource(R.string.stats_anejo_meses, it.dias / 30)
             }
-            add(Triple("🍷", "El platino añejo", "${it.titulo} · $texto"))
+            add(Triple("🍷", stringResource(R.string.stats_anejo), stringResource(R.string.comun_a_b, it.titulo, texto)))
         }
         hitos.rachaMasLarga?.takeIf { it.dias >= 3 }?.let {
-            add(Triple("🔥", "Tu racha más larga", "${it.dias} días seguidos, del ${fechaCorta(it.desde)} al ${fechaCorta(it.hasta)}"))
+            add(Triple("🔥", stringResource(R.string.stats_racha_larga), stringResource(R.string.stats_racha_det, it.dias, fechaCorta(it.desde), fechaCorta(it.hasta))))
         }
     }
     if (filas.isEmpty()) return
 
-    SectionCard(title = "Hitos de tu carrera", subtitle = "Toda tu historia de trofeos, no solo este año") {
+    SectionCard(title = stringResource(R.string.stats_hitos), subtitle = stringResource(R.string.stats_hitos_sub)) {
         filas.forEachIndexed { index, (icono, etiqueta, detalle) ->
             if (index > 0) {
                 Spacer(Modifier.height(12.dp))
@@ -222,20 +225,20 @@ private data class HitoExportable(
 private fun GaleriaHitosCard(hitos: HitosStats, handle: String) {
     val items = buildList {
         hitos.primerTrofeo?.let {
-            add(HitoExportable("🎮", "Tu primer trofeo", "${it.nombre} · ${fechaCorta(it.fecha)}", it.iconUrl, it.tituloJuego, "PRIMER TROFEO", fechaLarga(it.fecha)))
+            add(HitoExportable("🎮", stringResource(R.string.stats_primer_trofeo), stringResource(R.string.comun_a_b, it.nombre, fechaCorta(it.fecha)), it.iconUrl, it.tituloJuego, stringResource(R.string.stats_badge_primer), fechaLarga(it.fecha)))
         }
         hitos.trofeoMasRaro?.let {
-            add(HitoExportable("💎", "Tu trofeo más raro", "${it.nombre} · ${"%.1f".format(it.rarityPercent)}% lo tiene", it.iconUrl, it.tituloJuego, "TROFEO MÁS RARO", it.nombre))
+            add(HitoExportable("💎", stringResource(R.string.stats_mas_raro), stringResource(R.string.stats_mas_raro_det2, it.nombre, "%.1f".format(it.rarityPercent)), it.iconUrl, it.tituloJuego, stringResource(R.string.stats_badge_raro), it.nombre))
         }
         hitos.platinosHitos.forEach {
-            add(HitoExportable("🏆", "Tu platino #${it.numero}", "${it.titulo} · ${fechaCorta(it.fecha)}", it.iconUrl, it.titulo, "TU PLATINO #${it.numero}", fechaLarga(it.fecha)))
+            add(HitoExportable("🏆", stringResource(R.string.stats_platino_n, it.numero), stringResource(R.string.comun_a_b, it.titulo, fechaCorta(it.fecha)), it.iconUrl, it.titulo, stringResource(R.string.stats_badge_platino_n, it.numero), fechaLarga(it.fecha)))
         }
     }
     if (items.isEmpty()) return
 
     var compartiendo by remember { mutableStateOf<HitoExportable?>(null) }
 
-    SectionCard(title = "Galería de hitos", subtitle = "Genera un póster para guardar o compartir") {
+    SectionCard(title = stringResource(R.string.stats_galeria), subtitle = stringResource(R.string.stats_galeria_sub)) {
         items.forEachIndexed { index, item ->
             if (index > 0) {
                 Spacer(Modifier.height(12.dp))
@@ -249,7 +252,7 @@ private fun GaleriaHitosCard(hitos: HitosStats, handle: String) {
                     Text(text = item.detalle, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                 }
                 IconButton(onClick = { compartiendo = item }) {
-                    Icon(Icons.Default.Share, contentDescription = "Generar tarjeta", tint = Accent)
+                    Icon(Icons.Default.Share, contentDescription = stringResource(R.string.stats_generar_tarjeta), tint = Accent)
                 }
             }
         }
@@ -267,7 +270,7 @@ private fun GaleriaHitosCard(hitos: HitosStats, handle: String) {
     }
 }
 
-private val FECHA_LARGA = java.text.SimpleDateFormat("d 'de' MMMM 'de' yyyy", java.util.Locale("es", "ES"))
+private val FECHA_LARGA get() = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG)
 
 private fun fechaLarga(iso: String): String =
     try { FECHA_LARGA.format(FECHA_ISO.parse(iso)!!) } catch (e: Exception) { iso }
@@ -305,7 +308,7 @@ private fun ParagonScoreCard(score: ParagonScoreStats) {
         ) { value, _ -> animatedTotal = value.toInt() }
     }
 
-    SectionCard(title = "Paragon Score", subtitle = "Puntuación unificada entre plataformas") {
+    SectionCard(title = "Paragon Score", subtitle = stringResource(R.string.stats_score_sub)) {
         Text(text = animatedTotal.toString(), color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         if (score.porPlataforma.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
@@ -315,7 +318,7 @@ private fun ParagonScoreCard(score: ParagonScoreStats) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(text = fila.platform.uppercase(), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    Text(text = "${fila.puntos} pts · ${fila.trofeos} trofeos", color = Foreground, fontSize = 13.sp)
+                    Text(text = stringResource(R.string.stats_score_fila, fila.puntos, fila.trofeos), color = Foreground, fontSize = 13.sp)
                 }
             }
         }
@@ -325,8 +328,8 @@ private fun ParagonScoreCard(score: ParagonScoreStats) {
 @Composable
 private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?) {
     SectionCard(
-        title = "ADN de trofeos",
-        subtitle = dna.arquetipo?.let { "Tu arquetipo: $it" } ?: "Sigue jugando para desbloquear tu arquetipo",
+        title = stringResource(R.string.stats_adn),
+        subtitle = dna.arquetipo?.let { stringResource(R.string.stats_arquetipo, it) } ?: stringResource(R.string.stats_arquetipo_no),
     ) {
         // Distinto del arquetipo de arriba (ese es de GÉNERO) — esto es el
         // estilo de caza: cómo juegas, no a qué.
@@ -338,7 +341,7 @@ private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?)
                     .background(Surface2, RoundedCornerShape(14.dp))
                     .padding(14.dp),
             ) {
-                Text(text = "TU ESTILO DE CAZA", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = stringResource(R.string.stats_estilo), color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 Text(text = estiloDeCaza.nombre, color = Foreground, fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
                 Text(text = estiloDeCaza.descripcion, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
             }
@@ -349,7 +352,7 @@ private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?)
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
             Text(
-                text = "Gira el gráfico con el dedo",
+                text = stringResource(R.string.stats_gira),
                 color = Muted,
                 fontSize = 11.sp,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
@@ -386,21 +389,21 @@ private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?)
 
 @Composable
 private fun RachasCard(rachas: RachasStats, historico: HistoricoStats) {
-    SectionCard(title = "Rachas y actividad") {
+    SectionCard(title = stringResource(R.string.stats_rachas)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MiniStat(label = "Racha actual", value = "${rachas.actual}d", modifier = Modifier.weight(1f))
-            MiniStat(label = "Mejor racha", value = "${rachas.mejor}d", modifier = Modifier.weight(1f))
-            MiniStat(label = "Días activos", value = rachas.diasActivos.toString(), modifier = Modifier.weight(1f))
+            MiniStat(label = stringResource(R.string.stats_racha_actual), value = "${rachas.actual}d", modifier = Modifier.weight(1f))
+            MiniStat(label = stringResource(R.string.stats_mejor_racha), value = "${rachas.mejor}d", modifier = Modifier.weight(1f))
+            MiniStat(label = stringResource(R.string.stats_dias_activos), value = rachas.diasActivos.toString(), modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(16.dp))
         Text(
-            text = "${historico.conFecha} trofeos con fecha conocida · ${historico.esteAnio} este año",
+            text = stringResource(R.string.stats_historico, historico.conFecha, historico.esteAnio),
             color = Muted,
             fontSize = 12.sp,
         )
         historico.mejorMes?.let {
             Text(
-                text = "Tu mejor mes: ${it.mes} (${it.total} trofeos)",
+                text = stringResource(R.string.stats_mejor_mes, it.mes, it.total),
                 color = Foreground,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -421,13 +424,13 @@ private fun RachasCard(rachas: RachasStats, historico: HistoricoStats) {
  */
 @Composable
 private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
-    SectionCard(title = "Horas jugadas") {
+    SectionCard(title = stringResource(R.string.stats_horas)) {
         Text(text = "${"%,d".format(horasTotales).replace(",", ".")}h", color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         Text(
             // Mismo dato que "Si juntaras las X horas... serían Y días" de
             // PlaytimeComparison.tsx en la web, para que cuadre con lo que
             // ya conoce quien también mira la web.
-            text = "= ${horasTotales / 24} días seguidos · en todas tus plataformas",
+            text = stringResource(R.string.stats_horas_dias, horasTotales / 24),
             color = Muted,
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp),
@@ -437,15 +440,15 @@ private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
         HorizontalDivider(color = Border)
         Spacer(Modifier.height(16.dp))
 
-        Text(text = "COSTE POR HORA", color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-        Text(text = "Solo juegos con precio y tiempo jugado registrados", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp, bottom = 10.dp))
+        Text(text = stringResource(R.string.stats_coste), color = Foreground, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = stringResource(R.string.stats_coste_sub), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp, bottom = 10.dp))
 
         if (financiero.juegosConDatos == 0) {
-            Text(text = "Sin datos suficientes todavía.", color = Muted, fontSize = 13.sp)
+            Text(text = stringResource(R.string.stats_sin_datos), color = Muted, fontSize = 13.sp)
         } else {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MiniStat(label = "Gastado", value = "${financiero.totalGastado.roundToInt()}€", modifier = Modifier.weight(1f))
-                MiniStat(label = "Horas con precio", value = financiero.totalHoras.roundToInt().toString(), modifier = Modifier.weight(1f))
+                MiniStat(label = stringResource(R.string.stats_gastado), value = "${financiero.totalGastado.roundToInt()}€", modifier = Modifier.weight(1f))
+                MiniStat(label = stringResource(R.string.stats_horas_precio), value = financiero.totalHoras.roundToInt().toString(), modifier = Modifier.weight(1f))
                 MiniStat(
                     label = "€/hora",
                     value = financiero.costeHoraMedio?.let { "%.2f€".format(it) } ?: "—",
@@ -458,9 +461,9 @@ private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
 
 @Composable
 private fun EficienciaCard(eficiencia: EficienciaStats) {
-    SectionCard(title = "Eficiencia de caza", subtitle = "Tu ritmo real frente a la estimación de HowLongToBeat") {
+    SectionCard(title = stringResource(R.string.stats_eficiencia), subtitle = stringResource(R.string.stats_eficiencia_sub)) {
         if (eficiencia.juegosConDatos == 0 || eficiencia.ritmoMedioPct == null) {
-            Text(text = "Sin datos suficientes todavía.", color = Muted, fontSize = 13.sp)
+            Text(text = stringResource(R.string.stats_sin_datos), color = Muted, fontSize = 13.sp)
         } else {
             val esMasRapido = eficiencia.ritmoMedioPct >= 0
             Text(
@@ -470,7 +473,7 @@ private fun EficienciaCard(eficiencia: EficienciaStats) {
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = if (esMasRapido) "Más rápido que la media de HLTB" else "Te lo tomas con más calma que la media",
+                text = if (esMasRapido) stringResource(R.string.stats_mas_rapido) else stringResource(R.string.stats_mas_calma),
                 color = Muted,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 4.dp),
@@ -481,14 +484,14 @@ private fun EficienciaCard(eficiencia: EficienciaStats) {
 
 @Composable
 private fun BacklogCard(backlog: BacklogStats) {
-    SectionCard(title = "Deuda de backlog", subtitle = "Horas restantes en lo que ya empezaste") {
+    SectionCard(title = stringResource(R.string.stats_backlog), subtitle = stringResource(R.string.stats_backlog_sub)) {
         if (backlog.juegosContados == 0) {
-            Text(text = "Nada empezado con dato de HowLongToBeat todavía.", color = Muted, fontSize = 13.sp)
+            Text(text = stringResource(R.string.stats_backlog_vacio), color = Muted, fontSize = 13.sp)
         } else {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MiniStat(label = "Hasta el final", value = "${backlog.horasHistoriaRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
-                MiniStat(label = "Hasta el platino", value = "${backlog.horasPlatinoRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
-                MiniStat(label = "Juegos contados", value = backlog.juegosContados.toString(), modifier = Modifier.weight(1f))
+                MiniStat(label = stringResource(R.string.stats_hasta_final), value = "${backlog.horasHistoriaRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
+                MiniStat(label = stringResource(R.string.stats_hasta_platino), value = "${backlog.horasPlatinoRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
+                MiniStat(label = stringResource(R.string.stats_juegos_contados), value = backlog.juegosContados.toString(), modifier = Modifier.weight(1f))
             }
         }
     }
@@ -504,7 +507,7 @@ private val ICONO_LIGA = mapOf("liga_mensual" to "🌐", "liga_privada" to "👥
  */
 @Composable
 private fun TrophyCaseCard(trophyCase: List<TrophyCaseAward>) {
-    SectionCard(title = "Palmarés", subtitle = "Ligas que has ganado de verdad") {
+    SectionCard(title = stringResource(R.string.stats_palmares), subtitle = stringResource(R.string.stats_palmares_sub)) {
         trophyCase.forEachIndexed { index, award ->
             if (index > 0) {
                 Spacer(Modifier.height(12.dp))
@@ -538,7 +541,7 @@ private val ICONO_BADGE = mapOf(
 /** Insignias por hitos (`checkAndGrantBadges`, se conceden solas al sincronizar) — sin tarjeta si no hay ninguna todavía. */
 @Composable
 private fun BadgesCard(badges: List<Badge>) {
-    SectionCard(title = "Badges", subtitle = "Insignias que has ido desbloqueando") {
+    SectionCard(title = "Badges", subtitle = stringResource(R.string.stats_badges_sub)) {
         badges.forEachIndexed { index, badge ->
             if (index > 0) {
                 Spacer(Modifier.height(12.dp))
@@ -557,7 +560,7 @@ private fun BadgesCard(badges: List<Badge>) {
 }
 
 /**
- * "🥗 Tu dieta gamer está muy densa" — aviso amistoso (nunca un bloqueo) si
+ * stringResource(R.string.stats_dieta) — aviso amistoso (nunca un bloqueo) si
  * los últimos 3 juegos terminados comparten género y suman muchas horas.
  * Ver dietaGamer() en lib/dietaGamer.ts (proyecto Next.js) para los
  * umbrales exactos. Mismo texto que DietaGamer.tsx en la web.
@@ -571,12 +574,11 @@ private fun DietaGamerCard(dieta: DietaGamer) {
             .border(1.dp, Border, RoundedCornerShape(20.dp))
             .padding(20.dp),
     ) {
-        Text(text = "🥗 Tu dieta gamer está muy densa", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.stats_dieta), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))
         val juegos = dieta.juegos.joinToString(", ") { it.titulo }
         Text(
-            text = "Tus últimos 3 juegos terminados — $juegos — son todos de ${dieta.genero} y suman más de ${dieta.horasTotales}h. " +
-                "Prueba algo distinto antes de tu próxima gran aventura del mismo tipo — un indie, unas plataformas o un puzle cortito para limpiar el paladar.",
+            text = stringResource(R.string.stats_dieta_texto, juegos, dieta.genero, dieta.horasTotales),
             color = Muted,
             fontSize = 13.sp,
             lineHeight = 19.sp,

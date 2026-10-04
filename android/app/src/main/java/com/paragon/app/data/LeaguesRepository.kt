@@ -11,6 +11,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Ligas propias del usuario (SocialScreen, pestaña "Mis Ligas") — DISTINTAS de la Liga Mensual global. */
 data class League(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?)
@@ -68,14 +70,14 @@ private val leaguesListAdapter = leaguesMoshi.adapter<List<League>>(
 class LeaguesRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
     /** Red primero, caché de respaldo — solo la lista de "Mis Ligas", no el detalle de cada una (ver getLeagueDetail). */
     suspend fun getLeagues(): LeaguesResult {
-        val store = tokenStore ?: return LeaguesResult.Error("Sin sesión.")
+        val store = tokenStore ?: return LeaguesResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             val response = ApiClient.leaguesApi(store).getLeagues()
             val leagues = response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt) }
             cacheDao?.put(SimpleCacheEntity(CACHE_KEY, leaguesListAdapter.toJson(leagues)))
             LeaguesResult.Ok(leagues)
         } catch (e: Exception) {
-            cachedLeagues() ?: LeaguesResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedLeagues() ?: LeaguesResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
@@ -89,7 +91,7 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
     suspend fun getInvites(): List<LeagueInvite> {
         val store = tokenStore ?: return emptyList()
         return try {
-            ApiClient.leaguesApi(store).getInvites().invites.map { LeagueInvite(it.id, it.name, it.ownerName ?: "Alguien") }
+            ApiClient.leaguesApi(store).getInvites().invites.map { LeagueInvite(it.id, it.name, it.ownerName ?: Textos.t(R.string.comun_alguien)) }
         } catch (e: Exception) {
             emptyList()
         }
@@ -127,7 +129,7 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
     }
 
     suspend fun getLeagueDetail(leagueId: String): LeagueDetailResult {
-        val store = tokenStore ?: return LeagueDetailResult.Error("Sin sesión.")
+        val store = tokenStore ?: return LeagueDetailResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             val dto = ApiClient.leaguesApi(store).getLeagueDetail(leagueId)
             LeagueDetailResult.Ok(
@@ -140,26 +142,26 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
                     durationUnit = dto.durationUnit,
                     endsAt = dto.endsAt,
                     standings = dto.standings.map {
-                        LeagueStanding(it.userId, it.name ?: it.handle ?: "Alguien", it.handle, it.image, it.points, it.movimiento)
+                        LeagueStanding(it.userId, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien), it.handle, it.image, it.points, it.movimiento)
                     },
-                    pendingMembers = dto.pendingMembers.map { PendingMember(it.userId, it.name ?: it.handle ?: "Alguien") },
+                    pendingMembers = dto.pendingMembers.map { PendingMember(it.userId, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien)) },
                     challenge = dto.challenge?.let { c ->
                         LeagueChallenge(
                             gameId = c.gameId,
                             title = c.title,
                             iconUrl = c.iconUrl,
                             standings = c.standings.map {
-                                ChallengeStanding(it.userId, it.name ?: it.handle ?: "Alguien", it.image, it.progressPercent, it.hasPlatinum, it.platinumAt)
+                                ChallengeStanding(it.userId, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien), it.image, it.progressPercent, it.hasPlatinum, it.platinumAt)
                             },
                         )
                     },
                 ),
             )
         } catch (e: HttpException) {
-            val message = if (e.code() == 404) "Esta liga no existe o no eres miembro." else "El servidor respondió con un error (${e.code()})."
+            val message = if (e.code() == 404) Textos.t(R.string.liga_err_no_existe) else Textos.t(R.string.error_servidor, e.code())
             LeagueDetailResult.Error(message)
         } catch (e: Exception) {
-            LeagueDetailResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            LeagueDetailResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 

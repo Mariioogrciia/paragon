@@ -53,6 +53,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import coil3.compose.AsyncImage
 import com.paragon.app.data.theme.ThemeStore
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * `userProfile`/`globalStats` ya son reales (bajan desde AppRoot vía
@@ -128,7 +130,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                     // Saludo y nivel
                     Text(
-                        text = "HOLA, ${userProfile.name.uppercase()}",
+                        text = stringResource(R.string.panel_hola, userProfile.name.uppercase()),
                         color = Foreground,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
@@ -136,7 +138,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                     )
 
                     Text(
-                        text = "Nivel Paragon ${userProfile.level}",
+                        text = stringResource(R.string.panel_nivel, userProfile.level),
                         color = Muted,
                         fontSize = 14.sp,
                         modifier = Modifier.padding(top = 4.dp, bottom = if (fromCache) 4.dp else 24.dp)
@@ -144,7 +146,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
 
                     if (fromCache) {
                         Text(
-                            text = "Sin conexión — mostrando la última copia guardada",
+                            text = stringResource(R.string.comun_sin_conexion_copia),
                             color = Muted,
                             fontSize = 11.sp,
                             modifier = Modifier.padding(bottom = 24.dp),
@@ -160,7 +162,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                         // diferenciarla de la azul algorítmica.
                         HeroGameCard(
                             game = game.toGameProgress(),
-                            label = "A POR ESTE PLATINO AHORA",
+                            label = stringResource(R.string.panel_a_por_este),
                             labelColor = Gold,
                             accentColor = Gold,
                             // A la ficha del juego, no directo a Modo Enfoque —
@@ -209,9 +211,9 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                         modifier = Modifier.heightIn(max = 300.dp) // Constraint para LazyGrid dentro de LazyColumn
                     ) {
                         item { PlatinumStatTile(globalStats.platinums, onEasterEgg = { showConfetti = true }) }
-                        item { StatTile("Trofeos", globalStats.trophies.toString()) }
-                        item { StatTile("Juegos", globalStats.games.toString()) }
-                        item { StatTile("Completado", "${globalStats.completionRate}%") }
+                        item { StatTile(stringResource(R.string.comun_trofeos), globalStats.trophies.toString()) }
+                        item { StatTile(stringResource(R.string.comun_juegos), globalStats.games.toString()) }
+                        item { StatTile(stringResource(R.string.panel_completado), "${globalStats.completionRate}%") }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -226,20 +228,20 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                             silver = globalStats.silver,
                             bronze = globalStats.bronze,
                         ),
-                        summary = "${globalStats.trophies} trofeos en ${globalStats.games} juegos"
+                        summary = stringResource(R.string.panel_resumen, globalStats.trophies, globalStats.games)
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Hero Card (A un paso del platino)
                     Text(
-                        text = "A UN PASO DEL PLATINO",
+                        text = stringResource(R.string.panel_un_paso),
                         color = Foreground,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "Lo que menos te queda, ordenado por trofeos pendientes.",
+                        text = stringResource(R.string.panel_un_paso_sub),
                         color = Muted,
                         fontSize = 13.sp,
                         modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
@@ -268,7 +270,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                             // ahora hay un botón explícito, igual que el
                             // resto de pantallas con estado de error.
                             TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 4.dp)) {
-                                Text("Reintentar", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                                Text(stringResource(R.string.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                             }
                         }
                         is HighlightsResult.Ok -> {
@@ -280,7 +282,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                                 )
                             } else {
                                 Text(
-                                    text = "Nada a un paso del platino todavía — sigue jugando.",
+                                    text = stringResource(R.string.panel_un_paso_vacio),
                                     color = Muted,
                                     fontSize = 13.sp,
                                 )
@@ -297,13 +299,13 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                     val nextTrophies = (highlights as? HighlightsResult.Ok)?.nextTrophies.orEmpty()
                     if (nextTrophies.isNotEmpty()) {
                         Text(
-                            text = "SIGUIENTE TROFEO",
+                            text = stringResource(R.string.panel_siguiente),
                             color = Foreground,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
+                            text = stringResource(R.string.panel_siguiente_sub),
                             color = Muted,
                             fontSize = 13.sp,
                             modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
@@ -321,7 +323,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
 
                     // Jugado recientemente
                     Text(
-                        text = "JUGADO RECIENTEMENTE",
+                        text = stringResource(R.string.panel_recientes),
                         color = Foreground,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -396,7 +398,7 @@ fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
     ) {
         Column {
             Text(
-                text = "PLATINOS",
+                text = stringResource(R.string.panel_platinos),
                 color = Platinum,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
@@ -426,9 +428,9 @@ fun MilestoneBanner(hito: HitoReservado, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "CERROJO DE HITOS", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(text = stringResource(R.string.panel_cerrojo), color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Text(
-                text = "${hito.titulo} reservado para tu platino #${hito.numero}",
+                text = stringResource(R.string.panel_cerrojo_texto, hito.titulo, hito.numero),
                 color = Foreground,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -446,13 +448,13 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
         var input by remember { mutableStateOf(targetPlatinums?.toString() ?: "") }
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Meta de Platinos", color = Foreground) },
+            title = { Text(stringResource(R.string.panel_meta_titulo), color = Foreground) },
             text = {
                 OutlinedTextField(
                     value = input,
                     onValueChange = { if (it.all { char -> char.isDigit() }) input = it },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                    placeholder = { Text("Ej: 50", color = Muted) }
+                    placeholder = { Text(stringResource(R.string.panel_meta_ph), color = Muted) }
                 )
             },
             confirmButton = {
@@ -465,7 +467,7 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
                     }
                     showDialog = false
                 }) {
-                    Text("Guardar", color = Accent)
+                    Text(stringResource(R.string.comun_guardar), color = Accent)
                 }
             },
             dismissButton = {
@@ -473,7 +475,7 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
                     onSetTarget(null)
                     showDialog = false
                 }) {
-                    Text("Eliminar Meta", color = Danger)
+                    Text(stringResource(R.string.panel_meta_eliminar), color = Danger)
                 }
             },
             containerColor = Surface,
@@ -491,10 +493,10 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "META PERSONAL", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(text = stringResource(R.string.panel_meta), color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             if (targetPlatinums == null) {
                 Text(
-                    text = "Fijar meta de platinos",
+                    text = stringResource(R.string.panel_meta_fijar),
                     color = Foreground,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -503,7 +505,7 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
             } else {
                 val progress = currentPlatinums.toFloat() / targetPlatinums.toFloat()
                 Text(
-                    text = "Objetivo: $targetPlatinums Platinos",
+                    text = stringResource(R.string.panel_meta_objetivo, targetPlatinums),
                     color = Foreground,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -543,9 +545,9 @@ fun RivalBanner(rival: CompareSide, me: CompareSide, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "RIVAL PRINCIPAL", color = Danger, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(text = stringResource(R.string.panel_rival), color = Danger, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Text(
-                text = "Tú (${me.platinos}) 🆚 ${rival.name} (${rival.platinos})",
+                text = stringResource(R.string.panel_rival_texto, me.platinos, rival.name, rival.platinos),
                 color = Foreground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,

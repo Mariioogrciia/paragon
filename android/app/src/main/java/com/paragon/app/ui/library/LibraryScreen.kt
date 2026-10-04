@@ -41,15 +41,18 @@ import com.paragon.app.util.rememberShakeListener
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Search
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
-private val FILTERS = listOf(
-    LibraryFilter.TODOS to "Todos",
-    LibraryFilter.JUGANDO to "Jugando",
-    LibraryFilter.PLATINADOS to "Platinados",
-    LibraryFilter.PLATINADO_SIN_DLC to "Solo falta el DLC",
-    LibraryFilter.COMPLETADOS to "Completados",
-    LibraryFilter.ABANDONADOS to "Abandonados",
-    LibraryFilter.BACKLOG to "Pila Vergüenza",
+private val FILTERS get() = listOf(
+    LibraryFilter.TODOS to Textos.t(R.string.biblio_todos),
+    LibraryFilter.JUGANDO to Textos.t(R.string.biblio_jugando),
+    LibraryFilter.PLATINADOS to Textos.t(R.string.biblio_platinados),
+    LibraryFilter.PLATINADO_SIN_DLC to Textos.t(R.string.biblio_falta_dlc),
+    LibraryFilter.COMPLETADOS to Textos.t(R.string.biblio_completados),
+    LibraryFilter.ABANDONADOS to Textos.t(R.string.biblio_abandonados),
+    LibraryFilter.BACKLOG to Textos.t(R.string.biblio_pila),
 )
 
 /** Biblioteca real contra GET /api/mobile/library (LibraryRepository). */
@@ -70,7 +73,7 @@ fun LibraryScreen(
     var selectedFilter by remember { mutableIntStateOf(0) }
     var isSortMenuExpanded by remember { mutableStateOf(false) }
     var sortOption by remember { mutableIntStateOf(0) } // 0: Progreso, 1: Título A-Z, 2: Título Z-A
-    val sortLabels = listOf("Progreso", "Título A-Z", "Título Z-A")
+    val sortLabels = listOf(stringResource(R.string.biblio_orden_progreso), stringResource(R.string.biblio_orden_az), stringResource(R.string.biblio_orden_za))
     val retryCounter = remember { mutableIntStateOf(0) }
     val haptic = LocalHapticFeedback.current
 
@@ -108,7 +111,7 @@ fun LibraryScreen(
                 .fillMaxSize()
                 .background(Background)
         ) {
-        // Cabecera con selector — antes "BIBLIOTECA" (32sp) + el desplegable
+        // Cabecera con selector — antes stringResource(R.string.biblio_titulo) (32sp) + el desplegable
         // de orden + el selector de vista iban los tres en la MISMA fila:
         // en un móvil normal no caben, y el texto del desplegable se
         // recortaba a medias ("Progreso" → "rogreso"). El título se lleva
@@ -116,7 +119,7 @@ fun LibraryScreen(
         // el ancho para ellos solos.
         Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp)) {
             Text(
-                text = "BIBLIOTECA",
+                text = stringResource(R.string.biblio_titulo),
                 color = Foreground,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
@@ -174,7 +177,7 @@ fun LibraryScreen(
                         ) {
                             Icon(
                                 icon,
-                                contentDescription = if (layout == 0) "Vista cuadrícula" else "Vista enfoque",
+                                contentDescription = if (layout == 0) stringResource(R.string.biblio_vista_cuadricula) else stringResource(R.string.biblio_vista_enfoque),
                                 tint = if (selected) Color.White else Muted,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -185,7 +188,7 @@ fun LibraryScreen(
 
             if ((result as? LibraryResult.Ok)?.fromCache == true) {
                 Text(
-                    text = "Sin conexión — mostrando la última copia guardada",
+                    text = stringResource(R.string.comun_sin_conexion_copia),
                     color = Muted,
                     fontSize = 11.sp,
                     modifier = Modifier.padding(top = 4.dp),
@@ -237,7 +240,7 @@ fun LibraryScreen(
                         modifier = Modifier.padding(top = 16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Accent),
                     ) {
-                        Text("Reintentar")
+                        Text(stringResource(R.string.comun_reintentar))
                     }
                 }
             }
@@ -271,11 +274,11 @@ fun LibraryScreen(
                     val hayFiltroActivo = searchQuery.isNotBlank() || selectedFilter != 0
                     com.paragon.app.ui.common.EmptyState(
                         icon = if (hayFiltroActivo) Icons.Default.Search else Icons.AutoMirrored.Filled.List,
-                        title = if (hayFiltroActivo) "Nada con esos filtros" else "Tu biblioteca está vacía",
+                        title = if (hayFiltroActivo) stringResource(R.string.biblio_nada_filtros) else stringResource(R.string.biblio_vacia),
                         description = if (hayFiltroActivo) {
-                            "Prueba a cambiar la búsqueda o el filtro de arriba."
+                            stringResource(R.string.biblio_nada_filtros_sub)
                         } else {
-                            "En cuanto vincules una cuenta y sincronices, tus juegos aparecerán aquí."
+                            stringResource(R.string.biblio_vacia_sub)
                         },
                     )
                 } else {

@@ -5,6 +5,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.request.crossfade
+import com.paragon.app.util.Textos
 
 /**
  * Ningún `AsyncImage` de la app pedía `crossfade` — cada carátula, avatar o
@@ -15,6 +16,11 @@ import coil3.request.crossfade
  * `ImageRequest` (o, peor, olvidarlo en alguno).
  */
 class ParagonApplication : Application(), SingletonImageLoader.Factory {
+    override fun onCreate() {
+        super.onCreate()
+        Textos.init(this)
+    }
+
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
             .crossfade(true)

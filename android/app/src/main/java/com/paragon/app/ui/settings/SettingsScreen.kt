@@ -34,6 +34,9 @@ import com.paragon.app.data.theme.PlatformColor
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 @Composable
 fun SettingsScreen(
@@ -55,7 +58,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     // Antes el botón se activaba con solo tener un nombre no vacío, aunque
-    // fuera el mismo de siempre — "Guardar cambios" sin ningún cambio
+    // fuera el mismo de siempre — stringResource(R.string.comun_guardar_cambios) sin ningún cambio
     // pendiente invita a pulsar sin necesidad. Se compara contra el último
     // valor GUARDADO (no contra `profile` directo, que es una prop que no
     // se actualiza sola tras guardar) para que el botón vuelva a
@@ -63,7 +66,7 @@ fun SettingsScreen(
     var nombreGuardado by remember { mutableStateOf(profile.name) }
     var avatarGuardado by remember { mutableStateOf(profile.image) }
     val hayCambiosSinGuardar = nameInput != nombreGuardado || avatarUrl != avatarGuardado
-    // "Cerrar Sesión" saltaba directo con un solo toque, sin nada de por
+    // stringResource(R.string.ajustes_cerrar_sesion_boton) saltaba directo con un solo toque, sin nada de por
     // medio — mismo criterio que "Desvincular" (LinkedAccountsScreen) y las
     // acciones de Ligas (LeagueDetailSheet).
     var showLogoutConfirm by remember { mutableStateOf(false) }
@@ -77,7 +80,7 @@ fun SettingsScreen(
             when (val result = repository.uploadAvatar(context, uri)) {
                 is SettingsResult.Ok -> {
                     avatarUrl = result.data
-                    successMessage = "Foto actualizada"
+                    successMessage = Textos.t(R.string.ajustes_foto_ok)
                 }
                 is SettingsResult.Error -> errorMessage = result.message
             }
@@ -100,10 +103,10 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = Foreground)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_atras), tint = Foreground)
                 }
                 Text(
-                    text = "Ajustes",
+                    text = stringResource(R.string.nav_ajustes),
                     color = Foreground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -119,7 +122,7 @@ fun SettingsScreen(
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text("PERFIL", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.ajustes_seccion_perfil), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(12.dp))
 
             // Foto de perfil — la misma que la web, editable desde aquí.
@@ -152,10 +155,10 @@ fun SettingsScreen(
                     TextButton(onClick = {
                         pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     }) {
-                        Text("Cambiar foto", color = Accent, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.ajustes_cambiar_foto), color = Accent, fontWeight = FontWeight.SemiBold)
                     }
                     Text(
-                        text = "Se ve igual en la web y en la app",
+                        text = stringResource(R.string.ajustes_foto_sub),
                         color = Muted,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(start = 16.dp),
@@ -168,7 +171,7 @@ fun SettingsScreen(
             OutlinedTextField(
                 value = nameInput,
                 onValueChange = { nameInput = it },
-                label = { Text("Nombre de usuario") },
+                label = { Text(stringResource(R.string.ajustes_nombre)) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Accent,
                     unfocusedBorderColor = Border,
@@ -192,7 +195,7 @@ fun SettingsScreen(
                         val result = repository.updateProfile(nameInput, avatarUrl)
                         when (result) {
                             is SettingsResult.Ok -> {
-                                successMessage = "Perfil actualizado"
+                                successMessage = Textos.t(R.string.ajustes_perfil_ok)
                                 nombreGuardado = nameInput
                                 avatarGuardado = avatarUrl
                             }
@@ -208,7 +211,7 @@ fun SettingsScreen(
                 if (isLoading) {
                     CircularProgressIndicator(color = Background, modifier = Modifier.size(24.dp))
                 } else {
-                    Text("Guardar cambios", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.comun_guardar_cambios), fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -221,7 +224,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text("APARIENCIA Y PERSONALIZACIÓN", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.ajustes_seccion_apariencia), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
             ThemePicker(themeStore = themeStore)
 
@@ -239,7 +242,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
             
-            Text("MODO SOLITARIO", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.ajustes_seccion_solitario), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
@@ -252,8 +255,8 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
-                    Text("Ocultar funciones sociales", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                    Text("Oculta la Comunidad y Ligas. Ideal si solo usas la app como herramienta personal.", color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
+                    Text(stringResource(R.string.ajustes_ocultar_social), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.ajustes_ocultar_social_sub), color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
                 }
                 androidx.compose.material3.Switch(
                     checked = themeStore.zenMode,
@@ -267,7 +270,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text("CONEXIONES", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.ajustes_seccion_conexiones), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
@@ -276,12 +279,12 @@ fun SettingsScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Surface),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cuentas Vinculadas", color = Foreground)
+                Text(stringResource(R.string.cuentas_titulo), color = Foreground)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text("AYUDA", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.ajustes_seccion_ayuda), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             // La guía completa (todo lo que hace Paragon + los comandos del
@@ -299,7 +302,7 @@ fun SettingsScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Surface),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cómo funciona Paragon (y el bot de Discord)", color = Foreground)
+                Text(stringResource(R.string.ajustes_como_funciona), color = Foreground)
             }
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -312,26 +315,26 @@ fun SettingsScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Danger)
             ) {
-                Text("Cerrar Sesión", color = Danger, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.ajustes_cerrar_sesion_boton), color = Danger, fontWeight = FontWeight.Bold)
             }
         }
     }
 
     if (showLogoutConfirm) {
         com.paragon.app.ui.common.ConfirmDialog(
-            title = "¿Cerrar sesión?",
-            message = "Tendrás que volver a entrar con Google o Discord para seguir viendo tus trofeos.",
-            confirmLabel = "Cerrar sesión",
+            title = stringResource(R.string.ajustes_cerrar_sesion_titulo),
+            message = stringResource(R.string.ajustes_cerrar_sesion_texto),
+            confirmLabel = stringResource(R.string.ajustes_cerrar_sesion_si),
             onConfirm = onLogout,
             onDismiss = { showLogoutConfirm = false },
         )
     }
 }
 
-private val THEME_OPTIONS = listOf(
-    ThemeMode.SISTEMA to "Sistema",
-    ThemeMode.CLARO to "Claro",
-    ThemeMode.OSCURO to "Oscuro",
+private val THEME_OPTIONS get() = listOf(
+    ThemeMode.SISTEMA to Textos.t(R.string.tema_sistema),
+    ThemeMode.CLARO to Textos.t(R.string.tema_claro),
+    ThemeMode.OSCURO to Textos.t(R.string.tema_oscuro),
 )
 
 /** Sistema/Claro/Oscuro — cambia al instante (ThemeStore es estado de Compose, no hace falta reiniciar la app). */
@@ -420,7 +423,7 @@ private fun PlatformPicker(themeStore: ThemeStore) {
         }
         if (blocked) {
             Text(
-                text = "Desactiva Material You para elegir un tema de plataforma (define fondo y acento).",
+                text = stringResource(R.string.ajustes_material_aviso),
                 color = Muted,
                 fontSize = 11.sp,
                 lineHeight = 14.sp,
@@ -444,8 +447,8 @@ private fun DynamicColorToggle(themeStore: ThemeStore) {
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
-                Text("Material You (Colores Dinámicos)", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                Text("Extrae fondo y acento de tu fondo de pantalla — anula el tema de plataforma mientras esté activo", color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
+                Text(stringResource(R.string.ajustes_material), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.ajustes_material_sub), color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
             }
             androidx.compose.material3.Switch(
                 checked = themeStore.useDynamicColor,
@@ -459,16 +462,16 @@ private fun DynamicColorToggle(themeStore: ThemeStore) {
     }
 }
 
-private val CUSTOM_COLORS = listOf(
-    -1L to "Auto",
-    0xFFFF3B30 to "Rojo",
-    0xFFFF9500 to "Naranja",
-    0xFFFFCC00 to "Amarillo",
-    0xFF4CD964 to "Verde",
-    0xFF5AC8FA to "Celeste",
-    0xFF007AFF to "Azul",
-    0xFF5856D6 to "Violeta",
-    0xFFFF2D55 to "Rosa"
+private val CUSTOM_COLORS get() = listOf(
+    -1L to Textos.t(R.string.color_auto),
+    0xFFFF3B30 to Textos.t(R.string.color_rojo),
+    0xFFFF9500 to Textos.t(R.string.color_naranja),
+    0xFFFFCC00 to Textos.t(R.string.color_amarillo),
+    0xFF4CD964 to Textos.t(R.string.color_verde),
+    0xFF5AC8FA to Textos.t(R.string.color_celeste),
+    0xFF007AFF to Textos.t(R.string.color_azul),
+    0xFF5856D6 to Textos.t(R.string.color_violeta),
+    0xFFFF2D55 to Textos.t(R.string.color_rosa)
 )
 
 @Composable
@@ -480,9 +483,9 @@ private fun CustomColorPicker(themeStore: ThemeStore) {
             .border(1.dp, Border, RoundedCornerShape(14.dp))
             .padding(16.dp)
     ) {
-        Text("Color de Acento Personalizado", color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.ajustes_acento), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
         Text(
-            "Solo cambia el acento (botones, resaltados) — el fondo lo sigue decidiendo la plataforma o Material You",
+            stringResource(R.string.ajustes_acento_sub),
             color = Muted,
             fontSize = 12.sp,
             lineHeight = 16.sp,
@@ -513,11 +516,11 @@ private fun CustomColorPicker(themeStore: ThemeStore) {
     }
 }
 
-private val FONT_OPTIONS = listOf(
-    0 to "Moderna",
-    1 to "Elegante",
-    2 to "Retro",
-    3 to "Casual"
+private val FONT_OPTIONS get() = listOf(
+    0 to Textos.t(R.string.fuente_moderna),
+    1 to Textos.t(R.string.fuente_elegante),
+    2 to Textos.t(R.string.fuente_retro),
+    3 to Textos.t(R.string.fuente_casual)
 )
 
 @Composable

@@ -3,6 +3,8 @@ package com.paragon.app.data
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /**
  * Palmarés (ligas ganadas) + Badges — GET /api/mobile/achievements, ver
@@ -21,7 +23,7 @@ sealed class AchievementsResult {
 
 class AchievementsRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getAchievements(): AchievementsResult {
-        val store = tokenStore ?: return AchievementsResult.Error("Sin sesión.")
+        val store = tokenStore ?: return AchievementsResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.achievementsApi(store).getAchievements()
@@ -30,9 +32,9 @@ class AchievementsRepository(private val tokenStore: TokenStore? = null) {
                 trophyCase = response.trophyCase.map { TrophyCaseAward(it.kind, it.rank, it.titulo, it.earnedAt) },
             )
         } catch (e: HttpException) {
-            AchievementsResult.Error("El servidor respondió con un error (${e.code()}).")
+            AchievementsResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            AchievementsResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            AchievementsResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 }

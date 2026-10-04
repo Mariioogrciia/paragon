@@ -47,6 +47,9 @@ import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 
 import com.paragon.app.data.theme.ThemeStore
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 /** Amigos y Liga reales contra GET /api/mobile/social (SocialRepository) — dos listas distintas, no la misma con otro orden. */
 @Composable
@@ -72,7 +75,12 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     var showNewClanDialog by remember { mutableStateOf(false) }
     var clanCreateError by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val tabs = listOf("Ligas", "Mis Ligas", "Amigos", "Clan")
+    val tabs = listOf(
+        stringResource(R.string.social_tab_ligas),
+        stringResource(R.string.social_tab_mis_ligas),
+        stringResource(R.string.social_tab_amigos),
+        stringResource(R.string.social_tab_clan),
+    )
 
     LaunchedEffect(retryCounter.value) {
         result = null
@@ -125,7 +133,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                             modifier = Modifier.padding(top = 16.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Accent),
                         ) {
-                            Text("Reintentar")
+                            Text(stringResource(R.string.comun_reintentar))
                         }
                     }
                 }
@@ -155,7 +163,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                         val miClan = current.myClan
                         if (miClan != null) {
                             ClanCard(
-                                title = "TU CLAN",
+                                title = stringResource(R.string.social_tu_clan),
                                 subtitle = "[${miClan.tag}] ${miClan.name}",
                                 onClick = { selectedClanTag = miClan.tag },
                             )
@@ -166,7 +174,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                     if (current.clans.isEmpty()) {
                         item {
                             Text(
-                                text = "Todavía no hay ningún clan. ¡Sé el primero en crear uno!",
+                                text = stringResource(R.string.social_sin_clanes),
                                 color = Muted,
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(top = 4.dp),
@@ -192,7 +200,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                             modifier = Modifier.padding(top = 16.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Accent),
                         ) {
-                            Text("Reintentar")
+                            Text(stringResource(R.string.comun_reintentar))
                         }
                     }
                 }
@@ -227,7 +235,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                     if (current.leagues.isEmpty()) {
                         item {
                             Text(
-                                text = "Solo con quien tú quieras — invita a amigos, no a toda la comunidad.",
+                                text = stringResource(R.string.social_mis_ligas_sub),
                                 color = Muted,
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(top = 4.dp),
@@ -253,7 +261,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                             modifier = Modifier.padding(top = 16.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Accent),
                         ) {
-                            Text("Reintentar")
+                            Text(stringResource(R.string.comun_reintentar))
                         }
                     }
                 }
@@ -266,14 +274,14 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                     if (vacioAmigos) {
                         com.paragon.app.ui.common.EmptyState(
                             icon = Icons.Default.Add,
-                            title = "Todavía no tienes amigos en Paragon",
-                            description = "Búscalos por su @handle desde Comparar, o compartiendo el tuyo — así podéis ver el progreso del otro.",
+                            title = stringResource(R.string.social_sin_amigos),
+                            description = stringResource(R.string.social_sin_amigos_sub),
                         )
                     } else if (vacioLiga) {
                         com.paragon.app.ui.common.EmptyState(
                             icon = Icons.Default.Add,
-                            title = "Sin ranking todavía",
-                            description = "En cuanto tengas amigos en Paragon, aquí saldréis clasificados por Paragon Score.",
+                            title = stringResource(R.string.social_sin_ranking),
+                            description = stringResource(R.string.social_sin_ranking_sub),
                         )
                     } else {
                         LazyColumn(
@@ -392,7 +400,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
 @Composable
 private fun OfflineBanner() {
     Text(
-        text = "Sin conexión — mostrando la última copia guardada",
+        text = stringResource(R.string.comun_sin_conexion_copia),
         color = Muted,
         fontSize = 11.sp,
     )
@@ -408,18 +416,18 @@ private fun LeagueInviteRow(invite: LeagueInvite, onAccept: () -> Unit, onDeclin
             .padding(16.dp),
     ) {
         Text(invite.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-        Text("${invite.ownerName} te ha invitado", color = Muted, fontSize = 12.sp)
+        Text(stringResource(R.string.social_te_ha_invitado, invite.ownerName), color = Muted, fontSize = 12.sp)
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
-                text = "Aceptar",
+                text = stringResource(R.string.comun_aceptar),
                 color = Accent,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.sp,
                 modifier = Modifier.clickable(onClick = onAccept),
             )
             Text(
-                text = "Rechazar",
+                text = stringResource(R.string.comun_rechazar),
                 color = Muted,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.sp,
@@ -429,7 +437,7 @@ private fun LeagueInviteRow(invite: LeagueInvite, onAccept: () -> Unit, onDeclin
     }
 }
 
-private val UNIDADES_DURACION = listOf("dias" to "Días", "semanas" to "Semanas", "meses" to "Meses", "anios" to "Años")
+private val UNIDADES_DURACION get() = listOf("dias" to Textos.t(R.string.duracion_dias), "semanas" to Textos.t(R.string.duracion_semanas), "meses" to Textos.t(R.string.duracion_meses), "anios" to Textos.t(R.string.duracion_anios))
 
 @Composable
 private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, String?) -> Unit) {
@@ -440,13 +448,13 @@ private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, Stri
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Surface,
-        title = { Text("Nueva liga", color = Foreground, fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.social_nueva_liga), color = Foreground, fontWeight = FontWeight.Bold) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { if (it.length <= 60) name = it },
-                    placeholder = { Text("Los de siempre") },
+                    placeholder = { Text(stringResource(R.string.social_liga_ph)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -457,7 +465,7 @@ private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, Stri
                     ),
                 )
                 Spacer(Modifier.height(12.dp))
-                Text("Duración (opcional)", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(stringResource(R.string.social_duracion), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
                     value = durationValue,
@@ -494,11 +502,11 @@ private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, Stri
                 onClick = { onCreate(name, durationValue.toIntOrNull(), durationUnit) },
                 enabled = name.isNotBlank(),
             ) {
-                Text("Crear", color = Accent, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.comun_crear), color = Accent, fontWeight = FontWeight.SemiBold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = Muted) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.comun_cancelar), color = Muted) }
         },
     )
 }
@@ -543,16 +551,16 @@ private fun CreateLeagueHero(onClick: () -> Unit) {
             .clickable { onClick() }
             .padding(18.dp),
     ) {
-        Text("CREA TU PROPIA LIGA", color = Accent, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 1.sp)
+        Text(stringResource(R.string.social_crea_liga), color = Accent, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 1.sp)
         Text(
-            "Compite con tus amigos durante el tiempo que quieras — solo entre quien tú invites.",
+            stringResource(R.string.social_crea_liga_sub),
             color = Muted,
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Add, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(16.dp))
-            Text("Crear liga", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
+            Text(stringResource(R.string.social_crear_liga), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
         }
     }
 }
@@ -582,8 +590,8 @@ fun LeagueRowItem(league: League, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
             Text(text = league.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(
-                text = "${league.memberCount} ${if (league.memberCount == 1) "miembro" else "miembros"}" +
-                    (dias?.let { " · Termina en $it ${if (it == 1) "día" else "días"}" } ?: ""),
+                text = (if (league.memberCount == 1) stringResource(R.string.comun_miembros_1, league.memberCount) else stringResource(R.string.comun_miembros_n, league.memberCount)) +
+                    (dias?.let { " · " + (if (it == 1) stringResource(R.string.comun_termina_en_1, it) else stringResource(R.string.comun_termina_en_n, it)) } ?: ""),
                 color = Muted,
                 fontSize = 12.sp,
             )
@@ -601,18 +609,18 @@ private fun ClanInviteRow(invite: ClanInvite, onAccept: () -> Unit, onDecline: (
             .padding(16.dp),
     ) {
         Text("[${invite.clanTag}] ${invite.clanName}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-        Text("${invite.invitedByName} te invita a unirte", color = Muted, fontSize = 12.sp)
+        Text(stringResource(R.string.social_te_invita, invite.invitedByName), color = Muted, fontSize = 12.sp)
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
-                text = "Unirme",
+                text = stringResource(R.string.social_unirme),
                 color = Accent,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.sp,
                 modifier = Modifier.clickable(onClick = onAccept),
             )
             Text(
-                text = "Rechazar",
+                text = stringResource(R.string.comun_rechazar),
                 color = Muted,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.sp,
@@ -651,16 +659,16 @@ private fun CreateClanHero(onClick: () -> Unit) {
             .clickable { onClick() }
             .padding(18.dp),
     ) {
-        Text("CREA TU PROPIO CLAN", color = Accent, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 1.sp)
+        Text(stringResource(R.string.social_crea_clan), color = Accent, fontWeight = FontWeight.Black, fontSize = 13.sp, letterSpacing = 1.sp)
         Text(
-            "Necesitas ser al menos Nivel 5 de Paragon. Une fuerzas con tu gente y sumad XP juntos.",
+            stringResource(R.string.social_crea_clan_sub),
             color = Muted,
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Add, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(16.dp))
-            Text("Crear clan", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
+            Text(stringResource(R.string.social_crear_clan), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
         }
     }
 }
@@ -693,7 +701,7 @@ private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
             }
         }
         Text(
-            text = "${clan.memberCount} ${if (clan.memberCount == 1) "miembro" else "miembros"}",
+            text = if (clan.memberCount == 1) stringResource(R.string.comun_miembros_1, clan.memberCount) else stringResource(R.string.comun_miembros_n, clan.memberCount),
             color = Muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
@@ -710,11 +718,11 @@ private fun NewClanDialog(error: String?, onDismiss: () -> Unit, onCreate: (Stri
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Surface,
-        title = { Text("Nuevo clan", color = Foreground, fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.social_nuevo_clan), color = Foreground, fontWeight = FontWeight.Bold) },
         text = {
             Column {
                 Text(
-                    "Necesitas ser al menos Nivel 5 de Paragon, y no pertenecer ya a otro clan.",
+                    stringResource(R.string.social_nuevo_clan_sub),
                     color = Muted,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 12.dp),
@@ -722,7 +730,7 @@ private fun NewClanDialog(error: String?, onDismiss: () -> Unit, onCreate: (Stri
                 OutlinedTextField(
                     value = name,
                     onValueChange = { if (it.length <= 60) name = it },
-                    placeholder = { Text("Nombre del clan") },
+                    placeholder = { Text(stringResource(R.string.social_clan_nombre)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -736,7 +744,7 @@ private fun NewClanDialog(error: String?, onDismiss: () -> Unit, onCreate: (Stri
                 OutlinedTextField(
                     value = tag,
                     onValueChange = { if (it.length <= 5) tag = it.uppercase() },
-                    placeholder = { Text("ETIQ (máx. 5)") },
+                    placeholder = { Text(stringResource(R.string.social_clan_tag)) },
                     singleLine = true,
                     modifier = Modifier.width(140.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -750,7 +758,7 @@ private fun NewClanDialog(error: String?, onDismiss: () -> Unit, onCreate: (Stri
                 OutlinedTextField(
                     value = description,
                     onValueChange = { if (it.length <= 200) description = it },
-                    placeholder = { Text("Descripción (opcional)") },
+                    placeholder = { Text(stringResource(R.string.social_clan_desc)) },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 70.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Accent,
@@ -769,11 +777,11 @@ private fun NewClanDialog(error: String?, onDismiss: () -> Unit, onCreate: (Stri
                 enabled = name.isNotBlank() && tag.isNotBlank(),
                 onClick = { onCreate(name.trim(), tag.trim(), description.trim()) },
             ) {
-                Text("Crear", color = Accent, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.comun_crear), color = Accent, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = Muted) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.comun_cancelar), color = Muted) }
         },
     )
 }
@@ -802,13 +810,13 @@ private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPunto
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column {
-                Text("LIGA MENSUAL", color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp)
-                Text("Los mejores cazatrofeos de este mes", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                Text(stringResource(R.string.social_liga_mensual), color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp)
+                Text(stringResource(R.string.social_liga_mensual_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("⏱", fontSize = 13.sp)
                 Text(
-                    text = if (diasRestantes <= 0) "Termina hoy" else "Termina en $diasRestantes ${if (diasRestantes == 1) "día" else "días"}",
+                    text = if (diasRestantes <= 0) stringResource(R.string.comun_termina_hoy) else if (diasRestantes == 1) stringResource(R.string.comun_termina_en_1, diasRestantes) else stringResource(R.string.comun_termina_en_n, diasRestantes),
                     color = if (diasRestantes <= 2) PodiumGold else Muted,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -821,8 +829,8 @@ private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPunto
             HorizontalDivider(color = Platinum.copy(alpha = 0.2f))
             Spacer(Modifier.height(10.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("$misPuntos puntos", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                Text("Puesto $miPosicion de $totalParticipantes", color = Muted, fontSize = 12.sp)
+                Text(stringResource(R.string.comun_puntos, misPuntos), color = Platinum, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text(stringResource(R.string.social_puesto, miPosicion, totalParticipantes), color = Muted, fontSize = 12.sp)
             }
         }
     }
@@ -865,12 +873,12 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
                     Text("🥇", fontSize = 20.sp)
                 }
                 Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 8.dp))
-                Text("${primero.points} puntos", color = PodiumGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(stringResource(R.string.comun_puntos, primero.points), color = PodiumGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 val segundo = top3.getOrNull(1)
                 if (segundo != null) {
                     val diferencia = primero.points - segundo.points
                     if (diferencia > 0) {
-                        Text("+$diferencia frente al segundo", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
+                        Text(stringResource(R.string.social_ventaja, diferencia), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
                     }
                 }
             }
@@ -900,7 +908,7 @@ private fun PodiumSecondaryCard(row: LigaRow, medalla: String, color: androidx.c
             Text(medalla, fontSize = 14.sp)
         }
         Text(row.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, modifier = Modifier.padding(top = 6.dp))
-        Text("${row.points} puntos", color = Muted, fontSize = 11.sp)
+        Text(stringResource(R.string.comun_puntos, row.points), color = Muted, fontSize = 11.sp)
     }
 }
 
@@ -945,7 +953,7 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
                 Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(text = "${row.points} puntos este mes", color = Muted, fontSize = 12.sp)
+                Text(text = stringResource(R.string.social_puntos_mes, row.points), color = Muted, fontSize = 12.sp)
             }
         }
         Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -968,7 +976,7 @@ fun AmigoRowItem(row: AmigoRow, position: Int, onClick: () -> Unit) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
                 Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(text = "Nivel Paragon ${row.level} · ${row.platinos} platinos", color = Muted, fontSize = 12.sp)
+                Text(text = stringResource(R.string.social_nivel_platinos, row.level, row.platinos), color = Muted, fontSize = 12.sp)
                 if (row.accounts.isNotEmpty()) {
                     Text(
                         text = row.accounts.joinToString(" · ") { "${it.platform.uppercase()}: ${it.username}" },

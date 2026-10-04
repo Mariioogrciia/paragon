@@ -33,6 +33,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.navigation.Screen
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Carpetas de juegos, contra GET/POST/PATCH/DELETE /api/mobile/collections
@@ -70,10 +72,10 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = { if (selected != null) selected = null else onBack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Foreground)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_volver), tint = Foreground)
             }
             Text(
-                text = (selected?.name ?: "CARPETAS").uppercase(),
+                text = (selected?.name ?: stringResource(R.string.carpetas_titulo)).uppercase(),
                 color = Foreground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -81,7 +83,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
             )
             if (selected == null) {
                 IconButton(onClick = { showCreateDialog = true }) {
-                    Icon(Icons.Default.Add, contentDescription = "Nueva carpeta", tint = Accent)
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.carpeta_nueva), tint = Accent)
                 }
             }
         }
@@ -98,7 +100,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                         onClick = { retryCounter.value += 1 },
                         modifier = Modifier.padding(top = 16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                    ) { Text("Reintentar") }
+                    ) { Text(stringResource(R.string.comun_reintentar)) }
                 }
             }
             current is CollectionsResult.Ok -> {
@@ -138,7 +140,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
 
     if (showCreateDialog) {
         NameDialog(
-            title = "Nueva carpeta",
+            title = stringResource(R.string.carpeta_nueva),
             initialValue = "",
             onDismiss = { showCreateDialog = false },
             onConfirm = { name ->
@@ -155,7 +157,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
 
     renaming?.let { coleccion ->
         NameDialog(
-            title = "Renombrar carpeta",
+            title = stringResource(R.string.carpeta_renombrar),
             initialValue = coleccion.name,
             onDismiss = { renaming = null },
             onConfirm = { name ->
@@ -183,8 +185,8 @@ private fun CollectionsList(
     if (collections.isEmpty()) {
         com.paragon.app.ui.common.EmptyState(
             icon = Icons.Default.Folder,
-            title = "Todavía no tienes ninguna carpeta",
-            description = "Agrupa tus juegos como quieras — por saga, por plataforma, por lo que sea — y créalas con el + de arriba.",
+            title = stringResource(R.string.carpeta_vacio),
+            description = stringResource(R.string.carpeta_vacio_sub),
         )
         return
     }
@@ -206,13 +208,13 @@ private fun CollectionsList(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = coleccion.name, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                    Text(text = "${coleccion.gameIds.size} juegos", color = Muted, fontSize = 12.sp)
+                    Text(text = stringResource(R.string.comun_n_juegos, coleccion.gameIds.size), color = Muted, fontSize = 12.sp)
                 }
                 IconButton(onClick = { onRename(coleccion) }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Renombrar", tint = Muted)
+                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.comun_renombrar), tint = Muted)
                 }
                 IconButton(onClick = { deleting = coleccion }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Borrar", tint = Danger)
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.comun_borrar), tint = Danger)
                 }
             }
         }
@@ -220,9 +222,9 @@ private fun CollectionsList(
 
     deleting?.let { coleccion ->
         com.paragon.app.ui.common.ConfirmDialog(
-            title = "¿Borrar esta carpeta?",
-            message = "\"${coleccion.name}\" desaparece con los ${coleccion.gameIds.size} juegos que agrupa (los juegos en sí no se borran, solo la carpeta).",
-            confirmLabel = "Sí, borrar",
+            title = stringResource(R.string.carpeta_borrar_titulo),
+            message = stringResource(R.string.carpeta_borrar_texto, coleccion.name, coleccion.gameIds.size),
+            confirmLabel = stringResource(R.string.comun_si_borrar),
             onConfirm = { onDelete(coleccion) },
             onDismiss = { deleting = null },
         )
@@ -234,8 +236,8 @@ private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> U
     if (games.isEmpty()) {
         com.paragon.app.ui.common.EmptyState(
             icon = Icons.Default.Folder,
-            title = "Ningún juego en esta carpeta todavía",
-            description = "Añádelos desde su ficha, o desde la Biblioteca con el menú de cada tarjeta.",
+            title = stringResource(R.string.carpeta_sin_juegos),
+            description = stringResource(R.string.carpeta_sin_juegos_sub),
         )
         return
     }
@@ -265,7 +267,7 @@ private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> U
                     Text(text = "${game.progressPercent}%", color = Muted, fontSize = 12.sp)
                 }
                 IconButton(onClick = { onRemove(game.id) }) {
-                    Icon(Icons.Default.Close, contentDescription = "Quitar de la carpeta", tint = Muted)
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.carpeta_quitar), tint = Muted)
                 }
             }
         }
@@ -295,11 +297,11 @@ private fun NameDialog(title: String, initialValue: String, onDismiss: () -> Uni
         },
         confirmButton = {
             TextButton(onClick = { if (name.isNotBlank()) onConfirm(name.trim()) }) {
-                Text("Guardar", color = Accent)
+                Text(stringResource(R.string.comun_guardar), color = Accent)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = Muted) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.comun_cancelar), color = Muted) }
         },
     )
 }
@@ -323,7 +325,7 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
 
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp).padding(bottom = 24.dp)) {
-            Text(text = "AÑADIR A CARPETA", color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(text = stringResource(R.string.carpeta_anadir), color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(Modifier.height(12.dp))
 
             val actuales = collections
@@ -331,7 +333,7 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
                 actuales == null -> Box(modifier = Modifier.fillMaxWidth().height(80.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Accent)
                 }
-                actuales.isEmpty() -> Text(text = "Todavía no tienes ninguna carpeta. Crea una desde Biblioteca.", color = Muted, fontSize = 13.sp)
+                actuales.isEmpty() -> Text(text = stringResource(R.string.carpeta_vacio_crear), color = Muted, fontSize = 13.sp)
                 else -> actuales.forEach { coleccion ->
                     var dentro by remember(coleccion.id) { mutableStateOf(gameId in coleccion.gameIds) }
                     Row(

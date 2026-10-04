@@ -26,6 +26,8 @@ import com.paragon.app.ui.theme.Background
 import com.paragon.app.ui.theme.Foreground
 import com.paragon.app.ui.theme.Muted
 import com.paragon.app.ui.theme.Platinum
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Tarjeta vertical (9:16, estilo Instagram/TikTok Stories) para el Platino
@@ -44,10 +46,10 @@ fun TrophyShareCard(
     handle: String,
     earnedTrophies: Int? = null,
     totalTrophies: Int? = null,
-    // "PLATINO" por defecto (el uso de siempre, GameDetailScreen); la
+    // stringResource(R.string.comparte_badge_platino) por defecto (el uso de siempre, GameDetailScreen); la
     // galería de hitos (StatsScreen) pasa "TU PLATINO #47", "PRIMER
     // TROFEO"... — mismo diseño de tarjeta, distinto rótulo.
-    badge: String = "PLATINO",
+    badge: String = stringResource(R.string.comparte_badge_platino),
     // Sustituye a "X/Y trofeos conseguidos" cuando no hay esos dos números
     // que mostrar (un hito no tiene "progreso", tiene una fecha).
     subtitle: String? = null,
@@ -112,12 +114,12 @@ fun TrophyShareCard(
                     modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
                 )
                 val lineaProgreso = subtitle
-                    ?: if (earnedTrophies != null && totalTrophies != null) "$earnedTrophies/$totalTrophies trofeos conseguidos" else null
+                    ?: if (earnedTrophies != null && totalTrophies != null) stringResource(R.string.comparte_trofeos, earnedTrophies, totalTrophies) else null
                 lineaProgreso?.let {
                     Text(text = it, color = Muted, fontSize = 14.sp)
                 }
                 Text(
-                    text = "@$handle en Paragon",
+                    text = stringResource(R.string.comparte_handle, handle),
                     color = Accent,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,

@@ -94,6 +94,8 @@ import com.paragon.app.ui.theme.Border
 import com.paragon.app.ui.theme.Foreground
 import com.paragon.app.ui.theme.Gold
 import com.paragon.app.ui.theme.Muted
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 // Definimos la estructura de items de navegación
 sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
@@ -180,7 +182,7 @@ fun MainScreen(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("Buscar juego...", color = Muted) },
+                        placeholder = { Text(stringResource(R.string.main_buscar_ph), color = Muted) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Background,
                             unfocusedContainerColor = Background,
@@ -196,7 +198,7 @@ fun MainScreen(
                         isSearchActive = false
                         searchQuery = "" 
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar búsqueda", tint = Foreground)
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.main_cerrar_busqueda), tint = Foreground)
                     }
                 } else {
                     ParagonWordmark()
@@ -206,7 +208,7 @@ fun MainScreen(
                         IconButton(onClick = { isSearchActive = true }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = "Buscar",
+                                contentDescription = stringResource(R.string.comun_buscar_accion),
                                 tint = Foreground
                             )
                         }
@@ -241,10 +243,10 @@ fun MainScreen(
                             onDismissRequest = { isMenuExpanded = false },
                             // Antes era el menú desplegable genérico de
                             // Material sin más (fondo plano, texto suelto
-                            // sin iconos, "Ajustes" mezclado con accesos
+                            // sin iconos, stringResource(R.string.nav_ajustes) mezclado con accesos
                             // directos como si fuera uno más) — borde +
                             // esquinas propias de la app, un icono por
-                            // opción, y "Ajustes" separado por un divisor
+                            // opción, y stringResource(R.string.nav_ajustes) separado por un divisor
                             // porque es la única que no es un atajo a una
                             // función, es la puerta a toda una sección.
                             modifier = Modifier
@@ -254,7 +256,7 @@ fun MainScreen(
                         ) {
                             HeaderMenuItem(
                                 icon = Icons.Default.CenterFocusStrong,
-                                label = "Modo Enfoque",
+                                label = stringResource(R.string.nav_enfoque),
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.Focus.route)
@@ -262,7 +264,7 @@ fun MainScreen(
                             )
                             HeaderMenuItem(
                                 icon = Icons.AutoMirrored.Filled.CompareArrows,
-                                label = "Comparar",
+                                label = stringResource(R.string.nav_comparar),
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate("compare")
@@ -270,7 +272,7 @@ fun MainScreen(
                             )
                             HeaderMenuItem(
                                 icon = Icons.Default.Folder,
-                                label = "Carpetas",
+                                label = stringResource(R.string.nav_carpetas),
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.Collections.route)
@@ -278,7 +280,7 @@ fun MainScreen(
                             )
                             HeaderMenuItem(
                                 icon = Icons.Default.Star,
-                                label = "Trofeos Atascados",
+                                label = stringResource(R.string.nav_atascados_menu),
                                 onClick = {
                                     isMenuExpanded = false
                                     navController.navigate(Screen.StuckTrophies.route)
@@ -287,7 +289,7 @@ fun MainScreen(
                             HorizontalDivider(color = Border, modifier = Modifier.padding(vertical = 4.dp))
                             HeaderMenuItem(
                                 icon = Icons.Default.Settings,
-                                label = "Ajustes",
+                                label = stringResource(R.string.nav_ajustes),
                                 iconTint = Accent,
                                 onClick = {
                                     isMenuExpanded = false
@@ -523,7 +525,7 @@ private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Default.Whatshot,
-            contentDescription = if (viva) "Racha de ${racha.actual} días" else "Sin racha activa",
+            contentDescription = if (viva) stringResource(R.string.main_racha, racha.actual) else stringResource(R.string.main_sin_racha),
             tint = if (viva) Gold else Muted,
             modifier = Modifier.size(20.dp),
         )

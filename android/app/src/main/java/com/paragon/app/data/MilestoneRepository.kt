@@ -4,6 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.network.HitoDto
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Cerrojo de Hitos: qué juego está reservado ahora mismo para tu próximo platino en número redondo. */
 data class HitoReservado(
@@ -22,15 +24,15 @@ private fun HitoDto.toHitoReservado() = HitoReservado(gameId, titulo, iconUrl, n
 
 class MilestoneRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getMilestone(): MilestoneResult {
-        val store = tokenStore ?: return MilestoneResult.Error("Sin sesión.")
+        val store = tokenStore ?: return MilestoneResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.milestoneApi(store).getMilestone()
             MilestoneResult.Ok(response.hito?.toHitoReservado())
         } catch (e: HttpException) {
-            MilestoneResult.Error("El servidor respondió con un error (${e.code()}).")
+            MilestoneResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            MilestoneResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            MilestoneResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 }

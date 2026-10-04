@@ -43,6 +43,8 @@ import com.paragon.app.data.mensajeClanActividad
 import com.paragon.app.ui.common.ConfirmDialog
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 private val MEDALLA = mapOf(0 to "🥇", 1 to "🥈", 2 to "🥉")
 
@@ -114,13 +116,13 @@ fun ClanDetailSheet(
         val detail = (result as? ClanDetailResult.Ok)?.detail
         val esOwner = detail?.amIOwner == true
         ConfirmDialog(
-            title = if (esOwner) "¿Abandonar tu propio clan?" else "¿Salir del clan?",
+            title = if (esOwner) stringResource(R.string.clan_abandonar_propio) else stringResource(R.string.clan_salir_titulo),
             message = if (esOwner) {
-                "Al ser el líder, si sales el clan entero desaparece — para todos sus miembros, con su ranking y su actividad. No se puede deshacer."
+                stringResource(R.string.clan_abandonar_propio_texto)
             } else {
-                "Dejarás de aparecer en el ranking de \"${detail?.name}\" — tendrían que volver a invitarte para que entres otra vez."
+                stringResource(R.string.clan_salir_texto, detail?.name ?: "")
             },
-            confirmLabel = if (esOwner) "Sí, borrar el clan" else "Sí, salir",
+            confirmLabel = if (esOwner) stringResource(R.string.clan_borrar_si) else stringResource(R.string.liga_salir_si),
             onConfirm = {
                 confirmLeave = false
                 scope.launch {
@@ -136,9 +138,9 @@ fun ClanDetailSheet(
 
     inviteError?.let { message ->
         ConfirmDialog(
-            title = "No se pudo invitar",
+            title = stringResource(R.string.clan_invitar_error),
             message = message,
-            confirmLabel = "Vale",
+            confirmLabel = stringResource(R.string.comun_vale),
             onConfirm = { inviteError = null },
             onDismiss = { inviteError = null },
         )
@@ -175,11 +177,11 @@ private fun ClanDetailContent(
         Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             Column {
-                Text(text = "XP TOTAL", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = stringResource(R.string.clan_xp_total), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 Text(text = "${detail.score}".reversed().chunked(3).joinToString(".").reversed(), color = Platinum, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
             Column {
-                Text(text = "MIEMBROS", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = stringResource(R.string.clan_miembros), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 Text(text = detail.leaderboard.size.toString(), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
         }
@@ -187,11 +189,11 @@ private fun ClanDetailContent(
         Spacer(Modifier.height(16.dp))
         if (!detail.amIMember) {
             TextButton(onClick = onJoin) {
-                Text("Unirme a este clan", color = Accent, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(stringResource(R.string.clan_unirme), color = Accent, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
         } else {
             TextButton(onClick = onRequestLeave) {
-                Text(if (detail.amIOwner) "Abandonar clan (lo borra)" else "Abandonar clan", color = Danger, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(if (detail.amIOwner) stringResource(R.string.clan_abandonar_borra) else stringResource(R.string.clan_abandonar), color = Danger, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
             }
         }
 
@@ -199,7 +201,7 @@ private fun ClanDetailContent(
         HorizontalDivider(color = Border)
         Spacer(Modifier.height(16.dp))
 
-        Text(text = "RANKING", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = stringResource(R.string.clan_ranking), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Spacer(Modifier.height(8.dp))
         detail.leaderboard.forEachIndexed { index, member ->
             ClanMemberRow(member, index, onClick = { onMemberClick(member.handle) })
@@ -209,10 +211,10 @@ private fun ClanDetailContent(
         HorizontalDivider(color = Border)
         Spacer(Modifier.height(16.dp))
 
-        Text(text = "ACTIVIDAD DEL CLAN", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = stringResource(R.string.clan_actividad), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         Spacer(Modifier.height(8.dp))
         if (detail.activity.isEmpty()) {
-            Text(text = "Todavía no hay nada que enseñar aquí.", color = Muted, fontSize = 13.sp)
+            Text(text = stringResource(R.string.clan_actividad_vacia), color = Muted, fontSize = 13.sp)
         } else {
             detail.activity.forEach { item -> ClanActivityRow(item) }
         }
@@ -221,11 +223,11 @@ private fun ClanDetailContent(
             Spacer(Modifier.height(16.dp))
             HorizontalDivider(color = Border)
             Spacer(Modifier.height(16.dp))
-            Text(text = "INVITAR A UN AMIGO", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(text = stringResource(R.string.liga_invitar_amigo), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(Modifier.height(8.dp))
             if (detail.invitables.isEmpty()) {
                 Text(
-                    text = "No tienes amigos disponibles ahora mismo — o ya están todos en un clan, o ya se lo has pedido.",
+                    text = stringResource(R.string.clan_sin_amigos),
                     color = Muted,
                     fontSize = 13.sp,
                 )
@@ -256,7 +258,7 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             Text(
-                text = MEDALLA[index] ?: "${index + 1}º",
+                text = MEDALLA[index] ?: stringResource(R.string.clan_posicion, index + 1),
                 color = Muted,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
@@ -275,7 +277,7 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit) {
             Spacer(Modifier.width(10.dp))
             Column {
                 Text(text = member.name, color = if (esPrimero) Platinum else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                Text(text = "${if (member.role == "owner") "Líder" else "Miembro"} · ${member.trofeos} trofeos", color = Muted, fontSize = 11.sp)
+                Text(text = stringResource(R.string.clan_rol_trofeos, if (member.role == "owner") stringResource(R.string.clan_lider) else stringResource(R.string.clan_miembro), member.trofeos), color = Muted, fontSize = 11.sp)
             }
         }
         Text(text = "${member.score}", color = Platinum, fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -311,6 +313,6 @@ private fun InvitableFriendRow(friend: InvitableFriend, onInvite: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(text = friend.name, color = Foreground, fontSize = 14.sp)
-        Text(text = "Invitar", color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(text = stringResource(R.string.comun_invitar), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     }
 }

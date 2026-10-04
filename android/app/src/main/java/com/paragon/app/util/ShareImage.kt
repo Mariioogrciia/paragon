@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
+import com.paragon.app.R
+import com.paragon.app.util.Textos
 
 /**
  * Comparte un bitmap ya renderizado (la tarjeta de Platino, ver
@@ -31,5 +33,5 @@ fun shareBitmapAsImage(context: Context, bitmap: Bitmap, fileName: String = "par
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(Intent.createChooser(sendIntent, "Compartir Platino"))
+    context.startActivity(Intent.createChooser(sendIntent, Textos.t(R.string.ficha_compartir_platino)))
 }

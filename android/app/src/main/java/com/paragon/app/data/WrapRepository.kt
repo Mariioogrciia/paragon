@@ -2,6 +2,8 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 data class WrapTopGenre(val name: String, val count: Int)
 data class WrapTopGame(val id: String, val title: String, val iconUrl: String?, val horasTotal: Double, val earnedTrophies: Int)
@@ -32,7 +34,7 @@ sealed class WrapResult {
 
 class WrapRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getWrap(): WrapResult {
-        val store = tokenStore ?: return WrapResult.Error("Sin sesión.")
+        val store = tokenStore ?: return WrapResult.Error(Textos.t(R.string.error_sin_sesion))
         return try {
             val dto = ApiClient.wrapApi(store).getWrap()
             WrapResult.Ok(
@@ -48,7 +50,7 @@ class WrapRepository(private val tokenStore: TokenStore? = null) {
                 ),
             )
         } catch (e: Exception) {
-            WrapResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            WrapResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 }

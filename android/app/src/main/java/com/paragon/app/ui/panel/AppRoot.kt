@@ -64,6 +64,7 @@ import com.paragon.app.ui.theme.Platinum
 import com.paragon.app.ui.theme.Silver
 import com.paragon.app.ui.theme.Surface as SurfaceColor
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
 
 /**
  * Puerta de entrada real antes de `MainScreen` (el NavHost + BottomBar de
@@ -133,7 +134,7 @@ private const val PREFS_ONBOARDING = "paragon_onboarding"
 private const val CLAVE_VINCULAR_SALTADO = "vincular_saltado"
 
 /**
- * "Último paso: vincula tu cuenta" — reutiliza LinkedAccountsScreen tal
+ * stringResource(R.string.alta_ultimo_paso) — reutiliza LinkedAccountsScreen tal
  * cual (la misma que Ajustes → Cuentas vinculadas) con una cabecera que
  * explica el paso y dos salidas: recargar el panel ya con la cuenta, o
  * saltarlo.
@@ -144,13 +145,13 @@ private fun VincularCuentaGate(tokenStore: TokenStore, onListo: () -> Unit, onSa
     Column(modifier = Modifier.fillMaxSize().background(Background).statusBarsPadding()) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)) {
             Text(
-                text = "Último paso: vincula tu cuenta",
+                text = stringResource(R.string.alta_ultimo_paso),
                 color = Foreground,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Tus trofeos salen de tu perfil de PlayStation, Steam o Xbox. Vincula al menos uno y en unos minutos tendrás tu biblioteca aquí.",
+                text = stringResource(R.string.alta_ultimo_paso_sub),
                 color = Muted,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 6.dp),
@@ -160,11 +161,11 @@ private fun VincularCuentaGate(tokenStore: TokenStore, onListo: () -> Unit, onSa
                     onClick = onListo,
                     colors = ButtonDefaults.buttonColors(containerColor = Accent),
                 ) {
-                    Text("Ya lo he vinculado")
+                    Text(stringResource(R.string.alta_ya_vinculado))
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 TextButton(onClick = onSaltar) {
-                    Text("Saltar por ahora", color = Muted)
+                    Text(stringResource(R.string.alta_saltar), color = Muted)
                 }
             }
         }
@@ -233,7 +234,7 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
                 modifier = Modifier.padding(top = 18.dp),
             )
             Text(
-                text = "El siguiente platino no se espera.",
+                text = stringResource(R.string.login_lema),
                 color = Accent,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -244,28 +245,28 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(bottom = 32.dp),
             ) {
-                GradeChip("87", "Platino", Platinum)
-                GradeChip("341", "Oro", Gold)
-                GradeChip("812", "Plata", Silver)
-                GradeChip("3072", "Bronce", Bronze)
+                GradeChip("87", stringResource(R.string.grado_platino), Platinum)
+                GradeChip("341", stringResource(R.string.grado_oro), Gold)
+                GradeChip("812", stringResource(R.string.grado_plata), Silver)
+                GradeChip("3072", stringResource(R.string.grado_bronce), Bronze)
             }
 
             ProviderButton(
-                label = "Continuar con Google",
+                label = stringResource(R.string.login_google),
                 iconRes = R.drawable.ic_google,
                 accentColor = GoogleBlue,
                 onClick = { onLogin("google") },
             )
             Spacer(Modifier.height(12.dp))
             ProviderButton(
-                label = "Continuar con Discord",
+                label = stringResource(R.string.login_discord),
                 iconRes = R.drawable.ic_discord,
                 accentColor = DiscordBlurple,
                 onClick = { onLogin("discord") },
             )
 
             Text(
-                text = "No guardamos contraseñas: el acceso lo lleva tu proveedor.",
+                text = stringResource(R.string.login_sin_contrasenas),
                 color = Muted,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
@@ -295,7 +296,7 @@ private fun GradeChip(value: String, label: String, color: Color) {
 /**
  * Paso 1 del alta (ver POST /api/mobile/profile/handle): sin esto, un login
  * nuevo por Google/Discord se quedaba mirando "El servidor respondió con un
- * error (409)" con un botón "Reintentar" que repite la misma petición para
+ * error (409)" con un botón stringResource(R.string.comun_reintentar) que repite la misma petición para
  * siempre — el 409 es real y esperado (perfil sin `handle` todavía), no un
  * fallo de red, y nunca se arregla solo.
  */
@@ -330,14 +331,14 @@ private fun OnboardingGate(repository: PanelRepository, onDone: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                text = "Elige tu nombre de usuario",
+                text = stringResource(R.string.alta_handle),
                 color = Foreground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
             Text(
-                text = "Es tu identificador dentro de Paragon, y por donde tus amigos te añadirán.",
+                text = stringResource(R.string.alta_handle_sub),
                 color = Muted,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
@@ -389,12 +390,12 @@ private fun OnboardingGate(repository: PanelRepository, onDone: () -> Unit) {
                 if (loading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp))
                 } else {
-                    Text("Continuar")
+                    Text(stringResource(R.string.comun_continuar))
                 }
             }
 
             Text(
-                text = "Entre 3 y 20 caracteres, solo minúsculas, números y guion bajo.",
+                text = stringResource(R.string.alta_handle_reglas),
                 color = Muted,
                 fontSize = 11.sp,
                 textAlign = TextAlign.Center,
@@ -456,7 +457,7 @@ private fun ErrorGate(message: String, onRetry: () -> Unit) {
                 modifier = Modifier.padding(top = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Accent),
             ) {
-                Text("Reintentar")
+                Text(stringResource(R.string.comun_reintentar))
             }
         }
     }

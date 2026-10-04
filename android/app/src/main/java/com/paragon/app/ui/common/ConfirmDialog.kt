@@ -10,6 +10,8 @@ import com.paragon.app.ui.theme.Danger
 import com.paragon.app.ui.theme.Foreground
 import com.paragon.app.ui.theme.Muted
 import com.paragon.app.ui.theme.Surface
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * "¿Seguro?" antes de una acción destructiva (borrar, quitar, salir,
@@ -21,7 +23,7 @@ import com.paragon.app.ui.theme.Surface
 fun ConfirmDialog(
     title: String,
     message: String,
-    confirmLabel: String = "Sí, continuar",
+    confirmLabel: String = stringResource(R.string.comun_si_continuar),
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -36,7 +38,7 @@ fun ConfirmDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = Muted) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.comun_cancelar), color = Muted) }
         },
     )
 }

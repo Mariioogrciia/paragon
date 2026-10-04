@@ -39,6 +39,8 @@ import com.paragon.app.ui.theme.Foreground
 import com.paragon.app.ui.theme.Muted
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 private const val DURACION_MS = 6000
 
@@ -83,14 +85,14 @@ fun WrapStoriesScreen(tokenStore: TokenStore, onClose: () -> Unit) {
             ) {
                 Text(text = current.message, color = Foreground, fontSize = 14.sp)
                 TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 12.dp)) {
-                    Text("Reintentar", color = Accent, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold)
                 }
             }
             is WrapResult.Ok -> WrapStoriesContent(data = current.data)
         }
 
         IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(top = 32.dp, end = 12.dp)) {
-            Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White)
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.comun_cerrar), tint = Color.White)
         }
     }
 }
@@ -189,14 +191,14 @@ private fun buildSlides(data: WrapData): List<Slide> {
                     Column {
                         Text(text = "✨", fontSize = 48.sp)
                         Text(
-                            text = "${data.playerName}, todavía no hay Wrap que contar",
+                            text = stringResource(R.string.wrap_vacio, data.playerName),
                             color = Color.White,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = 20.dp),
                         )
                         Text(
-                            text = "En cuanto consigas trofeos con fecha este año, aparecerán aquí.",
+                            text = stringResource(R.string.wrap_vacio_sub),
                             color = Color.White.copy(alpha = 0.7f),
                             fontSize = 13.sp,
                             modifier = Modifier.padding(top = 12.dp),
@@ -215,7 +217,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                 Column {
                     EtiquetaSlide("PARAGON WRAP", Color(0xFFFCD34D))
                     Text(
-                        text = "¡Hola, ${data.playerName}!",
+                        text = stringResource(R.string.wrap_hola, data.playerName),
                         color = Color.White,
                         fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
@@ -224,7 +226,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                     Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 28.dp)) {
                         Text(text = data.esteAnio.toString(), color = Color.White, fontSize = 56.sp, fontWeight = FontWeight.Bold)
                         Text(
-                            text = "  trofeos\n  conseguidos",
+                            text = stringResource(R.string.wrap_trofeos_conseguidos),
                             color = Color.White.copy(alpha = 0.8f),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -239,7 +241,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
             background = Brush.linearGradient(listOf(Color(0xFF3B1D6E), Color(0xFF1C1040), Color(0xFF120A26))),
             content = {
                 Column {
-                    EtiquetaSlide("GÉNERO MÁS JUGADO", Color(0xFFC4B5FD))
+                    EtiquetaSlide(stringResource(R.string.wrap_genero), Color(0xFFC4B5FD))
                     Text(text = "🎮", fontSize = 44.sp, modifier = Modifier.padding(top = 20.dp))
                     Text(
                         text = data.topGenre.name,
@@ -249,7 +251,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                         modifier = Modifier.padding(top = 16.dp),
                     )
                     Text(
-                        text = "${data.topGenre.count} títulos de este género",
+                        text = stringResource(R.string.wrap_genero_titulos, data.topGenre.count),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 13.sp,
                         modifier = Modifier.padding(top = 10.dp),
@@ -278,7 +280,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                             Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
                         }
                         Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                            EtiquetaSlide("JUEGO MÁS EXPRIMIDO", Color(0xFFA8CCFF))
+                            EtiquetaSlide(stringResource(R.string.wrap_juego), Color(0xFFA8CCFF))
                             Text(
                                 text = topGame.title,
                                 color = Color.White,
@@ -288,9 +290,9 @@ private fun buildSlides(data: WrapData): List<Slide> {
                             )
                             Text(
                                 text = if (topGame.horasTotal > 0) {
-                                    "%.1fh jugadas".format(topGame.horasTotal)
+                                    stringResource(R.string.ficha_horas, "%.1f".format(topGame.horasTotal))
                                 } else {
-                                    "${topGame.earnedTrophies} trofeos conseguidos"
+                                    stringResource(R.string.wrap_trofeos_n, topGame.earnedTrophies)
                                 },
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontSize = 14.sp,
@@ -312,7 +314,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                 background = Brush.linearGradient(listOf(Color(0xFF14202C), Color(0xFF0D131C))),
                 content = {
                     Column {
-                        EtiquetaSlide("TU MEJOR MES", Color(0xFF9FD4EC))
+                        EtiquetaSlide(stringResource(R.string.wrap_mejor_mes), Color(0xFF9FD4EC))
                         Text(
                             text = nombreMes(mejorMes.mes),
                             color = Color.White,
@@ -322,7 +324,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                         )
                         Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 12.dp)) {
                             Text(text = mejorMes.total.toString(), color = Color(0xFF9FD4EC), fontSize = 44.sp, fontWeight = FontWeight.Bold)
-                            Text(text = "  trofeos ese mes", color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, modifier = Modifier.padding(bottom = 6.dp))
+                            Text(text = stringResource(R.string.wrap_trofeos_mes), color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, modifier = Modifier.padding(bottom = 6.dp))
                         }
                     }
                 },
@@ -337,19 +339,19 @@ private fun buildSlides(data: WrapData): List<Slide> {
                 background = Brush.linearGradient(listOf(Color(0xFF0F3D2E), Color(0xFF0A2620), Color(0xFF061715))),
                 content = {
                     Column {
-                        EtiquetaSlide("RACHA", Color(0xFF6EE7B7))
+                        EtiquetaSlide(stringResource(R.string.wrap_racha), Color(0xFF6EE7B7))
                         Text(text = "🔥", fontSize = 44.sp, modifier = Modifier.padding(top = 20.dp))
                         Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 12.dp)) {
                             Text(text = data.rachas.mejor.toString(), color = Color.White, fontSize = 44.sp, fontWeight = FontWeight.Bold)
                             Text(
-                                text = "  ${if (data.rachas.mejor == 1) "día seguido" else "días seguidos"}",
+                                text = stringResource(if (data.rachas.mejor == 1) R.string.wrap_dias_seguidos_1 else R.string.wrap_dias_seguidos_n),
                                 color = Color.White.copy(alpha = 0.7f),
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(bottom = 6.dp),
                             )
                         }
                         Text(
-                            text = "${data.rachas.diasActivos} días distintos con algún trofeo",
+                            text = stringResource(R.string.wrap_dias_activos, data.rachas.diasActivos),
                             color = Color.White.copy(alpha = 0.7f),
                             fontSize = 13.sp,
                             modifier = Modifier.padding(top = 10.dp),
@@ -368,16 +370,16 @@ private fun buildSlides(data: WrapData): List<Slide> {
                 background = Brush.linearGradient(listOf(Color(0xFF2C2438), Color(0xFF1A1522), Color(0xFF100D16))),
                 content = {
                     Column {
-                        EtiquetaSlide("CÓMO TE COMPARAS", Color(0xFFE2B53E))
+                        EtiquetaSlide(stringResource(R.string.wrap_comparas), Color(0xFFE2B53E))
                         Text(
-                            text = "Top ${percentil.percentil}%",
+                            text = stringResource(R.string.wrap_top, percentil.percentil),
                             color = Color.White,
                             fontSize = 38.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = 20.dp),
                         )
                         Text(
-                            text = "Menos trofeos con fecha este año que tú tiene el ${100 - percentil.percentil}% de los ${percentil.totalUsuarios} usuarios reales de Paragon.",
+                            text = stringResource(R.string.wrap_percentil, 100 - percentil.percentil, percentil.totalUsuarios),
                             color = Color.White.copy(alpha = 0.7f),
                             fontSize = 13.sp,
                             modifier = Modifier.padding(top = 12.dp),
@@ -396,14 +398,14 @@ private fun buildSlides(data: WrapData): List<Slide> {
                 Column {
                     Text(text = "🏆", fontSize = 44.sp)
                     Text(
-                        text = "Eso fue ${data.esteAnio} en Paragon",
+                        text = stringResource(R.string.wrap_eso_fue, data.esteAnio),
                         color = Color.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 20.dp),
                     )
                     Text(
-                        text = "Repartidos en ${data.juegosEsteAnio} ${if (data.juegosEsteAnio == 1) "juego" else "juegos"} distintos. A por el año que viene.",
+                        text = stringResource(if (data.juegosEsteAnio == 1) R.string.wrap_repartidos_1 else R.string.wrap_repartidos_n, data.juegosEsteAnio),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 13.sp,
                         modifier = Modifier.padding(top = 12.dp),

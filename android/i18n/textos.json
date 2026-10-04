@@ -1,0 +1,3200 @@
+{
+ "ajustes_acento": {
+  "de": "Eigene Akzentfarbe",
+  "en": "Custom accent colour",
+  "es": "Color de Acento Personalizado",
+  "fr": "Couleur d'accent personnalisée"
+ },
+ "ajustes_acento_sub": {
+  "de": "Ändert nur den Akzent (Buttons, Hervorhebungen) — den Hintergrund bestimmt weiter die Plattform oder Material You",
+  "en": "Only changes the accent (buttons, highlights) — the background still comes from the platform or Material You",
+  "es": "Solo cambia el acento (botones, resaltados) — el fondo lo sigue decidiendo la plataforma o Material You",
+  "fr": "Ne change que l'accent (boutons, surlignages) — le fond dépend toujours de la plateforme ou de Material You"
+ },
+ "ajustes_cambiar_foto": {
+  "de": "Foto ändern",
+  "en": "Change photo",
+  "es": "Cambiar foto",
+  "fr": "Changer de photo"
+ },
+ "ajustes_cerrar_sesion_boton": {
+  "de": "Abmelden",
+  "en": "Sign out",
+  "es": "Cerrar Sesión",
+  "fr": "Se déconnecter"
+ },
+ "ajustes_cerrar_sesion_si": {
+  "de": "Abmelden",
+  "en": "Sign out",
+  "es": "Cerrar sesión",
+  "fr": "Se déconnecter"
+ },
+ "ajustes_cerrar_sesion_texto": {
+  "de": "Du musst dich erneut mit Google oder Discord anmelden, um deine Trophäen zu sehen.",
+  "en": "You'll need to sign in again with Google or Discord to keep seeing your trophies.",
+  "es": "Tendrás que volver a entrar con Google o Discord para seguir viendo tus trofeos.",
+  "fr": "Tu devras te reconnecter avec Google ou Discord pour revoir tes trophées."
+ },
+ "ajustes_cerrar_sesion_titulo": {
+  "de": "Abmelden?",
+  "en": "Sign out?",
+  "es": "¿Cerrar sesión?",
+  "fr": "Se déconnecter ?"
+ },
+ "ajustes_como_funciona": {
+  "de": "So funktioniert Paragon (und der Discord-Bot)",
+  "en": "How Paragon works (and the Discord bot)",
+  "es": "Cómo funciona Paragon (y el bot de Discord)",
+  "fr": "Comment marche Paragon (et le bot Discord)"
+ },
+ "ajustes_err_cuentas": {
+  "de": "Fehler beim Laden der Konten ({0}).",
+  "en": "Error loading accounts ({0}).",
+  "es": "Error al cargar cuentas ({0}).",
+  "fr": "Erreur au chargement des comptes ({0})."
+ },
+ "ajustes_err_leer_imagen": {
+  "de": "Bild konnte nicht gelesen werden.",
+  "en": "Couldn't read the image.",
+  "es": "No se pudo leer la imagen.",
+  "fr": "Impossible de lire l'image."
+ },
+ "ajustes_err_subir_imagen": {
+  "de": "Bild konnte nicht hochgeladen werden.",
+  "en": "Couldn't upload the image.",
+  "es": "No se pudo subir la imagen.",
+  "fr": "Impossible d'envoyer l'image."
+ },
+ "ajustes_foto_ok": {
+  "de": "Foto aktualisiert",
+  "en": "Photo updated",
+  "es": "Foto actualizada",
+  "fr": "Photo mise à jour"
+ },
+ "ajustes_foto_sub": {
+  "de": "Im Web und in der App gleich",
+  "en": "Same on the web and in the app",
+  "es": "Se ve igual en la web y en la app",
+  "fr": "Identique sur le web et dans l'app"
+ },
+ "ajustes_material": {
+  "de": "Material You (dynamische Farben)",
+  "en": "Material You (dynamic colour)",
+  "es": "Material You (Colores Dinámicos)",
+  "fr": "Material You (couleurs dynamiques)"
+ },
+ "ajustes_material_aviso": {
+  "de": "Deaktiviere Material You, um ein Plattform-Theme zu wählen (Hintergrund und Akzent).",
+  "en": "Turn off Material You to pick a platform theme (sets background and accent).",
+  "es": "Desactiva Material You para elegir un tema de plataforma (define fondo y acento).",
+  "fr": "Désactive Material You pour choisir un thème de plateforme (fond et accent)."
+ },
+ "ajustes_material_sub": {
+  "de": "Übernimmt Hintergrund und Akzent von deinem Hintergrundbild — ersetzt solange das Plattform-Theme",
+  "en": "Takes background and accent from your wallpaper — overrides the platform theme while on",
+  "es": "Extrae fondo y acento de tu fondo de pantalla — anula el tema de plataforma mientras esté activo",
+  "fr": "Prend le fond et l'accent de ton fond d'écran — remplace le thème de plateforme tant qu'il est actif"
+ },
+ "ajustes_nombre": {
+  "de": "Anzeigename",
+  "en": "Display name",
+  "es": "Nombre de usuario",
+  "fr": "Nom affiché"
+ },
+ "ajustes_ocultar_social": {
+  "de": "Soziale Funktionen ausblenden",
+  "en": "Hide social features",
+  "es": "Ocultar funciones sociales",
+  "fr": "Masquer les fonctions sociales"
+ },
+ "ajustes_ocultar_social_sub": {
+  "de": "Blendet Community und Ligen aus. Ideal, wenn du die App nur für dich nutzt.",
+  "en": "Hides Community and Leagues. Ideal if you only use the app as a personal tool.",
+  "es": "Oculta la Comunidad y Ligas. Ideal si solo usas la app como herramienta personal.",
+  "fr": "Masque la Communauté et les Ligues. Idéal si tu utilises l'app comme outil personnel."
+ },
+ "ajustes_perfil_ok": {
+  "de": "Profil aktualisiert",
+  "en": "Profile updated",
+  "es": "Perfil actualizado",
+  "fr": "Profil mis à jour"
+ },
+ "ajustes_seccion_apariencia": {
+  "de": "DARSTELLUNG",
+  "en": "APPEARANCE",
+  "es": "APARIENCIA Y PERSONALIZACIÓN",
+  "fr": "APPARENCE"
+ },
+ "ajustes_seccion_ayuda": {
+  "de": "HILFE",
+  "en": "HELP",
+  "es": "AYUDA",
+  "fr": "AIDE"
+ },
+ "ajustes_seccion_conexiones": {
+  "de": "VERBINDUNGEN",
+  "en": "CONNECTIONS",
+  "es": "CONEXIONES",
+  "fr": "CONNEXIONS"
+ },
+ "ajustes_seccion_perfil": {
+  "de": "PROFIL",
+  "en": "PROFILE",
+  "es": "PERFIL",
+  "fr": "PROFIL"
+ },
+ "ajustes_seccion_solitario": {
+  "de": "SOLOMODUS",
+  "en": "SOLO MODE",
+  "es": "MODO SOLITARIO",
+  "fr": "MODE SOLO"
+ },
+ "alta_handle": {
+  "de": "Wähle deinen Benutzernamen",
+  "en": "Pick your username",
+  "es": "Elige tu nombre de usuario",
+  "fr": "Choisis ton nom d'utilisateur"
+ },
+ "alta_handle_reglas": {
+  "de": "3 bis 20 Zeichen, nur Kleinbuchstaben, Zahlen und Unterstrich.",
+  "en": "3 to 20 characters: lowercase letters, numbers and underscores only.",
+  "es": "Entre 3 y 20 caracteres, solo minúsculas, números y guion bajo.",
+  "fr": "Entre 3 et 20 caractères : minuscules, chiffres et tiret bas uniquement."
+ },
+ "alta_handle_sub": {
+  "de": "Das ist deine Kennung auf Paragon, darüber fügen dich Freunde hinzu.",
+  "en": "It's your ID on Paragon, and how your friends will add you.",
+  "es": "Es tu identificador dentro de Paragon, y por donde tus amigos te añadirán.",
+  "fr": "C'est ton identifiant sur Paragon, et c'est comme ça que tes amis t'ajouteront."
+ },
+ "alta_saltar": {
+  "de": "Vorerst überspringen",
+  "en": "Skip for now",
+  "es": "Saltar por ahora",
+  "fr": "Passer pour l'instant"
+ },
+ "alta_ultimo_paso": {
+  "de": "Letzter Schritt: Konto verknüpfen",
+  "en": "Last step: link your account",
+  "es": "Último paso: vincula tu cuenta",
+  "fr": "Dernière étape : associe ton compte"
+ },
+ "alta_ultimo_paso_sub": {
+  "de": "Deine Trophäen kommen aus deinem PlayStation-, Steam- oder Xbox-Profil. Verknüpfe mindestens eins und in wenigen Minuten ist deine Bibliothek da.",
+  "en": "Your trophies come from your PlayStation, Steam or Xbox profile. Link at least one and your library will be here in a few minutes.",
+  "es": "Tus trofeos salen de tu perfil de PlayStation, Steam o Xbox. Vincula al menos uno y en unos minutos tendrás tu biblioteca aquí.",
+  "fr": "Tes trophées viennent de ton profil PlayStation, Steam ou Xbox. Associes-en au moins un et ta bibliothèque sera là dans quelques minutes."
+ },
+ "alta_ya_vinculado": {
+  "de": "Ich habe es verknüpft",
+  "en": "I've linked it",
+  "es": "Ya lo he vinculado",
+  "fr": "C'est fait"
+ },
+ "arquetipo_cazador": {
+  "de": "Jäger:in",
+  "en": "Hunter",
+  "es": "Cazador",
+  "fr": "Chasseur"
+ },
+ "arquetipo_elite": {
+  "de": "Elite",
+  "en": "Elite",
+  "es": "Élite",
+  "fr": "Élite"
+ },
+ "arquetipo_explorador": {
+  "de": "Entdecker:in",
+  "en": "Explorer",
+  "es": "Explorador",
+  "fr": "Explorateur"
+ },
+ "arquetipo_veterano": {
+  "de": "Veteran:in",
+  "en": "Veteran",
+  "es": "Veterano",
+  "fr": "Vétéran"
+ },
+ "atascados_vacio": {
+  "de": "Du hast keine festgefahrenen Trophäen",
+  "en": "You don't have any stuck trophies",
+  "es": "No tienes ningún trofeo atascado",
+  "fr": "Tu n'as aucun trophée bloqué"
+ },
+ "atascados_vacio_sub": {
+  "de": "Wenn eine Trophäe nicht klappt, markier sie auf ihrer Spielseite — dann erscheint sie hier, mit Video-Guide auf einen Tipp.",
+  "en": "When a trophy fights back, mark it from its game page and it'll show up here — with a video guide one tap away.",
+  "es": "Cuando un trofeo se te resista, márcalo desde su ficha y aparecerá aquí — con una guía en vídeo a un toque.",
+  "fr": "Quand un trophée te résiste, marque-le depuis sa fiche et il apparaîtra ici — avec un guide vidéo à portée de doigt."
+ },
+ "biblio_abandonados": {
+  "de": "Abgebrochen",
+  "en": "Abandoned",
+  "es": "Abandonados",
+  "fr": "Abandonnés"
+ },
+ "biblio_completados": {
+  "de": "Abgeschlossen",
+  "en": "Completed",
+  "es": "Completados",
+  "fr": "Terminés"
+ },
+ "biblio_falta_dlc": {
+  "de": "Nur DLC fehlt",
+  "en": "Only DLC left",
+  "es": "Solo falta el DLC",
+  "fr": "Il ne manque que le DLC"
+ },
+ "biblio_jugando": {
+  "de": "Am Spielen",
+  "en": "Playing",
+  "es": "Jugando",
+  "fr": "En cours"
+ },
+ "biblio_nada_filtros": {
+  "de": "Nichts passt zu diesen Filtern",
+  "en": "Nothing matches those filters",
+  "es": "Nada con esos filtros",
+  "fr": "Rien avec ces filtres"
+ },
+ "biblio_nada_filtros_sub": {
+  "de": "Ändere die Suche oder den Filter oben.",
+  "en": "Try changing the search or the filter above.",
+  "es": "Prueba a cambiar la búsqueda o el filtro de arriba.",
+  "fr": "Essaie de changer la recherche ou le filtre ci-dessus."
+ },
+ "biblio_orden_az": {
+  "de": "Titel A–Z",
+  "en": "Title A-Z",
+  "es": "Título A-Z",
+  "fr": "Titre A-Z"
+ },
+ "biblio_orden_progreso": {
+  "de": "Fortschritt",
+  "en": "Progress",
+  "es": "Progreso",
+  "fr": "Progression"
+ },
+ "biblio_orden_za": {
+  "de": "Titel Z–A",
+  "en": "Title Z-A",
+  "es": "Título Z-A",
+  "fr": "Titre Z-A"
+ },
+ "biblio_pila": {
+  "de": "Stapel der Schande",
+  "en": "Pile of shame",
+  "es": "Pila Vergüenza",
+  "fr": "Pile de la honte"
+ },
+ "biblio_platinados": {
+  "de": "Platin geholt",
+  "en": "Platinum'd",
+  "es": "Platinados",
+  "fr": "Platinés"
+ },
+ "biblio_titulo": {
+  "de": "BIBLIOTHEK",
+  "en": "LIBRARY",
+  "es": "BIBLIOTECA",
+  "fr": "BIBLIOTHÈQUE"
+ },
+ "biblio_todos": {
+  "de": "Alle",
+  "en": "All",
+  "es": "Todos",
+  "fr": "Tous"
+ },
+ "biblio_vacia": {
+  "de": "Deine Bibliothek ist leer",
+  "en": "Your library is empty",
+  "es": "Tu biblioteca está vacía",
+  "fr": "Ta bibliothèque est vide"
+ },
+ "biblio_vacia_sub": {
+  "de": "Sobald du ein Konto verknüpfst und synchronisierst, erscheinen deine Spiele hier.",
+  "en": "As soon as you link an account and sync, your games will show up here.",
+  "es": "En cuanto vincules una cuenta y sincronices, tus juegos aparecerán aquí.",
+  "fr": "Dès que tu associes un compte et synchronises, tes jeux apparaîtront ici."
+ },
+ "biblio_vista_cuadricula": {
+  "de": "Rasteransicht",
+  "en": "Grid view",
+  "es": "Vista cuadrícula",
+  "fr": "Vue grille"
+ },
+ "biblio_vista_enfoque": {
+  "de": "Fokusansicht",
+  "en": "Focus view",
+  "es": "Vista enfoque",
+  "fr": "Vue focus"
+ },
+ "carpeta_anadir": {
+  "de": "ZU ORDNER HINZUFÜGEN",
+  "en": "ADD TO FOLDER",
+  "es": "AÑADIR A CARPETA",
+  "fr": "AJOUTER AU DOSSIER"
+ },
+ "carpeta_borrar_texto": {
+  "de": "„{0}“ verschwindet mit den {1} Spielen darin (die Spiele selbst bleiben, nur der Ordner wird gelöscht).",
+  "en": "\"{0}\" disappears with the {1} games it groups (the games themselves aren't deleted, only the folder).",
+  "es": "\"{0}\" desaparece con los {1} juegos que agrupa (los juegos en sí no se borran, solo la carpeta).",
+  "fr": "« {0} » disparaît avec les {1} jeux qu'il regroupe (les jeux eux-mêmes ne sont pas supprimés, seulement le dossier)."
+ },
+ "carpeta_borrar_titulo": {
+  "de": "Diesen Ordner löschen?",
+  "en": "Delete this folder?",
+  "es": "¿Borrar esta carpeta?",
+  "fr": "Supprimer ce dossier ?"
+ },
+ "carpeta_err_borrar": {
+  "de": "Ordner konnte nicht gelöscht werden.",
+  "en": "Couldn't delete the folder.",
+  "es": "No se pudo borrar la carpeta.",
+  "fr": "Impossible de supprimer le dossier."
+ },
+ "carpeta_err_crear": {
+  "de": "Ordner konnte nicht erstellt werden.",
+  "en": "Couldn't create the folder.",
+  "es": "No se pudo crear la carpeta.",
+  "fr": "Impossible de créer le dossier."
+ },
+ "carpeta_err_renombrar": {
+  "de": "Ordner konnte nicht umbenannt werden.",
+  "en": "Couldn't rename the folder.",
+  "es": "No se pudo renombrar la carpeta.",
+  "fr": "Impossible de renommer le dossier."
+ },
+ "carpeta_nueva": {
+  "de": "Neuer Ordner",
+  "en": "New folder",
+  "es": "Nueva carpeta",
+  "fr": "Nouveau dossier"
+ },
+ "carpeta_quitar": {
+  "de": "Aus dem Ordner entfernen",
+  "en": "Remove from folder",
+  "es": "Quitar de la carpeta",
+  "fr": "Retirer du dossier"
+ },
+ "carpeta_renombrar": {
+  "de": "Ordner umbenennen",
+  "en": "Rename folder",
+  "es": "Renombrar carpeta",
+  "fr": "Renommer le dossier"
+ },
+ "carpeta_sin_juegos": {
+  "de": "Noch keine Spiele in diesem Ordner",
+  "en": "No games in this folder yet",
+  "es": "Ningún juego en esta carpeta todavía",
+  "fr": "Aucun jeu dans ce dossier pour l'instant"
+ },
+ "carpeta_sin_juegos_sub": {
+  "de": "Füge sie auf ihrer Spielseite hinzu oder in der Bibliothek über das Menü jeder Karte.",
+  "en": "Add them from their game page, or from the Library with each card's menu.",
+  "es": "Añádelos desde su ficha, o desde la Biblioteca con el menú de cada tarjeta.",
+  "fr": "Ajoute-les depuis leur fiche, ou depuis la Bibliothèque avec le menu de chaque carte."
+ },
+ "carpeta_vacio": {
+  "de": "Du hast noch keine Ordner",
+  "en": "You don't have any folders yet",
+  "es": "Todavía no tienes ninguna carpeta",
+  "fr": "Tu n'as encore aucun dossier"
+ },
+ "carpeta_vacio_crear": {
+  "de": "Du hast noch keine Ordner. Erstelle einen in der Bibliothek.",
+  "en": "You don't have any folders yet. Create one from the Library.",
+  "es": "Todavía no tienes ninguna carpeta. Crea una desde Biblioteca.",
+  "fr": "Tu n'as encore aucun dossier. Crées-en un depuis la Bibliothèque."
+ },
+ "carpeta_vacio_sub": {
+  "de": "Gruppiere deine Spiele, wie du willst — nach Reihe, Plattform, egal — und erstelle Ordner mit dem + oben.",
+  "en": "Group your games however you like — by series, platform, anything — and create folders with the + above.",
+  "es": "Agrupa tus juegos como quieras — por saga, por plataforma, por lo que sea — y créalas con el + de arriba.",
+  "fr": "Regroupe tes jeux comme tu veux — par saga, plateforme, n'importe quoi — et crée des dossiers avec le + en haut."
+ },
+ "carpetas_titulo": {
+  "de": "ORDNER",
+  "en": "FOLDERS",
+  "es": "CARPETAS",
+  "fr": "DOSSIERS"
+ },
+ "clan_abandonar": {
+  "de": "Clan verlassen",
+  "en": "Leave clan",
+  "es": "Abandonar clan",
+  "fr": "Quitter le clan"
+ },
+ "clan_abandonar_borra": {
+  "de": "Clan verlassen (löscht ihn)",
+  "en": "Leave clan (deletes it)",
+  "es": "Abandonar clan (lo borra)",
+  "fr": "Quitter le clan (le supprime)"
+ },
+ "clan_abandonar_propio": {
+  "de": "Deinen eigenen Clan verlassen?",
+  "en": "Leave your own clan?",
+  "es": "¿Abandonar tu propio clan?",
+  "fr": "Quitter ton propre clan ?"
+ },
+ "clan_abandonar_propio_texto": {
+  "de": "Als Anführer:in verschwindet der ganze Clan, wenn du gehst — für alle Mitglieder, samt Rangliste und Aktivität. Das lässt sich nicht rückgängig machen.",
+  "en": "As the leader, if you leave the whole clan disappears — for all its members, with its ranking and activity. This can't be undone.",
+  "es": "Al ser el líder, si sales el clan entero desaparece — para todos sus miembros, con su ranking y su actividad. No se puede deshacer.",
+  "fr": "En tant que chef, si tu pars le clan entier disparaît — pour tous ses membres, avec son classement et son activité. C'est irréversible."
+ },
+ "clan_act_favorito": {
+  "de": "hat {0} favorisiert",
+  "en": "favourited {0}",
+  "es": "marcó {0} como favorito",
+  "fr": "a mis {0} en favori"
+ },
+ "clan_act_nota": {
+  "de": " mit {0}/10",
+  "en": " {0}/10",
+  "es": " con {0}/10",
+  "fr": " {0}/10"
+ },
+ "clan_act_nuevo": {
+  "de": "hat mit {0} angefangen",
+  "en": "started playing {0}",
+  "es": "empezó a jugar a {0}",
+  "fr": "a commencé {0}"
+ },
+ "clan_act_otro": {
+  "de": "hat etwas in {0} gemacht",
+  "en": "did something in {0}",
+  "es": "hizo algo en {0}",
+  "fr": "a fait quelque chose dans {0}"
+ },
+ "clan_act_platino": {
+  "de": "hat die Platin in {0} geholt",
+  "en": "got the Platinum in {0}",
+  "es": "consiguió el Platino en {0}",
+  "fr": "a eu le platine de {0}"
+ },
+ "clan_act_resena": {
+  "de": "hat {0} rezensiert",
+  "en": "reviewed {0}",
+  "es": "escribió una reseña de {0}",
+  "fr": "a écrit une critique de {0}"
+ },
+ "clan_act_valoro": {
+  "de": "hat {0} bewertet",
+  "en": "rated {0}",
+  "es": "valoró {0}",
+  "fr": "a noté {0}"
+ },
+ "clan_actividad": {
+  "de": "CLAN-AKTIVITÄT",
+  "en": "CLAN ACTIVITY",
+  "es": "ACTIVIDAD DEL CLAN",
+  "fr": "ACTIVITÉ DU CLAN"
+ },
+ "clan_actividad_vacia": {
+  "de": "Hier gibt es noch nichts zu sehen.",
+  "en": "Nothing to show here yet.",
+  "es": "Todavía no hay nada que enseñar aquí.",
+  "fr": "Rien à montrer ici pour l'instant."
+ },
+ "clan_borrar_si": {
+  "de": "Ja, Clan löschen",
+  "en": "Yes, delete the clan",
+  "es": "Sí, borrar el clan",
+  "fr": "Oui, supprimer le clan"
+ },
+ "clan_err_crear": {
+  "de": "Clan konnte nicht gegründet werden.",
+  "en": "Couldn't create the clan.",
+  "es": "No se pudo crear el clan.",
+  "fr": "Impossible de créer le clan."
+ },
+ "clan_err_invitar": {
+  "de": "Einladung fehlgeschlagen.",
+  "en": "Couldn't send the invite.",
+  "es": "No se pudo invitar.",
+  "fr": "Impossible d'inviter."
+ },
+ "clan_err_no_existe": {
+  "de": "Diesen Clan gibt es nicht.",
+  "en": "This clan doesn't exist.",
+  "es": "Este clan no existe.",
+  "fr": "Ce clan n'existe pas."
+ },
+ "clan_err_unir": {
+  "de": "Beitritt fehlgeschlagen.",
+  "en": "Couldn't join the clan.",
+  "es": "No se pudo unir al clan.",
+  "fr": "Impossible de rejoindre le clan."
+ },
+ "clan_invitar_error": {
+  "de": "Einladung fehlgeschlagen",
+  "en": "Couldn't send the invite",
+  "es": "No se pudo invitar",
+  "fr": "Impossible d'inviter"
+ },
+ "clan_lider": {
+  "de": "Anführer:in",
+  "en": "Leader",
+  "es": "Líder",
+  "fr": "Chef"
+ },
+ "clan_miembro": {
+  "de": "Mitglied",
+  "en": "Member",
+  "es": "Miembro",
+  "fr": "Membre"
+ },
+ "clan_miembros": {
+  "de": "MITGLIEDER",
+  "en": "MEMBERS",
+  "es": "MIEMBROS",
+  "fr": "MEMBRES"
+ },
+ "clan_posicion": {
+  "de": "{0}.",
+  "en": "#{0}",
+  "es": "{0}º",
+  "fr": "{0}e"
+ },
+ "clan_ranking": {
+  "de": "RANGLISTE",
+  "en": "RANKING",
+  "es": "RANKING",
+  "fr": "CLASSEMENT"
+ },
+ "clan_rol_trofeos": {
+  "de": "{0} · {1} Trophäen",
+  "en": "{0} · {1} trophies",
+  "es": "{0} · {1} trofeos",
+  "fr": "{0} · {1} trophées"
+ },
+ "clan_salir_texto": {
+  "de": "Du erscheinst nicht mehr in der Rangliste von „{0}“ — man müsste dich erneut einladen.",
+  "en": "You'll stop appearing in the \"{0}\" ranking — they'd have to invite you again for you to rejoin.",
+  "es": "Dejarás de aparecer en el ranking de \"{0}\" — tendrían que volver a invitarte para que entres otra vez.",
+  "fr": "Tu n'apparaîtras plus dans le classement de « {0} » — il faudrait te réinviter pour revenir."
+ },
+ "clan_salir_titulo": {
+  "de": "Clan verlassen?",
+  "en": "Leave the clan?",
+  "es": "¿Salir del clan?",
+  "fr": "Quitter le clan ?"
+ },
+ "clan_sin_amigos": {
+  "de": "Gerade keine Freunde verfügbar — alle sind schon in einem Clan oder bereits eingeladen.",
+  "en": "No friends available right now — they're all in a clan already or you've already asked them.",
+  "es": "No tienes amigos disponibles ahora mismo — o ya están todos en un clan, o ya se lo has pedido.",
+  "fr": "Aucun ami disponible pour l'instant — ils sont déjà tous dans un clan ou tu les as déjà invités."
+ },
+ "clan_unirme": {
+  "de": "Diesem Clan beitreten",
+  "en": "Join this clan",
+  "es": "Unirme a este clan",
+  "fr": "Rejoindre ce clan"
+ },
+ "clan_xp_total": {
+  "de": "GESAMT-XP",
+  "en": "TOTAL XP",
+  "es": "XP TOTAL",
+  "fr": "XP TOTAL"
+ },
+ "color_amarillo": {
+  "de": "Gelb",
+  "en": "Yellow",
+  "es": "Amarillo",
+  "fr": "Jaune"
+ },
+ "color_auto": {
+  "de": "Auto",
+  "en": "Auto",
+  "es": "Auto",
+  "fr": "Auto"
+ },
+ "color_azul": {
+  "de": "Blau",
+  "en": "Blue",
+  "es": "Azul",
+  "fr": "Bleu"
+ },
+ "color_celeste": {
+  "de": "Himmelblau",
+  "en": "Sky blue",
+  "es": "Celeste",
+  "fr": "Bleu ciel"
+ },
+ "color_naranja": {
+  "de": "Orange",
+  "en": "Orange",
+  "es": "Naranja",
+  "fr": "Orange"
+ },
+ "color_rojo": {
+  "de": "Rot",
+  "en": "Red",
+  "es": "Rojo",
+  "fr": "Rouge"
+ },
+ "color_rosa": {
+  "de": "Rosa",
+  "en": "Pink",
+  "es": "Rosa",
+  "fr": "Rose"
+ },
+ "color_verde": {
+  "de": "Grün",
+  "en": "Green",
+  "es": "Verde",
+  "fr": "Vert"
+ },
+ "color_violeta": {
+  "de": "Violett",
+  "en": "Violet",
+  "es": "Violeta",
+  "fr": "Violet"
+ },
+ "comparar_amigos": {
+  "de": "DEINE FREUNDE",
+  "en": "YOUR FRIENDS",
+  "es": "TUS AMIGOS",
+  "fr": "TES AMIS"
+ },
+ "comparar_ellos": {
+  "de": "SIE",
+  "en": "THEM",
+  "es": "ELLOS",
+  "fr": "EUX"
+ },
+ "comparar_ellos_pct": {
+  "de": "  ·  Sie {0} %{1}",
+  "en": "  ·  Them {0}%{1}",
+  "es": "  ·  Ellos {0}%{1}",
+  "fr": "  ·  Eux {0} %{1}"
+ },
+ "comparar_empate": {
+  "de": "Gleichstand bei Platin",
+  "en": "Tied on platinums",
+  "es": "Empate a platinos",
+  "fr": "Égalité en platines"
+ },
+ "comparar_en_comun": {
+  "de": "GEMEINSAME SPIELE ({0})",
+  "en": "GAMES IN COMMON ({0})",
+  "es": "JUEGOS EN COMÚN ({0})",
+  "fr": "JEUX EN COMMUN ({0})"
+ },
+ "comparar_err_no_existe": {
+  "de": "Diese Person gibt es nicht.",
+  "en": "That user doesn't exist.",
+  "es": "No existe ese usuario.",
+  "fr": "Cet utilisateur n'existe pas."
+ },
+ "comparar_err_sin_cuentas": {
+  "de": "Diese Person hat kein verknüpftes Konto.",
+  "en": "That person has no linked accounts.",
+  "es": "Esa persona no tiene ninguna cuenta vinculada.",
+  "fr": "Cette personne n'a aucun compte associé."
+ },
+ "comparar_ganando": {
+  "de": "Du liegst vorn",
+  "en": "You're winning",
+  "es": "Vas ganando",
+  "fr": "Tu mènes"
+ },
+ "comparar_handle_nivel": {
+  "de": "@{0} · Stufe {1}",
+  "en": "@{0} · Level {1}",
+  "es": "@{0} · Nivel {1}",
+  "fr": "@{0} · Niveau {1}"
+ },
+ "comparar_perdiendo": {
+  "de": "Du liegst hinten",
+  "en": "You're losing",
+  "es": "Vas perdiendo",
+  "fr": "Tu es derrière"
+ },
+ "comparar_ph": {
+  "de": "@handle einer Person",
+  "en": "someone's @handle",
+  "es": "@handle de alguien",
+  "fr": "le @handle de quelqu'un"
+ },
+ "comparar_sin_amigos": {
+  "de": "Du hast noch keine Freunde mit öffentlichem Profil für den Schnellvergleich — such oben nach einem @handle.",
+  "en": "You don't have friends with a public profile to compare in one tap yet — search any @handle above.",
+  "es": "Todavía no tienes amigos con perfil público para comparar de un toque — busca cualquier @handle arriba.",
+  "fr": "Tu n'as pas encore d'amis au profil public à comparer d'un geste — cherche n'importe quel @handle ci-dessus."
+ },
+ "comparar_sin_comun": {
+  "de": "Noch keine gemeinsamen Spiele.",
+  "en": "No games in common yet.",
+  "es": "Ningún juego en común todavía.",
+  "fr": "Aucun jeu en commun pour l'instant."
+ },
+ "comparar_titulo": {
+  "de": "VERGLEICHEN",
+  "en": "COMPARE",
+  "es": "COMPARAR",
+  "fr": "COMPARER"
+ },
+ "comparar_trofeos_juegos": {
+  "de": "{0} Trophäen · {1} Spiele",
+  "en": "{0} trophies · {1} games",
+  "es": "{0} trofeos · {1} juegos",
+  "fr": "{0} trophées · {1} jeux"
+ },
+ "comparar_tu": {
+  "de": "DU",
+  "en": "YOU",
+  "es": "TÚ",
+  "fr": "TOI"
+ },
+ "comparar_tu_pct": {
+  "de": "Du {0} %{1}",
+  "en": "You {0}%{1}",
+  "es": "Tú {0}%{1}",
+  "fr": "Toi {0} %{1}"
+ },
+ "comparte_badge_platino": {
+  "de": "PLATIN",
+  "en": "PLATINUM",
+  "es": "PLATINO",
+  "fr": "PLATINE"
+ },
+ "comparte_handle": {
+  "de": "@{0} auf Paragon",
+  "en": "@{0} on Paragon",
+  "es": "@{0} en Paragon",
+  "fr": "@{0} sur Paragon"
+ },
+ "comparte_trofeos": {
+  "de": "{0}/{1} Trophäen geholt",
+  "en": "{0}/{1} trophies earned",
+  "es": "{0}/{1} trofeos conseguidos",
+  "fr": "{0}/{1} trophées obtenus"
+ },
+ "compartir_anadido": {
+  "de": "{0} zur Wunschliste hinzugefügt",
+  "en": "{0} added to your wishlist",
+  "es": "{0} añadido a tu lista de deseados",
+  "fr": "{0} ajouté à ta liste de souhaits"
+ },
+ "compartir_elige": {
+  "de": "Wähle das richtige Spiel aus den Ergebnissen.",
+  "en": "Pick the right game from the results.",
+  "es": "Elige el juego correcto de los resultados.",
+  "fr": "Choisis le bon jeu dans les résultats."
+ },
+ "compartir_escribe": {
+  "de": "Gib den Titel ein, um im Katalog zu suchen.",
+  "en": "Type the title to search the catalogue.",
+  "es": "Escribe el título para buscar en el catálogo.",
+  "fr": "Tape le titre pour chercher dans le catalogue."
+ },
+ "compartir_login": {
+  "de": "Melde dich zuerst bei Paragon an",
+  "en": "Sign in to Paragon first",
+  "es": "Inicia sesión en Paragon primero",
+  "fr": "Connecte-toi d'abord à Paragon"
+ },
+ "compartir_login_sub": {
+  "de": "Öffne die App und melde dich an, bevor du hier Spiele hinzufügst.",
+  "en": "Open the app and sign in before adding games from here.",
+  "es": "Abre la app y entra con tu cuenta antes de añadir juegos desde aquí.",
+  "fr": "Ouvre l'app et connecte-toi avant d'ajouter des jeux d'ici."
+ },
+ "compartir_ph": {
+  "de": "Spieltitel…",
+  "en": "Game title…",
+  "es": "Título del juego…",
+  "fr": "Titre du jeu…"
+ },
+ "compartir_titulo": {
+  "de": "Zur Wunschliste hinzufügen",
+  "en": "Add to wishlist",
+  "es": "Añadir a Deseados",
+  "fr": "Ajouter aux souhaits"
+ },
+ "comun_a_b": {
+  "de": "{0} · {1}",
+  "en": "{0} · {1}",
+  "es": "{0} · {1}",
+  "fr": "{0} · {1}"
+ },
+ "comun_aceptar": {
+  "de": "Annehmen",
+  "en": "Accept",
+  "es": "Aceptar",
+  "fr": "Accepter"
+ },
+ "comun_alguien": {
+  "de": "Jemand",
+  "en": "Someone",
+  "es": "Alguien",
+  "fr": "Quelqu'un"
+ },
+ "comun_atras": {
+  "de": "Zurück",
+  "en": "Back",
+  "es": "Atrás",
+  "fr": "Retour"
+ },
+ "comun_borrar": {
+  "de": "Löschen",
+  "en": "Delete",
+  "es": "Borrar",
+  "fr": "Supprimer"
+ },
+ "comun_buscar": {
+  "de": "Suchen…",
+  "en": "Search…",
+  "es": "Buscar…",
+  "fr": "Rechercher…"
+ },
+ "comun_buscar_accion": {
+  "de": "Suchen",
+  "en": "Search",
+  "es": "Buscar",
+  "fr": "Rechercher"
+ },
+ "comun_cambiar": {
+  "de": "Ändern",
+  "en": "Change",
+  "es": "Cambiar",
+  "fr": "Changer"
+ },
+ "comun_cancelar": {
+  "de": "Abbrechen",
+  "en": "Cancel",
+  "es": "Cancelar",
+  "fr": "Annuler"
+ },
+ "comun_cerrar": {
+  "de": "Schließen",
+  "en": "Close",
+  "es": "Cerrar",
+  "fr": "Fermer"
+ },
+ "comun_compartir": {
+  "de": "Teilen",
+  "en": "Share",
+  "es": "Compartir",
+  "fr": "Partager"
+ },
+ "comun_completado": {
+  "de": "{0} % abgeschlossen",
+  "en": "{0}% complete",
+  "es": "{0}% completado",
+  "fr": "{0} % terminé"
+ },
+ "comun_continuar": {
+  "de": "Weiter",
+  "en": "Continue",
+  "es": "Continuar",
+  "fr": "Continuer"
+ },
+ "comun_crear": {
+  "de": "Erstellen",
+  "en": "Create",
+  "es": "Crear",
+  "fr": "Créer"
+ },
+ "comun_deseados": {
+  "de": "Wunschliste",
+  "en": "Wishlist",
+  "es": "Deseados",
+  "fr": "Souhaits"
+ },
+ "comun_editar": {
+  "de": "Bearbeiten",
+  "en": "Edit",
+  "es": "Editar",
+  "fr": "Modifier"
+ },
+ "comun_eliminar": {
+  "de": "Entfernen",
+  "en": "Remove",
+  "es": "Eliminar",
+  "fr": "Retirer"
+ },
+ "comun_enviar": {
+  "de": "Senden",
+  "en": "Send",
+  "es": "Enviar",
+  "fr": "Envoyer"
+ },
+ "comun_guardar": {
+  "de": "Speichern",
+  "en": "Save",
+  "es": "Guardar",
+  "fr": "Enregistrer"
+ },
+ "comun_guardar_cambios": {
+  "de": "Änderungen speichern",
+  "en": "Save changes",
+  "es": "Guardar cambios",
+  "fr": "Enregistrer"
+ },
+ "comun_invitar": {
+  "de": "Einladen",
+  "en": "Invite",
+  "es": "Invitar",
+  "fr": "Inviter"
+ },
+ "comun_juegos": {
+  "de": "Spiele",
+  "en": "Games",
+  "es": "Juegos",
+  "fr": "Jeux"
+ },
+ "comun_jugador": {
+  "de": "Spieler:in",
+  "en": "Player",
+  "es": "Jugador",
+  "fr": "Joueur"
+ },
+ "comun_miembros_1": {
+  "de": "{0} Mitglied",
+  "en": "{0} member",
+  "es": "{0} miembro",
+  "fr": "{0} membre"
+ },
+ "comun_miembros_n": {
+  "de": "{0} Mitglieder",
+  "en": "{0} members",
+  "es": "{0} miembros",
+  "fr": "{0} membres"
+ },
+ "comun_n_juegos": {
+  "de": "{0} Spiele",
+  "en": "{0} games",
+  "es": "{0} juegos",
+  "fr": "{0} jeux"
+ },
+ "comun_n_platinos": {
+  "de": "{0} Platin",
+  "en": "{0} platinums",
+  "es": "{0} platinos",
+  "fr": "{0} platines"
+ },
+ "comun_nivel": {
+  "de": "Stufe",
+  "en": "Level",
+  "es": "Nivel",
+  "fr": "Niveau"
+ },
+ "comun_nivel_n": {
+  "de": "Stufe {0}",
+  "en": "Level {0}",
+  "es": "Nivel {0}",
+  "fr": "Niveau {0}"
+ },
+ "comun_platinos": {
+  "de": "Platin",
+  "en": "Platinums",
+  "es": "Platinos",
+  "fr": "Platines"
+ },
+ "comun_pts": {
+  "de": "{0} Pkt.",
+  "en": "{0} pts",
+  "es": "{0} pts",
+  "fr": "{0} pts"
+ },
+ "comun_publicar": {
+  "de": "Veröffentlichen",
+  "en": "Publish",
+  "es": "Publicar",
+  "fr": "Publier"
+ },
+ "comun_puntos": {
+  "de": "{0} Punkte",
+  "en": "{0} points",
+  "es": "{0} puntos",
+  "fr": "{0} points"
+ },
+ "comun_rechazar": {
+  "de": "Ablehnen",
+  "en": "Decline",
+  "es": "Rechazar",
+  "fr": "Refuser"
+ },
+ "comun_reintentar": {
+  "de": "Erneut versuchen",
+  "en": "Retry",
+  "es": "Reintentar",
+  "fr": "Réessayer"
+ },
+ "comun_renombrar": {
+  "de": "Umbenennen",
+  "en": "Rename",
+  "es": "Renombrar",
+  "fr": "Renommer"
+ },
+ "comun_si_borrar": {
+  "de": "Ja, löschen",
+  "en": "Yes, delete",
+  "es": "Sí, borrar",
+  "fr": "Oui, supprimer"
+ },
+ "comun_si_continuar": {
+  "de": "Ja, weiter",
+  "en": "Yes, continue",
+  "es": "Sí, continuar",
+  "fr": "Oui, continuer"
+ },
+ "comun_sin_conexion_copia": {
+  "de": "Offline — letzte gespeicherte Kopie",
+  "en": "Offline — showing the last saved copy",
+  "es": "Sin conexión — mostrando la última copia guardada",
+  "fr": "Hors ligne — dernière copie enregistrée"
+ },
+ "comun_sin_resultados": {
+  "de": "Keine Ergebnisse.",
+  "en": "No results.",
+  "es": "Sin resultados.",
+  "fr": "Aucun résultat."
+ },
+ "comun_termina_en_1": {
+  "de": "Endet in {0} Tag",
+  "en": "Ends in {0} day",
+  "es": "Termina en {0} día",
+  "fr": "Se termine dans {0} jour"
+ },
+ "comun_termina_en_n": {
+  "de": "Endet in {0} Tagen",
+  "en": "Ends in {0} days",
+  "es": "Termina en {0} días",
+  "fr": "Se termine dans {0} jours"
+ },
+ "comun_termina_hoy": {
+  "de": "Endet heute",
+  "en": "Ends today",
+  "es": "Termina hoy",
+  "fr": "Se termine aujourd'hui"
+ },
+ "comun_trofeos": {
+  "de": "Trophäen",
+  "en": "Trophies",
+  "es": "Trofeos",
+  "fr": "Trophées"
+ },
+ "comun_vale": {
+  "de": "OK",
+  "en": "OK",
+  "es": "Vale",
+  "fr": "OK"
+ },
+ "comun_volver": {
+  "de": "Zurück",
+  "en": "Back",
+  "es": "Volver",
+  "fr": "Retour"
+ },
+ "cuentas_conectar": {
+  "de": "Verbinden",
+  "en": "Connect",
+  "es": "Conectar",
+  "fr": "Connecter"
+ },
+ "cuentas_declarado": {
+  "de": "Selbst gemeldeter Fortschritt · zählt nicht",
+  "en": "Self-reported progress · doesn't score",
+  "es": "Progreso declarado · no puntúa",
+  "fr": "Progression déclarée · ne compte pas"
+ },
+ "cuentas_desvincular": {
+  "de": "Trennen",
+  "en": "Unlink",
+  "es": "Desvincular",
+  "fr": "Dissocier"
+ },
+ "cuentas_desvincular_si": {
+  "de": "Ja, trennen",
+  "en": "Yes, unlink",
+  "es": "Sí, desvincular",
+  "fr": "Oui, dissocier"
+ },
+ "cuentas_desvincular_texto": {
+  "de": "Dein Fortschritt und deine gespeicherten Trophäen bleiben, aber die Synchronisierung stoppt, bis du das Konto wieder verknüpfst.",
+  "en": "Your progress and saved trophies stay as they are, but syncing stops until you link the account again.",
+  "es": "Tu progreso y trofeos ya guardados se quedan tal cual, pero deja de sincronizarse hasta que vuelvas a vincular la cuenta.",
+  "fr": "Ta progression et tes trophées enregistrés restent tels quels, mais la synchronisation s'arrête jusqu'à ce que tu associes de nouveau le compte."
+ },
+ "cuentas_desvincular_titulo": {
+  "de": "{0} trennen?",
+  "en": "Unlink {0}?",
+  "es": "¿Desvincular {0}?",
+  "fr": "Dissocier {0} ?"
+ },
+ "cuentas_epic_extension": {
+  "de": "Epic blockiert Anfragen von Servern, deshalb verknüpfst du es am Computer mit der Paragon-Browsererweiterung: Öffne deine Epic-Erfolgsseite und tippe auf Synchronisieren.",
+  "en": "Epic blocks requests from servers, so you link it from your computer with the Paragon browser extension: open your Epic achievements page and press Sync.",
+  "es": "Epic bloquea las consultas de los servidores, así que se vincula desde el ordenador con la extensión de Paragon para el navegador: abre tu página de logros de Epic y pulsa Sincronizar.",
+  "fr": "Epic bloque les requêtes des serveurs : on l'associe depuis l'ordinateur avec l'extension Paragon pour navigateur. Ouvre ta page de succès Epic et appuie sur Synchroniser."
+ },
+ "cuentas_ph_otro": {
+  "de": "Öffentliche ID / Gamertag",
+  "en": "Public ID / Gamertag",
+  "es": "ID Público / Gamertag",
+  "fr": "ID public / gamertag"
+ },
+ "cuentas_ph_psn": {
+  "de": "Deine PSN-Online-ID",
+  "en": "Your PSN Online ID",
+  "es": "Tu Online ID de PSN",
+  "fr": "Ton identifiant en ligne PSN"
+ },
+ "cuentas_ph_steam": {
+  "de": "Benutzername, SteamID64 oder Profil-URL",
+  "en": "Username, SteamID64 or profile URL",
+  "es": "Usuario, SteamID64 o URL del perfil",
+  "fr": "Pseudo, SteamID64 ou URL du profil"
+ },
+ "cuentas_ph_xbox": {
+  "de": "Dein Gamertag",
+  "en": "Your Gamertag",
+  "es": "Tu Gamertag",
+  "fr": "Ton gamertag"
+ },
+ "cuentas_plataformas_sub": {
+  "de": "Hier kommen deine echten Trophäen und Erfolge her.",
+  "en": "This is where your real trophies and achievements come from.",
+  "es": "De aquí salen tus trofeos y logros reales.",
+  "fr": "C'est d'ici que viennent tes vrais trophées et succès."
+ },
+ "cuentas_priv_otro": {
+  "de": "Wie stelle ich es auf öffentlich?",
+  "en": "How do I make it public?",
+  "es": "¿Cómo lo pongo en público?",
+  "fr": "Comment le rendre public ?"
+ },
+ "cuentas_priv_psn": {
+  "de": "Wo stelle ich mein PSN-Profil auf öffentlich?",
+  "en": "Where do I make my PSN profile public?",
+  "es": "¿Dónde pongo mi perfil de PSN en público?",
+  "fr": "Où rendre mon profil PSN public ?"
+ },
+ "cuentas_priv_steam": {
+  "de": "Wo stelle ich mein Steam-Profil auf öffentlich?",
+  "en": "Where do I make my Steam profile public?",
+  "es": "¿Dónde pongo mi perfil de Steam en público?",
+  "fr": "Où rendre mon profil Steam public ?"
+ },
+ "cuentas_priv_xbox": {
+  "de": "Wo stelle ich meinen Xbox-Verlauf auf öffentlich?",
+  "en": "Where do I make my Xbox history public?",
+  "es": "¿Dónde pongo mi historial de Xbox en público?",
+  "fr": "Où rendre mon historique Xbox public ?"
+ },
+ "cuentas_psn_1": {
+  "de": "Auf der Konsole (PS5/PS4): Einstellungen → Benutzer und Konten → Datenschutz → Anpassen.",
+  "en": "On the console (PS5/PS4): Settings → Users and Accounts → Privacy → Customise.",
+  "es": "Desde la consola (PS5/PS4): Ajustes → Usuarios y cuentas → Privacidad → Personalizar.",
+  "fr": "Sur la console (PS5/PS4) : Paramètres → Utilisateurs et comptes → Confidentialité → Personnaliser."
+ },
+ "cuentas_psn_2": {
+  "de": "Suche „Trophäenstufe, Spiele und Vitrinen“ (oder „Trophäen“) und stelle es auf „Jeder“.",
+  "en": "Find \"Trophy level, games and showcases\" (or \"Trophies\") and set it to \"Anyone\".",
+  "es": "Busca \"Nivel de trofeos, juegos y vitrinas\" (o \"Trofeos\") y ponlo en \"Cualquiera\" / \"Todo el mundo\".",
+  "fr": "Cherche « Niveau des trophées, jeux et vitrines » (ou « Trophées ») et règle-le sur « Tout le monde »."
+ },
+ "cuentas_psn_3": {
+  "de": "Vom Handy: PlayStation-App → dein Profil → Einstellungssymbol → Konto-Datenschutz → Trophäen.",
+  "en": "From your phone: PlayStation app → your profile → settings icon → Account privacy → Trophies.",
+  "es": "Desde el móvil: app de PlayStation → tu perfil → icono de ajustes → Privacidad de la cuenta → Trofeos.",
+  "fr": "Depuis le téléphone : app PlayStation → ton profil → icône des paramètres → Confidentialité du compte → Trophées."
+ },
+ "cuentas_psn_4": {
+  "de": "Die Änderung gilt sofort — du musst dich nicht neu anmelden.",
+  "en": "The change is instant — no need to sign in again.",
+  "es": "El cambio es inmediato — no hace falta reiniciar sesión.",
+  "fr": "Le changement est immédiat — pas besoin de te reconnecter."
+ },
+ "cuentas_seccion_login": {
+  "de": "ANMELDUNG (OAUTH)",
+  "en": "SIGN-IN (OAUTH)",
+  "es": "INICIO DE SESIÓN (OAUTH)",
+  "fr": "CONNEXION (OAUTH)"
+ },
+ "cuentas_seccion_plataformas": {
+  "de": "SPIELEPLATTFORMEN",
+  "en": "GAMING PLATFORMS",
+  "es": "PLATAFORMAS DE JUEGO",
+  "fr": "PLATEFORMES DE JEU"
+ },
+ "cuentas_steam_1": {
+  "de": "In deinem Steam-Profil (Web oder Client) → „Profil bearbeiten“ → „Privatsphäreeinstellungen“.",
+  "en": "On your Steam profile (web or client) → \"Edit Profile\" → \"Privacy Settings\".",
+  "es": "En tu perfil de Steam (web o cliente) → \"Editar perfil\" → \"Ajustes de privacidad\".",
+  "fr": "Sur ton profil Steam (web ou client) → « Modifier le profil » → « Paramètres de confidentialité »."
+ },
+ "cuentas_steam_2": {
+  "de": "Stelle „Mein Profil“ auf Öffentlich.",
+  "en": "Set \"My profile\" to Public.",
+  "es": "Pon \"Detalles de mi perfil\" en Público.",
+  "fr": "Mets « Mon profil » sur Public."
+ },
+ "cuentas_steam_3": {
+  "de": "Das, was fast alle übersehen: Stelle „Spieldetails“ AUCH auf Öffentlich — sonst lässt Steam deine Bibliothek nicht lesen.",
+  "en": "The one almost everyone misses: set \"Game details\" to Public TOO — without it, Steam won't let us read your library.",
+  "es": "El que casi todo el mundo se salta: pon \"Detalles del juego\" TAMBIÉN en Público — sin él, Steam no deja leer tu biblioteca.",
+  "fr": "Celui que presque tout le monde oublie : mets AUSSI « Détails des jeux » sur Public — sans ça, Steam ne laisse pas lire ta bibliothèque."
+ },
+ "cuentas_steam_4": {
+  "de": "Tippe unten auf der Seite auf „Speichern“.",
+  "en": "Press \"Save\" at the bottom of the page.",
+  "es": "Pulsa \"Guardar cambios\" al final de la página.",
+  "fr": "Appuie sur « Enregistrer » en bas de la page."
+ },
+ "cuentas_titulo": {
+  "de": "Verknüpfte Konten",
+  "en": "Linked accounts",
+  "es": "Cuentas Vinculadas",
+  "fr": "Comptes associés"
+ },
+ "cuentas_vinculada": {
+  "de": "Verknüpft",
+  "en": "Linked",
+  "es": "Vinculada",
+  "fr": "Associé"
+ },
+ "cuentas_vinculado": {
+  "de": "Verknüpft",
+  "en": "Linked",
+  "es": "Vinculado",
+  "fr": "Associé"
+ },
+ "cuentas_vincular": {
+  "de": "Verknüpfen",
+  "en": "Link",
+  "es": "Vincular",
+  "fr": "Associer"
+ },
+ "cuentas_xbox_1": {
+  "de": "Auf der Konsole oder in der Xbox-App: dein Profil → „Onlinesicherheit und Datenschutz“ → „Details anzeigen und anpassen“.",
+  "en": "On the console or the Xbox app: your profile → \"Online safety & privacy\" → \"View details & customise\".",
+  "es": "En la consola o la app Xbox: tu perfil → \"Privacidad y seguridad en línea\" → \"Ver detalles y personalizar\".",
+  "fr": "Sur la console ou l'app Xbox : ton profil → « Confidentialité et sécurité en ligne » → « Afficher les détails et personnaliser »."
+ },
+ "cuentas_xbox_2": {
+  "de": "Suche „Spielverlauf und Statistiken“ und stelle es auf „Jeder“.",
+  "en": "Find \"Game history & stats\" and set it to \"Everyone\".",
+  "es": "Busca \"Historial de juego y estadísticas\" y ponlo en \"Todos\".",
+  "fr": "Cherche « Historique de jeu et statistiques » et règle-le sur « Tout le monde »."
+ },
+ "cuentas_xbox_3": {
+  "de": "Xbox läuft über einen inoffiziellen Drittanbieterdienst — wenn es schon öffentlich ist und trotzdem nicht klappt, versuch es später noch mal.",
+  "en": "Xbox goes through an unofficial third-party service — if it's already public and still fails, try again later.",
+  "es": "Xbox usa un servicio de terceros no oficial — si ya es público y sigue sin funcionar, prueba de nuevo más tarde.",
+  "fr": "Xbox passe par un service tiers non officiel — si c'est déjà public et que ça échoue encore, réessaie plus tard."
+ },
+ "duracion_anios": {
+  "de": "Jahre",
+  "en": "Years",
+  "es": "Años",
+  "fr": "Ans"
+ },
+ "duracion_anios_1": {
+  "de": "{0} Jahr",
+  "en": "{0} year",
+  "es": "{0} año",
+  "fr": "{0} an"
+ },
+ "duracion_anios_n": {
+  "de": "{0} Jahre",
+  "en": "{0} years",
+  "es": "{0} años",
+  "fr": "{0} ans"
+ },
+ "duracion_dias": {
+  "de": "Tage",
+  "en": "Days",
+  "es": "Días",
+  "fr": "Jours"
+ },
+ "duracion_dias_1": {
+  "de": "{0} Tag",
+  "en": "{0} day",
+  "es": "{0} día",
+  "fr": "{0} jour"
+ },
+ "duracion_dias_n": {
+  "de": "{0} Tage",
+  "en": "{0} days",
+  "es": "{0} días",
+  "fr": "{0} jours"
+ },
+ "duracion_meses": {
+  "de": "Monate",
+  "en": "Months",
+  "es": "Meses",
+  "fr": "Mois"
+ },
+ "duracion_meses_1": {
+  "de": "{0} Monat",
+  "en": "{0} month",
+  "es": "{0} mes",
+  "fr": "{0} mois"
+ },
+ "duracion_meses_n": {
+  "de": "{0} Monate",
+  "en": "{0} months",
+  "es": "{0} meses",
+  "fr": "{0} mois"
+ },
+ "duracion_semanas": {
+  "de": "Wochen",
+  "en": "Weeks",
+  "es": "Semanas",
+  "fr": "Semaines"
+ },
+ "duracion_semanas_1": {
+  "de": "{0} Woche",
+  "en": "{0} week",
+  "es": "{0} semana",
+  "fr": "{0} semaine"
+ },
+ "duracion_semanas_n": {
+  "de": "{0} Wochen",
+  "en": "{0} weeks",
+  "es": "{0} semanas",
+  "fr": "{0} semaines"
+ },
+ "enfoque_aviso_1": {
+  "de": "{0} neue Trophäe!",
+  "en": "{0} new trophy!",
+  "es": "¡{0} trofeo nuevo!",
+  "fr": "{0} nouveau trophée !"
+ },
+ "enfoque_aviso_n": {
+  "de": "{0} neue Trophäen!",
+  "en": "{0} new trophies!",
+  "es": "¡{0} trofeos nuevos!",
+  "fr": "{0} nouveaux trophées !"
+ },
+ "enfoque_comprobando": {
+  "de": "Wird geprüft…",
+  "en": "Checking…",
+  "es": "Comprobando…",
+  "fr": "Vérification…"
+ },
+ "enfoque_detener": {
+  "de": "Sitzung beenden",
+  "en": "Stop session",
+  "es": "Detener sesión",
+  "fr": "Arrêter la session"
+ },
+ "enfoque_detener_esa": {
+  "de": "Diese Sitzung beenden",
+  "en": "Stop that session",
+  "es": "Detener esa sesión",
+  "fr": "Arrêter cette session"
+ },
+ "enfoque_diario": {
+  "de": "Tagebuch",
+  "en": "Log",
+  "es": "Diario",
+  "fr": "Journal"
+ },
+ "enfoque_diario_conseguidos_1": {
+  "de": ". {0} Trophäe geholt.",
+  "en": ". Earned {0} trophy.",
+  "es": ". Conseguido {0} trofeo.",
+  "fr": ". {0} trophée obtenu."
+ },
+ "enfoque_diario_conseguidos_n": {
+  "de": ". {0} Trophäen geholt.",
+  "en": ". Earned {0} trophies.",
+  "es": ". Conseguidos {0} trofeos.",
+  "fr": ". {0} trophées obtenus."
+ },
+ "enfoque_diario_linea": {
+  "de": "{0} {1} gespielt",
+  "en": "{0} playing {1}",
+  "es": "{0} jugando a {1}",
+  "fr": "{0} sur {1}"
+ },
+ "enfoque_diario_sub": {
+  "de": "Wie viel Zeit du wirklich in jede Platin steckst",
+  "en": "How much time you really spend on each platinum",
+  "es": "Cuánto tiempo de verdad le dedicas a cada platino",
+  "fr": "Combien de temps tu consacres vraiment à chaque platine"
+ },
+ "enfoque_diario_vacio": {
+  "de": "Noch keine Sitzungen — starte eine im Fokusmodus.",
+  "en": "No sessions logged yet — start one from Focus mode.",
+  "es": "Sin sesiones registradas todavía — inicia una desde Modo Enfoque.",
+  "fr": "Aucune session pour l'instant — lances-en une depuis le mode focus."
+ },
+ "enfoque_hecho": {
+  "de": "Hier ist keine Trophäe mehr offen. Erledigt.",
+  "en": "No trophies left here. It's done.",
+  "es": "No queda ningún trofeo pendiente aquí. Está hecho.",
+  "fr": "Plus aucun trophée en attente ici. C'est fait."
+ },
+ "enfoque_iniciar": {
+  "de": "⏱️ Zeit messen",
+  "en": "⏱️ Start tracking",
+  "es": "⏱️ Iniciar seguimiento",
+  "fr": "⏱️ Lancer le suivi"
+ },
+ "enfoque_nada_nuevo": {
+  "de": "Noch nichts Neues",
+  "en": "Nothing new yet",
+  "es": "Nada nuevo todavía",
+  "fr": "Rien de nouveau pour l'instant"
+ },
+ "enfoque_nota_offline": {
+  "de": "Auf dem Handy gespeichert — wird synchronisiert, sobald du wieder online bist",
+  "en": "Saved on the phone — it will sync when you're back online",
+  "es": "Guardada en el móvil — se sincronizará cuando vuelva la conexión",
+  "fr": "Enregistrée sur le téléphone — elle se synchronisera au retour de la connexion"
+ },
+ "enfoque_nota_ph": {
+  "de": "Private Notiz (ein Spindcode, wo du aufgehört hast...)",
+  "en": "Private note (a locker code, where you left off...)",
+  "es": "Nota privada (código de una taquilla, dónde te quedaste...)",
+  "fr": "Note privée (code d'un casier, où tu t'es arrêté...)"
+ },
+ "enfoque_nuevos_1": {
+  "de": " — {0} neue Trophäe",
+  "en": " — {0} new trophy",
+  "es": " — {0} trofeo nuevo",
+  "fr": " — {0} nouveau trophée"
+ },
+ "enfoque_nuevos_n": {
+  "de": " — {0} neue Trophäen",
+  "en": " — {0} new trophies",
+  "es": " — {0} trofeos nuevos",
+  "fr": " — {0} nouveaux trophées"
+ },
+ "enfoque_otra_sesion": {
+  "de": "Du hast eine aktive Sitzung in {0}",
+  "en": "You have an active session in {0}",
+  "es": "Tienes una sesión activa en {0}",
+  "fr": "Tu as une session active sur {0}"
+ },
+ "enfoque_platino": {
+  "de": "PLATIN FREIGESCHALTET",
+  "en": "PLATINUM UNLOCKED",
+  "es": "PLATINO DESBLOQUEADO",
+  "fr": "PLATINE DÉBLOQUÉ"
+ },
+ "enfoque_rareza": {
+  "de": "{0} % der Spieler:innen haben sie",
+  "en": "{0}% of players have it",
+  "es": "{0}% de jugadores lo tienen",
+  "fr": "{0} % des joueurs l'ont"
+ },
+ "enfoque_salir": {
+  "de": "Fokusmodus verlassen",
+  "en": "Exit focus mode",
+  "es": "Salir del modo enfoque",
+  "fr": "Quitter le mode focus"
+ },
+ "enfoque_sesion_guardada": {
+  "de": "Sitzung gespeichert: {0}",
+  "en": "Session saved: {0}",
+  "es": "Sesión guardada: {0}",
+  "fr": "Session enregistrée : {0}"
+ },
+ "enfoque_titulo": {
+  "de": "FOKUSMODUS",
+  "en": "FOCUS MODE",
+  "es": "MODO ENFOQUE",
+  "fr": "MODE FOCUS"
+ },
+ "enfoque_tu_diario": {
+  "de": "DEIN TAGEBUCH",
+  "en": "YOUR LOG",
+  "es": "TU DIARIO",
+  "fr": "TON JOURNAL"
+ },
+ "enfoque_vacio": {
+  "de": "Hefte ein Spiel an, um es hier zu sehen.",
+  "en": "Pin a game to see it here.",
+  "es": "Ancla un juego para verlo aquí.",
+  "fr": "Épingle un jeu pour le voir ici."
+ },
+ "enfoque_vacio_sub": {
+  "de": "Öffne eine Spielseite und tippe auf das Anheften-Symbol — es wird dein aktuelles Ziel.",
+  "en": "Open a game page and tap the pin icon — it becomes your current goal.",
+  "es": "Abre la ficha de un juego y toca el icono de anclar — se convierte en tu objetivo actual.",
+  "fr": "Ouvre la fiche d'un jeu et touche l'icône d'épingle — il devient ton objectif actuel."
+ },
+ "enfoque_ver_diario": {
+  "de": "Sitzungstagebuch ansehen",
+  "en": "See your session log",
+  "es": "Ver tu diario de sesiones",
+  "fr": "Voir ton journal de sessions"
+ },
+ "enfoque_ya_lo_tengo": {
+  "de": "Hab ich's schon?",
+  "en": "Got it yet?",
+  "es": "¿Ya lo tengo?",
+  "fr": "Je l'ai déjà ?"
+ },
+ "error_conexion": {
+  "de": "Keine Verbindung zu Paragon.",
+  "en": "Couldn't connect to Paragon.",
+  "es": "No se pudo conectar con Paragon.",
+  "fr": "Impossible de se connecter à Paragon."
+ },
+ "error_guardar_guia": {
+  "de": "Der Guide konnte nicht gespeichert werden.",
+  "en": "Couldn't save the guide.",
+  "es": "No se ha podido guardar la guía.",
+  "fr": "Impossible d'enregistrer le guide."
+ },
+ "error_red": {
+  "de": "Netzwerkfehler.",
+  "en": "Network error.",
+  "es": "Error de red.",
+  "fr": "Erreur réseau."
+ },
+ "error_servidor": {
+  "de": "Der Server hat einen Fehler gemeldet ({0}).",
+  "en": "The server returned an error ({0}).",
+  "es": "El servidor respondió con un error ({0}).",
+  "fr": "Le serveur a renvoyé une erreur ({0})."
+ },
+ "error_servidor_corto": {
+  "de": "Serverfehler ({0}).",
+  "en": "Server error ({0}).",
+  "es": "Error del servidor ({0}).",
+  "fr": "Erreur du serveur ({0})."
+ },
+ "error_sin_sesion": {
+  "de": "Nicht angemeldet.",
+  "en": "Not signed in.",
+  "es": "Sin sesión.",
+  "fr": "Non connecté."
+ },
+ "feed_comentar_ph": {
+  "de": "Kommentar schreiben...",
+  "en": "Add a comment...",
+  "es": "Añadir un comentario...",
+  "fr": "Ajouter un commentaire..."
+ },
+ "feed_favorito": {
+  "de": "Hat {0} favorisiert.",
+  "en": "Favourited {0}.",
+  "es": "Ha marcado {0} como favorito.",
+  "fr": "A mis {0} en favori."
+ },
+ "feed_nota": {
+  "de": " mit {0}/10.",
+  "en": " {0}/10.",
+  "es": " con {0}/10.",
+  "fr": " {0}/10."
+ },
+ "feed_nuevo": {
+  "de": "Hat mit {0} angefangen.",
+  "en": "Started playing {0}.",
+  "es": "Ha empezado a jugar a {0}.",
+  "fr": "A commencé {0}."
+ },
+ "feed_otro": {
+  "de": "Hat etwas in {0} gemacht.",
+  "en": "Did something in {0}.",
+  "es": "Ha hecho algo en {0}.",
+  "fr": "A fait quelque chose dans {0}."
+ },
+ "feed_otro_sin": {
+  "de": "Hat etwas gemacht.",
+  "en": "Did something.",
+  "es": "Ha hecho algo.",
+  "fr": "A fait quelque chose."
+ },
+ "feed_platino": {
+  "de": "Hat die Platin in {0} geholt.",
+  "en": "Got the Platinum in {0}.",
+  "es": "Ha conseguido el Platino en {0}.",
+  "fr": "A décroché le platine de {0}."
+ },
+ "feed_resena": {
+  "de": "Hat {0} rezensiert.",
+  "en": "Reviewed {0}.",
+  "es": "Ha escrito una reseña de {0}.",
+  "fr": "A écrit une critique de {0}."
+ },
+ "feed_titulo": {
+  "de": "COMMUNITY",
+  "en": "COMMUNITY",
+  "es": "COMUNIDAD",
+  "fr": "COMMUNAUTÉ"
+ },
+ "feed_vacio": {
+  "de": "Noch keine Aktivität",
+  "en": "No activity yet",
+  "es": "Sin actividad todavía",
+  "fr": "Pas encore d'activité"
+ },
+ "feed_vacio_sub": {
+  "de": "Deine und die deiner Freunde erscheint hier — Platin, Rezensionen, neue Spiele.",
+  "en": "Yours and your friends' will show up here — platinums, reviews, new games.",
+  "es": "La tuya y la de tus amigos aparecerá aquí — platinos, reseñas, juegos nuevos.",
+  "fr": "La tienne et celle de tes amis apparaîtront ici — platines, critiques, nouveaux jeux."
+ },
+ "feed_valoro": {
+  "de": "Hat {0} bewertet",
+  "en": "Rated {0}",
+  "es": "Ha valorado {0}",
+  "fr": "A noté {0}"
+ },
+ "feed_ver_comentarios": {
+  "de": "Alle {0} Kommentare ansehen",
+  "en": "View all {0} comments",
+  "es": "Ver los {0} comentarios",
+  "fr": "Voir les {0} commentaires"
+ },
+ "ficha_anclar": {
+  "de": "Als Ziel anheften",
+  "en": "Pin as goal",
+  "es": "Anclar objetivo",
+  "fr": "Épingler comme objectif"
+ },
+ "ficha_atascar": {
+  "de": "Als festgefahren markieren",
+  "en": "Mark as stuck",
+  "es": "Atascar",
+  "fr": "Marquer comme bloqué"
+ },
+ "ficha_buscar_guia": {
+  "de": "Guide suchen",
+  "en": "Find guide",
+  "es": "Buscar Guía",
+  "fr": "Chercher un guide"
+ },
+ "ficha_compartir_platino": {
+  "de": "Platin teilen",
+  "en": "Share platinum",
+  "es": "Compartir Platino",
+  "fr": "Partager le platine"
+ },
+ "ficha_cronologia": {
+  "de": "Zeitleiste",
+  "en": "Timeline",
+  "es": "Cronología",
+  "fr": "Chronologie"
+ },
+ "ficha_declarado": {
+  "de": "Selbst gemeldeter Fortschritt · zählt nicht für Stufen oder Ranglisten",
+  "en": "Self-reported progress · doesn't count for levels or rankings",
+  "es": "Progreso declarado · no puntúa en niveles ni rankings",
+  "fr": "Progression déclarée · ne compte ni pour les niveaux ni pour les classements"
+ },
+ "ficha_err_no_existe": {
+  "de": "Dieses Spiel gibt es nicht oder es gehört dir nicht.",
+  "en": "This game doesn't exist or isn't yours.",
+  "es": "Este juego no existe o no es tuyo.",
+  "fr": "Ce jeu n'existe pas ou n'est pas à toi."
+ },
+ "ficha_fecha_rareza": {
+  "de": "{0} · {1} %",
+  "en": "{0} · {1}%",
+  "es": "{0} · {1}%",
+  "fr": "{0} · {1} %"
+ },
+ "ficha_fecha_trofeos": {
+  "de": "{0} · {1} Trophäen",
+  "en": "{0} · {1} trophies",
+  "es": "{0} · {1} trofeos",
+  "fr": "{0} · {1} trophées"
+ },
+ "ficha_grado_rareza": {
+  "de": "{0} · {1} %",
+  "en": "{0} · {1}%",
+  "es": "{0} · {1}%",
+  "fr": "{0} · {1} %"
+ },
+ "ficha_grafica_vacia": {
+  "de": "Für das Diagramm braucht es mindestens zwei Trophäen mit Datum und Seltenheit.",
+  "en": "At least two trophies with a recorded date and rarity are needed to draw the chart.",
+  "es": "Hacen falta al menos dos trofeos con fecha y rareza registradas para dibujar la gráfica.",
+  "fr": "Il faut au moins deux trophées avec date et rareté pour tracer le graphique."
+ },
+ "ficha_guias_escritas": {
+  "de": "Schriftliche Guides",
+  "en": "Written guides",
+  "es": "Guías escritas",
+  "fr": "Guides écrits"
+ },
+ "ficha_horas": {
+  "de": "{0} h gespielt",
+  "en": "{0}h played",
+  "es": "{0}h jugadas",
+  "fr": "{0} h jouées"
+ },
+ "ficha_lista": {
+  "de": "Liste",
+  "en": "List",
+  "es": "Lista",
+  "fr": "Liste"
+ },
+ "ficha_notas": {
+  "de": "PRIVATE NOTIZEN",
+  "en": "PRIVATE NOTES",
+  "es": "NOTAS PRIVADAS",
+  "fr": "NOTES PRIVÉES"
+ },
+ "ficha_notas_anadir": {
+  "de": "Persönliche Notiz hinzufügen...",
+  "en": "Add a personal note...",
+  "es": "Añadir nota personal...",
+  "fr": "Ajouter une note perso..."
+ },
+ "ficha_notas_ph": {
+  "de": "Notizen, Codes, Farming-Routen...",
+  "en": "Notes, codes, farming routes...",
+  "es": "Apuntes, códigos, rutas de farmeo...",
+  "fr": "Notes, codes, itinéraires de farm..."
+ },
+ "ficha_objetivo_actual": {
+  "de": "Aktuelles Ziel",
+  "en": "Current goal",
+  "es": "Objetivo actual",
+  "fr": "Objectif actuel"
+ },
+ "ficha_prediccion": {
+  "de": "🔮 In diesem Tempo hast du sie am {0}",
+  "en": "🔮 At this pace, you'll have it on {0}",
+  "es": "🔮 A este ritmo, lo tienes el {0}",
+  "fr": "🔮 À ce rythme, tu l'auras le {0}"
+ },
+ "ficha_progreso": {
+  "de": "{0}/{1} Trophäen · {2} %",
+  "en": "{0}/{1} trophies · {2}%",
+  "es": "{0}/{1} trofeos · {2}%",
+  "fr": "{0}/{1} trophées · {2} %"
+ },
+ "ficha_reservado": {
+  "de": "Reserviert",
+  "en": "Reserved",
+  "es": "Reservado",
+  "fr": "Réservé"
+ },
+ "ficha_reservado_n": {
+  "de": "Reserviert für #{0}",
+  "en": "Reserved for #{0}",
+  "es": "Reservado para el #{0}",
+  "fr": "Réservé pour le n°{0}"
+ },
+ "ficha_reservar": {
+  "de": "Meilenstein reservieren",
+  "en": "Reserve milestone",
+  "es": "Reservar hito",
+  "fr": "Réserver l'étape"
+ },
+ "ficha_reservar_n": {
+  "de": "Für #{0} reservieren",
+  "en": "Reserve for #{0}",
+  "es": "Reservar para el #{0}",
+  "fr": "Réserver pour le n°{0}"
+ },
+ "fuente_casual": {
+  "de": "Locker",
+  "en": "Casual",
+  "es": "Casual",
+  "fr": "Décontractée"
+ },
+ "fuente_elegante": {
+  "de": "Elegant",
+  "en": "Elegant",
+  "es": "Elegante",
+  "fr": "Élégante"
+ },
+ "fuente_moderna": {
+  "de": "Modern",
+  "en": "Modern",
+  "es": "Moderna",
+  "fr": "Moderne"
+ },
+ "fuente_retro": {
+  "de": "Retro",
+  "en": "Retro",
+  "es": "Retro",
+  "fr": "Rétro"
+ },
+ "grado_bronce": {
+  "de": "Bronze",
+  "en": "Bronze",
+  "es": "Bronce",
+  "fr": "Bronze"
+ },
+ "grado_oro": {
+  "de": "Gold",
+  "en": "Gold",
+  "es": "Oro",
+  "fr": "Or"
+ },
+ "grado_plata": {
+  "de": "Silber",
+  "en": "Silver",
+  "es": "Plata",
+  "fr": "Argent"
+ },
+ "grado_platino": {
+  "de": "Platin",
+  "en": "Platinum",
+  "es": "Platino",
+  "fr": "Platine"
+ },
+ "guia_busqueda_video": {
+  "de": "{0} {1} Trophäe Guide",
+  "en": "{0} {1} trophy guide",
+  "es": "{0} {1} guía trofeo",
+  "fr": "{0} {1} guide trophée"
+ },
+ "guias_borrar_texto": {
+  "de": "Er verschwindet für alle, nicht nur für dich.",
+  "en": "It disappears for everyone, not just you.",
+  "es": "Desaparece para todo el mundo que la vea, no solo para ti.",
+  "fr": "Il disparaît pour tout le monde, pas seulement pour toi."
+ },
+ "guias_borrar_titulo": {
+  "de": "Deinen Guide löschen?",
+  "en": "Delete your guide?",
+  "es": "¿Borrar tu guía?",
+  "fr": "Supprimer ton guide ?"
+ },
+ "guias_ph": {
+  "de": "Schreib auf, wie man sie bekommt, Routen, Codes...",
+  "en": "Write how to get it, routes, codes...",
+  "es": "Apunta cómo se consigue, rutas, códigos...",
+  "fr": "Note comment l'obtenir, itinéraires, codes..."
+ },
+ "guias_tu_guia": {
+  "de": "DEIN GUIDE",
+  "en": "YOUR GUIDE",
+  "es": "TU GUÍA",
+  "fr": "TON GUIDE"
+ },
+ "guias_vacio": {
+  "de": "Für diese Trophäe gibt es noch keinen schriftlichen Guide.",
+  "en": "There's no written guide for this trophy yet.",
+  "es": "Todavía no hay ninguna guía escrita para este trofeo.",
+  "fr": "Il n'y a pas encore de guide écrit pour ce trophée."
+ },
+ "liga_borrar": {
+  "de": "Diese Liga löschen",
+  "en": "Delete this league",
+  "es": "Borrar esta liga",
+  "fr": "Supprimer cette ligue"
+ },
+ "liga_borrar_texto": {
+  "de": "„{0}“ verschwindet für alle Mitglieder, samt Tabelle und Herausforderung. Das lässt sich nicht rückgängig machen.",
+  "en": "\"{0}\" disappears for all its members, with its standings and challenge. This can't be undone.",
+  "es": "\"{0}\" desaparece para todos sus miembros, con su clasificación y su reto. No se puede deshacer.",
+  "fr": "« {0} » disparaît pour tous ses membres, avec son classement et son défi. C'est irréversible."
+ },
+ "liga_borrar_titulo": {
+  "de": "Diese Liga löschen?",
+  "en": "Delete this league?",
+  "es": "¿Borrar esta liga?",
+  "fr": "Supprimer cette ligue ?"
+ },
+ "liga_cancelar_inv_si": {
+  "de": "Ja, zurückziehen",
+  "en": "Yes, cancel",
+  "es": "Sí, cancelar",
+  "fr": "Oui, annuler"
+ },
+ "liga_cancelar_inv_texto": {
+  "de": "{0} kann sie dann nicht mehr annehmen.",
+  "en": "{0} won't be able to accept it.",
+  "es": "{0} ya no podrá aceptarla.",
+  "fr": "{0} ne pourra plus l'accepter."
+ },
+ "liga_cancelar_inv_titulo": {
+  "de": "Einladung zurückziehen?",
+  "en": "Cancel the invite?",
+  "es": "¿Cancelar la invitación?",
+  "fr": "Annuler l'invitation ?"
+ },
+ "liga_clasif_sub": {
+  "de": "Tabelle seit der Gründung — nur unter den Mitgliedern dieser Liga.",
+  "en": "Standings since it was created — only among this league's members.",
+  "es": "Clasificación desde que se creó — solo entre los miembros de esta liga.",
+  "fr": "Classement depuis sa création — uniquement entre les membres de cette ligue."
+ },
+ "liga_con_fin": {
+  "de": "Mit Enddatum.",
+  "en": "Has an end date.",
+  "es": "Con fecha de fin.",
+  "fr": "Avec une date de fin."
+ },
+ "liga_duracion_termina": {
+  "de": "{0} — endet am {1}.",
+  "en": "{0} — ends on {1}.",
+  "es": "{0} — termina el {1}.",
+  "fr": "{0} — se termine le {1}."
+ },
+ "liga_err_no_existe": {
+  "de": "Diese Liga gibt es nicht oder du bist kein Mitglied.",
+  "en": "This league doesn't exist or you're not a member.",
+  "es": "Esta liga no existe o no eres miembro.",
+  "fr": "Cette ligue n'existe pas ou tu n'en es pas membre."
+ },
+ "liga_esperando": {
+  "de": "wartet auf Antwort",
+  "en": "awaiting reply",
+  "es": "esperando respuesta",
+  "fr": "en attente de réponse"
+ },
+ "liga_invitaciones": {
+  "de": "OFFENE EINLADUNGEN",
+  "en": "PENDING INVITES",
+  "es": "INVITACIONES SIN RESPONDER",
+  "fr": "INVITATIONS EN ATTENTE"
+ },
+ "liga_invitar_amigo": {
+  "de": "FREUND EINLADEN",
+  "en": "INVITE A FRIEND",
+  "es": "INVITAR A UN AMIGO",
+  "fr": "INVITER UN AMI"
+ },
+ "liga_para_subir": {
+  "de": "{0} Pkt. bis zum nächsten Platz",
+  "en": "{0} pts to pass the next place up",
+  "es": "{0} pts para superar al puesto de arriba",
+  "fr": "{0} pts pour dépasser la place du dessus"
+ },
+ "liga_posicion": {
+  "de": "{0}.  {1}",
+  "en": "#{0}  {1}",
+  "es": "{0}º  {1}",
+  "fr": "{0}e  {1}"
+ },
+ "liga_quitar": {
+  "de": "Aus der Liga entfernen",
+  "en": "Remove from league",
+  "es": "Quitar de la liga",
+  "fr": "Retirer de la ligue"
+ },
+ "liga_quitar_reto": {
+  "de": "Herausforderung entfernen",
+  "en": "Remove challenge",
+  "es": "Quitar reto",
+  "fr": "Retirer le défi"
+ },
+ "liga_quitar_si": {
+  "de": "Ja, entfernen",
+  "en": "Yes, remove",
+  "es": "Sí, quitar",
+  "fr": "Oui, retirer"
+ },
+ "liga_quitar_texto": {
+  "de": "{0} erscheint nicht mehr in der Tabelle.",
+  "en": "{0} will no longer appear in the standings.",
+  "es": "{0} dejará de aparecer en la clasificación.",
+  "fr": "{0} n'apparaîtra plus dans le classement."
+ },
+ "liga_quitar_titulo": {
+  "de": "Aus der Liga entfernen?",
+  "en": "Remove from the league?",
+  "es": "¿Quitar de la liga?",
+  "fr": "Retirer de la ligue ?"
+ },
+ "liga_reto": {
+  "de": "HERAUSFORDERUNG",
+  "en": "CHALLENGE",
+  "es": "RETO",
+  "fr": "DÉFI"
+ },
+ "liga_reto_elegir": {
+  "de": "Herausforderungsspiel wählen",
+  "en": "Pick challenge game",
+  "es": "Elegir juego de reto",
+  "fr": "Choisir le jeu du défi"
+ },
+ "liga_reto_elige": {
+  "de": "Wähl ein Spiel aus deiner Bibliothek und wetteifert, wer zuerst Platin holt.",
+  "en": "Pick a game from your library and race to platinum it first.",
+  "es": "Elige un juego de tu biblioteca para picaros a ver quién lo platina antes.",
+  "fr": "Choisis un jeu de ta bibliothèque et voyez qui le platine en premier."
+ },
+ "liga_reto_texto": {
+  "de": "Mal sehen, wer zuerst die Platin in {0} holt.",
+  "en": "Let's see who gets the {0} platinum first.",
+  "es": "A ver quién le pilla antes el platino a {0}.",
+  "fr": "Voyons qui décroche le premier le platine de {0}."
+ },
+ "liga_salir": {
+  "de": "Diese Liga verlassen",
+  "en": "Leave this league",
+  "es": "Salir de esta liga",
+  "fr": "Quitter cette ligue"
+ },
+ "liga_salir_si": {
+  "de": "Ja, verlassen",
+  "en": "Yes, leave",
+  "es": "Sí, salir",
+  "fr": "Oui, quitter"
+ },
+ "liga_salir_texto": {
+  "de": "Du erscheinst nicht mehr in der Tabelle von „{0}“ — der Besitzer müsste dich erneut einladen.",
+  "en": "You'll stop appearing in the \"{0}\" standings — the owner would have to invite you again for you to rejoin.",
+  "es": "Dejarás de aparecer en la clasificación de \"{0}\" — el dueño tendría que volver a invitarte para que entres otra vez.",
+  "fr": "Tu n'apparaîtras plus dans le classement de « {0} » — le créateur devra te réinviter pour revenir."
+ },
+ "liga_salir_titulo": {
+  "de": "Diese Liga verlassen?",
+  "en": "Leave this league?",
+  "es": "¿Salir de esta liga?",
+  "fr": "Quitter cette ligue ?"
+ },
+ "liga_sin_fin": {
+  "de": "Kein Enddatum.",
+  "en": "No end date.",
+  "es": "Sin fecha de fin.",
+  "fr": "Pas de date de fin."
+ },
+ "liga_sin_reto": {
+  "de": "Noch keine Herausforderung — der Liga-Besitzer kann ein Spiel wählen.",
+  "en": "No challenge yet — the league owner can pick a game to race on.",
+  "es": "Sin reto todavía — el dueño de la liga puede elegir un juego para picarse.",
+  "fr": "Pas encore de défi — le créateur de la ligue peut choisir un jeu."
+ },
+ "liga_termina_el": {
+  "de": "Endet am {0}.",
+  "en": "Ends on {0}.",
+  "es": "Termina el {0}.",
+  "fr": "Se termine le {0}."
+ },
+ "liga_todos_dentro": {
+  "de": "Alle verfügbaren Freunde sind schon in dieser Liga.",
+  "en": "All your available friends are already in this league.",
+  "es": "Ya están todos tus amigos disponibles en esta liga.",
+  "fr": "Tous tes amis disponibles sont déjà dans cette ligue."
+ },
+ "login_discord": {
+  "de": "Weiter mit Discord",
+  "en": "Continue with Discord",
+  "es": "Continuar con Discord",
+  "fr": "Continuer avec Discord"
+ },
+ "login_google": {
+  "de": "Weiter mit Google",
+  "en": "Continue with Google",
+  "es": "Continuar con Google",
+  "fr": "Continuer avec Google"
+ },
+ "login_lema": {
+  "de": "Die nächste Platin wartet nicht.",
+  "en": "The next platinum won't wait.",
+  "es": "El siguiente platino no se espera.",
+  "fr": "Le prochain platine n'attend pas."
+ },
+ "login_sin_contrasenas": {
+  "de": "Wir speichern keine Passwörter: die Anmeldung übernimmt dein Anbieter.",
+  "en": "We don't store passwords: your provider handles sign-in.",
+  "es": "No guardamos contraseñas: el acceso lo lleva tu proveedor.",
+  "fr": "Nous ne stockons aucun mot de passe : ton fournisseur gère la connexion."
+ },
+ "main_buscar_ph": {
+  "de": "Spiel suchen...",
+  "en": "Search game...",
+  "es": "Buscar juego...",
+  "fr": "Chercher un jeu..."
+ },
+ "main_cerrar_busqueda": {
+  "de": "Suche schließen",
+  "en": "Close search",
+  "es": "Cerrar búsqueda",
+  "fr": "Fermer la recherche"
+ },
+ "main_racha": {
+  "de": "{0}-Tage-Serie",
+  "en": "{0}-day streak",
+  "es": "Racha de {0} días",
+  "fr": "Série de {0} jours"
+ },
+ "main_sin_racha": {
+  "de": "Keine aktive Serie",
+  "en": "No active streak",
+  "es": "Sin racha activa",
+  "fr": "Aucune série en cours"
+ },
+ "nav_ajustes": {
+  "de": "Einstellungen",
+  "en": "Settings",
+  "es": "Ajustes",
+  "fr": "Paramètres"
+ },
+ "nav_atascados": {
+  "de": "Festgefahrene Trophäen",
+  "en": "Stuck trophies",
+  "es": "Trofeos atascados",
+  "fr": "Trophées bloqués"
+ },
+ "nav_atascados_menu": {
+  "de": "Festgefahrene Trophäen",
+  "en": "Stuck trophies",
+  "es": "Trofeos Atascados",
+  "fr": "Trophées bloqués"
+ },
+ "nav_biblioteca": {
+  "de": "Bibliothek",
+  "en": "Library",
+  "es": "Biblioteca",
+  "fr": "Bibliothèque"
+ },
+ "nav_carpetas": {
+  "de": "Ordner",
+  "en": "Folders",
+  "es": "Carpetas",
+  "fr": "Dossiers"
+ },
+ "nav_comparar": {
+  "de": "Vergleichen",
+  "en": "Compare",
+  "es": "Comparar",
+  "fr": "Comparer"
+ },
+ "nav_comunidad": {
+  "de": "Community",
+  "en": "Community",
+  "es": "Comunidad",
+  "fr": "Communauté"
+ },
+ "nav_enfoque": {
+  "de": "Fokusmodus",
+  "en": "Focus mode",
+  "es": "Modo Enfoque",
+  "fr": "Mode focus"
+ },
+ "nav_estadisticas": {
+  "de": "Statistiken",
+  "en": "Stats",
+  "es": "Estadísticas",
+  "fr": "Statistiques"
+ },
+ "nav_ficha": {
+  "de": "Spielseite",
+  "en": "Game page",
+  "es": "Ficha de juego",
+  "fr": "Fiche du jeu"
+ },
+ "nav_ligas": {
+  "de": "Ligen",
+  "en": "Leagues",
+  "es": "Ligas",
+  "fr": "Ligues"
+ },
+ "nav_panel": {
+  "de": "Übersicht",
+  "en": "Home",
+  "es": "Panel",
+  "fr": "Accueil"
+ },
+ "panel_a_por_este": {
+  "de": "HOL DIR JETZT DIESE PLATIN",
+  "en": "GO FOR THIS PLATINUM NOW",
+  "es": "A POR ESTE PLATINO AHORA",
+  "fr": "VISE CE PLATINE MAINTENANT"
+ },
+ "panel_cerrojo": {
+  "de": "MEILENSTEIN-SPERRE",
+  "en": "MILESTONE LOCK",
+  "es": "CERROJO DE HITOS",
+  "fr": "VERROU D'ÉTAPE"
+ },
+ "panel_cerrojo_texto": {
+  "de": "{0} für deine Platin #{1} reserviert",
+  "en": "{0} reserved for your platinum #{1}",
+  "es": "{0} reservado para tu platino #{1}",
+  "fr": "{0} réservé pour ton platine n°{1}"
+ },
+ "panel_completado": {
+  "de": "Abgeschlossen",
+  "en": "Completed",
+  "es": "Completado",
+  "fr": "Terminé"
+ },
+ "panel_hola": {
+  "de": "HALLO, {0}",
+  "en": "HI, {0}",
+  "es": "HOLA, {0}",
+  "fr": "SALUT, {0}"
+ },
+ "panel_juego_progreso": {
+  "de": "{0} · {1} % abgeschlossen",
+  "en": "{0} · {1}% complete",
+  "es": "{0} · {1}% completado",
+  "fr": "{0} · {1} % terminé"
+ },
+ "panel_meta": {
+  "de": "PERSÖNLICHES ZIEL",
+  "en": "PERSONAL GOAL",
+  "es": "META PERSONAL",
+  "fr": "OBJECTIF PERSO"
+ },
+ "panel_meta_eliminar": {
+  "de": "Ziel entfernen",
+  "en": "Remove goal",
+  "es": "Eliminar Meta",
+  "fr": "Supprimer l'objectif"
+ },
+ "panel_meta_fijar": {
+  "de": "Platin-Ziel festlegen",
+  "en": "Set a platinum goal",
+  "es": "Fijar meta de platinos",
+  "fr": "Fixer un objectif de platines"
+ },
+ "panel_meta_objetivo": {
+  "de": "Ziel: {0} Platin",
+  "en": "Goal: {0} platinums",
+  "es": "Objetivo: {0} platinos",
+  "fr": "Objectif : {0} platines"
+ },
+ "panel_meta_ph": {
+  "de": "z. B. 50",
+  "en": "E.g. 50",
+  "es": "Ej: 50",
+  "fr": "Ex. : 50"
+ },
+ "panel_meta_titulo": {
+  "de": "Platin-Ziel",
+  "en": "Platinum goal",
+  "es": "Meta de Platinos",
+  "fr": "Objectif de platines"
+ },
+ "panel_nivel": {
+  "de": "Paragon-Stufe {0}",
+  "en": "Paragon level {0}",
+  "es": "Nivel Paragon {0}",
+  "fr": "Niveau Paragon {0}"
+ },
+ "panel_platinado": {
+  "de": "PLATIN GEHOLT",
+  "en": "PLATINUM'D",
+  "es": "PLATINADO",
+  "fr": "PLATINÉ"
+ },
+ "panel_platinado_excl": {
+  "de": "Platin geholt!",
+  "en": "Platinum'd!",
+  "es": "¡Platinado!",
+  "fr": "Platiné !"
+ },
+ "panel_platinos": {
+  "de": "PLATIN",
+  "en": "PLATINUMS",
+  "es": "PLATINOS",
+  "fr": "PLATINES"
+ },
+ "panel_recientes": {
+  "de": "ZULETZT GESPIELT",
+  "en": "RECENTLY PLAYED",
+  "es": "JUGADO RECIENTEMENTE",
+  "fr": "JOUÉ RÉCEMMENT"
+ },
+ "panel_restantes": {
+  "de": " Trophäen\n übrig",
+  "en": " trophies\n left",
+  "es": " trofeos\n restantes",
+  "fr": " trophées\n restants"
+ },
+ "panel_resumen": {
+  "de": "{0} Trophäen in {1} Spielen",
+  "en": "{0} trophies in {1} games",
+  "es": "{0} trofeos en {1} juegos",
+  "fr": "{0} trophées dans {1} jeux"
+ },
+ "panel_rival": {
+  "de": "HAUPTRIVAL:IN",
+  "en": "MAIN RIVAL",
+  "es": "RIVAL PRINCIPAL",
+  "fr": "RIVAL PRINCIPAL"
+ },
+ "panel_rival_texto": {
+  "de": "Du ({0}) 🆚 {1} ({2})",
+  "en": "You ({0}) 🆚 {1} ({2})",
+  "es": "Tú ({0}) 🆚 {1} ({2})",
+  "fr": "Toi ({0}) 🆚 {1} ({2})"
+ },
+ "panel_siguiente": {
+  "de": "NÄCHSTE TROPHÄE",
+  "en": "NEXT TROPHY",
+  "es": "SIGUIENTE TROFEO",
+  "fr": "PROCHAIN TROPHÉE"
+ },
+ "panel_siguiente_platino": {
+  "de": "NÄCHSTE PLATIN",
+  "en": "NEXT PLATINUM",
+  "es": "SIGUIENTE PLATINO",
+  "fr": "PROCHAIN PLATINE"
+ },
+ "panel_siguiente_sub": {
+  "de": "Automatische Priorität: zuerst das Hauptspiel, hoher Fortschritt und beste Chancen.",
+  "en": "Automatic priority: base game first, high progress and best odds of getting it.",
+  "es": "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
+  "fr": "Priorité automatique : d'abord le jeu de base, forte progression et meilleures chances."
+ },
+ "panel_un_paso": {
+  "de": "KURZ VOR DER PLATIN",
+  "en": "ONE STEP FROM PLATINUM",
+  "es": "A UN PASO DEL PLATINO",
+  "fr": "À UN PAS DU PLATINE"
+ },
+ "panel_un_paso_sub": {
+  "de": "Was dir am wenigsten fehlt, nach offenen Trophäen sortiert.",
+  "en": "What you're closest to, sorted by trophies left.",
+  "es": "Lo que menos te queda, ordenado por trofeos pendientes.",
+  "fr": "Ce qu'il te reste le moins, trié par trophées restants."
+ },
+ "panel_un_paso_vacio": {
+  "de": "Noch nichts kurz vor der Platin — spiel weiter.",
+  "en": "Nothing one step from platinum yet — keep playing.",
+  "es": "Nada a un paso del platino todavía — sigue jugando.",
+  "fr": "Rien à un pas du platine pour l'instant — continue à jouer."
+ },
+ "perfil_comparar": {
+  "de": "⚔ Trophäen vergleichen",
+  "en": "⚔ Compare trophies",
+  "es": "⚔ Comparar trofeos",
+  "fr": "⚔ Comparer les trophées"
+ },
+ "perfil_conectado_1": {
+  "de": "{0} verbunden",
+  "en": "{0} linked",
+  "es": "{0} conectado",
+  "fr": "{0} connecté"
+ },
+ "perfil_conectado_n": {
+  "de": "{0} verbunden",
+  "en": "{0} linked",
+  "es": "{0} conectados",
+  "fr": "{0} connectés"
+ },
+ "perfil_ellos": {
+  "de": "Sie {0}",
+  "en": "Them {0}",
+  "es": "Ellos {0}",
+  "fr": "Eux {0}"
+ },
+ "perfil_err_no_encontrado": {
+  "de": "Person nicht gefunden.",
+  "en": "User not found.",
+  "es": "Usuario no encontrado.",
+  "fr": "Utilisateur introuvable."
+ },
+ "perfil_fijar_rival": {
+  "de": "Als Hauptrival:in festlegen",
+  "en": "Set as main rival",
+  "es": "Fijar como rival principal",
+  "fr": "Définir comme rival principal"
+ },
+ "perfil_nivel_arquetipo": {
+  "de": "Paragon-Stufe {0} · {1}",
+  "en": "Paragon level {0} · {1}",
+  "es": "Nivel Paragon {0} · {1}",
+  "fr": "Niveau Paragon {0} · {1}"
+ },
+ "perfil_recientes": {
+  "de": "LETZTE SPIELE",
+  "en": "RECENT GAMES",
+  "es": "JUEGOS RECIENTES",
+  "fr": "JEUX RÉCENTS"
+ },
+ "perfil_rival": {
+  "de": "Hauptrival:in",
+  "en": "Main rival",
+  "es": "Rival principal",
+  "fr": "Rival principal"
+ },
+ "perfil_rivalidad": {
+  "de": "RIVALITÄT",
+  "en": "RIVALRY",
+  "es": "RIVALIDAD",
+  "fr": "RIVALITÉ"
+ },
+ "perfil_titulo": {
+  "de": "SPIELERPROFIL",
+  "en": "PLAYER PROFILE",
+  "es": "PERFIL DE JUGADOR",
+  "fr": "PROFIL DU JOUEUR"
+ },
+ "perfil_tu": {
+  "de": "Du {0}",
+  "en": "You {0}",
+  "es": "Tú {0}",
+  "fr": "Toi {0}"
+ },
+ "perfil_ventaja": {
+  "de": "Du liegst in {0} von {1} Kategorien vorn",
+  "en": "You're ahead in {0} of {1} categories",
+  "es": "Vas por delante en {0} de {1} categorías",
+  "fr": "Tu mènes dans {0} catégories sur {1}"
+ },
+ "perfil_ventaja_todo": {
+  "de": " — du führst überall.",
+  "en": " — you lead in everything.",
+  "es": " — les llevas ventaja en todo.",
+  "fr": " — tu mènes partout."
+ },
+ "push_canal": {
+  "de": "Paragon-Benachrichtigungen",
+  "en": "Paragon notifications",
+  "es": "Avisos de Paragon",
+  "fr": "Notifications Paragon"
+ },
+ "racha_activa": {
+  "de": "Serie läuft — weiter so",
+  "en": "Streak on — keep it up",
+  "es": "Racha activa — sigue así",
+  "fr": "Série en cours — continue"
+ },
+ "racha_activar": {
+  "de": "Hol eine Trophäe, um sie zu starten",
+  "en": "Earn a trophy to start it",
+  "es": "Completa un trofeo para activarla",
+  "fr": "Obtiens un trophée pour la lancer"
+ },
+ "racha_hoy": {
+  "de": "Deine nächste Serie beginnt heute",
+  "en": "Your next streak starts today",
+  "es": "Tu próxima racha empieza hoy",
+  "fr": "Ta prochaine série commence aujourd'hui"
+ },
+ "racha_semanas": {
+  "de": "LETZTE 5 WOCHEN",
+  "en": "LAST 5 WEEKS",
+  "es": "ÚLTIMAS 5 SEMANAS",
+  "fr": "5 DERNIÈRES SEMAINES"
+ },
+ "ruleta_empezar": {
+  "de": "Loslegen",
+  "en": "Start it",
+  "es": "Empezarlo",
+  "fr": "Le commencer"
+ },
+ "ruleta_titulo": {
+  "de": "WAS SPIELEN WIR?",
+  "en": "WHAT ARE WE PLAYING?",
+  "es": "¿A QUÉ JUGAMOS?",
+  "fr": "ON JOUE À QUOI ?"
+ },
+ "social_clan_desc": {
+  "de": "Beschreibung (optional)",
+  "en": "Description (optional)",
+  "es": "Descripción (opcional)",
+  "fr": "Description (facultatif)"
+ },
+ "social_clan_nombre": {
+  "de": "Clan-Name",
+  "en": "Clan name",
+  "es": "Nombre del clan",
+  "fr": "Nom du clan"
+ },
+ "social_clan_tag": {
+  "de": "TAG (max. 5)",
+  "en": "TAG (max. 5)",
+  "es": "ETIQ (máx. 5)",
+  "fr": "TAG (5 max.)"
+ },
+ "social_crea_clan": {
+  "de": "GRÜNDE DEINEN EIGENEN CLAN",
+  "en": "CREATE YOUR OWN CLAN",
+  "es": "CREA TU PROPIO CLAN",
+  "fr": "CRÉE TON PROPRE CLAN"
+ },
+ "social_crea_clan_sub": {
+  "de": "Du brauchst mindestens Paragon-Stufe 5. Tu dich mit deinen Leuten zusammen und sammelt gemeinsam XP.",
+  "en": "You need to be at least Paragon level 5. Team up with your people and earn XP together.",
+  "es": "Necesitas ser al menos Nivel 5 de Paragon. Une fuerzas con tu gente y sumad XP juntos.",
+  "fr": "Il faut être au moins niveau 5 de Paragon. Fais équipe avec les tiens et gagnez de l'XP ensemble."
+ },
+ "social_crea_liga": {
+  "de": "ERSTELLE DEINE EIGENE LIGA",
+  "en": "CREATE YOUR OWN LEAGUE",
+  "es": "CREA TU PROPIA LIGA",
+  "fr": "CRÉE TA PROPRE LIGUE"
+ },
+ "social_crea_liga_sub": {
+  "de": "Tritt gegen deine Freunde an, so lange du willst — nur mit Leuten, die du einlädst.",
+  "en": "Compete with your friends for as long as you like — only with people you invite.",
+  "es": "Compite con tus amigos durante el tiempo que quieras — solo entre quien tú invites.",
+  "fr": "Affronte tes amis aussi longtemps que tu veux — seulement avec ceux que tu invites."
+ },
+ "social_crear_clan": {
+  "de": "Clan gründen",
+  "en": "Create clan",
+  "es": "Crear clan",
+  "fr": "Créer un clan"
+ },
+ "social_crear_liga": {
+  "de": "Liga erstellen",
+  "en": "Create league",
+  "es": "Crear liga",
+  "fr": "Créer une ligue"
+ },
+ "social_duracion": {
+  "de": "Dauer (optional)",
+  "en": "Duration (optional)",
+  "es": "Duración (opcional)",
+  "fr": "Durée (facultatif)"
+ },
+ "social_liga_mensual": {
+  "de": "MONATSLIGA",
+  "en": "MONTHLY LEAGUE",
+  "es": "LIGA MENSUAL",
+  "fr": "LIGUE MENSUELLE"
+ },
+ "social_liga_mensual_sub": {
+  "de": "Die besten Trophäenjäger:innen des Monats",
+  "en": "This month's top trophy hunters",
+  "es": "Los mejores cazatrofeos de este mes",
+  "fr": "Les meilleurs chasseurs de trophées du mois"
+ },
+ "social_liga_ph": {
+  "de": "Die üblichen Verdächtigen",
+  "en": "The usual crew",
+  "es": "Los de siempre",
+  "fr": "La bande habituelle"
+ },
+ "social_mis_ligas_sub": {
+  "de": "Nur mit wem du willst — lade Freunde ein, nicht die ganze Community.",
+  "en": "Only with who you want — invite friends, not the whole community.",
+  "es": "Solo con quien tú quieras — invita a amigos, no a toda la comunidad.",
+  "fr": "Seulement avec qui tu veux — invite des amis, pas toute la communauté."
+ },
+ "social_nivel_platinos": {
+  "de": "Paragon-Stufe {0} · {1} Platin",
+  "en": "Paragon level {0} · {1} platinums",
+  "es": "Nivel Paragon {0} · {1} platinos",
+  "fr": "Niveau Paragon {0} · {1} platines"
+ },
+ "social_nueva_liga": {
+  "de": "Neue Liga",
+  "en": "New league",
+  "es": "Nueva liga",
+  "fr": "Nouvelle ligue"
+ },
+ "social_nuevo_clan": {
+  "de": "Neuer Clan",
+  "en": "New clan",
+  "es": "Nuevo clan",
+  "fr": "Nouveau clan"
+ },
+ "social_nuevo_clan_sub": {
+  "de": "Du brauchst mindestens Paragon-Stufe 5 und darfst in keinem anderen Clan sein.",
+  "en": "You need to be at least Paragon level 5 and not already in another clan.",
+  "es": "Necesitas ser al menos Nivel 5 de Paragon, y no pertenecer ya a otro clan.",
+  "fr": "Il faut être au moins niveau 5 de Paragon et ne pas déjà être dans un autre clan."
+ },
+ "social_puesto": {
+  "de": "Platz {0} von {1}",
+  "en": "Rank {0} of {1}",
+  "es": "Puesto {0} de {1}",
+  "fr": "Rang {0} sur {1}"
+ },
+ "social_puntos_mes": {
+  "de": "{0} Punkte diesen Monat",
+  "en": "{0} points this month",
+  "es": "{0} puntos este mes",
+  "fr": "{0} points ce mois-ci"
+ },
+ "social_sin_amigos": {
+  "de": "Du hast noch keine Freunde auf Paragon",
+  "en": "You don't have friends on Paragon yet",
+  "es": "Todavía no tienes amigos en Paragon",
+  "fr": "Tu n'as pas encore d'amis sur Paragon"
+ },
+ "social_sin_amigos_sub": {
+  "de": "Such sie über ihr @handle unter Vergleichen oder teile deins — dann seht ihr gegenseitig euren Fortschritt.",
+  "en": "Find them by their @handle from Compare, or share yours — then you can see each other's progress.",
+  "es": "Búscalos por su @handle desde Comparar, o compartiendo el tuyo — así podéis ver el progreso del otro.",
+  "fr": "Trouve-les par leur @handle depuis Comparer, ou partage le tien — vous verrez la progression de l'autre."
+ },
+ "social_sin_clanes": {
+  "de": "Es gibt noch keine Clans. Gründe als Erste:r einen!",
+  "en": "There are no clans yet. Be the first to create one!",
+  "es": "Todavía no hay ningún clan. ¡Sé el primero en crear uno!",
+  "fr": "Il n'y a encore aucun clan. Sois le premier à en créer un !"
+ },
+ "social_sin_ranking": {
+  "de": "Noch keine Rangliste",
+  "en": "No ranking yet",
+  "es": "Sin ranking todavía",
+  "fr": "Pas encore de classement"
+ },
+ "social_sin_ranking_sub": {
+  "de": "Sobald du Freunde auf Paragon hast, erscheint ihr hier nach Paragon Score sortiert.",
+  "en": "As soon as you have friends on Paragon, you'll be ranked here by Paragon Score.",
+  "es": "En cuanto tengas amigos en Paragon, aquí saldréis clasificados por Paragon Score.",
+  "fr": "Dès que tu auras des amis sur Paragon, vous serez classés ici par Paragon Score."
+ },
+ "social_tab_amigos": {
+  "de": "Freunde",
+  "en": "Friends",
+  "es": "Amigos",
+  "fr": "Amis"
+ },
+ "social_tab_clan": {
+  "de": "Clan",
+  "en": "Clan",
+  "es": "Clan",
+  "fr": "Clan"
+ },
+ "social_tab_ligas": {
+  "de": "Ligen",
+  "en": "Leagues",
+  "es": "Ligas",
+  "fr": "Ligues"
+ },
+ "social_tab_mis_ligas": {
+  "de": "Meine Ligen",
+  "en": "My leagues",
+  "es": "Mis Ligas",
+  "fr": "Mes ligues"
+ },
+ "social_te_ha_invitado": {
+  "de": "{0} hat dich eingeladen",
+  "en": "{0} invited you",
+  "es": "{0} te ha invitado",
+  "fr": "{0} t'a invité"
+ },
+ "social_te_invita": {
+  "de": "{0} lädt dich ein",
+  "en": "{0} invites you to join",
+  "es": "{0} te invita a unirte",
+  "fr": "{0} t'invite à rejoindre"
+ },
+ "social_tu_clan": {
+  "de": "DEIN CLAN",
+  "en": "YOUR CLAN",
+  "es": "TU CLAN",
+  "fr": "TON CLAN"
+ },
+ "social_unirme": {
+  "de": "Beitreten",
+  "en": "Join",
+  "es": "Unirme",
+  "fr": "Rejoindre"
+ },
+ "social_ventaja": {
+  "de": "+{0} vor Platz zwei",
+  "en": "+{0} ahead of second",
+  "es": "+{0} frente al segundo",
+  "fr": "+{0} devant le deuxième"
+ },
+ "stats_adn": {
+  "de": "Trophäen-DNA",
+  "en": "Trophy DNA",
+  "es": "ADN de trofeos",
+  "fr": "ADN des trophées"
+ },
+ "stats_anejo": {
+  "de": "Die gereifte Platin",
+  "en": "The aged platinum",
+  "es": "El platino añejo",
+  "fr": "Le platine millésimé"
+ },
+ "stats_anejo_anios": {
+  "de": "{0} Jahre und {1} Monate bis zum Fall",
+  "en": "{0} years and {1} months to fall",
+  "es": "{0} años y {1} meses en caer",
+  "fr": "{0} ans et {1} mois avant de tomber"
+ },
+ "stats_anejo_meses": {
+  "de": "{0} Monate bis zum Fall",
+  "en": "{0} months to fall",
+  "es": "{0} meses en caer",
+  "fr": "{0} mois avant de tomber"
+ },
+ "stats_arquetipo": {
+  "de": "Dein Archetyp: {0}",
+  "en": "Your archetype: {0}",
+  "es": "Tu arquetipo: {0}",
+  "fr": "Ton archétype : {0}"
+ },
+ "stats_arquetipo_no": {
+  "de": "Spiel weiter, um deinen Archetyp freizuschalten",
+  "en": "Keep playing to unlock your archetype",
+  "es": "Sigue jugando para desbloquear tu arquetipo",
+  "fr": "Continue à jouer pour débloquer ton archétype"
+ },
+ "stats_backlog": {
+  "de": "Backlog-Schulden",
+  "en": "Backlog debt",
+  "es": "Deuda de backlog",
+  "fr": "Dette de backlog"
+ },
+ "stats_backlog_sub": {
+  "de": "Verbleibende Stunden in Angefangenem",
+  "en": "Hours left in what you've already started",
+  "es": "Horas restantes en lo que ya empezaste",
+  "fr": "Heures restantes dans ce que tu as commencé"
+ },
+ "stats_backlog_vacio": {
+  "de": "Noch nichts Angefangenes mit HowLongToBeat-Daten.",
+  "en": "Nothing started with HowLongToBeat data yet.",
+  "es": "Nada empezado con dato de HowLongToBeat todavía.",
+  "fr": "Rien de commencé avec des données HowLongToBeat pour l'instant."
+ },
+ "stats_badge_platino_n": {
+  "de": "DEINE PLATIN #{0}",
+  "en": "YOUR PLATINUM #{0}",
+  "es": "TU PLATINO #{0}",
+  "fr": "TON PLATINE N°{0}"
+ },
+ "stats_badge_primer": {
+  "de": "ERSTE TROPHÄE",
+  "en": "FIRST TROPHY",
+  "es": "PRIMER TROFEO",
+  "fr": "PREMIER TROPHÉE"
+ },
+ "stats_badge_raro": {
+  "de": "SELTENSTE TROPHÄE",
+  "en": "RAREST TROPHY",
+  "es": "TROFEO MÁS RARO",
+  "fr": "TROPHÉE LE PLUS RARE"
+ },
+ "stats_badges_sub": {
+  "de": "Abzeichen, die du freigeschaltet hast",
+  "en": "Badges you've unlocked",
+  "es": "Insignias que has ido desbloqueando",
+  "fr": "Badges que tu as débloqués"
+ },
+ "stats_coste": {
+  "de": "KOSTEN PRO STUNDE",
+  "en": "COST PER HOUR",
+  "es": "COSTE POR HORA",
+  "fr": "COÛT PAR HEURE"
+ },
+ "stats_coste_sub": {
+  "de": "Nur Spiele mit erfasstem Preis und Spielzeit",
+  "en": "Only games with a recorded price and playtime",
+  "es": "Solo juegos con precio y tiempo jugado registrados",
+  "fr": "Seulement les jeux avec prix et temps de jeu enregistrés"
+ },
+ "stats_dias_activos": {
+  "de": "Aktive Tage",
+  "en": "Active days",
+  "es": "Días activos",
+  "fr": "Jours actifs"
+ },
+ "stats_dieta": {
+  "de": "🥗 Deine Gaming-Diät ist sehr einseitig",
+  "en": "🥗 Your gaming diet is very heavy",
+  "es": "🥗 Tu dieta gamer está muy densa",
+  "fr": "🥗 Ton régime de jeu est très chargé"
+ },
+ "stats_dieta_texto": {
+  "de": "Deine letzten 3 beendeten Spiele — {0} — sind alle {1} und kommen auf über {2} h. Probier vor deinem nächsten großen Abenteuer derselben Art etwas anderes — ein Indie, einen Plattformer oder ein kurzes Puzzle als Abwechslung.",
+  "en": "Your last 3 finished games — {0} — are all {1} and add up to more than {2}h. Try something different before your next big adventure of the same kind — an indie, a platformer or a short puzzle game to cleanse the palate.",
+  "es": "Tus últimos 3 juegos terminados — {0} — son todos de {1} y suman más de {2}h. Prueba algo distinto antes de tu próxima gran aventura del mismo tipo — un indie, unas plataformas o un puzle cortito para limpiar el paladar.",
+  "fr": "Tes 3 derniers jeux terminés — {0} — sont tous du {1} et font plus de {2} h. Essaie autre chose avant ta prochaine grande aventure du même genre — un indé, un jeu de plateforme ou un petit puzzle pour changer."
+ },
+ "stats_eficiencia": {
+  "de": "Jagdeffizienz",
+  "en": "Hunting efficiency",
+  "es": "Eficiencia de caza",
+  "fr": "Efficacité de chasse"
+ },
+ "stats_eficiencia_sub": {
+  "de": "Dein echtes Tempo gegenüber der HowLongToBeat-Schätzung",
+  "en": "Your real pace vs the HowLongToBeat estimate",
+  "es": "Tu ritmo real frente a la estimación de HowLongToBeat",
+  "fr": "Ton vrai rythme face à l'estimation HowLongToBeat"
+ },
+ "stats_estilo": {
+  "de": "DEIN JAGDSTIL",
+  "en": "YOUR HUNTING STYLE",
+  "es": "TU ESTILO DE CAZA",
+  "fr": "TON STYLE DE CHASSE"
+ },
+ "stats_galeria": {
+  "de": "Meilenstein-Galerie",
+  "en": "Milestone gallery",
+  "es": "Galería de hitos",
+  "fr": "Galerie des étapes"
+ },
+ "stats_galeria_sub": {
+  "de": "Erstelle ein Poster zum Speichern oder Teilen",
+  "en": "Make a poster to save or share",
+  "es": "Genera un póster para guardar o compartir",
+  "fr": "Crée une affiche à garder ou partager"
+ },
+ "stats_gastado": {
+  "de": "Ausgegeben",
+  "en": "Spent",
+  "es": "Gastado",
+  "fr": "Dépensé"
+ },
+ "stats_generar_tarjeta": {
+  "de": "Karte erstellen",
+  "en": "Make card",
+  "es": "Generar tarjeta",
+  "fr": "Créer une carte"
+ },
+ "stats_gira": {
+  "de": "Dreh das Diagramm mit dem Finger",
+  "en": "Spin the chart with your finger",
+  "es": "Gira el gráfico con el dedo",
+  "fr": "Fais tourner le graphique avec le doigt"
+ },
+ "stats_hasta_final": {
+  "de": "Bis zum Ende",
+  "en": "To the end",
+  "es": "Hasta el final",
+  "fr": "Jusqu'à la fin"
+ },
+ "stats_hasta_platino": {
+  "de": "Bis zur Platin",
+  "en": "To platinum",
+  "es": "Hasta el platino",
+  "fr": "Jusqu'au platine"
+ },
+ "stats_historico": {
+  "de": "{0} Trophäen mit bekanntem Datum · {1} dieses Jahr",
+  "en": "{0} trophies with a known date · {1} this year",
+  "es": "{0} trofeos con fecha conocida · {1} este año",
+  "fr": "{0} trophées avec date connue · {1} cette année"
+ },
+ "stats_hito_3": {
+  "de": "{0} · {1} · {2}",
+  "en": "{0} · {1} · {2}",
+  "es": "{0} · {1} · {2}",
+  "fr": "{0} · {1} · {2}"
+ },
+ "stats_hitos": {
+  "de": "Meilensteine deiner Karriere",
+  "en": "Career milestones",
+  "es": "Hitos de tu carrera",
+  "fr": "Étapes de ta carrière"
+ },
+ "stats_hitos_sub": {
+  "de": "Deine ganze Trophäengeschichte, nicht nur dieses Jahr",
+  "en": "Your whole trophy history, not just this year",
+  "es": "Toda tu historia de trofeos, no solo este año",
+  "fr": "Toute ton histoire de trophées, pas seulement cette année"
+ },
+ "stats_horas": {
+  "de": "Gespielte Stunden",
+  "en": "Hours played",
+  "es": "Horas jugadas",
+  "fr": "Heures jouées"
+ },
+ "stats_horas_dias": {
+  "de": "= {0} Tage am Stück · auf all deinen Plattformen",
+  "en": "= {0} days straight · across all your platforms",
+  "es": "= {0} días seguidos · en todas tus plataformas",
+  "fr": "= {0} jours d'affilée · sur toutes tes plateformes"
+ },
+ "stats_horas_precio": {
+  "de": "Stunden mit Preis",
+  "en": "Hours with price",
+  "es": "Horas con precio",
+  "fr": "Heures avec prix"
+ },
+ "stats_juegos_contados": {
+  "de": "Gezählte Spiele",
+  "en": "Games counted",
+  "es": "Juegos contados",
+  "fr": "Jeux comptés"
+ },
+ "stats_mas_calma": {
+  "de": "Du lässt dir mehr Zeit als der Schnitt",
+  "en": "You take it slower than average",
+  "es": "Te lo tomas con más calma que la media",
+  "fr": "Tu prends plus ton temps que la moyenne"
+ },
+ "stats_mas_rapido": {
+  "de": "Schneller als der HLTB-Schnitt",
+  "en": "Faster than the HLTB average",
+  "es": "Más rápido que la media de HLTB",
+  "fr": "Plus rapide que la moyenne HLTB"
+ },
+ "stats_mas_raro": {
+  "de": "Deine seltenste Trophäe",
+  "en": "Your rarest trophy",
+  "es": "Tu trofeo más raro",
+  "fr": "Ton trophée le plus rare"
+ },
+ "stats_mas_raro_det": {
+  "de": "{0} · {1}% haben sie · {2}",
+  "en": "{0} · {1}% have it · {2}",
+  "es": "{0} · lo tiene el {1}% · {2}",
+  "fr": "{0} · {1} % l'ont · {2}"
+ },
+ "stats_mas_raro_det2": {
+  "de": "{0} · {1}% haben sie",
+  "en": "{0} · {1}% have it",
+  "es": "{0} · lo tiene el {1}%",
+  "fr": "{0} · {1} % l'ont"
+ },
+ "stats_mejor_mes": {
+  "de": "Dein bester Monat: {0} ({1} Trophäen)",
+  "en": "Your best month: {0} ({1} trophies)",
+  "es": "Tu mejor mes: {0} ({1} trofeos)",
+  "fr": "Ton meilleur mois : {0} ({1} trophées)"
+ },
+ "stats_mejor_racha": {
+  "de": "Beste Serie",
+  "en": "Best streak",
+  "es": "Mejor racha",
+  "fr": "Meilleure série"
+ },
+ "stats_palmares": {
+  "de": "Erfolge",
+  "en": "Honours",
+  "es": "Palmarés",
+  "fr": "Palmarès"
+ },
+ "stats_palmares_sub": {
+  "de": "Ligen, die du wirklich gewonnen hast",
+  "en": "Leagues you've actually won",
+  "es": "Ligas que has ganado de verdad",
+  "fr": "Ligues que tu as vraiment gagnées"
+ },
+ "stats_platino_n": {
+  "de": "Deine Platin #{0}",
+  "en": "Your platinum #{0}",
+  "es": "Tu platino #{0}",
+  "fr": "Ton platine n°{0}"
+ },
+ "stats_primer_platino": {
+  "de": "Deine erste Platin",
+  "en": "Your first platinum",
+  "es": "Tu primer platino",
+  "fr": "Ton premier platine"
+ },
+ "stats_primer_trofeo": {
+  "de": "Deine erste Trophäe",
+  "en": "Your first trophy",
+  "es": "Tu primer trofeo",
+  "fr": "Ton premier trophée"
+ },
+ "stats_racha_actual": {
+  "de": "Aktuelle Serie",
+  "en": "Current streak",
+  "es": "Racha actual",
+  "fr": "Série actuelle"
+ },
+ "stats_racha_det": {
+  "de": "{0} Tage am Stück, {1} bis {2}",
+  "en": "{0} days in a row, {1} to {2}",
+  "es": "{0} días seguidos, del {1} al {2}",
+  "fr": "{0} jours d'affilée, du {1} au {2}"
+ },
+ "stats_racha_larga": {
+  "de": "Deine längste Serie",
+  "en": "Your longest streak",
+  "es": "Tu racha más larga",
+  "fr": "Ta plus longue série"
+ },
+ "stats_rachas": {
+  "de": "Serien und Aktivität",
+  "en": "Streaks and activity",
+  "es": "Rachas y actividad",
+  "fr": "Séries et activité"
+ },
+ "stats_score_fila": {
+  "de": "{0} Pkt. · {1} Trophäen",
+  "en": "{0} pts · {1} trophies",
+  "es": "{0} pts · {1} trofeos",
+  "fr": "{0} pts · {1} trophées"
+ },
+ "stats_score_sub": {
+  "de": "Eine Punktzahl über alle Plattformen",
+  "en": "One score across platforms",
+  "es": "Puntuación unificada entre plataformas",
+  "fr": "Un score unique entre plateformes"
+ },
+ "stats_sin_datos": {
+  "de": "Noch nicht genug Daten.",
+  "en": "Not enough data yet.",
+  "es": "Sin datos suficientes todavía.",
+  "fr": "Pas encore assez de données."
+ },
+ "stats_titulo": {
+  "de": "STATISTIKEN",
+  "en": "STATS",
+  "es": "ESTADÍSTICAS",
+  "fr": "STATISTIQUES"
+ },
+ "tema_claro": {
+  "de": "Hell",
+  "en": "Light",
+  "es": "Claro",
+  "fr": "Clair"
+ },
+ "tema_oscuro": {
+  "de": "Dunkel",
+  "en": "Dark",
+  "es": "Oscuro",
+  "fr": "Sombre"
+ },
+ "tema_sistema": {
+  "de": "System",
+  "en": "System",
+  "es": "Sistema",
+  "fr": "Système"
+ },
+ "tiempo_ahora": {
+  "de": "gerade eben",
+  "en": "just now",
+  "es": "ahora mismo",
+  "fr": "à l'instant"
+ },
+ "tiempo_d": {
+  "de": "vor {0} T.",
+  "en": "{0}d ago",
+  "es": "hace {0}d",
+  "fr": "il y a {0} j"
+ },
+ "tiempo_h": {
+  "de": "vor {0} Std.",
+  "en": "{0}h ago",
+  "es": "hace {0}h",
+  "fr": "il y a {0} h"
+ },
+ "tiempo_min": {
+  "de": "vor {0} Min.",
+  "en": "{0}m ago",
+  "es": "hace {0}min",
+  "fr": "il y a {0} min"
+ },
+ "widget_objetivo": {
+  "de": "Ziel: {0}",
+  "en": "Goal: {0}",
+  "es": "Objetivo: {0}",
+  "fr": "Objectif : {0}"
+ },
+ "widget_sin_objetivo": {
+  "de": "Kein Ziel angeheftet",
+  "en": "No pinned goal",
+  "es": "Sin objetivo anclado",
+  "fr": "Aucun objectif épinglé"
+ },
+ "widget_sin_objetivo_sub": {
+  "de": "Hefte ein Spiel auf seiner Spielseite an",
+  "en": "Pin a game from its game page",
+  "es": "Fija un juego desde la ficha de juego",
+  "fr": "Épingle un jeu depuis sa fiche"
+ },
+ "wrap_comparas": {
+  "de": "IM VERGLEICH",
+  "en": "HOW YOU COMPARE",
+  "es": "CÓMO TE COMPARAS",
+  "fr": "OÙ TU TE SITUES"
+ },
+ "wrap_dias_activos": {
+  "de": "{0} verschiedene Tage mit Trophäe",
+  "en": "{0} different days with a trophy",
+  "es": "{0} días distintos con algún trofeo",
+  "fr": "{0} jours différents avec un trophée"
+ },
+ "wrap_dias_seguidos_1": {
+  "de": "  Tag am Stück",
+  "en": "  day in a row",
+  "es": "  día seguido",
+  "fr": "  jour d'affilée"
+ },
+ "wrap_dias_seguidos_n": {
+  "de": "  Tage am Stück",
+  "en": "  days in a row",
+  "es": "  días seguidos",
+  "fr": "  jours d'affilée"
+ },
+ "wrap_eso_fue": {
+  "de": "Das war {0} auf Paragon",
+  "en": "That was {0} on Paragon",
+  "es": "Eso fue {0} en Paragon",
+  "fr": "C'était {0} sur Paragon"
+ },
+ "wrap_genero": {
+  "de": "MEISTGESPIELTES GENRE",
+  "en": "MOST PLAYED GENRE",
+  "es": "GÉNERO MÁS JUGADO",
+  "fr": "GENRE LE PLUS JOUÉ"
+ },
+ "wrap_genero_titulos": {
+  "de": "{0} Titel dieses Genres",
+  "en": "{0} titles in this genre",
+  "es": "{0} títulos de este género",
+  "fr": "{0} titres de ce genre"
+ },
+ "wrap_hola": {
+  "de": "Hallo, {0}!",
+  "en": "Hi, {0}!",
+  "es": "¡Hola, {0}!",
+  "fr": "Salut, {0} !"
+ },
+ "wrap_juego": {
+  "de": "AM MEISTEN AUSGEREIZT",
+  "en": "MOST SQUEEZED GAME",
+  "es": "JUEGO MÁS EXPRIMIDO",
+  "fr": "JEU LE PLUS PRESSÉ"
+ },
+ "wrap_mejor_mes": {
+  "de": "DEIN BESTER MONAT",
+  "en": "YOUR BEST MONTH",
+  "es": "TU MEJOR MES",
+  "fr": "TON MEILLEUR MOIS"
+ },
+ "wrap_percentil": {
+  "de": "{0} % der {1} echten Paragon-Nutzer:innen haben dieses Jahr weniger Trophäen mit Datum als du.",
+  "en": "{0}% of Paragon's {1} real users have fewer dated trophies this year than you.",
+  "es": "Menos trofeos con fecha este año que tú tiene el {0}% de los {1} usuarios reales de Paragon.",
+  "fr": "{0} % des {1} vrais utilisateurs de Paragon ont moins de trophées datés que toi cette année."
+ },
+ "wrap_racha": {
+  "de": "SERIE",
+  "en": "STREAK",
+  "es": "RACHA",
+  "fr": "SÉRIE"
+ },
+ "wrap_repartidos_1": {
+  "de": "Verteilt auf {0} Spiel. Auf ins nächste Jahr.",
+  "en": "Spread across {0} game. Here's to next year.",
+  "es": "Repartidos en {0} juego distinto. A por el año que viene.",
+  "fr": "Répartis sur {0} jeu. Vivement l'an prochain."
+ },
+ "wrap_repartidos_n": {
+  "de": "Verteilt auf {0} verschiedene Spiele. Auf ins nächste Jahr.",
+  "en": "Spread across {0} different games. Here's to next year.",
+  "es": "Repartidos en {0} juegos distintos. A por el año que viene.",
+  "fr": "Répartis sur {0} jeux différents. Vivement l'an prochain."
+ },
+ "wrap_top": {
+  "de": "Top {0} %",
+  "en": "Top {0}%",
+  "es": "Top {0}%",
+  "fr": "Top {0} %"
+ },
+ "wrap_trofeos_conseguidos": {
+  "de": "  Trophäen\n  geholt",
+  "en": "  trophies\n  earned",
+  "es": "  trofeos\n  conseguidos",
+  "fr": "  trophées\n  obtenus"
+ },
+ "wrap_trofeos_mes": {
+  "de": "  Trophäen in dem Monat",
+  "en": "  trophies that month",
+  "es": "  trofeos ese mes",
+  "fr": "  trophées ce mois-là"
+ },
+ "wrap_trofeos_n": {
+  "de": "{0} Trophäen geholt",
+  "en": "{0} trophies earned",
+  "es": "{0} trofeos conseguidos",
+  "fr": "{0} trophées obtenus"
+ },
+ "wrap_vacio": {
+  "de": "{0}, noch gibt es keinen Wrap",
+  "en": "{0}, there's no Wrap to tell yet",
+  "es": "{0}, todavía no hay Wrap que contar",
+  "fr": "{0}, pas encore de Wrap à raconter"
+ },
+ "wrap_vacio_sub": {
+  "de": "Sobald du dieses Jahr Trophäen mit Datum holst, erscheinen sie hier.",
+  "en": "As soon as you earn dated trophies this year, they'll show up here.",
+  "es": "En cuanto consigas trofeos con fecha este año, aparecerán aquí.",
+  "fr": "Dès que tu obtiendras des trophées datés cette année, ils apparaîtront ici."
+ }
+}

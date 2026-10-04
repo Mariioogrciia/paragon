@@ -9,6 +9,8 @@ import com.paragon.app.data.network.LigaDto
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Amigos y Liga (SocialScreen) — DOS conceptos distintos, ver GET /api/mobile/social en API-CONTRACT.md. */
 data class AmigoCuenta(val platform: String, val username: String)
@@ -40,7 +42,7 @@ sealed class SocialResult {
 
 private fun AmigoDto.toAmigoRow() = AmigoRow(
     userId = userId,
-    name = name ?: handle ?: "Jugador",
+    name = name ?: handle ?: Textos.t(R.string.comun_jugador),
     handle = handle,
     level = trophyLevel ?: 1,
     platinos = platinos,
@@ -50,7 +52,7 @@ private fun AmigoDto.toAmigoRow() = AmigoRow(
 
 private fun LigaDto.toLigaRow() = LigaRow(
     userId = userId,
-    name = name ?: handle ?: "Jugador",
+    name = name ?: handle ?: Textos.t(R.string.comun_jugador),
     handle = handle,
     points = points,
     avatarUrl = image,
@@ -63,7 +65,7 @@ private val socialDataAdapter = socialMoshi.adapter(SocialData::class.java)
 class SocialRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
     /** Red primero, caché de respaldo (mismo patrón que Library/Panel/GameDetail/Feed) — Amigos se quedaba en blanco sin conexión. */
     suspend fun getSocial(): SocialResult {
-        val store = tokenStore ?: return SocialResult.Error("Sin sesión.")
+        val store = tokenStore ?: return SocialResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.socialApi(store).getSocial()
@@ -77,9 +79,9 @@ class SocialRepository(private val tokenStore: TokenStore? = null, private val c
             cacheDao?.put(SimpleCacheEntity(CACHE_KEY, socialDataAdapter.toJson(data)))
             SocialResult.Ok(data)
         } catch (e: HttpException) {
-            cachedSocial() ?: SocialResult.Error("El servidor respondió con un error (${e.code()}).")
+            cachedSocial() ?: SocialResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            cachedSocial() ?: SocialResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            cachedSocial() ?: SocialResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 

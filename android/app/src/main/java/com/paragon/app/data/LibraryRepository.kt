@@ -9,6 +9,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import androidx.glance.appwidget.updateAll
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Biblioteca completa (LibraryScreen) — ver GET /api/mobile/library en API-CONTRACT.md. */
 data class LibraryGame(
@@ -82,7 +84,7 @@ class LibraryRepository(
     private val context: android.content.Context? = null
 ) {
     suspend fun getLibrary(): LibraryResult {
-        val store = tokenStore ?: return LibraryResult.Error("Sin sesión.")
+        val store = tokenStore ?: return LibraryResult.Error(Textos.t(R.string.error_sin_sesion))
 
         // 1. Obtener de caché local rápido si existe (Offline mode / Instant load)
         val localGames = libraryDao?.getAllGames()?.map { it.toDomain() }
@@ -103,10 +105,10 @@ class LibraryRepository(
             LibraryResult.Ok(remoteGames)
         } catch (e: HttpException) {
             if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)
-            else LibraryResult.Error("El servidor respondió con un error (${e.code()}).")
+            else LibraryResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
             if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)
-            else LibraryResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            else LibraryResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 

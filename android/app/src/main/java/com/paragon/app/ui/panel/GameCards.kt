@@ -31,6 +31,8 @@ import com.paragon.app.data.GameProgress
 import com.paragon.app.data.NextTrophy
 import com.paragon.app.ui.common.rememberCoverAuraColor
 import com.paragon.app.ui.theme.*
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * `coverUrl` sale de `iconUrl` del backend, y puede venir vacío para
@@ -76,7 +78,7 @@ private fun GameCover(coverUrl: String, title: String, modifier: Modifier) {
 fun HeroGameCard(
     game: GameProgress,
     onClick: () -> Unit = {},
-    label: String = "SIGUIENTE PLATINO",
+    label: String = stringResource(R.string.panel_siguiente_platino),
     labelColor: Color = Accent,
     accentColor: Color = Accent,
 ) {
@@ -163,7 +165,7 @@ fun HeroGameCard(
             // uno, no a que ya estaba hecho — bug real visto en Biblioteca
             // con juegos platinados de verdad.
             val terminado = restantes <= 0
-            val etiquetaFinal = if (terminado) "PLATINADO" else label
+            val etiquetaFinal = if (terminado) stringResource(R.string.panel_platinado) else label
             val colorEtiqueta = if (terminado) Platinum else labelColor
             Column {
                 Text(
@@ -202,7 +204,7 @@ fun HeroGameCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = " trofeos\n restantes",
+                            text = stringResource(R.string.panel_restantes),
                             color = Muted,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -216,7 +218,7 @@ fun HeroGameCard(
                     // terminados). "0 trofeos restantes" sin más también
                     // suena a fallo, no a logro — de ahí el texto final.
                     Text(
-                        text = "¡Platinado!",
+                        text = stringResource(R.string.panel_platinado_excl),
                         color = Platinum,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
@@ -412,7 +414,7 @@ fun NextTrophyCard(trophy: NextTrophy, onClick: () -> Unit = {}) {
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
             Text(
-                text = "${trophy.gameTitle} · ${trophy.gameProgress}% completado",
+                text = stringResource(R.string.panel_juego_progreso, trophy.gameTitle, trophy.gameProgress),
                 color = Muted,
                 fontSize = 12.sp,
                 maxLines = 1,

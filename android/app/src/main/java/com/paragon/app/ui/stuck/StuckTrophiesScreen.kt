@@ -30,6 +30,9 @@ import com.paragon.app.data.local.ParagonDatabase
 import com.paragon.app.data.local.StuckTrophyEntity
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.R
+import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.Textos
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,10 +54,10 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Trofeos Atascados", fontWeight = FontWeight.Bold, color = Foreground) },
+                title = { Text(stringResource(R.string.nav_atascados_menu), fontWeight = FontWeight.Bold, color = Foreground) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Foreground)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.comun_volver), tint = Foreground)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -69,8 +72,8 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, onBack: () -> Unit) {
             else -> if (current.isEmpty()) {
                 com.paragon.app.ui.common.EmptyState(
                     icon = Icons.Default.Search,
-                    title = "No tienes ningún trofeo atascado",
-                    description = "Cuando un trofeo se te resista, márcalo desde su ficha y aparecerá aquí — con una guía en vídeo a un toque.",
+                    title = stringResource(R.string.atascados_vacio),
+                    description = stringResource(R.string.atascados_vacio_sub),
                     modifier = Modifier.padding(innerPadding),
                 )
             } else {
@@ -138,7 +141,7 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
                         val uri = if (videoId != null) {
                             Uri.parse("https://www.youtube.com/watch?v=$videoId")
                         } else {
-                            val query = Uri.encode("${trophy.gameTitle} ${trophy.trophyName} trophy guide")
+                            val query = Uri.encode(Textos.t(R.string.guia_busqueda_video, trophy.gameTitle, trophy.trophyName))
                             Uri.parse("https://www.youtube.com/results?search_query=$query")
                         }
                         val appIntent = Intent(Intent.ACTION_VIEW, uri).apply { setPackage("com.google.android.youtube") }
@@ -154,14 +157,14 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
                 if (buscandoGuia) {
                     CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(16.dp))
                 } else {
-                    Icon(Icons.Default.Search, contentDescription = "Buscar Guía", tint = Accent, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.ficha_buscar_guia), tint = Accent, modifier = Modifier.size(20.dp))
                 }
             }
             IconButton(
                 onClick = onRemove,
                 modifier = Modifier.size(32.dp)
             ) {
-                Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Muted, modifier = Modifier.size(20.dp))
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.comun_eliminar), tint = Muted, modifier = Modifier.size(20.dp))
             }
         }
     }

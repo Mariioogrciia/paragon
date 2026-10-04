@@ -23,6 +23,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.paragon.app.ComposeMainActivity
+import com.paragon.app.R
+import com.paragon.app.util.Textos
 
 // Mismos valores de DarkAccent/DarkMuted/DarkGold de ui/theme/Color.kt — un
 // widget de Glance no puede leer `isDarkTheme` (vive fuera de la jerarquía
@@ -56,7 +58,7 @@ class PinnedGameWidget : GlanceAppWidget() {
             ) {
                 if (pinnedGame != null) {
                     Text(
-                        text = "Objetivo: ${pinnedGame.title}",
+                        text = Textos.t(R.string.widget_objetivo, pinnedGame.title),
                         style = TextStyle(color = ColorProvider(WidgetAccent)),
                         maxLines = 2,
                     )
@@ -69,16 +71,16 @@ class PinnedGameWidget : GlanceAppWidget() {
                     )
                     Spacer(modifier = GlanceModifier.height(6.dp))
                     Text(
-                        text = "${pinnedGame.earnedTotal}/${pinnedGame.definedTotal} trofeos · ${pinnedGame.progressPercent}%",
+                        text = Textos.t(R.string.ficha_progreso, pinnedGame.earnedTotal, pinnedGame.definedTotal, pinnedGame.progressPercent),
                         style = TextStyle(color = ColorProvider(WidgetMuted)),
                     )
                 } else {
                     Text(
-                        text = "Sin objetivo anclado",
+                        text = Textos.t(R.string.widget_sin_objetivo),
                         style = TextStyle(color = ColorProvider(WidgetAccent))
                     )
                     Text(
-                        text = "Fija un juego desde la ficha de juego",
+                        text = Textos.t(R.string.widget_sin_objetivo_sub),
                         style = TextStyle(color = ColorProvider(WidgetMuted))
                     )
                 }

@@ -6,6 +6,8 @@ import com.paragon.app.data.network.CollectionDto
 import com.paragon.app.data.network.CollectionNameRequest
 import com.paragon.app.data.network.paragonErrorMessage
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /** Carpetas de juegos (colecciones) — ver GET /api/mobile/collections en API-CONTRACT.md. */
 data class Coleccion(val id: String, val name: String, val gameIds: List<String>)
@@ -22,50 +24,50 @@ private fun CollectionDto.toColeccion() = Coleccion(id, name, gameIds)
 
 class CollectionsRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getCollections(): CollectionsResult {
-        val store = tokenStore ?: return CollectionsResult.Error("Sin sesión.")
+        val store = tokenStore ?: return CollectionsResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.collectionsApi(store).getCollections()
             CollectionsResult.Ok(response.collections.map { it.toColeccion() })
         } catch (e: HttpException) {
-            CollectionsResult.Error("El servidor respondió con un error (${e.code()}).")
+            CollectionsResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            CollectionsResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            CollectionsResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
     /** Máx. 40 caracteres (mismo límite que la web) — el servidor es quien valida de verdad. */
     suspend fun createCollection(name: String): MutationOutcome {
-        val store = tokenStore ?: return MutationOutcome(false, "Sin sesión.")
+        val store = tokenStore ?: return MutationOutcome(false, Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.collectionsApi(store).createCollection(CollectionNameRequest(name))
             MutationOutcome(true)
         } catch (e: HttpException) {
-            MutationOutcome(false, e.paragonErrorMessage() ?: "No se pudo crear la carpeta.")
+            MutationOutcome(false, e.paragonErrorMessage() ?: Textos.t(R.string.carpeta_err_crear))
         } catch (e: Exception) {
-            MutationOutcome(false, e.message ?: "No se pudo conectar con Paragon.")
+            MutationOutcome(false, Textos.t(R.string.error_conexion))
         }
     }
 
     suspend fun renameCollection(id: String, name: String): MutationOutcome {
-        val store = tokenStore ?: return MutationOutcome(false, "Sin sesión.")
+        val store = tokenStore ?: return MutationOutcome(false, Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.collectionsApi(store).renameCollection(id, CollectionNameRequest(name))
             MutationOutcome(true)
         } catch (e: HttpException) {
-            MutationOutcome(false, e.paragonErrorMessage() ?: "No se pudo renombrar la carpeta.")
+            MutationOutcome(false, e.paragonErrorMessage() ?: Textos.t(R.string.carpeta_err_renombrar))
         } catch (e: Exception) {
-            MutationOutcome(false, e.message ?: "No se pudo conectar con Paragon.")
+            MutationOutcome(false, Textos.t(R.string.error_conexion))
         }
     }
 
     suspend fun deleteCollection(id: String): MutationOutcome {
-        val store = tokenStore ?: return MutationOutcome(false, "Sin sesión.")
+        val store = tokenStore ?: return MutationOutcome(false, Textos.t(R.string.error_sin_sesion))
         return try {
             ApiClient.collectionsApi(store).deleteCollection(id)
             MutationOutcome(true)
         } catch (e: Exception) {
-            MutationOutcome(false, "No se pudo borrar la carpeta.")
+            MutationOutcome(false, Textos.t(R.string.carpeta_err_borrar))
         }
     }
 

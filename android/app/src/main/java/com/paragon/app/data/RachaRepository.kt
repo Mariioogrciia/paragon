@@ -3,6 +3,8 @@ package com.paragon.app.data
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import retrofit2.HttpException
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 data class DiaActividad(val dia: String, val trofeos: Int)
 
@@ -20,7 +22,7 @@ sealed class RachaDetalleResult {
 
 class RachaRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getRacha(): RachaDetalleResult {
-        val store = tokenStore ?: return RachaDetalleResult.Error("Sin sesión.")
+        val store = tokenStore ?: return RachaDetalleResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.rachaApi(store).getRacha()
@@ -33,9 +35,9 @@ class RachaRepository(private val tokenStore: TokenStore? = null) {
                 ),
             )
         } catch (e: HttpException) {
-            RachaDetalleResult.Error("El servidor respondió con un error (${e.code()}).")
+            RachaDetalleResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            RachaDetalleResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            RachaDetalleResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 }

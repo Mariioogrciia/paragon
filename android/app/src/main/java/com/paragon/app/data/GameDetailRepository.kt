@@ -17,6 +17,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.ceil
+import com.paragon.app.util.Textos
+import com.paragon.app.R
 
 /**
  * Ficha de un juego (GameDetailScreen). Forma pensada para calzar directo
@@ -186,7 +188,7 @@ class GameDetailRepository(
      * servidor, para no pisar algo que el usuario escribió sin conexión.
      */
     suspend fun getGameDetail(gameId: String): GameDetailResult {
-        val store = tokenStore ?: return GameDetailResult.Error("Sin sesión.")
+        val store = tokenStore ?: return GameDetailResult.Error(Textos.t(R.string.error_sin_sesion))
 
         return try {
             val response = ApiClient.gamesApi(store).getGameDetail(gameId)
@@ -199,15 +201,15 @@ class GameDetailRepository(
             val cached = gameDetailDao?.getCachedDetail(gameId)
             if (cached != null) return GameDetailResult.Ok(cached.toDomain(), fromCache = true)
             val message = if (e.code() == 404) {
-                "Este juego no existe o no es tuyo."
+                Textos.t(R.string.ficha_err_no_existe)
             } else {
-                "El servidor respondió con un error (${e.code()})."
+                Textos.t(R.string.error_servidor, e.code())
             }
             GameDetailResult.Error(message)
         } catch (e: Exception) {
             val cached = gameDetailDao?.getCachedDetail(gameId)
             if (cached != null) return GameDetailResult.Ok(cached.toDomain(), fromCache = true)
-            GameDetailResult.Error(e.message ?: "No se pudo conectar con Paragon.")
+            GameDetailResult.Error(Textos.t(R.string.error_conexion))
         }
     }
 
@@ -296,14 +298,14 @@ class GameDetailRepository(
 
     /** "¿Ya lo tengo?" — vuelve a pedir los trofeos de este juego sin esperar al cron. */
     suspend fun resync(gameId: String): ResyncOutcome {
-        val store = tokenStore ?: return ResyncOutcome(0, "Sin sesión.")
+        val store = tokenStore ?: return ResyncOutcome(0, Textos.t(R.string.error_sin_sesion))
         return try {
             val response = ApiClient.gamesApi(store).resync(gameId)
             ResyncOutcome(response.nuevos, response.error, response.platinoNuevo?.let { PlatinoNuevo(it.nombre, it.iconUrl) })
         } catch (e: HttpException) {
-            ResyncOutcome(0, e.paragonErrorMessage() ?: "El servidor respondió con un error (${e.code()}).")
+            ResyncOutcome(0, e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {
-            ResyncOutcome(0, e.message ?: "No se pudo conectar con Paragon.")
+            ResyncOutcome(0, Textos.t(R.string.error_conexion))
         }
     }
 
