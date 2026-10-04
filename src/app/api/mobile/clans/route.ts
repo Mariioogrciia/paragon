@@ -7,6 +7,7 @@ import { limitar } from "@/lib/rateLimit";
 import { createClan, getUserClan } from "@/lib/clans";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
+import { jsonConEtag } from "@/lib/etag";
 
 /** Todos los clanes con su nº de miembros (más miembros primero), + el clan del usuario si tiene uno — misma query que /clanes (web). */
 export async function GET(req: Request) {
@@ -31,10 +32,10 @@ export async function GET(req: Request) {
     getUserClan(userId),
   ]);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     clans: allClans,
     myClan: miClan ? { tag: miClan.clan.tag, name: miClan.clan.name, role: miClan.role } : null,
-  });
+  }, userId);
 }
 
 /**

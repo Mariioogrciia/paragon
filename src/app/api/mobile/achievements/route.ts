@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getProfileByUserId, getUserBadges } from "@/lib/profiles";
 import { getUserTrophyCase } from "@/lib/trophyCase";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Palmarés (ligas ganadas) + Badges/insignias del usuario — nada de esto
@@ -44,5 +45,5 @@ export async function GET(req: Request) {
     })
     .filter((b): b is NonNullable<typeof b> => b !== null);
 
-  return NextResponse.json({ badges, trophyCase });
+  return jsonConEtag(req, { badges, trophyCase }, userId);
 }

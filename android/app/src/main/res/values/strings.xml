@@ -150,6 +150,7 @@
     <string name="comun_buscar_accion">Buscar</string>
     <string name="comun_cambiar">Cambiar</string>
     <string name="comun_cancelar">Cancelar</string>
+    <string name="comun_cargando">Cargando</string>
     <string name="comun_cerrar">Cerrar</string>
     <string name="comun_compartir">Compartir</string>
     <string name="comun_completado">%1$s%% completado</string>

@@ -19,6 +19,7 @@ class ParagonApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         Textos.init(this)
+        com.paragon.app.data.network.ApiClient.init(this)
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {

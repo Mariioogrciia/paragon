@@ -869,6 +869,12 @@
   "es": "Cancelar",
   "fr": "Annuler"
  },
+ "comun_cargando": {
+  "de": "Wird geladen",
+  "en": "Loading",
+  "es": "Cargando",
+  "fr": "Chargement"
+ },
  "comun_cerrar": {
   "de": "Schließen",
   "en": "Close",

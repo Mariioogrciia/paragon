@@ -32,6 +32,23 @@ object ApiClient {
     @Volatile
     private var retrofit: Retrofit? = null
 
+    /**
+     * Caché HTTP de 10 MB (auditoría, 4 oct 2026): las rutas grandes de
+     * /api/mobile (biblioteca, panel, estadísticas...) mandan ETag, así que
+     * OkHttp revalida con If-None-Match y, si nada ha cambiado, el servidor
+     * contesta 304 sin cuerpo y se usa la copia guardada. Ver src/lib/etag.ts.
+     */
+    private var cache: okhttp3.Cache? = null
+
+    fun init(context: android.content.Context) {
+        if (cache == null) cache = okhttp3.Cache(java.io.File(context.cacheDir, "http"), 10L * 1024 * 1024)
+    }
+
+    /** Al cerrar sesión: que nada de la cuenta anterior quede guardado en el móvil. */
+    fun vaciarCache() {
+        try { cache?.evictAll() } catch (e: Exception) { }
+    }
+
     fun panelApi(tokenStore: TokenStore): PanelApi = retrofit(tokenStore).create(PanelApi::class.java)
     fun gamesApi(tokenStore: TokenStore): GamesApi = retrofit(tokenStore).create(GamesApi::class.java)
     fun libraryApi(tokenStore: TokenStore): LibraryApi = retrofit(tokenStore).create(LibraryApi::class.java)
@@ -68,6 +85,7 @@ object ApiClient {
     private fun build(tokenStore: TokenStore): Retrofit {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenStore))
+            .apply { cache?.let { cache(it) } }
             .build()
 
         val moshi = Moshi.Builder()

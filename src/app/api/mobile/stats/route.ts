@@ -6,6 +6,7 @@ import { calcularTrophyDna, calcularEstiloDeCaza } from "@/lib/trophyDna";
 import { rachas, resumenHistorico } from "@/lib/history";
 import { resumenFinanciero, eficienciaPersonal, resumenEficiencia, deudaBacklog } from "@/lib/backlog";
 import { horasTotales, hitosHistoricos } from "@/lib/profileStats";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Estadísticas — versión CURADA para el móvil, no las ~15 piezas de
@@ -41,7 +42,7 @@ export async function GET(req: Request) {
   const eficiencia = resumenEficiencia(eficienciaPersonal(games));
   const backlog = deudaBacklog(games);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     paragonScore: { total: paragonScore.total, porPlataforma: paragonScore.porPlataforma },
     trophyDna: { ejes: dna.ejes, arquetipo: dna.arquetipo },
     // Distinto del `arquetipo` de arriba (ese es de GÉNERO); esto mide el
@@ -64,5 +65,5 @@ export async function GET(req: Request) {
     // web (HistoricalTimeline.tsx), sin recortar nada: cada hito puede venir
     // `null` si todavía no aplica (p. ej. sin ningún platino).
     hitos,
-  });
+  }, userId);
 }

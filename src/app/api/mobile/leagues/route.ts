@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { createLeague, listUserLeagues, type LeagueDurationUnit } from "@/lib/leagues";
+import { jsonConEtag } from "@/lib/etag";
 
 const UNIDADES_DURACION: LeagueDurationUnit[] = ["dias", "semanas", "meses", "anios"];
 
@@ -13,7 +14,7 @@ export async function GET(req: Request) {
   }
 
   const leagues = await listUserLeagues(userId);
-  return NextResponse.json({ leagues });
+  return jsonConEtag(req, { leagues }, userId);
 }
 
 /** Crea una liga — `{ "name": "...", "durationValue"?: number, "durationUnit"?: "dias"|"semanas"|"meses"|"anios" }`. El creador entra como único miembro. */

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { dietaGamer } from "@/lib/dietaGamer";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * "Dieta Gamer" — aviso amistoso si tus últimos 3 juegos terminados
@@ -23,5 +24,5 @@ export async function GET(req: Request) {
   const { games } = await getLibrary(profile);
   const dieta = dietaGamer(games);
 
-  return NextResponse.json({ dieta });
+  return jsonConEtag(req, { dieta }, userId);
 }

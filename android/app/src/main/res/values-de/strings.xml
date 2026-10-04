@@ -146,6 +146,7 @@
     <string name="comun_buscar_accion">Suchen</string>
     <string name="comun_cambiar">Ändern</string>
     <string name="comun_cancelar">Abbrechen</string>
+    <string name="comun_cargando">Wird geladen</string>
     <string name="comun_cerrar">Schließen</string>
     <string name="comun_compartir">Teilen</string>
     <string name="comun_completado">%1$s %% abgeschlossen</string>

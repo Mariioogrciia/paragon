@@ -118,9 +118,7 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
         when (val current = result) {
             null -> {
                 if (isInitialLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Accent)
-                    }
+                    com.paragon.app.ui.common.EsqueletoLista(filas = 5)
                 }
             }
             is FeedResult.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

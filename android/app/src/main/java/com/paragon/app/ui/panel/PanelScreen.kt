@@ -250,12 +250,7 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                     when (val current = highlights) {
                         null -> {
                             if (isInitialLoading) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth().height(240.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator(color = Accent)
-                                }
+                                com.paragon.app.ui.common.EsqueletoTarjetas(tarjetas = 1, alto = 208.dp, modifier = Modifier.fillMaxWidth().height(240.dp))
                             }
                         }
                         is HighlightsResult.Error -> Column {

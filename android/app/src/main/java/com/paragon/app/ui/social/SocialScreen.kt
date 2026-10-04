@@ -122,9 +122,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
 
         if (selectedTab == 3) {
             when (val current = clansResult) {
-                null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Accent)
-                }
+                null -> com.paragon.app.ui.common.EsqueletoLista(filas = 6)
                 is ClansResult.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = current.message, color = Foreground, fontSize = 14.sp)
@@ -189,9 +187,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             }
         } else if (selectedTab == 1) {
             when (val current = leaguesResult) {
-                null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Accent)
-                }
+                null -> com.paragon.app.ui.common.EsqueletoLista(filas = 6)
                 is LeaguesResult.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = current.message, color = Foreground, fontSize = 14.sp)
@@ -250,9 +246,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             }
         } else {
             when (val current = result) {
-                null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Accent)
-                }
+                null -> com.paragon.app.ui.common.EsqueletoLista(filas = 6)
                 is SocialResult.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = current.message, color = Foreground, fontSize = 14.sp)

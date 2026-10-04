@@ -3,6 +3,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { listFriends } from "@/lib/profiles";
 import { clasificacionAmigos } from "@/lib/rankings";
 import { getLigaMensual } from "@/lib/ligas";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Datos de SocialScreen (Android): las dos pestañas del plan, "Amigos" y
@@ -37,5 +38,5 @@ export async function GET(req: Request) {
     accounts: accountsByUser.get(fila.userId) ?? [],
   }));
 
-  return NextResponse.json({ amigos, liga });
+  return jsonConEtag(req, { amigos, liga }, userId);
 }

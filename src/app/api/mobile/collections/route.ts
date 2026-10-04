@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { createCollection, CollectionNameError, listCollections } from "@/lib/collections";
+import { jsonConEtag } from "@/lib/etag";
 
 /** Carpetas de juegos (colecciones) del usuario. */
 export async function GET(req: Request) {
@@ -11,7 +12,7 @@ export async function GET(req: Request) {
   }
 
   const collections = await listCollections(userId);
-  return NextResponse.json({ collections });
+  return jsonConEtag(req, { collections }, userId);
 }
 
 /** Crea una carpeta — `{ "name": "..." }`. */

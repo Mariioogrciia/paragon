@@ -224,9 +224,7 @@ fun LibraryScreen(
         when (val current = result) {
             null -> {
                 if (isInitialLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Accent)
-                    }
+                    com.paragon.app.ui.common.EsqueletoLista()
                 }
             }
             is LibraryResult.Error -> Box(

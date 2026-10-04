@@ -5,6 +5,7 @@ import { gameProgress } from "@/lib/stats";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import type { Game } from "@/lib/types";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * "A un paso del platino" y "Jugado recientemente" del Panel (Android) —
@@ -56,7 +57,7 @@ export async function GET(req: Request) {
     .slice(0, 3)
     .map((g) => g.game);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     nearPlatinum: nearPlatinum.map(toCard),
     recent: recent.map(toCard),
     nextTrophies: recomendaciones.map((r) => ({
@@ -70,5 +71,5 @@ export async function GET(req: Request) {
       iconUrl: r.iconUrl,
       grade: r.grade,
     })),
-  });
+  }, userId);
 }

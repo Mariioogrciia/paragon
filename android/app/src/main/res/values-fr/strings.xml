@@ -146,6 +146,7 @@
     <string name="comun_buscar_accion">Rechercher</string>
     <string name="comun_cambiar">Changer</string>
     <string name="comun_cancelar">Annuler</string>
+    <string name="comun_cargando">Chargement</string>
     <string name="comun_cerrar">Fermer</string>
     <string name="comun_compartir">Partager</string>
     <string name="comun_completado">%1$s %% terminé</string>

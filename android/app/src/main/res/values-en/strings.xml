@@ -146,6 +146,7 @@
     <string name="comun_buscar_accion">Search</string>
     <string name="comun_cambiar">Change</string>
     <string name="comun_cancelar">Cancel</string>
+    <string name="comun_cargando">Loading</string>
     <string name="comun_cerrar">Close</string>
     <string name="comun_compartir">Share</string>
     <string name="comun_completado">%1$s%% complete</string>

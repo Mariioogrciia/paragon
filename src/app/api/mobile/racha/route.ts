@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { rachas } from "@/lib/history";
 import { actividadPorDia } from "@/lib/profileStats";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Detalle de la racha diaria, para la pantalla dedicada que se abre al
@@ -19,10 +20,10 @@ export async function GET(req: Request) {
 
   const [racha, dias] = await Promise.all([rachas(userId), actividadPorDia(userId, 35)]);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     actual: racha.actual,
     mejor: racha.mejor,
     diasActivos: racha.diasActivos,
     dias: dias.map((d) => ({ dia: d.dia, trofeos: d.trofeos })),
-  });
+  }, userId);
 }

@@ -4,6 +4,7 @@ import { getLibrary, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles
 import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { rachas } from "@/lib/history";
+import { jsonConEtag } from "@/lib/etag";
 
 /** Datos de la pantalla de Panel nativa (Android/Compose). Mismo cálculo que la portada web (`app/page.tsx`), reempaquetado en JSON. */
 export async function GET(req: Request) {
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
   const nivel = paragonProgress(games, xpMisiones);
   const psn = profile.accounts.find((a) => a.platform === "psn");
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     profile: {
       handle: profile.handle,
       name: profile.displayName ?? profile.handle,
@@ -55,5 +56,5 @@ export async function GET(req: Request) {
       actual: racha.actual,
       mejor: racha.mejor,
     },
-  });
+  }, userId);
 }

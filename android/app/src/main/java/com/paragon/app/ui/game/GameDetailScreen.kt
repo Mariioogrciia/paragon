@@ -102,12 +102,7 @@ fun GameDetailScreen(
     }
 
     when (val current = result) {
-        null -> Box(
-            modifier = Modifier.fillMaxSize().background(Background),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(color = Accent)
-        }
+        null -> com.paragon.app.ui.common.EsqueletoFicha(Modifier.fillMaxSize().background(Background))
         is GameDetailResult.Error -> Box(
             modifier = Modifier.fillMaxSize().background(Background).padding(24.dp),
             contentAlignment = Alignment.Center,

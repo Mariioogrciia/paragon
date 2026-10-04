@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
  * Refresca las cachés offline (Panel + Biblioteca) en segundo plano, aunque
  * nadie tenga la app abierta — antes solo se refrescaban al entrar en cada
  * pantalla, así que la "última copia guardada" del aviso offline podía ser
- * de la última vez que se abrió la app, no de hace 15 minutos. Ambos
+ * de la última vez que se abrió la app, no de hace unas horas. Ambos
  * repositorios ya escriben en su caché Room como efecto secundario de un
  * `getPanel()`/`getLibrary()` con éxito (ver PanelRepository.kt/
  * LibraryRepository.kt) — este Worker no hace nada nuevo, solo dispara esas
@@ -47,22 +47,25 @@ class PanelSyncWorker(context: Context, params: WorkerParameters) : CoroutineWor
         private const val UNIQUE_NAME = "panel_sync"
 
         /**
-         * 15 minutos es el intervalo mínimo real que deja Android para
-         * trabajo periódico (`PeriodicWorkRequest`, documentado en la propia
-         * API) — no hay forma de pedir algo más frecuente sin salirse de
-         * WorkManager. `KEEP`: si ya hay uno programado (llamadas repetidas
-         * en cada arranque de `ComposeMainActivity`), no lo duplica ni
-         * reinicia su cuenta atrás.
+         * `UPDATE`: si ya hay uno programado (llamadas repetidas en cada
+         * arranque de `ComposeMainActivity`), no lo duplica; y a quien ya lo
+         * tenía cada 15 min le cambia el intervalo sin reiniciar la cuenta
+         * atrás (con `KEEP` se habría quedado con el antiguo para siempre).
          */
         fun schedule(context: Context) {
+            // Cada 3 h, no cada 15 min (auditoría, 4 oct 2026): los datos del
+            // servidor se sincronizan una vez al día y al pedirlo, así que
+            // 96 llamadas diarias por móvil (panel + biblioteca entera) solo
+            // gastaban batería, datos y cuota de Vercel. Y no con batería baja.
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(true)
                 .build()
-            val request = PeriodicWorkRequestBuilder<PanelSyncWorker>(15, TimeUnit.MINUTES)
+            val request = PeriodicWorkRequestBuilder<PanelSyncWorker>(3, TimeUnit.HOURS)
                 .setConstraints(constraints)
                 .build()
             WorkManager.getInstance(context)
-                .enqueueUniquePeriodicWork(UNIQUE_NAME, ExistingPeriodicWorkPolicy.KEEP, request)
+                .enqueueUniquePeriodicWork(UNIQUE_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
         }
     }
 }

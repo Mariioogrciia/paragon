@@ -80,9 +80,7 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", onBack: (() -> Unit
         }
 
         when (val current = result) {
-            null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Accent)
-            }
+            null -> com.paragon.app.ui.common.EsqueletoTarjetas()
             is StatsResult.Error -> Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = current.message, color = Foreground, fontSize = 14.sp)

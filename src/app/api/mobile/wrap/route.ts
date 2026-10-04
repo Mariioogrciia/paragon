@@ -4,6 +4,7 @@ import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { generoTop, juegoDestacado } from "@/components/ParagonWrap";
 import { resumenHistorico, juegosDelAnio, rachas } from "@/lib/history";
 import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Paragon Wrap — mismo dato que las 3 tarjetas del perfil (ParagonWrap.tsx)
@@ -39,7 +40,7 @@ export async function GET(req: Request) {
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     playerName: profile.displayName ?? profile.handle,
     esteAnio: resumen.esteAnio,
     juegosEsteAnio,
@@ -56,5 +57,5 @@ export async function GET(req: Request) {
     mejorMes: resumen.mejorMes,
     rachas: rachasUsuario,
     percentil,
-  });
+  }, userId);
 }

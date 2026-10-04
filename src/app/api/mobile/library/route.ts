@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Biblioteca completa del usuario, para LibraryScreen (Android). Misma
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
 
   const { games } = await getLibrary(profile);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     games: games.map((g) => ({
       id: g.id,
       platform: g.platform,
@@ -40,5 +41,5 @@ export async function GET(req: Request) {
       lastPlayedAt: g.lastPlayedAt ?? null,
       playtimeMinutes: g.playtimeMinutes ?? null,
     })),
-  });
+  }, userId);
 }

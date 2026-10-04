@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getFeed } from "@/lib/feed";
+import { jsonConEtag } from "@/lib/etag";
 
 /**
  * Muro de actividad (propia + amigos) para FeedScreen (Android) — mismo
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
 
   const feed = await getFeed(userId);
 
-  return NextResponse.json({
+  return jsonConEtag(req, {
     items: feed.map((item) => ({
       id: item.id,
       type: item.type,
@@ -33,5 +34,5 @@ export async function GET(req: Request) {
       comments: item.comments,
       views: item.views,
     })),
-  });
+  }, userId);
 }
