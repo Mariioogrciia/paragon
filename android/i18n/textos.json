@@ -1571,6 +1571,30 @@
   "es": "Sin sesión.",
   "fr": "Non connecté."
  },
+ "feed_a11y_comentarios": {
+  "de": "{0} Kommentare. Kommentieren",
+  "en": "{0} comments. Comment",
+  "es": "{0} comentarios. Comentar",
+  "fr": "{0} commentaires. Commenter"
+ },
+ "feed_a11y_reaccionado": {
+  "de": "{0} Reaktionen. Du hast reagiert; tippen zum Ändern",
+  "en": "{0} reactions. You reacted; tap to change",
+  "es": "{0} reacciones. Has reaccionado; toca para cambiar",
+  "fr": "{0} réactions. Tu as réagi ; touche pour changer"
+ },
+ "feed_a11y_reaccionar": {
+  "de": "{0} Reaktionen. Reagieren",
+  "en": "{0} reactions. React",
+  "es": "{0} reacciones. Reaccionar",
+  "fr": "{0} réactions. Réagir"
+ },
+ "feed_a11y_vistas": {
+  "de": "Von {0} Personen gesehen",
+  "en": "Seen by {0} people",
+  "es": "Visto por {0} personas",
+  "fr": "Vu par {0} personnes"
+ },
  "feed_comentar_ph": {
   "de": "Kommentar schreiben...",
   "en": "Add a comment...",

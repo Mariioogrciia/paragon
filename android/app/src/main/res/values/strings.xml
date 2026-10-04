@@ -267,6 +267,10 @@
     <string name="error_servidor">El servidor respondió con un error (%1$s).</string>
     <string name="error_servidor_corto">Error del servidor (%1$s).</string>
     <string name="error_sin_sesion">Sin sesión.</string>
+    <string name="feed_a11y_comentarios">%1$s comentarios. Comentar</string>
+    <string name="feed_a11y_reaccionado">%1$s reacciones. Has reaccionado; toca para cambiar</string>
+    <string name="feed_a11y_reaccionar">%1$s reacciones. Reaccionar</string>
+    <string name="feed_a11y_vistas">Visto por %1$s personas</string>
     <string name="feed_comentar_ph">Añadir un comentario...</string>
     <string name="feed_favorito">Ha marcado %1$s como favorito.</string>
     <string name="feed_nota">" con %1$s/10."</string>

@@ -560,7 +560,7 @@ private fun BadgesCard(badges: List<Badge>) {
 }
 
 /**
- * stringResource(R.string.stats_dieta) — aviso amistoso (nunca un bloqueo) si
+ * "🥗 Tu dieta gamer está muy densa" — aviso amistoso (nunca un bloqueo) si
  * los últimos 3 juegos terminados comparten género y suman muchas horas.
  * Ver dietaGamer() en lib/dietaGamer.ts (proyecto Next.js) para los
  * umbrales exactos. Mismo texto que DietaGamer.tsx en la web.

@@ -263,6 +263,10 @@
     <string name="error_servidor">The server returned an error (%1$s).</string>
     <string name="error_servidor_corto">Server error (%1$s).</string>
     <string name="error_sin_sesion">Not signed in.</string>
+    <string name="feed_a11y_comentarios">%1$s comments. Comment</string>
+    <string name="feed_a11y_reaccionado">%1$s reactions. You reacted; tap to change</string>
+    <string name="feed_a11y_reaccionar">%1$s reactions. React</string>
+    <string name="feed_a11y_vistas">Seen by %1$s people</string>
     <string name="feed_comentar_ph">Add a comment...</string>
     <string name="feed_favorito">Favourited %1$s.</string>
     <string name="feed_nota">" %1$s/10."</string>

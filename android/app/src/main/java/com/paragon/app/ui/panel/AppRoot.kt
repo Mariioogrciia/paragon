@@ -134,7 +134,7 @@ private const val PREFS_ONBOARDING = "paragon_onboarding"
 private const val CLAVE_VINCULAR_SALTADO = "vincular_saltado"
 
 /**
- * stringResource(R.string.alta_ultimo_paso) — reutiliza LinkedAccountsScreen tal
+ * "Último paso: vincula tu cuenta" — reutiliza LinkedAccountsScreen tal
  * cual (la misma que Ajustes → Cuentas vinculadas) con una cabecera que
  * explica el paso y dos salidas: recargar el panel ya con la cuenta, o
  * saltarlo.
@@ -296,7 +296,7 @@ private fun GradeChip(value: String, label: String, color: Color) {
 /**
  * Paso 1 del alta (ver POST /api/mobile/profile/handle): sin esto, un login
  * nuevo por Google/Discord se quedaba mirando "El servidor respondió con un
- * error (409)" con un botón stringResource(R.string.comun_reintentar) que repite la misma petición para
+ * error (409)" con un botón "Reintentar" que repite la misma petición para
  * siempre — el 409 es real y esperado (perfil sin `handle` todavía), no un
  * fallo de red, y nunca se arregla solo.
  */

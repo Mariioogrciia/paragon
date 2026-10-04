@@ -118,7 +118,7 @@ fun GameDetailScreen(
                     // El `retryCounter` que dispara el `LaunchedEffect` de
                     // arriba ya existía — solo faltaba un botón que lo
                     // usara. Sin esto, un corte de red momentáneo dejaba
-                    // stringResource(R.string.comun_volver) como única salida, obligando a salir y
+                    // "Volver" como única salida, obligando a salir y
                     // volver a entrar desde el origen para reintentar.
                     Button(
                         onClick = { retryCounter.value += 1 },
@@ -181,7 +181,7 @@ private fun GameDetailContent(
     // "Platino conseguido" real (mismo criterio que el filtro "Platinados"
     // de Biblioteca en HANDOFF.md: earned.platinum > 0, no percent == 100 —
     // un juego sin trofeo de Platino definido nunca debería ofrecer
-    // stringResource(R.string.ficha_compartir_platino) aunque esté al 100%).
+    // "Compartir Platino" aunque esté al 100%).
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
     val prediccion = remember(game.trophies) { predecirPlatino(game.trophies) }
     var vistaCronologica by remember { mutableStateOf(false) }
@@ -570,7 +570,7 @@ private data class ResumenDia(
 private val GRADOS_EN_ORDEN = listOf(TrophyGrade.PLATINUM, TrophyGrade.GOLD, TrophyGrade.SILVER, TrophyGrade.BRONZE)
 
 /**
- * Vista stringResource(R.string.ficha_cronologia): cuándo cayó cada trofeo (eje X) y lo raro que es (eje
+ * Vista "Cronología": cuándo cayó cada trofeo (eje X) y lo raro que es (eje
  * Y, el % real — 0% arriba del todo, más raro, 100% abajo), con la foto
  * real del trofeo, no un icono genérico. Mismo cálculo que TrophyTimeline.tsx
  * en la web — solo cuenta lo que tiene `earnedAt` Y `rarityPercent` reales.
@@ -952,7 +952,7 @@ private fun TrophyRow(
                         }
                     }
                 },
-                modifier = Modifier.padding(start = 4.dp).size(24.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(Icons.Default.Star, contentDescription = stringResource(R.string.ficha_atascar), tint = if (isStuck) Accent else Muted, modifier = Modifier.size(16.dp))
             }
@@ -970,7 +970,7 @@ private fun TrophyRow(
                         abrirGuiaEnYoutube(context, videoId, game.title, trophy.name)
                     }
                 },
-                modifier = Modifier.padding(start = 4.dp).size(24.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 if (buscandoGuia) {
                     CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
@@ -980,7 +980,7 @@ private fun TrophyRow(
             }
             IconButton(
                 onClick = { showGuiasEscritas = true },
-                modifier = Modifier.padding(start = 4.dp).size(24.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = stringResource(R.string.ficha_guias_escritas), tint = Muted, modifier = Modifier.size(16.dp))
             }

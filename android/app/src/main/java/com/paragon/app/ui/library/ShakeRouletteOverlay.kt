@@ -1,5 +1,6 @@
 package com.paragon.app.ui.library
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -66,6 +67,9 @@ fun ShakeRouletteOverlay(
         spinning = false
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
     }
+
+    // Atrás (botón o gesto predictivo) cierra la ruleta, no la Biblioteca entera.
+    BackHandler(onBack = onDismiss)
 
     Box(
         modifier = Modifier

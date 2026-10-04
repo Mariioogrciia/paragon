@@ -263,6 +263,10 @@
     <string name="error_servidor">Der Server hat einen Fehler gemeldet (%1$s).</string>
     <string name="error_servidor_corto">Serverfehler (%1$s).</string>
     <string name="error_sin_sesion">Nicht angemeldet.</string>
+    <string name="feed_a11y_comentarios">%1$s Kommentare. Kommentieren</string>
+    <string name="feed_a11y_reaccionado">%1$s Reaktionen. Du hast reagiert; tippen zum Ändern</string>
+    <string name="feed_a11y_reaccionar">%1$s Reaktionen. Reagieren</string>
+    <string name="feed_a11y_vistas">Von %1$s Personen gesehen</string>
     <string name="feed_comentar_ph">Kommentar schreiben...</string>
     <string name="feed_favorito">Hat %1$s favorisiert.</string>
     <string name="feed_nota">" mit %1$s/10."</string>

@@ -1,5 +1,6 @@
 package com.paragon.app.ui.wrap
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -72,6 +73,9 @@ fun WrapStoriesScreen(tokenStore: TokenStore, onClose: () -> Unit) {
     val retryCounter = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(retryCounter.value) { result = repository.getWrap() }
+
+    // Atrás cierra las historias y vuelve a Estadísticas, en vez de salir de la pantalla.
+    BackHandler(onBack = onClose)
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.92f))) {
         when (val current = result) {

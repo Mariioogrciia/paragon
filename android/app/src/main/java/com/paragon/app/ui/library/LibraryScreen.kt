@@ -111,7 +111,7 @@ fun LibraryScreen(
                 .fillMaxSize()
                 .background(Background)
         ) {
-        // Cabecera con selector — antes stringResource(R.string.biblio_titulo) (32sp) + el desplegable
+        // Cabecera con selector — antes "BIBLIOTECA" (32sp) + el desplegable
         // de orden + el selector de vista iban los tres en la MISMA fila:
         // en un móvil normal no caben, y el texto del desplegable se
         // recortaba a medias ("Progreso" → "rogreso"). El título se lleva

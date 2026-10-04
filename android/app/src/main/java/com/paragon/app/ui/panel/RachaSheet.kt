@@ -36,6 +36,7 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.ui.theme.*
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.util.animacionesReducidas
 
 /**
  * Pantalla dedicada a la racha (pedido explícito del usuario: ni el resumen
@@ -155,12 +156,14 @@ private fun DiasGrid(dias: List<DiaActividad>) {
     // sin que el calendario entero titile.
     val hoy = dias.lastOrNull()
     val transicion = rememberInfiniteTransition(label = "pulsoHoy")
-    val pulso by transicion.animateFloat(
+    val pulsoAnimado by transicion.animateFloat(
         initialValue = 0.6f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(tween(1100), RepeatMode.Reverse),
         label = "pulsoHoyAlpha",
     )
+    // Con "quitar animaciones" el día de hoy se queda fijo, sin titilar.
+    val pulso = if (animacionesReducidas()) 1f else pulsoAnimado
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
         semanas.forEach { semana ->

@@ -344,7 +344,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 IconButton(
                     onClick = { showUnlinkConfirm = true },
                     enabled = !isProcessing,
-                    modifier = Modifier.size(34.dp),
+                    modifier = Modifier.size(48.dp),
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cuentas_desvincular), tint = Danger, modifier = Modifier.size(18.dp))
                 }

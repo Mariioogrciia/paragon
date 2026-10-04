@@ -263,6 +263,10 @@
     <string name="error_servidor">Le serveur a renvoyé une erreur (%1$s).</string>
     <string name="error_servidor_corto">Erreur du serveur (%1$s).</string>
     <string name="error_sin_sesion">Non connecté.</string>
+    <string name="feed_a11y_comentarios">%1$s commentaires. Commenter</string>
+    <string name="feed_a11y_reaccionado">%1$s réactions. Tu as réagi ; touche pour changer</string>
+    <string name="feed_a11y_reaccionar">%1$s réactions. Réagir</string>
+    <string name="feed_a11y_vistas">Vu par %1$s personnes</string>
     <string name="feed_comentar_ph">Ajouter un commentaire...</string>
     <string name="feed_favorito">A mis %1$s en favori.</string>
     <string name="feed_nota">" %1$s/10."</string>

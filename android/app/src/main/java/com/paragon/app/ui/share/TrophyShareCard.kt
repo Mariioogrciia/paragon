@@ -46,7 +46,7 @@ fun TrophyShareCard(
     handle: String,
     earnedTrophies: Int? = null,
     totalTrophies: Int? = null,
-    // stringResource(R.string.comparte_badge_platino) por defecto (el uso de siempre, GameDetailScreen); la
+    // "PLATINO" por defecto (el uso de siempre, GameDetailScreen); la
     // galería de hitos (StatsScreen) pasa "TU PLATINO #47", "PRIMER
     // TROFEO"... — mismo diseño de tarjeta, distinto rótulo.
     badge: String = stringResource(R.string.comparte_badge_platino),

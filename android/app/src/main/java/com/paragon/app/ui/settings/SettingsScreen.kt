@@ -58,7 +58,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     // Antes el botón se activaba con solo tener un nombre no vacío, aunque
-    // fuera el mismo de siempre — stringResource(R.string.comun_guardar_cambios) sin ningún cambio
+    // fuera el mismo de siempre — "Guardar cambios" sin ningún cambio
     // pendiente invita a pulsar sin necesidad. Se compara contra el último
     // valor GUARDADO (no contra `profile` directo, que es una prop que no
     // se actualiza sola tras guardar) para que el botón vuelva a
@@ -66,7 +66,7 @@ fun SettingsScreen(
     var nombreGuardado by remember { mutableStateOf(profile.name) }
     var avatarGuardado by remember { mutableStateOf(profile.image) }
     val hayCambiosSinGuardar = nameInput != nombreGuardado || avatarUrl != avatarGuardado
-    // stringResource(R.string.ajustes_cerrar_sesion_boton) saltaba directo con un solo toque, sin nada de por
+    // "Cerrar Sesión" saltaba directo con un solo toque, sin nada de por
     // medio — mismo criterio que "Desvincular" (LinkedAccountsScreen) y las
     // acciones de Ligas (LeagueDetailSheet).
     var showLogoutConfirm by remember { mutableStateOf(false) }
@@ -500,7 +500,7 @@ private fun CustomColorPicker(themeStore: ThemeStore) {
                 val isSelected = (themeStore.customAccentColor ?: -1L) == colorValue
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(if (colorValue == -1L) Surface2 else Color(colorValue))
                         .border(if (isSelected) 3.dp else 1.dp, if (isSelected) Foreground else Border, CircleShape)

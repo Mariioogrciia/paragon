@@ -58,6 +58,9 @@ import kotlinx.coroutines.launch
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -285,12 +288,14 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                 )
                 CountBadge(
                     icon = Icons.Default.ChatBubbleOutline,
+                    descripcion = stringResource(R.string.feed_a11y_comentarios, comments.size),
                     count = comments.size,
                     tint = Muted,
                     onClick = { showCommentInput = !showCommentInput },
                 )
                 CountBadge(
                     icon = Icons.Default.RemoveRedEye,
+                    descripcion = stringResource(R.string.feed_a11y_vistas, viewCount),
                     count = viewCount,
                     tint = Muted,
                 )
@@ -407,13 +412,16 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
 @Composable
 private fun CountBadge(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    descripcion: String,
     count: Int,
     tint: androidx.compose.ui.graphics.Color,
     onClick: (() -> Unit)? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
+        // TalkBack lee "3 comentarios" en vez de un icono sin nombre y un número suelto.
+        modifier = (if (onClick != null) Modifier.clickable(onClick = onClick, role = Role.Button) else Modifier)
+            .clearAndSetSemantics { contentDescription = descripcion },
     ) {
         Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
         Spacer(modifier = Modifier.width(4.dp))
@@ -433,9 +441,12 @@ private fun ReactionBadge(
     count: Int,
     onClick: () -> Unit,
 ) {
+    val descripcion = stringResource(if (reacted) R.string.feed_a11y_reaccionado else R.string.feed_a11y_reaccionar, count)
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable(onClick = onClick),
+        modifier = Modifier
+            .clickable(onClick = onClick, role = Role.Button)
+            .clearAndSetSemantics { contentDescription = descripcion },
     ) {
         if (reacted) {
             Text(text = emojiDeReaccion(miReaccion), fontSize = 15.sp)

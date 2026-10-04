@@ -519,7 +519,7 @@ private fun PendingTrophyCard(trofeo: TrophyItem, destacado: Boolean) {
 }
 
 /**
- * "Iniciar sesión" te sientas a jugar de verdad → stringResource(R.string.enfoque_detener) cuando
+ * "Iniciar sesión" te sientas a jugar de verdad → "Detener sesión" cuando
  * paras, y queda anotado en el Diario. Un solo botón según haya o no una
  * sesión activa — nunca los dos a la vez, no hace falta un tercer estado.
  */

@@ -30,7 +30,7 @@ class WishlistRepository(private val tokenStore: TokenStore? = null) {
         }
     }
 
-    /** Textos.t(R.string.comun_deseados) fijo como dispositivo — igual que el valor por defecto de `addToWishlistAction` en la web, no hay catálogo de dispositivos que elegir aquí. */
+    /** "Deseados" fijo como dispositivo — igual que el valor por defecto de `addToWishlistAction` en la web, no hay catálogo de dispositivos que elegir aquí. */
     suspend fun addToWishlist(game: GameSearchResult): Boolean {
         val store = tokenStore ?: return false
         return try {

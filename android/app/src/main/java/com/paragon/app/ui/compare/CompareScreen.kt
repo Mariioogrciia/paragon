@@ -123,7 +123,7 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
                     Text(text = (result as CompareResult.Error).message, color = Muted, fontSize = 14.sp)
                     // El buscador de arriba se queda con el @handle puesto,
                     // así que "reintentar" ya era posible tocando
-                    // stringResource(R.string.nav_comparar) otra vez — este botón solo lo hace
+                    // "Comparar" otra vez — este botón solo lo hace
                     // explícito, mismo patrón que el resto de pantallas
                     // con estado de error.
                     TextButton(onClick = { buscar(handle) }, modifier = Modifier.padding(top = 8.dp)) {
@@ -214,7 +214,7 @@ private fun CompareContent(data: CompareData) {
 /**
  * Antes esto era solo texto (nombre/nivel/platinos), sin foto ni ninguna
  * lectura de "quién va ganando" — la web ya tenía las dos cosas
- * (`comparar/[handle]/page.tsx`: `Avatar` + etiqueta stringResource(R.string.comparar_ganando)), esto
+ * (`comparar/[handle]/page.tsx`: `Avatar` + etiqueta "Vas ganando"), esto
  * las trae aquí con el mismo criterio (por platinos).
  */
 @Composable

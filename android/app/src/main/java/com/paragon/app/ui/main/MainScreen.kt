@@ -96,6 +96,18 @@ import com.paragon.app.ui.theme.Gold
 import com.paragon.app.ui.theme.Muted
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 
 // Definimos la estructura de items de navegación
 sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
@@ -165,6 +177,27 @@ fun MainScreen(
             BottomNavItem.Social
         )
     }
+
+    // Ventana ancha (tablet, plegable abierto, multiventana amplia): rail
+    // lateral en vez de barra inferior y contenido con ancho máximo, como
+    // pide Material para "expanded"/"medium". LocalConfiguration ya da el
+    // ancho de la VENTANA, así que también vale en pantalla dividida.
+    val anchoAmplio = LocalConfiguration.current.screenWidthDp >= 600
+    val navBackStackEntryActual by navController.currentBackStackEntryAsState()
+    fun irA(item: BottomNavItem) {
+        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        // `saveState`/`restoreState` (quitados a propósito): esos dos son
+        // justo lo que hacía que tocar una pestaña resucitara la pantalla que
+        // hubiera quedado a medias ahí la última vez (p. ej. Ajustes, abierto
+        // desde el menú de Inicio), en vez de llevar siempre a la raíz de esa
+        // pestaña — que es lo que se pidió de verdad.
+        navController.navigate(item.screen.route) {
+            popUpTo(navController.graph.findStartDestination().id)
+            launchSingleTop = true
+        }
+    }
+    fun estaEn(item: BottomNavItem) =
+        navBackStackEntryActual?.destination?.hierarchy?.any { it.route == item.screen.route } == true
 
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
@@ -243,10 +276,10 @@ fun MainScreen(
                             onDismissRequest = { isMenuExpanded = false },
                             // Antes era el menú desplegable genérico de
                             // Material sin más (fondo plano, texto suelto
-                            // sin iconos, stringResource(R.string.nav_ajustes) mezclado con accesos
+                            // sin iconos, "Ajustes" mezclado con accesos
                             // directos como si fuera uno más) — borde +
                             // esquinas propias de la app, un icono por
-                            // opción, y stringResource(R.string.nav_ajustes) separado por un divisor
+                            // opción, y "Ajustes" separado por un divisor
                             // porque es la única que no es un atajo a una
                             // función, es la puerta a toda una sección.
                             modifier = Modifier
@@ -302,7 +335,7 @@ fun MainScreen(
             }
         },
         bottomBar = {
-            AnimatedVisibility(
+            if (!anchoAmplio) AnimatedVisibility(
                 visible = bottomBarVisible,
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it })
@@ -312,9 +345,6 @@ fun MainScreen(
                     contentColor = Foreground,
                     modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
                 ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-
                 items.forEach { item ->
                     NavigationBarItem(
                         // Sin `label`: con 5 pestañas, textos como "Estadísticas"
@@ -322,21 +352,8 @@ fun MainScreen(
                         // icono (más grande, para que siga siendo legible) con
                         // `contentDescription` para accesibilidad.
                         icon = { Icon(item.icon, contentDescription = item.screen.title, modifier = Modifier.size(26.dp)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true,
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            // `saveState`/`restoreState` (quitados a propósito):
-                            // esos dos son justo lo que hacía que tocar una
-                            // pestaña de abajo resucitara la pantalla que
-                            // hubiera quedado a medias ahí la última vez (p.
-                            // ej. Ajustes, abierto desde el menú de Inicio),
-                            // en vez de llevar siempre a la raíz de esa
-                            // pestaña — que es lo que se pidió de verdad.
-                            navController.navigate(item.screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id)
-                                launchSingleTop = true
-                            }
-                        },
+                        selected = estaEn(item),
+                        onClick = { irA(item) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Accent,
                             unselectedIconColor = Muted,
@@ -350,6 +367,43 @@ fun MainScreen(
         }
     }
     ) { innerPadding ->
+        Row(
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                // El teclado empuja el contenido en vez de tapar el campo
+                // que se está escribiendo (comentarios, notas, búsqueda...).
+                .imePadding(),
+        ) {
+        if (anchoAmplio) {
+            NavigationRail(
+                containerColor = Background,
+                contentColor = Foreground,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Start)),
+            ) {
+                Spacer(Modifier.height(8.dp))
+                items.forEach { item ->
+                    NavigationRailItem(
+                        icon = { Icon(item.icon, contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        // En el rail sí caben las etiquetas (en la barra de abajo no).
+                        label = { Text(item.screen.title, maxLines = 1) },
+                        selected = estaEn(item),
+                        onClick = { irA(item) },
+                        colors = NavigationRailItemDefaults.colors(
+                            selectedIconColor = Accent,
+                            unselectedIconColor = Muted,
+                            selectedTextColor = Accent,
+                            unselectedTextColor = Muted,
+                            indicatorColor = com.paragon.app.ui.theme.AccentSoft,
+                        ),
+                    )
+                }
+            }
+        }
+        Box(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            contentAlignment = Alignment.TopCenter,
+        ) {
         // SharedTransitionLayout envuelve TODO el NavHost (no solo Biblioteca/
         // Ficha) porque la Ficha de juego se abre también desde el Panel,
         // Comunidad, Ligas y Carpetas — todas necesitan compartir el mismo
@@ -360,7 +414,9 @@ fun MainScreen(
         NavHost(
             navController = navController,
             startDestination = Screen.Dashboard.route,
-            modifier = Modifier.padding(innerPadding),
+            // Una columna de lectura cómoda en tablet: el diseño es de móvil y
+            // estirado a 1200 dp las tarjetas y listas se vuelven ilegibles.
+            modifier = Modifier.widthIn(max = 840.dp).fillMaxSize(),
             enterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
             exitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) },
             popEnterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
@@ -458,6 +514,8 @@ fun MainScreen(
                     animatedVisibilityScope = this,
                 )
             }
+        }
+        }
         }
         }
     }
