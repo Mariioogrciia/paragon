@@ -130,16 +130,26 @@ export interface ClanLeaderboardEntry {
   handle: string | null;
   name: string | null;
   image: string | null;
+  /** Paragon Score de toda su vida (todas sus plataformas). */
   score: number;
+  /** Trofeos de toda su vida. */
   trofeos: number;
+  /** Puntos que aporta al clan: Paragon Score de lo ganado desde que entró. */
   contribucion: number;
+  /** Trofeos ganados desde que entró. */
+  trofeosEnClan: number;
+  /** Cuándo entró en el clan. */
+  joinedAt: Date;
 }
 
 /**
- * Ranking interno del clan: cada miembro con su Paragon Score (trofeo a
- * trofeo, misma fórmula unificada entre plataformas de
- * `lib/paragonScore.ts`) y su recuento de trofeos, ordenado de mayor a
- * menor — "quién está carreando".
+ * Contribución de cada miembro al clan: el Paragon Score (trofeo a trofeo,
+ * misma fórmula unificada entre plataformas de `lib/paragonScore.ts`) de
+ * los trofeos ganados DESDE QUE ENTRÓ, no de toda su vida — pedido del
+ * usuario (5 oct 2026): la puntuación del clan son los trofeos que se
+ * ganan en él. Un trofeo sin fecha (alguna plataforma no la da) no cuenta
+ * como aportado. Ordenado por contribución: "quién está carreando". Se
+ * mantienen también el Paragon Score y los trofeos de toda su vida.
  *
  * La versión original de `getClanScore` (ahora sustituida) no compilaba:
  * leía columnas que no existen en el esquema (`userGames.earnedPlatinum` y
@@ -192,23 +202,26 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
       .where(inArray(users.id, memberIds)),
   ]);
 
-  const joinedAtMap = new Map(members.map(m => [m.userId, m.joinedAt]));
-  const stats = new Map<string, { score: number; trofeos: number; contribucion: number }>();
+  const joinedAtMap = new Map(members.map((m) => [m.userId, m.joinedAt]));
+  const vacio = () => ({ score: 0, trofeos: 0, contribucion: 0, trofeosEnClan: 0 });
+  const stats = new Map<string, ReturnType<typeof vacio>>();
   for (const row of trophyRows) {
-    const actual = stats.get(row.userId) ?? { score: 0, trofeos: 0, contribucion: 0 };
-    actual.score += trophyScore({
+    const actual = stats.get(row.userId) ?? vacio();
+    const puntos = trophyScore({
       platform: row.platform,
       grade: row.grade as TrophyGrade | null,
       xp: row.xp,
       rarityPercent: row.rarityPercent,
     });
+    actual.score += puntos;
     actual.trofeos += 1;
-    
+
     const joinedAt = joinedAtMap.get(row.userId);
-    if (row.earnedAt && joinedAt && row.earnedAt > joinedAt) {
-      actual.contribucion += 1;
+    if (row.earnedAt && joinedAt && row.earnedAt >= joinedAt) {
+      actual.contribucion += puntos;
+      actual.trofeosEnClan += 1;
     }
-    
+
     stats.set(row.userId, actual);
   }
 
@@ -217,7 +230,7 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
   return members
     .map((m) => {
       const p = profileMap.get(m.userId);
-      const s = stats.get(m.userId) ?? { score: 0, trofeos: 0, contribucion: 0 };
+      const s = stats.get(m.userId) ?? vacio();
       return {
         userId: m.userId,
         role: m.role,
@@ -227,12 +240,14 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
         score: s.score,
         trofeos: s.trofeos,
         contribucion: s.contribucion,
+        trofeosEnClan: s.trofeosEnClan,
+        joinedAt: m.joinedAt,
       };
     })
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.contribucion - a.contribucion || b.score - a.score);
 }
 
-/** Puntuación total del clan — suma del ranking de arriba. */
+/** Puntuación del clan: lo que han aportado sus miembros desde que entraron. */
 export async function getClanScore(clanId: string): Promise<number> {
   const leaderboard = await getClanLeaderboard(clanId);
   return leaderboard.reduce((sum, m) => sum + m.contribucion, 0);

@@ -624,6 +624,14 @@
     "ranking": "Rangliste ({n})",
     "lider": "Anführer",
     "miembro": "Mitglied",
-    "trofeos": "{n} Trophäen"
+    "trofeos": "{n} Trophäen",
+    "puntosClan": "Clan-Punkte",
+    "trofeosClan": "Trophäen im Clan",
+    "contribucion": "Beitrag",
+    "contribucionTexto": "Was jedes Mitglied seit dem Beitritt beigetragen hat: der Paragon Score der Trophäen, die es im Clan verdient hat.",
+    "desde": "seit {fecha}",
+    "trofeosEnClan": "{n, plural, one {# Trophäe} other {# Trophäen}} im Clan",
+    "parte": "{p} % des Clans",
+    "nota": "Trophäen von vor dem Beitritt zählen nicht, ebenso wenig solche ohne Datum der Plattform."
   }
 }

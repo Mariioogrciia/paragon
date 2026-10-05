@@ -3,6 +3,28 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
+**Noche del 5 oct (3) — eSports rehecho y puntuación del clan:**
+- **eSports** (rediseño con impeccable, estructura «Por competición»; brief en
+  `.impeccable/surfaces/src-app-esports-page-tsx.md`, sistema en DESIGN.md):
+  - `/esports`: filtros por juego + Todos / Mis equipos, franja «Tus equipos»,
+    directos y un bloque por competición con su tabla (`components/EsportsHub.tsx`).
+  - Ficha nueva `/esports/partido/[id]`: ruta del torneo, marcador, clasificación,
+    mapa a mapa, plantillas, todos los streams (directo incrustado si se juega),
+    otros partidos de la fase, cuenta atrás y `.ics` (`lib/pandascore.ts`
+    → `getPandaScoreMatchDetail`).
+  - **Favoritos**: tabla `esports_favorito` (creada en producción con
+    `scripts/crear-tabla-esports-favoritos.mts`). Noticias de tus equipos por
+    Google News RSS (`lib/esportsNews.ts`). Sin probar aún con sesión iniciada.
+  - PandaScore: 1000 peticiones/hora y 429 por ráfaga; tablas de 2 en 2 y caché.
+  - Pendiente: volver a la página tras entrar desde la estrella (`/entrar`
+    siempre manda a `/bienvenida`).
+- **Puntuación del clan** = Paragon Score de los trofeos ganados **desde que cada
+  miembro entró** (`getClanLeaderboard`: `contribucion`, `trofeosEnClan`,
+  `joinedAt`). Apartado «Contribución» en la web y en la hoja del clan de la app,
+  que sustituye al ranking de toda la vida. Contrato en CONTRACT.md.
+- Fuera `components/NativeAppSetup.tsx` (importaba Capacitor, que ya no es
+  dependencia: la web no compilaba). LinkedIn en el pie; logo de Steam monocromo.
+
 **Noche del 5 oct (2) — web y apps:**
 - **Web (ya en master)**: un único selector `components/ui/Selector.tsx` (nada
   de `<select>` nativos, regla en DESIGN.md); las mismas vistas de trofeos

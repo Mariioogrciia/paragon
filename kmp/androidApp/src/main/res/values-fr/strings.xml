@@ -118,6 +118,9 @@
     <string name="clan_actividad">ACTIVITÉ DU CLAN</string>
     <string name="clan_actividad_vacia">Rien à montrer ici pour l\'instant.</string>
     <string name="clan_borrar_si">Oui, supprimer le clan</string>
+    <string name="clan_contribucion">CONTRIBUTION</string>
+    <string name="clan_contribucion_fila">%1$s · %2$s trophées dans le clan</string>
+    <string name="clan_contribucion_texto">Ce que chacun a apporté depuis son arrivée : le Paragon Score des trophées gagnés dans le clan.</string>
     <string name="clan_err_crear">Impossible de créer le clan.</string>
     <string name="clan_err_invitar">Impossible d\'inviter.</string>
     <string name="clan_err_no_existe">Ce clan n\'existe pas.</string>
@@ -126,12 +129,15 @@
     <string name="clan_lider">Chef</string>
     <string name="clan_miembro">Membre</string>
     <string name="clan_miembros">MEMBRES</string>
+    <string name="clan_parte">%1$s %% du clan</string>
     <string name="clan_posicion">%1$se</string>
+    <string name="clan_puntos_clan">POINTS DU CLAN</string>
     <string name="clan_ranking">CLASSEMENT</string>
     <string name="clan_rol_trofeos">%1$s · %2$s trophées</string>
     <string name="clan_salir_texto">Tu n\'apparaîtras plus dans le classement de « %1$s » — il faudrait te réinviter pour revenir.</string>
     <string name="clan_salir_titulo">Quitter le clan ?</string>
     <string name="clan_sin_amigos">Aucun ami disponible pour l\'instant — ils sont déjà tous dans un clan ou tu les as déjà invités.</string>
+    <string name="clan_trofeos_clan">TROPHÉES DANS LE CLAN</string>
     <string name="clan_unirme">Rejoindre ce clan</string>
     <string name="clan_xp_total">XP TOTAL</string>
     <string name="color_amarillo">Jaune</string>

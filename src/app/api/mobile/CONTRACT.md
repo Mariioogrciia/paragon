@@ -368,17 +368,21 @@ Sin body. Simplemente borra la invitación.
 ```json
 {
   "clan": { "id": "cl_1", "tag": "FNTR", "name": "Fontanero", "description": "..." },
-  "score": 75745,
-  "leaderboard": [ { "userId": "u1", "role": "owner", "handle": "fende21", "name": "FENDE21", "image": "https://...", "score": 73550, "trofeos": 4741 } ],
+  "score": 1840,
+  "leaderboard": [ { "userId": "u1", "role": "owner", "handle": "fende21", "name": "FENDE21", "image": "https://...", "score": 73550, "trofeos": 4741, "contribucion": 1840, "trofeosEnClan": 96, "joinedAt": "2026-09-14T10:02:11.000Z" } ],
   "activity": [ { "id": "act_1", "type": "rating", "rating": 5, "createdAt": "...", "user": { "handle": "fende21", "name": "FENDE21", "image": "https://..." }, "game": { "id": "psn-...", "title": "...", "iconUrl": "https://..." } } ],
   "amIMember": true,
   "amIOwner": false,
   "invitables": []
 }
 ```
-`404` si el tag no existe. `score` es la suma del Paragon Score (misma
-fórmula unificada entre plataformas que el resto de la app) de todo el
-`leaderboard`, ya ordenado de mayor a menor — "XP total del clan".
+`404` si el tag no existe. `score` es la **puntuación del clan**: la suma
+de `contribucion` de todos los miembros. `contribucion` es el Paragon Score
+(misma fórmula unificada entre plataformas que el resto de la app) solo de
+los trofeos ganados desde `joinedAt`, y `trofeosEnClan` cuántos son; un
+trofeo sin fecha no cuenta. `score` y `trofeos` de cada miembro siguen
+siendo los de toda su vida. El `leaderboard` viene ordenado por
+`contribucion` (y, a igualdad, por `score`).
 `activity` es la actividad reciente de los miembros (máx. 15): **sin
 reacciones, comentarios ni contador de vistas a propósito** — es un
 escaparate de que el clan está vivo, no una segunda bandeja de entrada;

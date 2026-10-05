@@ -17,7 +17,20 @@ data class MyClan(val tag: String, val name: String, val role: String)
 
 data class ClanInvite(val clanId: String, val clanTag: String, val clanName: String, val invitedByName: String)
 
-data class ClanMember(val userId: String, val role: String, val handle: String?, val name: String, val image: String?, val score: Int, val trofeos: Int, val contribucion: Int)
+data class ClanMember(
+    val userId: String,
+    val role: String,
+    val handle: String?,
+    val name: String,
+    val image: String?,
+    val score: Int,
+    val trofeos: Int,
+    /** Puntos aportados al clan: Paragon Score de lo ganado desde que entró. */
+    val contribucion: Int,
+    val trofeosEnClan: Int,
+    /** ISO; null con un servidor viejo. */
+    val joinedAt: String?,
+)
 
 /** Igual que FeedItem (ver FeedRepository.kt), pero SIN reacciones/comentarios/vistas a propósito — escaparate de que el clan está vivo, no una segunda bandeja de entrada. */
 data class ClanActivityItem(val id: String, val type: String, val rating: Int?, val createdAt: String, val userName: String, val gameTitle: String)
@@ -131,7 +144,7 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
                     description = dto.clan.description,
                     score = dto.score,
                     leaderboard = dto.leaderboard.map {
-                        ClanMember(it.userId, it.role, it.handle, it.name ?: it.handle ?: Textos.t(T.comun_alguien), it.image, it.score, it.trofeos, it.contribucion)
+                        ClanMember(it.userId, it.role, it.handle, it.name ?: it.handle ?: Textos.t(T.comun_alguien), it.image, it.score, it.trofeos, it.contribucion, it.trofeosEnClan, it.joinedAt)
                     },
                     activity = dto.activity.map {
                         ClanActivityItem(it.id, it.type, it.rating, it.createdAt, it.user.name ?: it.user.handle ?: Textos.t(T.comun_alguien), it.game.title)

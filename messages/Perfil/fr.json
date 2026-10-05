@@ -624,6 +624,14 @@
     "ranking": "Classement ({n})",
     "lider": "Chef",
     "miembro": "Membre",
-    "trofeos": "{n} trophées"
+    "trofeos": "{n} trophées",
+    "puntosClan": "Points du clan",
+    "trofeosClan": "Trophées dans le clan",
+    "contribucion": "Contribution",
+    "contribucionTexto": "Ce que chacun a apporté depuis son arrivée : le Paragon Score des trophées gagnés dans le clan.",
+    "desde": "depuis le {fecha}",
+    "trofeosEnClan": "{n, plural, one {# trophée} other {# trophées}} dans le clan",
+    "parte": "{p} % du clan",
+    "nota": "Les trophées d'avant l'arrivée ne comptent pas, ni ceux que la plateforme ne date pas."
   }
 }

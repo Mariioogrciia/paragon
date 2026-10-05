@@ -38,7 +38,11 @@ data class ClanLeaderboardEntryDto(
     val image: String?,
     val score: Int,
     val trofeos: Int,
-    val contribucion: Int,
+    // Lo aportado al clan desde que entró (Paragon Score y nº de trofeos).
+    // Con valor por defecto: un servidor viejo no lo manda.
+    val contribucion: Int = 0,
+    val trofeosEnClan: Int = 0,
+    val joinedAt: String? = null,
 )
 @Serializable
 data class ClanActivityUserDto(val handle: String?, val name: String?, val image: String?)

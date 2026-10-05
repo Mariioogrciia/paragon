@@ -120,6 +120,9 @@
     <string name="clan_actividad">ACTIVIDAD DEL CLAN</string>
     <string name="clan_actividad_vacia">Todavía no hay nada que enseñar aquí.</string>
     <string name="clan_borrar_si">Sí, borrar el clan</string>
+    <string name="clan_contribucion">CONTRIBUCIÓN</string>
+    <string name="clan_contribucion_fila">%1$s · %2$s trofeos en el clan</string>
+    <string name="clan_contribucion_texto">Lo que ha aportado cada uno desde que entró: el Paragon Score de los trofeos ganados estando en el clan.</string>
     <string name="clan_err_crear">No se pudo crear el clan.</string>
     <string name="clan_err_invitar">No se pudo invitar.</string>
     <string name="clan_err_no_existe">Este clan no existe.</string>
@@ -128,12 +131,15 @@
     <string name="clan_lider">Líder</string>
     <string name="clan_miembro">Miembro</string>
     <string name="clan_miembros">MIEMBROS</string>
+    <string name="clan_parte">%1$s %% del clan</string>
     <string name="clan_posicion">%1$sº</string>
+    <string name="clan_puntos_clan">PUNTOS DEL CLAN</string>
     <string name="clan_ranking">RANKING</string>
     <string name="clan_rol_trofeos">%1$s · %2$s trofeos</string>
     <string name="clan_salir_texto">Dejarás de aparecer en el ranking de \"%1$s\" — tendrían que volver a invitarte para que entres otra vez.</string>
     <string name="clan_salir_titulo">¿Salir del clan?</string>
     <string name="clan_sin_amigos">No tienes amigos disponibles ahora mismo — o ya están todos en un clan, o ya se lo has pedido.</string>
+    <string name="clan_trofeos_clan">TROFEOS EN EL CLAN</string>
     <string name="clan_unirme">Unirme a este clan</string>
     <string name="clan_xp_total">XP TOTAL</string>
     <string name="color_amarillo">Amarillo</string>
