@@ -438,10 +438,14 @@ h3,
   animation-play-state: paused;
 }
 
-/* Personalización de la barra de desplazamiento */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+/* Personalización de la barra de desplazamiento. En capa base y con
+   :where() para que una utilidad ([scrollbar-width:none]) pueda ganarle:
+   fuera de capa, esta regla se imponía a cualquier clase de Tailwind. */
+@layer base {
+  :where(*) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -722,6 +726,11 @@ h3,
 @media (prefers-reduced-motion: reduce) {
   .carreras-fila { transition: none; }
 }
+
+/* Aviso de seguir / dejar de seguir un equipo en /esports. */
+.esports-aviso { animation: esports-aviso-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes esports-aviso-entra { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .esports-aviso { animation: none; } }
 
 /* Aviso de "trofeo desbloqueado" (TrofeoDesbloqueado.tsx): sube desde abajo
    con un destello en el icono, como el de la consola. */

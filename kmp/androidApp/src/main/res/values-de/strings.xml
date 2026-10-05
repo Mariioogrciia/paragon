@@ -122,6 +122,9 @@
     <string name="clan_actividad">CLAN-AKTIVITÄT</string>
     <string name="clan_actividad_vacia">Hier gibt es noch nichts zu sehen.</string>
     <string name="clan_borrar_si">Ja, Clan löschen</string>
+    <string name="clan_contribucion">BEITRAG</string>
+    <string name="clan_contribucion_fila">%1$s · %2$s Trophäen im Clan</string>
+    <string name="clan_contribucion_texto">Was jedes Mitglied seit dem Beitritt beigetragen hat: der Paragon Score der im Clan verdienten Trophäen.</string>
     <string name="clan_err_crear">Clan konnte nicht gegründet werden.</string>
     <string name="clan_err_invitar">Einladung fehlgeschlagen.</string>
     <string name="clan_err_no_existe">Diesen Clan gibt es nicht.</string>
@@ -130,12 +133,15 @@
     <string name="clan_lider">Anführer:in</string>
     <string name="clan_miembro">Mitglied</string>
     <string name="clan_miembros">MITGLIEDER</string>
+    <string name="clan_parte">%1$s %% des Clans</string>
     <string name="clan_posicion">%1$s.</string>
+    <string name="clan_puntos_clan">CLAN-PUNKTE</string>
     <string name="clan_ranking">RANGLISTE</string>
     <string name="clan_rol_trofeos">%1$s · %2$s Trophäen</string>
     <string name="clan_salir_texto">Du erscheinst nicht mehr in der Rangliste von „%1$s“ — man müsste dich erneut einladen.</string>
     <string name="clan_salir_titulo">Clan verlassen?</string>
     <string name="clan_sin_amigos">Gerade keine Freunde verfügbar — alle sind schon in einem Clan oder bereits eingeladen.</string>
+    <string name="clan_trofeos_clan">TROPHÄEN IM CLAN</string>
     <string name="clan_unirme">Diesem Clan beitreten</string>
     <string name="clan_xp_total">GESAMT-XP</string>
     <string name="color_amarillo">Gelb</string>

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-01T14:16:25.963Z",
+  "generatedAt": "2026-10-05T19:52:57.124924Z",
   "title": "Design System: Paragon",
   "extensions": {
     "colorMeta": {
@@ -498,6 +498,54 @@
           "#d9d9d9",
           "#f2f2f2"
         ]
+      },
+      "brand-twitch": {
+        "role": "secondary",
+        "displayName": "Twitch Brand",
+        "canonical": "#9146ff",
+        "tonalRamp": [
+          "#1f004c",
+          "#360085",
+          "#4c00bd",
+          "#6300f5",
+          "#8633ff",
+          "#aa70ff",
+          "#ceadff",
+          "#f0e5ff"
+        ],
+        "usage": "Streaming platform icon in an eSports match's 'Dónde verlo' list only."
+      },
+      "brand-youtube": {
+        "role": "secondary",
+        "displayName": "YouTube Brand",
+        "canonical": "#ff0033",
+        "tonalRamp": [
+          "#4c000f",
+          "#85001b",
+          "#bd0026",
+          "#f50031",
+          "#ff335c",
+          "#ff708d",
+          "#ffadbe",
+          "#ffe5eb"
+        ],
+        "usage": "Streaming platform icon in an eSports match's 'Dónde verlo' list only."
+      },
+      "brand-kick": {
+        "role": "secondary",
+        "displayName": "Kick Brand",
+        "canonical": "#53fc18",
+        "tonalRamp": [
+          "#144c01",
+          "#238302",
+          "#32ba02",
+          "#41f203",
+          "#69fc36",
+          "#96fd72",
+          "#c3feae",
+          "#ecffe6"
+        ],
+        "usage": "Streaming platform icon in an eSports match's 'Dónde verlo' list only."
       }
     },
     "typographyMeta": {
@@ -713,6 +761,11 @@
         "name": "list-row-hover",
         "value": "background-color 150ms",
         "purpose": "Rows in boards, rankings, guide, ticker: fill only; .fila-lista cancels the global glow inside cards."
+      },
+      {
+        "name": "esports-aviso",
+        "value": "260ms cubic-bezier(0.16, 1, 0.3, 1), from translateY(10px) and opacity 0",
+        "purpose": "Follow / unfollow notice on eSports; none under reduced motion."
       }
     ],
     "breakpoints": [
@@ -932,7 +985,7 @@
       "source": "src/app/globals.css (Paletas completas), src/lib/apariencia.ts ACENTOS"
     },
     "livery": {
-      "scope": "Ligas and Clanes only",
+      "scope": "Carreras world: Ligas, Clanes and eSports",
       "selection": "FNV-1a hash of user id or upper-cased clan tag, modulo 10",
       "pairs": [
         {
@@ -976,7 +1029,9 @@
           "ink": "#ffffff"
         }
       ],
-      "source": "src/lib/librea.ts"
+      "source": "src/lib/librea.ts",
+      "esports": "libreaDe(game name): one fixed plate colour per game across live cards, competition headers and match pages.",
+      "stateBand": "eSports match scoreboard: carreras-banda with --librea danger (live) or accent (otherwise), --librea-tinta surface."
     },
     "gamePalette": {
       "class": "accent-juego",
@@ -1059,7 +1114,16 @@
         "epic": "#2a2a2a"
       },
       "logo": "filter: brightness(0) invert(1) on brand fills",
-      "rule": "Platform brand colours only in platform-identity contexts."
+      "rule": "Platform brand colours only in platform-identity contexts.",
+      "streaming": {
+        "source": "src/app/esports/partido/[id]/page.tsx",
+        "icons": {
+          "twitch": "#9146ff",
+          "youtube": "#ff0033",
+          "kick": "#53fc18"
+        },
+        "treatment": "Icon tinted in brand colour on a 32px surface-2 tile, 8px radius; text, tags and hover stay on theme tokens."
+      }
     },
     "sectionMetaphors": {
       "perfil": "Holographic card",
@@ -1072,7 +1136,8 @@
       "amigos": "Stadium scoreboard",
       "noticias": "Departures board + wire ticker",
       "ajustes": "Refined control panel",
-      "plataformas": "Each in its own house"
+      "plataformas": "Each in its own house",
+      "esports": "Race-timing blocks per competition (Carreras world)"
     }
   },
   "components": [
@@ -1160,7 +1225,7 @@
       "name": "Carreras Standings Row",
       "kind": "custom",
       "refersTo": "dorsal",
-      "description": "Ligas/Clanes only: livery P# dorsal on a skewed plate, tabular figures, gap to leader, left-to-right livery streak on hover.",
+      "description": "Ligas, Clanes and eSports only: livery P# dorsal on a skewed plate, tabular figures, gap to leader, left-to-right livery streak on hover.",
       "html": "<div class=\"ds-tower\"><h3 class=\"ds-tower-title\"><span>September 2026 league</span></h3><div class=\"ds-row\" style=\"--librea:#ff6a00\"><span class=\"ds-dorsal\" style=\"--librea:#ff6a00;--librea-tinta:#111\"><span>P1</span></span><span class=\"ds-row-name\">kratos_main</span><span class=\"ds-fig ds-fig-pts\">4,820</span><span class=\"ds-fig ds-fig-gap\">Leader</span></div><div class=\"ds-row\" style=\"--librea:#00b8ff\"><span class=\"ds-dorsal\" style=\"--librea:#00b8ff;--librea-tinta:#04121f\"><span>P2</span></span><span class=\"ds-row-name\">hollow_hunter</span><span class=\"ds-fig ds-fig-pts\">4,310</span><span class=\"ds-fig ds-fig-gap\">−510</span></div><div class=\"ds-band\" style=\"--librea:#ff6a00;--librea-tinta:#111\"></div></div>",
       "css": ".ds-tower{max-width:32rem;color:var(--foreground,#e9eef7)}.ds-tower-title{margin:0 0 12px;font:700 1.5rem 'Chakra Petch',Barlow,sans-serif;text-transform:uppercase}.ds-tower-title>span{display:inline-block;transform:skewX(-8deg)}.ds-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border,#212a38);cursor:pointer;background-image:linear-gradient(90deg,transparent,color-mix(in srgb,var(--librea) 14%,transparent) 50%,transparent);background-size:200% 100%;background-position:200% 0;background-repeat:no-repeat;transition:background-position 600ms cubic-bezier(0.16,1,0.3,1),background-color 200ms}.ds-row:hover{background-position:-100% 0;background-color:rgb(124 196 228 / 0.04)}.ds-dorsal{display:inline-flex;min-width:2.75rem;align-items:center;justify-content:center;padding:0.25rem 0.6rem;transform:skewX(-12deg);background:var(--librea);color:var(--librea-tinta);font:700 0.875rem/1.1 'Chakra Petch',Barlow,sans-serif;letter-spacing:.02em;font-variant-numeric:tabular-nums;box-shadow:0 6px 14px -8px var(--librea)}.ds-dorsal>span{display:inline-block;transform:skewX(12deg)}.ds-row-name{flex:1;min-width:0;font:600 0.8125rem Barlow,sans-serif}.ds-fig{font-family:'Chakra Petch',Barlow,sans-serif;font-weight:700;font-variant-numeric:tabular-nums}.ds-fig-pts{font-size:1.25rem;color:color-mix(in srgb,rgb(124 196 228) 55%,white)}.ds-fig-gap{width:4.5rem;text-align:right;font-size:0.875rem;color:var(--muted,#a7b0c0)}.ds-band{margin-top:24px;height:6px;border-radius:9999px;opacity:.85;background:repeating-linear-gradient(-60deg,var(--librea) 0 18px,var(--librea-tinta) 18px 22px)}@media (prefers-reduced-motion:reduce){.ds-row{transition:none}}"
     },
@@ -1219,6 +1284,14 @@
       "description": "Dashboard module mounted in accent corner brackets; edit footer showing the 12-column grid.",
       "html": "<div class=\"ds-cab\"><div class=\"ds-cell\"><div class=\"ds-mod\"><div class=\"ds-cif\">38</div><div class=\"ds-mut\">Platinums</div></div></div><div class=\"ds-edit\"><span>2 modules hidden</span><a>Edit panel</a></div></div>",
       "css": ".ds-cab{display:grid;gap:24px;max-width:30rem;font-family:Barlow,sans-serif;color:#e9eef7}.ds-cell{position:relative}.ds-cell::before{content:'';position:absolute;inset:-6px;pointer-events:none;--l:rgb(124 196 228/.4);background:linear-gradient(var(--l),var(--l)) top left/12px 1.5px,linear-gradient(var(--l),var(--l)) top left/1.5px 12px,linear-gradient(var(--l),var(--l)) top right/12px 1.5px,linear-gradient(var(--l),var(--l)) top right/1.5px 12px,linear-gradient(var(--l),var(--l)) bottom left/12px 1.5px,linear-gradient(var(--l),var(--l)) bottom left/1.5px 12px,linear-gradient(var(--l),var(--l)) bottom right/12px 1.5px,linear-gradient(var(--l),var(--l)) bottom right/1.5px 12px;background-repeat:no-repeat;opacity:.7;transition:opacity 200ms,inset 200ms cubic-bezier(.16,1,.3,1)}.ds-cell:hover::before{opacity:1;inset:-8px}.ds-mod{padding:24px;border:1px solid #212a38;border-radius:20px;background:#10151f}.ds-cif{font:700 4.5rem/.85 'Chakra Petch',sans-serif;color:#dde8f4;text-shadow:0 0 40px rgb(124 196 228/.35)}.ds-mut{font-size:.8125rem;color:#a7b0c0}.ds-edit{display:flex;justify-content:space-between;padding:16px 20px;border-radius:20px;border:1px dashed rgb(124 196 228/.35);background:linear-gradient(rgb(124 196 228/.07) 1px,transparent 1px) 0 0/100% 14px,linear-gradient(90deg,rgb(124 196 228/.07) 1px,transparent 1px) 0 0/calc(100%/12) 100%,#10151f;font-size:.8125rem;color:#a7b0c0}.ds-edit:hover{border-color:rgb(124 196 228/.7)}.ds-edit a{color:#bde1f1;font-weight:700}"
+    },
+    {
+      "name": "eSports Competition Block",
+      "kind": "card",
+      "refersTo": "dorsal",
+      "description": "One block per competition: game plate, league, tier tag, live count; match rows with tabular times and scores, followed team in gold; standings column.",
+      "html": "<article class=\"ds-comp\"><header class=\"ds-comp-head\"><span class=\"ds-plate\"><span>Counter-Strike</span></span><h3>ESL Pro League</h3><span class=\"ds-tier\">Tier S</span><span class=\"ds-live\"><i></i>1 live</span></header><ol class=\"ds-comp-rows\"><li class=\"ds-comp-row\"><span class=\"ds-when ds-when-live\"><i></i>Live</span><span class=\"ds-teams\"><span class=\"ds-team\"><span class=\"ds-crest\">NV</span><b class=\"ds-fav\">Natus Vincere</b><svg class=\"ds-star\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span class=\"ds-score\">1</span></span><span class=\"ds-team\"><span class=\"ds-crest\">FZ</span><b>FaZe Clan</b><span class=\"ds-score\">0</span></span></span></li><li class=\"ds-comp-row\"><span class=\"ds-when\"><span class=\"ds-time\">18:30</span><small>Tomorrow</small></span><span class=\"ds-teams\"><span class=\"ds-team\"><span class=\"ds-crest\">G2</span><b>G2 Esports</b></span><span class=\"ds-team\"><span class=\"ds-crest\">VIT</span><b>Team Vitality</b></span></span></li></ol></article>",
+      "css": ".ds-comp{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;font-family:var(--font-body,Barlow,sans-serif);color:var(--foreground);max-width:560px} .ds-comp-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 20px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface-2) 50%,transparent)} .ds-comp-head h3{margin:0;font-family:var(--font-heading,'Chakra Petch',sans-serif);font-size:1.125rem;font-weight:700} .ds-plate{display:inline-flex;min-width:2.75rem;justify-content:center;padding:4px 10px;transform:skewX(-12deg);background:#ff6a00;color:#111;font-family:var(--font-heading,'Chakra Petch',sans-serif);font-weight:700;font-size:.875rem;box-shadow:0 6px 14px -8px #ff6a00} .ds-plate>span{transform:skewX(12deg);display:inline-block} .ds-tier{border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:.6875rem;font-weight:700;text-transform:uppercase;color:var(--muted)} .ds-live{display:flex;align-items:center;gap:6px;font-size:.75rem;font-weight:700;color:var(--danger)} .ds-live i,.ds-when-live i{width:6px;height:6px;border-radius:9999px;background:var(--danger);animation:ds-pulse 2s infinite} @keyframes ds-pulse{50%{opacity:.5}} .ds-comp-rows{list-style:none;margin:0;padding:0} .ds-comp-row{display:grid;grid-template-columns:4.25rem minmax(0,1fr);gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border);transition:background-color .15s;cursor:pointer} .ds-comp-row:last-child{border-bottom:0} .ds-comp-row:hover{background:color-mix(in srgb,var(--surface-2) 60%,transparent)} .ds-when{display:flex;flex-direction:column;font-size:.75rem;color:var(--muted)} .ds-when-live{flex-direction:row;align-items:center;gap:6px;font-weight:700;text-transform:uppercase;color:var(--danger)} .ds-time{font-family:var(--font-heading,'Chakra Petch',sans-serif);font-weight:700;font-variant-numeric:tabular-nums;font-size:1rem;color:var(--accent-text)} .ds-teams{display:flex;flex-direction:column;gap:6px;min-width:0} .ds-team{display:flex;align-items:center;gap:10px;font-size:.875rem} .ds-team b{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .ds-team b.ds-fav{color:var(--gold)} .ds-star{color:var(--gold);flex-shrink:0} .ds-crest{width:22px;height:22px;flex-shrink:0;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);font-family:var(--font-heading,'Chakra Petch',sans-serif);font-weight:700;font-size:.5625rem;display:flex;align-items:center;justify-content:center} .ds-score{margin-left:auto;font-family:var(--font-heading,'Chakra Petch',sans-serif);font-weight:700;font-variant-numeric:tabular-nums} @media (prefers-reduced-motion:reduce){.ds-live i,.ds-when-live i{animation:none}}"
     }
   ],
   "narrative": {
@@ -1237,7 +1310,7 @@
       "Every clickable glows on hover, enforced globally, except list rows inside a card.",
       "User-selectable mode, accent and style axes; components stay token-bound so all three work.",
       "One room metaphor per section, expressed through composition and a single signature detail.",
-      "Competition pages (Ligas, Clanes) wear a scoped race-timing world; platform pages wear their platform's house palette."
+      "Competition pages (Ligas, Clanes, eSports) wear a scoped race-timing world; platform pages wear their platform's house palette."
     ],
     "rules": [
       {
@@ -1247,7 +1320,7 @@
       },
       {
         "name": "The Metals Mean Grade Rule",
-        "body": "Bronze, silver, gold and platinum are only for trophy grade and rank (podiums, first place, a game's best grade) and the heat calendar's metal ladder, which counts trophies. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.",
+        "body": "Bronze, silver, gold and platinum are only for trophy grade and rank (podiums, first place, a game's best grade) and the heat calendar's metal ladder, which counts trophies. One scoped exception: in eSports, `gold` marks a followed team (star, name, tinted row), because there is no trophy grade on those pages for it to collide with. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.",
         "section": "colors"
       },
       {
@@ -1267,7 +1340,7 @@
       },
       {
         "name": "The Brand Lives at Home Rule",
-        "body": "Platform brand colours appear only in platform-identity contexts: the platform houses, the Discover platform tiles, platform logo tiles and the landing's convergence columns. They never tint generic UI.",
+        "body": "Platform brand colours appear only in platform-identity contexts: the platform houses, the Discover platform tiles, platform logo tiles, the landing's convergence columns and the streaming-platform icons in an eSports match's \"Dónde verlo\" list. They never tint generic UI.",
         "section": "colors"
       },
       {
@@ -1277,7 +1350,7 @@
       },
       {
         "name": "The Headings Wear the Plate Rule",
-        "body": "`h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`. The only exception is inside a platform house, where headings evoke the platform's own voice: PlayStation in Barlow at its lightest loaded weight, no uppercase, Steam's section headings in Barlow 600 at 0.9375rem with 0.08em tracking, Epic in Barlow 700 sentence case.",
+        "body": "`h1`, `h2`, `h3` and `.font-heading` always use the display face (set globally). Numerals that matter use it too, with `tabular-nums`. The only exception is inside a platform house, where headings evoke the platform's own voice: PlayStation in Barlow 300 (loaded for this), no uppercase, Steam's section headings in Barlow 600 at 0.9375rem with 0.08em tracking, Epic in Barlow 700 sentence case.",
         "section": "typography"
       },
       {
@@ -1317,7 +1390,7 @@
       },
       {
         "name": "The Unlayered CSS Wins Rule",
-        "body": "Component CSS in `globals.css` sits outside `@layer`, so it beats any Tailwind utility on the same element: a `.marcador-fila { display: grid }` overrides a `hidden` class. To hide or change display per breakpoint on an element that has a `globals.css` display rule, do it in that CSS with a media query, never with utilities.",
+        "body": "Component CSS in `globals.css` sits outside `@layer`, so it beats any Tailwind utility on the same element: a `.marcador-fila { display: grid }` overrides a `hidden` class. To hide or change display per breakpoint on an element that has a `globals.css` display rule, do it in that CSS with a media query, never with utilities. The one global default meant to be overridden, the thin scrollbar (`border` thumb on a transparent track), lives in `@layer base` under `:where(*)` so a utility such as `[scrollbar-width:none]` can hide it on a chip strip.",
         "section": "layout"
       },
       {
@@ -1341,19 +1414,19 @@
       "**Do** route all copy through next-intl (es, en, de, fr); no literal UI strings in components.",
       "**Do** show real data only; any synthetic block carries the translated \"Ejemplo\" chip.",
       "**Do** honour `prefers-reduced-motion` by stopping animations outright and painting the final state from the start.",
-      "**Do** prefix surface-scoped CSS in `globals.css` (`landing-`, `guia-`, `lomo-`, `matriz-`, `exitos-`, `cabina-`, `marcador-`, `salidas-`, `ajustes-`, `casa-`), because the stylesheet is global to the whole app.",
+      "**Do** prefix surface-scoped CSS in `globals.css` (`landing-`, `guia-`, `lomo-`, `matriz-`, `exitos-`, `cabina-`, `marcador-`, `salidas-`, `ajustes-`, `casa-`, `carreras-`, `esports-`), because the stylesheet is global to the whole app.",
       "**Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them, except on small shape-critical thumbnails.",
       "**Do** give a new full palette both a `.dark.accent-x` block (accent plus the four ground tokens) and a `.light.accent-x` darker accent, and a half-ground/half-accent swatch.",
       "**Do** correct any computed accent to at least 5:1 contrast against its own surface (dark) and white (light) before applying it, as `lib/paletaJuego.ts` does.",
       "**Do** build a new section-scoped world by redefining the theme tokens on a wrapper (as the platform houses do) so existing components repaint untouched.",
       "**Do** fade image scrims to `from-background` and set text over covers in `foreground`, outside the always-dark houses and own-art objects.",
       "**Do** put a heading's context below it as a muted subtitle.",
-      "**Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas and Clanes.",
+      "**Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas, Clanes and eSports.",
       "**Do** use only the type steps in the frontmatter, including the off-Tailwind ones (0.5625, 0.625, 0.6875, 0.8125, 0.9375, 1.0625rem)."
     ],
     "donts": [
       "**Don't** write literal accent colours such as `rgba(74, 158, 255, .14)`; they freeze one accent and one mode.",
-      "**Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade, rank and the heat calendar's metal ladder.",
+      "**Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade, rank, the heat calendar's metal ladder and, in eSports only, gold for a followed team.",
       "**Don't** put white text on an accent fill; use `background`.",
       "**Don't** set text sizes in px; they ignore the user's text-size setting.",
       "**Don't** put `overflow: hidden` on the element that owns a hover glow or shadow.",
@@ -1362,7 +1435,7 @@
       "**Don't** use gradient text; `text-gradient` is a leftover utility, not part of the system.",
       "**Don't** bring the Carreras world (dorsals, livery colours, skews, livery streaks) into the library, guides or the dashboard; its competitive energy tires everywhere else.",
       "**Don't** let a full palette repaint the ground in light, OLED or high-contrast mode.",
-      "**Don't** use platform brand colours outside platform-identity contexts.",
+      "**Don't** use platform brand colours outside platform-identity contexts; a streaming brand colour (Twitch, YouTube, Kick) colours its own icon and nothing else in the row.",
       "**Don't** make the scoreboard or departures board a fixed-colour island; only the flap letters keep their amber.",
       "**Don't** apply the LED dot mask to words; it is for figures only.",
       "**Don't** copy a platform's real interface or detailed logotypes inside its house; evoke it through palette and composition.",

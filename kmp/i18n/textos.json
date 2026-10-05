@@ -4282,5 +4282,41 @@
   "en": "Missing · {0}",
   "es": "Me faltan · {0}",
   "fr": "Manquants · {0}"
+ },
+ "clan_puntos_clan": {
+  "es": "PUNTOS DEL CLAN",
+  "en": "CLAN POINTS",
+  "de": "CLAN-PUNKTE",
+  "fr": "POINTS DU CLAN"
+ },
+ "clan_trofeos_clan": {
+  "es": "TROFEOS EN EL CLAN",
+  "en": "TROPHIES IN THE CLAN",
+  "de": "TROPHÄEN IM CLAN",
+  "fr": "TROPHÉES DANS LE CLAN"
+ },
+ "clan_contribucion": {
+  "es": "CONTRIBUCIÓN",
+  "en": "CONTRIBUTION",
+  "de": "BEITRAG",
+  "fr": "CONTRIBUTION"
+ },
+ "clan_contribucion_texto": {
+  "es": "Lo que ha aportado cada uno desde que entró: el Paragon Score de los trofeos ganados estando en el clan.",
+  "en": "What each member has added since joining: the Paragon Score of the trophies earned while in the clan.",
+  "de": "Was jedes Mitglied seit dem Beitritt beigetragen hat: der Paragon Score der im Clan verdienten Trophäen.",
+  "fr": "Ce que chacun a apporté depuis son arrivée : le Paragon Score des trophées gagnés dans le clan."
+ },
+ "clan_contribucion_fila": {
+  "es": "{0} · {1} trofeos en el clan",
+  "en": "{0} · {1} trophies in the clan",
+  "de": "{0} · {1} Trophäen im Clan",
+  "fr": "{0} · {1} trophées dans le clan"
+ },
+ "clan_parte": {
+  "es": "{0} % del clan",
+  "en": "{0}% of the clan",
+  "de": "{0} % des Clans",
+  "fr": "{0} % du clan"
  }
 }

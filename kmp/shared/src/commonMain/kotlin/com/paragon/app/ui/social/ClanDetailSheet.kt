@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import kotlin.math.roundToInt
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -222,8 +223,12 @@ private fun ClanDetailContent(
         Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             Column {
-                Text(text = "CONTRIBUCIÓN", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                Text(text = "${detail.score}".reversed().chunked(3).joinToString(".").reversed(), color = Platinum, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(text = Textos.t(T.clan_puntos_clan), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = miles(detail.score), color = Platinum, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+            Column {
+                Text(text = Textos.t(T.clan_trofeos_clan), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = miles(detail.leaderboard.sumOf { it.trofeosEnClan }), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
             Column {
                 Text(text = Textos.t(T.clan_miembros), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -246,20 +251,12 @@ private fun ClanDetailContent(
         HorizontalDivider(color = Border)
         Spacer(Modifier.height(16.dp))
 
-        Text(text = Textos.t(T.clan_ranking), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-        Spacer(Modifier.height(8.dp))
-        detail.leaderboard.forEachIndexed { index, member ->
-            ClanMemberRow(member, index, onClick = { onMemberClick(member.handle) })
-        }
-
-        Spacer(Modifier.height(16.dp))
-        HorizontalDivider(color = Border)
-        Spacer(Modifier.height(16.dp))
-
-        Text(text = "CONTRIBUCIÓN", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-        Spacer(Modifier.height(8.dp))
+        // Contribución: lo que ha ganado cada uno estando en el clan (el servidor ya lo ordena).
+        Text(text = Textos.t(T.clan_contribucion), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(text = Textos.t(T.clan_contribucion_texto), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+        Spacer(Modifier.height(10.dp))
         detail.leaderboard.sortedByDescending { it.contribucion }.forEachIndexed { index, member ->
-            ClanMemberRow(member, index, onClick = { onMemberClick(member.handle) }, showContribucion = true)
+            ClanMemberRow(member, index, totalClan = detail.score, onClick = { onMemberClick(member.handle) })
         }
 
         Spacer(Modifier.height(16.dp))
@@ -304,9 +301,10 @@ private fun ClanDetailContent(
 }
 
 @Composable
-private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit, showContribucion: Boolean = false) {
-    val esPrimero = index == 0
-    Row(
+private fun ClanMemberRow(member: ClanMember, index: Int, totalClan: Int, onClick: () -> Unit) {
+    val esPrimero = index == 0 && member.contribucion > 0
+    val parte = if (totalClan > 0) member.contribucion.toFloat() / totalClan else 0f
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(radio(12)))
@@ -314,6 +312,9 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit, s
             .then(if (esPrimero) Modifier.border(1.dp, Platinum.copy(alpha = 0.45f), RoundedCornerShape(radio(12))) else Modifier)
             .clickable(enabled = member.handle != null, onClick = onClick)
             .padding(12.dp),
+    ) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -334,10 +335,30 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit, s
             Spacer(Modifier.width(10.dp))
             Column {
                 Text(text = member.name, color = if (esPrimero) Platinum else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                Text(text = Textos.t(T.clan_rol_trofeos, if (member.role == "owner") Textos.t(T.clan_lider) else Textos.t(T.clan_miembro), member.trofeos), color = Muted, fontSize = 11.sp)
+                Text(text = Textos.t(T.clan_contribucion_fila, if (member.role == "owner") Textos.t(T.clan_lider) else Textos.t(T.clan_miembro), member.trofeosEnClan), color = Muted, fontSize = 11.sp)
             }
         }
-        Text(text = if (showContribucion) "${member.contribucion}" else "${member.score}", color = Platinum, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Column(horizontalAlignment = Alignment.End) {
+            Text(text = miles(member.contribucion), color = Platinum, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Text(text = Textos.t(T.clan_parte, (parte * 100).roundToInt()), color = Muted, fontSize = 10.sp)
+        }
+    }
+    // Su parte de los puntos del clan.
+    Box(
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .fillMaxWidth()
+            .height(4.dp)
+            .clip(RoundedCornerShape(radio(4)))
+            .background(Surface),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(if (member.contribucion > 0) parte.coerceAtLeast(0.02f) else 0f)
+                .fillMaxHeight()
+                .background(Platinum),
+        )
+    }
     }
     Spacer(Modifier.height(6.dp))
 }
@@ -471,3 +492,6 @@ private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResp
         }
     }
 }
+
+/** 18450 → "18.450". */
+private fun miles(n: Int): String = n.toString().reversed().chunked(3).joinToString(".").reversed()

@@ -15,7 +15,8 @@ function guerraJson(g: GuerraVista) {
 
 /**
  * Ficha de un clan — mismo dato que `/clanes/[tag]` (web): clan +
- * leaderboard (Paragon Score de cada miembro, ya ordenado) + actividad
+ * leaderboard (contribución de cada miembro: lo ganado desde que entró,
+ * ya ordenado) + actividad
  * reciente (sin reacciones/comentarios, ver `getClanActivity`) +
  * `amIMember`/`amIOwner` + `invitables` (amigos que el owner puede
  * invitar — solo se calcula si el que pregunta es el owner, igual que la
@@ -37,6 +38,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ tag: str
     getClanLeaderboard(clan.id),
     getClanActivity(clan.id),
   ]);
+  // Puntuación del clan: lo que han ganado sus miembros estando en él.
   const score = leaderboard.reduce((sum, m) => sum + m.contribucion, 0);
 
   const amIMember = leaderboard.some((m) => m.userId === userId);

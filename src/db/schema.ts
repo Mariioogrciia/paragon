@@ -1311,3 +1311,25 @@ export const missionCompletions = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.semana, t.misionId] })],
 );
+
+/**
+ * Equipos de eSports que sigue cada usuario (/esports): filtro "Mis equipos",
+ * franja de favoritos y noticias de esos equipos. Se guarda nombre y escudo
+ * para pintarlos sin volver a pedir PandaScore. Tabla creada con
+ * `scripts/crear-tabla-esports-favoritos.mts`.
+ */
+export const esportsFavoritos = pgTable(
+  "esports_favorito",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    teamId: integer("teamId").notNull(),
+    nombre: text("nombre").notNull(),
+    acronimo: text("acronimo"),
+    logo: text("logo"),
+    juego: text("juego"),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.teamId] })],
+);

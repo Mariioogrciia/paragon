@@ -624,6 +624,14 @@
     "ranking": "Clasificación ({n})",
     "lider": "Líder",
     "miembro": "Miembro",
-    "trofeos": "{n} trofeos"
+    "trofeos": "{n} trofeos",
+    "puntosClan": "Puntos del clan",
+    "trofeosClan": "Trofeos en el clan",
+    "contribucion": "Contribución",
+    "contribucionTexto": "Lo que ha aportado cada uno desde que entró: el Paragon Score de los trofeos que ha ganado estando en el clan.",
+    "desde": "desde {fecha}",
+    "trofeosEnClan": "{n, plural, one {# trofeo} other {# trofeos}} en el clan",
+    "parte": "{p} % del clan",
+    "nota": "Los trofeos de antes de entrar no cuentan, y tampoco los que la plataforma no fecha."
   }
 }

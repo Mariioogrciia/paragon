@@ -31,7 +31,7 @@ const USER_AGENT = "Paragon/1.0 (+https://github.com/Mariioogrciia/paragon)";
 
 const parser = new Parser({
   customFields: {
-    item: [["media:content", "mediaContent"]],
+    item: [["media:content", "mediaContent"], ["source", "source"]],
   },
 });
 
@@ -68,4 +68,78 @@ export async function getEsportsNews(limit = 6): Promise<EsportsNewsItem[]> {
     console.error("[esportsNews] no se pudo leer el feed", error);
     return [];
   }
+}
+
+/* ------------------------------------------------------------------ *
+ * Noticias de los equipos que sigue el usuario                       *
+ *                                                                    *
+ * El feed de Marca casi nunca nombra a un equipo concreto, así que    *
+ * se busca cada equipo en el RSS de Google News (probado: noticias    *
+ * reales y del día para equipos grandes; vacío para los pequeños).    *
+ * Se quitan las fuentes que solo son marcadores o cotizaciones.       *
+ * ------------------------------------------------------------------ */
+
+export interface NoticiaDeEquipo extends EsportsNewsItem {
+  equipo: string;
+  fuente: string | null;
+}
+
+const GNEWS_REGION: Record<string, string> = {
+  es: "hl=es&gl=ES&ceid=ES:es",
+  en: "hl=en-US&gl=US&ceid=US:en",
+  de: "hl=de&gl=DE&ceid=DE:de",
+  fr: "hl=fr&gl=FR&ceid=FR:fr",
+};
+
+/** Fuentes que en la búsqueda solo aportan marcadores, apuestas o cotizaciones. */
+const FUENTES_RUIDO = /sofascore|flashscore|coinmarketcap|coingecko|bet|odds|livescore|aiscore|365scores/i;
+
+async function noticiasDeUnEquipo(equipo: string, locale: string, porEquipo: number): Promise<NoticiaDeEquipo[]> {
+  const q = encodeURIComponent(`"${equipo}" esports`);
+  const region = GNEWS_REGION[locale] ?? GNEWS_REGION.es;
+  try {
+    const res = await fetch(`https://news.google.com/rss/search?q=${q}&${region}`, {
+      signal: AbortSignal.timeout(10_000),
+      headers: { "User-Agent": USER_AGENT },
+      next: { revalidate: 10_800 }, // 3h
+    });
+    if (!res.ok) return [];
+    const feed = await parser.parseString(await res.text());
+    return (feed.items ?? [])
+      .filter((item) => item.title && item.link)
+      .map((item) => {
+        // <source url="…">Nombre</source>: xml2js lo da como texto o como { _ }.
+        const crudo = (item as { source?: string | { _?: string } }).source;
+        const fuente = (typeof crudo === "string" ? crudo : crudo?._) ?? null;
+        // Google News añade " - Fuente" al final del título.
+        const titulo = limpiarTexto(item.title)!.replace(/\s+-\s+[^-]+$/, "");
+        return {
+          id: item.guid || item.link!,
+          title: titulo,
+          link: item.link!,
+          pubDate: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+          summary: null,
+          imageUrl: null,
+          equipo,
+          fuente,
+        };
+      })
+      .filter((n) => !FUENTES_RUIDO.test(n.fuente ?? "") && !/marcador en vivo|live score/i.test(n.title))
+      .slice(0, porEquipo);
+  } catch (error) {
+    console.error(`[esportsNews] no se pudieron leer las noticias de ${equipo}`, error);
+    return [];
+  }
+}
+
+/** Las más recientes de todos los equipos, sin repetir enlace. */
+export async function getNoticiasDeEquipos(equipos: string[], locale: string, limite = 12): Promise<NoticiaDeEquipo[]> {
+  const unicos = Array.from(new Set(equipos)).slice(0, 8);
+  const listas = await Promise.all(unicos.map((e) => noticiasDeUnEquipo(e, locale, 5)));
+  const vistos = new Set<string>();
+  return listas
+    .flat()
+    .sort((a, b) => b.pubDate.localeCompare(a.pubDate))
+    .filter((n) => (vistos.has(n.link) ? false : (vistos.add(n.link), true)))
+    .slice(0, limite);
 }
