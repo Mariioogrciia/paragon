@@ -1,6 +1,20 @@
 package com.paragon.app.ui.feed
 
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import com.paragon.app.data.network.ApiClient
+import com.paragon.app.util.DestinoQr
+import com.paragon.app.util.escanearQr
+import com.paragon.app.util.interpretarQr
+import com.paragon.shared.red.HttpException
+import com.paragon.shared.red.paragonErrorMessage
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,8 +66,34 @@ fun ComunidadScreen(
     onAbrirSesion: (String) -> Unit,
 ) {
     var seccion by rememberSaveable { mutableIntStateOf(0) }
+    val contexto = com.paragon.shared.contextoPlataforma()
+    val scope = rememberCoroutineScope()
+    var avisoQr by remember { mutableStateOf<String?>(null) }
     Column(Modifier.fillMaxSize().background(Background)) {
-        com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.feed_titulo))
+        com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.feed_titulo)) {
+            // Lector de QR (diseño v2): un perfil te envía la solicitud de amistad; una sesión se abre.
+            IconButton(onClick = {
+                escanearQr(contexto) { texto ->
+                    when (val destino = interpretarQr(texto)) {
+                        is DestinoQr.Sesion -> onAbrirSesion(destino.id)
+                        is DestinoQr.Perfil -> scope.launch {
+                            avisoQr = try {
+                                val r = ApiClient.amigosApi(tokenStore).enviar(destino.handle)
+                                if (r.amigos) Textos.t(T.amigos_ya_sois, destino.handle) else Textos.t(T.amigos_enviada, destino.handle)
+                            } catch (e: HttpException) {
+                                e.paragonErrorMessage() ?: Textos.t(T.error_conexion)
+                            } catch (e: Exception) {
+                                Textos.t(T.error_conexion)
+                            }
+                        }
+                        null -> avisoQr = Textos.t(T.qr_no_valido)
+                    }
+                }
+            }) {
+                Icon(Icons.Default.QrCodeScanner, contentDescription = Textos.t(T.qr_escanear), tint = Foreground)
+            }
+        }
+        avisoQr?.let { Text(it, color = Accent, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) }
         com.paragon.app.ui.common.ControlSegmentado(
             opciones = listOf(Textos.t(T.comunidad_muro), Textos.t(T.nav_sesiones)),
             seleccion = seccion,

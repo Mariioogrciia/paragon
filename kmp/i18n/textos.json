@@ -4456,5 +4456,35 @@
   "en": "Change account",
   "es": "Cambiar cuenta",
   "fr": "Changer de compte"
+ },
+ "qr_eres_tu": {
+  "de": "Das ist dein eigener Code.",
+  "en": "That's your own code.",
+  "es": "Ese código es el tuyo.",
+  "fr": "C'est ton propre code."
+ },
+ "qr_no_valido": {
+  "de": "Dieser QR-Code ist nicht von Paragon.",
+  "en": "That QR code isn't from Paragon.",
+  "es": "Ese QR no es de Paragon.",
+  "fr": "Ce QR code ne vient pas de Paragon."
+ },
+ "qr_tu_codigo": {
+  "de": "Dein Code",
+  "en": "Your code",
+  "es": "Tu código",
+  "fr": "Ton code"
+ },
+ "qr_tu_codigo_sub": {
+  "de": "Lass ihn scannen, um dich sofort hinzuzufügen.",
+  "en": "Let friends scan it to add you in a second.",
+  "es": "Que lo escaneen para agregarte en un segundo.",
+  "fr": "Fais-le scanner pour qu'on t'ajoute en une seconde."
+ },
+ "qr_escanear": {
+  "de": "QR-Code scannen",
+  "en": "Scan QR code",
+  "es": "Escanear QR",
+  "fr": "Scanner un QR code"
  }
 }

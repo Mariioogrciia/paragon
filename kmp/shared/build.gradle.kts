@@ -55,6 +55,8 @@ kotlin {
             api("com.russhwolf:multiplatform-settings:1.3.0")
             // AES-GCM del login (EnlaceSeguro): JDK en Android, CryptoKit en iOS.
             implementation("dev.whyoleg.cryptography:cryptography-core:0.6.0")
+            // Dibujar códigos QR (tu perfil, una sesión) — ver util/EscanerQr.kt.
+            implementation("io.github.alexzhirkevich:qrose:1.3.1")
             implementation("dev.whyoleg.cryptography:cryptography-provider-optimal:0.6.0")
         }
         commonTest.dependencies {
@@ -71,6 +73,8 @@ kotlin {
             implementation("androidx.appcompat:appcompat:1.7.1")
             // Custom Tab del login (abrirLoginEnNavegador).
             implementation("androidx.browser:browser:1.8.0")
+            // Lector de QR de Google Play (sin permiso de cámara) — ver EscanerQr.android.kt.
+            implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
         }
     }
 }

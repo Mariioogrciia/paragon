@@ -1,6 +1,19 @@
 package com.paragon.app.ui.social
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.Color
+import com.paragon.app.util.DestinoQr
+import com.paragon.app.util.enlacePerfil
+import com.paragon.app.util.escanearQr
+import com.paragon.app.util.interpretarQr
+import com.paragon.shared.contextoPlataforma
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,7 +73,14 @@ import kotlinx.coroutines.launch
  * `onCambio`: recargar la lista de amigos cuando alguien entra.
  */
 @Composable
-fun AmigosCabecera(tokenStore: TokenStore, onCambio: () -> Unit, modifier: Modifier = Modifier) {
+fun AmigosCabecera(
+    tokenStore: TokenStore,
+    onCambio: () -> Unit,
+    modifier: Modifier = Modifier,
+    miHandle: String? = null,
+    onAbrirSesion: ((String) -> Unit)? = null,
+) {
+    val contexto = contextoPlataforma()
     val scope = rememberCoroutineScope()
     var handle by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf<Pair<String, Boolean>?>(null) } // texto, ¿error?
@@ -74,6 +94,11 @@ fun AmigosCabecera(tokenStore: TokenStore, onCambio: () -> Unit, modifier: Modif
 
     fun enviar() {
         val limpio = handle.trim().removePrefix("@")
+        if (limpio.equals(miHandle, ignoreCase = true)) {
+            mensaje = Textos.t(T.qr_eres_tu) to true
+            handle = ""
+            return
+        }
         if (limpio.isEmpty() || enviando) return
         enviando = true
         mensaje = null
@@ -92,8 +117,49 @@ fun AmigosCabecera(tokenStore: TokenStore, onCambio: () -> Unit, modifier: Modif
         }
     }
 
-    Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp)) {
+    // Lo que se lee con el QR: un perfil se agrega como amigo; una sesión, se abre.
+    fun alLeer(texto: String) {
+        when (val destino = interpretarQr(texto)) {
+            is DestinoQr.Perfil -> { handle = destino.handle; enviar() }
+            is DestinoQr.Sesion -> if (onAbrirSesion != null) onAbrirSesion(destino.id) else mensaje = Textos.t(T.qr_no_valido) to true
+            null -> mensaje = Textos.t(T.qr_no_valido) to true
+        }
+    }
+
+    Column(modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
         val forma = RoundedCornerShape(radio(12))
+        // Tu código QR (diseño v2): quien lo escanee te envía la solicitud. También
+        // vale con la cámara normal del móvil: abre tu perfil en la web.
+        if (!miHandle.isNullOrBlank()) {
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(radio(20))).background(Surface).border(1.dp, Border, RoundedCornerShape(radio(20))).padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(Modifier.size(112.dp).clip(RoundedCornerShape(radio(14))).background(Color.White).padding(10.dp)) {
+                    Image(
+                        painter = rememberQrCodePainter(enlacePerfil(miHandle)),
+                        contentDescription = Textos.t(T.qr_tu_codigo),
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                Column(Modifier.weight(1f).padding(start = 16.dp)) {
+                    Text(Textos.t(T.qr_tu_codigo), color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(Textos.t(T.qr_tu_codigo_sub), color = Muted, fontSize = 13.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 4.dp))
+                    Text("@$miHandle", color = Accent, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
+                }
+            }
+            Spacer(Modifier.height(10.dp))
+        }
+        Row(
+            Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(radio(16))).background(Accent)
+                .premiumClickable { escanearQr(contexto) { alLeer(it) } },
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Default.QrCodeScanner, contentDescription = null, tint = OnAccent, modifier = Modifier.size(20.dp))
+            Text(Textos.t(T.qr_escanear), color = OnAccent, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 8.dp))
+        }
+        Spacer(Modifier.height(14.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicTextField(
                 value = handle,
@@ -131,7 +197,7 @@ fun AmigosCabecera(tokenStore: TokenStore, onCambio: () -> Unit, modifier: Modif
             }
         }
         mensaje?.let { (texto, error) ->
-            Text(texto, color = if (error) androidx.compose.ui.graphics.Color(0xFFE57373) else Accent, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
+            Text(texto, color = if (error) com.paragon.app.ui.theme.Danger else Accent, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
         }
 
         if (pendientes.isNotEmpty()) {

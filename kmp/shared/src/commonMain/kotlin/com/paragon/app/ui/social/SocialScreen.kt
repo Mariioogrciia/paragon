@@ -111,7 +111,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
         )
 
         // Amigos: añadir por @usuario y responder solicitudes (antes, solo la lista).
-        if (selectedTab == 2) AmigosCabecera(tokenStore, onCambio = { retryCounter.value += 1 })
+        if (selectedTab == 2) AmigosCabecera(tokenStore, onCambio = { retryCounter.value += 1 }, miHandle = myHandle)
 
         if (selectedTab == 3) {
             when (val current = clansResult) {

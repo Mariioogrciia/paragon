@@ -544,6 +544,11 @@
     <string name="perfil_ventaja">Du liegst in %1$s von %2$s Kategorien vorn</string>
     <string name="perfil_ventaja_todo">" — du führst überall."</string>
     <string name="push_canal">Paragon-Benachrichtigungen</string>
+    <string name="qr_eres_tu">Das ist dein eigener Code.</string>
+    <string name="qr_escanear">QR-Code scannen</string>
+    <string name="qr_no_valido">Dieser QR-Code ist nicht von Paragon.</string>
+    <string name="qr_tu_codigo">Dein Code</string>
+    <string name="qr_tu_codigo_sub">Lass ihn scannen, um dich sofort hinzuzufügen.</string>
     <string name="racha_activa">Serie läuft — weiter so</string>
     <string name="racha_activar">Hol eine Trophäe, um sie zu starten</string>
     <string name="racha_hoy">Deine nächste Serie beginnt heute</string>
