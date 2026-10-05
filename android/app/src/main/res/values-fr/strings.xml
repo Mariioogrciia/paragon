@@ -16,6 +16,7 @@
     <string name="ajustes_acento">Couleur d\'accent personnalisée</string>
     <string name="ajustes_acento_sub">Ne change que l\'accent (boutons, surlignages) — le fond dépend toujours de la plateforme ou de Material You</string>
     <string name="ajustes_apariencia_sub">Mode, accent, style et taille du texte</string>
+    <string name="ajustes_bot_discord">Comment connecter le bot Discord</string>
     <string name="ajustes_cambiar_foto">Changer de photo</string>
     <string name="ajustes_cerrar_sesion_boton">Se déconnecter</string>
     <string name="ajustes_cerrar_sesion_si">Se déconnecter</string>
@@ -242,6 +243,8 @@
     <string name="cuentas_steam_2">Mets « Mon profil » sur Public.</string>
     <string name="cuentas_steam_3">Celui que presque tout le monde oublie : mets AUSSI « Détails des jeux » sur Public — sans ça, Steam ne laisse pas lire ta bibliothèque.</string>
     <string name="cuentas_steam_4">Appuie sur « Enregistrer » en bas de la page.</string>
+    <string name="cuentas_steam_sync">Synchronisation de tes succès Steam… %1$s jeux sur %2$s</string>
+    <string name="cuentas_steam_sync_sub">Tu peux continuer à utiliser l\'app : les jeux afficheront leurs succès au fur et à mesure.</string>
     <string name="cuentas_titulo">Comptes associés</string>
     <string name="cuentas_vinculada">Associé</string>
     <string name="cuentas_vinculado">Associé</string>
@@ -352,6 +355,8 @@
     <string name="ficha_reservado">Réservé</string>
     <string name="ficha_reservado_n">Réservé pour le n°%1$s</string>
     <string name="ficha_reservar">Réserver l\'étape</string>
+    <string name="ficha_reservar_faltan_1">Réserver pour le n°%1$s · encore %2$s</string>
+    <string name="ficha_reservar_faltan_n">Réserver pour le n°%1$s · encore %2$s</string>
     <string name="ficha_reservar_n">Réserver pour le n°%1$s</string>
     <string name="fuente_casual">Décontractée</string>
     <string name="fuente_elegante">Élégante</string>

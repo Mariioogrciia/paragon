@@ -89,6 +89,12 @@
   "es": "Modo, acento, estilo y tamaño de texto",
   "fr": "Mode, accent, style et taille du texte"
  },
+ "ajustes_bot_discord": {
+  "de": "So verbindest du den Discord-Bot",
+  "en": "How to connect the Discord bot",
+  "es": "Cómo conectar el bot de Discord",
+  "fr": "Comment connecter le bot Discord"
+ },
  "ajustes_cambiar_foto": {
   "de": "Foto ändern",
   "en": "Change photo",
@@ -1445,6 +1451,18 @@
   "es": "Pulsa \"Guardar cambios\" al final de la página.",
   "fr": "Appuie sur « Enregistrer » en bas de la page."
  },
+ "cuentas_steam_sync": {
+  "de": "Deine Steam-Erfolge werden synchronisiert… {0} von {1} Spielen",
+  "en": "Syncing your Steam achievements… {0} of {1} games",
+  "es": "Sincronizando tus logros de Steam… {0} de {1} juegos",
+  "fr": "Synchronisation de tes succès Steam… {0} jeux sur {1}"
+ },
+ "cuentas_steam_sync_sub": {
+  "de": "Du kannst die App weiter nutzen: Die Spiele zeigen ihre Erfolge nach und nach.",
+  "en": "You can keep using the app: games will show their achievements as they arrive.",
+  "es": "Puedes seguir usando la app: los juegos irán mostrando sus logros.",
+  "fr": "Tu peux continuer à utiliser l'app : les jeux afficheront leurs succès au fur et à mesure."
+ },
  "cuentas_titulo": {
   "de": "Verknüpfte Konten",
   "en": "Linked accounts",
@@ -2104,6 +2122,18 @@
   "en": "Reserve milestone",
   "es": "Reservar hito",
   "fr": "Réserver l'étape"
+ },
+ "ficha_reservar_faltan_1": {
+  "de": "Für #{0} reservieren · noch {1}",
+  "en": "Reserve for #{0} · {1} to go",
+  "es": "Reservar para el #{0} · falta {1}",
+  "fr": "Réserver pour le n°{0} · encore {1}"
+ },
+ "ficha_reservar_faltan_n": {
+  "de": "Für #{0} reservieren · noch {1}",
+  "en": "Reserve for #{0} · {1} to go",
+  "es": "Reservar para el #{0} · faltan {1}",
+  "fr": "Réserver pour le n°{0} · encore {1}"
  },
  "ficha_reservar_n": {
   "de": "Für #{0} reservieren",

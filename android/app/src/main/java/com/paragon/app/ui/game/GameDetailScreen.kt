@@ -92,6 +92,7 @@ fun GameDetailScreen(
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     var result by remember { mutableStateOf<GameDetailResult?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
+    var proximoHito by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(gameId, retryCounter.value) {
@@ -99,6 +100,9 @@ fun GameDetailScreen(
         result = repository.getGameDetail(gameId)
         val milestoneResult = milestoneRepository.getMilestone()
         hito = (milestoneResult as? MilestoneResult.Ok)?.hito
+        (milestoneResult as? MilestoneResult.Ok)?.let { ok ->
+            if (ok.proximoNumero != null && ok.faltan != null) proximoHito = ok.proximoNumero to ok.faltan
+        }
     }
 
     when (val current = result) {
@@ -132,6 +136,7 @@ fun GameDetailScreen(
             game = current.detail,
             fromCache = current.fromCache,
             hitoInicial = hito,
+            proximoHito = proximoHito,
             tokenStore = tokenStore,
             handle = handle,
             repository = repository,
@@ -150,6 +155,7 @@ private fun GameDetailContent(
     game: GameDetailData,
     fromCache: Boolean,
     hitoInicial: HitoReservado?,
+    proximoHito: Pair<Int, Int>?,
     tokenStore: TokenStore,
     handle: String,
     repository: GameDetailRepository,
@@ -196,7 +202,9 @@ private fun GameDetailContent(
     // El número solo se conoce cuando ALGÚN juego está reservado (viene de
     // /api/mobile/milestone) — si no hay nada reservado todavía no hay
     // preview de número, mismo límite que tiene la API móvil.
-    val numeroHito = hitoInicial?.numero
+    // (número, platinos que faltan): siempre el del próximo hito, haya o no otro juego reservado.
+    val numeroHito = proximoHito?.first ?: hitoInicial?.numero
+    val faltanHito = proximoHito?.second
 
     fun togglePin() {
         pinned = !pinned
@@ -241,6 +249,7 @@ private fun GameDetailContent(
                 pinned = pinned,
                 reservado = reservado,
                 numeroHito = numeroHito,
+                faltanHito = faltanHito,
                 platinoConseguido = platinoConseguido,
                 onTogglePin = { togglePin() },
                 onToggleReserve = { toggleReserve() },
@@ -481,6 +490,7 @@ private fun GameActionsRow(
     pinned: Boolean,
     reservado: Boolean,
     numeroHito: Int?,
+    faltanHito: Int?,
     platinoConseguido: Boolean,
     onTogglePin: () -> Unit,
     onToggleReserve: () -> Unit,
@@ -505,6 +515,7 @@ private fun GameActionsRow(
             label = when {
                 reservado && numeroHito != null -> stringResource(R.string.ficha_reservado_n, numeroHito)
                 reservado -> stringResource(R.string.ficha_reservado)
+                numeroHito != null && faltanHito != null -> stringResource(if (faltanHito == 1) R.string.ficha_reservar_faltan_1 else R.string.ficha_reservar_faltan_n, numeroHito, faltanHito)
                 numeroHito != null -> stringResource(R.string.ficha_reservar_n, numeroHito)
                 else -> stringResource(R.string.ficha_reservar)
             },

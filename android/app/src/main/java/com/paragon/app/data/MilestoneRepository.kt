@@ -16,7 +16,7 @@ data class HitoReservado(
 )
 
 sealed class MilestoneResult {
-    data class Ok(val hito: HitoReservado?) : MilestoneResult()
+    data class Ok(val hito: HitoReservado?, val proximoNumero: Int? = null, val faltan: Int? = null) : MilestoneResult()
     data class Error(val message: String) : MilestoneResult()
 }
 
@@ -28,7 +28,7 @@ class MilestoneRepository(private val tokenStore: TokenStore? = null) {
 
         return try {
             val response = ApiClient.milestoneApi(store).getMilestone()
-            MilestoneResult.Ok(response.hito?.toHitoReservado())
+            MilestoneResult.Ok(response.hito?.toHitoReservado(), response.proximo?.numero, response.proximo?.faltan)
         } catch (e: HttpException) {
             MilestoneResult.Error(Textos.t(R.string.error_servidor, e.code()))
         } catch (e: Exception) {

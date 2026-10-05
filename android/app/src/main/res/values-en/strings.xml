@@ -16,6 +16,7 @@
     <string name="ajustes_acento">Custom accent colour</string>
     <string name="ajustes_acento_sub">Only changes the accent (buttons, highlights) — the background still comes from the platform or Material You</string>
     <string name="ajustes_apariencia_sub">Mode, accent, style and text size</string>
+    <string name="ajustes_bot_discord">How to connect the Discord bot</string>
     <string name="ajustes_cambiar_foto">Change photo</string>
     <string name="ajustes_cerrar_sesion_boton">Sign out</string>
     <string name="ajustes_cerrar_sesion_si">Sign out</string>
@@ -242,6 +243,8 @@
     <string name="cuentas_steam_2">Set \"My profile\" to Public.</string>
     <string name="cuentas_steam_3">The one almost everyone misses: set \"Game details\" to Public TOO — without it, Steam won\'t let us read your library.</string>
     <string name="cuentas_steam_4">Press \"Save\" at the bottom of the page.</string>
+    <string name="cuentas_steam_sync">Syncing your Steam achievements… %1$s of %2$s games</string>
+    <string name="cuentas_steam_sync_sub">You can keep using the app: games will show their achievements as they arrive.</string>
     <string name="cuentas_titulo">Linked accounts</string>
     <string name="cuentas_vinculada">Linked</string>
     <string name="cuentas_vinculado">Linked</string>
@@ -352,6 +355,8 @@
     <string name="ficha_reservado">Reserved</string>
     <string name="ficha_reservado_n">Reserved for #%1$s</string>
     <string name="ficha_reservar">Reserve milestone</string>
+    <string name="ficha_reservar_faltan_1">Reserve for #%1$s · %2$s to go</string>
+    <string name="ficha_reservar_faltan_n">Reserve for #%1$s · %2$s to go</string>
     <string name="ficha_reservar_n">Reserve for #%1$s</string>
     <string name="fuente_casual">Casual</string>
     <string name="fuente_elegante">Elegant</string>

@@ -60,7 +60,7 @@ object DatosDemo {
                 }.joinToString(",")
                 """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]}}"""
             }
-            ruta == "api/mobile/milestone" -> """{"hito":{"gameId":"psn-spidey","titulo":"Marvel's Spider-Man 2","iconUrl":"${portada(1817070)}","numero":90}}"""
+            ruta == "api/mobile/milestone" -> """{"hito":null,"proximo":{"numero":25,"faltan":11}}"""
             ruta == "api/mobile/racha" ->
                 """{"actual":6,"mejor":23,"diasActivos":148,"dias":[${(0 until 35).joinToString(",") { """{"dia":"2026-09-${"%02d".format(1 + it % 30)}","trofeos":${listOf(0, 2, 5, 0, 1, 8, 3)[it % 7]}}""" }}]}"""
             ruta == "api/mobile/feed" ->
@@ -82,6 +82,7 @@ object DatosDemo {
             ruta == "api/mobile/leagues/invites" -> """{"invites":[{"id":"l3","name":"Otra liga","ownerId":"u3","ownerName":"Iker"}]}"""
             ruta == "api/mobile/clans" -> """{"clans":[{"id":"c1","name":"Cazadores del Alba","tag":"ALBA","description":"Platinos al amanecer.","memberCount":12},{"id":"c2","name":"Fontaneros","tag":"FONT","description":"De Mario y poco más.","memberCount":5}],"myClan":{"tag":"ALBA","name":"Cazadores del Alba","role":"member"}}"""
             ruta == "api/mobile/clans/invites" -> """{"invites":[]}"""
+            ruta == "api/mobile/clans/ALBA" -> """{"clan":{"id":"c1","tag":"ALBA","name":"Cazadores del Alba","description":"Platinos al amanecer."},"score":18450,"amIMember":true,"amIOwner":false,"leaderboard":[{"userId":"u2","role":"owner","handle":"nerea","name":"Nerea","image":null,"score":9200,"trofeos":5120},{"userId":"u1","role":"member","handle":"lagrena","name":"La Greña","image":null,"score":9250,"trofeos":4312}],"activity":[],"invitables":[]}"""
             ruta == "api/mobile/achievements" -> """{"badges":[{"id":"b1","name":"Primer platino","description":"Tu primer platino en Paragon.","earnedAt":"2026-01-12T10:00:00.000Z"},{"id":"b2","name":"Racha de 7","description":"Siete días seguidos con trofeos.","earnedAt":"2026-03-02T10:00:00.000Z"}],"trophyCase":[{"kind":"liga","rank":1,"titulo":"Liga Mensual · septiembre de 2026","earnedAt":"2026-10-01T00:00:00.000Z"}]}"""
             ruta == "api/mobile/diet" -> """{"dieta":null}"""
             ruta == "api/mobile/stats" ->

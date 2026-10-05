@@ -320,6 +320,25 @@ fun SettingsScreen(
                 Text(stringResource(R.string.ajustes_como_funciona), color = Foreground)
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Guía paso a paso del bot de Discord: la misma de la web, en una
+            // ruta pública (/bot-discord) para que se abra aunque el navegador
+            // del teléfono no tenga sesión de Paragon.
+            Button(
+                onClick = {
+                    val url = android.net.Uri.parse(com.paragon.app.data.network.BASE_URL).buildUpon()
+                        .appendEncodedPath("bot-discord")
+                        .build()
+                    androidx.browser.customtabs.CustomTabsIntent.Builder().build().launchUrl(context, url)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Surface),
+                shape = RoundedCornerShape(radio(12))
+            ) {
+                Text(stringResource(R.string.ajustes_bot_discord), color = Foreground)
+            }
+
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(

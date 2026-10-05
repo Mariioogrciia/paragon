@@ -20,6 +20,7 @@
     <string name="ajustes_acento">Color de Acento Personalizado</string>
     <string name="ajustes_acento_sub">Solo cambia el acento (botones, resaltados) — el fondo lo sigue decidiendo la plataforma o Material You</string>
     <string name="ajustes_apariencia_sub">Modo, acento, estilo y tamaño de texto</string>
+    <string name="ajustes_bot_discord">Cómo conectar el bot de Discord</string>
     <string name="ajustes_cambiar_foto">Cambiar foto</string>
     <string name="ajustes_cerrar_sesion_boton">Cerrar Sesión</string>
     <string name="ajustes_cerrar_sesion_si">Cerrar sesión</string>
@@ -246,6 +247,8 @@
     <string name="cuentas_steam_2">Pon \"Detalles de mi perfil\" en Público.</string>
     <string name="cuentas_steam_3">El que casi todo el mundo se salta: pon \"Detalles del juego\" TAMBIÉN en Público — sin él, Steam no deja leer tu biblioteca.</string>
     <string name="cuentas_steam_4">Pulsa \"Guardar cambios\" al final de la página.</string>
+    <string name="cuentas_steam_sync">Sincronizando tus logros de Steam… %1$s de %2$s juegos</string>
+    <string name="cuentas_steam_sync_sub">Puedes seguir usando la app: los juegos irán mostrando sus logros.</string>
     <string name="cuentas_titulo">Cuentas Vinculadas</string>
     <string name="cuentas_vinculada">Vinculada</string>
     <string name="cuentas_vinculado">Vinculado</string>
@@ -356,6 +359,8 @@
     <string name="ficha_reservado">Reservado</string>
     <string name="ficha_reservado_n">Reservado para el #%1$s</string>
     <string name="ficha_reservar">Reservar hito</string>
+    <string name="ficha_reservar_faltan_1">Reservar para el #%1$s · falta %2$s</string>
+    <string name="ficha_reservar_faltan_n">Reservar para el #%1$s · faltan %2$s</string>
     <string name="ficha_reservar_n">Reservar para el #%1$s</string>
     <string name="fuente_casual">Casual</string>
     <string name="fuente_elegante">Elegante</string>

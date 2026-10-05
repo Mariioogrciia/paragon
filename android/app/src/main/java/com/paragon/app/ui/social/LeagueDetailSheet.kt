@@ -49,6 +49,7 @@ import kotlinx.coroutines.launch
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
 import com.paragon.app.util.Textos
+import com.paragon.app.ui.common.CabeceraHoja
 
 /**
  * Clasificación de una liga propia (solo con amigos, a diferencia de la
@@ -80,6 +81,7 @@ fun LeagueDetailSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
+            CabeceraHoja(onBack = onDismiss)
             when (val current = result) {
                 null -> Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Accent)

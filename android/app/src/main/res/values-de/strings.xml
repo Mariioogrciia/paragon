@@ -16,6 +16,7 @@
     <string name="ajustes_acento">Eigene Akzentfarbe</string>
     <string name="ajustes_acento_sub">Ändert nur den Akzent (Buttons, Hervorhebungen) — den Hintergrund bestimmt weiter die Plattform oder Material You</string>
     <string name="ajustes_apariencia_sub">Modus, Akzent, Stil und Textgröße</string>
+    <string name="ajustes_bot_discord">So verbindest du den Discord-Bot</string>
     <string name="ajustes_cambiar_foto">Foto ändern</string>
     <string name="ajustes_cerrar_sesion_boton">Abmelden</string>
     <string name="ajustes_cerrar_sesion_si">Abmelden</string>
@@ -242,6 +243,8 @@
     <string name="cuentas_steam_2">Stelle „Mein Profil“ auf Öffentlich.</string>
     <string name="cuentas_steam_3">Das, was fast alle übersehen: Stelle „Spieldetails“ AUCH auf Öffentlich — sonst lässt Steam deine Bibliothek nicht lesen.</string>
     <string name="cuentas_steam_4">Tippe unten auf der Seite auf „Speichern“.</string>
+    <string name="cuentas_steam_sync">Deine Steam-Erfolge werden synchronisiert… %1$s von %2$s Spielen</string>
+    <string name="cuentas_steam_sync_sub">Du kannst die App weiter nutzen: Die Spiele zeigen ihre Erfolge nach und nach.</string>
     <string name="cuentas_titulo">Verknüpfte Konten</string>
     <string name="cuentas_vinculada">Verknüpft</string>
     <string name="cuentas_vinculado">Verknüpft</string>
@@ -352,6 +355,8 @@
     <string name="ficha_reservado">Reserviert</string>
     <string name="ficha_reservado_n">Reserviert für #%1$s</string>
     <string name="ficha_reservar">Meilenstein reservieren</string>
+    <string name="ficha_reservar_faltan_1">Für #%1$s reservieren · noch %2$s</string>
+    <string name="ficha_reservar_faltan_n">Für #%1$s reservieren · noch %2$s</string>
     <string name="ficha_reservar_n">Für #%1$s reservieren</string>
     <string name="fuente_casual">Locker</string>
     <string name="fuente_elegante">Elegant</string>

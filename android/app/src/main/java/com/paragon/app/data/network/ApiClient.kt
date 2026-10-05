@@ -76,6 +76,7 @@ object ApiClient {
     fun wrapApi(tokenStore: TokenStore): WrapApi = retrofit(tokenStore).create(WrapApi::class.java)
     fun trophyGuidesApi(tokenStore: TokenStore): TrophyGuidesApi = retrofit(tokenStore).create(TrophyGuidesApi::class.java)
     fun aparienciaApi(tokenStore: TokenStore): AparienciaApi = retrofit(tokenStore).create(AparienciaApi::class.java)
+    fun steamApi(tokenStore: TokenStore): SteamApi = retrofit(tokenStore).create(SteamApi::class.java)
 
     /**
      * Un único Retrofit cacheado para todos los servicios — `.create()` sobre

@@ -39,6 +39,9 @@ import com.paragon.app.util.Textos
 import com.paragon.app.ui.theme.MarcaPlayStation
 import com.paragon.app.ui.theme.MarcaXbox
 import com.paragon.app.ui.theme.MarcaSteam
+import androidx.compose.runtime.LaunchedEffect
+import com.paragon.app.ui.theme.AccentSoft
+import com.paragon.app.ui.theme.Surface2
 
 // Colores de marca reales por plataforma — antes cada fila era el mismo
 // texto plano en mayúsculas sin nada que las distinguiera a simple vista
@@ -150,6 +153,18 @@ fun LinkedAccountsScreen(
         loadAccounts()
     }
 
+    // Logros de Steam que faltan tras vincular (5 oct 2026): el servidor los
+    // trae por lotes; aquí se piden hasta acabar y se enseña el avance.
+    val steamVinculada = response?.platforms?.any { it.platform == "steam" && it.linked } == true
+    var steamProgreso by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    LaunchedEffect(steamVinculada) {
+        if (steamVinculada) {
+            com.paragon.app.data.SteamRepository(com.paragon.app.data.auth.TokenStore(context.applicationContext))
+                .completarTodo { hechos, total -> steamProgreso = hechos to total }
+            steamProgreso = null
+        }
+    }
+
     Scaffold(
         containerColor = Background,
         topBar = {
@@ -198,6 +213,27 @@ fun LinkedAccountsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
+                steamProgreso?.let { (hechos, total) ->
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(AccentSoft, RoundedCornerShape(radio(14)))
+                                .border(1.dp, Accent.copy(alpha = 0.32f), RoundedCornerShape(radio(14)))
+                                .padding(16.dp),
+                        ) {
+                            Text(stringResource(R.string.cuentas_steam_sync, hechos, total), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.cuentas_steam_sync_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                            androidx.compose.material3.LinearProgressIndicator(
+                                progress = { if (total > 0) hechos / total.toFloat() else 0f },
+                                color = Accent,
+                                trackColor = Surface2,
+                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                            )
+                        }
+                    }
+                }
+
                 item {
                     Text(stringResource(R.string.cuentas_seccion_login), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     Spacer(modifier = Modifier.height(10.dp))

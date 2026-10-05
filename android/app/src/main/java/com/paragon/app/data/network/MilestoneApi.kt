@@ -9,7 +9,10 @@ data class HitoDto(
     val numero: Int,
 )
 
-data class MilestoneResponse(val hito: HitoDto?)
+/** Próximo hito redondo (#25, #50...) y cuántos platinos faltan hasta él, el hito incluido. */
+data class ProximoHitoDto(val numero: Int, val faltan: Int)
+
+data class MilestoneResponse(val hito: HitoDto?, val proximo: ProximoHitoDto? = null)
 
 interface MilestoneApi {
     /** Ver src/app/api/mobile/milestone/route.ts — null si no hay nada reservado (o ya se platinó solo). */

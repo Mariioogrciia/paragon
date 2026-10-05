@@ -13,6 +13,7 @@ import com.paragon.app.data.PanelRepository
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.ParagonDatabase
 import java.util.concurrent.TimeUnit
+import com.paragon.app.data.SteamRepository
 
 /**
  * Refresca las cachés offline (Panel + Biblioteca) en segundo plano, aunque
@@ -38,6 +39,8 @@ class PanelSyncWorker(context: Context, params: WorkerParameters) : CoroutineWor
         // devuelven un Result.Error con mensaje) — no hay nada que
         // reintentar aquí más allá de la próxima pasada periódica.
         PanelRepository(tokenStore, db.panelDao()).getPanel()
+        // Logros de Steam que faltan tras vincular (si no hay, el servidor contesta al momento).
+        SteamRepository(tokenStore).completarTodo()
         LibraryRepository(tokenStore, db.libraryDao(), applicationContext).getLibrary()
 
         return Result.success()

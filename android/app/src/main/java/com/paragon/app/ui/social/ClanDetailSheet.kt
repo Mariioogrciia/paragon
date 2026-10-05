@@ -45,6 +45,7 @@ import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.ui.common.CabeceraHoja
 
 private val MEDALLA = mapOf(0 to "🥇", 1 to "🥈", 2 to "🥉")
 
@@ -79,6 +80,7 @@ fun ClanDetailSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
+            CabeceraHoja(onBack = onDismiss)
             when (val current = result) {
                 null -> Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Accent)
