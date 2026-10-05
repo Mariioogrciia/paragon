@@ -250,9 +250,9 @@ export function Header({
           <span className="hidden sm:inline">
             <ThemeCustomizer />
           </span>
-          <span className="hidden sm:inline">
-            <LanguageSwitcher currentLocale={locale || "es"} />
-          </span>
+          {/* El idioma se ve también en móvil: antes solo estaba al final de la
+              hamburguesa y nadie lo encontraba. */}
+          <LanguageSwitcher currentLocale={locale || "es"} />
 
           {user ? (
             <>
@@ -407,9 +407,6 @@ export function Header({
               )}
             </div>
           )}
-          <div className="mt-2 pt-2 border-t border-border px-3.5">
-            <LanguageSwitcher currentLocale={locale || "es"} />
-          </div>
         </nav>
       )}
     </header>
