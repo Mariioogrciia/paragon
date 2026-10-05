@@ -331,10 +331,21 @@ export async function syncLibrary(
 
   if (library.length === 0) return 0;
 
-  const before = await db
-    .select({ total: sql<number>`coalesce(sum(${userGames.earnedTotal}), 0)` })
-    .from(userGames)
-    .where(eq(userGames.userId, userId));
+  // La fila de esta sincronización va AL PRINCIPIO (5 oct 2026): así los
+  // trofeos nuevos que detecte el detalle de esta misma pasada (abajo) se
+  // le suman con `sumarTrofeosNuevos`. Antes "Trofeos nuevos" se calculaba
+  // restando el total de la biblioteca antes y después — y salía siempre 0:
+  // Steam y Xbox no dan cuántos logros tienes en la biblioteca, y en todas
+  // las plataformas casi todo se detecta por el detalle de cada juego (el
+  // paso de detalles del cron, abrir la ficha, "¿Ya lo tengo?"), que va
+  // fuera de esta función.
+  await db.insert(syncRuns).values({
+    id: crypto.randomUUID(),
+    userId,
+    platform: account.platform,
+    games: library.length,
+    newTrophies: 0,
+  });
 
   await saveLibrary(userId, library);
 
@@ -407,22 +418,30 @@ export async function syncLibrary(
     });
   }
 
-  const after = await db
-    .select({ total: sql<number>`coalesce(sum(${userGames.earnedTotal}), 0)` })
-    .from(userGames)
-    .where(eq(userGames.userId, userId));
-  await db.insert(syncRuns).values({
-    id: crypto.randomUUID(),
-    userId,
-    platform: account.platform,
-    games: library.length,
-    newTrophies: Math.max(0, Number(after[0]?.total ?? 0) - Number(before[0]?.total ?? 0)),
-  });
-
   return library.length;
 }
 
 /* --------------------------------- Detalle -------------------------------- */
+
+/**
+ * Suma `n` trofeos nuevos a la última sincronización de esa cuenta (la
+ * tabla "Sincronizaciones recientes" del panel de admin y Ajustes →
+ * Plataformas). Los trofeos se detectan juego a juego, en el detalle, y no
+ * siempre dentro de `syncLibrary`: se atribuyen a la pasada más reciente
+ * de esa plataforma. Si aún no hay ninguna, no se apunta en ningún sitio.
+ */
+async function sumarTrofeosNuevos(userId: string, platform: string, n: number): Promise<void> {
+  if (n <= 0) return;
+  await db.execute(sql`
+    update ${syncRuns} set "newTrophies" = "newTrophies" + ${n}
+    where ${syncRuns.id} = (
+      select ${syncRuns.id} from ${syncRuns}
+      where ${syncRuns.userId} = ${userId} and ${syncRuns.platform} = ${platform}
+      order by ${syncRuns.createdAt} desc
+      limit 1
+    )
+  `);
+}
 
 /** Devuelve los trofeos de este lote que pasan a "conseguido" en esta misma
  * sincronización — ni estaban guardados como conseguidos antes, ni son un
@@ -772,6 +791,7 @@ export async function syncGameTrophies(
   // esta consulta extra en cada sincronización silenciosa, que es la
   // inmensa mayoría, y la primera vez nunca es "nuevo" de verdad.
   if (nuevos.length > 0 && !primeraSincronizacion) {
+    await sumarTrofeosNuevos(userId, platform, nuevos.length);
     const [info] = await db
       .select({ title: games.title, iconUrl: games.iconUrl })
       .from(games)
