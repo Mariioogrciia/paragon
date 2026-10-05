@@ -55,6 +55,10 @@ class ComposeMainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Textos comunes (:shared) en el idioma de la app: el elegido en Ajustes →
+        // Idioma (AppCompat recrea la actividad al cambiarlo) o el del teléfono.
+        com.paragon.shared.i18n.Textos.idioma =
+            com.paragon.shared.i18n.Textos.desdeCodigo(resources.configuration.locales[0].language)
         tokenStore = TokenStore(applicationContext)
         themeStore = ThemeStore(applicationContext)
 

@@ -10,8 +10,8 @@ import com.paragon.shared.red.LogoutRequest
 import com.paragon.shared.red.NextTrophyDto
 import com.paragon.shared.red.paragonErrorMessage
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 data class UserProfile(
     val handle: String,
@@ -193,23 +193,23 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 // solo reintentando, así que no se mira la caché: hace falta
                 // la pantalla de onboarding.
                 409 -> PanelResult.NeedsOnboarding
-                else -> cachedPanel() ?: PanelResult.Error(Textos.t(R.string.error_servidor, e.code()))
+                else -> cachedPanel() ?: PanelResult.Error(Textos.t(T.error_servidor, e.code()))
             }
         } catch (e: Exception) {
-            cachedPanel() ?: PanelResult.Error(Textos.t(R.string.error_conexion))
+            cachedPanel() ?: PanelResult.Error(Textos.t(T.error_conexion))
         }
     }
 
     /** Paso 1 del alta — ver POST /api/mobile/profile/handle. */
     suspend fun chooseHandle(handle: String): ChooseHandleResult {
-        val store = tokenStore ?: return ChooseHandleResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return ChooseHandleResult.Error(Textos.t(T.error_sin_sesion))
         return try {
             ApiClient.settingsApi(store).chooseHandle(ChooseHandleRequest(handle))
             ChooseHandleResult.Ok
         } catch (e: HttpException) {
-            ChooseHandleResult.Error(e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor, e.code()))
+            ChooseHandleResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            ChooseHandleResult.Error(Textos.t(R.string.error_conexion))
+            ChooseHandleResult.Error(Textos.t(T.error_conexion))
         }
     }
 
@@ -224,7 +224,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
     }
 
     suspend fun getHighlights(): HighlightsResult {
-        val store = tokenStore ?: return HighlightsResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return HighlightsResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.highlightsApi(store).getHighlights()
@@ -234,9 +234,9 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 nextTrophies = response.nextTrophies.map { it.toNextTrophy() },
             )
         } catch (e: HttpException) {
-            HighlightsResult.Error(Textos.t(R.string.error_servidor, e.code()))
+            HighlightsResult.Error(Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            HighlightsResult.Error(Textos.t(R.string.error_conexion))
+            HighlightsResult.Error(Textos.t(T.error_conexion))
         }
     }
 

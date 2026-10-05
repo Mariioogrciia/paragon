@@ -58,7 +58,11 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
     (`BundledSQLiteDriver`) en las dos plataformas; abre sin problema la base
     que creó la app anterior (probado instalando encima en el emulador).
     `ContextoPlataforma` = `Context` en Android.
-  - [ ] Repositorios (por tandas: Apariencia usa colores de la UI, Biblioteca el
+  - [x] `ApiClient` común (Android lo configura con `ApiAndroid`: OkHttp, caché,
+    modo demo) y 14 repositorios limpios en `shared` (mismo paquete
+    `com.paragon.app.data`; textos con `T.` en vez de `R.string.`). La actividad
+    pone `Textos.idioma` al crearse (el idioma de Ajustes → Idioma).
+  - [ ] Resto de repositorios (por tandas: Apariencia usa colores de la UI, Biblioteca el
     widget de Glance, tres usan `SimpleDateFormat`)
 - [ ] Fase 3 — pantallas
 - [ ] Fase 4 — plataforma

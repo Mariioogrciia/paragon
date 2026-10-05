@@ -156,8 +156,9 @@ private fun ShareAddCard(tokenStore: TokenStore, initialQuery: String, onClose: 
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(result.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                                if (!result.developer.isNullOrBlank()) {
-                                    Text(result.developer, color = Muted, fontSize = 12.sp)
+                                val developer = result.developer
+                                if (!developer.isNullOrBlank()) {
+                                    Text(developer, color = Muted, fontSize = 12.sp)
                                 }
                             }
                         }

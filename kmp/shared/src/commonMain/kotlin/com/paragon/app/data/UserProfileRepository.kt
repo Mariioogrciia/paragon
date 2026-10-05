@@ -4,8 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.UserProfileDto
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 sealed class UserProfileResult {
     data class Ok(val profile: UserProfileDto) : UserProfileResult()
@@ -14,19 +14,19 @@ sealed class UserProfileResult {
 
 class UserProfileRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getProfile(handle: String): UserProfileResult {
-        val store = tokenStore ?: return UserProfileResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return UserProfileResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.usersApi(store).getUserProfile(handle)
             UserProfileResult.Ok(response)
         } catch (e: HttpException) {
             if (e.code() == 404) {
-                UserProfileResult.Error(Textos.t(R.string.perfil_err_no_encontrado))
+                UserProfileResult.Error(Textos.t(T.perfil_err_no_encontrado))
             } else {
-                UserProfileResult.Error(Textos.t(R.string.error_servidor_corto, e.code()))
+                UserProfileResult.Error(Textos.t(T.error_servidor_corto, e.code()))
             }
         } catch (e: Exception) {
-            UserProfileResult.Error(Textos.t(R.string.error_conexion))
+            UserProfileResult.Error(Textos.t(T.error_conexion))
         }
     }
 }

@@ -484,7 +484,7 @@ fun MainScreen(
                         coroutineScope.launch {
                             PanelRepository(tokenStore).logout()
                             tokenStore.clear()
-                            com.paragon.app.data.network.ApiClient.vaciarCache()
+                            com.paragon.app.data.network.ApiAndroid.vaciarCache()
                             // Y el propio token de FCM se invalida en Firebase:
                             // aunque la llamada de arriba fallara sin red, ese
                             // token ya no puede recibir nada de esta cuenta.

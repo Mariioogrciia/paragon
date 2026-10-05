@@ -4,8 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.shared.red.AddWishlistRequest
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.GameSearchResultDto
-import com.paragon.app.R
-import com.paragon.app.util.Textos
+import com.paragon.shared.i18n.T
+import com.paragon.shared.i18n.Textos
 
 /** Un resultado de búsqueda en el catálogo (IGDB) — "Añadir a Paragon" desde el Sharesheet. */
 data class GameSearchResult(
@@ -43,7 +43,7 @@ class WishlistRepository(private val tokenStore: TokenStore? = null) {
                     genres = game.genres,
                     developer = game.developer,
                     publisher = game.publisher,
-                    deviceLabel = Textos.t(R.string.comun_deseados),
+                    deviceLabel = Textos.t(T.comun_deseados),
                 ),
             )
             true

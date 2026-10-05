@@ -4,8 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.HitoDto
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /** Cerrojo de Hitos: qué juego está reservado ahora mismo para tu próximo platino en número redondo. */
 data class HitoReservado(
@@ -24,15 +24,15 @@ private fun HitoDto.toHitoReservado() = HitoReservado(gameId, titulo, iconUrl, n
 
 class MilestoneRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getMilestone(): MilestoneResult {
-        val store = tokenStore ?: return MilestoneResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return MilestoneResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.milestoneApi(store).getMilestone()
             MilestoneResult.Ok(response.hito?.toHitoReservado(), response.proximo?.numero, response.proximo?.faltan)
         } catch (e: HttpException) {
-            MilestoneResult.Error(Textos.t(R.string.error_servidor, e.code()))
+            MilestoneResult.Error(Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            MilestoneResult.Error(Textos.t(R.string.error_conexion))
+            MilestoneResult.Error(Textos.t(T.error_conexion))
         }
     }
 }

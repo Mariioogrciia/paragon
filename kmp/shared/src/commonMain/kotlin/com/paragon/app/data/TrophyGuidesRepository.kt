@@ -4,8 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.SaveTrophyGuideRequest
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /** Guía escrita de un trofeo — apuntes reales de la comunidad, distinto del vídeo de YouTube (ver GameDetailRepository.getTrophyGuide). Una fila por (usuario, juego, trofeo). */
 data class TrophyGuideRow(
@@ -26,7 +26,7 @@ sealed class TrophyGuidesResult {
 
 class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getGuides(gameId: String, trophyId: String): TrophyGuidesResult {
-        val store = tokenStore ?: return TrophyGuidesResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return TrophyGuidesResult.Error(Textos.t(T.error_sin_sesion))
         return try {
             val response = ApiClient.trophyGuidesApi(store).getGuides(gameId, trophyId)
             TrophyGuidesResult.Ok(
@@ -34,20 +34,20 @@ class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
                 currentUserId = response.currentUserId,
             )
         } catch (e: Exception) {
-            TrophyGuidesResult.Error(Textos.t(R.string.error_conexion))
+            TrophyGuidesResult.Error(Textos.t(T.error_conexion))
         }
     }
 
     /** `null` si se publicó bien; el mensaje de error si no (vacía, o pasa de 4000 caracteres). */
     suspend fun saveGuide(gameId: String, trophyId: String, body: String): String? {
-        val store = tokenStore ?: return Textos.t(R.string.error_sin_sesion)
+        val store = tokenStore ?: return Textos.t(T.error_sin_sesion)
         return try {
             ApiClient.trophyGuidesApi(store).saveGuide(gameId, trophyId, SaveTrophyGuideRequest(body))
             null
         } catch (e: HttpException) {
-            Textos.t(R.string.error_guardar_guia)
+            Textos.t(T.error_guardar_guia)
         } catch (e: Exception) {
-            Textos.t(R.string.error_conexion)
+            Textos.t(T.error_conexion)
         }
     }
 

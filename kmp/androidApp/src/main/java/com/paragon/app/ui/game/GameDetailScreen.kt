@@ -101,7 +101,9 @@ fun GameDetailScreen(
         val milestoneResult = milestoneRepository.getMilestone()
         hito = (milestoneResult as? MilestoneResult.Ok)?.hito
         (milestoneResult as? MilestoneResult.Ok)?.let { ok ->
-            if (ok.proximoNumero != null && ok.faltan != null) proximoHito = ok.proximoNumero to ok.faltan
+            val numero = ok.proximoNumero
+            val faltan = ok.faltan
+            if (numero != null && faltan != null) proximoHito = numero to faltan
         }
     }
 

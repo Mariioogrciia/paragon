@@ -3,8 +3,7 @@ package com.paragon.app.data.auth
 import android.content.Context
 import com.russhwolf.settings.SharedPreferencesSettings
 
-/** La sesión es común (:shared); aquí solo se dice dónde se guarda en Android. */
-typealias TokenStore = com.paragon.shared.sesion.TokenStore
+// La sesión es común (:shared, TokenStore); aquí solo dónde se guarda en Android.
 
 /**
  * Las SharedPreferences "paragon_auth" de siempre: las mismas claves que

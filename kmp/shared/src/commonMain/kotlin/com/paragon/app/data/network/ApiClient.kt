@@ -3,59 +3,29 @@ package com.paragon.app.data.network
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.shared.red.ClienteParagon
 import com.paragon.shared.red.URL_BASE
-import io.ktor.client.engine.okhttp.OkHttp
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
+import kotlin.concurrent.Volatile
 
-/** Dominio de la API y del login en el navegador (definido en :shared). */
+/** Dominio de la API y del login en el navegador. */
 const val BASE_URL = URL_BASE
 
 /**
- * Acceso de la app Android a la API común (`ClienteParagon`, en :shared, con
- * Ktor). Mantiene las funciones de siempre (`panelApi(tokenStore)`...) para
- * que los repositorios no cambien mientras pasan a :shared.
+ * Acceso a la API común (`ClienteParagon`) desde los repositorios. Cada
+ * plataforma dice al arrancar cómo se crea el cliente (`configurar`): en
+ * Android, con OkHttp, caché HTTP y modo demo (ApiAndroid); en iOS, con Darwin.
  */
 object ApiClient {
     @Volatile
     private var cliente: ClienteParagon? = null
+    private var fabrica: ((TokenStore) -> ClienteParagon)? = null
 
-    /**
-     * Caché HTTP de 10 MB (auditoría, 4 oct 2026): las rutas grandes de
-     * /api/mobile (biblioteca, panel, estadísticas...) mandan ETag, así que
-     * OkHttp revalida con If-None-Match y, si nada ha cambiado, el servidor
-     * contesta 304 sin cuerpo y se usa la copia guardada. Ver src/lib/etag.ts.
-     */
-    private var cache: okhttp3.Cache? = null
-
-    /** Solo lo pone el modo demo de la compilación de depuración (src/debug/.../ModoDemo.kt). */
-    @Volatile
-    var interceptorDemo: Interceptor? = null
-
-    fun init(context: android.content.Context) {
-        if (cache == null) cache = okhttp3.Cache(java.io.File(context.cacheDir, "http"), 10L * 1024 * 1024)
-    }
-
-    /** Al cerrar sesión: que nada de la cuenta anterior quede guardado en el móvil. */
-    fun vaciarCache() {
-        try { cache?.evictAll() } catch (e: Exception) { }
+    fun configurar(crear: (TokenStore) -> ClienteParagon) {
+        fabrica = crear
+        cliente = null
     }
 
     fun cliente(tokenStore: TokenStore): ClienteParagon =
-        cliente ?: synchronized(this) {
-            cliente ?: crear(tokenStore).also { cliente = it }
-        }
-
-    private fun crear(tokenStore: TokenStore): ClienteParagon {
-        val okHttp = OkHttpClient.Builder()
-            .apply { cache?.let { cache(it) } }
-            .apply { interceptorDemo?.let { addInterceptor(it) } }
-            .build()
-        return ClienteParagon(
-            motor = OkHttp.create { preconfigured = okHttp },
-            token = { tokenStore.token },
-            idioma = { java.util.Locale.getDefault().toLanguageTag() },
-        )
-    }
+        cliente ?: requireNotNull(fabrica) { "ApiClient.configurar no se ha llamado al arrancar" }
+            .invoke(tokenStore).also { cliente = it }
 
     fun panelApi(tokenStore: TokenStore) = cliente(tokenStore).panel
     fun gamesApi(tokenStore: TokenStore) = cliente(tokenStore).games

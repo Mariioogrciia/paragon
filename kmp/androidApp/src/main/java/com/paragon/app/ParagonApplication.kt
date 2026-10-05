@@ -19,7 +19,7 @@ class ParagonApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         Textos.init(this)
-        com.paragon.app.data.network.ApiClient.init(this)
+        com.paragon.app.data.network.ApiAndroid.init(this)
         // Modo demo (solo existe en la compilación de depuración, ver
         // src/debug/.../ModoDemo.kt): en producción la clase no está y no pasa nada.
         if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) {

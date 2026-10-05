@@ -3,8 +3,8 @@ package com.paragon.app.data
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /**
  * Palmarés (ligas ganadas) + Badges — GET /api/mobile/achievements, ver
@@ -23,7 +23,7 @@ sealed class AchievementsResult {
 
 class AchievementsRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getAchievements(): AchievementsResult {
-        val store = tokenStore ?: return AchievementsResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return AchievementsResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.achievementsApi(store).getAchievements()
@@ -32,9 +32,9 @@ class AchievementsRepository(private val tokenStore: TokenStore? = null) {
                 trophyCase = response.trophyCase.map { TrophyCaseAward(it.kind, it.rank, it.titulo, it.earnedAt) },
             )
         } catch (e: HttpException) {
-            AchievementsResult.Error(Textos.t(R.string.error_servidor, e.code()))
+            AchievementsResult.Error(Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            AchievementsResult.Error(Textos.t(R.string.error_conexion))
+            AchievementsResult.Error(Textos.t(T.error_conexion))
         }
     }
 }

@@ -2,7 +2,7 @@ package com.paragon.app.demo
 
 import android.content.Context
 import com.paragon.app.data.auth.TokenStore
-import com.paragon.app.data.network.ApiClient
+import com.paragon.app.data.network.ApiAndroid
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Protocol
@@ -27,7 +27,7 @@ object ModoDemo {
         if (!File(context.filesDir, "modo_demo").exists()) return
         val tokens = TokenStore(context)
         if (tokens.token == null) tokens.token = "demo"
-        ApiClient.interceptorDemo = Interceptor { chain ->
+        ApiAndroid.interceptorDemo = Interceptor { chain ->
             val req = chain.request()
             val ruta = req.url.encodedPath.removePrefix("/")
             val cuerpo = DatosDemo.respuesta(req.method, ruta)

@@ -4,8 +4,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.paragonErrorMessage
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /** Comparativa 1 a 1 (CompareScreen) — versión curada de GET /api/mobile/compare/{handle}. */
 data class CompareSide(val name: String, val avatarUrl: String?, val level: Int, val platinos: Int, val trofeos: Int, val juegos: Int)
@@ -32,7 +32,7 @@ sealed class CompareResult {
 class CompareRepository(private val tokenStore: TokenStore? = null) {
     /** `handle` no tiene que ser tu amigo — cualquier perfil público se puede comparar, igual que en la web. */
     suspend fun compare(handle: String): CompareResult {
-        val store = tokenStore ?: return CompareResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return CompareResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.compareApi(store).compare(handle)
@@ -52,13 +52,13 @@ class CompareRepository(private val tokenStore: TokenStore? = null) {
             )
         } catch (e: HttpException) {
             val message = when (e.code()) {
-                404 -> Textos.t(R.string.comparar_err_no_existe)
-                409 -> e.paragonErrorMessage() ?: Textos.t(R.string.comparar_err_sin_cuentas)
-                else -> Textos.t(R.string.error_servidor, e.code())
+                404 -> Textos.t(T.comparar_err_no_existe)
+                409 -> e.paragonErrorMessage() ?: Textos.t(T.comparar_err_sin_cuentas)
+                else -> Textos.t(T.error_servidor, e.code())
             }
             CompareResult.Error(message)
         } catch (e: Exception) {
-            CompareResult.Error(Textos.t(R.string.error_conexion))
+            CompareResult.Error(Textos.t(T.error_conexion))
         }
     }
 }
