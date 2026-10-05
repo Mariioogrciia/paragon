@@ -3,7 +3,81 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
-**Estado actual (5 oct 2026) — léelo antes que nada:**
+**Estado actual (5 oct 2026, tarde) — léelo antes que nada:**
+- **Subido a `origin/master`** hasta `40301de` (Vercel despliega solo). Fuera
+  del repo: `.env.local`, `scratch/` (ojo: NO está en `.gitignore`, no hacer
+  `git add -A` en la raíz), `.impeccable/`, `ios-builder-test/` y el cambio
+  local de `.claude/launch.json` (certificado de Avast).
+- **La app móvil es ahora UNA sola app Compose Multiplatform en `kmp/`**
+  (Android + iOS nativo). Plan, versiones, piezas por plataforma y trampas:
+  **`kmp/MIGRACION.md`**. Fases 1-3 hechas; falta la 4 (probar iOS en un iPhone
+  real) y la 5 (retirar `android/` y el Capacitor de `ios/`).
+  - `kmp/shared`: red (Ktor), sesión, Room, 24 repositorios y **todas las
+    pantallas** en `commonMain` (mismos paquetes `com.paragon.app.*`).
+  - `kmp/androidApp`: solo lo propio de Android (actividad, FCM, widget
+    Glance, WorkManager, iconos, caché HTTP y modo demo en `ApiAndroid`).
+  - `kmp/iosApp`: host Swift (Siri/Atajos, Core Haptics, `onOpenURL` del login);
+    el `.xcodeproj` lo genera XcodeGen en la CI.
+  - **`android/` está CONGELADA** (alguien la sigue tocando: los cambios de
+    `android/` no llegan a la app; trasladarlos a `kmp/androidApp` o a `shared`).
+- **iOS**: `.github/workflows/build-ios-kmp.yml` compila un IPA sin firmar
+  (artefacto `paragon-kmp-ipa`, se instala con Sideloadly; cuenta de Apple
+  gratuita: caduca a los 7 días y sin push). Primer IPA de la app completa:
+  run 37315038576. Si falla, los errores de compilación salen como
+  **anotaciones** (se leen por la API sin sesión de GitHub:
+  `/repos/Mariioogrciia/paragon/check-runs/<job>/annotations`).
+  - Probado en el iPhone del usuario (iOS 26.6): la prueba (red, carátulas,
+    insets) y las vibraciones por metal. **Siri aún no registra las frases**
+    (faltaban icono y nombre en el Info.plist; corregido, sin confirmar).
+  - **La app completa en iOS no se ha probado todavía en un iPhone**: login por
+    Safari + vuelta por `paragon://auth`, fotos, clanes, ligas, ajustes.
+- **Hecho hoy en servidor/web** (desplegado):
+  - Fotos de perfil: 6 de 11 usuarios tenían la de PSN en `http://` (las apps
+    la bloquean); `avatarUrlSql`/`resolveAvatarUrl` la devuelven en `https`.
+  - **Ligas privadas que terminan de verdad**: `cerrarLigasPrivadasVencidas`
+    (lib/trophyCase.ts, en el cron) marca `awarded`, premia a los empatados en
+    lo alto y avisa a cada miembro de su puesto (las vencidas hace >3 días se
+    cierran sin avisar); `lib/ligasCierre.ts` (reglas, con tests); una liga
+    terminada no admite cambiar el reto, invitar ni aceptar (409 "Esta liga ya
+    ha terminado."); la web enseña "Terminó el X · Ganó Y". **Sin ver aún una
+    pasada real del cron.**
+  - **Guerra de clanes en la API móvil**: la ficha del clan trae `guerra` y
+    `retables`; `POST clans/[tag]/war` y `clans/wars/[id]`. Contrato en
+    `src/app/api/mobile/CONTRACT.md`.
+- **Verificación**: web `npx tsc --noEmit`, `npx eslint src`, `npm test` (135),
+  `npx tsx scripts/comprobar-namespaces-cliente.mts`. Móvil, desde `kmp/`:
+  `./gradlew :shared:compileCommonMainKotlinMetadata :androidApp:assembleDebug :shared:testAndroidHostTest`
+  (con `JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"` y el
+  `JAVA_TOOL_OPTIONS` de Avast: `-Djavax.net.ssl.trustStore=<repo>/scratch/cacerts-avast.jks -Djavax.net.ssl.trustStorePassword=changeit`).
+  La metadata común NO garantiza que iOS compile (pasó un `Modifier.androidx…`
+  que solo rompe en Kotlin/Native): la prueba de verdad es la CI de iOS.
+- **Trampas nuevas de hoy**:
+  - **Dos agentes compilando a la vez en `kmp/`** (Claude + Antigravity) se
+    rompen las builds: daemon parado a mitad, un APK sin las clases de
+    `:shared` (la app se cerraba al arrancar). Solo uno cada vez. Si pasa:
+    `./gradlew --stop`, borrar `shared/build` y `androidApp/build`, recompilar.
+  - Los archivos que escribe Antigravity vienen con CRLF: las sustituciones con
+    `$`/`\n` no casan; normalizar a LF antes.
+  - Textos de la app: **`kmp/i18n/textos.json`** + `node kmp/i18n/generar.mjs`
+    (`stringResource(T.clave)` / `Textos.t(T.clave)`); los de `android/i18n` ya
+    no valen.
+  - Ktor necesita `Content-Type: application/json` en la respuesta (el modo
+    demo no lo mandaba).
+  - Recursos comunes (logo, iconos) en `shared/src/commonMain/composeResources`;
+    sin `androidResources { enable = true }` no entran en el APK.
+- **Pendiente**:
+  - Que el usuario pruebe el IPA de la app completa; arreglar lo que falle.
+  - Siri (tras el arreglo del Info.plist).
+  - Antigravity tiene a medias transiciones compartidas Panel→Ficha
+    (`MainScreen.kt`, `PanelScreen.kt` sin commitear). Su auditoría de UX
+    propone blur (librería Haze), vibraciones y `animateItem`: acordado
+    dejarlo para después de que iOS funcione, y que no trabaje a la vez.
+  - Fase 5: retirar `android/` y el Capacitor de `ios/` cuando la app de
+    `kmp/` esté validada en los dos sistemas.
+  - APK firmada (falta clave propia); push en iOS (cuenta de pago).
+
+**Mañana del 5 oct (antes de la migración; las instrucciones de `android/` de
+este bloque ya NO valen):**
 - **Todo subido a `origin/master`** (último commit `fa47f50`; Vercel despliega
   solo). Fuera del repo siguen `.env.local`, `scratch/`, `.impeccable/` (rondas
   de diseño y respuestas, nunca subidas) y el cambio local de
@@ -55,42 +129,6 @@ releer todo el historial. Última actualización: **5 de octubre de 2026**.
   `node android/i18n/generar.mjs`) y los errores nuevos de `/api/mobile`,
   en `lib/mensajesApi.ts`; en Windows/Git Bash, `adb` con rutas `/data/...`
   necesita `MSYS_NO_PATHCONV=1`.
-
-**iOS nativo con Compose Multiplatform — prueba mínima (5 oct 2026):**
-- Decisión del usuario: app de iOS nativa (no Capacitor) migrando la app
-  Android a Compose Multiplatform, compilada sin Mac en GitHub Actions
-  (y más adelante con `ios-builder` de MobAI, clonado en `scratch/ios-builder`).
-- Antes de migrar nada, prueba aislada en `kmp/` (no toca `android/`):
-  `kmp/shared` (pantalla de próximos lanzamientos con Ktor +
-  kotlinx.serialization + Coil + insets + expect/actual) y `kmp/iosApp`
-  (host Swift; el `.xcodeproj` lo genera XcodeGen desde `project.yml` en la
-  CI). Workflow `.github/workflows/build-ios-kmp.yml` → artefacto
-  `paragon-kmp-ipa` (sin firmar, para Sideloadly) + `iosApp-xcodeproj` (para
-  commitearlo cuando se pase a ios-builder, que lo espera en el repo).
-- `build-ios.yml` (Capacitor) ya solo se lanza a mano: en cada push gastaba
-  minutos de macOS (x10).
-- Compilar en local: `./gradlew :shared:compileKotlinJvm` desde `kmp/` (el
-  target jvm existe solo para eso; iOS no compila en Windows). **Avast**:
-  Gradle no descarga nada sin
-  `JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=<repo>/scratch/cacerts-avast.jks -Djavax.net.ssl.trustStorePassword=changeit"`
-  (cacerts del JBR + `wscert.pem` de Avast, regenerable con `keytool -importcert`).
-- Trampa: en un `build.gradle.kts` con el plugin de Compose, una variable
-  llamada `compose` queda tapada por la extensión `compose` del plugin.
-- Bloqueadores conocidos de la migración completa (ver la conversación del
-  5 oct): Moshi→kotlinx.serialization, Retrofit→Ktor, Room KMP, crypto de
-  `EnlaceSeguro.kt` (javax.crypto), `LocalContext` en 19 archivos; widget,
-  FCM/APNs, WorkManager y compartir no son portables. Sideloadly con Apple
-  ID gratis: caduca a los 7 días y sin push.
-
-**Migración completa a Compose Multiplatform (5 oct 2026, en curso)** — plan y
-progreso en `kmp/MIGRACION.md`. La app Android vive ahora en `kmp/androidApp`
-(copia de `android/app` sin Capacitor, Kotlin 2.4 + AGP 9.4). **`android/` queda
-congelada**: cualquier cambio a la app Android va en `kmp/androidApp` (o se
-traslada allí; el 5 oct se trasladaron a mano dos arreglos hechos en paralelo en
-`android/`). **Los textos de la app ya no van en `android/i18n`**: fuente
-`kmp/i18n/textos.json`, `node kmp/i18n/generar.mjs`. Compilar Android:
-`./gradlew :androidApp:assembleDebug` desde `kmp/` (con el `JAVA_TOOL_OPTIONS` de
-Avast de arriba y `kmp/local.properties` copiado de `android/`).
 
 **Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
