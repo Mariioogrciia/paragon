@@ -3,6 +3,33 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
+**Noche del 5 oct (4) — diseño v2 de la app ("que se sienta una app de verdad"):**
+- Maqueta v2 de las 20 pantallas: https://claude.ai/artifact/D6EAtf8pUbhCVXjGYkDyVy
+  (aprobada: "adelante con todo"). Siempre push a master.
+- **Navegación nativa**: sin la barra "PARAGON" en ninguna pantalla; cada una
+  lleva `ui/common/CabeceraNativa` (‹ De dónde vienes + título grande).
+  Transiciones de empujar/volver en `MainScreen` (`esPestana()`: entre
+  pestañas, fundido). `ControlSegmentado` sustituye a las TabRow de Material.
+  `ConfirmDialog` es ahora una hoja inferior. `GrupoNativo`/`FilaNativa`
+  (`ui/common/ListaAgrupada.kt`) para listas tipo Ajustes del iPhone.
+- **Personalización**: el acento tiñe fondo, superficies y bordes en oscuro,
+  claro y OLED (`tenido()` en `ui/theme/Color.kt`); contraste alto, neutro.
+- **Icono de la app** a elegir (Ajustes → Apariencia): `kmp/iconos/generar.py`
+  saca las variantes (Paragon, Oro, Claro, Neón, Esmeralda). Android: un
+  `activity-alias` por icono (`IconSwitcher.kt`, ahora en `:shared`); iOS:
+  `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` en `project.yml`.
+- **QR** (`app/util/EscanerQr.kt`): el QR lleva el enlace web (`/u/<handle>`,
+  `/sesiones/<id>`), así vale con la cámara normal. Lector: Google Code
+  Scanner en Android, AVFoundation en iOS (`NSCameraUsageDescription`).
+  Dibujo con `io.github.alexzhirkevich:qrose`. Tu código en Perfil y Amigos;
+  lector en Comunidad y Amigos; compartir sesión desde su detalle.
+- **Plataformas** como la web: `POST /api/mobile/accounts/{platform}/sync`
+  (nuevo) y `avatarUrl/isPublic/syncedAt` en el GET; Sincronizar, Cambiar
+  cuenta y Desvincular (con confirmación).
+- Inicio v2 (cifras → Sigue jugando → Para hoy), Carpetas en cuadrícula con
+  hoja de opciones, pantalla de entrar nueva, Ajustes en listas agrupadas.
+- Android compila en la CI; iOS iba con mucha cola: revisar el último run.
+
 **Noche del 5 oct (3) — rediseño de la app (maqueta aprobada):**
 - Maqueta en https://claude.ai/artifact/6LesnTCahE8PorvE5nYhjV (5 pantallas de
   iPhone). Skill de diseño en `.claude/skills/mobile-app-ui-design`.
