@@ -15,6 +15,7 @@ kotlin {
         namespace = "com.paragon.shared"
         compileSdk = 37
         minSdk = 24
+        withHostTest {}
     }
 
     listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
@@ -36,6 +37,15 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
             implementation("io.coil-kt.coil3:coil-compose:$versionCoil")
             implementation("io.coil-kt.coil3:coil-network-ktor3:$versionCoil")
+            // Sesión: SharedPreferences en Android, Llavero en iOS.
+            api("com.russhwolf:multiplatform-settings:1.3.0")
+            // AES-GCM del login (EnlaceSeguro): JDK en Android, CryptoKit en iOS.
+            implementation("dev.whyoleg.cryptography:cryptography-core:0.6.0")
+            implementation("dev.whyoleg.cryptography:cryptography-provider-optimal:0.6.0")
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation("com.russhwolf:multiplatform-settings-test:1.3.0")
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:$versionKtor")

@@ -48,7 +48,12 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
     el emulador con el modo demo: panel, biblioteca, ficha, estadísticas,
     comunidad, ligas, ajustes. Ojo: Ktor necesita `Content-Type: application/json`
     en la respuesta (el servidor lo manda; el modo demo no lo mandaba).
-  - [ ] Sesión (`TokenStore`), `EnlaceSeguro`, repositorios, Room
+  - [x] Sesión: `TokenStore` común (multiplatform-settings; en Android las
+    mismas SharedPreferences y claves, no se cierra la sesión al actualizar; en
+    iOS irá al Llavero). `EnlaceSeguro` común con cryptography-kotlin (AES-GCM),
+    con test contra un vector cifrado por `src/lib/enlaceMovil.ts`
+    (`./gradlew :shared:testAndroidHostTest`).
+  - [ ] Repositorios y Room
 - [ ] Fase 3 — pantallas
 - [ ] Fase 4 — plataforma
 - [ ] Fase 5 — retirar lo viejo
