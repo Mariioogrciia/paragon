@@ -238,6 +238,8 @@
     <string name="comun_vale">OK</string>
     <string name="comun_volver">Retour</string>
     <string name="comunidad_muro">Mur</string>
+    <string name="cuentas_al_dia">Tout est à jour</string>
+    <string name="cuentas_cambiar">Changer de compte</string>
     <string name="cuentas_conectar">Connecter</string>
     <string name="cuentas_declarado">Progression déclarée · ne compte pas</string>
     <string name="cuentas_desvincular">Dissocier</string>
@@ -245,6 +247,7 @@
     <string name="cuentas_desvincular_texto">Ta progression et tes trophées enregistrés restent tels quels, mais la synchronisation s\'arrête jusqu\'à ce que tu associes de nouveau le compte.</string>
     <string name="cuentas_desvincular_titulo">Dissocier %1$s ?</string>
     <string name="cuentas_epic_extension">Epic bloque les requêtes des serveurs : on l\'associe depuis l\'ordinateur avec l\'extension Paragon pour navigateur. Ouvre ta page de succès Epic et appuie sur Synchroniser.</string>
+    <string name="cuentas_nivel">Niveau %1$s</string>
     <string name="cuentas_ph_otro">ID public / gamertag</string>
     <string name="cuentas_ph_psn">Ton identifiant en ligne PSN</string>
     <string name="cuentas_ph_steam">Pseudo, SteamID64 ou URL du profil</string>
@@ -254,12 +257,16 @@
     <string name="cuentas_priv_psn">Où rendre mon profil PSN public ?</string>
     <string name="cuentas_priv_steam">Où rendre mon profil Steam public ?</string>
     <string name="cuentas_priv_xbox">Où rendre mon historique Xbox public ?</string>
+    <string name="cuentas_privada">Privé</string>
     <string name="cuentas_psn_1">Sur la console (PS5/PS4) : Paramètres → Utilisateurs et comptes → Confidentialité → Personnaliser.</string>
     <string name="cuentas_psn_2">Cherche « Niveau des trophées, jeux et vitrines » (ou « Trophées ») et règle-le sur « Tout le monde ».</string>
     <string name="cuentas_psn_3">Depuis le téléphone : app PlayStation → ton profil → icône des paramètres → Confidentialité du compte → Trophées.</string>
     <string name="cuentas_psn_4">Le changement est immédiat — pas besoin de te reconnecter.</string>
     <string name="cuentas_seccion_login">CONNEXION (OAUTH)</string>
     <string name="cuentas_seccion_plataformas">PLATEFORMES DE JEU</string>
+    <string name="cuentas_sincronizada_hace">synchronisé %1$s</string>
+    <string name="cuentas_sincronizando">Synchronisation…</string>
+    <string name="cuentas_sincronizar">Synchroniser</string>
     <string name="cuentas_steam_1">Sur ton profil Steam (web ou client) → « Modifier le profil » → « Paramètres de confidentialité ».</string>
     <string name="cuentas_steam_2">Mets « Mon profil » sur Public.</string>
     <string name="cuentas_steam_3">Celui que presque tout le monde oublie : mets AUSSI « Détails des jeux » sur Public — sans ça, Steam ne laisse pas lire ta bibliothèque.</string>
@@ -267,6 +274,7 @@
     <string name="cuentas_steam_sync">Synchronisation de tes succès Steam… %1$s jeux sur %2$s</string>
     <string name="cuentas_steam_sync_sub">Tu peux continuer à utiliser l\'app : les jeux afficheront leurs succès au fur et à mesure.</string>
     <string name="cuentas_titulo">Comptes associés</string>
+    <string name="cuentas_trofeos_nuevos">%1$s nouveaux trophées</string>
     <string name="cuentas_vinculada">Associé</string>
     <string name="cuentas_vinculado">Associé</string>
     <string name="cuentas_vincular">Associer</string>

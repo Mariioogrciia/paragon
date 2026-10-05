@@ -240,6 +240,8 @@
     <string name="comun_vale">Vale</string>
     <string name="comun_volver">Volver</string>
     <string name="comunidad_muro">Muro</string>
+    <string name="cuentas_al_dia">Todo al día</string>
+    <string name="cuentas_cambiar">Cambiar cuenta</string>
     <string name="cuentas_conectar">Conectar</string>
     <string name="cuentas_declarado">Progreso declarado · no puntúa</string>
     <string name="cuentas_desvincular">Desvincular</string>
@@ -247,6 +249,7 @@
     <string name="cuentas_desvincular_texto">Tu progreso y trofeos ya guardados se quedan tal cual, pero deja de sincronizarse hasta que vuelvas a vincular la cuenta.</string>
     <string name="cuentas_desvincular_titulo">¿Desvincular %1$s?</string>
     <string name="cuentas_epic_extension">Epic bloquea las consultas de los servidores, así que se vincula desde el ordenador con la extensión de Paragon para el navegador: abre tu página de logros de Epic y pulsa Sincronizar.</string>
+    <string name="cuentas_nivel">Nivel %1$s</string>
     <string name="cuentas_ph_otro">ID Público / Gamertag</string>
     <string name="cuentas_ph_psn">Tu Online ID de PSN</string>
     <string name="cuentas_ph_steam">Usuario, SteamID64 o URL del perfil</string>
@@ -256,12 +259,16 @@
     <string name="cuentas_priv_psn">¿Dónde pongo mi perfil de PSN en público?</string>
     <string name="cuentas_priv_steam">¿Dónde pongo mi perfil de Steam en público?</string>
     <string name="cuentas_priv_xbox">¿Dónde pongo mi historial de Xbox en público?</string>
+    <string name="cuentas_privada">Privada</string>
     <string name="cuentas_psn_1">Desde la consola (PS5/PS4): Ajustes → Usuarios y cuentas → Privacidad → Personalizar.</string>
     <string name="cuentas_psn_2">Busca \"Nivel de trofeos, juegos y vitrinas\" (o \"Trofeos\") y ponlo en \"Cualquiera\" / \"Todo el mundo\".</string>
     <string name="cuentas_psn_3">Desde el móvil: app de PlayStation → tu perfil → icono de ajustes → Privacidad de la cuenta → Trofeos.</string>
     <string name="cuentas_psn_4">El cambio es inmediato — no hace falta reiniciar sesión.</string>
     <string name="cuentas_seccion_login">INICIO DE SESIÓN (OAUTH)</string>
     <string name="cuentas_seccion_plataformas">PLATAFORMAS DE JUEGO</string>
+    <string name="cuentas_sincronizada_hace">sincronizada %1$s</string>
+    <string name="cuentas_sincronizando">Sincronizando…</string>
+    <string name="cuentas_sincronizar">Sincronizar</string>
     <string name="cuentas_steam_1">En tu perfil de Steam (web o cliente) → \"Editar perfil\" → \"Ajustes de privacidad\".</string>
     <string name="cuentas_steam_2">Pon \"Detalles de mi perfil\" en Público.</string>
     <string name="cuentas_steam_3">El que casi todo el mundo se salta: pon \"Detalles del juego\" TAMBIÉN en Público — sin él, Steam no deja leer tu biblioteca.</string>
@@ -269,6 +276,7 @@
     <string name="cuentas_steam_sync">Sincronizando tus logros de Steam… %1$s de %2$s juegos</string>
     <string name="cuentas_steam_sync_sub">Puedes seguir usando la app: los juegos irán mostrando sus logros.</string>
     <string name="cuentas_titulo">Cuentas Vinculadas</string>
+    <string name="cuentas_trofeos_nuevos">%1$s trofeos nuevos</string>
     <string name="cuentas_vinculada">Vinculada</string>
     <string name="cuentas_vinculado">Vinculado</string>
     <string name="cuentas_vincular">Vincular</string>

@@ -238,6 +238,8 @@
     <string name="comun_vale">OK</string>
     <string name="comun_volver">Back</string>
     <string name="comunidad_muro">Wall</string>
+    <string name="cuentas_al_dia">All up to date</string>
+    <string name="cuentas_cambiar">Change account</string>
     <string name="cuentas_conectar">Connect</string>
     <string name="cuentas_declarado">Self-reported progress · doesn\'t score</string>
     <string name="cuentas_desvincular">Unlink</string>
@@ -245,6 +247,7 @@
     <string name="cuentas_desvincular_texto">Your progress and saved trophies stay as they are, but syncing stops until you link the account again.</string>
     <string name="cuentas_desvincular_titulo">Unlink %1$s?</string>
     <string name="cuentas_epic_extension">Epic blocks requests from servers, so you link it from your computer with the Paragon browser extension: open your Epic achievements page and press Sync.</string>
+    <string name="cuentas_nivel">Level %1$s</string>
     <string name="cuentas_ph_otro">Public ID / Gamertag</string>
     <string name="cuentas_ph_psn">Your PSN Online ID</string>
     <string name="cuentas_ph_steam">Username, SteamID64 or profile URL</string>
@@ -254,12 +257,16 @@
     <string name="cuentas_priv_psn">Where do I make my PSN profile public?</string>
     <string name="cuentas_priv_steam">Where do I make my Steam profile public?</string>
     <string name="cuentas_priv_xbox">Where do I make my Xbox history public?</string>
+    <string name="cuentas_privada">Private</string>
     <string name="cuentas_psn_1">On the console (PS5/PS4): Settings → Users and Accounts → Privacy → Customise.</string>
     <string name="cuentas_psn_2">Find \"Trophy level, games and showcases\" (or \"Trophies\") and set it to \"Anyone\".</string>
     <string name="cuentas_psn_3">From your phone: PlayStation app → your profile → settings icon → Account privacy → Trophies.</string>
     <string name="cuentas_psn_4">The change is instant — no need to sign in again.</string>
     <string name="cuentas_seccion_login">SIGN-IN (OAUTH)</string>
     <string name="cuentas_seccion_plataformas">GAMING PLATFORMS</string>
+    <string name="cuentas_sincronizada_hace">synced %1$s</string>
+    <string name="cuentas_sincronizando">Syncing…</string>
+    <string name="cuentas_sincronizar">Sync</string>
     <string name="cuentas_steam_1">On your Steam profile (web or client) → \"Edit Profile\" → \"Privacy Settings\".</string>
     <string name="cuentas_steam_2">Set \"My profile\" to Public.</string>
     <string name="cuentas_steam_3">The one almost everyone misses: set \"Game details\" to Public TOO — without it, Steam won\'t let us read your library.</string>
@@ -267,6 +274,7 @@
     <string name="cuentas_steam_sync">Syncing your Steam achievements… %1$s of %2$s games</string>
     <string name="cuentas_steam_sync_sub">You can keep using the app: games will show their achievements as they arrive.</string>
     <string name="cuentas_titulo">Linked accounts</string>
+    <string name="cuentas_trofeos_nuevos">%1$s new trophies</string>
     <string name="cuentas_vinculada">Linked</string>
     <string name="cuentas_vinculado">Linked</string>
     <string name="cuentas_vincular">Link</string>
