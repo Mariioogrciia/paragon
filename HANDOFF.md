@@ -1,49 +1,60 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **4 de octubre de 2026**.
+releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
-**Estado actual (4 oct 2026) — léelo antes que nada:**
-- **Rediseño de toda la plataforma: terminado** (las 10 secciones, más
-  Noticias, Descubrir y sus páginas de plataforma, Cómo funciona, Cuentas de
-  juegos y el perfil de ejemplo). `DESIGN.md` y su sidecar ya recogen todo
-  (documentador relanzado el 1 oct). Detalle en "REDISEÑO DE TODA LA
-  PLATAFORMA".
-- **Epic Games**: el servidor ya no puede leerlo (Cloudflare, 403); se
-  sincroniza con la extensión del navegador (v1.1.0) y su progreso es
-  **declarado** (no puntúa en nada). Ver "Epic Games: extensión del
-  navegador y progreso declarado". Si se añade algo que puntúe o clasifique,
-  usar `noDeclaradoPorId`/`esDeclarada`.
-- **Trofeos en tu idioma + guías en vídeo por idioma** (3 oct): ver "Trofeos
-  en tu idioma y guías en vídeo por idioma". Tablas nuevas ya creadas en
-  producción (`scripts/crear-tablas-traducciones-trofeo.mts`).
-- **App Android: auditoría Impeccable + arreglos (4 oct, tarde)** — ver
-  "Auditoría de la app Android" al final. Seguridad del login, app en
-  es/en/de/fr, rail en tablet, accesibilidad, esqueletos, ETag/304.
-- **Git**: `master` va **varios commits por delante de `origin`** (idiomas
-  web + toda la tanda de Android), sin subir a la espera de que el usuario
-  lo pida. **Ojo al subir**: el login nuevo de la app exige servidor Y APK
-  nuevos a la vez (ver la sección de Android).
-  Fuera del repo siguen `.env.local`, `scratch/`, `.impeccable/` (rondas de
-  diseño y respuestas, nunca subidas) y el cambio local de
+**Estado actual (5 oct 2026) — léelo antes que nada:**
+- **Todo subido a `origin/master`** (último commit `fa47f50`; Vercel despliega
+  solo). Fuera del repo siguen `.env.local`, `scratch/`, `.impeccable/` (rondas
+  de diseño y respuestas, nunca subidas) y el cambio local de
   `.claude/launch.json` (ruta del certificado de Avast).
-- **Verificación**: `npx tsc --noEmit`, `npx eslint src` (0 errores, 41 avisos
-  de `<img>`), `npm test` (117 tests) y
-  `npx tsx scripts/comprobar-namespaces-cliente.mts`.
+- **⚠ Hace falta APK nueva**: el login de la app ahora entrega el token
+  cifrado (`?c=`) y el servidor ya no lo da en claro, así que la APK anterior
+  no puede volver a iniciar sesión (las sesiones abiertas siguen valiendo
+  hasta caducar). Compilar con `./gradlew assembleRelease` desde `android/`
+  (sale **sin firmar**: hace falta una clave propia para repartirla;
+  `versionCode 2 / 1.1`, R8 activo).
+- **Rediseño de toda la plataforma: terminado**, `DESIGN.md` al día. Ver
+  "REDISEÑO DE TODA LA PLATAFORMA".
+- **Epic Games**: solo por la extensión del navegador (Cloudflare bloquea al
+  servidor), progreso **declarado** (no puntúa). Ver "Epic Games: extensión
+  del navegador y progreso declarado"; usar `noDeclaradoPorId`/`esDeclarada`
+  en todo lo que puntúe o clasifique.
+- **Trofeos en tu idioma + guías en vídeo por idioma** (3 oct): ver su
+  sección. Tablas ya creadas en producción.
+- **App Android — tres tandas (4-5 oct)**, detalle en "Auditoría de la app
+  Android" al final: seguridad del login, app en es/en/de/fr con selector en
+  Ajustes → Idioma, icono P, apariencia igual que la web y sincronizada con
+  la cuenta (`/api/mobile/appearance`), Panel reordenado, R8, errores del
+  servidor traducidos, y las cuatro quejas del 5 oct (hito "faltan N",
+  logros de Steam por lotes, volver en clanes, guía del bot de Discord).
+- **Web**: selector de idioma visible en la cabecera también en móvil;
+  `/bot-discord` (guía pública) y Ajustes → Bot de Discord; `BackButton` en
+  clanes; "Reservar para el #N · faltan X".
+- **Verificación**: `npx tsc --noEmit`, `npx eslint src` (0 errores),
+  `npm test` (128 tests), `npx tsx scripts/comprobar-namespaces-cliente.mts`
+  y, en `android/`, `./gradlew compileDebugKotlin` + `lintDebug`
+  (con `JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"`).
 - **Pendiente / sin probar**:
-  - La extensión no está instalada de verdad en Chrome (solo probado el
-    script de lectura en una página real de Epic) y no está en ninguna
-    tienda: instalación manual en modo desarrollador.
-  - La app de Android, con sesión iniciada: no se ha podido probar en el
-    emulador (exige una cuenta real de Google/Discord). Solo el login.
-  - Lista de coleccionables para trofeos de "consigue todos" (ninguna
-    plataforma dice qué objeto falta); API oficial de YouTube (necesita
-    clave) si se quiere filtrar mejor por idioma.
-- **Trampas nuevas de estas tandas** (ya detalladas abajo): CSS sin `@layer`
-  gana a utilidades de Tailwind como `hidden`; `isMissable` empareja por el
-  nombre ORIGINAL en inglés (no sustituir antes de calcularlo); el servidor
-  de desarrollo y la sesión del navegador del panel se pierden al reiniciar
-  (pedir login de nuevo para verificar pantallas con sesión).
+  - **Logros de Steam por lotes**: solo compila y la UI en el emulador; falta
+    probarlo con una cuenta de Steam real (vincular y ver el banner avanzar).
+  - La app con datos reales: solo revisada con el **modo demo** (debug,
+    `adb shell run-as com.paragon.app touch files/modo_demo`); falta una
+    pasada con una cuenta real, el rail en tablet y una APK firmada.
+  - La extensión de Epic no está instalada de verdad en Chrome ni en
+    ninguna tienda (instalación manual en modo desarrollador).
+  - Lista de coleccionables para trofeos de "consigue todos"; API oficial de
+    YouTube (necesita clave) para filtrar mejor por idioma.
+  - Si el servidor no tiene `DISCORD_APPLICATION_ID`, la guía del bot no
+    enseña el botón de invitación (dice que aún no está configurado).
+- **Trampas** (ya detalladas abajo): CSS sin `@layer` gana a utilidades de
+  Tailwind como `hidden`; `isMissable` empareja por el nombre ORIGINAL en
+  inglés; el servidor de desarrollo y la sesión del navegador del panel se
+  pierden al reiniciar; **los textos de la app Android solo en
+  `android/i18n/textos.json`** (se generan los `strings.xml` con
+  `node android/i18n/generar.mjs`) y los errores nuevos de `/api/mobile`,
+  en `lib/mensajesApi.ts`; en Windows/Git Bash, `adb` con rutas `/data/...`
+  necesita `MSYS_NO_PATHCONV=1`.
 
 **Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
