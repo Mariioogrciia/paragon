@@ -4486,5 +4486,35 @@
   "en": "Scan QR code",
   "es": "Escanear QR",
   "fr": "Scanner un QR code"
+ },
+ "inicio_sigue_jugando": {
+  "de": "Weiterspielen",
+  "en": "Keep playing",
+  "es": "Sigue jugando",
+  "fr": "Continue à jouer"
+ },
+ "inicio_ver_todo": {
+  "de": "Alle ansehen",
+  "en": "See all",
+  "es": "Ver todo",
+  "fr": "Tout voir"
+ },
+ "inicio_para_hoy": {
+  "de": "Für heute",
+  "en": "For today",
+  "es": "Para hoy",
+  "fr": "Pour aujourd'hui"
+ },
+ "inicio_siguiente_platino_de": {
+  "de": "Nächstes Platin: {0}",
+  "en": "Next platinum: {0}",
+  "es": "Siguiente platino: {0}",
+  "fr": "Prochain platine : {0}"
+ },
+ "inicio_faltan_n": {
+  "de": "noch {0}",
+  "en": "{0} to go",
+  "es": "faltan {0}",
+  "fr": "encore {0}"
  }
 }

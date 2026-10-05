@@ -435,11 +435,16 @@
     <string name="icono_oro">Or</string>
     <string name="icono_paragon">Paragon</string>
     <string name="inicio_faltan">Encore %1$s trophées</string>
+    <string name="inicio_faltan_n">encore %1$s</string>
     <string name="inicio_hola">Salut, %1$s</string>
     <string name="inicio_ir">Go</string>
     <string name="inicio_objetivo_anclado">Ton objectif · épinglé</string>
+    <string name="inicio_para_hoy">Pour aujourd\'hui</string>
     <string name="inicio_proxima_sesion">Ta prochaine session</string>
+    <string name="inicio_sigue_jugando">Continue à jouer</string>
+    <string name="inicio_siguiente_platino_de">Prochain platine : %1$s</string>
     <string name="inicio_ver_todas">Tout voir</string>
+    <string name="inicio_ver_todo">Tout voir</string>
     <string name="liga_borrar">Supprimer cette ligue</string>
     <string name="liga_borrar_texto">« %1$s » disparaît pour tous ses membres, avec son classement et son défi. C\'est irréversible.</string>
     <string name="liga_borrar_titulo">Supprimer cette ligue ?</string>

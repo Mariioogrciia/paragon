@@ -12,6 +12,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Star
+import com.paragon.app.data.isoAMillis
+import com.paragon.app.util.fechaConPatron
+import com.paragon.app.util.numeroLocal
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -78,6 +85,7 @@ fun PanelScreen(
     racha: com.paragon.app.data.RachaGlobal = com.paragon.app.data.RachaGlobal(0, 0),
     onRacha: () -> Unit = {},
     onPerfil: () -> Unit = {},
+    onBiblioteca: () -> Unit = {},
     sharedTransitionScope: androidx.compose.animation.SharedTransitionScope? = null,
     animatedVisibilityScope: androidx.compose.animation.AnimatedVisibilityScope? = null,
 ) {
@@ -164,106 +172,107 @@ fun PanelScreen(
                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
                     )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                val ok = highlights as? HighlightsResult.Ok
-                val cercano = ok?.nearPlatinum?.firstOrNull()
-                val objetivo = pinnedGame?.toGameProgress() ?: cercano
-                val siguientes = ok?.nextTrophies.orEmpty()
-                val siguienteDelObjetivo = objetivo?.let { o -> siguientes.firstOrNull { it.gameId == o.id } }
-                val siguienteMostrado = siguienteDelObjetivo ?: siguientes.firstOrNull()
-                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                    val anclado = pinnedGame
-                    // Primero el objetivo — el juego anclado o, si no hay, el
-                    // platino más cercano — con el siguiente trofeo de ESE juego
-                    // si el recomendador lo trae (si no, el primero que haya).
-                    if (objetivo != null) {
-                        ObjetivoCard(
-                            game = objetivo,
-                            etiqueta = if (anclado != null) Textos.t(T.inicio_objetivo_anclado) else Textos.t(T.panel_siguiente_platino),
-                            siguiente = siguienteMostrado,
-                            onAbrir = { navController.navigate(Screen.GameDetail.routeFor((siguienteDelObjetivo?.gameId) ?: objetivo.id)) },
-                        )
-                    } else {
-                        when (val current = highlights) {
-                            null -> if (isInitialLoading) {
-                                com.paragon.app.ui.common.EsqueletoTarjetas(tarjetas = 1, alto = 208.dp, modifier = Modifier.fillMaxWidth().height(240.dp))
-                            }
-                            is HighlightsResult.Error -> Column {
-                                Text(text = current.message, color = Muted, fontSize = 13.sp)
-                                TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 4.dp)) {
-                                    Text(Textos.t(T.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                                }
-                            }
-                            is HighlightsResult.Ok -> Text(text = Textos.t(T.panel_un_paso_vacio), color = Muted, fontSize = 13.sp)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                // Diseño v2 (5 oct 2026, maqueta "01 · Inicio"): tres cifras, "Sigue
+                // jugando" con carátulas grandes y "Para hoy" como lista agrupada.
                 CifrasInicio(
                     nivel = userProfile.level,
                     platinos = globalStats.platinums,
                     trofeos = globalStats.trophies,
                     onPlatinos = { showConfetti = true },
                 )
-                proximaSesion?.let { s ->
-                    TituloSeccion(Textos.t(T.inicio_proxima_sesion), Textos.t(T.inicio_ver_todas)) { navController.navigate(Screen.Sessions.route) }
-                    ProximaSesionCard(s) { navController.navigate(Screen.SessionDetail.routeFor(s.id)) }
-                }
-                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                    val anclado = pinnedGame
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // Con un juego anclado arriba, el más cercano al platino pasa aquí.
-                    // (sin repetir el anclado si es justo ese).
-                    val otroCercano = (highlights as? HighlightsResult.Ok)?.nearPlatinum?.firstOrNull { it.id != anclado?.id }
-                    if (anclado != null && otroCercano != null) {
-                        Text(text = Textos.t(T.panel_un_paso), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        Text(
-                            text = Textos.t(T.panel_un_paso_sub),
-                            color = Muted,
-                            fontSize = 13.sp,
-                            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
-                        )
-                        HeroGameCard(
-                            game = otroCercano,
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(otroCercano.id)) },
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedVisibilityScope = animatedVisibilityScope,
-                        )
-                        Spacer(modifier = Modifier.height(32.dp))
-                    }
-
-                    // Siguiente trofeo — mismo recomendador que la portada web
-                    // (lib/recommendations.ts): ya lo mandaba el backend desde
-                    // hace tiempo (/api/mobile/panel/highlights, campo
-                    // `nextTrophies`), pero el móvil lo descartaba al parsear.
-                    // El primero ya va en "Tu objetivo": aquí, los demás.
-                    val nextTrophies = (highlights as? HighlightsResult.Ok)?.nextTrophies.orEmpty().filter { it !== siguienteMostrado }.take(2)
-                    if (nextTrophies.isNotEmpty()) {
-                        Text(
-                            text = Textos.t(T.panel_siguiente),
-                            color = Foreground,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = Textos.t(T.panel_siguiente_sub),
-                            color = Muted,
-                            fontSize = 13.sp,
-                            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
-                        )
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            nextTrophies.forEach { trofeo ->
-                                NextTrophyCard(
-                                    trophy = trofeo,
-                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId)) },
-                                )
-                            }
+                val ok = highlights as? HighlightsResult.Ok
+                val recientes = ok?.recent.orEmpty()
+                if (recientes.isNotEmpty()) {
+                    TituloSeccion(Textos.t(T.inicio_sigue_jugando), Textos.t(T.inicio_ver_todo)) { onBiblioteca() }
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp),
+                    ) {
+                        items(recientes, key = { it.id }) { game ->
+                            TarjetaSigueJugando(
+                                game = game,
+                                onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
+                                sharedTransitionScope = sharedTransitionScope,
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            )
                         }
-                        Spacer(modifier = Modifier.height(32.dp))
                     }
+                } else if (highlights == null && isInitialLoading) {
+                    com.paragon.app.ui.common.EsqueletoTarjetas(tarjetas = 1, alto = 280.dp, modifier = Modifier.padding(top = 24.dp).fillMaxWidth().height(300.dp))
+                }
 
-                    // Lo secundario: cerrojo de hitos, meta de platinos y rival.
+                val cercano = ok?.nearPlatinum?.firstOrNull()
+                val objetivo = pinnedGame?.toGameProgress() ?: cercano
+                val siguientes = ok?.nextTrophies.orEmpty()
+                val siguienteDelObjetivo = objetivo?.let { o -> siguientes.firstOrNull { it.gameId == o.id } }
+                val otrosSiguientes = siguientes.filter { it !== siguienteDelObjetivo }.take(2)
+                TituloSeccion(Textos.t(T.inicio_para_hoy))
+                val filas = mutableListOf<@Composable () -> Unit>()
+                objetivo?.let { o ->
+                    filas += {
+                        val faltan = (o.totalTrophies - o.earnedTrophies).coerceAtLeast(0)
+                        com.paragon.app.ui.common.FilaNativa(
+                            icono = Icons.Default.EmojiEvents,
+                            titulo = Textos.t(T.inicio_siguiente_platino_de, o.title),
+                            subtitulo = listOfNotNull(
+                                Textos.t(T.inicio_faltan_n, faltan),
+                                siguienteDelObjetivo?.trophyName,
+                            ).joinToString(" · "),
+                            valor = "${o.percent}%",
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(o.id)) },
+                        )
+                    }
+                }
+                proximaSesion?.let { sesion ->
+                    filas += {
+                        val millis = isoAMillis(sesion.fechaHora)
+                        com.paragon.app.ui.common.FilaNativa(
+                            icono = Icons.Default.Groups,
+                            titulo = sesion.trofeo,
+                            subtitulo = listOfNotNull(sesion.juego.titulo, millis?.let { fechaConPatron(it, "EEEHHmm") }).joinToString(" · "),
+                            valor = "${sesion.ocupadas}/${sesion.plazasTotales}",
+                            onClick = { navController.navigate(Screen.SessionDetail.routeFor(sesion.id)) },
+                        )
+                    }
+                }
+                otrosSiguientes.forEach { trofeo ->
+                    filas += {
+                        com.paragon.app.ui.common.FilaNativa(
+                            icono = Icons.Default.Star,
+                            titulo = trofeo.trophyName,
+                            subtitulo = listOfNotNull(
+                                trofeo.gameTitle,
+                                trofeo.rarityPercent?.let { "${numeroLocal(it, 1)} %" },
+                            ).joinToString(" · "),
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId)) },
+                        )
+                    }
+                }
+                filas += {
+                    com.paragon.app.ui.common.FilaNativa(
+                        icono = Icons.Default.Lock,
+                        titulo = Textos.t(T.nav_atascados_menu),
+                        onClick = { navController.navigate(Screen.StuckTrophies.route) },
+                    )
+                }
+                com.paragon.app.ui.common.GrupoNativo(modifier = Modifier.padding(horizontal = 20.dp)) {
+                    filas.forEachIndexed { i, fila ->
+                        if (i > 0) com.paragon.app.ui.common.SeparadorFila()
+                        fila()
+                    }
+                }
+                (highlights as? HighlightsResult.Error)?.let { e ->
+                    Row(Modifier.padding(horizontal = 24.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = e.message, color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { retryCounter.value += 1 }) {
+                            Text(Textos.t(T.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        }
+                    }
+                }
+
+                // Lo secundario: cerrojo de hitos, meta de platinos y rival.
+                Column(modifier = Modifier.padding(horizontal = 20.dp).padding(top = 28.dp)) {
                     hito?.let { h ->
                         MilestoneBanner(hito = h, onClick = { navController.navigate(Screen.GameDetail.routeFor(h.gameId)) })
                         Spacer(modifier = Modifier.height(12.dp))
@@ -283,34 +292,10 @@ fun PanelScreen(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // Jugado recientemente
-                    Text(
-                        text = Textos.t(T.panel_recientes),
-                        color = Foreground,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    // Hueco para la barra flotante.
+                    Spacer(modifier = Modifier.height(72.dp))
                 }
             } }
-
-            // Carrusel horizontal
-            item {
-                val recentGames = (highlights as? HighlightsResult.Ok)?.recent.orEmpty()
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(horizontal = 24.dp)
-                ) {
-                    items(recentGames, key = { it.id }) { game ->
-                        StandardGameCard(
-                            game = game,
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) }
-                        )
-                    }
-                }
-            }
         }
     }
 

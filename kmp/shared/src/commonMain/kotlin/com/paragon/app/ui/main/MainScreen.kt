@@ -312,6 +312,7 @@ fun MainScreen(
                     racha = racha,
                     onRacha = { showRachaSheet = true },
                     onPerfil = { irA(BottomNavItem.Perfil) },
+                    onBiblioteca = { irA(BottomNavItem.Library) },
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 ) 

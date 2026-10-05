@@ -249,3 +249,48 @@ fun ProximaSesionCard(s: SesionDto, onClick: () -> Unit) {
         Text("${s.ocupadas}/${s.plazasTotales}", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
     }
 }
+
+/**
+ * "Sigue jugando" de Inicio (diseño v2): carátula grande con la plataforma
+ * arriba y, abajo, título, barra y lo que falta. La carátula vuela a la Ficha
+ * al abrirla (misma clave de transición que la Biblioteca).
+ */
+@OptIn(androidx.compose.animation.ExperimentalSharedTransitionApi::class)
+@Composable
+fun TarjetaSigueJugando(
+    game: GameProgress,
+    onClick: () -> Unit,
+    sharedTransitionScope: androidx.compose.animation.SharedTransitionScope? = null,
+    animatedVisibilityScope: androidx.compose.animation.AnimatedVisibilityScope? = null,
+) {
+    val faltan = (game.totalTrophies - game.earnedTrophies).coerceAtLeast(0)
+    Box(
+        Modifier.width(232.dp).height(296.dp).clip(RoundedCornerShape(radio(22))).background(Surface2)
+            .premiumClickable(onClick = onClick),
+    ) {
+        val portada = Modifier.fillMaxSize().let { base ->
+            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                with(sharedTransitionScope) {
+                    base.sharedElement(rememberSharedContentState(key = "game-cover-${game.id}"), animatedVisibilityScope = animatedVisibilityScope)
+                }
+            } else base
+        }
+        GameCover(coverUrl = game.coverUrl, title = game.title, modifier = portada)
+        Column(
+            Modifier.align(Alignment.BottomStart).fillMaxWidth().background(Background.copy(alpha = 0.86f)).padding(horizontal = 16.dp, vertical = 14.dp),
+        ) {
+            Text(game.title, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Box(Modifier.padding(top = 8.dp).fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(Border)) {
+                Box(Modifier.fillMaxWidth(game.percent.coerceIn(0, 100) / 100f).height(6.dp).background(Accent))
+            }
+            Text(
+                if (faltan == 0) "${game.percent}%" else Textos.t(T.biblio_pct_restantes, game.percent, faltan),
+                color = Muted,
+                fontSize = 12.sp,
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+        }
+    }
+}
