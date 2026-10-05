@@ -345,6 +345,9 @@
     <string name="ficha_anclar">Pin as goal</string>
     <string name="ficha_atascar">Mark as stuck</string>
     <string name="ficha_buscar_guia">Find guide</string>
+    <string name="ficha_cifra_horas">Played</string>
+    <string name="ficha_cifra_platino">Platinum ETA</string>
+    <string name="ficha_cifra_progreso">Progress</string>
     <string name="ficha_compartir_platino">Share platinum</string>
     <string name="ficha_cronologia">Timeline</string>
     <string name="ficha_declarado">Self-reported progress · doesn\'t count for levels or rankings</string>

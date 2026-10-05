@@ -347,6 +347,9 @@
     <string name="ficha_anclar">Anclar objetivo</string>
     <string name="ficha_atascar">Atascar</string>
     <string name="ficha_buscar_guia">Buscar Guía</string>
+    <string name="ficha_cifra_horas">Jugadas</string>
+    <string name="ficha_cifra_platino">Platino previsto</string>
+    <string name="ficha_cifra_progreso">Progreso</string>
     <string name="ficha_compartir_platino">Compartir Platino</string>
     <string name="ficha_cronologia">Cronología</string>
     <string name="ficha_declarado">Progreso declarado · no puntúa en niveles ni rankings</string>

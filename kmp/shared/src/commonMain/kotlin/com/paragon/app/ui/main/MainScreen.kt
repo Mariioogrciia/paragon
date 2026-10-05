@@ -494,6 +494,7 @@ fun MainScreen(
                     tokenStore = tokenStore,
                     handle = profile.handle,
                     onBack = { navController.popBackStack() },
+                    onModoEnfoque = { navController.navigate(Screen.Focus.route) },
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )

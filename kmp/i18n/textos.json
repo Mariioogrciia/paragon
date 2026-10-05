@@ -4234,5 +4234,23 @@
   "en": "{0}% · {1} to go",
   "es": "{0}% · faltan {1}",
   "fr": "{0}% · encore {1}"
+ },
+ "ficha_cifra_progreso": {
+  "de": "Fortschritt",
+  "en": "Progress",
+  "es": "Progreso",
+  "fr": "Progression"
+ },
+ "ficha_cifra_platino": {
+  "de": "Platin voraussichtl.",
+  "en": "Platinum ETA",
+  "es": "Platino previsto",
+  "fr": "Platine prévu"
+ },
+ "ficha_cifra_horas": {
+  "de": "Gespielt",
+  "en": "Played",
+  "es": "Jugadas",
+  "fr": "Jouées"
  }
 }

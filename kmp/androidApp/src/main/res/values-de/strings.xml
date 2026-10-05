@@ -345,6 +345,9 @@
     <string name="ficha_anclar">Als Ziel anheften</string>
     <string name="ficha_atascar">Als festgefahren markieren</string>
     <string name="ficha_buscar_guia">Guide suchen</string>
+    <string name="ficha_cifra_horas">Gespielt</string>
+    <string name="ficha_cifra_platino">Platin voraussichtl.</string>
+    <string name="ficha_cifra_progreso">Fortschritt</string>
     <string name="ficha_compartir_platino">Platin teilen</string>
     <string name="ficha_cronologia">Zeitleiste</string>
     <string name="ficha_declarado">Selbst gemeldeter Fortschritt · zählt nicht für Stufen oder Ranglisten</string>

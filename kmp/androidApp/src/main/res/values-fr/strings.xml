@@ -345,6 +345,9 @@
     <string name="ficha_anclar">Épingler comme objectif</string>
     <string name="ficha_atascar">Marquer comme bloqué</string>
     <string name="ficha_buscar_guia">Chercher un guide</string>
+    <string name="ficha_cifra_horas">Jouées</string>
+    <string name="ficha_cifra_platino">Platine prévu</string>
+    <string name="ficha_cifra_progreso">Progression</string>
     <string name="ficha_compartir_platino">Partager le platine</string>
     <string name="ficha_cronologia">Chronologie</string>
     <string name="ficha_declarado">Progression déclarée · ne compte ni pour les niveaux ni pour les classements</string>

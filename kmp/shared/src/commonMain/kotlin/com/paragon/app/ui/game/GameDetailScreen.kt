@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -96,6 +97,7 @@ fun GameDetailScreen(
     tokenStore: TokenStore,
     handle: String = "",
     onBack: () -> Unit = {},
+    onModoEnfoque: () -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
@@ -154,6 +156,7 @@ fun GameDetailScreen(
             handle = handle,
             repository = repository,
             onBack = onBack,
+            onModoEnfoque = onModoEnfoque,
             onMilestoneChanged = { retryCounter.value += 1 },
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
@@ -173,6 +176,7 @@ private fun GameDetailContent(
     handle: String,
     repository: GameDetailRepository,
     onBack: () -> Unit,
+    onModoEnfoque: () -> Unit,
     onMilestoneChanged: () -> Unit,
     sharedTransitionScope: SharedTransitionScope?,
     animatedVisibilityScope: AnimatedVisibilityScope?,
@@ -246,6 +250,7 @@ private fun GameDetailContent(
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
     val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
 
+    Box(Modifier.fillMaxSize()) {
     LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background)) {
         item {
             GameDetailHero(
@@ -327,7 +332,29 @@ private fun GameDetailContent(
             }
         }
 
-        item { Spacer(Modifier.height(32.dp)) }
+        // Hueco para el botón de abajo (no tapar el último trofeo).
+        item { Spacer(Modifier.height(104.dp)) }
+    }
+
+    // "Modo Enfoque" en la zona del pulgar (maqueta "3 · Ficha"): ancla el
+    // juego si no lo estaba (el Enfoque trabaja con el anclado) y lo abre.
+    androidx.compose.material3.Button(
+        onClick = {
+            if (!pinned) togglePin()
+            onModoEnfoque()
+        },
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Accent, contentColor = com.paragon.app.ui.theme.OnAccent),
+        shape = RoundedCornerShape(radio(28)),
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .fillMaxWidth()
+            .height(56.dp)
+            .shadow(12.dp, RoundedCornerShape(radio(28)), ambientColor = Accent.copy(alpha = 0.3f), spotColor = Accent.copy(alpha = 0.3f)),
+    ) {
+        Text(Textos.t(T.nav_enfoque), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
     }
 
     if (showCollections) {
@@ -370,122 +397,101 @@ private fun GameDetailHero(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     scrollOffset: Float = 0f,
 ) {
-    Box(modifier = Modifier.fillMaxWidth().height(320.dp)) {
-        AsyncImage(
-            model = game.coverUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().graphicsLayer {
-                translationY = scrollOffset * 0.4f
-            },
-            alpha = 0.35f,
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(colors = listOf(Color.Transparent, Background)))
-        )
-        IconButton(onClick = onBack, modifier = Modifier.padding(12.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
-        }
-        Row(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            val coverModifier = Modifier
-                .width(96.dp)
-                .height(136.dp)
-                .clip(RoundedCornerShape(radio(12)))
-                .background(Surface)
-                .let { base ->
-                    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-                        with(sharedTransitionScope) {
-                            base.sharedElement(
-                                rememberSharedContentState(key = "game-cover-${game.id}"),
-                                animatedVisibilityScope = animatedVisibilityScope,
-                            )
-                        }
-                    } else base
-                }
+    // Rediseño del 5 oct 2026 (maqueta "3 · Ficha del juego"): la portada a
+    // todo lo ancho con un velo del color de fondo del tema, el título grande
+    // abajo y, debajo de la portada, tres cifras (el valor por delante de la
+    // etiqueta) y la barra de progreso.
+    Column {
+        Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+            val coverModifier = Modifier.fillMaxSize().graphicsLayer { translationY = scrollOffset * 0.4f }.let { base ->
+                if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                    with(sharedTransitionScope) {
+                        base.sharedElement(
+                            rememberSharedContentState(key = "game-cover-${game.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                        )
+                    }
+                } else base
+            }
             AsyncImage(
                 model = game.coverUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = coverModifier,
             )
-            Spacer(Modifier.width(20.dp))
-            Column {
-                Text(
-                    text = game.title,
-                    color = Foreground,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.verticalGradient(colors = listOf(Background.copy(alpha = 0.35f), Color.Transparent, Background)))
+            )
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.padding(16.dp).size(44.dp).clip(RoundedCornerShape(radio(22))).background(Background.copy(alpha = 0.6f)),
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
+            }
+            Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 24.dp, vertical = 16.dp)) {
                 if (fromCache) {
-                    Text(
-                        text = Textos.t(T.comun_sin_conexion_copia),
-                        color = Muted,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
+                    Text(text = Textos.t(T.comun_sin_conexion_copia), color = Muted, fontSize = 11.sp)
                 }
-                Text(
-                    text = Textos.t(T.ficha_progreso, game.earnedTrophies, game.totalTrophies, game.percent),
-                    color = Muted,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 6.dp, bottom = 12.dp),
-                )
                 if (game.id.startsWith("epic-")) {
                     // Mismo aviso que MarcaDeclarado en la web: Epic solo se lee
                     // desde la extensión del navegador y no se puede comprobar.
-                    Text(
-                        text = Textos.t(T.ficha_declarado),
-                        color = Muted,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(bottom = 10.dp),
-                    )
+                    Text(text = Textos.t(T.ficha_declarado), color = Muted, fontSize = 12.sp)
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .background(Surface2, RoundedCornerShape(radio(4))),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(game.percent / 100f)
-                            .fillMaxHeight()
-                            .background(dynamicColor, RoundedCornerShape(radio(4))),
-                    )
-                }
-                // Total acumulado, no por sesión — la plataforma no da más
-                // detalle que eso (ver el comentario de horasPorJuego en
-                // lib/profileStats.ts, en el proyecto Next.js). `null` si la
-                // plataforma no lo reporta (algunos juegos manuales, o
-                // cuentas recién vinculadas sin sincronizar del todo).
-                game.playtimeMinutes?.let { minutos ->
-                    Text(
-                        text = Textos.t(T.ficha_horas, minutos / 60),
-                        color = Muted,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 8.dp),
-                    )
-                }
-                prediccion?.let {
-                    Text(
-                        text = Textos.t(T.ficha_prediccion, fechaPrediccion(it.fechaMillis)),
-                        color = Muted,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                }
+                Text(
+                    text = game.title,
+                    color = Foreground,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 32.sp,
+                    maxLines = 3,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                )
             }
+        }
+        Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            CifraFicha("${game.percent}%", Textos.t(T.ficha_cifra_progreso), Modifier.weight(1f), color = dynamicColor)
+            CifraFicha("${game.earnedTrophies}/${game.totalTrophies}", Textos.t(T.comun_trofeos), Modifier.weight(1f))
+            when {
+                prediccion != null -> CifraFicha(fechaConPatron(prediccion.fechaMillis, "dMMM"), Textos.t(T.ficha_cifra_platino), Modifier.weight(1f))
+                game.playtimeMinutes != null -> CifraFicha("${game.playtimeMinutes / 60} h", Textos.t(T.ficha_cifra_horas), Modifier.weight(1f))
+                else -> Spacer(Modifier.weight(1f))
+            }
+        }
+        Box(
+            modifier = Modifier
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 8.dp)
+                .fillMaxWidth()
+                .height(8.dp)
+                .background(Surface2, RoundedCornerShape(radio(4))),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(game.percent / 100f)
+                    .fillMaxHeight()
+                    .background(dynamicColor, RoundedCornerShape(radio(4))),
+            )
         }
     }
 }
 
+@Composable
+private fun CifraFicha(valor: String, etiqueta: String, modifier: Modifier, color: Color = Foreground) {
+    Column(modifier) {
+        Text(
+            valor,
+            color = color,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+            maxLines = 1,
+        )
+        Text(etiqueta, color = Muted, fontSize = 12.sp, maxLines = 1)
+    }
+}
+
 // Formatos de fecha del idioma del teléfono (antes fijos en español).
-private fun fechaPrediccion(millis: Long): String = fechaConPatron(millis, "EEEEdMMMM")
 
 
 /** "23 jun 2026" a partir del ISO real de earnedAt — para la fecha de cada fila de la Cronología. */
