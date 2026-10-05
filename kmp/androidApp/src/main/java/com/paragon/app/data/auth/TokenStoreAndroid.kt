@@ -11,5 +11,4 @@ import com.russhwolf.settings.SharedPreferencesSettings
  * copias de seguridad y de la transferencia entre dispositivos
  * (res/xml/backup_rules.xml y data_extraction_rules.xml).
  */
-fun TokenStore(context: Context): TokenStore =
-    TokenStore(SharedPreferencesSettings(context.getSharedPreferences("paragon_auth", Context.MODE_PRIVATE)))
+fun TokenStore(context: Context): TokenStore = com.paragon.shared.sesion.crearTokenStore(context)

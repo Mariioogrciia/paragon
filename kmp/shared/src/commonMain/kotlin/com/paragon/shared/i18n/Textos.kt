@@ -48,6 +48,6 @@ object Textos {
     private val HUECO = Regex("""\{(\d+)\}""")
 }
 
-/** Equivalente común de `stringResource(R.string.x, ...)`. */
+/** Equivalente común de `Textos.t(T.x, ...)`. */
 @Composable
 fun stringResource(texto: Texto, vararg args: Any?): String = Textos.t(texto, *args)

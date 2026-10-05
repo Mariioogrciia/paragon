@@ -86,6 +86,7 @@ class ComposeMainActivity : AppCompatActivity() {
                 AppRoot(
                     tokenStore = tokenStore,
                     themeStore = themeStore,
+                    database = com.paragon.app.data.local.ParagonDatabase.getDatabase(this@ComposeMainActivity),
                     refreshKey = refresh,
                     onLoginRequested = { provider -> openLogin(provider) },
                 )

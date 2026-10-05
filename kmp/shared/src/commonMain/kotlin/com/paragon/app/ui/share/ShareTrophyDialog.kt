@@ -1,0 +1,115 @@
+package com.paragon.app.ui.share
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import com.paragon.shared.contextoPlataforma
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.paragon.app.ui.theme.Accent
+import com.paragon.app.ui.theme.Muted
+import com.paragon.app.ui.theme.Surface
+import com.paragon.app.util.compartirImagen
+import kotlinx.coroutines.launch
+import com.paragon.shared.i18n.T
+import com.paragon.shared.i18n.Textos
+
+import com.paragon.app.ui.theme.radio
+
+/**
+ * Preview + captura de la tarjeta de Platino (ver `TrophyShareCard.kt`) para
+ * compartir — abierta desde `GameDetailScreen.kt` cuando el juego ya tiene
+ * el platino conseguido. `rememberGraphicsLayer` + `drawWithContent` es la
+ * forma real de capturar un Composable a bitmap desde Compose 1.7+ (llegó
+ * en el mismo BOM que ya subimos para las transiciones compartidas) — sin
+ * esto habría hecho falta la vía antigua de `View.drawToBitmap`, mucho más
+ * frágil con `AsyncImage`/Coil de por medio.
+ */
+@Composable
+fun ShareTrophyDialog(
+    coverUrl: String,
+    gameTitle: String,
+    handle: String,
+    earnedTrophies: Int? = null,
+    totalTrophies: Int? = null,
+    badge: String = Textos.t(T.comparte_badge_platino),
+    subtitle: String? = null,
+    onDismiss: () -> Unit,
+) {
+    val context = contextoPlataforma()
+    val coroutineScope = rememberCoroutineScope()
+    val graphicsLayer = rememberGraphicsLayer()
+
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(radio(24)))
+                .background(Surface)
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            TrophyShareCard(
+                coverUrl = coverUrl,
+                gameTitle = gameTitle,
+                earnedTrophies = earnedTrophies,
+                totalTrophies = totalTrophies,
+                handle = handle,
+                badge = badge,
+                subtitle = subtitle,
+                modifier = Modifier
+                    .width(260.dp)
+                    .drawWithContent {
+                        // Se graba el mismo dibujado que ya se ve en pantalla
+                        // — nada especial "invisible", la tarjeta del diálogo
+                        // ES la fuente de la imagen que se comparte.
+                        graphicsLayer.record { this@drawWithContent.drawContent() }
+                        drawLayer(graphicsLayer)
+                    },
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        compartirImagen(context, graphicsLayer.toImageBitmap())
+                        onDismiss()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(Textos.t(T.comun_compartir))
+            }
+
+            TextButton(onClick = onDismiss, modifier = Modifier.padding(top = 4.dp)) {
+                Text(Textos.t(T.comun_cerrar), color = Muted)
+            }
+        }
+    }
+}
+
+

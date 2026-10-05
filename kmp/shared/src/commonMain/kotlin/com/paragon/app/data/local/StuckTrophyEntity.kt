@@ -12,5 +12,5 @@ data class StuckTrophyEntity(
     val trophyDetail: String,
     val trophyGrade: String?, // "PLATINUM", "GOLD", "SILVER", "BRONZE"
     val coverUrl: String,
-    val addedAt: Long = System.currentTimeMillis()
+    val addedAt: Long = com.paragon.app.data.ahoraMillis()
 )
