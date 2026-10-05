@@ -793,6 +793,7 @@ h3,
 .guia-fila:last-child { border-bottom: 0; }
 .guia-fila:hover { background: rgb(var(--accent-rgb) / 0.05); }
 .guia-fila[data-hecho] .guia-nombre, .guia-fila[data-hecho] img { opacity: 0.55; }
+.guia-fila[data-sin-atenuar] .guia-nombre, .guia-fila[data-sin-atenuar] img { opacity: 1; }
 .guia-casilla {
   display: flex; height: 20px; width: 20px; align-items: center; justify-content: center;
   border: 2px solid var(--muted); border-radius: 4px; color: var(--background);

@@ -2,20 +2,53 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { TrophyPhoto } from "@/components/TrophyList";
-import { rarity, relativeDate } from "@/lib/design";
+import { FilaLista, TarjetaCuadricula } from "@/components/TrophyList";
+import { TrophyGuideModal } from "@/components/TrophyGuideModal";
+import { TrophyTimeline } from "@/components/TrophyTimeline";
+import { TrophyTree } from "@/components/TrophyTree";
+import { SelectorVistaTrofeos, useVistaTrofeos } from "@/components/VistasTrofeos";
 import type { DesgloseMes, TrofeoDelMes } from "@/lib/history";
+import type { Trophy } from "@/lib/types";
+
+/** Un trofeo del mes con la forma de los de la ficha del juego, para pintarlo con las mismas vistas. */
+interface TrofeoMes {
+  /** `gameId:trophyId`: el id de un trofeo solo es único dentro de su juego. */
+  clave: string;
+  gameId: string;
+  juego: string;
+  dia: string;
+  trophy: Trophy;
+}
+
+function aTrofeoMes(tr: TrofeoDelMes): TrofeoMes {
+  return {
+    clave: `${tr.gameId}:${tr.trophyId}`,
+    gameId: tr.gameId,
+    juego: tr.juego,
+    dia: tr.earnedAt.slice(0, 10),
+    trophy: {
+      id: tr.trophyId,
+      name: tr.nombre,
+      detail: tr.detalle,
+      grade: tr.grade ?? undefined,
+      earned: true,
+      earnedAt: tr.earnedAt,
+      rarityPercent: tr.rarityPercent ?? undefined,
+      iconUrl: tr.iconUrl ?? undefined,
+    },
+  };
+}
 
 /**
- * Calendario del mes + lista de trofeos de `/ritmo`, como un único
- * componente cliente.
+ * Calendario del mes + trofeos de `/ritmo`, como un único componente
+ * cliente: el filtro por día es estado local (todos los trofeos del mes ya
+ * están en memoria), sin viaje al servidor.
  *
- * El filtro por día antes vivía en la URL (`?dia=`) y recargaba la página
- * en el servidor al pinchar una barra — con todos los trofeos del mes ya
- * en memoria (los mismos que llegan aquí), ese viaje de ida y vuelta no
- * aportaba nada más que esperar: el filtrado es puramente local, así que
- * ahora es estado de React y se aplica al instante, sin spinner porque no
- * hay nada que cargar.
+ * Los trofeos se ven con las MISMAS cuatro vistas que en la ficha de un
+ * juego (components/VistasTrofeos.tsx), con sus mismas filas y tarjetas:
+ * lista y cuadrícula agrupadas por día (como la ficha agrupa por DLC), árbol
+ * uno por juego (su forma solo tiene sentido dentro de un juego) y la
+ * cronología de todo el mes. Tocar un trofeo abre su guía, igual que allí.
  */
 export function RitmoTrophyList({
   porDia,
@@ -27,13 +60,18 @@ export function RitmoTrophyList({
   const idioma = useLocale();
   const t = useTranslations("Analitica.ritmoPage");
   const [dia, setDia] = useState<string | null>(null);
-  const [vista, setVista] = useState<"lista" | "cuadricula">("lista");
+  const [vista, setVista] = useVistaTrofeos();
+  const [activo, setActivo] = useState<TrofeoMes | null>(null);
 
   const maxDia = Math.max(...porDia.map((d) => d.total), 1);
   const trofeos = useMemo(
-    () => (dia ? trofeosDelMes.filter((tr) => tr.earnedAt.startsWith(dia)) : trofeosDelMes),
+    () => (dia ? trofeosDelMes.filter((tr) => tr.earnedAt.startsWith(dia)) : trofeosDelMes).map(aTrofeoMes),
     [dia, trofeosDelMes],
   );
+  const porDiaAgrupado = useMemo(() => agrupar(trofeos, (m) => m.dia), [trofeos]);
+  const porJuego = useMemo(() => agrupar(trofeos, (m) => m.gameId), [trofeos]);
+  const fechaDia = (d: string) =>
+    new Date(`${d}T12:00:00Z`).toLocaleDateString(idioma, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 
   return (
     <>
@@ -103,116 +141,75 @@ export function RitmoTrophyList({
             <h2 className="font-heading text-2xl font-bold">{t("oneByOne")}</h2>
             <span className="text-[0.8125rem] text-muted">{t("trophyCount", { count: trofeos.length })}</span>
           </div>
-
-          <div
-            className="inline-flex gap-1 rounded-[10px] p-1"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            <ViewButton active={vista === "lista"} onClick={() => setVista("lista")} label={t("viewList")}>
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </ViewButton>
-            <ViewButton active={vista === "cuadricula"} onClick={() => setVista("cuadricula")} label={t("viewGrid")}>
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </ViewButton>
-          </div>
+          <SelectorVistaTrofeos vista={vista} onChange={setVista} />
         </div>
 
-        {vista === "lista" ? (
-          <div className="space-y-2">
-            {trofeos.map((trofeo) => {
-              const r = trofeo.rarityPercent !== null ? rarity(trofeo.rarityPercent, idioma) : null;
-
-              return (
-                <div
-                  key={`${trofeo.gameId}-${trofeo.trophyId}`}
-                  className="flex items-center gap-3.5 rounded-xl p-3.5"
-                  style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                >
-                  <TrophyPhoto trophy={trofeo} size={38} />
-
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[0.875rem] font-semibold">{trofeo.nombre}</p>
-                    <p className="truncate text-[0.75rem] text-muted">
-                      {trofeo.juego}
-                      {trofeo.detalle && ` · ${trofeo.detalle}`}
-                    </p>
-                  </div>
-
-                  {r && (
-                    <span
-                      className="hidden shrink-0 rounded-full px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-[0.08em] sm:inline-block"
-                      style={{ background: r.bg, color: r.fg }}
-                    >
-                      {trofeo.rarityPercent!.toFixed(1)}%
-                    </span>
-                  )}
-
-                  <span className="shrink-0 text-right text-[0.6875rem] text-muted">
-                    {t("dayShort", { dia: new Date(trofeo.earnedAt).getUTCDate() })}
-                    <span className="block">{relativeDate(trofeo.earnedAt, idioma)}</span>
-                  </span>
+        {vista === "arbol" ? (
+          <div className="space-y-6">
+            {porJuego.map(([gameId, lista]) => (
+              <div key={gameId}>
+                <Cabecera titulo={lista[0].juego} total={lista.length} />
+                <div className="overflow-hidden rounded-[20px] border border-[#1f2937] bg-[#0a0d14] shadow-lg">
+                  <TrophyTree
+                    trophies={lista.map((m) => m.trophy)}
+                    onTrophyClick={(tr) => setActivo(lista.find((m) => m.trophy.id === tr.id) ?? null)}
+                  />
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
+        ) : vista === "cronologia" ? (
+          // Mezcla juegos: id compuesto para que dos "trofeo 1" de juegos distintos no choquen.
+          <TrophyTimeline trophies={trofeos.map((m) => ({ ...m.trophy, id: m.clave }))} />
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-3">
-            {trofeos.map((trofeo) => (
-              <div
-                key={`${trofeo.gameId}-${trofeo.trophyId}`}
-                className="flex flex-col items-center gap-2 rounded-xl p-3 text-center"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                title={`${trofeo.nombre} · ${trofeo.juego}`}
-              >
-                <TrophyPhoto trophy={trofeo} size={56} />
-                <p className="line-clamp-2 text-[0.6875rem] font-semibold leading-tight">{trofeo.nombre}</p>
-                <p className="truncate text-[0.625rem] text-muted" style={{ maxWidth: "100%" }}>
-                  {trofeo.juego}
-                </p>
+          <div className="space-y-8">
+            {porDiaAgrupado.map(([d, lista]) => (
+              <div key={d}>
+                <Cabecera titulo={fechaDia(d)} total={lista.length} />
+                {vista === "lista" ? (
+                  <ul className="guia-lista">
+                    {lista.map((m) => (
+                      <FilaLista key={m.clave} trophy={m.trophy} juego={m.juego} atenuarHechos={false} onClick={() => setActivo(m)} />
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:gap-3">
+                    {lista.map((m) => (
+                      <TarjetaCuadricula key={m.clave} trophy={m.trophy} juego={m.juego} onClick={() => setActivo(m)} />
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </section>
+
+      {activo && (
+        <TrophyGuideModal gameTitle={activo.juego} gameId={activo.gameId} trophy={activo.trophy} esMio onClose={() => setActivo(null)} />
+      )}
     </>
   );
 }
 
-function ViewButton({
-  active,
-  onClick,
-  label,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  children: React.ReactNode;
-}) {
+/** Misma cabecera que los grupos (juego base / DLC) de la ficha del juego. */
+function Cabecera({ titulo, total }: { titulo: string; total: number }) {
   return (
-    <button
-      onClick={onClick}
-      title={label}
-      aria-label={label}
-      aria-pressed={active}
-      className="rounded-md p-1.5 transition-colors"
-      style={
-        active
-          ? { background: "rgb(var(--accent-rgb) / 0.16)", color: "var(--accent-text)" }
-          : { background: "transparent", color: "var(--muted)" }
-      }
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {children}
-      </svg>
-    </button>
+    <h3 className="mb-3 flex items-baseline gap-3 border-b-2 border-[var(--border)] px-1 pb-2 font-heading text-lg font-bold uppercase tracking-wide">
+      <span className="min-w-0 flex-1 truncate">{titulo}</span>
+      <span className="carreras-cifra shrink-0 text-sm text-muted">{total}</span>
+    </h3>
   );
+}
+
+/** Agrupa conservando el orden de llegada (los trofeos vienen del más reciente al más antiguo). */
+function agrupar<T>(lista: T[], clave: (x: T) => string): [string, T[]][] {
+  const grupos = new Map<string, T[]>();
+  for (const x of lista) {
+    const k = clave(x);
+    const g = grupos.get(k);
+    if (g) g.push(x);
+    else grupos.set(k, [x]);
+  }
+  return [...grupos.entries()];
 }

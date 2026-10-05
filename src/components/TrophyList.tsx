@@ -11,6 +11,7 @@ import { TrophyGuideModal } from "./TrophyGuideModal";
 import { TrophyTree } from "./TrophyTree";
 import { TrophyTimeline } from "./TrophyTimeline";
 import { ToggleChip } from "./ToggleChip";
+import { SelectorVistaTrofeos, useVistaTrofeos } from "./VistasTrofeos";
 
 /** Los filtros de tipo son justo `TrophyType` (ya calculado por trofeo con
  * `clasificarTrofeo`) más "perdible", que no es un tipo sino un aviso aparte
@@ -68,7 +69,7 @@ export function TrophyList({
   showcaseTrophies?: { gameId: string, trophyId: string }[];
 }) {
   const t = useTranslations("Biblioteca");
-  const [view, setView] = useState<"lista" | "cuadricula" | "arbol" | "cronologia">("lista");
+  const [view, setView] = useVistaTrofeos();
   // "Cronología" es como "Árbol": su propia vista de solo lectura, sin los
   // filtros/orden de arriba (que son de la lista y la cuadrícula) — cuenta
   // la historia de ESTE juego en el orden real en que pasó, no algo que
@@ -229,43 +230,7 @@ export function TrophyList({
           </div>
         )}
 
-        <div
-          className="ml-auto inline-flex gap-1 rounded-[10px] p-1"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-        >
-          <ViewButton active={view === "lista"} onClick={() => setView("lista")} label={t("TrophyList.view.list")}>
-            <line x1="8" y1="6" x2="21" y2="6" />
-            <line x1="8" y1="12" x2="21" y2="12" />
-            <line x1="8" y1="18" x2="21" y2="18" />
-            <line x1="3" y1="6" x2="3.01" y2="6" />
-            <line x1="3" y1="12" x2="3.01" y2="12" />
-            <line x1="3" y1="18" x2="3.01" y2="18" />
-          </ViewButton>
-          <ViewButton
-            active={view === "cuadricula"}
-            onClick={() => setView("cuadricula")}
-            label={t("TrophyList.view.grid")}
-          >
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-          </ViewButton>
-          <ViewButton active={view === "arbol"} onClick={() => setView("arbol")} label={t("TrophyList.view.tree")}>
-            <circle cx="12" cy="5" r="2" />
-            <circle cx="5" cy="19" r="2" />
-            <circle cx="19" cy="19" r="2" />
-            <line x1="12" y1="7" x2="12" y2="12" />
-            <line x1="12" y1="12" x2="5" y2="17" />
-            <line x1="12" y1="12" x2="19" y2="17" />
-          </ViewButton>
-          <ViewButton active={view === "cronologia"} onClick={() => setView("cronologia")} label={t("TrophyList.view.timeline")}>
-            <line x1="12" y1="3" x2="12" y2="21" />
-            <circle cx="12" cy="6" r="1.5" />
-            <circle cx="12" cy="12" r="1.5" />
-            <circle cx="12" cy="18" r="1.5" />
-          </ViewButton>
-        </div>
+        <SelectorVistaTrofeos vista={view} onChange={setView} className="ml-auto" />
       </div>
 
       {view === "arbol" ? (
@@ -320,47 +285,21 @@ export function TrophyList({
   );
 }
 
-function ViewButton({
-  active,
+/** Fila de la vista Lista. `juego`: en listas de varios juegos (el desglose del mes), de cuál es. */
+export function FilaLista({
+  trophy,
+  platform,
+  juego,
+  atenuarHechos = true,
   onClick,
-  label,
-  children,
 }: {
-  active: boolean;
+  trophy: Trophy;
+  platform?: Platform;
+  juego?: string;
+  /** En la guía de un juego lo conseguido se apaga; en una lista de solo conseguidos (el mes) se vería todo apagado. */
+  atenuarHechos?: boolean;
   onClick: () => void;
-  label: string;
-  children: React.ReactNode;
 }) {
-  return (
-    <button
-      onClick={onClick}
-      title={label}
-      aria-label={label}
-      aria-pressed={active}
-      className="rounded-md p-1.5 transition-colors"
-      style={
-        active
-          ? { background: "rgb(var(--accent-rgb) / 0.16)", color: "var(--accent-text)" }
-          : { background: "transparent", color: "var(--muted)" }
-      }
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {children}
-      </svg>
-    </button>
-  );
-}
-
-function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
   const idioma = useLocale();
   const t = useTranslations("Biblioteca");
   const oculto = trophy.hidden && !trophy.earned;
@@ -374,6 +313,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
       onClick={onClick}
       className="guia-fila grid cursor-pointer grid-cols-[22px_40px_1fr] items-start gap-3 px-2 py-3.5 sm:grid-cols-[22px_44px_1fr_150px] sm:gap-4 sm:px-3"
       data-hecho={trophy.earned || undefined}
+      data-sin-atenuar={atenuarHechos ? undefined : true}
     >
       {/* La casilla de la guía: marcada si ya lo tienes. */}
       <span className="guia-casilla mt-3" aria-hidden="true">
@@ -394,6 +334,7 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
             </span>
           )}
         </p>
+        {juego && <p className="truncate text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-muted">{juego}</p>}
         {/* El NOMBRE de un trofeo oculto se tapa (a veces desvela trama), pero
             la descripción de qué hacer sí se enseña, igual que en la guía. */}
         {trophy.detail && <p className="mt-1 text-[0.8125rem] leading-relaxed text-muted">{trophy.detail}</p>}
@@ -417,7 +358,8 @@ function FilaLista({ trophy, platform, onClick }: { trophy: Trophy, platform?: P
   );
 }
 
-function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, platform?: Platform, onClick: () => void }) {
+/** Tarjeta de la vista Cuadrícula. `juego`: igual que en `FilaLista`. */
+export function TarjetaCuadricula({ trophy, platform, juego, onClick }: { trophy: Trophy; platform?: Platform; juego?: string; onClick: () => void }) {
   const t = useTranslations("Biblioteca");
   const idioma = useLocale();
   const oculto = trophy.hidden && !trophy.earned;
@@ -471,6 +413,7 @@ function TarjetaCuadricula({ trophy, platform, onClick }: { trophy: Trophy, plat
         {gradeLabel(trophy.grade, t)}
       </span>
       {puntos !== null && <span className="text-[0.625rem] text-muted">{t("TrophyList.points", { points: puntos })}</span>}
+      {juego && <span className="mt-1 w-full truncate text-[0.625rem] text-muted">{juego}</span>}
 
       {r && (
         <span

@@ -22,8 +22,6 @@
     "oneByOne": "Uno por uno",
     "trophyCount": "{count, plural, one {# trofeo} other {# trofeos}}, del más reciente al más antiguo",
     "dayShort": "día {dia}",
-    "viewList": "Lista",
-    "viewGrid": "Cuadrícula",
     "clearDayFilter": "✕ Ver todo el mes",
     "barAriaLabel": "{mes}: {count, plural, one {# trofeo} other {# trofeos}}",
     "nombreMes": "{mes} de {anio}",

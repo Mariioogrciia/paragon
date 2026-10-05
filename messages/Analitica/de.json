@@ -22,8 +22,6 @@
     "oneByOne": "Alle einzeln",
     "trophyCount": "{count, plural, one {# Trophäe} other {# Trophäen}}, von der neuesten zur ältesten",
     "dayShort": "Tag {dia}",
-    "viewList": "Liste",
-    "viewGrid": "Raster",
     "clearDayFilter": "✕ Ganzen Monat anzeigen",
     "barAriaLabel": "{mes}: {count, plural, one {# Trophäe} other {# Trophäen}}",
     "nombreMes": "{mes} {anio}",

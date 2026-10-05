@@ -22,8 +22,6 @@
     "oneByOne": "One by one",
     "trophyCount": "{count, plural, one {# trophy} other {# trophies}}, most recent first",
     "dayShort": "day {dia}",
-    "viewList": "List",
-    "viewGrid": "Grid",
     "clearDayFilter": "✕ View the whole month",
     "barAriaLabel": "{mes}: {count, plural, one {# trophy} other {# trophies}}",
     "nombreMes": "{mes} {anio}",
