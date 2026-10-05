@@ -396,6 +396,12 @@
     <string name="guias_ph">Schreib auf, wie man sie bekommt, Routen, Codes…</string>
     <string name="guias_tu_guia">DEIN GUIDE</string>
     <string name="guias_vacio">Für diese Trophäe gibt es noch keinen schriftlichen Guide.</string>
+    <string name="inicio_faltan">Noch %1$s Trophäen</string>
+    <string name="inicio_hola">Hallo, %1$s</string>
+    <string name="inicio_ir">Los</string>
+    <string name="inicio_objetivo_anclado">Dein Ziel · angeheftet</string>
+    <string name="inicio_proxima_sesion">Deine nächste Session</string>
+    <string name="inicio_ver_todas">Alle ansehen</string>
     <string name="liga_borrar">Diese Liga löschen</string>
     <string name="liga_borrar_texto">„%1$s“ verschwindet für alle Mitglieder, samt Tabelle und Herausforderung. Das lässt sich nicht rückgängig machen.</string>
     <string name="liga_borrar_titulo">Diese Liga löschen?</string>

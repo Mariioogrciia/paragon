@@ -75,6 +75,9 @@ fun PanelScreen(
     userProfile: UserProfile,
     globalStats: GlobalStats,
     fromCache: Boolean = false,
+    racha: com.paragon.app.data.RachaGlobal = com.paragon.app.data.RachaGlobal(0, 0),
+    onRacha: () -> Unit = {},
+    onPerfil: () -> Unit = {},
     sharedTransitionScope: androidx.compose.animation.SharedTransitionScope? = null,
     animatedVisibilityScope: androidx.compose.animation.AnimatedVisibilityScope? = null,
 ) {
@@ -88,6 +91,9 @@ fun PanelScreen(
     var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
     var rivalComparison by remember { mutableStateOf<CompareResult?>(null) }
+    // Tu próxima sesión: una en la que estés (o organices); si no, ninguna.
+    var proximaSesion by remember { mutableStateOf<com.paragon.shared.red.SesionDto?>(null) }
+    val sesionesRepository = remember(tokenStore) { com.paragon.app.data.SesionesRepository(tokenStore) }
     
     val haptic = LocalHapticFeedback.current
     val retryCounter = remember { mutableIntStateOf(0) }
@@ -116,6 +122,10 @@ fun PanelScreen(
             launch { pinnedGame = libraryRepository.findPinnedGame() }
             launch { hito = (milestoneRepository.getMilestone() as? MilestoneResult.Ok)?.hito }
             launch {
+                val r = sesionesRepository.listar() as? com.paragon.app.data.SesionResultado.Ok
+                proximaSesion = r?.valor?.sesiones?.firstOrNull { (it.estoyApuntado || it.soyAnfitrion) && !it.cancelada }
+            }
+            launch {
                 themeStore.rivalHandle?.let { handle ->
                     rivalComparison = compareRepository.compare(handle)
                 }
@@ -141,50 +151,37 @@ fun PanelScreen(
                 .background(Background),
             contentPadding = PaddingValues(bottom = 32.dp)
         ) {
-            item {
-                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                    // Saludo y nivel
+            item { Column {
+                // Rediseño del 5 oct 2026 (maqueta "1 · Inicio"): cabecera propia
+                // (la barra de arriba de la app no sale aquí), "Tu objetivo" con
+                // el siguiente trofeo, tres cifras y tu próxima sesión.
+                CabeceraInicio(userProfile, racha, onRacha = onRacha, onPerfil = onPerfil)
+                if (fromCache) {
                     Text(
-                        text = Textos.t(T.panel_hola, userProfile.name.uppercase()),
-                        color = Foreground,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-
-                    Text(
-                        text = Textos.t(T.panel_nivel, userProfile.level),
+                        text = Textos.t(T.comun_sin_conexion_copia),
                         color = Muted,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 4.dp, bottom = if (fromCache) 4.dp else 24.dp)
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
                     )
-
-                    if (fromCache) {
-                        Text(
-                            text = Textos.t(T.comun_sin_conexion_copia),
-                            color = Muted,
-                            fontSize = 11.sp,
-                            modifier = Modifier.padding(bottom = 24.dp),
-                        )
-                    }
-
-                    // Orden del Panel (4 oct 2026): primero el objetivo — el juego
-                    // anclado o, si no hay, el platino más cercano —, luego el
-                    // resumen y el siguiente trofeo, y al final lo secundario
-                    // (cerrojo de hitos, meta, rival). Antes abría con esas
-                    // tarjetas secundarias y una rejilla de cuatro cifras.
-                    val cercano = (highlights as? HighlightsResult.Ok)?.nearPlatinum?.firstOrNull()
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                val ok = highlights as? HighlightsResult.Ok
+                val cercano = ok?.nearPlatinum?.firstOrNull()
+                val objetivo = pinnedGame?.toGameProgress() ?: cercano
+                val siguientes = ok?.nextTrophies.orEmpty()
+                val siguienteDelObjetivo = objetivo?.let { o -> siguientes.firstOrNull { it.gameId == o.id } }
+                val siguienteMostrado = siguienteDelObjetivo ?: siguientes.firstOrNull()
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                     val anclado = pinnedGame
-                    if (anclado != null) {
-                        HeroGameCard(
-                            game = anclado.toGameProgress(),
-                            label = Textos.t(T.panel_a_por_este),
-                            labelColor = Gold,
-                            accentColor = Gold,
-                            // A la ficha del juego, no directo a Modo Enfoque.
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(anclado.id)) },
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedVisibilityScope = animatedVisibilityScope,
+                    // Primero el objetivo — el juego anclado o, si no hay, el
+                    // platino más cercano — con el siguiente trofeo de ESE juego
+                    // si el recomendador lo trae (si no, el primero que haya).
+                    if (objetivo != null) {
+                        ObjetivoCard(
+                            game = objetivo,
+                            etiqueta = if (anclado != null) Textos.t(T.inicio_objetivo_anclado) else Textos.t(T.panel_siguiente_platino),
+                            siguiente = siguienteMostrado,
+                            onAbrir = { navController.navigate(Screen.GameDetail.routeFor((siguienteDelObjetivo?.gameId) ?: objetivo.id)) },
                         )
                     } else {
                         when (val current = highlights) {
@@ -197,32 +194,23 @@ fun PanelScreen(
                                     Text(Textos.t(T.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                                 }
                             }
-                            is HighlightsResult.Ok -> if (cercano != null) {
-                                HeroGameCard(
-                                    game = cercano,
-                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(cercano.id)) },
-                                    sharedTransitionScope = sharedTransitionScope,
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                )
-                            } else {
-                                Text(text = Textos.t(T.panel_un_paso_vacio), color = Muted, fontSize = 13.sp)
-                            }
+                            is HighlightsResult.Ok -> Text(text = Textos.t(T.panel_un_paso_vacio), color = Muted, fontSize = 13.sp)
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ResumenCard(
-                        platinos = globalStats.platinums,
-                        trofeos = globalStats.trophies,
-                        juegos = globalStats.games,
-                        completado = globalStats.completionRate,
-                        oro = globalStats.gold,
-                        plata = globalStats.silver,
-                        bronce = globalStats.bronze,
-                        onEasterEgg = { showConfetti = true },
-                    )
-
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                CifrasInicio(
+                    nivel = userProfile.level,
+                    platinos = globalStats.platinums,
+                    trofeos = globalStats.trophies,
+                    onPlatinos = { showConfetti = true },
+                )
+                proximaSesion?.let { s ->
+                    TituloSeccion(Textos.t(T.inicio_proxima_sesion), Textos.t(T.inicio_ver_todas)) { navController.navigate(Screen.Sessions.route) }
+                    ProximaSesionCard(s) { navController.navigate(Screen.SessionDetail.routeFor(s.id)) }
+                }
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    val anclado = pinnedGame
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Con un juego anclado arriba, el más cercano al platino pasa aquí.
@@ -249,7 +237,8 @@ fun PanelScreen(
                     // (lib/recommendations.ts): ya lo mandaba el backend desde
                     // hace tiempo (/api/mobile/panel/highlights, campo
                     // `nextTrophies`), pero el móvil lo descartaba al parsear.
-                    val nextTrophies = (highlights as? HighlightsResult.Ok)?.nextTrophies.orEmpty()
+                    // El primero ya va en "Tu objetivo": aquí, los demás.
+                    val nextTrophies = (highlights as? HighlightsResult.Ok)?.nextTrophies.orEmpty().filter { it !== siguienteMostrado }.take(2)
                     if (nextTrophies.isNotEmpty()) {
                         Text(
                             text = Textos.t(T.panel_siguiente),
@@ -305,7 +294,7 @@ fun PanelScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
-            }
+            } }
 
             // Carrusel horizontal
             item {

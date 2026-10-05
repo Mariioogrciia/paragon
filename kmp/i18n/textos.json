@@ -4174,5 +4174,41 @@
   "en": "With others",
   "es": "Con otros",
   "fr": "Avec les autres"
+ },
+ "inicio_hola": {
+  "de": "Hallo, {0}",
+  "en": "Hi, {0}",
+  "es": "Hola, {0}",
+  "fr": "Salut, {0}"
+ },
+ "inicio_faltan": {
+  "de": "Noch {0} Trophäen",
+  "en": "{0} trophies to go",
+  "es": "Faltan {0} trofeos",
+  "fr": "Encore {0} trophées"
+ },
+ "inicio_ir": {
+  "de": "Los",
+  "en": "Go",
+  "es": "Ir",
+  "fr": "Go"
+ },
+ "inicio_proxima_sesion": {
+  "de": "Deine nächste Session",
+  "en": "Your next session",
+  "es": "Tu próxima sesión",
+  "fr": "Ta prochaine session"
+ },
+ "inicio_ver_todas": {
+  "de": "Alle ansehen",
+  "en": "See all",
+  "es": "Ver todas",
+  "fr": "Tout voir"
+ },
+ "inicio_objetivo_anclado": {
+  "de": "Dein Ziel · angeheftet",
+  "en": "Your goal · pinned",
+  "es": "Tu objetivo · anclado",
+  "fr": "Ton objectif · épinglé"
  }
 }
