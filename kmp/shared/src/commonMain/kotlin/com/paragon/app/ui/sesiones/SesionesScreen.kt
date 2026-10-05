@@ -138,7 +138,7 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_atras), tint = Foreground) }
             Text(Textos.t(T.nav_sesiones), color = Foreground, fontSize = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            val juegos = (estado as? SesionResultado.Ok)?.valor?.juegos
+            val juegos = (estado as? SesionResultado.Ok<com.paragon.shared.red.SesionesResponse>)?.valor?.juegos
             if (juegos != null) {
                 Button(
                     onClick = { organizando = true },
@@ -294,8 +294,8 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
             when (val r = accion()) {
                 is SesionResultado.Error -> error = r.mensaje
                 is SesionResultado.Ok -> {
-                    @Suppress("UNCHECKED_CAST")
-                    (r.valor as? SesionDto)?.let { estado = SesionResultado.Ok(it) } ?: run { recarga++ }
+                    val nueva = r.valor as? SesionDto
+                    if (nueva != null) estado = SesionResultado.Ok(nueva) else recarga++
                 }
             }
             trabajando = false

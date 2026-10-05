@@ -127,7 +127,7 @@ fun FilaCuadricula(
     onClick: ((TrophyItem) -> Unit)? = null,
 ) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        trofeos.forEach { t -> TarjetaTrofeo(t, juegoDe(t), Modifier.weight(1f), onClick?.let { { it(t) } }) }
+        trofeos.forEach { t -> TarjetaTrofeo(t, juegoDe(t), Modifier.weight(1f), onClick?.let { f -> { f(t) } }) }
         repeat(columnas - trofeos.size) { Spacer(Modifier.weight(1f)) }
     }
 }
@@ -219,15 +219,14 @@ fun DiarioPlatinoCard(diario: DiarioPlatinoDto, titulo: String, modifier: Modifi
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(Textos.t(T.diario_titulo).uppercase(), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-        val estilo = Modifier
-        Text(conNegritas(Textos.t(T.diario_inicio), titulo, fecha(diario.primeraFecha), diario.primerTrofeo, cursiva = setOf(2)), color = Muted, fontSize = 14.sp, lineHeight = 20.sp, modifier = estilo)
+        Text(conNegritas(Textos.t(T.diario_inicio), titulo, fecha(diario.primeraFecha), diario.primerTrofeo, cursiva = setOf(2)), color = Muted, fontSize = 14.sp, lineHeight = 20.sp)
         if (diario.muroDias >= 3) {
             Text(conNegritas(Textos.t(T.diario_muro), diario.muroTrofeo, "${diario.muroDias}", cursiva = setOf(0)), color = Muted, fontSize = 14.sp, lineHeight = 20.sp)
         }
         diario.masRaro?.takeIf { it.rarityPercent < 20 }?.let {
             Text(conNegritas(Textos.t(T.diario_hazana), it.nombre, numeroLocal(it.rarityPercent, 1), cursiva = setOf(0)), color = Muted, fontSize = 14.sp, lineHeight = 20.sp)
         }
-        val final = if (diario.diasTotales == 1) Textos.t(T.diario_final_1) else Textos.t(T.diario_final_n)
-        Text(conNegritas(final, fecha(diario.fechaPlatino), "${diario.diasTotales}"), color = Muted, fontSize = 14.sp, lineHeight = 20.sp)
+        val cierre = if (diario.diasTotales == 1) Textos.t(T.diario_final_1) else Textos.t(T.diario_final_n)
+        Text(conNegritas(cierre, fecha(diario.fechaPlatino), "${diario.diasTotales}"), color = Muted, fontSize = 14.sp, lineHeight = 20.sp)
     }
 }

@@ -3,6 +3,27 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
+**Noche del 5 oct (2) — web y apps:**
+- **Web (ya en master)**: un único selector `components/ui/Selector.tsx` (nada
+  de `<select>` nativos, regla en DESIGN.md); las mismas vistas de trofeos
+  (`components/VistasTrofeos.tsx`) en la ficha del juego y en `/ritmo`; diario
+  del platino arreglado (comillas, fecha del platino, sin DLC posteriores).
+- **Apps (`kmp/`)**:
+  - Menú "Más" sin botones muertos (Descubrir/Planificador no existen en la
+    app), sin "Amigos" duplicado, traducido; añade Sesiones y Mes a mes.
+  - Fuera `GlassBackground` (desenfoque de iOS siempre oscuro, API de
+    interop obsoleta y sin efecto: el contenido no pasa bajo las barras).
+  - `ui/common/Selector.kt`: el desplegable de la app, gemelo del de la web.
+  - **Sesiones** (`ui/sesiones/`, API `api/mobile/sessions*`, CONTRACT.md):
+    lista, ficha con plazas y unirse/salir/cancelar, hoja para organizar con
+    el trofeo de los que te faltan y día/hora con los pickers de Material.
+  - Ficha del juego: diario del platino (`diario` en la API) y vistas
+    Lista/Cuadrícula/Cronología comunes (`ui/trofeos/VistasTrofeos.kt`); el
+    árbol de la web no está en las apps.
+  - **Mes a mes** (`ui/trofeos/RitmoScreen.kt`, `api/mobile/stats/month`).
+  - Sin probar en un teléfono: solo compilado en la CI de iOS. Los push siguen
+    abriendo el Panel (el `url` del aviso no se enruta todavía).
+
 **Noche del 5 oct — sesiones y revisión de Antigravity:**
 - **Sesiones rehechas** (sin migración): lista compacta que enlaza a la ficha
   nueva `/sesiones/[id]` (quién está dentro, plazas libres en huecos, detalles
