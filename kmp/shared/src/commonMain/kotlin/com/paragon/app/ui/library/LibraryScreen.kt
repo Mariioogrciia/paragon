@@ -41,6 +41,7 @@ import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.util.rememberShakeListener
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Search
 import com.paragon.shared.i18n.T
 import com.paragon.shared.i18n.Textos
@@ -80,6 +81,9 @@ fun LibraryScreen(
     var isInitialLoading by remember { mutableStateOf(true) }
     var isRefreshing by remember { mutableStateOf(false) }
     var showRoulette by remember { mutableStateOf(false) }
+    // Búsqueda dentro de la pantalla (rediseño del 5 oct 2026): antes era la
+    // lupa de la barra de arriba, que ya no sale en Biblioteca.
+    var busqueda by rememberSaveable { mutableStateOf(searchQuery) }
 
     LaunchedEffect(retryCounter.value) {
         if (result == null) isInitialLoading = true
@@ -111,62 +115,30 @@ fun LibraryScreen(
                 .fillMaxSize()
                 .background(Background)
         ) {
-        // Cabecera con selector — antes "BIBLIOTECA" (32sp) + el desplegable
-        // de orden + el selector de vista iban los tres en la MISMA fila:
-        // en un móvil normal no caben, y el texto del desplegable se
-        // recortaba a medias ("Progreso" → "rogreso"). El título se lleva
-        // su propia fila; orden y vista bajan a una segunda fila con todo
-        // el ancho para ellos solos.
-        Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp)) {
-            Text(
-                text = Textos.t(T.biblio_titulo),
-                color = Foreground,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Orden: el selector común de la app (common/Selector.kt), en su forma compacta.
-                com.paragon.app.ui.common.Selector(
-                    valor = sortOption.toString(),
-                    opciones = sortLabels.mapIndexed { i, etiqueta -> com.paragon.app.ui.common.OpcionSelector(i.toString(), etiqueta) },
-                    onElegir = { sortOption = it.toInt() },
-                    compacto = true,
-                )
-
-                // Selector de vista — antes era UN icono que cambiaba solo
-                // (cuadrícula/lista), sin dejar claro que hay dos formas
-                // distintas de ver lo mismo, ni cuál está activa a simple
-                // vista. Con las dos opciones siempre visibles y una
-                // resaltada queda claro que es una elección, no un botón
-                // de "siguiente estilo".
-                Row(
-                    modifier = Modifier
-                        .border(1.dp, Border, RoundedCornerShape(radio(10)))
-                        .padding(2.dp),
-                ) {
-                    listOf(0 to Icons.Default.GridView, 1 to Icons.AutoMirrored.Filled.List).forEach { (layout, icon) ->
-                        val selected = themeStore.libraryLayout == layout
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(radio(8)))
-                                .background(if (selected) Accent else Color.Transparent)
-                                .clickable { themeStore.setLibraryLayout(layout) }
-                                .padding(8.dp),
-                        ) {
-                            Icon(
-                                icon,
-                                contentDescription = if (layout == 0) Textos.t(T.biblio_vista_cuadricula) else Textos.t(T.biblio_vista_enfoque),
-                                tint = if (selected) OnAccent else Muted,
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
+        // Cabecera (maqueta "2 · Biblioteca"): título con tus cifras y la
+        // ruleta; el buscador; los filtros como pastillas; orden y vista.
+        val todos = (result as? LibraryResult.Ok)?.games.orEmpty()
+        Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(text = Textos.t(T.biblio_titulo), color = Foreground, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                    if (todos.isNotEmpty()) {
+                        Text(
+                            Textos.t(T.biblio_resumen, todos.size, todos.count { it.isPlatinado }),
+                            color = Muted,
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                    }
+                }
+                if (backlogGames.isNotEmpty()) {
+                    Box(
+                        Modifier.size(44.dp).clip(RoundedCornerShape(radio(22))).background(com.paragon.app.ui.theme.Surface)
+                            .border(1.dp, Border, RoundedCornerShape(radio(22)))
+                            .clickable { showRoulette = true },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(Icons.Default.Casino, contentDescription = Textos.t(T.biblio_ruleta), tint = Foreground, modifier = Modifier.size(20.dp))
                     }
                 }
             }
@@ -181,24 +153,60 @@ fun LibraryScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+            BuscadorBiblioteca(busqueda, { busqueda = it })
+        }
 
-            ScrollableTabRow(
-                selectedTabIndex = selectedFilter,
-                containerColor = Background,
-                contentColor = Accent,
-                divider = { HorizontalDivider(color = Border) }
+        androidx.compose.foundation.lazy.LazyRow(
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 12.dp),
+        ) {
+            items(FILTERS.size) { index ->
+                val (filtro, titulo) = FILTERS[index]
+                PastillaFiltro(
+                    texto = titulo,
+                    activa = selectedFilter == index,
+                    cuantos = if (selectedFilter == index) todos.filterByStatus(filtro).size else null,
+                ) {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    selectedFilter = index
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Orden: el selector común de la app (common/Selector.kt), en su forma compacta.
+            com.paragon.app.ui.common.Selector(
+                valor = sortOption.toString(),
+                opciones = sortLabels.mapIndexed { i, etiqueta -> com.paragon.app.ui.common.OpcionSelector(i.toString(), etiqueta) },
+                onElegir = { sortOption = it.toInt() },
+                compacto = true,
+            )
+            Row(
+                modifier = Modifier
+                    .border(1.dp, Border, RoundedCornerShape(radio(10)))
+                    .padding(2.dp),
             ) {
-                FILTERS.forEachIndexed { index, (_, title) ->
-                    Tab(
-                        selected = selectedFilter == index,
-                        onClick = { 
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            selectedFilter = index 
-                        },
-                        text = { Text(text = title, fontWeight = FontWeight.Bold) },
-                        selectedContentColor = Accent,
-                        unselectedContentColor = Muted
-                    )
+                listOf(0 to Icons.Default.GridView, 1 to Icons.AutoMirrored.Filled.List).forEach { (layout, icon) ->
+                    val selected = themeStore.libraryLayout == layout
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(radio(8)))
+                            .background(if (selected) Accent else Color.Transparent)
+                            .clickable { themeStore.setLibraryLayout(layout) }
+                            .padding(8.dp),
+                    ) {
+                        Icon(
+                            icon,
+                            contentDescription = if (layout == 0) Textos.t(T.biblio_vista_cuadricula) else Textos.t(T.biblio_vista_enfoque),
+                            tint = if (selected) OnAccent else Muted,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
                 }
             }
         }
@@ -232,10 +240,10 @@ fun LibraryScreen(
                 // en el buscador letra a letra, o por el chip de racha de
                 // la cabecera), volviendo a filtrar/ordenar la biblioteca
                 // entera sin que nada relevante hubiera cambiado.
-                val games = remember(current.games, selectedFilter, searchQuery, sortOption) {
+                val games = remember(current.games, selectedFilter, busqueda, sortOption) {
                     current.games
                         .filterByStatus(FILTERS[selectedFilter].first)
-                        .filter { if (searchQuery.isBlank()) true else it.title.contains(searchQuery, ignoreCase = true) }
+                        .filter { if (busqueda.isBlank()) true else it.title.contains(busqueda.trim(), ignoreCase = true) }
                         .let { list ->
                             when (sortOption) {
                                 0 -> list.sortedByDescending { it.progressPercent }
@@ -253,7 +261,7 @@ fun LibraryScreen(
                     // contexto, pese a ser una de las 5 pestañas
                     // principales. Copia distinta según si el hueco es "no
                     // tienes nada" o "nada con este filtro/búsqueda".
-                    val hayFiltroActivo = searchQuery.isNotBlank() || selectedFilter != 0
+                    val hayFiltroActivo = busqueda.isNotBlank() || selectedFilter != 0
                     com.paragon.app.ui.common.EmptyState(
                         icon = if (hayFiltroActivo) Icons.Default.Search else Icons.AutoMirrored.Filled.List,
                         title = if (hayFiltroActivo) Textos.t(T.biblio_nada_filtros) else Textos.t(T.biblio_vacia),
@@ -267,7 +275,7 @@ fun LibraryScreen(
                     val isList = themeStore.libraryLayout == 1
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(if (isList) 1 else 2),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                         contentPadding = PaddingValues(bottom = 32.dp)
@@ -279,8 +287,8 @@ fun LibraryScreen(
                                     onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) }
                                 )
                             } else {
-                                StandardGameCard(
-                                    game = game.toGameProgress(),
+                                TarjetaBiblioteca(
+                                    game = game,
                                     onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
                                     sharedTransitionScope = sharedTransitionScope,
                                     animatedVisibilityScope = animatedVisibilityScope,

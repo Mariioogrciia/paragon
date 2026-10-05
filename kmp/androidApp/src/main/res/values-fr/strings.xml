@@ -73,6 +73,7 @@
     <string name="atascados_vacio">Tu n\'as aucun trophée bloqué</string>
     <string name="atascados_vacio_sub">Quand un trophée te résiste, marque-le depuis sa fiche et il apparaîtra ici — avec un guide vidéo à portée de doigt.</string>
     <string name="biblio_abandonados">Abandonnés</string>
+    <string name="biblio_buscar">Chercher dans ta bibliothèque</string>
     <string name="biblio_completados">Terminés</string>
     <string name="biblio_falta_dlc">Il ne manque que le DLC</string>
     <string name="biblio_jugando">En cours</string>
@@ -81,8 +82,11 @@
     <string name="biblio_orden_az">Titre A-Z</string>
     <string name="biblio_orden_progreso">Progression</string>
     <string name="biblio_orden_za">Titre Z-A</string>
+    <string name="biblio_pct_restantes">%1$s%% · encore %2$s</string>
     <string name="biblio_pila">Pile de la honte</string>
     <string name="biblio_platinados">Platinés</string>
+    <string name="biblio_resumen">%1$s jeux · %2$s platines</string>
+    <string name="biblio_ruleta">Roulette : un jeu au hasard de ta pile</string>
     <string name="biblio_titulo">BIBLIOTHÈQUE</string>
     <string name="biblio_todos">Tous</string>
     <string name="biblio_vacia">Ta bibliothèque est vide</string>

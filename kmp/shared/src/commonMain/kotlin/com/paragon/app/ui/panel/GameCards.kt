@@ -46,7 +46,7 @@ import com.paragon.shared.i18n.Textos
  * carátulas en blanco reportadas el 16/09.
  */
 @Composable
-private fun GameCover(coverUrl: String, title: String, modifier: Modifier) {
+internal fun GameCover(coverUrl: String, title: String, modifier: Modifier) {
     if (coverUrl.isNotBlank()) {
         AsyncImage(
             model = coverUrl,

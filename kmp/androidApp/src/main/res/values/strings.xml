@@ -75,6 +75,7 @@
     <string name="atascados_vacio">No tienes ningún trofeo atascado</string>
     <string name="atascados_vacio_sub">Cuando un trofeo se te resista, márcalo desde su ficha y aparecerá aquí — con una guía en vídeo a un toque.</string>
     <string name="biblio_abandonados">Abandonados</string>
+    <string name="biblio_buscar">Buscar en tu biblioteca</string>
     <string name="biblio_completados">Completados</string>
     <string name="biblio_falta_dlc">Solo falta el DLC</string>
     <string name="biblio_jugando">Jugando</string>
@@ -83,8 +84,11 @@
     <string name="biblio_orden_az">Título A-Z</string>
     <string name="biblio_orden_progreso">Progreso</string>
     <string name="biblio_orden_za">Título Z-A</string>
+    <string name="biblio_pct_restantes">%1$s%% · faltan %2$s</string>
     <string name="biblio_pila">Pila Vergüenza</string>
     <string name="biblio_platinados">Platinados</string>
+    <string name="biblio_resumen">%1$s juegos · %2$s platinos</string>
+    <string name="biblio_ruleta">Ruleta: un juego al azar de tu pila</string>
     <string name="biblio_titulo">BIBLIOTECA</string>
     <string name="biblio_todos">Todos</string>
     <string name="biblio_vacia">Tu biblioteca está vacía</string>

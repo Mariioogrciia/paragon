@@ -73,6 +73,7 @@
     <string name="atascados_vacio">You don\'t have any stuck trophies</string>
     <string name="atascados_vacio_sub">When a trophy fights back, mark it from its game page and it\'ll show up here — with a video guide one tap away.</string>
     <string name="biblio_abandonados">Abandoned</string>
+    <string name="biblio_buscar">Search your library</string>
     <string name="biblio_completados">Completed</string>
     <string name="biblio_falta_dlc">Only DLC left</string>
     <string name="biblio_jugando">Playing</string>
@@ -81,8 +82,11 @@
     <string name="biblio_orden_az">Title A-Z</string>
     <string name="biblio_orden_progreso">Progress</string>
     <string name="biblio_orden_za">Title Z-A</string>
+    <string name="biblio_pct_restantes">%1$s%% · %2$s to go</string>
     <string name="biblio_pila">Pile of shame</string>
     <string name="biblio_platinados">Platinum\'d</string>
+    <string name="biblio_resumen">%1$s games · %2$s platinums</string>
+    <string name="biblio_ruleta">Roulette: a random game from your backlog</string>
     <string name="biblio_titulo">LIBRARY</string>
     <string name="biblio_todos">All</string>
     <string name="biblio_vacia">Your library is empty</string>

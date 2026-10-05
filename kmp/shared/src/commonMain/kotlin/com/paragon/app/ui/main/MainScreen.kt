@@ -207,9 +207,9 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
         topBar = {
-            // Inicio y Perfil llevan su propia cabecera grande (rediseño del 5 oct
+            // Inicio, Biblioteca y Perfil llevan su propia cabecera grande (rediseño del 5 oct
             // 2026); ahí la barra de arriba solo ocuparía sitio.
-            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route) {
+            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route || currentRoute == Screen.Library.route) {
                 Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
             } else
             androidx.compose.foundation.layout.Box(modifier = Modifier.background(Background)) {

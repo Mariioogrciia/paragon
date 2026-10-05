@@ -73,6 +73,7 @@
     <string name="atascados_vacio">Du hast keine festgefahrenen Trophäen</string>
     <string name="atascados_vacio_sub">Wenn eine Trophäe nicht klappt, markier sie auf ihrer Spielseite — dann erscheint sie hier, mit Video-Guide auf einen Tipp.</string>
     <string name="biblio_abandonados">Abgebrochen</string>
+    <string name="biblio_buscar">In deiner Bibliothek suchen</string>
     <string name="biblio_completados">Abgeschlossen</string>
     <string name="biblio_falta_dlc">Nur DLC fehlt</string>
     <string name="biblio_jugando">Am Spielen</string>
@@ -81,8 +82,11 @@
     <string name="biblio_orden_az">Titel A–Z</string>
     <string name="biblio_orden_progreso">Fortschritt</string>
     <string name="biblio_orden_za">Titel Z–A</string>
+    <string name="biblio_pct_restantes">%1$s%% · noch %2$s</string>
     <string name="biblio_pila">Stapel der Schande</string>
     <string name="biblio_platinados">Platin geholt</string>
+    <string name="biblio_resumen">%1$s Spiele · %2$s Platin</string>
+    <string name="biblio_ruleta">Roulette: ein zufälliges Spiel aus deinem Stapel</string>
     <string name="biblio_titulo">BIBLIOTHEK</string>
     <string name="biblio_todos">Alle</string>
     <string name="biblio_vacia">Deine Bibliothek ist leer</string>

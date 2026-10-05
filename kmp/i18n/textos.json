@@ -4210,5 +4210,29 @@
   "en": "Your goal · pinned",
   "es": "Tu objetivo · anclado",
   "fr": "Ton objectif · épinglé"
+ },
+ "biblio_resumen": {
+  "de": "{0} Spiele · {1} Platin",
+  "en": "{0} games · {1} platinums",
+  "es": "{0} juegos · {1} platinos",
+  "fr": "{0} jeux · {1} platines"
+ },
+ "biblio_buscar": {
+  "de": "In deiner Bibliothek suchen",
+  "en": "Search your library",
+  "es": "Buscar en tu biblioteca",
+  "fr": "Chercher dans ta bibliothèque"
+ },
+ "biblio_ruleta": {
+  "de": "Roulette: ein zufälliges Spiel aus deinem Stapel",
+  "en": "Roulette: a random game from your backlog",
+  "es": "Ruleta: un juego al azar de tu pila",
+  "fr": "Roulette : un jeu au hasard de ta pile"
+ },
+ "biblio_pct_restantes": {
+  "de": "{0}% · noch {1}",
+  "en": "{0}% · {1} to go",
+  "es": "{0}% · faltan {1}",
+  "fr": "{0}% · encore {1}"
  }
 }
