@@ -1,5 +1,6 @@
 package com.paragon.app.ui.game
 
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import com.paragon.app.util.fechaConPatron
 
 import com.paragon.app.util.fechaConEstilo
@@ -449,7 +450,7 @@ private fun GameDetailHero(
                 onClick = onBack,
                 modifier = Modifier.padding(16.dp).size(44.dp).clip(RoundedCornerShape(radio(22))).background(Background.copy(alpha = 0.6f)),
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
             }
             Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 24.dp, vertical = 16.dp)) {
                 if (fromCache) {

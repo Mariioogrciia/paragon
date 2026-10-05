@@ -1,5 +1,6 @@
 package com.paragon.app.ui.focus
 
+import androidx.compose.material.icons.filled.Close
 import com.paragon.app.util.fechaConPatron
 
 import com.paragon.app.data.ahoraMillis
@@ -267,7 +268,7 @@ private fun FocusContent(
                 Text(Textos.t(T.enfoque_diario), color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
             }
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.enfoque_salir), tint = Color.White)
+                Icon(Icons.Default.Close, contentDescription = Textos.t(T.enfoque_salir), tint = Color.White)
             }
         }
 
