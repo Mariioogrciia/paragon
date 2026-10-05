@@ -148,7 +148,6 @@ fun MainScreen(
             searchQuery = ""
         }
     }
-    var isMenuExpanded by remember { mutableStateOf(false) }
     var showMoreMenuSheet by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
@@ -255,7 +254,10 @@ fun MainScreen(
                         }
                     }
                     Box {
-                        IconButton(onClick = { isMenuExpanded = true }) {
+                        // El avatar es tu cuenta (Ajustes), como en las apps de iPhone. Antes
+                        // abría un menú con Enfoque/Comparar/Carpetas/Atascados que repetía la
+                        // pestaña "Más": ahora todo eso vive solo allí.
+                        IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
@@ -278,65 +280,6 @@ fun MainScreen(
                                     )
                                 }
                             }
-                        }
-                        DropdownMenu(
-                            expanded = isMenuExpanded,
-                            onDismissRequest = { isMenuExpanded = false },
-                            // Antes era el menú desplegable genérico de
-                            // Material sin más (fondo plano, texto suelto
-                            // sin iconos, "Ajustes" mezclado con accesos
-                            // directos como si fuera uno más) — borde +
-                            // esquinas propias de la app, un icono por
-                            // opción, y "Ajustes" separado por un divisor
-                            // porque es la única que no es un atajo a una
-                            // función, es la puerta a toda una sección.
-                            modifier = Modifier
-                                .background(com.paragon.app.ui.theme.Surface, RoundedCornerShape(radio(14)))
-                                .border(1.dp, com.paragon.app.ui.theme.Border, RoundedCornerShape(radio(14)))
-                                .width(220.dp)
-                        ) {
-                            HeaderMenuItem(
-                                icon = Icons.Default.CenterFocusStrong,
-                                label = Textos.t(T.nav_enfoque),
-                                onClick = {
-                                    isMenuExpanded = false
-                                    navController.navigate(Screen.Focus.route)
-                                }
-                            )
-                            HeaderMenuItem(
-                                icon = Icons.AutoMirrored.Filled.CompareArrows,
-                                label = Textos.t(T.nav_comparar),
-                                onClick = {
-                                    isMenuExpanded = false
-                                    navController.navigate("compare")
-                                }
-                            )
-                            HeaderMenuItem(
-                                icon = Icons.Default.Folder,
-                                label = Textos.t(T.nav_carpetas),
-                                onClick = {
-                                    isMenuExpanded = false
-                                    navController.navigate(Screen.Collections.route)
-                                }
-                            )
-                            HeaderMenuItem(
-                                icon = Icons.Default.Star,
-                                label = Textos.t(T.nav_atascados_menu),
-                                onClick = {
-                                    isMenuExpanded = false
-                                    navController.navigate(Screen.StuckTrophies.route)
-                                }
-                            )
-                            HorizontalDivider(color = Border, modifier = Modifier.padding(vertical = 4.dp))
-                            HeaderMenuItem(
-                                icon = Icons.Default.Settings,
-                                label = Textos.t(T.nav_ajustes),
-                                iconTint = Accent,
-                                onClick = {
-                                    isMenuExpanded = false
-                                    navController.navigate(Screen.Settings.route)
-                                }
-                            )
                         }
                     }
                 }
@@ -582,20 +525,6 @@ fun MainScreen(
         )
     }
     }
-}
-
-@Composable
-private fun HeaderMenuItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    onClick: () -> Unit,
-    iconTint: Color = Muted,
-) {
-    DropdownMenuItem(
-        text = { Text(label, color = Foreground, fontSize = 14.sp) },
-        leadingIcon = { Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp)) },
-        onClick = onClick,
-    )
 }
 
 /**
