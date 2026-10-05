@@ -6,6 +6,7 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -14,10 +15,13 @@ const val BASE_URL = "https://platinos-nine.vercel.app"
 /** Forma de `GET /api/games/upcoming` (pública, sin sesión). Solo lo que se pinta. */
 @Serializable
 data class Lanzamiento(
-    val id: String,
+    @SerialName("id") val idJuego: String,
     val title: String,
     val cover: String = "",
     val releaseLabel: String? = null,
+    /** ISO; solo es un día concreto si `releasePrecision == "day"`. */
+    val releaseDate: String? = null,
+    val releasePrecision: String? = null,
     val platforms: List<String> = emptyList(),
 )
 

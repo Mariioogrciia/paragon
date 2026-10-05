@@ -1,6 +1,9 @@
 package com.paragon.shared
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,9 +99,20 @@ fun App() {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(16.dp))
+                PruebaVibraciones()
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Prueba con Siri: «Próximos lanzamientos en Paragon» o «Cuenta atrás en Paragon».",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Próximos lanzamientos", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    Button(onClick = { intento++ }, enabled = estado !is Estado.Cargando) { Text("Recargar") }
+                    Button(
+                        onClick = { hapticos.toque(); intento++ },
+                        enabled = estado !is Estado.Cargando,
+                    ) { Text("Recargar") }
                 }
                 Spacer(Modifier.height(8.dp))
 
@@ -108,9 +122,42 @@ fun App() {
                     }
                     is Estado.Fallo -> Text("No se pudo cargar: ${e.mensaje}", color = Color(0xFFFF8A80))
                     is Estado.Listo -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(e.juegos, key = { it.id }) { FilaLanzamiento(it) }
+                        items(e.juegos, key = { it.idJuego }) { FilaLanzamiento(it) }
                         item { Spacer(Modifier.height(16.dp)) }
                     }
+                }
+            }
+        }
+    }
+}
+
+/** Colores de metal de la web (`--bronze`, `--silver`, `--gold` de globals.css) y el platino. */
+private val Metales = listOf(
+    "bronce" to Color(0xFFC07B4A),
+    "plata" to Color(0xFFB9C2CC),
+    "oro" to Color(0xFFE2B53E),
+    "platino" to Platino,
+)
+
+@Composable
+private fun PruebaVibraciones() {
+    Column(
+        Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(12.dp),
+    ) {
+        Text("Vibración al conseguir un trofeo", style = MaterialTheme.typography.titleSmall)
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Metales.forEach { (metal, color) ->
+                OutlinedButton(
+                    onClick = { hapticos.trofeo(metal) },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+                    border = BorderStroke(1.dp, color),
+                ) {
+                    Text(metal.replaceFirstChar { it.uppercase() }, color = color, style = MaterialTheme.typography.labelMedium, maxLines = 1)
                 }
             }
         }

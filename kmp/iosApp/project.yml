@@ -4,8 +4,10 @@
 name: iosApp
 options:
   bundleIdPrefix: com.paragon
+  # Las frases de Siri (Atajos.swift) están en español.
+  developmentLanguage: es
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "17.0"
 targets:
   iosApp:
     type: application
@@ -28,6 +30,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: Paragon
+        SWIFT_VERSION: "5.0"
         PRODUCT_BUNDLE_IDENTIFIER: com.paragon.app.kmp
         MARKETING_VERSION: "0.1"
         CURRENT_PROJECT_VERSION: "1"
