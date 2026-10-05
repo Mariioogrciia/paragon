@@ -3,6 +3,20 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
+**Noche del 5 oct (3) — rediseño de la app (maqueta aprobada):**
+- Maqueta en https://claude.ai/artifact/6LesnTCahE8PorvE5nYhjV (5 pantallas de
+  iPhone). Skill de diseño en `.claude/skills/mobile-app-ui-design`.
+- **Solo colores y radios del tema** (Accent, Surface, Border, radio()...): la
+  personalización de Apariencia tiene que seguir mandando en todo.
+- Barra de abajo = cápsula flotante (`BarraFlotante` en MainScreen) con
+  Inicio, Biblioteca, Comunidad, Ligas y **Perfil** (`ui/perfil/PerfilScreen`,
+  sustituye a "Más" y al menú del avatar).
+- Inicio (`ui/panel/InicioCards.kt`), Biblioteca (`ui/library/BibliotecaPiezas.kt`),
+  ficha del juego (cabecera nueva + "Modo Enfoque" abajo) y Comunidad
+  (`ui/feed/ComunidadScreen.kt`: Muro / Sesiones). Esas cuatro pantallas y
+  Perfil ya no tienen la barra de arriba (llevan su cabecera); el resto sí.
+- Sin probar en un teléfono: solo la CI de iOS.
+
 **Noche del 5 oct (2) — web y apps:**
 - **Web (ya en master)**: un único selector `components/ui/Selector.tsx` (nada
   de `<select>` nativos, regla en DESIGN.md); las mismas vistas de trofeos
