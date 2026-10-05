@@ -478,7 +478,16 @@ fun MainScreen(
                     onBack = { navController.popBackStack() },
                     onNavigateToLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                     onNavigateToApariencia = { navController.navigate(Screen.Apariencia.route) },
-                    onLogout = onLogout
+                    onLogout = {
+                        coroutineScope.launch {
+                            // Común: el servidor desasocia el token de push (va en el
+                            // cuerpo, por eso antes de borrar nada) y se borra la sesión.
+                            PanelRepository(tokenStore).logout()
+                            tokenStore.clear()
+                            // Lo de cada plataforma: cachés, push, volver a empezar.
+                            onLogout()
+                        }
+                    }
                 )
             }
             composable(Screen.Apariencia.route) {

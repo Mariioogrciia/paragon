@@ -89,6 +89,7 @@ class ComposeMainActivity : AppCompatActivity() {
                     database = com.paragon.app.data.local.ParagonDatabase.getDatabase(this@ComposeMainActivity),
                     refreshKey = refresh,
                     onLoginRequested = { provider -> openLogin(provider) },
+                    onLogout = { cerrarSesionAndroid() },
                 )
             }
         }
@@ -106,6 +107,18 @@ class ComposeMainActivity : AppCompatActivity() {
         // punto seguro para terminarlo sin arriesgarse a cerrar una tarea
         // que el usuario está mirando.
         flushPendingDisable(applicationContext)
+    }
+
+    /** Lo propio de Android al cerrar sesión (la sesión ya la borró la pantalla). */
+    private fun cerrarSesionAndroid() {
+        com.paragon.app.data.network.ApiAndroid.vaciarCache()
+        // Y el propio token de FCM se invalida en Firebase: aunque el aviso al
+        // servidor fallara sin red, ese token ya no puede recibir nada de esta cuenta.
+        tokenStore.fcmToken = null
+        if (FirebaseApp.getApps(applicationContext).isNotEmpty()) {
+            FirebaseMessaging.getInstance().deleteToken()
+        }
+        recreate()
     }
 
     private fun handleDeepLink(intent: Intent?) {

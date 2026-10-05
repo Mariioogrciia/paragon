@@ -13,6 +13,8 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                // Vuelta del login en Safari: paragon://auth?c=<token cifrado>.
+                .onOpenURL { url in AppIOS.shared.recibirEnlace(url: url.absoluteString) }
         }
     }
 }

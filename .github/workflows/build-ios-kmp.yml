@@ -42,6 +42,7 @@ jobs:
       - name: Compilar la app
         working-directory: kmp/iosApp
         run: |
+          set -o pipefail
           xcodebuild -project iosApp.xcodeproj \
                      -scheme iosApp \
                      -configuration Release \
@@ -50,7 +51,17 @@ jobs:
                      -derivedDataPath "$RUNNER_TEMP/dd" \
                      CODE_SIGNING_ALLOWED=NO \
                      CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGN_IDENTITY=""
+                     CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/xcode.log"
+
+      # Los logs de Actions piden sesión; las anotaciones no. Así los errores de
+      # Kotlin/Swift se pueden leer por la API sin estar logueado.
+      - name: Publicar los errores de compilación
+        if: failure()
+        run: |
+          grep -E "^e: |error:|: error" "$RUNNER_TEMP/xcode.log" | grep -v "^warning" | sort -u | head -150 > "$RUNNER_TEMP/errores.txt" || true
+          head -10 "$RUNNER_TEMP/errores.txt" | while IFS= read -r l; do echo "::error::${l}"; done
+          todo=$(sed -e "s/%/%25/g" "$RUNNER_TEMP/errores.txt" | awk 1 ORS="%0A")
+          echo "::error title=Todos los errores::${todo}"
 
       # Diagnóstico de Siri: sin Metadata.appintents, iOS no conoce los Atajos.
       - name: Revisar App Intents empaquetados
