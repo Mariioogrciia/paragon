@@ -374,6 +374,7 @@
     <string name="ficha_reservar_faltan_1">Reservar para el #%1$s · falta %2$s</string>
     <string name="ficha_reservar_faltan_n">Reservar para el #%1$s · faltan %2$s</string>
     <string name="ficha_reservar_n">Reservar para el #%1$s</string>
+    <string name="ficha_solo_faltan">Me faltan · %1$s</string>
     <string name="fuente_casual">Casual</string>
     <string name="fuente_elegante">Elegante</string>
     <string name="fuente_moderna">Moderna</string>

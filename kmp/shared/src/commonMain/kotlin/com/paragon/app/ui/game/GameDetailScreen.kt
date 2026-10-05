@@ -205,10 +205,12 @@ private fun GameDetailContent(
     // Antes se ordenaba dentro del propio LazyColumn (en cada recomposición
     // del contenido, p. ej. al tocar el chip de racha de la cabecera) —
     // ahora solo se recalcula si `game.trophies` cambia de verdad.
-    val trofeosOrdenados = remember(game.trophies) {
-        game.trophies.sortedWith(
-            compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() }
-        )
+    // "Solo los que me faltan": se recuerda mientras la app está abierta.
+    var soloPendientes by remember { mutableStateOf(false) }
+    val trofeosOrdenados = remember(game.trophies, soloPendientes) {
+        game.trophies
+            .filter { !soloPendientes || !it.earned }
+            .sortedWith(compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() })
     }
 
     val coverAura = com.paragon.app.ui.common.rememberCoverAuraColor(game.coverUrl)
@@ -301,7 +303,25 @@ private fun GameDetailContent(
 
         // Las mismas vistas que el desglose del mes (ui/trofeos/VistasTrofeos.kt).
         item {
-            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)) {
+            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                val faltan = game.trophies.count { !it.earned }
+                if (faltan > 0) {
+                    Box(
+                        Modifier.clip(RoundedCornerShape(50))
+                            .background(if (soloPendientes) Accent else Surface)
+                            .then(if (soloPendientes) Modifier else Modifier.border(1.dp, com.paragon.app.ui.theme.Border, RoundedCornerShape(50)))
+                            .clickable { soloPendientes = !soloPendientes }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Text(
+                            Textos.t(T.ficha_solo_faltan, faltan),
+                            color = if (soloPendientes) com.paragon.app.ui.theme.OnAccent else Foreground,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                        )
+                    }
+                }
                 Spacer(Modifier.weight(1f))
                 com.paragon.app.ui.trofeos.SelectorVistaTrofeos()
             }
@@ -911,13 +931,17 @@ private fun TrophyRow(
     var buscandoGuia by remember(trophy.id) { mutableStateOf(false) }
     var showGuiasEscritas by remember(trophy.id) { mutableStateOf(false) }
 
-    Row(
+    // Antes todo iba en UNA fila (foto, texto, %, ⭐, 🔍, 📖): en un móvil
+    // los botones se comían el ancho y el texto quedaba en una columna de
+    // cuatro letras, ilegible. Ahora el texto ocupa todo el ancho y las
+    // acciones bajan a su propia línea.
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
             .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
+    Row(verticalAlignment = Alignment.Top) {
         // Foto real del trofeo cuando la hay (mismo criterio que TrophyPhoto
         // en la web) — el cuadrado de color por metal es el respaldo para
         // cuando de verdad no hay icono, no la primera opción. Antes esta
@@ -959,9 +983,14 @@ private fun TrophyRow(
             )
         }
         trophy.rarityPercent?.let {
-            Text(text = "${com.paragon.app.util.numeroLocal(it, 1)} %", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.width(8.dp))
+            Text(text = "${com.paragon.app.util.numeroLocal(it, 1)} %", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        if (!trophy.earned) {
+    }
+        if (!trophy.earned) Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 56.dp, top = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             IconButton(
                 onClick = {
                     coroutineScope.launch {
@@ -984,7 +1013,7 @@ private fun TrophyRow(
                         }
                     }
                 },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Icon(Icons.Default.Star, contentDescription = Textos.t(T.ficha_atascar), tint = if (isStuck) Accent else Muted, modifier = Modifier.size(16.dp))
             }
@@ -1002,7 +1031,7 @@ private fun TrophyRow(
                         uriHandler.openUri(urlGuiaYoutube(videoId, game.title, trophy.name))
                     }
                 },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 if (buscandoGuia) {
                     CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
@@ -1012,7 +1041,7 @@ private fun TrophyRow(
             }
             IconButton(
                 onClick = { showGuiasEscritas = true },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = Textos.t(T.ficha_guias_escritas), tint = Muted, modifier = Modifier.size(16.dp))
             }

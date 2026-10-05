@@ -209,7 +209,9 @@ fun MainScreen(
         topBar = {
             // Inicio, Biblioteca y Perfil llevan su propia cabecera grande (rediseño del 5 oct
             // 2026); ahí la barra de arriba solo ocuparía sitio.
-            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route || currentRoute == Screen.Library.route || currentRoute == Screen.Feed.route) {
+            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route || currentRoute == Screen.Library.route || currentRoute == Screen.Feed.route ||
+                currentRoute == Screen.GameDetail.route || currentRoute == Screen.Sessions.route ||
+                currentRoute == Screen.SessionDetail.route || currentRoute == Screen.Ritmo.route) {
                 Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
             } else
             androidx.compose.foundation.layout.Box(modifier = Modifier.background(Background)) {

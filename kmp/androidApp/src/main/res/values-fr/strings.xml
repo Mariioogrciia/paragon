@@ -372,6 +372,7 @@
     <string name="ficha_reservar_faltan_1">Réserver pour le n°%1$s · encore %2$s</string>
     <string name="ficha_reservar_faltan_n">Réserver pour le n°%1$s · encore %2$s</string>
     <string name="ficha_reservar_n">Réserver pour le n°%1$s</string>
+    <string name="ficha_solo_faltan">Manquants · %1$s</string>
     <string name="fuente_casual">Décontractée</string>
     <string name="fuente_elegante">Élégante</string>
     <string name="fuente_moderna">Moderne</string>

@@ -4276,5 +4276,11 @@
   "en": "Helping",
   "es": "Ayuda",
   "fr": "Aide"
+ },
+ "ficha_solo_faltan": {
+  "de": "Fehlen · {0}",
+  "en": "Missing · {0}",
+  "es": "Me faltan · {0}",
+  "fr": "Manquants · {0}"
  }
 }

@@ -112,7 +112,10 @@ class ParagonFirebaseMessagingService : FirebaseMessagingService() {
         val caratula = imageUrl?.let { cargarCaratula(it) }
 
         val builder = NotificationCompat.Builder(this, channelId)
+            // La P de Paragon (silueta) en el color de acento: antes era un
+            // trofeo genérico sin color y se veía como una mancha blanca.
             .setSmallIcon(R.drawable.ic_stat_paragon)
+            .setColor(androidx.core.content.ContextCompat.getColor(this, R.color.notificacion_acento))
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)

@@ -372,6 +372,7 @@
     <string name="ficha_reservar_faltan_1">Für #%1$s reservieren · noch %2$s</string>
     <string name="ficha_reservar_faltan_n">Für #%1$s reservieren · noch %2$s</string>
     <string name="ficha_reservar_n">Für #%1$s reservieren</string>
+    <string name="ficha_solo_faltan">Fehlen · %1$s</string>
     <string name="fuente_casual">Locker</string>
     <string name="fuente_elegante">Elegant</string>
     <string name="fuente_moderna">Modern</string>
