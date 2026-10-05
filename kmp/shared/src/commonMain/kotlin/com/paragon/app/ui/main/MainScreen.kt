@@ -209,7 +209,7 @@ fun MainScreen(
         topBar = {
             // Inicio, Biblioteca y Perfil llevan su propia cabecera grande (rediseño del 5 oct
             // 2026); ahí la barra de arriba solo ocuparía sitio.
-            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route || currentRoute == Screen.Library.route) {
+            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route || currentRoute == Screen.Library.route || currentRoute == Screen.Feed.route) {
                 Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
             } else
             androidx.compose.foundation.layout.Box(modifier = Modifier.background(Background)) {
@@ -391,10 +391,13 @@ fun MainScreen(
                 )
             }
             composable(Screen.Stats.route) { StatsScreen(tokenStore, handle = profile.handle, database = database) }
-            composable(Screen.Feed.route) { 
-                FeedScreen(tokenStore, themeStore, onCompareClick = { handle ->
-                    navController.navigate(Screen.Compare.routeFor(handle))
-                }) 
+            composable(Screen.Feed.route) {
+                com.paragon.app.ui.feed.ComunidadScreen(
+                    tokenStore = tokenStore,
+                    themeStore = themeStore,
+                    onCompareClick = { handle -> navController.navigate(Screen.Compare.routeFor(handle)) },
+                    onAbrirSesion = { id -> navController.navigate(Screen.SessionDetail.routeFor(id)) },
+                )
             }
             composable(Screen.Social.route) {
                 SocialScreen(tokenStore, themeStore, myHandle = profile.handle, database = database, onCompareClick = { handle ->

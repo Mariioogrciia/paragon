@@ -126,7 +126,7 @@ private fun fechaSesion(iso: String, larga: Boolean = false): String =
 // ------------------------------------------------------------------ Lista
 
 @Composable
-fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String) -> Unit) {
+fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String) -> Unit, embebida: Boolean = false) {
     val repo = remember { SesionesRepository(tokenStore) }
     var estado by remember { mutableStateOf<SesionResultado<com.paragon.shared.red.SesionesResponse>?>(null) }
     var recarga by remember { mutableIntStateOf(0) }
@@ -134,8 +134,11 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
 
     LaunchedEffect(recarga) { estado = repo.listar() }
 
+    Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().background(Background)) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        // Incrustada en Comunidad (pestaña Sesiones) no lleva cabecera propia:
+        // "Organizar" pasa a ser un botón flotante en la zona del pulgar.
+        if (!embebida) Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_atras), tint = Foreground) }
             Text(Textos.t(T.nav_sesiones), color = Foreground, fontSize = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             val juegos = (estado as? SesionResultado.Ok<com.paragon.shared.red.SesionesResponse>)?.valor?.juegos
@@ -169,7 +172,7 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = if (embebida) 96.dp else 32.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(sesiones, key = { it.id }) { s -> FilaSesion(s) { onAbrir(s.id) } }
@@ -189,6 +192,19 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
                 }
             }
         }
+    }
+    if (embebida && (estado as? SesionResultado.Ok<com.paragon.shared.red.SesionesResponse>) != null) {
+        Button(
+            onClick = { organizando = true },
+            colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = com.paragon.app.ui.theme.OnAccent),
+            shape = RoundedCornerShape(radio(28)),
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).height(56.dp),
+        ) {
+            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(Textos.t(T.sesiones_organizar), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        }
+    }
     }
 }
 

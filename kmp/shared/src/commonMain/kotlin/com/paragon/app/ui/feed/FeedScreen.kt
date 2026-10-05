@@ -68,7 +68,7 @@ import androidx.compose.ui.semantics.contentDescription
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit) {
+fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit, conTitulo: Boolean = true) {
     val context = com.paragon.shared.contextoPlataforma()
     val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
     val repository = remember(tokenStore, cacheDao) { FeedRepository(tokenStore, cacheDao) }
@@ -101,13 +101,14 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                 .background(Background)
                 .padding(horizontal = 24.dp)
         ) {
-        Text(
+        // Dentro de Comunidad (ComunidadScreen) el título ya va arriba, con el selector.
+        if (conTitulo) Text(
             text = Textos.t(T.feed_titulo),
             color = Foreground,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp, bottom = if ((result as? FeedResult.Ok)?.fromCache == true) 4.dp else 24.dp)
-        )
+        ) else Spacer(Modifier.height(16.dp))
 
         if ((result as? FeedResult.Ok)?.fromCache == true) {
             Text(

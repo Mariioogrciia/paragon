@@ -4252,5 +4252,11 @@
   "en": "Played",
   "es": "Jugadas",
   "fr": "Jouées"
+ },
+ "comunidad_muro": {
+  "de": "Pinnwand",
+  "en": "Wall",
+  "es": "Muro",
+  "fr": "Mur"
  }
 }
