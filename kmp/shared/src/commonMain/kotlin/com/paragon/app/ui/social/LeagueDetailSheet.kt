@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paragon.app.data.AmigoRow
@@ -162,7 +163,7 @@ private fun LeagueDetailContent(
 ) {
     var confirm by remember { mutableStateOf<PendingConfirm?>(null) }
 
-    Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+    Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     Text(text = Textos.t(T.liga_clasif_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
     if (detail.terminada) {
         // Terminada: clasificación definitiva y quién ganó (el servidor la cierra y avisa a todos).
@@ -273,7 +274,7 @@ private fun LeagueDetailContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(text = amigo.name, color = Foreground, fontSize = 14.sp)
+                        Text(text = amigo.name, color = Foreground, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(text = Textos.t(T.comun_invitar), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
@@ -352,7 +353,7 @@ private fun PendingMemberRow(member: PendingMember, onCancel: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
-            Text(text = member.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            Text(text = member.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = Textos.t(T.liga_esperando), color = Muted, fontSize = 11.sp)
         }
         TextButton(onClick = onCancel) {
@@ -404,6 +405,8 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
                 color = if (esPrimero) Platinum else Foreground,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             // Sale de la foto semanal del cron — null hasta que corra una
             // vez para esta liga, o para alguien recién unido. 0 sí se
@@ -451,7 +454,7 @@ private fun ChallengeStandingRow(member: ChallengeStanding, position: Int) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = Textos.t(T.liga_posicion, position, member.name), color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text(text = Textos.t(T.liga_posicion, position, member.name), color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         if (member.hasPlatinum) {
             Text(text = Textos.t(T.grado_platino), color = Platinum, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         } else {

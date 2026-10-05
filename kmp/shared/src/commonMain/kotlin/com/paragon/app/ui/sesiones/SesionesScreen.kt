@@ -346,7 +346,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                             Caratula(s.juego.iconUrl, ancho = 72, alto = 100)
                             Spacer(Modifier.width(14.dp))
                             Column(Modifier.weight(1f)) {
-                                Text("${s.juego.titulo} · ${s.juego.deviceLabel}".uppercase(), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("${s.juego.titulo} · ${s.juego.deviceLabel}".uppercase(), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                                     s.trofeoInfo?.iconUrl?.let { url ->
                                         urlImagenSegura(url)?.let {

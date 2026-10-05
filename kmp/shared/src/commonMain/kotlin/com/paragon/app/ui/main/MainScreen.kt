@@ -1,5 +1,6 @@
 package com.paragon.app.ui.main
 
+import androidx.compose.animation.animateContentSize
 import androidx.savedstate.read
 
 import androidx.compose.foundation.background
@@ -587,39 +588,46 @@ private fun BarraFlotante(items: List<BottomNavItem>, estaEn: (BottomNavItem) ->
         Row(
             Modifier
                 .fillMaxWidth()
-                .height(64.dp)
+                .height(60.dp)
                 .shadow(16.dp, forma, ambientColor = Accent.copy(alpha = 0.18f), spotColor = Accent.copy(alpha = 0.18f))
                 .clip(forma)
                 .background(com.paragon.app.ui.theme.Surface)
                 .border(1.dp, Border, forma),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Sin letras debajo (5 oct 2026, "quitar las letras de la barra"):
+            // solo iconos; la pestaña activa se abre en una píldora con su
+            // nombre, como las barras de las apps nativas de ahora.
             items.forEach { item ->
                 val activa = estaEn(item)
-                Column(
+                Box(
                     Modifier
-                        .weight(1f)
+                        .weight(if (activa) 1.8f else 1f)
                         .fillMaxHeight()
                         .clickable { onClick(item) },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Box(
+                    Row(
                         Modifier
-                            .clip(RoundedCornerShape(radio(14)))
+                            .animateContentSize()
+                            .clip(RoundedCornerShape(50))
                             .background(if (activa) com.paragon.app.ui.theme.AccentSoft else androidx.compose.ui.graphics.Color.Transparent)
-                            .padding(horizontal = 14.dp, vertical = 3.dp),
+                            .padding(horizontal = if (activa) 14.dp else 10.dp, vertical = 9.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(item.icon, contentDescription = null, tint = if (activa) Accent else Muted, modifier = Modifier.size(22.dp))
+                        Icon(item.icon, contentDescription = item.screen.title, tint = if (activa) Accent else Muted, modifier = Modifier.size(24.dp))
+                        if (activa) {
+                            Text(
+                                item.screen.title,
+                                color = Accent,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(start = 6.dp),
+                            )
+                        }
                     }
-                    Text(
-                        item.screen.title,
-                        color = if (activa) Accent else Muted,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
                 }
             }
         }

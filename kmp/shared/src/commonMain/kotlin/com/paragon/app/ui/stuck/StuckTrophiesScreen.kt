@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -118,7 +119,7 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
         )
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = trophy.gameTitle, color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Text(text = trophy.gameTitle, color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = trophy.trophyName, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 2.dp))
             Text(text = trophy.trophyDetail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
         }

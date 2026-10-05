@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -86,6 +87,8 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             if (selected == null) {
                 IconButton(onClick = { showCreateDialog = true }) {
@@ -222,7 +225,7 @@ private fun CollectionsList(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = coleccion.name, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = coleccion.name, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(text = Textos.t(T.comun_n_juegos, coleccion.gameIds.size), color = Muted, fontSize = 12.sp)
                 }
                 IconButton(onClick = { onRename(coleccion) }) {
@@ -378,7 +381,7 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
                             colors = CheckboxDefaults.colors(checkedColor = Accent),
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(text = coleccion.name, color = Foreground, fontSize = 14.sp)
+                        Text(text = coleccion.name, color = Foreground, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }

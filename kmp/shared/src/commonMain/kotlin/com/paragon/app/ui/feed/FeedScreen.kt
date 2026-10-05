@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paragon.app.data.FeedItem
@@ -263,6 +264,8 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                         color = Accent,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Text(text = item.timeAgo, color = Muted, fontSize = 12.sp)
@@ -381,6 +384,8 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                                 color = Foreground,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
                             Text(
                                 text = "  ${comment.body}",

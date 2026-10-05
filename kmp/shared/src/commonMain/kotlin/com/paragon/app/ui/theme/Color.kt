@@ -39,19 +39,49 @@ private val BaseOled = Suelo(Color(0xFF000000), Color(0xFF0A0A0C), Color(0xFF141
 private val BaseContraste = Suelo(Color(0xFF000000), Color(0xFF0C1017), Color(0xFF1A212E), Color(0xFF5A6B82), Color(0xFFC3CDDB))
 
 /**
- * El suelo del momento. Las paletas completas (y la de juego) solo cambian
- * el fondo en modo oscuro, igual que la web: en claro, OLED o contraste
- * mandan lo que esos modos existen para hacer. Los estilos de plataforma
- * (PS5, Xbox...) tiñen el fondo en oscuro si la paleta no trae el suyo.
+ * El suelo del momento. Antes solo cambiaba en modo oscuro y con las paletas
+ * completas: elegir azul, rojo o verde cambiaba botones y poco más ("solo
+ * cambia el color de los acentuamientos", 5 oct 2026). Ahora el acento tiñe
+ * también el fondo y las superficies en oscuro, claro y OLED (en OLED el
+ * fondo sigue negro puro: solo se tiñen las tarjetas). Contraste alto se
+ * queda neutro, que es lo que ese modo existe para hacer. Las paletas
+ * completas y la de juego traen su propio suelo en oscuro; los estilos de
+ * plataforma (PS5, Xbox...) ponen su fondo de ambientación.
  */
 private fun suelo(): Suelo = when (modoActivo) {
-    ThemeMode.CLARO -> BaseClaro
-    ThemeMode.OLED -> BaseOled
+    ThemeMode.CLARO -> tenido(BaseClaro, claro = true)
+    ThemeMode.OLED -> tenido(BaseOled, claro = false).copy(background = BaseOled.background)
     ThemeMode.CONTRASTE -> BaseContraste
     else -> paletaJuegoActiva?.suelo
         ?: acentoActivo.suelo?.let { if (acentoLibreActivo == null) it else null }
-        ?: estiloActivo.fondoOscuro?.let { BaseOscuro.copy(background = it) }
-        ?: BaseOscuro
+        ?: tenido(estiloActivo.fondoOscuro?.let { BaseOscuro.copy(background = it) } ?: BaseOscuro, claro = false)
+}
+
+/** El color que tiñe el suelo: el del acento elegido (null = Platino, el de la marca, que ya es la base). */
+private fun tinteSuelo(): Color? = when {
+    activeDynamicScheme != null -> null
+    paletaJuegoActiva != null -> paletaJuegoActiva!!.oscuro
+    acentoLibreActivo != null -> acentoLibreActivo
+    acentoActivo.clave.isEmpty() -> null
+    else -> acentoActivo.oscuro
+}
+
+/** Mezcla la base con el acento: lo justo para que se note el cambio sin perder legibilidad. */
+private fun tenido(base: Suelo, claro: Boolean): Suelo {
+    val t = tinteSuelo() ?: return base
+    return if (claro) Suelo(
+        lerp(base.background, t, 0.08f),
+        lerp(base.surface, t, 0.025f),
+        lerp(base.surface2, t, 0.10f),
+        lerp(base.border, t, 0.18f),
+        base.muted,
+    ) else Suelo(
+        lerp(base.background, t, 0.07f),
+        lerp(base.surface, t, 0.09f),
+        lerp(base.surface2, t, 0.12f),
+        lerp(base.border, t, 0.18f),
+        base.muted,
+    )
 }
 
 private val vidrio: Boolean get() = estiloActivo.clave == "estilo-vidrio"

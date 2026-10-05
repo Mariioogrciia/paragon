@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import com.paragon.shared.contextoPlataforma
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -830,7 +831,7 @@ internal fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = 
                     .background(Surface, RoundedCornerShape(radio(14)))
                     .padding(14.dp),
             ) {
-                Text(text = p.trofeo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = p.trofeo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (p.trofeo.detail.isNotBlank()) {
                     Text(text = p.trofeo.detail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                 }
@@ -894,7 +895,7 @@ internal fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = 
                             }
                             Spacer(Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(p.trofeo.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                                Text(p.trofeo.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(
                                     Textos.t(T.ficha_grado_rareza, gradeLabelEs(p.trofeo.grade), p.trofeo.rarityPercent ?: "?"),
                                     color = Muted,

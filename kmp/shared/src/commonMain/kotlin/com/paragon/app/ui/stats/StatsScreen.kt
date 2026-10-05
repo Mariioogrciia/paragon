@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paragon.app.util.formatDecimal
@@ -521,7 +522,7 @@ private fun TrophyCaseCard(trophyCase: List<TrophyCaseAward>) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = ICONO_LIGA[award.kind] ?: "🏆", fontSize = 20.sp, modifier = Modifier.padding(end = 12.dp))
                 Column {
-                    Text(text = award.titulo, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = award.titulo, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(text = fechaCorta(award.earnedAt), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                 }
             }
@@ -555,7 +556,7 @@ private fun BadgesCard(badges: List<Badge>) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = ICONO_BADGE[badge.id] ?: "🏅", fontSize = 20.sp, modifier = Modifier.padding(end = 12.dp))
                 Column {
-                    Text(text = badge.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = badge.name, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(text = badge.description, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                 }
             }

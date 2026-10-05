@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -411,7 +412,7 @@ private fun LeagueInviteRow(invite: LeagueInvite, onAccept: () -> Unit, onDeclin
             .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .padding(16.dp),
     ) {
-        Text(invite.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        Text(invite.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(Textos.t(T.social_te_ha_invitado, invite.ownerName), color = Muted, fontSize = 12.sp)
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -573,7 +574,7 @@ fun LeagueRowItem(league: League, onClick: () -> Unit) {
             Text(league.name.take(1).uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 15.sp)
         }
         Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
-            Text(text = league.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text(text = league.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
                 text = (if (league.memberCount == 1) Textos.t(T.comun_miembros_1, league.memberCount) else Textos.t(T.comun_miembros_n, league.memberCount)) +
                     (if (league.terminada) " · " + Textos.t(T.liga_terminada)
@@ -681,7 +682,7 @@ private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
             Text(clan.tag.take(2).uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 12.sp)
         }
         Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
-            Text(text = "[${clan.tag}] ${clan.name}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text(text = "[${clan.tag}] ${clan.name}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (clan.description.isNotBlank()) {
                 Text(text = clan.description, color = Muted, fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             }
@@ -857,7 +858,7 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
                     RowAvatar(primero.name, primero.avatarUrl, size = 56.dp)
                     Text("🥇", fontSize = 20.sp)
                 }
-                Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 8.dp))
+                Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(Textos.t(T.comun_puntos, primero.points), color = PodiumGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 val segundo = top3.getOrNull(1)
                 if (segundo != null) {
@@ -923,7 +924,7 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = Textos.t(T.social_puntos_mes, row.points), color = Muted, fontSize = 12.sp)
             }
         }
@@ -946,7 +947,7 @@ fun AmigoRowItem(row: AmigoRow, position: Int, onClick: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = Textos.t(T.social_nivel_platinos, row.level, row.platinos), color = Muted, fontSize = 12.sp)
                 if (row.accounts.isNotEmpty()) {
                     Text(

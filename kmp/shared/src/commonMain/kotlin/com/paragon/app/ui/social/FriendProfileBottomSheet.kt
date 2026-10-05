@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -192,7 +193,7 @@ private fun ProfileContent(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text(profile.name, color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(profile.name, color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("@${profile.handle}", color = Muted, fontSize = 14.sp)
             Text(
                 Textos.t(T.perfil_nivel_arquetipo, profile.level, archetypeForLevel(profile.level)),

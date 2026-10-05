@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -156,7 +157,7 @@ private fun ShareAddCard(tokenStore: TokenStore, initialQuery: String, onClose: 
                             }
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(result.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                Text(result.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 val developer = result.developer
                                 if (!developer.isNullOrBlank()) {
                                     Text(developer, color = Muted, fontSize = 12.sp)

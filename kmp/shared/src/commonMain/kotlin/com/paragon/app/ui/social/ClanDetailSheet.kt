@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -214,7 +215,7 @@ private fun ClanDetailContent(
                     .padding(horizontal = 8.dp, vertical = 3.dp),
             )
             Spacer(Modifier.width(10.dp))
-            Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         if (detail.description.isNotBlank()) {
             Text(text = detail.description, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
@@ -334,7 +335,7 @@ private fun ClanMemberRow(member: ClanMember, index: Int, totalClan: Int, onClic
             }
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(text = member.name, color = if (esPrimero) Platinum else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = member.name, color = if (esPrimero) Platinum else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = Textos.t(T.clan_contribucion_fila, if (member.role == "owner") Textos.t(T.clan_lider) else Textos.t(T.clan_miembro), member.trofeosEnClan), color = Muted, fontSize = 11.sp)
             }
         }
@@ -390,7 +391,7 @@ private fun InvitableFriendRow(friend: InvitableFriend, onInvite: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = friend.name, color = Foreground, fontSize = 14.sp)
+        Text(text = friend.name, color = Foreground, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(text = Textos.t(T.comun_invitar), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     }
 }
@@ -484,7 +485,7 @@ private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResp
                 null -> Textos.t(T.guerra_empate) to Muted
             }
             Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("[${g.rival.tag}] ${g.rival.name}", color = Foreground, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("[${g.rival.tag}] ${g.rival.name}", color = Foreground, fontSize = 13.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("${g.misPuntos ?: 0} – ${g.susPuntos ?: 0}", color = Muted, fontSize = 12.sp)
                 Spacer(Modifier.width(10.dp))
                 Text(resultado, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold)

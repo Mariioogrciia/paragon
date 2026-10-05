@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -177,7 +178,7 @@ private fun FriendsPicker(amigos: List<AmigoRow>, onPick: (String) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(text = amigo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = amigo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(text = Textos.t(T.comparar_handle_nivel, amigo.handle ?: "", amigo.level), color = Muted, fontSize = 12.sp)
                     }
                     Text(text = Textos.t(T.comun_n_platinos, amigo.platinos), color = Platinum, fontSize = 13.sp, fontWeight = FontWeight.Bold)
@@ -266,7 +267,7 @@ private fun RowScope.CompareColumn(label: String, side: CompareSide, destacado: 
         }
         Spacer(Modifier.height(8.dp))
         Text(text = label, color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-        Text(text = side.name, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+        Text(text = side.name, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(text = Textos.t(T.comun_nivel_n, side.level), color = Muted, fontSize = 12.sp)
         Spacer(Modifier.height(10.dp))
         Text(text = side.platinos.toString(), color = Platinum, fontSize = 26.sp, fontWeight = FontWeight.Bold)
