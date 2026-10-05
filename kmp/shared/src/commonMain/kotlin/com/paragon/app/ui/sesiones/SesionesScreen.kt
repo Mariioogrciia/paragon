@@ -387,7 +387,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                         }
                         Text(textoLibres(s.libres), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
                         Persona(s.anfitrion, organiza = true, soyYo = s.soyAnfitrion)
-                        s.participantes.forEach { Persona(it, organiza = false, soyYo = false) }
+                        s.participantes.forEach { Persona(it, organiza = false, soyYo = false, ayuda = it.ayuda) }
                         repeat(s.libres) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -413,6 +413,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                                     s.soyAnfitrion -> Textos.t(T.sesiones_eres_anfitrion)
                                     s.estoyApuntado -> Textos.t(T.sesiones_estas_dentro)
                                     s.libres == 0 -> Textos.t(T.sesiones_sin_plazas)
+                                    s.yaLoTengo -> Textos.t(T.sesiones_ya_lo_tienes_ayuda)
                                     s.loTengo -> Textos.t(T.sesiones_puedes_unirte)
                                     else -> Textos.t(T.sesiones_no_lo_tienes, s.juego.deviceLabel)
                                 },
@@ -440,7 +441,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                                     colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = Background),
                                     shape = RoundedCornerShape(radio(10)),
                                     modifier = Modifier.fillMaxWidth(),
-                                ) { Text(Textos.t(T.sesiones_unirme), fontWeight = FontWeight.Bold) }
+                                ) { Text(if (s.yaLoTengo) Textos.t(T.sesiones_unirme_ayudar) else Textos.t(T.sesiones_unirme), fontWeight = FontWeight.Bold) }
                             }
                         }
                         error?.let { Text(it, color = androidx.compose.ui.graphics.Color(0xFFE57373), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
@@ -479,7 +480,7 @@ private fun Etiqueta(texto: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun Persona(p: SesionPersonaDto, organiza: Boolean, soyYo: Boolean) {
+private fun Persona(p: SesionPersonaDto, organiza: Boolean, soyYo: Boolean, ayuda: Boolean = false) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
@@ -492,6 +493,15 @@ private fun Persona(p: SesionPersonaDto, organiza: Boolean, soyYo: Boolean) {
         Column(Modifier.weight(1f)) {
             Text(nombreCorto(p) + if (soyYo) " (${Textos.t(T.sesiones_tu)})" else "", color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             p.handle?.let { Text("@$it", color = Muted, fontSize = 12.sp, maxLines = 1) }
+        }
+        if (ayuda) {
+            Text(
+                Textos.t(T.sesiones_ayuda),
+                color = Muted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clip(RoundedCornerShape(50)).border(1.dp, Border, RoundedCornerShape(50)).padding(horizontal = 8.dp, vertical = 3.dp),
+            )
         }
         if (organiza) {
             Text(
@@ -552,7 +562,7 @@ private fun NuevaSesionSheet(
                 val opciones = juegos
                     .sortedWith(compareBy({ PLATAFORMAS[it.platform] ?: "~" }, { it.titulo }, { it.deviceLabel }))
                     .map { OpcionSelector(it.id, it.titulo, detalle = "${it.deviceLabel} · ${it.progreso}%", grupo = PLATAFORMAS[it.platform] ?: Textos.t(T.sesiones_otras)) }
-                Selector(valor = gameId, opciones = opciones, onElegir = { gameId = it; trophyId = null })
+                Selector(valor = gameId, opciones = opciones, onElegir = { gameId = it; trophyId = null }, buscable = true)
             }
 
             Campo(Textos.t(T.sesiones_trofeo)) {

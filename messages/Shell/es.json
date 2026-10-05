@@ -603,7 +603,10 @@
     "trofeoOtro": "✍️ Otro (escribirlo a mano)",
     "sinListaTrofeos": "De este juego no tenemos la lista de trofeos (o ya los tienes todos): escríbelo a mano.",
     "trofeoEscrito": "¿Qué trofeo o logro?",
-    "juegoBase": "Juego base"
+    "juegoBase": "Juego base",
+    "unirmeAyudar": "Unirme para ayudar",
+    "yaLoTienesAyuda": "Ya tienes este trofeo: puedes unirte para ayudar a conseguirlo.",
+    "ayuda": "Ayuda"
   },
   "Temporada": {
     "titulo": "Pase de Temporada",

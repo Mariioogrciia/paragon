@@ -603,7 +603,10 @@
     "trofeoOtro": "✍️ Autre (le saisir)",
     "sinListaTrofeos": "On n'a pas la liste des trophées de ce jeu (ou tu les as déjà tous) : saisis-le.",
     "trofeoEscrito": "Quel trophée ou succès ?",
-    "juegoBase": "Jeu de base"
+    "juegoBase": "Jeu de base",
+    "unirmeAyudar": "Rejoindre pour aider",
+    "yaLoTienesAyuda": "Tu as déjà ce trophée : tu peux rejoindre pour aider les autres.",
+    "ayuda": "Aide"
   },
   "Temporada": {
     "titulo": "Passe de saison",

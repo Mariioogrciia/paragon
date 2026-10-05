@@ -9,7 +9,7 @@ import io.ktor.http.encodeURLPathPart
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SesionPersonaDto(val userId: String, val handle: String? = null, val name: String? = null, val image: String? = null)
+data class SesionPersonaDto(val userId: String, val handle: String? = null, val name: String? = null, val image: String? = null, val ayuda: Boolean = false)
 
 @Serializable
 data class SesionJuegoDto(
@@ -40,6 +40,8 @@ data class SesionDto(
     val participantes: List<SesionPersonaDto> = emptyList(),
     val soyAnfitrion: Boolean = false,
     val estoyApuntado: Boolean = false,
+    /** Quien mira ya tiene el trofeo: si se une, es para ayudar. */
+    val yaLoTengo: Boolean = false,
     val loTengo: Boolean = false,
 )
 

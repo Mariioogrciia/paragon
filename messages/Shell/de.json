@@ -603,7 +603,10 @@
     "trofeoOtro": "✍️ Andere (selbst eingeben)",
     "sinListaTrofeos": "Für dieses Spiel haben wir keine Trophäenliste (oder du hast schon alle): gib sie selbst ein.",
     "trofeoEscrito": "Welche Trophäe oder welcher Erfolg?",
-    "juegoBase": "Hauptspiel"
+    "juegoBase": "Hauptspiel",
+    "unirmeAyudar": "Beitreten, um zu helfen",
+    "yaLoTienesAyuda": "Du hast diese Trophäe schon: Du kannst beitreten, um den anderen zu helfen.",
+    "ayuda": "Hilft"
   },
   "Temporada": {
     "titulo": "Season Pass",

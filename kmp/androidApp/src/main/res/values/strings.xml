@@ -532,6 +532,7 @@
     <string name="selector_buscar">Buscar…</string>
     <string name="selector_elige">Elige una opción</string>
     <string name="selector_sin_resultados">Nada coincide con eso</string>
+    <string name="sesiones_ayuda">Ayuda</string>
     <string name="sesiones_cancelada">Cancelada</string>
     <string name="sesiones_cancelar">Cancelar sesión</string>
     <string name="sesiones_cancelar_texto">Avisaremos a quienes se habían unido.</string>
@@ -577,8 +578,10 @@
     <string name="sesiones_trofeo_otro">✍️ Otro (escribirlo a mano)</string>
     <string name="sesiones_tu">tú</string>
     <string name="sesiones_unirme">Unirme a la sesión</string>
+    <string name="sesiones_unirme_ayudar">Unirme para ayudar</string>
     <string name="sesiones_vacio_texto">Organiza la primera para ese trofeo online que te falta.</string>
     <string name="sesiones_vacio_titulo">No hay sesiones programadas</string>
+    <string name="sesiones_ya_lo_tienes_ayuda">Ya tienes este trofeo: puedes unirte para ayudar a conseguirlo.</string>
     <string name="sesiones_ya_no_abierta">Esta sesión ya no admite gente.</string>
     <string name="social_clan_desc">Descripción (opcional)</string>
     <string name="social_clan_nombre">Nombre del clan</string>

@@ -103,6 +103,9 @@ export default async function SesionPage({ params }: { params: Promise<{ id: str
                   </span>
                   {p.handle && <span className="block truncate text-xs text-muted">@{p.handle}</span>}
                 </span>
+                {"ayuda" in p && p.ayuda && (
+                  <span className="rounded-full border border-border px-2 py-0.5 text-[0.6875rem] font-bold text-muted">{t("ayuda")}</span>
+                )}
                 {p.organiza && (
                   <span className="rounded-full px-2 py-0.5 text-[0.6875rem] font-bold text-[var(--accent-text)]" style={{ background: "rgb(var(--accent-rgb) / 0.14)" }}>
                     {t("anfitrion")}
@@ -139,11 +142,13 @@ export default async function SesionPage({ params }: { params: Promise<{ id: str
                   ? t("estasDentro")
                   : s.libres === 0
                     ? t("sinPlazas")
-                    : s.loTengo
+                    : s.yaLoTengo
+                      ? t("yaLoTienesAyuda")
+                      : s.loTengo
                       ? t("puedesUnirte")
                       : t("noLoTienes", { consola: s.juego.deviceLabel })}
             </p>
-            <AccionesSesion sessionId={s.id} soyAnfitrion={s.soyAnfitrion} estoyApuntado={s.estoyApuntado} llena={s.libres === 0} />
+            <AccionesSesion sessionId={s.id} soyAnfitrion={s.soyAnfitrion} estoyApuntado={s.estoyApuntado} llena={s.libres === 0} paraAyudar={s.yaLoTengo} />
           </>
         )}
       </section>

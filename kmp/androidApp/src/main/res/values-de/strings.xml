@@ -530,6 +530,7 @@
     <string name="selector_buscar">Suchen…</string>
     <string name="selector_elige">Option auswählen</string>
     <string name="selector_sin_resultados">Nichts gefunden</string>
+    <string name="sesiones_ayuda">Hilft</string>
     <string name="sesiones_cancelada">Abgesagt</string>
     <string name="sesiones_cancelar">Session absagen</string>
     <string name="sesiones_cancelar_texto">Wir sagen allen Bescheid, die beigetreten sind.</string>
@@ -575,8 +576,10 @@
     <string name="sesiones_trofeo_otro">✍️ Andere (selbst eingeben)</string>
     <string name="sesiones_tu">du</string>
     <string name="sesiones_unirme">Session beitreten</string>
+    <string name="sesiones_unirme_ayudar">Beitreten, um zu helfen</string>
     <string name="sesiones_vacio_texto">Organisiere die erste für die Online-Trophäe, die dir fehlt.</string>
     <string name="sesiones_vacio_titulo">Keine Sessions geplant</string>
+    <string name="sesiones_ya_lo_tienes_ayuda">Du hast diese Trophäe schon: Du kannst beitreten, um den anderen zu helfen.</string>
     <string name="sesiones_ya_no_abierta">Diese Session nimmt niemanden mehr auf.</string>
     <string name="social_clan_desc">Beschreibung (optional)</string>
     <string name="social_clan_nombre">Clan-Name</string>

@@ -32,6 +32,8 @@ interface Persona {
   handle: string | null;
   name: string | null;
   image: string | null;
+  /** Ya tiene el trofeo de la sesión: va a ayudar a los demás. */
+  ayuda?: boolean;
 }
 
 export interface SesionVista {
@@ -53,6 +55,8 @@ export interface SesionVista {
   participantes: Persona[];
   soyAnfitrion: boolean;
   estoyApuntado: boolean;
+  /** Quien mira ya tiene ese trofeo: si se une, es para ayudar. */
+  yaLoTengo: boolean;
   /** Si quien mira tiene ese juego en su biblioteca (mismo igdbId o mismo id). */
   loTengo: boolean;
 }
@@ -72,6 +76,14 @@ export async function crearSesion(
       .where(and(eq(gameTrophies.gameId, datos.gameId), eq(gameTrophies.trophyId, datos.trophyId)))
       .limit(1);
     if (!def) throw new SesionError("Ese trofeo no es de este juego.");
+    // Solo de trofeos que te faltan: organizar uno que ya tienes no tiene
+    // sentido (para echar una mano está "Unirme para ayudar" en la de otro).
+    const [loTiene] = await db
+      .select({ earned: userTrophies.earned })
+      .from(userTrophies)
+      .where(and(eq(userTrophies.userId, hostId), eq(userTrophies.gameId, datos.gameId), eq(userTrophies.trophyId, datos.trophyId), eq(userTrophies.earned, true)))
+      .limit(1);
+    if (loTiene) throw new SesionError("Ya tienes ese trofeo: elige uno que te falte.");
     trofeo = def.name.trim().slice(0, 120);
   }
   const descripcion = datos.descripcion.trim();
@@ -177,6 +189,23 @@ export async function listarSesiones(userId: string | null, idioma: Idioma, solo
       ),
   ]);
   const defPorClave = new Map(definiciones.map((d) => [`${d.gameId}\u0000${d.name}`, d]));
+  // Quién de los que aparecen (y quien mira) ya tiene el trofeo de cada
+  // sesión: se une para ayudar. Solo sesiones cuyo trofeo casa con uno del juego.
+  const personas = [...new Set([...(userId ? [userId] : []), ...filas.map((f) => f.hostId), ...participantes.map((p) => p.userId)])];
+  const yaTienen = definiciones.length === 0 || personas.length === 0
+    ? []
+    : await db
+        .select({ userId: userTrophies.userId, gameId: userTrophies.gameId, trophyId: userTrophies.trophyId })
+        .from(userTrophies)
+        .where(
+          and(
+            eq(userTrophies.earned, true),
+            inArray(userTrophies.userId, personas),
+            inArray(userTrophies.gameId, [...new Set(definiciones.map((d) => d.gameId))]),
+            inArray(userTrophies.trophyId, [...new Set(definiciones.map((d) => d.trophyId))]),
+          ),
+        );
+  const tiene = new Set(yaTienen.map((r) => `${r.userId}\u0000${r.gameId}\u0000${r.trophyId}`));
   const traducciones = await traduccionesEnCache(
     definiciones.map((d) => ({ gameId: d.gameId, trophyId: d.trophyId })),
     idioma,
@@ -212,9 +241,13 @@ export async function listarSesiones(userId: string | null, idioma: Idioma, solo
       cancelada: f.cancelada,
       juego: { id: f.gameId, titulo: f.titulo, iconUrl: f.iconUrl, platform: f.platform, deviceLabel: f.deviceLabel, igdbId: f.igdbId },
       anfitrion: { userId: f.hostId, handle: f.hostHandle, name: f.hostName, image: f.hostImage },
-      participantes: suyos.map(({ sessionId: _s, ...p }) => p),
+      participantes: suyos.map(({ sessionId: _s, ...p }) => ({
+        ...p,
+        ayuda: def ? tiene.has(`${p.userId}\u0000${def.gameId}\u0000${def.trophyId}`) : false,
+      })),
       soyAnfitrion: f.hostId === userId,
       estoyApuntado: suyos.some((p) => p.userId === userId),
+      yaLoTengo: !!(userId && def && tiene.has(`${userId}\u0000${def.gameId}\u0000${def.trophyId}`)),
       loTengo: misIds.has(f.gameId) || (f.igdbId !== null && misIgdb.has(f.igdbId)),
     };
   });

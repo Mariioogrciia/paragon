@@ -905,7 +905,7 @@ total contando a quien organiza** (4 = el anfitrión + 3 libres).
 - `DELETE /api/mobile/sessions/{id}` → cancelar (solo el anfitrión; avisa a los apuntados).
 - `GET /api/mobile/sessions/trophies?gameId=` → `{ trofeos: [{ trophyId, name, grade, iconUrl, grupo }] }`: los que te faltan, en tu idioma; `grupo` null = juego base.
 
-`Sesion`: `{ id, trofeo, trofeoInfo: { iconUrl, grade, detail } | null, descripcion, fechaHora, plazasTotales, ocupadas, libres, cancelada, juego: { id, titulo, iconUrl, platform, deviceLabel, igdbId }, anfitrion, participantes: [{ userId, handle, name, image }], soyAnfitrion, estoyApuntado, loTengo }`.
+`Sesion`: `{ id, trofeo, trofeoInfo: { iconUrl, grade, detail } | null, descripcion, fechaHora, plazasTotales, ocupadas, libres, cancelada, juego: { id, titulo, iconUrl, platform, deviceLabel, igdbId }, anfitrion, participantes: [{ userId, handle, name, image }], soyAnfitrion, estoyApuntado, loTengo, yaLoTengo }`. `yaLoTengo`: quien mira ya tiene el trofeo (se une para ayudar); cada participante lleva `ayuda` con lo mismo. Crear una sesión de un trofeo que ya tienes da 400 "Ya tienes ese trofeo: elige uno que te falte."
 
 ### Diario del platino y desglose del mes
 

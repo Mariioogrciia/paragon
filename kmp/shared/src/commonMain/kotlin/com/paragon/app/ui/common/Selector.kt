@@ -83,11 +83,13 @@ fun Selector(
     placeholder: String = Textos.t(T.selector_elige),
     activo: Boolean = true,
     compacto: Boolean = false,
+    /** Caja de búsqueda; por defecto, solo con listas largas. */
+    buscable: Boolean? = null,
 ) {
     var abierto by remember { mutableStateOf(false) }
     var busqueda by remember { mutableStateOf("") }
     val elegida = opciones.firstOrNull { it.valor == valor }
-    val conBusqueda = opciones.size > UMBRAL_BUSQUEDA
+    val conBusqueda = buscable ?: (opciones.size > UMBRAL_BUSQUEDA)
     val forma = RoundedCornerShape(radio(8))
 
     Box(modifier = modifier) {

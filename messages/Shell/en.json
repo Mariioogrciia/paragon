@@ -603,7 +603,10 @@
     "trofeoOtro": "✍️ Other (type it in)",
     "sinListaTrofeos": "We don't have this game's trophy list (or you already have them all): type it in.",
     "trofeoEscrito": "Which trophy or achievement?",
-    "juegoBase": "Base game"
+    "juegoBase": "Base game",
+    "unirmeAyudar": "Join to help",
+    "yaLoTienesAyuda": "You already have this trophy: you can join to help the others get it.",
+    "ayuda": "Helping"
   },
   "Temporada": {
     "titulo": "Season Pass",

@@ -55,6 +55,7 @@ const FIJOS: Record<string, Trad> = {
   "La sesión tiene que ser dentro de al menos 10 minutos.": { en: "The session has to be at least 10 minutes from now.", de: "Die Session muss mindestens 10 Minuten in der Zukunft liegen.", fr: "La session doit commencer dans au moins 10 minutes." },
   "Como mucho con 60 días de antelación.": { en: "At most 60 days ahead.", de: "Höchstens 60 Tage im Voraus.", fr: "60 jours à l'avance maximum." },
   "Solo puedes organizar sesiones de juegos de tu biblioteca.": { en: "You can only set up sessions for games in your library.", de: "Du kannst nur Sessions für Spiele aus deiner Bibliothek organisieren.", fr: "Tu ne peux organiser des sessions que pour des jeux de ta bibliothèque." },
+  "Ya tienes ese trofeo: elige uno que te falte.": { en: "You already have that trophy: pick one you're missing.", de: "Diese Trophäe hast du schon: Wähle eine, die dir fehlt.", fr: "Tu as déjà ce trophée : choisis-en un qui te manque." },
   "Ese trofeo no es de este juego.": { en: "That trophy isn't from this game.", de: "Diese Trophäe gehört nicht zu diesem Spiel.", fr: "Ce trophée n'est pas de ce jeu." },
   "Esa sesión ya no está abierta.": { en: "That session isn't open anymore.", de: "Diese Session ist nicht mehr offen.", fr: "Cette session n'est plus ouverte." },
   "Es tu propia sesión.": { en: "It's your own session.", de: "Das ist deine eigene Session.", fr: "C'est ta propre session." },

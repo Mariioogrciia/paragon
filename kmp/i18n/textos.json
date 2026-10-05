@@ -4258,5 +4258,23 @@
   "en": "Wall",
   "es": "Muro",
   "fr": "Mur"
+ },
+ "sesiones_unirme_ayudar": {
+  "de": "Beitreten, um zu helfen",
+  "en": "Join to help",
+  "es": "Unirme para ayudar",
+  "fr": "Rejoindre pour aider"
+ },
+ "sesiones_ya_lo_tienes_ayuda": {
+  "de": "Du hast diese Trophäe schon: Du kannst beitreten, um den anderen zu helfen.",
+  "en": "You already have this trophy: you can join to help the others get it.",
+  "es": "Ya tienes este trofeo: puedes unirte para ayudar a conseguirlo.",
+  "fr": "Tu as déjà ce trophée : tu peux rejoindre pour aider les autres."
+ },
+ "sesiones_ayuda": {
+  "de": "Hilft",
+  "en": "Helping",
+  "es": "Ayuda",
+  "fr": "Aide"
  }
 }

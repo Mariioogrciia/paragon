@@ -112,6 +112,7 @@ export function NuevaSesion({ juegos }: { juegos: Juego[] }) {
             setTrophyId("");
           }}
           ariaLabel={t("juego")}
+          buscable
           options={grupos.flatMap((g) =>
             g.lista.map((j) => ({
               value: j.id,

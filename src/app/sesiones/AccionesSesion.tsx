@@ -10,11 +10,14 @@ export function AccionesSesion({
   soyAnfitrion,
   estoyApuntado,
   llena,
+  paraAyudar = false,
 }: {
   sessionId: string;
   soyAnfitrion: boolean;
   estoyApuntado: boolean;
   llena: boolean;
+  /** Ya tiene el trofeo: se une para ayudar a los demás. */
+  paraAyudar?: boolean;
 }) {
   const t = useTranslations("Shell.Sesiones");
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +52,7 @@ export function AccionesSesion({
           className="rounded-lg px-4 py-1.5 text-xs font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)] disabled:opacity-40"
           style={{ background: "var(--accent-grad)" }}
         >
-          {t("apuntarme")}
+          {paraAyudar ? t("unirmeAyudar") : t("apuntarme")}
         </button>
       )}
       {error && <p className="max-w-[220px] text-right text-xs font-semibold text-danger">{error}</p>}

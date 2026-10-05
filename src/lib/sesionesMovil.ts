@@ -17,6 +17,7 @@ export function sesionParaMovil(s: SesionVista) {
     participantes: s.participantes,
     soyAnfitrion: s.soyAnfitrion,
     estoyApuntado: s.estoyApuntado,
+    yaLoTengo: s.yaLoTengo,
     loTengo: s.loTengo,
   };
 }

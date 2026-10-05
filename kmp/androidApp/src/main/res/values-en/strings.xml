@@ -530,6 +530,7 @@
     <string name="selector_buscar">Search…</string>
     <string name="selector_elige">Pick an option</string>
     <string name="selector_sin_resultados">Nothing matches that</string>
+    <string name="sesiones_ayuda">Helping</string>
     <string name="sesiones_cancelada">Cancelled</string>
     <string name="sesiones_cancelar">Cancel session</string>
     <string name="sesiones_cancelar_texto">We\'ll let everyone who joined know.</string>
@@ -575,8 +576,10 @@
     <string name="sesiones_trofeo_otro">✍️ Other (type it in)</string>
     <string name="sesiones_tu">you</string>
     <string name="sesiones_unirme">Join session</string>
+    <string name="sesiones_unirme_ayudar">Join to help</string>
     <string name="sesiones_vacio_texto">Set up the first one for that online trophy you\'re missing.</string>
     <string name="sesiones_vacio_titulo">No sessions scheduled</string>
+    <string name="sesiones_ya_lo_tienes_ayuda">You already have this trophy: you can join to help the others get it.</string>
     <string name="sesiones_ya_no_abierta">This session isn\'t taking players anymore.</string>
     <string name="social_clan_desc">Description (optional)</string>
     <string name="social_clan_nombre">Clan name</string>
