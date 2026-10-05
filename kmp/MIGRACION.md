@@ -53,7 +53,13 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
     iOS irá al Llavero). `EnlaceSeguro` común con cryptography-kotlin (AES-GCM),
     con test contra un vector cifrado por `src/lib/enlaceMovil.ts`
     (`./gradlew :shared:testAndroidHostTest`).
-  - [ ] Repositorios y Room
+  - [x] Room: base, entidades y DAOs en `shared` (mismo paquete
+    `com.paragon.app.data.local`, las pantallas no cambian), SQLite propio
+    (`BundledSQLiteDriver`) en las dos plataformas; abre sin problema la base
+    que creó la app anterior (probado instalando encima en el emulador).
+    `ContextoPlataforma` = `Context` en Android.
+  - [ ] Repositorios (por tandas: Apariencia usa colores de la UI, Biblioteca el
+    widget de Glance, tres usan `SimpleDateFormat`)
 - [ ] Fase 3 — pantallas
 - [ ] Fase 4 — plataforma
 - [ ] Fase 5 — retirar lo viejo

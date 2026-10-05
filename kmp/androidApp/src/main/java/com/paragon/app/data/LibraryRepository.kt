@@ -12,6 +12,20 @@ import androidx.glance.appwidget.updateAll
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 
+/** La entidad de Room vive en :shared; la conversión al modelo de la app, aquí. */
+fun com.paragon.app.data.local.LibraryGameEntity.toDomain() = LibraryGame(
+    id = id,
+    title = title,
+    coverUrl = coverUrl,
+    progressPercent = progressPercent,
+    definedTotal = definedTotal,
+    earnedTotal = earnedTotal,
+    isPlatinado = isPlatinado,
+    lastPlayedAt = lastPlayedAt,
+    isPinned = isPinned,
+    playtimeMinutes = playtimeMinutes,
+)
+
 /** Biblioteca completa (LibraryScreen) — ver GET /api/mobile/library en API-CONTRACT.md. */
 data class LibraryGame(
     val id: String,

@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("com.android.application")
     kotlin("plugin.compose")
-    id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
 }
 
@@ -71,9 +70,7 @@ dependencies {
 
     implementation("androidx.glance:glance-appwidget:1.1.1")
 
-    implementation("androidx.room:room-runtime:2.8.5")
-    implementation("androidx.room:room-ktx:2.8.5")
-    ksp("androidx.room:room-compiler:2.8.5")
+    // Room (la base) vive en :shared.
 
     implementation("androidx.work:work-runtime-ktx:2.10.5")
 

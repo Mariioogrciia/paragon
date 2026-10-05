@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.serialization")
     id("org.jetbrains.compose")
     id("com.android.kotlin.multiplatform.library")
+    id("com.google.devtools.ksp")
 }
 
 val versionCompose = "1.12.1"
@@ -37,6 +38,9 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
             implementation("io.coil-kt.coil3:coil-compose:$versionCoil")
             implementation("io.coil-kt.coil3:coil-network-ktor3:$versionCoil")
+            // Base local (cachés y diario de sesiones): Room con SQLite propio.
+            api("androidx.room:room-runtime:2.8.5")
+            implementation("androidx.sqlite:sqlite-bundled:2.6.2")
             // Sesión: SharedPreferences en Android, Llavero en iOS.
             api("com.russhwolf:multiplatform-settings:1.3.0")
             // AES-GCM del login (EnlaceSeguro): JDK en Android, CryptoKit en iOS.
@@ -53,5 +57,12 @@ kotlin {
         androidMain.dependencies {
             implementation("io.ktor:ktor-client-okhttp:$versionKtor")
         }
+    }
+}
+
+// El compilador de Room genera la base para cada plataforma.
+dependencies {
+    listOf("kspAndroid", "kspIosArm64", "kspIosSimulatorArm64").forEach {
+        add(it, "androidx.room:room-compiler:2.8.5")
     }
 }
