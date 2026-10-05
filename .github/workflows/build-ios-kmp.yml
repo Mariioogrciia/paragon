@@ -58,10 +58,11 @@ jobs:
       - name: Publicar los errores de compilación
         if: failure()
         run: |
-          grep -E "^e: |error:|: error" "$RUNNER_TEMP/xcode.log" | grep -v "^warning" | sort -u | head -150 > "$RUNNER_TEMP/errores.txt" || true
-          head -10 "$RUNNER_TEMP/errores.txt" | while IFS= read -r l; do echo "::error::${l}"; done
+          grep -E "^e: |error:|: error" "$RUNNER_TEMP/xcode.log" | grep -v "^warning" | awk "!visto[$0]++" | head -150 > "$RUNNER_TEMP/errores.txt" || true
+          # GitHub guarda como mucho 10 errores por paso: primero la lista entera.
           todo=$(sed -e "s/%/%25/g" "$RUNNER_TEMP/errores.txt" | awk 1 ORS="%0A")
           echo "::error title=Todos los errores::${todo}"
+          head -8 "$RUNNER_TEMP/errores.txt" | while IFS= read -r l; do echo "::error::${l}"; done
 
       # Diagnóstico de Siri: sin Metadata.appintents, iOS no conoce los Atajos.
       - name: Revisar App Intents empaquetados
