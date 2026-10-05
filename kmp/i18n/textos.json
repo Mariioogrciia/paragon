@@ -4150,5 +4150,29 @@
   "en": "By game",
   "es": "Por juego",
   "fr": "Par jeu"
+ },
+ "nav_perfil": {
+  "de": "Profil",
+  "en": "Profile",
+  "es": "Perfil",
+  "fr": "Profil"
+ },
+ "perfil_racha": {
+  "de": "Serie",
+  "en": "Streak",
+  "es": "Racha",
+  "fr": "Série"
+ },
+ "perfil_tu_caza": {
+  "de": "Deine Jagd",
+  "en": "Your hunt",
+  "es": "Tu caza",
+  "fr": "Ta chasse"
+ },
+ "perfil_con_otros": {
+  "de": "Mit anderen",
+  "en": "With others",
+  "es": "Con otros",
+  "fr": "Avec les autres"
  }
 }

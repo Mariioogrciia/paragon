@@ -39,7 +39,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
@@ -54,6 +54,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import com.paragon.shared.contextoPlataforma
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -119,7 +122,7 @@ sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
     object Library : BottomNavItem(Screen.Library, Icons.AutoMirrored.Filled.List)
     object Feed : BottomNavItem(Screen.Feed, Icons.Default.Groups)
     object Ligas : BottomNavItem(Screen.Social, Icons.Default.EmojiEvents)
-    object Menu : BottomNavItem(Screen.Menu, Icons.Default.MoreHoriz)
+    object Perfil : BottomNavItem(Screen.Perfil, Icons.Default.Person)
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -148,7 +151,6 @@ fun MainScreen(
             searchQuery = ""
         }
     }
-    var showMoreMenuSheet by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
     var bottomBarVisible by rememberSaveable { mutableStateOf(true) }
@@ -172,7 +174,7 @@ fun MainScreen(
             BottomNavItem.Dashboard,
             BottomNavItem.Library,
             BottomNavItem.Feed,
-            BottomNavItem.Menu
+            BottomNavItem.Perfil
         )
     } else {
         listOf(
@@ -180,7 +182,7 @@ fun MainScreen(
             BottomNavItem.Library,
             BottomNavItem.Feed,
             BottomNavItem.Ligas,
-            BottomNavItem.Menu
+            BottomNavItem.Perfil
         )
     }
 
@@ -189,10 +191,6 @@ fun MainScreen(
     val navBackStackEntryActual by navController.currentBackStackEntryAsState()
     fun irA(item: BottomNavItem) {
         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-        if (item == BottomNavItem.Menu) {
-            showMoreMenuSheet = true
-            return
-        }
         // `saveState`/`restoreState` (quitados a propósito): esos dos son
         // justo lo que hacía que tocar una pestaña resucitara la pantalla que
         // hubiera quedado a medias ahí la última vez (p. ej. Ajustes, abierto
@@ -254,10 +252,9 @@ fun MainScreen(
                         }
                     }
                     Box {
-                        // El avatar es tu cuenta (Ajustes), como en las apps de iPhone. Antes
-                        // abría un menú con Enfoque/Comparar/Carpetas/Atascados que repetía la
-                        // pestaña "Más": ahora todo eso vive solo allí.
-                        IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
+                        // El avatar lleva a tu Perfil (la misma pestaña de abajo). Antes abría un
+                        // menú con Enfoque/Comparar/Carpetas/Atascados que repetía "Más".
+                        IconButton(onClick = { irA(BottomNavItem.Perfil) }) {
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
@@ -292,36 +289,12 @@ fun MainScreen(
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it })
             ) {
-                androidx.compose.foundation.layout.Box {
-                    NavigationBar(
-                        containerColor = Background,
-                        contentColor = Foreground,
-                        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-                    ) {
-                items.forEach { item ->
-                    NavigationBarItem(
-                        // Sin `label`: con 5 pestañas, textos como "Estadísticas"
-                        // o "Comunidad" no caben y se cortan — mejor solo el
-                        // icono (más grande, para que siga siendo legible) con
-                        // `contentDescription` para accesibilidad.
-                        icon = { Icon(item.icon, contentDescription = item.screen.title, modifier = Modifier.size(26.dp)) },
-                        selected = estaEn(item),
-                        onClick = { irA(item) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Accent,
-                            unselectedIconColor = Muted,
-                            selectedTextColor = Accent,
-                            unselectedTextColor = Muted,
-                            // Con la pastilla de Material: sin ella, la pestaña activa solo
-                            // cambiaba de tono y con el Platino casi no se distinguía.
-                            indicatorColor = com.paragon.app.ui.theme.AccentSoft
-                        )
-                    )
-                }
+                // Barra flotante (rediseño del 5 oct 2026): una cápsula separada de
+                // los bordes, con icono y nombre, como en las apps de iPhone. Solo
+                // colores del tema: superficie, borde, acento y su tono suave.
+                BarraFlotante(items = items, estaEn = { estaEn(it) }, onClick = { irA(it) })
             }
         }
-        }
-    }
     ) { innerPadding ->
         Row(
             modifier = Modifier
@@ -398,6 +371,15 @@ fun MainScreen(
                     searchQuery = searchQuery,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
+                )
+            }
+            composable(Screen.Perfil.route) {
+                com.paragon.app.ui.perfil.PerfilScreen(
+                    profile = profile,
+                    stats = stats,
+                    racha = racha,
+                    conLigas = themeStore.zenMode,
+                    onNavigate = { ruta -> navController.navigate(ruta) },
                 )
             }
             composable(Screen.Stats.route) { StatsScreen(tokenStore, handle = profile.handle, database = database) }
@@ -517,13 +499,6 @@ fun MainScreen(
     if (showRachaSheet) {
         RachaSheet(tokenStore = tokenStore, onDismiss = { showRachaSheet = false })
     }
-    if (showMoreMenuSheet) {
-        MoreMenuSheet(
-            conLigas = themeStore.zenMode,
-            onDismiss = { showMoreMenuSheet = false },
-            onNavigate = { route -> navController.navigate(route) }
-        )
-    }
     }
 }
 
@@ -582,5 +557,57 @@ private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp),
         )
+    }
+}
+
+@Composable
+private fun BarraFlotante(items: List<BottomNavItem>, estaEn: (BottomNavItem) -> Boolean, onClick: (BottomNavItem) -> Unit) {
+    val forma = RoundedCornerShape(radio(32))
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(Background)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .shadow(16.dp, forma, ambientColor = Accent.copy(alpha = 0.18f), spotColor = Accent.copy(alpha = 0.18f))
+                .clip(forma)
+                .background(com.paragon.app.ui.theme.Surface)
+                .border(1.dp, Border, forma),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            items.forEach { item ->
+                val activa = estaEn(item)
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable { onClick(item) },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Box(
+                        Modifier
+                            .clip(RoundedCornerShape(radio(14)))
+                            .background(if (activa) com.paragon.app.ui.theme.AccentSoft else androidx.compose.ui.graphics.Color.Transparent)
+                            .padding(horizontal = 14.dp, vertical = 3.dp),
+                    ) {
+                        Icon(item.icon, contentDescription = null, tint = if (activa) Accent else Muted, modifier = Modifier.size(22.dp))
+                    }
+                    Text(
+                        item.screen.title,
+                        color = if (activa) Accent else Muted,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+            }
+        }
     }
 }
