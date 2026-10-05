@@ -35,6 +35,9 @@ colors:
   brand-xbox: "#107c10"
   brand-steam: "#1b2838"
   brand-epic: "#2a2a2a"
+  brand-twitch: "#9146ff"
+  brand-youtube: "#ff0033"
+  brand-kick: "#53fc18"
 typography:
   display:
     fontFamily: "Chakra Petch, Barlow, ui-sans-serif, sans-serif"
@@ -205,6 +208,17 @@ components:
   dorsal-large:
     padding: "7px 16px"
     width: "72px"
+  team-crest:
+    backgroundColor: "#ffffff"
+    rounded: "{rounded.lg}"
+  team-crest-fallback:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.muted}"
+    rounded: "{rounded.lg}"
+  favorite-star-on:
+    textColor: "{colors.gold}"
+    rounded: "{rounded.full}"
+    size: "28px"
   toast-trophy:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.foreground}"
@@ -284,7 +298,7 @@ Paragon is a trophy room with the lights down: a deep navy-black floor (#0a0d13)
 
 The system is built on three independent axes that the user controls: **mode** (dark default, light, OLED, high contrast), **accent** (platinum default, plus blue, violet, red, green, orange, six full palettes, a palette taken from a chosen game's cover, and a free colour), and **style** (Classic default, plus Terminal, Glass, Brutalist, PS5, Xbox, Steam, Switch), which rewrites corner radius, shadow, type and page backdrop across every existing component. Every component must therefore be written against tokens, never against literal colours, so the three axes can repaint it without a code change.
 
-Since the October 2026 redesign each section of the platform carries its own **room metaphor**, all built on the same tokens: the profile is a holographic collectible card, a game's trophy list is a strategy guide, the library is a shelf of box spines, statistics lead with a heat calendar, Discover is a difficulty-by-hours matrix plus a music-chart "hit list", the community is a wall of achievements, the dashboard is a cockpit of bolted-in instruments, friends are a stadium scoreboard, news is a departures board with a wire ticker, settings are a refined control panel, and each platform page lives "in its own house". A metaphor shapes composition and one signature detail; it never brings its own palette, except where noted (platform houses, the split-flap amber).
+Since the October 2026 redesign each section of the platform carries its own **room metaphor**, all built on the same tokens: the profile is a holographic collectible card, a game's trophy list is a strategy guide, the library is a shelf of box spines, statistics lead with a heat calendar, Discover is a difficulty-by-hours matrix plus a music-chart "hit list", the community is a wall of achievements, the dashboard is a cockpit of bolted-in instruments, friends are a stadium scoreboard, news is a departures board with a wire ticker, settings are a refined control panel, eSports is a set of race-timing blocks, one per competition, and each platform page lives "in its own house". A metaphor shapes composition and one signature detail; it never brings its own palette, except where noted (platform houses, the split-flap amber).
 
 Density is medium: a hunter's dashboard is data-rich, so type is compact (13px secondary text is common) while hero moments go large, condensed and uppercase. Numbers are the heroes: counts, levels, ranks and trophies-remaining are set big in the display face, often in platinum or the accent.
 
@@ -296,7 +310,7 @@ Density is medium: a hunter's dashboard is data-rich, so type is compact (13px s
 - Every clickable glows on hover, enforced globally, except list rows inside a card.
 - User-selectable mode, accent and style axes; components stay token-bound so all three work.
 - One room metaphor per section, expressed through composition and a single signature detail.
-- Competition pages (Ligas, Clanes) wear a scoped race-timing world; platform pages wear their platform's house palette.
+- Competition pages (Ligas, Clanes, eSports) wear a scoped race-timing world; platform pages wear their platform's house palette.
 
 ## Colors
 
@@ -336,18 +350,20 @@ The house bleeds to the viewport edges with a 100vmax `box-shadow` in its own ba
 
 ### Platform brand marks
 - **Brand tiles** (`brand-playstation`, `brand-xbox`, `brand-steam`, `brand-epic`): the Discover platform access tiles fill with a 150deg gradient from the brand colour to the brand colour mixed 55% with black, white text, and the platform logo forced to white (`filter: brightness(0) invert(1)`). Logos are colour SVGs; on any brand fill they go white. Only platforms that actually sync get a tile.
+- **Streaming brand marks** (`brand-twitch`, `brand-youtube`, `brand-kick`): an eSports match's "Dónde verlo" list tints each platform's logo in its own brand colour on a 32px `surface-2` tile (8px radius). The colour sits on the icon only; the row's text, tags and hover stay on theme tokens. Streams from any other host get a neutral `currentColor` play glyph.
 - The landing's convergence columns use their own platform hues (PlayStation #2f7ad6, Steam #66c0f4, Xbox #16a316, Epic #c9ced6), tuned to read as accents on the night floor rather than as fills.
 
-### Livery (Ligas and Clanes only)
-A fixed list of ten plate/ink pairs in `src/lib/librea.ts` (orange #ff6a00, acid #e8ff3a, cyan #00b8ff, rose #ff2d55, green #35e36b, violet #b46bff, yellow #ffd60a, paper #f4f6fa, platinum #7cc4e4, red #ff3b30, each with an ink chosen to read on it). A hunter's or clan's livery is picked deterministically by an FNV hash of the user id or upper-cased clan tag, so the same competitor wears the same colours in every standings table. Livery colours are identity marks, not accents: they never tint anything outside the Carreras world (see Components).
+### Livery (Carreras world: Ligas, Clanes, eSports)
+A fixed list of ten plate/ink pairs in `src/lib/librea.ts` (orange #ff6a00, acid #e8ff3a, cyan #00b8ff, rose #ff2d55, green #35e36b, violet #b46bff, yellow #ffd60a, paper #f4f6fa, platinum #7cc4e4, red #ff3b30, each with an ink chosen to read on it). A hunter's or clan's livery is picked deterministically by an FNV hash of the user id or upper-cased clan tag, so the same competitor wears the same colours in every standings table. eSports hashes the **game name** through the same function (`libreaDe(game)`), so each game keeps one plate colour on every live card, competition header and match page. Livery colours are identity marks, not accents: they never tint anything outside the Carreras world (see Components).
 
 ### Tertiary (trophy grades)
 - **Platinum** (`platinum`), **Gold** (`gold`), **Silver** (`silver`), **Bronze** (`bronze`): the four trophy metals. They colour trophy icons, grade-specific rarity figures, platinum counts, the stripe and percentage of each box spine (the game's best grade), the podium of every ranked list (1 gold, 2 silver, 3 bronze), the scoreboard's first place, and the first-place hunter's card (gold tint at 8% fill, 45% border).
+- **Followed (eSports only):** a followed team's name and its filled star are set in `gold`; its row in a standings table takes gold mixed 8–10% into transparent. A rescheduled-match chip uses gold text on a 45% gold border.
 - **Metal ladder:** the statistics heat calendar (large variant) fills its four intensity levels bronze → silver → gold → platinum, so a busier day reads as a higher grade.
 
 ### Semantic
 - **Signal Green** (`good`): live and positive states: the "playing now" dot, the trust checkmarks under the landing CTAs, success, a release that has already arrived on the departures board.
-- **Alarm Coral** (`danger`): errors, destructive actions, and the italic "missable" note in the strategy guide's margin.
+- **Alarm Coral** (`danger`): errors, destructive actions, the italic "missable" note in the strategy guide's margin, and **live** in eSports: the live label, its count and a 6–8px dot that pulses (`animate-pulse`; a ping ring on the section dot), stopped under reduced motion. A losing result in a followed team's card also takes it, as a win takes `good`.
 - **Flap Amber** (`flap-amber`): the letters of the departures board's split-flap date tiles, the ticker's time stamp and the "coming soon" status (under 30 days). In light mode the text uses (`flap-amber-light`); the flap tiles themselves stay dark in every mode (`flap-tile`, with a #0b0d11 hinge line at the middle and #171a21 lower half).
 
 ### Neutral
@@ -363,7 +379,7 @@ A fixed list of ten plate/ink pairs in `src/lib/librea.ts` (orange #ff6a00, acid
 ### Named Rules
 **The One Channel Rule.** Every accent tint is `rgb(var(--accent-rgb) / alpha)` or one of the derived `--accent-*` variables. A literal `rgba(124,196,228,…)` breaks every other accent and every other mode.
 
-**The Metals Mean Grade Rule.** Bronze, silver, gold and platinum are only for trophy grade and rank (podiums, first place, a game's best grade) and the heat calendar's metal ladder, which counts trophies. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.
+**The Metals Mean Grade Rule.** Bronze, silver, gold and platinum are only for trophy grade and rank (podiums, first place, a game's best grade) and the heat calendar's metal ladder, which counts trophies. One scoped exception: in eSports, `gold` marks a followed team (star, name, tinted row), because there is no trophy grade on those pages for it to collide with. Platinum is also the brand accent's namesake, but the `platinum` token (#9fd4ec) stays fixed across accents because it represents the trophy, not the brand.
 
 **The Dark Text on Light Rule.** Text on an accent fill is `background` (dark), never white. Accent presets, and the game palette's contrast correction, are chosen so that pairing reads.
 
@@ -371,7 +387,7 @@ A fixed list of ten plate/ink pairs in `src/lib/librea.ts` (orange #ff6a00, acid
 
 **The Theme Scrim Rule.** Image scrims fade to the theme ground (`from-background`), and text over covers uses `foreground`. A literal #0a0d13 scrim or white text over a cover breaks light mode and every full palette. Two scoped exceptions: inside a platform house (always dark), hero art takes a black veil and white text; and a physical object that carries its own art (a box spine) keeps a fixed dark veil and `spine-ink`.
 
-**The Brand Lives at Home Rule.** Platform brand colours appear only in platform-identity contexts: the platform houses, the Discover platform tiles, platform logo tiles and the landing's convergence columns. They never tint generic UI.
+**The Brand Lives at Home Rule.** Platform brand colours appear only in platform-identity contexts: the platform houses, the Discover platform tiles, platform logo tiles, the landing's convergence columns and the streaming-platform icons in an eSports match's "Dónde verlo" list. They never tint generic UI.
 
 **The Board Follows the Theme Rule.** The scoreboard and the departures board are built from the theme's own ground (surface and background darkened with black, a 4px inset ring and a dotted lamp grid) and its accent; they are not fixed-colour islands. The only fixed colour they keep is the flap amber, and only on the flap letters, the ticker time and the soon status.
 
@@ -424,6 +440,8 @@ Responsive grammar is Tailwind's: `sm` 640px and `lg` 1024px do most of the work
 - **Platform house:** the body is two columns from `lg` (`7fr` own content | `5fr` rankings, 48px row gap, 40px column gap), one column when there are no rankings; releases always run full width below both columns.
 - **Settings:** horizontal scrolling strip of links on mobile; fixed sidebar by groups from `md`. Option pages with a preview become `1fr 17rem` from 1280px with the preview sticky at 6rem; below that the preview is hidden because the page itself already applies changes live.
 - **Community wall:** CSS columns (1, then 2 from `md`) with 1rem gaps; cards never break across columns.
+- **eSports list:** the page title and the filters share one row from `lg` (title left, game chips and the All / My teams switch right-aligned and wrapping); below `lg` they stack and the game chips become a horizontal strip with the scrollbar hidden. Then the followed-teams strip (256px cards), the live strip (280px cards, snap scrolling), and one block per competition: matches left, a 300px standings column right from `md`. Low-tier competitions with no live match and no followed team fold into a flat "more competitions" bar between two hairlines.
+- **eSports match page:** route and chips, a full-width 24px-radius scoreboard, then `minmax(0,1fr) 380px` from `lg`: standings, map by map and rosters (two columns from `sm`) on the left; the embedded live player, "where to watch" and "more matches in this stage" on the right.
 - **Scoreboard and departures board:** a single grid per row; on mobile figures fold under the name (4 equal columns) and the date tiles take their own line; the header row appears only from `sm` / `md`.
 
 ### Named Rules
@@ -433,7 +451,7 @@ Responsive grammar is Tailwind's: `sm` 640px and `lg` 1024px do most of the work
 
 **The Clip Inside Rule.** Never put `overflow: hidden` on the element that owns a hover shadow or drop-shadow glow; clip an inner layer instead.
 
-**The Unlayered CSS Wins Rule.** Component CSS in `globals.css` sits outside `@layer`, so it beats any Tailwind utility on the same element: a `.marcador-fila { display: grid }` overrides a `hidden` class. To hide or change display per breakpoint on an element that has a `globals.css` display rule, do it in that CSS with a media query, never with utilities.
+**The Unlayered CSS Wins Rule.** Component CSS in `globals.css` sits outside `@layer`, so it beats any Tailwind utility on the same element: a `.marcador-fila { display: grid }` overrides a `hidden` class. To hide or change display per breakpoint on an element that has a `globals.css` display rule, do it in that CSS with a media query, never with utilities. The one global default meant to be overridden, the thin scrollbar (`border` thumb on a transparent track), lives in `@layer base` under `:where(*)` so a utility such as `[scrollbar-width:none]` can hide it on a chip strip.
 
 ## Elevation & Depth
 
@@ -549,14 +567,30 @@ Shared parts: art enters with a 600ms fade from 103% scale; a black veil (85% at
 ### Trofeo desbloqueado toast (signature)
 The console's trophy pop-up, for every platform. When a sync (`syncNowAction` / `syncPlatformAction`) returns new trophies, up to three cards stack at the bottom centre of the viewport (20px from the bottom, 8px apart, max 384px wide), each following the previous by 140ms. A card is `surface` at 92% with a 10px backdrop blur, a 16px radius, an accent border at 35%, and `0 18px 40px -16px rgb(0 0 0 / 0.7)` under a faint inset highlight. Inside: the real 48px trophy photo in a 14px-radius tile, then the "Trofeo desbloqueado" line (11px bold `accent-text`, the console's own notification wording, specific to this toast), the trophy name (display face, body-medium, truncated) and the game (12px muted). Only the first card carries the close button (15px icon, 8px radius, hover fill `surface-2`). If more arrived than are shown, a fully rounded bordered "+N" chip follows. Motion: each card rises 18px from 97% scale in 520ms (`cubic-bezier(0.16, 1, 0.3, 1)`); 300ms later the photo flashes once with an accent halo (`0 0 22px 4px` at 55%, 1.2s ease-out, then gone). The whole stack dismisses itself after 7s. Under reduced motion both animations are removed and the cards simply appear. It is a `role="status"` polite live region.
 
-### Carreras world: Ligas and Clanes (scoped signature)
-Competition pages read like a race timing tower. This world lives only on `/ligas`, `/ligas/[id]`, the monthly league rows, `/clanes` and `/clanes/[tag]`.
-- **Dorsal:** position as "P1", "P2"… (or a clan tag) on a plate skewed −12deg, filled with the competitor's livery and set in its ink: display face, 14px bold, 0.02em tracking, tabular figures, min 44px wide, `0 6px 14px -8px` shadow in the livery colour. The text inside is counter-skewed upright. The large variant (clan header) is 24px text, min 72px wide.
-- **Skewed titles:** the page title's text (not its box) is skewed −8deg, uppercase display face.
+### Carreras world: Ligas, Clanes and eSports (scoped signature)
+Competition pages read like a race timing tower. This world lives only on `/ligas`, `/ligas/[id]`, the monthly league rows, `/clanes`, `/clanes/[tag]`, `/esports` and `/esports/partido/[id]`.
+- **Dorsal:** position as "P1", "P2"… (or a clan tag; in eSports, the **game name** as a game plate, coloured by `libreaDe(game)`) on a plate skewed −12deg, filled with the competitor's livery and set in its ink: display face, 14px bold, 0.02em tracking, tabular figures, min 44px wide, `0 6px 14px -8px` shadow in the livery colour. The text inside is counter-skewed upright. The large variant (clan header) is 24px text, min 72px wide.
+- **Skewed titles:** the page title's text (not its box) is skewed −8deg, uppercase display face. `/esports` uses it on its h1.
 - **Figures:** points, scores and counts use the display face bold with tabular figures; the leading figure takes `accent-text`.
 - **Gap to leader:** standings end with a muted tabular column showing the deficit to P1 as "−N" (a true minus sign); P1 shows the translated "leader" word.
 - **Row streak:** each standings row carries its competitor's livery as `--librea`; on hover a 14% livery band sweeps left to right across the row (600ms, `cubic-bezier(0.16, 1, 0.3, 1)`) over a 4% accent fill. Reduced motion removes the sweep transition.
-- **Livery band:** under a clan's header, a 6px fully rounded band of repeating −60deg stripes (18px livery, 4px ink) at 85% opacity.
+- **Livery band:** under a clan's header, a 6px fully rounded band of repeating −60deg stripes (18px livery, 4px ink) at 85% opacity. An eSports match scoreboard opens with the same band along its top edge, coloured by state instead of identity: `danger` while live, `accent` otherwise, with `surface` as the ink.
+- **Figures in eSports:** scores, times, formats ("BO3"), standings ranks and W-L records all use the tabular display figure; the next match time and a won score take `accent-text`.
+
+### eSports: Competition Blocks (scoped signature)
+The competition is the unit, not the loose match. Built from the Carreras parts above and theme tokens; no palette of its own beyond the game plates, `danger` for live and `gold` for followed.
+- **Team crest:** a team logo sits on a white tile (8px radius, padding 12% of its size) so dark and light logos both read on the night floor; without a logo, or if it fails to load, the tile becomes `surface-2` with a 1px `border` and the team's initials (up to three) in the display face, `muted`. Player photos use the same component fully rounded on `surface-2`, cropped from the top. Sizes in use: 18, 22, 24, 28, 36, 40 and 88px (the scoreboard).
+- **Filters:** game chips are fully rounded, 12px bold uppercase; active fills with `--accent-grad` and `background` text, inactive is `surface` with a 1px `border` and `muted` text, hovering to `surface-2`, a 50% accent border and a 2px lift. The All / My teams switch is a segmented control: a fully rounded `surface` track with a 4px pad, the selected half on `surface-2` in `foreground`, the other `muted` (hover `surface-2` at 60%); My teams carries a 12px gold star and the count. News uses the same segmented control for its "from your teams" / "all" tabs.
+- **Live card:** 280px, 16px radius, `surface`; a hairline header with the game plate, league (label type, `muted`) and format; below, two 40px crests either side of a 1.875rem tabular score. Hover tints the border with `danger` at 55%. The whole card is one link (an absolute overlay), focus shown as a 2px accent outline inset.
+- **Followed-team card:** 256px, 16px radius, crest, name, game in label type, and the star; under a hairline, one status line: live (pulsing coral dot, label, rival, score), next match (day and time in `accent-text`), or last result (win in `good`, loss in `danger`, draw `muted`).
+- **Competition block:** a 16px-radius `surface` card whose header strip is `surface-2` at 50% over a hairline: game plate, league name in the display face (1.125rem), a tier tag (1px `border`, 4px radius, label type), the live count in coral, and the stage name right-aligned in `muted` caption. Match rows are a two-column grid (3.75rem time column, 4.25rem from `sm`), hairline-divided, hovering to `surface-2` at 60%; a played match sets the winner bold with its score in `accent-text` and the loser `muted`. The standings column sits on `background` at 30% behind a hairline, rows 6px tall-padded with rank, 18px crest, name and W-L.
+- **Collapsed competitions:** a native disclosure styled as a flat bar between two hairlines (14px vertical padding, uppercase bold `muted`, brightening on hover) with a chevron that turns 180deg when open. Not a card.
+- **Match scoreboard:** 24px radius, `surface`, the state band on top, 88px crests and the name in the display face (1.125rem, 1.5rem from `sm`); the score at 3rem (4.5rem from `sm`), the winner's in `accent-text`, the loser's side at 60% opacity. An upcoming match shows "VS" in `muted` and, in a `surface-2`-at-40% footer, the local date, a countdown in `accent-text` and an "add to calendar" secondary button (12px radius).
+- **Standings with "in this match":** the two teams playing take an accent-10% row, bold names and a small accent-18% tag in `accent-text`; a followed team's row takes the gold tint. Column headers are label type, uppercase, 0.12em, `muted`.
+- **Map by map:** numbered rows (the number as a 1.5rem tabular figure in `muted` at 70%), the map winner's crest and name, a coral pulsing "in play" line while live, the duration in tabular `muted`.
+- **Embedded live:** a 16:9 player in a 16px-radius bordered frame on black; the frame stays invisible until the third-party document loads, then fades in over 500ms (no fade under reduced motion).
+- **Follow star:** a 28px round button (36px on the match page) with a 14px (18px) star: outline in `muted` at 70% when not followed, filled `gold` when followed; hover fills `surface-2` and scales 110%, press scales 95%. Changes are optimistic across every star on the page; the confirmation (or the rollback message) rises in a `surface` notice with a 12px radius, 1px `border` and `0 14px 30px -12px rgb(0 0 0 / 0.7)`, 24px from the bottom, entering 10px up in 260ms (`cubic-bezier(0.16, 1, 0.3, 1)`), gone after 4s, no motion under reduced motion; it is a polite live region.
+- **Loading:** skeletons mirror the final layout (title row, chip row, strips, blocks) as `surface-2` blocks at 50–70%, pulsing, still under reduced motion, with a screen-reader status label.
 
 ### Landing: Convergence to One Profile (signature)
 The landing's first-viewport story. Four platform columns (PlayStation #2f7ad6, Steam #66c0f4, Xbox #16a316, Epic #c9ced6) sit in a 2×2 grid on mobile and a row of four at `lg`. Each is a `surface` card, 16px radius, with a logo tile tinted 18% in its colour and three game rows with thin progress bars in that colour. Dashed curved SVG paths (1.5px, 45% opacity, `4 6` dash) lead from each column to a single **Paragon card**: `surface`, 24px radius, accent-35% border, the Paragon aura, a 96px **level ring** (7px stroke on a `surface-2` track, gradient from accent-2 to accent, round caps, level numeral centred in the display face), the four platform logos overlapped as 28px discs, then a hairline-divided "closest platinum" row with the trophies-remaining numeral in platinum. On scroll-in (35% visible) dots travel the paths, column borders take on 45% of their platform colour, the ring fills and the level counts up over 1.8s (`cubic-bezier(0.16, 1, 0.3, 1)`). The final state is painted from the start, so without JS or with reduced motion it is identical, only still.
@@ -579,19 +613,19 @@ A numbered vertical route: 40px circular markers with a 2px accent border, `back
 - **Do** route all copy through next-intl (es, en, de, fr); no literal UI strings in components.
 - **Do** show real data only; any synthetic block carries the translated "Ejemplo" chip.
 - **Do** honour `prefers-reduced-motion` by stopping animations outright and painting the final state from the start.
-- **Do** prefix surface-scoped CSS in `globals.css` (`landing-`, `guia-`, `lomo-`, `matriz-`, `exitos-`, `cabina-`, `marcador-`, `salidas-`, `ajustes-`, `casa-`), because the stylesheet is global to the whole app.
+- **Do** prefix surface-scoped CSS in `globals.css` (`landing-`, `guia-`, `lomo-`, `matriz-`, `exitos-`, `cabina-`, `marcador-`, `salidas-`, `ajustes-`, `casa-`, `carreras-`, `esports-`), because the stylesheet is global to the whole app.
 - **Do** use `rounded-*` and `shadow-*` classes for corners and shadows so the style axis can re-skin them, except on small shape-critical thumbnails.
 - **Do** give a new full palette both a `.dark.accent-x` block (accent plus the four ground tokens) and a `.light.accent-x` darker accent, and a half-ground/half-accent swatch.
 - **Do** correct any computed accent to at least 5:1 contrast against its own surface (dark) and white (light) before applying it, as `lib/paletaJuego.ts` does.
 - **Do** build a new section-scoped world by redefining the theme tokens on a wrapper (as the platform houses do) so existing components repaint untouched.
 - **Do** fade image scrims to `from-background` and set text over covers in `foreground`, outside the always-dark houses and own-art objects.
 - **Do** put a heading's context below it as a muted subtitle.
-- **Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas and Clanes.
+- **Do** keep the Carreras world (dorsals, livery, skewed titles, row streaks) inside Ligas, Clanes and eSports.
 - **Do** use only the type steps in the frontmatter, including the off-Tailwind ones (0.5625, 0.625, 0.6875, 0.8125, 0.9375, 1.0625rem).
 
 ### Don't:
 - **Don't** write literal accent colours such as `rgba(74, 158, 255, .14)`; they freeze one accent and one mode.
-- **Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade, rank and the heat calendar's metal ladder.
+- **Don't** use the trophy metals (bronze, silver, gold, platinum) for anything but grade, rank, the heat calendar's metal ladder and, in eSports only, gold for a followed team.
 - **Don't** put white text on an accent fill; use `background`.
 - **Don't** set text sizes in px; they ignore the user's text-size setting.
 - **Don't** put `overflow: hidden` on the element that owns a hover glow or shadow.
@@ -600,7 +634,7 @@ A numbered vertical route: 40px circular markers with a 2px accent border, `back
 - **Don't** use gradient text; `text-gradient` is a leftover utility, not part of the system.
 - **Don't** bring the Carreras world (dorsals, livery colours, skews, livery streaks) into the library, guides or the dashboard; its competitive energy tires everywhere else.
 - **Don't** let a full palette repaint the ground in light, OLED or high-contrast mode.
-- **Don't** use platform brand colours outside platform-identity contexts.
+- **Don't** use platform brand colours outside platform-identity contexts; a streaming brand colour (Twitch, YouTube, Kick) colours its own icon and nothing else in the row.
 - **Don't** make the scoreboard or departures board a fixed-colour island; only the flap letters keep their amber.
 - **Don't** apply the LED dot mask to words; it is for figures only.
 - **Don't** copy a platform's real interface or detailed logotypes inside its house; evoke it through palette and composition.
