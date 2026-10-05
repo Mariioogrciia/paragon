@@ -56,7 +56,8 @@ jobs:
       - name: Revisar App Intents empaquetados
         run: |
           APP="$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app"
-          plutil -p "$APP/Info.plist" | grep -iE "Bundle(Identifier|DisplayName|DevelopmentRegion|Localizations)" || true
+          plutil -p "$APP/Info.plist"
+          ls "$APP" | grep -iE "AppIcon|Assets.car" || echo "::warning::La app no lleva icono"
           if [ -d "$APP/Metadata.appintents" ]; then
             ls -la "$APP/Metadata.appintents"
             for f in "$APP/Metadata.appintents"/*.actionsdata; do
@@ -66,6 +67,8 @@ jobs:
           else
             echo "::warning::No hay Metadata.appintents en la app: Siri no verá los Atajos"
           fi
+
+      - name: Empaquetar IPA
         run: |
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
           cp -R "$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app" "$RUNNER_TEMP/ipa/Payload/"

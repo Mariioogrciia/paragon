@@ -15,23 +15,14 @@ targets:
     sources:
       - iosApp
     scheme: {}
-    info:
-      path: iosApp/Info.plist
-      properties:
-        CFBundleDisplayName: Paragon
-        CFBundleShortVersionString: $(MARKETING_VERSION)
-        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        # Compose Multiplatform se niega a arrancar sin esta clave (120 Hz en ProMotion).
-        CADisableMinimumFrameDurationOnPhone: true
-        UILaunchScreen: {}
-        UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
-        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
         PRODUCT_NAME: Paragon
         SWIFT_VERSION: "5.0"
         PRODUCT_BUNDLE_IDENTIFIER: com.paragon.app.kmp
+        # Escrito a mano (no generado): lleva el nombre y el icono que Siri necesita.
+        INFOPLIST_FILE: iosApp/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         MARKETING_VERSION: "0.1"
         CURRENT_PROJECT_VERSION: "1"
         TARGETED_DEVICE_FAMILY: "1"
