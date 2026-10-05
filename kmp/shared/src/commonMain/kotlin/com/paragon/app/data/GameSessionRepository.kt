@@ -1,8 +1,10 @@
 package com.paragon.app.data
 
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
 import com.paragon.app.data.local.GameSessionDao
 import com.paragon.app.data.local.GameSessionEntity
-import java.util.UUID
 
 /** Una sesión ya terminada, con lo que hace falta para el diario. */
 data class GameSession(
@@ -27,6 +29,7 @@ private fun GameSessionEntity.toDomain(): GameSession? {
  * 100% local, sin backend detrás: es un cronómetro sobre datos que la app
  * ya tiene (fechas y trofeos), no algo que otro dispositivo necesite ver.
  */
+@OptIn(ExperimentalUuidApi::class)
 class GameSessionRepository(private val dao: GameSessionDao? = null) {
     suspend fun getActiveSession(): GameSessionEntity? = dao?.getActiveSession()
 
@@ -34,10 +37,10 @@ class GameSessionRepository(private val dao: GameSessionDao? = null) {
     suspend fun startSession(gameId: String, gameTitle: String, trofeosActuales: Int) {
         dao?.insert(
             GameSessionEntity(
-                id = UUID.randomUUID().toString(),
+                id = Uuid.random().toString(),
                 gameId = gameId,
                 gameTitle = gameTitle,
-                startMillis = System.currentTimeMillis(),
+                startMillis = ahoraMillis(),
                 endMillis = null,
                 trophiesAtStart = trofeosActuales,
                 trophiesAtEnd = null,
@@ -48,7 +51,7 @@ class GameSessionRepository(private val dao: GameSessionDao? = null) {
     /** Devuelve la sesión ya cerrada (para el aviso "2h 30m, 2 trofeos") o `null` si no había ninguna activa. */
     suspend fun stopActiveSession(trofeosActuales: Int): GameSession? {
         val activa = dao?.getActiveSession() ?: return null
-        val fin = System.currentTimeMillis()
+        val fin = ahoraMillis()
         dao.finishSession(activa.id, fin, trofeosActuales)
         return activa.copy(endMillis = fin, trophiesAtEnd = trofeosActuales).toDomain()
     }

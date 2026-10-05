@@ -1,5 +1,11 @@
 package com.paragon.app.data
 
+import com.paragon.shared.red.jsonParagon
+
+import kotlinx.serialization.Serializable
+
+import kotlinx.serialization.builtins.ListSerializer
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.SimpleCacheDao
 import com.paragon.app.data.local.SimpleCacheEntity
@@ -7,26 +13,28 @@ import com.paragon.shared.red.AddLeagueMemberRequest
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.NewLeagueRequest
 import com.paragon.shared.red.SetLeagueChallengeRequest
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /** Ligas propias del usuario (SocialScreen, pestaña "Mis Ligas") — DISTINTAS de la Liga Mensual global. */
+@Serializable
 data class League(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?)
 
 /** Invitación a una liga todavía sin aceptar ni rechazar. */
+@Serializable
 data class LeagueInvite(val id: String, val name: String, val ownerName: String)
 
+@Serializable
 data class PendingMember(val userId: String, val name: String)
 
 // `movimiento` sale de la foto semanal del cron (/api/cron/league-snapshot)
 // — null hasta que corra una vez para esta liga, o para alguien recién unido.
+@Serializable
 data class LeagueStanding(val userId: String, val name: String, val handle: String?, val image: String?, val points: Int, val movimiento: Int? = null)
 
 /** Clasificación del "reto" de la liga — un juego concreto, quién llega antes al platino. */
+@Serializable
 data class ChallengeStanding(
     val userId: String,
     val name: String,
@@ -36,8 +44,10 @@ data class ChallengeStanding(
     val platinumAt: String?,
 )
 
+@Serializable
 data class LeagueChallenge(val gameId: String, val title: String, val iconUrl: String?, val standings: List<ChallengeStanding>)
 
+@Serializable
 data class LeagueDetail(
     val id: String,
     val name: String,
@@ -52,38 +62,39 @@ data class LeagueDetail(
 )
 
 sealed class LeaguesResult {
+    @Serializable
     data class Ok(val leagues: List<League>, val fromCache: Boolean = false) : LeaguesResult()
+    @Serializable
     data class Error(val message: String) : LeaguesResult()
 }
 
 sealed class LeagueDetailResult {
+    @Serializable
     data class Ok(val detail: LeagueDetail) : LeagueDetailResult()
+    @Serializable
     data class Error(val message: String) : LeagueDetailResult()
 }
 
 private const val CACHE_KEY = "leagues_list"
-private val leaguesMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-private val leaguesListAdapter = leaguesMoshi.adapter<List<League>>(
-    Types.newParameterizedType(List::class.java, League::class.java)
-)
+private val leaguesListSerializer = ListSerializer(League.serializer())
 
 class LeaguesRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
     /** Red primero, caché de respaldo — solo la lista de "Mis Ligas", no el detalle de cada una (ver getLeagueDetail). */
     suspend fun getLeagues(): LeaguesResult {
-        val store = tokenStore ?: return LeaguesResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return LeaguesResult.Error(Textos.t(T.error_sin_sesion))
         return try {
             val response = ApiClient.leaguesApi(store).getLeagues()
             val leagues = response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt) }
-            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, leaguesListAdapter.toJson(leagues)))
+            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, jsonParagon.encodeToString(leaguesListSerializer, leagues)))
             LeaguesResult.Ok(leagues)
         } catch (e: Exception) {
-            cachedLeagues() ?: LeaguesResult.Error(Textos.t(R.string.error_conexion))
+            cachedLeagues() ?: LeaguesResult.Error(Textos.t(T.error_conexion))
         }
     }
 
     private suspend fun cachedLeagues(): LeaguesResult.Ok? {
         val json = cacheDao?.get(CACHE_KEY) ?: return null
-        val leagues = try { leaguesListAdapter.fromJson(json) } catch (e: Exception) { null } ?: return null
+        val leagues = try { jsonParagon.decodeFromString(leaguesListSerializer, json) } catch (e: Exception) { null } ?: return null
         return LeaguesResult.Ok(leagues, fromCache = true)
     }
 
@@ -91,7 +102,7 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
     suspend fun getInvites(): List<LeagueInvite> {
         val store = tokenStore ?: return emptyList()
         return try {
-            ApiClient.leaguesApi(store).getInvites().invites.map { LeagueInvite(it.id, it.name, it.ownerName ?: Textos.t(R.string.comun_alguien)) }
+            ApiClient.leaguesApi(store).getInvites().invites.map { LeagueInvite(it.id, it.name, it.ownerName ?: Textos.t(T.comun_alguien)) }
         } catch (e: Exception) {
             emptyList()
         }
@@ -129,7 +140,7 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
     }
 
     suspend fun getLeagueDetail(leagueId: String): LeagueDetailResult {
-        val store = tokenStore ?: return LeagueDetailResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return LeagueDetailResult.Error(Textos.t(T.error_sin_sesion))
         return try {
             val dto = ApiClient.leaguesApi(store).getLeagueDetail(leagueId)
             LeagueDetailResult.Ok(
@@ -142,26 +153,26 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
                     durationUnit = dto.durationUnit,
                     endsAt = dto.endsAt,
                     standings = dto.standings.map {
-                        LeagueStanding(it.userId, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien), it.handle, it.image, it.points, it.movimiento)
+                        LeagueStanding(it.userId, it.name ?: it.handle ?: Textos.t(T.comun_alguien), it.handle, it.image, it.points, it.movimiento)
                     },
-                    pendingMembers = dto.pendingMembers.map { PendingMember(it.userId, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien)) },
+                    pendingMembers = dto.pendingMembers.map { PendingMember(it.userId, it.name ?: it.handle ?: Textos.t(T.comun_alguien)) },
                     challenge = dto.challenge?.let { c ->
                         LeagueChallenge(
                             gameId = c.gameId,
                             title = c.title,
                             iconUrl = c.iconUrl,
                             standings = c.standings.map {
-                                ChallengeStanding(it.userId, it.name ?: it.handle ?: Textos.t(R.string.comun_alguien), it.image, it.progressPercent, it.hasPlatinum, it.platinumAt)
+                                ChallengeStanding(it.userId, it.name ?: it.handle ?: Textos.t(T.comun_alguien), it.image, it.progressPercent, it.hasPlatinum, it.platinumAt)
                             },
                         )
                     },
                 ),
             )
         } catch (e: HttpException) {
-            val message = if (e.code() == 404) Textos.t(R.string.liga_err_no_existe) else Textos.t(R.string.error_servidor, e.code())
+            val message = if (e.code() == 404) Textos.t(T.liga_err_no_existe) else Textos.t(T.error_servidor, e.code())
             LeagueDetailResult.Error(message)
         } catch (e: Exception) {
-            LeagueDetailResult.Error(Textos.t(R.string.error_conexion))
+            LeagueDetailResult.Error(Textos.t(T.error_conexion))
         }
     }
 

@@ -1,5 +1,11 @@
 package com.paragon.app.data
 
+import com.paragon.shared.red.jsonParagon
+
+import kotlinx.serialization.Serializable
+
+import kotlinx.serialization.builtins.ListSerializer
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.CachedGameDetailEntity
 import com.paragon.app.data.local.GameDetailDao
@@ -8,17 +14,10 @@ import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.GameDetailDto
 import com.paragon.shared.red.NotesRequest
 import com.paragon.shared.red.paragonErrorMessage
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.paragon.shared.red.HttpException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 import kotlin.math.ceil
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /**
  * Ficha de un juego (GameDetailScreen). Forma pensada para calzar directo
@@ -28,6 +27,7 @@ import com.paragon.app.R
  */
 enum class TrophyGrade { BRONZE, SILVER, GOLD, PLATINUM }
 
+@Serializable
 data class TrophyItem(
     val id: String,
     val name: String,
@@ -39,11 +39,9 @@ data class TrophyItem(
     val iconUrl: String? = null,
 )
 
+@Serializable
 data class PlatinumPrediction(val fechaMillis: Long, val dias: Int)
 
-private val PREDICCION_ISO = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
-    timeZone = TimeZone.getTimeZone("UTC")
-}
 
 // Mismos umbrales que predecirPlatino() en lib/stats.ts, en el proyecto Next.js — no cambiar uno sin el otro.
 private const val VENTANA_RITMO_DIAS = 14
@@ -63,11 +61,11 @@ fun predecirPlatino(trophies: List<TrophyItem>): PlatinumPrediction? {
     val restantes = trophies.count { !it.earned }
     if (restantes == 0) return null
 
-    val ahora = System.currentTimeMillis()
+    val ahora = ahoraMillis()
     val desdeVentana = ahora - VENTANA_RITMO_DIAS * UN_DIA_MS
     val recientes = trophies.count { t ->
         if (!t.earned || t.earnedAt == null) return@count false
-        val millis = try { PREDICCION_ISO.parse(t.earnedAt)?.time } catch (e: Exception) { null } ?: return@count false
+        val millis = isoAMillis(t.earnedAt) ?: return@count false
         millis >= desdeVentana
     }
     if (recientes < MINIMO_TROFEOS_PARA_RITMO) return null
@@ -79,6 +77,7 @@ fun predecirPlatino(trophies: List<TrophyItem>): PlatinumPrediction? {
     return PlatinumPrediction(ahora + dias * UN_DIA_MS, dias)
 }
 
+@Serializable
 data class GameDetailData(
     val id: String,
     val title: String,
@@ -96,13 +95,17 @@ sealed class GameDetailResult {
     // `fromCache = true` cuando viene de la guía de bolsillo offline
     // (CachedGameDetailEntity), no del servidor — FocusScreen lo usa para
     // avisar de que puede estar desactualizada.
+    @Serializable
     data class Ok(val detail: GameDetailData, val fromCache: Boolean = false) : GameDetailResult()
+    @Serializable
     data class Error(val message: String) : GameDetailResult()
 }
 
+@Serializable
 data class PlatinoNuevo(val nombre: String, val iconUrl: String?)
 
 /** `error` viene relleno solo si la plataforma no respondió — nunca es un 4xx/5xx, ver POST .../resync. */
+@Serializable
 data class ResyncOutcome(val nuevos: Int, val error: String?, val platinoNuevo: PlatinoNuevo? = null)
 
 /** `Queued`: sin conexión, guardada en `pending_notes` para mandarla luego — no es un fallo real. */
@@ -143,13 +146,8 @@ private fun GameDetailDto.toGameDetailData(): GameDetailData = GameDetailData(
     },
 )
 
-// Reflexión (KotlinJsonAdapterFactory), igual que el Moshi de ApiClient —
-// uno propio y pequeño aquí porque este JSON nunca sale de Room, no tiene
-// sentido acoplarlo al Retrofit compartido.
-private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-private val trophyListAdapter = moshi.adapter<List<TrophyItem>>(
-    Types.newParameterizedType(List::class.java, TrophyItem::class.java)
-)
+// Los trofeos del juego anclado se guardan en Room como JSON (nunca sale del móvil).
+private val trophyListSerializer = ListSerializer(TrophyItem.serializer())
 
 private fun GameDetailData.toCachedEntity() = CachedGameDetailEntity(
     gameId = id,
@@ -159,7 +157,7 @@ private fun GameDetailData.toCachedEntity() = CachedGameDetailEntity(
     totalTrophies = totalTrophies,
     percent = percent,
     notes = notes,
-    trophiesJson = trophyListAdapter.toJson(trophies),
+    trophiesJson = jsonParagon.encodeToString(trophyListSerializer, trophies),
     playtimeMinutes = playtimeMinutes,
 )
 
@@ -173,7 +171,7 @@ private fun CachedGameDetailEntity.toDomain() = GameDetailData(
     isPinned = true, // solo se cachea el juego anclado (ver FocusScreen)
     notes = notes,
     playtimeMinutes = playtimeMinutes,
-    trophies = trophyListAdapter.fromJson(trophiesJson) ?: emptyList(),
+    trophies = try { jsonParagon.decodeFromString(trophyListSerializer, trophiesJson) } catch (e: Exception) { emptyList() },
 )
 
 class GameDetailRepository(
@@ -188,7 +186,7 @@ class GameDetailRepository(
      * servidor, para no pisar algo que el usuario escribió sin conexión.
      */
     suspend fun getGameDetail(gameId: String): GameDetailResult {
-        val store = tokenStore ?: return GameDetailResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return GameDetailResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.gamesApi(store).getGameDetail(gameId)
@@ -201,15 +199,15 @@ class GameDetailRepository(
             val cached = gameDetailDao?.getCachedDetail(gameId)
             if (cached != null) return GameDetailResult.Ok(cached.toDomain(), fromCache = true)
             val message = if (e.code() == 404) {
-                Textos.t(R.string.ficha_err_no_existe)
+                Textos.t(T.ficha_err_no_existe)
             } else {
-                Textos.t(R.string.error_servidor, e.code())
+                Textos.t(T.error_servidor, e.code())
             }
             GameDetailResult.Error(message)
         } catch (e: Exception) {
             val cached = gameDetailDao?.getCachedDetail(gameId)
             if (cached != null) return GameDetailResult.Ok(cached.toDomain(), fromCache = true)
-            GameDetailResult.Error(Textos.t(R.string.error_conexion))
+            GameDetailResult.Error(Textos.t(T.error_conexion))
         }
     }
 
@@ -298,14 +296,14 @@ class GameDetailRepository(
 
     /** "¿Ya lo tengo?" — vuelve a pedir los trofeos de este juego sin esperar al cron. */
     suspend fun resync(gameId: String): ResyncOutcome {
-        val store = tokenStore ?: return ResyncOutcome(0, Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return ResyncOutcome(0, Textos.t(T.error_sin_sesion))
         return try {
             val response = ApiClient.gamesApi(store).resync(gameId)
             ResyncOutcome(response.nuevos, response.error, response.platinoNuevo?.let { PlatinoNuevo(it.nombre, it.iconUrl) })
         } catch (e: HttpException) {
-            ResyncOutcome(0, e.paragonErrorMessage() ?: Textos.t(R.string.error_servidor, e.code()))
+            ResyncOutcome(0, e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            ResyncOutcome(0, Textos.t(R.string.error_conexion))
+            ResyncOutcome(0, Textos.t(T.error_conexion))
         }
     }
 

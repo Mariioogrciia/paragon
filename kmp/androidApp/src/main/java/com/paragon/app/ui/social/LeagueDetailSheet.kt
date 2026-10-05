@@ -404,11 +404,12 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
             // Sale de la foto semanal del cron — null hasta que corra una
             // vez para esta liga, o para alguien recién unido. 0 sí se
             // enseña (te has mantenido en el mismo puesto).
-            if (member.movimiento != null && member.movimiento != 0) {
+            val movimiento = member.movimiento
+            if (movimiento != null && movimiento != 0) {
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = if (member.movimiento > 0) "▲ ${member.movimiento}" else "▼ ${-member.movimiento}",
-                    color = if (member.movimiento > 0) Good else Danger,
+                    text = if (movimiento > 0) "▲ $movimiento" else "▼ ${-movimiento}",
+                    color = if (movimiento > 0) Good else Danger,
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp,
                 )

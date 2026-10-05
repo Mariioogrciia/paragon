@@ -62,6 +62,11 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
     modo demo) y 14 repositorios limpios en `shared` (mismo paquete
     `com.paragon.app.data`; textos con `T.` en vez de `R.string.`). La actividad
     pone `Textos.idioma` al crearse (el idioma de Ajustes → Idioma).
+  - [x] 6 más (Comunidad, Ficha, Ligas, Social, Estadísticas, Sesiones de juego):
+    Moshi → kotlinx.serialization (la caché ya guardada se sigue leyendo),
+    fechas con `Tiempo.kt` (con tests), `Uuid` común.
+  - [ ] Quedan: Library (widget Glance), Settings (leer imagen), Apariencia
+    (colores de la UI), ConnectivityObserver. Luego fase 3 (pantallas)
   - [ ] Resto de repositorios (por tandas: Apariencia usa colores de la UI, Biblioteca el
     widget de Glance, tres usan `SimpleDateFormat`)
 - [ ] Fase 3 — pantallas

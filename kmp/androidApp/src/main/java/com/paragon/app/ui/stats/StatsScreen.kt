@@ -464,12 +464,13 @@ private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
 @Composable
 private fun EficienciaCard(eficiencia: EficienciaStats) {
     SectionCard(title = stringResource(R.string.stats_eficiencia), subtitle = stringResource(R.string.stats_eficiencia_sub)) {
-        if (eficiencia.juegosConDatos == 0 || eficiencia.ritmoMedioPct == null) {
+        val ritmoMedioPct = eficiencia.ritmoMedioPct
+        if (eficiencia.juegosConDatos == 0 || ritmoMedioPct == null) {
             Text(text = stringResource(R.string.stats_sin_datos), color = Muted, fontSize = 13.sp)
         } else {
-            val esMasRapido = eficiencia.ritmoMedioPct >= 0
+            val esMasRapido = ritmoMedioPct >= 0
             Text(
-                text = "${if (esMasRapido) "+" else ""}${eficiencia.ritmoMedioPct}%",
+                text = "${if (esMasRapido) "+" else ""}${ritmoMedioPct}%",
                 color = if (esMasRapido) Good else Danger,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,

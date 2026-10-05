@@ -1,5 +1,11 @@
 package com.paragon.app.data
 
+import com.paragon.shared.red.jsonParagon
+
+import kotlinx.serialization.Serializable
+
+import kotlinx.serialization.builtins.ListSerializer
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.SimpleCacheDao
 import com.paragon.app.data.local.SimpleCacheEntity
@@ -8,20 +14,16 @@ import com.paragon.shared.red.FeedCommentDto
 import com.paragon.shared.red.FeedItemDto
 import com.paragon.shared.red.NewCommentRequest
 import com.paragon.shared.red.ReactRequest
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.paragon.shared.red.HttpException
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /** Un comentario ya existente en una publicación — de momento solo lectura, no hay POST desde la app todavía. */
+@Serializable
 data class FeedComment(val body: String, val userName: String, val timeAgo: String)
 
 /** Reacciones del feed — mismas 5 y mismo orden que `lib/reacciones.ts` en la web. */
+@Serializable
 data class Reaccion(val clave: String, val emoji: String)
 val REACCIONES = listOf(
     Reaccion("aplauso", "👏"),
@@ -33,6 +35,7 @@ val REACCIONES = listOf(
 fun emojiDeReaccion(clave: String?): String = REACCIONES.find { it.clave == clave }?.emoji ?: REACCIONES[0].emoji
 
 /** Actividad propia + amigos (FeedScreen) — ver GET /api/mobile/feed en API-CONTRACT.md. */
+@Serializable
 data class FeedItem(
     val id: String,
     val type: String,
@@ -52,40 +55,32 @@ data class FeedItem(
 )
 
 sealed class FeedResult {
+    @Serializable
     data class Ok(val items: List<FeedItem>, val fromCache: Boolean = false) : FeedResult()
+    @Serializable
     data class Error(val message: String) : FeedResult()
 }
 
 /** "type" de activities (src/db/schema.ts) → frase en español, mismo criterio que la web. "status" no lleva frase: el propio texto (item.review) ya lo es. */
 fun mensajeFeed(item: FeedItem): String = when (item.type) {
-    "platinum" -> Textos.t(R.string.feed_platino, item.gameTitle ?: "")
-    "new_game" -> Textos.t(R.string.feed_nuevo, item.gameTitle ?: "")
-    "review" -> Textos.t(R.string.feed_resena, item.gameTitle ?: "")
-    "rating" -> Textos.t(R.string.feed_valoro, item.gameTitle ?: "") + (item.rating?.let { Textos.t(R.string.feed_nota, it) } ?: ".")
-    "favorite" -> Textos.t(R.string.feed_favorito, item.gameTitle ?: "")
+    "platinum" -> Textos.t(T.feed_platino, item.gameTitle ?: "")
+    "new_game" -> Textos.t(T.feed_nuevo, item.gameTitle ?: "")
+    "review" -> Textos.t(T.feed_resena, item.gameTitle ?: "")
+    "rating" -> Textos.t(T.feed_valoro, item.gameTitle ?: "") + (item.rating?.let { Textos.t(T.feed_nota, it) } ?: ".")
+    "favorite" -> Textos.t(T.feed_favorito, item.gameTitle ?: "")
     "status" -> ""
-    else -> item.gameTitle?.let { Textos.t(R.string.feed_otro, it) } ?: Textos.t(R.string.feed_otro_sin)
-}
-
-// minSdk 24 no tiene java.time sin desugaring — SimpleDateFormat/Date sí
-// funcionan en cualquier API, de ahí no usar Instant aquí.
-private val ISO_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
-    timeZone = TimeZone.getTimeZone("UTC")
+    else -> item.gameTitle?.let { Textos.t(T.feed_otro, it) } ?: Textos.t(T.feed_otro_sin)
 }
 
 private fun relativeTimeEs(iso: String): String {
-    val millis = try {
-        ISO_FORMAT.parse(iso)?.time
-    } catch (e: Exception) {
-        null
-    } ?: return ""
+    val millis = isoAMillis(iso) ?: return ""
 
-    val diffMinutes = (System.currentTimeMillis() - millis) / 60_000
+    val diffMinutes = (ahoraMillis() - millis) / 60_000
     return when {
-        diffMinutes < 1 -> Textos.t(R.string.tiempo_ahora)
-        diffMinutes < 60 -> Textos.t(R.string.tiempo_min, diffMinutes)
-        diffMinutes < 60 * 24 -> Textos.t(R.string.tiempo_h, diffMinutes / 60)
-        else -> Textos.t(R.string.tiempo_d, diffMinutes / (60 * 24))
+        diffMinutes < 1 -> Textos.t(T.tiempo_ahora)
+        diffMinutes < 60 -> Textos.t(T.tiempo_min, diffMinutes)
+        diffMinutes < 60 * 24 -> Textos.t(T.tiempo_h, diffMinutes / 60)
+        else -> Textos.t(T.tiempo_d, diffMinutes / (60 * 24))
     }
 }
 
@@ -94,7 +89,7 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     type = type,
     rating = rating,
     review = review,
-    userName = user.name ?: user.handle ?: Textos.t(R.string.comun_alguien),
+    userName = user.name ?: user.handle ?: Textos.t(T.comun_alguien),
     gameTitle = game?.title,
     reactions = reactions,
     reacted = reacted,
@@ -112,31 +107,28 @@ private fun FeedCommentDto.toFeedComment() = FeedComment(
 )
 
 private const val CACHE_KEY = "feed_items"
-private val feedMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-private val feedListAdapter = feedMoshi.adapter<List<FeedItem>>(
-    Types.newParameterizedType(List::class.java, FeedItem::class.java)
-)
+private val feedListSerializer = ListSerializer(FeedItem.serializer())
 
 class FeedRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
     /** Red primero, caché de respaldo (mismo patrón que Library/Panel/GameDetail) — Comunidad se quedaba en blanco sin conexión. */
     suspend fun getFeed(): FeedResult {
-        val store = tokenStore ?: return FeedResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return FeedResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val response = ApiClient.feedApi(store).getFeed()
             val items = response.items.map { it.toFeedItem() }
-            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, feedListAdapter.toJson(items)))
+            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, jsonParagon.encodeToString(feedListSerializer, items)))
             FeedResult.Ok(items)
         } catch (e: HttpException) {
-            cachedFeed() ?: FeedResult.Error(Textos.t(R.string.error_servidor, e.code()))
+            cachedFeed() ?: FeedResult.Error(Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            cachedFeed() ?: FeedResult.Error(Textos.t(R.string.error_conexion))
+            cachedFeed() ?: FeedResult.Error(Textos.t(T.error_conexion))
         }
     }
 
     private suspend fun cachedFeed(): FeedResult.Ok? {
         val json = cacheDao?.get(CACHE_KEY) ?: return null
-        val items = try { feedListAdapter.fromJson(json) } catch (e: Exception) { null } ?: return null
+        val items = try { jsonParagon.decodeFromString(feedListSerializer, json) } catch (e: Exception) { null } ?: return null
         return FeedResult.Ok(items, fromCache = true)
     }
 

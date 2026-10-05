@@ -1,15 +1,17 @@
 package com.paragon.app.data
 
+import com.paragon.shared.red.jsonParagon
+
+import kotlinx.serialization.Serializable
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.SimpleCacheDao
 import com.paragon.app.data.local.SimpleCacheEntity
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.StatsResponse
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.paragon.shared.red.HttpException
-import com.paragon.app.util.Textos
-import com.paragon.app.R
+import com.paragon.shared.i18n.Textos
+import com.paragon.shared.i18n.T
 
 /**
  * Estadísticas (StatsScreen) — versión curada para móvil de GET
@@ -17,33 +19,51 @@ import com.paragon.app.R
  * (son ya números listos para pintar, sin lógica de negocio de por medio) en
  * vez de mapear campo a campo a un modelo aparte.
  */
+@Serializable
 data class ParagonScoreStats(val total: Int, val porPlataforma: List<ParagonScorePlataformaStats>)
+@Serializable
 data class ParagonScorePlataformaStats(val platform: String, val puntos: Int, val trofeos: Int)
 
+@Serializable
 data class TrophyDnaEje(val key: String, val label: String, val valor: Int, val trofeos: Int)
+@Serializable
 data class TrophyDnaStats(val ejes: List<TrophyDnaEje>, val arquetipo: String?)
 
 /** Distinto de `arquetipo` (ese es de GÉNERO) — mide CÓMO se cazan trofeos. */
+@Serializable
 data class EstiloDeCazaStats(val nombre: String, val descripcion: String)
 
+@Serializable
 data class RachasStats(val actual: Int, val mejor: Int, val diasActivos: Int)
 
+@Serializable
 data class MejorMesStats(val mes: String, val total: Int)
+@Serializable
 data class HistoricoStats(val conFecha: Int, val esteAnio: Int, val mejorMes: MejorMesStats?)
 
+@Serializable
 data class FinancieroStats(val totalGastado: Double, val totalHoras: Double, val costeHoraMedio: Double?, val juegosConDatos: Int)
 
+@Serializable
 data class EficienciaStats(val ritmoMedioPct: Int?, val juegosConDatos: Int)
 
+@Serializable
 data class BacklogStats(val juegosContados: Int, val horasHistoriaRestantes: Double, val horasPlatinoRestantes: Double)
 
+@Serializable
 data class PrimerTrofeoStats(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val grade: String?, val fecha: String)
+@Serializable
 data class PrimerPlatinoStats(val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
+@Serializable
 data class TrofeoMasRaroStats(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val rarityPercent: Double, val fecha: String?)
+@Serializable
 data class PlatinoAnejoStats(val gameId: String, val titulo: String, val iconUrl: String?, val dias: Int, val desde: String, val hasta: String)
+@Serializable
 data class RachaMasLargaStats(val dias: Int, val desde: String, val hasta: String)
+@Serializable
 data class PlatinoNumeradoStats(val numero: Int, val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
 
+@Serializable
 data class HitosStats(
     val primerTrofeo: PrimerTrofeoStats?,
     val primerPlatino: PrimerPlatinoStats?,
@@ -53,6 +73,7 @@ data class HitosStats(
     val platinosHitos: List<PlatinoNumeradoStats>,
 )
 
+@Serializable
 data class ParagonStats(
     val paragonScore: ParagonScoreStats,
     val trophyDna: TrophyDnaStats,
@@ -67,7 +88,9 @@ data class ParagonStats(
 )
 
 sealed class StatsResult {
+    @Serializable
     data class Ok(val stats: ParagonStats, val fromCache: Boolean = false) : StatsResult()
+    @Serializable
     data class Error(val message: String) : StatsResult()
 }
 
@@ -102,8 +125,6 @@ private fun StatsResponse.toParagonStats() = ParagonStats(
 )
 
 private const val CACHE_KEY = "stats_data"
-private val statsMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-private val paragonStatsAdapter = statsMoshi.adapter(ParagonStats::class.java)
 
 class StatsRepository(private val tokenStore: TokenStore? = null, private val cacheDao: SimpleCacheDao? = null) {
     /**
@@ -113,22 +134,22 @@ class StatsRepository(private val tokenStore: TokenStore? = null, private val ca
      * respaldo local, a diferencia de las demás.
      */
     suspend fun getStats(): StatsResult {
-        val store = tokenStore ?: return StatsResult.Error(Textos.t(R.string.error_sin_sesion))
+        val store = tokenStore ?: return StatsResult.Error(Textos.t(T.error_sin_sesion))
 
         return try {
             val stats = ApiClient.statsApi(store).getStats().toParagonStats()
-            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, paragonStatsAdapter.toJson(stats)))
+            cacheDao?.put(SimpleCacheEntity(CACHE_KEY, jsonParagon.encodeToString(ParagonStats.serializer(), stats)))
             StatsResult.Ok(stats)
         } catch (e: HttpException) {
-            cachedStats() ?: StatsResult.Error(Textos.t(R.string.error_servidor, e.code()))
+            cachedStats() ?: StatsResult.Error(Textos.t(T.error_servidor, e.code()))
         } catch (e: Exception) {
-            cachedStats() ?: StatsResult.Error(Textos.t(R.string.error_conexion))
+            cachedStats() ?: StatsResult.Error(Textos.t(T.error_conexion))
         }
     }
 
     private suspend fun cachedStats(): StatsResult.Ok? {
         val json = cacheDao?.get(CACHE_KEY) ?: return null
-        val stats = try { paragonStatsAdapter.fromJson(json) } catch (e: Exception) { null } ?: return null
+        val stats = try { jsonParagon.decodeFromString(ParagonStats.serializer(), json) } catch (e: Exception) { null } ?: return null
         return StatsResult.Ok(stats, fromCache = true)
     }
 }
