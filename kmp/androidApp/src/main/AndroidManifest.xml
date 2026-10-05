@@ -49,13 +49,10 @@
         </activity>
 
         <!--
-          Icono dinámico por tema de plataforma (Ajustes → Apariencia, ver
-          ThemeStore.setPlatform() / IconSwitcher.kt) — Android no deja
-          cambiar `android:icon` de una actividad en caliente, así que la
-          técnica real es esta: 4 alias del MISMO ComposeMainActivity, cada
-          uno con su propio icono de lanzador, y solo uno `enabled` a la
-          vez (lo gestiona IconSwitcher.applyLauncherIcon, no el manifiesto
-          — aquí solo se fija el estado inicial de instalación, Paragon).
+          Icono a elegir (Ajustes → Apariencia → Icono, ver IconSwitcher.kt en
+          :shared). Android no deja cambiar `android:icon` en caliente, así
+          que hay un <activity-alias> del MISMO ComposeMainActivity por icono
+          y solo uno `enabled` a la vez. Aquí solo el estado de instalación.
         -->
         <activity-alias
             android:name=".IconParagon"
@@ -70,11 +67,11 @@
             </intent-filter>
         </activity-alias>
         <activity-alias
-            android:name=".IconPlayStation"
+            android:name=".IconOro"
             android:targetActivity=".ComposeMainActivity"
             android:enabled="false"
-            android:icon="@mipmap/ic_launcher_playstation"
-            android:roundIcon="@mipmap/ic_launcher_playstation_round"
+            android:icon="@mipmap/ic_launcher_oro"
+            android:roundIcon="@mipmap/ic_launcher_oro_round"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -82,11 +79,11 @@
             </intent-filter>
         </activity-alias>
         <activity-alias
-            android:name=".IconXbox"
+            android:name=".IconClaro"
             android:targetActivity=".ComposeMainActivity"
             android:enabled="false"
-            android:icon="@mipmap/ic_launcher_xbox"
-            android:roundIcon="@mipmap/ic_launcher_xbox_round"
+            android:icon="@mipmap/ic_launcher_claro"
+            android:roundIcon="@mipmap/ic_launcher_claro_round"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -94,11 +91,23 @@
             </intent-filter>
         </activity-alias>
         <activity-alias
-            android:name=".IconSteam"
+            android:name=".IconNeon"
             android:targetActivity=".ComposeMainActivity"
             android:enabled="false"
-            android:icon="@mipmap/ic_launcher_steam"
-            android:roundIcon="@mipmap/ic_launcher_steam_round"
+            android:icon="@mipmap/ic_launcher_neon"
+            android:roundIcon="@mipmap/ic_launcher_neon_round"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".IconEsmeralda"
+            android:targetActivity=".ComposeMainActivity"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_esmeralda"
+            android:roundIcon="@mipmap/ic_launcher_esmeralda_round"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

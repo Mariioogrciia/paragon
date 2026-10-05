@@ -4366,5 +4366,47 @@
   "en": "You don't have any folders yet. Create one below.",
   "es": "Aún no tienes carpetas. Crea una aquí abajo.",
   "fr": "Tu n'as pas encore de dossier. Crées-en un ci-dessous."
+ },
+ "apariencia_icono": {
+  "de": "App-Symbol",
+  "en": "App icon",
+  "es": "Icono de la app",
+  "fr": "Icône de l'app"
+ },
+ "apariencia_icono_nota": {
+  "de": "Das neue Symbol kann ein paar Sekunden brauchen, bis es auf dem Startbildschirm erscheint (manchmal erst nach dem Verlassen der App).",
+  "en": "The new icon may take a few seconds to show on your home screen (sometimes until you leave the app).",
+  "es": "El icono nuevo puede tardar unos segundos en verse en la pantalla de inicio (a veces, hasta que sales de la app).",
+  "fr": "La nouvelle icône peut mettre quelques secondes à apparaître sur l'écran d'accueil (parfois jusqu'à ce que vous quittiez l'app)."
+ },
+ "icono_paragon": {
+  "de": "Paragon",
+  "en": "Paragon",
+  "es": "Paragon",
+  "fr": "Paragon"
+ },
+ "icono_oro": {
+  "de": "Gold",
+  "en": "Gold",
+  "es": "Oro",
+  "fr": "Or"
+ },
+ "icono_claro": {
+  "de": "Hell",
+  "en": "Light",
+  "es": "Claro",
+  "fr": "Clair"
+ },
+ "icono_neon": {
+  "de": "Neon",
+  "en": "Neon",
+  "es": "Neón",
+  "fr": "Néon"
+ },
+ "icono_esmeralda": {
+  "de": "Smaragd",
+  "en": "Emerald",
+  "es": "Esmeralda",
+  "fr": "Émeraude"
  }
 }

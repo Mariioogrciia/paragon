@@ -1,5 +1,15 @@
 package com.paragon.app.ui.settings
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.text.style.TextOverflow
+import com.paragon.app.ui.common.premiumClickable
+import com.paragon.shared.contextoPlataforma
+import com.paragon.app.util.ICONOS_APP
+import com.paragon.app.util.cambiarIconoApp
+import com.paragon.app.util.cambiarIconoAvisaAlCerrar
+import com.paragon.app.util.iconoAppActual
+import org.jetbrains.compose.resources.painterResource
 import com.paragon.shared.i18n.stringResource
 
 import androidx.compose.foundation.BorderStroke
@@ -231,6 +241,9 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                     }
                 }
             }
+
+            Seccion(T.apariencia_icono)
+            SelectorIcono()
 
             Seccion(T.apariencia_texto)
             Row(
@@ -531,4 +544,46 @@ private fun DialogoColorLibre(inicial: Color, onDismiss: () -> Unit, onElegir: (
             TextButton(onClick = onDismiss) { Text(Textos.t(T.comun_cancelar), color = Muted) }
         },
     )
+}
+
+/** Iconos de la app a elegir (kmp/iconos/generar.py): miniatura y nombre; el puesto, con el borde del acento. */
+@Composable
+private fun SelectorIcono() {
+    val contexto = contextoPlataforma()
+    var actual by remember { mutableStateOf(iconoAppActual(contexto)) }
+    var avisar by remember { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        ICONOS_APP.forEach { icono ->
+            val activo = actual == icono.clave
+            Column(
+                Modifier.width(72.dp).clip(RoundedCornerShape(radio(16))).premiumClickable {
+                    if (!activo) {
+                        cambiarIconoApp(contexto, icono.clave)
+                        actual = icono.clave
+                        avisar = cambiarIconoAvisaAlCerrar
+                    }
+                }.padding(vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painterResource(icono.miniatura),
+                    contentDescription = stringResource(icono.nombre),
+                    modifier = Modifier.size(60.dp)
+                        .border(if (activo) 3.dp else 1.dp, if (activo) Accent else Border, RoundedCornerShape(14.dp))
+                        .padding(if (activo) 4.dp else 1.dp)
+                        .clip(RoundedCornerShape(11.dp)),
+                )
+                Text(
+                    stringResource(icono.nombre),
+                    color = if (activo) Accent else Muted,
+                    fontSize = 12.sp,
+                    fontWeight = if (activo) FontWeight.Bold else FontWeight.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 6.dp),
+                )
+            }
+        }
+    }
+    if (avisar) Nota(T.apariencia_icono_nota)
 }

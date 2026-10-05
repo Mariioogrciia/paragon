@@ -13,8 +13,8 @@ import com.russhwolf.settings.SharedPreferencesSettings
 fun ThemeStore(context: Context): ThemeStore {
     val app = context.applicationContext
     val store = ThemeStore(SharedPreferencesSettings(app.getSharedPreferences("paragon_theme", Context.MODE_PRIVATE)))
-    // Icono único (la P): por si estaba activo el de PlayStation/Xbox/Steam
-    // de antes. Sin coste si ya está bien. Ver IconSwitcher.kt.
+    // El icono elegido (Ajustes → Apariencia → Icono); también recoloca a
+    // quien tuviera el de PlayStation/Xbox/Steam de antes. Ver IconSwitcher.kt.
     applyLauncherIcon(app)
     flushPendingDisable(app)
     return store

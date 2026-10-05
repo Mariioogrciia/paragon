@@ -57,6 +57,8 @@
     <string name="apariencia_acento">Akzent und Palette</string>
     <string name="apariencia_estilo">Stil</string>
     <string name="apariencia_estilo_nivel">Wird ab Stufe %1$s freigeschaltet (du bist Stufe %2$s)</string>
+    <string name="apariencia_icono">App-Symbol</string>
+    <string name="apariencia_icono_nota">Das neue Symbol kann ein paar Sekunden brauchen, bis es auf dem Startbildschirm erscheint (manchmal erst nach dem Verlassen der App).</string>
     <string name="apariencia_juego">Aus deinem Spiel</string>
     <string name="apariencia_juego_nota">Palette aus deinem Spiel (im Web gewählt). Wähle einen anderen Akzent, um sie zu entfernen.</string>
     <string name="apariencia_libre">Eigene Farbe</string>
@@ -419,6 +421,11 @@
     <string name="guias_ph">Schreib auf, wie man sie bekommt, Routen, Codes…</string>
     <string name="guias_tu_guia">DEIN GUIDE</string>
     <string name="guias_vacio">Für diese Trophäe gibt es noch keinen schriftlichen Guide.</string>
+    <string name="icono_claro">Hell</string>
+    <string name="icono_esmeralda">Smaragd</string>
+    <string name="icono_neon">Neon</string>
+    <string name="icono_oro">Gold</string>
+    <string name="icono_paragon">Paragon</string>
     <string name="inicio_faltan">Noch %1$s Trophäen</string>
     <string name="inicio_hola">Hallo, %1$s</string>
     <string name="inicio_ir">Los</string>

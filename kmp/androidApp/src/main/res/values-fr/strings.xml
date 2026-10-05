@@ -57,6 +57,8 @@
     <string name="apariencia_acento">Accent et palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Se débloque au niveau %1$s (tu es niveau %2$s)</string>
+    <string name="apariencia_icono">Icône de l\'app</string>
+    <string name="apariencia_icono_nota">La nouvelle icône peut mettre quelques secondes à apparaître sur l\'écran d\'accueil (parfois jusqu\'à ce que vous quittiez l\'app).</string>
     <string name="apariencia_juego">Depuis ton jeu</string>
     <string name="apariencia_juego_nota">Palette depuis ton jeu (choisie sur le web). Choisis un autre accent pour la retirer.</string>
     <string name="apariencia_libre">Couleur libre</string>
@@ -419,6 +421,11 @@
     <string name="guias_ph">Note comment l\'obtenir, itinéraires, codes…</string>
     <string name="guias_tu_guia">TON GUIDE</string>
     <string name="guias_vacio">Il n\'y a pas encore de guide écrit pour ce trophée.</string>
+    <string name="icono_claro">Clair</string>
+    <string name="icono_esmeralda">Émeraude</string>
+    <string name="icono_neon">Néon</string>
+    <string name="icono_oro">Or</string>
+    <string name="icono_paragon">Paragon</string>
     <string name="inicio_faltan">Encore %1$s trophées</string>
     <string name="inicio_hola">Salut, %1$s</string>
     <string name="inicio_ir">Go</string>
