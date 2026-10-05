@@ -214,7 +214,10 @@
     "salirDeLaLiga": "Salir de esta liga",
     "amigo": "Amigo",
     "colDif": "Dif.",
-    "lider": "Líder"
+    "lider": "Líder",
+    "terminada": "Terminó el {fecha}. La clasificación es definitiva.",
+    "ganador": "Ganó {nombres} con {puntos} puntos.",
+    "sinGanador": "Nadie sumó puntos durante la liga: no hay ganador."
   },
   "FriendsLeaderboard": {
     "sinAmigos": "Todavía no tienes amigos añadidos — en cuanto tengas alguno, aquí sale cómo os comparáis.",

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
-import { setLeagueChallenge } from "@/lib/leagues";
+import { setLeagueChallenge, ligaTerminadaPorId } from "@/lib/leagues";
 import { errorMovil } from "@/lib/mensajesApi";
 
 /** Fija (o quita, con `gameId: null`) el juego de reto de la liga — `{ "gameId": "..." | null }`. Solo el dueño. */
@@ -23,6 +23,7 @@ export async function POST(
 
   const ok = await setLeagueChallenge(id, userId, gameId);
   if (!ok) {
+    if (await ligaTerminadaPorId(id)) return errorMovil(req, "Esta liga ya ha terminado.", 409);
     return errorMovil(req, "Solo el dueño puede cambiar el reto.", 403);
   }
 

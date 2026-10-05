@@ -869,3 +869,23 @@ fondo. Mismo trabajo en la web: `POST /api/steam/completar` (banner
 SIEMPRE (el próximo hito redondo y los platinos que faltan, el hito
 incluido), haya o no un juego reservado: la ficha dice "Reservar para el #25
 · faltan 11".
+
+## Añadido el 5 oct 2026
+
+### Ligas privadas: fin de verdad
+- `GET /api/mobile/leagues` → cada liga trae `terminada: boolean` (ya pasó `endsAt`).
+- `GET /api/mobile/leagues/{id}` → `terminada: boolean` y `ganadores: string[]` (userIds
+  empatados en lo más alto; vacío si nadie sumó o si aún no ha terminado).
+- En una liga terminada, `challenge`, `members` (invitar) y `accept` responden
+  `409 { "error": "Esta liga ya ha terminado." }`.
+- El cron (`cerrarLigasPrivadasVencidas`, lib/trophyCase.ts) la cierra una vez
+  (`awarded`), da el premio del palmarés y avisa a cada miembro de su puesto.
+
+### Guerra de clanes
+- `GET /api/mobile/clans/{tag}` → además: `guerra: { abierta, historial }` (cada una:
+  `id, estado ("pendiente"|"activa"|"terminada"), soyRetador, rival {id,name,tag},
+  empiezaAt, terminaAt, diasRestantes, misPuntos, susPuntos, gane`) y `retables`
+  (clanes a los que puede retar el líder si no hay guerra abierta).
+- `POST /api/mobile/clans/{tag}/war` `{ "rivalId": "..." }` → retar (solo el líder).
+- `POST /api/mobile/clans/wars/{id}` `{ "aceptar": true|false }` → responder (solo
+  el líder del clan retado). Errores `409` con el mensaje de lib/clanWars.ts.

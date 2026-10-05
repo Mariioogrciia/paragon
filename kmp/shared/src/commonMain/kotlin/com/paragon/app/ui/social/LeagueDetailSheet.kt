@@ -164,7 +164,26 @@ private fun LeagueDetailContent(
 
     Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     Text(text = Textos.t(T.liga_clasif_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-    Text(text = textoDuracion(detail.durationValue, detail.durationUnit, detail.endsAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(bottom = 16.dp))
+    if (detail.terminada) {
+        // Terminada: clasificación definitiva y quién ganó (el servidor la cierra y avisa a todos).
+        val ganadores = detail.standings.filter { it.userId in detail.ganadores }
+        Column(
+            Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp)
+                .background(Surface2, RoundedCornerShape(radio(12)))
+                .padding(12.dp),
+        ) {
+            Text(Textos.t(T.liga_terminada_el, detail.endsAt?.let { com.paragon.app.util.formatFechaLarga(it) } ?: ""), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Text(
+                if (ganadores.isEmpty()) Textos.t(T.liga_sin_ganador)
+                else Textos.t(T.liga_gano, ganadores.joinToString(" · ") { it.name }, ganadores.first().points),
+                color = Muted,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+    } else {
+        Text(text = textoDuracion(detail.durationValue, detail.durationUnit, detail.endsAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(bottom = 16.dp))
+    }
 
     detail.standings.forEachIndexed { index, member ->
         // Puntos para superar al de arriba — dato nuevo, no venía de
@@ -220,13 +239,13 @@ private fun LeagueDetailContent(
         challenge.standings.forEachIndexed { index, member ->
             ChallengeStandingRow(member, index + 1)
         }
-        if (detail.isOwner) {
+        if (detail.isOwner && !detail.terminada) {
             Row(modifier = Modifier.padding(top = 4.dp)) {
                 TextButton(onClick = onPickChallenge) { Text(Textos.t(T.comun_cambiar), color = Accent, fontSize = 12.sp) }
                 TextButton(onClick = onClearChallenge) { Text(Textos.t(T.liga_quitar_reto), color = Danger, fontSize = 12.sp) }
             }
         }
-    } else if (detail.isOwner) {
+    } else if (detail.isOwner && !detail.terminada) {
         Text(text = Textos.t(T.liga_reto_elige), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(bottom = 8.dp))
         TextButton(onClick = onPickChallenge) {
             Text(Textos.t(T.liga_reto_elegir), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
@@ -235,7 +254,7 @@ private fun LeagueDetailContent(
         Text(text = Textos.t(T.liga_sin_reto), color = Muted, fontSize = 13.sp)
     }
 
-    if (detail.isOwner) {
+    if (detail.isOwner && !detail.terminada) {
         Spacer(Modifier.height(16.dp))
         HorizontalDivider(color = Border)
         Spacer(Modifier.height(16.dp))

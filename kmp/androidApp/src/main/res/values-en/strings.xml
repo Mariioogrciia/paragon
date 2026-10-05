@@ -401,6 +401,7 @@
     <string name="liga_duracion_termina">%1$s — ends on %2$s.</string>
     <string name="liga_err_no_existe">This league doesn\'t exist or you\'re not a member.</string>
     <string name="liga_esperando">awaiting reply</string>
+    <string name="liga_gano">%1$s won with %2$s points.</string>
     <string name="liga_invitaciones">PENDING INVITES</string>
     <string name="liga_invitar_amigo">INVITE A FRIEND</string>
     <string name="liga_para_subir">%1$s pts to pass the next place up</string>
@@ -419,8 +420,11 @@
     <string name="liga_salir_texto">You\'ll stop appearing in the \"%1$s\" standings — the owner would have to invite you again for you to rejoin.</string>
     <string name="liga_salir_titulo">Leave this league?</string>
     <string name="liga_sin_fin">No end date.</string>
+    <string name="liga_sin_ganador">Nobody scored during the league: there\'s no winner.</string>
     <string name="liga_sin_reto">No challenge yet — the league owner can pick a game to race on.</string>
     <string name="liga_termina_el">Ends on %1$s.</string>
+    <string name="liga_terminada">Ended</string>
+    <string name="liga_terminada_el">Ended on %1$s. The standings are final.</string>
     <string name="liga_todos_dentro">All your available friends are already in this league.</string>
     <string name="login_discord">Continue with Discord</string>
     <string name="login_google">Continue with Google</string>

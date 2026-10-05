@@ -4,6 +4,8 @@ import { trophyCaseAwards, leagues, users } from "@/db/schema";
 import { eq, and, lt, isNotNull, desc, inArray } from "drizzle-orm";
 import { getLigaMensual } from "@/lib/ligas";
 import { getLeagueRankings } from "@/lib/leagues";
+import { ganadoresDeLiga, puestosDeLiga } from "@/lib/ligasCierre";
+import { avisarUsuario } from "@/lib/avisos";
 import { avatarUrlSql } from "@/lib/avatarSql";
 
 /**
@@ -60,46 +62,85 @@ export async function cerrarLigaMensualSiToca(ahora: Date = new Date()): Promise
 }
 
 /**
- * Ganador de cada Liga privada cuya `endsAt` ya ha pasado y todavía no
- * tiene premio concedido. Solo el puesto 1: a diferencia de la Liga
- * Mensual (Top 3 entre todo el mundo), una liga de amigos se gana o no.
+ * Cierra de verdad cada Liga privada cuya `endsAt` ya ha pasado: la marca
+ * como terminada (`awarded`, una sola vez), da el premio del palmarés a
+ * quien gana (todos los empatados en lo más alto; a diferencia de la Liga
+ * Mensual, una liga de amigos se gana o no) y avisa a cada miembro de cómo
+ * ha quedado. Las reglas puras, con tests, en lib/ligasCierre.ts. Después de
+ * cerrarse, lib/leagues.ts no deja cambiar el reto ni invitar a nadie.
  */
+const AVISAR_HASTA_MS = 3 * 86_400_000;
+
 export async function cerrarLigasPrivadasVencidas(ahora: Date = new Date()): Promise<number> {
   const db = getDb();
 
+  // Solo las que aún no se han cerrado: `awarded` se pone al cerrar, así que
+  // cada liga se procesa (y avisa) una sola vez.
   const vencidas = await db
-    .select({ id: leagues.id, name: leagues.name })
+    .select({ id: leagues.id, name: leagues.name, endsAt: leagues.endsAt })
     .from(leagues)
-    .where(and(isNotNull(leagues.endsAt), lt(leagues.endsAt, ahora)));
+    .where(and(isNotNull(leagues.endsAt), lt(leagues.endsAt, ahora), eq(leagues.awarded, false)))
+    .limit(25);
   if (vencidas.length === 0) return 0;
 
-  const yaConcedidas = await db
-    .select({ periodo: trophyCaseAwards.periodo })
-    .from(trophyCaseAwards)
-    .where(
-      and(
-        eq(trophyCaseAwards.kind, "liga_privada"),
-        inArray(trophyCaseAwards.periodo, vencidas.map((l) => l.id)),
-      ),
-    );
-  const concedidasSet = new Set(yaConcedidas.map((r) => r.periodo));
-
-  let repartidos = 0;
+  let cerradas = 0;
   for (const liga of vencidas) {
-    if (concedidasSet.has(liga.id)) continue;
+    // Primero se marca: si algo falla después, no se repiten avisos en la siguiente pasada.
+    const marcada = await db
+      .update(leagues)
+      .set({ awarded: true })
+      .where(and(eq(leagues.id, liga.id), eq(leagues.awarded, false)))
+      .returning({ id: leagues.id });
+    if (marcada.length === 0) continue;
+    cerradas++;
 
     const ranking = await getLeagueRankings(liga.id);
-    const ganador = ranking.find((r) => r.points > 0);
-    if (!ganador) continue;
+    const ganadores = ganadoresDeLiga(ranking);
+    const puestos = puestosDeLiga(ranking);
 
-    await db
-      .insert(trophyCaseAwards)
-      .values({ userId: ganador.userId, kind: "liga_privada", rank: 1, periodo: liga.id, titulo: liga.name })
-      .onConflictDoNothing();
-    repartidos++;
+    // Palmarés: todos los empatados en lo más alto.
+    if (ganadores.length > 0) {
+      await db
+        .insert(trophyCaseAwards)
+        .values(ganadores.map((userId) => ({ userId, kind: "liga_privada" as const, rank: 1, periodo: liga.id, titulo: liga.name })))
+        .onConflictDoNothing();
+    }
+
+    // Aviso a cada miembro con su resultado. Las que terminaron hace días (las
+    // de antes de que existiera este cierre, 5 oct 2026) se cierran sin avisar:
+    // un aviso de una liga de hace meses solo confunde.
+    const reciente = !!liga.endsAt && ahora.getTime() - liga.endsAt.getTime() < AVISAR_HASTA_MS;
+    if (!reciente) continue;
+    const nombres = ganadores.length
+      ? await db.select({ id: users.id, name: users.name, handle: users.handle }).from(users).where(inArray(users.id, ganadores))
+      : [];
+    const nombreGanador = nombres
+      .map((u) => (u.handle ? `@${u.handle}` : u.name ?? "alguien"))
+      .join(" y ");
+    const puntosGanador = ranking.find((r) => ganadores.includes(r.userId))?.points ?? 0;
+    const ruta = `/ligas/${liga.id}`;
+    await Promise.all(
+      ranking.map((r) => {
+        const gane = ganadores.includes(r.userId);
+        const aviso = gane
+          ? {
+              titulo: ganadores.length > 1 ? `🏆 ¡Empate en lo más alto de «${liga.name}»!` : `🏆 ¡Has ganado la liga «${liga.name}»!`,
+              texto: `La liga ha terminado: ${puntosGanador} puntos. Ya está en tu palmarés.`,
+              ruta,
+            }
+          : {
+              titulo: `🏁 Ha terminado la liga «${liga.name}»`,
+              texto: ganadores.length
+                ? `Ganó ${nombreGanador} con ${puntosGanador} puntos. Tú quedaste ${puestos.get(r.userId)}.º de ${ranking.length}.`
+                : "Nadie sumó puntos durante la liga: no hay ganador.",
+              ruta,
+            };
+        return avisarUsuario(r.userId, aviso, "ligas").catch((e) => console.error("[ligas] aviso de cierre", e));
+      }),
+    );
   }
 
-  return repartidos;
+  return cerradas;
 }
 
 export interface TrophyCaseAward {

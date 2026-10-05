@@ -401,6 +401,7 @@
     <string name="liga_duracion_termina">%1$s — endet am %2$s.</string>
     <string name="liga_err_no_existe">Diese Liga gibt es nicht oder du bist kein Mitglied.</string>
     <string name="liga_esperando">wartet auf Antwort</string>
+    <string name="liga_gano">%1$s hat mit %2$s Punkten gewonnen.</string>
     <string name="liga_invitaciones">OFFENE EINLADUNGEN</string>
     <string name="liga_invitar_amigo">FREUND EINLADEN</string>
     <string name="liga_para_subir">%1$s Pkt. bis zum nächsten Platz</string>
@@ -419,8 +420,11 @@
     <string name="liga_salir_texto">Du erscheinst nicht mehr in der Tabelle von „%1$s“ — der Besitzer müsste dich erneut einladen.</string>
     <string name="liga_salir_titulo">Diese Liga verlassen?</string>
     <string name="liga_sin_fin">Kein Enddatum.</string>
+    <string name="liga_sin_ganador">Niemand hat während der Liga gepunktet: kein Sieger.</string>
     <string name="liga_sin_reto">Noch keine Herausforderung — der Liga-Besitzer kann ein Spiel wählen.</string>
     <string name="liga_termina_el">Endet am %1$s.</string>
+    <string name="liga_terminada">Beendet</string>
+    <string name="liga_terminada_el">Beendet am %1$s. Die Tabelle ist endgültig.</string>
     <string name="liga_todos_dentro">Alle verfügbaren Freunde sind schon in dieser Liga.</string>
     <string name="login_discord">Weiter mit Discord</string>
     <string name="login_google">Weiter mit Google</string>

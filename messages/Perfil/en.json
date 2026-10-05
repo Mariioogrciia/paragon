@@ -214,7 +214,10 @@
     "salirDeLaLiga": "Leave this league",
     "amigo": "Friend",
     "colDif": "Gap",
-    "lider": "Leader"
+    "lider": "Leader",
+    "terminada": "Ended on {fecha}. The standings are final.",
+    "ganador": "{nombres} won with {puntos} points.",
+    "sinGanador": "Nobody scored during the league: there's no winner."
   },
   "FriendsLeaderboard": {
     "sinAmigos": "You don't have any friends added yet — once you do, here's how you'll stack up against them.",

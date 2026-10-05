@@ -6,7 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.http.encodeURLPathPart
 
 @Serializable
-data class LeagueDto(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?)
+data class LeagueDto(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?, val terminada: Boolean = false)
 @Serializable
 data class LeaguesResponse(val leagues: List<LeagueDto>)
 @Serializable
@@ -43,6 +43,10 @@ data class LeagueDetailDto(
     val standings: List<LeagueStandingDto>,
     val pendingMembers: List<PendingMemberDto>,
     val challenge: LeagueChallengeDto?,
+    /** Ya pasó `endsAt`: clasificación definitiva (ver lib/ligasCierre.ts). */
+    val terminada: Boolean = false,
+    /** userIds de quien ganó (empatados incluidos); vacío si nadie sumó o no ha terminado. */
+    val ganadores: List<String> = emptyList(),
 )
 @Serializable
 data class NewLeagueRequest(val name: String, val durationValue: Int?, val durationUnit: String?)

@@ -119,7 +119,29 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
           <span className="carreras-titulo">{league.name}</span>
         </h1>
         <p className="text-muted">{t("LigaPage.clasificacionDesde")}</p>
-        <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt, t, idioma)}</p>
+        {league.terminada ? (
+          // Terminada: la clasificación es definitiva (lib/trophyCase.ts la cierra y avisa a todos).
+          <div className="mt-3 rounded-[14px] border border-border bg-surface px-4 py-3">
+            <p className="text-sm font-bold">
+              {t("LigaPage.terminada", {
+                fecha: new Date(league.endsAt!).toLocaleDateString(idioma, { day: "numeric", month: "long", year: "numeric" }),
+              })}
+            </p>
+            <p className="text-sm text-muted mt-1">
+              {league.ganadores.length > 0
+                ? t("LigaPage.ganador", {
+                    nombres: league.standings
+                      .filter((s) => league.ganadores.includes(s.userId))
+                      .map((s) => s.name ?? (s.handle ? `@${s.handle}` : "?"))
+                      .join(" · "),
+                    puntos: (league.standings.find((s) => league.ganadores.includes(s.userId))?.points ?? 0).toLocaleString(idioma),
+                  })
+                : t("LigaPage.sinGanador")}
+            </p>
+          </div>
+        ) : (
+          <p className="text-muted text-sm mt-1">{textoDuracion(league.durationValue, league.durationUnit, league.endsAt, t, idioma)}</p>
+        )}
       </div>
 
       <div className="mb-10 overflow-x-auto rounded-[18px] border border-border bg-surface">
@@ -282,7 +304,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
         ) : (
           <p className="text-muted text-sm mb-4">{t("LigaPage.retoSinTodavia")}{isOwner ? t("LigaPage.retoSinDueño") : t("LigaPage.retoSinMiembro")}</p>
         )}
-        {isOwner && (
+        {isOwner && !league.terminada && (
           <div className="mt-4">
             <SetLeagueChallengeForm leagueId={league.id} juegos={juegosDelDueño} actual={league.challenge?.gameId ?? null} />
           </div>
@@ -291,10 +313,12 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
 
       {isOwner ? (
         <div className="flex flex-col gap-6">
-          <div>
-            <h2 className="text-lg font-bold mb-2">{t("LigaPage.invitarAmigoTitulo")}</h2>
-            <AddLeagueMemberForm leagueId={league.id} candidatos={candidatos} />
-          </div>
+          {!league.terminada && (
+            <div>
+              <h2 className="text-lg font-bold mb-2">{t("LigaPage.invitarAmigoTitulo")}</h2>
+              <AddLeagueMemberForm leagueId={league.id} candidatos={candidatos} />
+            </div>
+          )}
           <div>
             <h2 className="text-lg font-bold mb-2 text-danger">{t("LigaPage.borrarLigaTitulo")}</h2>
             <p className="text-sm text-muted mb-2">{t("LigaPage.borrarLigaAyuda")}</p>

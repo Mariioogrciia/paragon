@@ -403,6 +403,7 @@
     <string name="liga_duracion_termina">%1$s — termina el %2$s.</string>
     <string name="liga_err_no_existe">Esta liga no existe o no eres miembro.</string>
     <string name="liga_esperando">esperando respuesta</string>
+    <string name="liga_gano">Ganó %1$s con %2$s puntos.</string>
     <string name="liga_invitaciones">INVITACIONES SIN RESPONDER</string>
     <string name="liga_invitar_amigo">INVITAR A UN AMIGO</string>
     <string name="liga_para_subir">%1$s pts para superar al puesto de arriba</string>
@@ -421,8 +422,11 @@
     <string name="liga_salir_texto">Dejarás de aparecer en la clasificación de \"%1$s\" — el dueño tendría que volver a invitarte para que entres otra vez.</string>
     <string name="liga_salir_titulo">¿Salir de esta liga?</string>
     <string name="liga_sin_fin">Sin fecha de fin.</string>
+    <string name="liga_sin_ganador">Nadie sumó puntos durante la liga: no hay ganador.</string>
     <string name="liga_sin_reto">Sin reto todavía — el dueño de la liga puede elegir un juego para picarse.</string>
     <string name="liga_termina_el">Termina el %1$s.</string>
+    <string name="liga_terminada">Terminada</string>
+    <string name="liga_terminada_el">Terminó el %1$s. La clasificación es definitiva.</string>
     <string name="liga_todos_dentro">Ya están todos tus amigos disponibles en esta liga.</string>
     <string name="login_discord">Continuar con Discord</string>
     <string name="login_google">Continuar con Google</string>

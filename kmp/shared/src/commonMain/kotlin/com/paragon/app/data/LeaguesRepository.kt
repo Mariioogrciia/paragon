@@ -19,7 +19,7 @@ import com.paragon.shared.i18n.T
 
 /** Ligas propias del usuario (SocialScreen, pestaña "Mis Ligas") — DISTINTAS de la Liga Mensual global. */
 @Serializable
-data class League(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?)
+data class League(val id: String, val name: String, val ownerId: String, val memberCount: Int, val endsAt: String?, val terminada: Boolean = false)
 
 /** Invitación a una liga todavía sin aceptar ni rechazar. */
 @Serializable
@@ -59,6 +59,8 @@ data class LeagueDetail(
     val standings: List<LeagueStanding>,
     val pendingMembers: List<PendingMember>,
     val challenge: LeagueChallenge?,
+    val terminada: Boolean = false,
+    val ganadores: List<String> = emptyList(),
 )
 
 sealed class LeaguesResult {
@@ -84,7 +86,7 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         val store = tokenStore ?: return LeaguesResult.Error(Textos.t(T.error_sin_sesion))
         return try {
             val response = ApiClient.leaguesApi(store).getLeagues()
-            val leagues = response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt) }
+            val leagues = response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt, it.terminada || ligaTerminada(it.endsAt)) }
             cacheDao?.put(SimpleCacheEntity(CACHE_KEY, jsonParagon.encodeToString(leaguesListSerializer, leagues)))
             LeaguesResult.Ok(leagues)
         } catch (e: Exception) {
@@ -152,6 +154,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
                     durationValue = dto.durationValue,
                     durationUnit = dto.durationUnit,
                     endsAt = dto.endsAt,
+                    terminada = dto.terminada || ligaTerminada(dto.endsAt),
+                    ganadores = dto.ganadores,
                     standings = dto.standings.map {
                         LeagueStanding(it.userId, it.name ?: it.handle ?: Textos.t(T.comun_alguien), it.handle, it.image, it.points, it.movimiento)
                     },
@@ -229,4 +233,10 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
             false
         }
     }
+}
+
+/** Ya pasó `endsAt` (por si el servidor aún no manda `terminada`). Mismo criterio que lib/ligasCierre.ts. */
+internal fun ligaTerminada(endsAt: String?): Boolean {
+    val fin = isoAMillis(endsAt) ?: return false
+    return fin <= ahoraMillis()
 }

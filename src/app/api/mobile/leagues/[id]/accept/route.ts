@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
-import { acceptLeagueInvite } from "@/lib/leagues";
+import { acceptLeagueInvite, ligaTerminadaPorId } from "@/lib/leagues";
 import { errorMovil } from "@/lib/mensajesApi";
 
 /** Acepta una invitación a una liga — a partir de aquí sí cuenta en la clasificación. */
@@ -16,6 +16,7 @@ export async function POST(
   const { id } = await params;
   const ok = await acceptLeagueInvite(id, userId);
   if (!ok) {
+    if (await ligaTerminadaPorId(id)) return errorMovil(req, "Esta liga ya ha terminado.", 409);
     return errorMovil(req, "No hay ninguna invitación pendiente a esa liga.", 404);
   }
 

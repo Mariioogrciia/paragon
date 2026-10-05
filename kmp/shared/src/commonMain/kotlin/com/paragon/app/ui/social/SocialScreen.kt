@@ -573,7 +573,8 @@ fun LeagueRowItem(league: League, onClick: () -> Unit) {
             Text(text = league.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(
                 text = (if (league.memberCount == 1) Textos.t(T.comun_miembros_1, league.memberCount) else Textos.t(T.comun_miembros_n, league.memberCount)) +
-                    (dias?.let { " · " + (if (it == 1) Textos.t(T.comun_termina_en_1, it) else Textos.t(T.comun_termina_en_n, it)) } ?: ""),
+                    (if (league.terminada) " · " + Textos.t(T.liga_terminada)
+                    else dias?.let { " · " + (if (it == 1) Textos.t(T.comun_termina_en_1, it) else Textos.t(T.comun_termina_en_n, it)) } ?: ""),
                 color = Muted,
                 fontSize = 12.sp,
             )

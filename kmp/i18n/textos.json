@@ -2399,6 +2399,12 @@
   "es": "esperando respuesta",
   "fr": "en attente de réponse"
  },
+ "liga_gano": {
+  "de": "{0} hat mit {1} Punkten gewonnen.",
+  "en": "{0} won with {1} points.",
+  "es": "Ganó {0} con {1} puntos.",
+  "fr": "{0} a gagné avec {1} points."
+ },
  "liga_invitaciones": {
   "de": "OFFENE EINLADUNGEN",
   "en": "PENDING INVITES",
@@ -2507,6 +2513,12 @@
   "es": "Sin fecha de fin.",
   "fr": "Pas de date de fin."
  },
+ "liga_sin_ganador": {
+  "de": "Niemand hat während der Liga gepunktet: kein Sieger.",
+  "en": "Nobody scored during the league: there's no winner.",
+  "es": "Nadie sumó puntos durante la liga: no hay ganador.",
+  "fr": "Personne n'a marqué pendant la ligue : pas de gagnant."
+ },
  "liga_sin_reto": {
   "de": "Noch keine Herausforderung — der Liga-Besitzer kann ein Spiel wählen.",
   "en": "No challenge yet — the league owner can pick a game to race on.",
@@ -2518,6 +2530,18 @@
   "en": "Ends on {0}.",
   "es": "Termina el {0}.",
   "fr": "Se termine le {0}."
+ },
+ "liga_terminada": {
+  "de": "Beendet",
+  "en": "Ended",
+  "es": "Terminada",
+  "fr": "Terminée"
+ },
+ "liga_terminada_el": {
+  "de": "Beendet am {0}. Die Tabelle ist endgültig.",
+  "en": "Ended on {0}. The standings are final.",
+  "es": "Terminó el {0}. La clasificación es definitiva.",
+  "fr": "Terminée le {0}. Le classement est définitif."
  },
  "liga_todos_dentro": {
   "de": "Alle verfügbaren Freunde sind schon in dieser Liga.",

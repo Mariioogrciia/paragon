@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
-import { addLeagueMember, NotFriendsError } from "@/lib/leagues";
+import { addLeagueMember, NotFriendsError, ligaTerminadaPorId } from "@/lib/leagues";
 import { errorMovil } from "@/lib/mensajesApi";
 
 /** Añade un amigo a la liga — `{ "userId": "..." }`, solo el dueño puede invitar, y solo a un amigo real. */
@@ -26,6 +26,7 @@ export async function POST(
 
   try {
     const ok = await addLeagueMember(id, userId, friendUserId);
+    if (!ok && (await ligaTerminadaPorId(id))) return errorMovil(req, "Esta liga ya ha terminado.", 409);
     if (!ok) return errorMovil(req, "Solo el dueño puede invitar.", 403);
     return NextResponse.json({ ok: true });
   } catch (error) {

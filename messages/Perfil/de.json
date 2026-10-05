@@ -214,7 +214,10 @@
     "salirDeLaLiga": "Diese Liga verlassen",
     "amigo": "Freund",
     "colDif": "Abst.",
-    "lider": "Führung"
+    "lider": "Führung",
+    "terminada": "Beendet am {fecha}. Die Tabelle ist endgültig.",
+    "ganador": "{nombres} hat mit {puntos} Punkten gewonnen.",
+    "sinGanador": "Niemand hat während der Liga gepunktet: kein Sieger."
   },
   "FriendsLeaderboard": {
     "sinAmigos": "Du hast noch keine Freunde hinzugefügt — sobald du welche hast, siehst du hier den Vergleich.",

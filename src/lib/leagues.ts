@@ -9,6 +9,7 @@ import { enviarPushFcm } from "@/lib/fcm";
 import { anunciarInvitacionLiga } from "@/lib/discordBot";
 import { esDeclarada } from "@/lib/declarado";
 import { noDeclaradoPorId } from "@/lib/declaradoSql";
+import { ganadoresDeLiga, ligaTerminada } from "@/lib/ligasCierre";
 
 /**
  * Ligas creadas por un usuario, solo entre amigos — distintas de la "Liga
@@ -29,6 +30,8 @@ export interface LeagueSummary {
   ownerId: string;
   memberCount: number;
   endsAt: string | null;
+  /** Ya pasó `endsAt`: la clasificación está congelada y no se puede cambiar nada. */
+  terminada: boolean;
 }
 
 export interface LeagueInvite {
@@ -71,6 +74,10 @@ export interface LeagueDetail {
   challenge: LeagueChallenge | null;
   /** Ver `getLeagueRecentTrophies`. */
   recentTrophies: LeagueRecentTrophy[];
+  /** Ya pasó `endsAt` (ver lib/ligasCierre.ts). */
+  terminada: boolean;
+  /** Solo si ha terminado: quién ganó (los empatados en lo más alto; vacío si nadie sumó). */
+  ganadores: string[];
 }
 
 /**
@@ -267,7 +274,7 @@ export async function createLeague(
   });
   await db.insert(leagueMembers).values({ leagueId: id, userId: ownerId, status: "accepted" });
 
-  return { id, name: trimmed, ownerId, memberCount: 1, endsAt: endsAt?.toISOString() ?? null };
+  return { id, name: trimmed, ownerId, memberCount: 1, endsAt: endsAt?.toISOString() ?? null, terminada: false };
 }
 
 /** Ligas de las que `userId` ya es miembro ACEPTADO (propias o a las que le han añadido) — para invitaciones sin responder, ver `listPendingLeagueInvites`. */
@@ -296,7 +303,12 @@ export async function listUserLeagues(userId: string): Promise<LeagueSummary[]> 
     .groupBy(leagues.id, leagues.name, leagues.ownerId, leagues.endsAt, leagues.createdAt)
     .orderBy(leagues.createdAt);
 
-  return rows.map((r) => ({ ...r, memberCount: Number(r.memberCount), endsAt: r.endsAt?.toISOString() ?? null }));
+  return rows.map((r) => ({
+    ...r,
+    memberCount: Number(r.memberCount),
+    endsAt: r.endsAt?.toISOString() ?? null,
+    terminada: ligaTerminada(r.endsAt),
+  }));
 }
 
 /** Invitaciones a ligas todavía sin aceptar ni rechazar. */
@@ -551,14 +563,24 @@ export async function getLeagueDetail(leagueId: string, requestingUserId: string
     pendingMembers,
     challenge,
     recentTrophies,
+    terminada: ligaTerminada(league.endsAt),
+    ganadores: ligaTerminada(league.endsAt) ? ganadoresDeLiga(standings) : [],
   };
+}
+
+/** Para explicar por qué se rechazó un cambio: la liga existe y ya terminó. */
+export async function ligaTerminadaPorId(leagueId: string): Promise<boolean> {
+  const [league] = await getDb().select({ endsAt: leagues.endsAt }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  return !!league && ligaTerminada(league.endsAt);
 }
 
 /** Fija (o quita, con `gameId: null`) el juego de reto de la liga — solo el dueño. */
 export async function setLeagueChallenge(leagueId: string, ownerId: string, gameId: string | null): Promise<boolean> {
   const db = getDb();
-  const [league] = await db.select({ ownerId: leagues.ownerId }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  const [league] = await db.select({ ownerId: leagues.ownerId, endsAt: leagues.endsAt }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
   if (!league || league.ownerId !== ownerId) return false;
+  // Terminada: la clasificación está cerrada, el reto ya no se cambia.
+  if (ligaTerminada(league.endsAt)) return false;
 
   await db.update(leagues).set({ challengeGameId: gameId }).where(eq(leagues.id, leagueId));
   return true;
@@ -574,8 +596,10 @@ export async function setLeagueChallenge(leagueId: string, ownerId: string, game
  */
 export async function addLeagueMember(leagueId: string, ownerId: string, friendUserId: string): Promise<boolean> {
   const db = getDb();
-  const [league] = await db.select({ ownerId: leagues.ownerId, name: leagues.name }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  const [league] = await db.select({ ownerId: leagues.ownerId, name: leagues.name, endsAt: leagues.endsAt }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
   if (!league || league.ownerId !== ownerId) return false;
+  // Terminada: ya no entra nadie nuevo.
+  if (ligaTerminada(league.endsAt)) return false;
   if (!(await areFriends(ownerId, friendUserId))) throw new NotFriendsError();
 
   const inserted = await db
@@ -611,6 +635,9 @@ export async function addLeagueMember(leagueId: string, ownerId: string, friendU
 /** El invitado acepta — a partir de aquí sí cuenta en la clasificación. Solo el propio invitado. */
 export async function acceptLeagueInvite(leagueId: string, userId: string): Promise<boolean> {
   const db = getDb();
+  // Una invitación a una liga ya terminada no se puede aceptar (no sumaría nada).
+  const [league] = await db.select({ endsAt: leagues.endsAt }).from(leagues).where(eq(leagues.id, leagueId)).limit(1);
+  if (!league || ligaTerminada(league.endsAt)) return false;
   const result = await db
     .update(leagueMembers)
     .set({ status: "accepted" })
