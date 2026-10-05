@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Folder
@@ -79,6 +80,7 @@ fun MoreMenuSheet(
             MoreMenuItem(Icons.Default.Groups, Textos.t(T.nav_sesiones)) { ir(Screen.Sessions.route) }
             if (conLigas) MoreMenuItem(Icons.Default.EmojiEvents, Textos.t(T.nav_ligas)) { ir(Screen.Social.route) }
             MoreMenuItem(Icons.Default.BarChart, Textos.t(T.nav_estadisticas)) { ir(Screen.Stats.route) }
+            MoreMenuItem(Icons.Default.CalendarMonth, Textos.t(T.ritmo_titulo)) { ir(Screen.Ritmo.route) }
             MoreMenuItem(Icons.Default.CenterFocusStrong, Textos.t(T.nav_enfoque)) { ir(Screen.Focus.route) }
             MoreMenuItem(Icons.Default.Star, Textos.t(T.nav_atascados_menu)) { ir(Screen.StuckTrophies.route) }
             MoreMenuItem(Icons.Default.Folder, Textos.t(T.nav_carpetas)) { ir(Screen.Collections.route) }

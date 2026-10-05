@@ -252,6 +252,12 @@
     <string name="cuentas_xbox_1">Auf der Konsole oder in der Xbox-App: dein Profil → „Onlinesicherheit und Datenschutz“ → „Details anzeigen und anpassen“.</string>
     <string name="cuentas_xbox_2">Suche „Spielverlauf und Statistiken“ und stelle es auf „Jeder“.</string>
     <string name="cuentas_xbox_3">Xbox läuft über einen inoffiziellen Drittanbieterdienst — wenn es schon öffentlich ist und trotzdem nicht klappt, versuch es später noch mal.</string>
+    <string name="diario_final_1">Schließlich wurdest du am %1$s gekrönt, nach 1 Tag der Jagd.</string>
+    <string name="diario_final_n">Schließlich wurdest du am %1$s gekrönt, nach %2$s Tagen der Jagd.</string>
+    <string name="diario_hazana">Deine größte Leistung war „%1$s“, die nur %2$s %% der Spieler erreichen.</string>
+    <string name="diario_inicio">Dein Abenteuer in %1$s begann am %2$s, mit „%3$s“.</string>
+    <string name="diario_muro">Deine größte Hürde war „%1$s“ zu überwinden — %2$s Tage lang hast du nichts freigeschaltet, bevor du es geschafft hast.</string>
+    <string name="diario_titulo">📖 Das Platin-Tagebuch</string>
     <string name="duracion_anios">Jahre</string>
     <string name="duracion_anios_1">%1$s Jahr</string>
     <string name="duracion_anios_n">%1$s Jahre</string>
@@ -494,6 +500,13 @@
     <string name="racha_activar">Hol eine Trophäe, um sie zu starten</string>
     <string name="racha_hoy">Deine nächste Serie beginnt heute</string>
     <string name="racha_semanas">LETZTE 5 WOCHEN</string>
+    <string name="ritmo_dia_a_dia">Tag für Tag</string>
+    <string name="ritmo_n_trofeos">%1$s Trophäen</string>
+    <string name="ritmo_por_juego">Nach Spiel</string>
+    <string name="ritmo_quitar_dia">Ganzen Monat zeigen</string>
+    <string name="ritmo_titulo">Monat für Monat</string>
+    <string name="ritmo_vacio_texto">Probier mit den Pfeilen oben einen anderen Monat.</string>
+    <string name="ritmo_vacio_titulo">Keine Trophäen in diesem Monat</string>
     <string name="ruleta_empezar">Loslegen</string>
     <string name="ruleta_titulo">WAS SPIELEN WIR?</string>
     <string name="selector_buscar">Suchen…</string>
@@ -654,6 +667,9 @@
     <string name="tiempo_d">vor %1$s T.</string>
     <string name="tiempo_h">vor %1$s Std.</string>
     <string name="tiempo_min">vor %1$s Min.</string>
+    <string name="vista_cronologia">Zeitachse</string>
+    <string name="vista_cuadricula">Raster</string>
+    <string name="vista_lista">Liste</string>
     <string name="widget_objetivo">Ziel: %1$s</string>
     <string name="widget_sin_objetivo">Kein Ziel angeheftet</string>
     <string name="widget_sin_objetivo_sub">Hefte ein Spiel auf seiner Spielseite an</string>

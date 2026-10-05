@@ -525,6 +525,11 @@ fun MainScreen(
                 )
             }
 
+            // Desglose del mes (como /ritmo en la web) — ver ui/trofeos.
+            composable(Screen.Ritmo.route) {
+                com.paragon.app.ui.trofeos.RitmoScreen(tokenStore = tokenStore, onBack = { navController.popBackStack() })
+            }
+
             // Sesiones de trofeos online (lista y ficha) — ver ui/sesiones.
             composable(Screen.Sessions.route) {
                 com.paragon.app.ui.sesiones.SesionesScreen(

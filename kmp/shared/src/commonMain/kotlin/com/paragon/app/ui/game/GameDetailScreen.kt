@@ -36,8 +36,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -200,7 +198,6 @@ private fun GameDetailContent(
     // "Compartir Platino" aunque esté al 100%).
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }
     val prediccion = remember(game.trophies) { predecirPlatino(game.trophies) }
-    var vistaCronologica by remember { mutableStateOf(false) }
     // Antes se ordenaba dentro del propio LazyColumn (en cada recomposición
     // del contenido, p. ej. al tocar el chip de racha de la cabecera) —
     // ahora solo se recalcula si `game.trophies` cambia de verdad.
@@ -290,19 +287,29 @@ private fun GameDetailContent(
             )
         }
 
-        item {
-            Row(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                FilterChip(selected = vistaCronologica == false, onClick = { vistaCronologica = false }, label = { Text(Textos.t(T.ficha_lista)) })
-                FilterChip(selected = vistaCronologica == true, onClick = { vistaCronologica = true }, label = { Text(Textos.t(T.ficha_cronologia)) })
+        // "El Diario del Platino", como en la web: solo con el platino y fechas.
+        game.diario?.let { diario ->
+            item {
+                com.paragon.app.ui.trofeos.DiarioPlatinoCard(diario, game.title, Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             }
         }
 
-        if (vistaCronologica) {
+        // Las mismas vistas que el desglose del mes (ui/trofeos/VistasTrofeos.kt).
+        item {
+            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)) {
+                Spacer(Modifier.weight(1f))
+                com.paragon.app.ui.trofeos.SelectorVistaTrofeos()
+            }
+        }
+
+        val vista = com.paragon.app.ui.trofeos.vistaTrofeosActual
+        if (vista == com.paragon.app.ui.trofeos.VistaTrofeos.CRONOLOGIA) {
             item {
                 TrophyRarityChart(trophies = game.trophies, modifier = Modifier.padding(horizontal = 24.dp))
+            }
+        } else if (vista == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA) {
+            items(trofeosOrdenados.chunked(4)) { fila ->
+                com.paragon.app.ui.trofeos.FilaCuadricula(fila, columnas = 4, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
             }
         } else {
             items(trofeosOrdenados, key = { it.id }) { trophy ->
@@ -607,7 +614,7 @@ private fun EjeYRareza() {
 }
 
 @Composable
-private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = Modifier) {
+internal fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = Modifier) {
     val puntos = remember(trophies) {
         trophies
             .filter { it.earned && it.earnedAt != null && it.rarityPercent != null }
@@ -946,7 +953,7 @@ private fun TrophyRow(
             )
         }
         trophy.rarityPercent?.let {
-            Text(text = "${it}%", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = "${com.paragon.app.util.numeroLocal(it, 1)} %", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
         if (!trophy.earned) {
             IconButton(

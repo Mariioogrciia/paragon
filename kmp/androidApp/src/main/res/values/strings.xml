@@ -254,6 +254,12 @@
     <string name="cuentas_xbox_1">En la consola o la app Xbox: tu perfil → \"Privacidad y seguridad en línea\" → \"Ver detalles y personalizar\".</string>
     <string name="cuentas_xbox_2">Busca \"Historial de juego y estadísticas\" y ponlo en \"Todos\".</string>
     <string name="cuentas_xbox_3">Xbox usa un servicio de terceros no oficial — si ya es público y sigue sin funcionar, prueba de nuevo más tarde.</string>
+    <string name="diario_final_1">Finalmente, te coronaste el %1$s, tras 1 día de caza.</string>
+    <string name="diario_final_n">Finalmente, te coronaste el %1$s, tras %2$s días de caza.</string>
+    <string name="diario_hazana">Tu mayor hazaña fue «%1$s», un trofeo que solo tiene el %2$s %% de quienes juegan a esto.</string>
+    <string name="diario_inicio">Tu aventura en %1$s empezó el %2$s, con «%3$s».</string>
+    <string name="diario_muro">Tu mayor muro fue superar «%1$s»: estuviste %2$s días sin desbloquear nada antes de conseguirlo.</string>
+    <string name="diario_titulo">📖 El diario del platino</string>
     <string name="duracion_anios">Años</string>
     <string name="duracion_anios_1">%1$s año</string>
     <string name="duracion_anios_n">%1$s años</string>
@@ -496,6 +502,13 @@
     <string name="racha_activar">Completa un trofeo para activarla</string>
     <string name="racha_hoy">Tu próxima racha empieza hoy</string>
     <string name="racha_semanas">ÚLTIMAS 5 SEMANAS</string>
+    <string name="ritmo_dia_a_dia">Día a día</string>
+    <string name="ritmo_n_trofeos">%1$s trofeos</string>
+    <string name="ritmo_por_juego">Por juego</string>
+    <string name="ritmo_quitar_dia">Ver todo el mes</string>
+    <string name="ritmo_titulo">Mes a mes</string>
+    <string name="ritmo_vacio_texto">Prueba con otro mes con las flechas de arriba.</string>
+    <string name="ritmo_vacio_titulo">Ningún trofeo este mes</string>
     <string name="ruleta_empezar">Empezarlo</string>
     <string name="ruleta_titulo">¿A QUÉ JUGAMOS?</string>
     <string name="selector_buscar">Buscar…</string>
@@ -656,6 +669,9 @@
     <string name="tiempo_d">hace %1$sd</string>
     <string name="tiempo_h">hace %1$sh</string>
     <string name="tiempo_min">hace %1$smin</string>
+    <string name="vista_cronologia">Cronología</string>
+    <string name="vista_cuadricula">Cuadrícula</string>
+    <string name="vista_lista">Lista</string>
     <string name="widget_objetivo">Objetivo: %1$s</string>
     <string name="widget_sin_objetivo">Sin objetivo anclado</string>
     <string name="widget_sin_objetivo_sub">Fija un juego desde la ficha de juego</string>

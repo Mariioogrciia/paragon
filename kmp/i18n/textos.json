@@ -4054,5 +4054,101 @@
   "en": "Pick the trophy you're missing.",
   "es": "Elige el trofeo que te falta.",
   "fr": "Choisis le trophée qui te manque."
+ },
+ "vista_lista": {
+  "de": "Liste",
+  "en": "List",
+  "es": "Lista",
+  "fr": "Liste"
+ },
+ "vista_cuadricula": {
+  "de": "Raster",
+  "en": "Grid",
+  "es": "Cuadrícula",
+  "fr": "Grille"
+ },
+ "vista_cronologia": {
+  "de": "Zeitachse",
+  "en": "Timeline",
+  "es": "Cronología",
+  "fr": "Chronologie"
+ },
+ "diario_titulo": {
+  "de": "📖 Das Platin-Tagebuch",
+  "en": "📖 The platinum diary",
+  "es": "📖 El diario del platino",
+  "fr": "📖 Le journal du platine"
+ },
+ "diario_inicio": {
+  "de": "Dein Abenteuer in {0} begann am {1}, mit „{2}“.",
+  "en": "Your journey in {0} began on {1}, with “{2}”.",
+  "es": "Tu aventura en {0} empezó el {1}, con «{2}».",
+  "fr": "Ton aventure dans {0} a commencé le {1}, avec « {2} »."
+ },
+ "diario_muro": {
+  "de": "Deine größte Hürde war „{0}“ zu überwinden — {1} Tage lang hast du nichts freigeschaltet, bevor du es geschafft hast.",
+  "en": "Your biggest wall was beating “{0}”: you went {1} days without unlocking anything before you got it.",
+  "es": "Tu mayor muro fue superar «{0}»: estuviste {1} días sin desbloquear nada antes de conseguirlo.",
+  "fr": "Ton plus gros obstacle a été « {0} » : tu es resté {1} jours sans rien débloquer avant de l'obtenir."
+ },
+ "diario_hazana": {
+  "de": "Deine größte Leistung war „{0}“, die nur {1} % der Spieler erreichen.",
+  "en": "Your greatest feat was “{0}”, earned by only {1}% of players.",
+  "es": "Tu mayor hazaña fue «{0}», un trofeo que solo tiene el {1} % de quienes juegan a esto.",
+  "fr": "Ton plus bel exploit a été « {0} », obtenu par seulement {1} % des joueurs."
+ },
+ "diario_final_1": {
+  "de": "Schließlich wurdest du am {0} gekrönt, nach 1 Tag der Jagd.",
+  "en": "Finally, you were crowned on {0}, after 1 day of hunting.",
+  "es": "Finalmente, te coronaste el {0}, tras 1 día de caza.",
+  "fr": "Enfin, tu as été couronné le {0}, après 1 jour de chasse."
+ },
+ "diario_final_n": {
+  "de": "Schließlich wurdest du am {0} gekrönt, nach {1} Tagen der Jagd.",
+  "en": "Finally, you were crowned on {0}, after {1} days of hunting.",
+  "es": "Finalmente, te coronaste el {0}, tras {1} días de caza.",
+  "fr": "Enfin, tu as été couronné le {0}, après {1} jours de chasse."
+ },
+ "ritmo_titulo": {
+  "de": "Monat für Monat",
+  "en": "Month by month",
+  "es": "Mes a mes",
+  "fr": "Mois par mois"
+ },
+ "ritmo_dia_a_dia": {
+  "de": "Tag für Tag",
+  "en": "Day by day",
+  "es": "Día a día",
+  "fr": "Jour par jour"
+ },
+ "ritmo_quitar_dia": {
+  "de": "Ganzen Monat zeigen",
+  "en": "Show the whole month",
+  "es": "Ver todo el mes",
+  "fr": "Voir tout le mois"
+ },
+ "ritmo_n_trofeos": {
+  "de": "{0} Trophäen",
+  "en": "{0} trophies",
+  "es": "{0} trofeos",
+  "fr": "{0} trophées"
+ },
+ "ritmo_vacio_titulo": {
+  "de": "Keine Trophäen in diesem Monat",
+  "en": "No trophies this month",
+  "es": "Ningún trofeo este mes",
+  "fr": "Aucun trophée ce mois-ci"
+ },
+ "ritmo_vacio_texto": {
+  "de": "Probier mit den Pfeilen oben einen anderen Monat.",
+  "en": "Try another month with the arrows above.",
+  "es": "Prueba con otro mes con las flechas de arriba.",
+  "fr": "Essaie un autre mois avec les flèches ci-dessus."
+ },
+ "ritmo_por_juego": {
+  "de": "Nach Spiel",
+  "en": "By game",
+  "es": "Por juego",
+  "fr": "Par jeu"
  }
 }

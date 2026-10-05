@@ -36,7 +36,22 @@ data class GameDetailDto(
 )
 
 @Serializable
-data class GameDetailResponse(val game: GameDetailDto)
+data class GameDetailResponse(val game: GameDetailDto, val diario: DiarioPlatinoDto? = null)
+
+/** "El Diario del Platino" (src/lib/diarioPlatino.ts); null sin platino o sin fechas. */
+@Serializable
+data class DiarioPlatinoMasRaroDto(val nombre: String, val rarityPercent: Double)
+
+@Serializable
+data class DiarioPlatinoDto(
+    val primeraFecha: String,
+    val primerTrofeo: String,
+    val muroDias: Int,
+    val muroTrofeo: String,
+    val masRaro: DiarioPlatinoMasRaroDto? = null,
+    val fechaPlatino: String,
+    val diasTotales: Int,
+)
 
 @Serializable
 data class PinResponse(val pinned: Boolean)

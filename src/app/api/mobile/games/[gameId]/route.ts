@@ -3,6 +3,8 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getGameDetail, getProfileByUserId } from "@/lib/profiles";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { errorMovil } from "@/lib/mensajesApi";
+import { gameProgress } from "@/lib/stats";
+import { generarDiarioPlatino } from "@/lib/diarioPlatino";
 
 /**
  * Ficha de un juego para GameDetailScreen (Android) — mismo `getGameDetail`
@@ -30,5 +32,8 @@ export async function GET(
     return errorMovil(req, "Juego no encontrado", 404);
   }
 
-  return NextResponse.json({ game: detail });
+  // "El Diario del Platino", como en la web: solo con el platino (o su
+  // equivalente sin metales) conseguido y fechas de verdad; si no, null.
+  const diario = gameProgress(detail).platinumEarned ? generarDiarioPlatino(detail.trophies) : null;
+  return NextResponse.json({ game: detail, diario });
 }

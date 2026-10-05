@@ -906,3 +906,8 @@ total contando a quien organiza** (4 = el anfitrión + 3 libres).
 - `GET /api/mobile/sessions/trophies?gameId=` → `{ trofeos: [{ trophyId, name, grade, iconUrl, grupo }] }`: los que te faltan, en tu idioma; `grupo` null = juego base.
 
 `Sesion`: `{ id, trofeo, trofeoInfo: { iconUrl, grade, detail } | null, descripcion, fechaHora, plazasTotales, ocupadas, libres, cancelada, juego: { id, titulo, iconUrl, platform, deviceLabel, igdbId }, anfitrion, participantes: [{ userId, handle, name, image }], soyAnfitrion, estoyApuntado, loTengo }`.
+
+### Diario del platino y desglose del mes
+
+- `GET /api/mobile/games/{gameId}` trae también `diario`: `{ primeraFecha, primerTrofeo, muroDias, muroTrofeo, masRaro: { nombre, rarityPercent } | null, fechaPlatino, diasTotales } | null` (src/lib/diarioPlatino.ts; null sin platino o sin fechas). Como en la web: el muro solo se cuenta con 3 días o más, y la hazaña si su rareza es menor del 20 %.
+- `GET /api/mobile/stats/month?mes=YYYY-MM` (por defecto el actual) → `{ mes, total, porDia: [{ dia, total }], porJuego: [{ gameId, juego, iconUrl, total }], trofeos: [{ gameId, juego, trophyId, nombre, detalle, grade, iconUrl, earnedAt, rarityPercent }] }`.

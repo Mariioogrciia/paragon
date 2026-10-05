@@ -89,6 +89,8 @@ data class GameDetailData(
     val notes: String,
     val playtimeMinutes: Int?,
     val trophies: List<TrophyItem>,
+    /** Ver DiarioPlatinoDto; nunca se guarda en la caché offline (se pide con red). */
+    val diario: com.paragon.shared.red.DiarioPlatinoDto? = null,
 )
 
 sealed class GameDetailResult {
@@ -190,7 +192,7 @@ class GameDetailRepository(
 
         return try {
             val response = ApiClient.gamesApi(store).getGameDetail(gameId)
-            var detail = response.game.toGameDetailData()
+            var detail = response.game.toGameDetailData().copy(diario = response.diario)
             val pending = gameDetailDao?.getPendingNote(gameId)
             if (pending != null) detail = detail.copy(notes = pending.notes)
             gameDetailDao?.upsertDetail(detail.toCachedEntity())

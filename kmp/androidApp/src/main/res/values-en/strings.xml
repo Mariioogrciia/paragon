@@ -252,6 +252,12 @@
     <string name="cuentas_xbox_1">On the console or the Xbox app: your profile → \"Online safety &amp; privacy\" → \"View details &amp; customise\".</string>
     <string name="cuentas_xbox_2">Find \"Game history &amp; stats\" and set it to \"Everyone\".</string>
     <string name="cuentas_xbox_3">Xbox goes through an unofficial third-party service — if it\'s already public and still fails, try again later.</string>
+    <string name="diario_final_1">Finally, you were crowned on %1$s, after 1 day of hunting.</string>
+    <string name="diario_final_n">Finally, you were crowned on %1$s, after %2$s days of hunting.</string>
+    <string name="diario_hazana">Your greatest feat was “%1$s”, earned by only %2$s%% of players.</string>
+    <string name="diario_inicio">Your journey in %1$s began on %2$s, with “%3$s”.</string>
+    <string name="diario_muro">Your biggest wall was beating “%1$s”: you went %2$s days without unlocking anything before you got it.</string>
+    <string name="diario_titulo">📖 The platinum diary</string>
     <string name="duracion_anios">Years</string>
     <string name="duracion_anios_1">%1$s year</string>
     <string name="duracion_anios_n">%1$s years</string>
@@ -494,6 +500,13 @@
     <string name="racha_activar">Earn a trophy to start it</string>
     <string name="racha_hoy">Your next streak starts today</string>
     <string name="racha_semanas">LAST 5 WEEKS</string>
+    <string name="ritmo_dia_a_dia">Day by day</string>
+    <string name="ritmo_n_trofeos">%1$s trophies</string>
+    <string name="ritmo_por_juego">By game</string>
+    <string name="ritmo_quitar_dia">Show the whole month</string>
+    <string name="ritmo_titulo">Month by month</string>
+    <string name="ritmo_vacio_texto">Try another month with the arrows above.</string>
+    <string name="ritmo_vacio_titulo">No trophies this month</string>
     <string name="ruleta_empezar">Start it</string>
     <string name="ruleta_titulo">WHAT ARE WE PLAYING?</string>
     <string name="selector_buscar">Search…</string>
@@ -654,6 +667,9 @@
     <string name="tiempo_d">%1$sd ago</string>
     <string name="tiempo_h">%1$sh ago</string>
     <string name="tiempo_min">%1$sm ago</string>
+    <string name="vista_cronologia">Timeline</string>
+    <string name="vista_cuadricula">Grid</string>
+    <string name="vista_lista">List</string>
     <string name="widget_objetivo">Goal: %1$s</string>
     <string name="widget_sin_objetivo">No pinned goal</string>
     <string name="widget_sin_objetivo_sub">Pin a game from its game page</string>

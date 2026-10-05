@@ -95,7 +95,40 @@ data class StatsResponse(
     val hitos: HitosDto,
 )
 
+/** Desglose de un mes — /api/mobile/stats/month, como /ritmo en la web. */
+@Serializable
+data class DiaMesDto(val dia: String, val total: Int)
+
+@Serializable
+data class JuegoMesDto(val gameId: String, val juego: String, val iconUrl: String? = null, val total: Int)
+
+@Serializable
+data class TrofeoMesDto(
+    val gameId: String,
+    val juego: String,
+    val trophyId: String,
+    val nombre: String,
+    val detalle: String = "",
+    val grade: String? = null,
+    val iconUrl: String? = null,
+    val earnedAt: String,
+    val rarityPercent: Double? = null,
+)
+
+@Serializable
+data class MesResponse(
+    val mes: String,
+    val total: Int = 0,
+    val porDia: List<DiaMesDto> = emptyList(),
+    val porJuego: List<JuegoMesDto> = emptyList(),
+    val trofeos: List<TrofeoMesDto> = emptyList(),
+)
+
 class StatsApi internal constructor(private val c: ClienteParagon) {
+    /** `mes`: "YYYY-MM"; null = el actual. */
+    suspend fun getMes(mes: String?): MesResponse =
+        c.http.get("api/mobile/stats/month") { if (mes != null) parameter("mes", mes) }.body()
+
     /** Versión curada para el móvil de /api/mobile/stats — ver route.ts y API-CONTRACT.md. */
     suspend fun getStats(): StatsResponse =
         c.http.get("api/mobile/stats").body()
