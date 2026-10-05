@@ -1,5 +1,10 @@
 package com.paragon.app.ui.social
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -74,13 +79,20 @@ fun ClanDetailSheet(
     val scope = rememberCoroutineScope()
     var confirmLeave by remember { mutableStateOf(false) }
     var inviteError by remember { mutableStateOf<String?>(null) }
+    var guerraError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(tag, refreshKey.value) {
         result = repository.getClanDetail(tag)
     }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp),
+        ) {
             CabeceraHoja(onBack = onDismiss)
             when (val current = result) {
                 null -> Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
@@ -99,6 +111,22 @@ fun ClanDetailSheet(
                         }
                     },
                     onRequestLeave = { confirmLeave = true },
+                    onRetar = { rivalId ->
+                        scope.launch {
+                            when (val res = repository.retarClan(tag, rivalId)) {
+                                is ClanActionResult.Ok -> refreshKey.value += 1
+                                is ClanActionResult.Error -> guerraError = res.message
+                            }
+                        }
+                    },
+                    onResponder = { guerraId, aceptar ->
+                        scope.launch {
+                            when (val res = repository.responderGuerra(guerraId, aceptar)) {
+                                is ClanActionResult.Ok -> refreshKey.value += 1
+                                is ClanActionResult.Error -> guerraError = res.message
+                            }
+                        }
+                    },
                     onInvite = { userId ->
                         scope.launch {
                             val res = repository.inviteToClan(tag, userId)
@@ -139,6 +167,16 @@ fun ClanDetailSheet(
         )
     }
 
+    guerraError?.let { message ->
+        ConfirmDialog(
+            title = Textos.t(T.guerra_titulo),
+            message = message,
+            confirmLabel = Textos.t(T.comun_vale),
+            onConfirm = { guerraError = null },
+            onDismiss = { guerraError = null },
+        )
+    }
+
     inviteError?.let { message ->
         ConfirmDialog(
             title = Textos.t(T.clan_invitar_error),
@@ -157,6 +195,8 @@ private fun ClanDetailContent(
     onJoin: () -> Unit,
     onRequestLeave: () -> Unit,
     onInvite: (String) -> Unit,
+    onRetar: (String) -> Unit = {},
+    onResponder: (String, Boolean) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -209,6 +249,12 @@ private fun ClanDetailContent(
         detail.leaderboard.forEachIndexed { index, member ->
             ClanMemberRow(member, index, onClick = { onMemberClick(member.handle) })
         }
+
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider(color = Border)
+        Spacer(Modifier.height(16.dp))
+
+        GuerraDeClanes(detail, onRetar, onResponder)
 
         Spacer(Modifier.height(16.dp))
         HorizontalDivider(color = Border)
@@ -313,5 +359,110 @@ private fun InvitableFriendRow(friend: InvitableFriend, onInvite: () -> Unit) {
     ) {
         Text(text = friend.name, color = Foreground, fontSize = 14.sp)
         Text(text = Textos.t(T.comun_invitar), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+/** Duración de una guerra (DURACION_DIAS en lib/clanWars.ts). */
+private const val DIAS_GUERRA = 14
+
+/**
+ * Guerra de clanes, como en la web (clanes/[tag]/GuerraDeClanes.tsx): la
+ * abierta con marcador en vivo, el reto pendiente (aceptar/rechazar si eres
+ * el líder retado), retar a otro clan si eres el líder y no hay ninguna, y
+ * las últimas terminadas.
+ */
+@Composable
+private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResponder: (String, Boolean) -> Unit) {
+    val abierta = detail.guerra.abierta
+    Text(text = Textos.t(T.guerra_titulo).uppercase(), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+    Spacer(Modifier.height(8.dp))
+    when {
+        abierta != null && abierta.estado == "activa" -> {
+            Column(
+                Modifier.fillMaxWidth()
+                    .background(AccentSoft, RoundedCornerShape(radio(12)))
+                    .padding(14.dp),
+            ) {
+                Text(Textos.t(T.guerra_contra, abierta.rival.tag, abierta.rival.name), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("[${detail.tag}] ${abierta.misPuntos ?: 0}", color = Accent, fontWeight = FontWeight.Black, fontSize = 22.sp)
+                    Text("  –  ", color = Muted, fontSize = 18.sp)
+                    Text("${abierta.susPuntos ?: 0} [${abierta.rival.tag}]", color = Foreground, fontWeight = FontWeight.Black, fontSize = 22.sp)
+                }
+                val dias = abierta.diasRestantes
+                if (dias != null) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(if (dias <= 0) Textos.t(T.guerra_ultimo_dia) else Textos.t(T.guerra_dias, dias), color = Muted, fontSize = 12.sp)
+                }
+            }
+        }
+        abierta != null && abierta.estado == "pendiente" && abierta.soyRetador -> {
+            Text(Textos.t(T.guerra_esperando, abierta.rival.tag), color = Muted, fontSize = 13.sp)
+        }
+        abierta != null && abierta.estado == "pendiente" -> {
+            Text(Textos.t(T.guerra_os_retan, abierta.rival.tag, abierta.rival.name, DIAS_GUERRA), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            if (detail.amIOwner) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
+                    TextButton(onClick = { onResponder(abierta.id, true) }) {
+                        Text(Textos.t(T.guerra_aceptar), color = Accent, fontWeight = FontWeight.Bold)
+                    }
+                    TextButton(onClick = { onResponder(abierta.id, false) }) {
+                        Text(Textos.t(T.guerra_rechazar), color = Danger, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            } else {
+                Text(Textos.t(T.guerra_responde_lider), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
+        else -> {
+            Text(Textos.t(T.guerra_ninguna), color = Muted, fontSize = 13.sp)
+            if (detail.amIOwner) {
+                Text(Textos.t(T.guerra_reglas, DIAS_GUERRA), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                Spacer(Modifier.height(8.dp))
+                if (detail.retables.isEmpty()) {
+                    Text(Textos.t(T.guerra_sin_rivales), color = Muted, fontSize = 12.sp)
+                } else {
+                    var elegido by remember { mutableStateOf<com.paragon.shared.red.ClanRivalDto?>(null) }
+                    var abiertoMenu by remember { mutableStateOf(false) }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box {
+                            TextButton(onClick = { abiertoMenu = true }) {
+                                Text(elegido?.let { "[${it.tag}] ${it.name}" } ?: Textos.t(T.guerra_elige_rival), color = Foreground)
+                            }
+                            DropdownMenu(expanded = abiertoMenu, onDismissRequest = { abiertoMenu = false }) {
+                                detail.retables.forEach { rival ->
+                                    DropdownMenuItem(
+                                        text = { Text("[${rival.tag}] ${rival.name}") },
+                                        onClick = { elegido = rival; abiertoMenu = false },
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        TextButton(onClick = { elegido?.let { onRetar(it.id) } }, enabled = elegido != null) {
+                            Text(Textos.t(T.guerra_retar), color = if (elegido != null) Accent else Muted, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (detail.guerra.historial.isNotEmpty()) {
+        Spacer(Modifier.height(12.dp))
+        Text(Textos.t(T.guerra_historial), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        detail.guerra.historial.forEach { g ->
+            val (resultado, color) = when (g.gane) {
+                true -> Textos.t(T.guerra_ganada) to Accent
+                false -> Textos.t(T.guerra_perdida) to Danger
+                null -> Textos.t(T.guerra_empate) to Muted
+            }
+            Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("[${g.rival.tag}] ${g.rival.name}", color = Foreground, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("${g.misPuntos ?: 0} – ${g.susPuntos ?: 0}", color = Muted, fontSize = 12.sp)
+                Spacer(Modifier.width(10.dp))
+                Text(resultado, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }

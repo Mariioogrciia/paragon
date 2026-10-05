@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends } from "@/lib/clans";
 import { errorMovil } from "@/lib/mensajesApi";
+import { clanesRetables, getGuerrasDeClan, type GuerraVista } from "@/lib/clanWars";
+
+/** Una guerra en JSON (fechas ISO), desde el punto de vista del clan de la ficha. */
+function guerraJson(g: GuerraVista) {
+  return {
+    ...g,
+    empiezaAt: g.empiezaAt?.toISOString() ?? null,
+    terminaAt: g.terminaAt?.toISOString() ?? null,
+  };
+}
 
 /**
  * Ficha de un clan — mismo dato que `/clanes/[tag]` (web): clan +
@@ -32,6 +42,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ tag: str
   const amIMember = leaderboard.some((m) => m.userId === userId);
   const amIOwner = clan.ownerId === userId;
   const invitables = amIOwner ? await getInvitableFriends(userId, clan.id) : [];
+  // Guerra de clanes (como en la web, GuerraDeClanes.tsx): la abierta con
+  // puntos en vivo, las 5 últimas terminadas y, si eres el líder y no hay
+  // ninguna abierta, a quién puedes retar.
+  const guerras = await getGuerrasDeClan(clan.id);
+  const retables = amIOwner && !guerras.abierta ? await clanesRetables(clan.id) : [];
 
   return NextResponse.json({
     clan: { id: clan.id, tag: clan.tag, name: clan.name, description: clan.description },
@@ -41,5 +56,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ tag: str
     amIMember,
     amIOwner,
     invitables,
+    guerra: {
+      abierta: guerras.abierta ? guerraJson(guerras.abierta) : null,
+      historial: guerras.historial.map(guerraJson),
+    },
+    retables,
   });
 }

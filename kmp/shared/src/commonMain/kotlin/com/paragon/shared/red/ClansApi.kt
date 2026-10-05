@@ -66,7 +66,40 @@ data class ClanDetailResponse(
     val amIMember: Boolean,
     val amIOwner: Boolean,
     val invitables: List<InvitableFriendDto>,
+    // Guerra de clanes (como la web). Con valor por defecto: un servidor viejo no la manda.
+    val guerra: ClanGuerrasDto = ClanGuerrasDto(),
+    /** Clanes a los que se puede retar: solo si soy el líder y no hay guerra abierta. */
+    val retables: List<ClanRivalDto> = emptyList(),
 )
+
+@Serializable
+data class ClanRivalDto(val id: String, val name: String, val tag: String)
+
+/** Una guerra desde el punto de vista del clan de la ficha (GuerraVista en lib/clanWars.ts). */
+@Serializable
+data class ClanGuerraDto(
+    val id: String,
+    /** "pendiente", "activa" o "terminada". */
+    val estado: String,
+    val soyRetador: Boolean,
+    val rival: ClanRivalDto,
+    val empiezaAt: String? = null,
+    val terminaAt: String? = null,
+    val diasRestantes: Int? = null,
+    val misPuntos: Int? = null,
+    val susPuntos: Int? = null,
+    /** Solo en las terminadas; null = empate. */
+    val gane: Boolean? = null,
+)
+
+@Serializable
+data class ClanGuerrasDto(val abierta: ClanGuerraDto? = null, val historial: List<ClanGuerraDto> = emptyList())
+
+@Serializable
+data class RetarClanRequest(val rivalId: String)
+
+@Serializable
+data class ResponderGuerraRequest(val aceptar: Boolean)
 
 @Serializable
 data class InviteToClanRequest(val invitedUserId: String)
@@ -106,5 +139,15 @@ class ClansApi internal constructor(private val c: ClienteParagon) {
     /** Solo el owner, y solo a un amigo suyo que no esté ya en un clan. */
     suspend fun inviteToClan(tag: String, request: InviteToClanRequest) {
         c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/invite") { json(request) }
+    }
+
+    /** Ver src/app/api/mobile/clans/[tag]/war/route.ts. */
+    suspend fun retarClan(tag: String, request: RetarClanRequest) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/war") { json(request) }
+    }
+
+    /** Ver src/app/api/mobile/clans/wars/[id]/route.ts. */
+    suspend fun responderGuerra(id: String, request: ResponderGuerraRequest) {
+        c.http.post("api/mobile/clans/wars/${id.encodeURLPathPart()}") { json(request) }
     }
 }

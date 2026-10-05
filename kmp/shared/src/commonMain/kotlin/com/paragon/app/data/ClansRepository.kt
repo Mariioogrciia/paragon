@@ -35,6 +35,8 @@ data class ClanDetail(
     val amIMember: Boolean,
     val amIOwner: Boolean,
     val invitables: List<InvitableFriend>,
+    val guerra: com.paragon.shared.red.ClanGuerrasDto = com.paragon.shared.red.ClanGuerrasDto(),
+    val retables: List<com.paragon.shared.red.ClanRivalDto> = emptyList(),
 )
 
 sealed class ClansResult {
@@ -137,6 +139,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
                     amIMember = dto.amIMember,
                     amIOwner = dto.amIOwner,
                     invitables = dto.invitables.map { InvitableFriend(it.userId, it.displayName ?: it.handle ?: Textos.t(T.comun_alguien)) },
+                    guerra = dto.guerra,
+                    retables = dto.retables,
                 ),
             )
         } catch (e: HttpException) {
@@ -167,6 +171,28 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    /** Retar a otro clan (solo el líder; ver retarClan en lib/clanWars.ts). */
+    suspend fun retarClan(tag: String, rivalId: String): ClanActionResult = accionGuerra {
+        ApiClient.clansApi(it).retarClan(tag, com.paragon.shared.red.RetarClanRequest(rivalId))
+    }
+
+    /** Aceptar o rechazar un reto (solo el líder del clan retado). */
+    suspend fun responderGuerra(guerraId: String, aceptar: Boolean): ClanActionResult = accionGuerra {
+        ApiClient.clansApi(it).responderGuerra(guerraId, com.paragon.shared.red.ResponderGuerraRequest(aceptar))
+    }
+
+    private suspend fun accionGuerra(llamada: suspend (TokenStore) -> Unit): ClanActionResult {
+        val store = tokenStore ?: return ClanActionResult.Error(Textos.t(T.error_sin_sesion))
+        return try {
+            llamada(store)
+            ClanActionResult.Ok
+        } catch (e: HttpException) {
+            ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: Exception) {
+            ClanActionResult.Error(Textos.t(T.error_conexion))
         }
     }
 

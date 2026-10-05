@@ -2189,6 +2189,114 @@
   "es": "Platino",
   "fr": "Platine"
  },
+ "guerra_aceptar": {
+  "de": "Annehmen",
+  "en": "Accept",
+  "es": "Aceptar",
+  "fr": "Accepter"
+ },
+ "guerra_contra": {
+  "de": "Gegen [{0}] {1}",
+  "en": "Against [{0}] {1}",
+  "es": "Contra [{0}] {1}",
+  "fr": "Contre [{0}] {1}"
+ },
+ "guerra_dias": {
+  "de": "Noch {0} Tage",
+  "en": "{0} days left",
+  "es": "Quedan {0} días",
+  "fr": "Encore {0} jours"
+ },
+ "guerra_elige_rival": {
+  "de": "Rivalen-Clan wählen",
+  "en": "Pick a rival clan",
+  "es": "Elige un clan rival",
+  "fr": "Choisis un clan rival"
+ },
+ "guerra_empate": {
+  "de": "Unentschieden",
+  "en": "Draw",
+  "es": "Empate",
+  "fr": "Égalité"
+ },
+ "guerra_esperando": {
+  "de": "Warten, bis [{0}] die Herausforderung annimmt",
+  "en": "Waiting for [{0}] to accept the challenge",
+  "es": "Esperando a que [{0}] acepte el reto",
+  "fr": "En attente que [{0}] accepte le défi"
+ },
+ "guerra_ganada": {
+  "de": "Gewonnen",
+  "en": "Won",
+  "es": "Victoria",
+  "fr": "Victoire"
+ },
+ "guerra_historial": {
+  "de": "Frühere Kriege",
+  "en": "Past wars",
+  "es": "Guerras anteriores",
+  "fr": "Guerres précédentes"
+ },
+ "guerra_ninguna": {
+  "de": "Kein laufender Krieg.",
+  "en": "No war in progress.",
+  "es": "Ninguna guerra en marcha.",
+  "fr": "Aucune guerre en cours."
+ },
+ "guerra_os_retan": {
+  "de": "[{0}] {1} fordert euch zu {2} Tagen Jagd heraus",
+  "en": "[{0}] {1} challenges you to {2} days of hunting",
+  "es": "[{0}] {1} os reta a {2} días de caza",
+  "fr": "[{0}] {1} vous défie pour {2} jours de chasse"
+ },
+ "guerra_perdida": {
+  "de": "Verloren",
+  "en": "Lost",
+  "es": "Derrota",
+  "fr": "Défaite"
+ },
+ "guerra_rechazar": {
+  "de": "Ablehnen",
+  "en": "Decline",
+  "es": "Rechazar",
+  "fr": "Refuser"
+ },
+ "guerra_reglas": {
+  "de": "{0} Tage: Jede Trophäe jedes Mitglieds zählt. Der Clan mit den meisten Punkten gewinnt.",
+  "en": "{0} days: every trophy from any member counts. The clan with the most points wins.",
+  "es": "{0} días: cada trofeo de cualquier miembro suma. Gana el clan con más puntos.",
+  "fr": "{0} jours : chaque trophée de n'importe quel membre compte. Le clan avec le plus de points gagne."
+ },
+ "guerra_responde_lider": {
+  "de": "Euer Anführer kann annehmen oder ablehnen.",
+  "en": "Your leader can accept or decline it.",
+  "es": "Tu líder puede aceptarlo o rechazarlo.",
+  "fr": "Ton chef peut l'accepter ou le refuser."
+ },
+ "guerra_retar": {
+  "de": "Herausfordern",
+  "en": "Challenge",
+  "es": "Retar",
+  "fr": "Défier"
+ },
+ "guerra_sin_rivales": {
+  "de": "Es gibt noch keine anderen Clans zum Herausfordern.",
+  "en": "There are no other clans to challenge yet.",
+  "es": "No hay otros clanes a los que retar todavía.",
+  "fr": "Il n'y a pas encore d'autres clans à défier."
+ },
+ "guerra_titulo": {
+  "de": "Clan-Krieg",
+  "en": "Clan war",
+  "es": "Guerra de clanes",
+  "fr": "Guerre de clans"
+ },
+ "guerra_ultimo_dia": {
+  "de": "Letzter Tag",
+  "en": "Last day",
+  "es": "Último día",
+  "fr": "Dernier jour"
+ },
  "guia_busqueda_video": {
   "de": "{0} {1} Trophäe Guide",
   "en": "{0} {1} trophy guide",
