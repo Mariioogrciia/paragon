@@ -52,7 +52,20 @@ jobs:
                      CODE_SIGNING_REQUIRED=NO \
                      CODE_SIGN_IDENTITY=""
 
-      - name: Empaquetar IPA
+      # Diagnóstico de Siri: sin Metadata.appintents, iOS no conoce los Atajos.
+      - name: Revisar App Intents empaquetados
+        run: |
+          APP="$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app"
+          plutil -p "$APP/Info.plist" | grep -iE "Bundle(Identifier|DisplayName|DevelopmentRegion|Localizations)" || true
+          if [ -d "$APP/Metadata.appintents" ]; then
+            ls -la "$APP/Metadata.appintents"
+            for f in "$APP/Metadata.appintents"/*.actionsdata; do
+              echo "== $f"
+              python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(json.dumps({k: d[k] for k in d if k in ("actions","autoShortcuts","autoShortcutProviderMangledName","version")}, ensure_ascii=False)[:4000])' "$f" || head -c 4000 "$f"
+            done
+          else
+            echo "::warning::No hay Metadata.appintents en la app: Siri no verá los Atajos"
+          fi
         run: |
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
           cp -R "$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app" "$RUNNER_TEMP/ipa/Payload/"
