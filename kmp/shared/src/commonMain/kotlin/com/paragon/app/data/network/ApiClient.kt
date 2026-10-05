@@ -47,6 +47,7 @@ object ApiClient {
     fun achievementsApi(tokenStore: TokenStore) = cliente(tokenStore).achievements
     fun clansApi(tokenStore: TokenStore) = cliente(tokenStore).clans
     fun sesionesApi(tokenStore: TokenStore) = cliente(tokenStore).sesiones
+    fun amigosApi(tokenStore: TokenStore) = cliente(tokenStore).amigos
     fun dietApi(tokenStore: TokenStore) = cliente(tokenStore).diet
     fun wrapApi(tokenStore: TokenStore) = cliente(tokenStore).wrap
     fun trophyGuidesApi(tokenStore: TokenStore) = cliente(tokenStore).trophyGuides

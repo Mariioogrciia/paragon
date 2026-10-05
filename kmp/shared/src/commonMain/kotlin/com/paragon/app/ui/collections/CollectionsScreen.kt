@@ -55,6 +55,11 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
     var selected by remember { mutableStateOf<Coleccion?>(null) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var renaming by remember { mutableStateOf<Coleccion?>(null) }
+    // Antes, si el servidor decía que no (nombre repetido, sin conexión...),
+    // la app no enseñaba nada: el diálogo se quedaba abierto o el borrado no
+    // ocurría, sin explicación. Ahora siempre se dice qué ha pasado.
+    var errorDialogo by remember { mutableStateOf<String?>(null) }
+    var aviso by remember { mutableStateOf<String?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
 
     fun reload() {
@@ -89,6 +94,9 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
             }
         }
 
+        aviso?.let {
+            Text(it, color = Danger, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+        }
         val current = result
         when {
             current == null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -113,7 +121,8 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                         onRename = { renaming = it },
                         onDelete = { coleccion ->
                             coroutineScope.launch {
-                                repository.deleteCollection(coleccion.id)
+                                val r = repository.deleteCollection(coleccion.id)
+                                aviso = if (r.ok) null else r.message
                                 reload()
                             }
                         },
@@ -125,7 +134,8 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                         onOpenGame = { navController.navigate(Screen.GameDetail.routeFor(it)) },
                         onRemove = { gameId ->
                             coroutineScope.launch {
-                                repository.toggleGameInCollection(activeSelected.id, gameId)
+                                val sigueDentro = repository.toggleGameInCollection(activeSelected.id, gameId)
+                                aviso = if (sigueDentro) Textos.t(T.carpeta_err_quitar) else null
                                 val refreshed = repository.getCollections()
                                 result = refreshed
                                 if (refreshed is CollectionsResult.Ok) {
@@ -143,14 +153,16 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
         NameDialog(
             title = Textos.t(T.carpeta_nueva),
             initialValue = "",
-            onDismiss = { showCreateDialog = false },
+            error = errorDialogo,
+            onDismiss = { showCreateDialog = false; errorDialogo = null },
             onConfirm = { name ->
                 coroutineScope.launch {
                     val outcome = repository.createCollection(name)
                     if (outcome.ok) {
                         showCreateDialog = false
+                        errorDialogo = null
                         reload()
-                    }
+                    } else errorDialogo = outcome.message
                 }
             },
         )
@@ -160,14 +172,16 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
         NameDialog(
             title = Textos.t(T.carpeta_renombrar),
             initialValue = coleccion.name,
-            onDismiss = { renaming = null },
+            error = errorDialogo,
+            onDismiss = { renaming = null; errorDialogo = null },
             onConfirm = { name ->
                 coroutineScope.launch {
                     val outcome = repository.renameCollection(coleccion.id, name)
                     if (outcome.ok) {
                         renaming = null
+                        errorDialogo = null
                         reload()
-                    }
+                    } else errorDialogo = outcome.message
                 }
             },
         )
@@ -276,13 +290,14 @@ private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> U
 }
 
 @Composable
-private fun NameDialog(title: String, initialValue: String, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+private fun NameDialog(title: String, initialValue: String, error: String? = null, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     var name by remember { mutableStateOf(initialValue) }
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Surface,
         title = { Text(text = title, color = Foreground) },
         text = {
+            Column {
             OutlinedTextField(
                 value = name,
                 onValueChange = { if (it.length <= 40) name = it },
@@ -295,6 +310,8 @@ private fun NameDialog(title: String, initialValue: String, onDismiss: () -> Uni
                     unfocusedBorderColor = Border,
                 ),
             )
+            error?.let { Text(it, color = Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
+            }
         },
         confirmButton = {
             TextButton(onClick = { if (name.isNotBlank()) onConfirm(name.trim()) }) {
@@ -318,8 +335,12 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
     val repository = remember(tokenStore) { CollectionsRepository(tokenStore) }
     val coroutineScope = rememberCoroutineScope()
     var collections by remember { mutableStateOf<List<Coleccion>?>(null) }
+    var recarga by remember { mutableIntStateOf(0) }
+    var creando by remember { mutableStateOf(false) }
+    var errorCrear by remember { mutableStateOf<String?>(null) }
+    var aviso by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(recarga) {
         val r = repository.getCollections()
         collections = (r as? CollectionsResult.Ok)?.collections ?: emptyList()
     }
@@ -334,7 +355,7 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
                 actuales == null -> Box(modifier = Modifier.fillMaxWidth().height(80.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Accent)
                 }
-                actuales.isEmpty() -> Text(text = Textos.t(T.carpeta_vacio_crear), color = Muted, fontSize = 13.sp)
+                actuales.isEmpty() -> Text(text = Textos.t(T.carpeta_vacio_sheet), color = Muted, fontSize = 13.sp)
                 else -> actuales.forEach { coleccion ->
                     var dentro by remember(coleccion.id) { mutableStateOf(gameId in coleccion.gameIds) }
                     Row(
@@ -342,8 +363,10 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
                             .fillMaxWidth()
                             .clickable {
                                 dentro = !dentro
+                                val esperado = dentro
                                 coroutineScope.launch {
                                     dentro = repository.toggleGameInCollection(coleccion.id, gameId)
+                                    aviso = if (dentro != esperado) Textos.t(T.carpeta_err_cambiar) else null
                                 }
                             }
                             .padding(vertical = 10.dp),
@@ -359,6 +382,31 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
                     }
                 }
             }
+            aviso?.let { Text(it, color = Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp)) }
+            // Crear una carpeta sin salir de la ficha (antes solo se podía en Carpetas).
+            TextButton(onClick = { creando = true }, modifier = Modifier.padding(top = 4.dp)) {
+                Icon(Icons.Default.Add, contentDescription = null, tint = Accent)
+                Spacer(Modifier.width(6.dp))
+                Text(Textos.t(T.carpeta_nueva), color = Accent, fontWeight = FontWeight.Bold)
+            }
         }
+    }
+    if (creando) {
+        NameDialog(
+            title = Textos.t(T.carpeta_nueva),
+            initialValue = "",
+            error = errorCrear,
+            onDismiss = { creando = false; errorCrear = null },
+            onConfirm = { name ->
+                coroutineScope.launch {
+                    val outcome = repository.createCollection(name)
+                    if (outcome.ok) {
+                        creando = false
+                        errorCrear = null
+                        recarga++
+                    } else errorCrear = outcome.message
+                }
+            },
+        )
     }
 }

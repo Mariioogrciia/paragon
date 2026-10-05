@@ -4318,5 +4318,53 @@
   "en": "{0}% of the clan",
   "de": "{0} % des Clans",
   "fr": "{0} % du clan"
+ },
+ "amigos_placeholder": {
+  "de": "@Benutzername deines Freundes",
+  "en": "Your friend's @username",
+  "es": "@usuario de tu amigo",
+  "fr": "@pseudo de ton ami"
+ },
+ "amigos_anadir": {
+  "de": "Hinzufügen",
+  "en": "Add",
+  "es": "Añadir",
+  "fr": "Ajouter"
+ },
+ "amigos_enviada": {
+  "de": "Anfrage an @{0} gesendet.",
+  "en": "Request sent to @{0}.",
+  "es": "Solicitud enviada a @{0}.",
+  "fr": "Demande envoyée à @{0}."
+ },
+ "amigos_ya_sois": {
+  "de": "Ihr seid jetzt befreundet: @{0} hatte dir eine Anfrage geschickt.",
+  "en": "You're friends now: @{0} had sent you a request.",
+  "es": "Ya sois amigos: @{0} te había enviado una solicitud.",
+  "fr": "Vous êtes amis : @{0} t'avait envoyé une demande."
+ },
+ "amigos_solicitudes": {
+  "de": "Freundschaftsanfragen",
+  "en": "Friend requests",
+  "es": "Solicitudes de amistad",
+  "fr": "Demandes d'ami"
+ },
+ "carpeta_err_quitar": {
+  "de": "Das Spiel konnte nicht aus dem Ordner entfernt werden. Versuch es erneut.",
+  "en": "Couldn't remove the game from the folder. Try again.",
+  "es": "No se pudo sacar el juego de la carpeta. Inténtalo de nuevo.",
+  "fr": "Impossible de retirer le jeu du dossier. Réessaie."
+ },
+ "carpeta_err_cambiar": {
+  "de": "Der Ordner konnte nicht geändert werden. Prüf die Verbindung und versuch es erneut.",
+  "en": "Couldn't update the folder. Check your connection and try again.",
+  "es": "No se pudo cambiar la carpeta. Revisa la conexión e inténtalo de nuevo.",
+  "fr": "Impossible de modifier le dossier. Vérifie la connexion et réessaie."
+ },
+ "carpeta_vacio_sheet": {
+  "de": "Du hast noch keine Ordner. Erstell unten einen.",
+  "en": "You don't have any folders yet. Create one below.",
+  "es": "Aún no tienes carpetas. Crea una aquí abajo.",
+  "fr": "Tu n'as pas encore de dossier. Crées-en un ci-dessous."
  }
 }

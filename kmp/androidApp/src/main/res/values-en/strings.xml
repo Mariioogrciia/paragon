@@ -49,6 +49,11 @@
     <string name="alta_ultimo_paso">Last step: link your account</string>
     <string name="alta_ultimo_paso_sub">Your trophies come from your PlayStation, Steam or Xbox profile. Link at least one and your library will be here in a few minutes.</string>
     <string name="alta_ya_vinculado">I\'ve linked it</string>
+    <string name="amigos_anadir">Add</string>
+    <string name="amigos_enviada">Request sent to @%1$s.</string>
+    <string name="amigos_placeholder">Your friend\'s @username</string>
+    <string name="amigos_solicitudes">Friend requests</string>
+    <string name="amigos_ya_sois">You\'re friends now: @%1$s had sent you a request.</string>
     <string name="apariencia_acento">Accent and palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Unlocks at level %1$s (you\'re level %2$s)</string>
@@ -97,7 +102,9 @@
     <string name="carpeta_borrar_texto">\"%1$s\" disappears with the %2$s games it groups (the games themselves aren\'t deleted, only the folder).</string>
     <string name="carpeta_borrar_titulo">Delete this folder?</string>
     <string name="carpeta_err_borrar">Couldn\'t delete the folder.</string>
+    <string name="carpeta_err_cambiar">Couldn\'t update the folder. Check your connection and try again.</string>
     <string name="carpeta_err_crear">Couldn\'t create the folder.</string>
+    <string name="carpeta_err_quitar">Couldn\'t remove the game from the folder. Try again.</string>
     <string name="carpeta_err_renombrar">Couldn\'t rename the folder.</string>
     <string name="carpeta_nueva">New folder</string>
     <string name="carpeta_quitar">Remove from folder</string>
@@ -106,6 +113,7 @@
     <string name="carpeta_sin_juegos_sub">Add them from their game page, or from the Library with each card\'s menu.</string>
     <string name="carpeta_vacio">You don\'t have any folders yet</string>
     <string name="carpeta_vacio_crear">You don\'t have any folders yet. Create one from the Library.</string>
+    <string name="carpeta_vacio_sheet">You don\'t have any folders yet. Create one below.</string>
     <string name="carpeta_vacio_sub">Group your games however you like — by series, platform, anything — and create folders with the + above.</string>
     <string name="carpetas_titulo">FOLDERS</string>
     <string name="clan_abandonar">Leave clan</string>

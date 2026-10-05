@@ -49,6 +49,11 @@
     <string name="alta_ultimo_paso">Dernière étape : associe ton compte</string>
     <string name="alta_ultimo_paso_sub">Tes trophées viennent de ton profil PlayStation, Steam ou Xbox. Associes-en au moins un et ta bibliothèque sera là dans quelques minutes.</string>
     <string name="alta_ya_vinculado">C\'est fait</string>
+    <string name="amigos_anadir">Ajouter</string>
+    <string name="amigos_enviada">Demande envoyée à @%1$s.</string>
+    <string name="amigos_placeholder">\@pseudo de ton ami</string>
+    <string name="amigos_solicitudes">Demandes d\'ami</string>
+    <string name="amigos_ya_sois">Vous êtes amis : @%1$s t\'avait envoyé une demande.</string>
     <string name="apariencia_acento">Accent et palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Se débloque au niveau %1$s (tu es niveau %2$s)</string>
@@ -97,7 +102,9 @@
     <string name="carpeta_borrar_texto">« %1$s » disparaît avec les %2$s jeux qu\'il regroupe (les jeux eux-mêmes ne sont pas supprimés, seulement le dossier).</string>
     <string name="carpeta_borrar_titulo">Supprimer ce dossier ?</string>
     <string name="carpeta_err_borrar">Impossible de supprimer le dossier.</string>
+    <string name="carpeta_err_cambiar">Impossible de modifier le dossier. Vérifie la connexion et réessaie.</string>
     <string name="carpeta_err_crear">Impossible de créer le dossier.</string>
+    <string name="carpeta_err_quitar">Impossible de retirer le jeu du dossier. Réessaie.</string>
     <string name="carpeta_err_renombrar">Impossible de renommer le dossier.</string>
     <string name="carpeta_nueva">Nouveau dossier</string>
     <string name="carpeta_quitar">Retirer du dossier</string>
@@ -106,6 +113,7 @@
     <string name="carpeta_sin_juegos_sub">Ajoute-les depuis leur fiche, ou depuis la Bibliothèque avec le menu de chaque carte.</string>
     <string name="carpeta_vacio">Tu n\'as encore aucun dossier</string>
     <string name="carpeta_vacio_crear">Tu n\'as encore aucun dossier. Crées-en un depuis la Bibliothèque.</string>
+    <string name="carpeta_vacio_sheet">Tu n\'as pas encore de dossier. Crées-en un ci-dessous.</string>
     <string name="carpeta_vacio_sub">Regroupe tes jeux comme tu veux — par saga, plateforme, n\'importe quoi — et crée des dossiers avec le + en haut.</string>
     <string name="carpetas_titulo">DOSSIERS</string>
     <string name="clan_abandonar">Quitter le clan</string>

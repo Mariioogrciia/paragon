@@ -915,3 +915,9 @@ total contando a quien organiza** (4 = el anfitrión + 3 libres).
 
 - `GET /api/mobile/games/{gameId}` trae también `diario`: `{ primeraFecha, primerTrofeo, muroDias, muroTrofeo, masRaro: { nombre, rarityPercent } | null, fechaPlatino, diasTotales } | null` (src/lib/diarioPlatino.ts; null sin platino o sin fechas). Como en la web: el muro solo se cuenta con 3 días o más, y la hazaña si su rareza es menor del 20 %.
 - `GET /api/mobile/stats/month?mes=YYYY-MM` (por defecto el actual) → `{ mes, total, porDia: [{ dia, total }], porJuego: [{ gameId, juego, iconUrl, total }], trofeos: [{ gameId, juego, trophyId, nombre, detalle, grade, iconUrl, earnedAt, rarityPercent }] }`.
+
+### Amigos (añadir, aceptar, rechazar)
+
+- `GET /api/mobile/friends` → `{ pendientes: [{ userId, handle, name, image }] }`: solicitudes que te han enviado.
+- `POST /api/mobile/friends` `{ handle }` (con o sin @) → `{ ok, amigos }` (`amigos`: esa persona ya te la había enviado y quedáis como amigos). 409 con el motivo ("No existe nadie con ese usuario.", "Ya sois amigos."...).
+- `POST /api/mobile/friends/{userId}` → aceptar su solicitud. `DELETE` → rechazarla o dejar de ser amigos.

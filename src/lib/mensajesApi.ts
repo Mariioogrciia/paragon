@@ -61,6 +61,12 @@ const FIJOS: Record<string, Trad> = {
   "Es tu propia sesión.": { en: "It's your own session.", de: "Das ist deine eigene Session.", fr: "C'est ta propre session." },
   "Ya no quedan plazas.": { en: "There are no spots left.", de: "Es sind keine Plätze mehr frei.", fr: "Il n'y a plus de places." },
   "Solo quien la organiza puede cancelarla.": { en: "Only the host can cancel it.", de: "Nur wer sie organisiert, kann sie absagen.", fr: "Seul l'organisateur peut l'annuler." },
+  // Amigos (lib/profiles.ts → sendFriendRequest).
+  "Escribe el usuario de tu amigo.": { en: "Type your friend's username.", de: "Gib den Benutzernamen deines Freundes ein.", fr: "Écris le nom d'utilisateur de ton ami." },
+  "No existe nadie con ese usuario.": { en: "Nobody has that username.", de: "Niemand hat diesen Benutzernamen.", fr: "Personne n'a ce nom d'utilisateur." },
+  "Ese eres tú.": { en: "That's you.", de: "Das bist du.", fr: "C'est toi." },
+  "Ya sois amigos.": { en: "You're already friends.", de: "Ihr seid schon befreundet.", fr: "Vous êtes déjà amis." },
+  "Ya le enviaste una solicitud.": { en: "You already sent them a request.", de: "Du hast schon eine Anfrage geschickt.", fr: "Tu lui as déjà envoyé une demande." },
   "Liga no encontrada": { en: "League not found", de: "Liga nicht gefunden", fr: "Ligue introuvable" },
   "La etiqueta debe tener 5 caracteres máximo": { en: "The tag can be 5 characters at most", de: "Der Tag darf höchstens 5 Zeichen haben", fr: "Le tag fait 5 caractères maximum" },
   "Juego no encontrado": { en: "Game not found", de: "Spiel nicht gefunden", fr: "Jeu introuvable" },

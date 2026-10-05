@@ -49,6 +49,11 @@
     <string name="alta_ultimo_paso">Letzter Schritt: Konto verknüpfen</string>
     <string name="alta_ultimo_paso_sub">Deine Trophäen kommen aus deinem PlayStation-, Steam- oder Xbox-Profil. Verknüpfe mindestens eins und in wenigen Minuten ist deine Bibliothek da.</string>
     <string name="alta_ya_vinculado">Ich habe es verknüpft</string>
+    <string name="amigos_anadir">Hinzufügen</string>
+    <string name="amigos_enviada">Anfrage an @%1$s gesendet.</string>
+    <string name="amigos_placeholder">\@Benutzername deines Freundes</string>
+    <string name="amigos_solicitudes">Freundschaftsanfragen</string>
+    <string name="amigos_ya_sois">Ihr seid jetzt befreundet: @%1$s hatte dir eine Anfrage geschickt.</string>
     <string name="apariencia_acento">Akzent und Palette</string>
     <string name="apariencia_estilo">Stil</string>
     <string name="apariencia_estilo_nivel">Wird ab Stufe %1$s freigeschaltet (du bist Stufe %2$s)</string>
@@ -97,7 +102,9 @@
     <string name="carpeta_borrar_texto">„%1$s“ verschwindet mit den %2$s Spielen darin (die Spiele selbst bleiben, nur der Ordner wird gelöscht).</string>
     <string name="carpeta_borrar_titulo">Diesen Ordner löschen?</string>
     <string name="carpeta_err_borrar">Ordner konnte nicht gelöscht werden.</string>
+    <string name="carpeta_err_cambiar">Der Ordner konnte nicht geändert werden. Prüf die Verbindung und versuch es erneut.</string>
     <string name="carpeta_err_crear">Ordner konnte nicht erstellt werden.</string>
+    <string name="carpeta_err_quitar">Das Spiel konnte nicht aus dem Ordner entfernt werden. Versuch es erneut.</string>
     <string name="carpeta_err_renombrar">Ordner konnte nicht umbenannt werden.</string>
     <string name="carpeta_nueva">Neuer Ordner</string>
     <string name="carpeta_quitar">Aus dem Ordner entfernen</string>
@@ -106,6 +113,7 @@
     <string name="carpeta_sin_juegos_sub">Füge sie auf ihrer Spielseite hinzu oder in der Bibliothek über das Menü jeder Karte.</string>
     <string name="carpeta_vacio">Du hast noch keine Ordner</string>
     <string name="carpeta_vacio_crear">Du hast noch keine Ordner. Erstelle einen in der Bibliothek.</string>
+    <string name="carpeta_vacio_sheet">Du hast noch keine Ordner. Erstell unten einen.</string>
     <string name="carpeta_vacio_sub">Gruppiere deine Spiele, wie du willst — nach Reihe, Plattform, egal — und erstelle Ordner mit dem + oben.</string>
     <string name="carpetas_titulo">ORDNER</string>
     <string name="clan_abandonar">Clan verlassen</string>

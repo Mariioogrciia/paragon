@@ -51,6 +51,11 @@
     <string name="alta_ultimo_paso">Último paso: vincula tu cuenta</string>
     <string name="alta_ultimo_paso_sub">Tus trofeos salen de tu perfil de PlayStation, Steam o Xbox. Vincula al menos uno y en unos minutos tendrás tu biblioteca aquí.</string>
     <string name="alta_ya_vinculado">Ya lo he vinculado</string>
+    <string name="amigos_anadir">Añadir</string>
+    <string name="amigos_enviada">Solicitud enviada a @%1$s.</string>
+    <string name="amigos_placeholder">\@usuario de tu amigo</string>
+    <string name="amigos_solicitudes">Solicitudes de amistad</string>
+    <string name="amigos_ya_sois">Ya sois amigos: @%1$s te había enviado una solicitud.</string>
     <string name="apariencia_acento">Acento y paleta</string>
     <string name="apariencia_estilo">Estilo</string>
     <string name="apariencia_estilo_nivel">Se desbloquea en el nivel %1$s (vas por el %2$s)</string>
@@ -99,7 +104,9 @@
     <string name="carpeta_borrar_texto">\"%1$s\" desaparece con los %2$s juegos que agrupa (los juegos en sí no se borran, solo la carpeta).</string>
     <string name="carpeta_borrar_titulo">¿Borrar esta carpeta?</string>
     <string name="carpeta_err_borrar">No se pudo borrar la carpeta.</string>
+    <string name="carpeta_err_cambiar">No se pudo cambiar la carpeta. Revisa la conexión e inténtalo de nuevo.</string>
     <string name="carpeta_err_crear">No se pudo crear la carpeta.</string>
+    <string name="carpeta_err_quitar">No se pudo sacar el juego de la carpeta. Inténtalo de nuevo.</string>
     <string name="carpeta_err_renombrar">No se pudo renombrar la carpeta.</string>
     <string name="carpeta_nueva">Nueva carpeta</string>
     <string name="carpeta_quitar">Quitar de la carpeta</string>
@@ -108,6 +115,7 @@
     <string name="carpeta_sin_juegos_sub">Añádelos desde su ficha, o desde la Biblioteca con el menú de cada tarjeta.</string>
     <string name="carpeta_vacio">Todavía no tienes ninguna carpeta</string>
     <string name="carpeta_vacio_crear">Todavía no tienes ninguna carpeta. Crea una desde Biblioteca.</string>
+    <string name="carpeta_vacio_sheet">Aún no tienes carpetas. Crea una aquí abajo.</string>
     <string name="carpeta_vacio_sub">Agrupa tus juegos como quieras — por saga, por plataforma, por lo que sea — y créalas con el + de arriba.</string>
     <string name="carpetas_titulo">CARPETAS</string>
     <string name="clan_abandonar">Abandonar clan</string>

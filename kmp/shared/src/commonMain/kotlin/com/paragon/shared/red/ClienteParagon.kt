@@ -100,6 +100,7 @@ class ClienteParagon(
     }
 
     val achievements by lazy { AchievementsApi(this) }
+    val amigos by lazy { AmigosApi(this) }
     val apariencia by lazy { AparienciaApi(this) }
     val clans by lazy { ClansApi(this) }
     val collections by lazy { CollectionsApi(this) }
