@@ -1,6 +1,11 @@
 package com.paragon.app.ui.main
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.savedstate.read
 
 import androidx.compose.foundation.background
@@ -208,88 +213,10 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
         topBar = {
-            // Inicio, Biblioteca y Perfil llevan su propia cabecera grande (rediseño del 5 oct
-            // 2026); ahí la barra de arriba solo ocuparía sitio.
-            if (currentRoute == Screen.Dashboard.route || currentRoute == Screen.Perfil.route || currentRoute == Screen.Library.route || currentRoute == Screen.Feed.route ||
-                currentRoute == Screen.GameDetail.route || currentRoute == Screen.Sessions.route ||
-                currentRoute == Screen.SessionDetail.route || currentRoute == Screen.Ritmo.route) {
-                Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
-            } else
-            androidx.compose.foundation.layout.Box(modifier = Modifier.background(Background)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (isSearchActive && isOnLibrary) {
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text(Textos.t(T.main_buscar_ph), color = Muted) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Background,
-                            unfocusedContainerColor = Background,
-                            focusedTextColor = Foreground,
-                            unfocusedTextColor = Foreground,
-                            cursorColor = Accent,
-                            focusedIndicatorColor = Accent,
-                            unfocusedIndicatorColor = Border
-                        ),
-                        singleLine = true
-                    )
-                    IconButton(onClick = { 
-                        isSearchActive = false
-                        searchQuery = "" 
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = Textos.t(T.main_cerrar_busqueda), tint = Foreground)
-                    }
-                } else {
-                    ParagonWordmark()
-                    Spacer(Modifier.weight(1f))
-                    StreakChip(racha = racha, onClick = { showRachaSheet = true })
-                    if (isOnLibrary) {
-                        IconButton(onClick = { isSearchActive = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = Textos.t(T.comun_buscar_accion),
-                                tint = Foreground
-                            )
-                        }
-                    }
-                    Box {
-                        // El avatar lleva a tu Perfil (la misma pestaña de abajo). Antes abría un
-                        // menú con Enfoque/Comparar/Carpetas/Atascados que repetía "Más".
-                        IconButton(onClick = { irA(BottomNavItem.Perfil) }) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .background(com.paragon.app.ui.theme.AccentSoft, RoundedCornerShape(radio(16))),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                // Misma foto que la web (`resolveAvatarUrl`, ver
-                                // API-CONTRACT.md) si el perfil ya tiene una —
-                                // solo cae a la inicial cuando no hay ninguna.
-                                // La inicial siempre debajo: si la foto no carga, se ve ella.
-                                Text(profile.name.take(1).uppercase(), color = Accent, fontWeight = FontWeight.Bold)
-                                com.paragon.app.ui.common.urlImagenSegura(profile.image)?.let { foto ->
-                                    coil3.compose.AsyncImage(
-                                        model = foto,
-                                        contentDescription = null,
-                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(32.dp)
-                                            .clip(RoundedCornerShape(radio(16))),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            }
+            // Sin barra "PARAGON" encima (diseño v2, 5 oct 2026): cada pantalla
+            // lleva su propia cabecera nativa (CabeceraNativa), como una app de
+            // verdad. Aquí solo se reserva la barra de estado.
+            Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
         },
         bottomBar = {
             if (!anchoAmplio) AnimatedVisibility(
@@ -354,10 +281,25 @@ fun MainScreen(
             // Una columna de lectura cómoda en tablet: el diseño es de móvil y
             // estirado a 1200 dp las tarjetas y listas se vuelven ilegibles.
             modifier = Modifier.widthIn(max = 840.dp).fillMaxSize(),
-            enterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
-            exitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) },
-            popEnterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
-            popExitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
+            // Transiciones nativas (diseño v2): entre pestañas, fundido corto; al
+            // abrir una pantalla, entra desde la derecha y la de debajo se
+            // desplaza un poco a la izquierda, como en iPhone; al volver, al revés.
+            enterTransition = {
+                if (esPestana(targetState.destination.route)) fadeIn(tween(180))
+                else slideInHorizontally(tween(320)) { it } + fadeIn(tween(200))
+            },
+            exitTransition = {
+                if (esPestana(targetState.destination.route)) fadeOut(tween(140))
+                else slideOutHorizontally(tween(320)) { -it / 4 } + fadeOut(tween(320), targetAlpha = 0.6f)
+            },
+            popEnterTransition = {
+                if (esPestana(initialState.destination.route) && esPestana(targetState.destination.route)) fadeIn(tween(180))
+                else slideInHorizontally(tween(320)) { -it / 4 } + fadeIn(tween(320), initialAlpha = 0.6f)
+            },
+            popExitTransition = {
+                if (esPestana(initialState.destination.route) && esPestana(targetState.destination.route)) fadeOut(tween(140))
+                else slideOutHorizontally(tween(320)) { it }
+            }
         ) {
             composable(Screen.Dashboard.route) { 
                 PanelScreen(
@@ -393,7 +335,7 @@ fun MainScreen(
                     onNavigate = { ruta -> navController.navigate(ruta) },
                 )
             }
-            composable(Screen.Stats.route) { StatsScreen(tokenStore, handle = profile.handle, database = database) }
+            composable(Screen.Stats.route) { StatsScreen(tokenStore, handle = profile.handle, database = database, onBack = { navController.popBackStack() }) }
             composable(Screen.Feed.route) {
                 com.paragon.app.ui.feed.ComunidadScreen(
                     tokenStore = tokenStore,
@@ -633,3 +575,8 @@ private fun BarraFlotante(items: List<BottomNavItem>, estaEn: (BottomNavItem) ->
         }
     }
 }
+
+/** Las raíces de la barra de abajo: entre ellas se cambia con fundido, no empujando. */
+private fun esPestana(ruta: String?): Boolean = ruta in setOf(
+    Screen.Dashboard.route, Screen.Library.route, Screen.Feed.route, Screen.Social.route, Screen.Perfil.route,
+)

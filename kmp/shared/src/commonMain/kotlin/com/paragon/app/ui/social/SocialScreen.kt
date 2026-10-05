@@ -101,23 +101,14 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             .fillMaxSize()
             .background(Background)
     ) {
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = Background,
-            contentColor = Accent,
-            divider = { HorizontalDivider(color = Border) },
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-        ) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTab == index,
-                    onClick = { selectedTab = index },
-                    text = { Text(text = title, fontWeight = FontWeight.Bold) },
-                    selectedContentColor = Accent,
-                    unselectedContentColor = Muted
-                )
-            }
-        }
+        // Diseño v2: título grande y selector segmentado, como el resto de pestañas.
+        com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_ligas))
+        com.paragon.app.ui.common.ControlSegmentado(
+            opciones = tabs,
+            seleccion = selectedTab,
+            onCambio = { selectedTab = it },
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+        )
 
         // Amigos: añadir por @usuario y responder solicitudes (antes, solo la lista).
         if (selectedTab == 2) AmigosCabecera(tokenStore, onCambio = { retryCounter.value += 1 })

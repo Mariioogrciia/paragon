@@ -53,31 +53,13 @@ fun ComunidadScreen(
 ) {
     var seccion by rememberSaveable { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize().background(Background)) {
-        Text(
-            Textos.t(T.feed_titulo),
-            color = Foreground,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp),
+        com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.feed_titulo))
+        com.paragon.app.ui.common.ControlSegmentado(
+            opciones = listOf(Textos.t(T.comunidad_muro), Textos.t(T.nav_sesiones)),
+            seleccion = seccion,
+            onCambio = { seccion = it },
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
         )
-        val forma = RoundedCornerShape(radio(14))
-        Row(
-            Modifier.padding(horizontal = 24.dp, vertical = 16.dp).fillMaxWidth()
-                .clip(forma).background(Surface).border(1.dp, Border, forma).padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            listOf(Textos.t(T.comunidad_muro), Textos.t(T.nav_sesiones)).forEachIndexed { i, texto ->
-                val activa = seccion == i
-                Box(
-                    Modifier.weight(1f).height(36.dp).clip(RoundedCornerShape(radio(10)))
-                        .background(if (activa) AccentSoft else Surface)
-                        .premiumClickable { seccion = i },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(texto, color = if (activa) Accent else Muted, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-        }
         Box(Modifier.weight(1f)) {
             if (seccion == 0) {
                 FeedScreen(tokenStore, themeStore, onCompareClick = onCompareClick, conTitulo = false)

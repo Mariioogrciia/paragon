@@ -50,15 +50,7 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(Textos.t(T.nav_atascados_menu), fontWeight = FontWeight.Bold, color = Foreground) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
-            )
+            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_atascados_menu), atras = null, onBack = onBack, modifier = Modifier.padding(bottom = 8.dp))
         },
         containerColor = Background
     ) { innerPadding ->

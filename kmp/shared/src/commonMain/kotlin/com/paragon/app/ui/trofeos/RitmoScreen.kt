@@ -120,10 +120,7 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit) {
     }
 
     Column(Modifier.fillMaxSize().background(Background)) {
-        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_atras), tint = Foreground) }
-            Text(Textos.t(T.ritmo_titulo), color = Foreground, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-        }
+        com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.ritmo_titulo), atras = Textos.t(T.nav_perfil), onBack = onBack)
         val actual = mes
         if (actual != null) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {

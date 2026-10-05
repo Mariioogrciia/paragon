@@ -2,6 +2,7 @@
 
 package com.paragon.app.ui.sesiones
 
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -138,19 +139,11 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
     Column(Modifier.fillMaxSize().background(Background)) {
         // Incrustada en Comunidad (pestaña Sesiones) no lleva cabecera propia:
         // "Organizar" pasa a ser un botón flotante en la zona del pulgar.
-        if (!embebida) Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_atras), tint = Foreground) }
-            Text(Textos.t(T.nav_sesiones), color = Foreground, fontSize = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+        if (!embebida) com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_sesiones), onBack = onBack) {
             val juegos = (estado as? SesionResultado.Ok<com.paragon.shared.red.SesionesResponse>)?.valor?.juegos
             if (juegos != null) {
-                Button(
-                    onClick = { organizando = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = Background),
-                    shape = RoundedCornerShape(radio(10)),
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(Textos.t(T.sesiones_organizar), fontWeight = FontWeight.Bold)
+                IconButton(onClick = { organizando = true }) {
+                    Icon(Icons.Default.Add, contentDescription = Textos.t(T.sesiones_organizar), tint = Accent)
                 }
             }
         }
@@ -319,8 +312,10 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
     }
 
     Column(Modifier.fillMaxSize().background(Background)) {
-        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_atras), tint = Foreground) }
+        // Solo la fila de volver: el título grande es el trofeo, más abajo.
+        Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 6.dp).premiumClickable(onClick = onBack), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_atras), tint = Accent, modifier = Modifier.size(32.dp))
+            Text(Textos.t(T.nav_sesiones), color = Accent, fontSize = 17.sp)
         }
         when (val e = estado) {
             null -> EsqueletoLista()

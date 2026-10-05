@@ -74,22 +74,11 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
     LaunchedEffect(retryCounter.value) { reload() }
 
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        com.paragon.app.ui.common.CabeceraNativa(
+            titulo = selected?.name ?: Textos.t(T.carpetas_titulo),
+            atras = if (selected != null) Textos.t(T.carpetas_titulo) else Textos.t(T.nav_perfil),
+            onBack = { if (selected != null) selected = null else onBack() },
         ) {
-            IconButton(onClick = { if (selected != null) selected = null else onBack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
-            }
-            Text(
-                text = (selected?.name ?: Textos.t(T.carpetas_titulo)).uppercase(),
-                color = Foreground,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
             if (selected == null) {
                 IconButton(onClick = { showCreateDialog = true }) {
                     Icon(Icons.Default.Add, contentDescription = Textos.t(T.carpeta_nueva), tint = Accent)

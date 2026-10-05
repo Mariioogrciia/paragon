@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -68,26 +69,13 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", database: com.parag
 
     Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        com.paragon.app.ui.common.CabeceraNativa(
+            titulo = Textos.t(T.stats_titulo),
+            atras = Textos.t(T.nav_perfil),
+            onBack = onBack,
         ) {
-            if (onBack != null) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
-                }
-            } else {
-                Spacer(Modifier.width(16.dp))
-            }
-            Text(
-                text = Textos.t(T.stats_titulo),
-                color = Foreground,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = if (onBack != null) 0.dp else 16.dp).weight(1f),
-            )
             IconButton(onClick = { showWrap = true }) {
-                Text("✨", fontSize = 20.sp)
+                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Accent)
             }
         }
 

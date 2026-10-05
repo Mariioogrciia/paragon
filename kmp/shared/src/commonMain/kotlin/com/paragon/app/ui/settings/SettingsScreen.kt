@@ -93,28 +93,7 @@ fun SettingsScreen(
     Scaffold(
         containerColor = Background,
         topBar = {
-            // Sin `windowInsetsPadding(WindowInsets.statusBars)` a propósito:
-            // esta pantalla siempre vive DENTRO del NavHost de MainScreen,
-            // debajo de su barra "PARAGON" (que ya consume ese inset) —
-            // repetirlo aquí sumaba el alto de la barra de estado dos veces,
-            // dejando una cabecera enorme con un hueco en blanco arriba.
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_atras), tint = Foreground)
-                }
-                Text(
-                    text = Textos.t(T.nav_ajustes),
-                    color = Foreground,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
+            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_ajustes), atras = Textos.t(T.nav_perfil), onBack = onBack, modifier = Modifier.padding(bottom = 8.dp))
         }
     ) { paddingValues ->
         Column(

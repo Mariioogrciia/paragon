@@ -78,15 +78,7 @@ fun CompareScreen(tokenStore: TokenStore, initialHandle: String? = null, onBack:
     }
 
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = Textos.t(T.comun_volver), tint = Foreground)
-            }
-            Text(text = Textos.t(T.comparar_titulo), color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        }
+        com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.comparar_titulo), onBack = onBack)
 
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
