@@ -1,5 +1,16 @@
 package com.paragon.app.ui.perfil
 
+import androidx.compose.foundation.Image
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import com.paragon.app.util.enlacePerfil
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -78,11 +89,18 @@ fun PerfilScreen(
     conLigas: Boolean,
     onNavigate: (String) -> Unit,
 ) {
+    var verQr by remember { mutableStateOf(false) }
+    if (verQr) HojaMiQr(handle = profile.handle, onDismiss = { verQr = false })
     Column(
         Modifier.fillMaxSize().background(Background).verticalScroll(rememberScrollState()).padding(bottom = 32.dp),
     ) {
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(Textos.t(T.nav_perfil), color = Foreground, fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            // Tu código QR (diseño v2): quien lo escanee te envía la solicitud de amistad.
+            IconButton(
+                onClick = { verQr = true },
+                modifier = Modifier.padding(end = 8.dp).size(44.dp).clip(RoundedCornerShape(50)).background(Surface).border(1.dp, Border, RoundedCornerShape(50)),
+            ) { Icon(Icons.Default.QrCode2, contentDescription = Textos.t(T.qr_tu_codigo), tint = Foreground) }
             IconButton(
                 onClick = { onNavigate(Screen.Settings.route) },
                 modifier = Modifier.size(44.dp).clip(RoundedCornerShape(50)).background(Surface).border(1.dp, Border, RoundedCornerShape(50)),
@@ -169,4 +187,27 @@ private fun Fila(icono: ImageVector, texto: String, ultima: Boolean = false, onC
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Muted, modifier = Modifier.size(20.dp))
     }
     if (!ultima) HorizontalDivider(color = Surface2, modifier = Modifier.padding(start = 60.dp))
+}
+
+/** Hoja con tu código QR en grande (el mismo que en Amigos). */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HojaMiQr(handle: String, onDismiss: () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+        Column(
+            Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(Textos.t(T.qr_tu_codigo), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(Textos.t(T.qr_tu_codigo_sub), color = Muted, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 20.dp))
+            Box(Modifier.size(240.dp).clip(RoundedCornerShape(radio(24))).background(Color.White).padding(18.dp)) {
+                Image(
+                    painter = rememberQrCodePainter(enlacePerfil(handle)),
+                    contentDescription = Textos.t(T.qr_tu_codigo),
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            Text("@$handle", color = Accent, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
+        }
+    }
 }

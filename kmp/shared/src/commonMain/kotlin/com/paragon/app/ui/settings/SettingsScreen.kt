@@ -1,5 +1,9 @@
 package com.paragon.app.ui.settings
 
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -198,28 +202,15 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(Textos.t(T.ajustes_seccion_apariencia), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            // Todo lo de apariencia vive en su propia pantalla (como
-            // /ajustes/apariencia en la web), con muestra en vivo.
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(radio(14)))
-                    .background(Surface)
-                    .border(1.dp, Border, RoundedCornerShape(radio(14)))
-                    .clickable(onClick = onNavigateToApariencia)
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(Modifier.size(28.dp).background(Brush.linearGradient(listOf(Accent2, Accent)), CircleShape))
-                Column(modifier = Modifier.weight(1f).padding(horizontal = 14.dp)) {
-                    Text(Textos.t(T.apariencia_titulo), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                    Text(Textos.t(T.ajustes_apariencia_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                }
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Muted)
+            // Diseño v2: listas agrupadas como Ajustes del iPhone.
+            com.paragon.app.ui.common.GrupoNativo(titulo = Textos.t(T.ajustes_seccion_apariencia)) {
+                com.paragon.app.ui.common.FilaNativa(
+                    icono = Icons.Default.Palette,
+                    titulo = Textos.t(T.apariencia_titulo),
+                    subtitulo = Textos.t(T.ajustes_apariencia_sub),
+                    onClick = onNavigateToApariencia,
+                )
             }
-
             Spacer(modifier = Modifier.height(12.dp))
             IdiomaSelector()
 
@@ -253,66 +244,46 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(Textos.t(T.ajustes_seccion_conexiones), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = onNavigateToLinkedAccounts,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Surface),
-                shape = RoundedCornerShape(radio(12))
-            ) {
-                Text(Textos.t(T.cuentas_titulo), color = Foreground)
+            com.paragon.app.ui.common.GrupoNativo(titulo = Textos.t(T.ajustes_seccion_conexiones)) {
+                com.paragon.app.ui.common.FilaNativa(
+                    icono = Icons.Default.Link,
+                    titulo = Textos.t(T.cuentas_titulo),
+                    onClick = onNavigateToLinkedAccounts,
+                )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            Text(Textos.t(T.ajustes_seccion_ayuda), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // La guía completa (todo lo que hace Paragon + los comandos del
-            // bot de Discord uno a uno) ya existe entera en la web — se abre
-            // ahí en vez de duplicarla en Kotlin, mismo criterio que
-            // "Vincular" para Google/Discord (CustomTab, no una copia nativa).
-            Button(
-                onClick = {
-                    uriHandler.openUri("https://paragon.app/como-funciona")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Surface),
-                shape = RoundedCornerShape(radio(12))
-            ) {
-                Text(Textos.t(T.ajustes_como_funciona), color = Foreground)
+            // La guía completa y la del bot de Discord ya existen enteras en la
+            // web: se abren ahí en vez de duplicarlas en Kotlin.
+            com.paragon.app.ui.common.GrupoNativo(titulo = Textos.t(T.ajustes_seccion_ayuda)) {
+                com.paragon.app.ui.common.FilaNativa(
+                    icono = Icons.AutoMirrored.Filled.HelpOutline,
+                    titulo = Textos.t(T.ajustes_como_funciona),
+                    onClick = { uriHandler.openUri("https://paragon.app/como-funciona") },
+                )
+                com.paragon.app.ui.common.SeparadorFila()
+                com.paragon.app.ui.common.FilaNativa(
+                    icono = Icons.Default.SmartToy,
+                    titulo = Textos.t(T.ajustes_bot_discord),
+                    onClick = { uriHandler.openUri("https://paragon.app/bot-discord") },
+                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Guía paso a paso del bot de Discord: la misma de la web, en una
-            // ruta pública (/bot-discord) para que se abra aunque el navegador
-            // del teléfono no tenga sesión de Paragon.
-            Button(
-                onClick = {
-                    uriHandler.openUri("https://paragon.app/bot-discord")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Surface),
-                shape = RoundedCornerShape(radio(12))
-            ) {
-                Text(Textos.t(T.ajustes_bot_discord), color = Foreground)
-            }
-
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             Button(
                 onClick = { showLogoutConfirm = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Danger)
+                    .height(50.dp)
+                    .padding(bottom = 0.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Surface),
+                shape = RoundedCornerShape(radio(14)),
             ) {
                 Text(Textos.t(T.ajustes_cerrar_sesion_boton), color = Danger, fontWeight = FontWeight.Bold)
             }
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 
