@@ -29,9 +29,9 @@ import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.SettingsResult
 import com.paragon.app.data.auth.EnlaceSeguro
 import com.paragon.app.data.auth.TokenStore
-import com.paragon.app.data.network.LinkedAccountsResponse
-import com.paragon.app.data.network.OauthAccountDto
-import com.paragon.app.data.network.PlatformAccountDto
+import com.paragon.shared.red.LinkedAccountsResponse
+import com.paragon.shared.red.OauthAccountDto
+import com.paragon.shared.red.PlatformAccountDto
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource

@@ -1,7 +1,11 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
+@Serializable
 data class GameCardDto(
     val id: String,
     val title: String,
@@ -17,6 +21,7 @@ data class GameCardDto(
  * mayor probabilidad real de conseguirlo. `rarityPercent`/`grade`/`iconUrl`
  * pueden venir `null` (ver CONTRACT.md).
  */
+@Serializable
 data class NextTrophyDto(
     val gameId: String,
     val gameTitle: String,
@@ -29,6 +34,7 @@ data class NextTrophyDto(
     val grade: String?,
 )
 
+@Serializable
 data class HighlightsResponse(
     val nearPlatinum: List<GameCardDto>,
     val recent: List<GameCardDto>,
@@ -38,8 +44,8 @@ data class HighlightsResponse(
     val nextTrophies: List<NextTrophyDto> = emptyList(),
 )
 
-interface HighlightsApi {
+class HighlightsApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/panel/highlights/route.ts en el proyecto Next.js. */
-    @GET("api/mobile/panel/highlights")
-    suspend fun getHighlights(): HighlightsResponse
+    suspend fun getHighlights(): HighlightsResponse =
+        c.http.get("api/mobile/panel/highlights").body()
 }

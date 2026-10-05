@@ -2,7 +2,7 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
-import retrofit2.HttpException
+import com.paragon.shared.red.HttpException
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 

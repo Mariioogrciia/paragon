@@ -36,6 +36,8 @@ object ModoDemo {
                 .protocol(Protocol.HTTP_1_1)
                 .code(if (cuerpo == null) 404 else 200)
                 .message(if (cuerpo == null) "Not Found" else "OK")
+                // Ktor (a diferencia de Retrofit) decide cómo leer el cuerpo por esta cabecera.
+                .header("Content-Type", "application/json")
                 .body((cuerpo ?: """{"error":"Sin datos de demo para $ruta"}""").toResponseBody("application/json".toMediaType()))
                 .build()
         }

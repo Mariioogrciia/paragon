@@ -1,25 +1,37 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
+@Serializable
 data class ParagonScorePlataformaDto(val platform: String, val puntos: Int, val trofeos: Int)
+@Serializable
 data class ParagonScoreDto(val total: Int, val porPlataforma: List<ParagonScorePlataformaDto>)
 
+@Serializable
 data class TrophyDnaEjeDto(val key: String, val label: String, val valor: Int, val trofeos: Int)
 // `arquetipo` es null si todavía no hay ningún trofeo con género conocido — ver calcularTrophyDna en trophyDna.ts.
+@Serializable
 data class TrophyDnaDto(val ejes: List<TrophyDnaEjeDto>, val arquetipo: String?)
 
 // Distinto de `arquetipo` (ese es de GÉNERO) — mide CÓMO se cazan trofeos,
 // no a qué se juega. `null` con menos de 3 juegos con progreso real o si
 // no encaja claramente en ninguna categoría — ver calcularEstiloDeCaza en
 // trophyDna.ts.
+@Serializable
 data class EstiloDeCazaDto(val nombre: String, val descripcion: String)
 
+@Serializable
 data class RachasDto(val actual: Int, val mejor: Int, val diasActivos: Int)
 
+@Serializable
 data class MejorMesDto(val mes: String, val total: Int)
+@Serializable
 data class HistoricoDto(val conFecha: Int, val esteAnio: Int, val mejorMes: MejorMesDto?)
 
+@Serializable
 data class FinancieroDto(
     val totalGastado: Double,
     val totalHoras: Double,
@@ -28,14 +40,17 @@ data class FinancieroDto(
 )
 
 // Negativo = más lento que la estimación de HowLongToBeat, positivo = más rápido.
+@Serializable
 data class EficienciaDto(val ritmoMedioPct: Int?, val juegosConDatos: Int)
 
+@Serializable
 data class BacklogDto(
     val juegosContados: Int,
     val horasHistoriaRestantes: Double,
     val horasPlatinoRestantes: Double,
 )
 
+@Serializable
 data class PrimerTrofeoDto(
     val gameId: String,
     val tituloJuego: String,
@@ -44,12 +59,18 @@ data class PrimerTrofeoDto(
     val grade: String?,
     val fecha: String,
 )
+@Serializable
 data class PrimerPlatinoDto(val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
+@Serializable
 data class TrofeoMasRaroDto(val gameId: String, val tituloJuego: String, val nombre: String, val iconUrl: String?, val rarityPercent: Double, val fecha: String?)
+@Serializable
 data class PlatinoAnejoDto(val gameId: String, val titulo: String, val iconUrl: String?, val dias: Int, val desde: String, val hasta: String)
+@Serializable
 data class RachaMasLargaDto(val dias: Int, val desde: String, val hasta: String)
+@Serializable
 data class PlatinoNumeradoDto(val numero: Int, val gameId: String, val titulo: String, val iconUrl: String?, val fecha: String)
 
+@Serializable
 data class HitosDto(
     val primerTrofeo: PrimerTrofeoDto?,
     val primerPlatino: PrimerPlatinoDto?,
@@ -59,6 +80,7 @@ data class HitosDto(
     val platinosHitos: List<PlatinoNumeradoDto>,
 )
 
+@Serializable
 data class StatsResponse(
     val paragonScore: ParagonScoreDto,
     val trophyDna: TrophyDnaDto,
@@ -73,8 +95,8 @@ data class StatsResponse(
     val hitos: HitosDto,
 )
 
-interface StatsApi {
+class StatsApi internal constructor(private val c: ClienteParagon) {
     /** Versión curada para el móvil de /api/mobile/stats — ver route.ts y API-CONTRACT.md. */
-    @GET("api/mobile/stats")
-    suspend fun getStats(): StatsResponse
+    suspend fun getStats(): StatsResponse =
+        c.http.get("api/mobile/stats").body()
 }

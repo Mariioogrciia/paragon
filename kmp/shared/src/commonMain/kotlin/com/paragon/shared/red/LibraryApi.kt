@@ -1,13 +1,18 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
 // Sin @JsonClass(generateAdapter = true) — mismo motivo que PanelApi.kt/
 // GamesApi.kt: KotlinJsonAdapterFactory (reflexión) lee estas data class
 // directamente, sin kapt.
 /** `null` en Steam/Xbox — no tienen desglose por metal (ver API-CONTRACT.md). */
+@Serializable
 data class TrophyBreakdownDto(val bronze: Int, val silver: Int, val gold: Int, val platinum: Int)
 
+@Serializable
 data class LibraryGameDto(
     val id: String,
     val platform: String,
@@ -23,10 +28,11 @@ data class LibraryGameDto(
     val playtimeMinutes: Int?,
 )
 
+@Serializable
 data class LibraryResponse(val games: List<LibraryGameDto>)
 
-interface LibraryApi {
+class LibraryApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/library/route.ts en el proyecto Next.js. */
-    @GET("api/mobile/library")
-    suspend fun getLibrary(): LibraryResponse
+    suspend fun getLibrary(): LibraryResponse =
+        c.http.get("api/mobile/library").body()
 }

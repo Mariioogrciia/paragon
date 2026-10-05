@@ -1,11 +1,11 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
-// Sin @JsonClass(generateAdapter = true) a propósito: eso pide el
-// annotation processor de Moshi (kapt), que este módulo no tiene montado.
-// ApiClient.kt registra KotlinJsonAdapterFactory (reflexión), que lee estas
-// mismas data class sin generar nada en tiempo de compilación.
+@Serializable
 data class PanelProfileDto(
     val handle: String,
     val name: String,
@@ -14,6 +14,7 @@ data class PanelProfileDto(
     val image: String?,
 )
 
+@Serializable
 data class PanelStatsDto(
     val platinums: Int,
     val trophies: Int,
@@ -24,19 +25,21 @@ data class PanelStatsDto(
     val bronze: Int,
 )
 
+@Serializable
 data class PanelRachaDto(
     val actual: Int,
     val mejor: Int,
 )
 
+@Serializable
 data class PanelResponse(
     val profile: PanelProfileDto,
     val stats: PanelStatsDto,
     val racha: PanelRachaDto,
 )
 
-interface PanelApi {
+class PanelApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/panel/route.ts en el proyecto Next.js. */
-    @GET("api/mobile/panel")
-    suspend fun getPanel(): PanelResponse
+    suspend fun getPanel(): PanelResponse =
+        c.http.get("api/mobile/panel").body()
 }

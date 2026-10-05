@@ -5,13 +5,13 @@ import com.paragon.app.data.local.CachedGameDetailEntity
 import com.paragon.app.data.local.GameDetailDao
 import com.paragon.app.data.local.PendingNoteEntity
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.GameDetailDto
-import com.paragon.app.data.network.NotesRequest
-import com.paragon.app.data.network.paragonErrorMessage
+import com.paragon.shared.red.GameDetailDto
+import com.paragon.shared.red.NotesRequest
+import com.paragon.shared.red.paragonErrorMessage
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import retrofit2.HttpException
+import com.paragon.shared.red.HttpException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

@@ -1,10 +1,15 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
 /** Online ID de PSN / gamertag de Xbox / SteamID — para añadirlos directamente en esa plataforma. */
+@Serializable
 data class AmigoCuentaDto(val platform: String, val username: String)
 
+@Serializable
 data class AmigoDto(
     val userId: String,
     val name: String?,
@@ -18,6 +23,7 @@ data class AmigoDto(
     val accounts: List<AmigoCuentaDto> = emptyList(),
 )
 
+@Serializable
 data class LigaDto(
     val userId: String,
     val handle: String?,
@@ -26,10 +32,11 @@ data class LigaDto(
     val points: Int,
 )
 
+@Serializable
 data class SocialResponse(val amigos: List<AmigoDto>, val liga: List<LigaDto>)
 
-interface SocialApi {
+class SocialApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/social/route.ts en el proyecto Next.js. */
-    @GET("api/mobile/social")
-    suspend fun getSocial(): SocialResponse
+    suspend fun getSocial(): SocialResponse =
+        c.http.get("api/mobile/social").body()
 }

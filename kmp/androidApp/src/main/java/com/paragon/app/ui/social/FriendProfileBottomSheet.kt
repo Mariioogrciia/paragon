@@ -39,7 +39,7 @@ import com.paragon.app.data.PanelResult
 import com.paragon.app.data.UserProfileRepository
 import com.paragon.app.data.UserProfileResult
 import com.paragon.app.data.auth.TokenStore
-import com.paragon.app.data.network.UserProfileDto
+import com.paragon.shared.red.UserProfileDto
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 import com.paragon.app.R
@@ -372,7 +372,7 @@ private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
  * apretado y sin más dato que el %.
  */
 @Composable
-private fun RecentGameCard(game: com.paragon.app.data.network.RecentGameDto) {
+private fun RecentGameCard(game: com.paragon.shared.red.RecentGameDto) {
     Row(
         modifier = Modifier
             .width(220.dp)

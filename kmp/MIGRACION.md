@@ -41,6 +41,14 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
   `node kmp/i18n/generar.mjs` genera los strings.xml de androidApp y
   `shared/.../i18n/TextosGenerados.kt` (`stringResource(T.clave)` común).
 - [ ] Fase 2 — datos
+  - [x] Red: los 63 endpoints en `shared/.../red` (Ktor + kotlinx.serialization,
+    convertidos con un script desde Retrofit). `ClienteParagon` (motor por
+    plataforma), `HttpException` con `code()` y `paragonErrorMessage()` como
+    Retrofit. Android usa el motor OkHttp (caché HTTP + modo demo). Probado en
+    el emulador con el modo demo: panel, biblioteca, ficha, estadísticas,
+    comunidad, ligas, ajustes. Ojo: Ktor necesita `Content-Type: application/json`
+    en la respuesta (el servidor lo manda; el modo demo no lo mandaba).
+  - [ ] Sesión (`TokenStore`), `EnlaceSeguro`, repositorios, Room
 - [ ] Fase 3 — pantallas
 - [ ] Fase 4 — plataforma
 - [ ] Fase 5 — retirar lo viejo

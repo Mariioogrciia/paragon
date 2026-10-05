@@ -4,10 +4,10 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.SimpleCacheDao
 import com.paragon.app.data.local.SimpleCacheEntity
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.StatsResponse
+import com.paragon.shared.red.StatsResponse
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import retrofit2.HttpException
+import com.paragon.shared.red.HttpException
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 

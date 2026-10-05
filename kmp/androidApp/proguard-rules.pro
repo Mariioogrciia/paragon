@@ -21,15 +21,14 @@
 #-renamesourcefileattribute SourceFile
 
 # --- Paragon (4 oct 2026): reglas para minificar la APK de producción ---
-# Moshi lee los DTO por reflexión (KotlinJsonAdapterFactory + kotlin-reflect):
-# nombres de campos y metadatos de Kotlin tienen que sobrevivir a R8.
--keep class com.paragon.app.data.network.** { *; }
+# Moshi (cachés locales) lee por reflexión las clases que guarda: nombres de
+# campos y metadatos de Kotlin tienen que sobrevivir a R8. Los DTO de la API
+# (kotlinx.serialization) no lo necesitan, pero se conservan por si alguna
+# caché guarda uno.
+-keep class com.paragon.app.data.** { *; }
+-keep class com.paragon.shared.red.** { *; }
 -keep class kotlin.Metadata { *; }
 -keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
-# Retrofit con funciones suspend: el tipo de Continuation y las interfaces de la API.
--keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
--keep,allowobfuscation,allowshrinking interface retrofit2.Call
--keep,allowobfuscation,allowshrinking class retrofit2.Response
 # Widget de Glance: el receptor lo instancia el sistema por nombre.
 -keep class com.paragon.app.widget.** { *; }
 -dontwarn org.slf4j.**

@@ -2,7 +2,7 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.PushTokenRequest
+import com.paragon.shared.red.PushTokenRequest
 
 /** Registro del token de Firebase Cloud Messaging de este dispositivo — ver POST /api/mobile/push-token en API-CONTRACT.md. */
 class PushRepository(private val tokenStore: TokenStore? = null) {

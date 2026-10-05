@@ -4,12 +4,12 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.PanelCacheEntity
 import com.paragon.app.data.local.PanelDao
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.ChooseHandleRequest
-import com.paragon.app.data.network.GameCardDto
-import com.paragon.app.data.network.LogoutRequest
-import com.paragon.app.data.network.NextTrophyDto
-import com.paragon.app.data.network.paragonErrorMessage
-import retrofit2.HttpException
+import com.paragon.shared.red.ChooseHandleRequest
+import com.paragon.shared.red.GameCardDto
+import com.paragon.shared.red.LogoutRequest
+import com.paragon.shared.red.NextTrophyDto
+import com.paragon.shared.red.paragonErrorMessage
+import com.paragon.shared.red.HttpException
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 

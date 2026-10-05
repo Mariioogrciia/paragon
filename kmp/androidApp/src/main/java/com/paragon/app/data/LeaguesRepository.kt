@@ -3,14 +3,14 @@ package com.paragon.app.data
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.SimpleCacheDao
 import com.paragon.app.data.local.SimpleCacheEntity
-import com.paragon.app.data.network.AddLeagueMemberRequest
+import com.paragon.shared.red.AddLeagueMemberRequest
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.NewLeagueRequest
-import com.paragon.app.data.network.SetLeagueChallengeRequest
+import com.paragon.shared.red.NewLeagueRequest
+import com.paragon.shared.red.SetLeagueChallengeRequest
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import retrofit2.HttpException
+import com.paragon.shared.red.HttpException
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 

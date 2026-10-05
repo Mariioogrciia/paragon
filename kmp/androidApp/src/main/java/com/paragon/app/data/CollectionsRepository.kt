@@ -2,10 +2,10 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.CollectionDto
-import com.paragon.app.data.network.CollectionNameRequest
-import com.paragon.app.data.network.paragonErrorMessage
-import retrofit2.HttpException
+import com.paragon.shared.red.CollectionDto
+import com.paragon.shared.red.CollectionNameRequest
+import com.paragon.shared.red.paragonErrorMessage
+import com.paragon.shared.red.HttpException
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 

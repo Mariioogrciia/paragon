@@ -2,8 +2,8 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.LibraryGameDto
-import retrofit2.HttpException
+import com.paragon.shared.red.LibraryGameDto
+import com.paragon.shared.red.HttpException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

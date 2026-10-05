@@ -1,10 +1,12 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
 /** Ver src/app/api/mobile/appearance/route.ts — la misma apariencia que la web. */
+@Serializable
 data class PaletaJuegoDto(
     val rgb: String,
     val rgbClaro: String,
@@ -15,8 +17,10 @@ data class PaletaJuegoDto(
     val border: String,
 )
 
+@Serializable
 data class AcentoJuegoDto(val id: String, val color: String, val paleta: PaletaJuegoDto? = null)
 
+@Serializable
 data class AparienciaDto(
     val guardada: Boolean = false,
     val acento: String = "",
@@ -28,6 +32,7 @@ data class AparienciaDto(
     val requisitosEstilo: Map<String, Int> = emptyMap(),
 )
 
+@Serializable
 data class GuardarAparienciaRequest(
     val acento: String,
     val acentoLibre: String,
@@ -36,10 +41,10 @@ data class GuardarAparienciaRequest(
     val tamanoTexto: String,
 )
 
-interface AparienciaApi {
-    @GET("api/mobile/appearance")
-    suspend fun obtener(): AparienciaDto
+class AparienciaApi internal constructor(private val c: ClienteParagon) {
+    suspend fun obtener(): AparienciaDto =
+        c.http.get("api/mobile/appearance").body()
 
-    @POST("api/mobile/appearance")
-    suspend fun guardar(@Body body: GuardarAparienciaRequest): AparienciaDto
+    suspend fun guardar(body: GuardarAparienciaRequest): AparienciaDto =
+        c.http.post("api/mobile/appearance") { json(body) }.body()
 }

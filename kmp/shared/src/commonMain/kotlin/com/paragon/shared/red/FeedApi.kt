@@ -1,16 +1,20 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
 // Sin @JsonClass(generateAdapter = true) — mismo motivo que el resto de
 // DTOs de este paquete: KotlinJsonAdapterFactory los lee por reflexión.
+@Serializable
 data class FeedUserDto(val id: String, val handle: String?, val name: String?, val image: String?)
+@Serializable
 data class FeedGameDto(val id: String, val title: String, val iconUrl: String?, val deviceLabel: String?)
+@Serializable
 data class FeedCommentDto(val activityId: String, val body: String, val userName: String, val createdAt: String)
 
+@Serializable
 data class FeedItemDto(
     val id: String,
     val type: String,
@@ -28,30 +32,35 @@ data class FeedItemDto(
     val views: Int = 0,
 )
 
+@Serializable
 data class FeedResponse(val items: List<FeedItemDto>)
 
+@Serializable
 data class ReactResponse(val reacted: Boolean)
 
+@Serializable
 data class ReactRequest(val reaction: String)
 
+@Serializable
 data class ViewResponse(val isNew: Boolean)
 
+@Serializable
 data class NewCommentRequest(val body: String)
 
-interface FeedApi {
+class FeedApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/feed/route.ts en el proyecto Next.js. */
-    @GET("api/mobile/feed")
-    suspend fun getFeed(): FeedResponse
+    suspend fun getFeed(): FeedResponse =
+        c.http.get("api/mobile/feed").body()
 
     /** Alterna la reacción a una publicación (👏🔥🏆😂😮) — ver .../feed/{activityId}/react/route.ts. */
-    @POST("api/mobile/feed/{activityId}/react")
-    suspend fun react(@Path("activityId") activityId: String, @Body request: ReactRequest): ReactResponse
+    suspend fun react(activityId: String, request: ReactRequest): ReactResponse =
+        c.http.post("api/mobile/feed/${activityId.encodeURLPathPart()}/react") { json(request) }.body()
 
     /** Registra que se ha visto una publicación — ver .../feed/{activityId}/view/route.ts. */
-    @POST("api/mobile/feed/{activityId}/view")
-    suspend fun registerView(@Path("activityId") activityId: String): ViewResponse
+    suspend fun registerView(activityId: String): ViewResponse =
+        c.http.post("api/mobile/feed/${activityId.encodeURLPathPart()}/view").body()
 
     /** Añade un comentario — ver .../feed/{activityId}/comment/route.ts. */
-    @POST("api/mobile/feed/{activityId}/comment")
-    suspend fun addComment(@Path("activityId") activityId: String, @Body request: NewCommentRequest): FeedCommentDto
+    suspend fun addComment(activityId: String, request: NewCommentRequest): FeedCommentDto =
+        c.http.post("api/mobile/feed/${activityId.encodeURLPathPart()}/comment") { json(request) }.body()
 }

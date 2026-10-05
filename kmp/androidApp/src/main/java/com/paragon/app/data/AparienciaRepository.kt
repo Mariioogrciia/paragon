@@ -2,11 +2,11 @@ package com.paragon.app.data
 
 import androidx.compose.ui.graphics.Color
 import com.paragon.app.data.auth.TokenStore
-import com.paragon.app.data.network.AcentoJuegoDto
+import com.paragon.shared.red.AcentoJuegoDto
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.AparienciaDto
-import com.paragon.app.data.network.GuardarAparienciaRequest
-import com.paragon.app.data.network.PaletaJuegoDto
+import com.paragon.shared.red.AparienciaDto
+import com.paragon.shared.red.GuardarAparienciaRequest
+import com.paragon.shared.red.PaletaJuegoDto
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.theme.PaletaJuego
 import com.paragon.app.ui.theme.Suelo

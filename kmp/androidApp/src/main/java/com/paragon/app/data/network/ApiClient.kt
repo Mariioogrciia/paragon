@@ -1,36 +1,23 @@
 package com.paragon.app.data.network
 
 import com.paragon.app.data.auth.TokenStore
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.paragon.shared.red.ClienteParagon
+import com.paragon.shared.red.URL_BASE
+import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+
+/** Dominio de la API y del login en el navegador (definido en :shared). */
+const val BASE_URL = URL_BASE
 
 /**
- * Mismo dominio que capacitor.config.ts (server.url) — cuando eso cambie a un
- * dominio propio, cambia aquí también.
+ * Acceso de la app Android a la API común (`ClienteParagon`, en :shared, con
+ * Ktor). Mantiene las funciones de siempre (`panelApi(tokenStore)`...) para
+ * que los repositorios no cambien mientras pasan a :shared.
  */
-const val BASE_URL = "https://platinos-nine.vercel.app/"
-
-/** Añade `Authorization: Bearer <token>` a cada llamada si hay sesión guardada. */
-private class AuthInterceptor(private val tokenStore: TokenStore) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
-        val token = tokenStore.token
-        val builder = chain.request().newBuilder()
-            // Idioma del teléfono: el servidor devuelve los nombres de los
-            // trofeos en ese idioma si la plataforma los tiene (ver
-            // idiomaDeCabecera en lib/idiomasTrofeo.ts).
-            .header("Accept-Language", java.util.Locale.getDefault().toLanguageTag())
-        if (token != null) builder.addHeader("Authorization", "Bearer $token")
-        return chain.proceed(builder.build())
-    }
-}
-
 object ApiClient {
     @Volatile
-    private var retrofit: Retrofit? = null
+    private var cliente: ClienteParagon? = null
 
     /**
      * Caché HTTP de 10 MB (auditoría, 4 oct 2026): las rutas grandes de
@@ -53,56 +40,45 @@ object ApiClient {
         try { cache?.evictAll() } catch (e: Exception) { }
     }
 
-    fun panelApi(tokenStore: TokenStore): PanelApi = retrofit(tokenStore).create(PanelApi::class.java)
-    fun gamesApi(tokenStore: TokenStore): GamesApi = retrofit(tokenStore).create(GamesApi::class.java)
-    fun libraryApi(tokenStore: TokenStore): LibraryApi = retrofit(tokenStore).create(LibraryApi::class.java)
-    fun feedApi(tokenStore: TokenStore): FeedApi = retrofit(tokenStore).create(FeedApi::class.java)
-    fun socialApi(tokenStore: TokenStore): SocialApi = retrofit(tokenStore).create(SocialApi::class.java)
-    fun highlightsApi(tokenStore: TokenStore): HighlightsApi = retrofit(tokenStore).create(HighlightsApi::class.java)
-    fun logoutApi(tokenStore: TokenStore): LogoutApi = retrofit(tokenStore).create(LogoutApi::class.java)
-    fun settingsApi(tokenStore: TokenStore): SettingsApi = retrofit(tokenStore).create(SettingsApi::class.java)
-    fun statsApi(tokenStore: TokenStore): StatsApi = retrofit(tokenStore).create(StatsApi::class.java)
-    fun milestoneApi(tokenStore: TokenStore): MilestoneApi = retrofit(tokenStore).create(MilestoneApi::class.java)
-    fun collectionsApi(tokenStore: TokenStore): CollectionsApi = retrofit(tokenStore).create(CollectionsApi::class.java)
-    fun compareApi(tokenStore: TokenStore): CompareApi = retrofit(tokenStore).create(CompareApi::class.java)
-    fun pushTokenApi(tokenStore: TokenStore): PushTokenApi = retrofit(tokenStore).create(PushTokenApi::class.java)
-    fun rachaApi(tokenStore: TokenStore): RachaApi = retrofit(tokenStore).create(RachaApi::class.java)
-    fun usersApi(tokenStore: TokenStore): UsersApi = retrofit(tokenStore).create(UsersApi::class.java)
-    fun leaguesApi(tokenStore: TokenStore): LeaguesApi = retrofit(tokenStore).create(LeaguesApi::class.java)
-    fun wishlistApi(tokenStore: TokenStore): WishlistApi = retrofit(tokenStore).create(WishlistApi::class.java)
-    fun achievementsApi(tokenStore: TokenStore): AchievementsApi = retrofit(tokenStore).create(AchievementsApi::class.java)
-    fun clansApi(tokenStore: TokenStore): ClansApi = retrofit(tokenStore).create(ClansApi::class.java)
-    fun dietApi(tokenStore: TokenStore): DietApi = retrofit(tokenStore).create(DietApi::class.java)
-    fun wrapApi(tokenStore: TokenStore): WrapApi = retrofit(tokenStore).create(WrapApi::class.java)
-    fun trophyGuidesApi(tokenStore: TokenStore): TrophyGuidesApi = retrofit(tokenStore).create(TrophyGuidesApi::class.java)
-    fun aparienciaApi(tokenStore: TokenStore): AparienciaApi = retrofit(tokenStore).create(AparienciaApi::class.java)
-    fun steamApi(tokenStore: TokenStore): SteamApi = retrofit(tokenStore).create(SteamApi::class.java)
-
-    /**
-     * Un único Retrofit cacheado para todos los servicios — `.create()` sobre
-     * uno ya construido es barato (solo genera el proxy dinámico), así que no
-     * hace falta cachear cada interfaz por separado.
-     */
-    private fun retrofit(tokenStore: TokenStore): Retrofit =
-        retrofit ?: synchronized(this) {
-            retrofit ?: build(tokenStore).also { retrofit = it }
+    fun cliente(tokenStore: TokenStore): ClienteParagon =
+        cliente ?: synchronized(this) {
+            cliente ?: crear(tokenStore).also { cliente = it }
         }
 
-    private fun build(tokenStore: TokenStore): Retrofit {
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(tokenStore))
+    private fun crear(tokenStore: TokenStore): ClienteParagon {
+        val okHttp = OkHttpClient.Builder()
             .apply { cache?.let { cache(it) } }
             .apply { interceptorDemo?.let { addInterceptor(it) } }
             .build()
-
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
+        return ClienteParagon(
+            motor = OkHttp.create { preconfigured = okHttp },
+            token = { tokenStore.token },
+            idioma = { java.util.Locale.getDefault().toLanguageTag() },
+        )
     }
+
+    fun panelApi(tokenStore: TokenStore) = cliente(tokenStore).panel
+    fun gamesApi(tokenStore: TokenStore) = cliente(tokenStore).games
+    fun libraryApi(tokenStore: TokenStore) = cliente(tokenStore).library
+    fun feedApi(tokenStore: TokenStore) = cliente(tokenStore).feed
+    fun socialApi(tokenStore: TokenStore) = cliente(tokenStore).social
+    fun highlightsApi(tokenStore: TokenStore) = cliente(tokenStore).highlights
+    fun logoutApi(tokenStore: TokenStore) = cliente(tokenStore).logout
+    fun settingsApi(tokenStore: TokenStore) = cliente(tokenStore).settings
+    fun statsApi(tokenStore: TokenStore) = cliente(tokenStore).stats
+    fun milestoneApi(tokenStore: TokenStore) = cliente(tokenStore).milestone
+    fun collectionsApi(tokenStore: TokenStore) = cliente(tokenStore).collections
+    fun compareApi(tokenStore: TokenStore) = cliente(tokenStore).compare
+    fun pushTokenApi(tokenStore: TokenStore) = cliente(tokenStore).pushToken
+    fun rachaApi(tokenStore: TokenStore) = cliente(tokenStore).racha
+    fun usersApi(tokenStore: TokenStore) = cliente(tokenStore).users
+    fun leaguesApi(tokenStore: TokenStore) = cliente(tokenStore).leagues
+    fun wishlistApi(tokenStore: TokenStore) = cliente(tokenStore).wishlist
+    fun achievementsApi(tokenStore: TokenStore) = cliente(tokenStore).achievements
+    fun clansApi(tokenStore: TokenStore) = cliente(tokenStore).clans
+    fun dietApi(tokenStore: TokenStore) = cliente(tokenStore).diet
+    fun wrapApi(tokenStore: TokenStore) = cliente(tokenStore).wrap
+    fun trophyGuidesApi(tokenStore: TokenStore) = cliente(tokenStore).trophyGuides
+    fun aparienciaApi(tokenStore: TokenStore) = cliente(tokenStore).apariencia
+    fun steamApi(tokenStore: TokenStore) = cliente(tokenStore).steam
 }

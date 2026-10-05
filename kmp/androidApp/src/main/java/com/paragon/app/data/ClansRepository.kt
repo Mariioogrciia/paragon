@@ -2,10 +2,10 @@ package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.InviteToClanRequest
-import com.paragon.app.data.network.NewClanRequest
-import com.paragon.app.data.network.paragonErrorMessage
-import retrofit2.HttpException
+import com.paragon.shared.red.InviteToClanRequest
+import com.paragon.shared.red.NewClanRequest
+import com.paragon.shared.red.paragonErrorMessage
+import com.paragon.shared.red.HttpException
 import com.paragon.app.R
 import com.paragon.app.util.Textos
 

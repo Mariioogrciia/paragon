@@ -4,14 +4,11 @@ import android.content.Context
 import android.net.Uri
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.LinkedAccountsResponse
-import com.paragon.app.data.network.LinkPlatformRequest
-import com.paragon.app.data.network.UpdateProfileRequest
-import com.paragon.app.data.network.paragonErrorMessage
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.HttpException
+import com.paragon.shared.red.LinkedAccountsResponse
+import com.paragon.shared.red.LinkPlatformRequest
+import com.paragon.shared.red.UpdateProfileRequest
+import com.paragon.shared.red.paragonErrorMessage
+import com.paragon.shared.red.HttpException
 import com.paragon.app.util.Textos
 import com.paragon.app.R
 
@@ -91,12 +88,11 @@ class SettingsRepository(private val tokenStore: TokenStore) {
                 "image/webp" -> "webp"
                 else -> "jpg"
             }
-            val body = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
-            val part = MultipartBody.Part.createFormData("file", "avatar.$extension", body)
-
-            val response = ApiClient.settingsApi(tokenStore).uploadAvatar(part)
-            if (response.url != null) {
-                SettingsResult.Ok(response.url)
+            val response = ApiClient.cliente(tokenStore).subirAvatar(bytes, mimeType, extension)
+            // Copia local: el DTO es de :shared y Kotlin no hace smart cast entre módulos.
+            val url = response.url
+            if (url != null) {
+                SettingsResult.Ok(url)
             } else {
                 SettingsResult.Error(response.error ?: Textos.t(R.string.ajustes_err_subir_imagen))
             }

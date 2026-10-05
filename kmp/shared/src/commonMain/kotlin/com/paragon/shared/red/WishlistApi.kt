@@ -1,10 +1,11 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
+@Serializable
 data class GameSearchResultDto(
     val igdbId: Int,
     val title: String,
@@ -14,8 +15,10 @@ data class GameSearchResultDto(
     val genres: List<String>?,
     val pegi: String?,
 )
+@Serializable
 data class GameSearchResponse(val results: List<GameSearchResultDto>)
 
+@Serializable
 data class AddWishlistRequest(
     val igdbId: Int,
     val title: String,
@@ -26,13 +29,14 @@ data class AddWishlistRequest(
     val publisher: String?,
     val deviceLabel: String,
 )
+@Serializable
 data class AddWishlistResponse(val gameId: String)
 
 /** "Añadir a Paragon" desde el Sharesheet — ver .../games/search y .../wishlist en API-CONTRACT.md. */
-interface WishlistApi {
-    @GET("api/mobile/games/search")
-    suspend fun search(@Query("q") query: String): GameSearchResponse
+class WishlistApi internal constructor(private val c: ClienteParagon) {
+    suspend fun search(query: String): GameSearchResponse =
+        c.http.get("api/mobile/games/search") { parameter("q", query) }.body()
 
-    @POST("api/mobile/wishlist")
-    suspend fun addToWishlist(@Body request: AddWishlistRequest): AddWishlistResponse
+    suspend fun addToWishlist(request: AddWishlistRequest): AddWishlistResponse =
+        c.http.post("api/mobile/wishlist") { json(request) }.body()
 }

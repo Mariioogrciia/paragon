@@ -1,8 +1,11 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
-import retrofit2.http.Path
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
+@Serializable
 data class UserProfileDto(
     val userId: String,
     val name: String,
@@ -15,11 +18,13 @@ data class UserProfileDto(
     val recentGames: List<RecentGameDto>
 )
 
+@Serializable
 data class AccountDto(
     val platform: String,
     val username: String
 )
 
+@Serializable
 data class RecentGameDto(
     val id: String,
     val title: String,
@@ -27,7 +32,7 @@ data class RecentGameDto(
     val percent: Int
 )
 
-interface UsersApi {
-    @GET("api/mobile/users/{handle}")
-    suspend fun getUserProfile(@Path("handle") handle: String): UserProfileDto
+class UsersApi internal constructor(private val c: ClienteParagon) {
+    suspend fun getUserProfile(handle: String): UserProfileDto =
+        c.http.get("api/mobile/users/${handle.encodeURLPathPart()}").body()
 }

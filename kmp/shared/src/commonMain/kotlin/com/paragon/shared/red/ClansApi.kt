@@ -1,17 +1,23 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
+@Serializable
 data class ClanSummaryDto(val id: String, val name: String, val tag: String, val description: String, val memberCount: Int)
+@Serializable
 data class MyClanDto(val tag: String, val name: String, val role: String)
+@Serializable
 data class ClansListResponse(val clans: List<ClanSummaryDto>, val myClan: MyClanDto?)
 
+@Serializable
 data class NewClanRequest(val name: String, val tag: String, val description: String?)
+@Serializable
 data class NewClanResponseDto(val id: String, val tag: String, val name: String)
 
+@Serializable
 data class ClanInviteDto(
     val clanId: String,
     val clanName: String,
@@ -20,8 +26,10 @@ data class ClanInviteDto(
     val invitedByHandle: String?,
     val createdAt: String,
 )
+@Serializable
 data class ClanInvitesResponse(val invites: List<ClanInviteDto>)
 
+@Serializable
 data class ClanLeaderboardEntryDto(
     val userId: String,
     val role: String,
@@ -31,8 +39,11 @@ data class ClanLeaderboardEntryDto(
     val score: Int,
     val trofeos: Int,
 )
+@Serializable
 data class ClanActivityUserDto(val handle: String?, val name: String?, val image: String?)
+@Serializable
 data class ClanActivityGameDto(val id: String, val title: String, val iconUrl: String?)
+@Serializable
 data class ClanActivityItemDto(
     val id: String,
     val type: String,
@@ -41,9 +52,12 @@ data class ClanActivityItemDto(
     val user: ClanActivityUserDto,
     val game: ClanActivityGameDto,
 )
+@Serializable
 data class ClanInfoDto(val id: String, val tag: String, val name: String, val description: String)
+@Serializable
 data class InvitableFriendDto(val userId: String, val handle: String?, val displayName: String?, val image: String?)
 
+@Serializable
 data class ClanDetailResponse(
     val clan: ClanInfoDto,
     val score: Int,
@@ -54,37 +68,43 @@ data class ClanDetailResponse(
     val invitables: List<InvitableFriendDto>,
 )
 
+@Serializable
 data class InviteToClanRequest(val invitedUserId: String)
 
 /** Clanes — ver la sección "Clanes" en API-CONTRACT.md. */
-interface ClansApi {
-    @GET("api/mobile/clans")
-    suspend fun getClans(): ClansListResponse
+class ClansApi internal constructor(private val c: ClienteParagon) {
+    suspend fun getClans(): ClansListResponse =
+        c.http.get("api/mobile/clans").body()
 
     /** `403` si no llegas a Nivel 5 de Paragon, `409` si ya perteneces a un clan — ver el mensaje del cuerpo del error. */
-    @POST("api/mobile/clans")
-    suspend fun createClan(@Body request: NewClanRequest): NewClanResponseDto
+    suspend fun createClan(request: NewClanRequest): NewClanResponseDto =
+        c.http.post("api/mobile/clans") { json(request) }.body()
 
-    @GET("api/mobile/clans/invites")
-    suspend fun getInvites(): ClanInvitesResponse
+    suspend fun getInvites(): ClanInvitesResponse =
+        c.http.get("api/mobile/clans/invites").body()
 
-    @POST("api/mobile/clans/invites/{clanId}/accept")
-    suspend fun acceptInvite(@Path("clanId") clanId: String)
+    suspend fun acceptInvite(clanId: String) {
+        c.http.post("api/mobile/clans/invites/${clanId.encodeURLPathPart()}/accept")
+    }
 
-    @POST("api/mobile/clans/invites/{clanId}/decline")
-    suspend fun declineInvite(@Path("clanId") clanId: String)
+    suspend fun declineInvite(clanId: String) {
+        c.http.post("api/mobile/clans/invites/${clanId.encodeURLPathPart()}/decline")
+    }
 
-    @GET("api/mobile/clans/{tag}")
-    suspend fun getClanDetail(@Path("tag") tag: String): ClanDetailResponse
+    suspend fun getClanDetail(tag: String): ClanDetailResponse =
+        c.http.get("api/mobile/clans/${tag.encodeURLPathPart()}").body()
 
-    @POST("api/mobile/clans/{tag}/join")
-    suspend fun joinClan(@Path("tag") tag: String)
+    suspend fun joinClan(tag: String) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/join")
+    }
 
     /** Si eres el owner, borra el clan ENTERO — confirmar con el usuario ANTES de llamar (el backend no vuelve a preguntar). */
-    @POST("api/mobile/clans/{tag}/leave")
-    suspend fun leaveClan(@Path("tag") tag: String)
+    suspend fun leaveClan(tag: String) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/leave")
+    }
 
     /** Solo el owner, y solo a un amigo suyo que no esté ya en un clan. */
-    @POST("api/mobile/clans/{tag}/invite")
-    suspend fun inviteToClan(@Path("tag") tag: String, @Body request: InviteToClanRequest)
+    suspend fun inviteToClan(tag: String, request: InviteToClanRequest) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/invite") { json(request) }
+    }
 }

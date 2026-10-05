@@ -1,8 +1,12 @@
-package com.paragon.app.data.network
+package com.paragon.shared.red
 
-import retrofit2.http.GET
+import kotlinx.serialization.Serializable
+import io.ktor.client.call.body
+import io.ktor.client.request.*
+import io.ktor.http.encodeURLPathPart
 
 /** `earnedAt` en ISO — `id`/`name`/`description` ver API-CONTRACT.md (BADGE_DEFINITIONS en components/Badges.tsx, web). */
+@Serializable
 data class BadgeDto(
     val id: String,
     val name: String,
@@ -11,6 +15,7 @@ data class BadgeDto(
 )
 
 /** `kind`: `"liga_mensual"` | `"liga_privada"`. Solo el ganador absoluto, nunca Top 3. */
+@Serializable
 data class TrophyCaseAwardDto(
     val kind: String,
     val rank: Int,
@@ -18,13 +23,14 @@ data class TrophyCaseAwardDto(
     val earnedAt: String,
 )
 
+@Serializable
 data class AchievementsResponse(
     val badges: List<BadgeDto>,
     val trophyCase: List<TrophyCaseAwardDto>,
 )
 
-interface AchievementsApi {
+class AchievementsApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/achievements/route.ts en el proyecto Next.js. */
-    @GET("api/mobile/achievements")
-    suspend fun getAchievements(): AchievementsResponse
+    suspend fun getAchievements(): AchievementsResponse =
+        c.http.get("api/mobile/achievements").body()
 }

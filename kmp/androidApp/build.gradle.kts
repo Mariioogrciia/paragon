@@ -77,9 +77,10 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.10.5")
 
-    // Red: pasa a Ktor en :shared en la fase 2.
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
+    // Red: la API es común (:shared, Ktor); aquí solo el motor OkHttp, con la
+    // caché HTTP y el interceptor del modo demo (ver ApiClient.kt).
+    implementation("io.ktor:ktor-client-okhttp:3.6.0")
+    // Moshi solo para las cachés locales que aún no han pasado a :shared.
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
 
     // Custom Tabs para el login (ver ComposeMainActivity.kt).

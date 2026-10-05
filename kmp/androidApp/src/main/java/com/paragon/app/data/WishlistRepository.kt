@@ -1,9 +1,9 @@
 package com.paragon.app.data
 
 import com.paragon.app.data.auth.TokenStore
-import com.paragon.app.data.network.AddWishlistRequest
+import com.paragon.shared.red.AddWishlistRequest
 import com.paragon.app.data.network.ApiClient
-import com.paragon.app.data.network.GameSearchResultDto
+import com.paragon.shared.red.GameSearchResultDto
 import com.paragon.app.R
 import com.paragon.app.util.Textos
 
