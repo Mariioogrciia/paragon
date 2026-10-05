@@ -26,6 +26,7 @@ import com.paragon.app.ui.theme.ParagonTheme
 import com.paragon.app.util.flushPendingDisable
 import com.paragon.app.work.PanelSyncWorker
 import kotlinx.coroutines.launch
+import androidx.appcompat.app.AppCompatActivity
 
 /**
  * Único login real de la app (Google/Discord, sin contraseña — ver auth.ts en
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
  * de entrada normal — la Custom Tab reactiva ESTA Activity (declarada
  * singleTask en el manifest), no crea una nueva.
  */
-class ComposeMainActivity : ComponentActivity() {
+class ComposeMainActivity : AppCompatActivity() {
     private lateinit var tokenStore: TokenStore
     private lateinit var themeStore: ThemeStore
 

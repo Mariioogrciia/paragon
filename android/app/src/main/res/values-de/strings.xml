@@ -27,6 +27,8 @@
     <string name="ajustes_err_subir_imagen">Bild konnte nicht hochgeladen werden.</string>
     <string name="ajustes_foto_ok">Foto aktualisiert</string>
     <string name="ajustes_foto_sub">Im Web und in der App gleich</string>
+    <string name="ajustes_idioma">Sprache</string>
+    <string name="ajustes_idioma_auto">Automatisch (Sprache des Handys)</string>
     <string name="ajustes_material">Material You (dynamische Farben)</string>
     <string name="ajustes_material_aviso">Deaktiviere Material You, um ein Plattform-Theme zu wählen (Hintergrund und Akzent).</string>
     <string name="ajustes_material_sub">Übernimmt Hintergrund und Akzent von deinem Hintergrundbild — ersetzt solange das Plattform-Theme</string>

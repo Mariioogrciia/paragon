@@ -252,6 +252,9 @@ fun SettingsScreen(
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Muted)
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
+            IdiomaSelector()
+
             Spacer(modifier = Modifier.height(32.dp))
             
             Text(stringResource(R.string.ajustes_seccion_solitario), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)

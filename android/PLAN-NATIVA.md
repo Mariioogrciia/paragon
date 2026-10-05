@@ -38,6 +38,7 @@ Reglas de base (ya acordadas, no reabrir sin decirlo el usuario):
   (desde la raíz del repo). Huecos como `{0}`, `{1}`. En Compose:
   `stringResource(R.string.x, a)`; fuera de Compose (repositorios, widget,
   push): `Textos.t(R.string.x, a)`. No editar los strings.xml a mano.
+- El idioma se elige en Ajustes → Idioma (`IdiomaSelector.kt`, `AppCompatDelegate.setApplicationLocales`); por eso las actividades extienden `AppCompatActivity`.
 - Fechas con el formato del teléfono (`DateFormat.getDateInstance`), nunca
   `Locale("es", "ES")` fijo.
 - Login: el enlace `paragon://auth` ahora lleva el token CIFRADO (`?c=`), con

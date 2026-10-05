@@ -27,6 +27,8 @@
     <string name="ajustes_err_subir_imagen">Impossible d\'envoyer l\'image.</string>
     <string name="ajustes_foto_ok">Photo mise à jour</string>
     <string name="ajustes_foto_sub">Identique sur le web et dans l\'app</string>
+    <string name="ajustes_idioma">Langue</string>
+    <string name="ajustes_idioma_auto">Automatique (langue du téléphone)</string>
     <string name="ajustes_material">Material You (couleurs dynamiques)</string>
     <string name="ajustes_material_aviso">Désactive Material You pour choisir un thème de plateforme (fond et accent).</string>
     <string name="ajustes_material_sub">Prend le fond et l\'accent de ton fond d\'écran — remplace le thème de plateforme tant qu\'il est actif</string>

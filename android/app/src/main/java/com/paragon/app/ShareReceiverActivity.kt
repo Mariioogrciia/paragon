@@ -9,6 +9,7 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.share.ShareAddScreen
 import com.paragon.app.ui.theme.ParagonTheme
+import androidx.appcompat.app.AppCompatActivity
 
 /**
  * "Añadir a Paragon" desde el Sharesheet del sistema (idea #4 de
@@ -19,7 +20,7 @@ import com.paragon.app.ui.theme.ParagonTheme
  * (singleTask, los 4 alias de icono, el deep link de login) — se abre,
  * hace su cosa, se cierra.
  */
-class ShareReceiverActivity : ComponentActivity() {
+class ShareReceiverActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

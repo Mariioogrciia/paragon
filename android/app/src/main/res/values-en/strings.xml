@@ -27,6 +27,8 @@
     <string name="ajustes_err_subir_imagen">Couldn\'t upload the image.</string>
     <string name="ajustes_foto_ok">Photo updated</string>
     <string name="ajustes_foto_sub">Same on the web and in the app</string>
+    <string name="ajustes_idioma">Language</string>
+    <string name="ajustes_idioma_auto">Automatic (phone\'s language)</string>
     <string name="ajustes_material">Material You (dynamic colour)</string>
     <string name="ajustes_material_aviso">Turn off Material You to pick a platform theme (sets background and accent).</string>
     <string name="ajustes_material_sub">Takes background and accent from your wallpaper — overrides the platform theme while on</string>

@@ -155,6 +155,18 @@
   "es": "Se ve igual en la web y en la app",
   "fr": "Identique sur le web et dans l'app"
  },
+ "ajustes_idioma": {
+  "de": "Sprache",
+  "en": "Language",
+  "es": "Idioma",
+  "fr": "Langue"
+ },
+ "ajustes_idioma_auto": {
+  "de": "Automatisch (Sprache des Handys)",
+  "en": "Automatic (phone's language)",
+  "es": "Automático (el del teléfono)",
+  "fr": "Automatique (langue du téléphone)"
+ },
  "ajustes_material": {
   "de": "Material You (dynamische Farben)",
   "en": "Material You (dynamic colour)",

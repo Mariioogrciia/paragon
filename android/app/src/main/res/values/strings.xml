@@ -31,6 +31,8 @@
     <string name="ajustes_err_subir_imagen">No se pudo subir la imagen.</string>
     <string name="ajustes_foto_ok">Foto actualizada</string>
     <string name="ajustes_foto_sub">Se ve igual en la web y en la app</string>
+    <string name="ajustes_idioma">Idioma</string>
+    <string name="ajustes_idioma_auto">Automático (el del teléfono)</string>
     <string name="ajustes_material">Material You (Colores Dinámicos)</string>
     <string name="ajustes_material_aviso">Desactiva Material You para elegir un tema de plataforma (define fondo y acento).</string>
     <string name="ajustes_material_sub">Extrae fondo y acento de tu fondo de pantalla — anula el tema de plataforma mientras esté activo</string>
