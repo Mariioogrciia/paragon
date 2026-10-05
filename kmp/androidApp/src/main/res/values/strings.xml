@@ -555,6 +555,8 @@
     <string name="perfil_ventaja">Vas por delante en %1$s de %2$s categorías</string>
     <string name="perfil_ventaja_todo">" — les llevas ventaja en todo."</string>
     <string name="push_canal">Avisos de Paragon</string>
+    <string name="qr_compartir_sesion">Compartir sesión</string>
+    <string name="qr_compartir_sesion_sub">Que lo escaneen para verla y unirse.</string>
     <string name="qr_eres_tu">Ese código es el tuyo.</string>
     <string name="qr_escanear">Escanear QR</string>
     <string name="qr_no_valido">Ese QR no es de Paragon.</string>

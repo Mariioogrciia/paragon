@@ -4540,5 +4540,17 @@
   "en": "PlayStation, Steam and Xbox together, with your friends, leagues and sessions to hunt platinums.",
   "es": "PlayStation, Steam y Xbox juntos, con tus amigos, ligas y sesiones para cazar platinos.",
   "fr": "PlayStation, Steam et Xbox réunis, avec tes amis, ligues et sessions pour chasser les platines."
+ },
+ "qr_compartir_sesion": {
+  "de": "Session teilen",
+  "en": "Share session",
+  "es": "Compartir sesión",
+  "fr": "Partager la session"
+ },
+ "qr_compartir_sesion_sub": {
+  "de": "Lass ihn scannen, um sie zu sehen und beizutreten.",
+  "en": "Let others scan it to see it and join.",
+  "es": "Que lo escaneen para verla y unirse.",
+  "fr": "Fais-le scanner pour la voir et la rejoindre."
  }
 }

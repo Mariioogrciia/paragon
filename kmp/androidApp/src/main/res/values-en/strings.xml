@@ -553,6 +553,8 @@
     <string name="perfil_ventaja">You\'re ahead in %1$s of %2$s categories</string>
     <string name="perfil_ventaja_todo">" — you lead in everything."</string>
     <string name="push_canal">Paragon notifications</string>
+    <string name="qr_compartir_sesion">Share session</string>
+    <string name="qr_compartir_sesion_sub">Let others scan it to see it and join.</string>
     <string name="qr_eres_tu">That\'s your own code.</string>
     <string name="qr_escanear">Scan QR code</string>
     <string name="qr_no_valido">That QR code isn\'t from Paragon.</string>

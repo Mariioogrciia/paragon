@@ -2,6 +2,7 @@
 
 package com.paragon.app.ui.sesiones
 
+import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -293,6 +294,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
     var trabajando by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var confirmarCancelar by remember { mutableStateOf(false) }
+    var verQr by remember { mutableStateOf(false) }
 
     LaunchedEffect(sesionId, recarga) { estado = repo.ficha(sesionId) }
 
@@ -417,6 +419,9 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                                 lineHeight = 18.sp,
                             )
                             Spacer(Modifier.height(10.dp))
+                            // Diseño v2: la acción a lo ancho y, al lado, compartir la sesión con QR.
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(Modifier.weight(1f)) {
                             when {
                                 s.soyAnfitrion -> OutlinedButton(
                                     onClick = { confirmarCancelar = true },
@@ -438,10 +443,18 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                                     modifier = Modifier.fillMaxWidth(),
                                 ) { Text(if (s.yaLoTengo) Textos.t(T.sesiones_unirme_ayudar) else Textos.t(T.sesiones_unirme), fontWeight = FontWeight.Bold) }
                             }
+                                }
+                                Spacer(Modifier.width(10.dp))
+                                IconButton(
+                                    onClick = { verQr = true },
+                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(radio(14))).background(Surface),
+                                ) { Icon(Icons.Default.QrCode2, contentDescription = Textos.t(T.qr_compartir_sesion), tint = Foreground) }
+                            }
                         }
-                        error?.let { Text(it, color = androidx.compose.ui.graphics.Color(0xFFE57373), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
+                        error?.let { Text(it, color = com.paragon.app.ui.theme.Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
                     }
                 }
+                if (verQr) HojaQrSesion(sesionId) { verQr = false }
                 if (confirmarCancelar) {
                     ConfirmDialog(
                         title = Textos.t(T.sesiones_cancelar_titulo),
@@ -607,7 +620,7 @@ private fun NuevaSesionSheet(
                 CampoTexto(descripcion, { if (it.length <= 500) descripcion = it }, Textos.t(T.sesiones_descripcion_placeholder), lineas = 3)
             }
 
-            error?.let { Text(it, color = androidx.compose.ui.graphics.Color(0xFFE57373), fontSize = 13.sp) }
+            error?.let { Text(it, color = com.paragon.app.ui.theme.Danger, fontSize = 13.sp) }
 
             Button(
                 onClick = {
@@ -715,4 +728,25 @@ private fun CampoTexto(valor: String, onCambio: (String) -> Unit, placeholder: S
             unfocusedContainerColor = Background,
         ),
     )
+}
+
+/** El QR de una sesión (diseño v2): con la cámara normal abre la sesión en la web; con el lector de la app, aquí. */
+@Composable
+private fun HojaQrSesion(id: String, onDismiss: () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+        Column(
+            Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(Textos.t(T.qr_compartir_sesion), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(Textos.t(T.qr_compartir_sesion_sub), color = Muted, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, bottom = 20.dp))
+            Box(Modifier.size(240.dp).clip(RoundedCornerShape(radio(24))).background(androidx.compose.ui.graphics.Color.White).padding(18.dp)) {
+                androidx.compose.foundation.Image(
+                    painter = io.github.alexzhirkevich.qrose.rememberQrCodePainter(com.paragon.app.util.enlaceSesion(id)),
+                    contentDescription = Textos.t(T.qr_compartir_sesion),
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+    }
 }
