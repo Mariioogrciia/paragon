@@ -21,6 +21,7 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
         db.execSQL("ALTER TABLE panel_cache ADD COLUMN gold INTEGER NOT NULL DEFAULT 0")
         db.execSQL("ALTER TABLE panel_cache ADD COLUMN silver INTEGER NOT NULL DEFAULT 0")
         db.execSQL("ALTER TABLE panel_cache ADD COLUMN bronze INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `simple_cache` (`key` TEXT NOT NULL, `json` TEXT NOT NULL, PRIMARY KEY(`key`))")
     }
 }
 
