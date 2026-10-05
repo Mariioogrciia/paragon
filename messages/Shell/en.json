@@ -425,7 +425,7 @@
       "b1t": "Browser push",
       "b1": "A direct alert to your phone or browser the moment you unlock a trophy — turn it on from Settings. On iPhone you need to install Paragon via \"Share → Add to Home Screen\" in Safari for it to work (an Apple limitation, not Paragon's).",
       "b2t": "Discord bot",
-      "b2": "Turn on Paragon bot DM alerts from Settings — it needs you to have signed in with Discord. From then on you get the same things by DM that already arrive by push: friend requests, level-ups from people around you, and league invites.",
+      "b2": "Turn on Paragon bot DM alerts from Settings — it needs you to have signed in with Discord. From then on you get the same things by DM that already arrive by push: friend requests, level-ups from people around you, and league invites. Step-by-step guide in <link>Discord bot</link>.",
       "b3t": "Add the bot to your server",
       "b3ConLink": "Anyone can invite it with this link — <link>add Paragon to a Discord server →</link> — Discord will ask which server and to confirm the permissions (it only asks for <enviarMensajes>Send Messages</enviarMensajes>, so it can post in the <comando>/anunciosaqui</comando> channel). You don't need to own the server, just \"Manage Server\" permission there.",
       "b3LinkTexto": "add Paragon to a Discord server →",

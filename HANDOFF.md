@@ -1391,6 +1391,29 @@ commits:
 - **Sin probar**: nada con datos reales (solo con el modo demo); el rail
   en tablet; una APK **firmada** de producción (solo probada con la clave
   de depuración). Para repartirla hará falta una clave propia.
+**Tercera tanda (5 oct 2026)** — cuatro quejas del usuario:
+- **"Reservar para el #25" siempre**: es por diseño el próximo hito redondo
+  (#25, #50…), pero sin decir cuánto falta parecía fijo. Web y app dicen
+  ahora "Reservar para el #25 · faltan 11". En la app, además, el número solo
+  llegaba si ya había OTRO juego reservado; `/api/mobile/milestone` devuelve
+  ahora `proximo` siempre.
+- **Steam no se vinculaba del todo al momento**: al vincular solo se traían
+  los logros de los 40 juegos más recientes y el resto "al abrir cada
+  ficha". `completarDetalleSteam` (lib/sync.ts) trae el resto por lotes;
+  banner con progreso `CompletarSteam` en Ajustes → Plataformas y en el alta
+  (`/api/steam/completar`), y en la app al abrir Cuentas vinculadas y desde su
+  sincronización de fondo (`/api/mobile/steam/completar`). Límite de uso
+  `completarSteam`. **Sin probar contra Steam real** (no hay cuenta aquí):
+  solo compila, tipa y la UI en el emulador.
+- **Clanes sin botón volver**: `BackButton` en `/clanes` y `/clanes/[tag]`;
+  en la app, cabecera con flecha en las hojas de clan y de liga
+  (`CabeceraHoja`).
+- **Bot de Discord con instrucciones claras**: guía de 5 pasos con el estado
+  real de tu cuenta, problemas frecuentes y botón de invitación
+  (`GuiaBotDiscord`): en Ajustes → Bot de Discord y pública en `/bot-discord`
+  (la abre la app). Enlazada desde el interruptor de DM y "Cómo funciona".
+- Idioma de la app en Ajustes → Idioma; selector de idioma de la web visible
+  en la cabecera también en móvil.
 **Sin probar:** todas las pantallas con sesión iniciada, porque exigen una
 cuenta real. Tampoco el rail en tablet ni el teclado con un campo abierto.
 

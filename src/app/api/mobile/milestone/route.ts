@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
-import { getHitoReservado } from "@/lib/milestones";
+import { getHitoReservado, proximoHito } from "@/lib/milestones";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
 import { errorMovil } from "@/lib/mensajesApi";
@@ -21,5 +21,8 @@ export async function GET(req: Request) {
   const { platinos } = summarise(games);
   const hito = await getHitoReservado(userId, platinos);
 
-  return NextResponse.json({ hito });
+  // `proximo` va SIEMPRE (haya algo reservado o no): la app lo necesita para
+  // decir "Reservar para el #25 · faltan 11" en la ficha de cualquier juego.
+  const numero = proximoHito(platinos);
+  return NextResponse.json({ hito, proximo: { numero, faltan: numero - platinos } });
 }

@@ -9,6 +9,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Dorsal } from "@/components/carreras/Dorsal";
 import { libreaDe } from "@/lib/librea";
 import { ClanActivityFeed } from "@/components/ClanActivityFeed";
+import { BackButton } from "@/components/BackButton";
 import { GuerraDeClanes } from "./GuerraDeClanes";
 import { DURACION_DIAS, clanesRetables, getGuerrasDeClan, type GuerraVista } from "@/lib/clanWars";
 
@@ -64,6 +65,8 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
+      {/* Antes no había forma de volver sin usar el atrás del navegador. */}
+      <BackButton fallbackHref="/clanes" />
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-4">

@@ -854,3 +854,18 @@ Todos los `{ "error": "..." }` de `/api/mobile` salen en el idioma del
 `Accept-Language` (es/en/de/fr) vía `lib/mensajesApi.ts`; lo que no esté en
 su lista sale en español. Al añadir un error nuevo a la API móvil, añadirlo
 ahí también.
+
+## `POST /api/mobile/steam/completar` — Logros de Steam que faltan
+
+Al vincular Steam solo se traen los logros de los 40 juegos más recientes;
+esto trae el resto **por lotes** (~24 juegos por llamada). Sin body.
+`{ "hechos": 24, "restantes": 131 }`. Llamarlo en bucle hasta
+`restantes == 0`, y parar también si `hechos == 0` (juegos que Steam no deja
+leer). La app lo hace al abrir Cuentas vinculadas y en su sincronización de
+fondo. Mismo trabajo en la web: `POST /api/steam/completar` (banner
+`CompletarSteam`).
+
+`GET /api/mobile/milestone` devuelve además `proximo: { numero, faltan }`
+SIEMPRE (el próximo hito redondo y los platinos que faltan, el hito
+incluido), haya o no un juego reservado: la ficha dice "Reservar para el #25
+· faltan 11".

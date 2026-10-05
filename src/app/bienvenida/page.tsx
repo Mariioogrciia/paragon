@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm } from "@/components/forms/Forms";
 import { accountFor, getProfileByUserId } from "@/lib/profiles";
 import { getTranslations } from "next-intl/server";
+import { CompletarSteamSiHaceFalta } from "@/components/CompletarSteamSiHaceFalta";
 
 export const metadata = { title: "Bienvenida · Paragon" };
 
@@ -32,6 +33,10 @@ export default async function BienvenidaPage() {
         {t("bienvenida.title")}
       </h1>
       <p className="mt-2.5 text-[0.9375rem] text-muted">{t("bienvenida.subtitle")}</p>
+
+      <div className="mt-5">
+        <CompletarSteamSiHaceFalta userId={session.user.id} />
+      </div>
 
       <section className="mt-7 rounded-[18px] p-6" style={CARD}>
         <div className="flex items-center gap-3">

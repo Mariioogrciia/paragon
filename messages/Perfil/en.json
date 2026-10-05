@@ -479,7 +479,9 @@
     "quitarReserva": "Remove the reservation on this milestone",
     "reservarTitulo": "Reserve this game for your platinum #{numero}",
     "reservado": "Reserved for #{numero}",
-    "reservar": "Reserve for #{numero}"
+    "reservar": "Reserve for #{numero}",
+    "reservarFaltan": "Reserve for #{numero} · {faltan, plural, one {# platinum to go} other {# platinums to go}}",
+    "reservarTituloFaltan": "Reserve this game for your platinum #{numero} ({faltan, plural, one {# platinum to go} other {# platinums to go}})"
   },
   "ProfileTabsNav": {
     "resumen": "Overview",

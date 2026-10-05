@@ -425,7 +425,7 @@
       "b1t": "Browser-Push",
       "b1": "Ein direkter Hinweis aufs Handy oder in den Browser, sobald du eine Trophäe freischaltest — aktiviere ihn in den Einstellungen. Auf dem iPhone musst du Paragon über „Teilen → Zum Home-Bildschirm“ in Safari installieren, damit es funktioniert (eine Einschränkung von Apple, nicht von Paragon).",
       "b2t": "Discord-Bot",
-      "b2": "Aktiviere DM-Hinweise vom Paragon-Bot in den Einstellungen — dafür musst du dich mit Discord angemeldet haben. Ab dann bekommst du per DM dieselben Dinge, die auch per Push kommen: Freundschaftsanfragen, Level-Ups von Leuten in deiner Umgebung und Liga-Einladungen.",
+      "b2": "Aktiviere DM-Hinweise vom Paragon-Bot in den Einstellungen — dafür musst du dich mit Discord angemeldet haben. Ab dann bekommst du per DM dieselben Dinge, die auch per Push kommen: Freundschaftsanfragen, Level-Ups von Leuten in deiner Umgebung und Liga-Einladungen. Schritt-für-Schritt-Anleitung unter <link>Discord-Bot</link>.",
       "b3t": "Den Bot zu deinem Server hinzufügen",
       "b3ConLink": "Jeder kann ihn mit diesem Link einladen — <link>Paragon zu einem Discord-Server hinzufügen →</link> — Discord fragt, welchen Server, und bittet um Bestätigung der Berechtigungen (verlangt nur <enviarMensajes>Nachrichten senden</enviarMensajes>, um im <comando>/anunciosaqui</comando>-Kanal ankündigen zu können). Du musst nicht Serverbesitzer sein, „Server verwalten“-Rechte dort reichen.",
       "b3LinkTexto": "Paragon zu einem Discord-Server hinzufügen →",

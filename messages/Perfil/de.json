@@ -479,7 +479,9 @@
     "quitarReserva": "Reservierung für diesen Meilenstein aufheben",
     "reservarTitulo": "Dieses Spiel für dein Platin Nr. {numero} reservieren",
     "reservado": "Reserviert für Nr. {numero}",
-    "reservar": "Für Nr. {numero} reservieren"
+    "reservar": "Für Nr. {numero} reservieren",
+    "reservarFaltan": "Für #{numero} reservieren · {faltan, plural, one {noch # Platin} other {noch # Platin}}",
+    "reservarTituloFaltan": "Dieses Spiel für deine Platin #{numero} reservieren (noch {faltan} bis dahin)"
   },
   "ProfileTabsNav": {
     "resumen": "Übersicht",

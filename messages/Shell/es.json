@@ -425,7 +425,7 @@
       "b1t": "Push del navegador",
       "b1": "Un aviso directo al móvil o al navegador en cuanto desbloqueas un trofeo — actívalo desde Ajustes. En iPhone hace falta instalar Paragon desde “Compartir → Añadir a pantalla de inicio” en Safari para que funcione (limitación de Apple, no de Paragon).",
       "b2t": "Bot de Discord",
-      "b2": "Activa los avisos por DM del bot de Paragon desde Ajustes — necesita que hayas iniciado sesión con Discord. A partir de ahí te llegan por DM las cosas que ya llegan por push: solicitudes de amistad, subidas de nivel de gente a tu alrededor e invitaciones a ligas.",
+      "b2": "Activa los avisos por DM del bot de Paragon desde Ajustes — necesita que hayas iniciado sesión con Discord. A partir de ahí te llegan por DM las cosas que ya llegan por push: solicitudes de amistad, subidas de nivel de gente a tu alrededor e invitaciones a ligas. Guía paso a paso en <link>Bot de Discord</link>.",
       "b3t": "Añadir el bot a tu servidor",
       "b3ConLink": "Cualquiera puede invitarlo con este enlace — <link>añadir Paragon a un servidor de Discord →</link> — Discord pedirá qué servidor y confirmar los permisos (solo pide <enviarMensajes>Enviar mensajes</enviarMensajes>, para poder anunciar en el canal de <comando>/anunciosaqui</comando>). No hace falta ser dueño del servidor, basta con permiso de “Gestionar servidor” ahí.",
       "b3LinkTexto": "añadir Paragon a un servidor de Discord →",

@@ -479,7 +479,9 @@
     "quitarReserva": "Retirer la réservation de ce palier",
     "reservarTitulo": "Réserver ce jeu pour ton platine n°{numero}",
     "reservado": "Réservé pour le n°{numero}",
-    "reservar": "Réserver pour le n°{numero}"
+    "reservar": "Réserver pour le n°{numero}",
+    "reservarFaltan": "Réserver pour le n°{numero} · {faltan, plural, one {encore # platine} other {encore # platines}}",
+    "reservarTituloFaltan": "Réserver ce jeu pour ton platine n°{numero} (encore {faltan} pour y arriver)"
   },
   "ProfileTabsNav": {
     "resumen": "Aperçu",

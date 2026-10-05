@@ -138,6 +138,7 @@ export default async function JuegoPage({
         const platinosActuales = summarise(bibliotecaCompleta).platinos;
         return {
           numero: proximoHito(platinosActuales),
+          faltan: proximoHito(platinosActuales) - platinosActuales,
           reservado: await getHitoReservado(profile.userId, platinosActuales),
         };
       })()
@@ -269,6 +270,7 @@ export default async function JuegoPage({
                   <ReservarHitoButton
                     gameId={game.id}
                     numero={hito.numero}
+                    faltan={hito.faltan}
                     reservadoInicial={hito.reservado?.gameId === game.id}
                   />
                 )}

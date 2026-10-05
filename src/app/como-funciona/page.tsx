@@ -218,8 +218,14 @@ export default async function ComoFuncionaPage() {
           <Bloque title={t("notificaciones.b1t")} href="/ajustes" hrefLabel={t("irFlecha")}>
             {t("notificaciones.b1")}
           </Bloque>
-          <Bloque title={t("notificaciones.b2t")} href="/ajustes" hrefLabel={t("irFlecha")}>
-            {t("notificaciones.b2")}
+          <Bloque title={t("notificaciones.b2t")} href="/bot-discord" hrefLabel={t("irFlecha")}>
+            {t.rich("notificaciones.b2", {
+              link: (chunks) => (
+                <Link href="/bot-discord" className="font-semibold text-[var(--accent-text)] underline-offset-2 hover:underline">
+                  {chunks}
+                </Link>
+              ),
+            })}
           </Bloque>
           <Bloque title={t("notificaciones.b3t")}>
             {DISCORD_INVITE_URL ? (

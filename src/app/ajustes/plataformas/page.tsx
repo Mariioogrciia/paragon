@@ -16,6 +16,7 @@ import { getSyncHistory } from "@/lib/syncHistory";
 import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo, EpicGamesLogo } from "@/components/ui/PlatformLogos";
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
 import { getLocale, getTranslations } from "next-intl/server";
+import { CompletarSteamSiHaceFalta } from "@/components/CompletarSteamSiHaceFalta";
 
 export const metadata = { title: "Ajustes · Paragon" };
 
@@ -169,6 +170,8 @@ export default async function AjustesPlataformasPage() {
         <h1 className="font-heading text-2xl font-bold mb-2">{t("ajustesPlataformas.title")}</h1>
         <p className="text-sm text-muted">{t("ajustesPlataformas.description")}</p>
       </div>
+
+      <CompletarSteamSiHaceFalta userId={session.user.id} />
 
       <div className="cuentas-lista">
         <PlatformSection platform="psn" account={psn} t={t}>

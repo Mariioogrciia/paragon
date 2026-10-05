@@ -17,7 +17,8 @@
     "titulo": "Réglages",
     "grupoPerfil": "Ton profil",
     "grupoCuenta": "Compte",
-    "grupoPanel": "Tableau de bord et menu"
+    "grupoPanel": "Tableau de bord et menu",
+    "discord": "Bot Discord"
   },
   "navOcultable": {
     "feed": "Communauté",
@@ -252,7 +253,8 @@
       "notLinked": "Connecte-toi avec Discord (plutôt qu'avec Google) pour pouvoir activer ceci — sans ça, le bot ne sait pas à qui écrire.",
       "title": "Alertes par MP du bot",
       "description": "Un message privé du bot Paragon dès que tu obtiens un nouveau trophée.",
-      "hint": "Pour que le bot puisse t'écrire, vous devez partager un serveur Discord (celui où le bot Paragon est invité) et avoir les MP des membres du serveur activés."
+      "hint": "Pour que le bot puisse t'écrire, vous devez partager un serveur Discord (celui où le bot Paragon est invité) et avoir les MP des membres du serveur activés.",
+      "guia": "Comment connecter le bot, pas à pas →"
     },
     "sync": {
       "syncNow": "Synchroniser maintenant",
@@ -458,5 +460,62 @@
     "titulo": "Trophée débloqué",
     "cerrar": "Fermer",
     "mas": "{n, plural, one {+# nouveau trophée} other {+# nouveaux trophées}}"
+  },
+  "completarSteam": {
+    "titulo": "Synchronisation de tes succès Steam… {hechos} jeux sur {total}",
+    "descripcion": "Tu peux continuer à utiliser Paragon : les jeux affichent leurs succès au fur et à mesure.",
+    "error": "Impossible de récupérer tous tes succès Steam pour l'instant. Ils se complèteront tout seuls, ou appuie sur « Synchroniser maintenant »."
+  },
+  "guiaDiscord": {
+    "titulo": "Bot Discord",
+    "descripcion": "Comment connecter le bot de Paragon, pas à pas. Il te permet d'utiliser des commandes comme /perfil ou /racha sur ton serveur et de recevoir des notifications.",
+    "opcional": "Facultatif",
+    "p1": {
+      "titulo": "Associe ton Discord à ton compte Paragon",
+      "texto": "Le bot sait qui tu es grâce à ton compte Discord. Si tu t'es connecté à Paragon avec Discord, c'est fait. Si tu es entré avec Google, associe ton Discord dans Paramètres → « Connexion et sécurité ».",
+      "listo": "C'est fait : ton Discord est associé.",
+      "boton": "Associer mon Discord"
+    },
+    "p2": {
+      "titulo": "Ajoute le bot à ton serveur",
+      "texto": "Appuie sur le bouton, choisis le serveur Discord voulu et confirme. Il te faut la permission <b>Gérer le serveur</b> sur ce serveur (pas besoin d'en être le propriétaire). Le bot ne demande que la permission d'envoyer des messages.",
+      "boton": "Ajouter Paragon à Discord",
+      "sinConfigurar": "Le bot n'est pas encore configuré sur ce Paragon. Reviens plus tard.",
+      "yaEsta": "Si le bot est déjà sur ton serveur (quelqu'un d'autre l'a ajouté), passe cette étape."
+    },
+    "p3": {
+      "titulo": "Vérifie que ça marche",
+      "texto": "Dans n'importe quel salon de ce serveur, écris <c>/perfil</c> et envoie. S'il répond avec tes statistiques Paragon, tout est bon.",
+      "nota": "Si Discord ne propose pas les commandes de Paragon quand tu tapes « / », attends quelques minutes et redémarre l'app Discord."
+    },
+    "p4": {
+      "titulo": "Annonces dans un salon",
+      "texto": "Dans le salon où tu veux les annonces (par exemple quand quelqu'un du serveur monte de niveau sur Paragon), écris <c>/anunciosaqui</c>. Ça ne marche que si tu gères le serveur, et ça n'annonce que les personnes qui ont activé les notifications Discord dans Paragon."
+    },
+    "p5": {
+      "titulo": "Notifications par message privé",
+      "texto": "Active « Notifications MP du bot » dans Paramètres → Général et le bot t'écrira quand tu obtiens un trophée. Pour qu'il puisse t'écrire, vous devez partager un serveur (celui qui a le bot) et autoriser les messages privés des membres du serveur (dans Discord : paramètres du serveur → Confidentialité).",
+      "boton": "Aller à Paramètres → Général"
+    },
+    "fallos": {
+      "titulo": "Si quelque chose ne marche pas",
+      "noVinculada": {
+        "pregunta": "Le bot dit que mon compte n'est pas associé",
+        "respuesta": "Tu utilises un autre Discord que celui associé à Paragon. Connecte-toi à Paragon (ou associe-le dans « Connexion et sécurité ») avec le même compte Discord que celui avec lequel tu écris les commandes."
+      },
+      "noResponde": {
+        "pregunta": "Discord dit « L'application n'a pas répondu »",
+        "respuesta": "Ça arrive parfois la première fois après un moment sans utiliser le bot, car il met un instant à démarrer. Renvoie la commande."
+      },
+      "noComandos": {
+        "pregunta": "Les commandes n'apparaissent pas quand je tape /",
+        "respuesta": "Vérifie que le bot est sur le serveur (il est dans la liste des membres). Si tu viens de l'ajouter, Discord peut mettre quelques minutes à afficher les commandes ; redémarre l'app Discord. Essaie <c>/help</c>."
+      },
+      "noDm": {
+        "pregunta": "Je ne reçois pas les notifications par message privé",
+        "respuesta": "Vérifie que ton Discord est associé (étape 1), que tu partages un serveur avec le bot et que tu autorises les messages privés des membres du serveur. Dans Paramètres → Général, interrupteur activé, un bouton « Tester » t'indique la raison exacte en cas d'échec."
+      }
+    },
+    "comandos": "Liste des commandes et plus de détails dans <link>Comment ça marche</link>."
   }
 }

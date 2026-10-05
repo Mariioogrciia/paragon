@@ -17,7 +17,8 @@
     "titulo": "Settings",
     "grupoPerfil": "Your profile",
     "grupoCuenta": "Account",
-    "grupoPanel": "Dashboard and menu"
+    "grupoPanel": "Dashboard and menu",
+    "discord": "Discord bot"
   },
   "navOcultable": {
     "feed": "Community",
@@ -252,7 +253,8 @@
       "notLinked": "Sign in with Discord (instead of Google) to be able to turn this on — without that, the bot doesn't know who to message.",
       "title": "DM alerts from the bot",
       "description": "A direct message from the Paragon bot whenever you earn a new trophy.",
-      "hint": "For the bot to be able to message you, you both need to share a Discord server (the same one the Paragon bot is invited to) and have DMs from server members enabled."
+      "hint": "For the bot to be able to message you, you both need to share a Discord server (the same one the Paragon bot is invited to) and have DMs from server members enabled.",
+      "guia": "How to connect the bot, step by step →"
     },
     "sync": {
       "syncNow": "Sync now",
@@ -458,5 +460,62 @@
     "titulo": "Trophy unlocked",
     "cerrar": "Close",
     "mas": "{n, plural, one {+# more new trophy} other {+# more new trophies}}"
+  },
+  "completarSteam": {
+    "titulo": "Syncing your Steam achievements… {hechos} of {total} games",
+    "descripcion": "You can keep using Paragon: games show their achievements as they arrive.",
+    "error": "Couldn't fetch all your Steam achievements right now. They'll fill in on their own, or you can press “Sync now”."
+  },
+  "guiaDiscord": {
+    "titulo": "Discord bot",
+    "descripcion": "How to connect the Paragon bot, step by step. It lets you use commands like /perfil or /racha in your server and get notifications.",
+    "opcional": "Optional",
+    "p1": {
+      "titulo": "Link your Discord to your Paragon account",
+      "texto": "The bot knows who you are by your Discord account. If you signed in to Paragon with Discord, you're done. If you signed in with Google, link your Discord in Settings → “Sign-in and security”.",
+      "listo": "Done: your Discord is linked.",
+      "boton": "Link my Discord"
+    },
+    "p2": {
+      "titulo": "Add the bot to your server",
+      "texto": "Press the button, pick the Discord server you want it in and confirm. You need the <b>Manage Server</b> permission on that server (you don't have to be the owner). The bot only asks for permission to send messages.",
+      "boton": "Add Paragon to Discord",
+      "sinConfigurar": "The bot isn't set up on this Paragon yet. Come back later.",
+      "yaEsta": "If the bot is already in your server (someone else added it), skip this step."
+    },
+    "p3": {
+      "titulo": "Check that it works",
+      "texto": "In any channel of that server type <c>/perfil</c> and send it. If it replies with your Paragon stats, everything is fine.",
+      "nota": "If Discord doesn't suggest Paragon's commands when you type “/”, wait a few minutes and restart the Discord app."
+    },
+    "p4": {
+      "titulo": "Announcements in a channel",
+      "texto": "In the channel where you want announcements (for example when someone in the server levels up on Paragon) type <c>/anunciosaqui</c>. It only works if you manage the server, and it only announces people who have Discord notifications turned on in Paragon."
+    },
+    "p5": {
+      "titulo": "Direct-message notifications",
+      "texto": "Turn on “Bot DM notifications” in Settings → General and the bot will message you when you earn a trophy. For it to be able to message you, you must share a server (the one with the bot) and allow direct messages from server members (in Discord: server settings → Privacy).",
+      "boton": "Go to Settings → General"
+    },
+    "fallos": {
+      "titulo": "If something doesn't work",
+      "noVinculada": {
+        "pregunta": "The bot says my account isn't linked",
+        "respuesta": "You're using a different Discord from the one you linked to Paragon. Sign in to Paragon (or link under “Sign-in and security”) with the same Discord account you type the commands with."
+      },
+      "noResponde": {
+        "pregunta": "Discord says “The application did not respond”",
+        "respuesta": "It sometimes happens the first time after a while without using the bot, because it takes a moment to wake up. Send the command again."
+      },
+      "noComandos": {
+        "pregunta": "The commands don't show up when I type /",
+        "respuesta": "Check that the bot is in the server (it's in the member list). If you just added it, Discord can take a few minutes to show the commands; restart the Discord app. Try <c>/help</c>."
+      },
+      "noDm": {
+        "pregunta": "I'm not getting direct-message notifications",
+        "respuesta": "Check that your Discord is linked (step 1), that you share a server with the bot and that you allow direct messages from server members. In Settings → General, with the switch on, a “Test” button tells you the exact reason if it fails."
+      }
+    },
+    "comandos": "Full command list and more details in <link>How it works</link>."
   }
 }

@@ -79,6 +79,8 @@ export const LIMITES = {
   resync: [20, 600],
   pushToken: [10, 600],
   reaccion: [60, 60],
+  // Lotes de logros de Steam tras vincular (~24 juegos cada uno: 200 juegos = 9 llamadas).
+  completarSteam: [40, 600],
 } as const satisfies Record<string, readonly [number, number]>;
 
 export function limitar(accion: keyof typeof LIMITES, quien: string): Promise<boolean> {

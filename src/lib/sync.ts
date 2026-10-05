@@ -1,7 +1,7 @@
 import "server-only";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, like, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { activities, gameTrophies, games, userGames, userTrophies, syncRuns, users } from "@/db/schema";
+import { activities, gameTrophies, games, platformAccounts, userGames, userTrophies, syncRuns, users } from "@/db/schema";
 import { avisoPermitido } from "@/lib/avisosPreferencias";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
 import type { AuthorizationPayload } from "psn-api";
@@ -130,6 +130,69 @@ async function soloDesactualizados(userId: string, gameIds: string[], platform: 
   );
 
   return gameIds.filter((id) => !frescos.has(id));
+}
+
+/**
+ * Juegos de Steam de esta persona cuyo detalle de logros todavía no se ha
+ * traído (`trophiesSyncedAt` nulo), los más jugados primero.
+ *
+ * Al vincular, solo se traen los STEAM_DETAIL_LIMIT más recientes (Steam no
+ * da los logros en la llamada de biblioteca: hay que pedirlos juego a juego)
+ * y el resto "se rellena al abrir cada ficha" — así que justo después de
+ * vincular casi toda la biblioteca de Steam salía sin logros y parecía que
+ * no se habían vinculado (queja real, 5 oct 2026). `completarDetalleSteam`
+ * termina ese trabajo por lotes, en cuanto se vincula.
+ */
+export async function juegosSteamSinDetalle(userId: string): Promise<string[]> {
+  const filas = await db
+    .select({ gameId: userGames.gameId })
+    .from(userGames)
+    .where(and(eq(userGames.userId, userId), like(userGames.gameId, "steam-%"), isNull(userGames.trophiesSyncedAt)))
+    .orderBy(desc(sql`coalesce(${userGames.playtimeMinutes}, 0)`));
+  return filas.map((f) => f.gameId);
+}
+
+export interface ProgresoSteam {
+  /** Juegos cuyo detalle se ha traído en esta llamada. */
+  hechos: number;
+  /** Juegos que siguen sin detalle. */
+  restantes: number;
+}
+
+/**
+ * Un lote de `completarDetalleSteam`: trae el detalle de logros de los
+ * juegos de Steam que faltan, hasta `lote` juegos o hasta agotar
+ * `presupuestoMs` (lo que llegue primero), y dice cuántos quedan. Se llama
+ * en bucle desde el cliente (web y app) hasta que `restantes` sea 0; si en
+ * una llamada no se consigue ninguno (`hechos` 0), el cliente para — son
+ * juegos que Steam no deja leer, no hay nada que reintentar ahora.
+ */
+export async function completarDetalleSteam(
+  userId: string,
+  opts: { lote?: number; presupuestoMs?: number } = {},
+): Promise<ProgresoSteam> {
+  const [cuenta] = await db
+    .select({ accountId: platformAccounts.accountId, isPublic: platformAccounts.isPublic })
+    .from(platformAccounts)
+    .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, "steam")))
+    .limit(1);
+  if (!cuenta || !cuenta.isPublic) return { hechos: 0, restantes: 0 };
+
+  const pendientes = await juegosSteamSinDetalle(userId);
+  if (pendientes.length === 0) return { hechos: 0, restantes: 0 };
+
+  const lote = pendientes.slice(0, opts.lote ?? 24);
+  const limite = Date.now() + (opts.presupuestoMs ?? 35_000);
+  let hechos = 0;
+
+  await mapLimit(lote, STEAM_CONCURRENCY, async (gameId) => {
+    // Con el tiempo agotado no se arranca ninguno nuevo (los que ya van, terminan).
+    if (Date.now() > limite) return;
+    await syncGameTrophies(userId, { platform: "steam", accountId: cuenta.accountId }, gameId);
+    hechos++;
+  });
+
+  return { hechos, restantes: pendientes.length - hechos };
 }
 
 /** Lanza las tareas de N en N: ni una a una (lento) ni todas (Steam corta). */

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { EyeOff, Gamepad2, Palette, ShieldCheck, Sparkles, UserRound, type LucideIcon } from "lucide-react";
+import { EyeOff, Gamepad2, MessageCircle, Palette, ShieldCheck, Sparkles, UserRound, type LucideIcon } from "lucide-react";
 
 const GRUPOS: { clave: "grupoPerfil" | "grupoCuenta" | "grupoPanel"; items: { href: string; clave: string; icono: LucideIcon }[] }[] = [
   {
@@ -19,6 +19,7 @@ const GRUPOS: { clave: "grupoPerfil" | "grupoCuenta" | "grupoPanel"; items: { hr
     items: [
       { href: "/ajustes/seguridad", clave: "seguridad", icono: ShieldCheck },
       { href: "/ajustes/plataformas", clave: "plataformas", icono: Gamepad2 },
+      { href: "/ajustes/discord", clave: "discord", icono: MessageCircle },
     ],
   },
   {

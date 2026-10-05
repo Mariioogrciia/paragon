@@ -425,7 +425,7 @@
       "b1t": "Push du navigateur",
       "b1": "Une alerte directe sur ton mobile ou ton navigateur dès que tu débloques un trophée — active-la depuis les Paramètres. Sur iPhone, il faut installer Paragon via « Partager → Sur l'écran d'accueil » dans Safari pour que ça marche (une limite d'Apple, pas de Paragon).",
       "b2t": "Bot Discord",
-      "b2": "Active les alertes en MP du bot Paragon depuis les Paramètres — il faut t'être connecté avec Discord. À partir de là, tu reçois par MP les mêmes choses qui arrivent déjà par push : demandes d'amis, montées de niveau des gens autour de toi et invitations aux ligues.",
+      "b2": "Active les alertes en MP du bot Paragon depuis les Paramètres — il faut t'être connecté avec Discord. À partir de là, tu reçois par MP les mêmes choses qui arrivent déjà par push : demandes d'amis, montées de niveau des gens autour de toi et invitations aux ligues. Guide pas à pas dans <link>Bot Discord</link>.",
       "b3t": "Ajouter le bot à ton serveur",
       "b3ConLink": "N'importe qui peut l'inviter avec ce lien — <link>ajouter Paragon à un serveur Discord →</link> — Discord demandera quel serveur et de confirmer les autorisations (il ne demande que <enviarMensajes>Envoyer des messages</enviarMensajes>, pour pouvoir annoncer dans le canal <comando>/anunciosaqui</comando>). Pas besoin d'être propriétaire du serveur, l'autorisation « Gérer le serveur » suffit.",
       "b3LinkTexto": "ajouter Paragon à un serveur Discord →",

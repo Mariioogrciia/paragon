@@ -8,6 +8,7 @@ import { auth } from "@/auth";
 import { getPendingInvites, getUserClan } from "@/lib/clans";
 
 import { SeccionTabs } from "@/components/SeccionTabs";
+import { BackButton } from "@/components/BackButton";
 import { getTranslations } from "next-intl/server";
 import { Dorsal } from "@/components/carreras/Dorsal";
 import { libreaDe } from "@/lib/librea";
@@ -38,6 +39,7 @@ export default async function ClanesPage() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-7 py-12">
+      <BackButton fallbackHref="/" />
       <SeccionTabs seccion="comunidad" />
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>

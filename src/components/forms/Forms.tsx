@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import {
   addFriendAction,
   addLeagueMemberAction,
@@ -444,9 +445,12 @@ export function DiscordDmForm({ enabled, vinculado }: { enabled: boolean; vincul
 
   if (!vinculado) {
     return (
-      <p className="text-xs leading-relaxed text-muted">
-        {t("forms.discordDm.notLinked")}
-      </p>
+      <div>
+        <p className="text-xs leading-relaxed text-muted">{t("forms.discordDm.notLinked")}</p>
+        <Link href="/ajustes/discord" className="mt-2 inline-block text-xs font-semibold text-[var(--accent-text)] underline-offset-2 hover:underline">
+          {t("forms.discordDm.guia")}
+        </Link>
+      </div>
     );
   }
 
@@ -482,6 +486,9 @@ export function DiscordDmForm({ enabled, vinculado }: { enabled: boolean; vincul
       <p className="mt-3 text-xs leading-relaxed text-muted">
         {t("forms.discordDm.hint")}
       </p>
+      <Link href="/ajustes/discord" className="mt-2 inline-block text-xs font-semibold text-[var(--accent-text)] underline-offset-2 hover:underline">
+        {t("forms.discordDm.guia")}
+      </Link>
     </div>
   );
 }

@@ -479,7 +479,9 @@
     "quitarReserva": "Quitar la reserva de este hito",
     "reservarTitulo": "Reservar este juego para tu platino #{numero}",
     "reservado": "Reservado para el #{numero}",
-    "reservar": "Reservar para el #{numero}"
+    "reservar": "Reservar para el #{numero}",
+    "reservarFaltan": "Reservar para el #{numero} · {faltan, plural, one {falta # platino} other {faltan # platinos}}",
+    "reservarTituloFaltan": "Reservar este juego para tu platino #{numero} (te {faltan, plural, one {falta # platino} other {faltan # platinos}} para llegar)"
   },
   "ProfileTabsNav": {
     "resumen": "Resumen",
