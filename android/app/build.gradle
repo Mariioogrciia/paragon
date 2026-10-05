@@ -14,8 +14,11 @@ android {
         applicationId "com.paragon.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // 2 / 1.1 (4 oct 2026): login cifrado, app traducida, apariencia de la
+        // web. Subir en cada APK que se reparta (Android no instala encima
+        // una con el mismo versionCode desde una tienda).
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -25,8 +28,11 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // R8: APK más pequeña y más rápida. Las reglas propias (Moshi por
+            // reflexión, Capacitor, Glance) están en proguard-rules.pro.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     buildFeatures {

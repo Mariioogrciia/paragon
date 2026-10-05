@@ -822,3 +822,35 @@ endpoint aparte. `400` si falta `title`/`igdbId` válido.
 ```json
 { "gameId": "manual:1234:deseados" }
 ```
+
+## `GET|POST /api/mobile/appearance` — Apariencia de la cuenta (la misma que la web)
+
+Acento, color libre, paleta "desde tu juego", estilo y tamaño de texto de
+Ajustes → Apariencia (`lib/aparienciaCuenta.ts`, compartido con la acción de
+la web). El **modo** (oscuro/claro/OLED/contraste) NO viaja: es de cada
+dispositivo.
+
+```json
+{
+  "guardada": true,
+  "acento": "accent-fosforo", "acentoLibre": "",
+  "acentoJuego": { "id": "steam-1145360", "color": "#c0392b",
+    "paleta": { "rgb": "212 90 70", "rgbClaro": "170 50 35", "c2": "#f3c4bb",
+                "bg": "#150d0c", "surface": "#1c1210", "surface2": "#281a17", "border": "#3a2723" } },
+  "estilo": "estilo-terminal", "tamanoTexto": "grande",
+  "nivel": 42, "requisitosEstilo": { "estilo-ps5": 10, "estilo-xbox": 10, "estilo-steam": 20, "estilo-switch": 20 }
+}
+```
+`guardada: false` = la cuenta nunca eligió nada: la app sube la suya del
+teléfono. El POST recibe `{ acento, acentoLibre, acentoJuego?: {id,color}, estilo,
+tamanoTexto }`, lo normaliza (nada de clases o colores inventados; un estilo
+por encima del `nivel` se quita) y devuelve lo guardado de verdad. Claves
+iguales que la web (`accent-*`, `estilo-*`); catálogo y colores en
+`ui/theme/Apariencia.kt`, que hay que mantener a la par de `globals.css`.
+
+## Errores en el idioma del teléfono
+
+Todos los `{ "error": "..." }` de `/api/mobile` salen en el idioma del
+`Accept-Language` (es/en/de/fr) vía `lib/mensajesApi.ts`; lo que no esté en
+su lista sale en español. Al añadir un error nuevo a la API móvil, añadirlo
+ahí también.

@@ -138,7 +138,7 @@ private fun RachaContent(detalle: RachaDetalle) {
 private fun MiniStatRacha(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .background(Surface2, RoundedCornerShape(14.dp))
+            .background(Surface2, RoundedCornerShape(radio(14)))
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -182,10 +182,10 @@ private fun DiasGrid(dias: List<DiaActividad>) {
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
-                            .background(color, RoundedCornerShape(6.dp))
+                            .background(color, RoundedCornerShape(radio(6)))
                             .then(
                                 if (dia === hoy) {
-                                    Modifier.border(2.dp, Accent.copy(alpha = pulso), RoundedCornerShape(6.dp))
+                                    Modifier.border(2.dp, Accent.copy(alpha = pulso), RoundedCornerShape(radio(6)))
                                 } else Modifier,
                             ),
                     )

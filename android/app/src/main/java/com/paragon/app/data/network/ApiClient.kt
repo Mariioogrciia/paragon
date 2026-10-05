@@ -40,6 +40,10 @@ object ApiClient {
      */
     private var cache: okhttp3.Cache? = null
 
+    /** Solo lo pone el modo demo de la compilación de depuración (src/debug/.../ModoDemo.kt). */
+    @Volatile
+    var interceptorDemo: Interceptor? = null
+
     fun init(context: android.content.Context) {
         if (cache == null) cache = okhttp3.Cache(java.io.File(context.cacheDir, "http"), 10L * 1024 * 1024)
     }
@@ -71,6 +75,7 @@ object ApiClient {
     fun dietApi(tokenStore: TokenStore): DietApi = retrofit(tokenStore).create(DietApi::class.java)
     fun wrapApi(tokenStore: TokenStore): WrapApi = retrofit(tokenStore).create(WrapApi::class.java)
     fun trophyGuidesApi(tokenStore: TokenStore): TrophyGuidesApi = retrofit(tokenStore).create(TrophyGuidesApi::class.java)
+    fun aparienciaApi(tokenStore: TokenStore): AparienciaApi = retrofit(tokenStore).create(AparienciaApi::class.java)
 
     /**
      * Un único Retrofit cacheado para todos los servicios — `.create()` sobre
@@ -86,6 +91,7 @@ object ApiClient {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenStore))
             .apply { cache?.let { cache(it) } }
+            .apply { interceptorDemo?.let { addInterceptor(it) } }
             .build()
 
         val moshi = Moshi.Builder()

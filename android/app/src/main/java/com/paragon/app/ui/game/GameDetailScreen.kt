@@ -357,7 +357,7 @@ private fun GameDetailHero(
             val coverModifier = Modifier
                 .width(96.dp)
                 .height(136.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(radio(12)))
                 .background(Surface)
                 .let { base ->
                     if (sharedTransitionScope != null && animatedVisibilityScope != null) {
@@ -411,13 +411,13 @@ private fun GameDetailHero(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
-                        .background(Surface2, RoundedCornerShape(4.dp)),
+                        .background(Surface2, RoundedCornerShape(radio(4))),
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(game.percent / 100f)
                             .fillMaxHeight()
-                            .background(dynamicColor, RoundedCornerShape(4.dp)),
+                            .background(dynamicColor, RoundedCornerShape(radio(4))),
                     )
                 }
                 // Total acumulado, no por sesión — la plataforma no da más
@@ -537,7 +537,7 @@ private fun GameActionsRow(
 private fun ActionChip(label: String, active: Boolean, accentColor: Color, onClick: () -> Unit) {
     androidx.compose.material3.Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(radio(20)),
         color = if (active) accentColor.copy(alpha = 0.16f) else Surface,
         border = androidx.compose.foundation.BorderStroke(1.dp, if (active) accentColor.copy(alpha = 0.6f) else Border),
     ) {
@@ -771,7 +771,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .fillMaxWidth()
-                    .background(Surface, RoundedCornerShape(14.dp))
+                    .background(Surface, RoundedCornerShape(radio(14)))
                     .padding(14.dp),
             ) {
                 Text(text = p.trofeo.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
@@ -813,7 +813,7 @@ private fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = M
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Surface2, RoundedCornerShape(12.dp))
+                                .background(Surface2, RoundedCornerShape(radio(12)))
                                 .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -877,7 +877,7 @@ private fun TrophyRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
+            .background(Surface, RoundedCornerShape(radio(16)))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -890,7 +890,7 @@ private fun TrophyRow(
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .clip(RoundedCornerShape(11.dp))
+                .clip(RoundedCornerShape(radio(11)))
                 .background(gradeColor(trophy.grade).copy(alpha = if (trophy.earned) 1f else 0.25f))
                 .alpha(if (trophy.earned) 1f else 0.42f),
             contentAlignment = Alignment.Center,
@@ -1066,8 +1066,8 @@ private fun NotesSection(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Surface, RoundedCornerShape(12.dp))
-                        .border(1.dp, Border, RoundedCornerShape(12.dp))
+                        .background(Surface, RoundedCornerShape(radio(12)))
+                        .border(1.dp, Border, RoundedCornerShape(radio(12)))
                         .clickable { isEditing = true }
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
@@ -1082,8 +1082,8 @@ private fun NotesSection(
                     lineHeight = 20.sp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Surface, RoundedCornerShape(12.dp))
-                        .border(1.dp, Border, RoundedCornerShape(12.dp))
+                        .background(Surface, RoundedCornerShape(radio(12)))
+                        .border(1.dp, Border, RoundedCornerShape(radio(12)))
                         .padding(16.dp)
                 )
             }

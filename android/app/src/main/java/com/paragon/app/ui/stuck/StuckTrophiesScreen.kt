@@ -109,8 +109,8 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .background(Surface, RoundedCornerShape(radio(16)))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -118,7 +118,7 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
             model = trophy.coverUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp))
+            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(radio(8)))
         )
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {

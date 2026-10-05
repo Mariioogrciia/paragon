@@ -265,17 +265,17 @@ private fun ProfileContent(
             Button(
                 onClick = onCompareClick,
                 modifier = Modifier.fillMaxWidth().height(54.dp),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(radio(14)),
                 contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Brush.linearGradient(listOf(Accent, dominantColor ?: Color(0xFF7657FF))), RoundedCornerShape(14.dp)),
+                        .background(Brush.linearGradient(listOf(Accent, dominantColor ?: Color(0xFF7657FF))), RoundedCornerShape(radio(14))),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(stringResource(R.string.perfil_comparar), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(stringResource(R.string.perfil_comparar), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = textoSobre(Accent))
                 }
             }
 
@@ -287,7 +287,7 @@ private fun ProfileContent(
                     else themeStore.setRivalHandle(profile.handle)
                 },
                 modifier = Modifier.fillMaxWidth().height(46.dp),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(radio(14)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isRival) Platinum else Foreground),
                 border = androidx.compose.foundation.BorderStroke(1.dp, if (isRival) Platinum.copy(alpha = 0.5f) else Border)
             ) {
@@ -343,8 +343,8 @@ private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(16.dp))
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .background(Surface2, RoundedCornerShape(radio(16)))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .padding(18.dp)
     ) {
         Text(stringResource(R.string.perfil_rivalidad), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -376,8 +376,8 @@ private fun RecentGameCard(game: com.paragon.app.data.network.RecentGameDto) {
     Row(
         modifier = Modifier
             .width(220.dp)
-            .background(Surface2, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp)),
+            .background(Surface2, RoundedCornerShape(radio(12)))
+            .clip(RoundedCornerShape(radio(12))),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier.size(64.dp).background(Background)) {

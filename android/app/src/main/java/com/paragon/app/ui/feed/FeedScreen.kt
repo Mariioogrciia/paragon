@@ -233,8 +233,8 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .background(Surface, RoundedCornerShape(radio(16)))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .pointerInput(item.id) {
                 detectTapGestures(
                     onDoubleTap = { toggleReaction() },

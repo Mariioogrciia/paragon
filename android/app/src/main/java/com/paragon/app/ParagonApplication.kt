@@ -20,6 +20,13 @@ class ParagonApplication : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         Textos.init(this)
         com.paragon.app.data.network.ApiClient.init(this)
+        // Modo demo (solo existe en la compilación de depuración, ver
+        // src/debug/.../ModoDemo.kt): en producción la clase no está y no pasa nada.
+        if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            try {
+                Class.forName("com.paragon.app.demo.ModoDemo").getMethod("instalar", android.content.Context::class.java).invoke(null, this)
+            } catch (e: Exception) { }
+        }
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {

@@ -83,8 +83,8 @@ fun ShakeRouletteOverlay(
         Column(
             modifier = Modifier
                 .padding(32.dp)
-                .background(Surface, RoundedCornerShape(24.dp))
-                .border(1.dp, Border, RoundedCornerShape(24.dp))
+                .background(Surface, RoundedCornerShape(radio(24)))
+                .border(1.dp, Border, RoundedCornerShape(radio(24)))
                 .padding(28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -96,11 +96,11 @@ fun ShakeRouletteOverlay(
                     model = shown.coverUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(140.dp).clip(RoundedCornerShape(16.dp)),
+                    modifier = Modifier.size(140.dp).clip(RoundedCornerShape(radio(16))),
                 )
             } else {
                 Box(
-                    modifier = Modifier.size(140.dp).background(AccentSoft, RoundedCornerShape(16.dp)),
+                    modifier = Modifier.size(140.dp).background(AccentSoft, RoundedCornerShape(radio(16))),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(text = shown.title.take(1).uppercase(), color = Accent, fontSize = 40.sp, fontWeight = FontWeight.Bold)

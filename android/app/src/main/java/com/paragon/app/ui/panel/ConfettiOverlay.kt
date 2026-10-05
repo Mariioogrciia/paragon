@@ -32,7 +32,7 @@ private class Confeti(
 
 /**
  * Lluvia de "platinos" — easter egg de PanelScreen (5 toques seguidos en
- * PlatinumStatTile). Un `Canvas` con ~40 cuadrados cayendo en vez de una
+ * ResumenCard). Un `Canvas` con ~40 cuadrados cayendo en vez de una
  * librería de partículas: no hace falta más para un guiño de 2 segundos.
  */
 @Composable

@@ -84,7 +84,7 @@ fun HeroGameCard(
 ) {
     val restantes = game.totalTrophies - game.earnedTrophies
     val aura = rememberCoverAuraColor(game.coverUrl)
-    val shape = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(radio(20))
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -152,8 +152,8 @@ fun HeroGameCard(
                 modifier = Modifier
                     .width(100.dp)
                     .height(140.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(1.dp, Border, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(radio(12)))
+                    .border(1.dp, Border, RoundedCornerShape(radio(12)))
             )
 
             Spacer(modifier = Modifier.width(20.dp))
@@ -175,7 +175,7 @@ fun HeroGameCard(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                     modifier = Modifier
-                        .background(colorEtiqueta.copy(alpha = 0.14f), RoundedCornerShape(12.dp))
+                        .background(colorEtiqueta.copy(alpha = 0.14f), RoundedCornerShape(radio(12)))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
 
@@ -238,13 +238,13 @@ fun HeroGameCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
-                        .background(Surface2, RoundedCornerShape(4.dp))
+                        .background(Surface2, RoundedCornerShape(radio(4)))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(progresoAnimado)
                             .fillMaxHeight()
-                            .background(accentColor, RoundedCornerShape(4.dp))
+                            .background(accentColor, RoundedCornerShape(radio(4)))
                     )
                 }
             }
@@ -271,8 +271,8 @@ fun StandardGameCard(
         modifier = Modifier
             .width(180.dp)
             .height(260.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .background(Surface)
             .clickable { onClick() }
     ) {
@@ -386,9 +386,9 @@ fun NextTrophyCard(trophy: NextTrophy, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(radio(16)))
             .background(Surface)
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -398,8 +398,8 @@ fun NextTrophyCard(trophy: NextTrophy, onClick: () -> Unit = {}) {
             title = trophy.trophyName,
             modifier = Modifier
                 .size(44.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .border(1.dp, gradeColor(trophy.grade).copy(alpha = 0.5f), RoundedCornerShape(10.dp)),
+                .clip(RoundedCornerShape(radio(10)))
+                .border(1.dp, gradeColor(trophy.grade).copy(alpha = 0.5f), RoundedCornerShape(radio(10))),
         )
 
         Spacer(modifier = Modifier.width(12.dp))

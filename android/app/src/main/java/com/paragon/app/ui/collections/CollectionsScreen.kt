@@ -200,8 +200,8 @@ private fun CollectionsList(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Surface, RoundedCornerShape(14.dp))
-                    .border(1.dp, Border, RoundedCornerShape(14.dp))
+                    .background(Surface, RoundedCornerShape(radio(14)))
+                    .border(1.dp, Border, RoundedCornerShape(radio(14)))
                     .clickable { onOpen(coleccion) }
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -251,7 +251,7 @@ private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> U
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Surface, RoundedCornerShape(14.dp))
+                    .background(Surface, RoundedCornerShape(radio(14)))
                     .clickable { onOpenGame(game.id) }
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -259,7 +259,7 @@ private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> U
                 AsyncImage(
                     model = game.coverUrl,
                     contentDescription = null,
-                    modifier = Modifier.size(44.dp).background(Surface2, RoundedCornerShape(10.dp)),
+                    modifier = Modifier.size(44.dp).background(Surface2, RoundedCornerShape(radio(10))),
                 )
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {

@@ -1368,6 +1368,29 @@ commits:
 - En el emulador (Pixel 7a, API 35): login en es/en/de y enlaces falsos
   ignorados.
 
+**Segunda tanda (5 oct 2026)**: icono, apariencia, minificado, errores traducidos.
+- **Icono**: la P de la web, adaptativo con capa monocroma (iconos
+  temáticos de Android 13); los accesos de PlayStation/Xbox/Steam enseñan
+  la misma P. La marca de dentro de la app es la P (`ParagonMark`), ya no
+  la gema con flecha.
+- **Apariencia como la web y sincronizada** (`/api/mobile/appearance`,
+  `lib/aparienciaCuenta.ts` compartido con la acción web): modos
+  (sistema/oscuro/claro/OLED/contraste), 12 acentos y paletas, color libre,
+  paleta de juego (la elige la web; la app la aplica), 8 estilos con su
+  nivel mínimo y tamaño de texto. Pantalla propia (Ajustes → Apariencia)
+  con muestra en vivo. Los temas de plataforma y la tipografía propios de
+  la app desaparecen; el color propio antiguo pasa a color libre.
+- **Panel reordenado**: primero el objetivo, luego un resumen único
+  (`ResumenCard`), siguiente trofeo y al final lo secundario.
+- **Errores del servidor traducidos** (`lib/mensajesApi.ts`).
+- **R8**: release 26 → 6 MB, `versionCode 2 / 1.1`. Comprobado que la
+  APK minificada parsea los JSON (con el modo demo) y arranca.
+- **Modo demo** (solo debug) para revisar pantallas con sesión.
+- Arreglado un cierre al arrancar sin Play Services o sin red (la tarea de
+  FCM lanzaba la excepción).
+- **Sin probar**: nada con datos reales (solo con el modo demo); el rail
+  en tablet; una APK **firmada** de producción (solo probada con la clave
+  de depuración). Para repartirla hará falta una clave propia.
 **Sin probar:** todas las pantallas con sesión iniciada, porque exigen una
 cuenta real. Tampoco el rail en tablet ni el teclado con un campo abierto.
 

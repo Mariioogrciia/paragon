@@ -278,8 +278,8 @@ private fun SectionCard(title: String, subtitle: String? = null, content: @Compo
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .background(Surface, RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(20.dp),
     ) {
         Text(text = title.uppercase(), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -316,7 +316,7 @@ private fun ParagonScoreCard(score: ParagonScoreStats) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(text = fila.platform.uppercase(), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    Text(text = stringResource(R.string.stats_score_fila, fila.puntos, fila.trofeos), color = Foreground, fontSize = 13.sp)
+                    Text(text = stringResource(R.string.stats_score_fila, com.paragon.app.ui.panel.cifra(fila.puntos), com.paragon.app.ui.panel.cifra(fila.trofeos)), color = Foreground, fontSize = 13.sp)
                 }
             }
         }
@@ -336,7 +336,7 @@ private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?)
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp)
-                    .background(Surface2, RoundedCornerShape(14.dp))
+                    .background(Surface2, RoundedCornerShape(radio(14)))
                     .padding(14.dp),
             ) {
                 Text(text = stringResource(R.string.stats_estilo), color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -372,12 +372,12 @@ private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?)
                     animationSpec = androidx.compose.animation.core.tween(700),
                     label = "ejeDna",
                 )
-                Box(modifier = Modifier.fillMaxWidth().height(6.dp).background(Surface2, RoundedCornerShape(3.dp))) {
+                Box(modifier = Modifier.fillMaxWidth().height(6.dp).background(Surface2, RoundedCornerShape(radio(3)))) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(fraccionAnimada)
                             .fillMaxHeight()
-                            .background(Accent, RoundedCornerShape(3.dp)),
+                            .background(Accent, RoundedCornerShape(radio(3))),
                     )
                 }
             }
@@ -423,7 +423,7 @@ private fun RachasCard(rachas: RachasStats, historico: HistoricoStats) {
 @Composable
 private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
     SectionCard(title = stringResource(R.string.stats_horas)) {
-        Text(text = "${"%,d".format(horasTotales).replace(",", ".")}h", color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        Text(text = "${com.paragon.app.ui.panel.cifra(horasTotales)} h", color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         Text(
             // Mismo dato que "Si juntaras las X horas... serían Y días" de
             // PlaytimeComparison.tsx en la web, para que cuadre con lo que
@@ -568,8 +568,8 @@ private fun DietaGamerCard(dieta: DietaGamer) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .background(Surface, RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(20.dp),
     ) {
         Text(text = stringResource(R.string.stats_dieta), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Bold)
@@ -588,7 +588,7 @@ private fun DietaGamerCard(dieta: DietaGamer) {
 private fun MiniStat(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .background(Surface2, RoundedCornerShape(14.dp))
+            .background(Surface2, RoundedCornerShape(radio(14)))
             .padding(horizontal = 12.dp, vertical = 10.dp),
     ) {
         Text(

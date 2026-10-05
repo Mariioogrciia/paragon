@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- GENERADO por android/i18n/generar.mjs desde android/i18n/textos.json: no editar a mano. -->
 <resources>
+    <string name="acento_azul">Blue</string>
+    <string name="acento_carreras">Racing league</string>
+    <string name="acento_datos">Data</string>
+    <string name="acento_fosforo">Phosphor</string>
+    <string name="acento_inmersion">Immersion</string>
+    <string name="acento_laton">Service record</string>
+    <string name="acento_morado">Purple</string>
+    <string name="acento_naranja">Orange</string>
+    <string name="acento_platino">Platinum</string>
+    <string name="acento_rojo">Red</string>
+    <string name="acento_salidas">Departures board</string>
+    <string name="acento_verde">Green</string>
     <string name="ajustes_acento">Custom accent colour</string>
     <string name="ajustes_acento_sub">Only changes the accent (buttons, highlights) — the background still comes from the platform or Material You</string>
+    <string name="ajustes_apariencia_sub">Mode, accent, style and text size</string>
     <string name="ajustes_cambiar_foto">Change photo</string>
     <string name="ajustes_cerrar_sesion_boton">Sign out</string>
     <string name="ajustes_cerrar_sesion_si">Sign out</string>
@@ -33,6 +46,23 @@
     <string name="alta_ultimo_paso">Last step: link your account</string>
     <string name="alta_ultimo_paso_sub">Your trophies come from your PlayStation, Steam or Xbox profile. Link at least one and your library will be here in a few minutes.</string>
     <string name="alta_ya_vinculado">I\'ve linked it</string>
+    <string name="apariencia_acento">Accent and palette</string>
+    <string name="apariencia_estilo">Style</string>
+    <string name="apariencia_estilo_nivel">Unlocks at level %1$s (you\'re level %2$s)</string>
+    <string name="apariencia_juego">From your game</string>
+    <string name="apariencia_juego_nota">Palette from your game (picked on the web). Pick another accent to remove it.</string>
+    <string name="apariencia_libre">Custom colour</string>
+    <string name="apariencia_libre_actual">Custom colour %1$s</string>
+    <string name="apariencia_material_activo">Material You is on: colours come from your wallpaper.</string>
+    <string name="apariencia_material_sub">Colours from your wallpaper. While it\'s on, it overrides the accent.</string>
+    <string name="apariencia_modo">Mode</string>
+    <string name="apariencia_modo_nota">The mode belongs to this phone: System follows Android\'s dark mode.</string>
+    <string name="apariencia_muestra_boton">Go for platinum</string>
+    <string name="apariencia_muestra_chip" formatted="false">68%</string>
+    <string name="apariencia_sincronizada">Accent, style and text size are saved to your account: the same on the web and on your phone.</string>
+    <string name="apariencia_temas">Themes</string>
+    <string name="apariencia_texto">Text size</string>
+    <string name="apariencia_titulo">Appearance</string>
     <string name="arquetipo_cazador">Hunter</string>
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Explorer</string>
@@ -264,6 +294,22 @@
     <string name="error_servidor">The server returned an error (%1$s).</string>
     <string name="error_servidor_corto">Server error (%1$s).</string>
     <string name="error_sin_sesion">Not signed in.</string>
+    <string name="estilo_brutalista">Brutalist</string>
+    <string name="estilo_brutalista_desc">No corners, hard edges</string>
+    <string name="estilo_clasico">Classic</string>
+    <string name="estilo_clasico_desc">The usual</string>
+    <string name="estilo_ps5">PS5</string>
+    <string name="estilo_ps5_desc">Night blue and soft curves</string>
+    <string name="estilo_steam">Steam</string>
+    <string name="estilo_steam_desc">Bluish and almost square</string>
+    <string name="estilo_switch">Switch</string>
+    <string name="estilo_switch_desc">Console grey and friendly corners</string>
+    <string name="estilo_terminal">Terminal</string>
+    <string name="estilo_terminal_desc">Monospace and square corners</string>
+    <string name="estilo_vidrio">Glass</string>
+    <string name="estilo_vidrio_desc">Translucent surfaces, very rounded</string>
+    <string name="estilo_xbox">Xbox</string>
+    <string name="estilo_xbox_desc">Green on black, firm corners</string>
     <string name="feed_a11y_comentarios">%1$s comments. Comment</string>
     <string name="feed_a11y_reaccionado">%1$s reactions. You reacted; tap to change</string>
     <string name="feed_a11y_reaccionar">%1$s reactions. React</string>
@@ -510,8 +556,18 @@
     <string name="stats_sin_datos">Not enough data yet.</string>
     <string name="stats_titulo">STATS</string>
     <string name="tema_claro">Light</string>
+    <string name="tema_contraste">Contrast</string>
+    <string name="tema_oled">OLED</string>
     <string name="tema_oscuro">Dark</string>
+    <string name="tema_rapido_combate">Combat</string>
+    <string name="tema_rapido_contraste">High contrast</string>
+    <string name="tema_rapido_dia">Bright day</string>
+    <string name="tema_rapido_neon">Neon</string>
     <string name="tema_sistema">System</string>
+    <string name="texto_enorme">Huge</string>
+    <string name="texto_grande">Large</string>
+    <string name="texto_normal">Normal</string>
+    <string name="texto_pequeno">Small</string>
     <string name="tiempo_ahora">just now</string>
     <string name="tiempo_d">%1$sd ago</string>
     <string name="tiempo_h">%1$sh ago</string>

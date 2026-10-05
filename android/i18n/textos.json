@@ -1,4 +1,76 @@
 {
+ "acento_azul": {
+  "de": "Blau",
+  "en": "Blue",
+  "es": "Azul",
+  "fr": "Bleu"
+ },
+ "acento_carreras": {
+  "de": "Rennliga",
+  "en": "Racing league",
+  "es": "Liga de carreras",
+  "fr": "Ligue de course"
+ },
+ "acento_datos": {
+  "de": "Daten",
+  "en": "Data",
+  "es": "Datos",
+  "fr": "Données"
+ },
+ "acento_fosforo": {
+  "de": "Phosphor",
+  "en": "Phosphor",
+  "es": "Fósforo",
+  "fr": "Phosphore"
+ },
+ "acento_inmersion": {
+  "de": "Eintauchen",
+  "en": "Immersion",
+  "es": "Inmersión",
+  "fr": "Immersion"
+ },
+ "acento_laton": {
+  "de": "Dienstakte",
+  "en": "Service record",
+  "es": "Hoja de servicio",
+  "fr": "État de service"
+ },
+ "acento_morado": {
+  "de": "Lila",
+  "en": "Purple",
+  "es": "Morado",
+  "fr": "Violet"
+ },
+ "acento_naranja": {
+  "de": "Orange",
+  "en": "Orange",
+  "es": "Naranja",
+  "fr": "Orange"
+ },
+ "acento_platino": {
+  "de": "Platin",
+  "en": "Platinum",
+  "es": "Platino",
+  "fr": "Platine"
+ },
+ "acento_rojo": {
+  "de": "Rot",
+  "en": "Red",
+  "es": "Rojo",
+  "fr": "Rouge"
+ },
+ "acento_salidas": {
+  "de": "Abflugtafel",
+  "en": "Departures board",
+  "es": "Panel de salidas",
+  "fr": "Tableau des départs"
+ },
+ "acento_verde": {
+  "de": "Grün",
+  "en": "Green",
+  "es": "Verde",
+  "fr": "Vert"
+ },
  "ajustes_acento": {
   "de": "Eigene Akzentfarbe",
   "en": "Custom accent colour",
@@ -10,6 +82,12 @@
   "en": "Only changes the accent (buttons, highlights) — the background still comes from the platform or Material You",
   "es": "Solo cambia el acento (botones, resaltados) — el fondo lo sigue decidiendo la plataforma o Material You",
   "fr": "Ne change que l'accent (boutons, surlignages) — le fond dépend toujours de la plateforme ou de Material You"
+ },
+ "ajustes_apariencia_sub": {
+  "de": "Modus, Akzent, Stil und Textgröße",
+  "en": "Mode, accent, style and text size",
+  "es": "Modo, acento, estilo y tamaño de texto",
+  "fr": "Mode, accent, style et taille du texte"
  },
  "ajustes_cambiar_foto": {
   "de": "Foto ändern",
@@ -190,6 +268,108 @@
   "en": "I've linked it",
   "es": "Ya lo he vinculado",
   "fr": "C'est fait"
+ },
+ "apariencia_acento": {
+  "de": "Akzent und Palette",
+  "en": "Accent and palette",
+  "es": "Acento y paleta",
+  "fr": "Accent et palette"
+ },
+ "apariencia_estilo": {
+  "de": "Stil",
+  "en": "Style",
+  "es": "Estilo",
+  "fr": "Style"
+ },
+ "apariencia_estilo_nivel": {
+  "de": "Wird ab Stufe {0} freigeschaltet (du bist Stufe {1})",
+  "en": "Unlocks at level {0} (you're level {1})",
+  "es": "Se desbloquea en el nivel {0} (vas por el {1})",
+  "fr": "Se débloque au niveau {0} (tu es niveau {1})"
+ },
+ "apariencia_juego": {
+  "de": "Aus deinem Spiel",
+  "en": "From your game",
+  "es": "Desde tu juego",
+  "fr": "Depuis ton jeu"
+ },
+ "apariencia_juego_nota": {
+  "de": "Palette aus deinem Spiel (im Web gewählt). Wähle einen anderen Akzent, um sie zu entfernen.",
+  "en": "Palette from your game (picked on the web). Pick another accent to remove it.",
+  "es": "Paleta desde tu juego (elegida en la web). Elige otro acento para quitarla.",
+  "fr": "Palette depuis ton jeu (choisie sur le web). Choisis un autre accent pour la retirer."
+ },
+ "apariencia_libre": {
+  "de": "Eigene Farbe",
+  "en": "Custom colour",
+  "es": "Color libre",
+  "fr": "Couleur libre"
+ },
+ "apariencia_libre_actual": {
+  "de": "Eigene Farbe {0}",
+  "en": "Custom colour {0}",
+  "es": "Color libre {0}",
+  "fr": "Couleur libre {0}"
+ },
+ "apariencia_material_activo": {
+  "de": "Material You ist aktiv: Die Farben kommen von deinem Hintergrundbild.",
+  "en": "Material You is on: colours come from your wallpaper.",
+  "es": "Material You activo: los colores salen de tu fondo de pantalla.",
+  "fr": "Material You est actif : les couleurs viennent de ton fond d'écran."
+ },
+ "apariencia_material_sub": {
+  "de": "Farben deines Hintergrundbilds. Solange es aktiv ist, ersetzt es den Akzent.",
+  "en": "Colours from your wallpaper. While it's on, it overrides the accent.",
+  "es": "Colores de tu fondo de pantalla. Mientras esté activo, manda sobre el acento.",
+  "fr": "Couleurs de ton fond d'écran. Tant qu'il est actif, il remplace l'accent."
+ },
+ "apariencia_modo": {
+  "de": "Modus",
+  "en": "Mode",
+  "es": "Modo",
+  "fr": "Mode"
+ },
+ "apariencia_modo_nota": {
+  "de": "Der Modus gilt für dieses Handy: System folgt dem dunklen Modus von Android.",
+  "en": "The mode belongs to this phone: System follows Android's dark mode.",
+  "es": "El modo es de este teléfono: Sistema sigue al modo oscuro de Android.",
+  "fr": "Le mode est propre à ce téléphone : Système suit le mode sombre d'Android."
+ },
+ "apariencia_muestra_boton": {
+  "de": "Auf zur Platin",
+  "en": "Go for platinum",
+  "es": "A por el platino",
+  "fr": "Vise le platine"
+ },
+ "apariencia_muestra_chip": {
+  "de": "68 %",
+  "en": "68%",
+  "es": "68 %",
+  "fr": "68 %"
+ },
+ "apariencia_sincronizada": {
+  "de": "Akzent, Stil und Textgröße werden in deinem Konto gespeichert: gleich im Web und auf dem Handy.",
+  "en": "Accent, style and text size are saved to your account: the same on the web and on your phone.",
+  "es": "Acento, estilo y tamaño de texto se guardan en tu cuenta: los mismos en la web y en el móvil.",
+  "fr": "Accent, style et taille du texte sont enregistrés sur ton compte : les mêmes sur le web et sur le téléphone."
+ },
+ "apariencia_temas": {
+  "de": "Themes",
+  "en": "Themes",
+  "es": "Temas",
+  "fr": "Thèmes"
+ },
+ "apariencia_texto": {
+  "de": "Textgröße",
+  "en": "Text size",
+  "es": "Tamaño de texto",
+  "fr": "Taille du texte"
+ },
+ "apariencia_titulo": {
+  "de": "Darstellung",
+  "en": "Appearance",
+  "es": "Apariencia",
+  "fr": "Apparence"
  },
  "arquetipo_cazador": {
   "de": "Jäger:in",
@@ -1576,6 +1756,102 @@
   "en": "Not signed in.",
   "es": "Sin sesión.",
   "fr": "Non connecté."
+ },
+ "estilo_brutalista": {
+  "de": "Brutalistisch",
+  "en": "Brutalist",
+  "es": "Brutalista",
+  "fr": "Brutaliste"
+ },
+ "estilo_brutalista_desc": {
+  "de": "Keine Rundungen, harte Kanten",
+  "en": "No corners, hard edges",
+  "es": "Sin esquinas, bordes duros",
+  "fr": "Sans arrondis, bords durs"
+ },
+ "estilo_clasico": {
+  "de": "Klassisch",
+  "en": "Classic",
+  "es": "Clásico",
+  "fr": "Classique"
+ },
+ "estilo_clasico_desc": {
+  "de": "Wie immer",
+  "en": "The usual",
+  "es": "El de siempre",
+  "fr": "Celui de toujours"
+ },
+ "estilo_ps5": {
+  "de": "PS5",
+  "en": "PS5",
+  "es": "PS5",
+  "fr": "PS5"
+ },
+ "estilo_ps5_desc": {
+  "de": "Nachtblau und weiche Rundungen",
+  "en": "Night blue and soft curves",
+  "es": "Azul noche y curvas suaves",
+  "fr": "Bleu nuit et courbes douces"
+ },
+ "estilo_steam": {
+  "de": "Steam",
+  "en": "Steam",
+  "es": "Steam",
+  "fr": "Steam"
+ },
+ "estilo_steam_desc": {
+  "de": "Bläulich und fast eckig",
+  "en": "Bluish and almost square",
+  "es": "Azulado y casi recto",
+  "fr": "Bleuté et presque droit"
+ },
+ "estilo_switch": {
+  "de": "Switch",
+  "en": "Switch",
+  "es": "Switch",
+  "fr": "Switch"
+ },
+ "estilo_switch_desc": {
+  "de": "Konsolengrau und freundliche Ecken",
+  "en": "Console grey and friendly corners",
+  "es": "Gris consola y esquinas amables",
+  "fr": "Gris console et coins doux"
+ },
+ "estilo_terminal": {
+  "de": "Terminal",
+  "en": "Terminal",
+  "es": "Terminal",
+  "fr": "Terminal"
+ },
+ "estilo_terminal_desc": {
+  "de": "Monospace und eckige Kanten",
+  "en": "Monospace and square corners",
+  "es": "Monoespaciada y esquinas rectas",
+  "fr": "Monospace et coins droits"
+ },
+ "estilo_vidrio": {
+  "de": "Glas",
+  "en": "Glass",
+  "es": "Vidrio",
+  "fr": "Verre"
+ },
+ "estilo_vidrio_desc": {
+  "de": "Durchscheinende Flächen, sehr rund",
+  "en": "Translucent surfaces, very rounded",
+  "es": "Superficies translúcidas, muy redondeado",
+  "fr": "Surfaces translucides, très arrondi"
+ },
+ "estilo_xbox": {
+  "de": "Xbox",
+  "en": "Xbox",
+  "es": "Xbox",
+  "fr": "Xbox"
+ },
+ "estilo_xbox_desc": {
+  "de": "Grün auf Schwarz, feste Ecken",
+  "en": "Green on black, firm corners",
+  "es": "Verde sobre negro, esquinas firmes",
+  "fr": "Vert sur noir, coins nets"
  },
  "feed_a11y_comentarios": {
   "de": "{0} Kommentare. Kommentieren",
@@ -3053,17 +3329,77 @@
   "es": "Claro",
   "fr": "Clair"
  },
+ "tema_contraste": {
+  "de": "Kontrast",
+  "en": "Contrast",
+  "es": "Contraste",
+  "fr": "Contraste"
+ },
+ "tema_oled": {
+  "de": "OLED",
+  "en": "OLED",
+  "es": "OLED",
+  "fr": "OLED"
+ },
  "tema_oscuro": {
   "de": "Dunkel",
   "en": "Dark",
   "es": "Oscuro",
   "fr": "Sombre"
  },
+ "tema_rapido_combate": {
+  "de": "Kampf",
+  "en": "Combat",
+  "es": "Combate",
+  "fr": "Combat"
+ },
+ "tema_rapido_contraste": {
+  "de": "Hoher Kontrast",
+  "en": "High contrast",
+  "es": "Contraste alto",
+  "fr": "Contraste élevé"
+ },
+ "tema_rapido_dia": {
+  "de": "Heller Tag",
+  "en": "Bright day",
+  "es": "Día claro",
+  "fr": "Grand jour"
+ },
+ "tema_rapido_neon": {
+  "de": "Neon",
+  "en": "Neon",
+  "es": "Neón",
+  "fr": "Néon"
+ },
  "tema_sistema": {
   "de": "System",
   "en": "System",
   "es": "Sistema",
   "fr": "Système"
+ },
+ "texto_enorme": {
+  "de": "Riesig",
+  "en": "Huge",
+  "es": "Enorme",
+  "fr": "Énorme"
+ },
+ "texto_grande": {
+  "de": "Groß",
+  "en": "Large",
+  "es": "Grande",
+  "fr": "Grand"
+ },
+ "texto_normal": {
+  "de": "Normal",
+  "en": "Normal",
+  "es": "Normal",
+  "fr": "Normal"
+ },
+ "texto_pequeno": {
+  "de": "Klein",
+  "en": "Small",
+  "es": "Pequeño",
+  "fr": "Petit"
  },
  "tiempo_ahora": {
   "de": "gerade eben",

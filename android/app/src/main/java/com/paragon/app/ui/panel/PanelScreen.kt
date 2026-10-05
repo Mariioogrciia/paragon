@@ -156,139 +156,73 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                         )
                     }
 
-                    pinnedGame?.let { game ->
-                        // Antes esto era `PinnedGameBanner`, una fila plana de
-                        // 56dp — mucha menos presencia que `HeroGameCard` (la
-                        // de "Cerca del platino", más abajo) a pesar de ser
-                        // el objetivo que el usuario eligió a mano, no un
-                        // cálculo. Misma Hero Card, en dorado para
-                        // diferenciarla de la azul algorítmica.
+                    // Orden del Panel (4 oct 2026): primero el objetivo — el juego
+                    // anclado o, si no hay, el platino más cercano —, luego el
+                    // resumen y el siguiente trofeo, y al final lo secundario
+                    // (cerrojo de hitos, meta, rival). Antes abría con esas
+                    // tarjetas secundarias y una rejilla de cuatro cifras.
+                    val cercano = (highlights as? HighlightsResult.Ok)?.nearPlatinum?.firstOrNull()
+                    val anclado = pinnedGame
+                    if (anclado != null) {
                         HeroGameCard(
-                            game = game.toGameProgress(),
+                            game = anclado.toGameProgress(),
                             label = stringResource(R.string.panel_a_por_este),
                             labelColor = Gold,
                             accentColor = Gold,
-                            // A la ficha del juego, no directo a Modo Enfoque —
-                            // ese es un modo aparte que se elige a propósito
-                            // desde el menú, no algo que se cae encima al
-                            // tocar tu objetivo actual en el Panel.
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(game.id)) },
+                            // A la ficha del juego, no directo a Modo Enfoque.
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(anclado.id)) },
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-
-                    hito?.let { h ->
-                        MilestoneBanner(
-                            hito = h,
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(h.gameId)) },
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-
-                    GoalBanner(
-                        currentPlatinums = globalStats.platinums,
-                        targetPlatinums = themeStore.targetPlatinums,
-                        onSetTarget = { themeStore.setTargetPlatinums(it) }
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    if (themeStore.rivalHandle != null) {
-                        (rivalComparison as? CompareResult.Ok)?.let { result ->
-                            RivalBanner(
-                                rival = result.data.them,
-                                me = result.data.me,
-                                onClick = { navController.navigate(Screen.Compare.routeFor(themeStore.rivalHandle!!)) }
-                            )
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
-                    } else if (hito == null) {
-                        // Spacer extra if we have neither milestone nor rival
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-
-                    // Resumen Stats
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.heightIn(max = 300.dp) // Constraint para LazyGrid dentro de LazyColumn
-                    ) {
-                        item { PlatinumStatTile(globalStats.platinums, onEasterEgg = { showConfetti = true }) }
-                        item { StatTile(stringResource(R.string.comun_trofeos), globalStats.trophies.toString()) }
-                        item { StatTile(stringResource(R.string.comun_juegos), globalStats.games.toString()) }
-                        item { StatTile(stringResource(R.string.panel_completado), "${globalStats.completionRate}%") }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Desglose de trofeos — datos reales de GET /api/mobile/panel
-                    // (antes era PanelRepository.getMockTrophyCounts(), fijo,
-                    // sin relación con la cuenta real del usuario).
-                    TrophyCountRow(
-                        counts = TrophyCounts(
-                            platinum = globalStats.platinums,
-                            gold = globalStats.gold,
-                            silver = globalStats.silver,
-                            bronze = globalStats.bronze,
-                        ),
-                        summary = stringResource(R.string.panel_resumen, globalStats.trophies, globalStats.games)
-                    )
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // Hero Card (A un paso del platino)
-                    Text(
-                        text = stringResource(R.string.panel_un_paso),
-                        color = Foreground,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = stringResource(R.string.panel_un_paso_sub),
-                        color = Muted,
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
-                    )
-
-                    when (val current = highlights) {
-                        null -> {
-                            if (isInitialLoading) {
+                    } else {
+                        when (val current = highlights) {
+                            null -> if (isInitialLoading) {
                                 com.paragon.app.ui.common.EsqueletoTarjetas(tarjetas = 1, alto = 208.dp, modifier = Modifier.fillMaxWidth().height(240.dp))
                             }
-                        }
-                        is HighlightsResult.Error -> Column {
-                            Text(
-                                text = current.message,
-                                color = Muted,
-                                fontSize = 13.sp,
-                            )
-                            // Antes solo quedaba el pull-to-refresh de toda
-                            // la pantalla (no evidente para quien no lo
-                            // sepa) para recuperarse de un corte de red —
-                            // ahora hay un botón explícito, igual que el
-                            // resto de pantallas con estado de error.
-                            TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 4.dp)) {
-                                Text(stringResource(R.string.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                            is HighlightsResult.Error -> Column {
+                                Text(text = current.message, color = Muted, fontSize = 13.sp)
+                                TextButton(onClick = { retryCounter.value += 1 }, modifier = Modifier.padding(top = 4.dp)) {
+                                    Text(stringResource(R.string.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                                }
                             }
-                        }
-                        is HighlightsResult.Ok -> {
-                            val nearest = current.nearPlatinum.firstOrNull()
-                            if (nearest != null) {
+                            is HighlightsResult.Ok -> if (cercano != null) {
                                 HeroGameCard(
-                                    game = nearest,
-                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(nearest.id)) },
+                                    game = cercano,
+                                    onClick = { navController.navigate(Screen.GameDetail.routeFor(cercano.id)) },
                                 )
                             } else {
-                                Text(
-                                    text = stringResource(R.string.panel_un_paso_vacio),
-                                    color = Muted,
-                                    fontSize = 13.sp,
-                                )
+                                Text(text = stringResource(R.string.panel_un_paso_vacio), color = Muted, fontSize = 13.sp)
                             }
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ResumenCard(
+                        platinos = globalStats.platinums,
+                        trofeos = globalStats.trophies,
+                        juegos = globalStats.games,
+                        completado = globalStats.completionRate,
+                        oro = globalStats.gold,
+                        plata = globalStats.silver,
+                        bronce = globalStats.bronze,
+                        onEasterEgg = { showConfetti = true },
+                    )
+
                     Spacer(modifier = Modifier.height(32.dp))
+
+                    // Con un juego anclado arriba, el más cercano al platino pasa aquí.
+                    // (sin repetir el anclado si es justo ese).
+                    val otroCercano = (highlights as? HighlightsResult.Ok)?.nearPlatinum?.firstOrNull { it.id != anclado?.id }
+                    if (anclado != null && otroCercano != null) {
+                        Text(text = stringResource(R.string.panel_un_paso), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = stringResource(R.string.panel_un_paso_sub),
+                            color = Muted,
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
+                        )
+                        HeroGameCard(game = otroCercano, onClick = { navController.navigate(Screen.GameDetail.routeFor(otroCercano.id)) })
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
 
                     // Siguiente trofeo — mismo recomendador que la portada web
                     // (lib/recommendations.ts): ya lo mandaba el backend desde
@@ -318,6 +252,28 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                         }
                         Spacer(modifier = Modifier.height(32.dp))
                     }
+
+                    // Lo secundario: cerrojo de hitos, meta de platinos y rival.
+                    hito?.let { h ->
+                        MilestoneBanner(hito = h, onClick = { navController.navigate(Screen.GameDetail.routeFor(h.gameId)) })
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    GoalBanner(
+                        currentPlatinums = globalStats.platinums,
+                        targetPlatinums = themeStore.targetPlatinums,
+                        onSetTarget = { themeStore.setTargetPlatinums(it) },
+                    )
+                    if (themeStore.rivalHandle != null) {
+                        (rivalComparison as? CompareResult.Ok)?.let { result ->
+                            Spacer(modifier = Modifier.height(12.dp))
+                            RivalBanner(
+                                rival = result.data.them,
+                                me = result.data.me,
+                                onClick = { navController.navigate(Screen.Compare.routeFor(themeStore.rivalHandle!!)) },
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
 
                     // Jugado recientemente
                     Text(
@@ -354,63 +310,6 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
     }
 }
 
-/**
- * Easter egg: 5 toques seguidos (menos de 1s entre cada uno, si no se
- * reinicia la cuenta) disparan `onEasterEgg` — lluvia de confeti en
- * PanelScreen. `indication = null` porque el ripple de Material sobre un
- * gradiente ya oscuro apenas se ve y aquí distraía más que ayudaba.
- */
-@Composable
-fun PlatinumStatTile(value: Int, onEasterEgg: () -> Unit = {}) {
-    var tapCount by remember { mutableIntStateOf(0) }
-    var lastTapAt by remember { mutableLongStateOf(0L) }
-    val haptic = LocalHapticFeedback.current
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.linearGradient(
-                    // Del tema activo (antes azul noche fijo, que en modo claro o con
-                    // el tema de Xbox/Steam quedaba como un parche de otro sitio).
-                    colors = listOf(Surface2, Surface)
-                ),
-                shape = RoundedCornerShape(20.dp)
-            )
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
-            .clickable(
-                indication = null,
-                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-            ) {
-                val now = System.currentTimeMillis()
-                tapCount = if (now - lastTapAt > 1000) 1 else tapCount + 1
-                lastTapAt = now
-                if (tapCount >= 5) {
-                    tapCount = 0
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onEasterEgg()
-                }
-            }
-            .padding(24.dp)
-    ) {
-        Column {
-            Text(
-                text = stringResource(R.string.panel_platinos),
-                color = Platinum,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.5.sp
-            )
-            Text(
-                text = value.toString(),
-                color = Foreground,
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-    }
-}
 
 /** Banner del Cerrojo de Hitos: qué juego está reservado para tu próximo platino en número redondo. */
 @Composable
@@ -418,8 +317,8 @@ fun MilestoneBanner(hito: HitoReservado, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .background(Surface, RoundedCornerShape(radio(16)))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -483,8 +382,8 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .background(Surface, RoundedCornerShape(radio(16)))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .clickable { showDialog = true }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -513,13 +412,13 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
                         .fillMaxWidth()
                         .padding(top = 8.dp)
                         .height(8.dp)
-                        .background(Background, RoundedCornerShape(4.dp)),
+                        .background(Background, RoundedCornerShape(radio(4))),
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(progress.coerceIn(0f, 1f))
                             .fillMaxHeight()
-                            .background(Accent, RoundedCornerShape(4.dp)),
+                            .background(Accent, RoundedCornerShape(radio(4))),
                     )
                 }
                 Text(text = "$currentPlatinums / $targetPlatinums", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
@@ -534,8 +433,8 @@ fun RivalBanner(rival: CompareSide, me: CompareSide, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (winning) Accent.copy(alpha=0.1f) else Surface, RoundedCornerShape(16.dp))
-            .border(1.dp, if (winning) Accent else Border, RoundedCornerShape(16.dp))
+            .background(if (winning) Accent.copy(alpha=0.1f) else Surface, RoundedCornerShape(radio(16)))
+            .border(1.dp, if (winning) Accent else Border, RoundedCornerShape(radio(16)))
             .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -555,30 +454,3 @@ fun RivalBanner(rival: CompareSide, me: CompareSide, onClick: () -> Unit) {
     }
 }
 
-@Composable
-fun StatTile(label: String, value: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
-            .padding(24.dp)
-    ) {
-        Column {
-            Text(
-                text = label.uppercase(),
-                color = Muted,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.5.sp
-            )
-            Text(
-                text = value,
-                color = Foreground,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-    }
-}

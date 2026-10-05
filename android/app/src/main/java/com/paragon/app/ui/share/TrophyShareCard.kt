@@ -28,6 +28,7 @@ import com.paragon.app.ui.theme.Muted
 import com.paragon.app.ui.theme.Platinum
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.ui.theme.radio
 
 /**
  * Tarjeta vertical (9:16, estilo Instagram/TikTok Stories) para el Platino
@@ -58,7 +59,7 @@ fun TrophyShareCard(
     Box(
         modifier = modifier
             .aspectRatio(9f / 16f)
-            .clip(RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(radio(28)))
             .background(Background)
     ) {
         if (coverUrl.isNotBlank()) {
@@ -103,7 +104,7 @@ fun TrophyShareCard(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                     modifier = Modifier
-                        .background(AccentSoft, RoundedCornerShape(12.dp))
+                        .background(AccentSoft, RoundedCornerShape(radio(12)))
                         .padding(horizontal = 10.dp, vertical = 5.dp)
                 )
                 Text(

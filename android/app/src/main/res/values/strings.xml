@@ -5,8 +5,21 @@
     <string name="title_activity_main" translatable="false">Paragon</string>
     <string name="package_name" translatable="false">com.paragon.app</string>
     <string name="custom_url_scheme" translatable="false">com.paragon.app</string>
+    <string name="acento_azul">Azul</string>
+    <string name="acento_carreras">Liga de carreras</string>
+    <string name="acento_datos">Datos</string>
+    <string name="acento_fosforo">Fósforo</string>
+    <string name="acento_inmersion">Inmersión</string>
+    <string name="acento_laton">Hoja de servicio</string>
+    <string name="acento_morado">Morado</string>
+    <string name="acento_naranja">Naranja</string>
+    <string name="acento_platino">Platino</string>
+    <string name="acento_rojo">Rojo</string>
+    <string name="acento_salidas">Panel de salidas</string>
+    <string name="acento_verde">Verde</string>
     <string name="ajustes_acento">Color de Acento Personalizado</string>
     <string name="ajustes_acento_sub">Solo cambia el acento (botones, resaltados) — el fondo lo sigue decidiendo la plataforma o Material You</string>
+    <string name="ajustes_apariencia_sub">Modo, acento, estilo y tamaño de texto</string>
     <string name="ajustes_cambiar_foto">Cambiar foto</string>
     <string name="ajustes_cerrar_sesion_boton">Cerrar Sesión</string>
     <string name="ajustes_cerrar_sesion_si">Cerrar sesión</string>
@@ -37,6 +50,23 @@
     <string name="alta_ultimo_paso">Último paso: vincula tu cuenta</string>
     <string name="alta_ultimo_paso_sub">Tus trofeos salen de tu perfil de PlayStation, Steam o Xbox. Vincula al menos uno y en unos minutos tendrás tu biblioteca aquí.</string>
     <string name="alta_ya_vinculado">Ya lo he vinculado</string>
+    <string name="apariencia_acento">Acento y paleta</string>
+    <string name="apariencia_estilo">Estilo</string>
+    <string name="apariencia_estilo_nivel">Se desbloquea en el nivel %1$s (vas por el %2$s)</string>
+    <string name="apariencia_juego">Desde tu juego</string>
+    <string name="apariencia_juego_nota">Paleta desde tu juego (elegida en la web). Elige otro acento para quitarla.</string>
+    <string name="apariencia_libre">Color libre</string>
+    <string name="apariencia_libre_actual">Color libre %1$s</string>
+    <string name="apariencia_material_activo">Material You activo: los colores salen de tu fondo de pantalla.</string>
+    <string name="apariencia_material_sub">Colores de tu fondo de pantalla. Mientras esté activo, manda sobre el acento.</string>
+    <string name="apariencia_modo">Modo</string>
+    <string name="apariencia_modo_nota">El modo es de este teléfono: Sistema sigue al modo oscuro de Android.</string>
+    <string name="apariencia_muestra_boton">A por el platino</string>
+    <string name="apariencia_muestra_chip" formatted="false">68 %</string>
+    <string name="apariencia_sincronizada">Acento, estilo y tamaño de texto se guardan en tu cuenta: los mismos en la web y en el móvil.</string>
+    <string name="apariencia_temas">Temas</string>
+    <string name="apariencia_texto">Tamaño de texto</string>
+    <string name="apariencia_titulo">Apariencia</string>
     <string name="arquetipo_cazador">Cazador</string>
     <string name="arquetipo_elite">Élite</string>
     <string name="arquetipo_explorador">Explorador</string>
@@ -268,6 +298,22 @@
     <string name="error_servidor">El servidor respondió con un error (%1$s).</string>
     <string name="error_servidor_corto">Error del servidor (%1$s).</string>
     <string name="error_sin_sesion">Sin sesión.</string>
+    <string name="estilo_brutalista">Brutalista</string>
+    <string name="estilo_brutalista_desc">Sin esquinas, bordes duros</string>
+    <string name="estilo_clasico">Clásico</string>
+    <string name="estilo_clasico_desc">El de siempre</string>
+    <string name="estilo_ps5">PS5</string>
+    <string name="estilo_ps5_desc">Azul noche y curvas suaves</string>
+    <string name="estilo_steam">Steam</string>
+    <string name="estilo_steam_desc">Azulado y casi recto</string>
+    <string name="estilo_switch">Switch</string>
+    <string name="estilo_switch_desc">Gris consola y esquinas amables</string>
+    <string name="estilo_terminal">Terminal</string>
+    <string name="estilo_terminal_desc">Monoespaciada y esquinas rectas</string>
+    <string name="estilo_vidrio">Vidrio</string>
+    <string name="estilo_vidrio_desc">Superficies translúcidas, muy redondeado</string>
+    <string name="estilo_xbox">Xbox</string>
+    <string name="estilo_xbox_desc">Verde sobre negro, esquinas firmes</string>
     <string name="feed_a11y_comentarios">%1$s comentarios. Comentar</string>
     <string name="feed_a11y_reaccionado">%1$s reacciones. Has reaccionado; toca para cambiar</string>
     <string name="feed_a11y_reaccionar">%1$s reacciones. Reaccionar</string>
@@ -514,8 +560,18 @@
     <string name="stats_sin_datos">Sin datos suficientes todavía.</string>
     <string name="stats_titulo">ESTADÍSTICAS</string>
     <string name="tema_claro">Claro</string>
+    <string name="tema_contraste">Contraste</string>
+    <string name="tema_oled">OLED</string>
     <string name="tema_oscuro">Oscuro</string>
+    <string name="tema_rapido_combate">Combate</string>
+    <string name="tema_rapido_contraste">Contraste alto</string>
+    <string name="tema_rapido_dia">Día claro</string>
+    <string name="tema_rapido_neon">Neón</string>
     <string name="tema_sistema">Sistema</string>
+    <string name="texto_enorme">Enorme</string>
+    <string name="texto_grande">Grande</string>
+    <string name="texto_normal">Normal</string>
+    <string name="texto_pequeno">Pequeño</string>
     <string name="tiempo_ahora">ahora mismo</string>
     <string name="tiempo_d">hace %1$sd</string>
     <string name="tiempo_h">hace %1$sh</string>

@@ -4,15 +4,18 @@ import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
-import com.paragon.app.data.theme.PlatformColor
 
 // Nombres completos de los <activity-alias> del manifiesto — los 4 apuntan
-// al mismo ComposeMainActivity, solo cambia su icono de lanzador.
-private val ALIAS_BY_PLATFORM = mapOf(
-    PlatformColor.PARAGON to "com.paragon.app.IconParagon",
-    PlatformColor.PLAYSTATION to "com.paragon.app.IconPlayStation",
-    PlatformColor.XBOX to "com.paragon.app.IconXbox",
-    PlatformColor.STEAM to "com.paragon.app.IconSteam",
+// al mismo ComposeMainActivity. Desde el 4 oct 2026 el icono es uno solo (la
+// P de la web) y los 4 enseñan la P; solo se mantienen para no dejar sin
+// icono a quien tuviera activo el de PlayStation, Xbox o Steam: en cada
+// arranque se vuelve a dejar encendido solo el de Paragon.
+private const val ALIAS_PARAGON = "com.paragon.app.IconParagon"
+private val ALIAS_TODOS = listOf(
+    ALIAS_PARAGON,
+    "com.paragon.app.IconPlayStation",
+    "com.paragon.app.IconXbox",
+    "com.paragon.app.IconSteam",
 )
 
 private const val PREFS_NAME = "paragon_icon_switcher"
@@ -28,7 +31,7 @@ private const val KEY_PENDING_DISABLE = "pending_disable_alias"
 private fun currentForegroundAlias(context: Context): String? {
     val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return null
     val base = am.appTasks.firstOrNull()?.taskInfo?.baseActivity?.className ?: return null
-    return ALIAS_BY_PLATFORM.values.firstOrNull { it == base }
+    return ALIAS_TODOS.firstOrNull { it == base }
 }
 
 /**
@@ -50,13 +53,13 @@ private fun currentForegroundAlias(context: Context): String? {
  * hay ninguna Activity viva usándolo (ver `ComposeMainActivity.onStop` y
  * `ThemeStore.init`).
  */
-fun applyLauncherIcon(context: Context, platform: PlatformColor) {
+fun applyLauncherIcon(context: Context) {
     val pm = context.packageManager
-    val activeAlias = ALIAS_BY_PLATFORM.getValue(platform)
+    val activeAlias = ALIAS_PARAGON
     val foregroundAlias = currentForegroundAlias(context)
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    ALIAS_BY_PLATFORM.values.forEach { alias ->
+    ALIAS_TODOS.forEach { alias ->
         if (alias == activeAlias) {
             setAliasEnabled(pm, context, alias, true)
             if (prefs.getString(KEY_PENDING_DISABLE, null) == alias) {

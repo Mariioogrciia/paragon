@@ -243,8 +243,8 @@ fun OauthItem(oauth: OauthAccountDto, onLinkRequested: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, if (oauth.linked) Good.copy(alpha = 0.35f) else Border, RoundedCornerShape(14.dp))
+            .background(Surface, RoundedCornerShape(radio(14)))
+            .border(1.dp, if (oauth.linked) Good.copy(alpha = 0.35f) else Border, RoundedCornerShape(radio(14)))
             .padding(14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -278,7 +278,7 @@ fun OauthItem(oauth: OauthAccountDto, onLinkRequested: () -> Unit) {
             Button(
                 onClick = onLinkRequested,
                 colors = ButtonDefaults.buttonColors(containerColor = Surface2),
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(radio(10)),
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                 modifier = Modifier.height(34.dp)
             ) {
@@ -302,8 +302,8 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, if (platform.linked) brandColor.copy(alpha = 0.35f) else Border, RoundedCornerShape(14.dp))
+            .background(Surface, RoundedCornerShape(radio(14)))
+            .border(1.dp, if (platform.linked) brandColor.copy(alpha = 0.35f) else Border, RoundedCornerShape(radio(14)))
             .padding(14.dp)
     ) {
         Row(
@@ -353,11 +353,11 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     Button(
                         onClick = { isLinking = true },
                         colors = ButtonDefaults.buttonColors(containerColor = brandColor),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(radio(10)),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         modifier = Modifier.height(34.dp)
                     ) {
-                        Text(stringResource(R.string.cuentas_vincular), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        Text(stringResource(R.string.cuentas_vincular), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = textoSobre(brandColor))
                     }
                 }
             }
@@ -381,7 +381,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 onValueChange = { inputUsername = it; errorMsg = null },
                 placeholder = { Text(platformPlaceholder(platform.platform), color = Muted) },
                 isError = errorMsg != null,
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(radio(10)),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = brandColor,
                     unfocusedBorderColor = Border,
@@ -419,13 +419,13 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = brandColor),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(radio(10)),
                     enabled = !isProcessing && inputUsername.isNotBlank()
                 ) {
                     if (isProcessing) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
+                        CircularProgressIndicator(color = textoSobre(brandColor), modifier = Modifier.size(16.dp))
                     } else {
-                        Text(stringResource(R.string.cuentas_conectar), color = Color.White, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.cuentas_conectar), color = textoSobre(brandColor), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -460,7 +460,7 @@ private fun PrivacyGuide(platform: String, brandColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(10.dp))
+            .background(Surface2, RoundedCornerShape(radio(10)))
             .clickable { expanded = !expanded }
             .padding(12.dp),
     ) {

@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Paragon (4 oct 2026): reglas para minificar la APK de producción ---
+# Moshi lee los DTO por reflexión (KotlinJsonAdapterFactory + kotlin-reflect):
+# nombres de campos y metadatos de Kotlin tienen que sobrevivir a R8.
+-keep class com.paragon.app.data.network.** { *; }
+-keep class kotlin.Metadata { *; }
+-keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+# Retrofit con funciones suspend: el tipo de Continuation y las interfaces de la API.
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+# Capacitor (MainActivity y sus plugins se cargan por reflexión).
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
+-keep class com.capacitorjs.** { *; }
+# Widget de Glance: el receptor lo instancia el sistema por nombre.
+-keep class com.paragon.app.widget.** { *; }
+-dontwarn org.slf4j.**

@@ -35,6 +35,7 @@ import com.paragon.app.util.shareBitmapAsImage
 import kotlinx.coroutines.launch
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.ui.theme.radio
 
 /**
  * Preview + captura de la tarjeta de Platino (ver `TrophyShareCard.kt`) para
@@ -63,7 +64,7 @@ fun ShareTrophyDialog(
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(radio(24)))
                 .background(Surface)
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

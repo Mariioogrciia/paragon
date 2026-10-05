@@ -108,6 +108,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import com.paragon.app.ui.theme.radio
 
 // Definimos la estructura de items de navegación
 sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
@@ -251,7 +252,7 @@ fun MainScreen(
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
-                                    .background(com.paragon.app.ui.theme.AccentSoft, RoundedCornerShape(16.dp)),
+                                    .background(com.paragon.app.ui.theme.AccentSoft, RoundedCornerShape(radio(16))),
                                 contentAlignment = Alignment.Center
                             ) {
                                 // Misma foto que la web (`resolveAvatarUrl`, ver
@@ -264,7 +265,7 @@ fun MainScreen(
                                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                         modifier = Modifier
                                             .size(32.dp)
-                                            .clip(RoundedCornerShape(16.dp)),
+                                            .clip(RoundedCornerShape(radio(16))),
                                     )
                                 } else {
                                     Text(profile.name.take(1).uppercase(), color = Accent, fontWeight = FontWeight.Bold)
@@ -283,8 +284,8 @@ fun MainScreen(
                             // porque es la única que no es un atajo a una
                             // función, es la puerta a toda una sección.
                             modifier = Modifier
-                                .background(com.paragon.app.ui.theme.Surface, RoundedCornerShape(14.dp))
-                                .border(1.dp, com.paragon.app.ui.theme.Border, RoundedCornerShape(14.dp))
+                                .background(com.paragon.app.ui.theme.Surface, RoundedCornerShape(radio(14)))
+                                .border(1.dp, com.paragon.app.ui.theme.Border, RoundedCornerShape(radio(14)))
                                 .width(220.dp)
                         ) {
                             HeaderMenuItem(
@@ -359,7 +360,9 @@ fun MainScreen(
                             unselectedIconColor = Muted,
                             selectedTextColor = Accent,
                             unselectedTextColor = Muted,
-                            indicatorColor = Background // Quitamos la pastilla redondeada por defecto
+                            // Con la pastilla de Material: sin ella, la pestaña activa solo
+                            // cambiaba de tono y con el Platino casi no se distinguía.
+                            indicatorColor = com.paragon.app.ui.theme.AccentSoft
                         )
                     )
                 }
@@ -470,6 +473,7 @@ fun MainScreen(
                     themeStore = themeStore,
                     onBack = { navController.popBackStack() },
                     onNavigateToLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
+                    onNavigateToApariencia = { navController.navigate(Screen.Apariencia.route) },
                     onLogout = {
                         // Cierra sesión SOLO en este móvil (mintMobileSession
                         // en el backend le da a la app un sessionToken propio,
@@ -491,6 +495,13 @@ fun MainScreen(
                             (context as? ComposeMainActivity)?.recreate()
                         }
                     }
+                )
+            }
+            composable(Screen.Apariencia.route) {
+                com.paragon.app.ui.settings.AparienciaScreen(
+                    tokenStore = tokenStore,
+                    themeStore = themeStore,
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable(Screen.LinkedAccounts.route) {
@@ -576,7 +587,7 @@ private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
     val viva = racha.actual > 0
     Row(
         modifier = Modifier
-            .clip(RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(radio(14)))
             .clickable { onClick() }
             .background(if (viva) Gold.copy(alpha = 0.14f) else Color.Transparent)
             .padding(horizontal = 10.dp, vertical = 6.dp),

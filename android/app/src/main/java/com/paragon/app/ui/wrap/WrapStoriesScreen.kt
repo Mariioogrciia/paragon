@@ -42,6 +42,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
+import com.paragon.app.ui.theme.radio
 
 private const val DURACION_MS = 6000
 
@@ -139,7 +140,7 @@ private fun WrapStoriesContent(data: WrapData) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .background(slide.background, RoundedCornerShape(24.dp))
+            .background(slide.background, RoundedCornerShape(radio(24)))
             .pointerInput(slides.size) {
                 detectTapGestures(
                     onPress = {
@@ -160,14 +161,14 @@ private fun WrapStoriesContent(data: WrapData) {
                         modifier = Modifier
                             .weight(1f)
                             .height(3.dp)
-                            .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(2.dp)),
+                            .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(radio(2))),
                     ) {
                         val frac = if (i < index) 1f else if (i == index) progress else 0f
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth(frac)
                                 .fillMaxHeight()
-                                .background(Color.White, RoundedCornerShape(2.dp)),
+                                .background(Color.White, RoundedCornerShape(radio(2))),
                         )
                     }
                 }

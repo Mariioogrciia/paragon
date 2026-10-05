@@ -164,7 +164,7 @@ private fun ClanDetailContent(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .background(AccentSoft, RoundedCornerShape(6.dp))
+                    .background(AccentSoft, RoundedCornerShape(radio(6)))
                     .padding(horizontal = 8.dp, vertical = 3.dp),
             )
             Spacer(Modifier.width(10.dp))
@@ -248,9 +248,9 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(radio(12)))
             .background(if (esPrimero) Platinum.copy(alpha = 0.12f) else Surface2)
-            .then(if (esPrimero) Modifier.border(1.dp, Platinum.copy(alpha = 0.45f), RoundedCornerShape(12.dp)) else Modifier)
+            .then(if (esPrimero) Modifier.border(1.dp, Platinum.copy(alpha = 0.45f), RoundedCornerShape(radio(12))) else Modifier)
             .clickable(enabled = member.handle != null, onClick = onClick)
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -290,7 +290,7 @@ private fun ClanActivityRow(item: ClanActivityItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(10.dp))
+            .background(Surface2, RoundedCornerShape(radio(10)))
             .padding(horizontal = 12.dp, vertical = 10.dp),
     ) {
         Text(

@@ -20,8 +20,8 @@ fun TrophyCountRow(counts: TrophyCounts, summary: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .background(Surface, RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(20.dp)
     ) {
         Row(
@@ -56,7 +56,7 @@ fun TrophyBadge(count: String, color: Color) {
         Box(
             modifier = Modifier
                 .size(16.dp)
-                .background(color, RoundedCornerShape(8.dp))
+                .background(color, RoundedCornerShape(radio(8)))
         )
         Text(
             text = count,

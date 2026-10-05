@@ -56,8 +56,8 @@ private fun NoSessionCard(onClose: () -> Unit) {
     Column(
         modifier = Modifier
             .padding(32.dp)
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .background(Surface, RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -93,8 +93,8 @@ private fun ShareAddCard(tokenStore: TokenStore, initialQuery: String, onClose: 
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp)
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .background(Surface, RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(20.dp),
     ) {
         Text(stringResource(R.string.compartir_titulo), color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -148,10 +148,10 @@ private fun ShareAddCard(tokenStore: TokenStore, initialQuery: String, onClose: 
                                     model = result.coverUrl,
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
-                                    modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)),
+                                    modifier = Modifier.size(44.dp).clip(RoundedCornerShape(radio(8))),
                                 )
                             } else {
-                                Box(modifier = Modifier.size(44.dp).background(AccentSoft, RoundedCornerShape(8.dp)))
+                                Box(modifier = Modifier.size(44.dp).background(AccentSoft, RoundedCornerShape(radio(8))))
                             }
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {

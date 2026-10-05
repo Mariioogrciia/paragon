@@ -104,8 +104,8 @@ fun TrophyGuidesSheet(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(AccentSoft, RoundedCornerShape(14.dp))
-                                .border(1.dp, Accent.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+                                .background(AccentSoft, RoundedCornerShape(radio(14)))
+                                .border(1.dp, Accent.copy(alpha = 0.35f), RoundedCornerShape(radio(14)))
                                 .padding(14.dp),
                         ) {
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -198,7 +198,7 @@ private fun TrophyGuideRowItem(guide: TrophyGuideRow) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(12.dp))
+            .background(Surface2, RoundedCornerShape(radio(12)))
             .padding(14.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

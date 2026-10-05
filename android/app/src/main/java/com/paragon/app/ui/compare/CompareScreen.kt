@@ -170,7 +170,7 @@ private fun FriendsPicker(amigos: List<AmigoRow>, onPick: (String) -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Surface, RoundedCornerShape(14.dp))
+                        .background(Surface, RoundedCornerShape(radio(14)))
                         .clickable { onPick(amigo.handle!!) }
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -222,8 +222,8 @@ private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: Compar
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(20.dp))
-            .border(1.dp, Border, RoundedCornerShape(20.dp))
+            .background(Surface, RoundedCornerShape(radio(20)))
+            .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(20.dp),
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
@@ -244,7 +244,7 @@ private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: Compar
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .background(color.copy(alpha = 0.14f), RoundedCornerShape(20.dp))
+                .background(color.copy(alpha = 0.14f), RoundedCornerShape(radio(20)))
                 .padding(horizontal = 14.dp, vertical = 6.dp),
         )
     }
@@ -289,14 +289,14 @@ private fun SharedGameRow(game: SharedGame) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
+            .background(Surface, RoundedCornerShape(radio(14)))
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
             model = game.iconUrl,
             contentDescription = null,
-            modifier = Modifier.size(44.dp).background(Surface2, RoundedCornerShape(10.dp)),
+            modifier = Modifier.size(44.dp).background(Surface2, RoundedCornerShape(radio(10))),
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {

@@ -19,6 +19,7 @@ sealed class Screen(val route: String, @StringRes val titleRes: Int) {
     }
     object Settings : Screen("settings", R.string.nav_ajustes)
     object LinkedAccounts : Screen("linked_accounts", R.string.cuentas_titulo)
+    object Apariencia : Screen("apariencia", R.string.apariencia_titulo)
     object Stats : Screen("stats", R.string.nav_estadisticas)
     object Focus : Screen("focus", R.string.nav_enfoque)
     object Compare : Screen("compare?handle={handle}", R.string.nav_comparar) {

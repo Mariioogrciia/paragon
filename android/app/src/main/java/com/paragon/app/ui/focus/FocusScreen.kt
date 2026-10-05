@@ -268,12 +268,12 @@ private fun FocusContent(
         Spacer(Modifier.height(12.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.weight(1f).height(6.dp).background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(3.dp))) {
+            Box(modifier = Modifier.weight(1f).height(6.dp).background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(radio(3)))) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(game.percent / 100f)
                         .fillMaxHeight()
-                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(3.dp)),
+                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(radio(3))),
                 )
             }
             Spacer(Modifier.width(10.dp))
@@ -389,7 +389,7 @@ private fun FocusContent(
             },
             enabled = !comprobando,
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(radio(16)),
             colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black, disabledContainerColor = Color.White.copy(alpha = 0.6f)),
         ) {
             Text(text = if (comprobando) stringResource(R.string.enfoque_comprobando) else stringResource(R.string.enfoque_ya_lo_tengo), fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -476,8 +476,8 @@ private fun PendingTrophyCard(trofeo: TrophyItem, destacado: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White.copy(alpha = if (destacado) 0.09f else 0.04f), RoundedCornerShape(16.dp))
-            .then(if (destacado) Modifier.border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(16.dp)) else Modifier)
+            .background(Color.White.copy(alpha = if (destacado) 0.09f else 0.04f), RoundedCornerShape(radio(16)))
+            .then(if (destacado) Modifier.border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(radio(16))) else Modifier)
             .padding(14.dp),
         verticalAlignment = Alignment.Top,
     ) {
@@ -536,7 +536,7 @@ private fun SessionTimerCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(16.dp))
+            .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(radio(16)))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -551,7 +551,7 @@ private fun SessionTimerCard(
             Button(
                 onClick = onDetener,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(radio(14)),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.9f), contentColor = Color.Black),
             ) {
                 Text(stringResource(R.string.enfoque_detener), fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -568,7 +568,7 @@ private fun SessionTimerCard(
                 OutlinedButton(
                     onClick = onDetener,
                     modifier = Modifier.fillMaxWidth().height(44.dp),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(radio(14)),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
                 ) {
@@ -578,7 +578,7 @@ private fun SessionTimerCard(
                 Button(
                     onClick = onIniciar,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(radio(14)),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.9f), contentColor = Color.Black),
                 ) {
                     // "Iniciar sesión" se confundía con iniciar sesión de
@@ -603,7 +603,7 @@ private fun DiarioDialog(sessionRepository: GameSessionRepository, onDismiss: ()
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = 480.dp)
-                .background(Color(0xFF111111), RoundedCornerShape(20.dp))
+                .background(Color(0xFF111111), RoundedCornerShape(radio(20)))
                 .padding(20.dp),
         ) {
             Text(stringResource(R.string.enfoque_tu_diario), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)

@@ -49,6 +49,15 @@ Reglas de base (ya acordadas, no reabrir sin decirlo el usuario):
 - Ventana de 600 dp o más: `MainScreen` pone rail lateral y limita el
   contenido a 840 dp. Overlays a pantalla completa propios: `BackHandler`.
 - Colores de marca en `ui/theme/Color.kt` (`MarcaPlayStation`...), no a mano.
+- **Apariencia = la de la web.** Mismo modelo y claves (`accent-*`, `estilo-*`,
+  color libre, paleta de juego, tamaño de texto), sincronizado con la cuenta
+  (`/api/mobile/appearance`). Catálogo en `ui/theme/Apariencia.kt`; las
+  esquinas con `radio(N)` (nunca `RoundedCornerShape(N.dp)` a pelo) para que
+  el estilo mande; texto sobre un relleno de acento con `OnAccent`/`textoSobre`.
+- **Icono único: la P** de la web (`public/logo.png`): `ic_launcher_*`,
+  `ic_launcher_monochrome` (Android 13) y `drawable-nodpi/marca_paragon.png`.
+- **Modo demo** (solo compilación debug, `src/debug/.../demo`): para revisar
+  pantallas con sesión sin cuenta real. `adb shell run-as com.paragon.app touch files/modo_demo`.
 
 ## Estado (16 de septiembre de 2026) — paridad básica con la web alcanzada
 

@@ -67,6 +67,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import com.paragon.app.ui.theme.MarcaGoogle
 import com.paragon.app.ui.theme.MarcaDiscord
+import com.paragon.app.ui.theme.radio
+import com.paragon.app.ui.theme.OnAccent
 
 /**
  * Puerta de entrada real antes de `MainScreen` (el NavHost + BottomBar de
@@ -279,7 +281,7 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
 @Composable
 private fun GradeChip(value: String, label: String, color: Color) {
     Surface(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(radio(12)),
         color = SurfaceColor,
         border = BorderStroke(1.dp, Border),
     ) {
@@ -346,7 +348,7 @@ private fun OnboardingGate(repository: PanelRepository, onDone: () -> Unit) {
             )
 
             Surface(
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(radio(14)),
                 color = SurfaceColor,
                 border = BorderStroke(1.dp, if (error != null) Danger else Border),
                 modifier = Modifier.fillMaxWidth(),
@@ -388,7 +390,7 @@ private fun OnboardingGate(repository: PanelRepository, onDone: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
             ) {
                 if (loading) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp))
+                    CircularProgressIndicator(color = OnAccent, modifier = Modifier.size(18.dp))
                 } else {
                     Text(stringResource(R.string.comun_continuar))
                 }
@@ -414,7 +416,7 @@ private fun ProviderButton(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(radio(14)),
         color = SurfaceColor,
         border = BorderStroke(1.dp, Border),
         modifier = Modifier.fillMaxWidth(),

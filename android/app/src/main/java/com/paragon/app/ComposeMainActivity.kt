@@ -73,6 +73,11 @@ class ComposeMainActivity : ComponentActivity() {
                     registerPushTokenIfLoggedIn()
                     PanelSyncWorker.schedule(applicationContext)
                 }
+                // Apariencia de la cuenta (la misma que en la web): al abrir y
+                // tras cada login nuevo (`refresh` sube con el deep link).
+                androidx.compose.runtime.LaunchedEffect(refresh) {
+                    com.paragon.app.data.AparienciaRepository(tokenStore, themeStore).sincronizarDesdeCuenta()
+                }
                 AppRoot(
                     tokenStore = tokenStore,
                     themeStore = themeStore,
@@ -132,6 +137,10 @@ class ComposeMainActivity : ComponentActivity() {
         if (FirebaseApp.getApps(applicationContext).isEmpty()) return
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            // Sin red o sin Play Services, la tarea falla y `task.result` LANZA
+            // la excepción (no devuelve null): eso cerraba la app al arrancar.
+            // Se reintenta solo en el siguiente arranque o con onNewToken.
+            if (!task.isSuccessful) return@addOnCompleteListener
             val token = task.result ?: return@addOnCompleteListener
             lifecycleScope.launch {
                 PushRepository(tokenStore).registerToken(token)

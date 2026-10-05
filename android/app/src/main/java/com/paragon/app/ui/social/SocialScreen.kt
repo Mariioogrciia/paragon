@@ -405,8 +405,8 @@ private fun LeagueInviteRow(invite: LeagueInvite, onAccept: () -> Unit, onDeclin
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .background(Surface, RoundedCornerShape(radio(12)))
+            .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .padding(16.dp),
     ) {
         Text(invite.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
@@ -480,12 +480,12 @@ private fun NewLeagueDialog(onDismiss: () -> Unit, onCreate: (String, Int?, Stri
                         val selected = durationUnit == value
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(radio(8)))
                                 .background(if (selected) Accent else Surface2)
                                 .clickable { durationUnit = if (selected) null else value }
                                 .padding(horizontal = 10.dp, vertical = 6.dp),
                         ) {
-                            Text(label, color = if (selected) androidx.compose.ui.graphics.Color.White else Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                            Text(label, color = if (selected) OnAccent else Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -539,9 +539,9 @@ private fun CreateLeagueHero(onClick: () -> Unit) {
             .fillMaxWidth()
             .background(
                 androidx.compose.ui.graphics.Brush.linearGradient(listOf(AccentSoft, Surface)),
-                RoundedCornerShape(16.dp),
+                RoundedCornerShape(radio(16)),
             )
-            .border(1.dp, Accent.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .border(1.dp, Accent.copy(alpha = 0.3f), RoundedCornerShape(radio(16)))
             .clickable { onClick() }
             .padding(18.dp),
     ) {
@@ -553,8 +553,8 @@ private fun CreateLeagueHero(onClick: () -> Unit) {
             modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(16.dp))
-            Text(stringResource(R.string.social_crear_liga), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
+            Icon(Icons.Default.Add, contentDescription = null, tint = Accent, modifier = Modifier.size(16.dp))
+            Text(stringResource(R.string.social_crear_liga), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
         }
     }
 }
@@ -566,8 +566,8 @@ fun LeagueRowItem(league: League, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .background(Surface, RoundedCornerShape(radio(12)))
+            .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .clickable { onClick() }
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -575,7 +575,7 @@ fun LeagueRowItem(league: League, onClick: () -> Unit) {
         Box(
             modifier = Modifier
                 .size(38.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(radio(10)))
                 .background(color.copy(alpha = 0.16f)),
             contentAlignment = Alignment.Center,
         ) {
@@ -598,8 +598,8 @@ private fun ClanInviteRow(invite: ClanInvite, onAccept: () -> Unit, onDecline: (
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .background(Surface, RoundedCornerShape(radio(12)))
+            .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .padding(16.dp),
     ) {
         Text("[${invite.clanTag}] ${invite.clanName}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
@@ -630,8 +630,8 @@ private fun ClanCard(title: String, subtitle: String, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
-            .border(1.dp, Border, RoundedCornerShape(16.dp))
+            .background(Surface, RoundedCornerShape(radio(16)))
+            .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .clickable { onClick() }
             .padding(18.dp),
     ) {
@@ -647,9 +647,9 @@ private fun CreateClanHero(onClick: () -> Unit) {
             .fillMaxWidth()
             .background(
                 androidx.compose.ui.graphics.Brush.linearGradient(listOf(AccentSoft, Surface)),
-                RoundedCornerShape(16.dp),
+                RoundedCornerShape(radio(16)),
             )
-            .border(1.dp, Accent.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .border(1.dp, Accent.copy(alpha = 0.3f), RoundedCornerShape(radio(16)))
             .clickable { onClick() }
             .padding(18.dp),
     ) {
@@ -661,8 +661,8 @@ private fun CreateClanHero(onClick: () -> Unit) {
             modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(16.dp))
-            Text(stringResource(R.string.social_crear_clan), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
+            Icon(Icons.Default.Add, contentDescription = null, tint = Accent, modifier = Modifier.size(16.dp))
+            Text(stringResource(R.string.social_crear_clan), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
         }
     }
 }
@@ -673,8 +673,8 @@ private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .background(Surface, RoundedCornerShape(radio(12)))
+            .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .clickable { onClick() }
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -682,7 +682,7 @@ private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
         Box(
             modifier = Modifier
                 .size(38.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(radio(10)))
                 .background(color.copy(alpha = 0.16f)),
             contentAlignment = Alignment.Center,
         ) {
@@ -797,9 +797,9 @@ private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPunto
             .fillMaxWidth()
             .background(
                 androidx.compose.ui.graphics.Brush.linearGradient(listOf(Platinum.copy(alpha = 0.14f), Surface)),
-                RoundedCornerShape(16.dp),
+                RoundedCornerShape(radio(16)),
             )
-            .border(1.dp, Platinum.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .border(1.dp, Platinum.copy(alpha = 0.3f), RoundedCornerShape(radio(16)))
             .padding(18.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -856,8 +856,8 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(PodiumGold.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
-                    .border(1.dp, PodiumGold.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+                    .background(PodiumGold.copy(alpha = 0.12f), RoundedCornerShape(radio(16)))
+                    .border(1.dp, PodiumGold.copy(alpha = 0.4f), RoundedCornerShape(radio(16)))
                     .clickable { onClick(primero.handle) }
                     .padding(vertical = 18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -891,8 +891,8 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
 private fun PodiumSecondaryCard(row: LigaRow, medalla: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: (String?) -> Unit) {
     Column(
         modifier = modifier
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+            .background(Surface, RoundedCornerShape(radio(14)))
+            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(radio(14)))
             .clickable { onClick(row.handle) }
             .padding(14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -936,8 +936,8 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .background(Surface, RoundedCornerShape(radio(12)))
+            .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .clickable { onClick() }
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -959,8 +959,8 @@ fun AmigoRowItem(row: AmigoRow, position: Int, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(1.dp, Border, RoundedCornerShape(12.dp))
+            .background(Surface, RoundedCornerShape(radio(12)))
+            .border(1.dp, Border, RoundedCornerShape(radio(12)))
             .clickable { onClick() }
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,

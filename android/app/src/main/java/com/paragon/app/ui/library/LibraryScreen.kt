@@ -163,14 +163,14 @@ fun LibraryScreen(
                 // de "siguiente estilo".
                 Row(
                     modifier = Modifier
-                        .border(1.dp, Border, RoundedCornerShape(10.dp))
+                        .border(1.dp, Border, RoundedCornerShape(radio(10)))
                         .padding(2.dp),
                 ) {
                     listOf(0 to Icons.Default.GridView, 1 to Icons.AutoMirrored.Filled.List).forEach { (layout, icon) ->
                         val selected = themeStore.libraryLayout == layout
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(radio(8)))
                                 .background(if (selected) Accent else Color.Transparent)
                                 .clickable { themeStore.setLibraryLayout(layout) }
                                 .padding(8.dp),
@@ -178,7 +178,7 @@ fun LibraryScreen(
                             Icon(
                                 icon,
                                 contentDescription = if (layout == 0) stringResource(R.string.biblio_vista_cuadricula) else stringResource(R.string.biblio_vista_enfoque),
-                                tint = if (selected) Color.White else Muted,
+                                tint = if (selected) OnAccent else Muted,
                                 modifier = Modifier.size(20.dp),
                             )
                         }

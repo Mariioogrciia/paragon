@@ -331,7 +331,7 @@ private fun PendingMemberRow(member: PendingMember, onCancel: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(12.dp))
+            .background(Surface2, RoundedCornerShape(radio(12)))
             .padding(14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -359,10 +359,10 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
             .fillMaxWidth()
             .background(
                 if (esPrimero) Platinum.copy(alpha = 0.12f) else Surface2,
-                RoundedCornerShape(12.dp),
+                RoundedCornerShape(radio(12)),
             )
             .then(
-                if (esPrimero) Modifier.border(1.dp, Platinum.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+                if (esPrimero) Modifier.border(1.dp, Platinum.copy(alpha = 0.45f), RoundedCornerShape(radio(12)))
                 else Modifier,
             )
             .padding(14.dp),
@@ -439,7 +439,7 @@ private fun ChallengeStandingRow(member: ChallengeStanding, position: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface2, RoundedCornerShape(12.dp))
+            .background(Surface2, RoundedCornerShape(radio(12)))
             .padding(14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

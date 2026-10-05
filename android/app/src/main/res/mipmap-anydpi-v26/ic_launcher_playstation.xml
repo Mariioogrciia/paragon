@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Icono único de Paragon: la P de la web (public/logo.png). Las variantes
+     playstation/xbox/steam existen solo para que quien las tuviera activas
+     siga viendo la app tras actualizar; todas enseñan la misma P. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/ic_launcher_bg_playstation" />
+    <background android:drawable="@color/ic_launcher_bg_paragon" />
     <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome" />
 </adaptive-icon>

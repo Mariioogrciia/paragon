@@ -30,13 +30,18 @@ import com.paragon.app.data.SettingsRepository
 import com.paragon.app.data.SettingsResult
 import com.paragon.app.data.UserProfile
 import com.paragon.app.data.theme.ThemeMode
-import com.paragon.app.data.theme.PlatformColor
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 import com.paragon.app.R
 import androidx.compose.ui.res.stringResource
 import com.paragon.app.util.Textos
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.ui.graphics.Brush
+import com.paragon.app.ui.theme.radio
+import com.paragon.app.ui.theme.Accent2
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 
 @Composable
 fun SettingsScreen(
@@ -45,6 +50,7 @@ fun SettingsScreen(
     themeStore: ThemeStore,
     onBack: () -> Unit,
     onNavigateToLinkedAccounts: () -> Unit,
+    onNavigateToApariencia: () -> Unit,
     onLogout: () -> Unit
 ) {
     var nameInput by remember { mutableStateOf(profile.name) }
@@ -209,7 +215,7 @@ fun SettingsScreen(
                 enabled = !isLoading && nameInput.isNotBlank() && hayCambiosSinGuardar
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = Background, modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(color = OnAccent, modifier = Modifier.size(24.dp))
                 } else {
                     Text(stringResource(R.string.comun_guardar_cambios), fontWeight = FontWeight.Bold)
                 }
@@ -226,19 +232,25 @@ fun SettingsScreen(
 
             Text(stringResource(R.string.ajustes_seccion_apariencia), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            ThemePicker(themeStore = themeStore)
-
-            Spacer(modifier = Modifier.height(12.dp))
-            DynamicColorToggle(themeStore = themeStore)
-
-            Spacer(modifier = Modifier.height(12.dp))
-            PlatformPicker(themeStore = themeStore)
-
-            Spacer(modifier = Modifier.height(12.dp))
-            CustomColorPicker(themeStore = themeStore)
-
-            Spacer(modifier = Modifier.height(12.dp))
-            FontFamilyPicker(themeStore = themeStore)
+            // Todo lo de apariencia vive en su propia pantalla (como
+            // /ajustes/apariencia en la web), con muestra en vivo.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(radio(14)))
+                    .background(Surface)
+                    .border(1.dp, Border, RoundedCornerShape(radio(14)))
+                    .clickable(onClick = onNavigateToApariencia)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(Modifier.size(28.dp).background(Brush.linearGradient(listOf(Accent2, Accent)), CircleShape))
+                Column(modifier = Modifier.weight(1f).padding(horizontal = 14.dp)) {
+                    Text(stringResource(R.string.apariencia_titulo), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.ajustes_apariencia_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Muted)
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
             
@@ -247,8 +259,8 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Surface, RoundedCornerShape(14.dp))
-                    .border(1.dp, Border, RoundedCornerShape(14.dp))
+                    .background(Surface, RoundedCornerShape(radio(14)))
+                    .border(1.dp, Border, RoundedCornerShape(radio(14)))
                     .clickable { themeStore.setZenMode(!themeStore.zenMode) }
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -262,7 +274,7 @@ fun SettingsScreen(
                     checked = themeStore.zenMode,
                     onCheckedChange = { themeStore.setZenMode(it) },
                     colors = androidx.compose.material3.SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
+                        checkedThumbColor = OnAccent,
                         checkedTrackColor = Accent,
                     )
                 )
@@ -277,7 +289,7 @@ fun SettingsScreen(
                 onClick = onNavigateToLinkedAccounts,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Surface),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(radio(12))
             ) {
                 Text(stringResource(R.string.cuentas_titulo), color = Foreground)
             }
@@ -300,7 +312,7 @@ fun SettingsScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Surface),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(radio(12))
             ) {
                 Text(stringResource(R.string.ajustes_como_funciona), color = Foreground)
             }
@@ -328,229 +340,5 @@ fun SettingsScreen(
             onConfirm = onLogout,
             onDismiss = { showLogoutConfirm = false },
         )
-    }
-}
-
-private val THEME_OPTIONS get() = listOf(
-    ThemeMode.SISTEMA to Textos.t(R.string.tema_sistema),
-    ThemeMode.CLARO to Textos.t(R.string.tema_claro),
-    ThemeMode.OSCURO to Textos.t(R.string.tema_oscuro),
-)
-
-/** Sistema/Claro/Oscuro — cambia al instante (ThemeStore es estado de Compose, no hace falta reiniciar la app). */
-@Composable
-private fun ThemePicker(themeStore: ThemeStore) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, Border, RoundedCornerShape(14.dp))
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        THEME_OPTIONS.forEach { (mode, label) ->
-            val selected = themeStore.mode == mode
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (selected) Accent else Color.Transparent)
-                    .clickable { themeStore.setMode(mode) }
-                    .padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = label,
-                    // Blanco fijo (no `Background`): el pill seleccionado es
-                    // siempre Accent (un azul), y en modo claro Background es
-                    // casi blanco — usarlo aquí dejaría el texto casi
-                    // invisible sobre el azul.
-                    color = if (selected) Color.White else Muted,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        }
-    }
-}
-
-private val PLATFORM_OPTIONS = listOf(
-    PlatformColor.PARAGON to "Paragon",
-    PlatformColor.PLAYSTATION to "PSN",
-    PlatformColor.XBOX to "Xbox",
-    PlatformColor.STEAM to "Steam"
-)
-
-@Composable
-private fun PlatformPicker(themeStore: ThemeStore) {
-    // Plataforma y Material You son dos temas COMPLETOS (fondo + acento
-    // cada uno) que no pueden mandar los dos a la vez — mientras Material
-    // You esté activo, este selector se bloquea (en vez de dejarlo
-    // clicable sin ningún efecto visible, que era la queja real).
-    val blocked = themeStore.useDynamicColor
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Surface, RoundedCornerShape(14.dp))
-                .border(1.dp, Border, RoundedCornerShape(14.dp))
-                .padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            PLATFORM_OPTIONS.forEach { (platform, label) ->
-                val selected = !blocked && themeStore.platform == platform
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(if (selected) Accent else Color.Transparent)
-                        .clickable(enabled = !blocked) { themeStore.setPlatform(platform) }
-                        .padding(vertical = 10.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = label,
-                        color = when {
-                            selected -> Color.White
-                            blocked -> Muted.copy(alpha = 0.4f)
-                            else -> Muted
-                        },
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-            }
-        }
-        if (blocked) {
-            Text(
-                text = stringResource(R.string.ajustes_material_aviso),
-                color = Muted,
-                fontSize = 11.sp,
-                lineHeight = 14.sp,
-                modifier = Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun DynamicColorToggle(themeStore: ThemeStore) {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Surface, RoundedCornerShape(14.dp))
-                .border(1.dp, Border, RoundedCornerShape(14.dp))
-                .clickable { themeStore.setUseDynamicColor(!themeStore.useDynamicColor) }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
-                Text(stringResource(R.string.ajustes_material), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                Text(stringResource(R.string.ajustes_material_sub), color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 2.dp))
-            }
-            androidx.compose.material3.Switch(
-                checked = themeStore.useDynamicColor,
-                onCheckedChange = { themeStore.setUseDynamicColor(it) },
-                colors = androidx.compose.material3.SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = Accent,
-                )
-            )
-        }
-    }
-}
-
-private val CUSTOM_COLORS get() = listOf(
-    -1L to Textos.t(R.string.color_auto),
-    0xFFFF3B30 to Textos.t(R.string.color_rojo),
-    0xFFFF9500 to Textos.t(R.string.color_naranja),
-    0xFFFFCC00 to Textos.t(R.string.color_amarillo),
-    0xFF4CD964 to Textos.t(R.string.color_verde),
-    0xFF5AC8FA to Textos.t(R.string.color_celeste),
-    0xFF007AFF to Textos.t(R.string.color_azul),
-    0xFF5856D6 to Textos.t(R.string.color_violeta),
-    0xFFFF2D55 to Textos.t(R.string.color_rosa)
-)
-
-@Composable
-private fun CustomColorPicker(themeStore: ThemeStore) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, Border, RoundedCornerShape(14.dp))
-            .padding(16.dp)
-    ) {
-        Text(stringResource(R.string.ajustes_acento), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-        Text(
-            stringResource(R.string.ajustes_acento_sub),
-            color = Muted,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            CUSTOM_COLORS.forEach { (colorValue, label) ->
-                val isSelected = (themeStore.customAccentColor ?: -1L) == colorValue
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(if (colorValue == -1L) Surface2 else Color(colorValue))
-                        .border(if (isSelected) 3.dp else 1.dp, if (isSelected) Foreground else Border, CircleShape)
-                        .clickable { themeStore.setCustomAccentColor(if (colorValue == -1L) null else colorValue) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (colorValue == -1L) {
-                        Text("X", color = Muted, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-    }
-}
-
-private val FONT_OPTIONS get() = listOf(
-    0 to Textos.t(R.string.fuente_moderna),
-    1 to Textos.t(R.string.fuente_elegante),
-    2 to Textos.t(R.string.fuente_retro),
-    3 to Textos.t(R.string.fuente_casual)
-)
-
-@Composable
-private fun FontFamilyPicker(themeStore: ThemeStore) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(14.dp))
-            .border(1.dp, Border, RoundedCornerShape(14.dp))
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        FONT_OPTIONS.forEach { (fontIndex, label) ->
-            val selected = themeStore.fontFamily == fontIndex
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (selected) Accent else Color.Transparent)
-                    .clickable { themeStore.setFontFamily(fontIndex) }
-                    .padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = label,
-                    color = if (selected) Color.White else Muted,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        }
     }
 }
