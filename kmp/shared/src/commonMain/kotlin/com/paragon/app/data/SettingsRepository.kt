@@ -56,6 +56,17 @@ class SettingsRepository(private val tokenStore: TokenStore) {
         }
     }
 
+    /** Sincroniza una plataforma; devuelve cuántos trofeos han entrado. */
+    suspend fun syncPlatform(platform: String): SettingsResult<Int> {
+        return try {
+            SettingsResult.Ok(ApiClient.settingsApi(tokenStore).syncPlatform(platform).nuevos)
+        } catch (e: HttpException) {
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: Exception) {
+            SettingsResult.Error(Textos.t(T.error_red))
+        }
+    }
+
     suspend fun updateProfile(name: String, image: String?): SettingsResult<Unit> {
         return try {
             ApiClient.settingsApi(tokenStore).updateProfile(UpdateProfileRequest(name, image))

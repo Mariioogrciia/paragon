@@ -11,14 +11,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import com.paragon.shared.contextoPlataforma
 import com.paragon.shared.recursos.Res
 import com.paragon.shared.recursos.*
@@ -326,6 +329,35 @@ fun OauthItem(oauth: OauthAccountDto, onLinkRequested: () -> Unit) {
     }
 }
 
+/** El degradado de cada plataforma, el mismo que AVATAR_BG en /ajustes/plataformas (colores de marca, no del tema). */
+private fun platformGradient(platform: String): Brush = Brush.linearGradient(
+    when (platform) {
+        "psn" -> listOf(Color(0xFF2F7AD6), Color(0xFF6B3FD4))
+        "steam" -> listOf(Color(0xFF2F7D9D), Color(0xFF1B2838))
+        "xbox" -> listOf(Color(0xFF107C10), Color(0xFF16A316))
+        else -> listOf(Color(0xFF313131), Color(0xFF0A0A0A))
+    },
+)
+
+/** "hace 12 min", "hace 3 h"... a partir del ISO de syncedAt. */
+private fun haceCuanto(iso: String?): String? {
+    val millis = com.paragon.app.data.isoAMillis(iso) ?: return null
+    val minutos = ((com.paragon.app.data.ahoraMillis() - millis) / 60_000).coerceAtLeast(0)
+    return when {
+        minutos < 1 -> Textos.t(T.tiempo_ahora)
+        minutos < 60 -> Textos.t(T.tiempo_min, minutos)
+        minutos < 60 * 24 -> Textos.t(T.tiempo_h, minutos / 60)
+        else -> Textos.t(T.tiempo_d, minutos / (60 * 24))
+    }
+}
+
+/**
+ * Una plataforma (rediseño del 5 oct 2026, como /ajustes/plataformas en la
+ * web): logo con su degradado, estado (vinculada o privada), quién eres ahí
+ * y cuándo se sincronizó; debajo, Sincronizar, Cambiar cuenta y Desvincular
+ * (con confirmación). Antes solo había una papelera roja: parecía que se
+ * borraba algo, y no había forma de sincronizar una sola plataforma.
+ */
 @Composable
 fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, onUpdate: () -> Unit) {
     var isLinking by remember { mutableStateOf(false) }
@@ -333,71 +365,151 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var isProcessing by remember { mutableStateOf(false) }
     var showUnlinkConfirm by remember { mutableStateOf(false) }
+    var sincronizando by remember { mutableStateOf(false) }
+    var avisoSync by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
     val scope = rememberCoroutineScope()
 
     val brandColor = platformBrandColor(platform.platform)
+    val forma = RoundedCornerShape(radio(20))
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(radio(14)))
-            .border(1.dp, if (platform.linked) brandColor.copy(alpha = 0.35f) else Border, RoundedCornerShape(radio(14)))
-            .padding(14.dp)
+            .background(Surface, forma)
+            .border(1.dp, Border, forma)
+            .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(radio(10))).background(platformGradient(platform.platform)),
+                contentAlignment = Alignment.Center,
+            ) {
+                val iconRes = platformIconRes(platform.platform)
+                if (iconRes != null) {
+                    Icon(painter = painterResource(iconRes), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                } else {
+                    Text(text = platformShort(platform.platform), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Black)
+                }
+            }
+            Text(
+                text = platformLabel(platform.platform),
+                color = Foreground,
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).padding(start = 12.dp),
+            )
+            if (platform.linked) {
+                val color = if (platform.isPublic) Good else Gold
+                Row(
+                    Modifier.clip(RoundedCornerShape(50)).background(color.copy(alpha = 0.14f)).padding(horizontal = 10.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(Modifier.size(6.dp).background(color, CircleShape))
+                    Text(
+                        if (platform.isPublic) Textos.t(T.cuentas_vinculada) else Textos.t(T.cuentas_privada),
+                        color = color,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 6.dp),
+                    )
+                }
+            } else if (platform.appLinkable && !isLinking) {
+                Button(
+                    onClick = { isLinking = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                    shape = RoundedCornerShape(50),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text(Textos.t(T.cuentas_vincular), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = OnAccent)
+                }
+            }
+        }
+
+        if (platform.linked) {
+            Row(Modifier.fillMaxWidth().padding(top = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    modifier = Modifier.size(36.dp).background(brandColor.copy(alpha = 0.14f), CircleShape),
+                    Modifier.size(40.dp).clip(CircleShape).background(platformGradient(platform.platform)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    val iconRes = platformIconRes(platform.platform)
-                    if (iconRes != null) {
-                        Icon(
-                            painter = painterResource(iconRes),
+                    Text((platform.username ?: "?").take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                    if (platform.avatarUrl != null) {
+                        coil3.compose.AsyncImage(
+                            model = platform.avatarUrl,
                             contentDescription = null,
-                            // El logo de Epic es monocromo: sigue al color del texto (claro/oscuro).
-                            tint = if (platform.platform == "epic") Foreground else Color.Unspecified,
-                            modifier = Modifier.size(18.dp),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
                         )
-                    } else {
-                        Text(text = platformShort(platform.platform), color = brandColor, fontSize = 12.sp, fontWeight = FontWeight.Black)
                     }
                 }
-                Column(modifier = Modifier.padding(start = 12.dp)) {
-                    Text(text = platformLabel(platform.platform), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    if (platform.linked) {
-                        Text(text = platform.username ?: Textos.t(T.cuentas_vinculado), color = Muted, fontSize = 13.sp)
-                    }
-                    if (platform.declared) {
-                        // Igual que MarcaDeclarado en la web: se ve, pero no puntúa.
-                        Text(text = Textos.t(T.cuentas_declarado), color = Muted, fontSize = 12.sp)
+                Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                    Text(
+                        text = platform.username ?: Textos.t(T.cuentas_vinculado),
+                        color = Foreground,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    val detalle = listOfNotNull(
+                        platform.level?.let { Textos.t(T.cuentas_nivel, it) },
+                        haceCuanto(platform.syncedAt)?.let { Textos.t(T.cuentas_sincronizada_hace, it) },
+                        if (platform.declared) Textos.t(T.cuentas_declarado) else null,
+                    ).joinToString(" · ")
+                    if (detalle.isNotEmpty()) {
+                        Text(detalle, color = Muted, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
-            if (platform.linked) {
-                IconButton(
-                    onClick = { showUnlinkConfirm = true },
-                    enabled = !isProcessing,
-                    modifier = Modifier.size(48.dp),
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = Textos.t(T.cuentas_desvincular), tint = Danger, modifier = Modifier.size(18.dp))
-                }
-            } else if (platform.appLinkable) {
-                if (!isLinking) {
-                    Button(
-                        onClick = { isLinking = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = brandColor),
-                        shape = RoundedCornerShape(radio(10)),
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
-                        modifier = Modifier.height(34.dp)
+            HorizontalDivider(color = Border, modifier = Modifier.padding(top = 14.dp))
+            Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                // Epic no: se sincroniza con la extensión del navegador.
+                if (platform.appLinkable) {
+                    Row(
+                        Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(AccentSoft)
+                            .clickable(enabled = !sincronizando) {
+                                scope.launch {
+                                    sincronizando = true
+                                    avisoSync = null
+                                    avisoSync = when (val r = repository.syncPlatform(platform.platform)) {
+                                        is SettingsResult.Ok -> (if (r.data > 0) Textos.t(T.cuentas_trofeos_nuevos, r.data) else Textos.t(T.cuentas_al_dia)) to true
+                                        is SettingsResult.Error -> r.message to false
+                                    }
+                                    sincronizando = false
+                                    if (avisoSync?.second == true) onUpdate()
+                                }
+                            }
+                            .padding(horizontal = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(Textos.t(T.cuentas_vincular), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = textoSobre(brandColor))
+                        if (sincronizando) {
+                            CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
+                        } else {
+                            Icon(Icons.Default.Refresh, contentDescription = null, tint = Accent, modifier = Modifier.size(16.dp))
+                        }
+                        Text(
+                            if (sincronizando) Textos.t(T.cuentas_sincronizando) else Textos.t(T.cuentas_sincronizar),
+                            color = Accent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            modifier = Modifier.padding(start = 6.dp),
+                        )
+                    }
+                    TextButton(onClick = { isLinking = !isLinking; errorMsg = null }, enabled = !isProcessing) {
+                        Text(Textos.t(T.cuentas_cambiar), color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     }
                 }
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { showUnlinkConfirm = true }, enabled = !isProcessing) {
+                    Text(Textos.t(T.cuentas_desvincular), color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+            }
+            avisoSync?.let { (texto, ok) ->
+                Text(texto, color = if (ok) Good else Danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
             }
         }
 
@@ -410,7 +522,7 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
             )
         }
 
-        if (isLinking && !platform.linked) {
+        if (isLinking && platform.appLinkable) {
             Spacer(modifier = Modifier.height(14.dp))
             HorizontalDivider(color = Border)
             Spacer(modifier = Modifier.height(14.dp))

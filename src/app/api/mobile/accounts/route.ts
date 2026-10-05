@@ -49,8 +49,18 @@ export async function GET(req: Request) {
     const cuenta = profile.accounts.find((a) => a.platform === platform);
     const extra = { declared: esDeclarada(platform), appLinkable: platform !== "epic" };
     return cuenta
-      ? { platform, linked: true, username: cuenta.username, level: cuenta.level, ...extra }
-      : { platform, linked: false, username: null, level: null, ...extra };
+      ? {
+          platform,
+          linked: true,
+          username: cuenta.username,
+          level: cuenta.level,
+          // Como la web (/ajustes/plataformas): avatar, si es pública y cuándo se sincronizó.
+          avatarUrl: cuenta.avatarUrl,
+          isPublic: cuenta.isPublic,
+          syncedAt: cuenta.syncedAt ? cuenta.syncedAt.toISOString() : null,
+          ...extra,
+        }
+      : { platform, linked: false, username: null, level: null, avatarUrl: null, isPublic: false, syncedAt: null, ...extra };
   });
 
   return NextResponse.json({ oauth, platforms });

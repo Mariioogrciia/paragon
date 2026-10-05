@@ -4408,5 +4408,53 @@
   "en": "Emerald",
   "es": "Esmeralda",
   "fr": "Émeraude"
+ },
+ "cuentas_privada": {
+  "de": "Privat",
+  "en": "Private",
+  "es": "Privada",
+  "fr": "Privé"
+ },
+ "cuentas_nivel": {
+  "de": "Stufe {0}",
+  "en": "Level {0}",
+  "es": "Nivel {0}",
+  "fr": "Niveau {0}"
+ },
+ "cuentas_sincronizada_hace": {
+  "de": "synchronisiert {0}",
+  "en": "synced {0}",
+  "es": "sincronizada {0}",
+  "fr": "synchronisé {0}"
+ },
+ "cuentas_trofeos_nuevos": {
+  "de": "{0} neue Trophäen",
+  "en": "{0} new trophies",
+  "es": "{0} trofeos nuevos",
+  "fr": "{0} nouveaux trophées"
+ },
+ "cuentas_al_dia": {
+  "de": "Alles aktuell",
+  "en": "All up to date",
+  "es": "Todo al día",
+  "fr": "Tout est à jour"
+ },
+ "cuentas_sincronizando": {
+  "de": "Synchronisiere…",
+  "en": "Syncing…",
+  "es": "Sincronizando…",
+  "fr": "Synchronisation…"
+ },
+ "cuentas_sincronizar": {
+  "de": "Synchronisieren",
+  "en": "Sync",
+  "es": "Sincronizar",
+  "fr": "Synchroniser"
+ },
+ "cuentas_cambiar": {
+  "de": "Konto wechseln",
+  "en": "Change account",
+  "es": "Cambiar cuenta",
+  "fr": "Changer de compte"
  }
 }

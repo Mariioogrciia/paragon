@@ -22,6 +22,11 @@ data class PlatformAccountDto(
     val declared: Boolean = false,
     /** Epic no se puede vincular desde el móvil, solo con la extensión del navegador. */
     val appLinkable: Boolean = true,
+    val avatarUrl: String? = null,
+    /** false = perfil privado en la plataforma (se ve vinculada, pero no se leen sus juegos). */
+    val isPublic: Boolean = true,
+    /** ISO 8601 o null: cuándo se sincronizó de verdad la última vez. */
+    val syncedAt: String? = null,
 )
 
 @Serializable
@@ -42,6 +47,9 @@ data class LinkPlatformResponse(
 
 @Serializable
 data class SuccessResponse(val ok: Boolean)
+
+@Serializable
+data class SyncPlatformResponse(val nuevos: Int = 0)
 
 @Serializable
 data class UpdateProfileRequest(
@@ -69,6 +77,10 @@ class SettingsApi internal constructor(private val c: ClienteParagon) {
 
     suspend fun unlinkPlatform(platform: String): SuccessResponse =
         c.http.delete("api/mobile/accounts/${platform.encodeURLPathPart()}").body()
+
+    /** El botón "Sincronizar" de cada plataforma — ver accounts/[platform]/sync/route.ts. */
+    suspend fun syncPlatform(platform: String): SyncPlatformResponse =
+        c.http.post("api/mobile/accounts/${platform.encodeURLPathPart()}/sync").body()
 
     suspend fun updateProfile(request: UpdateProfileRequest): SuccessResponse =
         c.http.post("api/mobile/profile") { json(request) }.body()

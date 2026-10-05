@@ -554,7 +554,8 @@ hay 404 aparte — el resultado que le importa al cliente es el mismo).
     { "provider": "discord", "linked": false, "configured": true }
   ],
   "platforms": [
-    { "platform": "psn", "linked": true, "username": "mario_psn", "level": 245 },
+    { "platform": "psn", "linked": true, "username": "mario_psn", "level": 245,
+      "avatarUrl": "https://…", "isPublic": true, "syncedAt": "2026-10-05T19:40:00.000Z" },
     { "platform": "steam", "linked": false, "username": null, "level": null },
     { "platform": "xbox", "linked": false, "username": null, "level": null },
     { "platform": "epic", "linked": false, "username": null, "level": null, "declared": true, "appLinkable": false }
@@ -591,6 +592,14 @@ y demás, ver `src/lib/profiles.ts`).
 ## `DELETE /api/mobile/accounts/{platform}` — Desvincular PSN/Steam/Xbox
 
 `{ "ok": true }`. Borra la cuenta vinculada, no los juegos ya importados.
+
+## `POST /api/mobile/accounts/{platform}/sync` — Sincronizar una plataforma
+
+Como el botón "Sincronizar" de cada fila de `/ajustes/plataformas`.
+`{ "nuevos": 3 }` (trofeos que han entrado). `429` si se sincronizó hace
+menos de 2 minutos o por el límite `resync`; `404` si no está vinculada;
+`400` para Epic (va con la extensión). Las cuentas vinculadas traen además
+`avatarUrl`, `isPublic` (`false` = perfil privado) y `syncedAt` (ISO o `null`).
 
 ## `POST /api/mobile/profile/handle` — Elegir nombre de usuario (alta nueva)
 
