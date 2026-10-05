@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, count, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, asc, count, eq, gt, inArray, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { boostParticipants, boostSessions, gameTrophies, games, notificationLog, userGames, userTrophies, users } from "@/db/schema";
 import { avatarUrlSql } from "@/lib/avatarSql";
@@ -218,6 +218,22 @@ export async function listarSesiones(userId: string | null, idioma: Idioma, solo
       loTengo: misIds.has(f.gameId) || (f.igdbId !== null && misIgdb.has(f.igdbId)),
     };
   });
+}
+
+/** Juegos con los que `userId` puede organizar una sesión: los de su biblioteca sin completar. */
+export async function juegosParaSesion(userId: string) {
+  return db
+    .select({
+      id: games.id,
+      titulo: games.title,
+      platform: games.platform,
+      deviceLabel: games.deviceLabel,
+      progreso: userGames.progressPercent,
+    })
+    .from(userGames)
+    .innerJoin(games, eq(games.id, userGames.gameId))
+    .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), lt(userGames.progressPercent, 100)))
+    .orderBy(games.title);
 }
 
 /**

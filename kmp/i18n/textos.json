@@ -3742,5 +3742,317 @@
   "en": "As soon as you earn dated trophies this year, they'll show up here.",
   "es": "En cuanto consigas trofeos con fecha este año, aparecerán aquí.",
   "fr": "Dès que tu obtiendras des trophées datés cette année, ils apparaîtront ici."
+ },
+ "selector_elige": {
+  "de": "Option auswählen",
+  "en": "Pick an option",
+  "es": "Elige una opción",
+  "fr": "Choisis une option"
+ },
+ "selector_buscar": {
+  "de": "Suchen…",
+  "en": "Search…",
+  "es": "Buscar…",
+  "fr": "Rechercher…"
+ },
+ "selector_sin_resultados": {
+  "de": "Nichts gefunden",
+  "en": "Nothing matches that",
+  "es": "Nada coincide con eso",
+  "fr": "Aucun résultat"
+ },
+ "nav_sesiones": {
+  "de": "Sessions",
+  "en": "Sessions",
+  "es": "Sesiones",
+  "fr": "Sessions"
+ },
+ "sesiones_subtitulo": {
+  "de": "Online-Trophäen in der Gruppe: organisiere eine Runde oder tritt einer bei. Alle werden eine Stunde vorher erinnert.",
+  "en": "Online trophies as a group: set up a session or join someone else's. Everyone gets a reminder an hour before.",
+  "es": "Trofeos online en grupo: organiza una partida o únete a la de otro. Os avisamos una hora antes.",
+  "fr": "Trophées en ligne à plusieurs : organise une partie ou rejoins celle d'un autre. Rappel une heure avant."
+ },
+ "sesiones_organizar": {
+  "de": "Organisieren",
+  "en": "Set up",
+  "es": "Organizar",
+  "fr": "Organiser"
+ },
+ "sesiones_vacio_titulo": {
+  "de": "Keine Sessions geplant",
+  "en": "No sessions scheduled",
+  "es": "No hay sesiones programadas",
+  "fr": "Aucune session prévue"
+ },
+ "sesiones_vacio_texto": {
+  "de": "Organisiere die erste für die Online-Trophäe, die dir fehlt.",
+  "en": "Set up the first one for that online trophy you're missing.",
+  "es": "Organiza la primera para ese trofeo online que te falta.",
+  "fr": "Organise la première pour ce trophée en ligne qui te manque."
+ },
+ "sesiones_dentro": {
+  "de": "Du bist dabei",
+  "en": "You're in",
+  "es": "Estás dentro",
+  "fr": "Tu en fais partie"
+ },
+ "sesiones_lo_tienes": {
+  "de": "Hast du",
+  "en": "You own it",
+  "es": "Lo tienes",
+  "fr": "Tu l'as"
+ },
+ "sesiones_en_curso": {
+  "de": "Läuft",
+  "en": "In progress",
+  "es": "En curso",
+  "fr": "En cours"
+ },
+ "sesiones_completa": {
+  "de": "Voll",
+  "en": "Full",
+  "es": "Completa",
+  "fr": "Complète"
+ },
+ "sesiones_libres_1": {
+  "de": "1 Platz frei",
+  "en": "1 spot left",
+  "es": "Queda 1 libre",
+  "fr": "1 place libre"
+ },
+ "sesiones_libres_n": {
+  "de": "{0} Plätze frei",
+  "en": "{0} spots left",
+  "es": "Quedan {0} libres",
+  "fr": "{0} places libres"
+ },
+ "sesiones_quien_esta": {
+  "de": "Wer ist dabei",
+  "en": "Who's in",
+  "es": "Quién está dentro",
+  "fr": "Qui est dedans"
+ },
+ "sesiones_organiza": {
+  "de": "Organisiert",
+  "en": "Host",
+  "es": "Organiza",
+  "fr": "Organise"
+ },
+ "sesiones_plaza_libre": {
+  "de": "Freier Platz",
+  "en": "Open spot",
+  "es": "Plaza libre",
+  "fr": "Place libre"
+ },
+ "sesiones_tu": {
+  "de": "du",
+  "en": "you",
+  "es": "tú",
+  "fr": "toi"
+ },
+ "sesiones_detalles": {
+  "de": "Details",
+  "en": "Details",
+  "es": "Detalles",
+  "fr": "Détails"
+ },
+ "sesiones_unirme": {
+  "de": "Session beitreten",
+  "en": "Join session",
+  "es": "Unirme a la sesión",
+  "fr": "Rejoindre la session"
+ },
+ "sesiones_salirme": {
+  "de": "Verlassen",
+  "en": "Leave",
+  "es": "Salirme",
+  "fr": "Quitter"
+ },
+ "sesiones_cancelar": {
+  "de": "Session absagen",
+  "en": "Cancel session",
+  "es": "Cancelar sesión",
+  "fr": "Annuler la session"
+ },
+ "sesiones_cancelar_titulo": {
+  "de": "Session absagen?",
+  "en": "Cancel the session?",
+  "es": "¿Cancelar la sesión?",
+  "fr": "Annuler la session ?"
+ },
+ "sesiones_cancelar_texto": {
+  "de": "Wir sagen allen Bescheid, die beigetreten sind.",
+  "en": "We'll let everyone who joined know.",
+  "es": "Avisaremos a quienes se habían unido.",
+  "fr": "On préviendra ceux qui l'avaient rejointe."
+ },
+ "sesiones_cancelada": {
+  "de": "Abgesagt",
+  "en": "Cancelled",
+  "es": "Cancelada",
+  "fr": "Annulée"
+ },
+ "sesiones_terminada": {
+  "de": "Beendet",
+  "en": "Finished",
+  "es": "Ya terminó",
+  "fr": "Terminée"
+ },
+ "sesiones_ya_no_abierta": {
+  "de": "Diese Session nimmt niemanden mehr auf.",
+  "en": "This session isn't taking players anymore.",
+  "es": "Esta sesión ya no admite gente.",
+  "fr": "Cette session n'accepte plus personne."
+ },
+ "sesiones_eres_anfitrion": {
+  "de": "Deine Session: Wir sagen dir Bescheid, wenn jemand beitritt oder geht.",
+  "en": "It's your session: we'll let you know whenever someone joins or leaves.",
+  "es": "Es tu sesión: te avisamos cada vez que alguien se una o se salga.",
+  "fr": "C'est ta session : on te prévient dès que quelqu'un rejoint ou part."
+ },
+ "sesiones_estas_dentro": {
+  "de": "Du bist dabei. Eine Stunde vorher bekommst du eine Erinnerung.",
+  "en": "You're in. You'll get a reminder an hour before.",
+  "es": "Estás dentro. Te llegará un recordatorio una hora antes.",
+  "fr": "Tu en fais partie. Tu recevras un rappel une heure avant."
+ },
+ "sesiones_sin_plazas": {
+  "de": "Die Session ist voll.",
+  "en": "This session is full.",
+  "es": "La sesión está completa.",
+  "fr": "La session est complète."
+ },
+ "sesiones_puedes_unirte": {
+  "de": "Du hast das Spiel: Tritt bei, wir erinnern dich eine Stunde vorher.",
+  "en": "You own the game: join and we'll remind you an hour before.",
+  "es": "Tienes el juego: únete y te avisamos una hora antes.",
+  "fr": "Tu as le jeu : rejoins-la et on te rappelle une heure avant."
+ },
+ "sesiones_no_lo_tienes": {
+  "de": "Achtung: Du hast dieses Spiel für {0} nicht in deiner Bibliothek.",
+  "en": "Heads up: you don't have this game on {0} in your library.",
+  "es": "Ojo: no tienes este juego en {0} en tu biblioteca.",
+  "fr": "Attention : tu n'as pas ce jeu sur {0} dans ta bibliothèque."
+ },
+ "sesiones_nueva_titulo": {
+  "de": "Session organisieren",
+  "en": "Set up a session",
+  "es": "Organizar una sesión",
+  "fr": "Organiser une session"
+ },
+ "sesiones_juego": {
+  "de": "Spiel",
+  "en": "Game",
+  "es": "Juego",
+  "fr": "Jeu"
+ },
+ "sesiones_trofeo": {
+  "de": "Trophäe oder Erfolg",
+  "en": "Trophy or achievement",
+  "es": "Trofeo o logro",
+  "fr": "Trophée ou succès"
+ },
+ "sesiones_trofeo_elige": {
+  "de": "Wähle die Trophäe, die dir fehlt",
+  "en": "Pick the trophy you're missing",
+  "es": "Elige el trofeo que te falta",
+  "fr": "Choisis le trophée qui te manque"
+ },
+ "sesiones_trofeo_cargando": {
+  "de": "Deine fehlenden Trophäen werden geladen…",
+  "en": "Loading the trophies you're missing…",
+  "es": "Cargando los trofeos que te faltan…",
+  "fr": "Chargement des trophées qui te manquent…"
+ },
+ "sesiones_trofeo_otro": {
+  "de": "✍️ Andere (selbst eingeben)",
+  "en": "✍️ Other (type it in)",
+  "es": "✍️ Otro (escribirlo a mano)",
+  "fr": "✍️ Autre (le saisir)"
+ },
+ "sesiones_trofeo_escrito": {
+  "de": "Welche Trophäe oder welcher Erfolg?",
+  "en": "Which trophy or achievement?",
+  "es": "¿Qué trofeo o logro?",
+  "fr": "Quel trophée ou succès ?"
+ },
+ "sesiones_sin_lista": {
+  "de": "Für dieses Spiel haben wir keine Trophäenliste (oder du hast schon alle): gib sie selbst ein.",
+  "en": "We don't have this game's trophy list (or you already have them all): type it in.",
+  "es": "De este juego no tenemos la lista de trofeos (o ya los tienes todos): escríbelo a mano.",
+  "fr": "On n'a pas la liste des trophées de ce jeu (ou tu les as déjà tous) : saisis-le."
+ },
+ "sesiones_fecha": {
+  "de": "Tag",
+  "en": "Day",
+  "es": "Día",
+  "fr": "Jour"
+ },
+ "sesiones_hora": {
+  "de": "Uhrzeit",
+  "en": "Time",
+  "es": "Hora",
+  "fr": "Heure"
+ },
+ "sesiones_plazas": {
+  "de": "Plätze insgesamt (mit dir)",
+  "en": "Total spots (including you)",
+  "es": "Plazas en total (contándote)",
+  "fr": "Places au total (toi compris)"
+ },
+ "sesiones_plazas_ayuda": {
+  "de": "Du belegst einen: {0} für die anderen.",
+  "en": "You take one: {0} left for the rest.",
+  "es": "Tú ocupas una: quedan {0} para el resto.",
+  "fr": "Tu en occupes une : {0} pour les autres."
+ },
+ "sesiones_descripcion": {
+  "de": "Details (optional)",
+  "en": "Details (optional)",
+  "es": "Detalles (opcional)",
+  "fr": "Détails (facultatif)"
+ },
+ "sesiones_descripcion_placeholder": {
+  "de": "Region, Mikro, Voraussetzungen, Treffpunkt…",
+  "en": "Region, mic, requirements, how you'll meet up…",
+  "es": "Región, micro, requisitos, cómo os juntáis…",
+  "fr": "Région, micro, conditions, comment vous retrouver…"
+ },
+ "sesiones_publicar": {
+  "de": "Session veröffentlichen",
+  "en": "Publish session",
+  "es": "Publicar sesión",
+  "fr": "Publier la session"
+ },
+ "sesiones_sin_juegos": {
+  "de": "Du brauchst ein unfertiges Spiel in deiner Bibliothek, um eine Session zu organisieren.",
+  "en": "You need an unfinished game in your library to set up a session.",
+  "es": "Necesitas algún juego sin completar en tu biblioteca para organizar una sesión.",
+  "fr": "Il te faut un jeu non terminé dans ta bibliothèque pour organiser une session."
+ },
+ "sesiones_juego_base": {
+  "de": "Hauptspiel",
+  "en": "Base game",
+  "es": "Juego base",
+  "fr": "Jeu de base"
+ },
+ "sesiones_otras": {
+  "de": "Andere",
+  "en": "Other",
+  "es": "Otras",
+  "fr": "Autres"
+ },
+ "sesiones_falta_fecha": {
+  "de": "Wähle Tag und Uhrzeit.",
+  "en": "Pick the day and time.",
+  "es": "Elige el día y la hora.",
+  "fr": "Choisis le jour et l'heure."
+ },
+ "sesiones_falta_trofeo": {
+  "de": "Wähle die Trophäe, die dir fehlt.",
+  "en": "Pick the trophy you're missing.",
+  "es": "Elige el trofeo que te falta.",
+  "fr": "Choisis le trophée qui te manque."
  }
 }

@@ -889,3 +889,20 @@ incluido), haya o no un juego reservado: la ficha dice "Reservar para el #25
 - `POST /api/mobile/clans/{tag}/war` `{ "rivalId": "..." }` → retar (solo el líder).
 - `POST /api/mobile/clans/wars/{id}` `{ "aceptar": true|false }` → responder (solo
   el líder del clan retado). Errores `409` con el mensaje de lib/clanWars.ts.
+
+### Sesiones de trofeos online
+
+Lo mismo que /sesiones en la web (src/lib/sesiones.ts). **Plazas: siempre el
+total contando a quien organiza** (4 = el anfitrión + 3 libres).
+
+- `GET /api/mobile/sessions` → `{ sesiones: Sesion[], juegos: [{ id, titulo, platform, deviceLabel, progreso }] }`.
+  Próximas (y las empezadas hace < 2 h), primero las de juegos que tienes;
+  `juegos` = tu biblioteca sin completar, para organizar.
+- `GET /api/mobile/sessions/{id}` → `Sesion` (también cancelada o pasada). 404 "Sesión no encontrada".
+- `POST /api/mobile/sessions` `{ gameId, trophyId | null, trofeo, descripcion, fechaHora (ISO), plazasTotales (2-16) }` → `{ id }`.
+  `trophyId` elegido de la lista de abajo (se guarda su nombre original); null = escrito a mano en `trofeo`.
+- `POST /api/mobile/sessions/{id}` `{ accion: "unirse" | "salir" }` → `Sesion` ya actualizada. 409 con el motivo.
+- `DELETE /api/mobile/sessions/{id}` → cancelar (solo el anfitrión; avisa a los apuntados).
+- `GET /api/mobile/sessions/trophies?gameId=` → `{ trofeos: [{ trophyId, name, grade, iconUrl, grupo }] }`: los que te faltan, en tu idioma; `grupo` null = juego base.
+
+`Sesion`: `{ id, trofeo, trofeoInfo: { iconUrl, grade, detail } | null, descripcion, fechaHora, plazasTotales, ocupadas, libres, cancelada, juego: { id, titulo, iconUrl, platform, deviceLabel, igdbId }, anfitrion, participantes: [{ userId, handle, name, image }], soyAnfitrion, estoyApuntado, loTengo }`.

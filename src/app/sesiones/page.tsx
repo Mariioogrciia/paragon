@@ -1,12 +1,9 @@
 import Link from "next/link";
-import { and, eq, lt } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { games, userGames } from "@/db/schema";
 import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
-import { listarSesiones, type SesionVista } from "@/lib/sesiones";
+import { juegosParaSesion, listarSesiones, type SesionVista } from "@/lib/sesiones";
 import { idiomaActual } from "@/lib/trofeosIdioma";
 import { NuevaSesion } from "./NuevaSesion";
 import { Plazas } from "./Plazas";
@@ -30,18 +27,7 @@ export default async function SesionesPage() {
   const [sesiones, misJuegos] = await Promise.all([
     listarSesiones(userId, idioma).catch((): SesionVista[] => []),
     userId
-      ? db
-          .select({
-            id: games.id,
-            titulo: games.title,
-            platform: games.platform,
-            deviceLabel: games.deviceLabel,
-            progreso: userGames.progressPercent,
-          })
-          .from(userGames)
-          .innerJoin(games, eq(games.id, userGames.gameId))
-          .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), lt(userGames.progressPercent, 100)))
-          .orderBy(games.title)
+      ? juegosParaSesion(userId)
       : Promise.resolve([]),
   ]);
   const ordenadas = [...sesiones].sort((a, b) => Number(b.loTengo) - Number(a.loTengo));

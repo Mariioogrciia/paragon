@@ -210,11 +210,7 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
         topBar = {
-            androidx.compose.foundation.layout.Box {
-                com.paragon.app.ui.common.GlassBackground(
-                    modifier = Modifier.matchParentSize(),
-                    fallbackColor = Background
-                )
+            androidx.compose.foundation.layout.Box(modifier = Modifier.background(Background)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -354,12 +350,8 @@ fun MainScreen(
                 exit = slideOutVertically(targetOffsetY = { it })
             ) {
                 androidx.compose.foundation.layout.Box {
-                    com.paragon.app.ui.common.GlassBackground(
-                        modifier = Modifier.matchParentSize(),
-                        fallbackColor = Background
-                    )
                     NavigationBar(
-                        containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                        containerColor = Background,
                         contentColor = Foreground,
                         modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
                     ) {
@@ -533,6 +525,26 @@ fun MainScreen(
                 )
             }
 
+            // Sesiones de trofeos online (lista y ficha) — ver ui/sesiones.
+            composable(Screen.Sessions.route) {
+                com.paragon.app.ui.sesiones.SesionesScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrir = { id -> navController.navigate(Screen.SessionDetail.routeFor(id)) },
+                )
+            }
+            composable(
+                route = Screen.SessionDetail.route,
+                arguments = listOf(navArgument("sesionId") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val sesionId = backStackEntry.arguments?.read { getStringOrNull("sesionId") } ?: return@composable
+                com.paragon.app.ui.sesiones.SesionDetalleScreen(
+                    tokenStore = tokenStore,
+                    sesionId = sesionId,
+                    onBack = { navController.popBackStack() },
+                )
+            }
+
             // Ficha de Juego
             composable(
                 route = Screen.GameDetail.route,
@@ -559,6 +571,7 @@ fun MainScreen(
     }
     if (showMoreMenuSheet) {
         MoreMenuSheet(
+            conLigas = themeStore.zenMode,
             onDismiss = { showMoreMenuSheet = false },
             onNavigate = { route -> navController.navigate(route) }
         )

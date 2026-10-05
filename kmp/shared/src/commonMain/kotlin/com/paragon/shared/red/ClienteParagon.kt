@@ -115,6 +115,7 @@ class ClienteParagon(
     val panel by lazy { PanelApi(this) }
     val pushToken by lazy { PushTokenApi(this) }
     val racha by lazy { RachaApi(this) }
+    val sesiones by lazy { SesionesApi(this) }
     val settings by lazy { SettingsApi(this) }
     val social by lazy { SocialApi(this) }
     val stats by lazy { StatsApi(this) }

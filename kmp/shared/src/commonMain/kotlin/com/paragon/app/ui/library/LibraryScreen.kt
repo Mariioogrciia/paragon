@@ -72,7 +72,6 @@ fun LibraryScreen(
     val repository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
     var result by remember { mutableStateOf<LibraryResult?>(null) }
     var selectedFilter by rememberSaveable { mutableIntStateOf(0) }
-    var isSortMenuExpanded by remember { mutableStateOf(false) }
     var sortOption by remember { mutableIntStateOf(0) } // 0: Progreso, 1: Título A-Z, 2: Título Z-A
     val sortLabels = listOf(Textos.t(T.biblio_orden_progreso), Textos.t(T.biblio_orden_az), Textos.t(T.biblio_orden_za))
     val retryCounter = remember { mutableIntStateOf(0) }
@@ -133,28 +132,13 @@ fun LibraryScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón real de orden con DropdownMenu
-                Box {
-                    TextButton(onClick = { isSortMenuExpanded = true }, contentPadding = PaddingValues(0.dp)) {
-                        Text(text = sortLabels[sortOption], color = Muted, fontSize = 14.sp)
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Muted)
-                    }
-                    DropdownMenu(
-                        expanded = isSortMenuExpanded,
-                        onDismissRequest = { isSortMenuExpanded = false },
-                        modifier = Modifier.background(Surface)
-                    ) {
-                        sortLabels.forEachIndexed { index, label ->
-                            DropdownMenuItem(
-                                text = { Text(label, color = Foreground) },
-                                onClick = {
-                                    sortOption = index
-                                    isSortMenuExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
+                // Orden: el selector común de la app (common/Selector.kt), en su forma compacta.
+                com.paragon.app.ui.common.Selector(
+                    valor = sortOption.toString(),
+                    opciones = sortLabels.mapIndexed { i, etiqueta -> com.paragon.app.ui.common.OpcionSelector(i.toString(), etiqueta) },
+                    onElegir = { sortOption = it.toInt() },
+                    compacto = true,
+                )
 
                 // Selector de vista — antes era UN icono que cambiaba solo
                 // (cuadrícula/lista), sin dejar claro que hay dos formas

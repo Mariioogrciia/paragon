@@ -85,12 +85,8 @@ fun ClanDetailSheet(
         result = repository.getClanDetail(tag)
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = androidx.compose.ui.graphics.Color.Transparent) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
         androidx.compose.foundation.layout.Box {
-            com.paragon.app.ui.common.GlassBackground(
-                modifier = Modifier.matchParentSize(),
-                fallbackColor = Surface
-            )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -440,21 +436,14 @@ private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResp
                     Text(Textos.t(T.guerra_sin_rivales), color = Muted, fontSize = 12.sp)
                 } else {
                     var elegido by remember { mutableStateOf<com.paragon.shared.red.ClanRivalDto?>(null) }
-                    var abiertoMenu by remember { mutableStateOf(false) }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box {
-                            TextButton(onClick = { abiertoMenu = true }) {
-                                Text(elegido?.let { "[${it.tag}] ${it.name}" } ?: Textos.t(T.guerra_elige_rival), color = Foreground)
-                            }
-                            DropdownMenu(expanded = abiertoMenu, onDismissRequest = { abiertoMenu = false }) {
-                                detail.retables.forEach { rival ->
-                                    DropdownMenuItem(
-                                        text = { Text("[${rival.tag}] ${rival.name}") },
-                                        onClick = { elegido = rival; abiertoMenu = false },
-                                    )
-                                }
-                            }
-                        }
+                        com.paragon.app.ui.common.Selector(
+                            valor = elegido?.id,
+                            opciones = detail.retables.map { com.paragon.app.ui.common.OpcionSelector(it.id, it.name, detalle = "[${it.tag}]") },
+                            onElegir = { id -> elegido = detail.retables.firstOrNull { it.id == id } },
+                            placeholder = Textos.t(T.guerra_elige_rival),
+                            modifier = Modifier.weight(1f),
+                        )
                         Spacer(Modifier.width(8.dp))
                         TextButton(onClick = { elegido?.let { onRetar(it.id) } }, enabled = elegido != null) {
                             Text(Textos.t(T.guerra_retar), color = if (elegido != null) Accent else Muted, fontWeight = FontWeight.Bold)
