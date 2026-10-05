@@ -387,9 +387,9 @@
   },
   "DiarioPlatino": {
     "titulo": "📖 The platinum diary",
-    "inicio": "Your journey in <b>{titulo}</b> began on <strong>{fecha}</strong>, with <italic>&ldquo;{primerTrofeo}&rdquo;</italic>.",
-    "muro": "Your biggest wall was beating <italic>&ldquo;{muroTrofeo}&rdquo;</italic> — you went <strong>{dias, plural, one {# day} other {# days}}</strong> without unlocking anything before you got it.",
-    "hazana": "Your greatest feat was <italic>&ldquo;{nombre}&rdquo;</italic>, earned by only <strong>{porcentaje}%</strong> of players.",
+    "inicio": "Your journey in <b>{titulo}</b> began on <strong>{fecha}</strong>, with <italic>“{primerTrofeo}”</italic>.",
+    "muro": "Your biggest wall was beating <italic>“{muroTrofeo}”</italic>: you went <strong>{dias, plural, one {# day} other {# days}}</strong> without unlocking anything before you got it.",
+    "hazana": "Your greatest feat was <italic>“{nombre}”</italic>, earned by only <strong>{porcentaje}%</strong> of players.",
     "final": "Finally, you were crowned on <strong>{fecha}</strong>, after <strong>{dias, plural, one {# day} other {# days}}</strong> of hunting."
   },
   "CollectionProgress": {

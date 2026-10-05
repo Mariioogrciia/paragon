@@ -387,9 +387,9 @@
   },
   "DiarioPlatino": {
     "titulo": "📖 El diario del platino",
-    "inicio": "Tu aventura en <b>{titulo}</b> empezó el <strong>{fecha}</strong>, con <italic>&ldquo;{primerTrofeo}&rdquo;</italic>.",
-    "muro": "Tu mayor muro fue superar <italic>&ldquo;{muroTrofeo}&rdquo;</italic> — estuviste <strong>{dias, plural, one {# día} other {# días}}</strong> sin desbloquear nada antes de conseguirlo.",
-    "hazana": "Tu mayor hazaña fue <italic>&ldquo;{nombre}&rdquo;</italic>, conseguido solo por el <strong>{porcentaje}%</strong> de quienes juegan esto.",
+    "inicio": "Tu aventura en <b>{titulo}</b> empezó el <strong>{fecha}</strong>, con <italic>«{primerTrofeo}»</italic>.",
+    "muro": "Tu mayor muro fue superar <italic>«{muroTrofeo}»</italic>: estuviste <strong>{dias, plural, one {# día} other {# días}}</strong> sin desbloquear nada antes de conseguirlo.",
+    "hazana": "Tu mayor hazaña fue <italic>«{nombre}»</italic>, un trofeo que solo tiene el <strong>{porcentaje} %</strong> de quienes juegan a esto.",
     "final": "Finalmente, te coronaste el <strong>{fecha}</strong>, tras <strong>{dias, plural, one {# día} other {# días}}</strong> de caza."
   },
   "CollectionProgress": {

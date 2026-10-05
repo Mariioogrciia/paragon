@@ -387,10 +387,10 @@
   },
   "DiarioPlatino": {
     "titulo": "📖 Le journal du platine",
-    "inicio": "Votre aventure dans <b>{titulo}</b> a commencé le <strong>{fecha}</strong>, avec <italic>« {primerTrofeo} »</italic>.",
-    "muro": "Votre plus gros obstacle a été de battre <italic>« {muroTrofeo} »</italic> — vous êtes resté <strong>{dias, plural, one {# jour} other {# jours}}</strong> sans rien débloquer avant d'y arriver.",
-    "hazana": "Votre plus bel exploit a été <italic>« {nombre} »</italic>, obtenu par seulement <strong>{porcentaje}%</strong> des joueurs.",
-    "final": "Enfin, vous avez été couronné le <strong>{fecha}</strong>, après <strong>{dias, plural, one {# jour} other {# jours}}</strong> de chasse."
+    "inicio": "Ton aventure dans <b>{titulo}</b> a commencé le <strong>{fecha}</strong>, avec <italic>« {primerTrofeo} »</italic>.",
+    "muro": "Ton plus gros obstacle a été <italic>« {muroTrofeo} »</italic> : tu es resté <strong>{dias, plural, one {# jour} other {# jours}}</strong> sans rien débloquer avant de l'obtenir.",
+    "hazana": "Ton plus bel exploit a été <italic>« {nombre} »</italic>, obtenu par seulement <strong>{porcentaje} %</strong> des joueurs.",
+    "final": "Enfin, tu as été couronné le <strong>{fecha}</strong>, après <strong>{dias, plural, one {# jour} other {# jours}}</strong> de chasse."
   },
   "CollectionProgress": {
     "titulo": "Collections",

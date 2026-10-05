@@ -51,7 +51,7 @@ export async function DiarioPlatino({ diario, titulo }: { diario: Diario; titulo
               strong,
               italic,
               nombre: diario.masRaro.nombre,
-              porcentaje: diario.masRaro.rarityPercent.toFixed(1),
+              porcentaje: diario.masRaro.rarityPercent.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
             })}
           </p>
         )}

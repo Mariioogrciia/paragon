@@ -30,16 +30,26 @@ export interface DiarioPlatino {
  * solo que lo hubo.
  */
 export function generarDiarioPlatino(trophies: Trophy[]): DiarioPlatino | null {
-  const conseguidos = trophies
+  const conFecha = trophies
     .filter((t) => t.earned && t.earnedAt)
     .map((t) => ({ ...t, fecha: new Date(t.earnedAt!) }))
+    .filter((t) => !Number.isNaN(t.fecha.getTime()))
     .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+
+  // "Te coronaste" es el día del PLATINO, no el del último trofeo: los de un
+  // DLC sacados meses después movían la fecha final, los días de caza y el
+  // muro (el hueco hasta volver al juego por el DLC salía como "tu mayor
+  // muro"). Sin metales (Steam, Xbox), el último del juego base.
+  const platino = conFecha.find((t) => t.grade === "platinum");
+  const base = conFecha.filter((t) => !t.groupId || t.groupId === "default");
+  const corona = platino ?? base[base.length - 1] ?? conFecha[conFecha.length - 1];
+  if (!corona) return null;
+  const conseguidos = conFecha.filter((t) => t.fecha.getTime() <= corona.fecha.getTime());
 
   // Con menos de 2 fechas no hay ni "primero" ni "hueco" que contar de verdad.
   if (conseguidos.length < 2) return null;
 
   const primero = conseguidos[0];
-  const ultimo = conseguidos[conseguidos.length - 1];
 
   let muroDias = 0;
   let muroTrofeo = conseguidos[0].name;
@@ -51,7 +61,8 @@ export function generarDiarioPlatino(trophies: Trophy[]): DiarioPlatino | null {
     }
   }
 
-  const conRareza = conseguidos.filter((t) => t.rarityPercent !== undefined);
+  // La hazaña es otro trofeo: el platino ya tiene su frase (la final).
+  const conRareza = conseguidos.filter((t) => t.rarityPercent !== undefined && t !== platino);
   const masRaro = conRareza.length > 0
     ? conRareza.reduce((a, b) => (b.rarityPercent! < a.rarityPercent! ? b : a))
     : null;
@@ -62,7 +73,7 @@ export function generarDiarioPlatino(trophies: Trophy[]): DiarioPlatino | null {
     muroDias: Math.round(muroDias),
     muroTrofeo,
     masRaro: masRaro ? { nombre: masRaro.name, rarityPercent: masRaro.rarityPercent! } : null,
-    fechaPlatino: ultimo.fecha.toISOString(),
-    diasTotales: Math.max(1, Math.round((ultimo.fecha.getTime() - primero.fecha.getTime()) / DIA_MS)),
+    fechaPlatino: corona.fecha.toISOString(),
+    diasTotales: Math.max(1, Math.round((corona.fecha.getTime() - primero.fecha.getTime()) / DIA_MS)),
   };
 }
