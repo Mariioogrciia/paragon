@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758664616938",
+    "project_id": "paragon-d5455",
+    "storage_bucket": "paragon-d5455.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758664616938:android:3edcf2fe442a5c616fb093",
+        "android_client_info": {
+          "package_name": "com.paragon.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxHAgwZxTJ852czkfP0cempf0GqXf8Om4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

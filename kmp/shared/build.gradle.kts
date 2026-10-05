@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.compose")
     kotlin("plugin.serialization")
     id("org.jetbrains.compose")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 val versionCompose = "1.12.1"
@@ -10,9 +11,11 @@ val versionKtor = "3.6.0"
 val versionCoil = "3.6.3"
 
 kotlin {
-    // Solo para compilar commonMain en Windows (donde iOS no compila); la app
-    // de escritorio no existe ni se publica.
-    jvm()
+    android {
+        namespace = "com.paragon.shared"
+        compileSdk = 37
+        minSdk = 24
+    }
 
     listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {
@@ -37,8 +40,8 @@ kotlin {
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:$versionKtor")
         }
-        jvmMain.dependencies {
-            implementation("io.ktor:ktor-client-java:$versionKtor")
+        androidMain.dependencies {
+            implementation("io.ktor:ktor-client-okhttp:$versionKtor")
         }
     }
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: ni la copia en la nube ni el paso a otro teléfono se llevan la sesión (paragon_auth). Tema, notas pendientes y demás, sí. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="paragon_auth.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="paragon_auth.xml" />
+    </device-transfer>
+</data-extraction-rules>

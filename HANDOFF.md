@@ -82,6 +82,16 @@ releer todo el historial. Última actualización: **5 de octubre de 2026**.
   FCM/APNs, WorkManager y compartir no son portables. Sideloadly con Apple
   ID gratis: caduca a los 7 días y sin push.
 
+**Migración completa a Compose Multiplatform (5 oct 2026, en curso)** — plan y
+progreso en `kmp/MIGRACION.md`. La app Android vive ahora en `kmp/androidApp`
+(copia de `android/app` sin Capacitor, Kotlin 2.4 + AGP 9.4). **`android/` queda
+congelada**: cualquier cambio a la app Android va en `kmp/androidApp` (o se
+traslada allí; el 5 oct se trasladaron a mano dos arreglos hechos en paralelo en
+`android/`). **Los textos de la app ya no van en `android/i18n`**: fuente
+`kmp/i18n/textos.json`, `node kmp/i18n/generar.mjs`. Compilar Android:
+`./gradlew :androidApp:assembleDebug` desde `kmp/` (con el `JAVA_TOOL_OPTIONS` de
+Avast de arriba y `kmp/local.properties` copiado de `android/`).
+
 **Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
   estados/reacciones en Android, arreglos en `/ajustes/plataformas`, orden
