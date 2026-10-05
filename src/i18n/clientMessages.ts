@@ -56,13 +56,12 @@ export const NAMESPACES_CLIENTE = [
   "Shell.BackButton",
   "Shell.ConfirmForm",
   "Shell.CookieBanner",
-  "Shell.CustomSelect",
-  "Shell.Dropdown",
   "Shell.Footer",
   "Shell.Header",
   "Shell.Home",
   "Shell.HunterGame",
   "Shell.Offline",
+  "Shell.Selector",
   "Shell.Sesiones",
 ] as const;
 

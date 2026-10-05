@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Selector } from "@/components/ui/Selector";
 import type { PuntoPrecio } from "@/lib/itad";
 
 /**
@@ -98,7 +98,7 @@ export function PriceHistoryChart({ puntos, compact = false }: Props) {
   }, [todos, rango]);
 
   const selectorTienda = tiendas.length > 1 && (
-    <CustomSelect
+    <Selector
       value={tienda}
       onChange={setTienda}
       options={[{ value: TODAS_LAS_TIENDAS, label: t("masBarataTodas") }, ...tiendas.map((nombreTienda) => ({ value: nombreTienda, label: nombreTienda }))]}

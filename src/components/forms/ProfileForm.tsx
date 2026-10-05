@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Selector } from "@/components/ui/Selector";
 import { ProfileSectionOrderEditor } from "@/components/ProfileSectionOrderEditor";
 import { normalizeSectionOrder } from "@/lib/profileSections";
 import { BADGE_DEFINITIONS } from "@/components/Badges";
@@ -503,7 +503,7 @@ export function ProfileForm({
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.visual.themeLabel")}</label>
-              <CustomSelect name="theme" value={theme} onChange={setTheme} options={TEMAS_PERFIL} />
+              <Selector name="theme" value={theme} onChange={setTheme} options={TEMAS_PERFIL} />
               <p className="mt-1.5 text-xs text-muted">{t("profileForm.visual.themeHint")}</p>
             </div>
             <div>
@@ -520,11 +520,11 @@ export function ProfileForm({
                   </AvatarFrame>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <CustomSelect
+                  <Selector
                     name="profileFrame"
                     value={marco}
                     onChange={setMarco}
-                    options={FRAMES.map((f) => (marcoBloqueado(f.value) ? { value: f.value, label: `🔒 ${f.label}` } : f))}
+                    options={FRAMES.map((f) => (marcoBloqueado(f.value) ? { ...f, icono: "🔒" } : f))}
                   />
                 </div>
               </div>
@@ -548,7 +548,7 @@ export function ProfileForm({
           <h2 className="font-semibold mb-4">{t("profileForm.regional.title")}</h2>
           <div className="max-w-sm">
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.regional.timezoneLabel")}</label>
-            <CustomSelect
+            <Selector
               name="timezone"
               value={timezone}
               onChange={setTimezone}

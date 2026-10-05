@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Dropdown } from "@/components/Dropdown";
+import { Selector } from "@/components/ui/Selector";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient } from "@/lib/design";
 import { toggleGameCollectionAction, syncHltbAction } from "@/app/actions";
@@ -147,13 +147,13 @@ export function Planificador({
           <p className="mt-1 text-sm text-muted">{t("subtitulo")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Dropdown
+          <Selector
             value={collectionId}
             onChange={setCollectionId}
             options={collections.map((c) => ({ value: c.id, label: c.name, count: c.gameIds.length }))}
             className="w-52"
           />
-          <Dropdown value={sort} onChange={(v) => setSort(v as typeof sort)} options={ordenesDisponibles} className="w-48" />
+          <Selector value={sort} onChange={(v) => setSort(v as typeof sort)} options={ordenesDisponibles} className="w-48" />
         </div>
       </div>
 

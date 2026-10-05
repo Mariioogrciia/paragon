@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Swords } from "lucide-react";
 import { responderGuerraAction, retarClanAction } from "../actions";
+import { Selector } from "@/components/ui/Selector";
 
 interface Rival {
   id: string;
@@ -133,18 +134,13 @@ export function GuerraDeClanes({
           </p>
           {soyLider && retables.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
-              <select
+              <Selector
                 value={rivalId}
-                onChange={(e) => setRivalId(e.target.value)}
-                aria-label="Clan al que retar"
-                className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm"
-              >
-                {retables.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    [{c.tag}] {c.name}
-                  </option>
-                ))}
-              </select>
+                onChange={setRivalId}
+                ariaLabel="Clan al que retar"
+                className="min-w-0 flex-1"
+                options={retables.map((c) => ({ value: c.id, label: c.name, detalle: `[${c.tag}]` }))}
+              />
               <button
                 type="button"
                 disabled={pendiente || !rivalId}

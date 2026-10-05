@@ -52,11 +52,10 @@
     "volver": "Zurück",
     "volverAlInicio": "Zurück zur Startseite"
   },
-  "Dropdown": {
-    "seleccionar": "Auswählen..."
-  },
-  "CustomSelect": {
-    "seleccionaOpcion": "Wähle eine Option"
+  "Selector": {
+    "seleccionar": "Option auswählen",
+    "buscar": "Suchen…",
+    "sinResultados": "Nichts gefunden"
   },
   "ConfirmForm": {
     "siContinuar": "Ja, weiter",
@@ -603,7 +602,8 @@
     "eligeTrofeo": "Wähle die Trophäe, die dir fehlt",
     "trofeoOtro": "✍️ Andere (selbst eingeben)",
     "sinListaTrofeos": "Für dieses Spiel haben wir keine Trophäenliste (oder du hast schon alle): gib sie selbst ein.",
-    "trofeoEscrito": "Welche Trophäe oder welcher Erfolg?"
+    "trofeoEscrito": "Welche Trophäe oder welcher Erfolg?",
+    "juegoBase": "Hauptspiel"
   },
   "Temporada": {
     "titulo": "Season Pass",

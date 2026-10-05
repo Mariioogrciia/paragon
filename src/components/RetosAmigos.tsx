@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Swords, Trophy } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
+import { Selector } from "@/components/ui/Selector";
 import { cancelarRetoAmigosAction, crearRetoAmigosAction, responderRetoAmigosAction } from "@/app/actions";
 import { DURACIONES_RETO, MAX_INVITADOS_RETO } from "@/lib/retosAmigosReglas";
 
@@ -105,17 +106,12 @@ export function RetosAmigos({ retos, amigos, miId }: { retos: Reto[]; amigos: Am
           <div className="mt-4 flex flex-wrap items-end gap-3">
             <label className="text-xs">
               <span className="mb-1 block font-bold uppercase tracking-wider text-muted">{t("duracion")}</span>
-              <select
-                value={dias}
-                onChange={(e) => setDias(Number(e.target.value))}
-                className="rounded-md border border-border bg-surface-2 px-2 py-1.5 text-sm"
-              >
-                {DURACIONES_RETO.map((d) => (
-                  <option key={d} value={d}>
-                    {t("dias", { n: d })}
-                  </option>
-                ))}
-              </select>
+              <Selector
+                value={String(dias)}
+                onChange={(v) => setDias(Number(v))}
+                className="min-w-[140px]"
+                options={DURACIONES_RETO.map((d) => ({ value: String(d), label: t("dias", { n: d }) }))}
+              />
             </label>
             <label className="min-w-[180px] flex-1 text-xs">
               <span className="mb-1 block font-bold uppercase tracking-wider text-muted">{t("nombreOpcional")}</span>

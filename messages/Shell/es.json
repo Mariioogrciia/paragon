@@ -52,11 +52,10 @@
     "volver": "Volver",
     "volverAlInicio": "Volver al inicio"
   },
-  "Dropdown": {
-    "seleccionar": "Seleccionar..."
-  },
-  "CustomSelect": {
-    "seleccionaOpcion": "Selecciona una opción"
+  "Selector": {
+    "seleccionar": "Selecciona una opción",
+    "buscar": "Buscar…",
+    "sinResultados": "Nada coincide con eso"
   },
   "ConfirmForm": {
     "siContinuar": "Sí, continuar",
@@ -603,7 +602,8 @@
     "eligeTrofeo": "Elige el trofeo que te falta",
     "trofeoOtro": "✍️ Otro (escribirlo a mano)",
     "sinListaTrofeos": "De este juego no tenemos la lista de trofeos (o ya los tienes todos): escríbelo a mano.",
-    "trofeoEscrito": "¿Qué trofeo o logro?"
+    "trofeoEscrito": "¿Qué trofeo o logro?",
+    "juegoBase": "Juego base"
   },
   "Temporada": {
     "titulo": "Pase de Temporada",

@@ -108,7 +108,7 @@ function NuevaCarpetaForm({ library, onClose }: { library: Game[]; onClose: () =
   );
 }
 
-/** El desplegable de "mover a otra carpeta" — llama a la acción directamente (no es un <form>, `Dropdown` no dispara eventos de formulario) y ofrece crear una carpeta nueva en el mismo sitio. */
+/** El desplegable de "mover a otra carpeta" — llama a la acción directamente (no es un <form>, `Selector` no dispara eventos de formulario) y ofrece crear una carpeta nueva en el mismo sitio. */
 function MoverA({ juego, carpetaActual, otrasCarpetas }: { juego: Game; carpetaActual: string; otrasCarpetas: Collection[] }) {
   const t = useTranslations("Biblioteca");
   const [abierto, setAbierto] = useState(false);

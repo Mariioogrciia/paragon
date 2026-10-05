@@ -52,11 +52,10 @@
     "volver": "Retour",
     "volverAlInicio": "Retour à l'accueil"
   },
-  "Dropdown": {
-    "seleccionar": "Sélectionner..."
-  },
-  "CustomSelect": {
-    "seleccionaOpcion": "Choisis une option"
+  "Selector": {
+    "seleccionar": "Choisis une option",
+    "buscar": "Rechercher…",
+    "sinResultados": "Aucun résultat"
   },
   "ConfirmForm": {
     "siContinuar": "Oui, continuer",
@@ -603,7 +602,8 @@
     "eligeTrofeo": "Choisis le trophée qui te manque",
     "trofeoOtro": "✍️ Autre (le saisir)",
     "sinListaTrofeos": "On n'a pas la liste des trophées de ce jeu (ou tu les as déjà tous) : saisis-le.",
-    "trofeoEscrito": "Quel trophée ou succès ?"
+    "trofeoEscrito": "Quel trophée ou succès ?",
+    "juegoBase": "Jeu de base"
   },
   "Temporada": {
     "titulo": "Passe de saison",

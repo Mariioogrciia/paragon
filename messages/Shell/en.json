@@ -52,11 +52,10 @@
     "volver": "Back",
     "volverAlInicio": "Back to home"
   },
-  "Dropdown": {
-    "seleccionar": "Select..."
-  },
-  "CustomSelect": {
-    "seleccionaOpcion": "Select an option"
+  "Selector": {
+    "seleccionar": "Select an option",
+    "buscar": "Search…",
+    "sinResultados": "Nothing matches that"
   },
   "ConfirmForm": {
     "siContinuar": "Yes, continue",
@@ -603,7 +602,8 @@
     "eligeTrofeo": "Pick the trophy you're missing",
     "trofeoOtro": "✍️ Other (type it in)",
     "sinListaTrofeos": "We don't have this game's trophy list (or you already have them all): type it in.",
-    "trofeoEscrito": "Which trophy or achievement?"
+    "trofeoEscrito": "Which trophy or achievement?",
+    "juegoBase": "Base game"
   },
   "Temporada": {
     "titulo": "Season Pass",

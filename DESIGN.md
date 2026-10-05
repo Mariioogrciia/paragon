@@ -488,6 +488,7 @@ Rows inside a card (the matrix's quadrant list, the community top, rankings) mar
 ### Inputs / Fields
 - **Style:** `background` fill inside a `surface` context, 1px `border`, 8px radius, 6px × 10px padding, body-UI type. Text selection is re-enabled on inputs (it is disabled app-wide for a native feel).
 - **Focus:** native outline only for keyboard focus.
+- **Selects:** always `components/ui/Selector.tsx`, never a native `<select>` (each OS paints those its own way). Trigger styled as a field; panel is a `surface` popover with 12px radius, rows with `surface-2` hover, the chosen one in `accent-text` with a check. Optional group headers, right-aligned detail (console, %), leading icon, and a search box above 12 options. Opens upward when there is no room below.
 
 ### Navigation
 - **Style:** sticky 64px header with `border` bottom and backdrop blur; wordmark in the display face at 18px with 0.06em tracking. Links are 13px semibold, 0.04em tracking, muted, 8px radius; on hover the text brightens to white with a 15px accent glow. Dropdowns are `surface` panels with 12px radius. Below `lg` the nav collapses into a 44px round menu button.

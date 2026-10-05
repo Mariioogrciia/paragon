@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useTranslations } from "next-intl";
 import { GameCard } from "@/components/GameCard";
-import { Dropdown } from "@/components/Dropdown";
+import { Selector } from "@/components/ui/Selector";
 import { RatingStars } from "@/components/RatingStars";
 import { PinGameButton } from "@/components/PinGameButton";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
@@ -407,7 +407,7 @@ export function LibraryGrid({
         </div>
 
         <div className="flex w-full sm:w-auto flex-wrap items-center gap-2.5">
-          <Dropdown 
+          <Selector
             value={sort} 
             onChange={(v) => setSort(v as SortKey)} 
             options={SORTS} 
@@ -575,7 +575,7 @@ export function LibraryGrid({
         {showAdvanced && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
           {collections.length > 0 && (
-            <Dropdown
+            <Selector
               value={collection}
               onChange={setCollection}
               placeholder={t("folderPlaceholder")}
@@ -588,7 +588,7 @@ export function LibraryGrid({
           )}
 
           {facets.publishers.length > 0 && (
-            <Dropdown
+            <Selector
               value={publisher}
               onChange={setPublisher}
               placeholder={t("publisherPlaceholder")}
@@ -601,7 +601,7 @@ export function LibraryGrid({
           )}
 
           {facets.genres.length > 0 && (
-            <Dropdown
+            <Selector
               value={genre}
               onChange={setGenre}
               placeholder={t("genrePlaceholder")}
@@ -614,7 +614,7 @@ export function LibraryGrid({
           )}
 
           {facets.pegis.length > 1 && (
-            <Dropdown
+            <Selector
               value={pegi}
               onChange={setPegi}
               placeholder={t("pegiPlaceholder")}
@@ -627,7 +627,7 @@ export function LibraryGrid({
           )}
 
           {facets.dificultades.length > 1 && (
-            <Dropdown
+            <Selector
               value={dificultad ? String(dificultad) : ""}
               onChange={(v) => setDificultad((v ? Number(v) : 0) as Dificultad["nivel"] | 0)}
               placeholder={t("difficultyPlaceholder")}
@@ -647,7 +647,7 @@ export function LibraryGrid({
           )}
 
           {facets.horas.length > 1 && (
-            <Dropdown
+            <Selector
               value={horas}
               onChange={(v) => setHoras(v as HorasBucket | "")}
               placeholder={t("hoursPlaceholder")}
@@ -664,7 +664,7 @@ export function LibraryGrid({
               en vez de dos filtros sueltos: nadie tiene tantos formatos
               distintos a la vez como para que hagan falta chips aparte. */}
           {facets.acquisitionFormats.length > 1 && (
-            <Dropdown
+            <Selector
               value={acquisitionFormat}
               onChange={(v) => setAcquisitionFormat(v as NonNullable<Game["acquisitionFormat"]> | "")}
               placeholder={t("formatPlaceholder")}

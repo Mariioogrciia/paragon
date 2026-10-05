@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { addManualGameAction, addToWishlistAction, type AddManualGameInput } from "@/app/actions";
-import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Selector } from "@/components/ui/Selector";
 import { Pegi } from "@/components/Pegi";
 
 interface SearchResult {
@@ -253,7 +253,7 @@ export function AddManualGameModal() {
               <label className="text-xs font-semibold uppercase tracking-wide text-muted">
                 {t("AddManualGameModal.deviceLabel")}
               </label>
-              <CustomSelect
+              <Selector
                 value={device}
                 onChange={setDevice}
                 options={DEVICE_OPTIONS.map((d) => ({ value: d, label: d }))}

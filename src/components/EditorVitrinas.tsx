@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { borrarVitrinaAction, crearVitrinaAction } from "@/app/actions";
+import { Selector } from "@/components/ui/Selector";
 
 type Tipo = "manual" | "desarrolladora" | "raros";
 
@@ -82,22 +83,19 @@ export function EditorVitrinas({
       ) : (
         <div className="grid gap-3">
           <input value={titulo} onChange={(e) => setTitulo(e.target.value)} maxLength={60} placeholder={t("tituloPlaceholder")} className={campo} />
-          <select value={tipo} onChange={(e) => setTipo(e.target.value as Tipo)} className={campo} aria-label={t("tipo")}>
-            <option value="manual">{t("tipos.manual")}</option>
-            <option value="desarrolladora" disabled={estudios.length === 0}>
-              {t("tipos.desarrolladora")}
-            </option>
-            <option value="raros">{t("tipos.raros")}</option>
-          </select>
+          <Selector
+            value={tipo}
+            onChange={(v) => setTipo(v as Tipo)}
+            ariaLabel={t("tipo")}
+            options={[
+              { value: "manual", label: t("tipos.manual") },
+              { value: "desarrolladora", label: t("tipos.desarrolladora"), disabled: estudios.length === 0 },
+              { value: "raros", label: t("tipos.raros") },
+            ]}
+          />
 
           {tipo === "desarrolladora" && (
-            <select value={estudio} onChange={(e) => setEstudio(e.target.value)} className={campo} aria-label={t("estudio")}>
-              {estudios.map((e) => (
-                <option key={e} value={e}>
-                  {e}
-                </option>
-              ))}
-            </select>
+            <Selector value={estudio} onChange={setEstudio} ariaLabel={t("estudio")} options={estudios.map((e) => ({ value: e, label: e }))} />
           )}
 
           {tipo === "manual" && (

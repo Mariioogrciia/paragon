@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { crearSesionAction, trofeosSesionAction } from "@/app/actions";
+import { Selector } from "@/components/ui/Selector";
 
 interface Juego {
   id: string;
@@ -68,12 +69,7 @@ export function NuevaSesion({ juegos }: { juegos: Juego[] }) {
 
   if (juegos.length === 0) return <p className="text-sm text-muted">{t("sinJuegos")}</p>;
 
-  const gruposTrofeo = (trofeos ?? []).reduce<{ grupo: string | null; lista: Trofeo[] }[]>((acc, tr) => {
-    const ultimo = acc[acc.length - 1];
-    if (ultimo && ultimo.grupo === tr.grupo) ultimo.lista.push(tr);
-    else acc.push({ grupo: tr.grupo, lista: [tr] });
-    return acc;
-  }, []);
+  const hayDlc = (trofeos ?? []).some((tr) => tr.grupo !== null);
   const escribeAMano = trophyId === OTRO;
 
   function enviar(e: React.FormEvent) {
@@ -109,54 +105,43 @@ export function NuevaSesion({ juegos }: { juegos: Juego[] }) {
     <form onSubmit={enviar} className="grid gap-3 sm:grid-cols-2">
       <label className="sm:col-span-2">
         <span className={etiqueta}>{t("juego")}</span>
-        <select
+        <Selector
           value={gameId}
-          onChange={(e) => {
-            setGameId(e.target.value);
+          onChange={(v) => {
+            setGameId(v);
             setTrophyId("");
           }}
-          className={campo}
-        >
-          {grupos.map((g) => (
-            <optgroup key={g.platform} label={PLATAFORMAS[g.platform] ?? t("otrasPlataformas")}>
-              {g.lista.map((j) => (
-                <option key={j.id} value={j.id}>
-                  {j.titulo} · {j.deviceLabel} · {j.progreso}%
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+          ariaLabel={t("juego")}
+          options={grupos.flatMap((g) =>
+            g.lista.map((j) => ({
+              value: j.id,
+              label: j.titulo,
+              detalle: `${j.deviceLabel} · ${j.progreso}%`,
+              grupo: PLATAFORMAS[g.platform] ?? t("otrasPlataformas"),
+            })),
+          )}
+        />
       </label>
       <label className="sm:col-span-2">
         <span className={etiqueta}>{t("trofeo")}</span>
-        <select
+        <Selector
           value={trophyId}
-          onChange={(e) => setTrophyId(e.target.value)}
+          onChange={setTrophyId}
           disabled={trofeos === null}
-          required
-          className={campo}
-        >
-          <option value="" disabled>
-            {trofeos === null ? t("cargandoTrofeos") : t("eligeTrofeo")}
-          </option>
-          {gruposTrofeo.map((g) => {
-            const opciones = g.lista.map((tr) => (
-              <option key={tr.trophyId} value={tr.trophyId}>
-                {tr.grade ? `${METAL[tr.grade] ?? ""} ` : ""}
-                {tr.name}
-              </option>
-            ));
-            return g.grupo ? (
-              <optgroup key={g.grupo} label={g.grupo}>
-                {opciones}
-              </optgroup>
-            ) : (
-              opciones
-            );
-          })}
-          <option value={OTRO}>{t("trofeoOtro")}</option>
-        </select>
+          ariaLabel={t("trofeo")}
+          placeholder={trofeos === null ? t("cargandoTrofeos") : t("eligeTrofeo")}
+          buscable={(trofeos?.length ?? 0) > 8}
+          options={[
+            { value: OTRO, label: t("trofeoOtro") },
+            ...(trofeos ?? []).map((tr) => ({
+              value: tr.trophyId,
+              label: tr.name,
+              icono: tr.grade ? METAL[tr.grade] : undefined,
+              // Con DLC, los del juego base también llevan encabezado.
+              grupo: tr.grupo ?? (hayDlc ? t("juegoBase") : null),
+            })),
+          ]}
+        />
         {trofeos !== null && trofeos.length === 0 && <span className="mt-1 block text-xs text-muted">{t("sinListaTrofeos")}</span>}
       </label>
       {escribeAMano && (

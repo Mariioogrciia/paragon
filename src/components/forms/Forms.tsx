@@ -24,7 +24,7 @@ import {
   type ActionState,
 } from "@/app/actions";
 import type { NavKey } from "@/lib/navPreferences";
-import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Selector } from "@/components/ui/Selector";
 import { PrivacyGuide } from "@/components/PrivacyGuide";
 import { PublicAccountNotice } from "@/components/PublicAccountNotice";
 import { TrofeoDesbloqueadoAviso } from "@/components/TrofeoDesbloqueado";
@@ -275,7 +275,7 @@ export function NewLeagueForm() {
           className="w-16 rounded-xl px-2.5 py-2 text-[0.8125rem] text-foreground outline-none"
           style={FIELD}
         />
-        <CustomSelect
+        <Selector
           name="durationUnit"
           value={durationUnit}
           onChange={setDurationUnit}
@@ -319,7 +319,7 @@ export function SetLeagueChallengeForm({
   return (
     <form action={setLeagueChallengeAction} className="flex flex-col gap-2.5 sm:flex-row">
       <input type="hidden" name="leagueId" value={leagueId} />
-      <CustomSelect name="gameId" value={gameId} onChange={setGameId} options={options} className="min-w-0 flex-1" />
+      <Selector name="gameId" value={gameId} onChange={setGameId} options={options} className="min-w-0 flex-1" />
       <Submit>{t("forms.common.save")}</Submit>
     </form>
   );
@@ -343,7 +343,7 @@ export function AddLeagueMemberForm({
   return (
     <form action={addLeagueMemberAction} className="flex flex-col gap-2.5 sm:flex-row">
       <input type="hidden" name="leagueId" value={leagueId} />
-      <CustomSelect
+      <Selector
         name="friendUserId"
         value={friendUserId}
         onChange={setFriendUserId}

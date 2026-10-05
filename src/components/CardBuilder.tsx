@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { toPng } from "html-to-image";
 import { TiltCard } from "@/components/TiltCard";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { Selector } from "@/components/ui/Selector";
 
 interface SampleGame {
   title: string;
@@ -77,18 +78,11 @@ export function CardBuilder({ games }: { games: SampleGame[] }) {
               <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
                 {t("builderJuegoLabel")}
               </span>
-              <select
+              <Selector
                 value={juego.title}
-                onChange={(e) => setJuego(games.find((g) => g.title === e.target.value) ?? games[0])}
-                className="rounded-xl px-4 py-3 text-[0.9375rem] font-semibold outline-none transition-colors focus:border-[rgb(var(--accent-rgb))]"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)", color: "var(--foreground)" }}
-              >
-                {games.map((g) => (
-                  <option key={g.title} value={g.title}>
-                    {g.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(titulo) => setJuego(games.find((g) => g.title === titulo) ?? games[0])}
+                options={games.map((g) => ({ value: g.title, label: g.title }))}
+              />
             </label>
 
             <div className="mt-2 flex gap-3">
