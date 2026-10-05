@@ -40,6 +40,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -149,7 +150,7 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-            Muestra()
+            Muestra(tokenStore)
 
             Seccion(T.apariencia_temas)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -281,9 +282,19 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
     }
 }
 
-/** Piezas reales de la app con la apariencia actual: cifra de platinos, barra, botón y chip. */
+/**
+ * Piezas reales de la app con la apariencia actual: tus platinos y tu % de
+ * completado de verdad (el panel, con su caché local), barra, botón y chip.
+ */
 @Composable
-private fun Muestra() {
+private fun Muestra(tokenStore: TokenStore) {
+    val contexto = com.paragon.shared.contextoPlataforma()
+    var stats by remember { mutableStateOf<com.paragon.app.data.GlobalStats?>(null) }
+    LaunchedEffect(tokenStore) {
+        val dao = com.paragon.app.data.local.ParagonDatabase.getDatabase(contexto).panelDao()
+        stats = (com.paragon.app.data.PanelRepository(tokenStore, dao).getPanel() as? com.paragon.app.data.PanelResult.Ok)?.stats
+    }
+    val completado = (stats?.completionRate ?: 0).coerceIn(0, 100)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -292,7 +303,7 @@ private fun Muestra() {
             .padding(20.dp),
     ) {
         Text(Textos.t(T.panel_platinos), color = Platinum, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-        Text("87", color = Foreground, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        Text(stats?.let { com.paragon.app.util.cifra(it.platinums) } ?: "–", color = Foreground, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
         Box(
             Modifier
@@ -302,7 +313,7 @@ private fun Muestra() {
         ) {
             Box(
                 Modifier
-                    .fillMaxWidth(0.68f)
+                    .fillMaxWidth(completado / 100f)
                     .height(8.dp)
                     .background(Brush.horizontalGradient(listOf(Accent, Accent2)), RoundedCornerShape(radio(4))),
             )
@@ -322,7 +333,7 @@ private fun Muestra() {
                     .background(AccentSoft, CircleShape)
                     .padding(horizontal = 12.dp, vertical = 6.dp),
             ) {
-                Text(Textos.t(T.apariencia_muestra_chip), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                Text(stats?.let { "$completado %" } ?: "–", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
             }
         }
     }

@@ -123,15 +123,13 @@ export function accountFor(
  * con foto en su propio perfil.
  */
 export function resolveAvatarUrl(row: ProfileRow): string | undefined {
-  if (row.avatarPersonalizado && row.image) return row.image;
-
   const psnAccount = accountFor(row, "psn");
-  return (
-    psnAccount?.avatarUrl ??
-    row.accounts.find((a) => a.avatarUrl)?.avatarUrl ??
-    row.image ??
-    undefined
-  );
+  const url =
+    row.avatarPersonalizado && row.image
+      ? row.image
+      : psnAccount?.avatarUrl ?? row.accounts.find((a) => a.avatarUrl)?.avatarUrl ?? row.image ?? undefined;
+  // Las fotos antiguas de PSN vienen en http://: mismo arreglo que avatarUrlSql.
+  return url?.replace(/^http:[/][/]/, "https://");
 }
 
 function toPlayer(row: ProfileRow): Player {

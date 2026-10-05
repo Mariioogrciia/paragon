@@ -187,16 +187,7 @@ private fun ProfileContent(
                     .border(3.dp, ringColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                if (!profile.image.isNullOrBlank()) {
-                    AsyncImage(
-                        model = profile.image,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(100.dp).clip(CircleShape)
-                    )
-                } else {
-                    Text(profile.name.take(1).uppercase(), color = Accent, fontSize = 40.sp, fontWeight = FontWeight.Bold)
-                }
+                com.paragon.app.ui.common.AvatarPersona(profile.image, profile.name, size = 100.dp, colorInicial = Accent, fondo = Background)
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -378,6 +369,7 @@ private fun StatItem(label: String, value: String) {
         Text(label, color = Muted, fontSize = 12.sp)
     }
 }
+
 
 
 

@@ -251,13 +251,19 @@ fun FeedCard(item: FeedItem, repository: FeedRepository, onUserClick: () -> Unit
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = item.userName,
-                    color = Accent,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    modifier = Modifier.clickable { onUserClick() }
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onUserClick() },
+                ) {
+                    com.paragon.app.ui.common.AvatarPersona(item.userImage, item.userName, size = 28.dp)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = item.userName,
+                        color = Accent,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                    )
+                }
                 Text(text = item.timeAgo, color = Muted, fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))

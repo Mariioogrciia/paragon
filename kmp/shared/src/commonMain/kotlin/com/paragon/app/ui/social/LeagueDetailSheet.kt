@@ -377,16 +377,7 @@ private fun LeagueStandingRow(member: LeagueStanding, position: Int, puntosParaS
                     .then(if (esPrimero) Modifier.border(2.dp, Platinum, CircleShape) else Modifier),
                 contentAlignment = Alignment.Center,
             ) {
-                if (member.image != null) {
-                    AsyncImage(
-                        model = member.image,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().clip(CircleShape),
-                    )
-                } else {
-                    Text(member.name.take(1).uppercase(), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                }
+                com.paragon.app.ui.common.AvatarPersona(member.image, member.name, size = if (esPrimero) 36.dp else 30.dp, fondo = Surface)
             }
             Spacer(Modifier.width(10.dp))
             Text(
@@ -520,3 +511,4 @@ private fun GamePickerDialog(tokenStore: TokenStore, onDismiss: () -> Unit, onPi
         },
     )
 }
+

@@ -258,17 +258,17 @@ fun MainScreen(
                                 // Misma foto que la web (`resolveAvatarUrl`, ver
                                 // API-CONTRACT.md) si el perfil ya tiene una —
                                 // solo cae a la inicial cuando no hay ninguna.
-                                if (!profile.image.isNullOrBlank()) {
+                                // La inicial siempre debajo: si la foto no carga, se ve ella.
+                                Text(profile.name.take(1).uppercase(), color = Accent, fontWeight = FontWeight.Bold)
+                                com.paragon.app.ui.common.urlImagenSegura(profile.image)?.let { foto ->
                                     coil3.compose.AsyncImage(
-                                        model = profile.image,
+                                        model = foto,
                                         contentDescription = null,
                                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                         modifier = Modifier
                                             .size(32.dp)
                                             .clip(RoundedCornerShape(radio(16))),
                                     )
-                                } else {
-                                    Text(profile.name.take(1).uppercase(), color = Accent, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }

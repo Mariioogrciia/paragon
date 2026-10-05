@@ -262,16 +262,7 @@ private fun RowScope.CompareColumn(label: String, side: CompareSide, destacado: 
                 .then(if (destacado) Modifier.border(2.dp, Accent, CircleShape) else Modifier),
             contentAlignment = Alignment.Center,
         ) {
-            if (side.avatarUrl != null) {
-                AsyncImage(
-                    model = side.avatarUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().clip(CircleShape),
-                )
-            } else {
-                Text(side.name.take(1).uppercase(), color = Muted, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            }
+            com.paragon.app.ui.common.AvatarPersona(side.avatarUrl, side.name, size = 48.dp)
         }
         Spacer(Modifier.height(8.dp))
         Text(text = label, color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)

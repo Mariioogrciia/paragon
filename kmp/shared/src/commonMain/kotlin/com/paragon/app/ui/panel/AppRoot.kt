@@ -252,10 +252,11 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(bottom = 32.dp),
             ) {
-                GradeChip("87", Textos.t(T.grado_platino), Platinum)
-                GradeChip("341", Textos.t(T.grado_oro), Gold)
-                GradeChip("812", Textos.t(T.grado_plata), Silver)
-                GradeChip("3072", Textos.t(T.grado_bronce), Bronze)
+                // Sin cuenta todavía: los cuatro metales, sin cifras inventadas.
+                GradeChip(Textos.t(T.grado_platino), Platinum)
+                GradeChip(Textos.t(T.grado_oro), Gold)
+                GradeChip(Textos.t(T.grado_plata), Silver)
+                GradeChip(Textos.t(T.grado_bronce), Bronze)
             }
 
             ProviderButton(
@@ -284,7 +285,7 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
 }
 
 @Composable
-private fun GradeChip(value: String, label: String, color: Color) {
+private fun GradeChip(label: String, color: Color) {
     Surface(
         shape = RoundedCornerShape(radio(12)),
         color = SurfaceColor,
@@ -294,7 +295,8 @@ private fun GradeChip(value: String, label: String, color: Color) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
-            Text(text = value, color = color, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Box(Modifier.size(10.dp).background(color, CircleShape))
+            Spacer(Modifier.height(6.dp))
             Text(text = label, color = Muted, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
         }
     }

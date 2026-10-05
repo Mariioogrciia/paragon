@@ -245,7 +245,10 @@ private fun GameDetailContent(
         }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize().background(Background)) {
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
+
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background)) {
         item {
             GameDetailHero(
                 game = game,
@@ -255,6 +258,7 @@ private fun GameDetailContent(
                 onBack = onBack,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                scrollOffset = scrollOffset,
             )
         }
 
@@ -356,13 +360,16 @@ private fun GameDetailHero(
     onBack: () -> Unit,
     sharedTransitionScope: SharedTransitionScope?,
     animatedVisibilityScope: AnimatedVisibilityScope?,
+    scrollOffset: Float = 0f,
 ) {
     Box(modifier = Modifier.fillMaxWidth().height(320.dp)) {
         AsyncImage(
             model = game.coverUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().androidx.compose.ui.graphics.graphicsLayer {
+                translationY = scrollOffset * 0.4f
+            },
             alpha = 0.35f,
         )
         Box(

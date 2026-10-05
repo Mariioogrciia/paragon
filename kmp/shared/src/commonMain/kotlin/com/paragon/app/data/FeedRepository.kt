@@ -52,6 +52,8 @@ data class FeedItem(
     val userHandle: String,
     val comments: List<FeedComment> = emptyList(),
     val views: Int = 0,
+    /** Foto de quien publica (la misma que en la web: avatarUrlSql). Con valor por defecto: la caché guardada antes no la tiene. */
+    val userImage: String? = null,
 )
 
 sealed class FeedResult {
@@ -90,6 +92,7 @@ private fun FeedItemDto.toFeedItem() = FeedItem(
     rating = rating,
     review = review,
     userName = user.name ?: user.handle ?: Textos.t(T.comun_alguien),
+    userImage = user.image,
     gameTitle = game?.title,
     reactions = reactions,
     reacted = reacted,

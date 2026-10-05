@@ -271,11 +271,7 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit) {
                 modifier = Modifier.size(32.dp).clip(CircleShape).background(Surface),
                 contentAlignment = Alignment.Center,
             ) {
-                if (member.image != null) {
-                    AsyncImage(model = member.image, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize().clip(CircleShape))
-                } else {
-                    Text(member.name.take(1).uppercase(), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                }
+                com.paragon.app.ui.common.AvatarPersona(member.image, member.name, size = 32.dp, fondo = Surface)
             }
             Spacer(Modifier.width(10.dp))
             Column {

@@ -141,15 +141,8 @@ fun SettingsScreen(
                 ) {
                     if (isUploadingAvatar) {
                         CircularProgressIndicator(color = Accent, modifier = Modifier.size(28.dp))
-                    } else if (!avatarUrl.isNullOrBlank()) {
-                        AsyncImage(
-                            model = avatarUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize().clip(CircleShape),
-                        )
                     } else {
-                        Text(profile.name.take(1).uppercase(), color = Accent, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                        com.paragon.app.ui.common.AvatarPersona(avatarUrl, profile.name, size = 72.dp, colorInicial = Accent, fondo = AccentSoft)
                     }
                 }
                 Spacer(Modifier.width(16.dp))
@@ -304,7 +297,7 @@ fun SettingsScreen(
             // "Vincular" para Google/Discord (CustomTab, no una copia nativa).
             Button(
                 onClick = {
-                    uriHandler.openUri(com.paragon.app.data.network.BASE_URL + "como-funciona")
+                    uriHandler.openUri("https://paragon.app/como-funciona")
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Surface),
@@ -320,7 +313,7 @@ fun SettingsScreen(
             // del teléfono no tenga sesión de Paragon.
             Button(
                 onClick = {
-                    uriHandler.openUri(com.paragon.app.data.network.BASE_URL + "bot-discord")
+                    uriHandler.openUri("https://paragon.app/bot-discord")
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Surface),

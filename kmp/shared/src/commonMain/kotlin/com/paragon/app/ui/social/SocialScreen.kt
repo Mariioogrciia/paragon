@@ -901,21 +901,7 @@ private fun PodiumSecondaryCard(row: LigaRow, medalla: String, color: androidx.c
  */
 @Composable
 private fun RowAvatar(name: String, avatarUrl: String?, size: androidx.compose.ui.unit.Dp = 40.dp) {
-    Box(
-        modifier = Modifier.size(size).background(Surface2, CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (!avatarUrl.isNullOrBlank()) {
-            coil3.compose.AsyncImage(
-                model = avatarUrl,
-                contentDescription = null,
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().clip(CircleShape),
-            )
-        } else {
-            Text(name.take(1).uppercase(), color = Muted, fontWeight = FontWeight.Bold, fontSize = (size.value / 2.4).sp)
-        }
-    }
+    com.paragon.app.ui.common.AvatarPersona(avatarUrl, name, size = size)
 }
 
 @Composable

@@ -5,6 +5,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.ComposeUIViewController
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.crossfade
 import com.paragon.app.data.AparienciaRepository
 import com.paragon.app.data.local.ParagonDatabase
 import com.paragon.app.data.network.ApiClient
@@ -64,6 +68,13 @@ object AppIOS {
 fun MainViewController(): UIViewController {
     AppIOS.configurar()
     return ComposeUIViewController {
+        // Coil en iOS: descarga por Ktor (Darwin) y fundido al aparecer, como en Android.
+        setSingletonImageLoaderFactory { contexto ->
+            ImageLoader.Builder(contexto)
+                .components { add(KtorNetworkFetcherFactory()) }
+                .crossfade(true)
+                .build()
+        }
         val refresco = AppIOS.refresco
         ParagonTheme(themeStore = AppIOS.themeStore) {
             // Apariencia de la cuenta (la misma que en la web): al abrir y tras cada login.

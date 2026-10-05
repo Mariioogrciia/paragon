@@ -19,7 +19,10 @@ import { platformAccounts } from "@/db/schema";
  * foto ahí, aunque su perfil sí la tuviera.
  */
 export function avatarUrlSql(userIdColumn: AnyColumn, imageColumn: AnyColumn, avatarPersonalizadoColumn: AnyColumn) {
-  return sql<string | null>`
+  // Las fotos antiguas de PSN vienen en http:// (static-resource.np.community.
+  // playstation.net): las apps (Android/iOS) bloquean http y el mismo servidor
+  // responde por https.
+  return sql<string | null>`regexp_replace(
     case when ${avatarPersonalizadoColumn} and ${imageColumn} is not null then ${imageColumn} else
       coalesce(
         (select ${platformAccounts.avatarUrl} from ${platformAccounts}
@@ -30,6 +33,6 @@ export function avatarUrlSql(userIdColumn: AnyColumn, imageColumn: AnyColumn, av
           limit 1),
         ${imageColumn}
       )
-    end
+    end, '^http://', 'https://')
   `;
 }

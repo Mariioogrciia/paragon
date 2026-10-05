@@ -77,6 +77,7 @@ private fun GameCover(coverUrl: String, title: String, modifier: Modifier) {
  * (una fila plana de 56dp, sin esta presencia) pese a ser la elección
  * deliberada del usuario, no un cálculo.
  */
+@OptIn(androidx.compose.animation.ExperimentalSharedTransitionApi::class)
 @Composable
 fun HeroGameCard(
     game: GameProgress,
@@ -84,6 +85,8 @@ fun HeroGameCard(
     label: String = Textos.t(T.panel_siguiente_platino),
     labelColor: Color = Accent,
     accentColor: Color = Accent,
+    sharedTransitionScope: androidx.compose.animation.SharedTransitionScope? = null,
+    animatedVisibilityScope: androidx.compose.animation.AnimatedVisibilityScope? = null,
 ) {
     val restantes = game.totalTrophies - game.earnedTrophies
     val aura = rememberCoverAuraColor(game.coverUrl)
@@ -148,15 +151,27 @@ fun HeroGameCard(
                 .padding(24.dp),
             verticalAlignment = Alignment.Bottom
         ) {
+            val coverModifier = Modifier
+                .width(100.dp)
+                .height(140.dp)
+                .clip(RoundedCornerShape(radio(12)))
+                .border(1.dp, Border, RoundedCornerShape(radio(12)))
+                .let { base ->
+                    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                        with(sharedTransitionScope) {
+                            base.sharedElement(
+                                rememberSharedContentState(key = "game-cover-${game.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            )
+                        }
+                    } else base
+                }
+
             // Portada pequeña
             GameCover(
                 coverUrl = game.coverUrl,
                 title = game.title,
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(radio(12)))
-                    .border(1.dp, Border, RoundedCornerShape(radio(12)))
+                modifier = coverModifier
             )
 
             Spacer(modifier = Modifier.width(20.dp))
