@@ -2,6 +2,9 @@ package com.paragon.app.util
 
 import com.paragon.shared.ContextoPlataforma
 import platform.UIKit.UIApplication
+import platform.UIKit.alternateIconName
+import platform.UIKit.setAlternateIconName
+import platform.UIKit.supportsAlternateIcons
 
 // Nombres de los AppIcon-<Nombre> de Assets.xcassets (kmp/iconos/generar.py);
 // iOS los conoce por ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES (project.yml).
