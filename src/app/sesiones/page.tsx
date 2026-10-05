@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { and, eq, lt } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
@@ -6,8 +7,9 @@ import { games, userGames } from "@/db/schema";
 import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
 import { listarSesiones, type SesionVista } from "@/lib/sesiones";
-import { AccionesSesion } from "./AccionesSesion";
+import { idiomaActual } from "@/lib/trofeosIdioma";
 import { NuevaSesion } from "./NuevaSesion";
+import { Plazas } from "./Plazas";
 import { SeccionTabs } from "@/components/SeccionTabs";
 
 export const metadata = { title: "Sesiones · Paragon" };
@@ -15,18 +17,27 @@ export const metadata = { title: "Sesiones · Paragon" };
 /**
  * Sesiones de trofeos online en grupo — ver lib/sesiones.ts. Primero las de
  * juegos que tienes: son las únicas a las que te puedes apuntar de verdad.
+ * La lista es solo un índice: quién está dentro, los detalles y el botón para
+ * unirse viven en la ficha (`/sesiones/[id]`).
  */
 export default async function SesionesPage() {
   const session = await auth();
   const userId = session?.user?.id ?? null;
   const t = await getTranslations("Shell.Sesiones");
   const locale = await getLocale();
+  const idioma = await idiomaActual();
 
   const [sesiones, misJuegos] = await Promise.all([
-    listarSesiones(userId).catch((): SesionVista[] => []),
+    listarSesiones(userId, idioma).catch((): SesionVista[] => []),
     userId
       ? db
-          .select({ id: games.id, titulo: games.title, platform: games.platform })
+          .select({
+            id: games.id,
+            titulo: games.title,
+            platform: games.platform,
+            deviceLabel: games.deviceLabel,
+            progreso: userGames.progressPercent,
+          })
           .from(userGames)
           .innerJoin(games, eq(games.id, userGames.gameId))
           .where(and(eq(userGames.userId, userId), eq(userGames.isWishlist, false), lt(userGames.progressPercent, 100)))
@@ -37,73 +48,77 @@ export default async function SesionesPage() {
   const ahora = new Date();
 
   return (
-    <div className="mx-auto max-w-[900px] space-y-8">
+    <div className="mx-auto max-w-[900px] space-y-6">
       <BackButton fallbackHref="/" />
       <SeccionTabs seccion="comunidad" />
-      <div>
-        <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">{t("titulo")}</h1>
-        <p className="mt-2 max-w-[650px] text-sm text-muted">{t("subtitulo")}</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-[2.625rem] font-bold uppercase leading-none">{t("titulo")}</h1>
+          <p className="mt-2 max-w-[560px] text-sm text-muted">{t("subtitulo")}</p>
+        </div>
       </div>
 
-      <section className="rounded-[18px] border border-border bg-surface p-5">
-        <h2 className="mb-4 font-heading text-xl font-bold">{t("nueva")}</h2>
-        {userId ? <NuevaSesion juegos={misJuegos} /> : <p className="text-sm text-muted">{t("entra")}</p>}
-      </section>
+      {/* Plegado: la mayoría viene a mirar las que hay, no a organizar. */}
+      <details className="group rounded-[18px] border border-border bg-surface">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-heading text-lg font-bold [&::-webkit-details-marker]:hidden">
+          <span>＋ {t("nueva")}</span>
+          <span className="text-muted transition-transform group-open:rotate-45" aria-hidden>
+            ＋
+          </span>
+        </summary>
+        <div className="border-t border-border p-5">
+          {userId ? <NuevaSesion juegos={misJuegos} /> : <p className="text-sm text-muted">{t("entra")}</p>}
+        </div>
+      </details>
 
       <section>
-        <h2 className="mb-4 font-heading text-xl font-bold">{t("proximas")}</h2>
+        <h2 className="mb-3 font-heading text-xl font-bold">{t("proximas")}</h2>
         {ordenadas.length === 0 ? (
           <p className="rounded-xl border border-border bg-surface px-4 py-8 text-center text-sm text-muted">{t("vacio")}</p>
         ) : (
-          <div className="grid gap-3">
+          <ul className="grid gap-2">
             {ordenadas.map((s) => {
-              const libres = Math.max(0, s.plazas - s.apuntados);
               const empezada = s.fechaHora <= ahora;
               const nombre = s.anfitrion.name?.trim().split(/\s+/)[0] || `@${s.anfitrion.handle}`;
               return (
-                <article
-                  key={s.id}
-                  id={s.id}
-                  className="flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center"
-                  style={{ borderColor: s.loTengo ? "rgb(var(--accent-rgb) / 0.35)" : "var(--border)", background: "var(--surface)" }}
-                >
-                  <div className="h-16 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-2">
-                    {s.juego.iconUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.juego.iconUrl} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold uppercase tracking-wide text-muted">
-                      {s.juego.titulo} · {s.juego.platform.toUpperCase()}
-                      {s.loTengo && <span className="ml-2 text-[var(--accent-text)]">{t("loTienes")}</span>}
-                    </p>
-                    <p className="mt-0.5 truncate text-base font-bold">{s.trofeo}</p>
-                    <p className="text-sm text-muted">
-                      {empezada
-                        ? t("empezada")
-                        : s.fechaHora.toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })}
-                      {" · "}
-                      {t("plazasLibres", { libres })}
-                    </p>
-                    {s.descripcion && <p className="mt-1 text-sm">{s.descripcion}</p>}
-                    <div className="mt-2 flex items-center gap-2">
-                      <Avatar src={s.anfitrion.image} name={nombre} size={22} />
-                      <span className="text-xs text-muted">{t("organiza", { nombre })}</span>
-                      <div className="ml-1 flex -space-x-1.5">
-                        {s.participantes.slice(0, 8).map((p) => (
-                          <Avatar key={p.userId} src={p.image} name={p.name ?? p.handle ?? "?"} size={22} />
-                        ))}
-                      </div>
+                <li key={s.id} id={s.id}>
+                  <Link
+                    href={`/sesiones/${s.id}`}
+                    className="flex items-center gap-3 rounded-2xl border p-3 transition-colors hover:border-accent/60 hover:bg-surface-2"
+                    style={{ borderColor: s.loTengo ? "rgb(var(--accent-rgb) / 0.35)" : "var(--border)", background: "var(--surface)" }}
+                  >
+                    <div className="h-14 w-10 shrink-0 overflow-hidden rounded-md bg-surface-2">
+                      {s.juego.iconUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={s.juego.iconUrl} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                      )}
                     </div>
-                  </div>
-                  {userId && !empezada && (
-                    <AccionesSesion sessionId={s.id} soyAnfitrion={s.soyAnfitrion} estoyApuntado={s.estoyApuntado} llena={libres === 0} />
-                  )}
-                </article>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[0.6875rem] font-bold uppercase tracking-wide text-muted">
+                        {s.juego.titulo} · {s.juego.deviceLabel}
+                        {s.estoyApuntado || s.soyAnfitrion ? (
+                          <span className="ml-2 text-[var(--accent-text)]">{t("dentro")}</span>
+                        ) : (
+                          s.loTengo && <span className="ml-2 text-[var(--accent-text)]">{t("loTienes")}</span>
+                        )}
+                      </p>
+                      <p className="truncate text-[0.9375rem] font-bold">{s.trofeo}</p>
+                      <p className="flex items-center gap-1.5 truncate text-xs text-muted">
+                        <Avatar src={s.anfitrion.image} name={nombre} size={16} />
+                        {empezada
+                          ? t("empezada")
+                          : s.fechaHora.toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <Plazas ocupadas={s.ocupadas} total={s.plazasTotales} />
+                      <span className="text-[0.6875rem] text-muted">{t("plazasLibres", { libres: s.libres })}</span>
+                    </div>
+                  </Link>
+                </li>
               );
             })}
-          </div>
+          </ul>
         )}
       </section>
     </div>

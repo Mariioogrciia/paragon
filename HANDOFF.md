@@ -3,6 +3,28 @@
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
 releer todo el historial. Última actualización: **5 de octubre de 2026**.
 
+**Noche del 5 oct — sesiones y revisión de Antigravity:**
+- **Sesiones rehechas** (sin migración): lista compacta que enlaza a la ficha
+  nueva `/sesiones/[id]` (quién está dentro, plazas libres en huecos, detalles
+  y el botón de unirse, que ya solo vive ahí). Formulario plegado; juegos por
+  plataforma con su consola (`deviceLabel`) y % para distinguir "GTA V" de
+  PS3/PS4/PS5; el trofeo se elige de un desplegable con los que te FALTAN
+  (`trofeosPendientes`; "Otro" para escribirlo a mano) y se guarda con su
+  nombre original para enseñar icono, metal y traducción. **Plazas = total
+  contándote** (4 → tú + 3 libres, "1/4"); en la base `boost_session.plazas`
+  sigue siendo "sin contar al anfitrión": total = plazas + 1. Los avisos
+  (push y DM de Discord) dicen quién se une o se sale, consola, "2/4
+  ocupadas" y la lista de quién hay dentro, también a los que ya estaban.
+- **El commit de Antigravity `eab7abb` rompió el deploy de Vercel** (ERROR):
+  quitó `@capacitor/*` del package.json pero `NativeAppSetup.tsx` los
+  importaba, y un tipo mal en `getClanLeaderboard`. Arreglado: el shell de
+  Capacitor de `ios/` se lee de `window.Capacitor` (sin paquetes npm).
+  También borró `android/` entera (fase 5) antes de validar iOS.
+- **Pendiente de decidir (clanes, de Antigravity)**: la cifra del clan pasó de
+  XP a "contribución" (nº de trofeos desde que entraste), el texto
+  "CONTRIBUCIÓN" está en español a fuego (sin i18n) y la ficha del clan ahora
+  tiene 3 columnas en escritorio.
+
 **Estado actual (5 oct 2026, tarde) — léelo antes que nada:**
 - **Subido a `origin/master`** hasta `40301de` (Vercel despliega solo). Fuera
   del repo: `.env.local`, `scratch/` (ojo: NO está en `.gitignore`, no hacer

@@ -60,7 +60,7 @@ import { ipActual, limitar } from "@/lib/rateLimit";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
 import { borrarAlertaPrecio, guardarAlertaPrecio } from "@/lib/priceAlerts";
 import { setObjetivoFecha } from "@/lib/goals";
-import { SesionError, apuntarse, cancelarSesion, crearSesion, salirse } from "@/lib/sesiones";
+import { SesionError, apuntarse, cancelarSesion, crearSesion, salirse, trofeosPendientes } from "@/lib/sesiones";
 import { CoopError, proponerReto, responderReto } from "@/lib/coop";
 import { RetoAmigosError, cancelarRetoAmigos, crearRetoAmigos, responderRetoAmigos } from "@/lib/retosAmigos";
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
@@ -1664,10 +1664,13 @@ export async function setObjetivoFechaAction(gameId: string, fecha: string | nul
 /** Ver lib/sesiones.ts. `fechaHora` en ISO (el navegador convierte su hora local). */
 export async function crearSesionAction(datos: {
   gameId: string;
+  /** Trofeo elegido de la lista; null = escrito a mano en `trofeo`. */
+  trophyId: string | null;
   trofeo: string;
   descripcion: string;
   fechaHora: string;
-  plazas: number;
+  /** Contando a quien organiza. */
+  plazasTotales: number;
 }): Promise<{ error?: string; id?: string }> {
   const userId = await requireUserId();
   if (!(await limitar("comentario", userId))) return { error: "Espera un momento antes de crear otra sesión." };
@@ -1681,6 +1684,12 @@ export async function crearSesionAction(datos: {
   }
 }
 
+/** Trofeos que te faltan en ese juego, para el selector de "Organizar una sesión". */
+export async function trofeosSesionAction(gameId: string) {
+  const userId = await requireUserId();
+  return trofeosPendientes(userId, gameId, await idiomaActual());
+}
+
 export async function apuntarseSesionAction(sessionId: string, apuntar: boolean): Promise<{ error?: string }> {
   const userId = await requireUserId();
   try {
@@ -1691,6 +1700,7 @@ export async function apuntarseSesionAction(sessionId: string, apuntar: boolean)
     throw e;
   }
   revalidatePath("/sesiones");
+  revalidatePath(`/sesiones/${sessionId}`);
   return {};
 }
 
@@ -1703,6 +1713,7 @@ export async function cancelarSesionAction(sessionId: string): Promise<{ error?:
     throw e;
   }
   revalidatePath("/sesiones");
+  revalidatePath(`/sesiones/${sessionId}`);
   return {};
 }
 

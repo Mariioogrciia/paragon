@@ -11,28 +11,43 @@ import { useEffect } from "react";
  * navegador de verdad (incluido el de un móvil sin la app instalada) este
  * componente no hace absolutamente nada.
  *
- * Import dinámico de `@capacitor/core` (y de cada plugin dentro del if):
- * son dependencias reales del proyecto, pero cargarlas de golpe en el
- * bundle de la WEB (que sirve a muchísimos más visitantes que la app)
- * sería peso muerto para quien nunca va a estar dentro de un WebView.
+ * Sin paquetes de npm (5 oct 2026): `@capacitor/*` salió del package.json
+ * al pasar las apps a kmp/, pero el shell de Capacitor que aún queda en
+ * ios/ sigue cargando esta web. Dentro de ese WebView el propio runtime
+ * nativo inyecta `window.Capacitor` con sus plugins registrados, así que se
+ * leen de ahí; en un navegador normal no existe y esto no hace nada.
  */
+
+interface PluginsCapacitor {
+  StatusBar?: { setOverlaysWebView(o: { overlay: boolean }): Promise<void>; setStyle(o: { style: string }): Promise<void> };
+  SplashScreen?: { hide(): Promise<void> };
+  App?: {
+    addListener(evento: "backButton", cb: (e: { canGoBack: boolean }) => void): Promise<{ remove(): void }>;
+    exitApp(): Promise<void>;
+  };
+  Haptics?: { impact(o: { style: string }): Promise<void> };
+}
+
+function capacitorNativo(): PluginsCapacitor | null {
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?(): boolean; Plugins?: PluginsCapacitor } }).Capacitor;
+  return cap?.isNativePlatform?.() ? (cap.Plugins ?? {}) : null;
+}
 export function NativeAppSetup() {
   useEffect(() => {
     let cleanupBackButton: (() => void) | undefined;
     let cleanupHaptics: (() => void) | undefined;
 
     (async () => {
-      const { Capacitor } = await import("@capacitor/core");
-      if (!Capacitor.isNativePlatform()) return;
+      const plugins = capacitorNativo();
+      if (!plugins) return;
 
       // --- Barra de estado transparente y "edge-to-edge" (dibujada por encima
       // de la app, en lugar de empujar el contenido hacia abajo) para aprovechar
       // toda la pantalla como una verdadera app nativa. `Style.Dark` = iconos claros. ---
       try {
-        const { StatusBar, Style } = await import("@capacitor/status-bar");
         // Overlay true: el WebView se dibuja debajo de la barra de estado.
-        await StatusBar.setOverlaysWebView({ overlay: true });
-        await StatusBar.setStyle({ style: Style.Dark });
+        await plugins.StatusBar?.setOverlaysWebView({ overlay: true });
+        await plugins.StatusBar?.setStyle({ style: "DARK" });
       } catch (error) {
         console.error("[NativeAppSetup] status bar", error);
       }
@@ -43,8 +58,7 @@ export function NativeAppSetup() {
       // haya pintado nada de verdad, y se ve un parpadeo en blanco/oscuro
       // liso entre el splash y el contenido real. ---
       try {
-        const { SplashScreen } = await import("@capacitor/splash-screen");
-        await SplashScreen.hide();
+        await plugins.SplashScreen?.hide();
       } catch (error) {
         console.error("[NativeAppSetup] splash screen", error);
       }
@@ -56,15 +70,17 @@ export function NativeAppSetup() {
       // dentro del WebView, "su navegación" es el historial del propio
       // navegador (`history.back()`), no el de Capacitor. ---
       try {
-        const { App } = await import("@capacitor/app");
-        const listener = await App.addListener("backButton", ({ canGoBack }) => {
-          if (canGoBack) {
-            window.history.back();
-          } else {
-            App.exitApp();
-          }
-        });
-        cleanupBackButton = () => listener.remove();
+        const App = plugins.App;
+        if (App) {
+          const listener = await App.addListener("backButton", ({ canGoBack }) => {
+            if (canGoBack) {
+              window.history.back();
+            } else {
+              App.exitApp();
+            }
+          });
+          cleanupBackButton = () => listener.remove();
+        }
       } catch (error) {
         console.error("[NativeAppSetup] back button", error);
       }
@@ -75,11 +91,12 @@ export function NativeAppSetup() {
       // dispara si el toque cae de verdad sobre un `button`/`a`/`[role=
       // button]`, no en cualquier parte de la pantalla. ---
       try {
-        const { Haptics, ImpactStyle } = await import("@capacitor/haptics");
+        const Haptics = plugins.Haptics;
+        if (!Haptics) throw new Error("sin plugin Haptics");
         const handler = (event: PointerEvent) => {
           const target = event.target as Element | null;
           if (target?.closest('button, a, [role="button"]')) {
-            Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+            Haptics.impact({ style: "LIGHT" }).catch(() => {});
           }
         };
         document.addEventListener("pointerdown", handler, { passive: true });

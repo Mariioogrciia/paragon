@@ -217,7 +217,7 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
   return members
     .map((m) => {
       const p = profileMap.get(m.userId);
-      const s = stats.get(m.userId) ?? { score: 0, trofeos: 0 };
+      const s = stats.get(m.userId) ?? { score: 0, trofeos: 0, contribucion: 0 };
       return {
         userId: m.userId,
         role: m.role,
