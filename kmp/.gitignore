@@ -1,0 +1,6 @@
+.gradle/
+.kotlin/
+build/
+local.properties
+# Lo genera XcodeGen en la CI a partir de iosApp/project.yml.
+iosApp/iosApp.xcodeproj/

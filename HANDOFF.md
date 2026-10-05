@@ -56,6 +56,32 @@ releer todo el historial. Última actualización: **5 de octubre de 2026**.
   en `lib/mensajesApi.ts`; en Windows/Git Bash, `adb` con rutas `/data/...`
   necesita `MSYS_NO_PATHCONV=1`.
 
+**iOS nativo con Compose Multiplatform — prueba mínima (5 oct 2026):**
+- Decisión del usuario: app de iOS nativa (no Capacitor) migrando la app
+  Android a Compose Multiplatform, compilada sin Mac en GitHub Actions
+  (y más adelante con `ios-builder` de MobAI, clonado en `scratch/ios-builder`).
+- Antes de migrar nada, prueba aislada en `kmp/` (no toca `android/`):
+  `kmp/shared` (pantalla de próximos lanzamientos con Ktor +
+  kotlinx.serialization + Coil + insets + expect/actual) y `kmp/iosApp`
+  (host Swift; el `.xcodeproj` lo genera XcodeGen desde `project.yml` en la
+  CI). Workflow `.github/workflows/build-ios-kmp.yml` → artefacto
+  `paragon-kmp-ipa` (sin firmar, para Sideloadly) + `iosApp-xcodeproj` (para
+  commitearlo cuando se pase a ios-builder, que lo espera en el repo).
+- `build-ios.yml` (Capacitor) ya solo se lanza a mano: en cada push gastaba
+  minutos de macOS (x10).
+- Compilar en local: `./gradlew :shared:compileKotlinJvm` desde `kmp/` (el
+  target jvm existe solo para eso; iOS no compila en Windows). **Avast**:
+  Gradle no descarga nada sin
+  `JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=<repo>/scratch/cacerts-avast.jks -Djavax.net.ssl.trustStorePassword=changeit"`
+  (cacerts del JBR + `wscert.pem` de Avast, regenerable con `keytool -importcert`).
+- Trampa: en un `build.gradle.kts` con el plugin de Compose, una variable
+  llamada `compose` queda tapada por la extensión `compose` del plugin.
+- Bloqueadores conocidos de la migración completa (ver la conversación del
+  5 oct): Moshi→kotlinx.serialization, Retrofit→Ktor, Room KMP, crypto de
+  `EnlaceSeguro.kt` (javax.crypto), `LocalContext` en 19 archivos; widget,
+  FCM/APNs, WorkManager y compartir no son portables. Sideloadly con Apple
+  ID gratis: caduca a los 7 días y sin push.
+
 **Estado anterior (30 sept 2026):**
 - **Todo commiteado y subido a `origin/master`** (i18n de Ajustes,
   estados/reacciones en Android, arreglos en `/ajustes/plataformas`, orden

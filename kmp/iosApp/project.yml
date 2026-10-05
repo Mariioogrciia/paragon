@@ -1,0 +1,45 @@
+# XcodeGen: la CI genera iosApp.xcodeproj a partir de este archivo (sin Mac
+# no hay Xcode para crearlo a mano). Para pasar a ios-builder, que espera el
+# .xcodeproj ya en el repo, basta con commitear el que sube la CI como artefacto.
+name: iosApp
+options:
+  bundleIdPrefix: com.paragon
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - iosApp
+    scheme: {}
+    info:
+      path: iosApp/Info.plist
+      properties:
+        CFBundleDisplayName: Paragon
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # Compose Multiplatform se niega a arrancar sin esta clave (120 Hz en ProMotion).
+        CADisableMinimumFrameDurationOnPhone: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_NAME: Paragon
+        PRODUCT_BUNDLE_IDENTIFIER: com.paragon.app.kmp
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        FRAMEWORK_SEARCH_PATHS: $(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+        OTHER_LDFLAGS: ["$(inherited)", "-framework", "Shared"]
+        # La fase de Gradle escribe fuera del proyecto de Xcode.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    preBuildScripts:
+      - name: Compilar Kotlin (Shared.framework)
+        basedOnDependencyAnalysis: false
+        script: |
+          cd "$SRCROOT/.."
+          chmod +x ./gradlew
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode

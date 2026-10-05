@@ -1,0 +1,70 @@
+name: Build iOS IPA (KMP)
+
+# Prueba de Compose Multiplatform: kmp/shared (Kotlin) + kmp/iosApp (host Swift).
+# Solo a mano o al tocar kmp/: los minutos de macOS cuentan x10.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+    paths:
+      - "kmp/**"
+      - ".github/workflows/build-ios-kmp.yml"
+
+jobs:
+  build:
+    name: IPA sin firmar para Sideloadly
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Caché de Kotlin/Native
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('kmp/**/*.gradle.kts') }}
+          restore-keys: konan-${{ runner.os }}-
+
+      - name: Generar iosApp.xcodeproj (XcodeGen)
+        working-directory: kmp/iosApp
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Compilar la app
+        working-directory: kmp/iosApp
+        run: |
+          xcodebuild -project iosApp.xcodeproj \
+                     -scheme iosApp \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -destination 'generic/platform=iOS' \
+                     -derivedDataPath "$RUNNER_TEMP/dd" \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGN_IDENTITY=""
+
+      - name: Empaquetar IPA
+        run: |
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app" "$RUNNER_TEMP/ipa/Payload/"
+          cd "$RUNNER_TEMP/ipa" && zip -qry paragon-kmp.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paragon-kmp-ipa
+          path: ${{ runner.temp }}/ipa/paragon-kmp.ipa
+
+      # Para pasar a ios-builder (espera el .xcodeproj commiteado).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iosApp-xcodeproj
+          path: kmp/iosApp/iosApp.xcodeproj
