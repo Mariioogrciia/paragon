@@ -93,6 +93,8 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
 
     LaunchedEffect(showConfetti) {
         if (showConfetti) {
+            // En iPhone, la vibración de platino de Core Haptics (HapticosIOS.swift).
+            com.paragon.shared.hapticos.trofeo("platino")
             kotlinx.coroutines.delay(2300)
             showConfetti = false
         }

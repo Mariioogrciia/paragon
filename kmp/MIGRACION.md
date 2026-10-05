@@ -40,7 +40,7 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
   biblioteca, estadísticas, comunidad, ligas). Textos: `kmp/i18n/textos.json` →
   `node kmp/i18n/generar.mjs` genera los strings.xml de androidApp y
   `shared/.../i18n/TextosGenerados.kt` (`stringResource(T.clave)` común).
-- [ ] Fase 2 — datos
+- [x] Fase 2 — datos
   - [x] Red: los 63 endpoints en `shared/.../red` (Ktor + kotlinx.serialization,
     convertidos con un script desde Retrofit). `ClienteParagon` (motor por
     plataforma), `HttpException` con `code()` y `paragonErrorMessage()` como
@@ -65,10 +65,24 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
   - [x] 6 más (Comunidad, Ficha, Ligas, Social, Estadísticas, Sesiones de juego):
     Moshi → kotlinx.serialization (la caché ya guardada se sigue leyendo),
     fechas con `Tiempo.kt` (con tests), `Uuid` común.
-  - [ ] Quedan: Library (widget Glance), Settings (leer imagen), Apariencia
-    (colores de la UI), ConnectivityObserver. Luego fase 3 (pantallas)
-  - [ ] Resto de repositorios (por tandas: Apariencia usa colores de la UI, Biblioteca el
-    widget de Glance, tres usan `SimpleDateFormat`)
-- [ ] Fase 3 — pantallas
-- [ ] Fase 4 — plataforma
+  - [x] Los 4 que quedaban (Library, Settings, Apariencia, ConnectivityObserver),
+    trasladados por Antigravity y corregidos.
+- [x] Fase 3 — pantallas en `shared/commonMain` (las movió Antigravity sin que
+  compilara; 232 errores arreglados el 5 oct). Android probado en el emulador
+  con el modo demo (todas las pestañas, ficha, ajustes, apariencia).
+  Comprobar SIEMPRE `./gradlew :shared:compileCommonMainKotlinMetadata`: al
+  compilar para Android el código común ve las APIs de Android/Java y se
+  cuelan cosas que en iOS no compilan.
+  Piezas por plataforma (expect/actual): `contextoPlataforma()`,
+  `ajustesLocales`, `crearTokenStore` (Llavero en iOS),
+  `abrirLoginEnNavegador`, `setAppLanguage`, `rememberShakeListener`
+  (CoreMotion), `compartirImagen` (UIActivityViewController),
+  `ProfileImagePicker` (PHPicker), `fechaConPatron`/`numeroLocal`,
+  `ManejadorAtras`, `conPixelesLegibles`, `extractAuraColor`.
+  Recursos comunes (logo, iconos) en `shared/src/commonMain/composeResources`
+  (clase `com.paragon.shared.recursos.Res`; `androidResources.enable` hace
+  falta para que entren en el APK).
+- [ ] Fase 4 — plataforma: iOS arranca `AppRoot` (MainViewController en
+  iosMain/com/paragon/app), login por Safari + `paragon://auth`
+  (onOpenURL). Falta probar en el iPhone; push en iOS necesita cuenta de pago.
 - [ ] Fase 5 — retirar lo viejo
