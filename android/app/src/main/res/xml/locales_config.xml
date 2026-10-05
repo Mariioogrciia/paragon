@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Idiomas de la app (Android 13+: Ajustes → Apps → Paragon → Idioma). Los mismos que la web. -->
-<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-    <locale android:name="es" />
-    <locale android:name="en" />
-    <locale android:name="de" />
-    <locale android:name="fr" />
-</locale-config>

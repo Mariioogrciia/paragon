@@ -37,7 +37,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ tag: str
     getClanLeaderboard(clan.id),
     getClanActivity(clan.id),
   ]);
-  const score = leaderboard.reduce((sum, m) => sum + m.score, 0);
+  const score = leaderboard.reduce((sum, m) => sum + m.contribucion, 0);
 
   const amIMember = leaderboard.some((m) => m.userId === userId);
   const amIOwner = clan.ownerId === userId;

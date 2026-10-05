@@ -85,14 +85,19 @@ fun ClanDetailSheet(
         result = repository.getClanDetail(tag)
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
-        ) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = androidx.compose.ui.graphics.Color.Transparent) {
+        androidx.compose.foundation.layout.Box {
+            com.paragon.app.ui.common.GlassBackground(
+                modifier = Modifier.matchParentSize(),
+                fallbackColor = Surface
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+            ) {
             CabeceraHoja(onBack = onDismiss)
             when (val current = result) {
                 null -> Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
@@ -140,6 +145,7 @@ fun ClanDetailSheet(
                     },
                 )
             }
+        }
         }
     }
 
@@ -220,7 +226,7 @@ private fun ClanDetailContent(
         Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             Column {
-                Text(text = Textos.t(T.clan_xp_total), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(text = "CONTRIBUCIÓN", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 Text(text = "${detail.score}".reversed().chunked(3).joinToString(".").reversed(), color = Platinum, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
             Column {
@@ -248,6 +254,16 @@ private fun ClanDetailContent(
         Spacer(Modifier.height(8.dp))
         detail.leaderboard.forEachIndexed { index, member ->
             ClanMemberRow(member, index, onClick = { onMemberClick(member.handle) })
+        }
+
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider(color = Border)
+        Spacer(Modifier.height(16.dp))
+
+        Text(text = "CONTRIBUCIÓN", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Spacer(Modifier.height(8.dp))
+        detail.leaderboard.sortedByDescending { it.contribucion }.forEachIndexed { index, member ->
+            ClanMemberRow(member, index, onClick = { onMemberClick(member.handle) }, showContribucion = true)
         }
 
         Spacer(Modifier.height(16.dp))
@@ -292,7 +308,7 @@ private fun ClanDetailContent(
 }
 
 @Composable
-private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit) {
+private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit, showContribucion: Boolean = false) {
     val esPrimero = index == 0
     Row(
         modifier = Modifier
@@ -325,7 +341,7 @@ private fun ClanMemberRow(member: ClanMember, index: Int, onClick: () -> Unit) {
                 Text(text = Textos.t(T.clan_rol_trofeos, if (member.role == "owner") Textos.t(T.clan_lider) else Textos.t(T.clan_miembro), member.trofeos), color = Muted, fontSize = 11.sp)
             }
         }
-        Text(text = "${member.score}", color = Platinum, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Text(text = if (showContribucion) "${member.contribucion}" else "${member.score}", color = Platinum, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
     Spacer(Modifier.height(6.dp))
 }

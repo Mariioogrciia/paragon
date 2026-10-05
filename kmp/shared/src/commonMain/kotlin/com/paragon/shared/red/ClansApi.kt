@@ -38,6 +38,7 @@ data class ClanLeaderboardEntryDto(
     val image: String?,
     val score: Int,
     val trofeos: Int,
+    val contribucion: Int,
 )
 @Serializable
 data class ClanActivityUserDto(val handle: String?, val name: String?, val image: String?)

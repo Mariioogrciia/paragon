@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
@@ -116,9 +117,9 @@ import com.paragon.app.ui.theme.radio
 sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
     object Dashboard : BottomNavItem(Screen.Dashboard, Icons.Default.Home)
     object Library : BottomNavItem(Screen.Library, Icons.AutoMirrored.Filled.List)
-    object Stats : BottomNavItem(Screen.Stats, Icons.Default.BarChart)
     object Feed : BottomNavItem(Screen.Feed, Icons.Default.Groups)
-    object Social : BottomNavItem(Screen.Social, Icons.Default.EmojiEvents)
+    object Ligas : BottomNavItem(Screen.Social, Icons.Default.EmojiEvents)
+    object Menu : BottomNavItem(Screen.Menu, Icons.Default.MoreHoriz)
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -148,6 +149,7 @@ fun MainScreen(
         }
     }
     var isMenuExpanded by remember { mutableStateOf(false) }
+    var showMoreMenuSheet by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
     var bottomBarVisible by rememberSaveable { mutableStateOf(true) }
@@ -170,15 +172,16 @@ fun MainScreen(
         listOf(
             BottomNavItem.Dashboard,
             BottomNavItem.Library,
-            BottomNavItem.Stats
+            BottomNavItem.Feed,
+            BottomNavItem.Menu
         )
     } else {
         listOf(
             BottomNavItem.Dashboard,
             BottomNavItem.Library,
-            BottomNavItem.Stats,
             BottomNavItem.Feed,
-            BottomNavItem.Social
+            BottomNavItem.Ligas,
+            BottomNavItem.Menu
         )
     }
 
@@ -187,6 +190,10 @@ fun MainScreen(
     val navBackStackEntryActual by navController.currentBackStackEntryAsState()
     fun irA(item: BottomNavItem) {
         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        if (item == BottomNavItem.Menu) {
+            showMoreMenuSheet = true
+            return
+        }
         // `saveState`/`restoreState` (quitados a propósito): esos dos son
         // justo lo que hacía que tocar una pestaña resucitara la pantalla que
         // hubiera quedado a medias ahí la última vez (p. ej. Ajustes, abierto
@@ -203,12 +210,16 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Background)
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
+            androidx.compose.foundation.layout.Box {
+                com.paragon.app.ui.common.GlassBackground(
+                    modifier = Modifier.matchParentSize(),
+                    fallbackColor = Background
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.statusBars)
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (isSearchActive && isOnLibrary) {
@@ -334,6 +345,7 @@ fun MainScreen(
                     }
                 }
             }
+            }
         },
         bottomBar = {
             if (!anchoAmplio) AnimatedVisibility(
@@ -341,11 +353,16 @@ fun MainScreen(
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it })
             ) {
-                NavigationBar(
-                    containerColor = Background,
-                    contentColor = Foreground,
-                    modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-                ) {
+                androidx.compose.foundation.layout.Box {
+                    com.paragon.app.ui.common.GlassBackground(
+                        modifier = Modifier.matchParentSize(),
+                        fallbackColor = Background
+                    )
+                    NavigationBar(
+                        containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                        contentColor = Foreground,
+                        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+                    ) {
                 items.forEach { item ->
                     NavigationBarItem(
                         // Sin `label`: con 5 pestañas, textos como "Estadísticas"
@@ -367,6 +384,7 @@ fun MainScreen(
                     )
                 }
             }
+        }
         }
     }
     ) { innerPadding ->
@@ -425,7 +443,18 @@ fun MainScreen(
             popEnterTransition = { androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
             popExitTransition = { androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
-            composable(Screen.Dashboard.route) { PanelScreen(navController, tokenStore, themeStore, profile, stats, panelFromCache) }
+            composable(Screen.Dashboard.route) { 
+                PanelScreen(
+                    navController = navController, 
+                    tokenStore = tokenStore, 
+                    themeStore = themeStore, 
+                    userProfile = profile, 
+                    globalStats = stats, 
+                    fromCache = panelFromCache,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
+                ) 
+            }
             composable(Screen.Library.route) {
                 LibraryScreen(
                     navController = navController,
@@ -527,6 +556,12 @@ fun MainScreen(
 
     if (showRachaSheet) {
         RachaSheet(tokenStore = tokenStore, onDismiss = { showRachaSheet = false })
+    }
+    if (showMoreMenuSheet) {
+        MoreMenuSheet(
+            onDismiss = { showMoreMenuSheet = false },
+            onNavigate = { route -> navController.navigate(route) }
+        )
     }
     }
 }

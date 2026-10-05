@@ -26,5 +26,6 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
         fun routeFor(handle: String) = "compare?handle=$handle"
     }
     object Collections : Screen("collections", T.nav_carpetas)
+    object Menu : Screen("menu", T.nav_ajustes)
     object StuckTrophies : Screen("stuck_trophies", T.nav_atascados)
 }

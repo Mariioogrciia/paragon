@@ -34,7 +34,7 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
     getClanLeaderboard(clan.id),
     getClanActivity(clan.id),
   ]);
-  const score = leaderboard.reduce((sum, m) => sum + m.score, 0);
+  const score = leaderboard.reduce((sum, m) => sum + m.contribucion, 0);
 
   const amIMember = leaderboard.some(m => m.userId === userId);
   const amIOwner = clan.ownerId === userId;
@@ -78,7 +78,7 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
           {clan.description && <p className="mt-4 max-w-xl text-muted">{clan.description}</p>}
           <div className="mt-5 flex gap-8">
             <div>
-              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("ClanPage.xpTotal")}</p>
+              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">CONTRIBUCIÓN</p>
               <p className="carreras-cifra mt-1 text-3xl text-[var(--accent-text)]">{score.toLocaleString(idioma)}</p>
             </div>
             <div>
@@ -110,7 +110,7 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
         </div>
       )}
 
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px_320px]">
         <div className="min-w-0">
           <h2 className="font-heading mb-6 text-2xl font-bold uppercase">{t("ClanPage.actividad")}</h2>
           <ClanActivityFeed items={actividad} />
@@ -135,6 +135,31 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
                     </span>
                   </span>
                   <span className="carreras-cifra shrink-0 text-sm text-[var(--accent-text)]">{m.score.toLocaleString(idioma)}</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="min-w-0">
+          <h2 className="font-heading mb-6 text-2xl font-bold uppercase">Contribución</h2>
+          <ol className="overflow-hidden rounded-[18px] border border-border bg-surface">
+            {[...leaderboard].sort((a, b) => b.contribucion - a.contribucion).map((m, i) => (
+              <li key={m.userId} className="border-b border-border last:border-0">
+                <Link
+                  href={`/u/${m.handle}`}
+                  className="carreras-fila flex items-center gap-3 px-3 py-3"
+                  style={{ ["--librea" as string]: libreaDe(m.userId).fondo }}
+                >
+                  <Dorsal id={m.userId} texto={`P${i + 1}`} />
+                  <Avatar src={m.image} name={m.name ?? m.handle ?? "?"} size={34} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-bold">{m.name || m.handle}</span>
+                    <span className="block text-xs text-muted">
+                      {m.role === "owner" ? t("ClanPage.lider") : t("ClanPage.miembro")}
+                    </span>
+                  </span>
+                  <span className="carreras-cifra shrink-0 text-sm text-[var(--accent-text)]">{m.contribucion.toLocaleString(idioma)}</span>
                 </Link>
               </li>
             ))}

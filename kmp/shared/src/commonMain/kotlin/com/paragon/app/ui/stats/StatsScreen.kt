@@ -285,7 +285,7 @@ private fun SectionCard(title: String, subtitle: String? = null, content: @Compo
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(20)))
             .border(1.dp, Border, RoundedCornerShape(radio(20)))
-            .padding(20.dp),
+            .padding(24.dp),
     ) {
         Text(text = title.uppercase(), color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         if (subtitle != null) {
@@ -576,7 +576,7 @@ private fun DietaGamerCard(dieta: DietaGamer) {
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(20)))
             .border(1.dp, Border, RoundedCornerShape(radio(20)))
-            .padding(20.dp),
+            .padding(24.dp),
     ) {
         Text(text = Textos.t(T.stats_dieta), color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))

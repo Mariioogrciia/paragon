@@ -132,6 +132,7 @@ export interface ClanLeaderboardEntry {
   image: string | null;
   score: number;
   trofeos: number;
+  contribucion: number;
 }
 
 /**
@@ -154,7 +155,7 @@ export interface ClanLeaderboardEntry {
  */
 export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboardEntry[]> {
   const members = await db
-    .select({ userId: clanMembers.userId, role: clanMembers.role })
+    .select({ userId: clanMembers.userId, role: clanMembers.role, joinedAt: clanMembers.joinedAt })
     .from(clanMembers)
     .where(eq(clanMembers.clanId, clanId));
 
@@ -170,6 +171,7 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
         grade: gameTrophies.grade,
         xp: gameTrophies.xp,
         rarityPercent: userTrophies.rarityPercent,
+        earnedAt: userTrophies.earnedAt,
       })
       .from(userTrophies)
       .innerJoin(games, eq(games.id, userTrophies.gameId))
@@ -190,9 +192,10 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
       .where(inArray(users.id, memberIds)),
   ]);
 
-  const stats = new Map<string, { score: number; trofeos: number }>();
+  const joinedAtMap = new Map(members.map(m => [m.userId, m.joinedAt]));
+  const stats = new Map<string, { score: number; trofeos: number; contribucion: number }>();
   for (const row of trophyRows) {
-    const actual = stats.get(row.userId) ?? { score: 0, trofeos: 0 };
+    const actual = stats.get(row.userId) ?? { score: 0, trofeos: 0, contribucion: 0 };
     actual.score += trophyScore({
       platform: row.platform,
       grade: row.grade as TrophyGrade | null,
@@ -200,6 +203,12 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
       rarityPercent: row.rarityPercent,
     });
     actual.trofeos += 1;
+    
+    const joinedAt = joinedAtMap.get(row.userId);
+    if (row.earnedAt && joinedAt && row.earnedAt > joinedAt) {
+      actual.contribucion += 1;
+    }
+    
     stats.set(row.userId, actual);
   }
 
@@ -217,6 +226,7 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
         image: p?.image ?? null,
         score: s.score,
         trofeos: s.trofeos,
+        contribucion: s.contribucion,
       };
     })
     .sort((a, b) => b.score - a.score);
@@ -225,7 +235,7 @@ export async function getClanLeaderboard(clanId: string): Promise<ClanLeaderboar
 /** Puntuación total del clan — suma del ranking de arriba. */
 export async function getClanScore(clanId: string): Promise<number> {
   const leaderboard = await getClanLeaderboard(clanId);
-  return leaderboard.reduce((sum, m) => sum + m.score, 0);
+  return leaderboard.reduce((sum, m) => sum + m.contribucion, 0);
 }
 
 /**

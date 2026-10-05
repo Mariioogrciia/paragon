@@ -136,7 +136,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 is ClansResult.Ok -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
                 ) {
                     if (clanInvites.isNotEmpty()) {
                         items(clanInvites, key = { it.clanId }) { invite ->
@@ -201,7 +201,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 is LeaguesResult.Ok -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
                 ) {
                     if (current.fromCache) {
                         item { OfflineBanner() }
@@ -281,7 +281,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                                 .fillMaxSize()
                                 .padding(horizontal = 24.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
+                            contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp)
                         ) {
                             if (current.fromCache) {
                                 item { OfflineBanner() }

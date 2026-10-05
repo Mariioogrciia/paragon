@@ -4,6 +4,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import platform.AuthenticationServices.ASWebAuthenticationSession
+import platform.AuthenticationServices.ASWebAuthenticationPresentationContextProvidingProtocol
+import platform.AuthenticationServices.ASPresentationAnchor
+import platform.Foundation.NSURL
+import platform.darwin.NSObject
 import androidx.compose.ui.window.ComposeUIViewController
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
@@ -67,7 +72,14 @@ object AppIOS {
 @Suppress("FunctionName", "unused")
 fun MainViewController(): UIViewController {
     AppIOS.configurar()
-    return ComposeUIViewController {
+
+    // Variable mutable para que no recolecte basura la sesión
+    var authSession: ASWebAuthenticationSession? = null
+
+    // Pre-declaramos el controller para poder usar su `window` en el delegate
+    lateinit var controller: UIViewController
+
+    controller = ComposeUIViewController {
         // Coil en iOS: descarga por Ktor (Darwin) y fundido al aparecer, como en Android.
         setSingletonImageLoaderFactory { contexto ->
             ImageLoader.Builder(contexto)
@@ -86,9 +98,33 @@ fun MainViewController(): UIViewController {
                 themeStore = AppIOS.themeStore,
                 database = ParagonDatabase.getDatabase(ContextoIOS),
                 refreshKey = refresco,
-                onLoginRequested = { provider -> abrirLoginEnNavegador(ContextoIOS, AppIOS.tokenStore, provider) },
+                onLoginRequested = { provider ->
+                    val urlString = EnlaceSeguro.urlLogin(AppIOS.tokenStore, provider)
+                    val url = NSURL.URLWithString(urlString)!!
+                    
+                    authSession = ASWebAuthenticationSession(
+                        uRL = url,
+                        callbackURLScheme = "paragon",
+                        completionHandler = { callbackUrl: NSURL?, error: platform.Foundation.NSError? ->
+                            if (callbackUrl != null) {
+                                AppIOS.recibirEnlace(callbackUrl.absoluteString!!)
+                            }
+                            authSession = null
+                        }
+                    )
+                    
+                    authSession?.presentationContextProvider = object : NSObject(), ASWebAuthenticationPresentationContextProvidingProtocol {
+                        override fun presentationAnchorForWebAuthenticationSession(session: ASWebAuthenticationSession): ASPresentationAnchor {
+                            return controller.view.window!!
+                        }
+                    }
+                    
+                    authSession?.start()
+                },
                 onLogout = { AppIOS.refresco++ },
             )
         }
     }
+    
+    return controller
 }

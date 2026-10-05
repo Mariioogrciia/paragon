@@ -3,7 +3,7 @@ package com.paragon.app.ui.panel
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import com.paragon.app.ui.common.premiumClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -68,7 +68,16 @@ import com.paragon.app.ui.theme.Foreground
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore: ThemeStore, userProfile: UserProfile, globalStats: GlobalStats, fromCache: Boolean = false) {
+fun PanelScreen(
+    navController: NavController,
+    tokenStore: TokenStore,
+    themeStore: ThemeStore,
+    userProfile: UserProfile,
+    globalStats: GlobalStats,
+    fromCache: Boolean = false,
+    sharedTransitionScope: androidx.compose.animation.SharedTransitionScope? = null,
+    animatedVisibilityScope: androidx.compose.animation.AnimatedVisibilityScope? = null,
+) {
     val repository = remember(tokenStore) { PanelRepository(tokenStore) }
     val context = com.paragon.shared.contextoPlataforma()
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
@@ -174,6 +183,8 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                             accentColor = Gold,
                             // A la ficha del juego, no directo a Modo Enfoque.
                             onClick = { navController.navigate(Screen.GameDetail.routeFor(anclado.id)) },
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
                         )
                     } else {
                         when (val current = highlights) {
@@ -190,6 +201,8 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                                 HeroGameCard(
                                     game = cercano,
                                     onClick = { navController.navigate(Screen.GameDetail.routeFor(cercano.id)) },
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                 )
                             } else {
                                 Text(text = Textos.t(T.panel_un_paso_vacio), color = Muted, fontSize = 13.sp)
@@ -223,7 +236,12 @@ fun PanelScreen(navController: NavController, tokenStore: TokenStore, themeStore
                             fontSize = 13.sp,
                             modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
                         )
-                        HeroGameCard(game = otroCercano, onClick = { navController.navigate(Screen.GameDetail.routeFor(otroCercano.id)) })
+                        HeroGameCard(
+                            game = otroCercano,
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(otroCercano.id)) },
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
+                        )
                         Spacer(modifier = Modifier.height(32.dp))
                     }
 
@@ -322,7 +340,7 @@ fun MilestoneBanner(hito: HitoReservado, onClick: () -> Unit) {
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
             .border(1.dp, Border, RoundedCornerShape(radio(16)))
-            .clickable(onClick = onClick)
+            .premiumClickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -387,7 +405,7 @@ fun GoalBanner(currentPlatinums: Int, targetPlatinums: Int?, onSetTarget: (Int?)
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
             .border(1.dp, Border, RoundedCornerShape(radio(16)))
-            .clickable { showDialog = true }
+            .premiumClickable { showDialog = true }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -438,7 +456,7 @@ fun RivalBanner(rival: CompareSide, me: CompareSide, onClick: () -> Unit) {
             .fillMaxWidth()
             .background(if (winning) Accent.copy(alpha=0.1f) else Surface, RoundedCornerShape(radio(16)))
             .border(1.dp, if (winning) Accent else Border, RoundedCornerShape(radio(16)))
-            .clickable(onClick = onClick)
+            .premiumClickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

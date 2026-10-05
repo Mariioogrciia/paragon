@@ -7,7 +7,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import com.paragon.app.ui.common.premiumClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -107,7 +107,7 @@ fun HeroGameCard(
             )
             .clip(shape)
             .border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.02f))), shape)
-            .clickable { onClick() }
+            .premiumClickable { onClick() }
     ) {
         // Imagen de fondo con opacidad — sin degradado de respaldo aquí:
         // con coverUrl vacío simplemente no hay capa de fondo, el Box ya
@@ -292,7 +292,7 @@ fun StandardGameCard(
             .clip(RoundedCornerShape(radio(20)))
             .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .background(Surface)
-            .clickable { onClick() }
+            .premiumClickable { onClick() }
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -407,7 +407,7 @@ fun NextTrophyCard(trophy: NextTrophy, onClick: () -> Unit = {}) {
             .clip(RoundedCornerShape(radio(16)))
             .background(Surface)
             .border(1.dp, Border, RoundedCornerShape(radio(16)))
-            .clickable { onClick() }
+            .premiumClickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

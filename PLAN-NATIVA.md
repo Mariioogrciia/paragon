@@ -168,6 +168,16 @@ arreglados por Claude:**
       duplicaba los márgenes de `WindowInsets` → huecos negros). Terminado
       por Gemini.
 
+## Migración a Kotlin Multiplatform (KMP) - ¡En marcha!
+
+Se ha decidido unificar el esfuerzo nativo usando Compose Multiplatform (KMP) para compartir lógica y UI entre Android e iOS, descartando la necesidad de reescribir en Swift.
+
+**Fase 1 (Completada)**: Traslado de la app de `android/` a `kmp/androidApp`, sin Capacitor. Funciona en el emulador en modo demo.
+**Fase 2 (Completada)**: Código común en `kmp/shared`. Ktor para red (63 endpoints), sesión y login cifrado (con tests), Room migrado, traducciones en 4 idiomas y los 24 repositorios de datos migrados. Tests pasando.
+**Fase 3 (Pendiente)**: Pasar las pantallas de Compose a código común (Compose Multiplatform) para tener UI nativa real en iOS.
+**Fase 4 (Pendiente)**: Funciones específicas de cada plataforma (login con navegador en iOS, ruleta con el sensor de movimiento).
+**Fase 5 (Pendiente)**: Limpiar el proyecto: retirar la vieja carpeta `android/` y el proyecto Capacitor viejo de `ios/`.
+
 ## Tareas de Claude (backend + enganche de datos reales)
 
 - [x] Backend completo de las 5 piezas nuevas (16/09):

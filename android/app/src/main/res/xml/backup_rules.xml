@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Android 11 y anteriores: la sesión (paragon_auth) nunca sale del teléfono en una copia de seguridad. -->
-<full-backup-content>
-    <exclude domain="sharedpref" path="paragon_auth.xml" />
-</full-backup-content>
