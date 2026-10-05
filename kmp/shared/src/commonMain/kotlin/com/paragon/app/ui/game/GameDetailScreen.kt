@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import com.paragon.shared.contextoPlataforma
 import androidx.compose.ui.text.font.FontWeight
@@ -367,7 +368,7 @@ private fun GameDetailHero(
             model = game.coverUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().androidx.compose.ui.graphics.graphicsLayer {
+            modifier = Modifier.fillMaxSize().graphicsLayer {
                 translationY = scrollOffset * 0.4f
             },
             alpha = 0.35f,
