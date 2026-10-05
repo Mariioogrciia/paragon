@@ -4516,5 +4516,29 @@
   "en": "{0} to go",
   "es": "faltan {0}",
   "fr": "encore {0}"
+ },
+ "carpeta_opciones": {
+  "de": "Ordneroptionen",
+  "en": "Folder options",
+  "es": "Opciones de la carpeta",
+  "fr": "Options du dossier"
+ },
+ "carpeta_abrir": {
+  "de": "Öffnen",
+  "en": "Open",
+  "es": "Abrir",
+  "fr": "Ouvrir"
+ },
+ "login_titular": {
+  "de": "Alle deine Trophäen.\nAn einem Ort.",
+  "en": "All your trophies.\nOne place.",
+  "es": "Todos tus trofeos.\nUn solo sitio.",
+  "fr": "Tous tes trophées.\nUn seul endroit."
+ },
+ "login_subtitulo": {
+  "de": "PlayStation, Steam und Xbox zusammen, mit Freunden, Ligen und Sessions für die Platin-Jagd.",
+  "en": "PlayStation, Steam and Xbox together, with your friends, leagues and sessions to hunt platinums.",
+  "es": "PlayStation, Steam y Xbox juntos, con tus amigos, ligas y sesiones para cazar platinos.",
+  "fr": "PlayStation, Steam et Xbox réunis, avec tes amis, ligues et sessions pour chasser les platines."
  }
 }

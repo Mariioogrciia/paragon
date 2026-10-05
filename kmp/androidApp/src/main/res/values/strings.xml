@@ -102,6 +102,7 @@
     <string name="biblio_vacia_sub">En cuanto vincules una cuenta y sincronices, tus juegos aparecerán aquí.</string>
     <string name="biblio_vista_cuadricula">Vista cuadrícula</string>
     <string name="biblio_vista_enfoque">Vista enfoque</string>
+    <string name="carpeta_abrir">Abrir</string>
     <string name="carpeta_anadir">AÑADIR A CARPETA</string>
     <string name="carpeta_borrar_texto">\"%1$s\" desaparece con los %2$s juegos que agrupa (los juegos en sí no se borran, solo la carpeta).</string>
     <string name="carpeta_borrar_titulo">¿Borrar esta carpeta?</string>
@@ -111,6 +112,7 @@
     <string name="carpeta_err_quitar">No se pudo sacar el juego de la carpeta. Inténtalo de nuevo.</string>
     <string name="carpeta_err_renombrar">No se pudo renombrar la carpeta.</string>
     <string name="carpeta_nueva">Nueva carpeta</string>
+    <string name="carpeta_opciones">Opciones de la carpeta</string>
     <string name="carpeta_quitar">Quitar de la carpeta</string>
     <string name="carpeta_renombrar">Renombrar carpeta</string>
     <string name="carpeta_sin_juegos">Ningún juego en esta carpeta todavía</string>
@@ -487,6 +489,8 @@
     <string name="login_google">Continuar con Google</string>
     <string name="login_lema">El siguiente platino no se espera.</string>
     <string name="login_sin_contrasenas">No guardamos contraseñas: el acceso lo lleva tu proveedor.</string>
+    <string name="login_subtitulo">PlayStation, Steam y Xbox juntos, con tus amigos, ligas y sesiones para cazar platinos.</string>
+    <string name="login_titular">Todos tus trofeos.\nUn solo sitio.</string>
     <string name="main_buscar_ph">Buscar juego…</string>
     <string name="main_cerrar_busqueda">Cerrar búsqueda</string>
     <string name="main_racha">Racha de %1$s días</string>

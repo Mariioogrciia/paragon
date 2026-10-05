@@ -100,6 +100,7 @@
     <string name="biblio_vacia_sub">Sobald du ein Konto verknüpfst und synchronisierst, erscheinen deine Spiele hier.</string>
     <string name="biblio_vista_cuadricula">Rasteransicht</string>
     <string name="biblio_vista_enfoque">Fokusansicht</string>
+    <string name="carpeta_abrir">Öffnen</string>
     <string name="carpeta_anadir">ZU ORDNER HINZUFÜGEN</string>
     <string name="carpeta_borrar_texto">„%1$s“ verschwindet mit den %2$s Spielen darin (die Spiele selbst bleiben, nur der Ordner wird gelöscht).</string>
     <string name="carpeta_borrar_titulo">Diesen Ordner löschen?</string>
@@ -109,6 +110,7 @@
     <string name="carpeta_err_quitar">Das Spiel konnte nicht aus dem Ordner entfernt werden. Versuch es erneut.</string>
     <string name="carpeta_err_renombrar">Ordner konnte nicht umbenannt werden.</string>
     <string name="carpeta_nueva">Neuer Ordner</string>
+    <string name="carpeta_opciones">Ordneroptionen</string>
     <string name="carpeta_quitar">Aus dem Ordner entfernen</string>
     <string name="carpeta_renombrar">Ordner umbenennen</string>
     <string name="carpeta_sin_juegos">Noch keine Spiele in diesem Ordner</string>
@@ -485,6 +487,8 @@
     <string name="login_google">Weiter mit Google</string>
     <string name="login_lema">Die nächste Platin wartet nicht.</string>
     <string name="login_sin_contrasenas">Wir speichern keine Passwörter: die Anmeldung übernimmt dein Anbieter.</string>
+    <string name="login_subtitulo">PlayStation, Steam und Xbox zusammen, mit Freunden, Ligen und Sessions für die Platin-Jagd.</string>
+    <string name="login_titular">Alle deine Trophäen.\nAn einem Ort.</string>
     <string name="main_buscar_ph">Spiel suchen…</string>
     <string name="main_cerrar_busqueda">Suche schließen</string>
     <string name="main_racha">%1$s-Tage-Serie</string>

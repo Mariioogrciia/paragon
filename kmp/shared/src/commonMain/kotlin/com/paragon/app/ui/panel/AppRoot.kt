@@ -1,5 +1,8 @@
 package com.paragon.app.ui.panel
 
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.TextButton
 import com.paragon.app.data.SettingsRepository
@@ -56,6 +59,7 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.theme.ThemeStore
 import com.paragon.app.ui.main.MainScreen
 import com.paragon.app.ui.theme.Accent
+import com.paragon.app.ui.theme.textoSobre
 import com.paragon.app.ui.theme.Background
 import com.paragon.app.ui.theme.Border
 import com.paragon.app.ui.theme.Bronze
@@ -214,73 +218,65 @@ private fun LoadingGate() {
  */
 @Composable
 private fun LoginGate(onLogin: (provider: String) -> Unit) {
-    Box(
+    // Diseño v2 (maqueta "20 · Entrar"): la marca y un titular grande arriba,
+    // y los botones abajo, en la zona del pulgar, como las apps de verdad.
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(Accent.copy(alpha = 0.16f), Background),
-                    radius = 900f,
-                )
-            )
-            .padding(24.dp),
-        contentAlignment = Alignment.Center,
+            .background(Brush.radialGradient(colors = listOf(Accent.copy(alpha = 0.14f), Background), radius = 1100f))
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .padding(horizontal = 24.dp),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
+        Spacer(Modifier.weight(1f))
+        com.paragon.app.ui.common.ParagonMark(modifier = Modifier.size(72.dp))
+        Text(
+            text = Textos.t(T.login_titular),
+            color = Foreground,
+            fontSize = 38.sp,
+            lineHeight = 41.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 22.dp),
+        )
+        Text(
+            text = Textos.t(T.login_subtitulo),
+            color = Muted,
+            fontSize = 16.sp,
+            lineHeight = 23.sp,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+        Row(
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 20.dp),
         ) {
-            com.paragon.app.ui.common.ParagonMark(modifier = Modifier.size(64.dp))
-
-            Text(
-                text = "PARAGON",
-                color = Foreground,
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 4.sp,
-                modifier = Modifier.padding(top = 18.dp),
-            )
-            Text(
-                text = Textos.t(T.login_lema),
-                color = Accent,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 10.dp, bottom = 28.dp),
-            )
-
-            Row(
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 32.dp),
-            ) {
-                // Sin cuenta todavía: los cuatro metales, sin cifras inventadas.
-                GradeChip(Textos.t(T.grado_platino), Platinum)
-                GradeChip(Textos.t(T.grado_oro), Gold)
-                GradeChip(Textos.t(T.grado_plata), Silver)
-                GradeChip(Textos.t(T.grado_bronce), Bronze)
-            }
-
-            ProviderButton(
-                label = Textos.t(T.login_google),
-                iconRes = Res.drawable.ic_google,
-                accentColor = MarcaGoogle,
-                onClick = { onLogin("google") },
-            )
-            Spacer(Modifier.height(12.dp))
-            ProviderButton(
-                label = Textos.t(T.login_discord),
-                iconRes = Res.drawable.ic_discord,
-                accentColor = MarcaDiscord,
-                onClick = { onLogin("discord") },
-            )
-
-            Text(
-                text = Textos.t(T.login_sin_contrasenas),
-                color = Muted,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 32.dp),
-            )
+            GradeChip(Textos.t(T.grado_platino), Platinum)
+            GradeChip(Textos.t(T.grado_oro), Gold)
+            GradeChip(Textos.t(T.grado_plata), Silver)
+            GradeChip(Textos.t(T.grado_bronce), Bronze)
         }
+        Spacer(Modifier.weight(1f))
+        ProviderButton(
+            label = Textos.t(T.login_google),
+            iconRes = Res.drawable.ic_google,
+            fondo = Color.White,
+            texto = textoSobre(Color.White),
+            onClick = { onLogin("google") },
+        )
+        Spacer(Modifier.height(10.dp))
+        ProviderButton(
+            label = Textos.t(T.login_discord),
+            iconRes = Res.drawable.ic_discord,
+            fondo = MarcaDiscord,
+            texto = Color.White,
+            tintarIcono = true,
+            onClick = { onLogin("discord") },
+        )
+        Text(
+            text = Textos.t(T.login_sin_contrasenas),
+            color = Muted,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
+        )
     }
 }
 
@@ -414,41 +410,36 @@ private fun OnboardingGate(repository: PanelRepository, onDone: () -> Unit) {
     }
 }
 
+/** Botón de "Continuar con…": a lo ancho, 54 dp, con el color de la marca (Google en blanco, Discord en su morado). */
 @Composable
 private fun ProviderButton(
     label: String,
     iconRes: DrawableResource,
-    accentColor: Color,
+    fondo: Color,
+    texto: Color,
+    tintarIcono: Boolean = false,
     onClick: () -> Unit,
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(radio(14)),
-        color = SurfaceColor,
-        border = BorderStroke(1.dp, Border),
-        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(radio(16)),
+        color = fondo,
+        modifier = Modifier.fillMaxWidth().height(54.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 15.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(accentColor.copy(alpha = 0.12f), CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    // Sin tinte: los vector drawable ya llevan sus colores
-                    // de marca reales (el de Google, 4 colores).
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-            Spacer(Modifier.width(14.dp))
-            Text(text = label, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                // Google lleva sus 4 colores; Discord, en blanco sobre su morado.
+                tint = if (tintarIcono) texto else Color.Unspecified,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(text = label, color = texto, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

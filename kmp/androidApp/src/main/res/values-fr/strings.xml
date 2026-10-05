@@ -100,6 +100,7 @@
     <string name="biblio_vacia_sub">Dès que tu associes un compte et synchronises, tes jeux apparaîtront ici.</string>
     <string name="biblio_vista_cuadricula">Vue grille</string>
     <string name="biblio_vista_enfoque">Vue focus</string>
+    <string name="carpeta_abrir">Ouvrir</string>
     <string name="carpeta_anadir">AJOUTER AU DOSSIER</string>
     <string name="carpeta_borrar_texto">« %1$s » disparaît avec les %2$s jeux qu\'il regroupe (les jeux eux-mêmes ne sont pas supprimés, seulement le dossier).</string>
     <string name="carpeta_borrar_titulo">Supprimer ce dossier ?</string>
@@ -109,6 +110,7 @@
     <string name="carpeta_err_quitar">Impossible de retirer le jeu du dossier. Réessaie.</string>
     <string name="carpeta_err_renombrar">Impossible de renommer le dossier.</string>
     <string name="carpeta_nueva">Nouveau dossier</string>
+    <string name="carpeta_opciones">Options du dossier</string>
     <string name="carpeta_quitar">Retirer du dossier</string>
     <string name="carpeta_renombrar">Renommer le dossier</string>
     <string name="carpeta_sin_juegos">Aucun jeu dans ce dossier pour l\'instant</string>
@@ -485,6 +487,8 @@
     <string name="login_google">Continuer avec Google</string>
     <string name="login_lema">Le prochain platine n\'attend pas.</string>
     <string name="login_sin_contrasenas">Nous ne stockons aucun mot de passe : ton fournisseur gère la connexion.</string>
+    <string name="login_subtitulo">PlayStation, Steam et Xbox réunis, avec tes amis, ligues et sessions pour chasser les platines.</string>
+    <string name="login_titular">Tous tes trophées.\nUn seul endroit.</string>
     <string name="main_buscar_ph">Chercher un jeu…</string>
     <string name="main_cerrar_busqueda">Fermer la recherche</string>
     <string name="main_racha">Série de %1$s jours</string>

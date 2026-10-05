@@ -100,6 +100,7 @@
     <string name="biblio_vacia_sub">As soon as you link an account and sync, your games will show up here.</string>
     <string name="biblio_vista_cuadricula">Grid view</string>
     <string name="biblio_vista_enfoque">Focus view</string>
+    <string name="carpeta_abrir">Open</string>
     <string name="carpeta_anadir">ADD TO FOLDER</string>
     <string name="carpeta_borrar_texto">\"%1$s\" disappears with the %2$s games it groups (the games themselves aren\'t deleted, only the folder).</string>
     <string name="carpeta_borrar_titulo">Delete this folder?</string>
@@ -109,6 +110,7 @@
     <string name="carpeta_err_quitar">Couldn\'t remove the game from the folder. Try again.</string>
     <string name="carpeta_err_renombrar">Couldn\'t rename the folder.</string>
     <string name="carpeta_nueva">New folder</string>
+    <string name="carpeta_opciones">Folder options</string>
     <string name="carpeta_quitar">Remove from folder</string>
     <string name="carpeta_renombrar">Rename folder</string>
     <string name="carpeta_sin_juegos">No games in this folder yet</string>
@@ -485,6 +487,8 @@
     <string name="login_google">Continue with Google</string>
     <string name="login_lema">The next platinum won\'t wait.</string>
     <string name="login_sin_contrasenas">We don\'t store passwords: your provider handles sign-in.</string>
+    <string name="login_subtitulo">PlayStation, Steam and Xbox together, with your friends, leagues and sessions to hunt platinums.</string>
+    <string name="login_titular">All your trophies.\nOne place.</string>
     <string name="main_buscar_ph">Search game…</string>
     <string name="main_cerrar_busqueda">Close search</string>
     <string name="main_racha">%1$s-day streak</string>

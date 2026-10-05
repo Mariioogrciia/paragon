@@ -6,6 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -109,6 +114,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                 if (activeSelected == null) {
                     CollectionsList(
                         collections = current.collections,
+                        portadas = { c -> c.gameIds.mapNotNull { id -> libraryGames.firstOrNull { it.id == id }?.coverUrl }.take(4) },
                         onOpen = { selected = it },
                         onRename = { renaming = it },
                         onDelete = { coleccion ->
@@ -180,14 +186,22 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
     }
 }
 
+/**
+ * Tus carpetas (diseño v2, maqueta "19 · Carpetas"): cuadrícula de dos
+ * columnas con las cuatro primeras carátulas de cada una, y sus opciones
+ * (cambiar nombre, borrar) en una hoja desde abajo con "⋯".
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CollectionsList(
     collections: List<Coleccion>,
+    portadas: (Coleccion) -> List<String>,
     onOpen: (Coleccion) -> Unit,
     onRename: (Coleccion) -> Unit,
     onDelete: (Coleccion) -> Unit,
 ) {
     var deleting by remember { mutableStateOf<Coleccion?>(null) }
+    var opciones by remember { mutableStateOf<Coleccion?>(null) }
 
     if (collections.isEmpty()) {
         com.paragon.app.ui.common.EmptyState(
@@ -198,31 +212,59 @@ private fun CollectionsList(
         return
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp),
     ) {
         items(collections, key = { it.id }) { coleccion ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Surface, RoundedCornerShape(radio(14)))
-                    .border(1.dp, Border, RoundedCornerShape(radio(14)))
-                    .clickable { onOpen(coleccion) }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            val caratulas = portadas(coleccion)
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(radio(20))).background(Surface)
+                    .clickable { onOpen(coleccion) }.padding(10.dp),
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = coleccion.name, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(text = Textos.t(T.comun_n_juegos, coleccion.gameIds.size), color = Muted, fontSize = 12.sp)
+                // 2×2 carátulas; los huecos, en la superficie de al lado.
+                Column(Modifier.fillMaxWidth().aspectRatio(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    for (fila in 0..1) {
+                        Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            for (col in 0..1) {
+                                val url = caratulas.getOrNull(fila * 2 + col)
+                                Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(radio(8))).background(Surface2)) {
+                                    if (url != null) {
+                                        AsyncImage(
+                                            model = url,
+                                            contentDescription = null,
+                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                IconButton(onClick = { onRename(coleccion) }) {
-                    Icon(Icons.Default.Edit, contentDescription = Textos.t(T.comun_renombrar), tint = Muted)
+                Row(Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(coleccion.name, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(Textos.t(T.comun_n_juegos, coleccion.gameIds.size), color = Muted, fontSize = 12.sp, maxLines = 1)
+                    }
+                    IconButton(onClick = { opciones = coleccion }, modifier = Modifier.size(36.dp)) {
+                        Icon(Icons.Default.MoreHoriz, contentDescription = Textos.t(T.carpeta_opciones), tint = Muted)
+                    }
                 }
-                IconButton(onClick = { deleting = coleccion }) {
-                    Icon(Icons.Default.Delete, contentDescription = Textos.t(T.comun_borrar), tint = Danger)
-                }
+            }
+        }
+    }
+
+    opciones?.let { coleccion ->
+        ModalBottomSheet(onDismissRequest = { opciones = null }, containerColor = Surface) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
+                Text(coleccion.name, color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(bottom = 8.dp))
+                OpcionHoja(Icons.Default.Folder, Textos.t(T.carpeta_abrir)) { opciones = null; onOpen(coleccion) }
+                OpcionHoja(Icons.Default.Edit, Textos.t(T.comun_renombrar)) { opciones = null; onRename(coleccion) }
+                OpcionHoja(Icons.Default.Delete, Textos.t(T.comun_borrar), color = Danger) { opciones = null; deleting = coleccion }
             }
         }
     }
@@ -235,6 +277,18 @@ private fun CollectionsList(
             onConfirm = { onDelete(coleccion) },
             onDismiss = { deleting = null },
         )
+    }
+}
+
+/** Una opción de una hoja de acciones: icono y texto a lo ancho, como en iPhone. */
+@Composable
+private fun OpcionHoja(icono: androidx.compose.ui.graphics.vector.ImageVector, texto: String, color: androidx.compose.ui.graphics.Color = Foreground, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(radio(12))).clickable(onClick = onClick).padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icono, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+        Text(texto, color = color, fontSize = 16.sp, modifier = Modifier.padding(start = 14.dp))
     }
 }
 
