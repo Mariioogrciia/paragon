@@ -15,7 +15,9 @@ data class UserProfileDto(
     val platinos: Int,
     val trofeos: Int,
     val accounts: List<AccountDto>,
-    val recentGames: List<RecentGameDto>
+    val recentGames: List<RecentGameDto>,
+    /** ninguna / solicitudEnviada / solicitudRecibida / amigos / yo (botón de amistad). */
+    val amistad: String = "ninguna",
 )
 
 @Serializable

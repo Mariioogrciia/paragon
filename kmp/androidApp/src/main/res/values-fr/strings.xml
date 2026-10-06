@@ -54,6 +54,10 @@
     <string name="amigos_placeholder">\@pseudo de ton ami</string>
     <string name="amigos_solicitudes">Demandes d\'ami</string>
     <string name="amigos_ya_sois">Vous êtes amis : @%1$s t\'avait envoyé une demande.</string>
+    <string name="amistad_aceptar">Accepter la demande</string>
+    <string name="amistad_amigos">Amis</string>
+    <string name="amistad_anadir">Ajouter en ami</string>
+    <string name="amistad_enviada">Demande envoyée</string>
     <string name="apariencia_acento">Accent et palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Se débloque au niveau %1$s (tu es niveau %2$s)</string>

@@ -293,8 +293,7 @@ fun PanelScreen(
                             )
                         }
                     }
-                    // Hueco para la barra flotante.
-                    Spacer(modifier = Modifier.height(72.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             } }
         }

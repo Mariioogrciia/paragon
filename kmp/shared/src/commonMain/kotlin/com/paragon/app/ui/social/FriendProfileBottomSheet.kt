@@ -1,5 +1,10 @@
 package com.paragon.app.ui.social
 
+import com.paragon.shared.red.paragonErrorMessage
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -106,6 +111,7 @@ fun FriendProfileBottomSheet(
                         dominantColor = dominantColor,
                         myStats = myStats,
                         themeStore = themeStore,
+                        tokenStore = tokenStore,
                         onCompareClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onCompareClick(profile.handle)
@@ -140,6 +146,7 @@ private fun ProfileContent(
     dominantColor: Color?,
     myStats: GlobalStats?,
     themeStore: com.paragon.app.data.theme.ThemeStore,
+    tokenStore: TokenStore,
     onCompareClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -223,7 +230,14 @@ private fun ProfileContent(
                 StatItem(Textos.t(T.comun_trofeos), profile.trofeos.toString())
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Amistad (6 oct 2026, como el botón del perfil en la web): enviar,
+            // aceptar si te la había mandado, o "Amigos ✓" si ya lo sois.
+            if (profile.amistad != "yo") {
+                BotonAmistad(profile, tokenStore)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
             // Botón principal: antes blanco/color dominante puro, con
             // demasiada presencia visual para lo que es — degradado de
@@ -374,3 +388,73 @@ private fun StatItem(label: String, value: String) {
 
 
 
+
+@Composable
+private fun BotonAmistad(profile: UserProfileDto, tokenStore: TokenStore) {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+    var estado by remember(profile.handle) { mutableStateOf(profile.amistad) }
+    var trabajando by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val forma = RoundedCornerShape(com.paragon.app.ui.theme.radio(16))
+    val relleno = estado == "ninguna" || estado == "solicitudRecibida"
+    val texto = when (estado) {
+        "amigos" -> Textos.t(T.amistad_amigos)
+        "solicitudEnviada" -> Textos.t(T.amistad_enviada)
+        "solicitudRecibida" -> Textos.t(T.amistad_aceptar)
+        else -> Textos.t(T.amistad_anadir)
+    }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .clip(forma)
+                .background(if (relleno) Accent else Background.copy(alpha = 0.4f))
+                .border(1.dp, if (relleno) Accent else Border, forma)
+                .clickable(enabled = relleno && !trabajando) {
+                    trabajando = true
+                    error = null
+                    scope.launch {
+                        try {
+                            val api = com.paragon.app.data.network.ApiClient.amigosApi(tokenStore)
+                            if (estado == "solicitudRecibida") {
+                                api.aceptar(profile.userId)
+                                estado = "amigos"
+                            } else {
+                                val r = api.enviar(profile.handle)
+                                estado = if (r.amigos) "amigos" else "solicitudEnviada"
+                            }
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        } catch (e: com.paragon.shared.red.HttpException) {
+                            error = e.paragonErrorMessage() ?: Textos.t(T.error_conexion)
+                        } catch (e: Exception) {
+                            error = Textos.t(T.error_conexion)
+                        }
+                        trabajando = false
+                    }
+                },
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                when (estado) {
+                    "amigos" -> Icons.Default.Check
+                    "solicitudEnviada" -> Icons.Default.Schedule
+                    else -> Icons.Default.PersonAdd
+                },
+                contentDescription = null,
+                tint = if (relleno) com.paragon.app.ui.theme.OnAccent else Muted,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                if (trabajando) "…" else texto,
+                color = if (relleno) com.paragon.app.ui.theme.OnAccent else Muted,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+        error?.let { Text(it, color = com.paragon.app.ui.theme.Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp)) }
+    }
+}

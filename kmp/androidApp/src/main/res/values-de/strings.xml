@@ -54,6 +54,10 @@
     <string name="amigos_placeholder">\@Benutzername deines Freundes</string>
     <string name="amigos_solicitudes">Freundschaftsanfragen</string>
     <string name="amigos_ya_sois">Ihr seid jetzt befreundet: @%1$s hatte dir eine Anfrage geschickt.</string>
+    <string name="amistad_aceptar">Anfrage annehmen</string>
+    <string name="amistad_amigos">Befreundet</string>
+    <string name="amistad_anadir">Als Freund hinzufügen</string>
+    <string name="amistad_enviada">Anfrage gesendet</string>
     <string name="apariencia_acento">Akzent und Palette</string>
     <string name="apariencia_estilo">Stil</string>
     <string name="apariencia_estilo_nivel">Wird ab Stufe %1$s freigeschaltet (du bist Stufe %2$s)</string>

@@ -23,7 +23,14 @@
     "compartir": "Compartir",
     "enlaceCopiado": "Enlace copiado",
     "compartirTexto": "Mira el perfil de trofeos de {nombre} en Paragon",
-    "cartaNivel": "Nivel {n}"
+    "cartaNivel": "Nivel {n}",
+    "amistad": {
+      "anadir": "Añadir amigo",
+      "enviada": "Solicitud enviada",
+      "aceptar": "Aceptar solicitud",
+      "amigos": "Amigos",
+      "error": "No se pudo enviar la solicitud"
+    }
   },
   "EstadisticasPage": {
     "meta": "Estadísticas de @{handle} · Paragon",

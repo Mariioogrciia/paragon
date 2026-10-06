@@ -54,6 +54,10 @@
     <string name="amigos_placeholder">Your friend\'s @username</string>
     <string name="amigos_solicitudes">Friend requests</string>
     <string name="amigos_ya_sois">You\'re friends now: @%1$s had sent you a request.</string>
+    <string name="amistad_aceptar">Accept request</string>
+    <string name="amistad_amigos">Friends</string>
+    <string name="amistad_anadir">Add friend</string>
+    <string name="amistad_enviada">Request sent</string>
     <string name="apariencia_acento">Accent and palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Unlocks at level %1$s (you\'re level %2$s)</string>

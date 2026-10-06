@@ -54,6 +54,7 @@ export const NAMESPACES_CLIENTE = [
   "Descubrir.UpcomingGames",
   "Onboarding",
   "Perfil",
+  "PerfilPage.amistad",
   "Shell.BackButton",
   "Shell.ConfirmForm",
   "Shell.CookieBanner",

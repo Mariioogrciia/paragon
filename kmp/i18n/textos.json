@@ -4594,5 +4594,29 @@
   "en": "No trophies match this filter.",
   "es": "No hay trofeos con este filtro.",
   "fr": "Aucun trophée avec ce filtre."
+ },
+ "amistad_anadir": {
+  "de": "Als Freund hinzufügen",
+  "en": "Add friend",
+  "es": "Añadir amigo",
+  "fr": "Ajouter en ami"
+ },
+ "amistad_enviada": {
+  "de": "Anfrage gesendet",
+  "en": "Request sent",
+  "es": "Solicitud enviada",
+  "fr": "Demande envoyée"
+ },
+ "amistad_aceptar": {
+  "de": "Anfrage annehmen",
+  "en": "Accept request",
+  "es": "Aceptar solicitud",
+  "fr": "Accepter la demande"
+ },
+ "amistad_amigos": {
+  "de": "Befreundet",
+  "en": "Friends",
+  "es": "Amigos",
+  "fr": "Amis"
  }
 }

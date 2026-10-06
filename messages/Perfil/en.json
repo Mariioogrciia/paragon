@@ -23,7 +23,14 @@
     "compartir": "Share",
     "enlaceCopiado": "Link copied",
     "compartirTexto": "Check out {nombre}'s trophy profile on Paragon",
-    "cartaNivel": "Level {n}"
+    "cartaNivel": "Level {n}",
+    "amistad": {
+      "anadir": "Add friend",
+      "enviada": "Request sent",
+      "aceptar": "Accept request",
+      "amigos": "Friends",
+      "error": "Could not send the request"
+    }
   },
   "EstadisticasPage": {
     "meta": "Stats for @{handle} · Paragon",

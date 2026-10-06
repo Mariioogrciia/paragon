@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
-import { getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
+import { getFriendshipStatus, getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { errorMovil } from "@/lib/mensajesApi";
@@ -26,7 +26,11 @@ export async function GET(
     return errorMovil(req, "No existe ese usuario", 404);
   }
 
-  const { games, xpMisiones } = await getLibrary(profile);
+  const [{ games, xpMisiones }, amistad] = await Promise.all([
+    getLibrary(profile),
+    // Para el botón de amistad del perfil (6 oct 2026): "yo" si es tu perfil.
+    profile.userId === userId ? Promise.resolve("yo" as const) : getFriendshipStatus(userId, profile.userId),
+  ]);
   const stats = summarise(games);
   const nivel = paragonProgress(games, xpMisiones);
 
@@ -44,6 +48,7 @@ export async function GET(
     handle: profile.handle,
     image: resolveAvatarUrl(profile) ?? null,
     level: nivel.level,
+    amistad,
     platinos: stats.platinos,
     trofeos: stats.trofeos,
     accounts: profile.accounts.map(acc => ({

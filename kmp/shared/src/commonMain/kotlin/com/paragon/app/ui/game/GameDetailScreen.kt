@@ -336,22 +336,19 @@ private fun GameDetailContent(
                         modifier = Modifier.weight(1f),
                     )
                 }
+                // DLC: el mismo desplegable que el resto de la app (ui/common/Selector),
+                // con el progreso de cada grupo a la derecha.
                 if (grupos.size > 1) {
-                    androidx.compose.foundation.lazy.LazyRow(
-                        contentPadding = PaddingValues(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(top = 10.dp),
-                    ) {
-                        item {
-                            com.paragon.app.ui.library.PastillaFiltro(Textos.t(T.ficha_filtro_todo_dlc), grupoElegido == null, null) { grupoElegido = null }
-                        }
-                        items(grupos.size) { i ->
-                            val (id, lista) = grupos[i]
-                            com.paragon.app.ui.library.PastillaFiltro(nombreGrupo(id, lista), grupoElegido == id, lista.size) {
-                                grupoElegido = if (grupoElegido == id) null else id
-                            }
-                        }
-                    }
+                    com.paragon.app.ui.common.Selector(
+                        valor = grupoElegido ?: "",
+                        opciones = listOf(
+                            com.paragon.app.ui.common.OpcionSelector("", Textos.t(T.ficha_filtro_todo_dlc), detalle = "${game.trophies.count { it.earned }}/${game.trophies.size}"),
+                        ) + grupos.map { (id, lista) ->
+                            com.paragon.app.ui.common.OpcionSelector(id, nombreGrupo(id, lista), detalle = "${lista.count { it.earned }}/${lista.size}")
+                        },
+                        onElegir = { grupoElegido = it.ifEmpty { null } },
+                        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp),
+                    )
                 }
                 Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(Textos.t(T.ritmo_n_trofeos, trofeosOrdenados.size), color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))

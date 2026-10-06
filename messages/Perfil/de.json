@@ -23,7 +23,14 @@
     "compartir": "Teilen",
     "enlaceCopiado": "Link kopiert",
     "compartirTexto": "Sieh dir das Trophäenprofil von {nombre} auf Paragon an",
-    "cartaNivel": "Level {n}"
+    "cartaNivel": "Level {n}",
+    "amistad": {
+      "anadir": "Als Freund hinzufügen",
+      "enviada": "Anfrage gesendet",
+      "aceptar": "Anfrage annehmen",
+      "amigos": "Befreundet",
+      "error": "Anfrage konnte nicht gesendet werden"
+    }
   },
   "EstadisticasPage": {
     "meta": "Statistiken von @{handle} · Paragon",

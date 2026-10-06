@@ -1,6 +1,14 @@
 package com.paragon.app.ui.main
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.EmojiEvents
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -123,12 +131,14 @@ import androidx.compose.foundation.layout.height
 import com.paragon.app.ui.theme.radio
 
 // Definimos la estructura de items de navegación
-sealed class BottomNavItem(val screen: Screen, val icon: ImageVector) {
-    object Dashboard : BottomNavItem(Screen.Dashboard, Icons.Default.Home)
-    object Library : BottomNavItem(Screen.Library, Icons.AutoMirrored.Filled.List)
-    object Feed : BottomNavItem(Screen.Feed, Icons.Default.Groups)
-    object Ligas : BottomNavItem(Screen.Social, Icons.Default.EmojiEvents)
-    object Perfil : BottomNavItem(Screen.Perfil, Icons.Default.Person)
+// `icon` relleno para la pestaña activa e `iconoInactivo` de contorno, como
+// la barra de Instagram (6 oct 2026).
+sealed class BottomNavItem(val screen: Screen, val icon: ImageVector, val iconoInactivo: ImageVector) {
+    object Dashboard : BottomNavItem(Screen.Dashboard, Icons.Filled.Home, Icons.Outlined.Home)
+    object Library : BottomNavItem(Screen.Library, Icons.Filled.GridView, Icons.Outlined.GridView)
+    object Feed : BottomNavItem(Screen.Feed, Icons.Filled.Groups, Icons.Outlined.Groups)
+    object Ligas : BottomNavItem(Screen.Social, Icons.Filled.EmojiEvents, Icons.Outlined.EmojiEvents)
+    object Perfil : BottomNavItem(Screen.Perfil, Icons.Filled.Person, Icons.Outlined.Person)
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -211,7 +221,12 @@ fun MainScreen(
         navBackStackEntryActual?.destination?.hierarchy?.any { it.route == item.screen.route } == true
 
     Scaffold(
-        modifier = Modifier.nestedScroll(nestedScrollConnection),
+        // Barra de abajo fija, como Instagram (6 oct 2026): siempre visible,
+        // de lado a lado y solo iconos. Ya no se esconde al hacer scroll (eso
+        // recolocaba la pantalla y daba un tirón al llegar arriba o abajo).
+        bottomBar = {
+            if (!anchoAmplio) BarraInferior(items = items, estaEn = { estaEn(it) }, foto = profile.image, inicial = profile.name.take(1), onClick = { irA(it) })
+        },
         topBar = {
             // Sin barra "PARAGON" encima (diseño v2, 5 oct 2026): cada pantalla
             // lleva su propia cabecera nativa (CabeceraNativa), como una app de
@@ -219,10 +234,6 @@ fun MainScreen(
             Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
         },
     ) { innerPadding ->
-        // La barra flotante va ENCIMA del contenido (6 oct 2026): antes era el
-        // bottomBar del Scaffold, con un fondo cuadrado detrás de la cápsula y,
-        // al esconderse/aparecer al hacer scroll, toda la pantalla se volvía a
-        // medir (el tirón al llegar arriba o abajo del todo).
         Box(Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
@@ -445,14 +456,6 @@ fun MainScreen(
         }
         }
         }
-        if (!anchoAmplio) AnimatedVisibility(
-            visible = bottomBarVisible,
-            enter = slideInVertically(initialOffsetY = { it }),
-            exit = slideOutVertically(targetOffsetY = { it }),
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            BarraFlotante(items = items, estaEn = { estaEn(it) }, onClick = { irA(it) })
-        }
         }
     }
 
@@ -521,56 +524,54 @@ private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
 }
 
 @Composable
-private fun BarraFlotante(items: List<BottomNavItem>, estaEn: (BottomNavItem) -> Boolean, onClick: (BottomNavItem) -> Unit) {
-    val forma = RoundedCornerShape(radio(32))
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
-    ) {
+private fun BarraInferior(
+    items: List<BottomNavItem>,
+    estaEn: (BottomNavItem) -> Boolean,
+    foto: String?,
+    inicial: String,
+    onClick: (BottomNavItem) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().background(Background)) {
+        HorizontalDivider(color = Border, thickness = 0.5.dp)
         Row(
-            Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .shadow(16.dp, forma, ambientColor = Accent.copy(alpha = 0.18f), spotColor = Accent.copy(alpha = 0.18f))
-                .clip(forma)
-                .background(com.paragon.app.ui.theme.Surface)
-                .border(1.dp, Border, forma),
+            Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).height(52.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Sin letras debajo (5 oct 2026, "quitar las letras de la barra"):
-            // solo iconos; la pestaña activa se abre en una píldora con su
-            // nombre, como las barras de las apps nativas de ahora.
             items.forEach { item ->
                 val activa = estaEn(item)
                 Box(
-                    Modifier
-                        .weight(if (activa) 1.8f else 1f)
-                        .fillMaxHeight()
-                        .clickable { onClick(item) },
+                    Modifier.weight(1f).fillMaxHeight()
+                        .clickable(
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                            indication = null,
+                        ) { onClick(item) },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Row(
-                        Modifier
-                            .animateContentSize()
-                            .clip(RoundedCornerShape(50))
-                            .background(if (activa) com.paragon.app.ui.theme.AccentSoft else androidx.compose.ui.graphics.Color.Transparent)
-                            .padding(horizontal = if (activa) 14.dp else 10.dp, vertical = 9.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(item.icon, contentDescription = item.screen.title, tint = if (activa) Accent else Muted, modifier = Modifier.size(24.dp))
-                        if (activa) {
-                            Text(
-                                item.screen.title,
-                                color = Accent,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(start = 6.dp),
-                            )
+                    if (item is BottomNavItem.Perfil) {
+                        // Tu foto, como en Instagram; con anillo del acento si es la pestaña activa.
+                        Box(
+                            Modifier.size(30.dp).clip(CircleShape)
+                                .border(if (activa) 2.dp else 1.dp, if (activa) Accent else Border, CircleShape)
+                                .padding(if (activa) 3.dp else 1.dp).clip(CircleShape).background(com.paragon.app.ui.theme.AccentSoft),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(inicial.uppercase(), color = Accent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            com.paragon.app.ui.common.urlImagenSegura(foto)?.let { url ->
+                                coil3.compose.AsyncImage(
+                                    model = url,
+                                    contentDescription = item.screen.title,
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
                         }
+                    } else {
+                        Icon(
+                            if (activa) item.icon else item.iconoInactivo,
+                            contentDescription = item.screen.title,
+                            tint = if (activa) Accent else Foreground.copy(alpha = 0.75f),
+                            modifier = Modifier.size(27.dp),
+                        )
                     }
                 }
             }
