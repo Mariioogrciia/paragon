@@ -381,12 +381,18 @@
     <string name="ficha_cronologia">Cronología</string>
     <string name="ficha_declarado">Progreso declarado · no puntúa en niveles ni rankings</string>
     <string name="ficha_err_no_existe">Este juego no existe o no es tuyo.</string>
+    <string name="ficha_expansion">Expansión</string>
     <string name="ficha_fecha_rareza">%1$s · %2$s%%</string>
     <string name="ficha_fecha_trofeos">%1$s · %2$s trofeos</string>
+    <string name="ficha_filtro_conseguidos">Conseguidos</string>
+    <string name="ficha_filtro_faltan">Me faltan · %1$s</string>
+    <string name="ficha_filtro_todo_dlc">Todo</string>
+    <string name="ficha_filtro_todos">Todos</string>
     <string name="ficha_grado_rareza">%1$s · %2$s%%</string>
     <string name="ficha_grafica_vacia">Hacen falta al menos dos trofeos con fecha y rareza registradas para dibujar la gráfica.</string>
     <string name="ficha_guias_escritas">Guías escritas</string>
     <string name="ficha_horas">%1$sh jugadas</string>
+    <string name="ficha_juego_base">Juego base</string>
     <string name="ficha_lista">Lista</string>
     <string name="ficha_notas">NOTAS PRIVADAS</string>
     <string name="ficha_notas_anadir">Añadir nota personal…</string>
@@ -400,6 +406,7 @@
     <string name="ficha_reservar_faltan_1">Reservar para el #%1$s · falta %2$s</string>
     <string name="ficha_reservar_faltan_n">Reservar para el #%1$s · faltan %2$s</string>
     <string name="ficha_reservar_n">Reservar para el #%1$s</string>
+    <string name="ficha_sin_trofeos_filtro">No hay trofeos con este filtro.</string>
     <string name="ficha_solo_faltan">Me faltan · %1$s</string>
     <string name="fuente_casual">Casual</string>
     <string name="fuente_elegante">Elegante</string>

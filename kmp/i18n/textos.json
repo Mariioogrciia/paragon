@@ -4552,5 +4552,47 @@
   "en": "Let others scan it to see it and join.",
   "es": "Que lo escaneen para verla y unirse.",
   "fr": "Fais-le scanner pour la voir et la rejoindre."
+ },
+ "ficha_juego_base": {
+  "de": "Hauptspiel",
+  "en": "Base game",
+  "es": "Juego base",
+  "fr": "Jeu de base"
+ },
+ "ficha_expansion": {
+  "de": "Erweiterung",
+  "en": "Expansion",
+  "es": "Expansión",
+  "fr": "Extension"
+ },
+ "ficha_filtro_todos": {
+  "de": "Alle",
+  "en": "All",
+  "es": "Todos",
+  "fr": "Tous"
+ },
+ "ficha_filtro_faltan": {
+  "de": "Fehlen · {0}",
+  "en": "Missing · {0}",
+  "es": "Me faltan · {0}",
+  "fr": "Manquants · {0}"
+ },
+ "ficha_filtro_conseguidos": {
+  "de": "Erhalten",
+  "en": "Earned",
+  "es": "Conseguidos",
+  "fr": "Obtenus"
+ },
+ "ficha_filtro_todo_dlc": {
+  "de": "Alles",
+  "en": "Everything",
+  "es": "Todo",
+  "fr": "Tout"
+ },
+ "ficha_sin_trofeos_filtro": {
+  "de": "Keine Trophäen mit diesem Filter.",
+  "en": "No trophies match this filter.",
+  "es": "No hay trofeos con este filtro.",
+  "fr": "Aucun trophée avec ce filtre."
  }
 }

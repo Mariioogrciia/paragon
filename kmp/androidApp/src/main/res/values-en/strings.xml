@@ -379,12 +379,18 @@
     <string name="ficha_cronologia">Timeline</string>
     <string name="ficha_declarado">Self-reported progress · doesn\'t count for levels or rankings</string>
     <string name="ficha_err_no_existe">This game doesn\'t exist or isn\'t yours.</string>
+    <string name="ficha_expansion">Expansion</string>
     <string name="ficha_fecha_rareza">%1$s · %2$s%%</string>
     <string name="ficha_fecha_trofeos">%1$s · %2$s trophies</string>
+    <string name="ficha_filtro_conseguidos">Earned</string>
+    <string name="ficha_filtro_faltan">Missing · %1$s</string>
+    <string name="ficha_filtro_todo_dlc">Everything</string>
+    <string name="ficha_filtro_todos">All</string>
     <string name="ficha_grado_rareza">%1$s · %2$s%%</string>
     <string name="ficha_grafica_vacia">At least two trophies with a recorded date and rarity are needed to draw the chart.</string>
     <string name="ficha_guias_escritas">Written guides</string>
     <string name="ficha_horas">%1$sh played</string>
+    <string name="ficha_juego_base">Base game</string>
     <string name="ficha_lista">List</string>
     <string name="ficha_notas">PRIVATE NOTES</string>
     <string name="ficha_notas_anadir">Add a personal note…</string>
@@ -398,6 +404,7 @@
     <string name="ficha_reservar_faltan_1">Reserve for #%1$s · %2$s to go</string>
     <string name="ficha_reservar_faltan_n">Reserve for #%1$s · %2$s to go</string>
     <string name="ficha_reservar_n">Reserve for #%1$s</string>
+    <string name="ficha_sin_trofeos_filtro">No trophies match this filter.</string>
     <string name="ficha_solo_faltan">Missing · %1$s</string>
     <string name="fuente_casual">Casual</string>
     <string name="fuente_elegante">Elegant</string>

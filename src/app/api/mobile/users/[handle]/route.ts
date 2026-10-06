@@ -30,8 +30,13 @@ export async function GET(
   const stats = summarise(games);
   const nivel = paragonProgress(games, xpMisiones);
 
-  // Tomamos los últimos jugados (sin wishlist)
-  const recent = games.filter((g) => !g.isWishlist).slice(0, 3);
+  // Los últimos jugados de verdad (sin lista de deseos). getLibrary ordena con
+  // `desc(lastPlayedAt)`, y en Postgres eso pone primero los juegos SIN fecha
+  // (NULLS FIRST): salían juegos cualquiera en vez de los recientes (6 oct 2026).
+  const recent = games
+    .filter((g) => !g.isWishlist)
+    .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""))
+    .slice(0, 6);
 
   return NextResponse.json({
     userId: profile.userId,

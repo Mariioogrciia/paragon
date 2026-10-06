@@ -379,12 +379,18 @@
     <string name="ficha_cronologia">Zeitleiste</string>
     <string name="ficha_declarado">Selbst gemeldeter Fortschritt · zählt nicht für Stufen oder Ranglisten</string>
     <string name="ficha_err_no_existe">Dieses Spiel gibt es nicht oder es gehört dir nicht.</string>
+    <string name="ficha_expansion">Erweiterung</string>
     <string name="ficha_fecha_rareza">%1$s · %2$s %%</string>
     <string name="ficha_fecha_trofeos">%1$s · %2$s Trophäen</string>
+    <string name="ficha_filtro_conseguidos">Erhalten</string>
+    <string name="ficha_filtro_faltan">Fehlen · %1$s</string>
+    <string name="ficha_filtro_todo_dlc">Alles</string>
+    <string name="ficha_filtro_todos">Alle</string>
     <string name="ficha_grado_rareza">%1$s · %2$s %%</string>
     <string name="ficha_grafica_vacia">Für das Diagramm braucht es mindestens zwei Trophäen mit Datum und Seltenheit.</string>
     <string name="ficha_guias_escritas">Schriftliche Guides</string>
     <string name="ficha_horas">%1$s h gespielt</string>
+    <string name="ficha_juego_base">Hauptspiel</string>
     <string name="ficha_lista">Liste</string>
     <string name="ficha_notas">PRIVATE NOTIZEN</string>
     <string name="ficha_notas_anadir">Persönliche Notiz hinzufügen…</string>
@@ -398,6 +404,7 @@
     <string name="ficha_reservar_faltan_1">Für #%1$s reservieren · noch %2$s</string>
     <string name="ficha_reservar_faltan_n">Für #%1$s reservieren · noch %2$s</string>
     <string name="ficha_reservar_n">Für #%1$s reservieren</string>
+    <string name="ficha_sin_trofeos_filtro">Keine Trophäen mit diesem Filter.</string>
     <string name="ficha_solo_faltan">Fehlen · %1$s</string>
     <string name="fuente_casual">Locker</string>
     <string name="fuente_elegante">Elegant</string>

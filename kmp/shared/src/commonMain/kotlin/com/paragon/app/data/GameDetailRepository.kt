@@ -37,6 +37,9 @@ data class TrophyItem(
     val earnedAt: String?,
     val rarityPercent: Double?,
     val iconUrl: String? = null,
+    /** Grupo de trofeos: "default" = juego base, otro = un DLC. */
+    val groupId: String = "default",
+    val groupName: String? = null,
 )
 
 @Serializable
@@ -144,6 +147,8 @@ private fun GameDetailDto.toGameDetailData(): GameDetailData = GameDetailData(
             earnedAt = it.earnedAt,
             rarityPercent = it.rarityPercent,
             iconUrl = it.iconUrl,
+            groupId = it.groupId,
+            groupName = it.groupName,
         )
     },
 )

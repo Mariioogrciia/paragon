@@ -18,6 +18,9 @@ data class TrophyDto(
     val earnedAt: String?,
     val rarityPercent: Double?,
     val iconUrl: String?,
+    /** "default" = juego base; otro = un DLC (como en la web, TrophyList.tsx). */
+    val groupId: String = "default",
+    val groupName: String? = null,
 )
 
 @Serializable

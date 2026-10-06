@@ -218,19 +218,12 @@ fun MainScreen(
             // verdad. Aquí solo se reserva la barra de estado.
             Spacer(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars))
         },
-        bottomBar = {
-            if (!anchoAmplio) AnimatedVisibility(
-                visible = bottomBarVisible,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it })
-            ) {
-                // Barra flotante (rediseño del 5 oct 2026): una cápsula separada de
-                // los bordes, con icono y nombre, como en las apps de iPhone. Solo
-                // colores del tema: superficie, borde, acento y su tono suave.
-                BarraFlotante(items = items, estaEn = { estaEn(it) }, onClick = { irA(it) })
-            }
-        }
     ) { innerPadding ->
+        // La barra flotante va ENCIMA del contenido (6 oct 2026): antes era el
+        // bottomBar del Scaffold, con un fondo cuadrado detrás de la cápsula y,
+        // al esconderse/aparecer al hacer scroll, toda la pantalla se volvía a
+        // medir (el tirón al llegar arriba o abajo del todo).
+        Box(Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
                 .padding(innerPadding)
@@ -452,6 +445,15 @@ fun MainScreen(
         }
         }
         }
+        if (!anchoAmplio) AnimatedVisibility(
+            visible = bottomBarVisible,
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it }),
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            BarraFlotante(items = items, estaEn = { estaEn(it) }, onClick = { irA(it) })
+        }
+        }
     }
 
     if (showRachaSheet) {
@@ -524,7 +526,6 @@ private fun BarraFlotante(items: List<BottomNavItem>, estaEn: (BottomNavItem) ->
     Box(
         Modifier
             .fillMaxWidth()
-            .background(Background)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
     ) {

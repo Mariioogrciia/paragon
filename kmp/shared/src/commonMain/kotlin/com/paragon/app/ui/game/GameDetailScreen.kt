@@ -1,5 +1,6 @@
 package com.paragon.app.ui.game
 
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import com.paragon.app.util.fechaConPatron
 
@@ -208,11 +209,28 @@ private fun GameDetailContent(
     // del contenido, p. ej. al tocar el chip de racha de la cabecera) —
     // ahora solo se recalcula si `game.trophies` cambia de verdad.
     // "Solo los que me faltan": se recuerda mientras la app está abierta.
-    var soloPendientes by remember { mutableStateOf(false) }
-    val trofeosOrdenados = remember(game.trophies, soloPendientes) {
+    // Filtros de la lista (5 oct 2026, como en la web): estado (todos /
+    // pendientes / conseguidos) y DLC. Sin filtro de DLC, la lista va
+    // agrupada por juego base y cada DLC, con su progreso.
+    var estadoTrofeos by remember { mutableStateOf(0) } // 0 todos, 1 me faltan, 2 conseguidos
+    var grupoElegido by remember(gameId) { mutableStateOf<String?>(null) }
+    val nombreBase = Textos.t(T.ficha_juego_base)
+    val grupos = remember(game.trophies) {
+        game.trophies.groupBy { it.groupId }.toList()
+            .sortedWith(compareBy<Pair<String, List<TrophyItem>>> { it.first != "default" }.thenBy { it.second.firstOrNull()?.groupName ?: it.first })
+    }
+    fun nombreGrupo(id: String, lista: List<TrophyItem>) =
+        if (id == "default") nombreBase else lista.firstOrNull()?.groupName ?: Textos.t(T.ficha_expansion)
+    val trofeosOrdenados = remember(game.trophies, estadoTrofeos, grupoElegido) {
         game.trophies
-            .filter { !soloPendientes || !it.earned }
+            .filter { grupoElegido == null || it.groupId == grupoElegido }
+            .filter { when (estadoTrofeos) { 1 -> !it.earned; 2 -> it.earned; else -> true } }
             .sortedWith(compareByDescending<TrophyItem> { it.grade?.ordinal ?: -1 }.thenBy { it.earned.not() })
+    }
+    // Los grupos que se pintan: todos (con cabecera) si hay DLC y no se ha elegido uno.
+    val gruposVisibles = remember(trofeosOrdenados, grupos, grupoElegido) {
+        if (grupos.size <= 1 || grupoElegido != null) listOf(null to trofeosOrdenados)
+        else grupos.map { (id, _) -> id to trofeosOrdenados.filter { it.groupId == id } }.filter { it.second.isNotEmpty() }
     }
 
     val coverAura = com.paragon.app.ui.common.rememberCoverAuraColor(game.coverUrl)
@@ -303,54 +321,85 @@ private fun GameDetailContent(
             }
         }
 
-        // Las mismas vistas que el desglose del mes (ui/trofeos/VistasTrofeos.kt).
+        // Filtros: estado (segmentado) y, si hay DLC, una fila de pastillas por grupo.
         item {
-            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                val faltan = game.trophies.count { !it.earned }
-                if (faltan > 0) {
-                    Box(
-                        Modifier.clip(RoundedCornerShape(50))
-                            .background(if (soloPendientes) Accent else Surface)
-                            .then(if (soloPendientes) Modifier else Modifier.border(1.dp, com.paragon.app.ui.theme.Border, RoundedCornerShape(50)))
-                            .clickable { soloPendientes = !soloPendientes }
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+            Column(Modifier.padding(top = 12.dp)) {
+                Row(modifier = Modifier.padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+                    com.paragon.app.ui.common.ControlSegmentado(
+                        opciones = listOf(
+                            Textos.t(T.ficha_filtro_todos),
+                            Textos.t(T.ficha_filtro_faltan, game.trophies.count { !it.earned }),
+                            Textos.t(T.ficha_filtro_conseguidos),
+                        ),
+                        seleccion = estadoTrofeos,
+                        onCambio = { estadoTrofeos = it },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                if (grupos.size > 1) {
+                    androidx.compose.foundation.lazy.LazyRow(
+                        contentPadding = PaddingValues(horizontal = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(top = 10.dp),
                     ) {
-                        Text(
-                            Textos.t(T.ficha_solo_faltan, faltan),
-                            color = if (soloPendientes) com.paragon.app.ui.theme.OnAccent else Foreground,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                        )
+                        item {
+                            com.paragon.app.ui.library.PastillaFiltro(Textos.t(T.ficha_filtro_todo_dlc), grupoElegido == null, null) { grupoElegido = null }
+                        }
+                        items(grupos.size) { i ->
+                            val (id, lista) = grupos[i]
+                            com.paragon.app.ui.library.PastillaFiltro(nombreGrupo(id, lista), grupoElegido == id, lista.size) {
+                                grupoElegido = if (grupoElegido == id) null else id
+                            }
+                        }
                     }
                 }
-                Spacer(Modifier.weight(1f))
-                com.paragon.app.ui.trofeos.SelectorVistaTrofeos()
+                Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(Textos.t(T.ritmo_n_trofeos, trofeosOrdenados.size), color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    com.paragon.app.ui.trofeos.SelectorVistaTrofeos()
+                }
             }
         }
 
         val vista = com.paragon.app.ui.trofeos.vistaTrofeosActual
         if (vista == com.paragon.app.ui.trofeos.VistaTrofeos.CRONOLOGIA) {
             item {
-                TrophyRarityChart(trophies = game.trophies, modifier = Modifier.padding(horizontal = 24.dp))
+                TrophyRarityChart(trophies = trofeosOrdenados, modifier = Modifier.padding(horizontal = 24.dp))
             }
-        } else if (vista == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA) {
-            items(trofeosOrdenados.chunked(4)) { fila ->
-                com.paragon.app.ui.trofeos.FilaCuadricula(fila, columnas = 4, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+        } else gruposVisibles.forEach { (grupoId, lista) ->
+            if (grupoId != null) {
+                item(key = "grupo-$grupoId") {
+                    val todos = grupos.firstOrNull { it.first == grupoId }?.second.orEmpty()
+                    CabeceraGrupoTrofeos(
+                        nombre = nombreGrupo(grupoId, todos),
+                        conseguidos = todos.count { it.earned },
+                        total = todos.size,
+                        esDlc = grupoId != "default",
+                    )
+                }
             }
-        } else {
-            items(trofeosOrdenados, key = { it.id }) { trophy ->
-                TrophyRow(
-                    trophy,
-                    game = game,
-                    repository = repository,
-                    tokenStore = tokenStore,
-                    isStuck = trophy.id in stuckIds,
-                    onStuckChange = { nuevo ->
-                        stuckIds = if (nuevo) stuckIds + trophy.id else stuckIds - trophy.id
-                    },
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                )
+            if (vista == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA) {
+                items(lista.chunked(4)) { fila ->
+                    com.paragon.app.ui.trofeos.FilaCuadricula(fila, columnas = 4, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+                }
+            } else {
+                items(lista, key = { "${grupoId}-${it.id}" }) { trophy ->
+                    TrophyRow(
+                        trophy,
+                        game = game,
+                        repository = repository,
+                        tokenStore = tokenStore,
+                        isStuck = trophy.id in stuckIds,
+                        onStuckChange = { nuevo ->
+                            stuckIds = if (nuevo) stuckIds + trophy.id else stuckIds - trophy.id
+                        },
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                    )
+                }
+            }
+        }
+        if (trofeosOrdenados.isEmpty()) {
+            item {
+                Text(Textos.t(T.ficha_sin_trofeos_filtro), color = Muted, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp))
             }
         }
 
@@ -372,10 +421,16 @@ private fun GameDetailContent(
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(horizontal = 16.dp, vertical = 16.dp)
             .fillMaxWidth()
-            .height(56.dp)
-            .shadow(12.dp, RoundedCornerShape(radio(28)), ambientColor = Accent.copy(alpha = 0.3f), spotColor = Accent.copy(alpha = 0.3f)),
+            .height(56.dp),
     ) {
         Text(Textos.t(T.nav_enfoque), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
+    // Volver siempre a mano (diseño v2): fijo arriba aunque se baje por la ficha.
+    IconButton(
+        onClick = onBack,
+        modifier = Modifier.align(Alignment.TopStart).padding(12.dp).size(44.dp).clip(RoundedCornerShape(50)).background(Background.copy(alpha = 0.7f)),
+    ) {
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
     }
     }
 
@@ -424,7 +479,9 @@ private fun GameDetailHero(
     // abajo y, debajo de la portada, tres cifras (el valor por delante de la
     // etiqueta) y la barra de progreso.
     Column {
-        Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+        // clipToBounds: con el efecto parallax la carátula bajaba por debajo
+        // de la cabecera y se veía detrás de las cifras (captura del 6 oct).
+        Box(modifier = Modifier.fillMaxWidth().height(300.dp).clipToBounds()) {
             val coverModifier = Modifier.fillMaxSize().graphicsLayer { translationY = scrollOffset * 0.4f }.let { base ->
                 if (sharedTransitionScope != null && animatedVisibilityScope != null) {
                     with(sharedTransitionScope) {
@@ -446,12 +503,6 @@ private fun GameDetailHero(
                     .fillMaxSize()
                     .background(Brush.verticalGradient(colors = listOf(Background.copy(alpha = 0.35f), Color.Transparent, Background)))
             )
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.padding(16.dp).size(44.dp).clip(RoundedCornerShape(radio(22))).background(Background.copy(alpha = 0.6f)),
-            ) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
-            }
             Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 24.dp, vertical = 16.dp)) {
                 if (fromCache) {
                     Text(text = Textos.t(T.comun_sin_conexion_copia), color = Muted, fontSize = 11.sp)
@@ -548,8 +599,11 @@ private fun GameActionsRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
-            .horizontalScroll(rememberScrollState()),
+            .padding(vertical = 12.dp)
+            // El scroll antes del margen: así las pastillas llegan al borde
+            // al deslizar en vez de cortarse a 24 dp de él.
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         ActionChip(
@@ -1151,6 +1205,30 @@ private fun NotesSection(
                         .padding(16.dp)
                 )
             }
+        }
+    }
+}
+
+/** Cabecera de un grupo de trofeos (juego base o un DLC) con su progreso. */
+@Composable
+private fun CabeceraGrupoTrofeos(nombre: String, conseguidos: Int, total: Int, esDlc: Boolean) {
+    Column(Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (esDlc) {
+                Text(
+                    "DLC",
+                    color = Accent,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clip(RoundedCornerShape(50)).background(com.paragon.app.ui.theme.AccentSoft).padding(horizontal = 7.dp, vertical = 2.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+            }
+            Text(nombre, color = Foreground, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text("$conseguidos/$total", color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+        }
+        Box(Modifier.padding(top = 8.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(com.paragon.app.ui.theme.Border)) {
+            Box(Modifier.fillMaxWidth(if (total > 0) conseguidos / total.toFloat() else 0f).height(4.dp).background(Accent))
         }
     }
 }

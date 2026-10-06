@@ -1063,7 +1063,8 @@ export const getLibrary = cache(
     .from(userGames)
     .innerJoin(gamesTable, eq(gamesTable.id, userGames.gameId))
     .where(eq(userGames.userId, profile.userId))
-    .orderBy(desc(userGames.lastPlayedAt));
+    // NULLS LAST: en Postgres `desc` pone primero los juegos sin fecha (6 oct 2026).
+    .orderBy(sql`${userGames.lastPlayedAt} desc nulls last`);
 
   // Solo se reintenta lo que NUNCA se comprobó. `metadataSyncedAt` lo marca
   // `syncIgdbMetadata`/`syncStoreMetadata` incluso cuando no encuentran nada,
@@ -1238,7 +1239,8 @@ export async function getGamesForBackground(
         isNotNull(gamesTable.iconUrl),
       ),
     )
-    .orderBy(desc(userGames.lastPlayedAt));
+    // NULLS LAST: en Postgres `desc` pone primero los juegos sin fecha (6 oct 2026).
+    .orderBy(sql`${userGames.lastPlayedAt} desc nulls last`);
 
   return rows.map((r) => ({ id: r.id, title: r.title, iconUrl: r.iconUrl! }));
 }
