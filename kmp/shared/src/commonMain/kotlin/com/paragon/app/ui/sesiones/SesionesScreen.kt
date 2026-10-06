@@ -109,7 +109,6 @@ import kotlin.time.Instant
  * Plazas: siempre el total contando a quien organiza (4 = tú + 3 libres).
  */
 
-private val METAL = mapOf("platinum" to "🏆", "gold" to "🥇", "silver" to "🥈", "bronze" to "🥉")
 private val PLATAFORMAS = mapOf("psn" to "PlayStation", "xbox" to "Xbox", "steam" to "Steam", "epic" to "Epic Games", "ubisoft" to "Ubisoft", "google" to "Google Play")
 private const val OTRO = "__otro__"
 
@@ -352,7 +351,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                                         }
                                     }
                                     Text(
-                                        (s.trofeoInfo?.grade?.let { METAL[it]?.plus(" ") } ?: "") + s.trofeo,
+                                        s.trofeo,
                                         color = Foreground,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
@@ -578,7 +577,7 @@ private fun NuevaSesionSheet(
                 val hayDlc = lista?.any { it.grupo != null } == true
                 val opciones = listOf(OpcionSelector(OTRO, Textos.t(T.sesiones_trofeo_otro))) +
                     (lista ?: emptyList()).map {
-                        OpcionSelector(it.trophyId, it.name, icono = it.grade?.let { g -> METAL[g] }, grupo = it.grupo ?: if (hayDlc) Textos.t(T.sesiones_juego_base) else null)
+                        OpcionSelector(it.trophyId, it.name, imagen = it.iconUrl, grupo = it.grupo ?: if (hayDlc) Textos.t(T.sesiones_juego_base) else null)
                     }
                 Selector(
                     valor = trophyId,

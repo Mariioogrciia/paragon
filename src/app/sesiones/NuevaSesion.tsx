@@ -18,7 +18,6 @@ interface Juego {
 type Trofeo = Awaited<ReturnType<typeof trofeosSesionAction>>[number];
 
 const PLATAFORMAS: Record<string, string> = { psn: "PlayStation", xbox: "Xbox", steam: "Steam", epic: "Epic Games", ubisoft: "Ubisoft", google: "Google Play" };
-const METAL: Record<string, string> = { platinum: "🏆", gold: "🥇", silver: "🥈", bronze: "🥉" };
 /** Valor del selector para "lo escribo yo" (juegos sin lista o trofeos que no salen). */
 const OTRO = "__otro__";
 
@@ -137,7 +136,10 @@ export function NuevaSesion({ juegos }: { juegos: Juego[] }) {
             ...(trofeos ?? []).map((tr) => ({
               value: tr.trophyId,
               label: tr.name,
-              icono: tr.grade ? METAL[tr.grade] : undefined,
+              icono: tr.iconUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={tr.iconUrl} alt="" loading="lazy" className="h-5 w-5 rounded object-cover" />
+              ) : undefined,
               // Con DLC, los del juego base también llevan encabezado.
               grupo: tr.grupo ?? (hayDlc ? t("juegoBase") : null),
             })),
