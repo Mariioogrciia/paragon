@@ -543,6 +543,7 @@
     <string name="panel_siguiente">PROCHAIN TROPHÉE</string>
     <string name="panel_siguiente_platino">PROCHAIN PLATINE</string>
     <string name="panel_siguiente_sub">Priorité automatique : d\'abord le jeu de base, forte progression et meilleures chances.</string>
+    <string name="panel_ultimos_trofeos">Derniers trophées</string>
     <string name="panel_un_paso">À UN PAS DU PLATINE</string>
     <string name="panel_un_paso_sub">Ce qu\'il te reste le moins, trié par trophées restants.</string>
     <string name="panel_un_paso_vacio">Rien à un pas du platine pour l\'instant — continue à jouer.</string>

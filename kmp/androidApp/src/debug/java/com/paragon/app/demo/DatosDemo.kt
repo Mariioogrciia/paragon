@@ -50,7 +50,8 @@ object DatosDemo {
                 """{"profile":{"handle":"lagrena","name":"La Greña","level":42,"psnId":"lagrena_69","image":null},"stats":{"platinums":87,"trophies":4312,"games":214,"completionRate":68,"gold":341,"silver":812,"bronze":3072},"racha":{"actual":6,"mejor":23}}"""
             ruta == "api/mobile/panel/highlights" ->
                 """{"nearPlatinum":[${juegos.filter { it.pct in 80..99 }.joinToString(",") { tarjeta(it) }}],"recent":[${juegos.take(5).joinToString(",") { tarjeta(it) }}],"nextTrophies":[""" +
-                    trofeos.drop(1).take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"psn-elden","gameTitle":"Elden Ring","trophyId":"t$i","trophyName":"$n","detail":"Derrota a un enemigo poderoso.","rarityPercent":$r,"gameProgress":92,"iconUrl":null,"grade":"$g"}""" }.joinToString(",") + "]}"
+                    trofeos.drop(1).take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"psn-elden","gameTitle":"Elden Ring","trophyId":"t$i","trophyName":"$n","detail":"Derrota a un enemigo poderoso.","rarityPercent":$r,"gameProgress":92,"iconUrl":null,"grade":"$g"}""" }.joinToString(",") + "]," +
+                    "\"latestTrophies\":[" + trofeos.take(5).mapIndexed { i, (n, g, r) -> """{"gameId":"${juegos[i].id}","gameTitle":"${juegos[i].titulo}","gameIconUrl":"${portada(juegos[i].app)}","trophyId":"t$i","trophyName":"$n","iconUrl":null,"grade":"$g","earnedAt":"2026-10-0${5 - i}T20:00:00.000Z","rarityPercent":$r}""" }.joinToString(",") + "]}"
             ruta == "api/mobile/library" -> """{"games":[${juegos.mapIndexed { i, j -> biblioteca(j, i) }.joinToString(",")}]}"""
             ruta.startsWith("api/mobile/games/") && ruta.count { it == '/' } == 3 -> {
                 val j = juegos.firstOrNull { ruta.endsWith(it.id) } ?: juegos[0]

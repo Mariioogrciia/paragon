@@ -272,6 +272,18 @@ fun PanelScreen(
                     }
                 }
 
+                // Últimos trofeos — los más recientes de toda la biblioteca,
+                // como en el perfil web (RecentTrophies.tsx).
+                val ultimos = ok?.latestTrophies.orEmpty()
+                if (ultimos.isNotEmpty()) {
+                    TituloSeccion(Textos.t(T.panel_ultimos_trofeos))
+                    UltimosTrofeos(
+                        trofeos = ultimos,
+                        onClick = { navController.navigate(Screen.GameDetail.routeFor(it.gameId)) },
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                    )
+                }
+
                 // Lo secundario: cerrojo de hitos, meta de platinos y rival.
                 Column(modifier = Modifier.padding(horizontal = 20.dp).padding(top = 28.dp)) {
                     hito?.let { h ->

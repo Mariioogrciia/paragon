@@ -85,7 +85,7 @@ web. `actual`/`mejor`/`diasActivos` son el mismo cálculo que
 `GET /api/mobile/stats` y que el propio Panel (duplicado como dato en los
 tres sitios a propósito, ver la nota en `panel/route.ts`).
 
-## `GET /api/mobile/panel/highlights` — "A un paso del platino", "Recientes" y "Siguiente trofeo"
+## `GET /api/mobile/panel/highlights` — "A un paso del platino", "Recientes", "Siguiente trofeo" y "Últimos trofeos"
 
 ```json
 {
@@ -93,6 +93,9 @@ tres sitios a propósito, ver la nota en `panel/route.ts`).
   "recent": [ { "id": "abc123", "title": "Elden Ring", "coverUrl": "https://...", "earnedTrophies": 32, "totalTrophies": 42, "percent": 74 } ],
   "nextTrophies": [
     { "gameId": "abc123", "gameTitle": "Elden Ring", "trophyId": "t1", "trophyName": "Maestro de las artes marciales", "detail": "...", "rarityPercent": 18.4, "gameProgress": 74, "iconUrl": "https://...", "grade": "gold" }
+  ],
+  "latestTrophies": [
+    { "gameId": "abc123", "gameTitle": "Elden Ring", "gameIconUrl": "https://...", "trophyId": "t7", "trophyName": "Señor del Círculo", "iconUrl": "https://...", "grade": "gold", "earnedAt": "2026-10-05T21:14:00.000Z", "rarityPercent": 12.3 }
   ]
 }
 ```
@@ -109,6 +112,11 @@ web ("Siguiente trofeo" en `app/page.tsx`): primero el juego BASE (el
 platino nunca depende del DLC), luego progreso alto, luego mayor
 probabilidad real de conseguirlo (`rarityPercent` más alto = menos raro).
 `rarityPercent`/`grade`/`iconUrl` pueden ser `null`.
+
+`latestTrophies` es "Últimos trofeos" (`ultimosTrofeos()` en
+`lib/history.ts`, máx. 5): los conseguidos más recientes de toda la
+biblioteca por `earnedAt`, lo mismo que la sección del perfil web.
+`gameIconUrl`/`iconUrl`/`grade`/`rarityPercent` pueden ser `null`.
 
 ## `GET /api/mobile/library` — Biblioteca
 

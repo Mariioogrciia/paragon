@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.paragon.app.data.GameProgress
+import com.paragon.app.data.LatestTrophy
 import com.paragon.app.data.NextTrophy
 import com.paragon.app.ui.common.rememberCoverAuraColor
 import com.paragon.app.ui.theme.*
@@ -452,6 +453,67 @@ fun NextTrophyCard(trophy: NextTrophy, onClick: () -> Unit = {}) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 8.dp),
             )
+        }
+    }
+}
+
+/**
+ * "Últimos trofeos" — los conseguidos más recientes de toda la biblioteca,
+ * como la sección del perfil web (RecentTrophies.tsx). Mismo aspecto que
+ * "Para hoy" (GrupoNativo): una fila por trofeo con su foto y el borde de su
+ * metal, el juego debajo, y hace cuánto y la rareza a la derecha.
+ */
+@Composable
+fun UltimosTrofeos(trofeos: List<LatestTrophy>, onClick: (LatestTrophy) -> Unit, modifier: Modifier = Modifier) {
+    com.paragon.app.ui.common.GrupoNativo(modifier = modifier) {
+        trofeos.forEachIndexed { i, trofeo ->
+            if (i > 0) com.paragon.app.ui.common.SeparadorFila()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .premiumClickable { onClick(trofeo) }
+                    .padding(horizontal = 16.dp, vertical = 11.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                GameCover(
+                    coverUrl = trofeo.iconUrl ?: trofeo.gameIconUrl ?: "",
+                    title = trofeo.trophyName,
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(RoundedCornerShape(radio(10)))
+                        .border(1.dp, gradeColor(trofeo.grade).copy(alpha = 0.6f), RoundedCornerShape(radio(10))),
+                )
+                Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                    Text(
+                        text = trofeo.trophyName,
+                        color = Foreground,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = trofeo.gameTitle,
+                        color = Muted,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 1.dp),
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
+                    Text(text = trofeo.timeAgo, color = Muted, fontSize = 13.sp)
+                    trofeo.rarityPercent?.let { rareza ->
+                        Text(
+                            text = "${formatDecimal(rareza, 1)}%",
+                            color = gradeColor(trofeo.grade),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 1.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }

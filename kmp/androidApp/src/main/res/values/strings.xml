@@ -545,6 +545,7 @@
     <string name="panel_siguiente">SIGUIENTE TROFEO</string>
     <string name="panel_siguiente_platino">SIGUIENTE PLATINO</string>
     <string name="panel_siguiente_sub">Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.</string>
+    <string name="panel_ultimos_trofeos">Últimos trofeos</string>
     <string name="panel_un_paso">A UN PASO DEL PLATINO</string>
     <string name="panel_un_paso_sub">Lo que menos te queda, ordenado por trofeos pendientes.</string>
     <string name="panel_un_paso_vacio">Nada a un paso del platino todavía — sigue jugando.</string>

@@ -2819,6 +2819,12 @@
   "es": "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
   "fr": "Priorité automatique : d'abord le jeu de base, forte progression et meilleures chances."
  },
+ "panel_ultimos_trofeos": {
+  "de": "Letzte Trophäen",
+  "en": "Latest trophies",
+  "es": "Últimos trofeos",
+  "fr": "Derniers trophées"
+ },
  "panel_un_paso": {
   "de": "KURZ VOR DER PLATIN",
   "en": "ONE STEP FROM PLATINUM",

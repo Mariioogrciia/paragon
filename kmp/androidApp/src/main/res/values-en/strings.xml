@@ -543,6 +543,7 @@
     <string name="panel_siguiente">NEXT TROPHY</string>
     <string name="panel_siguiente_platino">NEXT PLATINUM</string>
     <string name="panel_siguiente_sub">Automatic priority: base game first, high progress and best odds of getting it.</string>
+    <string name="panel_ultimos_trofeos">Latest trophies</string>
     <string name="panel_un_paso">ONE STEP FROM PLATINUM</string>
     <string name="panel_un_paso_sub">What you\'re closest to, sorted by trophies left.</string>
     <string name="panel_un_paso_vacio">Nothing one step from platinum yet — keep playing.</string>
