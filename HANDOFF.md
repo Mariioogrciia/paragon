@@ -1,7 +1,40 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **5 de octubre de 2026**.
+releer todo el historial. Última actualización: **6 de octubre de 2026**.
+
+**6 oct — pruebas en el móvil: barra tipo Instagram, DLC, amistad y fallos:**
+- **Barra de abajo** (`BarraInferior` en `MainScreen`, sustituye a la cápsula
+  `BarraFlotante`): fija y siempre visible, de lado a lado, solo iconos
+  (relleno = activa, contorno = resto, `BottomNavItem.iconoInactivo`) y la
+  foto del usuario en Perfil. Ya no se esconde al hacer scroll: eso hacía
+  que el Scaffold se volviera a medir y daba un tirón al llegar arriba/abajo.
+- **Ficha: trofeos por DLC**: la API ya mandaba `groupId/groupName` y la app
+  los tiraba (`TrophyDto`/`TrophyItem` ahora los llevan). Lista agrupada por
+  juego base y cada DLC (`CabeceraGrupoTrofeos` con progreso), filtro de
+  estado con `ControlSegmentado` (Todos / Me faltan / Conseguidos) y de DLC
+  con el `Selector` común (el usuario pidió coherencia: **mismos selectores
+  en toda la app**, nada de pastillas sueltas para esto).
+- **Ficha, fallos visuales**: la carátula con parallax se veía detrás de las
+  cifras (`clipToBounds`), las pastillas de acciones se cortaban (el
+  `horizontalScroll` va antes del padding), volver fijo arriba y Modo
+  Enfoque sin halo.
+- **Amistad desde el perfil**: `GET /api/mobile/users/{handle}` devuelve
+  `amistad` (ninguna / solicitudEnviada / solicitudRecibida / amigos / yo) y
+  `FriendProfileBottomSheet` tiene `BotonAmistad`. Web: `FriendRequestButton`
+  traducido (`Perfil.PerfilPage.amistad`) y con "Amigos ✓".
+- **Ojo con los namespaces de la web**: los textos van por carpeta
+  (`useTranslations("Perfil.PerfilPage...")`, no `"PerfilPage..."`). Si no,
+  la web enseña la clave. `scripts/comprobar-namespaces-cliente.mts` ya
+  comprueba que cada namespace exista en `messages/`.
+- **Jugado recientemente** (perfil de otros): la biblioteca ordenaba por
+  `desc(lastPlayedAt)` y Postgres pone los NULL primero; ahora
+  `desc nulls last` en `lib/profiles.ts` (afecta también a la web).
+- CI: Android verde en `bf126eb`; iOS verde en `0d190d4` (el de `bf126eb`
+  estaba en curso). Pendiente que el usuario lo pruebe en el móvil.
+- **Siguiente (preguntado, sin confirmar)**: "Últimos trofeos" en la app (en
+  la web está en el perfil, `components/RecentTrophies.tsx` +
+  `lib/history.ts → ultimosTrofeos`): en tu Perfil y en el de otros.
 
 **Noche del 5 oct (4) — diseño v2 de la app ("que se sienta una app de verdad"):**
 - Maqueta v2 de las 20 pantallas: https://claude.ai/artifact/D6EAtf8pUbhCVXjGYkDyVy
@@ -35,9 +68,9 @@ releer todo el historial. Última actualización: **5 de octubre de 2026**.
   iPhone). Skill de diseño en `.claude/skills/mobile-app-ui-design`.
 - **Solo colores y radios del tema** (Accent, Surface, Border, radio()...): la
   personalización de Apariencia tiene que seguir mandando en todo.
-- Barra de abajo = cápsula flotante (`BarraFlotante` en MainScreen) con
-  Inicio, Biblioteca, Comunidad, Ligas y **Perfil** (`ui/perfil/PerfilScreen`,
-  sustituye a "Más" y al menú del avatar).
+- Barra de abajo con Inicio, Biblioteca, Comunidad, Ligas y **Perfil**
+  (`ui/perfil/PerfilScreen`, sustituye a "Más" y al menú del avatar). Desde
+  el 6 oct es `BarraInferior` (fija, tipo Instagram), ya no la cápsula.
 - Inicio (`ui/panel/InicioCards.kt`), Biblioteca (`ui/library/BibliotecaPiezas.kt`),
   ficha del juego (cabecera nueva + "Modo Enfoque" abajo) y Comunidad
   (`ui/feed/ComunidadScreen.kt`: Muro / Sesiones). Esas cuatro pantallas y
