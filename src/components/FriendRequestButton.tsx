@@ -26,7 +26,7 @@ export function FriendRequestButton({
   const [status, setStatus] = useState(initialStatus);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const t = useTranslations("PerfilPage.amistad");
+  const t = useTranslations("Perfil.PerfilPage.amistad");
 
   async function enviar() {
     setLoading(true);
