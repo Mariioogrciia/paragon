@@ -127,7 +127,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.asPaddingValues
-import dev.chrisbanes.haze.glass.hazeGlass
+import com.paragon.app.ui.common.cristal
 import dev.chrisbanes.haze.hazeSource
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -600,17 +600,10 @@ private fun BarraInferior(
                 // Cristal líquido (haze-glass), como la barra de Instagram en
                 // iOS 26: transparente, refracta el borde y brilla arriba; el
                 // tinte justo para leer los iconos sobre cualquier fondo.
-                .hazeGlass(
-                    dev.chrisbanes.haze.HazeInput.Sources(hazeState),
-                    dev.chrisbanes.haze.glass.GlassStyle {
-                        shape(forma)
-                        backgroundColor(Background)
-                        tint(tinte.copy(alpha = 0.4f))
-                        // Desenfoque suave: lo de detrás se intuye (como en
-                        // Instagram) sin que se lean textos detrás de los iconos.
-                        optics(blurRadius = 10.dp)
-                    },
-                )
+                // Desenfoque suave: lo de detrás se intuye (como en Instagram)
+                // sin que se lean textos detrás de los iconos. Opaco con
+                // "Reducir transparencia" o en contraste alto (ui/common/Cristal.kt).
+                .cristal(hazeState, forma, tinte = tinte, alfaTinte = 0.4f, desenfoque = 10.dp)
                 .clip(forma)
                 .padding(6.dp),
         ) {

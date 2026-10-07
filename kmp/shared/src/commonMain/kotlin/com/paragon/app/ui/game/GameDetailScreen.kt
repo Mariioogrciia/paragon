@@ -83,6 +83,9 @@ import com.paragon.app.ui.common.gradeColor
 import com.paragon.app.ui.common.gradeLabelEs
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.ui.common.cristal
+import com.paragon.app.ui.common.premiumClickable
+import dev.chrisbanes.haze.hazeSource
 import com.paragon.shared.i18n.T
 import com.paragon.shared.i18n.Textos
 
@@ -308,9 +311,22 @@ private fun GameDetailContent(
         resaltado = null
     }
     val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
+    // Cristal de la ficha (7 oct 2026): la lista es la fuente; el botón de
+    // volver y la cabecera fina, hermanos encima (no dentro de la lista, para
+    // que el efecto no se muestree a sí mismo).
+    // (Con el estado de MainScreen el cristal quedaba dentro de su propia
+    // fuente y se pintaba a sí mismo sin fin: la app se cerraba.)
+    val hazeFicha = dev.chrisbanes.haze.rememberHazeState()
+    // La cabecera fina sale cuando el título grande de la portada se va por arriba.
+    val umbralCabecera = with(androidx.compose.ui.platform.LocalDensity.current) { (ALTO_PORTADA - 72.dp).toPx() }
+    val cabeceraCompacta by remember {
+        androidx.compose.runtime.derivedStateOf {
+            listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > umbralCabecera
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background), contentPadding = PaddingValues(bottom = com.paragon.app.ui.common.huecoBarra())) {
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background).hazeSource(hazeFicha), contentPadding = PaddingValues(bottom = com.paragon.app.ui.common.huecoBarra())) {
         item {
             GameDetailHero(
                 game = game,
@@ -456,20 +472,23 @@ private fun GameDetailContent(
         shape = RoundedCornerShape(radio(28)),
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            // Encima de la barra flotante de abajo (desde el 7 oct el
+            // contenido pasa por detrás de ella y el botón quedaba tapado).
+            .padding(start = 16.dp, end = 16.dp, bottom = (com.paragon.app.ui.common.huecoBarra() + 6.dp).coerceAtLeast(16.dp))
             .fillMaxWidth()
             .height(56.dp),
     ) {
         Text(Textos.t(T.nav_enfoque), fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
     // Volver siempre a mano (diseño v2): fijo arriba aunque se baje por la ficha.
-    IconButton(
-        onClick = onBack,
-        modifier = Modifier.align(Alignment.TopStart).padding(12.dp).size(44.dp).clip(RoundedCornerShape(50)).background(Background.copy(alpha = 0.7f)),
-    ) {
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
-    }
+    CabeceraFicha(
+        titulo = game.title,
+        compacta = cabeceraCompacta,
+        estado = hazeFicha,
+        onBack = onBack,
+        onTitulo = { coroutineScope.launch { listState.animateScrollToItem(0) } },
+        modifier = Modifier.align(Alignment.TopStart),
+    )
     }
 
     if (showCollections) {
@@ -519,7 +538,7 @@ private fun GameDetailHero(
     Column {
         // clipToBounds: con el efecto parallax la carátula bajaba por debajo
         // de la cabecera y se veía detrás de las cifras (captura del 6 oct).
-        Box(modifier = Modifier.fillMaxWidth().height(300.dp).clipToBounds()) {
+        Box(modifier = Modifier.fillMaxWidth().height(ALTO_PORTADA).clipToBounds()) {
             val coverModifier = Modifier.fillMaxSize().graphicsLayer { translationY = scrollOffset * 0.4f }.let { base ->
                 if (sharedTransitionScope != null && animatedVisibilityScope != null) {
                     with(sharedTransitionScope) {
@@ -1276,6 +1295,66 @@ private fun CabeceraGrupoTrofeos(nombre: String, conseguidos: Int, total: Int, e
         }
         Box(Modifier.padding(top = 8.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(com.paragon.app.ui.theme.Border)) {
             Box(Modifier.fillMaxWidth(if (total > 0) conseguidos / total.toFloat() else 0f).height(4.dp).background(Accent))
+        }
+    }
+}
+
+/** Alto de la portada de la ficha; la cabecera fina sale al pasarla. */
+private val ALTO_PORTADA = 300.dp
+
+/**
+ * Botón de volver de cristal sobre la portada que, al bajar por la ficha,
+ * se estira hasta ser una cabecera fina con el título (como en iOS 26): sin
+ * él, a mitad de la lista de trofeos no se sabía de qué juego eran. Tocar el
+ * título vuelve arriba. Cristal: `ui/common/Cristal.kt`.
+ */
+@Composable
+private fun CabeceraFicha(
+    titulo: String,
+    compacta: Boolean,
+    estado: dev.chrisbanes.haze.HazeState,
+    onBack: () -> Unit,
+    onTitulo: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val progreso by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (compacta) 1f else 0f,
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.85f, stiffness = 420f),
+        label = "cabeceraFicha",
+    )
+    val forma = RoundedCornerShape(50)
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier.fillMaxWidth().padding(12.dp)) {
+        Row(
+            Modifier
+                .width(androidx.compose.ui.unit.lerp(44.dp, maxWidth, progreso))
+                .height(44.dp)
+                .shadow(10.dp, forma, ambientColor = Color.Black.copy(alpha = 0.35f), spotColor = Color.Black.copy(alpha = 0.35f))
+                .cristal(estado, forma, seleccion = dev.chrisbanes.haze.HazeSourceSelection.All)
+                .clip(forma),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier.size(44.dp).clip(forma).premiumClickable(onClick = onBack),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
+            }
+            if (progreso > 0.01f) {
+                Text(
+                    text = titulo,
+                    color = Foreground,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        // El título entra cuando la cápsula ya casi está abierta.
+                        .graphicsLayer { alpha = ((progreso - 0.45f) / 0.55f).coerceIn(0f, 1f) }
+                        .clickable(onClick = onTitulo)
+                        .padding(end = 16.dp, top = 10.dp, bottom = 10.dp),
+                )
+            }
         }
     }
 }
