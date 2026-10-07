@@ -1,7 +1,48 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **7 de octubre de 2026**.
+releer todo el historial. Última actualización: **7 de octubre de 2026** (tarde).
+
+**7 oct (tarde) — cristal en la ficha, fotos de eSports y menú del clan:**
+- **Cristal en la ficha del juego** (apps): el botón de volver es de cristal
+  sobre la portada y, al pasar el título, se estira hasta ser una cabecera
+  fina con el nombre (tocarlo vuelve arriba) — `CabeceraFicha` en
+  `GameDetailScreen.kt`. La ficha tiene su PROPIO `HazeState`: la lista es la
+  fuente y el cristal va encima, como hermano, con `HazeSourceSelection.All`.
+  **Nunca un cristal dentro de su propia fuente** (probado con el estado de
+  MainScreen: se pinta a sí mismo sin fin y la app se cierra).
+- `ui/common/Cristal.kt`: `Modifier.cristal(...)` común (lo usan la ficha y
+  la barra de abajo). Opaco con "Reducir transparencia" de iOS
+  (`reducirTransparenciaSistema()`, expect/actual) y en modo **contraste
+  alto** de la app. Ojo al probar: el emulador estaba en contraste alto y el
+  cristal salía opaco a propósito; para verlo, modo oscuro.
+- "Modo Enfoque" de la ficha iba tapado por la barra flotante: ahora se
+  coloca con `huecoBarra()`.
+- **Revisión de propuestas de cristal**: hecho lo de la ficha; **descartada
+  por ahora la barra nativa de iOS 26** (SwiftUI `TabView`): toda la app es
+  un único `ComposeUIViewController`, habría que partirla en cinco raíces de
+  Compose, el encogimiento al hacer scroll no llega (las listas de Compose no
+  son UIScrollView) y serían dos barras que mantener.
+- **eSports — fotos y Avast**: Avast tiene `cdn-api.pandascore.co` (y desde
+  este PC también `api.pandascore.co`) en su lista negra y avisaba por cada
+  escudo. Las imágenes pasan ahora por `/api/esports/img?u=` (solo ese host,
+  solo imágenes, caché larga en la CDN: `X-Vercel-Cache: HIT`); en
+  desarrollo la ruta las pide a la de producción. `imagenEsports()` en
+  `components/esports/util.ts`, la usa `Escudo`. Las iniciales que quedan son
+  jugadores/equipos sin imagen en PandaScore. Si en local la página se queda
+  sin partidos: excepción de `pandascore.co` en Avast.
+- **Clanes (web)**: el menú "…" de gestión de un miembro salía cortado (la
+  lista de contribución tenía `overflow-hidden`); ahora redondea cada fila y
+  el menú se cierra al pulsar fuera o con Escape (`GestionMiembro.tsx`).
+- **IPA sin Mac**: compilar iOS en este PC no es posible; el IPA sale de la
+  CI al subir `kmp/` a master (~15-50 min) o con "Run workflow". La
+  herramienta `ios-builder-test/` no está instalada y su `ios-build.yml` no
+  está en master.
+- **Pendiente de decidir — más plataformas**: Switch no tiene logros (solo
+  registro manual, sin puntuar); EA y Ubisoft solo por la extensión, como
+  Epic (declarado, no puntúa); **RetroAchievements** tiene API pública y
+  podría puntuar (necesita una clave gratuita en `.env.local`); GOG por
+  confirmar.
 
 **7 oct — barra de cristal, rangos de clan, comparar meses y muchos arreglos:**
 - **Barra de abajo** (`BarraInferior` en `MainScreen`): cápsula flotante de
@@ -61,10 +102,11 @@ releer todo el historial. Última actualización: **7 de octubre de 2026**.
   con gema) en `scratch/marca/simbolo.svg`, **sin aplicar** (icono de app,
   notificación Android, favicon, `ParagonMark`).
 - **Siguiente (propuesto, sin confirmar)**:
-  - Cristal en más sitios: botones sobre la portada de la ficha y cabecera
-    fina al hacer scroll (no en todas las tarjetas: rendimiento).
-  - Solo iPhone con la cuenta gratuita: barra de pestañas nativa de iOS 26
-    (SwiftUI `TabView`, cristal del sistema), notificaciones locales de racha
+  - ~~Cristal en la ficha~~ (hecho el 7 oct por la tarde). Siguientes
+    candidatas, con el mismo patrón: cabecera fina en Biblioteca y Perfil.
+    No en las tarjetas (rendimiento; sobre fondo liso no se nota).
+  - Solo iPhone con la cuenta gratuita: ~~barra de pestañas nativa de iOS 26~~
+    (descartada, ver arriba), notificaciones locales de racha
     y sesiones, accesos rápidos del icono, Spotlight, Background App Refresh.
     Con cuenta de pago: widgets, Live Activities / Dynamic Island, push.
   - Ya hay en iOS: 120 Hz (`CADisableMinimumFrameDurationOnPhone`), Core
