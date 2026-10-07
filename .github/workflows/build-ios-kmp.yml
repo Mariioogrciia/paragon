@@ -17,17 +17,17 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Caché de Kotlin/Native
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.konan
           key: konan-${{ runner.os }}-${{ hashFiles('kmp/**/*.gradle.kts') }}
@@ -86,13 +86,13 @@ jobs:
           cp -R "$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app" "$RUNNER_TEMP/ipa/Payload/"
           cd "$RUNNER_TEMP/ipa" && zip -qry paragon-kmp.ipa Payload
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: paragon-kmp-ipa
           path: ${{ runner.temp }}/ipa/paragon-kmp.ipa
 
       # Para pasar a ios-builder (espera el .xcodeproj commiteado).
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: iosApp-xcodeproj
           path: kmp/iosApp/iosApp.xcodeproj
