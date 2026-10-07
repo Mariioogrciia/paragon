@@ -11,6 +11,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -61,6 +65,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
     var selected by remember { mutableStateOf<Coleccion?>(null) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var renaming by remember { mutableStateOf<Coleccion?>(null) }
+    var anadiendo by remember { mutableStateOf(false) }
     // Antes, si el servidor decía que no (nombre repetido, sin conexión...),
     // la app no enseñaba nada: el diálogo se quedaba abierto o el borrado no
     // ocurría, sin explicación. Ahora siempre se dice qué ha pasado.
@@ -87,6 +92,11 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
             if (selected == null) {
                 IconButton(onClick = { showCreateDialog = true }) {
                     Icon(Icons.Default.Add, contentDescription = Textos.t(T.carpeta_nueva), tint = Accent)
+                }
+            } else {
+                // Meter juegos desde la propia carpeta (antes solo desde la ficha de cada juego).
+                IconButton(onClick = { anadiendo = true }) {
+                    Icon(Icons.Default.Add, contentDescription = Textos.t(T.carpeta_anadir_juegos), tint = Accent)
                 }
             }
         }
@@ -129,6 +139,7 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                     val juegosDeLaCarpeta = libraryGames.filter { it.id in activeSelected.gameIds }
                     CollectionDetail(
                         games = juegosDeLaCarpeta,
+                        onAnadir = { anadiendo = true },
                         onOpenGame = { navController.navigate(Screen.GameDetail.routeFor(it)) },
                         onRemove = { gameId ->
                             coroutineScope.launch {
@@ -145,6 +156,23 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                 }
             }
         }
+    }
+
+    val carpeta = selected
+    if (anadiendo && carpeta != null) {
+        AnadirJuegosSheet(
+            juegos = libraryGames,
+            dentro = carpeta.gameIds.toSet(),
+            onAlternar = { gameId -> repository.toggleGameInCollection(carpeta.id, gameId) },
+            onDismiss = {
+                anadiendo = false
+                coroutineScope.launch {
+                    val refreshed = repository.getCollections()
+                    result = refreshed
+                    if (refreshed is CollectionsResult.Ok) selected = refreshed.collections.find { it.id == carpeta.id }
+                }
+            },
+        )
     }
 
     if (showCreateDialog) {
@@ -293,13 +321,24 @@ private fun OpcionHoja(icono: androidx.compose.ui.graphics.vector.ImageVector, t
 }
 
 @Composable
-private fun CollectionDetail(games: List<LibraryGame>, onOpenGame: (String) -> Unit, onRemove: (String) -> Unit) {
+private fun CollectionDetail(games: List<LibraryGame>, onAnadir: () -> Unit, onOpenGame: (String) -> Unit, onRemove: (String) -> Unit) {
     if (games.isEmpty()) {
-        com.paragon.app.ui.common.EmptyState(
-            icon = Icons.Default.Folder,
-            title = Textos.t(T.carpeta_sin_juegos),
-            description = Textos.t(T.carpeta_sin_juegos_sub),
-        )
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            com.paragon.app.ui.common.EmptyState(
+                icon = Icons.Default.Folder,
+                title = Textos.t(T.carpeta_sin_juegos),
+                description = Textos.t(T.carpeta_sin_juegos_sub),
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            Button(
+                onClick = onAnadir,
+                colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                modifier = Modifier.padding(top = 8.dp),
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null, tint = com.paragon.app.ui.theme.OnAccent, modifier = Modifier.size(18.dp))
+                Text(Textos.t(T.carpeta_anadir_juegos), color = com.paragon.app.ui.theme.OnAccent, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp))
+            }
+        }
         return
     }
 
@@ -454,5 +493,87 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
                 }
             },
         )
+    }
+}
+
+/**
+ * Añadir o quitar juegos de una carpeta desde la propia carpeta: tu
+ * biblioteca con buscador y una marca en los que ya están. Cada toque se
+ * guarda al momento (el mismo endpoint que el botón de la ficha del juego).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AnadirJuegosSheet(
+    juegos: List<LibraryGame>,
+    dentro: Set<String>,
+    onAlternar: suspend (String) -> Boolean,
+    onDismiss: () -> Unit,
+) {
+    var marcados by remember { mutableStateOf(dentro) }
+    var busqueda by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val filtrados = remember(juegos, busqueda) {
+        val q = busqueda.trim().lowercase()
+        juegos.filter { q.isEmpty() || it.title.lowercase().contains(q) }.sortedBy { it.title.lowercase() }
+    }
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = com.paragon.app.ui.theme.SurfaceSolida,
+    ) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+            Text(Textos.t(T.carpeta_anadir_juegos), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(Textos.t(T.carpeta_anadir_sub, marcados.size), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp, bottom = 12.dp))
+            OutlinedTextField(
+                value = busqueda,
+                onValueChange = { busqueda = it },
+                placeholder = { Text(Textos.t(T.carpeta_buscar), color = Muted) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Muted) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(radio(14)),
+            )
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().heightIn(max = 520.dp).padding(top = 8.dp),
+                contentPadding = PaddingValues(bottom = 32.dp),
+            ) {
+                items(filtrados, key = { it.id }) { game ->
+                    val marcado = game.id in marcados
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(radio(12)))
+                            .clickable {
+                                // Al momento en pantalla; si el servidor dice otra cosa, se corrige.
+                                marcados = if (marcado) marcados - game.id else marcados + game.id
+                                scope.launch {
+                                    val real = onAlternar(game.id)
+                                    marcados = if (real) marcados + game.id else marcados - game.id
+                                }
+                            }
+                            .padding(vertical = 8.dp, horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        AsyncImage(
+                            model = game.coverUrl,
+                            contentDescription = null,
+                            modifier = Modifier.size(44.dp).clip(RoundedCornerShape(radio(10))).background(Surface2),
+                        )
+                        Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                            Text(game.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                            Text("${game.progressPercent}%", color = Muted, fontSize = 12.sp)
+                        }
+                        Box(
+                            Modifier.size(26.dp).clip(CircleShape)
+                                .background(if (marcado) Accent else Color.Transparent)
+                                .border(2.dp, if (marcado) Accent else Border, CircleShape),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (marcado) Icon(Icons.Default.Check, contentDescription = null, tint = com.paragon.app.ui.theme.OnAccent, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
+            }
+        }
     }
 }

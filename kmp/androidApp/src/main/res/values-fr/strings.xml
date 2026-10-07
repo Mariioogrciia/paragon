@@ -108,8 +108,11 @@
     <string name="biblio_vista_enfoque">Vue focus</string>
     <string name="carpeta_abrir">Ouvrir</string>
     <string name="carpeta_anadir">AJOUTER AU DOSSIER</string>
+    <string name="carpeta_anadir_juegos">Ajouter des jeux</string>
+    <string name="carpeta_anadir_sub">%1$s dans ce dossier. Touche pour ajouter ou retirer.</string>
     <string name="carpeta_borrar_texto">« %1$s » disparaît avec les %2$s jeux qu\'il regroupe (les jeux eux-mêmes ne sont pas supprimés, seulement le dossier).</string>
     <string name="carpeta_borrar_titulo">Supprimer ce dossier ?</string>
+    <string name="carpeta_buscar">Chercher dans ta bibliothèque</string>
     <string name="carpeta_err_borrar">Impossible de supprimer le dossier.</string>
     <string name="carpeta_err_cambiar">Impossible de modifier le dossier. Vérifie la connexion et réessaie.</string>
     <string name="carpeta_err_crear">Impossible de créer le dossier.</string>

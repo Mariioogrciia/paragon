@@ -108,8 +108,11 @@
     <string name="biblio_vista_enfoque">Fokusansicht</string>
     <string name="carpeta_abrir">Öffnen</string>
     <string name="carpeta_anadir">ZU ORDNER HINZUFÜGEN</string>
+    <string name="carpeta_anadir_juegos">Spiele hinzufügen</string>
+    <string name="carpeta_anadir_sub">%1$s in diesem Ordner. Tippe, um hinzuzufügen oder zu entfernen.</string>
     <string name="carpeta_borrar_texto">„%1$s“ verschwindet mit den %2$s Spielen darin (die Spiele selbst bleiben, nur der Ordner wird gelöscht).</string>
     <string name="carpeta_borrar_titulo">Diesen Ordner löschen?</string>
+    <string name="carpeta_buscar">In deiner Bibliothek suchen</string>
     <string name="carpeta_err_borrar">Ordner konnte nicht gelöscht werden.</string>
     <string name="carpeta_err_cambiar">Der Ordner konnte nicht geändert werden. Prüf die Verbindung und versuch es erneut.</string>
     <string name="carpeta_err_crear">Ordner konnte nicht erstellt werden.</string>

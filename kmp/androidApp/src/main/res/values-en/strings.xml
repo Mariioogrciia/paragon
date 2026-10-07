@@ -108,8 +108,11 @@
     <string name="biblio_vista_enfoque">Focus view</string>
     <string name="carpeta_abrir">Open</string>
     <string name="carpeta_anadir">ADD TO FOLDER</string>
+    <string name="carpeta_anadir_juegos">Add games</string>
+    <string name="carpeta_anadir_sub">%1$s in this folder. Tap to add or remove.</string>
     <string name="carpeta_borrar_texto">\"%1$s\" disappears with the %2$s games it groups (the games themselves aren\'t deleted, only the folder).</string>
     <string name="carpeta_borrar_titulo">Delete this folder?</string>
+    <string name="carpeta_buscar">Search your library</string>
     <string name="carpeta_err_borrar">Couldn\'t delete the folder.</string>
     <string name="carpeta_err_cambiar">Couldn\'t update the folder. Check your connection and try again.</string>
     <string name="carpeta_err_crear">Couldn\'t create the folder.</string>

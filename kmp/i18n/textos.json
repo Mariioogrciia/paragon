@@ -2879,6 +2879,24 @@
   "es": "Guardar escudo",
   "fr": "Enregistrer le blason"
  },
+ "carpeta_anadir_juegos": {
+  "de": "Spiele hinzufügen",
+  "en": "Add games",
+  "es": "Añadir juegos",
+  "fr": "Ajouter des jeux"
+ },
+ "carpeta_anadir_sub": {
+  "de": "{0} in diesem Ordner. Tippe, um hinzuzufügen oder zu entfernen.",
+  "en": "{0} in this folder. Tap to add or remove.",
+  "es": "{0} en esta carpeta. Toca para meter o sacar.",
+  "fr": "{0} dans ce dossier. Touche pour ajouter ou retirer."
+ },
+ "carpeta_buscar": {
+  "de": "In deiner Bibliothek suchen",
+  "en": "Search your library",
+  "es": "Buscar en tu biblioteca",
+  "fr": "Chercher dans ta bibliothèque"
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",
