@@ -139,6 +139,12 @@
     },
     "clear": "Zurücksetzen",
     "hideEarned": "Erhaltene ausblenden",
+    "estado": "Status",
+    "estadoTodos": "Alle",
+    "estadoFaltan": "Fehlen · {n}",
+    "estadoConseguidos": "Erhalten",
+    "dlc": "Hauptspiel und DLC",
+    "todoDlc": "Alles (Hauptspiel und DLC)",
     "chronologicalOrder": "Chronologische Reihenfolge",
     "view": {
       "list": "Liste",

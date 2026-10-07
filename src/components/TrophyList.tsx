@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Selector } from "@/components/ui/Selector";
 import { useTranslations, useLocale } from "next-intl";
 import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
 import { colorFor, rarity, relativeDate } from "@/lib/design";
@@ -77,7 +78,11 @@ export function TrophyList({
   const mostrarControlesDeLista = view === "lista" || view === "cuadricula";
   const [activeTrophy, setActiveTrophy] = useState<Trophy | null>(null);
   const [filtros, setFiltros] = useState<Set<Filtro>>(new Set());
-  const [ocultarConseguidos, setOcultarConseguidos] = useState(false);
+  // Estado y DLC, como en la ficha de la app (7 oct 2026): "Todos / Me faltan
+  // · N / Conseguidos" y, si el juego tiene DLC, un desplegable con el
+  // progreso de cada grupo. Sustituyen al antiguo "Ocultar conseguidos".
+  const [estado, setEstado] = useState<"todos" | "faltan" | "conseguidos">("todos");
+  const [grupoElegido, setGrupoElegido] = useState<string>("");
   const [ordenCronologico, setOrdenCronologico] = useState(false);
   // "Mostrar ocultos": los trofeos ocultos tapan el nombre para no destripar
   // la trama, pero quien caza trofeos a menudo quiere verlos. Se aplica aquí,
@@ -122,9 +127,29 @@ export function TrophyList({
   }, [trophies]);
 
   const trofeosFiltrados = useMemo(
-    () => trophies.filter((t) => pasaFiltro(t, filtros) && (!ocultarConseguidos || !t.earned)),
-    [trophies, filtros, ocultarConseguidos],
+    () =>
+      trophies.filter(
+        (t) =>
+          pasaFiltro(t, filtros) &&
+          (estado === "todos" || (estado === "faltan" ? !t.earned : t.earned)) &&
+          (grupoElegido === "" || (t.groupId || "default") === grupoElegido),
+      ),
+    [trophies, filtros, estado, grupoElegido],
   );
+
+  // Grupos del juego (base + DLC) con su progreso, para el desplegable.
+  const gruposDelJuego = useMemo(() => {
+    const m = new Map<string, { nombre: string; hechos: number; total: number }>();
+    for (const tr of trophies) {
+      const id = tr.groupId || "default";
+      const g = m.get(id) ?? { nombre: tr.groupName || "", hechos: 0, total: 0 };
+      g.total++;
+      if (tr.earned) g.hechos++;
+      m.set(id, g);
+    }
+    return [...m.entries()].sort(([a], [b]) => (a === "default" ? -1 : b === "default" ? 1 : a.localeCompare(b)));
+  }, [trophies]);
+  const faltan = trophies.filter((tr) => !tr.earned).length;
 
   function alternarFiltro(valor: Filtro) {
     setFiltros((prev) => {
@@ -214,10 +239,37 @@ export function TrophyList({
                 en su propia fila, separados de los chips de categoría de
                 arriba: no filtran por tipo de trofeo, uno filtra por estado
                 (ya lo tienes o no) y el otro solo reordena, no esconde nada. */}
-            {trophies.some((trofeo) => trofeo.earned) && (
-              <ToggleChip active={ocultarConseguidos} onClick={() => setOcultarConseguidos((v) => !v)}>
-                {t("TrophyList.hideEarned")}
-              </ToggleChip>
+            {/* Estado: segmentado, como en la app. */}
+            <div role="group" aria-label={t("TrophyList.estado")} className="flex rounded-full border border-border bg-surface p-0.5">
+              {(["todos", "faltan", "conseguidos"] as const).map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  aria-pressed={estado === e}
+                  onClick={() => setEstado(e)}
+                  className={`rounded-full px-3 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.03em] transition-colors ${
+                    estado === e ? "bg-surface-2 text-foreground" : "text-muted hover:bg-surface-2/60 hover:text-foreground"
+                  }`}
+                >
+                  {e === "todos" ? t("TrophyList.estadoTodos") : e === "faltan" ? t("TrophyList.estadoFaltan", { n: faltan }) : t("TrophyList.estadoConseguidos")}
+                </button>
+              ))}
+            </div>
+            {gruposDelJuego.length > 1 && (
+              <Selector
+                value={grupoElegido}
+                onChange={setGrupoElegido}
+                ariaLabel={t("TrophyList.dlc")}
+                className="min-w-[12rem]"
+                options={[
+                  { value: "", label: t("TrophyList.todoDlc"), detalle: `${trophies.filter((x) => x.earned).length}/${trophies.length}` },
+                  ...gruposDelJuego.map(([id, g]) => ({
+                    value: id,
+                    label: id === "default" ? nombreJuegoBase : g.nombre || t("TrophyList.expansion"),
+                    detalle: `${g.hechos}/${g.total}`,
+                  })),
+                ]}
+              />
             )}
             <ToggleChip active={ordenCronologico} onClick={() => setOrdenCronologico((v) => !v)}>
               {t("TrophyList.chronologicalOrder")}

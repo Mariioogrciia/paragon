@@ -139,6 +139,12 @@
     },
     "clear": "Limpiar",
     "hideEarned": "Ocultar conseguidos",
+    "estado": "Estado",
+    "estadoTodos": "Todos",
+    "estadoFaltan": "Me faltan · {n}",
+    "estadoConseguidos": "Conseguidos",
+    "dlc": "Juego base y DLC",
+    "todoDlc": "Todo (juego base y DLC)",
     "chronologicalOrder": "Orden cronológico",
     "view": {
       "list": "Lista",
