@@ -1,10 +1,77 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **6 de octubre de 2026**.
+releer todo el historial. Última actualización: **7 de octubre de 2026**.
+
+**7 oct — barra de cristal, rangos de clan, comparar meses y muchos arreglos:**
+- **Barra de abajo** (`BarraInferior` en `MainScreen`): cápsula flotante de
+  **cristal líquido** como la de Instagram (`haze-glass` 2.0.1:
+  `hazeSource` en el contenido, `hazeGlass` en la barra, desenfoque 10 dp,
+  tinte 40 %). Una píldora se desliza con muelle a la pestaña activa, sin
+  ripple. El contenido pasa POR DETRÁS: cada lista suma
+  `ui/common/huecoBarra()` a su relleno inferior (`LocalHuecoBarra`, lo da
+  MainScreen). Pantalla nueva con scroll → sumarle `huecoBarra()`.
+  En Android < 13 queda un cristal simple, sin refracción.
+- **Trofeo → ficha**: `Screen.GameDetail.routeFor(gameId, trofeo, de)`. La
+  ficha baja hasta el trofeo y lo resalta. `de=<handle>` abre la ficha de
+  OTRA persona en solo lectura (`/api/mobile/games/[id]?de=`), sin caché
+  local; los juegos recientes del perfil de alguien la usan
+  (`LocalAbrirJuegoDe`).
+- **Platinado con DLC pendientes**: el servidor manda `platinado` en
+  highlights, `GameProgress.platinado`; ya no sale "siguiente platino".
+  Steam/Xbox no distinguen DLC (Steam sigue siendo el 100 %).
+- **Clanes**: escudo personalizable (forma + símbolo + 2 colores,
+  `lib/clanEmblema.ts` ↔ `ui/social/EscudoClan.kt`, guardado en
+  `clans.logoUrl`). **Rangos** líder / colíder / veterano / miembro
+  (`lib/clanRangos.ts` ↔ `data/ClanRangos.kt`, con tests; en
+  `clan_members.role`, "admin" = colíder). Si el líder se va, hereda el
+  colíder más antiguo (`sucesorDelLider`). Las acciones de la web devuelven
+  `{ error }` (`ClanError`): lanzar daba "Minified React error #441".
+- **Carpetas**: añadir/quitar juegos desde la carpeta y **foto propia**
+  (`collection.portada`, `POST/DELETE /api/mobile/collections/[id]/portada`).
+- **Apariencia** rediseñada (miniaturas de temas y estilos, modos con icono,
+  acentos con nombre). Cada **estilo** trae fondo y tiñe tarjetas; las
+  **paletas completas** oscurecen su fondo también en OLED. Interlineado
+  relativo a la letra en todo el tema (`interlineadoRelativo` en Theme.kt).
+- **Amigos**: selector Amigos / Solicitudes (N) / Añadir. **Racha**
+  rediseñada (anillo hacia el récord, semana, mapa de 5 semanas).
+  **Mes a mes**: comparar con un amigo (web `/ritmo?con=`, app; API
+  `stats/month?de=`, solo amigos). **Web**: filtros de la ficha como la app
+  (Todos / Me faltan / Conseguidos + DLC) y fondo con el artwork de IGDB.
+- **Imágenes**: `ui/common/UrlImagenes.kt` corrige TODAS las URLs (http →
+  https, sin esquema, relativas) en los dos ImageLoader: carátulas y fotos
+  de PSN que no cargaban en iOS.
+- **Varios**: hojas opacas (`SurfaceSolida`), "Ocultar funciones sociales"
+  quita Comunidad, botones de Cuentas vinculadas, enlaces de Ajustes a la web
+  real (`BASE_URL`), APK firmada siempre con `kmp/androidApp/debug.keystore`
+  (antes "conflicto de paquete" en cada APK del CI).
+- **Base de datos (aplicado con `db:push`)**: `collection.portada` nueva; se
+  quitó la clave foránea `game_guide.gameId → game.id` (las guías usan el id
+  global de IGDB: publicar fallaba siempre). Ojo: el primer `db:push` del día
+  añadió además claves foráneas que faltaban en ~20 tablas (sin errores).
+- **Vercel** (CPU 3 h 33 min de 4 h del plan): el cron solo resincroniza a
+  quien lleve > 2 h (`HORAS_ENTRE_RESYNC`) y `sync-frecuente.yml` va cada
+  30 min. Si vuelve a apretar: avisos, alertas y resúmenes corren en cada
+  llamada.
+- **Compilar en este PC**: el antivirus (Avast) rompe el SSL de Gradle.
+  `JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=<repo>/scratch/cacerts-avast.jks
+  -Djavax.net.ssl.trustStorePassword=changeit"` y `./gradlew --stop` antes.
+  Así compila también iOS (`:shared:compileKotlinIosSimulatorArm64`).
+- **Marca**: el nombre sigue siendo Paragon "de momento". Logo elegido (copa
+  con gema) en `scratch/marca/simbolo.svg`, **sin aplicar** (icono de app,
+  notificación Android, favicon, `ParagonMark`).
+- **Siguiente (propuesto, sin confirmar)**:
+  - Cristal en más sitios: botones sobre la portada de la ficha y cabecera
+    fina al hacer scroll (no en todas las tarjetas: rendimiento).
+  - Solo iPhone con la cuenta gratuita: barra de pestañas nativa de iOS 26
+    (SwiftUI `TabView`, cristal del sistema), notificaciones locales de racha
+    y sesiones, accesos rápidos del icono, Spotlight, Background App Refresh.
+    Con cuenta de pago: widgets, Live Activities / Dynamic Island, push.
+  - Ya hay en iOS: 120 Hz (`CADisableMinimumFrameDurationOnPhone`), Core
+    Haptics, Atajos (en diagnóstico), iconos alternativos.
 
 **6 oct — pruebas en el móvil: barra tipo Instagram, DLC, amistad y fallos:**
-- **Barra de abajo** (`BarraInferior` en `MainScreen`, sustituye a la cápsula
+- **Barra de abajo** (desde el 7 oct es de cristal y flotante, ver arriba) (`BarraInferior` en `MainScreen`, sustituye a la cápsula
   `BarraFlotante`): fija y siempre visible, de lado a lado, solo iconos
   (relleno = activa, contorno = resto, `BottomNavItem.iconoInactivo`) y la
   foto del usuario en Perfil. Ya no se esconde al hacer scroll: eso hacía
