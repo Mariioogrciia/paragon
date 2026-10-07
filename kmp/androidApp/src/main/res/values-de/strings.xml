@@ -184,6 +184,7 @@
     <string name="clan_rango_veterano">Ältester</string>
     <string name="clan_ranking">RANGLISTE</string>
     <string name="clan_rol_trofeos">%1$s · %2$s Trophäen</string>
+    <string name="clan_salir_lider_sucesor">Du bist der Anführer: Wenn du gehst, übernimmt %1$s die Führung.</string>
     <string name="clan_salir_texto">Du erscheinst nicht mehr in der Rangliste von „%1$s“ — man müsste dich erneut einladen.</string>
     <string name="clan_salir_titulo">Clan verlassen?</string>
     <string name="clan_sin_amigos">Gerade keine Freunde verfügbar — alle sind schon in einem Clan oder bereits eingeladen.</string>

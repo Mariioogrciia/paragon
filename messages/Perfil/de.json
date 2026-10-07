@@ -624,6 +624,8 @@
     "vacio": "Noch keine Clans. Gründe den ersten!"
   },
   "ClanPage": {
+    "salirLiderSucesor": "Du bist der Anführer: Wenn du gehst, übernimmt {nombre} die Führung. Clan verlassen?",
+    "salirLiderSolo": "Du bist allein im Clan: Wenn du gehst, wird der Clan gelöscht. Sicher?",
     "rango_owner": "Anführer",
     "rango_colider": "Vize-Anführer",
     "rango_veterano": "Ältester",

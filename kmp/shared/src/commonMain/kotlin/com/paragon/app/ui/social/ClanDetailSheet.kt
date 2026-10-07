@@ -222,14 +222,16 @@ fun ClanDetailSheet(
     if (confirmLeave) {
         val detail = (result as? ClanDetailResult.Ok)?.detail
         val esOwner = detail?.amIOwner == true
+        // Si eres el líder, el liderazgo pasa a otro; solo si estás solo se borra el clan.
+        val sucesor = if (esOwner) detail?.leaderboard?.let { com.paragon.app.data.ClanRangos.sucesor(it) } else null
         ConfirmDialog(
-            title = if (esOwner) Textos.t(T.clan_abandonar_propio) else Textos.t(T.clan_salir_titulo),
-            message = if (esOwner) {
-                Textos.t(T.clan_abandonar_propio_texto)
-            } else {
-                Textos.t(T.clan_salir_texto, detail?.name ?: "")
+            title = if (esOwner && sucesor == null) Textos.t(T.clan_abandonar_propio) else Textos.t(T.clan_salir_titulo),
+            message = when {
+                esOwner && sucesor != null -> Textos.t(T.clan_salir_lider_sucesor, sucesor.name)
+                esOwner -> Textos.t(T.clan_abandonar_propio_texto)
+                else -> Textos.t(T.clan_salir_texto, detail?.name ?: "")
             },
-            confirmLabel = if (esOwner) Textos.t(T.clan_borrar_si) else Textos.t(T.liga_salir_si),
+            confirmLabel = if (esOwner && sucesor == null) Textos.t(T.clan_borrar_si) else Textos.t(T.liga_salir_si),
             onConfirm = {
                 confirmLeave = false
                 scope.launch {
@@ -343,7 +345,9 @@ private fun ClanDetailContent(
             }
         } else {
             TextButton(onClick = onRequestLeave) {
-                Text(if (detail.amIOwner) Textos.t(T.clan_abandonar_borra) else Textos.t(T.clan_abandonar), color = Danger, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                // "(lo borra)" solo si eres el líder y estás solo: si no, el liderazgo pasa a otro.
+                val borraria = detail.amIOwner && detail.leaderboard.size <= 1
+                Text(if (borraria) Textos.t(T.clan_abandonar_borra) else Textos.t(T.clan_abandonar), color = Danger, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
             }
         }
 

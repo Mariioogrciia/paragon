@@ -1,5 +1,5 @@
 import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends, getUserClan } from "@/lib/clans";
-import { normalizarRango, puedeEditarClan, puedeInvitar } from "@/lib/clanRangos";
+import { normalizarRango, puedeEditarClan, puedeInvitar, sucesorDelLider } from "@/lib/clanRangos";
 import { GestionMiembro } from "./GestionMiembro";
 import { EditorInfoClan } from "./EditorInfoClan";
 import { notFound } from "next/navigation";
@@ -114,7 +114,13 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
 
         <div className="flex flex-wrap items-start gap-3">
           {puedoInvitar && <InviteFriendsButton clanId={clan.id} friends={invitables} />}
-          {userId && <ClanActions clanId={clan.id} amIMember={amIMember} amIOwner={amIOwner} otroClan={otroClan} />}
+          {userId && <ClanActions
+              clanId={clan.id}
+              amIMember={amIMember}
+              amIOwner={amIOwner}
+              otroClan={otroClan}
+              sucesor={amIOwner && userId ? (() => { const s = sucesorDelLider(leaderboard, userId); return s ? s.name || s.handle || "?" : null; })() : null}
+            />}
         </div>
       </div>
 

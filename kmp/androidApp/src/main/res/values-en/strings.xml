@@ -184,6 +184,7 @@
     <string name="clan_rango_veterano">Elder</string>
     <string name="clan_ranking">RANKING</string>
     <string name="clan_rol_trofeos">%1$s · %2$s trophies</string>
+    <string name="clan_salir_lider_sucesor">You\'re the leader: if you leave, leadership passes to %1$s.</string>
     <string name="clan_salir_texto">You\'ll stop appearing in the \"%1$s\" ranking — they\'d have to invite you again for you to rejoin.</string>
     <string name="clan_salir_titulo">Leave the clan?</string>
     <string name="clan_sin_amigos">No friends available right now — they\'re all in a clan already or you\'ve already asked them.</string>

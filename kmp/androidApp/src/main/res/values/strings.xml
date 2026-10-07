@@ -186,6 +186,7 @@
     <string name="clan_rango_veterano">Veterano</string>
     <string name="clan_ranking">RANKING</string>
     <string name="clan_rol_trofeos">%1$s · %2$s trofeos</string>
+    <string name="clan_salir_lider_sucesor">Eres el líder: si sales, el liderazgo pasará a %1$s.</string>
     <string name="clan_salir_texto">Dejarás de aparecer en el ranking de \"%1$s\" — tendrían que volver a invitarte para que entres otra vez.</string>
     <string name="clan_salir_titulo">¿Salir del clan?</string>
     <string name="clan_sin_amigos">No tienes amigos disponibles ahora mismo — o ya están todos en un clan, o ya se lo has pedido.</string>

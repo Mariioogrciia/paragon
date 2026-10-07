@@ -184,6 +184,7 @@
     <string name="clan_rango_veterano">Aîné</string>
     <string name="clan_ranking">CLASSEMENT</string>
     <string name="clan_rol_trofeos">%1$s · %2$s trophées</string>
+    <string name="clan_salir_lider_sucesor">Tu es le chef : si tu pars, %1$s prendra la direction.</string>
     <string name="clan_salir_texto">Tu n\'apparaîtras plus dans le classement de « %1$s » — il faudrait te réinviter pour revenir.</string>
     <string name="clan_salir_titulo">Quitter le clan ?</string>
     <string name="clan_sin_amigos">Aucun ami disponible pour l\'instant — ils sont déjà tous dans un clan ou tu les as déjà invités.</string>

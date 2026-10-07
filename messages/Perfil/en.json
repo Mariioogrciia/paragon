@@ -624,6 +624,8 @@
     "vacio": "No clans yet. Be the first to create one!"
   },
   "ClanPage": {
+    "salirLiderSucesor": "You're the leader: if you leave, leadership passes to {nombre}. Leave the clan?",
+    "salirLiderSolo": "You're alone in the clan: if you leave, the clan will be deleted. Are you sure?",
     "rango_owner": "Leader",
     "rango_colider": "Co-leader",
     "rango_veterano": "Elder",

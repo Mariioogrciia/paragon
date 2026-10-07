@@ -624,6 +624,8 @@
     "vacio": "Todavía no hay ningún clan. ¡Sé el primero en crear uno!"
   },
   "ClanPage": {
+    "salirLiderSucesor": "Eres el líder: si sales, el liderazgo pasará a {nombre}. ¿Salir del clan?",
+    "salirLiderSolo": "Estás solo en el clan: si sales, el clan desaparecerá. ¿Seguro?",
     "rango_owner": "Líder",
     "rango_colider": "Colíder",
     "rango_veterano": "Veterano",

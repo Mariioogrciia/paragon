@@ -4,7 +4,9 @@ import { getClanByTag, leaveClan } from "@/lib/clans";
 import { errorMovil } from "@/lib/mensajesApi";
 
 /**
- * Abandona un clan por su tag. Si eres el owner, `leaveClan` borra el clan
+ * Abandona un clan por su tag. Si eres el líder, el liderazgo pasa al colíder
+ * más antiguo (lib/clanRangos.ts: sucesorDelLider); solo si estás solo se
+ * borra el clan. (Antes: `leaveClan` borraba el clan
  * ENTERO (sin transferencia de liderazgo, simplificación deliberada de
  * lib/clans.ts) — la app debe confirmarlo con el usuario ANTES de llamar
  * aquí, igual que el `confirm()` de la web (`ClanActions.tsx`). Sin body.

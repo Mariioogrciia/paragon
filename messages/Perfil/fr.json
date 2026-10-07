@@ -624,6 +624,8 @@
     "vacio": "Aucun clan pour l'instant. Sois le premier à en créer un !"
   },
   "ClanPage": {
+    "salirLiderSucesor": "Tu es le chef : si tu pars, {nombre} prendra la direction. Quitter le clan ?",
+    "salirLiderSolo": "Tu es seul dans le clan : si tu pars, le clan disparaîtra. Sûr ?",
     "rango_owner": "Chef",
     "rango_colider": "Adjoint",
     "rango_veterano": "Aîné",

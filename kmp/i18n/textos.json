@@ -3005,6 +3005,12 @@
   "es": "Guardar",
   "fr": "Enregistrer"
  },
+ "clan_salir_lider_sucesor": {
+  "de": "Du bist der Anführer: Wenn du gehst, übernimmt {0} die Führung.",
+  "en": "You're the leader: if you leave, leadership passes to {0}.",
+  "es": "Eres el líder: si sales, el liderazgo pasará a {0}.",
+  "fr": "Tu es le chef : si tu pars, {0} prendra la direction."
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",

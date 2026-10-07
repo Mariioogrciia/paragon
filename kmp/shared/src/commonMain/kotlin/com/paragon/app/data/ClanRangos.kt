@@ -27,6 +27,16 @@ object ClanRangos {
         else -> 0
     }
 
+    /**
+     * Quién hereda el liderazgo si el líder se va (igual que sucesorDelLider de
+     * la web): el colíder más antiguo; si no hay, el veterano más antiguo, y si
+     * no, el miembro más antiguo. null si el líder está solo.
+     */
+    fun sucesor(miembros: List<ClanMember>): ClanMember? =
+        miembros.filter { normalizar(it.role) != "owner" }
+            .sortedWith(compareByDescending<ClanMember> { nivel(it.role) }.thenBy { it.joinedAt ?: "9999" })
+            .firstOrNull()
+
     fun puedeEditar(role: String?) = nivel(role) >= 2
     fun puedeInvitar(role: String?) = nivel(role) >= 1
     fun puedeExpulsar(actor: String?, objetivo: String?) = nivel(actor) >= 2 && nivel(actor) > nivel(objetivo)

@@ -24,6 +24,23 @@ export function nivelRango(role: string | null | undefined): number {
   return { owner: 3, colider: 2, veterano: 1, member: 0 }[normalizarRango(role)];
 }
 
+/**
+ * Quién hereda el liderazgo si el líder se va: el colíder más antiguo; si no
+ * hay, el veterano más antiguo, y si no, el miembro más antiguo. null si el
+ * líder está solo (entonces el clan se borra).
+ */
+export function sucesorDelLider<T extends { userId: string; role: string; joinedAt: Date | string | null }>(
+  miembros: T[],
+  liderId: string,
+): T | null {
+  const fecha = (m: T) => (m.joinedAt ? new Date(m.joinedAt).getTime() : Number.MAX_SAFE_INTEGER);
+  return (
+    miembros
+      .filter((m) => m.userId !== liderId)
+      .sort((a, b) => nivelRango(b.role) - nivelRango(a.role) || fecha(a) - fecha(b))[0] ?? null
+  );
+}
+
 /** Nombre, descripción y escudo. */
 export function puedeEditarClan(role: string | null | undefined): boolean {
   return nivelRango(role) >= 2;

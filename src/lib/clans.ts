@@ -11,7 +11,7 @@ import { enviarPush } from "./webPush";
 import { enviarPushFcm } from "./fcm";
 import type { TrophyGrade } from "./types";
 import { emblemaATexto, type Emblema } from "./clanEmblema";
-import { normalizarRango, puedeCambiarRango, puedeEditarClan, puedeExpulsar, puedeInvitar, type Rango } from "./clanRangos";
+import { normalizarRango, puedeCambiarRango, puedeEditarClan, puedeExpulsar, puedeInvitar, sucesorDelLider, type Rango } from "./clanRangos";
 
 /**
  * Error que se puede enseñar tal cual a quien lo provoca ("ya estás en un
@@ -107,8 +107,20 @@ export async function leaveClan(userId: string, clanId: string) {
   if (membership.length === 0) return;
 
   if (membership[0].role === "owner") {
-    // Para simplificar: si el owner se va, borramos el clan entero.
-    await db.delete(clans).where(eq(clans.id, clanId));
+    // El liderazgo pasa al colíder más antiguo (ver sucesorDelLider); solo si
+    // el líder estaba solo se borra el clan.
+    const miembros = await db
+      .select({ userId: clanMembers.userId, role: clanMembers.role, joinedAt: clanMembers.joinedAt })
+      .from(clanMembers)
+      .where(eq(clanMembers.clanId, clanId));
+    const sucesor = sucesorDelLider(miembros, userId);
+    if (!sucesor) {
+      await db.delete(clans).where(eq(clans.id, clanId));
+      return;
+    }
+    await db.update(clanMembers).set({ role: "owner" }).where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, sucesor.userId)));
+    await db.update(clans).set({ ownerId: sucesor.userId }).where(eq(clans.id, clanId));
+    await db.delete(clanMembers).where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, userId)));
   } else {
     await db
       .delete(clanMembers)
