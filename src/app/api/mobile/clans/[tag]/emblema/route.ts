@@ -6,7 +6,7 @@ import { errorMovil } from "@/lib/mensajesApi";
 
 /**
  * Cambia el escudo del clan — `{ "emblema": "emblema:1:<forma>:<simbolo>:<fondo>:<color>" }`
- * (ver lib/clanEmblema.ts). Solo el líder, como en la web.
+ * (ver lib/clanEmblema.ts). Líder y colíderes, como en la web.
  */
 export async function POST(req: Request, { params }: { params: Promise<{ tag: string }> }) {
   const userId = await getMobileUserId(req);
@@ -27,7 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ tag: st
   }
 
   if (!(await setClanEmblema(userId, clan.id, emblema))) {
-    return errorMovil(req, "Solo el líder puede cambiar el escudo", 403);
+    return errorMovil(req, "Tu rango en el clan no permite editarlo", 403);
   }
   return NextResponse.json({ ok: true });
 }

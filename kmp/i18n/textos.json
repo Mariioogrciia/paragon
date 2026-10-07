@@ -2921,6 +2921,90 @@
   "es": "Quitar foto",
   "fr": "Retirer la photo"
  },
+ "clan_rango_colider": {
+  "de": "Vize-Anführer",
+  "en": "Co-leader",
+  "es": "Colíder",
+  "fr": "Adjoint"
+ },
+ "clan_rango_veterano": {
+  "de": "Ältester",
+  "en": "Elder",
+  "es": "Veterano",
+  "fr": "Aîné"
+ },
+ "clan_gestionar": {
+  "de": "{0} verwalten",
+  "en": "Manage {0}",
+  "es": "Gestionar a {0}",
+  "fr": "Gérer {0}"
+ },
+ "clan_hacer_lider": {
+  "de": "Zum Anführer machen",
+  "en": "Make leader",
+  "es": "Hacer líder",
+  "fr": "Nommer chef"
+ },
+ "clan_ascender_a": {
+  "de": "Befördern zu {0}",
+  "en": "Promote to {0}",
+  "es": "Ascender a {0}",
+  "fr": "Promouvoir {0}"
+ },
+ "clan_degradar_a": {
+  "de": "Herabstufen zu {0}",
+  "en": "Demote to {0}",
+  "es": "Degradar a {0}",
+  "fr": "Rétrograder {0}"
+ },
+ "clan_expulsar": {
+  "de": "Aus dem Clan werfen",
+  "en": "Kick from clan",
+  "es": "Expulsar del clan",
+  "fr": "Exclure du clan"
+ },
+ "clan_confirmar_lider": {
+  "de": "Die Führung an {0} übergeben? Du wirst Vize-Anführer.",
+  "en": "Hand leadership to {0}? You'll become co-leader.",
+  "es": "¿Pasar el liderazgo a {0}? Tú quedarás como colíder.",
+  "fr": "Confier la direction à {0} ? Tu deviendras adjoint."
+ },
+ "clan_confirmar_expulsar": {
+  "de": "{0} aus dem Clan werfen?",
+  "en": "Kick {0} from the clan?",
+  "es": "¿Expulsar a {0} del clan?",
+  "fr": "Exclure {0} du clan ?"
+ },
+ "clan_gestion_error": {
+  "de": "Nicht möglich",
+  "en": "Couldn't do that",
+  "es": "No se ha podido",
+  "fr": "Impossible"
+ },
+ "clan_editar_info": {
+  "de": "Name und Beschreibung bearbeiten",
+  "en": "Edit name and description",
+  "es": "Editar nombre y descripción",
+  "fr": "Modifier le nom et la description"
+ },
+ "clan_campo_nombre": {
+  "de": "Name",
+  "en": "Name",
+  "es": "Nombre",
+  "fr": "Nom"
+ },
+ "clan_campo_descripcion": {
+  "de": "Beschreibung",
+  "en": "Description",
+  "es": "Descripción",
+  "fr": "Description"
+ },
+ "clan_guardar": {
+  "de": "Speichern",
+  "en": "Save",
+  "es": "Guardar",
+  "fr": "Enregistrer"
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",

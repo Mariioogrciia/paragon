@@ -22,7 +22,18 @@ const FIJOS: Record<string, Trad> = {
   "Perfil sin terminar de configurar": { en: "Profile setup not finished", de: "Profil noch nicht fertig eingerichtet", fr: "Profil pas encore configuré" },
   "Clan no encontrado": { en: "Clan not found", de: "Clan nicht gefunden", fr: "Clan introuvable" },
   "Escudo no válido": { en: "Invalid crest", de: "Ungültiges Wappen", fr: "Blason non valide" },
-  "Solo el líder puede cambiar el escudo": { en: "Only the leader can change the crest", de: "Nur der Anführer kann das Wappen ändern", fr: "Seul le chef peut changer le blason" },
+  "Tu rango en el clan no permite editarlo": { en: "Your clan rank can't edit it", de: "Dein Clan-Rang erlaubt das Bearbeiten nicht", fr: "Ton rang dans le clan ne permet pas de le modifier" },
+  "Tu rango en el clan no permite invitar": { en: "Your clan rank can't invite", de: "Dein Clan-Rang erlaubt keine Einladungen", fr: "Ton rang dans le clan ne permet pas d'inviter" },
+  "Tu rango en el clan no permite ese cambio": { en: "Your clan rank can't make that change", de: "Dein Clan-Rang erlaubt diese Änderung nicht", fr: "Ton rang dans le clan ne permet pas ce changement" },
+  "Tu rango en el clan no permite expulsar a esa persona": { en: "Your clan rank can't kick that person", de: "Dein Clan-Rang erlaubt nicht, diese Person zu entfernen", fr: "Ton rang dans le clan ne permet pas d'exclure cette personne" },
+  "No puedes cambiar tu propio rango": { en: "You can't change your own rank", de: "Du kannst deinen eigenen Rang nicht ändern", fr: "Tu ne peux pas changer ton propre rang" },
+  "Para irte, usa Abandonar clan": { en: "To leave, use Leave clan", de: "Zum Verlassen nutze „Clan verlassen“", fr: "Pour partir, utilise Quitter le clan" },
+  "Esa persona no está en el clan": { en: "That person isn't in the clan", de: "Diese Person ist nicht im Clan", fr: "Cette personne n'est pas dans le clan" },
+  "Rango no válido": { en: "Invalid rank", de: "Ungültiger Rang", fr: "Rang non valide" },
+  "Ya estás en un clan. Sal de él para unirte a otro.": { en: "You're already in a clan. Leave it to join another.", de: "Du bist schon in einem Clan. Verlass ihn, um einem anderen beizutreten.", fr: "Tu es déjà dans un clan. Quitte-le pour en rejoindre un autre." },
+  "El nombre debe tener entre 3 y 40 caracteres": { en: "The name must be 3 to 40 characters", de: "Der Name muss 3 bis 40 Zeichen haben", fr: "Le nom doit faire entre 3 et 40 caractères" },
+  "La descripción no puede pasar de 200 caracteres": { en: "The description can't exceed 200 characters", de: "Die Beschreibung darf höchstens 200 Zeichen haben", fr: "La description ne peut pas dépasser 200 caractères" },
+  "Ya existe un clan con ese nombre": { en: "A clan with that name already exists", de: "Es gibt schon einen Clan mit diesem Namen", fr: "Un clan porte déjà ce nom" },
   "No tienes esa plataforma vinculada.": { en: "You don't have that platform linked.", de: "Diese Plattform ist nicht verknüpft.", fr: "Cette plateforme n'est pas liée." },
   "Esa plataforma se sincroniza con la extensión del navegador.": { en: "That platform syncs through the browser extension.", de: "Diese Plattform wird über die Browser-Erweiterung synchronisiert.", fr: "Cette plateforme se synchronise via l'extension du navigateur." },
   "Ya se sincronizó hace muy poco. Espera un par de minutos.": { en: "It synced very recently. Wait a couple of minutes.", de: "Gerade erst synchronisiert. Warte ein paar Minuten.", fr: "Synchronisé il y a très peu. Attends quelques minutes." },
@@ -124,6 +135,10 @@ const FIJOS: Record<string, Trad> = {
 };
 
 const PATRONES: { re: RegExp; trad: (m: RegExpMatchArray) => Trad }[] = [
+  {
+    re: /^Ya estás en \[(.*)\]\. Sal de ese clan para unirte a otro\.$/,
+    trad: (m) => ({ en: `You're already in [${m[1]}]. Leave that clan to join another.`, de: `Du bist schon in [${m[1]}]. Verlass diesen Clan, um einem anderen beizutreten.`, fr: `Tu es déjà dans [${m[1]}]. Quitte ce clan pour en rejoindre un autre.` }),
+  },
   {
     re: /^PSN no encuentra ningún perfil con el ID "(.*)"\.$/,
     trad: (m) => ({ en: `PSN can't find any profile with the ID "${m[1]}".`, de: `PSN findet kein Profil mit der ID „${m[1]}“.`, fr: `PSN ne trouve aucun profil avec l'ID « ${m[1]} ».` }),

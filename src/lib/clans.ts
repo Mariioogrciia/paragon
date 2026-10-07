@@ -11,6 +11,25 @@ import { enviarPush } from "./webPush";
 import { enviarPushFcm } from "./fcm";
 import type { TrophyGrade } from "./types";
 import { emblemaATexto, type Emblema } from "./clanEmblema";
+import { normalizarRango, puedeCambiarRango, puedeEditarClan, puedeExpulsar, puedeInvitar, type Rango } from "./clanRangos";
+
+/**
+ * Error que se puede enseñar tal cual a quien lo provoca ("ya estás en un
+ * clan", "no tienes rango para eso"...). Las acciones de servidor lo
+ * devuelven como `{ error }` en vez de lanzarlo: en producción React oculta
+ * el mensaje de lo que se lanza y salía "Minified React error #441".
+ */
+export class ClanError extends Error {}
+
+/** Rango de alguien en un clan (normalizado), o null si no es miembro. */
+export async function rangoEnClan(userId: string, clanId: string): Promise<Rango | null> {
+  const [m] = await db
+    .select({ role: clanMembers.role })
+    .from(clanMembers)
+    .where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, userId)))
+    .limit(1);
+  return m ? normalizarRango(m.role) : null;
+}
 
 /**
  * Crea un clan nuevo y asigna al creador como 'owner'.
@@ -64,13 +83,15 @@ export async function joinClan(userId: string, clanId: string) {
   // quien de verdad lo impide a nivel de base de datos; aquí solo se
   // convierte ese rechazo en un mensaje legible.
   const current = await getUserClan(userId);
-  if (current) throw new Error("Ya estás en un clan");
+  if (current) {
+    throw new ClanError(`Ya estás en [${current.clan.tag}]. Sal de ese clan para unirte a otro.`);
+  }
 
   try {
     await db.insert(clanMembers).values({ clanId, userId, role: "member" });
   } catch (err) {
     if (err instanceof Error && "code" in err && (err as { code?: string }).code === "23505") {
-      throw new Error("Ya estás en un clan");
+      throw new ClanError("Ya estás en un clan. Sal de él para unirte a otro.");
     }
     throw err;
   }
@@ -330,19 +351,20 @@ export async function getInvitableFriends(userId: string, clanId: string) {
 export async function inviteToClan(clanId: string, invitedByUserId: string, invitedUserId: string) {
   const [clan] = await db.select().from(clans).where(eq(clans.id, clanId)).limit(1);
   if (!clan) throw new Error("Clan no encontrado");
-  if (clan.ownerId !== invitedByUserId) throw new Error("Solo el líder del clan puede invitar");
+  // Veteranos, colíderes y líder (ver lib/clanRangos.ts).
+  if (!puedeInvitar(await rangoEnClan(invitedByUserId, clanId))) throw new ClanError("Tu rango en el clan no permite invitar");
 
   const yaEnClan = await getUserClan(invitedUserId);
-  if (yaEnClan) throw new Error("Esa persona ya está en un clan");
+  if (yaEnClan) throw new ClanError("Esa persona ya está en un clan");
 
   const amigos = await listFriends(invitedByUserId);
-  if (!amigos.some((a) => a.userId === invitedUserId)) throw new Error("Solo puedes invitar a amigos tuyos");
+  if (!amigos.some((a) => a.userId === invitedUserId)) throw new ClanError("Solo puedes invitar a amigos tuyos");
 
   try {
     await db.insert(clanInvites).values({ clanId, invitedUserId, invitedByUserId });
   } catch (err) {
     if (err instanceof Error && "code" in err && (err as { code?: string }).code === "23505") {
-      throw new Error("Ya le has invitado a este clan");
+      throw new ClanError("Ya le has invitado a este clan");
     }
     throw err;
   }
@@ -384,7 +406,7 @@ export async function acceptClanInvite(userId: string, clanId: string) {
     .from(clanInvites)
     .where(and(eq(clanInvites.clanId, clanId), eq(clanInvites.invitedUserId, userId)))
     .limit(1);
-  if (!invite) throw new Error("Esa invitación ya no existe");
+  if (!invite) throw new ClanError("Esa invitación ya no existe");
 
   // joinClan ya comprueba que no estés en otro clan (aplicado también a
   // nivel de base con el índice único de clan_members.userId).
@@ -397,14 +419,58 @@ export async function declineClanInvite(userId: string, clanId: string) {
 }
 
 /**
- * Cambia el escudo del clan (ver lib/clanEmblema.ts). Solo el líder: es la
- * cara del clan, igual que el nombre. Devuelve false si no lo es.
+ * Cambia el escudo del clan (ver lib/clanEmblema.ts). Líder y colíderes:
+ * es la cara del clan. Devuelve false si no tiene rango para ello.
  */
 export async function setClanEmblema(userId: string, clanId: string, emblema: Emblema): Promise<boolean> {
-  const cambiados = await db
-    .update(clans)
-    .set({ logoUrl: emblemaATexto(emblema) })
-    .where(and(eq(clans.id, clanId), eq(clans.ownerId, userId)))
-    .returning({ id: clans.id });
-  return cambiados.length > 0;
+  if (!puedeEditarClan(await rangoEnClan(userId, clanId))) return false;
+  await db.update(clans).set({ logoUrl: emblemaATexto(emblema) }).where(eq(clans.id, clanId));
+  return true;
+}
+
+/** Nombre y descripción del clan (líder y colíderes), con las mismas reglas que al crearlo. */
+export async function editarClan(userId: string, clanId: string, datos: { name: string; description: string }) {
+  if (!puedeEditarClan(await rangoEnClan(userId, clanId))) throw new ClanError("Tu rango en el clan no permite editarlo");
+  const name = datos.name.trim().replace(/\s+/g, " ");
+  const description = datos.description.trim();
+  if (name.length < 3 || name.length > 40) throw new ClanError("El nombre debe tener entre 3 y 40 caracteres");
+  if (description.length > 200) throw new ClanError("La descripción no puede pasar de 200 caracteres");
+  const ofensivo = errorSiOfensivo(name) ?? errorSiOfensivo(description);
+  if (ofensivo) throw new ClanError(ofensivo);
+  try {
+    await db.update(clans).set({ name, description }).where(eq(clans.id, clanId));
+  } catch (err) {
+    if (err instanceof Error && "code" in err && (err as { code?: string }).code === "23505") {
+      throw new ClanError("Ya existe un clan con ese nombre");
+    }
+    throw err;
+  }
+}
+
+/**
+ * Cambia el rango de un miembro (ver puedeCambiarRango). Con "owner" el líder
+ * pasa el liderazgo: el otro pasa a líder (y a clans.ownerId) y él a colíder.
+ */
+export async function cambiarRango(actorId: string, clanId: string, objetivoId: string, nuevo: Rango) {
+  if (actorId === objetivoId) throw new ClanError("No puedes cambiar tu propio rango");
+  const [actor, objetivo] = await Promise.all([rangoEnClan(actorId, clanId), rangoEnClan(objetivoId, clanId)]);
+  if (!objetivo) throw new ClanError("Esa persona no está en el clan");
+  if (!puedeCambiarRango(actor, objetivo, nuevo)) throw new ClanError("Tu rango en el clan no permite ese cambio");
+
+  if (nuevo === "owner") {
+    await db.update(clanMembers).set({ role: "owner" }).where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, objetivoId)));
+    await db.update(clanMembers).set({ role: "colider" }).where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, actorId)));
+    await db.update(clans).set({ ownerId: objetivoId }).where(eq(clans.id, clanId));
+    return;
+  }
+  await db.update(clanMembers).set({ role: nuevo }).where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, objetivoId)));
+}
+
+/** Expulsa a un miembro de rango inferior (líder o colíder). */
+export async function expulsarDelClan(actorId: string, clanId: string, objetivoId: string) {
+  if (actorId === objetivoId) throw new ClanError("Para irte, usa Abandonar clan");
+  const [actor, objetivo] = await Promise.all([rangoEnClan(actorId, clanId), rangoEnClan(objetivoId, clanId)]);
+  if (!objetivo) throw new ClanError("Esa persona no está en el clan");
+  if (!puedeExpulsar(actor, objetivo)) throw new ClanError("Tu rango en el clan no permite expulsar a esa persona");
+  await db.delete(clanMembers).where(and(eq(clanMembers.clanId, clanId), eq(clanMembers.userId, objetivoId)));
 }

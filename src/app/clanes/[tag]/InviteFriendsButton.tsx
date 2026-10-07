@@ -22,7 +22,8 @@ export function InviteFriendsButton({ clanId, friends }: { clanId: string; frien
     setEnviando(friendId);
     setError("");
     try {
-      await inviteToClanAction(clanId, friendId);
+      const r = await inviteToClanAction(clanId, friendId);
+      if (r.error) throw new Error(r.error);
       setInvitados((prev) => new Set(prev).add(friendId));
     } catch (e) {
       setError(e instanceof Error ? e.message : "No se pudo invitar");

@@ -49,6 +49,10 @@ data class ClanDetail(
     val activity: List<ClanActivityItem>,
     val amIMember: Boolean,
     val amIOwner: Boolean,
+    /** Mi rango (ver ClanRangos); null si no soy miembro. */
+    val miRango: String? = null,
+    val puedoEditar: Boolean = false,
+    val puedoInvitar: Boolean = false,
     val invitables: List<InvitableFriend>,
     val guerra: com.paragon.shared.red.ClanGuerrasDto = com.paragon.shared.red.ClanGuerrasDto(),
     val retables: List<com.paragon.shared.red.ClanRivalDto> = emptyList(),
@@ -154,6 +158,9 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
                     },
                     amIMember = dto.amIMember,
                     amIOwner = dto.amIOwner,
+                    miRango = dto.miRango,
+                    puedoEditar = dto.puedoEditar,
+                    puedoInvitar = dto.puedoInvitar,
                     invitables = dto.invitables.map { InvitableFriend(it.userId, it.displayName ?: it.handle ?: Textos.t(T.comun_alguien)) },
                     guerra = dto.guerra,
                     retables = dto.retables,
@@ -167,7 +174,30 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
         }
     }
 
-    /** Cambia el escudo (solo el líder). `emblema` en el formato de EscudoClan.kt. */
+    /** Nombre y descripción del clan (líder y colíderes). */
+    suspend fun editarClan(tag: String, nombre: String, descripcion: String): ClanActionResult =
+        accionClan { ApiClient.clansApi(it).editarClan(tag, com.paragon.shared.red.EditarClanRequest(nombre, descripcion)) }
+
+    /** Cambia el rango de un miembro; "owner" le pasa el liderazgo. */
+    suspend fun cambiarRango(tag: String, userId: String, rango: String): ClanActionResult =
+        accionClan { ApiClient.clansApi(it).cambiarRango(tag, userId, com.paragon.shared.red.RangoRequest(rango)) }
+
+    suspend fun expulsar(tag: String, userId: String): ClanActionResult =
+        accionClan { ApiClient.clansApi(it).expulsar(tag, userId) }
+
+    private suspend fun accionClan(llamada: suspend (TokenStore) -> Unit): ClanActionResult {
+        val store = tokenStore ?: return ClanActionResult.Error(Textos.t(T.error_sin_sesion))
+        return try {
+            llamada(store)
+            ClanActionResult.Ok
+        } catch (e: HttpException) {
+            ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: Exception) {
+            ClanActionResult.Error(Textos.t(T.error_conexion))
+        }
+    }
+
+    /** Cambia el escudo (líder y colíderes). `emblema` en el formato de EscudoClan.kt. */
     suspend fun setEmblema(tag: String, emblema: String): ClanActionResult {
         val store = tokenStore ?: return ClanActionResult.Error(Textos.t(T.error_sin_sesion))
         return try {

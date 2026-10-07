@@ -1,6 +1,24 @@
 "use server";
 import { auth } from "@/auth";
-import { createClan, joinClan, leaveClan, getUserClan, inviteToClan, acceptClanInvite, declineClanInvite, setClanEmblema } from "@/lib/clans";
+import { createClan, joinClan, leaveClan, getUserClan, inviteToClan, acceptClanInvite, declineClanInvite, setClanEmblema, ClanError, editarClan, cambiarRango, expulsarDelClan } from "@/lib/clans";
+import { RANGOS, type Rango } from "@/lib/clanRangos";
+
+type Resultado = { error?: string };
+
+/**
+ * Ejecuta una acción de clan y devuelve su error de reglas como texto. Antes
+ * se lanzaban y en producción React escondía el mensaje: al unirte a un clan
+ * estando ya en otro salía "Minified React error #441".
+ */
+async function comoResultado(accion: () => Promise<unknown>): Promise<Resultado> {
+  try {
+    await accion();
+    return {};
+  } catch (e) {
+    if (e instanceof ClanError) return { error: e.message };
+    throw e;
+  }
+}
 import { textoAEmblema } from "@/lib/clanEmblema";
 import { getLibrary } from "@/lib/profiles";
 import { getProfileByUserId } from "@/lib/profiles";
@@ -38,15 +56,17 @@ export async function createClanAction(formData: FormData) {
   revalidatePath(`/u/${profile.handle}`);
 }
 
-export async function joinClanAction(clanId: string) {
+export async function joinClanAction(clanId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("No autenticado");
+  if (!session?.user?.id) return { error: "No autenticado" };
+  const userId = session.user.id;
 
-  await joinClan(session.user.id, clanId);
-  revalidatePath("/clanes");
-  
-  const profile = await getProfileByUserId(session.user.id);
+  const r = await comoResultado(() => joinClan(userId, clanId));
+  if (r.error) return r;
+  revalidatePath("/clanes", "layout");
+  const profile = await getProfileByUserId(userId);
   if (profile) revalidatePath(`/u/${profile.handle}`);
+  return {};
 }
 
 export async function leaveClanAction(clanId: string) {
@@ -59,22 +79,27 @@ export async function leaveClanAction(clanId: string) {
   if (profile) revalidatePath(`/u/${profile.handle}`);
 }
 
-export async function inviteToClanAction(clanId: string, invitedUserId: string) {
+export async function inviteToClanAction(clanId: string, invitedUserId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("No autenticado");
+  if (!session?.user?.id) return { error: "No autenticado" };
+  const userId = session.user.id;
 
-  await inviteToClan(clanId, session.user.id, invitedUserId);
-  revalidatePath(`/clanes`);
+  const r = await comoResultado(() => inviteToClan(clanId, userId, invitedUserId));
+  if (!r.error) revalidatePath(`/clanes`);
+  return r;
 }
 
-export async function acceptClanInviteAction(clanId: string) {
+export async function acceptClanInviteAction(clanId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("No autenticado");
+  if (!session?.user?.id) return { error: "No autenticado" };
+  const userId = session.user.id;
 
-  await acceptClanInvite(session.user.id, clanId);
-  revalidatePath("/clanes");
-  const profile = await getProfileByUserId(session.user.id);
+  const r = await comoResultado(() => acceptClanInvite(userId, clanId));
+  if (r.error) return r;
+  revalidatePath("/clanes", "layout");
+  const profile = await getProfileByUserId(userId);
   if (profile) revalidatePath(`/u/${profile.handle}`);
+  return {};
 }
 
 export async function declineClanInviteAction(clanId: string) {
@@ -124,4 +149,36 @@ export async function setEmblemaAction(clanId: string, emblema: string): Promise
   if (!(await setClanEmblema(session.user.id, clanId, e))) return { error: "lider" };
   revalidatePath("/clanes", "layout");
   return {};
+}
+
+/* ---------------------------------- Rangos (lib/clanRangos.ts) --------------------------------- */
+
+/** Nombre y descripción (líder y colíderes). */
+export async function editarClanAction(clanId: string, name: string, description: string): Promise<Resultado> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "No autenticado" };
+  const userId = session.user.id;
+  const r = await comoResultado(() => editarClan(userId, clanId, { name, description }));
+  if (!r.error) revalidatePath("/clanes", "layout");
+  return r;
+}
+
+/** Ascender, degradar o pasar el liderazgo ("owner"). */
+export async function cambiarRangoAction(clanId: string, objetivoId: string, rango: string): Promise<Resultado> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!(RANGOS as readonly string[]).includes(rango)) return { error: "Rango no válido" };
+  const userId = session.user.id;
+  const r = await comoResultado(() => cambiarRango(userId, clanId, objetivoId, rango as Rango));
+  if (!r.error) revalidatePath("/clanes", "layout");
+  return r;
+}
+
+export async function expulsarAction(clanId: string, objetivoId: string): Promise<Resultado> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "No autenticado" };
+  const userId = session.user.id;
+  const r = await comoResultado(() => expulsarDelClan(userId, clanId, objetivoId));
+  if (!r.error) revalidatePath("/clanes", "layout");
+  return r;
 }
