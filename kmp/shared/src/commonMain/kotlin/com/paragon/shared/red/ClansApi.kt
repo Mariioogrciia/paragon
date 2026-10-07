@@ -6,9 +6,9 @@ import io.ktor.client.request.*
 import io.ktor.http.encodeURLPathPart
 
 @Serializable
-data class ClanSummaryDto(val id: String, val name: String, val tag: String, val description: String, val memberCount: Int)
+data class ClanSummaryDto(val id: String, val name: String, val tag: String, val description: String, val memberCount: Int, val emblema: String? = null)
 @Serializable
-data class MyClanDto(val tag: String, val name: String, val role: String)
+data class MyClanDto(val tag: String, val name: String, val role: String, val emblema: String? = null)
 @Serializable
 data class ClansListResponse(val clans: List<ClanSummaryDto>, val myClan: MyClanDto?)
 
@@ -58,7 +58,7 @@ data class ClanActivityItemDto(
     val game: ClanActivityGameDto,
 )
 @Serializable
-data class ClanInfoDto(val id: String, val tag: String, val name: String, val description: String)
+data class ClanInfoDto(val id: String, val tag: String, val name: String, val description: String, val emblema: String? = null)
 @Serializable
 data class InvitableFriendDto(val userId: String, val handle: String?, val displayName: String?, val image: String?)
 
@@ -109,6 +109,9 @@ data class ResponderGuerraRequest(val aceptar: Boolean)
 @Serializable
 data class InviteToClanRequest(val invitedUserId: String)
 
+@Serializable
+data class EmblemaClanRequest(val emblema: String)
+
 /** Clanes — ver la sección "Clanes" en API-CONTRACT.md. */
 class ClansApi internal constructor(private val c: ClienteParagon) {
     suspend fun getClans(): ClansListResponse =
@@ -144,6 +147,11 @@ class ClansApi internal constructor(private val c: ClienteParagon) {
     /** Solo el owner, y solo a un amigo suyo que no esté ya en un clan. */
     suspend fun inviteToClan(tag: String, request: InviteToClanRequest) {
         c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/invite") { json(request) }
+    }
+
+    /** Escudo del clan, solo el líder — ver src/app/api/mobile/clans/[tag]/emblema/route.ts. */
+    suspend fun setEmblema(tag: String, request: EmblemaClanRequest) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/emblema") { json(request) }
     }
 
     /** Ver src/app/api/mobile/clans/[tag]/war/route.ts. */

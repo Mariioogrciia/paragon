@@ -10,6 +10,7 @@ import { listFriends } from "./profiles";
 import { enviarPush } from "./webPush";
 import { enviarPushFcm } from "./fcm";
 import type { TrophyGrade } from "./types";
+import { emblemaATexto, type Emblema } from "./clanEmblema";
 
 /**
  * Crea un clan nuevo y asigna al creador como 'owner'.
@@ -393,4 +394,17 @@ export async function acceptClanInvite(userId: string, clanId: string) {
 
 export async function declineClanInvite(userId: string, clanId: string) {
   await db.delete(clanInvites).where(and(eq(clanInvites.clanId, clanId), eq(clanInvites.invitedUserId, userId)));
+}
+
+/**
+ * Cambia el escudo del clan (ver lib/clanEmblema.ts). Solo el líder: es la
+ * cara del clan, igual que el nombre. Devuelve false si no lo es.
+ */
+export async function setClanEmblema(userId: string, clanId: string, emblema: Emblema): Promise<boolean> {
+  const cambiados = await db
+    .update(clans)
+    .set({ logoUrl: emblemaATexto(emblema) })
+    .where(and(eq(clans.id, clanId), eq(clans.ownerId, userId)))
+    .returning({ id: clans.id });
+  return cambiados.length > 0;
 }

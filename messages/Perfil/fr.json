@@ -624,6 +624,16 @@
     "vacio": "Aucun clan pour l'instant. Sois le premier à en créer un !"
   },
   "ClanPage": {
+    "escudoEditar": "Modifier le blason",
+    "escudoTitulo": "Blason du clan",
+    "escudoTexto": "Choisis forme, symbole et couleurs. Il s'affiche sur le web et dans l'app.",
+    "escudoForma": "Forme",
+    "escudoSimbolo": "Symbole",
+    "escudoFondo": "Couleur de fond",
+    "escudoColor": "Couleur du symbole",
+    "escudoGuardar": "Enregistrer le blason",
+    "escudoCancelar": "Annuler",
+    "escudoError": "Impossible d'enregistrer le blason.",
     "noEncontrado": "Clan introuvable",
     "xpTotal": "XP total du clan",
     "miembros": "Membres",

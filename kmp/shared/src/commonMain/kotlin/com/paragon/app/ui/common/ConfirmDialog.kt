@@ -49,7 +49,7 @@ fun ConfirmDialog(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = Surface,
+        containerColor = com.paragon.app.ui.theme.SurfaceSolida,
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 12.dp).navigationBarsPadding()) {
             Text(title, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)

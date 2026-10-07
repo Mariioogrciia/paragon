@@ -559,7 +559,7 @@ private fun NuevaSesionSheet(
         trophyId = if (lista.isEmpty()) OTRO else null
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -738,7 +738,7 @@ private fun CampoTexto(valor: String, onCambio: (String) -> Unit, placeholder: S
 /** El QR de una sesión (diseño v2): con la cámara normal abre la sesión en la web; con el lector de la app, aquí. */
 @Composable
 private fun HojaQrSesion(id: String, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

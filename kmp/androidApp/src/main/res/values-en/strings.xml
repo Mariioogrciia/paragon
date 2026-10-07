@@ -61,6 +61,7 @@
     <string name="apariencia_acento">Accent and palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Unlocks at level %1$s (you\'re level %2$s)</string>
+    <string name="apariencia_estilo_oled">In OLED mode the background stays pure black: the style tints cards and borders.</string>
     <string name="apariencia_icono">App icon</string>
     <string name="apariencia_icono_nota">The new icon may take a few seconds to show on your home screen (sometimes until you leave the app).</string>
     <string name="apariencia_juego">From your game</string>
@@ -77,6 +78,7 @@
     <string name="apariencia_temas">Themes</string>
     <string name="apariencia_texto">Text size</string>
     <string name="apariencia_titulo">Appearance</string>
+    <string name="apariencia_vista_previa">Preview</string>
     <string name="arquetipo_cazador">Hunter</string>
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Explorer</string>
@@ -145,6 +147,14 @@
     <string name="clan_err_invitar">Couldn\'t send the invite.</string>
     <string name="clan_err_no_existe">This clan doesn\'t exist.</string>
     <string name="clan_err_unir">Couldn\'t join the clan.</string>
+    <string name="clan_escudo_color">Symbol colour</string>
+    <string name="clan_escudo_editar">Edit crest</string>
+    <string name="clan_escudo_fondo">Background colour</string>
+    <string name="clan_escudo_forma">Shape</string>
+    <string name="clan_escudo_guardar">Save crest</string>
+    <string name="clan_escudo_simbolo">Symbol</string>
+    <string name="clan_escudo_texto">Pick a shape, symbol and colours. It shows on the web and in the app.</string>
+    <string name="clan_escudo_titulo">Clan crest</string>
     <string name="clan_invitar_error">Couldn\'t send the invite</string>
     <string name="clan_lider">Leader</string>
     <string name="clan_miembro">Member</string>

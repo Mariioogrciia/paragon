@@ -61,6 +61,7 @@
     <string name="apariencia_acento">Accent et palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Se débloque au niveau %1$s (tu es niveau %2$s)</string>
+    <string name="apariencia_estilo_oled">En mode OLED, le fond reste noir pur : le style teinte les cartes et les bordures.</string>
     <string name="apariencia_icono">Icône de l\'app</string>
     <string name="apariencia_icono_nota">La nouvelle icône peut mettre quelques secondes à apparaître sur l\'écran d\'accueil (parfois jusqu\'à ce que vous quittiez l\'app).</string>
     <string name="apariencia_juego">Depuis ton jeu</string>
@@ -77,6 +78,7 @@
     <string name="apariencia_temas">Thèmes</string>
     <string name="apariencia_texto">Taille du texte</string>
     <string name="apariencia_titulo">Apparence</string>
+    <string name="apariencia_vista_previa">Aperçu</string>
     <string name="arquetipo_cazador">Chasseur</string>
     <string name="arquetipo_elite">Élite</string>
     <string name="arquetipo_explorador">Explorateur</string>
@@ -145,6 +147,14 @@
     <string name="clan_err_invitar">Impossible d\'inviter.</string>
     <string name="clan_err_no_existe">Ce clan n\'existe pas.</string>
     <string name="clan_err_unir">Impossible de rejoindre le clan.</string>
+    <string name="clan_escudo_color">Couleur du symbole</string>
+    <string name="clan_escudo_editar">Modifier le blason</string>
+    <string name="clan_escudo_fondo">Couleur de fond</string>
+    <string name="clan_escudo_forma">Forme</string>
+    <string name="clan_escudo_guardar">Enregistrer le blason</string>
+    <string name="clan_escudo_simbolo">Symbole</string>
+    <string name="clan_escudo_texto">Choisis forme, symbole et couleurs. Il s\'affiche sur le web et dans l\'app.</string>
+    <string name="clan_escudo_titulo">Blason du clan</string>
     <string name="clan_invitar_error">Impossible d\'inviter</string>
     <string name="clan_lider">Chef</string>
     <string name="clan_miembro">Membre</string>

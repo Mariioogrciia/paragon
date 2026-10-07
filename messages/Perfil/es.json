@@ -624,6 +624,16 @@
     "vacio": "Todavía no hay ningún clan. ¡Sé el primero en crear uno!"
   },
   "ClanPage": {
+    "escudoEditar": "Editar escudo",
+    "escudoTitulo": "Escudo del clan",
+    "escudoTexto": "Elige forma, símbolo y colores. Se ve en la web y en la app.",
+    "escudoForma": "Forma",
+    "escudoSimbolo": "Símbolo",
+    "escudoFondo": "Color de fondo",
+    "escudoColor": "Color del símbolo",
+    "escudoGuardar": "Guardar escudo",
+    "escudoCancelar": "Cancelar",
+    "escudoError": "No se pudo guardar el escudo.",
     "noEncontrado": "Clan no encontrado",
     "xpTotal": "XP total del clan",
     "miembros": "Miembros",

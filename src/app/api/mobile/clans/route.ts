@@ -24,6 +24,8 @@ export async function GET(req: Request) {
         name: clans.name,
         tag: clans.tag,
         description: clans.description,
+        // Escudo (ver lib/clanEmblema.ts): en logoUrl, null si no ha elegido.
+        emblema: clans.logoUrl,
         memberCount: sql<number>`count(${clanMembers.userId})`.mapWith(Number),
       })
       .from(clans)
@@ -35,7 +37,7 @@ export async function GET(req: Request) {
 
   return jsonConEtag(req, {
     clans: allClans,
-    myClan: miClan ? { tag: miClan.clan.tag, name: miClan.clan.name, role: miClan.role } : null,
+    myClan: miClan ? { tag: miClan.clan.tag, name: miClan.clan.name, role: miClan.role, emblema: miClan.clan.logoUrl } : null,
   }, userId);
 }
 

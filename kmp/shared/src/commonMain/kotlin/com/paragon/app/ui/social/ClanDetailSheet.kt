@@ -54,6 +54,7 @@ import com.paragon.shared.i18n.T
 import com.paragon.shared.i18n.Textos
 
 import com.paragon.app.ui.common.CabeceraHoja
+import com.paragon.app.ui.common.premiumClickable
 
 private val MEDALLA = mapOf(0 to "🥇", 1 to "🥈", 2 to "🥉")
 
@@ -82,12 +83,13 @@ fun ClanDetailSheet(
     var confirmLeave by remember { mutableStateOf(false) }
     var inviteError by remember { mutableStateOf<String?>(null) }
     var guerraError by remember { mutableStateOf<String?>(null) }
+    var editandoEscudo by remember { mutableStateOf(false) }
 
     LaunchedEffect(tag, refreshKey.value) {
         result = repository.getClanDetail(tag)
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         androidx.compose.foundation.layout.Box {
             Column(
                 modifier = Modifier
@@ -114,6 +116,7 @@ fun ClanDetailSheet(
                         }
                     },
                     onRequestLeave = { confirmLeave = true },
+                    onEditarEscudo = { editandoEscudo = true },
                     onRetar = { rivalId ->
                         scope.launch {
                             when (val res = repository.retarClan(tag, rivalId)) {
@@ -145,6 +148,19 @@ fun ClanDetailSheet(
             }
         }
         }
+    }
+
+    if (editandoEscudo) {
+        EditorEscudoSheet(
+            inicial = (result as? ClanDetailResult.Ok)?.detail?.emblema,
+            onGuardar = { texto ->
+                when (val res = repository.setEmblema(tag, texto)) {
+                    is ClanActionResult.Ok -> { refreshKey.value += 1; onChanged(); null }
+                    is ClanActionResult.Error -> res.message
+                }
+            },
+            onDismiss = { editandoEscudo = false },
+        )
     }
 
     if (confirmLeave) {
@@ -199,23 +215,41 @@ private fun ClanDetailContent(
     onJoin: () -> Unit,
     onRequestLeave: () -> Unit,
     onInvite: (String) -> Unit,
+    onEditarEscudo: () -> Unit = {},
     onRetar: (String) -> Unit = {},
     onResponder: (String, Boolean) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
+        // Escudo del clan (ver EscudoClan.kt); el líder lo cambia tocándolo.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "[${detail.tag}]",
-                color = Accent,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .background(AccentSoft, RoundedCornerShape(radio(6)))
-                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            EscudoClan(
+                detail.emblema,
+                72.dp,
+                modifier = if (detail.amIOwner) Modifier.premiumClickable(onClick = onEditarEscudo) else Modifier,
             )
-            Spacer(Modifier.width(10.dp))
-            Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = "[${detail.tag}]",
+                    color = Accent,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .background(AccentSoft, RoundedCornerShape(radio(6)))
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                )
+                Text(text = detail.name, color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                if (detail.amIOwner) {
+                    Text(
+                        Textos.t(T.clan_escudo_editar),
+                        color = Accent,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(radio(6))).premiumClickable(onClick = onEditarEscudo).padding(vertical = 2.dp),
+                    )
+                }
+            }
         }
         if (detail.description.isNotBlank()) {
             Text(text = detail.description, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))

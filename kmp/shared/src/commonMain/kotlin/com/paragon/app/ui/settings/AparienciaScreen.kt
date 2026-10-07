@@ -39,6 +39,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Brightness1
+import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.paragon.app.ui.theme.EstiloDef
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -149,12 +159,27 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
             Muestra(tokenStore)
 
             Seccion(T.apariencia_temas)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
                 TEMAS_RAPIDOS.forEach { t ->
                     val bloqueado = (themeStore.requisitosEstilo[t.estilo] ?: 0) > themeStore.nivel
                     val activo = themeStore.mode == t.modo && themeStore.acento == t.acento && themeStore.estilo == t.estilo &&
                         themeStore.acentoLibre.isEmpty() && themeStore.paletaJuego == null
-                    Chip(stringResource(t.nombre), activo, enabled = !bloqueado) {
+                    val estilo = com.paragon.app.ui.theme.estiloPorClave(t.estilo)
+                    val acento = com.paragon.app.ui.theme.acentoPorClave(t.acento)
+                    val claro = t.modo == ThemeMode.CLARO
+                    TarjetaMiniatura(
+                        nombre = stringResource(t.nombre),
+                        fondo = fondoDeModo(t.modo, estilo),
+                        tarjeta = tarjetaDeModo(t.modo, estilo),
+                        acento = if (claro) acento.claro else acento.oscuro,
+                        texto = if (claro) Color(0xFF10151F) else Color(0xFFE9EEF7),
+                        radio = estilo.radio ?: 10,
+                        activo = activo,
+                        bloqueado = bloqueado,
+                    ) {
                         themeStore.setMode(t.modo)
                         themeStore.setAcento(t.acento)
                         themeStore.setEstilo(t.estilo)
@@ -164,9 +189,39 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
             }
 
             Seccion(T.apariencia_modo)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Surface, RoundedCornerShape(radio(16)))
+                    .border(1.dp, Border, RoundedCornerShape(radio(16)))
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 MODOS.forEach { (modo, nombre) ->
-                    Chip(stringResource(nombre), themeStore.mode == modo) { themeStore.setMode(modo) }
+                    val activo = themeStore.mode == modo
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(radio(12)))
+                            .background(if (activo) Accent else Color.Transparent)
+                            .clickable(role = Role.RadioButton) { themeStore.setMode(modo) }
+                            .semantics { selected = activo }
+                            .heightIn(min = 64.dp)
+                            .padding(vertical = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(iconoDeModo(modo), contentDescription = null, tint = if (activo) OnAccent else Foreground, modifier = Modifier.size(22.dp))
+                        Text(
+                            stringResource(nombre),
+                            color = if (activo) OnAccent else Muted,
+                            fontSize = 11.sp,
+                            fontWeight = if (activo) FontWeight.Bold else FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
                 }
             }
             Nota(T.apariencia_modo_nota)
@@ -182,51 +237,73 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                 Spacer(Modifier.height(12.dp))
             }
             Column(Modifier.alpha(if (materialYou) 0.45f else 1f)) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Rejilla con el nombre debajo de cada color: antes eran círculos
+                // sueltos sin nombre y no se sabía qué era cada uno.
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Surface, RoundedCornerShape(radio(18)))
+                        .border(1.dp, Border, RoundedCornerShape(radio(18)))
+                        .padding(vertical = 14.dp, horizontal = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    maxItemsInEachRow = 4,
+                ) {
                     ACENTOS.forEach { a ->
                         val activo = !materialYou && themeStore.paletaJuego == null && themeStore.acentoLibre.isEmpty() && themeStore.acento == a.clave
-                        Muestrario(a, activo, stringResource(a.nombre), enabled = !materialYou) {
-                            themeStore.setAcento(a.clave)
-                            guardar()
+                        ConNombre(stringResource(a.nombre), activo) {
+                            Muestrario(a, activo, stringResource(a.nombre), enabled = !materialYou) {
+                                themeStore.setAcento(a.clave)
+                                guardar()
+                            }
                         }
                     }
                     val libre = themeStore.acentoLibre.takeIf { it.isNotEmpty() }?.let { colorDeHex(it) }
-                    MuestrarioLibre(libre, activo = !materialYou && libre != null && themeStore.paletaJuego == null, enabled = !materialYou) {
-                        editandoLibre = true
+                    val libreActivo = !materialYou && libre != null && themeStore.paletaJuego == null
+                    ConNombre(Textos.t(T.apariencia_libre), libreActivo) {
+                        MuestrarioLibre(libre, activo = libreActivo, enabled = !materialYou) {
+                            editandoLibre = true
+                        }
                     }
                     themeStore.paletaJuego?.let { p ->
-                        MuestrarioColor(colorDeHex(p.color) ?: p.oscuro, p.suelo.background, activo = !materialYou, descripcion = Textos.t(T.apariencia_juego), enabled = false) {}
+                        ConNombre(Textos.t(T.apariencia_juego), !materialYou) {
+                            MuestrarioColor(colorDeHex(p.color) ?: p.oscuro, p.suelo.background, activo = !materialYou, descripcion = Textos.t(T.apariencia_juego), enabled = false) {}
+                        }
                     }
                 }
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = when {
-                        materialYou -> Textos.t(T.apariencia_material_activo)
-                        themeStore.paletaJuego != null -> Textos.t(T.apariencia_juego_nota)
-                        themeStore.acentoLibre.isNotEmpty() -> Textos.t(T.apariencia_libre_actual, themeStore.acentoLibre.uppercase())
-                        else -> stringResource(ACENTOS.first { it.clave == themeStore.acento }.nombre)
-                    },
-                    color = Muted,
-                    fontSize = 13.sp,
-                )
+                // El nombre del acento ya va bajo su color: aquí solo los casos que lo necesitan.
+                when {
+                    materialYou -> Textos.t(T.apariencia_material_activo)
+                    themeStore.paletaJuego != null -> Textos.t(T.apariencia_juego_nota)
+                    themeStore.acentoLibre.isNotEmpty() -> Textos.t(T.apariencia_libre_actual, themeStore.acentoLibre.uppercase())
+                    else -> null
+                }?.let { Text(it, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
             }
 
             Seccion(T.apariencia_estilo)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ESTILOS.forEach { e ->
-                    val requisito = themeStore.requisitosEstilo[e.clave] ?: 0
-                    val bloqueado = requisito > themeStore.nivel
-                    FilaEstilo(
-                        nombre = stringResource(e.nombre),
-                        descripcion = if (bloqueado) Textos.t(T.apariencia_estilo_nivel, requisito, themeStore.nivel) else stringResource(e.descripcion),
-                        activo = themeStore.estilo == e.clave,
-                        bloqueado = bloqueado,
-                    ) {
-                        themeStore.setEstilo(e.clave)
-                        guardar()
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                ESTILOS.chunked(2).forEach { par ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        par.forEach { e ->
+                            val requisito = themeStore.requisitosEstilo[e.clave] ?: 0
+                            val bloqueado = requisito > themeStore.nivel
+                            TarjetaEstilo(
+                                estilo = e,
+                                nombre = stringResource(e.nombre),
+                                descripcion = if (bloqueado) Textos.t(T.apariencia_estilo_nivel, requisito, themeStore.nivel) else stringResource(e.descripcion),
+                                activo = themeStore.estilo == e.clave,
+                                bloqueado = bloqueado,
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                themeStore.setEstilo(e.clave)
+                                guardar()
+                            }
+                        }
+                        if (par.size == 1) Spacer(Modifier.weight(1f))
                     }
                 }
             }
+            if (themeStore.mode == ThemeMode.OLED) Nota(T.apariencia_estilo_oled)
 
             Seccion(T.apariencia_icono)
             SelectorIcono()
@@ -282,8 +359,10 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
 }
 
 /**
- * Piezas reales de la app con la apariencia actual: tus platinos y tu % de
- * completado de verdad (el panel, con su caché local), barra, botón y chip.
+ * Vista previa con la apariencia actual (rediseño, 7 oct 2026: antes era la
+ * cifra de platinos sin más). Una tarjeta como las del Panel: brillo del
+ * acento, tus platinos y tu % de verdad (el panel, con su caché local), el
+ * desglose por metal, la barra, un botón y un chip.
  */
 @Composable
 private fun Muestra(tokenStore: TokenStore) {
@@ -294,16 +373,58 @@ private fun Muestra(tokenStore: TokenStore) {
         stats = (com.paragon.app.data.PanelRepository(tokenStore, dao).getPanel() as? com.paragon.app.data.PanelResult.Ok)?.stats
     }
     val completado = (stats?.completionRate ?: 0).coerceIn(0, 100)
+    val forma = RoundedCornerShape(radio(22))
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(Surface2, Surface)), RoundedCornerShape(radio(20)))
-            .border(1.dp, Border, RoundedCornerShape(radio(20)))
+            .clip(forma)
+            .background(Surface)
+            .background(Brush.radialGradient(listOf(Accent.copy(alpha = 0.30f), Color.Transparent), center = Offset(0f, 0f), radius = 700f))
+            .background(Brush.radialGradient(listOf(Accent2.copy(alpha = 0.12f), Color.Transparent), center = Offset(1100f, 0f), radius = 600f))
+            .border(1.dp, Border, forma)
             .padding(20.dp),
     ) {
-        Text(Textos.t(T.panel_platinos), color = Platinum, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-        Text(stats?.let { com.paragon.app.util.cifra(it.platinums) } ?: "–", color = Foreground, fontSize = 40.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(Textos.t(T.apariencia_vista_previa).uppercase(), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp, modifier = Modifier.weight(1f))
+            Box(Modifier.size(8.dp).background(Accent, CircleShape))
+            Spacer(Modifier.width(4.dp))
+            Box(Modifier.size(8.dp).background(Accent2, CircleShape))
+        }
+        Spacer(Modifier.height(14.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Trofeo de platino en una baldosa con el brillo del acento.
+            Box(
+                Modifier.size(56.dp)
+                    .background(Brush.linearGradient(listOf(Accent.copy(alpha = 0.35f), Accent2.copy(alpha = 0.10f))), RoundedCornerShape(radio(16)))
+                    .border(1.dp, Accent.copy(alpha = 0.45f), RoundedCornerShape(radio(16))),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Platinum, modifier = Modifier.size(30.dp))
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(Textos.t(T.panel_platinos), color = Platinum, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+                Text(stats?.let { com.paragon.app.util.cifra(it.platinums) } ?: "–", color = Foreground, fontSize = 36.sp, fontWeight = FontWeight.Bold, lineHeight = 38.sp)
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                com.paragon.app.ui.theme.Gold to stats?.gold,
+                com.paragon.app.ui.theme.Silver to stats?.silver,
+                com.paragon.app.ui.theme.Bronze to stats?.bronze,
+            ).forEach { (color, n) ->
+                Row(
+                    Modifier.weight(1f).background(Surface2, RoundedCornerShape(radio(10))).padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(Modifier.size(10.dp).background(color, CircleShape))
+                    Spacer(Modifier.width(6.dp))
+                    Text(n?.let { com.paragon.app.util.cifra(it) } ?: "–", color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                }
+            }
+        }
+        Spacer(Modifier.height(14.dp))
         Box(
             Modifier
                 .fillMaxWidth()
@@ -335,6 +456,142 @@ private fun Muestra(tokenStore: TokenStore) {
                 Text(stats?.let { "$completado %" } ?: "–", color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
             }
         }
+    }
+}
+
+/** Fondo de un modo (con el del estilo, si trae uno), para las miniaturas. */
+private fun fondoDeModo(modo: ThemeMode, e: EstiloDef): Color = when (modo) {
+    ThemeMode.CLARO -> e.fondoClaro ?: Color(0xFFF4F6FA)
+    ThemeMode.OLED, ThemeMode.CONTRASTE -> Color.Black
+    else -> e.fondoOscuro ?: Color(0xFF0A0D13)
+}
+
+/** Tarjeta de un modo (teñida con el estilo, si trae color), para las miniaturas. */
+private fun tarjetaDeModo(modo: ThemeMode, e: EstiloDef): Color = when (modo) {
+    ThemeMode.CLARO -> Color.White
+    ThemeMode.CONTRASTE -> Color(0xFF1A212E)
+    else -> lerp(e.fondoOscuro ?: Color(0xFF0A0D13), e.tinte ?: Color.White, 0.10f)
+}
+
+private fun iconoDeModo(modo: ThemeMode): ImageVector = when (modo) {
+    ThemeMode.SISTEMA -> Icons.Default.Smartphone
+    ThemeMode.OSCURO -> Icons.Default.DarkMode
+    ThemeMode.CLARO -> Icons.Default.LightMode
+    ThemeMode.OLED -> Icons.Default.Brightness1
+    ThemeMode.CONTRASTE -> Icons.Default.Contrast
+}
+
+/** Una pantalla en miniatura: fondo, una tarjeta con texto de relleno y una píldora del acento. */
+@Composable
+private fun Miniatura(fondo: Color, tarjeta: Color, acento: Color, texto: Color, radio: Int, modifier: Modifier = Modifier) {
+    val r = (radio / 2).coerceAtMost(10)
+    Column(modifier.background(fondo).padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(Modifier.fillMaxWidth(0.55f).height(6.dp).background(texto.copy(alpha = 0.8f), RoundedCornerShape(3.dp)))
+        Column(
+            Modifier.fillMaxWidth().background(tarjeta, RoundedCornerShape(r.dp)).padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
+            Box(Modifier.fillMaxWidth(0.7f).height(5.dp).background(texto.copy(alpha = 0.5f), RoundedCornerShape(3.dp)))
+            Box(Modifier.fillMaxWidth().height(4.dp).background(texto.copy(alpha = 0.12f), RoundedCornerShape(2.dp))) {
+                Box(Modifier.fillMaxWidth(0.6f).height(4.dp).background(acento, RoundedCornerShape(2.dp)))
+            }
+        }
+        Box(Modifier.width(36.dp).height(12.dp).background(acento, RoundedCornerShape((r + 2).dp)))
+    }
+}
+
+/** Un tema rápido: su miniatura (modo, estilo y acento propios) con el nombre debajo. */
+@Composable
+private fun TarjetaMiniatura(
+    nombre: String,
+    fondo: Color,
+    tarjeta: Color,
+    acento: Color,
+    texto: Color,
+    radio: Int,
+    activo: Boolean,
+    bloqueado: Boolean,
+    onClick: () -> Unit,
+) {
+    val forma = RoundedCornerShape(radio(16))
+    Column(
+        Modifier
+            .width(124.dp)
+            .clip(forma)
+            .background(Surface)
+            .border(if (activo) 2.dp else 1.dp, if (activo) Accent else Border, forma)
+            .clickable(enabled = !bloqueado, role = Role.RadioButton, onClick = onClick)
+            .semantics { selected = activo }
+            .alpha(if (bloqueado) 0.5f else 1f),
+    ) {
+        Miniatura(fondo, tarjeta, acento, texto, radio, Modifier.fillMaxWidth().height(86.dp))
+        Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(nombre, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            when {
+                bloqueado -> Icon(Icons.Default.Lock, contentDescription = null, tint = Muted, modifier = Modifier.size(14.dp))
+                activo -> Icon(Icons.Default.Check, contentDescription = null, tint = Accent, modifier = Modifier.size(16.dp))
+            }
+        }
+    }
+}
+
+/** Un estilo: su miniatura (fondo, esquinas y tinte propios) con el nombre y la descripción. */
+@Composable
+private fun TarjetaEstilo(
+    estilo: EstiloDef,
+    nombre: String,
+    descripcion: String,
+    activo: Boolean,
+    bloqueado: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val forma = RoundedCornerShape(radio(16))
+    val claro = Foreground.luminance() < 0.5f
+    // Clásico no trae fondo: el de la app sin teñir, no el del estilo que esté puesto.
+    val fondo = (if (claro) estilo.fondoClaro else estilo.fondoOscuro) ?: if (claro) Color(0xFFF4F6FA) else Color(0xFF0A0D13)
+    val tarjeta = if (claro) Color.White else lerp(fondo, estilo.tinte ?: Color.White, 0.10f)
+    Column(
+        modifier
+            .clip(forma)
+            .background(Surface)
+            .border(if (activo) 2.dp else 1.dp, if (activo) Accent else Border, forma)
+            .clickable(enabled = !bloqueado, role = Role.RadioButton, onClick = onClick)
+            .semantics { selected = activo },
+    ) {
+        Box {
+            Miniatura(fondo, tarjeta, estilo.tinte ?: Accent, Foreground, estilo.radio ?: 10, Modifier.fillMaxWidth().height(84.dp).alpha(if (bloqueado) 0.45f else 1f))
+            if (activo || bloqueado) {
+                Box(
+                    Modifier.align(Alignment.TopEnd).padding(8.dp).size(22.dp)
+                        .background(if (activo) Accent else Surface2, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(if (activo) Icons.Default.Check else Icons.Default.Lock, contentDescription = null, tint = if (activo) OnAccent else Muted, modifier = Modifier.size(14.dp))
+                }
+            }
+        }
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+            Text(nombre, color = if (bloqueado) Muted else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            Text(descripcion, color = Muted, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
+        }
+    }
+}
+
+/** Muestra de color con su nombre debajo (en el acento si está elegida). */
+@Composable
+private fun ConNombre(nombre: String, activo: Boolean, contenido: @Composable () -> Unit) {
+    Column(Modifier.width(72.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        contenido()
+        Text(
+            nombre,
+            color = if (activo) Accent else Muted,
+            fontSize = 11.sp,
+            fontWeight = if (activo) FontWeight.Bold else FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 6.dp),
+        )
     }
 }
 

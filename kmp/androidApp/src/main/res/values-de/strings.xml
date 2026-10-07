@@ -61,6 +61,7 @@
     <string name="apariencia_acento">Akzent und Palette</string>
     <string name="apariencia_estilo">Stil</string>
     <string name="apariencia_estilo_nivel">Wird ab Stufe %1$s freigeschaltet (du bist Stufe %2$s)</string>
+    <string name="apariencia_estilo_oled">Im OLED-Modus bleibt der Hintergrund reines Schwarz: Der Stil färbt Karten und Ränder.</string>
     <string name="apariencia_icono">App-Symbol</string>
     <string name="apariencia_icono_nota">Das neue Symbol kann ein paar Sekunden brauchen, bis es auf dem Startbildschirm erscheint (manchmal erst nach dem Verlassen der App).</string>
     <string name="apariencia_juego">Aus deinem Spiel</string>
@@ -77,6 +78,7 @@
     <string name="apariencia_temas">Themes</string>
     <string name="apariencia_texto">Textgröße</string>
     <string name="apariencia_titulo">Darstellung</string>
+    <string name="apariencia_vista_previa">Vorschau</string>
     <string name="arquetipo_cazador">Jäger:in</string>
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Entdecker:in</string>
@@ -145,6 +147,14 @@
     <string name="clan_err_invitar">Einladung fehlgeschlagen.</string>
     <string name="clan_err_no_existe">Diesen Clan gibt es nicht.</string>
     <string name="clan_err_unir">Beitritt fehlgeschlagen.</string>
+    <string name="clan_escudo_color">Symbolfarbe</string>
+    <string name="clan_escudo_editar">Wappen bearbeiten</string>
+    <string name="clan_escudo_fondo">Hintergrundfarbe</string>
+    <string name="clan_escudo_forma">Form</string>
+    <string name="clan_escudo_guardar">Wappen speichern</string>
+    <string name="clan_escudo_simbolo">Symbol</string>
+    <string name="clan_escudo_texto">Wähle Form, Symbol und Farben. Es erscheint im Web und in der App.</string>
+    <string name="clan_escudo_titulo">Clan-Wappen</string>
     <string name="clan_invitar_error">Einladung fehlgeschlagen</string>
     <string name="clan_lider">Anführer:in</string>
     <string name="clan_miembro">Mitglied</string>

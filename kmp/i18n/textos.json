@@ -2819,6 +2819,66 @@
   "es": "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
   "fr": "Priorité automatique : d'abord le jeu de base, forte progression et meilleures chances."
  },
+ "apariencia_vista_previa": {
+  "de": "Vorschau",
+  "en": "Preview",
+  "es": "Vista previa",
+  "fr": "Aperçu"
+ },
+ "apariencia_estilo_oled": {
+  "de": "Im OLED-Modus bleibt der Hintergrund reines Schwarz: Der Stil färbt Karten und Ränder.",
+  "en": "In OLED mode the background stays pure black: the style tints cards and borders.",
+  "es": "En OLED el fondo sigue siendo negro puro: el estilo tiñe las tarjetas y los bordes.",
+  "fr": "En mode OLED, le fond reste noir pur : le style teinte les cartes et les bordures."
+ },
+ "clan_escudo_editar": {
+  "de": "Wappen bearbeiten",
+  "en": "Edit crest",
+  "es": "Editar escudo",
+  "fr": "Modifier le blason"
+ },
+ "clan_escudo_titulo": {
+  "de": "Clan-Wappen",
+  "en": "Clan crest",
+  "es": "Escudo del clan",
+  "fr": "Blason du clan"
+ },
+ "clan_escudo_texto": {
+  "de": "Wähle Form, Symbol und Farben. Es erscheint im Web und in der App.",
+  "en": "Pick a shape, symbol and colours. It shows on the web and in the app.",
+  "es": "Elige forma, símbolo y colores. Se ve en la web y en la app.",
+  "fr": "Choisis forme, symbole et couleurs. Il s'affiche sur le web et dans l'app."
+ },
+ "clan_escudo_forma": {
+  "de": "Form",
+  "en": "Shape",
+  "es": "Forma",
+  "fr": "Forme"
+ },
+ "clan_escudo_simbolo": {
+  "de": "Symbol",
+  "en": "Symbol",
+  "es": "Símbolo",
+  "fr": "Symbole"
+ },
+ "clan_escudo_fondo": {
+  "de": "Hintergrundfarbe",
+  "en": "Background colour",
+  "es": "Color de fondo",
+  "fr": "Couleur de fond"
+ },
+ "clan_escudo_color": {
+  "de": "Symbolfarbe",
+  "en": "Symbol colour",
+  "es": "Color del símbolo",
+  "fr": "Couleur du symbole"
+ },
+ "clan_escudo_guardar": {
+  "de": "Wappen speichern",
+  "en": "Save crest",
+  "es": "Guardar escudo",
+  "fr": "Enregistrer le blason"
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",

@@ -1,6 +1,7 @@
 "use server";
 import { auth } from "@/auth";
-import { createClan, joinClan, leaveClan, getUserClan, inviteToClan, acceptClanInvite, declineClanInvite } from "@/lib/clans";
+import { createClan, joinClan, leaveClan, getUserClan, inviteToClan, acceptClanInvite, declineClanInvite, setClanEmblema } from "@/lib/clans";
+import { textoAEmblema } from "@/lib/clanEmblema";
 import { getLibrary } from "@/lib/profiles";
 import { getProfileByUserId } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
@@ -110,6 +111,17 @@ export async function responderGuerraAction(guerraId: string, aceptar: boolean):
     if (e instanceof GuerraError) return { error: e.message };
     throw e;
   }
+  revalidatePath("/clanes", "layout");
+  return {};
+}
+
+/** Cambia el escudo del clan (solo el líder). `emblema` en el formato de lib/clanEmblema.ts. */
+export async function setEmblemaAction(clanId: string, emblema: string): Promise<{ error?: "login" | "invalido" | "lider" }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "login" };
+  const e = textoAEmblema(emblema);
+  if (!e) return { error: "invalido" };
+  if (!(await setClanEmblema(session.user.id, clanId, e))) return { error: "lider" };
   revalidatePath("/clanes", "layout");
   return {};
 }

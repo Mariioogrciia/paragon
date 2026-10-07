@@ -624,6 +624,16 @@
     "vacio": "No clans yet. Be the first to create one!"
   },
   "ClanPage": {
+    "escudoEditar": "Edit crest",
+    "escudoTitulo": "Clan crest",
+    "escudoTexto": "Pick a shape, symbol and colours. It shows on the web and in the app.",
+    "escudoForma": "Shape",
+    "escudoSimbolo": "Symbol",
+    "escudoFondo": "Background colour",
+    "escudoColor": "Symbol colour",
+    "escudoGuardar": "Save crest",
+    "escudoCancelar": "Cancel",
+    "escudoError": "Couldn't save the crest.",
     "noEncontrado": "Clan not found",
     "xpTotal": "Clan total XP",
     "miembros": "Members",

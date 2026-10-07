@@ -11,6 +11,7 @@ import { SeccionTabs } from "@/components/SeccionTabs";
 import { BackButton } from "@/components/BackButton";
 import { getTranslations } from "next-intl/server";
 import { Dorsal } from "@/components/carreras/Dorsal";
+import { EscudoClan } from "@/components/EscudoClan";
 import { libreaDe } from "@/lib/librea";
 
 export default async function ClanesPage() {
@@ -25,6 +26,7 @@ export default async function ClanesPage() {
         name: clans.name,
         tag: clans.tag,
         description: clans.description,
+        emblema: clans.logoUrl,
         memberCount: sql<number>`count(${clanMembers.userId})`.mapWith(Number),
       })
       .from(clans)
@@ -75,6 +77,7 @@ export default async function ClanesPage() {
                 style={{ ["--librea" as string]: libreaDe(clan.tag.toUpperCase()).fondo }}
               >
                 <span className="carreras-cifra w-8 shrink-0 text-sm text-muted">P{i + 1}</span>
+                <EscudoClan emblema={clan.emblema} size={40} />
                 <Dorsal id={clan.tag.toUpperCase()} texto={clan.tag} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-heading text-lg font-bold uppercase tracking-wide">{clan.name}</span>

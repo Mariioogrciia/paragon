@@ -51,7 +51,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ tag: str
   const retables = amIOwner && !guerras.abierta ? await clanesRetables(clan.id) : [];
 
   return NextResponse.json({
-    clan: { id: clan.id, tag: clan.tag, name: clan.name, description: clan.description },
+    clan: { id: clan.id, tag: clan.tag, name: clan.name, description: clan.description, emblema: clan.logoUrl },
     score,
     leaderboard,
     activity: actividad,

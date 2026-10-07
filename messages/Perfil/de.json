@@ -624,6 +624,16 @@
     "vacio": "Noch keine Clans. Gründe den ersten!"
   },
   "ClanPage": {
+    "escudoEditar": "Wappen bearbeiten",
+    "escudoTitulo": "Clan-Wappen",
+    "escudoTexto": "Wähle Form, Symbol und Farben. Es erscheint im Web und in der App.",
+    "escudoForma": "Form",
+    "escudoSimbolo": "Symbol",
+    "escudoFondo": "Hintergrundfarbe",
+    "escudoColor": "Symbolfarbe",
+    "escudoGuardar": "Wappen speichern",
+    "escudoCancelar": "Abbrechen",
+    "escudoError": "Das Wappen konnte nicht gespeichert werden.",
     "noEncontrado": "Clan nicht gefunden",
     "xpTotal": "Gesamt-XP des Clans",
     "miembros": "Mitglieder",

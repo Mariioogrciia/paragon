@@ -259,7 +259,7 @@ private fun CollectionsList(
     }
 
     opciones?.let { coleccion ->
-        ModalBottomSheet(onDismissRequest = { opciones = null }, containerColor = Surface) {
+        ModalBottomSheet(onDismissRequest = { opciones = null }, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
                 Text(coleccion.name, color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(bottom = 8.dp))
                 OpcionHoja(Icons.Default.Folder, Textos.t(T.carpeta_abrir)) { opciones = null; onOpen(coleccion) }
@@ -391,7 +391,7 @@ fun AddToCollectionSheet(gameId: String, tokenStore: TokenStore, onDismiss: () -
         collections = (r as? CollectionsResult.Ok)?.collections ?: emptyList()
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp).padding(bottom = 24.dp)) {
             Text(text = Textos.t(T.carpeta_anadir), color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(Modifier.height(12.dp))

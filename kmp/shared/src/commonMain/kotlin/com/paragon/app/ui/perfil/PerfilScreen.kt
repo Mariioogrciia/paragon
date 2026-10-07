@@ -193,7 +193,7 @@ private fun Fila(icono: ImageVector, texto: String, ultima: Boolean = false, onC
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HojaMiQr(handle: String, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

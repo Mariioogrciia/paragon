@@ -57,20 +57,27 @@ data class EstiloDef(
     val descripcion: Texto,
     /** Radio fijo de todas las esquinas (como `[class*="rounded"]` en la web); null = el de cada pieza. */
     val radio: Int?,
-    /** Fondo de "ambientación" en modo oscuro (el degradado de la web, su color de arriba). */
+    /** Fondo propio en modo oscuro (el degradado de la web, su color de arriba); null = el de la app. */
     val fondoOscuro: Color? = null,
     val monoespaciada: Boolean = false,
+    /** Fondo propio en modo claro. */
+    val fondoClaro: Color? = null,
+    /** Color que tiñe tarjetas y bordes del estilo (también en OLED, donde el fondo sigue negro). */
+    val tinte: Color? = null,
 )
 
 val ESTILOS = listOf(
     EstiloDef("", T.estilo_clasico, T.estilo_clasico_desc, null),
-    EstiloDef("estilo-terminal", T.estilo_terminal, T.estilo_terminal_desc, 2, monoespaciada = true),
-    EstiloDef("estilo-vidrio", T.estilo_vidrio, T.estilo_vidrio_desc, 22),
-    EstiloDef("estilo-brutalista", T.estilo_brutalista, T.estilo_brutalista_desc, 0),
-    EstiloDef("estilo-ps5", T.estilo_ps5, T.estilo_ps5_desc, 20, Color(0xFF050B1A)),
-    EstiloDef("estilo-xbox", T.estilo_xbox, T.estilo_xbox_desc, 8, Color(0xFF060D08)),
-    EstiloDef("estilo-steam", T.estilo_steam, T.estilo_steam_desc, 6, Color(0xFF0A0E17)),
-    EstiloDef("estilo-switch", T.estilo_switch, T.estilo_switch_desc, 14, Color(0xFF131313)),
+    // Cada estilo trae su propio fondo y tiñe tarjetas y bordes (7 oct 2026:
+    // "cambiar el estilo sigue sin cambiar el fondo"): antes solo los de
+    // plataforma y solo en modo oscuro.
+    EstiloDef("estilo-terminal", T.estilo_terminal, T.estilo_terminal_desc, 2, Color(0xFF03100A), monoespaciada = true, fondoClaro = Color(0xFFEEF5EF), tinte = Color(0xFF33FF66)),
+    EstiloDef("estilo-vidrio", T.estilo_vidrio, T.estilo_vidrio_desc, 22, Color(0xFF0B1024), fondoClaro = Color(0xFFECEFFB), tinte = Color(0xFF8EA2FF)),
+    EstiloDef("estilo-brutalista", T.estilo_brutalista, T.estilo_brutalista_desc, 0, Color(0xFF141414), fondoClaro = Color(0xFFF7F4EC)),
+    EstiloDef("estilo-ps5", T.estilo_ps5, T.estilo_ps5_desc, 20, Color(0xFF050B1A), fondoClaro = Color(0xFFECF2FC), tinte = Color(0xFF4A9EFF)),
+    EstiloDef("estilo-xbox", T.estilo_xbox, T.estilo_xbox_desc, 8, Color(0xFF060D08), fondoClaro = Color(0xFFEDF6EE), tinte = Color(0xFF3DDC64)),
+    EstiloDef("estilo-steam", T.estilo_steam, T.estilo_steam_desc, 6, Color(0xFF0E1621), fondoClaro = Color(0xFFECF1F6), tinte = Color(0xFF66C0F4)),
+    EstiloDef("estilo-switch", T.estilo_switch, T.estilo_switch_desc, 14, Color(0xFF131313), fondoClaro = Color(0xFFF4F4F4), tinte = Color(0xFFE60012)),
 )
 
 fun estiloPorClave(clave: String): EstiloDef = ESTILOS.firstOrNull { it.clave == clave } ?: ESTILOS[0]

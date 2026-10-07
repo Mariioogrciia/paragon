@@ -156,6 +156,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                             ClanCard(
                                 title = Textos.t(T.social_tu_clan),
                                 subtitle = "[${miClan.tag}] ${miClan.name}",
+                                emblema = miClan.emblema,
                                 onClick = { selectedClanTag = miClan.tag },
                             )
                         } else {
@@ -610,17 +611,21 @@ private fun ClanInviteRow(invite: ClanInvite, onAccept: () -> Unit, onDecline: (
 
 /** "Tu clan" cuando ya perteneces a uno — mismo hueco que ocuparía "Crea tu propio clan", pero llevando directo a la ficha en vez de invitar a crear otro. */
 @Composable
-private fun ClanCard(title: String, subtitle: String, onClick: () -> Unit) {
-    Column(
+private fun ClanCard(title: String, subtitle: String, emblema: String?, onClick: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
             .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .clickable { onClick() }
             .padding(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(title, color = Muted, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
-        Text(subtitle, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp))
+        EscudoClan(emblema, 48.dp)
+        Column(Modifier.padding(start = 14.dp)) {
+            Text(title, color = Muted, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
+            Text(subtitle, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp))
+        }
     }
 }
 
@@ -663,15 +668,7 @@ private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(38.dp)
-                .clip(RoundedCornerShape(radio(10)))
-                .background(color.copy(alpha = 0.16f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(clan.tag.take(2).uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 12.sp)
-        }
+        EscudoClan(clan.emblema, 40.dp)
         Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
             Text(text = "[${clan.tag}] ${clan.name}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (clan.description.isNotBlank()) {

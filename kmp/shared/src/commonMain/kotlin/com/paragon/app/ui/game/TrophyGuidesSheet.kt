@@ -84,7 +84,7 @@ fun TrophyGuidesSheet(
         result = repository.getGuides(gameId, trophyId)
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
             Text(text = Textos.t(T.ficha_guias_escritas), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Text(text = trophyName, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp, bottom = 16.dp))

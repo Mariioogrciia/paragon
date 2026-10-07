@@ -63,6 +63,7 @@
     <string name="apariencia_acento">Acento y paleta</string>
     <string name="apariencia_estilo">Estilo</string>
     <string name="apariencia_estilo_nivel">Se desbloquea en el nivel %1$s (vas por el %2$s)</string>
+    <string name="apariencia_estilo_oled">En OLED el fondo sigue siendo negro puro: el estilo tiñe las tarjetas y los bordes.</string>
     <string name="apariencia_icono">Icono de la app</string>
     <string name="apariencia_icono_nota">El icono nuevo puede tardar unos segundos en verse en la pantalla de inicio (a veces, hasta que sales de la app).</string>
     <string name="apariencia_juego">Desde tu juego</string>
@@ -79,6 +80,7 @@
     <string name="apariencia_temas">Temas</string>
     <string name="apariencia_texto">Tamaño de texto</string>
     <string name="apariencia_titulo">Apariencia</string>
+    <string name="apariencia_vista_previa">Vista previa</string>
     <string name="arquetipo_cazador">Cazador</string>
     <string name="arquetipo_elite">Élite</string>
     <string name="arquetipo_explorador">Explorador</string>
@@ -147,6 +149,14 @@
     <string name="clan_err_invitar">No se pudo invitar.</string>
     <string name="clan_err_no_existe">Este clan no existe.</string>
     <string name="clan_err_unir">No se pudo unir al clan.</string>
+    <string name="clan_escudo_color">Color del símbolo</string>
+    <string name="clan_escudo_editar">Editar escudo</string>
+    <string name="clan_escudo_fondo">Color de fondo</string>
+    <string name="clan_escudo_forma">Forma</string>
+    <string name="clan_escudo_guardar">Guardar escudo</string>
+    <string name="clan_escudo_simbolo">Símbolo</string>
+    <string name="clan_escudo_texto">Elige forma, símbolo y colores. Se ve en la web y en la app.</string>
+    <string name="clan_escudo_titulo">Escudo del clan</string>
     <string name="clan_invitar_error">No se pudo invitar</string>
     <string name="clan_lider">Líder</string>
     <string name="clan_miembro">Miembro</string>

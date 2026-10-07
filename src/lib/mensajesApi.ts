@@ -21,6 +21,8 @@ const FIJOS: Record<string, Trad> = {
   "Demasiadas peticiones seguidas. Espera un momento.": { en: "Too many requests in a row. Wait a moment.", de: "Zu viele Anfragen hintereinander. Warte kurz.", fr: "Trop de requêtes d'affilée. Patiente un instant." },
   "Perfil sin terminar de configurar": { en: "Profile setup not finished", de: "Profil noch nicht fertig eingerichtet", fr: "Profil pas encore configuré" },
   "Clan no encontrado": { en: "Clan not found", de: "Clan nicht gefunden", fr: "Clan introuvable" },
+  "Escudo no válido": { en: "Invalid crest", de: "Ungültiges Wappen", fr: "Blason non valide" },
+  "Solo el líder puede cambiar el escudo": { en: "Only the leader can change the crest", de: "Nur der Anführer kann das Wappen ändern", fr: "Seul le chef peut changer le blason" },
   "No tienes esa plataforma vinculada.": { en: "You don't have that platform linked.", de: "Diese Plattform ist nicht verknüpft.", fr: "Cette plateforme n'est pas liée." },
   "Esa plataforma se sincroniza con la extensión del navegador.": { en: "That platform syncs through the browser extension.", de: "Diese Plattform wird über die Browser-Erweiterung synchronisiert.", fr: "Cette plateforme se synchronise via l'extension du navigateur." },
   "Ya se sincronizó hace muy poco. Espera un par de minutos.": { en: "It synced very recently. Wait a couple of minutes.", de: "Gerade erst synchronisiert. Warte ein paar Minuten.", fr: "Synchronisé il y a très peu. Attends quelques minutes." },

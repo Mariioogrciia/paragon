@@ -85,7 +85,7 @@ fun FriendProfileBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Surface,
+        containerColor = com.paragon.app.ui.theme.SurfaceSolida,
         dragHandle = null // Custom header
     ) {
         Box(

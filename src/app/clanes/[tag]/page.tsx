@@ -11,6 +11,8 @@ import { libreaDe } from "@/lib/librea";
 import { ClanActivityFeed } from "@/components/ClanActivityFeed";
 import { BackButton } from "@/components/BackButton";
 import { GuerraDeClanes } from "./GuerraDeClanes";
+import { EditorEscudo } from "./EditorEscudo";
+import { EscudoClan } from "@/components/EscudoClan";
 import { DURACION_DIAS, clanesRetables, getGuerrasDeClan, type GuerraVista } from "@/lib/clanWars";
 
 /** Sin esto la pestaña decía solo "Paragon" en la página de cualquier clan. */
@@ -72,12 +74,18 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-4">
+            <EscudoClan emblema={clan.logoUrl} size={72} />
             <Dorsal id={clan.tag.toUpperCase()} texto={clan.tag} grande />
             <h1 className="font-heading min-w-0 text-[clamp(1.875rem,5vw,2.75rem)] font-bold uppercase leading-tight">
               <span className="carreras-titulo">{clan.name}</span>
             </h1>
           </div>
           {clan.description && <p className="mt-4 max-w-xl text-muted">{clan.description}</p>}
+          {amIOwner && (
+            <div className="mt-4">
+              <EditorEscudo clanId={clan.id} inicial={clan.logoUrl} />
+            </div>
+          )}
           <div className="mt-5 flex flex-wrap gap-x-8 gap-y-4">
             <div>
               <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("ClanPage.puntosClan")}</p>
