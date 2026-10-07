@@ -22,7 +22,23 @@ android {
         versionName = "1.1"
     }
 
+    // Siempre la misma clave de depuración (la de androidApp/debug.keystore,
+    // con la contraseña estándar "android"): sin esto, GitHub Actions firma
+    // cada APK con una clave nueva y Android se niega a instalarla encima de
+    // la anterior ("conflicto de paquete"). No es secreta: solo vale para debug.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             // R8: APK más pequeña y más rápida. Reglas propias en proguard-rules.pro.
             isMinifyEnabled = true
