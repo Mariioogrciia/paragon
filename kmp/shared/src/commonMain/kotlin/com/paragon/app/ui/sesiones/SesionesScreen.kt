@@ -285,7 +285,7 @@ private fun Caratula(url: String?, ancho: Int, alto: Int) {
 // ------------------------------------------------------------------ Ficha
 
 @Composable
-fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> Unit) {
+fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> Unit, onAbrirTrofeo: (gameId: String, trophyId: String?) -> Unit = { _, _ -> }) {
     val repo = remember { SesionesRepository(tokenStore) }
     val scope = rememberCoroutineScope()
     var estado by remember { mutableStateOf<SesionResultado<SesionDto>?>(null) }
@@ -343,7 +343,13 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                             Spacer(Modifier.width(14.dp))
                             Column(Modifier.weight(1f)) {
                                 Text("${s.juego.titulo} · ${s.juego.deviceLabel}".uppercase(), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                // Con el juego en tu biblioteca, el trofeo abre tu ficha en él.
+                                val miJuego = s.miJuegoId
+                                Row(
+                                    Modifier.padding(top = 6.dp)
+                                        .then(if (miJuego != null) Modifier.clip(RoundedCornerShape(radio(8))).premiumClickable { onAbrirTrofeo(miJuego, s.trofeoInfo?.trophyId) } else Modifier),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
                                     s.trofeoInfo?.iconUrl?.let { url ->
                                         urlImagenSegura(url)?.let {
                                             AsyncImage(model = it, contentDescription = null, modifier = Modifier.size(30.dp).clip(RoundedCornerShape(radio(6))))

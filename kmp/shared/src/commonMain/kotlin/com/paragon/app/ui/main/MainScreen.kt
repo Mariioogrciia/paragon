@@ -372,7 +372,8 @@ fun MainScreen(
                 StuckTrophiesScreen(
                     tokenStore = tokenStore,
                     dao = remember { database.stuckTrophyDao() },
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
                 )
             }
             
@@ -413,7 +414,11 @@ fun MainScreen(
 
             // Desglose del mes (como /ritmo en la web) — ver ui/trofeos.
             composable(Screen.Ritmo.route) {
-                com.paragon.app.ui.trofeos.RitmoScreen(tokenStore = tokenStore, onBack = { navController.popBackStack() })
+                com.paragon.app.ui.trofeos.RitmoScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
+                )
             }
 
             // Sesiones de trofeos online (lista y ficha) — ver ui/sesiones.
@@ -433,17 +438,22 @@ fun MainScreen(
                     tokenStore = tokenStore,
                     sesionId = sesionId,
                     onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
                 )
             }
 
             // Ficha de Juego
             composable(
                 route = Screen.GameDetail.route,
-                arguments = listOf(navArgument("gameId") { type = NavType.StringType }),
+                arguments = listOf(
+                    navArgument("gameId") { type = NavType.StringType },
+                    navArgument("trofeo") { type = NavType.StringType; nullable = true; defaultValue = null },
+                ),
             ) { backStackEntry ->
                 val gameId = backStackEntry.arguments?.read { getStringOrNull("gameId") } ?: return@composable
                 GameDetailScreen(
                     gameId = gameId,
+                    trofeoInicial = backStackEntry.arguments?.read { getStringOrNull("trofeo") },
                     tokenStore = tokenStore,
                     handle = profile.handle,
                     onBack = { navController.popBackStack() },
@@ -531,19 +541,38 @@ private fun BarraInferior(
     inicial: String,
     onClick: (BottomNavItem) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().background(Background)) {
-        HorizontalDivider(color = Border, thickness = 0.5.dp)
+    // Cápsula flotante, como Instagram (7 oct 2026): siempre visible, pero
+    // separada de los bordes y del fondo de la pantalla, con la pestaña activa
+    // marcada por una píldora detrás del icono.
+    val forma = RoundedCornerShape(50)
+    Box(
+        Modifier.fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(start = 14.dp, end = 14.dp, top = 6.dp, bottom = 10.dp),
+    ) {
         Row(
-            Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).height(52.dp),
+            Modifier.fillMaxWidth().height(64.dp)
+                .shadow(18.dp, forma, ambientColor = Color.Black, spotColor = Color.Black)
+                .clip(forma)
+                .background(com.paragon.app.ui.theme.Surface2.copy(alpha = 0.96f))
+                .border(1.dp, Border, forma)
+                .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             items.forEach { item ->
                 val activa = estaEn(item)
+                val fondo by androidx.compose.animation.animateColorAsState(
+                    if (activa) Foreground.copy(alpha = 0.10f) else Color.Transparent,
+                    androidx.compose.animation.core.tween(180),
+                    label = "pestana",
+                )
                 Box(
                     Modifier.weight(1f).fillMaxHeight()
+                        .clip(forma)
+                        .background(fondo)
                         .clickable(
                             interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                            indication = null,
+                            indication = androidx.compose.material3.ripple(bounded = true),
                         ) { onClick(item) },
                     contentAlignment = Alignment.Center,
                 ) {
@@ -569,8 +598,8 @@ private fun BarraInferior(
                         Icon(
                             if (activa) item.icon else item.iconoInactivo,
                             contentDescription = item.screen.title,
-                            tint = if (activa) Accent else Foreground.copy(alpha = 0.75f),
-                            modifier = Modifier.size(27.dp),
+                            tint = if (activa) Foreground else Foreground.copy(alpha = 0.7f),
+                            modifier = Modifier.size(26.dp),
                         )
                     }
                 }

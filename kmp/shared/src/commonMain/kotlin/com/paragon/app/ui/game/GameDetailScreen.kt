@@ -98,6 +98,8 @@ import com.paragon.shared.i18n.Textos
 fun GameDetailScreen(
     gameId: String,
     tokenStore: TokenStore,
+    /** Si se llega desde un trofeo: la lista baja hasta él y lo resalta. */
+    trofeoInicial: String? = null,
     handle: String = "",
     onBack: () -> Unit = {},
     onModoEnfoque: () -> Unit = {},
@@ -151,6 +153,7 @@ fun GameDetailScreen(
         }
         is GameDetailResult.Ok -> GameDetailContent(
             gameId = gameId,
+            trofeoInicial = trofeoInicial,
             game = current.detail,
             fromCache = current.fromCache,
             hitoInicial = hito,
@@ -171,6 +174,7 @@ fun GameDetailScreen(
 @Composable
 private fun GameDetailContent(
     gameId: String,
+    trofeoInicial: String?,
     game: GameDetailData,
     fromCache: Boolean,
     hitoInicial: HitoReservado?,
@@ -270,6 +274,34 @@ private fun GameDetailContent(
     }
 
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    // Llegando desde un trofeo: se baja hasta él una sola vez. El índice se
+    // cuenta igual que se pintan los elementos de la LazyColumn de abajo
+    // (cabecera, acciones, notas, diario, filtros y luego cada grupo).
+    var resaltado by remember(gameId) { mutableStateOf(trofeoInicial) }
+    val gruposActuales by androidx.compose.runtime.rememberUpdatedState(gruposVisibles)
+    LaunchedEffect(gameId, trofeoInicial) {
+        val objetivo = trofeoInicial ?: return@LaunchedEffect
+        if (game.trophies.none { it.id == objetivo }) return@LaunchedEffect
+        // Si un filtro lo esconde, se quita; en cronología no hay filas, así que a la lista.
+        if (trofeosOrdenados.none { it.id == objetivo }) { estadoTrofeos = 0; grupoElegido = null }
+        if (com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CRONOLOGIA) {
+            com.paragon.app.ui.trofeos.vistaTrofeosActual = com.paragon.app.ui.trofeos.VistaTrofeos.LISTA
+        }
+        kotlinx.coroutines.delay(350) // que la lista se recomponga con los filtros quitados
+        val cuadricula = com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA
+        var indice = 4 + (if (game.diario != null) 1 else 0)
+        for ((grupoId, lista) in gruposActuales) {
+            if (grupoId != null) indice++
+            val pos = lista.indexOfFirst { it.id == objetivo }
+            if (pos >= 0) {
+                listState.animateScrollToItem(if (cuadricula) indice + pos / 4 else indice + pos, -160)
+                break
+            }
+            indice += if (cuadricula) (lista.size + 3) / 4 else lista.size
+        }
+        kotlinx.coroutines.delay(2500)
+        resaltado = null
+    }
     val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
 
     Box(Modifier.fillMaxSize()) {
@@ -382,6 +414,7 @@ private fun GameDetailContent(
                 items(lista, key = { "${grupoId}-${it.id}" }) { trophy ->
                     TrophyRow(
                         trophy,
+                        resaltado = trophy.id == resaltado,
                         game = game,
                         repository = repository,
                         tokenStore = tokenStore,
@@ -970,6 +1003,7 @@ internal fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = 
 @Composable
 private fun TrophyRow(
     trophy: TrophyItem,
+    resaltado: Boolean = false,
     game: GameDetailData,
     repository: GameDetailRepository,
     tokenStore: TokenStore,
@@ -988,10 +1022,16 @@ private fun TrophyRow(
     // los botones se comían el ancho y el texto quedaba en una columna de
     // cuatro letras, ilegible. Ahora el texto ocupa todo el ancho y las
     // acciones bajan a su propia línea.
+    val bordeResaltado by androidx.compose.animation.animateColorAsState(
+        if (resaltado) Accent else Color.Transparent,
+        androidx.compose.animation.core.tween(400),
+        label = "resaltado",
+    )
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
+            .border(2.dp, bordeResaltado, RoundedCornerShape(radio(16)))
             .padding(16.dp),
     ) {
     Row(verticalAlignment = Alignment.Top) {

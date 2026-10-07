@@ -19,5 +19,6 @@ export function sesionParaMovil(s: SesionVista) {
     estoyApuntado: s.estoyApuntado,
     yaLoTengo: s.yaLoTengo,
     loTengo: s.loTengo,
+    miJuegoId: s.miJuegoId,
   };
 }

@@ -41,7 +41,7 @@ export interface SesionVista {
   /** Nombre del trofeo en el idioma de quien mira si está en caché; si no, el guardado. */
   trofeo: string;
   /** Datos del trofeo si casa con uno del juego (los de texto libre no). */
-  trofeoInfo: { iconUrl: string | null; grade: string | null; detail: string } | null;
+  trofeoInfo: { trophyId: string; iconUrl: string | null; grade: string | null; detail: string } | null;
   descripcion: string | null;
   fechaHora: Date;
   /** Total contando a quien organiza. */
@@ -59,6 +59,8 @@ export interface SesionVista {
   yaLoTengo: boolean;
   /** Si quien mira tiene ese juego en su biblioteca (mismo igdbId o mismo id). */
   loTengo: boolean;
+  /** Tu copia de ese juego (la misma o la de otra plataforma), para abrir tu ficha. */
+  miJuegoId: string | null;
 }
 
 export async function crearSesion(
@@ -222,6 +224,7 @@ export async function listarSesiones(userId: string | null, idioma: Idioma, solo
     : [];
   const misIds = new Set(mios.map((m) => m.gameId));
   const misIgdb = new Set(mios.map((m) => m.igdbId).filter((x): x is number => x !== null));
+  const miCopiaPorIgdb = new Map(mios.filter((m) => m.igdbId !== null).map((m) => [m.igdbId!, m.gameId]));
 
   return filas.map((f) => {
     const suyos = participantes.filter((p) => p.sessionId === f.id);
@@ -232,7 +235,7 @@ export async function listarSesiones(userId: string | null, idioma: Idioma, solo
     return {
       id: f.id,
       trofeo: traducido?.name ?? f.trofeo,
-      trofeoInfo: def ? { iconUrl: def.iconUrl, grade: def.grade, detail: traducido?.detail || def.detail } : null,
+      trofeoInfo: def ? { trophyId: def.trophyId, iconUrl: def.iconUrl, grade: def.grade, detail: traducido?.detail || def.detail } : null,
       descripcion: f.descripcion,
       fechaHora: f.fechaHora,
       plazasTotales,
@@ -249,6 +252,7 @@ export async function listarSesiones(userId: string | null, idioma: Idioma, solo
       estoyApuntado: suyos.some((p) => p.userId === userId),
       yaLoTengo: !!(userId && def && tiene.has(`${userId}\u0000${def.gameId}\u0000${def.trophyId}`)),
       loTengo: misIds.has(f.gameId) || (f.igdbId !== null && misIgdb.has(f.igdbId)),
+      miJuegoId: misIds.has(f.gameId) ? f.gameId : f.igdbId !== null ? miCopiaPorIgdb.get(f.igdbId) ?? null : null,
     };
   });
 }

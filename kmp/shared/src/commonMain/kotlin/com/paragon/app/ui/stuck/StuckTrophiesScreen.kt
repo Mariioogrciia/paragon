@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import com.paragon.app.ui.common.premiumClickable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,7 +37,7 @@ import io.ktor.http.encodeURLQueryComponent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () -> Unit) {
+fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () -> Unit, onAbrirTrofeo: (gameId: String, trophyId: String) -> Unit = { _, _ -> }) {
     // `null` = todavía no se ha leído Room (distinto de "ya se leyó y está
     // vacío") — con `emptyList()` como valor inicial, cualquiera con
     // trofeos atascados de verdad veía un parpadeo del EmptyState antes de
@@ -75,6 +76,7 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
                         StuckTrophyCard(
                             trophy = trophy,
                             tokenStore = tokenStore,
+                            onClick = { onAbrirTrofeo(trophy.gameId, trophy.trophyId) },
                             onRemove = {
                                 coroutineScope.launch {
                                     dao.removeStuckTrophy(trophy.trophyId)
@@ -90,7 +92,7 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
 }
 
 @Composable
-fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove: () -> Unit) {
+fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove: () -> Unit, onClick: () -> Unit = {}) {
     val uriHandler = LocalUriHandler.current
     val repository = remember(tokenStore) { GameDetailRepository(tokenStore) }
     val coroutineScope = rememberCoroutineScope()
@@ -100,6 +102,8 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
             .border(1.dp, Border, RoundedCornerShape(radio(16)))
+            .clip(RoundedCornerShape(radio(16)))
+            .premiumClickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

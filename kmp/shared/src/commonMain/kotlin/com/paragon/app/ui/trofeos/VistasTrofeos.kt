@@ -162,9 +162,11 @@ fun TarjetaTrofeo(trophy: TrophyItem, juego: String?, modifier: Modifier = Modif
 
 /** Fila de la vista Lista para trofeos de varios juegos (el mes): foto, nombre, juego y rareza. */
 @Composable
-fun FilaTrofeo(trophy: TrophyItem, juego: String?, modifier: Modifier = Modifier) {
+fun FilaTrofeo(trophy: TrophyItem, juego: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     Row(
-        modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(radio(16))).background(Surface).padding(14.dp),
+        modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(radio(16))).background(Surface)
+            .then(if (onClick != null) Modifier.premiumClickable(onClick = onClick) else Modifier)
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         FotoTrofeo(trophy, 40)

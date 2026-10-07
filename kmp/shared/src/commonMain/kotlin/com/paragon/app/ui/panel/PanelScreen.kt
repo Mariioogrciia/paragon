@@ -246,7 +246,7 @@ fun PanelScreen(
                                 trofeo.gameTitle,
                                 trofeo.rarityPercent?.let { "${numeroLocal(it, 1)} %" },
                             ).joinToString(" · "),
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId)) },
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId, trofeo.trophyId)) },
                         )
                     }
                 }
@@ -279,7 +279,7 @@ fun PanelScreen(
                     TituloSeccion(Textos.t(T.panel_ultimos_trofeos))
                     UltimosTrofeos(
                         trofeos = ultimos,
-                        onClick = { navController.navigate(Screen.GameDetail.routeFor(it.gameId)) },
+                        onClick = { navController.navigate(Screen.GameDetail.routeFor(it.gameId, it.trophyId)) },
                         modifier = Modifier.padding(horizontal = 20.dp),
                     )
                 }

@@ -1,5 +1,7 @@
 package com.paragon.app.ui.navigation
 
+import io.ktor.http.encodeURLParameter
+
 import com.paragon.shared.i18n.Textos
 import com.paragon.shared.i18n.Texto
 import com.paragon.shared.i18n.T
@@ -14,8 +16,10 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     object Social : Screen("social", T.nav_ligas)
     // No es un item de la barra inferior — se llega desde una tarjeta de
     // juego (ver GameDetailScreen.kt), de ahí el argumento en la ruta.
-    object GameDetail : Screen("game/{gameId}", T.nav_ficha) {
-        fun routeFor(gameId: String) = "game/$gameId"
+    // `trofeo` (opcional): al abrirla desde un trofeo, la ficha baja hasta él.
+    object GameDetail : Screen("game/{gameId}?trofeo={trofeo}", T.nav_ficha) {
+        fun routeFor(gameId: String, trofeo: String? = null) =
+            "game/$gameId" + (trofeo?.let { "?trofeo=" + it.encodeURLParameter() } ?: "")
     }
     object Settings : Screen("settings", T.nav_ajustes)
     object LinkedAccounts : Screen("linked_accounts", T.cuentas_titulo)

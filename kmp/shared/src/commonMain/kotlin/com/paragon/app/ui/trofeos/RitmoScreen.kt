@@ -97,7 +97,7 @@ private fun nombreDia(dia: String): String =
     isoAMillis("${dia}T12:00:00.000Z")?.let { fechaConPatron(it, "EEEEdMMMM") } ?: dia
 
 @Composable
-fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit) {
+fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirTrofeo: (gameId: String, trophyId: String) -> Unit = { _, _ -> }) {
     var mes by remember { mutableStateOf<String?>(null) }
     var datos by remember { mutableStateOf<MesResponse?>(null) }
     var error by remember { mutableStateOf(false) }
@@ -162,11 +162,12 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit) {
                                         columnas = 4,
                                         juegoDe = { t -> fila.firstOrNull { "${it.gameId}:${it.trophyId}" == t.id }?.juego },
                                         modifier = Modifier.padding(vertical = 4.dp),
+                                        onClick = { t -> fila.firstOrNull { "${it.gameId}:${it.trophyId}" == t.id }?.let { onAbrirTrofeo(it.gameId, it.trophyId) } },
                                     )
                                 }
                             } else {
                                 items(lista, key = { "${it.gameId}:${it.trophyId}" }) { t ->
-                                    FilaTrofeo(t.aTrophyItem(), t.juego, Modifier.padding(vertical = 4.dp))
+                                    FilaTrofeo(t.aTrophyItem(), t.juego, Modifier.padding(vertical = 4.dp), onClick = { onAbrirTrofeo(t.gameId, t.trophyId) })
                                 }
                             }
                         }
