@@ -68,9 +68,11 @@ function Stat({ label, value, accent }: { label: string; value: string; accent: 
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ handle: string; gameId: string }> },
 ) {
+  // El dominio real desde el que se pide (antes ponía "paragon.app", que no es la web).
+  const dominio = new URL(request.url).host;
   const { handle, gameId: gameIdRaw } = await params;
   const gameId = decodeURIComponent(gameIdRaw);
 
@@ -225,7 +227,7 @@ export async function GET(
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", fontSize: 14, fontWeight: 700, letterSpacing: 1, color: "#5a6577" }}>PARAGON</div>
             <div style={{ display: "flex", fontSize: 14, color: "#5a6577" }}>
-              paragon.app/u/{handle}/{game.id}
+              {dominio}/u/{handle}/{game.id}
             </div>
           </div>
         </div>

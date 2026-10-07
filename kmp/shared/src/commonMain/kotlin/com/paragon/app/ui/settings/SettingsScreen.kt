@@ -260,13 +260,13 @@ fun SettingsScreen(
                 com.paragon.app.ui.common.FilaNativa(
                     icono = Icons.AutoMirrored.Filled.HelpOutline,
                     titulo = Textos.t(T.ajustes_como_funciona),
-                    onClick = { uriHandler.openUri("https://paragon.app/como-funciona") },
+                    onClick = { uriHandler.openUri("${com.paragon.shared.BASE_URL}/como-funciona") },
                 )
                 com.paragon.app.ui.common.SeparadorFila()
                 com.paragon.app.ui.common.FilaNativa(
                     icono = Icons.Default.SmartToy,
                     titulo = Textos.t(T.ajustes_bot_discord),
-                    onClick = { uriHandler.openUri("https://paragon.app/bot-discord") },
+                    onClick = { uriHandler.openUri("${com.paragon.shared.BASE_URL}/bot-discord") },
                 )
             }
 

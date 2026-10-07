@@ -822,9 +822,10 @@ export const gameGuides = pgTable("game_guide", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  gameId: text("gameId")
-    .notNull()
-    .references(() => games.id, { onDelete: "cascade" }),
+  // Id del juego GLOBAL (el de /juego/[id], de IGDB), no de una copia en
+  // `game` (psn-..., steam-...): por eso sin clave foránea. Con ella, publicar
+  // una guía fallaba siempre (7 oct 2026).
+  gameId: text("gameId").notNull(),
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

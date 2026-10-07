@@ -79,6 +79,9 @@ const PRESUPUESTO_MS = 22_000;
  */
 const POR_PASADA = 4;
 
+/** Horas mínimas entre dos resincronizaciones completas de la misma persona desde el cron. */
+const HORAS_ENTRE_RESYNC = 2;
+
 /**
  * Cuántas fichas de juego se rellenan por pasada.
  *
@@ -186,6 +189,11 @@ export async function GET(request: Request) {
     })
     .from(platformAccounts)
     .groupBy(platformAccounts.userId)
+    // Solo quien lleve más de HORAS_ENTRE_RESYNC sin intentarse (7 oct 2026):
+    // antes cada llamada (cada 10 min desde GitHub) resincronizaba a los 4
+    // más antiguos aunque se hubieran hecho hace un rato, y era lo que se
+    // comía la CPU del plan de Vercel. Abrir la app ya sincroniza al momento.
+    .having(sql`min(${platformAccounts.lastAttemptedAt}) is null or min(${platformAccounts.lastAttemptedAt}) < now() - make_interval(hours => ${HORAS_ENTRE_RESYNC})`)
     // El orden va entero en SQL crudo: envolverlo en asc() lo deja como
     // "nulls first asc", que Postgres rechaza.
     .orderBy(sql`min(${platformAccounts.lastAttemptedAt}) asc nulls first`)
