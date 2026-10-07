@@ -444,14 +444,14 @@ private fun ClanMemberRow(member: ClanMember, index: Int, totalClan: Int, onClic
                 com.paragon.app.ui.common.AvatarPersona(member.image, member.name, size = 32.dp, fondo = Surface)
             }
             Spacer(Modifier.width(10.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(text = member.name, color = if (esPrimero) Platinum else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = Textos.t(T.clan_contribucion_fila, nombreRango(member.role), member.trofeosEnClan), color = Muted, fontSize = 11.sp)
+                Text(text = Textos.t(T.clan_contribucion_fila, nombreRango(member.role), member.trofeosEnClan), color = Muted, fontSize = 11.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
-        Column(horizontalAlignment = Alignment.End) {
-            Text(text = miles(member.contribucion), color = Platinum, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-            Text(text = Textos.t(T.clan_parte, (parte * 100).roundToInt()), color = Muted, fontSize = 10.sp)
+        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
+            Text(text = miles(member.contribucion), color = Platinum, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            Text(text = Textos.t(T.clan_parte, (parte * 100).roundToInt()), color = Muted, fontSize = 10.sp, maxLines = 1, softWrap = false)
         }
         if (onGestionar != null) {
             IconButton(onClick = onGestionar, modifier = Modifier.size(36.dp)) {
@@ -534,10 +534,18 @@ private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResp
             ) {
                 Text(Textos.t(T.guerra_contra, abierta.rival.tag, abierta.rival.name), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("[${detail.tag}] ${abierta.misPuntos ?: 0}", color = Accent, fontWeight = FontWeight.Black, fontSize = 22.sp)
-                    Text("  –  ", color = Muted, fontSize = 18.sp)
-                    Text("${abierta.susPuntos ?: 0} [${abierta.rival.tag}]", color = Foreground, fontWeight = FontWeight.Black, fontSize = 22.sp)
+                // Marcador en dos columnas (tag arriba, puntos debajo): en una
+                // sola línea, con la monoespaciada, el tag se partía en dos.
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("[${detail.tag}]", color = Accent, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, softWrap = false)
+                        Text("${abierta.misPuntos ?: 0}", color = Accent, fontWeight = FontWeight.Black, fontSize = 26.sp, maxLines = 1, softWrap = false)
+                    }
+                    Text("–", color = Muted, fontSize = 20.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("[${abierta.rival.tag}]", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, softWrap = false)
+                        Text("${abierta.susPuntos ?: 0}", color = Foreground, fontWeight = FontWeight.Black, fontSize = 26.sp, maxLines = 1, softWrap = false)
+                    }
                 }
                 val dias = abierta.diasRestantes
                 if (dias != null) {

@@ -4,6 +4,13 @@
     "subtitle": "Choisis n'importe quel dossier comme plan et ajoute des jeux depuis chaque fiche pour construire ton parcours."
   },
   "ritmoPage": {
+    "compararCon": "Comparer avec",
+    "sinComparar": "Personne (moi seul)",
+    "tu": "Toi",
+    "empate": "Égalité",
+    "ganasTu": "Tu gagnes",
+    "ganaOtro": "{nombre} gagne",
+    "diaADia": "Jour par jour",
     "backButton": "Retour au tableau de bord",
     "helpCurrentYear": "Clique sur un mois pour voir son détail.",
     "helpOutOfRange": "Ce mois est en dehors de la dernière année, il n'apparaît donc pas marqué ci-dessous. Clique sur n'importe quelle barre pour revenir aux 12 derniers mois.",

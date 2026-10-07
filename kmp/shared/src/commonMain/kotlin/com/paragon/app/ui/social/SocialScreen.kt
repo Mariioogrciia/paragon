@@ -126,7 +126,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             com.paragon.app.ui.common.ControlSegmentado(
                 opciones = listOf(
                     Textos.t(T.amigos_lista),
-                    if (nSolicitudes > 0) Textos.t(T.amigos_solicitudes_n, nSolicitudes) else Textos.t(T.amigos_solicitudes),
+                    if (nSolicitudes > 0) Textos.t(T.amigos_solicitudes_n, nSolicitudes) else Textos.t(T.amigos_solicitudes_corto),
                     Textos.t(T.amigos_anadir),
                 ),
                 seleccion = subAmigos,
@@ -812,18 +812,22 @@ private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPunto
             .border(1.dp, Platinum.copy(alpha = 0.3f), RoundedCornerShape(radio(16)))
             .padding(18.dp),
     ) {
+        // El título se lleva el espacio y la cuenta atrás va en una línea:
+        // antes, con la monoespaciada, "Termina en 24 días" salía en vertical.
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(Textos.t(T.social_liga_mensual), color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp)
+            Column(Modifier.weight(1f)) {
+                Text(Textos.t(T.social_liga_mensual), color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(Textos.t(T.social_liga_mensual_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 10.dp)) {
                 Text("⏱", fontSize = 13.sp)
                 Text(
                     text = if (diasRestantes <= 0) Textos.t(T.comun_termina_hoy) else if (diasRestantes == 1) Textos.t(T.comun_termina_en_1, diasRestantes) else Textos.t(T.comun_termina_en_n, diasRestantes),
                     color = if (diasRestantes <= 2) PodiumGold else Muted,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    softWrap = false,
                     modifier = Modifier.padding(start = 4.dp),
                 )
             }
@@ -939,14 +943,14 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
                 Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = Textos.t(T.social_puntos_mes, row.points), color = Muted, fontSize = 12.sp)
+                Text(text = Textos.t(T.social_puntos_mes, row.points), color = Muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
-        Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, softWrap = false, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
@@ -962,22 +966,25 @@ fun AmigoRowItem(row: AmigoRow, position: Int, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // Los textos se llevan el ancho y el puesto no se parte en dos líneas.
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
                 Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = Textos.t(T.social_nivel_platinos, row.level, row.platinos), color = Muted, fontSize = 12.sp)
+                Text(text = Textos.t(T.social_nivel_platinos, row.level, row.platinos), color = Muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (row.accounts.isNotEmpty()) {
                     Text(
                         text = row.accounts.joinToString(" · ") { "${it.platform.uppercase()}: ${it.username}" },
                         color = Muted,
                         fontSize = 11.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 2.dp),
                     )
                 }
             }
         }
-        Text(text = "${position}º", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text(text = "${position}º", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 20.sp, maxLines = 1, softWrap = false, modifier = Modifier.padding(start = 10.dp))
     }
 }
 

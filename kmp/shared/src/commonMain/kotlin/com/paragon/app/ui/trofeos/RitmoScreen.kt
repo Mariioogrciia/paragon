@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import com.paragon.app.ui.theme.Surface2
+import com.paragon.app.ui.theme.Gold
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -103,6 +107,20 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirTrofeo: (game
     var error by remember { mutableStateOf(false) }
     var dia by remember { mutableStateOf<String?>(null) }
     var recarga by remember { mutableStateOf(0) }
+    // Comparar con un amigo (7 oct 2026): su mes al lado del tuyo.
+    var amigos by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) } // handle, nombre
+    var con by remember { mutableStateOf<String?>(null) }
+    var datosAmigo by remember { mutableStateOf<MesResponse?>(null) }
+    LaunchedEffect(Unit) {
+        amigos = try {
+            ApiClient.socialApi(tokenStore).getSocial().amigos.mapNotNull { a -> a.handle?.let { it to (a.name ?: it) } }
+        } catch (e: Exception) { emptyList() }
+    }
+    LaunchedEffect(mes, con) {
+        val h = con
+        val m = mes
+        datosAmigo = if (h == null || m == null) null else try { ApiClient.statsApi(tokenStore).getMes(m, h) } catch (e: Exception) { null }
+    }
 
     LaunchedEffect(mes, recarga) {
         // La primera carga (mes = null) ya trae el actual: no volver a pedirlo al fijar `mes`.
@@ -128,18 +146,37 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirTrofeo: (game
                 Text(nombreMes(actual), color = Foreground, fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 IconButton(onClick = { mes = mover(actual, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Foreground) }
             }
+            if (amigos.isNotEmpty()) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(Textos.t(T.ritmo_comparar_con), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(end = 10.dp))
+                    com.paragon.app.ui.common.Selector(
+                        valor = con ?: "",
+                        opciones = listOf(com.paragon.app.ui.common.OpcionSelector("", Textos.t(T.ritmo_sin_comparar))) +
+                            amigos.map { (h, n) -> com.paragon.app.ui.common.OpcionSelector(h, n, detalle = "@$h") },
+                        onElegir = { con = it.ifEmpty { null } },
+                        buscable = amigos.size > 8,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
         }
 
         val d = datos
         when {
             error -> EmptyState(Icons.Default.CalendarMonth, Textos.t(T.error_conexion), "", Textos.t(T.comun_reintentar), { recarga++ })
             d == null -> EsqueletoLista()
-            d.trofeos.isEmpty() -> EmptyState(Icons.Default.CalendarMonth, Textos.t(T.ritmo_vacio_titulo), Textos.t(T.ritmo_vacio_texto))
+            d.trofeos.isEmpty() && datosAmigo == null -> EmptyState(Icons.Default.CalendarMonth, Textos.t(T.ritmo_vacio_titulo), Textos.t(T.ritmo_vacio_texto))
             else -> {
                 val filtrados = remember(d, dia) { d.trofeos.filter { dia == null || it.earnedAt.startsWith(dia!!) } }
                 val porDia = remember(filtrados) { filtrados.groupBy { it.earnedAt.take(10) }.toList() }
                 val vista = vistaTrofeosActual
                 LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())) {
+                    datosAmigo?.let { otro ->
+                        item {
+                            ComparacionMes(d, otro, amigos.firstOrNull { it.first == con }?.second ?: con.orEmpty())
+                            Spacer(Modifier.height(14.dp))
+                        }
+                    }
                     item {
                         BarrasDias(d, dia) { dia = if (dia == it) null else it }
                     }
@@ -228,5 +265,91 @@ private fun BarrasDias(d: MesResponse, elegido: String?, onDia: (String) -> Unit
             Text("${d.porDia.size}", color = Muted, fontSize = 10.sp)
         }
         Spacer(Modifier.height(2.dp))
+    }
+}
+
+/** Días del mes "YYYY-MM" (28-31). */
+private fun diasDelMes(mes: String): Int {
+    val anio = mes.take(4).toIntOrNull() ?: return 31
+    return when (mes.drop(5).take(2).toIntOrNull()) {
+        2 -> if (anio % 4 == 0 && (anio % 100 != 0 || anio % 400 == 0)) 29 else 28
+        4, 6, 9, 11 -> 30
+        else -> 31
+    }
+}
+
+/**
+ * Tu mes contra el de un amigo: quién gana, trofeos, días activos y mejor día
+ * lado a lado (tú en el acento, tu amigo en oro), y el día a día con las dos
+ * barras juntas. Igual que en la web (/ritmo?con=).
+ */
+@Composable
+private fun ComparacionMes(yo: MesResponse, otro: MesResponse, nombreOtro: String) {
+    fun resumen(d: MesResponse) = Triple(d.total, d.porDia.count { it.total > 0 }, d.porDia.maxOfOrNull { it.total } ?: 0)
+    val a = resumen(yo)
+    val b = resumen(otro)
+    val n = diasDelMes(yo.mes)
+    fun delDia(d: MesResponse): List<Int> {
+        val m = d.porDia.associate { (it.dia.drop(8).take(2).toIntOrNull() ?: 0) to it.total }
+        return (1..n).map { m[it] ?: 0 }
+    }
+    val mios = delDia(yo)
+    val suyos = delDia(otro)
+    val maximo = (mios + suyos).maxOrNull()?.coerceAtLeast(1) ?: 1
+    val veredicto = when {
+        a.first == b.first -> Textos.t(T.ritmo_empate)
+        a.first > b.first -> Textos.t(T.ritmo_ganas_tu)
+        else -> Textos.t(T.ritmo_gana_otro, nombreOtro)
+    }
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(radio(18))).background(Surface).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                Textos.t(T.ritmo_tu_vs, nombreOtro),
+                color = Foreground,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                veredicto,
+                color = Foreground,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 8.dp).clip(RoundedCornerShape(50)).background(Surface2).padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        FilaComparacion(Textos.t(T.ritmo_n_trofeos_corto), a.first, b.first)
+        FilaComparacion(Textos.t(T.stats_dias_activos), a.second, b.second)
+        FilaComparacion(Textos.t(T.ritmo_mejor_dia), a.third, b.third)
+        Row(Modifier.fillMaxWidth().height(80.dp).padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.Bottom) {
+            mios.forEachIndexed { i, x ->
+                val y = suyos[i]
+                Row(Modifier.weight(1f).fillMaxHeight(), horizontalArrangement = Arrangement.spacedBy(1.dp), verticalAlignment = Alignment.Bottom) {
+                    Box(Modifier.weight(1f).fillMaxHeight(if (x == 0) 0.02f else (x.toFloat() / maximo).coerceAtLeast(0.05f)).clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)).background(if (x == 0) Border else Accent))
+                    Box(Modifier.weight(1f).fillMaxHeight(if (y == 0) 0.02f else (y.toFloat() / maximo).coerceAtLeast(0.05f)).clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)).background(if (y == 0) Border else Gold))
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(10.dp).clip(RoundedCornerShape(2.dp)).background(Accent))
+            Text(Textos.t(T.ritmo_tu), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(start = 4.dp, end = 12.dp))
+            Box(Modifier.size(10.dp).clip(RoundedCornerShape(2.dp)).background(Gold))
+            Text(nombreOtro, color = Muted, fontSize = 11.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.padding(start = 4.dp).weight(1f))
+            Text("1–$n", color = Muted, fontSize = 10.sp)
+        }
+    }
+}
+
+/** Una cifra tuya y la de tu amigo, con la que gana resaltada. */
+@Composable
+private fun FilaComparacion(etiqueta: String, yo: Int, otro: Int) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text("$yo", color = if (yo >= otro) Accent else Muted, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(56.dp))
+        Text(etiqueta, color = Muted, fontSize = 12.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Text("$otro", color = if (otro >= yo) Gold else Muted, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.End, modifier = Modifier.width(56.dp))
     }
 }

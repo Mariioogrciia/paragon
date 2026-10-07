@@ -126,8 +126,12 @@ data class MesResponse(
 
 class StatsApi internal constructor(private val c: ClienteParagon) {
     /** `mes`: "YYYY-MM"; null = el actual. */
-    suspend fun getMes(mes: String?): MesResponse =
-        c.http.get("api/mobile/stats/month") { if (mes != null) parameter("mes", mes) }.body()
+    suspend fun getMes(mes: String?, de: String? = null): MesResponse =
+        c.http.get("api/mobile/stats/month") {
+            if (mes != null) parameter("mes", mes)
+            // `de`: el mes de un amigo, para comparar (solo amigos).
+            if (de != null) parameter("de", de)
+        }.body()
 
     /** Versión curada para el móvil de /api/mobile/stats — ver route.ts y API-CONTRACT.md. */
     suspend fun getStats(): StatsResponse =

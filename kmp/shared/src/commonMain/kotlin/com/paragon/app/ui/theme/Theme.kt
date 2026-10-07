@@ -12,6 +12,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import com.paragon.app.data.theme.ThemeMode
 import com.paragon.app.data.theme.ThemeStore
@@ -64,7 +66,7 @@ fun ParagonTheme(
 
     // Terminal: monoespaciada en toda la interfaz (la web hace lo mismo).
     val base = Typography()
-    val typography = if (estiloActivo.monoespaciada) {
+    val tipografia = if (estiloActivo.monoespaciada) {
         val m = FontFamily.Monospace
         Typography(
             displayLarge = base.displayLarge.copy(fontFamily = m), displayMedium = base.displayMedium.copy(fontFamily = m),
@@ -77,6 +79,11 @@ fun ParagonTheme(
             labelSmall = base.labelSmall.copy(fontFamily = m),
         )
     } else base
+    // Interlineado relativo a la letra (7 oct 2026): los estilos de Material
+    // traen uno fijo (24 sp en el de cuerpo) y, en un texto de 11-12 sp que
+    // salta de línea, quedaba un hueco enorme entre líneas ("Miembro · 0 /
+    // trofeos en el / clan"), sobre todo con la monoespaciada de Terminal.
+    val typography = interlineadoRelativo(tipografia)
 
     // Las piezas de Material (botones, diálogos, campos...) también siguen al estilo.
     val shapes = Shapes(
@@ -102,4 +109,16 @@ fun colorDeHex(hex: String): Color? {
     val limpio = hex.removePrefix("#")
     if (limpio.length != 6) return null
     return limpio.toLongOrNull(16)?.let { Color(0xFF000000 or it) }
+}
+
+/** Todos los estilos con interlineado proporcional a su tamaño de letra. */
+private fun interlineadoRelativo(t: Typography): Typography {
+    fun TextStyle.rel(f: Float) = copy(lineHeight = f.em)
+    return Typography(
+        displayLarge = t.displayLarge.rel(1.12f), displayMedium = t.displayMedium.rel(1.15f), displaySmall = t.displaySmall.rel(1.2f),
+        headlineLarge = t.headlineLarge.rel(1.22f), headlineMedium = t.headlineMedium.rel(1.25f), headlineSmall = t.headlineSmall.rel(1.28f),
+        titleLarge = t.titleLarge.rel(1.28f), titleMedium = t.titleMedium.rel(1.32f), titleSmall = t.titleSmall.rel(1.32f),
+        bodyLarge = t.bodyLarge.rel(1.35f), bodyMedium = t.bodyMedium.rel(1.35f), bodySmall = t.bodySmall.rel(1.35f),
+        labelLarge = t.labelLarge.rel(1.3f), labelMedium = t.labelMedium.rel(1.3f), labelSmall = t.labelSmall.rel(1.3f),
+    )
 }

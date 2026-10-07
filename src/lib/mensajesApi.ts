@@ -53,6 +53,7 @@ const FIJOS: Record<string, Trad> = {
   "No se pudo borrar la liga.": { en: "Couldn't delete the league.", de: "Liga konnte nicht gelöscht werden.", fr: "Impossible de supprimer la ligue." },
   "No se envió ningún archivo": { en: "No file was sent", de: "Keine Datei gesendet", fr: "Aucun fichier envoyé" },
   "Carpeta no encontrada": { en: "Folder not found", de: "Ordner nicht gefunden", fr: "Dossier introuvable" },
+  "Solo puedes compararte con tus amigos": { en: "You can only compare yourself with friends", de: "Du kannst dich nur mit Freunden vergleichen", fr: "Tu ne peux te comparer qu'avec tes amis" },
   "Necesitas ser al menos Nivel 5 de Paragon para crear un clan.": { en: "You need to be at least Paragon level 5 to create a clan.", de: "Du brauchst mindestens Paragon-Stufe 5, um einen Clan zu gründen.", fr: "Il faut être au moins niveau 5 de Paragon pour créer un clan." },
   "Esta liga ya ha terminado.": { en: "This league has already ended.", de: "Diese Liga ist schon vorbei.", fr: "Cette ligue est déjà terminée." },
   // Guerra de clanes (lib/clanWars.ts).

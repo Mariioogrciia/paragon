@@ -3089,6 +3089,66 @@
   "es": "Más",
   "fr": "Plus"
  },
+ "ritmo_comparar_con": {
+  "de": "Vergleichen mit",
+  "en": "Compare with",
+  "es": "Comparar con",
+  "fr": "Comparer avec"
+ },
+ "ritmo_sin_comparar": {
+  "de": "Niemand",
+  "en": "Nobody",
+  "es": "Nadie",
+  "fr": "Personne"
+ },
+ "ritmo_tu_vs": {
+  "de": "Du vs {0}",
+  "en": "You vs {0}",
+  "es": "Tú vs {0}",
+  "fr": "Toi vs {0}"
+ },
+ "ritmo_tu": {
+  "de": "Du",
+  "en": "You",
+  "es": "Tú",
+  "fr": "Toi"
+ },
+ "ritmo_empate": {
+  "de": "Unentschieden",
+  "en": "Tie",
+  "es": "Empate",
+  "fr": "Égalité"
+ },
+ "ritmo_ganas_tu": {
+  "de": "Du gewinnst",
+  "en": "You win",
+  "es": "Ganas tú",
+  "fr": "Tu gagnes"
+ },
+ "ritmo_gana_otro": {
+  "de": "{0} gewinnt",
+  "en": "{0} wins",
+  "es": "Gana {0}",
+  "fr": "{0} gagne"
+ },
+ "ritmo_n_trofeos_corto": {
+  "de": "Trophäen",
+  "en": "Trophies",
+  "es": "Trofeos",
+  "fr": "Trophées"
+ },
+ "ritmo_mejor_dia": {
+  "de": "Bester Tag",
+  "en": "Best day",
+  "es": "Mejor día",
+  "fr": "Meilleur jour"
+ },
+ "amigos_solicitudes_corto": {
+  "de": "Anfragen",
+  "en": "Requests",
+  "es": "Solicitudes",
+  "fr": "Demandes"
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",
