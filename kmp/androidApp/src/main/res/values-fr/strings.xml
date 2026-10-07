@@ -113,6 +113,7 @@
     <string name="carpeta_borrar_texto">« %1$s » disparaît avec les %2$s jeux qu\'il regroupe (les jeux eux-mêmes ne sont pas supprimés, seulement le dossier).</string>
     <string name="carpeta_borrar_titulo">Supprimer ce dossier ?</string>
     <string name="carpeta_buscar">Chercher dans ta bibliothèque</string>
+    <string name="carpeta_cambiar_foto">Changer la photo</string>
     <string name="carpeta_err_borrar">Impossible de supprimer le dossier.</string>
     <string name="carpeta_err_cambiar">Impossible de modifier le dossier. Vérifie la connexion et réessaie.</string>
     <string name="carpeta_err_crear">Impossible de créer le dossier.</string>
@@ -120,7 +121,9 @@
     <string name="carpeta_err_renombrar">Impossible de renommer le dossier.</string>
     <string name="carpeta_nueva">Nouveau dossier</string>
     <string name="carpeta_opciones">Options du dossier</string>
+    <string name="carpeta_poner_foto">Ajouter une photo</string>
     <string name="carpeta_quitar">Retirer du dossier</string>
+    <string name="carpeta_quitar_foto">Retirer la photo</string>
     <string name="carpeta_renombrar">Renommer le dossier</string>
     <string name="carpeta_sin_juegos">Aucun jeu dans ce dossier pour l\'instant</string>
     <string name="carpeta_sin_juegos_sub">Ajoute-les depuis leur fiche, ou depuis la Bibliothèque avec le menu de chaque carte.</string>
@@ -466,6 +469,7 @@
     <string name="inicio_ir">Go</string>
     <string name="inicio_objetivo_anclado">Ton objectif · épinglé</string>
     <string name="inicio_para_hoy">Pour aujourd\'hui</string>
+    <string name="inicio_platinado_dlc">Platiné · %1$s de DLC restants</string>
     <string name="inicio_proxima_sesion">Ta prochaine session</string>
     <string name="inicio_sigue_jugando">Continue à jouer</string>
     <string name="inicio_siguiente_platino_de">Prochain platine : %1$s</string>

@@ -79,14 +79,14 @@ import com.paragon.shared.i18n.Textos
  * es con otros. Ajustes, arriba a la derecha. Solo colores del tema
  * (acento, superficie, bordes y radios de Apariencia), nada fijo.
  *
- * `conLigas`: en modo zen la barra no tiene Ligas; aquí no se pierde.
+ * `modoZen` ("Ocultar funciones sociales"): sin el grupo "Con otros".
  */
 @Composable
 fun PerfilScreen(
     profile: UserProfile,
     stats: GlobalStats,
     racha: RachaGlobal,
-    conLigas: Boolean,
+    modoZen: Boolean,
     onNavigate: (String) -> Unit,
 ) {
     var verQr by remember { mutableStateOf(false) }
@@ -144,9 +144,8 @@ fun PerfilScreen(
             Fila(Icons.Default.Star, Textos.t(T.nav_atascados_menu)) { onNavigate(Screen.StuckTrophies.route) }
             Fila(Icons.Default.Folder, Textos.t(T.nav_carpetas), ultima = true) { onNavigate(Screen.Collections.route) }
         }
-        Grupo(Textos.t(T.perfil_con_otros)) {
+        if (!modoZen) Grupo(Textos.t(T.perfil_con_otros)) {
             Fila(Icons.Default.Groups, Textos.t(T.nav_sesiones)) { onNavigate(Screen.Sessions.route) }
-            if (conLigas) Fila(Icons.Default.EmojiEvents, Textos.t(T.nav_ligas)) { onNavigate(Screen.Social.route) }
             Fila(Icons.AutoMirrored.Filled.CompareArrows, Textos.t(T.nav_comparar), ultima = true) { onNavigate("compare") }
         }
     }

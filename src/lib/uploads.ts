@@ -17,7 +17,7 @@ import { createClient } from "@supabase/supabase-js";
  *   - Cada subida dejaba la anterior huérfana en el bucket para siempre.
  */
 
-export type TipoSubida = "avatar" | "banner";
+export type TipoSubida = "avatar" | "banner" | "carpeta";
 
 const BUCKET = "Avatars";
 const TAMANO_MAXIMO = 4 * 1024 * 1024;
@@ -35,6 +35,7 @@ const MIME_POR_EXTENSION: Record<string, string> = {
 const EXTENSIONES_PERMITIDAS: Record<TipoSubida, string[]> = {
   avatar: [".jpg", ".jpeg", ".png", ".gif", ".webp"],
   banner: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".webm"],
+  carpeta: [".jpg", ".jpeg", ".png", ".webp"],
 };
 
 /** ¿Empieza el archivo por la firma que corresponde a su tipo? */

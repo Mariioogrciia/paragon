@@ -56,7 +56,9 @@ data class GameProgress(
     val coverUrl: String,
     val earnedTrophies: Int,
     val totalTrophies: Int,
-    val percent: Int
+    val percent: Int,
+    /** Platino del juego base conseguido: lo que quede son DLC, no es "siguiente platino". */
+    val platinado: Boolean = false,
 )
 
 /** Perfil + stats reales, o por qué no se pudieron traer — ver /api/mobile/panel en el proyecto Next.js. */
@@ -129,6 +131,7 @@ private fun GameCardDto.toGameProgress() = GameProgress(
     earnedTrophies = earnedTrophies,
     totalTrophies = totalTrophies,
     percent = percent,
+    platinado = platinado,
 )
 
 private fun NextTrophyDto.toNextTrophy() = NextTrophy(

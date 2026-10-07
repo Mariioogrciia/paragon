@@ -17,9 +17,15 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     // No es un item de la barra inferior — se llega desde una tarjeta de
     // juego (ver GameDetailScreen.kt), de ahí el argumento en la ruta.
     // `trofeo` (opcional): al abrirla desde un trofeo, la ficha baja hasta él.
-    object GameDetail : Screen("game/{gameId}?trofeo={trofeo}", T.nav_ficha) {
-        fun routeFor(gameId: String, trofeo: String? = null) =
-            "game/$gameId" + (trofeo?.let { "?trofeo=" + it.encodeURLParameter() } ?: "")
+    // `de` (opcional): handle de otra persona, para ver SU ficha de ese juego.
+    object GameDetail : Screen("game/{gameId}?trofeo={trofeo}&de={de}", T.nav_ficha) {
+        fun routeFor(gameId: String, trofeo: String? = null, de: String? = null): String {
+            val params = listOfNotNull(
+                trofeo?.let { "trofeo=" + it.encodeURLParameter() },
+                de?.let { "de=" + it.encodeURLParameter() },
+            )
+            return "game/$gameId" + if (params.isEmpty()) "" else "?" + params.joinToString("&")
+        }
     }
     object Settings : Screen("settings", T.nav_ajustes)
     object LinkedAccounts : Screen("linked_accounts", T.cuentas_titulo)
@@ -38,3 +44,6 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
         fun routeFor(sesionId: String) = "session/$sesionId"
     }
 }
+
+/** Abrir la ficha de un juego de otra persona desde donde sea (la hoja de su perfil...). Lo da MainScreen. */
+val LocalAbrirJuegoDe = androidx.compose.runtime.staticCompositionLocalOf<(handle: String, gameId: String) -> Unit> { { _, _ -> } }

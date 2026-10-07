@@ -521,6 +521,8 @@ export const collections = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
+    /** Foto de la carpeta (subida a Storage, ver lib/uploads.ts); null = las carátulas de sus juegos. */
+    portada: text("portada"),
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   },
   (c) => [uniqueIndex("collection_user_name_idx").on(c.userId, c.name)],

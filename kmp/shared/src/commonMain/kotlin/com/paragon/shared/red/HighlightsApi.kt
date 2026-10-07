@@ -13,6 +13,8 @@ data class GameCardDto(
     val earnedTrophies: Int,
     val totalTrophies: Int,
     val percent: Int,
+    /** Platino conseguido (del juego base), aunque queden DLC por completar. */
+    val platinado: Boolean = false,
 )
 
 /**

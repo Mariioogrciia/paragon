@@ -185,11 +185,12 @@ fun MainScreen(
         }
     }
 
+    // "Ocultar funciones sociales": fuera Comunidad y Ligas (antes solo Ligas,
+    // y Comunidad seguía en la barra).
     val items = if (themeStore.zenMode) {
         listOf(
             BottomNavItem.Dashboard,
             BottomNavItem.Library,
-            BottomNavItem.Feed,
             BottomNavItem.Perfil
         )
     } else {
@@ -278,6 +279,9 @@ fun MainScreen(
         // SharedTransitionScope para que la carátula pueda "volar" cuando SÍ
         // hay una tarjeta de origen con la misma clave (Biblioteca), y
         // simplemente no anime cuando no la hay (resto de orígenes).
+        androidx.compose.runtime.CompositionLocalProvider(
+            com.paragon.app.ui.navigation.LocalAbrirJuegoDe provides { h: String, g: String -> navController.navigate(Screen.GameDetail.routeFor(g, de = h)) },
+        ) {
         SharedTransitionLayout {
         NavHost(
             navController = navController,
@@ -336,7 +340,7 @@ fun MainScreen(
                     profile = profile,
                     stats = stats,
                     racha = racha,
-                    conLigas = themeStore.zenMode,
+                    modoZen = themeStore.zenMode,
                     onNavigate = { ruta -> navController.navigate(ruta) },
                 )
             }
@@ -448,12 +452,14 @@ fun MainScreen(
                 arguments = listOf(
                     navArgument("gameId") { type = NavType.StringType },
                     navArgument("trofeo") { type = NavType.StringType; nullable = true; defaultValue = null },
+                    navArgument("de") { type = NavType.StringType; nullable = true; defaultValue = null },
                 ),
             ) { backStackEntry ->
                 val gameId = backStackEntry.arguments?.read { getStringOrNull("gameId") } ?: return@composable
                 GameDetailScreen(
                     gameId = gameId,
                     trofeoInicial = backStackEntry.arguments?.read { getStringOrNull("trofeo") },
+                    de = backStackEntry.arguments?.read { getStringOrNull("de") },
                     tokenStore = tokenStore,
                     handle = profile.handle,
                     onBack = { navController.popBackStack() },
@@ -462,6 +468,7 @@ fun MainScreen(
                     animatedVisibilityScope = this,
                 )
             }
+        }
         }
         }
         }

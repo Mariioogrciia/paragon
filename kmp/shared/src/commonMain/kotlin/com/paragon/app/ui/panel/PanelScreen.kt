@@ -204,7 +204,8 @@ fun PanelScreen(
                 }
 
                 val cercano = ok?.nearPlatinum?.firstOrNull()
-                val objetivo = pinnedGame?.toGameProgress() ?: cercano
+                // Un juego anclado ya platinado (solo le faltan DLC) no es "siguiente platino".
+                val objetivo = pinnedGame?.toGameProgress()?.takeIf { !it.platinado } ?: cercano
                 val siguientes = ok?.nextTrophies.orEmpty()
                 val siguienteDelObjetivo = objetivo?.let { o -> siguientes.firstOrNull { it.gameId == o.id } }
                 val otrosSiguientes = siguientes.filter { it !== siguienteDelObjetivo }.take(2)

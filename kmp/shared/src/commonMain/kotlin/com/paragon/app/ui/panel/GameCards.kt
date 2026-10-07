@@ -183,7 +183,8 @@ fun HeroGameCard(
             // "¡A un paso!" para algo ya terminado sonaba a que le faltaba
             // uno, no a que ya estaba hecho — bug real visto en Biblioteca
             // con juegos platinados de verdad.
-            val terminado = restantes <= 0
+            // Platinado aunque queden DLC (lo que falta ya no es el platino).
+            val terminado = restantes <= 0 || game.platinado
             val etiquetaFinal = if (terminado) Textos.t(T.panel_platinado) else label
             val colorEtiqueta = if (terminado) Platinum else labelColor
             Column {
@@ -214,7 +215,7 @@ fun HeroGameCard(
                     modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
                 )
 
-                if (restantes > 0) {
+                if (!terminado) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
                             text = restantes.toString(),

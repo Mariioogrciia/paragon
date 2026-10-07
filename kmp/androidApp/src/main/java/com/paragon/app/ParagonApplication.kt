@@ -31,6 +31,8 @@ class ParagonApplication : Application(), SingletonImageLoader.Factory {
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
+            // http → https, sin esquema y rutas relativas (ver UrlImagenes.kt).
+            .components { add(com.paragon.app.ui.common.UrlImagenesMapper) }
             .crossfade(true)
             .build()
     }

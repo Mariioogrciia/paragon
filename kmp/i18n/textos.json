@@ -2897,6 +2897,30 @@
   "es": "Buscar en tu biblioteca",
   "fr": "Chercher dans ta bibliothèque"
  },
+ "inicio_platinado_dlc": {
+  "de": "Platin · {0} DLC übrig",
+  "en": "Platinum · {0} DLC left",
+  "es": "Platinado · faltan {0} de DLC",
+  "fr": "Platiné · {0} de DLC restants"
+ },
+ "carpeta_poner_foto": {
+  "de": "Foto hinzufügen",
+  "en": "Add photo",
+  "es": "Poner foto",
+  "fr": "Ajouter une photo"
+ },
+ "carpeta_cambiar_foto": {
+  "de": "Foto ändern",
+  "en": "Change photo",
+  "es": "Cambiar foto",
+  "fr": "Changer la photo"
+ },
+ "carpeta_quitar_foto": {
+  "de": "Foto entfernen",
+  "en": "Remove photo",
+  "es": "Quitar foto",
+  "fr": "Retirer la photo"
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",

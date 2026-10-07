@@ -115,6 +115,7 @@
     <string name="carpeta_borrar_texto">\"%1$s\" desaparece con los %2$s juegos que agrupa (los juegos en sí no se borran, solo la carpeta).</string>
     <string name="carpeta_borrar_titulo">¿Borrar esta carpeta?</string>
     <string name="carpeta_buscar">Buscar en tu biblioteca</string>
+    <string name="carpeta_cambiar_foto">Cambiar foto</string>
     <string name="carpeta_err_borrar">No se pudo borrar la carpeta.</string>
     <string name="carpeta_err_cambiar">No se pudo cambiar la carpeta. Revisa la conexión e inténtalo de nuevo.</string>
     <string name="carpeta_err_crear">No se pudo crear la carpeta.</string>
@@ -122,7 +123,9 @@
     <string name="carpeta_err_renombrar">No se pudo renombrar la carpeta.</string>
     <string name="carpeta_nueva">Nueva carpeta</string>
     <string name="carpeta_opciones">Opciones de la carpeta</string>
+    <string name="carpeta_poner_foto">Poner foto</string>
     <string name="carpeta_quitar">Quitar de la carpeta</string>
+    <string name="carpeta_quitar_foto">Quitar foto</string>
     <string name="carpeta_renombrar">Renombrar carpeta</string>
     <string name="carpeta_sin_juegos">Ningún juego en esta carpeta todavía</string>
     <string name="carpeta_sin_juegos_sub">Añádelos desde su ficha, o desde la Biblioteca con el menú de cada tarjeta.</string>
@@ -468,6 +471,7 @@
     <string name="inicio_ir">Ir</string>
     <string name="inicio_objetivo_anclado">Tu objetivo · anclado</string>
     <string name="inicio_para_hoy">Para hoy</string>
+    <string name="inicio_platinado_dlc">Platinado · faltan %1$s de DLC</string>
     <string name="inicio_proxima_sesion">Tu próxima sesión</string>
     <string name="inicio_sigue_jugando">Sigue jugando</string>
     <string name="inicio_siguiente_platino_de">Siguiente platino: %1$s</string>

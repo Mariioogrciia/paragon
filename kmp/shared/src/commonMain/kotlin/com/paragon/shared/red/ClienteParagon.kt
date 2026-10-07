@@ -17,6 +17,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.encodeURLPathPart
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
@@ -131,15 +132,22 @@ class ClienteParagon(
      * multipart con el campo `file`.
      */
     suspend fun subirAvatar(bytes: ByteArray, tipoMime: String, extension: String): AvatarUploadResponse =
+        subirImagen("api/mobile/profile/avatar", bytes, tipoMime, extension)
+
+    /** Foto de una carpeta — ver src/app/api/mobile/collections/[id]/portada/route.ts. */
+    suspend fun subirPortadaCarpeta(id: String, bytes: ByteArray, tipoMime: String, extension: String): AvatarUploadResponse =
+        subirImagen("api/mobile/collections/${id.encodeURLPathPart()}/portada", bytes, tipoMime, extension)
+
+    private suspend fun subirImagen(ruta: String, bytes: ByteArray, tipoMime: String, extension: String): AvatarUploadResponse =
         http.submitFormWithBinaryData(
-            url = "api/mobile/profile/avatar",
+            url = ruta,
             formData = formData {
                 append(
                     "file",
                     bytes,
                     Headers.build {
                         append(HttpHeaders.ContentType, tipoMime)
-                        append(HttpHeaders.ContentDisposition, "filename=\"avatar.$extension\"")
+                        append(HttpHeaders.ContentDisposition, "filename=\"imagen.$extension\"")
                     },
                 )
             },

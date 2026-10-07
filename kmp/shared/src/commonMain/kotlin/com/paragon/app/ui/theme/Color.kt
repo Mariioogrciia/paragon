@@ -50,7 +50,12 @@ private val BaseContraste = Suelo(Color(0xFF000000), Color(0xFF0C1017), Color(0x
  */
 private fun suelo(): Suelo = when (modoActivo) {
     ThemeMode.CLARO -> sueloEstilo(claro = true) ?: tenido(BaseClaro, claro = true)
-    ThemeMode.OLED -> (sueloEstilo(claro = false) ?: tenido(BaseOled, claro = false)).copy(background = BaseOled.background)
+    // OLED: negro puro con los colores simples; las paletas completas (y la
+    // de juego) oscurecen SU fondo en vez de tirarlo a negro, para que se note
+    // la diferencia ("no cambia nada entre los colores simples y los de dos").
+    ThemeMode.OLED -> sueloEstilo(claro = false)?.copy(background = BaseOled.background)
+        ?: paletaCompleta()?.let { it.copy(background = lerp(it.background, Color.Black, 0.45f)) }
+        ?: tenido(BaseOled, claro = false).copy(background = BaseOled.background)
     ThemeMode.CONTRASTE -> BaseContraste
     else -> paletaJuegoActiva?.suelo
         ?: sueloEstilo(claro = false)
@@ -63,6 +68,10 @@ private fun suelo(): Suelo = when (modoActivo) {
  * y, a partir de él, tarjetas y bordes algo más claros (u oscuros, en claro)
  * teñidos con su color. null = Clásico, que usa el de la app.
  */
+/** El suelo propio de una paleta completa o de la de juego; null con un color simple. */
+private fun paletaCompleta(): Suelo? =
+    paletaJuegoActiva?.suelo ?: acentoActivo.suelo?.let { if (acentoLibreActivo == null) it else null }
+
 private fun sueloEstilo(claro: Boolean): Suelo? {
     val e = estiloActivo
     val fondo = (if (claro) e.fondoClaro else e.fondoOscuro) ?: return null

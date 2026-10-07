@@ -113,6 +113,7 @@
     <string name="carpeta_borrar_texto">\"%1$s\" disappears with the %2$s games it groups (the games themselves aren\'t deleted, only the folder).</string>
     <string name="carpeta_borrar_titulo">Delete this folder?</string>
     <string name="carpeta_buscar">Search your library</string>
+    <string name="carpeta_cambiar_foto">Change photo</string>
     <string name="carpeta_err_borrar">Couldn\'t delete the folder.</string>
     <string name="carpeta_err_cambiar">Couldn\'t update the folder. Check your connection and try again.</string>
     <string name="carpeta_err_crear">Couldn\'t create the folder.</string>
@@ -120,7 +121,9 @@
     <string name="carpeta_err_renombrar">Couldn\'t rename the folder.</string>
     <string name="carpeta_nueva">New folder</string>
     <string name="carpeta_opciones">Folder options</string>
+    <string name="carpeta_poner_foto">Add photo</string>
     <string name="carpeta_quitar">Remove from folder</string>
+    <string name="carpeta_quitar_foto">Remove photo</string>
     <string name="carpeta_renombrar">Rename folder</string>
     <string name="carpeta_sin_juegos">No games in this folder yet</string>
     <string name="carpeta_sin_juegos_sub">Add them from their game page, or from the Library with each card\'s menu.</string>
@@ -466,6 +469,7 @@
     <string name="inicio_ir">Go</string>
     <string name="inicio_objetivo_anclado">Your goal · pinned</string>
     <string name="inicio_para_hoy">For today</string>
+    <string name="inicio_platinado_dlc">Platinum · %1$s DLC left</string>
     <string name="inicio_proxima_sesion">Your next session</string>
     <string name="inicio_sigue_jugando">Keep playing</string>
     <string name="inicio_siguiente_platino_de">Next platinum: %1$s</string>

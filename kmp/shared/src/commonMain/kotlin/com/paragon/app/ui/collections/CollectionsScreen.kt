@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -127,6 +129,18 @@ fun CollectionsScreen(navController: NavController, tokenStore: TokenStore, onBa
                         portadas = { c -> c.gameIds.mapNotNull { id -> libraryGames.firstOrNull { it.id == id }?.coverUrl }.take(4) },
                         onOpen = { selected = it },
                         onRename = { renaming = it },
+                        onFoto = { coleccion, bytes, mime, ext ->
+                            coroutineScope.launch {
+                                aviso = repository.subirPortada(coleccion.id, bytes, mime, ext)
+                                reload()
+                            }
+                        },
+                        onQuitarFoto = { coleccion ->
+                            coroutineScope.launch {
+                                aviso = if (repository.quitarPortada(coleccion.id)) null else Textos.t(T.error_red)
+                                reload()
+                            }
+                        },
                         onDelete = { coleccion ->
                             coroutineScope.launch {
                                 val r = repository.deleteCollection(coleccion.id)
@@ -226,6 +240,8 @@ private fun CollectionsList(
     portadas: (Coleccion) -> List<String>,
     onOpen: (Coleccion) -> Unit,
     onRename: (Coleccion) -> Unit,
+    onFoto: (Coleccion, ByteArray, String, String) -> Unit,
+    onQuitarFoto: (Coleccion) -> Unit,
     onDelete: (Coleccion) -> Unit,
 ) {
     var deleting by remember { mutableStateOf<Coleccion?>(null) }
@@ -253,8 +269,16 @@ private fun CollectionsList(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(radio(20))).background(Surface)
                     .clickable { onOpen(coleccion) }.padding(10.dp),
             ) {
-                // 2×2 carátulas; los huecos, en la superficie de al lado.
-                Column(Modifier.fillMaxWidth().aspectRatio(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                // Su foto, si tiene; si no, 2×2 carátulas (los huecos, en la superficie de al lado).
+                val foto = coleccion.portada
+                if (foto != null) {
+                    AsyncImage(
+                        model = foto,
+                        contentDescription = null,
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(radio(12))).background(Surface2),
+                    )
+                } else Column(Modifier.fillMaxWidth().aspectRatio(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     for (fila in 0..1) {
                         Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             for (col in 0..1) {
@@ -292,6 +316,15 @@ private fun CollectionsList(
                 Text(coleccion.name, color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(bottom = 8.dp))
                 OpcionHoja(Icons.Default.Folder, Textos.t(T.carpeta_abrir)) { opciones = null; onOpen(coleccion) }
                 OpcionHoja(Icons.Default.Edit, Textos.t(T.comun_renombrar)) { opciones = null; onRename(coleccion) }
+                // Foto de la carpeta: el mismo selector de imágenes que la foto de perfil.
+                com.paragon.app.ui.settings.ProfileImagePicker(
+                    onImagePicked = { bytes, mime, ext -> opciones = null; onFoto(coleccion, bytes, mime, ext) },
+                ) { elegir ->
+                    OpcionHoja(Icons.Default.Image, if (coleccion.portada != null) Textos.t(T.carpeta_cambiar_foto) else Textos.t(T.carpeta_poner_foto), onClick = elegir)
+                }
+                if (coleccion.portada != null) {
+                    OpcionHoja(Icons.Default.HideImage, Textos.t(T.carpeta_quitar_foto)) { opciones = null; onQuitarFoto(coleccion) }
+                }
                 OpcionHoja(Icons.Default.Delete, Textos.t(T.comun_borrar), color = Danger) { opciones = null; deleting = coleccion }
             }
         }

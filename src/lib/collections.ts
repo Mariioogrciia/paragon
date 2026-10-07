@@ -15,6 +15,8 @@ import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 export interface Collection {
   id: string;
   name: string;
+  /** Foto propia de la carpeta; null = se ven las carátulas de sus juegos. */
+  portada: string | null;
   gameIds: string[];
 }
 
@@ -40,6 +42,7 @@ export async function listCollections(userId: string): Promise<Collection[]> {
     .select({
       id: collections.id,
       name: collections.name,
+      portada: collections.portada,
       gameId: collectionGames.gameId,
     })
     .from(collections)
@@ -50,7 +53,7 @@ export async function listCollections(userId: string): Promise<Collection[]> {
   const byId = new Map<string, Collection>();
 
   for (const row of rows) {
-    const carpeta = byId.get(row.id) ?? { id: row.id, name: row.name, gameIds: [] };
+    const carpeta = byId.get(row.id) ?? { id: row.id, name: row.name, portada: row.portada ?? null, gameIds: [] };
     if (row.gameId) carpeta.gameIds.push(row.gameId);
     byId.set(row.id, carpeta);
   }
@@ -180,4 +183,22 @@ export async function moveGameToCollection(
 ): Promise<void> {
   await removeGameFromCollection(userId, fromCollectionId, gameId);
   await addGamesToCollection(userId, toCollectionId, [gameId]);
+}
+
+/** La foto actual de una carpeta del usuario (undefined si la carpeta no es suya). */
+export async function portadaDeCarpeta(userId: string, id: string): Promise<string | null | undefined> {
+  const [fila] = await db
+    .select({ portada: collections.portada })
+    .from(collections)
+    .where(and(eq(collections.id, id), eq(collections.userId, userId)))
+    .limit(1);
+  return fila ? fila.portada : undefined;
+}
+
+/** Pone o quita (null) la foto de una carpeta del usuario. */
+export async function setPortadaCarpeta(userId: string, id: string, portada: string | null): Promise<void> {
+  await db
+    .update(collections)
+    .set({ portada })
+    .where(and(eq(collections.id, id), eq(collections.userId, userId)));
 }

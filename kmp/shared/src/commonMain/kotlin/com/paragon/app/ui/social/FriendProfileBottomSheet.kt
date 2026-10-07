@@ -1,5 +1,7 @@
 package com.paragon.app.ui.social
 
+import com.paragon.app.ui.common.premiumClickable
+
 import com.paragon.shared.red.paragonErrorMessage
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.filled.PersonAdd
@@ -299,7 +301,9 @@ private fun ProfileContent(
                     contentPadding = PaddingValues(bottom = 28.dp),
                 ) {
                     items(profile.recentGames, key = { it.id }) { game ->
-                        RecentGameCard(game)
+                        // Su ficha de ese juego (sus trofeos), no la tuya.
+                        val abrirJuegoDe = com.paragon.app.ui.navigation.LocalAbrirJuegoDe.current
+                        RecentGameCard(game, onClick = { onDismiss(); abrirJuegoDe(profile.handle, game.id) })
                     }
                 }
             }
@@ -352,12 +356,13 @@ private fun RivalryCard(myStats: GlobalStats, their: UserProfileDto) {
  * apretado y sin más dato que el %.
  */
 @Composable
-private fun RecentGameCard(game: com.paragon.shared.red.RecentGameDto) {
+private fun RecentGameCard(game: com.paragon.shared.red.RecentGameDto, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .width(220.dp)
             .background(Surface2, RoundedCornerShape(radio(12)))
-            .clip(RoundedCornerShape(radio(12))),
+            .clip(RoundedCornerShape(radio(12)))
+            .premiumClickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier.size(64.dp).background(Background)) {

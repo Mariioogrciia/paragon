@@ -113,6 +113,7 @@
     <string name="carpeta_borrar_texto">„%1$s“ verschwindet mit den %2$s Spielen darin (die Spiele selbst bleiben, nur der Ordner wird gelöscht).</string>
     <string name="carpeta_borrar_titulo">Diesen Ordner löschen?</string>
     <string name="carpeta_buscar">In deiner Bibliothek suchen</string>
+    <string name="carpeta_cambiar_foto">Foto ändern</string>
     <string name="carpeta_err_borrar">Ordner konnte nicht gelöscht werden.</string>
     <string name="carpeta_err_cambiar">Der Ordner konnte nicht geändert werden. Prüf die Verbindung und versuch es erneut.</string>
     <string name="carpeta_err_crear">Ordner konnte nicht erstellt werden.</string>
@@ -120,7 +121,9 @@
     <string name="carpeta_err_renombrar">Ordner konnte nicht umbenannt werden.</string>
     <string name="carpeta_nueva">Neuer Ordner</string>
     <string name="carpeta_opciones">Ordneroptionen</string>
+    <string name="carpeta_poner_foto">Foto hinzufügen</string>
     <string name="carpeta_quitar">Aus dem Ordner entfernen</string>
+    <string name="carpeta_quitar_foto">Foto entfernen</string>
     <string name="carpeta_renombrar">Ordner umbenennen</string>
     <string name="carpeta_sin_juegos">Noch keine Spiele in diesem Ordner</string>
     <string name="carpeta_sin_juegos_sub">Füge sie auf ihrer Spielseite hinzu oder in der Bibliothek über das Menü jeder Karte.</string>
@@ -466,6 +469,7 @@
     <string name="inicio_ir">Los</string>
     <string name="inicio_objetivo_anclado">Dein Ziel · angeheftet</string>
     <string name="inicio_para_hoy">Für heute</string>
+    <string name="inicio_platinado_dlc">Platin · %1$s DLC übrig</string>
     <string name="inicio_proxima_sesion">Deine nächste Session</string>
     <string name="inicio_sigue_jugando">Weiterspielen</string>
     <string name="inicio_siguiente_platino_de">Nächstes Platin: %1$s</string>

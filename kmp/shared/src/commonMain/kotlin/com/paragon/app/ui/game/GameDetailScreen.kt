@@ -100,6 +100,8 @@ fun GameDetailScreen(
     tokenStore: TokenStore,
     /** Si se llega desde un trofeo: la lista baja hasta él y lo resalta. */
     trofeoInicial: String? = null,
+    /** Handle de otra persona: su ficha, en solo lectura (sin anclar, notas, carpetas...). */
+    de: String? = null,
     handle: String = "",
     onBack: () -> Unit = {},
     onModoEnfoque: () -> Unit = {},
@@ -115,7 +117,8 @@ fun GameDetailScreen(
 
     LaunchedEffect(gameId, retryCounter.value) {
         result = null
-        result = repository.getGameDetail(gameId)
+        result = repository.getGameDetail(gameId, de)
+        if (de != null) return@LaunchedEffect
         val milestoneResult = milestoneRepository.getMilestone()
         hito = (milestoneResult as? MilestoneResult.Ok)?.hito
         (milestoneResult as? MilestoneResult.Ok)?.let { ok ->
@@ -154,6 +157,7 @@ fun GameDetailScreen(
         is GameDetailResult.Ok -> GameDetailContent(
             gameId = gameId,
             trofeoInicial = trofeoInicial,
+            soloLectura = de != null,
             game = current.detail,
             fromCache = current.fromCache,
             hitoInicial = hito,
@@ -175,6 +179,7 @@ fun GameDetailScreen(
 private fun GameDetailContent(
     gameId: String,
     trofeoInicial: String?,
+    soloLectura: Boolean,
     game: GameDetailData,
     fromCache: Boolean,
     hitoInicial: HitoReservado?,
@@ -319,7 +324,9 @@ private fun GameDetailContent(
             )
         }
 
-        item {
+        // De otra persona: sin acciones ni notas (son tuyas), pero el elemento
+        // sigue ahí vacío para que el índice de "bajar al trofeo" no cambie.
+        if (soloLectura) item {} else item {
             GameActionsRow(
                 pinned = pinned,
                 reservado = reservado,
@@ -334,7 +341,7 @@ private fun GameDetailContent(
             )
         }
 
-        item {
+        if (soloLectura) item {} else item {
             NotesSection(
                 initialNotes = game.notes,
                 dynamicColor = dynamicColor,
@@ -415,6 +422,7 @@ private fun GameDetailContent(
                     TrophyRow(
                         trophy,
                         resaltado = trophy.id == resaltado,
+                        soloLectura = soloLectura,
                         game = game,
                         repository = repository,
                         tokenStore = tokenStore,
@@ -1004,6 +1012,7 @@ internal fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = 
 private fun TrophyRow(
     trophy: TrophyItem,
     resaltado: Boolean = false,
+    soloLectura: Boolean = false,
     game: GameDetailData,
     repository: GameDetailRepository,
     tokenStore: TokenStore,
@@ -1084,7 +1093,8 @@ private fun TrophyRow(
             modifier = Modifier.fillMaxWidth().padding(start = 56.dp, top = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            IconButton(
+            // "Atascado" es de tu lista: en la ficha de otra persona no.
+            if (!soloLectura) IconButton(
                 onClick = {
                     coroutineScope.launch {
                         if (isStuck) {

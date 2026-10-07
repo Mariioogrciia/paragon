@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
-import { gameProgress } from "@/lib/stats";
+import { esPlatinoEquivalente, gameProgress } from "@/lib/stats";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { ultimosTrofeos } from "@/lib/history";
@@ -24,6 +24,10 @@ function toCard(game: Game) {
     earnedTrophies: game.earnedTotal,
     totalTrophies: game.definedTotal,
     percent: game.progressPercent,
+    // Platinado de verdad (platino del juego base), aunque falten DLC: sin
+    // esto la app contaba los trofeos de DLC pendientes y lo daba por
+    // "siguiente platino".
+    platinado: esPlatinoEquivalente(game),
   };
 }
 

@@ -10,6 +10,8 @@ data class CollectionDto(
     val id: String,
     val name: String,
     val gameIds: List<String>,
+    /** Foto propia (null = las carátulas de sus juegos). */
+    val portada: String? = null,
 )
 
 @Serializable
@@ -40,6 +42,10 @@ class CollectionsApi internal constructor(private val c: ClienteParagon) {
     /** Borra una carpeta (no borra los juegos, solo la carpeta). */
     suspend fun deleteCollection(id: String): OkResponseC =
         c.http.delete("api/mobile/collections/${id.encodeURLPathPart()}").body()
+
+    /** Quita la foto de la carpeta — ver collections/[id]/portada/route.ts. */
+    suspend fun quitarPortada(id: String): OkResponseC =
+        c.http.delete("api/mobile/collections/${id.encodeURLPathPart()}/portada").body()
 
     /** Mete/saca un juego de la carpeta — ver collections/[id]/games/[gameId]/route.ts. Sin body. */
     suspend fun toggleGameInCollection(id: String, gameId: String): ToggleGameInCollectionResponse =
