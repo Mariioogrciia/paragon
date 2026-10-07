@@ -127,7 +127,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.asPaddingValues
-import dev.chrisbanes.haze.blur.hazeBlur
+import dev.chrisbanes.haze.glass.hazeGlass
 import dev.chrisbanes.haze.hazeSource
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -560,7 +560,7 @@ private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
 }
 
 /** Alto de la cápsula de la barra de abajo (sin márgenes ni la barra de gestos). */
-private val ALTO_BARRA = 64.dp
+private val ALTO_BARRA = 68.dp
 
 /**
  * La barra de abajo (7 oct 2026), como la de Instagram: una cápsula flotante
@@ -596,24 +596,23 @@ private fun BarraInferior(
     ) {
         BoxWithConstraints(
             Modifier.fillMaxWidth().height(ALTO_BARRA)
-                .shadow(24.dp, forma, ambientColor = Color.Black.copy(alpha = 0.5f), spotColor = Color.Black.copy(alpha = 0.5f))
-                .clip(forma)
-                .hazeBlur(
+                .shadow(20.dp, forma, ambientColor = Color.Black.copy(alpha = 0.45f), spotColor = Color.Black.copy(alpha = 0.45f))
+                // Cristal líquido (haze-glass), como la barra de Instagram en
+                // iOS 26: transparente, refracta el borde y brilla arriba; el
+                // tinte justo para leer los iconos sobre cualquier fondo.
+                .hazeGlass(
                     dev.chrisbanes.haze.HazeInput.Sources(hazeState),
-                    dev.chrisbanes.haze.blur.HazeBlurStyle {
-                        blurRadius(26.dp)
+                    dev.chrisbanes.haze.glass.GlassStyle {
+                        shape(forma)
                         backgroundColor(Background)
-                        colorEffects(listOf(dev.chrisbanes.haze.blur.HazeColorEffect.tint(tinte.copy(alpha = 0.55f))))
-                        fallbackColorEffect(dev.chrisbanes.haze.blur.HazeColorEffect.tint(tinte.copy(alpha = 0.94f)))
+                        tint(tinte.copy(alpha = 0.4f))
+                        // Desenfoque suave: lo de detrás se intuye (como en
+                        // Instagram) sin que se lean textos detrás de los iconos.
+                        optics(blurRadius = 10.dp)
                     },
                 )
-                // Filo de luz: más claro arriba, como el borde de un cristal.
-                .border(
-                    1.dp,
-                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.22f), Color.White.copy(alpha = 0.04f))),
-                    forma,
-                )
-                .padding(5.dp),
+                .clip(forma)
+                .padding(6.dp),
         ) {
             val ancho = maxWidth / items.size
             if (activo >= 0) {
@@ -623,7 +622,7 @@ private fun BarraInferior(
                         .width(ancho)
                         .fillMaxHeight()
                         .clip(forma)
-                        .background(Foreground.copy(alpha = 0.11f)),
+                        .background(Foreground.copy(alpha = 0.16f)),
                 )
             }
             Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -661,7 +660,7 @@ private fun BarraInferior(
                                 if (esActiva) item.icon else item.iconoInactivo,
                                 contentDescription = item.screen.title,
                                 tint = if (esActiva) Foreground else Foreground.copy(alpha = 0.72f),
-                                modifier = Modifier.size(26.dp),
+                                modifier = Modifier.size(28.dp),
                             )
                         }
                     }

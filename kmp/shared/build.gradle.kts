@@ -60,6 +60,7 @@ kotlin {
             // Desenfoque de fondo (barra de abajo "de cristal", como Instagram) en Android e iOS.
             implementation("dev.chrisbanes.haze:haze:2.0.1")
             implementation("dev.chrisbanes.haze:haze-blur:2.0.1")
+            implementation("dev.chrisbanes.haze:haze-glass:2.0.1")
             implementation("dev.whyoleg.cryptography:cryptography-provider-optimal:0.6.0")
         }
         commonTest.dependencies {
