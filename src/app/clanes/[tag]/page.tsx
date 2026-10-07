@@ -146,12 +146,17 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
             {t("ClanPage.contribucion")}
           </h2>
           <p className="mb-6 mt-1 max-w-xl text-sm text-muted">{t("ClanPage.contribucionTexto")}</p>
-          <ol className="overflow-hidden rounded-[18px] border border-border bg-surface">
+          {/* Sin overflow-hidden: recortaba el menú de gestión de cada miembro
+              (GestionMiembro). Las esquinas las redondea cada fila. */}
+          <ol className="rounded-[18px] border border-border bg-surface">
             {leaderboard.map((m, i) => {
               const parte = score > 0 ? m.contribucion / score : 0;
               const librea = libreaDe(m.userId);
               return (
-                <li key={m.userId} className="flex items-start border-b border-border last:border-0">
+                <li
+                  key={m.userId}
+                  className="flex items-start border-b border-border last:border-0 first:[&>a]:rounded-tl-[17px] last:[&>a]:rounded-bl-[17px] first:[&>a:last-child]:rounded-tr-[17px] last:[&>a:last-child]:rounded-br-[17px]"
+                >
                   <Link
                     href={`/u/${m.handle}`}
                     className="carreras-fila flex min-w-0 flex-1 flex-col gap-2.5 px-4 py-3.5"

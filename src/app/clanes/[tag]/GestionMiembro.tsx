@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { nivelRango, puedeCambiarRango, puedeExpulsar, type Rango } from "@/lib/clanRangos";
 import { cambiarRangoAction, expulsarAction } from "../actions";
@@ -27,6 +27,24 @@ export function GestionMiembro({
   const [abierto, setAbierto] = useState(false);
   const [error, setError] = useState("");
   const [pendiente, startTransition] = useTransition();
+  const caja = useRef<HTMLDivElement>(null);
+
+  // Se cierra al pulsar fuera o con Escape.
+  useEffect(() => {
+    if (!abierto) return;
+    const fuera = (e: PointerEvent) => {
+      if (!caja.current?.contains(e.target as Node)) setAbierto(false);
+    };
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAbierto(false);
+    };
+    document.addEventListener("pointerdown", fuera);
+    document.addEventListener("keydown", tecla);
+    return () => {
+      document.removeEventListener("pointerdown", fuera);
+      document.removeEventListener("keydown", tecla);
+    };
+  }, [abierto]);
 
   const rangos: Rango[] = (["owner", "colider", "veterano", "member"] as Rango[]).filter((r) => puedeCambiarRango(miRango, rangoMiembro, r));
   const expulsable = puedeExpulsar(miRango, rangoMiembro);
@@ -46,7 +64,7 @@ export function GestionMiembro({
     r === "owner" ? t("hacerLider") : nivelRango(r) > nivelRango(rangoMiembro) ? t("ascenderA", { rango: t(`rango_${r}`) }) : t("degradarA", { rango: t(`rango_${r}`) });
 
   return (
-    <div className="relative">
+    <div className="relative" ref={caja}>
       <button
         type="button"
         onClick={() => setAbierto((a) => !a)}
