@@ -20,8 +20,15 @@ export async function GET(req: Request) {
   }
   if (url.protocol !== "https:" || url.hostname !== HOST) return new Response(null, { status: 400 });
 
+  // En local, Avast también corta la descarga desde el propio servidor: se
+  // pide a la ruta de producción, que la sirve desde vercel.app.
+  const origen =
+    process.env.NODE_ENV === "development"
+      ? `https://platinos-nine.vercel.app/api/esports/img?u=${encodeURIComponent(url.toString())}`
+      : url;
+
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8_000), cache: "no-store" });
+    const res = await fetch(origen, { signal: AbortSignal.timeout(8_000), cache: "no-store" });
     const tipo = res.headers.get("content-type") ?? "";
     const largo = Number(res.headers.get("content-length") ?? 0);
     if (!res.ok || !res.body || !tipo.startsWith("image/") || largo > MAX_BYTES) {
