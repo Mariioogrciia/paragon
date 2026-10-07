@@ -278,7 +278,7 @@ fun LibraryScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
-                        contentPadding = PaddingValues(bottom = 32.dp)
+                        contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
                     ) {
                         items(games, key = { it.id }) { game ->
                             if (isList) {

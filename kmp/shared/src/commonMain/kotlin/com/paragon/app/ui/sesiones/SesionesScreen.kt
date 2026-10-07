@@ -165,7 +165,7 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = if (embebida) 96.dp else 32.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(sesiones, key = { it.id }) { s -> FilaSesion(s) { onAbrir(s.id) } }
@@ -334,7 +334,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                     else -> null
                 }
                 Column(
-                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 32.dp),
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Tarjeta {

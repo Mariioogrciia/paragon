@@ -3011,6 +3011,84 @@
   "es": "Eres el líder: si sales, el liderazgo pasará a {0}.",
   "fr": "Tu es le chef : si tu pars, {0} prendra la direction."
  },
+ "amigos_lista": {
+  "de": "Freunde",
+  "en": "Friends",
+  "es": "Amigos",
+  "fr": "Amis"
+ },
+ "amigos_solicitudes_n": {
+  "de": "Anfragen · {0}",
+  "en": "Requests · {0}",
+  "es": "Solicitudes · {0}",
+  "fr": "Demandes · {0}"
+ },
+ "amigos_sin_solicitudes": {
+  "de": "Keine Anfragen",
+  "en": "No requests",
+  "es": "Sin solicitudes",
+  "fr": "Aucune demande"
+ },
+ "amigos_sin_solicitudes_sub": {
+  "de": "Wenn dich jemand hinzufügen will, erscheint es hier.",
+  "en": "When someone wants to add you, it'll show up here.",
+  "es": "Cuando alguien quiera agregarte, aparecerá aquí.",
+  "fr": "Quand quelqu'un voudra t'ajouter, ça apparaîtra ici."
+ },
+ "racha_dia_seguido": {
+  "de": "Tag in Folge",
+  "en": "day in a row",
+  "es": "día seguido",
+  "fr": "jour d'affilée"
+ },
+ "racha_dias_seguidos": {
+  "de": "Tage in Folge",
+  "en": "days in a row",
+  "es": "días seguidos",
+  "fr": "jours d'affilée"
+ },
+ "racha_es_record": {
+  "de": "Das ist deine beste Serie!",
+  "en": "This is your best streak!",
+  "es": "¡Es tu mejor racha!",
+  "fr": "C'est ta meilleure série !"
+ },
+ "racha_falta_hoy": {
+  "de": "Hol dir heute eine Trophäe, um {0} Tage zu erreichen.",
+  "en": "Earn a trophy today to reach {0} days.",
+  "es": "Consigue un trofeo hoy para llegar a {0} días.",
+  "fr": "Obtiens un trophée aujourd'hui pour atteindre {0} jours."
+ },
+ "racha_hacia_record": {
+  "de": "Heute zählt schon · noch {0} Tage bis zum Rekord",
+  "en": "Today counts · {0} days to your record",
+  "es": "Hoy ya cuenta · {0} días para tu récord",
+  "fr": "Aujourd'hui compte · {0} jours avant ton record"
+ },
+ "racha_trofeos_semana": {
+  "de": "Diese Woche",
+  "en": "This week",
+  "es": "Esta semana",
+  "fr": "Cette semaine"
+ },
+ "racha_esta_semana": {
+  "de": "Diese Woche",
+  "en": "This week",
+  "es": "Esta semana",
+  "fr": "Cette semaine"
+ },
+ "racha_menos": {
+  "de": "Weniger",
+  "en": "Less",
+  "es": "Menos",
+  "fr": "Moins"
+ },
+ "racha_mas": {
+  "de": "Mehr",
+  "en": "More",
+  "es": "Más",
+  "fr": "Plus"
+ },
  "panel_ultimos_trofeos": {
   "de": "Letzte Trophäen",
   "en": "Latest trophies",

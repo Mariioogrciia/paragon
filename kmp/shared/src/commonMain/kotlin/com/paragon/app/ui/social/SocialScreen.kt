@@ -1,5 +1,7 @@
 package com.paragon.app.ui.social
 
+import androidx.compose.foundation.verticalScroll
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -64,6 +66,14 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     var clansResult by remember { mutableStateOf<ClansResult?>(null) }
     var clanInvites by remember { mutableStateOf<List<ClanInvite>>(emptyList()) }
     var selectedTab by remember { mutableIntStateOf(0) }
+    // Dentro de Amigos: 0 la lista, 1 solicitudes, 2 añadir (QR y @usuario).
+    var subAmigos by remember { mutableIntStateOf(0) }
+    var nSolicitudes by remember { mutableIntStateOf(0) }
+    LaunchedEffect(selectedTab, subAmigos) {
+        if (selectedTab == 2) nSolicitudes = try {
+            com.paragon.app.data.network.ApiClient.amigosApi(tokenStore).pendientes().pendientes.size
+        } catch (e: Exception) { nSolicitudes }
+    }
     val retryCounter = remember { mutableIntStateOf(0) }
     val leaguesRefresh = remember { mutableIntStateOf(0) }
     val clansRefresh = remember { mutableIntStateOf(0) }
@@ -110,8 +120,20 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
         )
 
-        // Amigos: añadir por @usuario y responder solicitudes (antes, solo la lista).
-        if (selectedTab == 2) AmigosCabecera(tokenStore, onCambio = { retryCounter.value += 1 }, miHandle = myHandle)
+        // Amigos: la lista, las solicitudes y añadir, cada una en su apartado
+        // (antes todo iba encima de la lista y no se veía casi ningún amigo).
+        if (selectedTab == 2) {
+            com.paragon.app.ui.common.ControlSegmentado(
+                opciones = listOf(
+                    Textos.t(T.amigos_lista),
+                    if (nSolicitudes > 0) Textos.t(T.amigos_solicitudes_n, nSolicitudes) else Textos.t(T.amigos_solicitudes),
+                    Textos.t(T.amigos_anadir),
+                ),
+                seleccion = subAmigos,
+                onCambio = { subAmigos = it },
+                modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 4.dp),
+            )
+        }
 
         if (selectedTab == 3) {
             when (val current = clansResult) {
@@ -131,7 +153,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 is ClansResult.Ok -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                 ) {
                     if (clanInvites.isNotEmpty()) {
                         items(clanInvites, key = { it.clanId }) { invite ->
@@ -197,7 +219,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 is LeaguesResult.Ok -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                 ) {
                     if (current.fromCache) {
                         item { OfflineBanner() }
@@ -238,6 +260,14 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                     }
                 }
             }
+        } else if (selectedTab == 2 && subAmigos != 0) {
+            AmigosCabecera(
+                tokenStore,
+                onCambio = { retryCounter.value += 1; nSolicitudes = (nSolicitudes - 1).coerceAtLeast(0) },
+                miHandle = myHandle,
+                seccion = if (subAmigos == 1) SeccionAmigos.SOLICITUDES else SeccionAmigos.ANADIR,
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra()),
+            )
         } else {
             when (val current = result) {
                 null -> com.paragon.app.ui.common.EsqueletoLista(filas = 6)
@@ -277,7 +307,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                                 .fillMaxSize()
                                 .padding(horizontal = 24.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp)
+                            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
                         ) {
                             if (current.fromCache) {
                                 item { OfflineBanner() }

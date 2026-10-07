@@ -310,7 +310,7 @@ private fun GameDetailContent(
     val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
 
     Box(Modifier.fillMaxSize()) {
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background)) {
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background), contentPadding = PaddingValues(bottom = com.paragon.app.ui.common.huecoBarra())) {
         item {
             GameDetailHero(
                 game = game,

@@ -111,7 +111,7 @@ private fun StatsContent(stats: ParagonStats, handle: String, achievements: Achi
         // abajo — más aún cuando esa barra se oculta/aparece al hacer
         // scroll (ver bottomBarVisible en MainScreen.kt) y el hueco
         // reservado cambia de tamaño en el momento.
-        contentPadding = PaddingValues(top = 8.dp, bottom = 96.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         // Mismo aviso que Biblioteca/Panel/Ficha de juego/Feed cuando se
         // sirve la caché de respaldo — Estadísticas no lo tenía (hueco real

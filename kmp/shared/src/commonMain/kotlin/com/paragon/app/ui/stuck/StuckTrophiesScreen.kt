@@ -70,7 +70,7 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 32.dp, top = 16.dp)
+                    contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra(), top = 16.dp)
                 ) {
                     items(current, key = { it.trophyId }) { trophy ->
                         StuckTrophyCard(

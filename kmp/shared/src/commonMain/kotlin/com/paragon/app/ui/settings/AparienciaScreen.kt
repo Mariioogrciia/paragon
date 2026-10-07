@@ -154,7 +154,7 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra()),
         ) {
             Muestra(tokenStore)
 

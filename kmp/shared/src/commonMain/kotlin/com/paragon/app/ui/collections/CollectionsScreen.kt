@@ -261,7 +261,7 @@ private fun CollectionsList(
         modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp),
+        contentPadding = PaddingValues(top = 12.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         items(collections, key = { it.id }) { coleccion ->
             val caratulas = portadas(coleccion)
@@ -378,7 +378,7 @@ private fun CollectionDetail(games: List<LibraryGame>, onAnadir: () -> Unit, onO
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         items(games, key = { it.id }) { game ->
             Row(

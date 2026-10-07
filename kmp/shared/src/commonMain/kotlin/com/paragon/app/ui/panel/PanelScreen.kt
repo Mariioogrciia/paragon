@@ -158,7 +158,7 @@ fun PanelScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Background),
-            contentPadding = PaddingValues(bottom = 32.dp)
+            contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
         ) {
             item { Column {
                 // Rediseño del 5 oct 2026 (maqueta "1 · Inicio"): cabecera propia

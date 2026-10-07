@@ -139,7 +139,7 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirTrofeo: (game
                 val filtrados = remember(d, dia) { d.trofeos.filter { dia == null || it.earnedAt.startsWith(dia!!) } }
                 val porDia = remember(filtrados) { filtrados.groupBy { it.earnedAt.take(10) }.toList() }
                 val vista = vistaTrofeosActual
-                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp)) {
+                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())) {
                     item {
                         BarrasDias(d, dia) { dia = if (dia == it) null else it }
                     }

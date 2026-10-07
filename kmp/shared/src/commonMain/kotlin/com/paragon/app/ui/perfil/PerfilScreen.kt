@@ -92,7 +92,7 @@ fun PerfilScreen(
     var verQr by remember { mutableStateOf(false) }
     if (verQr) HojaMiQr(handle = profile.handle, onDismiss = { verQr = false })
     Column(
-        Modifier.fillMaxSize().background(Background).verticalScroll(rememberScrollState()).padding(bottom = 32.dp),
+        Modifier.fillMaxSize().background(Background).verticalScroll(rememberScrollState()).padding(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(Textos.t(T.nav_perfil), color = Foreground, fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))

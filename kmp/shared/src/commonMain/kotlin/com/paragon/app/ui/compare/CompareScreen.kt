@@ -139,7 +139,7 @@ private fun FriendsPicker(amigos: List<AmigoRow>, onPick: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(top = 4.dp, bottom = 32.dp),
+        contentPadding = PaddingValues(top = 4.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         item {
             Text(
@@ -185,7 +185,7 @@ private fun CompareContent(data: CompareData) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(bottom = 32.dp),
+        contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         item { CompareSummary(data.me, data.them, data.resultado) }
         item {

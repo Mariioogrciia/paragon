@@ -199,7 +199,7 @@ fun LinkedAccountsScreen(
                     .padding(paddingValues)
                     .padding(horizontal = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 32.dp)
+                contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
             ) {
                 steamProgreso?.let { (hechos, total) ->
                     item {

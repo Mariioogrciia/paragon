@@ -105,7 +105,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra())
         ) {
             Text(Textos.t(T.ajustes_seccion_perfil), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(12.dp))
