@@ -375,5 +375,18 @@
     "principal": "Main",
     "oficial": "Official",
     "otrosPartidos": "More matches in this stage"
+  },
+  "PlatinosOferta": {
+    "titulo": "Platinums on sale",
+    "descripcion": "Discounted Steam games with an achievable 100%: difficulty comes from the rarest achievement on Steam. Games you own are left out.",
+    "logros": "{n} achievements · rarest, {raro}%",
+    "horas": "~{h} h to 100%",
+    "verFicha": "View game",
+    "verEnSteam": "View on Steam",
+    "nota": "Prices from Steam Spain. Deals via CheapShark; difficulty estimated from Steam's global percentages.",
+    "difMuyFacil": "Very easy",
+    "difFacil": "Easy",
+    "difMedia": "Medium",
+    "difDificil": "Hard"
   }
 }

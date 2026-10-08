@@ -941,3 +941,48 @@ total contando a quien organiza** (4 = el anfitrión + 3 libres).
 - `GET /api/mobile/friends` → `{ pendientes: [{ userId, handle, name, image }] }`: solicitudes que te han enviado.
 - `POST /api/mobile/friends` `{ handle }` (con o sin @) → `{ ok, amigos }` (`amigos`: esa persona ya te la había enviado y quedáis como amigos). 409 con el motivo ("No existe nadie con ese usuario.", "Ya sois amigos."...).
 - `POST /api/mobile/friends/{userId}` → aceptar su solicitud. `DELETE` → rechazarla o dejar de ser amigos.
+
+## Añadido el 8 oct 2026 — precios y "Platinos de oferta"
+
+### `GET /api/mobile/games/{gameId}/precios` — Precio en PC de un juego
+
+```json
+{ "precios": {
+  "steamAppId": "1245620",
+  "precio": { "final": 35.99, "inicial": 59.99, "descuento": 40 },
+  "ofertas": [{ "tienda": "GreenManGaming", "precio": 31.49, "precioOriginal": 59.99, "ahorro": 48, "url": "https://...", "viaCheapShark": true }],
+  "minimoHistoricoUsd": 23.99,
+  "alerta": 30
+} }
+```
+`precios: null` si el juego no tiene versión de PC: el AppID de Steam es el
+suyo si es de Steam y, si no (PSN, Xbox, a mano), el que enlaza IGDB
+(`lib/preciosJuego.ts`). `precio` es Steam España en **euros** (null si no
+está a la venta); `ofertas` y `minimoHistoricoUsd` vienen de CheapShark, en
+**dólares**. `alerta`: tu precio objetivo, o null.
+
+### `GET|POST|DELETE /api/mobile/price-alerts` — Alertas de precio
+
+- `GET` → `{ alertas: [{ steamAppId, gameId, titulo, precioObjetivo, precio: PrecioSteam|null, avisadoAt }] }`, la más nueva primero, con el precio de ahora en Steam España.
+- `POST { steamAppId, gameId, titulo, precioObjetivo }` → `{ ok: true }`. Crea o cambia la alerta (mismas reglas que la web: 0,01 a 999 €). 400 con el motivo si no vale.
+- `DELETE ?steamAppId=` → `{ ok: true }`.
+
+Las comprueba el cron (`lib/priceAlerts.ts`) y el aviso sale por `avisarUsuario`: push FCM en Android; en iOS, sin push, en la app.
+
+### `GET /api/mobile/platinos-oferta` — Platinos de oferta
+
+```json
+{ "ofertas": [{
+  "steamAppId": "304430", "titulo": "INSIDE",
+  "caratula": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/304430/header.jpg",
+  "precio": { "final": 2.29, "inicial": 22.99, "descuento": 90 }, "precioUsd": 1.99, "ahorro": 90,
+  "logros": 14, "logroMasRaro": 14, "dificultad": { "nivel": 4, "etiqueta": "Media", "color": "#8fa347" },
+  "horas": null, "gameId": null, "url": "https://store.steampowered.com/app/304430/"
+}] }
+```
+Juegos de Steam rebajados (CheapShark) con un 100 % asequible: `dificultad`
+sale del logro más raro según los porcentajes globales de Steam
+(`lib/platinosOferta.ts`, nivel 1-10, hasta 6). Sin los que ya tienes en
+Steam. `horas` (HowLongToBeat) y `gameId` solo si el juego ya está en
+Paragon; sin `gameId`, la app abre `url`. La primera petición tarda unos
+segundos (consulta Steam juego a juego); luego va en caché.

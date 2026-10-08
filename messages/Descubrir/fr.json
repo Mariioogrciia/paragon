@@ -375,5 +375,18 @@
     "principal": "Principal",
     "oficial": "Officiel",
     "otrosPartidos": "Autres matchs de cette phase"
+  },
+  "PlatinosOferta": {
+    "titulo": "Platines en promo",
+    "descripcion": "Jeux Steam en promo avec un 100 % abordable : la difficulté vient du succès le plus rare selon Steam. Sans ceux que tu possèdes.",
+    "logros": "{n} succès · le plus rare : {raro} %",
+    "horas": "~{h} h pour le 100 %",
+    "verFicha": "Voir la fiche",
+    "verEnSteam": "Voir sur Steam",
+    "nota": "Prix de Steam Espagne. Promos via CheapShark ; difficulté estimée avec les pourcentages globaux de Steam.",
+    "difMuyFacil": "Très facile",
+    "difFacil": "Facile",
+    "difMedia": "Moyenne",
+    "difDificil": "Difficile"
   }
 }

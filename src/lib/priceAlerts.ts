@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { priceAlerts } from "@/db/schema";
 import { precioSteamEs } from "@/lib/steamPrecio";
@@ -38,6 +38,22 @@ export async function guardarAlertaPrecio(
       // vuelva a avisar si el precio ya está por debajo del objetivo nuevo.
       set: { precioObjetivo: datos.precioObjetivo, titulo: datos.titulo, gameId: datos.gameId, avisadoAt: null, precioAvisado: null },
     });
+}
+
+/** Todas las alertas de alguien, de la más nueva a la más antigua (la app las lista). */
+export async function getAlertasPrecio(userId: string) {
+  return db
+    .select({
+      steamAppId: priceAlerts.steamAppId,
+      gameId: priceAlerts.gameId,
+      titulo: priceAlerts.titulo,
+      precioObjetivo: priceAlerts.precioObjetivo,
+      avisadoAt: priceAlerts.avisadoAt,
+      precioAvisado: priceAlerts.precioAvisado,
+    })
+    .from(priceAlerts)
+    .where(eq(priceAlerts.userId, userId))
+    .orderBy(desc(priceAlerts.creadoAt));
 }
 
 export async function borrarAlertaPrecio(userId: string, steamAppId: string): Promise<void> {

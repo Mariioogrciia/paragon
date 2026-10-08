@@ -1,7 +1,33 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **7 de octubre de 2026** (tarde).
+releer todo el historial. Última actualización: **8 de octubre de 2026**.
+
+**8 oct — precios en la app y "Platinos de oferta":**
+- **"Platinos de oferta"** (`lib/platinosOferta.ts`): ofertas de Steam de
+  CheapShark (2 páginas, 120) cruzadas con la rareza GLOBAL de los logros de
+  Steam (API pública sin clave): el logro más raro da la dificultad del 100 %
+  con la escala de siempre (`dificultadDesdeRareza`, hasta nivel 6). Precio
+  en euros de Steam España solo de las que se enseñan; horas de HLTB y ficha
+  si el juego ya está en Paragon; sin los que ya tienes en Steam. No se usan
+  las horas de HLTB ni los votos para filtrar: solo 22 juegos tienen horas y
+  hay 1 voto (8 oct). Primera vez ~8 s (Steam juego a juego), luego caché.
+  - Web: sección en Descubrir › Steam, en su propio `<Suspense>`
+    (`components/PlatinosDeOferta.tsx`).
+  - App: pantalla `ui/precios/PlatinosOfertaScreen` desde Perfil, con tus
+    alertas de precio arriba.
+- **Precio en la ficha de la app** (`TarjetaPrecioFicha`): Steam España en €,
+  la tienda más barata y el mínimo histórico (CheapShark, en US$) y botón de
+  alerta. No sale en tus propios juegos de Steam ni sin versión de PC
+  (`lib/preciosJuego.ts`: AppID propio o el que enlaza IGDB). Es un elemento
+  fijo de la lista: el índice de "bajar al trofeo" pasa de 4 a 5.
+- API móvil (CONTRACT.md): `games/{id}/precios`, `price-alerts` (GET/POST/
+  DELETE, mismas reglas que la web) y `platinos-oferta`. Modo demo con datos.
+- Arreglo: "Ofertas en Steam" de Descubrir pintaba "€" con precios de
+  CheapShark, que son dólares.
+- **Sin probar en un móvil**: el emulador no arranca desde la actualización
+  de Windows (26200 → 26300): `WHPX: Failed to setup partition` (acceso
+  denegado). Probablemente basta con reiniciar el PC.
 
 **7 oct (tarde) — cristal en la ficha, fotos de eSports y menú del clan:**
 - **Cristal en la ficha del juego** (apps): el botón de volver es de cristal
