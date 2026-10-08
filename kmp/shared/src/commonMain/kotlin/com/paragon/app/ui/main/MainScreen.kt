@@ -425,6 +425,14 @@ fun MainScreen(
             }
 
             // Desglose del mes (como /ritmo en la web) — ver ui/trofeos.
+            composable(Screen.PlatinosOferta.route) {
+                com.paragon.app.ui.precios.PlatinosOfertaScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrirJuego = { g -> navController.navigate(Screen.GameDetail.routeFor(g)) },
+                )
+            }
+
             composable(Screen.Ritmo.route) {
                 com.paragon.app.ui.trofeos.RitmoScreen(
                     tokenStore = tokenStore,

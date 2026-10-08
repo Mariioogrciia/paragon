@@ -329,6 +329,10 @@
     <string name="diario_inicio">Ton aventure dans %1$s a commencé le %2$s, avec « %3$s ».</string>
     <string name="diario_muro">Ton plus gros obstacle a été « %1$s » : tu es resté %2$s jours sans rien débloquer avant de l\'obtenir.</string>
     <string name="diario_titulo">📖 Le journal du platine</string>
+    <string name="dif_dificil">Difficile</string>
+    <string name="dif_facil">Facile</string>
+    <string name="dif_media">Moyenne</string>
+    <string name="dif_muy_facil">Très facile</string>
     <string name="duracion_anios">Ans</string>
     <string name="duracion_anios_1">%1$s an</string>
     <string name="duracion_anios_n">%1$s ans</string>
@@ -556,6 +560,17 @@
     <string name="nav_panel">Accueil</string>
     <string name="nav_perfil">Profil</string>
     <string name="nav_sesiones">Sessions</string>
+    <string name="ofertas_ahora_sin_precio">—</string>
+    <string name="ofertas_alerta_fila">Objectif %1$s · maintenant %2$s</string>
+    <string name="ofertas_horas">~%1$s h pour le 100 %%</string>
+    <string name="ofertas_logros">%1$s succès · le plus rare : %2$s %%</string>
+    <string name="ofertas_nota">Prix de Steam Espagne. Promos via CheapShark ; difficulté selon les pourcentages globaux de Steam.</string>
+    <string name="ofertas_por_debajo">En dessous !</string>
+    <string name="ofertas_sin_alertas">Crée une alerte depuis la fiche d\'un jeu qui existe sur PC.</string>
+    <string name="ofertas_texto" formatted="false">Jeux Steam en promo avec un 100 % abordable : la difficulté vient du succès le plus rare selon Steam. Sans ceux que tu possèdes.</string>
+    <string name="ofertas_titulo">Platines en promo</string>
+    <string name="ofertas_tus_alertas">TES ALERTES DE PRIX</string>
+    <string name="ofertas_vacio" formatted="false">Aucune promo avec un 100 % abordable pour l\'instant.</string>
     <string name="panel_a_por_este">VISE CE PLATINE MAINTENANT</string>
     <string name="panel_cerrojo">VERROU D\'ÉTAPE</string>
     <string name="panel_cerrojo_texto">%1$s réservé pour ton platine n°%2$s</string>
@@ -601,6 +616,18 @@
     <string name="perfil_tu_caza">Ta chasse</string>
     <string name="perfil_ventaja">Tu mènes dans %1$s catégories sur %2$s</string>
     <string name="perfil_ventaja_todo">" — tu mènes partout."</string>
+    <string name="precio_alerta_activa">On te prévient sous %1$s</string>
+    <string name="precio_alerta_campo">Prix visé (€)</string>
+    <string name="precio_alerta_error">Indique un prix entre 0,01 et 999 €.</string>
+    <string name="precio_alerta_guardar">Enregistrer</string>
+    <string name="precio_alerta_quitar">Retirer l\'alerte</string>
+    <string name="precio_alerta_texto">On te préviendra quand %1$s passera sous ce prix sur Steam.</string>
+    <string name="precio_alerta_titulo">Alerte de prix</string>
+    <string name="precio_avisarme">M\'alerter s\'il baisse</string>
+    <string name="precio_mas_barato">Le moins cher : %1$s · %2$s US$</string>
+    <string name="precio_minimo">Prix le plus bas : %1$s US$</string>
+    <string name="precio_no_a_la_venta">Pas en vente sur Steam Espagne</string>
+    <string name="precio_titulo">PRIX SUR PC</string>
     <string name="push_canal">Notifications Paragon</string>
     <string name="qr_compartir_sesion">Partager la session</string>
     <string name="qr_compartir_sesion_sub">Fais-le scanner pour la voir et la rejoindre.</string>

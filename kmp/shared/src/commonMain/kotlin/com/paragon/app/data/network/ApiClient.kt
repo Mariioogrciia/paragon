@@ -37,6 +37,7 @@ object ApiClient {
     fun settingsApi(tokenStore: TokenStore) = cliente(tokenStore).settings
     fun statsApi(tokenStore: TokenStore) = cliente(tokenStore).stats
     fun milestoneApi(tokenStore: TokenStore) = cliente(tokenStore).milestone
+    fun preciosApi(tokenStore: TokenStore) = cliente(tokenStore).precios
     fun collectionsApi(tokenStore: TokenStore) = cliente(tokenStore).collections
     fun compareApi(tokenStore: TokenStore) = cliente(tokenStore).compare
     fun pushTokenApi(tokenStore: TokenStore) = cliente(tokenStore).pushToken

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Folder
@@ -142,7 +143,8 @@ fun PerfilScreen(
             Fila(Icons.Default.CalendarMonth, Textos.t(T.ritmo_titulo)) { onNavigate(Screen.Ritmo.route) }
             Fila(Icons.Default.CenterFocusStrong, Textos.t(T.nav_enfoque)) { onNavigate(Screen.Focus.route) }
             Fila(Icons.Default.Star, Textos.t(T.nav_atascados_menu)) { onNavigate(Screen.StuckTrophies.route) }
-            Fila(Icons.Default.Folder, Textos.t(T.nav_carpetas), ultima = true) { onNavigate(Screen.Collections.route) }
+            Fila(Icons.Default.Folder, Textos.t(T.nav_carpetas)) { onNavigate(Screen.Collections.route) }
+            Fila(Icons.Default.LocalOffer, Textos.t(T.ofertas_titulo), ultima = true) { onNavigate(Screen.PlatinosOferta.route) }
         }
         if (!modoZen) Grupo(Textos.t(T.perfil_con_otros)) {
             Fila(Icons.Default.Groups, Textos.t(T.nav_sesiones)) { onNavigate(Screen.Sessions.route) }

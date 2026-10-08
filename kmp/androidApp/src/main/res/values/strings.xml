@@ -331,6 +331,10 @@
     <string name="diario_inicio">Tu aventura en %1$s empezó el %2$s, con «%3$s».</string>
     <string name="diario_muro">Tu mayor muro fue superar «%1$s»: estuviste %2$s días sin desbloquear nada antes de conseguirlo.</string>
     <string name="diario_titulo">📖 El diario del platino</string>
+    <string name="dif_dificil">Difícil</string>
+    <string name="dif_facil">Fácil</string>
+    <string name="dif_media">Media</string>
+    <string name="dif_muy_facil">Muy fácil</string>
     <string name="duracion_anios">Años</string>
     <string name="duracion_anios_1">%1$s año</string>
     <string name="duracion_anios_n">%1$s años</string>
@@ -558,6 +562,17 @@
     <string name="nav_panel">Panel</string>
     <string name="nav_perfil">Perfil</string>
     <string name="nav_sesiones">Sesiones</string>
+    <string name="ofertas_ahora_sin_precio">—</string>
+    <string name="ofertas_alerta_fila">Objetivo %1$s · ahora %2$s</string>
+    <string name="ofertas_horas">~%1$s h al 100 %%</string>
+    <string name="ofertas_logros">%1$s logros · el más raro, %2$s %%</string>
+    <string name="ofertas_nota">Precios de Steam España. Ofertas vía CheapShark; dificultad con los porcentajes globales de Steam.</string>
+    <string name="ofertas_por_debajo">¡Por debajo!</string>
+    <string name="ofertas_sin_alertas">Pon una alerta desde la ficha de un juego que tenga versión de PC.</string>
+    <string name="ofertas_texto" formatted="false">Juegos de Steam rebajados cuyo 100 % es asequible: la dificultad sale del logro más raro según Steam. Sin los que ya tienes.</string>
+    <string name="ofertas_titulo">Platinos de oferta</string>
+    <string name="ofertas_tus_alertas">TUS ALERTAS DE PRECIO</string>
+    <string name="ofertas_vacio" formatted="false">Ahora mismo no hay ofertas con un 100 % asequible.</string>
     <string name="panel_a_por_este">A POR ESTE PLATINO AHORA</string>
     <string name="panel_cerrojo">CERROJO DE HITOS</string>
     <string name="panel_cerrojo_texto">%1$s reservado para tu platino #%2$s</string>
@@ -603,6 +618,18 @@
     <string name="perfil_tu_caza">Tu caza</string>
     <string name="perfil_ventaja">Vas por delante en %1$s de %2$s categorías</string>
     <string name="perfil_ventaja_todo">" — les llevas ventaja en todo."</string>
+    <string name="precio_alerta_activa">Te avisamos por debajo de %1$s</string>
+    <string name="precio_alerta_campo">Precio objetivo (€)</string>
+    <string name="precio_alerta_error">Pon un precio entre 0,01 y 999 €.</string>
+    <string name="precio_alerta_guardar">Guardar</string>
+    <string name="precio_alerta_quitar">Quitar alerta</string>
+    <string name="precio_alerta_texto">Te avisaremos cuando %1$s baje de este precio en Steam.</string>
+    <string name="precio_alerta_titulo">Alerta de precio</string>
+    <string name="precio_avisarme">Avisarme si baja</string>
+    <string name="precio_mas_barato">Más barato: %1$s · %2$s US$</string>
+    <string name="precio_minimo">Mínimo histórico: %1$s US$</string>
+    <string name="precio_no_a_la_venta">No está a la venta en Steam España</string>
+    <string name="precio_titulo">PRECIO EN PC</string>
     <string name="push_canal">Avisos de Paragon</string>
     <string name="qr_compartir_sesion">Compartir sesión</string>
     <string name="qr_compartir_sesion_sub">Que lo escaneen para verla y unirse.</string>

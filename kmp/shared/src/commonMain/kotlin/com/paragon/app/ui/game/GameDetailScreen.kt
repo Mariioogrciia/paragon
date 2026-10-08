@@ -297,7 +297,7 @@ private fun GameDetailContent(
         }
         kotlinx.coroutines.delay(350) // que la lista se recomponga con los filtros quitados
         val cuadricula = com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA
-        var indice = 4 + (if (game.diario != null) 1 else 0)
+        var indice = 5 + (if (game.diario != null) 1 else 0)
         for ((grupoId, lista) in gruposActuales) {
             if (grupoId != null) indice++
             val pos = lista.indexOfFirst { it.id == objetivo }
@@ -366,6 +366,18 @@ private fun GameDetailContent(
                         repository.saveNotes(gameId, newNotes)
                     }
                 }
+            )
+        }
+
+        // Precio en PC con alerta (8 oct 2026, ui/precios). No en tus propios
+        // juegos de Steam (ya los tienes); sin versión de PC no pinta nada.
+        // Elemento fijo, aunque esté vacío, para el índice de "bajar al trofeo".
+        if (gameId.startsWith("steam-") && !soloLectura) item {} else item {
+            com.paragon.app.ui.precios.TarjetaPrecioFicha(
+                gameId = gameId,
+                titulo = game.title,
+                tokenStore = tokenStore,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
             )
         }
 

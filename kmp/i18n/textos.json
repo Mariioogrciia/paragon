@@ -4954,5 +4954,167 @@
   "en": "Friends",
   "es": "Amigos",
   "fr": "Amis"
+ },
+ "precio_titulo": {
+  "de": "PC-PREIS",
+  "en": "PC PRICE",
+  "es": "PRECIO EN PC",
+  "fr": "PRIX SUR PC"
+ },
+ "precio_no_a_la_venta": {
+  "de": "Nicht im spanischen Steam erhältlich",
+  "en": "Not on sale on Steam Spain",
+  "es": "No está a la venta en Steam España",
+  "fr": "Pas en vente sur Steam Espagne"
+ },
+ "precio_minimo": {
+  "de": "Tiefstpreis: {0} US$",
+  "en": "All-time low: US${0}",
+  "es": "Mínimo histórico: {0} US$",
+  "fr": "Prix le plus bas : {0} US$"
+ },
+ "precio_mas_barato": {
+  "de": "Am günstigsten: {0} · {1} US$",
+  "en": "Cheapest: {0} · US${1}",
+  "es": "Más barato: {0} · {1} US$",
+  "fr": "Le moins cher : {0} · {1} US$"
+ },
+ "precio_avisarme": {
+  "de": "Bei Preissenkung benachrichtigen",
+  "en": "Alert me when it drops",
+  "es": "Avisarme si baja",
+  "fr": "M'alerter s'il baisse"
+ },
+ "precio_alerta_activa": {
+  "de": "Wir melden uns unter {0}",
+  "en": "We'll alert you below {0}",
+  "es": "Te avisamos por debajo de {0}",
+  "fr": "On te prévient sous {0}"
+ },
+ "precio_alerta_titulo": {
+  "de": "Preisalarm",
+  "en": "Price alert",
+  "es": "Alerta de precio",
+  "fr": "Alerte de prix"
+ },
+ "precio_alerta_texto": {
+  "de": "Wir sagen Bescheid, wenn {0} auf Steam unter diesen Preis fällt.",
+  "en": "We'll let you know when {0} drops below this price on Steam.",
+  "es": "Te avisaremos cuando {0} baje de este precio en Steam.",
+  "fr": "On te préviendra quand {0} passera sous ce prix sur Steam."
+ },
+ "precio_alerta_campo": {
+  "de": "Zielpreis (€)",
+  "en": "Target price (€)",
+  "es": "Precio objetivo (€)",
+  "fr": "Prix visé (€)"
+ },
+ "precio_alerta_guardar": {
+  "de": "Speichern",
+  "en": "Save",
+  "es": "Guardar",
+  "fr": "Enregistrer"
+ },
+ "precio_alerta_quitar": {
+  "de": "Alarm entfernen",
+  "en": "Remove alert",
+  "es": "Quitar alerta",
+  "fr": "Retirer l'alerte"
+ },
+ "precio_alerta_error": {
+  "de": "Gib einen Preis zwischen 0,01 und 999 € ein.",
+  "en": "Enter a price between €0.01 and €999.",
+  "es": "Pon un precio entre 0,01 y 999 €.",
+  "fr": "Indique un prix entre 0,01 et 999 €."
+ },
+ "ofertas_titulo": {
+  "de": "Platin im Angebot",
+  "en": "Platinums on sale",
+  "es": "Platinos de oferta",
+  "fr": "Platines en promo"
+ },
+ "ofertas_texto": {
+  "de": "Reduzierte Steam-Spiele mit machbaren 100 %: Die Schwierigkeit kommt vom seltensten Erfolg laut Steam. Ohne Spiele, die du schon hast.",
+  "en": "Discounted Steam games with an achievable 100%: difficulty comes from the rarest achievement on Steam. Games you own are left out.",
+  "es": "Juegos de Steam rebajados cuyo 100 % es asequible: la dificultad sale del logro más raro según Steam. Sin los que ya tienes.",
+  "fr": "Jeux Steam en promo avec un 100 % abordable : la difficulté vient du succès le plus rare selon Steam. Sans ceux que tu possèdes."
+ },
+ "ofertas_tus_alertas": {
+  "de": "DEINE PREISALARME",
+  "en": "YOUR PRICE ALERTS",
+  "es": "TUS ALERTAS DE PRECIO",
+  "fr": "TES ALERTES DE PRIX"
+ },
+ "ofertas_sin_alertas": {
+  "de": "Lege einen Alarm auf der Seite eines Spiels mit PC-Version an.",
+  "en": "Set an alert from the page of any game with a PC version.",
+  "es": "Pon una alerta desde la ficha de un juego que tenga versión de PC.",
+  "fr": "Crée une alerte depuis la fiche d'un jeu qui existe sur PC."
+ },
+ "ofertas_alerta_fila": {
+  "de": "Ziel {0} · jetzt {1}",
+  "en": "Target {0} · now {1}",
+  "es": "Objetivo {0} · ahora {1}",
+  "fr": "Objectif {0} · maintenant {1}"
+ },
+ "ofertas_por_debajo": {
+  "de": "Darunter!",
+  "en": "Below target!",
+  "es": "¡Por debajo!",
+  "fr": "En dessous !"
+ },
+ "ofertas_ahora_sin_precio": {
+  "de": "—",
+  "en": "—",
+  "es": "—",
+  "fr": "—"
+ },
+ "ofertas_logros": {
+  "de": "{0} Erfolge · seltenster: {1} %",
+  "en": "{0} achievements · rarest, {1}%",
+  "es": "{0} logros · el más raro, {1} %",
+  "fr": "{0} succès · le plus rare : {1} %"
+ },
+ "ofertas_horas": {
+  "de": "~{0} Std. bis 100 %",
+  "en": "~{0} h to 100%",
+  "es": "~{0} h al 100 %",
+  "fr": "~{0} h pour le 100 %"
+ },
+ "ofertas_vacio": {
+  "de": "Gerade keine Angebote mit machbaren 100 %.",
+  "en": "No deals with an achievable 100% right now.",
+  "es": "Ahora mismo no hay ofertas con un 100 % asequible.",
+  "fr": "Aucune promo avec un 100 % abordable pour l'instant."
+ },
+ "ofertas_nota": {
+  "de": "Preise von Steam Spanien. Angebote über CheapShark; Schwierigkeit aus den globalen Steam-Werten.",
+  "en": "Prices from Steam Spain. Deals via CheapShark; difficulty from Steam's global percentages.",
+  "es": "Precios de Steam España. Ofertas vía CheapShark; dificultad con los porcentajes globales de Steam.",
+  "fr": "Prix de Steam Espagne. Promos via CheapShark ; difficulté selon les pourcentages globaux de Steam."
+ },
+ "dif_muy_facil": {
+  "de": "Sehr leicht",
+  "en": "Very easy",
+  "es": "Muy fácil",
+  "fr": "Très facile"
+ },
+ "dif_facil": {
+  "de": "Leicht",
+  "en": "Easy",
+  "es": "Fácil",
+  "fr": "Facile"
+ },
+ "dif_media": {
+  "de": "Mittel",
+  "en": "Medium",
+  "es": "Media",
+  "fr": "Moyenne"
+ },
+ "dif_dificil": {
+  "de": "Schwer",
+  "en": "Hard",
+  "es": "Difícil",
+  "fr": "Difficile"
  }
 }

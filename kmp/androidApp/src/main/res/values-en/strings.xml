@@ -329,6 +329,10 @@
     <string name="diario_inicio">Your journey in %1$s began on %2$s, with “%3$s”.</string>
     <string name="diario_muro">Your biggest wall was beating “%1$s”: you went %2$s days without unlocking anything before you got it.</string>
     <string name="diario_titulo">📖 The platinum diary</string>
+    <string name="dif_dificil">Hard</string>
+    <string name="dif_facil">Easy</string>
+    <string name="dif_media">Medium</string>
+    <string name="dif_muy_facil">Very easy</string>
     <string name="duracion_anios">Years</string>
     <string name="duracion_anios_1">%1$s year</string>
     <string name="duracion_anios_n">%1$s years</string>
@@ -556,6 +560,17 @@
     <string name="nav_panel">Home</string>
     <string name="nav_perfil">Profile</string>
     <string name="nav_sesiones">Sessions</string>
+    <string name="ofertas_ahora_sin_precio">—</string>
+    <string name="ofertas_alerta_fila">Target %1$s · now %2$s</string>
+    <string name="ofertas_horas">~%1$s h to 100%%</string>
+    <string name="ofertas_logros">%1$s achievements · rarest, %2$s%%</string>
+    <string name="ofertas_nota">Prices from Steam Spain. Deals via CheapShark; difficulty from Steam\'s global percentages.</string>
+    <string name="ofertas_por_debajo">Below target!</string>
+    <string name="ofertas_sin_alertas">Set an alert from the page of any game with a PC version.</string>
+    <string name="ofertas_texto" formatted="false">Discounted Steam games with an achievable 100%: difficulty comes from the rarest achievement on Steam. Games you own are left out.</string>
+    <string name="ofertas_titulo">Platinums on sale</string>
+    <string name="ofertas_tus_alertas">YOUR PRICE ALERTS</string>
+    <string name="ofertas_vacio" formatted="false">No deals with an achievable 100% right now.</string>
     <string name="panel_a_por_este">GO FOR THIS PLATINUM NOW</string>
     <string name="panel_cerrojo">MILESTONE LOCK</string>
     <string name="panel_cerrojo_texto">%1$s reserved for your platinum #%2$s</string>
@@ -601,6 +616,18 @@
     <string name="perfil_tu_caza">Your hunt</string>
     <string name="perfil_ventaja">You\'re ahead in %1$s of %2$s categories</string>
     <string name="perfil_ventaja_todo">" — you lead in everything."</string>
+    <string name="precio_alerta_activa">We\'ll alert you below %1$s</string>
+    <string name="precio_alerta_campo">Target price (€)</string>
+    <string name="precio_alerta_error">Enter a price between €0.01 and €999.</string>
+    <string name="precio_alerta_guardar">Save</string>
+    <string name="precio_alerta_quitar">Remove alert</string>
+    <string name="precio_alerta_texto">We\'ll let you know when %1$s drops below this price on Steam.</string>
+    <string name="precio_alerta_titulo">Price alert</string>
+    <string name="precio_avisarme">Alert me when it drops</string>
+    <string name="precio_mas_barato">Cheapest: %1$s · US$%2$s</string>
+    <string name="precio_minimo">All-time low: US$%1$s</string>
+    <string name="precio_no_a_la_venta">Not on sale on Steam Spain</string>
+    <string name="precio_titulo">PC PRICE</string>
     <string name="push_canal">Paragon notifications</string>
     <string name="qr_compartir_sesion">Share session</string>
     <string name="qr_compartir_sesion_sub">Let others scan it to see it and join.</string>
