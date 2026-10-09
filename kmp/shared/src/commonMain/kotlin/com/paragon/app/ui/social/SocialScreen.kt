@@ -293,18 +293,18 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                                 }
                                 if (podio.isNotEmpty()) {
                                     item {
-                                        LeaguePodium(podio, onClick = { handle -> onAbrirPerfil(handle) })
+                                        LeaguePodium(podio, onClick = { handle -> handle?.let(onAbrirPerfil) })
                                     }
                                 }
                                 itemsIndexed(resto, key = { _, row -> row.userId }) { index, row ->
                                     SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                        LigaRowItem(row, index + 4, onClick = { onAbrirPerfil(row.handle) })
+                                        LigaRowItem(row, index + 4, onClick = { row.handle?.let(onAbrirPerfil) })
                                     }
                                 }
                             } else {
                                 itemsIndexed(current.data.amigos, key = { _, row -> row.userId }) { index, row ->
                                     SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                        AmigoRowItem(row, index + 1, onClick = { onAbrirPerfil(row.handle) })
+                                        AmigoRowItem(row, index + 1, onClick = { row.handle?.let(onAbrirPerfil) })
                                     }
                                 }
                             }
