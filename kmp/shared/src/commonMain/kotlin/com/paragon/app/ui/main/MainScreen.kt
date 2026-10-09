@@ -347,12 +347,15 @@ fun MainScreen(
                     themeStore = themeStore,
                     onCompareClick = { handle -> navController.navigate(Screen.Compare.routeFor(handle)) },
                     onAbrirSesion = { id -> navController.navigate(Screen.SessionDetail.routeFor(id)) },
+                    onAbrirPerfil = { handle -> navController.navigate(Screen.Usuario.routeFor(handle)) },
                 )
             }
             composable(Screen.Social.route) {
-                SocialScreen(tokenStore, themeStore, myHandle = profile.handle, database = database, onCompareClick = { handle ->
-                    navController.navigate(Screen.Compare.routeFor(handle))
-                })
+                SocialScreen(
+                    tokenStore, themeStore, myHandle = profile.handle, database = database,
+                    onCompareClick = { handle -> navController.navigate(Screen.Compare.routeFor(handle)) },
+                    onAbrirPerfil = { handle -> navController.navigate(Screen.Usuario.routeFor(handle)) },
+                )
             }
 
             composable(Screen.Focus.route) {
@@ -414,6 +417,30 @@ fun MainScreen(
             // Desglose del mes (como /ritmo en la web) — ver ui/trofeos.
             composable(Screen.Ritmo.route) {
                 com.paragon.app.ui.trofeos.RitmoScreen(tokenStore = tokenStore, onBack = { navController.popBackStack() })
+            }
+
+            // Perfil completo de alguien (o el tuyo) — ver ui/perfil/PerfilUsuarioScreen.
+            composable(
+                route = Screen.Usuario.route,
+                arguments = listOf(navArgument("handle") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val handle = backStackEntry.arguments?.read { getStringOrNull("handle") } ?: return@composable
+                // "‹ De dónde vienes": la pantalla de debajo en la pila.
+                val anterior = navController.previousBackStackEntry?.destination?.route
+                val atras = when (anterior) {
+                    Screen.Feed.route -> Screen.Feed.title
+                    Screen.Social.route -> Screen.Social.title
+                    else -> Screen.Perfil.title
+                }
+                com.paragon.app.ui.perfil.PerfilUsuarioScreen(
+                    handle = handle,
+                    tokenStore = tokenStore,
+                    database = database,
+                    themeStore = themeStore,
+                    atras = atras,
+                    onBack = { navController.popBackStack() },
+                    onComparar = { h -> navController.navigate(Screen.Compare.routeFor(h)) },
+                )
             }
 
             // Sesiones de trofeos online (lista y ficha) — ver ui/sesiones.

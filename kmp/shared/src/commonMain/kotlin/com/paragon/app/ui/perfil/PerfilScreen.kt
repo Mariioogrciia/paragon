@@ -115,6 +115,8 @@ fun PerfilScreen(
                 .clip(RoundedCornerShape(radio(24)))
                 .background(Surface)
                 .border(1.dp, Accent.copy(alpha = 0.35f), RoundedCornerShape(radio(24)))
+                // Tocar la tarjeta abre tu perfil completo (9 oct 2026), el mismo que ven los demás.
+                .premiumClickable { onNavigate(Screen.Usuario.routeFor(profile.handle)) }
                 .padding(20.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -134,6 +136,10 @@ fun PerfilScreen(
                 Cifra(cifra(stats.trophies), Textos.t(T.comun_trofeos), modifier = Modifier.weight(1f))
                 Cifra(cifra(stats.games), Textos.t(T.comun_juegos), modifier = Modifier.weight(1f))
                 Cifra(cifra(racha.actual), Textos.t(T.perfil_racha), modifier = Modifier.weight(1f))
+            }
+            Row(Modifier.fillMaxWidth().padding(top = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(Textos.t(T.perfil_ver_completo), color = Accent, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Accent, modifier = Modifier.size(18.dp))
             }
         }
 

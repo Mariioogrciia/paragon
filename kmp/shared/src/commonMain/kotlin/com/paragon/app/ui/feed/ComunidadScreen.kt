@@ -64,6 +64,7 @@ fun ComunidadScreen(
     themeStore: ThemeStore,
     onCompareClick: (String) -> Unit,
     onAbrirSesion: (String) -> Unit,
+    onAbrirPerfil: (String) -> Unit,
 ) {
     var seccion by rememberSaveable { mutableIntStateOf(0) }
     val contexto = com.paragon.shared.contextoPlataforma()
@@ -102,7 +103,7 @@ fun ComunidadScreen(
         )
         Box(Modifier.weight(1f)) {
             if (seccion == 0) {
-                FeedScreen(tokenStore, themeStore, onCompareClick = onCompareClick, conTitulo = false)
+                FeedScreen(tokenStore, themeStore, onCompareClick = onCompareClick, onAbrirPerfil = onAbrirPerfil, conTitulo = false)
             } else {
                 SesionesScreen(tokenStore = tokenStore, onBack = {}, onAbrir = onAbrirSesion, embebida = true)
             }

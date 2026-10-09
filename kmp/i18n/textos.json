@@ -4618,5 +4618,155 @@
   "en": "Friends",
   "es": "Amigos",
   "fr": "Amis"
+ },
+ "perfil_ver_completo": {
+  "de": "Dein Profil ansehen",
+  "en": "See your profile",
+  "es": "Ver tu perfil",
+  "fr": "Voir ton profil"
+ },
+ "perfil_horas": {
+  "de": "Stunden",
+  "en": "Hours",
+  "es": "Horas",
+  "fr": "Heures"
+ },
+ "perfil_completado_medio": {
+  "de": "Ø abgeschlossen",
+  "en": "Avg. completion",
+  "es": "Completado medio",
+  "fr": "Complétion moy."
+ },
+ "perfil_este_anio": {
+  "de": "Dieses Jahr",
+  "en": "This year",
+  "es": "Este año",
+  "fr": "Cette année"
+ },
+ "perfil_mejor_mes": {
+  "de": "Bester Monat",
+  "en": "Best month",
+  "es": "Mejor mes",
+  "fr": "Meilleur mois"
+ },
+ "perfil_dias_n": {
+  "de": "{0} Tage",
+  "en": "{0} days",
+  "es": "{0} días",
+  "fr": "{0} jours"
+ },
+ "perfil_ultimos_12": {
+  "de": "LETZTE 12 MONATE",
+  "en": "LAST 12 MONTHS",
+  "es": "ÚLTIMOS 12 MESES",
+  "fr": "12 DERNIERS MOIS"
+ },
+ "perfil_mes_titulo": {
+  "de": "MONAT FÜR MONAT",
+  "en": "MONTH BY MONTH",
+  "es": "MES A MES",
+  "fr": "MOIS PAR MOIS"
+ },
+ "perfil_mes_vs": {
+  "de": "Ihr Monat gegen deinen, Tag für Tag",
+  "en": "Their month against yours, day by day",
+  "es": "Su mes contra el tuyo, día a día",
+  "fr": "Son mois contre le tien, jour par jour"
+ },
+ "perfil_mes_propio": {
+  "de": "Deine Trophäen im Monat, Tag für Tag",
+  "en": "Your trophies this month, day by day",
+  "es": "Tus trofeos del mes, día a día",
+  "fr": "Tes trophées du mois, jour par jour"
+ },
+ "perfil_leyenda_tu": {
+  "de": "Du",
+  "en": "You",
+  "es": "Tú",
+  "fr": "Toi"
+ },
+ "perfil_por_dia": {
+  "de": "Pro Tag",
+  "en": "Per day",
+  "es": "Por día",
+  "fr": "Par jour"
+ },
+ "perfil_acumulado": {
+  "de": "Kumuliert",
+  "en": "Running total",
+  "es": "Acumulado",
+  "fr": "Cumul"
+ },
+ "perfil_dias_ganados": {
+  "de": "Gewonnene Tage: {0} – {1}",
+  "en": "Days won: {0} – {1}",
+  "es": "Días ganados: {0} – {1}",
+  "fr": "Jours gagnés : {0} – {1}"
+ },
+ "perfil_dias_activos": {
+  "de": "{0} Tage mit Trophäen",
+  "en": "{0} days with trophies",
+  "es": "{0} días con trofeos",
+  "fr": "{0} jours avec trophées"
+ },
+ "perfil_mejor_dia": {
+  "de": "Bester Tag: {0} ({1})",
+  "en": "Best day: {0} ({1})",
+  "es": "Mejor día: {0} ({1})",
+  "fr": "Meilleur jour : {0} ({1})"
+ },
+ "perfil_mes_gana": {
+  "de": "{0} liegt diesen Monat {1} Trophäen vorn",
+  "en": "{0} is {1} trophies ahead this month",
+  "es": "{0} te saca {1} trofeos este mes",
+  "fr": "{0} a {1} trophées d’avance ce mois-ci"
+ },
+ "perfil_mes_ganas": {
+  "de": "Du liegst diesen Monat {0} Trophäen vorn",
+  "en": "You are {0} trophies ahead this month",
+  "es": "Le sacas {0} trofeos este mes",
+  "fr": "Tu as {0} trophées d’avance ce mois-ci"
+ },
+ "perfil_mes_empate": {
+  "de": "Gleichstand diesen Monat",
+  "en": "Tied this month",
+  "es": "Empate este mes",
+  "fr": "Égalité ce mois-ci"
+ },
+ "perfil_toca_dia": {
+  "de": "Tippe auf einen Tag, um seine Trophäen zu sehen",
+  "en": "Tap a day to see that day’s trophies",
+  "es": "Toca un día para ver los trofeos de ese día",
+  "fr": "Touche un jour pour voir ses trophées"
+ },
+ "perfil_dia_vacio": {
+  "de": "An diesem Tag gab es keine Trophäen",
+  "en": "No trophies that day",
+  "es": "Ese día no hubo trofeos",
+  "fr": "Aucun trophée ce jour-là"
+ },
+ "perfil_ultimos_trofeos": {
+  "de": "NEUESTE TROPHÄEN",
+  "en": "LATEST TROPHIES",
+  "es": "ÚLTIMOS TROFEOS",
+  "fr": "DERNIERS TROPHÉES"
+ },
+ "perfil_juegos_mes": {
+  "de": "SPIELE DES MONATS",
+  "en": "GAMES THIS MONTH",
+  "es": "JUEGOS DEL MES",
+  "fr": "JEUX DU MOIS"
+ },
+ "perfil_cifras": {
+  "de": "ZAHLEN",
+  "en": "NUMBERS",
+  "es": "CIFRAS",
+  "fr": "CHIFFRES"
+ },
+ "perfil_actividad": {
+  "de": "AKTIVITÄT",
+  "en": "ACTIVITY",
+  "es": "ACTIVIDAD",
+  "fr": "ACTIVITÉ"
  }
 }

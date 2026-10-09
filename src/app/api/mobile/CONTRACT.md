@@ -424,9 +424,38 @@ Para el bottom sheet de perfil al tocar a alguien en Comunidad/Amigos (no
 hace falta que sea amigo tuyo). `amistad`: `ninguna`, `solicitudEnviada`,
 `solicitudRecibida`, `amigos` o `yo` — para el botón de amistad (enviar con
 `POST /api/mobile/friends`, aceptar con `POST /api/mobile/friends/{userId}`).
-`recentGames`: los 6 jugados más recientemente. `image` es la misma foto real que en toda
+`recentGames`: los 6 jugados más recientemente, sin deseados. `image` es la misma foto real que en toda
 la web (`resolveAvatarUrl`), `null` si no tiene ninguna. `404` si no existe
-ese handle. `recentGames` son los últimos 3 jugados, sin deseados.
+ese handle.
+
+Desde el 9 oct 2026 es el **perfil completo** de la app (pantalla
+`ui/perfil/PerfilUsuarioScreen`), y trae además:
+
+```json
+{
+  "juegos": 120, "oros": 80, "platas": 200, "bronces": 900, "completadoMedio": 46, "horas": 1500,
+  "racha": { "actual": 3, "mejor": 21, "diasActivos": 340 },
+  "esteAnio": 410, "mejorMes": { "mes": "2026-03", "total": 120 },
+  "porMes": [ { "mes": "2025-11", "total": 30, "platinos": 1 } ],
+  "clan": { "tag": "PRG", "name": "Paragon", "logoUrl": null },
+  "ultimosTrofeos": [ { "gameId": "g", "juego": "Elden Ring", "trophyId": "12", "nombre": "...", "detalle": "...", "grade": "gold", "iconUrl": "https://...", "earnedAt": "2026-10-08T20:01:00.000Z", "rarityPercent": 4.2 } ]
+}
+```
+`porMes`: los últimos 12 meses (los vacíos a cero, como `trofeosPorMes`).
+`clan`: `null` si no está en ninguno.
+
+## `GET /api/mobile/users/{handle}/month?mes=YYYY-MM` — Su mes contra el tuyo
+
+```json
+{
+  "mes": "2026-10",
+  "ellos": { "total": 40, "porDia": [ { "dia": "2026-10-01", "total": 3 } ], "porJuego": [ ... ], "trofeos": [ ... ] },
+  "yo":    { "total": 25, "porDia": [ ... ], "porJuego": [ ... ], "trofeos": [ ... ] }
+}
+```
+Mismos campos que `stats/month` para cada lado (todos los días del mes,
+también los de cero). `yo` es `null` si el handle eres tú. `404` si no
+existe.
 
 ## `GET /api/mobile/social` — Amigos y Liga
 

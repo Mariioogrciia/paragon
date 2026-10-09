@@ -19,7 +19,7 @@ import coil3.request.SuccessResult
  * IGNORANDO que el propio `AsyncImage` de al lado ya está pidiendo esa
  * MISMA imagen a Coil — doble descarga de red y doble decodificación de
  * bitmap por cada tarjeta visible. Pasar por `context.imageLoader` (mismo
- * patrón que ya usa `FriendProfileBottomSheet.kt` para el fondo del
+ * patrón que ya usa `PerfilUsuarioScreen.kt` para el fondo del
  * perfil) hace que esto sea un acierto de caché, no una descarga nueva,
  * cuando la carátula ya se pidió antes en la misma sesión.
  */

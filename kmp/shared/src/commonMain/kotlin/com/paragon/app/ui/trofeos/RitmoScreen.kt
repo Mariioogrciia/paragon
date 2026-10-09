@@ -72,7 +72,7 @@ private fun grado(g: String?): TrophyGrade? = when (g) {
 }
 
 /** Con el id compuesto: el id de un trofeo solo es único dentro de su juego. */
-private fun TrofeoMesDto.aTrophyItem() = TrophyItem(
+internal fun TrofeoMesDto.aTrophyItem() = TrophyItem(
     id = "$gameId:$trophyId",
     name = nombre,
     detail = detalle,
@@ -84,16 +84,16 @@ private fun TrofeoMesDto.aTrophyItem() = TrophyItem(
 )
 
 /** "2026-10" → "2026-09" / "2026-11". */
-private fun mover(mes: String, delta: Int): String {
+internal fun mover(mes: String, delta: Int): String {
     val (a, m) = mes.split("-").map { it.toInt() }
     val total = a * 12 + (m - 1) + delta
     return "${total / 12}-${(total % 12 + 1).toString().padStart(2, '0')}"
 }
 
-private fun nombreMes(mes: String): String =
+internal fun nombreMes(mes: String): String =
     isoAMillis("$mes-15T12:00:00.000Z")?.let { fechaConPatron(it, "MMMMy") }?.replaceFirstChar { it.uppercase() } ?: mes
 
-private fun nombreDia(dia: String): String =
+internal fun nombreDia(dia: String): String =
     isoAMillis("${dia}T12:00:00.000Z")?.let { fechaConPatron(it, "EEEEdMMMM") } ?: dia
 
 @Composable

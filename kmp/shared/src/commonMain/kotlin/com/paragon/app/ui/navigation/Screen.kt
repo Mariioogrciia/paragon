@@ -30,6 +30,10 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     object StuckTrophies : Screen("stuck_trophies", T.nav_atascados)
     object Sessions : Screen("sessions", T.nav_sesiones)
     object Ritmo : Screen("ritmo", T.ritmo_titulo)
+    // Perfil completo de cualquiera (9 oct 2026), también el tuyo — ver ui/perfil.
+    object Usuario : Screen("user/{handle}", T.nav_perfil) {
+        fun routeFor(handle: String) = "user/$handle"
+    }
     object SessionDetail : Screen("session/{sesionId}", T.nav_sesiones) {
         fun routeFor(sesionId: String) = "session/$sesionId"
     }

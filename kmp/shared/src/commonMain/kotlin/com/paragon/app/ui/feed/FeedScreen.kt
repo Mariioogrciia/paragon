@@ -69,14 +69,13 @@ import androidx.compose.ui.semantics.contentDescription
 /** Actividad real contra GET /api/mobile/feed (FeedRepository). */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit, conTitulo: Boolean = true) {
+fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (String) -> Unit, onAbrirPerfil: (String) -> Unit, conTitulo: Boolean = true) {
     val context = com.paragon.shared.contextoPlataforma()
     val cacheDao = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context).simpleCacheDao() }
     val repository = remember(tokenStore, cacheDao) { FeedRepository(tokenStore, cacheDao) }
     var result by remember { mutableStateOf<FeedResult?>(null) }
     val retryCounter = remember { mutableIntStateOf(0) }
     var isInitialLoading by remember { mutableStateOf(true) }
-    var selectedHandle by remember { mutableStateOf<String?>(null) }
     val haptic = LocalHapticFeedback.current
     var isRefreshing by remember { mutableStateOf(false) }
 
@@ -152,7 +151,7 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                         contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
                         items(current.items, key = { it.id }) { item ->
-                            FeedCard(item, repository = repository, onUserClick = { selectedHandle = item.userHandle })
+                            FeedCard(item, repository = repository, onUserClick = { onAbrirPerfil(item.userHandle) })
                         }
                     }
                 }
@@ -160,16 +159,6 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
         }
         }
 
-        selectedHandle?.let { handle ->
-            com.paragon.app.ui.social.FriendProfileBottomSheet(
-                handle = handle,
-                tokenStore = tokenStore,
-                database = com.paragon.app.data.local.ParagonDatabase.getDatabase(context),
-                themeStore = themeStore,
-                onDismiss = { selectedHandle = null },
-                onCompareClick = onCompareClick
-            )
-        }
     }
 }
 /**

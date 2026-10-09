@@ -1,7 +1,28 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **6 de octubre de 2026**.
+releer todo el historial. Última actualización: **9 de octubre de 2026**.
+
+**9 oct — perfil completo en la app y el mes día a día contra otro:**
+- **Perfil de verdad** (`ui/perfil/PerfilUsuarioScreen.kt`, ruta
+  `user/{handle}`): pantalla completa que sustituye a la hoja
+  `FriendProfileBottomSheet` (borrada). Se abre al tocar a alguien en
+  Comunidad, Amigos/Ligas, el podio o un clan, y tu tarjeta de la pestaña
+  Perfil abre el tuyo ("Ver tu perfil"). Cabecera con el color de la foto,
+  nivel, plataformas y clan; amistad, comparar y rival; cifras por metal,
+  horas y completado medio; racha, este año y mejor mes; últimos 12 meses;
+  rivalidad con tiras; últimos trofeos y jugado recientemente.
+- **Mes a mes contra ti**: en ese perfil, flechas para cualquier mes; barras
+  dobles por día (suyas en el acento, tuyas en gris), o la "carrera"
+  acumulada (`ControlSegmentado` Por día / Acumulado); marcador del mes,
+  días ganados por cada uno, mejor día, juegos del mes; tocar un día enseña
+  los trofeos de los dos ese día. En tu propio perfil solo tu serie.
+- **API**: `GET /api/mobile/users/{handle}` trae además juegos, oros/platas/
+  bronces, horas, completadoMedio, racha, esteAnio, mejorMes, porMes,
+  clan y ultimosTrofeos; nuevo `GET /api/mobile/users/{handle}/month?mes=`
+  (`ellos` y `yo`). Contrato en CONTRACT.md. Textos nuevos `perfil_*`.
+- Sin compilar en local (en la nube no se llega a Google Maven): la prueba es
+  la CI de Android. Pendiente probarlo en el móvil.
 
 **6 oct — pruebas en el móvil: barra tipo Instagram, DLC, amistad y fallos:**
 - **Barra de abajo** (`BarraInferior` en `MainScreen`, sustituye a la cápsula

@@ -5,6 +5,10 @@ import { getFriendshipStatus, getLibrary, getProfileByHandle, resolveAvatarUrl }
 import { summarise } from "@/lib/stats";
 import { paragonProgress } from "@/lib/level";
 import { errorMovil } from "@/lib/mensajesApi";
+import { rachas, resumenHistorico, trofeosPorMes, ultimosTrofeos } from "@/lib/history";
+import { horasTotales } from "@/lib/profileStats";
+import { getUserClan } from "@/lib/clans";
+import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 
 export async function GET(
   req: Request,
@@ -26,10 +30,19 @@ export async function GET(
     return errorMovil(req, "No existe ese usuario", 404);
   }
 
-  const [{ games, xpMisiones }, amistad] = await Promise.all([
+  // El perfil completo de la app (9 oct 2026): además de la cabecera, lo
+  // mismo que cuenta el perfil de la web — racha, año, meses, últimos
+  // trofeos, horas y clan. Todo sale de lo ya guardado, sin llamar a PSN.
+  const [{ games, xpMisiones }, amistad, racha, resumen, meses, ultimos, horas, clan] = await Promise.all([
     getLibrary(profile),
     // Para el botón de amistad del perfil (6 oct 2026): "yo" si es tu perfil.
     profile.userId === userId ? Promise.resolve("yo" as const) : getFriendshipStatus(userId, profile.userId),
+    rachas(profile.userId),
+    resumenHistorico(profile.userId),
+    trofeosPorMes(profile.userId, 12),
+    ultimosTrofeos(profile.userId, 8, idiomaDeCabecera(req.headers.get("accept-language"))),
+    horasTotales(profile.userId),
+    getUserClan(profile.userId),
   ]);
   const stats = summarise(games);
   const nivel = paragonProgress(games, xpMisiones);
@@ -51,6 +64,28 @@ export async function GET(
     amistad,
     platinos: stats.platinos,
     trofeos: stats.trofeos,
+    juegos: stats.juegos,
+    oros: stats.counts.gold,
+    platas: stats.counts.silver,
+    bronces: stats.counts.bronze,
+    completadoMedio: stats.completadoMedio,
+    horas,
+    racha: { actual: racha.actual, mejor: racha.mejor, diasActivos: racha.diasActivos },
+    esteAnio: resumen.esteAnio,
+    mejorMes: resumen.mejorMes,
+    porMes: meses,
+    clan: clan ? { tag: clan.clan.tag, name: clan.clan.name, logoUrl: clan.clan.logoUrl ?? null } : null,
+    ultimosTrofeos: ultimos.map((t) => ({
+      gameId: t.gameId,
+      juego: t.juego,
+      trophyId: t.trophyId,
+      nombre: t.nombre,
+      detalle: t.detalle,
+      grade: t.grade,
+      iconUrl: t.iconUrl,
+      earnedAt: t.earnedAt,
+      rarityPercent: t.rarityPercent,
+    })),
     accounts: profile.accounts.map(acc => ({
       platform: acc.platform,
       username: acc.username

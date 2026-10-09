@@ -53,7 +53,7 @@ import com.paragon.shared.i18n.T
 
 /** Amigos y Liga reales contra GET /api/mobile/social (SocialRepository) — dos listas distintas, no la misma con otro orden. */
 @Composable
-fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: String? = null, database: com.paragon.app.data.local.ParagonDatabase, onCompareClick: (String) -> Unit) {
+fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: String? = null, database: com.paragon.app.data.local.ParagonDatabase, onCompareClick: (String) -> Unit, onAbrirPerfil: (String) -> Unit) {
     val cacheDao = remember(database) { database.simpleCacheDao() }
     val repository = remember(tokenStore, cacheDao) { SocialRepository(tokenStore, cacheDao) }
     val leaguesRepository = remember(tokenStore, cacheDao) { LeaguesRepository(tokenStore, cacheDao) }
@@ -67,7 +67,6 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     val retryCounter = remember { mutableIntStateOf(0) }
     val leaguesRefresh = remember { mutableIntStateOf(0) }
     val clansRefresh = remember { mutableIntStateOf(0) }
-    var selectedHandle by remember { mutableStateOf<String?>(null) }
     var selectedLeagueId by remember { mutableStateOf<String?>(null) }
     var selectedClanTag by remember { mutableStateOf<String?>(null) }
     var showNewLeagueDialog by remember { mutableStateOf(false) }
@@ -294,18 +293,18 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                                 }
                                 if (podio.isNotEmpty()) {
                                     item {
-                                        LeaguePodium(podio, onClick = { handle -> selectedHandle = handle })
+                                        LeaguePodium(podio, onClick = { handle -> onAbrirPerfil(handle) })
                                     }
                                 }
                                 itemsIndexed(resto, key = { _, row -> row.userId }) { index, row ->
                                     SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                        LigaRowItem(row, index + 4, onClick = { selectedHandle = row.handle })
+                                        LigaRowItem(row, index + 4, onClick = { onAbrirPerfil(row.handle) })
                                     }
                                 }
                             } else {
                                 itemsIndexed(current.data.amigos, key = { _, row -> row.userId }) { index, row ->
                                     SwipeToCompareRow(handle = row.handle, onCompareClick = onCompareClick) {
-                                        AmigoRowItem(row, index + 1, onClick = { selectedHandle = row.handle })
+                                        AmigoRowItem(row, index + 1, onClick = { onAbrirPerfil(row.handle) })
                                     }
                                 }
                             }
@@ -315,17 +314,6 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             }
         }
         
-        selectedHandle?.let { handle ->
-            FriendProfileBottomSheet(
-                handle = handle,
-                tokenStore = tokenStore,
-                themeStore = themeStore,
-                database = database,
-                onDismiss = { selectedHandle = null },
-                onCompareClick = onCompareClick
-            )
-        }
-
         selectedLeagueId?.let { leagueId ->
             LeagueDetailSheet(
                 leagueId = leagueId,
@@ -358,7 +346,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 tokenStore = tokenStore,
                 onDismiss = { selectedClanTag = null },
                 onChanged = { clansRefresh.value += 1 },
-                onOpenProfile = { handle -> selectedHandle = handle },
+                onOpenProfile = { handle -> selectedClanTag = null; onAbrirPerfil(handle) },
             )
         }
 
