@@ -52,8 +52,10 @@ import com.paragon.shared.i18n.Textos
 data class OpcionSelector(
     val valor: String,
     val etiqueta: String,
-    /** Delante: emoji del metal, etc. */
+    /** Delante: un símbolo corto. */
     val icono: String? = null,
+    /** Delante, en vez de `icono`: una foto (la del trofeo, p. ej.). */
+    val imagen: String? = null,
     /** Pequeño, a la derecha: consola, %... */
     val detalle: String? = null,
     val grupo: String? = null,
@@ -101,7 +103,7 @@ fun Selector(
                 .alpha(if (activo) 1f else 0.5f)
                 .padding(horizontal = if (compacto) 4.dp else 12.dp, vertical = if (compacto) 4.dp else 11.dp),
         ) {
-            elegida?.icono?.let { Text(it, fontSize = 14.sp); Spacer(Modifier.width(6.dp)) }
+            elegida?.let { IconoOpcion(it, separacion = 6) }
             Text(
                 elegida?.etiqueta ?: placeholder,
                 color = if (elegida == null) Muted else if (compacto) Muted else Foreground,
@@ -178,7 +180,7 @@ fun Selector(
                         .alpha(if (o.activa) 1f else 0.4f)
                         .padding(horizontal = 10.dp, vertical = 10.dp),
                 ) {
-                    o.icono?.let { Text(it, fontSize = 14.sp); Spacer(Modifier.width(8.dp)) }
+                    IconoOpcion(o, separacion = 8)
                     Text(
                         o.etiqueta,
                         color = if (seleccionada) Accent else Foreground,
@@ -202,4 +204,20 @@ private fun normalizar(texto: String): String =
     texto.lowercase()
         .replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
         .replace('ü', 'u').replace('ñ', 'n').replace('à', 'a').replace('è', 'e').replace('ç', 'c')
-        .trim()
+        .trim()
+
+/** Foto de la opción (si es segura) o su símbolo, con el hueco detrás. */
+@Composable
+private fun IconoOpcion(o: OpcionSelector, separacion: Int) {
+    val foto = urlImagenSegura(o.imagen)
+    when {
+        foto != null -> coil3.compose.AsyncImage(
+            model = foto,
+            contentDescription = null,
+            modifier = Modifier.size(22.dp).clip(RoundedCornerShape(radio(5))),
+        )
+        o.icono != null -> Text(o.icono, fontSize = 14.sp)
+        else -> return
+    }
+    Spacer(Modifier.width(separacion.dp))
+}

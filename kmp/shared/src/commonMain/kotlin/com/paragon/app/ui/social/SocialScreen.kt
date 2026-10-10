@@ -1,5 +1,7 @@
 package com.paragon.app.ui.social
 
+import androidx.compose.foundation.verticalScroll
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -64,6 +66,14 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     var clansResult by remember { mutableStateOf<ClansResult?>(null) }
     var clanInvites by remember { mutableStateOf<List<ClanInvite>>(emptyList()) }
     var selectedTab by remember { mutableIntStateOf(0) }
+    // Dentro de Amigos: 0 la lista, 1 solicitudes, 2 añadir (QR y @usuario).
+    var subAmigos by remember { mutableIntStateOf(0) }
+    var nSolicitudes by remember { mutableIntStateOf(0) }
+    LaunchedEffect(selectedTab, subAmigos) {
+        if (selectedTab == 2) nSolicitudes = try {
+            com.paragon.app.data.network.ApiClient.amigosApi(tokenStore).pendientes().pendientes.size
+        } catch (e: Exception) { nSolicitudes }
+    }
     val retryCounter = remember { mutableIntStateOf(0) }
     val leaguesRefresh = remember { mutableIntStateOf(0) }
     val clansRefresh = remember { mutableIntStateOf(0) }
@@ -109,8 +119,20 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
         )
 
-        // Amigos: añadir por @usuario y responder solicitudes (antes, solo la lista).
-        if (selectedTab == 2) AmigosCabecera(tokenStore, onCambio = { retryCounter.value += 1 }, miHandle = myHandle)
+        // Amigos: la lista, las solicitudes y añadir, cada una en su apartado
+        // (antes todo iba encima de la lista y no se veía casi ningún amigo).
+        if (selectedTab == 2) {
+            com.paragon.app.ui.common.ControlSegmentado(
+                opciones = listOf(
+                    Textos.t(T.amigos_lista),
+                    if (nSolicitudes > 0) Textos.t(T.amigos_solicitudes_n, nSolicitudes) else Textos.t(T.amigos_solicitudes_corto),
+                    Textos.t(T.amigos_anadir),
+                ),
+                seleccion = subAmigos,
+                onCambio = { subAmigos = it },
+                modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 4.dp),
+            )
+        }
 
         if (selectedTab == 3) {
             when (val current = clansResult) {
@@ -130,7 +152,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 is ClansResult.Ok -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                 ) {
                     if (clanInvites.isNotEmpty()) {
                         items(clanInvites, key = { it.clanId }) { invite ->
@@ -155,6 +177,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                             ClanCard(
                                 title = Textos.t(T.social_tu_clan),
                                 subtitle = "[${miClan.tag}] ${miClan.name}",
+                                emblema = miClan.emblema,
                                 onClick = { selectedClanTag = miClan.tag },
                             )
                         } else {
@@ -195,7 +218,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                 is LeaguesResult.Ok -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                 ) {
                     if (current.fromCache) {
                         item { OfflineBanner() }
@@ -236,6 +259,14 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                     }
                 }
             }
+        } else if (selectedTab == 2 && subAmigos != 0) {
+            AmigosCabecera(
+                tokenStore,
+                onCambio = { retryCounter.value += 1; nSolicitudes = (nSolicitudes - 1).coerceAtLeast(0) },
+                miHandle = myHandle,
+                seccion = if (subAmigos == 1) SeccionAmigos.SOLICITUDES else SeccionAmigos.ANADIR,
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra()),
+            )
         } else {
             when (val current = result) {
                 null -> com.paragon.app.ui.common.EsqueletoLista(filas = 6)
@@ -275,7 +306,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                                 .fillMaxSize()
                                 .padding(horizontal = 24.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp)
+                            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
                         ) {
                             if (current.fromCache) {
                                 item { OfflineBanner() }
@@ -598,17 +629,21 @@ private fun ClanInviteRow(invite: ClanInvite, onAccept: () -> Unit, onDecline: (
 
 /** "Tu clan" cuando ya perteneces a uno — mismo hueco que ocuparía "Crea tu propio clan", pero llevando directo a la ficha en vez de invitar a crear otro. */
 @Composable
-private fun ClanCard(title: String, subtitle: String, onClick: () -> Unit) {
-    Column(
+private fun ClanCard(title: String, subtitle: String, emblema: String?, onClick: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
             .border(1.dp, Border, RoundedCornerShape(radio(16)))
             .clickable { onClick() }
             .padding(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(title, color = Muted, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
-        Text(subtitle, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp))
+        EscudoClan(emblema, 48.dp)
+        Column(Modifier.padding(start = 14.dp)) {
+            Text(title, color = Muted, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
+            Text(subtitle, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 4.dp))
+        }
     }
 }
 
@@ -651,15 +686,7 @@ private fun ClanRowItem(clan: ClanSummary, onClick: () -> Unit) {
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(38.dp)
-                .clip(RoundedCornerShape(radio(10)))
-                .background(color.copy(alpha = 0.16f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(clan.tag.take(2).uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 12.sp)
-        }
+        EscudoClan(clan.emblema, 40.dp)
         Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
             Text(text = "[${clan.tag}] ${clan.name}", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (clan.description.isNotBlank()) {
@@ -773,18 +800,22 @@ private fun LeagueSeasonCard(totalParticipantes: Int, miPosicion: Int?, misPunto
             .border(1.dp, Platinum.copy(alpha = 0.3f), RoundedCornerShape(radio(16)))
             .padding(18.dp),
     ) {
+        // El título se lleva el espacio y la cuenta atrás va en una línea:
+        // antes, con la monoespaciada, "Termina en 24 días" salía en vertical.
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(Textos.t(T.social_liga_mensual), color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp)
+            Column(Modifier.weight(1f)) {
+                Text(Textos.t(T.social_liga_mensual), color = Foreground, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 1.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(Textos.t(T.social_liga_mensual_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 10.dp)) {
                 Text("⏱", fontSize = 13.sp)
                 Text(
                     text = if (diasRestantes <= 0) Textos.t(T.comun_termina_hoy) else if (diasRestantes == 1) Textos.t(T.comun_termina_en_1, diasRestantes) else Textos.t(T.comun_termina_en_n, diasRestantes),
                     color = if (diasRestantes <= 2) PodiumGold else Muted,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    softWrap = false,
                     modifier = Modifier.padding(start = 4.dp),
                 )
             }
@@ -900,14 +931,14 @@ fun LigaRowItem(row: LigaRow, position: Int, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
                 Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = Textos.t(T.social_puntos_mes, row.points), color = Muted, fontSize = 12.sp)
+                Text(text = Textos.t(T.social_puntos_mes, row.points), color = Muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
-        Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(text = "${position}º", color = Muted, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, softWrap = false, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
@@ -923,22 +954,25 @@ fun AmigoRowItem(row: AmigoRow, position: Int, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // Los textos se llevan el ancho y el puesto no se parte en dos líneas.
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             RowAvatar(row.name, row.avatarUrl)
             Column(modifier = Modifier.padding(start = 12.dp)) {
                 Text(text = row.name, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = Textos.t(T.social_nivel_platinos, row.level, row.platinos), color = Muted, fontSize = 12.sp)
+                Text(text = Textos.t(T.social_nivel_platinos, row.level, row.platinos), color = Muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (row.accounts.isNotEmpty()) {
                     Text(
                         text = row.accounts.joinToString(" · ") { "${it.platform.uppercase()}: ${it.username}" },
                         color = Muted,
                         fontSize = 11.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 2.dp),
                     )
                 }
             }
         }
-        Text(text = "${position}º", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text(text = "${position}º", color = Platinum, fontWeight = FontWeight.Bold, fontSize = 20.sp, maxLines = 1, softWrap = false, modifier = Modifier.padding(start = 10.dp))
     }
 }
 

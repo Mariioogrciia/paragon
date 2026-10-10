@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { PlatinosDeOferta, PlatinosDeOfertaCargando } from "@/components/PlatinosDeOferta";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { auth } from "@/auth";
 import { GameGrid } from "@/components/GameGrid";
@@ -236,6 +238,11 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
               </p>
             </section>
           )}
+          {esSteam && (
+            <Suspense fallback={<PlatinosDeOfertaCargando />}>
+              <PlatinosDeOferta userId={userId ?? null} />
+            </Suspense>
+          )}
           {esSteam && ofertas.length > 0 && (
             <section className="mb-12">
               <h2 className="mb-1 font-heading text-2xl font-bold uppercase">
@@ -262,8 +269,9 @@ export default async function PlataformaPage({ params }: { params: Promise<{ pla
                     <div className="p-3">
                       <p className="truncate text-[0.8125rem] font-semibold">{oferta.titulo}</p>
                       <div className="mt-1 flex items-baseline gap-2">
-                        <span className="text-sm font-bold text-good">{oferta.precio.toFixed(2)} €</span>
-                        <span className="text-xs text-muted line-through">{oferta.precioOriginal.toFixed(2)} €</span>
+                        {/* Dólares: CheapShark da precios de tiendas de EE. UU. */}
+                        <span className="text-sm font-bold text-good">{oferta.precio.toFixed(2)} US$</span>
+                        <span className="text-xs text-muted line-through">{oferta.precioOriginal.toFixed(2)} US$</span>
                       </div>
                     </div>
                   </a>

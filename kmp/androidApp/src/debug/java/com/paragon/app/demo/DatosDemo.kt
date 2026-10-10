@@ -50,7 +50,8 @@ object DatosDemo {
                 """{"profile":{"handle":"lagrena","name":"La Greña","level":42,"psnId":"lagrena_69","image":null},"stats":{"platinums":87,"trophies":4312,"games":214,"completionRate":68,"gold":341,"silver":812,"bronze":3072},"racha":{"actual":6,"mejor":23}}"""
             ruta == "api/mobile/panel/highlights" ->
                 """{"nearPlatinum":[${juegos.filter { it.pct in 80..99 }.joinToString(",") { tarjeta(it) }}],"recent":[${juegos.take(5).joinToString(",") { tarjeta(it) }}],"nextTrophies":[""" +
-                    trofeos.drop(1).take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"psn-elden","gameTitle":"Elden Ring","trophyId":"t$i","trophyName":"$n","detail":"Derrota a un enemigo poderoso.","rarityPercent":$r,"gameProgress":92,"iconUrl":null,"grade":"$g"}""" }.joinToString(",") + "]}"
+                    trofeos.drop(1).take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"psn-elden","gameTitle":"Elden Ring","trophyId":"t$i","trophyName":"$n","detail":"Derrota a un enemigo poderoso.","rarityPercent":$r,"gameProgress":92,"iconUrl":null,"grade":"$g"}""" }.joinToString(",") + "]," +
+                    "\"latestTrophies\":[" + trofeos.take(5).mapIndexed { i, (n, g, r) -> """{"gameId":"${juegos[i].id}","gameTitle":"${juegos[i].titulo}","gameIconUrl":"${portada(juegos[i].app)}","trophyId":"t$i","trophyName":"$n","iconUrl":null,"grade":"$g","earnedAt":"2026-10-0${5 - i}T20:00:00.000Z","rarityPercent":$r}""" }.joinToString(",") + "]}"
             ruta == "api/mobile/library" -> """{"games":[${juegos.mapIndexed { i, j -> biblioteca(j, i) }.joinToString(",")}]}"""
             ruta.startsWith("api/mobile/games/") && ruta.count { it == '/' } == 3 -> {
                 val j = juegos.firstOrNull { ruta.endsWith(it.id) } ?: juegos[0]
@@ -60,7 +61,24 @@ object DatosDemo {
                 }.joinToString(",")
                 """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]}}"""
             }
-            ruta == "api/mobile/milestone" -> """{"hito":null,"proximo":{"numero":25,"faltan":11}}"""
+            // Precios y "Platinos de oferta" (8 oct 2026), con datos reales de ese día.
+            ruta.startsWith("api/mobile/games/") && ruta.endsWith("/precios") ->
+                """{"precios":{"steamAppId":"1245620","precio":{"final":35.99,"inicial":59.99,"descuento":40},"ofertas":[{"tienda":"GreenManGaming","precio":31.49,"precioOriginal":59.99,"ahorro":48,"url":"https://www.cheapshark.com"}],"minimoHistoricoUsd":23.99,"alerta":null}}"""
+            ruta == "api/mobile/price-alerts" ->
+                """{"alertas":[{"steamAppId":"814380","gameId":"steam-814380","titulo":"Sekiro: Shadows Die Twice","precioObjetivo":25.0,"precio":{"final":23.99,"inicial":59.99,"descuento":60},"avisadoAt":"2026-10-07T10:00:00.000Z"},{"steamAppId":"1145360","gameId":"steam-1145360","titulo":"Hades","precioObjetivo":8.0,"precio":{"final":24.5,"inicial":24.5,"descuento":0},"avisadoAt":null}]}"""
+            ruta == "api/mobile/platinos-oferta" ->
+                """{"ofertas":[""" + listOf(
+                    Triple(1170880 to "The Last Campfire", 1.47 to 14.79, Triple(22, 25.0, 3)),
+                    Triple(390290 to "Bulb Boy", 0.89 to 8.99, Triple(12, 10.3, 4)),
+                    Triple(304430 to "INSIDE", 2.29 to 22.99, Triple(14, 14.0, 4)),
+                    Triple(1013310 to "Yoku's Island Express", 1.99 to 19.99, Triple(31, 6.9, 5)),
+                ).joinToString(",") { (juego, precio, dif) ->
+                    val (app, titulo) = juego
+                    val (logros, raro, nivel) = dif
+                    val color = if (nivel <= 3) "#6a9c56" else if (nivel == 4) "#8fa347" else "#b8a53a"
+                    """{"steamAppId":"$app","titulo":"$titulo","caratula":"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/$app/header.jpg","precio":{"final":${precio.first},"inicial":${precio.second},"descuento":90},"precioUsd":${precio.first},"ahorro":90,"logros":$logros,"logroMasRaro":$raro,"dificultad":{"nivel":$nivel,"etiqueta":"","color":"$color"},"horas":null,"gameId":null,"url":"https://store.steampowered.com/app/$app/"}"""
+                } + "]}"
+            ruta == "api/mobile/milestone" ->"""{"hito":null,"proximo":{"numero":25,"faltan":11}}"""
             ruta == "api/mobile/racha" ->
                 """{"actual":6,"mejor":23,"diasActivos":148,"dias":[${(0 until 35).joinToString(",") { """{"dia":"2026-09-${"%02d".format(1 + it % 30)}","trofeos":${listOf(0, 2, 5, 0, 1, 8, 3)[it % 7]}}""" }}]}"""
             ruta == "api/mobile/feed" ->
@@ -80,9 +98,9 @@ object DatosDemo {
                 ]}"""
             ruta == "api/mobile/leagues" -> """{"leagues":[{"id":"l1","name":"Los de siempre","ownerId":"u1","memberCount":4,"endsAt":"2026-12-31T23:59:59.000Z"},{"id":"l2","name":"Para el finde","ownerId":"u2","memberCount":3,"endsAt":null}]}"""
             ruta == "api/mobile/leagues/invites" -> """{"invites":[{"id":"l3","name":"Otra liga","ownerId":"u3","ownerName":"Iker"}]}"""
-            ruta == "api/mobile/clans" -> """{"clans":[{"id":"c1","name":"Cazadores del Alba","tag":"ALBA","description":"Platinos al amanecer.","memberCount":12},{"id":"c2","name":"Fontaneros","tag":"FONT","description":"De Mario y poco más.","memberCount":5}],"myClan":{"tag":"ALBA","name":"Cazadores del Alba","role":"member"}}"""
+            ruta == "api/mobile/clans" -> """{"clans":[{"id":"c1","name":"Cazadores del Alba","tag":"ALBA","description":"Platinos al amanecer.","memberCount":12,"emblema":"emblema:1:hexagono:llama:1:9"},{"id":"c2","name":"Fontaneros","tag":"FONT","description":"De Mario y poco más.","memberCount":5,"emblema":"emblema:1:circulo:mando:0:9"}],"myClan":{"tag":"ALBA","name":"Cazadores del Alba","role":"owner","emblema":"emblema:1:hexagono:llama:1:9"}}"""
             ruta == "api/mobile/clans/invites" -> """{"invites":[]}"""
-            ruta == "api/mobile/clans/ALBA" -> """{"clan":{"id":"c1","tag":"ALBA","name":"Cazadores del Alba","description":"Platinos al amanecer."},"score":18450,"amIMember":true,"amIOwner":false,"leaderboard":[{"userId":"u2","role":"owner","handle":"nerea","name":"Nerea","image":null,"score":9200,"trofeos":5120},{"userId":"u1","role":"member","handle":"lagrena","name":"La Greña","image":null,"score":9250,"trofeos":4312}],"activity":[],"invitables":[]}"""
+            ruta == "api/mobile/clans/ALBA" -> """{"clan":{"id":"c1","tag":"ALBA","name":"Cazadores del Alba","description":"Platinos al amanecer.","emblema":"emblema:1:hexagono:llama:1:9"},"score":18450,"amIMember":true,"amIOwner":true,"miRango":"owner","puedoEditar":true,"puedoInvitar":true,"leaderboard":[{"userId":"u2","role":"veterano","handle":"nerea","name":"Nerea","image":null,"score":9200,"trofeos":5120},{"userId":"u1","role":"owner","handle":"lagrena","name":"La Greña","image":null,"score":9250,"trofeos":4312}],"activity":[],"invitables":[]}"""
             ruta == "api/mobile/achievements" -> """{"badges":[{"id":"b1","name":"Primer platino","description":"Tu primer platino en Paragon.","earnedAt":"2026-01-12T10:00:00.000Z"},{"id":"b2","name":"Racha de 7","description":"Siete días seguidos con trofeos.","earnedAt":"2026-03-02T10:00:00.000Z"}],"trophyCase":[{"kind":"liga","rank":1,"titulo":"Liga Mensual · septiembre de 2026","earnedAt":"2026-10-01T00:00:00.000Z"}]}"""
             ruta == "api/mobile/diet" -> """{"dieta":null}"""
             ruta == "api/mobile/stats" ->

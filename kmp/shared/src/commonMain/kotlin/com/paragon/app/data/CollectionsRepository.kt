@@ -10,7 +10,7 @@ import com.paragon.shared.i18n.Textos
 import com.paragon.shared.i18n.T
 
 /** Carpetas de juegos (colecciones) — ver GET /api/mobile/collections en API-CONTRACT.md. */
-data class Coleccion(val id: String, val name: String, val gameIds: List<String>)
+data class Coleccion(val id: String, val name: String, val gameIds: List<String>, val portada: String? = null)
 
 sealed class CollectionsResult {
     data class Ok(val collections: List<Coleccion>) : CollectionsResult()
@@ -20,7 +20,7 @@ sealed class CollectionsResult {
 /** Resultado de una operación de escritura (crear/renombrar/borrar) — `message` solo si falló. */
 data class MutationOutcome(val ok: Boolean, val message: String? = null)
 
-private fun CollectionDto.toColeccion() = Coleccion(id, name, gameIds)
+private fun CollectionDto.toColeccion() = Coleccion(id, name, gameIds, portada)
 
 class CollectionsRepository(private val tokenStore: TokenStore? = null) {
     suspend fun getCollections(): CollectionsResult {
@@ -76,6 +76,29 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return false
         return try {
             ApiClient.collectionsApi(store).toggleGameInCollection(collectionId, gameId).dentro
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /** Sube la foto de la carpeta; null si fue bien, o el motivo. */
+    suspend fun subirPortada(id: String, bytes: ByteArray, mimeType: String, extension: String): String? {
+        val store = tokenStore ?: return Textos.t(T.error_sin_sesion)
+        return try {
+            val r = ApiClient.cliente(store).subirPortadaCarpeta(id, bytes, mimeType, extension)
+            if (r.url != null) null else r.error ?: Textos.t(T.ajustes_err_subir_imagen)
+        } catch (e: HttpException) {
+            e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code())
+        } catch (e: Exception) {
+            Textos.t(T.error_red)
+        }
+    }
+
+    /** Quita la foto: vuelven las carátulas de sus juegos. */
+    suspend fun quitarPortada(id: String): Boolean {
+        val store = tokenStore ?: return false
+        return try {
+            ApiClient.collectionsApi(store).quitarPortada(id).ok
         } catch (e: Exception) {
             false
         }

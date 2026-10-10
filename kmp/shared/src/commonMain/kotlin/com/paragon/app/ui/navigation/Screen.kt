@@ -1,5 +1,7 @@
 package com.paragon.app.ui.navigation
 
+import io.ktor.http.encodeURLParameter
+
 import com.paragon.shared.i18n.Textos
 import com.paragon.shared.i18n.Texto
 import com.paragon.shared.i18n.T
@@ -14,8 +16,16 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     object Social : Screen("social", T.nav_ligas)
     // No es un item de la barra inferior — se llega desde una tarjeta de
     // juego (ver GameDetailScreen.kt), de ahí el argumento en la ruta.
-    object GameDetail : Screen("game/{gameId}", T.nav_ficha) {
-        fun routeFor(gameId: String) = "game/$gameId"
+    // `trofeo` (opcional): al abrirla desde un trofeo, la ficha baja hasta él.
+    // `de` (opcional): handle de otra persona, para ver SU ficha de ese juego.
+    object GameDetail : Screen("game/{gameId}?trofeo={trofeo}&de={de}", T.nav_ficha) {
+        fun routeFor(gameId: String, trofeo: String? = null, de: String? = null): String {
+            val params = listOfNotNull(
+                trofeo?.let { "trofeo=" + it.encodeURLParameter() },
+                de?.let { "de=" + it.encodeURLParameter() },
+            )
+            return "game/$gameId" + if (params.isEmpty()) "" else "?" + params.joinToString("&")
+        }
     }
     object Settings : Screen("settings", T.nav_ajustes)
     object LinkedAccounts : Screen("linked_accounts", T.cuentas_titulo)
@@ -34,7 +44,11 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     object Usuario : Screen("user/{handle}", T.nav_perfil) {
         fun routeFor(handle: String) = "user/$handle"
     }
+    object PlatinosOferta : Screen("platinos_oferta", T.ofertas_titulo)
     object SessionDetail : Screen("session/{sesionId}", T.nav_sesiones) {
         fun routeFor(sesionId: String) = "session/$sesionId"
     }
 }
+
+/** Abrir la ficha de un juego de otra persona desde donde sea (la hoja de su perfil...). Lo da MainScreen. */
+val LocalAbrirJuegoDe = androidx.compose.runtime.staticCompositionLocalOf<(handle: String, gameId: String) -> Unit> { { _, _ -> } }

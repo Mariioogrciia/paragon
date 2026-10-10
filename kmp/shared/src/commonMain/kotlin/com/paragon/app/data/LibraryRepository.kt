@@ -51,6 +51,7 @@ data class LibraryGame(
         earnedTrophies = earnedTotal,
         totalTrophies = definedTotal,
         percent = progressPercent,
+        platinado = isPlatinado,
     )
 }
 

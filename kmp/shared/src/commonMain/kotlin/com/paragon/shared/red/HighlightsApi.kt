@@ -13,6 +13,8 @@ data class GameCardDto(
     val earnedTrophies: Int,
     val totalTrophies: Int,
     val percent: Int,
+    /** Platino conseguido (del juego base), aunque queden DLC por completar. */
+    val platinado: Boolean = false,
 )
 
 /**
@@ -34,6 +36,20 @@ data class NextTrophyDto(
     val grade: String?,
 )
 
+/** "Últimos trofeos" — `ultimosTrofeos()` de lib/history.ts, igual que el perfil web. */
+@Serializable
+data class LatestTrophyDto(
+    val gameId: String,
+    val gameTitle: String,
+    val gameIconUrl: String? = null,
+    val trophyId: String,
+    val trophyName: String,
+    val iconUrl: String? = null,
+    val grade: String? = null,
+    val earnedAt: String,
+    val rarityPercent: Double? = null,
+)
+
 @Serializable
 data class HighlightsResponse(
     val nearPlatinum: List<GameCardDto>,
@@ -42,6 +58,7 @@ data class HighlightsResponse(
     // sin esto, Gson/Moshi deja la lista en null y revienta el .map() de
     // PanelRepository en vez de mostrar la sección vacía sin más.
     val nextTrophies: List<NextTrophyDto> = emptyList(),
+    val latestTrophies: List<LatestTrophyDto> = emptyList(),
 )
 
 class HighlightsApi internal constructor(private val c: ClienteParagon) {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
-import { getGameDetail, getProfileByUserId } from "@/lib/profiles";
+import { getGameDetail, getProfileByHandle, getProfileByUserId } from "@/lib/profiles";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { errorMovil } from "@/lib/mensajesApi";
 import { gameProgress } from "@/lib/stats";
@@ -21,9 +21,16 @@ export async function GET(
     return errorMovil(req, "No autenticado", 401);
   }
 
-  const profile = await getProfileByUserId(userId);
-  if (!profile?.handle) {
+  const propio = await getProfileByUserId(userId);
+  if (!propio?.handle) {
     return errorMovil(req, "Perfil sin terminar de configurar", 409);
+  }
+  // `?de=<handle>`: la ficha de ese juego de OTRA persona (desde su perfil),
+  // pública igual que /u/[handle]/[gameId] en la web.
+  const de = new URL(req.url).searchParams.get("de");
+  const profile = de && de !== propio.handle ? await getProfileByHandle(de) : propio;
+  if (!profile) {
+    return errorMovil(req, "Perfil no encontrado", 404);
   }
 
   const { gameId } = await params;

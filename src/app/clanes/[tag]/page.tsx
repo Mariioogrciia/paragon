@@ -1,4 +1,7 @@
-import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends } from "@/lib/clans";
+import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends, getUserClan } from "@/lib/clans";
+import { normalizarRango, puedeEditarClan, puedeInvitar, sucesorDelLider } from "@/lib/clanRangos";
+import { GestionMiembro } from "./GestionMiembro";
+import { EditorInfoClan } from "./EditorInfoClan";
 import { notFound } from "next/navigation";
 import { ClanActions } from "./ClanActions";
 import { InviteFriendsButton } from "./InviteFriendsButton";
@@ -11,6 +14,8 @@ import { libreaDe } from "@/lib/librea";
 import { ClanActivityFeed } from "@/components/ClanActivityFeed";
 import { BackButton } from "@/components/BackButton";
 import { GuerraDeClanes } from "./GuerraDeClanes";
+import { EditorEscudo } from "./EditorEscudo";
+import { EscudoClan } from "@/components/EscudoClan";
 import { DURACION_DIAS, clanesRetables, getGuerrasDeClan, type GuerraVista } from "@/lib/clanWars";
 
 /** Sin esto la pestaña decía solo "Paragon" en la página de cualquier clan. */
@@ -40,9 +45,15 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
 
   const amIMember = leaderboard.some(m => m.userId === userId);
   const amIOwner = clan.ownerId === userId;
+  // Tu rango aquí (lib/clanRangos.ts) decide qué puedes tocar; null si no eres miembro.
+  const miRango = amIMember ? normalizarRango(leaderboard.find((m) => m.userId === userId)?.role) : null;
+  const puedoEditar = puedeEditarClan(miRango);
+  const puedoInvitar = puedeInvitar(miRango);
+  // Si ya estás en OTRO clan, en vez de "Unirme" se dice que salgas de ese primero.
+  const otroClan = userId && !amIMember ? (await getUserClan(userId))?.clan.tag ?? null : null;
 
   // Solo se calcula si hace falta: nadie más lo va a ver.
-  const invitables = amIOwner && userId ? await getInvitableFriends(userId, clan.id) : [];
+  const invitables = puedoInvitar && userId ? await getInvitableFriends(userId, clan.id) : [];
   // Guerra de clanes (lib/clanWars.ts). Si fallara (p. ej. sin la tabla),
   // la página del clan se enseña igual, sin la sección.
   const [guerras, retables] = await Promise.all([
@@ -72,12 +83,19 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-4">
+            <EscudoClan emblema={clan.logoUrl} size={72} />
             <Dorsal id={clan.tag.toUpperCase()} texto={clan.tag} grande />
             <h1 className="font-heading min-w-0 text-[clamp(1.875rem,5vw,2.75rem)] font-bold uppercase leading-tight">
               <span className="carreras-titulo">{clan.name}</span>
             </h1>
           </div>
           {clan.description && <p className="mt-4 max-w-xl text-muted">{clan.description}</p>}
+          {puedoEditar && (
+            <div className="mt-4 flex flex-wrap items-start gap-2">
+              <EditorEscudo clanId={clan.id} inicial={clan.logoUrl} />
+              <EditorInfoClan clanId={clan.id} nombre={clan.name} descripcion={clan.description} />
+            </div>
+          )}
           <div className="mt-5 flex flex-wrap gap-x-8 gap-y-4">
             <div>
               <p className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("ClanPage.puntosClan")}</p>
@@ -95,8 +113,14 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
         </div>
 
         <div className="flex flex-wrap items-start gap-3">
-          {amIOwner && <InviteFriendsButton clanId={clan.id} friends={invitables} />}
-          {userId && <ClanActions clanId={clan.id} amIMember={amIMember} amIOwner={amIOwner} />}
+          {puedoInvitar && <InviteFriendsButton clanId={clan.id} friends={invitables} />}
+          {userId && <ClanActions
+              clanId={clan.id}
+              amIMember={amIMember}
+              amIOwner={amIOwner}
+              otroClan={otroClan}
+              sucesor={amIOwner && userId ? (() => { const s = sucesorDelLider(leaderboard, userId); return s ? s.name || s.handle || "?" : null; })() : null}
+            />}
         </div>
       </div>
 
@@ -122,15 +146,20 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
             {t("ClanPage.contribucion")}
           </h2>
           <p className="mb-6 mt-1 max-w-xl text-sm text-muted">{t("ClanPage.contribucionTexto")}</p>
-          <ol className="overflow-hidden rounded-[18px] border border-border bg-surface">
+          {/* Sin overflow-hidden: recortaba el menú de gestión de cada miembro
+              (GestionMiembro). Las esquinas las redondea cada fila. */}
+          <ol className="rounded-[18px] border border-border bg-surface">
             {leaderboard.map((m, i) => {
               const parte = score > 0 ? m.contribucion / score : 0;
               const librea = libreaDe(m.userId);
               return (
-                <li key={m.userId} className="border-b border-border last:border-0">
+                <li
+                  key={m.userId}
+                  className="flex items-start border-b border-border last:border-0 first:[&>a]:rounded-tl-[17px] last:[&>a]:rounded-bl-[17px] first:[&>a:last-child]:rounded-tr-[17px] last:[&>a:last-child]:rounded-br-[17px]"
+                >
                   <Link
                     href={`/u/${m.handle}`}
-                    className="carreras-fila flex flex-col gap-2.5 px-4 py-3.5"
+                    className="carreras-fila flex min-w-0 flex-1 flex-col gap-2.5 px-4 py-3.5"
                     style={{ ["--librea" as string]: librea.fondo }}
                   >
                     <span className="flex items-center gap-3">
@@ -139,7 +168,7 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-bold">{m.name || m.handle}</span>
                         <span className="block text-xs leading-snug text-muted">
-                          {m.role === "owner" ? t("ClanPage.lider") : t("ClanPage.miembro")} ·{" "}
+                          {t(`ClanPage.rango_${normalizarRango(m.role)}`)} ·{" "}
                           {t("ClanPage.desde", { fecha: m.joinedAt.toLocaleDateString(idioma, { day: "numeric", month: "short", year: "numeric" }) })} ·{" "}
                           {t("ClanPage.trofeosEnClan", { n: m.trofeosEnClan })}
                         </span>
@@ -156,6 +185,11 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
                       <span className="block h-full rounded-full" style={{ width: `${Math.max(parte * 100, m.contribucion > 0 ? 2 : 0)}%`, background: librea.fondo }} />
                     </span>
                   </Link>
+                  {miRango && m.userId !== userId && (
+                    <div className="shrink-0 py-3 pr-2">
+                      <GestionMiembro clanId={clan.id} miembroId={m.userId} nombre={m.name || m.handle || "?"} rangoMiembro={m.role} miRango={miRango} />
+                    </div>
+                  )}
                 </li>
               );
             })}

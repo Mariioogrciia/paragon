@@ -76,8 +76,8 @@ data class TrophyGuideResponse(val videoId: String?)
 
 class GamesApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/games/[gameId]/route.ts en el proyecto Next.js. */
-    suspend fun getGameDetail(gameId: String): GameDetailResponse =
-        c.http.get("api/mobile/games/${gameId.encodeURLPathPart()}").body()
+    suspend fun getGameDetail(gameId: String, de: String? = null): GameDetailResponse =
+        c.http.get("api/mobile/games/${gameId.encodeURLPathPart()}") { de?.let { parameter("de", it) } }.body()
 
     /** Anclar/desanclar para Modo Enfoque — ver games/[gameId]/pin/route.ts. Sin body. */
     suspend fun togglePin(gameId: String): PinResponse =

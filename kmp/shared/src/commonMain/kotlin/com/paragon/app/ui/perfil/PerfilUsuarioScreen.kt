@@ -1,5 +1,6 @@
 package com.paragon.app.ui.perfil
 
+import com.paragon.app.ui.common.premiumClickable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -205,14 +206,19 @@ private fun ContenidoPerfil(
         if (p.ultimosTrofeos.isNotEmpty()) {
             Seccion(Textos.t(T.perfil_ultimos_trofeos)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    p.ultimosTrofeos.forEach { t -> FilaTrofeo(t.aTrophyItem(), t.juego) }
+                    // Cada trofeo abre SU ficha de ese juego (como la hoja de perfil de antes, en master).
+                    val abrirJuegoDe = com.paragon.app.ui.navigation.LocalAbrirJuegoDe.current
+                    p.ultimosTrofeos.forEach { t -> FilaTrofeo(t.aTrophyItem(), t.juego, onClick = { abrirJuegoDe(p.handle, t.gameId) }) }
                 }
             }
         }
         if (p.recentGames.isNotEmpty()) {
             Seccion(Textos.t(T.perfil_recientes), conPadding = false) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(horizontal = 20.dp)) {
-                    items(p.recentGames, key = { it.id }) { JuegoReciente(it) }
+                    items(p.recentGames, key = { it.id }) { juego ->
+                        val abrirJuegoDe = com.paragon.app.ui.navigation.LocalAbrirJuegoDe.current
+                        JuegoReciente(juego, onClick = { abrirJuegoDe(p.handle, juego.id) })
+                    }
                 }
             }
         }
@@ -777,8 +783,8 @@ private fun Rivalidad(mias: GlobalStats, suyo: UserProfileDto) {
 /* ------------------------------- Jugado recientemente ------------------------------ */
 
 @Composable
-private fun JuegoReciente(game: RecentGameDto) {
-    Column(Modifier.width(120.dp)) {
+private fun JuegoReciente(game: RecentGameDto, onClick: () -> Unit) {
+    Column(Modifier.width(120.dp).clip(RoundedCornerShape(radio(14))).premiumClickable(onClick = onClick)) {
         Box(Modifier.size(120.dp).clip(RoundedCornerShape(radio(14))).background(Surface2)) {
             if (game.coverUrl.isNotBlank()) {
                 AsyncImage(model = game.coverUrl, contentDescription = game.title, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())

@@ -7,6 +7,7 @@ import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.ChooseHandleRequest
 import com.paragon.shared.red.GameCardDto
 import com.paragon.shared.red.LogoutRequest
+import com.paragon.shared.red.LatestTrophyDto
 import com.paragon.shared.red.NextTrophyDto
 import com.paragon.shared.red.paragonErrorMessage
 import com.paragon.shared.red.HttpException
@@ -55,7 +56,9 @@ data class GameProgress(
     val coverUrl: String,
     val earnedTrophies: Int,
     val totalTrophies: Int,
-    val percent: Int
+    val percent: Int,
+    /** Platino del juego base conseguido: lo que quede son DLC, no es "siguiente platino". */
+    val platinado: Boolean = false,
 )
 
 /** Perfil + stats reales, o por qué no se pudieron traer — ver /api/mobile/panel en el proyecto Next.js. */
@@ -96,12 +99,27 @@ data class NextTrophy(
     val grade: String?,
 )
 
-/** "A un paso del platino" + "Recientes" + "Siguiente trofeo" — ver /api/mobile/panel/highlights, mismo cálculo que la portada web. */
+/** "Últimos trofeos" — los conseguidos más recientes de toda la biblioteca, como en el perfil web. */
+data class LatestTrophy(
+    val gameId: String,
+    val gameTitle: String,
+    val gameIconUrl: String?,
+    val trophyId: String,
+    val trophyName: String,
+    val iconUrl: String?,
+    val grade: String?,
+    /** Ya formateado ("3 h", "2 d"). */
+    val timeAgo: String,
+    val rarityPercent: Double?,
+)
+
+/** "A un paso del platino" + "Recientes" + "Siguiente trofeo" + "Últimos trofeos" — ver /api/mobile/panel/highlights, mismo cálculo que la portada web. */
 sealed class HighlightsResult {
     data class Ok(
         val nearPlatinum: List<GameProgress>,
         val recent: List<GameProgress>,
         val nextTrophies: List<NextTrophy> = emptyList(),
+        val latestTrophies: List<LatestTrophy> = emptyList(),
     ) : HighlightsResult()
     data class Error(val message: String) : HighlightsResult()
 }
@@ -113,6 +131,7 @@ private fun GameCardDto.toGameProgress() = GameProgress(
     earnedTrophies = earnedTrophies,
     totalTrophies = totalTrophies,
     percent = percent,
+    platinado = platinado,
 )
 
 private fun NextTrophyDto.toNextTrophy() = NextTrophy(
@@ -125,6 +144,18 @@ private fun NextTrophyDto.toNextTrophy() = NextTrophy(
     gameProgress = gameProgress,
     iconUrl = iconUrl,
     grade = grade,
+)
+
+private fun LatestTrophyDto.toLatestTrophy() = LatestTrophy(
+    gameId = gameId,
+    gameTitle = gameTitle,
+    gameIconUrl = gameIconUrl,
+    trophyId = trophyId,
+    trophyName = trophyName,
+    iconUrl = iconUrl,
+    grade = grade,
+    timeAgo = relativeTimeEs(earnedAt),
+    rarityPercent = rarityPercent,
 )
 
 class PanelRepository(private val tokenStore: TokenStore? = null, private val panelDao: PanelDao? = null) {
@@ -232,6 +263,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 nearPlatinum = response.nearPlatinum.map { it.toGameProgress() },
                 recent = response.recent.map { it.toGameProgress() },
                 nextTrophies = response.nextTrophies.map { it.toNextTrophy() },
+                latestTrophies = response.latestTrophies.map { it.toLatestTrophy() },
             )
         } catch (e: HttpException) {
             HighlightsResult.Error(Textos.t(T.error_servidor, e.code()))

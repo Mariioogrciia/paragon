@@ -4,6 +4,13 @@
     "subtitle": "Wähle einen beliebigen Ordner als Plan und füge Spiele von jeder Spielseite hinzu, um deine Route aufzubauen."
   },
   "ritmoPage": {
+    "compararCon": "Vergleichen mit",
+    "sinComparar": "Niemand (nur ich)",
+    "tu": "Du",
+    "empate": "Unentschieden",
+    "ganasTu": "Du gewinnst",
+    "ganaOtro": "{nombre} gewinnt",
+    "diaADia": "Tag für Tag",
     "backButton": "Zurück zur Übersicht",
     "helpCurrentYear": "Klicke auf einen Monat, um die Aufschlüsselung zu sehen.",
     "helpOutOfRange": "Dieser Monat liegt außerhalb des letzten Jahres und ist unten deshalb nicht markiert. Klicke auf einen Balken, um zu den letzten 12 Monaten zurückzukehren.",

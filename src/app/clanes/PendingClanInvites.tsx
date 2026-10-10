@@ -23,7 +23,10 @@ export function PendingClanInvites({ invites }: { invites: Invite[] }) {
     setCargando(clanId);
     setError("");
     try {
-      if (accion === "aceptar") await acceptClanInviteAction(clanId);
+      if (accion === "aceptar") {
+        const r = await acceptClanInviteAction(clanId);
+        if (r.error) throw new Error(r.error);
+      }
       else await declineClanInviteAction(clanId);
       setResueltas((prev) => new Set(prev).add(clanId));
     } catch (e) {

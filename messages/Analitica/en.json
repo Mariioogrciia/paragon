@@ -4,6 +4,13 @@
     "subtitle": "Pick any folder as your plan and add games from each game page to build your route."
   },
   "ritmoPage": {
+    "compararCon": "Compare with",
+    "sinComparar": "Nobody (just me)",
+    "tu": "You",
+    "empate": "Tie",
+    "ganasTu": "You win",
+    "ganaOtro": "{nombre} wins",
+    "diaADia": "Day by day",
     "backButton": "Back to dashboard",
     "helpCurrentYear": "Click any month to see its breakdown.",
     "helpOutOfRange": "This month falls outside the last year, so it isn't marked below. Click any bar to go back to the last 12 months.",

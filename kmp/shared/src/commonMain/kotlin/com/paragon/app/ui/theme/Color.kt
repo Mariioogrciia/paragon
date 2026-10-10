@@ -49,12 +49,46 @@ private val BaseContraste = Suelo(Color(0xFF000000), Color(0xFF0C1017), Color(0x
  * plataforma (PS5, Xbox...) ponen su fondo de ambientación.
  */
 private fun suelo(): Suelo = when (modoActivo) {
-    ThemeMode.CLARO -> tenido(BaseClaro, claro = true)
-    ThemeMode.OLED -> tenido(BaseOled, claro = false).copy(background = BaseOled.background)
+    ThemeMode.CLARO -> sueloEstilo(claro = true) ?: tenido(BaseClaro, claro = true)
+    // OLED: negro puro con los colores simples; las paletas completas (y la
+    // de juego) oscurecen SU fondo en vez de tirarlo a negro, para que se note
+    // la diferencia ("no cambia nada entre los colores simples y los de dos").
+    ThemeMode.OLED -> sueloEstilo(claro = false)?.copy(background = BaseOled.background)
+        ?: paletaCompleta()?.let { it.copy(background = lerp(it.background, Color.Black, 0.45f)) }
+        ?: tenido(BaseOled, claro = false).copy(background = BaseOled.background)
     ThemeMode.CONTRASTE -> BaseContraste
     else -> paletaJuegoActiva?.suelo
+        ?: sueloEstilo(claro = false)
         ?: acentoActivo.suelo?.let { if (acentoLibreActivo == null) it else null }
-        ?: tenido(estiloActivo.fondoOscuro?.let { BaseOscuro.copy(background = it) } ?: BaseOscuro, claro = false)
+        ?: tenido(BaseOscuro, claro = false)
+}
+
+/**
+ * El suelo de un estilo con fondo propio (Terminal, Vidrio, PS5...): su fondo
+ * y, a partir de él, tarjetas y bordes algo más claros (u oscuros, en claro)
+ * teñidos con su color. null = Clásico, que usa el de la app.
+ */
+/** El suelo propio de una paleta completa o de la de juego; null con un color simple. */
+private fun paletaCompleta(): Suelo? =
+    paletaJuegoActiva?.suelo ?: acentoActivo.suelo?.let { if (acentoLibreActivo == null) it else null }
+
+private fun sueloEstilo(claro: Boolean): Suelo? {
+    val e = estiloActivo
+    val fondo = (if (claro) e.fondoClaro else e.fondoOscuro) ?: return null
+    val tinte = e.tinte ?: fondo
+    return if (claro) Suelo(
+        fondo,
+        lerp(Color.White, tinte, 0.025f),
+        lerp(lerp(fondo, Color.Black, 0.035f), tinte, 0.05f),
+        lerp(BaseClaro.border, tinte, 0.20f),
+        BaseClaro.muted,
+    ) else Suelo(
+        fondo,
+        lerp(lerp(fondo, Color.White, 0.05f), tinte, 0.07f),
+        lerp(lerp(fondo, Color.White, 0.10f), tinte, 0.10f),
+        lerp(lerp(fondo, Color.White, 0.14f), tinte, 0.18f),
+        BaseOscuro.muted,
+    )
 }
 
 /** El color que tiñe el suelo: el del acento elegido (null = Platino, el de la marca, que ya es la base). */
@@ -90,6 +124,8 @@ private val brutalista: Boolean get() = estiloActivo.clave == "estilo-brutalista
 val Background: Color get() = activeDynamicScheme?.background ?: suelo().background
 // Vidrio: superficies algo translúcidas sobre el fondo (la web, además, desenfoca).
 val Surface: Color get() = activeDynamicScheme?.surface ?: suelo().surface.let { if (vidrio) it.copy(alpha = 0.78f) else it }
+/** Surface siempre opaca: hojas y diálogos (en Vidrio, Surface es translúcida y se veía lo de detrás). */
+val SurfaceSolida: Color get() = Surface.copy(alpha = 1f)
 val Surface2: Color get() = activeDynamicScheme?.surfaceVariant ?: suelo().surface2.let { if (vidrio) it.copy(alpha = 0.82f) else it }
 // Brutalista: bordes marcados con el color del texto, nada de líneas tenues.
 val Border: Color get() = if (brutalista) Foreground.copy(alpha = 0.6f) else activeDynamicScheme?.outline ?: suelo().border

@@ -375,5 +375,18 @@
     "principal": "Principal",
     "oficial": "Oficial",
     "otrosPartidos": "Más partidos de esta fase"
+  },
+  "PlatinosOferta": {
+    "titulo": "Platinos de oferta",
+    "descripcion": "Juegos de Steam rebajados cuyo 100 % es asequible: la dificultad sale del logro más raro según Steam. Sin los que ya tienes.",
+    "logros": "{n} logros · el más raro, {raro} %",
+    "horas": "~{h} h al 100 %",
+    "verFicha": "Ver ficha",
+    "verEnSteam": "Ver en Steam",
+    "nota": "Precios de Steam España. Ofertas vía CheapShark; dificultad estimada con los porcentajes globales de Steam.",
+    "difMuyFacil": "Muy fácil",
+    "difFacil": "Fácil",
+    "difMedia": "Media",
+    "difDificil": "Difícil"
   }
 }

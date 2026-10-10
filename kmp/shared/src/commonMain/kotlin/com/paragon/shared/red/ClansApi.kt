@@ -6,9 +6,9 @@ import io.ktor.client.request.*
 import io.ktor.http.encodeURLPathPart
 
 @Serializable
-data class ClanSummaryDto(val id: String, val name: String, val tag: String, val description: String, val memberCount: Int)
+data class ClanSummaryDto(val id: String, val name: String, val tag: String, val description: String, val memberCount: Int, val emblema: String? = null)
 @Serializable
-data class MyClanDto(val tag: String, val name: String, val role: String)
+data class MyClanDto(val tag: String, val name: String, val role: String, val emblema: String? = null)
 @Serializable
 data class ClansListResponse(val clans: List<ClanSummaryDto>, val myClan: MyClanDto?)
 
@@ -58,7 +58,7 @@ data class ClanActivityItemDto(
     val game: ClanActivityGameDto,
 )
 @Serializable
-data class ClanInfoDto(val id: String, val tag: String, val name: String, val description: String)
+data class ClanInfoDto(val id: String, val tag: String, val name: String, val description: String, val emblema: String? = null)
 @Serializable
 data class InvitableFriendDto(val userId: String, val handle: String?, val displayName: String?, val image: String?)
 
@@ -70,6 +70,10 @@ data class ClanDetailResponse(
     val activity: List<ClanActivityItemDto>,
     val amIMember: Boolean,
     val amIOwner: Boolean,
+    /** Mi rango en este clan (owner/colider/veterano/member), null si no soy miembro. */
+    val miRango: String? = null,
+    val puedoEditar: Boolean = false,
+    val puedoInvitar: Boolean = false,
     val invitables: List<InvitableFriendDto>,
     // Guerra de clanes (como la web). Con valor por defecto: un servidor viejo no la manda.
     val guerra: ClanGuerrasDto = ClanGuerrasDto(),
@@ -109,6 +113,15 @@ data class ResponderGuerraRequest(val aceptar: Boolean)
 @Serializable
 data class InviteToClanRequest(val invitedUserId: String)
 
+@Serializable
+data class EmblemaClanRequest(val emblema: String)
+
+@Serializable
+data class EditarClanRequest(val name: String, val description: String)
+
+@Serializable
+data class RangoRequest(val rango: String)
+
 /** Clanes — ver la sección "Clanes" en API-CONTRACT.md. */
 class ClansApi internal constructor(private val c: ClienteParagon) {
     suspend fun getClans(): ClansListResponse =
@@ -144,6 +157,26 @@ class ClansApi internal constructor(private val c: ClienteParagon) {
     /** Solo el owner, y solo a un amigo suyo que no esté ya en un clan. */
     suspend fun inviteToClan(tag: String, request: InviteToClanRequest) {
         c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/invite") { json(request) }
+    }
+
+    /** Nombre y descripción (líder y colíderes) — PATCH en clans/[tag]/route.ts. */
+    suspend fun editarClan(tag: String, request: EditarClanRequest) {
+        c.http.patch("api/mobile/clans/${tag.encodeURLPathPart()}") { json(request) }
+    }
+
+    /** Cambiar el rango de un miembro ("owner" pasa el liderazgo) — clans/[tag]/miembros/[userId]. */
+    suspend fun cambiarRango(tag: String, userId: String, request: RangoRequest) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/miembros/${userId.encodeURLPathPart()}") { json(request) }
+    }
+
+    /** Expulsar a un miembro de rango inferior. */
+    suspend fun expulsar(tag: String, userId: String) {
+        c.http.delete("api/mobile/clans/${tag.encodeURLPathPart()}/miembros/${userId.encodeURLPathPart()}")
+    }
+
+    /** Escudo del clan, líder y colíderes — ver src/app/api/mobile/clans/[tag]/emblema/route.ts. */
+    suspend fun setEmblema(tag: String, request: EmblemaClanRequest) {
+        c.http.post("api/mobile/clans/${tag.encodeURLPathPart()}/emblema") { json(request) }
     }
 
     /** Ver src/app/api/mobile/clans/[tag]/war/route.ts. */

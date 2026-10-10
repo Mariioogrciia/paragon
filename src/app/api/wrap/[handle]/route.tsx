@@ -17,9 +17,11 @@ import { generoTop, juegoDestacado } from "@/components/ParagonWrap";
  * Postgres a través de `postgres-js`, que no funciona en edge.
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ handle: string }> },
 ) {
+  // El dominio real desde el que se pide (antes ponía "paragon.app", que no es la web).
+  const dominio = new URL(request.url).host;
   const { handle } = await params;
 
   const profile = await getProfileByHandle(handle);
@@ -151,7 +153,7 @@ export async function GET(
         </div>
 
         <div style={{ display: "flex", marginTop: "36px", fontSize: 15, color: "#4b5468" }}>
-          paragon.app/u/{handle}
+          {dominio}/u/{handle}
         </div>
       </div>
     ),

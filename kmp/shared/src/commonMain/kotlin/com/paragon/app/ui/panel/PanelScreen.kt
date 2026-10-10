@@ -158,7 +158,7 @@ fun PanelScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Background),
-            contentPadding = PaddingValues(bottom = 32.dp)
+            contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
         ) {
             item { Column {
                 // Rediseño del 5 oct 2026 (maqueta "1 · Inicio"): cabecera propia
@@ -204,7 +204,8 @@ fun PanelScreen(
                 }
 
                 val cercano = ok?.nearPlatinum?.firstOrNull()
-                val objetivo = pinnedGame?.toGameProgress() ?: cercano
+                // Un juego anclado ya platinado (solo le faltan DLC) no es "siguiente platino".
+                val objetivo = pinnedGame?.toGameProgress()?.takeIf { !it.platinado } ?: cercano
                 val siguientes = ok?.nextTrophies.orEmpty()
                 val siguienteDelObjetivo = objetivo?.let { o -> siguientes.firstOrNull { it.gameId == o.id } }
                 val otrosSiguientes = siguientes.filter { it !== siguienteDelObjetivo }.take(2)
@@ -246,7 +247,7 @@ fun PanelScreen(
                                 trofeo.gameTitle,
                                 trofeo.rarityPercent?.let { "${numeroLocal(it, 1)} %" },
                             ).joinToString(" · "),
-                            onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId)) },
+                            onClick = { navController.navigate(Screen.GameDetail.routeFor(trofeo.gameId, trofeo.trophyId)) },
                         )
                     }
                 }
@@ -270,6 +271,18 @@ fun PanelScreen(
                             Text(Textos.t(T.comun_reintentar), color = Accent, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                         }
                     }
+                }
+
+                // Últimos trofeos — los más recientes de toda la biblioteca,
+                // como en el perfil web (RecentTrophies.tsx).
+                val ultimos = ok?.latestTrophies.orEmpty()
+                if (ultimos.isNotEmpty()) {
+                    TituloSeccion(Textos.t(T.panel_ultimos_trofeos))
+                    UltimosTrofeos(
+                        trofeos = ultimos,
+                        onClick = { navController.navigate(Screen.GameDetail.routeFor(it.gameId, it.trophyId)) },
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                    )
                 }
 
                 // Lo secundario: cerrojo de hitos, meta de platinos y rival.

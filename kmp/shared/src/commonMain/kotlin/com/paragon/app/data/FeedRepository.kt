@@ -74,7 +74,8 @@ fun mensajeFeed(item: FeedItem): String = when (item.type) {
     else -> item.gameTitle?.let { Textos.t(T.feed_otro, it) } ?: Textos.t(T.feed_otro_sin)
 }
 
-private fun relativeTimeEs(iso: String): String {
+/** "ahora", "5 min", "3 h", "2 d" — también lo usa "Últimos trofeos" del Panel. */
+internal fun relativeTimeEs(iso: String): String {
     val millis = isoAMillis(iso) ?: return ""
 
     val diffMinutes = (ahoraMillis() - millis) / 60_000

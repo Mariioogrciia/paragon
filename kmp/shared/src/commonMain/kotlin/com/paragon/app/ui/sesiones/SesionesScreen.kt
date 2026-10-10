@@ -109,7 +109,6 @@ import kotlin.time.Instant
  * Plazas: siempre el total contando a quien organiza (4 = tú + 3 libres).
  */
 
-private val METAL = mapOf("platinum" to "🏆", "gold" to "🥇", "silver" to "🥈", "bronze" to "🥉")
 private val PLATAFORMAS = mapOf("psn" to "PlayStation", "xbox" to "Xbox", "steam" to "Steam", "epic" to "Epic Games", "ubisoft" to "Ubisoft", "google" to "Google Play")
 private const val OTRO = "__otro__"
 
@@ -166,7 +165,7 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = if (embebida) 96.dp else 32.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(sesiones, key = { it.id }) { s -> FilaSesion(s) { onAbrir(s.id) } }
@@ -286,7 +285,7 @@ private fun Caratula(url: String?, ancho: Int, alto: Int) {
 // ------------------------------------------------------------------ Ficha
 
 @Composable
-fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> Unit) {
+fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> Unit, onAbrirTrofeo: (gameId: String, trophyId: String?) -> Unit = { _, _ -> }) {
     val repo = remember { SesionesRepository(tokenStore) }
     val scope = rememberCoroutineScope()
     var estado by remember { mutableStateOf<SesionResultado<SesionDto>?>(null) }
@@ -335,7 +334,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                     else -> null
                 }
                 Column(
-                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 32.dp),
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Tarjeta {
@@ -344,7 +343,13 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                             Spacer(Modifier.width(14.dp))
                             Column(Modifier.weight(1f)) {
                                 Text("${s.juego.titulo} · ${s.juego.deviceLabel}".uppercase(), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                // Con el juego en tu biblioteca, el trofeo abre tu ficha en él.
+                                val miJuego = s.miJuegoId
+                                Row(
+                                    Modifier.padding(top = 6.dp)
+                                        .then(if (miJuego != null) Modifier.clip(RoundedCornerShape(radio(8))).premiumClickable { onAbrirTrofeo(miJuego, s.trofeoInfo?.trophyId) } else Modifier),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
                                     s.trofeoInfo?.iconUrl?.let { url ->
                                         urlImagenSegura(url)?.let {
                                             AsyncImage(model = it, contentDescription = null, modifier = Modifier.size(30.dp).clip(RoundedCornerShape(radio(6))))
@@ -352,7 +357,7 @@ fun SesionDetalleScreen(tokenStore: TokenStore, sesionId: String, onBack: () -> 
                                         }
                                     }
                                     Text(
-                                        (s.trofeoInfo?.grade?.let { METAL[it]?.plus(" ") } ?: "") + s.trofeo,
+                                        s.trofeo,
                                         color = Foreground,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
@@ -554,7 +559,7 @@ private fun NuevaSesionSheet(
         trophyId = if (lista.isEmpty()) OTRO else null
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -578,7 +583,7 @@ private fun NuevaSesionSheet(
                 val hayDlc = lista?.any { it.grupo != null } == true
                 val opciones = listOf(OpcionSelector(OTRO, Textos.t(T.sesiones_trofeo_otro))) +
                     (lista ?: emptyList()).map {
-                        OpcionSelector(it.trophyId, it.name, icono = it.grade?.let { g -> METAL[g] }, grupo = it.grupo ?: if (hayDlc) Textos.t(T.sesiones_juego_base) else null)
+                        OpcionSelector(it.trophyId, it.name, imagen = it.iconUrl, grupo = it.grupo ?: if (hayDlc) Textos.t(T.sesiones_juego_base) else null)
                     }
                 Selector(
                     valor = trophyId,
@@ -733,7 +738,7 @@ private fun CampoTexto(valor: String, onCambio: (String) -> Unit, placeholder: S
 /** El QR de una sesión (diseño v2): con la cámara normal abre la sesión en la web; con el lector de la app, aquí. */
 @Composable
 private fun HojaQrSesion(id: String, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

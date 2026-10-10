@@ -1,7 +1,7 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **9 de octubre de 2026**.
+releer todo el historial. Última actualización: **10 de octubre de 2026**.
 
 **9 oct — perfil completo en la app y el mes día a día contra otro:**
 - **Perfil de verdad** (`ui/perfil/PerfilUsuarioScreen.kt`, ruta
@@ -23,9 +23,151 @@ releer todo el historial. Última actualización: **9 de octubre de 2026**.
   (`ellos` y `yo`). Contrato en CONTRACT.md. Textos nuevos `perfil_*`.
 - Sin compilar en local (en la nube no se llega a Google Maven): la prueba es
   la CI de Android. Pendiente probarlo en el móvil.
+- **10 oct**: estos dos cambios (9 oct) vivían solo en la rama
+  `claude/focused-shannon-2l5u4p`; se han juntado con master (que ya tenía
+  la barra de cristal, precios, rangos de clan...). Al juntar: la hoja
+  `FriendProfileBottomSheet` se queda borrada y lo que master le había
+  añadido (tocar un juego reciente abre SU ficha, `LocalAbrirJuegoDe`) pasa a
+  `PerfilUsuarioScreen`, también en los últimos trofeos.
+
+
+**8 oct — precios en la app y "Platinos de oferta":**
+- **"Platinos de oferta"** (`lib/platinosOferta.ts`): ofertas de Steam de
+  CheapShark (2 páginas, 120) cruzadas con la rareza GLOBAL de los logros de
+  Steam (API pública sin clave): el logro más raro da la dificultad del 100 %
+  con la escala de siempre (`dificultadDesdeRareza`, hasta nivel 6). Precio
+  en euros de Steam España solo de las que se enseñan; horas de HLTB y ficha
+  si el juego ya está en Paragon; sin los que ya tienes en Steam. No se usan
+  las horas de HLTB ni los votos para filtrar: solo 22 juegos tienen horas y
+  hay 1 voto (8 oct). Primera vez ~8 s (Steam juego a juego), luego caché.
+  - Web: sección en Descubrir › Steam, en su propio `<Suspense>`
+    (`components/PlatinosDeOferta.tsx`).
+  - App: pantalla `ui/precios/PlatinosOfertaScreen` desde Perfil, con tus
+    alertas de precio arriba.
+- **Precio en la ficha de la app** (`TarjetaPrecioFicha`): Steam España en €,
+  la tienda más barata y el mínimo histórico (CheapShark, en US$) y botón de
+  alerta. No sale en tus propios juegos de Steam ni sin versión de PC
+  (`lib/preciosJuego.ts`: AppID propio o el que enlaza IGDB). Es un elemento
+  fijo de la lista: el índice de "bajar al trofeo" pasa de 4 a 5.
+- API móvil (CONTRACT.md): `games/{id}/precios`, `price-alerts` (GET/POST/
+  DELETE, mismas reglas que la web) y `platinos-oferta`. Modo demo con datos.
+- Arreglo: "Ofertas en Steam" de Descubrir pintaba "€" con precios de
+  CheapShark, que son dólares.
+- **Sin probar en un móvil**: el emulador no arranca desde la actualización
+  de Windows (26200 → 26300): `WHPX: Failed to setup partition` (acceso
+  denegado). Probablemente basta con reiniciar el PC.
+
+**7 oct (tarde) — cristal en la ficha, fotos de eSports y menú del clan:**
+- **Cristal en la ficha del juego** (apps): el botón de volver es de cristal
+  sobre la portada y, al pasar el título, se estira hasta ser una cabecera
+  fina con el nombre (tocarlo vuelve arriba) — `CabeceraFicha` en
+  `GameDetailScreen.kt`. La ficha tiene su PROPIO `HazeState`: la lista es la
+  fuente y el cristal va encima, como hermano, con `HazeSourceSelection.All`.
+  **Nunca un cristal dentro de su propia fuente** (probado con el estado de
+  MainScreen: se pinta a sí mismo sin fin y la app se cierra).
+- `ui/common/Cristal.kt`: `Modifier.cristal(...)` común (lo usan la ficha y
+  la barra de abajo). Opaco con "Reducir transparencia" de iOS
+  (`reducirTransparenciaSistema()`, expect/actual) y en modo **contraste
+  alto** de la app. Ojo al probar: el emulador estaba en contraste alto y el
+  cristal salía opaco a propósito; para verlo, modo oscuro.
+- "Modo Enfoque" de la ficha iba tapado por la barra flotante: ahora se
+  coloca con `huecoBarra()`.
+- **Revisión de propuestas de cristal**: hecho lo de la ficha; **descartada
+  por ahora la barra nativa de iOS 26** (SwiftUI `TabView`): toda la app es
+  un único `ComposeUIViewController`, habría que partirla en cinco raíces de
+  Compose, el encogimiento al hacer scroll no llega (las listas de Compose no
+  son UIScrollView) y serían dos barras que mantener.
+- **eSports — fotos y Avast**: Avast tiene `cdn-api.pandascore.co` (y desde
+  este PC también `api.pandascore.co`) en su lista negra y avisaba por cada
+  escudo. Las imágenes pasan ahora por `/api/esports/img?u=` (solo ese host,
+  solo imágenes, caché larga en la CDN: `X-Vercel-Cache: HIT`); en
+  desarrollo la ruta las pide a la de producción. `imagenEsports()` en
+  `components/esports/util.ts`, la usa `Escudo`. Las iniciales que quedan son
+  jugadores/equipos sin imagen en PandaScore. Si en local la página se queda
+  sin partidos: excepción de `pandascore.co` en Avast.
+- **Clanes (web)**: el menú "…" de gestión de un miembro salía cortado (la
+  lista de contribución tenía `overflow-hidden`); ahora redondea cada fila y
+  el menú se cierra al pulsar fuera o con Escape (`GestionMiembro.tsx`).
+- **IPA sin Mac**: compilar iOS en este PC no es posible; el IPA sale de la
+  CI al subir `kmp/` a master (~15-50 min) o con "Run workflow". La
+  herramienta `ios-builder-test/` no está instalada y su `ios-build.yml` no
+  está en master.
+- **Pendiente de decidir — más plataformas**: Switch no tiene logros (solo
+  registro manual, sin puntuar); EA y Ubisoft solo por la extensión, como
+  Epic (declarado, no puntúa); **RetroAchievements** tiene API pública y
+  podría puntuar (necesita una clave gratuita en `.env.local`); GOG por
+  confirmar.
+
+**7 oct — barra de cristal, rangos de clan, comparar meses y muchos arreglos:**
+- **Barra de abajo** (`BarraInferior` en `MainScreen`): cápsula flotante de
+  **cristal líquido** como la de Instagram (`haze-glass` 2.0.1:
+  `hazeSource` en el contenido, `hazeGlass` en la barra, desenfoque 10 dp,
+  tinte 40 %). Una píldora se desliza con muelle a la pestaña activa, sin
+  ripple. El contenido pasa POR DETRÁS: cada lista suma
+  `ui/common/huecoBarra()` a su relleno inferior (`LocalHuecoBarra`, lo da
+  MainScreen). Pantalla nueva con scroll → sumarle `huecoBarra()`.
+  En Android < 13 queda un cristal simple, sin refracción.
+- **Trofeo → ficha**: `Screen.GameDetail.routeFor(gameId, trofeo, de)`. La
+  ficha baja hasta el trofeo y lo resalta. `de=<handle>` abre la ficha de
+  OTRA persona en solo lectura (`/api/mobile/games/[id]?de=`), sin caché
+  local; los juegos recientes del perfil de alguien la usan
+  (`LocalAbrirJuegoDe`).
+- **Platinado con DLC pendientes**: el servidor manda `platinado` en
+  highlights, `GameProgress.platinado`; ya no sale "siguiente platino".
+  Steam/Xbox no distinguen DLC (Steam sigue siendo el 100 %).
+- **Clanes**: escudo personalizable (forma + símbolo + 2 colores,
+  `lib/clanEmblema.ts` ↔ `ui/social/EscudoClan.kt`, guardado en
+  `clans.logoUrl`). **Rangos** líder / colíder / veterano / miembro
+  (`lib/clanRangos.ts` ↔ `data/ClanRangos.kt`, con tests; en
+  `clan_members.role`, "admin" = colíder). Si el líder se va, hereda el
+  colíder más antiguo (`sucesorDelLider`). Las acciones de la web devuelven
+  `{ error }` (`ClanError`): lanzar daba "Minified React error #441".
+- **Carpetas**: añadir/quitar juegos desde la carpeta y **foto propia**
+  (`collection.portada`, `POST/DELETE /api/mobile/collections/[id]/portada`).
+- **Apariencia** rediseñada (miniaturas de temas y estilos, modos con icono,
+  acentos con nombre). Cada **estilo** trae fondo y tiñe tarjetas; las
+  **paletas completas** oscurecen su fondo también en OLED. Interlineado
+  relativo a la letra en todo el tema (`interlineadoRelativo` en Theme.kt).
+- **Amigos**: selector Amigos / Solicitudes (N) / Añadir. **Racha**
+  rediseñada (anillo hacia el récord, semana, mapa de 5 semanas).
+  **Mes a mes**: comparar con un amigo (web `/ritmo?con=`, app; API
+  `stats/month?de=`, solo amigos). **Web**: filtros de la ficha como la app
+  (Todos / Me faltan / Conseguidos + DLC) y fondo con el artwork de IGDB.
+- **Imágenes**: `ui/common/UrlImagenes.kt` corrige TODAS las URLs (http →
+  https, sin esquema, relativas) en los dos ImageLoader: carátulas y fotos
+  de PSN que no cargaban en iOS.
+- **Varios**: hojas opacas (`SurfaceSolida`), "Ocultar funciones sociales"
+  quita Comunidad, botones de Cuentas vinculadas, enlaces de Ajustes a la web
+  real (`BASE_URL`), APK firmada siempre con `kmp/androidApp/debug.keystore`
+  (antes "conflicto de paquete" en cada APK del CI).
+- **Base de datos (aplicado con `db:push`)**: `collection.portada` nueva; se
+  quitó la clave foránea `game_guide.gameId → game.id` (las guías usan el id
+  global de IGDB: publicar fallaba siempre). Ojo: el primer `db:push` del día
+  añadió además claves foráneas que faltaban en ~20 tablas (sin errores).
+- **Vercel** (CPU 3 h 33 min de 4 h del plan): el cron solo resincroniza a
+  quien lleve > 2 h (`HORAS_ENTRE_RESYNC`) y `sync-frecuente.yml` va cada
+  30 min. Si vuelve a apretar: avisos, alertas y resúmenes corren en cada
+  llamada.
+- **Compilar en este PC**: el antivirus (Avast) rompe el SSL de Gradle.
+  `JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=<repo>/scratch/cacerts-avast.jks
+  -Djavax.net.ssl.trustStorePassword=changeit"` y `./gradlew --stop` antes.
+  Así compila también iOS (`:shared:compileKotlinIosSimulatorArm64`).
+- **Marca**: el nombre sigue siendo Paragon "de momento". Logo elegido (copa
+  con gema) en `scratch/marca/simbolo.svg`, **sin aplicar** (icono de app,
+  notificación Android, favicon, `ParagonMark`).
+- **Siguiente (propuesto, sin confirmar)**:
+  - ~~Cristal en la ficha~~ (hecho el 7 oct por la tarde). Siguientes
+    candidatas, con el mismo patrón: cabecera fina en Biblioteca y Perfil.
+    No en las tarjetas (rendimiento; sobre fondo liso no se nota).
+  - Solo iPhone con la cuenta gratuita: ~~barra de pestañas nativa de iOS 26~~
+    (descartada, ver arriba), notificaciones locales de racha
+    y sesiones, accesos rápidos del icono, Spotlight, Background App Refresh.
+    Con cuenta de pago: widgets, Live Activities / Dynamic Island, push.
+  - Ya hay en iOS: 120 Hz (`CADisableMinimumFrameDurationOnPhone`), Core
+    Haptics, Atajos (en diagnóstico), iconos alternativos.
 
 **6 oct — pruebas en el móvil: barra tipo Instagram, DLC, amistad y fallos:**
-- **Barra de abajo** (`BarraInferior` en `MainScreen`, sustituye a la cápsula
+- **Barra de abajo** (desde el 7 oct es de cristal y flotante, ver arriba) (`BarraInferior` en `MainScreen`, sustituye a la cápsula
   `BarraFlotante`): fija y siempre visible, de lado a lado, solo iconos
   (relleno = activa, contorno = resto, `BottomNavItem.iconoInactivo`) y la
   foto del usuario en Perfil. Ya no se esconde al hacer scroll: eso hacía

@@ -124,6 +124,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.asPaddingValues
+import com.paragon.app.ui.common.cristal
+import dev.chrisbanes.haze.hazeSource
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -185,11 +190,12 @@ fun MainScreen(
         }
     }
 
+    // "Ocultar funciones sociales": fuera Comunidad y Ligas (antes solo Ligas,
+    // y Comunidad seguía en la barra).
     val items = if (themeStore.zenMode) {
         listOf(
             BottomNavItem.Dashboard,
             BottomNavItem.Library,
-            BottomNavItem.Feed,
             BottomNavItem.Perfil
         )
     } else {
@@ -220,13 +226,14 @@ fun MainScreen(
     fun estaEn(item: BottomNavItem) =
         navBackStackEntryActual?.destination?.hierarchy?.any { it.route == item.screen.route } == true
 
+    // Barra de abajo como Instagram (7 oct 2026): cápsula flotante de cristal
+    // que desenfoca lo que pasa por detrás (Haze). El contenido llega hasta
+    // abajo del todo y cada lista deja `huecoBarra()` al final.
+    val hazeState = dev.chrisbanes.haze.rememberHazeState()
+    val gestos = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val hueco = if (anchoAmplio) gestos else ALTO_BARRA + 16.dp + gestos
     Scaffold(
-        // Barra de abajo fija, como Instagram (6 oct 2026): siempre visible,
-        // de lado a lado y solo iconos. Ya no se esconde al hacer scroll (eso
-        // recolocaba la pantalla y daba un tirón al llegar arriba o abajo).
-        bottomBar = {
-            if (!anchoAmplio) BarraInferior(items = items, estaEn = { estaEn(it) }, foto = profile.image, inicial = profile.name.take(1), onClick = { irA(it) })
-        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             // Sin barra "PARAGON" encima (diseño v2, 5 oct 2026): cada pantalla
             // lleva su propia cabecera nativa (CabeceraNativa), como una app de
@@ -237,6 +244,7 @@ fun MainScreen(
         Box(Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
+                .hazeSource(hazeState)
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 // El teclado empuja el contenido en vez de tapar el campo
@@ -278,6 +286,10 @@ fun MainScreen(
         // SharedTransitionScope para que la carátula pueda "volar" cuando SÍ
         // hay una tarjeta de origen con la misma clave (Biblioteca), y
         // simplemente no anime cuando no la hay (resto de orígenes).
+        androidx.compose.runtime.CompositionLocalProvider(
+            com.paragon.app.ui.common.LocalHuecoBarra provides hueco,
+            com.paragon.app.ui.navigation.LocalAbrirJuegoDe provides { h: String, g: String -> navController.navigate(Screen.GameDetail.routeFor(g, de = h)) },
+        ) {
         SharedTransitionLayout {
         NavHost(
             navController = navController,
@@ -336,7 +348,7 @@ fun MainScreen(
                     profile = profile,
                     stats = stats,
                     racha = racha,
-                    conLigas = themeStore.zenMode,
+                    modoZen = themeStore.zenMode,
                     onNavigate = { ruta -> navController.navigate(ruta) },
                 )
             }
@@ -375,7 +387,8 @@ fun MainScreen(
                 StuckTrophiesScreen(
                     tokenStore = tokenStore,
                     dao = remember { database.stuckTrophyDao() },
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
                 )
             }
             
@@ -415,8 +428,20 @@ fun MainScreen(
             }
 
             // Desglose del mes (como /ritmo en la web) — ver ui/trofeos.
+            composable(Screen.PlatinosOferta.route) {
+                com.paragon.app.ui.precios.PlatinosOfertaScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrirJuego = { g -> navController.navigate(Screen.GameDetail.routeFor(g)) },
+                )
+            }
+
             composable(Screen.Ritmo.route) {
-                com.paragon.app.ui.trofeos.RitmoScreen(tokenStore = tokenStore, onBack = { navController.popBackStack() })
+                com.paragon.app.ui.trofeos.RitmoScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
+                )
             }
 
             // Perfil completo de alguien (o el tuyo) — ver ui/perfil/PerfilUsuarioScreen.
@@ -460,17 +485,24 @@ fun MainScreen(
                     tokenStore = tokenStore,
                     sesionId = sesionId,
                     onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
                 )
             }
 
             // Ficha de Juego
             composable(
                 route = Screen.GameDetail.route,
-                arguments = listOf(navArgument("gameId") { type = NavType.StringType }),
+                arguments = listOf(
+                    navArgument("gameId") { type = NavType.StringType },
+                    navArgument("trofeo") { type = NavType.StringType; nullable = true; defaultValue = null },
+                    navArgument("de") { type = NavType.StringType; nullable = true; defaultValue = null },
+                ),
             ) { backStackEntry ->
                 val gameId = backStackEntry.arguments?.read { getStringOrNull("gameId") } ?: return@composable
                 GameDetailScreen(
                     gameId = gameId,
+                    trofeoInicial = backStackEntry.arguments?.read { getStringOrNull("trofeo") },
+                    de = backStackEntry.arguments?.read { getStringOrNull("de") },
                     tokenStore = tokenStore,
                     handle = profile.handle,
                     onBack = { navController.popBackStack() },
@@ -482,6 +514,18 @@ fun MainScreen(
         }
         }
         }
+        }
+        }
+        if (!anchoAmplio) {
+            BarraInferior(
+                items = items,
+                estaEn = { estaEn(it) },
+                foto = profile.image,
+                inicial = profile.name.take(1),
+                hazeState = hazeState,
+                onClick = { irA(it) },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
         }
         }
     }
@@ -550,55 +594,103 @@ private fun StreakChip(racha: RachaGlobal, onClick: () -> Unit) {
     }
 }
 
+/** Alto de la cápsula de la barra de abajo (sin márgenes ni la barra de gestos). */
+private val ALTO_BARRA = 68.dp
+
+/**
+ * La barra de abajo (7 oct 2026), como la de Instagram: una cápsula flotante
+ * de cristal (desenfoca lo que pasa por detrás, con un tinte translúcido y un
+ * filo de luz arriba) y UNA píldora que se desliza con muelle hasta la
+ * pestaña activa. Sin efecto de pulsación: el "ripple" pintaba un recuadro
+ * detrás del icono y, con el fundido de color de cada pestaña, daba sensación
+ * de tirón al cambiar.
+ */
 @Composable
 private fun BarraInferior(
     items: List<BottomNavItem>,
     estaEn: (BottomNavItem) -> Boolean,
     foto: String?,
     inicial: String,
+    hazeState: dev.chrisbanes.haze.HazeState,
     onClick: (BottomNavItem) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(Modifier.fillMaxWidth().background(Background)) {
-        HorizontalDivider(color = Border, thickness = 0.5.dp)
-        Row(
-            Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).height(52.dp),
-            verticalAlignment = Alignment.CenterVertically,
+    val forma = RoundedCornerShape(50)
+    val activo = items.indexOfFirst { estaEn(it) }
+    val posicion by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = activo.coerceAtLeast(0).toFloat(),
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.78f, stiffness = 520f),
+        label = "pildora",
+    )
+    val tinte = com.paragon.app.ui.theme.Surface2
+    Box(
+        modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 10.dp),
+    ) {
+        BoxWithConstraints(
+            Modifier.fillMaxWidth().height(ALTO_BARRA)
+                .shadow(20.dp, forma, ambientColor = Color.Black.copy(alpha = 0.45f), spotColor = Color.Black.copy(alpha = 0.45f))
+                // Cristal líquido (haze-glass), como la barra de Instagram en
+                // iOS 26: transparente, refracta el borde y brilla arriba; el
+                // tinte justo para leer los iconos sobre cualquier fondo.
+                // Desenfoque suave: lo de detrás se intuye (como en Instagram)
+                // sin que se lean textos detrás de los iconos. Opaco con
+                // "Reducir transparencia" o en contraste alto (ui/common/Cristal.kt).
+                .cristal(hazeState, forma, tinte = tinte, alfaTinte = 0.4f, desenfoque = 10.dp)
+                .clip(forma)
+                .padding(6.dp),
         ) {
-            items.forEach { item ->
-                val activa = estaEn(item)
+            val ancho = maxWidth / items.size
+            if (activo >= 0) {
                 Box(
-                    Modifier.weight(1f).fillMaxHeight()
-                        .clickable(
-                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                            indication = null,
-                        ) { onClick(item) },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (item is BottomNavItem.Perfil) {
-                        // Tu foto, como en Instagram; con anillo del acento si es la pestaña activa.
-                        Box(
-                            Modifier.size(30.dp).clip(CircleShape)
-                                .border(if (activa) 2.dp else 1.dp, if (activa) Accent else Border, CircleShape)
-                                .padding(if (activa) 3.dp else 1.dp).clip(CircleShape).background(com.paragon.app.ui.theme.AccentSoft),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(inicial.uppercase(), color = Accent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            com.paragon.app.ui.common.urlImagenSegura(foto)?.let { url ->
-                                coil3.compose.AsyncImage(
-                                    model = url,
-                                    contentDescription = item.screen.title,
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize(),
-                                )
+                    Modifier
+                        .offset(x = ancho * posicion)
+                        .width(ancho)
+                        .fillMaxHeight()
+                        .clip(forma)
+                        .background(Foreground.copy(alpha = 0.16f)),
+                )
+            }
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                items.forEach { item ->
+                    val esActiva = estaEn(item)
+                    Box(
+                        Modifier.weight(1f).fillMaxHeight()
+                            .clip(forma)
+                            .clickable(
+                                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                indication = null,
+                            ) { onClick(item) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (item is BottomNavItem.Perfil) {
+                            // Tu foto, como en Instagram; con anillo del acento si es la pestaña activa.
+                            Box(
+                                Modifier.size(30.dp).clip(CircleShape)
+                                    .border(if (esActiva) 2.dp else 1.dp, if (esActiva) Accent else Border, CircleShape)
+                                    .padding(if (esActiva) 3.dp else 1.dp).clip(CircleShape).background(com.paragon.app.ui.theme.AccentSoft),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(inicial.uppercase(), color = Accent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                com.paragon.app.ui.common.urlImagenSegura(foto)?.let { url ->
+                                    coil3.compose.AsyncImage(
+                                        model = url,
+                                        contentDescription = item.screen.title,
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
+                                }
                             }
+                        } else {
+                            Icon(
+                                if (esActiva) item.icon else item.iconoInactivo,
+                                contentDescription = item.screen.title,
+                                tint = if (esActiva) Foreground else Foreground.copy(alpha = 0.72f),
+                                modifier = Modifier.size(28.dp),
+                            )
                         }
-                    } else {
-                        Icon(
-                            if (activa) item.icon else item.iconoInactivo,
-                            contentDescription = item.screen.title,
-                            tint = if (activa) Accent else Foreground.copy(alpha = 0.75f),
-                            modifier = Modifier.size(27.dp),
-                        )
                     }
                 }
             }

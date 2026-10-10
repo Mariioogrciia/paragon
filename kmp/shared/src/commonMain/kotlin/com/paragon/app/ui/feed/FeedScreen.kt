@@ -148,7 +148,7 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 32.dp)
+                        contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
                     ) {
                         items(current.items, key = { it.id }) { item ->
                             FeedCard(item, repository = repository, onUserClick = { onAbrirPerfil(item.userHandle) })

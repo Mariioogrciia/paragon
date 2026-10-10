@@ -83,7 +83,10 @@ fun MainViewController(): UIViewController {
         // Coil en iOS: descarga por Ktor (Darwin) y fundido al aparecer, como en Android.
         setSingletonImageLoaderFactory { contexto ->
             ImageLoader.Builder(contexto)
-                .components { add(KtorNetworkFetcherFactory()) }
+                .components {
+                    add(com.paragon.app.ui.common.UrlImagenesMapper)
+                    add(KtorNetworkFetcherFactory())
+                }
                 .crossfade(true)
                 .build()
         }

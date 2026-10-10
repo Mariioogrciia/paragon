@@ -2819,6 +2819,342 @@
   "es": "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
   "fr": "Priorité automatique : d'abord le jeu de base, forte progression et meilleures chances."
  },
+ "apariencia_vista_previa": {
+  "de": "Vorschau",
+  "en": "Preview",
+  "es": "Vista previa",
+  "fr": "Aperçu"
+ },
+ "apariencia_estilo_oled": {
+  "de": "Im OLED-Modus bleibt der Hintergrund reines Schwarz: Der Stil färbt Karten und Ränder.",
+  "en": "In OLED mode the background stays pure black: the style tints cards and borders.",
+  "es": "En OLED el fondo sigue siendo negro puro: el estilo tiñe las tarjetas y los bordes.",
+  "fr": "En mode OLED, le fond reste noir pur : le style teinte les cartes et les bordures."
+ },
+ "clan_escudo_editar": {
+  "de": "Wappen bearbeiten",
+  "en": "Edit crest",
+  "es": "Editar escudo",
+  "fr": "Modifier le blason"
+ },
+ "clan_escudo_titulo": {
+  "de": "Clan-Wappen",
+  "en": "Clan crest",
+  "es": "Escudo del clan",
+  "fr": "Blason du clan"
+ },
+ "clan_escudo_texto": {
+  "de": "Wähle Form, Symbol und Farben. Es erscheint im Web und in der App.",
+  "en": "Pick a shape, symbol and colours. It shows on the web and in the app.",
+  "es": "Elige forma, símbolo y colores. Se ve en la web y en la app.",
+  "fr": "Choisis forme, symbole et couleurs. Il s'affiche sur le web et dans l'app."
+ },
+ "clan_escudo_forma": {
+  "de": "Form",
+  "en": "Shape",
+  "es": "Forma",
+  "fr": "Forme"
+ },
+ "clan_escudo_simbolo": {
+  "de": "Symbol",
+  "en": "Symbol",
+  "es": "Símbolo",
+  "fr": "Symbole"
+ },
+ "clan_escudo_fondo": {
+  "de": "Hintergrundfarbe",
+  "en": "Background colour",
+  "es": "Color de fondo",
+  "fr": "Couleur de fond"
+ },
+ "clan_escudo_color": {
+  "de": "Symbolfarbe",
+  "en": "Symbol colour",
+  "es": "Color del símbolo",
+  "fr": "Couleur du symbole"
+ },
+ "clan_escudo_guardar": {
+  "de": "Wappen speichern",
+  "en": "Save crest",
+  "es": "Guardar escudo",
+  "fr": "Enregistrer le blason"
+ },
+ "carpeta_anadir_juegos": {
+  "de": "Spiele hinzufügen",
+  "en": "Add games",
+  "es": "Añadir juegos",
+  "fr": "Ajouter des jeux"
+ },
+ "carpeta_anadir_sub": {
+  "de": "{0} in diesem Ordner. Tippe, um hinzuzufügen oder zu entfernen.",
+  "en": "{0} in this folder. Tap to add or remove.",
+  "es": "{0} en esta carpeta. Toca para meter o sacar.",
+  "fr": "{0} dans ce dossier. Touche pour ajouter ou retirer."
+ },
+ "carpeta_buscar": {
+  "de": "In deiner Bibliothek suchen",
+  "en": "Search your library",
+  "es": "Buscar en tu biblioteca",
+  "fr": "Chercher dans ta bibliothèque"
+ },
+ "inicio_platinado_dlc": {
+  "de": "Platin · {0} DLC übrig",
+  "en": "Platinum · {0} DLC left",
+  "es": "Platinado · faltan {0} de DLC",
+  "fr": "Platiné · {0} de DLC restants"
+ },
+ "carpeta_poner_foto": {
+  "de": "Foto hinzufügen",
+  "en": "Add photo",
+  "es": "Poner foto",
+  "fr": "Ajouter une photo"
+ },
+ "carpeta_cambiar_foto": {
+  "de": "Foto ändern",
+  "en": "Change photo",
+  "es": "Cambiar foto",
+  "fr": "Changer la photo"
+ },
+ "carpeta_quitar_foto": {
+  "de": "Foto entfernen",
+  "en": "Remove photo",
+  "es": "Quitar foto",
+  "fr": "Retirer la photo"
+ },
+ "clan_rango_colider": {
+  "de": "Vize-Anführer",
+  "en": "Co-leader",
+  "es": "Colíder",
+  "fr": "Adjoint"
+ },
+ "clan_rango_veterano": {
+  "de": "Ältester",
+  "en": "Elder",
+  "es": "Veterano",
+  "fr": "Aîné"
+ },
+ "clan_gestionar": {
+  "de": "{0} verwalten",
+  "en": "Manage {0}",
+  "es": "Gestionar a {0}",
+  "fr": "Gérer {0}"
+ },
+ "clan_hacer_lider": {
+  "de": "Zum Anführer machen",
+  "en": "Make leader",
+  "es": "Hacer líder",
+  "fr": "Nommer chef"
+ },
+ "clan_ascender_a": {
+  "de": "Befördern zu {0}",
+  "en": "Promote to {0}",
+  "es": "Ascender a {0}",
+  "fr": "Promouvoir {0}"
+ },
+ "clan_degradar_a": {
+  "de": "Herabstufen zu {0}",
+  "en": "Demote to {0}",
+  "es": "Degradar a {0}",
+  "fr": "Rétrograder {0}"
+ },
+ "clan_expulsar": {
+  "de": "Aus dem Clan werfen",
+  "en": "Kick from clan",
+  "es": "Expulsar del clan",
+  "fr": "Exclure du clan"
+ },
+ "clan_confirmar_lider": {
+  "de": "Die Führung an {0} übergeben? Du wirst Vize-Anführer.",
+  "en": "Hand leadership to {0}? You'll become co-leader.",
+  "es": "¿Pasar el liderazgo a {0}? Tú quedarás como colíder.",
+  "fr": "Confier la direction à {0} ? Tu deviendras adjoint."
+ },
+ "clan_confirmar_expulsar": {
+  "de": "{0} aus dem Clan werfen?",
+  "en": "Kick {0} from the clan?",
+  "es": "¿Expulsar a {0} del clan?",
+  "fr": "Exclure {0} du clan ?"
+ },
+ "clan_gestion_error": {
+  "de": "Nicht möglich",
+  "en": "Couldn't do that",
+  "es": "No se ha podido",
+  "fr": "Impossible"
+ },
+ "clan_editar_info": {
+  "de": "Name und Beschreibung bearbeiten",
+  "en": "Edit name and description",
+  "es": "Editar nombre y descripción",
+  "fr": "Modifier le nom et la description"
+ },
+ "clan_campo_nombre": {
+  "de": "Name",
+  "en": "Name",
+  "es": "Nombre",
+  "fr": "Nom"
+ },
+ "clan_campo_descripcion": {
+  "de": "Beschreibung",
+  "en": "Description",
+  "es": "Descripción",
+  "fr": "Description"
+ },
+ "clan_guardar": {
+  "de": "Speichern",
+  "en": "Save",
+  "es": "Guardar",
+  "fr": "Enregistrer"
+ },
+ "clan_salir_lider_sucesor": {
+  "de": "Du bist der Anführer: Wenn du gehst, übernimmt {0} die Führung.",
+  "en": "You're the leader: if you leave, leadership passes to {0}.",
+  "es": "Eres el líder: si sales, el liderazgo pasará a {0}.",
+  "fr": "Tu es le chef : si tu pars, {0} prendra la direction."
+ },
+ "amigos_lista": {
+  "de": "Freunde",
+  "en": "Friends",
+  "es": "Amigos",
+  "fr": "Amis"
+ },
+ "amigos_solicitudes_n": {
+  "de": "Anfragen · {0}",
+  "en": "Requests · {0}",
+  "es": "Solicitudes · {0}",
+  "fr": "Demandes · {0}"
+ },
+ "amigos_sin_solicitudes": {
+  "de": "Keine Anfragen",
+  "en": "No requests",
+  "es": "Sin solicitudes",
+  "fr": "Aucune demande"
+ },
+ "amigos_sin_solicitudes_sub": {
+  "de": "Wenn dich jemand hinzufügen will, erscheint es hier.",
+  "en": "When someone wants to add you, it'll show up here.",
+  "es": "Cuando alguien quiera agregarte, aparecerá aquí.",
+  "fr": "Quand quelqu'un voudra t'ajouter, ça apparaîtra ici."
+ },
+ "racha_dia_seguido": {
+  "de": "Tag in Folge",
+  "en": "day in a row",
+  "es": "día seguido",
+  "fr": "jour d'affilée"
+ },
+ "racha_dias_seguidos": {
+  "de": "Tage in Folge",
+  "en": "days in a row",
+  "es": "días seguidos",
+  "fr": "jours d'affilée"
+ },
+ "racha_es_record": {
+  "de": "Das ist deine beste Serie!",
+  "en": "This is your best streak!",
+  "es": "¡Es tu mejor racha!",
+  "fr": "C'est ta meilleure série !"
+ },
+ "racha_falta_hoy": {
+  "de": "Hol dir heute eine Trophäe, um {0} Tage zu erreichen.",
+  "en": "Earn a trophy today to reach {0} days.",
+  "es": "Consigue un trofeo hoy para llegar a {0} días.",
+  "fr": "Obtiens un trophée aujourd'hui pour atteindre {0} jours."
+ },
+ "racha_hacia_record": {
+  "de": "Heute zählt schon · noch {0} Tage bis zum Rekord",
+  "en": "Today counts · {0} days to your record",
+  "es": "Hoy ya cuenta · {0} días para tu récord",
+  "fr": "Aujourd'hui compte · {0} jours avant ton record"
+ },
+ "racha_trofeos_semana": {
+  "de": "Diese Woche",
+  "en": "This week",
+  "es": "Esta semana",
+  "fr": "Cette semaine"
+ },
+ "racha_esta_semana": {
+  "de": "Diese Woche",
+  "en": "This week",
+  "es": "Esta semana",
+  "fr": "Cette semaine"
+ },
+ "racha_menos": {
+  "de": "Weniger",
+  "en": "Less",
+  "es": "Menos",
+  "fr": "Moins"
+ },
+ "racha_mas": {
+  "de": "Mehr",
+  "en": "More",
+  "es": "Más",
+  "fr": "Plus"
+ },
+ "ritmo_comparar_con": {
+  "de": "Vergleichen mit",
+  "en": "Compare with",
+  "es": "Comparar con",
+  "fr": "Comparer avec"
+ },
+ "ritmo_sin_comparar": {
+  "de": "Niemand",
+  "en": "Nobody",
+  "es": "Nadie",
+  "fr": "Personne"
+ },
+ "ritmo_tu_vs": {
+  "de": "Du vs {0}",
+  "en": "You vs {0}",
+  "es": "Tú vs {0}",
+  "fr": "Toi vs {0}"
+ },
+ "ritmo_tu": {
+  "de": "Du",
+  "en": "You",
+  "es": "Tú",
+  "fr": "Toi"
+ },
+ "ritmo_empate": {
+  "de": "Unentschieden",
+  "en": "Tie",
+  "es": "Empate",
+  "fr": "Égalité"
+ },
+ "ritmo_ganas_tu": {
+  "de": "Du gewinnst",
+  "en": "You win",
+  "es": "Ganas tú",
+  "fr": "Tu gagnes"
+ },
+ "ritmo_gana_otro": {
+  "de": "{0} gewinnt",
+  "en": "{0} wins",
+  "es": "Gana {0}",
+  "fr": "{0} gagne"
+ },
+ "ritmo_n_trofeos_corto": {
+  "de": "Trophäen",
+  "en": "Trophies",
+  "es": "Trofeos",
+  "fr": "Trophées"
+ },
+ "ritmo_mejor_dia": {
+  "de": "Bester Tag",
+  "en": "Best day",
+  "es": "Mejor día",
+  "fr": "Meilleur jour"
+ },
+ "amigos_solicitudes_corto": {
+  "de": "Anfragen",
+  "en": "Requests",
+  "es": "Solicitudes",
+  "fr": "Demandes"
+ },
+ "panel_ultimos_trofeos": {
+  "de": "Letzte Trophäen",
+  "en": "Latest trophies",
+  "es": "Últimos trofeos",
+  "fr": "Derniers trophées"
+ },
  "panel_un_paso": {
   "de": "KURZ VOR DER PLATIN",
   "en": "ONE STEP FROM PLATINUM",
@@ -4618,6 +4954,168 @@
   "en": "Friends",
   "es": "Amigos",
   "fr": "Amis"
+ },
+ "precio_titulo": {
+  "de": "PC-PREIS",
+  "en": "PC PRICE",
+  "es": "PRECIO EN PC",
+  "fr": "PRIX SUR PC"
+ },
+ "precio_no_a_la_venta": {
+  "de": "Nicht im spanischen Steam erhältlich",
+  "en": "Not on sale on Steam Spain",
+  "es": "No está a la venta en Steam España",
+  "fr": "Pas en vente sur Steam Espagne"
+ },
+ "precio_minimo": {
+  "de": "Tiefstpreis: {0} US$",
+  "en": "All-time low: US${0}",
+  "es": "Mínimo histórico: {0} US$",
+  "fr": "Prix le plus bas : {0} US$"
+ },
+ "precio_mas_barato": {
+  "de": "Am günstigsten: {0} · {1} US$",
+  "en": "Cheapest: {0} · US${1}",
+  "es": "Más barato: {0} · {1} US$",
+  "fr": "Le moins cher : {0} · {1} US$"
+ },
+ "precio_avisarme": {
+  "de": "Bei Preissenkung benachrichtigen",
+  "en": "Alert me when it drops",
+  "es": "Avisarme si baja",
+  "fr": "M'alerter s'il baisse"
+ },
+ "precio_alerta_activa": {
+  "de": "Wir melden uns unter {0}",
+  "en": "We'll alert you below {0}",
+  "es": "Te avisamos por debajo de {0}",
+  "fr": "On te prévient sous {0}"
+ },
+ "precio_alerta_titulo": {
+  "de": "Preisalarm",
+  "en": "Price alert",
+  "es": "Alerta de precio",
+  "fr": "Alerte de prix"
+ },
+ "precio_alerta_texto": {
+  "de": "Wir sagen Bescheid, wenn {0} auf Steam unter diesen Preis fällt.",
+  "en": "We'll let you know when {0} drops below this price on Steam.",
+  "es": "Te avisaremos cuando {0} baje de este precio en Steam.",
+  "fr": "On te préviendra quand {0} passera sous ce prix sur Steam."
+ },
+ "precio_alerta_campo": {
+  "de": "Zielpreis (€)",
+  "en": "Target price (€)",
+  "es": "Precio objetivo (€)",
+  "fr": "Prix visé (€)"
+ },
+ "precio_alerta_guardar": {
+  "de": "Speichern",
+  "en": "Save",
+  "es": "Guardar",
+  "fr": "Enregistrer"
+ },
+ "precio_alerta_quitar": {
+  "de": "Alarm entfernen",
+  "en": "Remove alert",
+  "es": "Quitar alerta",
+  "fr": "Retirer l'alerte"
+ },
+ "precio_alerta_error": {
+  "de": "Gib einen Preis zwischen 0,01 und 999 € ein.",
+  "en": "Enter a price between €0.01 and €999.",
+  "es": "Pon un precio entre 0,01 y 999 €.",
+  "fr": "Indique un prix entre 0,01 et 999 €."
+ },
+ "ofertas_titulo": {
+  "de": "Platin im Angebot",
+  "en": "Platinums on sale",
+  "es": "Platinos de oferta",
+  "fr": "Platines en promo"
+ },
+ "ofertas_texto": {
+  "de": "Reduzierte Steam-Spiele mit machbaren 100 %: Die Schwierigkeit kommt vom seltensten Erfolg laut Steam. Ohne Spiele, die du schon hast.",
+  "en": "Discounted Steam games with an achievable 100%: difficulty comes from the rarest achievement on Steam. Games you own are left out.",
+  "es": "Juegos de Steam rebajados cuyo 100 % es asequible: la dificultad sale del logro más raro según Steam. Sin los que ya tienes.",
+  "fr": "Jeux Steam en promo avec un 100 % abordable : la difficulté vient du succès le plus rare selon Steam. Sans ceux que tu possèdes."
+ },
+ "ofertas_tus_alertas": {
+  "de": "DEINE PREISALARME",
+  "en": "YOUR PRICE ALERTS",
+  "es": "TUS ALERTAS DE PRECIO",
+  "fr": "TES ALERTES DE PRIX"
+ },
+ "ofertas_sin_alertas": {
+  "de": "Lege einen Alarm auf der Seite eines Spiels mit PC-Version an.",
+  "en": "Set an alert from the page of any game with a PC version.",
+  "es": "Pon una alerta desde la ficha de un juego que tenga versión de PC.",
+  "fr": "Crée une alerte depuis la fiche d'un jeu qui existe sur PC."
+ },
+ "ofertas_alerta_fila": {
+  "de": "Ziel {0} · jetzt {1}",
+  "en": "Target {0} · now {1}",
+  "es": "Objetivo {0} · ahora {1}",
+  "fr": "Objectif {0} · maintenant {1}"
+ },
+ "ofertas_por_debajo": {
+  "de": "Darunter!",
+  "en": "Below target!",
+  "es": "¡Por debajo!",
+  "fr": "En dessous !"
+ },
+ "ofertas_ahora_sin_precio": {
+  "de": "—",
+  "en": "—",
+  "es": "—",
+  "fr": "—"
+ },
+ "ofertas_logros": {
+  "de": "{0} Erfolge · seltenster: {1} %",
+  "en": "{0} achievements · rarest, {1}%",
+  "es": "{0} logros · el más raro, {1} %",
+  "fr": "{0} succès · le plus rare : {1} %"
+ },
+ "ofertas_horas": {
+  "de": "~{0} Std. bis 100 %",
+  "en": "~{0} h to 100%",
+  "es": "~{0} h al 100 %",
+  "fr": "~{0} h pour le 100 %"
+ },
+ "ofertas_vacio": {
+  "de": "Gerade keine Angebote mit machbaren 100 %.",
+  "en": "No deals with an achievable 100% right now.",
+  "es": "Ahora mismo no hay ofertas con un 100 % asequible.",
+  "fr": "Aucune promo avec un 100 % abordable pour l'instant."
+ },
+ "ofertas_nota": {
+  "de": "Preise von Steam Spanien. Angebote über CheapShark; Schwierigkeit aus den globalen Steam-Werten.",
+  "en": "Prices from Steam Spain. Deals via CheapShark; difficulty from Steam's global percentages.",
+  "es": "Precios de Steam España. Ofertas vía CheapShark; dificultad con los porcentajes globales de Steam.",
+  "fr": "Prix de Steam Espagne. Promos via CheapShark ; difficulté selon les pourcentages globaux de Steam."
+ },
+ "dif_muy_facil": {
+  "de": "Sehr leicht",
+  "en": "Very easy",
+  "es": "Muy fácil",
+  "fr": "Très facile"
+ },
+ "dif_facil": {
+  "de": "Leicht",
+  "en": "Easy",
+  "es": "Fácil",
+  "fr": "Facile"
+ },
+ "dif_media": {
+  "de": "Mittel",
+  "en": "Medium",
+  "es": "Media",
+  "fr": "Moyenne"
+ },
+ "dif_dificil": {
+  "de": "Schwer",
+  "en": "Hard",
+  "es": "Difícil",
+  "fr": "Difficile"
  },
  "perfil_ver_completo": {
   "de": "Dein Profil ansehen",

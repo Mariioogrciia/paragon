@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { imagenEsports } from "./util";
 
 /** Iniciales de un nombre ("Team Vitality" → "TV"), para cuando no hay imagen. */
 export function iniciales(nombre: string): string {
@@ -44,7 +45,7 @@ export function Escudo({ logo, name, size, redondo = false }: { logo: string | n
       <img
         loading="lazy"
         decoding="async"
-        src={logo}
+        src={imagenEsports(logo) ?? undefined}
         alt=""
         onError={() => setFallo(true)}
         className={redondo ? "h-full w-full object-cover object-top" : "max-h-full max-w-full object-contain"}

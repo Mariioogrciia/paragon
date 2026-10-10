@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh } from "next/cache";
 import { auth } from "@/auth";
 import { alternarFavorito, type EquipoFavorito } from "@/lib/esportsFavoritos";
 
@@ -23,7 +23,12 @@ export async function alternarFavoritoAction(
 
   try {
     const seguido = await alternarFavorito(session.user.id, limpio);
-    revalidatePath("/esports");
+    // refresh(), no revalidatePath("/esports"): eso tiraba también la caché
+    // de las peticiones a PandaScore de la página, y cada estrella volvía a
+    // pedir partidos y tablas — con el límite por hora agotado, "Todos" se
+    // quedaba sin un solo partido. Los favoritos ya están en el estado del
+    // cliente; esto solo trae de nuevo las noticias de tus equipos.
+    refresh();
     return { seguido };
   } catch (error) {
     if (error instanceof Error && error.message === "LIMITE") return { error: "limite" };

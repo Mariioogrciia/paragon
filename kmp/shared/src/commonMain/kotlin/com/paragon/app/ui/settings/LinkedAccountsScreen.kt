@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -197,7 +199,7 @@ fun LinkedAccountsScreen(
                     .padding(paddingValues)
                     .padding(horizontal = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 32.dp)
+                contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
             ) {
                 steamProgreso?.let { (hechos, total) ->
                     item {
@@ -417,9 +419,10 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     contentAlignment = Alignment.Center,
                 ) {
                     Text((platform.username ?: "?").take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
-                    if (platform.avatarUrl != null) {
+                    // http → https: iOS no carga imágenes por http (las de PSN, p. ej.).
+                    com.paragon.app.ui.common.urlImagenSegura(platform.avatarUrl)?.let { avatar ->
                         coil3.compose.AsyncImage(
-                            model = platform.avatarUrl,
+                            model = avatar,
                             contentDescription = null,
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                             modifier = Modifier.fillMaxSize(),
@@ -446,48 +449,48 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                 }
             }
             HorizontalDivider(color = Border, modifier = Modifier.padding(top = 14.dp))
-            Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            // Tres botones iguales con el icono encima: en fila y con texto no
+            // cabían en un móvil ("Desvincular" salía cortado en "Des").
+            Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Epic no: se sincroniza con la extensión del navegador.
                 if (platform.appLinkable) {
-                    Row(
-                        Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(AccentSoft)
-                            .clickable(enabled = !sincronizando) {
-                                scope.launch {
-                                    sincronizando = true
-                                    avisoSync = null
-                                    avisoSync = when (val r = repository.syncPlatform(platform.platform)) {
-                                        is SettingsResult.Ok -> (if (r.data > 0) Textos.t(T.cuentas_trofeos_nuevos, r.data) else Textos.t(T.cuentas_al_dia)) to true
-                                        is SettingsResult.Error -> r.message to false
-                                    }
-                                    sincronizando = false
-                                    if (avisoSync?.second == true) onUpdate()
-                                }
-                            }
-                            .padding(horizontal = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    BotonCuenta(
+                        icono = Icons.Default.Refresh,
+                        texto = if (sincronizando) Textos.t(T.cuentas_sincronizando) else Textos.t(T.cuentas_sincronizar),
+                        color = Accent,
+                        fondo = AccentSoft,
+                        cargando = sincronizando,
+                        enabled = !sincronizando,
+                        modifier = Modifier.weight(1f),
                     ) {
-                        if (sincronizando) {
-                            CircularProgressIndicator(color = Accent, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
-                        } else {
-                            Icon(Icons.Default.Refresh, contentDescription = null, tint = Accent, modifier = Modifier.size(16.dp))
+                        scope.launch {
+                            sincronizando = true
+                            avisoSync = null
+                            avisoSync = when (val r = repository.syncPlatform(platform.platform)) {
+                                is SettingsResult.Ok -> (if (r.data > 0) Textos.t(T.cuentas_trofeos_nuevos, r.data) else Textos.t(T.cuentas_al_dia)) to true
+                                is SettingsResult.Error -> r.message to false
+                            }
+                            sincronizando = false
+                            if (avisoSync?.second == true) onUpdate()
                         }
-                        Text(
-                            if (sincronizando) Textos.t(T.cuentas_sincronizando) else Textos.t(T.cuentas_sincronizar),
-                            color = Accent,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            modifier = Modifier.padding(start = 6.dp),
-                        )
                     }
-                    TextButton(onClick = { isLinking = !isLinking; errorMsg = null }, enabled = !isProcessing) {
-                        Text(Textos.t(T.cuentas_cambiar), color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                    }
+                    BotonCuenta(
+                        icono = Icons.Default.SwapHoriz,
+                        texto = Textos.t(T.cuentas_cambiar),
+                        color = Foreground,
+                        fondo = Surface2,
+                        enabled = !isProcessing,
+                        modifier = Modifier.weight(1f),
+                    ) { isLinking = !isLinking; errorMsg = null }
                 }
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = { showUnlinkConfirm = true }, enabled = !isProcessing) {
-                    Text(Textos.t(T.cuentas_desvincular), color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                }
+                BotonCuenta(
+                    icono = Icons.Default.LinkOff,
+                    texto = Textos.t(T.cuentas_desvincular),
+                    color = Danger,
+                    fondo = Danger.copy(alpha = 0.10f),
+                    enabled = !isProcessing,
+                    modifier = Modifier.weight(1f),
+                ) { showUnlinkConfirm = true }
             }
             avisoSync?.let { (texto, ok) ->
                 Text(texto, color = if (ok) Good else Danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
@@ -626,3 +629,30 @@ private fun PrivacyGuide(platform: String, brandColor: Color) {
     }
 }
 
+/** Botón de una cuenta vinculada: icono encima y texto debajo, todos del mismo ancho. */
+@Composable
+private fun BotonCuenta(
+    icono: androidx.compose.ui.graphics.vector.ImageVector,
+    texto: String,
+    color: Color,
+    fondo: Color,
+    modifier: Modifier = Modifier,
+    cargando: Boolean = false,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier
+            .heightIn(min = 60.dp)
+            .clip(RoundedCornerShape(radio(14)))
+            .background(fondo)
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 6.dp, vertical = 9.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        if (cargando) CircularProgressIndicator(color = color, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+        else Icon(icono, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+        Text(texto, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+    }
+}

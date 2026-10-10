@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import com.paragon.app.util.DestinoQr
@@ -79,6 +80,12 @@ fun AmigosCabecera(
     modifier: Modifier = Modifier,
     miHandle: String? = null,
     onAbrirSesion: ((String) -> Unit)? = null,
+    /**
+     * Qué parte enseñar (7 oct 2026: antes todo junto encima de la lista y el
+     * QR se comía la pantalla): SOLICITUDES o ANADIR (QR, escanear y @usuario).
+     * null = todo, como antes (para quien la use fuera de Amigos).
+     */
+    seccion: SeccionAmigos? = null,
 ) {
     val contexto = contextoPlataforma()
     val scope = rememberCoroutineScope()
@@ -128,6 +135,7 @@ fun AmigosCabecera(
 
     Column(modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
         val forma = RoundedCornerShape(radio(12))
+        if (seccion != SeccionAmigos.SOLICITUDES) {
         // Tu código QR (diseño v2): quien lo escanee te envía la solicitud. También
         // vale con la cámara normal del móvil: abre tu perfil en la web.
         if (!miHandle.isNullOrBlank()) {
@@ -199,8 +207,16 @@ fun AmigosCabecera(
         mensaje?.let { (texto, error) ->
             Text(texto, color = if (error) com.paragon.app.ui.theme.Danger else Accent, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
         }
+        }
 
-        if (pendientes.isNotEmpty()) {
+        if (seccion == SeccionAmigos.SOLICITUDES && pendientes.isEmpty()) {
+            com.paragon.app.ui.common.EmptyState(
+                icon = Icons.Default.PersonAdd,
+                title = Textos.t(T.amigos_sin_solicitudes),
+                description = Textos.t(T.amigos_sin_solicitudes_sub),
+            )
+        }
+        if (seccion != SeccionAmigos.ANADIR && pendientes.isNotEmpty()) {
             Text(
                 Textos.t(T.amigos_solicitudes).uppercase(),
                 color = Muted,
@@ -250,3 +266,6 @@ fun AmigosCabecera(
         }
     }
 }
+
+/** Las partes de Amigos que no son la lista: ver AmigosCabecera(seccion). */
+enum class SeccionAmigos { SOLICITUDES, ANADIR }

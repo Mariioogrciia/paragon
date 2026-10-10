@@ -11,7 +11,6 @@ import { Plazas } from "../Plazas";
 
 export const metadata = { title: "Sesión · Paragon" };
 
-const METAL: Record<string, string> = { platinum: "🏆", gold: "🥇", silver: "🥈", bronze: "🥉" };
 
 /**
  * Ficha de una sesión: todo lo que hace falta para decidir si unirte (juego y
@@ -59,10 +58,7 @@ export default async function SesionPage({ params }: { params: Promise<{ id: str
               // eslint-disable-next-line @next/next/no-img-element
               <img src={s.trofeoInfo.iconUrl} alt="" className="mt-0.5 h-8 w-8 shrink-0 rounded" />
             )}
-            <span>
-              {s.trofeoInfo?.grade && <span className="mr-1">{METAL[s.trofeoInfo.grade]}</span>}
-              {s.trofeo}
-            </span>
+            <span>{s.trofeo}</span>
           </h1>
           {s.trofeoInfo?.detail && <p className="mt-1 text-sm text-muted">{s.trofeoInfo.detail}</p>}
           <p className="mt-2 text-sm font-semibold">

@@ -54,6 +54,13 @@ import com.paragon.shared.i18n.T
 import com.paragon.shared.i18n.Textos
 
 import com.paragon.app.ui.common.CabeceraHoja
+import com.paragon.app.ui.common.premiumClickable
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 
 private val MEDALLA = mapOf(0 to "🥇", 1 to "🥈", 2 to "🥉")
 
@@ -82,12 +89,16 @@ fun ClanDetailSheet(
     var confirmLeave by remember { mutableStateOf(false) }
     var inviteError by remember { mutableStateOf<String?>(null) }
     var guerraError by remember { mutableStateOf<String?>(null) }
+    var editandoEscudo by remember { mutableStateOf(false) }
+    var editandoInfo by remember { mutableStateOf(false) }
+    var gestionando by remember { mutableStateOf<com.paragon.app.data.ClanMember?>(null) }
+    var errorGestion by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(tag, refreshKey.value) {
         result = repository.getClanDetail(tag)
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         androidx.compose.foundation.layout.Box {
             Column(
                 modifier = Modifier
@@ -114,6 +125,9 @@ fun ClanDetailSheet(
                         }
                     },
                     onRequestLeave = { confirmLeave = true },
+                    onEditarEscudo = { editandoEscudo = true },
+                    onEditarInfo = { editandoInfo = true },
+                    onGestionar = { gestionando = it },
                     onRetar = { rivalId ->
                         scope.launch {
                             when (val res = repository.retarClan(tag, rivalId)) {
@@ -147,17 +161,77 @@ fun ClanDetailSheet(
         }
     }
 
+    // Rango de un miembro / expulsar (solo lo que tu rango permite, ver ClanRangos).
+    gestionando?.let { miembro ->
+        val detalle = (result as? ClanDetailResult.Ok)?.detail
+        GestionMiembroSheet(
+            miembro = miembro,
+            miRango = detalle?.miRango,
+            onElegir = { accion ->
+                gestionando = null
+                scope.launch {
+                    val res = if (accion == "expulsar") repository.expulsar(tag, miembro.userId) else repository.cambiarRango(tag, miembro.userId, accion)
+                    when (res) {
+                        is ClanActionResult.Ok -> { refreshKey.value += 1; onChanged() }
+                        is ClanActionResult.Error -> errorGestion = res.message
+                    }
+                }
+            },
+            onDismiss = { gestionando = null },
+        )
+    }
+
+    errorGestion?.let { message ->
+        ConfirmDialog(
+            title = Textos.t(T.clan_gestion_error),
+            message = message,
+            confirmLabel = Textos.t(T.comun_vale),
+            onConfirm = { errorGestion = null },
+            onDismiss = { errorGestion = null },
+        )
+    }
+
+    if (editandoInfo) {
+        val detalle = (result as? ClanDetailResult.Ok)?.detail
+        EditarInfoClanDialog(
+            nombre = detalle?.name ?: "",
+            descripcion = detalle?.description ?: "",
+            onGuardar = { n, d ->
+                when (val res = repository.editarClan(tag, n, d)) {
+                    is ClanActionResult.Ok -> { refreshKey.value += 1; onChanged(); null }
+                    is ClanActionResult.Error -> res.message
+                }
+            },
+            onDismiss = { editandoInfo = false },
+        )
+    }
+
+    if (editandoEscudo) {
+        EditorEscudoSheet(
+            inicial = (result as? ClanDetailResult.Ok)?.detail?.emblema,
+            onGuardar = { texto ->
+                when (val res = repository.setEmblema(tag, texto)) {
+                    is ClanActionResult.Ok -> { refreshKey.value += 1; onChanged(); null }
+                    is ClanActionResult.Error -> res.message
+                }
+            },
+            onDismiss = { editandoEscudo = false },
+        )
+    }
+
     if (confirmLeave) {
         val detail = (result as? ClanDetailResult.Ok)?.detail
         val esOwner = detail?.amIOwner == true
+        // Si eres el líder, el liderazgo pasa a otro; solo si estás solo se borra el clan.
+        val sucesor = if (esOwner) detail?.leaderboard?.let { com.paragon.app.data.ClanRangos.sucesor(it) } else null
         ConfirmDialog(
-            title = if (esOwner) Textos.t(T.clan_abandonar_propio) else Textos.t(T.clan_salir_titulo),
-            message = if (esOwner) {
-                Textos.t(T.clan_abandonar_propio_texto)
-            } else {
-                Textos.t(T.clan_salir_texto, detail?.name ?: "")
+            title = if (esOwner && sucesor == null) Textos.t(T.clan_abandonar_propio) else Textos.t(T.clan_salir_titulo),
+            message = when {
+                esOwner && sucesor != null -> Textos.t(T.clan_salir_lider_sucesor, sucesor.name)
+                esOwner -> Textos.t(T.clan_abandonar_propio_texto)
+                else -> Textos.t(T.clan_salir_texto, detail?.name ?: "")
             },
-            confirmLabel = if (esOwner) Textos.t(T.clan_borrar_si) else Textos.t(T.liga_salir_si),
+            confirmLabel = if (esOwner && sucesor == null) Textos.t(T.clan_borrar_si) else Textos.t(T.liga_salir_si),
             onConfirm = {
                 confirmLeave = false
                 scope.launch {
@@ -199,23 +273,50 @@ private fun ClanDetailContent(
     onJoin: () -> Unit,
     onRequestLeave: () -> Unit,
     onInvite: (String) -> Unit,
+    onEditarEscudo: () -> Unit = {},
+    onEditarInfo: () -> Unit = {},
+    onGestionar: (com.paragon.app.data.ClanMember) -> Unit = {},
     onRetar: (String) -> Unit = {},
     onResponder: (String, Boolean) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
+        // Escudo del clan (ver EscudoClan.kt); el líder lo cambia tocándolo.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "[${detail.tag}]",
-                color = Accent,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .background(AccentSoft, RoundedCornerShape(radio(6)))
-                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            EscudoClan(
+                detail.emblema,
+                72.dp,
+                modifier = if (detail.puedoEditar) Modifier.premiumClickable(onClick = onEditarEscudo) else Modifier,
             )
-            Spacer(Modifier.width(10.dp))
-            Text(text = detail.name, color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = "[${detail.tag}]",
+                    color = Accent,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .background(AccentSoft, RoundedCornerShape(radio(6)))
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                )
+                Text(text = detail.name, color = Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                if (detail.puedoEditar) {
+                    Text(
+                        Textos.t(T.clan_editar_info),
+                        color = Accent,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(radio(6))).premiumClickable(onClick = onEditarInfo).padding(vertical = 2.dp),
+                    )
+                    Text(
+                        Textos.t(T.clan_escudo_editar),
+                        color = Accent,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(radio(6))).premiumClickable(onClick = onEditarEscudo).padding(vertical = 2.dp),
+                    )
+                }
+            }
         }
         if (detail.description.isNotBlank()) {
             Text(text = detail.description, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
@@ -244,7 +345,9 @@ private fun ClanDetailContent(
             }
         } else {
             TextButton(onClick = onRequestLeave) {
-                Text(if (detail.amIOwner) Textos.t(T.clan_abandonar_borra) else Textos.t(T.clan_abandonar), color = Danger, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                // "(lo borra)" solo si eres el líder y estás solo: si no, el liderazgo pasa a otro.
+                val borraria = detail.amIOwner && detail.leaderboard.size <= 1
+                Text(if (borraria) Textos.t(T.clan_abandonar_borra) else Textos.t(T.clan_abandonar), color = Danger, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
             }
         }
 
@@ -257,7 +360,14 @@ private fun ClanDetailContent(
         Text(text = Textos.t(T.clan_contribucion_texto), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
         Spacer(Modifier.height(10.dp))
         detail.leaderboard.sortedByDescending { it.contribucion }.forEachIndexed { index, member ->
-            ClanMemberRow(member, index, totalClan = detail.score, onClick = { onMemberClick(member.handle) })
+            // "⋯" solo en quien está por debajo de tu rango (ver ClanRangos).
+            val gestionable = com.paragon.app.data.ClanRangos.puedeExpulsar(detail.miRango, member.role) ||
+                com.paragon.app.data.ClanRangos.TODOS.any { com.paragon.app.data.ClanRangos.puedeCambiar(detail.miRango, member.role, it) }
+            ClanMemberRow(
+                member, index, totalClan = detail.score,
+                onClick = { onMemberClick(member.handle) },
+                onGestionar = if (gestionable) ({ onGestionar(member) }) else null,
+            )
         }
 
         Spacer(Modifier.height(16.dp))
@@ -278,7 +388,7 @@ private fun ClanDetailContent(
             detail.activity.forEach { item -> ClanActivityRow(item) }
         }
 
-        if (detail.amIOwner) {
+        if (detail.puedoInvitar) {
             Spacer(Modifier.height(16.dp))
             HorizontalDivider(color = Border)
             Spacer(Modifier.height(16.dp))
@@ -302,7 +412,7 @@ private fun ClanDetailContent(
 }
 
 @Composable
-private fun ClanMemberRow(member: ClanMember, index: Int, totalClan: Int, onClick: () -> Unit) {
+private fun ClanMemberRow(member: ClanMember, index: Int, totalClan: Int, onClick: () -> Unit, onGestionar: (() -> Unit)? = null) {
     val esPrimero = index == 0 && member.contribucion > 0
     val parte = if (totalClan > 0) member.contribucion.toFloat() / totalClan else 0f
     Column(
@@ -334,14 +444,19 @@ private fun ClanMemberRow(member: ClanMember, index: Int, totalClan: Int, onClic
                 com.paragon.app.ui.common.AvatarPersona(member.image, member.name, size = 32.dp, fondo = Surface)
             }
             Spacer(Modifier.width(10.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(text = member.name, color = if (esPrimero) Platinum else Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = Textos.t(T.clan_contribucion_fila, if (member.role == "owner") Textos.t(T.clan_lider) else Textos.t(T.clan_miembro), member.trofeosEnClan), color = Muted, fontSize = 11.sp)
+                Text(text = Textos.t(T.clan_contribucion_fila, nombreRango(member.role), member.trofeosEnClan), color = Muted, fontSize = 11.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
-        Column(horizontalAlignment = Alignment.End) {
-            Text(text = miles(member.contribucion), color = Platinum, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-            Text(text = Textos.t(T.clan_parte, (parte * 100).roundToInt()), color = Muted, fontSize = 10.sp)
+        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
+            Text(text = miles(member.contribucion), color = Platinum, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            Text(text = Textos.t(T.clan_parte, (parte * 100).roundToInt()), color = Muted, fontSize = 10.sp, maxLines = 1, softWrap = false)
+        }
+        if (onGestionar != null) {
+            IconButton(onClick = onGestionar, modifier = Modifier.size(36.dp)) {
+                Icon(Icons.Default.MoreVert, contentDescription = Textos.t(T.clan_gestionar, member.name), tint = Muted)
+            }
         }
     }
     // Su parte de los puntos del clan.
@@ -419,10 +534,18 @@ private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResp
             ) {
                 Text(Textos.t(T.guerra_contra, abierta.rival.tag, abierta.rival.name), color = Foreground, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("[${detail.tag}] ${abierta.misPuntos ?: 0}", color = Accent, fontWeight = FontWeight.Black, fontSize = 22.sp)
-                    Text("  –  ", color = Muted, fontSize = 18.sp)
-                    Text("${abierta.susPuntos ?: 0} [${abierta.rival.tag}]", color = Foreground, fontWeight = FontWeight.Black, fontSize = 22.sp)
+                // Marcador en dos columnas (tag arriba, puntos debajo): en una
+                // sola línea, con la monoespaciada, el tag se partía en dos.
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("[${detail.tag}]", color = Accent, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, softWrap = false)
+                        Text("${abierta.misPuntos ?: 0}", color = Accent, fontWeight = FontWeight.Black, fontSize = 26.sp, maxLines = 1, softWrap = false)
+                    }
+                    Text("–", color = Muted, fontSize = 20.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("[${abierta.rival.tag}]", color = Foreground, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, softWrap = false)
+                        Text("${abierta.susPuntos ?: 0}", color = Foreground, fontWeight = FontWeight.Black, fontSize = 26.sp, maxLines = 1, softWrap = false)
+                    }
                 }
                 val dias = abierta.diasRestantes
                 if (dias != null) {
@@ -496,3 +619,99 @@ private fun GuerraDeClanes(detail: ClanDetail, onRetar: (String) -> Unit, onResp
 
 /** 18450 → "18.450". */
 private fun miles(n: Int): String = n.toString().reversed().chunked(3).joinToString(".").reversed()
+
+/** "Líder", "Colíder", "Veterano" o "Miembro". */
+private fun nombreRango(role: String?): String = when (com.paragon.app.data.ClanRangos.normalizar(role)) {
+    "owner" -> Textos.t(T.clan_lider)
+    "colider" -> Textos.t(T.clan_rango_colider)
+    "veterano" -> Textos.t(T.clan_rango_veterano)
+    else -> Textos.t(T.clan_miembro)
+}
+
+/** Opciones sobre un miembro: los rangos a los que tu rango puede moverlo y expulsar. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun GestionMiembroSheet(
+    miembro: com.paragon.app.data.ClanMember,
+    miRango: String?,
+    onElegir: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val r = com.paragon.app.data.ClanRangos
+    var confirmar by remember { mutableStateOf<String?>(null) }
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
+            Text(miembro.name, color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(nombreRango(miembro.role), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(bottom = 8.dp))
+            r.TODOS.filter { r.puedeCambiar(miRango, miembro.role, it) }.forEach { nuevo ->
+                val texto = when {
+                    nuevo == "owner" -> Textos.t(T.clan_hacer_lider)
+                    r.nivel(nuevo) > r.nivel(miembro.role) -> Textos.t(T.clan_ascender_a, nombreRango(nuevo))
+                    else -> Textos.t(T.clan_degradar_a, nombreRango(nuevo))
+                }
+                Text(
+                    texto,
+                    color = Foreground,
+                    fontSize = 15.sp,
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(radio(10)))
+                        .premiumClickable { if (nuevo == "owner") confirmar = nuevo else onElegir(nuevo) }
+                        .padding(vertical = 14.dp, horizontal = 4.dp),
+                )
+            }
+            if (r.puedeExpulsar(miRango, miembro.role)) {
+                Text(
+                    Textos.t(T.clan_expulsar),
+                    color = Danger,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(radio(10)))
+                        .premiumClickable { confirmar = "expulsar" }
+                        .padding(vertical = 14.dp, horizontal = 4.dp),
+                )
+            }
+        }
+    }
+    confirmar?.let { accion ->
+        ConfirmDialog(
+            title = miembro.name,
+            message = if (accion == "owner") Textos.t(T.clan_confirmar_lider, miembro.name) else Textos.t(T.clan_confirmar_expulsar, miembro.name),
+            confirmLabel = if (accion == "owner") Textos.t(T.clan_hacer_lider) else Textos.t(T.clan_expulsar),
+            onConfirm = { confirmar = null; onElegir(accion) },
+            onDismiss = { confirmar = null },
+        )
+    }
+}
+
+/** Nombre y descripción del clan (líder y colíderes). */
+@Composable
+private fun EditarInfoClanDialog(nombre: String, descripcion: String, onGuardar: suspend (String, String) -> String?, onDismiss: () -> Unit) {
+    var n by remember { mutableStateOf(nombre) }
+    var d by remember { mutableStateOf(descripcion) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var guardando by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = com.paragon.app.ui.theme.SurfaceSolida,
+        title = { Text(Textos.t(T.clan_editar_info), color = Foreground, fontWeight = FontWeight.Bold) },
+        text = {
+            Column {
+                OutlinedTextField(value = n, onValueChange = { if (it.length <= 40) n = it }, label = { Text(Textos.t(T.clan_campo_nombre)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(value = d, onValueChange = { if (it.length <= 200) d = it }, label = { Text(Textos.t(T.clan_campo_descripcion)) }, minLines = 3, modifier = Modifier.fillMaxWidth())
+                error?.let { Text(it, color = Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = !guardando, onClick = {
+                guardando = true
+                scope.launch {
+                    error = onGuardar(n, d)
+                    guardando = false
+                    if (error == null) onDismiss()
+                }
+            }) { Text(Textos.t(T.clan_guardar), color = Accent, fontWeight = FontWeight.Bold) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(Textos.t(T.comun_cancelar), color = Muted) } },
+    )
+}

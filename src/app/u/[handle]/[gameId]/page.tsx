@@ -15,6 +15,7 @@ import { ReviewEditor } from "@/components/ReviewEditor";
 import { TrophyList } from "@/components/TrophyList";
 import { ManualGameStatus } from "@/components/ManualGameStatus";
 import { listCollections } from "@/lib/collections";
+import { getGameDetails } from "@/lib/igdb/client";
 import { colorFor, coverGradient, rarity, relativeDate } from "@/lib/design";
 import { getGameDetail, getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { getCommunityRating } from "@/lib/ratings";
@@ -116,6 +117,12 @@ export default async function JuegoPage({
   const game = await getGameDetail(profile, gameId, await idiomaActual());
   if (!game) notFound();
 
+  // Fondo de la cabecera (7 oct 2026, "la veo sosa"): el artwork del juego
+  // en IGDB (o una captura); sin nada, la carátula ampliada y desenfocada.
+  // getGameDetails va cacheado 6 h (lib/igdb/client.ts).
+  const detallesIgdb = game.igdbId ? await getGameDetails(game.igdbId).catch(() => null) : null;
+  const fondoCabecera = detallesIgdb?.artworkUrl ?? detallesIgdb?.screenshots?.[0] ?? null;
+
   const progress = gameProgress(game);
   const siguientes = nextSteps(game.trophies);
   const played = relativeDate(game.lastPlayedAt, idioma);
@@ -197,9 +204,17 @@ export default async function JuegoPage({
         className="relative overflow-hidden border-b border-border"
         style={{ background: "linear-gradient(135deg, #2b1b3f 0%, #16233d 55%, #0b1018 100%)" }}
       >
+        {fondoCabecera ? (
+          <img src={fondoCabecera} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+        ) : (
+          game.iconUrl && (
+            <img src={game.iconUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-125 object-cover opacity-30 blur-2xl" />
+          )
+        )}
+        {/* Oscurece de abajo y desde la izquierda, donde va el texto. */}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(rgba(10, 13, 19, 0.25), rgba(10, 13, 19, 0.9))" }}
+          style={{ background: "linear-gradient(rgba(10, 13, 19, 0.35), rgba(10, 13, 19, 0.92)), linear-gradient(90deg, rgba(10, 13, 19, 0.75), rgba(10, 13, 19, 0.15))" }}
         />
         <div className="relative mx-auto max-w-[1240px] px-7 pb-9 pt-7">
           <BackButton

@@ -61,6 +61,9 @@ private const val UN_DIA_MS = 86_400_000L
  * la caché offline.
  */
 fun predecirPlatino(trophies: List<TrophyItem>): PlatinumPrediction? {
+    // Con el platino ya conseguido no hay nada que predecir: lo que falte son
+    // DLC (antes los contaba y predecía un "platino" que ya tenías).
+    if (trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }) return null
     val restantes = trophies.count { !it.earned }
     if (restantes == 0) return null
 
@@ -192,8 +195,19 @@ class GameDetailRepository(
      * sincronizar (ver `saveNotes`) tiene prioridad sobre la que devuelva el
      * servidor, para no pisar algo que el usuario escribió sin conexión.
      */
-    suspend fun getGameDetail(gameId: String): GameDetailResult {
+    /** `de`: handle de otra persona para ver SU ficha (sin caché: la local es solo la tuya). */
+    suspend fun getGameDetail(gameId: String, de: String? = null): GameDetailResult {
         val store = tokenStore ?: return GameDetailResult.Error(Textos.t(T.error_sin_sesion))
+        if (de != null) {
+            return try {
+                val response = ApiClient.gamesApi(store).getGameDetail(gameId, de)
+                GameDetailResult.Ok(response.game.toGameDetailData().copy(diario = response.diario))
+            } catch (e: HttpException) {
+                GameDetailResult.Error(if (e.code() == 404) Textos.t(T.ficha_err_no_existe) else Textos.t(T.error_servidor, e.code()))
+            } catch (e: Exception) {
+                GameDetailResult.Error(Textos.t(T.error_conexion))
+            }
+        }
 
         return try {
             val response = ApiClient.gamesApi(store).getGameDetail(gameId)

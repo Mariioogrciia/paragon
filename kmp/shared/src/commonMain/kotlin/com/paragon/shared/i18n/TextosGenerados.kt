@@ -57,751 +57,834 @@ object T {
     val alta_ya_vinculado = Texto(47)
     val amigos_anadir = Texto(48)
     val amigos_enviada = Texto(49)
-    val amigos_placeholder = Texto(50)
-    val amigos_solicitudes = Texto(51)
-    val amigos_ya_sois = Texto(52)
-    val amistad_aceptar = Texto(53)
-    val amistad_amigos = Texto(54)
-    val amistad_anadir = Texto(55)
-    val amistad_enviada = Texto(56)
-    val apariencia_acento = Texto(57)
-    val apariencia_estilo = Texto(58)
-    val apariencia_estilo_nivel = Texto(59)
-    val apariencia_icono = Texto(60)
-    val apariencia_icono_nota = Texto(61)
-    val apariencia_juego = Texto(62)
-    val apariencia_juego_nota = Texto(63)
-    val apariencia_libre = Texto(64)
-    val apariencia_libre_actual = Texto(65)
-    val apariencia_material_activo = Texto(66)
-    val apariencia_material_sub = Texto(67)
-    val apariencia_modo = Texto(68)
-    val apariencia_modo_nota = Texto(69)
-    val apariencia_muestra_boton = Texto(70)
-    val apariencia_muestra_chip = Texto(71)
-    val apariencia_sincronizada = Texto(72)
-    val apariencia_temas = Texto(73)
-    val apariencia_texto = Texto(74)
-    val apariencia_titulo = Texto(75)
-    val arquetipo_cazador = Texto(76)
-    val arquetipo_elite = Texto(77)
-    val arquetipo_explorador = Texto(78)
-    val arquetipo_veterano = Texto(79)
-    val atascados_vacio = Texto(80)
-    val atascados_vacio_sub = Texto(81)
-    val biblio_abandonados = Texto(82)
-    val biblio_buscar = Texto(83)
-    val biblio_completados = Texto(84)
-    val biblio_falta_dlc = Texto(85)
-    val biblio_jugando = Texto(86)
-    val biblio_nada_filtros = Texto(87)
-    val biblio_nada_filtros_sub = Texto(88)
-    val biblio_orden_az = Texto(89)
-    val biblio_orden_progreso = Texto(90)
-    val biblio_orden_za = Texto(91)
-    val biblio_pct_restantes = Texto(92)
-    val biblio_pila = Texto(93)
-    val biblio_platinados = Texto(94)
-    val biblio_resumen = Texto(95)
-    val biblio_ruleta = Texto(96)
-    val biblio_titulo = Texto(97)
-    val biblio_todos = Texto(98)
-    val biblio_vacia = Texto(99)
-    val biblio_vacia_sub = Texto(100)
-    val biblio_vista_cuadricula = Texto(101)
-    val biblio_vista_enfoque = Texto(102)
-    val carpeta_abrir = Texto(103)
-    val carpeta_anadir = Texto(104)
-    val carpeta_borrar_texto = Texto(105)
-    val carpeta_borrar_titulo = Texto(106)
-    val carpeta_err_borrar = Texto(107)
-    val carpeta_err_cambiar = Texto(108)
-    val carpeta_err_crear = Texto(109)
-    val carpeta_err_quitar = Texto(110)
-    val carpeta_err_renombrar = Texto(111)
-    val carpeta_nueva = Texto(112)
-    val carpeta_opciones = Texto(113)
-    val carpeta_quitar = Texto(114)
-    val carpeta_renombrar = Texto(115)
-    val carpeta_sin_juegos = Texto(116)
-    val carpeta_sin_juegos_sub = Texto(117)
-    val carpeta_vacio = Texto(118)
-    val carpeta_vacio_crear = Texto(119)
-    val carpeta_vacio_sheet = Texto(120)
-    val carpeta_vacio_sub = Texto(121)
-    val carpetas_titulo = Texto(122)
-    val clan_abandonar = Texto(123)
-    val clan_abandonar_borra = Texto(124)
-    val clan_abandonar_propio = Texto(125)
-    val clan_abandonar_propio_texto = Texto(126)
-    val clan_act_favorito = Texto(127)
-    val clan_act_nota = Texto(128)
-    val clan_act_nuevo = Texto(129)
-    val clan_act_otro = Texto(130)
-    val clan_act_platino = Texto(131)
-    val clan_act_resena = Texto(132)
-    val clan_act_valoro = Texto(133)
-    val clan_actividad = Texto(134)
-    val clan_actividad_vacia = Texto(135)
-    val clan_borrar_si = Texto(136)
-    val clan_contribucion = Texto(137)
-    val clan_contribucion_fila = Texto(138)
-    val clan_contribucion_texto = Texto(139)
-    val clan_err_crear = Texto(140)
-    val clan_err_invitar = Texto(141)
-    val clan_err_no_existe = Texto(142)
-    val clan_err_unir = Texto(143)
-    val clan_invitar_error = Texto(144)
-    val clan_lider = Texto(145)
-    val clan_miembro = Texto(146)
-    val clan_miembros = Texto(147)
-    val clan_parte = Texto(148)
-    val clan_posicion = Texto(149)
-    val clan_puntos_clan = Texto(150)
-    val clan_ranking = Texto(151)
-    val clan_rol_trofeos = Texto(152)
-    val clan_salir_texto = Texto(153)
-    val clan_salir_titulo = Texto(154)
-    val clan_sin_amigos = Texto(155)
-    val clan_trofeos_clan = Texto(156)
-    val clan_unirme = Texto(157)
-    val clan_xp_total = Texto(158)
-    val color_amarillo = Texto(159)
-    val color_auto = Texto(160)
-    val color_azul = Texto(161)
-    val color_celeste = Texto(162)
-    val color_naranja = Texto(163)
-    val color_rojo = Texto(164)
-    val color_rosa = Texto(165)
-    val color_verde = Texto(166)
-    val color_violeta = Texto(167)
-    val comparar_amigos = Texto(168)
-    val comparar_ellos = Texto(169)
-    val comparar_ellos_pct = Texto(170)
-    val comparar_empate = Texto(171)
-    val comparar_en_comun = Texto(172)
-    val comparar_err_no_existe = Texto(173)
-    val comparar_err_sin_cuentas = Texto(174)
-    val comparar_ganando = Texto(175)
-    val comparar_handle_nivel = Texto(176)
-    val comparar_perdiendo = Texto(177)
-    val comparar_ph = Texto(178)
-    val comparar_sin_amigos = Texto(179)
-    val comparar_sin_comun = Texto(180)
-    val comparar_titulo = Texto(181)
-    val comparar_trofeos_juegos = Texto(182)
-    val comparar_tu = Texto(183)
-    val comparar_tu_pct = Texto(184)
-    val comparte_badge_platino = Texto(185)
-    val comparte_handle = Texto(186)
-    val comparte_trofeos = Texto(187)
-    val compartir_anadido = Texto(188)
-    val compartir_elige = Texto(189)
-    val compartir_escribe = Texto(190)
-    val compartir_login = Texto(191)
-    val compartir_login_sub = Texto(192)
-    val compartir_ph = Texto(193)
-    val compartir_titulo = Texto(194)
-    val comun_a_b = Texto(195)
-    val comun_aceptar = Texto(196)
-    val comun_alguien = Texto(197)
-    val comun_atras = Texto(198)
-    val comun_borrar = Texto(199)
-    val comun_buscar = Texto(200)
-    val comun_buscar_accion = Texto(201)
-    val comun_cambiar = Texto(202)
-    val comun_cancelar = Texto(203)
-    val comun_cargando = Texto(204)
-    val comun_cerrar = Texto(205)
-    val comun_compartir = Texto(206)
-    val comun_completado = Texto(207)
-    val comun_continuar = Texto(208)
-    val comun_crear = Texto(209)
-    val comun_deseados = Texto(210)
-    val comun_editar = Texto(211)
-    val comun_eliminar = Texto(212)
-    val comun_enviar = Texto(213)
-    val comun_guardar = Texto(214)
-    val comun_guardar_cambios = Texto(215)
-    val comun_invitar = Texto(216)
-    val comun_juegos = Texto(217)
-    val comun_jugador = Texto(218)
-    val comun_miembros_1 = Texto(219)
-    val comun_miembros_n = Texto(220)
-    val comun_n_juegos = Texto(221)
-    val comun_n_platinos = Texto(222)
-    val comun_nivel = Texto(223)
-    val comun_nivel_n = Texto(224)
-    val comun_platinos = Texto(225)
-    val comun_pts = Texto(226)
-    val comun_publicar = Texto(227)
-    val comun_puntos = Texto(228)
-    val comun_rechazar = Texto(229)
-    val comun_reintentar = Texto(230)
-    val comun_renombrar = Texto(231)
-    val comun_si_borrar = Texto(232)
-    val comun_si_continuar = Texto(233)
-    val comun_sin_conexion_copia = Texto(234)
-    val comun_sin_resultados = Texto(235)
-    val comun_termina_en_1 = Texto(236)
-    val comun_termina_en_n = Texto(237)
-    val comun_termina_hoy = Texto(238)
-    val comun_trofeos = Texto(239)
-    val comun_vale = Texto(240)
-    val comun_volver = Texto(241)
-    val comunidad_muro = Texto(242)
-    val cuentas_al_dia = Texto(243)
-    val cuentas_cambiar = Texto(244)
-    val cuentas_conectar = Texto(245)
-    val cuentas_declarado = Texto(246)
-    val cuentas_desvincular = Texto(247)
-    val cuentas_desvincular_si = Texto(248)
-    val cuentas_desvincular_texto = Texto(249)
-    val cuentas_desvincular_titulo = Texto(250)
-    val cuentas_epic_extension = Texto(251)
-    val cuentas_nivel = Texto(252)
-    val cuentas_ph_otro = Texto(253)
-    val cuentas_ph_psn = Texto(254)
-    val cuentas_ph_steam = Texto(255)
-    val cuentas_ph_xbox = Texto(256)
-    val cuentas_plataformas_sub = Texto(257)
-    val cuentas_priv_otro = Texto(258)
-    val cuentas_priv_psn = Texto(259)
-    val cuentas_priv_steam = Texto(260)
-    val cuentas_priv_xbox = Texto(261)
-    val cuentas_privada = Texto(262)
-    val cuentas_psn_1 = Texto(263)
-    val cuentas_psn_2 = Texto(264)
-    val cuentas_psn_3 = Texto(265)
-    val cuentas_psn_4 = Texto(266)
-    val cuentas_seccion_login = Texto(267)
-    val cuentas_seccion_plataformas = Texto(268)
-    val cuentas_sincronizada_hace = Texto(269)
-    val cuentas_sincronizando = Texto(270)
-    val cuentas_sincronizar = Texto(271)
-    val cuentas_steam_1 = Texto(272)
-    val cuentas_steam_2 = Texto(273)
-    val cuentas_steam_3 = Texto(274)
-    val cuentas_steam_4 = Texto(275)
-    val cuentas_steam_sync = Texto(276)
-    val cuentas_steam_sync_sub = Texto(277)
-    val cuentas_titulo = Texto(278)
-    val cuentas_trofeos_nuevos = Texto(279)
-    val cuentas_vinculada = Texto(280)
-    val cuentas_vinculado = Texto(281)
-    val cuentas_vincular = Texto(282)
-    val cuentas_xbox_1 = Texto(283)
-    val cuentas_xbox_2 = Texto(284)
-    val cuentas_xbox_3 = Texto(285)
-    val diario_final_1 = Texto(286)
-    val diario_final_n = Texto(287)
-    val diario_hazana = Texto(288)
-    val diario_inicio = Texto(289)
-    val diario_muro = Texto(290)
-    val diario_titulo = Texto(291)
-    val duracion_anios = Texto(292)
-    val duracion_anios_1 = Texto(293)
-    val duracion_anios_n = Texto(294)
-    val duracion_dias = Texto(295)
-    val duracion_dias_1 = Texto(296)
-    val duracion_dias_n = Texto(297)
-    val duracion_meses = Texto(298)
-    val duracion_meses_1 = Texto(299)
-    val duracion_meses_n = Texto(300)
-    val duracion_semanas = Texto(301)
-    val duracion_semanas_1 = Texto(302)
-    val duracion_semanas_n = Texto(303)
-    val enfoque_aviso_1 = Texto(304)
-    val enfoque_aviso_n = Texto(305)
-    val enfoque_comprobando = Texto(306)
-    val enfoque_detener = Texto(307)
-    val enfoque_detener_esa = Texto(308)
-    val enfoque_diario = Texto(309)
-    val enfoque_diario_conseguidos_1 = Texto(310)
-    val enfoque_diario_conseguidos_n = Texto(311)
-    val enfoque_diario_linea = Texto(312)
-    val enfoque_diario_sub = Texto(313)
-    val enfoque_diario_vacio = Texto(314)
-    val enfoque_hecho = Texto(315)
-    val enfoque_iniciar = Texto(316)
-    val enfoque_nada_nuevo = Texto(317)
-    val enfoque_nota_offline = Texto(318)
-    val enfoque_nota_ph = Texto(319)
-    val enfoque_nuevos_1 = Texto(320)
-    val enfoque_nuevos_n = Texto(321)
-    val enfoque_otra_sesion = Texto(322)
-    val enfoque_platino = Texto(323)
-    val enfoque_rareza = Texto(324)
-    val enfoque_salir = Texto(325)
-    val enfoque_sesion_guardada = Texto(326)
-    val enfoque_titulo = Texto(327)
-    val enfoque_tu_diario = Texto(328)
-    val enfoque_vacio = Texto(329)
-    val enfoque_vacio_sub = Texto(330)
-    val enfoque_ver_diario = Texto(331)
-    val enfoque_ya_lo_tengo = Texto(332)
-    val error_conexion = Texto(333)
-    val error_guardar_guia = Texto(334)
-    val error_red = Texto(335)
-    val error_servidor = Texto(336)
-    val error_servidor_corto = Texto(337)
-    val error_sin_sesion = Texto(338)
-    val estilo_brutalista = Texto(339)
-    val estilo_brutalista_desc = Texto(340)
-    val estilo_clasico = Texto(341)
-    val estilo_clasico_desc = Texto(342)
-    val estilo_ps5 = Texto(343)
-    val estilo_ps5_desc = Texto(344)
-    val estilo_steam = Texto(345)
-    val estilo_steam_desc = Texto(346)
-    val estilo_switch = Texto(347)
-    val estilo_switch_desc = Texto(348)
-    val estilo_terminal = Texto(349)
-    val estilo_terminal_desc = Texto(350)
-    val estilo_vidrio = Texto(351)
-    val estilo_vidrio_desc = Texto(352)
-    val estilo_xbox = Texto(353)
-    val estilo_xbox_desc = Texto(354)
-    val feed_a11y_comentarios = Texto(355)
-    val feed_a11y_reaccionado = Texto(356)
-    val feed_a11y_reaccionar = Texto(357)
-    val feed_a11y_vistas = Texto(358)
-    val feed_comentar_ph = Texto(359)
-    val feed_favorito = Texto(360)
-    val feed_nota = Texto(361)
-    val feed_nuevo = Texto(362)
-    val feed_otro = Texto(363)
-    val feed_otro_sin = Texto(364)
-    val feed_platino = Texto(365)
-    val feed_resena = Texto(366)
-    val feed_titulo = Texto(367)
-    val feed_vacio = Texto(368)
-    val feed_vacio_sub = Texto(369)
-    val feed_valoro = Texto(370)
-    val feed_ver_comentarios = Texto(371)
-    val ficha_anclar = Texto(372)
-    val ficha_atascar = Texto(373)
-    val ficha_buscar_guia = Texto(374)
-    val ficha_cifra_horas = Texto(375)
-    val ficha_cifra_platino = Texto(376)
-    val ficha_cifra_progreso = Texto(377)
-    val ficha_compartir_platino = Texto(378)
-    val ficha_cronologia = Texto(379)
-    val ficha_declarado = Texto(380)
-    val ficha_err_no_existe = Texto(381)
-    val ficha_expansion = Texto(382)
-    val ficha_fecha_rareza = Texto(383)
-    val ficha_fecha_trofeos = Texto(384)
-    val ficha_filtro_conseguidos = Texto(385)
-    val ficha_filtro_faltan = Texto(386)
-    val ficha_filtro_todo_dlc = Texto(387)
-    val ficha_filtro_todos = Texto(388)
-    val ficha_grado_rareza = Texto(389)
-    val ficha_grafica_vacia = Texto(390)
-    val ficha_guias_escritas = Texto(391)
-    val ficha_horas = Texto(392)
-    val ficha_juego_base = Texto(393)
-    val ficha_lista = Texto(394)
-    val ficha_notas = Texto(395)
-    val ficha_notas_anadir = Texto(396)
-    val ficha_notas_ph = Texto(397)
-    val ficha_objetivo_actual = Texto(398)
-    val ficha_prediccion = Texto(399)
-    val ficha_progreso = Texto(400)
-    val ficha_reservado = Texto(401)
-    val ficha_reservado_n = Texto(402)
-    val ficha_reservar = Texto(403)
-    val ficha_reservar_faltan_1 = Texto(404)
-    val ficha_reservar_faltan_n = Texto(405)
-    val ficha_reservar_n = Texto(406)
-    val ficha_sin_trofeos_filtro = Texto(407)
-    val ficha_solo_faltan = Texto(408)
-    val fuente_casual = Texto(409)
-    val fuente_elegante = Texto(410)
-    val fuente_moderna = Texto(411)
-    val fuente_retro = Texto(412)
-    val grado_bronce = Texto(413)
-    val grado_oro = Texto(414)
-    val grado_plata = Texto(415)
-    val grado_platino = Texto(416)
-    val guerra_aceptar = Texto(417)
-    val guerra_contra = Texto(418)
-    val guerra_dias = Texto(419)
-    val guerra_elige_rival = Texto(420)
-    val guerra_empate = Texto(421)
-    val guerra_esperando = Texto(422)
-    val guerra_ganada = Texto(423)
-    val guerra_historial = Texto(424)
-    val guerra_ninguna = Texto(425)
-    val guerra_os_retan = Texto(426)
-    val guerra_perdida = Texto(427)
-    val guerra_rechazar = Texto(428)
-    val guerra_reglas = Texto(429)
-    val guerra_responde_lider = Texto(430)
-    val guerra_retar = Texto(431)
-    val guerra_sin_rivales = Texto(432)
-    val guerra_titulo = Texto(433)
-    val guerra_ultimo_dia = Texto(434)
-    val guia_busqueda_video = Texto(435)
-    val guias_borrar_texto = Texto(436)
-    val guias_borrar_titulo = Texto(437)
-    val guias_ph = Texto(438)
-    val guias_tu_guia = Texto(439)
-    val guias_vacio = Texto(440)
-    val icono_claro = Texto(441)
-    val icono_esmeralda = Texto(442)
-    val icono_neon = Texto(443)
-    val icono_oro = Texto(444)
-    val icono_paragon = Texto(445)
-    val inicio_faltan = Texto(446)
-    val inicio_faltan_n = Texto(447)
-    val inicio_hola = Texto(448)
-    val inicio_ir = Texto(449)
-    val inicio_objetivo_anclado = Texto(450)
-    val inicio_para_hoy = Texto(451)
-    val inicio_proxima_sesion = Texto(452)
-    val inicio_sigue_jugando = Texto(453)
-    val inicio_siguiente_platino_de = Texto(454)
-    val inicio_ver_todas = Texto(455)
-    val inicio_ver_todo = Texto(456)
-    val liga_borrar = Texto(457)
-    val liga_borrar_texto = Texto(458)
-    val liga_borrar_titulo = Texto(459)
-    val liga_cancelar_inv_si = Texto(460)
-    val liga_cancelar_inv_texto = Texto(461)
-    val liga_cancelar_inv_titulo = Texto(462)
-    val liga_clasif_sub = Texto(463)
-    val liga_con_fin = Texto(464)
-    val liga_duracion_termina = Texto(465)
-    val liga_err_no_existe = Texto(466)
-    val liga_esperando = Texto(467)
-    val liga_gano = Texto(468)
-    val liga_invitaciones = Texto(469)
-    val liga_invitar_amigo = Texto(470)
-    val liga_para_subir = Texto(471)
-    val liga_posicion = Texto(472)
-    val liga_quitar = Texto(473)
-    val liga_quitar_reto = Texto(474)
-    val liga_quitar_si = Texto(475)
-    val liga_quitar_texto = Texto(476)
-    val liga_quitar_titulo = Texto(477)
-    val liga_reto = Texto(478)
-    val liga_reto_elegir = Texto(479)
-    val liga_reto_elige = Texto(480)
-    val liga_reto_texto = Texto(481)
-    val liga_salir = Texto(482)
-    val liga_salir_si = Texto(483)
-    val liga_salir_texto = Texto(484)
-    val liga_salir_titulo = Texto(485)
-    val liga_sin_fin = Texto(486)
-    val liga_sin_ganador = Texto(487)
-    val liga_sin_reto = Texto(488)
-    val liga_termina_el = Texto(489)
-    val liga_terminada = Texto(490)
-    val liga_terminada_el = Texto(491)
-    val liga_todos_dentro = Texto(492)
-    val login_discord = Texto(493)
-    val login_google = Texto(494)
-    val login_lema = Texto(495)
-    val login_sin_contrasenas = Texto(496)
-    val login_subtitulo = Texto(497)
-    val login_titular = Texto(498)
-    val main_buscar_ph = Texto(499)
-    val main_cerrar_busqueda = Texto(500)
-    val main_racha = Texto(501)
-    val main_sin_racha = Texto(502)
-    val nav_ajustes = Texto(503)
-    val nav_atascados = Texto(504)
-    val nav_atascados_menu = Texto(505)
-    val nav_biblioteca = Texto(506)
-    val nav_carpetas = Texto(507)
-    val nav_comparar = Texto(508)
-    val nav_comunidad = Texto(509)
-    val nav_enfoque = Texto(510)
-    val nav_estadisticas = Texto(511)
-    val nav_ficha = Texto(512)
-    val nav_ligas = Texto(513)
-    val nav_mas = Texto(514)
-    val nav_panel = Texto(515)
-    val nav_perfil = Texto(516)
-    val nav_sesiones = Texto(517)
-    val panel_a_por_este = Texto(518)
-    val panel_cerrojo = Texto(519)
-    val panel_cerrojo_texto = Texto(520)
-    val panel_completado = Texto(521)
-    val panel_hola = Texto(522)
-    val panel_juego_progreso = Texto(523)
-    val panel_meta = Texto(524)
-    val panel_meta_eliminar = Texto(525)
-    val panel_meta_fijar = Texto(526)
-    val panel_meta_objetivo = Texto(527)
-    val panel_meta_ph = Texto(528)
-    val panel_meta_titulo = Texto(529)
-    val panel_nivel = Texto(530)
-    val panel_platinado = Texto(531)
-    val panel_platinado_excl = Texto(532)
-    val panel_platinos = Texto(533)
-    val panel_recientes = Texto(534)
-    val panel_restantes = Texto(535)
-    val panel_resumen = Texto(536)
-    val panel_rival = Texto(537)
-    val panel_rival_texto = Texto(538)
-    val panel_siguiente = Texto(539)
-    val panel_siguiente_platino = Texto(540)
-    val panel_siguiente_sub = Texto(541)
-    val panel_un_paso = Texto(542)
-    val panel_un_paso_sub = Texto(543)
-    val panel_un_paso_vacio = Texto(544)
-    val perfil_actividad = Texto(545)
-    val perfil_acumulado = Texto(546)
-    val perfil_cifras = Texto(547)
-    val perfil_comparar = Texto(548)
-    val perfil_completado_medio = Texto(549)
-    val perfil_con_otros = Texto(550)
-    val perfil_conectado_1 = Texto(551)
-    val perfil_conectado_n = Texto(552)
-    val perfil_dia_vacio = Texto(553)
-    val perfil_dias_activos = Texto(554)
-    val perfil_dias_ganados = Texto(555)
-    val perfil_dias_n = Texto(556)
-    val perfil_ellos = Texto(557)
-    val perfil_err_no_encontrado = Texto(558)
-    val perfil_este_anio = Texto(559)
-    val perfil_fijar_rival = Texto(560)
-    val perfil_horas = Texto(561)
-    val perfil_juegos_mes = Texto(562)
-    val perfil_leyenda_tu = Texto(563)
-    val perfil_mejor_dia = Texto(564)
-    val perfil_mejor_mes = Texto(565)
-    val perfil_mes_empate = Texto(566)
-    val perfil_mes_gana = Texto(567)
-    val perfil_mes_ganas = Texto(568)
-    val perfil_mes_propio = Texto(569)
-    val perfil_mes_titulo = Texto(570)
-    val perfil_mes_vs = Texto(571)
-    val perfil_nivel_arquetipo = Texto(572)
-    val perfil_por_dia = Texto(573)
-    val perfil_racha = Texto(574)
-    val perfil_recientes = Texto(575)
-    val perfil_rival = Texto(576)
-    val perfil_rivalidad = Texto(577)
-    val perfil_titulo = Texto(578)
-    val perfil_toca_dia = Texto(579)
-    val perfil_tu = Texto(580)
-    val perfil_tu_caza = Texto(581)
-    val perfil_ultimos_12 = Texto(582)
-    val perfil_ultimos_trofeos = Texto(583)
-    val perfil_ventaja = Texto(584)
-    val perfil_ventaja_todo = Texto(585)
-    val perfil_ver_completo = Texto(586)
-    val push_canal = Texto(587)
-    val qr_compartir_sesion = Texto(588)
-    val qr_compartir_sesion_sub = Texto(589)
-    val qr_eres_tu = Texto(590)
-    val qr_escanear = Texto(591)
-    val qr_no_valido = Texto(592)
-    val qr_tu_codigo = Texto(593)
-    val qr_tu_codigo_sub = Texto(594)
-    val racha_activa = Texto(595)
-    val racha_activar = Texto(596)
-    val racha_hoy = Texto(597)
-    val racha_semanas = Texto(598)
-    val ritmo_dia_a_dia = Texto(599)
-    val ritmo_n_trofeos = Texto(600)
-    val ritmo_por_juego = Texto(601)
-    val ritmo_quitar_dia = Texto(602)
-    val ritmo_titulo = Texto(603)
-    val ritmo_vacio_texto = Texto(604)
-    val ritmo_vacio_titulo = Texto(605)
-    val ruleta_empezar = Texto(606)
-    val ruleta_titulo = Texto(607)
-    val selector_buscar = Texto(608)
-    val selector_elige = Texto(609)
-    val selector_sin_resultados = Texto(610)
-    val sesiones_ayuda = Texto(611)
-    val sesiones_cancelada = Texto(612)
-    val sesiones_cancelar = Texto(613)
-    val sesiones_cancelar_texto = Texto(614)
-    val sesiones_cancelar_titulo = Texto(615)
-    val sesiones_completa = Texto(616)
-    val sesiones_dentro = Texto(617)
-    val sesiones_descripcion = Texto(618)
-    val sesiones_descripcion_placeholder = Texto(619)
-    val sesiones_detalles = Texto(620)
-    val sesiones_en_curso = Texto(621)
-    val sesiones_eres_anfitrion = Texto(622)
-    val sesiones_estas_dentro = Texto(623)
-    val sesiones_falta_fecha = Texto(624)
-    val sesiones_falta_trofeo = Texto(625)
-    val sesiones_fecha = Texto(626)
-    val sesiones_hora = Texto(627)
-    val sesiones_juego = Texto(628)
-    val sesiones_juego_base = Texto(629)
-    val sesiones_libres_1 = Texto(630)
-    val sesiones_libres_n = Texto(631)
-    val sesiones_lo_tienes = Texto(632)
-    val sesiones_no_lo_tienes = Texto(633)
-    val sesiones_nueva_titulo = Texto(634)
-    val sesiones_organiza = Texto(635)
-    val sesiones_organizar = Texto(636)
-    val sesiones_otras = Texto(637)
-    val sesiones_plaza_libre = Texto(638)
-    val sesiones_plazas = Texto(639)
-    val sesiones_plazas_ayuda = Texto(640)
-    val sesiones_publicar = Texto(641)
-    val sesiones_puedes_unirte = Texto(642)
-    val sesiones_quien_esta = Texto(643)
-    val sesiones_salirme = Texto(644)
-    val sesiones_sin_juegos = Texto(645)
-    val sesiones_sin_lista = Texto(646)
-    val sesiones_sin_plazas = Texto(647)
-    val sesiones_subtitulo = Texto(648)
-    val sesiones_terminada = Texto(649)
-    val sesiones_trofeo = Texto(650)
-    val sesiones_trofeo_cargando = Texto(651)
-    val sesiones_trofeo_elige = Texto(652)
-    val sesiones_trofeo_escrito = Texto(653)
-    val sesiones_trofeo_otro = Texto(654)
-    val sesiones_tu = Texto(655)
-    val sesiones_unirme = Texto(656)
-    val sesiones_unirme_ayudar = Texto(657)
-    val sesiones_vacio_texto = Texto(658)
-    val sesiones_vacio_titulo = Texto(659)
-    val sesiones_ya_lo_tienes_ayuda = Texto(660)
-    val sesiones_ya_no_abierta = Texto(661)
-    val social_clan_desc = Texto(662)
-    val social_clan_nombre = Texto(663)
-    val social_clan_tag = Texto(664)
-    val social_crea_clan = Texto(665)
-    val social_crea_clan_sub = Texto(666)
-    val social_crea_liga = Texto(667)
-    val social_crea_liga_sub = Texto(668)
-    val social_crear_clan = Texto(669)
-    val social_crear_liga = Texto(670)
-    val social_duracion = Texto(671)
-    val social_liga_mensual = Texto(672)
-    val social_liga_mensual_sub = Texto(673)
-    val social_liga_ph = Texto(674)
-    val social_mis_ligas_sub = Texto(675)
-    val social_nivel_platinos = Texto(676)
-    val social_nueva_liga = Texto(677)
-    val social_nuevo_clan = Texto(678)
-    val social_nuevo_clan_sub = Texto(679)
-    val social_puesto = Texto(680)
-    val social_puntos_mes = Texto(681)
-    val social_sin_amigos = Texto(682)
-    val social_sin_amigos_sub = Texto(683)
-    val social_sin_clanes = Texto(684)
-    val social_sin_ranking = Texto(685)
-    val social_sin_ranking_sub = Texto(686)
-    val social_tab_amigos = Texto(687)
-    val social_tab_clan = Texto(688)
-    val social_tab_ligas = Texto(689)
-    val social_tab_mis_ligas = Texto(690)
-    val social_te_ha_invitado = Texto(691)
-    val social_te_invita = Texto(692)
-    val social_tu_clan = Texto(693)
-    val social_unirme = Texto(694)
-    val social_ventaja = Texto(695)
-    val stats_adn = Texto(696)
-    val stats_anejo = Texto(697)
-    val stats_anejo_anios = Texto(698)
-    val stats_anejo_meses = Texto(699)
-    val stats_arquetipo = Texto(700)
-    val stats_arquetipo_no = Texto(701)
-    val stats_backlog = Texto(702)
-    val stats_backlog_sub = Texto(703)
-    val stats_backlog_vacio = Texto(704)
-    val stats_badge_platino_n = Texto(705)
-    val stats_badge_primer = Texto(706)
-    val stats_badge_raro = Texto(707)
-    val stats_badges_sub = Texto(708)
-    val stats_coste = Texto(709)
-    val stats_coste_sub = Texto(710)
-    val stats_dias_activos = Texto(711)
-    val stats_dieta = Texto(712)
-    val stats_dieta_texto = Texto(713)
-    val stats_eficiencia = Texto(714)
-    val stats_eficiencia_sub = Texto(715)
-    val stats_estilo = Texto(716)
-    val stats_galeria = Texto(717)
-    val stats_galeria_sub = Texto(718)
-    val stats_gastado = Texto(719)
-    val stats_generar_tarjeta = Texto(720)
-    val stats_gira = Texto(721)
-    val stats_hasta_final = Texto(722)
-    val stats_hasta_platino = Texto(723)
-    val stats_historico = Texto(724)
-    val stats_hito_3 = Texto(725)
-    val stats_hitos = Texto(726)
-    val stats_hitos_sub = Texto(727)
-    val stats_horas = Texto(728)
-    val stats_horas_dias = Texto(729)
-    val stats_horas_precio = Texto(730)
-    val stats_juegos_contados = Texto(731)
-    val stats_mas_calma = Texto(732)
-    val stats_mas_rapido = Texto(733)
-    val stats_mas_raro = Texto(734)
-    val stats_mas_raro_det = Texto(735)
-    val stats_mas_raro_det2 = Texto(736)
-    val stats_mejor_mes = Texto(737)
-    val stats_mejor_racha = Texto(738)
-    val stats_palmares = Texto(739)
-    val stats_palmares_sub = Texto(740)
-    val stats_platino_n = Texto(741)
-    val stats_primer_platino = Texto(742)
-    val stats_primer_trofeo = Texto(743)
-    val stats_racha_actual = Texto(744)
-    val stats_racha_det = Texto(745)
-    val stats_racha_larga = Texto(746)
-    val stats_rachas = Texto(747)
-    val stats_score_fila = Texto(748)
-    val stats_score_sub = Texto(749)
-    val stats_sin_datos = Texto(750)
-    val stats_titulo = Texto(751)
-    val tema_claro = Texto(752)
-    val tema_contraste = Texto(753)
-    val tema_oled = Texto(754)
-    val tema_oscuro = Texto(755)
-    val tema_rapido_combate = Texto(756)
-    val tema_rapido_contraste = Texto(757)
-    val tema_rapido_dia = Texto(758)
-    val tema_rapido_neon = Texto(759)
-    val tema_sistema = Texto(760)
-    val texto_enorme = Texto(761)
-    val texto_grande = Texto(762)
-    val texto_normal = Texto(763)
-    val texto_pequeno = Texto(764)
-    val tiempo_ahora = Texto(765)
-    val tiempo_d = Texto(766)
-    val tiempo_h = Texto(767)
-    val tiempo_min = Texto(768)
-    val vista_cronologia = Texto(769)
-    val vista_cuadricula = Texto(770)
-    val vista_lista = Texto(771)
-    val widget_objetivo = Texto(772)
-    val widget_sin_objetivo = Texto(773)
-    val widget_sin_objetivo_sub = Texto(774)
-    val wrap_comparas = Texto(775)
-    val wrap_dias_activos = Texto(776)
-    val wrap_dias_seguidos_1 = Texto(777)
-    val wrap_dias_seguidos_n = Texto(778)
-    val wrap_eso_fue = Texto(779)
-    val wrap_genero = Texto(780)
-    val wrap_genero_titulos = Texto(781)
-    val wrap_hola = Texto(782)
-    val wrap_juego = Texto(783)
-    val wrap_mejor_mes = Texto(784)
-    val wrap_percentil = Texto(785)
-    val wrap_racha = Texto(786)
-    val wrap_repartidos_1 = Texto(787)
-    val wrap_repartidos_n = Texto(788)
-    val wrap_top = Texto(789)
-    val wrap_trofeos_conseguidos = Texto(790)
-    val wrap_trofeos_mes = Texto(791)
-    val wrap_trofeos_n = Texto(792)
-    val wrap_vacio = Texto(793)
-    val wrap_vacio_sub = Texto(794)
+    val amigos_lista = Texto(50)
+    val amigos_placeholder = Texto(51)
+    val amigos_sin_solicitudes = Texto(52)
+    val amigos_sin_solicitudes_sub = Texto(53)
+    val amigos_solicitudes = Texto(54)
+    val amigos_solicitudes_corto = Texto(55)
+    val amigos_solicitudes_n = Texto(56)
+    val amigos_ya_sois = Texto(57)
+    val amistad_aceptar = Texto(58)
+    val amistad_amigos = Texto(59)
+    val amistad_anadir = Texto(60)
+    val amistad_enviada = Texto(61)
+    val apariencia_acento = Texto(62)
+    val apariencia_estilo = Texto(63)
+    val apariencia_estilo_nivel = Texto(64)
+    val apariencia_estilo_oled = Texto(65)
+    val apariencia_icono = Texto(66)
+    val apariencia_icono_nota = Texto(67)
+    val apariencia_juego = Texto(68)
+    val apariencia_juego_nota = Texto(69)
+    val apariencia_libre = Texto(70)
+    val apariencia_libre_actual = Texto(71)
+    val apariencia_material_activo = Texto(72)
+    val apariencia_material_sub = Texto(73)
+    val apariencia_modo = Texto(74)
+    val apariencia_modo_nota = Texto(75)
+    val apariencia_muestra_boton = Texto(76)
+    val apariencia_muestra_chip = Texto(77)
+    val apariencia_sincronizada = Texto(78)
+    val apariencia_temas = Texto(79)
+    val apariencia_texto = Texto(80)
+    val apariencia_titulo = Texto(81)
+    val apariencia_vista_previa = Texto(82)
+    val arquetipo_cazador = Texto(83)
+    val arquetipo_elite = Texto(84)
+    val arquetipo_explorador = Texto(85)
+    val arquetipo_veterano = Texto(86)
+    val atascados_vacio = Texto(87)
+    val atascados_vacio_sub = Texto(88)
+    val biblio_abandonados = Texto(89)
+    val biblio_buscar = Texto(90)
+    val biblio_completados = Texto(91)
+    val biblio_falta_dlc = Texto(92)
+    val biblio_jugando = Texto(93)
+    val biblio_nada_filtros = Texto(94)
+    val biblio_nada_filtros_sub = Texto(95)
+    val biblio_orden_az = Texto(96)
+    val biblio_orden_progreso = Texto(97)
+    val biblio_orden_za = Texto(98)
+    val biblio_pct_restantes = Texto(99)
+    val biblio_pila = Texto(100)
+    val biblio_platinados = Texto(101)
+    val biblio_resumen = Texto(102)
+    val biblio_ruleta = Texto(103)
+    val biblio_titulo = Texto(104)
+    val biblio_todos = Texto(105)
+    val biblio_vacia = Texto(106)
+    val biblio_vacia_sub = Texto(107)
+    val biblio_vista_cuadricula = Texto(108)
+    val biblio_vista_enfoque = Texto(109)
+    val carpeta_abrir = Texto(110)
+    val carpeta_anadir = Texto(111)
+    val carpeta_anadir_juegos = Texto(112)
+    val carpeta_anadir_sub = Texto(113)
+    val carpeta_borrar_texto = Texto(114)
+    val carpeta_borrar_titulo = Texto(115)
+    val carpeta_buscar = Texto(116)
+    val carpeta_cambiar_foto = Texto(117)
+    val carpeta_err_borrar = Texto(118)
+    val carpeta_err_cambiar = Texto(119)
+    val carpeta_err_crear = Texto(120)
+    val carpeta_err_quitar = Texto(121)
+    val carpeta_err_renombrar = Texto(122)
+    val carpeta_nueva = Texto(123)
+    val carpeta_opciones = Texto(124)
+    val carpeta_poner_foto = Texto(125)
+    val carpeta_quitar = Texto(126)
+    val carpeta_quitar_foto = Texto(127)
+    val carpeta_renombrar = Texto(128)
+    val carpeta_sin_juegos = Texto(129)
+    val carpeta_sin_juegos_sub = Texto(130)
+    val carpeta_vacio = Texto(131)
+    val carpeta_vacio_crear = Texto(132)
+    val carpeta_vacio_sheet = Texto(133)
+    val carpeta_vacio_sub = Texto(134)
+    val carpetas_titulo = Texto(135)
+    val clan_abandonar = Texto(136)
+    val clan_abandonar_borra = Texto(137)
+    val clan_abandonar_propio = Texto(138)
+    val clan_abandonar_propio_texto = Texto(139)
+    val clan_act_favorito = Texto(140)
+    val clan_act_nota = Texto(141)
+    val clan_act_nuevo = Texto(142)
+    val clan_act_otro = Texto(143)
+    val clan_act_platino = Texto(144)
+    val clan_act_resena = Texto(145)
+    val clan_act_valoro = Texto(146)
+    val clan_actividad = Texto(147)
+    val clan_actividad_vacia = Texto(148)
+    val clan_ascender_a = Texto(149)
+    val clan_borrar_si = Texto(150)
+    val clan_campo_descripcion = Texto(151)
+    val clan_campo_nombre = Texto(152)
+    val clan_confirmar_expulsar = Texto(153)
+    val clan_confirmar_lider = Texto(154)
+    val clan_contribucion = Texto(155)
+    val clan_contribucion_fila = Texto(156)
+    val clan_contribucion_texto = Texto(157)
+    val clan_degradar_a = Texto(158)
+    val clan_editar_info = Texto(159)
+    val clan_err_crear = Texto(160)
+    val clan_err_invitar = Texto(161)
+    val clan_err_no_existe = Texto(162)
+    val clan_err_unir = Texto(163)
+    val clan_escudo_color = Texto(164)
+    val clan_escudo_editar = Texto(165)
+    val clan_escudo_fondo = Texto(166)
+    val clan_escudo_forma = Texto(167)
+    val clan_escudo_guardar = Texto(168)
+    val clan_escudo_simbolo = Texto(169)
+    val clan_escudo_texto = Texto(170)
+    val clan_escudo_titulo = Texto(171)
+    val clan_expulsar = Texto(172)
+    val clan_gestion_error = Texto(173)
+    val clan_gestionar = Texto(174)
+    val clan_guardar = Texto(175)
+    val clan_hacer_lider = Texto(176)
+    val clan_invitar_error = Texto(177)
+    val clan_lider = Texto(178)
+    val clan_miembro = Texto(179)
+    val clan_miembros = Texto(180)
+    val clan_parte = Texto(181)
+    val clan_posicion = Texto(182)
+    val clan_puntos_clan = Texto(183)
+    val clan_rango_colider = Texto(184)
+    val clan_rango_veterano = Texto(185)
+    val clan_ranking = Texto(186)
+    val clan_rol_trofeos = Texto(187)
+    val clan_salir_lider_sucesor = Texto(188)
+    val clan_salir_texto = Texto(189)
+    val clan_salir_titulo = Texto(190)
+    val clan_sin_amigos = Texto(191)
+    val clan_trofeos_clan = Texto(192)
+    val clan_unirme = Texto(193)
+    val clan_xp_total = Texto(194)
+    val color_amarillo = Texto(195)
+    val color_auto = Texto(196)
+    val color_azul = Texto(197)
+    val color_celeste = Texto(198)
+    val color_naranja = Texto(199)
+    val color_rojo = Texto(200)
+    val color_rosa = Texto(201)
+    val color_verde = Texto(202)
+    val color_violeta = Texto(203)
+    val comparar_amigos = Texto(204)
+    val comparar_ellos = Texto(205)
+    val comparar_ellos_pct = Texto(206)
+    val comparar_empate = Texto(207)
+    val comparar_en_comun = Texto(208)
+    val comparar_err_no_existe = Texto(209)
+    val comparar_err_sin_cuentas = Texto(210)
+    val comparar_ganando = Texto(211)
+    val comparar_handle_nivel = Texto(212)
+    val comparar_perdiendo = Texto(213)
+    val comparar_ph = Texto(214)
+    val comparar_sin_amigos = Texto(215)
+    val comparar_sin_comun = Texto(216)
+    val comparar_titulo = Texto(217)
+    val comparar_trofeos_juegos = Texto(218)
+    val comparar_tu = Texto(219)
+    val comparar_tu_pct = Texto(220)
+    val comparte_badge_platino = Texto(221)
+    val comparte_handle = Texto(222)
+    val comparte_trofeos = Texto(223)
+    val compartir_anadido = Texto(224)
+    val compartir_elige = Texto(225)
+    val compartir_escribe = Texto(226)
+    val compartir_login = Texto(227)
+    val compartir_login_sub = Texto(228)
+    val compartir_ph = Texto(229)
+    val compartir_titulo = Texto(230)
+    val comun_a_b = Texto(231)
+    val comun_aceptar = Texto(232)
+    val comun_alguien = Texto(233)
+    val comun_atras = Texto(234)
+    val comun_borrar = Texto(235)
+    val comun_buscar = Texto(236)
+    val comun_buscar_accion = Texto(237)
+    val comun_cambiar = Texto(238)
+    val comun_cancelar = Texto(239)
+    val comun_cargando = Texto(240)
+    val comun_cerrar = Texto(241)
+    val comun_compartir = Texto(242)
+    val comun_completado = Texto(243)
+    val comun_continuar = Texto(244)
+    val comun_crear = Texto(245)
+    val comun_deseados = Texto(246)
+    val comun_editar = Texto(247)
+    val comun_eliminar = Texto(248)
+    val comun_enviar = Texto(249)
+    val comun_guardar = Texto(250)
+    val comun_guardar_cambios = Texto(251)
+    val comun_invitar = Texto(252)
+    val comun_juegos = Texto(253)
+    val comun_jugador = Texto(254)
+    val comun_miembros_1 = Texto(255)
+    val comun_miembros_n = Texto(256)
+    val comun_n_juegos = Texto(257)
+    val comun_n_platinos = Texto(258)
+    val comun_nivel = Texto(259)
+    val comun_nivel_n = Texto(260)
+    val comun_platinos = Texto(261)
+    val comun_pts = Texto(262)
+    val comun_publicar = Texto(263)
+    val comun_puntos = Texto(264)
+    val comun_rechazar = Texto(265)
+    val comun_reintentar = Texto(266)
+    val comun_renombrar = Texto(267)
+    val comun_si_borrar = Texto(268)
+    val comun_si_continuar = Texto(269)
+    val comun_sin_conexion_copia = Texto(270)
+    val comun_sin_resultados = Texto(271)
+    val comun_termina_en_1 = Texto(272)
+    val comun_termina_en_n = Texto(273)
+    val comun_termina_hoy = Texto(274)
+    val comun_trofeos = Texto(275)
+    val comun_vale = Texto(276)
+    val comun_volver = Texto(277)
+    val comunidad_muro = Texto(278)
+    val cuentas_al_dia = Texto(279)
+    val cuentas_cambiar = Texto(280)
+    val cuentas_conectar = Texto(281)
+    val cuentas_declarado = Texto(282)
+    val cuentas_desvincular = Texto(283)
+    val cuentas_desvincular_si = Texto(284)
+    val cuentas_desvincular_texto = Texto(285)
+    val cuentas_desvincular_titulo = Texto(286)
+    val cuentas_epic_extension = Texto(287)
+    val cuentas_nivel = Texto(288)
+    val cuentas_ph_otro = Texto(289)
+    val cuentas_ph_psn = Texto(290)
+    val cuentas_ph_steam = Texto(291)
+    val cuentas_ph_xbox = Texto(292)
+    val cuentas_plataformas_sub = Texto(293)
+    val cuentas_priv_otro = Texto(294)
+    val cuentas_priv_psn = Texto(295)
+    val cuentas_priv_steam = Texto(296)
+    val cuentas_priv_xbox = Texto(297)
+    val cuentas_privada = Texto(298)
+    val cuentas_psn_1 = Texto(299)
+    val cuentas_psn_2 = Texto(300)
+    val cuentas_psn_3 = Texto(301)
+    val cuentas_psn_4 = Texto(302)
+    val cuentas_seccion_login = Texto(303)
+    val cuentas_seccion_plataformas = Texto(304)
+    val cuentas_sincronizada_hace = Texto(305)
+    val cuentas_sincronizando = Texto(306)
+    val cuentas_sincronizar = Texto(307)
+    val cuentas_steam_1 = Texto(308)
+    val cuentas_steam_2 = Texto(309)
+    val cuentas_steam_3 = Texto(310)
+    val cuentas_steam_4 = Texto(311)
+    val cuentas_steam_sync = Texto(312)
+    val cuentas_steam_sync_sub = Texto(313)
+    val cuentas_titulo = Texto(314)
+    val cuentas_trofeos_nuevos = Texto(315)
+    val cuentas_vinculada = Texto(316)
+    val cuentas_vinculado = Texto(317)
+    val cuentas_vincular = Texto(318)
+    val cuentas_xbox_1 = Texto(319)
+    val cuentas_xbox_2 = Texto(320)
+    val cuentas_xbox_3 = Texto(321)
+    val diario_final_1 = Texto(322)
+    val diario_final_n = Texto(323)
+    val diario_hazana = Texto(324)
+    val diario_inicio = Texto(325)
+    val diario_muro = Texto(326)
+    val diario_titulo = Texto(327)
+    val dif_dificil = Texto(328)
+    val dif_facil = Texto(329)
+    val dif_media = Texto(330)
+    val dif_muy_facil = Texto(331)
+    val duracion_anios = Texto(332)
+    val duracion_anios_1 = Texto(333)
+    val duracion_anios_n = Texto(334)
+    val duracion_dias = Texto(335)
+    val duracion_dias_1 = Texto(336)
+    val duracion_dias_n = Texto(337)
+    val duracion_meses = Texto(338)
+    val duracion_meses_1 = Texto(339)
+    val duracion_meses_n = Texto(340)
+    val duracion_semanas = Texto(341)
+    val duracion_semanas_1 = Texto(342)
+    val duracion_semanas_n = Texto(343)
+    val enfoque_aviso_1 = Texto(344)
+    val enfoque_aviso_n = Texto(345)
+    val enfoque_comprobando = Texto(346)
+    val enfoque_detener = Texto(347)
+    val enfoque_detener_esa = Texto(348)
+    val enfoque_diario = Texto(349)
+    val enfoque_diario_conseguidos_1 = Texto(350)
+    val enfoque_diario_conseguidos_n = Texto(351)
+    val enfoque_diario_linea = Texto(352)
+    val enfoque_diario_sub = Texto(353)
+    val enfoque_diario_vacio = Texto(354)
+    val enfoque_hecho = Texto(355)
+    val enfoque_iniciar = Texto(356)
+    val enfoque_nada_nuevo = Texto(357)
+    val enfoque_nota_offline = Texto(358)
+    val enfoque_nota_ph = Texto(359)
+    val enfoque_nuevos_1 = Texto(360)
+    val enfoque_nuevos_n = Texto(361)
+    val enfoque_otra_sesion = Texto(362)
+    val enfoque_platino = Texto(363)
+    val enfoque_rareza = Texto(364)
+    val enfoque_salir = Texto(365)
+    val enfoque_sesion_guardada = Texto(366)
+    val enfoque_titulo = Texto(367)
+    val enfoque_tu_diario = Texto(368)
+    val enfoque_vacio = Texto(369)
+    val enfoque_vacio_sub = Texto(370)
+    val enfoque_ver_diario = Texto(371)
+    val enfoque_ya_lo_tengo = Texto(372)
+    val error_conexion = Texto(373)
+    val error_guardar_guia = Texto(374)
+    val error_red = Texto(375)
+    val error_servidor = Texto(376)
+    val error_servidor_corto = Texto(377)
+    val error_sin_sesion = Texto(378)
+    val estilo_brutalista = Texto(379)
+    val estilo_brutalista_desc = Texto(380)
+    val estilo_clasico = Texto(381)
+    val estilo_clasico_desc = Texto(382)
+    val estilo_ps5 = Texto(383)
+    val estilo_ps5_desc = Texto(384)
+    val estilo_steam = Texto(385)
+    val estilo_steam_desc = Texto(386)
+    val estilo_switch = Texto(387)
+    val estilo_switch_desc = Texto(388)
+    val estilo_terminal = Texto(389)
+    val estilo_terminal_desc = Texto(390)
+    val estilo_vidrio = Texto(391)
+    val estilo_vidrio_desc = Texto(392)
+    val estilo_xbox = Texto(393)
+    val estilo_xbox_desc = Texto(394)
+    val feed_a11y_comentarios = Texto(395)
+    val feed_a11y_reaccionado = Texto(396)
+    val feed_a11y_reaccionar = Texto(397)
+    val feed_a11y_vistas = Texto(398)
+    val feed_comentar_ph = Texto(399)
+    val feed_favorito = Texto(400)
+    val feed_nota = Texto(401)
+    val feed_nuevo = Texto(402)
+    val feed_otro = Texto(403)
+    val feed_otro_sin = Texto(404)
+    val feed_platino = Texto(405)
+    val feed_resena = Texto(406)
+    val feed_titulo = Texto(407)
+    val feed_vacio = Texto(408)
+    val feed_vacio_sub = Texto(409)
+    val feed_valoro = Texto(410)
+    val feed_ver_comentarios = Texto(411)
+    val ficha_anclar = Texto(412)
+    val ficha_atascar = Texto(413)
+    val ficha_buscar_guia = Texto(414)
+    val ficha_cifra_horas = Texto(415)
+    val ficha_cifra_platino = Texto(416)
+    val ficha_cifra_progreso = Texto(417)
+    val ficha_compartir_platino = Texto(418)
+    val ficha_cronologia = Texto(419)
+    val ficha_declarado = Texto(420)
+    val ficha_err_no_existe = Texto(421)
+    val ficha_expansion = Texto(422)
+    val ficha_fecha_rareza = Texto(423)
+    val ficha_fecha_trofeos = Texto(424)
+    val ficha_filtro_conseguidos = Texto(425)
+    val ficha_filtro_faltan = Texto(426)
+    val ficha_filtro_todo_dlc = Texto(427)
+    val ficha_filtro_todos = Texto(428)
+    val ficha_grado_rareza = Texto(429)
+    val ficha_grafica_vacia = Texto(430)
+    val ficha_guias_escritas = Texto(431)
+    val ficha_horas = Texto(432)
+    val ficha_juego_base = Texto(433)
+    val ficha_lista = Texto(434)
+    val ficha_notas = Texto(435)
+    val ficha_notas_anadir = Texto(436)
+    val ficha_notas_ph = Texto(437)
+    val ficha_objetivo_actual = Texto(438)
+    val ficha_prediccion = Texto(439)
+    val ficha_progreso = Texto(440)
+    val ficha_reservado = Texto(441)
+    val ficha_reservado_n = Texto(442)
+    val ficha_reservar = Texto(443)
+    val ficha_reservar_faltan_1 = Texto(444)
+    val ficha_reservar_faltan_n = Texto(445)
+    val ficha_reservar_n = Texto(446)
+    val ficha_sin_trofeos_filtro = Texto(447)
+    val ficha_solo_faltan = Texto(448)
+    val fuente_casual = Texto(449)
+    val fuente_elegante = Texto(450)
+    val fuente_moderna = Texto(451)
+    val fuente_retro = Texto(452)
+    val grado_bronce = Texto(453)
+    val grado_oro = Texto(454)
+    val grado_plata = Texto(455)
+    val grado_platino = Texto(456)
+    val guerra_aceptar = Texto(457)
+    val guerra_contra = Texto(458)
+    val guerra_dias = Texto(459)
+    val guerra_elige_rival = Texto(460)
+    val guerra_empate = Texto(461)
+    val guerra_esperando = Texto(462)
+    val guerra_ganada = Texto(463)
+    val guerra_historial = Texto(464)
+    val guerra_ninguna = Texto(465)
+    val guerra_os_retan = Texto(466)
+    val guerra_perdida = Texto(467)
+    val guerra_rechazar = Texto(468)
+    val guerra_reglas = Texto(469)
+    val guerra_responde_lider = Texto(470)
+    val guerra_retar = Texto(471)
+    val guerra_sin_rivales = Texto(472)
+    val guerra_titulo = Texto(473)
+    val guerra_ultimo_dia = Texto(474)
+    val guia_busqueda_video = Texto(475)
+    val guias_borrar_texto = Texto(476)
+    val guias_borrar_titulo = Texto(477)
+    val guias_ph = Texto(478)
+    val guias_tu_guia = Texto(479)
+    val guias_vacio = Texto(480)
+    val icono_claro = Texto(481)
+    val icono_esmeralda = Texto(482)
+    val icono_neon = Texto(483)
+    val icono_oro = Texto(484)
+    val icono_paragon = Texto(485)
+    val inicio_faltan = Texto(486)
+    val inicio_faltan_n = Texto(487)
+    val inicio_hola = Texto(488)
+    val inicio_ir = Texto(489)
+    val inicio_objetivo_anclado = Texto(490)
+    val inicio_para_hoy = Texto(491)
+    val inicio_platinado_dlc = Texto(492)
+    val inicio_proxima_sesion = Texto(493)
+    val inicio_sigue_jugando = Texto(494)
+    val inicio_siguiente_platino_de = Texto(495)
+    val inicio_ver_todas = Texto(496)
+    val inicio_ver_todo = Texto(497)
+    val liga_borrar = Texto(498)
+    val liga_borrar_texto = Texto(499)
+    val liga_borrar_titulo = Texto(500)
+    val liga_cancelar_inv_si = Texto(501)
+    val liga_cancelar_inv_texto = Texto(502)
+    val liga_cancelar_inv_titulo = Texto(503)
+    val liga_clasif_sub = Texto(504)
+    val liga_con_fin = Texto(505)
+    val liga_duracion_termina = Texto(506)
+    val liga_err_no_existe = Texto(507)
+    val liga_esperando = Texto(508)
+    val liga_gano = Texto(509)
+    val liga_invitaciones = Texto(510)
+    val liga_invitar_amigo = Texto(511)
+    val liga_para_subir = Texto(512)
+    val liga_posicion = Texto(513)
+    val liga_quitar = Texto(514)
+    val liga_quitar_reto = Texto(515)
+    val liga_quitar_si = Texto(516)
+    val liga_quitar_texto = Texto(517)
+    val liga_quitar_titulo = Texto(518)
+    val liga_reto = Texto(519)
+    val liga_reto_elegir = Texto(520)
+    val liga_reto_elige = Texto(521)
+    val liga_reto_texto = Texto(522)
+    val liga_salir = Texto(523)
+    val liga_salir_si = Texto(524)
+    val liga_salir_texto = Texto(525)
+    val liga_salir_titulo = Texto(526)
+    val liga_sin_fin = Texto(527)
+    val liga_sin_ganador = Texto(528)
+    val liga_sin_reto = Texto(529)
+    val liga_termina_el = Texto(530)
+    val liga_terminada = Texto(531)
+    val liga_terminada_el = Texto(532)
+    val liga_todos_dentro = Texto(533)
+    val login_discord = Texto(534)
+    val login_google = Texto(535)
+    val login_lema = Texto(536)
+    val login_sin_contrasenas = Texto(537)
+    val login_subtitulo = Texto(538)
+    val login_titular = Texto(539)
+    val main_buscar_ph = Texto(540)
+    val main_cerrar_busqueda = Texto(541)
+    val main_racha = Texto(542)
+    val main_sin_racha = Texto(543)
+    val nav_ajustes = Texto(544)
+    val nav_atascados = Texto(545)
+    val nav_atascados_menu = Texto(546)
+    val nav_biblioteca = Texto(547)
+    val nav_carpetas = Texto(548)
+    val nav_comparar = Texto(549)
+    val nav_comunidad = Texto(550)
+    val nav_enfoque = Texto(551)
+    val nav_estadisticas = Texto(552)
+    val nav_ficha = Texto(553)
+    val nav_ligas = Texto(554)
+    val nav_mas = Texto(555)
+    val nav_panel = Texto(556)
+    val nav_perfil = Texto(557)
+    val nav_sesiones = Texto(558)
+    val ofertas_ahora_sin_precio = Texto(559)
+    val ofertas_alerta_fila = Texto(560)
+    val ofertas_horas = Texto(561)
+    val ofertas_logros = Texto(562)
+    val ofertas_nota = Texto(563)
+    val ofertas_por_debajo = Texto(564)
+    val ofertas_sin_alertas = Texto(565)
+    val ofertas_texto = Texto(566)
+    val ofertas_titulo = Texto(567)
+    val ofertas_tus_alertas = Texto(568)
+    val ofertas_vacio = Texto(569)
+    val panel_a_por_este = Texto(570)
+    val panel_cerrojo = Texto(571)
+    val panel_cerrojo_texto = Texto(572)
+    val panel_completado = Texto(573)
+    val panel_hola = Texto(574)
+    val panel_juego_progreso = Texto(575)
+    val panel_meta = Texto(576)
+    val panel_meta_eliminar = Texto(577)
+    val panel_meta_fijar = Texto(578)
+    val panel_meta_objetivo = Texto(579)
+    val panel_meta_ph = Texto(580)
+    val panel_meta_titulo = Texto(581)
+    val panel_nivel = Texto(582)
+    val panel_platinado = Texto(583)
+    val panel_platinado_excl = Texto(584)
+    val panel_platinos = Texto(585)
+    val panel_recientes = Texto(586)
+    val panel_restantes = Texto(587)
+    val panel_resumen = Texto(588)
+    val panel_rival = Texto(589)
+    val panel_rival_texto = Texto(590)
+    val panel_siguiente = Texto(591)
+    val panel_siguiente_platino = Texto(592)
+    val panel_siguiente_sub = Texto(593)
+    val panel_ultimos_trofeos = Texto(594)
+    val panel_un_paso = Texto(595)
+    val panel_un_paso_sub = Texto(596)
+    val panel_un_paso_vacio = Texto(597)
+    val perfil_actividad = Texto(598)
+    val perfil_acumulado = Texto(599)
+    val perfil_cifras = Texto(600)
+    val perfil_comparar = Texto(601)
+    val perfil_completado_medio = Texto(602)
+    val perfil_con_otros = Texto(603)
+    val perfil_conectado_1 = Texto(604)
+    val perfil_conectado_n = Texto(605)
+    val perfil_dia_vacio = Texto(606)
+    val perfil_dias_activos = Texto(607)
+    val perfil_dias_ganados = Texto(608)
+    val perfil_dias_n = Texto(609)
+    val perfil_ellos = Texto(610)
+    val perfil_err_no_encontrado = Texto(611)
+    val perfil_este_anio = Texto(612)
+    val perfil_fijar_rival = Texto(613)
+    val perfil_horas = Texto(614)
+    val perfil_juegos_mes = Texto(615)
+    val perfil_leyenda_tu = Texto(616)
+    val perfil_mejor_dia = Texto(617)
+    val perfil_mejor_mes = Texto(618)
+    val perfil_mes_empate = Texto(619)
+    val perfil_mes_gana = Texto(620)
+    val perfil_mes_ganas = Texto(621)
+    val perfil_mes_propio = Texto(622)
+    val perfil_mes_titulo = Texto(623)
+    val perfil_mes_vs = Texto(624)
+    val perfil_nivel_arquetipo = Texto(625)
+    val perfil_por_dia = Texto(626)
+    val perfil_racha = Texto(627)
+    val perfil_recientes = Texto(628)
+    val perfil_rival = Texto(629)
+    val perfil_rivalidad = Texto(630)
+    val perfil_titulo = Texto(631)
+    val perfil_toca_dia = Texto(632)
+    val perfil_tu = Texto(633)
+    val perfil_tu_caza = Texto(634)
+    val perfil_ultimos_12 = Texto(635)
+    val perfil_ultimos_trofeos = Texto(636)
+    val perfil_ventaja = Texto(637)
+    val perfil_ventaja_todo = Texto(638)
+    val perfil_ver_completo = Texto(639)
+    val precio_alerta_activa = Texto(640)
+    val precio_alerta_campo = Texto(641)
+    val precio_alerta_error = Texto(642)
+    val precio_alerta_guardar = Texto(643)
+    val precio_alerta_quitar = Texto(644)
+    val precio_alerta_texto = Texto(645)
+    val precio_alerta_titulo = Texto(646)
+    val precio_avisarme = Texto(647)
+    val precio_mas_barato = Texto(648)
+    val precio_minimo = Texto(649)
+    val precio_no_a_la_venta = Texto(650)
+    val precio_titulo = Texto(651)
+    val push_canal = Texto(652)
+    val qr_compartir_sesion = Texto(653)
+    val qr_compartir_sesion_sub = Texto(654)
+    val qr_eres_tu = Texto(655)
+    val qr_escanear = Texto(656)
+    val qr_no_valido = Texto(657)
+    val qr_tu_codigo = Texto(658)
+    val qr_tu_codigo_sub = Texto(659)
+    val racha_activa = Texto(660)
+    val racha_activar = Texto(661)
+    val racha_dia_seguido = Texto(662)
+    val racha_dias_seguidos = Texto(663)
+    val racha_es_record = Texto(664)
+    val racha_esta_semana = Texto(665)
+    val racha_falta_hoy = Texto(666)
+    val racha_hacia_record = Texto(667)
+    val racha_hoy = Texto(668)
+    val racha_mas = Texto(669)
+    val racha_menos = Texto(670)
+    val racha_semanas = Texto(671)
+    val racha_trofeos_semana = Texto(672)
+    val ritmo_comparar_con = Texto(673)
+    val ritmo_dia_a_dia = Texto(674)
+    val ritmo_empate = Texto(675)
+    val ritmo_gana_otro = Texto(676)
+    val ritmo_ganas_tu = Texto(677)
+    val ritmo_mejor_dia = Texto(678)
+    val ritmo_n_trofeos = Texto(679)
+    val ritmo_n_trofeos_corto = Texto(680)
+    val ritmo_por_juego = Texto(681)
+    val ritmo_quitar_dia = Texto(682)
+    val ritmo_sin_comparar = Texto(683)
+    val ritmo_titulo = Texto(684)
+    val ritmo_tu = Texto(685)
+    val ritmo_tu_vs = Texto(686)
+    val ritmo_vacio_texto = Texto(687)
+    val ritmo_vacio_titulo = Texto(688)
+    val ruleta_empezar = Texto(689)
+    val ruleta_titulo = Texto(690)
+    val selector_buscar = Texto(691)
+    val selector_elige = Texto(692)
+    val selector_sin_resultados = Texto(693)
+    val sesiones_ayuda = Texto(694)
+    val sesiones_cancelada = Texto(695)
+    val sesiones_cancelar = Texto(696)
+    val sesiones_cancelar_texto = Texto(697)
+    val sesiones_cancelar_titulo = Texto(698)
+    val sesiones_completa = Texto(699)
+    val sesiones_dentro = Texto(700)
+    val sesiones_descripcion = Texto(701)
+    val sesiones_descripcion_placeholder = Texto(702)
+    val sesiones_detalles = Texto(703)
+    val sesiones_en_curso = Texto(704)
+    val sesiones_eres_anfitrion = Texto(705)
+    val sesiones_estas_dentro = Texto(706)
+    val sesiones_falta_fecha = Texto(707)
+    val sesiones_falta_trofeo = Texto(708)
+    val sesiones_fecha = Texto(709)
+    val sesiones_hora = Texto(710)
+    val sesiones_juego = Texto(711)
+    val sesiones_juego_base = Texto(712)
+    val sesiones_libres_1 = Texto(713)
+    val sesiones_libres_n = Texto(714)
+    val sesiones_lo_tienes = Texto(715)
+    val sesiones_no_lo_tienes = Texto(716)
+    val sesiones_nueva_titulo = Texto(717)
+    val sesiones_organiza = Texto(718)
+    val sesiones_organizar = Texto(719)
+    val sesiones_otras = Texto(720)
+    val sesiones_plaza_libre = Texto(721)
+    val sesiones_plazas = Texto(722)
+    val sesiones_plazas_ayuda = Texto(723)
+    val sesiones_publicar = Texto(724)
+    val sesiones_puedes_unirte = Texto(725)
+    val sesiones_quien_esta = Texto(726)
+    val sesiones_salirme = Texto(727)
+    val sesiones_sin_juegos = Texto(728)
+    val sesiones_sin_lista = Texto(729)
+    val sesiones_sin_plazas = Texto(730)
+    val sesiones_subtitulo = Texto(731)
+    val sesiones_terminada = Texto(732)
+    val sesiones_trofeo = Texto(733)
+    val sesiones_trofeo_cargando = Texto(734)
+    val sesiones_trofeo_elige = Texto(735)
+    val sesiones_trofeo_escrito = Texto(736)
+    val sesiones_trofeo_otro = Texto(737)
+    val sesiones_tu = Texto(738)
+    val sesiones_unirme = Texto(739)
+    val sesiones_unirme_ayudar = Texto(740)
+    val sesiones_vacio_texto = Texto(741)
+    val sesiones_vacio_titulo = Texto(742)
+    val sesiones_ya_lo_tienes_ayuda = Texto(743)
+    val sesiones_ya_no_abierta = Texto(744)
+    val social_clan_desc = Texto(745)
+    val social_clan_nombre = Texto(746)
+    val social_clan_tag = Texto(747)
+    val social_crea_clan = Texto(748)
+    val social_crea_clan_sub = Texto(749)
+    val social_crea_liga = Texto(750)
+    val social_crea_liga_sub = Texto(751)
+    val social_crear_clan = Texto(752)
+    val social_crear_liga = Texto(753)
+    val social_duracion = Texto(754)
+    val social_liga_mensual = Texto(755)
+    val social_liga_mensual_sub = Texto(756)
+    val social_liga_ph = Texto(757)
+    val social_mis_ligas_sub = Texto(758)
+    val social_nivel_platinos = Texto(759)
+    val social_nueva_liga = Texto(760)
+    val social_nuevo_clan = Texto(761)
+    val social_nuevo_clan_sub = Texto(762)
+    val social_puesto = Texto(763)
+    val social_puntos_mes = Texto(764)
+    val social_sin_amigos = Texto(765)
+    val social_sin_amigos_sub = Texto(766)
+    val social_sin_clanes = Texto(767)
+    val social_sin_ranking = Texto(768)
+    val social_sin_ranking_sub = Texto(769)
+    val social_tab_amigos = Texto(770)
+    val social_tab_clan = Texto(771)
+    val social_tab_ligas = Texto(772)
+    val social_tab_mis_ligas = Texto(773)
+    val social_te_ha_invitado = Texto(774)
+    val social_te_invita = Texto(775)
+    val social_tu_clan = Texto(776)
+    val social_unirme = Texto(777)
+    val social_ventaja = Texto(778)
+    val stats_adn = Texto(779)
+    val stats_anejo = Texto(780)
+    val stats_anejo_anios = Texto(781)
+    val stats_anejo_meses = Texto(782)
+    val stats_arquetipo = Texto(783)
+    val stats_arquetipo_no = Texto(784)
+    val stats_backlog = Texto(785)
+    val stats_backlog_sub = Texto(786)
+    val stats_backlog_vacio = Texto(787)
+    val stats_badge_platino_n = Texto(788)
+    val stats_badge_primer = Texto(789)
+    val stats_badge_raro = Texto(790)
+    val stats_badges_sub = Texto(791)
+    val stats_coste = Texto(792)
+    val stats_coste_sub = Texto(793)
+    val stats_dias_activos = Texto(794)
+    val stats_dieta = Texto(795)
+    val stats_dieta_texto = Texto(796)
+    val stats_eficiencia = Texto(797)
+    val stats_eficiencia_sub = Texto(798)
+    val stats_estilo = Texto(799)
+    val stats_galeria = Texto(800)
+    val stats_galeria_sub = Texto(801)
+    val stats_gastado = Texto(802)
+    val stats_generar_tarjeta = Texto(803)
+    val stats_gira = Texto(804)
+    val stats_hasta_final = Texto(805)
+    val stats_hasta_platino = Texto(806)
+    val stats_historico = Texto(807)
+    val stats_hito_3 = Texto(808)
+    val stats_hitos = Texto(809)
+    val stats_hitos_sub = Texto(810)
+    val stats_horas = Texto(811)
+    val stats_horas_dias = Texto(812)
+    val stats_horas_precio = Texto(813)
+    val stats_juegos_contados = Texto(814)
+    val stats_mas_calma = Texto(815)
+    val stats_mas_rapido = Texto(816)
+    val stats_mas_raro = Texto(817)
+    val stats_mas_raro_det = Texto(818)
+    val stats_mas_raro_det2 = Texto(819)
+    val stats_mejor_mes = Texto(820)
+    val stats_mejor_racha = Texto(821)
+    val stats_palmares = Texto(822)
+    val stats_palmares_sub = Texto(823)
+    val stats_platino_n = Texto(824)
+    val stats_primer_platino = Texto(825)
+    val stats_primer_trofeo = Texto(826)
+    val stats_racha_actual = Texto(827)
+    val stats_racha_det = Texto(828)
+    val stats_racha_larga = Texto(829)
+    val stats_rachas = Texto(830)
+    val stats_score_fila = Texto(831)
+    val stats_score_sub = Texto(832)
+    val stats_sin_datos = Texto(833)
+    val stats_titulo = Texto(834)
+    val tema_claro = Texto(835)
+    val tema_contraste = Texto(836)
+    val tema_oled = Texto(837)
+    val tema_oscuro = Texto(838)
+    val tema_rapido_combate = Texto(839)
+    val tema_rapido_contraste = Texto(840)
+    val tema_rapido_dia = Texto(841)
+    val tema_rapido_neon = Texto(842)
+    val tema_sistema = Texto(843)
+    val texto_enorme = Texto(844)
+    val texto_grande = Texto(845)
+    val texto_normal = Texto(846)
+    val texto_pequeno = Texto(847)
+    val tiempo_ahora = Texto(848)
+    val tiempo_d = Texto(849)
+    val tiempo_h = Texto(850)
+    val tiempo_min = Texto(851)
+    val vista_cronologia = Texto(852)
+    val vista_cuadricula = Texto(853)
+    val vista_lista = Texto(854)
+    val widget_objetivo = Texto(855)
+    val widget_sin_objetivo = Texto(856)
+    val widget_sin_objetivo_sub = Texto(857)
+    val wrap_comparas = Texto(858)
+    val wrap_dias_activos = Texto(859)
+    val wrap_dias_seguidos_1 = Texto(860)
+    val wrap_dias_seguidos_n = Texto(861)
+    val wrap_eso_fue = Texto(862)
+    val wrap_genero = Texto(863)
+    val wrap_genero_titulos = Texto(864)
+    val wrap_hola = Texto(865)
+    val wrap_juego = Texto(866)
+    val wrap_mejor_mes = Texto(867)
+    val wrap_percentil = Texto(868)
+    val wrap_racha = Texto(869)
+    val wrap_repartidos_1 = Texto(870)
+    val wrap_repartidos_n = Texto(871)
+    val wrap_top = Texto(872)
+    val wrap_trofeos_conseguidos = Texto(873)
+    val wrap_trofeos_mes = Texto(874)
+    val wrap_trofeos_n = Texto(875)
+    val wrap_vacio = Texto(876)
+    val wrap_vacio_sub = Texto(877)
 }
 
 internal fun textosES(): Array<String> = arrayOf(
@@ -855,8 +938,13 @@ internal fun textosES(): Array<String> = arrayOf(
     "Ya lo he vinculado",
     "Añadir",
     "Solicitud enviada a @{0}.",
+    "Amigos",
     "@usuario de tu amigo",
+    "Sin solicitudes",
+    "Cuando alguien quiera agregarte, aparecerá aquí.",
     "Solicitudes de amistad",
+    "Solicitudes",
+    "Solicitudes · {0}",
     "Ya sois amigos: @{0} te había enviado una solicitud.",
     "Aceptar solicitud",
     "Amigos",
@@ -865,6 +953,7 @@ internal fun textosES(): Array<String> = arrayOf(
     "Acento y paleta",
     "Estilo",
     "Se desbloquea en el nivel {0} (vas por el {1})",
+    "En OLED el fondo sigue siendo negro puro: el estilo tiñe las tarjetas y los bordes.",
     "Icono de la app",
     "El icono nuevo puede tardar unos segundos en verse en la pantalla de inicio (a veces, hasta que sales de la app).",
     "Desde tu juego",
@@ -881,6 +970,7 @@ internal fun textosES(): Array<String> = arrayOf(
     "Temas",
     "Tamaño de texto",
     "Apariencia",
+    "Vista previa",
     "Cazador",
     "Élite",
     "Explorador",
@@ -910,8 +1000,12 @@ internal fun textosES(): Array<String> = arrayOf(
     "Vista enfoque",
     "Abrir",
     "AÑADIR A CARPETA",
+    "Añadir juegos",
+    "{0} en esta carpeta. Toca para meter o sacar.",
     "\"{0}\" desaparece con los {1} juegos que agrupa (los juegos en sí no se borran, solo la carpeta).",
     "¿Borrar esta carpeta?",
+    "Buscar en tu biblioteca",
+    "Cambiar foto",
     "No se pudo borrar la carpeta.",
     "No se pudo cambiar la carpeta. Revisa la conexión e inténtalo de nuevo.",
     "No se pudo crear la carpeta.",
@@ -919,7 +1013,9 @@ internal fun textosES(): Array<String> = arrayOf(
     "No se pudo renombrar la carpeta.",
     "Nueva carpeta",
     "Opciones de la carpeta",
+    "Poner foto",
     "Quitar de la carpeta",
+    "Quitar foto",
     "Renombrar carpeta",
     "Ningún juego en esta carpeta todavía",
     "Añádelos desde su ficha, o desde la Biblioteca con el menú de cada tarjeta.",
@@ -941,14 +1037,34 @@ internal fun textosES(): Array<String> = arrayOf(
     "valoró {0}",
     "ACTIVIDAD DEL CLAN",
     "Todavía no hay nada que enseñar aquí.",
+    "Ascender a {0}",
     "Sí, borrar el clan",
+    "Descripción",
+    "Nombre",
+    "¿Expulsar a {0} del clan?",
+    "¿Pasar el liderazgo a {0}? Tú quedarás como colíder.",
     "CONTRIBUCIÓN",
     "{0} · {1} trofeos en el clan",
     "Lo que ha aportado cada uno desde que entró: el Paragon Score de los trofeos ganados estando en el clan.",
+    "Degradar a {0}",
+    "Editar nombre y descripción",
     "No se pudo crear el clan.",
     "No se pudo invitar.",
     "Este clan no existe.",
     "No se pudo unir al clan.",
+    "Color del símbolo",
+    "Editar escudo",
+    "Color de fondo",
+    "Forma",
+    "Guardar escudo",
+    "Símbolo",
+    "Elige forma, símbolo y colores. Se ve en la web y en la app.",
+    "Escudo del clan",
+    "Expulsar del clan",
+    "No se ha podido",
+    "Gestionar a {0}",
+    "Guardar",
+    "Hacer líder",
     "No se pudo invitar",
     "Líder",
     "Miembro",
@@ -956,8 +1072,11 @@ internal fun textosES(): Array<String> = arrayOf(
     "{0} % del clan",
     "{0}º",
     "PUNTOS DEL CLAN",
+    "Colíder",
+    "Veterano",
     "RANKING",
     "{0} · {1} trofeos",
+    "Eres el líder: si sales, el liderazgo pasará a {0}.",
     "Dejarás de aparecer en el ranking de \"{0}\" — tendrían que volver a invitarte para que entres otra vez.",
     "¿Salir del clan?",
     "No tienes amigos disponibles ahora mismo — o ya están todos en un clan, o ya se lo has pedido.",
@@ -1097,6 +1216,10 @@ internal fun textosES(): Array<String> = arrayOf(
     "Tu aventura en {0} empezó el {1}, con «{2}».",
     "Tu mayor muro fue superar «{0}»: estuviste {1} días sin desbloquear nada antes de conseguirlo.",
     "📖 El diario del platino",
+    "Difícil",
+    "Fácil",
+    "Media",
+    "Muy fácil",
     "Años",
     "{0} año",
     "{0} años",
@@ -1257,6 +1380,7 @@ internal fun textosES(): Array<String> = arrayOf(
     "Ir",
     "Tu objetivo · anclado",
     "Para hoy",
+    "Platinado · faltan {0} de DLC",
     "Tu próxima sesión",
     "Sigue jugando",
     "Siguiente platino: {0}",
@@ -1323,6 +1447,17 @@ internal fun textosES(): Array<String> = arrayOf(
     "Panel",
     "Perfil",
     "Sesiones",
+    "—",
+    "Objetivo {0} · ahora {1}",
+    "~{0} h al 100 %",
+    "{0} logros · el más raro, {1} %",
+    "Precios de Steam España. Ofertas vía CheapShark; dificultad con los porcentajes globales de Steam.",
+    "¡Por debajo!",
+    "Pon una alerta desde la ficha de un juego que tenga versión de PC.",
+    "Juegos de Steam rebajados cuyo 100 % es asequible: la dificultad sale del logro más raro según Steam. Sin los que ya tienes.",
+    "Platinos de oferta",
+    "TUS ALERTAS DE PRECIO",
+    "Ahora mismo no hay ofertas con un 100 % asequible.",
     "A POR ESTE PLATINO AHORA",
     "CERROJO DE HITOS",
     "{0} reservado para tu platino #{1}",
@@ -1347,6 +1482,7 @@ internal fun textosES(): Array<String> = arrayOf(
     "SIGUIENTE TROFEO",
     "SIGUIENTE PLATINO",
     "Prioridad automática: primero el juego base, progreso alto y mayor probabilidad de conseguirlo.",
+    "Últimos trofeos",
     "A UN PASO DEL PLATINO",
     "Lo que menos te queda, ordenado por trofeos pendientes.",
     "Nada a un paso del platino todavía — sigue jugando.",
@@ -1392,6 +1528,18 @@ internal fun textosES(): Array<String> = arrayOf(
     "Vas por delante en {0} de {1} categorías",
     " — les llevas ventaja en todo.",
     "Ver tu perfil",
+    "Te avisamos por debajo de {0}",
+    "Precio objetivo (€)",
+    "Pon un precio entre 0,01 y 999 €.",
+    "Guardar",
+    "Quitar alerta",
+    "Te avisaremos cuando {0} baje de este precio en Steam.",
+    "Alerta de precio",
+    "Avisarme si baja",
+    "Más barato: {0} · {1} US\$",
+    "Mínimo histórico: {0} US\$",
+    "No está a la venta en Steam España",
+    "PRECIO EN PC",
     "Avisos de Paragon",
     "Compartir sesión",
     "Que lo escaneen para verla y unirse.",
@@ -1402,13 +1550,31 @@ internal fun textosES(): Array<String> = arrayOf(
     "Que lo escaneen para agregarte en un segundo.",
     "Racha activa — sigue así",
     "Completa un trofeo para activarla",
+    "día seguido",
+    "días seguidos",
+    "¡Es tu mejor racha!",
+    "Esta semana",
+    "Consigue un trofeo hoy para llegar a {0} días.",
+    "Hoy ya cuenta · {0} días para tu récord",
     "Tu próxima racha empieza hoy",
+    "Más",
+    "Menos",
     "ÚLTIMAS 5 SEMANAS",
+    "Esta semana",
+    "Comparar con",
     "Día a día",
+    "Empate",
+    "Gana {0}",
+    "Ganas tú",
+    "Mejor día",
     "{0} trofeos",
+    "Trofeos",
     "Por juego",
     "Ver todo el mes",
+    "Nadie",
     "Mes a mes",
+    "Tú",
+    "Tú vs {0}",
     "Prueba con otro mes con las flechas de arriba.",
     "Ningún trofeo este mes",
     "Empezarlo",
@@ -1653,8 +1819,13 @@ internal fun textosEN(): Array<String> = arrayOf(
     "I've linked it",
     "Add",
     "Request sent to @{0}.",
+    "Friends",
     "Your friend's @username",
+    "No requests",
+    "When someone wants to add you, it'll show up here.",
     "Friend requests",
+    "Requests",
+    "Requests · {0}",
     "You're friends now: @{0} had sent you a request.",
     "Accept request",
     "Friends",
@@ -1663,6 +1834,7 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Accent and palette",
     "Style",
     "Unlocks at level {0} (you're level {1})",
+    "In OLED mode the background stays pure black: the style tints cards and borders.",
     "App icon",
     "The new icon may take a few seconds to show on your home screen (sometimes until you leave the app).",
     "From your game",
@@ -1679,6 +1851,7 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Themes",
     "Text size",
     "Appearance",
+    "Preview",
     "Hunter",
     "Elite",
     "Explorer",
@@ -1708,8 +1881,12 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Focus view",
     "Open",
     "ADD TO FOLDER",
+    "Add games",
+    "{0} in this folder. Tap to add or remove.",
     "\"{0}\" disappears with the {1} games it groups (the games themselves aren't deleted, only the folder).",
     "Delete this folder?",
+    "Search your library",
+    "Change photo",
     "Couldn't delete the folder.",
     "Couldn't update the folder. Check your connection and try again.",
     "Couldn't create the folder.",
@@ -1717,7 +1894,9 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Couldn't rename the folder.",
     "New folder",
     "Folder options",
+    "Add photo",
     "Remove from folder",
+    "Remove photo",
     "Rename folder",
     "No games in this folder yet",
     "Add them from their game page, or from the Library with each card's menu.",
@@ -1739,14 +1918,34 @@ internal fun textosEN(): Array<String> = arrayOf(
     "rated {0}",
     "CLAN ACTIVITY",
     "Nothing to show here yet.",
+    "Promote to {0}",
     "Yes, delete the clan",
+    "Description",
+    "Name",
+    "Kick {0} from the clan?",
+    "Hand leadership to {0}? You'll become co-leader.",
     "CONTRIBUTION",
     "{0} · {1} trophies in the clan",
     "What each member has added since joining: the Paragon Score of the trophies earned while in the clan.",
+    "Demote to {0}",
+    "Edit name and description",
     "Couldn't create the clan.",
     "Couldn't send the invite.",
     "This clan doesn't exist.",
     "Couldn't join the clan.",
+    "Symbol colour",
+    "Edit crest",
+    "Background colour",
+    "Shape",
+    "Save crest",
+    "Symbol",
+    "Pick a shape, symbol and colours. It shows on the web and in the app.",
+    "Clan crest",
+    "Kick from clan",
+    "Couldn't do that",
+    "Manage {0}",
+    "Save",
+    "Make leader",
     "Couldn't send the invite",
     "Leader",
     "Member",
@@ -1754,8 +1953,11 @@ internal fun textosEN(): Array<String> = arrayOf(
     "{0}% of the clan",
     "#{0}",
     "CLAN POINTS",
+    "Co-leader",
+    "Elder",
     "RANKING",
     "{0} · {1} trophies",
+    "You're the leader: if you leave, leadership passes to {0}.",
     "You'll stop appearing in the \"{0}\" ranking — they'd have to invite you again for you to rejoin.",
     "Leave the clan?",
     "No friends available right now — they're all in a clan already or you've already asked them.",
@@ -1895,6 +2097,10 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Your journey in {0} began on {1}, with “{2}”.",
     "Your biggest wall was beating “{0}”: you went {1} days without unlocking anything before you got it.",
     "📖 The platinum diary",
+    "Hard",
+    "Easy",
+    "Medium",
+    "Very easy",
     "Years",
     "{0} year",
     "{0} years",
@@ -2055,6 +2261,7 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Go",
     "Your goal · pinned",
     "For today",
+    "Platinum · {0} DLC left",
     "Your next session",
     "Keep playing",
     "Next platinum: {0}",
@@ -2121,6 +2328,17 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Home",
     "Profile",
     "Sessions",
+    "—",
+    "Target {0} · now {1}",
+    "~{0} h to 100%",
+    "{0} achievements · rarest, {1}%",
+    "Prices from Steam Spain. Deals via CheapShark; difficulty from Steam's global percentages.",
+    "Below target!",
+    "Set an alert from the page of any game with a PC version.",
+    "Discounted Steam games with an achievable 100%: difficulty comes from the rarest achievement on Steam. Games you own are left out.",
+    "Platinums on sale",
+    "YOUR PRICE ALERTS",
+    "No deals with an achievable 100% right now.",
     "GO FOR THIS PLATINUM NOW",
     "MILESTONE LOCK",
     "{0} reserved for your platinum #{1}",
@@ -2145,6 +2363,7 @@ internal fun textosEN(): Array<String> = arrayOf(
     "NEXT TROPHY",
     "NEXT PLATINUM",
     "Automatic priority: base game first, high progress and best odds of getting it.",
+    "Latest trophies",
     "ONE STEP FROM PLATINUM",
     "What you're closest to, sorted by trophies left.",
     "Nothing one step from platinum yet — keep playing.",
@@ -2190,6 +2409,18 @@ internal fun textosEN(): Array<String> = arrayOf(
     "You're ahead in {0} of {1} categories",
     " — you lead in everything.",
     "See your profile",
+    "We'll alert you below {0}",
+    "Target price (€)",
+    "Enter a price between €0.01 and €999.",
+    "Save",
+    "Remove alert",
+    "We'll let you know when {0} drops below this price on Steam.",
+    "Price alert",
+    "Alert me when it drops",
+    "Cheapest: {0} · US\${1}",
+    "All-time low: US\${0}",
+    "Not on sale on Steam Spain",
+    "PC PRICE",
     "Paragon notifications",
     "Share session",
     "Let others scan it to see it and join.",
@@ -2200,13 +2431,31 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Let friends scan it to add you in a second.",
     "Streak on — keep it up",
     "Earn a trophy to start it",
+    "day in a row",
+    "days in a row",
+    "This is your best streak!",
+    "This week",
+    "Earn a trophy today to reach {0} days.",
+    "Today counts · {0} days to your record",
     "Your next streak starts today",
+    "More",
+    "Less",
     "LAST 5 WEEKS",
+    "This week",
+    "Compare with",
     "Day by day",
+    "Tie",
+    "{0} wins",
+    "You win",
+    "Best day",
     "{0} trophies",
+    "Trophies",
     "By game",
     "Show the whole month",
+    "Nobody",
     "Month by month",
+    "You",
+    "You vs {0}",
     "Try another month with the arrows above.",
     "No trophies this month",
     "Start it",
@@ -2451,8 +2700,13 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Ich habe es verknüpft",
     "Hinzufügen",
     "Anfrage an @{0} gesendet.",
+    "Freunde",
     "@Benutzername deines Freundes",
+    "Keine Anfragen",
+    "Wenn dich jemand hinzufügen will, erscheint es hier.",
     "Freundschaftsanfragen",
+    "Anfragen",
+    "Anfragen · {0}",
     "Ihr seid jetzt befreundet: @{0} hatte dir eine Anfrage geschickt.",
     "Anfrage annehmen",
     "Befreundet",
@@ -2461,6 +2715,7 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Akzent und Palette",
     "Stil",
     "Wird ab Stufe {0} freigeschaltet (du bist Stufe {1})",
+    "Im OLED-Modus bleibt der Hintergrund reines Schwarz: Der Stil färbt Karten und Ränder.",
     "App-Symbol",
     "Das neue Symbol kann ein paar Sekunden brauchen, bis es auf dem Startbildschirm erscheint (manchmal erst nach dem Verlassen der App).",
     "Aus deinem Spiel",
@@ -2477,6 +2732,7 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Themes",
     "Textgröße",
     "Darstellung",
+    "Vorschau",
     "Jäger:in",
     "Elite",
     "Entdecker:in",
@@ -2506,8 +2762,12 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Fokusansicht",
     "Öffnen",
     "ZU ORDNER HINZUFÜGEN",
+    "Spiele hinzufügen",
+    "{0} in diesem Ordner. Tippe, um hinzuzufügen oder zu entfernen.",
     "„{0}“ verschwindet mit den {1} Spielen darin (die Spiele selbst bleiben, nur der Ordner wird gelöscht).",
     "Diesen Ordner löschen?",
+    "In deiner Bibliothek suchen",
+    "Foto ändern",
     "Ordner konnte nicht gelöscht werden.",
     "Der Ordner konnte nicht geändert werden. Prüf die Verbindung und versuch es erneut.",
     "Ordner konnte nicht erstellt werden.",
@@ -2515,7 +2775,9 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Ordner konnte nicht umbenannt werden.",
     "Neuer Ordner",
     "Ordneroptionen",
+    "Foto hinzufügen",
     "Aus dem Ordner entfernen",
+    "Foto entfernen",
     "Ordner umbenennen",
     "Noch keine Spiele in diesem Ordner",
     "Füge sie auf ihrer Spielseite hinzu oder in der Bibliothek über das Menü jeder Karte.",
@@ -2537,14 +2799,34 @@ internal fun textosDE(): Array<String> = arrayOf(
     "hat {0} bewertet",
     "CLAN-AKTIVITÄT",
     "Hier gibt es noch nichts zu sehen.",
+    "Befördern zu {0}",
     "Ja, Clan löschen",
+    "Beschreibung",
+    "Name",
+    "{0} aus dem Clan werfen?",
+    "Die Führung an {0} übergeben? Du wirst Vize-Anführer.",
     "BEITRAG",
     "{0} · {1} Trophäen im Clan",
     "Was jedes Mitglied seit dem Beitritt beigetragen hat: der Paragon Score der im Clan verdienten Trophäen.",
+    "Herabstufen zu {0}",
+    "Name und Beschreibung bearbeiten",
     "Clan konnte nicht gegründet werden.",
     "Einladung fehlgeschlagen.",
     "Diesen Clan gibt es nicht.",
     "Beitritt fehlgeschlagen.",
+    "Symbolfarbe",
+    "Wappen bearbeiten",
+    "Hintergrundfarbe",
+    "Form",
+    "Wappen speichern",
+    "Symbol",
+    "Wähle Form, Symbol und Farben. Es erscheint im Web und in der App.",
+    "Clan-Wappen",
+    "Aus dem Clan werfen",
+    "Nicht möglich",
+    "{0} verwalten",
+    "Speichern",
+    "Zum Anführer machen",
     "Einladung fehlgeschlagen",
     "Anführer:in",
     "Mitglied",
@@ -2552,8 +2834,11 @@ internal fun textosDE(): Array<String> = arrayOf(
     "{0} % des Clans",
     "{0}.",
     "CLAN-PUNKTE",
+    "Vize-Anführer",
+    "Ältester",
     "RANGLISTE",
     "{0} · {1} Trophäen",
+    "Du bist der Anführer: Wenn du gehst, übernimmt {0} die Führung.",
     "Du erscheinst nicht mehr in der Rangliste von „{0}“ — man müsste dich erneut einladen.",
     "Clan verlassen?",
     "Gerade keine Freunde verfügbar — alle sind schon in einem Clan oder bereits eingeladen.",
@@ -2693,6 +2978,10 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Dein Abenteuer in {0} begann am {1}, mit „{2}“.",
     "Deine größte Hürde war „{0}“ zu überwinden — {1} Tage lang hast du nichts freigeschaltet, bevor du es geschafft hast.",
     "📖 Das Platin-Tagebuch",
+    "Schwer",
+    "Leicht",
+    "Mittel",
+    "Sehr leicht",
     "Jahre",
     "{0} Jahr",
     "{0} Jahre",
@@ -2853,6 +3142,7 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Los",
     "Dein Ziel · angeheftet",
     "Für heute",
+    "Platin · {0} DLC übrig",
     "Deine nächste Session",
     "Weiterspielen",
     "Nächstes Platin: {0}",
@@ -2919,6 +3209,17 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Übersicht",
     "Profil",
     "Sessions",
+    "—",
+    "Ziel {0} · jetzt {1}",
+    "~{0} Std. bis 100 %",
+    "{0} Erfolge · seltenster: {1} %",
+    "Preise von Steam Spanien. Angebote über CheapShark; Schwierigkeit aus den globalen Steam-Werten.",
+    "Darunter!",
+    "Lege einen Alarm auf der Seite eines Spiels mit PC-Version an.",
+    "Reduzierte Steam-Spiele mit machbaren 100 %: Die Schwierigkeit kommt vom seltensten Erfolg laut Steam. Ohne Spiele, die du schon hast.",
+    "Platin im Angebot",
+    "DEINE PREISALARME",
+    "Gerade keine Angebote mit machbaren 100 %.",
     "HOL DIR JETZT DIESE PLATIN",
     "MEILENSTEIN-SPERRE",
     "{0} für deine Platin #{1} reserviert",
@@ -2943,6 +3244,7 @@ internal fun textosDE(): Array<String> = arrayOf(
     "NÄCHSTE TROPHÄE",
     "NÄCHSTE PLATIN",
     "Automatische Priorität: zuerst das Hauptspiel, hoher Fortschritt und beste Chancen.",
+    "Letzte Trophäen",
     "KURZ VOR DER PLATIN",
     "Was dir am wenigsten fehlt, nach offenen Trophäen sortiert.",
     "Noch nichts kurz vor der Platin — spiel weiter.",
@@ -2988,6 +3290,18 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Du liegst in {0} von {1} Kategorien vorn",
     " — du führst überall.",
     "Dein Profil ansehen",
+    "Wir melden uns unter {0}",
+    "Zielpreis (€)",
+    "Gib einen Preis zwischen 0,01 und 999 € ein.",
+    "Speichern",
+    "Alarm entfernen",
+    "Wir sagen Bescheid, wenn {0} auf Steam unter diesen Preis fällt.",
+    "Preisalarm",
+    "Bei Preissenkung benachrichtigen",
+    "Am günstigsten: {0} · {1} US\$",
+    "Tiefstpreis: {0} US\$",
+    "Nicht im spanischen Steam erhältlich",
+    "PC-PREIS",
     "Paragon-Benachrichtigungen",
     "Session teilen",
     "Lass ihn scannen, um sie zu sehen und beizutreten.",
@@ -2998,13 +3312,31 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Lass ihn scannen, um dich sofort hinzuzufügen.",
     "Serie läuft — weiter so",
     "Hol eine Trophäe, um sie zu starten",
+    "Tag in Folge",
+    "Tage in Folge",
+    "Das ist deine beste Serie!",
+    "Diese Woche",
+    "Hol dir heute eine Trophäe, um {0} Tage zu erreichen.",
+    "Heute zählt schon · noch {0} Tage bis zum Rekord",
     "Deine nächste Serie beginnt heute",
+    "Mehr",
+    "Weniger",
     "LETZTE 5 WOCHEN",
+    "Diese Woche",
+    "Vergleichen mit",
     "Tag für Tag",
+    "Unentschieden",
+    "{0} gewinnt",
+    "Du gewinnst",
+    "Bester Tag",
     "{0} Trophäen",
+    "Trophäen",
     "Nach Spiel",
     "Ganzen Monat zeigen",
+    "Niemand",
     "Monat für Monat",
+    "Du",
+    "Du vs {0}",
     "Probier mit den Pfeilen oben einen anderen Monat.",
     "Keine Trophäen in diesem Monat",
     "Loslegen",
@@ -3249,8 +3581,13 @@ internal fun textosFR(): Array<String> = arrayOf(
     "C'est fait",
     "Ajouter",
     "Demande envoyée à @{0}.",
+    "Amis",
     "@pseudo de ton ami",
+    "Aucune demande",
+    "Quand quelqu'un voudra t'ajouter, ça apparaîtra ici.",
     "Demandes d'ami",
+    "Demandes",
+    "Demandes · {0}",
     "Vous êtes amis : @{0} t'avait envoyé une demande.",
     "Accepter la demande",
     "Amis",
@@ -3259,6 +3596,7 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Accent et palette",
     "Style",
     "Se débloque au niveau {0} (tu es niveau {1})",
+    "En mode OLED, le fond reste noir pur : le style teinte les cartes et les bordures.",
     "Icône de l'app",
     "La nouvelle icône peut mettre quelques secondes à apparaître sur l'écran d'accueil (parfois jusqu'à ce que vous quittiez l'app).",
     "Depuis ton jeu",
@@ -3275,6 +3613,7 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Thèmes",
     "Taille du texte",
     "Apparence",
+    "Aperçu",
     "Chasseur",
     "Élite",
     "Explorateur",
@@ -3304,8 +3643,12 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Vue focus",
     "Ouvrir",
     "AJOUTER AU DOSSIER",
+    "Ajouter des jeux",
+    "{0} dans ce dossier. Touche pour ajouter ou retirer.",
     "« {0} » disparaît avec les {1} jeux qu'il regroupe (les jeux eux-mêmes ne sont pas supprimés, seulement le dossier).",
     "Supprimer ce dossier ?",
+    "Chercher dans ta bibliothèque",
+    "Changer la photo",
     "Impossible de supprimer le dossier.",
     "Impossible de modifier le dossier. Vérifie la connexion et réessaie.",
     "Impossible de créer le dossier.",
@@ -3313,7 +3656,9 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Impossible de renommer le dossier.",
     "Nouveau dossier",
     "Options du dossier",
+    "Ajouter une photo",
     "Retirer du dossier",
+    "Retirer la photo",
     "Renommer le dossier",
     "Aucun jeu dans ce dossier pour l'instant",
     "Ajoute-les depuis leur fiche, ou depuis la Bibliothèque avec le menu de chaque carte.",
@@ -3335,14 +3680,34 @@ internal fun textosFR(): Array<String> = arrayOf(
     "a noté {0}",
     "ACTIVITÉ DU CLAN",
     "Rien à montrer ici pour l'instant.",
+    "Promouvoir {0}",
     "Oui, supprimer le clan",
+    "Description",
+    "Nom",
+    "Exclure {0} du clan ?",
+    "Confier la direction à {0} ? Tu deviendras adjoint.",
     "CONTRIBUTION",
     "{0} · {1} trophées dans le clan",
     "Ce que chacun a apporté depuis son arrivée : le Paragon Score des trophées gagnés dans le clan.",
+    "Rétrograder {0}",
+    "Modifier le nom et la description",
     "Impossible de créer le clan.",
     "Impossible d'inviter.",
     "Ce clan n'existe pas.",
     "Impossible de rejoindre le clan.",
+    "Couleur du symbole",
+    "Modifier le blason",
+    "Couleur de fond",
+    "Forme",
+    "Enregistrer le blason",
+    "Symbole",
+    "Choisis forme, symbole et couleurs. Il s'affiche sur le web et dans l'app.",
+    "Blason du clan",
+    "Exclure du clan",
+    "Impossible",
+    "Gérer {0}",
+    "Enregistrer",
+    "Nommer chef",
     "Impossible d'inviter",
     "Chef",
     "Membre",
@@ -3350,8 +3715,11 @@ internal fun textosFR(): Array<String> = arrayOf(
     "{0} % du clan",
     "{0}e",
     "POINTS DU CLAN",
+    "Adjoint",
+    "Aîné",
     "CLASSEMENT",
     "{0} · {1} trophées",
+    "Tu es le chef : si tu pars, {0} prendra la direction.",
     "Tu n'apparaîtras plus dans le classement de « {0} » — il faudrait te réinviter pour revenir.",
     "Quitter le clan ?",
     "Aucun ami disponible pour l'instant — ils sont déjà tous dans un clan ou tu les as déjà invités.",
@@ -3491,6 +3859,10 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Ton aventure dans {0} a commencé le {1}, avec « {2} ».",
     "Ton plus gros obstacle a été « {0} » : tu es resté {1} jours sans rien débloquer avant de l'obtenir.",
     "📖 Le journal du platine",
+    "Difficile",
+    "Facile",
+    "Moyenne",
+    "Très facile",
     "Ans",
     "{0} an",
     "{0} ans",
@@ -3651,6 +4023,7 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Go",
     "Ton objectif · épinglé",
     "Pour aujourd'hui",
+    "Platiné · {0} de DLC restants",
     "Ta prochaine session",
     "Continue à jouer",
     "Prochain platine : {0}",
@@ -3717,6 +4090,17 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Accueil",
     "Profil",
     "Sessions",
+    "—",
+    "Objectif {0} · maintenant {1}",
+    "~{0} h pour le 100 %",
+    "{0} succès · le plus rare : {1} %",
+    "Prix de Steam Espagne. Promos via CheapShark ; difficulté selon les pourcentages globaux de Steam.",
+    "En dessous !",
+    "Crée une alerte depuis la fiche d'un jeu qui existe sur PC.",
+    "Jeux Steam en promo avec un 100 % abordable : la difficulté vient du succès le plus rare selon Steam. Sans ceux que tu possèdes.",
+    "Platines en promo",
+    "TES ALERTES DE PRIX",
+    "Aucune promo avec un 100 % abordable pour l'instant.",
     "VISE CE PLATINE MAINTENANT",
     "VERROU D'ÉTAPE",
     "{0} réservé pour ton platine n°{1}",
@@ -3741,6 +4125,7 @@ internal fun textosFR(): Array<String> = arrayOf(
     "PROCHAIN TROPHÉE",
     "PROCHAIN PLATINE",
     "Priorité automatique : d'abord le jeu de base, forte progression et meilleures chances.",
+    "Derniers trophées",
     "À UN PAS DU PLATINE",
     "Ce qu'il te reste le moins, trié par trophées restants.",
     "Rien à un pas du platine pour l'instant — continue à jouer.",
@@ -3786,6 +4171,18 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Tu mènes dans {0} catégories sur {1}",
     " — tu mènes partout.",
     "Voir ton profil",
+    "On te prévient sous {0}",
+    "Prix visé (€)",
+    "Indique un prix entre 0,01 et 999 €.",
+    "Enregistrer",
+    "Retirer l'alerte",
+    "On te préviendra quand {0} passera sous ce prix sur Steam.",
+    "Alerte de prix",
+    "M'alerter s'il baisse",
+    "Le moins cher : {0} · {1} US\$",
+    "Prix le plus bas : {0} US\$",
+    "Pas en vente sur Steam Espagne",
+    "PRIX SUR PC",
     "Notifications Paragon",
     "Partager la session",
     "Fais-le scanner pour la voir et la rejoindre.",
@@ -3796,13 +4193,31 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Fais-le scanner pour qu'on t'ajoute en une seconde.",
     "Série en cours — continue",
     "Obtiens un trophée pour la lancer",
+    "jour d'affilée",
+    "jours d'affilée",
+    "C'est ta meilleure série !",
+    "Cette semaine",
+    "Obtiens un trophée aujourd'hui pour atteindre {0} jours.",
+    "Aujourd'hui compte · {0} jours avant ton record",
     "Ta prochaine série commence aujourd'hui",
+    "Plus",
+    "Moins",
     "5 DERNIÈRES SEMAINES",
+    "Cette semaine",
+    "Comparer avec",
     "Jour par jour",
+    "Égalité",
+    "{0} gagne",
+    "Tu gagnes",
+    "Meilleur jour",
     "{0} trophées",
+    "Trophées",
     "Par jeu",
     "Voir tout le mois",
+    "Personne",
     "Mois par mois",
+    "Toi",
+    "Toi vs {0}",
     "Essaie un autre mois avec les flèches ci-dessus.",
     "Aucun trophée ce mois-ci",
     "Le commencer",

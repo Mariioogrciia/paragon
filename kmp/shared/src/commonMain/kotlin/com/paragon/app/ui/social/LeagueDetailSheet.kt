@@ -80,7 +80,7 @@ fun LeagueDetailSheet(
         result = repository.getLeagueDetail(leagueId)
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
             CabeceraHoja(onBack = onDismiss)
             when (val current = result) {

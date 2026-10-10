@@ -83,6 +83,9 @@ import com.paragon.app.ui.common.gradeColor
 import com.paragon.app.ui.common.gradeLabelEs
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
+import com.paragon.app.ui.common.cristal
+import com.paragon.app.ui.common.premiumClickable
+import dev.chrisbanes.haze.hazeSource
 import com.paragon.shared.i18n.T
 import com.paragon.shared.i18n.Textos
 
@@ -98,6 +101,10 @@ import com.paragon.shared.i18n.Textos
 fun GameDetailScreen(
     gameId: String,
     tokenStore: TokenStore,
+    /** Si se llega desde un trofeo: la lista baja hasta él y lo resalta. */
+    trofeoInicial: String? = null,
+    /** Handle de otra persona: su ficha, en solo lectura (sin anclar, notas, carpetas...). */
+    de: String? = null,
     handle: String = "",
     onBack: () -> Unit = {},
     onModoEnfoque: () -> Unit = {},
@@ -113,7 +120,8 @@ fun GameDetailScreen(
 
     LaunchedEffect(gameId, retryCounter.value) {
         result = null
-        result = repository.getGameDetail(gameId)
+        result = repository.getGameDetail(gameId, de)
+        if (de != null) return@LaunchedEffect
         val milestoneResult = milestoneRepository.getMilestone()
         hito = (milestoneResult as? MilestoneResult.Ok)?.hito
         (milestoneResult as? MilestoneResult.Ok)?.let { ok ->
@@ -151,6 +159,8 @@ fun GameDetailScreen(
         }
         is GameDetailResult.Ok -> GameDetailContent(
             gameId = gameId,
+            trofeoInicial = trofeoInicial,
+            soloLectura = de != null,
             game = current.detail,
             fromCache = current.fromCache,
             hitoInicial = hito,
@@ -171,6 +181,8 @@ fun GameDetailScreen(
 @Composable
 private fun GameDetailContent(
     gameId: String,
+    trofeoInicial: String?,
+    soloLectura: Boolean,
     game: GameDetailData,
     fromCache: Boolean,
     hitoInicial: HitoReservado?,
@@ -270,10 +282,51 @@ private fun GameDetailContent(
     }
 
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    // Llegando desde un trofeo: se baja hasta él una sola vez. El índice se
+    // cuenta igual que se pintan los elementos de la LazyColumn de abajo
+    // (cabecera, acciones, notas, diario, filtros y luego cada grupo).
+    var resaltado by remember(gameId) { mutableStateOf(trofeoInicial) }
+    val gruposActuales by androidx.compose.runtime.rememberUpdatedState(gruposVisibles)
+    LaunchedEffect(gameId, trofeoInicial) {
+        val objetivo = trofeoInicial ?: return@LaunchedEffect
+        if (game.trophies.none { it.id == objetivo }) return@LaunchedEffect
+        // Si un filtro lo esconde, se quita; en cronología no hay filas, así que a la lista.
+        if (trofeosOrdenados.none { it.id == objetivo }) { estadoTrofeos = 0; grupoElegido = null }
+        if (com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CRONOLOGIA) {
+            com.paragon.app.ui.trofeos.vistaTrofeosActual = com.paragon.app.ui.trofeos.VistaTrofeos.LISTA
+        }
+        kotlinx.coroutines.delay(350) // que la lista se recomponga con los filtros quitados
+        val cuadricula = com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA
+        var indice = 5 + (if (game.diario != null) 1 else 0)
+        for ((grupoId, lista) in gruposActuales) {
+            if (grupoId != null) indice++
+            val pos = lista.indexOfFirst { it.id == objetivo }
+            if (pos >= 0) {
+                listState.animateScrollToItem(if (cuadricula) indice + pos / 4 else indice + pos, -160)
+                break
+            }
+            indice += if (cuadricula) (lista.size + 3) / 4 else lista.size
+        }
+        kotlinx.coroutines.delay(2500)
+        resaltado = null
+    }
     val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
+    // Cristal de la ficha (7 oct 2026): la lista es la fuente; el botón de
+    // volver y la cabecera fina, hermanos encima (no dentro de la lista, para
+    // que el efecto no se muestree a sí mismo).
+    // (Con el estado de MainScreen el cristal quedaba dentro de su propia
+    // fuente y se pintaba a sí mismo sin fin: la app se cerraba.)
+    val hazeFicha = dev.chrisbanes.haze.rememberHazeState()
+    // La cabecera fina sale cuando el título grande de la portada se va por arriba.
+    val umbralCabecera = with(androidx.compose.ui.platform.LocalDensity.current) { (ALTO_PORTADA - 72.dp).toPx() }
+    val cabeceraCompacta by remember {
+        androidx.compose.runtime.derivedStateOf {
+            listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > umbralCabecera
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background)) {
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().background(Background).hazeSource(hazeFicha), contentPadding = PaddingValues(bottom = com.paragon.app.ui.common.huecoBarra())) {
         item {
             GameDetailHero(
                 game = game,
@@ -287,7 +340,9 @@ private fun GameDetailContent(
             )
         }
 
-        item {
+        // De otra persona: sin acciones ni notas (son tuyas), pero el elemento
+        // sigue ahí vacío para que el índice de "bajar al trofeo" no cambie.
+        if (soloLectura) item {} else item {
             GameActionsRow(
                 pinned = pinned,
                 reservado = reservado,
@@ -302,7 +357,7 @@ private fun GameDetailContent(
             )
         }
 
-        item {
+        if (soloLectura) item {} else item {
             NotesSection(
                 initialNotes = game.notes,
                 dynamicColor = dynamicColor,
@@ -311,6 +366,18 @@ private fun GameDetailContent(
                         repository.saveNotes(gameId, newNotes)
                     }
                 }
+            )
+        }
+
+        // Precio en PC con alerta (8 oct 2026, ui/precios). No en tus propios
+        // juegos de Steam (ya los tienes); sin versión de PC no pinta nada.
+        // Elemento fijo, aunque esté vacío, para el índice de "bajar al trofeo".
+        if (gameId.startsWith("steam-") && !soloLectura) item {} else item {
+            com.paragon.app.ui.precios.TarjetaPrecioFicha(
+                gameId = gameId,
+                titulo = game.title,
+                tokenStore = tokenStore,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
             )
         }
 
@@ -382,6 +449,8 @@ private fun GameDetailContent(
                 items(lista, key = { "${grupoId}-${it.id}" }) { trophy ->
                     TrophyRow(
                         trophy,
+                        resaltado = trophy.id == resaltado,
+                        soloLectura = soloLectura,
                         game = game,
                         repository = repository,
                         tokenStore = tokenStore,
@@ -415,20 +484,23 @@ private fun GameDetailContent(
         shape = RoundedCornerShape(radio(28)),
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            // Encima de la barra flotante de abajo (desde el 7 oct el
+            // contenido pasa por detrás de ella y el botón quedaba tapado).
+            .padding(start = 16.dp, end = 16.dp, bottom = (com.paragon.app.ui.common.huecoBarra() + 6.dp).coerceAtLeast(16.dp))
             .fillMaxWidth()
             .height(56.dp),
     ) {
         Text(Textos.t(T.nav_enfoque), fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
     // Volver siempre a mano (diseño v2): fijo arriba aunque se baje por la ficha.
-    IconButton(
-        onClick = onBack,
-        modifier = Modifier.align(Alignment.TopStart).padding(12.dp).size(44.dp).clip(RoundedCornerShape(50)).background(Background.copy(alpha = 0.7f)),
-    ) {
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
-    }
+    CabeceraFicha(
+        titulo = game.title,
+        compacta = cabeceraCompacta,
+        estado = hazeFicha,
+        onBack = onBack,
+        onTitulo = { coroutineScope.launch { listState.animateScrollToItem(0) } },
+        modifier = Modifier.align(Alignment.TopStart),
+    )
     }
 
     if (showCollections) {
@@ -478,7 +550,7 @@ private fun GameDetailHero(
     Column {
         // clipToBounds: con el efecto parallax la carátula bajaba por debajo
         // de la cabecera y se veía detrás de las cifras (captura del 6 oct).
-        Box(modifier = Modifier.fillMaxWidth().height(300.dp).clipToBounds()) {
+        Box(modifier = Modifier.fillMaxWidth().height(ALTO_PORTADA).clipToBounds()) {
             val coverModifier = Modifier.fillMaxSize().graphicsLayer { translationY = scrollOffset * 0.4f }.let { base ->
                 if (sharedTransitionScope != null && animatedVisibilityScope != null) {
                     with(sharedTransitionScope) {
@@ -970,6 +1042,8 @@ internal fun TrophyRarityChart(trophies: List<TrophyItem>, modifier: Modifier = 
 @Composable
 private fun TrophyRow(
     trophy: TrophyItem,
+    resaltado: Boolean = false,
+    soloLectura: Boolean = false,
     game: GameDetailData,
     repository: GameDetailRepository,
     tokenStore: TokenStore,
@@ -988,10 +1062,16 @@ private fun TrophyRow(
     // los botones se comían el ancho y el texto quedaba en una columna de
     // cuatro letras, ilegible. Ahora el texto ocupa todo el ancho y las
     // acciones bajan a su propia línea.
+    val bordeResaltado by androidx.compose.animation.animateColorAsState(
+        if (resaltado) Accent else Color.Transparent,
+        androidx.compose.animation.core.tween(400),
+        label = "resaltado",
+    )
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(radio(16)))
+            .border(2.dp, bordeResaltado, RoundedCornerShape(radio(16)))
             .padding(16.dp),
     ) {
     Row(verticalAlignment = Alignment.Top) {
@@ -1044,7 +1124,8 @@ private fun TrophyRow(
             modifier = Modifier.fillMaxWidth().padding(start = 56.dp, top = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            IconButton(
+            // "Atascado" es de tu lista: en la ficha de otra persona no.
+            if (!soloLectura) IconButton(
                 onClick = {
                     coroutineScope.launch {
                         if (isStuck) {
@@ -1226,6 +1307,66 @@ private fun CabeceraGrupoTrofeos(nombre: String, conseguidos: Int, total: Int, e
         }
         Box(Modifier.padding(top = 8.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(com.paragon.app.ui.theme.Border)) {
             Box(Modifier.fillMaxWidth(if (total > 0) conseguidos / total.toFloat() else 0f).height(4.dp).background(Accent))
+        }
+    }
+}
+
+/** Alto de la portada de la ficha; la cabecera fina sale al pasarla. */
+private val ALTO_PORTADA = 300.dp
+
+/**
+ * Botón de volver de cristal sobre la portada que, al bajar por la ficha,
+ * se estira hasta ser una cabecera fina con el título (como en iOS 26): sin
+ * él, a mitad de la lista de trofeos no se sabía de qué juego eran. Tocar el
+ * título vuelve arriba. Cristal: `ui/common/Cristal.kt`.
+ */
+@Composable
+private fun CabeceraFicha(
+    titulo: String,
+    compacta: Boolean,
+    estado: dev.chrisbanes.haze.HazeState,
+    onBack: () -> Unit,
+    onTitulo: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val progreso by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (compacta) 1f else 0f,
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.85f, stiffness = 420f),
+        label = "cabeceraFicha",
+    )
+    val forma = RoundedCornerShape(50)
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier.fillMaxWidth().padding(12.dp)) {
+        Row(
+            Modifier
+                .width(androidx.compose.ui.unit.lerp(44.dp, maxWidth, progreso))
+                .height(44.dp)
+                .shadow(10.dp, forma, ambientColor = Color.Black.copy(alpha = 0.35f), spotColor = Color.Black.copy(alpha = 0.35f))
+                .cristal(estado, forma, seleccion = dev.chrisbanes.haze.HazeSourceSelection.All)
+                .clip(forma),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier.size(44.dp).clip(forma).premiumClickable(onClick = onBack),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = Textos.t(T.comun_volver), tint = Foreground, modifier = Modifier.size(30.dp))
+            }
+            if (progreso > 0.01f) {
+                Text(
+                    text = titulo,
+                    color = Foreground,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        // El título entra cuando la cápsula ya casi está abierta.
+                        .graphicsLayer { alpha = ((progreso - 0.45f) / 0.55f).coerceIn(0f, 1f) }
+                        .clickable(onClick = onTitulo)
+                        .padding(end = 16.dp, top = 10.dp, bottom = 10.dp),
+                )
+            }
         }
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Folder
@@ -79,20 +80,20 @@ import com.paragon.shared.i18n.Textos
  * es con otros. Ajustes, arriba a la derecha. Solo colores del tema
  * (acento, superficie, bordes y radios de Apariencia), nada fijo.
  *
- * `conLigas`: en modo zen la barra no tiene Ligas; aquí no se pierde.
+ * `modoZen` ("Ocultar funciones sociales"): sin el grupo "Con otros".
  */
 @Composable
 fun PerfilScreen(
     profile: UserProfile,
     stats: GlobalStats,
     racha: RachaGlobal,
-    conLigas: Boolean,
+    modoZen: Boolean,
     onNavigate: (String) -> Unit,
 ) {
     var verQr by remember { mutableStateOf(false) }
     if (verQr) HojaMiQr(handle = profile.handle, onDismiss = { verQr = false })
     Column(
-        Modifier.fillMaxSize().background(Background).verticalScroll(rememberScrollState()).padding(bottom = 32.dp),
+        Modifier.fillMaxSize().background(Background).verticalScroll(rememberScrollState()).padding(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
     ) {
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(Textos.t(T.nav_perfil), color = Foreground, fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -148,11 +149,11 @@ fun PerfilScreen(
             Fila(Icons.Default.CalendarMonth, Textos.t(T.ritmo_titulo)) { onNavigate(Screen.Ritmo.route) }
             Fila(Icons.Default.CenterFocusStrong, Textos.t(T.nav_enfoque)) { onNavigate(Screen.Focus.route) }
             Fila(Icons.Default.Star, Textos.t(T.nav_atascados_menu)) { onNavigate(Screen.StuckTrophies.route) }
-            Fila(Icons.Default.Folder, Textos.t(T.nav_carpetas), ultima = true) { onNavigate(Screen.Collections.route) }
+            Fila(Icons.Default.Folder, Textos.t(T.nav_carpetas)) { onNavigate(Screen.Collections.route) }
+            Fila(Icons.Default.LocalOffer, Textos.t(T.ofertas_titulo), ultima = true) { onNavigate(Screen.PlatinosOferta.route) }
         }
-        Grupo(Textos.t(T.perfil_con_otros)) {
+        if (!modoZen) Grupo(Textos.t(T.perfil_con_otros)) {
             Fila(Icons.Default.Groups, Textos.t(T.nav_sesiones)) { onNavigate(Screen.Sessions.route) }
-            if (conLigas) Fila(Icons.Default.EmojiEvents, Textos.t(T.nav_ligas)) { onNavigate(Screen.Social.route) }
             Fila(Icons.AutoMirrored.Filled.CompareArrows, Textos.t(T.nav_comparar), ultima = true) { onNavigate("compare") }
         }
     }
@@ -199,7 +200,7 @@ private fun Fila(icono: ImageVector, texto: String, ultima: Boolean = false, onC
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HojaMiQr(handle: String, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Surface) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = com.paragon.app.ui.theme.SurfaceSolida) {
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

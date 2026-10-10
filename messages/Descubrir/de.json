@@ -375,5 +375,18 @@
     "principal": "Haupt",
     "oficial": "Offiziell",
     "otrosPartidos": "Weitere Spiele dieser Phase"
+  },
+  "PlatinosOferta": {
+    "titulo": "Platin im Angebot",
+    "descripcion": "Reduzierte Steam-Spiele mit machbaren 100 %: Die Schwierigkeit kommt vom seltensten Erfolg laut Steam. Ohne Spiele, die du schon hast.",
+    "logros": "{n} Erfolge · seltenster: {raro} %",
+    "horas": "~{h} Std. bis 100 %",
+    "verFicha": "Zum Spiel",
+    "verEnSteam": "Auf Steam ansehen",
+    "nota": "Preise von Steam Spanien. Angebote über CheapShark; Schwierigkeit geschätzt aus den globalen Steam-Werten.",
+    "difMuyFacil": "Sehr leicht",
+    "difFacil": "Leicht",
+    "difMedia": "Mittel",
+    "difDificil": "Schwer"
   }
 }

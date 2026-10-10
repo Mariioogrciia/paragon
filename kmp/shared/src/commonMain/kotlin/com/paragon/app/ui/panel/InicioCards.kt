@@ -284,7 +284,11 @@ fun TarjetaSigueJugando(
                 Box(Modifier.fillMaxWidth(game.percent.coerceIn(0, 100) / 100f).height(6.dp).background(Accent))
             }
             Text(
-                if (faltan == 0) "${game.percent}%" else Textos.t(T.biblio_pct_restantes, game.percent, faltan),
+                when {
+                    faltan == 0 -> "${game.percent}%"
+                    game.platinado -> Textos.t(T.inicio_platinado_dlc, faltan)
+                    else -> Textos.t(T.biblio_pct_restantes, game.percent, faltan)
+                },
                 color = Muted,
                 fontSize = 12.sp,
                 fontFamily = FontFamily.Monospace,

@@ -4,6 +4,13 @@
     "subtitle": "Elige cualquier carpeta como tu plan y añade juegos desde cada ficha para construir tu ruta."
   },
   "ritmoPage": {
+    "compararCon": "Comparar con",
+    "sinComparar": "Nadie (solo yo)",
+    "tu": "Tú",
+    "empate": "Empate",
+    "ganasTu": "Ganas tú",
+    "ganaOtro": "Gana {nombre}",
+    "diaADia": "Día a día",
     "backButton": "Volver al panel",
     "helpCurrentYear": "Pincha en cualquier mes para ver su desglose.",
     "helpOutOfRange": "Este mes queda fuera del último año, así que no aparece marcado abajo. Pincha en cualquier barra para volver a los últimos 12 meses.",

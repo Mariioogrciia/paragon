@@ -21,7 +21,7 @@ data class SesionJuegoDto(
 )
 
 @Serializable
-data class SesionTrofeoInfoDto(val iconUrl: String? = null, val grade: String? = null, val detail: String = "")
+data class SesionTrofeoInfoDto(val trophyId: String? = null, val iconUrl: String? = null, val grade: String? = null, val detail: String = "")
 
 /** Ver CONTRACT.md → Sesiones y SesionVista en src/lib/sesiones.ts. Plazas: total contando a quien organiza. */
 @Serializable
@@ -43,6 +43,8 @@ data class SesionDto(
     /** Quien mira ya tiene el trofeo: si se une, es para ayudar. */
     val yaLoTengo: Boolean = false,
     val loTengo: Boolean = false,
+    /** Tu copia del juego, para abrir tu ficha en ese trofeo. */
+    val miJuegoId: String? = null,
 )
 
 /** Un juego tuyo con el que se puede organizar (biblioteca sin completar). */
