@@ -25,3 +25,8 @@ jobs:
         run: npx eslint src
       - name: Tests
         run: npm test
+      # Cada useTranslations del cliente tiene que existir en messages/ y en
+      # NAMESPACES_CLIENTE; si no, la web enseña la clave en vez del texto
+      # (pasó el 6 oct con "PerfilPage.amistad.enviada").
+      - name: Textos de la web (namespaces)
+        run: npx tsx scripts/comprobar-namespaces-cliente.mts

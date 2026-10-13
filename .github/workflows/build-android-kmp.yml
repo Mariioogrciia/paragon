@@ -26,9 +26,20 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - name: Compilar la APK
+      # Los tests de la app (kmp/shared/src/commonTest) antes de la APK: si
+      # alguno falla, no sale APK. Hasta el 13 oct 2026 existían pero nadie
+      # los ejecutaba. Mismo Gradle para los dos: se configura una sola vez.
+      - name: Tests de la app y APK
         working-directory: kmp
-        run: ./gradlew --no-daemon :androidApp:assembleDebug
+        run: ./gradlew --no-daemon :shared:testAndroidHostTest :androidApp:assembleDebug
+
+      - name: Informe de los tests (si fallan)
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: informe-tests-app
+          path: kmp/shared/build/reports/tests/
+          if-no-files-found: ignore
 
       - uses: actions/upload-artifact@v7
         with:
