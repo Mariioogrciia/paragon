@@ -70,6 +70,7 @@ jobs:
           APP="$RUNNER_TEMP/dd/Build/Products/Release-iphoneos/Paragon.app"
           plutil -p "$APP/Info.plist"
           ls "$APP" | grep -iE "AppIcon|Assets.car" || echo "::warning::La app no lleva icono"
+          ls "$APP/PlugIns" 2>/dev/null | grep -q "ParagonWidget.appex" && echo "Widget: ParagonWidget.appex dentro" || echo "::warning::La app no lleva el widget (PlugIns/ParagonWidget.appex)"
           if [ -d "$APP/Metadata.appintents" ]; then
             ls -la "$APP/Metadata.appintents"
             for f in "$APP/Metadata.appintents"/*.actionsdata; do
