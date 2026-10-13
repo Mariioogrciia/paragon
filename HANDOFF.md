@@ -1,7 +1,23 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **10 de octubre de 2026**.
+releer todo el historial. Última actualización: **13 de octubre de 2026**.
+
+**13 oct — auditoría y seguridad de dependencias:**
+- **Next 16.3.4 → 16.4.0**: la 16.3.x tenía un fallo crítico de ejecución
+  remota de código en `next/og` (`ImageResponse`), que usamos en 5 rutas
+  públicas (opengraph de perfil/juego/portada, firma, wrap, tarjeta de
+  trofeo). También `eslint-config-next` 16.4.0 y `npm audit fix` (sharp,
+  @grpc/grpc-js, source-map-js). `next build`, tsc, lint y los 143 tests, OK.
+- Queda 1 aviso moderado: `uuid@9` dentro de `firebase-admin` →
+  `@google-cloud/storage` → `gaxios@6`. Solo afecta a uuid v3/v5/v6 con
+  `buf`, que gaxios no usa; no se fuerza con `overrides`.
+- Pendiente de la auditoría (por orden): meter en la CI los tests de la app
+  (`kmp/shared/src/commonTest`, hoy no se ejecutan) y el comprobador de
+  namespaces de la web; traducir los ~32 errores de `actions.ts` y los textos
+  a mano de ~10 componentes (clanes, guerra, páginas de error, liga mensual);
+  iOS sin push ni widget (y `ManejadorAtras` vacío en iOS); firma de
+  publicación para tiendas (Android solo debug, iOS versión 0.1).
 
 **9 oct — perfil completo en la app y el mes día a día contra otro:**
 - **Perfil de verdad** (`ui/perfil/PerfilUsuarioScreen.kt`, ruta
