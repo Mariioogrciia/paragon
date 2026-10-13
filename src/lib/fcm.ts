@@ -3,6 +3,7 @@ import type { App } from "firebase-admin/app";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { fcmTokens } from "@/db/schema";
+import { enviarApns, esTokenApns } from "@/lib/apns";
 
 /**
  * Notificaciones push a la app NATIVA de Android (Firebase Cloud Messaging)
@@ -64,20 +65,28 @@ export async function borrarTokenFcm(token: string): Promise<void> {
 }
 
 /**
- * Manda un aviso a todos los dispositivos Android registrados de un
- * usuario. Igual que `enviarPush`: si FCM dice que el token ya no vale (la
- * app se desinstaló, o Firebase lo rotó), se borra solo en vez de
+ * Manda un aviso a todos los dispositivos registrados de un usuario: los
+ * Android por FCM y los iPhone (tokens `apns:...`, ver lib/apns.ts) directos
+ * a APNs. Igual que `enviarPush`: si FCM o APNs dicen que el token ya no
+ * vale (la app se desinstaló, o se rotó), se borra solo en vez de
  * reintentarlo para siempre.
  */
 export async function enviarPushFcm(
   userId: string,
   payload: { title: string; body: string; url?: string; imageUrl?: string },
 ): Promise<void> {
+  const filas = await db.select({ token: fcmTokens.token }).from(fcmTokens).where(eq(fcmTokens.userId, userId));
+  const iphones = filas.filter((f) => esTokenApns(f.token)).map((f) => f.token);
+  const tokens = filas.filter((f) => !esTokenApns(f.token));
+
+  if (iphones.length > 0) {
+    const caducados = await enviarApns(iphones, payload);
+    await Promise.all(caducados.map(borrarTokenFcm));
+  }
+
+  if (tokens.length === 0) return;
   const firebaseApp = await asegurarApp();
   if (!firebaseApp) return;
-
-  const tokens = await db.select({ token: fcmTokens.token }).from(fcmTokens).where(eq(fcmTokens.userId, userId));
-  if (tokens.length === 0) return;
 
   const { getMessaging } = await import("firebase-admin/messaging");
   const messaging = getMessaging(firebaseApp);

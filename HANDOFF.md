@@ -29,9 +29,47 @@ releer todo el historial. Última actualización: **13 de octubre de 2026**.
   LanguageSwitcher. `global-error.tsx` lleva sus textos en los 4 idiomas
   dentro del archivo (sin next-intl: su proveedor es lo que ha caído) y elige
   por el idioma del navegador. App: "platinos" de Comparar, traducido.
-- Pendiente de la auditoría: iOS sin push ni widget (y `ManejadorAtras`
-  vacío en iOS); firma de publicación para tiendas (Android solo debug, iOS
-  versión 0.1).
+- **iOS al nivel de Android** (punto 4 de la auditoría):
+  - *Atrás*: `ManejadorAtras` en iOS usa el `BackHandler` de Compose
+    (`ui-backhandler`), así el gesto de deslizar desde el borde cierra
+    también la ruleta, como el botón atrás de Android.
+  - *Push*: directas a APNs, sin el SDK de Firebase en la app.
+    `AppDelegate.swift` pide permiso al iniciar sesión, recibe el token y se
+    lo pasa a `AppIOS.registrarTokenPush`, que lo manda al mismo
+    `POST /api/mobile/push-token` con el prefijo `apns:` (misma tabla
+    `fcm_token`, sin migración). `enviarPushFcm` separa esos tokens y los
+    manda por `lib/apns.ts` (HTTP/2 + JWT ES256 hecho a mano, sin
+    dependencias). Variables del servidor: `APNS_KEY` (el .p8), `APNS_KEY_ID`,
+    `APNS_TEAM_ID`, opcionales `APNS_TOPIC` (por defecto
+    `com.paragon.app.kmp`) y `APNS_SANDBOX=1` para builds de Xcode. **Solo
+    funciona con la app firmada por una cuenta de desarrollador de pago**: la
+    IPA de Sideloadly con cuenta gratuita no tiene `aps-environment`.
+  - *Widget*: extensión `ParagonWidget` (WidgetKit, Swift puro, pequeño y
+    mediano): juego anclado y progreso, como el de Android. La app escribe
+    los textos ya traducidos en el App Group `group.com.paragon.app.kmp`
+    (`WidgetUpdater.ios.kt`) y le pide a WidgetKit que repinte.
+- **Publicar en las tiendas** (`.github/workflows/publicar-tiendas.yml`, a
+  mano desde Actions): Android saca un AAB de release firmado con la clave
+  de publicación y `versionCode` = número de ejecución; iOS hace el archive
+  firmado (firma automática en la nube con la clave de la API de App Store
+  Connect) y lo sube a TestFlight. Versión de iOS: 1.1 (como Android).
+  Secretos del repo que hacen falta:
+  - Android: `ANDROID_KEYSTORE_BASE64` (el .jks en base64),
+    `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+    Crear la clave una vez con `keytool -genkeypair -v -keystore
+    paragon-release.jks -alias paragon -keyalg RSA -keysize 2048 -validity
+    10000` y GUARDARLA: sin ella no se pueden publicar actualizaciones (o
+    activar "Play App Signing" y que esta sea solo la de subida). Sin
+    secretos el workflow saca el AAB sin firmar (sirve para probar R8).
+  - iOS: `APPLE_TEAM_ID`, y una clave de la API de App Store Connect
+    (Users and Access → Integrations → App Store Connect API, rol App
+    Manager o Admin): `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`. Antes, en
+    developer.apple.com, dar de alta los identificadores
+    `com.paragon.app.kmp` (con Push Notifications y App Groups) y
+    `com.paragon.app.kmp.widget` (App Groups), el grupo
+    `group.com.paragon.app.kmp`, y crear la app en App Store Connect.
+- Pendiente: nada de la auditoría. Las push de iOS y la publicación esperan
+  a la cuenta de desarrollador de Apple y a los secretos de arriba.
 
 **9 oct — perfil completo en la app y el mes día a día contra otro:**
 - **Perfil de verdad** (`ui/perfil/PerfilUsuarioScreen.kt`, ruta

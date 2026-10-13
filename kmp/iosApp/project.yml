@@ -26,13 +26,19 @@ targets:
         # Iconos a elegir en Ajustes → Apariencia → Icono (kmp/iconos/generar.py).
         ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIcon-Oro AppIcon-Claro AppIcon-Neon AppIcon-Esmeralda"
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
-        MARKETING_VERSION: "0.1"
+        # La versión que ve la gente; el número de build lo pone la CI al publicar.
+        MARKETING_VERSION: "1.1"
         CURRENT_PROJECT_VERSION: "1"
         TARGETED_DEVICE_FAMILY: "1"
         FRAMEWORK_SEARCH_PATHS: $(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
         OTHER_LDFLAGS: ["$(inherited)", "-framework", "Shared"]
         # La fase de Gradle escribe fuera del proyecto de Xcode.
         ENABLE_USER_SCRIPT_SANDBOXING: NO
+        # Push (APNs) y el App Group del widget. Sin firmar (Sideloadly) no se aplican.
+        CODE_SIGN_ENTITLEMENTS: iosApp/Paragon.entitlements
+    dependencies:
+      # El widget de la pantalla de inicio (va dentro de Paragon.app/PlugIns).
+      - target: ParagonWidget
     preBuildScripts:
       - name: Compilar Kotlin (Shared.framework)
         basedOnDependencyAnalysis: false
@@ -40,3 +46,19 @@ targets:
           cd "$SRCROOT/.."
           chmod +x ./gradlew
           ./gradlew :shared:embedAndSignAppleFrameworkForXcode
+  ParagonWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - ParagonWidget
+    settings:
+      base:
+        PRODUCT_NAME: ParagonWidget
+        SWIFT_VERSION: "5.0"
+        PRODUCT_BUNDLE_IDENTIFIER: com.paragon.app.kmp.widget
+        INFOPLIST_FILE: ParagonWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: ParagonWidget/ParagonWidget.entitlements
+        MARKETING_VERSION: "1.1"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES

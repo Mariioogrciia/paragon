@@ -8,6 +8,9 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+/** El .jks de publicación, si quien compila lo da (ver signingConfigs). */
+val claveRelease: File? = System.getenv("PARAGON_KEYSTORE")?.let { file(it) }?.takeIf { it.exists() }
+
 android {
     namespace = "com.paragon.app"
     compileSdk = 37
@@ -20,6 +23,8 @@ android {
         // el mismo versionCode desde una tienda).
         versionCode = 2
         versionName = "1.1"
+        // Al publicar, la CI pone el número de build (siempre creciente).
+        System.getenv("PARAGON_VERSION_CODE")?.toIntOrNull()?.let { versionCode = it }
     }
 
     // Siempre la misma clave de depuración (la de androidApp/debug.keystore,
@@ -33,6 +38,17 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+        // Clave de publicación (Google Play): solo existe si quien compila la
+        // da por variables de entorno — en la CI, el workflow "Publicar en
+        // las tiendas" la saca de los secretos del repo. Nunca va en el repo.
+        if (claveRelease != null) {
+            create("release") {
+                storeFile = claveRelease
+                storePassword = System.getenv("PARAGON_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("PARAGON_KEY_ALIAS")
+                keyPassword = System.getenv("PARAGON_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -44,6 +60,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Sin la clave de publicación sale sin firmar (no se puede subir a Play).
+            if (claveRelease != null) signingConfig = signingConfigs.getByName("release")
         }
     }
 

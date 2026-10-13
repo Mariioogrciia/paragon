@@ -15,6 +15,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.crossfade
 import com.paragon.app.data.AparienciaRepository
+import com.paragon.app.data.PushRepository
 import com.paragon.app.data.local.ParagonDatabase
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.theme.crearThemeStoreIOS
@@ -29,6 +30,8 @@ import com.paragon.shared.sesion.abrirLoginEnNavegador
 import com.paragon.shared.sesion.crearTokenStore
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.http.Url
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import platform.UIKit.UIViewController
 
 /** El estado de la app de iOS que vive fuera de Compose (lo usa también Swift). */
@@ -40,6 +43,32 @@ object AppIOS {
     internal var refresco by mutableIntStateOf(0)
 
     private var configurada = false
+
+    /** Las pone iOSApp.swift al arrancar (ver NativoIOS.kt). */
+    var avisos: AvisosIOS? = null
+    var widget: WidgetIOS? = null
+
+    /** Token de APNs de este iPhone, ya con el prefijo `apns:` (ver lib/apns.ts en el servidor). */
+    private var tokenPush: String? = null
+
+    fun haySesion(): Boolean = tokenStore.token != null
+
+    /**
+     * Lo llama AppDelegate.swift cuando iOS entrega el token del dispositivo.
+     * Va al mismo POST /api/mobile/push-token que Android; el prefijo le dice
+     * al servidor que es de APNs y no de Firebase.
+     */
+    fun registrarTokenPush(hex: String) {
+        configurar()
+        tokenPush = "apns:$hex"
+        enviarTokenPush()
+    }
+
+    private fun enviarTokenPush() {
+        val token = tokenPush ?: return
+        if (tokenStore.token == null) return
+        MainScope().launch { PushRepository(tokenStore).registerToken(token) }
+    }
 
     internal fun configurar() {
         if (configurada) return
@@ -65,6 +94,10 @@ object AppIOS {
         val token = EnlaceSeguro.tokenDelEnlace(tokenStore, enlace.parameters["c"]) ?: return
         tokenStore.token = token
         refresco++
+        // Recién logueado: pedir permiso de avisos (la primera vez sale el
+        // diálogo de iOS) y asociar el token que ya hubiera a esta cuenta.
+        avisos?.pedirPermiso()
+        enviarTokenPush()
     }
 }
 

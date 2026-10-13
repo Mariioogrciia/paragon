@@ -69,6 +69,8 @@ kotlin {
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:$versionKtor")
+            // ManejadorAtras: el gesto de volver de iOS (Plataforma.ios.kt).
+            implementation("org.jetbrains.compose.ui:ui-backhandler:$versionCompose")
         }
         androidMain.dependencies {
             implementation("io.ktor:ktor-client-okhttp:$versionKtor")

@@ -7,7 +7,9 @@ import { errorMovil } from "@/lib/mensajesApi";
 /**
  * Registra (o reasigna) el token de Firebase Cloud Messaging de este
  * dispositivo — la app lo llama al arrancar y cada vez que Firebase se lo
- * renueva. Body: `{ "token": "..." }`. Ver lib/fcm.ts.
+ * renueva. Body: `{ "token": "..." }`. Ver lib/fcm.ts. El iPhone manda su
+ * token de APNs con el prefijo `apns:` y se guarda en la misma tabla; al
+ * enviar se separa (lib/apns.ts).
  */
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);

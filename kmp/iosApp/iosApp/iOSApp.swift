@@ -4,6 +4,9 @@ import Shared
 
 @main
 struct iOSApp: App {
+    /// Push (APNs) y widget: ver AppDelegate.swift.
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     init() {
         HapticosKt.configurarHapticos(implementacion: HapticosIOS())
         // Para que «Cuánto falta para <juego>» reconozca los juegos de la lista.

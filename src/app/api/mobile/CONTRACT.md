@@ -837,6 +837,11 @@ dispositivo (`FirebaseMessaging.getInstance().token` en Android). Llamar al
 arrancar la app (tras tener sesión) y cada vez que `onNewToken` lo renueve.
 `{ "ok": true }` o `400` si falta el token. Ver `lib/fcm.ts`.
 
+En iOS el token es el de APNs (hexadecimal) con el prefijo `apns:` —
+`{ "token": "apns:9f86d0…" }` —; el servidor lo manda directo a APNs
+(`lib/apns.ts`) en vez de por Firebase. El `fcmToken` de `/logout` es el
+mismo valor, con prefijo.
+
 Esto es el equivalente para Android de la suscripción Web Push que ya usa
 la web — un canal aparte porque Web Push (VAPID) no puede entregar nada a
 una app nativa, solo a navegadores/PWA. Los eventos que ya avisaban por

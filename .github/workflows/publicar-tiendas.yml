@@ -1,0 +1,170 @@
+name: Publicar en las tiendas
+
+# Builds firmadas para Google Play (AAB) y App Store / TestFlight (iOS). Solo
+# a mano (Actions → "Publicar en las tiendas" → Run workflow). Las claves van
+# en los secretos del repo (Settings → Secrets and variables → Actions), nunca
+# en el código; ver la lista en HANDOFF.md ("Publicar en las tiendas").
+#
+# Android sin secretos sale igual, pero sin firmar: sirve para comprobar que
+# la build de release (R8) compila, no para subirla a Play.
+on:
+  workflow_dispatch:
+    inputs:
+      plataforma:
+        description: "Qué publicar"
+        type: choice
+        options: [android, ios, las-dos]
+        default: android
+
+jobs:
+  android:
+    name: Android (AAB firmado)
+    if: inputs.plataforma != 'ios'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Número de build siempre creciente: Play no acepta dos con el mismo.
+      PARAGON_VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Clave de publicación
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: el AAB sale SIN FIRMAR (no vale para Google Play)."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/paragon-release.jks"
+          echo "PARAGON_KEYSTORE=$RUNNER_TEMP/paragon-release.jks" >> "$GITHUB_ENV"
+
+      - name: AAB de release
+        working-directory: kmp
+        env:
+          PARAGON_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          PARAGON_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          PARAGON_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon :shared:testAndroidHostTest :androidApp:bundleRelease
+
+      - name: Borrar la clave del runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/paragon-release.jks"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: paragon-android-aab
+          path: kmp/androidApp/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+
+  ios:
+    name: iOS (TestFlight)
+    if: inputs.plataforma != 'android'
+    runs-on: macos-latest
+    timeout-minutes: 75
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      # Sin cuenta de desarrollador de pago no hay nada que firmar: mejor
+      # parar aquí con un mensaje claro que a mitad del archive.
+      - name: Comprobar los secretos de Apple
+        run: |
+          faltan=""
+          for v in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 APPLE_TEAM_ID; do
+            [ -n "${!v}" ] || faltan="$faltan $v"
+          done
+          if [ -n "$faltan" ]; then
+            echo "::error::Faltan secretos de Apple:$faltan (ver HANDOFF.md, 'Publicar en las tiendas')."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Caché de Kotlin/Native
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('kmp/**/*.gradle.kts') }}
+          restore-keys: konan-${{ runner.os }}-
+
+      - name: Generar iosApp.xcodeproj (XcodeGen)
+        working-directory: kmp/iosApp
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      # Clave de la API de App Store Connect (rol App Manager o Admin): con
+      # ella Xcode crea y renueva solo los certificados y perfiles (firma en
+      # la nube), sin .p12 ni perfiles a mano en los secretos.
+      - name: Clave de App Store Connect
+        run: |
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8"
+
+      - name: Archive firmado
+        working-directory: kmp/iosApp
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Paragon.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} 2>&1 | tee "$RUNNER_TEMP/xcode.log"
+
+      - name: Subir a TestFlight
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+          set -o pipefail
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Paragon.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" 2>&1 | tee -a "$RUNNER_TEMP/xcode.log"
+
+      - name: Publicar los errores
+        if: failure()
+        run: |
+          grep -E "^e: |error:|: error" "$RUNNER_TEMP/xcode.log" | awk '!visto[$0]++' | head -8 | while IFS= read -r l; do echo "::error::${l}"; done || true
+
+      - name: Borrar la clave del runner
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"
