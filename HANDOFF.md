@@ -12,9 +12,11 @@ releer todo el historial. Última actualización: **13 de octubre de 2026**.
 - Queda 1 aviso moderado: `uuid@9` dentro de `firebase-admin` →
   `@google-cloud/storage` → `gaxios@6`. Solo afecta a uuid v3/v5/v6 con
   `buf`, que gaxios no usa; no se fuerza con `overrides`.
-- Pendiente de la auditoría (por orden): meter en la CI los tests de la app
-  (`kmp/shared/src/commonTest`, hoy no se ejecutan) y el comprobador de
-  namespaces de la web; traducir los ~32 errores de `actions.ts` y los textos
+- **CI**: la de Android ejecuta `:shared:testAndroidHostTest` (los tests de
+  `kmp/shared/src/commonTest`, más los nuevos del lector de QR) antes de la
+  APK; si falla uno, no sale APK y se sube `informe-tests-app`. Comprobaciones
+  de la web ejecuta también `comprobar-namespaces-cliente.mts`.
+- Pendiente de la auditoría (por orden): traducir los ~32 errores de `actions.ts` y los textos
   a mano de ~10 componentes (clanes, guerra, páginas de error, liga mensual);
   iOS sin push ni widget (y `ManejadorAtras` vacío en iOS); firma de
   publicación para tiendas (Android solo debug, iOS versión 0.1).
