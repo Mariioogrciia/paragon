@@ -287,7 +287,8 @@
     "editarPanel": "Edit dashboard",
     "lecturas": "Readouts",
     "cabinaPie": "{n, plural, =0 {Every module on display} one {# module hidden} other {# modules hidden}}",
-    "cabinaPieAccion": "Choose which modules you see"
+    "cabinaPieAccion": "Choose which modules you see",
+    "descargarPng": "Download image (PNG)"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Sample profile",
@@ -637,5 +638,11 @@
     "etiqueta": "Locally declared progress",
     "explicacion": "It is sent by your browser and Paragon cannot verify it, so it earns no points and does not count in rankings, leagues or seasons.",
     "aviso": "Epic blocks reads from servers. It syncs through the Paragon extension from your own browser, and progress is shown as declared: it earns no XP and does not count in rankings, leagues or seasons."
+  },
+  "Error": {
+    "titulo": "Something broke",
+    "texto": "It wasn't you — a real bug on this page, already logged. You can try again or go back to where you were.",
+    "referencia": "Reference:",
+    "reintentar": "Try again"
   }
 }

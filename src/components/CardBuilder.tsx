@@ -99,7 +99,7 @@ export function CardBuilder({ games }: { games: SampleGame[] }) {
                 disabled={isExporting}
                 className="inline-flex items-center justify-center rounded-xl px-4 py-3.5 text-[0.9375rem] font-bold transition-all duration-300 hover:bg-white/5 disabled:opacity-50"
                 style={{ border: "1px solid var(--border)" }}
-                title="Descargar imagen (PNG)"
+                title={t("descargarPng")}
               >
                 {isExporting ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-foreground" />

@@ -287,7 +287,8 @@
     "editarPanel": "Editar panel",
     "lecturas": "Lecturas",
     "cabinaPie": "{n, plural, =0 {Todos los módulos a la vista} one {# módulo oculto} other {# módulos ocultos}}",
-    "cabinaPieAccion": "Elige qué módulos ves"
+    "cabinaPieAccion": "Elige qué módulos ves",
+    "descargarPng": "Descargar imagen (PNG)"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Perfil de ejemplo",
@@ -637,5 +638,11 @@
     "etiqueta": "Progreso declarado localmente",
     "explicacion": "Lo envía tu navegador y Paragon no puede comprobarlo, así que no suma puntos ni cuenta en rankings, ligas o temporadas.",
     "aviso": "Epic bloquea las lecturas desde servidores. Se sincroniza con la extensión de Paragon desde tu propio navegador, y el progreso se muestra como declarado: no suma XP ni cuenta en rankings, ligas o temporadas."
+  },
+  "Error": {
+    "titulo": "Algo se ha roto",
+    "texto": "No ha sido cosa tuya — un fallo real en esta página, ya registrado. Puedes intentarlo otra vez o volver a donde estabas.",
+    "referencia": "Referencia:",
+    "reintentar": "Reintentar"
   }
 }

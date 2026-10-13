@@ -272,7 +272,9 @@
       "title": "Subir Avatar",
       "uploadButton": "Subir Avatar",
       "uploading": "Subiendo...",
-      "hint": "Formatos JPG, JPEG, PNG y GIF, hasta 5 MB"
+      "hint": "Formatos JPG, JPEG, PNG y GIF, hasta 5 MB",
+      "errorSubida": "No se pudo subir el archivo.",
+      "usarAvatarDe": "Usar avatar de {plataforma}"
     },
     "banner": {
       "title": "Banner del perfil",

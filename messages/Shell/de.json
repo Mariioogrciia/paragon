@@ -287,7 +287,8 @@
     "editarPanel": "Dashboard bearbeiten",
     "lecturas": "Anzeigen",
     "cabinaPie": "{n, plural, =0 {Alle Module sichtbar} one {# Modul ausgeblendet} other {# Module ausgeblendet}}",
-    "cabinaPieAccion": "Wähle, welche Module du siehst"
+    "cabinaPieAccion": "Wähle, welche Module du siehst",
+    "descargarPng": "Bild herunterladen (PNG)"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Beispielprofil",
@@ -637,5 +638,11 @@
     "etiqueta": "Lokal angegebener Fortschritt",
     "explicacion": "Er wird von deinem Browser gesendet und Paragon kann ihn nicht prüfen – deshalb gibt er keine Punkte und zählt nicht in Ranglisten, Ligen oder Saisons.",
     "aviso": "Epic blockiert Abfragen von Servern. Die Synchronisierung läuft über die Paragon-Erweiterung in deinem eigenen Browser, der Fortschritt gilt als angegeben: kein XP, keine Wertung in Ranglisten, Ligen oder Saisons."
+  },
+  "Error": {
+    "titulo": "Etwas ist kaputtgegangen",
+    "texto": "Das lag nicht an dir — ein echter Fehler auf dieser Seite, bereits protokolliert. Du kannst es erneut versuchen oder zurückgehen.",
+    "referencia": "Referenz:",
+    "reintentar": "Erneut versuchen"
   }
 }

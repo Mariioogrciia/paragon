@@ -204,7 +204,7 @@ export function ProfileForm({
       router.refresh();
     } else {
       const data = await res.json().catch(() => null);
-      setErrorSubida(data?.error ?? "No se pudo subir el archivo.");
+      setErrorSubida(data?.error ?? t("profileForm.avatar.errorSubida"));
     }
     setIsUploading(false);
   };
@@ -230,7 +230,7 @@ export function ProfileForm({
       // Actualizamos el input oculto o directamente dejamos que el form mande la URL (lo haremos con input hidden)
     } else {
       const data = await res.json().catch(() => null);
-      setErrorSubida(data?.error ?? "No se pudo subir el archivo.");
+      setErrorSubida(data?.error ?? t("profileForm.avatar.errorSubida"));
     }
     setIsUploadingBanner(false);
   };
@@ -275,7 +275,7 @@ export function ProfileForm({
                       className={`h-8 w-8 overflow-hidden rounded-full border-2 transition-all hover:scale-110 ${
                         avatar === acc.avatarUrl ? "border-accent" : "border-transparent opacity-70 hover:opacity-100"
                       }`}
-                      title={`Usar avatar de ${acc.platform}`}
+                      title={t("profileForm.avatar.usarAvatarDe", { plataforma: acc.platform })}
                     >
                       <img src={acc.avatarUrl} alt={acc.platform} className="h-full w-full object-cover" />
                     </button>

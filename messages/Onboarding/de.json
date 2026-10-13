@@ -272,7 +272,9 @@
       "title": "Avatar hochladen",
       "uploadButton": "Avatar hochladen",
       "uploading": "Wird hochgeladen...",
-      "hint": "Formate JPG, JPEG, PNG und GIF, bis zu 5 MB"
+      "hint": "Formate JPG, JPEG, PNG und GIF, bis zu 5 MB",
+      "errorSubida": "Datei konnte nicht hochgeladen werden.",
+      "usarAvatarDe": "{plataforma}-Avatar verwenden"
     },
     "banner": {
       "title": "Profilbanner",

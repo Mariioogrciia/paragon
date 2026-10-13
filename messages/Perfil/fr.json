@@ -165,7 +165,11 @@
     "colPuntos": "Points",
     "historialTitulo": "Champions des mois précédents",
     "colDif": "Écart",
-    "lider": "Leader"
+    "lider": "Leader",
+    "desgloseMeta": "Détail des points · Ligue mensuelle · Paragon",
+    "verPerfil": "@{handle} — voir le profil",
+    "puntos": "points",
+    "trofeosSuman": "Trophées qui rapportent des points ce mois-ci"
   },
   "LigaPage": {
     "meta": "Ligue - Paragon",
@@ -667,6 +671,40 @@
     "desde": "depuis le {fecha}",
     "trofeosEnClan": "{n, plural, one {# trophée} other {# trophées}} dans le clan",
     "parte": "{p} % du clan",
-    "nota": "Les trophées d'avant l'arrivée ne comptent pas, ni ceux que la plateforme ne date pas."
+    "nota": "Les trophées d'avant l'arrivée ne comptent pas, ni ceux que la plateforme ne date pas.",
+    "invitacionesTitulo": "Tu as été invité dans un clan",
+    "invitadoPor": " — invité par <b>{nombre}</b>",
+    "unirme": "Rejoindre",
+    "rechazar": "Refuser",
+    "errorInvitacion": "Impossible de traiter l'invitation",
+    "abandonarClan": "Quitter le clan",
+    "unirmeClan": "Rejoindre ce clan",
+    "errorUnirse": "Impossible de rejoindre le clan",
+    "errorSalir": "Impossible de quitter le clan",
+    "invitarAmigos": "Inviter des amis",
+    "sinAmigosInvitar": "Tu n'as aucun ami à inviter pour l'instant — ils sont tous déjà dans un clan, ou tu le leur as déjà demandé.",
+    "invitado": "Invité",
+    "invitar": "Inviter",
+    "errorInvitar": "Impossible d'inviter",
+    "cerrar": "Fermer",
+    "guerra": {
+      "titulo": "Guerre de clans",
+      "terminaHoy": "Se termine aujourd'hui",
+      "quedan": "{n, plural, one {Encore # jour} other {Encore # jours}}",
+      "puntos": "platine 100, or 50, argent 25, bronze 10",
+      "habeisRetado": "Vous avez défié <b>[{tag}] {nombre}</b>. Il manque l'accord de leur chef.",
+      "osReta": "<b>[{tag}] {nombre}</b> vous défie pour {dias} jours de chasse.",
+      "aceptar": "Accepter le défi",
+      "rechazar": "Refuser",
+      "loAceptaLider": "C'est au chef du clan d'accepter.",
+      "explicacion": "Défie un autre clan : pendant {dias} jours, chaque trophée d'un membre rapporte des points à son clan.",
+      "clanARetar": "Clan à défier",
+      "retar": "Défier",
+      "sinRivales": "Il n'y a pas encore d'autres clans à défier.",
+      "anteriores": "Guerres précédentes",
+      "victoria": "Victoire",
+      "derrota": "Défaite",
+      "empate": "Égalité"
+    }
   }
 }

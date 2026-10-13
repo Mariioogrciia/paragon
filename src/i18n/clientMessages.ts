@@ -57,6 +57,7 @@ export const NAMESPACES_CLIENTE = [
   "Shell.BackButton",
   "Shell.ConfirmForm",
   "Shell.CookieBanner",
+  "Shell.Error",
   "Shell.Footer",
   "Shell.Header",
   "Shell.Home",

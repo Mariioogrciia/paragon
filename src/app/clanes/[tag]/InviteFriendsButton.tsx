@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/Avatar";
 import { inviteToClanAction } from "../actions";
 
@@ -13,6 +14,7 @@ interface Friend {
 
 /** Solo la ve el líder del clan — invitar queda restringido a un único rol por ahora. */
 export function InviteFriendsButton({ clanId, friends }: { clanId: string; friends: Friend[] }) {
+  const t = useTranslations("Perfil.ClanPage");
   const [open, setOpen] = useState(false);
   const [invitados, setInvitados] = useState<Set<string>>(new Set());
   const [enviando, setEnviando] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function InviteFriendsButton({ clanId, friends }: { clanId: string; frien
       if (r.error) throw new Error(r.error);
       setInvitados((prev) => new Set(prev).add(friendId));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo invitar");
+      setError(e instanceof Error ? e.message : t("errorInvitar"));
     } finally {
       setEnviando(null);
     }
@@ -38,7 +40,7 @@ export function InviteFriendsButton({ clanId, friends }: { clanId: string; frien
         onClick={() => setOpen(true)}
         className="rounded-[10px] border border-border px-4 py-2 font-bold text-muted transition-colors hover:border-[var(--accent)] hover:text-foreground"
       >
-        Invitar amigos
+        {t("invitarAmigos")}
       </button>
 
       {open && (
@@ -48,7 +50,7 @@ export function InviteFriendsButton({ clanId, friends }: { clanId: string; frien
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold">Invitar amigos</h2>
+              <h2 className="text-xl font-bold">{t("invitarAmigos")}</h2>
               <button onClick={() => setOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-white/10 hover:text-foreground">
                 ✕
               </button>
@@ -62,7 +64,7 @@ export function InviteFriendsButton({ clanId, friends }: { clanId: string; frien
 
             {friends.length === 0 ? (
               <p className="text-sm text-muted">
-                No tienes amigos disponibles para invitar ahora mismo — o ya están todos en un clan, o ya se lo has pedido.
+                {t("sinAmigosInvitar")}
               </p>
             ) : (
               <div className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto">
@@ -77,7 +79,7 @@ export function InviteFriendsButton({ clanId, friends }: { clanId: string; frien
                         disabled={enviando === f.userId || yaInvitado}
                         className="shrink-0 rounded-[10px] bg-accent px-3 py-1.5 text-xs font-bold text-background disabled:opacity-50"
                       >
-                        {yaInvitado ? "Invitado" : enviando === f.userId ? "..." : "Invitar"}
+                        {yaInvitado ? t("invitado") : enviando === f.userId ? "..." : t("invitar")}
                       </button>
                     </div>
                   );

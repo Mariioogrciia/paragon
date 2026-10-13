@@ -287,7 +287,8 @@
     "editarPanel": "Modifier le tableau de bord",
     "lecturas": "Relevés",
     "cabinaPie": "{n, plural, =0 {Tous les modules affichés} one {# module masqué} other {# modules masqués}}",
-    "cabinaPieAccion": "Choisis les modules à afficher"
+    "cabinaPieAccion": "Choisis les modules à afficher",
+    "descargarPng": "Télécharger l'image (PNG)"
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Profil d'exemple",
@@ -637,5 +638,11 @@
     "etiqueta": "Progression déclarée localement",
     "explicacion": "Elle est envoyée par ton navigateur et Paragon ne peut pas la vérifier : elle ne donne donc pas de points et ne compte pas dans les classements, ligues ou saisons.",
     "aviso": "Epic bloque les lectures depuis des serveurs. La synchronisation passe par l’extension Paragon depuis ton propre navigateur et la progression est affichée comme déclarée : pas d’XP ni de comptage dans les classements, ligues ou saisons."
+  },
+  "Error": {
+    "titulo": "Quelque chose a cassé",
+    "texto": "Ce n'est pas ta faute — un vrai bug sur cette page, déjà enregistré. Tu peux réessayer ou revenir où tu étais.",
+    "referencia": "Référence :",
+    "reintentar": "Réessayer"
   }
 }

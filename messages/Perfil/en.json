@@ -165,7 +165,11 @@
     "colPuntos": "Points",
     "historialTitulo": "Champions of past months",
     "colDif": "Gap",
-    "lider": "Leader"
+    "lider": "Leader",
+    "desgloseMeta": "Points breakdown · Monthly League · Paragon",
+    "verPerfil": "@{handle} — view profile",
+    "puntos": "points",
+    "trofeosSuman": "Trophies scoring points this month"
   },
   "LigaPage": {
     "meta": "League - Paragon",
@@ -667,6 +671,40 @@
     "desde": "since {fecha}",
     "trofeosEnClan": "{n, plural, one {# trophy} other {# trophies}} in the clan",
     "parte": "{p}% of the clan",
-    "nota": "Trophies from before joining don't count, nor do the ones the platform doesn't date."
+    "nota": "Trophies from before joining don't count, nor do the ones the platform doesn't date.",
+    "invitacionesTitulo": "You've been invited to a clan",
+    "invitadoPor": " — invited by <b>{nombre}</b>",
+    "unirme": "Join",
+    "rechazar": "Decline",
+    "errorInvitacion": "Couldn't process the invite",
+    "abandonarClan": "Leave clan",
+    "unirmeClan": "Join this clan",
+    "errorUnirse": "Couldn't join the clan",
+    "errorSalir": "Couldn't leave the clan",
+    "invitarAmigos": "Invite friends",
+    "sinAmigosInvitar": "You don't have any friends to invite right now — they're all in a clan already, or you've already asked them.",
+    "invitado": "Invited",
+    "invitar": "Invite",
+    "errorInvitar": "Couldn't send the invite",
+    "cerrar": "Close",
+    "guerra": {
+      "titulo": "Clan war",
+      "terminaHoy": "Ends today",
+      "quedan": "{n, plural, one {# day left} other {# days left}}",
+      "puntos": "platinum 100, gold 50, silver 25, bronze 10",
+      "habeisRetado": "You've challenged <b>[{tag}] {nombre}</b>. Waiting for their leader to accept.",
+      "osReta": "<b>[{tag}] {nombre}</b> challenges you to {dias} days of hunting.",
+      "aceptar": "Accept the challenge",
+      "rechazar": "Decline",
+      "loAceptaLider": "The clan leader has to accept it.",
+      "explicacion": "Challenge another clan: for {dias} days, every trophy any member earns scores points for their clan.",
+      "clanARetar": "Clan to challenge",
+      "retar": "Challenge",
+      "sinRivales": "There are no other clans to challenge yet.",
+      "anteriores": "Past wars",
+      "victoria": "Win",
+      "derrota": "Loss",
+      "empate": "Draw"
+    }
   }
 }

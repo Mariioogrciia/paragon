@@ -67,6 +67,7 @@ import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { ESTILO_REQUISITOS } from "@/lib/level";
+import { tr } from "@/lib/mensajesWeb";
 
 export interface ActionState {
   error?: string;
@@ -139,10 +140,10 @@ export async function chooseHandleAction(
   }
 
   if (await isHandleTaken(handle, userId)) {
-    return { error: "Ese nombre de usuario ya está cogido." };
+    return { error: await tr("Ese nombre de usuario ya está cogido.") };
   }
   const errorOfensivo = errorSiOfensivo(handle);
-  if (errorOfensivo) return { error: errorOfensivo };
+  if (errorOfensivo) return { error: await tr(errorOfensivo) };
 
   await setHandle(userId, handle);
   
@@ -154,7 +155,7 @@ export async function chooseHandleAction(
   
   revalidatePath("/", "layout");
 
-  return { success: `Ahora eres @${handle}.` };
+  return { success: await tr(`Ahora eres @${handle}.`) };
 }
 
 export async function updateProfileAction(
@@ -166,15 +167,15 @@ export async function updateProfileAction(
   const image = String(formData.get("image") ?? "").trim();
 
   if (!name) {
-    return { error: "El nombre a mostrar no puede estar vacío." };
+    return { error: await tr("El nombre a mostrar no puede estar vacío.") };
   }
   const errorOfensivo = errorSiOfensivo(name);
-  if (errorOfensivo) return { error: errorOfensivo };
+  if (errorOfensivo) return { error: await tr(errorOfensivo) };
 
   await setProfileInfo(userId, name, image || null);
   revalidatePath("/", "layout");
 
-  return { success: "Perfil actualizado correctamente." };
+  return { success: await tr("Perfil actualizado correctamente.") };
 }
 
 /* -------------------------------- Bot de Discord -------------------------------- */
@@ -193,20 +194,20 @@ export async function setDiscordDmAction(
   const activar = formData.get("activar") === "true";
 
   if (activar && !(await discordUserIdDe(userId))) {
-    return { error: "Tu cuenta no inició sesión con Discord — sin eso el bot no sabe a quién escribir." };
+    return { error: await tr("Tu cuenta no inició sesión con Discord — sin eso el bot no sabe a quién escribir.") };
   }
 
   await setDiscordDmEnabled(userId, activar);
   revalidatePath("/ajustes");
-  return activar ? { success: "Avisos por Discord activados." } : { success: "Avisos por Discord desactivados." };
+  return activar ? { success: await tr("Avisos por Discord activados.") } : { success: await tr("Avisos por Discord desactivados.") };
 }
 
 export async function probarDiscordDmAction(_prev: ActionState): Promise<ActionState> {
   const userId = await requireUserId();
   const res = await probarDiscordDm(userId);
   return res.ok
-    ? { success: "Mensaje de prueba enviado — revisa tus DMs de Discord." }
-    : { error: res.error ?? "No se pudo enviar." };
+    ? { success: await tr("Mensaje de prueba enviado — revisa tus DMs de Discord.") }
+    : { error: await tr(res.error ?? "No se pudo enviar.") };
 }
 
 /* ------------------------------ Notificaciones push ----------------------------- */
@@ -220,7 +221,7 @@ export async function subscribePushAction(subscription: {
     await guardarSuscripcionPush(userId, subscription);
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "No se pudo guardar." };
+    return { ok: false, error: await tr(error instanceof Error ? error.message : "No se pudo guardar.") };
   }
 }
 
@@ -243,11 +244,11 @@ export async function testPushAction(): Promise<{ ok: boolean; error?: string }>
     // ninguna suscripción — el botón "Probar" decía "enviado" aunque no
     // hubiera llegado a ningún sitio.
     if (resultado.enviados === 0) {
-      return { ok: false, error: resultado.error ?? "No se pudo entregar el aviso." };
+      return { ok: false, error: await tr(resultado.error ?? "No se pudo entregar el aviso.") };
     }
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "No se pudo enviar." };
+    return { ok: false, error: await tr(error instanceof Error ? error.message : "No se pudo enviar.") };
   }
 }
 
@@ -304,19 +305,19 @@ async function linkPlatform(
   const copy = PLATFORM_COPY[platform];
   const input = String(formData.get(copy.field) ?? "").trim();
 
-  if (!input) return { error: copy.missing };
+  if (!input) return { error: await tr(copy.missing) };
 
   try {
     const cuenta = await linkAccount(userId, platform, input);
     revalidatePath("/", "layout");
 
-    if (!cuenta.legible) return { warning: copy.privado(cuenta.username) };
+    if (!cuenta.legible) return { warning: await tr(copy.privado(cuenta.username)) };
 
     return {
-      success: `Vinculado a ${cuenta.username}: ${cuenta.juegos} juegos importados.`,
+      success: await tr(`Vinculado a ${cuenta.username}: ${cuenta.juegos} juegos importados.`),
     };
   } catch (error) {
-    return { error: describeError(error) };
+    return { error: await tr(describeError(error)) };
   }
 }
 
@@ -385,13 +386,13 @@ async function ultimaSincronizacion(
   return fila?.ultimo ? new Date(fila.ultimo) : null;
 }
 
-function esperaRestante(ultimo: Date | null): ActionState | null {
+async function esperaRestante(ultimo: Date | null): Promise<ActionState | null> {
   if (!ultimo) return null;
   const transcurrido = Date.now() - ultimo.getTime();
   if (transcurrido >= SYNC_COOLDOWN_MS) return null;
 
   const segundos = Math.ceil((SYNC_COOLDOWN_MS - transcurrido) / 1000);
-  return { error: `Ya se sincronizó hace muy poco — espera ${segundos}s.` };
+  return { error: await tr(`Ya se sincronizó hace muy poco — espera ${segundos}s.`) };
 }
 
 export async function syncNowAction(
@@ -400,7 +401,7 @@ export async function syncNowAction(
 ): Promise<ActionState> {
   const userId = await requireUserId();
 
-  const espera = esperaRestante(await ultimaSincronizacion(userId));
+  const espera = await esperaRestante(await ultimaSincronizacion(userId));
   if (espera) return espera;
 
   const antes = await contarTrofeos(userId);
@@ -408,7 +409,7 @@ export async function syncNowAction(
   const nuevos = Math.max(0, (await contarTrofeos(userId)) - antes);
   const trofeos = await ultimosTrofeos(userId, nuevos);
   revalidatePath("/", "layout");
-  return { success: "Sincronizado.", trofeos, nuevos };
+  return { success: await tr("Sincronizado."), trofeos, nuevos };
 }
 
 export async function syncPlatformAction(
@@ -418,11 +419,11 @@ export async function syncPlatformAction(
   const userId = await requireUserId();
   const platformInput = String(formData.get("platform"));
   if (!["psn", "steam", "xbox", "epic"].includes(platformInput)) {
-    return { error: "Plataforma no válida." };
+    return { error: await tr("Plataforma no válida.") };
   }
   const platform = platformInput as PlataformaVinculable;
 
-  const espera = esperaRestante(await ultimaSincronizacion(userId, platform));
+  const espera = await esperaRestante(await ultimaSincronizacion(userId, platform));
   if (espera) return espera;
 
   const antes = await contarTrofeos(userId);
@@ -430,7 +431,7 @@ export async function syncPlatformAction(
   const nuevos = Math.max(0, (await contarTrofeos(userId)) - antes);
   const trofeos = await ultimosTrofeos(userId, nuevos);
   revalidatePath("/", "layout");
-  return { success: "Sincronizado.", trofeos, nuevos };
+  return { success: await tr("Sincronizado."), trofeos, nuevos };
 }
 
 /* ------------------------------------ Carpetas ----------------------------------- */
@@ -451,10 +452,10 @@ export async function createCollectionAction(
     if (gameId) await toggleGameInCollection(userId, id, gameId);
 
     revalidatePath("/", "layout");
-    return { success: `Carpeta creada.` };
+    return { success: await tr(`Carpeta creada.`) };
   } catch (error) {
-    if (error instanceof CollectionNameError) return { error: error.message };
-    return { error: "No se ha podido crear la carpeta." };
+    if (error instanceof CollectionNameError) return { error: await tr(error.message) };
+    return { error: await tr("No se ha podido crear la carpeta.") };
   }
 }
 
@@ -487,10 +488,10 @@ export async function renameCollectionAction(_prev: ActionState, formData: FormD
   try {
     await renameCollection(userId, id, name);
     revalidatePath("/", "layout");
-    return { success: "Carpeta renombrada." };
+    return { success: await tr("Carpeta renombrada.") };
   } catch (error) {
-    if (error instanceof CollectionNameError) return { error: error.message };
-    return { error: "No se ha podido renombrar la carpeta." };
+    if (error instanceof CollectionNameError) return { error: await tr(error.message) };
+    return { error: await tr("No se ha podido renombrar la carpeta.") };
   }
 }
 
@@ -507,10 +508,10 @@ export async function createCollectionWithGamesAction(
     const id = await createCollection(userId, name);
     if (gameIds.length > 0) await addGamesToCollection(userId, id, gameIds);
     revalidatePath("/", "layout");
-    return { success: "Carpeta creada." };
+    return { success: await tr("Carpeta creada.") };
   } catch (error) {
-    if (error instanceof CollectionNameError) return { error: error.message };
-    return { error: "No se ha podido crear la carpeta." };
+    if (error instanceof CollectionNameError) return { error: await tr(error.message) };
+    return { error: await tr("No se ha podido crear la carpeta.") };
   }
 }
 
@@ -563,10 +564,10 @@ export async function moveGameToNewCollectionAction(
     const toCollectionId = await createCollection(userId, name);
     await moveGameToCollection(userId, fromCollectionId, toCollectionId, gameId);
     revalidatePath("/", "layout");
-    return { success: `Movido a «${name}».` };
+    return { success: await tr(`Movido a «${name}».`) };
   } catch (error) {
-    if (error instanceof CollectionNameError) return { error: error.message };
-    return { error: "No se ha podido mover el juego." };
+    if (error instanceof CollectionNameError) return { error: await tr(error.message) };
+    return { error: await tr("No se ha podido mover el juego.") };
   }
 }
 
@@ -582,17 +583,19 @@ export async function addFriendAction(
     .toLowerCase()
     .replace(/^@/, "");
 
-  if (!handle) return { error: "Escribe el usuario de tu amigo." };
+  if (!handle) return { error: await tr("Escribe el usuario de tu amigo.") };
 
   const result = await sendFriendRequest(userId, handle);
-  if (!result.ok) return { error: result.error };
+  if (!result.ok) return { error: await tr(result.error) };
 
   revalidatePath("/amigos");
 
   return {
-    success: result.accepted
-      ? `Ya sois amigos: @${handle} te había enviado una solicitud.`
-      : `Solicitud enviada a @${handle}.`,
+    success: await tr(
+      result.accepted
+        ? `Ya sois amigos: @${handle} te había enviado una solicitud.`
+        : `Solicitud enviada a @${handle}.`,
+    ),
   };
 }
 
@@ -615,7 +618,7 @@ export async function sendFriendRequestFromProfileAction(
 ): Promise<{ ok: boolean; error?: string }> {
   const userId = await requireUserId();
   const result = await sendFriendRequest(userId, handle);
-  if (!result.ok) return { ok: false, error: result.error };
+  if (!result.ok) return { ok: false, error: await tr(result.error) };
 
   revalidatePath(profilePath);
   revalidatePath("/amigos");
@@ -811,14 +814,14 @@ export async function toggleActivityReactionAction(formData: FormData): Promise<
 export async function publicarEstadoAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId();
   const texto = String(formData.get("texto") ?? "").trim().slice(0, 280);
-  if (!texto) return { error: "Escribe algo antes de publicar." };
+  if (!texto) return { error: await tr("Escribe algo antes de publicar.") };
   const errorOfensivo = errorSiOfensivo(texto);
-  if (errorOfensivo) return { error: errorOfensivo };
-  if (!(await limitar("estado", userId))) return { error: "Has publicado mucho seguido. Espera unos minutos." };
+  if (errorOfensivo) return { error: await tr(errorOfensivo) };
+  if (!(await limitar("estado", userId))) return { error: await tr("Has publicado mucho seguido. Espera unos minutos.") };
 
   await getDb().insert(activities).values({ id: crypto.randomUUID(), userId, type: "status", review: texto });
   revalidatePath("/feed");
-  return { success: "Publicado." };
+  return { success: await tr("Publicado.") };
 }
 
 /** Solo el autor, y solo sus estados (lo demás sale de la actividad real y no se borra desde aquí). */
@@ -989,10 +992,10 @@ export async function addManualGameAction(input: AddManualGameInput): Promise<Ac
   const userId = await requireUserId();
 
   if (!input.title.trim() || !Number.isFinite(input.igdbId)) {
-    return { error: "Elige un juego de los resultados de búsqueda." };
+    return { error: await tr("Elige un juego de los resultados de búsqueda.") };
   }
   if (!input.deviceLabel.trim()) {
-    return { error: "Di en qué lo has jugado (Switch, PS1, retro...)." };
+    return { error: await tr("Di en qué lo has jugado (Switch, PS1, retro...).") };
   }
 
   await addManualGame(userId, {
@@ -1002,14 +1005,14 @@ export async function addManualGameAction(input: AddManualGameInput): Promise<Ac
 
   revalidatePath("/", "layout");
 
-  return { success: `${input.title} añadido a tu biblioteca.` };
+  return { success: await tr(`${input.title} añadido a tu biblioteca.`) };
 }
 
 export async function addToWishlistAction(input: AddManualGameInput): Promise<ActionState> {
   const userId = await requireUserId();
 
   if (!input.title.trim() || !Number.isFinite(input.igdbId)) {
-    return { error: "Elige un juego de los resultados." };
+    return { error: await tr("Elige un juego de los resultados.") };
   }
 
   await addManualGame(userId, {
@@ -1019,7 +1022,7 @@ export async function addToWishlistAction(input: AddManualGameInput): Promise<Ac
 
   revalidatePath("/", "layout");
 
-  return { success: `${input.title} añadido a tu lista de deseados.` };
+  return { success: await tr(`${input.title} añadido a tu lista de deseados.`) };
 }
 
 export async function setManualGameCompletedAction(gameId: string, completed: boolean): Promise<void> {
@@ -1203,7 +1206,7 @@ export async function pinTrophyAction(gameId: string, trophyId: string) {
     showcase = showcase.filter((_, i) => i !== existingIndex);
   } else {
     if (showcase.length >= 3) {
-      return { error: "Solo puedes fijar un máximo de 3 trofeos." };
+      return { error: await tr("Solo puedes fijar un máximo de 3 trofeos.") };
     }
     showcase.push({ gameId, trophyId });
   }
@@ -1231,10 +1234,10 @@ export async function actualizarContadorManualAction(
   const userId = await requireUserId();
 
   if (target != null && (!Number.isFinite(target) || target <= 0)) {
-    return { error: "La meta tiene que ser un número mayor que 0." };
+    return { error: await tr("La meta tiene que ser un número mayor que 0.") };
   }
   if (!Number.isFinite(current) || current < 0) {
-    return { error: "El contador no puede ser negativo." };
+    return { error: await tr("El contador no puede ser negativo.") };
   }
 
   await setManualTrophyProgress(userId, gameId, trophyId, Math.round(current), target != null ? Math.round(target) : null);
@@ -1250,20 +1253,20 @@ const GUIA_MAX_RESPUESTA = 2_000;
 
 export async function createGuideAction(gameId: string, title: string, body: string): Promise<{ error?: string; id?: string }> {
   const userId = await requireUserId();
-  if (!(await limitar("comentario", userId))) return { error: "Has publicado mucho seguido. Espera un momento." };
+  if (!(await limitar("comentario", userId))) return { error: await tr("Has publicado mucho seguido. Espera un momento.") };
 
   const tituloLimpio = title.trim();
   const textoLimpio = body.trim();
   if (!tituloLimpio || !textoLimpio) {
-    return { error: "Ponle un título y algo de texto." };
+    return { error: await tr("Ponle un título y algo de texto.") };
   }
   // Sin tope, una guía podía ocupar lo que dejara el cuerpo de la petición
   // (~1 MB) — y se pinta entera en la página de guías.
   if (tituloLimpio.length > GUIA_MAX_TITULO || textoLimpio.length > GUIA_MAX_TEXTO) {
-    return { error: `Como mucho ${GUIA_MAX_TITULO} caracteres de título y ${GUIA_MAX_TEXTO} de texto.` };
+    return { error: await tr(`Como mucho ${GUIA_MAX_TITULO} caracteres de título y ${GUIA_MAX_TEXTO} de texto.`) };
   }
   if (contieneLenguajeOfensivo(tituloLimpio) || contieneLenguajeOfensivo(textoLimpio)) {
-    return { error: "Esa guía contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo." };
+    return { error: await tr("Esa guía contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo.") };
   }
 
   const id = await createGuide(userId, gameId, tituloLimpio, textoLimpio);
@@ -1273,13 +1276,13 @@ export async function createGuideAction(gameId: string, title: string, body: str
 
 export async function replyToGuideAction(guideId: string, gameId: string, body: string): Promise<{ error?: string }> {
   const userId = await requireUserId();
-  if (!(await limitar("comentario", userId))) return { error: "Has respondido mucho seguido. Espera un momento." };
+  if (!(await limitar("comentario", userId))) return { error: await tr("Has respondido mucho seguido. Espera un momento.") };
 
   const textoLimpio = body.trim();
-  if (!textoLimpio) return { error: "Escribe algo antes de responder." };
-  if (textoLimpio.length > GUIA_MAX_RESPUESTA) return { error: `Como mucho ${GUIA_MAX_RESPUESTA} caracteres.` };
+  if (!textoLimpio) return { error: await tr("Escribe algo antes de responder.") };
+  if (textoLimpio.length > GUIA_MAX_RESPUESTA) return { error: await tr(`Como mucho ${GUIA_MAX_RESPUESTA} caracteres.`) };
   if (contieneLenguajeOfensivo(textoLimpio)) {
-    return { error: "Esa respuesta contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo." };
+    return { error: await tr("Esa respuesta contiene lenguaje ofensivo — cámbiala e inténtalo de nuevo.") };
   }
 
   await replyToGuide(userId, guideId, textoLimpio);
@@ -1307,7 +1310,7 @@ export async function saveTrophyGuideAction(_prev: ActionState, formData: FormDa
   const trophyId = String(formData.get("trophyId") ?? "");
   const body = String(formData.get("body") ?? "");
 
-  if (!gameId || !trophyId) return { error: "Falta el trofeo." };
+  if (!gameId || !trophyId) return { error: await tr("Falta el trofeo.") };
 
   const db = getDb();
   const [dbUser] = await db.select({ language: users.language }).from(users).where(eq(users.id, userId)).limit(1);
@@ -1316,10 +1319,10 @@ export async function saveTrophyGuideAction(_prev: ActionState, formData: FormDa
   try {
     await upsertTrophyGuide(userId, gameId, trophyId, body, idioma);
     revalidatePath(`/juego/${gameId}`);
-    return { success: "Guía publicada." };
+    return { success: await tr("Guía publicada.") };
   } catch (error) {
-    if (error instanceof TrophyGuideError) return { error: error.message };
-    return { error: "No se ha podido guardar la guía." };
+    if (error instanceof TrophyGuideError) return { error: await tr(error.message) };
+    return { error: await tr("No se ha podido guardar la guía.") };
   }
 }
 
@@ -1506,10 +1509,10 @@ export async function actualizarAdquisicionAction(
   const userId = await requireUserId();
 
   if (format != null && !FORMATOS_ADQUISICION.includes(format as (typeof FORMATOS_ADQUISICION)[number])) {
-    return { error: "Formato no válido." };
+    return { error: await tr("Formato no válido.") };
   }
   if (price != null && (!Number.isFinite(price) || price < 0)) {
-    return { error: "El precio no puede ser negativo." };
+    return { error: await tr("El precio no puede ser negativo.") };
   }
 
   const db = getDb();
@@ -1537,10 +1540,10 @@ export async function createLeagueAction(_prev: ActionState, formData: FormData)
   const duration = durationValue > 0 && durationUnit ? { value: durationValue, unit: durationUnit } : undefined;
 
   const errorOfensivo = errorSiOfensivo(name);
-  if (errorOfensivo) return { error: errorOfensivo };
+  if (errorOfensivo) return { error: await tr(errorOfensivo) };
 
   const league = await createLeague(userId, name, duration);
-  if (!league) return { error: "Ponle un nombre a la liga." };
+  if (!league) return { error: await tr("Ponle un nombre a la liga.") };
 
   revalidatePath("/ligas");
   redirect(`/ligas/${league.id}`);
@@ -1629,8 +1632,8 @@ export async function guardarAlertaPrecioAction(
   precio: number,
 ): Promise<{ error?: string }> {
   const userId = await requireUserId();
-  if (!/^\d{1,10}$/.test(steamAppId) || !gameId || gameId.length > 100) return { error: "Juego no válido." };
-  if (!Number.isFinite(precio) || precio < 0.01 || precio > 999) return { error: "Pon un precio entre 0,01 y 999 €." };
+  if (!/^\d{1,10}$/.test(steamAppId) || !gameId || gameId.length > 100) return { error: await tr("Juego no válido.") };
+  if (!Number.isFinite(precio) || precio < 0.01 || precio > 999) return { error: await tr("Pon un precio entre 0,01 y 999 €.") };
   await guardarAlertaPrecio(userId, {
     steamAppId,
     gameId,
@@ -1673,13 +1676,13 @@ export async function crearSesionAction(datos: {
   plazasTotales: number;
 }): Promise<{ error?: string; id?: string }> {
   const userId = await requireUserId();
-  if (!(await limitar("comentario", userId))) return { error: "Espera un momento antes de crear otra sesión." };
+  if (!(await limitar("comentario", userId))) return { error: await tr("Espera un momento antes de crear otra sesión.") };
   try {
     const id = await crearSesion(userId, { ...datos, fechaHora: new Date(datos.fechaHora) });
     revalidatePath("/sesiones");
     return { id };
   } catch (e) {
-    if (e instanceof SesionError) return { error: e.message };
+    if (e instanceof SesionError) return { error: await tr(e.message) };
     throw e;
   }
 }
@@ -1696,7 +1699,7 @@ export async function apuntarseSesionAction(sessionId: string, apuntar: boolean)
     if (apuntar) await apuntarse(userId, sessionId);
     else await salirse(userId, sessionId);
   } catch (e) {
-    if (e instanceof SesionError) return { error: e.message };
+    if (e instanceof SesionError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/sesiones");
@@ -1709,7 +1712,7 @@ export async function cancelarSesionAction(sessionId: string): Promise<{ error?:
   try {
     await cancelarSesion(userId, sessionId);
   } catch (e) {
-    if (e instanceof SesionError) return { error: e.message };
+    if (e instanceof SesionError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/sesiones");
@@ -1727,11 +1730,11 @@ export async function proponerRetoAction(datos: {
   fecha: string;
 }): Promise<{ error?: string }> {
   const userId = await requireUserId();
-  if (!(await limitar("comentario", userId))) return { error: "Espera un momento antes de proponer otro reto." };
+  if (!(await limitar("comentario", userId))) return { error: await tr("Espera un momento antes de proponer otro reto.") };
   try {
     await proponerReto(userId, datos);
   } catch (e) {
-    if (e instanceof CoopError) return { error: e.message };
+    if (e instanceof CoopError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/amigos");
@@ -1743,7 +1746,7 @@ export async function responderRetoAction(retoId: string, aceptar: boolean): Pro
   try {
     await responderReto(userId, retoId, aceptar);
   } catch (e) {
-    if (e instanceof CoopError) return { error: e.message };
+    if (e instanceof CoopError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/amigos");
@@ -1803,7 +1806,7 @@ export async function crearVitrinaAction(datos: {
   try {
     await crearVitrina(userId, datos);
   } catch (e) {
-    if (e instanceof VitrinaError) return { error: e.message };
+    if (e instanceof VitrinaError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/", "layout");

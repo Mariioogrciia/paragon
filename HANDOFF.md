@@ -16,10 +16,22 @@ releer todo el historial. Última actualización: **13 de octubre de 2026**.
   `kmp/shared/src/commonTest`, más los nuevos del lector de QR) antes de la
   APK; si falla uno, no sale APK y se sube `informe-tests-app`. Comprobaciones
   de la web ejecuta también `comprobar-namespaces-cliente.mts`.
-- Pendiente de la auditoría (por orden): traducir los ~32 errores de `actions.ts` y los textos
-  a mano de ~10 componentes (clanes, guerra, páginas de error, liga mensual);
-  iOS sin push ni widget (y `ManejadorAtras` vacío en iOS); firma de
-  publicación para tiendas (Android solo debug, iOS versión 0.1).
+- **Web traducida del todo**: los `{ error, warning, success }` de las server
+  actions (`app/actions.ts`, `app/clanes/actions.ts`) pasan por
+  `tr()` (`lib/mensajesWeb.ts`), que usa la misma tabla que la API móvil
+  (`lib/mensajesApi.ts`, ~60 textos y ~15 patrones nuevos: vincular cuenta,
+  carpetas, guías, Discord, push...). Los códigos en minúscula ("sesion",
+  "limite"...) no se tocan: el cliente los convierte. Al añadir un mensaje
+  nuevo a una acción, añadirlo también a `FIJOS`/`PATRONES`. Textos a mano
+  pasados a `messages/`: invitaciones, acciones y guerra de clanes
+  (`Perfil.ClanPage`), desglose de la liga mensual (`Perfil.LigasPage`),
+  `error.tsx` (`Shell.Error`), y detalles de CardBuilder, ProfileForm y
+  LanguageSwitcher. `global-error.tsx` lleva sus textos en los 4 idiomas
+  dentro del archivo (sin next-intl: su proveedor es lo que ha caído) y elige
+  por el idioma del navegador. App: "platinos" de Comparar, traducido.
+- Pendiente de la auditoría: iOS sin push ni widget (y `ManejadorAtras`
+  vacío en iOS); firma de publicación para tiendas (Android solo debug, iOS
+  versión 0.1).
 
 **9 oct — perfil completo en la app y el mes día a día contra otro:**
 - **Perfil de verdad** (`ui/perfil/PerfilUsuarioScreen.kt`, ruta

@@ -165,7 +165,11 @@
     "colPuntos": "Puntos",
     "historialTitulo": "Campeones de meses anteriores",
     "colDif": "Dif.",
-    "lider": "Líder"
+    "lider": "Líder",
+    "desgloseMeta": "Desglose de puntos · Liga Mensual · Paragon",
+    "verPerfil": "@{handle} — ver perfil",
+    "puntos": "puntos",
+    "trofeosSuman": "Trofeos que suman puntos este mes"
   },
   "LigaPage": {
     "meta": "Liga - Paragon",
@@ -667,6 +671,40 @@
     "desde": "desde {fecha}",
     "trofeosEnClan": "{n, plural, one {# trofeo} other {# trofeos}} en el clan",
     "parte": "{p} % del clan",
-    "nota": "Los trofeos de antes de entrar no cuentan, y tampoco los que la plataforma no fecha."
+    "nota": "Los trofeos de antes de entrar no cuentan, y tampoco los que la plataforma no fecha.",
+    "invitacionesTitulo": "Te han invitado a un clan",
+    "invitadoPor": " — invitado por <b>{nombre}</b>",
+    "unirme": "Unirme",
+    "rechazar": "Rechazar",
+    "errorInvitacion": "No se pudo procesar la invitación",
+    "abandonarClan": "Abandonar clan",
+    "unirmeClan": "Unirme a este clan",
+    "errorUnirse": "No se pudo unir al clan",
+    "errorSalir": "No se pudo salir del clan",
+    "invitarAmigos": "Invitar amigos",
+    "sinAmigosInvitar": "No tienes amigos disponibles para invitar ahora mismo — o ya están todos en un clan, o ya se lo has pedido.",
+    "invitado": "Invitado",
+    "invitar": "Invitar",
+    "errorInvitar": "No se pudo invitar",
+    "cerrar": "Cerrar",
+    "guerra": {
+      "titulo": "Guerra de clanes",
+      "terminaHoy": "Termina hoy",
+      "quedan": "{n, plural, one {Queda # día} other {Quedan # días}}",
+      "puntos": "platino 100, oro 50, plata 25, bronce 10",
+      "habeisRetado": "Habéis retado a <b>[{tag}] {nombre}</b>. Falta que su líder acepte.",
+      "osReta": "<b>[{tag}] {nombre}</b> os reta a {dias} días de caza.",
+      "aceptar": "Aceptar el reto",
+      "rechazar": "Rechazar",
+      "loAceptaLider": "Lo tiene que aceptar el líder del clan.",
+      "explicacion": "Reta a otro clan: durante {dias} días, cada trofeo de cualquier miembro suma puntos para el suyo.",
+      "clanARetar": "Clan al que retar",
+      "retar": "Retar",
+      "sinRivales": "Todavía no hay otros clanes a los que retar.",
+      "anteriores": "Guerras anteriores",
+      "victoria": "Victoria",
+      "derrota": "Derrota",
+      "empate": "Empate"
+    }
   }
 }

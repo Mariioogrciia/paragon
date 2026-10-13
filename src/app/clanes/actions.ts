@@ -2,6 +2,7 @@
 import { auth } from "@/auth";
 import { createClan, joinClan, leaveClan, getUserClan, inviteToClan, acceptClanInvite, declineClanInvite, setClanEmblema, ClanError, editarClan, cambiarRango, expulsarDelClan } from "@/lib/clans";
 import { RANGOS, type Rango } from "@/lib/clanRangos";
+import { tr } from "@/lib/mensajesWeb";
 
 type Resultado = { error?: string };
 
@@ -15,7 +16,7 @@ async function comoResultado(accion: () => Promise<unknown>): Promise<Resultado>
     await accion();
     return {};
   } catch (e) {
-    if (e instanceof ClanError) return { error: e.message };
+    if (e instanceof ClanError) return { error: await tr(e.message) };
     throw e;
   }
 }
@@ -58,7 +59,7 @@ export async function createClanAction(formData: FormData) {
 
 export async function joinClanAction(clanId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
   const userId = session.user.id;
 
   const r = await comoResultado(() => joinClan(userId, clanId));
@@ -81,7 +82,7 @@ export async function leaveClanAction(clanId: string) {
 
 export async function inviteToClanAction(clanId: string, invitedUserId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
   const userId = session.user.id;
 
   const r = await comoResultado(() => inviteToClan(clanId, userId, invitedUserId));
@@ -91,7 +92,7 @@ export async function inviteToClanAction(clanId: string, invitedUserId: string):
 
 export async function acceptClanInviteAction(clanId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
   const userId = session.user.id;
 
   const r = await comoResultado(() => acceptClanInvite(userId, clanId));
@@ -115,12 +116,12 @@ export async function declineClanInviteAction(clanId: string) {
 /** Ver lib/clanWars.ts. Devuelve el error como texto (los errores de reglas no son fallos). */
 export async function retarClanAction(retadorId: string, retadoId: string): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
-  if (!(await limitar("comentario", session.user.id))) return { error: "Espera un momento antes de volver a intentarlo." };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
+  if (!(await limitar("comentario", session.user.id))) return { error: await tr("Espera un momento antes de volver a intentarlo.") };
   try {
     await retarClan(session.user.id, retadorId, retadoId);
   } catch (e) {
-    if (e instanceof GuerraError) return { error: e.message };
+    if (e instanceof GuerraError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/clanes", "layout");
@@ -129,11 +130,11 @@ export async function retarClanAction(retadorId: string, retadoId: string): Prom
 
 export async function responderGuerraAction(guerraId: string, aceptar: boolean): Promise<{ error?: string }> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
   try {
     await responderGuerra(session.user.id, guerraId, aceptar);
   } catch (e) {
-    if (e instanceof GuerraError) return { error: e.message };
+    if (e instanceof GuerraError) return { error: await tr(e.message) };
     throw e;
   }
   revalidatePath("/clanes", "layout");
@@ -156,7 +157,7 @@ export async function setEmblemaAction(clanId: string, emblema: string): Promise
 /** Nombre y descripción (líder y colíderes). */
 export async function editarClanAction(clanId: string, name: string, description: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
   const userId = session.user.id;
   const r = await comoResultado(() => editarClan(userId, clanId, { name, description }));
   if (!r.error) revalidatePath("/clanes", "layout");
@@ -166,8 +167,8 @@ export async function editarClanAction(clanId: string, name: string, description
 /** Ascender, degradar o pasar el liderazgo ("owner"). */
 export async function cambiarRangoAction(clanId: string, objetivoId: string, rango: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
-  if (!(RANGOS as readonly string[]).includes(rango)) return { error: "Rango no válido" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
+  if (!(RANGOS as readonly string[]).includes(rango)) return { error: await tr("Rango no válido") };
   const userId = session.user.id;
   const r = await comoResultado(() => cambiarRango(userId, clanId, objetivoId, rango as Rango));
   if (!r.error) revalidatePath("/clanes", "layout");
@@ -176,7 +177,7 @@ export async function cambiarRangoAction(clanId: string, objetivoId: string, ran
 
 export async function expulsarAction(clanId: string, objetivoId: string): Promise<Resultado> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "No autenticado" };
+  if (!session?.user?.id) return { error: await tr("No autenticado") };
   const userId = session.user.id;
   const r = await comoResultado(() => expulsarDelClan(userId, clanId, objetivoId));
   if (!r.error) revalidatePath("/clanes", "layout");

@@ -263,7 +263,7 @@ private fun RowScope.CompareColumn(label: String, side: CompareSide, destacado: 
         Text(text = Textos.t(T.comun_nivel_n, side.level), color = Muted, fontSize = 12.sp)
         Spacer(Modifier.height(10.dp))
         Text(text = side.platinos.toString(), color = Platinum, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-        Text(text = "platinos", color = Muted, fontSize = 11.sp)
+        Text(text = Textos.t(T.comun_platinos), color = Muted, fontSize = 11.sp)
         Spacer(Modifier.height(6.dp))
         Text(text = Textos.t(T.comparar_trofeos_juegos, side.trofeos, side.juegos), color = Muted, fontSize = 11.sp)
     }

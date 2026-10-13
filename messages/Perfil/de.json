@@ -165,7 +165,11 @@
     "colPuntos": "Punkte",
     "historialTitulo": "Champions der letzten Monate",
     "colDif": "Abst.",
-    "lider": "Führung"
+    "lider": "Führung",
+    "desgloseMeta": "Punkteaufschlüsselung · Monatsliga · Paragon",
+    "verPerfil": "@{handle} — Profil ansehen",
+    "puntos": "Punkte",
+    "trofeosSuman": "Trophäen, die diesen Monat Punkte bringen"
   },
   "LigaPage": {
     "meta": "Liga - Paragon",
@@ -667,6 +671,40 @@
     "desde": "seit {fecha}",
     "trofeosEnClan": "{n, plural, one {# Trophäe} other {# Trophäen}} im Clan",
     "parte": "{p} % des Clans",
-    "nota": "Trophäen von vor dem Beitritt zählen nicht, ebenso wenig solche ohne Datum der Plattform."
+    "nota": "Trophäen von vor dem Beitritt zählen nicht, ebenso wenig solche ohne Datum der Plattform.",
+    "invitacionesTitulo": "Du wurdest in einen Clan eingeladen",
+    "invitadoPor": " — eingeladen von <b>{nombre}</b>",
+    "unirme": "Beitreten",
+    "rechazar": "Ablehnen",
+    "errorInvitacion": "Einladung konnte nicht verarbeitet werden",
+    "abandonarClan": "Clan verlassen",
+    "unirmeClan": "Diesem Clan beitreten",
+    "errorUnirse": "Beitritt zum Clan fehlgeschlagen",
+    "errorSalir": "Clan konnte nicht verlassen werden",
+    "invitarAmigos": "Freunde einladen",
+    "sinAmigosInvitar": "Gerade kannst du keine Freunde einladen — sie sind alle schon in einem Clan oder du hast sie schon gefragt.",
+    "invitado": "Eingeladen",
+    "invitar": "Einladen",
+    "errorInvitar": "Einladung fehlgeschlagen",
+    "cerrar": "Schließen",
+    "guerra": {
+      "titulo": "Clan-Krieg",
+      "terminaHoy": "Endet heute",
+      "quedan": "{n, plural, one {Noch # Tag} other {Noch # Tage}}",
+      "puntos": "Platin 100, Gold 50, Silber 25, Bronze 10",
+      "habeisRetado": "Ihr habt <b>[{tag}] {nombre}</b> herausgefordert. Ihr Anführer muss noch annehmen.",
+      "osReta": "<b>[{tag}] {nombre}</b> fordert euch zu {dias} Tagen Jagd heraus.",
+      "aceptar": "Herausforderung annehmen",
+      "rechazar": "Ablehnen",
+      "loAceptaLider": "Die Clan-Leitung muss annehmen.",
+      "explicacion": "Fordere einen anderen Clan heraus: {dias} Tage lang bringt jede Trophäe eines Mitglieds Punkte für seinen Clan.",
+      "clanARetar": "Herauszufordernder Clan",
+      "retar": "Herausfordern",
+      "sinRivales": "Es gibt noch keine anderen Clans zum Herausfordern.",
+      "anteriores": "Frühere Kriege",
+      "victoria": "Sieg",
+      "derrota": "Niederlage",
+      "empate": "Unentschieden"
+    }
   }
 }

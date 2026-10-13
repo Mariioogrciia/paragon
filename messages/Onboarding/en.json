@@ -272,7 +272,9 @@
       "title": "Upload Avatar",
       "uploadButton": "Upload Avatar",
       "uploading": "Uploading...",
-      "hint": "JPG, JPEG, PNG and GIF formats, up to 5 MB"
+      "hint": "JPG, JPEG, PNG and GIF formats, up to 5 MB",
+      "errorSubida": "Couldn't upload the file.",
+      "usarAvatarDe": "Use {plataforma} avatar"
     },
     "banner": {
       "title": "Profile banner",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 /**
  * Solo se dispara si falla el propio layout raíz (sesión, `<html>`, lo que
@@ -10,7 +10,25 @@ import { useEffect, useState } from "react";
  * nada del árbol normal (ni Header, ni ThemeProvider, ni las variables de
  * `globals.css`): si el layout raíz reventó, no hay garantía de que nada
  * de eso esté disponible. Estilos en línea a propósito, no clases.
+ *
+ * Tampoco hay next-intl aquí (su proveedor vive en el layout que ha
+ * reventado): los textos van en los 4 idiomas en este mismo archivo y se
+ * elige por el idioma del navegador.
  */
+const TEXTOS = {
+  es: { titulo: "Paragon se ha caído", texto: "Un fallo grave impidió cargar la app entera, no solo esta página. Ya ha quedado registrado.", referencia: "Referencia:", reintentar: "Reintentar", inicio: "Ir al inicio" },
+  en: { titulo: "Paragon is down", texto: "A serious error stopped the whole app from loading, not just this page. It's already been logged.", referencia: "Reference:", reintentar: "Try again", inicio: "Go home" },
+  de: { titulo: "Paragon ist ausgefallen", texto: "Ein schwerer Fehler hat das Laden der ganzen App verhindert, nicht nur dieser Seite. Er wurde bereits protokolliert.", referencia: "Referenz:", reintentar: "Erneut versuchen", inicio: "Zur Startseite" },
+  fr: { titulo: "Paragon est en panne", texto: "Une erreur grave a empêché toute l'application de se charger, pas seulement cette page. Elle a déjà été enregistrée.", referencia: "Référence :", reintentar: "Réessayer", inicio: "Aller à l'accueil" },
+};
+type IdiomaError = keyof typeof TEXTOS;
+
+const sinSuscripcion = () => () => {};
+function idiomaNavegador(): IdiomaError {
+  const nav = (navigator.language || "es").slice(0, 2);
+  return nav in TEXTOS ? (nav as IdiomaError) : "es";
+}
+
 export default function GlobalError({
   error,
   reset,
@@ -30,9 +48,11 @@ export default function GlobalError({
   // "todo se rompió".
   const [hoverReintentar, setHoverReintentar] = useState(false);
   const [hoverInicio, setHoverInicio] = useState(false);
+  const idioma = useSyncExternalStore(sinSuscripcion, idiomaNavegador, () => "es" as IdiomaError);
+  const tx = TEXTOS[idioma];
 
   return (
-    <html lang="es">
+    <html lang={idioma}>
       <body
         style={{
           margin: 0,
@@ -49,14 +69,11 @@ export default function GlobalError({
           fontFamily: "system-ui, -apple-system, sans-serif",
         }}
       >
-        <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Paragon se ha caído</h1>
-        <p style={{ maxWidth: 420, color: "#9aa0ac", margin: 0 }}>
-          Un fallo grave impidió cargar la app entera, no solo esta página. Ya ha quedado
-          registrado.
-        </p>
+        <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>{tx.titulo}</h1>
+        <p style={{ maxWidth: 420, color: "#9aa0ac", margin: 0 }}>{tx.texto}</p>
         {error.digest && (
           <p style={{ fontSize: 12, color: "#6b7280", margin: 0 }}>
-            Referencia: <span style={{ fontFamily: "monospace" }}>{error.digest}</span>
+            {tx.referencia} <span style={{ fontFamily: "monospace" }}>{error.digest}</span>
           </p>
         )}
         <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
@@ -74,7 +91,7 @@ export default function GlobalError({
               cursor: "pointer",
             }}
           >
-            Reintentar
+            {tx.reintentar}
           </button>
           {/* <a> y no <Link> a propósito: global-error sustituye al layout
               raíz entero, y una recarga completa es justo lo que hace falta
@@ -94,7 +111,7 @@ export default function GlobalError({
               textDecoration: "none",
             }}
           >
-            Ir al inicio
+            {tx.inicio}
           </a>
         </div>
       </body>

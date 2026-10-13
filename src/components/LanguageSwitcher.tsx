@@ -30,6 +30,13 @@ const FALLO: Record<string, string> = {
   fr: "Échec du changement. Réessaie.",
 };
 
+const CAMBIAR_IDIOMA: Record<string, string> = {
+  es: "Cambiar idioma",
+  en: "Change language",
+  de: "Sprache ändern",
+  fr: "Changer de langue",
+};
+
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -94,8 +101,8 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
         disabled={isPending}
         className="flex items-center justify-center h-9 w-9 rounded-full transition-colors hover:text-foreground disabled:opacity-60"
         style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
-        title="Cambiar idioma"
-        aria-label="Cambiar idioma"
+        title={CAMBIAR_IDIOMA[currentLocale] ?? CAMBIAR_IDIOMA.es}
+        aria-label={CAMBIAR_IDIOMA[currentLocale] ?? CAMBIAR_IDIOMA.es}
       >
         {isPending ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">

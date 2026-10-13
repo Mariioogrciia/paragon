@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { BackButton } from "@/components/BackButton";
 
 /**
@@ -24,6 +25,7 @@ export default function ErrorBoundary({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Shell.Error");
   useEffect(() => {
     console.error("[error.tsx]", error);
   }, [error]);
@@ -46,14 +48,11 @@ export default function ErrorBoundary({
           <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
         </svg>
       </div>
-      <h1 className="font-heading mb-2 text-3xl font-bold uppercase">Algo se ha roto</h1>
-      <p className="max-w-md text-muted">
-        No ha sido cosa tuya — un fallo real en esta página, ya registrado.
-        Puedes intentarlo otra vez o volver a donde estabas.
-      </p>
+      <h1 className="font-heading mb-2 text-3xl font-bold uppercase">{t("titulo")}</h1>
+      <p className="max-w-md text-muted">{t("texto")}</p>
       {error.digest && (
         <p className="mt-2 text-xs text-muted/60">
-          Referencia: <span className="font-mono">{error.digest}</span>
+          {t("referencia")} <span className="font-mono">{error.digest}</span>
         </p>
       )}
       <div className="mt-8 flex items-center gap-3">
@@ -62,7 +61,7 @@ export default function ErrorBoundary({
           className="rounded-lg px-6 py-2.5 font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-lg"
           style={{ background: "var(--accent-grad)" }}
         >
-          Reintentar
+          {t("reintentar")}
         </button>
         <BackButton fallbackHref="/" className="mb-0" />
       </div>

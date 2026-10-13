@@ -27,7 +27,7 @@ export function ClanActions({ clanId, amIMember, amIOwner, otroClan, sucesor }: 
       const r = await joinClanAction(clanId);
       if (r.error) setError(r.error);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al unirse");
+      setError(e instanceof Error ? e.message : t("errorUnirse"));
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ export function ClanActions({ clanId, amIMember, amIOwner, otroClan, sucesor }: 
     try {
       await leaveClanAction(clanId);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al salir");
+      setError(e instanceof Error ? e.message : t("errorSalir"));
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export function ClanActions({ clanId, amIMember, amIOwner, otroClan, sucesor }: 
           disabled={loading}
           className="rounded-[10px] border border-red-500/50 text-red-500 hover:bg-red-500/10 px-6 py-2.5 font-bold disabled:opacity-50"
         >
-          {loading ? "..." : "Abandonar Clan"}
+          {loading ? "..." : t("abandonarClan")}
         </button>
       ) : otroClan ? (
         <p className="max-w-xs rounded-[10px] border border-border bg-surface px-4 py-2.5 text-right text-sm text-muted">
@@ -75,7 +75,7 @@ export function ClanActions({ clanId, amIMember, amIOwner, otroClan, sucesor }: 
           disabled={loading}
           className="rounded-[10px] bg-accent text-background px-6 py-2.5 font-bold disabled:opacity-50 shadow-[0_0_15px_var(--accent)] hover:shadow-[0_0_25px_var(--accent)] transition-shadow"
         >
-          {loading ? "..." : "Unirme a este Clan"}
+          {loading ? "..." : t("unirmeClan")}
         </button>
       )}
       {error && <span className="text-xs text-red-500">{error}</span>}

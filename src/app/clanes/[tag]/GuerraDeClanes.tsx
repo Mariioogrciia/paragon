@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Swords } from "lucide-react";
 import { responderGuerraAction, retarClanAction } from "../actions";
@@ -27,8 +28,7 @@ interface Guerra {
 
 /**
  * Sección "Guerra de clanes" de la página de un clan — ver lib/clanWars.ts.
- * Mismo estilo que el resto de esta página (textos en español directos,
- * igual que ClanActions).
+ * Textos en `Perfil.ClanPage.guerra`.
  */
 export function GuerraDeClanes({
   clanId,
@@ -47,6 +47,7 @@ export function GuerraDeClanes({
   retables: Rival[];
   duracionDias: number;
 }) {
+  const t = useTranslations("Perfil.ClanPage.guerra");
   const [rivalId, setRivalId] = useState(retables[0]?.id ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pendiente, startTransition] = useTransition();
@@ -64,7 +65,7 @@ export function GuerraDeClanes({
   return (
     <section className="rounded-[18px] border border-border bg-surface p-5">
       <h2 className="flex items-center gap-2 font-heading text-2xl font-bold">
-        <Swords size={22} className="text-[var(--accent-text)]" /> Guerra de clanes
+        <Swords size={22} className="text-[var(--accent-text)]" /> {t("titulo")}
       </h2>
 
       {abierta?.estado === "activa" && (
@@ -83,7 +84,7 @@ export function GuerraDeClanes({
             </div>
           </div>
           <p className="mt-3 text-center text-sm text-muted" suppressHydrationWarning>
-            {diasRestantes === 0 ? "Termina hoy" : `Quedan ${diasRestantes} día${diasRestantes === 1 ? "" : "s"}`} · platino 100, oro 50, plata 25, bronce 10
+            {diasRestantes === 0 ? t("terminaHoy") : t("quedan", { n: diasRestantes ?? 0 })} · {t("puntos")}
           </p>
         </div>
       )}
@@ -92,12 +93,21 @@ export function GuerraDeClanes({
         <div className="mt-4">
           {abierta.soyRetador ? (
             <p className="text-sm text-muted">
-              Habéis retado a <strong className="text-foreground">[{abierta.rival.tag}] {abierta.rival.name}</strong>. Falta que su líder acepte.
+              {t.rich("habeisRetado", {
+                tag: abierta.rival.tag,
+                nombre: abierta.rival.name,
+                b: (chunks) => <strong className="text-foreground">{chunks}</strong>,
+              })}
             </p>
           ) : (
             <>
               <p className="text-sm">
-                <strong>[{abierta.rival.tag}] {abierta.rival.name}</strong> os reta a {duracionDias} días de caza.
+                {t.rich("osReta", {
+                  tag: abierta.rival.tag,
+                  nombre: abierta.rival.name,
+                  dias: duracionDias,
+                  b: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
               {soyLider ? (
                 <div className="mt-3 flex gap-2">
@@ -108,7 +118,7 @@ export function GuerraDeClanes({
                     className="rounded-lg px-4 py-2 text-sm font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)] disabled:opacity-50"
                     style={{ background: "var(--accent-grad)" }}
                   >
-                    Aceptar el reto
+                    {t("aceptar")}
                   </button>
                   <button
                     type="button"
@@ -116,11 +126,11 @@ export function GuerraDeClanes({
                     onClick={() => ejecutar(() => responderGuerraAction(abierta.id, false))}
                     className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted transition-colors hover:border-danger/50 hover:text-danger disabled:opacity-50"
                   >
-                    Rechazar
+                    {t("rechazar")}
                   </button>
                 </div>
               ) : (
-                <p className="mt-1 text-xs text-muted">Lo tiene que aceptar el líder del clan.</p>
+                <p className="mt-1 text-xs text-muted">{t("loAceptaLider")}</p>
               )}
             </>
           )}
@@ -130,14 +140,14 @@ export function GuerraDeClanes({
       {!abierta && (
         <div className="mt-4">
           <p className="text-sm text-muted">
-            Reta a otro clan: durante {duracionDias} días, cada trofeo de cualquier miembro suma puntos para el suyo.
+            {t("explicacion", { dias: duracionDias })}
           </p>
           {soyLider && retables.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               <Selector
                 value={rivalId}
                 onChange={setRivalId}
-                ariaLabel="Clan al que retar"
+                ariaLabel={t("clanARetar")}
                 className="min-w-0 flex-1"
                 options={retables.map((c) => ({ value: c.id, label: c.name, detalle: `[${c.tag}]` }))}
               />
@@ -148,11 +158,11 @@ export function GuerraDeClanes({
                 className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-bold text-background transition-all hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgb(var(--accent-rgb)/0.4)] disabled:opacity-50"
                 style={{ background: "var(--accent-grad)" }}
               >
-                <Swords size={14} /> Retar
+                <Swords size={14} /> {t("retar")}
               </button>
             </div>
           )}
-          {soyLider && retables.length === 0 && <p className="mt-2 text-xs text-muted">Todavía no hay otros clanes a los que retar.</p>}
+          {soyLider && retables.length === 0 && <p className="mt-2 text-xs text-muted">{t("sinRivales")}</p>}
         </div>
       )}
 
@@ -160,7 +170,7 @@ export function GuerraDeClanes({
 
       {historial.length > 0 && (
         <div className="mt-5 border-t border-border pt-4">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">Guerras anteriores</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">{t("anteriores")}</p>
           <ul className="grid gap-1.5">
             {historial.map((g) => (
               <li key={g.id} className="flex items-center justify-between gap-3 text-sm">
@@ -170,7 +180,7 @@ export function GuerraDeClanes({
                 <span className="shrink-0 font-mono">
                   {g.misPuntos ?? 0}–{g.susPuntos ?? 0}{" "}
                   <span className={g.gane === true ? "text-good" : g.gane === false ? "text-danger" : "text-muted"}>
-                    {g.gane === true ? "Victoria" : g.gane === false ? "Derrota" : "Empate"}
+                    {g.gane === true ? t("victoria") : g.gane === false ? t("derrota") : t("empate")}
                   </span>
                 </span>
               </li>

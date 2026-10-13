@@ -7,7 +7,10 @@ import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
 import { relativeDate } from "@/lib/design";
 
-export const metadata = { title: "Desglose de puntos · Liga Mensual · Paragon" };
+export async function generateMetadata() {
+  const t = await getTranslations("Perfil.LigasPage");
+  return { title: t("desgloseMeta") };
+}
 
 const COLOR_GRADO: Record<string, string> = {
   platinum: "var(--platinum)",
@@ -41,7 +44,7 @@ export default async function DesgloseLigaMensualPage({ params }: { params: Prom
           <h1 className="font-heading truncate text-2xl font-bold">{profile.displayName ?? `@${profile.handle}`}</h1>
           {profile.handle && (
             <Link href={`/u/${profile.handle}`} className="text-sm text-muted hover:text-[rgb(var(--accent-rgb))] hover:underline">
-              @{profile.handle} — ver perfil
+              {t("verPerfil", { handle: profile.handle })}
             </Link>
           )}
         </div>
@@ -52,11 +55,11 @@ export default async function DesgloseLigaMensualPage({ params }: { params: Prom
           {t("tituloLiga", { mes: monthName, anio: year })}
         </p>
         <p className="mt-1 font-heading text-3xl font-bold text-[rgb(var(--accent-rgb))]">
-          {totalPuntos.toLocaleString()} <span className="text-base font-normal text-muted">puntos</span>
+          {totalPuntos.toLocaleString()} <span className="text-base font-normal text-muted">{t("puntos")}</span>
         </p>
       </div>
 
-      <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">Trofeos que suman puntos este mes</h2>
+      <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("trofeosSuman")}</h2>
 
       {desglose.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted">{t("sinTrofeosEsteMes")}</p>

@@ -272,7 +272,9 @@
       "title": "Téléverser un avatar",
       "uploadButton": "Téléverser un avatar",
       "uploading": "Envoi en cours...",
-      "hint": "Formats JPG, JPEG, PNG et GIF, jusqu'à 5 Mo"
+      "hint": "Formats JPG, JPEG, PNG et GIF, jusqu'à 5 Mo",
+      "errorSubida": "Impossible d'envoyer le fichier.",
+      "usarAvatarDe": "Utiliser l'avatar {plataforma}"
     },
     "banner": {
       "title": "Bannière du profil",
