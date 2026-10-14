@@ -5,8 +5,8 @@ releer todo el historial. Última actualización: **14 de octubre de 2026**.
 
 ## Dónde estamos (14 oct 2026) · leer primero
 
-**Código**: `master` = `0c12c47`; la rama de trabajo
-`claude/focused-shannon-2l5u4p` es igual a master. Regla del usuario:
+**Código**: último cambio de código en `0c12c47` (después solo este
+HANDOFF); la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a master. Regla del usuario:
 **siempre push a master** (fast-forward desde la rama).
 
 **CI, todo en verde en `0c12c47`**:
