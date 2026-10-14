@@ -1,7 +1,79 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **13 de octubre de 2026**.
+releer todo el historial. Última actualización: **14 de octubre de 2026**.
+
+## Dónde estamos (14 oct 2026) · leer primero
+
+**Código**: `master` = `0c12c47`; la rama de trabajo
+`claude/focused-shannon-2l5u4p` es igual a master. Regla del usuario:
+**siempre push a master** (fast-forward desde la rama).
+
+**CI, todo en verde en `0c12c47`**:
+- *Comprobaciones* (web): tsc, eslint (0 errores, 45 avisos de `<img>`),
+  146 tests de vitest y el comprobador de namespaces de `messages/`.
+- *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
+  y APK de debug.
+- *Build iOS IPA (KMP)*: IPA sin firmar para Sideloadly, con el widget dentro.
+- *Publicar en las tiendas* (a mano): el AAB de release de Android (R8)
+  compila; sale sin firmar hasta que estén los secretos.
+
+**Las tres piezas**:
+- **Web** (`src/`, Next 16.4.0 en Vercel, `platinos-nine.vercel.app`, sin
+  dominio propio): traducida entera a es/en/de/fr, incluidos los mensajes de
+  las server actions. Sin fallos de seguridad conocidos en dependencias
+  (queda `uuid@9` moderado y sin impacto, ver 13 oct).
+- **App Android** (`kmp/androidApp` + `kmp/shared`): versión 1.1
+  (versionCode 2). APK de debug para instalar a mano desde la CI. Push por
+  FCM, widget de Glance, lector de QR, diseño v2.
+- **App iOS** (`kmp/iosApp` + `kmp/shared`): versión 1.1. IPA sin firmar
+  (Sideloadly). Desde el 13 oct tiene lo mismo que Android: gesto de volver,
+  push (APNs) y widget (WidgetKit). Las push solo con firma de pago.
+
+**Esperando al usuario** (no se puede hacer desde aquí):
+1. **Cuenta de desarrollador de Apple** (de pago): sin ella no hay push en
+   iOS ni TestFlight/App Store. Después: identificadores, App Group, la app
+   en App Store Connect y los secretos `APPLE_TEAM_ID`, `ASC_KEY_ID`,
+   `ASC_ISSUER_ID` y `ASC_KEY_P8` (pasos en "13 oct", más abajo).
+2. **Push de iOS en el servidor**: `APNS_KEY`, `APNS_KEY_ID` y `APNS_TEAM_ID`
+   en las variables de Vercel.
+3. **Clave de publicación de Android**: crearla con `keytool` y subirla a los
+   secretos (`ANDROID_KEYSTORE_BASE64` y sus contraseñas). Guardarla bien:
+   sin ella no hay actualizaciones en Play.
+4. **Probar en un móvil de verdad** lo de los últimos días (perfil completo,
+   precios, DLC, QR, widget de iOS...): el emulador de Windows no arranca
+   desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
+5. **Dominio propio** (sin comprar).
+
+**Pendiente de código**, por si se quiere seguir:
+- **Pantallas v2 una a una** según la maqueta
+  (https://claude.ai/artifact/D6EAtf8pUbhCVXjGYkDyVy): la navegación nativa,
+  cabeceras, Inicio, Carpetas, Ajustes y Entrar ya están; falta repasar el
+  resto pantalla por pantalla.
+- Al tocar una notificación, las dos apps abren el inicio en vez de la
+  pantalla del aviso: el `url` ya llega (Android lo guarda en
+  `paragon://open?path=`, iOS en el `userInfo`), pero nadie navega con él.
+- 45 avisos de lint por `<img>` en la web (pasar a `next/image` donde
+  compense).
+- 15 rutas de escritura de `/api/mobile` sin límite de peticiones (riesgo
+  bajo: todas comprueban que el dato es tuyo).
+- Sin probar con sesión iniciada varias funciones web (ver "Pendiente").
+
+**Dónde está cada cosa**:
+- Textos de la web: `messages/<Carpeta>/<idioma>.json`; los namespaces de
+  cliente en `src/i18n/clientMessages.ts`
+  (`npx tsx scripts/comprobar-namespaces-cliente.mts` lo comprueba).
+- Textos de la app: `kmp/i18n/textos.json` y `node kmp/i18n/generar.mjs`.
+- Mensajes de error/éxito del servidor traducidos (web y app):
+  `src/lib/mensajesApi.ts` (`FIJOS` y `PATRONES`); en la web pasan por
+  `tr()` de `src/lib/mensajesWeb.ts`.
+- Push: `src/lib/webPush.ts` (navegador), `src/lib/fcm.ts` (Android, y reparte
+  los de iOS) y `src/lib/apns.ts` (iOS).
+- Contrato de la API móvil: `src/app/api/mobile/CONTRACT.md`.
+- Workflows: `.github/workflows/` (`comprobaciones.yml`,
+  `build-android-kmp.yml`, `build-ios-kmp.yml`, `publicar-tiendas.yml`).
+- No se puede compilar la app en la nube de Claude (Google Maven bloqueado):
+  la prueba de la app es siempre la CI.
 
 **13 oct — auditoría y seguridad de dependencias:**
 - **Next 16.3.4 → 16.4.0**: la 16.3.x tenía un fallo crítico de ejecución
@@ -68,8 +140,8 @@ releer todo el historial. Última actualización: **13 de octubre de 2026**.
     `com.paragon.app.kmp` (con Push Notifications y App Groups) y
     `com.paragon.app.kmp.widget` (App Groups), el grupo
     `group.com.paragon.app.kmp`, y crear la app en App Store Connect.
-- Pendiente: nada de la auditoría. Las push de iOS y la publicación esperan
-  a la cuenta de desarrollador de Apple y a los secretos de arriba.
+- La auditoría del 13 oct queda cerrada: lo que falta está en "Dónde
+  estamos", arriba.
 
 **9 oct — perfil completo en la app y el mes día a día contra otro:**
 - **Perfil de verdad** (`ui/perfil/PerfilUsuarioScreen.kt`, ruta
