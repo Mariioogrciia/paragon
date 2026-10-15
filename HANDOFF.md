@@ -9,8 +9,8 @@ releer todo el historial. Última actualización: **15 de octubre de 2026**.
 master. Regla del usuario:
 **siempre push a master** (fast-forward desde la rama).
 
-**CI**: todo en verde en `7508cc2` (último commit de código y HANDOFF del
-15 oct), comprobado en master: web, APK de Android e IPA de iOS.
+**CI**: web en verde con 153 tests en `f3800b2` (varias cuentas de Steam,
+solo web); la app, en verde en `7508cc2`: APK de Android e IPA de iOS.
 - *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 150 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
@@ -45,6 +45,24 @@ master. Regla del usuario:
    precios, DLC, QR, widget de iOS...): el emulador de Windows no arranca
    desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
 5. **Dominio propio** (sin comprar).
+
+**15 oct (tarde) — varias cuentas de Steam** (`f3800b2`, de momento solo el
+desarrollador, `esDesarrollador` en lib/profiles.ts):
+- La principal sigue en `platform_account`; las demás (hasta 3) en
+  `steam_account_extra`, que la app crea sola la primera vez
+  (`asegurarTablaSteamExtra`, lib/steamExtraDatos.ts) o con
+  `scripts/crear-tabla-steam-extra.mts`.
+- `syncLibrary` de Steam sincroniza después las extra: sus juegos van a la
+  misma biblioteca. Los logros de un juego se piden con TODAS las cuentas y
+  se juntan (`juntarLogros`, conseguido si lo tiene cualquiera, fecha más
+  antigua), así que ninguna sincronización "desconsigue" lo de otra.
+  `playtimeMinutes` y `lastPlayedAt` pasan a `greatest` para que dos cuentas
+  con el mismo juego no se pisen.
+- Web: Ajustes → Plataformas → "Otras cuentas de Steam" (añadir / quitar;
+  al quitar, lo conseguido se queda). La app ve los juegos sumados, pero
+  añadir o quitar cuentas es solo desde la web por ahora.
+- Para abrirlo a todo el mundo: quitar la comprobación de `esDesarrollador`
+  en `anadirSteamExtraAction` y en `ajustes/plataformas/page.tsx`.
 
 **15 oct — lo que quedaba de código** (commits `3680eba` avisos, `887c9b0`
 límites y lint, `2fd53c8` Enfoque, `cde5529` Estadísticas, `fb4f474`
