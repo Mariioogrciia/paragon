@@ -64,6 +64,11 @@ object AppIOS {
         enviarTokenPush()
     }
 
+    /** Tocar una notificación (AppDelegate.swift): `url` es la ruta de la web del aviso. */
+    fun abrirAviso(url: String) {
+        if (url.isNotBlank()) com.paragon.app.ui.navigation.EnlaceAviso.pendiente = url
+    }
+
     private fun enviarTokenPush() {
         val token = tokenPush ?: return
         if (tokenStore.token == null) return

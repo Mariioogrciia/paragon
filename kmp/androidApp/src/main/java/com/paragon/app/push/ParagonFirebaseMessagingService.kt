@@ -93,18 +93,17 @@ class ParagonFirebaseMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Abre la app directamente en la pantalla relevante (p.ej. "/amigos")
-        // vía el mismo esquema `paragon://` que ya usa el login — MainScreen
-        // no tiene todavía un router de deep links por ruta web, así que de
-        // momento esto abre la app en el Panel; `url` queda listo para
-        // cuando lo tenga.
+        // Abre la app en la pantalla del aviso (p. ej. "/amigos"): MainScreen
+        // traduce la ruta de la web a la suya (EnlaceAviso.kt en :shared).
         val intent = Intent(this, ComposeMainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            if (url != null) data = Uri.parse("paragon://open?path=$url")
+            if (url != null) data = Uri.parse("paragon://open").buildUpon().appendQueryParameter("path", url).build()
         }
         val pendingIntent = PendingIntent.getActivity(
             this,
-            0,
+            // Uno por ruta: con el mismo código, FLAG_UPDATE_CURRENT hacía que
+            // todos los avisos abiertos llevaran al destino del último.
+            url?.hashCode() ?: 0,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )

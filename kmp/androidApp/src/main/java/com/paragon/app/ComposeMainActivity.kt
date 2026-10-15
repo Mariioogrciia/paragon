@@ -63,7 +63,9 @@ class ComposeMainActivity : AppCompatActivity() {
         themeStore = ThemeStore(applicationContext)
 
         enableEdgeToEdge()
-        handleDeepLink(intent)
+        // Al recrearse (girar, cambiar el idioma) el intent es el mismo de
+        // antes: el aviso ya se abrió y no hay que volver a llevar ahí.
+        handleDeepLink(intent, abrirAviso = savedInstanceState == null)
 
         setContent {
             ParagonTheme(themeStore = themeStore) {
@@ -121,8 +123,17 @@ class ComposeMainActivity : AppCompatActivity() {
         recreate()
     }
 
-    private fun handleDeepLink(intent: Intent?) {
+    private fun handleDeepLink(intent: Intent?, abrirAviso: Boolean = true) {
         val data: Uri? = intent?.data
+        // Tocar una notificación: su pantalla (EnlaceAviso, en :shared). Con
+        // la app abierta la pinta ParagonFirebaseMessagingService
+        // (`paragon://open?path=`); en segundo plano la pinta el sistema y el
+        // `url` del aviso llega como extra.
+        if (abrirAviso) {
+            val ruta = if (data?.scheme == "paragon" && data.host == "open") data.getQueryParameter("path")
+            else intent?.getStringExtra("url")
+            if (!ruta.isNullOrBlank()) com.paragon.app.ui.navigation.EnlaceAviso.pendiente = ruta
+        }
         if (data?.scheme == "paragon" && data.host == "auth") {
             // Token cifrado con la clave de este login (ver EnlaceSeguro): un
             // enlace que no venga de nuestro login en curso se ignora.

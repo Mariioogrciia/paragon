@@ -55,6 +55,19 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         completionHandler([.banner, .list, .sound])
     }
 
+    /// Tocar un aviso abre su pantalla: el servidor manda la ruta de la web
+    /// en `url` (lib/apns.ts) y la app la traduce (EnlaceAviso.kt).
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        if let url = response.notification.request.content.userInfo["url"] as? String {
+            AppIOS.shared.abrirAviso(url: url)
+        }
+        completionHandler()
+    }
+
     // MARK: - WidgetIOS
 
     func recargar() {

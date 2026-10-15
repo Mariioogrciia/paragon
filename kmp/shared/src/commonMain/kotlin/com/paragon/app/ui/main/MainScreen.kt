@@ -226,6 +226,23 @@ fun MainScreen(
     fun estaEn(item: BottomNavItem) =
         navBackStackEntryActual?.destination?.hierarchy?.any { it.route == item.screen.route } == true
 
+    // Tocar una notificación: su pantalla (ver EnlaceAviso.kt). Las pestañas,
+    // como al tocarlas en la barra; el resto, encima de lo que hubiera.
+    val avisoPendiente = com.paragon.app.ui.navigation.EnlaceAviso.pendiente
+    androidx.compose.runtime.LaunchedEffect(avisoPendiente) {
+        val web = avisoPendiente ?: return@LaunchedEffect
+        com.paragon.app.ui.navigation.EnlaceAviso.pendiente = null
+        val ruta = com.paragon.app.ui.navigation.rutaAppDeAviso(web, profile.handle) ?: return@LaunchedEffect
+        if (esPestana(ruta)) {
+            navController.navigate(ruta) {
+                popUpTo(navController.graph.findStartDestination().id)
+                launchSingleTop = true
+            }
+        } else {
+            navController.navigate(ruta)
+        }
+    }
+
     // Barra de abajo como Instagram (7 oct 2026): cápsula flotante de cristal
     // que desenfoca lo que pasa por detrás (Haze). El contenido llega hasta
     // abajo del todo y cada lista deja `huecoBarra()` al final.
