@@ -297,7 +297,7 @@
     <string name="cuentas_nivel">Nivel %1$s</string>
     <string name="cuentas_ph_otro">ID Público / Gamertag</string>
     <string name="cuentas_ph_psn">Tu Online ID de PSN</string>
-    <string name="cuentas_ph_steam">Usuario, SteamID64 o URL del perfil</string>
+    <string name="cuentas_ph_steam">URL del perfil, SteamID64 o URL personalizada</string>
     <string name="cuentas_ph_xbox">Tu Gamertag</string>
     <string name="cuentas_plataformas_sub">De aquí salen tus trofeos y logros reales.</string>
     <string name="cuentas_priv_otro">¿Cómo lo pongo en público?</string>

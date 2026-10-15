@@ -295,7 +295,7 @@
     <string name="cuentas_nivel">Stufe %1$s</string>
     <string name="cuentas_ph_otro">Öffentliche ID / Gamertag</string>
     <string name="cuentas_ph_psn">Deine PSN-Online-ID</string>
-    <string name="cuentas_ph_steam">Benutzername, SteamID64 oder Profil-URL</string>
+    <string name="cuentas_ph_steam">Profil-URL, SteamID64 oder eigene URL</string>
     <string name="cuentas_ph_xbox">Dein Gamertag</string>
     <string name="cuentas_plataformas_sub">Hier kommen deine echten Trophäen und Erfolge her.</string>
     <string name="cuentas_priv_otro">Wie stelle ich es auf öffentlich?</string>

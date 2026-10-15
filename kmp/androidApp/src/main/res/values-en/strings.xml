@@ -295,7 +295,7 @@
     <string name="cuentas_nivel">Level %1$s</string>
     <string name="cuentas_ph_otro">Public ID / Gamertag</string>
     <string name="cuentas_ph_psn">Your PSN Online ID</string>
-    <string name="cuentas_ph_steam">Username, SteamID64 or profile URL</string>
+    <string name="cuentas_ph_steam">Profile URL, SteamID64 or custom URL</string>
     <string name="cuentas_ph_xbox">Your Gamertag</string>
     <string name="cuentas_plataformas_sub">This is where your real trophies and achievements come from.</string>
     <string name="cuentas_priv_otro">How do I make it public?</string>

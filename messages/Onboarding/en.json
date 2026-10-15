@@ -97,7 +97,7 @@
     "description": "Link your platforms to sync your trophies automatically.",
     "help": {
       "psn": "Your public PlayStation ID, the name you play under.",
-      "steam": "Your Steam username, your SteamID64, or your profile URL.",
+      "steam": "Your profile URL, your SteamID64 or your custom URL name (steamcommunity.com/id/that-name). The name shown on your profile won't work: Steam doesn't allow searching by it and it could pick someone else's account.",
       "xbox": "Your Xbox Gamertag. Syncs your real achievement history via a third-party service (not official from Microsoft) — it can fail or stop working if that service changes.",
       "epic": "The link to your Epic Games profile (or your account ID) — this isn't an official Epic API, so it can fail or stop working if Epic changes their site."
     },
@@ -215,7 +215,7 @@
       "link": "Link"
     },
     "steam": {
-      "placeholder": "your_username, 7656119… or your profile URL",
+      "placeholder": "Profile URL, SteamID64 or custom URL",
       "update": "Update",
       "link": "Link"
     },

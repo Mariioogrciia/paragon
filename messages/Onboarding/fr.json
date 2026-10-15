@@ -97,7 +97,7 @@
     "description": "Relie tes plateformes pour synchroniser tes trophées automatiquement.",
     "help": {
       "psn": "Ton identifiant public PlayStation, le nom sous lequel tu joues.",
-      "steam": "Ton pseudo Steam, ton SteamID64 ou l'URL de ton profil.",
+      "steam": "L'URL de ton profil, ton SteamID64 ou le nom de ton URL personnalisée (steamcommunity.com/id/ce-nom). Le nom affiché sur ton profil ne marche pas : Steam ne permet pas de chercher avec et pourrait trouver le compte de quelqu'un d'autre.",
       "xbox": "Ton Gamertag Xbox. Synchronise réellement ton historique de succès via un service tiers (non officiel de Microsoft) — peut échouer ou cesser de fonctionner si ce service change.",
       "epic": "Le lien vers ton profil Epic Games (ou ton ID de compte) — ce n'est pas une API officielle d'Epic, donc ça peut échouer ou cesser de fonctionner si Epic change son site."
     },
@@ -215,7 +215,7 @@
       "link": "Relier"
     },
     "steam": {
-      "placeholder": "ton_pseudo, 7656119… ou l'URL de ton profil",
+      "placeholder": "URL du profil, SteamID64 ou URL personnalisée",
       "update": "Mettre à jour",
       "link": "Relier"
     },

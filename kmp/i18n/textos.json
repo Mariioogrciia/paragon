@@ -1356,10 +1356,10 @@
   "fr": "Ton identifiant en ligne PSN"
  },
  "cuentas_ph_steam": {
-  "de": "Benutzername, SteamID64 oder Profil-URL",
-  "en": "Username, SteamID64 or profile URL",
-  "es": "Usuario, SteamID64 o URL del perfil",
-  "fr": "Pseudo, SteamID64 ou URL du profil"
+  "de": "Profil-URL, SteamID64 oder eigene URL",
+  "en": "Profile URL, SteamID64 or custom URL",
+  "es": "URL del perfil, SteamID64 o URL personalizada",
+  "fr": "URL du profil, SteamID64 ou URL personnalisée"
  },
  "cuentas_ph_xbox": {
   "de": "Dein Gamertag",

@@ -97,7 +97,7 @@
     "description": "Verknüpfe deine Plattformen, um deine Trophäen automatisch zu synchronisieren.",
     "help": {
       "psn": "Deine öffentliche PlayStation-ID, der Name, unter dem du spielst.",
-      "steam": "Dein Steam-Benutzername, deine SteamID64 oder deine Profil-URL.",
+      "steam": "Deine Profil-URL, deine SteamID64 oder der Name deiner benutzerdefinierten URL (steamcommunity.com/id/dieser-name). Der im Profil angezeigte Name funktioniert nicht: Steam erlaubt keine Suche danach und es könnte das Konto einer anderen Person treffen.",
       "xbox": "Dein Xbox-Gamertag. Synchronisiert deinen echten Erfolgsverlauf über einen Drittanbieter-Dienst (nicht offiziell von Microsoft) — kann ausfallen oder aufhören zu funktionieren, wenn sich dieser Dienst ändert.",
       "epic": "Der Link zu deinem Epic Games-Profil (oder deine Account-ID) — das ist keine offizielle Epic-API, kann also ausfallen oder aufhören zu funktionieren, wenn Epic ihre Website ändert."
     },
@@ -215,7 +215,7 @@
       "link": "Verknüpfen"
     },
     "steam": {
-      "placeholder": "dein_benutzername, 7656119… oder deine Profil-URL",
+      "placeholder": "Profil-URL, SteamID64 oder eigene URL",
       "update": "Aktualisieren",
       "link": "Verknüpfen"
     },

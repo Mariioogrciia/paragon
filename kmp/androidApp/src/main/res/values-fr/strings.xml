@@ -295,7 +295,7 @@
     <string name="cuentas_nivel">Niveau %1$s</string>
     <string name="cuentas_ph_otro">ID public / gamertag</string>
     <string name="cuentas_ph_psn">Ton identifiant en ligne PSN</string>
-    <string name="cuentas_ph_steam">Pseudo, SteamID64 ou URL du profil</string>
+    <string name="cuentas_ph_steam">URL du profil, SteamID64 ou URL personnalisée</string>
     <string name="cuentas_ph_xbox">Ton gamertag</string>
     <string name="cuentas_plataformas_sub">C\'est d\'ici que viennent tes vrais trophées et succès.</string>
     <string name="cuentas_priv_otro">Comment le rendre public ?</string>

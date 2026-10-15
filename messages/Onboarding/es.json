@@ -97,7 +97,7 @@
     "description": "Vincula tus plataformas para sincronizar tus trofeos automáticamente.",
     "help": {
       "psn": "Tu ID público de PlayStation, el nombre con el que juegas.",
-      "steam": "Tu usuario de Steam, tu SteamID64 o la URL de tu perfil.",
+      "steam": "La URL de tu perfil, tu SteamID64 o el nombre de tu URL personalizada (steamcommunity.com/id/ese-nombre). El nombre que se ve en tu perfil no vale: Steam no deja buscar por él y podría coger la cuenta de otra persona.",
       "xbox": "Tu Gamertag de Xbox. Sincroniza de verdad tu historial de logros, vía un servicio de terceros (no oficial de Microsoft) — puede fallar o dejar de funcionar si ese servicio cambia.",
       "epic": "El enlace a tu perfil de Epic Games (o tu ID de cuenta) — no es una API oficial de Epic, así que puede fallar o dejar de funcionar si Epic cambia su web."
     },
@@ -215,7 +215,7 @@
       "link": "Vincular"
     },
     "steam": {
-      "placeholder": "tu_usuario, 7656119… o la URL del perfil",
+      "placeholder": "URL del perfil, SteamID64 o URL personalizada",
       "update": "Actualizar",
       "link": "Vincular"
     },
