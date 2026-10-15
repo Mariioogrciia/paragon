@@ -316,6 +316,16 @@
     <string name="cuentas_steam_2">Stelle „Mein Profil“ auf Öffentlich.</string>
     <string name="cuentas_steam_3">Das, was fast alle übersehen: Stelle „Spieldetails“ AUCH auf Öffentlich — sonst lässt Steam deine Bibliothek nicht lesen.</string>
     <string name="cuentas_steam_4">Tippe unten auf der Seite auf „Speichern“.</string>
+    <string name="cuentas_steam_extra_anadida">%1$s hinzugefügt: %2$s Spiele importiert.</string>
+    <string name="cuentas_steam_extra_anadir">Konto hinzufügen</string>
+    <string name="cuentas_steam_extra_privada">%1$s hinzugefügt, aber die Bibliothek ist privat: Stelle in Steam „Spieldetails“ auf öffentlich.</string>
+    <string name="cuentas_steam_extra_quitar">Entfernen</string>
+    <string name="cuentas_steam_extra_quitar_si">Konto entfernen</string>
+    <string name="cuentas_steam_extra_quitar_texto">Es wird nicht mehr synchronisiert. Was du damit schon erreicht hast, bleibt in deiner Bibliothek.</string>
+    <string name="cuentas_steam_extra_quitar_titulo">%1$s entfernen?</string>
+    <string name="cuentas_steam_extra_sub">Ihre Spiele und Erfolge kommen zu deiner Bibliothek dazu und werden gleichzeitig synchronisiert.</string>
+    <string name="cuentas_steam_extra_titulo">WEITERE STEAM-KONTEN</string>
+    <string name="cuentas_steam_extra_vacio">Du hast noch keins hinzugefügt.</string>
     <string name="cuentas_steam_sync">Deine Steam-Erfolge werden synchronisiert… %1$s von %2$s Spielen</string>
     <string name="cuentas_steam_sync_sub">Du kannst die App weiter nutzen: Die Spiele zeigen ihre Erfolge nach und nach.</string>
     <string name="cuentas_titulo">Verknüpfte Konten</string>

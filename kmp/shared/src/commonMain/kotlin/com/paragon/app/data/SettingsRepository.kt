@@ -56,6 +56,28 @@ class SettingsRepository(private val tokenStore: TokenStore) {
         }
     }
 
+    /** Otra cuenta de Steam (ver lib/steamExtra.ts en el servidor): devuelve lo mismo que vincular. */
+    suspend fun anadirSteamExtra(entrada: String): SettingsResult<com.paragon.shared.red.LinkPlatformResponse> {
+        return try {
+            SettingsResult.Ok(ApiClient.settingsApi(tokenStore).anadirSteamExtra(LinkPlatformRequest(entrada)))
+        } catch (e: HttpException) {
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: Exception) {
+            SettingsResult.Error(Textos.t(T.error_red))
+        }
+    }
+
+    suspend fun quitarSteamExtra(steamId: String): SettingsResult<Unit> {
+        return try {
+            ApiClient.settingsApi(tokenStore).quitarSteamExtra(steamId)
+            SettingsResult.Ok(Unit)
+        } catch (e: HttpException) {
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: Exception) {
+            SettingsResult.Error(Textos.t(T.error_red))
+        }
+    }
+
     /** Sincroniza una plataforma; devuelve cuántos trofeos han entrado. */
     suspend fun syncPlatform(platform: String): SettingsResult<Int> {
         return try {

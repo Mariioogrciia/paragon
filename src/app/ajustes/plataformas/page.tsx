@@ -102,7 +102,7 @@ function PlatformSection({
                 title={t("ajustesPlataformas.confirmUnlink.title", { platform: PLATFORM_LABEL[platform] })}
                 message={t("ajustesPlataformas.confirmUnlink.message")}
                 confirmLabel={t("ajustesPlataformas.confirmUnlink.confirmLabel")}
-                triggerClassName="rounded-md px-1 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-danger"
+                triggerClassName="rounded-md px-1 py-0.5 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-danger"
               >
                 {t("ajustesPlataformas.confirmUnlink.trigger", { platform: PLATFORM_LABEL[platform] })}
               </ConfirmForm>

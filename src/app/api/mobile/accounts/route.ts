@@ -7,6 +7,8 @@ import { getProfileByUserId } from "@/lib/profiles";
 import type { PlataformaVinculable } from "@/lib/types";
 import { esDeclarada } from "@/lib/declarado";
 import { errorMovil } from "@/lib/mensajesApi";
+import { cuentasSteamExtra } from "@/lib/steamExtraDatos";
+import { MAX_CUENTAS_STEAM_EXTRA } from "@/lib/steamExtra";
 
 // Epic va aparte en la app (auditoría, 4 oct 2026): se ve, pero NO se puede
 // vincular desde el móvil — su web bloquea al servidor y solo la extensión
@@ -63,5 +65,22 @@ export async function GET(req: Request) {
       : { platform, linked: false, username: null, level: null, avatarUrl: null, isPublic: false, syncedAt: null, ...extra };
   });
 
-  return NextResponse.json({ oauth, platforms });
+  // Otras cuentas de Steam (15 oct 2026, ver lib/steamExtra.ts): solo para el
+  // desarrollador y con la principal vinculada; `null` para el resto.
+  const steamPrincipal = profile.accounts.some((a) => a.platform === "steam");
+  const steamExtra =
+    profile.esDesarrollador && steamPrincipal
+      ? {
+          max: MAX_CUENTAS_STEAM_EXTRA,
+          cuentas: (await cuentasSteamExtra(userId)).map((c) => ({
+            accountId: c.accountId,
+            username: c.username,
+            avatarUrl: c.avatarUrl,
+            isPublic: c.isPublic,
+            syncedAt: c.syncedAt ? c.syncedAt.toISOString() : null,
+          })),
+        }
+      : null;
+
+  return NextResponse.json({ oauth, platforms, steamExtra });
 }

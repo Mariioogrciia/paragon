@@ -316,6 +316,16 @@
     <string name="cuentas_steam_2">Set \"My profile\" to Public.</string>
     <string name="cuentas_steam_3">The one almost everyone misses: set \"Game details\" to Public TOO — without it, Steam won\'t let us read your library.</string>
     <string name="cuentas_steam_4">Press \"Save\" at the bottom of the page.</string>
+    <string name="cuentas_steam_extra_anadida">Added %1$s: %2$s games imported.</string>
+    <string name="cuentas_steam_extra_anadir">Add account</string>
+    <string name="cuentas_steam_extra_privada">Added %1$s, but its library is private: set \"Game details\" to public in Steam.</string>
+    <string name="cuentas_steam_extra_quitar">Remove</string>
+    <string name="cuentas_steam_extra_quitar_si">Remove account</string>
+    <string name="cuentas_steam_extra_quitar_texto">It will stop syncing. Anything already earned with it stays in your library.</string>
+    <string name="cuentas_steam_extra_quitar_titulo">Remove %1$s?</string>
+    <string name="cuentas_steam_extra_sub">Their games and achievements are added to your library with your main account\'s, and they sync at the same time.</string>
+    <string name="cuentas_steam_extra_titulo">OTHER STEAM ACCOUNTS</string>
+    <string name="cuentas_steam_extra_vacio">You haven\'t added any yet.</string>
     <string name="cuentas_steam_sync">Syncing your Steam achievements… %1$s of %2$s games</string>
     <string name="cuentas_steam_sync_sub">You can keep using the app: games will show their achievements as they arrive.</string>
     <string name="cuentas_titulo">Linked accounts</string>

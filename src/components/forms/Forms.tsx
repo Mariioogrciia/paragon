@@ -550,7 +550,9 @@ function SyncPlatformSubmit({ label }: { label: string }) {
   const t = useTranslations("Onboarding");
   const { pending } = useFormStatus();
   return (
-    <button disabled={pending} className="text-xs font-semibold text-accent hover:underline disabled:pointer-events-none disabled:opacity-50">
+    // Mismo tamaño y relleno que "Desvincular" de al lado (ajustes/plataformas):
+    // antes iban a distinta altura (este con `mt-2` y letra más pequeña).
+    <button disabled={pending} className="rounded-md px-1 py-0.5 text-[0.8125rem] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--accent-soft)] disabled:pointer-events-none disabled:opacity-50">
       {pending ? t("forms.sync.syncing") : t("forms.sync.syncPlatform", { label })}
     </button>
   );
@@ -561,7 +563,7 @@ function SyncPlatformSubmit({ label }: { label: string }) {
 export function SyncPlatformForm({ platform, label }: { platform: string; label: string }) {
   const [state, action] = useActionState(syncPlatformAction, EMPTY);
   return (
-    <form action={action} className="mt-2">
+    <form action={action}>
       <input type="hidden" name="platform" value={platform} />
       <SyncPlatformSubmit label={label} />
       <Feedback state={state} />

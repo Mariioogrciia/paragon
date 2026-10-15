@@ -32,7 +32,21 @@ data class PlatformAccountDto(
 @Serializable
 data class LinkedAccountsResponse(
     val oauth: List<OauthAccountDto>,
-    val platforms: List<PlatformAccountDto>
+    val platforms: List<PlatformAccountDto>,
+    /** Otras cuentas de Steam (ver lib/steamExtra.ts); null si no se pueden usar. */
+    val steamExtra: SteamExtraDto? = null,
+)
+
+@Serializable
+data class SteamExtraDto(val max: Int = 3, val cuentas: List<CuentaSteamExtraDto> = emptyList())
+
+@Serializable
+data class CuentaSteamExtraDto(
+    val accountId: String,
+    val username: String,
+    val avatarUrl: String? = null,
+    val isPublic: Boolean = true,
+    val syncedAt: String? = null,
 )
 
 @Serializable
@@ -77,6 +91,13 @@ class SettingsApi internal constructor(private val c: ClienteParagon) {
 
     suspend fun unlinkPlatform(platform: String): SuccessResponse =
         c.http.delete("api/mobile/accounts/${platform.encodeURLPathPart()}").body()
+
+    /** Añadir otra cuenta de Steam — ver accounts/steam-extra/route.ts. */
+    suspend fun anadirSteamExtra(request: LinkPlatformRequest): LinkPlatformResponse =
+        c.http.post("api/mobile/accounts/steam-extra") { json(request) }.body()
+
+    suspend fun quitarSteamExtra(steamId: String): SuccessResponse =
+        c.http.delete("api/mobile/accounts/steam-extra/${steamId.encodeURLPathPart()}").body()
 
     /** El botón "Sincronizar" de cada plataforma — ver accounts/[platform]/sync/route.ts. */
     suspend fun syncPlatform(platform: String): SyncPlatformResponse =

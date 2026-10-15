@@ -5428,5 +5428,65 @@
   "en": "TOMORROW",
   "es": "MAÑANA",
   "fr": "DEMAIN"
+ },
+ "cuentas_steam_extra_titulo": {
+  "de": "WEITERE STEAM-KONTEN",
+  "en": "OTHER STEAM ACCOUNTS",
+  "es": "OTRAS CUENTAS DE STEAM",
+  "fr": "AUTRES COMPTES STEAM"
+ },
+ "cuentas_steam_extra_sub": {
+  "de": "Ihre Spiele und Erfolge kommen zu deiner Bibliothek dazu und werden gleichzeitig synchronisiert.",
+  "en": "Their games and achievements are added to your library with your main account's, and they sync at the same time.",
+  "es": "Sus juegos y logros se suman a tu biblioteca, junto a los de tu cuenta principal, y se sincronizan a la vez.",
+  "fr": "Leurs jeux et succès s'ajoutent à ta bibliothèque avec ceux du compte principal, et se synchronisent en même temps."
+ },
+ "cuentas_steam_extra_anadir": {
+  "de": "Konto hinzufügen",
+  "en": "Add account",
+  "es": "Añadir cuenta",
+  "fr": "Ajouter un compte"
+ },
+ "cuentas_steam_extra_vacio": {
+  "de": "Du hast noch keins hinzugefügt.",
+  "en": "You haven't added any yet.",
+  "es": "Todavía no has añadido ninguna.",
+  "fr": "Tu n'en as encore ajouté aucun."
+ },
+ "cuentas_steam_extra_quitar": {
+  "de": "Entfernen",
+  "en": "Remove",
+  "es": "Quitar",
+  "fr": "Retirer"
+ },
+ "cuentas_steam_extra_quitar_titulo": {
+  "de": "{0} entfernen?",
+  "en": "Remove {0}?",
+  "es": "¿Quitar {0}?",
+  "fr": "Retirer {0} ?"
+ },
+ "cuentas_steam_extra_quitar_texto": {
+  "de": "Es wird nicht mehr synchronisiert. Was du damit schon erreicht hast, bleibt in deiner Bibliothek.",
+  "en": "It will stop syncing. Anything already earned with it stays in your library.",
+  "es": "Dejará de sincronizarse. Lo ya conseguido con ella se queda en tu biblioteca.",
+  "fr": "Il ne sera plus synchronisé. Ce que tu as déjà obtenu avec reste dans ta bibliothèque."
+ },
+ "cuentas_steam_extra_quitar_si": {
+  "de": "Konto entfernen",
+  "en": "Remove account",
+  "es": "Quitar cuenta",
+  "fr": "Retirer le compte"
+ },
+ "cuentas_steam_extra_anadida": {
+  "de": "{0} hinzugefügt: {1} Spiele importiert.",
+  "en": "Added {0}: {1} games imported.",
+  "es": "Añadida {0}: {1} juegos importados.",
+  "fr": "{0} ajouté : {1} jeux importés."
+ },
+ "cuentas_steam_extra_privada": {
+  "de": "{0} hinzugefügt, aber die Bibliothek ist privat: Stelle in Steam „Spieldetails“ auf öffentlich.",
+  "en": "Added {0}, but its library is private: set \"Game details\" to public in Steam.",
+  "es": "Añadida {0}, pero su biblioteca es privada: pon «Detalles del juego» en público en Steam.",
+  "fr": "{0} ajouté, mais sa bibliothèque est privée : mets « Détails des jeux » en public sur Steam."
  }
 }

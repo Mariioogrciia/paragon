@@ -316,6 +316,16 @@
     <string name="cuentas_steam_2">Mets « Mon profil » sur Public.</string>
     <string name="cuentas_steam_3">Celui que presque tout le monde oublie : mets AUSSI « Détails des jeux » sur Public — sans ça, Steam ne laisse pas lire ta bibliothèque.</string>
     <string name="cuentas_steam_4">Appuie sur « Enregistrer » en bas de la page.</string>
+    <string name="cuentas_steam_extra_anadida">%1$s ajouté : %2$s jeux importés.</string>
+    <string name="cuentas_steam_extra_anadir">Ajouter un compte</string>
+    <string name="cuentas_steam_extra_privada">%1$s ajouté, mais sa bibliothèque est privée : mets « Détails des jeux » en public sur Steam.</string>
+    <string name="cuentas_steam_extra_quitar">Retirer</string>
+    <string name="cuentas_steam_extra_quitar_si">Retirer le compte</string>
+    <string name="cuentas_steam_extra_quitar_texto">Il ne sera plus synchronisé. Ce que tu as déjà obtenu avec reste dans ta bibliothèque.</string>
+    <string name="cuentas_steam_extra_quitar_titulo">Retirer %1$s ?</string>
+    <string name="cuentas_steam_extra_sub">Leurs jeux et succès s\'ajoutent à ta bibliothèque avec ceux du compte principal, et se synchronisent en même temps.</string>
+    <string name="cuentas_steam_extra_titulo">AUTRES COMPTES STEAM</string>
+    <string name="cuentas_steam_extra_vacio">Tu n\'en as encore ajouté aucun.</string>
     <string name="cuentas_steam_sync">Synchronisation de tes succès Steam… %1$s jeux sur %2$s</string>
     <string name="cuentas_steam_sync_sub">Tu peux continuer à utiliser l\'app : les jeux afficheront leurs succès au fur et à mesure.</string>
     <string name="cuentas_titulo">Comptes associés</string>

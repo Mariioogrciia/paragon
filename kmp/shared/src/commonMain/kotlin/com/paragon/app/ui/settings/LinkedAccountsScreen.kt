@@ -40,6 +40,8 @@ import com.paragon.app.data.auth.TokenStore
 import com.paragon.shared.red.LinkedAccountsResponse
 import com.paragon.shared.red.OauthAccountDto
 import com.paragon.shared.red.PlatformAccountDto
+import com.paragon.shared.red.SteamExtraDto
+import com.paragon.shared.red.CuentaSteamExtraDto
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -255,6 +257,13 @@ fun LinkedAccountsScreen(
                         repository = repository,
                         onUpdate = { loadAccounts() }
                     )
+                }
+
+                // Otras cuentas de Steam (15 oct 2026): solo si el servidor lo permite.
+                response!!.steamExtra?.let { extra ->
+                    item(key = "steam-extra") {
+                        SteamExtraSeccion(extra = extra, repository = repository, onUpdate = { loadAccounts() })
+                    }
                 }
             }
         }
@@ -654,5 +663,128 @@ private fun BotonCuenta(
         if (cargando) CircularProgressIndicator(color = color, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
         else Icon(icono, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
         Text(texto, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+    }
+}
+
+/**
+ * Otras cuentas de Steam además de la principal (15 oct 2026, ver
+ * lib/steamExtra.ts en el servidor): la lista con "Quitar" y el campo para
+ * añadir otra. Sus juegos y logros se suman a la misma biblioteca.
+ */
+@Composable
+private fun SteamExtraSeccion(extra: SteamExtraDto, repository: SettingsRepository, onUpdate: () -> Unit) {
+    var entrada by remember { mutableStateOf("") }
+    var trabajando by remember { mutableStateOf(false) }
+    var aviso by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+    var quitando by remember { mutableStateOf<CuentaSteamExtraDto?>(null) }
+    val scope = rememberCoroutineScope()
+    val marca = platformBrandColor("steam")
+    val forma = RoundedCornerShape(radio(20))
+
+    Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
+        Text(Textos.t(T.cuentas_steam_extra_titulo), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(Textos.t(T.cuentas_steam_extra_sub), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp, bottom = 10.dp))
+        Column(
+            Modifier.fillMaxWidth().background(Surface, forma).border(1.dp, Border, forma).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            if (extra.cuentas.isEmpty()) {
+                Text(Textos.t(T.cuentas_steam_extra_vacio), color = Muted, fontSize = 13.sp)
+            }
+            extra.cuentas.forEach { c ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier.size(40.dp).clip(CircleShape).background(platformGradient("steam")),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(c.username.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                        com.paragon.app.ui.common.urlImagenSegura(c.avatarUrl)?.let { avatar ->
+                            coil3.compose.AsyncImage(
+                                model = avatar,
+                                contentDescription = null,
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+                    Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                        Text(c.username, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        val detalle = if (!c.isPublic) Textos.t(T.cuentas_privada)
+                        else haceCuanto(c.syncedAt)?.let { Textos.t(T.cuentas_sincronizada_hace, it) } ?: Textos.t(T.cuentas_vinculada)
+                        Text(detalle, color = if (c.isPublic) Muted else Gold, fontSize = 12.sp, maxLines = 1)
+                    }
+                    TextButton(onClick = { quitando = c }, enabled = !trabajando) {
+                        Text(Textos.t(T.cuentas_steam_extra_quitar), color = Danger, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+
+            if (extra.cuentas.size < extra.max) {
+                if (extra.cuentas.isNotEmpty()) HorizontalDivider(color = Border)
+                OutlinedTextField(
+                    value = entrada,
+                    onValueChange = { entrada = it; aviso = null },
+                    placeholder = { Text(platformPlaceholder("steam"), color = Muted) },
+                    shape = RoundedCornerShape(radio(10)),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = marca,
+                        unfocusedBorderColor = Border,
+                        focusedTextColor = Foreground,
+                        unfocusedTextColor = Foreground,
+                        focusedContainerColor = Surface2,
+                        unfocusedContainerColor = Surface2,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            trabajando = true
+                            aviso = null
+                            when (val r = repository.anadirSteamExtra(entrada.trim())) {
+                                is SettingsResult.Ok -> {
+                                    aviso = if (r.data.legible) Textos.t(T.cuentas_steam_extra_anadida, r.data.username, r.data.juegos) to true
+                                    else Textos.t(T.cuentas_steam_extra_privada, r.data.username) to false
+                                    entrada = ""
+                                    onUpdate()
+                                }
+                                is SettingsResult.Error -> aviso = r.message to false
+                            }
+                            trabajando = false
+                        }
+                    },
+                    enabled = !trabajando && entrada.isNotBlank(),
+                    colors = ButtonDefaults.buttonColors(containerColor = marca),
+                    shape = RoundedCornerShape(radio(12)),
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                ) {
+                    if (trabajando) CircularProgressIndicator(color = textoSobre(marca), strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+                    else Text(Textos.t(T.cuentas_steam_extra_anadir), color = textoSobre(marca), fontWeight = FontWeight.SemiBold)
+                }
+            }
+            aviso?.let { (texto, ok) ->
+                Text(texto, color = if (ok) Good else Danger, fontSize = 12.sp)
+            }
+        }
+    }
+
+    quitando?.let { c ->
+        com.paragon.app.ui.common.ConfirmDialog(
+            title = Textos.t(T.cuentas_steam_extra_quitar_titulo, c.username),
+            message = Textos.t(T.cuentas_steam_extra_quitar_texto),
+            confirmLabel = Textos.t(T.cuentas_steam_extra_quitar_si),
+            onConfirm = {
+                scope.launch {
+                    trabajando = true
+                    when (val r = repository.quitarSteamExtra(c.accountId)) {
+                        is SettingsResult.Ok -> onUpdate()
+                        is SettingsResult.Error -> aviso = r.message to false
+                    }
+                    trabajando = false
+                }
+            },
+            onDismiss = { quitando = null },
+        )
     }
 }

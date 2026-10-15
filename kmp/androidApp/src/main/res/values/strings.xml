@@ -318,6 +318,16 @@
     <string name="cuentas_steam_2">Pon \"Detalles de mi perfil\" en Público.</string>
     <string name="cuentas_steam_3">El que casi todo el mundo se salta: pon \"Detalles del juego\" TAMBIÉN en Público — sin él, Steam no deja leer tu biblioteca.</string>
     <string name="cuentas_steam_4">Pulsa \"Guardar cambios\" al final de la página.</string>
+    <string name="cuentas_steam_extra_anadida">Añadida %1$s: %2$s juegos importados.</string>
+    <string name="cuentas_steam_extra_anadir">Añadir cuenta</string>
+    <string name="cuentas_steam_extra_privada">Añadida %1$s, pero su biblioteca es privada: pon «Detalles del juego» en público en Steam.</string>
+    <string name="cuentas_steam_extra_quitar">Quitar</string>
+    <string name="cuentas_steam_extra_quitar_si">Quitar cuenta</string>
+    <string name="cuentas_steam_extra_quitar_texto">Dejará de sincronizarse. Lo ya conseguido con ella se queda en tu biblioteca.</string>
+    <string name="cuentas_steam_extra_quitar_titulo">¿Quitar %1$s?</string>
+    <string name="cuentas_steam_extra_sub">Sus juegos y logros se suman a tu biblioteca, junto a los de tu cuenta principal, y se sincronizan a la vez.</string>
+    <string name="cuentas_steam_extra_titulo">OTRAS CUENTAS DE STEAM</string>
+    <string name="cuentas_steam_extra_vacio">Todavía no has añadido ninguna.</string>
     <string name="cuentas_steam_sync">Sincronizando tus logros de Steam… %1$s de %2$s juegos</string>
     <string name="cuentas_steam_sync_sub">Puedes seguir usando la app: los juegos irán mostrando sus logros.</string>
     <string name="cuentas_titulo">Cuentas Vinculadas</string>
