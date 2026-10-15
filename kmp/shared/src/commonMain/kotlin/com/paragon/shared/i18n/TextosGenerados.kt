@@ -824,73 +824,85 @@ object T {
     val stats_hito_3 = Texto(814)
     val stats_hitos = Texto(815)
     val stats_hitos_sub = Texto(816)
-    val stats_horas = Texto(817)
-    val stats_horas_dias = Texto(818)
-    val stats_horas_precio = Texto(819)
-    val stats_juegos_contados = Texto(820)
-    val stats_mas_calma = Texto(821)
-    val stats_mas_rapido = Texto(822)
-    val stats_mas_raro = Texto(823)
-    val stats_mas_raro_det = Texto(824)
-    val stats_mas_raro_det2 = Texto(825)
-    val stats_mejor_mes = Texto(826)
-    val stats_mejor_racha = Texto(827)
-    val stats_palmares = Texto(828)
-    val stats_palmares_sub = Texto(829)
-    val stats_platino_n = Texto(830)
-    val stats_primer_platino = Texto(831)
-    val stats_primer_trofeo = Texto(832)
-    val stats_racha_actual = Texto(833)
-    val stats_racha_det = Texto(834)
-    val stats_racha_larga = Texto(835)
-    val stats_rachas = Texto(836)
-    val stats_score_fila = Texto(837)
-    val stats_score_sub = Texto(838)
-    val stats_sin_datos = Texto(839)
-    val stats_titulo = Texto(840)
-    val tema_claro = Texto(841)
-    val tema_contraste = Texto(842)
-    val tema_oled = Texto(843)
-    val tema_oscuro = Texto(844)
-    val tema_rapido_combate = Texto(845)
-    val tema_rapido_contraste = Texto(846)
-    val tema_rapido_dia = Texto(847)
-    val tema_rapido_neon = Texto(848)
-    val tema_sistema = Texto(849)
-    val texto_enorme = Texto(850)
-    val texto_grande = Texto(851)
-    val texto_normal = Texto(852)
-    val texto_pequeno = Texto(853)
-    val tiempo_ahora = Texto(854)
-    val tiempo_d = Texto(855)
-    val tiempo_h = Texto(856)
-    val tiempo_min = Texto(857)
-    val vista_cronologia = Texto(858)
-    val vista_cuadricula = Texto(859)
-    val vista_lista = Texto(860)
-    val widget_objetivo = Texto(861)
-    val widget_sin_objetivo = Texto(862)
-    val widget_sin_objetivo_sub = Texto(863)
-    val wrap_comparas = Texto(864)
-    val wrap_dias_activos = Texto(865)
-    val wrap_dias_seguidos_1 = Texto(866)
-    val wrap_dias_seguidos_n = Texto(867)
-    val wrap_eso_fue = Texto(868)
-    val wrap_genero = Texto(869)
-    val wrap_genero_titulos = Texto(870)
-    val wrap_hola = Texto(871)
-    val wrap_juego = Texto(872)
-    val wrap_mejor_mes = Texto(873)
-    val wrap_percentil = Texto(874)
-    val wrap_racha = Texto(875)
-    val wrap_repartidos_1 = Texto(876)
-    val wrap_repartidos_n = Texto(877)
-    val wrap_top = Texto(878)
-    val wrap_trofeos_conseguidos = Texto(879)
-    val wrap_trofeos_mes = Texto(880)
-    val wrap_trofeos_n = Texto(881)
-    val wrap_vacio = Texto(882)
-    val wrap_vacio_sub = Texto(883)
+    val stats_hora_favorita = Texto(817)
+    val stats_hora_manana = Texto(818)
+    val stats_hora_noche = Texto(819)
+    val stats_hora_tarde = Texto(820)
+    val stats_horas = Texto(821)
+    val stats_horas_dias = Texto(822)
+    val stats_horas_precio = Texto(823)
+    val stats_juegos_contados = Texto(824)
+    val stats_mas_calma = Texto(825)
+    val stats_mas_rapido = Texto(826)
+    val stats_mas_raro = Texto(827)
+    val stats_mas_raro_det = Texto(828)
+    val stats_mas_raro_det2 = Texto(829)
+    val stats_mejor_mes = Texto(830)
+    val stats_mejor_racha = Texto(831)
+    val stats_palmares = Texto(832)
+    val stats_palmares_sub = Texto(833)
+    val stats_periodo_anio = Texto(834)
+    val stats_periodo_semana = Texto(835)
+    val stats_periodo_siempre = Texto(836)
+    val stats_platino_n = Texto(837)
+    val stats_primer_platino = Texto(838)
+    val stats_primer_trofeo = Texto(839)
+    val stats_racha_actual = Texto(840)
+    val stats_racha_det = Texto(841)
+    val stats_racha_larga = Texto(842)
+    val stats_rachas = Texto(843)
+    val stats_score_fila = Texto(844)
+    val stats_score_sub = Texto(845)
+    val stats_sin_datos = Texto(846)
+    val stats_titulo = Texto(847)
+    val stats_trofeos_en = Texto(848)
+    val stats_trofeos_semana = Texto(849)
+    val stats_trofeos_siempre = Texto(850)
+    val stats_vs_anio = Texto(851)
+    val stats_vs_semana = Texto(852)
+    val tema_claro = Texto(853)
+    val tema_contraste = Texto(854)
+    val tema_oled = Texto(855)
+    val tema_oscuro = Texto(856)
+    val tema_rapido_combate = Texto(857)
+    val tema_rapido_contraste = Texto(858)
+    val tema_rapido_dia = Texto(859)
+    val tema_rapido_neon = Texto(860)
+    val tema_sistema = Texto(861)
+    val texto_enorme = Texto(862)
+    val texto_grande = Texto(863)
+    val texto_normal = Texto(864)
+    val texto_pequeno = Texto(865)
+    val tiempo_ahora = Texto(866)
+    val tiempo_d = Texto(867)
+    val tiempo_h = Texto(868)
+    val tiempo_min = Texto(869)
+    val vista_cronologia = Texto(870)
+    val vista_cuadricula = Texto(871)
+    val vista_lista = Texto(872)
+    val widget_objetivo = Texto(873)
+    val widget_sin_objetivo = Texto(874)
+    val widget_sin_objetivo_sub = Texto(875)
+    val wrap_comparas = Texto(876)
+    val wrap_dias_activos = Texto(877)
+    val wrap_dias_seguidos_1 = Texto(878)
+    val wrap_dias_seguidos_n = Texto(879)
+    val wrap_eso_fue = Texto(880)
+    val wrap_genero = Texto(881)
+    val wrap_genero_titulos = Texto(882)
+    val wrap_hola = Texto(883)
+    val wrap_juego = Texto(884)
+    val wrap_mejor_mes = Texto(885)
+    val wrap_percentil = Texto(886)
+    val wrap_racha = Texto(887)
+    val wrap_repartidos_1 = Texto(888)
+    val wrap_repartidos_n = Texto(889)
+    val wrap_top = Texto(890)
+    val wrap_trofeos_conseguidos = Texto(891)
+    val wrap_trofeos_mes = Texto(892)
+    val wrap_trofeos_n = Texto(893)
+    val wrap_vacio = Texto(894)
+    val wrap_vacio_sub = Texto(895)
 }
 
 internal fun textosES(): Array<String> = arrayOf(
@@ -1711,6 +1723,10 @@ internal fun textosES(): Array<String> = arrayOf(
     "{0} · {1} · {2}",
     "Hitos de tu carrera",
     "Toda tu historia de trofeos, no solo este año",
+    "HORA FAVORITA",
+    "Madrugador de manual",
+    "Noctámbulo de manual",
+    "Cazador de tarde",
     "Horas jugadas",
     "= {0} días seguidos · en todas tus plataformas",
     "Horas con precio",
@@ -1724,6 +1740,9 @@ internal fun textosES(): Array<String> = arrayOf(
     "Mejor racha",
     "Palmarés",
     "Ligas que has ganado de verdad",
+    "Año",
+    "Semana",
+    "Siempre",
     "Tu platino #{0}",
     "Tu primer platino",
     "Tu primer trofeo",
@@ -1735,6 +1754,11 @@ internal fun textosES(): Array<String> = arrayOf(
     "Puntuación unificada entre plataformas",
     "Sin datos suficientes todavía.",
     "ESTADÍSTICAS",
+    "trofeos en {0}",
+    "trofeos en los últimos 7 días",
+    "trofeos con fecha conocida",
+    "{0} vs {1} a estas alturas",
+    "{0} vs los 7 días anteriores",
     "Claro",
     "Contraste",
     "OLED",
@@ -2598,6 +2622,10 @@ internal fun textosEN(): Array<String> = arrayOf(
     "{0} · {1} · {2}",
     "Career milestones",
     "Your whole trophy history, not just this year",
+    "FAVOURITE HOUR",
+    "A textbook early bird",
+    "A textbook night owl",
+    "Afternoon hunter",
     "Hours played",
     "= {0} days straight · across all your platforms",
     "Hours with price",
@@ -2611,6 +2639,9 @@ internal fun textosEN(): Array<String> = arrayOf(
     "Best streak",
     "Honours",
     "Leagues you've actually won",
+    "Year",
+    "Week",
+    "All time",
     "Your platinum #{0}",
     "Your first platinum",
     "Your first trophy",
@@ -2622,6 +2653,11 @@ internal fun textosEN(): Array<String> = arrayOf(
     "One score across platforms",
     "Not enough data yet.",
     "STATS",
+    "trophies in {0}",
+    "trophies in the last 7 days",
+    "trophies with a known date",
+    "{0} vs {1} at this point",
+    "{0} vs the previous 7 days",
     "Light",
     "Contrast",
     "OLED",
@@ -3485,6 +3521,10 @@ internal fun textosDE(): Array<String> = arrayOf(
     "{0} · {1} · {2}",
     "Meilensteine deiner Karriere",
     "Deine ganze Trophäengeschichte, nicht nur dieses Jahr",
+    "LIEBLINGSZEIT",
+    "Frühaufsteher wie aus dem Buch",
+    "Nachteule wie aus dem Buch",
+    "Nachmittagsjäger",
     "Gespielte Stunden",
     "= {0} Tage am Stück · auf all deinen Plattformen",
     "Stunden mit Preis",
@@ -3498,6 +3538,9 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Beste Serie",
     "Erfolge",
     "Ligen, die du wirklich gewonnen hast",
+    "Jahr",
+    "Woche",
+    "Gesamt",
     "Deine Platin #{0}",
     "Deine erste Platin",
     "Deine erste Trophäe",
@@ -3509,6 +3552,11 @@ internal fun textosDE(): Array<String> = arrayOf(
     "Eine Punktzahl über alle Plattformen",
     "Noch nicht genug Daten.",
     "STATISTIKEN",
+    "Trophäen in {0}",
+    "Trophäen in den letzten 7 Tagen",
+    "Trophäen mit bekanntem Datum",
+    "{0} ggü. {1} zum selben Zeitpunkt",
+    "{0} ggü. den 7 Tagen davor",
     "Hell",
     "Kontrast",
     "OLED",
@@ -4372,6 +4420,10 @@ internal fun textosFR(): Array<String> = arrayOf(
     "{0} · {1} · {2}",
     "Étapes de ta carrière",
     "Toute ton histoire de trophées, pas seulement cette année",
+    "HEURE PRÉFÉRÉE",
+    "Lève-tôt de manuel",
+    "Oiseau de nuit de manuel",
+    "Chasseur de l'après-midi",
     "Heures jouées",
     "= {0} jours d'affilée · sur toutes tes plateformes",
     "Heures avec prix",
@@ -4385,6 +4437,9 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Meilleure série",
     "Palmarès",
     "Ligues que tu as vraiment gagnées",
+    "Année",
+    "Semaine",
+    "Toujours",
     "Ton platine n°{0}",
     "Ton premier platine",
     "Ton premier trophée",
@@ -4396,6 +4451,11 @@ internal fun textosFR(): Array<String> = arrayOf(
     "Un score unique entre plateformes",
     "Pas encore assez de données.",
     "STATISTIQUES",
+    "trophées en {0}",
+    "trophées ces 7 derniers jours",
+    "trophées à date connue",
+    "{0} vs {1} à la même date",
+    "{0} vs les 7 jours précédents",
     "Clair",
     "Contraste",
     "OLED",

@@ -818,6 +818,10 @@
     <string name="stats_hito_3">%1$s · %2$s · %3$s</string>
     <string name="stats_hitos">Étapes de ta carrière</string>
     <string name="stats_hitos_sub">Toute ton histoire de trophées, pas seulement cette année</string>
+    <string name="stats_hora_favorita">HEURE PRÉFÉRÉE</string>
+    <string name="stats_hora_manana">Lève-tôt de manuel</string>
+    <string name="stats_hora_noche">Oiseau de nuit de manuel</string>
+    <string name="stats_hora_tarde">Chasseur de l\'après-midi</string>
     <string name="stats_horas">Heures jouées</string>
     <string name="stats_horas_dias">= %1$s jours d\'affilée · sur toutes tes plateformes</string>
     <string name="stats_horas_precio">Heures avec prix</string>
@@ -831,6 +835,9 @@
     <string name="stats_mejor_racha">Meilleure série</string>
     <string name="stats_palmares">Palmarès</string>
     <string name="stats_palmares_sub">Ligues que tu as vraiment gagnées</string>
+    <string name="stats_periodo_anio">Année</string>
+    <string name="stats_periodo_semana">Semaine</string>
+    <string name="stats_periodo_siempre">Toujours</string>
     <string name="stats_platino_n">Ton platine n°%1$s</string>
     <string name="stats_primer_platino">Ton premier platine</string>
     <string name="stats_primer_trofeo">Ton premier trophée</string>
@@ -842,6 +849,11 @@
     <string name="stats_score_sub">Un score unique entre plateformes</string>
     <string name="stats_sin_datos">Pas encore assez de données.</string>
     <string name="stats_titulo">STATISTIQUES</string>
+    <string name="stats_trofeos_en">trophées en %1$s</string>
+    <string name="stats_trofeos_semana">trophées ces 7 derniers jours</string>
+    <string name="stats_trofeos_siempre">trophées à date connue</string>
+    <string name="stats_vs_anio">%1$s vs %2$s à la même date</string>
+    <string name="stats_vs_semana">%1$s vs les 7 jours précédents</string>
     <string name="tema_claro">Clair</string>
     <string name="tema_contraste">Contraste</string>
     <string name="tema_oled">OLED</string>

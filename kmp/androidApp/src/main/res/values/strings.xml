@@ -820,6 +820,10 @@
     <string name="stats_hito_3">%1$s · %2$s · %3$s</string>
     <string name="stats_hitos">Hitos de tu carrera</string>
     <string name="stats_hitos_sub">Toda tu historia de trofeos, no solo este año</string>
+    <string name="stats_hora_favorita">HORA FAVORITA</string>
+    <string name="stats_hora_manana">Madrugador de manual</string>
+    <string name="stats_hora_noche">Noctámbulo de manual</string>
+    <string name="stats_hora_tarde">Cazador de tarde</string>
     <string name="stats_horas">Horas jugadas</string>
     <string name="stats_horas_dias">= %1$s días seguidos · en todas tus plataformas</string>
     <string name="stats_horas_precio">Horas con precio</string>
@@ -833,6 +837,9 @@
     <string name="stats_mejor_racha">Mejor racha</string>
     <string name="stats_palmares">Palmarés</string>
     <string name="stats_palmares_sub">Ligas que has ganado de verdad</string>
+    <string name="stats_periodo_anio">Año</string>
+    <string name="stats_periodo_semana">Semana</string>
+    <string name="stats_periodo_siempre">Siempre</string>
     <string name="stats_platino_n">Tu platino #%1$s</string>
     <string name="stats_primer_platino">Tu primer platino</string>
     <string name="stats_primer_trofeo">Tu primer trofeo</string>
@@ -844,6 +851,11 @@
     <string name="stats_score_sub">Puntuación unificada entre plataformas</string>
     <string name="stats_sin_datos">Sin datos suficientes todavía.</string>
     <string name="stats_titulo">ESTADÍSTICAS</string>
+    <string name="stats_trofeos_en">trofeos en %1$s</string>
+    <string name="stats_trofeos_semana">trofeos en los últimos 7 días</string>
+    <string name="stats_trofeos_siempre">trofeos con fecha conocida</string>
+    <string name="stats_vs_anio">%1$s vs %2$s a estas alturas</string>
+    <string name="stats_vs_semana">%1$s vs los 7 días anteriores</string>
     <string name="tema_claro">Claro</string>
     <string name="tema_contraste">Contraste</string>
     <string name="tema_oled">OLED</string>

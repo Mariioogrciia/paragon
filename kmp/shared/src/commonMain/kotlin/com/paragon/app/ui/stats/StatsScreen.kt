@@ -122,9 +122,12 @@ private fun StatsContent(stats: ParagonStats, handle: String, achievements: Achi
                 Text(text = Textos.t(T.comun_sin_conexion_copia), color = Muted, fontSize = 11.sp)
             }
         }
+        // Cabecera v2: Semana / Año / Siempre, estilo de caza y hora favorita.
+        // Con ella, el estilo ya no se repite dentro del ADN de trofeos.
+        stats.periodos?.let { item { ResumenPeriodos(it, stats.estiloDeCaza) } }
         dieta?.let { item { DietaGamerCard(it) } }
         item { ParagonScoreCard(stats.paragonScore) }
-        item { TrophyDnaCard(stats.trophyDna, stats.estiloDeCaza) }
+        item { TrophyDnaCard(stats.trophyDna, if (stats.periodos == null) stats.estiloDeCaza else null) }
         item { RachasCard(stats.rachas, stats.historico) }
         item { FinancieroCard(stats.financiero, stats.horasTotales) }
         item { EficienciaCard(stats.eficiencia) }

@@ -2,7 +2,7 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { getParagonScore } from "@/lib/paragonScore";
 import { calcularTrophyDna, calcularEstiloDeCaza } from "@/lib/trophyDna";
-import { rachas, resumenHistorico } from "@/lib/history";
+import { periodosDeCaza, rachas, resumenHistorico } from "@/lib/history";
 import { resumenFinanciero, eficienciaPersonal, resumenEficiencia, deudaBacklog } from "@/lib/backlog";
 import { horasTotales, hitosHistoricos } from "@/lib/profileStats";
 import { jsonConEtag } from "@/lib/etag";
@@ -27,13 +27,14 @@ export async function GET(req: Request) {
     return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }
 
-  const [{ games }, paragonScore, rachasUsuario, historico, horas, hitos] = await Promise.all([
+  const [{ games }, paragonScore, rachasUsuario, historico, horas, hitos, periodos] = await Promise.all([
     getLibrary(profile),
     getParagonScore(userId),
     rachas(userId),
     resumenHistorico(userId),
     horasTotales(userId),
     hitosHistoricos(userId),
+    periodosDeCaza(userId),
   ]);
 
   const dna = calcularTrophyDna(games);
@@ -65,5 +66,9 @@ export async function GET(req: Request) {
     // web (HistoricalTimeline.tsx), sin recortar nada: cada hito puede venir
     // `null` si todavía no aplica (p. ej. sin ningún platino).
     hitos,
+    // Cabecera de Estadísticas (diseño v2, 15 oct 2026): Semana / Año /
+    // Siempre con su comparación y sus barras, y la hora favorita. Solo
+    // cuenta trofeos con fecha (ver la nota de cobertura en lib/history.ts).
+    periodos,
   }, userId);
 }

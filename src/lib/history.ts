@@ -7,6 +7,7 @@ import { getUserTimezone } from "@/lib/profiles";
 import type { TrophyGrade } from "@/lib/types";
 import { traduccionesEnCache } from "@/lib/trofeosIdioma";
 import type { Idioma } from "@/lib/idiomasTrofeo";
+import { calcularPeriodos, horaFavorita, type Periodos } from "@/lib/periodos";
 
 /**
  * Histórico de trofeos.
@@ -534,4 +535,41 @@ export function prevision(ritmo: number | null, trofeosRestantes: number): Previ
   const semanas = Math.ceil(trofeosRestantes / ritmo);
   const fecha = new Date(Date.now() + semanas * 7 * 86_400_000);
   return { fecha: fecha.toISOString(), semanas };
+}
+
+/* ------------------------------ Periodos (Estadísticas de la app) ----------------------------- */
+
+export interface PeriodosDeCaza extends Periodos {
+  /** La hora (0-23, zona del usuario) a la que más trofeos cae; null sin datos. */
+  horaFavorita: number | null;
+}
+
+/**
+ * Semana / Año / Siempre y la hora favorita (ver lib/periodos.ts), todo en la
+ * zona horaria del usuario: un trofeo de las 00:30 en Madrid es de ese día,
+ * no del anterior como diría UTC.
+ */
+export async function periodosDeCaza(userId: string): Promise<PeriodosDeCaza> {
+  const tz = await getUserTimezone(userId);
+  const local = sql`(${userTrophies.earnedAt} at time zone 'UTC' at time zone ${tz})`;
+  const deUsuario = and(eq(userTrophies.userId, userId), eq(userTrophies.earned, true), isNotNull(userTrophies.earnedAt));
+
+  const [dias, horas, [hoy]] = await Promise.all([
+    db
+      .select({ dia: sql<string>`to_char(${local}, 'YYYY-MM-DD')`, total: sql<number>`count(*)` })
+      .from(userTrophies)
+      .where(deUsuario)
+      .groupBy(sql`1`),
+    db
+      .select({ hora: sql<number>`extract(hour from ${local})::int`, total: sql<number>`count(*)` })
+      .from(userTrophies)
+      .where(deUsuario)
+      .groupBy(sql`1`),
+    db.execute<{ hoy: string }>(sql`select to_char(now() at time zone ${tz}, 'YYYY-MM-DD') as hoy`).then((r) => [...r]),
+  ]);
+
+  return {
+    ...calcularPeriodos(dias.map((d) => ({ dia: d.dia, total: Number(d.total) })), hoy?.hoy ?? new Date().toISOString().slice(0, 10)),
+    horaFavorita: horaFavorita(horas.map((h) => ({ hora: Number(h.hora), total: Number(h.total) }))),
+  };
 }

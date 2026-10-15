@@ -818,6 +818,10 @@
     <string name="stats_hito_3">%1$s · %2$s · %3$s</string>
     <string name="stats_hitos">Career milestones</string>
     <string name="stats_hitos_sub">Your whole trophy history, not just this year</string>
+    <string name="stats_hora_favorita">FAVOURITE HOUR</string>
+    <string name="stats_hora_manana">A textbook early bird</string>
+    <string name="stats_hora_noche">A textbook night owl</string>
+    <string name="stats_hora_tarde">Afternoon hunter</string>
     <string name="stats_horas">Hours played</string>
     <string name="stats_horas_dias">= %1$s days straight · across all your platforms</string>
     <string name="stats_horas_precio">Hours with price</string>
@@ -831,6 +835,9 @@
     <string name="stats_mejor_racha">Best streak</string>
     <string name="stats_palmares">Honours</string>
     <string name="stats_palmares_sub">Leagues you\'ve actually won</string>
+    <string name="stats_periodo_anio">Year</string>
+    <string name="stats_periodo_semana">Week</string>
+    <string name="stats_periodo_siempre">All time</string>
     <string name="stats_platino_n">Your platinum #%1$s</string>
     <string name="stats_primer_platino">Your first platinum</string>
     <string name="stats_primer_trofeo">Your first trophy</string>
@@ -842,6 +849,11 @@
     <string name="stats_score_sub">One score across platforms</string>
     <string name="stats_sin_datos">Not enough data yet.</string>
     <string name="stats_titulo">STATS</string>
+    <string name="stats_trofeos_en">trophies in %1$s</string>
+    <string name="stats_trofeos_semana">trophies in the last 7 days</string>
+    <string name="stats_trofeos_siempre">trophies with a known date</string>
+    <string name="stats_vs_anio">%1$s vs %2$s at this point</string>
+    <string name="stats_vs_semana">%1$s vs the previous 7 days</string>
     <string name="tema_claro">Light</string>
     <string name="tema_contraste">Contrast</string>
     <string name="tema_oled">OLED</string>

@@ -818,6 +818,10 @@
     <string name="stats_hito_3">%1$s · %2$s · %3$s</string>
     <string name="stats_hitos">Meilensteine deiner Karriere</string>
     <string name="stats_hitos_sub">Deine ganze Trophäengeschichte, nicht nur dieses Jahr</string>
+    <string name="stats_hora_favorita">LIEBLINGSZEIT</string>
+    <string name="stats_hora_manana">Frühaufsteher wie aus dem Buch</string>
+    <string name="stats_hora_noche">Nachteule wie aus dem Buch</string>
+    <string name="stats_hora_tarde">Nachmittagsjäger</string>
     <string name="stats_horas">Gespielte Stunden</string>
     <string name="stats_horas_dias">= %1$s Tage am Stück · auf all deinen Plattformen</string>
     <string name="stats_horas_precio">Stunden mit Preis</string>
@@ -831,6 +835,9 @@
     <string name="stats_mejor_racha">Beste Serie</string>
     <string name="stats_palmares">Erfolge</string>
     <string name="stats_palmares_sub">Ligen, die du wirklich gewonnen hast</string>
+    <string name="stats_periodo_anio">Jahr</string>
+    <string name="stats_periodo_semana">Woche</string>
+    <string name="stats_periodo_siempre">Gesamt</string>
     <string name="stats_platino_n">Deine Platin #%1$s</string>
     <string name="stats_primer_platino">Deine erste Platin</string>
     <string name="stats_primer_trofeo">Deine erste Trophäe</string>
@@ -842,6 +849,11 @@
     <string name="stats_score_sub">Eine Punktzahl über alle Plattformen</string>
     <string name="stats_sin_datos">Noch nicht genug Daten.</string>
     <string name="stats_titulo">STATISTIKEN</string>
+    <string name="stats_trofeos_en">Trophäen in %1$s</string>
+    <string name="stats_trofeos_semana">Trophäen in den letzten 7 Tagen</string>
+    <string name="stats_trofeos_siempre">Trophäen mit bekanntem Datum</string>
+    <string name="stats_vs_anio">%1$s ggü. %2$s zum selben Zeitpunkt</string>
+    <string name="stats_vs_semana">%1$s ggü. den 7 Tagen davor</string>
     <string name="tema_claro">Hell</string>
     <string name="tema_contraste">Kontrast</string>
     <string name="tema_oled">OLED</string>

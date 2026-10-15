@@ -686,9 +686,21 @@ avisos. `{ "ok": true }` siempre — ver `mintMobileSession`/
   "financiero": { "totalGastado": 1200, "totalHoras": 800, "costeHoraMedio": 1.5, "juegosConDatos": 40 },
   "eficiencia": { "ritmoMedioPct": -12, "juegosConDatos": 20 },
   "backlog": { "juegosContados": 15, "horasHistoriaRestantes": 120, "horasPlatinoRestantes": 300 },
-  "horasTotales": 14280
+  "horasTotales": 14280,
+  "periodos": {
+    "semana": { "total": 12, "anterior": 9, "barras": [0, 3, 0, 4, 1, 0, 4] },
+    "anio": { "anio": 2026, "total": 1204, "anterior": 1020, "barras": [90, 110, 140, 80, 120, 100, 160, 150, 148, 106, 0, 0] },
+    "siempre": { "total": 4200, "barras": [ { "anio": 2019, "total": 300 }, { "anio": 2026, "total": 1204 } ] },
+    "horaFavorita": 23
+  }
 }
 ```
+`periodos` (15 oct 2026, cabecera v2 de Estadísticas) cuenta solo trofeos con
+fecha, por día en la zona horaria del usuario: `semana.barras` son los 7
+últimos días con hoy al final y `anterior` los 7 de antes; `anio.barras`, de
+enero a diciembre, y `anterior` el mismo tramo del año pasado (hasta el mismo
+día); `siempre.barras`, un año por barra. `horaFavorita` (0-23) o `null`.
+
 `estiloDeCaza` es distinto de `trophyDna.arquetipo` (ese es de GÉNERO, qué
 juegas) — mide CÓMO cazas trofeos (terminas lo que empiezas, abarcas mucho,
 te quedas en pocos sitios...), ver `calcularEstiloDeCaza` en

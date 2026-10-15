@@ -85,6 +85,7 @@ data class ParagonStats(
     val backlog: BacklogStats,
     val horasTotales: Int,
     val hitos: HitosStats,
+    val periodos: com.paragon.shared.red.PeriodosDto? = null,
 )
 
 sealed class StatsResult {
@@ -122,6 +123,7 @@ private fun StatsResponse.toParagonStats() = ParagonStats(
         rachaMasLarga = hitos.rachaMasLarga?.let { RachaMasLargaStats(it.dias, it.desde, it.hasta) },
         platinosHitos = hitos.platinosHitos.map { PlatinoNumeradoStats(it.numero, it.gameId, it.titulo, it.iconUrl, it.fecha) },
     ),
+    periodos = periodos,
 )
 
 private const val CACHE_KEY = "stats_data"

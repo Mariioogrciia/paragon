@@ -5302,5 +5302,77 @@
   "en": "Skip",
   "es": "Saltar",
   "fr": "Passer"
+ },
+ "stats_periodo_semana": {
+  "de": "Woche",
+  "en": "Week",
+  "es": "Semana",
+  "fr": "Semaine"
+ },
+ "stats_periodo_anio": {
+  "de": "Jahr",
+  "en": "Year",
+  "es": "Año",
+  "fr": "Année"
+ },
+ "stats_periodo_siempre": {
+  "de": "Gesamt",
+  "en": "All time",
+  "es": "Siempre",
+  "fr": "Toujours"
+ },
+ "stats_trofeos_semana": {
+  "de": "Trophäen in den letzten 7 Tagen",
+  "en": "trophies in the last 7 days",
+  "es": "trofeos en los últimos 7 días",
+  "fr": "trophées ces 7 derniers jours"
+ },
+ "stats_trofeos_en": {
+  "de": "Trophäen in {0}",
+  "en": "trophies in {0}",
+  "es": "trofeos en {0}",
+  "fr": "trophées en {0}"
+ },
+ "stats_trofeos_siempre": {
+  "de": "Trophäen mit bekanntem Datum",
+  "en": "trophies with a known date",
+  "es": "trofeos con fecha conocida",
+  "fr": "trophées à date connue"
+ },
+ "stats_vs_semana": {
+  "de": "{0} ggü. den 7 Tagen davor",
+  "en": "{0} vs the previous 7 days",
+  "es": "{0} vs los 7 días anteriores",
+  "fr": "{0} vs les 7 jours précédents"
+ },
+ "stats_vs_anio": {
+  "de": "{0} ggü. {1} zum selben Zeitpunkt",
+  "en": "{0} vs {1} at this point",
+  "es": "{0} vs {1} a estas alturas",
+  "fr": "{0} vs {1} à la même date"
+ },
+ "stats_hora_favorita": {
+  "de": "LIEBLINGSZEIT",
+  "en": "FAVOURITE HOUR",
+  "es": "HORA FAVORITA",
+  "fr": "HEURE PRÉFÉRÉE"
+ },
+ "stats_hora_manana": {
+  "de": "Frühaufsteher wie aus dem Buch",
+  "en": "A textbook early bird",
+  "es": "Madrugador de manual",
+  "fr": "Lève-tôt de manuel"
+ },
+ "stats_hora_tarde": {
+  "de": "Nachmittagsjäger",
+  "en": "Afternoon hunter",
+  "es": "Cazador de tarde",
+  "fr": "Chasseur de l'après-midi"
+ },
+ "stats_hora_noche": {
+  "de": "Nachteule wie aus dem Buch",
+  "en": "A textbook night owl",
+  "es": "Noctámbulo de manual",
+  "fr": "Oiseau de nuit de manuel"
  }
 }

@@ -93,6 +93,26 @@ data class StatsResponse(
     // Ya son horas, no minutos — ver la nota en route.ts. NO dividir entre 60 otra vez.
     val horasTotales: Int,
     val hitos: HitosDto,
+    /** Cabecera de Estadísticas (diseño v2): Semana / Año / Siempre. Null con un servidor anterior. */
+    val periodos: PeriodosDto? = null,
+)
+
+/** Un periodo de `periodos`: total, el del periodo anterior y las barras (ver CONTRACT.md). */
+@Serializable
+data class PeriodoDto(val total: Int = 0, val anterior: Int = 0, val barras: List<Int> = emptyList(), val anio: Int = 0)
+
+@Serializable
+data class AnioTotalDto(val anio: Int, val total: Int)
+
+@Serializable
+data class SiempreDto(val total: Int = 0, val barras: List<AnioTotalDto> = emptyList())
+
+@Serializable
+data class PeriodosDto(
+    val semana: PeriodoDto = PeriodoDto(),
+    val anio: PeriodoDto = PeriodoDto(),
+    val siempre: SiempreDto = SiempreDto(),
+    val horaFavorita: Int? = null,
 )
 
 /** Desglose de un mes — /api/mobile/stats/month, como /ritmo en la web. */
