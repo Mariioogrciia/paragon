@@ -88,6 +88,9 @@
     <string name="arquetipo_elite">Élite</string>
     <string name="arquetipo_explorador">Explorateur</string>
     <string name="arquetipo_veterano">Vétéran</string>
+    <string name="atascados_sesion">Session</string>
+    <string name="atascados_sesion_desc">Organiser une session pour ce trophée</string>
+    <string name="atascados_subtitulo">Ce qui te sépare du platine, jeu par jeu. Demande de l\'aide avec une session.</string>
     <string name="atascados_vacio">Tu n\'as aucun trophée bloqué</string>
     <string name="atascados_vacio_sub">Quand un trophée te résiste, marque-le depuis sa fiche et il apparaîtra ici — avec un guide vidéo à portée de doigt.</string>
     <string name="biblio_abandonados">Abandonnés</string>

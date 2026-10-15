@@ -88,6 +88,9 @@
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Entdecker:in</string>
     <string name="arquetipo_veterano">Veteran:in</string>
+    <string name="atascados_sesion">Session</string>
+    <string name="atascados_sesion_desc">Eine Session für diese Trophäe organisieren</string>
+    <string name="atascados_subtitulo">Was dich von Platin trennt, Spiel für Spiel. Hol dir Hilfe mit einer Session.</string>
     <string name="atascados_vacio">Du hast keine festgefahrenen Trophäen</string>
     <string name="atascados_vacio_sub">Wenn eine Trophäe nicht klappt, markier sie auf ihrer Spielseite — dann erscheint sie hier, mit Video-Guide auf einen Tipp.</string>
     <string name="biblio_abandonados">Abgebrochen</string>

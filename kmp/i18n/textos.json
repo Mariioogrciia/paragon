@@ -5374,5 +5374,23 @@
   "en": "A textbook night owl",
   "es": "Noctámbulo de manual",
   "fr": "Oiseau de nuit de manuel"
+ },
+ "atascados_subtitulo": {
+  "de": "Was dich von Platin trennt, Spiel für Spiel. Hol dir Hilfe mit einer Session.",
+  "en": "What stands between you and the platinum, game by game. Ask for help with a session.",
+  "es": "Lo que te separa del platino, juego a juego. Pide ayuda con una sesión.",
+  "fr": "Ce qui te sépare du platine, jeu par jeu. Demande de l'aide avec une session."
+ },
+ "atascados_sesion": {
+  "de": "Session",
+  "en": "Session",
+  "es": "Sesión",
+  "fr": "Session"
+ },
+ "atascados_sesion_desc": {
+  "de": "Eine Session für diese Trophäe organisieren",
+  "en": "Set up a session for this trophy",
+  "es": "Organizar una sesión para este trofeo",
+  "fr": "Organiser une session pour ce trophée"
  }
 }

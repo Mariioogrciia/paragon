@@ -90,6 +90,9 @@
     <string name="arquetipo_elite">Élite</string>
     <string name="arquetipo_explorador">Explorador</string>
     <string name="arquetipo_veterano">Veterano</string>
+    <string name="atascados_sesion">Sesión</string>
+    <string name="atascados_sesion_desc">Organizar una sesión para este trofeo</string>
+    <string name="atascados_subtitulo">Lo que te separa del platino, juego a juego. Pide ayuda con una sesión.</string>
     <string name="atascados_vacio">No tienes ningún trofeo atascado</string>
     <string name="atascados_vacio_sub">Cuando un trofeo se te resista, márcalo desde su ficha y aparecerá aquí — con una guía en vídeo a un toque.</string>
     <string name="biblio_abandonados">Abandonados</string>

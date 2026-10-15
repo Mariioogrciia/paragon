@@ -45,6 +45,11 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
         fun routeFor(handle: String) = "user/$handle"
     }
     object PlatinosOferta : Screen("platinos_oferta", T.ofertas_titulo)
+    /** Sesiones con "Organizar" abierto y el juego y el trofeo ya elegidos (desde Trofeos atascados). */
+    object OrganizarSesion : Screen("sessions/new?juego={juego}&trofeo={trofeo}", T.nav_sesiones) {
+        fun routeFor(gameId: String, trophyId: String) =
+            "sessions/new?juego=${gameId.encodeURLParameter()}&trofeo=${trophyId.encodeURLParameter()}"
+    }
     object SessionDetail : Screen("session/{sesionId}", T.nav_sesiones) {
         fun routeFor(sesionId: String) = "session/$sesionId"
     }

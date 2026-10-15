@@ -410,6 +410,7 @@ fun MainScreen(
                     dao = remember { database.stuckTrophyDao() },
                     onBack = { navController.popBackStack() },
                     onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
+                    onOrganizarSesion = { g, t -> navController.navigate(Screen.OrganizarSesion.routeFor(g, t)) },
                 )
             }
             
@@ -495,6 +496,21 @@ fun MainScreen(
                     tokenStore = tokenStore,
                     onBack = { navController.popBackStack() },
                     onAbrir = { id -> navController.navigate(Screen.SessionDetail.routeFor(id)) },
+                )
+            }
+            composable(
+                route = Screen.OrganizarSesion.route,
+                arguments = listOf(
+                    navArgument("juego") { nullable = true; defaultValue = null },
+                    navArgument("trofeo") { nullable = true; defaultValue = null },
+                ),
+            ) { entrada ->
+                com.paragon.app.ui.sesiones.SesionesScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrir = { id -> navController.navigate(Screen.SessionDetail.routeFor(id)) },
+                    organizarJuego = entrada.arguments?.read { getStringOrNull("juego") },
+                    organizarTrofeo = entrada.arguments?.read { getStringOrNull("trofeo") },
                 )
             }
             composable(

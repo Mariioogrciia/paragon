@@ -127,11 +127,19 @@ private fun fechaSesion(iso: String, larga: Boolean = false): String =
 // ------------------------------------------------------------------ Lista
 
 @Composable
-fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String) -> Unit, embebida: Boolean = false) {
+fun SesionesScreen(
+    tokenStore: TokenStore,
+    onBack: () -> Unit,
+    onAbrir: (String) -> Unit,
+    embebida: Boolean = false,
+    /** Desde Trofeos atascados ("Sesión"): abre Organizar con ese juego y ese trofeo ya elegidos. */
+    organizarJuego: String? = null,
+    organizarTrofeo: String? = null,
+) {
     val repo = remember { SesionesRepository(tokenStore) }
     var estado by remember { mutableStateOf<SesionResultado<com.paragon.shared.red.SesionesResponse>?>(null) }
     var recarga by remember { mutableIntStateOf(0) }
-    var organizando by remember { mutableStateOf(false) }
+    var organizando by remember { mutableStateOf(organizarJuego != null) }
 
     LaunchedEffect(recarga) { estado = repo.listar() }
 
@@ -175,6 +183,8 @@ fun SesionesScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrir: (String)
                     NuevaSesionSheet(
                         repo = repo,
                         juegos = e.valor.juegos,
+                        juegoInicial = organizarJuego,
+                        trofeoInicial = organizarTrofeo,
                         onDismiss = { organizando = false },
                         onCreada = { id ->
                             organizando = false
@@ -536,9 +546,11 @@ private fun NuevaSesionSheet(
     juegos: List<JuegoSesionDto>,
     onDismiss: () -> Unit,
     onCreada: (String) -> Unit,
+    juegoInicial: String? = null,
+    trofeoInicial: String? = null,
 ) {
     val scope = rememberCoroutineScope()
-    var gameId by remember { mutableStateOf(juegos.firstOrNull()?.id) }
+    var gameId by remember { mutableStateOf(juegos.firstOrNull { it.id == juegoInicial }?.id ?: juegos.firstOrNull()?.id) }
     var trofeos by remember { mutableStateOf<List<TrofeoPendienteDto>?>(null) }
     var trophyId by remember { mutableStateOf<String?>(null) }
     var trofeoLibre by remember { mutableStateOf("") }
@@ -556,7 +568,11 @@ private fun NuevaSesionSheet(
         trofeos = null
         val lista = repo.trofeosPendientes(id)
         trofeos = lista
-        trophyId = if (lista.isEmpty()) OTRO else null
+        trophyId = when {
+            lista.isEmpty() -> OTRO
+            id == juegoInicial && lista.any { it.trophyId == trofeoInicial } -> trofeoInicial
+            else -> null
+        }
     }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = com.paragon.app.ui.theme.SurfaceSolida) {

@@ -1,5 +1,8 @@
 package com.paragon.app.ui.stuck
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +40,14 @@ import io.ktor.http.encodeURLQueryComponent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () -> Unit, onAbrirTrofeo: (gameId: String, trophyId: String) -> Unit = { _, _ -> }) {
+fun StuckTrophiesScreen(
+    tokenStore: TokenStore,
+    dao: StuckTrophyDao,
+    onBack: () -> Unit,
+    onAbrirTrofeo: (gameId: String, trophyId: String) -> Unit = { _, _ -> },
+    /** "Sesión" (diseño v2): organizar una sesión online para ese trofeo, ya elegido. */
+    onOrganizarSesion: (gameId: String, trophyId: String) -> Unit = { _, _ -> },
+) {
     // `null` = todavía no se ha leído Room (distinto de "ya se leyó y está
     // vacío") — con `emptyList()` como valor inicial, cualquiera con
     // trofeos atascados de verdad veía un parpadeo del EmptyState antes de
@@ -51,7 +61,13 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
 
     Scaffold(
         topBar = {
-            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_atascados_menu), atras = null, onBack = onBack, modifier = Modifier.padding(bottom = 8.dp))
+            com.paragon.app.ui.common.CabeceraNativa(
+                titulo = Textos.t(T.nav_atascados_menu),
+                atras = null,
+                onBack = onBack,
+                subtitulo = Textos.t(T.atascados_subtitulo),
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
         },
         containerColor = Background
     ) { innerPadding ->
@@ -77,6 +93,7 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
                             trophy = trophy,
                             tokenStore = tokenStore,
                             onClick = { onAbrirTrofeo(trophy.gameId, trophy.trophyId) },
+                            onSesion = { onOrganizarSesion(trophy.gameId, trophy.trophyId) },
                             onRemove = {
                                 coroutineScope.launch {
                                     dao.removeStuckTrophy(trophy.trophyId)
@@ -92,7 +109,7 @@ fun StuckTrophiesScreen(tokenStore: TokenStore, dao: StuckTrophyDao, onBack: () 
 }
 
 @Composable
-fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove: () -> Unit, onClick: () -> Unit = {}) {
+fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove: () -> Unit, onClick: () -> Unit = {}, onSesion: (() -> Unit)? = null) {
     val uriHandler = LocalUriHandler.current
     val repository = remember(tokenStore) { GameDetailRepository(tokenStore) }
     val coroutineScope = rememberCoroutineScope()
@@ -118,6 +135,22 @@ fun StuckTrophyCard(trophy: StuckTrophyEntity, tokenStore: TokenStore, onRemove:
             Text(text = trophy.gameTitle, color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = trophy.trophyName, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 2.dp))
             Text(text = trophy.trophyDetail, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+            if (onSesion != null) {
+                // Pedir ayuda: Organizar sesión con este juego y este trofeo ya puestos.
+                Text(
+                    text = Textos.t(T.atascados_sesion),
+                    color = textoSobre(Accent),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .clip(RoundedCornerShape(radio(10)))
+                        .background(Accent)
+                        .premiumClickable(onClick = onSesion)
+                        .semantics { contentDescription = Textos.t(T.atascados_sesion_desc) }
+                        .padding(horizontal = 14.dp, vertical = 7.dp),
+                )
+            }
         }
         Column {
             IconButton(

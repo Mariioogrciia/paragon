@@ -88,6 +88,9 @@
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Explorer</string>
     <string name="arquetipo_veterano">Veteran</string>
+    <string name="atascados_sesion">Session</string>
+    <string name="atascados_sesion_desc">Set up a session for this trophy</string>
+    <string name="atascados_subtitulo">What stands between you and the platinum, game by game. Ask for help with a session.</string>
     <string name="atascados_vacio">You don\'t have any stuck trophies</string>
     <string name="atascados_vacio_sub">When a trophy fights back, mark it from its game page and it\'ll show up here — with a video guide one tap away.</string>
     <string name="biblio_abandonados">Abandoned</string>
