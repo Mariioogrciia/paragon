@@ -148,6 +148,18 @@
       "paso3": "Click the extension icon → “Sync Epic now”. Repeat whenever you want to update.",
       "conectar": "Connect the extension",
       "formulario": "Try with my profile link (Epic usually blocks it)"
+    },
+    "steamExtra": {
+      "titulo": "Other Steam accounts",
+      "descripcion": "Their games and achievements are added to your library, together with your main account's. They sync at the same time.",
+      "anadir": "Add account",
+      "sinCuentas": "You haven't added any yet.",
+      "privada": "Private library",
+      "sincronizada": "Synced {date}",
+      "quitar": "Remove",
+      "confirmTitulo": "Remove {nombre}?",
+      "confirmTexto": "It will stop syncing. Anything already earned with it stays in your library.",
+      "confirmBoton": "Remove account"
     }
   },
   "ajustesSeguridad": {

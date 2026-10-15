@@ -1,7 +1,9 @@
 import "server-only";
 import { and, desc, eq, inArray, isNull, like, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { activities, gameTrophies, games, platformAccounts, userGames, userTrophies, syncRuns, users } from "@/db/schema";
+import { activities, gameTrophies, games, platformAccounts, steamAccountExtra, userGames, userTrophies, syncRuns, users } from "@/db/schema";
+import { cuentasSteamExtra } from "@/lib/steamExtraDatos";
+import { juntarLogros } from "@/lib/juntarLogros";
 import { avisoPermitido } from "@/lib/avisosPreferencias";
 import { fetchLibrary as fetchPsnLibrary, fetchTrophies } from "@/lib/psn/client";
 import type { AuthorizationPayload } from "psn-api";
@@ -274,8 +276,13 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
           progressPercent: sql`greatest(${userGames.progressPercent}, excluded."progressPercent")`,
           earnedTotal: sql`greatest(${userGames.earnedTotal}, excluded."earnedTotal")`,
           earned: sql`coalesce(excluded."earned", ${userGames.earned})`,
-          lastPlayedAt: sqlExcluded("lastPlayedAt"),
-          playtimeMinutes: sql`coalesce(excluded."playtimeMinutes", ${userGames.playtimeMinutes})`,
+          // `greatest` (ignora los null) en vez de quedarse con lo último: con
+          // dos cuentas de Steam que tienen el mismo juego (ver
+          // lib/steamExtra.ts), cada sincronización pisaba a la otra y las
+          // horas subían y bajaban. Las horas solo crecen, y la última vez
+          // que se jugó es la más reciente de las dos.
+          lastPlayedAt: sql`greatest(${userGames.lastPlayedAt}, excluded."lastPlayedAt")`,
+          playtimeMinutes: sql`greatest(${userGames.playtimeMinutes}, excluded."playtimeMinutes")`,
           // A diferencia de `playtimeMinutes` (que solo crece), esta es una
           // ventana móvil de 2 semanas: se sobrescribe entera en cada
           // sincronización, incluso a `null` si ya no se ha jugado — lo
@@ -293,16 +300,43 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
  * por eso, después de guardar, se traen los logros de los juegos más recientes
  * (ver STEAM_DETAIL_LIMIT).
  */
-export async function syncLibrary(
-  userId: string,
-  account: SyncAccount,
-  opts: {
-    forzarDetalle?: boolean;
-    psnAuth?: AuthorizationPayload;
-    /** Epic leído por la extensión del navegador: se usa esto en vez de consultar a Epic desde el servidor (que Epic bloquea). */
-    epicDatos?: EpicDatosExtension;
-  } = {},
-): Promise<number> {
+interface OpcionesSync {
+  forzarDetalle?: boolean;
+  psnAuth?: AuthorizationPayload;
+  /** Epic leído por la extensión del navegador: se usa esto en vez de consultar a Epic desde el servidor (que Epic bloquea). */
+  epicDatos?: EpicDatosExtension;
+}
+
+export async function syncLibrary(userId: string, account: SyncAccount, opts: OpcionesSync = {}): Promise<number> {
+  const juegos = await syncLibraryDeCuenta(userId, account, opts);
+  if (account.platform !== "steam") return juegos;
+
+  // Cuentas de Steam extra (15 oct 2026, ver lib/steamExtra.ts): cada vez que
+  // se sincroniza la principal —cron, "Sincronizar", la app— también las
+  // demás, y sus juegos se suman a la misma biblioteca. Una que falle no
+  // tumba la principal.
+  let total = juegos;
+  for (const extra of await cuentasSteamExtra(userId)) {
+    if (!extra.isPublic || extra.accountId === account.accountId) continue;
+    try {
+      total += await syncLibraryDeCuenta(userId, { platform: "steam", accountId: extra.accountId }, { forzarDetalle: opts.forzarDetalle });
+      await db
+        .update(steamAccountExtra)
+        .set({ syncedAt: new Date() })
+        .where(and(eq(steamAccountExtra.userId, userId), eq(steamAccountExtra.accountId, extra.accountId)));
+    } catch (error) {
+      console.error("[sync] cuenta de Steam extra", extra.accountId, error);
+    }
+  }
+  return total;
+}
+
+/** Solo la biblioteca de UNA cuenta de Steam extra (al añadirla), sin volver a pasar por la principal. */
+export function syncCuentaSteamExtra(userId: string, steamId: string): Promise<number> {
+  return syncLibraryDeCuenta(userId, { platform: "steam", accountId: steamId });
+}
+
+async function syncLibraryDeCuenta(userId: string, account: SyncAccount, opts: OpcionesSync = {}): Promise<number> {
   // Google y Ubisoft no tienen lector propio todavía. Sin esta salida,
   // "cualquier plataforma que no sea psn/steam/xbox/epic" caía por defecto
   // en el lector de Steam y le pedía la biblioteca a Steam con, p. ej., un
@@ -422,6 +456,33 @@ export async function syncLibrary(
 }
 
 /* --------------------------------- Detalle -------------------------------- */
+
+/**
+ * Los logros de un juego de Steam con TODAS las cuentas de Steam del usuario
+ * (la principal y las extra, ver lib/steamExtra.ts): conseguido si lo tiene
+ * cualquiera, con la fecha más antigua. Sin cuentas extra es exactamente la
+ * llamada de siempre. Steam devuelve la lista entera del juego también a
+ * quien no lo tiene (todo sin conseguir), así que juntar es seguro.
+ */
+async function logrosSteamDeTodas(userId: string, cuenta: string, appId: string): Promise<Trophy[]> {
+  const extra = await cuentasSteamExtra(userId);
+  const base = await fetchAchievements(cuenta, appId);
+  if (extra.length === 0) return base;
+
+  // Todas menos la que ya se ha pedido: las extra públicas y, si se está
+  // sincronizando una extra, también la principal (si no, sus logros se
+  // darían por no conseguidos).
+  const [principal] = await db
+    .select({ accountId: platformAccounts.accountId })
+    .from(platformAccounts)
+    .where(and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, "steam")))
+    .limit(1);
+  const otrasCuentas = [principal?.accountId, ...extra.filter((c) => c.isPublic).map((c) => c.accountId)]
+    .filter((id): id is string => !!id && id !== cuenta);
+
+  const otras = await Promise.allSettled(otrasCuentas.map((id) => fetchAchievements(id, appId)));
+  return juntarLogros(base, otras.flatMap((r) => (r.status === "fulfilled" ? [r.value] : [])));
+}
 
 /**
  * Suma `n` trofeos nuevos a la última sincronización de esa cuenta (la
@@ -738,7 +799,7 @@ export async function syncGameTrophies(
       await syncIgdbMetadata(gameId, row.title);
     }
   } else {
-    trophies = await fetchAchievements(account.accountId, nativeId);
+    trophies = await logrosSteamDeTodas(userId, account.accountId, nativeId);
     await syncStoreMetadata(gameId, nativeId);
   }
 

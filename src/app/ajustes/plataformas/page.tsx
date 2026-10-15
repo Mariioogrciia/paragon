@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { ShieldQuestion } from "lucide-react";
 import { useLocale } from "next-intl";
 import { auth } from "@/auth";
-import { unlinkAccountAction } from "@/app/actions";
+import { quitarSteamExtraAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { cuentasSteamExtra, type CuentaSteamExtra } from "@/lib/steamExtraDatos";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { SaludSincronizacion } from "@/components/SaludSincronizacion";
@@ -123,6 +124,75 @@ function PlatformSection({
   );
 }
 
+/**
+ * Otras cuentas de Steam (15 oct 2026, ver lib/steamExtra.ts): debajo de la
+ * principal, la lista con "Quitar" y el campo para añadir otra. Solo sale
+ * al desarrollador y con la principal ya vinculada.
+ */
+function CuentasSteamExtra({ cuentas, t, idioma }: { cuentas: CuentaSteamExtra[]; t: Traductor; idioma: string }) {
+  return (
+    <section className="cuenta-fila" aria-labelledby="cuenta-steam-extra">
+      <div className="cuenta-identidad">
+        <div className="flex items-center gap-3">
+          <span className="cuenta-logo" style={{ background: AVATAR_BG.steam }}>
+            <SteamLogo className="h-5 w-5" />
+          </span>
+          <h2 id="cuenta-steam-extra" className="font-heading text-lg font-bold">
+            {t("ajustesPlataformas.steamExtra.titulo")}
+          </h2>
+        </div>
+        <p className="mt-3 text-[0.8125rem] text-muted">{t("ajustesPlataformas.steamExtra.descripcion")}</p>
+        {cuentas.length === 0 ? (
+          <p className="mt-3 text-[0.8125rem] text-muted">{t("ajustesPlataformas.steamExtra.sinCuentas")}</p>
+        ) : (
+          <ul className="mt-4 flex flex-col gap-3">
+            {cuentas.map((c) => (
+              <li key={c.accountId} className="flex items-center gap-3">
+                <span className="cuenta-avatar" style={{ background: AVATAR_BG.steam }}>
+                  {c.avatarUrl ? (
+                    <img loading="lazy" decoding="async" src={c.avatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    c.username.charAt(0).toUpperCase()
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[0.9375rem] font-semibold" title={c.username}>
+                    {c.username}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {!c.isPublic
+                      ? t("ajustesPlataformas.steamExtra.privada")
+                      : c.syncedAt
+                        ? t("ajustesPlataformas.steamExtra.sincronizada", { date: relativeDate(c.syncedAt, idioma) ?? "" })
+                        : t("ajustesPlataformas.accountLinked")}
+                  </p>
+                </div>
+                <ConfirmForm
+                  action={quitarSteamExtraAction}
+                  hidden={{ steamId: c.accountId }}
+                  title={t("ajustesPlataformas.steamExtra.confirmTitulo", { nombre: c.username })}
+                  message={t("ajustesPlataformas.steamExtra.confirmTexto")}
+                  confirmLabel={t("ajustesPlataformas.steamExtra.confirmBoton")}
+                  triggerClassName="rounded-md px-1 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-danger"
+                >
+                  {t("ajustesPlataformas.steamExtra.quitar")}
+                </ConfirmForm>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div className="cuenta-formulario">
+        <p className="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
+          {t("ajustesPlataformas.steamExtra.anadir")}
+        </p>
+        <AnadirSteamExtraForm />
+        <p className="mt-2 text-xs text-muted">{t("ajustesPlataformas.help.steam")}</p>
+      </div>
+    </section>
+  );
+}
+
 export default async function AjustesPlataformasPage() {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
@@ -142,6 +212,7 @@ export default async function AjustesPlataformasPage() {
   ]);
 
   const t = await getTranslations("Onboarding");
+  const steamExtra = profile?.esDesarrollador && steam ? await cuentasSteamExtra(session.user.id) : null;
   const tDeclarado = await getTranslations("Shell.Declarado");
   const locale = await getLocale();
 
@@ -182,6 +253,8 @@ export default async function AjustesPlataformasPage() {
         <PlatformSection platform="steam" account={steam} t={t}>
           <LinkSteamForm current={steam?.username} sinAviso={steam?.isPublic === true} />
         </PlatformSection>
+
+        {steamExtra && <CuentasSteamExtra cuentas={steamExtra} t={t} idioma={locale} />}
 
         <PlatformSection platform="xbox" account={xbox} t={t}>
           <LinkXboxForm current={xbox?.username} sinAviso={xbox?.isPublic === true} />

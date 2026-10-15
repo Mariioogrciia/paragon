@@ -12,6 +12,7 @@ import {
   createLeagueAction,
   linkPsnAction,
   linkSteamAction,
+  anadirSteamExtraAction,
   linkXboxAction,
   linkEpicAction,
   updateProfileAction,
@@ -156,6 +157,29 @@ export function LinkSteamForm({ current, sinAviso = false }: { current?: string 
       </div>
       <Feedback state={state} />
       <PrivacyGuide platform="steam" />
+    </form>
+  );
+}
+
+/** Añadir otra cuenta de Steam (Ajustes → Plataformas, solo el desarrollador por ahora). */
+export function AnadirSteamExtraForm() {
+  const t = useTranslations("Onboarding");
+  const [state, action] = useActionState(anadirSteamExtraAction, EMPTY);
+
+  return (
+    <form action={action}>
+      <div className="flex flex-col gap-2.5 sm:flex-row">
+        <input
+          name="steamId"
+          placeholder={t("forms.steam.placeholder")}
+          autoComplete="off"
+          spellCheck={false}
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
+          style={FIELD}
+        />
+        <Submit>{t("ajustesPlataformas.steamExtra.anadir")}</Submit>
+      </div>
+      <Feedback state={state} />
     </form>
   );
 }

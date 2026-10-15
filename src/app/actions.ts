@@ -66,6 +66,7 @@ import { RetoAmigosError, cancelarRetoAmigos, crearRetoAmigos, responderRetoAmig
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { tr } from "@/lib/mensajesWeb";
+import { SteamExtraError, anadirCuentaSteamExtra, quitarCuentaSteamExtra } from "@/lib/steamExtra";
 
 export interface ActionState {
   error?: string;
@@ -354,6 +355,39 @@ export async function unlinkAccountAction(formData: FormData): Promise<void> {
   if (!["psn", "steam", "xbox", "epic"].includes(platformInput)) return;
 
   await unlinkAccount(userId, platformInput as PlataformaVinculable);
+  revalidatePath("/", "layout");
+}
+
+/* ---------------------- Cuentas de Steam extra (15 oct 2026) ---------------------- */
+
+/** Añadir otra cuenta de Steam al perfil (ver lib/steamExtra.ts). De momento solo el desarrollador. */
+export async function anadirSteamExtraAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId();
+  const profile = await getProfileByUserId(userId);
+  if (!profile?.esDesarrollador) return { error: await tr("No disponible.") };
+  if (!(await limitar("vincularCuenta", userId))) {
+    return { error: await tr("Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.") };
+  }
+
+  const entrada = String(formData.get("steamId") ?? "").trim();
+  if (!entrada) return { error: await tr(PLATFORM_COPY.steam.missing) };
+
+  try {
+    const r = await anadirCuentaSteamExtra(userId, entrada);
+    revalidatePath("/", "layout");
+    if (!r.legible) return { warning: await tr(PLATFORM_COPY.steam.privado(r.username)) };
+    return { success: await tr(`Vinculado a ${r.username}: ${r.juegos} juegos importados.`) };
+  } catch (error) {
+    if (error instanceof SteamExtraError) return { error: await tr(error.message) };
+    return { error: await tr(describeError(error)) };
+  }
+}
+
+export async function quitarSteamExtraAction(formData: FormData): Promise<void> {
+  const userId = await requireUserId();
+  const steamId = String(formData.get("steamId") ?? "");
+  if (!/^\d{5,25}$/.test(steamId)) return;
+  await quitarCuentaSteamExtra(userId, steamId);
   revalidatePath("/", "layout");
 }
 

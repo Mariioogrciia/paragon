@@ -133,6 +133,11 @@ const FIJOS: Record<string, Trad> = {
   "El archivo no es lo que dice su extensión": { en: "The file isn't what its extension says", de: "Die Datei passt nicht zu ihrer Endung", fr: "Le fichier ne correspond pas à son extension" },
   "No se pudo subir el archivo": { en: "Couldn't upload the file", de: "Datei konnte nicht hochgeladen werden", fr: "Impossible d'envoyer le fichier" },
   "No tienes vinculada esa plataforma.": { en: "You haven't linked that platform.", de: "Diese Plattform ist nicht verknüpft.", fr: "Tu n'as pas associé cette plateforme." },
+  // Cuentas de Steam extra (lib/steamExtra.ts, 15 oct 2026).
+  "No disponible.": { en: "Not available.", de: "Nicht verfügbar.", fr: "Non disponible." },
+  "Vincula primero tu cuenta principal de Steam.": { en: "Link your main Steam account first.", de: "Verknüpfe zuerst dein Haupt-Steam-Konto.", fr: "Associe d'abord ton compte Steam principal." },
+  "Esa ya es tu cuenta principal de Steam.": { en: "That's already your main Steam account.", de: "Das ist schon dein Haupt-Steam-Konto.", fr: "C'est déjà ton compte Steam principal." },
+  "No se ha podido guardar la cuenta. Inténtalo en un momento.": { en: "Couldn't save the account. Try again in a moment.", de: "Das Konto konnte nicht gespeichert werden. Versuch es gleich noch mal.", fr: "Impossible d'enregistrer le compte. Réessaie dans un instant." },
   // Server actions de la web (lib/mensajesWeb.ts, 13 oct 2026).
   "No se pudo entregar el aviso.": { en: "Couldn't deliver the notification.", de: "Die Benachrichtigung konnte nicht zugestellt werden.", fr: "Impossible de livrer la notification." },
   "No se pudo enviar.": { en: "Couldn't send it.", de: "Konnte nicht gesendet werden.", fr: "Impossible d'envoyer." },
@@ -328,6 +333,10 @@ const PATRONES: { re: RegExp; trad: (m: RegExpMatchArray) => Trad }[] = [
       de: `Konto mit ${m[1]} verknüpft, aber es ist nicht öffentlich. Im Epic Games Store: dein Avatar → „Erfolge“ → „Datenschutzstufe“ → „Öffentlich“.`,
       fr: `Compte associé à ${m[1]}, mais il n'est pas public. Dans l'Epic Games Store : ton avatar → « Succès » → « Niveau de confidentialité » → « Public ».`,
     }),
+  },
+  {
+    re: /^Como mucho (\d+) cuentas de Steam además de la principal\.$/,
+    trad: (m) => ({ en: `${m[1]} Steam accounts at most besides the main one.`, de: `Höchstens ${m[1]} Steam-Konten zusätzlich zum Hauptkonto.`, fr: `${m[1]} comptes Steam maximum en plus du principal.` }),
   },
   {
     re: /^Como mucho (\d+) caracteres\.$/,

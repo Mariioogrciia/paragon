@@ -148,6 +148,18 @@
       "paso3": "Clique sur l’icône de l’extension → « Synchroniser Epic maintenant ». Recommence quand tu veux mettre à jour.",
       "conectar": "Connecter l’extension",
       "formulario": "Essayer avec le lien de mon profil (Epic le bloque souvent)"
+    },
+    "steamExtra": {
+      "titulo": "Autres comptes Steam",
+      "descripcion": "Leurs jeux et succès s'ajoutent à ta bibliothèque, avec ceux de ton compte principal. Ils se synchronisent en même temps.",
+      "anadir": "Ajouter un compte",
+      "sinCuentas": "Tu n'en as encore ajouté aucun.",
+      "privada": "Bibliothèque privée",
+      "sincronizada": "Synchronisé {date}",
+      "quitar": "Retirer",
+      "confirmTitulo": "Retirer {nombre} ?",
+      "confirmTexto": "Il ne sera plus synchronisé. Ce que tu as déjà obtenu avec reste dans ta bibliothèque.",
+      "confirmBoton": "Retirer le compte"
     }
   },
   "ajustesSeguridad": {

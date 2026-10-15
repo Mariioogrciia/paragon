@@ -233,6 +233,30 @@ export const platformAccounts = pgTable(
 );
 
 /**
+ * Cuentas de Steam ADEMÁS de la principal (15 oct 2026): p. ej. una segunda
+ * cuenta solo para el FIFA. Sus juegos y logros se suman a la misma
+ * biblioteca (ver lib/steamExtra.ts). De momento solo para el desarrollador.
+ * La tabla la crea `asegurarTablaSteamExtra()` la primera vez (o el script
+ * scripts/crear-tabla-steam-extra.mts).
+ */
+export const steamAccountExtra = pgTable(
+  "steam_account_extra",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** SteamID64. */
+    accountId: text("accountId").notNull().unique(),
+    username: text("username").notNull(),
+    avatarUrl: text("avatarUrl"),
+    isPublic: boolean("isPublic").notNull().default(true),
+    syncedAt: timestamp("syncedAt", { mode: "date" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (a) => [primaryKey({ columns: [a.userId, a.accountId] })],
+);
+
+/**
  * @deprecated Sustituida por `platformAccounts`.
  *
  * Se queda definida solo para que `db:push` no la borre antes de que
