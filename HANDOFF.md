@@ -59,10 +59,15 @@ desarrollador, `esDesarrollador` en lib/profiles.ts):
   `playtimeMinutes` y `lastPlayedAt` pasan a `greatest` para que dos cuentas
   con el mismo juego no se pisen.
 - Web: Ajustes → Plataformas → "Otras cuentas de Steam" (añadir / quitar;
-  al quitar, lo conseguido se queda). La app ve los juegos sumados, pero
-  añadir o quitar cuentas es solo desde la web por ahora.
+  al quitar, lo conseguido se queda). App: lo mismo al final de Plataformas
+  vinculadas (`SteamExtraSeccion` en LinkedAccountsScreen.kt), con
+  `POST/DELETE /api/mobile/accounts/steam-extra` y `steamExtra` en
+  `GET /api/mobile/accounts` (CONTRACT.md).
+- De paso: en Ajustes → Plataformas, "Sincronizar X" y "Desvincular X" van a
+  la misma altura y tamaño.
 - Para abrirlo a todo el mundo: quitar la comprobación de `esDesarrollador`
-  en `anadirSteamExtraAction` y en `ajustes/plataformas/page.tsx`.
+  en `anadirSteamExtraAction`, `ajustes/plataformas/page.tsx`,
+  `api/mobile/accounts/route.ts` y `api/mobile/accounts/steam-extra/route.ts`.
 
 **15 oct — lo que quedaba de código** (commits `3680eba` avisos, `887c9b0`
 límites y lint, `2fd53c8` Enfoque, `cde5529` Estadísticas, `fb4f474`
