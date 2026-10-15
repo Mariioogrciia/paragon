@@ -388,7 +388,11 @@ fun MainScreen(
             }
 
             composable(Screen.Focus.route) {
-                FocusScreen(tokenStore, onBack = { navController.popBackStack() })
+                FocusScreen(
+                    tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrirTrofeo = { g, t -> navController.navigate(Screen.GameDetail.routeFor(g, t)) },
+                )
             }
             composable(
                 route = Screen.Compare.route,

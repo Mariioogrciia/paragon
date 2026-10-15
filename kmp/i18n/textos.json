@@ -5266,5 +5266,41 @@
   "en": "ACTIVITY",
   "es": "ACTIVIDAD",
   "fr": "ACTIVITÉ"
+ },
+ "enfoque_por_hacer": {
+  "de": "{0} · noch {1}",
+  "en": "{0} · {1} to go",
+  "es": "{0} · {1} por hacer",
+  "fr": "{0} · {1} à faire"
+ },
+ "enfoque_al_platino": {
+  "de": "bis Platin",
+  "en": "to platinum",
+  "es": "al platino",
+  "fr": "vers le platine"
+ },
+ "enfoque_ahora": {
+  "de": "JETZT",
+  "en": "NOW",
+  "es": "AHORA",
+  "fr": "MAINTENANT"
+ },
+ "enfoque_despues": {
+  "de": "DANACH",
+  "en": "NEXT",
+  "es": "DESPUÉS",
+  "fr": "ENSUITE"
+ },
+ "enfoque_ver_guia": {
+  "de": "Guide ansehen",
+  "en": "View guide",
+  "es": "Ver guía",
+  "fr": "Voir le guide"
+ },
+ "enfoque_saltar": {
+  "de": "Überspringen",
+  "en": "Skip",
+  "es": "Saltar",
+  "fr": "Passer"
  }
 }

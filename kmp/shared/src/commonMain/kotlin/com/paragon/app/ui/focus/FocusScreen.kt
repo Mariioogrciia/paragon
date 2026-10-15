@@ -52,6 +52,13 @@ import com.paragon.shared.i18n.Textos
 
 private val FocoNegro = Color(0xFF000000)
 
+// Modo Enfoque es siempre oscuro, con el acento del tema (maqueta v2): mismos
+// tonos que la maqueta para tarjetas, pista del anillo y texto secundario.
+private val FocoSuperficie = Color(0xFF121A26)
+private val FocoTarjeta = Color(0xFF10151F)
+private val FocoPista = Color(0xFF1A2230)
+private val FocoTenue = Color(0xFFA7B0C0)
+
 /**
  * Modo Enfoque: el móvil como segunda pantalla mientras se juega en la
  * tele — negro puro (ahorra batería OLED y se mira de reojo), trofeos
@@ -66,7 +73,12 @@ private val FocoNegro = Color(0xFF000000)
  * GET /api/mobile/games/{id}.
  */
 @Composable
-fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
+fun FocusScreen(
+    tokenStore: TokenStore,
+    onBack: () -> Unit = {},
+    /** "Ver guía": la ficha del juego, bajando hasta ese trofeo (ahí están las guías). */
+    onAbrirTrofeo: (gameId: String, trophyId: String) -> Unit = { _, _ -> },
+) {
     val context = com.paragon.shared.contextoPlataforma()
     val db = remember(context) { com.paragon.app.data.local.ParagonDatabase.getDatabase(context) }
     val libraryRepository = remember(tokenStore, db) { LibraryRepository(tokenStore, db.libraryDao(), context) }
@@ -137,6 +149,7 @@ fun FocusScreen(tokenStore: TokenStore, onBack: () -> Unit = {}) {
                     sessionRepository = sessionRepository,
                     activeSession = activeSession,
                     onActiveSessionChanged = { activeSession = it },
+                    onAbrirTrofeo = onAbrirTrofeo,
                 )
             }
         }
@@ -196,6 +209,7 @@ private fun FocusContent(
     sessionRepository: GameSessionRepository,
     activeSession: GameSessionEntity?,
     onActiveSessionChanged: (GameSessionEntity?) -> Unit,
+    onAbrirTrofeo: (gameId: String, trophyId: String) -> Unit,
 ) {
     var nota by remember(gameId) { mutableStateOf(game.notes) }
     var guardando by remember { mutableStateOf(false) }
@@ -232,61 +246,64 @@ private fun FocusContent(
         guardando = false
     }
 
-    val pendientes = game.trophies
-        .filter { !it.earned }
-        .sortedByDescending { it.rarityPercent ?: 0.0 }
-        .take(3)
+    // Los que faltan, del más fácil (más gente lo tiene) al más difícil.
+    // "Saltar" pasa al siguiente sin perder el orden.
+    val pendientes = remember(game.trophies) {
+        game.trophies.filter { !it.earned }.sortedByDescending { it.rarityPercent ?: 0.0 }
+    }
+    var saltados by remember(gameId) { mutableIntStateOf(0) }
+    val ahora = pendientes.getOrNull(if (pendientes.isEmpty()) 0 else saltados % pendientes.size)
+    val despues = if (pendientes.size <= 1) emptyList() else
+        (1..minOf(2, pendientes.size - 1)).map { pendientes[(saltados + it) % pendientes.size] }
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 16.dp)) {
-        Row(verticalAlignment = Alignment.Top) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = Textos.t(T.enfoque_titulo),
-                    color = Color.White.copy(alpha = 0.4f),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp,
-                )
-                Text(
-                    text = game.title.uppercase(),
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    modifier = Modifier.padding(top = 2.dp),
-                )
-                if (fromCache) {
-                    Text(
-                        text = Textos.t(T.comun_sin_conexion_copia),
-                        color = Color.White.copy(alpha = 0.5f),
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                }
-            }
-            TextButton(onClick = { mostrarDiario = true }) {
-                Text(Textos.t(T.enfoque_diario), color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-            }
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.Close, contentDescription = Textos.t(T.enfoque_salir), tint = Color.White)
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+    ) {
+        // Diseño v2: salir a la izquierda, juego y lo que falta en el centro, Diario a la derecha.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.weight(1f).height(6.dp).background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(radio(3)))) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(game.percent / 100f)
-                        .fillMaxHeight()
-                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(radio(3))),
-                )
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(40.dp).clip(CircleShape).background(FocoSuperficie),
+            ) {
+                Icon(Icons.Default.Close, contentDescription = Textos.t(T.enfoque_salir), tint = Color.White, modifier = Modifier.size(18.dp))
             }
-            Spacer(Modifier.width(10.dp))
-            Text(text = "${game.earnedTrophies}/${game.totalTrophies}", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = Textos.t(T.enfoque_por_hacer, game.title.uppercase(), pendientes.size),
+                color = FocoTenue,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+            )
+            TextButton(onClick = { mostrarDiario = true }) {
+                Text(Textos.t(T.enfoque_diario), color = FocoTenue, fontSize = 12.sp)
+            }
+        }
+        if (fromCache) {
+            Text(
+                text = Textos.t(T.comun_sin_conexion_copia),
+                color = FocoTenue,
+                fontSize = 11.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            )
         }
 
+        Spacer(Modifier.height(24.dp))
+        AnilloPlatino(porcentaje = game.percent, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(
+            text = "${game.earnedTrophies}/${game.totalTrophies}",
+            color = FocoTenue,
+            fontSize = 13.sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
+        )
         Spacer(Modifier.height(16.dp))
 
         SessionTimerCard(
@@ -318,17 +335,49 @@ private fun FocusContent(
 
         Spacer(Modifier.height(16.dp))
 
-        if (pendientes.isEmpty()) {
-            Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                Text(text = Textos.t(T.enfoque_hecho), color = Color.White.copy(alpha = 0.6f), fontSize = 15.sp)
-            }
+        if (ahora == null) {
+            Text(
+                text = Textos.t(T.enfoque_hecho),
+                color = FocoTenue,
+                fontSize = 15.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+            )
         } else {
-            Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                pendientes.forEachIndexed { index, trofeo -> PendingTrophyCard(trofeo, destacado = index == 0) }
+            EtiquetaFoco(Textos.t(T.enfoque_ahora))
+            TrofeoAhora(ahora)
+            Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Button(
+                    onClick = { onAbrirTrofeo(gameId, ahora.id) },
+                    modifier = Modifier.weight(1f).height(52.dp),
+                    shape = RoundedCornerShape(radio(16)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = textoSobre(Accent)),
+                ) {
+                    Text(Textos.t(T.enfoque_ver_guia), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                }
+                Button(
+                    onClick = { saltados++ },
+                    enabled = pendientes.size > 1,
+                    modifier = Modifier.weight(1f).height(52.dp),
+                    shape = RoundedCornerShape(radio(16)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = FocoSuperficie,
+                        contentColor = Color.White,
+                        disabledContainerColor = FocoSuperficie,
+                        disabledContentColor = FocoTenue,
+                    ),
+                ) {
+                    Text(Textos.t(T.enfoque_saltar), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            if (despues.isNotEmpty()) {
+                EtiquetaFoco(Textos.t(T.enfoque_despues))
+                Column(Modifier.graphicsLayer { alpha = 0.7f }, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    despues.forEach { FilaDespues(it) }
+                }
             }
         }
-
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
 
         // Scratchpad — nota privada.
         OutlinedTextField(
@@ -401,6 +450,8 @@ private fun FocusContent(
         ) {
             Text(text = if (comprobando) Textos.t(T.enfoque_comprobando) else Textos.t(T.enfoque_ya_lo_tengo), fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
+        // Que la barra flotante de abajo no tape el botón al final del todo.
+        Spacer(Modifier.height(com.paragon.app.ui.common.huecoBarra()))
     }
 
     if (mostrarDiario) {
@@ -478,49 +529,114 @@ private fun PlatinoCelebracion(platino: PlatinoNuevo) {
     }
 }
 
+/** El progreso hacia el platino, en grande y con el acento (diseño v2). */
 @Composable
-private fun PendingTrophyCard(trofeo: TrophyItem, destacado: Boolean) {
+private fun AnilloPlatino(porcentaje: Int, modifier: Modifier = Modifier) {
+    val acento = Accent
+    Box(modifier.size(200.dp), contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+            val grosor = 10.dp.toPx()
+            val trazo = androidx.compose.ui.graphics.drawscope.Stroke(width = grosor, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            val margen = grosor / 2
+            val tam = androidx.compose.ui.geometry.Size(size.width - grosor, size.height - grosor)
+            val origen = androidx.compose.ui.geometry.Offset(margen, margen)
+            drawArc(FocoPista, 0f, 360f, useCenter = false, topLeft = origen, size = tam, style = trazo)
+            if (porcentaje > 0) {
+                drawArc(acento, -90f, 360f * porcentaje.coerceIn(0, 100) / 100f, useCenter = false, topLeft = origen, size = tam, style = trazo)
+            }
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "$porcentaje%",
+                color = Color.White,
+                fontSize = 44.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+            )
+            Text(text = Textos.t(T.enfoque_al_platino), color = FocoTenue, fontSize = 13.sp)
+        }
+    }
+}
+
+@Composable
+private fun EtiquetaFoco(texto: String) {
+    Text(
+        text = texto,
+        color = FocoTenue,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(top = 26.dp, bottom = 8.dp),
+    )
+}
+
+/** Icono del trofeo con el borde de su metal (la foto real cuando la hay). */
+@Composable
+private fun IconoTrofeoFoco(trofeo: TrophyItem, tam: androidx.compose.ui.unit.Dp, esquina: Int) {
+    val forma = RoundedCornerShape(radio(esquina))
+    Box(
+        Modifier
+            .size(tam)
+            .clip(forma)
+            .background(FocoPista)
+            .border(2.dp, gradeColor(trofeo.grade), forma),
+    ) {
+        if (trofeo.iconUrl != null) {
+            AsyncImage(
+                model = trofeo.iconUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().padding(2.dp).clip(forma),
+            )
+        }
+    }
+}
+
+/** El trofeo a por el que vas ahora: borde del acento, como en la maqueta v2. */
+@Composable
+private fun TrofeoAhora(trofeo: TrophyItem) {
+    val forma = RoundedCornerShape(radio(22))
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White.copy(alpha = if (destacado) 0.09f else 0.04f), RoundedCornerShape(radio(16)))
-            .then(if (destacado) Modifier.border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(radio(16))) else Modifier)
-            .padding(14.dp),
-        verticalAlignment = Alignment.Top,
+            .clip(forma)
+            .background(FocoTarjeta)
+            .border(1.dp, Accent, forma)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        // Foto real del trofeo cuando la hay — antes esto era siempre un
-        // cuadrado de color por metal, ni siquiera de respaldo (mismo
-        // hueco que se arregló en la Lista de la Ficha de juego).
-        val tam = if (destacado) 44.dp else 36.dp
-        Box(
-            modifier = Modifier
-                .size(tam)
-                .clip(RoundedCornerShape(if (destacado) 14.dp else 12.dp))
-                .background(gradeColor(trofeo.grade).copy(alpha = 0.7f)),
-        ) {
-            if (trofeo.iconUrl != null) {
-                AsyncImage(
-                    model = trofeo.iconUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-        }
-        Spacer(Modifier.width(14.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = trofeo.name,
-                color = Color.White,
-                fontSize = if (destacado) 17.sp else 15.sp,
-                fontWeight = FontWeight.Bold,
-            )
+        IconoTrofeoFoco(trofeo, 60.dp, 14)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(text = trofeo.name, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             if (trofeo.detail.isNotBlank()) {
-                Text(text = trofeo.detail, color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
+                Text(text = trofeo.detail, color = FocoTenue, fontSize = 13.sp, lineHeight = 18.sp)
             }
             trofeo.rarityPercent?.let {
-                Text(text = Textos.t(T.enfoque_rareza, it), color = Color.White.copy(alpha = 0.5f), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+                Text(text = Textos.t(T.enfoque_rareza, it), color = FocoTenue, fontSize = 11.sp)
             }
+        }
+    }
+}
+
+@Composable
+private fun FilaDespues(trofeo: TrophyItem) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        IconoTrofeoFoco(trofeo, 32.dp, 9)
+        Text(
+            text = trofeo.name,
+            color = Color.White,
+            fontSize = 14.sp,
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        trofeo.rarityPercent?.let {
+            Text(
+                text = "${com.paragon.app.util.formatDecimal(it, if (it < 10) 1 else 0)} %",
+                color = FocoTenue,
+                fontSize = 12.sp,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+            )
         }
     }
 }
