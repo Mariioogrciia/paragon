@@ -200,16 +200,15 @@ private fun CompareContent(data: CompareData) {
         if (data.sharedGames.isEmpty()) {
             item { Text(text = Textos.t(T.comparar_sin_comun), color = Muted, fontSize = 13.sp) }
         } else {
-            items(data.sharedGames, key = { it.id }) { SharedGameRow(it) }
+            items(data.sharedGames, key = { it.id }) { SharedGameRow(it, data.them.name) }
         }
     }
 }
 
 /**
- * Antes esto era solo texto (nombre/nivel/platinos), sin foto ni ninguna
- * lectura de "quién va ganando" — la web ya tenía las dos cosas
- * (`comparar/[handle]/page.tsx`: `Avatar` + etiqueta "Vas ganando"), esto
- * las trae aquí con el mismo criterio (por platinos).
+ * Diseño v2 (maqueta "15 · Comparar"): las dos fotos con el VS en medio y
+ * los platinos debajo, filas "tú | dato | el otro" con el que gana en el
+ * acento, y la etiqueta de quién va ganando (por platinos, como la web).
  */
 @Composable
 private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: CompareResultado) {
@@ -220,12 +219,23 @@ private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: Compar
             .border(1.dp, Border, RoundedCornerShape(radio(20)))
             .padding(20.dp),
     ) {
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            CompareColumn(label = Textos.t(T.comparar_tu), side = me, destacado = resultado == CompareResultado.GANO)
-            Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(Border))
-            CompareColumn(label = Textos.t(T.comparar_ellos), side = them, destacado = resultado == CompareResultado.PIERDO)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Lado(Textos.t(T.comparar_tu), me, destacado = resultado == CompareResultado.GANO)
+            Text(
+                text = "VS",
+                color = Muted,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+                modifier = Modifier.padding(horizontal = 8.dp),
+            )
+            Lado(them.name, them, destacado = resultado == CompareResultado.PIERDO)
         }
         Spacer(Modifier.height(16.dp))
+        FilaDato(me.level, Textos.t(T.comun_nivel), them.level)
+        FilaDato(me.trofeos, Textos.t(T.comun_trofeos), them.trofeos)
+        FilaDato(me.juegos, Textos.t(T.comun_juegos), them.juegos)
+        Spacer(Modifier.height(14.dp))
         val (texto, color) = when (resultado) {
             CompareResultado.GANO -> Textos.t(T.comparar_ganando) to Good
             CompareResultado.PIERDO -> Textos.t(T.comparar_perdiendo) to Danger
@@ -245,32 +255,58 @@ private fun CompareSummary(me: CompareSide, them: CompareSide, resultado: Compar
 }
 
 @Composable
-private fun RowScope.CompareColumn(label: String, side: CompareSide, destacado: Boolean) {
+private fun RowScope.Lado(etiqueta: String, side: CompareSide, destacado: Boolean) {
     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(64.dp)
                 .clip(CircleShape)
                 .background(Surface2)
                 .then(if (destacado) Modifier.border(2.dp, Accent, CircleShape) else Modifier),
             contentAlignment = Alignment.Center,
         ) {
-            com.paragon.app.ui.common.AvatarPersona(side.avatarUrl, side.name, size = 48.dp)
+            com.paragon.app.ui.common.AvatarPersona(side.avatarUrl, side.name, size = 64.dp)
         }
-        Spacer(Modifier.height(8.dp))
-        Text(text = label, color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-        Text(text = side.name, color = Foreground, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(text = Textos.t(T.comun_nivel_n, side.level), color = Muted, fontSize = 12.sp)
-        Spacer(Modifier.height(10.dp))
-        Text(text = side.platinos.toString(), color = Platinum, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-        Text(text = Textos.t(T.comun_platinos), color = Muted, fontSize = 11.sp)
-        Spacer(Modifier.height(6.dp))
-        Text(text = Textos.t(T.comparar_trofeos_juegos, side.trofeos, side.juegos), color = Muted, fontSize = 11.sp)
+        Text(
+            text = etiqueta,
+            color = Foreground,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 8.dp),
+        )
+        Text(text = Textos.t(T.comun_n_platinos, side.platinos), color = Platinum, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }
 
+/** "tú | dato | el otro": el número mayor va en el acento. */
 @Composable
-private fun SharedGameRow(game: SharedGame) {
+private fun FilaDato(mio: Int, etiqueta: String, suyo: Int) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = com.paragon.app.util.cifra(mio),
+            color = if (mio > suyo) Accent else Foreground,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+        Text(text = etiqueta, color = Muted, fontSize = 12.sp, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text(
+            text = com.paragon.app.util.cifra(suyo),
+            color = if (suyo > mio) Accent else Foreground,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
+}
+
+/** Un juego en común con una barra por persona (tú en el acento, el otro en gris). */
+@Composable
+private fun SharedGameRow(game: SharedGame, nombreOtro: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -281,24 +317,31 @@ private fun SharedGameRow(game: SharedGame) {
         AsyncImage(
             model = game.iconUrl,
             contentDescription = null,
-            modifier = Modifier.size(44.dp).background(Surface2, RoundedCornerShape(radio(10))),
+            modifier = Modifier.size(48.dp).background(Surface2, RoundedCornerShape(radio(10))),
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = game.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            Row(modifier = Modifier.padding(top = 4.dp)) {
-                Text(
-                    text = Textos.t(T.comparar_tu_pct, game.myPercent, if (game.myPercent >= 100) " ✓" else ""),
-                    color = if (game.myPercent >= 100) Good else Accent2,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = Textos.t(T.comparar_ellos_pct, game.theirPercent, if (game.theirPercent >= 100) " ✓" else ""),
-                    color = if (game.theirPercent >= 100) Good else Muted,
-                    fontSize = 12.sp,
-                )
-            }
+            Text(text = game.title, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            BarraPersona(Textos.t(T.comparar_tu).lowercase().replaceFirstChar { it.uppercase() }, game.myPercent, Accent)
+            BarraPersona(nombreOtro, game.theirPercent, Muted)
         }
+    }
+}
+
+@Composable
+private fun BarraPersona(nombre: String, pct: Int, color: androidx.compose.ui.graphics.Color) {
+    Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(text = nombre, color = Muted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(56.dp))
+        Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(radio(3))).background(Surface2)) {
+            Box(Modifier.fillMaxWidth(pct.coerceIn(0, 100) / 100f).fillMaxHeight().background(if (pct >= 100) Good else color))
+        }
+        Text(
+            text = if (pct >= 100) "100% ✓" else "$pct%",
+            color = if (pct >= 100) Good else Foreground,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.End,
+            modifier = Modifier.width(52.dp),
+        )
     }
 }
