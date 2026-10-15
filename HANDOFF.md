@@ -103,6 +103,8 @@ pantallas en la app, 4 idiomas en todo.
 - Contrato de la API móvil: `src/app/api/mobile/CONTRACT.md`.
 - Workflows: `.github/workflows/` (`comprobaciones.yml`,
   `build-android-kmp.yml`, `build-ios-kmp.yml`, `publicar-tiendas.yml`).
+- Vídeo de promoción para TikTok (Remotion): `video/` (ver su README); las
+  capturas de la web se rehacen con `npm run capturas` dentro.
 - No se puede compilar la app en la nube de Claude (Google Maven bloqueado):
   la prueba de la app es siempre la CI.
 

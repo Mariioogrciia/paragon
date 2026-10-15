@@ -35,5 +35,5 @@
   // pasó de verdad con un test de IGDB a medias— tira abajo `next build`
   // entero: `include` de arriba capta CUALQUIER .ts del repo, no solo el
   // de la app.
-  "exclude": ["node_modules", "scratch"]
+  "exclude": ["node_modules", "scratch", "video"]
 }
