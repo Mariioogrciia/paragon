@@ -5392,5 +5392,41 @@
   "en": "Set up a session for this trophy",
   "es": "Organizar una sesión para este trofeo",
   "fr": "Organiser une session pour ce trophée"
+ },
+ "sesiones_filtro_abiertas": {
+  "de": "Offen · {0}",
+  "en": "Open · {0}",
+  "es": "Abiertas · {0}",
+  "fr": "Ouvertes · {0}"
+ },
+ "sesiones_filtro_ayudar": {
+  "de": "Ich kann helfen · {0}",
+  "en": "I can help · {0}",
+  "es": "Puedo ayudar · {0}",
+  "fr": "Je peux aider · {0}"
+ },
+ "sesiones_filtro_mias": {
+  "de": "Meine · {0}",
+  "en": "Mine · {0}",
+  "es": "Mías · {0}",
+  "fr": "Les miennes · {0}"
+ },
+ "sesiones_filtro_vacio": {
+  "de": "Hier gibt es gerade keine Sessions.",
+  "en": "There are no sessions here right now.",
+  "es": "No hay ninguna sesión aquí ahora mismo.",
+  "fr": "Aucune session ici pour l'instant."
+ },
+ "sesiones_dia_hoy": {
+  "de": "HEUTE",
+  "en": "TODAY",
+  "es": "HOY",
+  "fr": "AUJOURD'HUI"
+ },
+ "sesiones_dia_manana": {
+  "de": "MORGEN",
+  "en": "TOMORROW",
+  "es": "MAÑANA",
+  "fr": "DEMAIN"
  }
 }

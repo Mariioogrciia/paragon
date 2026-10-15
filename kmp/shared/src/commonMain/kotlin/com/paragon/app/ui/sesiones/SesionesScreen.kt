@@ -53,6 +53,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -124,6 +125,21 @@ private fun textoLibres(libres: Int): String = when (libres) {
 private fun fechaSesion(iso: String, larga: Boolean = false): String =
     isoAMillis(iso)?.let { fechaConPatron(it, if (larga) "EEEEdMMMMHHmm" else "EEEdMMMHHmm") } ?: iso
 
+/** Días desde hoy (0 hoy, 1 mañana...) en la zona del teléfono; las ya empezadas cuentan como hoy. */
+private fun diaDeSesion(iso: String): Long {
+    val cuando = isoAMillis(iso) ?: return 0
+    val zona = TimeZone.currentSystemDefault()
+    val dia = Instant.fromEpochMilliseconds(cuando).toLocalDateTime(zona).date
+    val hoy = Instant.fromEpochMilliseconds(ahoraMillis()).toLocalDateTime(zona).date
+    return (dia.toEpochDays() - hoy.toEpochDays()).coerceAtLeast(0).toLong()
+}
+
+private fun rotuloDia(dia: Long, iso: String): String = when (dia) {
+    0L -> Textos.t(T.sesiones_dia_hoy)
+    1L -> Textos.t(T.sesiones_dia_manana)
+    else -> isoAMillis(iso)?.let { fechaConPatron(it, "EEEEdMMMM").uppercase() } ?: ""
+}
+
 // ------------------------------------------------------------------ Lista
 
 @Composable
@@ -140,6 +156,7 @@ fun SesionesScreen(
     var estado by remember { mutableStateOf<SesionResultado<com.paragon.shared.red.SesionesResponse>?>(null) }
     var recarga by remember { mutableIntStateOf(0) }
     var organizando by remember { mutableStateOf(organizarJuego != null) }
+    var filtro by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(recarga) { estado = repo.listar() }
 
@@ -171,12 +188,49 @@ fun SesionesScreen(
                 if (sesiones.isEmpty()) {
                     EmptyState(Icons.Default.Groups, Textos.t(T.sesiones_vacio_titulo), Textos.t(T.sesiones_vacio_texto))
                 } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        items(sesiones, key = { it.id }) { s -> FilaSesion(s) { onAbrir(s.id) } }
+                    // Diseño v2: Abiertas / Puedo ayudar (ya tienes el trofeo) / Mías,
+                    // y la lista agrupada por día.
+                    val ayudar = sesiones.filter { it.loTengo && !it.soyAnfitrion && !it.estoyApuntado }
+                    val mias = sesiones.filter { it.soyAnfitrion || it.estoyApuntado }
+                    val vista = when (filtro) { 1 -> ayudar; 2 -> mias; else -> sesiones }
+                    com.paragon.app.ui.common.ControlSegmentado(
+                        opciones = listOf(
+                            Textos.t(T.sesiones_filtro_abiertas, sesiones.size),
+                            Textos.t(T.sesiones_filtro_ayudar, ayudar.size),
+                            Textos.t(T.sesiones_filtro_mias, mias.size),
+                        ),
+                        seleccion = filtro,
+                        onCambio = { filtro = it },
+                        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp),
+                    )
+                    if (vista.isEmpty()) {
+                        Text(
+                            Textos.t(T.sesiones_filtro_vacio),
+                            color = Muted,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp),
+                        )
+                    } else {
+                        val porDia = vista.groupBy { diaDeSesion(it.fechaHora) }
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp + com.paragon.app.ui.common.huecoBarra()),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            porDia.forEach { (dia, delDia) ->
+                                item(key = "dia-$dia") {
+                                    Text(
+                                        rotuloDia(dia, delDia.first().fechaHora),
+                                        color = Muted,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 1.sp,
+                                        modifier = Modifier.padding(start = 4.dp, top = 8.dp),
+                                    )
+                                }
+                                items(delDia, key = { it.id }) { s -> FilaSesion(s) { onAbrir(s.id) } }
+                            }
+                        }
                     }
                 }
                 if (organizando) {
