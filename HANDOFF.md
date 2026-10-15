@@ -9,8 +9,8 @@ releer todo el historial. Última actualización: **15 de octubre de 2026**.
 master. Regla del usuario:
 **siempre push a master** (fast-forward desde la rama).
 
-**CI**: web en verde con 153 tests en `f3800b2` (varias cuentas de Steam,
-solo web); la app, en verde en `7508cc2`: APK de Android e IPA de iOS.
+**CI**: todo en verde en `a9f964f` (15 oct, master): web con 153 tests, APK
+de Android e IPA de iOS.
 - *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 150 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
@@ -114,6 +114,27 @@ Si se sigue programando, ideas que han salido y no están pedidas: abrir la
 pantalla de un clan concreto desde un aviso (hoy va a la pestaña Ligas, la
 app no tiene ruta por clan) y que "Ver guía" de Enfoque abra directamente el
 vídeo en vez de la ficha.
+
+**Tamaño a 15 oct**: 55 páginas web, 72 rutas de `/api/mobile`, 22
+pantallas en la app, 4 idiomas en todo.
+
+**Siguientes pasos recomendados** (opinión, 15 oct; nada de esto está pedido):
+1. *Probar en un móvil de verdad* todo lo de octubre antes de añadir más: es
+   la deuda más grande (casi todo se ha validado solo con la CI).
+2. *Publicar*: Google Play primero (pago único, prueba interna con amigos);
+   App Store cuando haya cuenta de Apple. Sin tiendas, la app no la usa
+   nadie más.
+3. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan de
+   verdad y esconder lo que nadie toca (eSports, arcade, noticias,
+   planificador...) para que lo importante —sincronizar, progreso, amigos—
+   se vea mejor. Desde aquí no se pudo leer (403 del equipo de Vercel).
+4. *Avisos de errores en producción* (alerta por correo o Discord cuando una
+   ruta falla mucho) y copia de seguridad de la base comprobada.
+5. *Partir este HANDOFF*: un `HANDOFF.md` corto con el estado y un
+   `HISTORIAL.md` con lo de cada día (ya pasa de 2000 líneas).
+6. Ideas de producto si se sigue: plan de platino guiado por juego (orden de
+   trofeos, perdibles, sesiones), resumen semanal en push, y abrir varias
+   cuentas de Steam a todos.
 
 **Dónde está cada cosa**:
 - Textos de la web: `messages/<Carpeta>/<idioma>.json`; los namespaces de
