@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { rachas } from "@/lib/history";
 import { actividadPorDia } from "@/lib/profileStats";

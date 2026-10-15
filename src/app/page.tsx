@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";

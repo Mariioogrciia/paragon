@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getFeed } from "@/lib/feed";
 import { jsonConEtag } from "@/lib/etag";

@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -707,7 +708,6 @@ function BackgroundGamePicker({
           className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg transition-transform hover:scale-105"
           style={{ border: `2px solid ${value === g.id ? "var(--accent)" : "var(--border)"}` }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={g.iconUrl} alt="" className="h-full w-full object-cover" />
           {favoritosSet.has(g.id) && (
             <span className="absolute right-0.5 top-0.5 text-[0.625rem] drop-shadow">⭐</span>

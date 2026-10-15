@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- ImageResponse (satori) solo entiende <img>, no next/image */
 import { ImageResponse } from "next/og";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";

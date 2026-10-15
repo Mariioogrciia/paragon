@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { CollectionNameError, deleteCollection, renameCollection } from "@/lib/collections";
 import { errorMovil } from "@/lib/mensajesApi";
 
@@ -11,6 +12,9 @@ export async function PATCH(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", userId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { id } = await params;
@@ -33,6 +37,9 @@ export async function DELETE(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", userId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { id } = await params;

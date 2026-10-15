@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import { useTranslations } from "next-intl";
 import { Check, Star } from "lucide-react";
 import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, nivelDeEstilo, useApariencia } from "@/lib/apariencia";

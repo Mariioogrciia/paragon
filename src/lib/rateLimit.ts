@@ -81,6 +81,11 @@ export const LIMITES = {
   reaccion: [60, 60],
   // Lotes de logros de Steam tras vincular (~24 juegos cada uno: 200 juegos = 9 llamadas).
   completarSteam: [40, 600],
+  // El resto de escrituras de /api/mobile (ligas, amigos, carpetas, clanes):
+  // de sobra para tocar botones, no para un script en bucle (15 oct 2026).
+  escritura: [60, 60],
+  // "Visto" de cada publicación del muro al pasar por ella.
+  vista: [240, 60],
 } as const satisfies Record<string, readonly [number, number]>;
 
 export function limitar(accion: keyof typeof LIMITES, quien: string): Promise<boolean> {

@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { summarise } from "@/lib/stats";

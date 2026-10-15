@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { removeLeagueMember } from "@/lib/leagues";
 import { errorMovil } from "@/lib/mensajesApi";
 
@@ -16,6 +17,9 @@ export async function POST(
   const userId = await getMobileUserId(req);
   if (!userId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", userId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { id } = await params;

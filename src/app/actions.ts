@@ -65,8 +65,6 @@ import { CoopError, proponerReto, responderReto } from "@/lib/coop";
 import { RetoAmigosError, cancelarRetoAmigos, crearRetoAmigos, responderRetoAmigos } from "@/lib/retosAmigos";
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
-import { getParagonLevel } from "@/lib/paragonLevel";
-import { ESTILO_REQUISITOS } from "@/lib/level";
 import { tr } from "@/lib/mensajesWeb";
 
 export interface ActionState {

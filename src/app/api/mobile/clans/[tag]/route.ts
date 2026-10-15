@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { getClanByTag, getClanLeaderboard, getClanActivity, getInvitableFriends, editarClan, ClanError } from "@/lib/clans";
 import { normalizarRango, puedeEditarClan, puedeInvitar } from "@/lib/clanRangos";
 import { errorMovil } from "@/lib/mensajesApi";
@@ -77,6 +78,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ tag: s
   const userId = await getMobileUserId(req);
   if (!userId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", userId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
   const { tag } = await params;
   const clan = await getClanByTag(tag);

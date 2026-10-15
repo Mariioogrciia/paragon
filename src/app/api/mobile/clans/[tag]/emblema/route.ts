@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { getClanByTag, setClanEmblema } from "@/lib/clans";
 import { textoAEmblema } from "@/lib/clanEmblema";
 import { errorMovil } from "@/lib/mensajesApi";
@@ -12,6 +13,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ tag: st
   const userId = await getMobileUserId(req);
   if (!userId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", userId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
 
   const { tag } = await params;

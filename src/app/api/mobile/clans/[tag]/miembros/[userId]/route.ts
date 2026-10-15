@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
+import { limitar } from "@/lib/rateLimit";
 import { getClanByTag, cambiarRango, expulsarDelClan, ClanError } from "@/lib/clans";
 import { RANGOS, type Rango } from "@/lib/clanRangos";
 import { errorMovil } from "@/lib/mensajesApi";
@@ -15,6 +16,9 @@ export async function POST(req: Request, { params }: Params) {
   const actorId = await getMobileUserId(req);
   if (!actorId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", actorId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
   const { tag, userId } = await params;
   const clan = await getClanByTag(tag);
@@ -39,6 +43,9 @@ export async function DELETE(req: Request, { params }: Params) {
   const actorId = await getMobileUserId(req);
   if (!actorId) {
     return errorMovil(req, "No autenticado", 401);
+  }
+  if (!(await limitar("escritura", actorId))) {
+    return errorMovil(req, "Demasiadas peticiones seguidas. Espera un momento.", 429);
   }
   const { tag, userId } = await params;
   const clan = await getClanByTag(tag);
