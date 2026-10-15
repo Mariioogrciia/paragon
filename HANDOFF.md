@@ -9,7 +9,8 @@ releer todo el historial. Última actualización: **15 de octubre de 2026**.
 master. Regla del usuario:
 **siempre push a master** (fast-forward desde la rama).
 
-**CI** (todo en verde a 15 oct):
+**CI**: todo en verde en `7508cc2` (último commit de código y HANDOFF del
+15 oct), comprobado en master: web, APK de Android e IPA de iOS.
 - *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 150 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
@@ -45,7 +46,10 @@ master. Regla del usuario:
    desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
 5. **Dominio propio** (sin comprar).
 
-**15 oct — lo que quedaba de código:**
+**15 oct — lo que quedaba de código** (commits `3680eba` avisos, `887c9b0`
+límites y lint, `2fd53c8` Enfoque, `cde5529` Estadísticas, `fb4f474`
+Atascados, `04dace6` Comparar, `e8a922f` Sesiones; todos con la CI de
+Android e iOS en verde):
 - **Tocar una notificación abre su pantalla** (Android e iOS): los avisos
   llevan la ruta de la web y `ui/navigation/EnlaceAviso.kt` la traduce
   (`/juego/x` → ficha, `/u/<tú>/<juego>` → tu ficha, `/u/<otro>/<juego>` →
@@ -73,9 +77,20 @@ master. Regla del usuario:
   - El resto (Amigos y QR, Ligas, Clan, Ritmo, detalle de sesión,
     Apariencia, Cuentas) ya seguía la maqueta.
 
-**Pendiente de código**: nada concreto. Sin probar con sesión iniciada
-varias funciones web (ver "Pendiente") y, en un móvil de verdad, lo de los
-últimos días.
+**Pendiente de código**: nada concreto; la lista de la auditoría del 13 oct
+y el repaso de la maqueta v2 están cerrados. Lo único abierto es probar:
+- En un móvil de verdad: lo de los últimos días (notificaciones que abren su
+  pantalla, Enfoque, Estadísticas, Atascados → Sesión, Comparar, Sesiones,
+  widget de iOS, perfil completo, precios, DLC, QR).
+- Con sesión iniciada en la web: varias funciones (ver "Pendiente").
+- Las Estadísticas nuevas necesitan el servidor desplegado (Vercel lo hace
+  solo al llegar a master): con un servidor anterior la cabecera Semana /
+  Año / Siempre no sale y la pantalla queda como antes.
+
+Si se sigue programando, ideas que han salido y no están pedidas: abrir la
+pantalla de un clan concreto desde un aviso (hoy va a la pestaña Ligas, la
+app no tiene ruta por clan) y que "Ver guía" de Enfoque abra directamente el
+vídeo en vez de la ficha.
 
 **Dónde está cada cosa**:
 - Textos de la web: `messages/<Carpeta>/<idioma>.json`; los namespaces de
