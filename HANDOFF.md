@@ -1,17 +1,17 @@
 # Paragon — traspaso
 
 Estado del proyecto y de la sesión de trabajo, para retomarlo sin tener que
-releer todo el historial. Última actualización: **14 de octubre de 2026**.
+releer todo el historial. Última actualización: **15 de octubre de 2026**.
 
-## Dónde estamos (14 oct 2026) · leer primero
+## Dónde estamos (15 oct 2026) · leer primero
 
-**Código**: último cambio de código en `0c12c47` (después solo este
-HANDOFF); la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a master. Regla del usuario:
+**Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
+master. Regla del usuario:
 **siempre push a master** (fast-forward desde la rama).
 
-**CI, todo en verde en `0c12c47`**:
-- *Comprobaciones* (web): tsc, eslint (0 errores, 45 avisos de `<img>`),
-  146 tests de vitest y el comprobador de namespaces de `messages/`.
+**CI** (todo en verde a 15 oct):
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 150 tests de
+  vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
 - *Build iOS IPA (KMP)*: IPA sin firmar para Sideloadly, con el widget dentro.
@@ -45,19 +45,37 @@ HANDOFF); la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a master. 
    desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
 5. **Dominio propio** (sin comprar).
 
-**Pendiente de código**, por si se quiere seguir:
-- **Pantallas v2 una a una** según la maqueta
-  (https://claude.ai/artifact/D6EAtf8pUbhCVXjGYkDyVy): la navegación nativa,
-  cabeceras, Inicio, Carpetas, Ajustes y Entrar ya están; falta repasar el
-  resto pantalla por pantalla.
-- Al tocar una notificación, las dos apps abren el inicio en vez de la
-  pantalla del aviso: el `url` ya llega (Android lo guarda en
-  `paragon://open?path=`, iOS en el `userInfo`), pero nadie navega con él.
-- 45 avisos de lint por `<img>` en la web (pasar a `next/image` donde
-  compense).
-- 15 rutas de escritura de `/api/mobile` sin límite de peticiones (riesgo
-  bajo: todas comprueban que el dato es tuyo).
-- Sin probar con sesión iniciada varias funciones web (ver "Pendiente").
+**15 oct — lo que quedaba de código:**
+- **Tocar una notificación abre su pantalla** (Android e iOS): los avisos
+  llevan la ruta de la web y `ui/navigation/EnlaceAviso.kt` la traduce
+  (`/juego/x` → ficha, `/u/<tú>/<juego>` → tu ficha, `/u/<otro>/<juego>` →
+  la suya, `/u/x` → perfil, `/sesiones/x` → sesión, amigos/ligas/clanes →
+  pestaña Ligas, `/ritmo` → Ritmo; lo demás se queda en Inicio). Android lo
+  saca del intent (`paragon://open?path=` o el extra `url` con la app en
+  segundo plano); iOS de `AppDelegate` → `AppIOS.abrirAviso`. Con tests.
+- **Límite de peticiones** en las 14 rutas de escritura de `/api/mobile` que
+  no tenían: `escritura` (60/min) y `vista` (240/min, el "visto" del muro).
+- **Lint de la web a cero**: los `<img>` de CDNs externos llevan una nota por
+  archivo (next/image gastaría la cuota del plan Hobby) e imports sin usar
+  fuera.
+- **Pantallas v2** según la maqueta:
+  - *Modo Enfoque*: anillo al platino con el acento, AHORA (Ver guía abre la
+    ficha en ese trofeo, Saltar pasa al siguiente) y DESPUÉS.
+  - *Estadísticas*: cabecera Semana / Año / Siempre con cifra, comparación y
+    barras, y fichas de estilo de caza y hora favorita. Datos nuevos del
+    servidor: `periodos` en `GET /api/mobile/stats` (`periodosDeCaza` en
+    `lib/history.ts`, cálculo puro y con tests en `lib/periodos.ts`).
+  - *Trofeos atascados*: subtítulo y botón "Sesión" que abre Organizar con
+    ese juego y trofeo ya elegidos (ruta `sessions/new?juego=&trofeo=`).
+  - *Comparar*: fotos con VS, filas tú | dato | el otro y dos barras por
+    juego en común.
+  - *Sesiones*: Abiertas / Puedo ayudar / Mías y la lista agrupada por día.
+  - El resto (Amigos y QR, Ligas, Clan, Ritmo, detalle de sesión,
+    Apariencia, Cuentas) ya seguía la maqueta.
+
+**Pendiente de código**: nada concreto. Sin probar con sesión iniciada
+varias funciones web (ver "Pendiente") y, en un móvil de verdad, lo de los
+últimos días.
 
 **Dónde está cada cosa**:
 - Textos de la web: `messages/<Carpeta>/<idioma>.json`; los namespaces de
