@@ -8,21 +8,28 @@ Lo de cada día (qué se hizo, por qué y con qué commits) está en
 antes del 23 sept, en [`docs/historial/`](docs/historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
-## Dónde estamos (16 oct 2026) · leer primero
+## Dónde estamos (16 oct 2026, tarde) · leer primero
 
 **Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
-master. Regla del usuario:
-**siempre push a master** (fast-forward desde la rama).
+master (`75ef977`). Regla del usuario: **siempre push a master**
+(fast-forward desde la rama).
 
-**CI**: todo en verde en `a9f964f` (15 oct, master): APK de Android e IPA
-de iOS; la web (*Comprobaciones*), en verde en cada push a master.
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 164 tests de
+**CI**: todo en verde en `75ef977` (16 oct, master): web, APK de Android e
+IPA de iOS.
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 165 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
 - *Build iOS IPA (KMP)*: IPA sin firmar para Sideloadly, con el widget dentro.
-- *Publicar en las tiendas* (a mano): el AAB de release de Android (R8)
-  compila; sale sin firmar hasta que estén los secretos.
+- *Publicar en las tiendas* (a mano): AAB de release de Android (R8) y, con
+  los secretos, firma y subida a Google Play; IPA de TestFlight con los de
+  Apple.
+- *Sincronización frecuente de trofeos*: llama a `/api/cron/sync` con
+  `CRON_SECRET` y falla si no recibe un 200. Está en verde: **`CRON_SECRET`
+  está puesta y funciona** (comprobado el 16 oct: HTTP 200, 2 cuentas
+  sincronizadas, `credencialPsn: null`, o sea el NPSSO de PSN va bien). Ojo:
+  aunque pide cada 30 min, GitHub retrasa los cron gratuitos y en la
+  práctica corre cada 3-5 h. Abrir la app o la web ya sincroniza al momento.
 
 **Las tres piezas**:
 - **Web** (`src/`, Next 16.4.0 en Vercel, `platinos-nine.vercel.app`, sin
@@ -31,81 +38,107 @@ de iOS; la web (*Comprobaciones*), en verde en cada push a master.
   (queda `uuid@9` moderado y sin impacto, ver HISTORIAL.md, 13 oct).
 - **App Android** (`kmp/androidApp` + `kmp/shared`): versión 1.1
   (versionCode 2). APK de debug para instalar a mano desde la CI. Push por
-  FCM, widget de Glance, lector de QR, diseño v2.
+  FCM, widget de Glance, lector de QR, diseño v2. Lista para Google Play
+  (falta la cuenta, ver abajo).
 - **App iOS** (`kmp/iosApp` + `kmp/shared`): versión 1.1. IPA sin firmar
-  (Sideloadly). Desde el 13 oct tiene lo mismo que Android: gesto de volver,
-  push (APNs) y widget (WidgetKit). Las push solo con firma de pago.
+  (Sideloadly). Lo mismo que Android: gesto de volver, push (APNs) y widget
+  (WidgetKit). Las push solo con firma de pago.
 
 **Esperando al usuario** (no se puede hacer desde aquí):
-1. **Cuenta de desarrollador de Apple** (de pago): sin ella no hay push en
-   iOS ni TestFlight/App Store. Después: identificadores, App Group, la app
-   en App Store Connect y los secretos `APPLE_TEAM_ID`, `ASC_KEY_ID`,
-   `ASC_ISSUER_ID` y `ASC_KEY_P8` (pasos en HISTORIAL.md, 13 oct, "Publicar en las tiendas").
-2. **Push de iOS en el servidor**: `APNS_KEY`, `APNS_KEY_ID` y `APNS_TEAM_ID`
-   en las variables de Vercel.
-3. **Google Play**: todo preparado en `kmp/play/` (guía paso a paso en su
-   README: cuenta de 25 $, clave de firma, primera subida a mano, formularios
-   de Play Console con las respuestas, y ficha y gráficos en 4 idiomas).
-   Después de la primera subida, el workflow "Publicar en las tiendas" sube
-   solo el AAB si está el secreto `PLAY_SERVICE_ACCOUNT_JSON`. Ojo: con una
-   cuenta personal nueva, Google pide una prueba cerrada de 12 personas
-   durante 14 días antes de producción.
-4. **Probar en un móvil de verdad** lo de los últimos días (perfil completo,
-   precios, DLC, QR, widget de iOS...): el emulador de Windows no arranca
-   desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
-5. **Dominio propio** (sin comprar). Sirve cualquier registrador (Vercel,
+1. **Google Play**: todo preparado en `kmp/play/`, con la guía paso a paso
+   en su README:
+   - Cuenta de desarrollador (25 $), clave de firma y secretos
+     `ANDROID_KEYSTORE_*`.
+   - Primera subida a mano (la API de Play no deja subir la primera).
+   - Formularios de Play Console con las respuestas ya escritas.
+   - Ficha y gráficos en 4 idiomas.
+   - Desde la segunda versión, el workflow sube solo el AAB si está el
+     secreto `PLAY_SERVICE_ACCOUNT_JSON`.
+   - Ojo: con una cuenta personal nueva, Google exige una prueba cerrada
+     con **12 personas durante 14 días** antes de producción.
+2. **Dominio propio** (sin comprar). Sirve cualquier registrador (Vercel,
    Cloudflare, Porkbun...): comprado fuera, se apuntan sus DNS a Vercel.
-   Candidato: `paragontrophies.com` (~11 $/año). Al comprarlo, cambiar las
-   referencias a `platinos-nine` (`grep -rn platinos-nine src kmp extension video`:
-   api/esports/img, ajustes/escaparate, extension/manifest.json,
-   PromoTikTok.tsx, Lanzamientos.kt, ClienteParagon.kt y dos tests de la
-   app) y las URLs de vuelta en las consolas de Google y Discord.
+   Candidato: `paragontrophies.com` (~11 $/año). Al comprarlo hay que:
+   - Cambiar las referencias a `platinos-nine` (`grep -rn platinos-nine src
+     kmp extension video`): api/esports/img, ajustes/escaparate,
+     extension/manifest.json, PromoTikTok.tsx, Lanzamientos.kt,
+     ClienteParagon.kt y dos tests de la app.
+   - Cambiar el secreto `SITE_URL` del repo (lo usa el cron).
+   - Añadir las URLs de vuelta en las consolas de Google y Discord.
+3. **Cuenta de desarrollador de Apple** (de pago): sin ella no hay push en
+   iOS ni TestFlight/App Store. Después hacen falta:
+   - Identificadores, App Group y la app en App Store Connect.
+   - Los secretos `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID` y
+     `ASC_KEY_P8` (pasos en HISTORIAL.md, 13 oct, "Publicar en las tiendas").
+   - Las variables `APNS_KEY`, `APNS_KEY_ID` y `APNS_TEAM_ID` en Vercel.
+4. **Probar en un móvil de verdad** lo de estos días (lista abajo). El
+   emulador de Windows no arranca desde la actualización 26200 → 26300
+   (probablemente basta con reiniciar).
 
-**Lo último** (detalle en HISTORIAL.md, 16 oct): avisos dentro de la web y
-la app (campana con bandeja y avisos en directo), Google Play preparado
-(`kmp/play/`, "Eliminar cuenta" en la app), "¿Lo compartes?" al sacar
-un platino (web y app, con imagen vertical para Stories), asistente para vincular
-cuentas (web `/vincular` y bienvenida; en la app, "Comprobar" en
-Plataformas vinculadas), aviso al desarrollador
-cuando el `PSN_NPSSO` falla o va a caducar, y la cabecera sin sesión más
-corta (Noticias y eSports dentro de Descubrir). Antes (15 oct): varias cuentas de Steam en
-el mismo perfil (de momento solo el desarrollador, web y app), avisos que
-abren su pantalla, límites en la API móvil, lint a cero y las pantallas v2
-de Enfoque, Estadísticas, Atascados, Comparar y Sesiones.
+**Lo último** (16 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+1. **Avisos dentro de la plataforma**: bandeja (`lib/bandeja.ts`, tabla
+   `aviso`) con todo lo que sale por push.
+   - Web: campana en la cabecera con contador, lista y avisos flotantes.
+   - App: campana en Inicio y pantalla Avisos.
+   - Nuevos avisos: "ha aceptado tu solicitud" y "tu amigo ha sacado un
+     platino" (este, solo en la campana).
+2. **Google Play preparado**: "Eliminar cuenta" en la app, página pública
+   `/eliminar-cuenta`, ficha y gráficos en `kmp/play/`, y subida automática
+   en el workflow.
+3. **"¿Lo compartes?" al sacar un platino**, en web y app, con imagen
+   vertical 1080×1920 para Stories y la dirección de la web visible.
+4. **Asistente para vincular cuentas**: "Comprobar" dice qué ajuste falta
+   antes de vincular.
+   - Web: `/vincular` y la bienvenida.
+   - App: en Plataformas vinculadas.
+5. **Aviso al desarrollador** cuando el `PSN_NPSSO` falla o le queda una
+   semana, y su estado en Admin → Sistema.
+6. **Cabecera sin sesión más corta**: Noticias y eSports pasan a Descubrir.
 
-**Pendiente de código**: nada concreto; la lista de la auditoría del 13 oct
-y el repaso de la maqueta v2 están cerrados. Lo único abierto es probar:
-- En un móvil de verdad: lo de los últimos días (notificaciones que abren su
-  pantalla, Enfoque, Estadísticas, Atascados → Sesión, Comparar, Sesiones,
-  widget de iOS, perfil completo, precios, DLC, QR).
-- Con sesión iniciada en la web: varias funciones (ver "Pendiente").
-- Las Estadísticas nuevas necesitan el servidor desplegado (Vercel lo hace
-  solo al llegar a master): con un servidor anterior la cabecera Semana /
-  Año / Siempre no sale y la pantalla queda como antes.
+Antes (15 oct): varias cuentas de Steam en el mismo perfil (de momento solo
+el desarrollador), avisos que abren su pantalla, límites en la API móvil,
+lint a cero y las pantallas v2.
 
-Si se sigue programando, ideas que han salido y no están pedidas: abrir la
-pantalla de un clan concreto desde un aviso (hoy va a la pestaña Ligas, la
-app no tiene ruta por clan) y que "Ver guía" de Enfoque abra directamente el
-vídeo en vez de la ficha.
+**Pendiente de código** (pequeño, nada pedido):
+- **Push en el idioma de cada persona**: hoy salen en español para todos. En
+  la campana se traducen al leer los avisos más comunes (`FIJOS`/`PATRONES`
+  de `lib/mensajesApi.ts`); el resto sigue en español.
+- **Hora de los avisos en la web**: la campana usa `relativeDate`, que solo
+  distingue días ("hoy", "ayer"); en la app sí sale "hace 5 min".
+- **Capturas de Google Play**: hay 2 (el mínimo) y con la app en español.
+  Con 4-8 por idioma la ficha luce más (`npm run graficos-play` en `video/`).
+- **NPSSO de PSN**: el que había puesto empezó a contarse el 16 oct (Sony no
+  dice cuándo caduca). Si caduca antes de los 60 días, avisará "ha
+  caducado" en vez de "caduca pronto".
+- Ideas sueltas: abrir la pantalla de un clan concreto desde un aviso (la
+  app no tiene ruta por clan) y que "Ver guía" de Enfoque abra el vídeo.
 
-**Tamaño a 15 oct**: 55 páginas web, 72 rutas de `/api/mobile`, 22
+**Sin probar con datos reales** (aquí no hay base de datos ni salida a
+Sony/Valve/Microsoft):
+- El asistente de vincular con cuentas de verdad.
+- La campana, el "¿Lo compartes?" y su imagen con un platino real.
+- "Eliminar cuenta" desde la app.
+- En un móvil: todo lo de octubre (avisos que abren su pantalla, Enfoque,
+  Estadísticas, Atascados → Sesión, Comparar, Sesiones, widget de iOS,
+  perfil completo, precios, DLC, QR).
+
+**Tamaño a 16 oct**: 57 páginas web, 75 rutas de `/api/mobile`, 21
 pantallas en la app, 4 idiomas en todo.
 
-**Siguientes pasos recomendados** (opinión, 15 oct; nada de esto está pedido):
-1. *Probar en un móvil de verdad* todo lo de octubre antes de añadir más: es
-   la deuda más grande (casi todo se ha validado solo con la CI).
-2. *Publicar*: Google Play primero (pago único, prueba interna con amigos);
-   App Store cuando haya cuenta de Apple. Sin tiendas, la app no la usa
-   nadie más.
-3. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan de
-   verdad y esconder lo que nadie toca (eSports, arcade, noticias,
-   planificador...) para que lo importante —sincronizar, progreso, amigos—
-   se vea mejor. Desde aquí no se pudo leer (403 del equipo de Vercel).
-4. *Avisos de errores en producción* (alerta por correo o Discord cuando una
-   ruta falla mucho) y copia de seguridad de la base comprobada.
-5. Ideas de producto si se sigue: plan de platino guiado por juego (orden de
-   trofeos, perdibles, sesiones), resumen semanal en push, y abrir varias
-   cuentas de Steam a todos.
+**Siguientes pasos recomendados** (opinión, 16 oct; nada de esto está pedido):
+1. *Publicar en Google Play* y hacer la prueba cerrada con amigos: es la
+   forma de que alguien más use la app, y sus 14 días sirven de prueba en
+   móviles de verdad.
+2. *Comprar el dominio* antes de la ficha de Play, para que la tienda, las
+   tarjetas de compartir y el vídeo salgan ya con la dirección buena.
+3. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan y
+   esconder lo que nadie toca (arcade, planificador...). Desde aquí no se
+   puede leer (403 del equipo de Vercel).
+4. *Avisos de errores en producción* (alerta cuando una ruta falla mucho) y
+   copia de seguridad de la base comprobada.
+5. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
+   perdibles, sesiones), resumen semanal en push, y abrir varias cuentas de
+   Steam a todos.
 
 **Dónde está cada cosa**:
 - Textos de la web: `messages/<Carpeta>/<idioma>.json`; los namespaces de
@@ -290,14 +323,14 @@ que causó el bug de las horas de PSN la primera vez.
 
 ## Pendiente
 
-**Actualizado el 29 de septiembre de 2026.** De la lista de abajo ya están
+**Actualizado el 29 de septiembre de 2026** (lo de octubre está arriba, en
+"Dónde estamos"). De la lista de abajo ya están
 hechos: i18n de `relativeDate()` y de los retos semanales, filtro de
 lenguaje en alemán y francés, Pase de Temporada, Vitrinas temáticas y las
 notificaciones push (Web Push + FCM, hace tiempo). Sigue pendiente de
 verdad:
 - **Rediseño visual de la landing**: sigue la decisión de no tocar la
   estética global.
-- **Dominio propio**: no comprado; la app sigue en `platinos-nine.vercel.app`.
 - **Epic no da horas jugadas** por su API: nunca aparecerán en rankings de
   horas (no es un fallo arreglable desde aquí). **Xbox sí** desde el 30
   sept 2026: `MinutesPlayed` por `POST /player/stats` de OpenXBL
@@ -476,15 +509,13 @@ Variables de entorno (ver `.env.example`):
 | `PSN_NPSSO` | **Caduca cada ~2 meses.** Cuando caduque, deja de sincronizar todo PSN. Desde el 16 oct el cron avisa al desarrollador (push + DM de Discord) una semana antes y en cuanto falla; estado en Admin → Sistema (`lib/credencialPsn.ts`). |
 | `STEAM_API_KEY` | No caduca. |
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | Twitch dev. |
-| `CRON_SECRET` | **Falta en Vercel.** Sin ella la ruta del cron devuelve 503 a propósito. |
+| `CRON_SECRET` | Puesta y funcionando (16 oct: el workflow "Sincronización frecuente" recibe HTTP 200). Sin ella la ruta del cron devuelve 503 a propósito. El mismo valor va en el secreto `CRON_SECRET` del repo, con `SITE_URL`. |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | Web Push (navegador/PWA) — `lib/webPush.ts`. Ya puestas desde la sesión del 6 de sept., faltaba anotarlas aquí. |
 | `FIREBASE_SERVICE_ACCOUNT_KEY` | **Nueva, de esta sesión.** JSON entero de la cuenta de servicio de Firebase (una sola línea), para `lib/fcm.ts` — el equivalente de las VAPID pero para la app nativa de Android. Ya puesta en Vercel por el usuario. |
 
-**Para que el cron funcione en producción hacen falta tres cosas:** subir
-`vercel.json` y la ruta, poner `CRON_SECRET` en las variables de Vercel, y
-redesplegar. El plan Hobby limita los crons a **una ejecución diaria**; el
-`vercel.json` pide una por hora, así que si estás en Hobby hay que bajarlo a
-`0 3 * * *` y subir los lotes por pasada.
+**El cron**: `vercel.json` lo lanza una vez al día (`0 3 * * *`, lo máximo
+del plan Hobby) y el workflow `sync-frecuente.yml` lo llama además "cada 30
+min", que GitHub convierte en cada 3-5 h. Las dos vías usan `CRON_SECRET`.
 
 **Migraciones:** la tabla `notification` se creó con SQL explícito
 (`CREATE TABLE IF NOT EXISTS`), no con `db:push`, para no darle a una

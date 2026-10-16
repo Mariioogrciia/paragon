@@ -6,6 +6,15 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct (6) — HANDOFF al día y `CRON_SECRET` comprobado**. El HANDOFF
+decía que faltaba `CRON_SECRET` en Vercel; no es así. El workflow
+`sync-frecuente.yml` falla si `/api/cron/sync` no devuelve 200 y lleva todas
+las pasadas en verde (la de las 13:24 UTC: HTTP 200, 2 cuentas
+sincronizadas, `credencialPsn: null`). Las variables de Vercel no se pueden
+leer desde aquí (403), así que se comprobó por el workflow. De paso: GitHub
+retrasa los cron gratuitos, y el de "cada 30 min" corre en la práctica cada
+3-5 h.
+
 **16 oct (5) — avisos dentro de la plataforma**. Antes un aviso solo existía
 como push: sin push activada, o al descartarla, se perdía, y dentro de la web
 no había dónde verlo.
