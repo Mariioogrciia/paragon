@@ -57,6 +57,8 @@ import { setPanelOculto } from "@/lib/panelPreferences";
 import { setAvisosActivos } from "@/lib/avisosPreferencias";
 import { COOKIES_SESION, cerrarOtrasSesiones } from "@/lib/mobileAuth";
 import { ipActual, limitar } from "@/lib/rateLimit";
+import { esPlataformaAsistente, type Diagnostico } from "@/lib/comprobarCuenta";
+import { diagnosticarCuenta } from "@/lib/diagnosticoCuenta";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
 import { borrarAlertaPrecio, guardarAlertaPrecio } from "@/lib/priceAlerts";
 import { setObjetivoFecha } from "@/lib/goals";
@@ -346,6 +348,34 @@ export async function linkEpicAction(
   formData: FormData,
 ): Promise<ActionState> {
   return linkPlatform("epic", formData);
+}
+
+/* ------------------ Asistente de vincular (16 oct 2026) ------------------ */
+
+/**
+ * "Comprobar" del asistente (components/AsistenteVincular.tsx): lee la
+ * cuenta sin vincularla y dice qué ajuste falta (lib/diagnosticoCuenta.ts).
+ */
+export async function comprobarCuentaAction(platform: string, input: string): Promise<{ diagnostico?: Diagnostico; error?: string }> {
+  const userId = await requireUserId();
+  if (!esPlataformaAsistente(platform)) return { error: await tr("Plataforma no válida") };
+  const limpio = input.trim();
+  if (!limpio) return { error: await tr(PLATFORM_COPY[platform].missing) };
+  if (!(await limitar("comprobarCuenta", userId))) return { error: await tr("Demasiadas comprobaciones seguidas. Espera un momento.") };
+
+  try {
+    return { diagnostico: await diagnosticarCuenta(userId, platform, limpio) };
+  } catch (error) {
+    return { error: await tr(describeError(error)) };
+  }
+}
+
+/** "Vincular" del asistente: lo mismo que los formularios de siempre (`linkPlatform`). */
+export async function vincularDesdeAsistenteAction(platform: string, input: string): Promise<ActionState> {
+  if (!esPlataformaAsistente(platform)) return { error: await tr("Plataforma no válida") };
+  const datos = new FormData();
+  datos.set(PLATFORM_COPY[platform].field, input);
+  return linkPlatform(platform, datos);
 }
 
 export async function unlinkAccountAction(formData: FormData): Promise<void> {

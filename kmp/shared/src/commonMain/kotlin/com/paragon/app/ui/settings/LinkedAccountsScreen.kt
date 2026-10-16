@@ -12,7 +12,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -42,6 +44,7 @@ import com.paragon.shared.red.OauthAccountDto
 import com.paragon.shared.red.PlatformAccountDto
 import com.paragon.shared.red.SteamExtraDto
 import com.paragon.shared.red.CuentaSteamExtraDto
+import com.paragon.shared.red.DiagnosticoCuentaDto
 import com.paragon.app.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -94,6 +97,88 @@ private fun platformPlaceholder(platform: String): String = when (platform) {
     "xbox" -> Textos.t(T.cuentas_ph_xbox)
     "steam" -> Textos.t(T.cuentas_ph_steam)
     else -> Textos.t(T.cuentas_ph_otro)
+}
+
+/** Dónde está el ID que hay que escribir — el paso 2 del asistente de la web (/vincular). */
+private fun platformDondeId(platform: String): String? = when (platform) {
+    "psn" -> Textos.t(T.cuentas_donde_psn)
+    "steam" -> Textos.t(T.cuentas_donde_steam)
+    "xbox" -> Textos.t(T.cuentas_donde_xbox)
+    else -> null
+}
+
+private fun textoComprobacion(clave: String, ok: Boolean): String = when (clave) {
+    "encontrada" -> Textos.t(T.cuentas_fila_encontrada)
+    "libre" -> Textos.t(T.cuentas_fila_libre)
+    "perfilPublico" -> if (ok) Textos.t(T.cuentas_fila_perfil_ok) else Textos.t(T.cuentas_fila_perfil_mal)
+    "detallesJuego" -> if (ok) Textos.t(T.cuentas_fila_detalles_ok) else Textos.t(T.cuentas_fila_detalles_mal)
+    "trofeosVisibles" -> if (ok) Textos.t(T.cuentas_fila_trofeos_ok) else Textos.t(T.cuentas_fila_trofeos_mal)
+    "logrosVisibles" -> if (ok) Textos.t(T.cuentas_fila_logros_ok) else Textos.t(T.cuentas_fila_logros_mal)
+    else -> clave
+}
+
+/** Resultado de "Comprobar": quién es la cuenta y qué está bien o falta (ver accounts/comprobar/route.ts). */
+@Composable
+private fun ResultadoComprobacion(d: DiagnosticoCuentaDto, platform: String) {
+    val forma = RoundedCornerShape(radio(12))
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp)
+            .background(Surface2, forma)
+            .padding(12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(36.dp).clip(CircleShape).background(platformGradient(platform)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(d.username.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                com.paragon.app.ui.common.urlImagenSegura(d.avatarUrl)?.let { avatar ->
+                    coil3.compose.AsyncImage(
+                        model = avatar,
+                        contentDescription = null,
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+            Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                Text(Textos.t(T.cuentas_eres_tu), color = Muted, fontSize = 11.sp)
+                Text(d.username, color = Foreground, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            d.comprobaciones.forEach { c ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier.size(18.dp).background(if (c.ok) Good else Danger, CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            if (c.ok) Icons.Default.Check else Icons.Default.Close,
+                            contentDescription = null,
+                            tint = Background,
+                            modifier = Modifier.size(12.dp),
+                        )
+                    }
+                    Text(
+                        textoComprobacion(c.clave, c.ok),
+                        color = Foreground,
+                        fontSize = 13.sp,
+                        fontWeight = if (c.ok) FontWeight.Normal else FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
+        }
+        val pie = when {
+            d.bloqueada -> Textos.t(T.cuentas_libre_ayuda)
+            d.listo -> Textos.t(T.cuentas_listo)
+            else -> Textos.t(T.cuentas_no_listo)
+        }
+        Text(pie, color = if (d.listo) Good else Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 10.dp))
+    }
 }
 
 private fun platformPrivacyTitle(platform: String): String = when (platform) {
@@ -359,6 +444,10 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
     var showUnlinkConfirm by remember { mutableStateOf(false) }
     var sincronizando by remember { mutableStateOf(false) }
     var avisoSync by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+    // Asistente de vincular (16 oct 2026): "Comprobar" lee la cuenta sin
+    // vincularla y dice qué ajuste falta, igual que /vincular en la web.
+    var diagnostico by remember { mutableStateOf<DiagnosticoCuentaDto?>(null) }
+    var comprobando by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     val brandColor = platformBrandColor(platform.platform)
@@ -519,9 +608,12 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
             Spacer(modifier = Modifier.height(14.dp))
             HorizontalDivider(color = Border)
             Spacer(modifier = Modifier.height(14.dp))
+            platformDondeId(platform.platform)?.let { donde ->
+                Text(donde, color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
+            }
             OutlinedTextField(
                 value = inputUsername,
-                onValueChange = { inputUsername = it; errorMsg = null },
+                onValueChange = { inputUsername = it; errorMsg = null; diagnostico = null },
                 placeholder = { Text(platformPlaceholder(platform.platform), color = Muted) },
                 isError = errorMsg != null,
                 shape = RoundedCornerShape(radio(10)),
@@ -540,11 +632,42 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
             if (errorMsg != null) {
                 Text(text = errorMsg!!, color = Danger, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
             }
+            OutlinedButton(
+                onClick = {
+                    scope.launch {
+                        comprobando = true
+                        errorMsg = null
+                        when (val r = repository.comprobarCuenta(platform.platform, inputUsername.trim())) {
+                            is SettingsResult.Ok -> diagnostico = r.data
+                            is SettingsResult.Error -> { diagnostico = null; errorMsg = r.message }
+                        }
+                        comprobando = false
+                    }
+                },
+                shape = RoundedCornerShape(radio(10)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, brandColor),
+                enabled = !comprobando && !isProcessing && inputUsername.isNotBlank(),
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+            ) {
+                if (comprobando) {
+                    CircularProgressIndicator(color = brandColor, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                } else {
+                    Text(Textos.t(T.cuentas_comprobar), color = brandColor, fontWeight = FontWeight.SemiBold)
+                }
+            }
+            diagnostico?.let { ResultadoComprobacion(it, platform.platform) }
             Spacer(modifier = Modifier.height(10.dp))
-            PrivacyGuide(platform = platform.platform, brandColor = brandColor)
+            // Con algo en rojo, los pasos de dónde tocarlo salen ya abiertos.
+            key(diagnostico) {
+                PrivacyGuide(
+                    platform = platform.platform,
+                    brandColor = brandColor,
+                    abiertaAlInicio = diagnostico?.let { !it.listo && !it.bloqueada } == true,
+                )
+            }
             Spacer(modifier = Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = { isLinking = false; errorMsg = null }, enabled = !isProcessing) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { isLinking = false; errorMsg = null; diagnostico = null }, enabled = !isProcessing) {
                     Text(Textos.t(T.comun_cancelar), color = Muted)
                 }
                 Spacer(modifier = Modifier.width(4.dp))
@@ -563,12 +686,13 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = brandColor),
                     shape = RoundedCornerShape(radio(10)),
-                    enabled = !isProcessing && inputUsername.isNotBlank()
+                    enabled = !isProcessing && !comprobando && inputUsername.isNotBlank() && diagnostico?.bloqueada != true
                 ) {
                     if (isProcessing) {
                         CircularProgressIndicator(color = textoSobre(brandColor), modifier = Modifier.size(16.dp))
                     } else {
-                        Text(Textos.t(T.cuentas_conectar), color = textoSobre(brandColor), fontWeight = FontWeight.SemiBold)
+                        val texto = if (diagnostico?.listo == false) Textos.t(T.cuentas_vincular_igual) else Textos.t(T.cuentas_conectar)
+                        Text(texto, color = textoSobre(brandColor), fontWeight = FontWeight.SemiBold, maxLines = 1)
                     }
                 }
             }
@@ -595,8 +719,8 @@ fun PlatformItem(platform: PlatformAccountDto, repository: SettingsRepository, o
 
 /** Desplegable "¿Dónde lo pongo en público?" — mismos pasos que PrivacyGuide.tsx en la web. */
 @Composable
-private fun PrivacyGuide(platform: String, brandColor: Color) {
-    var expanded by remember { mutableStateOf(false) }
+private fun PrivacyGuide(platform: String, brandColor: Color, abiertaAlInicio: Boolean = false) {
+    var expanded by remember { mutableStateOf(abiertaAlInicio) }
     val steps = remember(platform) { platformPrivacySteps(platform) }
     if (steps.isEmpty()) return
 

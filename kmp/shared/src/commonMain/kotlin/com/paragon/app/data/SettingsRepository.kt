@@ -57,6 +57,17 @@ class SettingsRepository(private val tokenStore: TokenStore) {
     }
 
     /** Otra cuenta de Steam (ver lib/steamExtra.ts en el servidor): devuelve lo mismo que vincular. */
+    /** Asistente de vincular: qué ajustes están bien o faltan, sin vincular nada. */
+    suspend fun comprobarCuenta(platform: String, entrada: String): SettingsResult<com.paragon.shared.red.DiagnosticoCuentaDto> {
+        return try {
+            SettingsResult.Ok(ApiClient.settingsApi(tokenStore).comprobarCuenta(com.paragon.shared.red.ComprobarCuentaRequest(platform, entrada)))
+        } catch (e: HttpException) {
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: Exception) {
+            SettingsResult.Error(Textos.t(T.error_red))
+        }
+    }
+
     suspend fun anadirSteamExtra(entrada: String): SettingsResult<com.paragon.shared.red.LinkPlatformResponse> {
         return try {
             SettingsResult.Ok(ApiClient.settingsApi(tokenStore).anadirSteamExtra(LinkPlatformRequest(entrada)))

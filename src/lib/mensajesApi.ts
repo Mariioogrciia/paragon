@@ -98,6 +98,7 @@ const FIJOS: Record<string, Trad> = {
   "Elige un juego de los resultados.": { en: "Pick a game from the results.", de: "Wähle ein Spiel aus den Ergebnissen.", fr: "Choisis un jeu dans les résultats." },
   "El nombre a mostrar no puede estar vacío.": { en: "The display name can't be empty.", de: "Der Anzeigename darf nicht leer sein.", fr: "Le nom affiché ne peut pas être vide." },
   "Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.": { en: "Too many link attempts in a row. Try again in a few minutes.", de: "Zu viele Verknüpfungsversuche hintereinander. Versuch es in ein paar Minuten.", fr: "Trop de tentatives d'association d'affilée. Réessaie dans quelques minutes." },
+  "Demasiadas comprobaciones seguidas. Espera un momento.": { en: "Too many checks in a row. Wait a moment.", de: "Zu viele Prüfungen hintereinander. Warte kurz.", fr: "Trop de vérifications d'affilée. Patiente un instant." },
   "Demasiados comentarios seguidos. Espera un momento.": { en: "Too many comments in a row. Wait a moment.", de: "Zu viele Kommentare hintereinander. Warte kurz.", fr: "Trop de commentaires d'affilée. Patiente un instant." },
   "Demasiadas subidas seguidas. Prueba dentro de unos minutos.": { en: "Too many uploads in a row. Try again in a few minutes.", de: "Zu viele Uploads hintereinander. Versuch es in ein paar Minuten.", fr: "Trop d'envois d'affilée. Réessaie dans quelques minutes." },
   "Datos no válidos": { en: "Invalid data", de: "Ungültige Daten", fr: "Données non valides" },

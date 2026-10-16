@@ -76,6 +76,8 @@ export const LIMITES = {
   perfil: [20, 60],
   // App Android (auditoría 4 oct 2026): rutas de /api/mobile que escriben o llaman fuera.
   vincularCuenta: [6, 600],
+  // "Comprobar" del asistente de vincular: lee la plataforma sin guardar nada.
+  comprobarCuenta: [20, 600],
   resync: [20, 600],
   pushToken: [10, 600],
   reaccion: [60, 60],

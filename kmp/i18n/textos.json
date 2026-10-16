@@ -5488,5 +5488,119 @@
   "en": "Added {0}, but its library is private: set \"Game details\" to public in Steam.",
   "es": "Añadida {0}, pero su biblioteca es privada: pon «Detalles del juego» en público en Steam.",
   "fr": "{0} ajouté, mais sa bibliothèque est privée : mets « Détails des jeux » en public sur Steam."
+ },
+ "cuentas_comprobar": {
+  "de": "Prüfen",
+  "en": "Check",
+  "es": "Comprobar",
+  "fr": "Vérifier"
+ },
+ "cuentas_eres_tu": {
+  "de": "Bist du das?",
+  "en": "Is this you?",
+  "es": "¿Eres tú?",
+  "fr": "C'est toi ?"
+ },
+ "cuentas_fila_encontrada": {
+  "de": "Konto gefunden",
+  "en": "Account found",
+  "es": "Cuenta encontrada",
+  "fr": "Compte trouvé"
+ },
+ "cuentas_fila_libre": {
+  "de": "Schon mit einer anderen Paragon-Person verknüpft",
+  "en": "Already linked to another Paragon user",
+  "es": "Ya está vinculada a otro usuario de Paragon",
+  "fr": "Déjà associé à un autre utilisateur de Paragon"
+ },
+ "cuentas_fila_perfil_ok": {
+  "de": "Profil ist öffentlich",
+  "en": "Profile is public",
+  "es": "Perfil en público",
+  "fr": "Profil public"
+ },
+ "cuentas_fila_perfil_mal": {
+  "de": "Profil ist privat",
+  "en": "Profile is private",
+  "es": "El perfil está en privado",
+  "fr": "Le profil est privé"
+ },
+ "cuentas_fila_detalles_ok": {
+  "de": "„Spieldetails“ sind öffentlich",
+  "en": "“Game details” is public",
+  "es": "«Detalles del juego» en público",
+  "fr": "« Détails des jeux » en public"
+ },
+ "cuentas_fila_detalles_mal": {
+  "de": "„Spieldetails“ sind privat",
+  "en": "“Game details” is private",
+  "es": "«Detalles del juego» está en privado",
+  "fr": "« Détails des jeux » est privé"
+ },
+ "cuentas_fila_trofeos_ok": {
+  "de": "Trophäen sind sichtbar",
+  "en": "Trophies are visible",
+  "es": "Trofeos visibles",
+  "fr": "Trophées visibles"
+ },
+ "cuentas_fila_trofeos_mal": {
+  "de": "Trophäen sind nicht sichtbar",
+  "en": "Trophies can't be seen",
+  "es": "Los trofeos no se pueden ver",
+  "fr": "Les trophées ne sont pas visibles"
+ },
+ "cuentas_fila_logros_ok": {
+  "de": "Erfolgsverlauf ist sichtbar",
+  "en": "Achievement history is visible",
+  "es": "Historial de logros visible",
+  "fr": "Historique des succès visible"
+ },
+ "cuentas_fila_logros_mal": {
+  "de": "Erfolgsverlauf ist nicht sichtbar",
+  "en": "Achievement history can't be seen",
+  "es": "El historial de logros no se puede ver",
+  "fr": "L'historique des succès n'est pas visible"
+ },
+ "cuentas_listo": {
+  "de": "Alles gut: Beim Verknüpfen wird deine Bibliothek importiert.",
+  "en": "All good: linking will import your library.",
+  "es": "Todo bien: al vincular se importa tu biblioteca.",
+  "fr": "Tout est bon : l'association importera ta bibliothèque."
+ },
+ "cuentas_no_listo": {
+  "de": "Du kannst es jetzt verknüpfen, aber deine Bibliothek bleibt leer, bis du das behebst. Unten steht, wo du es änderst.",
+  "en": "You can link it now, but your library will be empty until you fix this. See below for where to change it.",
+  "es": "Puedes vincularla ya, pero la biblioteca saldrá vacía hasta que lo arregles. Abajo tienes dónde tocar.",
+  "fr": "Tu peux l'associer maintenant, mais ta bibliothèque restera vide tant que ce n'est pas corrigé. Voir ci-dessous où le changer."
+ },
+ "cuentas_libre_ayuda": {
+  "de": "Wenn es deins ist, melde dich mit dem Paragon-Konto an, das es verknüpft hat, und trenne es unter Plattformen.",
+  "en": "If it's yours, sign in with the Paragon account that has it linked and unlink it from Platforms.",
+  "es": "Si es tuya, entra con la cuenta de Paragon que la tiene vinculada y desvincúlala desde Plataformas.",
+  "fr": "S'il est à toi, connecte-toi avec le compte Paragon qui l'a associé et dissocie-le depuis Plateformes."
+ },
+ "cuentas_vincular_igual": {
+  "de": "Trotzdem verknüpfen",
+  "en": "Link anyway",
+  "es": "Vincular igualmente",
+  "fr": "Associer quand même"
+ },
+ "cuentas_donde_psn": {
+  "de": "Deine Online-ID: der Name unter deinem Avatar in deinem PlayStation-Profil (nicht dein echter Name).",
+  "en": "Your online ID: the name under your avatar on your PlayStation profile (not your real name).",
+  "es": "Tu ID online: el nombre que sale debajo de tu avatar en tu perfil de PlayStation (no tu nombre real).",
+  "fr": "Ton ID en ligne : le nom sous ton avatar sur ton profil PlayStation (pas ton vrai nom)."
+ },
+ "cuentas_donde_steam": {
+  "de": "Die Adresse deines Steam-Profils (steamcommunity.com/id/… oder /profiles/7656…). Dein Anzeigename funktioniert nicht: Steam lässt nicht danach suchen.",
+  "en": "Your Steam profile address (steamcommunity.com/id/… or /profiles/7656…). Your display name won't work: Steam doesn't allow searching by it.",
+  "es": "La dirección de tu perfil de Steam (steamcommunity.com/id/… o /profiles/7656…). Tu nombre visible no vale: Steam no deja buscar por él.",
+  "fr": "L'adresse de ton profil Steam (steamcommunity.com/id/… ou /profiles/7656…). Ton nom affiché ne marche pas : Steam ne permet pas de chercher avec."
+ },
+ "cuentas_donde_xbox": {
+  "de": "Dein Gamertag: der große Name in deinem Xbox-Profil, mit der #Nummer, falls vorhanden.",
+  "en": "Your gamertag: the big name on your Xbox profile, with the #number if it has one.",
+  "es": "Tu gamertag: el nombre grande de tu perfil de Xbox, con el #número si lo lleva.",
+  "fr": "Ton gamertag : le grand nom de ton profil Xbox, avec le #numéro s'il en a un."
  }
 }

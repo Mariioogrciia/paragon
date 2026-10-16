@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { HandleForm, LinkPsnForm, LinkSteamForm, LinkXboxForm } from "@/components/forms/Forms";
-import { accountFor, getProfileByUserId } from "@/lib/profiles";
+import { HandleForm } from "@/components/forms/Forms";
+import { AsistenteVincular } from "@/components/AsistenteVincular";
+import { getProfileByUserId } from "@/lib/profiles";
 import { getTranslations } from "next-intl/server";
 import { CompletarSteamSiHaceFalta } from "@/components/CompletarSteamSiHaceFalta";
 
@@ -76,31 +77,9 @@ export default async function BienvenidaPage() {
           {t("bienvenida.step2.description")}
         </p>
 
-        <div className="space-y-5">
-          <div>
-            <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-              {t("bienvenida.step2.psnLabel")}
-            </label>
-            <LinkPsnForm current={accountFor(profile, "psn")?.username} />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-              {t("bienvenida.step2.steamLabel")}
-            </label>
-            <LinkSteamForm current={accountFor(profile, "steam")?.username} />
-            <p className="mt-2 text-xs text-muted">
-              {t("bienvenida.step2.steamHint")}
-            </p>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">
-              {t("bienvenida.step2.xboxLabel")}
-            </label>
-            <LinkXboxForm current={accountFor(profile, "xbox")?.username} />
-          </div>
-        </div>
+        {/* Asistente (16 oct 2026): antes eran los tres formularios uno
+            debajo de otro, sin decir dónde está cada ID ni comprobar nada. */}
+        <AsistenteVincular vinculadas={profile?.accounts.map((a) => a.platform) ?? []} handle={profile?.handle ?? null} />
       </section>
     </div>
   );

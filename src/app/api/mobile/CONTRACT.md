@@ -657,6 +657,32 @@ principal vinculada).
 
 Las extra se sincronizan solas junto a la principal (ver lib/steamExtra.ts).
 
+## `POST /api/mobile/accounts/comprobar` — Comprobar una cuenta antes de vincularla
+
+Asistente de vincular (16 oct 2026). Body: `{ "platform": "psn" | "steam" |
+"xbox", "input": "ID, URL o gamertag" }`. Lee la cuenta SIN vincularla y
+devuelve qué ajuste falta:
+
+```json
+{
+  "platform": "steam", "accountId": "7656...", "username": "Panchito",
+  "avatarUrl": "https://..." ,
+  "comprobaciones": [
+    { "clave": "encontrada", "ok": true },
+    { "clave": "perfilPublico", "ok": true },
+    { "clave": "detallesJuego", "ok": false }
+  ],
+  "listo": false, "bloqueada": false
+}
+```
+
+`clave`: `encontrada`, `libre` (solo sale, en rojo, si la cuenta ya es de
+otro usuario: entonces `bloqueada: true` y no se puede vincular),
+`perfilPublico` y `detallesJuego` (Steam), `trofeosVisibles` (PSN),
+`logrosVisibles` (Xbox). `listo` = todo en verde. Errores: `400`, `422` con
+el motivo (perfil no encontrado...) y `429` (20 comprobaciones / 10 min).
+Para vincular después, el `POST /api/mobile/accounts/{platform}` de siempre.
+
 ## `POST /api/mobile/profile/handle` — Elegir nombre de usuario (alta nueva)
 
 Body: `{ "handle": "mario_gg" }`. `{ "ok": true, "handle": "mario_gg" }` o

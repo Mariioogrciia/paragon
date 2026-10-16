@@ -531,5 +531,91 @@
       }
     },
     "comandos": "Lista de comandos y más detalles en <link>Cómo funciona</link>."
+  },
+  "asistente": {
+    "enlace": "¿No sabes qué poner? Asistente paso a paso",
+    "titulo": "Vincula tu cuenta paso a paso",
+    "subtitulo": "Elige dónde juegas, te enseñamos dónde está tu ID y comprobamos que se pueda leer antes de vincular.",
+    "paso1": "¿Dónde juegas?",
+    "paso2": "Tu ID",
+    "paso3": "Comprobación",
+    "ilustracion": "Ilustración de dónde mirar",
+    "donde": {
+      "psn": {
+        "titulo": "Tu ID online de PlayStation",
+        "pasos": [
+          "Abre tu perfil en la consola o en la app de PlayStation.",
+          "Es el nombre que sale debajo de tu avatar (el ID online, no tu nombre real).",
+          "Escríbelo tal cual."
+        ]
+      },
+      "steam": {
+        "titulo": "La dirección de tu perfil de Steam",
+        "pasos": [
+          "Abre tu perfil de Steam (en el navegador, o en Steam: tu nombre → Perfil).",
+          "Copia la dirección: steamcommunity.com/id/… o steamcommunity.com/profiles/7656…",
+          "Pégala entera. Tu nombre visible no vale: Steam no deja buscar por él."
+        ]
+      },
+      "xbox": {
+        "titulo": "Tu gamertag de Xbox",
+        "pasos": [
+          "Abre tu perfil en la consola o en la app de Xbox.",
+          "Es el nombre grande de arriba.",
+          "Escríbelo tal cual, con el #número si lo lleva."
+        ]
+      }
+    },
+    "comprobar": "Comprobar",
+    "comprobando": "Comprobando…",
+    "eresTu": "¿Eres tú?",
+    "filas": {
+      "encontrada": "Cuenta encontrada",
+      "libre": "Ya está vinculada a otro usuario de Paragon",
+      "perfilPublico": {
+        "ok": "Perfil en público",
+        "mal": "El perfil está en privado"
+      },
+      "detallesJuego": {
+        "ok": "«Detalles del juego» en público",
+        "mal": "«Detalles del juego» está en privado"
+      },
+      "trofeosVisibles": {
+        "ok": "Trofeos visibles",
+        "mal": "Los trofeos no se pueden ver"
+      },
+      "logrosVisibles": {
+        "ok": "Historial de logros visible",
+        "mal": "El historial de logros no se puede ver"
+      }
+    },
+    "comoArreglarlo": "Cómo arreglarlo",
+    "psnExtension": "¿Prefieres no ponerlos en público? Con la extensión de Paragon para el navegador se leen con tu propia sesión.",
+    "psnExtensionEnlace": "Conectar la extensión",
+    "libreAyuda": "Si es tuya, entra con la cuenta de Paragon que la tiene vinculada y desvincúlala desde Ajustes → Plataformas.",
+    "listo": "Todo bien: al vincular se importa tu biblioteca.",
+    "noListo": "Puedes vincularla ya, pero la biblioteca saldrá vacía hasta que lo arregles.",
+    "volverAComprobar": "Volver a comprobar",
+    "vincular": "Vincular {nombre}",
+    "vincularIgual": "Vincular igualmente",
+    "vinculando": "Vinculando…",
+    "otraPlataforma": "Vincular otra plataforma",
+    "verBiblioteca": "Ver mi biblioteca",
+    "epic": "Epic Games va con la extensión del navegador: está en Ajustes → Plataformas.",
+    "maqueta": {
+      "perfil": "Perfil",
+      "idOnline": "ID online",
+      "privacidad": "Privacidad",
+      "psnTrofeos": "Nivel de trofeos, juegos y vitrinas",
+      "cualquiera": "Cualquiera",
+      "steamPrivacidad": "Ajustes de privacidad",
+      "steamPerfil": "Mi perfil",
+      "steamDetalles": "Detalles del juego",
+      "publico": "Público",
+      "xboxPrivacidad": "Privacidad y seguridad en línea",
+      "xboxHistorial": "Historial de juego y estadísticas",
+      "todos": "Todos",
+      "guardar": "Guardar"
+    }
   }
 }

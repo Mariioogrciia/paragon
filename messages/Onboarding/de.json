@@ -531,5 +531,91 @@
       }
     },
     "comandos": "Befehlsliste und mehr Details unter <link>So funktioniert's</link>."
+  },
+  "asistente": {
+    "enlace": "Unsicher, was du eingeben sollst? Schritt-für-Schritt-Hilfe",
+    "titulo": "Konto Schritt für Schritt verknüpfen",
+    "subtitulo": "Wähle, wo du spielst. Wir zeigen dir, wo deine ID steht, und prüfen vor dem Verknüpfen, ob sie lesbar ist.",
+    "paso1": "Wo spielst du?",
+    "paso2": "Deine ID",
+    "paso3": "Prüfung",
+    "ilustracion": "Illustration, wo du nachsehen musst",
+    "donde": {
+      "psn": {
+        "titulo": "Deine PlayStation-Online-ID",
+        "pasos": [
+          "Öffne dein Profil auf der Konsole oder in der PlayStation-App.",
+          "Es ist der Name unter deinem Avatar (die Online-ID, nicht dein echter Name).",
+          "Gib ihn genau so ein."
+        ]
+      },
+      "steam": {
+        "titulo": "Die Adresse deines Steam-Profils",
+        "pasos": [
+          "Öffne dein Steam-Profil (im Browser oder in Steam: dein Name → Profil).",
+          "Kopiere die Adresse: steamcommunity.com/id/… oder steamcommunity.com/profiles/7656…",
+          "Füge sie vollständig ein. Dein Anzeigename funktioniert nicht: Steam lässt nicht danach suchen."
+        ]
+      },
+      "xbox": {
+        "titulo": "Dein Xbox-Gamertag",
+        "pasos": [
+          "Öffne dein Profil auf der Konsole oder in der Xbox-App.",
+          "Es ist der große Name oben.",
+          "Gib ihn genau so ein, mit der #Nummer, falls vorhanden."
+        ]
+      }
+    },
+    "comprobar": "Prüfen",
+    "comprobando": "Wird geprüft…",
+    "eresTu": "Bist du das?",
+    "filas": {
+      "encontrada": "Konto gefunden",
+      "libre": "Schon mit einer anderen Paragon-Person verknüpft",
+      "perfilPublico": {
+        "ok": "Profil ist öffentlich",
+        "mal": "Profil ist privat"
+      },
+      "detallesJuego": {
+        "ok": "„Spieldetails“ sind öffentlich",
+        "mal": "„Spieldetails“ sind privat"
+      },
+      "trofeosVisibles": {
+        "ok": "Trophäen sind sichtbar",
+        "mal": "Trophäen sind nicht sichtbar"
+      },
+      "logrosVisibles": {
+        "ok": "Erfolgsverlauf ist sichtbar",
+        "mal": "Erfolgsverlauf ist nicht sichtbar"
+      }
+    },
+    "comoArreglarlo": "So behebst du es",
+    "psnExtension": "Lieber nicht öffentlich machen? Mit der Paragon-Browsererweiterung werden sie mit deiner eigenen Sitzung gelesen.",
+    "psnExtensionEnlace": "Erweiterung verbinden",
+    "libreAyuda": "Wenn es deins ist, melde dich mit dem Paragon-Konto an, das es verknüpft hat, und trenne es unter Einstellungen → Plattformen.",
+    "listo": "Alles gut: Beim Verknüpfen wird deine Bibliothek importiert.",
+    "noListo": "Du kannst es jetzt verknüpfen, aber deine Bibliothek bleibt leer, bis du das behebst.",
+    "volverAComprobar": "Erneut prüfen",
+    "vincular": "{nombre} verknüpfen",
+    "vincularIgual": "Trotzdem verknüpfen",
+    "vinculando": "Wird verknüpft…",
+    "otraPlataforma": "Andere Plattform verknüpfen",
+    "verBiblioteca": "Meine Bibliothek ansehen",
+    "epic": "Epic Games läuft über die Browsererweiterung: unter Einstellungen → Plattformen.",
+    "maqueta": {
+      "perfil": "Profil",
+      "idOnline": "Online-ID",
+      "privacidad": "Datenschutz",
+      "psnTrofeos": "Trophäenstufe, Spiele und Vitrinen",
+      "cualquiera": "Alle",
+      "steamPrivacidad": "Privatsphäre-Einstellungen",
+      "steamPerfil": "Mein Profil",
+      "steamDetalles": "Spieldetails",
+      "publico": "Öffentlich",
+      "xboxPrivacidad": "Datenschutz & Onlinesicherheit",
+      "xboxHistorial": "Spielverlauf und Statistiken",
+      "todos": "Alle",
+      "guardar": "Speichern"
+    }
   }
 }

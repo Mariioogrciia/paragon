@@ -16,7 +16,7 @@ master. Regla del usuario:
 
 **CI**: todo en verde en `a9f964f` (15 oct, master): APK de Android e IPA
 de iOS; la web (*Comprobaciones*), en verde en cada push a master.
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 158 tests de
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 164 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
@@ -57,7 +57,9 @@ de iOS; la web (*Comprobaciones*), en verde en cada push a master.
    PromoTikTok.tsx, Lanzamientos.kt, ClienteParagon.kt y dos tests de la
    app) y las URLs de vuelta en las consolas de Google y Discord.
 
-**Lo último** (detalle en HISTORIAL.md, 16 oct): aviso al desarrollador
+**Lo último** (detalle en HISTORIAL.md, 16 oct): asistente para vincular
+cuentas (web `/vincular` y bienvenida; en la app, "Comprobar" en
+Plataformas vinculadas), aviso al desarrollador
 cuando el `PSN_NPSSO` falla o va a caducar, y la cabecera sin sesión más
 corta (Noticias y eSports dentro de Descubrir). Antes (15 oct): varias cuentas de Steam en
 el mismo perfil (de momento solo el desarrollador, web y app), avisos que
@@ -109,6 +111,9 @@ pantallas en la app, 4 idiomas en todo.
 - Push: `src/lib/webPush.ts` (navegador), `src/lib/fcm.ts` (Android, y reparte
   los de iOS) y `src/lib/apns.ts` (iOS).
 - Contrato de la API móvil: `src/app/api/mobile/CONTRACT.md`.
+- Vincular cuentas: `linkAccount` en `src/lib/profiles.ts`; el asistente
+  (comprobar sin vincular) en `src/components/AsistenteVincular.tsx`,
+  `src/lib/diagnosticoCuenta.ts` y `src/lib/comprobarCuenta.ts`.
 - Workflows: `.github/workflows/` (`comprobaciones.yml`,
   `build-android-kmp.yml`, `build-ios-kmp.yml`, `publicar-tiendas.yml`).
 - Vídeo de promoción para TikTok (Remotion): `video/` (ver su README); las

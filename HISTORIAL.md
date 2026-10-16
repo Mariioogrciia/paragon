@@ -6,6 +6,30 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct (2) — asistente para vincular cuentas**. Era donde más gente se
+perdía: no sabía qué escribir (en Steam el nombre visible no vale) o
+vinculaba una cuenta privada y veía la biblioteca vacía sin saber por qué.
+- "Comprobar" lee la cuenta SIN vincularla y dice qué falta
+  (`diagnosticarCuenta`, lib/diagnosticoCuenta.ts; la parte pura, con tests,
+  en lib/comprobarCuenta.ts): cuenta encontrada; Steam, perfil público y
+  «Detalles del juego» público por separado; PSN, trofeos visibles; Xbox,
+  historial visible; y si ya es de otro usuario de Paragon, bloqueada.
+  Límite `comprobarCuenta` (20 / 10 min).
+- Web: `AsistenteVincular` (components/AsistenteVincular.tsx). Eliges
+  plataforma, una ilustración enseña dónde está tu ID, comprueba y, lo que
+  sale en rojo, otra ilustración marca el ajuste a tocar con los pasos de
+  siempre (`privacyGuide`). Luego "Vincular" (o "Vincular igualmente"), que
+  es el mismo `linkPlatform` de los formularios. Las ilustraciones son
+  maquetas en HTML, no capturas: no se quedan viejas y salen en el idioma
+  de quien mira. Está en la bienvenida (paso 2, sustituye a los tres
+  formularios) y en `/vincular`, enlazado desde Ajustes → Plataformas.
+  Textos en `Onboarding.asistente`.
+- App: en Plataformas vinculadas, al vincular sale dónde está tu ID y un
+  botón "Comprobar" (`POST /api/mobile/accounts/comprobar`, CONTRACT.md)
+  con la misma lista; si algo falla, los pasos de dónde tocarlo se abren
+  solos y el botón pasa a "Vincular igualmente".
+- Epic no entra en el asistente: va con la extensión (Ajustes → Plataformas).
+
 **16 oct — aviso de PSN y cabecera más corta**:
 - `PSN_NPSSO` (la única credencial de PlayStation del servidor) caduca cada
   ~2 meses y, al caducar, PSN dejaba de sincronizar para todos sin que nadie

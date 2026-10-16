@@ -241,6 +241,12 @@ export default async function AjustesPlataformasPage() {
       <div>
         <h1 className="font-heading text-2xl font-bold mb-2">{t("ajustesPlataformas.title")}</h1>
         <p className="text-sm text-muted">{t("ajustesPlataformas.description")}</p>
+        <Link
+          href="/vincular"
+          className="mt-3 inline-block rounded-md px-1 text-[0.8125rem] font-bold text-[var(--accent-text)] hover:bg-[var(--accent-soft)] hover:underline"
+        >
+          {t("asistente.enlace")} →
+        </Link>
       </div>
 
       <CompletarSteamSiHaceFalta userId={session.user.id} />

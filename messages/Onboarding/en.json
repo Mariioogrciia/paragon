@@ -531,5 +531,91 @@
       }
     },
     "comandos": "Full command list and more details in <link>How it works</link>."
+  },
+  "asistente": {
+    "enlace": "Not sure what to enter? Step-by-step helper",
+    "titulo": "Link your account step by step",
+    "subtitulo": "Pick where you play, we'll show you where to find your ID and check it can be read before linking.",
+    "paso1": "Where do you play?",
+    "paso2": "Your ID",
+    "paso3": "Check",
+    "ilustracion": "Illustration of where to look",
+    "donde": {
+      "psn": {
+        "titulo": "Your PlayStation online ID",
+        "pasos": [
+          "Open your profile on the console or in the PlayStation app.",
+          "It's the name under your avatar (the online ID, not your real name).",
+          "Type it exactly as it is."
+        ]
+      },
+      "steam": {
+        "titulo": "Your Steam profile address",
+        "pasos": [
+          "Open your Steam profile (in the browser, or in Steam: your name → Profile).",
+          "Copy the address: steamcommunity.com/id/… or steamcommunity.com/profiles/7656…",
+          "Paste it in full. Your display name won't work: Steam doesn't allow searching by it."
+        ]
+      },
+      "xbox": {
+        "titulo": "Your Xbox gamertag",
+        "pasos": [
+          "Open your profile on the console or in the Xbox app.",
+          "It's the big name at the top.",
+          "Type it exactly, with the #number if it has one."
+        ]
+      }
+    },
+    "comprobar": "Check",
+    "comprobando": "Checking…",
+    "eresTu": "Is this you?",
+    "filas": {
+      "encontrada": "Account found",
+      "libre": "Already linked to another Paragon user",
+      "perfilPublico": {
+        "ok": "Profile is public",
+        "mal": "Profile is private"
+      },
+      "detallesJuego": {
+        "ok": "“Game details” is public",
+        "mal": "“Game details” is private"
+      },
+      "trofeosVisibles": {
+        "ok": "Trophies are visible",
+        "mal": "Trophies can't be seen"
+      },
+      "logrosVisibles": {
+        "ok": "Achievement history is visible",
+        "mal": "Achievement history can't be seen"
+      }
+    },
+    "comoArreglarlo": "How to fix it",
+    "psnExtension": "Rather not make them public? With the Paragon browser extension they're read with your own session.",
+    "psnExtensionEnlace": "Connect the extension",
+    "libreAyuda": "If it's yours, sign in with the Paragon account that has it linked and unlink it from Settings → Platforms.",
+    "listo": "All good: linking will import your library.",
+    "noListo": "You can link it now, but your library will be empty until you fix this.",
+    "volverAComprobar": "Check again",
+    "vincular": "Link {nombre}",
+    "vincularIgual": "Link anyway",
+    "vinculando": "Linking…",
+    "otraPlataforma": "Link another platform",
+    "verBiblioteca": "See my library",
+    "epic": "Epic Games works through the browser extension: it's in Settings → Platforms.",
+    "maqueta": {
+      "perfil": "Profile",
+      "idOnline": "Online ID",
+      "privacidad": "Privacy",
+      "psnTrofeos": "Trophy level, games and showcases",
+      "cualquiera": "Anyone",
+      "steamPrivacidad": "Privacy settings",
+      "steamPerfil": "My profile",
+      "steamDetalles": "Game details",
+      "publico": "Public",
+      "xboxPrivacidad": "Privacy & online safety",
+      "xboxHistorial": "Game history and stats",
+      "todos": "Everyone",
+      "guardar": "Save"
+    }
   }
 }

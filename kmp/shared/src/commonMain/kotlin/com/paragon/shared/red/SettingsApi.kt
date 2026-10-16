@@ -59,6 +59,23 @@ data class LinkPlatformResponse(
     val juegos: Int
 )
 
+/** "Comprobar" del asistente de vincular — ver accounts/comprobar/route.ts. */
+@Serializable
+data class ComprobarCuentaRequest(val platform: String, val input: String)
+
+@Serializable
+data class ComprobacionDto(val clave: String, val ok: Boolean)
+
+@Serializable
+data class DiagnosticoCuentaDto(
+    val platform: String,
+    val username: String,
+    val avatarUrl: String? = null,
+    val comprobaciones: List<ComprobacionDto> = emptyList(),
+    val listo: Boolean = false,
+    val bloqueada: Boolean = false,
+)
+
 @Serializable
 data class SuccessResponse(val ok: Boolean)
 
@@ -91,6 +108,10 @@ class SettingsApi internal constructor(private val c: ClienteParagon) {
 
     suspend fun unlinkPlatform(platform: String): SuccessResponse =
         c.http.delete("api/mobile/accounts/${platform.encodeURLPathPart()}").body()
+
+    /** Lee la cuenta sin vincularla y dice qué ajuste falta — ver accounts/comprobar/route.ts. */
+    suspend fun comprobarCuenta(request: ComprobarCuentaRequest): DiagnosticoCuentaDto =
+        c.http.post("api/mobile/accounts/comprobar") { json(request) }.body()
 
     /** Añadir otra cuenta de Steam — ver accounts/steam-extra/route.ts. */
     suspend fun anadirSteamExtra(request: LinkPlatformRequest): LinkPlatformResponse =
