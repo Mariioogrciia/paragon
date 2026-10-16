@@ -1,22 +1,22 @@
 # Paragon — traspaso
 
 Estado del proyecto para retomarlo sin releer nada más. Última
-actualización: **15 de octubre de 2026**.
+actualización: **16 de octubre de 2026**.
 
 Lo de cada día (qué se hizo, por qué y con qué commits) está en
 [`HISTORIAL.md`](HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
 antes del 23 sept, en [`docs/historial/`](docs/historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
-## Dónde estamos (15 oct 2026) · leer primero
+## Dónde estamos (16 oct 2026) · leer primero
 
 **Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
 master. Regla del usuario:
 **siempre push a master** (fast-forward desde la rama).
 
-**CI**: todo en verde en `a9f964f` (15 oct, master): web con 153 tests, APK
-de Android e IPA de iOS.
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 153 tests de
+**CI**: todo en verde en `a9f964f` (15 oct, master): APK de Android e IPA
+de iOS; la web (*Comprobaciones*), en verde en cada push a master.
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 158 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
@@ -49,9 +49,17 @@ de Android e IPA de iOS.
 4. **Probar en un móvil de verdad** lo de los últimos días (perfil completo,
    precios, DLC, QR, widget de iOS...): el emulador de Windows no arranca
    desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
-5. **Dominio propio** (sin comprar).
+5. **Dominio propio** (sin comprar). Sirve cualquier registrador (Vercel,
+   Cloudflare, Porkbun...): comprado fuera, se apuntan sus DNS a Vercel.
+   Candidato: `paragontrophies.com` (~11 $/año). Al comprarlo, cambiar las
+   referencias a `platinos-nine` (`grep -rn platinos-nine src kmp extension video`:
+   api/esports/img, ajustes/escaparate, extension/manifest.json,
+   PromoTikTok.tsx, Lanzamientos.kt, ClienteParagon.kt y dos tests de la
+   app) y las URLs de vuelta en las consolas de Google y Discord.
 
-**Lo último** (detalle en HISTORIAL.md, 15 oct): varias cuentas de Steam en
+**Lo último** (detalle en HISTORIAL.md, 16 oct): aviso al desarrollador
+cuando el `PSN_NPSSO` falla o va a caducar, y la cabecera sin sesión más
+corta (Noticias y eSports dentro de Descubrir). Antes (15 oct): varias cuentas de Steam en
 el mismo perfil (de momento solo el desarrollador, web y app), avisos que
 abren su pantalla, límites en la API móvil, lint a cero y las pantallas v2
 de Enfoque, Estadísticas, Atascados, Comparar y Sesiones.
@@ -444,7 +452,7 @@ Variables de entorno (ver `.env.example`):
 |---|---|
 | `DATABASE_URL` / `DIRECT_URL` | Supabase. La segunda, solo para DDL. |
 | `AUTH_SECRET`, `AUTH_GOOGLE_*`, `AUTH_DISCORD_*` | Auth.js. |
-| `PSN_NPSSO` | **Caduca cada ~2 meses.** Cuando caduque, deja de sincronizar todo PSN. |
+| `PSN_NPSSO` | **Caduca cada ~2 meses.** Cuando caduque, deja de sincronizar todo PSN. Desde el 16 oct el cron avisa al desarrollador (push + DM de Discord) una semana antes y en cuanto falla; estado en Admin → Sistema (`lib/credencialPsn.ts`). |
 | `STEAM_API_KEY` | No caduca. |
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | Twitch dev. |
 | `CRON_SECRET` | **Falta en Vercel.** Sin ella la ruta del cron devuelve 503 a propósito. |

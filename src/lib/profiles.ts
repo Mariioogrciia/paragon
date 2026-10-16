@@ -82,7 +82,7 @@ export interface ProfileRow {
  * un booleano — así que no hace falta guardarlo aparte ni ocultarlo del
  * resto del código.
  */
-const CORREO_DESARROLLADOR = "mario.meca2005@gmail.com";
+export const CORREO_DESARROLLADOR = "mario.meca2005@gmail.com";
 
 /**
  * Zona horaria guardada en Ajustes (`users.timezone`, por defecto

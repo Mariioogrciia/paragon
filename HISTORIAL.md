@@ -6,6 +6,30 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct — aviso de PSN y cabecera más corta**:
+- `PSN_NPSSO` (la única credencial de PlayStation del servidor) caduca cada
+  ~2 meses y, al caducar, PSN dejaba de sincronizar para todos sin que nadie
+  se enterara. Ahora el cron llama a `revisarCredencialPsn`
+  (lib/credencialPsn.ts) en cada pasada y avisa al desarrollador
+  (`avisarUsuario`: push y DM de Discord si los tiene activos, enlace a
+  Admin → Sistema):
+  - si falta la variable o Sony rechaza el NPSSO, una vez al día;
+  - una semana antes de los 60 días, una sola vez por NPSSO.
+  Sony no dice cuándo caduca, así que se cuenta desde la primera vez que el
+  servidor lo vio funcionar. El estado va en `notification_log` del
+  desarrollador (sin tabla nueva): `psn-npsso-visto` con una huella (hash
+  corto, el NPSSO nunca se guarda) y `psn-npsso` con los avisos mandados.
+  La lógica pura, con tests, en lib/caducidadNpsso.ts. Al cambiar el
+  NPSSO, la cuenta vuelve a empezar sola (otra huella). El NPSSO que ya
+  estaba puesto empieza a contar el 16 oct: si caduca antes, avisa el
+  "ha caducado".
+- Admin → Sistema: la fila "PlayStation Network (NPSSO)" ya no es un punto
+  verde fijo: rojo si falta o ha fallado hoy, amarillo la última semana, y
+  los días que le quedan.
+- Cabecera sin sesión: Inicio · Descubrir · Ligas · Cómo funciona. Noticias
+  y eSports pasan a Descubrir (ya eran sus pestañas con sesión), para que
+  quien llega nuevo vea qué es Paragon y no un portal de noticias.
+
 **15 oct (tarde) — varias cuentas de Steam** (`f3800b2`, de momento solo el
 desarrollador, `esDesarrollador` en lib/profiles.ts):
 - La principal sigue en `platform_account`; las demás (hasta 3) en

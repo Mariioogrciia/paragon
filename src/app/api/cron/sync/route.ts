@@ -16,6 +16,7 @@ import { revisarRetosCoop } from "@/lib/coop";
 import { cerrarRetosAmigos } from "@/lib/retosAmigos";
 import { cerrarTemporadaAnteriorSiToca } from "@/lib/temporadas";
 import { registrarHorasDelDia } from "@/lib/horasPeriodo";
+import { revisarCredencialPsn } from "@/lib/credencialPsn";
 
 /**
  * Sincronización desatendida.
@@ -436,6 +437,16 @@ export async function GET(request: Request) {
     }
   }
 
+  // Aviso al desarrollador si el NPSSO del servidor falla o está a punto de
+  // caducar (lib/credencialPsn.ts). Va siempre: usa el token en caché, y es
+  // justo lo que explica una pasada en la que PSN no sincroniza a nadie.
+  let credencialPsn: string | null = null;
+  try {
+    credencialPsn = await revisarCredencialPsn();
+  } catch (error) {
+    console.error("[cron-sync] credencial PSN", error);
+  }
+
   // Registro diario de horas (lib/horasPeriodo.ts): solo inserta los juegos
   // cuyo total ha cambiado, así que en la mayoría de pasadas no escribe nada.
   let horasRegistradas = 0;
@@ -511,6 +522,7 @@ export async function GET(request: Request) {
     guerrasCerradas,
     temporadasCerradas,
     resumenesSemanales,
+    credencialPsn,
     premiosLigaMensual,
     premiosLigasPrivadas,
     pendientesPorTiempo: agotado,

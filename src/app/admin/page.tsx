@@ -9,6 +9,8 @@ import { BackButton } from "@/components/BackButton";
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
+import { estadoCredencialPsn } from "@/lib/credencialPsn";
+import { DIAS_AVISO_ANTES } from "@/lib/caducidadNpsso";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -70,6 +72,7 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
   const clans = currentTab === "clans" ? await getAdminClans() : null;
   const recentTrophies = currentTab === "trophies" ? await getAdminRecentTrophies(60 * pagina + 1) : null;
   const syncRuns = currentTab === "system" ? await getRecentSyncRuns(30) : null;
+  const credencialPsn = currentTab === "system" ? await estadoCredencialPsn(session.user.id) : null;
   const [moderacion, activities] =
     currentTab === "moderation" ? await Promise.all([getAdminModeracion(), getAdminActivities(30 * pagina + 1)]) : [null, null];
   const handleMsg = typeof searchParams.handleMsg === "string" ? HANDLE_MENSAJES[searchParams.handleMsg] : null;
@@ -585,9 +588,29 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
                   <span className="font-bold text-sm">{t("system.infrastructure.supabase")}</span>
                 </div>
+                {/* El NPSSO del servidor caduca cada ~2 meses (lib/credencialPsn.ts). */}
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-                  <span className="font-bold text-sm">{t("system.infrastructure.psn")}</span>
+                  <div
+                    className={`w-2 h-2 shrink-0 rounded-full ${
+                      credencialPsn?.estado !== "ok"
+                        ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+                        : credencialPsn.diasRestantes !== null && credencialPsn.diasRestantes <= DIAS_AVISO_ANTES
+                          ? "bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]"
+                          : "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+                    }`}
+                  />
+                  <div>
+                    <span className="font-bold text-sm">{t("system.infrastructure.psn")}</span>
+                    <p className="text-xs text-muted">
+                      {credencialPsn?.estado === "falta"
+                        ? t("system.infrastructure.psnFalta")
+                        : credencialPsn?.estado === "caducado"
+                          ? t("system.infrastructure.psnCaducado")
+                          : credencialPsn?.diasRestantes != null
+                            ? t("system.infrastructure.psnDias", { dias: credencialPsn.diasRestantes })
+                            : t("system.infrastructure.psnSinDatos")}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />

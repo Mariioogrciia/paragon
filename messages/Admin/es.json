@@ -64,7 +64,11 @@
       "supabase": "Supabase Database",
       "psn": "PlayStation Network (NPSSO)",
       "steam": "Steam Web API",
-      "xbox": "OpenXBL (Rate limit mode)"
+      "xbox": "OpenXBL (Rate limit mode)",
+      "psnFalta": "Falta PSN_NPSSO: PSN no sincroniza",
+      "psnCaducado": "NPSSO caducado: renuévalo en Vercel",
+      "psnDias": "Caduca en unos {dias} días",
+      "psnSinDatos": "Sin datos todavía (los apunta el cron)"
     },
     "recentSyncs": {
       "title": "Sincronizaciones recientes",

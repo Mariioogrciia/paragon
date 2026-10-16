@@ -67,10 +67,19 @@ const NAV_MAS = [
   },
 ] as const;
 
+/**
+ * Sin sesión, la cabecera es lo primero que ve quien llega nuevo (16 oct
+ * 2026): Noticias y eSports ya no van sueltos, viven en Descubrir (son sus
+ * pestañas, igual que con sesión) para que se entienda de un vistazo qué es
+ * Paragon — tus trofeos, tus ligas — en vez de parecer un portal de noticias.
+ */
 const LOGGED_OUT_NAV = [
   { labelKey: "inicio", href: "/", match: (p: string) => p === "/" },
-  { labelKey: "noticias", href: "/noticias", match: (p: string) => p.startsWith("/noticias") },
-  { labelKey: "esports", href: "/esports", match: (p: string) => p.startsWith("/esports") },
+  {
+    labelKey: "descubrir",
+    href: "/descubrir",
+    match: (p: string) => p.startsWith("/descubrir") || p.startsWith("/noticias") || p.startsWith("/esports"),
+  },
   { labelKey: "ligas", href: "/ligas", match: (p: string) => p.startsWith("/ligas") },
   { labelKey: "comoFunciona", href: "/como-funciona", match: (p: string) => p.startsWith("/como-funciona") },
 ];
