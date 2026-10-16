@@ -29,7 +29,15 @@
     "apariencia": "Apariencia",
     "ajustes": "Ajustes",
     "entrar": "Entrar",
-    "crearCuenta": "Crear cuenta"
+    "crearCuenta": "Crear cuenta",
+    "avisos": {
+      "titulo": "Avisos",
+      "abrir": "Avisos",
+      "sinLeer": "{n} sin leer",
+      "vacio": "Todavía no tienes avisos. Aquí saldrán las solicitudes de amistad, las ligas, tus trofeos y los platinos de tus amigos.",
+      "cerrar": "Cerrar aviso",
+      "ajustes": "Elegir qué avisos recibir"
+    }
   },
   "Footer": {
     "marca": "PARAGON",

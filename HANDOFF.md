@@ -61,7 +61,8 @@ de iOS; la web (*Comprobaciones*), en verde en cada push a master.
    PromoTikTok.tsx, Lanzamientos.kt, ClienteParagon.kt y dos tests de la
    app) y las URLs de vuelta en las consolas de Google y Discord.
 
-**Lo último** (detalle en HISTORIAL.md, 16 oct): Google Play preparado
+**Lo último** (detalle en HISTORIAL.md, 16 oct): avisos dentro de la web y
+la app (campana con bandeja y avisos en directo), Google Play preparado
 (`kmp/play/`, "Eliminar cuenta" en la app), "¿Lo compartes?" al sacar
 un platino (web y app, con imagen vertical para Stories), asistente para vincular
 cuentas (web `/vincular` y bienvenida; en la app, "Comprobar" en
@@ -117,6 +118,11 @@ pantallas en la app, 4 idiomas en todo.
 - Push: `src/lib/webPush.ts` (navegador), `src/lib/fcm.ts` (Android, y reparte
   los de iOS) y `src/lib/apns.ts` (iOS).
 - Contrato de la API móvil: `src/app/api/mobile/CONTRACT.md`.
+- Avisos: `src/lib/avisos.ts` (`avisarUsuario`: push + Discord + bandeja),
+  `src/lib/bandeja.ts` (la bandeja, tabla `aviso`), campana web
+  `src/components/CampanaAvisos.tsx` (`/api/avisos`) y pantalla de la app
+  `ui/avisos/AvisosScreen.kt` (`/api/mobile/avisos`). Un aviso nuevo se
+  guarda solo si pasa por `avisarUsuario` o por `guardarAviso`.
 - Compartir platinos: `src/lib/compartirPlatino.ts` (qué platino preguntar),
   `/api/trophy-card/[handle]/[gameId]` (`?formato=historia` = 1080×1920,
   plantilla en `src/lib/og/historiaPlatino.tsx`), `AvisoCompartirPlatino`

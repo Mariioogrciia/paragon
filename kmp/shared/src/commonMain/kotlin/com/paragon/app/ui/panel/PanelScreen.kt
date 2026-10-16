@@ -87,6 +87,7 @@ fun PanelScreen(
     onRacha: () -> Unit = {},
     onPerfil: () -> Unit = {},
     onBiblioteca: () -> Unit = {},
+    onAvisos: () -> Unit = {},
     sharedTransitionScope: androidx.compose.animation.SharedTransitionScope? = null,
     animatedVisibilityScope: androidx.compose.animation.AnimatedVisibilityScope? = null,
 ) {
@@ -97,6 +98,21 @@ fun PanelScreen(
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     val compareRepository = remember(tokenStore) { CompareRepository(tokenStore) }
     var highlights by remember { mutableStateOf<HighlightsResult?>(null) }
+    // Contador de la campana (16 oct 2026): al entrar en Inicio y cada minuto
+    // mientras sigue a la vista.
+    var avisosSinLeer by remember { mutableIntStateOf(0) }
+    LaunchedEffect(tokenStore) {
+        while (true) {
+            avisosSinLeer = try {
+                com.paragon.app.data.network.ApiClient.avisosApi(tokenStore).avisos().noLeidos
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                avisosSinLeer
+            }
+            kotlinx.coroutines.delay(60_000)
+        }
+    }
     var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
     var rivalComparison by remember { mutableStateOf<CompareResult?>(null) }
@@ -164,7 +180,7 @@ fun PanelScreen(
                 // Rediseño del 5 oct 2026 (maqueta "1 · Inicio"): cabecera propia
                 // (la barra de arriba de la app no sale aquí), "Tu objetivo" con
                 // el siguiente trofeo, tres cifras y tu próxima sesión.
-                CabeceraInicio(userProfile, racha, onRacha = onRacha, onPerfil = onPerfil)
+                CabeceraInicio(userProfile, racha, onRacha = onRacha, onPerfil = onPerfil, noLeidos = avisosSinLeer, onAvisos = onAvisos)
                 if (fromCache) {
                     Text(
                         text = Textos.t(T.comun_sin_conexion_copia),

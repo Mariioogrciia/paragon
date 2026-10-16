@@ -6,6 +6,7 @@ import { avatarUrlSql } from "@/lib/avatarSql";
 import { areFriends } from "@/lib/profiles";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
+import { guardarAviso } from "@/lib/bandeja";
 import { anunciarInvitacionLiga } from "@/lib/discordBot";
 import { esDeclarada } from "@/lib/declarado";
 import { noDeclaradoPorId } from "@/lib/declaradoSql";
@@ -624,6 +625,7 @@ export async function addLeagueMember(leagueId: string, ownerId: string, friendU
   await Promise.all([
     enviarPush(friendUserId, aviso),
     enviarPushFcm(friendUserId, aviso),
+    guardarAviso(friendUserId, { titulo: aviso.title, texto: aviso.body, ruta: aviso.url }),
     anunciarInvitacionLiga(friendUserId, league.name, nombreDueño, leagueId),
   ]).catch((error) => {
     console.error("[leagues] fallo avisando de la invitación", error);

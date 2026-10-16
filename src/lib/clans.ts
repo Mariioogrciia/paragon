@@ -9,6 +9,7 @@ import { avatarUrlSql } from "./avatarSql";
 import { listFriends } from "./profiles";
 import { enviarPush } from "./webPush";
 import { enviarPushFcm } from "./fcm";
+import { guardarAviso } from "./bandeja";
 import type { TrophyGrade } from "./types";
 import { emblemaATexto, type Emblema } from "./clanEmblema";
 import { normalizarRango, puedeCambiarRango, puedeEditarClan, puedeExpulsar, puedeInvitar, sucesorDelLider, type Rango } from "./clanRangos";
@@ -391,7 +392,11 @@ export async function inviteToClan(clanId: string, invitedByUserId: string, invi
   // Los dos canales a la vez, mismo patrón que las solicitudes de amistad
   // (lib/profiles.ts) — ninguno hace nada si el destinatario no tiene nada
   // registrado en ese canal.
-  await Promise.all([enviarPush(invitedUserId, aviso), enviarPushFcm(invitedUserId, aviso)]);
+  await Promise.all([
+    enviarPush(invitedUserId, aviso),
+    enviarPushFcm(invitedUserId, aviso),
+    guardarAviso(invitedUserId, { titulo: aviso.title, texto: aviso.body, ruta: aviso.url }),
+  ]);
 }
 
 /** Invitaciones pendientes de un usuario, en cualquier clan. */

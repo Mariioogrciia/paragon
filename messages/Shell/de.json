@@ -29,7 +29,15 @@
     "apariencia": "Erscheinungsbild",
     "ajustes": "Einstellungen",
     "entrar": "Anmelden",
-    "crearCuenta": "Konto erstellen"
+    "crearCuenta": "Konto erstellen",
+    "avisos": {
+      "titulo": "Benachrichtigungen",
+      "abrir": "Benachrichtigungen",
+      "sinLeer": "{n} ungelesen",
+      "vacio": "Noch keine Benachrichtigungen. Hier erscheinen Freundschaftsanfragen, Ligen, deine Trophäen und das Platin deiner Freunde.",
+      "cerrar": "Benachrichtigung schließen",
+      "ajustes": "Auswählen, welche Benachrichtigungen du bekommst"
+    }
   },
   "Footer": {
     "marca": "PARAGON",

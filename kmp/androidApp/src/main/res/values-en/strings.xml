@@ -97,6 +97,9 @@
     <string name="atascados_subtitulo">What stands between you and the platinum, game by game. Ask for help with a session.</string>
     <string name="atascados_vacio">You don\'t have any stuck trophies</string>
     <string name="atascados_vacio_sub">When a trophy fights back, mark it from its game page and it\'ll show up here — with a video guide one tap away.</string>
+    <string name="avisos_sin_leer">%1$s unread notifications</string>
+    <string name="avisos_titulo">Notifications</string>
+    <string name="avisos_vacio">No notifications yet. Friend requests, leagues, your trophies and your friends\' platinums will show up here.</string>
     <string name="biblio_abandonados">Abandoned</string>
     <string name="biblio_buscar">Search your library</string>
     <string name="biblio_completados">Completed</string>

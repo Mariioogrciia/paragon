@@ -29,7 +29,15 @@
     "apariencia": "Apparence",
     "ajustes": "Paramètres",
     "entrar": "Connexion",
-    "crearCuenta": "Créer un compte"
+    "crearCuenta": "Créer un compte",
+    "avisos": {
+      "titulo": "Notifications",
+      "abrir": "Notifications",
+      "sinLeer": "{n} non lues",
+      "vacio": "Pas encore de notifications. Les demandes d'ami, les ligues, tes trophées et les platines de tes amis apparaîtront ici.",
+      "cerrar": "Fermer la notification",
+      "ajustes": "Choisir les notifications à recevoir"
+    }
   },
   "Footer": {
     "marca": "PARAGON",

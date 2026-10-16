@@ -657,6 +657,17 @@ principal vinculada).
 
 Las extra se sincronizan solas junto a la principal (ver lib/steamExtra.ts).
 
+## `GET/POST /api/mobile/avisos` — Bandeja de avisos
+
+16 oct 2026, ver `src/lib/bandeja.ts`. `GET` →
+`{ "avisos": [{ "id", "titulo", "texto", "ruta", "imagen", "leido", "createdAt" }], "noLeidos": 3 }`
+(los 40 últimos, del más nuevo al más viejo, traducidos al idioma de
+`Accept-Language` los más comunes). `ruta` es una ruta de la web
+(`/u/ana/psn:...`); la app la convierte con `rutaAppDeAviso`, igual que al
+tocar una push. `POST` (sin cuerpo) → `{ "ok": true }`: todo leído. Se
+guardan los mismos avisos que salen por push, más los platinos de los
+amigos (solo en la bandeja).
+
 ## `GET/POST /api/mobile/platino-por-compartir` — "¿Lo compartes?" tras un platino
 
 16 oct 2026, ver `src/lib/compartirPlatino.ts`. `GET` →

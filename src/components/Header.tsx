@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { Avatar } from "./Avatar";
 import { ThemeCustomizer } from "./ThemeCustomizer";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { CampanaAvisos } from "./CampanaAvisos";
 
 /**
  * Antes eran 9 enlaces en una sola fila (más "Admin" como un décimo, para
@@ -320,6 +321,8 @@ export function Header({
                   </svg>
                 </Link>
               )}
+              {/* Avisos dentro de la web (16 oct 2026, ver lib/bandeja.ts). */}
+              {user.handle && <CampanaAvisos />}
               <Link
                 href="/ajustes"
                 className="flex items-center gap-2.5 transition-opacity hover:opacity-80"

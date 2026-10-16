@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +50,7 @@ import com.paragon.app.ui.theme.Accent
 import com.paragon.app.ui.theme.AccentSoft
 import com.paragon.app.ui.theme.Background
 import com.paragon.app.ui.theme.Border
+import com.paragon.app.ui.theme.Danger
 import com.paragon.app.ui.theme.Foreground
 import com.paragon.app.ui.theme.Muted
 import com.paragon.app.ui.theme.OnAccent
@@ -69,7 +72,15 @@ private val METAL = mapOf("platinum" to "🏆", "gold" to "🥇", "silver" to "�
 
 /** Fecha de hoy, "Hola, Mario", la racha y tu avatar (que lleva a Perfil). */
 @Composable
-fun CabeceraInicio(profile: UserProfile, racha: RachaGlobal, onRacha: () -> Unit, onPerfil: () -> Unit) {
+fun CabeceraInicio(
+    profile: UserProfile,
+    racha: RachaGlobal,
+    onRacha: () -> Unit,
+    onPerfil: () -> Unit,
+    // Campana de avisos (16 oct 2026, ver ui/avisos/AvisosScreen.kt).
+    noLeidos: Int = 0,
+    onAvisos: () -> Unit = {},
+) {
     Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(
@@ -87,6 +98,29 @@ fun CabeceraInicio(profile: UserProfile, racha: RachaGlobal, onRacha: () -> Unit
                 overflow = TextOverflow.Ellipsis,
             )
         }
+        Box {
+            Box(
+                Modifier.size(36.dp).clip(CircleShape).background(Surface).border(1.dp, Border, CircleShape)
+                    .premiumClickable(onClick = onAvisos),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Default.Notifications,
+                    contentDescription = if (noLeidos > 0) Textos.t(T.avisos_sin_leer, noLeidos) else Textos.t(T.avisos_titulo),
+                    tint = Foreground,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+            if (noLeidos > 0) {
+                Box(
+                    Modifier.align(Alignment.TopEnd).offset(x = 4.dp, y = (-4).dp).size(16.dp).background(Danger, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(if (noLeidos > 9) "9+" else "$noLeidos", color = androidx.compose.ui.graphics.Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Spacer(Modifier.width(8.dp))
         Row(
             Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(Surface).border(1.dp, Border, RoundedCornerShape(50))
                 .premiumClickable(onClick = onRacha).padding(horizontal = 12.dp),

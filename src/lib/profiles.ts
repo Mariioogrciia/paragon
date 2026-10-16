@@ -28,6 +28,8 @@ import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } f
 import { syncGameTrophies, syncLibrary, type PlatinoNuevo } from "@/lib/sync";
 import { anunciarNivelSiSube } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
+import { guardarAviso } from "@/lib/bandeja";
+import { avisarUsuario } from "@/lib/avisos";
 import { enviarPushFcm } from "@/lib/fcm";
 import { traducirTrofeos, type TrofeoTraducido } from "@/lib/trofeosIdioma";
 import type { Idioma } from "@/lib/idiomasTrofeo";
@@ -1702,21 +1704,38 @@ export async function sendFriendRequest(fromUserId: string, toHandle: string) {
   // Los dos canales a la vez: Web Push llega a quien tiene la web/PWA
   // abierta, FCM a quien tiene la app nativa de Android — ninguno de los
   // dos hace nada si el destinatario no tiene nada registrado en ese canal.
-  await Promise.all([enviarPush(target.userId, avisoSolicitud), enviarPushFcm(target.userId, avisoSolicitud)]);
+  await Promise.all([
+    enviarPush(target.userId, avisoSolicitud),
+    enviarPushFcm(target.userId, avisoSolicitud),
+    guardarAviso(target.userId, { titulo: avisoSolicitud.title, texto: avisoSolicitud.body, ruta: avisoSolicitud.url }),
+  ]);
 
   return { ok: true as const, accepted: false };
 }
 
 export async function acceptFriendRequest(userId: string, requesterId: string) {
-  await db
+  const aceptadas = await db
     .update(friendships)
     .set({ status: "accepted" })
     .where(
       and(
         eq(friendships.requesterId, requesterId),
         eq(friendships.addresseeId, userId),
+        eq(friendships.status, "pending"),
       ),
-    );
+    )
+    .returning({ requesterId: friendships.requesterId });
+
+  // Aviso a quien la mandó (16 oct 2026): antes no se enteraba hasta que
+  // miraba su lista de amigos. Solo si de verdad estaba pendiente.
+  if (aceptadas.length > 0) {
+    const [yo] = await db.select({ handle: users.handle, name: users.name }).from(users).where(eq(users.id, userId)).limit(1);
+    await avisarUsuario(requesterId, {
+      titulo: "🤝 Solicitud aceptada",
+      texto: `${yo?.name ?? yo?.handle ?? "Alguien"} ya es tu amigo en Paragon.`,
+      ruta: yo?.handle ? `/u/${yo.handle}` : "/amigos",
+    });
+  }
 }
 
 export async function removeFriend(userId: string, otherId: string) {

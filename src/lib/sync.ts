@@ -24,6 +24,7 @@ import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
+import { avisarAmigosDePlatino, guardarAviso } from "@/lib/bandeja";
 import { horasCaducidadDe } from "@/lib/syncHealth";
 
 /**
@@ -896,6 +897,7 @@ export async function syncGameTrophies(
       await Promise.all([
         enviarPush(userId, { ...aviso, icon: info?.iconUrl ?? undefined }),
         enviarPushFcm(userId, { ...aviso, imageUrl: info?.iconUrl ?? undefined }),
+        guardarAviso(userId, { titulo: aviso.title, texto: aviso.body, ruta: aviso.url, imagen: info?.iconUrl ?? null }),
       ]);
     }
 
@@ -918,6 +920,8 @@ export async function syncGameTrophies(
         .values({ id: `plat-${userId}-${gameId}`, userId, type: "platinum", gameId })
         .onConflictDoNothing()
         .catch((error) => console.error("[sync] actividad de platino", error));
+      // Y a la campana de sus amigos (lib/bandeja.ts), sin push.
+      await avisarAmigosDePlatino(userId, { gameId, titulo, imagen: info?.iconUrl ?? null });
     }
   }
 

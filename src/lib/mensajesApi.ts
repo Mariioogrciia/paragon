@@ -98,6 +98,15 @@ const FIJOS: Record<string, Trad> = {
   "Elige un juego de los resultados.": { en: "Pick a game from the results.", de: "Wähle ein Spiel aus den Ergebnissen.", fr: "Choisis un jeu dans les résultats." },
   "El nombre a mostrar no puede estar vacío.": { en: "The display name can't be empty.", de: "Der Anzeigename darf nicht leer sein.", fr: "Le nom affiché ne peut pas être vide." },
   "Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.": { en: "Too many link attempts in a row. Try again in a few minutes.", de: "Zu viele Verknüpfungsversuche hintereinander. Versuch es in ein paar Minuten.", fr: "Trop de tentatives d'association d'affilée. Réessaie dans quelques minutes." },
+  // Avisos de la bandeja (lib/bandeja.ts, 16 oct 2026): los más comunes.
+  "Nueva solicitud de amistad": { en: "New friend request", de: "Neue Freundschaftsanfrage", fr: "Nouvelle demande d'ami" },
+  "🤝 Solicitud aceptada": { en: "🤝 Request accepted", de: "🤝 Anfrage angenommen", fr: "🤝 Demande acceptée" },
+  "Invitación a una liga": { en: "League invite", de: "Liga-Einladung", fr: "Invitation à une ligue" },
+  "Invitación a un clan": { en: "Clan invite", de: "Clan-Einladung", fr: "Invitation à un clan" },
+  "🏆 ¡Platino conseguido!": { en: "🏆 Platinum earned!", de: "🏆 Platin erreicht!", fr: "🏆 Platine obtenu !" },
+  "1 trofeo nuevo": { en: "1 new trophy", de: "1 neue Trophäe", fr: "1 nouveau trophée" },
+  "Está en tu lista de deseados de Paragon.": { en: "It's on your Paragon wishlist.", de: "Es steht auf deiner Paragon-Wunschliste.", fr: "Il est dans ta liste de souhaits Paragon." },
+  "❌ Sesión cancelada": { en: "❌ Session cancelled", de: "❌ Sitzung abgesagt", fr: "❌ Session annulée" },
   "Demasiadas comprobaciones seguidas. Espera un momento.": { en: "Too many checks in a row. Wait a moment.", de: "Zu viele Prüfungen hintereinander. Warte kurz.", fr: "Trop de vérifications d'affilée. Patiente un instant." },
   "Demasiados comentarios seguidos. Espera un momento.": { en: "Too many comments in a row. Wait a moment.", de: "Zu viele Kommentare hintereinander. Warte kurz.", fr: "Trop de commentaires d'affilée. Patiente un instant." },
   "Demasiadas subidas seguidas. Prueba dentro de unos minutos.": { en: "Too many uploads in a row. Try again in a few minutes.", de: "Zu viele Uploads hintereinander. Versuch es in ein paar Minuten.", fr: "Trop d'envois d'affilée. Réessaie dans quelques minutes." },
@@ -338,6 +347,51 @@ const PATRONES: { re: RegExp; trad: (m: RegExpMatchArray) => Trad }[] = [
   {
     re: /^Como mucho (\d+) cuentas de Steam además de la principal\.$/,
     trad: (m) => ({ en: `${m[1]} Steam accounts at most besides the main one.`, de: `Höchstens ${m[1]} Steam-Konten zusätzlich zum Hauptkonto.`, fr: `${m[1]} comptes Steam maximum en plus du principal.` }),
+  },
+  // Avisos de la bandeja (lib/bandeja.ts, 16 oct 2026).
+  {
+    re: /^(.*) quiere ser tu amigo en Paragon\.$/,
+    trad: (m) => ({ en: `${m[1]} wants to be your friend on Paragon.`, de: `${m[1]} möchte auf Paragon mit dir befreundet sein.`, fr: `${m[1]} veut être ton ami sur Paragon.` }),
+  },
+  {
+    re: /^(.*) ya es tu amigo en Paragon\.$/,
+    trad: (m) => ({ en: `${m[1]} is now your friend on Paragon.`, de: `${m[1]} ist jetzt auf Paragon mit dir befreundet.`, fr: `${m[1]} est maintenant ton ami sur Paragon.` }),
+  },
+  {
+    re: /^(.*) te ha invitado a la liga "(.*)" en Paragon\.$/,
+    trad: (m) => ({ en: `${m[1]} invited you to the league "${m[2]}" on Paragon.`, de: `${m[1]} hat dich in die Liga „${m[2]}“ auf Paragon eingeladen.`, fr: `${m[1]} t'a invité dans la ligue « ${m[2]} » sur Paragon.` }),
+  },
+  {
+    re: /^(.*) te invita a unirte a (\[.*\] .*)\.$/,
+    trad: (m) => ({ en: `${m[1]} invites you to join ${m[2]}.`, de: `${m[1]} lädt dich ein, ${m[2]} beizutreten.`, fr: `${m[1]} t'invite à rejoindre ${m[2]}.` }),
+  },
+  {
+    re: /^(\d+) trofeos nuevos$/,
+    trad: (m) => ({ en: `${m[1]} new trophies`, de: `${m[1]} neue Trophäen`, fr: `${m[1]} nouveaux trophées` }),
+  },
+  {
+    re: /^🏆 (.*) ha sacado un platino$/,
+    trad: (m) => ({ en: `🏆 ${m[1]} earned a platinum`, de: `🏆 ${m[1]} hat ein Platin geholt`, fr: `🏆 ${m[1]} a obtenu un platine` }),
+  },
+  {
+    re: /^📉 (.*) te ha adelantado en la liga$/,
+    trad: (m) => ({ en: `📉 ${m[1]} overtook you in the league`, de: `📉 ${m[1]} hat dich in der Liga überholt`, fr: `📉 ${m[1]} t'a dépassé dans la ligue` }),
+  },
+  {
+    re: /^Ahora vas (\d+)º de (\d+) en la liga del mes \((\d+) puntos por detrás\)\.$/,
+    trad: (m) => ({ en: `You're now ${m[1]} of ${m[2]} in this month's league (${m[3]} points behind).`, de: `Du bist jetzt ${m[1]}. von ${m[2]} in der Monatsliga (${m[3]} Punkte dahinter).`, fr: `Tu es maintenant ${m[1]}e sur ${m[2]} dans la ligue du mois (${m[3]} points derrière).` }),
+  },
+  {
+    re: /^🎮 ¡(.*) sale hoy!$/,
+    trad: (m) => ({ en: `🎮 ${m[1]} is out today!`, de: `🎮 ${m[1]} erscheint heute!`, fr: `🎮 ${m[1]} sort aujourd'hui !` }),
+  },
+  {
+    re: /^🎮 (.*) sale mañana$/,
+    trad: (m) => ({ en: `🎮 ${m[1]} is out tomorrow`, de: `🎮 ${m[1]} erscheint morgen`, fr: `🎮 ${m[1]} sort demain` }),
+  },
+  {
+    re: /^Se ha cancelado la sesión de «(.*)»\.$/,
+    trad: (m) => ({ en: `The session for "${m[1]}" has been cancelled.`, de: `Die Sitzung für „${m[1]}“ wurde abgesagt.`, fr: `La session pour « ${m[1]} » a été annulée.` }),
   },
   {
     re: /^Como mucho (\d+) caracteres\.$/,

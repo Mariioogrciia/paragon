@@ -5644,5 +5644,23 @@
   "en": "Yes, delete forever",
   "es": "Sí, eliminar para siempre",
   "fr": "Oui, supprimer définitivement"
+ },
+ "avisos_titulo": {
+  "de": "Benachrichtigungen",
+  "en": "Notifications",
+  "es": "Avisos",
+  "fr": "Notifications"
+ },
+ "avisos_vacio": {
+  "de": "Noch keine Benachrichtigungen. Hier erscheinen Freundschaftsanfragen, Ligen, deine Trophäen und das Platin deiner Freunde.",
+  "en": "No notifications yet. Friend requests, leagues, your trophies and your friends' platinums will show up here.",
+  "es": "Todavía no tienes avisos. Aquí saldrán las solicitudes de amistad, las ligas, tus trofeos y los platinos de tus amigos.",
+  "fr": "Pas encore de notifications. Les demandes d'ami, les ligues, tes trophées et les platines de tes amis apparaîtront ici."
+ },
+ "avisos_sin_leer": {
+  "de": "{0} ungelesene Benachrichtigungen",
+  "en": "{0} unread notifications",
+  "es": "{0} avisos sin leer",
+  "fr": "{0} notifications non lues"
  }
 }

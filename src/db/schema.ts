@@ -1138,6 +1138,29 @@ export const notificationLog = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.tipo, t.clave] })],
 );
 
+/**
+ * Bandeja de avisos dentro de la web y la app (16 oct 2026, ver
+ * lib/bandeja.ts): cada aviso que sale por push (o por la campana sola, como
+ * los platinos de los amigos) se guarda aquí para verlo luego. Se crea sola
+ * la primera vez (`asegurarTablaAvisos`).
+ */
+export const avisosBandeja = pgTable(
+  "aviso",
+  {
+    id: text("id").primaryKey(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    titulo: text("titulo").notNull(),
+    texto: text("texto").notNull(),
+    ruta: text("ruta"),
+    imagen: text("imagen"),
+    leido: boolean("leido").notNull().default(false),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [index("aviso_userId_createdAt_idx").on(t.userId, t.createdAt)],
+);
+
 /** Guerra de clanes: un clan reta a otro, y si acepta compiten hasta fin de mes. */
 export const clanWars = pgTable("clan_war", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),

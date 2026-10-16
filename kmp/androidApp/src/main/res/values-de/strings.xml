@@ -97,6 +97,9 @@
     <string name="atascados_subtitulo">Was dich von Platin trennt, Spiel für Spiel. Hol dir Hilfe mit einer Session.</string>
     <string name="atascados_vacio">Du hast keine festgefahrenen Trophäen</string>
     <string name="atascados_vacio_sub">Wenn eine Trophäe nicht klappt, markier sie auf ihrer Spielseite — dann erscheint sie hier, mit Video-Guide auf einen Tipp.</string>
+    <string name="avisos_sin_leer">%1$s ungelesene Benachrichtigungen</string>
+    <string name="avisos_titulo">Benachrichtigungen</string>
+    <string name="avisos_vacio">Noch keine Benachrichtigungen. Hier erscheinen Freundschaftsanfragen, Ligen, deine Trophäen und das Platin deiner Freunde.</string>
     <string name="biblio_abandonados">Abgebrochen</string>
     <string name="biblio_buscar">In deiner Bibliothek suchen</string>
     <string name="biblio_completados">Abgeschlossen</string>

@@ -16,6 +16,7 @@ export const CATEGORIAS_AVISO = [
   { clave: "precios", label: "Alertas de precio" },
   { clave: "ligas", label: "Ligas, temporada y guerras de clanes" },
   { clave: "social", label: "Sesiones y retos de Platinar juntos" },
+  { clave: "amigos", label: "Platinos de tus amigos (en la campana)" },
   { clave: "resumen", label: "Resumen semanal por Discord" },
 ] as const;
 

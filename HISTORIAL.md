@@ -6,6 +6,29 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct (5) — avisos dentro de la plataforma**. Antes un aviso solo existía
+como push: sin push activada, o al descartarla, se perdía, y dentro de la web
+no había dónde verlo.
+- Bandeja (`lib/bandeja.ts`, tabla `aviso`, se crea sola como
+  `steam_account_extra`): todo lo que pasa por `avisarUsuario` se guarda,
+  y también los avisos que mandaban push a mano (trofeos y platinos en
+  sync.ts, solicitudes de amistad, invitaciones a ligas y clanes). El cron
+  borra lo de más de 60 días.
+- Nuevos: "ha aceptado tu solicitud de amistad" (push + bandeja, solo si
+  estaba pendiente) y "tu amigo ha sacado un platino" (solo bandeja, sin
+  push; categoría nueva "Platinos de tus amigos" en Ajustes → Avisos).
+- Web: campana en la cabecera (`CampanaAvisos`) con contador, la lista al
+  pulsarla (todo pasa a leído) y, lo que llega con la página abierta, un
+  aviso flotante arriba a la derecha. Sondeo de `/api/avisos` cada 45 s solo
+  con la pestaña a la vista (en Vercel no hay sockets baratos).
+- App: campana en Inicio con contador (cada minuto) que abre la pantalla
+  Avisos (`AvisosScreen`, `GET/POST /api/mobile/avisos`); tocar un aviso
+  lleva a su pantalla con `rutaAppDeAviso`, como la push.
+- Los avisos se guardan en español (como las push); al leerlos se traducen
+  los más comunes (FIJOS y PATRONES nuevos en lib/mensajesApi.ts, con
+  tests). Las push siguen saliendo en español: pendiente traducirlas al
+  idioma de cada persona.
+
 **16 oct (4) — Google Play preparado**. Lo que la tienda pide y se puede
 hacer desde el código:
 - **Eliminar la cuenta desde la app** (Google lo exige a toda app con

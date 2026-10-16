@@ -228,11 +228,9 @@ fun MainScreen(
 
     // Tocar una notificación: su pantalla (ver EnlaceAviso.kt). Las pestañas,
     // como al tocarlas en la barra; el resto, encima de lo que hubiera.
-    val avisoPendiente = com.paragon.app.ui.navigation.EnlaceAviso.pendiente
-    androidx.compose.runtime.LaunchedEffect(avisoPendiente) {
-        val web = avisoPendiente ?: return@LaunchedEffect
-        com.paragon.app.ui.navigation.EnlaceAviso.pendiente = null
-        val ruta = com.paragon.app.ui.navigation.rutaAppDeAviso(web, profile.handle) ?: return@LaunchedEffect
+    // Lo mismo sirve para la bandeja de avisos (AvisosScreen).
+    fun abrirRutaDeAviso(web: String) {
+        val ruta = com.paragon.app.ui.navigation.rutaAppDeAviso(web, profile.handle) ?: return
         if (esPestana(ruta)) {
             navController.navigate(ruta) {
                 popUpTo(navController.graph.findStartDestination().id)
@@ -241,6 +239,12 @@ fun MainScreen(
         } else {
             navController.navigate(ruta)
         }
+    }
+    val avisoPendiente = com.paragon.app.ui.navigation.EnlaceAviso.pendiente
+    androidx.compose.runtime.LaunchedEffect(avisoPendiente) {
+        val web = avisoPendiente ?: return@LaunchedEffect
+        com.paragon.app.ui.navigation.EnlaceAviso.pendiente = null
+        abrirRutaDeAviso(web)
     }
 
     // "¿Lo compartes?" tras un platino nuevo (16 oct 2026, ver
@@ -379,9 +383,17 @@ fun MainScreen(
                     onRacha = { showRachaSheet = true },
                     onPerfil = { irA(BottomNavItem.Perfil) },
                     onBiblioteca = { irA(BottomNavItem.Library) },
+                    onAvisos = { navController.navigate(Screen.Avisos.route) },
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 ) 
+            }
+            composable(Screen.Avisos.route) {
+                com.paragon.app.ui.avisos.AvisosScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
+                    onAbrirRutaWeb = { web -> abrirRutaDeAviso(web) },
+                )
             }
             composable(Screen.Library.route) {
                 LibraryScreen(

@@ -17,6 +17,7 @@ import { cerrarRetosAmigos } from "@/lib/retosAmigos";
 import { cerrarTemporadaAnteriorSiToca } from "@/lib/temporadas";
 import { registrarHorasDelDia } from "@/lib/horasPeriodo";
 import { revisarCredencialPsn } from "@/lib/credencialPsn";
+import { limpiarAvisosViejos } from "@/lib/bandeja";
 
 /**
  * Sincronización desatendida.
@@ -465,6 +466,13 @@ export async function GET(request: Request) {
     borrados = eliminadas.length;
   } catch (error) {
     console.error("[cron-sync] limpieza sync_run", error);
+  }
+
+  // Bandeja de avisos (lib/bandeja.ts): fuera lo de hace más de 60 días.
+  try {
+    await limpiarAvisosViejos();
+  } catch (error) {
+    console.error("[cron-sync] limpieza de avisos", error);
   }
 
   // Sesiones caducadas: Auth.js solo borra una al intentar usarla, así que
