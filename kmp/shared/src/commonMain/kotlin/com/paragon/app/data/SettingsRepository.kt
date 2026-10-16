@@ -57,6 +57,18 @@ class SettingsRepository(private val tokenStore: TokenStore) {
     }
 
     /** Otra cuenta de Steam (ver lib/steamExtra.ts en el servidor): devuelve lo mismo que vincular. */
+    /** Borra la cuenta entera (Google Play lo exige dentro de la app). */
+    suspend fun eliminarCuenta(): SettingsResult<Unit> {
+        return try {
+            ApiClient.settingsApi(tokenStore).eliminarCuenta()
+            SettingsResult.Ok(Unit)
+        } catch (e: HttpException) {
+            SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: Exception) {
+            SettingsResult.Error(Textos.t(T.error_red))
+        }
+    }
+
     /** Asistente de vincular: qué ajustes están bien o faltan, sin vincular nada. */
     suspend fun comprobarCuenta(platform: String, entrada: String): SettingsResult<com.paragon.shared.red.DiagnosticoCuentaDto> {
         return try {

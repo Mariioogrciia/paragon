@@ -15,6 +15,16 @@ on:
         type: choice
         options: [android, ios, las-dos]
         default: android
+      pista_play:
+        description: "Pista de Google Play (si están los secretos de Play)"
+        type: choice
+        options: [internal, alpha, beta, production]
+        default: internal
+      estado_play:
+        description: "draft hasta que la app esté publicada una vez; luego completed"
+        type: choice
+        options: [draft, completed]
+        default: draft
 
 jobs:
   android:
@@ -57,6 +67,35 @@ jobs:
       - name: Borrar la clave del runner
         if: always()
         run: rm -f "$RUNNER_TEMP/paragon-release.jks"
+
+      # Subida a Google Play (16 oct 2026). Necesita el JSON de una cuenta de
+      # servicio con acceso a la app en Play Console (ver HANDOFF.md,
+      # "Publicar en Google Play") y el AAB firmado: sin cualquiera de los
+      # dos, este paso se salta y el AAB queda solo como artefacto. Las
+      # novedades salen de kmp/play/novedades/whatsnew-<idioma>.
+      - name: Comprobar Google Play
+        id: play
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$PLAY_JSON" ] && [ -n "$KEYSTORE_BASE64" ]; then
+            echo "subir=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Sin PLAY_SERVICE_ACCOUNT_JSON o sin la clave de firma: no se sube a Google Play."
+          fi
+
+      - name: Subir a Google Play
+        if: steps.play.outputs.subir == '1'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.paragon.app
+          releaseFiles: kmp/androidApp/build/outputs/bundle/release/*.aab
+          track: ${{ inputs.pista_play }}
+          status: ${{ inputs.estado_play }}
+          whatsNewDirectory: kmp/play/novedades
+          mappingFile: kmp/androidApp/build/outputs/mapping/release/mapping.txt
 
       - uses: actions/upload-artifact@v7
         with:

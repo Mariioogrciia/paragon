@@ -80,6 +80,9 @@ data class DiagnosticoCuentaDto(
 data class SuccessResponse(val ok: Boolean)
 
 @Serializable
+data class EliminarCuentaRequest(val confirmar: Boolean)
+
+@Serializable
 data class SyncPlatformResponse(val nuevos: Int = 0)
 
 @Serializable
@@ -108,6 +111,10 @@ class SettingsApi internal constructor(private val c: ClienteParagon) {
 
     suspend fun unlinkPlatform(platform: String): SuccessResponse =
         c.http.delete("api/mobile/accounts/${platform.encodeURLPathPart()}").body()
+
+    /** Eliminar la cuenta de Paragon entera — ver DELETE en api/mobile/profile/route.ts. */
+    suspend fun eliminarCuenta(): SuccessResponse =
+        c.http.delete("api/mobile/profile") { json(EliminarCuentaRequest(confirmar = true)) }.body()
 
     /** Lee la cuenta sin vincularla y dice qué ajuste falta — ver accounts/comprobar/route.ts. */
     suspend fun comprobarCuenta(request: ComprobarCuentaRequest): DiagnosticoCuentaDto =

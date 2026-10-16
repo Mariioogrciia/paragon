@@ -23,6 +23,10 @@
     <string name="ajustes_cerrar_sesion_texto">Du musst dich erneut mit Google oder Discord anmelden, um deine Trophäen zu sehen.</string>
     <string name="ajustes_cerrar_sesion_titulo">Abmelden?</string>
     <string name="ajustes_como_funciona">So funktioniert Paragon (und der Discord-Bot)</string>
+    <string name="ajustes_eliminar_cuenta_boton">Konto löschen</string>
+    <string name="ajustes_eliminar_cuenta_si">Ja, endgültig löschen</string>
+    <string name="ajustes_eliminar_cuenta_texto">Alles wird gelöscht: Profil, Bibliothek, Ligen, Freunde und Einstellungen. Das lässt sich nicht rückgängig machen. Deine PlayStation-, Steam- oder Xbox-Konten bleiben unberührt.</string>
+    <string name="ajustes_eliminar_cuenta_titulo">Dein Paragon-Konto löschen?</string>
     <string name="ajustes_err_cuentas">Fehler beim Laden der Konten (%1$s).</string>
     <string name="ajustes_err_leer_imagen">Bild konnte nicht gelesen werden.</string>
     <string name="ajustes_err_subir_imagen">Bild konnte nicht hochgeladen werden.</string>

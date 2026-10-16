@@ -6,7 +6,8 @@
   "scripts": {
     "capturas": "node capturar.mjs",
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts PromoTikTok out/paragon-tiktok.mp4 --crf=18"
+    "render": "remotion render src/index.ts PromoTikTok out/paragon-tiktok.mp4 --crf=18",
+    "graficos-play": "node graficos-play.mjs"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.535",

@@ -644,5 +644,15 @@
     "texto": "It wasn't you — a real bug on this page, already logged. You can try again or go back to where you were.",
     "referencia": "Reference:",
     "reintentar": "Try again"
+  },
+  "EliminarCuenta": {
+    "title": "Delete your Paragon account",
+    "intro": "You can delete your account whenever you want, from the website or the app. It's deleted right away and can't be undone.",
+    "web": "On the website: sign in, go to <ajustes>Settings → Security</ajustes> and tap “Delete account”.",
+    "app": "In the Paragon app: Settings → at the very bottom, “Delete account”.",
+    "queTitulo": "What gets deleted",
+    "que": "Your profile, the library and progress stored in Paragon, your leagues, clans, friends, notifications, settings and open sessions. Your PlayStation, Steam, Xbox or Epic accounts aren't touched: Paragon only read your public data.",
+    "sinAccesoTitulo": "Can't sign in?",
+    "sinAcceso": "Email us at <email>mario.meca2005@gmail.com</email> from the address you sign in with and we'll delete it within 30 days."
   }
 }

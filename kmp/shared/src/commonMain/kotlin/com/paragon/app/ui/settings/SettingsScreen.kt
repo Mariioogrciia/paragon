@@ -76,6 +76,10 @@ fun SettingsScreen(
     // medio — mismo criterio que "Desvincular" (LinkedAccountsScreen) y las
     // acciones de Ligas (LeagueDetailSheet).
     var showLogoutConfirm by remember { mutableStateOf(false) }
+    // Eliminar la cuenta (16 oct 2026): Google Play lo exige dentro de la app.
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var borrando by remember { mutableStateOf(false) }
+    var errorBorrar by remember { mutableStateOf<String?>(null) }
 
     ProfileImagePicker(onImagePicked = { bytes, mimeType, extension ->
         isUploadingAvatar = true
@@ -283,6 +287,20 @@ fun SettingsScreen(
             ) {
                 Text(Textos.t(T.ajustes_cerrar_sesion_boton), color = Danger, fontWeight = FontWeight.Bold)
             }
+            TextButton(
+                onClick = { showDeleteConfirm = true },
+                enabled = !borrando,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            ) {
+                if (borrando) {
+                    CircularProgressIndicator(color = Danger, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                } else {
+                    Text(Textos.t(T.ajustes_eliminar_cuenta_boton), color = Muted, fontSize = 13.sp)
+                }
+            }
+            errorBorrar?.let {
+                Text(it, color = Danger, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(top = 4.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            }
             Spacer(modifier = Modifier.height(40.dp))
         }
     }
@@ -294,6 +312,27 @@ fun SettingsScreen(
             confirmLabel = Textos.t(T.ajustes_cerrar_sesion_si),
             onConfirm = onLogout,
             onDismiss = { showLogoutConfirm = false },
+        )
+    }
+
+    if (showDeleteConfirm) {
+        com.paragon.app.ui.common.ConfirmDialog(
+            title = Textos.t(T.ajustes_eliminar_cuenta_titulo),
+            message = Textos.t(T.ajustes_eliminar_cuenta_texto),
+            confirmLabel = Textos.t(T.ajustes_eliminar_cuenta_si),
+            onConfirm = {
+                showDeleteConfirm = false
+                scope.launch {
+                    borrando = true
+                    errorBorrar = null
+                    when (val r = repository.eliminarCuenta()) {
+                        is com.paragon.app.data.SettingsResult.Ok -> onLogout()
+                        is com.paragon.app.data.SettingsResult.Error -> errorBorrar = r.message
+                    }
+                    borrando = false
+                }
+            },
+            onDismiss = { showDeleteConfirm = false },
         )
     }
 } 

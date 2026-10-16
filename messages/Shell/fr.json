@@ -644,5 +644,15 @@
     "texto": "Ce n'est pas ta faute — un vrai bug sur cette page, déjà enregistré. Tu peux réessayer ou revenir où tu étais.",
     "referencia": "Référence :",
     "reintentar": "Réessayer"
+  },
+  "EliminarCuenta": {
+    "title": "Supprimer ton compte Paragon",
+    "intro": "Tu peux supprimer ton compte quand tu veux, depuis le site ou l'appli. Il est supprimé immédiatement et c'est irréversible.",
+    "web": "Sur le site : connecte-toi, va dans <ajustes>Paramètres → Sécurité</ajustes> et appuie sur « Supprimer le compte ».",
+    "app": "Dans l'appli Paragon : Paramètres → tout en bas, « Supprimer le compte ».",
+    "queTitulo": "Ce qui est supprimé",
+    "que": "Ton profil, la bibliothèque et la progression enregistrées dans Paragon, tes ligues, clans, amis, notifications, réglages et sessions ouvertes. Tes comptes PlayStation, Steam, Xbox ou Epic ne sont pas touchés : Paragon ne lisait que tes données publiques.",
+    "sinAccesoTitulo": "Tu ne peux pas te connecter ?",
+    "sinAcceso": "Écris-nous à <email>mario.meca2005@gmail.com</email> depuis l'adresse avec laquelle tu te connectes et on le supprime sous 30 jours."
   }
 }

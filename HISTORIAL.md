@@ -6,6 +6,25 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct (4) — Google Play preparado**. Lo que la tienda pide y se puede
+hacer desde el código:
+- **Eliminar la cuenta desde la app** (Google lo exige a toda app con
+  cuentas): Ajustes → abajo, "Eliminar cuenta" con confirmación
+  (`DELETE /api/mobile/profile` con `{ "confirmar": true }`, igual que
+  `deleteAccountAction` de la web). Y la página pública `/eliminar-cuenta`
+  (sin sesión, 4 idiomas, en el sitemap), que es la URL que pide la ficha.
+- `kmp/play/`: textos de la ficha en es/en/de/fr (título ≤30, corta ≤80,
+  completa), icono 512, gráfico destacado 1024×500 y capturas 1080×1920 con
+  rótulo (las del móvil, 923×2000, Google las rechaza por pasar de 2:1; van
+  dentro de un marco). Se rehacen con `npm run graficos-play` en `video/`.
+  README con la guía de Play Console y las respuestas de cada formulario
+  (seguridad de los datos, clasificación, acceso para la revisión...).
+- Workflow "Publicar en las tiendas": tras firmar, sube el AAB a Google
+  Play (`r0adkll/upload-google-play@v1`, pista y estado elegibles, novedades
+  de `kmp/play/novedades/`) si están `PLAY_SERVICE_ACCOUNT_JSON` y la clave;
+  si no, se salta y el AAB queda como artefacto. La primera subida de una
+  app nueva tiene que ser a mano (la API de Play no la deja).
+
 **16 oct (3) — "¿Lo compartes?" al sacar un platino**. Cada platino
 compartido en Instagram o TikTok con la dirección de Paragon a la vista es
 publicidad gratis. Las tarjetas ya existían, pero solo con el botón de la

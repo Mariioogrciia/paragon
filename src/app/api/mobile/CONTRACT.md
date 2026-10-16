@@ -708,6 +708,14 @@ arreglarlo.
 Body: `{ "name": "Mario", "image": "https://..." | null }`. `{ "ok": true }`
 o `400` si `name` viene vacío.
 
+## `DELETE /api/mobile/profile` — Eliminar la cuenta
+
+16 oct 2026 (Google Play lo exige dentro de la app). Body:
+`{ "confirmar": true }` (sin él, `400`). Borra el usuario y, en cascada, todo
+lo suyo, sesiones de la app incluidas → `{ "ok": true }`. Igual que
+`deleteAccountAction` en la web. La explicación pública está en
+`/eliminar-cuenta`.
+
 ## `POST /api/mobile/profile/avatar` — Cambiar la foto de perfil
 
 `multipart/form-data` con un único campo `file` (jpg/jpeg/png/gif/webp).

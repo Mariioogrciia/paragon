@@ -23,6 +23,10 @@
     <string name="ajustes_cerrar_sesion_texto">Tu devras te reconnecter avec Google ou Discord pour revoir tes trophées.</string>
     <string name="ajustes_cerrar_sesion_titulo">Se déconnecter ?</string>
     <string name="ajustes_como_funciona">Comment marche Paragon (et le bot Discord)</string>
+    <string name="ajustes_eliminar_cuenta_boton">Supprimer le compte</string>
+    <string name="ajustes_eliminar_cuenta_si">Oui, supprimer définitivement</string>
+    <string name="ajustes_eliminar_cuenta_texto">Tout est supprimé : ton profil, ta bibliothèque, tes ligues, tes amis et tes réglages. C\'est irréversible. Tes comptes PlayStation, Steam ou Xbox ne sont pas touchés.</string>
+    <string name="ajustes_eliminar_cuenta_titulo">Supprimer ton compte Paragon ?</string>
     <string name="ajustes_err_cuentas">Erreur au chargement des comptes (%1$s).</string>
     <string name="ajustes_err_leer_imagen">Impossible de lire l\'image.</string>
     <string name="ajustes_err_subir_imagen">Impossible d\'envoyer l\'image.</string>

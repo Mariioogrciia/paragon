@@ -25,6 +25,10 @@
     <string name="ajustes_cerrar_sesion_texto">Tendrás que volver a entrar con Google o Discord para seguir viendo tus trofeos.</string>
     <string name="ajustes_cerrar_sesion_titulo">¿Cerrar sesión?</string>
     <string name="ajustes_como_funciona">Cómo funciona Paragon (y el bot de Discord)</string>
+    <string name="ajustes_eliminar_cuenta_boton">Eliminar cuenta</string>
+    <string name="ajustes_eliminar_cuenta_si">Sí, eliminar para siempre</string>
+    <string name="ajustes_eliminar_cuenta_texto">Se borra todo: tu perfil, tu biblioteca, tus ligas, tus amigos y tus ajustes. No se puede deshacer. Tus cuentas de PlayStation, Steam o Xbox no se tocan.</string>
+    <string name="ajustes_eliminar_cuenta_titulo">¿Eliminar tu cuenta de Paragon?</string>
     <string name="ajustes_err_cuentas">Error al cargar cuentas (%1$s).</string>
     <string name="ajustes_err_leer_imagen">No se pudo leer la imagen.</string>
     <string name="ajustes_err_subir_imagen">No se pudo subir la imagen.</string>

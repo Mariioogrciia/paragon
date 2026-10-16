@@ -644,5 +644,15 @@
     "texto": "Das lag nicht an dir — ein echter Fehler auf dieser Seite, bereits protokolliert. Du kannst es erneut versuchen oder zurückgehen.",
     "referencia": "Referenz:",
     "reintentar": "Erneut versuchen"
+  },
+  "EliminarCuenta": {
+    "title": "Dein Paragon-Konto löschen",
+    "intro": "Du kannst dein Konto jederzeit löschen, auf der Website oder in der App. Es wird sofort gelöscht und lässt sich nicht wiederherstellen.",
+    "web": "Auf der Website: Melde dich an, geh zu <ajustes>Einstellungen → Sicherheit</ajustes> und tippe auf „Konto löschen“.",
+    "app": "In der Paragon-App: Einstellungen → ganz unten „Konto löschen“.",
+    "queTitulo": "Was gelöscht wird",
+    "que": "Dein Profil, die in Paragon gespeicherte Bibliothek und dein Fortschritt, deine Ligen, Clans, Freunde, Benachrichtigungen, Einstellungen und offenen Sitzungen. Deine PlayStation-, Steam-, Xbox- oder Epic-Konten bleiben unberührt: Paragon hat nur deine öffentlichen Daten gelesen.",
+    "sinAccesoTitulo": "Du kommst nicht mehr rein?",
+    "sinAcceso": "Schreib uns an <email>mario.meca2005@gmail.com</email> von der Adresse, mit der du dich anmeldest, und wir löschen es innerhalb von 30 Tagen."
   }
 }

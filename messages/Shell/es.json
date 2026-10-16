@@ -644,5 +644,15 @@
     "texto": "No ha sido cosa tuya — un fallo real en esta página, ya registrado. Puedes intentarlo otra vez o volver a donde estabas.",
     "referencia": "Referencia:",
     "reintentar": "Reintentar"
+  },
+  "EliminarCuenta": {
+    "title": "Eliminar tu cuenta de Paragon",
+    "intro": "Puedes eliminar tu cuenta cuando quieras, desde la web o desde la app. Se borra al momento y no se puede deshacer.",
+    "web": "En la web: entra con tu cuenta, ve a <ajustes>Ajustes → Seguridad</ajustes> y pulsa «Eliminar cuenta».",
+    "app": "En la app de Paragon: Ajustes → abajo del todo, «Eliminar cuenta».",
+    "queTitulo": "Qué se borra",
+    "que": "Tu perfil, la biblioteca y el progreso guardados en Paragon, tus ligas, clanes, amigos, avisos, ajustes y las sesiones abiertas. Tus cuentas de PlayStation, Steam, Xbox o Epic no se tocan: Paragon solo leía tus datos públicos.",
+    "sinAccesoTitulo": "¿No puedes entrar?",
+    "sinAcceso": "Escríbenos a <email>mario.meca2005@gmail.com</email> desde el correo con el que entras y la borramos en un máximo de 30 días."
   }
 }

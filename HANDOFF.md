@@ -43,9 +43,13 @@ de iOS; la web (*Comprobaciones*), en verde en cada push a master.
    `ASC_ISSUER_ID` y `ASC_KEY_P8` (pasos en HISTORIAL.md, 13 oct, "Publicar en las tiendas").
 2. **Push de iOS en el servidor**: `APNS_KEY`, `APNS_KEY_ID` y `APNS_TEAM_ID`
    en las variables de Vercel.
-3. **Clave de publicación de Android**: crearla con `keytool` y subirla a los
-   secretos (`ANDROID_KEYSTORE_BASE64` y sus contraseñas). Guardarla bien:
-   sin ella no hay actualizaciones en Play.
+3. **Google Play**: todo preparado en `kmp/play/` (guía paso a paso en su
+   README: cuenta de 25 $, clave de firma, primera subida a mano, formularios
+   de Play Console con las respuestas, y ficha y gráficos en 4 idiomas).
+   Después de la primera subida, el workflow "Publicar en las tiendas" sube
+   solo el AAB si está el secreto `PLAY_SERVICE_ACCOUNT_JSON`. Ojo: con una
+   cuenta personal nueva, Google pide una prueba cerrada de 12 personas
+   durante 14 días antes de producción.
 4. **Probar en un móvil de verdad** lo de los últimos días (perfil completo,
    precios, DLC, QR, widget de iOS...): el emulador de Windows no arranca
    desde la actualización 26200 → 26300 (probablemente basta con reiniciar).
@@ -57,7 +61,8 @@ de iOS; la web (*Comprobaciones*), en verde en cada push a master.
    PromoTikTok.tsx, Lanzamientos.kt, ClienteParagon.kt y dos tests de la
    app) y las URLs de vuelta en las consolas de Google y Discord.
 
-**Lo último** (detalle en HISTORIAL.md, 16 oct): "¿Lo compartes?" al sacar
+**Lo último** (detalle en HISTORIAL.md, 16 oct): Google Play preparado
+(`kmp/play/`, "Eliminar cuenta" en la app), "¿Lo compartes?" al sacar
 un platino (web y app, con imagen vertical para Stories), asistente para vincular
 cuentas (web `/vincular` y bienvenida; en la app, "Comprobar" en
 Plataformas vinculadas), aviso al desarrollador

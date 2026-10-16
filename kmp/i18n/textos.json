@@ -5620,5 +5620,29 @@
   "en": "Not now",
   "es": "Ahora no",
   "fr": "Pas maintenant"
+ },
+ "ajustes_eliminar_cuenta_boton": {
+  "de": "Konto löschen",
+  "en": "Delete account",
+  "es": "Eliminar cuenta",
+  "fr": "Supprimer le compte"
+ },
+ "ajustes_eliminar_cuenta_titulo": {
+  "de": "Dein Paragon-Konto löschen?",
+  "en": "Delete your Paragon account?",
+  "es": "¿Eliminar tu cuenta de Paragon?",
+  "fr": "Supprimer ton compte Paragon ?"
+ },
+ "ajustes_eliminar_cuenta_texto": {
+  "de": "Alles wird gelöscht: Profil, Bibliothek, Ligen, Freunde und Einstellungen. Das lässt sich nicht rückgängig machen. Deine PlayStation-, Steam- oder Xbox-Konten bleiben unberührt.",
+  "en": "Everything is deleted: your profile, library, leagues, friends and settings. This can't be undone. Your PlayStation, Steam or Xbox accounts aren't touched.",
+  "es": "Se borra todo: tu perfil, tu biblioteca, tus ligas, tus amigos y tus ajustes. No se puede deshacer. Tus cuentas de PlayStation, Steam o Xbox no se tocan.",
+  "fr": "Tout est supprimé : ton profil, ta bibliothèque, tes ligues, tes amis et tes réglages. C'est irréversible. Tes comptes PlayStation, Steam ou Xbox ne sont pas touchés."
+ },
+ "ajustes_eliminar_cuenta_si": {
+  "de": "Ja, endgültig löschen",
+  "en": "Yes, delete forever",
+  "es": "Sí, eliminar para siempre",
+  "fr": "Oui, supprimer définitivement"
  }
 }
