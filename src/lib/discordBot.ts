@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { accounts, discordGuildSettings, userGames, users } from "@/db/schema";
 import type { Trophy } from "@/lib/types";
 import { getParagonLevel } from "@/lib/paragonLevel";
+import { traducirAviso } from "@/lib/avisosTraduccion";
+import { idiomaDeUsuario } from "@/lib/idiomaUsuario";
 
 /**
  * Avisos de trofeos por DM del propio bot de Discord de Paragon —
@@ -340,9 +342,10 @@ export async function enviarDmSiActivo(
     const discordUserId = await discordUserIdDe(userId);
     if (!discordUserId) return;
     const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    const idioma = await idiomaDeUsuario(userId);
     await enviarDM(discordUserId, {
-      title: aviso.titulo,
-      description: aviso.texto,
+      title: traducirAviso(aviso.titulo, idioma),
+      description: traducirAviso(aviso.texto, idioma),
       url: dominio && aviso.ruta ? `https://${dominio}${aviso.ruta}` : undefined,
       color: COLOR_GENERICO,
       footer: { text: "Paragon" },

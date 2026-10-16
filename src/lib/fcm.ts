@@ -1,5 +1,7 @@
 import "server-only";
 import type { App } from "firebase-admin/app";
+import { traducirAviso } from "@/lib/avisosTraduccion";
+import { idiomaDeUsuario } from "@/lib/idiomaUsuario";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { fcmTokens } from "@/db/schema";
@@ -76,6 +78,10 @@ export async function enviarPushFcm(
   payload: { title: string; body: string; url?: string; imageUrl?: string },
 ): Promise<void> {
   const filas = await db.select({ token: fcmTokens.token }).from(fcmTokens).where(eq(fcmTokens.userId, userId));
+  if (filas.length === 0) return;
+  // En el idioma de quien lo recibe (lib/avisosTraduccion.ts), para Android e iPhone.
+  const idioma = await idiomaDeUsuario(userId);
+  payload = { ...payload, title: traducirAviso(payload.title, idioma), body: traducirAviso(payload.body, idioma) };
   const iphones = filas.filter((f) => esTokenApns(f.token)).map((f) => f.token);
   const tokens = filas.filter((f) => !esTokenApns(f.token));
 

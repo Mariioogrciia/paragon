@@ -1,5 +1,7 @@
 import "server-only";
 import webpush from "web-push";
+import { traducirAviso } from "@/lib/avisosTraduccion";
+import { idiomaDeUsuario } from "@/lib/idiomaUsuario";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
@@ -110,6 +112,10 @@ export async function enviarPush(
   if (subs.length === 0) {
     return { enviados: 0, total: 0, error: "No hay ninguna suscripción guardada — activa las notificaciones primero." };
   }
+
+  // En el idioma de quien lo recibe (lib/avisosTraduccion.ts).
+  const idioma = await idiomaDeUsuario(userId);
+  payload = { ...payload, title: traducirAviso(payload.title, idioma), body: traducirAviso(payload.body, idioma) };
 
   let enviados = 0;
   let ultimoError: string | undefined;

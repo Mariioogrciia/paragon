@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { avisosBandeja, friendships, users } from "@/db/schema";
 import { avisoPermitido } from "@/lib/avisosPreferencias";
 import type { Idioma } from "@/lib/idiomasTrofeo";
-import { traducirMensaje } from "@/lib/mensajesApi";
+import { traducirAviso } from "@/lib/avisosTraduccion";
 
 /**
  * Bandeja de avisos dentro de la plataforma (16 oct 2026). Antes, un aviso
@@ -99,7 +99,7 @@ export async function guardarAviso(userIds: string | string[], aviso: AvisoNuevo
 /**
  * Lo último de la bandeja y cuántos quedan sin leer. Vacío si la tabla no
  * está. Los avisos se guardan en español (como las push); al leerlos se
- * traducen los más comunes (FIJOS y PATRONES de lib/mensajesApi.ts).
+ * traducen (lib/avisosTraduccion.ts).
  */
 export async function avisosDe(userId: string, idioma: Idioma = "es"): Promise<{ avisos: AvisoBandeja[]; noLeidos: number }> {
   if (!(await asegurarTablaAvisos())) return { avisos: [], noLeidos: 0 };
@@ -118,8 +118,8 @@ export async function avisosDe(userId: string, idioma: Idioma = "es"): Promise<{
   return {
     avisos: filas.map((f) => ({
       id: f.id,
-      titulo: traducirMensaje(f.titulo, idioma),
-      texto: traducirMensaje(f.texto, idioma),
+      titulo: traducirAviso(f.titulo, idioma),
+      texto: traducirAviso(f.texto, idioma),
       ruta: f.ruta,
       imagen: f.imagen,
       leido: f.leido,

@@ -5,6 +5,8 @@ import { paragonProgress } from "@/lib/level";
 import { rachas } from "@/lib/history";
 import { jsonConEtag } from "@/lib/etag";
 import { errorMovil } from "@/lib/mensajesApi";
+import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
+import { guardarIdiomaUsuario } from "@/lib/idiomaUsuario";
 
 /** Datos de la pantalla de Panel nativa (Android/Compose). Mismo cálculo que la portada web (`app/page.tsx`), reempaquetado en JSON. */
 export async function GET(req: Request) {
@@ -13,7 +15,11 @@ export async function GET(req: Request) {
     return errorMovil(req, "No autenticado", 401);
   }
 
-  const profile = await getProfileByUserId(userId);
+  // Al abrir la app: sus push salen en el idioma del móvil (lib/idiomaUsuario.ts).
+  const [profile] = await Promise.all([
+    getProfileByUserId(userId),
+    guardarIdiomaUsuario(userId, idiomaDeCabecera(req.headers.get("accept-language"))),
+  ]);
   if (!profile?.handle) {
     return errorMovil(req, "Perfil sin terminar de configurar", 409);
   }

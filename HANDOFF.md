@@ -15,8 +15,9 @@ master (`75ef977`). Regla del usuario: **siempre push a master**
 (fast-forward desde la rama).
 
 **CI**: todo en verde en `75ef977` (16 oct, master): web, APK de Android e
-IPA de iOS.
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 165 tests de
+IPA de iOS. Después, solo cambios de servidor y documentación (la web se
+comprueba en cada push).
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 172 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
@@ -76,6 +77,11 @@ IPA de iOS.
    (probablemente basta con reiniciar).
 
 **Lo último** (16 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+0. **Push y avisos en el idioma de cada persona**: se escriben en español y
+   se traducen al salir (`lib/avisosTraduccion.ts`) con `users.language`,
+   que ahora guarda el idioma del móvil al abrir la app y el elegido en la
+   web. Vale para push del navegador, Android, iPhone, DM de Discord de
+   `avisarUsuario` y la campana.
 1. **Avisos dentro de la plataforma**: bandeja (`lib/bandeja.ts`, tabla
    `aviso`) con todo lo que sale por push.
    - Web: campana en la cabecera con contador, lista y avisos flotantes.
@@ -100,9 +106,9 @@ el desarrollador), avisos que abren su pantalla, límites en la API móvil,
 lint a cero y las pantallas v2.
 
 **Pendiente de código** (pequeño, nada pedido):
-- **Push en el idioma de cada persona**: hoy salen en español para todos. En
-  la campana se traducen al leer los avisos más comunes (`FIJOS`/`PATRONES`
-  de `lib/mensajesApi.ts`); el resto sigue en español.
+- **DM de Discord de trofeos, nivel y resumen semanal**: siguen en español
+  (los arma `lib/discordBot.ts` y `lib/resumenSemanal.ts` por su cuenta). El
+  resto de avisos ya sale en el idioma de cada uno (ver "Lo último").
 - **Hora de los avisos en la web**: la campana usa `relativeDate`, que solo
   distingue días ("hoy", "ayer"); en la app sí sale "hace 5 min".
 - **Capturas de Google Play**: hay 2 (el mínimo) y con la app en español.
@@ -152,6 +158,9 @@ pantallas en la app, 4 idiomas en todo.
   los de iOS) y `src/lib/apns.ts` (iOS).
 - Contrato de la API móvil: `src/app/api/mobile/CONTRACT.md`.
 - Avisos: `src/lib/avisos.ts` (`avisarUsuario`: push + Discord + bandeja),
+  traducción al salir en `src/lib/avisosTraduccion.ts` (**si cambias la
+  frase de un aviso, cámbiala también ahí**) con el idioma de
+  `src/lib/idiomaUsuario.ts`,
   `src/lib/bandeja.ts` (la bandeja, tabla `aviso`), campana web
   `src/components/CampanaAvisos.tsx` (`/api/avisos`) y pantalla de la app
   `ui/avisos/AvisosScreen.kt` (`/api/mobile/avisos`). Un aviso nuevo se

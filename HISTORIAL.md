@@ -6,6 +6,26 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct (7) — push y avisos en el idioma de cada persona**. Antes todas
+las push salían en español.
+- Los avisos se siguen escribiendo en español donde nacen, y se traducen al
+  salir: `traducirAviso` (lib/avisosTraduccion.ts) con textos fijos y
+  patrones para todos los avisos que hay (amigos, ligas, clanes, trofeos,
+  perdibles, lanzamientos, precios, temporada, guerras de clanes, retos,
+  platinar juntos y sesiones, estas línea a línea). Lo que no conoce sale en
+  español. Los textos de aviso que el 16 oct (5) se pusieron en
+  lib/mensajesApi.ts pasan aquí.
+- Dónde se traduce: `enviarPush` (navegador), `enviarPushFcm` (Android y
+  iPhone), `enviarDmSiActivo` (Discord) y la bandeja al leerla.
+- El idioma: `users.language` (lib/idiomaUsuario.ts). Lo guarda la app con
+  el idioma del móvil (Accept-Language) al abrir el panel y al registrar el
+  token de push, y la web al cambiar de idioma o, si ya tiene la cookie
+  NEXT_LOCALE, al cargar con sesión. La web sin cookie no lo toca: pisaría
+  el de la app. Se escribe solo si cambia.
+- Siguen en español: los DM de Discord de trofeos y nivel y el resumen
+  semanal, que se arman aparte en lib/discordBot.ts y lib/resumenSemanal.ts.
+- Tests: tests/avisosTraduccion.test.ts con las frases reales.
+
 **16 oct (6) — HANDOFF al día y `CRON_SECRET` comprobado**. El HANDOFF
 decía que faltaba `CRON_SECRET` en Vercel; no es así. El workflow
 `sync-frecuente.yml` falla si `/api/cron/sync` no devuelve 200 y lleva todas

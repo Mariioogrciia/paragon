@@ -3,6 +3,8 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
 import { guardarTokenFcm } from "@/lib/fcm";
 import { errorMovil } from "@/lib/mensajesApi";
+import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
+import { guardarIdiomaUsuario } from "@/lib/idiomaUsuario";
 
 /**
  * Registra (o reasigna) el token de Firebase Cloud Messaging de este
@@ -28,5 +30,7 @@ export async function POST(req: Request) {
   }
 
   await guardarTokenFcm(userId, token);
+  // Las push salen en el idioma del móvil (lib/idiomaUsuario.ts).
+  await guardarIdiomaUsuario(userId, idiomaDeCabecera(req.headers.get("accept-language")));
   return NextResponse.json({ ok: true });
 }

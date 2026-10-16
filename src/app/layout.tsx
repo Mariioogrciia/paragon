@@ -1,4 +1,7 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
+import { esIdioma } from "@/lib/idiomasTrofeo";
+import { guardarIdiomaUsuario } from "@/lib/idiomaUsuario";
 import { CompartirPlatinoPendiente } from "@/components/CompartirPlatinoPendiente";
 import { Analytics } from "@vercel/analytics/next";
 import { dominioPublico } from "@/lib/site";
@@ -151,6 +154,13 @@ export default async function RootLayout({
   }
 
   const sessionUser = session?.user;
+
+  // Si eligió idioma en la web (cookie), sus push y avisos salen en ese
+  // idioma (lib/idiomaUsuario.ts). Sin cookie no se toca: pisaría el de la app.
+  if (sessionUser) {
+    const elegido = (await cookies()).get("NEXT_LOCALE")?.value;
+    if (elegido && esIdioma(elegido)) await guardarIdiomaUsuario(sessionUser.id, elegido);
+  }
 
   // Las tres no dependen entre sí — antes iban en serie (perfil, luego
   // nivel, luego nav oculta) en el camino crítico de CADA página. `nivel`
