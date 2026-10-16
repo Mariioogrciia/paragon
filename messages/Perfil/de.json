@@ -706,5 +706,12 @@
       "derrota": "Niederlage",
       "empate": "Unentschieden"
     }
+  },
+  "compartirPlatino": {
+    "titulo": "Platin in {juego}!",
+    "texto": "Teile es auf Instagram oder TikTok: Das Bild für Stories ist fertig.",
+    "compartir": "Bild teilen",
+    "ahoraNo": "Jetzt nicht",
+    "alt": "Karte zu deinem Platin in {juego}"
   }
 }

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { CompartirPlatinoPendiente } from "@/components/CompartirPlatinoPendiente";
 import { Analytics } from "@vercel/analytics/next";
 import { dominioPublico } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
@@ -262,6 +264,12 @@ export default async function RootLayout({
                 tarjetas de dentro pusieran su propio relleno encima. */}
             <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-9 sm:px-7">{children}</main>
             <Footer />
+            {/* "¿Lo compartes?" tras un platino nuevo (lib/compartirPlatino.ts). */}
+            {sessionUser && profile?.handle && (
+              <Suspense fallback={null}>
+                <CompartirPlatinoPendiente userId={sessionUser.id} handle={profile.handle} />
+              </Suspense>
+            )}
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

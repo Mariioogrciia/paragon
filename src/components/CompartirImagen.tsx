@@ -27,6 +27,7 @@ export function CompartirImagen({
   className = "text-xs font-bold uppercase tracking-wide text-accent hover:underline disabled:opacity-50",
   style,
   children,
+  onCompartido,
 }: {
   /** Endpoint que devuelve la imagen (un `ImageResponse` de next/og). */
   url: string;
@@ -35,6 +36,8 @@ export function CompartirImagen({
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
+  /** Tras abrir la hoja de compartir o descargar (p. ej. para no volver a preguntar, ver AvisoCompartirPlatino). */
+  onCompartido?: () => void;
 }) {
   const [cargando, setCargando] = useState(false);
   const t = useTranslations("Perfil");
@@ -50,6 +53,7 @@ export function CompartirImagen({
       if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title: tituloCompartir });
+          onCompartido?.();
         } catch {
           // El usuario cancelando la hoja de compartir también rechaza la
           // promesa (AbortError) — no es un fallo real, no hay nada que avisar.
@@ -67,6 +71,7 @@ export function CompartirImagen({
       a.click();
       a.remove();
       URL.revokeObjectURL(blobUrl);
+      onCompartido?.();
     } finally {
       setCargando(false);
     }

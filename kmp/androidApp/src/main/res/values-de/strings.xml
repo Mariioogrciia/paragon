@@ -225,8 +225,11 @@
     <string name="comparar_trofeos_juegos">%1$s Trophäen · %2$s Spiele</string>
     <string name="comparar_tu">DU</string>
     <string name="comparar_tu_pct">Du %1$s %%%2$s</string>
+    <string name="comparte_ahora_no">Jetzt nicht</string>
     <string name="comparte_badge_platino">PLATIN</string>
     <string name="comparte_handle">\@%1$s auf Paragon</string>
+    <string name="comparte_platino_nuevo">Platin in %1$s!</string>
+    <string name="comparte_platino_texto">Teile es auf Instagram oder TikTok: Die Karte ist fertig.</string>
     <string name="comparte_trofeos">%1$s/%2$s Trophäen geholt</string>
     <string name="compartir_anadido">%1$s zur Wunschliste hinzugefügt</string>
     <string name="compartir_elige">Wähle das richtige Spiel aus den Ergebnissen.</string>

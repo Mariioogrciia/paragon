@@ -127,6 +127,14 @@ fun TrophyShareCard(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 18.dp),
                 )
+                // La dirección de Paragon, bien visible (16 oct 2026): quien vea
+                // la story tiene que poder llegar sin buscar.
+                Text(
+                    text = com.paragon.shared.BASE_URL.removePrefix("https://"),
+                    color = Muted,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
             }
         }
     }

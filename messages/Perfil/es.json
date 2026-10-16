@@ -706,5 +706,12 @@
       "derrota": "Derrota",
       "empate": "Empate"
     }
+  },
+  "compartirPlatino": {
+    "titulo": "¡Platino en {juego}!",
+    "texto": "Compártelo en Instagram o TikTok: la imagen para Stories ya está lista.",
+    "compartir": "Compartir imagen",
+    "ahoraNo": "Ahora no",
+    "alt": "Tarjeta de tu platino en {juego}"
   }
 }

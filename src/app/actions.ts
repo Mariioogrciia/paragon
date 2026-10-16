@@ -59,6 +59,7 @@ import { COOKIES_SESION, cerrarOtrasSesiones } from "@/lib/mobileAuth";
 import { ipActual, limitar } from "@/lib/rateLimit";
 import { esPlataformaAsistente, type Diagnostico } from "@/lib/comprobarCuenta";
 import { diagnosticarCuenta } from "@/lib/diagnosticoCuenta";
+import { marcarPlatinoPreguntado } from "@/lib/compartirPlatino";
 import { HANDLE_RE } from "@/lib/validacionPerfil";
 import { borrarAlertaPrecio, guardarAlertaPrecio } from "@/lib/priceAlerts";
 import { setObjetivoFecha } from "@/lib/goals";
@@ -348,6 +349,13 @@ export async function linkEpicAction(
   formData: FormData,
 ): Promise<ActionState> {
   return linkPlatform("epic", formData);
+}
+
+/** "Ahora no" o compartido en el aviso de platino (components/AvisoCompartirPlatino.tsx): no se vuelve a preguntar. */
+export async function marcarPlatinoPreguntadoAction(gameId: string): Promise<void> {
+  const userId = await requireUserId();
+  if (typeof gameId !== "string" || !gameId || gameId.length > 200) return;
+  await marcarPlatinoPreguntado(userId, gameId);
 }
 
 /* ------------------ Asistente de vincular (16 oct 2026) ------------------ */

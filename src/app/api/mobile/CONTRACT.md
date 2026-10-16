@@ -657,6 +657,17 @@ principal vinculada).
 
 Las extra se sincronizan solas junto a la principal (ver lib/steamExtra.ts).
 
+## `GET/POST /api/mobile/platino-por-compartir` — "¿Lo compartes?" tras un platino
+
+16 oct 2026, ver `src/lib/compartirPlatino.ts`. `GET` →
+`{ "pendiente": { "gameId", "titulo", "coverUrl", "earnedTotal", "definedTotal" } | null }`:
+el platino nuevo más reciente de los últimos 7 días por el que aún no se ha
+preguntado (la actividad `platinum` que crea la sincronización, nunca la
+primera). `POST { "gameId": "..." }` → `{ "ok": true }`: ya se preguntó
+(compartido o "ahora no"), no vuelve a salir. La imagen vertical para
+Stories de la web es `GET /api/trophy-card/{handle}/{gameId}?formato=historia&lang=es`
+(1080×1920); la app dibuja la suya (`TrophyShareCard.kt`).
+
 ## `POST /api/mobile/accounts/comprobar` — Comprobar una cuenta antes de vincularla
 
 Asistente de vincular (16 oct 2026). Body: `{ "platform": "psn" | "steam" |

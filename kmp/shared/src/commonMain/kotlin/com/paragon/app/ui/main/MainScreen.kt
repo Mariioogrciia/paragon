@@ -243,6 +243,39 @@ fun MainScreen(
         }
     }
 
+    // "¿Lo compartes?" tras un platino nuevo (16 oct 2026, ver
+    // src/lib/compartirPlatino.ts): al abrir la app, si hay uno de esta
+    // semana por el que no se ha preguntado, sale la tarjeta para Stories.
+    // Compartir o "Ahora no" lo dan por preguntado y no vuelve a salir.
+    var platinoPorCompartir by remember { mutableStateOf<com.paragon.shared.red.PlatinoPorCompartirDto?>(null) }
+    val alcanceCompartir = rememberCoroutineScope()
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        platinoPorCompartir = try {
+            com.paragon.app.data.network.ApiClient.milestoneApi(tokenStore).platinoPorCompartir().pendiente
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            null
+        }
+    }
+    platinoPorCompartir?.let { p ->
+        com.paragon.app.ui.share.ShareTrophyDialog(
+            coverUrl = p.coverUrl ?: "",
+            gameTitle = p.titulo,
+            handle = profile.handle,
+            earnedTrophies = p.earnedTotal.takeIf { p.definedTotal > 0 },
+            totalTrophies = p.definedTotal.takeIf { it > 0 },
+            titulo = Textos.t(T.comparte_platino_nuevo, p.titulo),
+            textoCerrar = Textos.t(T.comparte_ahora_no),
+            onDismiss = {
+                platinoPorCompartir = null
+                alcanceCompartir.launch {
+                    runCatching { com.paragon.app.data.network.ApiClient.milestoneApi(tokenStore).platinoPreguntado(p.gameId) }
+                }
+            },
+        )
+    }
+
     // Barra de abajo como Instagram (7 oct 2026): cápsula flotante de cristal
     // que desenfoca lo que pasa por detrás (Haze). El contenido llega hasta
     // abajo del todo y cada lista deja `huecoBarra()` al final.

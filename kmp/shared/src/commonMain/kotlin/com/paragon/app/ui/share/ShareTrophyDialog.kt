@@ -29,6 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.paragon.app.ui.theme.Accent
 import com.paragon.app.ui.theme.Muted
+import com.paragon.app.ui.theme.Platinum
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.paragon.app.ui.theme.Surface
 import com.paragon.app.util.compartirImagen
 import kotlinx.coroutines.launch
@@ -55,6 +59,10 @@ fun ShareTrophyDialog(
     totalTrophies: Int? = null,
     badge: String = Textos.t(T.comparte_badge_platino),
     subtitle: String? = null,
+    // "¡Platino en X!" cuando lo abre el aviso de platino nuevo (MainScreen,
+    // 16 oct 2026); desde la ficha o las estadísticas no hace falta.
+    titulo: String? = null,
+    textoCerrar: String = Textos.t(T.comun_cerrar),
     onDismiss: () -> Unit,
 ) {
     val context = contextoPlataforma()
@@ -69,6 +77,22 @@ fun ShareTrophyDialog(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            titulo?.let {
+                Text(
+                    it,
+                    color = Platinum,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    Textos.t(T.comparte_platino_texto),
+                    color = Muted,
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 14.dp),
+                )
+            }
             TrophyShareCard(
                 coverUrl = coverUrl,
                 gameTitle = gameTitle,
@@ -106,7 +130,7 @@ fun ShareTrophyDialog(
             }
 
             TextButton(onClick = onDismiss, modifier = Modifier.padding(top = 4.dp)) {
-                Text(Textos.t(T.comun_cerrar), color = Muted)
+                Text(textoCerrar, color = Muted)
             }
         }
     }

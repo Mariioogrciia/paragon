@@ -706,5 +706,12 @@
       "derrota": "Loss",
       "empate": "Draw"
     }
+  },
+  "compartirPlatino": {
+    "titulo": "Platinum in {juego}!",
+    "texto": "Share it on Instagram or TikTok: the Stories image is ready.",
+    "compartir": "Share image",
+    "ahoraNo": "Not now",
+    "alt": "Card for your {juego} platinum"
   }
 }

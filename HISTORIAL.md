@@ -6,6 +6,30 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**16 oct (3) — "¿Lo compartes?" al sacar un platino**. Cada platino
+compartido en Instagram o TikTok con la dirección de Paragon a la vista es
+publicidad gratis. Las tarjetas ya existían, pero solo con el botón de la
+ficha del juego.
+- Qué preguntar: `platinoPorCompartir` (lib/compartirPlatino.ts) busca la
+  actividad `platinum` más reciente de los últimos 7 días (la crea
+  `syncGameTrophies` solo con un platino nuevo de verdad) que no esté en
+  `notification_log` (`compartir-platino` / gameId). Compartir, "Ahora no"
+  o la X la apuntan (`marcarPlatinoPreguntado`): una vez por platino. Como
+  el platino suele llegar con el cron, se pregunta al abrir la web o la
+  app, no en el momento.
+- Web: `CompartirPlatinoPendiente` en el layout raíz (en `<Suspense>`, un
+  fallo no rompe nada) saca `AvisoCompartirPlatino`, una tarjeta flotante
+  con la imagen y "Compartir imagen" (`CompartirImagen`, que ahora acepta
+  `onCompartido`). Textos en `Perfil.compartirPlatino`.
+- Imagen vertical para Stories: `/api/trophy-card/{handle}/{gameId}?formato=historia&lang=xx`,
+  1080×1920, carátula grande, cifras y la dirección de la web abajo, en el
+  idioma de quien comparte (plantilla en lib/og/historiaPlatino.tsx). La
+  horizontal de siempre sigue igual.
+- App: al abrir (MainScreen) pide `GET /api/mobile/platino-por-compartir` y,
+  si hay uno, abre `ShareTrophyDialog` con "¡Platino en X!" (la tarjeta 9:16
+  de la app, que ahora lleva también la dirección de la web). Al cerrar o
+  compartir, `POST` del mismo endpoint (CONTRACT.md).
+
 **16 oct (2) — asistente para vincular cuentas**. Era donde más gente se
 perdía: no sabía qué escribir (en Steam el nombre visible no vale) o
 vinculaba una cuenta privada y veía la biblioteca vacía sin saber por qué.

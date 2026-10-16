@@ -2,6 +2,8 @@ import { ImageResponse } from "next/og";
 import { getGameDetail, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { dificultadDeGame, esPlatinoEquivalente } from "@/lib/stats";
 import { urlAbsolutaParaOg } from "@/lib/design";
+import { esIdioma, type Idioma } from "@/lib/idiomasTrofeo";
+import { historia, TrofeoPlatino } from "@/lib/og/historiaPlatino";
 
 /**
  * Imagen compartible de un platino (o un 100% de Steam, que cuenta igual —
@@ -24,24 +26,6 @@ import { urlAbsolutaParaOg } from "@/lib/design";
  * color de la rareza empapando el resto de la tarjeta (glow, borde,
  * cifra) — cuanto más raro el platino, más "encendida" se ve la imagen.
  */
-
-/** Mismo path que TrophyIcon.tsx (PSN_PLATINUM) — se copia en vez de
- * importar el componente porque ese usa `currentColor`/CSS vars, que Satori
- * no resuelve; aquí hace falta un color plano de verdad. */
-function TrofeoPlatino({ size, color }: { size: number; color: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path
-        fill={color}
-        d="M12 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 9.5a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"
-      />
-      <path
-        fill={color}
-        d="M13.5 13.3c1.7.4 3 2 3 3.9v1.8h-9v-1.8c0-1.9 1.3-3.5 3-3.9v-1.3c-2-.4-3.5-2.2-3.5-4.4v-.6h2v.6c0 1.2.9 2.2 2 2.5v1.9h2v-1.9c1.1-.3 2-1.3 2-2.5v-.6h2v.6c0 2.2-1.5 4-3.5 4.4v1.3z"
-      />
-    </svg>
-  );
-}
 
 function Stat({ label, value, accent }: { label: string; value: string; accent: string }) {
   return (
@@ -66,6 +50,18 @@ function Stat({ label, value, accent }: { label: string; value: string; accent: 
     </div>
   );
 }
+
+/**
+ * Textos de la versión vertical (`?formato=historia`, 16 oct 2026), en el
+ * idioma de quien comparte (`?lang=`): esa imagen sale de Paragon hacia
+ * Instagram o TikTok, así que la tiene que entender su público.
+ */
+const TEXTOS_HISTORIA: Record<Idioma, { platino: string; cien: string; horas: string; rareza: string; trofeos: string; cta: string }> = {
+  es: { platino: "Platino conseguido", cien: "100% conseguido", horas: "Horas", rareza: "Rareza", trofeos: "Trofeos", cta: "Todos tus trofeos en un sitio" },
+  en: { platino: "Platinum earned", cien: "100% complete", horas: "Hours", rareza: "Rarity", trofeos: "Trophies", cta: "All your trophies in one place" },
+  de: { platino: "Platin erreicht", cien: "100 % geschafft", horas: "Stunden", rareza: "Seltenheit", trofeos: "Trophäen", cta: "Alle deine Trophäen an einem Ort" },
+  fr: { platino: "Platine obtenu", cien: "100 % terminé", horas: "Heures", rareza: "Rareté", trofeos: "Trophées", cta: "Tous tes trophées au même endroit" },
+};
 
 export async function GET(
   request: Request,
@@ -104,6 +100,29 @@ export async function GET(
   // cifras, nunca sustituye al color de marca del metal.
   const PLATINO = "#9fd4ec";
   const rarezaColor = dificultad?.color ?? PLATINO;
+
+  const consulta = new URL(request.url).searchParams;
+  if (consulta.get("formato") === "historia") {
+    const lang = consulta.get("lang");
+    const textos = TEXTOS_HISTORIA[esIdioma(lang) ? lang : "es"];
+    return historia({
+      dominio,
+      handle,
+      nombre: profile.displayName ?? `@${handle}`,
+      avatarUrl,
+      titulo: game.title,
+      coverUrl: game.iconUrl ?? null,
+      rotulo: hasPlatinum ? textos.platino : textos.cien,
+      stats: [
+        ...(horas !== null ? [{ label: textos.horas, value: `${horas.toFixed(0)} h`, accent: PLATINO }] : []),
+        ...(dificultad ? [{ label: textos.rareza, value: `${dificultad.rareza.toFixed(1)}%`, accent: rarezaColor }] : []),
+        { label: textos.trofeos, value: `${game.earnedTotal}/${game.definedTotal}`, accent: PLATINO },
+      ],
+      cta: textos.cta,
+      rarezaColor,
+      PLATINO,
+    });
+  }
 
   return new ImageResponse(
     (
@@ -236,3 +255,4 @@ export async function GET(
     { width: 1200, height: 630 },
   );
 }
+

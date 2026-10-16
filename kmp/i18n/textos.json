@@ -5602,5 +5602,23 @@
   "en": "Your gamertag: the big name on your Xbox profile, with the #number if it has one.",
   "es": "Tu gamertag: el nombre grande de tu perfil de Xbox, con el #número si lo lleva.",
   "fr": "Ton gamertag : le grand nom de ton profil Xbox, avec le #numéro s'il en a un."
+ },
+ "comparte_platino_nuevo": {
+  "de": "Platin in {0}!",
+  "en": "Platinum in {0}!",
+  "es": "¡Platino en {0}!",
+  "fr": "Platine dans {0} !"
+ },
+ "comparte_platino_texto": {
+  "de": "Teile es auf Instagram oder TikTok: Die Karte ist fertig.",
+  "en": "Share it on Instagram or TikTok: the card is ready.",
+  "es": "Compártelo en Instagram o TikTok: la tarjeta ya está lista.",
+  "fr": "Partage-le sur Instagram ou TikTok : la carte est prête."
+ },
+ "comparte_ahora_no": {
+  "de": "Jetzt nicht",
+  "en": "Not now",
+  "es": "Ahora no",
+  "fr": "Pas maintenant"
  }
 }
