@@ -6,6 +6,29 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**17 oct (2) — vigilancia del servidor y latido del cron**. Antes, si algo
+se rompía, nadie se enteraba hasta que alguien protestaba.
+- `vigilarServidor` (lib/vigilancia.ts), en cada pasada del cron:
+  - Si en una pasada con dos o más cuentas no se sincronizó ninguna:
+    "La sincronización falla para todos", con el primer error.
+  - Una vez por hora (marca en `notification_log`, tipo `vigilancia-hora`;
+    el cron borra las de más de dos días): una llamada barata a Steam
+    (GetPlayerSummaries), OpenXBL (`/account`) y Twitch (token de IGDB).
+    Avisa si falta la clave, si la rechazan (401/403; 400 en Twitch) o si
+    se acabó el cupo (429). Una caída suya (5xx) o de red no se avisa: se
+    arregla sola.
+  - Cada problema, una vez al día como mucho (tipo `vigilancia`).
+- `lib/avisoDesarrollador.ts`: lo común (quién es el desarrollador, avisar
+  una vez por clave, el latido). `credencialPsn.ts` lo reutiliza.
+- Latido: cada pasada que llega al final apunta su hora; Admin → Sistema
+  enseña "Cron de sincronización · última pasada hace X" (verde < 1 h,
+  amarillo < 6 h, rojo si más o nunca).
+- No se pudo probar contra los servicios de verdad (el proxy de la sesión
+  no deja salir a Steam, OpenXBL ni Twitch). Por eso solo se avisa con
+  respuestas claras: lo dudoso no avisa.
+- El cron más frecuente queda en manos del usuario: un cron externo por URL
+  (pasos en HANDOFF.md, "Esperando al usuario").
+
 **17 oct — DM de Discord en el idioma de cada persona**. Faltaban los que
 arma lib/discordBot.ts por su cuenta: trofeos nuevos, platino, nivel,
 invitación a una liga y el de prueba. Ahora salen de `textosDm(idioma)`

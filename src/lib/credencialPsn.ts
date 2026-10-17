@@ -2,10 +2,10 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { notificationLog, users } from "@/db/schema";
+import { notificationLog } from "@/db/schema";
 import { avisarUsuario } from "@/lib/avisos";
 import { avisoNpsso, diasRestantesNpsso, type AvisoNpsso } from "@/lib/caducidadNpsso";
-import { CORREO_DESARROLLADOR } from "@/lib/profiles";
+import { idDesarrollador } from "@/lib/avisoDesarrollador";
 import { getAuthorization, isPsnConfigured, PsnAuthError } from "@/lib/psn/auth";
 
 /**
@@ -29,11 +29,6 @@ const RUTA_ADMIN = "/admin?tab=system";
 function huellaNpsso(): string | null {
   const npsso = process.env.PSN_NPSSO;
   return npsso ? createHash("sha256").update(npsso).digest("hex").slice(0, 12) : null;
-}
-
-async function idDesarrollador(): Promise<string | null> {
-  const [fila] = await db.select({ id: users.id }).from(users).where(eq(users.email, CORREO_DESARROLLADOR)).limit(1);
-  return fila?.id ?? null;
 }
 
 async function vistoDesde(userId: string, huella: string): Promise<Date | null> {

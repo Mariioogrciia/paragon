@@ -68,7 +68,12 @@
       "psnFalta": "PSN_NPSSO missing: PSN isn't syncing",
       "psnCaducado": "NPSSO expired: renew it in Vercel",
       "psnDias": "Expires in about {dias} days",
-      "psnSinDatos": "No data yet (the cron records it)"
+      "psnSinDatos": "No data yet (the cron records it)",
+      "cron": "Sync cron",
+      "cronNunca": "No runs recorded yet",
+      "cronMin": "Last run {n} min ago",
+      "cronHoras": "Last run {n} h ago",
+      "cronDias": "Last run {n} days ago"
     },
     "recentSyncs": {
       "title": "Recent syncs",

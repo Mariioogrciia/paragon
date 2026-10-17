@@ -11,6 +11,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 import { estadoCredencialPsn } from "@/lib/credencialPsn";
 import { DIAS_AVISO_ANTES } from "@/lib/caducidadNpsso";
+import { minutosDesdePasadaCron } from "@/lib/avisoDesarrollador";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -73,6 +74,8 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
   const recentTrophies = currentTab === "trophies" ? await getAdminRecentTrophies(60 * pagina + 1) : null;
   const syncRuns = currentTab === "system" ? await getRecentSyncRuns(30) : null;
   const credencialPsn = currentTab === "system" ? await estadoCredencialPsn(session.user.id) : null;
+  // Latido del cron (lib/avisoDesarrollador.ts): si se para, aquí se ve.
+  const minutosCron = currentTab === "system" ? await minutosDesdePasadaCron(session.user.id).catch(() => null) : null;
   const [moderacion, activities] =
     currentTab === "moderation" ? await Promise.all([getAdminModeracion(), getAdminActivities(30 * pagina + 1)]) : [null, null];
   const handleMsg = typeof searchParams.handleMsg === "string" ? HANDLE_MENSAJES[searchParams.handleMsg] : null;
@@ -587,6 +590,30 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
                   <span className="font-bold text-sm">{t("system.infrastructure.supabase")}</span>
+                </div>
+                {/* Rojo si lleva más de 6 h sin pasar (con el cron externo debería ser cada 10-30 min). */}
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-2 h-2 shrink-0 rounded-full ${
+                      minutosCron === null || minutosCron > 360
+                        ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+                        : minutosCron > 60
+                          ? "bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]"
+                          : "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+                    }`}
+                  />
+                  <div>
+                    <span className="font-bold text-sm">{t("system.infrastructure.cron")}</span>
+                    <p className="text-xs text-muted">
+                      {minutosCron === null
+                        ? t("system.infrastructure.cronNunca")
+                        : minutosCron < 60
+                          ? t("system.infrastructure.cronMin", { n: minutosCron })
+                          : minutosCron < 60 * 48
+                            ? t("system.infrastructure.cronHoras", { n: Math.round(minutosCron / 60) })
+                            : t("system.infrastructure.cronDias", { n: Math.round(minutosCron / 1440) })}
+                    </p>
+                  </div>
                 </div>
                 {/* El NPSSO del servidor caduca cada ~2 meses (lib/credencialPsn.ts). */}
                 <div className="flex items-center gap-3">

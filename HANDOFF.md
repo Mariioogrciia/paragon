@@ -17,7 +17,7 @@ master (`75ef977`). Regla del usuario: **siempre push a master**
 **CI**: todo en verde en `75ef977` (16 oct, master): web, APK de Android e
 IPA de iOS. Después, solo cambios de servidor y documentación (la web se
 comprueba en cada push).
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 175 tests de
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 179 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
@@ -46,6 +46,17 @@ comprueba en cada push).
   (WidgetKit). Las push solo con firma de pago.
 
 **Esperando al usuario** (no se puede hacer desde aquí):
+0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron
+   corre cada 3-5 h (GitHub retrasa el suyo) y los avisos llegan tarde. En
+   https://cron-job.org (o cualquier servicio de cron por URL):
+   - URL: `https://platinos-nine.vercel.app/api/cron/sync` (o el dominio
+     propio cuando lo haya), método GET, cada 15 minutos.
+   - Cabecera: `Authorization: Bearer <el valor de CRON_SECRET en Vercel>`.
+   - Activar el aviso por correo si falla.
+   El workflow de GitHub se queda de respaldo. Para comprobarlo: Admin →
+   Sistema → "Cron de sincronización" tiene que decir "hace pocos minutos".
+   Más a menudo que cada 10 min no hace falta (el cron ya reparte el
+   trabajo y el plan Hobby de Vercel tiene tope de CPU).
 1. **Google Play**: todo preparado en `kmp/play/`, con la guía paso a paso
    en su README:
    - Cuenta de desarrollador (25 $), clave de firma y secretos
@@ -76,7 +87,13 @@ comprueba en cada push).
    emulador de Windows no arranca desde la actualización 26200 → 26300
    (probablemente basta con reiniciar).
 
-**Lo último** (16 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+**Lo último** (16-17 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+- **Vigilancia del servidor** (17 oct): te avisa (push, DM y campana, una
+  vez al día por problema) si la sincronización falla para todos o si
+  Steam, Xbox o IGDB rechazan su clave o se quedan sin cupo
+  (`lib/vigilancia.ts`). Admin → Sistema enseña cuándo pasó el cron por
+  última vez.
+- **DM de Discord en el idioma de cada persona** (17 oct).
 0. **Push y avisos en el idioma de cada persona**: se escriben en español y
    se traducen al salir (`lib/avisosTraduccion.ts`) con `users.language`,
    que ahora guarda el idioma del móvil al abrir la app y el elegido en la
@@ -158,6 +175,10 @@ pantallas en la app, 4 idiomas en todo.
 - Push: `src/lib/webPush.ts` (navegador), `src/lib/fcm.ts` (Android, y reparte
   los de iOS) y `src/lib/apns.ts` (iOS).
 - Contrato de la API móvil: `src/app/api/mobile/CONTRACT.md`.
+- Vigilancia y avisos al desarrollador: `src/lib/vigilancia.ts` (claves de
+  Steam/Xbox/IGDB y sincronización caída; reglas en `vigilanciaReglas.ts`),
+  `src/lib/credencialPsn.ts` (NPSSO) y `src/lib/avisoDesarrollador.ts`
+  (avisar una vez, latido del cron).
 - Avisos: `src/lib/avisos.ts` (`avisarUsuario`: push + Discord + bandeja),
   traducción al salir en `src/lib/avisosTraduccion.ts` (**si cambias la
   frase de un aviso, cámbiala también ahí**) con el idioma de

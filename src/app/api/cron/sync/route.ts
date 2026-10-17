@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { games, platformAccounts, rateLimits, sessions, syncRuns, userGames, userTrophies } from "@/db/schema";
+import { games, notificationLog, platformAccounts, rateLimits, sessions, syncRuns, userGames, userTrophies } from "@/db/schema";
 import { resyncLibraries } from "@/lib/profiles";
 import { syncGameTrophies } from "@/lib/sync";
 import { pegiPorTitulo } from "@/lib/igdb/client";
@@ -18,6 +18,8 @@ import { cerrarTemporadaAnteriorSiToca } from "@/lib/temporadas";
 import { registrarHorasDelDia } from "@/lib/horasPeriodo";
 import { revisarCredencialPsn } from "@/lib/credencialPsn";
 import { limpiarAvisosViejos } from "@/lib/bandeja";
+import { vigilarServidor } from "@/lib/vigilancia";
+import { apuntarPasadaCron, idDesarrollador } from "@/lib/avisoDesarrollador";
 
 /**
  * Sincronización desatendida.
@@ -468,6 +470,11 @@ export async function GET(request: Request) {
     console.error("[cron-sync] limpieza sync_run", error);
   }
 
+  // Vigilancia (lib/vigilancia.ts): avisa al desarrollador si la
+  // sincronización ha fallado para todos o, una vez por hora, si Steam,
+  // Xbox o IGDB rechazan su clave. Nunca lanza.
+  const vigilancia = await vigilarServidor(resultados);
+
   // Bandeja de avisos (lib/bandeja.ts): fuera lo de hace más de 60 días.
   try {
     await limpiarAvisosViejos();
@@ -518,6 +525,20 @@ export async function GET(request: Request) {
     console.error("[cron-sync] palmarés", error);
   }
 
+  // Latido: la hora de esta pasada, para Admin → Sistema (lib/avisoDesarrollador.ts).
+  // Las marcas horarias de la vigilancia de hace más de dos días ya no sirven.
+  try {
+    const desarrollador = await idDesarrollador();
+    if (desarrollador) {
+      await apuntarPasadaCron(desarrollador);
+      await db
+        .delete(notificationLog)
+        .where(and(eq(notificationLog.tipo, "vigilancia-hora"), lt(notificationLog.enviadoAt, new Date(Date.now() - 2 * 86_400_000))));
+    }
+  } catch (error) {
+    console.error("[cron-sync] latido", error);
+  }
+
   return NextResponse.json({
     sincronizados: resultados.filter((r) => r.error === undefined).length,
     fallidos: resultados.filter((r) => r.error !== undefined).length,
@@ -531,6 +552,7 @@ export async function GET(request: Request) {
     temporadasCerradas,
     resumenesSemanales,
     credencialPsn,
+    vigilancia,
     premiosLigaMensual,
     premiosLigasPrivadas,
     pendientesPorTiempo: agotado,

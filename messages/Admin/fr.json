@@ -68,7 +68,12 @@
       "psnFalta": "PSN_NPSSO manquant : PSN ne se synchronise pas",
       "psnCaducado": "NPSSO expiré : renouvelle-le dans Vercel",
       "psnDias": "Expire dans environ {dias} jours",
-      "psnSinDatos": "Pas encore de données (le cron les enregistre)"
+      "psnSinDatos": "Pas encore de données (le cron les enregistre)",
+      "cron": "Cron de synchronisation",
+      "cronNunca": "Aucun passage enregistré pour l'instant",
+      "cronMin": "Dernier passage il y a {n} min",
+      "cronHoras": "Dernier passage il y a {n} h",
+      "cronDias": "Dernier passage il y a {n} jours"
     },
     "recentSyncs": {
       "title": "Synchronisations récentes",
