@@ -21,6 +21,8 @@ type Trad = Record<Exclude<Idioma, "es">, string>;
 const FIJOS: Record<string, Trad> = {
   "✅ Paragon conectado": { en: "✅ Paragon connected", de: "✅ Paragon verbunden", fr: "✅ Paragon connecté" },
   "Cuando consigas un trofeo nuevo, se avisa aquí.": { en: "When you earn a new trophy, you'll be notified here.", de: "Wenn du eine neue Trophäe holst, wirst du hier benachrichtigt.", fr: "Quand tu obtiens un nouveau trophée, tu es prévenu ici." },
+  "📅 Tu semana en Paragon": { en: "📅 Your week on Paragon", de: "📅 Deine Woche auf Paragon", fr: "📅 Ta semaine sur Paragon" },
+  "Esta semana no ha caído ningún trofeo — ¿retomamos algo?": { en: "No trophies this week — shall we pick something back up?", de: "Diese Woche keine Trophäe — sollen wir etwas wieder aufnehmen?", fr: "Aucun trophée cette semaine — on reprend quelque chose ?" },
   "Nueva solicitud de amistad": { en: "New friend request", de: "Neue Freundschaftsanfrage", fr: "Nouvelle demande d'ami" },
   "🤝 Solicitud aceptada": { en: "🤝 Request accepted", de: "🤝 Anfrage angenommen", fr: "🤝 Demande acceptée" },
   "Invitación a una liga": { en: "League invite", de: "Liga-Einladung", fr: "Invitation à une ligue" },
@@ -156,6 +158,32 @@ const PATRONES: { re: RegExp; trad: (m: RegExpMatchArray) => Trad }[] = [
   { re: /^Se ha cancelado la sesión de «(.*)»\.$/, trad: (m) => ({ en: `The session for "${m[1]}" has been cancelled.`, de: `Die Sitzung für „${m[1]}“ wurde abgesagt.`, fr: `La session pour « ${m[1]} » a été annulée.` }) },
   { re: /^⏰ Sesión en (\d+) min: (.*)$/, trad: (m) => ({ en: `⏰ Session in ${m[1]} min: ${m[2]}`, de: `⏰ Sitzung in ${m[1]} Min.: ${m[2]}`, fr: `⏰ Session dans ${m[1]} min : ${m[2]}` }) },
   { re: /^«(.*)» con (\d+) personas\.$/, trad: (m) => ({ en: `“${m[1]}” with ${m[2]} people.`, de: `„${m[1]}“ mit ${m[2]} Personen.`, fr: `« ${m[1]} » avec ${m[2]} personnes.` }) },
+
+  // Resumen semanal por DM de Discord (lib/resumenSemanal.ts), línea a línea.
+  {
+    re: /^🏆 \*\*(\d+)\*\* trofeos en \*\*(\d+)\*\* juegos(?: · 💎 \*\*(\d+)\*\* platinos?)?$/,
+    trad: (m) => {
+      const p = m[3];
+      const pl = { en: p ? ` · 💎 **${p}** platinum${p === "1" ? "" : "s"}` : "", de: p ? ` · 💎 **${p}** Platin` : "", fr: p ? ` · 💎 **${p}** platine${s(p)}` : "" };
+      return {
+        en: `🏆 **${m[1]}** troph${m[1] === "1" ? "y" : "ies"} in **${m[2]}** game${s(m[2])}${pl.en}`,
+        de: `🏆 **${m[1]}** Trophäe${m[1] === "1" ? "" : "n"} in **${m[2]}** Spiel${m[2] === "1" ? "" : "en"}${pl.de}`,
+        fr: `🏆 **${m[1]}** trophée${s(m[1])} dans **${m[2]}** jeu${m[2] === "1" ? "" : "x"}${pl.fr}`,
+      };
+    },
+  },
+  {
+    re: /^🔥 Racha de \*\*(\d+)\*\* días?( \(¡consigue uno hoy para no perderla!\))?$/,
+    trad: (m) => {
+      const aviso = Boolean(m[2]);
+      return {
+        en: `🔥 **${m[1]}**-day streak${aviso ? " (earn one today to keep it!)" : ""}`,
+        de: `🔥 Serie von **${m[1]}** Tag${m[1] === "1" ? "" : "en"}${aviso ? " (hol heute eine, um sie nicht zu verlieren!)" : ""}`,
+        fr: `🔥 Série de **${m[1]}** jour${s(m[1])}${aviso ? " (obtiens-en un aujourd'hui pour ne pas la perdre !)" : ""}`,
+      };
+    },
+  },
+  { re: /^📊 Vas \*\*(\d+)º\*\* de (\d+) en la liga del mes$/, trad: (m) => ({ en: `📊 You're **${m[1]}** of ${m[2]} in this month's league`, de: `📊 Du bist **${m[1]}.** von ${m[2]} in der Monatsliga`, fr: `📊 Tu es **${m[1]}e** sur ${m[2]} dans la ligue du mois` }) },
 ];
 
 function traducirLinea(linea: string, idioma: Exclude<Idioma, "es">): string {

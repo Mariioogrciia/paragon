@@ -6,6 +6,7 @@ import type { Trophy } from "@/lib/types";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { traducirAviso } from "@/lib/avisosTraduccion";
 import { idiomaDeUsuario } from "@/lib/idiomaUsuario";
+import { textosDm } from "@/lib/textosDiscord";
 
 /**
  * Avisos de trofeos por DM del propio bot de Discord de Paragon —
@@ -190,9 +191,10 @@ export async function anunciarNivelSiSube(userId: string): Promise<void> {
   if (!discordUserId) return;
 
   if (row.discordDmEnabled) {
+    const t = textosDm(await idiomaDeUsuario(userId));
     await enviarDM(discordUserId, {
-      title: `⭐ ¡Nivel Paragon ${nivel.level}!`,
-      description: "Le has dado bien esta temporada.",
+      title: t.nivelTitulo(nivel.level),
+      description: t.nivelTexto,
       color: COLOR_GENERICO,
       footer: { text: "Paragon" },
     });
@@ -249,10 +251,12 @@ export async function anunciarLogrosNuevos(
   const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   const href = row.handle && dominio ? `https://${dominio}/u/${row.handle}/${opts.gameId}` : undefined;
   const platino = opts.nuevos.find((t) => t.grade === "platinum");
+  // En el idioma de quien lo recibe (lib/textosDiscord.ts).
+  const textos = textosDm(await idiomaDeUsuario(userId));
 
   if (platino) {
     await enviarDM(discordUserId, {
-      title: `🏆 ¡Platino conseguido! — ${opts.juego}`,
+      title: textos.platinoTitulo(opts.juego),
       url: href,
       color: COLOR_PLATINO,
       thumbnail: opts.iconUrl ? { url: opts.iconUrl } : undefined,
@@ -270,10 +274,10 @@ export async function anunciarLogrosNuevos(
     .slice(0, 5)
     .map((t) => `${t.grade ? (EMOJI[t.grade] ?? "🔹") : "🔹"} ${t.name}`)
     .join("\n");
-  const resto = opts.nuevos.length > 5 ? `\n… y ${opts.nuevos.length - 5} más` : "";
+  const resto = opts.nuevos.length > 5 ? `\n${textos.masTrofeos(opts.nuevos.length - 5)}` : "";
 
   await enviarDM(discordUserId, {
-    title: `🎮 ${opts.juego} — ${opts.nuevos.length === 1 ? "1 trofeo nuevo" : `${opts.nuevos.length} trofeos nuevos`}`,
+    title: textos.trofeosTitulo(opts.juego, opts.nuevos.length),
     description: lista + resto,
     url: href,
     color: colorDeGrado(opts.nuevos[0]?.grade),
@@ -289,9 +293,10 @@ export async function probarDiscordDm(userId: string): Promise<{ ok: boolean; er
     return { ok: false, error: "Tu cuenta de Paragon no inició sesión con Discord, así que no hay a quién escribir." };
   }
 
+  const t = textosDm(await idiomaDeUsuario(userId));
   return enviarDM(discordUserId, {
-    title: "✅ Paragon conectado",
-    description: "Cuando consigas un trofeo nuevo, te lo digo por aquí.",
+    title: t.conectadoTitulo,
+    description: t.conectadoTexto,
     color: COLOR_GENERICO,
     footer: { text: "Paragon" },
   });
@@ -318,9 +323,10 @@ export async function anunciarInvitacionLiga(userId: string, leagueName: string,
   const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   const href = dominio ? `https://${dominio}/ligas/${leagueId}` : undefined;
 
+  const t = textosDm(await idiomaDeUsuario(userId));
   await enviarDM(discordUserId, {
-    title: "🏅 Invitación a una liga",
-    description: `${inviterName} te ha invitado a la liga **${leagueName}** en Paragon.`,
+    title: t.ligaTitulo,
+    description: t.ligaTexto(inviterName, leagueName),
     url: href,
     color: COLOR_GENERICO,
     footer: { text: "Paragon" },

@@ -6,6 +6,17 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**17 oct — DM de Discord en el idioma de cada persona**. Faltaban los que
+arma lib/discordBot.ts por su cuenta: trofeos nuevos, platino, nivel,
+invitación a una liga y el de prueba. Ahora salen de `textosDm(idioma)`
+(lib/textosDiscord.ts, una tabla por idioma con los datos dentro, sin
+patrones) con `idiomaDeUsuario`. El resumen semanal ya iba por
+`enviarDmSiActivo`: se le añadieron sus frases a lib/avisosTraduccion.ts
+(trofeos/juegos/platinos, racha y puesto en la liga, con plurales). Los
+anuncios en el canal de un servidor siguen en español (los lee todo el
+servidor). Tests: tests/textosDiscord.test.ts y el resumen en
+tests/avisosTraduccion.test.ts.
+
 **16 oct (7) — push y avisos en el idioma de cada persona**. Antes todas
 las push salían en español.
 - Los avisos se siguen escribiendo en español donde nacen, y se traducen al

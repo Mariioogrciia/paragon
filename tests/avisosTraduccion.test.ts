@@ -66,6 +66,19 @@ describe("traducirAviso", () => {
     expect(traducirAviso("⏰ Sesión en 30 min: Elden Ring", "en")).toBe("⏰ Session in 30 min: Elden Ring");
   });
 
+  it("resumen semanal de Discord, línea a línea", () => {
+    const texto = [
+      "🏆 **12** trofeos en **3** juegos · 💎 **1** platino",
+      "🔥 Racha de **4** días (¡consigue uno hoy para no perderla!)",
+      "📊 Vas **2º** de 9 en la liga del mes",
+    ].join("\n");
+    expect(traducirAviso(texto, "en")).toBe(
+      ["🏆 **12** trophies in **3** games · 💎 **1** platinum", "🔥 **4**-day streak (earn one today to keep it!)", "📊 You're **2** of 9 in this month's league"].join("\n"),
+    );
+    expect(traducirAviso("📅 Tu semana en Paragon", "fr")).toBe("📅 Ta semaine sur Paragon");
+    expect(traducirAviso("🔥 Racha de **1** día", "de")).toBe("🔥 Serie von **1** Tag");
+  });
+
   it("lo que no conoce sale como estaba", () => {
     expect(traducirAviso("Elden Ring", "en")).toBe("Elden Ring");
   });

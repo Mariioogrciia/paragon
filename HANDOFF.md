@@ -17,7 +17,7 @@ master (`75ef977`). Regla del usuario: **siempre push a master**
 **CI**: todo en verde en `75ef977` (16 oct, master): web, APK de Android e
 IPA de iOS. Después, solo cambios de servidor y documentación (la web se
 comprueba en cada push).
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 172 tests de
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 175 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
@@ -80,8 +80,9 @@ comprueba en cada push).
 0. **Push y avisos en el idioma de cada persona**: se escriben en español y
    se traducen al salir (`lib/avisosTraduccion.ts`) con `users.language`,
    que ahora guarda el idioma del móvil al abrir la app y el elegido en la
-   web. Vale para push del navegador, Android, iPhone, DM de Discord de
-   `avisarUsuario` y la campana.
+   web. Vale para push del navegador, Android, iPhone, la campana y todos
+   los DM de Discord (los de trofeos, nivel, invitación y prueba, con
+   `lib/textosDiscord.ts`; el resumen semanal, con la misma traducción).
 1. **Avisos dentro de la plataforma**: bandeja (`lib/bandeja.ts`, tabla
    `aviso`) con todo lo que sale por push.
    - Web: campana en la cabecera con contador, lista y avisos flotantes.
@@ -106,9 +107,9 @@ el desarrollador), avisos que abren su pantalla, límites en la API móvil,
 lint a cero y las pantallas v2.
 
 **Pendiente de código** (pequeño, nada pedido):
-- **DM de Discord de trofeos, nivel y resumen semanal**: siguen en español
-  (los arma `lib/discordBot.ts` y `lib/resumenSemanal.ts` por su cuenta). El
-  resto de avisos ya sale en el idioma de cada uno (ver "Lo último").
+- **Anuncios en el canal de un servidor de Discord** (nivel, platino): siguen
+  en español a propósito, los lee todo el servidor. Todo lo que llega a una
+  persona (push, DM, campana) ya sale en su idioma.
 - **Hora de los avisos en la web**: la campana usa `relativeDate`, que solo
   distingue días ("hoy", "ayer"); en la app sí sale "hace 5 min".
 - **Capturas de Google Play**: hay 2 (el mínimo) y con la app en español.
