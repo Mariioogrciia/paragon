@@ -6,6 +6,30 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**19 oct (2) — anuncios preparados (apagados) con consentimiento
+certificado**. El usuario quiere ir metiendo anuncios; se deja todo lo que
+pide AdSense listo antes del dominio, sin que cambie nada hasta encenderlo.
+- `lib/publicidad.ts` (con tests): valida `NEXT_PUBLIC_ADSENSE_CLIENT`
+  (`ca-pub-` + dígitos) y `NEXT_PUBLIC_ADSENSE_SLOT`; sin ID válido,
+  `anunciosActivos()` es falso y no se carga nada.
+- `components/PublicidadScripts.tsx` (en el layout): la etiqueta del
+  mensaje de consentimiento de Google "Privacidad y mensajes"
+  (`fundingchoicesmessages.google.com/i/pub-…?ers=1`, IAB TCF v2.2) con la
+  señal `googlefcPresent`, y después `adsbygoogle.js`. AdSense espera al
+  consentimiento por su cuenta.
+- `app/ads.txt/route.ts`: la línea de Google, o 404 sin ID.
+- `components/HuecoAnuncio.tsx`: bloque adaptable, solo si además hay slot.
+  Puesto al final de Descubrir y en la ficha de juego (tras la lista de
+  deseos), lejos de botones para no provocar clics sin querer.
+- `components/GestionarConsentimiento.tsx`: "Gestionar cookies" en el pie y
+  en /cookies, que vuelve a abrir el mensaje de Google
+  (`googlefc.showRevocationMessage`).
+- Con anuncios activos, `CookieBanner` (el aviso informativo propio) se
+  oculta, y /privacidad y /cookies usan otros textos (Google y sus socios,
+  cookies de publicidad, enlace a cómo usa Google los datos). En es/en/de/fr.
+Probado en local con un ID falso: `ads.txt` correcto y las dos etiquetas en
+el HTML; sin ID, 404 y nada de Google. Guía para encenderlo en el HANDOFF.
+
 **19 oct — datos estructurados (JSON-LD) para Google**. No había ninguno.
 `lib/datosEstructurados.ts` (funciones puras con tests) y
 `components/JsonLd.tsx` (escapa `<`, como recomienda la guía de Next):

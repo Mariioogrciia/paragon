@@ -71,8 +71,11 @@ perfil privado.
      secreto `PLAY_SERVICE_ACCOUNT_JSON`.
    - Ojo: con una cuenta personal nueva, Google exige una prueba cerrada
      con **12 personas durante 14 días** antes de producción.
-2. **Dominio propio** (sin comprar). Sirve cualquier registrador (Vercel,
-   Cloudflare, Porkbun...): comprado fuera, se apuntan sus DNS a Vercel.
+2. **Dominio propio** (sin comprar). Sirve cualquier registrador
+   (Cloudflare, Porkbun, Namecheap, Spaceship...): comprado fuera, en Vercel
+   → Domains se añade y se crean en el registrador los registros que pida
+   (normalmente `A @ 76.76.21.21` y `CNAME www cname.vercel-dns.com`). Usar
+   un dominio propio en Hobby no cuesta nada en Vercel.
    Candidato: `paragontrophies.com` (~11 $/año). Al comprarlo hay que:
    - Cambiar las referencias a `platinos-nine` (`grep -rn platinos-nine src
      kmp extension video`): api/esports/img, ajustes/escaparate,
@@ -91,6 +94,10 @@ perfil privado.
    (probablemente basta con reiniciar).
 
 **Lo último** (16-19 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+- **Anuncios preparados y apagados** (19 oct, `lib/publicidad.ts`): AdSense
+  con el mensaje de consentimiento certificado de Google, `/ads.txt`,
+  huecos en Descubrir y en la ficha de juego, y textos de privacidad y
+  cookies que cambian solos. Se encienden con una variable; guía abajo.
 - **Datos estructurados para Google** (19 oct, `lib/datosEstructurados.ts`):
   el sitio y su autor en todas las páginas, la app en la portada, cada
   perfil público (`ProfilePage`) y cada ficha de juego (`VideoGame`, con la
@@ -131,19 +138,37 @@ Antes (15 oct): varias cuentas de Steam en el mismo perfil (de momento solo
 el desarrollador), avisos que abren su pantalla, límites en la API móvil,
 lint a cero y las pantallas v2.
 
-**Si se meten anuncios** (es la idea del usuario, 19 oct; aún no hay ninguno):
-- Vercel: el plan Hobby es solo para uso no comercial; con anuncios hay que
-  pasar a Pro (~20 $/mes; confirmar en su página de precios y en las "Fair
-  Use Guidelines").
-- Google AdSense pide dominio propio, política de privacidad al día y, en
-  Europa, un banner de consentimiento certificado (IAB TCF, por ejemplo el
-  de Google "Privacidad y mensajes"); el aviso de cookies de ahora es solo
-  informativo y no vale. También un `ads.txt` en la raíz.
-- En la app, AdMob, y actualizar "Seguridad de los datos" de Google Play
-  (los anuncios recogen identificadores).
-- Con poco tráfico los anuncios dan céntimos: primero tráfico (dominio,
-  Google, Play, LinkedIn); los enlaces de afiliado en "Platinos de oferta" y
-  las alertas de precio pueden rendir antes.
+**Anuncios: el código está listo y apagado** (19 oct; detalle en HISTORIAL.md).
+Mientras no exista `NEXT_PUBLIC_ADSENSE_CLIENT` no se carga nada de Google,
+`/ads.txt` da 404 y todo sigue como antes. Para encenderlos, en este orden:
+1. **Dominio propio** (AdSense no aprueba un `*.vercel.app`). Ver el punto 2
+   de arriba.
+2. **Cuenta de AdSense** (https://adsense.google.com) y añadir el dominio
+   como sitio. Google da el ID de editor `ca-pub-XXXXXXXXXXXXXXXX`.
+3. En Vercel → Settings → Environment Variables (Production):
+   `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-…` y, si se quieren los huecos fijos
+   (Descubrir y ficha de juego), `NEXT_PUBLIC_ADSENSE_SLOT=<id del bloque>`
+   (AdSense → Anuncios → Por bloque de anuncios → Display). **Redesplegar**:
+   las `NEXT_PUBLIC_` se meten al compilar.
+4. Comprobar `https://<dominio>/ads.txt` (una línea `google.com, pub-…,
+   DIRECT, f08c47fec0942fa0`) y pedir la revisión del sitio en AdSense.
+5. AdSense → **Privacidad y mensajes** → "Reglamentos europeos" → crear y
+   **publicar** el mensaje de consentimiento (IAB TCF v2.2, certificado).
+   Idiomas: es, en, de, fr. Opciones: "Consentir", "No consentir" y
+   "Gestionar opciones". Sin publicarlo, en Europa solo salen anuncios
+   limitados. La web ya carga la etiqueta de ese mensaje
+   (`components/PublicidadScripts.tsx`) y el enlace "Gestionar cookies" del
+   pie lo vuelve a abrir.
+6. Opcional: "Anuncios automáticos" en AdSense; no hace falta tocar código.
+7. **Vercel Pro** (~20 $/mes) en cuanto haya anuncios: Hobby es solo para
+   uso no comercial.
+Con anuncios activos, el aviso de cookies propio se oculta (lo sustituye el
+de Google) y `/privacidad` y `/cookies` cambian solos su texto para nombrar
+a Google y sus socios. Falta, si se quiere: AdMob en la app (con el
+consentimiento UMP) y actualizar "Seguridad de los datos" y "Anuncios: sí"
+en Google Play (`kmp/play/README.md` dice ahora "no tiene anuncios").
+Con poco tráfico los anuncios dan céntimos: los enlaces de afiliado en
+"Platinos de oferta" y las alertas de precio pueden rendir antes.
 
 **Pendiente de código** (nada pedido):
 - **Copia de seguridad de la base**: el plan gratis de Supabase no deja

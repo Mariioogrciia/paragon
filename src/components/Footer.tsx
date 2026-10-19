@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { GestionarConsentimiento } from "@/components/GestionarConsentimiento";
 import { SiInstagram, SiTiktok, SiGithub } from "@icons-pack/react-simple-icons";
 
 export function Footer() {
@@ -42,6 +43,7 @@ export function Footer() {
           >
             {t("cookies")}
           </Link>
+          <GestionarConsentimiento className="font-medium text-muted hover:text-foreground transition-colors" />
           <Link
             href="/terminos"
             className="font-medium text-muted hover:text-foreground transition-colors"

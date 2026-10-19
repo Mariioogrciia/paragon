@@ -48,7 +48,9 @@
     "cookies": "Cookies",
     "terminos": "AGB",
     "desarrolladoPor": "Entwickelt von",
-    "noAfiliado": "Nicht verbunden mit Sony oder Valve"
+    "noAfiliado": "Nicht verbunden mit Sony oder Valve",
+    "publicidad": "Anzeige",
+    "gestionarCookies": "Cookies verwalten"
   },
   "CookieBanner": {
     "ariaLabel": "Cookie-Hinweis",
@@ -516,7 +518,9 @@
     "s8t": "Minderjährige",
     "s8": "Paragon richtet sich nicht an Kinder unter 14 Jahren und fragt nicht wissentlich Daten von Personen unter diesem Alter ab. Falls du denkst, dass uns ein Minderjähriger Daten gegeben hat, schreib uns, und wir löschen sie.",
     "s9t": "Änderungen dieser Richtlinie",
-    "s9": "Ändert sich diese Richtlinie wesentlich, wird das Datum oben aktualisiert und, wenn die Änderung wichtig ist, innerhalb der App selbst darauf hingewiesen."
+    "s9": "Ändert sich diese Richtlinie wesentlich, wird das Datum oben aktualisiert und, wenn die Änderung wichtig ist, innerhalb der App selbst darauf hingewiesen.",
+    "s3pAnuncios": "Wir verkaufen oder vermieten deine personenbezogenen Daten <strong>niemals</strong>. Die Website zeigt Anzeigen von Google AdSense: Google kann Cookies und Kennungen verwenden, um sie anzuzeigen und zu messen, nur soweit du im Einwilligungshinweis zustimmst (siehe <cookiesLink>Cookie-Richtlinie</cookiesLink>). Besuche messen wir aggregiert und anonym mit Vercel Analytics, ohne Cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), um Anzeigen auf der Website zu zeigen, mit den Cookies und Kennungen, die du im Einwilligungshinweis erlaubst."
   },
   "Terminos": {
     "titulo": "Allgemeine Geschäftsbedingungen",
@@ -559,7 +563,10 @@
     "s6t": "Weitere Informationen",
     "s6": "Um zu erfahren, welche personenbezogenen Daten verarbeitet werden und wofür, sieh dir die <privacidadLink>Datenschutzerklärung</privacidadLink> und die <terminosLink>Allgemeine Geschäftsbedingungen</terminosLink> an.",
     "s6privacidadLink": "Datenschutzerklärung",
-    "s6terminosLink": "Allgemeine Geschäftsbedingungen"
+    "s6terminosLink": "Allgemeine Geschäftsbedingungen",
+    "s1Anuncios": "Paragon zeigt <strong>Anzeigen von Google AdSense</strong> und nutzt Werbe-Cookies nur, wenn du sie im Einwilligungshinweis akzeptierst. Ohne deine Erlaubnis sind die Anzeigen nicht personalisiert. Dazu kommt das Cookie, das dich angemeldet hält; die Nutzungsanalyse (siehe unten) verwendet keine Cookies und identifiziert dich nicht.",
+    "sAnunciosT": "Werbung (Google AdSense)",
+    "sAnuncios": "Die Anzeigen liefert Google AdSense. Bevor etwas nicht Notwendiges geladen wird, fragt ein zertifizierter Einwilligungshinweis (der von Google, IAB-TCF-kompatibel), was du erlaubst: personalisierte Anzeigen, nicht personalisierte oder nichts über das Nötige hinaus. Google und seine Partner können Cookies und Kennungen verwenden, um Anzeigen entsprechend deiner Wahl anzuzeigen und zu messen. Du kannst sie jederzeit mit „Cookies verwalten“ in der Fußzeile jeder Seite ändern. Mehr dazu, <googleLink>wie Google Informationen von Websites nutzt, die seine Dienste verwenden</googleLink>."
   },
   "NoEncontrado": {
     "titulo": "Hier ist nichts",

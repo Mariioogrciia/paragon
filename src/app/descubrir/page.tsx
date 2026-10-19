@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import Link from "next/link";
+import { HuecoAnuncio } from "@/components/HuecoAnuncio";
 import { getTranslations } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";
 import { getTrendingGames, getHiddenGems, getMatrizDescubrir } from "@/lib/discover";
@@ -129,6 +130,9 @@ export default async function DescubrirPage() {
           })
         )}
       </div>
+
+      {/* Anuncio, solo con AdSense configurado (lib/publicidad.ts). */}
+      <HuecoAnuncio />
     </div>
   );
 }

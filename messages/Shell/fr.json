@@ -48,7 +48,9 @@
     "cookies": "Cookies",
     "terminos": "Conditions",
     "desarrolladoPor": "Développé par",
-    "noAfiliado": "Non affilié à Sony ni à Valve"
+    "noAfiliado": "Non affilié à Sony ni à Valve",
+    "publicidad": "Publicité",
+    "gestionarCookies": "Gérer les cookies"
   },
   "CookieBanner": {
     "ariaLabel": "Avis sur les cookies",
@@ -516,7 +518,9 @@
     "s8t": "Mineurs",
     "s8": "Paragon ne s'adresse pas aux moins de 14 ans et ne demande pas sciemment de données à des personnes de cet âge. Si tu penses qu'un mineur nous a fourni des données, écris-nous et nous les supprimerons.",
     "s9t": "Changements de cette politique",
-    "s9": "Si cette politique change de façon significative, la date ci-dessus sera mise à jour et, si le changement est important, tu seras prévenu directement dans l'application."
+    "s9": "Si cette politique change de façon significative, la date ci-dessus sera mise à jour et, si le changement est important, tu seras prévenu directement dans l'application.",
+    "s3pAnuncios": "Nous ne vendons ni ne louons <strong>jamais</strong> tes données personnelles. Le site affiche des annonces Google AdSense : Google peut utiliser des cookies et des identifiants pour les afficher et les mesurer, seulement dans la mesure où tu l'acceptes dans l'avis de consentement (voir la <cookiesLink>politique de cookies</cookiesLink>). Les visites sont mesurées de façon agrégée et anonyme avec Vercel Analytics, sans cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), pour afficher des annonces sur le site, avec les cookies et identifiants que tu autorises dans l'avis de consentement."
   },
   "Terminos": {
     "titulo": "Conditions Générales",
@@ -559,7 +563,10 @@
     "s6t": "Plus d'informations",
     "s6": "Pour savoir quelles données personnelles sont traitées et pourquoi, consulte la <privacidadLink>Politique de Confidentialité</privacidadLink> et les <terminosLink>Conditions Générales</terminosLink>.",
     "s6privacidadLink": "Politique de Confidentialité",
-    "s6terminosLink": "Conditions Générales"
+    "s6terminosLink": "Conditions Générales",
+    "s1Anuncios": "Paragon affiche <strong>des annonces Google AdSense</strong> et n'utilise des cookies publicitaires que si tu les acceptes dans l'avis de consentement. Sans ton accord, les annonces ne sont pas personnalisées. Il y a aussi le cookie qui te garde connecté ; l'analyse d'utilisation (voir plus bas) n'utilise pas de cookies et ne t'identifie pas.",
+    "sAnunciosT": "Publicité (Google AdSense)",
+    "sAnuncios": "Les annonces sont diffusées par Google AdSense. Avant de charger quoi que ce soit de non essentiel, un avis de consentement certifié (celui de Google, compatible IAB TCF) te demande ce que tu autorises : annonces personnalisées, non personnalisées ou rien au-delà du nécessaire. Google et ses partenaires peuvent utiliser des cookies et des identifiants pour afficher et mesurer les annonces selon ton choix. Tu peux le changer à tout moment avec « Gérer les cookies », en bas de chaque page. Plus d'infos sur <googleLink>la façon dont Google utilise les informations des sites qui utilisent ses services</googleLink>."
   },
   "NoEncontrado": {
     "titulo": "Rien par ici",

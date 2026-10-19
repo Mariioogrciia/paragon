@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { HuecoAnuncio } from "@/components/HuecoAnuncio";
 import { JsonLd } from "@/components/JsonLd";
 import { datosJuego } from "@/lib/datosEstructurados";
 import { dominioPublico } from "@/lib/site";
@@ -558,6 +559,8 @@ export default async function JuegoGlobalPage({
             publisher={game.publisher}
           />
         )}
+        {/* Anuncio, solo con AdSense configurado (lib/publicidad.ts). */}
+        <HuecoAnuncio />
       </div>
     </div>
     </div>

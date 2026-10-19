@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { anunciosActivos } from "@/lib/publicidad";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -38,7 +39,9 @@ export function CookieBanner() {
     setVisible(false);
   }
 
-  if (!visible) return null;
+  // Con anuncios, el aviso es el de Google (CMP certificado, lib/publicidad.ts):
+  // este, que solo informa, sobraría y taparía el otro.
+  if (!visible || anunciosActivos()) return null;
 
   const enlaceCookies = (chunks: React.ReactNode) => (
     <Link href="/cookies" className="text-accent hover:underline">

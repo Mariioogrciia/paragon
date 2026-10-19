@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { anunciosActivos } from "@/lib/publicidad";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 
@@ -66,7 +67,7 @@ export default async function PrivacidadPage() {
           <li>{t("s3li4")}</li>
         </ul>
         <p className="text-muted">
-          {t.rich("s3p", {
+          {t.rich(anunciosActivos() ? "s3pAnuncios" : "s3p", {
             ...richTags,
             cookiesLink: (chunks) => <Link href="/cookies" className="text-accent hover:underline">{chunks}</Link>,
           })}
@@ -81,6 +82,7 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s4li3", richTags)}</li>
           <li>{t.rich("s4li4", richTags)}</li>
           <li>{t.rich("s4li5", richTags)}</li>
+          {anunciosActivos() && <li>{t.rich("s4liAnuncios", richTags)}</li>}
         </ul>
       </Seccion>
 

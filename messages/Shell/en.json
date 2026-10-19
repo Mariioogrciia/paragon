@@ -48,7 +48,9 @@
     "cookies": "Cookies",
     "terminos": "Terms",
     "desarrolladoPor": "Built by",
-    "noAfiliado": "Not affiliated with Sony or Valve"
+    "noAfiliado": "Not affiliated with Sony or Valve",
+    "publicidad": "Advertisement",
+    "gestionarCookies": "Manage cookies"
   },
   "CookieBanner": {
     "ariaLabel": "Cookie notice",
@@ -516,7 +518,9 @@
     "s8t": "Minors",
     "s8": "Paragon isn't directed at children under 14 and doesn't knowingly request data from anyone under that age. If you believe a minor has given us data, let us know and we'll remove it.",
     "s9t": "Changes to this policy",
-    "s9": "If this policy changes in a meaningful way, the date above will be updated and, when the change matters, you'll be notified inside the app itself."
+    "s9": "If this policy changes in a meaningful way, the date above will be updated and, when the change matters, you'll be notified inside the app itself.",
+    "s3pAnuncios": "We <strong>never</strong> sell or rent your personal data. The website shows Google AdSense ads: Google may use cookies and identifiers to show and measure them, only as far as you accept in the consent notice (see the <cookiesLink>cookie policy</cookiesLink>). Visits are measured in aggregate and anonymously with Vercel Analytics, without cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), to show ads on the website, with the cookies and identifiers you allow in the consent notice."
   },
   "Terminos": {
     "titulo": "Terms and Conditions",
@@ -559,7 +563,10 @@
     "s6t": "More information",
     "s6": "To see what personal data is processed and why, check the <privacidadLink>Privacy Policy</privacidadLink> and the <terminosLink>Terms and Conditions</terminosLink>.",
     "s6privacidadLink": "Privacy Policy",
-    "s6terminosLink": "Terms and Conditions"
+    "s6terminosLink": "Terms and Conditions",
+    "s1Anuncios": "Paragon shows <strong>Google AdSense ads</strong>, and only uses advertising cookies if you accept them in the consent notice. Without your permission, ads aren't personalised. There's also the cookie that keeps you logged in; the usage analytics (see below) uses no cookies and doesn't identify you.",
+    "sAnunciosT": "Advertising (Google AdSense)",
+    "sAnuncios": "Ads are served by Google AdSense. Before anything non-essential loads, a certified consent notice (Google's, IAB TCF compatible) asks what you allow: personalised ads, non-personalised ads, or nothing beyond what's necessary. Google and its partners may use cookies and identifiers to show and measure ads according to your choice. You can change it any time with “Manage cookies” in the footer of every page. More in <googleLink>how Google uses information from sites that use its services</googleLink>."
   },
   "NoEncontrado": {
     "titulo": "Nothing here",

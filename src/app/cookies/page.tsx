@@ -1,5 +1,7 @@
 import React from "react";
 import Link from "next/link";
+import { anunciosActivos } from "@/lib/publicidad";
+import { GestionarConsentimiento } from "@/components/GestionarConsentimiento";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 
@@ -8,6 +10,7 @@ export const metadata = { title: "Cookies · Paragon" };
 export default async function CookiesPage() {
   const t = await getTranslations("Shell.Cookies");
   const tShell = await getTranslations("Shell.BackButton");
+  const anuncios = anunciosActivos();
 
   const richTags = {
     strong: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
@@ -26,8 +29,29 @@ export default async function CookiesPage() {
 
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">{t("s1t")}</h2>
-        <p className="text-muted">{t.rich("s1", richTags)}</p>
+        <p className="text-muted">{t.rich(anuncios ? "s1Anuncios" : "s1", richTags)}</p>
       </section>
+
+      {anuncios && (
+        <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
+          <h2 className="text-lg font-bold text-foreground">{t("sAnunciosT")}</h2>
+          <p className="text-muted">
+            {t.rich("sAnuncios", {
+              googleLink: (chunks) => (
+                <a
+                  href="https://policies.google.com/technologies/partner-sites"
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="text-accent hover:underline"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
+          </p>
+          <GestionarConsentimiento className="rounded-xl border border-border px-4 py-2 text-sm font-semibold hover:bg-[var(--surface-2)]" />
+        </section>
+      )}
 
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">{t("s2t")}</h2>

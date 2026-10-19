@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { cookies } from "next/headers";
+import { PublicidadScripts } from "@/components/PublicidadScripts";
 import { esIdioma } from "@/lib/idiomasTrofeo";
 import { guardarIdiomaUsuario } from "@/lib/idiomaUsuario";
 import { CompartirPlatinoPendiente } from "@/components/CompartirPlatinoPendiente";
@@ -272,6 +273,8 @@ export default async function RootLayout({
             )}
             {/* Datos estructurados del sitio para buscadores (lib/datosEstructurados.ts). */}
             <JsonLd datos={datosSitio(DOMINIO, PERFILES_AUTOR)} />
+            {/* Consentimiento de Google + AdSense; nada sin NEXT_PUBLIC_ADSENSE_CLIENT (lib/publicidad.ts). */}
+            <PublicidadScripts />
             <Header user={headerUser} navOculta={navOculta} locale={locale} />
             {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
                 56px de los 375 de un movil (un 15% del ancho) antes de que las
