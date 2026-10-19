@@ -11,12 +11,12 @@ algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 ## Dónde estamos (19 oct 2026) · leer primero
 
 **Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
-master (`2135ffa`, 17 oct). Regla del usuario: **siempre push a master**
+master (`364ce69`, 19 oct). Regla del usuario: **siempre push a master**
 (fast-forward desde la rama).
 
-**CI**: todo en verde. App (APK de Android e IPA de iOS) en `75ef977`, el
-último cambio con código de la app; web (*Comprobaciones*) en `2135ffa`.
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 184 tests de
+**CI**: todo en verde en `364ce69` (web, APK de Android con AdMob dentro e
+IPA de iOS).
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 188 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
