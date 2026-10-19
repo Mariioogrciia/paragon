@@ -16,7 +16,7 @@ master (`2135ffa`, 17 oct). Regla del usuario: **siempre push a master**
 
 **CI**: todo en verde. App (APK de Android e IPA de iOS) en `75ef977`, el
 último cambio con código de la app; web (*Comprobaciones*) en `2135ffa`.
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 179 tests de
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 184 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
@@ -90,7 +90,12 @@ perfil privado.
    emulador de Windows no arranca desde la actualización 26200 → 26300
    (probablemente basta con reiniciar).
 
-**Lo último** (16-17 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+**Lo último** (16-19 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+- **Datos estructurados para Google** (19 oct, `lib/datosEstructurados.ts`):
+  el sitio y su autor en todas las páginas, la app en la portada, cada
+  perfil público (`ProfilePage`) y cada ficha de juego (`VideoGame`, con la
+  nota de la comunidad si hay 3 votos o más). Usan el dominio público, así
+  que cambian solos con el dominio nuevo.
 - **Vigilancia del servidor** (17 oct): te avisa (push, DM y campana, una
   vez al día por problema) si la sincronización falla para todos o si
   Steam, Xbox o IGDB rechazan su clave o se quedan sin cupo
@@ -125,6 +130,20 @@ perfil privado.
 Antes (15 oct): varias cuentas de Steam en el mismo perfil (de momento solo
 el desarrollador), avisos que abren su pantalla, límites en la API móvil,
 lint a cero y las pantallas v2.
+
+**Si se meten anuncios** (es la idea del usuario, 19 oct; aún no hay ninguno):
+- Vercel: el plan Hobby es solo para uso no comercial; con anuncios hay que
+  pasar a Pro (~20 $/mes; confirmar en su página de precios y en las "Fair
+  Use Guidelines").
+- Google AdSense pide dominio propio, política de privacidad al día y, en
+  Europa, un banner de consentimiento certificado (IAB TCF, por ejemplo el
+  de Google "Privacidad y mensajes"); el aviso de cookies de ahora es solo
+  informativo y no vale. También un `ads.txt` en la raíz.
+- En la app, AdMob, y actualizar "Seguridad de los datos" de Google Play
+  (los anuncios recogen identificadores).
+- Con poco tráfico los anuncios dan céntimos: primero tráfico (dominio,
+  Google, Play, LinkedIn); los enlaces de afiliado en "Platinos de oferta" y
+  las alertas de precio pueden rendir antes.
 
 **Pendiente de código** (nada pedido):
 - **Copia de seguridad de la base**: el plan gratis de Supabase no deja

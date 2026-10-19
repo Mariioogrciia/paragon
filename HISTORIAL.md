@@ -6,6 +6,22 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**19 oct — datos estructurados (JSON-LD) para Google**. No había ninguno.
+`lib/datosEstructurados.ts` (funciones puras con tests) y
+`components/JsonLd.tsx` (escapa `<`, como recomienda la guía de Next):
+- Layout raíz: `WebSite` + `Person` (el autor, con los mismos perfiles que el
+  pie, `PERFILES_AUTOR` en lib/site.ts).
+- Portada sin sesión: `WebApplication` gratuita (web, Android, iOS).
+- `/u/[handle]`: `ProfilePage` con la misma descripción que sus metadatos.
+- `/juego/[id]`: `VideoGame` con desarrolladora, editora, géneros,
+  plataformas, fecha (si IGDB la sabe al día) y `aggregateRating` solo con
+  3 votos o más de la comunidad (nada inventado).
+Todo con `dominioPublico()`, así que pasa solo al dominio nuevo. Se
+comprobó en local que sale en el HTML; validar en producción con
+https://search.google.com/test/rich-results. De paso se dejó en el HANDOFF
+qué implica meter anuncios (Vercel Pro, AdSense con consentimiento
+certificado, ads.txt, AdMob en la app).
+
 **17 oct (2) — vigilancia del servidor y latido del cron**. Antes, si algo
 se rompía, nadie se enteraba hasta que alguien protestaba.
 - `vigilarServidor` (lib/vigilancia.ts), en cada pasada del cron:

@@ -4,7 +4,9 @@ import { esIdioma } from "@/lib/idiomasTrofeo";
 import { guardarIdiomaUsuario } from "@/lib/idiomaUsuario";
 import { CompartirPlatinoPendiente } from "@/components/CompartirPlatinoPendiente";
 import { Analytics } from "@vercel/analytics/next";
-import { dominioPublico } from "@/lib/site";
+import { dominioPublico, PERFILES_AUTOR } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
+import { datosSitio } from "@/lib/datosEstructurados";
 import type { Metadata, Viewport } from "next";
 import type { Session } from "next-auth";
 import Script from "next/script";
@@ -268,6 +270,8 @@ export default async function RootLayout({
             {sessionUser && profile && (
               <SincronizarApariencia guardada={profile.apariencia ?? null} nivel={nivelParagon?.level ?? 1} />
             )}
+            {/* Datos estructurados del sitio para buscadores (lib/datosEstructurados.ts). */}
+            <JsonLd datos={datosSitio(DOMINIO, PERFILES_AUTOR)} />
             <Header user={headerUser} navOculta={navOculta} locale={locale} />
             {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
                 56px de los 375 de un movil (un 15% del ancho) antes de que las

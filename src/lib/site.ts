@@ -15,3 +15,15 @@ export function dominioPublico(): string {
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000";
 }
+
+/**
+ * Los perfiles públicos de quien hace Paragon: los mismos enlaces que el pie
+ * (components/Footer.tsx). Van en los datos estructurados del sitio
+ * (lib/datosEstructurados.ts) para que los buscadores sepan quién está detrás.
+ */
+export const PERFILES_AUTOR = [
+  "https://www.instagram.com/mariioogrciia/",
+  "https://www.tiktok.com/@mariioogrciia",
+  "https://github.com/Mariioogrciia",
+  "https://www.linkedin.com/in/mario-garc%C3%ADa-romero-453348304",
+];

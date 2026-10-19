@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { datosPerfil } from "@/lib/datosEstructurados";
+import { dominioPublico } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { StatTile } from "@/components/StatTile";
-import { getLibrary, getProfileByHandle, getUserBadges, getFriendshipStatus } from "@/lib/profiles";
+import { getLibrary, getProfileByHandle, getUserBadges, getFriendshipStatus, resolveAvatarUrl } from "@/lib/profiles";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { FriendRequestButton } from "@/components/FriendRequestButton";
 import { summarise } from "@/lib/stats";
@@ -17,7 +20,7 @@ import { FavoritePicker } from "@/components/FavoritePicker";
 import { AddManualGameModal } from "@/components/AddManualGameModal";
 import { ImportLibraryModal } from "@/components/ImportLibraryModal";
 import { TiltCard } from "@/components/TiltCard";
-import { coverGradient } from "@/lib/design";
+import { coverGradient, urlAbsolutaParaOg } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
 import { juegosDelAnio, rachas as rachasDe, resumenHistorico, ultimosTrofeos } from "@/lib/history";
 import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
@@ -282,8 +285,24 @@ export default async function PerfilPage({
   const juegoAnclado = games.find((g) => g.isPinned);
   const auraAnclado = juegoAnclado ? await getOrComputeAuraColor(juegoAnclado.id, juegoAnclado.iconUrl) : null;
 
+  // Para buscadores: perfil público de un jugador (lib/datosEstructurados.ts).
+  const datosBuscador = datosPerfil(dominioPublico(), {
+    handle: profile.handle ?? handle,
+    nombre: profile.displayName,
+    imagen: urlAbsolutaParaOg(resolveAvatarUrl(profile)) ?? null,
+    descripcion:
+      games.length === 0
+        ? t("PerfilPage.metaDescripcionVacia", { nombre: profile.displayName ?? handle })
+        : t("PerfilPage.metaDescripcionStats", {
+            trofeos: stats.trofeos.toLocaleString(locale),
+            platinos: stats.platinos.toLocaleString(locale),
+            juegos: stats.juegos.toLocaleString(locale),
+          }),
+  });
+
   return (
     <div className={`-mx-4 -mt-9 sm:-mx-7 ${temaClase}`} style={customStyle}>
+      <JsonLd datos={datosBuscador} />
       <div
         className="relative overflow-hidden border-b border-border"
         style={{

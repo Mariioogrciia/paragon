@@ -1,5 +1,8 @@
 /* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
+import { datosAplicacion } from "@/lib/datosEstructurados";
+import { dominioPublico } from "@/lib/site";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -108,6 +111,8 @@ async function Landing() {
 
   return (
     <div>
+      {/* Para buscadores: qué es Paragon (gratis, web, Android e iOS). */}
+      <JsonLd datos={datosAplicacion(dominioPublico())} />
       <section className="relative pt-6 text-center sm:pt-10">
         <div className="landing-hero-halo pointer-events-none absolute inset-x-0 -top-24 bottom-0 -z-10 [mask-image:linear-gradient(90deg,transparent,black_18%,black_82%,transparent)]" aria-hidden="true" />
 

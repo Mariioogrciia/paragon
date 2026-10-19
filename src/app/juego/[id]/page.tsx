@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { JsonLd } from "@/components/JsonLd";
+import { datosJuego } from "@/lib/datosEstructurados";
+import { dominioPublico } from "@/lib/site";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
@@ -155,8 +158,23 @@ export default async function JuegoGlobalPage({
   // dejaba casi negro — la cabecera parecía vacía (auditoría, 28 sept 2026).
   const fondoCabecera = detalles?.artworkUrl ?? detalles?.screenshots[0];
 
+  // Para buscadores: ficha del juego (lib/datosEstructurados.ts).
+  const datosBuscador = datosJuego(dominioPublico(), {
+    id: gameId,
+    titulo: game.title,
+    imagen: game.iconUrl ?? null,
+    descripcion: detalles?.summary ?? null,
+    desarrolladora: game.developer ?? null,
+    editora: game.publisher ?? null,
+    generos: game.genres ?? [],
+    plataformas: detalles?.platforms ?? [],
+    fechaSalida: detalles?.releasePrecision === "day" && detalles.releaseDate ? detalles.releaseDate.slice(0, 10) : null,
+    nota: rating ? { media: rating.average, votos: rating.votes } : null,
+  });
+
   return (
     <div className="-mx-4 -mt-9 sm:-mx-7">
+      <JsonLd datos={datosBuscador} />
       <div
         className="relative overflow-hidden border-b border-border"
         style={
