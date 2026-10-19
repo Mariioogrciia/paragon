@@ -13,6 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- AdMob: el ID de la app (el de prueba de Google si se compila sin
+             anuncios, ver build.gradle.kts y anuncios/Publicidad.kt). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+
         <activity
             android:name=".ComposeMainActivity"
             android:label="@string/title_activity_main"

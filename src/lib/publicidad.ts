@@ -23,6 +23,7 @@
  */
 
 const CLIENTE_RE = /^ca-pub-\d{10,20}$/;
+const APP_ADMOB_RE = /^ca-app-pub-(\d{10,20})~\d{6,20}$/;
 const SLOT_RE = /^\d{6,20}$/;
 
 /** `ca-pub-…` válido, o null (apagado). */
@@ -56,4 +57,25 @@ export function urlMensajeConsentimiento(cliente: string): string {
 
 export function urlAdSense(cliente: string): string {
   return `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${cliente}`;
+}
+
+/**
+ * AdMob (la app de Android, 19 oct 2026): el ID de editor (`pub-…`) sacado
+ * del ID de la app (`ca-app-pub-…~…`, el mismo secreto ADMOB_APP_ID con el
+ * que se compila la app; en Vercel, como variable normal). Null si no está.
+ */
+export function editorAdMob(valor = process.env.ADMOB_APP_ID): string | null {
+  const m = valor?.trim().match(APP_ADMOB_RE);
+  return m ? `pub-${m[1]}` : null;
+}
+
+/**
+ * `/app-ads.txt`: AdMob lo busca en el sitio web que figura en la ficha de
+ * Google Play. Con la cuenta de AdSense y la de AdMob en el mismo Google
+ * suelen compartir el ID de editor; si no, salen las dos líneas.
+ */
+export function lineasAppAdsTxt(admob: string | null, adsense: string | null): string | null {
+  const editores = new Set([admob, adsense?.replace(/^ca-/, "")].filter((e): e is string => !!e));
+  if (editores.size === 0) return null;
+  return [...editores].map((e) => `google.com, ${e}, DIRECT, f08c47fec0942fa0\n`).join("");
 }

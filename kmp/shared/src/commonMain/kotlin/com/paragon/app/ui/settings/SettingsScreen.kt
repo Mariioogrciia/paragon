@@ -3,6 +3,7 @@ package com.paragon.app.ui.settings
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +14,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import com.paragon.app.ui.common.Anuncios
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -272,6 +274,17 @@ fun SettingsScreen(
                     titulo = Textos.t(T.ajustes_bot_discord),
                     onClick = { uriHandler.openUri("${com.paragon.shared.BASE_URL}/bot-discord") },
                 )
+                // Con anuncios y en un país que lo exige (Europa): volver a
+                // decidir sobre el consentimiento (ver ui/common/Anuncios.kt).
+                Anuncios.opcionesPrivacidad?.let { abrir ->
+                    val contexto = com.paragon.shared.contextoPlataforma()
+                    com.paragon.app.ui.common.SeparadorFila()
+                    com.paragon.app.ui.common.FilaNativa(
+                        icono = Icons.Default.PrivacyTip,
+                        titulo = Textos.t(T.ajustes_privacidad_anuncios),
+                        onClick = { abrir(contexto) },
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(28.dp))

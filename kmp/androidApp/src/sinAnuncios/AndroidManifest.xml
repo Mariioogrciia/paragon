@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Solo se usa al compilar SIN anuncios (ver build.gradle.kts): quita el
+     permiso del identificador de publicidad que trae el SDK de AdMob. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+</manifest>

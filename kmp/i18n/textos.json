@@ -5662,5 +5662,17 @@
   "en": "{0} unread notifications",
   "es": "{0} avisos sin leer",
   "fr": "{0} notifications non lues"
+ },
+ "anuncio_rotulo": {
+  "de": "Anzeige",
+  "en": "Advertisement",
+  "es": "Publicidad",
+  "fr": "Publicité"
+ },
+ "ajustes_privacidad_anuncios": {
+  "de": "Datenschutz bei Anzeigen",
+  "en": "Ad privacy",
+  "es": "Privacidad de los anuncios",
+  "fr": "Confidentialité des annonces"
  }
 }

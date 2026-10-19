@@ -519,8 +519,9 @@
     "s8": "Paragon isn't directed at children under 14 and doesn't knowingly request data from anyone under that age. If you believe a minor has given us data, let us know and we'll remove it.",
     "s9t": "Changes to this policy",
     "s9": "If this policy changes in a meaningful way, the date above will be updated and, when the change matters, you'll be notified inside the app itself.",
-    "s3pAnuncios": "We <strong>never</strong> sell or rent your personal data. The website shows Google AdSense ads: Google may use cookies and identifiers to show and measure them, only as far as you accept in the consent notice (see the <cookiesLink>cookie policy</cookiesLink>). Visits are measured in aggregate and anonymously with Vercel Analytics, without cookies.",
-    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), to show ads on the website, with the cookies and identifiers you allow in the consent notice."
+    "s3pAnuncios": "We <strong>never</strong> sell or rent your personal data. Paragon shows Google ads: on the website Google may use cookies and identifiers, and in the Android app the device's advertising ID, to show and measure them, only as far as you accept in the consent notice (see the <cookiesLink>cookie policy</cookiesLink>). Visits are measured in aggregate and anonymously with Vercel Analytics, without cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), to show ads on the website, with the cookies and identifiers you allow in the consent notice.",
+    "s4liAdMob": "<strong>Google AdMob</strong> (Google Ireland Ltd.), to show ads in the Android app, using the device's advertising ID as you allow in the app's consent notice (you can change it in Settings → Ad privacy)."
   },
   "Terminos": {
     "titulo": "Terms and Conditions",

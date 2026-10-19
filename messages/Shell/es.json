@@ -519,8 +519,9 @@
     "s8": "Paragon no está dirigido a menores de 14 años y no solicita conscientemente datos de menores de esa edad. Si crees que un menor nos ha facilitado datos, escríbenos y los eliminaremos.",
     "s9t": "Cambios en esta política",
     "s9": "Si esta política cambia de forma relevante, se actualizará la fecha de arriba y, cuando el cambio sea importante, se avisará dentro de la propia aplicación.",
-    "s3pAnuncios": "<strong>Nunca</strong> vendemos ni alquilamos tus datos personales. La web muestra anuncios de Google AdSense: Google puede usar cookies e identificadores para mostrarlos y medirlos, solo en la medida en que lo aceptes en el aviso de consentimiento (ver la <cookiesLink>política de cookies</cookiesLink>). Las visitas las medimos de forma agregada y anónima con Vercel Analytics, sin cookies.",
-    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), para mostrar anuncios en la web, con las cookies e identificadores que permitas en el aviso de consentimiento."
+    "s3pAnuncios": "<strong>Nunca</strong> vendemos ni alquilamos tus datos personales. Paragon muestra anuncios de Google: en la web, Google puede usar cookies e identificadores, y en la app de Android, el identificador de publicidad del dispositivo, para mostrarlos y medirlos, solo en la medida en que lo aceptes en el aviso de consentimiento (ver la <cookiesLink>política de cookies</cookiesLink>). Las visitas las medimos de forma agregada y anónima con Vercel Analytics, sin cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), para mostrar anuncios en la web, con las cookies e identificadores que permitas en el aviso de consentimiento.",
+    "s4liAdMob": "<strong>Google AdMob</strong> (Google Ireland Ltd.), para mostrar anuncios en la app de Android, con el identificador de publicidad del dispositivo según lo que permitas en el aviso de consentimiento de la app (lo puedes cambiar en Ajustes → Privacidad de los anuncios)."
   },
   "Terminos": {
     "titulo": "Términos y Condiciones",

@@ -62,6 +62,9 @@ jobs:
           PARAGON_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           PARAGON_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           PARAGON_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          # Anuncios (kmp/play/README.md): sin estos dos secretos, la app sale sin anuncios.
+          ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+          ADMOB_BANNER_ID: ${{ secrets.ADMOB_BANNER_ID }}
         run: ./gradlew --no-daemon :shared:testAndroidHostTest :androidApp:bundleRelease
 
       - name: Borrar la clave del runner

@@ -519,8 +519,9 @@
     "s8": "Paragon richtet sich nicht an Kinder unter 14 Jahren und fragt nicht wissentlich Daten von Personen unter diesem Alter ab. Falls du denkst, dass uns ein Minderjähriger Daten gegeben hat, schreib uns, und wir löschen sie.",
     "s9t": "Änderungen dieser Richtlinie",
     "s9": "Ändert sich diese Richtlinie wesentlich, wird das Datum oben aktualisiert und, wenn die Änderung wichtig ist, innerhalb der App selbst darauf hingewiesen.",
-    "s3pAnuncios": "Wir verkaufen oder vermieten deine personenbezogenen Daten <strong>niemals</strong>. Die Website zeigt Anzeigen von Google AdSense: Google kann Cookies und Kennungen verwenden, um sie anzuzeigen und zu messen, nur soweit du im Einwilligungshinweis zustimmst (siehe <cookiesLink>Cookie-Richtlinie</cookiesLink>). Besuche messen wir aggregiert und anonym mit Vercel Analytics, ohne Cookies.",
-    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), um Anzeigen auf der Website zu zeigen, mit den Cookies und Kennungen, die du im Einwilligungshinweis erlaubst."
+    "s3pAnuncios": "Wir verkaufen oder vermieten deine personenbezogenen Daten <strong>niemals</strong>. Paragon zeigt Anzeigen von Google: auf der Website kann Google Cookies und Kennungen verwenden, in der Android-App die Werbe-ID des Geräts, um sie anzuzeigen und zu messen, nur soweit du im Einwilligungshinweis zustimmst (siehe <cookiesLink>Cookie-Richtlinie</cookiesLink>). Besuche messen wir aggregiert und anonym mit Vercel Analytics, ohne Cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), um Anzeigen auf der Website zu zeigen, mit den Cookies und Kennungen, die du im Einwilligungshinweis erlaubst.",
+    "s4liAdMob": "<strong>Google AdMob</strong> (Google Ireland Ltd.), um Anzeigen in der Android-App zu zeigen, mit der Werbe-ID des Geräts, soweit du es im Einwilligungshinweis der App erlaubst (änderbar unter Einstellungen → Datenschutz bei Anzeigen)."
   },
   "Terminos": {
     "titulo": "Allgemeine Geschäftsbedingungen",

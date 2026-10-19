@@ -519,8 +519,9 @@
     "s8": "Paragon ne s'adresse pas aux moins de 14 ans et ne demande pas sciemment de données à des personnes de cet âge. Si tu penses qu'un mineur nous a fourni des données, écris-nous et nous les supprimerons.",
     "s9t": "Changements de cette politique",
     "s9": "Si cette politique change de façon significative, la date ci-dessus sera mise à jour et, si le changement est important, tu seras prévenu directement dans l'application.",
-    "s3pAnuncios": "Nous ne vendons ni ne louons <strong>jamais</strong> tes données personnelles. Le site affiche des annonces Google AdSense : Google peut utiliser des cookies et des identifiants pour les afficher et les mesurer, seulement dans la mesure où tu l'acceptes dans l'avis de consentement (voir la <cookiesLink>politique de cookies</cookiesLink>). Les visites sont mesurées de façon agrégée et anonyme avec Vercel Analytics, sans cookies.",
-    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), pour afficher des annonces sur le site, avec les cookies et identifiants que tu autorises dans l'avis de consentement."
+    "s3pAnuncios": "Nous ne vendons ni ne louons <strong>jamais</strong> tes données personnelles. Paragon affiche des annonces Google : sur le site, Google peut utiliser des cookies et des identifiants, et dans l'app Android, l'identifiant publicitaire de l'appareil, pour les afficher et les mesurer, seulement dans la mesure où tu l'acceptes dans l'avis de consentement (voir la <cookiesLink>politique de cookies</cookiesLink>). Les visites sont mesurées de façon agrégée et anonyme avec Vercel Analytics, sans cookies.",
+    "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), pour afficher des annonces sur le site, avec les cookies et identifiants que tu autorises dans l'avis de consentement.",
+    "s4liAdMob": "<strong>Google AdMob</strong> (Google Ireland Ltd.), pour afficher des annonces dans l'app Android, avec l'identifiant publicitaire de l'appareil selon ce que tu autorises dans l'avis de consentement de l'app (modifiable dans Réglages → Confidentialité des annonces)."
   },
   "Terminos": {
     "titulo": "Conditions Générales",

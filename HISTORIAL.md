@@ -6,6 +6,30 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**19 oct (3) — AdMob en la app de Android (apagado)**. Mismo criterio que
+en la web: todo listo, nada cambia hasta poner los IDs.
+- `androidApp/.../anuncios/Publicidad.kt`: en cada arranque pide el estado
+  del consentimiento (UMP, el mensaje certificado de "Privacidad y
+  mensajes" de AdMob) y lo enseña si toca; solo con `canRequestAds()` inicia
+  el SDK (fuera del hilo principal) y rellena `Anuncios.banner`
+  (ui/common/Anuncios.kt, en :shared). Banner adaptable con el alto
+  reservado. Si la ley pide poder cambiarlo, `Anuncios.opcionesPrivacidad`
+  y Ajustes enseña "Privacidad de los anuncios".
+- Huecos (`HuecoAnuncio`, con el rótulo "Publicidad"): en el muro tras la
+  cuarta publicación y al final de la ficha de juego (detrás de todo, para
+  no mover el índice de "bajar al trofeo").
+- `build.gradle.kts`: `ADMOB_APP_ID` y `ADMOB_BANNER_ID` por entorno (los
+  pasa "Publicar en las tiendas" desde los secretos). Sin los dos: el
+  APPLICATION_ID de prueba de Google (el SDK lo exige), `ADMOB_BANNER`
+  vacío y un manifiesto extra (`src/sinAnuncios`) que quita el permiso
+  AD_ID. En depuración, siempre el bloque de prueba de Google.
+- Web: `/app-ads.txt` (de `ADMOB_APP_ID` en Vercel, o el editor de AdSense)
+  y la política de privacidad nombra AdMob cuando está.
+- `kmp/play/README.md`, sección 8: pasos y lo que cambia en Seguridad de
+  los datos. iOS sin anuncios (SDK por SPM + ATT + cuenta de Apple).
+No se pudo compilar en local (sin SDK de Android ni acceso al Maven de
+Google): lo comprueba la CI.
+
 **19 oct (2) — anuncios preparados (apagados) con consentimiento
 certificado**. El usuario quiere ir metiendo anuncios; se deja todo lo que
 pide AdSense listo antes del dominio, sin que cambie nada hasta encenderlo.

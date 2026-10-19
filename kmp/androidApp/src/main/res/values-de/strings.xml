@@ -41,6 +41,7 @@
     <string name="ajustes_ocultar_social">Soziale Funktionen ausblenden</string>
     <string name="ajustes_ocultar_social_sub">Blendet Community und Ligen aus. Ideal, wenn du die App nur für dich nutzt.</string>
     <string name="ajustes_perfil_ok">Profil aktualisiert</string>
+    <string name="ajustes_privacidad_anuncios">Datenschutz bei Anzeigen</string>
     <string name="ajustes_seccion_apariencia">DARSTELLUNG</string>
     <string name="ajustes_seccion_ayuda">HILFE</string>
     <string name="ajustes_seccion_conexiones">VERBINDUNGEN</string>
@@ -67,6 +68,7 @@
     <string name="amistad_amigos">Befreundet</string>
     <string name="amistad_anadir">Als Freund hinzufügen</string>
     <string name="amistad_enviada">Anfrage gesendet</string>
+    <string name="anuncio_rotulo">Anzeige</string>
     <string name="apariencia_acento">Akzent und Palette</string>
     <string name="apariencia_estilo">Stil</string>
     <string name="apariencia_estilo_nivel">Wird ab Stufe %1$s freigeschaltet (du bist Stufe %2$s)</string>

@@ -85,7 +85,8 @@ Sitio web: la dirección de la web (o el dominio propio cuando lo haya).
   vincula un ID público de PlayStation, Steam o Xbox (por ejemplo, una
   cuenta de Steam con el perfil en público)". Si piden una cuenta fija, crea
   una de Google solo para esto y dásela.
-- **Anuncios**: no tiene anuncios.
+- **Anuncios**: "no" mientras se publique sin AdMob; "sí" desde la primera
+  versión compilada con los secretos de AdMob (sección 8).
 - **Clasificación de contenido**: cuestionario IARC, tipo "Todos los demás
   tipos de apps" (no es un juego). Interacción entre usuarios: sí (amigos,
   comentarios, clanes). Sin violencia, sexo, apuestas, ubicación ni
@@ -108,6 +109,11 @@ Sitio web: la dirección de la web (o el dominio propio cuando lo haya).
     proveedores que trabajan para la app, eso no cuenta como compartir).
   - Sin analíticas ni informes de fallos en la app (solo usa Firebase
     Messaging para los avisos).
+  - **Con anuncios** (sección 8), además: *Identificadores del dispositivo*
+    → ID de publicidad, recogido y **compartido** con Google (AdMob) para
+    publicidad y analítica de anuncios, opcional (depende del
+    consentimiento). Y en "Contenido de la aplicación" → **ID de
+    publicidad**: sí, para publicidad.
 - **Eliminación de la cuenta**: dentro de la app, Ajustes → "Eliminar
   cuenta" (abajo del todo). URL pública: `https://<la web>/eliminar-cuenta`.
 - **Permisos**: solo internet y notificaciones. El lector de QR usa el
@@ -120,3 +126,31 @@ Prueba interna (hasta 100 personas, sin revisión larga) → prueba cerrada
 (los 12 durante 14 días si la cuenta es personal) → solicitar acceso a
 producción → Producción. Cada paso es "promocionar versión" en Play
 Console, o lanzar el workflow con `pista_play` = `alpha`/`production`.
+
+## 8. Anuncios con AdMob (opcional)
+
+La app lleva AdMob preparado y apagado (19 oct 2026,
+`androidApp/.../anuncios/Publicidad.kt`): sin los IDs, no se inicia, no
+pinta huecos y ni siquiera pide el identificador de publicidad. Con ellos,
+sale un banner en el muro de Comunidad (tras la cuarta publicación) y al
+final de la ficha de cada juego, siempre después del consentimiento.
+
+1. Cuenta en https://admob.google.com (con el mismo Google que AdSense, así
+   comparten ID de editor). Añadir la app (Android, "está publicada en Google
+   Play" cuando ya lo esté) y crear un bloque **Banner**.
+2. Privacidad y mensajes → "Reglamentos europeos" → crear y **publicar** el
+   mensaje para la app (es, en, de, fr). Sin publicarlo, en Europa solo hay
+   anuncios limitados. Ajustes → "Privacidad de los anuncios" lo vuelve a
+   abrir.
+3. Secretos del repo: `ADMOB_APP_ID` (`ca-app-pub-…~…`) y `ADMOB_BANNER_ID`
+   (`ca-app-pub-…/…`). La siguiente ejecución de "Publicar en las tiendas"
+   ya sale con anuncios. Las compilaciones de depuración usan siempre el
+   bloque de prueba de Google: **nunca pinches tus propios anuncios**.
+4. En Vercel, la variable `ADMOB_APP_ID` (el mismo valor) y redesplegar: así
+   sale `https://<la web>/app-ads.txt`, que AdMob busca en el sitio web de
+   la ficha de Play, y la política de privacidad nombra AdMob.
+5. Play Console: "Anuncios: sí", el formulario del ID de publicidad y
+   Seguridad de los datos (sección 6).
+
+iOS aún no lleva anuncios: haría falta el SDK de Google por Swift Package
+Manager, el aviso de seguimiento de Apple (ATT) y la cuenta de desarrollador.

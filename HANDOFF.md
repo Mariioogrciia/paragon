@@ -98,6 +98,10 @@ perfil privado.
   con el mensaje de consentimiento certificado de Google, `/ads.txt`,
   huecos en Descubrir y en la ficha de juego, y textos de privacidad y
   cookies que cambian solos. Se encienden con una variable; guía abajo.
+- **AdMob en la app de Android, apagado** (19 oct, `anuncios/Publicidad.kt`):
+  consentimiento UMP primero, banner en el muro y en la ficha de juego,
+  "Privacidad de los anuncios" en Ajustes y `/app-ads.txt` en la web. Se
+  enciende con dos secretos del repo; guía en `kmp/play/README.md` (8).
 - **Datos estructurados para Google** (19 oct, `lib/datosEstructurados.ts`):
   el sitio y su autor en todas las páginas, la app en la portada, cada
   perfil público (`ProfilePage`) y cada ficha de juego (`VideoGame`, con la
@@ -164,9 +168,10 @@ Mientras no exista `NEXT_PUBLIC_ADSENSE_CLIENT` no se carga nada de Google,
    uso no comercial.
 Con anuncios activos, el aviso de cookies propio se oculta (lo sustituye el
 de Google) y `/privacidad` y `/cookies` cambian solos su texto para nombrar
-a Google y sus socios. Falta, si se quiere: AdMob en la app (con el
-consentimiento UMP) y actualizar "Seguridad de los datos" y "Anuncios: sí"
-en Google Play (`kmp/play/README.md` dice ahora "no tiene anuncios").
+a Google y sus socios. La app de Android lleva AdMob igual de preparado y
+apagado (secretos `ADMOB_APP_ID` y `ADMOB_BANNER_ID`, más `ADMOB_APP_ID` en
+Vercel para `/app-ads.txt`): guía en `kmp/play/README.md`, sección 8. iOS
+aún sin anuncios.
 Con poco tráfico los anuncios dan céntimos: los enlaces de afiliado en
 "Platinos de oferta" y las alertas de precio pueden rendir antes.
 

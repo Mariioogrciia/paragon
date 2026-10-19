@@ -469,6 +469,12 @@ private fun GameDetailContent(
             }
         }
 
+        // Anuncio al final, tras los trofeos (sin anuncios no pinta nada).
+        // Va detrás de todo para no mover el índice de "bajar al trofeo".
+        item {
+            com.paragon.app.ui.common.HuecoAnuncio(Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
+        }
+
         // Hueco para el botón de abajo (no tapar el último trofeo).
         item { Spacer(Modifier.height(104.dp)) }
     }

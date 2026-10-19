@@ -11,6 +11,19 @@ plugins {
 /** El .jks de publicación, si quien compila lo da (ver signingConfigs). */
 val claveRelease: File? = System.getenv("PARAGON_KEYSTORE")?.let { file(it) }?.takeIf { it.exists() }
 
+/**
+ * AdMob (19 oct 2026, ver anuncios/Publicidad.kt). Los IDs llegan por
+ * variables de entorno (en la CI, de los secretos ADMOB_APP_ID y
+ * ADMOB_BANNER_ID). Sin los dos, la app sale sin anuncios: el SDK va dentro
+ * pero no se inicia, y se quita el permiso del identificador de publicidad.
+ */
+val admobApp: String? = System.getenv("ADMOB_APP_ID")?.trim()?.takeIf { Regex("""ca-app-pub-\d{10,20}~\d{6,20}""").matches(it) }
+val admobBanner: String? = System.getenv("ADMOB_BANNER_ID")?.trim()?.takeIf { Regex("""ca-app-pub-\d{10,20}/\d{6,20}""").matches(it) }
+val conAnuncios = admobApp != null && admobBanner != null
+/** IDs de prueba públicos de Google: la app de ejemplo y su banner adaptable. */
+val admobAppPrueba = "ca-app-pub-3940256099942544~3347511713"
+val admobBannerPrueba = "ca-app-pub-3940256099942544/9214589741"
+
 android {
     namespace = "com.paragon.app"
     compileSdk = 37
@@ -25,6 +38,8 @@ android {
         versionName = "1.1"
         // Al publicar, la CI pone el número de build (siempre creciente).
         System.getenv("PARAGON_VERSION_CODE")?.toIntOrNull()?.let { versionCode = it }
+        // El SDK de AdMob exige un APPLICATION_ID aunque no se use: sin anuncios, el de prueba.
+        manifestPlaceholders["admobAppId"] = admobApp ?: admobAppPrueba
     }
 
     // Siempre la misma clave de depuración (la de androidApp/debug.keystore,
@@ -54,6 +69,8 @@ android {
     buildTypes {
         debug {
             signingConfig = signingConfigs.getByName("debug")
+            // En depuración, siempre el bloque de prueba de Google.
+            buildConfigField("String", "ADMOB_BANNER", "\"${if (conAnuncios) admobBannerPrueba else ""}\"")
         }
         release {
             // R8: APK más pequeña y más rápida. Reglas propias en proguard-rules.pro.
@@ -62,11 +79,20 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // Sin la clave de publicación sale sin firmar (no se puede subir a Play).
             if (claveRelease != null) signingConfig = signingConfigs.getByName("release")
+            buildConfigField("String", "ADMOB_BANNER", "\"${admobBanner.takeIf { conAnuncios } ?: ""}\"")
         }
+    }
+
+    // Sin anuncios, fuera el permiso AD_ID que añade el SDK de AdMob: así la
+    // ficha de Google Play no tiene que declarar el identificador de publicidad.
+    if (!conAnuncios) {
+        sourceSets.getByName("debug").manifest.srcFile("src/sinAnuncios/AndroidManifest.xml")
+        sourceSets.getByName("release").manifest.srcFile("src/sinAnuncios/AndroidManifest.xml")
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -119,4 +145,8 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-messaging")
+
+    // Anuncios (apagados sin ADMOB_APP_ID, ver arriba) y su consentimiento (UMP).
+    implementation("com.google.android.gms:play-services-ads:24.5.0")
+    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
 }

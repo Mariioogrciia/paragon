@@ -41,6 +41,7 @@
     <string name="ajustes_ocultar_social">Masquer les fonctions sociales</string>
     <string name="ajustes_ocultar_social_sub">Masque la Communauté et les Ligues. Idéal si tu utilises l\'app comme outil personnel.</string>
     <string name="ajustes_perfil_ok">Profil mis à jour</string>
+    <string name="ajustes_privacidad_anuncios">Confidentialité des annonces</string>
     <string name="ajustes_seccion_apariencia">APPARENCE</string>
     <string name="ajustes_seccion_ayuda">AIDE</string>
     <string name="ajustes_seccion_conexiones">CONNEXIONS</string>
@@ -67,6 +68,7 @@
     <string name="amistad_amigos">Amis</string>
     <string name="amistad_anadir">Ajouter en ami</string>
     <string name="amistad_enviada">Demande envoyée</string>
+    <string name="anuncio_rotulo">Publicité</string>
     <string name="apariencia_acento">Accent et palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Se débloque au niveau %1$s (tu es niveau %2$s)</string>

@@ -41,6 +41,7 @@
     <string name="ajustes_ocultar_social">Hide social features</string>
     <string name="ajustes_ocultar_social_sub">Hides Community and Leagues. Ideal if you only use the app as a personal tool.</string>
     <string name="ajustes_perfil_ok">Profile updated</string>
+    <string name="ajustes_privacidad_anuncios">Ad privacy</string>
     <string name="ajustes_seccion_apariencia">APPEARANCE</string>
     <string name="ajustes_seccion_ayuda">HELP</string>
     <string name="ajustes_seccion_conexiones">CONNECTIONS</string>
@@ -67,6 +68,7 @@
     <string name="amistad_amigos">Friends</string>
     <string name="amistad_anadir">Add friend</string>
     <string name="amistad_enviada">Request sent</string>
+    <string name="anuncio_rotulo">Advertisement</string>
     <string name="apariencia_acento">Accent and palette</string>
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Unlocks at level %1$s (you\'re level %2$s)</string>

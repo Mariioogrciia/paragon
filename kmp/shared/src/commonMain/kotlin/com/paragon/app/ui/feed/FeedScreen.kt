@@ -150,7 +150,16 @@ fun FeedScreen(tokenStore: TokenStore, themeStore: ThemeStore, onCompareClick: (
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         contentPadding = PaddingValues(bottom = 32.dp + com.paragon.app.ui.common.huecoBarra())
                     ) {
-                        items(current.items, key = { it.id }) { item ->
+                        // Un anuncio tras las cuatro primeras publicaciones (o al
+                        // final si hay menos); sin anuncios, el hueco no pinta nada.
+                        val corte = minOf(4, current.items.size)
+                        items(current.items.take(corte), key = { it.id }) { item ->
+                            FeedCard(item, repository = repository, onUserClick = { onAbrirPerfil(item.userHandle) })
+                        }
+                        item(key = "anuncio") {
+                            com.paragon.app.ui.common.HuecoAnuncio(Modifier.padding(horizontal = 24.dp))
+                        }
+                        items(current.items.drop(corte), key = { it.id }) { item ->
                             FeedCard(item, repository = repository, onUserClick = { onAbrirPerfil(item.userHandle) })
                         }
                     }

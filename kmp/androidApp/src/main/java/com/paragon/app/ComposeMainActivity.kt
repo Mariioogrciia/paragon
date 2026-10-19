@@ -66,6 +66,9 @@ class ComposeMainActivity : AppCompatActivity() {
         // Al recrearse (girar, cambiar el idioma) el intent es el mismo de
         // antes: el aviso ya se abrió y no hay que volver a llevar ahí.
         handleDeepLink(intent, abrirAviso = savedInstanceState == null)
+        // Anuncios (solo si la app se compiló con AdMob): el consentimiento
+        // primero, ver anuncios/Publicidad.kt.
+        com.paragon.app.anuncios.Publicidad.iniciar(this)
 
         setContent {
             ParagonTheme(themeStore = themeStore) {
