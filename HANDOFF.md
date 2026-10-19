@@ -1,22 +1,21 @@
 # Paragon — traspaso
 
 Estado del proyecto para retomarlo sin releer nada más. Última
-actualización: **16 de octubre de 2026**.
+actualización: **19 de octubre de 2026**.
 
 Lo de cada día (qué se hizo, por qué y con qué commits) está en
 [`HISTORIAL.md`](HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
 antes del 23 sept, en [`docs/historial/`](docs/historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
-## Dónde estamos (16 oct 2026, tarde) · leer primero
+## Dónde estamos (19 oct 2026) · leer primero
 
 **Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
-master (`75ef977`). Regla del usuario: **siempre push a master**
+master (`2135ffa`, 17 oct). Regla del usuario: **siempre push a master**
 (fast-forward desde la rama).
 
-**CI**: todo en verde en `75ef977` (16 oct, master): web, APK de Android e
-IPA de iOS. Después, solo cambios de servidor y documentación (la web se
-comprueba en cada push).
+**CI**: todo en verde. App (APK de Android e IPA de iOS) en `75ef977`, el
+último cambio con código de la app; web (*Comprobaciones*) en `2135ffa`.
 - *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 179 tests de
   vitest y el comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
@@ -26,11 +25,15 @@ comprueba en cada push).
   los secretos, firma y subida a Google Play; IPA de TestFlight con los de
   Apple.
 - *Sincronización frecuente de trofeos*: llama a `/api/cron/sync` con
-  `CRON_SECRET` y falla si no recibe un 200. Está en verde: **`CRON_SECRET`
-  está puesta y funciona** (comprobado el 16 oct: HTTP 200, 2 cuentas
-  sincronizadas, `credencialPsn: null`, o sea el NPSSO de PSN va bien). Ojo:
-  aunque pide cada 30 min, GitHub retrasa los cron gratuitos y en la
-  práctica corre cada 3-5 h. Abrir la app o la web ya sincroniza al momento.
+  `CRON_SECRET` y falla si no recibe un 200. Siempre en verde.
+
+**Producción** (leído de la respuesta del cron, 19 oct 07:18 UTC): HTTP
+200, 4 cuentas sincronizadas y 0 fallidas, `credencialPsn: null` (el NPSSO
+va bien) y `vigilancia: []` (Steam, Xbox e IGDB sin problemas). El cron
+sigue pasando cada 2-4 h: el cron externo de "Esperando al usuario" aún no
+está puesto. Una de las cuentas sincroniza siempre 0 juegos (`ac4ed878…`,
+también el 16 oct): mirar en Admin si tiene la biblioteca vacía por un
+perfil privado.
 
 **Las tres piezas**:
 - **Web** (`src/`, Next 16.4.0 en Vercel, `platinos-nine.vercel.app`, sin
@@ -123,7 +126,14 @@ Antes (15 oct): varias cuentas de Steam en el mismo perfil (de momento solo
 el desarrollador), avisos que abren su pantalla, límites en la API móvil,
 lint a cero y las pantallas v2.
 
-**Pendiente de código** (pequeño, nada pedido):
+**Pendiente de código** (nada pedido):
+- **Copia de seguridad de la base**: el plan gratis de Supabase no deja
+  recuperar copias. Si se borra algo por error, se pierde. Propuesta: un
+  `pg_dump` semanal cifrado (lleva correos) guardado fuera de Supabase.
+- **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
+  privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
+  ("tu perfil de Steam ya no es público, mira cómo arreglarlo") con enlace a
+  `/vincular`.
 - **Anuncios en el canal de un servidor de Discord** (nivel, platino): siguen
   en español a propósito, los lee todo el servidor. Todo lo que llega a una
   persona (push, DM, campana) ya sale en su idioma.
@@ -146,20 +156,20 @@ Sony/Valve/Microsoft):
   Estadísticas, Atascados → Sesión, Comparar, Sesiones, widget de iOS,
   perfil completo, precios, DLC, QR).
 
-**Tamaño a 16 oct**: 57 páginas web, 75 rutas de `/api/mobile`, 21
+**Tamaño a 19 oct**: 57 páginas web, 75 rutas de `/api/mobile`, 21
 pantallas en la app, 4 idiomas en todo.
 
-**Siguientes pasos recomendados** (opinión, 16 oct; nada de esto está pedido):
-1. *Publicar en Google Play* y hacer la prueba cerrada con amigos: es la
-   forma de que alguien más use la app, y sus 14 días sirven de prueba en
-   móviles de verdad.
-2. *Comprar el dominio* antes de la ficha de Play, para que la tienda, las
-   tarjetas de compartir y el vídeo salgan ya con la dirección buena.
-3. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan y
+**Siguientes pasos recomendados** (opinión, 19 oct; nada de esto está pedido):
+1. *Poner el cron externo* (5 minutos, ver arriba): sin él, todos los avisos
+   llegan con horas de retraso.
+2. *Comprar el dominio* y después *publicar en Google Play* con la prueba
+   cerrada de 12 amigos: es la forma de que alguien más use la app, y sus
+   14 días sirven de prueba en móviles de verdad.
+3. *Copia de seguridad de la base* y *avisar a quien deja de poder leerse*
+   (ver "Pendiente de código").
+4. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan y
    esconder lo que nadie toca (arcade, planificador...). Desde aquí no se
    puede leer (403 del equipo de Vercel).
-4. *Avisos de errores en producción* (alerta cuando una ruta falla mucho) y
-   copia de seguridad de la base comprobada.
 5. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
    perdibles, sesiones), resumen semanal en push, y abrir varias cuentas de
    Steam a todos.
