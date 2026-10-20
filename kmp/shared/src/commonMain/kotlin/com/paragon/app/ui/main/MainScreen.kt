@@ -393,6 +393,13 @@ fun MainScreen(
                     tokenStore = tokenStore,
                     onBack = { navController.popBackStack() },
                     onAbrirRutaWeb = { web -> abrirRutaDeAviso(web) },
+                    onAjustes = { navController.navigate(Screen.PreferenciasAvisos.route) },
+                )
+            }
+            composable(Screen.PreferenciasAvisos.route) {
+                com.paragon.app.ui.avisos.PreferenciasAvisosScreen(
+                    tokenStore = tokenStore,
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable(Screen.Library.route) {
@@ -468,6 +475,7 @@ fun MainScreen(
                     onBack = { navController.popBackStack() },
                     onNavigateToLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                     onNavigateToApariencia = { navController.navigate(Screen.Apariencia.route) },
+                    onNavigateToAvisos = { navController.navigate(Screen.PreferenciasAvisos.route) },
                     onLogout = {
                         coroutineScope.launch {
                             // Común: el servidor desasocia el token de push (va en el

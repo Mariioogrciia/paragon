@@ -5674,5 +5674,107 @@
   "en": "Ad privacy",
   "es": "Privacidad de los anuncios",
   "fr": "Confidentialité des annonces"
+ },
+ "aviso_cat_trofeos": {
+  "de": "Neue Trophäen und Platin",
+  "en": "New trophies and platinums",
+  "es": "Trofeos y platinos nuevos",
+  "fr": "Nouveaux trophées et platines"
+ },
+ "aviso_cat_perdibles": {
+  "de": "Verpassbare Trophäen beim Spielstart",
+  "en": "Missable trophies when you start a game",
+  "es": "Trofeos perdibles al empezar un juego",
+  "fr": "Trophées manquables au début d'un jeu"
+ },
+ "aviso_cat_lanzamientos": {
+  "de": "Veröffentlichungen aus deiner Wunschliste",
+  "en": "Releases from your wishlist",
+  "es": "Lanzamientos de tu lista de deseados",
+  "fr": "Sorties de ta liste de souhaits"
+ },
+ "aviso_cat_precios": {
+  "de": "Preisalarme",
+  "en": "Price alerts",
+  "es": "Alertas de precio",
+  "fr": "Alertes de prix"
+ },
+ "aviso_cat_ligas": {
+  "de": "Ligen, Saison und Clankriege",
+  "en": "Leagues, season and clan wars",
+  "es": "Ligas, temporada y guerras de clanes",
+  "fr": "Ligues, saison et guerres de clans"
+ },
+ "aviso_cat_social": {
+  "de": "Gemeinsame Sitzungen und Herausforderungen",
+  "en": "Play-together sessions and challenges",
+  "es": "Sesiones y retos de Platinar juntos",
+  "fr": "Sessions et défis Platiner ensemble"
+ },
+ "aviso_cat_amigos": {
+  "de": "Platin deiner Freunde (in Benachrichtigungen)",
+  "en": "Your friends' platinums (in Notifications)",
+  "es": "Platinos de tus amigos (en Avisos)",
+  "fr": "Platines de tes amis (dans Notifications)"
+ },
+ "aviso_cat_resumen": {
+  "de": "Wöchentliche Discord-Zusammenfassung",
+  "en": "Weekly Discord summary",
+  "es": "Resumen semanal por Discord",
+  "fr": "Résumé hebdomadaire par Discord"
+ },
+ "ajustes_avisos_fila": {
+  "de": "Benachrichtigungen",
+  "en": "Notifications",
+  "es": "Avisos",
+  "fr": "Notifications"
+ },
+ "ajustes_avisos_fila_sub": {
+  "de": "Worüber wir dich informieren und wo",
+  "en": "What we notify you about and where",
+  "es": "Qué te avisamos y por dónde",
+  "fr": "Ce dont on te prévient et où"
+ },
+ "avisos_pref_titulo": {
+  "de": "Worüber wir dich benachrichtigen",
+  "en": "What we notify you about",
+  "es": "Qué te avisamos",
+  "fr": "Ce dont on te prévient"
+ },
+ "avisos_pref_sub": {
+  "de": "Auf dem Handy, im Browser und auf Discord. Einladungen und Freundschaftsanfragen kommen immer an.",
+  "en": "On your phone, browser and Discord. Invitations and friend requests always arrive.",
+  "es": "En el móvil, el navegador y Discord. Las invitaciones y solicitudes de amistad llegan siempre.",
+  "fr": "Sur ton téléphone, ton navigateur et Discord. Les invitations et demandes d'amis arrivent toujours."
+ },
+ "avisos_pref_discord": {
+  "de": "Nachrichten vom Discord-Bot",
+  "en": "Discord bot messages",
+  "es": "Mensajes del bot de Discord",
+  "fr": "Messages du bot Discord"
+ },
+ "avisos_pref_discord_sub": {
+  "de": "Dieselben Benachrichtigungen, auch per Direktnachricht",
+  "en": "The same notifications, also by direct message",
+  "es": "Los mismos avisos, también por mensaje privado",
+  "fr": "Les mêmes notifications, aussi en message privé"
+ },
+ "avisos_pref_discord_sin": {
+  "de": "Melde dich auf der Website mit Discord an, um es zu aktivieren",
+  "en": "Sign in with Discord on the website to turn it on",
+  "es": "Inicia sesión con Discord en la web para activarlo",
+  "fr": "Connecte-toi avec Discord sur le site pour l'activer"
+ },
+ "avisos_pref_sistema": {
+  "de": "Benachrichtigungsberechtigung des Handys",
+  "en": "Phone notification permission",
+  "es": "Permiso de notificaciones del móvil",
+  "fr": "Autorisation de notifications du téléphone"
+ },
+ "avisos_pref_sistema_sub": {
+  "de": "Wenn nichts ankommt, prüfe in den Systemeinstellungen, ob Paragon dich benachrichtigen darf",
+  "en": "If nothing arrives, check that Paragon may notify you in system settings",
+  "es": "Si no te llega nada, revisa que Paragon pueda avisarte en los ajustes del sistema",
+  "fr": "Si rien n'arrive, vérifie dans les réglages du système que Paragon peut te notifier"
  }
 }

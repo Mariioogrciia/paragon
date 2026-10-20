@@ -4,6 +4,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,6 +53,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onNavigateToLinkedAccounts: () -> Unit,
     onNavigateToApariencia: () -> Unit,
+    onNavigateToAvisos: () -> Unit,
     onLogout: () -> Unit
 ) {
     var nameInput by remember { mutableStateOf(profile.name) }
@@ -215,6 +217,13 @@ fun SettingsScreen(
                     titulo = Textos.t(T.apariencia_titulo),
                     subtitulo = Textos.t(T.ajustes_apariencia_sub),
                     onClick = onNavigateToApariencia,
+                )
+                com.paragon.app.ui.common.SeparadorFila()
+                com.paragon.app.ui.common.FilaNativa(
+                    icono = Icons.Default.Notifications,
+                    titulo = Textos.t(T.ajustes_avisos_fila),
+                    subtitulo = Textos.t(T.ajustes_avisos_fila_sub),
+                    onClick = onNavigateToAvisos,
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))

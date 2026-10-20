@@ -47,6 +47,8 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     object PlatinosOferta : Screen("platinos_oferta", T.ofertas_titulo)
     /** Bandeja de avisos (16 oct 2026, ver src/lib/bandeja.ts). */
     object Avisos : Screen("avisos", T.avisos_titulo)
+    /** Qué avisos recibir (20 oct 2026, Ajustes → Avisos). */
+    object PreferenciasAvisos : Screen("avisos_preferencias", T.ajustes_avisos_fila)
     /** Sesiones con "Organizar" abierto y el juego y el trofeo ya elegidos (desde Trofeos atascados). */
     object OrganizarSesion : Screen("sessions/new?juego={juego}&trofeo={trofeo}", T.nav_sesiones) {
         fun routeFor(gameId: String, trophyId: String) =

@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 
 /**
- * Categorías de aviso que cada uno puede apagar (Ajustes → General). Antes
+ * Categorías de aviso que cada uno puede apagar (Ajustes → Avisos, en la web y en la app). Antes
  * era todo o nada: o activabas los avisos del navegador/Discord y te llegaba
  * todo, o nada. Las invitaciones y solicitudes de amistad no tienen
  * categoría: van dirigidas a ti y siempre llegan.

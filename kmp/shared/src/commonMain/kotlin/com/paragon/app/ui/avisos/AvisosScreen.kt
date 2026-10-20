@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,6 +68,7 @@ fun AvisosScreen(
     tokenStore: TokenStore,
     onBack: () -> Unit,
     onAbrirRutaWeb: (String) -> Unit,
+    onAjustes: () -> Unit,
 ) {
     var avisos by remember { mutableStateOf<List<AvisoDto>?>(null) }
     var error by remember { mutableStateOf(false) }
@@ -85,7 +87,12 @@ fun AvisosScreen(
     }
 
     Column(Modifier.fillMaxSize().background(Background)) {
-        CabeceraNativa(titulo = Textos.t(T.avisos_titulo), atras = Textos.t(T.nav_panel), onBack = onBack)
+        CabeceraNativa(titulo = Textos.t(T.avisos_titulo), atras = Textos.t(T.nav_panel), onBack = onBack) {
+            // Qué avisos recibir (PreferenciasAvisosScreen).
+            androidx.compose.material3.IconButton(onClick = onAjustes) {
+                Icon(Icons.Default.Settings, contentDescription = Textos.t(T.ajustes_avisos_fila), tint = Foreground)
+            }
+        }
         val lista = avisos
         when {
             error -> Mensaje(Textos.t(T.error_red))

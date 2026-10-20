@@ -668,6 +668,18 @@ tocar una push. `POST` (sin cuerpo) → `{ "ok": true }`: todo leído. Se
 guardan los mismos avisos que salen por push, más los platinos de los
 amigos (solo en la bandeja).
 
+## `GET/PUT /api/mobile/avisos/preferencias` — Qué avisos recibir
+
+Lo mismo que Ajustes → Avisos en la web (20 oct 2026). GET y PUT devuelven:
+
+`{ "categorias": [{ "clave": "trofeos", "activa": true }], "discord": { "vinculado": true, "activo": false } }`
+
+PUT `{ "activas": ["trofeos", "ligas"], "discordDm": true }`: los dos campos
+son opcionales. `activas` son las categorías encendidas (el resto se apaga);
+claves en `lib/avisosPreferencias.ts`. `discordDm: true` sin haber iniciado
+sesión con Discord → 400. Las invitaciones y solicitudes de amistad llegan
+siempre, no tienen categoría.
+
 ## `GET/POST /api/mobile/platino-por-compartir` — "¿Lo compartes?" tras un platino
 
 16 oct 2026, ver `src/lib/compartirPlatino.ts`. `GET` →

@@ -6,6 +6,20 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**20 oct (3) — Ajustes → Avisos en la app**. Las mismas preferencias que en
+la web, que hasta ahora no se podían cambiar desde el móvil:
+- `GET/PUT /api/mobile/avisos/preferencias` (CONTRACT.md): categorías y DM
+  de Discord; `discordDm: true` sin Discord vinculado da 400 (mensaje ya
+  traducido en lib/mensajesApi.ts). Los campos a null no se tocan.
+- `ui/avisos/PreferenciasAvisosScreen.kt`: un interruptor por categoría y
+  otro para Discord (apagado y explicado si no hay Discord), guardado al
+  tocar y deshecho si falla. Arriba, "Permiso de notificaciones del móvil",
+  que abre los ajustes del sistema (`abrirAjustesNotificaciones`,
+  expect/actual: `ACTION_APP_NOTIFICATION_SETTINGS` en Android, los
+  ajustes de la app en iOS).
+- Se llega desde Ajustes ("Avisos", bajo Apariencia) y desde el engranaje
+  de la pantalla de Avisos.
+
 **20 oct (2) — Ajustes → Avisos**. El usuario: "cuando le das a elegir qué
 avisos recibir no lleva a ningún ajuste". Las preferencias existían, pero al
 final de "General", debajo de todo el formulario del perfil y sin entrada en
@@ -13,9 +27,7 @@ el menú. Página nueva `app/ajustes/avisos` con lo que estaba repartido: qué
 avisos recibir (`PreferenciasAvisos`), notificaciones del navegador
 (`PushToggle`) y DM de Discord (`DiscordDmForm`), y entrada "Avisos" en el
 menú de Ajustes. Llevan ahí la campana, el paso 5 de la guía del bot y el
-bloque de notificaciones de "Cómo funciona". La app aún no tiene esas
-preferencias (el servidor las respeta, pero no se pueden cambiar desde el
-móvil).
+bloque de notificaciones de "Cómo funciona".
 
 **20 oct — copia de seguridad semanal de la base**. El plan gratis de
 Supabase no deja recuperar copias. Workflow `copia-base.yml` (lunes 04:23
