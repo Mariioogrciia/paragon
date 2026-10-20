@@ -184,6 +184,9 @@ Con poco tráfico los anuncios dan céntimos: los enlaces de afiliado en
 "Platinos de oferta" y las alertas de precio pueden rendir antes.
 
 **Pendiente de código** (nada pedido):
+- **Preferencias de avisos en la app**: en la web están en Ajustes → Avisos
+  (20 oct); la app no tiene pantalla para cambiarlas (el servidor sí las
+  respeta). Haría falta una ruta en `/api/mobile` y la pantalla.
 - **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
   privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
   ("tu perfil de Steam ya no es público, mira cómo arreglarlo") con enlace a

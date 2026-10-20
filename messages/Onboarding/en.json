@@ -18,7 +18,8 @@
     "grupoPerfil": "Your profile",
     "grupoCuenta": "Account",
     "grupoPanel": "Dashboard and menu",
-    "discord": "Discord bot"
+    "discord": "Discord bot",
+    "avisos": "Notifications"
   },
   "navOcultable": {
     "feed": "Community",
@@ -618,5 +619,9 @@
       "todos": "Everyone",
       "guardar": "Save"
     }
+  },
+  "ajustesAvisos": {
+    "titulo": "Notifications",
+    "descripcion": "What we notify you about and where: the bell on the website, your browser, the app and Discord."
   }
 }

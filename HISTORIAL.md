@@ -6,6 +6,17 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**20 oct (2) — Ajustes → Avisos**. El usuario: "cuando le das a elegir qué
+avisos recibir no lleva a ningún ajuste". Las preferencias existían, pero al
+final de "General", debajo de todo el formulario del perfil y sin entrada en
+el menú. Página nueva `app/ajustes/avisos` con lo que estaba repartido: qué
+avisos recibir (`PreferenciasAvisos`), notificaciones del navegador
+(`PushToggle`) y DM de Discord (`DiscordDmForm`), y entrada "Avisos" en el
+menú de Ajustes. Llevan ahí la campana, el paso 5 de la guía del bot y el
+bloque de notificaciones de "Cómo funciona". La app aún no tiene esas
+preferencias (el servidor las respeta, pero no se pueden cambiar desde el
+móvil).
+
 **20 oct — copia de seguridad semanal de la base**. El plan gratis de
 Supabase no deja recuperar copias. Workflow `copia-base.yml` (lunes 04:23
 UTC y a mano) con `scripts/copia-base.sh`:

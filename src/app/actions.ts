@@ -200,7 +200,7 @@ export async function setDiscordDmAction(
   }
 
   await setDiscordDmEnabled(userId, activar);
-  revalidatePath("/ajustes");
+  revalidatePath("/ajustes/avisos");
   return activar ? { success: await tr("Avisos por Discord activados.") } : { success: await tr("Avisos por Discord desactivados.") };
 }
 
@@ -1118,7 +1118,7 @@ export async function setHiddenNavItemsAction(formData: FormData): Promise<void>
 export async function setAvisosActivosAction(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   await setAvisosActivos(userId, formData.getAll("categoria").map(String));
-  revalidatePath("/ajustes");
+  revalidatePath("/ajustes/avisos");
 }
 
 export async function setPanelOcultoAction(formData: FormData): Promise<void> {

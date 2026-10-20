@@ -15,8 +15,6 @@ import { AvatarFrame } from "@/components/AvatarFrame";
 import { Avatar } from "@/components/Avatar";
 import { BannerPresetPicker, PlatformBanner } from "@/components/BannerPresets";
 import { bannerPresetKey } from "@/lib/bannerPresets";
-import { DiscordDmForm } from "@/components/forms/Forms";
-import { PushToggle } from "@/components/PushToggle";
 
 interface ProfileFormUser {
   id: string;
@@ -46,7 +44,6 @@ export function ProfileForm({
   badges = [],
   juegos = [],
   favoritos = [],
-  discordVinculado = false,
   cuentasVinculadas = [],
 }: {
   user: ProfileFormUser;
@@ -62,8 +59,6 @@ export function ProfileForm({
   /** IDs de los juegos favoritos del usuario, para ponerlos primero en el
    * selector — el fondo "basado en tu juego favorito" que se pidió. */
   favoritos?: string[];
-  /** Si esta cuenta inició sesión con Discord alguna vez — sin esto el bot no tiene a quién escribir. */
-  discordVinculado?: boolean;
   /** Cuentas vinculadas que tienen avatar disponible, para poder elegirlo. */
   cuentasVinculadas?: { platform: string; avatarUrl: string }[];
 }) {
@@ -601,18 +596,8 @@ export function ProfileForm({
         </div>
       </div>
 
-      {/* Fuera del <form> grande a propósito: son dos acciones de servidor
-          propias (guardar/probar), y un <form> dentro de otro no es HTML
-          válido — el navegador ignora el anidado y rompe el envío. */}
-      <section className="ajustes-grupo">
-        <h2 className="font-semibold mb-4">{t("profileForm.discordTitle")}</h2>
-        <DiscordDmForm enabled={user.discordDmEnabled ?? false} vinculado={discordVinculado} />
-      </section>
-
-      <section className="ajustes-grupo">
-        <h2 className="font-semibold mb-4">{t("profileForm.pushTitle")}</h2>
-        <PushToggle />
-      </section>
+      {/* Los DM de Discord y las notificaciones del navegador están en
+          Ajustes → Avisos (app/ajustes/avisos) desde el 20 oct 2026. */}
     </div>
 
       {/* Vista previa del perfil: lee el estado del formulario, así cambia

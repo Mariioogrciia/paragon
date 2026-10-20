@@ -18,7 +18,8 @@
     "grupoPerfil": "Ton profil",
     "grupoCuenta": "Compte",
     "grupoPanel": "Tableau de bord et menu",
-    "discord": "Bot Discord"
+    "discord": "Bot Discord",
+    "avisos": "Notifications"
   },
   "navOcultable": {
     "feed": "Communauté",
@@ -618,5 +619,9 @@
       "todos": "Tout le monde",
       "guardar": "Enregistrer"
     }
+  },
+  "ajustesAvisos": {
+    "titulo": "Notifications",
+    "descripcion": "Ce dont on te prévient et où : la cloche du site, ton navigateur, l'app et Discord."
   }
 }

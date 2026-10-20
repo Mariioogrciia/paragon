@@ -160,7 +160,7 @@ export function CampanaAvisos() {
               </ul>
             )}
             <Link
-              href="/ajustes"
+              href="/ajustes/avisos"
               onClick={() => setAbierto(false)}
               className="mt-1 block rounded-lg px-3 py-2 text-xs font-semibold text-muted hover:bg-[var(--surface-2)] hover:text-foreground"
             >

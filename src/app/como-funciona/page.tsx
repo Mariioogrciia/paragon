@@ -215,7 +215,7 @@ export default async function ComoFuncionaPage() {
       label: t("tabs.notificaciones"),
       content: (
         <Grid>
-          <Bloque title={t("notificaciones.b1t")} href="/ajustes" hrefLabel={t("irFlecha")}>
+          <Bloque title={t("notificaciones.b1t")} href="/ajustes/avisos" hrefLabel={t("irFlecha")}>
             {t("notificaciones.b1")}
           </Bloque>
           <Bloque title={t("notificaciones.b2t")} href="/bot-discord" hrefLabel={t("irFlecha")}>

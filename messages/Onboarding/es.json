@@ -18,7 +18,8 @@
     "grupoPerfil": "Tu perfil",
     "grupoCuenta": "Cuenta",
     "grupoPanel": "Panel y menú",
-    "discord": "Bot de Discord"
+    "discord": "Bot de Discord",
+    "avisos": "Avisos"
   },
   "navOcultable": {
     "feed": "Comunidad",
@@ -618,5 +619,9 @@
       "todos": "Todos",
       "guardar": "Guardar"
     }
+  },
+  "ajustesAvisos": {
+    "titulo": "Avisos",
+    "descripcion": "Qué te avisamos y por dónde: en la campana de la web, en el navegador, en la app y por Discord."
   }
 }

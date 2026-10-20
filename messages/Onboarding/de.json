@@ -18,7 +18,8 @@
     "grupoPerfil": "Dein Profil",
     "grupoCuenta": "Konto",
     "grupoPanel": "Dashboard und Menü",
-    "discord": "Discord-Bot"
+    "discord": "Discord-Bot",
+    "avisos": "Benachrichtigungen"
   },
   "navOcultable": {
     "feed": "Community",
@@ -618,5 +619,9 @@
       "todos": "Alle",
       "guardar": "Speichern"
     }
+  },
+  "ajustesAvisos": {
+    "titulo": "Benachrichtigungen",
+    "descripcion": "Worüber wir dich informieren und wo: die Glocke auf der Website, dein Browser, die App und Discord."
   }
 }

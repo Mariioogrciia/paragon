@@ -97,7 +97,7 @@ export async function GuiaBotDiscord({ vinculado, urlPaso1 }: { vinculado: boole
         <Paso etiquetaOpcional={t("guiaDiscord.opcional")} n={5} titulo={t("guiaDiscord.p5.titulo")} opcional>
           <p>{t("guiaDiscord.p5.texto")}</p>
           <div>
-            <Link href={vinculado === null ? "/entrar" : "/ajustes"} className={enlace} style={{ background: "var(--surface-2)", color: "var(--foreground)", border: "1px solid var(--border)" }}>
+            <Link href={vinculado === null ? "/entrar" : "/ajustes/avisos"} className={enlace} style={{ background: "var(--surface-2)", color: "var(--foreground)", border: "1px solid var(--border)" }}>
               {t("guiaDiscord.p5.boton")}
             </Link>
           </div>
