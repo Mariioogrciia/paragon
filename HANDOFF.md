@@ -60,6 +60,14 @@ perfil privado.
    Sistema → "Cron de sincronización" tiene que decir "hace pocos minutos".
    Más a menudo que cada 10 min no hace falta (el cron ya reparte el
    trabajo y el plan Hobby de Vercel tiene tope de CPU).
+0. **Secretos de la copia de seguridad** (2 minutos; hecho el código el
+   20 oct, ver "Copia de seguridad" en Operación). Sin ellos, el workflow
+   del lunes fallará y GitHub mandará un correo:
+   - `BACKUP_DATABASE_URL` = la `DATABASE_URL` de Vercel tal cual.
+   - `BACKUP_PASSPHRASE` = una contraseña larga (20+), guardada también en
+     tu gestor de contraseñas: sin ella la copia no se abre.
+   Luego Actions → "Copia de seguridad de la base" → Run workflow, y mirar
+   que salga verde con "Restaurada: N tablas, M filas".
 1. **Google Play**: todo preparado en `kmp/play/`, con la guía paso a paso
    en su README:
    - Cuenta de desarrollador (25 $), clave de firma y secretos
@@ -176,9 +184,6 @@ Con poco tráfico los anuncios dan céntimos: los enlaces de afiliado en
 "Platinos de oferta" y las alertas de precio pueden rendir antes.
 
 **Pendiente de código** (nada pedido):
-- **Copia de seguridad de la base**: el plan gratis de Supabase no deja
-  recuperar copias. Si se borra algo por error, se pierde. Propuesta: un
-  `pg_dump` semanal cifrado (lleva correos) guardado fuera de Supabase.
 - **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
   privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
   ("tu perfil de Steam ya no es público, mira cómo arreglarlo") con enlace a
@@ -214,7 +219,7 @@ pantallas en la app, 4 idiomas en todo.
 2. *Comprar el dominio* y después *publicar en Google Play* con la prueba
    cerrada de 12 amigos: es la forma de que alguien más use la app, y sus
    14 días sirven de prueba en móviles de verdad.
-3. *Copia de seguridad de la base* y *avisar a quien deja de poder leerse*
+3. *Avisar a quien deja de poder leerse*
    (ver "Pendiente de código").
 4. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan y
    esconder lo que nadie toca (arcade, planificador...). Desde aquí no se
@@ -589,6 +594,28 @@ contra ellos, no con datos inventados.)
 ---
 
 ## Operación
+
+### Copia de seguridad (20 oct 2026)
+
+Cada lunes, el workflow "Copia de seguridad de la base"
+(`scripts/copia-base.sh`) hace un `pg_dump` de los esquemas `public` y
+`drizzle`, **lo restaura en una base vacía para comprobar que vale** (y falla
+si no hay usuarios), lo cifra con AES-256 y lo deja como artefacto de esa
+ejecución 90 días. El repo es público: el artefacto se puede descargar, por
+eso solo sale cifrado. Lo de Supabase Storage (avatares, fondos) no entra.
+
+Para restaurar (en Windows, con Gpg4win y las herramientas de PostgreSQL
+17; o en cualquier Linux):
+1. Actions → la ejecución que quieras → Artifacts → descargar y descomprimir.
+2. `gpg --decrypt --output paragon.dump paragon-AAAA-MM-DD.dump.gpg` (pide
+   `BACKUP_PASSPHRASE`).
+3. Mejor en un proyecto de Supabase **nuevo** (cadena de sesión, puerto
+   5432): `psql "<url>" -c "drop schema public cascade"` y después
+   `pg_restore --no-owner --no-privileges -d "<url>" paragon.dump`. Luego se
+   cambian `DATABASE_URL`/`DIRECT_URL` en Vercel.
+   Para recuperar solo una tabla sin tocar el resto:
+   `pg_restore --data-only -t <tabla> -f tabla.sql paragon.dump` y aplicar
+   lo que haga falta a mano.
 
 Variables de entorno (ver `.env.example`):
 

@@ -6,6 +6,23 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**20 oct — copia de seguridad semanal de la base**. El plan gratis de
+Supabase no deja recuperar copias. Workflow `copia-base.yml` (lunes 04:23
+UTC y a mano) con `scripts/copia-base.sh`:
+- `pg_dump` (Docker `postgres:17`, que vale para Supabase 15 y 17) de
+  `public` y `drizzle`. Acepta la misma `DATABASE_URL` de Vercel: pasa el
+  pooler de transacciones (6543) al de sesión (5432), quita `pgbouncer=true`
+  y obliga SSL.
+- La restaura en un Postgres vacío (servicio del job) y cuenta tablas y
+  filas; si la tabla `user` sale vacía, falla. En el registro solo salen
+  totales (el repo es público).
+- La cifra con gpg (AES-256, `BACKUP_PASSPHRASE` de 20+ caracteres) y solo
+  sube el cifrado, como artefacto de 90 días.
+Probado en local con Postgres 16 y el esquema de drizzle: copia,
+restauración (58 tablas), descifrado, contraseña equivocada que no abre y
+los fallos (sin usuarios, contraseña corta). Falta que el usuario ponga los
+dos secretos; guía para restaurar en el HANDOFF (Operación).
+
 **19 oct (3) — AdMob en la app de Android (apagado)**. Mismo criterio que
 en la web: todo listo, nada cambia hasta poner los IDs.
 - `androidApp/.../anuncios/Publicidad.kt`: en cada arranque pide el estado

@@ -1,0 +1,59 @@
+name: Copia de seguridad de la base
+
+# Copia semanal de Supabase (20 oct 2026), cifrada, como artefacto de esta
+# ejecución durante 90 días (unas 13 copias). Todo el trabajo y el porqué en
+# scripts/copia-base.sh; cómo restaurarla, en HANDOFF.md ("Copia de
+# seguridad"). Si falla, GitHub manda un correo: hay que mirarlo.
+#
+# Secretos del repo (Settings → Secrets and variables → Actions):
+#   - BACKUP_DATABASE_URL: la DATABASE_URL de Vercel tal cual (el script la
+#     pasa al pooler de sesión). No vale la conexión directa
+#     db.<proyecto>.supabase.co: solo tiene IPv6 y aquí no hay.
+#   - BACKUP_PASSPHRASE: una contraseña larga (20+) que guardes también
+#     fuera de GitHub. Sin ella, la copia no se puede abrir: nadie más la tiene.
+on:
+  schedule:
+    - cron: "23 4 * * 1" # Lunes a las 04:23 UTC.
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: copia-base
+  cancel-in-progress: false
+
+jobs:
+  copia:
+    name: Copiar, probar y cifrar
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      # Base vacía donde se prueba a restaurar cada copia.
+      prueba:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: prueba
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Copia de la base
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+          PRUEBA_URL: postgresql://postgres:prueba@localhost:5432/postgres
+          # pg_dump tiene que ser de la misma versión que Supabase o mayor.
+          PG_IMAGEN: postgres:17
+        run: bash scripts/copia-base.sh "$RUNNER_TEMP/copia"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: copia-base-${{ github.run_number }}
+          path: ${{ runner.temp }}/copia/*.dump.gpg
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
