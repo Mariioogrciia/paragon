@@ -1,0 +1,11 @@
+{
+  "title": "Entra in Paragon",
+  "description": "Scegli con quale account vuoi entrare. Poi colleghi i tuoi profili PlayStation o Steam, da cui arrivano trofei e obiettivi.",
+  "google": "Continua con Google",
+  "discord": "Continua con Discord",
+  "disclaimer": "Non salviamo password: l'accesso lo gestisce il tuo provider. I trofei si leggono dal profilo pubblico di PSN, quindi il tuo profilo trofei deve essere visibile.",
+  "stats": {
+    "heading": "4.312 trofei\nancora da contare.",
+    "subheading": "Ogni partita muove un numero. Paragon li legge tutti e ti dice quale è a un solo trofeo o obiettivo dal cadere."
+  }
+}

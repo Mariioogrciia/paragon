@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-const LOCALE_TAGS: Record<string, string> = { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR" };
+const LOCALE_TAGS: Record<string, string> = { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR", it: "it-IT", pt: "pt-PT" };
 
 /**
  * Fecha en la zona horaria de quien la ve (el servidor va en UTC: pintada

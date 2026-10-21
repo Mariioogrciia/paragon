@@ -9,7 +9,7 @@ import { Escudo } from "@/components/esports/Escudo";
 import { EstrellaFavorito, useFavoritos } from "@/components/esports/Favoritos";
 import { comoFavorito, hrefPartido } from "@/components/esports/util";
 
-const LOCALE_TAGS: Record<string, string> = { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR" };
+const LOCALE_TAGS: Record<string, string> = { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR", it: "it-IT", pt: "pt-PT" };
 const ORDEN_NIVEL: Record<string, number> = { s: 0, a: 1, b: 2, c: 3, d: 4 };
 const nivelDe = (tier: string | null | undefined) => ORDEN_NIVEL[tier ?? ""] ?? 5;
 

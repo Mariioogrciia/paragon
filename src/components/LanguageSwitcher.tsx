@@ -9,6 +9,8 @@ const IDIOMAS = [
   { id: "es", label: "Español" },
   { id: "fr", label: "Français" },
   { id: "de", label: "Deutsch" },
+  { id: "it", label: "Italiano" },
+  { id: "pt", label: "Português" },
 ];
 
 /**
@@ -36,6 +38,21 @@ function Bandera({ idioma, size = 20 }: { idioma: string; size?: number }) {
         <rect width="20" height="6.67" fill="#000" />
         <rect y="6.67" width="20" height="6.67" fill="#dd0000" />
         <rect y="13.33" width="20" height="6.67" fill="#ffce00" />
+      </>
+    ),
+    it: (
+      <>
+        <rect width="20" height="20" fill="#fff" />
+        <rect width="6.67" height="20" fill="#009246" />
+        <rect x="13.33" width="6.67" height="20" fill="#ce2b37" />
+      </>
+    ),
+    pt: (
+      <>
+        <rect width="20" height="20" fill="#da291c" />
+        <rect width="8" height="20" fill="#046a38" />
+        <circle cx="8" cy="10" r="3.2" fill="#ffe000" />
+        <circle cx="8" cy="10" r="1.8" fill="#da291c" />
       </>
     ),
     en: (
@@ -69,6 +86,8 @@ const CAMBIANDO: Record<string, string> = {
   en: "Switching language…",
   de: "Sprache wird geändert…",
   fr: "Changement de langue…",
+  it: "Cambio della lingua…",
+  pt: "A mudar de idioma…",
 };
 
 /** Si falla la petición (red, servidor reiniciando…), este es el aviso —
@@ -79,6 +98,8 @@ const FALLO: Record<string, string> = {
   en: "Couldn't switch. Try again.",
   de: "Wechsel fehlgeschlagen. Erneut versuchen.",
   fr: "Échec du changement. Réessaie.",
+  it: "Impossibile cambiare. Riprova.",
+  pt: "Não foi possível mudar. Tenta de novo.",
 };
 
 const CAMBIAR_IDIOMA: Record<string, string> = {
@@ -86,6 +107,8 @@ const CAMBIAR_IDIOMA: Record<string, string> = {
   en: "Change language",
   de: "Sprache ändern",
   fr: "Changer de langue",
+  it: "Cambia lingua",
+  pt: "Mudar idioma",
 };
 
 export function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {

@@ -1,0 +1,558 @@
+{
+  "BibliotecaPage": {
+    "breadcrumb": "Libreria",
+    "title": "Libreria",
+    "gamesHeading": "Giochi",
+    "gamesCount": "{count, plural, one {# gioco} other {# giochi}} · dal più recente al più vecchio",
+    "wishlistCount": "{count, plural, one {# desiderato} other {# desiderati}}"
+  },
+  "GameDetailPage": {
+    "backLabel": "Libreria di @{handle}",
+    "playedAgo": "Giocato {played}",
+    "globalPageTitleAttr": "Vedi la scheda globale di questo gioco con le statistiche della community",
+    "globalPageLink": "Vedi la scheda globale",
+    "externalGuideQuery": "{title} guida completa migliori armi e armature",
+    "externalGuideTitleAttr": "Guida completa del gioco su un sito esterno",
+    "externalGuideLink": "Guida completa",
+    "ofLabel": "di",
+    "ofAchievements": "di {count} obiettivi",
+    "trophiesForPlatinum": "Trofei per il platino",
+    "excludingDlc": "Senza contare {count} dei DLC, che non contano per il platino.",
+    "pendingDlcTrophies": "Trofei dei DLC mancanti",
+    "baseCompleteDlcRemaining": "Il gioco base è al 100%: quello che resta sono le espansioni.",
+    "sharePlatinumTitle": "Platino di {title}",
+    "sharePlatinum": "Condividi il platino",
+    "difficultyHeading": "Difficoltà stimata {basis, select, platinum {del platino} other {del 100%}}",
+    "rarityStat": "Solo il <strong>{percent}%</strong> di chi ci gioca lo ottiene",
+    "difficultyExplanation": "Stimata dalla rarità, che mescola difficoltà, durata e quante persone abbandonano il gioco. Non misura l'abilità: un platino lungo e facile può essere più raro di uno breve e impossibile.",
+    "communityRatingHeading": "Valutazione della community",
+    "viewAllStatsAndReviews": "Vedi statistiche e recensioni di tutti →",
+    "reviewBy": "Recensione di {name}",
+    "nextStepsHeading": "Prossimi passi",
+    "nextStepsBadge": "I più a portata di mano",
+    "focusModeLink": "Modalità concentrazione",
+    "nextStepsExplanation": "Ordinati per quelli che ottiene più gente. Il platino va sempre per ultimo: non è un compito, è la conseguenza.",
+    "allTrophiesHeading": "Tutti i trofei",
+    "trophiesEarnedOf": "{earned} di {total} ottenuti"
+  },
+  "JuegoPage": {
+    "verFicha": "Vedi la mia scheda",
+    "acercaDe": "Informazioni",
+    "acercaDeFuente": "Descrizione di IGDB, disponibile solo in inglese.",
+    "historia": "Storia",
+    "enBiblioteca": "In libreria",
+    "jugandoAhora": "Lo stanno giocando",
+    "al100": "Al 100%",
+    "completado": "Completato",
+    "platinado": "Platinato",
+    "tasaFinalizacion": "Tasso di completamento",
+    "resenasComunidad": "Recensioni della community",
+    "resenasCount": "{count, plural, =0 {Ancora nessuna} one {# recensione} other {# recensioni}}",
+    "guiasEscritas": "Guide scritte →",
+    "sinResenas": "Nessuno ha ancora scritto una recensione di questo gioco. Sii il primo dalla tua scheda.",
+    "alguien": "Qualcuno",
+    "verSuFicha": "Vedi la sua scheda →",
+    "juegosSimilares": "Giochi simili",
+    "dondeComprarlo": "Dove comprarlo",
+    "minimoHistorico": "Minimo storico: {precio} US$",
+    "masBarato": "Più economico",
+    "preciosDisclaimer": "Prezzi in dollari di negozi statunitensi, tramite CheapShark; potrebbero non includere le tasse. L'offerta di Steam apre direttamente la sua scheda",
+    "preciosDisclaimerSufijoCheapShark": "; il resto passa per il reindirizzamento di CheapShark, l'unica cosa che pubblica la sua API.",
+    "preciosDisclaimerSufijoSolo": ".",
+    "precioTiempo": "Prezzo nel tempo",
+    "historicoViaITAD": "Storico tramite IsThereAnyDeal.",
+    "miProgreso": {
+      "titulo": "Il tuo progresso",
+      "trofeos": "{conseguidos} di {total} trofei",
+      "faltan": "{n, plural, =0 {Hai tutto!} one {Ti manca # trofeo} other {Ti mancano # trofei}}",
+      "platino": "Platino ottenuto",
+      "sinPlatino": "Platino in sospeso",
+      "horas": "{horas} h giocate",
+      "ultimaVez": "Ultima volta: {cuando}"
+    },
+    "alertaPrecio": {
+      "titulo": "Prezzo su Steam Spagna",
+      "gratis": "Non è in vendita su Steam in questo momento.",
+      "avisame": "Avvisami quando scende sotto",
+      "guardar": "Crea avviso",
+      "quitar": "Togli avviso",
+      "activa": "Ti avviseremo quando scende sotto {precio}.",
+      "conSesion": "Accedi per creare un avviso di prezzo.",
+      "invalido": "Inserisci un prezzo tra 0,01 e 999 €.",
+      "ayuda": "Ti arriva come notifica e, se l'hai attivato, su Discord."
+    }
+  },
+  "GuiasPage": {
+    "titulo": "Guide",
+    "guiasCount": "{count, plural, =0 {Ancora nessuna} one {# guida} other {# guide}}",
+    "entraParaEscribir": "<link>Accedi</link> per scrivere una guida.",
+    "sinGuias": "Nessuno ha ancora scritto una guida di questo gioco. Sii il primo.",
+    "respuestasCount": "{count, plural, one {# risposta} other {# risposte}}"
+  },
+  "GuiaDetailPage": {
+    "todasLasGuias": "Tutte le guide",
+    "confirmarBorrarTitulo": "Eliminare questa guida?",
+    "confirmarBorrarMensaje": "Sparisce per tutti, insieme alle sue risposte. Non si può annullare.",
+    "confirmarBorrarBoton": "Sì, elimina",
+    "borrarGuia": "Elimina guida",
+    "respuestasHeading": "{count, plural, =0 {Risposte} one {# risposta} other {# risposte}}",
+    "entraParaResponder": "<link>Accedi</link> per rispondere."
+  },
+  "EnfoquePage": {},
+  "TrophyCountRow": {
+    "logros": "Obiettivi",
+    "tooltipPlatino": "Platini reali di PSN/Epic, più il 100% degli obiettivi su Steam/Xbox: contano allo stesso modo.",
+    "tooltipMetales": "Solo PSN ed Epic danno oro, argento e bronzo.",
+    "tooltipLogros": "Obiettivi singoli di Steam e Xbox: quelle piattaforme non li classificano per metallo, ma qui ognuno conta."
+  },
+  "TrophyIcon": {
+    "grade": {
+      "bronze": "Bronzo",
+      "silver": "Argento",
+      "gold": "Oro",
+      "platinum": "Platino"
+    },
+    "logro": "Obiettivo",
+    "tipos": {
+      "historia": "Storia",
+      "coleccionable": "Collezionabile",
+      "completista": "Completista",
+      "multijugador": "Multigiocatore",
+      "habilidad": "Abilità",
+      "grindeo": "Grinding",
+      "secreto": "Segreto"
+    },
+    "tipoAproximado": " (approssimativo, dal testo del trofeo)"
+  },
+  "TrophyList": {
+    "baseGame": "Gioco base",
+    "expansion": "Espansione",
+    "filtro": {
+      "perdible": "Perdibili",
+      "multijugador": "Multigiocatore",
+      "coleccionable": "Collezionabili",
+      "completista": "Completista",
+      "historia": "Storia",
+      "habilidad": "Abilità",
+      "grindeo": "Grinding",
+      "secreto": "Segreti"
+    },
+    "clear": "Pulisci",
+    "hideEarned": "Nascondi ottenuti",
+    "estado": "Stato",
+    "estadoTodos": "Tutti",
+    "estadoFaltan": "Mi mancano · {n}",
+    "estadoConseguidos": "Ottenuti",
+    "dlc": "Gioco base e DLC",
+    "todoDlc": "Tutto (gioco base e DLC)",
+    "chronologicalOrder": "Ordine cronologico",
+    "view": {
+      "list": "Elenco",
+      "grid": "Griglia",
+      "tree": "Albero",
+      "timeline": "Cronologia"
+    },
+    "hiddenTrophy": "Trofeo nascosto",
+    "missableHint": "Può restare non ottenuto per sempre se non lo fai al momento giusto",
+    "missable": "Perdibile",
+    "points": "{points} pt",
+    "showHidden": "Mostra nascosti"
+  },
+  "TrophyCounts": {},
+  "GameTrophyBreakdown": {
+    "title": "Obiettivi per piattaforma",
+    "subtitle": "Quanti trofei/obiettivi ha definito ogni versione di questo gioco.",
+    "trophiesHint": "Obiettivi/trofei definiti in questa versione",
+    "pointsHint": "Punti che si sommano al livello trofei PSN se li ottieni tutti (bronzo 15 · argento 30 · oro 90 · platino 300)",
+    "levelPoints": "{points} pt livello PSN"
+  },
+  "AchievementIcon": {},
+  "EtaPlatino": {
+    "rateFast": "{count} trofei/giorno",
+    "rateSlow": "1 trofeo ogni {days} giorni",
+    "heading": "Al tuo ritmo, finisci",
+    "tomorrow": "domani",
+    "inDays": "tra {days} giorni",
+    "calculated": "Calcolato con il {pronoun, select, mine {tuo} other {suo}} ritmo degli ultimi 30 giorni ({rate}). Se {pronoun, select, mine {rallenti o acceleri} other {rallenta o accelera}}, la data si sposta da sola alla prossima sincronizzazione."
+  },
+  "GameDlcs": {
+    "title": "Contenuti aggiuntivi",
+    "noCover": "Senza copertina"
+  },
+  "GameLanguages": {
+    "title": "Lingue",
+    "audio": "Audio",
+    "subtitles": "Sottotitoli",
+    "interface": "Interfaccia",
+    "showLess": "Mostra meno",
+    "showAll": "Mostra tutte le {count} lingue"
+  },
+  "GameNotes": {
+    "addNote": "+ Aggiungi una nota privata",
+    "edit": "Modifica",
+    "yourNote": "La tua nota (la vedi solo tu)",
+    "privateNoteLabel": "Nota privata — la vedi solo tu",
+    "placeholder": "Es.: mi manca il collezionabile 14 del capitolo 3",
+    "cancel": "Annulla",
+    "saving": "Salvataggio…",
+    "save": "Salva"
+  },
+  "GameVideos": {
+    "title": "Video"
+  },
+  "HltbCard": {
+    "title": "Ore stimate",
+    "mainStory": "Storia principale",
+    "platinum100": "Platino / 100%",
+    "note": "Media della community su HowLongToBeat, non il tuo ritmo — per quello c'è \"al tuo ritmo, finisci\" più sotto."
+  },
+  "CommunityRating": {
+    "noRatings": "Nessuno l'ha ancora valutato.",
+    "votes": "{count, plural, one {# valutazione} other {# valutazioni}}"
+  },
+  "CommunityDifficulty": {
+    "labelGifted": "Regalato",
+    "labelEasy": "Facile",
+    "labelMedium": "Media",
+    "labelHard": "Difficile",
+    "labelBrutal": "Brutale",
+    "voteAriaLabel": "Vota difficoltà {n} su 5: {label}",
+    "votes": "{count, plural, one {# voto} other {# voti}} di difficoltà",
+    "noVotes": "Nessuno ha ancora votato la difficoltà.",
+    "youVoted": "Hai votato: {label}",
+    "votePrompt": "Vota quanto ti è sembrato duro."
+  },
+  "AcquisitionEditor": {
+    "format": {
+      "fisico": "Fisico",
+      "digital": "Digitale",
+      "ps_plus": "PS Plus",
+      "game_pass": "Game Pass",
+      "prestado": "In prestito",
+      "gratis": "Gratis"
+    },
+    "prompt": "Da dove viene questo gioco, e quanto l'hai pagato?",
+    "edit": "Modifica",
+    "paid": "Hai pagato:",
+    "pricePlaceholder": "0.00",
+    "cancel": "Annulla",
+    "saving": "Salvataggio…",
+    "save": "Salva"
+  },
+  "CostePorHora": {
+    "hoursPlayed": "{price}€ · {hours}h giocate",
+    "perHour": "{value}€/h",
+    "invested": "Investito",
+    "hoursGained": "Ore ottenute",
+    "averagePerHour": "€/ora in media",
+    "dataCoverage": "Con {count, plural, one {# gioco} other {# giochi}} con prezzo e ore inseriti — più ne compili, più questa cifra sarà reale.",
+    "bestValue": "I più ammortizzati",
+    "worstValue": "I più cari all'ora"
+  },
+  "GameWishlistCard": {
+    "title": "Ti manca questo?",
+    "subtitle": "Aggiungilo ai desiderati per non perderlo di vista.",
+    "adding": "Aggiunta…",
+    "added": "✓ Nei desiderati",
+    "add": "+ Aggiungi ai desiderati"
+  },
+  "NuevaGuiaForm": {
+    "writeGuide": "+ Scrivi una guida",
+    "titlePlaceholder": "Titolo — es. «Percorso ottimale senza perdere nessun collezionabile»",
+    "bodyPlaceholder": "Spiegalo con calma: ordine consigliato, cosa lasceresti per ultimo, trappole tipiche…",
+    "cancel": "Annulla",
+    "publishing": "Pubblicazione…",
+    "publish": "Pubblica guida"
+  },
+  "RespuestaGuiaForm": {
+    "placeholder": "Rispondi con la tua esperienza, una correzione, un dubbio…",
+    "sending": "Invio…",
+    "submit": "Rispondi"
+  },
+  "TrophyGuideModal": {
+    "title": "Guida al trofeo: {name}",
+    "unpin": "Togli dalla vetrina",
+    "pin": "Fissa nella vetrina del profilo",
+    "tabVideo": "Video",
+    "tabWrittenGuide": "Guida scritta",
+    "searchingAnother": "Cerco un altro video...",
+    "searchingBest": "Cerco la migliore guida su YouTube...",
+    "noVideoFound": "Nessun video trovato",
+    "noVideoFoundDetail": "Non siamo riusciti a trovare automaticamente una guida su YouTube per questo trofeo.",
+    "wrongVideoHint": "Non è il video giusto? Cercane un altro.",
+    "searchAgain": "Cerca di nuovo",
+    "wrongVideoButton": "Non è questo — cercane un altro",
+    "noDescription": "Trofeo senza descrizione aggiuntiva.",
+    "earnedOn": "Ottenuto il {date}",
+    "manualCounter": {
+      "goalLabel": "Obiettivo:",
+      "goalPlaceholder": "es. 50",
+      "create": "Crea contatore",
+      "cancel": "Annulla",
+      "start": "+ Tieni il conto tu (contatore manuale)",
+      "remove": "Togli"
+    },
+    "writtenGuide": {
+      "notLinked": "Questa scheda non è collegata a un gioco, quindi qui non si può salvare niente.",
+      "loading": "Caricamento...",
+      "empty": "Nessuno qui ha ancora scritto una guida per questo trofeo. Sii il primo.",
+      "yours": "La tua guida",
+      "edit": "Modifica",
+      "deleteConfirmTitle": "Eliminare la tua guida?",
+      "deleteConfirmMessage": "Sparisce per tutti. Non si può annullare.",
+      "deleteConfirmLabel": "Sì, elimina",
+      "delete": "Elimina",
+      "placeholder": "Spiega come si ottiene questo trofeo — cosa va storto, cosa evitare, un trucco non ovvio...",
+      "saveChanges": "Salva modifiche",
+      "publish": "Pubblica guida",
+      "cancel": "Annulla",
+      "signInToWrite": "<link>Accedi</link> per scrivere la tua guida.",
+      "someone": "Qualcuno",
+      "searchElsewhere": "Preferisci cercarla fuori? Si apre in una nuova scheda.",
+      "searchTerm": "guida trofeo",
+      "searchOn": "Cerca su {site}"
+    },
+    "nextVideo": "Video successivo",
+    "videoN": "Video {n}",
+    "missingLabel": "Cosa ti manca?",
+    "missingHelp": "Scrivi cosa non trovi e cerco video nella tua lingua.",
+    "missingPlaceholder": "es. l'ultima reliquia, zona innevata",
+    "missingButton": "Cerca",
+    "missingSearching": "Ricerca…",
+    "missingResults": "Risultati per «{texto}»",
+    "backToGeneral": "Torna alla ricerca generale",
+    "needLogin": "Accedi per cercare con il tuo testo.",
+    "offensive": "Quel testo contiene linguaggio offensivo.",
+    "limit": "Troppe ricerche di fila. Riprova tra qualche minuto.",
+    "noResultsText": "Non ho trovato video con quel testo. Prova con altre parole."
+  },
+  "GameGuideLink": {
+    "searchQuery": "{title} guida completa migliori armi e armature",
+    "title": "Guida completa del gioco",
+    "subtitle": "Migliori armi, armature e altro — su un sito esterno"
+  },
+  "GameHeaderLogo": {},
+  "ManualGameStatus": {
+    "title": "Progresso",
+    "description": "Questo gioco è stato aggiunto a mano: non ci sono obiettivi da sincronizzare, quindi il progresso lo segni tu.",
+    "notStarted": "Da iniziare",
+    "completed": "Completato"
+  },
+  "PinGameButton": {
+    "unpin": "Togli come obiettivo attuale",
+    "pin": "Fissa come obiettivo attuale — si vedrà sul tuo profilo"
+  },
+  "PinnedGameBanner": {
+    "currentTarget": "Ora a caccia di questo platino",
+    "status": "{percent}% · {hasRemaining, select, yes {mancano {remaining} trofei} other {platinato!}}"
+  },
+  "AddManualGameModal": {
+    "searchUnavailable": "Ricerca non disponibile.",
+    "searchFailed": "Impossibile cercare. Controlla la connessione.",
+    "missingDevice": "Indica su cosa ci hai giocato.",
+    "addGame": "Aggiungi gioco",
+    "confirmGame": "Conferma il gioco",
+    "searchGame": "Cerca un gioco",
+    "close": "Chiudi",
+    "titlePlaceholder": "Titolo del gioco (es. Celeste, Chrono Trigger…)",
+    "searchHelp": "Per ciò che non ha obiettivi automatici: Switch, retro, giochi da tavolo… Si cerca nel catalogo di IGDB.",
+    "searching": "Ricerca…",
+    "noResults": "Nessun risultato per \"{query}\".",
+    "noDate": "Senza data",
+    "wishlisted": "✓ Desiderato",
+    "addToWishlist": "+ Desiderati",
+    "igdbCatalog": "Catalogo IGDB",
+    "pickAnother": "Scegline un altro",
+    "deviceLabel": "Su cosa ci hai giocato?",
+    "customDevicePlaceholder": "Es. Master System, gioco da tavolo, arcade…",
+    "notStarted": "Da iniziare",
+    "completed": "Completato",
+    "adding": "Aggiunta…",
+    "addToLibrary": "Aggiungi alla mia libreria"
+  },
+  "FocusMode": {
+    "trofeosNuevos": "{nuevos, plural, one {# nuovo trofeo} other {# nuovi trofei}}!",
+    "nadaNuevo": "Ancora niente di nuovo",
+    "ariaLabel": "Modalità concentrazione: {titulo}",
+    "modoEnfoque": "Modalità concentrazione",
+    "salirAriaLabel": "Esci dalla modalità concentrazione",
+    "oraculo": "Al tuo ritmo, lo finisci verso il <strong>{fecha}</strong> ({semanas, plural, one {# settimana} other {# settimane}} al tuo ritmo degli ultimi 90 giorni).",
+    "sinTrofeos": "Qui non resta nessun trofeo da ottenere. È fatta.",
+    "verGuia": "Vedi la guida",
+    "comprobando": "Controllo…",
+    "yaLoTengo": "Ce l'ho già?",
+    "salir": "Esci",
+    "notaAriaLabel": "Annota una nota veloce",
+    "notaPrivadaAriaLabel": "Nota privata",
+    "notaPrivadaTitulo": "Nota privata — la vedi solo tu",
+    "guardando": "Salvataggio…",
+    "guardado": "Salvato",
+    "notaPlaceholder": "Es.: codice dell'armadietto della sala d'attesa: DCM",
+    "cerrar": "Chiudi",
+    "platinoDesbloqueado": "Platino sbloccato"
+  },
+  "DiarioPlatino": {
+    "titulo": "📖 Il diario del platino",
+    "inicio": "La tua avventura in <b>{titulo}</b> è iniziata il <strong>{fecha}</strong>, con <italic>«{primerTrofeo}»</italic>.",
+    "muro": "Il tuo muro più grande è stato superare <italic>«{muroTrofeo}»</italic>: sei rimasto <strong>{dias, plural, one {# giorno} other {# giorni}}</strong> senza sbloccare niente prima di riuscirci.",
+    "hazana": "La tua impresa più grande è stata <italic>«{nombre}»</italic>, un trofeo che ha solo il <strong>{porcentaje} %</strong> di chi gioca a questo.",
+    "final": "Alla fine, ti sei incoronato il <strong>{fecha}</strong>, dopo <strong>{dias, plural, one {# giorno} other {# giorni}}</strong> di caccia."
+  },
+  "CollectionProgress": {
+    "titulo": "Collezioni",
+    "subtitulo": "Progresso raggruppato per obiettivi e saghe.",
+    "planificar": "Pianifica",
+    "completado": "{average}% completato"
+  },
+  "Collections": {
+    "titulo": "Cartelle",
+    "subtitulo": "I tuoi raggruppamenti, per ciò che non si può ordinare da solo.",
+    "sinCarpetas": "Non hai ancora cartelle. Si creano dalla scheda di qualsiasi gioco.",
+    "juegosCantidad": "{cantidad, plural, one {# gioco} other {# giochi}}",
+    "confirmarBorrarTitulo": "Eliminare questa cartella?",
+    "confirmarBorrarMensaje": "«{nombre}» sparisce con {cantidad, plural, one {il # gioco} other {i # giochi}} che raggruppa (i giochi non vengono eliminati, solo la cartella).",
+    "confirmarBorrarBoton": "Sì, elimina",
+    "borrar": "Elimina"
+  },
+  "CarpetasManager": {
+    "submitPending": "…",
+    "searchLibrary": "Cerca nella tua libreria...",
+    "noMatches": "Nessuna corrispondenza.",
+    "folderNamePlaceholder": "Nome della cartella",
+    "create": "Crea",
+    "cancel": "Annulla",
+    "addGamesNow": "Aggiungi giochi subito (facoltativo, si può fare dopo):",
+    "newFolderNamePlaceholder": "Nome della nuova cartella",
+    "move": "Sposta",
+    "moveTo": "Sposta in…",
+    "newFolder": "+ Nuova cartella",
+    "rename": "Rinomina",
+    "confirmDelete": "Sicuro?",
+    "yes": "Sì",
+    "no": "No",
+    "delete": "Elimina",
+    "save": "Salva",
+    "noGamesYet": "Ancora nessun gioco.",
+    "remove": "Togli",
+    "add": "Aggiungi",
+    "close": "Chiudi",
+    "addGames": "+ Aggiungi giochi",
+    "title": "Le tue cartelle",
+    "emptyState": "Non hai ancora nessuna cartella. Crea la prima per iniziare a organizzare la tua libreria."
+  },
+  "CollapsibleSection": {
+    "hide": "Nascondi {label}",
+    "show": "Mostra {label}"
+  },
+  "Pegi": {
+    "titleAttr": "PEGI {edad}: non consigliato ai minori di {edad} anni",
+    "ariaLabel": "PEGI {edad}"
+  },
+  "FavoritePicker": {
+    "edit": "Modifica preferiti",
+    "selectTitle": "Scegli i tuoi preferiti ({count}/4)",
+    "searchPlaceholder": "Cerca un gioco...",
+    "cancel": "Annulla",
+    "save": "Salva preferiti"
+  },
+  "FiltroEstadoAnimo": {
+    "title": "Cosa ti va oggi?",
+    "empty": "Niente in sospeso di quel tipo in questo momento — il tuo backlog è pulito in questa categoria."
+  },
+  "RefrescoAutomatico": {},
+  "SaludSincronizacion": {
+    "noneRefreshed": "Questa volta non è stato possibile aggiornarne nessuno.",
+    "updated": "{count, plural, one {# gioco aggiornato} other {# giochi aggiornati}}.",
+    "remaining": " Ne restano {count}: puoi riprovare.",
+    "allUpToDate": " È tutto aggiornato.",
+    "totalGames": "{count, plural, one {# gioco} other {# giochi}} ·",
+    "upToDate": "aggiornati",
+    "noDetail": "{count} senza dettaglio",
+    "stale": "{count} da aggiornare",
+    "updating": "Aggiornamento…",
+    "catchUp": "Mettiti in pari",
+    "explanation": "«Senza dettaglio» sono giochi di cui sappiamo il totale dei trofei ma non quali né quando — finché non si richiedono, non contano nello storico né nelle serie. L'aggiornamento va a blocchi: se ne restano altri, si può ripetere. Xbox è escluso di proposito, perché la sua API ha un limite orario condiviso tra tutti gli utenti di Paragon."
+  },
+  "AutoSyncJuego": {
+    "newTrophies": "✨ {count, plural, one {# nuovo trofeo} other {# nuovi trofei}} dall'ultima volta"
+  },
+  "GameCard": {
+    "objetivoActualTitle": "Ora a caccia di questo platino",
+    "objetivoActual": "Obiettivo attuale"
+  },
+  "GameGrid": {},
+  "GameDetailsSidebar": {
+    "title": "Dettagli",
+    "developer": "Sviluppatore",
+    "publisher": "Editore",
+    "releaseDate": "Data di uscita",
+    "platforms": "Piattaforme",
+    "genres": "Generi",
+    "themes": "Temi",
+    "gameModes": "Modalità di gioco",
+    "franchises": "Franchise",
+    "websites": "Siti web"
+  },
+  "LibraryGrid": {
+    "status": {
+      "todos": "Tutti",
+      "enCurso": "In corso",
+      "aPunto": "A un passo",
+      "abandonado": "Abbandonati",
+      "platinado": "Platinati",
+      "completado": "Al 100%",
+      "sinEmpezar": "Da iniziare",
+      "deseados": "Desiderati"
+    },
+    "sort": {
+      "reciente": "Più recente",
+      "progreso": "Più completato",
+      "pendientes": "Ciò che manca meno",
+      "asequible": "Platino più abbordabile",
+      "titulo": "Titolo (A-Z)",
+      "horas": "Più ore giocate"
+    },
+    "adquisicion": {
+      "fisico": "Fisico",
+      "digital": "Digitale",
+      "psPlus": "PS Plus",
+      "gamePass": "Game Pass",
+      "prestado": "In prestito",
+      "gratis": "Gratis"
+    },
+    "sinEmpresa": "Senza azienda",
+    "listPercentCompleted": "{percent}% completato",
+    "searchPlaceholder": "Cerca per titolo, azienda o genere…",
+    "clear": "Pulisci",
+    "sortAsc": "Ordine crescente",
+    "sortDesc": "Ordine decrescente",
+    "allPlatforms": "Tutte",
+    "platformCount": "{label} ({count})",
+    "moreFilters": "Altri filtri",
+    "resultsCount": "{count} risultati",
+    "clearFilters": "Pulisci filtri",
+    "folderPlaceholder": "Tutte le cartelle",
+    "publisherPlaceholder": "Tutte le aziende",
+    "genrePlaceholder": "Tutti i generi",
+    "pegiPlaceholder": "Qualsiasi età",
+    "pegiOption": "PEGI {value}",
+    "difficultyPlaceholder": "Qualsiasi difficoltà",
+    "difficultyOption": "{label} ({level}/10)",
+    "hoursPlaceholder": "Qualsiasi durata",
+    "formatPlaceholder": "Qualsiasi formato",
+    "porAmortizar": "Da ammortizzare (>5€/h)",
+    "soloFaltaDlc": "Manca solo il DLC",
+    "agruparPorEmpresa": "Raggruppa per azienda",
+    "noResults": "Nessun gioco con questi filtri.",
+    "groupCount": "{count} giochi",
+    "loadingMore": "Caricamento di altri giochi…",
+    "viewSpines": "Dorsi"
+  },
+  "IgnorarHoras": {
+    "segunPlataforma": "La piattaforma dice che hai giocato {horas} h.",
+    "ignoradas": "Queste {horas} h non contano nelle tue statistiche.",
+    "explicacion": "PlayStation e Steam attribuiscono le ore all'account, non alla persona: se qualcuno gioca con il tuo account, sembrano tue.",
+    "ignorar": "Non ci ho giocato: ignora le ore",
+    "volverAContar": "Torna a contarle"
+  }
+}

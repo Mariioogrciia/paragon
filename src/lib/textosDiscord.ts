@@ -67,6 +67,28 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     ligaTitulo: "🏅 Invitation à une ligue",
     ligaTexto: (q, l) => `${q} t'a invité dans la ligue **${l}** sur Paragon.`,
   },
+  it: {
+    nivelTitulo: (n) => `⭐ Livello Paragon ${n}!`,
+    nivelTexto: "Stai andando alla grande in questa stagione.",
+    platinoTitulo: (j) => `🏆 Platino ottenuto! — ${j}`,
+    trofeosTitulo: (j, n) => `🎮 ${j} — ${n === 1 ? "1 nuovo trofeo" : `${n} nuovi trofei`}`,
+    masTrofeos: (n) => `… e altri ${n}`,
+    conectadoTitulo: "✅ Paragon collegato",
+    conectadoTexto: "Quando ottieni un nuovo trofeo, te lo dico qui.",
+    ligaTitulo: "🏅 Invito a una lega",
+    ligaTexto: (q, l) => `${q} ti ha invitato alla lega **${l}** su Paragon.`,
+  },
+  pt: {
+    nivelTitulo: (n) => `⭐ Nível Paragon ${n}!`,
+    nivelTexto: "Estás a dar tudo esta temporada.",
+    platinoTitulo: (j) => `🏆 Platina conquistada! — ${j}`,
+    trofeosTitulo: (j, n) => `🎮 ${j} — ${n === 1 ? "1 troféu novo" : `${n} troféus novos`}`,
+    masTrofeos: (n) => `… e mais ${n}`,
+    conectadoTitulo: "✅ Paragon ligado",
+    conectadoTexto: "Quando conseguires um troféu novo, digo-te por aqui.",
+    ligaTitulo: "🏅 Convite para uma liga",
+    ligaTexto: (q, l) => `${q} convidou-te para a liga **${l}** no Paragon.`,
+  },
 };
 
 export function textosDm(idioma: Idioma): TextosDm {

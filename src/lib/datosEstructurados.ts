@@ -28,7 +28,7 @@ export function datosSitio(dominio: string, perfilesDelAutor: string[]): Json {
         name: NOMBRE,
         url: `${dominio}/`,
         description: DESCRIPCION_ES,
-        inLanguage: ["es", "en", "de", "fr"],
+        inLanguage: ["es", "en", "de", "fr", "it", "pt"],
         publisher: { "@id": `${dominio}/#autor` },
       },
       {

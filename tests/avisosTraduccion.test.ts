@@ -88,7 +88,9 @@ describe("normalizarIdioma", () => {
   it("se queda con el idioma de Paragon y si no, español", () => {
     expect(normalizarIdioma("en-US")).toBe("en");
     expect(normalizarIdioma("de")).toBe("de");
-    expect(normalizarIdioma("pt-BR")).toBe("es");
+    expect(normalizarIdioma("pt-BR")).toBe("pt");
+    expect(normalizarIdioma("it-IT")).toBe("it");
+    expect(normalizarIdioma("ja-JP")).toBe("es");
     expect(normalizarIdioma(null)).toBe("es");
   });
 });

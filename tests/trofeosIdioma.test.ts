@@ -3,9 +3,9 @@ import { BUSQUEDA_VIDEO, CODIGO_PLATAFORMA, IDIOMAS, IDIOMA_BASE, esIdioma } fro
 import { rarity } from "@/lib/design";
 
 describe("idiomas de trofeos", () => {
-  it("reconoce solo los cuatro idiomas de la interfaz", () => {
+  it("reconoce solo los idiomas de la interfaz", () => {
     for (const i of IDIOMAS) expect(esIdioma(i)).toBe(true);
-    for (const raro of ["pt", "es-ES", "", null, undefined, 3]) expect(esIdioma(raro)).toBe(false);
+    for (const raro of ["ja", "pt-BR", "es-ES", "", null, undefined, 3]) expect(esIdioma(raro)).toBe(false);
   });
 
   it("cada plataforma que se pide por servidor tiene un código para cada idioma", () => {

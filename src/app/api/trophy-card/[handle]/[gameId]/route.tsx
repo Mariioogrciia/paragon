@@ -61,6 +61,8 @@ const TEXTOS_HISTORIA: Record<Idioma, { platino: string; cien: string; horas: st
   en: { platino: "Platinum earned", cien: "100% complete", horas: "Hours", rareza: "Rarity", trofeos: "Trophies", cta: "All your trophies in one place" },
   de: { platino: "Platin erreicht", cien: "100 % geschafft", horas: "Stunden", rareza: "Seltenheit", trofeos: "Trophäen", cta: "Alle deine Trophäen an einem Ort" },
   fr: { platino: "Platine obtenu", cien: "100 % terminé", horas: "Heures", rareza: "Rareté", trofeos: "Trophées", cta: "Tous tes trophées au même endroit" },
+  it: { platino: "Platino ottenuto", cien: "100% completato", horas: "Ore", rareza: "Rarità", trofeos: "Trofei", cta: "Tutti i tuoi trofei in un unico posto" },
+  pt: { platino: "Platina conquistada", cien: "100% concluído", horas: "Horas", rareza: "Raridade", trofeos: "Troféus", cta: "Todos os teus troféus num só sítio" },
 };
 
 export async function GET(

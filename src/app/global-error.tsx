@@ -13,7 +13,7 @@ import { reportarError } from "@/lib/reportarError";
  * de eso esté disponible. Estilos en línea a propósito, no clases.
  *
  * Tampoco hay next-intl aquí (su proveedor vive en el layout que ha
- * reventado): los textos van en los 4 idiomas en este mismo archivo y se
+ * reventado): los textos van en los 6 idiomas en este mismo archivo y se
  * elige por el idioma del navegador.
  */
 const TEXTOS = {
@@ -21,6 +21,8 @@ const TEXTOS = {
   en: { titulo: "Paragon is down", texto: "A serious error stopped the whole app from loading, not just this page. It's already been logged.", referencia: "Reference:", reintentar: "Try again", inicio: "Go home" },
   de: { titulo: "Paragon ist ausgefallen", texto: "Ein schwerer Fehler hat das Laden der ganzen App verhindert, nicht nur dieser Seite. Er wurde bereits protokolliert.", referencia: "Referenz:", reintentar: "Erneut versuchen", inicio: "Zur Startseite" },
   fr: { titulo: "Paragon est en panne", texto: "Une erreur grave a empêché toute l'application de se charger, pas seulement cette page. Elle a déjà été enregistrée.", referencia: "Référence :", reintentar: "Réessayer", inicio: "Aller à l'accueil" },
+  it: { titulo: "Paragon non funziona", texto: "Un errore grave ha impedito il caricamento dell'intera app, non solo di questa pagina. È già stato registrato.", referencia: "Riferimento:", reintentar: "Riprova", inicio: "Vai alla home" },
+  pt: { titulo: "O Paragon foi abaixo", texto: "Um erro grave impediu a app inteira de carregar, não só esta página. Já ficou registado.", referencia: "Referência:", reintentar: "Tentar de novo", inicio: "Ir para o início" },
 };
 type IdiomaError = keyof typeof TEXTOS;
 

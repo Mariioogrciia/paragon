@@ -1,0 +1,641 @@
+{
+  "ajustesErrores": {
+    "contenido_ofensivo": "Non è stato salvato niente — qualche campo (utente, nome, titolo o stato) contiene linguaggio offensivo. Cambialo e riprova.",
+    "handle_invalido": "Non è stato salvato niente — il nome utente deve avere tra 3 e 20 caratteri: solo minuscole, numeri e trattino basso.",
+    "handle_cogido": "Non è stato salvato niente — quel nome utente è già preso.",
+    "datos_invalidos": "Non è stato salvato niente — l'immagine, il banner, il colore o il fuso orario non hanno un formato valido.",
+    "update_failed": "Impossibile salvare. Riprova tra un momento.",
+    "demasiados_intentos": "Hai salvato molte volte di fila. Aspetta un minuto e riprova."
+  },
+  "ajustesNav": {
+    "general": "Generale",
+    "apariencia": "Aspetto",
+    "escaparate": "Vetrine e firma",
+    "seguridad": "Accesso e sicurezza",
+    "plataformas": "Account di gioco",
+    "ocultar": "Nascondi",
+    "titulo": "Impostazioni",
+    "grupoPerfil": "Il tuo profilo",
+    "grupoCuenta": "Account",
+    "grupoPanel": "Pannello e menu",
+    "discord": "Bot di Discord",
+    "avisos": "Avvisi"
+  },
+  "navOcultable": {
+    "feed": "Community",
+    "ligas": "Leghe",
+    "amigos": "Amici",
+    "descubrir": "Scopri",
+    "planificador": "Pianificatore"
+  },
+  "panelOcultable": {
+    "ritmo": "Il tuo ritmo (riepilogo del mese e grafico)",
+    "misiones": "Missioni settimanali",
+    "talDia": "Un giorno come oggi",
+    "estadisticas": "Attività e statistiche",
+    "recomendaciones": "Prossimo trofeo",
+    "aUnPaso": "A un passo dal platino",
+    "parados": "Giochi fermi",
+    "lanzamientos": "Prossime uscite",
+    "recientes": "Giocati di recente",
+    "actividad": "Attività recente"
+  },
+  "categoriaAviso": {
+    "trofeos": "Nuovi trofei e platini",
+    "perdibles": "Trofei perdibili all'inizio di un gioco",
+    "lanzamientos": "Uscite della tua lista dei desideri",
+    "precios": "Avvisi di prezzo",
+    "ligas": "Leghe, stagione e guerre tra clan",
+    "social": "Sessioni e sfide di Platinare insieme",
+    "amigos": "Platini dei tuoi amici (nella campanella)",
+    "resumen": "Riepilogo settimanale su Discord"
+  },
+  "avisoPublico": {
+    "psn": "Il tuo profilo trofei deve essere pubblico perché possiamo leggerlo — se è privato, la tua libreria resterà vuota.",
+    "steam": "Il tuo profilo Steam deve essere pubblico, e anche «Dettagli di gioco» — senza questa seconda impostazione la tua libreria resterà vuota anche se il profilo è già pubblico.",
+    "xbox": "La tua cronologia degli obiettivi Xbox deve essere pubblica perché possiamo leggerla — se è privata, la tua libreria resterà vuota.",
+    "epic": "Il tuo profilo obiettivi di Epic Games deve essere pubblico perché possiamo leggerlo — se è privato, la tua libreria resterà vuota."
+  },
+  "bienvenida": {
+    "title": "Prepariamoci",
+    "subtitle": "Due passi ed è fatta.",
+    "step1": {
+      "title": "Scegli il tuo nome utente",
+      "description": "È il tuo identificativo dentro Paragon, ed è da lì che i tuoi amici ti aggiungeranno. Minuscole, numeri e trattino basso."
+    },
+    "step2": {
+      "title": "Collega dove giochi",
+      "description": "Ne basta una per iniziare; l'altra puoi aggiungerla quando vuoi dalle impostazioni. Non serve password né token per nessuna delle due: a leggere gli obiettivi ci pensa il server.",
+      "psnLabel": "PlayStation · il tuo ID pubblico",
+      "steamLabel": "Steam · utente, SteamID64 o URL del profilo",
+      "steamHint": "Su Steam, «Il mio profilo» e «Dettagli di gioco» devono essere pubblici per poter leggere gli obiettivi.",
+      "xboxLabel": "Xbox · il tuo Gamertag"
+    }
+  },
+  "movilEnlazar": {
+    "error": {
+      "title": "Impossibile collegare l'app",
+      "description": "Riprova dal pulsante \"Accedi\" dentro l'app di Paragon."
+    },
+    "linking": {
+      "title": "Collegamento con l'app…",
+      "description": "Se non torni automaticamente all'app, tocca il link.",
+      "openApp": "Apri Paragon"
+    },
+    "actualizar": {
+      "title": "Aggiorna l'app di Paragon",
+      "description": "Questa versione dell'app non può più accedere in modo sicuro. Installa l'ultima versione e accedi di nuovo da lì."
+    }
+  },
+  "ajustesOcultar": {
+    "title": "Nascondi",
+    "description": "Niente community — questo è solo tuo. Togli dal menu le funzioni che non ti interessano; restano lì per tutti, tu smetti solo di vederle.",
+    "panelTitle": "Sezioni del pannello",
+    "panelDescription": "Quelle che selezioni non appaiono nel tuo pannello (e non vengono calcolate, così carica prima).",
+    "navTitle": "Menu di navigazione"
+  },
+  "ajustesPlataformas": {
+    "title": "Account di gioco",
+    "description": "Collega le tue piattaforme per sincronizzare automaticamente i tuoi trofei.",
+    "help": {
+      "psn": "Il tuo ID pubblico PlayStation, il nome con cui giochi.",
+      "steam": "L'URL del tuo profilo, il tuo SteamID64 o il nome del tuo URL personalizzato (steamcommunity.com/id/quel-nome). Il nome che si vede sul profilo non va bene: Steam non permette di cercarlo e potrebbe prendere l'account di un'altra persona.",
+      "xbox": "Il tuo Gamertag Xbox. Sincronizza davvero la tua cronologia degli obiettivi, tramite un servizio di terzi (non ufficiale di Microsoft) — può fallire o smettere di funzionare se quel servizio cambia.",
+      "epic": "Il link al tuo profilo Epic Games (o il tuo ID account) — non è un'API ufficiale di Epic, quindi può fallire o smettere di funzionare se Epic cambia il suo sito."
+    },
+    "avisoPublico": {
+      "psn": "Il tuo profilo trofei PSN deve essere pubblico, o non potremo leggere i tuoi giochi né i tuoi trofei.",
+      "steam": "Su Steam, «Il mio profilo» E «Dettagli di gioco» devono essere pubblici — solo uno dei due non basta.",
+      "xbox": "La tua cronologia degli obiettivi Xbox deve essere visibile, o non potremo leggerla dopo il collegamento.",
+      "epic": "Il tuo profilo Epic Games deve essere «Pubblico», o non potremo leggere i tuoi obiettivi."
+    },
+    "linked": "Collegato",
+    "private": "Privato",
+    "levelLabel": "Livello {level}",
+    "accountLinked": "Account collegato",
+    "syncedAt": " · sincronizzato {date}",
+    "changeAccount": "Cambia account",
+    "linkAccount": "Collega account",
+    "confirmUnlink": {
+      "title": "Scollegare {platform}?",
+      "message": "Il tuo progresso e i trofei già salvati restano così come sono, ma smette di sincronizzarsi finché non ricolleghi l'account.",
+      "confirmLabel": "Sì, scollega",
+      "trigger": "Scollega {platform}"
+    },
+    "nintendo": {
+      "title": "Nintendo Switch",
+      "badge": "Ecosistema chiuso",
+      "description": "Nintendo Switch non ha un sistema di trofei proprio né un'API dell'attività di gioco."
+    },
+    "collections": {
+      "title": "Cartelle",
+      "description": "I tuoi raggruppamenti fatti a mano. Si creano e si riempiono dalla scheda di ogni gioco; qui si rivedono e si eliminano soltanto."
+    },
+    "sync": {
+      "title": "Sincronizzazione",
+      "steamNote": "Steam non dà la percentuale di obiettivi nell'elenco dei giochi: si calcola gioco per gioco. Sincronizzando arrivano i più recenti e il resto si completa da solo la prima volta che apri la loro scheda."
+    },
+    "health": {
+      "title": "Stato della libreria",
+      "description": "Cosa manca da portare da ogni piattaforma."
+    },
+    "history": {
+      "title": "Cronologia di sincronizzazione",
+      "row": "{games} giochi · {newTrophies} nuovi trofei · {date}"
+    },
+    "epicExt": {
+      "titulo": "Collega Epic con l'estensione di Paragon",
+      "paso1": "Installa l'estensione di Paragon nel tuo browser e collegala al tuo account.",
+      "paso2": "Accedi all'Epic Games Store con il tuo account e apri il tuo avatar → «I miei obiettivi» (l'indirizzo finisce con /u/ e un codice).",
+      "paso3": "Tocca l'icona dell'estensione → «Sincronizza Epic ora». Ripetilo quando vuoi aggiornare.",
+      "conectar": "Collega l'estensione",
+      "formulario": "Prova con il link del mio profilo (Epic di solito lo blocca)"
+    },
+    "steamExtra": {
+      "titulo": "Altri account Steam",
+      "descripcion": "I loro giochi e obiettivi si sommano alla tua libreria, insieme a quelli del tuo account principale. Si sincronizzano insieme a esso.",
+      "anadir": "Aggiungi account",
+      "sinCuentas": "Non ne hai ancora aggiunto nessuno.",
+      "privada": "Libreria privata",
+      "sincronizada": "Sincronizzato {date}",
+      "quitar": "Togli",
+      "confirmTitulo": "Togliere {nombre}?",
+      "confirmTexto": "Smetterà di sincronizzarsi. Quello che hai già ottenuto con esso resta nella tua libreria.",
+      "confirmBoton": "Togli account"
+    },
+    "epicOficial": {
+      "boton": "Verifica con Epic Games",
+      "ayuda": "Accedi a Epic e quell'account sarà collegato e verificato: Epic conferma che è tuo. Gli obiettivi continuano ad arrivare con l'estensione.",
+      "verificada": "Verificato",
+      "yaVerificada": "Account verificato con Epic Games.",
+      "ok": "Account Epic collegato e verificato.",
+      "deOtro": "Quell'account Epic è già collegato a un altro utente di Paragon.",
+      "error": "Impossibile verificare l'account Epic. Riprova tra un momento."
+    }
+  },
+  "ajustesSeguridad": {
+    "title": "Accesso e sicurezza",
+    "description": "Controlla gli account con cui accedi e chiudi la tua sessione attiva.",
+    "linkedBanner": "Account collegato — ora puoi entrare in Paragon con uno qualsiasi dei due.",
+    "alreadyLinkedBanner": "Quell'account è già collegato a UN ALTRO utente di Paragon — non si può unire al tuo. Se è un errore, esci e accedi direttamente con esso per vedere a quale account appartiene.",
+    "linkedAccounts": {
+      "title": "Account collegati (accesso)",
+      "linked": "Collegato",
+      "hint": "Collega un altro modo di accedere — con entrambi attivi, uno qualsiasi dei due apre questo stesso account, anche se hanno email diverse.",
+      "linkWith": "Collega con {provider}",
+      "linkAction": "Collega"
+    },
+    "confirmUnlink": {
+      "title": "Scollegare {provider}?",
+      "message": "Non potrai più entrare in Paragon con questo account. Se è l'unico modo di accedere che ti resta, non potrai annullarlo senza ricollegarlo.",
+      "confirmLabel": "Sì, scollega"
+    },
+    "export": {
+      "title": "La tua eredità (esporta i dati)",
+      "description": "Scarica una copia completa della tua cronologia sulla piattaforma in formato JSON. Include i tuoi giochi, i trofei ottenuti, recensioni, cartelle, guide create e la cronologia di sincronizzazione. Non include password né token.",
+      "button": "Esporta i miei dati"
+    },
+    "signOut": {
+      "title": "Esci",
+      "description": "Chiude la sessione attuale in questo browser. Dovrai autenticarti di nuovo la prossima volta che entri.",
+      "button": "Esci"
+    },
+    "sessions": {
+      "title": "Sessioni aperte",
+      "description": "{n, plural, =1 {Hai solo questa sessione aperta.} other {Hai # sessioni aperte: questo browser, altri browser, l'app Android o l'estensione PSN.}}",
+      "button": "Esci dagli altri dispositivi",
+      "confirmTitle": "Chiudere le altre sessioni?",
+      "confirmMessage": "Paragon verrà chiuso in tutti gli altri browser, nell'app Android e nell'estensione PSN. Questo browser resta dentro.",
+      "confirmLabel": "Sì, chiudile"
+    }
+  },
+  "forms": {
+    "common": {
+      "save": "Salva",
+      "test": "Prova"
+    },
+    "handle": {
+      "placeholder": "il_tuo_utente",
+      "change": "Cambia",
+      "continue": "Continua",
+      "keepAvatar": "Usa la foto del mio account come avatar"
+    },
+    "psn": {
+      "placeholder": "Il tuo ID PlayStation",
+      "update": "Aggiorna",
+      "link": "Collega"
+    },
+    "steam": {
+      "placeholder": "URL del profilo, SteamID64 o URL personalizzato",
+      "update": "Aggiorna",
+      "link": "Collega"
+    },
+    "xbox": {
+      "placeholder": "Il tuo Gamertag Xbox",
+      "update": "Aggiorna",
+      "link": "Collega"
+    },
+    "epic": {
+      "placeholder": "Link al tuo profilo Epic Games",
+      "update": "Aggiorna",
+      "link": "Collega"
+    },
+    "collection": {
+      "placeholder": "Nuova cartella (es. «Da fare 2026»)",
+      "create": "Crea"
+    },
+    "league": {
+      "namePlaceholder": "Nome della lega (es. «I soliti»)",
+      "create": "Crea lega",
+      "durationLabel": "Durata (facoltativa):",
+      "durationPlaceholder": "3",
+      "durationNone": "Senza data di fine",
+      "durationUnits": {
+        "dias": "Giorni",
+        "semanas": "Settimane",
+        "meses": "Mesi",
+        "anios": "Anni"
+      },
+      "noChallenge": "Senza sfida",
+      "noFriendsAvailable": "Tutti i tuoi amici disponibili sono già in questa lega.",
+      "chooseFriend": "Scegli un amico…",
+      "invite": "Invita"
+    },
+    "friend": {
+      "placeholder": "utente_di_paragon",
+      "sendRequest": "Invia richiesta"
+    },
+    "profile": {
+      "displayNameLabel": "Nome visualizzato",
+      "displayNamePlaceholder": "Es. Alex",
+      "avatarUrlLabel": "URL dell'avatar",
+      "avatarUrlPlaceholder": "https://...",
+      "save": "Salva profilo"
+    },
+    "discordDm": {
+      "notLinked": "Accedi con Discord (invece che con Google) per poter attivare questa opzione — senza, il bot non sa a chi scrivere.",
+      "title": "Avvisi via DM del bot",
+      "description": "Un messaggio diretto del bot di Paragon quando ottieni un nuovo trofeo.",
+      "hint": "Perché il bot possa scriverti, dovete condividere un server Discord (quello in cui è stato invitato il bot di Paragon) e avere attivi i DM dai membri del server.",
+      "guia": "Come collegare il bot, passo dopo passo →"
+    },
+    "sync": {
+      "syncNow": "Sincronizza ora",
+      "syncing": "Sincronizzazione…",
+      "syncPlatform": "Sincronizza {label}"
+    },
+    "hiddenNav": {
+      "hideLabel": "Nascondi {label}"
+    }
+  },
+  "profileForm": {
+    "title": "Informazioni personali",
+    "description": "Gestisci le tue informazioni personali e le preferenze.",
+    "avatar": {
+      "title": "Carica avatar",
+      "uploadButton": "Carica avatar",
+      "uploading": "Caricamento...",
+      "hint": "Formati JPG, JPEG, PNG e GIF, fino a 5 MB",
+      "errorSubida": "Impossibile caricare il file.",
+      "usarAvatarDe": "Usa l'avatar di {plataforma}"
+    },
+    "banner": {
+      "title": "Banner del profilo",
+      "empty": "Nessun banner personalizzato",
+      "uploadButton": "Carica banner",
+      "uploading": "Caricamento...",
+      "hint": "Sostituisce lo sfondo di gioco. Immagine (JPG, PNG, GIF) o breve video (MP4, WebM), proporzione ideale 3:1"
+    },
+    "details": {
+      "title": "Dettagli del profilo",
+      "usernameLabel": "Nome utente",
+      "emailLabel": "Email",
+      "firstNameLabel": "Nome",
+      "lastNameLabel": "Cognome",
+      "profileTitleLabel": "Titolo del profilo",
+      "profileTitlePlaceholder": "Es. Cacciatore di platini",
+      "backgroundGameLabel": "Gioco per lo sfondo",
+      "statusLabel": "Stato",
+      "statusPlaceholder": "A cosa stai giocando?"
+    },
+    "visual": {
+      "title": "Personalizzazione visiva",
+      "colorLabel": "Colore del profilo",
+      "colorHint": "Questo colore inonderà il tuo profilo quando lo visitano.",
+      "themeLabel": "Tema del profilo",
+      "themeHint": "Come si vede il tuo profilo per chi lo visita — non cambia il suo.",
+      "frameLabel": "Cornice dell'avatar",
+      "frameHint": "Sei al livello {nivel}. Le cornici bloccate vengono scartate anche se le scegli.",
+      "previewLabel": "Anteprima",
+      "previewFallbackName": "Il tuo nome",
+      "previewFallbackTitle": "Ancora senza titolo",
+      "bannerLabel": "Banner per piattaforma",
+      "bannerHint": "Arte originale di Paragon, senza foto protette da diritti. Sostituisce quello che carichi sopra; caricare di nuovo un file lo rimpiazza.",
+      "sectionOrderLabel": "Ordine delle sezioni"
+    },
+    "regional": {
+      "title": "Impostazioni regionali",
+      "languageLabel": "Lingua",
+      "timezoneLabel": "Fuso orario"
+    },
+    "saveButton": "Salva modifiche",
+    "noChanges": "Nessuna modifica da salvare",
+    "unsavedChanges": "Hai modifiche non salvate",
+    "resetButton": "Ripristina",
+    "discordTitle": "Discord",
+    "pushTitle": "Notifiche del browser",
+    "frames": {
+      "none": "Senza cornice",
+      "neon": "Cornice Neon (livello 5+)",
+      "gold": "Cornice Dorata (livello 10+)",
+      "circuito": "Cornice Circuito (livello 25+)",
+      "platinum": "Cornice Platino (livello 50+)",
+      "fire": "Cornice Fuoco (livello 100+)",
+      "cristal": "Cornice Cristallo (livello 150+)",
+      "laurel": "Alloro (distintivo Campione)",
+      "aurora": "Aurora (distintivo Stagione d'oro)",
+      "eclipse": "Eclissi (distintivo nascosto)"
+    },
+    "themes": {
+      "dark": "Scuro",
+      "light": "Chiaro",
+      "oled": "OLED",
+      "highContrast": "Contrasto alto"
+    },
+    "backgroundPicker": {
+      "empty": "Ancora nessun gioco nella tua libreria.",
+      "autoTitle": "Automatico (il più recente)",
+      "auto": "Auto",
+      "verTodos": "Vedi tutti ({n})"
+    },
+    "previewTitle": "Così ti vedono",
+    "previewHint": "Si aggiorna mentre modifichi; si salva premendo Salva.",
+    "verMenos": "Vedi meno",
+    "masIdeas": "+{n} idee",
+    "verBloqueados": "🔒 Vedi {n} da sbloccare",
+    "ocultarBloqueados": "Nascondi quelli bloccati"
+  },
+  "appearanceSettings": {
+    "title": "Aspetto",
+    "description": "Come vedi tu l'app in questo browser — non cambia quello che vedono gli altri.",
+    "modeTitle": "Modalità",
+    "textSizeTitle": "Dimensione del testo",
+    "textSizeDescription": "Riguarda tutta l'app. Se hai già il browser o il telefono con il carattere più grande, «Normale» rispetta la tua impostazione.",
+    "accentTitle": "Accento e tavolozza",
+    "freeColor": "Colore libero",
+    "styleTitle": "Stile",
+    "styleDescription": "Non solo il colore — il raggio degli angoli, l'ombra, il carattere e perfino lo sfondo cambiano secondo lo stile.",
+    "themesTitle": "Temi",
+    "themesDescription": "Combinazioni con un clic: modalità + accento + stile insieme.",
+    "styleLocked": "Si sblocca al livello {nivel}",
+    "gameTitle": "Dal tuo gioco",
+    "gameDescription": "Tutta l'app prende il colore della copertina del gioco che scegli. Se quel colore si legge male, si corregge da solo.",
+    "gameEmpty": "Quando avrai giochi con copertina nella libreria, potrai sceglierne uno qui.",
+    "gameFavorite": "Preferito",
+    "previewTitle": "Anteprima",
+    "previewHint": "Cambia subito con quello che scegli.",
+    "previewNext": "Prossimo platino",
+    "previewLeft": "{n} trofei per il platino",
+    "previewButton": "Vedi percorso"
+  },
+  "themeCustomizer": {
+    "label": "Aspetto"
+  },
+  "pushToggle": {
+    "notConfigured": "Il server non ha ancora configurato le notifiche push.",
+    "activateError": "Impossibile attivare.",
+    "activated": "Notifiche attivate.",
+    "deactivateError": "Impossibile disattivare.",
+    "deactivated": "Notifiche disattivate.",
+    "testSent": "Avviso inviato — dovrebbe arrivarti tra pochi secondi.",
+    "testError": "Impossibile inviare.",
+    "notSupported": "Questo browser non supporta le notifiche push.",
+    "denied": "Hai bloccato le notifiche per questo sito. Attivale dalle impostazioni del browser (l'icona accanto alla barra degli indirizzi) per poterle accendere qui.",
+    "checking": "Controllo…",
+    "deactivate": "Disattiva",
+    "test": "Prova",
+    "activate": "Attiva notifiche",
+    "hint": "Un avviso quando ottieni un nuovo trofeo, anche se non hai Paragon aperto — arriva direttamente dal browser, senza passare da terzi."
+  },
+  "privacyGuide": {
+    "title": {
+      "psn": "Dove rendo pubblico il mio profilo PSN?",
+      "steam": "Dove rendo pubblico il mio profilo Steam?",
+      "xbox": "Dove rendo pubblica la mia cronologia Xbox?",
+      "epic": "Dove rendo pubblico il mio profilo Epic Games?"
+    },
+    "steps": {
+      "psn": [
+        "Dalla console (PS5/PS4): Impostazioni → Utenti e account → Privacy → Personalizza.",
+        "Cerca \"Livello trofei, giochi e vetrine\" (o \"Trofei\") e impostalo su \"Chiunque\" / \"Tutti\".",
+        "Se preferisci dal telefono: app PlayStation → il tuo profilo → icona impostazioni → Privacy dell'account → Trofei.",
+        "La modifica è immediata — non serve uscire e rientrare né aspettare."
+      ],
+      "steam": [
+        "Vai al tuo profilo Steam (web o client) → \"Modifica profilo\" → \"Impostazioni privacy\".",
+        "Imposta \"Il mio profilo\" su Pubblico.",
+        "Questa è quella che quasi tutti saltano: imposta ANCHE \"Dettagli di gioco\" su Pubblico — senza, Steam non permette di leggere la tua libreria anche se il profilo è già pubblico.",
+        "Premi \"Salva\" in fondo alla pagina."
+      ],
+      "xbox": [
+        "Sulla console o nell'app Xbox: il tuo profilo → \"Privacy e sicurezza online\" → \"Visualizza dettagli e personalizza\".",
+        "Cerca \"Cronologia di gioco e statistiche\" (o \"Condivisione contenuti\") e impostalo su \"Tutti\".",
+        "Xbox usa un servizio di terzi non ufficiale (OpenXBL) per leggere questi dati — se il tuo profilo è già pubblico e continua a non funzionare, non è la tua impostazione: riprova più tardi."
+      ],
+      "epic": [
+        "Nell'Epic Games Store (web o launcher): tocca il tuo avatar in alto a destra → \"I miei obiettivi\".",
+        "In alto a destra nella pagina degli obiettivi, tocca \"Livello di privacy\" e scegli \"Pubblico\".",
+        "Copia il link di quella stessa pagina (finisce con /u/ seguito da un codice) e incollalo qui."
+      ]
+    }
+  },
+  "importLibraryModal": {
+    "trigger": "Importa CSV",
+    "title": "Importa libreria",
+    "invalidCsv": "Nessun gioco valido trovato nel CSV. Assicurati che ci sia una colonna 'Name'.",
+    "csvReadError": "Errore nella lettura del CSV: {message}",
+    "importError": "Errore durante l'importazione",
+    "dropzone": "<strong>Clicca per caricare</strong> il tuo CSV (Playnite / GOG)",
+    "dropzoneHint": "Deve contenere colonne come Name, Platform...",
+    "gamesFound": "Trovati <strong>{count}</strong> giochi pronti da importare. Il processo abbinerà automaticamente ogni gioco alla sua copertina IGDB. Può richiedere un po' di tempo.",
+    "moreGames": "...e altri {count} giochi.",
+    "importing": "Importazione...",
+    "startImport": "Avvia importazione"
+  },
+  "platformTiles": {
+    "todo": "Tutto",
+    "recommendations": "Suggerimenti",
+    "playstation": "PlayStation",
+    "xbox": "Xbox",
+    "steam": "Steam",
+    "nintendo": "Nintendo",
+    "nintendoNote": "I giochi Switch si registrano a mano nella tua libreria — Scopri non ha ancora una sezione propria per loro (in sviluppo).",
+    "epicGames": "Epic Games",
+    "epicGamesNote": "Si può già collegare da Impostazioni → Account di gioco. Non c'è ancora nessuna fonte pubblica di notizie né catalogo: il suo sito blocca persino il proprio feed RSS ufficiale.",
+    "ubisoft": "Ubisoft",
+    "ubisoftNote": "Non si può più collegare a Paragon (non ha mai avuto una vera sincronizzazione) — e non ha nemmeno un feed di notizie pubblico: il suo sito non espone RSS."
+  },
+  "firma": {
+    "titulo": "La tua firma",
+    "descripcion": "Un'immagine con il tuo livello, i platini e gli ultimi trofei che si aggiorna da sola. Incollala nei forum, nella bio di Twitch o su Discord.",
+    "enlace": "Immagine",
+    "copiar": "Copia",
+    "obs": "Per le dirette: in OBS aggiungi una «Sorgente browser» con il link OBS (480×120). Mostra il tuo gioco attuale e il tuo ultimo trofeo, e si aggiorna da sola."
+  },
+  "avisos": {
+    "titulo": "Di cosa ti avvisiamo",
+    "descripcion": "Su browser, app e Discord. Gli inviti e le richieste di amicizia arrivano sempre."
+  },
+  "trofeoDesbloqueado": {
+    "titulo": "Trofeo sbloccato",
+    "cerrar": "Chiudi",
+    "mas": "{n, plural, one {+# altro nuovo trofeo} other {+# altri nuovi trofei}}"
+  },
+  "completarSteam": {
+    "titulo": "Sincronizzazione dei tuoi obiettivi Steam… {hechos} di {total} giochi",
+    "descripcion": "Puoi continuare a usare Paragon: man mano che arrivano, i giochi mostrano i loro obiettivi.",
+    "error": "Non è stato possibile portare ora tutti gli obiettivi di Steam. Si completeranno da soli, oppure puoi premere «Sincronizza ora»."
+  },
+  "guiaDiscord": {
+    "titulo": "Bot di Discord",
+    "descripcion": "Come collegare il bot di Paragon, passo dopo passo. Così puoi usare comandi come /perfil o /racha nel tuo server e ricevere avvisi.",
+    "opcional": "Facoltativo",
+    "p1": {
+      "titulo": "Collega il tuo Discord al tuo account Paragon",
+      "texto": "Il bot sa chi sei dal tuo account Discord. Se sei entrato in Paragon con Discord, è già fatto. Se sei entrato con Google, devi collegare il tuo Discord in Impostazioni → «Accesso e sicurezza».",
+      "listo": "Fatto: il tuo Discord è collegato.",
+      "boton": "Collega il mio Discord"
+    },
+    "p2": {
+      "titulo": "Aggiungi il bot al tuo server",
+      "texto": "Premi il pulsante, scegli il server Discord dove lo vuoi e conferma. Ti serve il permesso <b>Gestisci server</b> in quel server (non serve esserne il proprietario). Il bot chiede solo il permesso di inviare messaggi.",
+      "boton": "Aggiungi Paragon a Discord",
+      "sinConfigurar": "Il bot non è ancora configurato in questo Paragon. Torna più tardi.",
+      "yaEsta": "Se il bot è già nel tuo server (l'ha aggiunto un'altra persona), salta questo passo."
+    },
+    "p3": {
+      "titulo": "Controlla che funzioni",
+      "texto": "In un canale qualsiasi di quel server scrivi <c>/perfil</c> e invialo. Se ti risponde con le tue statistiche di Paragon, è tutto a posto.",
+      "nota": "Se scrivendo «/» Discord non ti suggerisce i comandi di Paragon, aspetta qualche minuto e riavvia l'app di Discord."
+    },
+    "p4": {
+      "titulo": "Avvisi in un canale",
+      "texto": "Nel canale dove vuoi gli annunci (per esempio, quando qualcuno del server sale di livello Paragon) scrivi <c>/anunciosaqui</c>. Funziona solo se gestisci il server, e annuncia solo chi ha gli avvisi di Discord attivi in Paragon."
+    },
+    "p5": {
+      "titulo": "Avvisi via messaggio diretto",
+      "texto": "Attiva «Avvisi via DM del bot» in Impostazioni → Generale e il bot ti scriverà quando ottieni un trofeo. Perché possa scriverti dovete condividere un server (quello con il bot) e avere consentiti i messaggi diretti dai membri del server (su Discord: impostazioni del server → Privacy).",
+      "boton": "Vai a Impostazioni → Generale"
+    },
+    "fallos": {
+      "titulo": "Se qualcosa non funziona",
+      "noVinculada": {
+        "pregunta": "Il bot dice che il mio account non è collegato",
+        "respuesta": "Stai usando un Discord diverso da quello che hai collegato a Paragon. Entra in Paragon (o collega in «Accesso e sicurezza») con lo stesso account Discord con cui scrivi i comandi."
+      },
+      "noResponde": {
+        "pregunta": "Discord dice «L'applicazione non ha risposto»",
+        "respuesta": "Succede a volte la prima volta dopo un po' che non si usa il bot, perché impiega a partire. Invia di nuovo il comando."
+      },
+      "noComandos": {
+        "pregunta": "Non vedo i comandi scrivendo /",
+        "respuesta": "Controlla che il bot sia nel server (appare nell'elenco dei membri). Se l'hai appena aggiunto, Discord può impiegare qualche minuto a mostrare i comandi; riavvia l'app di Discord. Prova con <c>/help</c>."
+      },
+      "noDm": {
+        "pregunta": "Non mi arrivano gli avvisi via messaggio diretto",
+        "respuesta": "Controlla che il tuo Discord sia collegato (passo 1), che condividi un server con il bot e che consenti i messaggi diretti dai membri del server. In Impostazioni → Generale, con l'interruttore attivo, appare un pulsante «Prova» che ti dice il motivo esatto se fallisce."
+      }
+    },
+    "comandos": "Elenco dei comandi e altri dettagli in <link>Come funziona</link>."
+  },
+  "asistente": {
+    "enlace": "Non sai cosa mettere? Assistente passo dopo passo",
+    "titulo": "Collega il tuo account passo dopo passo",
+    "subtitulo": "Scegli dove giochi, ti mostriamo dov'è il tuo ID e controlliamo che si possa leggere prima di collegarlo.",
+    "paso1": "Dove giochi?",
+    "paso2": "Il tuo ID",
+    "paso3": "Verifica",
+    "ilustracion": "Illustrazione di dove guardare",
+    "donde": {
+      "psn": {
+        "titulo": "Il tuo ID online PlayStation",
+        "pasos": [
+          "Apri il tuo profilo sulla console o nell'app PlayStation.",
+          "È il nome che appare sotto il tuo avatar (l'ID online, non il tuo nome reale).",
+          "Scrivilo così com'è."
+        ]
+      },
+      "steam": {
+        "titulo": "L'indirizzo del tuo profilo Steam",
+        "pasos": [
+          "Apri il tuo profilo Steam (nel browser, o in Steam: il tuo nome → Profilo).",
+          "Copia l'indirizzo: steamcommunity.com/id/… o steamcommunity.com/profiles/7656…",
+          "Incollalo intero. Il nome visibile non va bene: Steam non permette di cercarlo."
+        ]
+      },
+      "xbox": {
+        "titulo": "Il tuo gamertag Xbox",
+        "pasos": [
+          "Apri il tuo profilo sulla console o nell'app Xbox.",
+          "È il nome grande in alto.",
+          "Scrivilo così com'è, con il #numero se ce l'ha."
+        ]
+      }
+    },
+    "comprobar": "Verifica",
+    "comprobando": "Verifica…",
+    "eresTu": "Sei tu?",
+    "filas": {
+      "encontrada": "Account trovato",
+      "libre": "È già collegato a un altro utente di Paragon",
+      "perfilPublico": {
+        "ok": "Profilo pubblico",
+        "mal": "Il profilo è privato"
+      },
+      "detallesJuego": {
+        "ok": "«Dettagli di gioco» pubblici",
+        "mal": "«Dettagli di gioco» è privato"
+      },
+      "trofeosVisibles": {
+        "ok": "Trofei visibili",
+        "mal": "I trofei non si possono vedere"
+      },
+      "logrosVisibles": {
+        "ok": "Cronologia degli obiettivi visibile",
+        "mal": "La cronologia degli obiettivi non si può vedere"
+      }
+    },
+    "comoArreglarlo": "Come sistemarlo",
+    "psnExtension": "Preferisci non renderli pubblici? Con l'estensione di Paragon per il browser si leggono con la tua sessione.",
+    "psnExtensionEnlace": "Collega l'estensione",
+    "libreAyuda": "Se è tuo, entra con l'account Paragon che lo ha collegato e scollegalo da Impostazioni → Piattaforme.",
+    "listo": "Tutto a posto: collegando si importa la tua libreria.",
+    "noListo": "Puoi collegarlo già, ma la libreria resterà vuota finché non lo sistemi.",
+    "volverAComprobar": "Verifica di nuovo",
+    "vincular": "Collega {nombre}",
+    "vincularIgual": "Collega comunque",
+    "vinculando": "Collegamento…",
+    "otraPlataforma": "Collega un'altra piattaforma",
+    "verBiblioteca": "Vedi la mia libreria",
+    "epic": "Epic Games funziona con l'estensione del browser: è in Impostazioni → Piattaforme.",
+    "maqueta": {
+      "perfil": "Profilo",
+      "idOnline": "ID online",
+      "privacidad": "Privacy",
+      "psnTrofeos": "Livello trofei, giochi e vetrine",
+      "cualquiera": "Chiunque",
+      "steamPrivacidad": "Impostazioni privacy",
+      "steamPerfil": "Il mio profilo",
+      "steamDetalles": "Dettagli di gioco",
+      "publico": "Pubblico",
+      "xboxPrivacidad": "Privacy e sicurezza online",
+      "xboxHistorial": "Cronologia di gioco e statistiche",
+      "todos": "Tutti",
+      "guardar": "Salva"
+    }
+  },
+  "ajustesAvisos": {
+    "titulo": "Avvisi",
+    "descripcion": "Di cosa ti avvisiamo e dove: nella campanella del sito, nel browser, nell'app e su Discord."
+  }
+}

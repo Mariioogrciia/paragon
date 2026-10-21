@@ -2,7 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { NAMESPACES } from '../../messages/manifest';
 
-export const locales = ['es', 'en', 'de', 'fr'];
+export const locales = ['es', 'en', 'de', 'fr', 'it', 'pt'];
 export const defaultLocale = 'es';
 
 export default getRequestConfig(async () => {

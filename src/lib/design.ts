@@ -142,4 +142,6 @@ const ETIQUETAS_RAREZA: Record<string, [string, string, string, string]> = {
   en: ["Ultra rare", "Very rare", "Rare", "Common"],
   de: ["Ultra selten", "Sehr selten", "Selten", "Häufig"],
   fr: ["Ultra rare", "Très rare", "Rare", "Commun"],
+  it: ["Ultra raro", "Molto raro", "Raro", "Comune"],
+  pt: ["Ultra raro", "Muito raro", "Raro", "Comum"],
 };

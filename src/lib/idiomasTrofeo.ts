@@ -2,7 +2,7 @@
  * Idiomas de la interfaz y cómo se pide cada uno a cada plataforma (ver
  * lib/trofeosIdioma.ts). Módulo puro: lo usan también las guías en vídeo.
  */
-export const IDIOMAS = ["es", "en", "de", "fr"] as const;
+export const IDIOMAS = ["es", "en", "de", "fr", "it", "pt"] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
 export function esIdioma(valor: unknown): valor is Idioma {
@@ -30,9 +30,9 @@ export const IDIOMA_BASE: Record<string, Idioma> = { psn: "en", xbox: "en", stea
 
 /** Código que entiende cada plataforma. Epic y manual no se piden por servidor. */
 export const CODIGO_PLATAFORMA: Record<string, Record<Idioma, string> | undefined> = {
-  psn: { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR" },
-  xbox: { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR" },
-  steam: { es: "spanish", en: "english", de: "german", fr: "french" },
+  psn: { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR", it: "it-IT", pt: "pt-PT" },
+  xbox: { es: "es-ES", en: "en-US", de: "de-DE", fr: "fr-FR", it: "it-IT", pt: "pt-PT" },
+  steam: { es: "spanish", en: "english", de: "german", fr: "french", it: "italian", pt: "portuguese" },
 };
 
 /** Para las búsquedas de YouTube (parámetros `hl` y `gl`) y la palabra "guía" de cada idioma. */
@@ -41,4 +41,6 @@ export const BUSQUEDA_VIDEO: Record<Idioma, { hl: string; gl: string; guia: stri
   en: { hl: "en", gl: "US", guia: "guide" },
   de: { hl: "de", gl: "DE", guia: "Anleitung" },
   fr: { hl: "fr", gl: "FR", guia: "guide" },
+  it: { hl: "it", gl: "IT", guia: "guida" },
+  pt: { hl: "pt", gl: "PT", guia: "guia" },
 };

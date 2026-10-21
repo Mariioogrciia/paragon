@@ -1,0 +1,11 @@
+{
+  "title": "Entrar no Paragon",
+  "description": "Escolhe com que conta queres entrar. Depois ligas os teus perfis da PlayStation ou do Steam, que é de onde vêm os troféus e as conquistas.",
+  "google": "Continuar com o Google",
+  "discord": "Continuar com o Discord",
+  "disclaimer": "Não guardamos palavras-passe: o acesso fica com o teu fornecedor. Os troféus são lidos do perfil público da PSN, por isso o teu perfil de troféus tem de estar visível.",
+  "stats": {
+    "heading": "4.312 troféus\npor contar.",
+    "subheading": "Cada partida mexe num número. O Paragon lê-os todos e diz-te qual está a um só troféu ou conquista de cair."
+  }
+}

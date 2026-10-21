@@ -76,6 +76,7 @@ import { RetoAmigosError, cancelarRetoAmigos, crearRetoAmigos, responderRetoAmig
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { tr } from "@/lib/mensajesWeb";
+import { esIdioma } from "@/lib/idiomasTrofeo";
 import { SteamExtraError, anadirCuentaSteamExtra, quitarCuentaSteamExtra } from "@/lib/steamExtra";
 
 export interface ActionState {
@@ -1121,6 +1122,7 @@ export async function adminAvisoATodosAction(formData: FormData): Promise<void> 
 import { cookies } from "next/headers";
 
 export async function updateLanguageAction(locale: string): Promise<void> {
+  if (!esIdioma(locale)) return;
   const cookieStore = await cookies();
   cookieStore.set("NEXT_LOCALE", locale, { path: "/", maxAge: 31536000 }); // 1 year
 

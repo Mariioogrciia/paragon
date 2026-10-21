@@ -89,6 +89,8 @@ const GNEWS_REGION: Record<string, string> = {
   en: "hl=en-US&gl=US&ceid=US:en",
   de: "hl=de&gl=DE&ceid=DE:de",
   fr: "hl=fr&gl=FR&ceid=FR:fr",
+  it: "hl=it&gl=IT&ceid=IT:it",
+  pt: "hl=pt-PT&gl=PT&ceid=PT:pt-150",
 };
 
 /** Fuentes que en la búsqueda solo aportan marcadores, apuestas o cotizaciones. */
