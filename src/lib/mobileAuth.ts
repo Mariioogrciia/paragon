@@ -2,6 +2,7 @@ import "server-only";
 import { and, count, eq, gt, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
+import { registrarActividadApp } from "@/lib/trafico";
 
 /**
  * Autenticación para el cliente nativo de Android (Compose): usa un
@@ -34,6 +35,8 @@ export async function getMobileUserId(req: Request): Promise<string | null> {
     where: and(eq(sessions.sessionToken, token), gt(sessions.expires, new Date())),
   });
 
+  // Cuenta el día como "usó la app" para Admin → Analítica (lib/trafico.ts). Sin esperar.
+  if (row?.userId) void registrarActividadApp(row.userId);
   return row?.userId ?? null;
 }
 

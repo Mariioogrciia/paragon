@@ -1623,3 +1623,27 @@ h3,
 /* Marca de progreso declarado (MarcaDeclarado.tsx): icono discreto con tooltip. */
 .marca-declarado { display: inline-flex; vertical-align: -2px; margin-left: 0.25rem; color: var(--gold); opacity: 0.85; cursor: help; }
 .marca-declarado:hover { opacity: 1; }
+
+/* Colores categóricos de las gráficas de Admin → Analítica (22 oct 2026):
+   la paleta validada de la guía de visualización (orden fijo, distinguibles
+   con daltonismo entre vecinos), con su escalón para fondo oscuro y claro.
+   "Otros" va siempre en gris. Las de una sola serie usan el acento. */
+:root {
+  --cat-1: #3987e5;
+  --cat-2: #d95926;
+  --cat-3: #199e70;
+  --cat-4: #c98500;
+  --cat-5: #d55181;
+  --cat-otros: #6b6b66;
+  --estado-bien: #0ca30c;
+  --estado-regular: #fab219;
+  --estado-mal: #d03b3b;
+}
+.light {
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
+  --cat-4: #eda100;
+  --cat-5: #e87ba4;
+  --cat-otros: #a3a39c;
+}

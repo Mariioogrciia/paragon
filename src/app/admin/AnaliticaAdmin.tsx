@@ -1,15 +1,50 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { analitica } from "@/lib/trafico";
+import { analitica, audiencia } from "@/lib/trafico";
+import { datosPlataforma } from "@/lib/analiticaPlataforma";
 import { resumenRegistro24h } from "@/lib/registro";
 import { GraficaDias } from "@/components/admin/GraficaDias";
+import { Donut, type PorcionDonut } from "@/components/admin/Donut";
+import { MapaCalor } from "@/components/admin/MapaCalor";
+import { BarrasLista, Embudo, TablaCohortes, TarjetaVital } from "@/components/admin/GraficasPanel";
+import { PLATFORM_LABEL } from "@/lib/types";
 
 /**
  * Admin → Analítica (21 oct 2026): el tráfico propio (lib/trafico.ts), la
  * gente activa, las altas y las sincronizaciones, con gráficas por día y
  * selector de periodo. Server component: las gráficas son la única parte
  * de cliente (por el ratón).
+ *
+ * Ampliado el 22 oct 2026 ("todo lo que se pueda sacar de analíticas, con
+ * gráficas y gráficos circulares"): audiencia (país, navegador, sistema,
+ * dispositivo, idioma, pantalla, tema, campañas), cuándo (mapa de calor),
+ * web frente a app, rendimiento (Web Vitals), usuarios (embudo, retención,
+ * registro, plataformas, avisos), comunidad y calidad (404 y bots).
  */
+
+const SECCIONES = ["trafico", "audiencia", "cuando", "rendimiento", "usuarios", "comunidad", "calidad"] as const;
+
+/** Bandera a partir del código de país (🇪🇸). */
+function bandera(codigo: string): string {
+  return /^[A-Z]{2}$/.test(codigo) ? String.fromCodePoint(...[...codigo].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)) : "🏳️";
+}
+
+function Seccion({ id, titulo, children }: { id: string; titulo: string; children: React.ReactNode }) {
+  return (
+    <section id={`a-${id}`} className="scroll-mt-24 space-y-5">
+      <h2 className="font-heading border-b border-border pb-2 text-lg font-bold uppercase tracking-wide">{titulo}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Tarjeta({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`min-w-0 rounded-[14px] p-4 ${className}`} style={CARD}>
+      {children}
+    </div>
+  );
+}
 
 const PERIODOS = [7, 30, 90] as const;
 const CARD = { border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" };
@@ -37,14 +72,46 @@ function Kpi({ label, valor, children }: { label: string; valor: string; childre
 }
 
 export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: string }) {
-  const [t, datos, registro] = await Promise.all([getTranslations("Admin"), analitica(dias), resumenRegistro24h()]);
+  const [t, datos, registro, aud, plat] = await Promise.all([
+    getTranslations("Admin"),
+    analitica(dias),
+    resumenRegistro24h(),
+    audiencia(dias),
+    datosPlataforma(dias),
+  ]);
   const num = (n: number) => n.toLocaleString(locale);
   const pctMovil = datos.totales.vistas > 0 ? Math.round((datos.totales.movil / datos.totales.vistas) * 100) : 0;
   const maxRuta = Math.max(1, ...datos.topRutas.map((r) => r.vistas));
   const maxOrigen = Math.max(1, ...datos.topOrigenes.map((o) => o.entradas));
 
+  const nombrePais = new Intl.DisplayNames([locale], { type: "region" });
+  const nombreIdioma = new Intl.DisplayNames([locale], { type: "language" });
+  const seguro = (f: () => string, otro: string) => {
+    try {
+      return f();
+    } catch {
+      return otro;
+    }
+  };
+  const rep = (tipo: string) => aud.reparto[tipo] ?? [];
+  const donut = (tipo: string, etiqueta: (v: string) => string, icono?: (v: string) => string): PorcionDonut[] =>
+    rep(tipo).map((r) => ({ etiqueta: etiqueta(r.valor), valor: r.n, icono: icono?.(r.valor) }));
+  const comun = { locale, etiquetaOtros: t("analitica.otros"), vacio: t("analitica.sinDatosCorto") };
+  const plataforma = (v: string) => PLATFORM_LABEL[v as keyof typeof PLATFORM_LABEL] ?? v;
+  const proveedor = (v: string) => ({ google: "Google", discord: "Discord", epic: "Epic Games" })[v] ?? v;
+  const vitales = ["LCP", "INP", "CLS", "FCP", "TTFB"].map((m) => aud.rendimiento.find((r) => r.metrica === m)).filter((r) => r !== undefined);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
+      <nav aria-label={t("analitica.secciones")} className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold uppercase tracking-wide">
+        {SECCIONES.map((s) => (
+          <a key={s} href={`#a-${s}`} className="text-muted hover:text-[var(--accent-text)]">
+            {t(`analitica.seccion.${s}`)}
+          </a>
+        ))}
+      </nav>
+
+      <Seccion id="trafico" titulo={t("analitica.seccion.trafico")}>
       <div className="flex flex-wrap items-center gap-2">
         {PERIODOS.map((p) => (
           <Link
@@ -151,6 +218,172 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
           )}
         </section>
       </div>
+
+      </Seccion>
+
+      <Seccion id="audiencia" titulo={t("analitica.seccion.audiencia")}>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <Tarjeta>
+            <Donut titulo={t("analitica.paises")} unidad={t("analitica.unidadVisitas")} {...comun}
+              datos={donut("pais", (v) => seguro(() => nombrePais.of(v) ?? v, v), bandera)} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.dispositivos")} unidad={t("analitica.unidadVisitas")} {...comun}
+              datos={donut("dispositivo", (v) => t(`analitica.dispositivo.${v === "movil" || v === "tablet" ? v : "escritorio"}`))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.navegadores")} unidad={t("analitica.unidadVisitas")} {...comun} datos={donut("navegador", (v) => v)} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.sistemas")} unidad={t("analitica.unidadVisitas")} {...comun} datos={donut("sistema", (v) => v)} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.idiomas")} unidad={t("analitica.unidadVisitas")} {...comun}
+              datos={donut("idioma", (v) => (v === "otro" ? t("analitica.otros") : seguro(() => nombreIdioma.of(v) ?? v, v)))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.temas")} unidad={t("analitica.unidadVisitas")} {...comun}
+              datos={donut("tema", (v) => t(`analitica.tema.${v === "claro" ? "claro" : "oscuro"}`))} />
+          </Tarjeta>
+          <Tarjeta>
+            <h3 className="mb-3 text-sm font-bold">{t("analitica.pantallas")}</h3>
+            <BarrasLista locale={locale} vacio={t("analitica.sinDatosCorto")}
+              filas={["< 640", "640–1023", "1024–1439", "1440–1919", "≥ 1920"].map((v) => ({ clave: v, etiqueta: `${v} px`, valor: rep("pantalla").find((r) => r.valor === v)?.n ?? 0 })).filter((f) => f.valor > 0)} />
+          </Tarjeta>
+          <Tarjeta>
+            <h3 className="mb-3 text-sm font-bold">{t("analitica.campanas")}</h3>
+            <BarrasLista locale={locale} vacio={t("analitica.sinCampanas")} filas={rep("campana").slice(0, 10).map((r) => ({ clave: r.valor, etiqueta: r.valor, valor: r.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.conSesion")} unidad={t("analitica.unidadVistas")} {...comun}
+              datos={donut("sesion", (v) => t(`analitica.sesion.${v === "con" ? "con" : "sin"}`))} />
+          </Tarjeta>
+        </div>
+      </Seccion>
+
+      <Seccion id="cuando" titulo={t("analitica.seccion.cuando")}>
+        <Tarjeta>
+          <MapaCalor
+            titulo={t("analitica.mapaCalor")}
+            datos={aud.semanaHora}
+            dias={t("analitica.diasSemana").split(",")}
+            unidad={t("analitica.unidadVistas")}
+            locale={locale}
+            textoTabla={t("analitica.verTabla")}
+            textoHora={t("analitica.horaPunta", { h: "{h}" })}
+          />
+        </Tarjeta>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <Tarjeta>
+            <GraficaDias titulo={t("analitica.graficaApp")} puntos={aud.appPorDia} tipo="columnas" unidad={t("analitica.unidadPersonas")} locale={locale} textoTabla={t("analitica.verTabla")} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.webApp")} unidad={t("analitica.unidadPersonas")} {...comun}
+              datos={[{ etiqueta: t("analitica.web"), valor: aud.usuariosWeb }, { etiqueta: t("analitica.app"), valor: aud.usuariosApp }]} />
+            <p className="mt-3 text-xs text-muted">{t("analitica.webAppNota")}</p>
+          </Tarjeta>
+        </div>
+      </Seccion>
+
+      <Seccion id="rendimiento" titulo={t("analitica.seccion.rendimiento")}>
+        {vitales.length === 0 ? (
+          <p className="text-sm text-muted">{t("analitica.sinVitales")}</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
+            {vitales.map((v) => (
+              <TarjetaVital key={v.metrica} {...v} nombre={t(`analitica.vital.${v.metrica}`)} locale={locale}
+                textos={{ bien: t("analitica.bien"), regular: t("analitica.regular"), mal: t("analitica.mal"), medidas: t("analitica.medidas", { n: "{n}" }) }} />
+            ))}
+          </div>
+        )}
+        <p className="max-w-3xl text-xs text-muted">{t("analitica.vitalesNota")}</p>
+      </Seccion>
+
+      <Seccion id="usuarios" titulo={t("analitica.seccion.usuarios")}>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <Tarjeta>
+            <h3 className="mb-3 text-sm font-bold">{t("analitica.embudo")}</h3>
+            <Embudo locale={locale} textoDelAnterior={t("analitica.delAnterior", { pct: "{pct}" })}
+              pasos={[
+                { etiqueta: t("analitica.paso.registrados"), valor: plat.embudo.registrados },
+                { etiqueta: t("analitica.paso.conPerfil"), valor: plat.embudo.conPerfil },
+                { etiqueta: t("analitica.paso.conPlataforma"), valor: plat.embudo.conPlataforma },
+                { etiqueta: t("analitica.paso.sincronizados"), valor: plat.embudo.sincronizados },
+                { etiqueta: t("analitica.paso.conLogros"), valor: plat.embudo.conLogros },
+                { etiqueta: t("analitica.paso.conPlatino"), valor: plat.embudo.conPlatino },
+              ]} />
+          </Tarjeta>
+          <Tarjeta>
+            <h3 className="mb-1 text-sm font-bold">{t("analitica.retencion")}</h3>
+            <p className="mb-3 text-xs text-muted">{t("analitica.retencionAyuda")}</p>
+            <TablaCohortes cohortes={plat.cohortes} locale={locale}
+              textos={{ semana: t("analitica.semanaAlta"), altas: t("analitica.altas"), vacio: t("analitica.sinCohortes"), columna: t("analitica.semanaN", { n: "{n}" }) }} />
+          </Tarjeta>
+        </div>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <Tarjeta>
+            <Donut titulo={t("analitica.proveedores")} unidad={t("analitica.unidadPersonas")} {...comun} datos={plat.proveedores.map((p) => ({ etiqueta: proveedor(p.valor), valor: p.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.plataformasVinculadas")} unidad={t("analitica.unidadCuentas")} {...comun} datos={plat.plataformas.map((p) => ({ etiqueta: plataforma(p.valor), valor: p.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.multiplataforma")} unidad={t("analitica.unidadPersonas")} {...comun}
+              datos={plat.multiplataforma.map((p) => ({ etiqueta: t("analitica.nPlataformas", { n: Number(p.valor) }), valor: p.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <h3 className="mb-3 text-sm font-bold">{t("analitica.avisosActivados")}</h3>
+            <BarrasLista locale={locale} vacio={t("analitica.sinDatosCorto")} porcentaje={false}
+              filas={[
+                { clave: "web", etiqueta: t("analitica.avisoWeb"), valor: plat.avisos.webPush },
+                { clave: "app", etiqueta: t("analitica.avisoApp"), valor: plat.avisos.app },
+              ]} />
+            <p className="mt-3 text-xs text-muted">
+              {t("analitica.avisosTotal", { n: plat.avisos.usuarios, pct: plat.embudo.registrados > 0 ? Math.round((plat.avisos.usuarios / plat.embudo.registrados) * 100) : 0 })}
+            </p>
+          </Tarjeta>
+        </div>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <Tarjeta>
+            <Donut titulo={t("analitica.trofeosPorPlataforma")} unidad={t("analitica.unidadTrofeos")} {...comun} datos={plat.trofeosPeriodo.map((p) => ({ etiqueta: plataforma(p.valor), valor: p.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.syncsPorPlataforma")} unidad={t("analitica.unidadSync")} {...comun} datos={plat.syncsPeriodo.map((p) => ({ etiqueta: plataforma(p.valor), valor: p.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <h3 className="mb-3 text-sm font-bold">{t("analitica.topJuegos")}</h3>
+            <BarrasLista locale={locale} vacio={t("analitica.sinDatosCorto")} porcentaje={false}
+              filas={plat.topJuegos.map((j) => ({ clave: `${j.plataforma}-${j.titulo}`, etiqueta: <>{j.titulo} <span className="text-xs text-muted">· {plataforma(j.plataforma)}</span></>, valor: j.jugadores }))} />
+          </Tarjeta>
+        </div>
+      </Seccion>
+
+      <Seccion id="comunidad" titulo={t("analitica.seccion.comunidad")}>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+          <Kpi label={t("analitica.catalogoJuegos")} valor={num(plat.catalogo.juegos)} />
+          <Kpi label={t("analitica.catalogoTrofeos")} valor={num(plat.catalogo.trofeos)} />
+          <Kpi label={t("analitica.trofeosGanados")} valor={num(plat.catalogo.ganados)} />
+          {["amistades", "clanes", "ligas", "guias", "colecciones", "comentarios", "reacciones", "sesiones"].map((k) => (
+            <Kpi key={k} label={t(`analitica.comunidad.${k}`)} valor={num(plat.comunidad[k] ?? 0)} />
+          ))}
+          <Kpi label={t("analitica.pegajosidad")} valor={datos.activos.mes > 0 ? `${Math.round((datos.activos.hoy / datos.activos.mes) * 100)}%` : "—"}>
+            <p className="mt-1 text-xs text-muted">{t("analitica.pegajosidadAyuda")}</p>
+          </Kpi>
+        </div>
+      </Seccion>
+
+      <Seccion id="calidad" titulo={t("analitica.seccion.calidad")}>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <Tarjeta>
+            <h3 className="mb-3 text-sm font-bold">{t("analitica.noEncontradas")}</h3>
+            <BarrasLista locale={locale} vacio={t("analitica.sin404")} filas={aud.noEncontradas.map((r) => ({ clave: r.valor, etiqueta: <code className="text-xs">{r.valor}</code>, valor: r.n }))} />
+          </Tarjeta>
+          <Tarjeta>
+            <Donut titulo={t("analitica.bots")} unidad={t("analitica.unidadAvisos")} {...comun} vacio={t("analitica.sinBots")} datos={aud.bots.map((b) => ({ etiqueta: b.valor, valor: b.n }))} />
+            <p className="mt-3 text-xs text-muted">{t("analitica.botsNota")}</p>
+          </Tarjeta>
+        </div>
+      </Seccion>
 
       <p className="max-w-3xl text-xs text-muted">{t("analitica.nota")}</p>
     </div>

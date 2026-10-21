@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Contador404 } from "@/components/Contador404";
 
 /**
  * 404 propio. Sin este archivo, un perfil o juego inexistente
@@ -18,6 +19,7 @@ export default async function NoEncontrado() {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
+      <Contador404 />
       <p className="font-heading text-[clamp(4rem,20vw,7rem)] font-bold leading-none text-[var(--accent-text)]">404</p>
       <h1 className="font-heading mt-4 text-3xl font-bold uppercase">{t("titulo")}</h1>
       <p className="mt-3 max-w-md text-muted">{t("texto")}</p>

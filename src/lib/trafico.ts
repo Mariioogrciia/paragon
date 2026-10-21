@@ -15,13 +15,26 @@ import { db } from "@/db";
  *   cuánta gente usa Paragon (activos por día/semana/mes). Solo la fecha; se
  *   borra a los 90 días (está en la política de privacidad).
  *
+ * Ampliado el 22 oct 2026 ("todo lo que se pueda sacar de analíticas"):
+ *
+ * - `trafico_dimension`: por día, contadores de etiquetas cerradas — país
+ *   (cabecera de Vercel, nunca la IP), navegador, sistema, dispositivo,
+ *   idioma, ancho de pantalla, tema y campaña de cada visita; y por cada
+ *   vista, el día de la semana con la hora y si había sesión. Las etiquetas
+ *   salen de lib/traficoRutas.ts, nunca el User-Agent tal cual.
+ * - `rendimiento_dia`: Web Vitals (LCP, INP, CLS, FCP, TTFB) por día: cuántas
+ *   medidas, la suma y cuántas buenas/regulares/malas.
+ * - `trafico_404`: qué direcciones dan "no encontrado".
+ * - `trafico_bot`: los bots que el contador descarta, por familia.
+ * - `actividad_app`: qué días entra cada usuario desde la app (90 días).
+ *
  * El "día" es el de Madrid. Tablas creadas solas la primera vez; nada lanza.
  */
 
 const ZONA = "Europe/Madrid";
 let tablasListas: Promise<boolean> | null = null;
 
-function asegurarTablas(): Promise<boolean> {
+export function asegurarTablas(): Promise<boolean> {
   tablasListas ??= (async () => {
     try {
       await db.execute(sql`
@@ -49,7 +62,51 @@ function asegurarTablas(): Promise<boolean> {
           PRIMARY KEY ("dia", "userId")
         )
       `);
-      for (const tabla of ["trafico_dia", "trafico_origen", "actividad_usuario"]) {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "trafico_dimension" (
+          "dia" date NOT NULL,
+          "tipo" text NOT NULL,
+          "valor" text NOT NULL,
+          "n" integer NOT NULL DEFAULT 0,
+          PRIMARY KEY ("dia", "tipo", "valor")
+        )
+      `);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "rendimiento_dia" (
+          "dia" date NOT NULL,
+          "metrica" text NOT NULL,
+          "n" integer NOT NULL DEFAULT 0,
+          "suma" double precision NOT NULL DEFAULT 0,
+          "buenas" integer NOT NULL DEFAULT 0,
+          "regulares" integer NOT NULL DEFAULT 0,
+          "malas" integer NOT NULL DEFAULT 0,
+          PRIMARY KEY ("dia", "metrica")
+        )
+      `);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "trafico_404" (
+          "dia" date NOT NULL,
+          "ruta" text NOT NULL,
+          "n" integer NOT NULL DEFAULT 0,
+          PRIMARY KEY ("dia", "ruta")
+        )
+      `);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "trafico_bot" (
+          "dia" date NOT NULL,
+          "bot" text NOT NULL,
+          "n" integer NOT NULL DEFAULT 0,
+          PRIMARY KEY ("dia", "bot")
+        )
+      `);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "actividad_app" (
+          "dia" date NOT NULL,
+          "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+          PRIMARY KEY ("dia", "userId")
+        )
+      `);
+      for (const tabla of ["trafico_dia", "trafico_origen", "actividad_usuario", "trafico_dimension", "rendimiento_dia", "trafico_404", "trafico_bot", "actividad_app"]) {
         await db.execute(sql.raw(`ALTER TABLE "${tabla}" ENABLE ROW LEVEL SECURITY`));
       }
       return true;
@@ -64,8 +121,40 @@ function asegurarTablas(): Promise<boolean> {
 
 const HOY = sql.raw(`(now() at time zone '${ZONA}')::date`);
 
-/** Una vista de página. `origen` solo en la primera página de la visita. Nunca lanza. */
-export async function registrarVista(v: { ruta: string; entrada: boolean; origen: string | null; movil: boolean; userId: string | null }): Promise<void> {
+/** Suma 1 a varias etiquetas de `trafico_dimension` de hoy, en una sola consulta. */
+async function sumarDimensiones(pares: [string, string][]): Promise<void> {
+  if (pares.length === 0) return;
+  const filas = sql.join(
+    pares.map(([tipo, valor]) => sql`(${HOY}, ${tipo}, ${valor.slice(0, 60)}, 1)`),
+    sql`, `,
+  );
+  await db.execute(sql`
+    INSERT INTO "trafico_dimension" ("dia", "tipo", "valor", "n") VALUES ${filas}
+    ON CONFLICT ("dia", "tipo", "valor") DO UPDATE SET "n" = "trafico_dimension"."n" + 1
+  `);
+}
+
+/** Etiquetas de la visita (solo en su primera página) para las tartas y barras de Admin → Analítica. */
+export interface DimensionesVisita {
+  pais: string | null;
+  navegador: string;
+  sistema: string;
+  dispositivo: string;
+  idioma: string;
+  pantalla: string | null;
+  tema: string | null;
+  campana: string | null;
+}
+
+/** Una vista de página. `origen` y `visita` solo en la primera página de la visita. Nunca lanza. */
+export async function registrarVista(v: {
+  ruta: string;
+  entrada: boolean;
+  origen: string | null;
+  movil: boolean;
+  userId: string | null;
+  visita?: DimensionesVisita | null;
+}): Promise<void> {
   try {
     if (!(await asegurarTablas())) return;
     await db.execute(sql`
@@ -85,8 +174,90 @@ export async function registrarVista(v: { ruta: string; entrada: boolean; origen
     if (v.userId) {
       await db.execute(sql`INSERT INTO "actividad_usuario" ("dia", "userId") VALUES (${HOY}, ${v.userId}) ON CONFLICT DO NOTHING`);
     }
+    // Día de la semana (1 = lunes) y hora de Madrid, para el mapa de calor; y si había sesión.
+    const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: ZONA }));
+    const pares: [string, string][] = [
+      ["semanahora", `${((ahora.getDay() + 6) % 7) + 1}-${ahora.getHours()}`],
+      ["sesion", v.userId ? "con" : "sin"],
+    ];
+    const d = v.entrada ? v.visita : null;
+    if (d) {
+      pares.push(["navegador", d.navegador], ["sistema", d.sistema], ["dispositivo", d.dispositivo], ["idioma", d.idioma]);
+      if (d.pais) pares.push(["pais", d.pais]);
+      if (d.pantalla) pares.push(["pantalla", d.pantalla]);
+      if (d.tema) pares.push(["tema", d.tema]);
+      if (d.campana) pares.push(["campana", d.campana]);
+    }
+    await sumarDimensiones(pares);
   } catch (error) {
     console.error("[trafico] registrar", error);
+  }
+}
+
+/** Una medida de Web Vitals con la nota que le da el propio navegador. Nunca lanza. */
+export async function registrarRendimiento(metrica: string, valor: number, nota: "good" | "needs-improvement" | "poor"): Promise<void> {
+  try {
+    if (!(await asegurarTablas())) return;
+    await db.execute(sql`
+      INSERT INTO "rendimiento_dia" ("dia", "metrica", "n", "suma", "buenas", "regulares", "malas")
+      VALUES (${HOY}, ${metrica}, 1, ${valor}, ${nota === "good" ? 1 : 0}, ${nota === "needs-improvement" ? 1 : 0}, ${nota === "poor" ? 1 : 0})
+      ON CONFLICT ("dia", "metrica") DO UPDATE SET
+        "n" = "rendimiento_dia"."n" + 1,
+        "suma" = "rendimiento_dia"."suma" + EXCLUDED."suma",
+        "buenas" = "rendimiento_dia"."buenas" + EXCLUDED."buenas",
+        "regulares" = "rendimiento_dia"."regulares" + EXCLUDED."regulares",
+        "malas" = "rendimiento_dia"."malas" + EXCLUDED."malas"
+    `);
+  } catch (error) {
+    console.error("[trafico] rendimiento", error);
+  }
+}
+
+/** Una dirección que ha dado "no encontrado". Nunca lanza. */
+export async function registrar404(ruta: string): Promise<void> {
+  try {
+    if (!(await asegurarTablas())) return;
+    await db.execute(sql`
+      INSERT INTO "trafico_404" ("dia", "ruta", "n") VALUES (${HOY}, ${ruta.slice(0, 120)}, 1)
+      ON CONFLICT ("dia", "ruta") DO UPDATE SET "n" = "trafico_404"."n" + 1
+    `);
+  } catch (error) {
+    console.error("[trafico] 404", error);
+  }
+}
+
+/** Un aviso del contador que venía de un bot: solo se cuenta su familia. Nunca lanza. */
+export async function registrarBot(bot: string): Promise<void> {
+  try {
+    if (!(await asegurarTablas())) return;
+    await db.execute(sql`
+      INSERT INTO "trafico_bot" ("dia", "bot", "n") VALUES (${HOY}, ${bot}, 1)
+      ON CONFLICT ("dia", "bot") DO UPDATE SET "n" = "trafico_bot"."n" + 1
+    `);
+  } catch (error) {
+    console.error("[trafico] bot", error);
+  }
+}
+
+/**
+ * El usuario ha usado la app hoy. Se llama en cada petición autenticada de
+ * /api/mobile, así que se recuerda en memoria quién ya se apuntó hoy en esta
+ * instancia para no escribir en la base a cada petición.
+ */
+const appHoy = { dia: "", vistos: new Set<string>() };
+export async function registrarActividadApp(userId: string): Promise<void> {
+  const dia = new Date().toLocaleDateString("sv-SE", { timeZone: ZONA });
+  if (appHoy.dia !== dia) {
+    appHoy.dia = dia;
+    appHoy.vistos.clear();
+  }
+  if (appHoy.vistos.has(userId)) return;
+  appHoy.vistos.add(userId);
+  try {
+    if (!(await asegurarTablas())) return;
+    await db.execute(sql`INSERT INTO "actividad_app" ("dia", "userId") VALUES (${HOY}, ${userId}) ON CONFLICT DO NOTHING`);
+  } catch (error) {
+    console.error("[trafico] actividad app", error);
   }
 }
 
@@ -193,7 +364,93 @@ export async function limpiarTrafico(): Promise<void> {
     await db.execute(sql`DELETE FROM "actividad_usuario" WHERE "dia" < ${HOY} - 90`);
     await db.execute(sql`DELETE FROM "trafico_dia" WHERE "dia" < ${HOY} - 730`);
     await db.execute(sql`DELETE FROM "trafico_origen" WHERE "dia" < ${HOY} - 730`);
+    await db.execute(sql`DELETE FROM "actividad_app" WHERE "dia" < ${HOY} - 90`);
+    await db.execute(sql`DELETE FROM "trafico_dimension" WHERE "dia" < ${HOY} - 730`);
+    await db.execute(sql`DELETE FROM "rendimiento_dia" WHERE "dia" < ${HOY} - 730`);
+    await db.execute(sql`DELETE FROM "trafico_404" WHERE "dia" < ${HOY} - 180`);
+    await db.execute(sql`DELETE FROM "trafico_bot" WHERE "dia" < ${HOY} - 180`);
   } catch (error) {
     console.error("[trafico] limpiar", error);
   }
+}
+
+export interface Reparto {
+  valor: string;
+  n: number;
+}
+
+export interface Rendimiento {
+  metrica: string;
+  n: number;
+  media: number;
+  buenas: number;
+  regulares: number;
+  malas: number;
+}
+
+export interface Audiencia {
+  /** Etiquetas por tipo (pais, navegador, sistema...), de más a menos. */
+  reparto: Record<string, Reparto[]>;
+  /** [dia 1-7][hora 0-23] → vistas. */
+  semanaHora: number[][];
+  rendimiento: Rendimiento[];
+  noEncontradas: Reparto[];
+  bots: Reparto[];
+  appPorDia: PuntoDia[];
+  usuariosApp: number;
+  usuariosWeb: number;
+}
+
+/** Lo de las secciones Audiencia, Cuándo, Rendimiento y Calidad de Admin → Analítica. */
+export async function audiencia(dias: number): Promise<Audiencia> {
+  await asegurarTablas();
+  const desde = sql`${HOY} - ${dias - 1}::int`;
+  const numero = (v: unknown) => Number(v ?? 0);
+  const [dims, rend, n404, bots, app, [usuarios]] = await Promise.all([
+    db.execute<{ tipo: string; valor: string; n: number }>(sql`
+      SELECT "tipo", "valor", sum("n")::int AS "n" FROM "trafico_dimension" WHERE "dia" >= ${desde}
+      GROUP BY "tipo", "valor" ORDER BY 3 DESC`),
+    db.execute<{ metrica: string; n: number; suma: number; buenas: number; regulares: number; malas: number }>(sql`
+      SELECT "metrica", sum("n")::int AS "n", sum("suma") AS "suma", sum("buenas")::int AS "buenas",
+        sum("regulares")::int AS "regulares", sum("malas")::int AS "malas"
+      FROM "rendimiento_dia" WHERE "dia" >= ${desde} GROUP BY "metrica"`),
+    db.execute<{ valor: string; n: number }>(sql`
+      SELECT "ruta" AS "valor", sum("n")::int AS "n" FROM "trafico_404" WHERE "dia" >= ${desde} GROUP BY 1 ORDER BY 2 DESC LIMIT 15`),
+    db.execute<{ valor: string; n: number }>(sql`
+      SELECT "bot" AS "valor", sum("n")::int AS "n" FROM "trafico_bot" WHERE "dia" >= ${desde} GROUP BY 1 ORDER BY 2 DESC`),
+    db.execute<{ dia: string; valor: number }>(sql`
+      SELECT "dia"::text AS "dia", count(*)::int AS "valor" FROM "actividad_app" WHERE "dia" >= ${desde} GROUP BY "dia"`),
+    db.execute<{ app: number; web: number }>(sql`
+      SELECT
+        (SELECT count(DISTINCT "userId")::int FROM "actividad_app" WHERE "dia" >= ${desde}) AS "app",
+        (SELECT count(DISTINCT "userId")::int FROM "actividad_usuario" WHERE "dia" >= ${desde}) AS "web"`),
+  ]);
+
+  const reparto: Record<string, Reparto[]> = {};
+  const semanaHora = Array.from({ length: 7 }, () => Array<number>(24).fill(0));
+  for (const f of dims) {
+    if (f.tipo === "semanahora") {
+      const [d, h] = f.valor.split("-").map(Number);
+      if (d >= 1 && d <= 7 && h >= 0 && h <= 23) semanaHora[d - 1][h] += numero(f.n);
+      continue;
+    }
+    (reparto[f.tipo] ??= []).push({ valor: f.valor, n: numero(f.n) });
+  }
+  return {
+    reparto,
+    semanaHora,
+    rendimiento: [...rend].map((r) => ({
+      metrica: r.metrica,
+      n: numero(r.n),
+      media: numero(r.n) > 0 ? numero(r.suma) / numero(r.n) : 0,
+      buenas: numero(r.buenas),
+      regulares: numero(r.regulares),
+      malas: numero(r.malas),
+    })),
+    noEncontradas: [...n404].map((r) => ({ valor: r.valor, n: numero(r.n) })),
+    bots: [...bots].map((r) => ({ valor: r.valor, n: numero(r.n) })),
+    appPorDia: serieCompleta(dias, [...app].map((a) => ({ dia: a.dia, valor: numero(a.valor) })), { valor: 0 }),
+    usuariosApp: numero(usuarios?.app),
+    usuariosWeb: numero(usuarios?.web),
+  };
 }

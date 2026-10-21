@@ -6,6 +6,30 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Selector de idioma con banderas (22 oct)
+
+- `LanguageSwitcher`: ahora es una píldora con la bandera redonda y el nombre del idioma (en móvil, solo la bandera) y un menú con banderas redondas y ✓ en el activo. Las banderas están dibujadas en SVG, porque los emojis de bandera no existen en Windows (salían "ES", "GB").
+
+### Analítica completa en Admin (22 oct)
+
+- **Se recoge más, siempre como recuentos por día y etiquetas cerradas, sin cookies ni IP**:
+  - Una vez por visita: país (cabecera de Vercel), navegador, sistema, dispositivo, idioma, ancho de pantalla, tema y campaña (utm_source).
+  - En cada vista: día de la semana con la hora, y si había sesión.
+  - Web Vitals (LCP, INP, CLS, FCP, TTFB).
+  - Direcciones que dan 404.
+  - Bots descartados, por familia.
+  - Días de uso de la app (en `getMobileUserId`).
+  - Tablas nuevas, creadas solas: `trafico_dimension`, `rendimiento_dia`, `trafico_404`, `trafico_bot`, `actividad_app`.
+- **Admin → Analítica** se divide en Tráfico, Audiencia, Cuándo, Rendimiento, Usuarios y plataformas, Comunidad y Calidad, con:
+  - Donuts: países, dispositivos, navegadores, sistemas, idiomas, tema, sesión, web/app, registro, plataformas, trofeos y syncs por plataforma, bots.
+  - Mapa de calor día × hora.
+  - Embudo de activación.
+  - Retención por semana de alta.
+  - Tarjetas de Web Vitals.
+  - Juegos con más jugadores y cifras de comunidad.
+- Colores: la paleta categórica validada (`--cat-1..5`, oscuro y claro) y los colores de estado con icono y texto.
+- Privacidad (s4propia) actualizada con lo que se cuenta ahora.
+
 ### Verificar la cuenta de Epic con el login oficial de Epic (21 oct)
 
 - Vuelve el proveedor `epic` de Auth.js, ahora por **Epic Account Services** (la vía oficial, con dominio verificado y revisión de marca). Solo vincula, nunca sirve para entrar: con la sesión abierta, guarda esa cuenta de Epic como la tuya y la marca **verificada**; sin sesión, no hace nada. No crea usuarios, ni filas en `accounts`, ni sesiones (`verificarEpic` en `src/auth.ts`).
