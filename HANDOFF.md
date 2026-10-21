@@ -52,6 +52,13 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
   **cualquier enlace nuevo debe importar `Link` de `@/components/Enlace`**,
   no de `next/link`). Antes cada `<Link>` visible renderizaba el layout raíz
   en el servidor por culpa de `app/loading.tsx`.
+- **Portada, fichas de juego y perfiles, sin sesión, salen ya hechos de la
+  CDN** (`app/(publico)` + `src/proxy.ts`; detalle en HISTORIAL.md). Reglas:
+  nada dentro de `app/(publico)` ni de `components/paginas/*` con
+  `conSesion={false}` puede leer cookies, cabeceras ni la sesión (o vuelve a
+  renderizarse en cada visita); una página pública nueva que se quiera
+  cachear necesita su copia en `(publico)` y su ruta en el `matcher` del
+  proxy; las tarjetas sociales de ficha y perfil van por `/api/og/…`.
 - Nivel y racha de la cabecera, 2 min de memoria por persona;
   `staleTimes.dynamic: 30`; imágenes OG y tarjetas cacheadas un día en la
   CDN; `robots.txt` echa a los rastreadores de IA y SEO.
@@ -106,8 +113,7 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    cuenta de desarrollador (25 $), clave de firma y secretos
    `ANDROID_KEYSTORE_*`, primera subida a mano, formularios con las
    respuestas escritas. Con una cuenta personal nueva Google exige una
-   prueba cerrada con **12 personas durante 14 días**. Ojo: la ficha está
-   en 4 idiomas, no en 6 (ver sugerencias).
+   prueba cerrada con **12 personas durante 14 días**. Ficha en 6 idiomas.
 3. **Cuenta de desarrollador de Apple** (de pago): sin ella no hay push en
    iOS ni TestFlight. Después: identificadores, App Group, la app en App
    Store Connect, secretos `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`,
@@ -141,24 +147,21 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
 - **Copia de seguridad semanal** cifrada y probada (20 oct).
 
 **Sugerencias** (opinión, 21 oct; nada de esto está pedido), por orden:
-1. **Servir desde la CDN las páginas públicas sin sesión** (fichas de juego,
-   perfiles, Descubrir). Hoy todas se renderizan en cada visita porque el
-   layout raíz lee la sesión y la cookie de idioma. Es lo que más CPU
-   ahorraría para no volver a pasarse del cupo de Hobby.
-2. **Ficha de Google Play en italiano y portugués** (`kmp/play/ficha`,
-   `kmp/play/novedades`): la app ya habla 6 idiomas y la ficha solo 4.
-3. **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
+1. ~~Páginas públicas desde la CDN~~ y ~~ficha de Play en it/pt~~: hechas
+   (21 oct). Siguiente candidato: `/descubrir` y sus plataformas, con la
+   misma receta (copia en `(publico)` + ruta en el proxy).
+2. **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
    privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
    con enlace a `/vincular`.
-4. **Hora de los avisos en la web**: la campana usa `relativeDate` (solo
+3. **Hora de los avisos en la web**: la campana usa `relativeDate` (solo
    "hoy"/"ayer"); en la app ya sale "hace 5 min".
-5. **Extensión del navegador y `manifest.ts` en más idiomas**: hoy solo en
+4. **Extensión del navegador y `manifest.ts` en más idiomas**: hoy solo en
    español.
-6. **Comprobar los huecos `{0}` en `kmp/i18n/generar.mjs`**: hoy solo mira
+5. **Comprobar los huecos `{0}` en `kmp/i18n/generar.mjs`**: hoy solo mira
    que exista cada idioma; un hueco perdido en una traducción no avisa.
-7. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
+6. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
    qué páginas no usa nadie (arcade, planificador…).
-8. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
+7. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
    perdibles, sesiones), resumen semanal en push, varias cuentas de Steam
    para todos, `pt-BR` si llegan brasileños.
 

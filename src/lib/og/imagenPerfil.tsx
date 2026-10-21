@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- es una imagen de Satori (ImageResponse): ahí no existe next/image */
 import { ImageResponse } from "next/og";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { paragonProgress } from "@/lib/level";
@@ -29,11 +30,7 @@ import { urlAbsolutaParaOg } from "@/lib/design";
  * enlace por WhatsApp no tiene por qué haber entrado nunca en Paragon.
  */
 
-// Se genera como mucho una vez al día por página (21 oct 2026): cada imagen es mucha CPU y la piden todos los bots de enlaces.
-export const revalidate = 86400;
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
-export const alt = "Perfil de Paragon";
+const size = { width: 1200, height: 630 };
 
 const PLATINO = "#9fd4ec";
 const FONDO = "#0a0d13";
@@ -73,8 +70,7 @@ function Cifra({ valor, etiqueta, color }: { valor: string; etiqueta: string; co
   );
 }
 
-export default async function Image({ params }: { params: Promise<{ handle: string }> }) {
-  const { handle } = await params;
+export async function imagenPerfil(handle: string): Promise<ImageResponse> {
   const profile = await getProfileByHandle(handle);
 
   // Un handle que no existe igual acaba compartido por ahí (un enlace mal

@@ -67,16 +67,15 @@ function hexToRgb(hex: string) {
 }
 
 /**
- * Metadatos sociales del perfil. La IMAGEN no se declara aquí: la pone sola
- * `opengraph-image.tsx` (convención de archivo de Next), que vive en esta
- * misma carpeta.
+ * Metadatos sociales del perfil. La IMAGEN sale de `api/og/u/[handle]`
+ * (antes era un `opengraph-image.tsx`, ver esa ruta).
  *
  * Los números van en la descripcion a proposito: "1.240 trofeos y 24
  * platinos" da una razon para pulsar el enlace que "Perfil de Paragon" no
  * da. Se reusa `getProfileByHandle`, que ya cachea por peticion, asi que
  * esto no duplica consultas con el render de la pagina.
  */
-export async function generateMetadata({
+export async function metadatosPerfil({
   params,
 }: {
   params: Promise<{ handle: string }>;
@@ -100,13 +99,19 @@ export async function generateMetadata({
         });
 
   const meta = metaPublica(`/u/${handle}`, titulo, descripcion);
-  return { ...meta, openGraph: { ...meta.openGraph, type: "profile" } };
+  // Tarjeta social en dirección fija (api/og), la misma para la versión con
+  // sesión y para la copia pública cacheada.
+  const imagen = `/api/og/u/${encodeURIComponent(handle)}`;
+  return { ...meta, openGraph: { ...meta.openGraph, type: "profile", images: [imagen] }, twitter: { ...meta.twitter, images: [imagen] } };
 }
 
-export default async function PerfilPage({
+export async function PerfilJugador({
   params,
+  conSesion = true,
 }: {
   params: Promise<{ handle: string }>;
+  /** `false` en la copia pública cacheable (`(publico)`): ni se mira la sesión. */
+  conSesion?: boolean;
 }) {
   const { handle } = await params;
   const [t, locale] = await Promise.all([getTranslations("Perfil"), getLocale()]);
@@ -114,7 +119,7 @@ export default async function PerfilPage({
   const profile = await getProfileByHandle(handle);
   if (!profile) notFound();
 
-  const session = await auth();
+  const session = conSesion ? await auth() : null;
   const esMio = session?.user?.id === profile.userId;
 
   const { player, games, xpMisiones } = await getLibrary(profile);

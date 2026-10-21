@@ -28,6 +28,8 @@ import {
   accountFor,
   describePlatformError,
   getProfileByUserId,
+  handleDe,
+  olvidarPerfilPublico,
   isHandleTaken,
   linkAccount,
   refrescarJuego,
@@ -762,7 +764,9 @@ export async function unlinkAuthAccountAction(formData: FormData): Promise<void>
 export async function deleteAccountAction(): Promise<void> {
   const userId = await requireUserId();
   const db = getDb();
+  const handle = await handleDe(userId);
   await db.delete(users).where(eq(users.id, userId)); // Cascade borrará perfiles, colecciones, etc.
+  olvidarPerfilPublico(handle);
   await signOut({ redirectTo: "/" });
 }
 

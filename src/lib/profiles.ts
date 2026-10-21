@@ -5,7 +5,8 @@ import { getWeeklyMissions, xpMisiones } from "@/lib/missions";
 import { LOGROS, logroConseguido } from "@/lib/logros";
 import { medirLogros } from "@/lib/medirLogros";
 import { normalizarPerdibles } from "@/lib/perdibles";
-import { unstable_cache } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
+import { locales } from "@/i18n/idiomas";
 import { cache } from "react";
 import { and, desc, eq, gte, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 import { avatarUrlSql } from "@/lib/avatarSql";
@@ -257,7 +258,27 @@ export async function isHandleTaken(handle: string, exceptUserId?: string) {
 }
 
 export async function setHandle(userId: string, handle: string) {
+  const antes = { handle: await handleDe(userId) };
   await db.update(users).set({ handle }).where(eq(users.id, userId));
+  // Copia pública cacheada del perfil: ver `olvidarPerfilPublico`.
+  // La del nombre viejo ya no debe salir, y la del nuevo puede estar guardada como 404.
+  olvidarPerfilPublico(antes?.handle);
+  olvidarPerfilPublico(handle);
+}
+
+/**
+ * Tira la copia pública cacheada de un perfil (`app/(publico)`, 21 oct 2026)
+ * en todos los idiomas, para que la próxima visita la rehaga: al cambiar de
+ * nombre de usuario o al borrar la cuenta, no puede seguir saliendo la vieja.
+ */
+export function olvidarPerfilPublico(handle: string | null | undefined) {
+  if (handle) for (const idioma of locales) revalidatePath(`/p/${idioma}/u/${handle}`);
+}
+
+/** El @ de alguien antes de borrarle (para `olvidarPerfilPublico`). */
+export async function handleDe(userId: string): Promise<string | null> {
+  const [fila] = await db.select({ handle: users.handle }).from(users).where(eq(users.id, userId)).limit(1);
+  return fila?.handle ?? null;
 }
 
 export async function setProfileInfo(userId: string, name: string, image: string | null) {
@@ -456,7 +477,7 @@ export const getRecentPlatinumActivity = unstable_cache(
     return rows.map((r) => ({ ...r, createdAt: r.createdAt! }));
   },
   ["recent-platinum-activity"],
-  { revalidate: 60 },
+  { revalidate: 600 },
 );
 
 export interface TopHunter {

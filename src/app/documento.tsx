@@ -1,31 +1,32 @@
-import { Suspense } from "react";
-import { cookies } from "next/headers";
-import { PublicidadScripts } from "@/components/PublicidadScripts";
-import { esIdioma } from "@/lib/idiomasTrofeo";
-import { guardarIdiomaUsuario } from "@/lib/idiomaUsuario";
-import { CompartirPlatinoPendiente } from "@/components/CompartirPlatinoPendiente";
+import type { ReactNode } from "react";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
+import { Barlow, Chakra_Petch, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
+import { PublicidadScripts } from "@/components/PublicidadScripts";
 import { dominioPublico, PERFILES_AUTOR } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
 import { datosSitio } from "@/lib/datosEstructurados";
-import type { Metadata, Viewport } from "next";
-import type { Session } from "next-auth";
-import Script from "next/script";
-import { Barlow, Chakra_Petch, JetBrains_Mono } from "next/font/google";
-import { auth } from "@/auth";
-import { SincronizarApariencia } from "@/components/SincronizarApariencia";
+import { IMAGEN_SOCIAL } from "@/lib/seo";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
-import { getParagonLevel } from "@/lib/paragonLevel";
-import { getHiddenNavItems } from "@/lib/navPreferences";
-import { rachas } from "@/lib/history";
-import { recordado } from "@/lib/enSerie";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
 import { mensajesCliente } from "@/i18n/clientMessages";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { CookieBanner } from "@/components/CookieBanner";
+import { ContadorVisitas } from "@/components/ContadorVisitas";
 import "./globals.css";
+
+/*
+ * El documento HTML de Paragon (21 oct 2026), compartido por las dos raíces:
+ * - `(app)/layout.tsx`: la de siempre, con sesión (se renderiza en cada visita).
+ * - `(publico)/p/[locale]/layout.tsx`: la de las páginas públicas sin sesión,
+ *   que no lee cookies y por eso se puede servir ya hecha desde la CDN (ver
+ *   `src/proxy.ts`).
+ * Lo que cambia entre las dos (la persona de la cabecera, el idioma) llega
+ * por props.
+ */
 
 const barlow = Barlow({
   subsets: ["latin"],
@@ -87,11 +88,13 @@ export const metadata: Metadata = {
     type: "website",
     title: TITULO,
     description: DESCRIPCION,
+    images: [IMAGEN_SOCIAL],
   },
   twitter: {
     card: "summary_large_image",
     title: TITULO,
     description: DESCRIPCION,
+    images: [IMAGEN_SOCIAL],
   },
   // El propio archivo `app/manifest.ts` ya hace que Next sirva
   // /manifest.webmanifest y (con esta línea) lo enlace en el <head> — antes
@@ -125,96 +128,27 @@ export const metadata: Metadata = {
   // donde sí hace falta grande.
 };
 
-/**
- * Next señala cosas como `redirect()`, `notFound()` o "esta ruta tiene que ser
- * dinámica" lanzando errores especiales, marcados con `digest`. No son fallos:
- * son control de flujo. Si los capturásemos, romperíamos el renderizado sin
- * que se note hasta producción.
- */
-function relanzarSiEsDeNext(error: unknown): void {
-  if (typeof (error as { digest?: unknown })?.digest === "string") throw error;
-}
+type UsuarioCabecera = Parameters<typeof Header>[0]["user"];
 
-import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
-import { CookieBanner } from "@/components/CookieBanner";
-import { ContadorVisitas } from "@/components/ContadorVisitas";
-
-export default async function RootLayout({
+export function Documento({
+  locale,
+  messages,
+  user,
+  navOculta,
+  antes,
+  despues,
   children,
-}: Readonly<{ children: React.ReactNode }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-
-  // La sesión se pide dentro de un try a propósito. Este layout envuelve TODAS
-  // las rutas, así que sin esto un fallo de configuración (falta DATABASE_URL,
-  // la cadena apunta al puerto directo en vez del pooler, la base no responde)
-  // tumba hasta las páginas que no tocan la base, como /faq: el usuario ve un
-  // "server error" en blanco y no hay forma de saber qué pasa. Degradando a
-  // "sesión no iniciada" el sitio público sigue en pie y el fallo queda escrito
-  // en los logs, que es donde se puede leer.
-  // `auth()` está sobrecargada (sirve también de middleware), así que su tipo
-  // de retorno inferido no es solo la sesión: la anotamos a mano.
-  let session: Session | null = null;
-
-  try {
-    session = await auth();
-  } catch (error) {
-    relanzarSiEsDeNext(error);
-    console.error("[layout] no se pudo leer la sesión:", error);
-  }
-
-  const sessionUser = session?.user;
-
-  // Si eligió idioma en la web (cookie), sus push y avisos salen en ese
-  // idioma (lib/idiomaUsuario.ts). Sin cookie no se toca: pisaría el de la app.
-  if (sessionUser) {
-    const elegido = (await cookies()).get("NEXT_LOCALE")?.value;
-    if (elegido && esIdioma(elegido)) await guardarIdiomaUsuario(sessionUser.id, elegido);
-  }
-
-  // Las tres no dependen entre sí — antes iban en serie (perfil, luego
-  // nivel, luego nav oculta) en el camino crítico de CADA página. `nivel`
-  // es la más cara de las tres (getParagonLevels escanea todo el
-  // historial de trofeos), así que ya no se queda esperando a que el
-  // perfil termine primero sin motivo.
-  let profile = null;
-  const [profileResult, nivelParagon, navOculta, rachaUsuario] = sessionUser
-    ? await Promise.all([
-        getProfileByUserId(sessionUser.id).catch((error) => {
-          relanzarSiEsDeNext(error);
-          console.error("[layout] no se pudo leer el perfil:", error);
-          return null;
-        }),
-        // Nivel y racha recorren todo el historial de trofeos y salen en la
-        // cabecera de CADA página: dos minutos de memoria por persona bastan
-        // (21 oct 2026, CPU de Vercel pasada del plan Hobby).
-        recordado(`nivel:${sessionUser.id}`, 120_000, () => getParagonLevel(sessionUser.id)),
-        getHiddenNavItems(sessionUser.id),
-        recordado(`racha:${sessionUser.id}`, 120_000, () => rachas(sessionUser.id)).catch((error) => {
-          relanzarSiEsDeNext(error);
-          console.error("[layout] no se pudo leer la racha:", error);
-          return null;
-        }),
-      ])
-    : [null, null, [], null];
-  profile = profileResult;
-
-  const headerUser = sessionUser
-    ? {
-        handle: profile?.handle ?? null,
-        name: sessionUser.name ?? "?",
-        // La misma foto que en el resto de la app (ver resolveAvatarUrl):
-        // antes esto era `sessionUser.image`, la del proveedor de login, así
-        // que quien entraba con Google pero tenía PSN vinculado veía su cara
-        // de Google arriba y su avatar de PSN en el perfil y las reseñas.
-        image: (profile ? resolveAvatarUrl(profile) : undefined) ?? sessionUser.image,
-        paragonLevel: nivelParagon?.level ?? null,
-        paragonProgress: nivelParagon?.progreso ?? null,
-        esDesarrollador: profile?.esDesarrollador ?? false,
-        racha: rachaUsuario && rachaUsuario.actual > 0 ? { actual: rachaUsuario.actual, hoyCuenta: rachaUsuario.hoyCuenta } : null,
-      }
-    : null;
-
+}: {
+  locale: string;
+  messages: AbstractIntlMessages;
+  user: UsuarioCabecera;
+  navOculta: Parameters<typeof Header>[0]["navOculta"];
+  /** Dentro del tema, antes de la cabecera (p. ej. la apariencia guardada). */
+  antes?: ReactNode;
+  /** Dentro del tema, después del pie (p. ej. "¿Lo compartes?"). */
+  despues?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <html lang={locale} className={`${barlow.variable} ${chakra.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
@@ -279,25 +213,18 @@ export default async function RootLayout({
             enableSystem
             themes={["dark", "light", "oled", "high-contrast"]}
           >
-            {sessionUser && profile && (
-              <SincronizarApariencia guardada={profile.apariencia ?? null} nivel={nivelParagon?.level ?? 1} />
-            )}
+            {antes}
             {/* Datos estructurados del sitio para buscadores (lib/datosEstructurados.ts). */}
             <JsonLd datos={datosSitio(DOMINIO, PERFILES_AUTOR)} />
             {/* Consentimiento de Google + AdSense; nada sin NEXT_PUBLIC_ADSENSE_CLIENT (lib/publicidad.ts). */}
             <PublicidadScripts />
-            <Header user={headerUser} navOculta={navOculta} locale={locale} />
+            <Header user={user} navOculta={navOculta} locale={locale} />
             {/* `px-4` en movil, `px-7` a partir de tablet: 28px por lado se comian
                 56px de los 375 de un movil (un 15% del ancho) antes de que las
                 tarjetas de dentro pusieran su propio relleno encima. */}
             <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-9 sm:px-7">{children}</main>
             <Footer />
-            {/* "¿Lo compartes?" tras un platino nuevo (lib/compartirPlatino.ts). */}
-            {sessionUser && profile?.handle && (
-              <Suspense fallback={null}>
-                <CompartirPlatinoPendiente userId={sessionUser.id} handle={profile.handle} />
-              </Suspense>
-            )}
+            {despues}
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

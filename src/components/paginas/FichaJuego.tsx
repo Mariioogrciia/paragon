@@ -44,13 +44,13 @@ import { precioSteamEs } from "@/lib/steamPrecio";
 import { getAlertaPrecio } from "@/lib/priceAlerts";
 
 /**
- * La IMAGEN de la tarjeta social la pone sola `opengraph-image.tsx` (misma
- * carpeta, convencion de Next). Lo que hay que declarar aqui es el titulo y
+ * La IMAGEN de la tarjeta social sale de `api/og/juego/[id]` (antes era un
+ * `opengraph-image.tsx`, ver esa ruta). Lo que hay que declarar aqui es el titulo y
  * la descripcion de openGraph: sin ellos se heredan los del layout raiz y la
  * tarjeta salia titulada "Paragon" en vez de con el nombre del juego —
  * comprobado en el HTML, no supuesto.
  */
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+export async function metadatosFichaJuego({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const game = await getGlobalGame(decodeURIComponent(id));
   if (!game) return { title: "Juego · Paragon" };
@@ -61,13 +61,20 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     ? `Trofeos, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`
     : `Logros, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`;
 
-  return metaPublica(`/juego/${id}`, titulo, descripcion);
+  // Tarjeta social en dirección fija (api/og), la misma para la versión con
+  // sesión y para la copia pública cacheada.
+  const imagen = `/api/og/juego/${encodeURIComponent(id)}`;
+  const meta = metaPublica(`/juego/${id}`, titulo, descripcion);
+  return { ...meta, openGraph: { ...meta.openGraph, images: [imagen] }, twitter: { ...meta.twitter, images: [imagen] } };
 }
 
-export default async function JuegoGlobalPage({
+export async function FichaJuego({
   params,
+  conSesion = true,
 }: {
   params: Promise<{ id: string }>;
+  /** `false` en la copia pública cacheable (`(publico)`): ni se mira la sesión. */
+  conSesion?: boolean;
 }) {
   const idioma = await getLocale();
   const { id } = await params;
@@ -86,7 +93,7 @@ export default async function JuegoGlobalPage({
     getCommunityRating(gameId),
     getDificultadComunidad(gameId),
     getGameReviews(gameId),
-    auth(),
+    conSesion ? auth() : Promise.resolve(null),
     // Capturas, historia, temas, modos de juego y enlaces oficiales: viven en
     // IGDB, no en nuestra base (games no guarda ese detalle) — se piden en
     // vivo, cacheadas por el propio cliente de IGDB (ver getGameDetails).

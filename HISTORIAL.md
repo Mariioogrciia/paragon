@@ -6,6 +6,20 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Páginas públicas desde la CDN y ficha de Play en it/pt (21 oct)
+
+- **Portada, fichas de juego y perfiles, sin sesión, ya hechos desde la CDN.** Antes cada visita (casi todas de buscadores y gente sin cuenta) se renderizaba de cero: 48-97 ms de CPU, y hasta `/privacidad` gastaba 22 ms solo en montar React y Next. Ahora, en local, 7-9 ms; en Vercel ni se ejecuta la función.
+  - Dos raíces de rutas: `app/(app)/` (todas las de siempre, con su layout que lee la sesión) y `app/(publico)/p/[locale]/` (portada, `juego/[id]` y `u/[handle]`, sin cookies, con `revalidate` de 15-30 min). Las URL no cambian.
+  - `src/proxy.ts`: sin cookie de sesión de Auth.js, reescribe `/`, `/juego/:id` y `/u/:handle` a la copia de `/p/<idioma>/…` (idioma de la cookie `NEXT_LOCALE`). Con sesión no toca nada. `/p/…` a pelo redirige a la URL buena.
+  - `app/documento.tsx`: el `<html>` común a las dos raíces (fuentes, cabecera, pie, proveedores, metadatos). `components/paginas/FichaJuego.tsx` y `PerfilJugador.tsx` (con `conSesion`) y `components/landing/Portada.tsx`: las páginas, compartidas por las dos versiones.
+  - `i18n/request.ts` usa primero el idioma fijado con `setRequestLocale` y solo si no, la cookie. `i18n/idiomas.ts`: la lista de idiomas, sin next-intl, para el proxy.
+  - `app/global-not-found.tsx` (`experimental.globalNotFound`): sin layout común, el 404 de una URL inexistente se monta con la raíz de siempre.
+  - Tarjetas sociales de ficha y perfil en dirección fija (`/api/og/juego/[id]`, `/api/og/u/[handle]`, un día en la CDN): con dos raíces, Next les ponía un sufijo cambiante a los `opengraph-image.tsx`. La genérica se enlaza a mano (`IMAGEN_SOCIAL` en `lib/seo.ts`).
+  - Al cambiar de @ o borrar la cuenta, `olvidarPerfilPublico` tira la copia cacheada del perfil en los 6 idiomas.
+  - La cinta de "platinos recientes" de la portada se cachea 10 min (antes 1, y eso obligaba a rehacer la portada cada minuto).
+  - Probado en local en modo producción: sin sesión sale de caché (`s-maxage`), con sesión sigue siendo privado y personal, el idioma de la cookie se respeta, el selector de idioma funciona sobre la copia cacheada y el 404 sale con el diseño de Paragon.
+- **Ficha de Google Play en italiano y portugués** (`kmp/play/ficha`, `novedades`, gráficos con `npm run graficos-play`). Las capturas siguen siendo de la app en español, como en alemán y francés.
+
 ### Italiano y portugués, y segunda ronda de CPU (21 oct)
 
 - **Italiano y portugués** en la web y en las apps (portugués de Portugal):

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { alternarFavoritoAction } from "@/app/esports/actions";
+import { alternarFavoritoAction } from "@/app/(app)/esports/actions";
 import type { EquipoFavorito } from "@/lib/esportsFavoritos";
 
 interface FavoritosCtx {

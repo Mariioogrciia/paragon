@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
-import { setProfileInfo } from "@/lib/profiles";
+import { handleDe, olvidarPerfilPublico, setProfileInfo } from "@/lib/profiles";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -49,6 +49,8 @@ export async function DELETE(req: Request) {
     return errorMovil(req, "Datos no válidos", 400);
   }
 
+  const handle = await handleDe(userId);
   await db.delete(users).where(eq(users.id, userId));
+  olvidarPerfilPublico(handle);
   return NextResponse.json({ ok: true });
 }

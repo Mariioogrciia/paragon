@@ -2,16 +2,22 @@ import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { NAMESPACES } from '../../messages/manifest';
 
-export const locales = ['es', 'en', 'de', 'fr', 'it', 'pt'];
-export const defaultLocale = 'es';
+import { locales, defaultLocale } from './idiomas';
 
-export default getRequestConfig(async () => {
-  const cookieStore = await cookies();
-  const localeCookie = cookieStore.get('NEXT_LOCALE')?.value;
+export { locales, defaultLocale };
+
+export default getRequestConfig(async ({ requestLocale }) => {
+  // Las páginas públicas cacheables (`app/(publico)/p/[locale]`, 21 oct 2026)
+  // fijan el idioma con `setRequestLocale`: entonces no se mira la cookie,
+  // porque leerla haría que Next renderizase la página en cada visita.
+  const fijado = await requestLocale;
   let locale = defaultLocale;
 
-  if (localeCookie && locales.includes(localeCookie)) {
-    locale = localeCookie;
+  if (fijado && locales.includes(fijado)) {
+    locale = fijado;
+  } else {
+    const localeCookie = (await cookies()).get('NEXT_LOCALE')?.value;
+    if (localeCookie && locales.includes(localeCookie)) locale = localeCookie;
   }
 
   // Cada namespace de NAMESPACES es una carpeta con un JSON por idioma (ver

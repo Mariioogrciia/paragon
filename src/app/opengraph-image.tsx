@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
  * no tenga la suya propia (portada, /descubrir, /noticias, /ligas...).
  *
  * Deliberadamente sobria y sin datos: es la cara de la app, no de nadie en
- * concreto. Los perfiles tienen la suya en `u/[handle]/opengraph-image.tsx`,
+ * concreto. Los perfiles tienen la suya en `api/og/u/[handle]`,
  * con cifras reales.
  */
 

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- es una imagen de Satori (ImageResponse): ahí no existe next/image */
 import { ImageResponse } from "next/og";
 import { getGlobalGame } from "@/lib/community";
 import { urlAbsolutaParaOg } from "@/lib/design";
@@ -15,18 +16,13 @@ import { urlAbsolutaParaOg } from "@/lib/design";
  * flexbox: Satori no entiende grid.
  */
 
-// Se genera como mucho una vez al día por página (21 oct 2026): cada imagen es mucha CPU y la piden todos los bots de enlaces.
-export const revalidate = 86400;
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
-export const alt = "Ficha de juego en Paragon";
+const size = { width: 1200, height: 630 };
 
 const PLATINO = "#9fd4ec";
 const FONDO = "#0a0d13";
 const TENUE = "#8b93a7";
 
-export default async function Image({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function imagenJuego(id: string): Promise<ImageResponse> {
   const game = await getGlobalGame(decodeURIComponent(id));
 
   if (!game) {

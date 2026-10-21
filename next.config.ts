@@ -26,6 +26,8 @@ const nextConfig: NextConfig = {
   // servidor. Las acciones que cambian datos ya invalidan esta caché.
   experimental: {
     staleTimes: { dynamic: 30 },
+    // 404 con el diseño de Paragon con dos raíces de rutas (app/global-not-found.tsx).
+    globalNotFound: true,
   },
   images: {
     remotePatterns: [
