@@ -24,6 +24,8 @@ class TextosTest {
     fun idiomaDesconocidoCaeEnEspanol() {
         assertEquals(Idioma.ES, Textos.desdeCodigo("ja"))
         assertEquals(Idioma.FR, Textos.desdeCodigo("fr-CA"))
+        assertEquals(Idioma.IT, Textos.desdeCodigo("it-IT"))
+        assertEquals(Idioma.PT, Textos.desdeCodigo("pt-BR"))
         assertEquals(Idioma.EN, Textos.desdeCodigo("EN"))
     }
 

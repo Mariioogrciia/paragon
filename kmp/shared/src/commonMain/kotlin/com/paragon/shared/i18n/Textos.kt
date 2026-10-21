@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-/** Los 4 idiomas de la app (los mismos que la web). */
-enum class Idioma(val codigo: String) { ES("es"), EN("en"), DE("de"), FR("fr") }
+/** Los idiomas de la app (los mismos que la web). */
+enum class Idioma(val codigo: String) { ES("es"), EN("en"), DE("de"), FR("fr"), IT("it"), PT("pt") }
 
 /** Idioma del sistema (código ISO de dos letras, p. ej. "es"). */
 expect fun idiomaDelSistema(): String
@@ -32,6 +32,8 @@ object Textos {
                 Idioma.EN -> textosEN()
                 Idioma.DE -> textosDE()
                 Idioma.FR -> textosFR()
+                Idioma.IT -> textosIT()
+                Idioma.PT -> textosPT()
             }
         }
         return rellenar(tabla[texto.indice], args)

@@ -6,6 +6,18 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Italiano y portugués, y segunda ronda de CPU (22 oct)
+
+- **Italiano y portugués** en la web y en las apps (portugués de Portugal):
+  - Web: selector con banderas IT/PT, los ocho namespaces de `messages/`, avisos, API móvil, Discord y tarjetas. `Admin` en it/pt es copia del inglés (panel solo para el desarrollador).
+  - Test de paridad (`tests/mensajesIdiomas.test.ts`): cada idioma con las mismas claves y argumentos ICU que el español.
+  - Apps: los 963 textos de `kmp/i18n/textos.json`, `values-it`/`values-pt`, `locales_config.xml`, `Info.plist` y el widget de iOS.
+- **CPU de Vercel, segunda ronda** (5 h 24 min de 4 h, Fast Origin Transfer 10,29 GB de 10 GB):
+  - Con `app/loading.tsx` en la raíz, cada `<Link>` visible pedía al servidor el layout raíz (nivel Paragon, racha y perfil). `components/Enlace.tsx` precarga solo al pasar el ratón o tocar; todos los enlaces lo usan.
+  - Nivel y racha de la cabecera se recuerdan 2 min por persona.
+  - `staleTimes.dynamic: 30`: volver atrás no repite el render.
+  - Volver a la pestaña ya no refresca Descubrir ni pide los avisos cada vez.
+
 ### Admin que carga y menos CPU en Vercel (22 oct)
 
 Se pasó el cupo gratis de CPU activa de Vercel (4 h 59 min de 4 h) y Admin → Analítica no llegaba a cargar.

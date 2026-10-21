@@ -1,5 +1,5 @@
 // Genera los textos de la app móvil a partir de textos.json (una sola fuente
-// con los 4 idiomas: es por defecto, en, de, fr — los mismos que la web):
+// con los 6 idiomas: es por defecto, en, de, fr, it, pt — los mismos que la web):
 //   1. kmp/shared/.../i18n/TextosGenerados.kt — código común (Android e iOS):
 //      stringResource(T.clave, a, b) en Compose / Textos.t(T.clave, a, b) fuera.
 //   2. kmp/androidApp/src/main/res/values*/strings.xml — para el código de
@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 const aqui = dirname(fileURLToPath(import.meta.url));
 const textos = JSON.parse(readFileSync(join(aqui, "textos.json"), "utf8"));
 const claves = Object.keys(textos).sort();
-const IDIOMAS = ["es", "en", "de", "fr"];
+const IDIOMAS = ["es", "en", "de", "fr", "it", "pt"];
 
 for (const clave of claves) {
   for (const idioma of IDIOMAS) {
@@ -66,7 +66,7 @@ writeFileSync(join(rutaKt, "TextosGenerados.kt"), kt.join("\n"));
 // --- 2. strings.xml de Android ---------------------------------------------
 
 const res = join(aqui, "..", "androidApp", "src", "main", "res");
-const CARPETAS = { es: "values", en: "values-en", de: "values-de", fr: "values-fr" };
+const CARPETAS = { es: "values", en: "values-en", de: "values-de", fr: "values-fr", it: "values-it", pt: "values-pt" };
 const FIJOS = { app_name: "Paragon", title_activity_main: "Paragon" };
 
 function escaparXml(texto) {

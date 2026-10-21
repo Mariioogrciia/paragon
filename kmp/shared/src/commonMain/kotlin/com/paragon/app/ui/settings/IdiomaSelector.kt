@@ -43,7 +43,7 @@ import com.paragon.app.ui.theme.radio
 
 /**
  * Idioma de la app (Ajustes, 5 oct 2026): antes solo se cambiaba desde los
- * ajustes del teléfono, que casi nadie encuentra. Mismos cuatro idiomas que
+ * ajustes del teléfono, que casi nadie encuentra. Mismos idiomas que
  * la web. Cada idioma se escribe en su propio idioma (si alguien se queda en
  * uno que no entiende, tiene que poder reconocer el suyo). "Automático" sigue
  * al teléfono. Va con `AppCompatDelegate.setApplicationLocales`: en Android
@@ -51,7 +51,7 @@ import com.paragon.app.ui.theme.radio
  * y por debajo lo guarda AppCompat (ver AppLocalesMetadataHolderService en el
  * manifiesto). Cambiarlo recrea la pantalla al momento.
  */
-private val IDIOMAS = listOf("es" to "Español", "en" to "English", "de" to "Deutsch", "fr" to "Français")
+private val IDIOMAS = listOf("es" to "Español", "en" to "English", "de" to "Deutsch", "fr" to "Français", "it" to "Italiano", "pt" to "Português")
 
 private fun idiomaActual(): String = getAppLanguage()
 

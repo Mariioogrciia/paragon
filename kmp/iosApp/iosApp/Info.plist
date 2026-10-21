@@ -12,6 +12,8 @@
 		<string>en</string>
 		<string>de</string>
 		<string>fr</string>
+		<string>it</string>
+		<string>pt</string>
 	</array>
 	<!-- Lo que se ve bajo el icono y el nombre con el que Siri reconoce la app
 	     («… en Paragon», ver Atajos.swift). -->

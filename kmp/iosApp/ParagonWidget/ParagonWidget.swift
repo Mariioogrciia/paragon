@@ -53,6 +53,8 @@ struct Proveedor: TimelineProvider {
         case "en": return ("No pinned goal", "Pin a game from its game page")
         case "de": return ("Kein Ziel angeheftet", "Hefte ein Spiel auf seiner Spielseite an")
         case "fr": return ("Aucun objectif épinglé", "Épingle un jeu depuis sa fiche")
+        case "it": return ("Nessun obiettivo fissato", "Fissa un gioco dalla sua scheda")
+        case "pt": return ("Sem objetivo fixado", "Fixa um jogo a partir da ficha de jogo")
         default: return ("Sin objetivo anclado", "Fija un juego desde la ficha de juego")
         }
     }
@@ -110,6 +112,8 @@ private var descripcion: String {
     case "en": return "Your pinned game and its progress."
     case "de": return "Dein angeheftetes Spiel und sein Fortschritt."
     case "fr": return "Ton jeu épinglé et sa progression."
+    case "it": return "Il tuo gioco fissato e i suoi progressi."
+    case "pt": return "O teu jogo fixado e o seu progresso."
     default: return "Tu juego anclado y su progreso."
     }
 }
