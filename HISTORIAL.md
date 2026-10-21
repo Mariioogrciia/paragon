@@ -6,6 +6,38 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct (7) — panel de admin: analítica, registro y controles de verdad**.
+- Tráfico propio, sin cookies (`lib/trafico.ts`, `lib/traficoRutas.ts` con
+  tests, `api/v`, `ContadorVisitas` en el layout con `sendBeacon`): por día
+  y tipo de página (`/u/[handle]`, no qué perfil), vistas, entradas (primera
+  página de la visita, si viene de fuera), móvil y de qué dominio llegan.
+  Sin IP ni navegador; respeta Do Not Track / GPC; los bots no cuentan.
+  `actividad_usuario` (día + usuario con sesión) para activos por
+  día/semana/mes, 90 días. Tablas creadas solas la primera vez.
+- `lib/registro.ts`: registro de eventos (30 días). Escriben el cron (resumen
+  de cada pasada), cada cuenta que falla, las alertas de vigilancia y del
+  NPSSO, todas las acciones de admin (auditoría) y los errores que ve la
+  gente (`error.tsx`/`global-error.tsx` → `api/registro-error`, con tope por
+  conexión: la IP solo se usa resumida como clave del límite).
+- Admin → Analítica (pestaña por defecto): selector 7/30/90 días; KPIs con
+  variación frente al periodo anterior (vistas, visitas, activos hoy/7/30,
+  altas, trofeos sincronizados, errores 24 h); gráficas por día de vistas,
+  activos, altas y sincronizaciones (`components/admin/GraficaDias.tsx`: una
+  serie, tooltip con línea vertical al pasar el ratón, tabla plegada); top
+  de páginas y de orígenes y % desde el móvil.
+- Admin → Registro: filtros por nivel y origen, datos desplegables, "ver más
+  antiguos".
+- Admin → Sistema: fuera los dos controles de mentira ("Próximamente").
+  Ahora: pausar/reanudar la sincronización de PSN, Steam o Xbox
+  (`lib/ajustesSistema.ts`, `resyncLibraries` se las salta), lanzar el cron
+  ahora (`after()` + `CRON_SECRET`), aviso a todos (campana, y opcional push
+  y Discord) y la lista de cuentas que no consiguen sincronizar.
+- Privacidad: nueva línea sobre los días de uso (90 días); cookies: el
+  contador propio sin cookies. En 4 idiomas.
+Probado en local con datos de prueba: gráficas, tooltip, filtros del
+registro, pausa de Xbox y aviso a 25 personas, todo apuntado en Registro.
+Los datos de tráfico empiezan a contar desde este despliegue.
+
 **21 oct (6) — Wrap rediseñado**. El usuario: "son fotos con color de fondo
 y letras". Antes: tres degradados con un número cada uno, y unas historias
 igual (degradado + emoji + número).

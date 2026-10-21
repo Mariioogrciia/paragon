@@ -19,6 +19,8 @@ import { registrarHorasDelDia } from "@/lib/horasPeriodo";
 import { revisarCredencialPsn } from "@/lib/credencialPsn";
 import { limpiarAvisosViejos } from "@/lib/bandeja";
 import { vigilarServidor } from "@/lib/vigilancia";
+import { limpiarRegistro, registrar } from "@/lib/registro";
+import { limpiarTrafico } from "@/lib/trafico";
 import { apuntarPasadaCron, idDesarrollador } from "@/lib/avisoDesarrollador";
 
 /**
@@ -538,6 +540,21 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("[cron-sync] latido", error);
   }
+
+  // Registro de eventos (lib/registro.ts, Admin → Registro): el resumen de
+  // la pasada, cada cuenta que falla y las alertas mandadas. Y limpieza de lo
+  // viejo del registro y del tráfico (lib/trafico.ts).
+  const fallidas = resultados.filter((r) => r.error !== undefined);
+  for (const f of fallidas.slice(0, 20)) await registrar("aviso", "sync", f.error ?? "Error al sincronizar", { userId: f.userId });
+  for (const alerta of vigilancia) await registrar("error", "vigilancia", alerta);
+  if (credencialPsn) await registrar("error", "psn", `NPSSO de PSN: ${credencialPsn}`);
+  await registrar(fallidas.length > 0 && fallidas.length === resultados.length ? "error" : "info", "cron", `Pasada: ${resultados.length - fallidas.length} sincronizadas, ${fallidas.length} con error`, {
+    segundos: Math.round((Date.now() - arranque) / 1000),
+    fichasRellenadas: detalles,
+    pendientesPorTiempo: agotado,
+  });
+  await limpiarRegistro();
+  await limpiarTrafico();
 
   return NextResponse.json({
     sincronizados: resultados.filter((r) => r.error === undefined).length,

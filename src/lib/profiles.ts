@@ -1,4 +1,5 @@
 import "server-only";
+import { plataformasPausadas } from "@/lib/ajustesSistema";
 import { getHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { getWeeklyMissions, xpMisiones } from "@/lib/missions";
 import { LOGROS, logroConseguido } from "@/lib/logros";
@@ -759,6 +760,7 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
   if (!profile) return 0;
 
   let total = 0;
+  const pausadas = await plataformasPausadas();
 
   for (const account of profile.accounts) {
     if (!account.isPublic) continue;
@@ -767,6 +769,9 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
     // solo se actualiza con la extensión del navegador (linkEpicWithExtension).
     // Intentarlo aquí no traería nada y marcaría "sincronizado" en falso.
     if (account.platform === "epic") continue;
+
+    // Pausada desde Admin → Sistema (lib/ajustesSistema.ts): ni se intenta.
+    if (pausadas.has(account.platform)) continue;
 
     // Cada cuenta va en su propio try/catch a propósito (7 sept 2026, bug
     // real en producción): antes, un fallo de red al pedir la biblioteca de

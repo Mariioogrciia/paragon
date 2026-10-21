@@ -107,6 +107,7 @@ export default async function CookiesPage() {
             ),
           })}
         </p>
+        <p className="text-muted">{t("s4propia")}</p>
       </section>
 
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">

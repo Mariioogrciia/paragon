@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { reportarError } from "@/lib/reportarError";
 
 /**
  * Solo se dispara si falla el propio layout raíz (sesión, `<html>`, lo que
@@ -38,6 +39,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("[global-error.tsx]", error);
+    reportarError(error);
   }, [error]);
 
   // Sin clases en todo este archivo a propósito (ver el comentario de

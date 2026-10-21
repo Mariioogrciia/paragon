@@ -575,3 +575,37 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     insignias: Number(insigniasRow?.n ?? 0),
   };
 }
+
+export interface AdminCuentaProblema {
+  handle: string | null;
+  userId: string;
+  platform: string;
+  username: string;
+  syncedAt: Date | null;
+  lastAttemptedAt: Date | null;
+}
+
+/**
+ * Cuentas que se intentaron sincronizar en las últimas 24 h pero llevan más
+ * de 2 días sin hacerlo bien (21 oct 2026): perfil en privado, NPSSO
+ * caducado, cuenta borrada en la plataforma... Para Admin → Sistema.
+ */
+export async function getCuentasConProblemas(limit = 30): Promise<AdminCuentaProblema[]> {
+  return db
+    .select({
+      handle: users.handle,
+      userId: platformAccounts.userId,
+      platform: platformAccounts.platform,
+      username: platformAccounts.username,
+      syncedAt: platformAccounts.syncedAt,
+      lastAttemptedAt: platformAccounts.lastAttemptedAt,
+    })
+    .from(platformAccounts)
+    .innerJoin(users, eq(users.id, platformAccounts.userId))
+    .where(
+      sql`${platformAccounts.lastAttemptedAt} > now() - interval '1 day'
+        AND (${platformAccounts.syncedAt} IS NULL OR ${platformAccounts.syncedAt} < now() - interval '2 days')`,
+    )
+    .orderBy(desc(platformAccounts.lastAttemptedAt))
+    .limit(limit);
+}

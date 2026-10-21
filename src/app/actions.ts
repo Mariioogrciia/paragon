@@ -1,6 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { registrar } from "@/lib/registro";
+import { PLATAFORMAS_PAUSABLES, pausarPlataforma, type PlataformaPausable } from "@/lib/ajustesSistema";
+import { avisarUsuario } from "@/lib/avisos";
+import { guardarAviso } from "@/lib/bandeja";
+import { dominioPublico } from "@/lib/site";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { users, userGames, activities, platformAccounts, leagues, accounts, userTrophies, gameTrophies, games } from "@/db/schema";
@@ -951,6 +957,7 @@ export async function deleteActivityAction(formData: FormData): Promise<void> {
     await database.update(userGames).set({ review: null }).where(and(eq(userGames.userId, activity.userId), eq(userGames.gameId, activity.gameId!)));
   }
 
+  await registrar("info", "admin", "Publicación del muro borrada", { activityId });
   revalidatePath("/", "layout");
 }
 
@@ -974,6 +981,7 @@ export async function adminDeleteLeagueAction(formData: FormData): Promise<void>
 
   const database = getDb();
   await database.delete(leagues).where(eq(leagues.id, leagueId));
+  await registrar("info", "admin", "Liga borrada", { leagueId });
 
   revalidatePath("/", "layout");
 }
@@ -989,6 +997,7 @@ export async function adminDeleteClanAction(formData: FormData): Promise<void> {
   const { clans } = await import("@/db/schema");
   const database = getDb();
   await database.delete(clans).where(eq(clans.id, clanId));
+  await registrar("info", "admin", "Clan borrado", { clanId });
 
   revalidatePath("/", "layout");
 }
@@ -1018,6 +1027,7 @@ export async function adminSetHandleAction(formData: FormData): Promise<void> {
   if (contieneLenguajeOfensivo(handle)) redirect(volver("ofensivo"));
 
   await setHandle(targetUserId, handle);
+  await registrar("info", "admin", `Handle cambiado a @${handle}`, { targetUserId });
   revalidatePath("/", "layout");
   redirect(volver("ok"));
 }
@@ -1036,7 +1046,74 @@ export async function adminVaciarCampoAction(formData: FormData): Promise<void> 
 
   const database = getDb();
   await database.update(users).set({ [campo]: null }).where(eq(users.id, targetUserId));
+  await registrar("info", "admin", `Campo vaciado: ${campo}`, { targetUserId });
   revalidatePath("/", "layout");
+}
+
+/**
+ * Admin → Sistema → "Lanzar el cron ahora" (21 oct 2026): llama a la ruta del
+ * cron como lo haría el programador, pero sin esperar a su hora. Corre
+ * después de responder (`after`): la pasada puede tardar minutos. El
+ * resultado queda en Admin → Registro.
+ */
+export async function adminLanzarCronAction(): Promise<void> {
+  const adminUserId = await requireUserId();
+  const adminProfile = await getProfileByUserId(adminUserId);
+  if (!adminProfile?.esDesarrollador) return;
+  const secreto = process.env.CRON_SECRET;
+  if (!secreto) {
+    await registrar("error", "admin", "No se puede lanzar el cron: falta CRON_SECRET");
+    return;
+  }
+  await registrar("info", "admin", "Cron lanzado a mano");
+  after(async () => {
+    try {
+      const res = await fetch(`${dominioPublico()}/api/cron/sync`, { headers: { Authorization: `Bearer ${secreto}` }, cache: "no-store" });
+      if (!res.ok) await registrar("error", "cron", `La pasada lanzada a mano respondió ${res.status}`);
+    } catch (error) {
+      await registrar("error", "cron", "La pasada lanzada a mano no respondió", { error: String(error).slice(0, 300) });
+    }
+  });
+  revalidatePath("/admin");
+}
+
+/** Admin → Sistema: pausar o reanudar la sincronización de una plataforma (lib/ajustesSistema.ts). */
+export async function adminPausarPlataformaAction(formData: FormData): Promise<void> {
+  const adminUserId = await requireUserId();
+  const adminProfile = await getProfileByUserId(adminUserId);
+  if (!adminProfile?.esDesarrollador) return;
+  const plataforma = String(formData.get("plataforma") ?? "");
+  if (!(PLATAFORMAS_PAUSABLES as readonly string[]).includes(plataforma)) return;
+  const pausar = formData.get("pausar") === "1";
+  await pausarPlataforma(plataforma as PlataformaPausable, pausar);
+  await registrar("aviso", "admin", `${pausar ? "Pausada" : "Reanudada"} la sincronización de ${plataforma}`);
+  revalidatePath("/admin");
+}
+
+/**
+ * Admin → Sistema → "Aviso a todos" (21 oct 2026): un mensaje en la campana
+ * de todo el mundo y, si se marca, también por push y Discord (respeta
+ * quien no los tenga activados). Para novedades o un corte de servicio.
+ */
+export async function adminAvisoATodosAction(formData: FormData): Promise<void> {
+  const adminUserId = await requireUserId();
+  const adminProfile = await getProfileByUserId(adminUserId);
+  if (!adminProfile?.esDesarrollador) return;
+  const titulo = String(formData.get("titulo") ?? "").trim().slice(0, 120);
+  const texto = String(formData.get("texto") ?? "").trim().slice(0, 400);
+  const rutaCruda = String(formData.get("ruta") ?? "").trim();
+  const ruta = rutaCruda.startsWith("/") && !rutaCruda.startsWith("//") ? rutaCruda.slice(0, 200) : undefined;
+  const conPush = formData.get("push") === "on";
+  if (!titulo || !texto) redirect("/admin?tab=system&aviso=vacio");
+
+  const todos = await getDb().select({ id: users.id }).from(users);
+  if (conPush) {
+    for (const u of todos) await avisarUsuario(u.id, { titulo, texto, ruta });
+  } else {
+    await guardarAviso(todos.map((u) => u.id), { titulo, texto, ruta });
+  }
+  await registrar("info", "admin", `Aviso a todos: ${titulo}`, { personas: todos.length, push: conPush });
+  redirect(`/admin?tab=system&aviso=ok&n=${todos.length}`);
 }
 
 /* ---------------------------------- Juegos manuales --------------------------------- */

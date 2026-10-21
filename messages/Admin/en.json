@@ -7,7 +7,9 @@
     "clans": "🛡️ Clans",
     "trophies": "🏅 Trophies",
     "system": "⚙️ System",
-    "moderation": "🚩 Moderation"
+    "moderation": "🚩 Moderation",
+    "analitica": "📈 Analytics",
+    "registro": "📜 Log"
   },
   "dashboard": {
     "stats": {
@@ -103,5 +105,87 @@
         "empty": "No recent activity to moderate."
       }
     }
+  },
+  "analitica": {
+    "dias": "{n} days",
+    "vistas": "Page views",
+    "entradas": "Visits",
+    "activos": "Active users",
+    "activosDetalle": "today · 7 days · 30 days",
+    "altas": "Sign-ups",
+    "trofeosNuevos": "Trophies synced",
+    "syncs": "in {n} syncs",
+    "movil": "From mobile",
+    "movilDetalle": "of page views",
+    "errores24h": "Errors in 24 h",
+    "avisos24h": "and {n} warnings",
+    "verRegistro": "See log →",
+    "vsAnterior": "{pct}% vs. the previous {n} days",
+    "sinAnterior": "no data for the previous period",
+    "graficaVistas": "Page views per day",
+    "graficaActivos": "Active users per day",
+    "graficaAltas": "Sign-ups per day",
+    "graficaSync": "Syncs per day",
+    "unidadVistas": "views",
+    "unidadPersonas": "people",
+    "unidadAltas": "sign-ups",
+    "unidadSync": "syncs",
+    "extraEntradas": "{n} visits",
+    "extraTrofeos": "{n} trophies",
+    "verTabla": "See the data as a table",
+    "paginas": "Most viewed pages",
+    "pagina": "Page",
+    "origenes": "Where people come from",
+    "origen": "Source",
+    "directo": "Direct (no link)",
+    "sinDatos": "No traffic data yet: the counter started on 21 October 2026.",
+    "nota": "Counted in our own database, without cookies: page type, whether it was the first of the visit, which site it came from and whether it was a phone. Active users are signed-in people; crawlers don't count."
+  },
+  "registro": {
+    "titulo": "Event log",
+    "nivel": "Level",
+    "origen": "Source",
+    "todos": "All",
+    "niveles": {
+      "info": "Info",
+      "aviso": "Warning",
+      "error": "Error"
+    },
+    "origenes": {
+      "cron": "Cron",
+      "sync": "Sync",
+      "vigilancia": "Monitoring",
+      "admin": "Admin",
+      "cliente": "Website (users)",
+      "psn": "PSN"
+    },
+    "vacio": "Nothing to show with these filters.",
+    "mas": "See older",
+    "datos": "Data",
+    "nota": "Kept for 30 days. Written by the cron, failed syncs, alerts, your admin actions and errors people see on the website."
+  },
+  "acciones": {
+    "titulo": "Actions",
+    "lanzarCron": "Run the cron now",
+    "lanzarCronAyuda": "Runs a sync pass right away, without waiting for its schedule. It takes a few minutes; the result shows up in Log.",
+    "avisoTodos": "Notice to everyone",
+    "avisoTitulo": "Title",
+    "avisoTexto": "Text",
+    "avisoRuta": "Link (optional, e.g. /descubrir)",
+    "avisoPush": "Also send by push and Discord",
+    "avisoEnviar": "Send to everyone",
+    "avisoOk": "Sent to {n} people.",
+    "avisoVacio": "Title or text is missing.",
+    "cuentasProblema": "Accounts that don't sync",
+    "cuentasProblemaAyuda": "Tried in the last 24 h, but more than 2 days without a successful sync.",
+    "ninguna": "None. 👌",
+    "ultimaBuena": "Last good: {fecha}",
+    "nunca": "never",
+    "pausas": "Pause syncing",
+    "pausasAyuda": "If a platform is down or erroring (e.g. OpenXBL), pausing it avoids cascading failures. The app keeps showing what's already saved.",
+    "pausada": "Paused",
+    "activa": "Active",
+    "pausar": "Pause",
+    "reanudar": "Resume"
   }
 }

@@ -7,7 +7,9 @@
     "clans": "🛡️ Clanes",
     "trophies": "🏅 Trofeos",
     "system": "⚙️ Sistema",
-    "moderation": "🚩 Moderación"
+    "moderation": "🚩 Moderación",
+    "analitica": "📈 Analítica",
+    "registro": "📜 Registro"
   },
   "dashboard": {
     "stats": {
@@ -103,5 +105,87 @@
         "empty": "No hay actividades recientes para moderar."
       }
     }
+  },
+  "analitica": {
+    "dias": "{n} días",
+    "vistas": "Páginas vistas",
+    "entradas": "Visitas",
+    "activos": "Usuarios activos",
+    "activosDetalle": "hoy · 7 días · 30 días",
+    "altas": "Altas",
+    "trofeosNuevos": "Trofeos sincronizados",
+    "syncs": "en {n} sincronizaciones",
+    "movil": "Desde el móvil",
+    "movilDetalle": "de las páginas vistas",
+    "errores24h": "Errores en 24 h",
+    "avisos24h": "y {n} avisos",
+    "verRegistro": "Ver registro →",
+    "vsAnterior": "{pct}% vs. los {n} días anteriores",
+    "sinAnterior": "sin datos del periodo anterior",
+    "graficaVistas": "Páginas vistas por día",
+    "graficaActivos": "Usuarios activos por día",
+    "graficaAltas": "Altas por día",
+    "graficaSync": "Sincronizaciones por día",
+    "unidadVistas": "vistas",
+    "unidadPersonas": "personas",
+    "unidadAltas": "altas",
+    "unidadSync": "sincronizaciones",
+    "extraEntradas": "{n} entradas",
+    "extraTrofeos": "{n} trofeos",
+    "verTabla": "Ver los datos en tabla",
+    "paginas": "Páginas más vistas",
+    "pagina": "Página",
+    "origenes": "De dónde llega la gente",
+    "origen": "Origen",
+    "directo": "Directo (sin enlace)",
+    "sinDatos": "Todavía no hay datos de tráfico: el contador empezó el 21 de octubre de 2026.",
+    "nota": "Contado en nuestra base, sin cookies: tipo de página, si era la primera de la visita, de qué web venía y si era un móvil. Los activos son personas con sesión iniciada; los rastreadores no cuentan."
+  },
+  "registro": {
+    "titulo": "Registro de eventos",
+    "nivel": "Nivel",
+    "origen": "Origen",
+    "todos": "Todos",
+    "niveles": {
+      "info": "Info",
+      "aviso": "Aviso",
+      "error": "Error"
+    },
+    "origenes": {
+      "cron": "Cron",
+      "sync": "Sincronización",
+      "vigilancia": "Vigilancia",
+      "admin": "Admin",
+      "cliente": "Web (usuarios)",
+      "psn": "PSN"
+    },
+    "vacio": "Nada que mostrar con estos filtros.",
+    "mas": "Ver más antiguos",
+    "datos": "Datos",
+    "nota": "Se guarda 30 días. Lo apuntan el cron, las sincronizaciones que fallan, las alertas, tus acciones de admin y los errores que ve la gente en la web."
+  },
+  "acciones": {
+    "titulo": "Acciones",
+    "lanzarCron": "Lanzar el cron ahora",
+    "lanzarCronAyuda": "Hace una pasada de sincronización ya, sin esperar a su hora. Tarda unos minutos; el resultado sale en Registro.",
+    "avisoTodos": "Aviso a todos",
+    "avisoTitulo": "Título",
+    "avisoTexto": "Texto",
+    "avisoRuta": "Enlace (opcional, p. ej. /descubrir)",
+    "avisoPush": "Mandar también por push y Discord",
+    "avisoEnviar": "Enviar a todos",
+    "avisoOk": "Enviado a {n} personas.",
+    "avisoVacio": "Falta el título o el texto.",
+    "cuentasProblema": "Cuentas que no sincronizan",
+    "cuentasProblemaAyuda": "Se intentaron en las últimas 24 h, pero llevan más de 2 días sin sincronizar bien.",
+    "ninguna": "Ninguna. 👌",
+    "ultimaBuena": "Última buena: {fecha}",
+    "nunca": "nunca",
+    "pausas": "Pausar la sincronización",
+    "pausasAyuda": "Si una plataforma está caída o da errores (p. ej. OpenXBL), pausarla evita fallos en cadena. La app sigue enseñando lo ya guardado.",
+    "pausada": "Pausada",
+    "activa": "Activa",
+    "pausar": "Pausar",
+    "reanudar": "Reanudar"
   }
 }

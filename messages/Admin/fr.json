@@ -7,7 +7,9 @@
     "clans": "🛡️ Clans",
     "trophies": "🏅 Trophées",
     "system": "⚙️ Système",
-    "moderation": "🚩 Modération"
+    "moderation": "🚩 Modération",
+    "analitica": "📈 Statistiques",
+    "registro": "📜 Journal"
   },
   "dashboard": {
     "stats": {
@@ -103,5 +105,87 @@
         "empty": "Aucune activité récente à modérer."
       }
     }
+  },
+  "analitica": {
+    "dias": "{n} jours",
+    "vistas": "Pages vues",
+    "entradas": "Visites",
+    "activos": "Utilisateurs actifs",
+    "activosDetalle": "aujourd'hui · 7 jours · 30 jours",
+    "altas": "Inscriptions",
+    "trofeosNuevos": "Trophées synchronisés",
+    "syncs": "en {n} synchronisations",
+    "movil": "Depuis le mobile",
+    "movilDetalle": "des pages vues",
+    "errores24h": "Erreurs en 24 h",
+    "avisos24h": "et {n} avertissements",
+    "verRegistro": "Voir le journal →",
+    "vsAnterior": "{pct} % vs. les {n} jours précédents",
+    "sinAnterior": "pas de données pour la période précédente",
+    "graficaVistas": "Pages vues par jour",
+    "graficaActivos": "Utilisateurs actifs par jour",
+    "graficaAltas": "Inscriptions par jour",
+    "graficaSync": "Synchronisations par jour",
+    "unidadVistas": "vues",
+    "unidadPersonas": "personnes",
+    "unidadAltas": "inscriptions",
+    "unidadSync": "synchronisations",
+    "extraEntradas": "{n} visites",
+    "extraTrofeos": "{n} trophées",
+    "verTabla": "Voir les données en tableau",
+    "paginas": "Pages les plus vues",
+    "pagina": "Page",
+    "origenes": "D'où viennent les gens",
+    "origen": "Source",
+    "directo": "Direct (sans lien)",
+    "sinDatos": "Pas encore de données de trafic : le compteur a démarré le 21 octobre 2026.",
+    "nota": "Compté dans notre propre base, sans cookies : type de page, si c'était la première de la visite, de quel site elle venait et si c'était un mobile. Les actifs sont des personnes connectées ; les robots ne comptent pas."
+  },
+  "registro": {
+    "titulo": "Journal des événements",
+    "nivel": "Niveau",
+    "origen": "Source",
+    "todos": "Tous",
+    "niveles": {
+      "info": "Info",
+      "aviso": "Avertissement",
+      "error": "Erreur"
+    },
+    "origenes": {
+      "cron": "Cron",
+      "sync": "Synchronisation",
+      "vigilancia": "Surveillance",
+      "admin": "Admin",
+      "cliente": "Site (utilisateurs)",
+      "psn": "PSN"
+    },
+    "vacio": "Rien à afficher avec ces filtres.",
+    "mas": "Voir plus ancien",
+    "datos": "Données",
+    "nota": "Conservé 30 jours. Y écrivent : le cron, les synchronisations échouées, les alertes, tes actions d'admin et les erreurs que les gens voient sur le site."
+  },
+  "acciones": {
+    "titulo": "Actions",
+    "lanzarCron": "Lancer le cron maintenant",
+    "lanzarCronAyuda": "Fait une synchronisation tout de suite, sans attendre l'horaire. Ça prend quelques minutes ; le résultat apparaît dans le Journal.",
+    "avisoTodos": "Message à tout le monde",
+    "avisoTitulo": "Titre",
+    "avisoTexto": "Texte",
+    "avisoRuta": "Lien (facultatif, p. ex. /descubrir)",
+    "avisoPush": "Envoyer aussi par push et Discord",
+    "avisoEnviar": "Envoyer à tous",
+    "avisoOk": "Envoyé à {n} personnes.",
+    "avisoVacio": "Il manque le titre ou le texte.",
+    "cuentasProblema": "Comptes qui ne se synchronisent pas",
+    "cuentasProblemaAyuda": "Tentés dans les dernières 24 h, mais plus de 2 jours sans synchronisation réussie.",
+    "ninguna": "Aucun. 👌",
+    "ultimaBuena": "Dernière réussie : {fecha}",
+    "nunca": "jamais",
+    "pausas": "Mettre en pause la synchronisation",
+    "pausasAyuda": "Si une plateforme est en panne ou renvoie des erreurs (p. ex. OpenXBL), la mettre en pause évite les échecs en cascade. L'app continue d'afficher ce qui est déjà enregistré.",
+    "pausada": "En pause",
+    "activa": "Active",
+    "pausar": "Mettre en pause",
+    "reanudar": "Reprendre"
   }
 }

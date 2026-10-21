@@ -61,6 +61,7 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s2li3", richTags)}</li>
           <li>{t.rich("s2li4", richTags)}</li>
           <li>{t.rich("s2li5", richTags)}</li>
+          <li>{t.rich("s2li6", richTags)}</li>
         </ul>
       </Seccion>
 

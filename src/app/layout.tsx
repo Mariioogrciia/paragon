@@ -136,6 +136,7 @@ function relanzarSiEsDeNext(error: unknown): void {
 
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { CookieBanner } from "@/components/CookieBanner";
+import { ContadorVisitas } from "@/components/ContadorVisitas";
 
 export default async function RootLayout({
   children,
@@ -267,6 +268,7 @@ export default async function RootLayout({
         <Analytics />
         <NextIntlClientProvider locale={locale} messages={mensajesCliente(messages)}>
           <CookieBanner />
+          <ContadorVisitas />
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"

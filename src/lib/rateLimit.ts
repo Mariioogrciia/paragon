@@ -86,6 +86,8 @@ export const LIMITES = {
   // El resto de escrituras de /api/mobile (ligas, amigos, carpetas, clanes):
   // de sobra para tocar botones, no para un script en bucle (15 oct 2026).
   escritura: [60, 60],
+  // Errores que ve alguien en la web y se apuntan en Admin → Registro (21 oct 2026).
+  registroCliente: [10, 600],
   // "Visto" de cada publicación del muro al pasar por ella.
   vista: [240, 60],
 } as const satisfies Record<string, readonly [number, number]>;

@@ -13,6 +13,9 @@ import { estadoCredencialPsn } from "@/lib/credencialPsn";
 import { ComprobarNpsso } from "@/components/ComprobarNpsso";
 import { DIAS_AVISO_ANTES } from "@/lib/caducidadNpsso";
 import { minutosDesdePasadaCron } from "@/lib/avisoDesarrollador";
+import { AnaliticaAdmin } from "./AnaliticaAdmin";
+import { RegistroAdmin } from "./RegistroAdmin";
+import { AccionesSistema } from "./AccionesSistema";
 
 export const metadata = { title: "Admin · Paragon" };
 
@@ -56,7 +59,14 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
 
   const t = await getTranslations("Admin");
   const searchParams = await props.searchParams;
-  const currentTab = typeof searchParams.tab === "string" ? searchParams.tab : "dashboard";
+  // Analítica por defecto (21 oct 2026): es lo primero que se quiere ver.
+  const currentTab = typeof searchParams.tab === "string" ? searchParams.tab : "analitica";
+  const diasAnalitica = [7, 30, 90].includes(Number(searchParams.dias)) ? Number(searchParams.dias) : 30;
+  const filtroNivel = ["info", "aviso", "error"].includes(String(searchParams.nivel)) ? (String(searchParams.nivel) as "info" | "aviso" | "error") : undefined;
+  const filtroOrigen = ["cron", "sync", "vigilancia", "admin", "cliente", "psn"].includes(String(searchParams.origen))
+    ? (String(searchParams.origen) as "cron" | "sync" | "vigilancia" | "admin" | "cliente" | "psn")
+    : undefined;
+  const antesDe = Number(searchParams.antesDe) > 0 ? Number(searchParams.antesDe) : undefined;
   // Paginación por pestaña (`?pagina=N`, ver VerMas): antes la tabla de
   // usuarios traía a todo el mundo de golpe y el resto cortaba en seco.
   const pagina = paginaDe(searchParams.pagina);
@@ -93,12 +103,14 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       {/* Tabs Navigation */}
       <div className="flex items-center gap-2 border-b border-border pb-px overflow-x-auto">
         {[
+          { id: "analitica", label: t("tabs.analitica") },
           { id: "dashboard", label: t("tabs.dashboard") },
           { id: "leagues", label: t("tabs.leagues") },
           { id: "clans", label: t("tabs.clans") },
           { id: "trophies", label: t("tabs.trophies") },
           { id: "moderation", label: t("tabs.moderation") },
           { id: "system", label: t("tabs.system") },
+          { id: "registro", label: t("tabs.registro") },
         ].map(tab => (
           <Link
             key={tab.id}
@@ -113,6 +125,9 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
           </Link>
         ))}
       </div>
+
+      {currentTab === "analitica" && <AnaliticaAdmin dias={diasAnalitica} locale={idioma} />}
+      {currentTab === "registro" && <RegistroAdmin nivel={filtroNivel} origen={filtroOrigen} antesDe={antesDe} locale={idioma} />}
 
       {/* TAB: DASHBOARD */}
       {currentTab === "dashboard" && overview && usuarios && (
@@ -557,34 +572,13 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
       {/* TAB: SISTEMA */}
       {currentTab === "system" && syncRuns && (
         <div className="space-y-9">
-          
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Controles de Sistema (UI dummy para el futuro) */}
-            <div>
-              <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.controls.title")}</h2>
-              <div className="rounded-[14px] p-6 flex flex-col gap-4" style={CARD}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold">{t("system.controls.maintenanceMode.title")}</h3>
-                    <p className="text-xs text-muted">{t("system.controls.maintenanceMode.description")}</p>
-                  </div>
-                  <button disabled className="bg-surface-2 text-muted px-4 py-2 rounded-full text-xs font-bold border border-border opacity-50 cursor-not-allowed">
-                    {t("system.controls.comingSoon")}
-                  </button>
-                </div>
-                <div className="h-px bg-border w-full" />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold">{t("system.controls.stopXboxSync.title")}</h3>
-                    <p className="text-xs text-muted">{t("system.controls.stopXboxSync.description")}</p>
-                  </div>
-                  <button disabled className="bg-surface-2 text-muted px-4 py-2 rounded-full text-xs font-bold border border-border opacity-50 cursor-not-allowed">
-                    {t("system.controls.comingSoon")}
-                  </button>
-                </div>
-              </div>
-            </div>
+          <AccionesSistema
+            avisoEstado={typeof searchParams.aviso === "string" ? searchParams.aviso : undefined}
+            avisoN={Number(searchParams.n) || 0}
+            locale={idioma}
+          />
 
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h2 className="font-heading mb-3 text-lg font-bold uppercase tracking-wide">{t("system.infrastructure.title")}</h2>
               <div className="rounded-[14px] p-6 flex flex-col gap-4" style={CARD}>

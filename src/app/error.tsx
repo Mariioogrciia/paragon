@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { BackButton } from "@/components/BackButton";
+import { reportarError } from "@/lib/reportarError";
 
 /**
  * Red de seguridad de toda la app: sin este archivo, cualquier fallo en
@@ -28,6 +29,7 @@ export default function ErrorBoundary({
   const t = useTranslations("Shell.Error");
   useEffect(() => {
     console.error("[error.tsx]", error);
+    reportarError(error);
   }, [error]);
 
   return (

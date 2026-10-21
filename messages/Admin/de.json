@@ -7,7 +7,9 @@
     "clans": "🛡️ Clans",
     "trophies": "🏅 Trophäen",
     "system": "⚙️ System",
-    "moderation": "🚩 Moderation"
+    "moderation": "🚩 Moderation",
+    "analitica": "📈 Analyse",
+    "registro": "📜 Protokoll"
   },
   "dashboard": {
     "stats": {
@@ -103,5 +105,87 @@
         "empty": "Keine aktuellen Aktivitäten zur Moderation."
       }
     }
+  },
+  "analitica": {
+    "dias": "{n} Tage",
+    "vistas": "Seitenaufrufe",
+    "entradas": "Besuche",
+    "activos": "Aktive Nutzer",
+    "activosDetalle": "heute · 7 Tage · 30 Tage",
+    "altas": "Registrierungen",
+    "trofeosNuevos": "Synchronisierte Trophäen",
+    "syncs": "in {n} Synchronisierungen",
+    "movil": "Vom Handy",
+    "movilDetalle": "der Seitenaufrufe",
+    "errores24h": "Fehler in 24 h",
+    "avisos24h": "und {n} Warnungen",
+    "verRegistro": "Protokoll ansehen →",
+    "vsAnterior": "{pct} % ggü. den {n} Tagen davor",
+    "sinAnterior": "keine Daten für den Vorzeitraum",
+    "graficaVistas": "Seitenaufrufe pro Tag",
+    "graficaActivos": "Aktive Nutzer pro Tag",
+    "graficaAltas": "Registrierungen pro Tag",
+    "graficaSync": "Synchronisierungen pro Tag",
+    "unidadVistas": "Aufrufe",
+    "unidadPersonas": "Personen",
+    "unidadAltas": "Registrierungen",
+    "unidadSync": "Synchronisierungen",
+    "extraEntradas": "{n} Besuche",
+    "extraTrofeos": "{n} Trophäen",
+    "verTabla": "Daten als Tabelle ansehen",
+    "paginas": "Meistbesuchte Seiten",
+    "pagina": "Seite",
+    "origenes": "Woher die Leute kommen",
+    "origen": "Quelle",
+    "directo": "Direkt (ohne Link)",
+    "sinDatos": "Noch keine Besucherdaten: Der Zähler startete am 21. Oktober 2026.",
+    "nota": "In unserer eigenen Datenbank gezählt, ohne Cookies: Seitentyp, ob es die erste Seite des Besuchs war, von welcher Website und ob vom Handy. Aktive Nutzer sind angemeldete Personen; Crawler zählen nicht."
+  },
+  "registro": {
+    "titulo": "Ereignisprotokoll",
+    "nivel": "Stufe",
+    "origen": "Quelle",
+    "todos": "Alle",
+    "niveles": {
+      "info": "Info",
+      "aviso": "Warnung",
+      "error": "Fehler"
+    },
+    "origenes": {
+      "cron": "Cron",
+      "sync": "Synchronisierung",
+      "vigilancia": "Überwachung",
+      "admin": "Admin",
+      "cliente": "Website (Nutzer)",
+      "psn": "PSN"
+    },
+    "vacio": "Mit diesen Filtern gibt es nichts anzuzeigen.",
+    "mas": "Ältere ansehen",
+    "datos": "Daten",
+    "nota": "Wird 30 Tage aufbewahrt. Schreiben: der Cron, fehlgeschlagene Synchronisierungen, Warnungen, deine Admin-Aktionen und Fehler, die Leute auf der Website sehen."
+  },
+  "acciones": {
+    "titulo": "Aktionen",
+    "lanzarCron": "Cron jetzt starten",
+    "lanzarCronAyuda": "Führt sofort eine Synchronisierung aus, ohne auf den Zeitplan zu warten. Dauert ein paar Minuten; das Ergebnis erscheint im Protokoll.",
+    "avisoTodos": "Hinweis an alle",
+    "avisoTitulo": "Titel",
+    "avisoTexto": "Text",
+    "avisoRuta": "Link (optional, z. B. /descubrir)",
+    "avisoPush": "Auch per Push und Discord senden",
+    "avisoEnviar": "An alle senden",
+    "avisoOk": "An {n} Personen gesendet.",
+    "avisoVacio": "Titel oder Text fehlt.",
+    "cuentasProblema": "Konten, die nicht synchronisieren",
+    "cuentasProblemaAyuda": "In den letzten 24 h versucht, aber seit über 2 Tagen ohne erfolgreiche Synchronisierung.",
+    "ninguna": "Keine. 👌",
+    "ultimaBuena": "Zuletzt erfolgreich: {fecha}",
+    "nunca": "nie",
+    "pausas": "Synchronisierung pausieren",
+    "pausasAyuda": "Wenn eine Plattform ausfällt oder Fehler liefert (z. B. OpenXBL), verhindert eine Pause Folgefehler. Die App zeigt weiter das Gespeicherte.",
+    "pausada": "Pausiert",
+    "activa": "Aktiv",
+    "pausar": "Pausieren",
+    "reanudar": "Fortsetzen"
   }
 }
