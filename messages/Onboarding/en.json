@@ -162,6 +162,15 @@
       "confirmTitulo": "Remove {nombre}?",
       "confirmTexto": "It will stop syncing. Anything already earned with it stays in your library.",
       "confirmBoton": "Remove account"
+    },
+    "epicOficial": {
+      "boton": "Verify with Epic Games",
+      "ayuda": "Sign in to Epic and that account will be linked and verified: Epic confirms it's yours. Achievements still come in through the extension.",
+      "verificada": "Verified",
+      "yaVerificada": "Account verified with Epic Games.",
+      "ok": "Epic account linked and verified.",
+      "deOtro": "That Epic account is already linked to another Paragon user.",
+      "error": "We couldn't verify the Epic account. Try again in a moment."
     }
   },
   "ajustesSeguridad": {

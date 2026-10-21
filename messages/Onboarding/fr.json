@@ -162,6 +162,15 @@
       "confirmTitulo": "Retirer {nombre} ?",
       "confirmTexto": "Il ne sera plus synchronisé. Ce que tu as déjà obtenu avec reste dans ta bibliothèque.",
       "confirmBoton": "Retirer le compte"
+    },
+    "epicOficial": {
+      "boton": "Vérifier avec Epic Games",
+      "ayuda": "Connecte-toi à Epic et ce compte sera lié et vérifié : Epic confirme qu'il est à toi. Les succès arrivent toujours via l'extension.",
+      "verificada": "Vérifié",
+      "yaVerificada": "Compte vérifié avec Epic Games.",
+      "ok": "Compte Epic lié et vérifié.",
+      "deOtro": "Ce compte Epic est déjà lié à un autre utilisateur de Paragon.",
+      "error": "Impossible de vérifier le compte Epic. Réessaie dans un instant."
     }
   },
   "ajustesSeguridad": {

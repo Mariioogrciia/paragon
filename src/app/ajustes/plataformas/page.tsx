@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ShieldQuestion } from "lucide-react";
+import { BadgeCheck, ShieldQuestion } from "lucide-react";
 import { useLocale } from "next-intl";
-import { auth } from "@/auth";
+import { auth, signIn } from "@/auth";
+import { epicVerificada } from "@/lib/epic/verificacion";
 import { quitarSteamExtraAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
 import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
@@ -43,11 +44,14 @@ function PlatformSection({
   account,
   t,
   children,
+  verificada = false,
 }: {
   platform: PlataformaVinculable;
   account: PlatformAccount | null;
   t: Traductor;
   children: React.ReactNode;
+  /** Cuenta confirmada por la propia plataforma (de momento, solo Epic: lib/epic/verificacion.ts). */
+  verificada?: boolean;
 }) {
   const idioma = useLocale();
   const sincronizado = account?.syncedAt ? relativeDate(account.syncedAt, idioma) : null;
@@ -84,8 +88,14 @@ function PlatformSection({
                 )}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-[0.9375rem] font-semibold" title={account.username}>
-                  {account.username}
+                <p className="flex min-w-0 items-center gap-1.5 text-[0.9375rem] font-semibold" title={account.username}>
+                  <span className="truncate">{account.username}</span>
+                  {verificada && (
+                    <span className="flex shrink-0 items-center gap-1 text-[0.6875rem] font-bold text-[var(--accent-text)]">
+                      <BadgeCheck size={14} aria-hidden="true" />
+                      {t("ajustesPlataformas.epicOficial.verificada")}
+                    </span>
+                  )}
                 </p>
                 <p className="text-xs text-muted">
                   {account.level !== null ? t("ajustesPlataformas.levelLabel", { level: account.level }) : t("ajustesPlataformas.accountLinked")}
@@ -193,9 +203,10 @@ function CuentasSteamExtra({ cuentas, t, idioma }: { cuentas: CuentaSteamExtra[]
   );
 }
 
-export default async function AjustesPlataformasPage() {
+export default async function AjustesPlataformasPage({ searchParams }: { searchParams: Promise<{ epic?: string }> }) {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
+  const { epic: resultadoEpic } = await searchParams;
 
   const profile = await getProfileByUserId(session.user.id);
   const psn = accountFor(profile, "psn");
@@ -215,9 +226,43 @@ export default async function AjustesPlataformasPage() {
   const steamExtra = profile?.esDesarrollador && steam ? await cuentasSteamExtra(session.user.id) : null;
   const tDeclarado = await getTranslations("Shell.Declarado");
   const locale = await getLocale();
+  const loginEpic = Boolean(process.env.AUTH_EPIC_ID);
+  const epicConfirmada = loginEpic && epic ? await epicVerificada(session.user.id) : false;
 
   // Epic bloquea las lecturas desde el servidor (antibots): se sincroniza con
   // la extensión del navegador y el progreso es declarado (lib/declarado.ts).
+  // Login oficial de Epic (Epic Account Services): vincula y verifica la
+  // cuenta. Solo aparece si el servidor tiene el cliente de Epic configurado.
+  const verificarEpic = loginEpic && (
+    <div className="mb-4 rounded-xl border border-border p-4">
+      {resultadoEpic === "verificada" && <p className="mb-2 text-xs font-semibold text-green-500">✓ {t("ajustesPlataformas.epicOficial.ok")}</p>}
+      {resultadoEpic === "de-otro" && <p className="mb-2 text-xs font-semibold text-red-400">✕ {t("ajustesPlataformas.epicOficial.deOtro")}</p>}
+      {resultadoEpic === "error" && <p className="mb-2 text-xs font-semibold text-red-400">✕ {t("ajustesPlataformas.epicOficial.error")}</p>}
+      {epicConfirmada ? (
+        <p className="flex items-center gap-2 text-[0.8125rem] font-semibold">
+          <BadgeCheck size={16} className="shrink-0 text-[var(--accent-text)]" aria-hidden="true" />
+          {t("ajustesPlataformas.epicOficial.yaVerificada")}
+        </p>
+      ) : (
+        <form
+          action={async () => {
+            "use server";
+            await signIn("epic", { redirectTo: "/ajustes/plataformas" });
+          }}
+        >
+          <button
+            type="submit"
+            className="flex items-center gap-2 rounded-full bg-[#2a2a2a] px-4 py-2 text-[0.8125rem] font-bold text-white transition-colors hover:bg-[#3a3a3a]"
+          >
+            <EpicGamesLogo className="h-4 w-4" />
+            {t("ajustesPlataformas.epicOficial.boton")}
+          </button>
+          <p className="mt-2 text-xs text-muted">{t("ajustesPlataformas.epicOficial.ayuda")}</p>
+        </form>
+      )}
+    </div>
+  );
+
   const avisoEpic = (
     <div className="mb-4 rounded-xl border border-border bg-[var(--surface-2)] p-4">
       <p className="font-heading text-sm font-bold">{t("ajustesPlataformas.epicExt.titulo")}</p>
@@ -266,7 +311,8 @@ export default async function AjustesPlataformasPage() {
           <LinkXboxForm current={xbox?.username} sinAviso={xbox?.isPublic === true} />
         </PlatformSection>
 
-        <PlatformSection platform="epic" account={epic} t={t}>
+        <PlatformSection platform="epic" account={epic} t={t} verificada={epicConfirmada}>
+          {verificarEpic}
           {avisoEpic}
           <details className="group">
             <summary className="cursor-pointer rounded-md px-1 py-1 text-[0.8125rem] font-semibold text-muted hover:bg-[var(--surface-2)] hover:text-foreground">

@@ -12,8 +12,16 @@
  *
  * Devuelve la URL sin `iss`, o null si no hay nada que tocar.
  */
-export function urlSinIssDeDiscord(url: URL): URL | null {
-  if (!url.pathname.endsWith("/callback/discord")) return null;
+/** Proveedores OAuth (sin emisor para Auth.js) y los dominios de los que se acepta su `iss`. Epic se suma el 21 oct 2026 por si hace lo mismo. */
+const EMISORES: Record<string, string[]> = {
+  discord: ["discord.com"],
+  epic: ["epicgames.dev", "epicgames.com"],
+};
+
+export function urlSinIssDelProveedor(url: URL): URL | null {
+  const proveedor = url.pathname.match(/\/callback\/([a-z]+)$/)?.[1];
+  const dominios = proveedor ? EMISORES[proveedor] : undefined;
+  if (!dominios) return null;
   const iss = url.searchParams.get("iss");
   if (!iss) return null;
   let host: string;
@@ -22,7 +30,7 @@ export function urlSinIssDeDiscord(url: URL): URL | null {
   } catch {
     return null;
   }
-  if (host !== "discord.com" && !host.endsWith(".discord.com")) return null;
+  if (!dominios.some((d) => host === d || host.endsWith(`.${d}`))) return null;
   const limpia = new URL(url);
   limpia.searchParams.delete("iss");
   return limpia;

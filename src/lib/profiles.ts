@@ -528,14 +528,19 @@ export interface LinkResult {
  */
 export class PlatformAccountAlreadyLinkedError extends Error {}
 
-/** Error de Postgres (paquete `postgres`) por violar un índice único concreto. */
-function esViolacionDe(error: unknown, constraintName: string): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    (error as { code?: string }).code === "23505" &&
-    (error as { constraint_name?: string }).constraint_name === constraintName
-  );
+/**
+ * Error de Postgres (paquete `postgres`) por violar un índice único concreto.
+ * Drizzle lo envuelve en un `DrizzleQueryError` con el original en `cause`
+ * (visto el 21 oct 2026: sin mirar dentro, el aviso de "ya es de otro
+ * usuario" nunca salía), así que se mira en el error y en su causa.
+ */
+export function esViolacionDe(error: unknown, constraintName: string): boolean {
+  const coincide = (e: unknown) =>
+    typeof e === "object" &&
+    e !== null &&
+    (e as { code?: string }).code === "23505" &&
+    (e as { constraint_name?: string }).constraint_name === constraintName;
+  return coincide(error) || (typeof error === "object" && error !== null && coincide((error as { cause?: unknown }).cause));
 }
 
 /**

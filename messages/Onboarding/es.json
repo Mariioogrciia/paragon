@@ -162,6 +162,15 @@
       "confirmTitulo": "¿Quitar {nombre}?",
       "confirmTexto": "Dejará de sincronizarse. Lo ya conseguido con ella se queda en tu biblioteca.",
       "confirmBoton": "Quitar cuenta"
+    },
+    "epicOficial": {
+      "boton": "Verificar con Epic Games",
+      "ayuda": "Inicia sesión en Epic y esa cuenta quedará vinculada y verificada: Epic confirma que es tuya. Los logros siguen llegando con la extensión.",
+      "verificada": "Verificada",
+      "yaVerificada": "Cuenta verificada con Epic Games.",
+      "ok": "Cuenta de Epic vinculada y verificada.",
+      "deOtro": "Esa cuenta de Epic ya está vinculada a otro usuario de Paragon.",
+      "error": "No se ha podido verificar la cuenta de Epic. Inténtalo otra vez en un momento."
     }
   },
   "ajustesSeguridad": {

@@ -162,6 +162,15 @@
       "confirmTitulo": "{nombre} entfernen?",
       "confirmTexto": "Es wird nicht mehr synchronisiert. Was du damit schon erreicht hast, bleibt in deiner Bibliothek.",
       "confirmBoton": "Konto entfernen"
+    },
+    "epicOficial": {
+      "boton": "Mit Epic Games bestätigen",
+      "ayuda": "Melde dich bei Epic an und das Konto wird verknüpft und bestätigt: Epic bestätigt, dass es deins ist. Erfolge kommen weiterhin über die Erweiterung.",
+      "verificada": "Bestätigt",
+      "yaVerificada": "Konto mit Epic Games bestätigt.",
+      "ok": "Epic-Konto verknüpft und bestätigt.",
+      "deOtro": "Dieses Epic-Konto ist bereits mit einem anderen Paragon-Nutzer verknüpft.",
+      "error": "Das Epic-Konto konnte nicht bestätigt werden. Versuch es gleich noch einmal."
     }
   },
   "ajustesSeguridad": {

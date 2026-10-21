@@ -75,6 +75,21 @@ async function vincularLoginASesionActiva(account: Account) {
 }
 
 /**
+ * Vuelta del login de Epic: con sesión abierta, guarda esa cuenta de Epic
+ * como la tuya y verificada; sin sesión, no entra a nadie (Epic no da
+ * correo y no es una forma de crear cuentas en Paragon). Siempre devuelve
+ * una URL: así Auth.js no crea usuario, ni fila en `accounts`, ni sesión.
+ * Import dinámico para no cargar lib/profiles en cada `auth()`.
+ */
+async function verificarEpic(account: Account, nombre: string | null) {
+  const userId = (await auth())?.user?.id;
+  if (!userId) return "/entrar?epic=sin-sesion";
+  const { guardarEpicVerificada } = await import("@/lib/epic/verificacion");
+  const resultado = await guardarEpicVerificada(userId, account.providerAccountId, nombre ?? "Epic Games");
+  return `/ajustes/plataformas?epic=${resultado}`;
+}
+
+/**
  * Autenticación de la app (no de PSN: eso es otra cosa, ver lib/psn).
  *
  * Delegamos en Google y Discord a propósito: así no guardamos contraseñas de
@@ -123,11 +138,43 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
     ...(process.env.AUTH_DISCORD_ID
       ? [Discord({ allowDangerousEmailAccountLinking: true })]
       : []),
-    // El proveedor de Epic Games (login OAuth para vincular la cuenta, no
-    // para entrar a Paragon) se quitó el 11 de septiembre de 2026, junto
-    // con Google Play y Ubisoft Connect — ninguna de las tres llegó a tener
-    // sincronización real de logros. Detalle completo en HANDOFF.md y en el
-    // comentario de PLATFORM_LABEL (lib/types.ts).
+    // Epic Games (vuelve el 21 oct 2026, ahora por Epic Account Services,
+    // la vía oficial): SOLO para vincular y verificar la cuenta de Epic con
+    // la sesión de Paragon ya abierta, nunca para entrar (ver el callback
+    // `signIn` y lib/epic/verificacion.ts). OAuth a mano en vez de OIDC:
+    // basta con `basic_profile`, y el id de cuenta llega en la respuesta del
+    // token (`account_id`); el nombre se pide a la API de cuentas de Epic.
+    ...(process.env.AUTH_EPIC_ID
+      ? [
+          {
+            id: "epic",
+            name: "Epic Games",
+            type: "oauth" as const,
+            issuer: "https://api.epicgames.dev/epic/oauth/v2",
+            clientId: process.env.AUTH_EPIC_ID,
+            clientSecret: process.env.AUTH_EPIC_SECRET,
+            checks: ["state" as const],
+            authorization: { url: "https://www.epicgames.com/id/authorize", params: { scope: "basic_profile" } },
+            token: "https://api.epicgames.dev/epic/oauth/v2/token",
+            userinfo: {
+              url: "https://api.epicgames.dev/epic/id/v2/accounts",
+              async request({ tokens }: { tokens: { access_token?: string; account_id?: unknown } }) {
+                const id = String(tokens.account_id ?? "");
+                const res = await fetch(`https://api.epicgames.dev/epic/id/v2/accounts?accountId=${encodeURIComponent(id)}`, {
+                  headers: { Authorization: `Bearer ${tokens.access_token}` },
+                });
+                const cuentas = res.ok ? ((await res.json()) as { accountId?: string; displayName?: string }[]) : [];
+                return { accountId: id, displayName: cuentas[0]?.displayName ?? null };
+              },
+            },
+            profile(p: { accountId: string; displayName: string | null }) {
+              return { id: p.accountId, name: p.displayName, email: null, image: null };
+            },
+          },
+        ]
+      : []),
+    // Google Play y Ubisoft Connect se quitaron el 11 de septiembre de 2026
+    // (ninguna llegó a tener sincronización real de logros): HANDOFF.md.
   ],
   pages: {
     signIn: "/entrar",
@@ -139,10 +186,11 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
       session.user.handle = (user as { handle?: string | null }).handle ?? null;
       return session;
     },
-    async signIn({ account }) {
+    async signIn({ account, user }) {
       if (account?.provider === "google" || account?.provider === "discord") {
         return await vincularLoginASesionActiva(account);
       }
+      if (account?.provider === "epic") return await verificarEpic(account, user.name ?? null);
       return true;
     },
   },

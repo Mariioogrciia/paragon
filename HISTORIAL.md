@@ -6,6 +6,15 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Verificar la cuenta de Epic con el login oficial de Epic (21 oct)
+
+- Vuelve el proveedor `epic` de Auth.js, ahora por **Epic Account Services** (la vía oficial, con dominio verificado y revisión de marca). Solo vincula, nunca sirve para entrar: con la sesión abierta, guarda esa cuenta de Epic como la tuya y la marca **verificada**; sin sesión, no hace nada. No crea usuarios, ni filas en `accounts`, ni sesiones (`verificarEpic` en `src/auth.ts`).
+- `lib/epic/verificacion.ts`: tabla `cuenta_verificada`, creada sola. La cuenta cuenta como verificada mientras siga siendo la misma que verificó Epic.
+- Ajustes → Plataformas → Epic: botón "Verificar con Epic Games" (solo si existe `AUTH_EPIC_ID`) y la marca "Verificada" junto al nombre. Los logros siguen llegando con la extensión.
+- `lib/authIss.ts` quita también el `iss` de Epic si lo manda, como con Discord.
+- Arreglado de paso: `esViolacionDe` no veía el error de Postgres dentro del `DrizzleQueryError`, así que "esa cuenta ya es de otro usuario de Paragon" nunca salía al vincular. Salía un error genérico.
+- Pendiente de Epic: aprobar la marca y cambiar la URL de redirección a `https://www.paragontrophies.com/api/auth/callback/epic`. Hasta entonces solo funciona con la cuenta del desarrollador.
+
 ### Hoja de servicios y Wrap, pasada de diseño (21 oct)
 
 - **Hoja de servicios** (`/u/[handle]/cv`): rehecha como expediente. Franja con nº de expediente y fecha de emisión, avatar dentro del anillo de progreso del nivel, cuentas vinculadas, cifras en libro de cuentas (en móvil los platinos arriba y el resto en 2×2), reparto por metales con icono y número, últimos platinos, condecoraciones con su nombre, juegos destacados con su progreso y un sello. Si no hay platinos, las condecoraciones ocupan todo el ancho. El pie ya pone el dominio bueno (antes decía `paragon.app`). Al imprimir pasa a blanco y negro.
