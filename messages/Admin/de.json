@@ -73,7 +73,12 @@
       "cronNunca": "Noch keine Läufe erfasst",
       "cronMin": "Letzter Lauf vor {n} Min.",
       "cronHoras": "Letzter Lauf vor {n} Std.",
-      "cronDias": "Letzter Lauf vor {n} Tagen"
+      "cronDias": "Letzter Lauf vor {n} Tagen",
+      "psnComprobar": "Jetzt prüfen",
+      "psnComprobando": "Wird geprüft…",
+      "psnAhoraOk": "Sony akzeptiert das NPSSO: PSN synchronisiert wieder.",
+      "psnAhoraCaducado": "Sony lehnt dieses NPSSO ab. Kopiere es erneut bei offener playstation.com-Sitzung und melde dich dort danach nicht ab (das macht es ungültig). Hast du nach der Änderung neu deployt?",
+      "psnAhoraSinRespuesta": "PSN antwortet gerade nicht; versuch es später noch einmal."
     },
     "recentSyncs": {
       "title": "Letzte Synchronisierungen",

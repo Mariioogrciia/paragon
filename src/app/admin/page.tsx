@@ -10,6 +10,7 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 import { estadoCredencialPsn } from "@/lib/credencialPsn";
+import { ComprobarNpsso } from "@/components/ComprobarNpsso";
 import { DIAS_AVISO_ANTES } from "@/lib/caducidadNpsso";
 import { minutosDesdePasadaCron } from "@/lib/avisoDesarrollador";
 
@@ -637,6 +638,16 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                             ? t("system.infrastructure.psnDias", { dias: credencialPsn.diasRestantes })
                             : t("system.infrastructure.psnSinDatos")}
                     </p>
+                    <ComprobarNpsso
+                      textos={{
+                        boton: t("system.infrastructure.psnComprobar"),
+                        comprobando: t("system.infrastructure.psnComprobando"),
+                        ok: t("system.infrastructure.psnAhoraOk"),
+                        caducado: t("system.infrastructure.psnAhoraCaducado"),
+                        falta: t("system.infrastructure.psnFalta"),
+                        "sin-respuesta": t("system.infrastructure.psnAhoraSinRespuesta"),
+                      }}
+                    />
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

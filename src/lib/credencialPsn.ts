@@ -6,7 +6,7 @@ import { notificationLog } from "@/db/schema";
 import { avisarUsuario } from "@/lib/avisos";
 import { avisoNpsso, diasRestantesNpsso, type AvisoNpsso } from "@/lib/caducidadNpsso";
 import { idDesarrollador } from "@/lib/avisoDesarrollador";
-import { getAuthorization, isPsnConfigured, PsnAuthError } from "@/lib/psn/auth";
+import { getAuthorization, isPsnConfigured, npssoDelEntorno, olvidarTokenPsn, PsnAuthError } from "@/lib/psn/auth";
 
 /**
  * Aviso al desarrollador cuando el NPSSO del servidor (`PSN_NPSSO`) falla o
@@ -27,7 +27,7 @@ const TIPO_AVISO = "psn-npsso";
 const RUTA_ADMIN = "/admin?tab=system";
 
 function huellaNpsso(): string | null {
-  const npsso = process.env.PSN_NPSSO;
+  const npsso = npssoDelEntorno();
   return npsso ? createHash("sha256").update(npsso).digest("hex").slice(0, 12) : null;
 }
 
@@ -121,4 +121,24 @@ export async function estadoCredencialPsn(userId: string, ahora = new Date()): P
   if (fallo) return { estado: "caducado" };
   const desde = await vistoDesde(userId, huella);
   return { estado: "ok", desde, diasRestantes: desde ? diasRestantesNpsso(desde, ahora) : null };
+}
+
+/**
+ * Admin → Sistema → "Comprobar ahora" (21 oct 2026): prueba el NPSSO contra
+ * Sony en el momento, sin el token en caché ni esperar al cron. Si va bien,
+ * lo apunta como visto (así el estado pasa a verde enseguida).
+ */
+export async function comprobarCredencialPsnAhora(userId: string): Promise<"ok" | "falta" | "caducado" | "sin-respuesta"> {
+  if (!isPsnConfigured()) return "falta";
+  olvidarTokenPsn();
+  try {
+    await getAuthorization();
+  } catch (error) {
+    return error instanceof PsnAuthError ? "caducado" : "sin-respuesta";
+  }
+  const huella = huellaNpsso();
+  if (huella) {
+    await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
+  }
+  return "ok";
 }

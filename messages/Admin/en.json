@@ -73,7 +73,12 @@
       "cronNunca": "No runs recorded yet",
       "cronMin": "Last run {n} min ago",
       "cronHoras": "Last run {n} h ago",
-      "cronDias": "Last run {n} days ago"
+      "cronDias": "Last run {n} days ago",
+      "psnComprobar": "Check now",
+      "psnComprobando": "Checking…",
+      "psnAhoraOk": "Sony accepts the NPSSO: PSN syncing is back.",
+      "psnAhoraCaducado": "Sony rejects this NPSSO. Copy it again with your playstation.com session open and don't sign out there afterwards (that invalidates it). Did you redeploy after changing it?",
+      "psnAhoraSinRespuesta": "PSN isn't responding right now; try again in a while."
     },
     "recentSyncs": {
       "title": "Recent syncs",

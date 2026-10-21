@@ -73,7 +73,12 @@
       "cronNunca": "Sin pasadas registradas todavía",
       "cronMin": "Última pasada hace {n} min",
       "cronHoras": "Última pasada hace {n} h",
-      "cronDias": "Última pasada hace {n} días"
+      "cronDias": "Última pasada hace {n} días",
+      "psnComprobar": "Comprobar ahora",
+      "psnComprobando": "Comprobando…",
+      "psnAhoraOk": "Sony acepta el NPSSO: PSN vuelve a sincronizar.",
+      "psnAhoraCaducado": "Sony rechaza este NPSSO. Cópialo otra vez con la sesión de playstation.com abierta y no cierres sesión allí después (eso lo invalida). ¿Redesplegaste tras cambiarlo?",
+      "psnAhoraSinRespuesta": "PSN no responde ahora mismo; prueba en un rato."
     },
     "recentSyncs": {
       "title": "Sincronizaciones recientes",

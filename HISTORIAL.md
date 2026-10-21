@@ -6,6 +6,15 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct (5) — NPSSO: limpiar el valor y "Comprobar ahora"**. El usuario
+renovó el NPSSO y seguía saliendo "ha caducado". Causas probables: el valor
+pegado con comillas/JSON/espacios (Sony lo rechaza) o no redesplegar tras
+cambiarlo. `npssoDelEntorno()` (lib/psn/auth.ts, con tests) acepta el valor
+solo, entre comillas, `{"npsso":"…"}`, `"npsso":"…"` o `npsso=…`; lo usan la
+autenticación y la huella del aviso. Admin → Sistema tiene un botón
+"Comprobar ahora" (`ComprobarNpsso`, `comprobarCredencialPsnAhora`) que
+prueba el NPSSO contra Sony sin caché y dice al momento si vale.
+
 **21 oct (4) — cabecera del perfil y formulario de Ajustes aligerados**. El
 usuario los veía "demasiado cargados".
 - Cabecera de /u/[handle]: de siete filas a cuatro. Chips (desarrollador,

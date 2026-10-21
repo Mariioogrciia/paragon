@@ -43,8 +43,37 @@ export class PsnAuthError extends Error {
   }
 }
 
+/**
+ * El NPSSO de `PSN_NPSSO`, limpio (21 oct 2026). Lo que da
+ * ca.account.sony.com/api/v1/ssocookie es `{"npsso":"…"}`, y al pegarlo en
+ * Vercel es muy fácil llevarse las comillas, el JSON entero o un espacio:
+ * Sony lo rechazaba y salía "ha caducado" con uno recién copiado. Se acepta
+ * cualquiera de esas formas y se usa solo el valor.
+ */
+export function npssoDelEntorno(valor = process.env.PSN_NPSSO): string | null {
+  const bruto = valor?.trim();
+  if (!bruto) return null;
+  try {
+    const json: unknown = JSON.parse(bruto);
+    if (typeof json === "object" && json && typeof (json as { npsso?: unknown }).npsso === "string") {
+      return (json as { npsso: string }).npsso.trim() || null;
+    }
+  } catch {
+    // No es JSON: se mira abajo.
+  }
+  const conClave = bruto.match(/npsso"?\s*[:=]\s*"?([A-Za-z0-9]+)/i);
+  if (conClave) return conClave[1];
+  const limpio = bruto.replace(/^["']+|["']+$/g, "").trim();
+  return limpio || null;
+}
+
 export function isPsnConfigured(): boolean {
-  return Boolean(process.env.PSN_NPSSO);
+  return npssoDelEntorno() !== null;
+}
+
+/** Olvida el token en caché: para comprobar un NPSSO recién puesto sin esperar a que caduque el anterior. */
+export function olvidarTokenPsn(): void {
+  cache = null;
 }
 
 async function authenticateWithNpsso(npsso: string): Promise<CachedAuth> {
@@ -109,7 +138,7 @@ export async function getAuthorization(): Promise<AuthorizationPayload> {
     }
   }
 
-  const npsso = process.env.PSN_NPSSO;
+  const npsso = npssoDelEntorno();
   if (!npsso) throw new PsnNotConfiguredError();
 
   cache = await authenticateWithNpsso(npsso);
