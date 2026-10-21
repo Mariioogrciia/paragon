@@ -7,14 +7,20 @@ import { medallaDe } from "@/lib/temporada";
  * perfil. Antes solo se veía el chip de la temporada EN CURSO: al cerrarla,
  * la medalla quedaba guardada pero no salía en ningún sitio público.
  */
-export async function MedallasTemporada({ historial }: { historial: { temporada: string; nivel: number }[] }) {
+export async function MedallasTemporada({
+  historial,
+  className = "mt-2 flex flex-wrap gap-1.5",
+}: {
+  historial: { temporada: string; nivel: number }[];
+  className?: string;
+}) {
   const conMedalla = historial
     .map((h) => ({ ...h, medalla: medallaDe(h.nivel) }))
     .filter((h): h is typeof h & { medalla: NonNullable<typeof h.medalla> } => h.medalla !== null);
   if (conMedalla.length === 0) return null;
   const t = await getTranslations("Shell.Temporada");
   return (
-    <div className="mt-2 flex flex-wrap gap-1.5">
+    <div className={className}>
       {conMedalla.map((h) => (
         <Link
           key={h.temporada}

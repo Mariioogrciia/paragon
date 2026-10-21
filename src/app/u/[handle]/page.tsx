@@ -49,6 +49,8 @@ import { CompartirPerfil } from "@/components/CompartirPerfil";
 import { VitrinasPerfil } from "@/components/VitrinasPerfil";
 import { ChipTemporada } from "@/components/ChipTemporada";
 import { MedallasTemporada } from "@/components/MedallasTemporada";
+import { MasHonores } from "@/components/MasHonores";
+import { medallaDe } from "@/lib/temporada";
 import { TituloEspecial } from "@/components/TituloEspecial";
 import { EFECTO_POR_CLAVE } from "@/lib/efectosNombre";
 import { CartaHolo } from "@/components/CartaHolo";
@@ -214,6 +216,11 @@ export default async function PerfilPage({
     medirLogros(profile.userId, nivelParagon.level),
     historialTemporadas(profile.userId).catch(() => []),
   ]);
+  // Lo que pliega el "+N" de la cabecera: el palmarés salvo el primero y
+  // las medallas de temporadas pasadas (solo las que tienen medalla). Sin
+  // palmarés no hay nada delante del "+N", así que las medallas salen tal cual.
+  const medallasPasadas = temporadasCerradas.filter((h) => medallaDe(h.nivel) !== null).length;
+  const honoresPlegados = palmares.length > 0 ? palmares.length - 1 + medallasPasadas : 0;
 
   const showcaseTrophyIds = profile.showcaseTrophies?.map(p => p.trophyId) ?? [];
   const showcaseTrophiesData = showcaseTrophyIds.length > 0 
@@ -455,33 +462,53 @@ export default async function PerfilPage({
                 </span>
               )}
               <TituloEspecial clave={profile.tituloDesbloqueado} />
-              {clanMembership && (
-                <Link href={`/clanes/${clanMembership.clan.tag.toLowerCase()}`} className="rounded px-1 text-sm font-bold text-[var(--accent-text)] transition-colors hover:bg-[var(--surface-2)]">
-                  [{clanMembership.clan.tag}] {clanMembership.clan.name}
-                </Link>
-              )}
             </div>
-            {player.accounts.length > 0 && (
-              <p className="mt-2 text-sm text-muted">
+            {/* Cabecera aligerada (21 oct 2026): antes eran siete filas
+                apiladas. Ahora tu título y tu frase van juntos, el clan y
+                las cuentas en una sola línea gris, y de insignias y
+                palmarés sale lo primero con un "+N" (todo sigue en Logros
+                o desplegándolo). */}
+            {(profile.profileTitle || profile.statusText) && (
+              <p className="mt-2 text-sm">
+                {profile.profileTitle && <span className="font-semibold text-[var(--accent-text)]">{profile.profileTitle}</span>}
+                {profile.profileTitle && profile.statusText && <span className="text-muted"> · </span>}
+                {profile.statusText && <span className="italic text-foreground/80">&quot;{profile.statusText}&quot;</span>}
+              </p>
+            )}
+            {(clanMembership || player.accounts.length > 0) && (
+              <p className="mt-1.5 text-[0.8125rem] text-muted">
+                {clanMembership && (
+                  <Link href={`/clanes/${clanMembership.clan.tag.toLowerCase()}`} className="font-bold text-[var(--accent-text)] hover:underline">
+                    [{clanMembership.clan.tag}] {clanMembership.clan.name}
+                  </Link>
+                )}
                 {player.accounts.map((a, i) => (
                   <span key={`${a.platform}-${a.username}`}>
-                    {i > 0 && " · "}
+                    {(i > 0 || clanMembership) && " · "}
                     {a.username}
                     {esDeclarada(a.platform) && <MarcaDeclarado />}
                   </span>
                 ))}
               </p>
             )}
-            {profile.statusText && (
-              <p className="mt-2 text-sm italic opacity-80" style={{ color: "var(--foreground)" }}>
-                &quot;{profile.statusText}&quot;
-              </p>
-            )}
-            {profile.profileTitle && <p className="mt-2 text-sm font-semibold text-[var(--accent-text)]">{profile.profileTitle}</p>}
-            {badges.length > 0 && <Badges earnedBadges={badges} />}
-            <TrophyCase items={palmares} />
-            <ChipTemporada userId={profile.userId} />
-            <MedallasTemporada historial={temporadasCerradas} />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {badges.length > 0 && (
+                <Badges earnedBadges={badges} max={6} masHref="#logros" className="flex flex-wrap items-center gap-1.5" />
+              )}
+              {palmares.length > 0 && <TrophyCase items={palmares.slice(0, 1)} className="contents" />}
+              <ChipTemporada userId={profile.userId} className="" />
+              {palmares.length === 0 && <MedallasTemporada historial={temporadasCerradas} className="contents" />}
+              {honoresPlegados > 0 && (
+                <MasHonores
+                  n={honoresPlegados}
+                  etiquetaAbrir={t("PerfilPage.verPalmares")}
+                  etiquetaCerrar={t("PerfilPage.ocultarPalmares")}
+                >
+                  {palmares.length > 1 && <TrophyCase items={palmares.slice(1)} className="contents" />}
+                  <MedallasTemporada historial={temporadasCerradas} className="contents" />
+                </MasHonores>
+              )}
+            </div>
 
             <div className="mt-5 flex flex-wrap items-center gap-2.5">
               <Link

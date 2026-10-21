@@ -12,12 +12,12 @@ import { TrophyTile } from "@/components/TrophyIcon";
  * mismo lenguaje visual que ya usa el resto de la app para "esto es lo más
  * alto que hay", no un icono importado de fuera.
  */
-export function TrophyCase({ items }: { items: TrophyCaseAward[] }) {
+export function TrophyCase({ items, className = "mt-3 flex flex-wrap gap-2" }: { items: TrophyCaseAward[]; className?: string }) {
   const locale = useLocale();
   if (items.length === 0) return null;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
+    <div className={className}>
       {items.map((award, i) => (
         <span
           key={`${award.kind}-${award.titulo}-${i}`}

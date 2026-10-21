@@ -6,6 +6,26 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct (4) — cabecera del perfil y formulario de Ajustes aligerados**. El
+usuario los veía "demasiado cargados".
+- Cabecera de /u/[handle]: de siete filas a cuatro. Chips (desarrollador,
+  título especial); título del perfil y frase en una línea; clan y cuentas
+  en una línea gris; y una fila de honores: 6 insignias + "+N" (lleva a
+  `#logros`, la sección que ya las tiene todas), el último palmarés, el
+  chip de la temporada y un "+N" (`MasHonores`) que despliega el resto del
+  palmarés y las medallas pasadas. `Badges`, `TrophyCase`, `ChipTemporada`
+  y `MedallasTemporada` aceptan `className` (y `Badges`, `max`/`masHref`).
+- Ajustes → General: de las ideas de título salen 4 y "+N ideas"; del
+  título especial y del efecto del nombre, solo los desbloqueados y
+  "🔒 Ver N por desbloquear"; juego de fondo: 10 + "Ver todos (N)", el
+  elegido siempre a la vista, sin casillas de juegos sin carátula (ni las
+  de carátula rota).
+- Arreglado de paso: el título especial y el efecto del nombre estaban
+  dentro del bloque de ideas de título, así que sin insignias no salían
+  (ni su campo oculto, con lo que guardar podía borrar el título elegido).
+Comprobado con capturas en local (Postgres con un perfil de prueba de 12
+insignias y 3 palmarés), en escritorio y móvil.
+
 **21 oct (3) — login con Discord roto por el `iss`**. Con el dominio nuevo,
 el login con Discord fallaba: `CallbackRouteError: unexpected "iss"
 (issuer) response parameter value`, esperado `https://authjs.dev`. Discord

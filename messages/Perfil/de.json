@@ -30,7 +30,10 @@
       "aceptar": "Anfrage annehmen",
       "amigos": "Befreundet",
       "error": "Anfrage konnte nicht gesendet werden"
-    }
+    },
+    "verTodasInsignias": "Alle {n} Abzeichen ansehen",
+    "verPalmares": "Restliche Erfolge ansehen",
+    "ocultarPalmares": "Restliche Erfolge ausblenden"
   },
   "EstadisticasPage": {
     "meta": "Statistiken von @{handle} · Paragon",

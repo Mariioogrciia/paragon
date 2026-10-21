@@ -356,10 +356,15 @@
     "backgroundPicker": {
       "empty": "Encore aucun jeu dans ta bibliothèque.",
       "autoTitle": "Automatique (le plus récent)",
-      "auto": "Auto"
+      "auto": "Auto",
+      "verTodos": "Tout voir ({n})"
     },
     "previewTitle": "Ce que voient les autres",
-    "previewHint": "Se met à jour pendant l’édition ; enregistré avec Enregistrer."
+    "previewHint": "Se met à jour pendant l’édition ; enregistré avec Enregistrer.",
+    "verMenos": "Voir moins",
+    "masIdeas": "+{n} idées",
+    "verBloqueados": "🔒 Voir les {n} à débloquer",
+    "ocultarBloqueados": "Masquer les verrouillés"
   },
   "appearanceSettings": {
     "title": "Apparence",

@@ -356,10 +356,15 @@
     "backgroundPicker": {
       "empty": "Noch keine Spiele in deiner Bibliothek.",
       "autoTitle": "Automatisch (das neueste)",
-      "auto": "Auto"
+      "auto": "Auto",
+      "verTodos": "Alle ansehen ({n})"
     },
     "previewTitle": "So sehen dich andere",
-    "previewHint": "Aktualisiert sich beim Bearbeiten; gespeichert wird mit Speichern."
+    "previewHint": "Aktualisiert sich beim Bearbeiten; gespeichert wird mit Speichern.",
+    "verMenos": "Weniger anzeigen",
+    "masIdeas": "+{n} Ideen",
+    "verBloqueados": "🔒 {n} noch gesperrte ansehen",
+    "ocultarBloqueados": "Gesperrte ausblenden"
   },
   "appearanceSettings": {
     "title": "Erscheinungsbild",

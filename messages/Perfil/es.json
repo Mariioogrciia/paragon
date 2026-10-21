@@ -30,7 +30,10 @@
       "aceptar": "Aceptar solicitud",
       "amigos": "Amigos",
       "error": "No se pudo enviar la solicitud"
-    }
+    },
+    "verTodasInsignias": "Ver las {n} insignias",
+    "verPalmares": "Ver el resto del palmarés",
+    "ocultarPalmares": "Ocultar el resto del palmarés"
   },
   "EstadisticasPage": {
     "meta": "Estadísticas de @{handle} · Paragon",

@@ -30,7 +30,10 @@
       "aceptar": "Accepter la demande",
       "amigos": "Amis",
       "error": "Impossible d'envoyer la demande"
-    }
+    },
+    "verTodasInsignias": "Voir les {n} badges",
+    "verPalmares": "Voir le reste du palmarès",
+    "ocultarPalmares": "Masquer le reste du palmarès"
   },
   "EstadisticasPage": {
     "meta": "Statistiques de @{handle} · Paragon",

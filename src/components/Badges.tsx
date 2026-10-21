@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AchievementIcon } from "./AchievementIcon";
 import { getTranslations } from "next-intl/server";
 import { LOGROS } from "@/lib/logros";
@@ -25,14 +26,32 @@ export const BADGE_DEFINITIONS: Record<string, BadgeDef> = Object.fromEntries(
   ]),
 );
 
-export async function Badges({ earnedBadges }: { earnedBadges: { badgeId: string, earnedAt: Date }[] }) {
-  if (earnedBadges.length === 0) return null;
+/**
+ * Con `max` (cabecera del perfil, 21 oct 2026) solo salen las primeras y un
+ * "+N" que lleva a `masHref` (la sección de logros, donde están todas): con
+ * una docena de insignias la cabecera se llenaba de círculos.
+ */
+export async function Badges({
+  earnedBadges,
+  max,
+  masHref,
+  className = "mt-3 flex flex-wrap gap-2",
+}: {
+  earnedBadges: { badgeId: string; earnedAt: Date }[];
+  max?: number;
+  masHref?: string;
+  className?: string;
+}) {
+  const conocidas = earnedBadges.filter(({ badgeId }) => BADGE_DEFINITIONS[badgeId]);
+  if (conocidas.length === 0) return null;
 
   const t = await getTranslations("Perfil");
+  const visibles = max ? conocidas.slice(0, max) : conocidas;
+  const resto = conocidas.length - visibles.length;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
-      {earnedBadges.map(({ badgeId }) => {
+    <div className={className}>
+      {visibles.map(({ badgeId }) => {
         const badge = BADGE_DEFINITIONS[badgeId];
         if (!badge) return null;
 
@@ -54,6 +73,15 @@ export async function Badges({ earnedBadges }: { earnedBadges: { badgeId: string
           </div>
         );
       })}
+      {resto > 0 && masHref && (
+        <Link
+          href={masHref}
+          aria-label={t("PerfilPage.verTodasInsignias", { n: conocidas.length })}
+          className="flex h-8 min-w-8 items-center justify-center rounded-full border border-[var(--border)] px-2 text-xs font-bold text-muted transition-colors hover:border-accent hover:text-foreground"
+        >
+          +{resto}
+        </Link>
+      )}
     </div>
   );
 }

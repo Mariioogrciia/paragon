@@ -99,6 +99,12 @@ export function ProfileForm({
   const marcoBloqueado = (v: string) => v !== "" && !marcoDisponible(v, nivel, badges);
   const [marco, setMarco] = useState(marcoBloqueado(user.profileFrame ?? "") ? "" : (user.profileFrame ?? ""));
   const [fondoJuegoId, setFondoJuegoId] = useState(user.profileBackgroundGameId ?? "");
+  // Qué se despliega del formulario (21 oct 2026, ver el bloque de títulos).
+  const [verIdeas, setVerIdeas] = useState(false);
+  const [verTitulosBloqueados, setVerTitulosBloqueados] = useState(false);
+  const [verEfectosBloqueados, setVerEfectosBloqueados] = useState(false);
+  const titulosBloqueados = TITULOS.filter((tit) => !tituloDesbloqueado(tit, nivel, badges)).length;
+  const efectosBloqueados = EFECTOS_NOMBRE.filter((e) => !efectoDisponible(e, nivel, badges)).length;
   const titulosSugeridos = badges
     .map((id) => BADGE_DEFINITIONS[id]?.name)
     .filter((n): n is string => Boolean(n));
@@ -347,20 +353,32 @@ export function ProfileForm({
                 placeholder={t("profileForm.details.profileTitlePlaceholder")}
                 className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none"
               />
+              {/* Formulario aligerado (21 oct 2026): de las ideas de título
+                  salen unas pocas, y de títulos especiales y efectos, los
+                  que ya puedes usar; lo bloqueado se despliega aparte. Antes
+                  el título especial y el efecto estaban DENTRO del bloque de
+                  ideas, así que sin insignias ni se veían. */}
               {titulosSugeridos.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {titulosSugeridos.map((t) => (
+                  {(verIdeas ? titulosSugeridos : titulosSugeridos.slice(0, IDEAS_VISIBLES)).map((idea) => (
                     <button
-                      key={t}
+                      key={idea}
                       type="button"
-                      onClick={() => setTitulo(t)}
+                      onClick={() => setTitulo(idea)}
                       className="rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold transition-colors hover:text-foreground"
                       style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
                     >
-                      {t}
+                      {idea}
                     </button>
                   ))}
-                  <div className="mt-4">
+                  {titulosSugeridos.length > IDEAS_VISIBLES && (
+                    <BotonPlegar abierto={verIdeas} onClick={() => setVerIdeas((v) => !v)}>
+                      {verIdeas ? t("profileForm.verMenos") : t("profileForm.masIdeas", { n: titulosSugeridos.length - IDEAS_VISIBLES })}
+                    </BotonPlegar>
+                  )}
+                </div>
+              )}
+              <div className="mt-5">
                 <input type="hidden" name="tituloDesbloqueado" value={tituloEspecial} />
                 <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted">{tp("TituloEspecial.label")}</p>
                 <div className="flex flex-wrap gap-1.5">
@@ -373,7 +391,7 @@ export function ProfileForm({
                   >
                     {tp("TituloEspecial.ninguno")}
                   </button>
-                  {TITULOS.map((tit) => {
+                  {TITULOS.filter((tit) => verTitulosBloqueados || tituloDesbloqueado(tit, nivel, badges)).map((tit) => {
                     const libre = tituloDesbloqueado(tit, nivel, badges);
                     const requisito = "nivel" in tit.requisito
                       ? tp("TituloEspecial.nivel", { n: tit.requisito.nivel })
@@ -398,10 +416,15 @@ export function ProfileForm({
                       </button>
                     );
                   })}
+                  {titulosBloqueados > 0 && (
+                    <BotonPlegar abierto={verTitulosBloqueados} onClick={() => setVerTitulosBloqueados((v) => !v)}>
+                      {verTitulosBloqueados ? t("profileForm.ocultarBloqueados") : t("profileForm.verBloqueados", { n: titulosBloqueados })}
+                    </BotonPlegar>
+                  )}
                 </div>
                 <p className="mt-1.5 text-xs text-muted">{tp("TituloEspecial.ayuda")}</p>
               </div>
-              <div className="mt-4">
+              <div className="mt-5">
                 <input type="hidden" name="efectoNombre" value={efecto} />
                 <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted">{tp("EfectosNombre.label")}</p>
                 <div className="flex flex-wrap gap-1.5">
@@ -414,7 +437,7 @@ export function ProfileForm({
                   >
                     {tp("TituloEspecial.ninguno")}
                   </button>
-                  {EFECTOS_NOMBRE.map((e) => {
+                  {EFECTOS_NOMBRE.filter((e) => verEfectosBloqueados || efectoDisponible(e, nivel, badges)).map((e) => {
                     const libre = efectoDisponible(e, nivel, badges);
                     const requisito = "nivel" in e.requisito
                       ? tp("TituloEspecial.nivel", { n: e.requisito.nivel })
@@ -437,11 +460,14 @@ export function ProfileForm({
                       </button>
                     );
                   })}
+                  {efectosBloqueados > 0 && (
+                    <BotonPlegar abierto={verEfectosBloqueados} onClick={() => setVerEfectosBloqueados((v) => !v)}>
+                      {verEfectosBloqueados ? t("profileForm.ocultarBloqueados") : t("profileForm.verBloqueados", { n: efectosBloqueados })}
+                    </BotonPlegar>
+                  )}
                 </div>
                 <p className="mt-1.5 text-xs text-muted">{tp("EfectosNombre.ayuda")}</p>
               </div>
-            </div>
-              )}
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.backgroundGameLabel")}</label>
@@ -662,8 +688,10 @@ function BackgroundGamePicker({
   onChange: (id: string) => void;
 }) {
   const t = useTranslations("Onboarding");
+  const [verTodos, setVerTodos] = useState(false);
   const favoritosSet = new Set(favoritos);
-  const ordenados = [...juegos].sort((a, b) => {
+  // Sin carátula no hay nada que elegir: salían casillas grises vacías.
+  const ordenados = juegos.filter((g) => g.iconUrl).sort((a, b) => {
     const aFav = favoritosSet.has(a.id) ? 0 : 1;
     const bFav = favoritosSet.has(b.id) ? 0 : 1;
     return aFav - bFav;
@@ -672,6 +700,12 @@ function BackgroundGamePicker({
   if (ordenados.length === 0) {
     return <p className="text-xs text-muted">{t("profileForm.backgroundPicker.empty")}</p>;
   }
+
+  // Plegado (21 oct 2026): primero los favoritos y unos pocos más; el
+  // elegido sale siempre aunque esté más abajo. Desplegado, hasta 48.
+  const visibles = verTodos ? ordenados.slice(0, 48) : ordenados.slice(0, FONDOS_VISIBLES);
+  const elegido = ordenados.find((g) => g.id === value);
+  if (!verTodos && elegido && !visibles.includes(elegido)) visibles.push(elegido);
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -684,7 +718,7 @@ function BackgroundGamePicker({
       >
         {t("profileForm.backgroundPicker.auto")}
       </button>
-      {ordenados.slice(0, 24).map((g) => (
+      {visibles.map((g) => (
         <button
           key={g.id}
           type="button"
@@ -693,12 +727,51 @@ function BackgroundGamePicker({
           className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg transition-transform hover:scale-105"
           style={{ border: `2px solid ${value === g.id ? "var(--accent)" : "var(--border)"}` }}
         >
-          <img src={g.iconUrl} alt="" className="h-full w-full object-cover" />
+          <img
+            src={g.iconUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            // Carátula rota (CDN que ya no la sirve): fuera la casilla, que salía gris.
+            onError={(e) => {
+              const casilla = e.currentTarget.parentElement;
+              if (casilla) casilla.style.display = "none";
+            }}
+          />
           {favoritosSet.has(g.id) && (
             <span className="absolute right-0.5 top-0.5 text-[0.625rem] drop-shadow">⭐</span>
           )}
         </button>
       ))}
+      {ordenados.length > FONDOS_VISIBLES && (
+        <button
+          type="button"
+          onClick={() => setVerTodos((v) => !v)}
+          aria-expanded={verTodos}
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-[var(--border)] px-1 text-center text-[0.625rem] font-semibold text-muted transition-colors hover:border-accent hover:text-foreground"
+        >
+          {verTodos ? t("profileForm.verMenos") : t("profileForm.backgroundPicker.verTodos", { n: ordenados.length })}
+        </button>
+      )}
     </div>
+  );
+}
+
+/** Cuántas ideas de título salen sin desplegar. */
+const IDEAS_VISIBLES = 4;
+
+/** Cuántos juegos de fondo salen sin desplegar (dos filas con "Auto" y "Ver todos"). */
+const FONDOS_VISIBLES = 10;
+
+/** El botón de "ver más / ver menos" de las listas de chips del formulario. */
+function BotonPlegar({ abierto, onClick, children }: { abierto: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={abierto}
+      className="rounded-full border border-dashed border-[var(--border)] px-2.5 py-1 text-[0.6875rem] font-semibold text-muted transition-colors hover:border-accent hover:text-foreground"
+    >
+      {children}
+    </button>
   );
 }

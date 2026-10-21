@@ -356,10 +356,15 @@
     "backgroundPicker": {
       "empty": "No games in your library yet.",
       "autoTitle": "Automatic (most recent)",
-      "auto": "Auto"
+      "auto": "Auto",
+      "verTodos": "See all ({n})"
     },
     "previewTitle": "How others see you",
-    "previewHint": "Updates as you edit; saved when you press Save."
+    "previewHint": "Updates as you edit; saved when you press Save.",
+    "verMenos": "Show less",
+    "masIdeas": "+{n} ideas",
+    "verBloqueados": "🔒 See {n} still locked",
+    "ocultarBloqueados": "Hide locked ones"
   },
   "appearanceSettings": {
     "title": "Appearance",

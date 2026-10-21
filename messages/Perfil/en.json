@@ -30,7 +30,10 @@
       "aceptar": "Accept request",
       "amigos": "Friends",
       "error": "Could not send the request"
-    }
+    },
+    "verTodasInsignias": "See all {n} badges",
+    "verPalmares": "See the rest of the trophy case",
+    "ocultarPalmares": "Hide the rest of the trophy case"
   },
   "EstadisticasPage": {
     "meta": "Stats for @{handle} · Paragon",

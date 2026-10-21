@@ -20,7 +20,7 @@ export async function ParagonAchievements({ medidas, earnedIds }: { medidas: Med
   const totalConseguidos = evaluados.filter((e) => e.conseguido).length;
 
   return (
-    <section className="rounded-[18px] border border-border bg-surface p-5">
+    <section id="logros" className="scroll-mt-24 rounded-[18px] border border-border bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
           <h2 className="font-heading text-xl font-bold uppercase tracking-wide">{t("ParagonAchievements.heading")}</h2>
