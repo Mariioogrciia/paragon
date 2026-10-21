@@ -1,121 +1,168 @@
 # Paragon — traspaso
 
 Estado del proyecto para retomarlo sin releer nada más. Última
-actualización: **19 de octubre de 2026**.
+actualización: **21 de octubre de 2026**.
 
 Lo de cada día (qué se hizo, por qué y con qué commits) está en
 [`HISTORIAL.md`](HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
 antes del 23 sept, en [`docs/historial/`](docs/historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
-## Dónde estamos (19 oct 2026) · leer primero
+## Dónde estamos (21 oct 2026) · leer primero
 
 **Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
-master (`364ce69`, 19 oct). Regla del usuario: **siempre push a master**
+master (`f0aac88`, 21 oct). Regla del usuario: **siempre push a master**
 (fast-forward desde la rama).
 
-**CI**: todo en verde en `364ce69` (web, APK de Android con AdMob dentro e
-IPA de iOS).
-- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 188 tests de
-  vitest y el comprobador de namespaces de `messages/`.
+**CI**: todo en verde en `f0aac88` (el IPA de iOS a la segunda: la primera
+vez GitHub canceló el job sin llegar a ejecutar ningún paso).
+- *Comprobaciones* (web): tsc, eslint (sin errores ni avisos), 241 tests de
+  vitest (incluida la paridad de claves e ICU de los 6 idiomas) y el
+  comprobador de namespaces de `messages/`.
 - *Build Android APK (KMP)*: tests de la app (`:shared:testAndroidHostTest`)
   y APK de debug.
 - *Build iOS IPA (KMP)*: IPA sin firmar para Sideloadly, con el widget dentro.
+  Tarda 40-50 min.
 - *Publicar en las tiendas* (a mano): AAB de release de Android (R8) y, con
   los secretos, firma y subida a Google Play; IPA de TestFlight con los de
   Apple.
 - *Sincronización frecuente de trofeos*: llama a `/api/cron/sync` con
-  `CRON_SECRET` y falla si no recibe un 200. Siempre en verde.
-
-**Producción** (leído de la respuesta del cron, 19 oct 07:18 UTC): HTTP
-200, 4 cuentas sincronizadas y 0 fallidas, `credencialPsn: null` (el NPSSO
-va bien) y `vigilancia: []` (Steam, Xbox e IGDB sin problemas). El cron
-sigue pasando cada 2-4 h: el cron externo de "Esperando al usuario" aún no
-está puesto. Una de las cuentas sincroniza siempre 0 juegos (`ac4ed878…`,
-también el 16 oct): mirar en Admin si tiene la biblioteca vacía por un
-perfil privado.
+  `CRON_SECRET` y falla si no recibe un 200.
+- *Copia de seguridad de la base* (lunes): falla mientras no estén sus
+  secretos (ver abajo).
 
 **Las tres piezas**:
-- **Web** (`src/`, Next 16.4.0 en Vercel, `platinos-nine.vercel.app`, sin
-  dominio propio): traducida entera a es/en/de/fr, incluidos los mensajes de
-  las server actions. Sin fallos de seguridad conocidos en dependencias
-  (queda `uuid@9` moderado y sin impacto, ver HISTORIAL.md, 13 oct).
+- **Web** (`src/`, Next 16.4.0 en Vercel, **`www.paragontrophies.com`**;
+  `platinos-nine.vercel.app` sigue sirviendo `/api` y `/movil` para las
+  apps y la extensión viejas). En **6 idiomas**: es/en/de/fr/it/pt
+  (portugués de Portugal; `Admin` en it/pt es copia del inglés).
 - **App Android** (`kmp/androidApp` + `kmp/shared`): versión 1.1
-  (versionCode 2). APK de debug para instalar a mano desde la CI. Push por
-  FCM, widget de Glance, lector de QR, diseño v2. Lista para Google Play
-  (falta la cuenta, ver abajo).
-- **App iOS** (`kmp/iosApp` + `kmp/shared`): versión 1.1. IPA sin firmar
-  (Sideloadly). Lo mismo que Android: gesto de volver, push (APNs) y widget
-  (WidgetKit). Las push solo con firma de pago.
+  (versionCode 2), 6 idiomas. APK de debug desde la CI. Push por FCM, widget
+  de Glance, lector de QR, diseño v2. Lista para Google Play (falta la
+  cuenta).
+- **App iOS** (`kmp/iosApp` + `kmp/shared`): versión 1.1, 6 idiomas. IPA sin
+  firmar (Sideloadly). Push (APNs) y widget (WidgetKit) solo con firma de
+  pago.
+
+**Vercel, plan Hobby: cuidado con el cupo** (21 oct). Se pasó de CPU activa
+(5 h 24 min de 4 h) y de Fast Origin Transfer (10,29 GB de 10 GB). Hecho:
+- Admin → Analítica ya no lanza 28 consultas a la vez (`lib/enSerie.ts`,
+  `Suspense` por bloques, memoria de 2-5 min).
+- Los enlaces solo precargan con intención (`components/Enlace.tsx`;
+  **cualquier enlace nuevo debe importar `Link` de `@/components/Enlace`**,
+  no de `next/link`). Antes cada `<Link>` visible renderizaba el layout raíz
+  en el servidor por culpa de `app/loading.tsx`.
+- Nivel y racha de la cabecera, 2 min de memoria por persona;
+  `staleTimes.dynamic: 30`; imágenes OG y tarjetas cacheadas un día en la
+  CDN; `robots.txt` echa a los rastreadores de IA y SEO.
+- Firewall de Vercel (lo puso el usuario): **AI Bots en Deny** y **Bot
+  Protection en Log**. No pasar Bot Protection a Challenge sin excepciones
+  para `/api/mobile`, `/api/discord` y `/api/cron`: la app, Discord y el
+  workflow de sincronización no son navegadores.
+- El contador del ciclo no baja: el efecto se verá en el siguiente.
 
 **Esperando al usuario** (no se puede hacer desde aquí):
+0. **Epic Games**: la revisión de marca está enviada (la app queda bloqueada
+   mientras tanto). Cuando la aprueben, en los dos clientes ("Paragon" y
+   "Paragon Web") cambiar la URL de redirección a
+   `https://www.paragontrophies.com/api/auth/callback/epic` y quitar las de
+   `localhost:3000` y `platinos-nine`. Hasta entonces "Verificar con Epic"
+   solo funciona con la cuenta del desarrollador.
 0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron
    corre cada 3-5 h (GitHub retrasa el suyo) y los avisos llegan tarde. En
    https://cron-job.org (o cualquier servicio de cron por URL):
-   - URL: `https://platinos-nine.vercel.app/api/cron/sync` (o el dominio
-     propio cuando lo haya), método GET, cada 15 minutos.
+   - URL: `https://www.paragontrophies.com/api/cron/sync`, método GET, cada
+     15 minutos.
    - Cabecera: `Authorization: Bearer <el valor de CRON_SECRET en Vercel>`.
    - Activar el aviso por correo si falla.
    El workflow de GitHub se queda de respaldo. Para comprobarlo: Admin →
    Sistema → "Cron de sincronización" tiene que decir "hace pocos minutos".
-   Más a menudo que cada 10 min no hace falta (el cron ya reparte el
-   trabajo y el plan Hobby de Vercel tiene tope de CPU).
-0. **Secretos de la copia de seguridad** (2 minutos; hecho el código el
-   20 oct, ver "Copia de seguridad" en Operación). Sin ellos, el workflow
-   del lunes fallará y GitHub mandará un correo:
+   Más a menudo que cada 10 min no hace falta (cupo de CPU de Hobby).
+0. **Secretos de la copia de seguridad** (2 minutos; código del 20 oct, ver
+   "Copia de seguridad" en Operación). Sin ellos, el workflow del lunes
+   falla y GitHub manda un correo:
    - `BACKUP_DATABASE_URL` = la `DATABASE_URL` de Vercel tal cual.
    - `BACKUP_PASSPHRASE` = una contraseña larga (20+), guardada también en
-     tu gestor de contraseñas: sin ella la copia no se abre.
+     el gestor de contraseñas: sin ella la copia no se abre.
    Luego Actions → "Copia de seguridad de la base" → Run workflow, y mirar
    que salga verde con "Restaurada: N tablas, M filas".
-1. **Google Play**: todo preparado en `kmp/play/`, con la guía paso a paso
-   en su README:
-   - Cuenta de desarrollador (25 $), clave de firma y secretos
-     `ANDROID_KEYSTORE_*`.
-   - Primera subida a mano (la API de Play no deja subir la primera).
-   - Formularios de Play Console con las respuestas ya escritas.
-   - Ficha y gráficos en 4 idiomas.
-   - Desde la segunda versión, el workflow sube solo el AAB si está el
-     secreto `PLAY_SERVICE_ACCOUNT_JSON`.
-   - Ojo: con una cuenta personal nueva, Google exige una prueba cerrada
-     con **12 personas durante 14 días** antes de producción.
-2. **Dominio `paragontrophies.com`** (comprado en Cloudflare el 21 oct,
-   DNS en gris hacia Vercel; el principal es `www.paragontrophies.com`). El
-   código ya está cambiado (ver HISTORIAL.md, 21 oct). Queda, a mano:
-   - Google Cloud → Credenciales → el cliente OAuth: añadir
-     `https://www.paragontrophies.com` a "Orígenes de JavaScript" y
-     `https://www.paragontrophies.com/api/auth/callback/google` a "URIs de
-     redireccionamiento". **Sin borrar las de `platinos-nine`** (la app vieja
-     sigue entrando por ahí).
-   - Discord Developer Portal → OAuth2 → Redirects: añadir
-     `https://www.paragontrophies.com/api/auth/callback/discord`.
-   - Vercel → Environment Variables: si existe `AUTH_URL` o `NEXTAUTH_URL`
-     con el dominio viejo, borrarla (en Vercel, Auth.js usa el host de cada
-     petición) y redesplegar.
-   - Secreto del repo `SITE_URL` = `https://www.paragontrophies.com` (y la
-     URL del cron externo, cuando se ponga).
-   - Google Search Console: propiedad de dominio `paragontrophies.com`
-     (verificación por TXT en Cloudflare) y enviar
-     `https://www.paragontrophies.com/sitemap.xml`. Bing Webmaster Tools:
-     importar desde Search Console.
-   - El cliente OAuth de Google **no está** en el proyecto de Google Cloud
-     "Paragon" (paragon-d5455, el de Firebase): está en otro. Para dar con
-     él, el número del principio de `AUTH_GOOGLE_ID` (Vercel) es el número
-     del proyecto: buscarlo en el selector de proyectos de Google Cloud.
-   - La extensión 1.2.0 y una APK nueva ya usan el dominio; las instaladas
-     siguen funcionando por `platinos-nine.vercel.app` (/api y /movil no
-     redirigen).
+0. **NPSSO de PSN**: Admin → Sistema → "Comprobar ahora" (botón del 21 oct)
+   tiene que decir que vale.
+1. **Dominio** (`www.paragontrophies.com`, 21 oct). Comprobar que está
+   hecho, a mano:
+   - Google Cloud → el cliente OAuth: `https://www.paragontrophies.com` en
+     "Orígenes de JavaScript" y `…/api/auth/callback/google` en "URIs de
+     redireccionamiento", **sin borrar las de `platinos-nine`**. El cliente
+     no está en el proyecto "Paragon" de Firebase: el número del principio
+     de `AUTH_GOOGLE_ID` es el número de su proyecto.
+   - Discord Developer Portal → OAuth2 → Redirects:
+     `…/api/auth/callback/discord`.
+   - Vercel: borrar `AUTH_URL`/`NEXTAUTH_URL` si apuntan al dominio viejo.
+   - Secreto del repo `SITE_URL` = `https://www.paragontrophies.com`.
+   - Google Search Console (propiedad de dominio, TXT en Cloudflare) y
+     enviar `https://www.paragontrophies.com/sitemap.xml`; Bing importa
+     desde Search Console.
+2. **Google Play**: todo preparado en `kmp/play/` (guía en su README):
+   cuenta de desarrollador (25 $), clave de firma y secretos
+   `ANDROID_KEYSTORE_*`, primera subida a mano, formularios con las
+   respuestas escritas. Con una cuenta personal nueva Google exige una
+   prueba cerrada con **12 personas durante 14 días**. Ojo: la ficha está
+   en 4 idiomas, no en 6 (ver sugerencias).
 3. **Cuenta de desarrollador de Apple** (de pago): sin ella no hay push en
-   iOS ni TestFlight/App Store. Después hacen falta:
-   - Identificadores, App Group y la app en App Store Connect.
-   - Los secretos `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID` y
-     `ASC_KEY_P8` (pasos en HISTORIAL.md, 13 oct, "Publicar en las tiendas").
-   - Las variables `APNS_KEY`, `APNS_KEY_ID` y `APNS_TEAM_ID` en Vercel.
-4. **Probar en un móvil de verdad** lo de estos días (lista abajo). El
-   emulador de Windows no arranca desde la actualización 26200 → 26300
-   (probablemente basta con reiniciar).
+   iOS ni TestFlight. Después: identificadores, App Group, la app en App
+   Store Connect, secretos `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`,
+   `ASC_KEY_P8` y variables `APNS_KEY`, `APNS_KEY_ID`, `APNS_TEAM_ID` en
+   Vercel.
+4. **Probar en un móvil de verdad** lo de octubre (lista abajo), y la app en
+   italiano y portugués.
+5. En unos días, Vercel → Firewall → Bot Management: ver qué apunta Bot
+   Protection en Log antes de decidir nada.
 
-**Lo último** (16-19 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+**Lo último** (20-21 oct; detalle en HISTORIAL.md):
+- **Italiano y portugués** en web y apps (21 oct). Test de paridad
+  `tests/mensajesIdiomas.test.ts`: cada idioma con las mismas claves y
+  argumentos ICU que el español. Al añadir un texto nuevo hay que ponerlo en
+  los 6 (`messages/<Carpeta>/<idioma>.json` y `kmp/i18n/textos.json`).
+- **Selector de idioma** con banderas redondas en SVG (21 oct).
+- **Admin → Analítica completa** (21 oct): tráfico, audiencia (navegador,
+  sistema, dispositivo, idioma, país, pantalla, campañas), cuándo se usa
+  (mapa de calor), Web Vitals, 404, bots, embudo de altas, cohortes,
+  plataformas, comunidad y calidad. Con donuts y barras
+  (`components/admin/`). Sin cookies ni IP.
+- **Admin → Registro y Sistema** (21 oct): registro de eventos 30 días,
+  pausar la sincronización de una plataforma, lanzar el cron, aviso a todos.
+- **Verificar la cuenta de Epic** con el login oficial de Epic (21 oct,
+  `lib/epic/verificacion.ts`). Solo verifica, no sirve para entrar.
+- **Wrap y Hoja de servicios** rediseñados (21 oct).
+- **Login con Discord arreglado** (21 oct, `lib/authIss.ts`): Discord empezó
+  a mandar `iss` y Auth.js lo rechazaba.
+- **Dominio propio, SEO y cabeceras de seguridad** (21 oct).
+- **Ajustes → Avisos** en web y app (20 oct): qué recibir y por dónde.
+- **Copia de seguridad semanal** cifrada y probada (20 oct).
+
+**Sugerencias** (opinión, 21 oct; nada de esto está pedido), por orden:
+1. **Servir desde la CDN las páginas públicas sin sesión** (fichas de juego,
+   perfiles, Descubrir). Hoy todas se renderizan en cada visita porque el
+   layout raíz lee la sesión y la cookie de idioma. Es lo que más CPU
+   ahorraría para no volver a pasarse del cupo de Hobby.
+2. **Ficha de Google Play en italiano y portugués** (`kmp/play/ficha`,
+   `kmp/play/novedades`): la app ya habla 6 idiomas y la ficha solo 4.
+3. **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
+   privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
+   con enlace a `/vincular`.
+4. **Hora de los avisos en la web**: la campana usa `relativeDate` (solo
+   "hoy"/"ayer"); en la app ya sale "hace 5 min".
+5. **Extensión del navegador y `manifest.ts` en más idiomas**: hoy solo en
+   español.
+6. **Comprobar los huecos `{0}` en `kmp/i18n/generar.mjs`**: hoy solo mira
+   que exista cada idioma; un hueco perdido en una traducción no avisa.
+7. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
+   qué páginas no usa nadie (arcade, planificador…).
+8. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
+   perdibles, sesiones), resumen semanal en push, varias cuentas de Steam
+   para todos, `pt-BR` si llegan brasileños.
+
+**Antes** (16-19 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
 - **Anuncios preparados y apagados** (19 oct, `lib/publicidad.ts`): AdSense
   con el mensaje de consentimiento certificado de Google, `/ads.txt`,
   huecos en Descubrir y en la ficha de juego, y textos de privacidad y
@@ -179,7 +226,7 @@ Mientras no exista `NEXT_PUBLIC_ADSENSE_CLIENT` no se carga nada de Google,
    DIRECT, f08c47fec0942fa0`) y pedir la revisión del sitio en AdSense.
 5. AdSense → **Privacidad y mensajes** → "Reglamentos europeos" → crear y
    **publicar** el mensaje de consentimiento (IAB TCF v2.2, certificado).
-   Idiomas: es, en, de, fr. Opciones: "Consentir", "No consentir" y
+   Idiomas: es, en, de, fr, it, pt. Opciones: "Consentir", "No consentir" y
    "Gestionar opciones". Sin publicarlo, en Europa solo salen anuncios
    limitados. La web ya carga la etiqueta de ese mensaje
    (`components/PublicidadScripts.tsx`) y el enlace "Gestionar cookies" del
@@ -203,21 +250,13 @@ aún sin anuncios.
 Con poco tráfico los anuncios dan céntimos: los enlaces de afiliado en
 "Platinos de oferta" y las alertas de precio pueden rendir antes.
 
-**Pendiente de código** (nada pedido):
-- **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
-  privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
-  ("tu perfil de Steam ya no es público, mira cómo arreglarlo") con enlace a
-  `/vincular`.
+**Pendiente de código** (nada pedido; lo más útil está en "Sugerencias"
+arriba):
 - **Anuncios en el canal de un servidor de Discord** (nivel, platino): siguen
   en español a propósito, los lee todo el servidor. Todo lo que llega a una
   persona (push, DM, campana) ya sale en su idioma.
-- **Hora de los avisos en la web**: la campana usa `relativeDate`, que solo
-  distingue días ("hoy", "ayer"); en la app sí sale "hace 5 min".
 - **Capturas de Google Play**: hay 2 (el mínimo) y con la app en español.
   Con 4-8 por idioma la ficha luce más (`npm run graficos-play` en `video/`).
-- **NPSSO de PSN**: el que había puesto empezó a contarse el 16 oct (Sony no
-  dice cuándo caduca). Si caduca antes de los 60 días, avisará "ha
-  caducado" en vez de "caduca pronto".
 - Ideas sueltas: abrir la pantalla de un clan concreto desde un aviso (la
   app no tiene ruta por clan) y que "Ver guía" de Enfoque abra el vídeo.
 
@@ -230,26 +269,13 @@ Sony/Valve/Microsoft):
   Estadísticas, Atascados → Sesión, Comparar, Sesiones, widget de iOS,
   perfil completo, precios, DLC, QR).
 
-**Tamaño a 19 oct**: 57 páginas web, 75 rutas de `/api/mobile`, 21
-pantallas en la app, 4 idiomas en todo.
-
-**Siguientes pasos recomendados** (opinión, 19 oct; nada de esto está pedido):
-1. *Poner el cron externo* (5 minutos, ver arriba): sin él, todos los avisos
-   llegan con horas de retraso.
-2. *Comprar el dominio* y después *publicar en Google Play* con la prueba
-   cerrada de 12 amigos: es la forma de que alguien más use la app, y sus
-   14 días sirven de prueba en móviles de verdad.
-3. *Avisar a quien deja de poder leerse*
-   (ver "Pendiente de código").
-4. *Medir y recortar*: mirar en Vercel Analytics qué páginas se usan y
-   esconder lo que nadie toca (arcade, planificador...). Desde aquí no se
-   puede leer (403 del equipo de Vercel).
-5. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
-   perdibles, sesiones), resumen semanal en push, y abrir varias cuentas de
-   Steam a todos.
+**Sin probar en un móvil de verdad** (21 oct): la app en italiano y
+portugués (textos largos que se corten) y la navegación web con la precarga
+solo por intención.
 
 **Dónde está cada cosa**:
-- Textos de la web: `messages/<Carpeta>/<idioma>.json`; los namespaces de
+- Textos de la web: `messages/<Carpeta>/<idioma>.json` (6 idiomas, con test
+  de paridad); los namespaces de
   cliente en `src/i18n/clientMessages.ts`
   (`npx tsx scripts/comprobar-namespaces-cliente.mts` lo comprueba).
 - Textos de la app: `kmp/i18n/textos.json` y `node kmp/i18n/generar.mjs`.

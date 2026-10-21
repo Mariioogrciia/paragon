@@ -6,7 +6,7 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
-### Italiano y portugués, y segunda ronda de CPU (22 oct)
+### Italiano y portugués, y segunda ronda de CPU (21 oct)
 
 - **Italiano y portugués** en la web y en las apps (portugués de Portugal):
   - Web: selector con banderas IT/PT, los ocho namespaces de `messages/`, avisos, API móvil, Discord y tarjetas. `Admin` en it/pt es copia del inglés (panel solo para el desarrollador).
@@ -18,7 +18,7 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
   - `staleTimes.dynamic: 30`: volver atrás no repite el render.
   - Volver a la pestaña ya no refresca Descubrir ni pide los avisos cada vez.
 
-### Admin que carga y menos CPU en Vercel (22 oct)
+### Admin que carga y menos CPU en Vercel (21 oct)
 
 Se pasó el cupo gratis de CPU activa de Vercel (4 h 59 min de 4 h) y Admin → Analítica no llegaba a cargar.
 
@@ -33,11 +33,11 @@ Se pasó el cupo gratis de CPU activa de Vercel (4 h 59 min de 4 h) y Admin → 
   - Las Web Vitals salen en un solo aviso por página.
   - La campana de avisos pregunta cada 2 minutos (antes, cada 45 s).
 
-### Selector de idioma con banderas (22 oct)
+### Selector de idioma con banderas (21 oct)
 
 - `LanguageSwitcher`: ahora es una píldora con la bandera redonda y el nombre del idioma (en móvil, solo la bandera) y un menú con banderas redondas y ✓ en el activo. Las banderas están dibujadas en SVG, porque los emojis de bandera no existen en Windows (salían "ES", "GB").
 
-### Analítica completa en Admin (22 oct)
+### Analítica completa en Admin (21 oct)
 
 - **Se recoge más, siempre como recuentos por día y etiquetas cerradas, sin cookies ni IP**:
   - Una vez por visita: país (cabecera de Vercel), navegador, sistema, dispositivo, idioma, ancho de pantalla, tema y campaña (utm_source).

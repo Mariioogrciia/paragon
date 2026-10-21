@@ -1624,7 +1624,7 @@ h3,
 .marca-declarado { display: inline-flex; vertical-align: -2px; margin-left: 0.25rem; color: var(--gold); opacity: 0.85; cursor: help; }
 .marca-declarado:hover { opacity: 1; }
 
-/* Colores categóricos de las gráficas de Admin → Analítica (22 oct 2026):
+/* Colores categóricos de las gráficas de Admin → Analítica (21 oct 2026):
    la paleta validada de la guía de visualización (orden fijo, distinguibles
    con daltonismo entre vecinos), con su escalón para fondo oscuro y claro.
    "Otros" va siempre en gris. Las de una sola serie usan el acento. */

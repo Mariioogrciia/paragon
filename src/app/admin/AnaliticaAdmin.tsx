@@ -16,7 +16,7 @@ import { PLATFORM_LABEL } from "@/lib/types";
  * selector de periodo. Server component: las gráficas son la única parte
  * de cliente (por el ratón).
  *
- * Ampliado el 22 oct 2026 ("todo lo que se pueda sacar de analíticas, con
+ * Ampliado el 21 oct 2026 ("todo lo que se pueda sacar de analíticas, con
  * gráficas y gráficos circulares"): audiencia (país, navegador, sistema,
  * dispositivo, idioma, pantalla, tema, campañas), cuándo (mapa de calor),
  * web frente a app, rendimiento (Web Vitals), usuarios (embudo, retención,

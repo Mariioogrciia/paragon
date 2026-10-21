@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /**
- * Gráfico circular (donut) de Admin → Analítica (22 oct 2026), para "qué
+ * Gráfico circular (donut) de Admin → Analítica (21 oct 2026), para "qué
  * parte del total es cada cosa" con pocas categorías. Criterios de la guía
  * de visualización: como mucho 5 porciones con color y el resto juntas en
  * "Otros" en gris; colores categóricos en orden fijo (--cat-1..5, validados

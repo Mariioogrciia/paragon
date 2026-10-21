@@ -12,7 +12,7 @@ import { traducirMensaje } from "@/lib/mensajesApi";
  * patrones; un aviso de varias líneas se traduce línea a línea. Si un texto
  * no está aquí, sale en español: mejor eso que nada.
  *
- * Italiano y portugués (de Portugal) desde el 22 oct 2026.
+ * Italiano y portugués (de Portugal) desde el 21 oct 2026.
  *
  * **Si cambias la redacción de un aviso en español, cámbiala también aquí**
  * (los tests de tests/avisosTraduccion.test.ts usan las frases reales).

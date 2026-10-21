@@ -16,7 +16,7 @@ import { enSerie, recordado } from "@/lib/enSerie";
  *   cuánta gente usa Paragon (activos por día/semana/mes). Solo la fecha; se
  *   borra a los 90 días (está en la política de privacidad).
  *
- * Ampliado el 22 oct 2026 ("todo lo que se pueda sacar de analíticas"):
+ * Ampliado el 21 oct 2026 ("todo lo que se pueda sacar de analíticas"):
  *
  * - `trafico_dimension`: por día, contadores de etiquetas cerradas — país
  *   (cabecera de Vercel, nunca la IP), navegador, sistema, dispositivo,

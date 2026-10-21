@@ -29,7 +29,7 @@ interface Aviso {
   createdAt: string;
 }
 
-// Cada 2 minutos (antes 45 s, 22 oct 2026): cada vuelta es una llamada a Vercel por pestaña abierta. Al volver a la pestaña se mira al momento.
+// Cada 2 minutos (antes 45 s, 21 oct 2026): cada vuelta es una llamada a Vercel por pestaña abierta. Al volver a la pestaña se mira al momento.
 const CADA_MS = 120_000;
 const TOAST_MS = 7_000;
 const MAX_TOASTS = 3;
@@ -73,7 +73,7 @@ export function CampanaAvisos() {
       if (document.visibilityState === "visible") void cargar();
     }, CADA_MS);
     // Volver a la pestaña solo pregunta si hace rato de la última vez: cada
-    // cambio de pestaña era una función de Vercel (22 oct 2026).
+    // cambio de pestaña era una función de Vercel (21 oct 2026).
     let ultimo = Date.now();
     const alVolver = () => {
       if (document.visibilityState !== "visible" || Date.now() - ultimo < 30_000) return;

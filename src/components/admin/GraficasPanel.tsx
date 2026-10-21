@@ -1,5 +1,5 @@
 /**
- * Gráficos sin interacción de Admin → Analítica (22 oct 2026): listas de
+ * Gráficos sin interacción de Admin → Analítica (21 oct 2026): listas de
  * barras, embudo de activación, retención por semanas de alta y Web Vitals.
  * Componentes de servidor; los que necesitan el ratón están en Donut,
  * MapaCalor y GraficaDias. Una sola serie por gráfico, en el acento; las

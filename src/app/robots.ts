@@ -42,7 +42,7 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
-      // Rastreadores de IA y de SEO (22 oct 2026): no traen visitas y cada
+      // Rastreadores de IA y de SEO (21 oct 2026): no traen visitas y cada
       // página que piden es CPU del servidor (se pasó del cupo de Vercel).
       // Los que respetan robots.txt dejan de venir; Google y Bing siguen.
       { userAgent: BOTS_FUERA, disallow: "/" },

@@ -1,5 +1,5 @@
 /**
- * Espera una lista de consultas UNA DETRÁS DE OTRA (22 oct 2026). Las
+ * Espera una lista de consultas UNA DETRÁS DE OTRA (21 oct 2026). Las
  * consultas de drizzle no arrancan hasta que se esperan, así que esto, a
  * diferencia de `Promise.all`, ocupa una sola conexión del pool (que tiene
  * `max: 5`, ver db/index.ts). Admin → Analítica lanzaba unas 28 a la vez y

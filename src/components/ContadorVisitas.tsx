@@ -10,7 +10,7 @@ import { useReportWebVitals } from "next/web-vitals";
  * ni retrasa nada. No usa cookies ni guarda nada en el navegador; respeta
  * "No rastrear" (Do Not Track / Global Privacy Control) si está activado.
  *
- * Desde el 22 oct 2026, en la primera página de la visita manda también el
+ * Desde el 21 oct 2026, en la primera página de la visita manda también el
  * idioma del navegador, el ancho de pantalla, si usa tema oscuro y la
  * campaña (utm_source), y las medidas de Web Vitals de cada página. El
  * servidor lo reduce todo a etiquetas (lib/traficoRutas.ts).

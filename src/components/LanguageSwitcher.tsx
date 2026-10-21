@@ -14,7 +14,7 @@ const IDIOMAS = [
 ];
 
 /**
- * Banderas redondas dibujadas en SVG (22 oct 2026): los emojis de bandera
+ * Banderas redondas dibujadas en SVG (21 oct 2026): los emojis de bandera
  * no existen en Windows (salen las letras "ES", "GB"...), así que el
  * selector se veía distinto en cada sistema.
  */

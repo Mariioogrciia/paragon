@@ -5,7 +5,7 @@ import { enSerie, recordado } from "@/lib/enSerie";
 import { asegurarTablas } from "@/lib/trafico";
 
 /**
- * Admin → Analítica, parte de "usuarios y plataforma" (22 oct 2026): lo que
+ * Admin → Analítica, parte de "usuarios y plataforma" (21 oct 2026): lo que
  * sale de los datos que Paragon ya tiene, sin contar nada nuevo. Embudo de
  * activación, retención por semanas de alta, con qué se registra la gente,
  * qué plataformas vincula, avisos activados, juegos con más jugadores,

@@ -7,7 +7,7 @@ import { locales } from "@/i18n/request";
 /**
  * Cada namespace de messages/ tiene que estar en todos los idiomas con las
  * mismas claves y los mismos huecos ({n}, {handle}...) que el español
- * (22 oct 2026, al añadir italiano y portugués): una clave que falta sale
+ * (21 oct 2026, al añadir italiano y portugués): una clave que falta sale
  * como "Namespace.clave" en la web, y un hueco mal escrito revienta el texto.
  */
 

@@ -61,7 +61,7 @@ export function esMovil(ua: string | null | undefined): boolean {
   return !!ua && /mobile|android|iphone|ipad/i.test(ua);
 }
 
-/* ---- Dimensiones de la visita (22 oct 2026) ----
+/* ---- Dimensiones de la visita (21 oct 2026) ----
  * Lo que Admin → Analítica enseña en tartas y barras: todo se reduce a una
  * etiqueta corta de una lista cerrada antes de guardarse (nunca el
  * User-Agent ni el idioma tal cual), así no hay nada que identifique a nadie

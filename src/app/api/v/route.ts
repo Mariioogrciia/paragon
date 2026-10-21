@@ -26,8 +26,8 @@ import {
  *   idioma, el ancho de pantalla, el tema y la campaña (utm_source); el país
  *   sale de la cabecera de Vercel y el navegador/sistema del User-Agent,
  *   reducidos a una etiqueta (lib/traficoRutas.ts). No se guarda la IP.
- * - `wv`: las medidas de Web Vitals de una página, en un solo aviso (22 oct 2026).
- * - `404`: una dirección que no existe (22 oct 2026).
+ * - `wv`: las medidas de Web Vitals de una página, en un solo aviso (21 oct 2026).
+ * - `404`: una dirección que no existe (21 oct 2026).
  *
  * Los bots no cuentan como visitas, pero se apunta su familia.
  */

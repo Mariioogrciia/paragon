@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /**
- * Mapa de calor día de la semana × hora (22 oct 2026) para "¿cuándo se usa
+ * Mapa de calor día de la semana × hora (21 oct 2026) para "¿cuándo se usa
  * Paragon?". Una sola magnitud, así que una sola tonalidad (el acento) de
  * más clara a más intensa; las celdas vacías quedan en el fondo. Al pasar
  * el ratón, la cifra exacta arriba; debajo, la tabla para quien no ve el

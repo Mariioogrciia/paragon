@@ -15,7 +15,7 @@ import { urlAbsolutaParaOg } from "@/lib/design";
  * flexbox: Satori no entiende grid.
  */
 
-// Se genera como mucho una vez al día por página (22 oct 2026): cada imagen es mucha CPU y la piden todos los bots de enlaces.
+// Se genera como mucho una vez al día por página (21 oct 2026): cada imagen es mucha CPU y la piden todos los bots de enlaces.
 export const revalidate = 86400;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

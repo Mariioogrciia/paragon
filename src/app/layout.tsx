@@ -187,7 +187,7 @@ export default async function RootLayout({
         }),
         // Nivel y racha recorren todo el historial de trofeos y salen en la
         // cabecera de CADA página: dos minutos de memoria por persona bastan
-        // (22 oct 2026, CPU de Vercel pasada del plan Hobby).
+        // (21 oct 2026, CPU de Vercel pasada del plan Hobby).
         recordado(`nivel:${sessionUser.id}`, 120_000, () => getParagonLevel(sessionUser.id)),
         getHiddenNavItems(sessionUser.id),
         recordado(`racha:${sessionUser.id}`, 120_000, () => rachas(sessionUser.id)).catch((error) => {

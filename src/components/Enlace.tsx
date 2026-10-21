@@ -5,7 +5,7 @@ import { useState, type ComponentProps } from "react";
 
 /**
  * `next/link` que solo precarga cuando hay intención (ratón encima o dedo
- * tocando), no por aparecer en pantalla (22 oct 2026).
+ * tocando), no por aparecer en pantalla (21 oct 2026).
  *
  * Por qué: hay un `app/loading.tsx` en la raíz, así que para Next TODAS las
  * rutas dinámicas tienen frontera de carga y cada `<Link>` visible pedía al

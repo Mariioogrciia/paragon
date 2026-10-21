@@ -257,7 +257,7 @@ export async function GET(
     {
       width: 1200,
       height: 630,
-      // Generar la imagen es lo más caro en CPU de toda la web: que la sirva la CDN un día (22 oct 2026).
+      // Generar la imagen es lo más caro en CPU de toda la web: que la sirva la CDN un día (21 oct 2026).
       headers: { "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800" },
     },
   );
