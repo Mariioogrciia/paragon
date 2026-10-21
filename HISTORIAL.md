@@ -6,6 +6,17 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct (3) — login con Discord roto por el `iss`**. Con el dominio nuevo,
+el login con Discord fallaba: `CallbackRouteError: unexpected "iss"
+(issuer) response parameter value`, esperado `https://authjs.dev`. Discord
+manda ahora `iss` en la vuelta del login (RFC 9207) y Auth.js 0.41.3
+(next-auth 5 beta 32) lo compara con su emisor de relleno para proveedores
+OAuth sin OIDC. `lib/authIss.ts` (con tests) lo quita en
+`api/auth/[...nextauth]/route.ts` solo si el emisor es discord.com; el
+`state` y el PKCE se siguen comprobando igual. Afecta también al login de
+la app (va por la misma ruta). Si una versión futura de Auth.js lo
+arregla, se puede quitar.
+
 **21 oct (2) — SEO, seguridad y textos legales con el dominio nuevo**.
 - SEO: `lib/seo.ts` (`metaPublica`): título, descripción y **URL canónica**
   en la portada y todas las páginas públicas (descubrir y sus plataformas,
