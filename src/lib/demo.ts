@@ -1,3 +1,4 @@
+import type { WrapAnual } from "@/lib/wrapAnual";
 import type { Game, Player } from "@/lib/types";
 
 /**
@@ -178,3 +179,36 @@ export const DEMO_JUEGOS: Game[] = [
     genres: ["Aventura"],
   },
 ];
+
+/**
+ * El Wrap del año del perfil de ejemplo (21 oct 2026, ver lib/wrapAnual.ts):
+ * sale de los propios juegos de aquí y suma lo mismo que `DEMO_ANIO`, para
+ * que la página no se contradiga.
+ */
+export const DEMO_WRAP: WrapAnual = (() => {
+  const reparto = [4, 6, 9, 3, 12, 8, 5, 14, 11, 16, 8, 0];
+  const conTrofeos = [...DEMO_JUEGOS].filter((g) => g.earnedTotal > 0).sort((a, b) => b.earnedTotal - a.earnedTotal);
+  return {
+    anio: new Date(HOY).getFullYear(),
+    porMes: reparto.map((total, i) => ({ mes: i + 1, total })),
+    porMetal: { platinum: 2, gold: 9, silver: 21, bronze: 52, otros: 12 },
+    topJuegos: conTrofeos.slice(0, 5).map((g, i) => ({
+      gameId: g.id,
+      titulo: g.title,
+      iconUrl: g.iconUrl ?? null,
+      trofeos: [31, 24, 18, 13, 10][i] ?? 5,
+    })),
+    platinos: DEMO_JUEGOS.filter((g) => (g.earned?.platinum ?? 0) > 0).map((g, i) => ({
+      gameId: g.id,
+      titulo: g.title,
+      iconUrl: g.iconUrl ?? null,
+      fecha: haceDias(40 + i * 60),
+    })),
+    masRaro: { nombre: "Señor de Elden", iconUrl: null, juego: "Elden Ring", rareza: 1.8, grado: "platinum" },
+    generos: [
+      { nombre: "Acción", juegos: 4 },
+      { nombre: "Rol", juegos: 3 },
+      { nombre: "Aventura", juegos: 2 },
+    ],
+  };
+})();

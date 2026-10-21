@@ -25,6 +25,7 @@ import { coverGradient, urlAbsolutaParaOg } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
 import { juegosDelAnio, rachas as rachasDe, resumenHistorico, ultimosTrofeos } from "@/lib/history";
 import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
+import { wrapAnual } from "@/lib/wrapAnual";
 import { RecentTrophies } from "@/components/RecentTrophies";
 import { Badges } from "@/components/Badges";
 import { Pegi } from "@/components/Pegi";
@@ -188,10 +189,11 @@ export default async function PerfilPage({
   // sección "Colecciones", que vive ahora en /u/[handle]/biblioteca.
   // Pública igual que el resto de la ficha: se ve tanto en tu propio
   // perfil como en el de cualquiera que lo visite.
-  const [resumen, juegosEsteAnio, badges] = await Promise.all([
+  const [resumen, juegosEsteAnio, badges, anual] = await Promise.all([
     resumenHistorico(profile.userId),
     juegosDelAnio(profile.userId),
     getUserBadges(profile.userId),
+    wrapAnual(profile.userId),
   ]);
   const [recientes, palmares, clanMembership, vitrinas] = await Promise.all([
     ultimosTrofeos(profile.userId, 8, await idiomaActual()),
@@ -551,6 +553,7 @@ export default async function PerfilPage({
                 games={games}
                 esteAnio={resumen.esteAnio}
                 juegosEsteAnio={juegosEsteAnio}
+                anual={anual}
                 handle={handle}
                 playerName={profile.displayName ?? player.name}
                 mejorMes={resumen.mejorMes}

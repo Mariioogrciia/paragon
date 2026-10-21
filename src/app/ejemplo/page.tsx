@@ -6,7 +6,7 @@ import { GameCard } from "@/components/GameCard";
 import { ParagonWrap } from "@/components/ParagonWrap";
 import { StatTile } from "@/components/StatTile";
 import { TrophyCountRow } from "@/components/TrophyCounts";
-import { DEMO_ANIO, DEMO_HANDLE, DEMO_JUEGOS, DEMO_JUGADOR } from "@/lib/demo";
+import { DEMO_ANIO, DEMO_HANDLE, DEMO_JUEGOS, DEMO_JUGADOR, DEMO_WRAP } from "@/lib/demo";
 import { CartaHolo } from "@/components/CartaHolo";
 import { Badges } from "@/components/Badges";
 import { coverGradient } from "@/lib/design";
@@ -135,6 +135,7 @@ export default async function EjemploPage() {
           games={DEMO_JUEGOS}
           esteAnio={DEMO_ANIO.trofeos}
           juegosEsteAnio={DEMO_ANIO.juegos}
+          anual={DEMO_WRAP}
         />
 
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

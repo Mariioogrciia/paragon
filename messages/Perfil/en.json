@@ -278,7 +278,14 @@
     "resumenDelAnio": "Year in review",
     "trofeos": "trophies",
     "sinTrofeosEsteAnio": "No trophies dated this year yet",
-    "repartidosEnJuegos": "Across {count, plural, one {# game} other {# games}}"
+    "repartidosEnJuegos": "Across {count, plural, one {# game} other {# games}}",
+    "tuAnio": "Your {anio}",
+    "trofeosEnJuegos": "trophies across {count, plural, one {# game} other {# games}}",
+    "mesTrofeos": "{mes}: {total} trophies",
+    "logrosSinMetal": "achievements without a tier",
+    "tusJuegosDelAnio": "Your games of the year",
+    "platinosDelAnio": "Platinums this year",
+    "trofeoMasRaro": "Your rarest trophy"
   },
   "WrapStories": {
     "cerrar": "Close",
@@ -318,7 +325,18 @@
       "octubre": "October",
       "noviembre": "November",
       "diciembre": "December"
-    }
+    },
+    "mesAMes": "Month by month",
+    "mejorMesTexto": "{mes} was your best month: {total} trophies",
+    "mesTrofeos": "{mes}: {total} trophies",
+    "metalesTitulo": "Your trophies, by tier",
+    "logrosSinMetal": "achievements without a tier",
+    "topJuegosTitulo": "Your games of the year",
+    "platinosTitulo": "Platinums this year",
+    "platinosCount": "{count, plural, one {# platinum} other {# platinums}}",
+    "raroTitulo": "Your rarest trophy",
+    "raroTexto": "Only<br></br><b>{rareza}%</b><br></br>of the people who play that game have it",
+    "generosNota": "Games with a trophy this year, by genre"
   },
   "WrapStoriesButton": {
     "verWrapCompleto": "See full Wrap"

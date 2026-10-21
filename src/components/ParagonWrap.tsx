@@ -1,14 +1,15 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";
 import { WrapStoriesButton } from "@/components/WrapStoriesButton";
 import { type Game } from "@/lib/types";
-import { coverGradient } from "@/lib/design";
 import { gruposPorTitulo } from "@/lib/stats";
 import type { Rachas } from "@/lib/history";
 import type { PercentilAnio } from "@/lib/wrapPercentile";
 import { TrophyIcon } from "./TrophyIcon";
+import type { WrapAnual } from "@/lib/wrapAnual";
+import { BarraMetales, BarrasHorizontales, BarrasMeses, Caratula } from "@/components/wrap/GraficasWrap";
 
 /**
  * Paragon Wrap: el resumen "de póster" del perfil.
@@ -21,7 +22,7 @@ import { TrophyIcon } from "./TrophyIcon";
  */
 
 const TARJETA =
-  "relative overflow-hidden rounded-2xl p-6 shadow-lg transition-transform hover:scale-[1.02]";
+  "relative overflow-hidden rounded-2xl p-6 shadow-lg transition-transform hover:scale-[1.01]";
 
 /**
  * Cada tarjeta enseña un solo número ("tu género más jugado"); esto la hace
@@ -33,22 +34,24 @@ const TARJETA =
 function Tarjeta({
   href,
   style,
+  className = "",
   children,
 }: {
   href?: string;
   style: CSSProperties;
+  className?: string;
   children: ReactNode;
 }) {
   if (!href) {
     return (
-      <div className={TARJETA} style={style}>
+      <div className={`${TARJETA} ${className}`} style={style}>
         {children}
       </div>
     );
   }
 
   return (
-    <Link href={href} className={TARJETA} style={style}>
+    <Link href={href} className={`${TARJETA} ${className}`} style={style}>
       {children}
     </Link>
   );
@@ -110,6 +113,7 @@ export async function ParagonWrap({
   games,
   esteAnio,
   juegosEsteAnio,
+  anual,
   handle,
   playerName,
   mejorMes,
@@ -121,6 +125,8 @@ export async function ParagonWrap({
   esteAnio: number;
   /** Juegos distintos tocados este año. NO es el tamaño de la biblioteca. */
   juegosEsteAnio: number;
+  /** El año en detalle (lib/wrapAnual.ts): mes a mes, metales, top, platinos... */
+  anual: WrapAnual;
   /**
    * El handle del perfil, para el botón de compartir. Opcional porque el
    * perfil de ejemplo (`/ejemplo`) no tiene una imagen que generar — ahí no
@@ -138,9 +144,10 @@ export async function ParagonWrap({
   rachas?: Rachas;
   percentil?: PercentilAnio | null;
 }) {
-  const t = await getTranslations("Perfil");
+  const [t, locale] = await Promise.all([getTranslations("Perfil"), getLocale()]);
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
+  const conAnio = esteAnio > 0;
 
   return (
     <section className="mb-10">
@@ -160,6 +167,7 @@ export async function ParagonWrap({
                 mejorMes: mejorMes ?? null,
                 rachas: rachas ?? { actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false },
                 percentil: percentil ?? null,
+                anual,
                 handle,
               }}
             />
@@ -174,47 +182,49 @@ export async function ParagonWrap({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Tarjeta
-          href={handle ? `/u/${handle}/wrap/generos` : undefined}
-          style={{
-            background: "linear-gradient(140deg, #3b1d6e, #1c1040 70%, #120a26)",
-            border: "1px solid rgba(167, 139, 250, 0.35)",
-          }}
-        >
-          <div className="absolute -right-4 -top-4 text-[5rem] opacity-10">🎮</div>
-          <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#c4b5fd" }}>
-            {t("ParagonWrap.generoMasJugado")}
-          </h3>
-          <p className="font-heading mb-2 text-3xl font-bold text-white">
-            {topGenre.count === 0 ? t("ParagonWrap.generoNinguno") : topGenre.name}
-          </p>
-          <p className="text-sm" style={{ color: "rgba(233, 226, 255, 0.8)" }}>
-            {topGenre.count === 0
-              ? t("ParagonWrap.sinGeneros")
-              : t("ParagonWrap.titulosDeGenero", { count: topGenre.count })}
-          </p>
+      {/* Rediseño (21 oct 2026): antes eran tres degradados de color con un
+          número cada uno. Ahora es un póster del año en mosaico: el mes a mes
+          y los metales, el juego con su carátula de verdad, el top de juegos
+          y los platinos del año con el trofeo más raro. */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
+        <Tarjeta href={handle ? `/u/${handle}/wrap/trofeos?rango=anio` : undefined} className="md:col-span-4" style={POSTER}>
+          <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(600px 260px at 0% 0%, rgb(var(--accent-rgb) / 0.22), transparent 70%)" }} />
+          <div className="relative">
+            <p className={ROTULO}>{t("ParagonWrap.tuAnio", { anio: anual.anio })}</p>
+            <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-1">
+              <p className="font-heading text-6xl font-bold leading-none text-white">{esteAnio.toLocaleString(locale)}</p>
+              <p className="pb-1 text-sm text-white/70">
+                {conAnio ? t("ParagonWrap.trofeosEnJuegos", { count: juegosEsteAnio }) : t("ParagonWrap.sinTrofeosEsteAnio")}
+              </p>
+            </div>
+            {conAnio && (
+              <>
+                <div className="mt-6">
+                  <BarrasMeses porMes={anual.porMes} locale={locale} alto={96} etiqueta={(mes, total) => t("ParagonWrap.mesTrofeos", { mes, total })} />
+                </div>
+                <div className="mt-5">
+                  <BarraMetales porMetal={anual.porMetal} etiquetaOtros={t("ParagonWrap.logrosSinMetal")} />
+                </div>
+              </>
+            )}
+          </div>
         </Tarjeta>
 
         <Tarjeta
           href={handle ? `/u/${handle}/wrap/${topGame?.horasTotal ? "horas" : "trofeos"}` : undefined}
-          style={{
-            background: topGame ? coverGradient(topGame.game.id) : "#131a26",
-            border: "1px solid rgba(125, 179, 255, 0.35)",
-          }}
+          className="flex min-h-[260px] flex-col justify-end md:col-span-2"
+          style={POSTER}
         >
-          <div className="absolute inset-0 bg-black/55" />
-          <div className="relative z-10">
-            <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#a8ccff" }}>
-              {t("ParagonWrap.juegoMasExprimido")}
-            </h3>
-            <p
-              className="font-heading mb-2 truncate text-2xl font-bold leading-tight text-white"
-              title={topGame?.game.title}
-            >
+          {topGame && (
+            <Caratula gameId={topGame.game.id} iconUrl={topGame.game.iconUrl ?? null} titulo={topGame.game.title} className="absolute inset-0" />
+          )}
+          <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(8,10,15,0.1) 0%, rgba(8,10,15,0.55) 45%, rgba(8,10,15,0.95) 100%)" }} />
+          <div className="relative">
+            <p className={ROTULO}>{t("ParagonWrap.juegoMasExprimido")}</p>
+            <p className="font-heading mt-1 line-clamp-2 text-2xl font-bold leading-tight text-white" title={topGame?.game.title}>
               {topGame?.game.title ?? t("ParagonWrap.generoNinguno")}
             </p>
-            <p className="text-sm font-medium" style={{ color: "rgba(219, 234, 254, 0.9)" }}>
+            <p className="mt-1 text-sm font-medium text-white/80">
               {topGame && topGame.horasTotal > 0
                 ? t("ParagonWrap.horasJugadas", { horas: topGame.horasTotal.toFixed(1) })
                 : t("ParagonWrap.trofeosConseguidos", { trofeos: topGame?.game.earnedTotal ?? 0 })}
@@ -222,34 +232,76 @@ export async function ParagonWrap({
           </div>
         </Tarjeta>
 
-        <Tarjeta
-          href={handle ? `/u/${handle}/wrap/trofeos?rango=anio` : undefined}
-          style={{
-            background: "linear-gradient(140deg, #5a3410, #3a1f08 70%, #241305)",
-            border: "1px solid rgba(251, 191, 36, 0.35)",
-          }}
-        >
-          <div className="absolute bottom-2 right-2 opacity-20">
-            <TrophyIcon grade="gold" size={60} />
-          </div>
-          <h3 className="mb-1 text-[0.8125rem] font-bold uppercase tracking-widest" style={{ color: "#fcd34d" }}>
-            {t("ParagonWrap.resumenDelAnio")}
-          </h3>
-          <div className="mb-2 flex items-end gap-2">
-            <p className="font-heading text-4xl font-bold text-white">{esteAnio}</p>
-            <p className="mb-1 text-sm" style={{ color: "rgba(254, 240, 199, 0.8)" }}>
-              {t("ParagonWrap.trofeos")}
-            </p>
-          </div>
-          {/* Antes aquí salía el tamaño de la biblioteca entera, que no tiene
-              nada que ver con este año. */}
-          <p className="text-sm" style={{ color: "rgba(254, 240, 199, 0.8)" }}>
-            {juegosEsteAnio === 0
-              ? t("ParagonWrap.sinTrofeosEsteAnio")
-              : t("ParagonWrap.repartidosEnJuegos", { count: juegosEsteAnio })}
-          </p>
-        </Tarjeta>
+        {conAnio && anual.topJuegos.length > 0 && (
+          <Tarjeta href={handle ? `/u/${handle}/wrap/trofeos?rango=anio` : undefined} className="md:col-span-3" style={POSTER}>
+            <p className={ROTULO}>{t("ParagonWrap.tusJuegosDelAnio")}</p>
+            <ol className="mt-4 flex flex-col gap-3">
+              {anual.topJuegos.map((j, i) => (
+                <li key={j.gameId} className="flex items-center gap-3">
+                  <span className="w-4 shrink-0 text-center font-heading text-sm font-bold text-white/50">{i + 1}</span>
+                  <Caratula gameId={j.gameId} iconUrl={j.iconUrl} titulo={j.titulo} className="h-10 w-10 shrink-0 rounded-lg" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="truncate text-sm font-semibold text-white">{j.titulo}</span>
+                      <span className="shrink-0 text-xs font-bold tabular-nums text-white/75">{j.trofeos.toLocaleString(locale)}</span>
+                    </div>
+                    <div className="mt-1.5 h-1 rounded-full bg-white/10">
+                      <div className="h-full rounded-full" style={{ width: `${Math.max(4, (j.trofeos / anual.topJuegos[0].trofeos) * 100)}%`, background: "rgb(var(--accent-rgb))" }} />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </Tarjeta>
+        )}
+
+        {conAnio && (
+          <Tarjeta href={handle ? `/u/${handle}/wrap/generos` : undefined} className="md:col-span-3" style={POSTER}>
+            {anual.platinos.length > 0 ? (
+              <>
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className={ROTULO}>{t("ParagonWrap.platinosDelAnio")}</p>
+                  <p className="font-heading text-3xl font-bold leading-none" style={{ color: "var(--platinum)" }}>{anual.platinos.length}</p>
+                </div>
+                <div className="mt-4 grid grid-cols-4 gap-2">
+                  {anual.platinos.slice(0, 8).map((p) => (
+                    <Caratula key={p.gameId} gameId={p.gameId} iconUrl={p.iconUrl} titulo={p.titulo} className="aspect-square rounded-lg ring-1 ring-[rgb(159_212_236/0.35)]" />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className={ROTULO}>{t("ParagonWrap.generoMasJugado")}</p>
+                <div className="mt-4">
+                  {anual.generos.length > 0 ? (
+                    <BarrasHorizontales filas={anual.generos.map((g) => ({ clave: g.nombre, etiqueta: g.nombre, valor: g.juegos }))} />
+                  ) : (
+                    <p className="text-sm text-white/70">{t("ParagonWrap.sinGeneros")}</p>
+                  )}
+                </div>
+              </>
+            )}
+            {anual.masRaro && (
+              <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
+                <TrophyIcon grade={anual.masRaro.grado ?? "gold"} size={28} />
+                <div className="min-w-0">
+                  <p className="text-[0.6875rem] font-bold uppercase tracking-widest text-white/55">{t("ParagonWrap.trofeoMasRaro")}</p>
+                  <p className="truncate text-sm font-semibold text-white">
+                    {anual.masRaro.nombre} <span className="font-normal text-white/60">· {anual.masRaro.juego}</span>
+                  </p>
+                </div>
+                <p className="ml-auto shrink-0 font-heading text-xl font-bold text-white">
+                  {anual.masRaro.rareza.toLocaleString(locale, { maximumFractionDigits: 1 })}%
+                </p>
+              </div>
+            )}
+          </Tarjeta>
+        )}
       </div>
     </section>
   );
 }
+
+/** Fondo de póster: siempre oscuro, en cualquier tema (ver el comentario de arriba). */
+const POSTER = { background: "linear-gradient(160deg, #141a24, #0b0f16)", border: "1px solid rgba(255,255,255,0.08)" } as const;
+const ROTULO = "text-[0.75rem] font-bold uppercase tracking-[0.14em] text-white/60";

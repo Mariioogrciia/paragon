@@ -278,7 +278,14 @@
     "resumenDelAnio": "Jahresrückblick",
     "trofeos": "Trophäen",
     "sinTrofeosEsteAnio": "Noch keine Trophäen mit Datum in diesem Jahr",
-    "repartidosEnJuegos": "Verteilt auf {count, plural, one {# Spiel} other {# Spiele}}"
+    "repartidosEnJuegos": "Verteilt auf {count, plural, one {# Spiel} other {# Spiele}}",
+    "tuAnio": "Dein {anio}",
+    "trofeosEnJuegos": "Trophäen in {count, plural, one {# Spiel} other {# Spielen}}",
+    "mesTrofeos": "{mes}: {total} Trophäen",
+    "logrosSinMetal": "Erfolge ohne Stufe",
+    "tusJuegosDelAnio": "Deine Spiele des Jahres",
+    "platinosDelAnio": "Platin in diesem Jahr",
+    "trofeoMasRaro": "Deine seltenste Trophäe"
   },
   "WrapStories": {
     "cerrar": "Schließen",
@@ -318,7 +325,18 @@
       "octubre": "Oktober",
       "noviembre": "November",
       "diciembre": "Dezember"
-    }
+    },
+    "mesAMes": "Monat für Monat",
+    "mejorMesTexto": "{mes} war dein bester Monat: {total} Trophäen",
+    "mesTrofeos": "{mes}: {total} Trophäen",
+    "metalesTitulo": "Deine Trophäen nach Stufe",
+    "logrosSinMetal": "Erfolge ohne Stufe",
+    "topJuegosTitulo": "Deine Spiele des Jahres",
+    "platinosTitulo": "Platin in diesem Jahr",
+    "platinosCount": "{count, plural, one {# Platin} other {# Platin}}",
+    "raroTitulo": "Deine seltenste Trophäe",
+    "raroTexto": "Nur<br></br><b>{rareza} %</b><br></br>der Spieler dieses Spiels haben sie",
+    "generosNota": "Spiele mit einer Trophäe in diesem Jahr, nach Genre"
   },
   "WrapStoriesButton": {
     "verWrapCompleto": "Ganzen Wrap ansehen"

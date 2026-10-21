@@ -6,6 +6,35 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct (6) — Wrap rediseñado**. El usuario: "son fotos con color de fondo
+y letras". Antes: tres degradados con un número cada uno, y unas historias
+igual (degradado + emoji + número).
+- `lib/wrapAnual.ts`: el año en detalle desde `user_trophy.earnedAt` (año
+  natural): mes a mes, reparto por metal, top 5 de juegos con carátula,
+  platinos del año, trofeo más raro (con su metal) y top 3 de géneros. Seis
+  consultas agrupadas en SQL, en paralelo.
+- `components/wrap/GraficasWrap.tsx`: `BarrasMeses` (una serie, columnas
+  finas, el mejor mes del año destacado y rotulado; con empate, el más
+  reciente — `mejorMesDe`, que también usa el texto), `BarraMetales`
+  (apilada con 2px de hueco; cada metal con su icono y su cifra, nunca solo
+  color — colores comprobados con el validador de la guía de dataviz),
+  `Caratula`, `BarrasHorizontales`.
+- Perfil: mosaico tipo póster (tu año con el mes a mes y los metales, el
+  juego más exprimido con su carátula a sangre, el top 5 y los platinos del
+  año con el trofeo más raro).
+- Historias: portada y cierre con mosaico de tus carátulas, mes a mes
+  animado, metales, top 5, juego con su carátula difuminada de fondo,
+  platinos, trofeo más raro, géneros, racha y percentil; contador animado
+  y entrada escalonada (todo sin movimiento con `prefers-reduced-motion`).
+  Arreglado de paso: el cierre llamaba a `onClose` dentro del actualizador
+  de `setIndex` (aviso de React "Cannot update a component while rendering").
+- Imagen para compartir (`/api/wrap/[handle]`) a juego; las carátulas se
+  bajan antes como data URL (3 s, PNG/JPEG) porque Satori tumba la imagen
+  entera si una URL falla.
+- `/ejemplo` tiene su Wrap de ejemplo (`DEMO_WRAP` en lib/demo.ts).
+Comprobado con capturas en local (6 juegos de prueba con carátulas
+generadas y 127 trofeos repartidos por el año), escritorio y móvil.
+
 **21 oct (5) — NPSSO: limpiar el valor y "Comprobar ahora"**. El usuario
 renovó el NPSSO y seguía saliendo "ha caducado". Causas probables: el valor
 pegado con comillas/JSON/espacios (Sony lo rechaza) o no redesplegar tras

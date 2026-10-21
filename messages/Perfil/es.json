@@ -278,7 +278,14 @@
     "resumenDelAnio": "Resumen del año",
     "trofeos": "trofeos",
     "sinTrofeosEsteAnio": "Aún no hay trofeos con fecha de este año",
-    "repartidosEnJuegos": "Repartidos en {count, plural, one {# juego} other {# juegos}}"
+    "repartidosEnJuegos": "Repartidos en {count, plural, one {# juego} other {# juegos}}",
+    "tuAnio": "Tu {anio}",
+    "trofeosEnJuegos": "trofeos en {count, plural, one {# juego} other {# juegos}}",
+    "mesTrofeos": "{mes}: {total} trofeos",
+    "logrosSinMetal": "logros sin metal",
+    "tusJuegosDelAnio": "Tus juegos del año",
+    "platinosDelAnio": "Platinos del año",
+    "trofeoMasRaro": "Tu trofeo más raro"
   },
   "WrapStories": {
     "cerrar": "Cerrar",
@@ -318,7 +325,18 @@
       "octubre": "Octubre",
       "noviembre": "Noviembre",
       "diciembre": "Diciembre"
-    }
+    },
+    "mesAMes": "Mes a mes",
+    "mejorMesTexto": "{mes} fue tu mejor mes: {total} trofeos",
+    "mesTrofeos": "{mes}: {total} trofeos",
+    "metalesTitulo": "Tus trofeos, por metal",
+    "logrosSinMetal": "logros sin metal",
+    "topJuegosTitulo": "Tus juegos del año",
+    "platinosTitulo": "Platinos del año",
+    "platinosCount": "{count, plural, one {# platino} other {# platinos}}",
+    "raroTitulo": "Tu trofeo más raro",
+    "raroTexto": "Solo lo tiene el<br></br><b>{rareza}%</b><br></br>de quienes juegan a ese juego",
+    "generosNota": "Juegos con algún trofeo este año, por género"
   },
   "WrapStoriesButton": {
     "verWrapCompleto": "Ver Wrap completo"
