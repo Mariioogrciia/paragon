@@ -374,7 +374,9 @@
     "idiomaDesconocido": "Sprache nicht angegeben",
     "principal": "Haupt",
     "oficial": "Offiziell",
-    "otrosPartidos": "Weitere Spiele dieser Phase"
+    "otrosPartidos": "Weitere Spiele dieser Phase",
+    "directoCargar": "Stream ansehen",
+    "directoAviso": "Beim Klick wird der Player von {servicio} geladen, der eigene Cookies verwenden kann."
   },
   "PlatinosOferta": {
     "titulo": "Platin im Angebot",

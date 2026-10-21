@@ -13,9 +13,7 @@ import { TrophyIcon } from "@/components/TrophyIcon";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 import { PublicarEstado } from "@/components/PublicarEstado";
 
-export const metadata = {
-  title: "Comunidad - Paragon",
-};
+export const metadata = { title: "Comunidad · Paragon" };
 
 const TARJETA = "w-[82vw] max-w-[320px] shrink-0 snap-start rounded-[18px] border border-border bg-surface p-4 lg:w-auto lg:max-w-none";
 const POR_PAGINA = 20;

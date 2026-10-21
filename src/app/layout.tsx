@@ -48,7 +48,11 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
 });
 
-const DESCRIPCION = "Tu progreso de trofeos y logros multiplataforma, en un solo sitio.";
+// Lo que enseña Google bajo el título (21 oct 2026): con las palabras que
+// busca la gente ("trofeos", "logros", "platino") y las tres plataformas.
+const TITULO = "Paragon · Trofeos de PlayStation y logros de Steam y Xbox";
+const DESCRIPCION =
+  "Todos tus trofeos de PlayStation y logros de Steam y Xbox en un solo perfil: platinos, rareza, estadísticas, ligas con amigos y guías. Gratis, en la web y en el móvil.";
 
 /**
  * `metadataBase` NO es opcional en cuanto hay imagenes sociales: sin el,
@@ -70,8 +74,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(DOMINIO),
-  title: "Paragon",
+  title: TITULO,
   description: DESCRIPCION,
+  applicationName: "Paragon",
   // Valores por defecto para CUALQUIER pagina que no declare los suyos.
   // Antes la app no tenia nada de openGraph en ningun sitio, asi que
   // compartir un enlace de Paragon dejaba un enlace pelado.
@@ -79,12 +84,12 @@ export const metadata: Metadata = {
     siteName: "Paragon",
     locale: "es_ES",
     type: "website",
-    title: "Paragon",
+    title: TITULO,
     description: DESCRIPCION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Paragon",
+    title: TITULO,
     description: DESCRIPCION,
   },
   // El propio archivo `app/manifest.ts` ya hace que Next sirva

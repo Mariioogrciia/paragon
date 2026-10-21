@@ -374,7 +374,9 @@
     "idiomaDesconocido": "Language not given",
     "principal": "Main",
     "oficial": "Official",
-    "otrosPartidos": "More matches in this stage"
+    "otrosPartidos": "More matches in this stage",
+    "directoCargar": "Watch the stream",
+    "directoAviso": "Pressing it loads the {servicio} player, which may use its own cookies."
   },
   "PlatinosOferta": {
     "titulo": "Platinums on sale",

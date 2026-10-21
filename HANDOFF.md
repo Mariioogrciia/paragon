@@ -98,6 +98,10 @@ perfil privado.
      (verificación por TXT en Cloudflare) y enviar
      `https://www.paragontrophies.com/sitemap.xml`. Bing Webmaster Tools:
      importar desde Search Console.
+   - El cliente OAuth de Google **no está** en el proyecto de Google Cloud
+     "Paragon" (paragon-d5455, el de Firebase): está en otro. Para dar con
+     él, el número del principio de `AUTH_GOOGLE_ID` (Vercel) es el número
+     del proyecto: buscarlo en el selector de proyectos de Google Cloud.
    - La extensión 1.2.0 y una APK nueva ya usan el dominio; las instaladas
      siguen funcionando por `platinos-nine.vercel.app` (/api y /movil no
      redirigen).
@@ -183,6 +187,13 @@ Mientras no exista `NEXT_PUBLIC_ADSENSE_CLIENT` no se carga nada de Google,
 6. Opcional: "Anuncios automáticos" en AdSense; no hace falta tocar código.
 7. **Vercel Pro** (~20 $/mes) en cuanto haya anuncios: Hobby es solo para
    uso no comercial.
+**Aviso legal (LSSI) antes de los anuncios**: en España, una web personal
+con anuncios es un "servicio de la sociedad de la información" y el art. 10
+de la LSSI pide un aviso legal con nombre, **NIF**, **domicilio** y correo.
+Hoy no hace falta (no hay actividad económica), y por eso no está: son datos
+personales que el usuario tiene que decidir publicar. Al encender AdSense o
+AdMob, añadir una página `/aviso-legal` con ellos (o una dirección postal
+de empresa si la hay).
 Con anuncios activos, el aviso de cookies propio se oculta (lo sustituye el
 de Google) y `/privacidad` y `/cookies` cambian solos su texto para nombrar
 a Google y sus socios. La app de Android lleva AdMob igual de preparado y

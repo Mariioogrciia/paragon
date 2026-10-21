@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { metaPublica } from "@/lib/seo";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
 import { datosPerfil } from "@/lib/datosEstructurados";
@@ -95,12 +96,8 @@ export async function generateMetadata({
           juegos: stats.juegos.toLocaleString(locale),
         });
 
-  return {
-    title: titulo,
-    description: descripcion,
-    openGraph: { title: titulo, description: descripcion, type: "profile" },
-    twitter: { card: "summary_large_image", title: titulo, description: descripcion },
-  };
+  const meta = metaPublica(`/u/${handle}`, titulo, descripcion);
+  return { ...meta, openGraph: { ...meta.openGraph, type: "profile" } };
 }
 
 export default async function PerfilPage({

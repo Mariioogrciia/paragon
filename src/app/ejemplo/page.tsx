@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { metaPublica } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import { GameCard } from "@/components/GameCard";
@@ -14,7 +15,11 @@ import { BackButton } from "@/components/BackButton";
 import { AvatarFrame } from "@/components/AvatarFrame";
 import { PlatformBanner } from "@/components/BannerPresets";
 
-export const metadata = { title: "Perfil de ejemplo · Paragon" };
+export const metadata = metaPublica(
+  "/ejemplo",
+  "Perfil de ejemplo · Paragon",
+  "Así se ve un perfil de Paragon: trofeos y logros de todas tus plataformas, platinos, rarezas y estadísticas en una sola página.",
+);
 
 const DEMO_INSIGNIAS = ["first_blood", "cazador", "multiplataforma", "rolero", "joya_rara"].map((badgeId) => ({ badgeId, earnedAt: new Date("2026-09-01") }));
 

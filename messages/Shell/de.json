@@ -54,8 +54,8 @@
   },
   "CookieBanner": {
     "ariaLabel": "Cookie-Hinweis",
-    "texto": "Wir verwenden nur das unbedingt nötige Cookie, das dich eingeloggt hält — keine Werbe-Cookies, und die Nutzungsanalyse, die wir erfassen, identifiziert oder verfolgt dich nicht. Mehr Details unter <cookiesLink>Cookies</cookiesLink>.",
-    "textoCorto": "Nur ein Sitzungs-Cookie: keine Werbung, kein Tracking. <cookiesLink>Details</cookiesLink>",
+    "texto": "Wir verwenden nur technische Cookies: die, die dich eingeloggt halten, und das, das sich deine Sprache merkt — keine Werbe-Cookies, und die Nutzungsanalyse, die wir erfassen, identifiziert oder verfolgt dich nicht. Mehr Details unter <cookiesLink>Cookies</cookiesLink>.",
+    "textoCorto": "Nur technische Cookies (Sitzung und Sprache): keine Werbung, kein Tracking. <cookiesLink>Details</cookiesLink>",
     "entendido": "Verstanden"
   },
   "BackButton": {
@@ -484,7 +484,7 @@
   },
   "Privacidad": {
     "titulo": "Datenschutzerklärung",
-    "ultimaActualizacion": "Zuletzt aktualisiert: September 2026",
+    "ultimaActualizacion": "Zuletzt aktualisiert: Oktober 2026",
     "s1t": "Wer deine Daten verarbeitet",
     "s1": "Paragon ist ein persönliches Projekt von <strong>Mario García</strong>, kein Unternehmen. Im Sinne der Datenschutz-Grundverordnung (DSGVO) ist Mario García der Verantwortliche für die hier beschriebene Datenverarbeitung. Du kannst dich bei Fragen oder um deine Rechte auszuüben (Abschnitt 6) an <email>mario.meca2005@gmail.com</email> wenden.",
     "s2t": "Welche Daten wir erheben",
@@ -504,10 +504,10 @@
     "s4t": "Mit wem geteilt wird, und warum",
     "s4intro": "Keine deiner Daten wird verkauft. Es gibt aber technische Dienste, die sie für uns verarbeiten oder von denen wir öffentliche Daten lesen:",
     "s4li1": "<strong>Vercel</strong> hostet die Anwendung. <strong>Supabase</strong> hostet die Datenbank. Beide agieren als Auftragsverarbeiter, nicht als Eigentümer deiner Daten.",
-    "s4li2": "<strong>Google und Discord</strong>, nur für die Anmeldung (OAuth) — sie erhalten keine Trophäendaten oder Informationen zu deiner Aktivität in Paragon.",
-    "s4li3": "<strong>PlayStation Network, Steam und Xbox</strong> (Letzteres über einen inoffiziellen Drittanbieter-Dienst): von dort werden deine öffentlichen Trophäendaten <em>gelesen</em>, es wird ihnen nie etwas gesendet.",
+    "s4li2": "<strong>Google und Discord</strong> für die Anmeldung (OAuth): Sie erhalten keine Daten über deine Aktivität auf Paragon. Wenn du Nachrichten vom Discord-Bot aktivierst, erhält Discord außerdem den Text dieser Benachrichtigungen (zum Beispiel eine neue Trophäe), um sie dir zuzustellen.",
+    "s4li3": "<strong>PlayStation Network, Steam und Xbox</strong>: Dort werden deine öffentlichen Trophäen- und Erfolgsdaten <em>gelesen</em>. Für die Abfrage wird nur deine öffentliche Kennung auf der Plattform gesendet (bei Xbox über OpenXBL, einen inoffiziellen Drittanbieter).",
     "s4li4": "<strong>IGDB, PowerPyx, HowLongToBeat, YouTube und IsThereAnyDeal</strong>: Quellen, aus denen öffentliche Informationen über die Spiele selbst gelesen werden (Cover, Genres, Guides, Durchspielzeiten, Preise) — sie erhalten keine Daten von dir, wir fragen sie nur nach Informationen zu einem Spiel.",
-    "s4li5": "<strong>Der Push-Benachrichtigungsdienst deines eigenen Browsers</strong> (zum Beispiel Firebase Cloud Messaging in Chrome), nur wenn du Hinweise aktivierst — das ist der Standardmechanismus des Webs, nichts Paragon-Eigenes.",
+    "s4li5": "<strong>Die Benachrichtigungsdienste</strong>, nur wenn du Benachrichtigungen aktivierst: der deines Browsers (zum Beispiel Firebase Cloud Messaging in Chrome), Firebase Cloud Messaging (Google) in der Android-App und der von Apple (APNs) auf dem iPhone. Sie erhalten eine Gerätekennung und den Text der Benachrichtigung.",
     "s5t": "Wie lange sie aufbewahrt werden",
     "s5": "Solange dein Konto existiert. Löschst du es (Abschnitt 6), werden deine verknüpften Plattformkonten, deine privaten Notizen, dein Push-Abo und dein Discord-Webhook mitgelöscht. Öffentliche Inhalte, die du mit anderen geteilt hast (Rezensionen, Kommentare, Guides), können anonymisiert statt vollständig gelöscht werden, wenn die vollständige Löschung ein fremdes Gespräch zerstören würde.",
     "s6t": "Deine Rechte",
@@ -521,7 +521,12 @@
     "s9": "Ändert sich diese Richtlinie wesentlich, wird das Datum oben aktualisiert und, wenn die Änderung wichtig ist, innerhalb der App selbst darauf hingewiesen.",
     "s3pAnuncios": "Wir verkaufen oder vermieten deine personenbezogenen Daten <strong>niemals</strong>. Paragon zeigt Anzeigen von Google: auf der Website kann Google Cookies und Kennungen verwenden, in der Android-App die Werbe-ID des Geräts, um sie anzuzeigen und zu messen, nur soweit du im Einwilligungshinweis zustimmst (siehe <cookiesLink>Cookie-Richtlinie</cookiesLink>). Besuche messen wir aggregiert und anonym mit Vercel Analytics, ohne Cookies.",
     "s4liAnuncios": "<strong>Google AdSense</strong> (Google Ireland Ltd.), um Anzeigen auf der Website zu zeigen, mit den Cookies und Kennungen, die du im Einwilligungshinweis erlaubst.",
-    "s4liAdMob": "<strong>Google AdMob</strong> (Google Ireland Ltd.), um Anzeigen in der Android-App zu zeigen, mit der Werbe-ID des Geräts, soweit du es im Einwilligungshinweis der App erlaubst (änderbar unter Einstellungen → Datenschutz bei Anzeigen)."
+    "s4liAdMob": "<strong>Google AdMob</strong> (Google Ireland Ltd.), um Anzeigen in der Android-App zu zeigen, mit der Werbe-ID des Geräts, soweit du es im Einwilligungshinweis der App erlaubst (änderbar unter Einstellungen → Datenschutz bei Anzeigen).",
+    "s3baseT": "Auf welcher Rechtsgrundlage",
+    "s3base1": "<strong>Dein Konto, deine Statistiken, Freunde, Ligen und was du veröffentlichst:</strong> Das ist der Dienst, den du bei der Registrierung anforderst, und ohne diese Daten kann er nicht erbracht werden (Vertragserfüllung, Art. 6 Abs. 1 lit. b DSGVO).",
+    "s3base2": "<strong>Push-Benachrichtigungen, Nachrichten vom Discord-Bot und personalisierte Anzeigen:</strong> deine Einwilligung (Art. 6 Abs. 1 lit. a), die du jederzeit unter Einstellungen → Benachrichtigungen oder im Datenschutzhinweis der Anzeigen widerrufen kannst, ohne dass das Vorherige berührt wird.",
+    "s3base3": "<strong>Sicherheit, Missbrauchsschutz (etwa Anfragelimits) und anonyme Besuchsstatistik:</strong> das berechtigte Interesse, den Dienst sicher zu halten und zu wissen, welche Teile genutzt werden (Art. 6 Abs. 1 lit. f). Du kannst widersprechen, indem du an die Adresse aus Abschnitt 1 schreibst.",
+    "s4transfer": "Einige dieser Anbieter haben ihren Sitz in den USA oder können Daten dort verarbeiten (Vercel, Supabase, Google, Discord). Diese Übermittlungen stützen sich auf das EU-US Data Privacy Framework (Angemessenheitsbeschluss der Europäischen Kommission vom Juli 2023) bei zertifizierten Unternehmen oder auf die von der Kommission genehmigten Standardvertragsklauseln."
   },
   "Terminos": {
     "titulo": "Allgemeine Geschäftsbedingungen",
@@ -549,9 +554,9 @@
   },
   "Cookies": {
     "titulo": "Cookie-Richtlinie",
-    "ultimaActualizacion": "Zuletzt aktualisiert: September 2026",
+    "ultimaActualizacion": "Zuletzt aktualisiert: Oktober 2026",
     "s1t": "Die Kurzfassung",
-    "s1": "Paragon <strong>verwendet keine Werbe- oder Analyse-Cookies</strong>. Es gibt kein Tracking-Pixel, kein Google Analytics, keine eingebetteten Social-Media-Widgets, die dir folgen könnten. Es gibt nur ein Cookie, und das ist das, das deine Sitzung angemeldet hält — die Nutzungsanalyse, die wir tatsächlich erfassen (siehe unten), verwendet keine Cookies und identifiziert dich nicht.",
+    "s1": "Paragon <strong>verwendet keine Werbe- oder Analyse-Cookies</strong>. Es gibt keine Tracking-Pixel und kein Google Analytics. Nur technische Cookies: die, die dich angemeldet halten, und das, das sich deine gewählte Sprache merkt (unten einzeln). Die Nutzungsanalyse, die wir durchführen, verwendet keine Cookies und identifiziert dich nicht.",
     "s2t": "Sitzungscookie (unbedingt notwendig)",
     "s2": "Wenn du dich mit Google oder Discord anmeldest, speichert Paragon ein technisches Cookie (verwaltet von Auth.js), das deine Sitzung identifiziert, damit du dich nicht auf jeder Seite neu anmelden musst. Es ist strikt notwendig, damit die App funktioniert — ohne es kann kein Konto angemeldet bleiben — und braucht deshalb keine separate Zustimmung: Die Cookie-Regelungen (spanische Umsetzung der ePrivacy-Richtlinie, LSSI-CE) nehmen unbedingt notwendige technische oder betriebliche Cookies aus.",
     "s3t": "Lokaler Speicher (keine Cookies)",
@@ -565,9 +570,17 @@
     "s6": "Um zu erfahren, welche personenbezogenen Daten verarbeitet werden und wofür, sieh dir die <privacidadLink>Datenschutzerklärung</privacidadLink> und die <terminosLink>Allgemeine Geschäftsbedingungen</terminosLink> an.",
     "s6privacidadLink": "Datenschutzerklärung",
     "s6terminosLink": "Allgemeine Geschäftsbedingungen",
-    "s1Anuncios": "Paragon zeigt <strong>Anzeigen von Google AdSense</strong> und nutzt Werbe-Cookies nur, wenn du sie im Einwilligungshinweis akzeptierst. Ohne deine Erlaubnis sind die Anzeigen nicht personalisiert. Dazu kommt das Cookie, das dich angemeldet hält; die Nutzungsanalyse (siehe unten) verwendet keine Cookies und identifiziert dich nicht.",
+    "s1Anuncios": "Paragon zeigt <strong>Anzeigen von Google AdSense</strong> und verwendet Werbe-Cookies nur, wenn du im Einwilligungshinweis zustimmst. Ohne deine Erlaubnis sind die Anzeigen nicht personalisiert. Dazu kommen die technischen Sitzungs- und Sprach-Cookies (unten einzeln); die Nutzungsanalyse verwendet keine Cookies und identifiziert dich nicht.",
     "sAnunciosT": "Werbung (Google AdSense)",
-    "sAnuncios": "Die Anzeigen liefert Google AdSense. Bevor etwas nicht Notwendiges geladen wird, fragt ein zertifizierter Einwilligungshinweis (der von Google, IAB-TCF-kompatibel), was du erlaubst: personalisierte Anzeigen, nicht personalisierte oder nichts über das Nötige hinaus. Google und seine Partner können Cookies und Kennungen verwenden, um Anzeigen entsprechend deiner Wahl anzuzeigen und zu messen. Du kannst sie jederzeit mit „Cookies verwalten“ in der Fußzeile jeder Seite ändern. Mehr dazu, <googleLink>wie Google Informationen von Websites nutzt, die seine Dienste verwenden</googleLink>."
+    "sAnuncios": "Die Anzeigen liefert Google AdSense. Bevor etwas nicht Notwendiges geladen wird, fragt ein zertifizierter Einwilligungshinweis (der von Google, IAB-TCF-kompatibel), was du erlaubst: personalisierte Anzeigen, nicht personalisierte oder nichts über das Nötige hinaus. Google und seine Partner können Cookies und Kennungen verwenden, um Anzeigen entsprechend deiner Wahl anzuzeigen und zu messen. Du kannst sie jederzeit mit „Cookies verwalten“ in der Fußzeile jeder Seite ändern. Mehr dazu, <googleLink>wie Google Informationen von Websites nutzt, die seine Dienste verwenden</googleLink>.",
+    "sListaT": "Die Cookies im Einzelnen",
+    "sListaIntro": "Alle sind eigene Cookies (gesetzt von paragontrophies.com) und technisch, daher ist keine Einwilligung nötig:",
+    "sLista1": "<c>authjs.session-token</c>: hält dich angemeldet. Gilt bis zu 30 Tage oder bis du dich abmeldest.",
+    "sLista2": "<c>authjs.csrf-token</c>: schützt die Anmeldung vor gefälschten Anfragen anderer Websites. Wird beim Schließen des Browsers gelöscht.",
+    "sLista3": "<c>authjs.callback-url</c>: zu welcher Seite du nach der Anmeldung zurückkehrst. Wird beim Schließen des Browsers gelöscht.",
+    "sLista4": "<c>NEXT_LOCALE</c>: die Sprache, die du auf der Website wählst. Gilt ein Jahr. Es ist eine Einstellung, die du selbst wählst, daher ist sie ausgenommen.",
+    "sTercerosT": "Inhalte anderer Dienste, die du lädst",
+    "sTerceros": "Die Videos der Guides werden nur dann von youtube-nocookie.com (YouTubes erweiterter Datenschutzmodus) abgespielt, wenn du ein Video öffnest, und eSports-Streams (Twitch, YouTube oder Kick) nur, wenn du auf „Stream ansehen“ drückst. Ab dann können diese Dienste nach ihren eigenen Richtlinien eigene Cookies oder Speicher verwenden."
   },
   "NoEncontrado": {
     "titulo": "Hier ist nichts",

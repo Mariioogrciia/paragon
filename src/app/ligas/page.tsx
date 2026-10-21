@@ -1,4 +1,5 @@
 import { getLigaMensual } from "@/lib/ligas";
+import { metaPublica } from "@/lib/seo";
 import { listUserLeagues, listPendingLeagueInvites } from "@/lib/leagues";
 import { getMonthlyLeagueHistory } from "@/lib/trophyCase";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -14,9 +15,11 @@ import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actio
 import { SeccionTabs } from "@/components/SeccionTabs";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 
-export const metadata = {
-  title: "Liga Mensual - Paragon",
-};
+export const metadata = metaPublica(
+  "/ligas",
+  "Liga mensual de cazadores de trofeos · Paragon",
+  "La clasificación de este mes: quién saca más trofeos y platinos en PlayStation, Steam y Xbox. Crea ligas con tus amigos.",
+);
 
 export default async function LigasPage({ searchParams }: { searchParams: Promise<{ pagina?: string }> }) {
   const t = await getTranslations("Perfil");

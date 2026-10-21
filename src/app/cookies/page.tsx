@@ -1,11 +1,16 @@
 import React from "react";
+import { metaPublica } from "@/lib/seo";
 import Link from "next/link";
 import { anunciosActivos } from "@/lib/publicidad";
 import { GestionarConsentimiento } from "@/components/GestionarConsentimiento";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 
-export const metadata = { title: "Cookies · Paragon" };
+export const metadata = metaPublica(
+  "/cookies",
+  "Política de cookies · Paragon",
+  "Qué cookies y almacenamiento usa Paragon, para qué sirve cada uno y cuánto duran.",
+);
 
 export default async function CookiesPage() {
   const t = await getTranslations("Shell.Cookies");
@@ -56,6 +61,25 @@ export default async function CookiesPage() {
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">{t("s2t")}</h2>
         <p className="text-muted">{t("s2")}</p>
+      </section>
+
+      {/* Cada cookie con su nombre, para qué y cuánto dura (21 oct 2026): lo
+          pide la guía de cookies de la AEPD. Si se añade una, va aquí. */}
+      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
+        <h2 className="text-lg font-bold text-foreground">{t("sListaT")}</h2>
+        <p className="text-muted">{t("sListaIntro")}</p>
+        <ul className="list-disc space-y-1.5 pl-5 text-muted">
+          {(["sLista1", "sLista2", "sLista3", "sLista4"] as const).map((clave) => (
+            <li key={clave}>
+              {t.rich(clave, { c: (chunks) => <code className="rounded bg-surface-2 px-1.5 py-0.5 text-xs">{chunks}</code> })}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
+        <h2 className="text-lg font-bold text-foreground">{t("sTercerosT")}</h2>
+        <p className="text-muted">{t("sTerceros")}</p>
       </section>
 
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">

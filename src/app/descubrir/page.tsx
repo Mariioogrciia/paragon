@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { metaPublica } from "@/lib/seo";
 import Link from "next/link";
 import { HuecoAnuncio } from "@/components/HuecoAnuncio";
 import { getTranslations } from "next-intl/server";
@@ -14,9 +15,11 @@ import { novedades as getNovedades, destacadosRecientes, releaseLabelEs, IgdbNot
 import { BackButton } from "@/components/BackButton";
 import { SeccionTabs } from "@/components/SeccionTabs";
 
-export const metadata = {
-  title: "Descubrir · Paragon",
-};
+export const metadata = metaPublica(
+  "/descubrir",
+  "Descubrir juegos y trofeos · Paragon",
+  "Los juegos que más se platinan, los trofeos más raros y lo que está jugando la comunidad de Paragon en PlayStation, Steam y Xbox.",
+);
 
 export default async function DescubrirPage() {
   const t = await getTranslations("Descubrir.DescubrirPage");

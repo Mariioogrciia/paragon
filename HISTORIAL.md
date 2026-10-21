@@ -6,6 +6,36 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct (2) — SEO, seguridad y textos legales con el dominio nuevo**.
+- SEO: `lib/seo.ts` (`metaPublica`): título, descripción y **URL canónica**
+  en la portada y todas las páginas públicas (descubrir y sus plataformas,
+  noticias, ligas, eSports, cómo funciona, ejemplo, fichas de juego,
+  perfiles y páginas legales). Títulos con lo que busca la gente ("Trofeos
+  de X", "Logros de X") y separador único "·". Título y descripción por
+  defecto nuevos en el layout. Sitemap: fuera `/feed` (pide sesión), dentro
+  `/esports`, y sin `lastModified` falso (era siempre "ahora"). robots.txt:
+  también fuera las páginas que piden sesión (amigos, enfoque, feed,
+  movil, vincular, recomendaciones).
+- Seguridad: HSTS con `includeSubDomains` (sin preload), CSP con
+  `object-src 'none'` y `base-uri 'self'` además de `frame-ancestors`, COOP
+  `same-origin-allow-popups`, y `/.well-known/security.txt` (RFC 9116) que
+  remite a /privacidad. `npm audit --omit=dev`: solo los 2 moderados de
+  `uuid` ya conocidos (13 oct).
+- Cookies (guía de la AEPD): el directo de un partido de eSports se cargaba
+  solo al abrir la página y metía cookies de Twitch/YouTube sin ninguna
+  acción; ahora es un botón "Ver el directo" que avisa de qué se carga.
+  /cookies lista cada cookie (`authjs.session-token`, `authjs.csrf-token`,
+  `authjs.callback-url`, `NEXT_LOCALE`) con su fin y duración, y explica
+  los vídeos de YouTube (nocookie, al abrirlos) y los directos. Antes decía
+  "solo hay una cookie", y el aviso de cookies igual: corregidos.
+- Privacidad (RGPD art. 13): base legal de cada uso (contrato,
+  consentimiento, interés legítimo), transferencias a EE. UU. (Marco de
+  Privacidad de Datos UE-EE. UU. o cláusulas tipo), y arreglos: Discord
+  recibe el texto de los DM del bot, a OpenXBL/PSN/Steam se les envía el
+  identificador público, y los avisos de la app pasan por FCM y APNs.
+- Pendiente del usuario: aviso legal (LSSI) con NIF y domicilio cuando haya
+  anuncios (ver HANDOFF).
+
 **21 oct — dominio propio: `www.paragontrophies.com`**. Comprado por el
 usuario en Cloudflare (DNS en gris hacia Vercel; Vercel pone el `www` de
 principal y redirige el dominio sin www a él).

@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { metaPublica } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { getWishlistIgdbIds } from "@/lib/manualGames";
 import { getProfileByUserId, getLibrary } from "@/lib/profiles";
@@ -9,9 +10,11 @@ import { TarjetaNoticia } from "@/components/TarjetaNoticia";
 import { TeletipoNoticias } from "@/components/TeletipoNoticias";
 import { SeccionTabs } from "@/components/SeccionTabs";
 
-export const metadata = {
-  title: "Noticias y Lanzamientos - Paragon",
-};
+export const metadata = metaPublica(
+  "/noticias",
+  "Noticias y lanzamientos de videojuegos · Paragon",
+  "Próximos lanzamientos de PlayStation, Xbox y PC y las noticias de los juegos que sigues, con sus trofeos y logros.",
+);
 
 
 export default async function NoticiasPage() {

@@ -374,7 +374,9 @@
     "idiomaDesconocido": "Idioma sin indicar",
     "principal": "Principal",
     "oficial": "Oficial",
-    "otrosPartidos": "Más partidos de esta fase"
+    "otrosPartidos": "Más partidos de esta fase",
+    "directoCargar": "Ver el directo",
+    "directoAviso": "Al pulsar se carga el reproductor de {servicio}, que puede usar sus propias cookies."
   },
   "PlatinosOferta": {
     "titulo": "Platinos de oferta",

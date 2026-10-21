@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { metaPublica } from "@/lib/seo";
 import { notFound, redirect } from "next/navigation";
 import { HuecoAnuncio } from "@/components/HuecoAnuncio";
 import { JsonLd } from "@/components/JsonLd";
@@ -54,18 +55,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const game = await getGlobalGame(decodeURIComponent(id));
   if (!game) return { title: "Juego · Paragon" };
 
-  const titulo = `${game.title} · Paragon`;
+  const titulo = `${game.hasPlatinum ? "Trofeos" : "Logros"} de ${game.title} · Paragon`;
   const partes = [game.developer ?? game.publisher, (game.genres ?? []).slice(0, 2).join(", ")].filter(Boolean);
   const descripcion = game.hasPlatinum
     ? `Trofeos, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`
     : `Logros, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`;
 
-  return {
-    title: titulo,
-    description: descripcion,
-    openGraph: { title: titulo, description: descripcion, type: "article" as const },
-    twitter: { card: "summary_large_image" as const, title: titulo, description: descripcion },
-  };
+  return metaPublica(`/juego/${id}`, titulo, descripcion);
 }
 
 export default async function JuegoGlobalPage({

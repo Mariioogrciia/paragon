@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { metaPublica } from "@/lib/seo";
 import { formatDistanceToNow } from "date-fns";
 import { es, enUS, de, fr } from "date-fns/locale";
 import { auth } from "@/auth";
@@ -14,9 +15,11 @@ import { FavoritosProvider } from "@/components/esports/Favoritos";
 import { PestanasNoticias } from "@/components/esports/PestanasNoticias";
 import { Escudo } from "@/components/esports/Escudo";
 
-export const metadata = {
-  title: "eSports - Paragon",
-};
+export const metadata = metaPublica(
+  "/esports",
+  "eSports: partidos, resultados y directos · Paragon",
+  "Partidos de hoy y próximos de League of Legends, Valorant, CS2 y más, con resultados y directos.",
+);
 
 const DATE_FNS_LOCALES = { es, en: enUS, de, fr } as const;
 const ORDEN_NIVEL: Record<string, number> = { s: 0, a: 1, b: 2 };

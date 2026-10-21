@@ -1,10 +1,15 @@
 import React from "react";
+import { metaPublica } from "@/lib/seo";
 import Link from "next/link";
 import { anunciosActivos, editorAdMob } from "@/lib/publicidad";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 
-export const metadata = { title: "Privacidad · Paragon" };
+export const metadata = metaPublica(
+  "/privacidad",
+  "Política de privacidad · Paragon",
+  "Qué datos trata Paragon, para qué, con qué base legal, con quién se comparten y cómo ejercer tus derechos.",
+);
 
 function Seccion({ num, title, children }: { num: string; title: string; children: React.ReactNode }) {
   return (
@@ -66,6 +71,12 @@ export default async function PrivacidadPage() {
           <li>{t("s3li3")}</li>
           <li>{t("s3li4")}</li>
         </ul>
+        <h3 className="pt-2 font-semibold text-foreground">{t("s3baseT")}</h3>
+        <ul className="list-disc pl-5 space-y-1.5 text-muted">
+          <li>{t.rich("s3base1", richTags)}</li>
+          <li>{t.rich("s3base2", richTags)}</li>
+          <li>{t.rich("s3base3", richTags)}</li>
+        </ul>
         <p className="text-muted">
           {t.rich(anunciosActivos() || editorAdMob() ? "s3pAnuncios" : "s3p", {
             ...richTags,
@@ -85,6 +96,7 @@ export default async function PrivacidadPage() {
           {anunciosActivos() && <li>{t.rich("s4liAnuncios", richTags)}</li>}
           {editorAdMob() && <li>{t.rich("s4liAdMob", richTags)}</li>}
         </ul>
+        <p className="text-muted">{t("s4transfer")}</p>
       </Seccion>
 
       <Seccion num="5" title={t("s5t")}>

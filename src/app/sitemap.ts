@@ -22,26 +22,27 @@ export const revalidate = 86_400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const dominio = dominioPublico();
-  const ahora = new Date();
 
   // Estaticas y publicas. Fuera todo lo que exige sesion (redirige a
   // /entrar, indexarlo es enviar al rastreador a una pantalla de login) y
-  // las utilidades sin contenido (/offline, /entrar).
+  // las utilidades sin contenido (/offline, /entrar). Sin `lastModified`
+  // (21 oct 2026): antes iba la hora de generar el sitemap en todas, y
+  // Google deja de fiarse del dato si siempre dice "ahora mismo".
   const fijas: MetadataRoute.Sitemap = [
-    { url: dominio, lastModified: ahora, changeFrequency: "daily", priority: 1 },
-    { url: `${dominio}/como-funciona`, lastModified: ahora, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${dominio}/descubrir`, lastModified: ahora, changeFrequency: "daily", priority: 0.8 },
-    { url: `${dominio}/descubrir/playstation`, lastModified: ahora, changeFrequency: "daily", priority: 0.7 },
-    { url: `${dominio}/descubrir/steam`, lastModified: ahora, changeFrequency: "daily", priority: 0.7 },
-    { url: `${dominio}/descubrir/xbox`, lastModified: ahora, changeFrequency: "daily", priority: 0.6 },
-    { url: `${dominio}/noticias`, lastModified: ahora, changeFrequency: "daily", priority: 0.7 },
-    { url: `${dominio}/ligas`, lastModified: ahora, changeFrequency: "daily", priority: 0.6 },
-    { url: `${dominio}/feed`, lastModified: ahora, changeFrequency: "hourly", priority: 0.5 },
-    { url: `${dominio}/ejemplo`, lastModified: ahora, changeFrequency: "monthly", priority: 0.4 },
-    { url: `${dominio}/privacidad`, lastModified: ahora, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${dominio}/eliminar-cuenta`, lastModified: ahora, changeFrequency: "yearly", priority: 0.1 },
-    { url: `${dominio}/cookies`, lastModified: ahora, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${dominio}/terminos`, lastModified: ahora, changeFrequency: "yearly", priority: 0.2 },
+    { url: dominio, changeFrequency: "daily", priority: 1 },
+    { url: `${dominio}/como-funciona`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${dominio}/descubrir`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${dominio}/descubrir/playstation`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${dominio}/descubrir/steam`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${dominio}/descubrir/xbox`, changeFrequency: "daily", priority: 0.6 },
+    { url: `${dominio}/noticias`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${dominio}/ligas`, changeFrequency: "daily", priority: 0.6 },
+    { url: `${dominio}/esports`, changeFrequency: "daily", priority: 0.5 },
+    { url: `${dominio}/ejemplo`, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${dominio}/privacidad`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${dominio}/eliminar-cuenta`, changeFrequency: "yearly", priority: 0.1 },
+    { url: `${dominio}/cookies`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${dominio}/terminos`, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   try {
@@ -57,16 +58,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const rutasPerfil: MetadataRoute.Sitemap = perfiles.flatMap(({ handle }) =>
       handle
         ? [
-            { url: `${dominio}/u/${handle}`, lastModified: ahora, changeFrequency: "daily" as const, priority: 0.9 },
-            { url: `${dominio}/u/${handle}/biblioteca`, lastModified: ahora, changeFrequency: "daily" as const, priority: 0.6 },
-            { url: `${dominio}/u/${handle}/estadisticas`, lastModified: ahora, changeFrequency: "weekly" as const, priority: 0.5 },
+            { url: `${dominio}/u/${handle}`, changeFrequency: "daily" as const, priority: 0.9 },
+            { url: `${dominio}/u/${handle}/biblioteca`, changeFrequency: "daily" as const, priority: 0.6 },
+            { url: `${dominio}/u/${handle}/estadisticas`, changeFrequency: "weekly" as const, priority: 0.5 },
           ]
         : [],
     );
 
     const rutasJuego: MetadataRoute.Sitemap = catalogo.flatMap(({ igdbId }) =>
       igdbId
-        ? [{ url: `${dominio}/juego/${igdbId}`, lastModified: ahora, changeFrequency: "weekly" as const, priority: 0.6 }]
+        ? [{ url: `${dominio}/juego/${igdbId}`, changeFrequency: "weekly" as const, priority: 0.6 }]
         : [],
     );
 

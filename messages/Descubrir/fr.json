@@ -374,7 +374,9 @@
     "idiomaDesconocido": "Langue non précisée",
     "principal": "Principal",
     "oficial": "Officiel",
-    "otrosPartidos": "Autres matchs de cette phase"
+    "otrosPartidos": "Autres matchs de cette phase",
+    "directoCargar": "Voir le direct",
+    "directoAviso": "En cliquant, le lecteur {servicio} se charge et peut utiliser ses propres cookies."
   },
   "PlatinosOferta": {
     "titulo": "Platines en promo",

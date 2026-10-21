@@ -48,13 +48,25 @@ const nextConfig: NextConfig = {
   // Analytics y carátulas de media docena de CDNs, una CSP estricta sin
   // poder probarla contra todo eso rompería más de lo que protege.
   // Permissions-Policy no toca `screen-wake-lock` (lo usa el Modo Enfoque).
+  //
+  // Con el dominio propio (21 oct 2026), además:
+  // - HSTS con includeSubDomains: Vercel ya manda HSTS, pero sin subdominios;
+  //   así ningún subdominio de paragontrophies.com se puede servir por http.
+  //   Sin `preload` a propósito: entrar en esa lista es casi irreversible.
+  // - CSP mínima que no rompe nada de lo de arriba: sin <object>/<embed>
+  //   (plugins) y sin <base> ajeno (que cambiaría a dónde apuntan los
+  //   enlaces relativos).
+  // - COOP: otra pestaña abierta desde Paragon no puede tocar esta ventana;
+  //   "allow-popups" para no romper ventanas que abra Paragon.
   async headers() {
     return [
       {
         source: "/:path*",
         headers: [
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },

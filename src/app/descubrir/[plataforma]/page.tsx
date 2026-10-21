@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { metaPublica } from "@/lib/seo";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { PlatinosDeOferta, PlatinosDeOfertaCargando } from "@/components/PlatinosDeOferta";
@@ -42,7 +43,12 @@ const PLATAFORMAS: Record<string, { label: string; hubKey: PlataformaHub; iconoB
 export async function generateMetadata({ params }: { params: Promise<{ plataforma: string }> }) {
   const { plataforma } = await params;
   const info = PLATAFORMAS[plataforma];
-  return { title: info ? `${info.label} · Descubrir · Paragon` : "Descubrir · Paragon" };
+  if (!info) return { title: "Descubrir · Paragon" };
+  return metaPublica(
+    `/descubrir/${plataforma}`,
+    `${info.label}: juegos y trofeos en tendencia · Paragon`,
+    `Los juegos de ${info.label} que más juega y platina la comunidad de Paragon, y los trofeos más raros.`,
+  );
 }
 
 export default async function PlataformaPage({ params }: { params: Promise<{ plataforma: string }> }) {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { datosAplicacion } from "@/lib/datosEstructurados";
 import { dominioPublico } from "@/lib/site";
+import { metaPublica } from "@/lib/seo";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -416,6 +417,13 @@ async function Landing() {
     </div>
   );
 }
+
+// La portada, con su URL canónica (sin ?parámetros ni la dirección vieja).
+export const metadata = metaPublica(
+  "/",
+  "Paragon · Trofeos de PlayStation y logros de Steam y Xbox",
+  "Todos tus trofeos de PlayStation y logros de Steam y Xbox en un solo perfil: platinos, rareza, estadísticas, ligas con amigos y guías. Gratis, en la web y en el móvil.",
+);
 
 export default async function HomePage() {
   const session = await auth();

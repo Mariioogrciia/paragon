@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { metaPublica } from "@/lib/seo";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { getXboxNews } from "@/lib/xboxNews";
@@ -17,9 +18,11 @@ import { getXboxGamePassNuevos } from "@/lib/xboxGamePass";
 import { GameGrid } from "@/components/GameGrid";
 import { relativeDate } from "@/lib/design";
 
-export const metadata = {
-  title: "Xbox · Descubrir · Paragon",
-};
+export const metadata = metaPublica(
+  "/descubrir/xbox",
+  "Logros de Xbox: tendencias y Game Pass · Paragon",
+  "Los juegos de Xbox que más juega la comunidad, las novedades de Game Pass y los logros que más cuestan, en Paragon.",
+);
 
 /**
  * Xbox ya sincroniza biblioteca de verdad (ver lib/xbl/client.ts), así que

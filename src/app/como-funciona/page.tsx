@@ -1,11 +1,16 @@
 import React from "react";
+import { metaPublica } from "@/lib/seo";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 import { IndiceManual } from "@/components/IndiceManual";
 import { BarChart3, Bell, CalendarClock, Layers, Link2, Trophy, UserRound, Users, type LucideIcon } from "lucide-react";
 
-export const metadata = { title: "Cómo funciona · Paragon" };
+export const metadata = metaPublica(
+  "/como-funciona",
+  "Cómo funciona Paragon: vincula PlayStation, Steam y Xbox",
+  "Guía de Paragon: cómo vincular tus cuentas de PlayStation, Steam y Xbox, cómo se cuentan los trofeos, las ligas, los avisos y el bot de Discord.",
+);
 
 /**
  * Apartado del manual (rediseño del 1 oct 2026): título y texto como en el

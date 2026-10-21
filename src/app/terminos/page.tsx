@@ -1,9 +1,14 @@
 import React from "react";
+import { metaPublica } from "@/lib/seo";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 
-export const metadata = { title: "Términos y Condiciones · Paragon" };
+export const metadata = metaPublica(
+  "/terminos",
+  "Términos y condiciones · Paragon",
+  "Las condiciones de uso de Paragon, el rastreador de trofeos y logros de PlayStation, Steam y Xbox.",
+);
 
 function Seccion({ num, title, children }: { num: string; title: string; children: React.ReactNode }) {
   return (
