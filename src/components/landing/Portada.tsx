@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import Link from "@/components/Enlace";
 import { metaPublica } from "@/lib/seo";
+import { haceRato } from "@/lib/design";
 import { JsonLd } from "@/components/JsonLd";
 import { datosAplicacion } from "@/lib/datosEstructurados";
 import { dominioPublico } from "@/lib/site";
@@ -45,17 +46,6 @@ const SAMPLE_SHELF = [
   { title: "Hollow Knight", pct: 63, ratio: "39/63", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/cobfzp.jpg" },
   { title: "Ghost of Tsushima", pct: 100, ratio: "55/55", cover: "https://images.igdb.com/igdb/image/upload/t_cover_big/co2crj.jpg" },
 ];
-
-function haceTiempo(date: Date | string, locale: string): string {
-  // Mismo criterio de estilo que `relativeDate` (lib/design.ts): en francés
-  // y alemán el "narrow" sale raro ("-5 min"), ahí va "short".
-  const rtf = new Intl.RelativeTimeFormat(locale, { style: locale === "es" || locale === "en" ? "narrow" : "short" });
-  const minutos = Math.max(1, Math.round((Date.now() - new Date(date).getTime()) / 60_000));
-  if (minutos < 60) return rtf.format(-minutos, "minute");
-  const horas = Math.round(minutos / 60);
-  if (horas < 24) return rtf.format(-horas, "hour");
-  return rtf.format(-Math.round(horas / 24), "day");
-}
 
 /**
  * Nombre que se enseña en la portada pública (sin sesión): solo el de pila.
@@ -142,7 +132,7 @@ export async function Landing() {
                 <span className="font-semibold text-platinum">{nombrePublico(p.name, p.handle)}</span>
                 <span className="text-muted">{t("tickerAcabaDePlatinar")}</span>
                 <span className="font-semibold">{p.gameTitle}</span>
-                <span className="text-[0.6875rem] text-muted">· {haceTiempo(p.createdAt, idioma)}</span>
+                <span className="text-[0.6875rem] text-muted">· {haceRato(p.createdAt, idioma)}</span>
               </div>
             ))}
           </div>
@@ -190,7 +180,7 @@ export async function Landing() {
                         {t("landing.cartelaRareza", { percent: rt.rarityPercent.toLocaleString(idioma, { maximumFractionDigits: 1 }) })}
                       </span>
                       <span className="mt-0.5 block truncate text-[0.6875rem] text-muted">
-                        {t("landing.cartelaPor", { handle: rt.handle ?? "?" })} · {haceTiempo(rt.earnedAt, idioma)}
+                        {t("landing.cartelaPor", { handle: rt.handle ?? "?" })} · {haceRato(rt.earnedAt, idioma)}
                       </span>
                     </span>
                   </Link>
@@ -213,7 +203,7 @@ export async function Landing() {
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-bold">{p.gameTitle}</span>
                     <span className="block truncate text-xs text-muted">
-                      {nombrePublico(p.name, p.handle)} · {haceTiempo(p.createdAt, idioma)}
+                      {nombrePublico(p.name, p.handle)} · {haceRato(p.createdAt, idioma)}
                     </span>
                   </span>
                 </Link>

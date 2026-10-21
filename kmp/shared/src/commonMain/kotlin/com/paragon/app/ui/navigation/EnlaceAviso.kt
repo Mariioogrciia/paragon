@@ -42,6 +42,9 @@ fun rutaAppDeAviso(rutaWeb: String, miHandle: String?): String? {
         // Amigos, ligas y clanes viven en la pestaña Ligas de la app.
         "amigos", "ligas", "clanes" -> Screen.Social.route
         "ritmo" -> Screen.Ritmo.route
+        // "No podemos leer tu cuenta" (perfil puesto en privado): a las cuentas vinculadas.
+        "vincular" -> Screen.LinkedAccounts.route
+        "ajustes" -> if (partes.getOrNull(1) == "plataformas") Screen.LinkedAccounts.route else null
         else -> null
     }
 }

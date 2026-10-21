@@ -5,7 +5,7 @@ import Link from "@/components/Enlace";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Bell, X } from "lucide-react";
-import { relativeDate } from "@/lib/design";
+import { haceRato } from "@/lib/design";
 
 /**
  * Campana de avisos de la cabecera (16 oct 2026, ver lib/bandeja.ts). Pide
@@ -214,7 +214,7 @@ function FilaAviso({ aviso, locale, onClick }: { aviso: Aviso; locale: string; o
       <div className="min-w-0 flex-1">
         <p className="text-[0.8125rem] font-bold leading-snug">{aviso.titulo}</p>
         <p className="mt-0.5 line-clamp-2 whitespace-pre-line text-xs text-muted">{aviso.texto}</p>
-        <p className="mt-1 text-[0.6875rem] text-muted">{relativeDate(aviso.createdAt, locale) ?? ""}</p>
+        <p className="mt-1 text-[0.6875rem] text-muted">{haceRato(aviso.createdAt, locale)}</p>
       </div>
       {!aviso.leido && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true" />}
     </div>

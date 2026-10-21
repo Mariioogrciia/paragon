@@ -150,18 +150,15 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
 1. ~~Páginas públicas desde la CDN~~ y ~~ficha de Play en it/pt~~: hechas
    (21 oct). Siguiente candidato: `/descubrir` y sus plataformas, con la
    misma receta (copia en `(publico)` + ruta en el proxy).
-2. **Avisar a quien deja de poder leerse**: si alguien pone su perfil en
-   privado, su biblioteca deja de actualizarse sin que se entere. Un aviso
-   con enlace a `/vincular`.
-3. **Hora de los avisos en la web**: la campana usa `relativeDate` (solo
-   "hoy"/"ayer"); en la app ya sale "hace 5 min".
-4. **Extensión del navegador y `manifest.ts` en más idiomas**: hoy solo en
+2. ~~Avisar a quien deja de poder leerse~~ y ~~hora exacta en la campana~~:
+   hechas (21 oct).
+3. **Extensión del navegador y `manifest.ts` en más idiomas**: hoy solo en
    español.
-5. **Comprobar los huecos `{0}` en `kmp/i18n/generar.mjs`**: hoy solo mira
+4. **Comprobar los huecos `{0}` en `kmp/i18n/generar.mjs`**: hoy solo mira
    que exista cada idioma; un hueco perdido en una traducción no avisa.
-6. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
+5. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
    qué páginas no usa nadie (arcade, planificador…).
-7. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
+6. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
    perdibles, sesiones), resumen semanal en push, varias cuentas de Steam
    para todos, `pt-BR` si llegan brasileños.
 

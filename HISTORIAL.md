@@ -6,6 +6,13 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Aviso de cuenta que ya no se puede leer y hora exacta en la campana (21 oct)
+
+- **"No podemos leer tu cuenta"** (`lib/cuentaIlegible.ts`): si alguien pone su perfil de PlayStation, Steam o Xbox en privado después de vincularlo, su biblioteca dejaba de actualizarse sin que se enterase. Con Steam era peor: con "Detalles del juego" en privado devuelve una biblioteca VACÍA sin error, y la sincronización se daba por buena. Ahora `resyncLibraries`, cuando una cuenta no trae juegos o falla, comprueba si se puede leer (las llamadas del asistente de vincular) y, si no, avisa una vez por plataforma (push, Discord y campana) con enlace a `/vincular`. Cuando vuelve a leerse se olvida, para avisar otra vez si se repite. Si la comprobación misma falla (red), no avisa. Marca en `notification_log` (tipo `cuenta-ilegible`).
+  - Traducido en los 6 idiomas (`lib/avisosTraduccion.ts`); en la app, tocarlo abre Cuentas vinculadas (`rutaAppDeAviso`: `/vincular` y `/ajustes/plataformas`).
+  - Tests: `tests/cuentaIlegible.test.ts` y `EnlaceAvisoTest`.
+- **Campana de la web con hora exacta**: "hace 5 min", "hace 3 h" (`haceRato` en `lib/design.ts`, la misma que usa la portada) en vez de solo "hoy"/"ayer".
+
 ### Páginas públicas desde la CDN y ficha de Play en it/pt (21 oct)
 
 - **Portada, fichas de juego y perfiles, sin sesión, ya hechos desde la CDN.** Antes cada visita (casi todas de buscadores y gente sin cuenta) se renderizaba de cero: 48-97 ms de CPU, y hasta `/privacidad` gastaba 22 ms solo en montar React y Next. Ahora, en local, 7-9 ms; en Vercel ni se ejecuta la función.

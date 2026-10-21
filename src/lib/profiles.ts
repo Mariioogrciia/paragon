@@ -1,5 +1,6 @@
 import "server-only";
 import { plataformasPausadas } from "@/lib/ajustesSistema";
+import { vigilarLectura } from "@/lib/cuentaIlegible";
 import { getHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { getWeeklyMissions, xpMisiones } from "@/lib/missions";
 import { LOGROS, logroConseguido } from "@/lib/logros";
@@ -810,11 +811,14 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
     // saliendo como "sin refrescar" es más honesto que fingir que se
     // comprobó.
     try {
-      total += await syncLibrary(
+      const juegos = await syncLibrary(
         userId,
         { platform: account.platform, accountId: account.accountId },
         opts,
       );
+      total += juegos;
+      // ¿Sin juegos porque la puso en privado? Avisarle (lib/cuentaIlegible.ts).
+      await vigilarLectura(userId, account, juegos);
 
       await db
         .update(platformAccounts)
@@ -827,6 +831,7 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
         );
     } catch (error) {
       console.error("[resyncLibraries]", account.platform, error);
+      await vigilarLectura(userId, account, null);
       // `syncedAt` no se toca (motivo de siempre, ver arriba), pero
       // `lastAttemptedAt` SÍ — si no, una cuenta que falla siempre se
       // queda siendo "la más rancia" para el cron para siempre y bloquea

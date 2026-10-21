@@ -118,6 +118,23 @@ export function relativeDate(input?: string | Date | null, locale = "es"): strin
   return rtf.format(-Math.floor(days / 365), "year");
 }
 
+/**
+ * "hace 5 min", "hace 3 h", "hace 2 d": para lo que pasa en el día (la campana
+ * de avisos, la cinta de la portada). `relativeDate` solo distingue días.
+ * Mismo criterio de estilo: en francés y alemán el "narrow" sale raro
+ * ("-5 min"), ahí va "short".
+ */
+export function haceRato(input: string | Date, locale = "es"): string {
+  const rtf = new Intl.RelativeTimeFormat(locale, { style: locale === "es" || locale === "en" ? "narrow" : "short" });
+  const minutos = Math.max(1, Math.round((Date.now() - new Date(input).getTime()) / 60_000));
+  if (minutos < 60) return rtf.format(-minutos, "minute");
+  const horas = Math.round(minutos / 60);
+  if (horas < 24) return rtf.format(-horas, "hour");
+  const dias = Math.round(horas / 24);
+  if (dias < 30) return rtf.format(-dias, "day");
+  return relativeDate(input, locale) ?? rtf.format(-dias, "day");
+}
+
 export interface Rarity {
   label: string;
   bg: string;

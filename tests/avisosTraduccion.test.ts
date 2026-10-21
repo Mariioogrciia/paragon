@@ -79,6 +79,13 @@ describe("traducirAviso", () => {
     expect(traducirAviso("🔥 Racha de **1** día", "de")).toBe("🔥 Serie von **1** Tag");
   });
 
+  it("cuenta que ya no se puede leer", () => {
+    expect(traducirAviso("🔒 No podemos leer tu cuenta de Steam", "en")).toBe("🔒 We can't read your Steam account");
+    expect(
+      traducirAviso("Tu perfil de PlayStation ya no es público y tu biblioteca ha dejado de actualizarse. Toca para ver cómo arreglarlo.", "pt"),
+    ).toBe("O teu perfil PlayStation já não é público e a tua biblioteca deixou de ser atualizada. Toca para veres como resolver.");
+  });
+
   it("lo que no conoce sale como estaba", () => {
     expect(traducirAviso("Elden Ring", "en")).toBe("Elden Ring");
   });
