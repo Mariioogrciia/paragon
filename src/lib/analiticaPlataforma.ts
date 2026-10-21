@@ -1,6 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+import { enSerie, recordado } from "@/lib/enSerie";
 import { asegurarTablas } from "@/lib/trafico";
 
 /**
@@ -39,7 +40,11 @@ export interface DatosPlataforma {
 
 const SEMANAS = 8;
 
-export async function datosPlataforma(dias: number): Promise<DatosPlataforma> {
+export function datosPlataforma(dias: number): Promise<DatosPlataforma> {
+  return recordado(`plataforma-${dias}`, 5 * 60_000, () => calcularDatosPlataforma(dias));
+}
+
+async function calcularDatosPlataforma(dias: number): Promise<DatosPlataforma> {
   // La retención lee actividad_app, que crea lib/trafico.ts.
   await asegurarTablas();
   const desde = sql`${HOY} - ${dias - 1}::int`;
@@ -58,7 +63,7 @@ export async function datosPlataforma(dias: number): Promise<DatosPlataforma> {
     actividadCohorte,
     [comunidad],
     [catalogo],
-  ] = await Promise.all([
+  ] = await enSerie([
     db.execute<Record<string, number>>(sql`
       SELECT
         (SELECT count(*)::int FROM "user") AS "registrados",
@@ -80,11 +85,10 @@ export async function datosPlataforma(dias: number): Promise<DatosPlataforma> {
         (SELECT count(DISTINCT "userId")::int FROM "push_subscription") AS "webPush",
         (SELECT count(DISTINCT "userId")::int FROM "fcm_token") AS "app",
         (SELECT count(*)::int FROM (SELECT "userId" FROM "push_subscription" UNION SELECT "userId" FROM "fcm_token") u) AS "usuarios"`),
+    // De sync_run (pequeña) y no de user_trophy (enorme): los trofeos nuevos que trajo cada sincronización.
     db.execute<{ valor: string; n: number }>(sql`
-      SELECT g."platform" AS "valor", count(*)::int AS "n"
-      FROM "user_trophy" ut JOIN "game" g ON g."id" = ut."gameId"
-      WHERE ut."earned" AND ut."earnedAt" IS NOT NULL AND ${fechaMadrid("earnedAt")} >= ${desde}
-      GROUP BY 1 ORDER BY 2 DESC`),
+      SELECT "platform" AS "valor", sum("newTrophies")::int AS "n" FROM "sync_run"
+      WHERE ${fechaMadrid("createdAt")} >= ${desde} GROUP BY 1 HAVING sum("newTrophies") > 0 ORDER BY 2 DESC`),
     db.execute<{ valor: string; n: number }>(sql`
       SELECT "platform" AS "valor", count(*)::int AS "n" FROM "sync_run"
       WHERE ${fechaMadrid("createdAt")} >= ${desde} GROUP BY 1 ORDER BY 2 DESC`),
@@ -120,7 +124,7 @@ export async function datosPlataforma(dias: number): Promise<DatosPlataforma> {
       SELECT
         (SELECT count(*)::int FROM "game") AS "juegos",
         (SELECT count(*)::int FROM "game_trophy") AS "trofeos",
-        (SELECT count(*)::int FROM "user_trophy" WHERE "earned") AS "ganados"`),
+        (SELECT coalesce(sum("earnedTotal"), 0)::int FROM "user_game") AS "ganados"`),
   ]);
 
   // Las semanas de alta, de la más reciente a la más antigua, con su retención.

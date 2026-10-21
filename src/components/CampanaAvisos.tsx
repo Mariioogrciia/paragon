@@ -29,7 +29,8 @@ interface Aviso {
   createdAt: string;
 }
 
-const CADA_MS = 45_000;
+// Cada 2 minutos (antes 45 s, 22 oct 2026): cada vuelta es una llamada a Vercel por pestaña abierta. Al volver a la pestaña se mira al momento.
+const CADA_MS = 120_000;
 const TOAST_MS = 7_000;
 const MAX_TOASTS = 3;
 

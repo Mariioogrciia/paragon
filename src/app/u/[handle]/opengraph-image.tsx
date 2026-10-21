@@ -29,6 +29,8 @@ import { urlAbsolutaParaOg } from "@/lib/design";
  * enlace por WhatsApp no tiene por qué haber entrado nunca en Paragon.
  */
 
+// Se genera como mucho una vez al día por página (22 oct 2026): cada imagen es mucha CPU y la piden todos los bots de enlaces.
+export const revalidate = 86400;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Perfil de Paragon";

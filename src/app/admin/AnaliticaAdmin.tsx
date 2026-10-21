@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { analitica, audiencia } from "@/lib/trafico";
@@ -71,18 +72,55 @@ function Kpi({ label, valor, children }: { label: string; valor: string; childre
   );
 }
 
+type Parte = (typeof SECCIONES)[number];
+
+/**
+ * La pestaña se pinta al momento y cada grupo de secciones llega por su
+ * cuenta (Suspense): antes se esperaba a las ~28 consultas antes de enseñar
+ * nada, y con el pool de 5 conexiones a veces no llegaba a cargar.
+ */
 export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: string }) {
-  const [t, datos, registro, aud, plat] = await Promise.all([
-    getTranslations("Admin"),
-    analitica(dias),
-    resumenRegistro24h(),
-    audiencia(dias),
-    datosPlataforma(dias),
-  ]);
+  const t = await getTranslations("Admin");
+  const grupos: Parte[][] = [["trafico"], ["audiencia", "cuando", "rendimiento"], ["usuarios", "comunidad"], ["calidad"]];
+  return (
+    <div className="space-y-10">
+      <nav aria-label={t("analitica.secciones")} className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold uppercase tracking-wide">
+        {SECCIONES.map((s) => (
+          <a key={s} href={`#a-${s}`} className="text-muted hover:text-[var(--accent-text)]">
+            {t(`analitica.seccion.${s}`)}
+          </a>
+        ))}
+      </nav>
+      {grupos.map((partes) => (
+        <Suspense
+          key={partes.join("-")}
+          fallback={
+            <div className="space-y-5" aria-busy="true">
+              <p className="font-heading border-b border-border pb-2 text-lg font-bold uppercase tracking-wide text-muted">{t(`analitica.seccion.${partes[0]}`)}</p>
+              <div className="h-48 animate-pulse rounded-[14px] bg-[var(--surface-2)]" />
+            </div>
+          }
+        >
+          <Bloque dias={dias} locale={locale} partes={partes} />
+        </Suspense>
+      ))}
+      <p className="max-w-3xl text-xs text-muted">{t("analitica.nota")}</p>
+    </div>
+  );
+}
+
+/** Un grupo de secciones: solo pide los datos que esas secciones usan. */
+async function Bloque({ dias, locale, partes }: { dias: number; locale: string; partes: Parte[] }) {
+  const quiere = (...p: Parte[]) => p.some((x) => partes.includes(x));
+  const t = await getTranslations("Admin");
+  const datos = quiere("trafico", "comunidad") ? await analitica(dias) : null;
+  const registro = quiere("trafico") ? await resumenRegistro24h() : null;
+  const aud = quiere("audiencia", "cuando", "rendimiento", "calidad") ? await audiencia(dias) : null;
+  const plat = quiere("usuarios", "comunidad") ? await datosPlataforma(dias) : null;
   const num = (n: number) => n.toLocaleString(locale);
-  const pctMovil = datos.totales.vistas > 0 ? Math.round((datos.totales.movil / datos.totales.vistas) * 100) : 0;
-  const maxRuta = Math.max(1, ...datos.topRutas.map((r) => r.vistas));
-  const maxOrigen = Math.max(1, ...datos.topOrigenes.map((o) => o.entradas));
+  const pctMovil = datos && datos.totales.vistas > 0 ? Math.round((datos.totales.movil / datos.totales.vistas) * 100) : 0;
+  const maxRuta = Math.max(1, ...(datos?.topRutas.map((r) => r.vistas) ?? []));
+  const maxOrigen = Math.max(1, ...(datos?.topOrigenes.map((o) => o.entradas) ?? []));
 
   const nombrePais = new Intl.DisplayNames([locale], { type: "region" });
   const nombreIdioma = new Intl.DisplayNames([locale], { type: "language" });
@@ -93,24 +131,18 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
       return otro;
     }
   };
-  const rep = (tipo: string) => aud.reparto[tipo] ?? [];
+  const rep = (tipo: string) => aud?.reparto[tipo] ?? [];
   const donut = (tipo: string, etiqueta: (v: string) => string, icono?: (v: string) => string): PorcionDonut[] =>
     rep(tipo).map((r) => ({ etiqueta: etiqueta(r.valor), valor: r.n, icono: icono?.(r.valor) }));
   const comun = { locale, etiquetaOtros: t("analitica.otros"), vacio: t("analitica.sinDatosCorto") };
   const plataforma = (v: string) => PLATFORM_LABEL[v as keyof typeof PLATFORM_LABEL] ?? v;
   const proveedor = (v: string) => ({ google: "Google", discord: "Discord", epic: "Epic Games" })[v] ?? v;
-  const vitales = ["LCP", "INP", "CLS", "FCP", "TTFB"].map((m) => aud.rendimiento.find((r) => r.metrica === m)).filter((r) => r !== undefined);
+  const vitales = ["LCP", "INP", "CLS", "FCP", "TTFB"].map((m) => aud?.rendimiento.find((r) => r.metrica === m)).filter((r) => r !== undefined);
 
   return (
     <div className="space-y-10">
-      <nav aria-label={t("analitica.secciones")} className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold uppercase tracking-wide">
-        {SECCIONES.map((s) => (
-          <a key={s} href={`#a-${s}`} className="text-muted hover:text-[var(--accent-text)]">
-            {t(`analitica.seccion.${s}`)}
-          </a>
-        ))}
-      </nav>
 
+      {partes.includes("trafico") && datos && registro && (
       <Seccion id="trafico" titulo={t("analitica.seccion.trafico")}>
       <div className="flex flex-wrap items-center gap-2">
         {PERIODOS.map((p) => (
@@ -220,7 +252,9 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
       </div>
 
       </Seccion>
+      )}
 
+      {partes.includes("audiencia") && aud && (
       <Seccion id="audiencia" titulo={t("analitica.seccion.audiencia")}>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           <Tarjeta>
@@ -260,7 +294,9 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
           </Tarjeta>
         </div>
       </Seccion>
+      )}
 
+      {partes.includes("cuando") && aud && (
       <Seccion id="cuando" titulo={t("analitica.seccion.cuando")}>
         <Tarjeta>
           <MapaCalor
@@ -284,7 +320,9 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
           </Tarjeta>
         </div>
       </Seccion>
+      )}
 
+      {partes.includes("rendimiento") && aud && (
       <Seccion id="rendimiento" titulo={t("analitica.seccion.rendimiento")}>
         {vitales.length === 0 ? (
           <p className="text-sm text-muted">{t("analitica.sinVitales")}</p>
@@ -298,7 +336,9 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
         )}
         <p className="max-w-3xl text-xs text-muted">{t("analitica.vitalesNota")}</p>
       </Seccion>
+      )}
 
+      {partes.includes("usuarios") && plat && (
       <Seccion id="usuarios" titulo={t("analitica.seccion.usuarios")}>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Tarjeta>
@@ -357,7 +397,9 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
           </Tarjeta>
         </div>
       </Seccion>
+      )}
 
+      {partes.includes("comunidad") && plat && datos && (
       <Seccion id="comunidad" titulo={t("analitica.seccion.comunidad")}>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
           <Kpi label={t("analitica.catalogoJuegos")} valor={num(plat.catalogo.juegos)} />
@@ -371,7 +413,9 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
           </Kpi>
         </div>
       </Seccion>
+      )}
 
+      {partes.includes("calidad") && aud && (
       <Seccion id="calidad" titulo={t("analitica.seccion.calidad")}>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Tarjeta>
@@ -384,8 +428,7 @@ export async function AnaliticaAdmin({ dias, locale }: { dias: number; locale: s
           </Tarjeta>
         </div>
       </Seccion>
-
-      <p className="max-w-3xl text-xs text-muted">{t("analitica.nota")}</p>
+      )}
     </div>
   );
 }

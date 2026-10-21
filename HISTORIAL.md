@@ -6,6 +6,21 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Admin que carga y menos CPU en Vercel (22 oct)
+
+Se pasó el cupo gratis de CPU activa de Vercel (4 h 59 min de 4 h) y Admin → Analítica no llegaba a cargar.
+
+- **Admin**: la pestaña lanzaba unas 28 consultas a la vez contra un pool de 5 conexiones. Ahora:
+  - Se pinta al momento y cada grupo de secciones llega por su cuenta (`Suspense`).
+  - Las consultas de cada grupo van una detrás de otra (`lib/enSerie.ts`).
+  - Los resultados se recuerdan unos minutos por instancia.
+  - Fuera los recuentos que recorrían `user_trophy` entera.
+- **CPU**:
+  - `robots.txt` cierra la puerta a los rastreadores de IA y de SEO.
+  - Las imágenes para compartir se cachean un día: `revalidate` en `opengraph-image` y `Cache-Control` en `/api/wrap` y `/api/trophy-card`.
+  - Las Web Vitals salen en un solo aviso por página.
+  - La campana de avisos pregunta cada 2 minutos (antes, cada 45 s).
+
 ### Selector de idioma con banderas (22 oct)
 
 - `LanguageSwitcher`: ahora es una píldora con la bandera redonda y el nombre del idioma (en móvil, solo la bandera) y un menú con banderas redondas y ✓ en el activo. Las banderas están dibujadas en SVG, porque los emojis de bandera no existen en Windows (salían "ES", "GB").

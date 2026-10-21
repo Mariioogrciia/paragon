@@ -14,6 +14,9 @@ import { useReportWebVitals } from "next/web-vitals";
  * idioma del navegador, el ancho de pantalla, si usa tema oscuro y la
  * campaña (utm_source), y las medidas de Web Vitals de cada página. El
  * servidor lo reduce todo a etiquetas (lib/traficoRutas.ts).
+ *
+ * Las Web Vitals se juntan y salen en UN solo aviso al ocultar la página
+ * (antes, hasta cinco llamadas por página: cada una es CPU en Vercel).
  */
 
 function sinRastreo(): boolean {
@@ -31,13 +34,30 @@ export function avisarContador(cuerpo: Record<string, unknown>) {
   }
 }
 
+const pendientes = new Map<string, { n: string; v: number; c: string }>();
+
+function enviarVitales() {
+  if (pendientes.size === 0) return;
+  avisarContador({ k: "wv", m: [...pendientes.values()] });
+  pendientes.clear();
+}
+
 export function ContadorVisitas() {
   const ruta = usePathname();
   const primera = useRef(true);
 
   useReportWebVitals((m) => {
-    avisarContador({ k: "wv", n: m.name, v: Math.round(m.name === "CLS" ? m.value * 1000 : m.value) / (m.name === "CLS" ? 1000 : 1), c: m.rating });
+    // La última medida de cada métrica es la que vale (CLS e INP se actualizan).
+    pendientes.set(m.name, { n: m.name, v: m.name === "CLS" ? Math.round(m.value * 1000) / 1000 : Math.round(m.value), c: m.rating });
   });
+
+  useEffect(() => {
+    const alOcultar = () => {
+      if (document.visibilityState === "hidden") enviarVitales();
+    };
+    document.addEventListener("visibilitychange", alOcultar);
+    return () => document.removeEventListener("visibilitychange", alOcultar);
+  }, []);
 
   useEffect(() => {
     const esPrimera = primera.current;

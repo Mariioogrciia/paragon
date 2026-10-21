@@ -26,7 +26,7 @@ import {
  *   idioma, el ancho de pantalla, el tema y la campaña (utm_source); el país
  *   sale de la cabecera de Vercel y el navegador/sistema del User-Agent,
  *   reducidos a una etiqueta (lib/traficoRutas.ts). No se guarda la IP.
- * - `wv`: una medida de Web Vitals (22 oct 2026).
+ * - `wv`: las medidas de Web Vitals de una página, en un solo aviso (22 oct 2026).
  * - `404`: una dirección que no existe (22 oct 2026).
  *
  * Los bots no cuentan como visitas, pero se apunta su familia.
@@ -49,10 +49,14 @@ export async function POST(req: Request) {
   if (!cuerpo || typeof cuerpo !== "object") return nada;
 
   if (cuerpo.k === "wv") {
-    const metrica = METRICAS_WEB_VITALS.find((m) => m === cuerpo.n);
-    const valor = typeof cuerpo.v === "number" && Number.isFinite(cuerpo.v) && cuerpo.v >= 0 && cuerpo.v < 120_000 ? cuerpo.v : null;
-    const nota = cuerpo.c === "good" || cuerpo.c === "needs-improvement" || cuerpo.c === "poor" ? cuerpo.c : null;
-    if (metrica && valor !== null && nota) await registrarRendimiento(metrica, valor, nota);
+    // Un lote con la última medida de cada métrica de la página.
+    const lote = Array.isArray(cuerpo.m) ? cuerpo.m.slice(0, METRICAS_WEB_VITALS.length) : [];
+    for (const medida of lote as Record<string, unknown>[]) {
+      const metrica = METRICAS_WEB_VITALS.find((m) => m === medida?.n);
+      const valor = typeof medida?.v === "number" && Number.isFinite(medida.v) && medida.v >= 0 && medida.v < 120_000 ? medida.v : null;
+      const nota = medida?.c === "good" || medida?.c === "needs-improvement" || medida?.c === "poor" ? medida.c : null;
+      if (metrica && valor !== null && nota) await registrarRendimiento(metrica, valor, nota);
+    }
     return nada;
   }
 

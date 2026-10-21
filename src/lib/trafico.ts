@@ -1,6 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+import { enSerie, recordado } from "@/lib/enSerie";
 
 /**
  * Tráfico dentro de Paragon (21 oct 2026), para Admin → Analítica. Vercel
@@ -293,13 +294,17 @@ function serieCompleta<T extends { dia: string }>(dias: number, filas: T[], vaci
 }
 
 /** Todo lo de Admin → Analítica para los últimos `dias` días. */
-export async function analitica(dias: number): Promise<Analitica> {
+export function analitica(dias: number): Promise<Analitica> {
+  return recordado(`analitica-${dias}`, 2 * 60_000, () => calcularAnalitica(dias));
+}
+
+async function calcularAnalitica(dias: number): Promise<Analitica> {
   await asegurarTablas();
   const desde = sql`${HOY} - ${dias - 1}::int`;
   const desdeAnterior = sql`${HOY} - ${2 * dias - 1}::int`;
   const numero = (v: unknown) => Number(v ?? 0);
 
-  const [vistas, activosDia, altas, syncs, [totales], [anteriores], [activos], rutas, origenes] = await Promise.all([
+  const [vistas, activosDia, altas, syncs, [totales], [anteriores], [activos], rutas, origenes] = await enSerie([
     db.execute<{ dia: string; vistas: number; entradas: number }>(sql`
       SELECT "dia"::text AS "dia", sum("vistas")::int AS "vistas", sum("entradas")::int AS "entradas"
       FROM "trafico_dia" WHERE "dia" >= ${desde} GROUP BY "dia"`),
@@ -402,11 +407,15 @@ export interface Audiencia {
 }
 
 /** Lo de las secciones Audiencia, Cuándo, Rendimiento y Calidad de Admin → Analítica. */
-export async function audiencia(dias: number): Promise<Audiencia> {
+export function audiencia(dias: number): Promise<Audiencia> {
+  return recordado(`audiencia-${dias}`, 2 * 60_000, () => calcularAudiencia(dias));
+}
+
+async function calcularAudiencia(dias: number): Promise<Audiencia> {
   await asegurarTablas();
   const desde = sql`${HOY} - ${dias - 1}::int`;
   const numero = (v: unknown) => Number(v ?? 0);
-  const [dims, rend, n404, bots, app, [usuarios]] = await Promise.all([
+  const [dims, rend, n404, bots, app, [usuarios]] = await enSerie([
     db.execute<{ tipo: string; valor: string; n: number }>(sql`
       SELECT "tipo", "valor", sum("n")::int AS "n" FROM "trafico_dimension" WHERE "dia" >= ${desde}
       GROUP BY "tipo", "valor" ORDER BY 3 DESC`),

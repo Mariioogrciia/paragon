@@ -11,11 +11,42 @@ import { dominioPublico } from "@/lib/site";
  * una pantalla de uso, no contenido). Los perfiles publicos, las fichas de
  * juego y las guias SI se indexan: son justo lo que puede traer a alguien.
  */
+const BOTS_FUERA = [
+  "GPTBot",
+  "ChatGPT-User",
+  "OAI-SearchBot",
+  "ClaudeBot",
+  "anthropic-ai",
+  "CCBot",
+  "Bytespider",
+  "Amazonbot",
+  "meta-externalagent",
+  "FacebookBot",
+  "PerplexityBot",
+  "Google-Extended",
+  "Applebot-Extended",
+  "cohere-ai",
+  "Diffbot",
+  "AhrefsBot",
+  "SemrushBot",
+  "MJ12bot",
+  "DotBot",
+  "DataForSeoBot",
+  "PetalBot",
+  "BLEXBot",
+  "serpstatbot",
+];
+
 export default function robots(): MetadataRoute.Robots {
   const dominio = dominioPublico();
 
   return {
-    rules: {
+    rules: [
+      // Rastreadores de IA y de SEO (22 oct 2026): no traen visitas y cada
+      // página que piden es CPU del servidor (se pasó del cupo de Vercel).
+      // Los que respetan robots.txt dejan de venir; Google y Bing siguen.
+      { userAgent: BOTS_FUERA, disallow: "/" },
+      {
       userAgent: "*",
       allow: "/",
       disallow: [
@@ -38,7 +69,8 @@ export default function robots(): MetadataRoute.Robots {
         "/ritmo",
         "/vincular",
       ],
-    },
+      },
+    ],
     sitemap: `${dominio}/sitemap.xml`,
   };
 }
