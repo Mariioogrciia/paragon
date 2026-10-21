@@ -8,6 +8,7 @@ import { EditorVitrinas } from "@/components/EditorVitrinas";
 import { FirmaCompartible } from "@/components/FirmaCompartible";
 import { MAX_VITRINAS, estudiosCompletados, getVitrinas } from "@/lib/vitrinas";
 import { getProfileByUserId } from "@/lib/profiles";
+import { DOMINIO, dominioProduccion } from "@/lib/site";
 
 export const metadata = { title: "Vitrinas y firma · Ajustes · Paragon" };
 
@@ -21,9 +22,9 @@ export default async function AjustesEscaparatePage() {
   if (!session?.user?.id) redirect("/entrar");
   const userId = session.user.id;
 
-  // En producción, el dominio configurado en Vercel (no la cabecera Host); en local, la cabecera.
+  // En producción, el dominio de Paragon (no la cabecera Host); en local, la cabecera.
   const cabeceras = await headers();
-  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? cabeceras.get("host") ?? "platinos-nine.vercel.app";
+  const host = dominioProduccion() ?? cabeceras.get("host") ?? DOMINIO;
   const origen = `${host.startsWith("localhost") ? "http" : "https"}://${host}`;
 
   const [profile, vitrinas, estudios, juegosVitrina] = await Promise.all([

@@ -24,10 +24,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 /**
- * Mismo dominio que la web. Cuando haya dominio propio, cambiarlo aquí (y en
- * `EnlaceSeguro`, que abre el login en el navegador).
+ * Mismo dominio que la web (DOMINIO en src/lib/site.ts), con el `www`: es el
+ * principal, y una redirección desde otro host haría perder la cabecera
+ * Authorization. Las versiones viejas siguen en platinos-nine.vercel.app,
+ * que sigue sirviendo /api y /movil.
  */
-const val URL_BASE = "https://platinos-nine.vercel.app/"
+const val URL_BASE = "https://www.paragontrophies.com/"
 
 /**
  * El JSON de la API móvil, con el mismo comportamiento que tenía Moshi:

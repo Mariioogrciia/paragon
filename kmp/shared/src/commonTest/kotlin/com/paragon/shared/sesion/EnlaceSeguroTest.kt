@@ -34,6 +34,6 @@ class EnlaceSeguroTest {
         val url = EnlaceSeguro.urlLogin(tokens, "discord")
         // CLAVE_RE de enlaceMovil.ts: 43 caracteres base64url.
         assertTrue(Regex("^[A-Za-z0-9_-]{43}$").matches(tokens.pendingLoginKey!!))
-        assertEquals("https://platinos-nine.vercel.app/movil/entrar/discord?k=${tokens.pendingLoginKey}", url)
+        assertEquals("https://www.paragontrophies.com/movil/entrar/discord?k=${tokens.pendingLoginKey}", url)
     }
 }

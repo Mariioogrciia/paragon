@@ -7,6 +7,7 @@ import { getParagonLevel } from "@/lib/paragonLevel";
 import { traducirAviso } from "@/lib/avisosTraduccion";
 import { idiomaDeUsuario } from "@/lib/idiomaUsuario";
 import { textosDm } from "@/lib/textosDiscord";
+import { dominioProduccion } from "@/lib/site";
 
 /**
  * Avisos de trofeos por DM del propio bot de Discord de Paragon —
@@ -245,10 +246,8 @@ export async function anunciarLogrosNuevos(
   const discordUserId = await discordUserIdDe(userId);
   if (!discordUserId) return;
 
-  // `VERCEL_PROJECT_PRODUCTION_URL` (dominio real de producción, sin
-  // protocolo) la pone Vercel sola en cada despliegue — sin dominio fijo
-  // guardado en el proyecto para no arriesgarse a adivinarlo mal.
-  const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  // Sin dominio en local: un enlace a localhost en un DM no sirve a nadie.
+  const dominio = dominioProduccion();
   const href = row.handle && dominio ? `https://${dominio}/u/${row.handle}/${opts.gameId}` : undefined;
   const platino = opts.nuevos.find((t) => t.grade === "platinum");
   // En el idioma de quien lo recibe (lib/textosDiscord.ts).
@@ -320,7 +319,7 @@ export async function anunciarInvitacionLiga(userId: string, leagueName: string,
   const discordUserId = await discordUserIdDe(userId);
   if (!discordUserId) return;
 
-  const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const dominio = dominioProduccion();
   const href = dominio ? `https://${dominio}/ligas/${leagueId}` : undefined;
 
   const t = textosDm(await idiomaDeUsuario(userId));
@@ -347,7 +346,7 @@ export async function enviarDmSiActivo(
     if (!row?.activado) return;
     const discordUserId = await discordUserIdDe(userId);
     if (!discordUserId) return;
-    const dominio = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    const dominio = dominioProduccion();
     const idioma = await idiomaDeUsuario(userId);
     await enviarDM(discordUserId, {
       title: traducirAviso(aviso.titulo, idioma),

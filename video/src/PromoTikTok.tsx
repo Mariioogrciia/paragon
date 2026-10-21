@@ -319,7 +319,7 @@ const EscenaWeb = ({ titulo, subtitulo, imagen, dura }: { titulo: string; subtit
             <span key={c} style={{ width: 18, height: 18, borderRadius: 9, background: c }} />
           ))}
           <div style={{ marginLeft: 18, flex: 1, height: 38, borderRadius: 19, background: "#0b0f16", color: APAGADO, fontSize: 22, display: "flex", alignItems: "center", padding: "0 20px" }}>
-            platinos-nine.vercel.app
+            paragontrophies.com
           </div>
         </div>
         <div style={{ height: altoVista, overflow: "hidden", position: "relative" }}>
@@ -414,7 +414,7 @@ const Cierre = () => {
             boxShadow: `0 0 ${80 * brillo}px ${ACENTO}`,
           }}
         >
-          platinos-nine.vercel.app
+          paragontrophies.com
         </div>
         <div style={{ marginTop: 40, fontSize: 40, color: ORO, fontWeight: 700, opacity: boton }}>Pruébalo gratis 🏆</div>
       </div>

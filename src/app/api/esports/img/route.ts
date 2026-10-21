@@ -7,6 +7,8 @@
  * Solo ese host (no es un proxy abierto) y solo imágenes. Caché larga en la
  * CDN de Vercel: la función solo corre la primera vez que se pide cada una.
  */
+import { DOMINIO } from "@/lib/site";
+
 const HOST = "cdn-api.pandascore.co";
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -21,10 +23,10 @@ export async function GET(req: Request) {
   if (url.protocol !== "https:" || url.hostname !== HOST) return new Response(null, { status: 400 });
 
   // En local, Avast también corta la descarga desde el propio servidor: se
-  // pide a la ruta de producción, que la sirve desde vercel.app.
+  // pide a la ruta de producción, que la sirve desde Vercel.
   const origen =
     process.env.NODE_ENV === "development"
-      ? `https://platinos-nine.vercel.app/api/esports/img?u=${encodeURIComponent(url.toString())}`
+      ? `https://${DOMINIO}/api/esports/img?u=${encodeURIComponent(url.toString())}`
       : url;
 
   try {

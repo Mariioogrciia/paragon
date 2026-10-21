@@ -1,4 +1,4 @@
-const BASE_URL = "https://platinos-nine.vercel.app";
+const BASE_URL = "https://www.paragontrophies.com";
 
 const estado = document.getElementById("estado");
 const btnConectar = document.getElementById("btn-conectar");

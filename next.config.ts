@@ -65,6 +65,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        // Dominio propio (21 oct 2026, ver DOMINIO en lib/site.ts): quien
+        // entre por la dirección vieja va a la nueva. Menos /api y /movil:
+        // las apps y la extensión ya instaladas siguen llamando a vercel.app,
+        // y una redirección a otro dominio les haría perder la sesión (el
+        // móvil no reenvía la cabecera Authorization a otro host).
+        source: "/:path((?!api/|movil/|_next/).*)",
+        has: [{ type: "host", value: "platinos-nine.vercel.app" }],
+        destination: "https://www.paragontrophies.com/:path",
+        permanent: true,
+      },
+      {
         // `/rankings` se elimino: era una copia de lo que `/amigos` ya
         // enseñaba (las tablas "Esta semana"/"Este mes" salian de la MISMA
         // `getPeriodRankings`, y su ranking general por XP es la misma

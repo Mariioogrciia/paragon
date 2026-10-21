@@ -10,7 +10,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-const val BASE_URL = "https://platinos-nine.vercel.app"
+const val BASE_URL = "https://www.paragontrophies.com"
 
 /** Forma de `GET /api/games/upcoming` (pública, sin sesión). Solo lo que se pinta. */
 @Serializable

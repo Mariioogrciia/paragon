@@ -130,7 +130,7 @@ fun TrophyShareCard(
                 // La dirección de Paragon, bien visible (16 oct 2026): quien vea
                 // la story tiene que poder llegar sin buscar.
                 Text(
-                    text = com.paragon.shared.BASE_URL.removePrefix("https://"),
+                    text = com.paragon.shared.BASE_URL.removePrefix("https://").removePrefix("www."),
                     color = Muted,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 2.dp),

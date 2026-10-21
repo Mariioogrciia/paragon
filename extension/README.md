@@ -48,10 +48,11 @@ volviendo a pulsar "Sincronizar" cuando haga falta, no es un fallo.
 3. En otra pestaña, entra en `playstation.com` con tu cuenta real de PSN.
 4. Vuelve al popup de la extensión → "Sincronizar PSN ahora".
 
-`manifest.json` apunta a `https://platinos-nine.vercel.app` a pelo (un
-manifest no puede leer variables de entorno) — si el dominio cambia algún
-día, es el único sitio que hay que tocar (junto con `capacitor.config.ts`,
-que tiene el mismo valor por el mismo motivo).
+El dominio va a pelo (un manifest no puede leer variables de entorno):
+`https://www.paragontrophies.com` desde la 1.2.0 (21 oct 2026) en
+`manifest.json`, `popup.js` y `background.js`. El manifest sigue aceptando
+también `platinos-nine.vercel.app`, que sigue sirviendo /api y /movil para
+las versiones viejas.
 
 ## Qué falta antes de publicarla de verdad
 

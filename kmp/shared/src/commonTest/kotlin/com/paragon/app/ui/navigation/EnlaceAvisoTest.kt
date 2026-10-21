@@ -23,7 +23,7 @@ class EnlaceAvisoTest {
     fun loSocialVaALaPestanaLigas() {
         assertEquals(Screen.Social.route, rutaAppDeAviso("/amigos", null))
         assertEquals(Screen.Social.route, rutaAppDeAviso("/ligas/abc", null))
-        assertEquals(Screen.Social.route, rutaAppDeAviso("https://platinos-nine.vercel.app/clanes/pgn?x=1", null))
+        assertEquals(Screen.Social.route, rutaAppDeAviso("https://www.paragontrophies.com/clanes/pgn?x=1", null))
     }
 
     @Test

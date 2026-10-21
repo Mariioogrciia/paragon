@@ -1,7 +1,7 @@
 // Cambiar aquí si el dominio de producción cambia (ver capacitor.config.ts,
 // que tiene el mismo valor hardcodeado por el mismo motivo: un manifest de
 // extensión no puede leer variables de entorno).
-const BASE_URL = "https://platinos-nine.vercel.app";
+const BASE_URL = "https://www.paragontrophies.com";
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "PARAGON_TOKEN") {

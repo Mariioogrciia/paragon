@@ -79,18 +79,28 @@ perfil privado.
      secreto `PLAY_SERVICE_ACCOUNT_JSON`.
    - Ojo: con una cuenta personal nueva, Google exige una prueba cerrada
      con **12 personas durante 14 días** antes de producción.
-2. **Dominio propio** (sin comprar). Sirve cualquier registrador
-   (Cloudflare, Porkbun, Namecheap, Spaceship...): comprado fuera, en Vercel
-   → Domains se añade y se crean en el registrador los registros que pida
-   (normalmente `A @ 76.76.21.21` y `CNAME www cname.vercel-dns.com`). Usar
-   un dominio propio en Hobby no cuesta nada en Vercel.
-   Candidato: `paragontrophies.com` (~11 $/año). Al comprarlo hay que:
-   - Cambiar las referencias a `platinos-nine` (`grep -rn platinos-nine src
-     kmp extension video`): api/esports/img, ajustes/escaparate,
-     extension/manifest.json, PromoTikTok.tsx, Lanzamientos.kt,
-     ClienteParagon.kt y dos tests de la app.
-   - Cambiar el secreto `SITE_URL` del repo (lo usa el cron).
-   - Añadir las URLs de vuelta en las consolas de Google y Discord.
+2. **Dominio `paragontrophies.com`** (comprado en Cloudflare el 21 oct,
+   DNS en gris hacia Vercel; el principal es `www.paragontrophies.com`). El
+   código ya está cambiado (ver HISTORIAL.md, 21 oct). Queda, a mano:
+   - Google Cloud → Credenciales → el cliente OAuth: añadir
+     `https://www.paragontrophies.com` a "Orígenes de JavaScript" y
+     `https://www.paragontrophies.com/api/auth/callback/google` a "URIs de
+     redireccionamiento". **Sin borrar las de `platinos-nine`** (la app vieja
+     sigue entrando por ahí).
+   - Discord Developer Portal → OAuth2 → Redirects: añadir
+     `https://www.paragontrophies.com/api/auth/callback/discord`.
+   - Vercel → Environment Variables: si existe `AUTH_URL` o `NEXTAUTH_URL`
+     con el dominio viejo, borrarla (en Vercel, Auth.js usa el host de cada
+     petición) y redesplegar.
+   - Secreto del repo `SITE_URL` = `https://www.paragontrophies.com` (y la
+     URL del cron externo, cuando se ponga).
+   - Google Search Console: propiedad de dominio `paragontrophies.com`
+     (verificación por TXT en Cloudflare) y enviar
+     `https://www.paragontrophies.com/sitemap.xml`. Bing Webmaster Tools:
+     importar desde Search Console.
+   - La extensión 1.2.0 y una APK nueva ya usan el dominio; las instaladas
+     siguen funcionando por `platinos-nine.vercel.app` (/api y /movil no
+     redirigen).
 3. **Cuenta de desarrollador de Apple** (de pago): sin ella no hay push en
    iOS ni TestFlight/App Store. Después hacen falta:
    - Identificadores, App Group y la app en App Store Connect.
@@ -153,8 +163,7 @@ lint a cero y las pantallas v2.
 **Anuncios: el código está listo y apagado** (19 oct; detalle en HISTORIAL.md).
 Mientras no exista `NEXT_PUBLIC_ADSENSE_CLIENT` no se carga nada de Google,
 `/ads.txt` da 404 y todo sigue como antes. Para encenderlos, en este orden:
-1. **Dominio propio** (AdSense no aprueba un `*.vercel.app`). Ver el punto 2
-   de arriba.
+1. **Dominio propio**: ya está (`www.paragontrophies.com`, 21 oct).
 2. **Cuenta de AdSense** (https://adsense.google.com) y añadir el dominio
    como sitio. Google da el ID de editor `ca-pub-XXXXXXXXXXXXXXXX`.
 3. En Vercel → Settings → Environment Variables (Production):
@@ -460,9 +469,7 @@ verdad:
   tocar la estética por ahora. Si se retoma, ojo: `globals.css` es
   global a toda la app, no solo a la landing — habría que decidir
   alcance antes de tocar nada.
-- **Dominio propio (`paragontrofeos.com` estaba libre a fecha de la
-  sesión)** — comprobado disponible, no comprado. La app sigue en
-  `platinos-nine.vercel.app`.
+- ~~Dominio propio~~ → comprado el 21 oct 2026: `paragontrophies.com`.
 
 **Funciones acordadas y no hechas:**
 1. ~~`igdbId` en `games` + emparejado.~~ → **Confirmado el 9 de septiembre**:

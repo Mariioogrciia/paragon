@@ -1,4 +1,5 @@
 import type { TrophyGrade } from "@/lib/types";
+import { dominioPublico } from "@/lib/site";
 
 /**
  * Convierte una URL relativa ("/uploads/foo.jpg", de un avatar subido a
@@ -8,8 +9,8 @@ import type { TrophyGrade } from "@/lib/types";
  * revienta la generación entera de la imagen, no solo esa foto. El resto
  * de <img> normales de la app siguen usando rutas relativas sin problema.
  *
- * En produccion el dominio lo pone Vercel (`VERCEL_PROJECT_PRODUCTION_URL`);
- * en local se cae a `http://localhost:3000`, que es donde corre `next dev`.
+ * En produccion, el dominio de Paragon (`dominioPublico`, lib/site.ts); en
+ * local se cae a `http://localhost:3000`, que es donde corre `next dev`.
  * Antes devolvia `undefined` en local, con el efecto practico de que ningun
  * avatar subido a mano salia en NINGUNA tarjeta social mientras se
  * desarrollaba — es decir, no habia forma de comprobar el hueco mas
@@ -19,11 +20,7 @@ export function urlAbsolutaParaOg(url: string | undefined): string | undefined {
   if (!url) return undefined;
   if (/^https?:\/\//i.test(url)) return url;
 
-  const base = process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000";
-
-  return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
+  return `${dominioPublico()}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
 /**

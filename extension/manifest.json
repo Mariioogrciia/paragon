@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Paragon — Sincronizar PSN y Epic",
   "description": "Sincroniza tus trofeos de PlayStation y tus logros de Epic con Paragon leyendo tu propia sesión en este navegador, sin copiar tokens a mano.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "icons": {
     "16": "icons/icon128.png",
     "48": "icons/icon128.png",
@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://platinos-nine.vercel.app/movil/enlazar-extension*"],
+      "matches": ["https://www.paragontrophies.com/movil/enlazar-extension*", "https://platinos-nine.vercel.app/movil/enlazar-extension*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     },
@@ -30,6 +30,7 @@
   "host_permissions": [
     "https://ca.account.sony.com/*",
     "https://store.epicgames.com/*",
+    "https://www.paragontrophies.com/*",
     "https://platinos-nine.vercel.app/*"
   ],
   "permissions": ["storage"]

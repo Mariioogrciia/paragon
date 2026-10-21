@@ -6,6 +6,26 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+**21 oct — dominio propio: `www.paragontrophies.com`**. Comprado por el
+usuario en Cloudflare (DNS en gris hacia Vercel; Vercel pone el `www` de
+principal y redirige el dominio sin www a él).
+- `DOMINIO` en lib/site.ts, y `dominioPublico()`/`dominioProduccion()` lo
+  usan en vez de `VERCEL_PROJECT_PRODUCTION_URL`: Vercel pone ahí el dominio
+  más corto, que es el que redirige. Lo usan las tarjetas sociales
+  (`urlAbsolutaParaOg`), sitemap, robots, datos estructurados, los enlaces
+  de los DM de Discord y la firma de Ajustes → Escaparate.
+- next.config.ts: `platinos-nine.vercel.app` → 308 al dominio nuevo, salvo
+  `/api`, `/movil` y `/_next`. Las apps y la extensión instaladas siguen
+  llamando a vercel.app, y OkHttp no reenvía `Authorization` a otro host.
+  Probado en local con la cabecera Host: páginas con 308 (y su query), /api
+  y /movil sin tocar.
+- App: `URL_BASE` y `BASE_URL` con el `www` (sin redirección de por medio);
+  la tarjeta de compartir enseña `paragontrophies.com`. Tests actualizados.
+- Extensión 1.2.0: el dominio nuevo, y el manifest acepta los dos.
+- Vídeo promocional: `paragontrophies.com`.
+Queda a mano (HANDOFF, "Esperando al usuario" 2): las URLs de vuelta en
+Google y Discord, `SITE_URL`, revisar `AUTH_URL` y Search Console.
+
 **20 oct (3) — Ajustes → Avisos en la app**. Las mismas preferencias que en
 la web, que hasta ahora no se podían cambiar desde el móvil:
 - `GET/PUT /api/mobile/avisos/preferencias` (CONTRACT.md): categorías y DM
