@@ -18,6 +18,6 @@ Paragon brings your PlayStation trophies and your Steam and Xbox achievements to
 
 Paragon only reads your public data. On PlayStation, your trophy profile must be public; on Steam, your profile and "Game details". The app tells you exactly what's missing.
 
-Available in English, Spanish, German and French.
+Available in English, Spanish, German, French, Italian and Portuguese.
 
 Paragon is not affiliated with Sony Interactive Entertainment, Valve or Microsoft.

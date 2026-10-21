@@ -18,6 +18,6 @@ Paragon junta en un solo sitio tus trofeos de PlayStation y tus logros de Steam 
 
 Paragon lee solo tus datos públicos. Para PlayStation, tu perfil de trofeos tiene que estar en público; en Steam, el perfil y «Detalles del juego». La app te dice exactamente qué falta.
 
-Disponible en español, inglés, alemán y francés.
+Disponible en español, inglés, alemán, francés, italiano y portugués.
 
 Paragon no está afiliado a Sony Interactive Entertainment, Valve ni Microsoft.

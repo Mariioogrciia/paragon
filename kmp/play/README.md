@@ -7,7 +7,7 @@ en cada uno.
 
 | Carpeta | Qué hay |
 |---|---|
-| `ficha/<idioma>/` | `titulo.txt` (≤30), `corta.txt` (≤80) y `completa.txt` (≤4000) en es-ES, en-US, de-DE y fr-FR |
+| `ficha/<idioma>/` | `titulo.txt` (≤30), `corta.txt` (≤80) y `completa.txt` (≤4000) en es-ES, en-US, de-DE, fr-FR, it-IT y pt-PT |
 | `graficos/icono-512.png` | Icono de la tienda (512 × 512) |
 | `graficos/<idioma>/destacado.png` | Gráfico de funciones (1024 × 500) |
 | `graficos/<idioma>/telefono-N.png` | Capturas del móvil (1080 × 1920) |

@@ -56,6 +56,22 @@ const TEXTOS = {
       ["Ta progression, trophée par trophée", "La courbe de ton platine, jour après jour"],
     ],
   },
+  "it-IT": {
+    lema: "Tutti i tuoi trofei in un posto",
+    plataformas: "PlayStation · Steam · Xbox",
+    capturas: [
+      ["Il diario di ogni platino", "Quando hai ottenuto ogni trofeo e quanto ti è costato"],
+      ["I tuoi progressi, trofeo dopo trofeo", "Il grafico del platino, giorno per giorno"],
+    ],
+  },
+  "pt-PT": {
+    lema: "Todos os teus troféus num só sítio",
+    plataformas: "PlayStation · Steam · Xbox",
+    capturas: [
+      ["O diário de cada platina", "Quando conquistaste cada troféu e quanto te custou"],
+      ["O teu progresso, troféu a troféu", "O gráfico da platina, dia a dia"],
+    ],
+  },
 };
 
 const BASE = `<style>${FUENTES}*{margin:0;box-sizing:border-box}body{background:#0a0d13;color:#fff;font-family:Barlow,sans-serif;overflow:hidden}
