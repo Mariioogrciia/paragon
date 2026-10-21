@@ -148,14 +148,20 @@ export async function ParagonWrap({
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
   const conAnio = esteAnio > 0;
+  const extras = [
+    rachas && rachas.mejor > 0 && { etiqueta: t("ParagonWrap.mejorRacha"), valor: t("ParagonWrap.dias", { n: rachas.mejor }) },
+    rachas && rachas.diasActivos > 0 && { etiqueta: t("ParagonWrap.diasActivos"), valor: rachas.diasActivos.toLocaleString(locale) },
+    percentil && percentil.totalUsuarios > 1 && { etiqueta: t("ParagonWrap.entreCazadores"), valor: t("ParagonWrap.top", { n: percentil.percentil }) },
+  ].filter((e): e is { etiqueta: string; valor: string } => Boolean(e));
 
   return (
     <section className="mb-10">
       <div className="mb-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="font-heading text-[1.625rem] font-bold uppercase tracking-wide flex items-center gap-2">
-          <span className="text-xl">✨</span> {t("ParagonWrap.titulo")}
+        <h2 className="font-heading flex items-center gap-3 text-[1.625rem] font-bold uppercase tracking-wide">
+          {t("ParagonWrap.titulo")}
+          <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-bold tabular-nums tracking-[0.14em] text-muted">{anual.anio}</span>
         </h2>
-        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-4">
+        <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-3 sm:w-auto sm:justify-end">
           {playerName && (
             <WrapStoriesButton
               data={{
@@ -191,11 +197,24 @@ export async function ParagonWrap({
           <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(600px 260px at 0% 0%, rgb(var(--accent-rgb) / 0.22), transparent 70%)" }} />
           <div className="relative">
             <p className={ROTULO}>{t("ParagonWrap.tuAnio", { anio: anual.anio })}</p>
-            <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-1">
-              <p className="font-heading text-6xl font-bold leading-none text-white">{esteAnio.toLocaleString(locale)}</p>
-              <p className="pb-1 text-sm text-white/70">
-                {conAnio ? t("ParagonWrap.trofeosEnJuegos", { count: juegosEsteAnio }) : t("ParagonWrap.sinTrofeosEsteAnio")}
-              </p>
+            <div className="mt-1 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+              <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
+                <p className="font-heading text-6xl font-bold leading-none text-white">{esteAnio.toLocaleString(locale)}</p>
+                <p className="pb-1 text-sm text-white/70">
+                  {conAnio ? t("ParagonWrap.trofeosEnJuegos", { count: juegosEsteAnio }) : t("ParagonWrap.sinTrofeosEsteAnio")}
+                </p>
+              </div>
+              {/* Tres cifras de contexto: lo que el número grande no cuenta. */}
+              {conAnio && extras.length > 0 && (
+                <dl className="flex gap-5 pb-1">
+                  {extras.map((e) => (
+                    <div key={e.etiqueta} className="min-w-0">
+                      <dt className="text-[0.625rem] font-bold uppercase tracking-[0.14em] text-white/50">{e.etiqueta}</dt>
+                      <dd className="mt-0.5 font-heading text-lg font-bold leading-none tabular-nums text-white">{e.valor}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
             </div>
             {conAnio && (
               <>
@@ -226,7 +245,7 @@ export async function ParagonWrap({
             </p>
             <p className="mt-1 text-sm font-medium text-white/80">
               {topGame && topGame.horasTotal > 0
-                ? t("ParagonWrap.horasJugadas", { horas: topGame.horasTotal.toFixed(1) })
+                ? t("ParagonWrap.horasJugadas", { horas: Math.round(topGame.horasTotal).toLocaleString(locale) })
                 : t("ParagonWrap.trofeosConseguidos", { trofeos: topGame?.game.earnedTotal ?? 0 })}
             </p>
           </div>

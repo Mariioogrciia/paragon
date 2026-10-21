@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Hoja de servicios y Wrap, pasada de diseño (21 oct)
+
+- **Hoja de servicios** (`/u/[handle]/cv`): rehecha como expediente. Franja con nº de expediente y fecha de emisión, avatar dentro del anillo de progreso del nivel, cuentas vinculadas, cifras en libro de cuentas (en móvil los platinos arriba y el resto en 2×2), reparto por metales con icono y número, últimos platinos, condecoraciones con su nombre, juegos destacados con su progreso y un sello. Si no hay platinos, las condecoraciones ocupan todo el ancho. El pie ya pone el dominio bueno (antes decía `paragon.app`). Al imprimir pasa a blanco y negro.
+- **Wrap**: el año va en una etiqueta junto al título (sin el emoji), "Ver Wrap completo" es el botón principal, el póster del año suma mejor racha, días con trofeo y percentil entre cazadores, y las horas del juego más exprimido salen redondeadas y en el formato del idioma (antes "90.0").
+
 **21 oct (7) — panel de admin: analítica, registro y controles de verdad**.
 - Tráfico propio, sin cookies (`lib/trafico.ts`, `lib/traficoRutas.ts` con
   tests, `api/v`, `ContadorVisitas` en el layout con `sendBeacon`): por día

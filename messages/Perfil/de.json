@@ -52,7 +52,18 @@
     "destacados": "Top-Spiele",
     "horas": "{horas} Std.",
     "trofeosCount": "{n} Trophäen",
-    "footer": "Erstellt mit Paragon · paragon.app/u/{handle}"
+    "footer": "Ausgestellt von Paragon · {url}",
+    "marca": "Dienstakte",
+    "expediente": "Akte Nr. {n}",
+    "emitido": "ausgestellt am {fecha}",
+    "rango": "Rang",
+    "paraSiguiente": "{xp} bis Stufe {n}",
+    "completado": "Ø Abschluss",
+    "metales": "Trophäen nach Stufe",
+    "logrosSinMetal": "{n} Erfolge ohne Stufe",
+    "platinosRecientes": "Letzte Platin",
+    "condecoraciones": "Auszeichnungen · {n}",
+    "sello": "Geprüft"
   },
   "WrapRankingPage": {
     "tituloHoras": "Rangliste der Spielstunden",
@@ -285,7 +296,12 @@
     "logrosSinMetal": "Erfolge ohne Stufe",
     "tusJuegosDelAnio": "Deine Spiele des Jahres",
     "platinosDelAnio": "Platin in diesem Jahr",
-    "trofeoMasRaro": "Deine seltenste Trophäe"
+    "trofeoMasRaro": "Deine seltenste Trophäe",
+    "mejorRacha": "Beste Serie",
+    "dias": "{n, plural, one {# Tag} other {# Tage}}",
+    "diasActivos": "Tage mit Trophäe",
+    "entreCazadores": "Unter Jägern",
+    "top": "Top {n} %"
   },
   "WrapStories": {
     "cerrar": "Schließen",

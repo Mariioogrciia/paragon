@@ -52,7 +52,18 @@
     "destacados": "Jeux phares",
     "horas": "{horas} h",
     "trofeosCount": "{n} trophées",
-    "footer": "Généré par Paragon · paragon.app/u/{handle}"
+    "footer": "Émis par Paragon · {url}",
+    "marca": "État de service",
+    "expediente": "Dossier n° {n}",
+    "emitido": "émis le {fecha}",
+    "rango": "Rang",
+    "paraSiguiente": "{xp} jusqu'au niveau {n}",
+    "completado": "Complétion moyenne",
+    "metales": "Trophées par métal",
+    "logrosSinMetal": "{n} succès sans métal",
+    "platinosRecientes": "Derniers platines",
+    "condecoraciones": "Décorations · {n}",
+    "sello": "Vérifié"
   },
   "WrapRankingPage": {
     "tituloHoras": "Classement des heures jouées",
@@ -285,7 +296,12 @@
     "logrosSinMetal": "succès sans métal",
     "tusJuegosDelAnio": "Tes jeux de l'année",
     "platinosDelAnio": "Platines de l'année",
-    "trofeoMasRaro": "Ton trophée le plus rare"
+    "trofeoMasRaro": "Ton trophée le plus rare",
+    "mejorRacha": "Meilleure série",
+    "dias": "{n, plural, one {# jour} other {# jours}}",
+    "diasActivos": "Jours avec trophée",
+    "entreCazadores": "Parmi les chasseurs",
+    "top": "Top {n} %"
   },
   "WrapStories": {
     "cerrar": "Fermer",

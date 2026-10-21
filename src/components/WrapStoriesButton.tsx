@@ -16,9 +16,13 @@ export function WrapStoriesButton({ data }: { data: WrapStoriesData }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent hover:underline"
+        className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide text-[var(--background)] transition-transform hover:scale-[1.03] active:scale-[0.98]"
+        style={{ background: "rgb(var(--accent-rgb))" }}
       >
-        ▶ {t("WrapStoriesButton.verWrapCompleto")}
+        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+          <path d="M1.5 0.8 9 5 1.5 9.2z" fill="currentColor" />
+        </svg>
+        {t("WrapStoriesButton.verWrapCompleto")}
       </button>
       {open && <WrapStories data={data} onClose={() => setOpen(false)} />}
     </>

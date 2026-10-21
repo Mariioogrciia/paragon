@@ -52,7 +52,18 @@
     "destacados": "Juegos destacados",
     "horas": "{horas} h",
     "trofeosCount": "{n} trofeos",
-    "footer": "Generado por Paragon · paragon.app/u/{handle}"
+    "footer": "Emitido por Paragon · {url}",
+    "marca": "Hoja de servicios",
+    "expediente": "Expediente nº {n}",
+    "emitido": "emitido el {fecha}",
+    "rango": "Rango",
+    "paraSiguiente": "{xp} para el nivel {n}",
+    "completado": "Completado medio",
+    "metales": "Trofeos por metal",
+    "logrosSinMetal": "{n} logros sin metal",
+    "platinosRecientes": "Últimos platinos",
+    "condecoraciones": "Condecoraciones · {n}",
+    "sello": "Verificado"
   },
   "WrapRankingPage": {
     "tituloHoras": "Ranking de horas jugadas",
@@ -285,7 +296,12 @@
     "logrosSinMetal": "logros sin metal",
     "tusJuegosDelAnio": "Tus juegos del año",
     "platinosDelAnio": "Platinos del año",
-    "trofeoMasRaro": "Tu trofeo más raro"
+    "trofeoMasRaro": "Tu trofeo más raro",
+    "mejorRacha": "Mejor racha",
+    "dias": "{n, plural, one {# día} other {# días}}",
+    "diasActivos": "Días con trofeo",
+    "entreCazadores": "Entre cazadores",
+    "top": "Top {n}%"
   },
   "WrapStories": {
     "cerrar": "Cerrar",
