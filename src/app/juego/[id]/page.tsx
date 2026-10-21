@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { metaPublica } from "@/lib/seo";
 import { notFound, redirect } from "next/navigation";
 import { HuecoAnuncio } from "@/components/HuecoAnuncio";

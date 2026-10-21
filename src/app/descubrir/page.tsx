@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { metaPublica } from "@/lib/seo";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { HuecoAnuncio } from "@/components/HuecoAnuncio";
 import { getTranslations } from "next-intl/server";
 import { RefrescoAutomatico } from "@/components/RefrescoAutomatico";

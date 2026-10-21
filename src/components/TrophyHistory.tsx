@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useLocale, useTranslations } from "next-intl";
 import { StatTile } from "@/components/StatTile";
 import type { MesConTrofeos, Rachas, ResumenHistorico } from "@/lib/history";

@@ -20,6 +20,7 @@ import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getHiddenNavItems } from "@/lib/navPreferences";
 import { rachas } from "@/lib/history";
+import { recordado } from "@/lib/enSerie";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -184,9 +185,12 @@ export default async function RootLayout({
           console.error("[layout] no se pudo leer el perfil:", error);
           return null;
         }),
-        getParagonLevel(sessionUser.id),
+        // Nivel y racha recorren todo el historial de trofeos y salen en la
+        // cabecera de CADA página: dos minutos de memoria por persona bastan
+        // (22 oct 2026, CPU de Vercel pasada del plan Hobby).
+        recordado(`nivel:${sessionUser.id}`, 120_000, () => getParagonLevel(sessionUser.id)),
         getHiddenNavItems(sessionUser.id),
-        rachas(sessionUser.id).catch((error) => {
+        recordado(`racha:${sessionUser.id}`, 120_000, () => rachas(sessionUser.id)).catch((error) => {
           relanzarSiEsDeNext(error);
           console.error("[layout] no se pudo leer la racha:", error);
           return null;

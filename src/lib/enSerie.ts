@@ -21,6 +21,8 @@ export function recordado<T>(clave: string, ms: number, fn: () => Promise<T>): P
   const ahora = Date.now();
   const hit = memoria.get(clave);
   if (hit && hit.hasta > ahora) return hit.valor as Promise<T>;
+  // Claves por persona (cabecera del layout): que no crezca sin fin.
+  if (memoria.size > 500) for (const [k, v] of memoria) if (v.hasta <= ahora) memoria.delete(k);
   const valor = fn().catch((error) => {
     memoria.delete(clave);
     throw error;

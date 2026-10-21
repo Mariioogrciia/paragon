@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { MesConTrofeos } from "@/lib/history";

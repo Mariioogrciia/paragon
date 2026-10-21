@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations, getLocale } from "next-intl/server";
 import { coverGradient, relativeDate } from "@/lib/design";
 import { TrophyPhoto } from "@/components/TrophyList";

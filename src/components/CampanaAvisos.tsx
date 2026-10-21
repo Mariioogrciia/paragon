@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- carátulas de CDNs externos (PSN, Steam, Xbox...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Bell, X } from "lucide-react";
@@ -72,8 +72,13 @@ export function CampanaAvisos() {
     const intervalo = setInterval(() => {
       if (document.visibilityState === "visible") void cargar();
     }, CADA_MS);
+    // Volver a la pestaña solo pregunta si hace rato de la última vez: cada
+    // cambio de pestaña era una función de Vercel (22 oct 2026).
+    let ultimo = Date.now();
     const alVolver = () => {
-      if (document.visibilityState === "visible") void cargar();
+      if (document.visibilityState !== "visible" || Date.now() - ultimo < 30_000) return;
+      ultimo = Date.now();
+      void cargar();
     };
     document.addEventListener("visibilitychange", alVolver);
     return () => {

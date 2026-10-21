@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { Swords } from "lucide-react";
 import { responderGuerraAction, retarClanAction } from "../actions";
 import { Selector } from "@/components/ui/Selector";

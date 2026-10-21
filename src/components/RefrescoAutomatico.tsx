@@ -25,15 +25,19 @@ export function RefrescoAutomatico({ segundos = 300 }: { segundos?: number }) {
   const router = useRouter();
 
   useEffect(() => {
-    const cada = setInterval(() => {
-      // Solo si la pestaña se esta viendo: refrescar en segundo plano gasta
-      // servidor y base de datos para nadie.
-      if (document.visibilityState === "visible") router.refresh();
-    }, segundos * 1000);
-
-    const alVolver = () => {
-      if (document.visibilityState === "visible") router.refresh();
+    // Al volver a la pestaña solo se refresca si ya toca: antes cada cambio
+    // de pestaña era un render entero de Descubrir en el servidor.
+    let ultimo = Date.now();
+    const refrescar = () => {
+      if (document.visibilityState !== "visible" || Date.now() - ultimo < segundos * 1000 - 2000) return;
+      ultimo = Date.now();
+      router.refresh();
     };
+
+    // Solo si la pestaña se esta viendo: refrescar en segundo plano gasta
+    // servidor y base de datos para nadie.
+    const cada = setInterval(refrescar, segundos * 1000);
+    const alVolver = refrescar;
     document.addEventListener("visibilitychange", alVolver);
 
     return () => {

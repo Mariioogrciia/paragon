@@ -6,7 +6,7 @@ import { PLATFORM_LABEL, type AccountPlatform } from "@/lib/types";
 import { relativeDate } from "@/lib/design";
 import { deleteActivityAction, adminDeleteLeagueAction, adminDeleteClanAction, adminSetHandleAction, adminVaciarCampoAction } from "@/app/actions";
 import { BackButton } from "@/components/BackButton";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations, getLocale } from "next-intl/server";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 import { estadoCredencialPsn } from "@/lib/credencialPsn";

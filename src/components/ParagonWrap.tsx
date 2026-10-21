@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import type { CSSProperties, ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";

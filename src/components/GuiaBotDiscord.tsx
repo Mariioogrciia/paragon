@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { Check, ExternalLink } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 

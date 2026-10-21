@@ -6,7 +6,7 @@ import { getAdminLeagueDetail } from "@/lib/admin";
 import { relativeDate } from "@/lib/design";
 import { BackButton } from "@/components/BackButton";
 import { adminDeleteLeagueAction } from "@/app/actions";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 
 export const metadata = { title: "Liga · Admin · Paragon" };
 

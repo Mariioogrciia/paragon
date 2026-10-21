@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 
 const TOP_MOSTRADO = 8;

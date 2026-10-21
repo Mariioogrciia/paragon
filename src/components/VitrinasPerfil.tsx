@@ -1,5 +1,5 @@
 import { useLocale } from "next-intl";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import type { Vitrina } from "@/lib/vitrinas";
 
 /** Vitrinas temáticas en el perfil — ver lib/vitrinas.ts. Sin vitrinas (o vacías), no pinta nada. */

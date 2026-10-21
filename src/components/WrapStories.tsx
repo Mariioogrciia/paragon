@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { CompartirImagenWrap } from "@/components/CompartirImagenWrap";

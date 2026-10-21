@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 import { GestionarConsentimiento } from "@/components/GestionarConsentimiento";
 import { SiInstagram, SiTiktok, SiGithub } from "@icons-pack/react-simple-icons";

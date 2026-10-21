@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 import { joinClanAction, leaveClanAction } from "../actions";
 

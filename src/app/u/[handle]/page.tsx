@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
 import { datosPerfil } from "@/lib/datosEstructurados";
 import { dominioPublico } from "@/lib/site";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";

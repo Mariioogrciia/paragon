@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { coverGradient } from "@/lib/design";
 import { releaseLabelEs, type IgdbGameResult } from "@/lib/igdb/client";
 

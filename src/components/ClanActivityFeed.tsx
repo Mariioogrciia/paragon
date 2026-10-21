@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { formatDistanceToNow } from "date-fns";
 import { useLocale } from "next-intl";
 import { localeFechas } from "@/lib/localeFechas";

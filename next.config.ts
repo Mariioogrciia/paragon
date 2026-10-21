@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
   // PSN en vez de solo optimizarlas. Antes de migrar esos componentes,
   // confirmar el/los hostname(s) reales contra una cuenta viva y añadirlos
   // aquí.
+  // Caché del navegador para páginas dinámicas (22 oct 2026): volver atrás o
+  // repetir una pestaña dentro de 30 s no vuelve a pedir el render al
+  // servidor. Las acciones que cambian datos ya invalidan esta caché.
+  experimental: {
+    staleTimes: { dynamic: 30 },
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.igdb.com" },

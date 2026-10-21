@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export type Casa = "ps" | "xbox" | "steam" | "epic";

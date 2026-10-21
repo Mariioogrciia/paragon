@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 import { TrophyPhoto } from "@/components/TrophyList";
 import { TrophyGuideModal } from "@/components/TrophyGuideModal";

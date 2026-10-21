@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations } from "next-intl/server";
 import { analitica, audiencia } from "@/lib/trafico";
 import { datosPlataforma } from "@/lib/analiticaPlataforma";

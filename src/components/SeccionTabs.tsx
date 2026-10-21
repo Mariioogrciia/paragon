@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Star, TrendingUp } from "lucide-react";
 import { coverGradient } from "@/lib/design";

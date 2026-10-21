@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { clans, clanMembers } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { ClanCreateForm } from "./ClanCreateForm";
 import { PendingClanInvites } from "./PendingClanInvites";
 import { auth } from "@/auth";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations } from "next-intl/server";
 import { medallaDe, nivelDe, temporadaDe } from "@/lib/temporada";
 import { puntosUsuarioTemporada } from "@/lib/temporadas";

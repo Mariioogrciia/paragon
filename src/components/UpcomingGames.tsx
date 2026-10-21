@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { addToWishlistAction } from "@/app/actions";

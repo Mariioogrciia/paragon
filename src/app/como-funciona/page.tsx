@@ -1,6 +1,6 @@
 import React from "react";
 import { metaPublica } from "@/lib/seo";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations } from "next-intl/server";
 import { BackButton } from "@/components/BackButton";
 import { IndiceManual } from "@/components/IndiceManual";

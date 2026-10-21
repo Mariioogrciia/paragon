@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 import { Selector } from "@/components/ui/Selector";
 import { TiltCard } from "@/components/TiltCard";

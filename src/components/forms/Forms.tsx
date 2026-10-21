@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import {
   addFriendAction,
   addLeagueMemberAction,

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations } from "next-intl/server";
 import { adminAvisoATodosAction, adminLanzarCronAction, adminPausarPlataformaAction } from "@/app/actions";
 import { PLATAFORMAS_PAUSABLES, plataformasPausadas } from "@/lib/ajustesSistema";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 import { addToWishlistAction } from "@/app/actions";
 import { coverGradient } from "@/lib/design";

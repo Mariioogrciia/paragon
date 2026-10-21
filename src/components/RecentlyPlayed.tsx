@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useLocale } from "next-intl";
 import { coverGradient, relativeDate } from "@/lib/design";
 import type { Game } from "@/lib/types";

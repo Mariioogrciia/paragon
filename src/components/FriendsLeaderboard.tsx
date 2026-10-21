@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
 import type { StatsAmigo } from "@/lib/profileStats";

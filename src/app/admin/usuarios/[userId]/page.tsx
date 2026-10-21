@@ -9,7 +9,7 @@ import { relativeDate } from "@/lib/design";
 import { Avatar } from "@/components/Avatar";
 import { BackButton } from "@/components/BackButton";
 import { adminSetHandleAction } from "@/app/actions";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 
 export const metadata = { title: "Usuario · Admin · Paragon" };
 

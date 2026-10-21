@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations, getLocale } from "next-intl/server";
 import type { PlatinoAlAlcance } from "@/lib/backlog";
 import { relativeDate } from "@/lib/design";

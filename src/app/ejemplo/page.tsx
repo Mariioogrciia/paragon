@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { metaPublica } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";

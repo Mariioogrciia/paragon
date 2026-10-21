@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Avatar } from "@/components/Avatar";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { BackButton } from "@/components/BackButton";
 import { AddLeagueMemberForm, SetLeagueChallengeForm } from "@/components/forms/Forms";
 import { removeLeagueMemberAction, deleteLeagueAction, acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";

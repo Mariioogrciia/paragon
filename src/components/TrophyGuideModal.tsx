@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState, useTransition } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations, useLocale } from "next-intl";
 import {
   searchTrophyGuideAction,

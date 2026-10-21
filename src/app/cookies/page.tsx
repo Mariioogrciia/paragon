@@ -1,6 +1,6 @@
 import React from "react";
 import { metaPublica } from "@/lib/seo";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { anunciosActivos } from "@/lib/publicidad";
 import { GestionarConsentimiento } from "@/components/GestionarConsentimiento";
 import { getTranslations } from "next-intl/server";

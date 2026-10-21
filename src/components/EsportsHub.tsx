@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations, useLocale } from "next-intl";
 import type { EsportsMatch, EsportsStanding } from "@/lib/pandascore";
 import { Dorsal } from "@/components/carreras/Dorsal";

@@ -7,7 +7,7 @@ import { ClanActions } from "./ClanActions";
 import { InviteFriendsButton } from "./InviteFriendsButton";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Dorsal } from "@/components/carreras/Dorsal";
 import { libreaDe } from "@/lib/librea";

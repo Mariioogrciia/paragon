@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getProfileByUserId, resolveAvatarUrl } from "@/lib/profiles";
 import { getLigaMensualDesglose } from "@/lib/ligas";

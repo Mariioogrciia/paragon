@@ -5,7 +5,7 @@ import { getMonthlyLeagueHistory } from "@/lib/trophyCase";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { TrophyTile } from "@/components/TrophyIcon";
 import { LigaMensualFila } from "@/components/LigaMensualFila";
 import { BackButton } from "@/components/BackButton";

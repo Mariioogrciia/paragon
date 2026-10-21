@@ -3,7 +3,7 @@
 import { useActionState, useMemo, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import {
   createCollectionWithGamesAction,
   renameCollectionAction,

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { anunciosActivos } from "@/lib/publicidad";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";

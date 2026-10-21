@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useTranslations } from "next-intl";
 import type { Efemeride } from "@/lib/history";
 import { TrophyPhoto } from "@/components/TrophyList";

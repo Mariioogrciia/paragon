@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useLocale, useTranslations } from "next-intl";
 import type { PuntoMatriz } from "@/lib/discover";
 

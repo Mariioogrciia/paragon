@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- avatares de PSN, Steam y Xbox (CDNs externos), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, X } from "lucide-react";

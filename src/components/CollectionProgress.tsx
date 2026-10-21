@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { getTranslations } from "next-intl/server";
 import type { Collection } from "@/lib/collections";
 import type { Game } from "@/lib/types";

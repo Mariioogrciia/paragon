@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { useLocale, useTranslations } from "next-intl";
 import { Avatar } from "@/components/Avatar";
 import { Dorsal } from "@/components/carreras/Dorsal";

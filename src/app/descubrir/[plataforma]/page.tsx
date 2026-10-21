@@ -11,7 +11,7 @@ import { ReleaseGrid } from "@/components/ReleaseGrid";
 import { CardCarousel } from "@/components/CardCarousel";
 import { PosterCard } from "@/components/PosterCard";
 import { PlayStationIcon, SteamIcon, EpicGamesIcon } from "@/lib/platformIcons";
-import Link from "next/link";
+import Link from "@/components/Enlace";
 import { DestacadoCasa, type Casa, type JuegoDestacado } from "@/components/descubrir/DestacadoCasa";
 import { TopComunidad } from "@/components/descubrir/Exitos";
 import { getEpicGratis } from "@/lib/epicGratis";
