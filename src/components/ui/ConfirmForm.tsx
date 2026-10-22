@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 /**
@@ -59,55 +58,45 @@ export function ConfirmForm({
         </button>
       </form>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4"
-            onClick={() => setOpen(false)}
+      {open && (
+        <div
+          className="entra-fundido fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby={`${id}-titulo`}
+            aria-describedby={`${id}-texto`}
+            className="entra-dialogo w-full max-w-sm rounded-2xl p-6"
+            style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.15 }}
-              role="alertdialog"
-              aria-modal="true"
-              aria-labelledby={`${id}-titulo`}
-              aria-describedby={`${id}-texto`}
-              className="w-full max-w-sm rounded-2xl p-6"
-              style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 id={`${id}-titulo`} className="font-heading text-lg font-bold">{title}</h3>
-              <p id={`${id}-texto`} className="mt-2 text-sm text-muted">{message}</p>
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  autoFocus
-                  onClick={() => setOpen(false)}
-                  className="text-sm font-semibold text-muted transition-colors hover:text-foreground"
-                >
-                  {resolvedCancelLabel}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    formRef.current?.requestSubmit();
-                  }}
-                  className="rounded-lg bg-danger px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
-                >
-                  {resolvedConfirmLabel}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <h3 id={`${id}-titulo`} className="font-heading text-lg font-bold">{title}</h3>
+            <p id={`${id}-texto`} className="mt-2 text-sm text-muted">{message}</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setOpen(false)}
+                className="text-sm font-semibold text-muted transition-colors hover:text-foreground"
+              >
+                {resolvedCancelLabel}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  formRef.current?.requestSubmit();
+                }}
+                className="rounded-lg bg-danger px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+              >
+                {resolvedConfirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -6,6 +6,13 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Animaciones sin framer-motion donde no hacía falta (22 oct)
+
+- framer-motion eran 42 KB comprimidos en cada página con una cifra destacada, un selector o un diálogo de confirmar, para fundidos simples. `StatTile` y `MonthlySummary` aparecen ahora con CSS (`.aparecer`, `.aparecer-escala` en globals.css) y un IntersectionObserver de una sola vez (`lib/useAparecer.ts`); `Selector` y `ConfirmForm` entran con una animación CSS al montarse (`.entra-desplegable`, `.entra-fundido`, `.entra-dialogo`) y se cierran sin animación. Todo respeta `prefers-reduced-motion`. framer-motion solo queda en `LibraryGrid` (animación `layout`) y `ProfileSectionOrderEditor` (`Reorder`).
+- Medido (JS comprimido): perfil de 258 a 214 KB, ajustes de 252 a 201, inicio 213, ficha de juego 206; /privacidad igual (178).
+- De paso, un fallo que ya tenía framer-motion: si se saltaba POR ENCIMA de una cifra sin pasar por ella (enlace a una sección, volver atrás y recuperar el scroll), se quedaba invisible para siempre. `useAparecer` cuenta como visto lo que ya quedó por encima.
+- Probado con Playwright: cifras que aparecen al bajar (y al saltar), selector que abre y cierra al elegir, diálogo con foco en «Cancelar» y Escape; recorrido de 14 páginas sin errores.
+
 ### Logos oficiales en «Sitios web» y en la lista de precios (22 oct)
 
 - En la ficha de juego, Xbox, PlayStation, Nintendo e itch.io salían con el globo genérico, y el resto eran SVG dibujados a mano. `components/SiteIcon.tsx` usa ahora los logos oficiales de Simple Icons (`@icons-pack/react-simple-icons`, ya en el proyecto; Xbox, Microsoft y Nintendo de react-icons, porque Simple Icons ya no los tiene), también para las tiendas de la lista de precios (Humble, Ubisoft, EA, Battle.net, Microsoft…). Solo el «Sitio oficial» y las tiendas sin logo siguen con el globo.

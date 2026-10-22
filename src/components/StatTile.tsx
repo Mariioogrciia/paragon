@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useAparecer } from "@/lib/useAparecer";
 
 /**
  * Cifra destacada. No es un gráfico a propósito: un solo número se lee mejor
@@ -17,18 +17,17 @@ export function StatTile({
   hint?: string;
   accent?: string;
 }) {
+  const [ref, visible] = useAparecer<HTMLDivElement>("-50px");
   return (
     // El recorte del brillo (`animate-glint`, que trae su propio
     // `overflow: hidden`) va en el div interior, no en este — si viviera
     // aquí se comería en silencio el `hover:shadow` de abajo, la misma
     // trampa que ya pasó con `filter: drop-shadow` en DiscoverCard.tsx (ver
     // HANDOFF). El resplandor de hover necesita el borde de la caja libre.
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="h-full rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]"
+    <div
+      ref={ref}
+      data-visible={visible || undefined}
+      className="aparecer h-full rounded-[20px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]"
     >
       {/* h-full en las dos capas: el grid ya estira esta caja a la altura de
           la fila (comportamiento por defecto), pero el borde/fondo vive en
@@ -46,6 +45,6 @@ export function StatTile({
         <p className="mt-3 text-[0.625rem] font-bold uppercase tracking-[0.1em] text-muted [overflow-wrap:anywhere] sm:text-[0.6875rem] sm:tracking-[0.12em]">{label}</p>
         {hint && <p className="mt-2 text-xs text-muted">{hint}</p>}
       </div>
-    </motion.div>
+    </div>
   );
 }

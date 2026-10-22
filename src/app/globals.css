@@ -1654,3 +1654,59 @@ h3,
   cursor: grabbing !important;
   user-select: none !important;
 }
+
+/*
+ * Animaciones de entrada sin framer-motion (22 oct 2026; ver lib/useAparecer.ts).
+ * - `.aparecer` / `.aparecer-escala`: hasta que el elemento entra en pantalla
+ *   (`data-visible`), invisible y algo desplazado o encogido; la transición la
+ *   pone el propio elemento (`transition-all`).
+ * - `.entra-desplegable` / `.entra-fundido` / `.entra-dialogo`: al montarse.
+ *   Al cerrar desaparecen sin animación (antes se fundían 0,15 s).
+ */
+.aparecer:not([data-visible]) {
+  opacity: 0;
+  transform: translateY(15px);
+}
+.aparecer-escala:not([data-visible]) {
+  opacity: 0;
+  transform: scale(0.95);
+}
+@keyframes entra-desplegable {
+  from {
+    opacity: 0;
+    transform: translateY(var(--entra-desde, -6px));
+  }
+}
+@keyframes entra-fundido {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes entra-dialogo {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+}
+.entra-desplegable {
+  animation: entra-desplegable 140ms ease-out;
+}
+.entra-fundido {
+  animation: entra-fundido 150ms ease-out;
+}
+.entra-dialogo {
+  animation: entra-dialogo 150ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aparecer:not([data-visible]),
+  .aparecer-escala:not([data-visible]) {
+    opacity: 1;
+    transform: none;
+  }
+  .entra-desplegable,
+  .entra-fundido,
+  .entra-dialogo {
+    animation: none;
+  }
+}

@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 export interface OpcionSelector {
@@ -194,77 +193,71 @@ export function Selector({ value, onChange, options, placeholder, name, ariaLabe
         </svg>
       </button>
 
-      <AnimatePresence>
-        {abierto && (
-          <motion.div
-            initial={{ opacity: 0, y: haciaArriba ? 6 : -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: haciaArriba ? 6 : -6 }}
-            transition={{ duration: 0.14, ease: "easeOut" }}
-            // Dentro de un <label> (casi siempre), un clic en una opción
-            // "activaría" el label y este volvería a pulsar el botón: se
-            // reabriría el panel nada más elegir. Cancelar el clic lo evita.
-            onClick={(e) => e.preventDefault()}
-            className={`absolute left-0 z-50 w-full min-w-[220px] overflow-hidden rounded-xl border border-border shadow-lg ${haciaArriba ? "bottom-full mb-1" : "top-full mt-1"}`}
-            style={{ background: "var(--surface)" }}
-          >
-            {conBusqueda && (
-              <div className="border-b border-border p-2">
-                <input
-                  ref={cajaBusqueda}
-                  value={busqueda}
-                  onChange={(e) => {
-                    setBusqueda(e.target.value);
-                    setActivo(0);
-                  }}
-                  placeholder={t("buscar")}
-                  aria-label={t("buscar")}
-                  className="w-full rounded-lg border border-border px-2.5 py-1.5 text-sm focus:border-accent focus:outline-none"
-                  style={{ background: "var(--background)" }}
-                />
-              </div>
-            )}
-            <ul ref={lista} id={`${id}-lista`} role="listbox" aria-label={ariaLabel} className="overflow-y-auto py-1" style={{ maxHeight: conBusqueda ? ALTO_PANEL - 52 : ALTO_PANEL }}>
-              {visibles.length === 0 && <li className="px-3 py-2 text-sm text-muted">{t("sinResultados")}</li>}
-              {visibles.map((o, i) => {
-                const seleccionada = o.value === value;
-                const nuevoGrupo = !!o.grupo && o.grupo !== visibles[i - 1]?.grupo;
-                return (
-                  <Fragment key={o.value}>
-                    {nuevoGrupo && (
-                      <li role="presentation" className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
-                        {o.grupo}
-                      </li>
-                    )}
-                    <li
-                      role="option"
-                      aria-selected={seleccionada}
-                      aria-disabled={o.disabled}
-                      data-indice={i}
-                      onMouseEnter={() => !o.disabled && setActivo(i)}
-                      onClick={() => elegir(o)}
-                      className={`fila-lista mx-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm ${
-                        o.disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"
-                      } ${seleccionada ? "font-bold text-[var(--accent-text)]" : "font-medium text-foreground"}`}
-                      style={i === activo && !o.disabled ? { background: "var(--surface-2)" } : undefined}
-                    >
-                      {o.icono && <span className="shrink-0">{o.icono}</span>}
-                      <span className="min-w-0 flex-1 truncate">
-                        {o.label}
-                        {o.count !== undefined && <span className="ml-1 font-medium text-muted">({o.count})</span>}
-                      </span>
-                      {o.detalle && <span className="shrink-0 text-xs font-medium text-muted">{o.detalle}</span>}
-                      <span className="w-3.5 shrink-0 text-center" aria-hidden>
-                        {seleccionada ? "✓" : ""}
-                      </span>
+      {abierto && (
+        <div
+          // Dentro de un <label> (casi siempre), un clic en una opción
+          // "activaría" el label y este volvería a pulsar el botón: se
+          // reabriría el panel nada más elegir. Cancelar el clic lo evita.
+          onClick={(e) => e.preventDefault()}
+          className={`entra-desplegable absolute left-0 z-50 w-full min-w-[220px] overflow-hidden rounded-xl border border-border shadow-lg ${haciaArriba ? "bottom-full mb-1" : "top-full mt-1"}`}
+          style={{ background: "var(--surface)", ["--entra-desde" as string]: haciaArriba ? "6px" : "-6px" }}
+        >
+          {conBusqueda && (
+            <div className="border-b border-border p-2">
+              <input
+                ref={cajaBusqueda}
+                value={busqueda}
+                onChange={(e) => {
+                  setBusqueda(e.target.value);
+                  setActivo(0);
+                }}
+                placeholder={t("buscar")}
+                aria-label={t("buscar")}
+                className="w-full rounded-lg border border-border px-2.5 py-1.5 text-sm focus:border-accent focus:outline-none"
+                style={{ background: "var(--background)" }}
+              />
+            </div>
+          )}
+          <ul ref={lista} id={`${id}-lista`} role="listbox" aria-label={ariaLabel} className="overflow-y-auto py-1" style={{ maxHeight: conBusqueda ? ALTO_PANEL - 52 : ALTO_PANEL }}>
+            {visibles.length === 0 && <li className="px-3 py-2 text-sm text-muted">{t("sinResultados")}</li>}
+            {visibles.map((o, i) => {
+              const seleccionada = o.value === value;
+              const nuevoGrupo = !!o.grupo && o.grupo !== visibles[i - 1]?.grupo;
+              return (
+                <Fragment key={o.value}>
+                  {nuevoGrupo && (
+                    <li role="presentation" className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
+                      {o.grupo}
                     </li>
-                  </Fragment>
-                );
-              })}
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  )}
+                  <li
+                    role="option"
+                    aria-selected={seleccionada}
+                    aria-disabled={o.disabled}
+                    data-indice={i}
+                    onMouseEnter={() => !o.disabled && setActivo(i)}
+                    onClick={() => elegir(o)}
+                    className={`fila-lista mx-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm ${
+                      o.disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"
+                    } ${seleccionada ? "font-bold text-[var(--accent-text)]" : "font-medium text-foreground"}`}
+                    style={i === activo && !o.disabled ? { background: "var(--surface-2)" } : undefined}
+                  >
+                    {o.icono && <span className="shrink-0">{o.icono}</span>}
+                    <span className="min-w-0 flex-1 truncate">
+                      {o.label}
+                      {o.count !== undefined && <span className="ml-1 font-medium text-muted">({o.count})</span>}
+                    </span>
+                    {o.detalle && <span className="shrink-0 text-xs font-medium text-muted">{o.detalle}</span>}
+                    <span className="w-3.5 shrink-0 text-center" aria-hidden>
+                      {seleccionada ? "✓" : ""}
+                    </span>
+                  </li>
+                </Fragment>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

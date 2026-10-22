@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "@/components/Enlace";
-import { motion } from "framer-motion";
+import { useAparecer } from "@/lib/useAparecer";
 import { useTranslations } from "next-intl";
 import type { MesConTrofeos } from "@/lib/history";
 
@@ -13,6 +13,7 @@ function nombreMes(clave: string, nombresMeses: string[]): string {
 
 export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
   const t = useTranslations("Analitica.monthlySummary");
+  const [ref, visible] = useAparecer<HTMLDivElement>();
   const nombresMeses = t.raw("meses") as string[];
   if (!meses || meses.length === 0) return null;
 
@@ -44,11 +45,9 @@ export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
+    <div
+      ref={ref}
+      data-visible={visible || undefined}
       // `h-full` importa de verdad aqui: esta tarjeta vive en una rejilla
       // `[1fr_2.5fr]` (app/page.tsx) junto a "Tu ritmo", que es mucho mas
       // alta. Sin esto, la tarjeta se quedaba con su altura natural y dejaba
@@ -56,7 +55,7 @@ export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
       // de dentro no servia de nada, porque su padre no tenia altura contra
       // la que resolverse. La variante de "mes sin trofeos" de arriba ya lo
       // tenia; esta se habia quedado sin el.
-      className="animate-glint relative flex h-full flex-col overflow-hidden rounded-[20px] p-6 text-white transition-all duration-300 hover:-translate-y-1"
+      className="aparecer-escala animate-glint relative flex h-full flex-col overflow-hidden rounded-[20px] p-6 text-white transition-all duration-300 hover:-translate-y-1"
       style={{
         background: "linear-gradient(135deg, rgb(var(--accent-rgb) / 0.8), rgb(var(--accent-rgb) / 0.3))",
         border: "1px solid rgb(var(--accent-rgb) / 0.4)",
@@ -95,6 +94,6 @@ export function MonthlySummary({ meses }: { meses: MesConTrofeos[] }) {
         className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full blur-2xl pointer-events-none"
         style={{ background: "white", opacity: 0.1 }}
       />
-    </motion.div>
+    </div>
   );
 }

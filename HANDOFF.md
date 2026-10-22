@@ -482,12 +482,9 @@ notificaciones push (Web Push + FCM, hace tiempo). Sigue pendiente de
 verdad:
 - **Rendimiento, ideas medidas en la auditoría del 22 oct 2026** (detalle en
   docs/HISTORIAL.md):
-  - framer-motion pesa 42 KB comprimidos en las páginas con selector,
-    diálogo de confirmar o biblioteca, y casi todo son fundidos simples.
-    Pasar `StatTile`, `MonthlySummary`, `ConfirmForm` y `Selector` a
-    transiciones CSS lo quitaría de esas páginas (la biblioteca y
-    `ProfileSectionOrderEditor` sí lo necesitan). `LazyMotion` en la raíz
-    se probó y empeoraba: lo cargaba en todas las páginas.
+  - ~~framer-motion en StatTile, MonthlySummary, ConfirmForm y Selector~~
+    → hecho el 22 oct (CSS + `lib/useAparecer.ts`). Solo queda en
+    `LibraryGrid` (animación `layout`) y `ProfileSectionOrderEditor`.
   - Siguen ~83 KB de textos en el HTML de cada página: `Shell.Home` (9 KB,
     solo la portada) y los sub-apartados más grandes se podrían mandar solo
     en las páginas que los usan, con un `NextIntlClientProvider` anidado.
