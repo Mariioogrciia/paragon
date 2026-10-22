@@ -356,7 +356,7 @@ export async function upcomingGames(limit = 8, plataforma?: keyof typeof ABREVIA
         return games.sort((x, y) => (puesto.get(x.id) ?? Infinity) - (puesto.get(y.id) ?? Infinity));
       })
       .catch((error) => {
-        console.error("[igdb] más esperados", error);
+        if (!(error instanceof IgdbNotConfiguredError)) console.error("[igdb] más esperados", error);
         return [] as IgdbGame[];
       }),
     query<IgdbGame>("games", `${FIELDS} where ${futuros} & hypes != null; sort hypes desc; limit ${limit};`, VENTANA_SEGUNDOS),

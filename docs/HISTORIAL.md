@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Next.js 16.4.0 → 16.4.2: fallos de seguridad (22 oct)
+
+- `npm audit` marcaba Next.js 16.0.0–16.4.0 con tres avisos, uno crítico: ejecución remota de código en la optimización de imágenes con SVG (GHSA-2464-fhr4-w9xw), otra en funciones `use cache` que devuelven arrays tipados (GHSA-673q-mjm6-r5xr) y una denegación de servicio con Server Actions (GHSA-p3m5-59mp-jv5r). Arreglados en 16.4.2 (`next` y `eslint-config-next`, versión fija como antes). `npm audit fix` sin `--force` además subió `vite`. Comprobado: tipos, ESLint, 270 tests, build y las páginas principales con y sin sesión.
+- Lo que sigue marcado es de herramientas de desarrollo que no van a producción (Vitest 3 —el arreglo es Vitest 5, cambio grande—, ESLint, drizzle-kit) y `uuid`/`gaxios` dentro de firebase-admin.
+
 ### Color libre: principal y fondo (22 oct)
 
 - El color libre solo cambiaba el acento. Ahora hay dos: **color principal** (acentos, como antes) y **color de fondo**, en la web (Ajustes → Apariencia) y en la app. Del fondo salen las superficies, el borde y el texto: claro u oscuro según el contraste (`sueloDesdeFondo` en `lib/paletaJuego.ts`; `sueloLibre` en `kmp/.../theme/Color.kt`), con el gris secundario sin bajar de 3,5:1. Va en el `style` del `<html>`, así que manda sobre el fondo del modo, de las paletas y del juego; el script anti-parpadeo de `documento.tsx` lo aplica antes de pintar. «Fondo de siempre» lo quita. Aviso si el principal apenas se lee sobre el fondo.
