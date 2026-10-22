@@ -4,7 +4,7 @@ import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { ultimosTrofeos } from "@/lib/history";
 import { summarise } from "@/lib/stats";
-import { urlAbsolutaParaOg } from "@/lib/design";
+import { imagenSegura } from "@/lib/og/imagenSegura";
 
 const COLOR_GRADO: Record<string, string> = {
   platinum: "#9fd4ec",
@@ -36,7 +36,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ han
     ultimosTrofeos(profile.userId, 3),
   ]);
   const resumen = summarise(games);
-  const avatar = urlAbsolutaParaOg(player.avatarUrl);
+  // Bajadas antes: una sola imagen caída rompía la firma entera (lib/og/imagenSegura.ts).
+  const [avatar, ...iconos] = await Promise.all([
+    imagenSegura(player.avatarUrl),
+    ...recientes.map((t) => imagenSegura(t.iconUrl ?? t.gameIconUrl)),
+  ]);
 
   const dato = (valor: number | string, etiqueta: string, color = "#e6edf5") => (
     <div style={{ display: "flex", flexDirection: "column", marginRight: 18 }}>
@@ -84,8 +88,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ han
         </div>
 
         <div style={{ display: "flex", alignSelf: "flex-start", marginTop: 20 }}>
-          {recientes.map((t) => {
-            const icono = urlAbsolutaParaOg(t.iconUrl ?? t.gameIconUrl ?? undefined);
+          {recientes.map((t, i) => {
+            const icono = iconos[i];
             return icono ? (
               <img
                 key={`${t.gameId}-${t.trophyId}`}

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getGameDetail, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { dificultadDeGame, esPlatinoEquivalente } from "@/lib/stats";
-import { urlAbsolutaParaOg } from "@/lib/design";
+import { imagenSegura } from "@/lib/og/imagenSegura";
 import { esIdioma, type Idioma } from "@/lib/idiomasTrofeo";
 import { historia, TrofeoPlatino } from "@/lib/og/historiaPlatino";
 
@@ -89,7 +89,8 @@ export async function GET(
     return new Response("Este juego todavía no está platinado.", { status: 400 });
   }
 
-  const avatarUrl = urlAbsolutaParaOg(resolveAvatarUrl(profile));
+  // Bajadas antes: una imagen caída rompía la tarjeta entera (lib/og/imagenSegura.ts).
+  const [avatarUrl, portada] = await Promise.all([imagenSegura(resolveAvatarUrl(profile)), imagenSegura(game.iconUrl)]);
   const horas = game.playtimeMinutes ? game.playtimeMinutes / 60 : null;
   const dificultad = dificultadDeGame(game);
   // Steam no tiene trofeo de platino de verdad que contar (por eso
@@ -111,9 +112,9 @@ export async function GET(
       dominio,
       handle,
       nombre: profile.displayName ?? `@${handle}`,
-      avatarUrl,
+      avatarUrl: avatarUrl ?? undefined,
       titulo: game.title,
-      coverUrl: game.iconUrl ?? null,
+      coverUrl: portada,
       rotulo: hasPlatinum ? textos.platino : textos.cien,
       stats: [
         ...(horas !== null ? [{ label: textos.horas, value: `${horas.toFixed(0)} h`, accent: PLATINO }] : []),
@@ -206,9 +207,9 @@ export async function GET(
                 flexShrink: 0,
               }}
             >
-              {game.iconUrl && (
+              {portada && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={game.iconUrl} width={176} height={234} style={{ objectFit: "cover" }} alt="" />
+                <img src={portada} width={176} height={234} style={{ objectFit: "cover" }} alt="" />
               )}
             </div>
 

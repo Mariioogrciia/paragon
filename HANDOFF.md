@@ -480,6 +480,17 @@ hechos: i18n de `relativeDate()` y de los retos semanales, filtro de
 lenguaje en alemán y francés, Pase de Temporada, Vitrinas temáticas y las
 notificaciones push (Web Push + FCM, hace tiempo). Sigue pendiente de
 verdad:
+- **Rendimiento, ideas medidas en la auditoría del 22 oct 2026** (detalle en
+  docs/HISTORIAL.md):
+  - framer-motion pesa 42 KB comprimidos en las páginas con selector,
+    diálogo de confirmar o biblioteca, y casi todo son fundidos simples.
+    Pasar `StatTile`, `MonthlySummary`, `ConfirmForm` y `Selector` a
+    transiciones CSS lo quitaría de esas páginas (la biblioteca y
+    `ProfileSectionOrderEditor` sí lo necesitan). `LazyMotion` en la raíz
+    se probó y empeoraba: lo cargaba en todas las páginas.
+  - Siguen ~83 KB de textos en el HTML de cada página: `Shell.Home` (9 KB,
+    solo la portada) y los sub-apartados más grandes se podrían mandar solo
+    en las páginas que los usan, con un `NextIntlClientProvider` anidado.
 - **Rediseño visual de la landing**: sigue la decisión de no tocar la
   estética global.
 - **Epic no da horas jugadas** por su API: nunca aparecerán en rankings de

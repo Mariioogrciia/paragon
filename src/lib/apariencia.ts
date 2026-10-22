@@ -318,7 +318,15 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
     if (sincronizar) guardarAparienciaAction(leerLocal()).catch(() => undefined);
   }
 
+  /** Las paletas completas, la de juego y los temas traen su propio fondo: el libre se quita para que se vea. */
+  function quitarFondoSiTapa() {
+    if (!leerFondoLibre()) return;
+    setFondoLibre("");
+    escribirFondoLibre("");
+  }
+
   function elegirAcento(valor: string) {
+    if (ACENTOS.find((a) => a.value === valor)?.color.startsWith("linear-gradient")) quitarFondoSiTapa();
     setAcento(valor);
     setAcentoLibre("");
     setAcentoJuego("");
@@ -348,6 +356,7 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
   }
 
   function elegirAcentoJuego(juego: AcentoJuego) {
+    quitarFondoSiTapa();
     setAcentoJuego(juego.id);
     setAcento("");
     setAcentoLibre("");
@@ -374,6 +383,7 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
   }
 
   function elegirTema(t: (typeof TEMAS)[number]) {
+    quitarFondoSiTapa();
     setTheme(t.modo);
     elegirAcento(t.acento);
     elegirEstilo(t.estilo);

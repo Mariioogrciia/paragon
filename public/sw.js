@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
           const preloadResponse = await event.preloadResponse;
           if (preloadResponse) return preloadResponse;
           return await fetch(request);
-        } catch (error) {
+        } catch {
           const cache = await caches.open(CACHE_NAME);
           const cachedResponse = await cache.match(OFFLINE_URL);
           return cachedResponse || new Response('Offline', { status: 503, statusText: 'Offline' });
@@ -91,7 +91,7 @@ self.addEventListener('push', (event) => {
   let datos = { title: 'Paragon', body: 'Tienes una novedad.' };
   try {
     if (event.data) datos = event.data.json();
-  } catch (error) {
+  } catch {
     // Un payload que no es JSON no debe tumbar el aviso entero — se enseña
     // el genérico de arriba en vez de nada.
   }

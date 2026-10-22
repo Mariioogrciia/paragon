@@ -21,7 +21,10 @@ import { ConfirmForm } from "@/components/ui/ConfirmForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CompletarSteamSiHaceFalta } from "@/components/CompletarSteamSiHaceFalta";
 
-export const metadata = { title: "Ajustes · Paragon" };
+export async function generateMetadata() {
+  const t = await getTranslations("Onboarding.ajustesNav");
+  return { title: `${t("plataformas")} · ${t("titulo")} · Paragon` };
+}
 
 
 const AVATAR_BG: Record<PlataformaVinculable, string> = {

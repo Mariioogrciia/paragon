@@ -11,6 +11,11 @@ import { GoogleLogo, DiscordLogo } from "@/components/ui/PlatformLogos";
 
 const NOMBRE_PROVEEDOR: Record<string, string> = { google: "Google", discord: "Discord" };
 
+export async function generateMetadata() {
+  const t = await getTranslations("Onboarding.ajustesNav");
+  return { title: `${t("seguridad")} · ${t("titulo")} · Paragon` };
+}
+
 export default async function AjustesSeguridadPage({
   searchParams,
 }: {

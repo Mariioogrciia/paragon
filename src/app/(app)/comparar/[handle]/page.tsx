@@ -20,6 +20,11 @@ const OUTCOME_STYLE = {
   empate: { bg: "rgba(135, 148, 168, 0.12)", fg: "var(--muted)", border: "rgba(135, 148, 168, 0.25)" },
 };
 
+export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }) {
+  const { handle } = await params;
+  return { title: `vs @${decodeURIComponent(handle)} · Paragon` };
+}
+
 export default async function CompararPage({
   params,
 }: {

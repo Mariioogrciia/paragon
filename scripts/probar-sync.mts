@@ -23,7 +23,7 @@ if (!accountId || (platform !== "psn" && platform !== "steam" && platform !== "x
 const cuenta = { platform, accountId };
 
 const { db } = await import("../src/db/index");
-const { users, userGames, userTrophies, games, gameTrophies } = await import(
+const { users, userGames, userTrophies, games } = await import(
   "../src/db/schema"
 );
 const { syncLibrary, syncGameTrophies } = await import("../src/lib/sync");

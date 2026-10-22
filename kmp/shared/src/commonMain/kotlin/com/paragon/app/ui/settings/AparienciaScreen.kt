@@ -254,6 +254,8 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                         val activo = !materialYou && themeStore.paletaJuego == null && themeStore.acentoLibre.isEmpty() && themeStore.acento == a.clave
                         ConNombre(stringResource(a.nombre), activo) {
                             Muestrario(a, activo, stringResource(a.nombre), enabled = !materialYou) {
+                                // Una paleta completa trae su fondo: el libre la taparía (como en la web).
+                                if (a.suelo != null) themeStore.setFondoLibre("")
                                 themeStore.setAcento(a.clave)
                                 guardar()
                             }

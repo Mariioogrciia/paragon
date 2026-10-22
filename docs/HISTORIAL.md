@@ -6,6 +6,18 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Auditoría de funciones, personalización y rendimiento (22 oct)
+
+- **Cómo**: recorrido con Playwright de 50 rutas con y sin sesión (estado, errores de consola y de red, peso, nodos, títulos), las mismas a 375 px buscando desbordes horizontales, 88 enlaces internos comprobados, registros del servidor, y medida de JS y HTML comprimidos. Resultado: ningún enlace roto, ningún desborde en móvil, ningún error de JavaScript ni texto sin traducir; el servidor responde en 40-80 ms en local.
+- **Arreglado**:
+  - La **firma** (`/api/firma`) y la **tarjeta de platino** se rompían ENTERAS si una sola imagen (avatar o carátula) fallaba al cargar (Satori revienta). Ahora se bajan antes con tiempo límite y la que falla se omite (`lib/og/imagenSegura.ts`, la que ya usaba el Wrap, ahora compartida).
+  - **Textos en el HTML**: "Onboarding", "Perfil" y "Biblioteca" iban enteros a cada página. Ahora van solo los sub-apartados que usan los componentes de cliente: de 109 a 83 KB por página (HTML del perfil de 82 a 74 KB comprimido). `scripts/comprobar-namespaces-cliente.mts` comprueba ahora cada `t("parte.clave")` de un namespace mandado en parte, y el test lo ejecuta.
+  - **Fondo libre**: elegir una paleta completa, un tema o la paleta de un juego (que traen su fondo) quita el fondo libre; si no, lo tapaba y parecía que no cambiaba nada (web y app).
+  - **Títulos de pestaña** propios en Apariencia, Cuentas de juegos, Seguridad, Clanes y Comparar (salían "Ajustes · Paragon" o el genérico).
+  - **Diálogo de confirmar**: ahora es un `alertdialog` con título y texto enlazados, se cierra con Escape y el foco va a «Cancelar».
+  - Los 3 avisos de ESLint que quedaban (variables sin usar en `sw.js` y `probar-sync.mts`).
+- **Probado y descartado**: `LazyMotion` de framer-motion en la raíz cargaba las animaciones en TODAS las páginas (/privacidad de 178 a 221 KB de JS): deshecho. Ideas pendientes en HANDOFF.md → Pendiente.
+
 ### Next.js 16.4.0 → 16.4.2: fallos de seguridad (22 oct)
 
 - `npm audit` marcaba Next.js 16.0.0–16.4.0 con tres avisos, uno crítico: ejecución remota de código en la optimización de imágenes con SVG (GHSA-2464-fhr4-w9xw), otra en funciones `use cache` que devuelven arrays tipados (GHSA-673q-mjm6-r5xr) y una denegación de servicio con Server Actions (GHSA-p3m5-59mp-jv5r). Arreglados en 16.4.2 (`next` y `eslint-config-next`, versión fija como antes). `npm audit fix` sin `--force` además subió `vite`. Comprobado: tipos, ESLint, 270 tests, build y las páginas principales con y sin sesión.

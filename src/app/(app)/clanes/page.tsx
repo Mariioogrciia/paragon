@@ -14,6 +14,11 @@ import { Dorsal } from "@/components/carreras/Dorsal";
 import { EscudoClan } from "@/components/EscudoClan";
 import { libreaDe } from "@/lib/librea";
 
+export async function generateMetadata() {
+  const t = await getTranslations("Perfil.ClanesPage");
+  return { title: `${t("titulo")} · Paragon` };
+}
+
 export default async function ClanesPage() {
   const session = await auth();
   const userId = session?.user?.id;

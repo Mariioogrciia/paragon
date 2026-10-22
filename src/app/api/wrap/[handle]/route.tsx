@@ -2,7 +2,7 @@
 import { ImageResponse } from "next/og";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
 import { resumenHistorico, juegosDelAnio } from "@/lib/history";
-import { urlAbsolutaParaOg } from "@/lib/design";
+import { imagenSegura } from "@/lib/og/imagenSegura";
 import { juegoDestacado } from "@/components/ParagonWrap";
 import { wrapAnual } from "@/lib/wrapAnual";
 import { mejorMesDe } from "@/components/wrap/GraficasWrap";
@@ -24,27 +24,6 @@ import { mejorMesDe } from "@/components/wrap/GraficasWrap";
 const METAL = { platinum: "#9fd4ec", gold: "#e2b53e", silver: "#b9c2cc", bronze: "#c07b4a", otros: "#7d8bb5" } as const;
 const MESES = ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 
-/**
- * Una carátula como data URL, o null. Satori revienta la imagen ENTERA si
- * una URL falla al cargar, y las carátulas vienen de CDNs ajenos: se bajan
- * antes (3 s como mucho, solo PNG/JPEG, que es lo que entiende Satori) y la
- * que falla se queda en el degradado.
- */
-async function caratulaSegura(url: string | null): Promise<string | null> {
-  const absoluta = urlAbsolutaParaOg(url ?? undefined);
-  if (!absoluta) return null;
-  try {
-    const res = await fetch(absoluta, { signal: AbortSignal.timeout(3000) });
-    const tipo = res.headers.get("content-type") ?? "";
-    if (!res.ok || !/^image\/(png|jpe?g)/.test(tipo)) return null;
-    const datos = Buffer.from(await res.arrayBuffer());
-    if (datos.length > 1_500_000) return null;
-    return `data:${tipo.split(";")[0]};base64,${datos.toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ handle: string }> },
@@ -63,10 +42,10 @@ export async function GET(
     juegosDelAnio(profile.userId),
     wrapAnual(profile.userId),
   ]);
-  const avatarUrl = await caratulaSegura(player.avatarUrl ?? null);
+  const avatarUrl = await imagenSegura(player.avatarUrl ?? null);
   const topGame = juegoDestacado(games);
   const top3 = anual.topJuegos.slice(0, 3);
-  const portadas = await Promise.all(top3.map((j) => caratulaSegura(j.iconUrl)));
+  const portadas = await Promise.all(top3.map((j) => imagenSegura(j.iconUrl)));
   const maxMes = Math.max(1, ...anual.porMes.map((m) => m.total));
   const mejor = mejorMesDe(anual.porMes);
   const totalMetales = Object.values(anual.porMetal).reduce((a, b) => a + b, 0);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -37,6 +37,17 @@ export function ConfirmForm({
   const resolvedCancelLabel = cancelLabel ?? t("cancelar");
   const [open, setOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const id = useId();
+
+  // Escape cierra, como cualquier ventana (22 oct 2026).
+  useEffect(() => {
+    if (!open) return;
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", alPulsar);
+    return () => window.removeEventListener("keydown", alPulsar);
+  }, [open]);
 
   return (
     <>
@@ -63,15 +74,20 @@ export function ConfirmForm({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.15 }}
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby={`${id}-titulo`}
+              aria-describedby={`${id}-texto`}
               className="w-full max-w-sm rounded-2xl p-6"
               style={{ border: "1px solid var(--border)", background: "linear-gradient(var(--surface), var(--background))" }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="font-heading text-lg font-bold">{title}</h3>
-              <p className="mt-2 text-sm text-muted">{message}</p>
+              <h3 id={`${id}-titulo`} className="font-heading text-lg font-bold">{title}</h3>
+              <p id={`${id}-texto`} className="mt-2 text-sm text-muted">{message}</p>
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
+                  autoFocus
                   onClick={() => setOpen(false)}
                   className="text-sm font-semibold text-muted transition-colors hover:text-foreground"
                 >

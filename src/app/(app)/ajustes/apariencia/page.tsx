@@ -4,6 +4,12 @@ import { AppearanceSettings } from "@/components/AppearanceSettings";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { getGamesForBackground, getProfileByUserId } from "@/lib/profiles";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Onboarding.ajustesNav");
+  return { title: `${t("apariencia")} · ${t("titulo")} · Paragon` };
+}
 
 /** Juegos que se ofrecen para "desde tu juego": favoritos primero, luego lo último jugado. */
 const MAX_JUEGOS_PALETA = 12;
