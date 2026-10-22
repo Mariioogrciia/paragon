@@ -1647,3 +1647,10 @@ h3,
   --cat-5: #e87ba4;
   --cat-otros: #a3a39c;
 }
+
+/* Arrastrar con el ratón una fila con scroll horizontal (components/ArrastrarParaDesplazar.tsx). */
+.arrastrando-scroll,
+.arrastrando-scroll * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}

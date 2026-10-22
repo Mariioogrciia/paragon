@@ -16,6 +16,7 @@ import { mensajesCliente } from "@/i18n/clientMessages";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { CookieBanner } from "@/components/CookieBanner";
 import { ContadorVisitas } from "@/components/ContadorVisitas";
+import { ArrastrarParaDesplazar } from "@/components/ArrastrarParaDesplazar";
 import "./globals.css";
 
 /*
@@ -201,6 +202,7 @@ export function Documento({
       </head>
       <body className="flex min-h-screen flex-col transition-colors duration-300">
         <ServiceWorkerRegister />
+        <ArrastrarParaDesplazar />
         <Analytics />
         <NextIntlClientProvider locale={locale} messages={mensajesCliente(messages)}>
           <CookieBanner />

@@ -6,6 +6,10 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Arrastrar con el ratón las filas con scroll horizontal (22 oct)
+
+- En el móvil las filas (carruseles, pestañas, chips, mapas de calor…) se movían con el dedo, pero con ratón solo con la barra o Mayús+rueda. `components/ArrastrarParaDesplazar.tsx`, montado una vez en `documento.tsx`, escucha en todo el documento: al pulsar con el ratón dentro de un elemento con `overflow-x` auto/scroll que tenga algo que desplazar y moverlo más de 6 px, arrastra la fila, con inercia suave al soltar. El clic al soltar se anula (no abre la tarjeta donde se empezó), un clic sin mover sigue funcionando, el snap se apaga mientras se arrastra y vuelve al final, y no afecta a campos de formulario ni a lo marcado con `data-sin-arrastre`. Probado con Playwright (arrastre, inercia, snap, clic normal y vuelta).
+
 ### Limpieza del repositorio (22 oct)
 
 - Fuera lo que ya no usaba nada: el proyecto Capacitor de `ios/` con `capacitor-www/`, `resources/` y el workflow `build-ios.yml` (fase 5 del plan nativo: la app es `kmp/`); los borradores de `scratch/`; la configuración de herramientas `.impeccable/`, `.agents/` y `Paragon/.obsidian`; 31 scripts de migración de una sola vez ya aplicados y sin ninguna referencia (siguen en el historial de git); y `DiscoverCard`, `SectionTabs` y `lib/google/client.ts`, sin ningún import (comprobado con knip).
