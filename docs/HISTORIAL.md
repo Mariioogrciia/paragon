@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Logos oficiales en «Sitios web» y en la lista de precios (22 oct)
+
+- En la ficha de juego, Xbox, PlayStation, Nintendo e itch.io salían con el globo genérico, y el resto eran SVG dibujados a mano. `components/SiteIcon.tsx` usa ahora los logos oficiales de Simple Icons (`@icons-pack/react-simple-icons`, ya en el proyecto; Xbox, Microsoft y Nintendo de react-icons, porque Simple Icons ya no los tiene), también para las tiendas de la lista de precios (Humble, Ubisoft, EA, Battle.net, Microsoft…). Solo el «Sitio oficial» y las tiendas sin logo siguen con el globo.
+- IGDB: se enseñan también Fandom, Facebook, Instagram, App Store y Google Play (tipos 2, 4, 8, 10, 11 y 12), que antes se descartaban.
+
 ### Auditoría de funciones, personalización y rendimiento (22 oct)
 
 - **Cómo**: recorrido con Playwright de 50 rutas con y sin sesión (estado, errores de consola y de red, peso, nodos, títulos), las mismas a 375 px buscando desbordes horizontales, 88 enlaces internos comprobados, registros del servidor, y medida de JS y HTML comprimidos. Resultado: ningún enlace roto, ningún desborde en móvil, ningún error de JavaScript ni texto sin traducir; el servidor responde en 40-80 ms en local.

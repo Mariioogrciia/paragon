@@ -579,9 +579,10 @@ export async function getGame(igdbId: number): Promise<IgdbGameResult | null> {
 /* --------------------------- Ficha ampliada (/juego/[id]) --------------------------- */
 
 /**
- * Categorías de `websites` documentadas por IGDB — solo las que tiene
- * sentido enseñar como enlace con su propio icono/etiqueta. El resto (wikia,
- * facebook, apps de tienda móvil...) cae en el genérico "Sitio web".
+ * Categorías de `websites` documentadas por IGDB que se enseñan como enlace
+ * con su logo (components/SiteIcon.tsx). Desde el 22 oct 2026 también
+ * Fandom, Facebook, Instagram y las tiendas móviles, que antes se
+ * descartaban; un tipo que no esté aquí no se enseña.
  *
  * Los números son los ids de la tabla de referencia `website_types` de
  * IGDB — comprobados a mano contra `POST /v4/website_types` el 4 de
@@ -593,10 +594,16 @@ export async function getGame(igdbId: number): Promise<IgdbGameResult | null> {
  */
 const WEBSITE_LABELS: Record<number, string> = {
   1: "Sitio oficial",
+  2: "Fandom",
   3: "Wikipedia",
+  4: "Facebook",
   5: "Twitter / X",
   6: "Twitch",
+  8: "Instagram",
   9: "YouTube",
+  10: "App Store",
+  11: "App Store (iPad)",
+  12: "Google Play",
   13: "Steam",
   14: "Reddit",
   15: "itch.io",
