@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Verificar Epic sin tocar su portal: vuelta por la URL ya registrada (22 oct)
+
+- El portal de Epic tiene como URL de redirección `https://platinos-nine.vercel.app/api/auth/callback/epic` (y la de localhost) y no deja cambiarla. Ahora el proveedor `epic` usa el proxy de redirección de Auth.js (`redirectProxyUrl`, solo en producción; `AUTH_EPIC_REDIRECT_PROXY_URL` lo cambia o, vacía, lo apaga): Paragon manda a Epic esa URL registrada, Epic vuelve a platinos-nine (el mismo despliegue; `/api` no redirige al dominio) y ahí Auth.js descifra el `state` con AUTH_SECRET y reenvía a `www.paragontrophies.com/api/auth/callback/epic`, donde está la sesión y se termina de verificar. Google y Discord no cambian.
+- Simulado con los dos dominios llamando a los manejadores de Auth.js: la ida lleva `redirect_uri` de platinos-nine y la vuelta reenvía a www con el código y el state. El canje del código por el token solo se puede probar con Epic de verdad.
+
 ### "NPSSO caducado" con uno recién puesto (22 oct)
 
 - Admin → Sistema decía "NPSSO caducado" con un NPSSO renovado el día antes. Dos fallos:

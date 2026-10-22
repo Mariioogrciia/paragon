@@ -69,12 +69,10 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
 - El contador del ciclo no baja: el efecto se verá en el siguiente.
 
 **Esperando al usuario** (no se puede hacer desde aquí):
-0. **Epic Games**: la revisión de marca está enviada (la app queda bloqueada
-   mientras tanto). Cuando la aprueben, en los dos clientes ("Paragon" y
-   "Paragon Web") cambiar la URL de redirección a
-   `https://www.paragontrophies.com/api/auth/callback/epic` y quitar las de
-   `localhost:3000` y `platinos-nine`. Hasta entonces "Verificar con Epic"
-   solo funciona con la cuenta del desarrollador.
+0. **Epic Games**: marca aprobada. La URL de redirección no hace falta
+   cambiarla: el login de Epic vuelve por la de platinos-nine (ya registrada)
+   y Paragon reenvía a www (proxy de redirección, ver HISTORIAL.md, 22 oct).
+   Falta probarlo de verdad: Ajustes → Plataformas → "Verificar con Epic Games".
 0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron
    corre cada 3-5 h (GitHub retrasa el suyo) y los avisos llegan tarde. En
    https://cron-job.org (o cualquier servicio de cron por URL):
