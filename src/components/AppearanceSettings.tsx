@@ -2,9 +2,10 @@
 
 /* eslint-disable @next/next/no-img-element -- imágenes de CDNs externos (PSN, Steam, Xbox, IGDB...), como en el resto de la web: next/image gastaría la cuota de optimización del plan Hobby */
 import { useTranslations } from "next-intl";
-import { Check, Star } from "lucide-react";
+import { Check, RotateCcw, Star } from "lucide-react";
 import { ACENTOS, ESTILOS, MODOS, TAMANOS_TEXTO, TEMAS, nivelDeEstilo, useApariencia } from "@/lib/apariencia";
 import { TrophyIcon } from "@/components/TrophyIcon";
+import { contrasteHex } from "@/lib/paletaJuego";
 
 export interface JuegoPaleta {
   id: string;
@@ -37,11 +38,13 @@ export function AppearanceSettings({ nivel, juegosPaleta = [] }: { nivel: number
     acento,
     acentoLibre,
     acentoJuego,
+    fondoLibre,
     estilo,
     tamanoTexto,
     elegirAcento,
     elegirAcentoLibre,
     elegirAcentoJuego,
+    elegirFondoLibre,
     elegirEstilo,
     elegirTamanoTexto,
     elegirTema,
@@ -50,6 +53,8 @@ export function AppearanceSettings({ nivel, juegosPaleta = [] }: { nivel: number
   if (!montado) return null;
 
   const muestra = juegosPaleta.find((j) => j.id === acentoJuego) ?? juegosPaleta[0];
+  // Con los dos colores libres, avisar si el principal apenas se lee sobre el fondo.
+  const contrasteLibre = acentoLibre && fondoLibre ? contrasteHex(acentoLibre, fondoLibre) : null;
 
   return (
     <div className="ajustes-con-vista">
@@ -116,25 +121,65 @@ export function AppearanceSettings({ nivel, juegosPaleta = [] }: { nivel: number
                 />
               );
             })}
-            <label
-              title={t("appearanceSettings.freeColor")}
-              aria-label={t("appearanceSettings.freeColor")}
-              className="relative h-10 w-10 shrink-0 cursor-pointer rounded-full transition-transform hover:scale-110"
-              style={{
-                background: acentoLibre || "conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red)",
-                outline: acentoLibre ? "2px solid var(--foreground)" : "none",
-                outlineOffset: 2,
-              }}
-            >
-              <input
-                type="color"
-                value={acentoLibre || "#7cc4e4"}
-                onChange={(e) => elegirAcentoLibre(e.target.value)}
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-              />
-            </label>
-            <span className="text-xs text-muted">{t("appearanceSettings.freeColor")}</span>
           </div>
+
+          {/* Color libre (22 oct 2026): el principal (acentos) y, aparte, el
+              del fondo, del que salen superficies, bordes y texto legible. */}
+          <h3 className="mt-5 text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted">{t("appearanceSettings.freeColor")}</h3>
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <label className="flex cursor-pointer items-center gap-2.5">
+              <span
+                className="relative h-10 w-10 shrink-0 rounded-full transition-transform hover:scale-110"
+                style={{
+                  background: acentoLibre || "conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red)",
+                  outline: acentoLibre ? "2px solid var(--foreground)" : "none",
+                  outlineOffset: 2,
+                }}
+              >
+                <input
+                  type="color"
+                  value={acentoLibre || "#7cc4e4"}
+                  onChange={(e) => elegirAcentoLibre(e.target.value)}
+                  aria-label={t("appearanceSettings.freeAccent")}
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                />
+              </span>
+              <span className="text-sm font-semibold">{t("appearanceSettings.freeAccent")}</span>
+            </label>
+            <label className="flex cursor-pointer items-center gap-2.5">
+              <span
+                className="relative h-10 w-10 shrink-0 rounded-full border border-[var(--border)] transition-transform hover:scale-110"
+                style={{
+                  background: fondoLibre || "linear-gradient(135deg, #0a0d13 50%, #f4f6fa 50%)",
+                  outline: fondoLibre ? "2px solid var(--foreground)" : "none",
+                  outlineOffset: 2,
+                }}
+              >
+                <input
+                  type="color"
+                  value={fondoLibre || "#0a0d13"}
+                  onChange={(e) => elegirFondoLibre(e.target.value)}
+                  aria-label={t("appearanceSettings.freeBackground")}
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                />
+              </span>
+              <span className="text-sm font-semibold">{t("appearanceSettings.freeBackground")}</span>
+            </label>
+            {fondoLibre && (
+              <button
+                type="button"
+                onClick={() => elegirFondoLibre("")}
+                className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[0.8125rem] font-semibold text-muted transition-colors hover:bg-[var(--surface-2)] hover:text-foreground"
+              >
+                <RotateCcw size={13} aria-hidden="true" />
+                {t("appearanceSettings.freeBackgroundReset")}
+              </button>
+            )}
+          </div>
+          <p className="ajustes-ayuda mt-2.5">{t("appearanceSettings.freeColorHelp")}</p>
+          {contrasteLibre !== null && contrasteLibre < 3 && (
+            <p className="mt-1.5 text-xs font-semibold text-foreground">⚠ {t("appearanceSettings.freeContrastLow")}</p>
+          )}
         </section>
 
         <section className="ajustes-grupo">

@@ -75,6 +75,12 @@
     <string name="apariencia_estilo">Stil</string>
     <string name="apariencia_estilo_nivel">Wird ab Stufe %1$s freigeschaltet (du bist Stufe %2$s)</string>
     <string name="apariencia_estilo_oled">Im OLED-Modus bleibt der Hintergrund reines Schwarz: Der Stil färbt Karten und Ränder.</string>
+    <string name="apariencia_fondo">Hintergrund</string>
+    <string name="apariencia_fondo_intensidad">Intensität</string>
+    <string name="apariencia_fondo_luz">Helligkeit</string>
+    <string name="apariencia_fondo_quitar">Standardhintergrund</string>
+    <string name="apariencia_fondo_titulo">Hintergrundfarbe</string>
+    <string name="apariencia_fondo_tono">Farbton</string>
     <string name="apariencia_icono">App-Symbol</string>
     <string name="apariencia_icono_nota">Das neue Symbol kann ein paar Sekunden brauchen, bis es auf dem Startbildschirm erscheint (manchmal erst nach dem Verlassen der App).</string>
     <string name="apariencia_juego">Aus deinem Spiel</string>

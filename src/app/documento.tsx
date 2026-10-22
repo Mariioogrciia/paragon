@@ -187,6 +187,11 @@ export function Documento({
                 var a=localStorage.getItem("platinos:acento");
                 if(a) document.documentElement.classList.add(a);
               }
+              // Color de fondo libre: variables ya calculadas (lib/apariencia.ts).
+              var fondo=JSON.parse(localStorage.getItem("platinos:fondo-libre")||"null");
+              if(fondo&&fondo.vars){
+                for(var f in fondo.vars) if(/^--(background|surface|surface-2|border|foreground|muted)$/.test(f)) document.documentElement.style.setProperty(f, fondo.vars[f]);
+              }
               var e=localStorage.getItem("platinos:estilo");
               if(e) document.documentElement.classList.add(e);
               // Tamaño de letra: se aplica ANTES de pintar. Si se dejara al

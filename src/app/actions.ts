@@ -2001,7 +2001,7 @@ export async function setHorasIgnoradasAction(gameId: string, ignorar: boolean):
  * usa `requireUserId`, que redirige: esto se llama "disparar y olvidar" desde
  * el selector y una redirección ahí sacaría a la persona de la página.
  */
-export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre?: string; acentoJuego?: { id: string; color: string }; estilo?: string; tamanoTexto?: string }): Promise<void> {
+export async function guardarAparienciaAction(ap: { acento?: string; acentoLibre?: string; acentoJuego?: { id: string; color: string }; fondoLibre?: string; estilo?: string; tamanoTexto?: string }): Promise<void> {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return;

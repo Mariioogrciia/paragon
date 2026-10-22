@@ -75,6 +75,12 @@
     <string name="apariencia_estilo">Style</string>
     <string name="apariencia_estilo_nivel">Unlocks at level %1$s (you\'re level %2$s)</string>
     <string name="apariencia_estilo_oled">In OLED mode the background stays pure black: the style tints cards and borders.</string>
+    <string name="apariencia_fondo">Background</string>
+    <string name="apariencia_fondo_intensidad">Intensity</string>
+    <string name="apariencia_fondo_luz">Lightness</string>
+    <string name="apariencia_fondo_quitar">Default background</string>
+    <string name="apariencia_fondo_titulo">Background colour</string>
+    <string name="apariencia_fondo_tono">Hue</string>
     <string name="apariencia_icono">App icon</string>
     <string name="apariencia_icono_nota">The new icon may take a few seconds to show on your home screen (sometimes until you leave the app).</string>
     <string name="apariencia_juego">From your game</string>

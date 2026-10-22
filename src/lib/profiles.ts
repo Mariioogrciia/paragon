@@ -70,7 +70,7 @@ export interface ProfileRow {
   /** Efecto animado del nombre (lib/efectosNombre.ts). */
   efectoNombre?: string | null;
   /** Acento/estilo/tamaño de texto guardados en la cuenta (lib/apariencia.ts). */
-  apariencia?: { acento?: string; acentoLibre?: string; estilo?: string; tamanoTexto?: string } | null;
+  apariencia?: { acento?: string; acentoLibre?: string; fondoLibre?: string; estilo?: string; tamanoTexto?: string } | null;
   /** Modo de tema (dark/light/oled/high-contrast) aplicado solo al contenedor
    * del perfil público — no afecta al resto de la app ni al visitante. */
   theme?: string | null;

@@ -34,15 +34,17 @@ fun ParagonTheme(
         ThemeMode.SISTEMA -> if (sistemaOscuro) ThemeMode.OSCURO else ThemeMode.CLARO
         else -> themeStore.mode
     }
-    val oscuro = modo != ThemeMode.CLARO
 
     // Se escribe ANTES de construir el esquema (no en un SideEffect) para que
     // Background/Accent/... ya valgan lo correcto en este mismo frame.
     modoActivo = modo
     acentoActivo = acentoPorClave(themeStore.acento)
     acentoLibreActivo = themeStore.acentoLibre.takeIf { it.isNotEmpty() }?.let { colorDeHex(it) }
+    fondoLibreActivo = themeStore.fondoLibre.takeIf { it.isNotEmpty() }?.let { colorDeHex(it) }
     paletaJuegoActiva = themeStore.paletaJuego
     estiloActivo = estiloPorClave(themeStore.estilo)
+    // Con fondo libre, oscuro o claro lo decide ese fondo (texto, esquema de Material).
+    val oscuro = isDarkTheme
 
     activeDynamicScheme = if (themeStore.useDynamicColor) {
         platformDynamicColorScheme(oscuro)

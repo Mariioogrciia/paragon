@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Color libre: principal y fondo (22 oct)
+
+- El color libre solo cambiaba el acento. Ahora hay dos: **color principal** (acentos, como antes) y **color de fondo**, en la web (Ajustes → Apariencia) y en la app. Del fondo salen las superficies, el borde y el texto: claro u oscuro según el contraste (`sueloDesdeFondo` en `lib/paletaJuego.ts`; `sueloLibre` en `kmp/.../theme/Color.kt`), con el gris secundario sin bajar de 3,5:1. Va en el `style` del `<html>`, así que manda sobre el fondo del modo, de las paletas y del juego; el script anti-parpadeo de `documento.tsx` lo aplica antes de pintar. «Fondo de siempre» lo quita. Aviso si el principal apenas se lee sobre el fondo.
+- Se guarda en la cuenta (`fondoLibre` en `apariencia`) y la app lo recibe y lo manda por `/api/mobile/appearance`; si una versión vieja de la app guarda sin ese campo, se conserva el que hubiera. En la app, con fondo libre, oscuro o claro (texto, acento, esquema de Material) lo decide ese fondo; el selector tiene tono, intensidad y luz. Tests en `tests/sueloLibre.test.ts`; probado en el navegador con fondo oscuro, claro y quitándolo. La app no se pudo compilar aquí (Gradle sin red): la compila la CI.
+
 ### Arrastrar con el ratón las filas con scroll horizontal (22 oct)
 
 - En el móvil las filas (carruseles, pestañas, chips, mapas de calor…) se movían con el dedo, pero con ratón solo con la barra o Mayús+rueda. `components/ArrastrarParaDesplazar.tsx`, montado una vez en `documento.tsx`, escucha en todo el documento: al pulsar con el ratón dentro de un elemento con `overflow-x` auto/scroll que tenga algo que desplazar y moverlo más de 6 px, arrastra la fila, con inercia suave al soltar. El clic al soltar se anula (no abre la tarjeta donde se empezó), un clic sin mover sigue funcionando, el snap se apaga mientras se arrastra y vuelve al final, y no afecta a campos de formulario ni a lo marcado con `data-sin-arrastre`. Probado con Playwright (arrastre, inercia, snap, clic normal y vuelta).

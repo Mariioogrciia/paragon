@@ -18,6 +18,8 @@ export interface AparienciaCuenta {
   acento: string;
   acentoLibre: string;
   acentoJuego?: { id: string; color: string };
+  /** Color de fondo libre ("#rrggbb") o "" para el de siempre. */
+  fondoLibre: string;
   estilo: string;
   tamanoTexto: string;
 }
@@ -31,7 +33,9 @@ export const TAMANOS_TEXTO_VALIDOS = ["", "grande", "enorme", "pequeno"];
 export async function normalizarApariencia(userId: string, ap: Partial<Record<keyof AparienciaCuenta, unknown>>): Promise<AparienciaCuenta> {
   const texto = (v: unknown) => (typeof v === "string" ? v : "");
   const acento = /^(accent-[a-z]+)?$/.test(texto(ap.acento)) ? texto(ap.acento) : "";
-  const acentoLibre = /^(#[0-9a-f]{6})?$/i.test(texto(ap.acentoLibre)) ? texto(ap.acentoLibre).toLowerCase() : "";
+  const hexOVacio = (v: unknown) => (/^(#[0-9a-f]{6})?$/i.test(texto(v)) ? texto(v).toLowerCase() : "");
+  const acentoLibre = hexOVacio(ap.acentoLibre);
+  const fondoLibre = hexOVacio(ap.fondoLibre);
   // Paleta "desde tu juego": id del juego (solo para marcar cuál está
   // elegido) y el color de su carátula; la paleta se recalcula al cargar.
   const juego = ap.acentoJuego as { id?: unknown; color?: unknown } | undefined;
@@ -45,7 +49,7 @@ export async function normalizarApariencia(userId: string, ap: Partial<Record<ke
     const nivel = await getParagonLevel(userId);
     if (nivel.level < ESTILO_REQUISITOS[estilo]) estilo = "";
   }
-  return { acento, acentoLibre, ...(acentoJuego ? { acentoJuego } : {}), estilo, tamanoTexto };
+  return { acento, acentoLibre, ...(acentoJuego ? { acentoJuego } : {}), fondoLibre, estilo, tamanoTexto };
 }
 
 export async function guardarAparienciaCuenta(userId: string, ap: AparienciaCuenta): Promise<void> {
@@ -60,6 +64,7 @@ export async function leerAparienciaCuenta(userId: string): Promise<AparienciaCu
     acento: ap.acento ?? "",
     acentoLibre: ap.acentoLibre ?? "",
     ...(ap.acentoJuego ? { acentoJuego: ap.acentoJuego } : {}),
+    fondoLibre: ap.fondoLibre ?? "",
     estilo: ap.estilo ?? "",
     tamanoTexto: ap.tamanoTexto ?? "",
   };

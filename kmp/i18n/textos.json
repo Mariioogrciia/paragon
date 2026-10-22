@@ -447,6 +447,54 @@
   "it": "Colore libero {0}",
   "pt": "Cor livre {0}"
  },
+ "apariencia_fondo": {
+  "de": "Hintergrund",
+  "en": "Background",
+  "es": "Fondo",
+  "fr": "Fond",
+  "it": "Sfondo",
+  "pt": "Fundo"
+ },
+ "apariencia_fondo_titulo": {
+  "de": "Hintergrundfarbe",
+  "en": "Background colour",
+  "es": "Color de fondo",
+  "fr": "Couleur de fond",
+  "it": "Colore di sfondo",
+  "pt": "Cor de fundo"
+ },
+ "apariencia_fondo_quitar": {
+  "de": "Standardhintergrund",
+  "en": "Default background",
+  "es": "Fondo de siempre",
+  "fr": "Fond par défaut",
+  "it": "Sfondo predefinito",
+  "pt": "Fundo predefinido"
+ },
+ "apariencia_fondo_tono": {
+  "de": "Farbton",
+  "en": "Hue",
+  "es": "Tono",
+  "fr": "Teinte",
+  "it": "Tonalità",
+  "pt": "Tom"
+ },
+ "apariencia_fondo_luz": {
+  "de": "Helligkeit",
+  "en": "Lightness",
+  "es": "Luz",
+  "fr": "Luminosité",
+  "it": "Luminosità",
+  "pt": "Luz"
+ },
+ "apariencia_fondo_intensidad": {
+  "de": "Intensität",
+  "en": "Intensity",
+  "es": "Intensidad",
+  "fr": "Intensité",
+  "it": "Intensità",
+  "pt": "Intensidade"
+ },
  "apariencia_material_activo": {
   "de": "Material You ist aktiv: Die Farben kommen von deinem Hintergrundbild.",
   "en": "Material You is on: colours come from your wallpaper.",

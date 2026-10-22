@@ -26,6 +26,8 @@ data class AparienciaDto(
     val acento: String = "",
     val acentoLibre: String = "",
     val acentoJuego: AcentoJuegoDto? = null,
+    /** Color de fondo libre ("#rrggbb") o "" para el de siempre (22 oct 2026). */
+    val fondoLibre: String = "",
     val estilo: String = "",
     val tamanoTexto: String = "",
     val nivel: Int = 1,
@@ -39,6 +41,7 @@ data class GuardarAparienciaRequest(
     val acentoJuego: AcentoJuegoDto?,
     val estilo: String,
     val tamanoTexto: String,
+    val fondoLibre: String = "",
 )
 
 class AparienciaApi internal constructor(private val c: ClienteParagon) {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { guardarAparienciaAction } from "@/app/actions";
 import { ESTILO_REQUISITOS } from "@/lib/level";
-import { paletaDesdeColor, variablesPaleta } from "@/lib/paletaJuego";
+import { paletaDesdeColor, sueloDesdeFondo, variablesPaleta } from "@/lib/paletaJuego";
 
 /**
  * Estado y lógica de personalización (modo, acento, estilo), compartidos
@@ -74,6 +74,10 @@ const CLAVE_TEXTO = "platinos:texto";
  *  variables ya calculadas (el script anti-parpadeo de layout.tsx solo las
  *  copia, no puede recalcular la paleta). */
 const CLAVE_ACENTO_JUEGO = "platinos:acento-juego";
+/** JSON `{ color, vars }`: el color de fondo libre y sus variables ya calculadas
+ *  (el script anti-parpadeo de documento.tsx solo las copia). */
+const CLAVE_FONDO_LIBRE = "platinos:fondo-libre";
+const VARIABLES_FONDO = ["--background", "--surface", "--surface-2", "--border", "--foreground", "--muted"];
 
 export interface AcentoJuego {
   id: string;
@@ -172,6 +176,35 @@ function escribirAcentoJuego(juego: AcentoJuego | undefined) {
   else localStorage.removeItem(CLAVE_ACENTO_JUEGO);
 }
 
+/**
+ * Color de fondo libre (22 oct 2026): independiente del acento, manda sobre
+ * el fondo del modo, de las paletas y del juego (va en el `style` del <html>,
+ * que gana a cualquier clase). Vacío = el fondo de siempre.
+ */
+function aplicarFondoLibre(color: string): Record<string, string> | null {
+  const html = document.documentElement;
+  for (const v of VARIABLES_FONDO) html.style.removeProperty(v);
+  const suelo = color ? sueloDesdeFondo(color) : null;
+  if (!suelo) return null;
+  for (const [k, v] of Object.entries(suelo.vars)) html.style.setProperty(k, v);
+  return suelo.vars;
+}
+
+function leerFondoLibre(): string {
+  try {
+    const crudo = JSON.parse(localStorage.getItem(CLAVE_FONDO_LIBRE) ?? "null");
+    return crudo && typeof crudo.color === "string" ? crudo.color : "";
+  } catch {
+    return "";
+  }
+}
+
+function escribirFondoLibre(color: string) {
+  const vars = aplicarFondoLibre(color);
+  if (vars) localStorage.setItem(CLAVE_FONDO_LIBRE, JSON.stringify({ color, vars }));
+  else localStorage.removeItem(CLAVE_FONDO_LIBRE);
+}
+
 /** Aplica la clase de estilo al <html>, quitando la anterior. */
 function aplicarEstilo(clase: string) {
   const html = document.documentElement;
@@ -183,6 +216,7 @@ export interface AparienciaGuardada {
   acento?: string;
   acentoLibre?: string;
   acentoJuego?: AcentoJuego;
+  fondoLibre?: string;
   estilo?: string;
   tamanoTexto?: string;
 }
@@ -197,6 +231,7 @@ function leerLocal(): AparienciaGuardada {
     acento: localStorage.getItem(CLAVE_ACENTO) ?? "",
     acentoLibre: localStorage.getItem(CLAVE_ACENTO_LIBRE) ?? "",
     ...(leerAcentoJuego() ? { acentoJuego: leerAcentoJuego() } : {}),
+    fondoLibre: leerFondoLibre(),
     estilo: localStorage.getItem(CLAVE_ESTILO) ?? "",
     tamanoTexto: localStorage.getItem(CLAVE_TEXTO) ?? "",
   };
@@ -219,7 +254,7 @@ export function aplicarAparienciaGuardada(guardada: AparienciaGuardada | null, n
     const deseada = guardada ?? actual;
     const requisito = nivelDeEstilo(deseada.estilo ?? "");
     const estilo = requisito !== null && nivel < requisito ? "" : (deseada.estilo ?? "");
-    const final = { ...deseada, estilo };
+    const final = { ...deseada, fondoLibre: deseada.fondoLibre ?? "", estilo };
     if (JSON.stringify(final) === JSON.stringify(actual)) return;
     escribirLocal(CLAVE_ACENTO, final.acento);
     escribirLocal(CLAVE_ACENTO_LIBRE, final.acentoLibre);
@@ -231,6 +266,7 @@ export function aplicarAparienciaGuardada(guardada: AparienciaGuardada | null, n
       if (final.acentoLibre) aplicarAcentoLibre(final.acentoLibre);
       else aplicarAcento(final.acento ?? "");
     }
+    escribirFondoLibre(final.fondoLibre);
     aplicarEstilo(final.estilo);
     aplicarTamanoTexto(final.tamanoTexto ?? "");
   } catch {
@@ -247,6 +283,7 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
   const [acento, setAcento] = useState("");
   const [acentoLibre, setAcentoLibre] = useState("");
   const [acentoJuego, setAcentoJuego] = useState("");
+  const [fondoLibre, setFondoLibre] = useState("");
   const [estilo, setEstilo] = useState("");
   const [tamanoTexto, setTamanoTexto] = useState("");
   const [montado, setMontado] = useState(false);
@@ -274,6 +311,7 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
     // el estado de React con lo que ya está puesto en el <html>.
     setEstilo(localStorage.getItem(CLAVE_ESTILO) ?? "");
     setTamanoTexto(localStorage.getItem(CLAVE_TEXTO) ?? "");
+    setFondoLibre(leerFondoLibre());
   }, []);
 
   function persistir() {
@@ -299,6 +337,13 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
     aplicarAcentoLibre(hex);
     localStorage.setItem(CLAVE_ACENTO_LIBRE, hex);
     localStorage.removeItem(CLAVE_ACENTO);
+    persistir();
+  }
+
+  /** `""` vuelve al fondo de siempre. */
+  function elegirFondoLibre(color: string) {
+    setFondoLibre(color);
+    escribirFondoLibre(color);
     persistir();
   }
 
@@ -341,11 +386,13 @@ export function useApariencia({ sincronizar = false }: { sincronizar?: boolean }
     acento,
     acentoLibre,
     acentoJuego,
+    fondoLibre,
     estilo,
     tamanoTexto,
     elegirAcento,
     elegirAcentoLibre,
     elegirAcentoJuego,
+    elegirFondoLibre,
     elegirEstilo,
     elegirTamanoTexto,
     elegirTema,

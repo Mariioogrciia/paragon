@@ -26,6 +26,7 @@ async function respuesta(userId: string, ap: AparienciaCuenta | null) {
     acento: ap?.acento ?? "",
     acentoLibre: ap?.acentoLibre ?? "",
     acentoJuego: juego && paleta ? { ...juego, paleta } : null,
+    fondoLibre: ap?.fondoLibre ?? "",
     estilo: ap?.estilo ?? "",
     tamanoTexto: ap?.tamanoTexto ?? "",
     nivel: nivel.level,
@@ -41,7 +42,7 @@ export async function GET(req: Request) {
   return NextResponse.json(await respuesta(userId, await leerAparienciaCuenta(userId)));
 }
 
-/** Body: `{ acento, acentoLibre, acentoJuego?: { id, color }, estilo, tamanoTexto }`. Devuelve lo guardado de verdad (normalizado). */
+/** Body: `{ acento, acentoLibre, acentoJuego?: { id, color }, fondoLibre?, estilo, tamanoTexto }`. Devuelve lo guardado de verdad (normalizado). */
 export async function POST(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) {
@@ -54,7 +55,10 @@ export async function POST(req: Request) {
   if (!body || typeof body !== "object") {
     return errorMovil(req, "Datos no válidos", 400);
   }
-  const ap = await normalizarApariencia(userId, body);
+  // Las versiones de la app anteriores al fondo libre (22 oct 2026) no lo
+  // mandan: se conserva el que hubiera, en vez de borrar el elegido en la web.
+  const conFondo = "fondoLibre" in body ? body : { ...body, fondoLibre: (await leerAparienciaCuenta(userId))?.fondoLibre ?? "" };
+  const ap = await normalizarApariencia(userId, conFondo);
   await guardarAparienciaCuenta(userId, ap);
   return NextResponse.json(await respuesta(userId, ap));
 }

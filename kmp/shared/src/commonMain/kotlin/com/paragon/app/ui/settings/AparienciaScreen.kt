@@ -141,6 +141,7 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
     val repo = remember(tokenStore, themeStore) { AparienciaRepository(tokenStore, themeStore) }
     fun guardar() { scope.launch { repo.guardar() } }
     var editandoLibre by remember { mutableStateOf(false) }
+    var editandoFondo by remember { mutableStateOf(false) }
     val materialYou = themeStore.useDynamicColor
 
     Scaffold(
@@ -265,6 +266,13 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                             editandoLibre = true
                         }
                     }
+                    // Color de fondo libre (22 oct 2026, como la web): aparte del acento.
+                    val fondo = themeStore.fondoLibre.takeIf { it.isNotEmpty() }?.let { colorDeHex(it) }
+                    ConNombre(Textos.t(T.apariencia_fondo), !materialYou && fondo != null) {
+                        MuestrarioFondo(fondo, activo = !materialYou && fondo != null, enabled = !materialYou) {
+                            editandoFondo = true
+                        }
+                    }
                     themeStore.paletaJuego?.let { p ->
                         ConNombre(Textos.t(T.apariencia_juego), !materialYou) {
                             MuestrarioColor(colorDeHex(p.color) ?: p.oscuro, p.suelo.background, activo = !materialYou, descripcion = Textos.t(T.apariencia_juego), enabled = false) {}
@@ -278,6 +286,11 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                     themeStore.acentoLibre.isNotEmpty() -> Textos.t(T.apariencia_libre_actual, themeStore.acentoLibre.uppercase())
                     else -> null
                 }?.let { Text(it, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) }
+                if (themeStore.fondoLibre.isNotEmpty() && !materialYou) {
+                    TextButton(onClick = { themeStore.setFondoLibre(""); guardar() }) {
+                        Text(Textos.t(T.apariencia_fondo_quitar), color = Accent, fontWeight = FontWeight.SemiBold)
+                    }
+                }
             }
 
             Seccion(T.apariencia_estilo)
@@ -343,6 +356,18 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
             Text(Textos.t(T.apariencia_sincronizada), color = Muted, fontSize = 12.sp, lineHeight = 17.sp)
             Spacer(Modifier.height(32.dp))
         }
+    }
+
+    if (editandoFondo) {
+        DialogoFondoLibre(
+            inicial = themeStore.fondoLibre.takeIf { it.isNotEmpty() }?.let { colorDeHex(it) } ?: Background,
+            onDismiss = { editandoFondo = false },
+            onElegir = { hex ->
+                editandoFondo = false
+                themeStore.setFondoLibre(hex)
+                guardar()
+            },
+        )
     }
 
     if (editandoLibre) {
@@ -679,6 +704,30 @@ private fun MuestrarioLibre(color: Color?, activo: Boolean, enabled: Boolean, on
     }
 }
 
+/** Fondo libre: mitad oscuro y mitad claro si no hay ninguno, o el elegido. */
+@Composable
+private fun MuestrarioFondo(color: Color?, activo: Boolean, enabled: Boolean, onClick: () -> Unit) {
+    val descripcion = Textos.t(T.apariencia_fondo_titulo)
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .border(BorderStroke(if (activo) 3.dp else 1.dp, if (activo) Foreground else Border), CircleShape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .semantics { contentDescription = descripcion; selected = activo },
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.size(42.dp).clip(CircleShape)) {
+            if (color != null) drawRect(color)
+            else {
+                drawRect(Color(0xFF0A0D13))
+                drawRect(Color(0xFFF4F6FA), topLeft = Offset(size.width / 2f, 0f), size = Size(size.width / 2f, size.height))
+            }
+        }
+        if (activo && color != null) Icon(Icons.Default.Check, contentDescription = null, tint = contraste(color), modifier = Modifier.size(18.dp))
+    }
+}
+
 private fun contraste(c: Color): Color =
     if ((0.2126f * c.red + 0.7152f * c.green + 0.0722f * c.blue) > 0.5f) Color(0xFF0A0D13) else Color.White
 
@@ -829,4 +878,79 @@ private fun SelectorIcono() {
         }
     }
     if (avisar) Nota(T.apariencia_icono_nota)
+}
+
+/**
+ * Color de fondo libre: tono, intensidad y luz (HSL), porque un fondo puede
+ * ser casi negro, casi blanco o de cualquier color; el texto y las tarjetas se
+ * adaptan solos (ver `sueloLibre` en Color.kt).
+ */
+@Composable
+private fun DialogoFondoLibre(inicial: Color, onDismiss: () -> Unit, onElegir: (String) -> Unit) {
+    val (h0, s0, l0) = tonoIntensidadLuz(inicial)
+    var tono by remember { mutableFloatStateOf(h0) }
+    var intensidad by remember { mutableFloatStateOf(s0) }
+    var luz by remember { mutableFloatStateOf(l0) }
+    val color = Color.hsl(tono, intensidad, luz)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Surface,
+        title = { Text(Textos.t(T.apariencia_fondo_titulo), color = Foreground, fontWeight = FontWeight.Bold) },
+        text = {
+            Column {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(color, RoundedCornerShape(radio(12)))
+                        .border(1.dp, Border, RoundedCornerShape(radio(12))),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("Aa", color = if (color.luminance() > 0.35f) Color(0xFF10151F) else Color(0xFFE9EEF7), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
+                Spacer(Modifier.height(12.dp))
+                DeslizadorFondo(Textos.t(T.apariencia_fondo_tono), tono, 0f..360f, (0..6).map { Color.hsl(it * 60f % 360f, 0.7f, 0.5f) }) { tono = it }
+                DeslizadorFondo(Textos.t(T.apariencia_fondo_intensidad), intensidad, 0f..1f, listOf(Color.hsl(tono, 0f, luz), Color.hsl(tono, 1f, luz))) { intensidad = it }
+                DeslizadorFondo(Textos.t(T.apariencia_fondo_luz), luz, 0.02f..0.98f, listOf(Color.hsl(tono, intensidad, 0.02f), Color.hsl(tono, intensidad, 0.5f), Color.hsl(tono, intensidad, 0.98f))) { luz = it }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onElegir("#" + (color.toArgb() and 0xFFFFFF).toString(16).padStart(6, '0')) }) {
+                Text(Textos.t(T.comun_guardar), color = Accent, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(Textos.t(T.comun_cancelar), color = Muted) }
+        },
+    )
+}
+
+@Composable
+private fun DeslizadorFondo(nombre: String, valor: Float, rango: ClosedFloatingPointRange<Float>, degradado: List<Color>, onCambio: (Float) -> Unit) {
+    Text(nombre, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+    Canvas(Modifier.fillMaxWidth().height(10.dp).padding(top = 2.dp).clip(RoundedCornerShape(radio(5)))) {
+        drawRect(Brush.horizontalGradient(degradado), topLeft = Offset.Zero, size = Size(size.width, size.height))
+    }
+    Slider(
+        value = valor,
+        onValueChange = onCambio,
+        valueRange = rango,
+        colors = SliderDefaults.colors(thumbColor = Foreground, activeTrackColor = Color.Transparent, inactiveTrackColor = Color.Transparent),
+    )
+}
+
+/** Tono (0-360), intensidad (saturación HSL) y luz de un color. */
+private fun tonoIntensidadLuz(c: Color): Triple<Float, Float, Float> {
+    val max = maxOf(c.red, c.green, c.blue)
+    val min = minOf(c.red, c.green, c.blue)
+    val l = (max + min) / 2f
+    val d = max - min
+    if (d == 0f) return Triple(0f, 0f, l.coerceIn(0.02f, 0.98f))
+    val s = if (l > 0.5f) d / (2f - max - min) else d / (max + min)
+    val h = when (max) {
+        c.red -> 60f * (((c.green - c.blue) / d) % 6f)
+        c.green -> 60f * (((c.blue - c.red) / d) + 2f)
+        else -> 60f * (((c.red - c.green) / d) + 4f)
+    }.let { if (it < 0f) it + 360f else it }
+    return Triple(h, s.coerceIn(0f, 1f), l.coerceIn(0.02f, 0.98f))
 }

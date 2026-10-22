@@ -75,6 +75,12 @@
     <string name="apariencia_estilo">Estilo</string>
     <string name="apariencia_estilo_nivel">Desbloqueia no nível %1$s (estás no %2$s)</string>
     <string name="apariencia_estilo_oled">Em OLED o fundo continua preto puro: o estilo tinge os cartões e as margens.</string>
+    <string name="apariencia_fondo">Fundo</string>
+    <string name="apariencia_fondo_intensidad">Intensidade</string>
+    <string name="apariencia_fondo_luz">Luz</string>
+    <string name="apariencia_fondo_quitar">Fundo predefinido</string>
+    <string name="apariencia_fondo_titulo">Cor de fundo</string>
+    <string name="apariencia_fondo_tono">Tom</string>
     <string name="apariencia_icono">Ícone da app</string>
     <string name="apariencia_icono_nota">O novo ícone pode demorar uns segundos a aparecer no ecrã inicial (às vezes, até saíres da app).</string>
     <string name="apariencia_juego">Do teu jogo</string>

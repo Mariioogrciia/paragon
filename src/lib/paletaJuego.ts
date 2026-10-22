@@ -117,3 +117,58 @@ export function variablesPaleta(p: PaletaJuego): Record<string, string> {
     "--juego-border": p.border,
   };
 }
+
+/**
+ * "Color de fondo" libre (Ajustes → Apariencia, 22 oct 2026): del color que
+ * elige la persona salen el fondo, las dos superficies, el borde y el color
+ * del texto. El texto se elige por contraste (claro sobre fondos oscuros,
+ * oscuro sobre claros), así que cualquier color se puede leer; el fondo se
+ * respeta tal cual.
+ */
+export interface SueloLibre {
+  claro: boolean;
+  vars: Record<string, string>;
+}
+
+const TEXTO_CLARO: Rgb = [233, 238, 247];
+const TEXTO_OSCURO: Rgb = [16, 21, 31];
+const NEGRO: Rgb = [0, 0, 0];
+
+function mezclar(a: Rgb, b: Rgb, t: number): Rgb {
+  return [0, 1, 2].map((i) => Math.round(a[i] + (b[i] - a[i]) * t)) as Rgb;
+}
+
+export function sueloDesdeFondo(color: string): SueloLibre | null {
+  const bg = hexARgb(color);
+  if (!bg) return null;
+  const claro = contraste(TEXTO_OSCURO, bg) > contraste(TEXTO_CLARO, bg);
+  const texto = claro ? TEXTO_OSCURO : TEXTO_CLARO;
+  const [surface, surface2, border] = claro
+    ? [mezclar(bg, BLANCO, 0.55), mezclar(bg, NEGRO, 0.05), mezclar(bg, NEGRO, 0.16)]
+    : [mezclar(bg, BLANCO, 0.04), mezclar(bg, BLANCO, 0.09), mezclar(bg, BLANCO, 0.14)];
+  // Texto secundario: el principal fundido con el fondo, pero sin bajar de un
+  // contraste legible (con fondos de tono medio hay que fundirlo menos).
+  let mezcla = 0.35;
+  let muted = mezclar(texto, bg, mezcla);
+  while (mezcla > 0 && Math.min(contraste(muted, bg), contraste(muted, surface)) < 3.5) {
+    mezcla = Math.max(0, mezcla - 0.05);
+    muted = mezclar(texto, bg, mezcla);
+  }
+  return {
+    claro,
+    vars: {
+      "--background": hex(bg),
+      "--surface": hex(surface),
+      "--surface-2": hex(surface2),
+      "--border": hex(border),
+      "--foreground": hex(texto),
+      "--muted": hex(muted),
+    },
+  };
+}
+
+/** Contraste entre dos colores en hex (`null` si alguno no vale). */
+export function contrasteHex(a: string, b: string): number | null {
+  const [x, y] = [hexARgb(a), hexARgb(b)];
+  return x && y ? contraste(x, y) : null;
+}

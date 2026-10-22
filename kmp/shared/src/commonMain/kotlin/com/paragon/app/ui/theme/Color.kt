@@ -23,7 +23,10 @@ import com.paragon.app.data.theme.ThemeMode
 
 /** Modo ya resuelto (SISTEMA convertido en OSCURO o CLARO). */
 internal var modoActivo by mutableStateOf(ThemeMode.OSCURO)
-internal val isDarkTheme: Boolean get() = modoActivo != ThemeMode.CLARO
+/** Color de fondo libre (22 oct 2026, como la web): manda sobre el fondo del modo, del acento y del estilo. */
+internal var fondoLibreActivo by mutableStateOf<Color?>(null)
+/** Oscuro o claro según lo que se ve: con fondo libre, según ese fondo, no según el modo. */
+internal val isDarkTheme: Boolean get() = fondoLibreActivo?.let { !fondoEsClaro(it) } ?: (modoActivo != ThemeMode.CLARO)
 internal var acentoActivo by mutableStateOf(ACENTOS[0])
 internal var acentoLibreActivo by mutableStateOf<Color?>(null)
 internal var paletaJuegoActiva by mutableStateOf<PaletaJuego?>(null)
@@ -48,7 +51,7 @@ private val BaseContraste = Suelo(Color(0xFF000000), Color(0xFF0C1017), Color(0x
  * completas y la de juego traen su propio suelo en oscuro; los estilos de
  * plataforma (PS5, Xbox...) ponen su fondo de ambientación.
  */
-private fun suelo(): Suelo = when (modoActivo) {
+private fun suelo(): Suelo = fondoLibreActivo?.let { sueloLibre(it) } ?: when (modoActivo) {
     ThemeMode.CLARO -> sueloEstilo(claro = true) ?: tenido(BaseClaro, claro = true)
     // OLED: negro puro con los colores simples; las paletas completas (y la
     // de juego) oscurecen SU fondo en vez de tirarlo a negro, para que se note
@@ -129,7 +132,7 @@ val SurfaceSolida: Color get() = Surface.copy(alpha = 1f)
 val Surface2: Color get() = activeDynamicScheme?.surfaceVariant ?: suelo().surface2.let { if (vidrio) it.copy(alpha = 0.82f) else it }
 // Brutalista: bordes marcados con el color del texto, nada de líneas tenues.
 val Border: Color get() = if (brutalista) Foreground.copy(alpha = 0.6f) else activeDynamicScheme?.outline ?: suelo().border
-val Foreground: Color get() = when (modoActivo) {
+val Foreground: Color get() = fondoLibreActivo?.let { textoSobreFondo(it) } ?: when (modoActivo) {
     ThemeMode.CLARO -> Color(0xFF10151F)
     ThemeMode.CONTRASTE -> Color(0xFFFFFFFF)
     else -> Color(0xFFE9EEF7)
@@ -182,3 +185,39 @@ val MarcaXbox = Color(0xFF107C10)
 val MarcaSteam = Color(0xFF66C0F4)
 val MarcaGoogle = Color(0xFF4285F4)
 val MarcaDiscord = Color(0xFF5865F2)
+
+// --- Color de fondo libre (lib/paletaJuego.ts → sueloDesdeFondo, en la web) ---
+
+private val TextoClaroFondo = Color(0xFFE9EEF7)
+private val TextoOscuroFondo = Color(0xFF10151F)
+
+private fun contrasteColores(a: Color, b: Color): Float {
+    val (la, lb) = a.luminance() to b.luminance()
+    return (maxOf(la, lb) + 0.05f) / (minOf(la, lb) + 0.05f)
+}
+
+/** Claro si el texto oscuro se lee mejor que el claro sobre ese fondo. */
+internal fun fondoEsClaro(fondo: Color): Boolean =
+    contrasteColores(TextoOscuroFondo, fondo) > contrasteColores(TextoClaroFondo, fondo)
+
+private fun textoSobreFondo(fondo: Color): Color = if (fondoEsClaro(fondo)) TextoOscuroFondo else TextoClaroFondo
+
+/**
+ * Del fondo elegido salen las superficies, el borde y el texto secundario:
+ * tarjetas algo más claras sobre un fondo oscuro y blanquecinas sobre uno
+ * claro, y un gris que no baje de un contraste legible.
+ */
+private fun sueloLibre(fondo: Color): Suelo {
+    val claro = fondoEsClaro(fondo)
+    val surface = if (claro) lerp(fondo, Color.White, 0.55f) else lerp(fondo, Color.White, 0.04f)
+    val surface2 = if (claro) lerp(fondo, Color.Black, 0.05f) else lerp(fondo, Color.White, 0.09f)
+    val border = if (claro) lerp(fondo, Color.Black, 0.16f) else lerp(fondo, Color.White, 0.14f)
+    val texto = textoSobreFondo(fondo)
+    var mezcla = 0.35f
+    var muted = lerp(texto, fondo, mezcla)
+    while (mezcla > 0f && minOf(contrasteColores(muted, fondo), contrasteColores(muted, surface)) < 3.5f) {
+        mezcla = maxOf(0f, mezcla - 0.05f)
+        muted = lerp(texto, fondo, mezcla)
+    }
+    return Suelo(fondo, surface, surface2, border, muted)
+}

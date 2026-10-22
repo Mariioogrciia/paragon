@@ -36,6 +36,7 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
     private var current: ThemeMode by mutableStateOf(loadMode())
     private var currentAcento by mutableStateOf(prefs.getString(KEY_ACENTO, ""))
     private var currentAcentoLibre by mutableStateOf(prefs.getString(KEY_ACENTO_LIBRE, ""))
+    private var currentFondoLibre by mutableStateOf(prefs.getString(KEY_FONDO_LIBRE, ""))
     private var currentPaletaJuego by mutableStateOf(loadPaletaJuego())
     private var currentEstilo by mutableStateOf(prefs.getString(KEY_ESTILO, ""))
     private var currentTamanoTexto by mutableStateOf(prefs.getString(KEY_TAMANO_TEXTO, ""))
@@ -52,6 +53,8 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
     val mode: ThemeMode get() = current
     val acento: String get() = currentAcento
     val acentoLibre: String get() = currentAcentoLibre
+    /** Color de fondo libre ("#rrggbb"), independiente del acento; "" = el del modo. */
+    val fondoLibre: String get() = currentFondoLibre
     val paletaJuego: PaletaJuego? get() = currentPaletaJuego
     val estilo: String get() = currentEstilo
     val tamanoTexto: String get() = currentTamanoTexto
@@ -112,6 +115,12 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
         prefs.remove(KEY_PALETA_JUEGO)
     }
 
+    /** "" vuelve al fondo de siempre. */
+    fun setFondoLibre(hex: String) {
+        currentFondoLibre = hex
+        if (hex.isEmpty()) prefs.remove(KEY_FONDO_LIBRE) else prefs.putString(KEY_FONDO_LIBRE, hex)
+    }
+
     fun setEstilo(clave: String) {
         currentEstilo = clave
         prefs.putString(KEY_ESTILO, clave)
@@ -133,6 +142,7 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
 
         currentAcento = dto.acento
         currentAcentoLibre = dto.acentoLibre
+        currentFondoLibre = dto.fondoLibre
         currentPaletaJuego = paletaJuego
         // Un estilo por encima del nivel se quita (p. ej. elegido antes de existir el requisito).
         currentEstilo = if ((requisitos[dto.estilo] ?: 0) > dto.nivel) "" else dto.estilo
@@ -141,6 +151,7 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
         currentRequisitos = requisitos
         prefs.putString(KEY_ACENTO, dto.acento)
         prefs.putString(KEY_ACENTO_LIBRE, dto.acentoLibre)
+        prefs.putString(KEY_FONDO_LIBRE, dto.fondoLibre)
         prefs.putString(KEY_ESTILO, currentEstilo)
         prefs.putString(KEY_TAMANO_TEXTO, dto.tamanoTexto)
         prefs.putInt(KEY_NIVEL, dto.nivel)
@@ -150,7 +161,7 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
 
     override fun requestParaGuardar(): GuardarAparienciaRequest {
         val juego = currentPaletaJuego?.let { AcentoJuegoDto(it.id, it.color) }
-        return GuardarAparienciaRequest(currentAcento, currentAcentoLibre, juego, currentEstilo, currentTamanoTexto)
+        return GuardarAparienciaRequest(currentAcento, currentAcentoLibre, juego, currentEstilo, currentTamanoTexto, fondoLibre = currentFondoLibre)
     }
 
     private fun paletaDesdeDto(id: String, color: String, p: PaletaJuegoDto): PaletaJuego? {
@@ -222,6 +233,7 @@ class ThemeStore(private val prefs: Settings) : ThemeSettings {
         const val KEY_MODE = "mode"
         const val KEY_ACENTO = "acento"
         const val KEY_ACENTO_LIBRE = "acento_libre"
+        const val KEY_FONDO_LIBRE = "fondo_libre"
         const val KEY_PALETA_JUEGO = "paleta_juego"
         const val KEY_ESTILO = "estilo"
         const val KEY_TAMANO_TEXTO = "tamano_texto"
