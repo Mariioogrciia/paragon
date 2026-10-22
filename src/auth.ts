@@ -95,11 +95,12 @@ async function verificarEpic(account: Account, nombre: string | null) {
  * Delegamos en Google y Discord a propósito: así no guardamos contraseñas de
  * nadie, ni tenemos que resolver el "olvidé mi contraseña" ni el 2FA.
  */
-/** Base del proxy de redirección de Epic (ver el proveedor `epic`); `undefined` = sin proxy. */
+/**
+ * Base del proxy de redirección de Epic (ver el proveedor `epic`);
+ * `undefined` = sin proxy, Epic vuelve al mismo dominio en el que se empezó.
+ */
 function proxyRedireccionEpic(): string | undefined {
-  const propio = process.env.AUTH_EPIC_REDIRECT_PROXY_URL;
-  if (propio !== undefined) return propio.trim() || undefined;
-  return process.env.VERCEL_ENV === "production" ? "https://platinos-nine.vercel.app/api/auth" : undefined;
+  return process.env.AUTH_EPIC_REDIRECT_PROXY_URL?.trim() || undefined;
 }
 
 const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
@@ -161,13 +162,12 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
             clientId: process.env.AUTH_EPIC_ID,
             clientSecret: process.env.AUTH_EPIC_SECRET,
             checks: ["state" as const],
-            // Epic vuelve a la URL de redirección registrada en su portal, que
-            // es la de platinos-nine.vercel.app y no deja cambiarla (22 oct
-            // 2026). Auth.js manda a Epic esa dirección y, al volver, la
-            // misma web (es el mismo despliegue y el `state` va cifrado con
-            // AUTH_SECRET) reenvía a quien empezó en www.paragontrophies.com,
-            // donde está su sesión. Solo en producción: en local no hay ese
-            // AUTH_SECRET. Con AUTH_EPIC_REDIRECT_PROXY_URL="" se apaga.
+            // Epic vuelve a `<dominio>/api/auth/callback/epic`, que tiene que
+            // estar en las URL de redirección de su portal. Con la marca
+            // aprobada, Epic solo acepta las del dominio verificado
+            // (paragontrophies.com): la vuelta por platinos-nine que se usó el
+            // 22 oct 2026 da `client_redirect_domain_mismatch`. El proxy de
+            // Auth.js sigue disponible con AUTH_EPIC_REDIRECT_PROXY_URL.
             redirectProxyUrl: proxyRedireccionEpic(),
             authorization: { url: "https://www.epicgames.com/id/authorize", params: { scope: "basic_profile" } },
             token: "https://api.epicgames.dev/epic/oauth/v2/token",

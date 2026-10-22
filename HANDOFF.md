@@ -69,10 +69,13 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
 - El contador del ciclo no baja: el efecto se verá en el siguiente.
 
 **Esperando al usuario** (no se puede hacer desde aquí):
-0. **Epic Games**: marca aprobada. La URL de redirección no hace falta
-   cambiarla: el login de Epic vuelve por la de platinos-nine (ya registrada)
-   y Paragon reenvía a www (proxy de redirección, ver HISTORIAL.md, 22 oct).
-   Falta probarlo de verdad: Ajustes → Plataformas → "Verificar con Epic Games".
+0. **Epic Games**: marca aprobada, y desde entonces Epic solo acepta URL de
+   redirección del dominio verificado (`client_redirect_domain_mismatch` con
+   la de platinos-nine). En el portal de Epic, en el cliente de
+   `AUTH_EPIC_ID`, añadir
+   `https://www.paragontrophies.com/api/auth/callback/epic` a las URL de
+   redireccionamiento. Si en Vercel existe `AUTH_EPIC_REDIRECT_PROXY_URL`,
+   borrarla. Probar: Ajustes → Plataformas → "Verificar con Epic Games".
 0. **Steam**: probar «Verificar con Steam» en Ajustes → Plataformas (no hace
    falta configurar nada; solo se puede probar con Steam de verdad).
 0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron

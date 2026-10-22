@@ -6,6 +6,10 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Epic: «El cliente no reconoce la URL de redireccionamiento» (22 oct)
+
+- Con la vuelta por platinos-nine, Epic contesta `client_redirect_domain_mismatch`: con la marca aprobada solo admite URL de redirección del dominio verificado (paragontrophies.com). El proveedor `epic` deja de usar el proxy por defecto y Epic vuelve directamente a `https://www.paragontrophies.com/api/auth/callback/epic`, que hay que añadir en el portal de Epic. `AUTH_EPIC_REDIRECT_PROXY_URL` sigue sirviendo para volver a usar un proxy.
+
 ### Verificar la cuenta de Steam con «Iniciar sesión con Steam» (22 oct)
 
 - Con el dominio propio ya se puede usar el login oficial de Steam (OpenID 2.0, el mismo de las webs de intercambio): en Ajustes → Plataformas, «Verificar con Steam» manda a steamcommunity.com, la persona inicia sesión allí y Steam devuelve su SteamID. Paragon no ve la contraseña ni recibe ningún permiso: solo el SteamID. Steam no usa OAuth, así que va aparte de Auth.js.
