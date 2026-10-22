@@ -6,6 +6,12 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Admin colgado (504): el ALTER TABLE de cada arranque bloqueaba las tablas (22 oct)
+
+- Síntoma: Admin tardaba muchísimo o daba `504 FUNCTION_INVOCATION_TIMEOUT`.
+- Causa: seis módulos (`trafico`, `bandeja`, `registro`, `ajustesSistema`, `epic/verificacion`, `steamExtraDatos`) creaban sus tablas solos y, en CADA arranque de una instancia de Vercel, lanzaban `ALTER TABLE … ENABLE ROW LEVEL SECURITY`. Ese ALTER pide el bloqueo más fuerte de Postgres: espera a cualquier escritura en curso (en las de tráfico se escribe en cada visita) y, mientras espera, todo lo que llega detrás, hasta un SELECT, hace cola. Reproducido en local: el ALTER esperó 5 s y un SELECT normal 3,6 s detrás de él. Con las consultas de Analítica en serie, las esperas se sumaban hasta el límite de la función. También afectaba a la campana de avisos (tabla `aviso`).
+- Arreglo: `lib/esquema.ts` (`prepararTablas`) mira primero en el catálogo, sin bloquear nada, si ya existen las tablas, los índices y el RLS; solo si falta algo ejecuta el DDL, en una transacción con `lock_timeout` de 3 s para no formar cola nunca. En local, una instancia nueva con la tabla ocupada pasa de quedarse esperando a 49 ms; Admin carga en 0,05-1,4 s.
+
 ### Wrap con datos del año, extensión y web instalable en 6 idiomas, huecos de la app (22 oct)
 
 - **Wrap**: "Días con trofeo" y "Mejor racha" bajo "Tu 2026" eran los de siempre (salía "1555 días con trofeo" en un año). Ahora son del año: `rachasDelAnio` en `lib/history.ts` (y `rachasDeDias`, con test). La API del Wrap de la app también da la racha y el mejor mes del año (`mejorMesDelAnio`; antes podía decir "abril de 2021" en el Wrap de 2026).

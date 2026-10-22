@@ -1,6 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+import { prepararTablas } from "@/lib/esquema";
 
 /**
  * Registro de eventos de Paragon (21 oct 2026), para Admin → Registro.
@@ -37,7 +38,13 @@ let tablaLista: Promise<boolean> | null = null;
 function asegurarTabla(): Promise<boolean> {
   tablaLista ??= (async () => {
     try {
-      await db.execute(sql`
+      // Sin tocar nada si ya está todo (ver lib/esquema.ts: el ALTER de cada arranque
+      // bloqueaba la tabla y dejaba colgado lo demás).
+      const ok = await prepararTablas({
+        tablas: ["registro"],
+        indices: ["registro_at_idx"],
+        ddl: [
+        sql`
         CREATE TABLE IF NOT EXISTS "registro" (
           "id" bigserial PRIMARY KEY,
           "at" timestamptz NOT NULL DEFAULT now(),
@@ -46,9 +53,11 @@ function asegurarTabla(): Promise<boolean> {
           "mensaje" text NOT NULL,
           "datos" jsonb
         )
-      `);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "registro_at_idx" ON "registro" ("at" DESC)`);
-      await db.execute(sql`ALTER TABLE "registro" ENABLE ROW LEVEL SECURITY`);
+      `,
+        sql`CREATE INDEX IF NOT EXISTS "registro_at_idx" ON "registro" ("at" DESC)`,
+        ],
+      });
+      if (!ok) throw new Error("tablas sin crear");
       return true;
     } catch (error) {
       console.error("[registro] no se pudo crear la tabla", error);

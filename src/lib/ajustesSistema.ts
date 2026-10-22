@@ -1,6 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+import { prepararTablas } from "@/lib/esquema";
 
 /**
  * Ajustes del sistema que cambia el desarrollador desde Admin → Sistema
@@ -19,14 +20,21 @@ let tablaLista: Promise<boolean> | null = null;
 function asegurarTabla(): Promise<boolean> {
   tablaLista ??= (async () => {
     try {
-      await db.execute(sql`
+      // Sin tocar nada si ya está todo (ver lib/esquema.ts: el ALTER de cada arranque
+      // bloqueaba la tabla y dejaba colgado lo demás).
+      const ok = await prepararTablas({
+        tablas: ["ajuste_sistema"],
+        ddl: [
+        sql`
         CREATE TABLE IF NOT EXISTS "ajuste_sistema" (
           "clave" text PRIMARY KEY,
           "valor" text NOT NULL,
           "actualizado" timestamptz NOT NULL DEFAULT now()
         )
-      `);
-      await db.execute(sql`ALTER TABLE "ajuste_sistema" ENABLE ROW LEVEL SECURITY`);
+      `,
+        ],
+      });
+      if (!ok) throw new Error("tablas sin crear");
       return true;
     } catch (error) {
       console.error("[ajustesSistema] no se pudo crear la tabla", error);

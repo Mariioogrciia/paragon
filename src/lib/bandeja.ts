@@ -6,6 +6,7 @@ import { avisosBandeja, friendships, users } from "@/db/schema";
 import { avisoPermitido } from "@/lib/avisosPreferencias";
 import type { Idioma } from "@/lib/idiomasTrofeo";
 import { traducirAviso } from "@/lib/avisosTraduccion";
+import { prepararTablas } from "@/lib/esquema";
 
 /**
  * Bandeja de avisos dentro de la plataforma (16 oct 2026). Antes, un aviso
@@ -51,7 +52,13 @@ export function asegurarTablaAvisos(): Promise<boolean> {
     try {
       const [fila] = await db.execute<{ existe: string | null }>(sql`select to_regclass('public.aviso')::text as existe`);
       if (fila?.existe) return true;
-      await db.execute(sql`
+      // Sin tocar nada si ya está todo (ver lib/esquema.ts: el ALTER de cada arranque
+      // bloqueaba la tabla y dejaba colgado lo demás).
+      const ok = await prepararTablas({
+        tablas: ["aviso"],
+        indices: ["aviso_userId_createdAt_idx"],
+        ddl: [
+        sql`
         CREATE TABLE IF NOT EXISTS "aviso" (
           "id" text PRIMARY KEY,
           "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
@@ -62,9 +69,11 @@ export function asegurarTablaAvisos(): Promise<boolean> {
           "leido" boolean NOT NULL DEFAULT false,
           "createdAt" timestamp NOT NULL DEFAULT now()
         )
-      `);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "aviso_userId_createdAt_idx" ON "aviso" ("userId", "createdAt")`);
-      await db.execute(sql`ALTER TABLE "aviso" ENABLE ROW LEVEL SECURITY`);
+      `,
+        sql`CREATE INDEX IF NOT EXISTS "aviso_userId_createdAt_idx" ON "aviso" ("userId", "createdAt")`,
+        ],
+      });
+      if (!ok) throw new Error("tablas sin crear");
       return true;
     } catch (error) {
       console.error("[bandeja] no se pudo crear la tabla", error);

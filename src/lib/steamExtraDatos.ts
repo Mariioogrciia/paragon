@@ -2,6 +2,7 @@ import "server-only";
 import { asc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { steamAccountExtra } from "@/db/schema";
+import { prepararTablas } from "@/lib/esquema";
 
 /**
  * Lectura de las cuentas de Steam extra (ver `steamAccountExtra` en
@@ -24,7 +25,12 @@ export function asegurarTablaSteamExtra(): Promise<boolean> {
       // Lo normal es que ya exista: entonces ni se toca (sin DDL ni bloqueos).
       const [fila] = await db.execute<{ existe: string | null }>(sql`select to_regclass('public.steam_account_extra')::text as existe`);
       if (fila?.existe) return true;
-      await db.execute(sql`
+      // Sin tocar nada si ya está todo (ver lib/esquema.ts: el ALTER de cada arranque
+      // bloqueaba la tabla y dejaba colgado lo demás).
+      const ok = await prepararTablas({
+        tablas: ["steam_account_extra"],
+        ddl: [
+        sql`
         CREATE TABLE IF NOT EXISTS "steam_account_extra" (
           "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
           "accountId" text NOT NULL UNIQUE,
@@ -35,8 +41,10 @@ export function asegurarTablaSteamExtra(): Promise<boolean> {
           "createdAt" timestamp NOT NULL DEFAULT now(),
           PRIMARY KEY ("userId", "accountId")
         )
-      `);
-      await db.execute(sql`ALTER TABLE "steam_account_extra" ENABLE ROW LEVEL SECURITY`);
+      `,
+        ],
+      });
+      if (!ok) throw new Error("tablas sin crear");
       return true;
     } catch (error) {
       console.error("[steamExtra] no se pudo crear la tabla", error);

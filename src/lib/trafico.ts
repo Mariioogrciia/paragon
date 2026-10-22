@@ -2,6 +2,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import { enSerie, recordado } from "@/lib/enSerie";
+import { prepararTablas } from "@/lib/esquema";
 
 /**
  * Tráfico dentro de Paragon (21 oct 2026), para Admin → Analítica. Vercel
@@ -38,7 +39,12 @@ let tablasListas: Promise<boolean> | null = null;
 export function asegurarTablas(): Promise<boolean> {
   tablasListas ??= (async () => {
     try {
-      await db.execute(sql`
+      // Sin tocar nada si ya está todo (ver lib/esquema.ts: el ALTER de cada arranque
+      // bloqueaba la tabla y dejaba colgado lo demás).
+      const ok = await prepararTablas({
+        tablas: ["trafico_dia", "trafico_origen", "actividad_usuario", "trafico_dimension", "rendimiento_dia", "trafico_404", "trafico_bot", "actividad_app"],
+        ddl: [
+        sql`
         CREATE TABLE IF NOT EXISTS "trafico_dia" (
           "dia" date NOT NULL,
           "ruta" text NOT NULL,
@@ -47,23 +53,23 @@ export function asegurarTablas(): Promise<boolean> {
           "movil" integer NOT NULL DEFAULT 0,
           PRIMARY KEY ("dia", "ruta")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "trafico_origen" (
           "dia" date NOT NULL,
           "origen" text NOT NULL,
           "entradas" integer NOT NULL DEFAULT 0,
           PRIMARY KEY ("dia", "origen")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "actividad_usuario" (
           "dia" date NOT NULL,
           "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
           PRIMARY KEY ("dia", "userId")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "trafico_dimension" (
           "dia" date NOT NULL,
           "tipo" text NOT NULL,
@@ -71,8 +77,8 @@ export function asegurarTablas(): Promise<boolean> {
           "n" integer NOT NULL DEFAULT 0,
           PRIMARY KEY ("dia", "tipo", "valor")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "rendimiento_dia" (
           "dia" date NOT NULL,
           "metrica" text NOT NULL,
@@ -83,33 +89,33 @@ export function asegurarTablas(): Promise<boolean> {
           "malas" integer NOT NULL DEFAULT 0,
           PRIMARY KEY ("dia", "metrica")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "trafico_404" (
           "dia" date NOT NULL,
           "ruta" text NOT NULL,
           "n" integer NOT NULL DEFAULT 0,
           PRIMARY KEY ("dia", "ruta")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "trafico_bot" (
           "dia" date NOT NULL,
           "bot" text NOT NULL,
           "n" integer NOT NULL DEFAULT 0,
           PRIMARY KEY ("dia", "bot")
         )
-      `);
-      await db.execute(sql`
+      `,
+        sql`
         CREATE TABLE IF NOT EXISTS "actividad_app" (
           "dia" date NOT NULL,
           "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
           PRIMARY KEY ("dia", "userId")
         )
-      `);
-      for (const tabla of ["trafico_dia", "trafico_origen", "actividad_usuario", "trafico_dimension", "rendimiento_dia", "trafico_404", "trafico_bot", "actividad_app"]) {
-        await db.execute(sql.raw(`ALTER TABLE "${tabla}" ENABLE ROW LEVEL SECURITY`));
-      }
+      `,
+        ],
+      });
+      if (!ok) throw new Error("tablas sin crear");
       return true;
     } catch (error) {
       console.error("[trafico] no se pudieron crear las tablas", error);

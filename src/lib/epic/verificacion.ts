@@ -3,6 +3,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { platformAccounts } from "@/db/schema";
 import { esViolacionDe } from "@/lib/profiles";
+import { prepararTablas } from "@/lib/esquema";
 
 /**
  * Cuentas de Epic verificadas con el login oficial de Epic (Epic Account
@@ -25,7 +26,12 @@ let tablaLista: Promise<boolean> | null = null;
 function asegurarTabla(): Promise<boolean> {
   tablaLista ??= (async () => {
     try {
-      await db.execute(sql`
+      // Sin tocar nada si ya está todo (ver lib/esquema.ts: el ALTER de cada arranque
+      // bloqueaba la tabla y dejaba colgado lo demás).
+      const ok = await prepararTablas({
+        tablas: ["cuenta_verificada"],
+        ddl: [
+        sql`
         CREATE TABLE IF NOT EXISTS "cuenta_verificada" (
           "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
           "platform" text NOT NULL,
@@ -33,8 +39,10 @@ function asegurarTabla(): Promise<boolean> {
           "verificadaEl" timestamptz NOT NULL DEFAULT now(),
           PRIMARY KEY ("userId", "platform")
         )
-      `);
-      await db.execute(sql`ALTER TABLE "cuenta_verificada" ENABLE ROW LEVEL SECURITY`);
+      `,
+        ],
+      });
+      if (!ok) throw new Error("tablas sin crear");
       return true;
     } catch (error) {
       console.error("[verificacion] no se pudo crear la tabla", error);
