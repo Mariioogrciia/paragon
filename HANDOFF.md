@@ -74,8 +74,13 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    la de platinos-nine). En el portal de Epic, en el cliente de
    `AUTH_EPIC_ID`, añadir
    `https://www.paragontrophies.com/api/auth/callback/epic` a las URL de
-   redireccionamiento. Si en Vercel existe `AUTH_EPIC_REDIRECT_PROXY_URL`,
-   borrarla. Probar: Ajustes → Plataformas → "Verificar con Epic Games".
+   redireccionamiento (hecho el 22 oct). Ojo: la aplicación publicada está
+   bloqueada y los cambios quedan en BORRADOR hasta otra revisión de Epic, así
+   que hay que enviar el borrador a revisión y esperar. Hasta entonces Epic
+   solo acepta `localhost` (probado: la de www da
+   `client_redirect_domain_mismatch`; el cliente que usa la web es «Paragon
+   Web»). Si en Vercel existe `AUTH_EPIC_REDIRECT_PROXY_URL`, borrarla.
+   Probar: Ajustes → Plataformas → "Verificar con Epic Games".
 0. **Steam**: probar «Verificar con Steam» en Ajustes → Plataformas (no hace
    falta configurar nada; solo se puede probar con Steam de verdad).
 0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron
