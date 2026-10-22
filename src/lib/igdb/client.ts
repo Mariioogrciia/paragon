@@ -308,19 +308,74 @@ function filtroPlataforma(plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): st
   return ` & platforms.abbreviation = (${lista})`;
 }
 
+/** Tipo de popularidad de IGDB «Want to Play»: cuánta gente lo tiene apuntado para jugar. */
+const QUIERO_JUGAR = 2;
+
 /**
- * Próximos lanzamientos: fecha de salida en el futuro, ordenados por hype
- * (cuánta gente en IGDB lo sigue) para que salgan los títulos grandes
- * primero y no ruido de catálogo.
+ * Los juegos más apuntados en «Want to Play» de IGDB, del más al menos.
+ * Son 1000 (dos páginas, el máximo por petición es 500): la mayoría ya han
+ * salido, y de aquí solo interesan los que aún no. Cambia despacio: se
+ * cachea 6 h como el resto del catálogo.
+ */
+async function masEsperadosIds(): Promise<number[]> {
+  const paginas = await Promise.all(
+    [0, 500].map((offset) =>
+      query<{ game_id: number }>(
+        "popularity_primitives",
+        `fields game_id; where popularity_type = ${QUIERO_JUGAR}; sort value desc; limit 500; offset ${offset};`,
+      ),
+    ),
+  );
+  return paginas.flat().map((f) => f.game_id);
+}
+
+/**
+ * Próximos lanzamientos: los MÁS ESPERADOS con fecha de salida en el futuro.
+ *
+ * Antes se ordenaba solo por `hypes` (follows antes de salir), que se
+ * acumulan desde el anuncio: los anunciados hace años lo copaban y uno
+ * enorme anunciado este año no entraba (God of War Laufey, 22 oct 2026).
+ * Ahora manda «Want to Play» de IGDB (`popularity_primitives`), que mide el
+ * interés de la gente; el orden por `hypes` queda de relleno y de respaldo
+ * si esa consulta falla.
  */
 export async function upcomingGames(limit = 8, plataforma?: keyof typeof ABREVIATURAS_PLATAFORMA): Promise<IgdbGameResult[]> {
   const now = ahoraRedondeado();
-  const games = await query<IgdbGame>(
-    "games",
-    `${FIELDS} where first_release_date > ${now} & cover != null & hypes != null${filtroPlataforma(plataforma)}; sort hypes desc; limit ${limit};`,
-    VENTANA_SEGUNDOS,
-  );
-  return games.map(formatGame);
+  const futuros = `first_release_date > ${now} & cover != null${filtroPlataforma(plataforma)}`;
+
+  const [esperados, porHype] = await Promise.all([
+    masEsperadosIds()
+      .then(async (ids) => {
+        if (ids.length === 0) return [];
+        const games = await query<IgdbGame>(
+          "games",
+          `${FIELDS} where id = (${ids.join(",")}) & ${futuros}; limit 500;`,
+          VENTANA_SEGUNDOS,
+        );
+        const puesto = new Map(ids.map((id, i) => [id, i]));
+        return games.sort((x, y) => (puesto.get(x.id) ?? Infinity) - (puesto.get(y.id) ?? Infinity));
+      })
+      .catch((error) => {
+        console.error("[igdb] más esperados", error);
+        return [] as IgdbGame[];
+      }),
+    query<IgdbGame>("games", `${FIELDS} where ${futuros} & hypes != null; sort hypes desc; limit ${limit};`, VENTANA_SEGUNDOS),
+  ]);
+
+  return juntarSinRepetir(esperados, porHype, limit).map(formatGame);
+}
+
+/** Los de `primero` en su orden y, hasta `limite`, los de `relleno` que no estén ya. */
+export function juntarSinRepetir<T extends { id: number }>(primero: T[], relleno: T[], limite: number): T[] {
+  const vistos = new Set<number>();
+  const fuera: T[] = [];
+  for (const g of [...primero, ...relleno]) {
+    if (fuera.length >= limite) break;
+    if (vistos.has(g.id)) continue;
+    vistos.add(g.id);
+    fuera.push(g);
+  }
+  return fuera;
 }
 
 /**

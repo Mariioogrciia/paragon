@@ -6,6 +6,10 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Próximos lanzamientos: los más esperados de verdad (22 oct)
+
+- God of War Laufey (16 feb 2027) no salía: se ordenaba solo por `hypes` de IGDB, que se acumulan desde el anuncio, y los anunciados hace años copaban los 8 huecos. `upcomingGames` (`lib/igdb/client.ts`) ordena ahora por «Want to Play» de IGDB (`popularity_primitives`, tipo 2, los 1000 más apuntados) entre los que tienen fecha futura, y rellena con el orden por `hypes` (también de respaldo si esa consulta falla). Vale para Inicio, Noticias y las páginas de plataforma de Descubrir. Test de la mezcla en `tests/masEsperados.test.ts`. No se pudo probar contra IGDB desde aquí (sin acceso a la red): mirar la fila tras el despliegue.
+
 ### «No podemos leer tu cuenta de Xbox» cada 3 horas con el perfil en público (22 oct)
 
 - OpenXBL falla a ratos (límite de peticiones, caídas) y `canReadAchievements` daba `false` también en esos fallos: cada sincronización fallida contaba como "perfil privado" y avisaba, y la siguiente buena borraba el aviso, así que volvía a llegar. Lo mismo podía pasar con Steam y PSN.
