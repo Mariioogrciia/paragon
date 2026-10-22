@@ -30,3 +30,9 @@ jobs:
       # (pasó el 6 oct con "PerfilPage.amistad.enviada").
       - name: Textos de la web (namespaces)
         run: npx tsx scripts/comprobar-namespaces-cliente.mts
+      # Textos de la app (21 oct 2026): cada idioma con los mismos huecos {0}
+      # que el español, y lo generado al día con kmp/i18n/textos.json.
+      - name: Textos de la app (huecos y generado)
+        run: |
+          node kmp/i18n/generar.mjs
+          git diff --exit-code -- kmp/shared/src/commonMain/kotlin/com/paragon/shared/i18n kmp/androidApp/src/main/res

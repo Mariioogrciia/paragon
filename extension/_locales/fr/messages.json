@@ -1,0 +1,89 @@
+{
+  "nombre": {
+    "message": "Paragon — Synchroniser PSN et Epic"
+  },
+  "descripcion": {
+    "message": "Synchronise tes trophées PlayStation et tes succès Epic avec Paragon en lisant ta propre session dans ce navigateur, sans copier de jetons à la main."
+  },
+  "comprobando": {
+    "message": "Vérification…"
+  },
+  "conectar": {
+    "message": "Se connecter à Paragon"
+  },
+  "syncPsn": {
+    "message": "Synchroniser PSN maintenant"
+  },
+  "syncEpic": {
+    "message": "Synchroniser Epic maintenant"
+  },
+  "desconectar": {
+    "message": "Déconnecter cette extension"
+  },
+  "conectado": {
+    "message": "Connecté. PSN : appuie pour synchroniser. Epic : ouvre d'abord ta page « Mes succès »."
+  },
+  "desconectado": {
+    "message": "Connecte d'abord ton compte Paragon."
+  },
+  "sincronizando": {
+    "message": "Synchronisation…"
+  },
+  "leyendoEpic": {
+    "message": "Lecture de tes succès Epic… cela peut prendre un moment."
+  },
+  "listoPsn": {
+    "message": "Terminé — $JUEGOS$ jeu(x) synchronisé(s) en tant que $USUARIO$.",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "listoEpic": {
+    "message": "Terminé — $JUEGOS$ jeu(x) Epic synchronisé(s) en tant que $USUARIO$. Ils apparaissent comme progression déclarée (ils ne comptent pas dans les classements).",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorServidor": {
+    "message": "Erreur du serveur ($CODIGO$).",
+    "placeholders": {
+      "codigo": {
+        "content": "$1"
+      }
+    }
+  },
+  "err_sin_sesion_psn": {
+    "message": "Aucune session PlayStation détectée dans ce navigateur — ouvre playstation.com, connecte-toi et réessaie."
+  },
+  "err_abre_mis_logros": {
+    "message": "Ouvre ta page « Mes succès » sur store.epicgames.com (avatar → Mes succès), connecté, et appuie à nouveau."
+  },
+  "err_recarga_epic": {
+    "message": "Recharge l'onglet Epic (F5) et réessaie : il a été ouvert avant l'installation de l'extension."
+  },
+  "err_perfil_privado": {
+    "message": "Epic ne renvoie pas tes succès : dans « Mes succès » → « Niveau de confidentialité », mets-le sur Public et réessaie."
+  },
+  "err_perfil_no_encontrado": {
+    "message": "Epic ne renvoie pas ce profil. Vérifie que tu es sur ta page « Mes succès »."
+  },
+  "err_epic_reto": {
+    "message": "Epic te demande de prouver que tu es humain. Ouvre le site d'Epic normalement, termine la vérification et réessaie."
+  },
+  "err_epic_no_responde": {
+    "message": "Epic n'a pas répondu. Réessaie dans un instant."
+  },
+  "err_no_es_pagina_de_logros": {
+    "message": "Ouvre ta page Epic « Mes succès » (l'URL se termine par /u/ et un code)."
+  }
+}

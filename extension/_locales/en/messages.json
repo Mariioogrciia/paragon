@@ -1,0 +1,89 @@
+{
+  "nombre": {
+    "message": "Paragon — Sync PSN and Epic"
+  },
+  "descripcion": {
+    "message": "Syncs your PlayStation trophies and Epic achievements with Paragon by reading your own session in this browser, without copying tokens by hand."
+  },
+  "comprobando": {
+    "message": "Checking…"
+  },
+  "conectar": {
+    "message": "Connect to Paragon"
+  },
+  "syncPsn": {
+    "message": "Sync PSN now"
+  },
+  "syncEpic": {
+    "message": "Sync Epic now"
+  },
+  "desconectar": {
+    "message": "Disconnect this extension"
+  },
+  "conectado": {
+    "message": "Connected. PSN: press to sync. Epic: open your “My Achievements” page first."
+  },
+  "desconectado": {
+    "message": "Connect your Paragon account first."
+  },
+  "sincronizando": {
+    "message": "Syncing…"
+  },
+  "leyendoEpic": {
+    "message": "Reading your Epic achievements… this may take a moment."
+  },
+  "listoPsn": {
+    "message": "Done — $JUEGOS$ game(s) synced as $USUARIO$.",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "listoEpic": {
+    "message": "Done — $JUEGOS$ Epic game(s) synced as $USUARIO$. They show as self-reported progress (they don't count for rankings).",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorServidor": {
+    "message": "Server error ($CODIGO$).",
+    "placeholders": {
+      "codigo": {
+        "content": "$1"
+      }
+    }
+  },
+  "err_sin_sesion_psn": {
+    "message": "No PlayStation session found in this browser — open playstation.com, sign in and try again."
+  },
+  "err_abre_mis_logros": {
+    "message": "Open your “My Achievements” page on store.epicgames.com (avatar → My Achievements), signed in, and press again."
+  },
+  "err_recarga_epic": {
+    "message": "Reload the Epic tab (F5) and try again: it was opened before the extension was installed."
+  },
+  "err_perfil_privado": {
+    "message": "Epic isn't returning your achievements: in “My Achievements” → “Privacy level”, set it to Public and try again."
+  },
+  "err_perfil_no_encontrado": {
+    "message": "Epic isn't returning that profile. Check that you're on your “My Achievements” page."
+  },
+  "err_epic_reto": {
+    "message": "Epic is asking you to prove you're human. Open the Epic website normally, complete it and try again."
+  },
+  "err_epic_no_responde": {
+    "message": "Epic didn't respond. Try again in a moment."
+  },
+  "err_no_es_pagina_de_logros": {
+    "message": "Open your Epic “My Achievements” page (the URL ends in /u/ and a code)."
+  }
+}

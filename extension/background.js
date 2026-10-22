@@ -91,7 +91,7 @@ async function sincronizarPsn() {
     // caducó) — se borra solo para que el popup vuelva a pedir conectar,
     // en vez de fallar en silencio para siempre.
     if (respuesta.status === 401) await chrome.storage.local.remove("paragonToken");
-    return { error: resultado?.error ?? `Error del servidor (${respuesta.status})` };
+    return resultado?.error ? { error: resultado.error } : { error: "error-servidor", estado: respuesta.status };
   }
 
   return resultado;
@@ -134,7 +134,7 @@ async function sincronizarEpic() {
 
   if (!respuesta.ok) {
     if (respuesta.status === 401) await chrome.storage.local.remove("paragonToken");
-    return { error: resultado?.error ?? `Error del servidor (${respuesta.status})` };
+    return resultado?.error ? { error: resultado.error } : { error: "error-servidor", estado: respuesta.status };
   }
 
   return resultado;

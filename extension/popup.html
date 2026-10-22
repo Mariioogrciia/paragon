@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Paragon — Sincronizar PSN y Epic</title>
+  <title>Paragon</title>
   <style>
     body {
       width: 280px;
@@ -49,11 +49,11 @@
 </head>
 <body>
   <h1>Paragon</h1>
-  <p id="estado">Comprobando…</p>
-  <button id="btn-conectar" hidden>Conectar con Paragon</button>
-  <button id="btn-sync" hidden>Sincronizar PSN ahora</button>
-  <button id="btn-sync-epic" hidden>Sincronizar Epic ahora</button>
-  <button id="btn-desconectar" hidden>Desconectar esta extensión</button>
+  <p id="estado" data-i18n="comprobando"></p>
+  <button id="btn-conectar" data-i18n="conectar" hidden></button>
+  <button id="btn-sync" data-i18n="syncPsn" hidden></button>
+  <button id="btn-sync-epic" data-i18n="syncEpic" hidden></button>
+  <button id="btn-desconectar" data-i18n="desconectar" hidden></button>
   <script src="popup.js"></script>
 </body>
 </html>

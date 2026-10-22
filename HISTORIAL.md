@@ -6,6 +6,14 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Wrap con datos del año, extensión y web instalable en 6 idiomas, huecos de la app (22 oct)
+
+- **Wrap**: "Días con trofeo" y "Mejor racha" bajo "Tu 2026" eran los de siempre (salía "1555 días con trofeo" en un año). Ahora son del año: `rachasDelAnio` en `lib/history.ts` (y `rachasDeDias`, con test). La API del Wrap de la app también da la racha y el mejor mes del año (`mejorMesDelAnio`; antes podía decir "abril de 2021" en el Wrap de 2026).
+  - Enlaces de las tarjetas: "Tu año" iba al ranking de juegos y "Platinos del año" al de géneros. Ahora "Tu año" y "Ver mes a mes" llevan a `/ritmo` en tu perfil y a las estadísticas de la persona en el de otro; "Platinos del año", a su biblioteca filtrada por platinados (si no hay platinos y sale el género, al ranking de géneros del año).
+- **Extensión 1.3.0 en 6 idiomas** (`extension/_locales`, `chrome.i18n`): nombre, popup y errores; el "Error del servidor (N)" ya no llega en español desde el background. Probada cargándola en Chromium en italiano, portugués y alemán.
+- **Web instalable en 6 idiomas**: un manifiesto por idioma (`/manifiesto/<idioma>`, generado al compilar, `lib/manifiestoWeb.ts`), enlazado por `metadatosDocumento` en las dos raíces. `/manifest.webmanifest` sigue respondiendo (en español) por una reescritura, para lo ya instalado.
+- **Textos de la app**: `kmp/i18n/generar.mjs` falla si una traducción tiene huecos `{0}` distintos de los del español, y la CI (Comprobaciones) lo ejecuta y comprueba que lo generado está al día.
+
 ### Aviso de cuenta que ya no se puede leer y hora exacta en la campana (21 oct)
 
 - **"No podemos leer tu cuenta"** (`lib/cuentaIlegible.ts`): si alguien pone su perfil de PlayStation, Steam o Xbox en privado después de vincularlo, su biblioteca dejaba de actualizarse sin que se enterase. Con Steam era peor: con "Detalles del juego" en privado devuelve una biblioteca VACÍA sin error, y la sincronización se daba por buena. Ahora `resyncLibraries`, cuando una cuenta no trae juegos o falla, comprueba si se puede leer (las llamadas del asistente de vincular) y, si no, avisa una vez por plataforma (push, Discord y campana) con enlace a `/vincular`. Cuando vuelve a leerse se olvida, para avisar otra vez si se repite. Si la comprobación misma falla (red), no avisa. Marca en `notification_log` (tipo `cuenta-ilegible`).

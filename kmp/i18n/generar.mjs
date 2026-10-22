@@ -17,12 +17,21 @@ const textos = JSON.parse(readFileSync(join(aqui, "textos.json"), "utf8"));
 const claves = Object.keys(textos).sort();
 const IDIOMAS = ["es", "en", "de", "fr", "it", "pt"];
 
+// Los huecos {0}, {1}... de cada idioma tienen que ser los mismos que en
+// español (21 oct 2026): uno perdido en una traducción no daba ningún error,
+// solo un texto sin el dato; uno de más salía tal cual, "{1}", en pantalla.
+const huecos = (texto) => [...new Set(texto.match(/\{\d+\}/g) ?? [])].sort().join(",");
+const errores = [];
 for (const clave of claves) {
   for (const idioma of IDIOMAS) {
-    if (textos[clave][idioma] == null) throw new Error(`Falta "${idioma}" en ${clave}`);
+    if (textos[clave][idioma] == null) errores.push(`Falta "${idioma}" en ${clave}`);
+    else if (huecos(textos[clave][idioma]) !== huecos(textos[clave].es)) {
+      errores.push(`Huecos distintos en ${clave} (${idioma}): "${huecos(textos[clave][idioma])}" frente a "${huecos(textos[clave].es)}" en español`);
+    }
   }
-  if (!/^[a-z][a-z0-9_]*$/.test(clave)) throw new Error(`Clave no válida en Kotlin/Android: ${clave}`);
+  if (!/^[a-z][a-z0-9_]*$/.test(clave)) errores.push(`Clave no válida en Kotlin/Android: ${clave}`);
 }
+if (errores.length > 0) throw new Error(errores.join("\n"));
 
 // --- 1. Kotlin común -------------------------------------------------------
 

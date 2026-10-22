@@ -101,7 +101,17 @@ export interface Rachas {
  * páginas (p.ej. la portada) lo vuelven a pedir para lo suyo — sin
  * memoizar, esa segunda llamada era la misma consulta otra vez.
  */
-export const rachas = cache(async (userId: string): Promise<Rachas> => {
+export const rachas = cache(async (userId: string): Promise<Rachas> => rachasDeDias(await diasConTrofeo(userId, false)));
+
+/**
+ * Lo mismo pero solo con los días de ESTE año (21 oct 2026): para el Wrap,
+ * que lo enseña bajo "Tu 2026". Antes salía la cuenta de siempre y alguien con
+ * años en Paragon veía "1555 días con trofeo" en un año.
+ */
+export const rachasDelAnio = cache(async (userId: string): Promise<Rachas> => rachasDeDias(await diasConTrofeo(userId, true)));
+
+/** Los días distintos con algún trofeo, en orden ("YYYY-MM-DD"). */
+async function diasConTrofeo(userId: string, soloEsteAnio: boolean): Promise<string[]> {
   const filas = await db
     .select({ dia: sql<string>`to_char(date(${userTrophies.earnedAt}), 'YYYY-MM-DD')` })
     .from(userTrophies)
@@ -110,12 +120,17 @@ export const rachas = cache(async (userId: string): Promise<Rachas> => {
         eq(userTrophies.userId, userId),
         eq(userTrophies.earned, true),
         isNotNull(userTrophies.earnedAt),
+        soloEsteAnio ? sql`date_part('year', ${userTrophies.earnedAt}) = date_part('year', now())` : undefined,
       ),
     )
     .groupBy(sql`date(${userTrophies.earnedAt})`)
     .orderBy(sql`date(${userTrophies.earnedAt})`);
 
-  const dias = filas.map((f) => f.dia);
+  return filas.map((f) => f.dia);
+}
+
+/** Rachas a partir de los días con trofeo (ordenados). */
+export function rachasDeDias(dias: string[]): Rachas {
   if (dias.length === 0) return { actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false };
 
   const DIA_MS = 86_400_000;
@@ -139,7 +154,7 @@ export const rachas = cache(async (userId: string): Promise<Rachas> => {
   const hoyCuenta = distancia === 0;
 
   return { actual, mejor, diasActivos: dias.length, hoyCuenta };
-});
+}
 
 export interface ResumenHistorico {
   /** Trofeos con fecha conocida: la base real de todo lo de arriba. */
@@ -187,6 +202,28 @@ export async function resumenHistorico(userId: string): Promise<ResumenHistorico
     esteAnio: Number(fila?.esteAnio ?? 0),
     mejorMes: mejor ? { mes: mejor.mes, total: Number(mejor.total) } : null,
   };
+}
+
+/** El mejor mes de ESTE año (para el Wrap; con empate, el más reciente, como la gráfica). */
+export async function mejorMesDelAnio(userId: string): Promise<{ mes: string; total: number } | null> {
+  const [mejor] = await db
+    .select({
+      mes: sql<string>`to_char(date_trunc('month', ${userTrophies.earnedAt}), 'YYYY-MM')`,
+      total: sql<number>`count(*)`,
+    })
+    .from(userTrophies)
+    .where(
+      and(
+        eq(userTrophies.userId, userId),
+        eq(userTrophies.earned, true),
+        isNotNull(userTrophies.earnedAt),
+        sql`date_part('year', ${userTrophies.earnedAt}) = date_part('year', now())`,
+      ),
+    )
+    .groupBy(sql`date_trunc('month', ${userTrophies.earnedAt})`)
+    .orderBy(sql`count(*) desc, date_trunc('month', ${userTrophies.earnedAt}) desc`)
+    .limit(1);
+  return mejor ? { mes: mejor.mes, total: Number(mejor.total) } : null;
 }
 
 /* ------------------------------ Desglose de un mes ----------------------------- */

@@ -82,6 +82,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // La web instalable ya no sale de `app/manifest.ts` sino de un manifiesto por
+  // idioma (app/manifiesto/[idioma], 21 oct 2026); la dirección de siempre, para
+  // lo ya instalado, da el español.
+  async rewrites() {
+    return [{ source: "/manifest.webmanifest", destination: "/manifiesto/es" }];
+  },
   async redirects() {
     return [
       {

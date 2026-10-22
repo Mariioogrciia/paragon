@@ -23,7 +23,7 @@ import { ImportLibraryModal } from "@/components/ImportLibraryModal";
 import { TiltCard } from "@/components/TiltCard";
 import { coverGradient, urlAbsolutaParaOg } from "@/lib/design";
 import { ParagonWrap } from "@/components/ParagonWrap";
-import { juegosDelAnio, rachas as rachasDe, resumenHistorico, ultimosTrofeos } from "@/lib/history";
+import { juegosDelAnio, rachasDelAnio, resumenHistorico, ultimosTrofeos } from "@/lib/history";
 import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
 import { wrapAnual } from "@/lib/wrapAnual";
 import { RecentTrophies } from "@/components/RecentTrophies";
@@ -209,7 +209,7 @@ export async function PerfilJugador({
   ]);
   const [[rachasPerfil, percentilAnio], estadoAmistad] = await Promise.all([
     games.length > 0
-      ? Promise.all([rachasDe(profile.userId), percentilTrofeosAnio(profile.userId)])
+      ? Promise.all([rachasDelAnio(profile.userId), percentilTrofeosAnio(profile.userId)])
       : Promise.resolve([{ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }, null] as const),
     // Solo hace falta si estás mirando el perfil de otra persona con
     // sesión iniciada — nadie más lo va a ver.
@@ -564,6 +564,7 @@ export async function PerfilJugador({
                 mejorMes={resumen.mejorMes}
                 rachas={rachasPerfil}
                 percentil={percentilAnio}
+                esMio={esMio}
               />
             ),
             stats: (

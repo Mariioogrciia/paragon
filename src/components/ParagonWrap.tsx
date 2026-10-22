@@ -119,6 +119,7 @@ export async function ParagonWrap({
   mejorMes,
   rachas,
   percentil,
+  esMio = false,
 }: {
   games: Game[];
   /** Trofeos conseguidos este año (solo los que tienen fecha registrada). */
@@ -143,11 +144,16 @@ export async function ParagonWrap({
   mejorMes?: { mes: string; total: number } | null;
   rachas?: Rachas;
   percentil?: PercentilAnio | null;
+  /** Tu propio perfil: el mes a mes es /ritmo; en el de otro, sus estadísticas. */
+  esMio?: boolean;
 }) {
   const [t, locale] = await Promise.all([getTranslations("Perfil"), getLocale()]);
   const topGenre = generoTop(games);
   const topGame = juegoDestacado(games);
   const conAnio = esteAnio > 0;
+  // Adónde lleva cada tarjeta (21 oct 2026): antes "Tu año" iba al ranking de
+  // juegos y "Platinos del año" al de géneros, nada que ver con lo que enseñan.
+  const mesAMes = esMio || !handle ? "/ritmo" : `/u/${handle}/estadisticas`;
   const extras = [
     rachas && rachas.mejor > 0 && { etiqueta: t("ParagonWrap.mejorRacha"), valor: t("ParagonWrap.dias", { n: rachas.mejor }) },
     rachas && rachas.diasActivos > 0 && { etiqueta: t("ParagonWrap.diasActivos"), valor: rachas.diasActivos.toLocaleString(locale) },
@@ -180,7 +186,7 @@ export async function ParagonWrap({
           )}
           {handle && <CompartirImagenWrap handle={handle} />}
           <Link
-            href="/ritmo"
+            href={mesAMes}
             className="text-xs font-bold uppercase tracking-wide text-accent hover:underline"
           >
             {t("ParagonWrap.verMesAMes")}
@@ -193,7 +199,7 @@ export async function ParagonWrap({
           y los metales, el juego con su carátula de verdad, el top de juegos
           y los platinos del año con el trofeo más raro. */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
-        <Tarjeta href={handle ? `/u/${handle}/wrap/trofeos?rango=anio` : undefined} className="md:col-span-4" style={POSTER}>
+        <Tarjeta href={handle ? mesAMes : undefined} className="md:col-span-4" style={POSTER}>
           <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(600px 260px at 0% 0%, rgb(var(--accent-rgb) / 0.22), transparent 70%)" }} />
           <div className="relative">
             <p className={ROTULO}>{t("ParagonWrap.tuAnio", { anio: anual.anio })}</p>
@@ -275,7 +281,11 @@ export async function ParagonWrap({
         )}
 
         {conAnio && (
-          <Tarjeta href={handle ? `/u/${handle}/wrap/generos` : undefined} className="md:col-span-3" style={POSTER}>
+          <Tarjeta
+            href={handle ? (anual.platinos.length > 0 ? `/u/${handle}/biblioteca?estado=platinado` : `/u/${handle}/wrap/generos?rango=anio`) : undefined}
+            className="md:col-span-3"
+            style={POSTER}
+          >
             {anual.platinos.length > 0 ? (
               <>
                 <div className="flex items-baseline justify-between gap-3">

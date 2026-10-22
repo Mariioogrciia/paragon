@@ -808,8 +808,8 @@ lento que la estimación de HowLongToBeat, positivo más rápido.
   "juegosEsteAnio": 20,
   "topGenre": { "name": "Adventure", "count": 170 },
   "topGame": { "id": "psn-...", "title": "Fortnite", "iconUrl": "https://...", "horasTotal": 2108.5, "earnedTrophies": 0 },
-  "mejorMes": { "mes": "2021-04", "total": 129 },
-  "rachas": { "actual": 5, "mejor": 17, "diasActivos": 1541, "hoyCuenta": true },
+  "mejorMes": { "mes": "2026-09", "total": 71 },
+  "rachas": { "actual": 5, "mejor": 9, "diasActivos": 119, "hoyCuenta": true },
   "percentil": { "percentil": 8, "totalUsuarios": 120, "miTotal": 96 }
 }
 ```
@@ -819,6 +819,9 @@ solo tenía sitio en la versión ampliada "Stories" de la web
 cálculo nuevo (`lib/history.ts`, `lib/wrapPercentile.ts`,
 `generoTop`/`juegoDestacado` en `ParagonWrap.tsx`), solo un único endpoint
 que junta todo para no hacer 4-5 llamadas sueltas.
+
+`mejorMes` y `rachas` son del año en curso (21 oct 2026; antes eran los de
+siempre y el Wrap enseñaba, p. ej., "1541 días con trofeo" en un año).
 
 `topGame` es `null` si la biblioteca está vacía o solo tiene deseados.
 `horasTotal` es 0 si el juego más exprimido se decidió por trofeos, no por

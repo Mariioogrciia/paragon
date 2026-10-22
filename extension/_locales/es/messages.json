@@ -1,0 +1,89 @@
+{
+  "nombre": {
+    "message": "Paragon — Sincronizar PSN y Epic"
+  },
+  "descripcion": {
+    "message": "Sincroniza tus trofeos de PlayStation y tus logros de Epic con Paragon leyendo tu propia sesión en este navegador, sin copiar tokens a mano."
+  },
+  "comprobando": {
+    "message": "Comprobando…"
+  },
+  "conectar": {
+    "message": "Conectar con Paragon"
+  },
+  "syncPsn": {
+    "message": "Sincronizar PSN ahora"
+  },
+  "syncEpic": {
+    "message": "Sincronizar Epic ahora"
+  },
+  "desconectar": {
+    "message": "Desconectar esta extensión"
+  },
+  "conectado": {
+    "message": "Conectado. PSN: pulsa para sincronizar. Epic: abre antes tu página «Mis logros»."
+  },
+  "desconectado": {
+    "message": "Conecta tu cuenta de Paragon primero."
+  },
+  "sincronizando": {
+    "message": "Sincronizando…"
+  },
+  "leyendoEpic": {
+    "message": "Leyendo tus logros de Epic… puede tardar un poco."
+  },
+  "listoPsn": {
+    "message": "Listo — $JUEGOS$ juego(s) sincronizado(s) como $USUARIO$.",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "listoEpic": {
+    "message": "Listo — $JUEGOS$ juego(s) de Epic sincronizado(s) como $USUARIO$. Se muestran como progreso declarado (no puntúan en rankings).",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorServidor": {
+    "message": "Error del servidor ($CODIGO$).",
+    "placeholders": {
+      "codigo": {
+        "content": "$1"
+      }
+    }
+  },
+  "err_sin_sesion_psn": {
+    "message": "No se ha detectado sesión de PlayStation en este navegador — abre playstation.com, inicia sesión y vuelve a intentarlo."
+  },
+  "err_abre_mis_logros": {
+    "message": "Abre tu página «Mis logros» en store.epicgames.com (avatar → Mis logros), con tu sesión iniciada, y vuelve a pulsar."
+  },
+  "err_recarga_epic": {
+    "message": "Recarga la pestaña de Epic (F5) y vuelve a intentarlo: se abrió antes de instalar la extensión."
+  },
+  "err_perfil_privado": {
+    "message": "Epic no devuelve tus logros: en «Mis logros» → «Nivel de privacidad», ponlo en Público y vuelve a intentarlo."
+  },
+  "err_perfil_no_encontrado": {
+    "message": "Epic no devuelve ese perfil. Comprueba que estás en tu página «Mis logros»."
+  },
+  "err_epic_reto": {
+    "message": "Epic te está pidiendo comprobar que eres una persona. Abre la web de Epic con normalidad, complétalo y reintenta."
+  },
+  "err_epic_no_responde": {
+    "message": "Epic no ha respondido. Inténtalo de nuevo en un momento."
+  },
+  "err_no_es_pagina_de_logros": {
+    "message": "Abre tu página «Mis logros» de Epic (la URL acaba en /u/ y un código)."
+  }
+}

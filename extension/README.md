@@ -54,6 +54,13 @@ El dominio va a pelo (un manifest no puede leer variables de entorno):
 también `platinos-nine.vercel.app`, que sigue sirviendo /api y /movil para
 las versiones viejas.
 
+## Idiomas (desde la 1.3.0)
+
+Nombre, descripción, popup y mensajes de error en es/en/de/fr/it/pt, con el
+sistema de Chrome: `_locales/<idioma>/messages.json`, y `chrome.i18n` en
+`popup.js` (`data-i18n` en `popup.html`). Sale en el idioma del navegador;
+si no es ninguno de los seis, en español (`default_locale`).
+
 ## Qué falta antes de publicarla de verdad
 
 - Icono propio (hoy reutiliza `public/logo.png` tal cual, sin recortar

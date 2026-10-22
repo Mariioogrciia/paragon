@@ -1,0 +1,89 @@
+{
+  "nombre": {
+    "message": "Paragon — PSN und Epic synchronisieren"
+  },
+  "descripcion": {
+    "message": "Synchronisiert deine PlayStation-Trophäen und Epic-Erfolge mit Paragon über deine eigene Sitzung in diesem Browser, ohne Tokens von Hand zu kopieren."
+  },
+  "comprobando": {
+    "message": "Wird geprüft…"
+  },
+  "conectar": {
+    "message": "Mit Paragon verbinden"
+  },
+  "syncPsn": {
+    "message": "PSN jetzt synchronisieren"
+  },
+  "syncEpic": {
+    "message": "Epic jetzt synchronisieren"
+  },
+  "desconectar": {
+    "message": "Diese Erweiterung trennen"
+  },
+  "conectado": {
+    "message": "Verbunden. PSN: zum Synchronisieren tippen. Epic: öffne vorher deine Seite „Meine Erfolge“."
+  },
+  "desconectado": {
+    "message": "Verbinde zuerst dein Paragon-Konto."
+  },
+  "sincronizando": {
+    "message": "Wird synchronisiert…"
+  },
+  "leyendoEpic": {
+    "message": "Deine Epic-Erfolge werden gelesen… das kann etwas dauern."
+  },
+  "listoPsn": {
+    "message": "Fertig — $JUEGOS$ Spiel(e) als $USUARIO$ synchronisiert.",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "listoEpic": {
+    "message": "Fertig — $JUEGOS$ Epic-Spiel(e) als $USUARIO$ synchronisiert. Sie erscheinen als angegebener Fortschritt (zählen nicht für Ranglisten).",
+    "placeholders": {
+      "juegos": {
+        "content": "$1"
+      },
+      "usuario": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorServidor": {
+    "message": "Serverfehler ($CODIGO$).",
+    "placeholders": {
+      "codigo": {
+        "content": "$1"
+      }
+    }
+  },
+  "err_sin_sesion_psn": {
+    "message": "Keine PlayStation-Sitzung in diesem Browser gefunden — öffne playstation.com, melde dich an und versuche es erneut."
+  },
+  "err_abre_mis_logros": {
+    "message": "Öffne deine Seite „Meine Erfolge“ auf store.epicgames.com (Avatar → Meine Erfolge), angemeldet, und tippe erneut."
+  },
+  "err_recarga_epic": {
+    "message": "Lade den Epic-Tab neu (F5) und versuche es erneut: Er wurde vor der Installation der Erweiterung geöffnet."
+  },
+  "err_perfil_privado": {
+    "message": "Epic gibt deine Erfolge nicht heraus: Stelle unter „Meine Erfolge“ → „Datenschutzstufe“ auf Öffentlich und versuche es erneut."
+  },
+  "err_perfil_no_encontrado": {
+    "message": "Epic gibt dieses Profil nicht heraus. Prüfe, ob du auf deiner Seite „Meine Erfolge“ bist."
+  },
+  "err_epic_reto": {
+    "message": "Epic möchte prüfen, ob du ein Mensch bist. Öffne die Epic-Website ganz normal, schließe es ab und versuche es erneut."
+  },
+  "err_epic_no_responde": {
+    "message": "Epic hat nicht geantwortet. Versuche es gleich noch einmal."
+  },
+  "err_no_es_pagina_de_logros": {
+    "message": "Öffne deine Epic-Seite „Meine Erfolge“ (die URL endet auf /u/ und einen Code)."
+  }
+}

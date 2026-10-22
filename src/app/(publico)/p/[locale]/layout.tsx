@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { Documento } from "../../../documento";
+import { Documento, metadatosDocumento } from "../../../documento";
 import { locales } from "@/i18n/idiomas";
-export { metadata, viewport } from "../../../documento";
+export { viewport } from "../../../documento";
 
 /**
  * Raíz de las páginas públicas cacheables (21 oct 2026). `src/proxy.ts`
@@ -19,6 +19,10 @@ export { metadata, viewport } from "../../../documento";
 // no debe depender de que responda): cada una con la primera visita.
 export function generateStaticParams() {
   return [];
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  return metadatosDocumento((await params).locale);
 }
 
 export default async function LayoutPublico({

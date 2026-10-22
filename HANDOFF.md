@@ -152,13 +152,12 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    misma receta (copia en `(publico)` + ruta en el proxy).
 2. ~~Avisar a quien deja de poder leerse~~ y ~~hora exacta en la campana~~:
    hechas (21 oct).
-3. **Extensión del navegador y `manifest.ts` en más idiomas**: hoy solo en
-   español.
-4. **Comprobar los huecos `{0}` en `kmp/i18n/generar.mjs`**: hoy solo mira
-   que exista cada idioma; un hueco perdido en una traducción no avisa.
-5. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
+3. ~~Extensión y web instalable en 6 idiomas~~ y ~~huecos `{0}` en el
+   generador~~: hechas (22 oct). La extensión 1.3.0 hay que recargarla (o
+   publicarla) para que llegue a quien la tenga.
+4. **Medir y recortar**: con la analítica nueva de Admin, en un mes se verá
    qué páginas no usa nadie (arcade, planificador…).
-6. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
+5. Ideas de producto: plan de platino guiado por juego (orden de trofeos,
    perdibles, sesiones), resumen semanal en push, varias cuentas de Steam
    para todos, `pt-BR` si llegan brasileños.
 

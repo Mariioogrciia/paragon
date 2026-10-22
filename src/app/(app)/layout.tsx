@@ -1,5 +1,5 @@
-import { Documento } from "../documento";
-export { metadata, viewport } from "../documento";
+import { Documento, metadatosDocumento } from "../documento";
+export { viewport } from "../documento";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { esIdioma } from "@/lib/idiomasTrofeo";
@@ -25,6 +25,10 @@ function relanzarSiEsDeNext(error: unknown): void {
   if (typeof (error as { digest?: unknown })?.digest === "string") throw error;
 }
 
+
+export async function generateMetadata() {
+  return metadatosDocumento(await getLocale());
+}
 
 export default async function RootLayout({
   children,

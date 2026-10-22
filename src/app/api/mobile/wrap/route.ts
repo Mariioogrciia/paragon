@@ -1,7 +1,7 @@
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { generoTop, juegoDestacado } from "@/components/ParagonWrap";
-import { resumenHistorico, juegosDelAnio, rachas } from "@/lib/history";
+import { resumenHistorico, juegosDelAnio, mejorMesDelAnio, rachasDelAnio } from "@/lib/history";
 import { percentilTrofeosAnio } from "@/lib/wrapPercentile";
 import { jsonConEtag } from "@/lib/etag";
 import { errorMovil } from "@/lib/mensajesApi";
@@ -30,11 +30,14 @@ export async function GET(req: Request) {
 
   const { games } = await getLibrary(profile);
 
-  const [resumen, juegosEsteAnio, rachasUsuario, percentil] = await Promise.all([
+  // Todo del año en curso: es el Wrap del año (21 oct 2026; antes la racha,
+  // los días con trofeo y el mejor mes eran los de siempre).
+  const [resumen, juegosEsteAnio, rachasUsuario, percentil, mejorMes] = await Promise.all([
     resumenHistorico(userId),
     juegosDelAnio(userId),
-    games.length > 0 ? rachas(userId) : Promise.resolve({ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }),
+    games.length > 0 ? rachasDelAnio(userId) : Promise.resolve({ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }),
     games.length > 0 ? percentilTrofeosAnio(userId) : Promise.resolve(null),
+    mejorMesDelAnio(userId),
   ]);
 
   const topGenre = generoTop(games);
@@ -54,7 +57,7 @@ export async function GET(req: Request) {
           earnedTrophies: topGame.game.earnedTotal,
         }
       : null,
-    mejorMes: resumen.mejorMes,
+    mejorMes,
     rachas: rachasUsuario,
     percentil,
   }, userId);
