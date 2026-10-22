@@ -146,6 +146,18 @@ export async function canReadAchievements(xuid: string): Promise<boolean> {
   return Array.isArray(data?.content?.titles);
 }
 
+/**
+ * Como `canReadAchievements`, pero `null` cuando OpenXBL no ha contestado
+ * (red, límite de peticiones, caída): para lib/cuentaIlegible.ts. Antes
+ * esos fallos contaban como "perfil privado" y llegaba el aviso de Xbox
+ * cada pocas horas con el perfil en público (22 oct 2026).
+ */
+export async function lecturaLogros(xuid: string): Promise<boolean | null> {
+  const data = await get<{ content?: { titles?: unknown[] } }>(`/achievements/player/${xuid}`);
+  if (data === null) return null;
+  return Array.isArray(data.content?.titles);
+}
+
 /* ------------------------------- Biblioteca ------------------------------- */
 
 interface TitleEntry {

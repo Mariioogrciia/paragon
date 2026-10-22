@@ -101,6 +101,27 @@ export async function resolveOwnProfile(auth: AuthorizationPayload): Promise<Res
  * PlayStation. Con cualquier otra, `getUserTitles` falla. Merece la pena
  * comprobarlo al vincular y no al pintar la biblioteca, para poder explicarlo.
  */
+/**
+ * Como `canReadTrophies`, pero `null` si el fallo es nuestro (sin NPSSO
+ * válido, Sony sin responder): para lib/cuentaIlegible.ts.
+ */
+export async function lecturaTrofeos(accountId: string): Promise<boolean | null> {
+  let auth: Awaited<ReturnType<typeof getAuthorization>>;
+  try {
+    auth = await getAuthorization();
+  } catch {
+    return null;
+  }
+  try {
+    await getUserTitles(auth, accountId, { limit: 1 });
+    return true;
+  } catch (error) {
+    // Sony contestando con un error para ESA cuenta (perfil privado) es un
+    // "no"; un fallo de red no dice nada de la cuenta.
+    return error instanceof TypeError ? null : false;
+  }
+}
+
 export async function canReadTrophies(accountId: string): Promise<boolean> {
   try {
     const auth = await getAuthorization();

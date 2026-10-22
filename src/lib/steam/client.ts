@@ -168,6 +168,19 @@ export async function canReadLibrary(steamId: string): Promise<boolean> {
   return typeof owned?.response?.game_count === "number";
 }
 
+/**
+ * Como `canReadLibrary`, pero `null` cuando Steam no ha contestado (red,
+ * 429, 5xx): para lib/cuentaIlegible.ts, que no debe confundir un fallo
+ * pasajero con una biblioteca en privado.
+ */
+export async function lecturaBiblioteca(steamId: string): Promise<boolean | null> {
+  const owned = await get<{ response?: { game_count?: number } }>(
+    `${API}/IPlayerService/GetOwnedGames/v1/?key=${apiKey()}&steamid=${steamId}&include_played_free_games=1&skip_unvetted_apps=false`,
+  );
+  if (owned === null) return null;
+  return typeof owned.response?.game_count === "number";
+}
+
 /* ------------------------------- Biblioteca ------------------------------- */
 
 interface OwnedGame {

@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### «No podemos leer tu cuenta de Xbox» cada 3 horas con el perfil en público (22 oct)
+
+- OpenXBL falla a ratos (límite de peticiones, caídas) y `canReadAchievements` daba `false` también en esos fallos: cada sincronización fallida contaba como "perfil privado" y avisaba, y la siguiente buena borraba el aviso, así que volvía a llegar. Lo mismo podía pasar con Steam y PSN.
+- `lib/cuentaIlegible.ts` usa ahora `lecturaLogros` / `lecturaBiblioteca` / `lecturaTrofeos`, que devuelven `null` si la plataforma no contesta (no cuenta). Además, la primera vez solo apunta la sospecha y avisa si sigue igual en una sincronización al menos 6 h después, y no repite el aviso de una plataforma en 7 días aunque se arregle entre medias. Test reescrito con una base simulada en memoria (`tests/cuentaIlegible.test.ts`), y el `ON CONFLICT … RETURNING` probado contra Postgres.
+
 ### Privacidad: Epic Games y «Iniciar sesión con Steam» (22 oct)
 
 - La política de privacidad no mencionaba a Epic, y Epic la revisa con la marca. Dos puntos nuevos en «Con quién se comparten» (`s4liEpic`, `s4liSteam`, seis idiomas): qué entrega Epic Account Services (id de cuenta y nombre visible), que los logros de Epic llegan por la extensión, y que el login de Steam solo confirma el SteamID.
