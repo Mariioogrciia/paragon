@@ -6,6 +6,10 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Privacidad: Epic Games y «Iniciar sesión con Steam» (22 oct)
+
+- La política de privacidad no mencionaba a Epic, y Epic la revisa con la marca. Dos puntos nuevos en «Con quién se comparten» (`s4liEpic`, `s4liSteam`, seis idiomas): qué entrega Epic Account Services (id de cuenta y nombre visible), que los logros de Epic llegan por la extensión, y que el login de Steam solo confirma el SteamID.
+
 ### Epic: «El cliente no reconoce la URL de redireccionamiento» (22 oct)
 
 - Con la vuelta por platinos-nine, Epic contesta `client_redirect_domain_mismatch`: con la marca aprobada solo admite URL de redirección del dominio verificado (paragontrophies.com). El proveedor `epic` deja de usar el proxy por defecto y Epic vuelve directamente a `https://www.paragontrophies.com/api/auth/callback/epic`, que hay que añadir en el portal de Epic. `AUTH_EPIC_REDIRECT_PROXY_URL` sigue sirviendo para volver a usar un proxy.

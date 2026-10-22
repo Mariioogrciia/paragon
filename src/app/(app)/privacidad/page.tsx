@@ -92,6 +92,8 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s4li1", richTags)}</li>
           <li>{t.rich("s4li2", richTags)}</li>
           <li>{t.rich("s4li3", richTags)}</li>
+          <li>{t.rich("s4liEpic", richTags)}</li>
+          <li>{t.rich("s4liSteam", richTags)}</li>
           <li>{t.rich("s4li4", richTags)}</li>
           <li>{t.rich("s4li5", richTags)}</li>
           {anunciosActivos() && <li>{t.rich("s4liAnuncios", richTags)}</li>}
