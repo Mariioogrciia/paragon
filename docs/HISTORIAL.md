@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Limpieza del repositorio (22 oct)
+
+- Fuera lo que ya no usaba nada: el proyecto Capacitor de `ios/` con `capacitor-www/`, `resources/` y el workflow `build-ios.yml` (fase 5 del plan nativo: la app es `kmp/`); los borradores de `scratch/`; la configuración de herramientas `.impeccable/`, `.agents/` y `Paragon/.obsidian`; 31 scripts de migración de una sola vez ya aplicados y sin ninguna referencia (siguen en el historial de git); y `DiscoverCard`, `SectionTabs` y `lib/google/client.ts`, sin ningún import (comprobado con knip).
+- Los documentos pasan a `docs/` (`HISTORIAL`, `DESIGN`, `PRODUCT`, `CONTEXTO`, `HALLAZGOS`, `ROADMAP`, `PLAN-NATIVA`); en la raíz quedan `README.md`, `HANDOFF.md` y las instrucciones para agentes.
+
 ### Próximos lanzamientos: los más esperados de verdad (22 oct)
 
 - God of War Laufey (16 feb 2027) no salía: se ordenaba solo por `hypes` de IGDB, que se acumulan desde el anuncio, y los anunciados hace años copaban los 8 huecos. `upcomingGames` (`lib/igdb/client.ts`) ordena ahora por «Want to Play» de IGDB (`popularity_primitives`, tipo 2, los 1000 más apuntados) entre los que tienen fecha futura, y rellena con el orden por `hypes` (también de respaldo si esa consulta falla). Vale para Inicio, Noticias y las páginas de plataforma de Descubrir. Test de la mezcla en `tests/masEsperados.test.ts`. No se pudo probar contra IGDB desde aquí (sin acceso a la red): mirar la fila tras el despliegue.

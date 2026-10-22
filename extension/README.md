@@ -1,7 +1,7 @@
 # Paragon — extensión de sincronización de PSN y Epic
 
 Resuelve el bloqueo de "solo entran amigos de la cuenta maestra" (ver
-`ROADMAP.md` §0 y `HALLAZGOS.md` §1) sin pedirle a nadie que copie su NPSSO
+`docs/ROADMAP.md` §0 y `docs/HALLAZGOS.md` §1) sin pedirle a nadie que copie su NPSSO
 a mano ni que Paragon lo guarde: la extensión lee la sesión de PSN que el
 propio navegador ya tiene abierta (la misma que usarías para copiar el
 NPSSO manualmente) y se lo manda a Paragon **una vez por sincronización**.

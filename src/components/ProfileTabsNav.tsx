@@ -9,8 +9,8 @@ import { useTranslations } from "next-intl";
  * Pestañas del perfil, pero como ENLACES a rutas de verdad, no como
  * secciones ocultas con `hidden`.
  *
- * Antes esto lo hacía `SectionTabs` (que sigue existiendo y sigue valiendo
- * para el panel): renderizaba las tres pestañas enteras en el servidor y
+ * Antes esto lo hacía `SectionTabs` (borrado el 22 oct 2026, ya sin uso):
+ * renderizaba las tres pestañas enteras en el servidor y
  * solo escondía las que no tocaban. El problema medido: la pestaña
  * "Biblioteca" le pasa los juegos ENTEROS a `LibraryGrid`, que es un
  * componente de cliente — con 291 juegos, el perfil mandaba **1.030 KB** en

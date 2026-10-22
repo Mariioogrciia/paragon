@@ -41,7 +41,7 @@ const ALTO_PANEL = 320;
  * EL selector de Paragon (5 oct 2026): antes convivían `Dropdown`,
  * `CustomSelect` (casi iguales, cada uno con su radio y sus colores) y siete
  * `<select>` nativos que cada sistema pintaba a su manera. Ahora todos los
- * desplegables de la web son este, con el aspecto de DESIGN.md: el botón como
+ * desplegables de la web son este, con el aspecto de docs/DESIGN.md: el botón como
  * un campo (fondo `background`, borde de 1px, 8px de radio) y el panel como
  * los menús de la cabecera (`surface`, 12px).
  *

@@ -4,7 +4,7 @@ Estado del proyecto para retomarlo sin releer nada más. Última
 actualización: **21 de octubre de 2026**.
 
 Lo de cada día (qué se hizo, por qué y con qué commits) está en
-[`HISTORIAL.md`](HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
+[`docs/HISTORIAL.md`](docs/HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
 antes del 23 sept, en [`docs/historial/`](docs/historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
@@ -53,7 +53,7 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
   no de `next/link`). Antes cada `<Link>` visible renderizaba el layout raíz
   en el servidor por culpa de `app/loading.tsx`.
 - **Portada, fichas de juego y perfiles, sin sesión, salen ya hechos de la
-  CDN** (`app/(publico)` + `src/proxy.ts`; detalle en HISTORIAL.md). Reglas:
+  CDN** (`app/(publico)` + `src/proxy.ts`; detalle en docs/HISTORIAL.md). Reglas:
   nada dentro de `app/(publico)` ni de `components/paginas/*` con
   `conSesion={false}` puede leer cookies, cabeceras ni la sesión (o vuelve a
   renderizarse en cada visita); una página pública nueva que se quiera
@@ -132,7 +132,7 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
 5. En unos días, Vercel → Firewall → Bot Management: ver qué apunta Bot
    Protection en Log antes de decidir nada.
 
-**Lo último** (20-21 oct; detalle en HISTORIAL.md):
+**Lo último** (20-21 oct; detalle en docs/HISTORIAL.md):
 - **Italiano y portugués** en web y apps (21 oct). Test de paridad
   `tests/mensajesIdiomas.test.ts`: cada idioma con las mismas claves y
   argumentos ICU que el español. Al añadir un texto nuevo hay que ponerlo en
@@ -172,7 +172,7 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    perdibles, sesiones), resumen semanal en push, varias cuentas de Steam
    para todos, `pt-BR` si llegan brasileños.
 
-**Antes** (16-19 oct; detalle en HISTORIAL.md, del más nuevo al más viejo):
+**Antes** (16-19 oct; detalle en docs/HISTORIAL.md, del más nuevo al más viejo):
 - **Anuncios preparados y apagados** (19 oct, `lib/publicidad.ts`): AdSense
   con el mensaje de consentimiento certificado de Google, `/ads.txt`,
   huecos en Descubrir y en la ficha de juego, y textos de privacidad y
@@ -221,7 +221,7 @@ Antes (15 oct): varias cuentas de Steam en el mismo perfil (de momento solo
 el desarrollador), avisos que abren su pantalla, límites en la API móvil,
 lint a cero y las pantallas v2.
 
-**Anuncios: el código está listo y apagado** (19 oct; detalle en HISTORIAL.md).
+**Anuncios: el código está listo y apagado** (19 oct; detalle en docs/HISTORIAL.md).
 Mientras no exista `NEXT_PUBLIC_ADSENSE_CLIENT` no se carga nada de Google,
 `/ads.txt` da 404 y todo sigue como antes. Para encenderlos, en este orden:
 1. **Dominio propio**: ya está (`www.paragontrophies.com`, 21 oct).
@@ -368,7 +368,7 @@ mano. Antes de una sesión larga, `git pull` primero.
 | Horas de PSN: nunca colapsar por nombre sin más | El endpoint de horas jugadas da una fila POR VERSIÓN REALMENTE JUGADA (PS4 y PS5 de un mismo juego son dos filas con horas propias, no la misma cifra repetida — ver la trampa de más abajo). `repartirHoras()` en `psn/client.ts` decide si sumar (una sola ficha de trofeos para el nombre) o repartir por dispositivo (varias fichas). Para "tu juego más jugado" A TRAVÉS de plataformas distintas (Steam + PSN del mismo título), es `gruposPorTitulo()` en `lib/stats.ts` quien suma. |
 | Tablas nuevas: SQL explícito, no `db:push` | Todas las tablas de esta sesión (`game_difficulty_vote`, `game_guide`, `game_guide_reply`) se crearon con scripts `CREATE TABLE IF NOT EXISTS` en `scripts/`, mismo motivo que `notification`: `db:push` compara el esquema entero y es más arriesgado sobre producción. |
 | El hover global va por CSS sin `@layer`, no por componente | `globals.css`: reglas con `[class*="rounded"]`/`[class*="cursor-pointer"]` sobre `button`/`a`. Al no estar en ningún `@layer`, le gana a las utilidades de Tailwind (que sí van en `@layer utilities`) pase lo que pase con la especificidad — así un botón nuevo sale con hover sin que nadie tenga que acordarse de ponérselo. |
-| `overflow-hidden` recorta el propio `filter` del elemento que lo lleva | El resplandor de hover es `filter: drop-shadow`. Si el mismo elemento tiene `overflow-hidden` (para recortar una carátula a sus esquinas redondeadas), se recorta a sí mismo el resplandor. El recorte va siempre en un hijo interior, nunca en el elemento que declara el hover — ver `GameCard.tsx`/`DiscoverCard.tsx`. |
+| `overflow-hidden` recorta el propio `filter` del elemento que lo lleva | El resplandor de hover es `filter: drop-shadow`. Si el mismo elemento tiene `overflow-hidden` (para recortar una carátula a sus esquinas redondeadas), se recorta a sí mismo el resplandor. El recorte va siempre en un hijo interior, nunca en el elemento que declara el hover — ver `GameCard.tsx`. |
 | "Estilo" es un eje aparte de "modo" y "acento" | El modo (claro/oscuro/OLED/contraste) cambia colores base; el acento, el color de marca; el estilo (`lib/apariencia.ts`) cambia la FORMA de toda la página — radio, sombra, tipografía, fondo. Los tres son independientes: se puede querer OLED + acento verde + estilo Vidrio. |
 | Horas por juego: unificadas en el perfil, separadas por plataforma | En Estadísticas del perfil (`horasPorJuego`, `lib/profileStats.ts`) el mismo juego en dos plataformas suma sus horas en una fila — es "cuánto le he echado en total". En `/descubrir/[plataforma]` (`mostPlayedOnPlatform`, `lib/platformHub.ts`) se filtra `games.platform` ANTES de agrupar, así que cada plataforma solo cuenta sus propias horas. Las dos reglas son a propósito y no hay que igualarlas. |
 | `avatarPersonalizado` decide si la foto subida a mano gana a PSN | `users.image` guarda a la vez la imagen de login (Google/Discord) y la subida a mano desde /ajustes — sin ese booleano no hay forma de distinguirlas. Solo `/api/upload` (subida real de avatar) lo pone a `true`. Cualquier sitio nuevo que resuelva un avatar tiene que pasar por `resolveAvatarUrl`/`avatarUrlSql`, nunca leer `users.image` a pelo. |
@@ -436,7 +436,7 @@ y en medio falta una línea que nadie ve porque **no da error**.
   esto" pensado para móvil necesita la Web Share API (`navigator.share`
   con `files`), no un enlace con `download`.
 - **`{ ...g, genres: [] }` no rellena un campo con nombre distinto.** Los
-  objetos de IGDB usan `coverUrl`; las tarjetas (`PosterCard`, `DiscoverCard`)
+  objetos de IGDB usan `coverUrl`; las tarjetas (`PosterCard`)
   leen `iconUrl`. Hacer spread directo del objeto de IGDB dentro de `game={...}`
   compila perfecto (ningún campo es obligatorio) y no carga ninguna
   carátula, en silencio — pasó en "Juegos similares". Cuando se pase un

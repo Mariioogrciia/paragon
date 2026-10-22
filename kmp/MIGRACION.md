@@ -21,7 +21,7 @@ Apple **gratuita** por ahora (Sideloadly, 7 días, sin push).
    ruleta (CoreMotion en iOS), vibraciones, compartir. Solo Android: FCM,
    widget Glance, WorkManager, iconos alternativos. Solo iOS: Siri/Atajos,
    Core Haptics (y, con cuenta de pago, Dynamic Island y widgets).
-5. **Fase 5 — retirar** `android/` y el proyecto Capacitor de `ios/`.
+5. **Fase 5 — retirar** `android/` y el proyecto Capacitor de `ios/` (hecho: `android/` antes y `ios/` el 22 oct 2026).
 
 ## Versiones
 
@@ -85,4 +85,4 @@ KSP 2.3.12 · Room 2.8.5 · Ktor 3.6.0 · Coil 3.6.3 · navigation-compose
 - [ ] Fase 4 — plataforma: iOS arranca `AppRoot` (MainViewController en
   iosMain/com/paragon/app), login por Safari + `paragon://auth`
   (onOpenURL). Falta probar en el iPhone; push en iOS necesita cuenta de pago.
-- [ ] Fase 5 — retirar lo viejo
+- [x] Fase 5 — retirar lo viejo

@@ -130,9 +130,9 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
               // Sin el scope de Google Play Games: es "sensible" para Google
               // (obliga a verificación y a listar cada tester a mano en modo
               // Prueba, que es el "Acceso bloqueado" que se ve al entrar).
-              // Y de nada sirve: lib/google/client.ts explica por qué esa
-              // API nunca puede dar la biblioteca completa de un jugador,
-              // solo logros del juego atado a este Client ID. openid/email/
+              // Y de nada sirve: esa API nunca puede dar la biblioteca
+              // completa de un jugador, solo logros del juego atado a este
+              // Client ID. openid/email/
               // profile son scopes normales — no piden verificación.
               params: {
                 scope: "openid email profile",
