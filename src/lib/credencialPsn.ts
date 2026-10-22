@@ -1,6 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { notificationLog } from "@/db/schema";
 import { avisarUsuario } from "@/lib/avisos";
@@ -20,10 +20,15 @@ import { getAuthorization, isPsnConfigured, npssoDelEntorno, olvidarTokenPsn, Ps
  * - `psn-npsso-visto` / huella: cuándo funcionó por primera vez este NPSSO
  *   (la huella es un hash corto: el NPSSO nunca se guarda en la base).
  * - `psn-npsso` / clave del aviso: los avisos ya mandados, para no repetirlos.
+ * - `psn-npsso-ultimo` / `ok:<huella>` y `fallo:<huella>` (22 oct 2026): la
+ *   hora del último acierto y del último rechazo. Admin enseña "caducado"
+ *   solo si lo último fue un rechazo: antes bastaba UN fallo en el día para
+ *   dejarlo en rojo hasta medianoche, aunque luego funcionase.
  */
 
 const TIPO_VISTO = "psn-npsso-visto";
 const TIPO_AVISO = "psn-npsso";
+const TIPO_ULTIMO = "psn-npsso-ultimo";
 const RUTA_ADMIN = "/admin?tab=system";
 
 function huellaNpsso(): string | null {
@@ -36,6 +41,27 @@ async function vistoDesde(userId: string, huella: string): Promise<Date | null> 
     .select({ enviadoAt: notificationLog.enviadoAt })
     .from(notificationLog)
     .where(and(eq(notificationLog.userId, userId), eq(notificationLog.tipo, TIPO_VISTO), eq(notificationLog.clave, huella)))
+    .limit(1);
+  return fila?.enviadoAt ?? null;
+}
+
+/** Apunta la hora del último acierto o rechazo de este NPSSO. Nunca lanza. */
+async function apuntarUltimo(userId: string, huella: string, resultado: "ok" | "fallo"): Promise<void> {
+  await db
+    .insert(notificationLog)
+    .values({ userId, tipo: TIPO_ULTIMO, clave: `${resultado}:${huella}` })
+    .onConflictDoUpdate({
+      target: [notificationLog.userId, notificationLog.tipo, notificationLog.clave],
+      set: { enviadoAt: sql`now()` },
+    })
+    .catch((error) => console.error("[credencialPsn] apuntar", error));
+}
+
+async function ultimo(userId: string, huella: string, resultado: "ok" | "fallo"): Promise<Date | null> {
+  const [fila] = await db
+    .select({ enviadoAt: notificationLog.enviadoAt })
+    .from(notificationLog)
+    .where(and(eq(notificationLog.userId, userId), eq(notificationLog.tipo, TIPO_ULTIMO), eq(notificationLog.clave, `${resultado}:${huella}`)))
     .limit(1);
   return fila?.enviadoAt ?? null;
 }
@@ -78,6 +104,8 @@ export async function revisarCredencialPsn(ahora = new Date()): Promise<AvisoNps
     }
   }
 
+  if (configurado && huella) await apuntarUltimo(desarrollador, huella, falla ? "fallo" : "ok");
+
   let desde: Date | null = null;
   if (configurado && !falla && huella) {
     await db.insert(notificationLog).values({ userId: desarrollador, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
@@ -107,18 +135,9 @@ export type EstadoCredencialPsn =
 export async function estadoCredencialPsn(userId: string, ahora = new Date()): Promise<EstadoCredencialPsn> {
   const huella = huellaNpsso();
   if (!isPsnConfigured() || !huella) return { estado: "falta" };
-  const [fallo] = await db
-    .select({ clave: notificationLog.clave })
-    .from(notificationLog)
-    .where(
-      and(
-        eq(notificationLog.userId, userId),
-        eq(notificationLog.tipo, TIPO_AVISO),
-        eq(notificationLog.clave, `caducado-${huella}-${ahora.toISOString().slice(0, 10)}`),
-      ),
-    )
-    .limit(1);
-  if (fallo) return { estado: "caducado" };
+  const [ultimoOk, ultimoFallo] = await Promise.all([ultimo(userId, huella, "ok"), ultimo(userId, huella, "fallo")]);
+  // Caducado solo si lo último que se sabe de este NPSSO es un rechazo.
+  if (ultimoFallo && (!ultimoOk || ultimoFallo > ultimoOk)) return { estado: "caducado" };
   const desde = await vistoDesde(userId, huella);
   return { estado: "ok", desde, diasRestantes: desde ? diasRestantesNpsso(desde, ahora) : null };
 }
@@ -134,11 +153,15 @@ export async function comprobarCredencialPsnAhora(userId: string): Promise<"ok" 
   try {
     await getAuthorization();
   } catch (error) {
-    return error instanceof PsnAuthError ? "caducado" : "sin-respuesta";
+    if (!(error instanceof PsnAuthError)) return "sin-respuesta";
+    const huella = huellaNpsso();
+    if (huella) await apuntarUltimo(userId, huella, "fallo");
+    return "caducado";
   }
   const huella = huellaNpsso();
   if (huella) {
     await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
+    await apuntarUltimo(userId, huella, "ok");
   }
   return "ok";
 }

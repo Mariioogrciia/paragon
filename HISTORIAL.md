@@ -6,6 +6,12 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### "NPSSO caducado" con uno recién puesto (22 oct)
+
+- Admin → Sistema decía "NPSSO caducado" con un NPSSO renovado el día antes. Dos fallos:
+  - `exchangeNpssoForCode` de psn-api da el mismo error tanto si Sony rechaza el NPSSO como si responde mal por otra cosa (403/429 de su antibots, 5xx, red), y todo se apuntaba como "caducado". Ahora `codigoDesdeNpsso` (`lib/psn/auth.ts`) hace la petición y separa: redirige sin código → caducado (`PsnAuthError`); cualquier otra respuesta → "PSN no responde". Con test (`tests/codigoNpsso.test.ts`).
+  - Bastaba UN fallo en el día para dejarlo en rojo hasta medianoche, aunque "Comprobar ahora" o el cron funcionasen después. Ahora se guarda la hora del último acierto y del último rechazo (`psn-npsso-ultimo` en `notification_log`) y sale "caducado" solo si lo último fue un rechazo.
+
 ### Admin colgado (504): el ALTER TABLE de cada arranque bloqueaba las tablas (22 oct)
 
 - Síntoma: Admin tardaba muchísimo o daba `504 FUNCTION_INVOCATION_TIMEOUT`.

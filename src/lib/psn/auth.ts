@@ -1,9 +1,4 @@
-import {
-  exchangeCodeForAccessToken,
-  exchangeNpssoForCode,
-  exchangeRefreshTokenForAuthTokens,
-  type AuthorizationPayload,
-} from "psn-api";
+import { exchangeCodeForAccessToken, exchangeRefreshTokenForAuthTokens, type AuthorizationPayload } from "psn-api";
 
 /**
  * Autenticación contra PSN, con la credencial del servidor.
@@ -67,6 +62,38 @@ export function npssoDelEntorno(valor = process.env.PSN_NPSSO): string | null {
   return limpio || null;
 }
 
+/**
+ * NPSSO → código de acceso (22 oct 2026). Lo hacía `exchangeNpssoForCode` de
+ * psn-api, que da el MISMO error ("¿es válido tu NPSSO?") tanto si Sony
+ * rechaza el NPSSO como si no contesta bien por otra cosa (un 403 o 429 de su
+ * antibots, un 5xx, la red). Así, un tropiezo puntual se apuntaba como "NPSSO
+ * caducado" con uno recién puesto. Aquí se separan:
+ * - Sony redirige con `?code=`: bien.
+ * - Redirige SIN código (le falta la sesión: NPSSO inválido): `PsnAuthError`.
+ * - Cualquier otra respuesta o fallo de red: error normal, "PSN no responde".
+ * Misma petición que psn-api (cliente de la app de PlayStation).
+ */
+export async function codigoDesdeNpsso(npsso: string): Promise<string> {
+  const parametros = new URLSearchParams({
+    access_type: "offline",
+    client_id: "09515159-7237-4370-9b40-3806e67c0891",
+    redirect_uri: "com.scee.psxandroid.scecompcall://redirect",
+    response_type: "code",
+    scope: "psn:mobile.v2.core psn:clientapp",
+  });
+  const respuesta = await fetch(`https://ca.account.sony.com/api/authz/v3/oauth/authorize?${parametros}`, {
+    headers: { Cookie: `npsso=${npsso}` },
+    redirect: "manual",
+  });
+  const destino = respuesta.headers.get("location") ?? "";
+  const codigo = destino.includes("?code=") ? new URLSearchParams(destino.split("?")[1]).get("code") : null;
+  if (codigo) return codigo;
+  if (respuesta.status >= 300 && respuesta.status < 400) {
+    throw new PsnAuthError("PSN no aceptó el token NPSSO: ha caducado o se cerró esa sesión. Vuelve a copiarlo con la sesión de PlayStation abierta.");
+  }
+  throw new Error(`PSN no respondió como se esperaba al pedir el acceso (HTTP ${respuesta.status}).`);
+}
+
 export function isPsnConfigured(): boolean {
   return npssoDelEntorno() !== null;
 }
@@ -77,14 +104,8 @@ export function olvidarTokenPsn(): void {
 }
 
 async function authenticateWithNpsso(npsso: string): Promise<CachedAuth> {
-  let code: string;
-  try {
-    code = await exchangeNpssoForCode(npsso);
-  } catch {
-    throw new PsnAuthError(
-      "PSN no aceptó el token NPSSO. Lo más habitual es que haya caducado: vuelve a copiarlo con la sesión de PlayStation abierta.",
-    );
-  }
+  // `PsnAuthError` solo si Sony rechaza el NPSSO de verdad (ver codigoDesdeNpsso).
+  const code = await codigoDesdeNpsso(npsso);
 
   const tokens = await exchangeCodeForAccessToken(code);
 
@@ -106,8 +127,9 @@ async function authenticateWithNpsso(npsso: string): Promise<CachedAuth> {
 export async function authenticateWithNpssoEphemeral(npsso: string): Promise<AuthorizationPayload> {
   let code: string;
   try {
-    code = await exchangeNpssoForCode(npsso);
-  } catch {
+    code = await codigoDesdeNpsso(npsso);
+  } catch (error) {
+    if (!(error instanceof PsnAuthError)) throw error;
     throw new PsnAuthError(
       "PSN no ha aceptado la sesión — vuelve a intentarlo con playstation.com abierto y con la sesión iniciada.",
     );
