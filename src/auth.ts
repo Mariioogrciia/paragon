@@ -84,7 +84,7 @@ async function vincularLoginASesionActiva(account: Account) {
 async function verificarEpic(account: Account, nombre: string | null) {
   const userId = (await auth())?.user?.id;
   if (!userId) return "/entrar?epic=sin-sesion";
-  const { guardarEpicVerificada } = await import("@/lib/epic/verificacion");
+  const { guardarEpicVerificada } = await import("@/lib/verificacion");
   const resultado = await guardarEpicVerificada(userId, account.providerAccountId, nombre ?? "Epic Games");
   return `/ajustes/plataformas?epic=${resultado}`;
 }
@@ -148,7 +148,7 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
     // Epic Games (vuelve el 21 oct 2026, ahora por Epic Account Services,
     // la vía oficial): SOLO para vincular y verificar la cuenta de Epic con
     // la sesión de Paragon ya abierta, nunca para entrar (ver el callback
-    // `signIn` y lib/epic/verificacion.ts). OAuth a mano en vez de OIDC:
+    // `signIn` y lib/verificacion.ts). OAuth a mano en vez de OIDC:
     // basta con `basic_profile`, y el id de cuenta llega en la respuesta del
     // token (`account_id`); el nombre se pide a la API de cuentas de Epic.
     ...(process.env.AUTH_EPIC_ID

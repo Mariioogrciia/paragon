@@ -171,6 +171,14 @@
       "ok": "Epic-Konto verknüpft und bestätigt.",
       "deOtro": "Dieses Epic-Konto ist bereits mit einem anderen Paragon-Nutzer verknüpft.",
       "error": "Das Epic-Konto konnte nicht bestätigt werden. Versuch es gleich noch einmal."
+    },
+    "steamOficial": {
+      "boton": "Mit Steam verifizieren",
+      "ayuda": "Melde dich bei Steam an (auf der offiziellen Website), und dieses Konto wird verknüpft und verifiziert: Steam bestätigt, dass es dir gehört. Paragon sieht dein Passwort nie.",
+      "yaVerificada": "Mit Steam verifiziertes Konto.",
+      "ok": "Steam-Konto verknüpft und verifiziert.",
+      "deOtro": "Dieses Steam-Konto ist bereits mit einem anderen Paragon-Nutzer verknüpft.",
+      "error": "Das Steam-Konto konnte nicht verifiziert werden. Versuche es gleich noch einmal."
     }
   },
   "ajustesSeguridad": {

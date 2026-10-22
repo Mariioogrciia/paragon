@@ -171,6 +171,14 @@
       "ok": "Cuenta de Epic vinculada y verificada.",
       "deOtro": "Esa cuenta de Epic ya está vinculada a otro usuario de Paragon.",
       "error": "No se ha podido verificar la cuenta de Epic. Inténtalo otra vez en un momento."
+    },
+    "steamOficial": {
+      "boton": "Verificar con Steam",
+      "ayuda": "Inicia sesión en Steam (en su web oficial) y esa cuenta quedará vinculada y verificada: Steam confirma que es tuya. Paragon no ve tu contraseña.",
+      "yaVerificada": "Cuenta verificada con Steam.",
+      "ok": "Cuenta de Steam vinculada y verificada.",
+      "deOtro": "Esa cuenta de Steam ya está vinculada a otro usuario de Paragon.",
+      "error": "No se ha podido verificar la cuenta de Steam. Inténtalo otra vez en un momento."
     }
   },
   "ajustesSeguridad": {

@@ -171,6 +171,14 @@
       "ok": "Compte Epic lié et vérifié.",
       "deOtro": "Ce compte Epic est déjà lié à un autre utilisateur de Paragon.",
       "error": "Impossible de vérifier le compte Epic. Réessaie dans un instant."
+    },
+    "steamOficial": {
+      "boton": "Vérifier avec Steam",
+      "ayuda": "Connecte-toi à Steam (sur son site officiel) et ce compte sera lié et vérifié : Steam confirme qu'il est à toi. Paragon ne voit jamais ton mot de passe.",
+      "yaVerificada": "Compte vérifié avec Steam.",
+      "ok": "Compte Steam lié et vérifié.",
+      "deOtro": "Ce compte Steam est déjà lié à un autre utilisateur de Paragon.",
+      "error": "Impossible de vérifier le compte Steam. Réessaie dans un instant."
     }
   },
   "ajustesSeguridad": {

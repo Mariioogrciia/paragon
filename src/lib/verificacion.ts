@@ -6,20 +6,19 @@ import { esViolacionDe } from "@/lib/profiles";
 import { prepararTablas } from "@/lib/esquema";
 
 /**
- * Cuentas de Epic verificadas con el login oficial de Epic (Epic Account
- * Services, 21 oct 2026). Hasta ahora, vincular Epic era pegar un enlace o
- * un ID: cualquiera podía decir "esta cuenta es mía". Con el login de Epic
- * es Epic quien dice qué cuenta es la tuya, así que se puede marcar como
- * verificada.
+ * Cuentas verificadas por la propia plataforma: Epic con su login oficial
+ * (Epic Account Services, 21 oct 2026) y Steam con "Iniciar sesión con
+ * Steam" (OpenID, 22 oct 2026, ver lib/steam/openid.ts). Vincular pegando un
+ * enlace o un ID deja a cualquiera decir "esta cuenta es mía"; con el login de
+ * la plataforma es ella quien dice qué cuenta es tuya.
  *
- * El login de Epic NO sirve para entrar a Paragon (no da correo, y no
- * queremos una tercera forma de crear cuentas): solo vincula, con la
- * sesión de Paragon ya abierta. Ver el callback `signIn` de src/auth.ts.
+ * Esos logins NO sirven para entrar a Paragon: solo vinculan y verifican,
+ * con la sesión de Paragon ya abierta.
  *
  * Una fila por usuario y plataforma con el id de cuenta que se verificó: la
- * cuenta vinculada cuenta como verificada solo si sigue siendo ESA (si
- * luego se cambia a otra pegando un enlace, deja de estarlo sola). Tabla
- * creada la primera vez, como ajuste_sistema.
+ * cuenta vinculada cuenta como verificada solo si sigue siendo ESA (si luego
+ * se cambia a otra pegando un enlace, deja de estarlo sola). Tabla creada la
+ * primera vez (lib/esquema.ts).
  */
 
 let tablaLista: Promise<boolean> | null = null;
@@ -76,26 +75,31 @@ export async function guardarEpicVerificada(userId: string, accountId: string, n
     return "error";
   }
 
+  return marcarVerificada(userId, "epic", accountId);
+}
+
+/** Apunta que la cuenta `accountId` de `platform` la ha confirmado la propia plataforma. */
+export async function marcarVerificada(userId: string, platform: string, accountId: string): Promise<ResultadoVerificacion> {
   if (!(await asegurarTabla())) return "error";
   await db.execute(sql`
     INSERT INTO "cuenta_verificada" ("userId", "platform", "accountId", "verificadaEl")
-    VALUES (${userId}, 'epic', ${accountId}, now())
+    VALUES (${userId}, ${platform}, ${accountId}, now())
     ON CONFLICT ("userId", "platform") DO UPDATE SET "accountId" = EXCLUDED."accountId", "verificadaEl" = now()
   `);
   return "verificada";
 }
 
-/** Si la cuenta de Epic que tiene vinculada ahora es la que verificó con Epic. */
-export async function epicVerificada(userId: string): Promise<boolean> {
+/** Si la cuenta de `platform` que tiene vinculada ahora es la que verificó la plataforma. */
+export async function cuentaVerificada(userId: string, platform: "epic" | "steam"): Promise<boolean> {
   try {
     if (!(await asegurarTabla())) return false;
     const vinculada = await db.query.platformAccounts.findFirst({
       columns: { accountId: true },
-      where: and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, "epic")),
+      where: and(eq(platformAccounts.userId, userId), eq(platformAccounts.platform, platform)),
     });
     if (!vinculada) return false;
     const filas = await db.execute<{ accountId: string }>(sql`
-      SELECT "accountId" FROM "cuenta_verificada" WHERE "userId" = ${userId} AND "platform" = 'epic'
+      SELECT "accountId" FROM "cuenta_verificada" WHERE "userId" = ${userId} AND "platform" = ${platform}
     `);
     return [...filas][0]?.accountId === vinculada.accountId;
   } catch (error) {
@@ -103,3 +107,5 @@ export async function epicVerificada(userId: string): Promise<boolean> {
     return false;
   }
 }
+
+export const epicVerificada = (userId: string) => cuentaVerificada(userId, "epic");

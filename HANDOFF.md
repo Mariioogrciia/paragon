@@ -73,6 +73,8 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    cambiarla: el login de Epic vuelve por la de platinos-nine (ya registrada)
    y Paragon reenvía a www (proxy de redirección, ver HISTORIAL.md, 22 oct).
    Falta probarlo de verdad: Ajustes → Plataformas → "Verificar con Epic Games".
+0. **Steam**: probar «Verificar con Steam» en Ajustes → Plataformas (no hace
+   falta configurar nada; solo se puede probar con Steam de verdad).
 0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron
    corre cada 3-5 h (GitHub retrasa el suyo) y los avisos llegan tarde. En
    https://cron-job.org (o cualquier servicio de cron por URL):
@@ -135,8 +137,11 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
   (`components/admin/`). Sin cookies ni IP.
 - **Admin → Registro y Sistema** (21 oct): registro de eventos 30 días,
   pausar la sincronización de una plataforma, lanzar el cron, aviso a todos.
+- **Verificar la cuenta de Steam** con «Iniciar sesión con Steam» (OpenID
+  oficial, 22 oct, `lib/steam/openid.ts` y `api/steam/verificar`). No necesita
+  ninguna clave ni registro en Steam. Solo verifica, no sirve para entrar.
 - **Verificar la cuenta de Epic** con el login oficial de Epic (21 oct,
-  `lib/epic/verificacion.ts`). Solo verifica, no sirve para entrar.
+  `lib/verificacion.ts`, compartido con Steam). Solo verifica, no sirve para entrar.
 - **Wrap y Hoja de servicios** rediseñados (21 oct).
 - **Login con Discord arreglado** (21 oct, `lib/authIss.ts`): Discord empezó
   a mandar `iss` y Auth.js lo rechazaba.

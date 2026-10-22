@@ -171,6 +171,14 @@
       "ok": "Account Epic collegato e verificato.",
       "deOtro": "Quell'account Epic è già collegato a un altro utente di Paragon.",
       "error": "Impossibile verificare l'account Epic. Riprova tra un momento."
+    },
+    "steamOficial": {
+      "boton": "Verifica con Steam",
+      "ayuda": "Accedi a Steam (sul suo sito ufficiale) e quell'account verrà collegato e verificato: Steam conferma che è tuo. Paragon non vede mai la tua password.",
+      "yaVerificada": "Account verificato con Steam.",
+      "ok": "Account Steam collegato e verificato.",
+      "deOtro": "Quell'account Steam è già collegato a un altro utente Paragon.",
+      "error": "Impossibile verificare l'account Steam. Riprova tra un momento."
     }
   },
   "ajustesSeguridad": {

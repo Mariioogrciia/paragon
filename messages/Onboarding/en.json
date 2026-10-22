@@ -171,6 +171,14 @@
       "ok": "Epic account linked and verified.",
       "deOtro": "That Epic account is already linked to another Paragon user.",
       "error": "We couldn't verify the Epic account. Try again in a moment."
+    },
+    "steamOficial": {
+      "boton": "Verify with Steam",
+      "ayuda": "Sign in to Steam (on its official site) and that account will be linked and verified: Steam confirms it's yours. Paragon never sees your password.",
+      "yaVerificada": "Account verified with Steam.",
+      "ok": "Steam account linked and verified.",
+      "deOtro": "That Steam account is already linked to another Paragon user.",
+      "error": "Couldn't verify the Steam account. Try again in a moment."
     }
   },
   "ajustesSeguridad": {

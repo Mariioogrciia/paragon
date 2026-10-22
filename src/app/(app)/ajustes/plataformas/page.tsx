@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { BadgeCheck, ShieldQuestion } from "lucide-react";
 import { useLocale } from "next-intl";
 import { auth, signIn } from "@/auth";
-import { epicVerificada } from "@/lib/epic/verificacion";
+import { cuentaVerificada } from "@/lib/verificacion";
 import { quitarSteamExtraAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
 import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
@@ -50,7 +50,7 @@ function PlatformSection({
   account: PlatformAccount | null;
   t: Traductor;
   children: React.ReactNode;
-  /** Cuenta confirmada por la propia plataforma (de momento, solo Epic: lib/epic/verificacion.ts). */
+  /** Cuenta confirmada por la propia plataforma (Epic y Steam: lib/verificacion.ts). */
   verificada?: boolean;
 }) {
   const idioma = useLocale();
@@ -203,10 +203,10 @@ function CuentasSteamExtra({ cuentas, t, idioma }: { cuentas: CuentaSteamExtra[]
   );
 }
 
-export default async function AjustesPlataformasPage({ searchParams }: { searchParams: Promise<{ epic?: string }> }) {
+export default async function AjustesPlataformasPage({ searchParams }: { searchParams: Promise<{ epic?: string; steam?: string }> }) {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
-  const { epic: resultadoEpic } = await searchParams;
+  const { epic: resultadoEpic, steam: resultadoSteam } = await searchParams;
 
   const profile = await getProfileByUserId(session.user.id);
   const psn = accountFor(profile, "psn");
@@ -227,7 +227,10 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
   const tDeclarado = await getTranslations("Shell.Declarado");
   const locale = await getLocale();
   const loginEpic = Boolean(process.env.AUTH_EPIC_ID);
-  const epicConfirmada = loginEpic && epic ? await epicVerificada(session.user.id) : false;
+  const [epicConfirmada, steamConfirmada] = await Promise.all([
+    loginEpic && epic ? cuentaVerificada(session.user.id, "epic") : false,
+    steam ? cuentaVerificada(session.user.id, "steam") : false,
+  ]);
 
   // Epic bloquea las lecturas desde el servidor (antibots): se sincroniza con
   // la extensión del navegador y el progreso es declarado (lib/declarado.ts).
@@ -259,6 +262,34 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
           </button>
           <p className="mt-2 text-xs text-muted">{t("ajustesPlataformas.epicOficial.ayuda")}</p>
         </form>
+      )}
+    </div>
+  );
+
+  // «Iniciar sesión con Steam» oficial (OpenID 2.0, api/steam/verificar):
+  // Steam confirma que la cuenta es tuya. No hace falta ninguna clave, así que
+  // sale siempre. Es un enlace normal: el servidor redirige a Steam.
+  const verificarSteam = (
+    <div className="mb-4 rounded-xl border border-border p-4">
+      {resultadoSteam === "verificada" && <p className="mb-2 text-xs font-semibold text-green-500">✓ {t("ajustesPlataformas.steamOficial.ok")}</p>}
+      {resultadoSteam === "de-otro" && <p className="mb-2 text-xs font-semibold text-red-400">✕ {t("ajustesPlataformas.steamOficial.deOtro")}</p>}
+      {resultadoSteam === "error" && <p className="mb-2 text-xs font-semibold text-red-400">✕ {t("ajustesPlataformas.steamOficial.error")}</p>}
+      {steamConfirmada ? (
+        <p className="flex items-center gap-2 text-[0.8125rem] font-semibold">
+          <BadgeCheck size={16} className="shrink-0 text-[var(--accent-text)]" aria-hidden="true" />
+          {t("ajustesPlataformas.steamOficial.yaVerificada")}
+        </p>
+      ) : (
+        <>
+          <a
+            href="/api/steam/verificar"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1b2838] px-4 py-2 text-[0.8125rem] font-bold text-white transition-colors hover:bg-[#2a475e]"
+          >
+            <SteamLogo className="h-4 w-4" />
+            {t("ajustesPlataformas.steamOficial.boton")}
+          </a>
+          <p className="mt-2 text-xs text-muted">{t("ajustesPlataformas.steamOficial.ayuda")}</p>
+        </>
       )}
     </div>
   );
@@ -301,7 +332,8 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
           <LinkPsnForm current={psn?.username} sinAviso={psn?.isPublic === true} />
         </PlatformSection>
 
-        <PlatformSection platform="steam" account={steam} t={t}>
+        <PlatformSection platform="steam" account={steam} t={t} verificada={steamConfirmada}>
+          {verificarSteam}
           <LinkSteamForm current={steam?.username} sinAviso={steam?.isPublic === true} />
         </PlatformSection>
 

@@ -6,6 +6,13 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Verificar la cuenta de Steam con «Iniciar sesión con Steam» (22 oct)
+
+- Con el dominio propio ya se puede usar el login oficial de Steam (OpenID 2.0, el mismo de las webs de intercambio): en Ajustes → Plataformas, «Verificar con Steam» manda a steamcommunity.com, la persona inicia sesión allí y Steam devuelve su SteamID. Paragon no ve la contraseña ni recibe ningún permiso: solo el SteamID. Steam no usa OAuth, así que va aparte de Auth.js.
+- `lib/steam/openid.ts`: `urlLoginSteam` arma la ida; `steamIdConfirmado` comprueba la vuelta (modo `id_res`, servidor de Steam, que vuelve a NUESTRA dirección exacta y `claimed_id` de 17 cifras igual a `identity`) y además le pregunta a Steam si la firma es suya (`check_authentication` → `is_valid:true`), porque esos parámetros los puede escribir cualquiera. Con test (`tests/steamOpenid.test.ts`).
+- `api/steam/verificar` (ida, pide sesión y deja un nonce en una cookie de 10 min) y `api/steam/verificar/vuelta` (comprueba nonce y firma; si la cuenta de Steam vinculada es otra o no hay ninguna, vincula esa; si ya es de otro usuario → aviso). Marca la cuenta como verificada y sale la insignia «Verificada», como con Epic.
+- `lib/epic/verificacion.ts` pasa a `lib/verificacion.ts` y sirve para las dos (`cuentaVerificada(userId, "epic" | "steam")`). Textos en los seis idiomas.
+
 ### Verificar Epic sin tocar su portal: vuelta por la URL ya registrada (22 oct)
 
 - El portal de Epic tiene como URL de redirección `https://platinos-nine.vercel.app/api/auth/callback/epic` (y la de localhost) y no deja cambiarla. Ahora el proveedor `epic` usa el proxy de redirección de Auth.js (`redirectProxyUrl`, solo en producción; `AUTH_EPIC_REDIRECT_PROXY_URL` lo cambia o, vacía, lo apaga): Paragon manda a Epic esa URL registrada, Epic vuelve a platinos-nine (el mismo despliegue; `/api` no redirige al dominio) y ahí Auth.js descifra el `state` con AUTH_SECRET y reenvía a `www.paragontrophies.com/api/auth/callback/epic`, donde está la sesión y se termina de verificar. Google y Discord no cambian.
