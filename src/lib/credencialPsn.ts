@@ -147,21 +147,31 @@ export async function estadoCredencialPsn(userId: string, ahora = new Date()): P
  * Sony en el momento, sin el token en caché ni esperar al cron. Si va bien,
  * lo apunta como visto (así el estado pasa a verde enseguida).
  */
-export async function comprobarCredencialPsnAhora(userId: string): Promise<"ok" | "falta" | "caducado" | "sin-respuesta"> {
-  if (!isPsnConfigured()) return "falta";
+export type ResultadoComprobacion = {
+  resultado: "ok" | "falta" | "caducado" | "sin-respuesta";
+  /** Para el desarrollador: forma del NPSSO puesto y lo que dijo Sony (nunca el NPSSO). */
+  detalle: string | null;
+};
+
+export async function comprobarCredencialPsnAhora(userId: string): Promise<ResultadoComprobacion> {
+  const npsso = npssoDelEntorno();
+  if (!npsso) return { resultado: "falta", detalle: null };
+  const huella = huellaNpsso();
+  // Uno bueno son 64 letras y números: otra cosa es que se pegó mal.
+  const forma = `NPSSO de ${npsso.length} caracteres${/^[A-Za-z0-9]{64}$/.test(npsso) ? "" : " (uno válido tiene 64 letras y números)"}, huella ${huella}`;
   olvidarTokenPsn();
   try {
     await getAuthorization();
   } catch (error) {
-    if (!(error instanceof PsnAuthError)) return "sin-respuesta";
-    const huella = huellaNpsso();
+    if (!(error instanceof PsnAuthError)) {
+      return { resultado: "sin-respuesta", detalle: `${forma} · ${error instanceof Error ? error.message : String(error)}` };
+    }
     if (huella) await apuntarUltimo(userId, huella, "fallo");
-    return "caducado";
+    return { resultado: "caducado", detalle: `${forma} · Sony: ${error.detalle ?? error.message}` };
   }
-  const huella = huellaNpsso();
   if (huella) {
     await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
     await apuntarUltimo(userId, huella, "ok");
   }
-  return "ok";
+  return { resultado: "ok", detalle: forma };
 }

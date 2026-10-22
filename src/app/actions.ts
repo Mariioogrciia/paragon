@@ -59,7 +59,7 @@ import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
 import { votarDificultad } from "@/lib/communityDifficulty";
 import type { PlataformaVinculable } from "@/lib/types";
 import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
-import { comprobarCredencialPsnAhora } from "@/lib/credencialPsn";
+import { type ResultadoComprobacion, comprobarCredencialPsnAhora } from "@/lib/credencialPsn";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 import { setHiddenNavItems } from "@/lib/navPreferences";
 import { setPanelOculto } from "@/lib/panelPreferences";
@@ -967,7 +967,7 @@ export async function deleteActivityAction(formData: FormData): Promise<void> {
 }
 
 /** Admin → Sistema → "Comprobar ahora" del NPSSO (lib/credencialPsn.ts). */
-export async function comprobarNpssoAction(): Promise<"ok" | "falta" | "caducado" | "sin-respuesta" | null> {
+export async function comprobarNpssoAction(): Promise<ResultadoComprobacion | null> {
   const userId = await requireUserId();
   const profile = await getProfileByUserId(userId);
   if (!profile?.esDesarrollador) return null;

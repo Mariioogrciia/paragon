@@ -32,10 +32,24 @@ export class PsnNotConfiguredError extends Error {
 }
 
 export class PsnAuthError extends Error {
-  constructor(message: string) {
+  /** Lo que contestó Sony, para Admin → Sistema (sin códigos ni tokens). */
+  detalle?: string;
+  constructor(message: string, detalle?: string) {
     super(message);
     this.name = "PsnAuthError";
+    this.detalle = detalle;
   }
+}
+
+/** "HTTP 302 → error=login_required, error_code=4165" a partir de la respuesta de Sony. */
+function resumenRespuesta(status: number, destino: string): string {
+  if (!destino) return `HTTP ${status}`;
+  const [base, consulta = ""] = destino.split("?");
+  const datos = new URLSearchParams(consulta);
+  const utiles = ["error", "error_code", "error_description"]
+    .filter((k) => datos.get(k))
+    .map((k) => `${k}=${datos.get(k)}`);
+  return `HTTP ${status} → ${utiles.length > 0 ? utiles.join(", ") : base.replace(/^[a-z.]+:\/\//i, "").slice(0, 80)}`;
 }
 
 /**
@@ -89,9 +103,12 @@ export async function codigoDesdeNpsso(npsso: string): Promise<string> {
   const codigo = destino.includes("?code=") ? new URLSearchParams(destino.split("?")[1]).get("code") : null;
   if (codigo) return codigo;
   if (respuesta.status >= 300 && respuesta.status < 400) {
-    throw new PsnAuthError("PSN no aceptó el token NPSSO: ha caducado o se cerró esa sesión. Vuelve a copiarlo con la sesión de PlayStation abierta.");
+    throw new PsnAuthError(
+      "PSN no aceptó el token NPSSO: ha caducado o se cerró esa sesión. Vuelve a copiarlo con la sesión de PlayStation abierta.",
+      resumenRespuesta(respuesta.status, destino),
+    );
   }
-  throw new Error(`PSN no respondió como se esperaba al pedir el acceso (HTTP ${respuesta.status}).`);
+  throw new Error(`PSN no respondió como se esperaba al pedir el acceso (${resumenRespuesta(respuesta.status, destino)}).`);
 }
 
 export function isPsnConfigured(): boolean {
