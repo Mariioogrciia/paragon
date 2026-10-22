@@ -10,7 +10,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run",
-    "test:namespaces": "tsx scripts/comprobar-namespaces-cliente.mts"
+    "test:namespaces": "tsx scripts/textos-por-ruta.mts --comprobar"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",

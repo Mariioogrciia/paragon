@@ -29,7 +29,7 @@ jobs:
       # NAMESPACES_CLIENTE; si no, la web enseña la clave en vez del texto
       # (pasó el 6 oct con "PerfilPage.amistad.enviada").
       - name: Textos de la web (namespaces)
-        run: npx tsx scripts/comprobar-namespaces-cliente.mts
+        run: npx tsx scripts/textos-por-ruta.mts --comprobar
       # Textos de la app (21 oct 2026): cada idioma con los mismos huecos {0}
       # que el español, y lo generado al día con kmp/i18n/textos.json.
       - name: Textos de la app (huecos y generado)

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Selector } from "@/components/ui/Selector";
 import { useTranslations, useLocale } from "next-intl";
 import { gradeLabel, TrophyTile, TrophyTypeIcon } from "@/components/TrophyIcon";
+// @textos Biblioteca.TrophyIcon — `gradeLabel(grado, t)` lee "TrophyIcon.*" (scripts/textos-por-ruta.mts).
 import { colorFor, rarity, relativeDate } from "@/lib/design";
 import { clasificarTrofeo, type TrophyType } from "@/lib/trophyType";
 import { trophyScore } from "@/lib/trophyScore";

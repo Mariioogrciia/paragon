@@ -32,10 +32,20 @@ import { Landing } from "@/components/landing/Portada";
 import { SlidersHorizontal } from "lucide-react";
 import { getPanelOculto, type SeccionPanel } from "@/lib/panelPreferences";
 import { idiomaActual } from "@/lib/trofeosIdioma";
+import { TextosRuta } from "@/components/TextosRuta";
 
 export { metadatosPortada as metadata } from "@/components/landing/Portada";
 
+/** La portada lleva sus textos aquí: `/` no tiene carpeta propia con layout (ver components/TextosRuta.tsx). */
 export default async function HomePage() {
+  return (
+    <TextosRuta ruta="/">
+      <Inicio />
+    </TextosRuta>
+  );
+}
+
+async function Inicio() {
   const session = await auth();
   if (!session?.user) return <Landing />;
 

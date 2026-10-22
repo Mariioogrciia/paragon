@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { PerfilJugador, metadatosPerfil } from "@/components/paginas/PerfilJugador";
+import { TextosRuta } from "@/components/TextosRuta";
 
 // Perfil sin sesión, cacheado media hora (ver el layout de `p/[locale]`).
 export const revalidate = 1800;
@@ -21,5 +22,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function PerfilPublico({ params }: { params: Params }) {
   const { locale, handle } = await params;
   setRequestLocale(locale);
-  return <PerfilJugador params={Promise.resolve({ handle })} conSesion={false} />;
+  return (
+    <TextosRuta ruta="publico:/u">
+      <PerfilJugador params={Promise.resolve({ handle })} conSesion={false} />
+    </TextosRuta>
+  );
 }

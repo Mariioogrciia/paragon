@@ -6,6 +6,14 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Textos de la web solo en la sección que los usa (22 oct)
+
+- Hasta hoy, todos los textos de componentes de cliente (83 KB en español) iban en el HTML de CADA página. Ahora:
+  - `scripts/textos-por-ruta.mts` sigue los imports desde cada carpeta de `app/(app)` (y las páginas de `app/(publico)`) y recoge los `useTranslations` de todo lo alcanzable, ajustados a los sub-apartados que se usan (`t("parte.clave")`). Usa el compilador de TypeScript para saber qué `t` es el traductor (un `t` de `.map((t) => …)` o `clearInterval(t)` no lo es). Si `t` se pasa a otro archivo, el apartado entero, salvo anotación `// @textos Ns.parte`. Genera `src/i18n/textosPorRuta.ts`.
+  - Globales (cabecera, pie, cookies...): ~2 KB en `documento.tsx`. Cada sección añade los suyos desde su `layout.tsx` con `<TextosRuta>` (18 layouts nuevos, uno por carpeta con textos; la portada y las páginas públicas, en la propia página). `MasTextos` los fusiona en el navegador con los globales: un `NextIntlClientProvider` anidado sustituye los mensajes, y así los globales no viajan dos veces.
+  - La CI (`npm run test:namespaces`, y un test) falla si el archivo generado no está al día o si a una sección le falta su `<TextosRuta>`. Sustituye a `comprobar-namespaces-cliente.mts`.
+- HTML comprimido: /privacidad de 52,7 a 23,6 KB, inicio de 61 a 37,7, perfil de 74 a 56,8, ficha de juego 30. Probado: recorrido de 51 rutas con y sin sesión buscando claves sin traducir en pantalla y errores (ninguno), y navegación sin recargar entre 10 secciones.
+
 ### Animaciones sin framer-motion donde no hacía falta (22 oct)
 
 - framer-motion eran 42 KB comprimidos en cada página con una cifra destacada, un selector o un diálogo de confirmar, para fundidos simples. `StatTile` y `MonthlySummary` aparecen ahora con CSS (`.aparecer`, `.aparecer-escala` en globals.css) y un IntersectionObserver de una sola vez (`lib/useAparecer.ts`); `Selector` y `ConfirmForm` entran con una animación CSS al montarse (`.entra-desplegable`, `.entra-fundido`, `.entra-dialogo`) y se cierran sin animación. Todo respeta `prefers-reduced-motion`. framer-motion solo queda en `LibraryGrid` (animación `layout`) y `ProfileSectionOrderEditor` (`Reorder`).

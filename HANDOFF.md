@@ -379,6 +379,18 @@ mano. Antes de una sesión larga, `git pull` primero.
 
 ---
 
+**Textos de la web por sección (22 oct 2026).** Al navegador solo van los
+textos que usan sus componentes de cliente, y por secciones:
+`scripts/textos-por-ruta.mts` sigue los imports de cada carpeta de
+`app/(app)` (y de las páginas de `app/(publico)`) y genera
+`src/i18n/textosPorRuta.ts`; los globales van en `documento.tsx` y los de cada
+sección los añade su `layout.tsx` con `<TextosRuta ruta="/seccion">`. Al
+añadir o cambiar textos de cliente: `npx tsx scripts/textos-por-ruta.mts`
+(la CI falla si está desfasado, o si una sección con textos no tiene su
+`<TextosRuta>`). Si un componente le pasa `t` a una función de OTRO archivo,
+el análisis no ve qué claves usa y manda el apartado entero; para evitarlo,
+anotar `// @textos Ns.parte` en ese archivo (ver `TrophyList.tsx`).
+
 ## La trampa recurrente de este código
 
 **Cosas que parecen funcionar y no hacen nada.** Ha pasado cinco veces en una
@@ -485,9 +497,8 @@ verdad:
   - ~~framer-motion en StatTile, MonthlySummary, ConfirmForm y Selector~~
     → hecho el 22 oct (CSS + `lib/useAparecer.ts`). Solo queda en
     `LibraryGrid` (animación `layout`) y `ProfileSectionOrderEditor`.
-  - Siguen ~83 KB de textos en el HTML de cada página: `Shell.Home` (9 KB,
-    solo la portada) y los sub-apartados más grandes se podrían mandar solo
-    en las páginas que los usan, con un `NextIntlClientProvider` anidado.
+  - ~~~83 KB de textos en el HTML de cada página~~ → hecho el 22 oct:
+    textos por sección (ver "Decisiones de arquitectura").
 - **Rediseño visual de la landing**: sigue la decisión de no tocar la
   estética global.
 - **Epic no da horas jugadas** por su API: nunca aparecerán en rankings de
