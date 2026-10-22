@@ -10,6 +10,7 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 - Fuera lo que ya no usaba nada: el proyecto Capacitor de `ios/` con `capacitor-www/`, `resources/` y el workflow `build-ios.yml` (fase 5 del plan nativo: la app es `kmp/`); los borradores de `scratch/`; la configuración de herramientas `.impeccable/`, `.agents/` y `Paragon/.obsidian`; 31 scripts de migración de una sola vez ya aplicados y sin ninguna referencia (siguen en el historial de git); y `DiscoverCard`, `SectionTabs` y `lib/google/client.ts`, sin ningún import (comprobado con knip).
 - Los documentos pasan a `docs/` (`HISTORIAL`, `DESIGN`, `PRODUCT`, `CONTEXTO`, `HALLAZGOS`, `ROADMAP`, `PLAN-NATIVA`); en la raíz quedan `README.md`, `HANDOFF.md` y las instrucciones para agentes.
+- Fuera también seis imágenes de `public/` sin uso (las de ejemplo de create-next-app y `bg-games.jpg`). README nuevo: qué es Paragon, funciones, plataformas, arquitectura (diagrama), stack, estructura, puesta en marcha con todas las variables y documentación. El viejo mandaba copiar un `.env.example` que no existe y hablaba de Capacitor.
 
 ### Próximos lanzamientos: los más esperados de verdad (22 oct)
 
