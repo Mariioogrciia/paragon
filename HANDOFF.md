@@ -52,8 +52,8 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
   **cualquier enlace nuevo debe importar `Link` de `@/components/Enlace`**,
   no de `next/link`). Antes cada `<Link>` visible renderizaba el layout raíz
   en el servidor por culpa de `app/loading.tsx`.
-- **Portada, fichas de juego y perfiles, sin sesión, salen ya hechos de la
-  CDN** (`app/(publico)` + `src/proxy.ts`; detalle en docs/HISTORIAL.md). Reglas:
+- **Portada, fichas de juego, perfiles, Descubrir, Noticias y eSports, sin
+  sesión, salen ya hechos de la CDN** (`app/(publico)` + `src/proxy.ts`; detalle en docs/HISTORIAL.md). Reglas:
   nada dentro de `app/(publico)` ni de `components/paginas/*` con
   `conSesion={false}` puede leer cookies, cabeceras ni la sesión (o vuelve a
   renderizarse en cada visita); una página pública nueva que se quiera

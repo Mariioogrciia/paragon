@@ -6,6 +6,11 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Octubre de 2026
 
+### Descubrir, Noticias y eSports desde la CDN sin sesión (23 oct)
+
+- Como la portada, las fichas y los perfiles (21 oct): quien llega sin sesión a `/descubrir`, `/noticias` o `/esports` recibe la copia ya hecha de `app/(publico)/p/<idioma>/…` (`src/proxy.ts`, reescritura sin cambiar la URL). Las páginas pasan a `components/paginas/{Descubrir,Noticias,Esports}.tsx` con `conSesion`: sin sesión no se leen cookies ni la sesión (lo único personal eran los deseados, las noticias de tus juegos y los equipos favoritos). Caché de 5 min en Descubrir (los datos de IGDB se renuevan cada 5), 15 en Noticias y 5 en eSports (partidos en directo).
+- Comprobado: las tres salen como ISR (●) en el build; sin sesión, la segunda visita es `x-nextjs-cache: HIT`; con sesión, `private, no-store` y la versión personal (enlace a recomendaciones); el idioma de la cookie se respeta (en/de/it); recorrido sin errores ni claves sin traducir.
+
 ### Textos de la web solo en la sección que los usa (22 oct)
 
 - Hasta hoy, todos los textos de componentes de cliente (83 KB en español) iban en el HTML de CADA página. Ahora:

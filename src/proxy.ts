@@ -3,7 +3,8 @@ import { defaultLocale, locales } from "@/i18n/idiomas";
 
 /**
  * Páginas públicas desde la CDN (21 oct 2026). Quien llega SIN sesión a la
- * portada, a una ficha de juego o a un perfil recibe la copia ya hecha de
+ * portada, a una ficha de juego, a un perfil o (desde el 23 oct) a
+ * Descubrir, Noticias o eSports recibe la copia ya hecha de
  * `app/(publico)/p/<idioma>/…`, que Next genera una vez y Vercel guarda (ver
  * su layout). Con sesión, la de siempre, renderizada para esa persona. La URL
  * del navegador no cambia: es una reescritura, no una redirección.
@@ -36,5 +37,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/juego/:id", "/u/:handle", "/p/:path*"],
+  matcher: ["/", "/juego/:id", "/u/:handle", "/descubrir", "/noticias", "/esports", "/p/:path*"],
 };
