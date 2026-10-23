@@ -17,7 +17,7 @@
  *   npx tsx scripts/textos-por-ruta.mts --comprobar # falla si no está al día (CI)
  */
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import ts from "typescript";
 
 const RAIZ = resolve(import.meta.dirname, "..");
@@ -241,7 +241,8 @@ function existe(ns: string): boolean {
 /* ------------------------------- Rutas ------------------------------- */
 
 const MODULOS_RUTA = /^(page|layout|loading|error|not-found|template|default)\.tsx?$/;
-const modulosDe = (dir: string) => archivos(dir).filter((a) => MODULOS_RUTA.test(a.split("/").pop()!));
+// basename y no split("/"): en Windows las rutas llevan "\" y no salía ninguna sección.
+const modulosDe = (dir: string) => archivos(dir).filter((a) => MODULOS_RUTA.test(basename(a)));
 
 const APP_GRUPO = join(APP, "(app)");
 const PUBLICO = join(APP, "(publico)", "p", "[locale]");
@@ -311,7 +312,8 @@ if (errores.length) {
 }
 
 if (process.argv.includes("--comprobar")) {
-  const actual = existsSync(SALIDA) ? readFileSync(SALIDA, "utf8") : "";
+  // Sin "\r": con core.autocrlf (Windows) git lo saca con CRLF aunque esté al día.
+  const actual = existsSync(SALIDA) ? readFileSync(SALIDA, "utf8").replace(/\r\n/g, "\n") : "";
   if (actual !== salida) {
     console.error("src/i18n/textosPorRuta.ts no está al día: npx tsx scripts/textos-por-ruta.mts");
     process.exit(1);

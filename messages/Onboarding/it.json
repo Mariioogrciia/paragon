@@ -145,11 +145,21 @@
     },
     "epicExt": {
       "titulo": "Collega Epic con l'estensione di Paragon",
-      "paso1": "Installa l'estensione di Paragon nel tuo browser e collegala al tuo account.",
       "paso2": "Accedi all'Epic Games Store con il tuo account e apri il tuo avatar → «I miei obiettivi» (l'indirizzo finisce con /u/ e un codice).",
       "paso3": "Tocca l'icona dell'estensione → «Sincronizza Epic ora». Ripetilo quando vuoi aggiornare.",
       "conectar": "Collega l'estensione",
-      "formulario": "Prova con il link del mio profilo (Epic di solito lo blocca)"
+      "formulario": "Prova con il link del mio profilo (Epic di solito lo blocca)",
+      "pendientes": "Il tuo account Epic è collegato, ma non ci sono ancora obiettivi: recuperali con l’estensione.",
+      "sincronizada": "Obiettivi Epic sincronizzati.",
+      "comprobando": "Controllo dell’estensione…",
+      "instalar": "Installa l’estensione dal Chrome Web Store",
+      "descargar": "Scarica l’estensione (.zip)",
+      "manual1": "Estrai lo .zip in una cartella che non cancellerai.",
+      "manual2": "Apri chrome://extensions (o edge://extensions) e attiva la «Modalità sviluppatore».",
+      "manual3": "Premi «Carica estensione non pacchettizzata», scegli la cartella e ricarica questa pagina.",
+      "sinConectar": "L’estensione è installata. Manca collegarla al tuo account Paragon.",
+      "traer": "Recupera i miei obiettivi Epic",
+      "traerAyuda": "Si apre la tua pagina degli obiettivi su Epic e l’estensione li invia da sola. Se Epic ti chiede di dimostrare che sei una persona, fallo e ricarica la pagina."
     },
     "steamExtra": {
       "titulo": "Altri account Steam",
@@ -170,7 +180,12 @@
       "yaVerificada": "Account verificato con Epic Games.",
       "ok": "Account Epic collegato e verificato.",
       "deOtro": "Quell'account Epic è già collegato a un altro utente di Paragon.",
-      "error": "Impossibile verificare l'account Epic. Riprova tra un momento."
+      "motivo": {
+        "cancelado": "Hai annullato l’accesso a Epic. Puoi riprovare quando vuoi.",
+        "estado": "La sessione si è persa per strada (hai iniziato in un’altra scheda o su un altro indirizzo di Paragon?). Premi di nuovo «Verifica con Epic Games».",
+        "fallo": "Non è stato possibile verificare l’account Epic. Riprova tra un momento; se continua a non funzionare, collega Epic con l’estensione.",
+        "extension": "L’estensione non è riuscita a recuperare i tuoi obiettivi Epic. Il suo avviso nella pagina di Epic spiega il motivo."
+      }
     },
     "steamOficial": {
       "boton": "Verifica con Steam",

@@ -10,7 +10,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run",
-    "test:namespaces": "tsx scripts/textos-por-ruta.mts --comprobar"
+    "test:namespaces": "tsx scripts/textos-por-ruta.mts --comprobar",
+    "extension:zip": "node scripts/empaquetar-extension.mjs"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",

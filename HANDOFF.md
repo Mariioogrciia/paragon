@@ -81,6 +81,14 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    `client_redirect_domain_mismatch`; el cliente que usa la web es «Paragon
    Web»). Si en Vercel existe `AUTH_EPIC_REDIRECT_PROXY_URL`, borrarla.
    Probar: Ajustes → Plataformas → "Verificar con Epic Games".
+   Si la revisión tarda: crear otro cliente en el mismo producto con la URL
+   de www desde el principio y cambiar `AUTH_EPIC_ID`/`AUTH_EPIC_SECRET`
+   (sin probar si el bloqueo de la aplicación le afecta).
+0. **Extensión en la Chrome Web Store** (23 oct): ficha y permisos listos
+   para copiar en [`docs/CHROME-WEB-STORE.md`](docs/CHROME-WEB-STORE.md);
+   paquete `public/descargas/paragon-extension.zip`. Alta de desarrollador
+   (5 $), subir, enviar a revisión y, publicada, poner
+   `NEXT_PUBLIC_EXTENSION_STORE_URL` en Vercel.
 0. **Steam**: probar «Verificar con Steam» en Ajustes → Plataformas (no hace
    falta configurar nada; solo se puede probar con Steam de verdad).
 0. **Cron externo cada 15 min** (5 minutos de trabajo, gratis). Hoy el cron
@@ -131,6 +139,25 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    italiano y portugués.
 5. En unos días, Vercel → Firewall → Bot Management: ver qué apunta Bot
    Protection en Log antes de decidir nada.
+
+**Epic de verdad** (23 oct). El login de Epic solo verifica la cuenta (Epic
+no da logros por API y bloquea al servidor): los logros solo llegan con la
+extensión, y no había de dónde sacarla. Hecho:
+- **Extensión 1.4.0**: Ajustes enlaza a `store.epicgames.com/u/<id>?paragon=sync`
+  y la página de Epic lee y envía sola, con aviso y "Volver a Paragon";
+  `marca.js` le dice a Ajustes si está instalada y conectada.
+- **Ajustes → Plataformas → Epic** (`components/ExtensionEpic.tsx`): el paso
+  que toca (descargar/instalar, conectar o traer logros) y "vinculada, pero
+  todavía sin logros" (`lib/epic/estado.ts`).
+- **Descarga** `public/descargas/paragon-extension.zip`
+  (`npm run extension:zip`; regenerarlo al cambiar la extensión).
+- **Fallos del login de Epic** a Ajustes con motivo (cancelado, sesión
+  perdida, fallo) en vez de a `/entrar` (`lib/epicVuelta.ts`). Auth.js manda
+  `error=Configuration` también para `InvalidCheck`: el motivo "sesión
+  perdida" se saca de si la petición traía la cookie `authjs.state`.
+- En Windows: `scripts/textos-por-ruta.mts` no encontraba ninguna sección
+  (`split("/")`) y `--comprobar` fallaba por CRLF; el test lanzaba `npx`
+  sin shell. Arreglados los tres.
 
 **Lo último** (20-21 oct; detalle en docs/HISTORIAL.md):
 - **Italiano y portugués** en web y apps (21 oct). Test de paridad

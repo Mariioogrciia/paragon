@@ -145,11 +145,21 @@
     },
     "epicExt": {
       "titulo": "Link Epic with the Paragon extension",
-      "paso1": "Install the Paragon extension in your browser and connect it to your account.",
       "paso2": "Sign in to the Epic Games Store and open your avatar → “My achievements” (the address ends in /u/ and a code).",
       "paso3": "Click the extension icon → “Sync Epic now”. Repeat whenever you want to update.",
       "conectar": "Connect the extension",
-      "formulario": "Try with my profile link (Epic usually blocks it)"
+      "formulario": "Try with my profile link (Epic usually blocks it)",
+      "pendientes": "Your Epic account is linked, but there are no achievements yet: bring them in with the extension.",
+      "sincronizada": "Epic achievements synced.",
+      "comprobando": "Checking the extension…",
+      "instalar": "Install the extension from the Chrome Web Store",
+      "descargar": "Download the extension (.zip)",
+      "manual1": "Unzip the .zip into a folder you won't delete.",
+      "manual2": "Open chrome://extensions (or edge://extensions) and turn on “Developer mode”.",
+      "manual3": "Click “Load unpacked”, choose that folder and reload this page.",
+      "sinConectar": "The extension is installed. It still needs to be connected to your Paragon account.",
+      "traer": "Bring in my Epic achievements",
+      "traerAyuda": "Your achievements page on Epic opens and the extension sends them on its own. If Epic asks you to prove you're human, do it and reload that page."
     },
     "steamExtra": {
       "titulo": "Other Steam accounts",
@@ -170,7 +180,12 @@
       "yaVerificada": "Account verified with Epic Games.",
       "ok": "Epic account linked and verified.",
       "deOtro": "That Epic account is already linked to another Paragon user.",
-      "error": "We couldn't verify the Epic account. Try again in a moment."
+      "motivo": {
+        "cancelado": "You cancelled the Epic sign-in. You can try again whenever you like.",
+        "estado": "The session got lost on the way (did you start in another tab or on another Paragon address?). Press “Verify with Epic Games” again.",
+        "fallo": "The Epic account couldn't be verified. Try again in a moment; if it keeps failing, link Epic with the extension.",
+        "extension": "The extension couldn't fetch your Epic achievements. Its notice on the Epic page explains why."
+      }
     },
     "steamOficial": {
       "boton": "Verify with Steam",

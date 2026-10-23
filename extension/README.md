@@ -99,3 +99,28 @@ acaba en `/u/<id de 32 caracteres>`), pulsar el icono de la extensión →
   en `epic.js` y en `src/lib/epic/client.ts`.
 - Recargar las pestañas de Epic abiertas antes de instalar/actualizar la
   extensión, para que tengan `epic.js`.
+
+## Sincronizar Epic en un clic y aviso de instalada (desde la 1.4.0)
+
+- **Desde Paragon**: Ajustes → Plataformas → Epic enlaza a
+  `store.epicgames.com/u/<id>?paragon=sync` (el id es el de la cuenta
+  vinculada o verificada). Al abrirse así, `epic.js` lee y envía solo (el
+  background lee ESA pestaña, `SYNC_EPIC` con `desdePestana`) y enseña un
+  aviso con el resultado y "Volver a Paragon" (`?epic=sincronizada` o
+  `?epic=error&motivo=extension`). Quita el parámetro de la URL para que
+  recargar no reenvíe.
+- **`marca.js`** (en las páginas de Paragon): deja
+  `data-paragon-extension="conectada" | "sin-conectar"` en `<html>` y lanza
+  el evento `paragon-extension`. `src/components/ExtensionEpic.tsx` lo lee
+  para enseñar el paso que toca: instalar, conectar o traer los logros. Sin
+  marca a los 1,5 s, se da por no instalada.
+
+## Empaquetar (descarga y Chrome Web Store)
+
+`npm run extension:zip` (`scripts/empaquetar-extension.mjs`) genera
+`public/descargas/paragon-extension.zip`: es la descarga de Ajustes mientras
+no esté en la tienda, y el mismo archivo que se sube a la Chrome Web Store.
+**Volver a ejecutarlo cada vez que cambie la extensión.** Con
+`NEXT_PUBLIC_EXTENSION_STORE_URL` en Vercel, Ajustes enlaza a la tienda en
+vez de a la descarga. La ficha de la tienda, lista para copiar:
+[`docs/CHROME-WEB-STORE.md`](../docs/CHROME-WEB-STORE.md).

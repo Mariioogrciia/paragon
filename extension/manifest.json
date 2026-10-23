@@ -3,7 +3,7 @@
   "name": "__MSG_nombre__",
   "description": "__MSG_descripcion__",
   "default_locale": "es",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "icons": {
     "16": "icons/icon128.png",
     "48": "icons/icon128.png",
@@ -26,6 +26,16 @@
         "content.js"
       ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.paragontrophies.com/*",
+        "https://platinos-nine.vercel.app/*"
+      ],
+      "js": [
+        "marca.js"
+      ],
+      "run_at": "document_start"
     },
     {
       "matches": [

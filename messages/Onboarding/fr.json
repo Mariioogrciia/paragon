@@ -145,11 +145,21 @@
     },
     "epicExt": {
       "titulo": "Lier Epic avec l’extension Paragon",
-      "paso1": "Installe l’extension Paragon dans ton navigateur et connecte-la à ton compte.",
       "paso2": "Connecte-toi à l’Epic Games Store et ouvre ton avatar → « Mes succès » (l’adresse se termine par /u/ et un code).",
       "paso3": "Clique sur l’icône de l’extension → « Synchroniser Epic maintenant ». Recommence quand tu veux mettre à jour.",
       "conectar": "Connecter l’extension",
-      "formulario": "Essayer avec le lien de mon profil (Epic le bloque souvent)"
+      "formulario": "Essayer avec le lien de mon profil (Epic le bloque souvent)",
+      "pendientes": "Ton compte Epic est associé, mais il n’y a pas encore de succès : récupère-les avec l’extension.",
+      "sincronizada": "Succès Epic synchronisés.",
+      "comprobando": "Vérification de l’extension…",
+      "instalar": "Installer l’extension depuis le Chrome Web Store",
+      "descargar": "Télécharger l’extension (.zip)",
+      "manual1": "Décompresse le .zip dans un dossier que tu ne supprimeras pas.",
+      "manual2": "Ouvre chrome://extensions (ou edge://extensions) et active le « Mode développeur ».",
+      "manual3": "Clique sur « Charger l’extension non empaquetée », choisis ce dossier et recharge cette page.",
+      "sinConectar": "L’extension est installée. Il reste à la connecter à ton compte Paragon.",
+      "traer": "Récupérer mes succès Epic",
+      "traerAyuda": "Ta page de succès Epic s’ouvre et l’extension les envoie toute seule. Si Epic te demande de prouver que tu es humain, fais-le et recharge cette page."
     },
     "steamExtra": {
       "titulo": "Autres comptes Steam",
@@ -170,7 +180,12 @@
       "yaVerificada": "Compte vérifié avec Epic Games.",
       "ok": "Compte Epic lié et vérifié.",
       "deOtro": "Ce compte Epic est déjà lié à un autre utilisateur de Paragon.",
-      "error": "Impossible de vérifier le compte Epic. Réessaie dans un instant."
+      "motivo": {
+        "cancelado": "Tu as annulé la connexion à Epic. Tu peux réessayer quand tu veux.",
+        "estado": "La session s’est perdue en route (as-tu commencé dans un autre onglet ou sur une autre adresse de Paragon ?). Clique à nouveau sur « Vérifier avec Epic Games ».",
+        "fallo": "Impossible de vérifier le compte Epic. Réessaie dans un instant ; si ça échoue encore, associe Epic avec l’extension.",
+        "extension": "L’extension n’a pas pu récupérer tes succès Epic. Son message sur la page d’Epic indique pourquoi."
+      }
     },
     "steamOficial": {
       "boton": "Vérifier avec Steam",

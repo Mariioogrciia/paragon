@@ -85,5 +85,8 @@
   },
   "err_no_es_pagina_de_logros": {
     "message": "Abre tu página «Mis logros» de Epic (la URL acaba en /u/ y un código)."
+  },
+  "volverAParagon": {
+    "message": "Volver a Paragon"
   }
 }

@@ -145,11 +145,21 @@
     },
     "epicExt": {
       "titulo": "Epic mit der Paragon-Erweiterung verknüpfen",
-      "paso1": "Installiere die Paragon-Erweiterung in deinem Browser und verbinde sie mit deinem Konto.",
       "paso2": "Melde dich im Epic Games Store an und öffne deinen Avatar → „Meine Erfolge“ (die Adresse endet auf /u/ und einem Code).",
       "paso3": "Klicke auf das Erweiterungssymbol → „Epic jetzt synchronisieren“. Wiederhole das, wenn du aktualisieren willst.",
       "conectar": "Erweiterung verbinden",
-      "formulario": "Mit meinem Profil-Link versuchen (Epic blockiert das meist)"
+      "formulario": "Mit meinem Profil-Link versuchen (Epic blockiert das meist)",
+      "pendientes": "Dein Epic-Konto ist verknüpft, aber es gibt noch keine Erfolge: Hol sie mit der Erweiterung.",
+      "sincronizada": "Epic-Erfolge synchronisiert.",
+      "comprobando": "Erweiterung wird geprüft…",
+      "instalar": "Erweiterung aus dem Chrome Web Store installieren",
+      "descargar": "Erweiterung herunterladen (.zip)",
+      "manual1": "Entpacke die .zip in einen Ordner, den du nicht löschst.",
+      "manual2": "Öffne chrome://extensions (oder edge://extensions) und aktiviere den „Entwicklermodus“.",
+      "manual3": "Klicke auf „Entpackte Erweiterung laden“, wähle den Ordner und lade diese Seite neu.",
+      "sinConectar": "Die Erweiterung ist installiert. Sie muss noch mit deinem Paragon-Konto verbunden werden.",
+      "traer": "Meine Epic-Erfolge holen",
+      "traerAyuda": "Deine Erfolgsseite bei Epic öffnet sich und die Erweiterung sendet sie von selbst. Wenn Epic prüfen will, ob du ein Mensch bist, bestätige es und lade die Seite neu."
     },
     "steamExtra": {
       "titulo": "Weitere Steam-Konten",
@@ -170,7 +180,12 @@
       "yaVerificada": "Konto mit Epic Games bestätigt.",
       "ok": "Epic-Konto verknüpft und bestätigt.",
       "deOtro": "Dieses Epic-Konto ist bereits mit einem anderen Paragon-Nutzer verknüpft.",
-      "error": "Das Epic-Konto konnte nicht bestätigt werden. Versuch es gleich noch einmal."
+      "motivo": {
+        "cancelado": "Du hast die Anmeldung bei Epic abgebrochen. Du kannst es jederzeit erneut versuchen.",
+        "estado": "Die Sitzung ist unterwegs verloren gegangen (hast du in einem anderen Tab oder unter einer anderen Paragon-Adresse begonnen?). Klicke erneut auf „Mit Epic Games verifizieren“.",
+        "fallo": "Das Epic-Konto konnte nicht verifiziert werden. Versuche es gleich noch einmal; wenn es weiter fehlschlägt, verknüpfe Epic mit der Erweiterung.",
+        "extension": "Die Erweiterung konnte deine Epic-Erfolge nicht abrufen. Ihr Hinweis auf der Epic-Seite nennt den Grund."
+      }
     },
     "steamOficial": {
       "boton": "Mit Steam verifizieren",

@@ -3,7 +3,7 @@
 // extensión no puede leer variables de entorno).
 const BASE_URL = "https://www.paragontrophies.com";
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "PARAGON_TOKEN") {
     chrome.storage.local.set({ paragonToken: message.token }).then(() => sendResponse({ ok: true }));
     return true;
@@ -24,7 +24,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message?.type === "SYNC_EPIC") {
-    sincronizarEpic()
+    // `desdePestana`: lo pide la propia página de Epic al abrirse desde Paragon
+    // con ?paragon=sync (ver epic.js); se lee esa pestaña y no se busca otra.
+    sincronizarEpic(message.desdePestana ? sender.tab?.id : undefined)
       .then(sendResponse)
       .catch((error) => sendResponse({ error: String(error?.message ?? error) }));
     return true;
@@ -103,18 +105,20 @@ async function sincronizarPsn() {
  * consultas desde el servidor de Paragon. Aquí solo se busca esa pestaña
  * ("Mis logros", /u/<id>), se le pide que lea y se envía el resultado.
  */
-async function sincronizarEpic() {
+async function sincronizarEpic(idPestana) {
   const { paragonToken } = await chrome.storage.local.get("paragonToken");
   if (!paragonToken) return { error: "no-conectado" };
 
-  const pestanas = await chrome.tabs.query({ url: "https://store.epicgames.com/*" });
-  const deLogros = pestanas.filter((p) => /\/u\/[0-9a-f]{32}/i.test(p.url ?? ""));
-  if (deLogros.length === 0) return { error: "abre-mis-logros-de-epic" };
-  const pestana = deLogros.find((p) => p.active) ?? deLogros[0];
+  if (idPestana === undefined) {
+    const pestanas = await chrome.tabs.query({ url: "https://store.epicgames.com/*" });
+    const deLogros = pestanas.filter((p) => /\/u\/[0-9a-f]{32}/i.test(p.url ?? ""));
+    if (deLogros.length === 0) return { error: "abre-mis-logros-de-epic" };
+    idPestana = (deLogros.find((p) => p.active) ?? deLogros[0]).id;
+  }
 
   let lectura;
   try {
-    lectura = await chrome.tabs.sendMessage(pestana.id, { type: "EPIC_LEER" });
+    lectura = await chrome.tabs.sendMessage(idPestana, { type: "EPIC_LEER" });
   } catch {
     // La pestaña estaba abierta antes de instalar/actualizar la extensión: no tiene el script.
     return { error: "recarga-la-pagina-de-epic" };

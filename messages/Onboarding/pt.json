@@ -145,11 +145,21 @@
     },
     "epicExt": {
       "titulo": "Ligar a Epic com a extensão do Paragon",
-      "paso1": "Instala a extensão do Paragon no teu navegador e liga-a à tua conta.",
       "paso2": "Entra na Epic Games Store com a tua sessão e abre o teu avatar → «As minhas conquistas» (o endereço acaba em /u/ e um código).",
       "paso3": "Toca no ícone da extensão → «Sincronizar Epic agora». Repete quando quiseres atualizar.",
       "conectar": "Ligar a extensão",
-      "formulario": "Experimentar com a ligação do meu perfil (a Epic costuma bloqueá-la)"
+      "formulario": "Experimentar com a ligação do meu perfil (a Epic costuma bloqueá-la)",
+      "pendientes": "A tua conta da Epic está ligada, mas ainda não há conquistas: traz-as com a extensão.",
+      "sincronizada": "Conquistas da Epic sincronizadas.",
+      "comprobando": "A verificar a extensão…",
+      "instalar": "Instalar a extensão a partir da Chrome Web Store",
+      "descargar": "Transferir a extensão (.zip)",
+      "manual1": "Descomprime o .zip numa pasta que não vás apagar.",
+      "manual2": "Abre chrome://extensions (ou edge://extensions) e ativa o «Modo de programador».",
+      "manual3": "Carrega em «Carregar expandida», escolhe essa pasta e recarrega esta página.",
+      "sinConectar": "A extensão está instalada. Falta ligá-la à tua conta do Paragon.",
+      "traer": "Trazer as minhas conquistas da Epic",
+      "traerAyuda": "Abre-se a tua página de conquistas na Epic e a extensão envia-as sozinha. Se a Epic pedir para provares que és uma pessoa, fá-lo e recarrega essa página."
     },
     "steamExtra": {
       "titulo": "Outras contas do Steam",
@@ -170,7 +180,12 @@
       "yaVerificada": "Conta verificada com a Epic Games.",
       "ok": "Conta da Epic ligada e verificada.",
       "deOtro": "Essa conta da Epic já está ligada a outro utilizador do Paragon.",
-      "error": "Não foi possível verificar a conta da Epic. Tenta outra vez daqui a um momento."
+      "motivo": {
+        "cancelado": "Cancelaste o início de sessão na Epic. Podes tentar outra vez quando quiseres.",
+        "estado": "A sessão perdeu-se pelo caminho (começaste noutro separador ou noutro endereço do Paragon?). Carrega outra vez em «Verificar com a Epic Games».",
+        "fallo": "Não foi possível verificar a conta da Epic. Tenta outra vez daqui a pouco; se continuar a falhar, liga a Epic com a extensão.",
+        "extension": "A extensão não conseguiu trazer as tuas conquistas da Epic. O aviso da extensão, na página da Epic, explica porquê."
+      }
     },
     "steamOficial": {
       "boton": "Verificar com o Steam",

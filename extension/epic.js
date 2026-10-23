@@ -156,3 +156,90 @@ chrome.runtime.onMessage.addListener((mensaje, _remitente, responder) => {
   leerEpic().then(responder);
   return true;
 });
+
+// ── Sincronizar en un clic desde Paragon (1.4.0, 23 oct 2026) ──────────────
+// Ajustes → Plataformas enlaza a store.epicgames.com/u/<tu id>?paragon=sync.
+// Al abrirse así, esta página se lee sola y lo envía, sin pasar por el popup,
+// y enseña un aviso con el resultado y un enlace de vuelta a Paragon.
+
+const BASE_URL = "https://www.paragontrophies.com";
+const t = (clave, ...sustituciones) => chrome.i18n.getMessage(clave, sustituciones) || clave;
+
+// Mismos códigos que en popup.js.
+const MENSAJES_ERROR = {
+  "no-conectado": "desconectado",
+  "perfil-privado": "err_perfil_privado",
+  "perfil-no-encontrado": "err_perfil_no_encontrado",
+  "epic-reto": "err_epic_reto",
+  "epic-no-responde": "err_epic_no_responde",
+  "no-es-pagina-de-logros": "err_no_es_pagina_de_logros",
+};
+
+function avisoParagon() {
+  const anfitrion = document.createElement("div");
+  // Shadow DOM: los estilos de la web de Epic no tocan el aviso, ni al revés.
+  const raiz = anfitrion.attachShadow({ mode: "closed" });
+  raiz.innerHTML = `
+    <style>
+      .caja { position: fixed; right: 20px; bottom: 20px; z-index: 2147483647; max-width: 360px;
+        padding: 16px 18px; border-radius: 16px; background: #10151f; color: #e9eef7;
+        border: 1px solid #212a38; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+        font: 500 14px/1.45 system-ui, sans-serif; }
+      .marca { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; color: #9fd4ec; }
+      .texto { margin: 6px 0 0; }
+      .caja[data-estado="error"] .texto { color: #ff8a8a; }
+      a { display: inline-block; margin-top: 12px; padding: 8px 14px; border-radius: 999px;
+        background: rgb(124,196,228); color: #0a0d13; font-weight: 700; text-decoration: none; }
+      a:hover { background: #d7eef8; }
+      a[hidden] { display: none; }
+    </style>
+    <div class="caja" role="status" aria-live="polite">
+      <div class="marca">Paragon</div>
+      <p class="texto"></p>
+      <a hidden></a>
+    </div>`;
+  document.documentElement.appendChild(anfitrion);
+  const caja = raiz.querySelector(".caja");
+  const texto = raiz.querySelector(".texto");
+  const enlace = raiz.querySelector("a");
+  return {
+    estado(mensaje, tipo = "info", vuelta = null) {
+      caja.dataset.estado = tipo;
+      texto.textContent = mensaje;
+      enlace.hidden = !vuelta;
+      if (vuelta) {
+        enlace.href = vuelta.url;
+        enlace.textContent = vuelta.texto;
+      }
+    },
+  };
+}
+
+async function sincronizarDesdeParagon() {
+  const params = new URLSearchParams(location.search);
+  if (params.get("paragon") !== "sync") return;
+  // Fuera de la URL para que recargar no vuelva a enviar.
+  params.delete("paragon");
+  history.replaceState(null, "", location.pathname + (params.size ? `?${params}` : "") + location.hash);
+
+  const aviso = avisoParagon();
+  aviso.estado(t("leyendoEpic"));
+  const resultado = await chrome.runtime.sendMessage({ type: "SYNC_EPIC", desdePestana: true }).catch(() => ({ error: "epic-no-responde" }));
+
+  if (resultado?.error === "no-conectado") {
+    aviso.estado(t("desconectado"), "error", { url: `${BASE_URL}/movil/enlazar-extension`, texto: t("conectar") });
+    return;
+  }
+  if (resultado?.error) {
+    const clave = MENSAJES_ERROR[resultado.error];
+    const mensaje = resultado.error === "error-servidor" ? t("errorServidor", String(resultado.estado ?? "")) : clave ? t(clave) : resultado.error;
+    aviso.estado(mensaje, "error", { url: `${BASE_URL}/ajustes/plataformas?epic=error&motivo=extension`, texto: t("volverAParagon") });
+    return;
+  }
+  aviso.estado(t("listoEpic", String(resultado.juegos), resultado.username), "ok", {
+    url: `${BASE_URL}/ajustes/plataformas?epic=sincronizada`,
+    texto: t("volverAParagon"),
+  });
+}
+
+sincronizarDesdeParagon();

@@ -20,6 +20,11 @@ import { PlayStationLogo, SteamLogo, XboxLogo, NintendoLogo, EpicGamesLogo } fro
 import { ConfirmForm } from "@/components/ui/ConfirmForm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CompletarSteamSiHaceFalta } from "@/components/CompletarSteamSiHaceFalta";
+import { ExtensionEpic } from "@/components/ExtensionEpic";
+import { idParaPaginaDeLogros, tieneJuegosDeEpic } from "@/lib/epic/estado";
+import type { MotivoFalloEpic } from "@/lib/epicVuelta";
+
+const MOTIVOS_EPIC: (MotivoFalloEpic | "extension")[] = ["cancelado", "estado", "fallo", "extension"];
 
 export async function generateMetadata() {
   const t = await getTranslations("Onboarding.ajustesNav");
@@ -206,10 +211,10 @@ function CuentasSteamExtra({ cuentas, t, idioma }: { cuentas: CuentaSteamExtra[]
   );
 }
 
-export default async function AjustesPlataformasPage({ searchParams }: { searchParams: Promise<{ epic?: string; steam?: string }> }) {
+export default async function AjustesPlataformasPage({ searchParams }: { searchParams: Promise<{ epic?: string; motivo?: string; steam?: string }> }) {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
-  const { epic: resultadoEpic, steam: resultadoSteam } = await searchParams;
+  const { epic: resultadoEpic, motivo: motivoEpic, steam: resultadoSteam } = await searchParams;
 
   const profile = await getProfileByUserId(session.user.id);
   const psn = accountFor(profile, "psn");
@@ -230,10 +235,13 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
   const tDeclarado = await getTranslations("Shell.Declarado");
   const locale = await getLocale();
   const loginEpic = Boolean(process.env.AUTH_EPIC_ID);
-  const [epicConfirmada, steamConfirmada] = await Promise.all([
+  const [epicConfirmada, steamConfirmada, epicConLogros] = await Promise.all([
     loginEpic && epic ? cuentaVerificada(session.user.id, "epic") : false,
     steam ? cuentaVerificada(session.user.id, "steam") : false,
+    epic ? tieneJuegosDeEpic(session.user.id) : false,
   ]);
+  // Motivo de un fallo del login de Epic (lib/epicVuelta.ts) o de la extensión (epic.js).
+  const motivoFallo = MOTIVOS_EPIC.find((m) => m === motivoEpic) ?? "fallo";
 
   // Epic bloquea las lecturas desde el servidor (antibots): se sincroniza con
   // la extensión del navegador y el progreso es declarado (lib/declarado.ts).
@@ -243,7 +251,6 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
     <div className="mb-4 rounded-xl border border-border p-4">
       {resultadoEpic === "verificada" && <p className="mb-2 text-xs font-semibold text-green-500">✓ {t("ajustesPlataformas.epicOficial.ok")}</p>}
       {resultadoEpic === "de-otro" && <p className="mb-2 text-xs font-semibold text-red-400">✕ {t("ajustesPlataformas.epicOficial.deOtro")}</p>}
-      {resultadoEpic === "error" && <p className="mb-2 text-xs font-semibold text-red-400">✕ {t("ajustesPlataformas.epicOficial.error")}</p>}
       {epicConfirmada ? (
         <p className="flex items-center gap-2 text-[0.8125rem] font-semibold">
           <BadgeCheck size={16} className="shrink-0 text-[var(--accent-text)]" aria-hidden="true" />
@@ -297,17 +304,21 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
     </div>
   );
 
+  const resultadoDeEpic = (resultadoEpic === "error" || resultadoEpic === "sincronizada") && (
+    <p role="status" className={`mb-3 text-xs font-semibold ${resultadoEpic === "error" ? "text-red-400" : "text-green-500"}`}>
+      {resultadoEpic === "error" ? `✕ ${t(`ajustesPlataformas.epicOficial.motivo.${motivoFallo}`)}` : `✓ ${t("ajustesPlataformas.epicExt.sincronizada")}`}
+    </p>
+  );
+
+  // Los logros solo llegan con la extensión (Epic bloquea al servidor): el
+  // paso que toca lo decide ExtensionEpic según esté instalada o no.
   const avisoEpic = (
     <div className="mb-4 rounded-xl border border-border bg-[var(--surface-2)] p-4">
       <p className="font-heading text-sm font-bold">{t("ajustesPlataformas.epicExt.titulo")}</p>
-      <ol className="mt-2 list-decimal space-y-1 pl-5 text-[0.8125rem] text-muted">
-        <li>{t("ajustesPlataformas.epicExt.paso1")}</li>
-        <li>{t("ajustesPlataformas.epicExt.paso2")}</li>
-        <li>{t("ajustesPlataformas.epicExt.paso3")}</li>
-      </ol>
-      <Link href="/movil/enlazar-extension" className="mt-3 inline-block rounded-md px-1 text-[0.8125rem] font-bold text-[var(--accent-text)] hover:bg-[var(--accent-soft)] hover:underline">
-        {t("ajustesPlataformas.epicExt.conectar")} →
-      </Link>
+      {epic && !epicConLogros && <p className="mt-1 text-[0.8125rem] font-semibold text-[var(--gold)]">{t("ajustesPlataformas.epicExt.pendientes")}</p>}
+      <div className="mt-3">
+        <ExtensionEpic epicId={idParaPaginaDeLogros(epic?.accountId)} urlTienda={process.env.NEXT_PUBLIC_EXTENSION_STORE_URL?.trim() || null} />
+      </div>
       <p className="mt-3 flex items-start gap-2 text-xs text-muted">
         <ShieldQuestion size={14} className="mt-0.5 shrink-0 text-[var(--gold)]" aria-hidden="true" />
         {tDeclarado("aviso")}
@@ -347,6 +358,7 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
         </PlatformSection>
 
         <PlatformSection platform="epic" account={epic} t={t} verificada={epicConfirmada}>
+          {resultadoDeEpic}
           {verificarEpic}
           {avisoEpic}
           <details className="group">

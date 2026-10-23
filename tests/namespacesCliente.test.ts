@@ -6,7 +6,8 @@ import { describe, expect, it } from "vitest";
 // con textos lleva su <TextosRuta>.
 describe("textos por ruta", () => {
   it("el archivo generado está al día", () => {
-    const r = spawnSync("npx", ["tsx", "scripts/textos-por-ruta.mts", "--comprobar"], { encoding: "utf8" });
+    // En Windows npx es npx.cmd: sin shell, spawnSync no lo encuentra.
+    const r = spawnSync("npx", ["tsx", "scripts/textos-por-ruta.mts", "--comprobar"], { encoding: "utf8", shell: process.platform === "win32" });
     expect(r.stderr.trim()).toBe("");
     expect(r.status).toBe(0);
   }, 120_000);
