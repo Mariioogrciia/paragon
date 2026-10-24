@@ -1,11 +1,12 @@
 import { cache } from "react";
-import NextAuth, { type Account } from "next-auth";
+import NextAuth, { customFetch, type Account } from "next-auth";
 import Discord from "next-auth/providers/discord";
 import Google from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { and, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
+import { fetchEpic, URL_TOKEN_EPIC } from "@/lib/epicToken";
 
 /**
  * Vincula Google/Discord a la cuenta de Paragon que YA tiene sesión
@@ -170,7 +171,10 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
             // Auth.js sigue disponible con AUTH_EPIC_REDIRECT_PROXY_URL.
             redirectProxyUrl: proxyRedireccionEpic(),
             authorization: { url: "https://www.epicgames.com/id/authorize", params: { scope: "basic_profile" } },
-            token: "https://api.epicgames.dev/epic/oauth/v2/token",
+            token: URL_TOKEN_EPIC,
+            // El secreto, sin codificar en la cabecera Basic: Auth.js lo
+            // codifica y Epic rechaza un secreto con "/" o "+" (lib/epicToken.ts).
+            [customFetch]: fetchEpic(process.env.AUTH_EPIC_ID, process.env.AUTH_EPIC_SECRET),
             userinfo: {
               url: "https://api.epicgames.dev/epic/id/v2/accounts",
               async request({ tokens }: { tokens: { access_token?: string; account_id?: unknown } }) {
