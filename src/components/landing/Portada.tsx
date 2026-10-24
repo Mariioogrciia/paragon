@@ -388,6 +388,6 @@ export async function Landing() {
 // La portada, con su URL canónica (sin ?parámetros ni la dirección vieja).
 export const metadatosPortada = metaPublica(
   "/",
-  "Paragon · Trofeos de PlayStation y logros de Steam y Xbox",
-  "Todos tus trofeos de PlayStation y logros de Steam y Xbox en un solo perfil: platinos, rareza, estadísticas, ligas con amigos y guías. Gratis, en la web y en el móvil.",
+  "Paragon · Trofeos y logros de PlayStation, Steam, Xbox y Epic",
+  "Tus trofeos y logros de PlayStation, Steam, Xbox y Epic en un solo perfil: platinos, rareza, ligas con amigos y guías. Gratis, en la web y en el móvil.",
 );

@@ -15,7 +15,10 @@
 type Json = Record<string, unknown>;
 
 const NOMBRE = "Paragon";
-const DESCRIPCION_ES = "Todos tus trofeos de PlayStation, Steam y Xbox en un solo sitio: progreso, platinos, ligas y amigos.";
+// "Paragon" a secas es un nombre muy repartido (un juego de Epic, empresas…):
+// sin alternativas, Google enseñaba "paragontrophies.com" como nombre del sitio.
+const NOMBRES_ALTERNATIVOS = ["Paragon Trophies", "paragontrophies.com"];
+const DESCRIPCION_ES = "Todos tus trofeos y logros de PlayStation, Steam, Xbox y Epic en un solo sitio: progreso, platinos, ligas y amigos.";
 
 /** El sitio y quien lo hace (en el layout raíz, todas las páginas). */
 export function datosSitio(dominio: string, perfilesDelAutor: string[]): Json {
@@ -26,6 +29,7 @@ export function datosSitio(dominio: string, perfilesDelAutor: string[]): Json {
         "@type": "WebSite",
         "@id": `${dominio}/#sitio`,
         name: NOMBRE,
+        alternateName: NOMBRES_ALTERNATIVOS,
         url: `${dominio}/`,
         description: DESCRIPCION_ES,
         inLanguage: ["es", "en", "de", "fr", "it", "pt"],

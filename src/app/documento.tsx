@@ -52,10 +52,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 // Lo que enseña Google bajo el título (21 oct 2026): con las palabras que
-// busca la gente ("trofeos", "logros", "platino") y las tres plataformas.
-const TITULO = "Paragon · Trofeos de PlayStation y logros de Steam y Xbox";
+// busca la gente ("trofeos", "logros", "platino") y las cuatro plataformas.
+const TITULO = "Paragon · Trofeos y logros de PlayStation, Steam, Xbox y Epic";
 const DESCRIPCION =
-  "Todos tus trofeos de PlayStation y logros de Steam y Xbox en un solo perfil: platinos, rareza, estadísticas, ligas con amigos y guías. Gratis, en la web y en el móvil.";
+  "Tus trofeos y logros de PlayStation, Steam, Xbox y Epic en un solo perfil: platinos, rareza, ligas con amigos y guías. Gratis, en la web y en el móvil.";
 
 /**
  * `metadataBase` NO es opcional en cuanto hay imagenes sociales: sin el,
