@@ -21,7 +21,7 @@
  *     60 días: desde ahora la sincronización los apunta sola (lib/sync.ts),
  *     con el mismo id determinista, así que repetir el script no duplica.
  *
- *   npx tsx scripts/crear-tablas-auditoria-3.mts
+ *   npx tsx scripts/migraciones/crear-tablas-auditoria-3.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

@@ -1956,7 +1956,7 @@ origin/master..HEAD` antes de asumir que hay algo sin subir.
   `notification` para la estadística "avisos generados" de `/admin` —
   se congeló ese número a mano (`AVISOS_CONGELADOS`, lib/admin.ts) antes
   de borrar la tabla, para no dejar esa página rota.
-  `scripts/borrar-notification-y-webhook.mts` ya ejecutado contra la
+  `scripts/migraciones/borrar-notification-y-webhook.mts` ya ejecutado contra la
   base real.
 
 ### 3 bugs reportados probando en el navegador de verdad — 1 real, 2 falsas alarmas ya explicadas
@@ -4333,7 +4333,7 @@ vivo.**
 
 ### Rendimiento
 
-- **5 índices nuevos** en producción (`scripts/anadir-indices-rendimiento.mts`,
+- **5 índices nuevos** en producción (`scripts/migraciones/anadir-indices-rendimiento.mts`,
   ya ejecutado): `user_game`/`user_trophy` por `gameId` solo (la PK
   compuesta no servía para eso, y hay 10+ sitios que filtran así — stats de
   un juego, reseñas, recomendaciones, Descubrir...), y `activity` por
@@ -4541,7 +4541,7 @@ Antes `resolveAvatarUrl`/`avatarUrlSql` no distinguían "subiste una foto tú
 mismo" de "esta es la que puso Google/Discord al entrar la primera vez" —
 las dos viven en la misma columna `users.image`. Columna nueva
 `users.avatarPersonalizado` (migración ejecutada:
-`scripts/anadir-avatar-personalizado.mts`), que `/api/upload` marca a
+`scripts/migraciones/anadir-avatar-personalizado.mts`), que `/api/upload` marca a
 `true` solo al subir un avatar a mano. `resolveAvatarUrl` (profiles.ts) y
 `avatarUrlSql` (avatarSql.ts, firma cambiada — ahora pide también esa
 columna, revisar cualquier llamada nueva) le dan prioridad sobre PSN solo
@@ -4577,7 +4577,7 @@ primero).
 ### Guías de trofeo escritas en la plataforma
 Antes `TrophyGuideModal` en su pestaña "Guía escrita" solo mandaba a buscar
 en Google/Vandal/Meristation/3DJuegos. Tabla nueva `trophy_guide`
-(migración ejecutada: `scripts/crear-tabla-guias-trofeo.mts`; una fila por
+(migración ejecutada: `scripts/migraciones/crear-tabla-guias-trofeo.mts`; una fila por
 usuario+juego+trofeo, `upsert` al reescribir, no duplica) — `lib/trophyGuides.ts`,
 acciones en `actions.ts`. La pestaña ahora enseña las guías reales de la
 comunidad para ese trofeo y deja escribir/editar la tuya; los enlaces de
@@ -4720,7 +4720,7 @@ rompería en producción, son enlaces reales a una búsqueda de Google (con
 - **Tendencias, Joyas Ocultas, Por género y buscador global** añadidos a lo
   que ya había (recomendado por biblioteca). `lib/discover.ts`, nuevo.
   "Tendencias" necesitó columna nueva **`user_game.createdAt`**
-  (`scripts/anadir-createdat-user-game.mts`, **ya ejecutada** — antes solo
+  (`scripts/migraciones/anadir-createdat-user-game.mts`, **ya ejecutada** — antes solo
   existían `lastPlayedAt`/`trophiesSyncedAt`, que no dicen lo mismo). Las
   filas de antes de la migración quedaron todas con la misma fecha, así
   que Tendencias no dirá nada útil hasta que pase un tiempo de uso real —
@@ -4814,7 +4814,7 @@ pasada, sin repasarlo a fondo)
   `app/manifest.ts`, `/offline`) — el manifest estaba roto, ver arriba; el
   resto no se ha auditado.
 - **`igdbId` en `games` + scripts de unificación**
-  (`scripts/anadir-igdbid-juegos.mts`, `scripts/unificar-catalogo.mts`) —
+  (`scripts/migraciones/anadir-igdbid-juegos.mts`, `scripts/migraciones/unificar-catalogo.mts`) —
   el punto 1 de "Pendiente" de más abajo parece que ya está en marcha o
   hecho, no solo "sin tocar" como decía este documento. **Sin confirmar si
   esos scripts ya se ejecutaron contra producción** — comprobar antes de
@@ -4856,7 +4856,7 @@ cerraron los huecos reales:
 - **Orden de secciones del perfil, arrastrable** (`Reorder` de
   framer-motion, que ya estaba instalado — sin dependencia nueva). Columna
   nueva `users.profileSectionOrder` (jsonb), migrada con
-  `scripts/anadir-orden-secciones-perfil.mts` (mismo patrón que las demás:
+  `scripts/migraciones/anadir-orden-secciones-perfil.mts` (mismo patrón que las demás:
   SQL explícito, no `db:push` — **ya ejecutado contra producción**).
   `lib/profileSections.ts` tiene las claves y el orden por defecto;
   `normalizeSectionOrder()` rellena con lo que falte si se añade una

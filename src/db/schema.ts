@@ -237,7 +237,7 @@ export const platformAccounts = pgTable(
  * cuenta solo para el FIFA. Sus juegos y logros se suman a la misma
  * biblioteca (ver lib/steamExtra.ts). De momento solo para el desarrollador.
  * La tabla la crea `asegurarTablaSteamExtra()` la primera vez (o el script
- * scripts/crear-tabla-steam-extra.mts).
+ * scripts/migraciones/crear-tabla-steam-extra.mts).
  */
 export const steamAccountExtra = pgTable(
   "steam_account_extra",
@@ -260,7 +260,7 @@ export const steamAccountExtra = pgTable(
  * @deprecated Sustituida por `platformAccounts`.
  *
  * Se queda definida solo para que `db:push` no la borre antes de que
- * `scripts/migrar-multiplataforma.mts` copie las filas a la tabla nueva.
+ * `scripts/migraciones/migrar-multiplataforma.mts` copie las filas a la tabla nueva.
  * Una vez migrado, se puede borrar de aquí y volver a hacer push.
  */
 export const psnProfiles = pgTable(
@@ -483,7 +483,7 @@ export const userGames = pgTable(
     // La PK (userId, gameId) no sirve para buscar solo por gameId — y hay
     // más de 10 sitios que lo hacen (estadísticas de un juego, reseñas,
     // recomendaciones, Descubrir...). Creado con SQL explícito
-    // (scripts/anadir-indices-rendimiento.mts), esto es solo para que
+    // (scripts/migraciones/anadir-indices-rendimiento.mts), esto es solo para que
     // drizzle-kit no proponga borrarlo.
     index("user_game_gameId_idx").on(t.gameId),
   ],
@@ -799,7 +799,7 @@ export const trophyCaseAwards = pgTable(
  * todo esa sesión), y esta vez sí con confirmación explícita del usuario
  * tras comprobar que había 8 filas reales (congeladas ahora en
  * `AVISOS_CONGELADOS`, lib/admin.ts) y no una tabla vacía. Ver
- * scripts/borrar-notification-y-webhook.mts para el DROP real.
+ * scripts/migraciones/borrar-notification-y-webhook.mts para el DROP real.
  */
 
 /* ------------------------------------------------------------------ *
@@ -914,7 +914,7 @@ export const trophyGuides = pgTable(
  * pedírselo en otro idioma, la primera vez que alguien con ese idioma *
  * abre el juego. Nada de traducción automática. Ver                   *
  * lib/trofeosIdioma.ts. Creadas con                                   *
- * scripts/crear-tablas-traducciones-trofeo.mts (RLS activado).        *
+ * scripts/migraciones/crear-tablas-traducciones-trofeo.mts (RLS activado).        *
  * ------------------------------------------------------------------ */
 export const gameTrophyI18n = pgTable(
   "game_trophy_i18n",
@@ -1072,7 +1072,7 @@ export const clanInvites = pgTable("clan_invite", {
 /**
  * Contadores del limitador de peticiones (lib/rateLimit.ts): una fila por
  * clave (`<acción>:<usuario o IP>`), ventana fija. Tabla creada con
- * `scripts/crear-tabla-rate-limit.mts` (SQL explícito, no `db:push`); el
+ * `scripts/migraciones/crear-tabla-rate-limit.mts` (SQL explícito, no `db:push`); el
  * cron borra las filas viejas.
  */
 export const rateLimits = pgTable("rate_limit", {
@@ -1084,7 +1084,7 @@ export const rateLimits = pgTable("rate_limit", {
 /*
  * Tablas de las funciones del 28 sept 2026 (alertas de precio, objetivos con
  * fecha, resumen semanal y guerras de clanes). Creadas con
- * `scripts/crear-tablas-funciones-nuevas.mts`. Nuevas a propósito — ver el
+ * `scripts/migraciones/crear-tablas-funciones-nuevas.mts`. Nuevas a propósito — ver el
  * comentario de ese script.
  */
 
@@ -1180,7 +1180,7 @@ export const clanWars = pgTable("clan_war", {
   puntosRetado: integer("puntosRetado"),
 });
 
-/* Segunda tanda (29 sept 2026) — `scripts/crear-tablas-funciones-nuevas-2.mts`. */
+/* Segunda tanda (29 sept 2026) — `scripts/migraciones/crear-tablas-funciones-nuevas-2.mts`. */
 
 /** Último puesto conocido en la liga del mes (clave "2026-09"), para "te han adelantado". */
 export const leaguePositions = pgTable(
@@ -1315,7 +1315,7 @@ export const seasonResults = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.temporada] })],
 );
 
-/** Juegos cuyas horas ignora el usuario (lib/horasIgnoradas.ts) — `scripts/crear-tabla-horas-ignoradas.mts`. */
+/** Juegos cuyas horas ignora el usuario (lib/horasIgnoradas.ts) — `scripts/migraciones/crear-tabla-horas-ignoradas.mts`. */
 export const playtimeIgnored = pgTable(
   "playtime_ignored",
   {
@@ -1330,7 +1330,7 @@ export const playtimeIgnored = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.gameId] })],
 );
 
-/** Total de horas de cada juego, un registro por día en que cambia (lib/horasPeriodo.ts) — `scripts/crear-tabla-registro-horas.mts`. */
+/** Total de horas de cada juego, un registro por día en que cambia (lib/horasPeriodo.ts) — `scripts/migraciones/crear-tabla-registro-horas.mts`. */
 export const playtimeSnapshots = pgTable(
   "playtime_snapshot",
   {
@@ -1346,7 +1346,7 @@ export const playtimeSnapshots = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.gameId, t.fecha] })],
 );
 
-/** Misiones semanales cumplidas, con la XP que suman al nivel (lib/missions.ts) — `scripts/crear-tablas-auditoria-3.mts`. */
+/** Misiones semanales cumplidas, con la XP que suman al nivel (lib/missions.ts) — `scripts/migraciones/crear-tablas-auditoria-3.mts`. */
 export const missionCompletions = pgTable(
   "mission_completion",
   {
@@ -1366,7 +1366,7 @@ export const missionCompletions = pgTable(
  * Equipos de eSports que sigue cada usuario (/esports): filtro "Mis equipos",
  * franja de favoritos y noticias de esos equipos. Se guarda nombre y escudo
  * para pintarlos sin volver a pedir PandaScore. Tabla creada con
- * `scripts/crear-tabla-esports-favoritos.mts`.
+ * `scripts/migraciones/crear-tabla-esports-favoritos.mts`.
  */
 export const esportsFavoritos = pgTable(
   "esports_favorito",

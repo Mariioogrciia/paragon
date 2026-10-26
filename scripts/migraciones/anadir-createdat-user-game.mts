@@ -9,7 +9,7 @@
  * ya estaba, así que Tendencias empezará plana hasta que pase un tiempo de
  * uso real.
  *
- *   npx tsx scripts/anadir-createdat-user-game.mts
+ *   npx tsx scripts/migraciones/anadir-createdat-user-game.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

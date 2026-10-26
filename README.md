@@ -179,17 +179,24 @@ flowchart LR
 │   │   └── api/        Cron, app móvil, extensión, Discord, OG…
 │   ├── components/     Componentes de React
 │   ├── lib/            Lógica: un cliente por plataforma, sincronización, estadísticas…
+│   ├── i18n/           Configuración de idiomas y qué textos van a cada página
 │   ├── db/             Esquema de la base de datos (Drizzle)
 │   └── proxy.ts        Reparte entre páginas públicas y con sesión
 ├── messages/           Traducciones de la web (6 idiomas por namespace)
-├── kmp/                Apps nativas de Android e iOS
+├── kmp/                Apps nativas de Android e iOS (Kotlin Multiplatform)
 ├── extension/          Extensión de navegador (PlayStation y Epic)
-├── video/              Vídeo de promoción (Remotion)
-├── scripts/            Utilidades: copia de seguridad, comandos de Discord…
+├── video/              Vídeo de promoción y gráficos de las tiendas (Remotion)
+├── scripts/            Herramientas: copia de seguridad, empaquetar la extensión…
+│   └── migraciones/    Cambios de la base de datos aplicados a mano, uno por archivo
 ├── tests/              Pruebas (Vitest)
-├── docs/               Historial, diseño, producto y hallazgos
-└── HANDOFF.md          Estado actual del proyecto y qué falta
+├── public/             Logo, iconos y archivos estáticos
+├── docs/               Estado del proyecto, historial, diseño y producto
+└── .github/workflows/  CI, apps, publicación en tiendas, copias de seguridad
 ```
+
+Los archivos sueltos de la raíz son la configuración que Next.js, TypeScript,
+ESLint, Vitest, Drizzle y Vercel buscan ahí, y `AGENTS.md`/`CLAUDE.md`, las
+instrucciones para los asistentes de código.
 
 ## 🚀 Puesta en marcha
 
@@ -240,6 +247,7 @@ Al desplegar, registra las URL de redirección de OAuth con el dominio real.
 | `npm test` | Pruebas con Vitest |
 | `npm run test:namespaces` | Comprueba que todas las traducciones que usa el cliente se envían |
 | `npm run db:push` · `npm run db:studio` | Aplicar el esquema · explorar la base de datos |
+| `npm run extension:zip` | Empaqueta la extensión para descargarla o subirla a la Chrome Web Store |
 
 Las apps nativas se compilan desde `kmp/` con Gradle y Xcode. En GitHub Actions se compilan solas y se publican en las tiendas.
 
@@ -247,11 +255,13 @@ Las apps nativas se compilan desde `kmp/` con Gradle y Xcode. En GitHub Actions 
 
 | Documento | Contenido |
 |---|---|
-| [`HANDOFF.md`](HANDOFF.md) | **Empieza aquí**: estado actual, qué falta y reglas del proyecto |
+| [`docs/HANDOFF.md`](docs/HANDOFF.md) | **Empieza aquí**: estado actual, qué falta y reglas del proyecto |
 | [`docs/HISTORIAL.md`](docs/HISTORIAL.md) | Todo lo que se ha hecho y por qué, de lo más nuevo a lo más viejo |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Sistema de diseño de la web |
 | [`docs/PRODUCT.md`](docs/PRODUCT.md) · [`docs/CONTEXTO.md`](docs/CONTEXTO.md) | Producto, usuarios y visión |
 | [`docs/HALLAZGOS.md`](docs/HALLAZGOS.md) | Lo que se descubrió al conectar las plataformas de verdad |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) · [`docs/PLAN-NATIVA.md`](docs/PLAN-NATIVA.md) | Lo que viene y el plan de las apps nativas |
+| [`docs/CHROME-WEB-STORE.md`](docs/CHROME-WEB-STORE.md) | Ficha y permisos para publicar la extensión |
 | [`kmp/MIGRACION.md`](kmp/MIGRACION.md) | Las apps nativas en Kotlin Multiplatform |
 | [`extension/README.md`](extension/README.md) | La extensión de navegador |
 

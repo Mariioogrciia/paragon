@@ -3,7 +3,7 @@ name: Publicar en las tiendas
 # Builds firmadas para Google Play (AAB) y App Store / TestFlight (iOS). Solo
 # a mano (Actions → "Publicar en las tiendas" → Run workflow). Las claves van
 # en los secretos del repo (Settings → Secrets and variables → Actions), nunca
-# en el código; ver la lista en HANDOFF.md ("Publicar en las tiendas").
+# en el código; ver la lista en docs/HANDOFF.md ("Publicar en las tiendas").
 #
 # Android sin secretos sale igual, pero sin firmar: sirve para comprobar que
 # la build de release (R8) compila, no para subirla a Play.
@@ -72,7 +72,7 @@ jobs:
         run: rm -f "$RUNNER_TEMP/paragon-release.jks"
 
       # Subida a Google Play (16 oct 2026). Necesita el JSON de una cuenta de
-      # servicio con acceso a la app en Play Console (ver HANDOFF.md,
+      # servicio con acceso a la app en Play Console (ver docs/HANDOFF.md,
       # "Publicar en Google Play") y el AAB firmado: sin cualquiera de los
       # dos, este paso se salta y el AAB queda solo como artefacto. Las
       # novedades salen de kmp/play/novedades/whatsnew-<idioma>.
@@ -126,7 +126,7 @@ jobs:
             [ -n "${!v}" ] || faltan="$faltan $v"
           done
           if [ -n "$faltan" ]; then
-            echo "::error::Faltan secretos de Apple:$faltan (ver HANDOFF.md, 'Publicar en las tiendas')."
+            echo "::error::Faltan secretos de Apple:$faltan (ver docs/HANDOFF.md, 'Publicar en las tiendas')."
             exit 1
           fi
 

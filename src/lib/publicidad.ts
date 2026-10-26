@@ -15,7 +15,7 @@
  *
  * El banner en sí (textos, botones, idiomas) se configura en AdSense →
  * Privacidad y mensajes → "Reglamentos europeos" y se publica desde allí;
- * aquí solo se carga su etiqueta. Ver la guía en HANDOFF.md.
+ * aquí solo se carga su etiqueta. Ver la guía en docs/HANDOFF.md.
  *
  * Son `NEXT_PUBLIC_` porque las lee también el navegador (el hueco de cada
  * anuncio); no son secretos: el ID de editor sale en el HTML de cualquier

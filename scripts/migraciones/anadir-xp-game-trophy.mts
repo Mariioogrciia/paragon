@@ -7,7 +7,7 @@
  * `db:push` (mismo motivo de siempre: no darle a una herramienta la
  * ocasión de proponer cambios sobre toda la base de producción).
  *
- *   npx tsx scripts/anadir-xp-game-trophy.mts
+ *   npx tsx scripts/migraciones/anadir-xp-game-trophy.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

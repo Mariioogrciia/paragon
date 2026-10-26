@@ -12,7 +12,7 @@
  * Mismo criterio que `crear-tablas-funciones-nuevas.mts`: solo tablas
  * nuevas, idempotente, con RLS y sin permisos para anon/authenticated.
  *
- *   npx tsx scripts/crear-tablas-funciones-nuevas-2.mts
+ *   npx tsx scripts/migraciones/crear-tablas-funciones-nuevas-2.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

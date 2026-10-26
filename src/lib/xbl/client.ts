@@ -12,7 +12,7 @@ import { gameKey, type Game, type Trophy } from "@/lib/types";
  * de servidor — mismo modelo que PSN_NPSSO/STEAM_API_KEY en la forma de
  * usarlo, pero **no** en la garantía: no es de Microsoft, puede romperse,
  * cambiar de condiciones o cerrar sin avisar. Riesgo asumido a propósito
- * (ver HANDOFF.md), no un descuido.
+ * (ver docs/HANDOFF.md), no un descuido.
  *
  * Todo esto se comprobó a mano contra la API real antes de escribir el
  * código (gamertag "TalkyLicense530", 4 de septiembre de 2026):

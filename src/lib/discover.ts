@@ -39,7 +39,7 @@ function parseGenres(raw: string | null): string[] {
  * últimos `dias` — la sensación de "esto está vivo ahora mismo".
  *
  * Depende de `userGames.createdAt` (migrada en
- * scripts/anadir-createdat-user-game.mts): las filas de antes de esa
+ * scripts/migraciones/anadir-createdat-user-game.mts): las filas de antes de esa
  * migración quedaron todas con la misma fecha, así que esto no dirá nada
  * útil hasta que pase un tiempo de uso real — es preferible a inventar una
  * fecha de alta que no se puede saber.

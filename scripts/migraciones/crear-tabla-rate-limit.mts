@@ -5,7 +5,7 @@
  *
  * RLS activado de paso, igual que el resto tras `activar-rls.mts`.
  *
- *   npx tsx scripts/crear-tabla-rate-limit.mts
+ *   npx tsx scripts/migraciones/crear-tabla-rate-limit.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

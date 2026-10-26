@@ -1,7 +1,7 @@
 import { isNull, eq } from "drizzle-orm";
-import { db } from "../src/db";
-import { games } from "../src/db/schema";
-import { matchIgdbGames } from "../src/lib/igdb/client";
+import { db } from "../../src/db";
+import { games } from "../../src/db/schema";
+import { matchIgdbGames } from "../../src/lib/igdb/client";
 
 // MODO DRY-RUN: pon esto a false para escribir realmente en la BD
 const DRY_RUN = false;

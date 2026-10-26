@@ -193,7 +193,7 @@ const { handlers, auth: uncachedAuth, signIn, signOut } = NextAuth(() => ({
         ]
       : []),
     // Google Play y Ubisoft Connect se quitaron el 11 de septiembre de 2026
-    // (ninguna llegó a tener sincronización real de logros): HANDOFF.md.
+    // (ninguna llegó a tener sincronización real de logros): docs/HANDOFF.md.
   ],
   pages: {
     signIn: "/entrar",

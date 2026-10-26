@@ -6,7 +6,7 @@
  * motivo que `crear-tablas-nuevas.mts`). Con `ADD COLUMN IF NOT EXISTS` se
  * puede volver a ejecutar sin miedo.
  *
- *   npx tsx scripts/anadir-orden-secciones-perfil.mts
+ *   npx tsx scripts/migraciones/anadir-orden-secciones-perfil.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

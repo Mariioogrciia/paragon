@@ -15,7 +15,7 @@
  * Idempotente (IF NOT EXISTS). RLS activado y sin permisos para
  * anon/authenticated, igual que el resto tras `activar-rls.mts`.
  *
- *   npx tsx scripts/crear-tablas-funciones-nuevas.mts
+ *   npx tsx scripts/migraciones/crear-tablas-funciones-nuevas.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

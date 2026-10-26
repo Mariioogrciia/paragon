@@ -13,7 +13,7 @@ export { trophyScore } from "@/lib/trophyScore";
  * nivel Paragon que ya existe (`lib/level.ts`, `paragonProgress`): ese solo
  * cuenta metales de PSN (`game.earned`) y ya está enganchado en la navbar,
  * la tarjeta del perfil y el Wrap con un histórico de bugs de
- * desincronización entre esos tres sitios (ver HANDOFF.md) — tocarlo a
+ * desincronización entre esos tres sitios (ver docs/HANDOFF.md) — tocarlo a
  * fondo para meter Xbox/Steam ahí es un riesgo real que no hace falta
  * correr. Esto es una cifra NUEVA y aparte, pensada para comparar entre
  * plataformas de verdad.

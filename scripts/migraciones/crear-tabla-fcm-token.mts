@@ -12,7 +12,7 @@
  * Ya ejecutada contra producción el 16 de septiembre de 2026 — se deja
  * aquí por si hace falta recrearla en otro entorno, no para repetirla.
  *
- *   npx tsx scripts/crear-tabla-fcm-token.mts
+ *   npx tsx scripts/migraciones/crear-tabla-fcm-token.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

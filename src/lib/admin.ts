@@ -18,7 +18,7 @@ import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 
 /**
  * "Avisos generados": congelado a mano en 8 (0 en los últimos 7 días) —
- * eran los del sistema de campana que se quitó del todo (ver HANDOFF.md,
+ * eran los del sistema de campana que se quitó del todo (ver docs/HANDOFF.md,
  * sesión del 9 de septiembre de 2026). La tabla `notification` se borró
  * en el repaso de limpieza del 10 de septiembre: ya no hay de dónde
  * volver a contar esto, así que se congela en el número real que tenía

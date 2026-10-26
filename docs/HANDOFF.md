@@ -4,8 +4,8 @@ Estado del proyecto para retomarlo sin releer nada más. Última
 actualización: **21 de octubre de 2026**.
 
 Lo de cada día (qué se hizo, por qué y con qué commits) está en
-[`docs/HISTORIAL.md`](docs/HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
-antes del 23 sept, en [`docs/historial/`](docs/historial/). Antes de dar
+[`docs/HISTORIAL.md`](HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
+antes del 23 sept, en [`docs/historial/`](historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
 ## Dónde estamos (21 oct 2026) · leer primero
@@ -85,7 +85,7 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
    de www desde el principio y cambiar `AUTH_EPIC_ID`/`AUTH_EPIC_SECRET`
    (sin probar si el bloqueo de la aplicación le afecta).
 0. **Extensión en la Chrome Web Store** (23 oct): ficha y permisos listos
-   para copiar en [`docs/CHROME-WEB-STORE.md`](docs/CHROME-WEB-STORE.md);
+   para copiar en [`docs/CHROME-WEB-STORE.md`](CHROME-WEB-STORE.md);
    paquete `public/descargas/paragon-extension.zip`. Alta de desarrollador
    (5 $), subir, enviar a revisión y, publicada, poner
    `NEXT_PUBLIC_EXTENSION_STORE_URL` en Vercel.
@@ -571,7 +571,7 @@ verdad:
    días sin confirmarlo.
 2. ~~Compartir el Wrap como imagen~~ → hecho el 3 de septiembre de 2026, con
    `ImageResponse` de `next/og` (ya viene con Next, no hizo falta el paquete
-   `@vercel/og` suelto). Ruta [`/api/wrap/[handle]`](src/app/api/wrap/%5Bhandle%5D/route.tsx),
+   `@vercel/og` suelto). Ruta [`/api/wrap/[handle]`](../src/app/api/wrap/%5Bhandle%5D/route.tsx),
    1200×630, mismas tres tarjetas que `ParagonWrap` con los mismos números
    (`juegoDestacado`/`generoTop` se exportaron desde ahí para no duplicar la
    cuenta). Botón "Compartir imagen" en la cabecera del Wrap del perfil.
@@ -599,26 +599,26 @@ verdad:
 
 **Fallos conocidos, arreglados el 3 de septiembre de 2026:**
 - ~~Xbox, Epic y Ubisoft son vinculables pero no existen~~ → sus `resolve*`
-  ([profiles.ts](src/lib/profiles.ts)) ahora devuelven `legible: false` (igual
+  ([profiles.ts](../src/lib/profiles.ts)) ahora devuelven `legible: false` (igual
   Google, que tampoco tiene lector real), y `syncLibrary`
-  ([sync.ts](src/lib/sync.ts)) corta explícito si la plataforma no es `psn` ni
+  ([sync.ts](../src/lib/sync.ts)) corta explícito si la plataforma no es `psn` ni
   `steam`, por si algo vuelve a marcar `isPublic` sin querer. Ya no se le pide
   la biblioteca a Steam con un gamertag de Xbox. Se sigue pudiendo vincular la
   cuenta (queda guardada y visible), simplemente no sincroniza — que es lo que
   la propia UI ya decía ("en fase de desarrollo").
 - ~~`unlinkAccountAction` solo desvincula PSN y Steam~~ → ahora acepta las seis
-  plataformas ([actions.ts](src/app/actions.ts)).
+  plataformas ([actions.ts](../src/app/actions.ts)).
 - ~~El cron por hora no despliega en plan Hobby~~ (Vercel: "Hobby accounts are
   limited to daily cron jobs") → `vercel.json` a `0 3 * * *` y lotes por
-  pasada más grandes en [route.ts](src/app/api/cron/sync/route.ts), para
+  pasada más grandes en [route.ts](../src/app/api/cron/sync/route.ts), para
   aprovechar la única ejecución diaria.
 - ~~El nivel Paragon no cuadraba entre la navbar y la tarjeta del perfil~~ →
-  [`lib/level.ts`](src/lib/level.ts) calculaba `platinos` (XP de los
+  [`lib/level.ts`](../src/lib/level.ts) calculaba `platinos` (XP de los
   platinos) y no lo sumaba al `total`, así que cualquiera con algún platino
   veía un nivel más bajo bajo el Wrap que en la navbar (`lib/paragonLevel.ts`,
   que sí lo suma). De paso arregla el propio donut de la tarjeta, que reparte
   sus 360° entre trofeos/platinos/completados sobre ese mismo `total`.
-- ~~La app se sentía lenta~~ → `getLibrary` ([profiles.ts](src/lib/profiles.ts))
+- ~~La app se sentía lenta~~ → `getLibrary` ([profiles.ts](../src/lib/profiles.ts))
   reintentaba el PEGI en IGDB (cuatro oleadas, la última una consulta por
   título) para los mismos ~40 juegos **en cada carga de biblioteca**, porque
   solo marcaba `pegi` cuando IGDB devolvía algo y nunca cuando no encontraba
@@ -739,22 +739,22 @@ min", que GitHub convierte en cada 3-5 h. Las dos vías usan `CRON_SECRET`.
 herramienta la ocasión de proponer cambios sobre una base de producción.
 Recomendado seguir así con lo aditivo. Mismo patrón para las tablas de
 `game_difficulty_vote`, `game_guide`/`game_guide_reply` y, de esta sesión,
-`trophy_guide` (`scripts/crear-tabla-guias-trofeo.mts`): scripts en
+`trophy_guide` (`scripts/migraciones/crear-tabla-guias-trofeo.mts`): scripts en
 `scripts/crear-*.mts`, ya ejecutados contra producción. Igual para columnas
 sueltas: `users.profileSectionOrder`
-(`scripts/anadir-orden-secciones-perfil.mts`), `user_game.createdAt`
-(`scripts/anadir-createdat-user-game.mts`, para "Tendencias" en Descubrir) y,
+(`scripts/migraciones/anadir-orden-secciones-perfil.mts`), `user_game.createdAt`
+(`scripts/migraciones/anadir-createdat-user-game.mts`, para "Tendencias" en Descubrir) y,
 de esta sesión, `users.avatarPersonalizado`
-(`scripts/anadir-avatar-personalizado.mts`, decide si el avatar subido a
+(`scripts/migraciones/anadir-avatar-personalizado.mts`, decide si el avatar subido a
 mano gana a PSN), y de la sesión del 5 de septiembre,
-`game_trophy.xp` (`scripts/anadir-xp-game-trophy.mts`, Gamerscore real de
+`game_trophy.xp` (`scripts/migraciones/anadir-xp-game-trophy.mts`, Gamerscore real de
 Xbox para Paragon Score) — **todas ya ejecutadas contra producción**. Los 5
-índices de rendimiento (`scripts/anadir-indices-rendimiento.mts`:
+índices de rendimiento (`scripts/migraciones/anadir-indices-rendimiento.mts`:
 `user_game`/`user_trophy` por `gameId`, `activity` por `userId`/`gameId`,
 `activity_comment` por `activityId`) también, mismo día. Sin confirmar si
-`scripts/anadir-igdbid-juegos.mts` y `scripts/unificar-catalogo.mts` (de
+`scripts/migraciones/anadir-igdbid-juegos.mts` y `scripts/migraciones/unificar-catalogo.mts` (de
 Antigravity) llegaron a correrse — ver el punto 1 de "Pendiente". De esta
-sesión, `fcm_token` (`scripts/crear-tabla-fcm-token.mts`) — **ya ejecutada
+sesión, `fcm_token` (`scripts/migraciones/crear-tabla-fcm-token.mts`) — **ya ejecutada
 contra producción**. Ojo con este caso concreto: se intentó primero con
 `db:push` y drizzle-kit preguntó si truncar `push_subscription` (2 filas
 reales, gente con Web Push activado) para poder ponerle una restricción

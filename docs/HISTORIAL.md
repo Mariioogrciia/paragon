@@ -636,7 +636,7 @@ desarrollador, `esDesarrollador` en lib/profiles.ts):
 - La principal sigue en `platform_account`; las demás (hasta 3) en
   `steam_account_extra`, que la app crea sola la primera vez
   (`asegurarTablaSteamExtra`, lib/steamExtraDatos.ts) o con
-  `scripts/crear-tabla-steam-extra.mts`.
+  `scripts/migraciones/crear-tabla-steam-extra.mts`.
 - `syncLibrary` de Steam sincroniza después las extra: sus juegos van a la
   misma biblioteca. Los logros de un juego se piden con TODAS las cuentas y
   se juntan (`juntarLogros`, conseguido si lo tiene cualquiera, fecha más
@@ -1000,7 +1000,7 @@ Android e iOS en verde):
     otros partidos de la fase, cuenta atrás y `.ics` (`lib/pandascore.ts`
     → `getPandaScoreMatchDetail`).
   - **Favoritos**: tabla `esports_favorito` (creada en producción con
-    `scripts/crear-tabla-esports-favoritos.mts`). Noticias de tus equipos por
+    `scripts/migraciones/crear-tabla-esports-favoritos.mts`). Noticias de tus equipos por
     Google News RSS (`lib/esportsNews.ts`). Sin probar aún con sesión iniciada.
   - PandaScore: 1000 peticiones/hora y 429 por ráfaga; tablas de 2 en 2 y caché.
   - Pendiente: volver a la página tras entrar desde la estrella (`/entrar`
@@ -1197,7 +1197,7 @@ este bloque ya NO valen):**
   horas por periodo → moderación, logros, niveles y Comunidad (29-30 sept) →
   cuarta auditoría y lo que vino después (30 sept).
 - **Base de datos**: los cambios de esta última sesión están todos en
-  `scripts/crear-tablas-auditoria-3.mts` (idempotente, ya ejecutado en
+  `scripts/migraciones/crear-tablas-auditoria-3.mts` (idempotente, ya ejecutado en
   producción): `mission_completion`, columnas nuevas en `user`
   (`tituloDesbloqueado`, `apariencia`, `panelOculto`, `avisosDesactivados`,
   `efectoNombre`) y `activity.gameId` admitiendo null.
@@ -1247,11 +1247,11 @@ INSERT, UPDATE, DELETE, TRUNCATE) — con la clave `anon`, cualquiera
 habría podido leer `session`/`account` (tokens) o vaciar tablas. La
 clave no aparece en el repo ni en la app Android, así que no era
 explotable hoy, pero Supabase la trata como pública.
-`scripts/activar-rls.mts` lo cierra (RLS sin políticas + REVOKE + default
+`scripts/migraciones/activar-rls.mts` lo cierra (RLS sin políticas + REVOKE + default
 privileges). La app no se entera: se conecta como `postgres` (dueño de
 todas las tablas, BYPASSRLS — comprobado). El clasificador de permisos
 bloqueó ejecutarlo contra producción desde la sesión: lo tiene que lanzar
-el usuario (`npx tsx scripts/activar-rls.mts`).
+el usuario (`npx tsx scripts/migraciones/activar-rls.mts`).
 
 **Arreglado en código:**
 - `/api/profile/update`: el handle se guardaba sin validar (vacío, "/",
@@ -1354,8 +1354,8 @@ comprobó renderizando el componente aparte.
 
 **Pendiente de ejecutar por el usuario** (el clasificador bloquea escribir en
 la base de producción desde la sesión):
-- `npx tsx scripts/activar-rls.mts` — lo más grave, sigue abierto.
-- `npx tsx scripts/crear-tabla-rate-limit.mts` — hasta entonces el
+- `npx tsx scripts/migraciones/activar-rls.mts` — lo más grave, sigue abierto.
+- `npx tsx scripts/migraciones/crear-tabla-rate-limit.mts` — hasta entonces el
   limitador deja pasar todo (falla abierto, avisa una vez en los logs).
 
 **Hecho:**
@@ -1396,7 +1396,7 @@ la base de producción desde la sesión):
 ## Funciones nuevas (28 sept 2026, piloto automático)
 
 Las seis propuestas de la auditoría, en un solo push. **Tablas creadas en
-producción** con `scripts/crear-tablas-funciones-nuevas.mts` (esta vez el
+producción** con `scripts/migraciones/crear-tablas-funciones-nuevas.mts` (esta vez el
 clasificador sí dejó ejecutar un script solo aditivo) y también
 `crear-tabla-rate-limit.mts` → el limitador de peticiones ya está activo.
 `activar-rls.mts` sigue PENDIENTE (lo lanza el usuario).
@@ -1431,7 +1431,7 @@ clasificador sí dejó ejecutar un script solo aditivo) y también
 Otros: título de pestaña en la página de clan; importes en euros con el
 formato del idioma.
 
-**Actualización (28 sept 2026):** el usuario ejecutó `scripts/activar-rls.mts`.
+**Actualización (28 sept 2026):** el usuario ejecutó `scripts/migraciones/activar-rls.mts`.
 Comprobado después: 40 tablas en `public`, 0 sin RLS, 0 permisos de
 `anon`/`authenticated`; producción responde 200 en portada, perfiles, ficha
 de juego, clanes, Descubrir y API. La API REST de Supabase queda cerrada.
@@ -1443,7 +1443,7 @@ default privileges también quedaron retirados).
 ## Tercera tanda de funciones (29 sept 2026)
 
 Tablas nuevas creadas en producción con
-`scripts/crear-tablas-funciones-nuevas-2.mts` (league_position,
+`scripts/migraciones/crear-tablas-funciones-nuevas-2.mts` (league_position,
 boost_session, boost_participant, coop_challenge, showcase_shelf,
 season_result), todas con RLS.
 
@@ -1515,7 +1515,7 @@ cuadrícula, árbol, cronología y la ficha del trofeo.
 ## Moderación, logros, personalización por nivel y Comunidad (29-30 sept 2026)
 
 Tanda pedida por el usuario tras una "auditoría de logros/personalización/
-cosas fuera de sitio". Script `scripts/crear-tablas-auditoria-3.mts`, **ya
+cosas fuera de sitio". Script `scripts/migraciones/crear-tablas-auditoria-3.mts`, **ya
 ejecutado en producción** (solo añade): tabla `mission_completion` (RLS),
 columnas `user.tituloDesbloqueado` y `user.apariencia`, y 2 platinos
 recientes rellenados como `activity` tipo "platinum".
@@ -1585,7 +1585,7 @@ reiniciarlo lo arregla.
 ## Cuarta auditoría y mejoras (30 sept 2026)
 
 Pedida por el usuario tras revisar lo anterior ("repasa absolutamente todo").
-`scripts/crear-tablas-auditoria-3.mts` se volvió a ejecutar (idempotente)
+`scripts/migraciones/crear-tablas-auditoria-3.mts` se volvió a ejecutar (idempotente)
 para añadir `user.panelOculto`.
 
 **Hecho:**
@@ -2044,7 +2044,7 @@ plataforma lo da (solo PSN a veces da el progreso 35/36). Pendiente, si se
 quiere: listas de coleccionables escritas por la comunidad, y la API oficial de
 YouTube (filtra mejor por idioma pero pide clave y tiene cuota ~100 búsquedas
 nuevas/día) en lugar de leer el HTML. Tablas creadas con
-`scripts/crear-tablas-traducciones-trofeo.mts` (ya ejecutado, RLS activado).
+`scripts/migraciones/crear-tablas-traducciones-trofeo.mts` (ya ejecutado, RLS activado).
 
 ### Entorno local (Windows con Avast)
 - Avast (Web/Mail Shield) intercepta HTTPS con su propio certificado. El

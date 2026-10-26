@@ -6,7 +6,7 @@
  * en cada pasada, y así el dato de Sony se queda intacto (y se puede
  * deshacer). Con RLS, como el resto.
  *
- *   npx tsx scripts/crear-tabla-horas-ignoradas.mts
+ *   npx tsx scripts/migraciones/crear-tabla-horas-ignoradas.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

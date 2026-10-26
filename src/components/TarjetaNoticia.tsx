@@ -20,7 +20,7 @@ export async function TarjetaNoticia({ item, badge }: { item: NewsItem; badge?: 
       {/* overflow-hidden va aquí, no en el <a>: el <a> es quien lleva el
           hover:shadow-md, y el mismo elemento no puede recortar y proyectar
           sombra a la vez sin recortarse a sí mismo (misma trampa que
-          TiltCard — ver HANDOFF.md). También es quien de verdad necesita
+          TiltCard — ver docs/HANDOFF.md). También es quien de verdad necesita
           recortar, porque la imagen escala al 105% en hover. */}
       <div className="flex flex-col flex-1 overflow-hidden rounded-xl">
         {item.imageUrl ? (

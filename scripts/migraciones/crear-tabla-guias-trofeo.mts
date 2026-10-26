@@ -4,7 +4,7 @@
  * el esquema entero y es más arriesgado sobre producción que un CREATE
  * TABLE IF NOT EXISTS con alcance propio.
  *
- *   npx tsx scripts/crear-tabla-guias-trofeo.mts
+ *   npx tsx scripts/migraciones/crear-tabla-guias-trofeo.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

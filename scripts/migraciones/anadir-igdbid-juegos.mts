@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { db } from "../src/db";
+import { db } from "../../src/db";
 
 async function main() {
   console.log("Añadiendo columna 'igdbId' a la tabla 'game'...");

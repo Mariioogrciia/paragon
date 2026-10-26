@@ -1,11 +1,11 @@
 /**
  * Crea `steam_account_extra` (cuentas de Steam además de la principal, 15 oct
- * 2026), con RLS activado (regla de las tablas nuevas, ver HANDOFF.md).
+ * 2026), con RLS activado (regla de las tablas nuevas, ver docs/HANDOFF.md).
  * Idempotente. No hace falta ejecutarlo: la app la crea sola la primera vez
  * (`asegurarTablaSteamExtra` en lib/steamExtraDatos.ts); queda por si se
  * prefiere hacerlo a mano.
  *
- *   npx tsx scripts/crear-tabla-steam-extra.mts
+ *   npx tsx scripts/migraciones/crear-tabla-steam-extra.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

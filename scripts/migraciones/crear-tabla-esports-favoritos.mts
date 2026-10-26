@@ -2,7 +2,7 @@
  * Crea la tabla de equipos de eSports favoritos (`esports_favorito`) — SQL
  * explícito en vez de `db:push`, como el resto de tablas sueltas.
  *
- *   npx tsx scripts/crear-tabla-esports-favoritos.mts
+ *   npx tsx scripts/migraciones/crear-tabla-esports-favoritos.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

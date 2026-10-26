@@ -21,7 +21,7 @@
  * índice — a costa de no poder ir dentro de una transacción, por eso cada
  * `CREATE INDEX` es su propia sentencia, no todas juntas.
  *
- *   npx tsx scripts/anadir-indices-rendimiento.mts
+ *   npx tsx scripts/migraciones/anadir-indices-rendimiento.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

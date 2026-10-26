@@ -17,7 +17,7 @@
  *   3. ALTER DEFAULT PRIVILEGES para que las tablas que creen los próximos
  *      scripts de `scripts/` nazcan ya sin esos permisos.
  *
- *   npx tsx scripts/activar-rls.mts
+ *   npx tsx scripts/migraciones/activar-rls.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

@@ -1,7 +1,7 @@
 /**
  * Crea las tablas de traducciones de trofeos y de vídeos de guía por idioma
  * (1 oct 2026), con SQL explícito y RLS activado (regla de las tablas nuevas,
- * ver HANDOFF.md). Idempotente, solo aditivo.
+ * ver docs/HANDOFF.md). Idempotente, solo aditivo.
  *
  * - game_trophy_i18n: nombre y descripción de cada trofeo en un idioma
  *   (es/en/de/fr), tal como los da la propia plataforma en ese idioma.
@@ -9,7 +9,7 @@
  *   trofeos devolvió, para no repetir la petición en cada visita.
  * - trophy_guide_video: candidatos de vídeo de guía por trofeo e idioma.
  *
- *   npx tsx scripts/crear-tablas-traducciones-trofeo.mts
+ *   npx tsx scripts/migraciones/crear-tablas-traducciones-trofeo.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

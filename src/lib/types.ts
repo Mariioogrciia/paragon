@@ -99,7 +99,7 @@ export const GRADES: TrophyGrade[] = ["platinum", "gold", "silver", "bronze"];
  * platino/100%). Steam y Xbox no tienen ese desglose (`grade: undefined`
  * en sus clientes) — una biblioteca solo de esas dos siempre daría 0 en
  * las tres, así que `TrophyCountRow` las oculta en vez de enseñarlas a
- * cero (ver HANDOFF.md).
+ * cero (ver docs/HANDOFF.md).
  */
 export const PLATFORMS_WITH_METALS: Platform[] = ["psn", "epic"];
 

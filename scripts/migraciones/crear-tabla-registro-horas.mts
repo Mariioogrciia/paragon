@@ -11,7 +11,7 @@
  * Además de crear la tabla, hace la foto de partida de hoy con los totales
  * actuales: a partir de aquí empieza a haber historia.
  *
- *   npx tsx scripts/crear-tabla-registro-horas.mts
+ *   npx tsx scripts/migraciones/crear-tabla-registro-horas.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

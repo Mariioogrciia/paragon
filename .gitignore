@@ -49,3 +49,11 @@ next-env.d.ts
 
 .vercel
 android/.idea/
+
+# pruebas y borradores locales: nunca al repo
+/scratch/
+/linkedin/
+/ios-builder-test/
+/builder.json
+/.impeccable/
+/.agents/

@@ -74,7 +74,7 @@ export interface FilaClasificacion {
  * los campos minimos y se decide con `esPlatinoEquivalente` (lib/stats.ts),
  * la MISMA funcion que usa el resto de la app. Un 100% de Steam cuenta como
  * platino, y esa regla ya ha divergido entre sitios en el pasado — ver el
- * historial en HANDOFF.md.
+ * historial en docs/HANDOFF.md.
  */
 export async function clasificacionAmigos(userIds: string[]): Promise<FilaClasificacion[]> {
   if (userIds.length === 0) return [];

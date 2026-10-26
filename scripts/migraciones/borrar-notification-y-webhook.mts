@@ -10,7 +10,7 @@
  *     ningún código la leía ni la escribía ya (1 cuenta real la tenía
  *     puesta, su URL antigua e inútil desde que existe el bot).
  *
- *   npx tsx scripts/borrar-notification-y-webhook.mts
+ *   npx tsx scripts/migraciones/borrar-notification-y-webhook.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

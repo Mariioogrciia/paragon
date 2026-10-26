@@ -80,7 +80,7 @@ export async function createClan(
 export async function joinClan(userId: string, clanId: string) {
   // Comprobar si ya está en otro clan. No es suficiente por sí solo (dos
   // clics casi simultáneos podrían pasar los dos esta comprobación): el
-  // índice único en clan_members.userId (scripts/crear-tabla-clanes.mts) es
+  // índice único en clan_members.userId (scripts/migraciones/crear-tabla-clanes.mts) es
   // quien de verdad lo impide a nivel de base de datos; aquí solo se
   // convierte ese rechazo en un mensaje legible.
   const current = await getUserClan(userId);

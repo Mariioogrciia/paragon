@@ -373,7 +373,7 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
 
         {/* Google Play y Ubisoft Connect se quitaron del todo el 11 de
             septiembre de 2026 — ninguna llegó a tener sincronización real
-            (ver HANDOFF.md). Epic volvió el 22 de septiembre de 2026 con un
+            (ver docs/HANDOFF.md). Epic volvió el 22 de septiembre de 2026 con un
             enfoque distinto — ver lib/epic/client.ts. Nintendo no se puede
             vincular: una línea al final, sin ocupar una ficha entera. */}
         <div className="flex items-start gap-3 px-1 pt-1">

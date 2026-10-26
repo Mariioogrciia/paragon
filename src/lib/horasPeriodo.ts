@@ -9,7 +9,7 @@ import { db } from "@/db";
  * restar el total de hoy menos el del inicio del periodo.
  *
  * Solo hay registro desde el 29 de septiembre de 2026 (foto inicial de
- * `scripts/crear-tabla-registro-horas.mts`): para un periodo que empieza
+ * `scripts/migraciones/crear-tabla-registro-horas.mts`): para un periodo que empieza
  * antes, se resta desde el primer registro y la pantalla lo avisa
  * (`inicioRegistro`), en vez de inventarse unas horas que no se saben.
  */

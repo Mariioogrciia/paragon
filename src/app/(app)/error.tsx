@@ -11,7 +11,7 @@ import { reportarError } from "@/lib/reportarError";
  * un bug de verdad) tumbaba al visitante en la pantalla de error genérica
  * de Next — en inglés, sin "Volver", sin nada de la identidad de Paragon.
  * Esta sesión ya tocó ese caso una vez de verdad (un CSS mal codificado
- * rompiendo el build entero), y HANDOFF.md lleva varios bugs de fallo
+ * rompiendo el build entero), y docs/HANDOFF.md lleva varios bugs de fallo
  * silencioso documentados — no era una posibilidad remota.
  *
  * `error.tsx` cubre los fallos de renderizado dentro del layout normal

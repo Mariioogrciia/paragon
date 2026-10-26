@@ -11,7 +11,7 @@
  * índice, nada lo impide de verdad a nivel de base de datos), y sirve de
  * índice para `getUserClan`, que se consulta en cada carga de `/u/[handle]`.
  *
- *   npx tsx scripts/crear-tabla-clanes.mts
+ *   npx tsx scripts/migraciones/crear-tabla-clanes.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
@@ -21,7 +21,7 @@ import postgres from "postgres";
 async function main() {
   // DIRECT_URL (session pooler), no DATABASE_URL (transaction pooler): el
   // de transacciones no mantiene sesión y el DDL da timeout/falla — ver
-  // HANDOFF.md.
+  // docs/HANDOFF.md.
   const url = process.env.DIRECT_URL;
   if (!url) throw new Error("Falta DIRECT_URL en .env.local");
 

@@ -17,7 +17,7 @@ export function TiltCard({
    * quien lleva el `hover:shadow-*` (y quien rota con el tilt), y
    * `overflow-hidden` en el mismo elemento que declara ese resplandor lo
    * recorta a sí mismo en silencio, sin ningún error (misma trampa que
-   * `overflow-hidden` con un `filter: drop-shadow` — ver HANDOFF.md). El
+   * `overflow-hidden` con un `filter: drop-shadow` — ver docs/HANDOFF.md). El
    * radio de esquina (`rounded-*`) tiene que repetirse en los dos sitios:
    * aquí para que el recorte coincida con la carátula, y en `className`
    * para que la sombra/el borde del propio `<Link>` salgan con la misma

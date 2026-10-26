@@ -2,7 +2,7 @@ name: Copia de seguridad de la base
 
 # Copia semanal de Supabase (20 oct 2026), cifrada, como artefacto de esta
 # ejecución durante 90 días (unas 13 copias). Todo el trabajo y el porqué en
-# scripts/copia-base.sh; cómo restaurarla, en HANDOFF.md ("Copia de
+# scripts/copia-base.sh; cómo restaurarla, en docs/HANDOFF.md ("Copia de
 # seguridad"). Si falla, GitHub manda un correo: hay que mirarlo.
 #
 # Secretos del repo (Settings → Secrets and variables → Actions):

@@ -212,7 +212,7 @@ private fun GameDetailContent(
     var showShare by remember { mutableStateOf(false) }
     var dynamicColor by remember { mutableStateOf(Accent) }
     // "Platino conseguido" real (mismo criterio que el filtro "Platinados"
-    // de Biblioteca en HANDOFF.md: earned.platinum > 0, no percent == 100 —
+    // de Biblioteca en docs/HANDOFF.md: earned.platinum > 0, no percent == 100 —
     // un juego sin trofeo de Platino definido nunca debería ofrecer
     // "Compartir Platino" aunque esté al 100%).
     val platinoConseguido = game.trophies.any { it.grade == TrophyGrade.PLATINUM && it.earned }

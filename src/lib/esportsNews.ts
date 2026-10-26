@@ -3,7 +3,7 @@ import Parser from "rss-parser";
 
 /**
  * Noticias de eSports (LoL, VALORANT, torneos españoles...) para su propio
- * apartado en /noticias — pedido explícito del usuario (ver HANDOFF.md).
+ * apartado en /noticias — pedido explícito del usuario (ver docs/HANDOFF.md).
  * Mismo patrón que `psNews.ts`: `fetch` a mano (no `parser.parseURL`, que
  * hace su propio fetch por dentro) para poder cachearlo con
  * `next: { revalidate }`, y falla en silencio a `[]` si el feed no

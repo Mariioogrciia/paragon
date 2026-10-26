@@ -10,7 +10,7 @@ import type { PuntoPrecio } from "@/lib/itad";
  * nueva, mismo patrón que ActivityHeatmap). Los datos vienen de
  * historicoPreciosSteam() (lib/itad.ts), que trae el precio por TIENDA (PC:
  * Steam, GOG, Epic, Humble...) — nunca por consola, ninguna API pública lo
- * da para PSN/Xbox/Switch, comprobado y documentado en HANDOFF.md. Por
+ * da para PSN/Xbox/Switch, comprobado y documentado en docs/HANDOFF.md. Por
  * defecto se colapsa a "el más barato de todas las tiendas en cada fecha";
  * el selector de tienda deja fijar una sola línea en vez de la envolvente.
  *

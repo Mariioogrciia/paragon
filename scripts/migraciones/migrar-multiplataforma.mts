@@ -10,14 +10,14 @@
  * vuelven a traer de PSN y de Steam con un "Sincronizar ahora". Usuarios,
  * handles y amistades no se tocan.
  *
- *   npx tsx scripts/migrar-multiplataforma.mts   # fase 1: limpia
+ *   npx tsx scripts/migraciones/migrar-multiplataforma.mts   # fase 1: limpia
  *   npm run db:push                              # aplica el esquema nuevo
- *   npx tsx scripts/migrar-multiplataforma.mts   # fase 2: copia las cuentas
+ *   npx tsx scripts/migraciones/migrar-multiplataforma.mts   # fase 2: copia las cuentas
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-const { db } = await import("../src/db/index");
+const { db } = await import("../../src/db/index");
 const { sql } = await import("drizzle-orm");
 
 async function existeTabla(nombre: string): Promise<boolean> {
@@ -46,7 +46,7 @@ if (!hayTablaNueva) {
   console.log("");
   console.log("Ahora:");
   console.log("   1. npm run db:push");
-  console.log("   2. npx tsx scripts/migrar-multiplataforma.mts   (fase 2)");
+  console.log("   2. npx tsx scripts/migraciones/migrar-multiplataforma.mts   (fase 2)");
 } else {
   console.log("Fase 2: copiando las cuentas de PSN a la tabla nueva…");
 

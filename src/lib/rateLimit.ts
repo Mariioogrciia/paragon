@@ -17,7 +17,7 @@ import { rateLimits } from "@/db/schema";
  * Falla ABIERTO: si la tabla no existe todavía o la base da error, deja
  * pasar. Un limitador caído no puede tumbar la app entera.
  */
-// La tabla aún no existe (falta `scripts/crear-tabla-rate-limit.mts`): se
+// La tabla aún no existe (falta `scripts/migraciones/crear-tabla-rate-limit.mts`): se
 // avisa una vez por instancia y se deja de intentar, en vez de llenar los
 // logs con el mismo error en cada petición.
 let sinTabla = false;

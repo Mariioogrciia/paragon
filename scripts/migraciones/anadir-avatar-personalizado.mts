@@ -6,7 +6,7 @@
  * saber cuál es cuál. Ver el comentario en schema.ts y resolveAvatarUrl en
  * lib/profiles.ts.
  *
- *   npx tsx scripts/anadir-avatar-personalizado.mts
+ *   npx tsx scripts/migraciones/anadir-avatar-personalizado.mts
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });

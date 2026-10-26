@@ -25,8 +25,8 @@
 set -euo pipefail
 
 SALIDA=${1:?Uso: copia-base.sh <carpeta de salida>}
-: "${BACKUP_DATABASE_URL:?Falta BACKUP_DATABASE_URL (secreto del repo, ver HANDOFF.md)}"
-: "${BACKUP_PASSPHRASE:?Falta BACKUP_PASSPHRASE (secreto del repo, ver HANDOFF.md)}"
+: "${BACKUP_DATABASE_URL:?Falta BACKUP_DATABASE_URL (secreto del repo, ver docs/HANDOFF.md)}"
+: "${BACKUP_PASSPHRASE:?Falta BACKUP_PASSPHRASE (secreto del repo, ver docs/HANDOFF.md)}"
 : "${PRUEBA_URL:?Falta PRUEBA_URL (base vacía para probar la restauración)}"
 if [ "${#BACKUP_PASSPHRASE}" -lt 20 ]; then
   echo "::error::BACKUP_PASSPHRASE es demasiado corta: mínimo 20 caracteres."

@@ -495,7 +495,7 @@ export async function GET(request: Request) {
 
   // Contadores del limitador (lib/rateLimit.ts): la ventana más larga es de
   // 10 minutos, así que lo de hace más de un día ya no cuenta para nada.
-  // Falla en silencio si la tabla aún no existe (scripts/crear-tabla-rate-limit.mts).
+  // Falla en silencio si la tabla aún no existe (scripts/migraciones/crear-tabla-rate-limit.mts).
   try {
     await db.delete(rateLimits).where(lt(rateLimits.ventana, new Date(Date.now() - 24 * 60 * 60 * 1000)));
   } catch {

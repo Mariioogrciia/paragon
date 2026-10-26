@@ -45,7 +45,7 @@ export interface GameProgress {
  * `clasificacionAmigos` (lib/rankings.ts) trae solo estos tres campos de
  * cada fila. Cualquier `Game` sigue valiendo tal cual; lo que se evita es
  * la tentacion de reimplementar la regla en SQL, que ya ha divergido entre
- * sitios en el pasado (ver HANDOFF.md).
+ * sitios en el pasado (ver docs/HANDOFF.md).
  */
 export function esPlatinoEquivalente(
   game: Pick<Game, "earned" | "platform" | "progressPercent">,
