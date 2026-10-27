@@ -24,6 +24,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // El vídeo de promoción es un proyecto aparte (Remotion, ver video/README.md).
     "video/**",
+    // Las copias de trabajo de Claude (.claude/worktrees) son otros checkouts
+    // del repo: sin esto, `npm run lint` las revisaba también (11.571 avisos).
+    ".claude/**",
   ]),
 ]);
 
