@@ -445,17 +445,36 @@ export async function setClanEmblema(userId: string, clanId: string, emblema: Em
   return true;
 }
 
-/** Nombre y descripción del clan (líder y colíderes), con las mismas reglas que al crearlo. */
-export async function editarClan(userId: string, clanId: string, datos: { name: string; description: string }) {
+/**
+ * Nombre, abreviatura y descripción del clan (líder y colíderes), con las
+ * mismas reglas que al crearlo. Sin `tag` la abreviatura no se toca. Devuelve
+ * la abreviatura con la que queda: va en la URL (/clanes/[tag]), así que si
+ * cambia, quien llama tiene que llevar a la dirección nueva.
+ */
+export async function editarClan(userId: string, clanId: string, datos: { name: string; description: string; tag?: string }) {
   if (!puedeEditarClan(await rangoEnClan(userId, clanId))) throw new ClanError("Tu rango en el clan no permite editarlo");
   const name = datos.name.trim().replace(/\s+/g, " ");
   const description = datos.description.trim();
+  const tag = datos.tag?.trim().toUpperCase();
   if (name.length < 3 || name.length > 40) throw new ClanError("El nombre debe tener entre 3 y 40 caracteres");
   if (description.length > 200) throw new ClanError("La descripción no puede pasar de 200 caracteres");
-  const ofensivo = errorSiOfensivo(name) ?? errorSiOfensivo(description);
+  if (tag !== undefined && !/^[A-Z0-9]{2,5}$/.test(tag)) throw new ClanError("La etiqueta tiene que tener de 2 a 5 letras o números.");
+  const ofensivo = errorSiOfensivo(name) ?? errorSiOfensivo(description) ?? (tag ? errorSiOfensivo(tag) : null);
   if (ofensivo) throw new ClanError(ofensivo);
+
+  // Nombre y abreviatura son únicos los dos: se mira antes cuál choca para
+  // decir cuál es (el 23505 de abajo solo cubre dos guardados a la vez).
+  if (tag) {
+    const [otro] = await db.select({ id: clans.id }).from(clans).where(eq(clans.tag, tag)).limit(1);
+    if (otro && otro.id !== clanId) throw new ClanError("Ya existe un clan con esa abreviatura");
+  }
   try {
-    await db.update(clans).set({ name, description }).where(eq(clans.id, clanId));
+    const [clan] = await db
+      .update(clans)
+      .set(tag ? { name, description, tag } : { name, description })
+      .where(eq(clans.id, clanId))
+      .returning({ tag: clans.tag });
+    return { tag: clan.tag };
   } catch (err) {
     if (err instanceof Error && "code" in err && (err as { code?: string }).code === "23505") {
       throw new ClanError("Ya existe un clan con ese nombre");

@@ -154,14 +154,19 @@ export async function setEmblemaAction(clanId: string, emblema: string): Promise
 
 /* ---------------------------------- Rangos (lib/clanRangos.ts) --------------------------------- */
 
-/** Nombre y descripción (líder y colíderes). */
-export async function editarClanAction(clanId: string, name: string, description: string): Promise<Resultado> {
+/** Nombre, abreviatura y descripción (líder y colíderes). Devuelve la abreviatura final para ir a su URL. */
+export async function editarClanAction(clanId: string, name: string, description: string, tag: string): Promise<Resultado & { tag?: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: await tr("No autenticado") };
   const userId = session.user.id;
-  const r = await comoResultado(() => editarClan(userId, clanId, { name, description }));
-  if (!r.error) revalidatePath("/clanes", "layout");
-  return r;
+  try {
+    const r = await editarClan(userId, clanId, { name, description, tag });
+    revalidatePath("/clanes", "layout");
+    return { tag: r.tag };
+  } catch (e) {
+    if (e instanceof ClanError) return { error: await tr(e.message) };
+    throw e;
+  }
 }
 
 /** Ascender, degradar o pasar el liderazgo ("owner"). */

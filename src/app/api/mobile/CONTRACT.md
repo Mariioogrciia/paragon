@@ -399,6 +399,15 @@ mismo significado que en `/feed`. `invitables` (amigos que se pueden
 invitar ahora mismo: ni ya están en un clan, ni ya invitados a este) viene
 vacío salvo que `amIOwner: true` — nadie más lo necesita.
 
+### `PATCH /api/mobile/clans/{tag}` — Editar el clan
+
+Body: `{ "name": "...", "description": "...", "tag": "..." }` (cualquiera se
+puede omitir y se queda como está). Líder y colíderes (`puedoEditar`).
+`tag`: 2 a 5 letras o números, se guarda en mayúsculas y no puede repetir
+la de otro clan. Responde `{ "ok": true, "tag": "NUEVO" }`: si la
+abreviatura cambió, el clan pasa a estar en `/clans/{NUEVO}` y la ruta
+vieja da `404`. `400` con el mensaje si algo no cumple las reglas.
+
 ### `POST /api/mobile/clans/{tag}/join` — Unirse
 
 Sin body. `400` si ya estás en un clan (el tuyo o cualquier otro).

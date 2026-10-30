@@ -73,7 +73,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ tag: str
   });
 }
 
-/** Nombre y descripción — `{ "name": "...", "description": "..." }`. Líder y colíderes. */
+/**
+ * Nombre, abreviatura y descripción — `{ "name": "...", "description": "...", "tag": "..." }`
+ * (cualquiera se puede omitir). Líder y colíderes. Responde `{ ok, tag }`: si
+ * la abreviatura cambió, las siguientes peticiones van a la ruta nueva.
+ */
 export async function PATCH(req: Request, { params }: { params: Promise<{ tag: string }> }) {
   const userId = await getMobileUserId(req);
   if (!userId) {
@@ -89,11 +93,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ tag: s
   }
   const body = await req.json().catch(() => null);
   try {
-    await editarClan(userId, clan.id, {
+    const r = await editarClan(userId, clan.id, {
       name: typeof body?.name === "string" ? body.name : clan.name,
       description: typeof body?.description === "string" ? body.description : clan.description,
+      tag: typeof body?.tag === "string" ? body.tag : undefined,
     });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, tag: r.tag });
   } catch (e) {
     if (e instanceof ClanError) return errorMovil(req, e.message, 400);
     throw e;

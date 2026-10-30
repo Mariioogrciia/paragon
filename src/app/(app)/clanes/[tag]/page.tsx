@@ -93,7 +93,7 @@ export default async function ClanPage({ params }: { params: Promise<{ tag: stri
           {puedoEditar && (
             <div className="mt-4 flex flex-wrap items-start gap-2">
               <EditorEscudo clanId={clan.id} inicial={clan.logoUrl} />
-              <EditorInfoClan clanId={clan.id} nombre={clan.name} descripcion={clan.description} />
+              <EditorInfoClan clanId={clan.id} nombre={clan.name} etiqueta={clan.tag} descripcion={clan.description} />
             </div>
           )}
           <div className="mt-5 flex flex-wrap gap-x-8 gap-y-4">
