@@ -13,7 +13,7 @@ algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 **Rama**: `claude/keen-euler-s1sudo` (sin pasar a master todavía). Detalle de
 cada cosa en docs/HISTORIAL.md («5 nov»).
 
-**Hecho** (todo con textos en los 6 idiomas; 337 pruebas puras + 13 de
+**Hecho** (todo con textos en los 6 idiomas; 336 pruebas puras + 13 de
 integración contra Postgres + prueba de humo con Playwright; CI de Android
 e iOS en verde con todo lo de `kmp/`):
 - Filtros de la biblioteca en el móvil (salían en columna al filtrar).
