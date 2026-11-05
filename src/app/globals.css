@@ -504,6 +504,15 @@ h3,
   filter: drop-shadow(0 0 8px rgba(127,188,216,0.5));
 }
 
+/* El arte grande del perfil entra con un fundido al llegar (FondoPerfil.tsx). */
+@keyframes perfil-fondo-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.perfil-fondo-aparece {
+  animation: perfil-fondo-aparece 0.5s ease-out;
+}
+
 /* Brillo de "cargando" sobre la carátula del aviso de platino (AvisoCompartirPlatino.tsx). */
 @keyframes aviso-platino-brillo {
   from { transform: translateX(-100%); }

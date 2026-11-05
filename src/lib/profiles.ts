@@ -1,4 +1,5 @@
 import "server-only";
+import { after } from "next/server";
 import { plataformasPausadas } from "@/lib/ajustesSistema";
 import { vigilarLectura } from "@/lib/cuentaIlegible";
 import { getHorasIgnoradas } from "@/lib/horasIgnoradas";
@@ -847,6 +848,9 @@ export async function saveGameNotes(userId: string, gameId: string, notes: strin
  * este perfil: Steam o PSN solo nos dejarían leer ciertas cuentas, pero lo que
  * ya guardamos es nuestro. Salen los juegos de todas las plataformas juntos.
  */
+/** Juegos cuyo PEGI ya se está buscando (getLibrary), para no pedirlo dos veces a la vez. */
+const pegiEnCurso = new Set<string>();
+
 export const getLibrary = cache(
   async (profile: ProfileRow): Promise<Library> => {
   const rows = await db
@@ -911,21 +915,19 @@ export const getLibrary = cache(
   // a IGDB por título) en **cada** carga de biblioteca. Sin nadie viéndolo
   // fallar — la ficha seguía sin PEGI, así que parecía que "no había pasado
   // nada" — pero era la causa real de que la app se sintiera lenta.
-  const sinPegi = rows.filter((row) => !row.pegi && !row.metadataSyncedAt);
-  const encontrados = new Map<string, string>();
-
+  // Y no frena la página (5 nov 2026, "tarda mucho en cargar el perfil de
+  // alguien"): antes se esperaba aquí a IGDB (EE. UU., hasta 100 títulos y
+  // varias oleadas) antes de pintar nada, en cada biblioteca con juegos
+  // recién sincronizados. Ahora se pide después de responder (`after`): esta
+  // carga sale sin PEGI en esos juegos y la siguiente ya lo trae.
+  const sinPegi = rows.filter((row) => !row.pegi && !row.metadataSyncedAt && !pegiEnCurso.has(row.id)).slice(0, 100);
   if (sinPegi.length > 0) {
-    try {
-      // La primera tanda mejora la respuesta inmediata; el cron completa el
-      // resto sin bloquear cada navegación del usuario.
-      for (let inicio = 0; inicio < Math.min(sinPegi.length, 100); inicio += 100) {
-        const lote = sinPegi.slice(inicio, inicio + 100);
-        const lotePegi = await pegiPorTitulo(lote.map((row) => row.title));
-
-        for (const [title, pegi] of lotePegi) encontrados.set(title, pegi);
-
+    for (const row of sinPegi) pegiEnCurso.add(row.id);
+    const completarPegi = async () => {
+      try {
+        const lotePegi = await pegiPorTitulo(sinPegi.map((row) => row.title));
         await Promise.all(
-          lote.map((row) => {
+          sinPegi.map((row) => {
             const pegi = lotePegi.get(row.title);
             // Se marca como comprobado tanto si se encontró como si no: es lo
             // que evita volver a preguntarle a IGDB por el mismo título en la
@@ -936,9 +938,17 @@ export const getLibrary = cache(
               .where(eq(gamesTable.id, row.id));
           }),
         );
+      } catch (error) {
+        console.error("[library] pegi", error);
+      } finally {
+        for (const row of sinPegi) pegiEnCurso.delete(row.id);
       }
-    } catch (error) {
-      console.error("[library] pegi", error);
+    };
+    try {
+      after(completarPegi);
+    } catch {
+      // Fuera de una petición (scripts, cron sin contexto): en segundo plano y ya.
+      void completarPegi();
     }
   }
 
@@ -1035,7 +1045,7 @@ export const getLibrary = cache(
     developer: r.developer ?? undefined,
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,
-    pegi: r.pegi ?? encontrados.get(r.title),
+    pegi: r.pegi ?? undefined,
     igdbId: r.igdbId,
     platinumRarity: r.platinumRarity ?? undefined,
     steamTrophyXp: steamXpPorJuego.get(r.id),

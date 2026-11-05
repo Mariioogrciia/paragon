@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { metaPublica } from "@/lib/seo";
 import type { Metadata } from "next";
@@ -48,7 +49,7 @@ import { BackButton } from "@/components/BackButton";
 import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
-import { artesPorIgdb } from "@/lib/igdb/client";
+import { ArteDeFondo, CapaFondo } from "@/components/FondoPerfil";
 import { getUserClan } from "@/lib/clans";
 import { CompartirPerfil } from "@/components/CompartirPerfil";
 import { VitrinasPerfil } from "@/components/VitrinasPerfil";
@@ -286,21 +287,6 @@ export async function PerfilJugador({
   // juego de fondo elegido a propósito con un banner también puesto se
   // enseñaba SIN el tratamiento, nítido y sin oscurecer.
   const fondoEsCaratulaSuelta = Boolean(juegoDeFondoElegido) || !profile.profileBannerUrl;
-  // "Se ve demasiado difuminado y de mala calidad" (5 nov 2026): la carátula
-  // de trofeos mide 320-512 px y aquí se estira a 1240x320, así que solo
-  // aguanta borrosa. Si el juego está en IGDB se usa su arte promocional a
-  // 1080p (el mismo de las páginas de plataforma), que sí se ve nítido a lo
-  // ancho. Con tope de tiempo: sin IGDB o si tarda, la carátula de siempre.
-  const arteDeFondo =
-    fondoEsCaratulaSuelta && backgroundGame?.igdbId && !backgroundEsVideo
-      ? await Promise.race([
-          artesPorIgdb([backgroundGame.igdbId])
-            .then((m) => m.get(backgroundGame.igdbId!) ?? null)
-            .catch(() => null),
-          new Promise<null>((r) => setTimeout(() => r(null), 2500)),
-        ])
-      : null;
-  const imagenDeFondo = arteDeFondo ?? backgroundImage;
 
   const customStyle: Record<`--${string}`, string> = {};
   if (profile.profileColor) {
@@ -382,32 +368,15 @@ export async function PerfilJugador({
               playsInline
             />
           )}
-          {backgroundImage && !backgroundEsVideo && (
-            <div
-              className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${!fondoEsCaratulaSuelta && !arteDeFondo ? "perfil-banner-parallax" : ""}`}
-              style={{
-                backgroundImage: `url(${imagenDeFondo})`,
-                ...(arteDeFondo
-                  ? // Arte grande: nítido, solo oscurecido para que se lea el texto.
-                    { filter: "brightness(0.7) saturate(1.1)", backgroundPosition: "center 30%" }
-                  : fondoEsCaratulaSuelta
-                  ? {
-                      // Reportado: "no aprecio el juego, está demasiado
-                      // difuminado" — con 40px de blur y solo al 50% de
-                      // opacidad, una carátula ya pequeña (pensada para un
-                      // cuadrado de trofeos, no una cabecera ancha) se
-                      // volvía irreconocible. Menos blur y más opacidad:
-                      // sigue sin verse nítida al 100% (es la franja fija
-                      // de arriba, ver el comentario de "franja de alto
-                      // FIJO"), pero ahora sí se distingue qué juego es.
-                      filter: "blur(14px) brightness(0.55)",
-                      opacity: 0.75,
-                      transform: "scale(1.08)",
-                    }
-                  : {}),
-              }}
-            />
-          )}
+          {backgroundImage && !backgroundEsVideo &&
+            (fondoEsCaratulaSuelta && backgroundGame?.igdbId ? (
+              // El arte de IGDB no frena la página: sale la carátula y el arte entra al llegar (FondoPerfil.tsx).
+              <Suspense fallback={<CapaFondo url={backgroundImage} modo="caratula" />}>
+                <ArteDeFondo igdbId={backgroundGame.igdbId} caratula={backgroundImage} />
+              </Suspense>
+            ) : (
+              <CapaFondo url={backgroundImage} modo={fondoEsCaratulaSuelta ? "caratula" : "banner"} />
+            ))}
 
           {/* Capa de acento sutil encima del blur */}
           {backgroundImage && (
