@@ -36,3 +36,52 @@ jobs:
         run: |
           node kmp/i18n/generar.mjs
           git diff --exit-code -- kmp/shared/src/commonMain/kotlin/com/paragon/shared/i18n kmp/androidApp/src/main/res
+
+  # Consultas SQL contra un Postgres de verdad y la web arrancada con un
+  # navegador (5 nov 2026): lo que tsc y las pruebas puras no ven (la
+  # «trampa recurrente» de docs/HANDOFF.md). Base vacía de usar y tirar.
+  integracion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: prueba
+          POSTGRES_DB: paragon_prueba
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:prueba@localhost:5432/paragon_prueba
+      AUTH_SECRET: secreto-solo-para-la-ci
+      AUTH_TRUST_HOST: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Esquema en la base de prueba
+        run: npx drizzle-kit push --force
+      - name: Migración de noviembre (dos veces, tiene que poder repetirse)
+        run: |
+          psql "$DATABASE_URL" -c "create role anon; create role authenticated;"
+          npx tsx scripts/migraciones/crear-tablas-noviembre-2026.mts
+          npx tsx scripts/migraciones/crear-tablas-noviembre-2026.mts
+      - name: Pruebas de integración
+        run: npm run test:integracion
+      - name: Build
+        run: npx next build
+      - name: Prueba de humo (Playwright, móvil y escritorio)
+        run: |
+          npm i --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+          npx next start -p 3000 &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3000/robots.txt && break; sleep 1; done
+          BASE_URL=http://localhost:3000 node tests/humo/humo.mjs

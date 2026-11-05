@@ -1,6 +1,6 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { telegramChats, users } from "@/db/schema";
 import { traducirAviso } from "@/lib/avisosTraduccion";
@@ -42,8 +42,13 @@ export async function estadoTelegram(userId: string): Promise<{ vinculado: boole
 /** `/start <codigo>`: conecta este chat con la cuenta del código. Devuelve el nombre, o `null` si no vale. */
 export async function vincularChat(codigo: string, chatId: string): Promise<string | null> {
   if (!/^[A-Za-z0-9_-]{10,64}$/.test(codigo)) return null;
+  // Primero, que el código valga: antes se borraba el chat ANTES de mirarlo,
+  // y volver a abrir un enlace ya usado desconectaba tu propia cuenta (lo
+  // pilló tests/integracion, 5 nov 2026).
+  const [pendiente] = await db.select({ userId: telegramChats.userId }).from(telegramChats).where(eq(telegramChats.codigo, codigo)).limit(1);
+  if (!pendiente) return null;
   // Un chat solo puede ser de una cuenta: si ya lo era de otra, deja de serlo.
-  await db.delete(telegramChats).where(eq(telegramChats.chatId, chatId));
+  await db.delete(telegramChats).where(and(eq(telegramChats.chatId, chatId), ne(telegramChats.userId, pendiente.userId)));
   const [fila] = await db
     .update(telegramChats)
     .set({ chatId, codigo: null, vinculadoAt: new Date() })

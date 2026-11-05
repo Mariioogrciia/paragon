@@ -53,7 +53,12 @@ export async function registrarPago(pago: PagoKofi): Promise<{ nuevo: boolean; u
 
   if (insertadas.length > 0 && userId) {
     // La copia pública del perfil (CDN) tiene que rehacerse para enseñar la insignia.
-    olvidarPerfilPublico(await handleDe(userId));
+    // Que falle la caché no puede dejar sin el aviso a quien acaba de pagar.
+    try {
+      olvidarPerfilPublico(await handleDe(userId));
+    } catch (error) {
+      console.error("[apoyo] revalidar perfil", error);
+    }
     await avisarUsuario(userId, { titulo: "💜 ¡Gracias por apoyar Paragon!", texto: "Ya tienes Paragon+ en tu perfil durante un mes.", ruta: "/apoyar" });
   }
   return { nuevo: insertadas.length > 0, userId };

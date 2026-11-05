@@ -11,7 +11,8 @@
     "db:studio": "drizzle-kit studio",
     "test": "vitest run",
     "test:namespaces": "tsx scripts/textos-por-ruta.mts --comprobar",
-    "extension:zip": "node scripts/empaquetar-extension.mjs"
+    "extension:zip": "node scripts/empaquetar-extension.mjs",
+    "test:integracion": "vitest run --config vitest.integracion.config.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",

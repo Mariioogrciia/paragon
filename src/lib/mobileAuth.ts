@@ -38,9 +38,15 @@ export function huellaToken(token: string): string {
   return `h:${createHash("sha256").update(token).digest("base64url")}`;
 }
 
-/** Las dos formas en que puede estar guardado un token: con huella (nuevo) o tal cual (los de antes del 5 nov). */
+/**
+ * Las dos formas en que puede estar guardado un token: con huella (nuevo) o
+ * tal cual (los de antes del 5 nov). Un "token" que empieza por `h:` es una
+ * huella copiada de la base: nunca se acepta tal cual, o cualquiera con un
+ * volcado entraría con ella (lo pilló tests/integracion, 5 nov 2026). Los
+ * tokens de verdad (UUID o base64url) nunca llevan ":".
+ */
 function formasGuardadas(token: string): string[] {
-  return [huellaToken(token), token];
+  return token.startsWith("h:") ? [huellaToken(token)] : [huellaToken(token), token];
 }
 
 /** 32 bytes aleatorios: más entropía que un UUID y sin guiones. */
