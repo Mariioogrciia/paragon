@@ -656,16 +656,14 @@ menos de 2 minutos o por el límite `resync`; `404` si no está vinculada;
 `400` para Epic (va con la extensión). Las cuentas vinculadas traen además
 `avatarUrl`, `isPublic` (`false` = perfil privado) y `syncedAt` (ISO o `null`).
 
-## Otras cuentas de Steam (15 oct 2026, de momento solo el desarrollador)
+## Otras cuentas de Steam (15 oct 2026; para todo el mundo desde el 5 nov 2026)
 
 `GET /api/mobile/accounts` trae además `steamExtra`: `{ "max": 3, "cuentas":
 [{ "accountId", "username", "avatarUrl", "isPublic", "syncedAt" }] }`, o
-`null` si no se puede usar (no eres el desarrollador o no tienes la Steam
-principal vinculada).
+`null` si no tienes la Steam principal vinculada.
 
 - `POST /api/mobile/accounts/steam-extra` — `{ "input": "usuario, SteamID64 o
-  URL" }` → `{ username, legible, juegos }` (como vincular). `403` si no está
-  disponible, `422` con el motivo (ya es tu principal, de otro usuario, más
+  URL" }` → `{ username, legible, juegos }` (como vincular). `422` con el motivo (ya es tu principal, de otro usuario, más
   de 3...).
 - `DELETE /api/mobile/accounts/steam-extra/{steamId}` → `{ "ok": true }`. Lo
   ya conseguido con ella se queda.

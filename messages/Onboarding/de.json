@@ -316,6 +316,14 @@
       "placeholder": "Dein RetroAchievements-Benutzername",
       "update": "Aktualisieren",
       "link": "Verknüpfen"
+    },
+    "claveXbl": {
+      "titulo": "Xbox langsam? Nutze deinen eigenen OpenXBL-Schlüssel",
+      "tituloConClave": "Du nutzt deinen eigenen OpenXBL-Schlüssel",
+      "ayuda": "Xbox wird über OpenXBL gelesen, das ein stündliches Kontingent für ganz Paragon hat. Mit einem kostenlosen Konto auf xbl.io → Profile → API Keys bekommst du dein eigenes. Er wird verschlüsselt gespeichert und nur für deine Xbox genutzt. Leer lassen und speichern, um ihn zu entfernen.",
+      "placeholder": "Dein OpenXBL-Schlüssel",
+      "placeholderConClave": "•••••••• (gespeichert; leer zum Entfernen)",
+      "guardar": "Speichern"
     }
   },
   "profileForm": {

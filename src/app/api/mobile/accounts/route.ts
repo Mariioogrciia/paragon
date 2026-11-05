@@ -66,11 +66,11 @@ export async function GET(req: Request) {
       : { platform, linked: false, username: null, level: null, avatarUrl: null, isPublic: false, syncedAt: null, ...extra };
   });
 
-  // Otras cuentas de Steam (15 oct 2026, ver lib/steamExtra.ts): solo para el
-  // desarrollador y con la principal vinculada; `null` para el resto.
+  // Otras cuentas de Steam (15 oct 2026, ver lib/steamExtra.ts): para todo el
+  // mundo desde el 5 nov 2026, con la principal vinculada; `null` si no la hay.
   const steamPrincipal = profile.accounts.some((a) => a.platform === "steam");
   const steamExtra =
-    profile.esDesarrollador && steamPrincipal
+    steamPrincipal
       ? {
           max: MAX_CUENTAS_STEAM_EXTRA,
           cuentas: (await cuentasSteamExtra(userId)).map((c) => ({

@@ -53,6 +53,12 @@ const TABLAS: Record<string, string> = {
       "recibidoAt" timestamp NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS "apoyo_user_idx" ON "apoyo" ("userId", "recibidoAt");`,
+  clave_xbl: `
+    CREATE TABLE IF NOT EXISTS "clave_xbl" (
+      "userId" text PRIMARY KEY REFERENCES "user"("id") ON DELETE CASCADE,
+      "clave" text NOT NULL,
+      "actualizadaAt" timestamp NOT NULL DEFAULT now()
+    );`,
 };
 
 async function main() {

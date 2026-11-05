@@ -11,9 +11,9 @@ import { asegurarTablaSteamExtra, cuentasSteamExtra } from "@/lib/steamExtraDato
  * vincula como siempre (platform_account) y las demás van aquí, en
  * `steam_account_extra`. Sus juegos se guardan en la misma biblioteca y los
  * logros de un juego se juntan con los de todas las cuentas (ver
- * `syncLibrary` y `logrosSteamDeTodas` en lib/sync.ts). De momento solo para
- * el desarrollador (`esDesarrollador`, lib/profiles.ts): lo comprueba quien
- * llama.
+ * `syncLibrary` y `logrosSteamDeTodas` en lib/sync.ts). Para todo el mundo
+ * desde el 5 nov 2026 (antes solo el desarrollador), hasta
+ * MAX_CUENTAS_STEAM_EXTRA por perfil.
  */
 
 export class SteamExtraError extends Error {}

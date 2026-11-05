@@ -1459,3 +1459,16 @@ export const apoyos = pgTable("apoyo", {
   suscripcion: boolean("suscripcion").notNull().default(false),
   recibidoAt: timestamp("recibidoAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Clave propia de OpenXBL (5 nov 2026, lib/claveXbl.ts): quien la pone usa
+ * su cupo (150 peticiones/hora gratis) en vez del compartido de todo
+ * Paragon. Cifrada con lib/cifrado.ts.
+ */
+export const clavesXbl = pgTable("clave_xbl", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  clave: text("clave").notNull(),
+  actualizadaAt: timestamp("actualizadaAt", { mode: "date" }).notNull().defaultNow(),
+});

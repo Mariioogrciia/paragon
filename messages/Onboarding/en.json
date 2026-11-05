@@ -316,6 +316,14 @@
       "placeholder": "Your RetroAchievements username",
       "update": "Update",
       "link": "Link"
+    },
+    "claveXbl": {
+      "titulo": "Xbox slow? Use your own OpenXBL key",
+      "tituloConClave": "You're using your own OpenXBL key",
+      "ayuda": "Xbox is read through OpenXBL, which gives one hourly request quota for all of Paragon. A free account at xbl.io → Profile → API Keys gives you your own quota. It's stored encrypted and only used for your Xbox. Leave it empty and save to remove it.",
+      "placeholder": "Your OpenXBL key",
+      "placeholderConClave": "•••••••• (saved; empty to remove)",
+      "guardar": "Save"
     }
   },
   "profileForm": {

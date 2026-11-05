@@ -316,6 +316,14 @@
       "placeholder": "Tu usuario de RetroAchievements",
       "update": "Actualizar",
       "link": "Vincular"
+    },
+    "claveXbl": {
+      "titulo": "¿Xbox va lento? Usa tu propia clave de OpenXBL",
+      "tituloConClave": "Usas tu propia clave de OpenXBL",
+      "ayuda": "Xbox se lee con OpenXBL, que da un cupo de peticiones por hora para todo Paragon. Con una cuenta gratis en xbl.io → Profile → API Keys tienes tu propio cupo. Se guarda cifrada y solo se usa para tu Xbox. Déjalo vacío y guarda para quitarla.",
+      "placeholder": "Tu clave de OpenXBL",
+      "placeholderConClave": "•••••••• (guardada; vacío para quitarla)",
+      "guardar": "Guardar"
     }
   },
   "profileForm": {

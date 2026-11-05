@@ -1,4 +1,5 @@
 import "server-only";
+import { claveXblEnCurso } from "@/lib/claveXbl";
 import { gameKey, type Game, type Trophy } from "@/lib/types";
 
 /**
@@ -44,7 +45,8 @@ export class XblProfileNotFoundError extends Error {
 }
 
 function apiKey(): string {
-  const key = process.env.XBL_API_KEY;
+  // Clave propia de quien se está sincronizando (lib/claveXbl.ts), si la puso.
+  const key = claveXblEnCurso() ?? process.env.XBL_API_KEY;
   if (!key) throw new XblNotConfiguredError();
   return key;
 }

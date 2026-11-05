@@ -22,3 +22,13 @@ describe("npssoDelEntorno", () => {
     expect(npssoDelEntorno('""')).toBeNull();
   });
 });
+
+describe("npssosDelEntorno (respaldo)", () => {
+  const OTRO = "ZzZz0123456789ZzZz0123456789ZzZz0123456789ZzZz0123456789ZzZz0123";
+  it("el principal primero y luego los de respaldo, limpios y sin repetir", async () => {
+    const { npssosDelEntorno } = await import("@/lib/psn/auth");
+    expect(npssosDelEntorno(NPSSO, ` "${OTRO}" ,\n${NPSSO}`)).toEqual([NPSSO, OTRO]);
+    expect(npssosDelEntorno(undefined, OTRO)).toEqual([OTRO]);
+    expect(npssosDelEntorno(undefined, undefined)).toEqual([]);
+  });
+});

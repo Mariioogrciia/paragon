@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { limitar } from "@/lib/rateLimit";
-import { describePlatformError, getProfileByUserId } from "@/lib/profiles";
+import { describePlatformError } from "@/lib/profiles";
 import { SteamExtraError, anadirCuentaSteamExtra } from "@/lib/steamExtra";
 import { errorMovil } from "@/lib/mensajesApi";
 
@@ -17,8 +17,6 @@ export async function POST(req: Request) {
     return errorMovil(req, "Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.", 429);
   }
 
-  const profile = await getProfileByUserId(userId);
-  if (!profile?.esDesarrollador) return errorMovil(req, "No disponible.", 403);
 
   const body = await req.json().catch(() => null);
   const input = typeof body?.input === "string" ? body.input.trim() : "";

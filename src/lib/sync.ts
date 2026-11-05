@@ -14,6 +14,7 @@ import {
 } from "@/lib/steam/client";
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
 import * as retro from "@/lib/retro/client";
+import { conClaveXbl } from "@/lib/claveXbl";
 
 /** Juegos de RetroAchievements cuyo detalle se trae en cada sincronización (los más recientes). */
 const RETRO_DETAIL_LIMIT = 15;
@@ -364,7 +365,7 @@ async function syncLibraryDeCuenta(userId: string, account: SyncAccount, opts: O
       : account.platform === "steam"
         ? await fetchSteamLibrary(account.accountId)
         : account.platform === "xbox"
-          ? await fetchXblLibrary(account.accountId)
+          ? await conClaveXbl(userId, () => fetchXblLibrary(account.accountId))
           : account.platform === "retro"
             ? await retro.fetchLibrary(account.accountId)
             : opts.epicDatos
@@ -793,7 +794,7 @@ export async function syncGameTrophies(
       await syncIgdbMetadata(gameId, row.title);
     }
   } else if (platform === "xbox") {
-    trophies = await fetchXblAchievements(account.accountId, nativeId);
+    trophies = await conClaveXbl(userId, () => fetchXblAchievements(account.accountId, nativeId));
 
     // Xbox no tiene una API de tienda pública como Steam (syncStoreMetadata
     // es específica de appid de Steam) — se empareja por título en IGDB,

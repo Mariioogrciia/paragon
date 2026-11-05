@@ -78,6 +78,7 @@ import { RetoAmigosError, cancelarRetoAmigos, crearRetoAmigos, responderRetoAmig
 import { VitrinaError, borrarVitrina, crearVitrina } from "@/lib/vitrinas";
 import { setHorasIgnoradas } from "@/lib/horasIgnoradas";
 import { tr } from "@/lib/mensajesWeb";
+import { guardarClaveXbl } from "@/lib/claveXbl";
 import { esIdioma } from "@/lib/idiomasTrofeo";
 import { SteamExtraError, anadirCuentaSteamExtra, quitarCuentaSteamExtra } from "@/lib/steamExtra";
 
@@ -366,6 +367,36 @@ export async function linkRetroAction(
   return linkPlatform("retro", formData);
 }
 
+/**
+ * Clave propia de OpenXBL (lib/claveXbl.ts): se comprueba contra OpenXBL
+ * antes de guardarla, para no dejar guardada una que no vale. Vacía = quitarla.
+ */
+export async function guardarClaveXblAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const userId = await requireUserId();
+  if (!(await limitar("vincularCuenta", userId))) {
+    return { error: await tr("Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.") };
+  }
+  const clave = String(formData.get("claveXbl") ?? "").trim();
+  if (!clave) {
+    await guardarClaveXbl(userId, null);
+    return { success: await tr("Clave de OpenXBL quitada: Xbox vuelve a usar la del servidor.") };
+  }
+  if (clave.length < 16 || clave.length > 200 || /\s/.test(clave)) return { error: await tr("Esa clave de OpenXBL no tiene buena pinta.") };
+  try {
+    const res = await fetch("https://xbl.io/api/v2/account", {
+      headers: { "X-Authorization": clave, Accept: "application/json" },
+      signal: AbortSignal.timeout(10_000),
+      cache: "no-store",
+    });
+    if (res.status === 401 || res.status === 403) return { error: await tr("OpenXBL no acepta esa clave.") };
+    if (!res.ok) return { error: await tr("No se ha podido comprobar la clave con OpenXBL. Inténtalo en un momento.") };
+  } catch {
+    return { error: await tr("No se ha podido comprobar la clave con OpenXBL. Inténtalo en un momento.") };
+  }
+  await guardarClaveXbl(userId, clave);
+  return { success: await tr("Clave de OpenXBL guardada: tu Xbox se sincroniza con tu propio cupo.") };
+}
+
 export async function linkEpicAction(
   _prev: ActionState,
   formData: FormData,
@@ -420,11 +451,9 @@ export async function unlinkAccountAction(formData: FormData): Promise<void> {
 
 /* ---------------------- Cuentas de Steam extra (15 oct 2026) ---------------------- */
 
-/** Añadir otra cuenta de Steam al perfil (ver lib/steamExtra.ts). De momento solo el desarrollador. */
+/** Añadir otra cuenta de Steam al perfil (ver lib/steamExtra.ts). Para todo el mundo desde el 5 nov 2026. */
 export async function anadirSteamExtraAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const userId = await requireUserId();
-  const profile = await getProfileByUserId(userId);
-  if (!profile?.esDesarrollador) return { error: await tr("No disponible.") };
   if (!(await limitar("vincularCuenta", userId))) {
     return { error: await tr("Demasiados intentos de vincular seguidos. Prueba dentro de unos minutos.") };
   }

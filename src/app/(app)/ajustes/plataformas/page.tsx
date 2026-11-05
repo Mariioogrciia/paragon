@@ -7,8 +7,9 @@ import { auth, signIn } from "@/auth";
 import { cuentaVerificada } from "@/lib/verificacion";
 import { quitarSteamExtraAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkRetroForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkRetroForm, ClaveXblForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { cuentasSteamExtra, type CuentaSteamExtra } from "@/lib/steamExtraDatos";
+import { tieneClaveXbl } from "@/lib/claveXbl";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
 import { SaludSincronizacion } from "@/components/SaludSincronizacion";
@@ -234,14 +235,16 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
   ]);
 
   const t = await getTranslations("Onboarding");
-  const steamExtra = profile?.esDesarrollador && steam ? await cuentasSteamExtra(session.user.id) : null;
+  // Varias cuentas de Steam: para todo el mundo desde el 5 nov 2026 (antes, solo el desarrollador).
+  const steamExtra = steam ? await cuentasSteamExtra(session.user.id) : null;
   const tDeclarado = await getTranslations("Shell.Declarado");
   const locale = await getLocale();
   const loginEpic = Boolean(process.env.AUTH_EPIC_ID);
-  const [epicConfirmada, steamConfirmada, epicConLogros] = await Promise.all([
+  const [epicConfirmada, steamConfirmada, epicConLogros, xboxConClave] = await Promise.all([
     loginEpic && epic ? cuentaVerificada(session.user.id, "epic") : false,
     steam ? cuentaVerificada(session.user.id, "steam") : false,
     epic ? tieneJuegosDeEpic(session.user.id) : false,
+    xbox ? tieneClaveXbl(session.user.id) : false,
   ]);
   // Motivo de un fallo del login de Epic (lib/epicVuelta.ts) o de la extensión (epic.js).
   const motivoFallo = MOTIVOS_EPIC.find((m) => m === motivoEpic) ?? "fallo";
@@ -358,6 +361,7 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
 
         <PlatformSection platform="xbox" account={xbox} t={t}>
           <LinkXboxForm current={xbox?.username} sinAviso={xbox?.isPublic === true} />
+          {xbox && <ClaveXblForm tieneClave={xboxConClave} />}
         </PlatformSection>
 
         <PlatformSection platform="epic" account={epic} t={t} verificada={epicConfirmada}>

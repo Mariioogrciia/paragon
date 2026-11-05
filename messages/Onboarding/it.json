@@ -316,6 +316,14 @@
       "placeholder": "Il tuo nome utente RetroAchievements",
       "update": "Aggiorna",
       "link": "Collega"
+    },
+    "claveXbl": {
+      "titulo": "Xbox lento? Usa la tua chiave OpenXBL",
+      "tituloConClave": "Usi la tua chiave OpenXBL",
+      "ayuda": "Xbox si legge con OpenXBL, che dà una quota oraria per tutto Paragon. Con un account gratuito su xbl.io → Profile → API Keys hai la tua quota. Viene salvata cifrata e usata solo per la tua Xbox. Lascia vuoto e salva per rimuoverla.",
+      "placeholder": "La tua chiave OpenXBL",
+      "placeholderConClave": "•••••••• (salvata; vuoto per rimuoverla)",
+      "guardar": "Salva"
     }
   },
   "profileForm": {

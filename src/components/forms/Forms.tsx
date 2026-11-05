@@ -15,6 +15,7 @@ import {
   anadirSteamExtraAction,
   linkXboxAction,
   linkRetroAction,
+  guardarClaveXblAction,
   linkEpicAction,
   updateProfileAction,
   setDiscordDmAction,
@@ -208,6 +209,36 @@ export function LinkXboxForm({ current, sinAviso = false }: { current?: string |
       <Feedback state={state} />
       <PrivacyGuide platform="xbox" />
     </form>
+  );
+}
+
+/** Clave propia de OpenXBL (lib/claveXbl.ts), plegada: la mayoría no la necesita. */
+export function ClaveXblForm({ tieneClave }: { tieneClave: boolean }) {
+  const t = useTranslations("Onboarding.forms.claveXbl");
+  const [state, action] = useActionState(guardarClaveXblAction, EMPTY);
+
+  return (
+    <details className="mt-3">
+      <summary className="cursor-pointer rounded-md px-1 py-1 text-[0.8125rem] font-semibold text-muted hover:bg-[var(--surface-2)] hover:text-foreground">
+        {tieneClave ? t("tituloConClave") : t("titulo")}
+      </summary>
+      <form action={action} className="mt-3">
+        <p className="mb-2 text-xs text-muted">{t("ayuda")}</p>
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          <input
+            name="claveXbl"
+            type="password"
+            placeholder={tieneClave ? t("placeholderConClave") : t("placeholder")}
+            autoComplete="off"
+            spellCheck={false}
+            className="min-w-0 flex-1 rounded-xl px-3.5 py-3 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
+            style={FIELD}
+          />
+          <Submit>{t("guardar")}</Submit>
+        </div>
+        <Feedback state={state} />
+      </form>
+    </details>
   );
 }
 

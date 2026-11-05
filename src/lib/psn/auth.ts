@@ -177,9 +177,46 @@ export async function getAuthorization(): Promise<AuthorizationPayload> {
     }
   }
 
-  const npsso = npssoDelEntorno();
-  if (!npsso) throw new PsnNotConfiguredError();
+  const candidatos = npssosDelEntorno();
+  if (candidatos.length === 0) throw new PsnNotConfiguredError();
 
-  cache = await authenticateWithNpsso(npsso);
-  return { accessToken: cache.accessToken };
+  // NPSSO de respaldo (5 nov 2026): si Sony rechaza el principal (caducado
+  // o sesión cerrada), se prueba con los de `PSN_NPSSO_RESPALDO` en orden
+  // en vez de dejar PlayStation caído hasta que alguien lo renueve a mano.
+  // Solo se pasa al siguiente con `PsnAuthError` (rechazo de verdad): un
+  // fallo de red o del antibots de Sony no es culpa del NPSSO.
+  let ultimoError: unknown = null;
+  for (const [i, npsso] of candidatos.entries()) {
+    try {
+      cache = await authenticateWithNpsso(npsso);
+      npssoEnUso = i;
+      return { accessToken: cache.accessToken };
+    } catch (error) {
+      if (!(error instanceof PsnAuthError)) throw error;
+      ultimoError = error;
+    }
+  }
+  throw ultimoError;
+}
+
+/**
+ * Qué NPSSO está funcionando: 0 el principal (`PSN_NPSSO`), 1+ uno de
+ * `PSN_NPSSO_RESPALDO`. Para Admin → Sistema y el aviso al desarrollador:
+ * tirar de respaldo significa que hay que renovar el principal.
+ */
+export let npssoEnUso = 0;
+
+/**
+ * El principal y los de respaldo (`PSN_NPSSO_RESPALDO`, separados por comas
+ * o saltos de línea), limpios y sin repetir.
+ *
+ * Ojo: el NPSSO de otra cuenta de PlayStation tiene OTROS amigos. Con un
+ * respaldo de otra cuenta solo se leen los perfiles con los trofeos en
+ * público y los amigos de esa otra cuenta, no los de la principal. Lo ideal
+ * es que el respaldo sea una segunda sesión de la MISMA cuenta (otro
+ * navegador): caduca por su lado.
+ */
+export function npssosDelEntorno(principal = process.env.PSN_NPSSO, respaldo = process.env.PSN_NPSSO_RESPALDO): string[] {
+  const lista = [npssoDelEntorno(principal), ...(respaldo ?? "").split(/[,\n]/).map((v) => npssoDelEntorno(v))];
+  return [...new Set(lista.filter((v): v is string => Boolean(v)))];
 }
