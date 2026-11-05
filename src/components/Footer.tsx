@@ -50,6 +50,12 @@ export function Footer() {
           >
             {t("terminos")}
           </Link>
+          <Link
+            href="/apoyar"
+            className="font-medium text-muted hover:text-foreground transition-colors"
+          >
+            💜 {t("apoyar")}
+          </Link>
           <span className="hidden md:inline text-muted/60">·</span>
           <span className="hidden md:flex text-[0.6875rem] text-muted/80 items-center gap-2">
             {t("desarrolladoPor")} <strong className="text-foreground/80">Mario García</strong>

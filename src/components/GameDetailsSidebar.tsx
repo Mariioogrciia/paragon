@@ -6,6 +6,7 @@
  * concreto — cada fila se oculta sola si no hay dato, no se rellena con
  * nada inventado.
  */
+import { enlaceAfiliado, relTienda } from "@/lib/afiliados";
 import { SiteIcon } from "@/components/SiteIcon";
 import { getTranslations } from "next-intl/server";
 
@@ -91,12 +92,14 @@ export async function GameDetailsSidebar({ developer, publisher, releaseLabel, p
       {websites.length > 0 && (
         <Fila label={t("websites")}>
           <div className="flex flex-wrap gap-2">
-            {websites.map((w) => (
+            {websites.map((w) => {
+              const enlace = enlaceAfiliado(w.url);
+              return (
               <a
                 key={w.url}
-                href={w.url}
+                href={enlace.url}
                 target="_blank"
-                rel="noopener noreferrer nofollow"
+                rel={relTienda(enlace.afiliado)}
                 title={w.label}
                 aria-label={w.label}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-muted transition-colors hover:text-accent"
@@ -104,7 +107,8 @@ export async function GameDetailsSidebar({ developer, publisher, releaseLabel, p
               >
                 <SiteIcon label={w.label} />
               </a>
-            ))}
+              );
+            })}
           </div>
         </Fila>
       )}

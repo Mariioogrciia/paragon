@@ -87,7 +87,8 @@
       "d": "d",
       "h": "h",
       "min": "min"
-    }
+    },
+    "afiliados": "Some links are affiliate links: if you buy, Paragon gets a small commission at no extra cost to you."
   },
   "GuiasPage": {
     "titulo": "Guides",

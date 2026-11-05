@@ -39,7 +39,8 @@
       "siguiendo": "Abonné",
       "seguidores": "{count, plural, one {# abonné} other {# abonnés}}",
       "error": "Ça n’a pas marché. Réessaie."
-    }
+    },
+    "apoyoTooltip": "Soutient Paragon"
   },
   "EstadisticasPage": {
     "meta": "Statistiques de @{handle} · Paragon",
@@ -778,5 +779,18 @@
       "puzles": "puzzle",
       "deportes": "sport"
     }
+  },
+  "Apoyo": {
+    "titulo": "Soutiens Paragon",
+    "descripcion": "Paragon est un projet personnel : les serveurs, le domaine et les clés des plateformes coûtent de l’argent chaque mois. S’il t’est utile, tu peux donner un coup de main.",
+    "ventaja": {
+      "insignia": "Le badge 💜 Paragon+ sur ton profil tant que ton soutien dure.",
+      "sinAnuncios": "Tu aides Paragon à rester sans publicité.",
+      "todoGratis": "Rien ne devient payant : tout ce qu’il y a sur Paragon reste pour tout le monde."
+    },
+    "boton": "Soutenir sur Ko-fi",
+    "comoSeAsocia": "Utilise sur Ko-fi le même e-mail que pour Paragon, ou écris ton @ dans le message, pour que ça arrive sur ton profil. Chaque contribution donne un mois de Paragon+.",
+    "yaApoyas": "💜 Tu as déjà Paragon+. Merci !",
+    "prontoDisponible": "Bientôt, tu pourras soutenir Paragon d’ici."
   }
 }

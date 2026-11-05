@@ -87,7 +87,8 @@
       "d": "d",
       "h": "h",
       "min": "min"
-    }
+    },
+    "afiliados": "Algunos enlaces son de afiliado: si compras, Paragon se lleva una pequeña comisión sin que te cueste más."
   },
   "GuiasPage": {
     "titulo": "Guías",

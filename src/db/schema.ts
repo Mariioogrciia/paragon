@@ -1440,3 +1440,22 @@ export const follows = pgTable(
   },
   (t) => [primaryKey({ columns: [t.followerId, t.followedId] }), index("follow_followed_idx").on(t.followedId)],
 );
+
+/**
+ * Apoyos de Paragon+ por Ko-fi (5 nov 2026, /api/kofi y lib/apoyo.ts): un
+ * pago da 31 días de Paragon+ desde que llega. `userId` sale del correo o
+ * del @ que la persona pone en el mensaje; si no casa, queda sin dueño y
+ * se asigna a mano desde Admin.
+ */
+export const apoyos = pgTable("apoyo", {
+  /** `kofi_transaction_id`: el mismo pago no cuenta dos veces. */
+  id: text("id").primaryKey(),
+  userId: text("userId").references(() => users.id, { onDelete: "set null" }),
+  email: text("email"),
+  nombre: text("nombre"),
+  tipo: text("tipo").notNull(),
+  importe: text("importe").notNull(),
+  moneda: text("moneda").notNull(),
+  suscripcion: boolean("suscripcion").notNull().default(false),
+  recibidoAt: timestamp("recibidoAt", { mode: "date" }).notNull().defaultNow(),
+});

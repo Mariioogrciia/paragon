@@ -9,6 +9,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
 import { PlatinosRapidos } from "@/components/PlatinosRapidos";
+import { enlaceAfiliado, relTienda } from "@/lib/afiliados";
 import { CommunityRating } from "@/components/CommunityRating";
 import { CommunityDifficulty } from "@/components/CommunityDifficulty";
 import { Stars } from "@/components/Stars";
@@ -505,12 +506,15 @@ export async function FichaJuego({
             </div>
 
             <div className="overflow-hidden rounded-xl" style={{ border: "1px solid var(--border)" }}>
-              {precios.ofertas.slice(0, 6).map((oferta, i) => (
+              {precios.ofertas.slice(0, 6).map((oferta, i) => {
+                // Afiliados (lib/afiliados.ts): solo cambia algo si hay código para esa tienda.
+                const enlace = enlaceAfiliado(oferta.url);
+                return (
                 <a
                   key={oferta.tienda}
-                  href={oferta.url}
+                  href={enlace.url}
                   target="_blank"
-                  rel="noopener noreferrer nofollow"
+                  rel={relTienda(enlace.afiliado)}
                   className="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-border px-3.5 py-2.5 last:border-0 transition-colors hover:bg-surface-2"
                 >
                   {/* Logo de la tienda: la lista se lee de un vistazo, sin
@@ -534,13 +538,15 @@ export async function FichaJuego({
                     <span className="shrink-0 text-[0.6875rem] font-bold text-good">-{oferta.ahorro}%</span>
                   )}
                 </a>
-              ))}
+                );
+              })}
             </div>
             <p className="-mt-2 text-[0.625rem] text-muted">
               {t("preciosDisclaimer")}
               {precios.ofertas.some((o) => o.viaCheapShark)
                 ? t("preciosDisclaimerSufijoCheapShark")
                 : t("preciosDisclaimerSufijoSolo")}
+              {precios.ofertas.slice(0, 6).some((o) => enlaceAfiliado(o.url).afiliado) && ` ${t("afiliados")}`}
             </p>
 
             {historicoPrecios.length > 0 && (

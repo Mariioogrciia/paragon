@@ -40,6 +40,19 @@ const TABLAS: Record<string, string> = {
       PRIMARY KEY ("followerId", "followedId")
     );
     CREATE INDEX IF NOT EXISTS "follow_followed_idx" ON "follow" ("followedId");`,
+  apoyo: `
+    CREATE TABLE IF NOT EXISTS "apoyo" (
+      "id" text PRIMARY KEY,
+      "userId" text REFERENCES "user"("id") ON DELETE SET NULL,
+      "email" text,
+      "nombre" text,
+      "tipo" text NOT NULL,
+      "importe" text NOT NULL,
+      "moneda" text NOT NULL,
+      "suscripcion" boolean NOT NULL DEFAULT false,
+      "recibidoAt" timestamp NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS "apoyo_user_idx" ON "apoyo" ("userId", "recibidoAt");`,
 };
 
 async function main() {

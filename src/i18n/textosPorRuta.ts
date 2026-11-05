@@ -15,6 +15,7 @@ export const NAMESPACES_GLOBALES = [
   "Shell.Error.reintentar",
   "Shell.Error.texto",
   "Shell.Error.titulo",
+  "Shell.Footer.apoyar",
   "Shell.Footer.comoFunciona",
   "Shell.Footer.cookies",
   "Shell.Footer.desarrolladoPor",

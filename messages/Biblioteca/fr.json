@@ -87,7 +87,8 @@
       "d": "j",
       "h": "h",
       "min": "min"
-    }
+    },
+    "afiliados": "Certains liens sont affiliés : si tu achètes, Paragon touche une petite commission sans surcoût pour toi."
   },
   "GuiasPage": {
     "titulo": "Soluces",

@@ -15,6 +15,7 @@ import { PLATFORM_LABEL } from "@/lib/types";
 import { FriendRequestButton } from "@/components/FriendRequestButton";
 import { BotonSeguir } from "@/components/BotonSeguir";
 import { estadoSeguir } from "@/lib/seguir";
+import { esApoyo } from "@/lib/apoyo";
 import { summarise } from "@/lib/stats";
 import { db } from "@/db";
 import { gameTrophies } from "@/db/schema";
@@ -209,7 +210,7 @@ export async function PerfilJugador({
     // Si la tabla no existiera, el perfil se enseña igual, sin vitrinas.
     getVitrinas(profile.userId).catch(() => []),
   ]);
-  const [[rachasPerfil, percentilAnio], estadoAmistad, seguir] = await Promise.all([
+  const [[rachasPerfil, percentilAnio], estadoAmistad, seguir, apoyo] = await Promise.all([
     games.length > 0
       ? Promise.all([rachasDelAnio(profile.userId), percentilTrofeosAnio(profile.userId)])
       : Promise.resolve([{ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }, null] as const),
@@ -220,6 +221,8 @@ export async function PerfilJugador({
       : Promise.resolve("ninguna" as const),
     // Seguir (5 nov 2026): el botón solo sale con sesión y en perfiles ajenos.
     !esMio && session?.user?.id ? estadoSeguir(session.user.id, profile.userId).catch(() => null) : Promise.resolve(null),
+    // Paragon+ (lib/apoyo.ts): solo lee la base, vale en la copia de la CDN.
+    esApoyo(profile.userId).catch(() => false),
   ]);
 
   const efectoNombre = profile.efectoNombre ? EFECTO_POR_CLAVE.get(profile.efectoNombre) : undefined;
@@ -473,6 +476,16 @@ export async function PerfilJugador({
                 </span>
               )}
               <TituloEspecial clave={profile.tituloDesbloqueado} />
+              {apoyo && (
+                <Link
+                  href="/apoyar"
+                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.6875rem] font-bold uppercase tracking-[0.06em] transition-all hover:brightness-110"
+                  style={{ background: "rgb(192 132 252 / 0.14)", border: "1px solid rgb(192 132 252 / 0.4)", color: "#d8b4fe" }}
+                  title={t("PerfilPage.apoyoTooltip")}
+                >
+                  💜 Paragon+
+                </Link>
+              )}
             </div>
             {/* Cabecera aligerada (21 oct 2026): antes eran siete filas
                 apiladas. Ahora tu título y tu frase van juntos, el clan y

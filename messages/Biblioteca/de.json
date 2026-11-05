@@ -87,7 +87,8 @@
       "d": "T",
       "h": "Std",
       "min": "Min"
-    }
+    },
+    "afiliados": "Einige Links sind Affiliate-Links: Wenn du kaufst, bekommt Paragon eine kleine Provision, ohne dass es dich mehr kostet."
   },
   "GuiasPage": {
     "titulo": "Anleitungen",
