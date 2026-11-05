@@ -17,6 +17,7 @@ export const NAV_OCULTABLE = [
   { key: "amigos", label: "Amigos" },
   { key: "descubrir", label: "Descubrir" },
   { key: "planificador", label: "Planificador" },
+  { key: "preguntar", label: "Pregúntale a Paragon" },
 ] as const;
 
 export type NavKey = (typeof NAV_OCULTABLE)[number]["key"];

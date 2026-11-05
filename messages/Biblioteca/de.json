@@ -599,5 +599,25 @@
         "consejo": "Der Rest, vom häufigsten zum seltensten. Die seltensten sind meist die schwierigsten."
       }
     }
+  },
+  "asistente": {
+    "titulo": "Frag Paragon",
+    "descripcion": "Frag alles über deine Bibliothek und deinen Fortschritt, so wie du einen Freund fragen würdest. Die Antwort kommt aus deinen echten Daten.",
+    "ejemplo1": "Welches Platin schaffe ich dieses Wochenende mit etwa 6 Stunden?",
+    "ejemplo2": "Welche Spiele habe ich fast bei 100 % liegen lassen?",
+    "ejemplo3": "In welches Spiel habe ich die meisten Stunden gesteckt?",
+    "ejemplo4": "Ich habe eine halbe Stunde: Was kann ich abschließen?",
+    "placeholder": "Schreib deine Frage…",
+    "enviar": "Senden",
+    "pensando": "Ich schaue in deine Bibliothek…",
+    "aviso": "Eine KI (Claude) antwortet mit den Daten deiner Bibliothek; sie kann sich irren. Bis zu 20 Fragen am Tag. Das Gespräch wird nicht gespeichert.",
+    "inactivo": "Der Assistent ist in diesem Paragon noch nicht aktiviert.",
+    "error": {
+      "limite": "Du hast das Fragenlimit fürs Erste erreicht. Komm später wieder.",
+      "sesion": "Melde dich an, um zu fragen.",
+      "inactivo": "Der Assistent ist nicht aktiviert.",
+      "rechazo": "Darauf kann ich nicht antworten. Versuch eine andere Frage zu deinen Spielen.",
+      "fallo": "Etwas ist schiefgelaufen. Versuch es gleich noch einmal."
+    }
   }
 }

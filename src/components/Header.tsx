@@ -66,6 +66,13 @@ const NAV_MAS = [
     match: (p: string) => p.startsWith("/planificador"),
     navKey: "planificador",
   },
+  {
+    // «Pregúntale a Paragon» (5 nov 2026, lib/asistente.ts).
+    labelKey: "preguntar",
+    href: "/preguntar",
+    match: (p: string) => p.startsWith("/preguntar"),
+    navKey: "preguntar",
+  },
 ] as const;
 
 /**

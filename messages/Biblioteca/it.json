@@ -599,5 +599,25 @@
         "consejo": "Il resto, dal più comune al più raro. I più rari di solito sono i più difficili."
       }
     }
+  },
+  "asistente": {
+    "titulo": "Chiedi a Paragon",
+    "descripcion": "Chiedi quello che vuoi sulla tua libreria e sui tuoi progressi, come lo chiederesti a un amico. Risponde con i tuoi dati reali.",
+    "ejemplo1": "Quale platino posso prendere questo weekend con circa 6 ore?",
+    "ejemplo2": "Quali giochi ho abbandonato quasi al 100%?",
+    "ejemplo3": "A quale gioco ho dedicato più ore?",
+    "ejemplo4": "Ho mezz’ora: cosa chiudo?",
+    "placeholder": "Scrivi la tua domanda…",
+    "enviar": "Invia",
+    "pensando": "Sto guardando la tua libreria…",
+    "aviso": "Risponde un’IA (Claude) con i dati della tua libreria; può sbagliare. Fino a 20 domande al giorno. La conversazione non viene salvata.",
+    "inactivo": "L’assistente non è ancora attivo su questo Paragon.",
+    "error": {
+      "limite": "Hai raggiunto il limite di domande per ora. Torna più tardi.",
+      "sesion": "Accedi per fare domande.",
+      "inactivo": "L’assistente non è attivo.",
+      "rechazo": "Non posso rispondere a questo. Prova un’altra domanda sui tuoi giochi.",
+      "fallo": "Qualcosa è andato storto. Riprova tra poco."
+    }
   }
 }

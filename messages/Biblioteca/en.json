@@ -599,5 +599,25 @@
         "consejo": "The rest, from most common to rarest. The rarest are usually the hardest."
       }
     }
+  },
+  "asistente": {
+    "titulo": "Ask Paragon",
+    "descripcion": "Ask anything about your library and progress, the way you'd ask a friend. It answers with your real data.",
+    "ejemplo1": "Which platinum can I get this weekend with about 6 hours?",
+    "ejemplo2": "Which games have I abandoned at almost 100%?",
+    "ejemplo3": "Which game have I put the most hours into?",
+    "ejemplo4": "I've got half an hour: what can I finish?",
+    "placeholder": "Type your question…",
+    "enviar": "Send",
+    "pensando": "Looking at your library…",
+    "aviso": "An AI (Claude) answers using your library data; it can make mistakes. Up to 20 questions a day. The conversation isn't saved.",
+    "inactivo": "The assistant isn't enabled on this Paragon yet.",
+    "error": {
+      "limite": "You've hit the question limit for now. Come back in a while.",
+      "sesion": "Sign in to ask.",
+      "inactivo": "The assistant isn't enabled.",
+      "rechazo": "I can't answer that. Try another question about your games.",
+      "fallo": "Something went wrong. Try again in a moment."
+    }
   }
 }

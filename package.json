@@ -14,6 +14,7 @@
     "extension:zip": "node scripts/empaquetar-extension.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.5.0",
     "@auth/drizzle-adapter": "^1.11.3",
     "@icons-pack/react-simple-icons": "^13.15.1",
     "@supabase/supabase-js": "^2.115.0",

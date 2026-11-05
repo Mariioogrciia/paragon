@@ -619,6 +619,13 @@ export const NAMESPACES_POR_RUTA: Record<string, readonly string[]> = {
     "Shell.Selector.seleccionar",
     "Shell.Selector.sinResultados"
   ],
+  "/preguntar": [
+    "Biblioteca.asistente.aviso",
+    "Biblioteca.asistente.enviar",
+    "Biblioteca.asistente.error",
+    "Biblioteca.asistente.pensando",
+    "Biblioteca.asistente.placeholder"
+  ],
   "/ritmo": [
     "Analitica.ritmoPage.clearDayFilter",
     "Analitica.ritmoPage.compararCon",

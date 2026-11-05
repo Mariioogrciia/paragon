@@ -599,5 +599,25 @@
         "consejo": "O resto, do mais comum ao mais raro. Os mais raros costumam ser os mais difíceis."
       }
     }
+  },
+  "asistente": {
+    "titulo": "Pergunta ao Paragon",
+    "descripcion": "Pergunta o que quiseres sobre a tua biblioteca e o teu progresso, como perguntarias a um amigo. Responde com os teus dados reais.",
+    "ejemplo1": "Que platina consigo este fim de semana com umas 6 horas?",
+    "ejemplo2": "Que jogos tenho abandonados quase a 100%?",
+    "ejemplo3": "A que jogo dediquei mais horas?",
+    "ejemplo4": "Tenho meia hora: o que fecho?",
+    "placeholder": "Escreve a tua pergunta…",
+    "enviar": "Enviar",
+    "pensando": "A ver a tua biblioteca…",
+    "aviso": "Responde uma IA (Claude) com os dados da tua biblioteca; pode enganar-se. Até 20 perguntas por dia. A conversa não é guardada.",
+    "inactivo": "O assistente ainda não está ativado neste Paragon.",
+    "error": {
+      "limite": "Chegaste ao limite de perguntas por agora. Volta daqui a pouco.",
+      "sesion": "Inicia sessão para perguntar.",
+      "inactivo": "O assistente não está ativado.",
+      "rechazo": "Não posso responder a isso. Experimenta outra pergunta sobre os teus jogos.",
+      "fallo": "Algo falhou. Tenta outra vez daqui a pouco."
+    }
   }
 }
