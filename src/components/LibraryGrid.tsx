@@ -489,10 +489,15 @@ export function LibraryGrid({
               // caben en una linea y, sin envolver, se salian de la pantalla
               // y provocaban scroll horizontal en toda la pagina (medido: 401px
               // de contenido en 375px de ancho).
-              className="flex flex-1 flex-wrap min-w-0 rounded-xl p-1 gap-1.5 sm:min-w-[240px] sm:flex-nowrap"
+              // `w-full` en el móvil y `flex-1` solo desde `sm`: con `flex-1`
+              // (base 0) la caja nunca bajaba a su propia línea, así que al
+              // filtrar ("N resultados" + "Limpiar filtros" en la misma fila)
+              // se quedaba en ~60px y las plataformas salían en columna, una
+              // letra encima de "Más filtros" (captura del 5 nov 2026).
+              className="flex w-full flex-wrap min-w-0 rounded-xl p-1 gap-1.5 sm:w-auto sm:flex-1 sm:min-w-[240px] sm:flex-nowrap"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
-              <Pill active={platform === "todas"} onClick={() => setPlatform("todas")} className="flex-1 flex justify-center text-center">
+              <Pill active={platform === "todas"} onClick={() => setPlatform("todas")} className="flex-1 flex justify-center whitespace-nowrap text-center">
                 {t("allPlatforms")}
               </Pill>
               {facets.platforms.map((p) => (
@@ -500,7 +505,7 @@ export function LibraryGrid({
                   key={p.value}
                   active={platform === p.value}
                   onClick={() => setPlatform(p.value as Platform)}
-                  className="flex-1 flex justify-center text-center"
+                  className="flex-1 flex items-center justify-center gap-1 whitespace-nowrap text-center"
                 >
                   {t("platformCount", { label: PLATFORM_LABEL[p.value as Platform], count: conteoPlataformas.porPlataforma.get(p.value) ?? 0 })}
                   {esDeclarada(p.value) && <MarcaDeclarado />}
@@ -543,7 +548,7 @@ export function LibraryGrid({
           </button>
 
           {filtrado && (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="text-[0.8125rem] text-muted">{t("resultsCount", { count: visible.length })}</span>
               <button
                 onClick={() => {
