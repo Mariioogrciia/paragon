@@ -1383,3 +1383,41 @@ export const esportsFavoritos = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.teamId] })],
 );
+
+/* ---------------------- Noviembre 2026 (scripts/migraciones/crear-tablas-noviembre-2026.mts) ---------------------- */
+
+/**
+ * Quién de Paragon está en cada servidor de Discord, para `/ranking`: se
+ * apunta a alguien al usar cualquier comando del bot en ese servidor. Así no
+ * hace falta el intent privilegiado de miembros (que pediría verificar el
+ * bot) ni pedir a Discord la lista entera.
+ */
+export const discordGuildMembers = pgTable(
+  "discord_guild_member",
+  {
+    guildId: text("guildId").notNull(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    vistoAt: timestamp("vistoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.guildId, t.userId] })],
+);
+
+/**
+ * Linked Roles de Discord: el permiso `role_connections.write` de cada
+ * persona, para volver a mandar su nivel y platinos cuando cambian. Los
+ * tokens van cifrados con AES-GCM (lib/cifrado.ts).
+ */
+export const discordRoleConnections = pgTable("discord_role_connection", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  discordUserId: text("discordUserId").notNull(),
+  accessToken: text("accessToken").notNull(),
+  refreshToken: text("refreshToken").notNull(),
+  expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
+  /** Lo último que se mandó, para no repetir el PUT si nada ha cambiado. */
+  ultimoEnvio: jsonb("ultimoEnvio").$type<Record<string, number>>(),
+  actualizadoAt: timestamp("actualizadoAt", { mode: "date" }).notNull().defaultNow(),
+});

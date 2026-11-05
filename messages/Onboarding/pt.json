@@ -578,7 +578,22 @@
         "respuesta": "Confirma que o teu Discord está ligado (passo 1), que partilhas servidor com o bot e que permites mensagens diretas de membros do servidor. Em Definições → Geral, com o interruptor ativado, aparece um botão «Testar» que te diz o motivo exato se falhar."
       }
     },
-    "comandos": "Lista de comandos e mais detalhes em <link>Como funciona</link>."
+    "comandos": "Lista de comandos e mais detalhes em <link>Como funciona</link>.",
+    "p6": {
+      "titulo": "Cargos automáticos nos teus servidores",
+      "texto": "Com os «Linked Roles», os servidores do Discord podem dar-te cargos sozinhos segundo o teu nível Paragon, platinas, troféus ou plataformas ligadas (por exemplo, «Caçador de platinas» a partir de 50). Liga o Paragon uma vez e atualiza-se sempre que sincronizas.",
+      "boton": "Ligar ao Discord",
+      "reconectar": "Voltar a ligar",
+      "instalarCuenta": "Instalar o bot na minha conta",
+      "nota": "Quem gere o servidor ativa-o em Definições do servidor → Cargos → um cargo → Ligações → Adicionar requisito → Paragon. «Instalar o bot na minha conta» deixa-te usar /perfil, /comparar e o clique direito → Apps em qualquer servidor ou DM, mesmo sem o bot lá.",
+      "resultado": {
+        "ok": "Ligado: os teus servidores já veem o teu nível e as tuas platinas.",
+        "fallo": "O Discord não aceitou a ligação. Tenta outra vez daqui a pouco.",
+        "cancelado": "Cancelaste no Discord: não se ligou nada.",
+        "sesion-perdida": "A ligação expirou. Carrega outra vez em «Ligar ao Discord».",
+        "sin-configurar": "Os cargos automáticos ainda não estão ativados neste Paragon."
+      }
+    }
   },
   "asistente": {
     "enlace": "Não sabes o que pôr? Assistente passo a passo",

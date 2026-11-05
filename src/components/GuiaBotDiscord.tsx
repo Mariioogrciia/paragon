@@ -17,6 +17,11 @@ const INVITACION = process.env.DISCORD_APPLICATION_ID
   ? `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_APPLICATION_ID}&scope=bot%20applications.commands&permissions=3072`
   : undefined;
 
+/** Instalar el bot en tu cuenta (no en un servidor): los comandos van contigo a cualquier servidor o DM. */
+const INSTALAR_EN_CUENTA = process.env.DISCORD_APPLICATION_ID
+  ? `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_APPLICATION_ID}&integration_type=1&scope=applications.commands`
+  : undefined;
+
 function Paso({ n, titulo, listo, opcional, etiquetaOpcional, children }: { n: number; titulo: string; listo?: boolean; opcional?: boolean; etiquetaOpcional: string; children: React.ReactNode }) {
   return (
     <li className="rounded-[16px] p-5" style={{ background: "var(--surface)", border: `1px solid ${listo ? "rgb(52 168 83 / 0.4)" : "var(--border)"}` }}>
@@ -44,7 +49,16 @@ function Paso({ n, titulo, listo, opcional, etiquetaOpcional, children }: { n: n
  * `vinculado`: este Discord ya está vinculado a la cuenta (null = no hay sesión: se enseña la guía sin estados).
  * `urlBoton1`: a dónde lleva el paso 1 (Ajustes → seguridad con sesión, el login sin ella).
  */
-export async function GuiaBotDiscord({ vinculado, urlPaso1 }: { vinculado: boolean | null; urlPaso1: string }) {
+export async function GuiaBotDiscord({
+  vinculado,
+  urlPaso1,
+  roles,
+}: {
+  vinculado: boolean | null;
+  urlPaso1: string;
+  /** Linked Roles (lib/discordRoles.ts): si ya los conectó y el resultado de la vuelta (`?roles=`). */
+  roles?: { conectado: boolean; resultado?: string };
+}) {
   const t = await getTranslations("Onboarding");
   const cmd = (chunks: React.ReactNode) => <kbd className="manual-mando">{chunks}</kbd>;
   const enlace = "inline-flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-[0.8125rem] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0";
@@ -101,6 +115,27 @@ export async function GuiaBotDiscord({ vinculado, urlPaso1 }: { vinculado: boole
               {t("guiaDiscord.p5.boton")}
             </Link>
           </div>
+        </Paso>
+
+        <Paso etiquetaOpcional={t("guiaDiscord.opcional")} n={6} titulo={t("guiaDiscord.p6.titulo")} listo={roles?.conectado} opcional>
+          <p>{t("guiaDiscord.p6.texto")}</p>
+          {roles?.resultado && ["ok", "fallo", "cancelado", "sesion-perdida", "sin-configurar"].includes(roles.resultado) && (
+            <p className="font-semibold" style={{ color: roles.resultado === "ok" ? "#86efac" : "var(--foreground)" }}>
+              {t(`guiaDiscord.p6.resultado.${roles.resultado as "ok" | "fallo" | "cancelado" | "sesion-perdida" | "sin-configurar"}`)}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {/* Ruta de API (redirección a Discord): <a> normal, no el Link con precarga. */}
+            <a href="/api/discord/roles" className={enlace} style={{ background: "#5865F2", color: "#fff" }}>
+              {roles?.conectado ? t("guiaDiscord.p6.reconectar") : t("guiaDiscord.p6.boton")}
+            </a>
+            {INSTALAR_EN_CUENTA && (
+              <a href={INSTALAR_EN_CUENTA} target="_blank" rel="noopener noreferrer" className={enlace} style={{ background: "var(--surface-2)", color: "var(--foreground)", border: "1px solid var(--border)" }}>
+                {t("guiaDiscord.p6.instalarCuenta")} <ExternalLink size={14} />
+              </a>
+            )}
+          </div>
+          <p className="text-xs">{t("guiaDiscord.p6.nota")}</p>
         </Paso>
       </ol>
 

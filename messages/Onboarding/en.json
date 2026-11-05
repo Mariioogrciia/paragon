@@ -578,7 +578,22 @@
         "respuesta": "Check that your Discord is linked (step 1), that you share a server with the bot and that you allow direct messages from server members. In Settings → General, with the switch on, a “Test” button tells you the exact reason if it fails."
       }
     },
-    "comandos": "Full command list and more details in <link>How it works</link>."
+    "comandos": "Full command list and more details in <link>How it works</link>.",
+    "p6": {
+      "titulo": "Automatic roles in your servers",
+      "texto": "With “Linked Roles”, Discord servers can give you roles automatically based on your Paragon level, platinums, trophies or linked platforms (for example, “Platinum hunter” from 50 up). Connect Paragon once and it updates every time you sync.",
+      "boton": "Connect with Discord",
+      "reconectar": "Reconnect",
+      "instalarCuenta": "Install the bot on my account",
+      "nota": "Whoever manages the server turns it on in Server Settings → Roles → a role → Links → Add requirement → Paragon. “Install the bot on my account” lets you use /perfil, /comparar and right-click → Apps in any server or DM, even if the bot isn't in it.",
+      "resultado": {
+        "ok": "Connected: your servers can now see your level and platinums.",
+        "fallo": "Discord didn't accept the connection. Try again in a moment.",
+        "cancelado": "You cancelled on Discord: nothing was connected.",
+        "sesion-perdida": "The link expired. Press “Connect with Discord” again.",
+        "sin-configurar": "Automatic roles aren't enabled on this Paragon yet."
+      }
+    }
   },
   "asistente": {
     "enlace": "Not sure what to enter? Step-by-step helper",

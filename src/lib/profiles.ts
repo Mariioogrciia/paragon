@@ -29,7 +29,8 @@ import { pegiPorTitulo } from "@/lib/igdb/client";
 import { trophyScore, xpSteamPorRareza } from "@/lib/trophyScore";
 import { normalizar as normalizarNombrePowerpyx, trofeosPerdiblesDeConEstado } from "@/lib/powerpyx";
 import { syncGameTrophies, syncLibrary, type PlatinoNuevo } from "@/lib/sync";
-import { anunciarNivelSiSube } from "@/lib/discordBot";
+import { anunciarNivelSiSube, anunciarSolicitudAmistad } from "@/lib/discordBot";
+import { actualizarRolesDiscord } from "@/lib/discordRoles";
 import { enviarPush } from "@/lib/webPush";
 import { guardarAviso } from "@/lib/bandeja";
 import { avisarUsuario } from "@/lib/avisos";
@@ -865,6 +866,9 @@ export async function resyncLibraries(userId: string, opts: { forzarDetalle?: bo
   } catch (error) {
     console.error("[resyncLibraries] anuncio de nivel", error);
   }
+
+  // Linked Roles de Discord: nivel y platinos nuevos a los servidores (no lanza).
+  await actualizarRolesDiscord(userId);
 
   return total;
 }
@@ -1744,12 +1748,14 @@ export async function sendFriendRequest(fromUserId: string, toHandle: string) {
     enviarPush(target.userId, avisoSolicitud),
     enviarPushFcm(target.userId, avisoSolicitud),
     guardarAviso(target.userId, { titulo: avisoSolicitud.title, texto: avisoSolicitud.body, ruta: avisoSolicitud.url }),
+    // Y por DM de Discord, con botones para aceptar o rechazar ahí mismo.
+    anunciarSolicitudAmistad(target.userId, fromUserId, nombreRemitente, remitente?.handle ?? null),
   ]);
 
   return { ok: true as const, accepted: false };
 }
 
-export async function acceptFriendRequest(userId: string, requesterId: string) {
+export async function acceptFriendRequest(userId: string, requesterId: string): Promise<boolean> {
   const aceptadas = await db
     .update(friendships)
     .set({ status: "accepted" })
@@ -1772,6 +1778,22 @@ export async function acceptFriendRequest(userId: string, requesterId: string) {
       ruta: yo?.handle ? `/u/${yo.handle}` : "/amigos",
     });
   }
+  return aceptadas.length > 0;
+}
+
+/** Rechaza una solicitud que sigue pendiente (botón del DM de Discord); no toca una amistad ya aceptada. */
+export async function declineFriendRequest(userId: string, requesterId: string): Promise<boolean> {
+  const borradas = await db
+    .delete(friendships)
+    .where(
+      and(
+        eq(friendships.requesterId, requesterId),
+        eq(friendships.addresseeId, userId),
+        eq(friendships.status, "pending"),
+      ),
+    )
+    .returning({ requesterId: friendships.requesterId });
+  return borradas.length > 0;
 }
 
 export async function removeFriend(userId: string, otherId: string) {

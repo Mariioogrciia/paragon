@@ -578,7 +578,22 @@
         "respuesta": "Controlla che il tuo Discord sia collegato (passo 1), che condividi un server con il bot e che consenti i messaggi diretti dai membri del server. In Impostazioni → Generale, con l'interruttore attivo, appare un pulsante «Prova» che ti dice il motivo esatto se fallisce."
       }
     },
-    "comandos": "Elenco dei comandi e altri dettagli in <link>Come funziona</link>."
+    "comandos": "Elenco dei comandi e altri dettagli in <link>Come funziona</link>.",
+    "p6": {
+      "titulo": "Ruoli automatici nei tuoi server",
+      "texto": "Con i «Linked Roles», i server Discord possono darti ruoli automaticamente in base al tuo livello Paragon, ai platini, ai trofei o alle piattaforme collegate (per esempio «Cacciatore di platini» da 50 in su). Collega Paragon una volta e si aggiorna a ogni sincronizzazione.",
+      "boton": "Collega con Discord",
+      "reconectar": "Ricollega",
+      "instalarCuenta": "Installa il bot sul mio account",
+      "nota": "Chi gestisce il server lo attiva in Impostazioni server → Ruoli → un ruolo → Collegamenti → Aggiungi requisito → Paragon. «Installa il bot sul mio account» ti permette di usare /perfil, /comparar e il clic destro → App in qualsiasi server o DM, anche senza il bot.",
+      "resultado": {
+        "ok": "Collegato: i tuoi server ora vedono il tuo livello e i tuoi platini.",
+        "fallo": "Discord non ha accettato il collegamento. Riprova tra poco.",
+        "cancelado": "Hai annullato su Discord: non è stato collegato nulla.",
+        "sesion-perdida": "Il link è scaduto. Premi di nuovo «Collega con Discord».",
+        "sin-configurar": "I ruoli automatici non sono ancora attivi su questo Paragon."
+      }
+    }
   },
   "asistente": {
     "enlace": "Non sai cosa mettere? Assistente passo dopo passo",

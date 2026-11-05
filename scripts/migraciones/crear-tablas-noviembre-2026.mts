@@ -1,0 +1,56 @@
+/**
+ * Tablas nuevas del 5 nov 2026 (auditoría: Discord, producto y plataformas),
+ * con SQL explícito y RLS activado (regla de las tablas nuevas, ver
+ * docs/HANDOFF.md). Idempotente y solo aditivo: se puede lanzar las veces
+ * que haga falta.
+ *
+ *   npx tsx scripts/migraciones/crear-tablas-noviembre-2026.mts
+ *
+ * Hasta que se lance, todo lo que usa estas tablas se apaga solo (captura
+ * el error 42P01 de "la tabla no existe") en vez de romper la página.
+ */
+import { config } from "dotenv";
+config({ path: ".env.local" });
+
+import postgres from "postgres";
+
+const TABLAS: Record<string, string> = {
+  discord_guild_member: `
+    CREATE TABLE IF NOT EXISTS "discord_guild_member" (
+      "guildId" text NOT NULL,
+      "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+      "vistoAt" timestamp NOT NULL DEFAULT now(),
+      PRIMARY KEY ("guildId", "userId")
+    );`,
+  discord_role_connection: `
+    CREATE TABLE IF NOT EXISTS "discord_role_connection" (
+      "userId" text PRIMARY KEY REFERENCES "user"("id") ON DELETE CASCADE,
+      "discordUserId" text NOT NULL,
+      "accessToken" text NOT NULL,
+      "refreshToken" text NOT NULL,
+      "expiresAt" timestamp NOT NULL,
+      "ultimoEnvio" jsonb,
+      "actualizadoAt" timestamp NOT NULL DEFAULT now()
+    );`,
+};
+
+async function main() {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("Falta DATABASE_URL en .env.local");
+  const sql = postgres(url, { prepare: false });
+  try {
+    for (const [tabla, crear] of Object.entries(TABLAS)) {
+      await sql.unsafe(crear);
+      await sql.unsafe(`ALTER TABLE "${tabla}" ENABLE ROW LEVEL SECURITY`);
+      await sql.unsafe(`REVOKE ALL ON "${tabla}" FROM anon, authenticated`);
+      console.log("OK:", tabla);
+    }
+  } finally {
+    await sql.end();
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

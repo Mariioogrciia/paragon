@@ -578,7 +578,22 @@
         "respuesta": "Vérifie que ton Discord est associé (étape 1), que tu partages un serveur avec le bot et que tu autorises les messages privés des membres du serveur. Dans Paramètres → Général, interrupteur activé, un bouton « Tester » t'indique la raison exacte en cas d'échec."
       }
     },
-    "comandos": "Liste des commandes et plus de détails dans <link>Comment ça marche</link>."
+    "comandos": "Liste des commandes et plus de détails dans <link>Comment ça marche</link>.",
+    "p6": {
+      "titulo": "Rôles automatiques sur tes serveurs",
+      "texto": "Avec les « Linked Roles », les serveurs Discord peuvent te donner des rôles automatiquement selon ton niveau Paragon, tes platines, tes trophées ou tes plateformes liées (par exemple « Chasseur de platines » à partir de 50). Connecte Paragon une fois et tout se met à jour à chaque synchronisation.",
+      "boton": "Connecter avec Discord",
+      "reconectar": "Reconnecter",
+      "instalarCuenta": "Installer le bot sur mon compte",
+      "nota": "La personne qui gère le serveur l’active dans Paramètres du serveur → Rôles → un rôle → Liens → Ajouter une condition → Paragon. « Installer le bot sur mon compte » te permet d’utiliser /perfil, /comparar et clic droit → Applications sur n’importe quel serveur ou MP, même sans le bot.",
+      "resultado": {
+        "ok": "Connecté : tes serveurs voient maintenant ton niveau et tes platines.",
+        "fallo": "Discord n’a pas accepté la connexion. Réessaie dans un instant.",
+        "cancelado": "Tu as annulé sur Discord : rien n’a été connecté.",
+        "sesion-perdida": "Le lien a expiré. Appuie de nouveau sur « Connecter avec Discord ».",
+        "sin-configurar": "Les rôles automatiques ne sont pas encore activés sur ce Paragon."
+      }
+    }
   },
   "asistente": {
     "enlace": "Tu ne sais pas quoi mettre ? Assistant pas à pas",

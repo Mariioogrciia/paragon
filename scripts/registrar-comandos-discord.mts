@@ -91,6 +91,7 @@ const COMANDOS = [
         name: "titulo",
         description: "Título del juego (no hace falta exacto)",
         required: true,
+        autocomplete: true,
       },
     ],
   },
@@ -103,6 +104,7 @@ const COMANDOS = [
         name: "titulo",
         description: "Título del juego (no hace falta exacto)",
         required: true,
+        autocomplete: true,
       },
       {
         type: 3, // STRING
@@ -144,6 +146,7 @@ const COMANDOS = [
         name: "nombre",
         description: "Nombre de la liga (no hace falta exacto)",
         required: true,
+        autocomplete: true,
       },
     ],
   },
@@ -156,7 +159,29 @@ const COMANDOS = [
     description: "Qué comandos tiene el bot de Paragon y para qué sirve cada uno.",
   },
   {
+    name: "ranking",
+    description: "Clasificación por nivel de la gente de este servidor que usa Paragon.",
+    contexts: [0],
+  },
+  {
+    name: "comparar",
+    description: "Tú contra un amigo: nivel, platinos, trofeos y juegos en común.",
+    options: [
+      {
+        type: 6, // USER
+        name: "usuario",
+        description: "Con quién comparar",
+        required: true,
+      },
+    ],
+  },
+  // Menús contextuales de usuario (clic derecho en alguien → Apps). Tipo 2,
+  // sin descripción: Discord enseña el nombre tal cual.
+  { type: 2, name: "Ver en Paragon" },
+  { type: 2, name: "Comparar en Paragon" },
+  {
     name: "anunciosaqui",
+    contexts: [0],
     description: "Anuncia en este canal cuando alguien del servidor suba de nivel Paragon.",
     // Bitfield de permisos de Discord como texto — 0x20 = MANAGE_GUILD
     // ("Gestionar servidor"). Sin esto, cualquiera podría decidir dónde
@@ -164,6 +189,20 @@ const COMANDOS = [
     default_member_permissions: "32",
   },
 ];
+
+/**
+ * App instalable también por usuario (5 nov 2026): `integration_types` 0 =
+ * instalada en un servidor, 1 = instalada en la cuenta de alguien (sirve en
+ * cualquier servidor o DM sin que un admin añada el bot). `contexts`: 0 =
+ * servidor, 1 = DM con el bot, 2 = DM o grupo entre personas. Lo que solo
+ * tiene sentido en un servidor (`/ranking`, `/anunciosaqui`) ya trae su
+ * `contexts: [0]` arriba. Hay que activar "User Install" en el Developer
+ * Portal → Installation.
+ */
+for (const c of COMANDOS as Record<string, unknown>[]) {
+  c.integration_types ??= [0, 1];
+  c.contexts ??= [0, 1, 2];
+}
 
 async function main() {
   const url = GUILD_ID
@@ -184,7 +223,7 @@ async function main() {
   const registrados = (await res.json()) as { name: string }[];
   console.log(
     `Registrados ${registrados.length} comando(s) ${GUILD_ID ? `en el servidor ${GUILD_ID} (al momento)` : "en GLOBAL (tardan hasta 1h en aparecer)"}:`,
-    registrados.map((c) => `/${c.name}`).join(", "),
+    registrados.map((c) => c.name).join(", "),
   );
 }
 

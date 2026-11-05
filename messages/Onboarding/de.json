@@ -578,7 +578,22 @@
         "respuesta": "Prüfe, ob dein Discord verknüpft ist (Schritt 1), ob du einen Server mit dem Bot teilst und ob du Direktnachrichten von Servermitgliedern erlaubst. Unter Einstellungen → Allgemein zeigt dir bei aktiviertem Schalter ein „Testen“-Button den genauen Grund, wenn es scheitert."
       }
     },
-    "comandos": "Befehlsliste und mehr Details unter <link>So funktioniert's</link>."
+    "comandos": "Befehlsliste und mehr Details unter <link>So funktioniert's</link>.",
+    "p6": {
+      "titulo": "Automatische Rollen auf deinen Servern",
+      "texto": "Mit „Linked Roles“ können Discord-Server dir automatisch Rollen nach deiner Paragon-Stufe, deinen Platin, Trophäen oder verknüpften Plattformen geben (zum Beispiel „Platinjäger“ ab 50). Verbinde Paragon einmal, und es aktualisiert sich bei jeder Synchronisierung.",
+      "boton": "Mit Discord verbinden",
+      "reconectar": "Erneut verbinden",
+      "instalarCuenta": "Bot in meinem Konto installieren",
+      "nota": "Wer den Server verwaltet, aktiviert es unter Servereinstellungen → Rollen → eine Rolle → Links → Anforderung hinzufügen → Paragon. „Bot in meinem Konto installieren“ lässt dich /perfil, /comparar und Rechtsklick → Apps auf jedem Server oder in jeder DM nutzen, auch ohne den Bot dort.",
+      "resultado": {
+        "ok": "Verbunden: Deine Server sehen jetzt deine Stufe und dein Platin.",
+        "fallo": "Discord hat die Verbindung nicht angenommen. Versuch es gleich noch einmal.",
+        "cancelado": "Du hast in Discord abgebrochen: Es wurde nichts verbunden.",
+        "sesion-perdida": "Der Link ist abgelaufen. Drück noch einmal auf „Mit Discord verbinden“.",
+        "sin-configurar": "Automatische Rollen sind in diesem Paragon noch nicht aktiviert."
+      }
+    }
   },
   "asistente": {
     "enlace": "Unsicher, was du eingeben sollst? Schritt-für-Schritt-Hilfe",

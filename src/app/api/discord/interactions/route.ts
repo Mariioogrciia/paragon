@@ -1,7 +1,10 @@
 import { NextResponse, after } from "next/server";
 import nacl from "tweetnacl";
-import { usuarioParagonDeDiscord, setAnnounceChannel, anadirNotaJuego } from "@/lib/discordBot";
-import { getLibrary, getGameDetail, getProfileByUserId } from "@/lib/profiles";
+import { usuarioParagonDeDiscord, setAnnounceChannel, anadirNotaJuego, type FilaBotones } from "@/lib/discordBot";
+import { getLibrary, getGameDetail, getProfileByUserId, acceptFriendRequest, declineFriendRequest } from "@/lib/profiles";
+import { getParagonLevels } from "@/lib/paragonLevel";
+import { acceptLeagueInvite, declineLeagueInvite } from "@/lib/leagues";
+import { apuntarMiembroServidor, miembrosParagonDelServidor, titulosParaAutocompletar } from "@/lib/discordServidor";
 import { platinosAlAlcance, salonDeLaVerguenza } from "@/lib/backlog";
 import { sugerirPorTiempo } from "@/lib/recomendadorTiempo";
 import { summarise } from "@/lib/stats";
@@ -53,19 +56,40 @@ interface DiscordInteraction {
   user?: { id: string };
   data?: {
     name: string;
-    options?: { name: string; value: string | number }[];
+    /** 1 = comando de barra, 2 = menú contextual de usuario. */
+    type?: number;
+    /** A quién se le hizo clic derecho (menú contextual de usuario). */
+    target_id?: string;
+    /** El botón pulsado (componentes). */
+    custom_id?: string;
+    options?: { name: string; value: string | number; focused?: boolean }[];
   };
 }
 
-const InteractionType = { PING: 1, APPLICATION_COMMAND: 2 } as const;
-const ResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4, DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5 } as const;
+const InteractionType = { PING: 1, APPLICATION_COMMAND: 2, MESSAGE_COMPONENT: 3, AUTOCOMPLETE: 4 } as const;
+const ResponseType = {
+  PONG: 1,
+  CHANNEL_MESSAGE_WITH_SOURCE: 4,
+  DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5,
+  DEFERRED_UPDATE_MESSAGE: 6,
+  AUTOCOMPLETE_RESULT: 8,
+} as const;
+
+/** Lo que se manda a Discord: texto y, si hace falta, tarjetas (embeds) y botones. */
+interface Respuesta {
+  content: string;
+  embeds?: Record<string, unknown>[];
+  components?: FilaBotones[];
+}
+
+const COLOR_PARAGON = 0x7fbcd8;
 const EPHEMERAL = 1 << 6;
 
 const SIN_VINCULAR = "Tu cuenta de Discord no está vinculada a ninguna cuenta de Paragon — inicia sesión en Paragon con este mismo Discord primero.";
 
 /** Solo el CONTENIDO — quién ve el mensaje (público/efímero) ya se decidió al diferir, no aquí. */
-function mensaje(content: string): { content: string } {
-  return { content };
+function mensaje(content: string, extra: Omit<Respuesta, "content"> = {}): Respuesta {
+  return { content, ...extra };
 }
 
 /**
@@ -73,7 +97,7 @@ function mensaje(content: string): { content: string } {
  * token de la interacción hace de autenticación por sí solo en este
  * endpoint concreto de Discord, no hace falta el token del bot.
  */
-async function editarRespuestaDiferida(token: string, content: string): Promise<void> {
+async function editarRespuestaDiferida(token: string, respuesta: Respuesta): Promise<void> {
   const applicationId = process.env.DISCORD_APPLICATION_ID;
   if (!applicationId) {
     console.error("[discord-interactions] Falta DISCORD_APPLICATION_ID — no se puede editar la respuesta diferida.");
@@ -83,7 +107,7 @@ async function editarRespuestaDiferida(token: string, content: string): Promise<
     const res = await fetch(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content }),
+      body: JSON.stringify(respuesta),
     });
     if (!res.ok) console.error("[discord-interactions] Discord devolvió", res.status, "editando la respuesta diferida:", await res.text());
   } catch (error) {
@@ -137,9 +161,18 @@ async function comandoJuego(discordUserId: string, busqueda: string) {
   }
   lineas.push(perdibles > 0 ? `⚠️ ${perdibles} trofeo${perdibles === 1 ? "" : "s"} perdible${perdibles === 1 ? "" : "s"} — cuidado con el orden` : "✅ Sin trofeos perdibles conocidos");
   lineas.push(`🏆 Llevas ${conseguidos}/${detalle.trophies.length} (${detalle.progressPercent ?? 0}%)`);
-  lineas.push(`🔗 ${dominioPublico()}/u/${profile.handle}/${detalle.id}`);
-
-  return mensaje(lineas.join("\n"));
+  return mensaje("", {
+    embeds: [
+      {
+        title: detalle.title,
+        url: `${dominioPublico()}/u/${profile.handle}/${encodeURIComponent(detalle.id)}`,
+        description: lineas.slice(1).join("\n"),
+        color: COLOR_PARAGON,
+        ...(detalle.iconUrl ? { thumbnail: { url: detalle.iconUrl } } : {}),
+        footer: { text: "Paragon" },
+      },
+    ],
+  });
 }
 
 async function comandoNota(discordUserId: string, busqueda: string, texto: string) {
@@ -258,7 +291,22 @@ async function comandoPerfil(discordUserId: string, discordUserIdObjetivo: strin
   if (hitos.primerPlatino) lineas.push(`🥇 Primer platino: ${hitos.primerPlatino.titulo}`);
   if (hitos.trofeoMasRaro) lineas.push(`💎 Trofeo más raro: ${hitos.trofeoMasRaro.nombre} (${hitos.trofeoMasRaro.rarityPercent.toFixed(1)}%)`);
 
-  return mensaje(lineas.join("\n"));
+  // Tarjeta con la imagen social del perfil (la misma de WhatsApp o X) en
+  // vez de solo texto (5 nov 2026).
+  if (!profile.handle) return mensaje(lineas.join("\n"));
+  const web = dominioPublico();
+  return mensaje("", {
+    embeds: [
+      {
+        title: lineas[0].replace(/\*\*/g, ""),
+        url: `${web}/u/${profile.handle}`,
+        description: lineas.slice(1).join("\n"),
+        color: COLOR_PARAGON,
+        image: { url: `${web}/api/og/u/${profile.handle}` },
+        footer: { text: "Paragon" },
+      },
+    ],
+  });
 }
 
 /** Coincidencia exacta si la hay; si no, la primera que CONTENGA lo escrito — mismo criterio que `encontrarJuegoPorTitulo`. */
@@ -324,8 +372,108 @@ async function comandoInvitacionesLiga(discordUserId: string) {
   if (invitaciones.length === 0) return mensaje("No tienes ninguna invitación a ligas pendiente.");
 
   const lineas = invitaciones.map((inv) => `🏅 **${inv.name}** — invitación de ${inv.ownerName ?? "alguien"}`);
-  lineas.push("", `Acéptalas o recházalas desde la web (${dominioPublico()}/ligas) o la app.`);
-  return mensaje(lineas.join("\n"));
+  // Un botón por invitación (Discord deja 5 filas por mensaje).
+  const filas: FilaBotones[] = invitaciones.slice(0, 5).map((inv) => ({
+    type: 1,
+    components: [
+      { type: 2, style: 3, label: `Aceptar · ${inv.name}`.slice(0, 80), custom_id: `liga:aceptar:${inv.id}` },
+      { type: 2, style: 4, label: "Rechazar", custom_id: `liga:rechazar:${inv.id}` },
+    ],
+  }));
+  return mensaje(lineas.join("\n"), { components: filas });
+}
+
+/**
+ * /ranking: clasificación de la gente de este servidor que usa Paragon, por
+ * nivel. "La gente de este servidor" = quien ha usado algún comando aquí
+ * (lib/discordServidor.ts), sin pedir a Discord la lista de miembros.
+ */
+async function comandoRanking(guildId: string | null) {
+  if (!guildId) return mensaje("Esto solo funciona dentro de un servidor, no por DM.");
+  const miembros = await miembrosParagonDelServidor(guildId);
+  if (miembros.length === 0) return mensaje("Todavía nadie de este servidor ha usado el bot de Paragon.");
+  const niveles = await getParagonLevels(miembros.map((m) => m.userId));
+  const orden = miembros
+    .map((m) => ({ ...m, nivel: niveles.get(m.userId) }))
+    .sort((a, b) => (b.nivel?.xp ?? 0) - (a.nivel?.xp ?? 0))
+    .slice(0, 15);
+  const medallas = ["🥇", "🥈", "🥉"];
+  const lineas = orden.map((m, i) => `${medallas[i] ?? `${i + 1}.`} **${m.nombre}** — nivel ${m.nivel?.level ?? 1} (${(m.nivel?.xp ?? 0).toLocaleString("es-ES")} XP)`);
+  lineas.push("", "Sale aquí quien haya usado algún comando del bot en este servidor.");
+  return mensaje("", { embeds: [{ title: "🏆 Ranking Paragon del servidor", description: lineas.join("\n"), color: COLOR_PARAGON }] });
+}
+
+/** Clic derecho → Apps → "Comparar en Paragon" (o `/comparar`): tú contra esa persona. */
+async function comandoComparar(discordUserId: string, discordObjetivo: string | null) {
+  const yoId = await usuarioParagonDeDiscord(discordUserId);
+  if (!yoId) return mensaje(SIN_VINCULAR);
+  if (!discordObjetivo) return mensaje("Dime con quién — por ejemplo `/comparar @amigo`.");
+  const otroId = await usuarioParagonDeDiscord(discordObjetivo);
+  if (!otroId) return mensaje("Esa persona no tiene su Discord vinculado a ninguna cuenta de Paragon.");
+  if (otroId === yoId) return mensaje("Ese eres tú. 😄");
+
+  const [yo, otro] = await Promise.all([getProfileByUserId(yoId), getProfileByUserId(otroId)]);
+  if (!yo || !otro) return mensaje("No encuentro alguno de los dos perfiles.");
+  const [libYo, libOtro, niveles] = await Promise.all([getLibrary(yo), getLibrary(otro), getParagonLevels([yoId, otroId])]);
+  const a = summarise(libYo.games);
+  const b = summarise(libOtro.games);
+  const clave = (g: Game) => (g.igdbId ? `i${g.igdbId}` : normalizarTitulo(g.title));
+  const mios = new Set(libYo.games.filter((g) => !g.isWishlist).map(clave));
+  const comunes = new Set(libOtro.games.filter((g) => !g.isWishlist).map(clave).filter((k) => mios.has(k))).size;
+
+  const fila = (etiqueta: string, x: number, y: number) => `${etiqueta}: **${x.toLocaleString("es-ES")}** ${x > y ? "🟢" : x < y ? "🔴" : "🟰"} **${y.toLocaleString("es-ES")}**`;
+  const nombreA = yo.displayName ?? yo.handle ?? "Tú";
+  const nombreB = otro.displayName ?? otro.handle ?? "Rival";
+  const lineas = [
+    `${nombreA} vs ${nombreB}`,
+    fila("⭐ Nivel", niveles.get(yoId)?.level ?? 1, niveles.get(otroId)?.level ?? 1),
+    fila("🏆 Platinos", a.platinos, b.platinos),
+    fila("🧩 Trofeos", a.trofeos, b.trofeos),
+    fila("🎮 Juegos", a.juegos, b.juegos),
+    fila("📈 Completado medio %", a.completadoMedio, b.completadoMedio),
+    `🤝 Juegos en común: **${comunes}**`,
+  ];
+  return mensaje("", {
+    embeds: [
+      {
+        title: `⚔️ ${lineas[0]}`,
+        url: otro.handle ? `${dominioPublico()}/comparar/${otro.handle}` : undefined,
+        description: lineas.slice(1).join("\n"),
+        color: COLOR_PARAGON,
+        footer: { text: "Paragon" },
+      },
+    ],
+  });
+}
+
+/**
+ * Un botón pulsado (invitación de liga o solicitud de amistad, en un DM o
+ * en la respuesta de /invitacionesliga). Quien pulsa tiene que ser la
+ * persona invitada: aceptar y rechazar ya lo comprueban en la base.
+ */
+async function responderBoton(customId: string, discordUserId: string): Promise<Respuesta> {
+  const userId = await usuarioParagonDeDiscord(discordUserId);
+  if (!userId) return mensaje(SIN_VINCULAR, { components: [] });
+  const [tipo, accion, id] = customId.split(":");
+  if (!id) return mensaje("Botón no reconocido.", { components: [] });
+
+  if (tipo === "liga") {
+    if (accion === "aceptar") {
+      const ok = await acceptLeagueInvite(id, userId);
+      return mensaje(ok ? "✅ Te has unido a la liga. ¡A por ellos!" : "Esa invitación ya no está pendiente.", { components: [] });
+    }
+    await declineLeagueInvite(id, userId);
+    return mensaje("Invitación rechazada.", { components: [] });
+  }
+  if (tipo === "amigo") {
+    if (accion === "aceptar") {
+      const ok = await acceptFriendRequest(userId, id);
+      return mensaje(ok ? "🤝 ¡Ya sois amigos en Paragon!" : "Esa solicitud ya no está pendiente.", { components: [] });
+    }
+    const ok = await declineFriendRequest(userId, id);
+    return mensaje(ok ? "Solicitud rechazada." : "Esa solicitud ya no está pendiente.", { components: [] });
+  }
+  return mensaje("Botón no reconocido.", { components: [] });
 }
 
 function comandoHelp() {
@@ -342,7 +490,10 @@ function comandoHelp() {
       "🎲 `/ruleta [minutos] [genero]` — te elige UN juego que encaje con el tiempo que tienes.",
       "🏅 `/ligas` — tus ligas creadas con amigos y tu posición en cada una.",
       "🏅 `/liga <nombre>` — clasificación completa de una liga (y su reto, si tiene).",
-      "✉️ `/invitacionesliga` — invitaciones a ligas sin responder todavía.",
+      "✉️ `/invitacionesliga` — invitaciones a ligas sin responder, con botones para aceptarlas.",
+      "📊 `/ranking` — clasificación por nivel de la gente de este servidor que usa Paragon.",
+      "⚔️ `/comparar <usuario>` — tú contra un amigo: nivel, platinos, trofeos y juegos en común.",
+      "🖱️ Clic derecho en alguien → Apps → «Ver en Paragon» o «Comparar en Paragon».",
       "📣 `/anunciosaqui` — (solo quien gestione el servidor) anuncia aquí cuando alguien suba de nivel.",
       "",
       "Para que cualquiera de estos funcione, tu cuenta de Discord tiene que estar vinculada a una cuenta de Paragon — inicia sesión en Paragon con este mismo Discord.",
@@ -393,9 +544,18 @@ function usuarioMencionado(interaction: DiscordInteraction): string | null {
  * contestado ya a Discord con la respuesta diferida. Devuelve el texto
  * final, nunca un `NextResponse` (eso ya se mandó).
  */
-async function calcularRespuesta(interaction: DiscordInteraction, discordUserId: string): Promise<{ content: string }> {
+async function calcularRespuesta(interaction: DiscordInteraction, discordUserId: string): Promise<Respuesta> {
   const nombre = interaction.data!.name;
   switch (nombre) {
+    // Menús contextuales de usuario (clic derecho → Apps).
+    case "Ver en Paragon":
+      return await comandoPerfil(discordUserId, interaction.data!.target_id ?? null);
+    case "Comparar en Paragon":
+      return await comandoComparar(discordUserId, interaction.data!.target_id ?? null);
+    case "comparar":
+      return await comandoComparar(discordUserId, usuarioMencionado(interaction));
+    case "ranking":
+      return await comandoRanking(interaction.guild_id ?? null);
     case "platinosalalcance":
       return await comandoPlatinosAlAlcance(discordUserId);
     case "hoy": {
@@ -483,6 +643,48 @@ export async function POST(request: Request) {
     return NextResponse.json({ type: ResponseType.PONG });
   }
 
+  const discordAutor = interaction.member?.user?.id ?? interaction.user?.id;
+
+  // Autocompletado de /juego, /nota y /liga: hay que contestar en menos de
+  // 3 s y sin diferir, así que va con una consulta mínima (solo títulos).
+  if (interaction.type === InteractionType.AUTOCOMPLETE && interaction.data) {
+    const foco = interaction.data.options?.find((o) => o.focused);
+    let opciones: { name: string; value: string }[] = [];
+    try {
+      const userId = discordAutor ? await usuarioParagonDeDiscord(discordAutor) : null;
+      if (userId && foco) {
+        const texto = String(foco.value ?? "");
+        const nombres =
+          interaction.data.name === "liga"
+            ? (await listUserLeagues(userId)).map((l) => l.name).filter((n) => normalizarTitulo(n).includes(normalizarTitulo(texto)))
+            : await titulosParaAutocompletar(userId, texto);
+        // Discord: 25 opciones como mucho y 100 caracteres por nombre y valor.
+        opciones = [...new Set(nombres)].slice(0, 25).map((n) => ({ name: n.slice(0, 100), value: n.slice(0, 100) }));
+      }
+    } catch (error) {
+      console.error("[discord-interactions] autocompletado", error);
+    }
+    return NextResponse.json({ type: ResponseType.AUTOCOMPLETE_RESULT, data: { choices: opciones } });
+  }
+
+  // Botones (aceptar/rechazar ligas y amistades). Se contesta "editaré este
+  // mensaje" al momento y el cambio de verdad va en `after()`.
+  if (interaction.type === InteractionType.MESSAGE_COMPONENT && interaction.data?.custom_id && discordAutor) {
+    const { token } = interaction;
+    const customId = interaction.data.custom_id;
+    after(async () => {
+      let respuesta: Respuesta;
+      try {
+        respuesta = await responderBoton(customId, discordAutor);
+      } catch (error) {
+        console.error("[discord-interactions] botón", customId, error);
+        respuesta = mensaje("Algo falló — inténtalo desde la web.", { components: [] });
+      }
+      await editarRespuestaDiferida(token, respuesta);
+    });
+    return NextResponse.json({ type: ResponseType.DEFERRED_UPDATE_MESSAGE });
+  }
+
   if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.data) {
     // En un servidor el autor va en `member.user`; en un DM al bot, en `user` a secas.
     const discordUserId = interaction.member?.user?.id ?? interaction.user?.id;
@@ -497,7 +699,7 @@ export async function POST(request: Request) {
     // Único comando público — presumir de estadísticas en /perfil SÍ tiene
     // sentido delante del canal, a diferencia del backlog o la vergüenza
     // de cada uno (todo lo demás es efímero).
-    const esPublico = interaction.data.name === "perfil";
+    const esPublico = ["perfil", "ranking", "comparar", "Ver en Paragon", "Comparar en Paragon"].includes(interaction.data.name);
     const { token } = interaction;
 
     // El cálculo de verdad (consultas a la base, a veces un sync en vivo)
@@ -505,14 +707,16 @@ export async function POST(request: Request) {
     // del archivo sobre por qué (bug real de "La aplicación no ha
     // respondido" en producción).
     after(async () => {
-      let contenido: string;
+      let respuesta: Respuesta;
       try {
-        contenido = (await calcularRespuesta(interaction, discordUserId)).content;
+        respuesta = await calcularRespuesta(interaction, discordUserId);
       } catch (error) {
         console.error("[discord-interactions]", interaction.data!.name, error);
-        contenido = "Algo falló consultando tu biblioteca — inténtalo de nuevo en un momento.";
+        respuesta = mensaje("Algo falló consultando tu biblioteca — inténtalo de nuevo en un momento.");
       }
-      await editarRespuestaDiferida(token, contenido);
+      await editarRespuestaDiferida(token, respuesta);
+      // Para /ranking: quien usa el bot en un servidor sale en el de ese servidor.
+      if (interaction.guild_id) await apuntarMiembroServidor(interaction.guild_id, discordUserId);
     });
 
     return NextResponse.json({

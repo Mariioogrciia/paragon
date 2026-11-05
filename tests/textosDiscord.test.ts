@@ -11,6 +11,8 @@ describe("textosDm", () => {
       expect(t.trofeosTitulo("Elden Ring", 3)).toContain("3");
       expect(t.ligaTexto("Ana", "Los de siempre")).toContain("**Los de siempre**");
       expect(t.conectadoTitulo.length).toBeGreaterThan(0);
+      expect(t.amistadTexto("Ana")).toContain("Ana");
+      expect(t.aceptar.length * t.rechazar.length * t.verPerfil.length).toBeGreaterThan(0);
     }
   });
 

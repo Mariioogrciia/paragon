@@ -4,11 +4,12 @@ import { auth } from "@/auth";
 import { getDb } from "@/db";
 import { accounts } from "@/db/schema";
 import { GuiaBotDiscord } from "@/components/GuiaBotDiscord";
+import { tieneRolesDiscord } from "@/lib/discordRoles";
 
 export const metadata = { title: "Bot de Discord · Paragon" };
 
 /** Guía del bot de Discord dentro de Ajustes, con el estado real de tu cuenta (ver GuiaBotDiscord). */
-export default async function AjustesDiscordPage() {
+export default async function AjustesDiscordPage({ searchParams }: { searchParams: Promise<{ roles?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
 
@@ -18,5 +19,7 @@ export default async function AjustesDiscordPage() {
     .where(and(eq(accounts.userId, session.user.id), eq(accounts.provider, "discord")))
     .limit(1);
 
-  return <GuiaBotDiscord vinculado={Boolean(vinculada)} urlPaso1="/ajustes/seguridad" />;
+  const [{ roles: resultado }, conectado] = await Promise.all([searchParams, tieneRolesDiscord(session.user.id)]);
+
+  return <GuiaBotDiscord vinculado={Boolean(vinculada)} urlPaso1="/ajustes/seguridad" roles={{ conectado, resultado }} />;
 }

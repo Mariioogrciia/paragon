@@ -46,6 +46,19 @@ interface EmbedDiscord {
 
 const API_BASE = "https://discord.com/api/v10";
 
+/**
+ * Fila de botones de un mensaje (componentes de Discord). Los de estilo 1-4
+ * llevan `custom_id`, que vuelve a `/api/discord/interactions` al pulsarlos
+ * (ver `responderBoton` ahí); los de estilo 5 son enlaces.
+ */
+export interface FilaBotones {
+  type: 1;
+  components: (
+    | { type: 2; style: 1 | 2 | 3 | 4; label: string; custom_id: string }
+    | { type: 2; style: 5; label: string; url: string }
+  )[];
+}
+
 /** El ID de Discord de este usuario, si alguna vez inició sesión con ese proveedor. `null` = nunca lo vinculó, no hay a quién escribir. */
 export async function discordUserIdDe(userId: string): Promise<string | null> {
   const [row] = await db
@@ -73,7 +86,7 @@ function tokenHeaders(): { Authorization: string; "Content-Type": string } | nul
 }
 
 /** Manda un embed a un canal (de DM o de servidor, da igual — la API de Discord no distingue una vez tienes el ID). */
-async function enviarAlCanal(channelId: string, embed: EmbedDiscord): Promise<{ ok: boolean; error?: string }> {
+async function enviarAlCanal(channelId: string, embed: EmbedDiscord, botones?: FilaBotones[]): Promise<{ ok: boolean; error?: string }> {
   const headers = tokenHeaders();
   if (!headers) return { ok: false, error: "Falta DISCORD_BOT_TOKEN en el servidor." };
 
@@ -82,7 +95,7 @@ async function enviarAlCanal(channelId: string, embed: EmbedDiscord): Promise<{ 
       signal: AbortSignal.timeout(10_000),
       method: "POST",
       headers,
-      body: JSON.stringify({ embeds: [embed] }),
+      body: JSON.stringify(botones?.length ? { embeds: [embed], components: botones } : { embeds: [embed] }),
     });
     if (!mensaje.ok) return { ok: false, error: `Discord devolvió ${mensaje.status} al mandar el mensaje.` };
     return { ok: true };
@@ -102,7 +115,7 @@ async function enviarAlCanal(channelId: string, embed: EmbedDiscord): Promise<{ 
  * los DMs cerrados a gente del servidor), y merece decirlo tal cual, no un
  * "algo falló" genérico.
  */
-async function enviarDM(discordUserId: string, embed: EmbedDiscord): Promise<{ ok: boolean; error?: string }> {
+async function enviarDM(discordUserId: string, embed: EmbedDiscord, botones?: FilaBotones[]): Promise<{ ok: boolean; error?: string }> {
   const headers = tokenHeaders();
   if (!headers) return { ok: false, error: "Falta DISCORD_BOT_TOKEN en el servidor." };
 
@@ -120,7 +133,7 @@ async function enviarDM(discordUserId: string, embed: EmbedDiscord): Promise<{ o
       return { ok: false, error: `Discord devolvió ${canal.status} al abrir el DM.` };
     }
     const { id: channelId } = (await canal.json()) as { id: string };
-    return enviarAlCanal(channelId, embed);
+    return enviarAlCanal(channelId, embed, botones);
   } catch (error) {
     console.error("[discordBot] no se pudo avisar", error);
     return { ok: false, error: "Fallo de red al hablar con Discord." };
@@ -323,13 +336,55 @@ export async function anunciarInvitacionLiga(userId: string, leagueName: string,
   const href = dominio ? `https://${dominio}/ligas/${leagueId}` : undefined;
 
   const t = textosDm(await idiomaDeUsuario(userId));
-  await enviarDM(discordUserId, {
-    title: t.ligaTitulo,
-    description: t.ligaTexto(inviterName, leagueName),
-    url: href,
-    color: COLOR_GENERICO,
-    footer: { text: "Paragon" },
-  });
+  // Aceptar o rechazar sin salir de Discord (5 nov 2026): el botón vuelve a
+  // /api/discord/interactions con `liga:aceptar:<id>`.
+  await enviarDM(
+    discordUserId,
+    {
+      title: t.ligaTitulo,
+      description: t.ligaTexto(inviterName, leagueName),
+      url: href,
+      color: COLOR_GENERICO,
+      footer: { text: "Paragon" },
+    },
+    [botonesAceptarRechazar(`liga:aceptar:${leagueId}`, `liga:rechazar:${leagueId}`, t)],
+  );
+}
+
+function botonesAceptarRechazar(aceptar: string, rechazar: string, t: { aceptar: string; rechazar: string }): FilaBotones {
+  return {
+    type: 1,
+    components: [
+      { type: 2, style: 3, label: t.aceptar, custom_id: aceptar },
+      { type: 2, style: 4, label: t.rechazar, custom_id: rechazar },
+    ],
+  };
+}
+
+/**
+ * DM de "X quiere ser tu amigo" con botones para aceptar o rechazar desde
+ * Discord (5 nov 2026). Antes las solicitudes solo avisaban por push y en
+ * la campana. Mismo criterio que el resto (DM activado + Discord
+ * vinculado); nunca lanza.
+ */
+export async function anunciarSolicitudAmistad(userId: string, deUserId: string, nombre: string, handle: string | null): Promise<void> {
+  try {
+    const [row] = await db.select({ activado: users.discordDmEnabled }).from(users).where(eq(users.id, userId)).limit(1);
+    if (!row?.activado) return;
+    const discordUserId = await discordUserIdDe(userId);
+    if (!discordUserId) return;
+    const t = textosDm(await idiomaDeUsuario(userId));
+    const dominio = dominioProduccion();
+    const fila = botonesAceptarRechazar(`amigo:aceptar:${deUserId}`, `amigo:rechazar:${deUserId}`, t);
+    if (dominio && handle) fila.components.push({ type: 2, style: 5, label: t.verPerfil, url: `https://${dominio}/u/${handle}` });
+    await enviarDM(
+      discordUserId,
+      { title: t.amistadTitulo, description: t.amistadTexto(nombre), color: COLOR_GENERICO, footer: { text: "Paragon" } },
+      [fila],
+    );
+  } catch (error) {
+    console.error("[discord] DM de amistad", error);
+  }
 }
 
 /**

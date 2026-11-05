@@ -20,6 +20,11 @@ export interface TextosDm {
   conectadoTexto: string;
   ligaTitulo: string;
   ligaTexto: (quien: string, liga: string) => string;
+  amistadTitulo: string;
+  amistadTexto: (quien: string) => string;
+  aceptar: string;
+  rechazar: string;
+  verPerfil: string;
 }
 
 const TEXTOS: Record<Idioma, TextosDm> = {
@@ -33,6 +38,11 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     conectadoTexto: "Cuando consigas un trofeo nuevo, te lo digo por aquí.",
     ligaTitulo: "🏅 Invitación a una liga",
     ligaTexto: (q, l) => `${q} te ha invitado a la liga **${l}** en Paragon.`,
+    amistadTitulo: "🤝 Solicitud de amistad",
+    amistadTexto: (q) => `${q} quiere ser tu amigo en Paragon.`,
+    aceptar: "Aceptar",
+    rechazar: "Rechazar",
+    verPerfil: "Ver perfil",
   },
   en: {
     nivelTitulo: (n) => `⭐ Paragon level ${n}!`,
@@ -44,6 +54,11 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     conectadoTexto: "When you earn a new trophy, I'll tell you here.",
     ligaTitulo: "🏅 League invite",
     ligaTexto: (q, l) => `${q} invited you to the league **${l}** on Paragon.`,
+    amistadTitulo: "🤝 Friend request",
+    amistadTexto: (q) => `${q} wants to be your friend on Paragon.`,
+    aceptar: "Accept",
+    rechazar: "Decline",
+    verPerfil: "View profile",
   },
   de: {
     nivelTitulo: (n) => `⭐ Paragon-Stufe ${n}!`,
@@ -55,6 +70,11 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     conectadoTexto: "Wenn du eine neue Trophäe holst, sage ich es dir hier.",
     ligaTitulo: "🏅 Liga-Einladung",
     ligaTexto: (q, l) => `${q} hat dich in die Liga **${l}** auf Paragon eingeladen.`,
+    amistadTitulo: "🤝 Freundschaftsanfrage",
+    amistadTexto: (q) => `${q} möchte auf Paragon mit dir befreundet sein.`,
+    aceptar: "Annehmen",
+    rechazar: "Ablehnen",
+    verPerfil: "Profil ansehen",
   },
   fr: {
     nivelTitulo: (n) => `⭐ Niveau Paragon ${n} !`,
@@ -66,6 +86,11 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     conectadoTexto: "Quand tu obtiens un nouveau trophée, je te le dis ici.",
     ligaTitulo: "🏅 Invitation à une ligue",
     ligaTexto: (q, l) => `${q} t'a invité dans la ligue **${l}** sur Paragon.`,
+    amistadTitulo: "🤝 Demande d’ami",
+    amistadTexto: (q) => `${q} veut être ton ami sur Paragon.`,
+    aceptar: "Accepter",
+    rechazar: "Refuser",
+    verPerfil: "Voir le profil",
   },
   it: {
     nivelTitulo: (n) => `⭐ Livello Paragon ${n}!`,
@@ -77,6 +102,11 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     conectadoTexto: "Quando ottieni un nuovo trofeo, te lo dico qui.",
     ligaTitulo: "🏅 Invito a una lega",
     ligaTexto: (q, l) => `${q} ti ha invitato alla lega **${l}** su Paragon.`,
+    amistadTitulo: "🤝 Richiesta di amicizia",
+    amistadTexto: (q) => `${q} vuole essere tuo amico su Paragon.`,
+    aceptar: "Accetta",
+    rechazar: "Rifiuta",
+    verPerfil: "Vedi profilo",
   },
   pt: {
     nivelTitulo: (n) => `⭐ Nível Paragon ${n}!`,
@@ -88,6 +118,11 @@ const TEXTOS: Record<Idioma, TextosDm> = {
     conectadoTexto: "Quando conseguires um troféu novo, digo-te por aqui.",
     ligaTitulo: "🏅 Convite para uma liga",
     ligaTexto: (q, l) => `${q} convidou-te para a liga **${l}** no Paragon.`,
+    amistadTitulo: "🤝 Pedido de amizade",
+    amistadTexto: (q) => `${q} quer ser teu amigo no Paragon.`,
+    aceptar: "Aceitar",
+    rechazar: "Recusar",
+    verPerfil: "Ver perfil",
   },
 };
 
