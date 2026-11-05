@@ -1472,3 +1472,15 @@ export const clavesXbl = pgTable("clave_xbl", {
   clave: text("clave").notNull(),
   actualizadaAt: timestamp("actualizadaAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Quién quiere el resumen semanal por correo (5 nov 2026, lib/correo.ts).
+ * Solo con alta expresa en Ajustes → Avisos (una fila = alta); la baja borra
+ * la fila, desde Ajustes o desde el enlace de cada correo.
+ */
+export const correoSemanal = pgTable("correo_semanal", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  altaAt: timestamp("altaAt", { mode: "date" }).notNull().defaultNow(),
+});

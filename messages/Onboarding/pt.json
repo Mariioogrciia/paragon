@@ -707,5 +707,13 @@
     "google": "Google Calendar",
     "enlace": "Ligação",
     "privado": "A ligação é só tua: não a partilhes, porque quem a tiver vê as tuas datas."
+  },
+  "correoSemanal": {
+    "titulo": "Resumo semanal por e-mail",
+    "descripcion": "Todos os domingos à tarde: os teus troféus da semana, a tua sequência e o teu lugar na liga. Só se o ativares, e cancelas com um clique em qualquer e-mail.",
+    "casilla": "Quero o resumo semanal em {email}",
+    "sinCorreo": "A tua conta não tem e-mail (entraste com o Discord sem o partilhar).",
+    "bajaOk": "Feito: já não vais receber o resumo por e-mail.",
+    "enlaceRoto": "Essa ligação de cancelamento não é válida. Desativa aqui."
   }
 }

@@ -38,8 +38,29 @@ export async function enviarResumenesSemanales(hasta: number, ahora = new Date()
     .limit(maximo);
   if (candidatos.length === 0) return 0;
 
+  const lineasPorUsuario = await lineasDeResumen(candidatos.map((c) => c.userId), ahora);
+
+  let enviados = 0;
+  for (const { userId } of candidatos) {
+    if (Date.now() > hasta) break;
+    const lineas = lineasPorUsuario.get(userId) ?? [];
+
+    await enviarDmSiActivo(userId, { titulo: "📅 Tu semana en Paragon", texto: lineas.join("\n"), ruta: "/ritmo" });
+    // Se apunta aunque el DM falle por dentro (enviarDmSiActivo no lanza):
+    // mejor perder un resumen que mandar el mismo cada 10 minutos.
+    await db.insert(notificationLog).values({ userId, tipo: TIPO, clave }).onConflictDoNothing();
+    enviados++;
+  }
+  return enviados;
+}
+
+/**
+ * Las líneas del resumen de la semana de cada persona (en español; se
+ * traducen al salir, ver lib/avisosTraduccion.ts): trofeos, platinos, racha
+ * y puesto en la liga del mes. La usan el DM de Discord y el correo.
+ */
+export async function lineasDeResumen(ids: string[], ahora = new Date()): Promise<Map<string, string[]>> {
   const hace7Dias = new Date(ahora.getTime() - 7 * 86_400_000);
-  const ids = candidatos.map((c) => c.userId);
   const [semana, liga] = await Promise.all([
     db
       .select({
@@ -55,27 +76,21 @@ export async function enviarResumenesSemanales(hasta: number, ahora = new Date()
     getLigaMensual(ahora).catch(() => []),
   ]);
   const porUsuario = new Map(semana.map((s) => [s.userId, s]));
-
-  let enviados = 0;
-  for (const { userId } of candidatos) {
-    if (Date.now() > hasta) break;
+  const resultado = new Map<string, string[]>();
+  for (const userId of ids) {
     const datos = porUsuario.get(userId);
     const racha = await rachas(userId).catch(() => null);
     const puesto = liga.findIndex((l) => l.userId === userId);
-
-    const lineas = [
-      datos
-        ? `🏆 **${Number(datos.trofeos)}** trofeos en **${Number(datos.juegos)}** juegos${Number(datos.platinos) > 0 ? ` · 💎 **${Number(datos.platinos)}** platino${Number(datos.platinos) > 1 ? "s" : ""}` : ""}`
-        : "Esta semana no ha caído ningún trofeo — ¿retomamos algo?",
-      racha && racha.actual > 0 ? `🔥 Racha de **${racha.actual}** día${racha.actual > 1 ? "s" : ""}${racha.hoyCuenta ? "" : " (¡consigue uno hoy para no perderla!)"}` : null,
-      puesto >= 0 ? `📊 Vas **${puesto + 1}º** de ${liga.length} en la liga del mes` : null,
-    ].filter(Boolean);
-
-    await enviarDmSiActivo(userId, { titulo: "📅 Tu semana en Paragon", texto: lineas.join("\n"), ruta: "/ritmo" });
-    // Se apunta aunque el DM falle por dentro (enviarDmSiActivo no lanza):
-    // mejor perder un resumen que mandar el mismo cada 10 minutos.
-    await db.insert(notificationLog).values({ userId, tipo: TIPO, clave }).onConflictDoNothing();
-    enviados++;
+    resultado.set(
+      userId,
+      [
+        datos
+          ? `🏆 **${Number(datos.trofeos)}** trofeos en **${Number(datos.juegos)}** juegos${Number(datos.platinos) > 0 ? ` · 💎 **${Number(datos.platinos)}** platino${Number(datos.platinos) > 1 ? "s" : ""}` : ""}`
+          : "Esta semana no ha caído ningún trofeo — ¿retomamos algo?",
+        racha && racha.actual > 0 ? `🔥 Racha de **${racha.actual}** día${racha.actual > 1 ? "s" : ""}${racha.hoyCuenta ? "" : " (¡consigue uno hoy para no perderla!)"}` : null,
+        puesto >= 0 ? `📊 Vas **${puesto + 1}º** de ${liga.length} en la liga del mes` : null,
+      ].filter((l): l is string => Boolean(l)),
+    );
   }
-  return enviados;
+  return resultado;
 }

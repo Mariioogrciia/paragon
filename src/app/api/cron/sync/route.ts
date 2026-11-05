@@ -9,6 +9,7 @@ import { HORAS_CADUCIDAD, HORAS_CADUCIDAD_XBOX } from "@/lib/syncHealth";
 import { cerrarLigaMensualSiToca, cerrarLigasPrivadasVencidas } from "@/lib/trophyCase";
 import { comprobarAlertasPrecio } from "@/lib/priceAlerts";
 import { enviarResumenesSemanales } from "@/lib/resumenSemanal";
+import { enviarCorreosSemanales } from "@/lib/correo";
 import { cerrarGuerrasVencidas } from "@/lib/clanWars";
 import { traeSecretoCron } from "@/lib/secretoCron";
 import { avisarAdelantos, avisarLanzamientos, avisarPerdibles } from "@/lib/avisosAutomaticos";
@@ -417,6 +418,12 @@ export async function GET(request: Request) {
       resumenesSemanales = await enviarResumenesSemanales(arranque + PRESUPUESTO_MS - MARGEN_MS / 2);
     } catch (error) {
       console.error("[cron-sync] resumen semanal", error);
+    }
+    // Y por correo, a quien se dio de alta (lib/correo.ts).
+    try {
+      resumenesSemanales += await enviarCorreosSemanales(arranque + PRESUPUESTO_MS - MARGEN_MS / 2);
+    } catch (error) {
+      console.error("[cron-sync] resumen por correo", error);
     }
   }
 

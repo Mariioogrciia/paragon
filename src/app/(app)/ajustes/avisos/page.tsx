@@ -9,6 +9,8 @@ import { PreferenciasAvisos } from "@/components/PreferenciasAvisos";
 import { PushToggle } from "@/components/PushToggle";
 import { CATEGORIAS_AVISO, getAvisosDesactivados } from "@/lib/avisosPreferencias";
 import { CalendarioSuscripcion } from "@/components/CalendarioSuscripcion";
+import { CorreoSemanalToggle } from "@/components/CorreoSemanalToggle";
+import { correoActivo, estaSuscrito } from "@/lib/correo";
 import { firmarEnlace } from "@/lib/enlaceFirmado";
 import { dominioPublico } from "@/lib/site";
 
@@ -21,14 +23,14 @@ export const metadata = { title: "Avisos · Ajustes · Paragon" };
  * menú: "Elegir qué avisos recibir" de la campana llevaba a una página en la
  * que no se veían. Ahora todo junto aquí.
  */
-export default async function AjustesAvisosPage() {
+export default async function AjustesAvisosPage({ searchParams }: { searchParams: Promise<{ correo?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/entrar");
   const userId = session.user.id;
   const db = getDb();
 
-  const [usuario, discordVinculado, avisosOff, t] = await Promise.all([
-    db.query.users.findFirst({ where: eq(users.id, userId), columns: { discordDmEnabled: true } }),
+  const [usuario, discordVinculado, avisosOff, t, suscritoCorreo, { correo: resultadoCorreo }] = await Promise.all([
+    db.query.users.findFirst({ where: eq(users.id, userId), columns: { discordDmEnabled: true, email: true } }),
     // Si el bot puede escribirle por DM: sale de haber iniciado sesión con
     // Discord alguna vez (accounts.provider='discord'), no de un campo aparte.
     db
@@ -39,6 +41,8 @@ export default async function AjustesAvisosPage() {
       .then((filas) => filas.length > 0),
     getAvisosDesactivados(userId).catch(() => new Set<string>()),
     getTranslations("Onboarding"),
+    estaSuscrito(userId).catch(() => false),
+    searchParams,
   ]);
 
   // Las claves son la fuente de la verdad (avisosPreferencias.ts); el texto
@@ -63,6 +67,8 @@ export default async function AjustesAvisosPage() {
         <h2 className="mb-4 font-semibold">{t("profileForm.discordTitle")}</h2>
         <DiscordDmForm enabled={usuario?.discordDmEnabled ?? false} vinculado={discordVinculado} />
       </section>
+
+      {correoActivo() && <CorreoSemanalToggle suscrito={suscritoCorreo} email={usuario?.email ?? null} resultado={resultadoCorreo} />}
 
       <CalendarioSuscripcion url={`${dominioPublico()}/api/calendario/${firmarEnlace("calendario", userId)}.ics`} />
     </div>

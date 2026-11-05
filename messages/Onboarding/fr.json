@@ -707,5 +707,13 @@
     "google": "Google Agenda",
     "enlace": "Lien",
     "privado": "Le lien n’est qu’à toi : ne le partage pas, car quiconque l’a verra tes dates."
+  },
+  "correoSemanal": {
+    "titulo": "Résumé hebdomadaire par e-mail",
+    "descripcion": "Chaque dimanche soir : tes trophées de la semaine, ta série et ta place dans la ligue. Seulement si tu l’actives, et désabonnement en un clic depuis chaque e-mail.",
+    "casilla": "Je veux le résumé hebdomadaire à {email}",
+    "sinCorreo": "Ton compte n’a pas d’e-mail (tu t’es connecté avec Discord sans le partager).",
+    "bajaOk": "C’est fait : tu ne recevras plus le résumé par e-mail.",
+    "enlaceRoto": "Ce lien de désabonnement n’est pas valide. Désactive-le ici."
   }
 }

@@ -707,5 +707,13 @@
     "google": "Google Kalender",
     "enlace": "Link",
     "privado": "Der Link gehört nur dir: Teile ihn nicht, denn wer ihn hat, sieht deine Termine."
+  },
+  "correoSemanal": {
+    "titulo": "Wöchentliche Zusammenfassung per E-Mail",
+    "descripcion": "Jeden Sonntagabend: deine Trophäen der Woche, deine Serie und dein Ligaplatz. Nur wenn du es aktivierst, und mit einem Klick in jeder E-Mail abbestellbar.",
+    "casilla": "Ich möchte die Zusammenfassung an {email}",
+    "sinCorreo": "Dein Konto hat keine E-Mail (du hast dich mit Discord angemeldet, ohne sie zu teilen).",
+    "bajaOk": "Erledigt: Du bekommst die Zusammenfassung nicht mehr per E-Mail.",
+    "enlaceRoto": "Dieser Abmeldelink ist ungültig. Deaktiviere es hier."
   }
 }

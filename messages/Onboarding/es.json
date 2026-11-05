@@ -707,5 +707,13 @@
     "google": "Google Calendar",
     "enlace": "Enlace",
     "privado": "El enlace es solo tuyo: no lo compartas, porque quien lo tenga verá tus fechas."
+  },
+  "correoSemanal": {
+    "titulo": "Resumen semanal por correo",
+    "descripcion": "Cada domingo por la tarde, tus trofeos de la semana, tu racha y tu puesto en la liga. Solo si lo activas, y te das de baja con un clic desde cualquier correo.",
+    "casilla": "Quiero el resumen semanal en {email}",
+    "sinCorreo": "Tu cuenta no tiene correo (entraste con Discord sin compartirlo).",
+    "bajaOk": "Listo: ya no recibirás el resumen por correo.",
+    "enlaceRoto": "Ese enlace de baja no es válido. Desactívalo aquí."
   }
 }

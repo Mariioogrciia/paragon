@@ -707,5 +707,13 @@
     "google": "Google Calendar",
     "enlace": "Link",
     "privado": "Il link è solo tuo: non condividerlo, perché chi lo ha vedrà le tue date."
+  },
+  "correoSemanal": {
+    "titulo": "Riepilogo settimanale via e-mail",
+    "descripcion": "Ogni domenica sera: i tuoi trofei della settimana, la tua serie e la tua posizione nella lega. Solo se lo attivi, e ti disiscrivi con un clic da qualsiasi e-mail.",
+    "casilla": "Voglio il riepilogo settimanale a {email}",
+    "sinCorreo": "Il tuo account non ha un’e-mail (hai fatto accesso con Discord senza condividerla).",
+    "bajaOk": "Fatto: non riceverai più il riepilogo via e-mail.",
+    "enlaceRoto": "Quel link di disiscrizione non è valido. Disattivalo qui."
   }
 }

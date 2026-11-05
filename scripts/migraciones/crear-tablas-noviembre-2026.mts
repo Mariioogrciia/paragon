@@ -59,6 +59,11 @@ const TABLAS: Record<string, string> = {
       "clave" text NOT NULL,
       "actualizadaAt" timestamp NOT NULL DEFAULT now()
     );`,
+  correo_semanal: `
+    CREATE TABLE IF NOT EXISTS "correo_semanal" (
+      "userId" text PRIMARY KEY REFERENCES "user"("id") ON DELETE CASCADE,
+      "altaAt" timestamp NOT NULL DEFAULT now()
+    );`,
 };
 
 async function main() {

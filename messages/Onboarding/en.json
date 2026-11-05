@@ -707,5 +707,13 @@
     "google": "Google Calendar",
     "enlace": "Link",
     "privado": "The link is yours alone: don't share it, because anyone who has it will see your dates."
+  },
+  "correoSemanal": {
+    "titulo": "Weekly email summary",
+    "descripcion": "Every Sunday evening: your trophies of the week, your streak and your league position. Only if you turn it on, and you can unsubscribe in one click from any email.",
+    "casilla": "I want the weekly summary at {email}",
+    "sinCorreo": "Your account has no email (you signed in with Discord without sharing it).",
+    "bajaOk": "Done: you won't get the email summary any more.",
+    "enlaceRoto": "That unsubscribe link isn't valid. Turn it off here."
   }
 }
