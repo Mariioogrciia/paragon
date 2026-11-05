@@ -27,7 +27,7 @@ Hunters check Paragon between gaming sessions on desktop and phone (installable 
 
 ## Capabilities and Constraints
 
-- Next.js 16 App Router, Tailwind, next-intl with 4 interface languages (es, en, de, fr); all landing copy lives in message files.
+- Next.js 16 App Router, Tailwind, next-intl with 6 interface languages (es, en, de, fr, it, pt); all landing copy lives in message files.
 - Dark theme by default with alternative modes (light, OLED, high contrast) and user-chosen accent and "style" (lib/apariencia.ts); `globals.css` is global to the whole app.
 - Every clickable control must have a visible hover state (standing user rule).
 - Epic provides no playtime; Google Play/Nintendo are not supported.

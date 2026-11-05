@@ -1,5 +1,6 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from "next";
+import { politicaCsp } from "./src/lib/csp";
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
@@ -78,6 +79,9 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+          // CSP completa en modo SOLO INFORMAR (5 nov 2026): no bloquea nada,
+          // apunta en Admin → Registro lo que bloquearía (lib/csp.ts).
+          { key: "Content-Security-Policy-Report-Only", value: politicaCsp() },
         ],
       },
     ];

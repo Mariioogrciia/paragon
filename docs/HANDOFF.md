@@ -32,7 +32,7 @@ vez GitHub canceló el job sin llegar a ejecutar ningún paso).
   secretos (ver abajo).
 
 **Las tres piezas**:
-- **Web** (`src/`, Next 16.4.0 en Vercel, **`www.paragontrophies.com`**;
+- **Web** (`src/`, Next 16.4.2 en Vercel, **`www.paragontrophies.com`**;
   `platinos-nine.vercel.app` sigue sirviendo `/api` y `/movil` para las
   apps y la extensión viejas). En **6 idiomas**: es/en/de/fr/it/pt
   (portugués de Portugal; `Admin` en it/pt es copia del inglés).

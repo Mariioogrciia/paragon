@@ -1,5 +1,6 @@
 import "server-only";
-import { and, count, eq, gt, ne } from "drizzle-orm";
+import { createHash, randomBytes } from "node:crypto";
+import { and, count, eq, gt, inArray, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { registrarActividadApp } from "@/lib/trafico";
@@ -27,12 +28,32 @@ export function getBearerToken(req: Request): string | null {
   return token || null;
 }
 
+/**
+ * Lo que se guarda en `session.sessionToken` para un token de la app o de
+ * la extensión (5 nov 2026): su SHA-256 con el prefijo `h:`, nunca el token.
+ * Así una copia de la base no da sesiones usables. Las cookies del navegador
+ * siguen en claro porque las escribe y las busca Auth.js por su cuenta.
+ */
+export function huellaToken(token: string): string {
+  return `h:${createHash("sha256").update(token).digest("base64url")}`;
+}
+
+/** Las dos formas en que puede estar guardado un token: con huella (nuevo) o tal cual (los de antes del 5 nov). */
+function formasGuardadas(token: string): string[] {
+  return [huellaToken(token), token];
+}
+
+/** 32 bytes aleatorios: más entropía que un UUID y sin guiones. */
+function tokenNuevo(): string {
+  return randomBytes(32).toString("base64url");
+}
+
 export async function getMobileUserId(req: Request): Promise<string | null> {
   const token = getBearerToken(req);
   if (!token) return null;
 
   const row = await db.query.sessions.findFirst({
-    where: and(eq(sessions.sessionToken, token), gt(sessions.expires, new Date())),
+    where: and(inArray(sessions.sessionToken, formasGuardadas(token)), gt(sessions.expires, new Date())),
   });
 
   // Cuenta el día como "usó la app" para Admin → Analítica (lib/trafico.ts). Sin esperar.
@@ -53,10 +74,10 @@ const TREINTA_DIAS_MS = 30 * 24 * 60 * 60 * 1000;
  * cerrar sesión en el Chrome de ese teléfono ya no toca la app, y al revés.
  */
 export async function mintMobileSession(userId: string, sesionPrestada: string): Promise<string> {
-  const mobileToken = crypto.randomUUID();
+  const mobileToken = tokenNuevo();
 
   await db.insert(sessions).values({
-    sessionToken: mobileToken,
+    sessionToken: huellaToken(mobileToken),
     userId,
     expires: new Date(Date.now() + TREINTA_DIAS_MS),
   });
@@ -67,7 +88,7 @@ export async function mintMobileSession(userId: string, sesionPrestada: string):
 
 /** Cierra sesión SOLO en este móvil — borra únicamente su fila de `session`. */
 export async function revokeMobileSession(token: string): Promise<void> {
-  await db.delete(sessions).where(eq(sessions.sessionToken, token));
+  await db.delete(sessions).where(inArray(sessions.sessionToken, formasGuardadas(token)));
 }
 
 /**
@@ -80,10 +101,10 @@ export async function revokeMobileSession(token: string): Promise<void> {
  * de las dos.
  */
 export async function mintExtensionSession(userId: string): Promise<string> {
-  const token = crypto.randomUUID();
+  const token = tokenNuevo();
 
   await db.insert(sessions).values({
-    sessionToken: token,
+    sessionToken: huellaToken(token),
     userId,
     expires: new Date(Date.now() + TREINTA_DIAS_MS),
   });

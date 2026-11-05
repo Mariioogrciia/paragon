@@ -20,8 +20,8 @@ Reglas de base (ya acordadas, no reabrir sin decirlo el usuario):
   entra en la UI en sí cuando el usuario lo pide explícitamente, nunca en un
   archivo que Gemini tenga abierto en ese momento.
 - Contrato de API exacto (forma del JSON de cada endpoint): ver
-  [`src/app/api/mobile/CONTRACT.md`](src/app/api/mobile/CONTRACT.md) (o su
-  copia [`android/API-CONTRACT.md`](android/API-CONTRACT.md)).
+  [`src/app/api/mobile/CONTRACT.md`](../src/app/api/mobile/CONTRACT.md) (la
+  copia de `android/` ya no existe: la app está en `kmp/`).
 - **Importante**: el backend (`src/`) solo funciona en la app una vez
   comiteado Y PUESTO EN `origin/master` — la app apunta a
   `platinos-nine.vercel.app`, no a este disco. Un endpoint sin `git push`

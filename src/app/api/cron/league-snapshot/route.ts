@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { leagues, leagueStandingSnapshots } from "@/db/schema";
 import { getLeagueRankings } from "@/lib/leagues";
+import { traeSecretoCron } from "@/lib/secretoCron";
 
 /**
  * Foto semanal de la clasificación de cada liga — sin esto, el ranking de
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
   if (!secreto) {
     return NextResponse.json({ error: "Falta CRON_SECRET en el servidor." }, { status: 503 });
   }
-  if (request.headers.get("authorization") !== `Bearer ${secreto}`) {
+  if (!traeSecretoCron(request.headers.get("authorization"), secreto)) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 });
   }
 

@@ -4,16 +4,22 @@ No es una ruta (Next.js la ignora, no exporta handlers) — es la referencia
 para quien construya la UI nativa sin tener que leer el backend. Si un campo
 cambia aquí, avisar en el mismo PR que lo cambie.
 
-**Copia real para Gemini en `android/API-CONTRACT.md`** — Gemini (Android
-Studio) solo tiene acceso a la carpeta `android/`, no a este archivo. Si
-cambias algo aquí, cambia también esa copia en el mismo commit.
+La app nativa vive en `kmp/` (Kotlin Multiplatform); la carpeta `android/`
+y su copia de este contrato para Gemini ya no existen: **este archivo es la
+única referencia**.
+
+**Tokens (5 nov 2026)**: los que entrega `/movil/enlazar` y
+`/movil/enlazar-extension` son 32 bytes aleatorios en base64url (antes un
+UUID). En la base solo se guarda su SHA-256 (`huellaToken` en
+`lib/mobileAuth.ts`); los de antes, guardados tal cual, siguen valiendo
+hasta que caduquen. Para la app no cambia nada: es una cadena opaca.
 
 ## Autenticación
 
 Un único login real: Google o Discord (no hay contraseña, ver `src/auth.ts`).
 
 1. La app abre `/movil/entrar/google` (o `/discord`) en una Custom Tab
-   (`androidx.browser`) — ese route (`src/app/movil/entrar/[provider]/route.ts`)
+   (`androidx.browser`) — ese route (`src/app/(app)/movil/entrar/[provider]/route.ts`)
    llama a `signIn()` directo, SIN pasar por la página web `/entrar` de por
    medio. `AppRoot.LoginGate` en Android ya tiene un botón por proveedor.
    **Desde el 4 oct 2026 con `?k=<clave>`**: 32 bytes aleatorios en base64url

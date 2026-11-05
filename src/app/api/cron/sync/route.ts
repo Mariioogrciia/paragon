@@ -10,6 +10,7 @@ import { cerrarLigaMensualSiToca, cerrarLigasPrivadasVencidas } from "@/lib/trop
 import { comprobarAlertasPrecio } from "@/lib/priceAlerts";
 import { enviarResumenesSemanales } from "@/lib/resumenSemanal";
 import { cerrarGuerrasVencidas } from "@/lib/clanWars";
+import { traeSecretoCron } from "@/lib/secretoCron";
 import { avisarAdelantos, avisarLanzamientos, avisarPerdibles } from "@/lib/avisosAutomaticos";
 import { recordarSesiones } from "@/lib/sesiones";
 import { revisarRetosCoop } from "@/lib/coop";
@@ -166,7 +167,7 @@ export async function GET(request: Request) {
     );
   }
 
-  if (request.headers.get("authorization") !== `Bearer ${secreto}`) {
+  if (!traeSecretoCron(request.headers.get("authorization"), secreto)) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 });
   }
 
