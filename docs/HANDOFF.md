@@ -1,14 +1,85 @@
 # Paragon — traspaso
 
 Estado del proyecto para retomarlo sin releer nada más. Última
-actualización: **21 de octubre de 2026**.
+actualización: **5 de noviembre de 2026**.
 
 Lo de cada día (qué se hizo, por qué y con qué commits) está en
 [`docs/HISTORIAL.md`](HISTORIAL.md), de lo más nuevo a lo más viejo; lo de
 antes del 23 sept, en [`docs/historial/`](historial/). Antes de dar
 algo por nuevo, buscar ahí (grep): casi todo tiene historia.
 
-## Dónde estamos (21 oct 2026) · leer primero
+## Lo del 5 nov 2026 (auditoría completa y todo lo que salió de ella) · leer primero
+
+**Rama**: `claude/keen-euler-s1sudo` (sin pasar a master todavía). Detalle de
+cada cosa en docs/HISTORIAL.md («5 nov»).
+
+**Hecho** (todo con textos en los 6 idiomas; 337 pruebas puras + 13 de
+integración contra Postgres + prueba de humo con Playwright; CI de Android
+e iOS en verde con todo lo de `kmp/`):
+- Filtros de la biblioteca en el móvil (salían en columna al filtrar).
+- Streamers: `/api/texto/<handle>` (Nightbot/StreamElements), overlay de
+  OBS con alerta animada, insignia SVG, RSS, calendario `.ics` personal.
+- Discord: Linked Roles, botones en DM, autocompletado, embeds con imagen,
+  `/ranking`, `/comparar`, clic derecho → Apps, app instalable por usuario.
+- Apps: App Links (Android) y Universal Links (iOS), accesos directos del
+  icono, tile de Enfoque, widget de racha, notificación de sesión,
+  recordatorio de racha local y Spotlight en iOS.
+- Producto: plan de platino guiado, platinos más rápidos, evento del mes,
+  seguir, «Pregúntale a Paragon» (Claude), Paragon+ (Ko-fi), afiliados,
+  lista de coleccionables con casillas, «Abrir en YouTube».
+- Plataformas: RetroAchievements, varias cuentas de Steam para todos, NPSSO
+  de respaldo, clave propia de OpenXBL.
+- Avisos: resumen semanal por correo (Resend, opcional) y bot de Telegram.
+- Seguridad: tokens de la app con huella en la base, CRON_SECRET en tiempo
+  constante, CSP completa en modo informe, cron desde Supabase (pg_cron).
+- `profiles.ts` partido (amigos y destacados a su archivo, reexportados).
+
+**Te toca a ti (en orden; nada de esto se puede hacer desde aquí)**:
+1. **Migración** (tablas nuevas; sin ella todo lo nuevo se apaga solo):
+   `npx tsx scripts/migraciones/crear-tablas-noviembre-2026.mts`
+   (follow, apoyo, clave_xbl, correo_semanal, telegram_chat,
+   coleccionable_trofeo, discord_guild_member, discord_role_connection).
+2. **Cron cada 15 min desde Supabase**: pegar
+   `scripts/migraciones/cron-supabase.sql` en Supabase → SQL Editor con tu
+   CRON_SECRET (sustituye a cron-job.org).
+3. **Discord**: `npx tsx scripts/registrar-comandos-discord.mts` (comandos
+   nuevos), activar «User Install» en el Developer Portal → Installation, y
+   para Linked Roles: General Information → Linked Roles Verification URL
+   `https://www.paragontrophies.com/api/discord/roles`, OAuth2 → Redirect
+   `…/api/discord/roles/vuelta`, `npx tsx scripts/registrar-metadatos-discord.mts`
+   y `DISCORD_CLIENT_SECRET` en Vercel si el bot no es la misma aplicación
+   que el login.
+4. **Variables nuevas en Vercel** (cada una enciende lo suyo; sin ella, no
+   sale nada):
+   | Variable | Qué enciende |
+   |---|---|
+   | `ANTHROPIC_API_KEY` | «Pregúntale a Paragon» (20 preguntas/día por persona) |
+   | `RA_API_KEY`, `RA_API_USER` | RetroAchievements (antes: `npx tsx scripts/probar-retro.mts <usuario>`, no se ha probado contra la API real) |
+   | `PSN_NPSSO_RESPALDO` | NPSSO de reserva (ideal: otra sesión de la MISMA cuenta; otra cuenta tiene otros amigos) |
+   | `RESEND_API_KEY`, `CORREO_REMITENTE` | Resumen semanal por correo (dominio verificado en Resend) |
+   | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_WEBHOOK_SECRET` | Bot de Telegram (luego `npx tsx scripts/registrar-webhook-telegram.mts`) |
+   | `NEXT_PUBLIC_KOFI_URL`, `KOFI_VERIFICATION_TOKEN` | Paragon+ (webhook de Ko-fi: `…/api/kofi`) |
+   | `NEXT_PUBLIC_AFILIADO_{HUMBLE,FANATICAL,GMG,INSTANTGAMING,GAMESPLANET}` | Enlaces de afiliado |
+   | `ANDROID_CERT_SHA256` | App Links con la firma de release y la de Play App Signing (separadas por comas) |
+   | `APPLE_TEAM_ID` | Universal Links de iOS (cuenta de pago) |
+   Ojo: Paragon+ y afiliados son ingresos → Vercel Pro y el aviso legal de
+   la LSSI (ver «Anuncios» más abajo).
+5. **Revisar Admin → Registro** un par de semanas: los avisos «CSP
+   bloquearía…» dicen qué falta para pasar la CSP de informe a obligatoria.
+
+**Decidido no hacer (y por qué)**: Wear OS (sin demanda medida), Live
+Activities de iOS (piden la cuenta de pago), GOG/EA/Ubisoft por la
+extensión (sin poder probarlo con cuentas reales, sería código a ciegas),
+WhatsApp (caro y con mucho papeleo), extensión de panel de Twitch (pide
+revisión de Twitch; el comando de chat y el overlay cubren lo principal).
+
+**Pruebas nuevas**: `npm run test:integracion` contra una base de PRUEBA
+(se niegan a correr contra Supabase); `node tests/humo/humo.mjs` con la web
+arrancada. La CI las lanza en el job `integracion` con un Postgres de
+servicio. Encontraron tres fallos de verdad que ya están arreglados (ver
+HISTORIAL): merece la pena añadir una cada vez que se toque una consulta.
+
+## Dónde estamos (21 oct 2026)
 
 **Código**: la rama de trabajo `claude/focused-shannon-2l5u4p` es igual a
 master (`f0aac88`, 21 oct). Regla del usuario: **siempre push a master**

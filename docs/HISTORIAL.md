@@ -4,6 +4,60 @@ Lo hecho en cada sesión, de lo más nuevo a lo más viejo. El estado actual,
 cómo funciona el proyecto y la operación están en [`HANDOFF.md`](HANDOFF.md).
 Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
+## Noviembre de 2026
+
+### Auditoría completa y todo lo que salió de ella (5 nov)
+
+Pedido: «una auditoría completísima» y luego «ponte con absolutamente todo
+lo que me has sugerido», más el fallo de los filtros en el móvil, «Abrir en
+YouTube» y una lista de coleccionables con casillas. Rama
+`claude/keen-euler-s1sudo`.
+
+- **Filtros de la biblioteca** (`LibraryGrid.tsx`): la caja de plataformas
+  tenía `flex-1` (base 0) y no bajaba a su línea; al filtrar se quedaba en
+  60 px y cada plataforma salía en vertical. `w-full` en el móvil.
+- **Streamers y calendario**: `lib/streamer.ts` + `lib/streamerTexto.ts`
+  (texto para el chat, insignia SVG), overlay con JSON cada 30 s y alerta
+  animada (JSON escapado dentro del script), `lib/rssFeed.ts`,
+  `lib/ics.ts` + `lib/calendarioPersonal.ts` con enlace firmado
+  (`lib/enlaceFirmado.ts`, HMAC con AUTH_SECRET, sin tabla).
+- **Discord**: Linked Roles (`lib/discordRoles.ts`, tokens cifrados con
+  `lib/cifrado.ts`, se reenvían al acabar cada sync solo si cambian),
+  botones en DM de liga y amistad (`declineFriendRequest` solo toca
+  pendientes), autocompletado, embeds, `/ranking` (`lib/discordServidor.ts`:
+  quien usa el bot en un servidor, sin intent privilegiado), `/comparar`,
+  menús contextuales, `integration_types`/`contexts`.
+- **Seguridad**: tokens de la app/extensión de 32 bytes y en la base solo
+  `h:` + SHA-256 (`huellaToken`); CRON_SECRET con `timingSafeEqual`;
+  `Content-Security-Policy-Report-Only` (`lib/csp.ts`, informes a
+  `/api/csp` → Registro); `cron-supabase.sql` (pg_cron + pg_net + Vault).
+- **Apps**: `assetlinks.json` y `apple-app-site-association`
+  (`lib/enlacesApp.ts`); intent-filter `autoVerify`; `xml/shortcuts.xml`;
+  `EnfoqueTileService`; `RachaWidget`; `NotificacionEnfoqueAndroid`; en iOS
+  accesos rápidos (escena propia), recordatorio de racha (`RachaIOS`) y
+  Spotlight (`BusquedaIOS`). Rutas web → app ampliadas en `EnlaceAviso.kt`.
+- **Producto**: `lib/planPlatino.ts` (fases), `lib/platinoRapido.ts`,
+  `lib/eventos.ts` + `/ligas/evento`, `lib/seguir.ts` (tabla `follow`, feed),
+  `lib/asistente.ts` (Claude con herramientas de `asistenteHerramientas.ts`,
+  esfuerzo bajo, 4 vueltas, `fallbacks: "default"`), `lib/apoyo.ts` + Ko-fi,
+  `lib/afiliados.ts`, `lib/coleccionables.ts` (lista pegada o de la
+  comunidad, mueve el contador manual).
+- **Plataformas**: `lib/retro/client.ts` (RetroAchievements, 100 % cuenta
+  como platino), varias Steam para todos, `npssosDelEntorno` (respaldo),
+  `lib/claveXbl.ts` (clave propia por AsyncLocalStorage).
+- **Avisos**: `lib/correo.ts` (Resend por HTTP, alta expresa, baja de un
+  clic con List-Unsubscribe) y `lib/telegram.ts` (webhook que contesta en
+  la propia respuesta).
+- **Pruebas**: `tests/integracion` contra Postgres y `tests/humo/humo.mjs`;
+  job `integracion` en la CI. Encontraron tres fallos de verdad:
+  1. una huella `h:` copiada de la base valía como token (`formasGuardadas`
+     aceptaba el valor «tal cual» también para huellas);
+  2. abrir otra vez un enlace de Telegram ya usado desconectaba tu cuenta
+     (se borraba el chat antes de comprobar el código);
+  3. si fallaba la revalidación de la caché, quien pagaba Paragon+ se
+     quedaba sin el aviso.
+- Docs: 6 idiomas en PRODUCT.md, contrato móvil sin la copia de `android/`.
+
 ## Octubre de 2026
 
 ### Descubrir, Noticias y eSports desde la CDN sin sesión (23 oct)
