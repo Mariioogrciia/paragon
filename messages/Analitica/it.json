@@ -32,8 +32,34 @@
     "clearDayFilter": "✕ Vedi tutto il mese",
     "barAriaLabel": "{mes}: {count, plural, one {# trofeo} other {# trofei}}",
     "nombreMes": "{mes} {anio}",
-    "mesesLargos": ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"],
-    "mesesCortos": ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
+    "mesesLargos": [
+      "gennaio",
+      "febbraio",
+      "marzo",
+      "aprile",
+      "maggio",
+      "giugno",
+      "luglio",
+      "agosto",
+      "settembre",
+      "ottobre",
+      "novembre",
+      "dicembre"
+    ],
+    "mesesCortos": [
+      "gen",
+      "feb",
+      "mar",
+      "apr",
+      "mag",
+      "giu",
+      "lug",
+      "ago",
+      "set",
+      "ott",
+      "nov",
+      "dic"
+    ]
   },
   "planificador": {
     "ordenProximidad": "Più vicini",
@@ -82,7 +108,20 @@
     "trofeosPorMes": "Trofei al mese",
     "verDetalle": "Vedi il dettaglio →",
     "tooltip": "{mes}: {count, plural, one {# trofeo} other {# trofei}}",
-    "mesesCortos": ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
+    "mesesCortos": [
+      "gen",
+      "feb",
+      "mar",
+      "apr",
+      "mag",
+      "giu",
+      "lug",
+      "ago",
+      "set",
+      "ott",
+      "nov",
+      "dic"
+    ]
   },
   "statusBadge": {
     "platinado": "Platinato",
@@ -123,8 +162,29 @@
     "sinAbandonados": "Nessun gioco abbandonato registrato."
   },
   "activityHeatmap": {
-    "diasSemanaIniciales": ["L", "", "M", "", "V", "", ""],
-    "mesesCortos": ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"],
+    "diasSemanaIniciales": [
+      "L",
+      "",
+      "M",
+      "",
+      "V",
+      "",
+      ""
+    ],
+    "mesesCortos": [
+      "gen",
+      "feb",
+      "mar",
+      "apr",
+      "mag",
+      "giu",
+      "lug",
+      "ago",
+      "set",
+      "ott",
+      "nov",
+      "dic"
+    ],
     "totalTrofeos": "{count, plural, one {# trofeo ottenuto} other {# trofei ottenuti}} negli ultimi 12 mesi",
     "tooltip": "{count, plural, one {# trofeo} other {# trofei}} · {fecha}",
     "menos": "Meno",
@@ -203,7 +263,20 @@
     "tooltipPlatinos": "{count, plural, one {# platino} other {# platini}}",
     "barAriaLabel": "{mes}: {count, plural, one {# trofeo} other {# trofei}}. Vedi il dettaglio",
     "footer": "Su {conFecha} di {total} trofei: contano solo quelli con data registrata. Le date arrivano sincronizzando il dettaglio di ogni gioco, e questo si completa da solo in background.",
-    "mesesCortos": ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
+    "mesesCortos": [
+      "gen",
+      "feb",
+      "mar",
+      "apr",
+      "mag",
+      "giu",
+      "lug",
+      "ago",
+      "set",
+      "ott",
+      "nov",
+      "dic"
+    ]
   },
   "trophyTree": {
     "aviso": "Raggruppati per metallo (o rarità), non per ordine reale di sblocco — né PSN né Steam dicono quale trofeo richiede quale.",
@@ -225,12 +298,33 @@
     "guiasEscritas": "Guide scritte di questo gioco"
   },
   "hourlyHeatmap": {
-    "dias": ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
+    "dias": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mer",
+      "Gio",
+      "Ven",
+      "Sab"
+    ],
     "resumen": "Il {pct}% dei tuoi trofei arriva il {dia} tra le {inicio}:00 e le {fin}:00.",
     "tooltip": "{count, plural, one {# trofeo} other {# trofei}} · {dia} {inicio}-{fin}"
   },
   "monthlySummary": {
-    "meses": ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
+    "meses": [
+      "Gennaio",
+      "Febbraio",
+      "Marzo",
+      "Aprile",
+      "Maggio",
+      "Giugno",
+      "Luglio",
+      "Agosto",
+      "Settembre",
+      "Ottobre",
+      "Novembre",
+      "Dicembre"
+    ],
     "sinTrofeosTitulo": "Ancora nessun trofeo questo mese",
     "sinTrofeosTexto": "Il primo apparirà qui appena lo ottieni.",
     "resumenDe": "Riepilogo di {mes}",

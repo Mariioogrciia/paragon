@@ -392,31 +392,106 @@
   },
   "Badges": {
     "items": {
-      "first_blood": { "name": "Primeiro Sangue", "description": "Conquistaste a tua primeira platina" },
-      "cazador": { "name": "Caçador", "description": "Conquistaste 10 platinas" },
-      "experto": { "name": "Especialista", "description": "Conquistaste 50 platinas" },
-      "leyenda": { "name": "Lenda", "description": "Conquistaste 100 platinas" },
-      "coleccionista": { "name": "Colecionador", "description": "Tens mais de 100 jogos na tua biblioteca" },
-      "madrugador": { "name": "Madrugador", "description": "Utilizador pioneiro do Paragon" },
-      "critico": { "name": "Crítico", "description": "Escreveste pelo menos 3 análises" },
-      "sociable": { "name": "Sociável", "description": "Tens pelo menos 3 amigos" },
-      "rolero": { "name": "Fã de RPG", "description": "Jogaste 5 RPG" },
-      "multiplataforma": { "name": "Multiplataforma", "description": "Tens PlayStation, Steam e Xbox ligados e a sincronizar" },
-      "joya_rara": { "name": "Joia rara", "description": "Consegue uma platina que menos de 5% dos jogadores tem." },
-      "uno_entre_cien": { "name": "Um em cem", "description": "Consegue 10 troféus que menos de 1% dos jogadores tem." },
-      "campeon": { "name": "Campeão", "description": "Ganha uma liga: a mensal ou uma privada." },
-      "senor_guerra": { "name": "Senhor da guerra", "description": "Ganha uma guerra de clãs." },
-      "en_equipo": { "name": "Em equipa", "description": "Cumpre a tempo um desafio de Platinar juntos." },
-      "anfitrion": { "name": "Anfitrião", "description": "Organiza uma sessão de troféus a que alguém se junte." },
-      "guia": { "name": "Guia da comunidade", "description": "Escreve 3 guias de troféus." },
-      "semana_perfecta": { "name": "Semana perfeita", "description": "Completa as 4 missões de uma semana." },
-      "incansable": { "name": "Incansável", "description": "Completa 25 missões semanais." },
-      "temporada_oro": { "name": "Temporada de ouro", "description": "Chega ao nível 30 num Passe de Temporada." },
-      "temporada_platino": { "name": "Temporada de platina", "description": "Chega ao nível 50 num Passe de Temporada." },
-      "veterano": { "name": "Veterano", "description": "Chega ao nível Paragon 25." },
-      "maestro": { "name": "Mestre", "description": "Chega ao nível Paragon 50." },
-      "noctambulo": { "name": "Noctívago", "description": "Consegue 10 troféus entre as 2 e as 5 da madrugada." },
-      "maraton": { "name": "Maratona", "description": "Consegue 40 troféus num só dia." }
+      "first_blood": {
+        "name": "Primeiro Sangue",
+        "description": "Conquistaste a tua primeira platina"
+      },
+      "cazador": {
+        "name": "Caçador",
+        "description": "Conquistaste 10 platinas"
+      },
+      "experto": {
+        "name": "Especialista",
+        "description": "Conquistaste 50 platinas"
+      },
+      "leyenda": {
+        "name": "Lenda",
+        "description": "Conquistaste 100 platinas"
+      },
+      "coleccionista": {
+        "name": "Colecionador",
+        "description": "Tens mais de 100 jogos na tua biblioteca"
+      },
+      "madrugador": {
+        "name": "Madrugador",
+        "description": "Utilizador pioneiro do Paragon"
+      },
+      "critico": {
+        "name": "Crítico",
+        "description": "Escreveste pelo menos 3 análises"
+      },
+      "sociable": {
+        "name": "Sociável",
+        "description": "Tens pelo menos 3 amigos"
+      },
+      "rolero": {
+        "name": "Fã de RPG",
+        "description": "Jogaste 5 RPG"
+      },
+      "multiplataforma": {
+        "name": "Multiplataforma",
+        "description": "Tens PlayStation, Steam e Xbox ligados e a sincronizar"
+      },
+      "joya_rara": {
+        "name": "Joia rara",
+        "description": "Consegue uma platina que menos de 5% dos jogadores tem."
+      },
+      "uno_entre_cien": {
+        "name": "Um em cem",
+        "description": "Consegue 10 troféus que menos de 1% dos jogadores tem."
+      },
+      "campeon": {
+        "name": "Campeão",
+        "description": "Ganha uma liga: a mensal ou uma privada."
+      },
+      "senor_guerra": {
+        "name": "Senhor da guerra",
+        "description": "Ganha uma guerra de clãs."
+      },
+      "en_equipo": {
+        "name": "Em equipa",
+        "description": "Cumpre a tempo um desafio de Platinar juntos."
+      },
+      "anfitrion": {
+        "name": "Anfitrião",
+        "description": "Organiza uma sessão de troféus a que alguém se junte."
+      },
+      "guia": {
+        "name": "Guia da comunidade",
+        "description": "Escreve 3 guias de troféus."
+      },
+      "semana_perfecta": {
+        "name": "Semana perfeita",
+        "description": "Completa as 4 missões de uma semana."
+      },
+      "incansable": {
+        "name": "Incansável",
+        "description": "Completa 25 missões semanais."
+      },
+      "temporada_oro": {
+        "name": "Temporada de ouro",
+        "description": "Chega ao nível 30 num Passe de Temporada."
+      },
+      "temporada_platino": {
+        "name": "Temporada de platina",
+        "description": "Chega ao nível 50 num Passe de Temporada."
+      },
+      "veterano": {
+        "name": "Veterano",
+        "description": "Chega ao nível Paragon 25."
+      },
+      "maestro": {
+        "name": "Mestre",
+        "description": "Chega ao nível Paragon 50."
+      },
+      "noctambulo": {
+        "name": "Noctívago",
+        "description": "Consegue 10 troféus entre as 2 e as 5 da madrugada."
+      },
+      "maraton": {
+        "name": "Maratona",
+        "description": "Consegue 40 troféus num só dia."
+      }
     }
   },
   "ScreenshotStrip": {

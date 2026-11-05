@@ -276,18 +276,54 @@
     "completada": "Concluída",
     "progreso": "{actual}/{total}",
     "retos": {
-      "trofeos": { "titulo": "Ritmo de caça", "descripcion": "Consegue 5 troféus esta semana." },
-      "platino": { "titulo": "Uma joia semanal", "descripcion": "Consegue 1 platina esta semana." },
-      "raros": { "titulo": "Caçador de raridades", "descripcion": "Consegue 2 troféus com 10% de raridade ou menos." },
-      "ultra-raros": { "titulo": "Ultra raro", "descripcion": "Consegue 1 troféu com 5% de raridade ou menos." },
-      "dias": { "titulo": "Constância", "descripcion": "Consegue conquistas em 3 dias diferentes." },
-      "finde": { "titulo": "Sessão de fim de semana", "descripcion": "Consegue alguma conquista ao sábado ou ao domingo." },
-      "juegos": { "titulo": "Dose dupla", "descripcion": "Consegue troféus em 2 jogos diferentes." },
-      "generos": { "titulo": "Explorador", "descripcion": "Consegue troféus em jogos de 2 géneros diferentes." },
-      "plataformas": { "titulo": "Multiplataforma", "descripcion": "Consegue troféus em 2 plataformas diferentes." },
-      "oro": { "titulo": "Sequência de ouro", "descripcion": "Consegue 3 troféus de ouro." },
-      "plata": { "titulo": "Colheita de prata", "descripcion": "Consegue 4 troféus de prata." },
-      "bronce": { "titulo": "Bronze aos montes", "descripcion": "Consegue 8 troféus de bronze." }
+      "trofeos": {
+        "titulo": "Ritmo de caça",
+        "descripcion": "Consegue 5 troféus esta semana."
+      },
+      "platino": {
+        "titulo": "Uma joia semanal",
+        "descripcion": "Consegue 1 platina esta semana."
+      },
+      "raros": {
+        "titulo": "Caçador de raridades",
+        "descripcion": "Consegue 2 troféus com 10% de raridade ou menos."
+      },
+      "ultra-raros": {
+        "titulo": "Ultra raro",
+        "descripcion": "Consegue 1 troféu com 5% de raridade ou menos."
+      },
+      "dias": {
+        "titulo": "Constância",
+        "descripcion": "Consegue conquistas em 3 dias diferentes."
+      },
+      "finde": {
+        "titulo": "Sessão de fim de semana",
+        "descripcion": "Consegue alguma conquista ao sábado ou ao domingo."
+      },
+      "juegos": {
+        "titulo": "Dose dupla",
+        "descripcion": "Consegue troféus em 2 jogos diferentes."
+      },
+      "generos": {
+        "titulo": "Explorador",
+        "descripcion": "Consegue troféus em jogos de 2 géneros diferentes."
+      },
+      "plataformas": {
+        "titulo": "Multiplataforma",
+        "descripcion": "Consegue troféus em 2 plataformas diferentes."
+      },
+      "oro": {
+        "titulo": "Sequência de ouro",
+        "descripcion": "Consegue 3 troféus de ouro."
+      },
+      "plata": {
+        "titulo": "Colheita de prata",
+        "descripcion": "Consegue 4 troféus de prata."
+      },
+      "bronce": {
+        "titulo": "Bronze aos montes",
+        "descripcion": "Consegue 8 troféus de bronze."
+      }
     }
   },
   "EsportsPartido": {

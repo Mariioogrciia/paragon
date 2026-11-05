@@ -276,18 +276,54 @@
     "completada": "Completata",
     "progreso": "{actual}/{total}",
     "retos": {
-      "trofeos": { "titulo": "Ritmo di caccia", "descripcion": "Ottieni 5 trofei questa settimana." },
-      "platino": { "titulo": "Una gemma settimanale", "descripcion": "Ottieni 1 platino questa settimana." },
-      "raros": { "titulo": "Cacciatore di rarità", "descripcion": "Ottieni 2 trofei con rarità del 10% o meno." },
-      "ultra-raros": { "titulo": "Ultra raro", "descripcion": "Ottieni 1 trofeo con rarità del 5% o meno." },
-      "dias": { "titulo": "Costanza", "descripcion": "Ottieni obiettivi in 3 giorni diversi." },
-      "finde": { "titulo": "Sessione del weekend", "descripcion": "Ottieni un obiettivo di sabato o domenica." },
-      "juegos": { "titulo": "Doppia porzione", "descripcion": "Ottieni trofei in 2 giochi diversi." },
-      "generos": { "titulo": "Esploratore", "descripcion": "Ottieni trofei in giochi di 2 generi diversi." },
-      "plataformas": { "titulo": "Multipiattaforma", "descripcion": "Ottieni trofei su 2 piattaforme diverse." },
-      "oro": { "titulo": "Serie d'oro", "descripcion": "Ottieni 3 trofei d'oro." },
-      "plata": { "titulo": "Raccolto d'argento", "descripcion": "Ottieni 4 trofei d'argento." },
-      "bronce": { "titulo": "Bronzo a volontà", "descripcion": "Ottieni 8 trofei di bronzo." }
+      "trofeos": {
+        "titulo": "Ritmo di caccia",
+        "descripcion": "Ottieni 5 trofei questa settimana."
+      },
+      "platino": {
+        "titulo": "Una gemma settimanale",
+        "descripcion": "Ottieni 1 platino questa settimana."
+      },
+      "raros": {
+        "titulo": "Cacciatore di rarità",
+        "descripcion": "Ottieni 2 trofei con rarità del 10% o meno."
+      },
+      "ultra-raros": {
+        "titulo": "Ultra raro",
+        "descripcion": "Ottieni 1 trofeo con rarità del 5% o meno."
+      },
+      "dias": {
+        "titulo": "Costanza",
+        "descripcion": "Ottieni obiettivi in 3 giorni diversi."
+      },
+      "finde": {
+        "titulo": "Sessione del weekend",
+        "descripcion": "Ottieni un obiettivo di sabato o domenica."
+      },
+      "juegos": {
+        "titulo": "Doppia porzione",
+        "descripcion": "Ottieni trofei in 2 giochi diversi."
+      },
+      "generos": {
+        "titulo": "Esploratore",
+        "descripcion": "Ottieni trofei in giochi di 2 generi diversi."
+      },
+      "plataformas": {
+        "titulo": "Multipiattaforma",
+        "descripcion": "Ottieni trofei su 2 piattaforme diverse."
+      },
+      "oro": {
+        "titulo": "Serie d'oro",
+        "descripcion": "Ottieni 3 trofei d'oro."
+      },
+      "plata": {
+        "titulo": "Raccolto d'argento",
+        "descripcion": "Ottieni 4 trofei d'argento."
+      },
+      "bronce": {
+        "titulo": "Bronzo a volontà",
+        "descripcion": "Ottieni 8 trofei di bronzo."
+      }
     }
   },
   "EsportsPartido": {

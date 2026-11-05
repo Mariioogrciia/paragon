@@ -32,8 +32,34 @@
     "clearDayFilter": "✕ Ver o mês todo",
     "barAriaLabel": "{mes}: {count, plural, one {# troféu} other {# troféus}}",
     "nombreMes": "{mes} de {anio}",
-    "mesesLargos": ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
-    "mesesCortos": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+    "mesesLargos": [
+      "janeiro",
+      "fevereiro",
+      "março",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro"
+    ],
+    "mesesCortos": [
+      "jan",
+      "fev",
+      "mar",
+      "abr",
+      "mai",
+      "jun",
+      "jul",
+      "ago",
+      "set",
+      "out",
+      "nov",
+      "dez"
+    ]
   },
   "planificador": {
     "ordenProximidad": "Mais perto",
@@ -82,7 +108,20 @@
     "trofeosPorMes": "Troféus por mês",
     "verDetalle": "Ver o detalhe →",
     "tooltip": "{mes}: {count, plural, one {# troféu} other {# troféus}}",
-    "mesesCortos": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+    "mesesCortos": [
+      "jan",
+      "fev",
+      "mar",
+      "abr",
+      "mai",
+      "jun",
+      "jul",
+      "ago",
+      "set",
+      "out",
+      "nov",
+      "dez"
+    ]
   },
   "statusBadge": {
     "platinado": "Platinado",
@@ -123,8 +162,29 @@
     "sinAbandonados": "Não há jogos abandonados registados."
   },
   "activityHeatmap": {
-    "diasSemanaIniciales": ["S", "", "Q", "", "S", "", ""],
-    "mesesCortos": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+    "diasSemanaIniciales": [
+      "S",
+      "",
+      "Q",
+      "",
+      "S",
+      "",
+      ""
+    ],
+    "mesesCortos": [
+      "jan",
+      "fev",
+      "mar",
+      "abr",
+      "mai",
+      "jun",
+      "jul",
+      "ago",
+      "set",
+      "out",
+      "nov",
+      "dez"
+    ],
     "totalTrofeos": "{count, plural, one {# troféu conquistado} other {# troféus conquistados}} nos últimos 12 meses",
     "tooltip": "{count, plural, one {# troféu} other {# troféus}} · {fecha}",
     "menos": "Menos",
@@ -203,7 +263,20 @@
     "tooltipPlatinos": "{count, plural, one {# platina} other {# platinas}}",
     "barAriaLabel": "{mes}: {count, plural, one {# troféu} other {# troféus}}. Ver detalhe",
     "footer": "Sobre {conFecha} de {total} troféus: só contam os que têm data registada. As datas chegam ao sincronizar o detalhe de cada jogo, e isso completa-se sozinho em segundo plano.",
-    "mesesCortos": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+    "mesesCortos": [
+      "jan",
+      "fev",
+      "mar",
+      "abr",
+      "mai",
+      "jun",
+      "jul",
+      "ago",
+      "set",
+      "out",
+      "nov",
+      "dez"
+    ]
   },
   "trophyTree": {
     "aviso": "Agrupado por metal (ou raridade), não pela ordem real de desbloqueio — nem a PSN nem o Steam dizem que troféu depende de qual.",
@@ -225,12 +298,33 @@
     "guiasEscritas": "Guias escritos deste jogo"
   },
   "hourlyHeatmap": {
-    "dias": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+    "dias": [
+      "Dom",
+      "Seg",
+      "Ter",
+      "Qua",
+      "Qui",
+      "Sex",
+      "Sáb"
+    ],
     "resumen": "{pct}% dos teus troféus caem à {dia} entre as {inicio}:00 e as {fin}:00.",
     "tooltip": "{count, plural, one {# troféu} other {# troféus}} · {dia} {inicio}h-{fin}h"
   },
   "monthlySummary": {
-    "meses": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+    "meses": [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro"
+    ],
     "sinTrofeosTitulo": "Ainda nenhum troféu este mês",
     "sinTrofeosTexto": "O primeiro aparece aqui assim que o conseguires.",
     "resumenDe": "Resumo de {mes}",
