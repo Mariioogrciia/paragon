@@ -571,7 +571,9 @@
   },
   "CompartirImagen": {
     "compartirImagen": "Bild teilen",
-    "preparando": "Wird vorbereitet…"
+    "preparando": "Wird vorbereitet…",
+    "tocaOtraVez": "Fertig · nochmal tippen",
+    "error": "Konnte nicht erstellt werden · erneut"
   },
   "CompartirImagenWrap": {
     "tituloCompartir": "Mein Paragon Wrap"

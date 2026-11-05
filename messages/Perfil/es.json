@@ -571,7 +571,9 @@
   },
   "CompartirImagen": {
     "compartirImagen": "Compartir imagen",
-    "preparando": "Preparando…"
+    "preparando": "Preparando…",
+    "tocaOtraVez": "Lista · toca otra vez",
+    "error": "No se pudo preparar · reintentar"
   },
   "CompartirImagenWrap": {
     "tituloCompartir": "Mi Paragon Wrap"

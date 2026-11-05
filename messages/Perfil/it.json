@@ -571,7 +571,9 @@
   },
   "CompartirImagen": {
     "compartirImagen": "Condividi immagine",
-    "preparando": "Preparazione…"
+    "preparando": "Preparazione…",
+    "tocaOtraVez": "Pronta · tocca di nuovo",
+    "error": "Impossibile prepararla · riprova"
   },
   "CompartirImagenWrap": {
     "tituloCompartir": "Il mio Paragon Wrap"

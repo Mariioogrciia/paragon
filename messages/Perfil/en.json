@@ -571,7 +571,9 @@
   },
   "CompartirImagen": {
     "compartirImagen": "Share image",
-    "preparando": "Preparing…"
+    "preparando": "Preparing…",
+    "tocaOtraVez": "Ready · tap again",
+    "error": "Couldn't prepare it · retry"
   },
   "CompartirImagenWrap": {
     "tituloCompartir": "My Paragon Wrap"

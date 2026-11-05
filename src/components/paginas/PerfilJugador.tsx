@@ -48,6 +48,7 @@ import { BackButton } from "@/components/BackButton";
 import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
+import { artesPorIgdb } from "@/lib/igdb/client";
 import { getUserClan } from "@/lib/clans";
 import { CompartirPerfil } from "@/components/CompartirPerfil";
 import { VitrinasPerfil } from "@/components/VitrinasPerfil";
@@ -285,6 +286,21 @@ export async function PerfilJugador({
   // juego de fondo elegido a propósito con un banner también puesto se
   // enseñaba SIN el tratamiento, nítido y sin oscurecer.
   const fondoEsCaratulaSuelta = Boolean(juegoDeFondoElegido) || !profile.profileBannerUrl;
+  // "Se ve demasiado difuminado y de mala calidad" (5 nov 2026): la carátula
+  // de trofeos mide 320-512 px y aquí se estira a 1240x320, así que solo
+  // aguanta borrosa. Si el juego está en IGDB se usa su arte promocional a
+  // 1080p (el mismo de las páginas de plataforma), que sí se ve nítido a lo
+  // ancho. Con tope de tiempo: sin IGDB o si tarda, la carátula de siempre.
+  const arteDeFondo =
+    fondoEsCaratulaSuelta && backgroundGame?.igdbId && !backgroundEsVideo
+      ? await Promise.race([
+          artesPorIgdb([backgroundGame.igdbId])
+            .then((m) => m.get(backgroundGame.igdbId!) ?? null)
+            .catch(() => null),
+          new Promise<null>((r) => setTimeout(() => r(null), 2500)),
+        ])
+      : null;
+  const imagenDeFondo = arteDeFondo ?? backgroundImage;
 
   const customStyle: Record<`--${string}`, string> = {};
   if (profile.profileColor) {
@@ -368,10 +384,13 @@ export async function PerfilJugador({
           )}
           {backgroundImage && !backgroundEsVideo && (
             <div
-              className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${!fondoEsCaratulaSuelta ? "perfil-banner-parallax" : ""}`}
+              className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${!fondoEsCaratulaSuelta && !arteDeFondo ? "perfil-banner-parallax" : ""}`}
               style={{
-                backgroundImage: `url(${backgroundImage})`,
-                ...(fondoEsCaratulaSuelta
+                backgroundImage: `url(${imagenDeFondo})`,
+                ...(arteDeFondo
+                  ? // Arte grande: nítido, solo oscurecido para que se lea el texto.
+                    { filter: "brightness(0.7) saturate(1.1)", backgroundPosition: "center 30%" }
+                  : fondoEsCaratulaSuelta
                   ? {
                       // Reportado: "no aprecio el juego, está demasiado
                       // difuminado" — con 40px de blur y solo al 50% de
