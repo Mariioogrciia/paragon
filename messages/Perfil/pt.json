@@ -33,7 +33,13 @@
     },
     "verTodasInsignias": "Ver as {n} insígnias",
     "verPalmares": "Ver o resto do palmarés",
-    "ocultarPalmares": "Esconder o resto do palmarés"
+    "ocultarPalmares": "Esconder o resto do palmarés",
+    "seguir": {
+      "seguir": "Seguir",
+      "siguiendo": "A seguir",
+      "seguidores": "{count, plural, one {# seguidor} other {# seguidores}}",
+      "error": "Não foi possível. Tenta outra vez."
+    }
   },
   "EstadisticasPage": {
     "meta": "Estatísticas de @{handle} · Paragon",
@@ -752,5 +758,25 @@
     "compartir": "Partilhar imagem",
     "ahoraNo": "Agora não",
     "alt": "Cartão da tua platina em {juego}"
+  },
+  "Evento": {
+    "tarjetaEyebrow": "Evento do mês · toda a comunidade",
+    "eyebrow": "Evento de {mes}",
+    "titulo": "Mês de {genero}",
+    "descripcion": "Este mês contam os troféus que ganhares em jogos de {genero}, contra toda a comunidade do Paragon, não só os teus amigos.",
+    "quedan": "{count, plural, =0 {Termina hoje} one {Falta # dia} other {Faltam # dias}}",
+    "vacio": "Ainda ninguém pontuou este mês. O primeiro troféu que ganhares num jogo do género põe-te no topo.",
+    "detalle": "{trofeos} troféus · {platinos} platinas",
+    "anterior": "Pódio do mês de {genero} ({mes})",
+    "reglas": "Pontos como na liga mensal: platina 100, ouro 50, prata 25 e o resto 10. O género do jogo vem do IGDB. A Epic não pontua (o progresso é declarado).",
+    "genero": {
+      "accion": "ação",
+      "rpg": "RPG",
+      "aventura": "aventura",
+      "estrategia": "estratégia",
+      "plataformas": "plataformas",
+      "puzles": "puzzles",
+      "deportes": "desporto"
+    }
   }
 }

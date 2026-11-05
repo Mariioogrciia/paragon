@@ -32,6 +32,14 @@ const TABLAS: Record<string, string> = {
       "ultimoEnvio" jsonb,
       "actualizadoAt" timestamp NOT NULL DEFAULT now()
     );`,
+  follow: `
+    CREATE TABLE IF NOT EXISTS "follow" (
+      "followerId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+      "followedId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+      "createdAt" timestamp NOT NULL DEFAULT now(),
+      PRIMARY KEY ("followerId", "followedId")
+    );
+    CREATE INDEX IF NOT EXISTS "follow_followed_idx" ON "follow" ("followedId");`,
 };
 
 async function main() {

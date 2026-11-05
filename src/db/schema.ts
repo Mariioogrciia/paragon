@@ -1421,3 +1421,22 @@ export const discordRoleConnections = pgTable("discord_role_connection", {
   ultimoEnvio: jsonb("ultimoEnvio").$type<Record<string, number>>(),
   actualizadoAt: timestamp("actualizadoAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Seguir a alguien sin ser amigos (5 nov 2026): solo perfiles públicos, sin
+ * pedir permiso, y sus logros salen en tu feed de Comunidad. La amistad
+ * (mutua) sigue siendo lo que desbloquea ligas, comparativas y retos.
+ */
+export const follows = pgTable(
+  "follow",
+  {
+    followerId: text("followerId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followedId: text("followedId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.followerId, t.followedId] }), index("follow_followed_idx").on(t.followedId)],
+);

@@ -33,7 +33,13 @@
     },
     "verTodasInsignias": "Voir les {n} badges",
     "verPalmares": "Voir le reste du palmarès",
-    "ocultarPalmares": "Masquer le reste du palmarès"
+    "ocultarPalmares": "Masquer le reste du palmarès",
+    "seguir": {
+      "seguir": "Suivre",
+      "siguiendo": "Abonné",
+      "seguidores": "{count, plural, one {# abonné} other {# abonnés}}",
+      "error": "Ça n’a pas marché. Réessaie."
+    }
   },
   "EstadisticasPage": {
     "meta": "Statistiques de @{handle} · Paragon",
@@ -752,5 +758,25 @@
     "compartir": "Partager l'image",
     "ahoraNo": "Pas maintenant",
     "alt": "Carte de ton platine dans {juego}"
+  },
+  "Evento": {
+    "tarjetaEyebrow": "Événement du mois · toute la communauté",
+    "eyebrow": "Événement de {mes}",
+    "titulo": "Mois {genero}",
+    "descripcion": "Ce mois-ci, ce sont les trophées obtenus dans les jeux {genero} qui comptent, contre toute la communauté Paragon, pas seulement tes amis.",
+    "quedan": "{count, plural, =0 {Se termine aujourd’hui} one {Reste # jour} other {Restent # jours}}",
+    "vacio": "Personne n’a encore marqué ce mois-ci. Ton premier trophée dans un jeu de ce genre te place en tête.",
+    "detalle": "{trofeos} trophées · {platinos} platines",
+    "anterior": "Podium du mois {genero} ({mes})",
+    "reglas": "Points comme dans la ligue mensuelle : platine 100, or 50, argent 25, le reste 10. Le genre du jeu vient d’IGDB. Epic ne compte pas (sa progression est déclarée).",
+    "genero": {
+      "accion": "action",
+      "rpg": "RPG",
+      "aventura": "aventure",
+      "estrategia": "stratégie",
+      "plataformas": "plateforme",
+      "puzles": "puzzle",
+      "deportes": "sport"
+    }
   }
 }

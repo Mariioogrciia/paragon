@@ -33,7 +33,13 @@
     },
     "verTodasInsignias": "Alle {n} Abzeichen ansehen",
     "verPalmares": "Restliche Erfolge ansehen",
-    "ocultarPalmares": "Restliche Erfolge ausblenden"
+    "ocultarPalmares": "Restliche Erfolge ausblenden",
+    "seguir": {
+      "seguir": "Folgen",
+      "siguiendo": "Folge ich",
+      "seguidores": "{count, plural, one {# Follower} other {# Follower}}",
+      "error": "Das hat nicht geklappt. Versuch es noch einmal."
+    }
   },
   "EstadisticasPage": {
     "meta": "Statistiken von @{handle} · Paragon",
@@ -752,5 +758,25 @@
     "compartir": "Bild teilen",
     "ahoraNo": "Jetzt nicht",
     "alt": "Karte zu deinem Platin in {juego}"
+  },
+  "Evento": {
+    "tarjetaEyebrow": "Event des Monats · ganze Community",
+    "eyebrow": "Event im {mes}",
+    "titulo": "{genero}-Monat",
+    "descripcion": "Diesen Monat zählen Trophäen aus {genero}-Spielen, gegen die ganze Paragon-Community, nicht nur deine Freunde.",
+    "quedan": "{count, plural, =0 {Endet heute} one {Noch # Tag} other {Noch # Tage}}",
+    "vacio": "Diesen Monat hat noch niemand gepunktet. Deine erste Trophäe in einem Spiel dieses Genres bringt dich nach oben.",
+    "detalle": "{trofeos} Trophäen · {platinos} Platin",
+    "anterior": "Podium des {genero}-Monats ({mes})",
+    "reglas": "Punkte wie in der Monatsliga: Platin 100, Gold 50, Silber 25, alles andere 10. Das Genre stammt von IGDB. Epic zählt nicht (der Fortschritt ist nur angegeben).",
+    "genero": {
+      "accion": "Action",
+      "rpg": "RPG",
+      "aventura": "Abenteuer",
+      "estrategia": "Strategie",
+      "plataformas": "Jump ’n’ Run",
+      "puzles": "Puzzle",
+      "deportes": "Sport"
+    }
   }
 }

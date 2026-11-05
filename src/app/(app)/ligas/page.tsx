@@ -13,6 +13,7 @@ import { NewLeagueForm } from "@/components/forms/Forms";
 import { acceptLeagueInviteAction, declineLeagueInviteAction } from "@/app/actions";
 
 import { SeccionTabs } from "@/components/SeccionTabs";
+import { eventoDelMes } from "@/lib/eventos";
 import { VerMas, hrefPagina, paginaDe } from "@/components/VerMas";
 
 export const metadata = metaPublica(
@@ -95,6 +96,19 @@ export default async function LigasPage({ searchParams }: { searchParams: Promis
           <NewLeagueForm />
         </div>
       )}
+
+      {/* Evento del mes de toda la comunidad (5 nov 2026, ligas/evento). */}
+      <Link
+        href="/ligas/evento"
+        className="mb-8 flex items-center justify-between gap-3 rounded-[18px] p-5 transition-all hover:-translate-y-0.5"
+        style={{ border: "1px solid var(--accent-line)", background: "var(--accent-soft)" }}
+      >
+        <span>
+          <span className="block text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">{t("Evento.tarjetaEyebrow")}</span>
+          <span className="font-heading text-lg font-bold">{t("Evento.titulo", { genero: t(`Evento.genero.${eventoDelMes(new Date()).categoria}`) })}</span>
+        </span>
+        <span aria-hidden className="text-xl">→</span>
+      </Link>
 
       <div className="mb-8">
         <h1 className="font-heading mb-2 text-[clamp(1.75rem,5vw,2.5rem)] font-bold uppercase leading-tight">

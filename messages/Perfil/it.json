@@ -33,7 +33,13 @@
     },
     "verTodasInsignias": "Vedi i {n} distintivi",
     "verPalmares": "Vedi il resto del palmarès",
-    "ocultarPalmares": "Nascondi il resto del palmarès"
+    "ocultarPalmares": "Nascondi il resto del palmarès",
+    "seguir": {
+      "seguir": "Segui",
+      "siguiendo": "Segui già",
+      "seguidores": "{count, plural, one {# follower} other {# follower}}",
+      "error": "Non è stato possibile. Riprova."
+    }
   },
   "EstadisticasPage": {
     "meta": "Statistiche di @{handle} · Paragon",
@@ -752,5 +758,25 @@
     "compartir": "Condividi immagine",
     "ahoraNo": "Non ora",
     "alt": "Card del tuo platino in {juego}"
+  },
+  "Evento": {
+    "tarjetaEyebrow": "Evento del mese · tutta la community",
+    "eyebrow": "Evento di {mes}",
+    "titulo": "Mese {genero}",
+    "descripcion": "Questo mese contano i trofei che ottieni nei giochi {genero}, contro tutta la community di Paragon, non solo i tuoi amici.",
+    "quedan": "{count, plural, =0 {Finisce oggi} one {Manca # giorno} other {Mancano # giorni}}",
+    "vacio": "Nessuno ha ancora fatto punti questo mese. Il tuo primo trofeo in un gioco del genere ti porta in cima.",
+    "detalle": "{trofeos} trofei · {platinos} platini",
+    "anterior": "Podio del mese {genero} ({mes})",
+    "reglas": "Punti come nella lega mensile: platino 100, oro 50, argento 25 e il resto 10. Il genere del gioco viene da IGDB. Epic non conta (il suo progresso è dichiarato).",
+    "genero": {
+      "accion": "azione",
+      "rpg": "GDR",
+      "aventura": "avventura",
+      "estrategia": "strategia",
+      "plataformas": "piattaforme",
+      "puzles": "puzzle",
+      "deportes": "sport"
+    }
   }
 }

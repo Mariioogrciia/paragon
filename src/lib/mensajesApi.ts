@@ -19,6 +19,10 @@ type Trad = { en: string; de: string; fr: string; it: string; pt: string };
 const FIJOS: Record<string, Trad> = {
   "No autenticado": { en: "Not signed in", de: "Nicht angemeldet", fr: "Non connecté", it: "Non autenticato", pt: "Sem sessão iniciada" },
   "Demasiadas peticiones seguidas. Espera un momento.": { en: "Too many requests in a row. Wait a moment.", de: "Zu viele Anfragen hintereinander. Warte kurz.", fr: "Trop de requêtes d'affilée. Patiente un instant.", it: "Troppe richieste di fila. Aspetta un momento.", pt: "Demasiados pedidos seguidos. Espera um momento." },
+  "Inicia sesión primero.": { en: "Sign in first.", de: "Melde dich zuerst an.", fr: "Connecte-toi d'abord.", it: "Accedi prima.", pt: "Inicia sessão primeiro." },
+  "No puedes seguirte a ti mismo.": { en: "You can't follow yourself.", de: "Du kannst dir nicht selbst folgen.", fr: "Tu ne peux pas te suivre toi-même.", it: "Non puoi seguire te stesso.", pt: "Não te podes seguir a ti mesmo." },
+  "Ese perfil es privado.": { en: "That profile is private.", de: "Dieses Profil ist privat.", fr: "Ce profil est privé.", it: "Quel profilo è privato.", pt: "Esse perfil é privado." },
+  "No existe ese perfil.": { en: "That profile doesn't exist.", de: "Dieses Profil gibt es nicht.", fr: "Ce profil n'existe pas.", it: "Quel profilo non esiste.", pt: "Esse perfil não existe." },
   "Perfil sin terminar de configurar": { en: "Profile setup not finished", de: "Profil noch nicht fertig eingerichtet", fr: "Profil pas encore configuré", it: "Profilo non ancora configurato", pt: "Perfil ainda por configurar" },
   "Clan no encontrado": { en: "Clan not found", de: "Clan nicht gefunden", fr: "Clan introuvable", it: "Clan non trovato", pt: "Clã não encontrado" },
   "Escudo no válido": { en: "Invalid crest", de: "Ungültiges Wappen", fr: "Blason non valide", it: "Stemma non valido", pt: "Emblema inválido" },

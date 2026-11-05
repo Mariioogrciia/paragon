@@ -1,3 +1,4 @@
+import { idsQueSigo } from "@/lib/seguir";
 import { getDb } from "@/db";
 import { activities, users, games, activityComments, activityReactions, activityViews } from "@/db/schema";
 import { inArray, desc, eq, and, or, sql } from "drizzle-orm";
@@ -94,7 +95,10 @@ export async function addActivityComment(userId: string, activityId: string, bod
 export async function getFeed(userId: string, { global = false, limite = 50 }: { global?: boolean; limite?: number } = {}) {
   const db = getDb();
 
-  const userIds = global ? [] : [userId, ...(await listFriends(userId)).map((f) => f.userId)];
+  // Tus amigos y, desde el 5 nov 2026, también a quien sigues (lib/seguir.ts).
+  const userIds = global
+    ? []
+    : [...new Set([userId, ...(await listFriends(userId)).map((f) => f.userId), ...(await idsQueSigo(userId))])];
 
   const rows = await db
     .select({

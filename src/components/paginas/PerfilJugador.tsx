@@ -13,6 +13,8 @@ import { StatTile } from "@/components/StatTile";
 import { getLibrary, getProfileByHandle, getUserBadges, getFriendshipStatus, resolveAvatarUrl } from "@/lib/profiles";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { FriendRequestButton } from "@/components/FriendRequestButton";
+import { BotonSeguir } from "@/components/BotonSeguir";
+import { estadoSeguir } from "@/lib/seguir";
 import { summarise } from "@/lib/stats";
 import { db } from "@/db";
 import { gameTrophies } from "@/db/schema";
@@ -207,7 +209,7 @@ export async function PerfilJugador({
     // Si la tabla no existiera, el perfil se enseña igual, sin vitrinas.
     getVitrinas(profile.userId).catch(() => []),
   ]);
-  const [[rachasPerfil, percentilAnio], estadoAmistad] = await Promise.all([
+  const [[rachasPerfil, percentilAnio], estadoAmistad, seguir] = await Promise.all([
     games.length > 0
       ? Promise.all([rachasDelAnio(profile.userId), percentilTrofeosAnio(profile.userId)])
       : Promise.resolve([{ actual: 0, mejor: 0, diasActivos: 0, hoyCuenta: false }, null] as const),
@@ -216,6 +218,8 @@ export async function PerfilJugador({
     !esMio && session?.user?.id
       ? getFriendshipStatus(session.user.id, profile.userId)
       : Promise.resolve("ninguna" as const),
+    // Seguir (5 nov 2026): el botón solo sale con sesión y en perfiles ajenos.
+    !esMio && session?.user?.id ? estadoSeguir(session.user.id, profile.userId).catch(() => null) : Promise.resolve(null),
   ]);
 
   const efectoNombre = profile.efectoNombre ? EFECTO_POR_CLAVE.get(profile.efectoNombre) : undefined;
@@ -537,6 +541,9 @@ export async function PerfilJugador({
               )}
               {!esMio && session?.user?.id && (
                 <FriendRequestButton handle={handle} otherUserId={profile.userId} initialStatus={estadoAmistad} profilePath={`/u/${handle}`} />
+              )}
+              {!esMio && seguir && (
+                <BotonSeguir userId={profile.userId} inicial={seguir.sigo} seguidores={seguir.seguidores} ruta={`/u/${handle}`} />
               )}
             </div>
           </div>

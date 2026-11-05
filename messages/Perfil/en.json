@@ -33,7 +33,13 @@
     },
     "verTodasInsignias": "See all {n} badges",
     "verPalmares": "See the rest of the trophy case",
-    "ocultarPalmares": "Hide the rest of the trophy case"
+    "ocultarPalmares": "Hide the rest of the trophy case",
+    "seguir": {
+      "seguir": "Follow",
+      "siguiendo": "Following",
+      "seguidores": "{count, plural, one {# follower} other {# followers}}",
+      "error": "That didn't work. Try again."
+    }
   },
   "EstadisticasPage": {
     "meta": "Stats for @{handle} · Paragon",
@@ -752,5 +758,25 @@
     "compartir": "Share image",
     "ahoraNo": "Not now",
     "alt": "Card for your {juego} platinum"
+  },
+  "Evento": {
+    "tarjetaEyebrow": "Event of the month · whole community",
+    "eyebrow": "{mes} event",
+    "titulo": "{genero} month",
+    "descripcion": "This month, trophies you earn in {genero} games score, against the whole Paragon community, not just your friends.",
+    "quedan": "{count, plural, =0 {Ends today} one {# day left} other {# days left}}",
+    "vacio": "Nobody has scored this month yet. Your first trophy in a game of this genre puts you on top.",
+    "detalle": "{trofeos} trophies · {platinos} platinums",
+    "anterior": "{genero} month podium ({mes})",
+    "reglas": "Points as in the monthly league: platinum 100, gold 50, silver 25, everything else 10. The game's genre comes from IGDB. Epic doesn't score (its progress is self-reported).",
+    "genero": {
+      "accion": "action",
+      "rpg": "RPG",
+      "aventura": "adventure",
+      "estrategia": "strategy",
+      "plataformas": "platformer",
+      "puzles": "puzzle",
+      "deportes": "sports"
+    }
   }
 }
