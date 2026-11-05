@@ -102,7 +102,8 @@
       "psn": "Deine öffentliche PlayStation-ID, der Name, unter dem du spielst.",
       "steam": "Deine Profil-URL, deine SteamID64 oder der Name deiner benutzerdefinierten URL (steamcommunity.com/id/dieser-name). Der im Profil angezeigte Name funktioniert nicht: Steam erlaubt keine Suche danach und es könnte das Konto einer anderen Person treffen.",
       "xbox": "Dein Xbox-Gamertag. Synchronisiert deinen echten Erfolgsverlauf über einen Drittanbieter-Dienst (nicht offiziell von Microsoft) — kann ausfallen oder aufhören zu funktionieren, wenn sich dieser Dienst ändert.",
-      "epic": "Der Link zu deinem Epic Games-Profil (oder deine Account-ID) — das ist keine offizielle Epic-API, kann also ausfallen oder aufhören zu funktionieren, wenn Epic ihre Website ändert."
+      "epic": "Der Link zu deinem Epic Games-Profil (oder deine Account-ID) — das ist keine offizielle Epic-API, kann also ausfallen oder aufhören zu funktionieren, wenn Epic ihre Website ändert.",
+      "retro": "Dein Benutzername bei retroachievements.org: Erfolge für Retro-Spiele (NES, SNES, Mega Drive, GBA, PS1, N64…) im Emulator. Ein Spiel mit 100 % zählt als Platin."
     },
     "avisoPublico": {
       "psn": "Dein PSN-Trophäenprofil muss öffentlich sein, sonst können wir deine Spiele oder Trophäen nicht lesen.",
@@ -310,6 +311,11 @@
     },
     "hiddenNav": {
       "hideLabel": "{label} ausblenden"
+    },
+    "retro": {
+      "placeholder": "Dein RetroAchievements-Benutzername",
+      "update": "Aktualisieren",
+      "link": "Verknüpfen"
     }
   },
   "profileForm": {

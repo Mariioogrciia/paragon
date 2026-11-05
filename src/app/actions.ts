@@ -307,6 +307,11 @@ const PLATFORM_COPY: Record<
       `Cuenta vinculada a ${nombre}, pero no es público. En la Epic Games Store: tu avatar → ` +
       `"Mis logros" → "Nivel de privacidad" → "Público".`,
   },
+  retro: {
+    field: "retroUser",
+    missing: "Escribe tu usuario de RetroAchievements.",
+    privado: (nombre) => `Cuenta vinculada a ${nombre}, pero RetroAchievements no nos deja leer sus logros ahora mismo.`,
+  },
 };
 
 async function linkPlatform(
@@ -352,6 +357,13 @@ export async function linkXboxAction(
   formData: FormData,
 ): Promise<ActionState> {
   return linkPlatform("xbox", formData);
+}
+
+export async function linkRetroAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  return linkPlatform("retro", formData);
 }
 
 export async function linkEpicAction(

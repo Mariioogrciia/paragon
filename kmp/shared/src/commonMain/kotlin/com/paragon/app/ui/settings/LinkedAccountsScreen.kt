@@ -73,6 +73,7 @@ private fun platformLabel(platform: String): String = when (platform) {
     "xbox" -> "Xbox"
     "steam" -> "Steam"
     "epic" -> "Epic Games"
+    "retro" -> "RetroAchievements"
     else -> platform.uppercase()
 }
 
@@ -80,6 +81,7 @@ private fun platformShort(platform: String): String = when (platform) {
     "psn" -> "PS"
     "xbox" -> "XB"
     "steam" -> "ST"
+    "retro" -> "RA"
     else -> platform.take(2).uppercase()
 }
 

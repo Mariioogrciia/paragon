@@ -16,6 +16,7 @@ import { friendships, gameTrophies, games as gamesTable, platformAccounts, userG
 import * as psn from "@/lib/psn/client";
 import * as steam from "@/lib/steam/client";
 import * as xbl from "@/lib/xbl/client";
+import * as retro from "@/lib/retro/client";
 import * as epic from "@/lib/epic/client";
 import { PsnProfileNotFoundError } from "@/lib/psn/client";
 import { PsnAuthError, PsnNotConfiguredError, authenticateWithNpssoEphemeral } from "@/lib/psn/auth";
@@ -594,6 +595,9 @@ export async function linkAccount(
     case "epic":
       resolved = await resolveEpic(input);
       break;
+    case "retro":
+      resolved = await resolveRetro(input);
+      break;
   }
 
   return finishLinking(userId, platform, resolved);
@@ -771,6 +775,18 @@ async function resolveEpic(input: string): Promise<Resolved> {
     level: null,
     avatarUrl: profile.avatarUrl ?? null,
     legible: profile.isPublic,
+  };
+}
+
+/** RetroAchievements (lib/retro/client.ts): se guarda el ULID, que no cambia si la persona se renombra. */
+async function resolveRetro(input: string): Promise<Resolved> {
+  const profile = await retro.resolveProfile(input);
+  return {
+    accountId: profile.id,
+    username: profile.usuario,
+    level: null,
+    avatarUrl: profile.avatarUrl,
+    legible: await retro.canRead(profile.id),
   };
 }
 
@@ -970,6 +986,9 @@ export function describePlatformError(error: unknown): string {
   if (error instanceof EpicProfileNotFoundError) return error.message;
   if (error instanceof EpicPrivateProfileError) return error.message;
   if (error instanceof EpicUnavailableError) return error.message;
+
+  if (error instanceof retro.RetroConfigError) return "El servidor no tiene configurado el acceso a RetroAchievements.";
+  if (error instanceof retro.RetroNotFoundError) return error.message;
 
   if (error instanceof PlatformAccountAlreadyLinkedError) return error.message;
 

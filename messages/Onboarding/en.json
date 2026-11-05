@@ -102,7 +102,8 @@
       "psn": "Your public PlayStation ID, the name you play under.",
       "steam": "Your profile URL, your SteamID64 or your custom URL name (steamcommunity.com/id/that-name). The name shown on your profile won't work: Steam doesn't allow searching by it and it could pick someone else's account.",
       "xbox": "Your Xbox Gamertag. Syncs your real achievement history via a third-party service (not official from Microsoft) — it can fail or stop working if that service changes.",
-      "epic": "The link to your Epic Games profile (or your account ID) — this isn't an official Epic API, so it can fail or stop working if Epic changes their site."
+      "epic": "The link to your Epic Games profile (or your account ID) — this isn't an official Epic API, so it can fail or stop working if Epic changes their site.",
+      "retro": "Your retroachievements.org username: achievements for retro games (NES, SNES, Mega Drive, GBA, PS1, N64…) played on emulators. A game at 100% counts as a platinum."
     },
     "avisoPublico": {
       "psn": "Your PSN trophy profile needs to be public, or we won't be able to read your games or trophies.",
@@ -310,6 +311,11 @@
     },
     "hiddenNav": {
       "hideLabel": "Hide {label}"
+    },
+    "retro": {
+      "placeholder": "Your RetroAchievements username",
+      "update": "Update",
+      "link": "Link"
     }
   },
   "profileForm": {

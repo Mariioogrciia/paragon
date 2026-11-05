@@ -54,7 +54,9 @@ export function esPlatinoEquivalente(
   // Steam no tiene trofeo de platino propio: el 100% de sus logros es lo más
   // parecido que hay. Epic (progreso declarado, ver lib/declarado.ts) NO
   // cuenta: su 100% no vale como platino ni en el perfil ni en rankings.
-  return game.platform === "steam" && game.progressPercent === 100;
+  // RetroAchievements (5 nov 2026): masterizar o completar un juego (100 %)
+  // es su "platino", igual que en Steam.
+  return (game.platform === "steam" || game.platform === "retro") && game.progressPercent === 100;
 }
 
 export function gameProgress(game: Game): GameProgress {

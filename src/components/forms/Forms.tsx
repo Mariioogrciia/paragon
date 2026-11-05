@@ -14,6 +14,7 @@ import {
   linkSteamAction,
   anadirSteamExtraAction,
   linkXboxAction,
+  linkRetroAction,
   linkEpicAction,
   updateProfileAction,
   setDiscordDmAction,
@@ -206,6 +207,31 @@ export function LinkXboxForm({ current, sinAviso = false }: { current?: string |
       </div>
       <Feedback state={state} />
       <PrivacyGuide platform="xbox" />
+    </form>
+  );
+}
+
+/** RetroAchievements (lib/retro/client.ts): el nombre de usuario; los logros siempre son públicos allí. */
+export function LinkRetroForm({ current }: { current?: string | null }) {
+  const t = useTranslations("Onboarding");
+  const [state, action] = useActionState(linkRetroAction, EMPTY);
+
+  return (
+    <form action={action}>
+      <div className="flex flex-col gap-2.5 sm:flex-row">
+        <input
+          name="retroUser"
+          type="text"
+          defaultValue={current ?? ""}
+          placeholder={t("forms.retro.placeholder")}
+          autoComplete="off"
+          spellCheck={false}
+          className="min-w-0 flex-1 rounded-xl px-3.5 py-3.5 text-[0.9375rem] text-foreground outline-none placeholder:text-muted"
+          style={FIELD}
+        />
+        <Submit>{current ? t("forms.retro.update") : t("forms.retro.link")}</Submit>
+      </div>
+      <Feedback state={state} />
     </form>
   );
 }

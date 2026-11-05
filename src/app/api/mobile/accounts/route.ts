@@ -14,7 +14,8 @@ import { MAX_CUENTAS_STEAM_EXTRA } from "@/lib/steamExtra";
 // vincular desde el móvil — su web bloquea al servidor y solo la extensión
 // del navegador puede leerla (`appLinkable: false`). Su progreso es
 // declarado: no puntúa en nada (`declared`, ver lib/declarado.ts).
-const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic"];
+// RetroAchievements (5 nov 2026) solo si el servidor tiene su clave.
+const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic", ...(process.env.RA_API_KEY ? (["retro"] as const) : [])];
 
 /**
  * Qué cuentas están vinculadas (para la pantalla "Vincular cuentas"). Los

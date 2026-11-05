@@ -299,7 +299,7 @@ export const psnProfiles = pgTable(
 export const games = pgTable("game", {
   id: text("id").primaryKey(),
   /** "manual" = añadido a mano (Switch, retro...), sin API detrás. */
-  platform: text("platform").$type<"psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" | "manual">().notNull(),
+  platform: text("platform").$type<"psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" | "retro" | "manual">().notNull(),
   /** npCommunicationId en PSN, appid en Steam, "<id de IGDB>:<dispositivo>" en manual. */
   nativeId: text("nativeId").notNull(),
   title: text("title").notNull(),

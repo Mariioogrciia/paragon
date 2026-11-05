@@ -19,6 +19,10 @@ type Trad = { en: string; de: string; fr: string; it: string; pt: string };
 const FIJOS: Record<string, Trad> = {
   "No autenticado": { en: "Not signed in", de: "Nicht angemeldet", fr: "Non connecté", it: "Non autenticato", pt: "Sem sessão iniciada" },
   "Demasiadas peticiones seguidas. Espera un momento.": { en: "Too many requests in a row. Wait a moment.", de: "Zu viele Anfragen hintereinander. Warte kurz.", fr: "Trop de requêtes d'affilée. Patiente un instant.", it: "Troppe richieste di fila. Aspetta un momento.", pt: "Demasiados pedidos seguidos. Espera um momento." },
+  "Escribe tu usuario de RetroAchievements.": { en: "Enter your RetroAchievements username.", de: "Gib deinen RetroAchievements-Benutzernamen ein.", fr: "Saisis ton pseudo RetroAchievements.", it: "Scrivi il tuo nome utente RetroAchievements.", pt: "Escreve o teu utilizador do RetroAchievements." },
+  "Ese nombre de usuario de RetroAchievements no es válido.": { en: "That RetroAchievements username isn't valid.", de: "Dieser RetroAchievements-Benutzername ist ungültig.", fr: "Ce pseudo RetroAchievements n'est pas valide.", it: "Quel nome utente RetroAchievements non è valido.", pt: "Esse utilizador do RetroAchievements não é válido." },
+  "No existe ese usuario en RetroAchievements.": { en: "That user doesn't exist on RetroAchievements.", de: "Diesen Benutzer gibt es auf RetroAchievements nicht.", fr: "Cet utilisateur n'existe pas sur RetroAchievements.", it: "Quell'utente non esiste su RetroAchievements.", pt: "Esse utilizador não existe no RetroAchievements." },
+  "El servidor no tiene configurado el acceso a RetroAchievements.": { en: "The server doesn't have RetroAchievements access configured.", de: "Der Server hat keinen RetroAchievements-Zugang eingerichtet.", fr: "Le serveur n'a pas configuré l'accès à RetroAchievements.", it: "Il server non ha configurato l'accesso a RetroAchievements.", pt: "O servidor não tem o acesso ao RetroAchievements configurado." },
   "Inicia sesión primero.": { en: "Sign in first.", de: "Melde dich zuerst an.", fr: "Connecte-toi d'abord.", it: "Accedi prima.", pt: "Inicia sessão primeiro." },
   "No puedes seguirte a ti mismo.": { en: "You can't follow yourself.", de: "Du kannst dir nicht selbst folgen.", fr: "Tu ne peux pas te suivre toi-même.", it: "Non puoi seguire te stesso.", pt: "Não te podes seguir a ti mesmo." },
   "Ese perfil es privado.": { en: "That profile is private.", de: "Dieses Profil ist privat.", fr: "Ce profil est privé.", it: "Quel profilo è privato.", pt: "Esse perfil é privado." },
@@ -330,6 +334,16 @@ const PATRONES: { re: RegExp; trad: (m: RegExpMatchArray) => Trad }[] = [
       en: `Account linked to ${m[1]}, but we can't read its achievement history — either the profile isn't public or Xbox can't find it.`,
       de: `Konto mit ${m[1]} verknüpft, aber wir können den Erfolgsverlauf nicht lesen — entweder ist das Profil nicht öffentlich oder Xbox findet es nicht.`,
       fr: `Compte associé à ${m[1]}, mais on ne peut pas lire son historique de succès — soit le profil n'est pas public, soit Xbox ne le trouve pas.`, it: `Account collegato a ${m[1]}, ma non possiamo leggere la cronologia degli obiettivi — o il profilo non è pubblico, o Xbox non lo trova.`, pt: `Conta ligada a ${m[1]}, mas não conseguimos ler o histórico de conquistas — ou o perfil não é público, ou a Xbox não o encontra.`,
+    }),
+  },
+  {
+    re: /^Cuenta vinculada a (.+), pero RetroAchievements no nos deja leer sus logros ahora mismo\.$/,
+    trad: (m) => ({
+      en: `Account linked to ${m[1]}, but RetroAchievements won't let us read its achievements right now.`,
+      de: `Konto mit ${m[1]} verknüpft, aber RetroAchievements lässt uns die Erfolge gerade nicht lesen.`,
+      fr: `Compte associé à ${m[1]}, mais RetroAchievements ne nous laisse pas lire ses succès pour l'instant.`,
+      it: `Account collegato a ${m[1]}, ma RetroAchievements non ci lascia leggere i suoi obiettivi al momento.`,
+      pt: `Conta ligada a ${m[1]}, mas o RetroAchievements não nos deixa ler as conquistas neste momento.`,
     }),
   },
   {

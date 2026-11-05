@@ -7,7 +7,7 @@ import { auth, signIn } from "@/auth";
 import { cuentaVerificada } from "@/lib/verificacion";
 import { quitarSteamExtraAction, unlinkAccountAction } from "@/app/actions";
 import { CollectionManager } from "@/components/Collections";
-import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
+import { AnadirSteamExtraForm, LinkPsnForm, LinkSteamForm, LinkXboxForm, LinkRetroForm, LinkEpicForm, SyncNowForm, SyncPlatformForm } from "@/components/forms/Forms";
 import { cuentasSteamExtra, type CuentaSteamExtra } from "@/lib/steamExtraDatos";
 import { listCollections } from "@/lib/collections";
 import { relativeDate } from "@/lib/design";
@@ -37,6 +37,7 @@ const AVATAR_BG: Record<PlataformaVinculable, string> = {
   steam: "linear-gradient(150deg, #2f7d9d, #1b2838)",
   xbox: "linear-gradient(150deg, #107C10, #16a316)",
   epic: "linear-gradient(150deg, #313131, #0a0a0a)",
+  retro: "linear-gradient(150deg, #c9a227, #6b4f00)",
 };
 
 type Traductor = Awaited<ReturnType<typeof getTranslations>>;
@@ -73,6 +74,7 @@ function PlatformSection({
             {platform === "steam" && <SteamLogo className="h-5 w-5" />}
             {platform === "xbox" && <XboxLogo className="h-5 w-5" />}
             {platform === "epic" && <EpicGamesLogo className="h-5 w-5" />}
+            {platform === "retro" && <span className="font-heading text-[0.8125rem] font-bold text-white">RA</span>}
           </span>
           <h2 id={`cuenta-${platform}`} className="font-heading text-lg font-bold">
             {PLATFORM_LABEL[platform]}
@@ -221,6 +223,7 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
   const steam = accountFor(profile, "steam");
   const xbox = accountFor(profile, "xbox");
   const epic = accountFor(profile, "epic");
+  const retro = accountFor(profile, "retro");
   const carpetas = await listCollections(session.user.id);
   // Las tres en paralelo: son independientes y el pool no se resiente por
   // tres consultas (ver el aviso de conexiones en db/index.ts).
@@ -370,6 +373,13 @@ export default async function AjustesPlataformasPage({ searchParams }: { searchP
             </div>
           </details>
         </PlatformSection>
+
+        {/* RetroAchievements (5 nov 2026, lib/retro/client.ts): solo si el servidor tiene la clave. */}
+        {process.env.RA_API_KEY && (
+          <PlatformSection platform="retro" account={retro} t={t}>
+            <LinkRetroForm current={retro?.username} />
+          </PlatformSection>
+        )}
 
         {/* Google Play y Ubisoft Connect se quitaron del todo el 11 de
             septiembre de 2026 — ninguna llegó a tener sincronización real

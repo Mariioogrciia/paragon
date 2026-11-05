@@ -102,7 +102,8 @@
       "psn": "Tu ID público de PlayStation, el nombre con el que juegas.",
       "steam": "La URL de tu perfil, tu SteamID64 o el nombre de tu URL personalizada (steamcommunity.com/id/ese-nombre). El nombre que se ve en tu perfil no vale: Steam no deja buscar por él y podría coger la cuenta de otra persona.",
       "xbox": "Tu Gamertag de Xbox. Sincroniza de verdad tu historial de logros, vía un servicio de terceros (no oficial de Microsoft) — puede fallar o dejar de funcionar si ese servicio cambia.",
-      "epic": "El enlace a tu perfil de Epic Games (o tu ID de cuenta) — no es una API oficial de Epic, así que puede fallar o dejar de funcionar si Epic cambia su web."
+      "epic": "El enlace a tu perfil de Epic Games (o tu ID de cuenta) — no es una API oficial de Epic, así que puede fallar o dejar de funcionar si Epic cambia su web.",
+      "retro": "Tu nombre de usuario de retroachievements.org: logros de juegos retro (NES, SNES, Mega Drive, GBA, PS1, N64…) jugados en emulador. Un juego al 100 % cuenta como platino."
     },
     "avisoPublico": {
       "psn": "Tu perfil de trofeos de PSN tiene que estar en público, o no podremos leer tus juegos ni trofeos.",
@@ -310,6 +311,11 @@
     },
     "hiddenNav": {
       "hideLabel": "Ocultar {label}"
+    },
+    "retro": {
+      "placeholder": "Tu usuario de RetroAchievements",
+      "update": "Actualizar",
+      "link": "Vincular"
     }
   },
   "profileForm": {

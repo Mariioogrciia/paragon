@@ -13,6 +13,10 @@ import {
   fetchStoreMetadata,
 } from "@/lib/steam/client";
 import { fetchAchievements as fetchXblAchievements, fetchLibrary as fetchXblLibrary } from "@/lib/xbl/client";
+import * as retro from "@/lib/retro/client";
+
+/** Juegos de RetroAchievements cuyo detalle se trae en cada sincronización (los más recientes). */
+const RETRO_DETAIL_LIMIT = 15;
 import {
   fetchAchievements as fetchEpicAchievements,
   fetchLibrary as fetchEpicLibrary,
@@ -349,7 +353,8 @@ async function syncLibraryDeCuenta(userId: string, account: SyncAccount, opts: O
     account.platform !== "psn" &&
     account.platform !== "steam" &&
     account.platform !== "xbox" &&
-    account.platform !== "epic"
+    account.platform !== "epic" &&
+    account.platform !== "retro"
   )
     return 0;
 
@@ -360,7 +365,9 @@ async function syncLibraryDeCuenta(userId: string, account: SyncAccount, opts: O
         ? await fetchSteamLibrary(account.accountId)
         : account.platform === "xbox"
           ? await fetchXblLibrary(account.accountId)
-          : opts.epicDatos
+          : account.platform === "retro"
+            ? await retro.fetchLibrary(account.accountId)
+            : opts.epicDatos
             ? bibliotecaDesdeResumenes(opts.epicDatos.resumenes)
             : await fetchEpicLibrary(account.accountId);
 
@@ -431,6 +438,18 @@ async function syncLibraryDeCuenta(userId: string, account: SyncAccount, opts: O
 
     await mapLimit(recientes, PSN_OWN_TOKEN_CONCURRENCY, async (game) => {
       await syncGameTrophies(userId, account, game.id, psnAuth);
+    });
+  }
+
+  if (account.platform === "retro") {
+    // RetroAchievements: la biblioteca ya trae el progreso; el detalle (los
+    // logros uno a uno) de los jugados más recientemente.
+    const recientes = library.slice(0, RETRO_DETAIL_LIMIT);
+    const pendientes = opts.forzarDetalle
+      ? recientes.map((g) => g.id)
+      : await soloDesactualizados(userId, recientes.map((g) => g.id), "retro");
+    await mapLimit(pendientes, 2, async (gameId) => {
+      await syncGameTrophies(userId, account, gameId);
     });
   }
 
@@ -783,6 +802,10 @@ export async function syncGameTrophies(
     if (row?.title) {
       await syncIgdbMetadata(gameId, row.title);
     }
+  } else if (platform === "retro") {
+    trophies = await retro.fetchAchievements(account.accountId, nativeId);
+    const [row] = await db.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1);
+    if (row?.title) await syncIgdbMetadata(gameId, row.title);
   } else if (platform === "epic") {
     // El "nativeId" de un juego de Epic es el sandboxId (ver fetchLibrary),
     // no un id de tienda como el appid de Steam, así que no hay
@@ -823,7 +846,7 @@ export async function syncGameTrophies(
   // progreso en la llamada de biblioteca, así que se calcula aquí, con los
   // logros de verdad ya en la mano — igual que definedTotal más abajo.
   const progreso =
-    platform === "steam" || platform === "xbox" || platform === "epic"
+    platform === "steam" || platform === "xbox" || platform === "epic" || platform === "retro"
       ? {
           earnedTotal,
           progressPercent: Math.round((earnedTotal / trophies.length) * 100),
@@ -835,7 +858,7 @@ export async function syncGameTrophies(
     .set({ trophiesSyncedAt: new Date(), ...progreso })
     .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
 
-  if (platform === "steam" || platform === "xbox" || platform === "epic") {
+  if (platform === "steam" || platform === "xbox" || platform === "epic" || platform === "retro") {
     await db
       .update(games)
       .set({ definedTotal: trophies.length })

@@ -13,7 +13,7 @@
  * la biblioteca, así que vive en el mismo tipo `Platform` para no duplicar
  * medio `stats.ts` y `LibraryGrid.tsx` con un tipo paralelo.
  */
-export type Platform = "psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" | "manual";
+export type Platform = "psn" | "steam" | "google" | "xbox" | "epic" | "ubisoft" | "retro" | "manual";
 
 /** Las que se vinculan por cuenta. Ver el comentario de "manual" arriba. */
 export type AccountPlatform = Exclude<Platform, "manual">;
@@ -32,10 +32,13 @@ export type AccountPlatform = Exclude<Platform, "manual">;
  * 4102bc1, retirado en 43226b0) era vía OAuth y nunca leyó logros de nadie.
  * Este es un camino distinto — lectura pública anónima por epicAccountId,
  * sin que el usuario autorice nada, ver lib/epic/client.ts — y sí funciona.
+ *
+ * RetroAchievements el 5 de noviembre de 2026 (lib/retro/client.ts): juegos
+ * retro con su API web pública, una clave del servidor como Steam.
  */
-export type PlataformaVinculable = "psn" | "steam" | "xbox" | "epic";
+export type PlataformaVinculable = "psn" | "steam" | "xbox" | "epic" | "retro";
 
-export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google", "xbox", "epic", "ubisoft"];
+export const PLATFORMS: AccountPlatform[] = ["psn", "steam", "google", "xbox", "epic", "ubisoft", "retro"];
 
 /**
  * "unified" no es una plataforma real: es cómo se marca la ficha global de un
@@ -51,6 +54,7 @@ export const PLATFORM_LABEL: Record<Platform | "unified", string> = {
   xbox: "Xbox",
   epic: "Epic Games",
   ubisoft: "Ubisoft Connect",
+  retro: "RetroAchievements",
   manual: "Añadido a mano",
   unified: "Multiplataforma",
 };
@@ -63,6 +67,7 @@ export const ACHIEVEMENT_LABEL: Record<Platform, { one: string; many: string }> 
   xbox: { one: "logro", many: "logros" },
   epic: { one: "logro", many: "logros" },
   ubisoft: { one: "logro", many: "logros" },
+  retro: { one: "logro", many: "logros" },
   manual: { one: "hito", many: "hitos" },
 };
 

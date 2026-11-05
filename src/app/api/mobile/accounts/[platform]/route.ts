@@ -9,8 +9,9 @@ import { SteamNotConfiguredError, SteamPrivateProfileError, SteamProfileNotFound
 import { XblNotConfiguredError, XblProfileNotFoundError } from "@/lib/xbl/client";
 import { EpicPrivateProfileError, EpicProfileNotFoundError, EpicUnavailableError } from "@/lib/epic/client";
 import { errorMovil } from "@/lib/mensajesApi";
+import { RetroConfigError, RetroNotFoundError } from "@/lib/retro/client";
 
-const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic"];
+const PLATAFORMAS: PlataformaVinculable[] = ["psn", "steam", "xbox", "epic", "retro"];
 
 function esPlataformaVinculable(value: string): value is PlataformaVinculable {
   return (PLATAFORMAS as string[]).includes(value);
@@ -18,6 +19,8 @@ function esPlataformaVinculable(value: string): value is PlataformaVinculable {
 
 /** Mismos tipos de error que ya traduce actions.ts (describeError) para la web — mismo criterio, JSON en vez de string suelto. */
 function describeError(error: unknown): string {
+  if (error instanceof RetroConfigError) return "El servidor no tiene configurado el acceso a RetroAchievements.";
+  if (error instanceof RetroNotFoundError) return error.message;
   if (error instanceof PsnNotConfiguredError) return "El servidor no tiene configurado el acceso a PSN.";
   if (error instanceof PsnAuthError) return error.message;
   if (error instanceof PsnProfileNotFoundError) return error.message;
