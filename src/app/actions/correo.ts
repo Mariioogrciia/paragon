@@ -11,3 +11,12 @@ export async function cambiarCorreoSemanalAction(alta: boolean): Promise<void> {
   await cambiarSuscripcion(session.user.id, alta);
   revalidatePath("/ajustes/avisos");
 }
+
+/** Desconectar Telegram desde Ajustes → Avisos (lib/telegram.ts). */
+export async function desvincularTelegramAction(): Promise<void> {
+  const session = await auth();
+  if (!session?.user?.id) return;
+  const { desvincularTelegram } = await import("@/lib/telegram");
+  await desvincularTelegram(session.user.id);
+  revalidatePath("/ajustes/avisos");
+}

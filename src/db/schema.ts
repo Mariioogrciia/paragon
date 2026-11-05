@@ -1484,3 +1484,17 @@ export const correoSemanal = pgTable("correo_semanal", {
     .references(() => users.id, { onDelete: "cascade" }),
   altaAt: timestamp("altaAt", { mode: "date" }).notNull().defaultNow(),
 });
+
+/**
+ * Bot de Telegram (5 nov 2026, lib/telegram.ts): el chat de cada persona.
+ * `codigo` es el del enlace `t.me/<bot>?start=<codigo>` mientras no se
+ * conecta; al conectarse se borra y queda `chatId`.
+ */
+export const telegramChats = pgTable("telegram_chat", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  chatId: text("chatId").unique(),
+  codigo: text("codigo").unique(),
+  vinculadoAt: timestamp("vinculadoAt", { mode: "date" }),
+});

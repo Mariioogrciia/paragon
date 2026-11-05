@@ -715,5 +715,13 @@
     "sinCorreo": "Tu cuenta no tiene correo (entraste con Discord sin compartirlo).",
     "bajaOk": "Listo: ya no recibirás el resumen por correo.",
     "enlaceRoto": "Ese enlace de baja no es válido. Desactívalo aquí."
+  },
+  "telegram": {
+    "titulo": "Telegram",
+    "descripcion": "Recibe en Telegram los mismos avisos que por Discord (trofeos, platinos, ligas, sesiones) y consulta /perfil o /racha.",
+    "conectar": "Conectar con Telegram",
+    "ayuda": "Se abre el bot de Paragon en Telegram: pulsa «Iniciar» y queda conectado. El enlace es solo tuyo.",
+    "conectado": "Telegram conectado",
+    "desconectar": "Desconectar"
   }
 }

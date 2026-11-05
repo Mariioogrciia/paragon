@@ -715,5 +715,13 @@
     "sinCorreo": "A tua conta não tem e-mail (entraste com o Discord sem o partilhar).",
     "bajaOk": "Feito: já não vais receber o resumo por e-mail.",
     "enlaceRoto": "Essa ligação de cancelamento não é válida. Desativa aqui."
+  },
+  "telegram": {
+    "titulo": "Telegram",
+    "descripcion": "Recebe no Telegram os mesmos avisos do Discord (troféus, platinas, ligas, sessões) e consulta /perfil ou /racha.",
+    "conectar": "Ligar ao Telegram",
+    "ayuda": "Abre-se o bot do Paragon no Telegram: carrega em «Iniciar» e fica ligado. A ligação é só tua.",
+    "conectado": "Telegram ligado",
+    "desconectar": "Desligar"
   }
 }

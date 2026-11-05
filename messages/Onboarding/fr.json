@@ -715,5 +715,13 @@
     "sinCorreo": "Ton compte n’a pas d’e-mail (tu t’es connecté avec Discord sans le partager).",
     "bajaOk": "C’est fait : tu ne recevras plus le résumé par e-mail.",
     "enlaceRoto": "Ce lien de désabonnement n’est pas valide. Désactive-le ici."
+  },
+  "telegram": {
+    "titulo": "Telegram",
+    "descripcion": "Reçois sur Telegram les mêmes notifications que sur Discord (trophées, platines, ligues, sessions) et consulte /perfil ou /racha.",
+    "conectar": "Connecter avec Telegram",
+    "ayuda": "Le bot Paragon s’ouvre dans Telegram : appuie sur « Démarrer » et c’est connecté. Le lien n’est qu’à toi.",
+    "conectado": "Telegram connecté",
+    "desconectar": "Déconnecter"
   }
 }

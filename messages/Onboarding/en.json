@@ -715,5 +715,13 @@
     "sinCorreo": "Your account has no email (you signed in with Discord without sharing it).",
     "bajaOk": "Done: you won't get the email summary any more.",
     "enlaceRoto": "That unsubscribe link isn't valid. Turn it off here."
+  },
+  "telegram": {
+    "titulo": "Telegram",
+    "descripcion": "Get the same notifications as on Discord (trophies, platinums, leagues, sessions) on Telegram, and check /perfil or /racha.",
+    "conectar": "Connect with Telegram",
+    "ayuda": "The Paragon bot opens in Telegram: press “Start” and you're connected. The link is yours alone.",
+    "conectado": "Telegram connected",
+    "desconectar": "Disconnect"
   }
 }

@@ -715,5 +715,13 @@
     "sinCorreo": "Dein Konto hat keine E-Mail (du hast dich mit Discord angemeldet, ohne sie zu teilen).",
     "bajaOk": "Erledigt: Du bekommst die Zusammenfassung nicht mehr per E-Mail.",
     "enlaceRoto": "Dieser Abmeldelink ist ungültig. Deaktiviere es hier."
+  },
+  "telegram": {
+    "titulo": "Telegram",
+    "descripcion": "Erhalte auf Telegram dieselben Benachrichtigungen wie auf Discord (Trophäen, Platin, Ligen, Sessions) und frag /perfil oder /racha ab.",
+    "conectar": "Mit Telegram verbinden",
+    "ayuda": "Der Paragon-Bot öffnet sich in Telegram: Drück auf „Starten“ und du bist verbunden. Der Link gehört nur dir.",
+    "conectado": "Telegram verbunden",
+    "desconectar": "Trennen"
   }
 }

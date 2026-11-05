@@ -64,6 +64,13 @@ const TABLAS: Record<string, string> = {
       "userId" text PRIMARY KEY REFERENCES "user"("id") ON DELETE CASCADE,
       "altaAt" timestamp NOT NULL DEFAULT now()
     );`,
+  telegram_chat: `
+    CREATE TABLE IF NOT EXISTS "telegram_chat" (
+      "userId" text PRIMARY KEY REFERENCES "user"("id") ON DELETE CASCADE,
+      "chatId" text UNIQUE,
+      "codigo" text UNIQUE,
+      "vinculadoAt" timestamp
+    );`,
 };
 
 async function main() {

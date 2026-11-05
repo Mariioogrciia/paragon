@@ -27,6 +27,7 @@ import {
 import type { EpicDatosExtension } from "@/lib/epic/extensionData";
 import { parseGameKey, type Game, type Platform, type Trophy } from "@/lib/types";
 import { anunciarLogrosNuevos } from "@/lib/discordBot";
+import { enviarTelegramSiVinculado } from "@/lib/telegram";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
 import { avisarAmigosDePlatino, guardarAviso } from "@/lib/bandeja";
@@ -922,6 +923,7 @@ export async function syncGameTrophies(
         enviarPush(userId, { ...aviso, icon: info?.iconUrl ?? undefined }),
         enviarPushFcm(userId, { ...aviso, imageUrl: info?.iconUrl ?? undefined }),
         guardarAviso(userId, { titulo: aviso.title, texto: aviso.body, ruta: aviso.url, imagen: info?.iconUrl ?? null }),
+        enviarTelegramSiVinculado(userId, { titulo: aviso.title, texto: aviso.body, ruta: aviso.url }),
       ]);
     }
 

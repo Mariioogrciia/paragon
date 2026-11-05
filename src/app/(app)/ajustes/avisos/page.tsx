@@ -11,6 +11,8 @@ import { CATEGORIAS_AVISO, getAvisosDesactivados } from "@/lib/avisosPreferencia
 import { CalendarioSuscripcion } from "@/components/CalendarioSuscripcion";
 import { CorreoSemanalToggle } from "@/components/CorreoSemanalToggle";
 import { correoActivo, estaSuscrito } from "@/lib/correo";
+import { TelegramAjustes } from "@/components/TelegramAjustes";
+import { estadoTelegram, telegramActivo } from "@/lib/telegram";
 import { firmarEnlace } from "@/lib/enlaceFirmado";
 import { dominioPublico } from "@/lib/site";
 
@@ -44,6 +46,7 @@ export default async function AjustesAvisosPage({ searchParams }: { searchParams
     estaSuscrito(userId).catch(() => false),
     searchParams,
   ]);
+  const telegram = await estadoTelegram(userId).catch(() => ({ vinculado: false, enlace: null }));
 
   // Las claves son la fuente de la verdad (avisosPreferencias.ts); el texto
   // que se ve sale siempre de la traducción.
@@ -67,6 +70,8 @@ export default async function AjustesAvisosPage({ searchParams }: { searchParams
         <h2 className="mb-4 font-semibold">{t("profileForm.discordTitle")}</h2>
         <DiscordDmForm enabled={usuario?.discordDmEnabled ?? false} vinculado={discordVinculado} />
       </section>
+
+      {telegramActivo() && <TelegramAjustes vinculado={telegram.vinculado} enlace={telegram.enlace} />}
 
       {correoActivo() && <CorreoSemanalToggle suscrito={suscritoCorreo} email={usuario?.email ?? null} resultado={resultadoCorreo} />}
 

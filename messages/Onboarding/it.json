@@ -715,5 +715,13 @@
     "sinCorreo": "Il tuo account non ha un’e-mail (hai fatto accesso con Discord senza condividerla).",
     "bajaOk": "Fatto: non riceverai più il riepilogo via e-mail.",
     "enlaceRoto": "Quel link di disiscrizione non è valido. Disattivalo qui."
+  },
+  "telegram": {
+    "titulo": "Telegram",
+    "descripcion": "Ricevi su Telegram gli stessi avvisi di Discord (trofei, platini, leghe, sessioni) e consulta /perfil o /racha.",
+    "conectar": "Collega con Telegram",
+    "ayuda": "Si apre il bot di Paragon su Telegram: premi «Avvia» e sei collegato. Il link è solo tuo.",
+    "conectado": "Telegram collegato",
+    "desconectar": "Scollega"
   }
 }

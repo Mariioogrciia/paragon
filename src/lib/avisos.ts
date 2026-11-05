@@ -2,6 +2,7 @@ import "server-only";
 import { enviarPush } from "@/lib/webPush";
 import { enviarPushFcm } from "@/lib/fcm";
 import { enviarDmSiActivo } from "@/lib/discordBot";
+import { enviarTelegramSiVinculado } from "@/lib/telegram";
 import { avisoPermitido, type CategoriaAviso } from "@/lib/avisosPreferencias";
 import { guardarAviso } from "@/lib/bandeja";
 
@@ -23,6 +24,8 @@ export async function avisarUsuario(
     enviarPush(userId, push),
     enviarPushFcm(userId, push),
     enviarDmSiActivo(userId, aviso),
+    // Y por Telegram, si lo conectó (lib/telegram.ts, 5 nov 2026).
+    enviarTelegramSiVinculado(userId, aviso),
     // Y a la bandeja de la web y la app (lib/bandeja.ts).
     guardarAviso(userId, { titulo: aviso.titulo, texto: aviso.texto, ruta: aviso.ruta }),
   ]);
