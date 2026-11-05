@@ -213,6 +213,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 )
             )
 
+            RecordatorioRacha.alCargarPanel?.invoke(racha.actual, response.racha.hoy)
             PanelResult.Ok(profile, stats, racha)
         } catch (e: HttpException) {
             when (e.code()) {

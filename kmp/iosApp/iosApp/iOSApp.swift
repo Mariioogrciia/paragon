@@ -1,4 +1,5 @@
 import AppIntents
+import CoreSpotlight
 import SwiftUI
 import Shared
 
@@ -16,8 +17,16 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                // Vuelta del login en Safari: paragon://auth?c=<token cifrado>.
+                // Vuelta del login en Safari (paragon://auth?c=<token cifrado>)
+                // y Universal Links de la web (https://www.paragontrophies.com/u/…):
+                // SwiftUI entrega los dos aquí.
                 .onOpenURL { url in AppIOS.shared.recibirEnlace(url: url.absoluteString) }
+                // Tocar un juego en Spotlight (AppDelegate.indexar): su ficha.
+                .onContinueUserActivity(CSSearchableItemActionType) { actividad in
+                    if let id = actividad.userInfo?[CSSearchableItemActivityIdentifier] as? String {
+                        AppIOS.shared.abrirAviso(url: "/juego/\(id)")
+                    }
+                }
         }
     }
 }

@@ -34,6 +34,15 @@ class EnlaceAvisoTest {
     }
 
     @Test
+    fun enlacesDeLaWebYAccesosDirectos() {
+        assertEquals(Screen.Focus.route, rutaAppDeAviso("https://www.paragontrophies.com/enfoque", "yo"))
+        assertEquals("compare?handle=ana", rutaAppDeAviso("/comparar/@ana", "yo"))
+        assertEquals(Screen.Library.route, rutaAppDeAviso("/biblioteca", "yo"))
+        assertEquals(Screen.Stats.route, rutaAppDeAviso("/estadisticas", "yo"))
+        assertEquals(Screen.PreferenciasAvisos.route, rutaAppDeAviso("/ajustes/avisos", "yo"))
+    }
+
+    @Test
     fun sinPantallaEquivalenteSeQuedaEnInicio() {
         assertNull(rutaAppDeAviso("/", "yo"))
         assertNull(rutaAppDeAviso("/temporada", "yo"))

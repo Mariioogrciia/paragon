@@ -6,6 +6,14 @@
 	<key>aps-environment</key>
 	<string>development</string>
 	<!-- Compartido con el widget (ParagonWidget): ahí deja la app el juego anclado. -->
+	<!-- Universal Links (5 nov 2026): los enlaces de la web abren la app.
+	     Apple lo comprueba en /.well-known/apple-app-site-association, que
+	     sale cuando APPLE_TEAM_ID está en Vercel (src/lib/enlacesApp.ts). -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:www.paragontrophies.com</string>
+		<string>applinks:paragontrophies.com</string>
+	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.paragon.app.kmp</string>

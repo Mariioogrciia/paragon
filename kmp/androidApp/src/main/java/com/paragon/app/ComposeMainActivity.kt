@@ -132,8 +132,12 @@ class ComposeMainActivity : AppCompatActivity() {
         // la app abierta la pinta ParagonFirebaseMessagingService
         // (`paragon://open?path=`); en segundo plano la pinta el sistema y el
         // `url` del aviso llega como extra.
+        // Y un enlace de la web (App Links, 5 nov 2026: perfil, ficha, sesión…)
+        // abre su pantalla igual; rutaAppDeAviso ya sabe quitar el dominio.
         if (abrirAviso) {
+            val esWeb = data?.scheme == "https" && (data.host == "www.paragontrophies.com" || data.host == "paragontrophies.com")
             val ruta = if (data?.scheme == "paragon" && data.host == "open") data.getQueryParameter("path")
+            else if (esWeb) data.toString()
             else intent?.getStringExtra("url")
             if (!ruta.isNullOrBlank()) com.paragon.app.ui.navigation.EnlaceAviso.pendiente = ruta
         }

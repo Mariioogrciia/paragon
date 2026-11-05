@@ -224,6 +224,17 @@ private fun FocusContent(
     // fuente de verdad es `activeSession.startMillis`, guardado en Room, así
     // que si Android mata el proceso mientras se juega al juego DE VERDAD,
     // la duración real no se pierde: se recalcula sola al volver.
+    // Notificación fija con el progreso mientras dura la sesión de este juego
+    // (5 nov 2026, NotificacionEnfoque.kt): se ve con la app cerrada.
+    LaunchedEffect(activeSession?.id, game.earnedTrophies) {
+        val sesion = activeSession
+        if (sesion != null && sesion.gameId == gameId) {
+            com.paragon.app.data.NotificacionEnfoque.mostrar?.invoke(game.title, game.earnedTrophies, game.totalTrophies, sesion.startMillis)
+        } else {
+            com.paragon.app.data.NotificacionEnfoque.ocultar?.invoke()
+        }
+    }
+
     var elapsedMillis by remember(activeSession?.id) { mutableLongStateOf(0L) }
     LaunchedEffect(activeSession?.id) {
         val inicio = activeSession?.startMillis ?: return@LaunchedEffect

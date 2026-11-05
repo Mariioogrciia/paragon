@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Accesos directos del icono (mantener pulsado, 5 nov 2026). Abren la app
+  con `paragon://open?path=…`, el mismo camino que tocar un aviso
+  (ComposeMainActivity.handleDeepLink → EnlaceAviso → rutaAppDeAviso).
+  Va en los <activity-alias> de lanzador del manifiesto: solo uno está
+  activo a la vez (IconSwitcher.kt) y Android coge los del activo.
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="enfoque"
+        android:enabled="true"
+        android:icon="@drawable/ic_atajo_enfoque"
+        android:shortcutShortLabel="@string/atajo_enfoque"
+        android:shortcutLongLabel="@string/atajo_enfoque_largo">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="paragon://open?path=/enfoque"
+            android:targetPackage="com.paragon.app"
+            android:targetClass="com.paragon.app.ComposeMainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="biblioteca"
+        android:enabled="true"
+        android:icon="@drawable/ic_atajo_biblioteca"
+        android:shortcutShortLabel="@string/atajo_biblioteca">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="paragon://open?path=/biblioteca"
+            android:targetPackage="com.paragon.app"
+            android:targetClass="com.paragon.app.ComposeMainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="ligas"
+        android:enabled="true"
+        android:icon="@drawable/ic_atajo_ligas"
+        android:shortcutShortLabel="@string/atajo_ligas">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="paragon://open?path=/ligas"
+            android:targetPackage="com.paragon.app"
+            android:targetClass="com.paragon.app.ComposeMainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="sesiones"
+        android:enabled="true"
+        android:icon="@drawable/ic_atajo_sesiones"
+        android:shortcutShortLabel="@string/atajo_sesiones">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="paragon://open?path=/sesiones"
+            android:targetPackage="com.paragon.app"
+            android:targetClass="com.paragon.app.ComposeMainActivity" />
+    </shortcut>
+</shortcuts>

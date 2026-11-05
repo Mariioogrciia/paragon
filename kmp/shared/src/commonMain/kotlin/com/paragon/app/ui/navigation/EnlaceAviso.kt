@@ -44,7 +44,21 @@ fun rutaAppDeAviso(rutaWeb: String, miHandle: String?): String? {
         "ritmo" -> Screen.Ritmo.route
         // "No podemos leer tu cuenta" (perfil puesto en privado): a las cuentas vinculadas.
         "vincular" -> Screen.LinkedAccounts.route
-        "ajustes" -> if (partes.getOrNull(1) == "plataformas") Screen.LinkedAccounts.route else null
+        "ajustes" -> when (partes.getOrNull(1)) {
+            "plataformas" -> Screen.LinkedAccounts.route
+            "avisos" -> Screen.PreferenciasAvisos.route
+            else -> null
+        }
+        // App Links (5 nov 2026) y accesos directos del icono: un enlace de la
+        // web a una de estas pantallas abre la app en ella.
+        "enfoque" -> Screen.Focus.route
+        "comparar" -> partes.getOrNull(1)?.removePrefix("@")?.let { Screen.Compare.routeFor(it) } ?: Screen.Social.route
+        "feed" -> Screen.Feed.route
+        // Rutas propias de la app (no existen en la web): las usan los
+        // accesos directos del icono, que no saben el @ de nadie.
+        "biblioteca" -> Screen.Library.route
+        "estadisticas" -> Screen.Stats.route
+        "avisos" -> Screen.Avisos.route
         else -> null
     }
 }

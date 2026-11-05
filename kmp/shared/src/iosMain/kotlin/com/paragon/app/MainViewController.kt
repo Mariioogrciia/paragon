@@ -47,6 +47,8 @@ object AppIOS {
     /** Las pone iOSApp.swift al arrancar (ver NativoIOS.kt). */
     var avisos: AvisosIOS? = null
     var widget: WidgetIOS? = null
+    var racha: RachaIOS? = null
+    var busqueda: BusquedaIOS? = null
 
     /** Token de APNs de este iPhone, ya con el prefijo `apns:` (ver lib/apns.ts en el servidor). */
     private var tokenPush: String? = null
@@ -78,6 +80,17 @@ object AppIOS {
     internal fun configurar() {
         if (configurada) return
         configurada = true
+        com.paragon.app.data.RecordatorioRacha.alCargarPanel = { dias, hoyHecho ->
+            racha?.programarRecordatorio(dias, hoyHecho, tituloRecordatorioRacha(), textoRecordatorioRacha(dias))
+        }
+        com.paragon.app.data.IndiceBusqueda.alCargarBiblioteca = { juegos ->
+            val primeros = juegos.take(500)
+            busqueda?.indexar(
+                primeros.map { it.id },
+                primeros.map { it.title },
+                primeros.map { "${it.progressPercent}% · ${it.earnedTotal}/${it.definedTotal}" },
+            )
+        }
         aplicarIdiomaGuardado()
         ApiClient.configurar { tokenStore ->
             ClienteParagon(
@@ -95,6 +108,12 @@ object AppIOS {
      */
     fun recibirEnlace(url: String) {
         val enlace = try { Url(url) } catch (e: Exception) { return }
+        // Universal Links (5 nov 2026): un enlace de la web abre su pantalla,
+        // igual que tocar un aviso (EnlaceAviso → rutaAppDeAviso).
+        if (enlace.protocol.name == "https" && (enlace.host == "www.paragontrophies.com" || enlace.host == "paragontrophies.com")) {
+            com.paragon.app.ui.navigation.EnlaceAviso.pendiente = url
+            return
+        }
         if (enlace.protocol.name != "paragon" || enlace.host != "auth") return
         val token = EnlaceSeguro.tokenDelEnlace(tokenStore, enlace.parameters["c"]) ?: return
         tokenStore.token = token

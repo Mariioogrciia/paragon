@@ -104,6 +104,11 @@
     <string name="arquetipo_elite">Élite</string>
     <string name="arquetipo_explorador">Explorador</string>
     <string name="arquetipo_veterano">Veterano</string>
+    <string name="atajo_biblioteca">Biblioteca</string>
+    <string name="atajo_enfoque">Modo Enfoque</string>
+    <string name="atajo_enfoque_largo">Abrir el juego que estás cazando</string>
+    <string name="atajo_ligas">Ligas</string>
+    <string name="atajo_sesiones">Sesiones</string>
     <string name="atascados_sesion">Sesión</string>
     <string name="atascados_sesion_desc">Organizar una sesión para este trofeo</string>
     <string name="atascados_subtitulo">Lo que te separa del platino, juego a juego. Pide ayuda con una sesión.</string>
@@ -418,6 +423,7 @@
     <string name="enfoque_al_platino">al platino</string>
     <string name="enfoque_aviso_1">¡%1$s trofeo nuevo!</string>
     <string name="enfoque_aviso_n">¡%1$s trofeos nuevos!</string>
+    <string name="enfoque_canal">Sesión de Modo Enfoque</string>
     <string name="enfoque_comprobando">Comprobando…</string>
     <string name="enfoque_despues">DESPUÉS</string>
     <string name="enfoque_detener">Detener sesión</string>
@@ -433,6 +439,7 @@
     <string name="enfoque_nada_nuevo">Nada nuevo todavía</string>
     <string name="enfoque_nota_offline">Guardada en el móvil — se sincronizará cuando vuelva la conexión</string>
     <string name="enfoque_nota_ph">Nota privada (código de una taquilla, dónde te quedaste…)</string>
+    <string name="enfoque_notificacion">%1$s/%2$s trofeos · %3$s%%</string>
     <string name="enfoque_nuevos_1">" — %1$s trofeo nuevo"</string>
     <string name="enfoque_nuevos_n">" — %1$s trofeos nuevos"</string>
     <string name="enfoque_otra_sesion">Tienes una sesión activa en %1$s</string>
@@ -749,6 +756,8 @@
     <string name="racha_menos">Menos</string>
     <string name="racha_semanas">ÚLTIMAS 5 SEMANAS</string>
     <string name="racha_trofeos_semana">Esta semana</string>
+    <string name="recordatorio_racha">Llevas %1$s días seguidos con trofeo. Saca uno hoy para no perderla.</string>
+    <string name="recordatorio_racha_titulo">🔥 ¡Tu racha sigue viva!</string>
     <string name="ritmo_comparar_con">Comparar con</string>
     <string name="ritmo_dia_a_dia">Día a día</string>
     <string name="ritmo_empate">Empate</string>
@@ -946,10 +955,15 @@
     <string name="tiempo_d">hace %1$sd</string>
     <string name="tiempo_h">hace %1$sh</string>
     <string name="tiempo_min">hace %1$smin</string>
+    <string name="tile_enfoque">Paragon · Enfoque</string>
     <string name="vista_cronologia">Cronología</string>
     <string name="vista_cuadricula">Cuadrícula</string>
     <string name="vista_lista">Lista</string>
     <string name="widget_objetivo">Objetivo: %1$s</string>
+    <string name="widget_racha_cero">Sin racha</string>
+    <string name="widget_racha_cero_sub">Saca un trofeo hoy para empezar una</string>
+    <string name="widget_racha_dias">🔥 %1$s días</string>
+    <string name="widget_racha_mejor">Mejor racha: %1$s</string>
     <string name="widget_sin_objetivo">Sin objetivo anclado</string>
     <string name="widget_sin_objetivo_sub">Fija un juego desde la ficha de juego</string>
     <string name="wrap_comparas">CÓMO TE COMPARAS</string>

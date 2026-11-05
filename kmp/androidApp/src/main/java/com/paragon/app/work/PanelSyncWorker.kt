@@ -8,6 +8,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import androidx.work.Constraints
+import androidx.glance.appwidget.updateAll
 import com.paragon.app.data.LibraryRepository
 import com.paragon.app.data.PanelRepository
 import com.paragon.app.data.auth.TokenStore
@@ -42,6 +43,8 @@ class PanelSyncWorker(context: Context, params: WorkerParameters) : CoroutineWor
         // Logros de Steam que faltan tras vincular (si no hay, el servidor contesta al momento).
         SteamRepository(tokenStore).completarTodo()
         LibraryRepository(tokenStore, db.libraryDao(), applicationContext).getLibrary()
+        // La racha sale del panel: que el widget de racha la pinte ya.
+        com.paragon.app.widget.RachaWidget().updateAll(applicationContext)
 
         return Result.success()
     }

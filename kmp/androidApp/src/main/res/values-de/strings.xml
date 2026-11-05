@@ -102,6 +102,11 @@
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Entdecker:in</string>
     <string name="arquetipo_veterano">Veteran:in</string>
+    <string name="atajo_biblioteca">Bibliothek</string>
+    <string name="atajo_enfoque">Fokusmodus</string>
+    <string name="atajo_enfoque_largo">Das Spiel öffnen, das du jagst</string>
+    <string name="atajo_ligas">Ligen</string>
+    <string name="atajo_sesiones">Sessions</string>
     <string name="atascados_sesion">Session</string>
     <string name="atascados_sesion_desc">Eine Session für diese Trophäe organisieren</string>
     <string name="atascados_subtitulo">Was dich von Platin trennt, Spiel für Spiel. Hol dir Hilfe mit einer Session.</string>
@@ -416,6 +421,7 @@
     <string name="enfoque_al_platino">bis Platin</string>
     <string name="enfoque_aviso_1">%1$s neue Trophäe!</string>
     <string name="enfoque_aviso_n">%1$s neue Trophäen!</string>
+    <string name="enfoque_canal">Fokusmodus-Session</string>
     <string name="enfoque_comprobando">Wird geprüft…</string>
     <string name="enfoque_despues">DANACH</string>
     <string name="enfoque_detener">Sitzung beenden</string>
@@ -431,6 +437,7 @@
     <string name="enfoque_nada_nuevo">Noch nichts Neues</string>
     <string name="enfoque_nota_offline">Auf dem Handy gespeichert — wird synchronisiert, sobald du wieder online bist</string>
     <string name="enfoque_nota_ph">Private Notiz (ein Spindcode, wo du aufgehört hast…)</string>
+    <string name="enfoque_notificacion">%1$s/%2$s Trophäen · %3$s%%</string>
     <string name="enfoque_nuevos_1">" — %1$s neue Trophäe"</string>
     <string name="enfoque_nuevos_n">" — %1$s neue Trophäen"</string>
     <string name="enfoque_otra_sesion">Du hast eine aktive Sitzung in %1$s</string>
@@ -747,6 +754,8 @@
     <string name="racha_menos">Weniger</string>
     <string name="racha_semanas">LETZTE 5 WOCHEN</string>
     <string name="racha_trofeos_semana">Diese Woche</string>
+    <string name="recordatorio_racha">Du hast seit %1$s Tagen jeden Tag eine Trophäe. Hol dir heute eine, damit sie nicht reißt.</string>
+    <string name="recordatorio_racha_titulo">🔥 Deine Serie lebt noch!</string>
     <string name="ritmo_comparar_con">Vergleichen mit</string>
     <string name="ritmo_dia_a_dia">Tag für Tag</string>
     <string name="ritmo_empate">Unentschieden</string>
@@ -944,10 +953,15 @@
     <string name="tiempo_d">vor %1$s T.</string>
     <string name="tiempo_h">vor %1$s Std.</string>
     <string name="tiempo_min">vor %1$s Min.</string>
+    <string name="tile_enfoque">Paragon · Fokus</string>
     <string name="vista_cronologia">Zeitachse</string>
     <string name="vista_cuadricula">Raster</string>
     <string name="vista_lista">Liste</string>
     <string name="widget_objetivo">Ziel: %1$s</string>
+    <string name="widget_racha_cero">Keine Serie</string>
+    <string name="widget_racha_cero_sub">Hol dir heute eine Trophäe, um eine zu starten</string>
+    <string name="widget_racha_dias">🔥 %1$s Tage</string>
+    <string name="widget_racha_mejor">Beste Serie: %1$s</string>
     <string name="widget_sin_objetivo">Kein Ziel angeheftet</string>
     <string name="widget_sin_objetivo_sub">Hefte ein Spiel auf seiner Spielseite an</string>
     <string name="wrap_comparas">IM VERGLEICH</string>

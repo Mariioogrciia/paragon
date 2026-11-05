@@ -7750,5 +7750,117 @@
   "fr": "Si rien n'arrive, vérifie dans les réglages du système que Paragon peut te notifier",
   "it": "Se non ti arriva nulla, controlla che Paragon possa avvisarti nelle impostazioni di sistema",
   "pt": "Se não te chegar nada, verifica nas definições do sistema que o Paragon te pode notificar"
+ },
+ "atajo_enfoque": {
+  "de": "Fokusmodus",
+  "en": "Focus mode",
+  "es": "Modo Enfoque",
+  "fr": "Mode focus",
+  "it": "Modalità focus",
+  "pt": "Modo foco"
+ },
+ "atajo_enfoque_largo": {
+  "de": "Das Spiel öffnen, das du jagst",
+  "en": "Open the game you're hunting",
+  "es": "Abrir el juego que estás cazando",
+  "fr": "Ouvrir le jeu que tu chasses",
+  "it": "Apri il gioco che stai cacciando",
+  "pt": "Abrir o jogo que estás a caçar"
+ },
+ "atajo_biblioteca": {
+  "de": "Bibliothek",
+  "en": "Library",
+  "es": "Biblioteca",
+  "fr": "Bibliothèque",
+  "it": "Libreria",
+  "pt": "Biblioteca"
+ },
+ "atajo_ligas": {
+  "de": "Ligen",
+  "en": "Leagues",
+  "es": "Ligas",
+  "fr": "Ligues",
+  "it": "Leghe",
+  "pt": "Ligas"
+ },
+ "atajo_sesiones": {
+  "de": "Sessions",
+  "en": "Sessions",
+  "es": "Sesiones",
+  "fr": "Sessions",
+  "it": "Sessioni",
+  "pt": "Sessões"
+ },
+ "tile_enfoque": {
+  "de": "Paragon · Fokus",
+  "en": "Paragon · Focus",
+  "es": "Paragon · Enfoque",
+  "fr": "Paragon · Focus",
+  "it": "Paragon · Focus",
+  "pt": "Paragon · Foco"
+ },
+ "recordatorio_racha_titulo": {
+  "de": "🔥 Deine Serie lebt noch!",
+  "en": "🔥 Your streak is still alive!",
+  "es": "🔥 ¡Tu racha sigue viva!",
+  "fr": "🔥 Ta série est toujours en vie !",
+  "it": "🔥 La tua serie è ancora viva!",
+  "pt": "🔥 A tua sequência continua viva!"
+ },
+ "recordatorio_racha": {
+  "de": "Du hast seit {0} Tagen jeden Tag eine Trophäe. Hol dir heute eine, damit sie nicht reißt.",
+  "en": "You're on a {0}-day trophy streak. Earn one today so you don't lose it.",
+  "es": "Llevas {0} días seguidos con trofeo. Saca uno hoy para no perderla.",
+  "fr": "Tu as eu un trophée {0} jours d’affilée. Obtiens-en un aujourd’hui pour ne pas la perdre.",
+  "it": "Hai un trofeo da {0} giorni di fila. Prendine uno oggi per non perderla.",
+  "pt": "Já tens troféus há {0} dias seguidos. Ganha um hoje para não a perderes."
+ },
+ "widget_racha_dias": {
+  "de": "🔥 {0} Tage",
+  "en": "🔥 {0} days",
+  "es": "🔥 {0} días",
+  "fr": "🔥 {0} jours",
+  "it": "🔥 {0} giorni",
+  "pt": "🔥 {0} dias"
+ },
+ "widget_racha_mejor": {
+  "de": "Beste Serie: {0}",
+  "en": "Best streak: {0}",
+  "es": "Mejor racha: {0}",
+  "fr": "Meilleure série : {0}",
+  "it": "Serie migliore: {0}",
+  "pt": "Melhor sequência: {0}"
+ },
+ "widget_racha_cero": {
+  "de": "Keine Serie",
+  "en": "No streak",
+  "es": "Sin racha",
+  "fr": "Pas de série",
+  "it": "Nessuna serie",
+  "pt": "Sem sequência"
+ },
+ "widget_racha_cero_sub": {
+  "de": "Hol dir heute eine Trophäe, um eine zu starten",
+  "en": "Earn a trophy today to start one",
+  "es": "Saca un trofeo hoy para empezar una",
+  "fr": "Obtiens un trophée aujourd’hui pour en lancer une",
+  "it": "Ottieni un trofeo oggi per iniziarne una",
+  "pt": "Ganha um troféu hoje para começar uma"
+ },
+ "enfoque_canal": {
+  "de": "Fokusmodus-Session",
+  "en": "Focus mode session",
+  "es": "Sesión de Modo Enfoque",
+  "fr": "Session du mode focus",
+  "it": "Sessione della modalità focus",
+  "pt": "Sessão do modo foco"
+ },
+ "enfoque_notificacion": {
+  "de": "{0}/{1} Trophäen · {2}%",
+  "en": "{0}/{1} trophies · {2}%",
+  "es": "{0}/{1} trofeos · {2}%",
+  "fr": "{0}/{1} trophées · {2} %",
+  "it": "{0}/{1} trofei · {2}%",
+  "pt": "{0}/{1} troféus · {2}%"
  }
 }

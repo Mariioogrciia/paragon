@@ -102,6 +102,11 @@
     <string name="arquetipo_elite">Elite</string>
     <string name="arquetipo_explorador">Explorer</string>
     <string name="arquetipo_veterano">Veteran</string>
+    <string name="atajo_biblioteca">Library</string>
+    <string name="atajo_enfoque">Focus mode</string>
+    <string name="atajo_enfoque_largo">Open the game you\'re hunting</string>
+    <string name="atajo_ligas">Leagues</string>
+    <string name="atajo_sesiones">Sessions</string>
     <string name="atascados_sesion">Session</string>
     <string name="atascados_sesion_desc">Set up a session for this trophy</string>
     <string name="atascados_subtitulo">What stands between you and the platinum, game by game. Ask for help with a session.</string>
@@ -416,6 +421,7 @@
     <string name="enfoque_al_platino">to platinum</string>
     <string name="enfoque_aviso_1">%1$s new trophy!</string>
     <string name="enfoque_aviso_n">%1$s new trophies!</string>
+    <string name="enfoque_canal">Focus mode session</string>
     <string name="enfoque_comprobando">Checking…</string>
     <string name="enfoque_despues">NEXT</string>
     <string name="enfoque_detener">Stop session</string>
@@ -431,6 +437,7 @@
     <string name="enfoque_nada_nuevo">Nothing new yet</string>
     <string name="enfoque_nota_offline">Saved on the phone — it will sync when you\'re back online</string>
     <string name="enfoque_nota_ph">Private note (a locker code, where you left off…)</string>
+    <string name="enfoque_notificacion">%1$s/%2$s trophies · %3$s%%</string>
     <string name="enfoque_nuevos_1">" — %1$s new trophy"</string>
     <string name="enfoque_nuevos_n">" — %1$s new trophies"</string>
     <string name="enfoque_otra_sesion">You have an active session in %1$s</string>
@@ -747,6 +754,8 @@
     <string name="racha_menos">Less</string>
     <string name="racha_semanas">LAST 5 WEEKS</string>
     <string name="racha_trofeos_semana">This week</string>
+    <string name="recordatorio_racha">You\'re on a %1$s-day trophy streak. Earn one today so you don\'t lose it.</string>
+    <string name="recordatorio_racha_titulo">🔥 Your streak is still alive!</string>
     <string name="ritmo_comparar_con">Compare with</string>
     <string name="ritmo_dia_a_dia">Day by day</string>
     <string name="ritmo_empate">Tie</string>
@@ -944,10 +953,15 @@
     <string name="tiempo_d">%1$sd ago</string>
     <string name="tiempo_h">%1$sh ago</string>
     <string name="tiempo_min">%1$sm ago</string>
+    <string name="tile_enfoque">Paragon · Focus</string>
     <string name="vista_cronologia">Timeline</string>
     <string name="vista_cuadricula">Grid</string>
     <string name="vista_lista">List</string>
     <string name="widget_objetivo">Goal: %1$s</string>
+    <string name="widget_racha_cero">No streak</string>
+    <string name="widget_racha_cero_sub">Earn a trophy today to start one</string>
+    <string name="widget_racha_dias">🔥 %1$s days</string>
+    <string name="widget_racha_mejor">Best streak: %1$s</string>
     <string name="widget_sin_objetivo">No pinned goal</string>
     <string name="widget_sin_objetivo_sub">Pin a game from its game page</string>
     <string name="wrap_comparas">HOW YOU COMPARE</string>

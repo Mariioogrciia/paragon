@@ -110,7 +110,10 @@ class LibraryRepository(
             
             // 3. Actualizar Widget para que refleje los datos nuevos
             notifyWidgetUpdate(context)
-            
+
+            // 4. Spotlight en iOS (IndiceBusqueda.kt): buscar tus juegos desde el sistema.
+            IndiceBusqueda.alCargarBiblioteca?.invoke(remoteGames)
+
             LibraryResult.Ok(remoteGames)
         } catch (e: HttpException) {
             if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)

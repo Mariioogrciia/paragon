@@ -61,6 +61,9 @@ export async function GET(req: Request) {
     racha: {
       actual: racha.actual,
       mejor: racha.mejor,
+      // Si hoy ya hay algún trofeo: el recordatorio local de racha de iOS
+      // (RecordatorioRacha.kt) solo avisa los días que aún no lo hay.
+      hoy: racha.hoyCuenta,
     },
   }, userId);
 }

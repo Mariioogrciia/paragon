@@ -29,6 +29,8 @@ data class PanelStatsDto(
 data class PanelRachaDto(
     val actual: Int,
     val mejor: Int,
+    /** Hoy ya hay algún trofeo (falta en servidores de antes del 5 nov 2026). */
+    val hoy: Boolean = false,
 )
 
 @Serializable

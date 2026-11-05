@@ -37,6 +37,30 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="paragon" android:host="auth" />
             </intent-filter>
+            <!-- paragon://open?path=… (avisos, accesos directos del icono y el
+                 tile de Enfoque) no necesita intent-filter: los tres mandan un
+                 intent explícito a esta actividad, y así ninguna otra app puede
+                 abrirla con ese esquema. -->
+            <!-- App Links (5 nov 2026): los enlaces de la web a estas rutas abren
+                 la app. `autoVerify` comprueba /.well-known/assetlinks.json
+                 (src/lib/enlacesApp.ts; las rutas tienen que ser las mismas que
+                 RUTAS_APP de ahí). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="www.paragontrophies.com" />
+                <data android:host="paragontrophies.com" />
+                <data android:pathPrefix="/u/" />
+                <data android:pathPrefix="/juego/" />
+                <data android:pathPrefix="/sesiones" />
+                <data android:pathPrefix="/ligas" />
+                <data android:pathPrefix="/amigos" />
+                <data android:pathPrefix="/clanes" />
+                <data android:pathPrefix="/comparar" />
+                <data android:pathPrefix="/enfoque" />
+            </intent-filter>
         </activity>
 
         <!-- "Añadir a Paragon" desde el Sharesheet del sistema (compartir un
@@ -71,6 +95,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
         <activity-alias
             android:name=".IconOro"
@@ -83,6 +108,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
         <activity-alias
             android:name=".IconClaro"
@@ -95,6 +121,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
         <activity-alias
             android:name=".IconNeon"
@@ -107,6 +134,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
         <activity-alias
             android:name=".IconEsmeralda"
@@ -119,6 +147,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
         <provider
@@ -159,6 +188,19 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/notificacion_acento" />
 
+        <!-- Tile de Ajustes rápidos: abre Modo Enfoque (tile/EnfoqueTileService.kt). -->
+        <service
+            android:name=".tile.EnfoqueTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_enfoque"
+            android:label="@string/tile_enfoque"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.ACTIVE_TILE" android:value="false" />
+        </service>
+
         <receiver
             android:name=".widget.PinnedGameWidgetReceiver"
             android:exported="true">
@@ -168,6 +210,17 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/pinned_game_widget_info" />
+        </receiver>
+        <!-- Widget de racha (widget/RachaWidget.kt). -->
+        <receiver
+            android:name=".widget.RachaWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/racha_widget_info" />
         </receiver>
     </application>
 
