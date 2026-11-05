@@ -504,6 +504,16 @@ h3,
   filter: drop-shadow(0 0 8px rgba(127,188,216,0.5));
 }
 
+/* Brillo de "cargando" sobre la carátula del aviso de platino (AvisoCompartirPlatino.tsx). */
+@keyframes aviso-platino-brillo {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+.aviso-platino-brillo {
+  background: linear-gradient(100deg, transparent 20%, rgb(159 212 236 / 0.28) 50%, transparent 80%);
+  animation: aviso-platino-brillo 1.3s ease-in-out infinite;
+}
+
 /* ---------------------------------------------------------------- *
  * Marcos de avatar (AvatarFrame.tsx). Cada uno tiene su propio       *
  * movimiento, no solo su propio color — si no, "marco nuevo" es solo *

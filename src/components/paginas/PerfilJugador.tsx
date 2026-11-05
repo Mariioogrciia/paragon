@@ -418,7 +418,7 @@ export async function PerfilJugador({
         <div className="relative z-10 mx-auto max-w-[1240px] px-7 pt-6">
           <BackButton fallbackHref="/" dark />
         </div>
-        <div className="relative z-10 mx-auto flex max-w-[1240px] flex-col gap-6 px-7 pb-8 pt-2 md:flex-row md:items-end">
+        <div className="relative z-10 mx-auto flex max-w-[1240px] flex-col gap-6 px-7 pb-8 pt-2 md:flex-row md:items-center">
           <CartaHolo className="mx-auto w-full max-w-[300px] shrink-0 md:mx-0">
             <Link href={`/u/${handle}/cv`} className="carta-holo-cara block px-5 pb-5 pt-4" aria-label={t("PerfilPage.hojaDeServicios")}>
               <span className="flex items-center justify-between text-[0.6875rem] font-bold">

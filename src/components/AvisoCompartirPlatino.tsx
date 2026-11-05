@@ -13,10 +13,13 @@ import { CompartirImagen } from "@/components/CompartirImagen";
  * la imagen vertical para Stories ya generada y el botón de compartir. Sale
  * una vez por platino: "Ahora no", la X o compartir lo dan por preguntado.
  */
-export function AvisoCompartirPlatino({ gameId, titulo, handle }: { gameId: string; titulo: string; handle: string }) {
+export function AvisoCompartirPlatino({ gameId, titulo, handle, coverUrl }: { gameId: string; titulo: string; handle: string; coverUrl?: string | null }) {
   const t = useTranslations("Perfil");
   const locale = useLocale();
   const [visible, setVisible] = useState(true);
+  // Mientras se genera la imagen (Satori + portada + avatar) se ve la
+  // carátula difuminada con un brillo, no una caja negra (5 nov 2026).
+  const [lista, setLista] = useState(false);
   if (!visible) return null;
 
   const imagen = `/api/trophy-card/${encodeURIComponent(handle)}/${encodeURIComponent(gameId)}?formato=historia&lang=${locale}`;
@@ -33,17 +36,25 @@ export function AvisoCompartirPlatino({ gameId, titulo, handle }: { gameId: stri
       className="fixed inset-x-3 bottom-3 z-50 flex gap-4 rounded-[20px] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.5)] sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[400px]"
       style={{ border: "1px solid rgb(159 212 236 / 0.35)", background: "linear-gradient(160deg, var(--surface), var(--background))" }}
     >
-      <img
-        src={imagen}
-        alt={t("compartirPlatino.alt", { juego: titulo })}
-        width={96}
-        height={171}
-        onError={(e) => {
-          e.currentTarget.style.display = "none";
-        }}
-        className="h-[171px] w-[96px] shrink-0 rounded-xl object-cover"
-        style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}
-      />
+      <div className="relative h-[171px] w-[96px] shrink-0 overflow-hidden rounded-xl" style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}>
+        {!lista && (
+          <>
+            {coverUrl && <img src={coverUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-[6px]" />}
+            <span aria-hidden="true" className="aviso-platino-brillo absolute inset-0 motion-reduce:hidden" />
+          </>
+        )}
+        <img
+          src={imagen}
+          alt={t("compartirPlatino.alt", { juego: titulo })}
+          width={96}
+          height={171}
+          onLoad={() => setLista(true)}
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+          className={`relative h-full w-full object-cover transition-opacity duration-300 ${lista ? "opacity-100" : "opacity-0"}`}
+        />
+      </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start gap-2">
           <p id="aviso-platino-titulo" className="font-heading flex-1 text-[1.0625rem] font-bold leading-tight text-platinum">

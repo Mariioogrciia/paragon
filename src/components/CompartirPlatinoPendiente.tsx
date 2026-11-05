@@ -13,5 +13,5 @@ export async function CompartirPlatinoPendiente({ userId, handle }: { userId: st
     return null;
   });
   if (!platino) return null;
-  return <AvisoCompartirPlatino key={platino.gameId} gameId={platino.gameId} titulo={platino.titulo} handle={handle} />;
+  return <AvisoCompartirPlatino key={platino.gameId} gameId={platino.gameId} titulo={platino.titulo} handle={handle} coverUrl={platino.coverUrl} />;
 }

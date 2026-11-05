@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getGameDetail, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
+import { getLibrary, getProfileByHandle, resolveAvatarUrl } from "@/lib/profiles";
 import { dificultadDeGame, esPlatinoEquivalente } from "@/lib/stats";
 import { imagenSegura } from "@/lib/og/imagenSegura";
 import { esIdioma, type Idioma } from "@/lib/idiomasTrofeo";
@@ -10,7 +10,7 @@ import { historia, TrofeoPlatino } from "@/lib/og/historiaPlatino";
  * ver esPlatinoEquivalente). Mismo mecanismo que /api/wrap/[handle]: Satori
  * vía `ImageResponse`, solo entiende flexbox, nada de CSS grid ni de
  * sombras/hover de la versión web. Corre en Node por lo mismo que el Wrap:
- * `getGameDetail` habla con Postgres por `postgres-js`, que no va en edge.
+ * `getLibrary` habla con Postgres por `postgres-js`, que no va en edge.
  *
  * No comprueba que quien la pide sea el dueño del perfil a propósito —
  * mismo criterio que el Wrap: es una imagen pensada para compartirse fuera
@@ -79,7 +79,11 @@ export async function GET(
     return new Response("No existe ese perfil.", { status: 404 });
   }
 
-  const game = await getGameDetail(profile, gameId);
+  // La biblioteca ya trae todo lo que pinta la tarjeta (horas, rareza,
+  // trofeos). getGameDetail además baja la lista de trofeos y, justo tras un
+  // platino (la base aún no tiene el último trofeo), sincronizaba en vivo con
+  // la plataforma: varios segundos con la caja del aviso vacía (5 nov 2026).
+  const game = (await getLibrary(profile)).games.find((g) => g.id === gameId);
   if (!game) {
     return new Response("No existe ese juego en la biblioteca.", { status: 404 });
   }
