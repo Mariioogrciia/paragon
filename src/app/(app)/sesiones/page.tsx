@@ -17,7 +17,10 @@ export const metadata = { title: "Sesiones · Paragon" };
  * La lista es solo un índice: quién está dentro, los detalles y el botón para
  * unirse viven en la ficha (`/sesiones/[id]`).
  */
-export default async function SesionesPage() {
+export default async function SesionesPage({ searchParams }: { searchParams: Promise<{ juego?: string }> }) {
+  // `?juego=` (desde la fase «Online» del plan de platino): el formulario
+  // de nueva sesión sale abierto y con ese juego ya elegido.
+  const { juego: juegoInicial } = await searchParams;
   const session = await auth();
   const userId = session?.user?.id ?? null;
   const t = await getTranslations("Shell.Sesiones");
@@ -45,7 +48,7 @@ export default async function SesionesPage() {
       </div>
 
       {/* Plegado: la mayoría viene a mirar las que hay, no a organizar. */}
-      <details className="group rounded-[18px] border border-border bg-surface">
+      <details open={Boolean(juegoInicial)} className="group rounded-[18px] border border-border bg-surface">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-heading text-lg font-bold [&::-webkit-details-marker]:hidden">
           <span>＋ {t("nueva")}</span>
           <span className="text-muted transition-transform group-open:rotate-45" aria-hidden>
@@ -53,7 +56,7 @@ export default async function SesionesPage() {
           </span>
         </summary>
         <div className="border-t border-border p-5">
-          {userId ? <NuevaSesion juegos={misJuegos} /> : <p className="text-sm text-muted">{t("entra")}</p>}
+          {userId ? <NuevaSesion juegos={misJuegos} juegoInicial={juegoInicial} /> : <p className="text-sm text-muted">{t("entra")}</p>}
         </div>
       </details>
 

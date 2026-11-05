@@ -28,6 +28,8 @@ import { AvisoHitoReservado } from "@/components/AvisoHitoReservado";
 import { dificultadDeJuego } from "@/lib/difficulty";
 import { estimarEta } from "@/lib/eta";
 import { EtaPlatinoCard } from "@/components/EtaPlatino";
+import { PlanPlatinoCard } from "@/components/PlanPlatino";
+import { planPlatino } from "@/lib/planPlatino";
 import { HltbCard } from "@/components/HltbCard";
 import { AutoSyncHltb } from "@/components/AutoSyncHltb";
 import type { Trophy } from "@/lib/types";
@@ -197,6 +199,8 @@ export default async function JuegoPage({
     !progress.hasPlatinum && progress.percent < 100 ? progress.total - progress.earned : 0
   );
   const eta = faltanParaMeta > 0 ? estimarEta(game.trophies, faltanParaMeta) : null;
+  // Plan de platino guiado (5 nov 2026): solo mientras quede algo por hacer.
+  const plan = faltanParaMeta > 0 ? planPlatino(game.trophies) : null;
 
   return (
     <div className="-mx-4 -mt-9 sm:-mx-7">
@@ -461,6 +465,8 @@ export default async function JuegoPage({
         {esMio && game.hltb === undefined && <AutoSyncHltb gameId={game.id} title={game.title} />}
 
         {eta && <EtaPlatinoCard eta={eta} esMio={esMio} />}
+
+        {plan && plan.faltan > 0 && <PlanPlatinoCard plan={plan} gameId={game.id} esMio={esMio} />}
 
         {diario && <DiarioPlatino diario={diario} titulo={game.title} />}
 

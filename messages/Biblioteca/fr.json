@@ -80,6 +80,13 @@
       "conSesion": "Connecte-toi pour créer une alerte de prix.",
       "invalido": "Indique un prix entre 0,01 et 999 €.",
       "ayuda": "Tu reçois une notification et, si activé, un message Discord."
+    },
+    "rapidos": {
+      "titulo": "Platines les plus rapides",
+      "descripcion": "Du premier trophée au platine (ou 100 % sur Steam), parmi les joueurs de Paragon.",
+      "d": "j",
+      "h": "h",
+      "min": "min"
     }
   },
   "GuiasPage": {
@@ -554,5 +561,43 @@
     "explicacion": "PlayStation et Steam attribuent le temps de jeu au compte, pas à la personne : si quelqu'un joue avec ton compte, on dirait que c'est toi.",
     "ignorar": "Je n'y ai pas joué : ignorer les heures",
     "volverAContar": "Les recompter"
+  },
+  "planPlatino": {
+    "titulo": "Plan de platine",
+    "faltan": "{count, plural, one {# trophée restant} other {# trophées restants}}",
+    "descripcion": "Ce qu’il te manque, dans l’ordre : d’abord ce qui peut être manqué, à la fin ce qui ne se rejoue pas. Ça se coche tout seul à la synchronisation.",
+    "descripcionAjeno": "Ce qu’il manque, dans l’ordre : d’abord ce qui peut être manqué, à la fin ce qui ne se rejoue pas.",
+    "masPendientes": "{count, plural, one {et # de plus} other {et # de plus}}",
+    "organizarSesion": "Organiser une session en ligne",
+    "fase": {
+      "perdibles": {
+        "nombre": "Manquables",
+        "consejo": "À faire d’abord : si tu dépasses le point de non-retour, il faudra rejouer. Consulte le guide avant chaque chapitre."
+      },
+      "historia": {
+        "nombre": "Histoire",
+        "consejo": "Ils viennent en jouant. Dans l’ordre du jeu, généralement celui des chapitres."
+      },
+      "coleccionables": {
+        "nombre": "Objets à collectionner",
+        "consejo": "Mieux vaut les faire dans la même partie que l’histoire, guide à côté, pour ne pas revisiter chaque zone."
+      },
+      "online": {
+        "nombre": "En ligne",
+        "consejo": "Avant la fermeture des serveurs. Une session avec des joueurs Paragon va beaucoup plus vite."
+      },
+      "habilidad": {
+        "nombre": "Habileté",
+        "consejo": "Quand tu connais le jeu et as un meilleur équipement : difficulté élevée, sans mourir, contre-la-montre."
+      },
+      "grindeo": {
+        "nombre": "Farm",
+        "consejo": "Répéter jusqu’à atteindre le chiffre. Beaucoup tombent tout seuls en faisant le reste : vérifie à la fin."
+      },
+      "limpieza": {
+        "nombre": "Nettoyage",
+        "consejo": "Le reste, du plus courant au plus rare. Les plus rares sont souvent les plus durs."
+      }
+    }
   }
 }

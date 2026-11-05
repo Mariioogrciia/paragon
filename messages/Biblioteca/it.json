@@ -80,6 +80,13 @@
       "conSesion": "Accedi per creare un avviso di prezzo.",
       "invalido": "Inserisci un prezzo tra 0,01 e 999 €.",
       "ayuda": "Ti arriva come notifica e, se l'hai attivato, su Discord."
+    },
+    "rapidos": {
+      "titulo": "Platini più veloci",
+      "descripcion": "Dal primo trofeo al platino (o al 100% su Steam), tra la gente di Paragon.",
+      "d": "g",
+      "h": "h",
+      "min": "min"
     }
   },
   "GuiasPage": {
@@ -554,5 +561,43 @@
     "explicacion": "PlayStation e Steam attribuiscono le ore all'account, non alla persona: se qualcuno gioca con il tuo account, sembrano tue.",
     "ignorar": "Non ci ho giocato: ignora le ore",
     "volverAContar": "Torna a contarle"
+  },
+  "planPlatino": {
+    "titulo": "Piano per il platino",
+    "faltan": "{count, plural, one {manca # trofeo} other {mancano # trofei}}",
+    "descripcion": "Quello che ti manca, in ordine: prima ciò che si può perdere, alla fine ciò che non si ripete. Si spunta da solo quando sincronizzi.",
+    "descripcionAjeno": "Quello che manca, in ordine: prima ciò che si può perdere, alla fine ciò che non si ripete.",
+    "masPendientes": "{count, plural, one {e # in più} other {e altri #}}",
+    "organizarSesion": "Organizza una sessione online",
+    "fase": {
+      "perdibles": {
+        "nombre": "Perdibili",
+        "consejo": "Vanno per primi: se superi il punto di non ritorno, tocca rigiocare. Guarda la guida prima di ogni capitolo."
+      },
+      "historia": {
+        "nombre": "Storia",
+        "consejo": "Arrivano giocando. Nell’ordine del gioco, di solito quello dei capitoli."
+      },
+      "coleccionables": {
+        "nombre": "Collezionabili",
+        "consejo": "Meglio nella stessa partita della storia e con la guida accanto, per non tornare in ogni zona."
+      },
+      "online": {
+        "nombre": "Online",
+        "consejo": "Prima che chiudano i server. Una sessione con gente di Paragon è molto più veloce."
+      },
+      "habilidad": {
+        "nombre": "Abilità",
+        "consejo": "Quando conosci già il gioco e hai un equipaggiamento migliore: difficoltà alta, senza morire, a tempo."
+      },
+      "grindeo": {
+        "nombre": "Grind",
+        "consejo": "Ripetere fino a raggiungere la cifra. Molti arrivano da soli mentre fai il resto: guardali alla fine."
+      },
+      "limpieza": {
+        "nombre": "Pulizia",
+        "consejo": "Il resto, dal più comune al più raro. I più rari di solito sono i più difficili."
+      }
+    }
   }
 }

@@ -80,6 +80,13 @@
       "conSesion": "Entra para crear una alerta de precio.",
       "invalido": "Pon un precio entre 0,01 y 999 €.",
       "ayuda": "Te llega por notificación y, si lo tienes activado, por Discord."
+    },
+    "rapidos": {
+      "titulo": "Platinos más rápidos",
+      "descripcion": "Del primer trofeo al platino (o al 100 % en Steam), entre la gente de Paragon.",
+      "d": "d",
+      "h": "h",
+      "min": "min"
     }
   },
   "GuiasPage": {
@@ -554,5 +561,43 @@
     "explicacion": "PlayStation y Steam atribuyen las horas a la cuenta, no a la persona: si alguien juega con tu cuenta, parecen tuyas.",
     "ignorar": "No he jugado esto: ignorar horas",
     "volverAContar": "Volver a contarlas"
+  },
+  "planPlatino": {
+    "titulo": "Plan de platino",
+    "faltan": "{count, plural, one {falta # trofeo} other {faltan # trofeos}}",
+    "descripcion": "Lo que te falta, por orden: primero lo que se puede perder, lo que no se repite al final. Se marca solo al sincronizar.",
+    "descripcionAjeno": "Lo que le falta, por orden: primero lo que se puede perder, lo que no se repite al final.",
+    "masPendientes": "{count, plural, one {y # más} other {y # más}}",
+    "organizarSesion": "Organizar una sesión online",
+    "fase": {
+      "perdibles": {
+        "nombre": "Perdibles",
+        "consejo": "Van primero: si pasas el punto de no retorno, toca rejugar. Mira la guía antes de cada capítulo."
+      },
+      "historia": {
+        "nombre": "Historia",
+        "consejo": "Salen jugando. En el orden del juego, que suele ser el de los capítulos."
+      },
+      "coleccionables": {
+        "nombre": "Coleccionables",
+        "consejo": "Mejor en la misma partida que la historia y con la guía al lado, para no volver a cada zona."
+      },
+      "online": {
+        "nombre": "Online",
+        "consejo": "Antes de que cierren los servidores. Una sesión con gente de Paragon lo hace mucho más rápido."
+      },
+      "habilidad": {
+        "nombre": "Habilidad",
+        "consejo": "Cuando ya conoces el juego y tienes mejor equipo: dificultad alta, sin morir, contrarreloj."
+      },
+      "grindeo": {
+        "nombre": "Grindeo",
+        "consejo": "Repetir hasta llegar a la cifra. Muchos salen solos mientras haces lo demás: míralos al final."
+      },
+      "limpieza": {
+        "nombre": "Limpieza",
+        "consejo": "El resto, de más común a más raro. Los más raros suelen ser los que más cuestan."
+      }
+    }
   }
 }

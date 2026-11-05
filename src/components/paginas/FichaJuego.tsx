@@ -8,6 +8,7 @@ import { dominioPublico } from "@/lib/site";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
+import { PlatinosRapidos } from "@/components/PlatinosRapidos";
 import { CommunityRating } from "@/components/CommunityRating";
 import { CommunityDifficulty } from "@/components/CommunityDifficulty";
 import { Stars } from "@/components/Stars";
@@ -391,6 +392,9 @@ export async function FichaJuego({
             </div>
           )}
         </section>
+
+        {/* Platinos más rápidos (5 nov 2026): solo lee la base, vale en la copia de la CDN. */}
+        <PlatinosRapidos gameId={gameId} />
 
         {detalles && detalles.similarGames.length > 0 && (
           <section>

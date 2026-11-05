@@ -80,6 +80,13 @@
       "conSesion": "Melde dich an, um einen Preisalarm zu erstellen.",
       "invalido": "Gib einen Preis zwischen 0,01 und 999 € ein.",
       "ayuda": "Du bekommst eine Benachrichtigung und, falls aktiviert, eine Discord-DM."
+    },
+    "rapidos": {
+      "titulo": "Schnellste Platin",
+      "descripcion": "Von der ersten Trophäe bis zum Platin (oder 100 % auf Steam), unter Paragon-Spielern.",
+      "d": "T",
+      "h": "Std",
+      "min": "Min"
     }
   },
   "GuiasPage": {
@@ -554,5 +561,43 @@
     "explicacion": "PlayStation und Steam rechnen Spielzeit dem Konto zu, nicht der Person: Spielt jemand mit deinem Konto, sieht es nach dir aus.",
     "ignorar": "Hab ich nicht gespielt: Stunden ignorieren",
     "volverAContar": "Wieder zählen"
+  },
+  "planPlatino": {
+    "titulo": "Platinplan",
+    "faltan": "{count, plural, one {noch # Trophäe} other {noch # Trophäen}}",
+    "descripcion": "Was dir fehlt, in Reihenfolge: zuerst das Verpassbare, zuletzt das, was man nicht wiederholen muss. Es hakt sich beim Synchronisieren selbst ab.",
+    "descripcionAjeno": "Was noch fehlt, in Reihenfolge: zuerst das Verpassbare, zuletzt das, was man nicht wiederholen muss.",
+    "masPendientes": "{count, plural, one {und # weitere} other {und # weitere}}",
+    "organizarSesion": "Eine Online-Session organisieren",
+    "fase": {
+      "perdibles": {
+        "nombre": "Verpassbare",
+        "consejo": "Die zuerst: Wenn du den Point of no Return überschreitest, musst du neu spielen. Schau vor jedem Kapitel in den Guide."
+      },
+      "historia": {
+        "nombre": "Story",
+        "consejo": "Die kommen beim Spielen. In der Reihenfolge des Spiels, meist nach Kapiteln."
+      },
+      "coleccionables": {
+        "nombre": "Sammelobjekte",
+        "consejo": "Am besten im selben Durchlauf wie die Story und mit Guide daneben, damit du nicht jedes Gebiet erneut besuchst."
+      },
+      "online": {
+        "nombre": "Online",
+        "consejo": "Bevor die Server abgeschaltet werden. Eine Session mit Paragon-Leuten geht viel schneller."
+      },
+      "habilidad": {
+        "nombre": "Können",
+        "consejo": "Wenn du das Spiel kennst und bessere Ausrüstung hast: hoher Schwierigkeitsgrad, ohne Tod, Zeitrennen."
+      },
+      "grindeo": {
+        "nombre": "Grind",
+        "consejo": "Wiederholen, bis die Zahl erreicht ist. Viele kommen nebenbei: schau am Ende nach."
+      },
+      "limpieza": {
+        "nombre": "Aufräumen",
+        "consejo": "Der Rest, vom häufigsten zum seltensten. Die seltensten sind meist die schwierigsten."
+      }
+    }
   }
 }

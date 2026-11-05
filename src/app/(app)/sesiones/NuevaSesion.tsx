@@ -22,10 +22,10 @@ const PLATAFORMAS: Record<string, string> = { psn: "PlayStation", xbox: "Xbox", 
 const OTRO = "__otro__";
 
 /** Formulario para organizar una sesión — ver lib/sesiones.ts. */
-export function NuevaSesion({ juegos }: { juegos: Juego[] }) {
+export function NuevaSesion({ juegos, juegoInicial }: { juegos: Juego[]; juegoInicial?: string }) {
   const t = useTranslations("Shell.Sesiones");
   const router = useRouter();
-  const [gameId, setGameId] = useState(juegos[0]?.id ?? "");
+  const [gameId, setGameId] = useState((juegoInicial && juegos.some((j) => j.id === juegoInicial) ? juegoInicial : juegos[0]?.id) ?? "");
   // Lista de trofeos y de qué juego es: mientras no coincida con `gameId`, está cargando.
   const [cargados, setCargados] = useState<{ gameId: string; lista: Trofeo[] } | null>(null);
   const trofeos = cargados?.gameId === gameId ? cargados.lista : null;

@@ -80,6 +80,13 @@
       "conSesion": "Sign in to create a price alert.",
       "invalido": "Enter a price between €0.01 and €999.",
       "ayuda": "You'll get a notification and, if enabled, a Discord DM."
+    },
+    "rapidos": {
+      "titulo": "Fastest platinums",
+      "descripcion": "From first trophy to platinum (or 100% on Steam), among Paragon players.",
+      "d": "d",
+      "h": "h",
+      "min": "min"
     }
   },
   "GuiasPage": {
@@ -554,5 +561,43 @@
     "explicacion": "PlayStation and Steam credit playtime to the account, not the person: if someone plays on your account, it looks like yours.",
     "ignorar": "I didn't play this: ignore hours",
     "volverAContar": "Count them again"
+  },
+  "planPlatino": {
+    "titulo": "Platinum plan",
+    "faltan": "{count, plural, one {# trophy left} other {# trophies left}}",
+    "descripcion": "What you still need, in order: what can be missed comes first, what can't be repeated last. It ticks itself off when you sync.",
+    "descripcionAjeno": "What they still need, in order: what can be missed comes first, what can't be repeated last.",
+    "masPendientes": "{count, plural, one {and # more} other {and # more}}",
+    "organizarSesion": "Organise an online session",
+    "fase": {
+      "perdibles": {
+        "nombre": "Missables",
+        "consejo": "These come first: if you pass the point of no return, you'll have to replay. Check the guide before each chapter."
+      },
+      "historia": {
+        "nombre": "Story",
+        "consejo": "These come from just playing. In the game's order, which is usually chapter order."
+      },
+      "coleccionables": {
+        "nombre": "Collectibles",
+        "consejo": "Best done in the same playthrough as the story, with the guide open, so you don't revisit every area."
+      },
+      "online": {
+        "nombre": "Online",
+        "consejo": "Before the servers shut down. A session with Paragon players makes it much quicker."
+      },
+      "habilidad": {
+        "nombre": "Skill",
+        "consejo": "Once you know the game and have better gear: high difficulty, no deaths, time trials."
+      },
+      "grindeo": {
+        "nombre": "Grind",
+        "consejo": "Repeat until you hit the number. Many pop on their own while you do the rest: check them at the end."
+      },
+      "limpieza": {
+        "nombre": "Clean-up",
+        "consejo": "The rest, from most common to rarest. The rarest are usually the hardest."
+      }
+    }
   }
 }
