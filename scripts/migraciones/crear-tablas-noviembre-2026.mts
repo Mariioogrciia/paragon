@@ -71,6 +71,17 @@ const TABLAS: Record<string, string> = {
       "codigo" text UNIQUE,
       "vinculadoAt" timestamp
     );`,
+  coleccionable_trofeo: `
+    CREATE TABLE IF NOT EXISTS "coleccionable_trofeo" (
+      "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+      "gameId" text NOT NULL REFERENCES "game"("id") ON DELETE CASCADE,
+      "trophyId" text NOT NULL,
+      "nombres" jsonb NOT NULL DEFAULT '[]'::jsonb,
+      "marcados" jsonb NOT NULL DEFAULT '[]'::jsonb,
+      "actualizadoAt" timestamp NOT NULL DEFAULT now(),
+      PRIMARY KEY ("userId", "gameId", "trophyId")
+    );
+    CREATE INDEX IF NOT EXISTS "coleccionable_trofeo_idx" ON "coleccionable_trofeo" ("gameId", "trophyId");`,
 };
 
 async function main() {

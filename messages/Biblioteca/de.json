@@ -332,7 +332,8 @@
     "needLogin": "Melde dich an, um mit eigenem Text zu suchen.",
     "offensive": "Dieser Text enthält anstößige Sprache.",
     "limit": "Zu viele Suchen hintereinander. Versuche es in ein paar Minuten erneut.",
-    "noResultsText": "Keine Videos zu diesem Text gefunden. Versuche andere Wörter."
+    "noResultsText": "Keine Videos zu diesem Text gefunden. Versuche andere Wörter.",
+    "abrirEnYoutube": "Auf YouTube öffnen"
   },
   "GameGuideLink": {
     "searchQuery": "{title} komplette Anleitung beste Waffen und Rüstung",
@@ -620,5 +621,18 @@
       "rechazo": "Darauf kann ich nicht antworten. Versuch eine andere Frage zu deinen Spielen.",
       "fallo": "Etwas ist schiefgelaufen. Versuch es gleich noch einmal."
     }
+  },
+  "coleccionables": {
+    "ver": "Liste anzeigen",
+    "ocultar": "Liste ausblenden",
+    "cargando": "Liste wird geladen…",
+    "pegarLista": "Liste aus einem Guide einfügen",
+    "cambiarLista": "Liste ändern",
+    "usarComunidad": "{count, plural, one {Liste der Community nutzen (# Sammelobjekt)} other {Liste der Community nutzen (# Sammelobjekte)}}",
+    "soloPendientes": "Nur fehlende",
+    "ayudaPegar": "Kopiere die Liste aus deinem Guide (PowerPyx, PSNProfiles, ein Video…) und füge sie hier ein: einer pro Zeile. Nummern oder Aufzählungszeichen sind egal.",
+    "placeholder": "1. Grille im Jogaku-Wald\n2. Grille am Akashima-Tempel\n…",
+    "guardarLista": "Liste speichern",
+    "todosHechos": "Du hast alle! 🎉"
   }
 }

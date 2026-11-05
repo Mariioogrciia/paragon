@@ -3,6 +3,9 @@
 import { useActionState, useEffect, useState, useTransition } from "react";
 import Link from "@/components/Enlace";
 import { useTranslations, useLocale } from "next-intl";
+import { ChecklistColeccionables } from "@/components/ChecklistColeccionables";
+import { cantidadDelTexto, MAX_COLECCIONABLES } from "@/lib/coleccionablesReglas";
+import { quitarColeccionablesAction } from "@/app/actions/coleccionables";
 import {
   searchTrophyGuideAction,
   videosGuiaAction,
@@ -251,6 +254,25 @@ export function TrophyGuideModal({
               )}
             </div>
 
+            {/* Abrir el vídeo en YouTube (5 nov 2026): en la app o la web de
+                YouTube se ve a pantalla completa, con capítulos y comentarios,
+                y se puede guardar para luego. */}
+            {videoId && !loading && (
+              <div className="flex justify-end border-b border-border px-6 py-2">
+                <a
+                  href={`https://www.youtube.com/watch?v=${videoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-semibold text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ color: "#ff0033" }}>
+                    <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z" />
+                  </svg>
+                  {t("TrophyGuideModal.abrirEnYoutube")}
+                </a>
+              </div>
+            )}
+
             {videos.length > 1 && !loading && (
               <div className="flex gap-2 overflow-x-auto border-b border-border px-6 py-3" role="tablist">
                 {videos.map((id, n) => (
@@ -339,8 +361,11 @@ export function TrophyGuideModal({
 function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) {
   const t = useTranslations("Biblioteca");
   const [manual, setManual] = useState(trophy.manualProgress ?? null);
-  const [metaEnCurso, setMetaEnCurso] = useState("");
+  // Si el texto del trofeo dice cuántos son ("Find all 16 crickets"), la meta ya sale puesta.
+  const sugerida = cantidadDelTexto(trophy.name, trophy.detail);
+  const [metaEnCurso, setMetaEnCurso] = useState(sugerida ? String(sugerida) : "");
   const [configurando, setConfigurando] = useState(false);
+  const [viendoLista, setViendoLista] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function guardar(current: number, target: number | null) {
@@ -393,7 +418,8 @@ function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) 
   }
 
   return (
-    <div className="flex items-center gap-3.5 border-t border-border px-6 py-3.5">
+    <>
+    <div className="flex flex-wrap items-center gap-3.5 border-t border-border px-6 py-3.5">
       <div className="flex items-center gap-2">
         <button
           onClick={() => guardar(Math.max(0, manual.current - 1), manual.target)}
@@ -418,10 +444,34 @@ function ContadorManual({ gameId, trophy }: { gameId: string; trophy: Trophy }) 
       <div className="h-1.5 flex-1 max-w-[200px] overflow-hidden rounded-full bg-surface-2">
         <div className="h-full rounded-full" style={{ width: `${Math.round((manual.current / manual.target) * 100)}%`, background: "var(--gold)" }} />
       </div>
-      <button onClick={() => guardar(0, null)} disabled={isPending} className="text-xs font-semibold text-muted hover:text-danger">
+      {manual.target <= MAX_COLECCIONABLES && (
+        <button onClick={() => setViendoLista((v) => !v)} className="text-xs font-semibold text-accent hover:underline">
+          {viendoLista ? t("coleccionables.ocultar") : t("coleccionables.ver")}
+        </button>
+      )}
+      <button
+        onClick={() => {
+          startTransition(async () => {
+            await quitarColeccionablesAction(gameId, trophy.id);
+            setManual(null);
+            setViendoLista(false);
+          });
+        }}
+        disabled={isPending}
+        className="text-xs font-semibold text-muted hover:text-danger"
+      >
         {t("TrophyGuideModal.manualCounter.remove")}
       </button>
     </div>
+    {viendoLista && (
+      <ChecklistColeccionables
+        gameId={gameId}
+        trophyId={trophy.id}
+        total={manual.target}
+        onCambio={(current, target) => setManual({ current, target })}
+      />
+    )}
+    </>
   );
 }
 

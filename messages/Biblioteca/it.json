@@ -332,7 +332,8 @@
     "needLogin": "Accedi per cercare con il tuo testo.",
     "offensive": "Quel testo contiene linguaggio offensivo.",
     "limit": "Troppe ricerche di fila. Riprova tra qualche minuto.",
-    "noResultsText": "Non ho trovato video con quel testo. Prova con altre parole."
+    "noResultsText": "Non ho trovato video con quel testo. Prova con altre parole.",
+    "abrirEnYoutube": "Apri su YouTube"
   },
   "GameGuideLink": {
     "searchQuery": "{title} guida completa migliori armi e armature",
@@ -620,5 +621,18 @@
       "rechazo": "Non posso rispondere a questo. Prova un’altra domanda sui tuoi giochi.",
       "fallo": "Qualcosa è andato storto. Riprova tra poco."
     }
+  },
+  "coleccionables": {
+    "ver": "Vedi lista",
+    "ocultar": "Nascondi lista",
+    "cargando": "Caricamento della lista…",
+    "pegarLista": "Incolla la lista di una guida",
+    "cambiarLista": "Cambia la lista",
+    "usarComunidad": "{count, plural, one {Usa la lista della community (# collezionabile)} other {Usa la lista della community (# collezionabili)}}",
+    "soloPendientes": "Solo quelli mancanti",
+    "ayudaPegar": "Copia la lista della guida che usi (PowerPyx, PSNProfiles, un video…) e incollala qui: uno per riga. Numeri o elenchi puntati vanno bene.",
+    "placeholder": "1. Grillo della foresta di Jogaku\n2. Grillo del tempio di Akashima\n…",
+    "guardarLista": "Salva la lista",
+    "todosHechos": "Li hai tutti! 🎉"
   }
 }

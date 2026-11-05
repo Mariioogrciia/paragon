@@ -211,3 +211,27 @@ describe("correo semanal", () => {
     expect(await estaSuscrito(u.id)).toBe(false);
   });
 });
+
+describe("lista de coleccionables", () => {
+  it("guarda nombres y marcados, mueve el contador y ofrece la lista a los demás", async () => {
+    const { guardarColeccionables, getColeccionables } = await import("@/lib/coleccionables");
+    const { userTrophies } = await import("@/db/schema");
+    const { and, eq } = await import("drizzle-orm");
+    const juego = await crearJuego("psn");
+    const ana = await crearUsuario();
+    const beto = await crearUsuario();
+    for (const u of [ana, beto]) await darJuego(u.id, juego);
+    const lista = await guardarColeccionables(ana.id, juego, "7", { nombres: ["Grillo A", "Grillo B", "Grillo C"], marcados: [2, 0, 9], total: 1 });
+    expect(lista).toEqual({ nombres: ["Grillo A", "Grillo B", "Grillo C"], marcados: [0, 2], total: 3 });
+    const [contador] = await db
+      .select({ c: userTrophies.manualProgressCurrent, m: userTrophies.manualProgressTarget })
+      .from(userTrophies)
+      .where(and(eq(userTrophies.userId, ana.id), eq(userTrophies.gameId, juego), eq(userTrophies.trophyId, "7")));
+    expect(contador).toEqual({ c: 2, m: 3 });
+    const deBeto = await getColeccionables(beto.id, juego, "7");
+    expect(deBeto.propia).toBeNull();
+    expect(deBeto.comunidad).toEqual(["Grillo A", "Grillo B", "Grillo C"]);
+    // Sin nombres: casillas numeradas.
+    expect((await guardarColeccionables(beto.id, juego, "7", { nombres: [], marcados: [1], total: 16 })).total).toBe(16);
+  });
+});

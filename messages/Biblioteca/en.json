@@ -332,7 +332,8 @@
     "needLogin": "Sign in to search with your own text.",
     "offensive": "That text contains offensive language.",
     "limit": "Too many searches in a row. Try again in a few minutes.",
-    "noResultsText": "No videos found for that text. Try different words."
+    "noResultsText": "No videos found for that text. Try different words.",
+    "abrirEnYoutube": "Open on YouTube"
   },
   "GameGuideLink": {
     "searchQuery": "{title} complete guide best weapons and armor",
@@ -620,5 +621,18 @@
       "rechazo": "I can't answer that. Try another question about your games.",
       "fallo": "Something went wrong. Try again in a moment."
     }
+  },
+  "coleccionables": {
+    "ver": "Show list",
+    "ocultar": "Hide list",
+    "cargando": "Loading the list…",
+    "pegarLista": "Paste a guide's list",
+    "cambiarLista": "Change the list",
+    "usarComunidad": "{count, plural, one {Use the community list (# collectible)} other {Use the community list (# collectibles)}}",
+    "soloPendientes": "Missing only",
+    "ayudaPegar": "Copy the list from the guide you use (PowerPyx, PSNProfiles, a video…) and paste it here: one per line. Numbers or bullets are fine.",
+    "placeholder": "1. Jogaku forest cricket\n2. Akashima temple cricket\n…",
+    "guardarLista": "Save the list",
+    "todosHechos": "You've got them all! 🎉"
   }
 }

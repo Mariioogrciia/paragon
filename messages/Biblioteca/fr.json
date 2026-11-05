@@ -332,7 +332,8 @@
     "needLogin": "Connecte-toi pour chercher avec ton propre texte.",
     "offensive": "Ce texte contient un langage offensant.",
     "limit": "Trop de recherches d’affilée. Réessaie dans quelques minutes.",
-    "noResultsText": "Aucune vidéo trouvée pour ce texte. Essaie d’autres mots."
+    "noResultsText": "Aucune vidéo trouvée pour ce texte. Essaie d’autres mots.",
+    "abrirEnYoutube": "Ouvrir sur YouTube"
   },
   "GameGuideLink": {
     "searchQuery": "{title} soluce complète meilleures armes et armure",
@@ -620,5 +621,18 @@
       "rechazo": "Je ne peux pas répondre à ça. Essaie une autre question sur tes jeux.",
       "fallo": "Quelque chose a échoué. Réessaie dans un instant."
     }
+  },
+  "coleccionables": {
+    "ver": "Voir la liste",
+    "ocultar": "Masquer la liste",
+    "cargando": "Chargement de la liste…",
+    "pegarLista": "Coller la liste d’un guide",
+    "cambiarLista": "Modifier la liste",
+    "usarComunidad": "{count, plural, one {Utiliser la liste de la communauté (# objet)} other {Utiliser la liste de la communauté (# objets)}}",
+    "soloPendientes": "Seulement ceux qui manquent",
+    "ayudaPegar": "Copie la liste du guide que tu utilises (PowerPyx, PSNProfiles, une vidéo…) et colle-la ici : un par ligne. Les numéros ou puces ne gênent pas.",
+    "placeholder": "1. Grillon de la forêt de Jogaku\n2. Grillon du temple d’Akashima\n…",
+    "guardarLista": "Enregistrer la liste",
+    "todosHechos": "Tu les as tous ! 🎉"
   }
 }

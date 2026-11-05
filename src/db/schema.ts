@@ -1498,3 +1498,26 @@ export const telegramChats = pgTable("telegram_chat", {
   codigo: text("codigo").unique(),
   vinculadoAt: timestamp("vinculadoAt", { mode: "date" }),
 });
+
+/**
+ * Lista de coleccionables de un trofeo (5 nov 2026, lib/coleccionables.ts):
+ * los nombres (pegados de una guía, o vacía = numerados) y cuáles ya tienes.
+ * Marcar mueve también `user_trophy.manualProgressCurrent`, el contador de
+ * siempre.
+ */
+export const coleccionablesTrofeo = pgTable(
+  "coleccionable_trofeo",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    gameId: text("gameId")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    trophyId: text("trophyId").notNull(),
+    nombres: jsonb("nombres").$type<string[]>().notNull().default([]),
+    marcados: jsonb("marcados").$type<number[]>().notNull().default([]),
+    actualizadoAt: timestamp("actualizadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.gameId, t.trophyId] }), index("coleccionable_trofeo_idx").on(t.gameId, t.trophyId)],
+);
