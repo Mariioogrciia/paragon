@@ -508,7 +508,11 @@
     "descripcion": "Ein Bild mit deinem Level, deinen Platins und letzten Trophäen, das sich selbst aktualisiert. Füge es in Foren, deine Twitch-Bio oder Discord ein.",
     "enlace": "Bild",
     "copiar": "Kopieren",
-    "obs": "Für Streams: Füge in OBS eine „Browserquelle“ mit dem OBS-Link hinzu (480×120). Sie zeigt dein aktuelles Spiel und deine letzte Trophäe und aktualisiert sich selbst."
+    "obs": "Für Streams: Füge in OBS eine „Browserquelle“ mit dem OBS-Link hinzu (480×190). Sie zeigt dein aktuelles Spiel und deine letzte Trophäe, und bei einer neuen erscheint ein animierter Hinweis. Hänge #prueba an den Link an, um den Hinweis zu testen.",
+    "insignia": "Abzeichen",
+    "streamersTitulo": "Für Streamer und Websites",
+    "streamersDescripcion": "Ein leichtes Abzeichen für dein README oder Forum, ein !paragon-Befehl für deinen Stream-Chat ohne eigenen Bot und ein RSS-Feed deiner neuesten Trophäen.",
+    "streamersAyuda": "Füge die Nightbot- oder StreamElements-Zeile in deinen Kanal-Chat ein (als Moderator). Hänge ?dato=nivel, platinos, juego oder ultimo an den Link für einen einzelnen Wert an, und &idioma=de für eine andere Sprache."
   },
   "avisos": {
     "titulo": "Worüber wir dich benachrichtigen",
@@ -665,5 +669,13 @@
   "ajustesAvisos": {
     "titulo": "Benachrichtigungen",
     "descripcion": "Worüber wir dich informieren und wo: die Glocke auf der Website, dein Browser, die App und Discord."
+  },
+  "calendario": {
+    "titulo": "Kalender",
+    "descripcion": "Abonniere ihn in Google Kalender, Apple oder Outlook und sieh dort die Veröffentlichungen deiner Wunschliste, deine Sessions, das Ende deiner Ligen und deine Ziele mit Datum. Er aktualisiert sich selbst.",
+    "abrir": "Zum Kalender hinzufügen",
+    "google": "Google Kalender",
+    "enlace": "Link",
+    "privado": "Der Link gehört nur dir: Teile ihn nicht, denn wer ihn hat, sieht deine Termine."
   }
 }

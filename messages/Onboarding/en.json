@@ -508,7 +508,11 @@
     "descripcion": "An image with your level, platinums and latest trophies that updates itself. Paste it in forums, your Twitch bio or Discord.",
     "enlace": "Image",
     "copiar": "Copy",
-    "obs": "For streams: in OBS add a “Browser source” with the OBS link (480×120). It shows your current game and latest trophy, and updates itself."
+    "obs": "For streams: in OBS add a “Browser source” with the OBS link (480×190). It shows your current game and latest trophy, and an animated alert pops up when you earn a new one. Add #prueba to the end of the link to preview the alert.",
+    "insignia": "Badge",
+    "streamersTitulo": "For streamers and websites",
+    "streamersDescripcion": "A lightweight badge for your README or forum, a !paragon command for your stream chat without installing any bot, and an RSS feed of your latest trophies.",
+    "streamersAyuda": "Paste the Nightbot or StreamElements line into your channel chat (as a moderator). Add ?dato=nivel, platinos, juego or ultimo to the link for a single stat, and &idioma=en for another language."
   },
   "avisos": {
     "titulo": "What we notify you about",
@@ -665,5 +669,13 @@
   "ajustesAvisos": {
     "titulo": "Notifications",
     "descripcion": "What we notify you about and where: the bell on the website, your browser, the app and Discord."
+  },
+  "calendario": {
+    "titulo": "Calendar",
+    "descripcion": "Subscribe from Google Calendar, Apple or Outlook to see your wishlist releases, your sessions, when your leagues end and your dated goals there. It updates itself.",
+    "abrir": "Add to calendar",
+    "google": "Google Calendar",
+    "enlace": "Link",
+    "privado": "The link is yours alone: don't share it, because anyone who has it will see your dates."
   }
 }

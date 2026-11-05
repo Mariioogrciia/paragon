@@ -8,6 +8,9 @@ import { DiscordDmForm } from "@/components/forms/Forms";
 import { PreferenciasAvisos } from "@/components/PreferenciasAvisos";
 import { PushToggle } from "@/components/PushToggle";
 import { CATEGORIAS_AVISO, getAvisosDesactivados } from "@/lib/avisosPreferencias";
+import { CalendarioSuscripcion } from "@/components/CalendarioSuscripcion";
+import { firmarEnlace } from "@/lib/enlaceFirmado";
+import { dominioPublico } from "@/lib/site";
 
 export const metadata = { title: "Avisos · Ajustes · Paragon" };
 
@@ -60,6 +63,8 @@ export default async function AjustesAvisosPage() {
         <h2 className="mb-4 font-semibold">{t("profileForm.discordTitle")}</h2>
         <DiscordDmForm enabled={usuario?.discordDmEnabled ?? false} vinculado={discordVinculado} />
       </section>
+
+      <CalendarioSuscripcion url={`${dominioPublico()}/api/calendario/${firmarEnlace("calendario", userId)}.ics`} />
     </div>
   );
 }

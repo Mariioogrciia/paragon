@@ -508,7 +508,11 @@
     "descripcion": "Un'immagine con il tuo livello, i platini e gli ultimi trofei che si aggiorna da sola. Incollala nei forum, nella bio di Twitch o su Discord.",
     "enlace": "Immagine",
     "copiar": "Copia",
-    "obs": "Per le dirette: in OBS aggiungi una «Sorgente browser» con il link OBS (480×120). Mostra il tuo gioco attuale e il tuo ultimo trofeo, e si aggiorna da sola."
+    "obs": "Per le dirette: in OBS aggiungi una «Sorgente browser» con il link OBS (480×190). Mostra il gioco attuale e l’ultimo trofeo, e quando ne ottieni uno nuovo compare un avviso animato. Aggiungi #prueba alla fine del link per provare l’avviso.",
+    "insignia": "Badge",
+    "streamersTitulo": "Per streamer e siti web",
+    "streamersDescripcion": "Un badge leggero per il tuo README o forum, un comando !paragon per la chat della tua diretta senza installare nessun bot e un feed RSS dei tuoi ultimi trofei.",
+    "streamersAyuda": "Incolla la riga di Nightbot o StreamElements nella chat del tuo canale (come moderatore). Aggiungi ?dato=nivel, platinos, juego o ultimo al link per un solo dato, e &idioma=it per un’altra lingua."
   },
   "avisos": {
     "titulo": "Di cosa ti avvisiamo",
@@ -665,5 +669,13 @@
   "ajustesAvisos": {
     "titulo": "Avvisi",
     "descripcion": "Di cosa ti avvisiamo e dove: nella campanella del sito, nel browser, nell'app e su Discord."
+  },
+  "calendario": {
+    "titulo": "Calendario",
+    "descripcion": "Iscriviti da Google Calendar, Apple o Outlook e vedrai lì le uscite della tua lista dei desideri, le tue sessioni, la chiusura delle tue leghe e i tuoi obiettivi con data. Si aggiorna da solo.",
+    "abrir": "Aggiungi al calendario",
+    "google": "Google Calendar",
+    "enlace": "Link",
+    "privado": "Il link è solo tuo: non condividerlo, perché chi lo ha vedrà le tue date."
   }
 }

@@ -508,7 +508,11 @@
     "descripcion": "Une image avec ton niveau, tes platines et tes derniers trophées qui se met à jour toute seule. Colle-la sur les forums, ta bio Twitch ou Discord.",
     "enlace": "Image",
     "copiar": "Copier",
-    "obs": "Pour les streams : dans OBS, ajoute une « Source navigateur » avec le lien OBS (480×120). Elle montre ton jeu actuel et ton dernier trophée, et se met à jour toute seule."
+    "obs": "Pour les lives : dans OBS, ajoute une « Source navigateur » avec le lien OBS (480×190). Elle affiche ton jeu actuel et ton dernier trophée, et une alerte animée apparaît quand tu en obtiens un nouveau. Ajoute #prueba à la fin du lien pour voir l’alerte.",
+    "insignia": "Badge",
+    "streamersTitulo": "Pour les streamers et les sites",
+    "streamersDescripcion": "Un badge léger pour ton README ou ton forum, une commande !paragon pour le chat de ton live sans installer de bot, et un flux RSS de tes derniers trophées.",
+    "streamersAyuda": "Colle la ligne Nightbot ou StreamElements dans le chat de ta chaîne (en tant que modérateur). Ajoute ?dato=nivel, platinos, juego ou ultimo au lien pour une seule info, et &idioma=fr pour une autre langue."
   },
   "avisos": {
     "titulo": "Ce dont on te prévient",
@@ -665,5 +669,13 @@
   "ajustesAvisos": {
     "titulo": "Notifications",
     "descripcion": "Ce dont on te prévient et où : la cloche du site, ton navigateur, l'app et Discord."
+  },
+  "calendario": {
+    "titulo": "Calendrier",
+    "descripcion": "Abonne-toi depuis Google Agenda, Apple ou Outlook pour y voir les sorties de ta liste de souhaits, tes sessions, la fin de tes ligues et tes objectifs datés. Il se met à jour tout seul.",
+    "abrir": "Ajouter à l’agenda",
+    "google": "Google Agenda",
+    "enlace": "Lien",
+    "privado": "Le lien n’est qu’à toi : ne le partage pas, car quiconque l’a verra tes dates."
   }
 }
