@@ -6,6 +6,32 @@ Partido del HANDOFF el 15 oct 2026, cuando pasaba de 2000 líneas.
 
 ## Noviembre de 2026
 
+### La app se pone al día y auditoría de la app (6 nov)
+
+Pedido: «¿y para las apps hiciste auditoría?» → «sí». Lo nuevo de la web del
+5 nov pasa a la app (Android e iOS, `kmp/shared`), con su API móvil
+(`src/app/api/mobile/CONTRACT.md`, apartado del 6 nov):
+
+- Ficha de juego: plan de platino (`ui/game/PlanPlatino.kt`; tocar un
+  trofeo baja hasta él), platinos más rápidos y la lista de coleccionables
+  con casillas (`ColeccionablesSheet.kt`) en los trofeos cuyo texto pide N
+  cosas o que ya tienen contador. Ojo con el índice de «bajar al trofeo»
+  (`conPlan`/`conRapidos` en GameDetailScreen): cada tarjeta nueva encima de
+  la lista tiene que sumarse ahí.
+- Perfil de otra persona: Seguir, seguidores, Paragon+ y su frase/título.
+- Ligas: tarjeta del evento del mes (`ui/social/EventoMes.kt`).
+- Perfil → «Pregúntale a Paragon» (`ui/asistente/PreguntarScreen.kt`).
+- Ajustes → Avisos: conectar Telegram y el resumen semanal por correo (solo
+  salen si el servidor los tiene montados).
+- Textos sacados de las traducciones de la web (6 idiomas).
+
+Fallos encontrados en la auditoría, arreglados:
+- **La sesión de la app caducaba a los 30 días de entrar** aunque se usara a
+  diario: `getMobileUserId` ahora la renueva con el uso (una vez al día).
+- La campana del Panel preguntaba por avisos cada minuto también en segundo
+  plano: ahora `repeatOnLifecycle(STARTED)`.
+- «Badges» sin traducir en Estadísticas.
+
 ### Auditoría completa y todo lo que salió de ella (5 nov)
 
 Pedido: «una auditoría completísima» y luego «ponte con absolutamente todo
