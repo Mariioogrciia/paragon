@@ -40,6 +40,12 @@ data class TrophyItem(
     /** Grupo de trofeos: "default" = juego base, otro = un DLC. */
     val groupId: String = "default",
     val groupName: String? = null,
+    val isMissable: Boolean = false,
+    /** Cuántos coleccionables pide el texto del trofeo (si lo dice). */
+    val coleccionables: Int? = null,
+    /** Contador manual: cuántos llevas y de cuántos (lo mueve la lista de coleccionables). */
+    val manualActual: Int? = null,
+    val manualMeta: Int? = null,
 )
 
 @Serializable
@@ -97,6 +103,9 @@ data class GameDetailData(
     val trophies: List<TrophyItem>,
     /** Ver DiarioPlatinoDto; nunca se guarda en la caché offline (se pide con red). */
     val diario: com.paragon.shared.red.DiarioPlatinoDto? = null,
+    /** Plan de platino y platinos más rápidos (6 nov 2026); tampoco van a la caché. */
+    val plan: com.paragon.shared.red.PlanPlatinoDto? = null,
+    val rapidos: List<com.paragon.shared.red.PlatinoRapidoDto> = emptyList(),
 )
 
 sealed class GameDetailResult {
@@ -152,6 +161,10 @@ private fun GameDetailDto.toGameDetailData(): GameDetailData = GameDetailData(
             iconUrl = it.iconUrl,
             groupId = it.groupId,
             groupName = it.groupName,
+            isMissable = it.isMissable,
+            coleccionables = it.coleccionables,
+            manualActual = it.manualProgress?.current,
+            manualMeta = it.manualProgress?.target,
         )
     },
 )
@@ -201,7 +214,7 @@ class GameDetailRepository(
         if (de != null) {
             return try {
                 val response = ApiClient.gamesApi(store).getGameDetail(gameId, de)
-                GameDetailResult.Ok(response.game.toGameDetailData().copy(diario = response.diario))
+                GameDetailResult.Ok(response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos))
             } catch (e: HttpException) {
                 GameDetailResult.Error(if (e.code() == 404) Textos.t(T.ficha_err_no_existe) else Textos.t(T.error_servidor, e.code()))
             } catch (e: Exception) {
@@ -211,7 +224,7 @@ class GameDetailRepository(
 
         return try {
             val response = ApiClient.gamesApi(store).getGameDetail(gameId)
-            var detail = response.game.toGameDetailData().copy(diario = response.diario)
+            var detail = response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos)
             val pending = gameDetailDao?.getPendingNote(gameId)
             if (pending != null) detail = detail.copy(notes = pending.notes)
             gameDetailDao?.upsertDetail(detail.toCachedEntity())

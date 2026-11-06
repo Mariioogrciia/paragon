@@ -55,4 +55,5 @@ object ApiClient {
     fun trophyGuidesApi(tokenStore: TokenStore) = cliente(tokenStore).trophyGuides
     fun aparienciaApi(tokenStore: TokenStore) = cliente(tokenStore).apariencia
     fun steamApi(tokenStore: TokenStore) = cliente(tokenStore).steam
+    fun novedadesApi(tokenStore: TokenStore) = cliente(tokenStore).novedades
 }

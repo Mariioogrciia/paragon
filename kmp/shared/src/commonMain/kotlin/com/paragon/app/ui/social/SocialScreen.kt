@@ -322,6 +322,10 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
                                         misPuntos = liga.firstOrNull { it.handle != null && it.handle == myHandle }?.points,
                                     )
                                 }
+                                // Evento del mes de toda la comunidad (6 nov 2026).
+                                item(key = "evento-mes") {
+                                    EventoMesTarjeta(tokenStore, onAbrirPerfil = onAbrirPerfil)
+                                }
                                 if (podio.isNotEmpty()) {
                                     item {
                                         LeaguePodium(podio, onClick = { handle -> handle?.let(onAbrirPerfil) })

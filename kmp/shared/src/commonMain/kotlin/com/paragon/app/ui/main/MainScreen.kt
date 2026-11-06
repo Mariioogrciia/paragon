@@ -343,6 +343,7 @@ fun MainScreen(
         androidx.compose.runtime.CompositionLocalProvider(
             com.paragon.app.ui.common.LocalHuecoBarra provides hueco,
             com.paragon.app.ui.navigation.LocalAbrirJuegoDe provides { h: String, g: String -> navController.navigate(Screen.GameDetail.routeFor(g, de = h)) },
+            com.paragon.app.ui.navigation.LocalAbrirPerfil provides { h: String -> navController.navigate(Screen.Usuario.routeFor(h)) },
         ) {
         SharedTransitionLayout {
         NavHost(
@@ -509,6 +510,10 @@ fun MainScreen(
                     onBack = { navController.popBackStack() },
                     onAbrirJuego = { g -> navController.navigate(Screen.GameDetail.routeFor(g)) },
                 )
+            }
+
+            composable(Screen.Preguntar.route) {
+                com.paragon.app.ui.asistente.PreguntarScreen(tokenStore, atras = Screen.Perfil.title, onBack = { navController.popBackStack() })
             }
 
             composable(Screen.Ritmo.route) {

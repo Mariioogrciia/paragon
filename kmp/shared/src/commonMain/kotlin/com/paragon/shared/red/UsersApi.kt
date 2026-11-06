@@ -32,7 +32,16 @@ data class UserProfileDto(
     val porMes: List<MesPerfilDto> = emptyList(),
     val clan: ClanPerfilDto? = null,
     val ultimosTrofeos: List<TrofeoMesDto> = emptyList(),
+    // 6 nov 2026: seguir, Paragon+ y la frase/título del perfil (como la web).
+    val seguir: SeguirDto = SeguirDto(),
+    val apoyo: Boolean = false,
+    val estado: String? = null,
+    val titulo: String? = null,
 )
+
+/** Seguir a alguien (lib/seguir.ts): si lo sigues, sus seguidores y a cuántos sigue. */
+@Serializable
+data class SeguirDto(val sigo: Boolean = false, val seguidores: Int = 0, val siguiendo: Int = 0)
 
 @Serializable
 data class RachaPerfilDto(val actual: Int = 0, val mejor: Int = 0, val diasActivos: Int = 0)
@@ -74,6 +83,11 @@ data class RecentGameDto(
 )
 
 class UsersApi internal constructor(private val c: ClienteParagon) {
+    /** Seguir (true) o dejar de seguir (false); devuelve el estado nuevo (users/[handle]/seguir). */
+    suspend fun seguir(handle: String, seguir: Boolean): SeguirDto =
+        if (seguir) c.http.post("api/mobile/users/${handle.encodeURLPathPart()}/seguir").body<SeguirDto>()
+        else c.http.delete("api/mobile/users/${handle.encodeURLPathPart()}/seguir").body<SeguirDto>()
+
     suspend fun getUserProfile(handle: String): UserProfileDto =
         c.http.get("api/mobile/users/${handle.encodeURLPathPart()}").body()
 

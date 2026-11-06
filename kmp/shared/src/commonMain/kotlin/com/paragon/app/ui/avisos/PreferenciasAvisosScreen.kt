@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -64,6 +65,25 @@ fun PreferenciasAvisosScreen(tokenStore: TokenStore, onBack: () -> Unit) {
     var estado by remember { mutableStateOf<PreferenciasAvisosDto?>(null) }
     var errorCarga by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+
+    // Telegram y el correo semanal (6 nov 2026): solo salen si el servidor los tiene.
+    val novedades = remember { ApiClient.novedadesApi(tokenStore) }
+    var canales by remember { mutableStateOf<com.paragon.shared.red.CanalesAvisosDto?>(null) }
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    LaunchedEffect(Unit) {
+        canales = try { novedades.canales() } catch (e: CancellationException) { throw e } catch (_: Exception) { null }
+    }
+    fun cambiarCanales(cuerpo: com.paragon.shared.red.CambiarCanalesRequest) {
+        scope.launch {
+            try {
+                canales = novedades.cambiarCanales(cuerpo)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                error = Textos.t(T.error_red)
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         try {
@@ -146,6 +166,37 @@ fun PreferenciasAvisosScreen(tokenStore: TokenStore, onBack: () -> Unit) {
                         habilitado = actual.discord.vinculado,
                     ) { activo ->
                         guardar(actual.copy(discord = actual.discord.copy(activo = activo)), GuardarPreferenciasAvisos(discordDm = activo))
+                    }
+                }
+
+                val c = canales
+                if (c != null && (c.telegram != null || c.correoSemanal != null)) {
+                    Spacer(Modifier.height(24.dp))
+                    GrupoNativo(titulo = Textos.t(T.avisos_otros_canales)) {
+                        c.telegram?.let { tg ->
+                            if (tg.vinculado) {
+                                FilaNativa(
+                                    icono = Icons.AutoMirrored.Filled.Send,
+                                    titulo = Textos.t(T.telegram_conectado),
+                                    subtitulo = Textos.t(T.telegram_desconectar),
+                                    onClick = { cambiarCanales(com.paragon.shared.red.CambiarCanalesRequest(desvincularTelegram = true)) },
+                                )
+                            } else if (tg.enlace != null) {
+                                FilaNativa(
+                                    icono = Icons.AutoMirrored.Filled.Send,
+                                    titulo = Textos.t(T.telegram_conectar),
+                                    subtitulo = Textos.t(T.telegram_ayuda),
+                                    onClick = { uriHandler.openUri(tg.enlace) },
+                                )
+                            }
+                        }
+                        c.correoSemanal?.let { suscrito ->
+                            if (c.telegram != null) SeparadorFila(conIcono = false)
+                            FilaInterruptor(titulo = Textos.t(T.correo_titulo), subtitulo = Textos.t(T.correo_descripcion), activo = suscrito) { alta ->
+                                canales = c.copy(correoSemanal = alta)
+                                cambiarCanales(com.paragon.shared.red.CambiarCanalesRequest(correoSemanal = alta))
+                            }
+                        }
                     }
                 }
 

@@ -5,6 +5,9 @@ import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { errorMovil } from "@/lib/mensajesApi";
 import { gameProgress } from "@/lib/stats";
 import { generarDiarioPlatino } from "@/lib/diarioPlatino";
+import { planPlatino } from "@/lib/planPlatino";
+import { platinosMasRapidos } from "@/lib/platinoRapido";
+import { cantidadDelTexto } from "@/lib/coleccionablesReglas";
 
 /**
  * Ficha de un juego para GameDetailScreen (Android) — mismo `getGameDetail`
@@ -41,6 +44,31 @@ export async function GET(
 
   // "El Diario del Platino", como en la web: solo con el platino (o su
   // equivalente sin metales) conseguido y fechas de verdad; si no, null.
-  const diario = gameProgress(detail).platinumEarned ? generarDiarioPlatino(detail.trophies) : null;
-  return NextResponse.json({ game: detail, diario });
+  const platinado = gameProgress(detail).platinumEarned;
+  const diario = platinado ? generarDiarioPlatino(detail.trophies) : null;
+
+  // Lo de la web del 5 nov 2026 también en la app (6 nov):
+  // - el plan de platino (lib/planPlatino.ts), solo en tu ficha y sin platino;
+  //   cada fase con los ids de lo que falta (la app ya tiene los trofeos);
+  // - los platinos más rápidos del juego (todas sus versiones si hay igdbId);
+  // - cuántos coleccionables pide cada trofeo (para la lista con casillas).
+  const plan = profile === propio && !platinado ? planPlatino(detail.trophies) : null;
+  const rapidos = await platinosMasRapidos(detail.igdbId ? String(detail.igdbId) : detail.id, 5).catch(() => []);
+  const game = {
+    ...detail,
+    trophies: detail.trophies.map((t) => ({ ...t, coleccionables: cantidadDelTexto(t.name, t.detail) })),
+  };
+  return NextResponse.json({
+    game,
+    diario,
+    plan:
+      plan && plan.faltan > 0
+        ? {
+            actual: plan.actual,
+            faltan: plan.faltan,
+            fases: plan.fases.map((f) => ({ fase: f.fase, total: f.total, conseguidos: f.conseguidos, pendientes: f.pendientes.map((t) => t.id) })),
+          }
+        : null,
+    rapidos: rapidos.map((r) => ({ handle: r.handle, nombre: r.nombre, avatarUrl: r.avatarUrl, platform: r.platform, duracionMs: r.duracionMs })),
+  });
 }

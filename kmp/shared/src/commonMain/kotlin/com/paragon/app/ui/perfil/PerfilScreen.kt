@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.LocalOffer
@@ -145,6 +146,7 @@ fun PerfilScreen(
         }
 
         Grupo(Textos.t(T.perfil_tu_caza)) {
+            Fila(Icons.Default.AutoAwesome, Textos.t(T.asistente_titulo)) { onNavigate(Screen.Preguntar.route) }
             Fila(Icons.Default.BarChart, Textos.t(T.nav_estadisticas)) { onNavigate(Screen.Stats.route) }
             Fila(Icons.Default.CalendarMonth, Textos.t(T.ritmo_titulo)) { onNavigate(Screen.Ritmo.route) }
             Fila(Icons.Default.CenterFocusStrong, Textos.t(T.nav_enfoque)) { onNavigate(Screen.Focus.route) }

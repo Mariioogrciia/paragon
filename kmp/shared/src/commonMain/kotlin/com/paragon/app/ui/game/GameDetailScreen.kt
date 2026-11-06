@@ -33,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
@@ -286,9 +287,14 @@ private fun GameDetailContent(
     // cuenta igual que se pintan los elementos de la LazyColumn de abajo
     // (cabecera, acciones, notas, diario, filtros y luego cada grupo).
     var resaltado by remember(gameId) { mutableStateOf(trofeoInicial) }
+    // A qué trofeo bajar: el de llegada o el que se toque en el plan de platino.
+    var irATrofeo by remember(gameId) { mutableStateOf(trofeoInicial) }
+    val conPlan = !soloLectura && game.plan != null
+    val conRapidos = game.rapidos.isNotEmpty()
     val gruposActuales by androidx.compose.runtime.rememberUpdatedState(gruposVisibles)
-    LaunchedEffect(gameId, trofeoInicial) {
-        val objetivo = trofeoInicial ?: return@LaunchedEffect
+    LaunchedEffect(gameId, irATrofeo) {
+        val objetivo = irATrofeo ?: return@LaunchedEffect
+        resaltado = objetivo
         if (game.trophies.none { it.id == objetivo }) return@LaunchedEffect
         // Si un filtro lo esconde, se quita; en cronología no hay filas, así que a la lista.
         if (trofeosOrdenados.none { it.id == objetivo }) { estadoTrofeos = 0; grupoElegido = null }
@@ -297,7 +303,7 @@ private fun GameDetailContent(
         }
         kotlinx.coroutines.delay(350) // que la lista se recomponga con los filtros quitados
         val cuadricula = com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA
-        var indice = 5 + (if (game.diario != null) 1 else 0)
+        var indice = 5 + (if (game.diario != null) 1 else 0) + (if (conPlan) 1 else 0) + (if (conRapidos) 1 else 0)
         for ((grupoId, lista) in gruposActuales) {
             if (grupoId != null) indice++
             val pos = lista.indexOfFirst { it.id == objetivo }
@@ -309,6 +315,7 @@ private fun GameDetailContent(
         }
         kotlinx.coroutines.delay(2500)
         resaltado = null
+        irATrofeo = null
     }
     val scrollOffset = if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else 0f
     // Cristal de la ficha (7 oct 2026): la lista es la fuente; el botón de
@@ -386,6 +393,18 @@ private fun GameDetailContent(
             item {
                 com.paragon.app.ui.trofeos.DiarioPlatinoCard(diario, game.title, Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             }
+        }
+
+        // Plan de platino y platinos más rápidos (6 nov 2026, como la web).
+        // Cuentan en el índice de "bajar al trofeo" (conPlan/conRapidos, arriba).
+        if (conPlan) game.plan?.let { plan ->
+            item {
+                PlanPlatinoCard(plan, game.trophies, onTrofeo = { irATrofeo = it }, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+            }
+        }
+        if (conRapidos) item {
+            val abrirPerfil = com.paragon.app.ui.navigation.LocalAbrirPerfil.current
+            PlatinosRapidosCard(game.rapidos, onPersona = abrirPerfil, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
         }
 
         // Filtros: estado (segmentado) y, si hay DLC, una fila de pastillas por grupo.
@@ -1063,6 +1082,12 @@ private fun TrophyRow(
     val coroutineScope = rememberCoroutineScope()
     var buscandoGuia by remember(trophy.id) { mutableStateOf(false) }
     var showGuiasEscritas by remember(trophy.id) { mutableStateOf(false) }
+    // Coleccionables (6 nov 2026): el contador del trofeo, que mueve la lista con casillas.
+    var showColeccionables by remember(trophy.id) { mutableStateOf(false) }
+    var progreso by remember(trophy.id, trophy.manualActual, trophy.manualMeta) {
+        mutableStateOf(trophy.manualActual to (trophy.manualMeta ?: trophy.coleccionables))
+    }
+    val conColeccionables = !soloLectura && (trophy.coleccionables != null || (trophy.manualMeta ?: 0) > 1)
 
     // Antes todo iba en UNA fila (foto, texto, %, ⭐, 🔍, 📖): en un móvil
     // los botones se comían el ancho y el texto quedaba en una columna de
@@ -1185,7 +1210,35 @@ private fun TrophyRow(
             ) {
                 Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = Textos.t(T.ficha_guias_escritas), tint = Muted, modifier = Modifier.size(16.dp))
             }
+            if (conColeccionables) {
+                Row(
+                    Modifier.height(40.dp).clip(RoundedCornerShape(radio(10))).clickable { showColeccionables = true }.padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Default.Checklist, contentDescription = Textos.t(T.colec_boton), tint = Accent, modifier = Modifier.size(16.dp))
+                    val (actual, meta) = progreso
+                    if (meta != null) Text(
+                        "${actual ?: 0}/$meta",
+                        color = Accent,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 4.dp),
+                    )
+                }
+            }
         }
+    }
+
+    if (showColeccionables) {
+        ColeccionablesSheet(
+            gameId = game.id,
+            trophyId = trophy.id,
+            trophyName = trophy.name,
+            total = progreso.second ?: trophy.coleccionables ?: 1,
+            tokenStore = tokenStore,
+            onCambio = { marcados, total -> progreso = marcados to total },
+            onDismiss = { showColeccionables = false },
+        )
     }
 
     if (showGuiasEscritas) {

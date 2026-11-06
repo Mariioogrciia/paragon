@@ -9,6 +9,8 @@ import { rachas, resumenHistorico, trofeosPorMes, ultimosTrofeos } from "@/lib/h
 import { horasTotales } from "@/lib/profileStats";
 import { getUserClan } from "@/lib/clans";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
+import { estadoSeguir } from "@/lib/seguir";
+import { esApoyo } from "@/lib/apoyo";
 
 export async function GET(
   req: Request,
@@ -33,7 +35,7 @@ export async function GET(
   // El perfil completo de la app (9 oct 2026): además de la cabecera, lo
   // mismo que cuenta el perfil de la web — racha, año, meses, últimos
   // trofeos, horas y clan. Todo sale de lo ya guardado, sin llamar a PSN.
-  const [{ games, xpMisiones }, amistad, racha, resumen, meses, ultimos, horas, clan] = await Promise.all([
+  const [{ games, xpMisiones }, amistad, racha, resumen, meses, ultimos, horas, clan, seguir, apoyo] = await Promise.all([
     getLibrary(profile),
     // Para el botón de amistad del perfil (6 oct 2026): "yo" si es tu perfil.
     profile.userId === userId ? Promise.resolve("yo" as const) : getFriendshipStatus(userId, profile.userId),
@@ -43,6 +45,9 @@ export async function GET(
     ultimosTrofeos(profile.userId, 8, idiomaDeCabecera(req.headers.get("accept-language"))),
     horasTotales(profile.userId),
     getUserClan(profile.userId),
+    // Seguir y Paragon+ (6 nov 2026, lo de la web del 5 nov): si fallan, el perfil sale igual.
+    estadoSeguir(userId, profile.userId).catch(() => ({ sigo: false, seguidores: 0, siguiendo: 0 })),
+    esApoyo(profile.userId).catch(() => false),
   ]);
   const stats = summarise(games);
   const nivel = paragonProgress(games, xpMisiones);
@@ -62,6 +67,10 @@ export async function GET(
     image: resolveAvatarUrl(profile) ?? null,
     level: nivel.level,
     amistad,
+    seguir,
+    apoyo,
+    estado: profile.statusText ?? null,
+    titulo: profile.profileTitle ?? null,
     platinos: stats.platinos,
     trofeos: stats.trofeos,
     juegos: stats.juegos,

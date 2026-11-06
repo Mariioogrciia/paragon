@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonSearch
@@ -185,6 +186,7 @@ private fun ContenidoPerfil(
         if (!esYo) {
             Column(Modifier.padding(horizontal = 20.dp).padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 BotonAmistad(p, tokenStore)
+                BotonSeguir(p, tokenStore)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     BotonSecundario(Icons.AutoMirrored.Filled.CompareArrows, Textos.t(T.nav_comparar), Modifier.weight(1f)) { onComparar(p.handle) }
                     val esRival = themeStore.rivalHandle == p.handle
@@ -264,6 +266,30 @@ private fun Cabecera(p: UserProfileDto, aura: Color?) {
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = 2.dp),
         )
+        // Título y frase del perfil, como en la web (6 nov 2026).
+        if (p.titulo != null || p.estado != null) {
+            Text(
+                listOfNotNull(p.titulo, p.estado?.let { "“$it”" }).joinToString(" · "),
+                color = Foreground.copy(alpha = 0.85f),
+                fontSize = 13.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+        }
+        if (p.apoyo || p.seguir.seguidores > 0) {
+            Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (p.apoyo) Text(
+                    "💜 " + Textos.t(T.paragon_plus),
+                    color = Color(0xFFD8B4FE),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clip(RoundedCornerShape(50)).background(Color(0x24C084FC)).border(1.dp, Color(0x66C084FC), RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+                if (p.seguir.seguidores > 0) Text(Textos.t(T.seguir_seguidores, p.seguir.seguidores), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            }
+        }
         val chips = buildList {
             p.clan?.let { add("[${it.tag}] ${it.name}") }
             p.accounts.forEach { add("${it.platform.uppercase()} · ${it.username}") }
@@ -357,6 +383,46 @@ private fun BotonAmistad(profile: UserProfileDto, tokenStore: TokenStore) {
                 modifier = Modifier.size(20.dp),
             )
             Text(if (trabajando) "…" else texto, color = if (relleno) OnAccent else Muted, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 8.dp))
+        }
+        error?.let { Text(it, color = Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp)) }
+    }
+}
+
+/** Seguir (6 nov 2026, como BotonSeguir.tsx en la web): ver su actividad en tu feed sin pedir amistad. */
+@Composable
+private fun BotonSeguir(profile: UserProfileDto, tokenStore: TokenStore) {
+    val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+    var sigo by remember(profile.handle) { mutableStateOf(profile.seguir.sigo) }
+    var trabajando by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    Column {
+        BotonSecundario(
+            if (sigo) Icons.Default.Check else Icons.Default.Add,
+            Textos.t(if (sigo) T.seguir_siguiendo else T.seguir_seguir),
+            Modifier.fillMaxWidth(),
+            color = if (sigo) Accent else Foreground,
+        ) {
+            if (trabajando) return@BotonSecundario
+            trabajando = true
+            error = null
+            val quiero = !sigo
+            sigo = quiero
+            scope.launch {
+                try {
+                    sigo = ApiClient.usersApi(tokenStore).seguir(profile.handle, quiero).sigo
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (e: HttpException) {
+                    sigo = !quiero
+                    error = e.paragonErrorMessage() ?: Textos.t(T.seguir_error)
+                } catch (e: Exception) {
+                    sigo = !quiero
+                    error = Textos.t(T.seguir_error)
+                }
+                trabajando = false
+            }
         }
         error?.let { Text(it, color = Danger, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp)) }
     }

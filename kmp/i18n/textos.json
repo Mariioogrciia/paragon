@@ -7862,5 +7862,629 @@
   "fr": "{0}/{1} trophées · {2} %",
   "it": "{0}/{1} trofei · {2}%",
   "pt": "{0}/{1} troféus · {2}%"
+ },
+ "plan_titulo": {
+  "es": "Plan de platino",
+  "en": "Platinum plan",
+  "de": "Platinplan",
+  "fr": "Plan de platine",
+  "it": "Piano per il platino",
+  "pt": "Plano de platina"
+ },
+ "plan_descripcion": {
+  "es": "Lo que te falta, por orden: primero lo que se puede perder, lo que no se repite al final. Se marca solo al sincronizar.",
+  "en": "What you still need, in order: what can be missed comes first, what can't be repeated last. It ticks itself off when you sync.",
+  "de": "Was dir fehlt, in Reihenfolge: zuerst das Verpassbare, zuletzt das, was man nicht wiederholen muss. Es hakt sich beim Synchronisieren selbst ab.",
+  "fr": "Ce qu’il te manque, dans l’ordre : d’abord ce qui peut être manqué, à la fin ce qui ne se rejoue pas. Ça se coche tout seul à la synchronisation.",
+  "it": "Quello che ti manca, in ordine: prima ciò che si può perdere, alla fine ciò che non si ripete. Si spunta da solo quando sincronizzi.",
+  "pt": "O que te falta, por ordem: primeiro o que se pode perder, no fim o que não se repete. Marca-se sozinho ao sincronizar."
+ },
+ "plan_fase_perdibles": {
+  "es": "Perdibles",
+  "en": "Missables",
+  "de": "Verpassbare",
+  "fr": "Manquables",
+  "it": "Perdibili",
+  "pt": "Perdíveis"
+ },
+ "plan_consejo_perdibles": {
+  "es": "Van primero: si pasas el punto de no retorno, toca rejugar. Mira la guía antes de cada capítulo.",
+  "en": "These come first: if you pass the point of no return, you'll have to replay. Check the guide before each chapter.",
+  "de": "Die zuerst: Wenn du den Point of no Return überschreitest, musst du neu spielen. Schau vor jedem Kapitel in den Guide.",
+  "fr": "À faire d’abord : si tu dépasses le point de non-retour, il faudra rejouer. Consulte le guide avant chaque chapitre.",
+  "it": "Vanno per primi: se superi il punto di non ritorno, tocca rigiocare. Guarda la guida prima di ogni capitolo.",
+  "pt": "Vêm primeiro: se passares o ponto sem retorno, tens de rejogar. Vê o guia antes de cada capítulo."
+ },
+ "plan_fase_historia": {
+  "es": "Historia",
+  "en": "Story",
+  "de": "Story",
+  "fr": "Histoire",
+  "it": "Storia",
+  "pt": "História"
+ },
+ "plan_consejo_historia": {
+  "es": "Salen jugando. En el orden del juego, que suele ser el de los capítulos.",
+  "en": "These come from just playing. In the game's order, which is usually chapter order.",
+  "de": "Die kommen beim Spielen. In der Reihenfolge des Spiels, meist nach Kapiteln.",
+  "fr": "Ils viennent en jouant. Dans l’ordre du jeu, généralement celui des chapitres.",
+  "it": "Arrivano giocando. Nell’ordine del gioco, di solito quello dei capitoli.",
+  "pt": "Saem a jogar. Pela ordem do jogo, que costuma ser a dos capítulos."
+ },
+ "plan_fase_coleccionables": {
+  "es": "Coleccionables",
+  "en": "Collectibles",
+  "de": "Sammelobjekte",
+  "fr": "Objets à collectionner",
+  "it": "Collezionabili",
+  "pt": "Colecionáveis"
+ },
+ "plan_consejo_coleccionables": {
+  "es": "Mejor en la misma partida que la historia y con la guía al lado, para no volver a cada zona.",
+  "en": "Best done in the same playthrough as the story, with the guide open, so you don't revisit every area.",
+  "de": "Am besten im selben Durchlauf wie die Story und mit Guide daneben, damit du nicht jedes Gebiet erneut besuchst.",
+  "fr": "Mieux vaut les faire dans la même partie que l’histoire, guide à côté, pour ne pas revisiter chaque zone.",
+  "it": "Meglio nella stessa partita della storia e con la guida accanto, per non tornare in ogni zona.",
+  "pt": "Melhor na mesma partida da história e com o guia ao lado, para não voltar a cada zona."
+ },
+ "plan_fase_online": {
+  "es": "Online",
+  "en": "Online",
+  "de": "Online",
+  "fr": "En ligne",
+  "it": "Online",
+  "pt": "Online"
+ },
+ "plan_consejo_online": {
+  "es": "Antes de que cierren los servidores. Una sesión con gente de Paragon lo hace mucho más rápido.",
+  "en": "Before the servers shut down. A session with Paragon players makes it much quicker.",
+  "de": "Bevor die Server abgeschaltet werden. Eine Session mit Paragon-Leuten geht viel schneller.",
+  "fr": "Avant la fermeture des serveurs. Une session avec des joueurs Paragon va beaucoup plus vite.",
+  "it": "Prima che chiudano i server. Una sessione con gente di Paragon è molto più veloce.",
+  "pt": "Antes de fecharem os servidores. Uma sessão com malta do Paragon torna tudo muito mais rápido."
+ },
+ "plan_fase_habilidad": {
+  "es": "Habilidad",
+  "en": "Skill",
+  "de": "Können",
+  "fr": "Habileté",
+  "it": "Abilità",
+  "pt": "Habilidade"
+ },
+ "plan_consejo_habilidad": {
+  "es": "Cuando ya conoces el juego y tienes mejor equipo: dificultad alta, sin morir, contrarreloj.",
+  "en": "Once you know the game and have better gear: high difficulty, no deaths, time trials.",
+  "de": "Wenn du das Spiel kennst und bessere Ausrüstung hast: hoher Schwierigkeitsgrad, ohne Tod, Zeitrennen.",
+  "fr": "Quand tu connais le jeu et as un meilleur équipement : difficulté élevée, sans mourir, contre-la-montre.",
+  "it": "Quando conosci già il gioco e hai un equipaggiamento migliore: difficoltà alta, senza morire, a tempo.",
+  "pt": "Quando já conheces o jogo e tens melhor equipamento: dificuldade alta, sem morrer, contrarrelógio."
+ },
+ "plan_fase_grindeo": {
+  "es": "Grindeo",
+  "en": "Grind",
+  "de": "Grind",
+  "fr": "Farm",
+  "it": "Grind",
+  "pt": "Grind"
+ },
+ "plan_consejo_grindeo": {
+  "es": "Repetir hasta llegar a la cifra. Muchos salen solos mientras haces lo demás: míralos al final.",
+  "en": "Repeat until you hit the number. Many pop on their own while you do the rest: check them at the end.",
+  "de": "Wiederholen, bis die Zahl erreicht ist. Viele kommen nebenbei: schau am Ende nach.",
+  "fr": "Répéter jusqu’à atteindre le chiffre. Beaucoup tombent tout seuls en faisant le reste : vérifie à la fin.",
+  "it": "Ripetere fino a raggiungere la cifra. Molti arrivano da soli mentre fai il resto: guardali alla fine.",
+  "pt": "Repetir até chegar ao número. Muitos saem sozinhos enquanto fazes o resto: vê-os no fim."
+ },
+ "plan_fase_limpieza": {
+  "es": "Limpieza",
+  "en": "Clean-up",
+  "de": "Aufräumen",
+  "fr": "Nettoyage",
+  "it": "Pulizia",
+  "pt": "Limpeza"
+ },
+ "plan_consejo_limpieza": {
+  "es": "El resto, de más común a más raro. Los más raros suelen ser los que más cuestan.",
+  "en": "The rest, from most common to rarest. The rarest are usually the hardest.",
+  "de": "Der Rest, vom häufigsten zum seltensten. Die seltensten sind meist die schwierigsten.",
+  "fr": "Le reste, du plus courant au plus rare. Les plus rares sont souvent les plus durs.",
+  "it": "Il resto, dal più comune al più raro. I più rari di solito sono i più difficili.",
+  "pt": "O resto, do mais comum ao mais raro. Os mais raros costumam ser os mais difíceis."
+ },
+ "rapidos_titulo": {
+  "es": "Platinos más rápidos",
+  "en": "Fastest platinums",
+  "de": "Schnellste Platin",
+  "fr": "Platines les plus rapides",
+  "it": "Platini più veloci",
+  "pt": "Platinas mais rápidas"
+ },
+ "rapidos_descripcion": {
+  "es": "Del primer trofeo al platino (o al 100 % en Steam), entre la gente de Paragon.",
+  "en": "From first trophy to platinum (or 100% on Steam), among Paragon players.",
+  "de": "Von der ersten Trophäe bis zum Platin (oder 100 % auf Steam), unter Paragon-Spielern.",
+  "fr": "Du premier trophée au platine (ou 100 % sur Steam), parmi les joueurs de Paragon.",
+  "it": "Dal primo trofeo al platino (o al 100% su Steam), tra la gente di Paragon.",
+  "pt": "Do primeiro troféu à platina (ou aos 100% no Steam), entre a malta do Paragon."
+ },
+ "colec_pegar_lista": {
+  "es": "Pegar la lista de una guía",
+  "en": "Paste a guide's list",
+  "de": "Liste aus einem Guide einfügen",
+  "fr": "Coller la liste d’un guide",
+  "it": "Incolla la lista di una guida",
+  "pt": "Colar a lista de um guia"
+ },
+ "colec_cambiar_lista": {
+  "es": "Cambiar la lista",
+  "en": "Change the list",
+  "de": "Liste ändern",
+  "fr": "Modifier la liste",
+  "it": "Cambia la lista",
+  "pt": "Mudar a lista"
+ },
+ "colec_solo_pendientes": {
+  "es": "Solo los que faltan",
+  "en": "Missing only",
+  "de": "Nur fehlende",
+  "fr": "Seulement ceux qui manquent",
+  "it": "Solo quelli mancanti",
+  "pt": "Só os que faltam"
+ },
+ "colec_ayuda_pegar": {
+  "es": "Copia la lista de la guía que uses (PowerPyx, PSNProfiles, un vídeo…) y pégala aquí: uno por línea. Da igual que lleve números o viñetas.",
+  "en": "Copy the list from the guide you use (PowerPyx, PSNProfiles, a video…) and paste it here: one per line. Numbers or bullets are fine.",
+  "de": "Kopiere die Liste aus deinem Guide (PowerPyx, PSNProfiles, ein Video…) und füge sie hier ein: einer pro Zeile. Nummern oder Aufzählungszeichen sind egal.",
+  "fr": "Copie la liste du guide que tu utilises (PowerPyx, PSNProfiles, une vidéo…) et colle-la ici : un par ligne. Les numéros ou puces ne gênent pas.",
+  "it": "Copia la lista della guida che usi (PowerPyx, PSNProfiles, un video…) e incollala qui: uno per riga. Numeri o elenchi puntati vanno bene.",
+  "pt": "Copia a lista do guia que usas (PowerPyx, PSNProfiles, um vídeo…) e cola-a aqui: um por linha. Números ou marcadores não fazem mal."
+ },
+ "colec_guardar_lista": {
+  "es": "Guardar la lista",
+  "en": "Save the list",
+  "de": "Liste speichern",
+  "fr": "Enregistrer la liste",
+  "it": "Salva la lista",
+  "pt": "Guardar a lista"
+ },
+ "colec_todos_hechos": {
+  "es": "¡Los tienes todos! 🎉",
+  "en": "You've got them all! 🎉",
+  "de": "Du hast alle! 🎉",
+  "fr": "Tu les as tous ! 🎉",
+  "it": "Li hai tutti! 🎉",
+  "pt": "Tens todos! 🎉"
+ },
+ "colec_cargando": {
+  "es": "Cargando la lista…",
+  "en": "Loading the list…",
+  "de": "Liste wird geladen…",
+  "fr": "Chargement de la liste…",
+  "it": "Caricamento della lista…",
+  "pt": "A carregar a lista…"
+ },
+ "seguir_seguir": {
+  "es": "Seguir",
+  "en": "Follow",
+  "de": "Folgen",
+  "fr": "Suivre",
+  "it": "Segui",
+  "pt": "Seguir"
+ },
+ "seguir_siguiendo": {
+  "es": "Siguiendo",
+  "en": "Following",
+  "de": "Folge ich",
+  "fr": "Abonné",
+  "it": "Segui già",
+  "pt": "A seguir"
+ },
+ "seguir_error": {
+  "es": "No se ha podido. Prueba otra vez.",
+  "en": "That didn't work. Try again.",
+  "de": "Das hat nicht geklappt. Versuch es noch einmal.",
+  "fr": "Ça n’a pas marché. Réessaie.",
+  "it": "Non è stato possibile. Riprova.",
+  "pt": "Não foi possível. Tenta outra vez."
+ },
+ "evento_tarjeta": {
+  "es": "Evento del mes · toda la comunidad",
+  "en": "Event of the month · whole community",
+  "de": "Event des Monats · ganze Community",
+  "fr": "Événement du mois · toute la communauté",
+  "it": "Evento del mese · tutta la community",
+  "pt": "Evento do mês · toda a comunidade"
+ },
+ "evento_titulo": {
+  "es": "Mes de {0}",
+  "en": "{0} month",
+  "de": "{0}-Monat",
+  "fr": "Mois {0}",
+  "it": "Mese {0}",
+  "pt": "Mês de {0}"
+ },
+ "evento_descripcion": {
+  "es": "Este mes puntúan los trofeos que saques en juegos de {0}, contra toda la comunidad de Paragon, no solo tus amigos.",
+  "en": "This month, trophies you earn in {0} games score, against the whole Paragon community, not just your friends.",
+  "de": "Diesen Monat zählen Trophäen aus {0}-Spielen, gegen die ganze Paragon-Community, nicht nur deine Freunde.",
+  "fr": "Ce mois-ci, ce sont les trophées obtenus dans les jeux {0} qui comptent, contre toute la communauté Paragon, pas seulement tes amis.",
+  "it": "Questo mese contano i trofei che ottieni nei giochi {0}, contro tutta la community di Paragon, non solo i tuoi amici.",
+  "pt": "Este mês contam os troféus que ganhares em jogos de {0}, contra toda a comunidade do Paragon, não só os teus amigos."
+ },
+ "evento_vacio": {
+  "es": "Todavía nadie ha puntuado este mes. El primer trofeo que saques en un juego del género te pone arriba.",
+  "en": "Nobody has scored this month yet. Your first trophy in a game of this genre puts you on top.",
+  "de": "Diesen Monat hat noch niemand gepunktet. Deine erste Trophäe in einem Spiel dieses Genres bringt dich nach oben.",
+  "fr": "Personne n’a encore marqué ce mois-ci. Ton premier trophée dans un jeu de ce genre te place en tête.",
+  "it": "Nessuno ha ancora fatto punti questo mese. Il tuo primo trofeo in un gioco del genere ti porta in cima.",
+  "pt": "Ainda ninguém pontuou este mês. O primeiro troféu que ganhares num jogo do género põe-te no topo."
+ },
+ "evento_detalle": {
+  "es": "{0} trofeos · {1} platinos",
+  "en": "{0} trophies · {1} platinums",
+  "de": "{0} Trophäen · {1} Platin",
+  "fr": "{0} trophées · {1} platines",
+  "it": "{0} trofei · {1} platini",
+  "pt": "{0} troféus · {1} platinas"
+ },
+ "evento_anterior": {
+  "es": "Podio del mes de {0} ({1})",
+  "en": "{0} month podium ({1})",
+  "de": "Podium des {0}-Monats ({1})",
+  "fr": "Podium du mois {0} ({1})",
+  "it": "Podio del mese {0} ({1})",
+  "pt": "Pódio do mês de {0} ({1})"
+ },
+ "evento_reglas": {
+  "es": "Puntos como en la liga mensual: platino 100, oro 50, plata 25 y el resto 10. Cuenta el género del juego según IGDB. Epic no puntúa (su progreso es declarado).",
+  "en": "Points as in the monthly league: platinum 100, gold 50, silver 25, everything else 10. The game's genre comes from IGDB. Epic doesn't score (its progress is self-reported).",
+  "de": "Punkte wie in der Monatsliga: Platin 100, Gold 50, Silber 25, alles andere 10. Das Genre stammt von IGDB. Epic zählt nicht (der Fortschritt ist nur angegeben).",
+  "fr": "Points comme dans la ligue mensuelle : platine 100, or 50, argent 25, le reste 10. Le genre du jeu vient d’IGDB. Epic ne compte pas (sa progression est déclarée).",
+  "it": "Punti come nella lega mensile: platino 100, oro 50, argento 25 e il resto 10. Il genere del gioco viene da IGDB. Epic non conta (il suo progresso è dichiarato).",
+  "pt": "Pontos como na liga mensal: platina 100, ouro 50, prata 25 e o resto 10. O género do jogo vem do IGDB. A Epic não pontua (o progresso é declarado)."
+ },
+ "evento_genero_accion": {
+  "es": "acción",
+  "en": "action",
+  "de": "Action",
+  "fr": "action",
+  "it": "azione",
+  "pt": "ação"
+ },
+ "evento_genero_rpg": {
+  "es": "RPG",
+  "en": "RPG",
+  "de": "RPG",
+  "fr": "RPG",
+  "it": "GDR",
+  "pt": "RPG"
+ },
+ "evento_genero_aventura": {
+  "es": "aventura",
+  "en": "adventure",
+  "de": "Abenteuer",
+  "fr": "aventure",
+  "it": "avventura",
+  "pt": "aventura"
+ },
+ "evento_genero_estrategia": {
+  "es": "estrategia",
+  "en": "strategy",
+  "de": "Strategie",
+  "fr": "stratégie",
+  "it": "strategia",
+  "pt": "estratégia"
+ },
+ "evento_genero_plataformas": {
+  "es": "plataformas",
+  "en": "platformer",
+  "de": "Jump ’n’ Run",
+  "fr": "plateforme",
+  "it": "piattaforme",
+  "pt": "plataformas"
+ },
+ "evento_genero_puzles": {
+  "es": "puzles",
+  "en": "puzzle",
+  "de": "Puzzle",
+  "fr": "puzzle",
+  "it": "puzzle",
+  "pt": "puzzles"
+ },
+ "evento_genero_deportes": {
+  "es": "deportes",
+  "en": "sports",
+  "de": "Sport",
+  "fr": "sport",
+  "it": "sport",
+  "pt": "desporto"
+ },
+ "asistente_titulo": {
+  "es": "Pregúntale a Paragon",
+  "en": "Ask Paragon",
+  "de": "Frag Paragon",
+  "fr": "Demande à Paragon",
+  "it": "Chiedi a Paragon",
+  "pt": "Pergunta ao Paragon"
+ },
+ "asistente_descripcion": {
+  "es": "Pregunta lo que quieras sobre tu biblioteca y tu progreso, como se lo preguntarías a un amigo. Contesta con tus datos de verdad.",
+  "en": "Ask anything about your library and progress, the way you'd ask a friend. It answers with your real data.",
+  "de": "Frag alles über deine Bibliothek und deinen Fortschritt, so wie du einen Freund fragen würdest. Die Antwort kommt aus deinen echten Daten.",
+  "fr": "Pose n’importe quelle question sur ta bibliothèque et ta progression, comme à un ami. Il répond avec tes vraies données.",
+  "it": "Chiedi quello che vuoi sulla tua libreria e sui tuoi progressi, come lo chiederesti a un amico. Risponde con i tuoi dati reali.",
+  "pt": "Pergunta o que quiseres sobre a tua biblioteca e o teu progresso, como perguntarias a um amigo. Responde com os teus dados reais."
+ },
+ "asistente_ejemplo1": {
+  "es": "¿Qué platino me saco este finde con unas 6 horas?",
+  "en": "Which platinum can I get this weekend with about 6 hours?",
+  "de": "Welches Platin schaffe ich dieses Wochenende mit etwa 6 Stunden?",
+  "fr": "Quel platine je peux avoir ce week-end avec environ 6 heures ?",
+  "it": "Quale platino posso prendere questo weekend con circa 6 ore?",
+  "pt": "Que platina consigo este fim de semana com umas 6 horas?"
+ },
+ "asistente_ejemplo2": {
+  "es": "¿Qué juegos tengo abandonados casi al 100 %?",
+  "en": "Which games have I abandoned at almost 100%?",
+  "de": "Welche Spiele habe ich fast bei 100 % liegen lassen?",
+  "fr": "Quels jeux ai-je abandonnés presque à 100 % ?",
+  "it": "Quali giochi ho abbandonato quasi al 100%?",
+  "pt": "Que jogos tenho abandonados quase a 100%?"
+ },
+ "asistente_ejemplo3": {
+  "es": "¿Cuál es el juego al que más horas le he echado?",
+  "en": "Which game have I put the most hours into?",
+  "de": "In welches Spiel habe ich die meisten Stunden gesteckt?",
+  "fr": "À quel jeu ai-je consacré le plus d’heures ?",
+  "it": "A quale gioco ho dedicato più ore?",
+  "pt": "A que jogo dediquei mais horas?"
+ },
+ "asistente_ejemplo4": {
+  "es": "Tengo media hora: ¿qué cierro?",
+  "en": "I've got half an hour: what can I finish?",
+  "de": "Ich habe eine halbe Stunde: Was kann ich abschließen?",
+  "fr": "J’ai une demi-heure : qu’est-ce que je boucle ?",
+  "it": "Ho mezz’ora: cosa chiudo?",
+  "pt": "Tenho meia hora: o que fecho?"
+ },
+ "asistente_placeholder": {
+  "es": "Escribe tu pregunta…",
+  "en": "Type your question…",
+  "de": "Schreib deine Frage…",
+  "fr": "Écris ta question…",
+  "it": "Scrivi la tua domanda…",
+  "pt": "Escreve a tua pergunta…"
+ },
+ "asistente_enviar": {
+  "es": "Enviar",
+  "en": "Send",
+  "de": "Senden",
+  "fr": "Envoyer",
+  "it": "Invia",
+  "pt": "Enviar"
+ },
+ "asistente_pensando": {
+  "es": "Mirando tu biblioteca…",
+  "en": "Looking at your library…",
+  "de": "Ich schaue in deine Bibliothek…",
+  "fr": "Je regarde ta bibliothèque…",
+  "it": "Sto guardando la tua libreria…",
+  "pt": "A ver a tua biblioteca…"
+ },
+ "asistente_aviso": {
+  "es": "Lo responde una IA (Claude) con los datos de tu biblioteca; puede equivocarse. Hasta 20 preguntas al día. La conversación no se guarda.",
+  "en": "An AI (Claude) answers using your library data; it can make mistakes. Up to 20 questions a day. The conversation isn't saved.",
+  "de": "Eine KI (Claude) antwortet mit den Daten deiner Bibliothek; sie kann sich irren. Bis zu 20 Fragen am Tag. Das Gespräch wird nicht gespeichert.",
+  "fr": "Une IA (Claude) répond avec les données de ta bibliothèque ; elle peut se tromper. Jusqu’à 20 questions par jour. La conversation n’est pas enregistrée.",
+  "it": "Risponde un’IA (Claude) con i dati della tua libreria; può sbagliare. Fino a 20 domande al giorno. La conversazione non viene salvata.",
+  "pt": "Responde uma IA (Claude) com os dados da tua biblioteca; pode enganar-se. Até 20 perguntas por dia. A conversa não é guardada."
+ },
+ "asistente_inactivo": {
+  "es": "El asistente todavía no está activado en este Paragon.",
+  "en": "The assistant isn't enabled on this Paragon yet.",
+  "de": "Der Assistent ist in diesem Paragon noch nicht aktiviert.",
+  "fr": "L’assistant n’est pas encore activé sur ce Paragon.",
+  "it": "L’assistente non è ancora attivo su questo Paragon.",
+  "pt": "O assistente ainda não está ativado neste Paragon."
+ },
+ "asistente_error_limite": {
+  "es": "Has llegado al límite de preguntas por ahora. Vuelve en un rato.",
+  "en": "You've hit the question limit for now. Come back in a while.",
+  "de": "Du hast das Fragenlimit fürs Erste erreicht. Komm später wieder.",
+  "fr": "Tu as atteint la limite de questions pour l’instant. Reviens plus tard.",
+  "it": "Hai raggiunto il limite di domande per ora. Torna più tardi.",
+  "pt": "Chegaste ao limite de perguntas por agora. Volta daqui a pouco."
+ },
+ "asistente_error_rechazo": {
+  "es": "No puedo contestar a eso. Prueba con otra pregunta sobre tus juegos.",
+  "en": "I can't answer that. Try another question about your games.",
+  "de": "Darauf kann ich nicht antworten. Versuch eine andere Frage zu deinen Spielen.",
+  "fr": "Je ne peux pas répondre à ça. Essaie une autre question sur tes jeux.",
+  "it": "Non posso rispondere a questo. Prova un’altra domanda sui tuoi giochi.",
+  "pt": "Não posso responder a isso. Experimenta outra pergunta sobre os teus jogos."
+ },
+ "asistente_error_fallo": {
+  "es": "Algo ha fallado. Prueba otra vez en un momento.",
+  "en": "Something went wrong. Try again in a moment.",
+  "de": "Etwas ist schiefgelaufen. Versuch es gleich noch einmal.",
+  "fr": "Quelque chose a échoué. Réessaie dans un instant.",
+  "it": "Qualcosa è andato storto. Riprova tra poco.",
+  "pt": "Algo falhou. Tenta outra vez daqui a pouco."
+ },
+ "telegram_titulo": {
+  "es": "Telegram",
+  "en": "Telegram",
+  "de": "Telegram",
+  "fr": "Telegram",
+  "it": "Telegram",
+  "pt": "Telegram"
+ },
+ "telegram_descripcion": {
+  "es": "Recibe en Telegram los mismos avisos que por Discord (trofeos, platinos, ligas, sesiones) y consulta /perfil o /racha.",
+  "en": "Get the same notifications as on Discord (trophies, platinums, leagues, sessions) on Telegram, and check /perfil or /racha.",
+  "de": "Erhalte auf Telegram dieselben Benachrichtigungen wie auf Discord (Trophäen, Platin, Ligen, Sessions) und frag /perfil oder /racha ab.",
+  "fr": "Reçois sur Telegram les mêmes notifications que sur Discord (trophées, platines, ligues, sessions) et consulte /perfil ou /racha.",
+  "it": "Ricevi su Telegram gli stessi avvisi di Discord (trofei, platini, leghe, sessioni) e consulta /perfil o /racha.",
+  "pt": "Recebe no Telegram os mesmos avisos do Discord (troféus, platinas, ligas, sessões) e consulta /perfil ou /racha."
+ },
+ "telegram_conectar": {
+  "es": "Conectar con Telegram",
+  "en": "Connect with Telegram",
+  "de": "Mit Telegram verbinden",
+  "fr": "Connecter avec Telegram",
+  "it": "Collega con Telegram",
+  "pt": "Ligar ao Telegram"
+ },
+ "telegram_ayuda": {
+  "es": "Se abre el bot de Paragon en Telegram: pulsa «Iniciar» y queda conectado. El enlace es solo tuyo.",
+  "en": "The Paragon bot opens in Telegram: press “Start” and you're connected. The link is yours alone.",
+  "de": "Der Paragon-Bot öffnet sich in Telegram: Drück auf „Starten“ und du bist verbunden. Der Link gehört nur dir.",
+  "fr": "Le bot Paragon s’ouvre dans Telegram : appuie sur « Démarrer » et c’est connecté. Le lien n’est qu’à toi.",
+  "it": "Si apre il bot di Paragon su Telegram: premi «Avvia» e sei collegato. Il link è solo tuo.",
+  "pt": "Abre-se o bot do Paragon no Telegram: carrega em «Iniciar» e fica ligado. A ligação é só tua."
+ },
+ "telegram_conectado": {
+  "es": "Telegram conectado",
+  "en": "Telegram connected",
+  "de": "Telegram verbunden",
+  "fr": "Telegram connecté",
+  "it": "Telegram collegato",
+  "pt": "Telegram ligado"
+ },
+ "telegram_desconectar": {
+  "es": "Desconectar",
+  "en": "Disconnect",
+  "de": "Trennen",
+  "fr": "Déconnecter",
+  "it": "Scollega",
+  "pt": "Desligar"
+ },
+ "correo_titulo": {
+  "es": "Resumen semanal por correo",
+  "en": "Weekly email summary",
+  "de": "Wöchentliche Zusammenfassung per E-Mail",
+  "fr": "Résumé hebdomadaire par e-mail",
+  "it": "Riepilogo settimanale via e-mail",
+  "pt": "Resumo semanal por e-mail"
+ },
+ "correo_descripcion": {
+  "es": "Cada domingo por la tarde, tus trofeos de la semana, tu racha y tu puesto en la liga. Solo si lo activas, y te das de baja con un clic desde cualquier correo.",
+  "en": "Every Sunday evening: your trophies of the week, your streak and your league position. Only if you turn it on, and you can unsubscribe in one click from any email.",
+  "de": "Jeden Sonntagabend: deine Trophäen der Woche, deine Serie und dein Ligaplatz. Nur wenn du es aktivierst, und mit einem Klick in jeder E-Mail abbestellbar.",
+  "fr": "Chaque dimanche soir : tes trophées de la semaine, ta série et ta place dans la ligue. Seulement si tu l’actives, et désabonnement en un clic depuis chaque e-mail.",
+  "it": "Ogni domenica sera: i tuoi trofei della settimana, la tua serie e la tua posizione nella lega. Solo se lo attivi, e ti disiscrivi con un clic da qualsiasi e-mail.",
+  "pt": "Todos os domingos à tarde: os teus troféus da semana, a tua sequência e o teu lugar na liga. Só se o ativares, e cancelas com um clique em qualquer e-mail."
+ },
+ "plan_faltan": {
+  "es": "Faltan {0}",
+  "en": "{0} to go",
+  "de": "Noch {0}",
+  "fr": "Encore {0}",
+  "it": "Ne mancano {0}",
+  "pt": "Faltam {0}"
+ },
+ "plan_siguiente": {
+  "es": "Ahora toca",
+  "en": "Up next",
+  "de": "Als Nächstes",
+  "fr": "À faire maintenant",
+  "it": "Ora tocca a",
+  "pt": "Agora é a vez de"
+ },
+ "plan_y_mas": {
+  "es": "y {0} más",
+  "en": "and {0} more",
+  "de": "und {0} weitere",
+  "fr": "et {0} de plus",
+  "it": "e altri {0}",
+  "pt": "e mais {0}"
+ },
+ "colec_boton": {
+  "es": "Lista de coleccionables",
+  "en": "Collectibles list",
+  "de": "Sammelobjekt-Liste",
+  "fr": "Liste des objets à collectionner",
+  "it": "Lista dei collezionabili",
+  "pt": "Lista de colecionáveis"
+ },
+ "colec_usar_comunidad": {
+  "es": "Usar la lista de la comunidad ({0})",
+  "en": "Use the community list ({0})",
+  "de": "Liste der Community verwenden ({0})",
+  "fr": "Utiliser la liste de la communauté ({0})",
+  "it": "Usa la lista della community ({0})",
+  "pt": "Usar a lista da comunidade ({0})"
+ },
+ "colec_quitar": {
+  "es": "Quitar la lista",
+  "en": "Remove the list",
+  "de": "Liste entfernen",
+  "fr": "Retirer la liste",
+  "it": "Rimuovi la lista",
+  "pt": "Remover a lista"
+ },
+ "colec_numero": {
+  "es": "Nº {0}",
+  "en": "No. {0}",
+  "de": "Nr. {0}",
+  "fr": "Nº {0}",
+  "it": "N. {0}",
+  "pt": "N.º {0}"
+ },
+ "seguir_seguidores": {
+  "es": "Seguidores: {0}",
+  "en": "Followers: {0}",
+  "de": "Follower: {0}",
+  "fr": "Abonnés : {0}",
+  "it": "Follower: {0}",
+  "pt": "Seguidores: {0}"
+ },
+ "evento_quedan": {
+  "es": "Quedan {0} días",
+  "en": "{0} days left",
+  "de": "Noch {0} Tage",
+  "fr": "Plus que {0} jours",
+  "it": "Mancano {0} giorni",
+  "pt": "Faltam {0} dias"
+ },
+ "evento_termina_hoy": {
+  "es": "Termina hoy",
+  "en": "Ends today",
+  "de": "Endet heute",
+  "fr": "Se termine aujourd'hui",
+  "it": "Finisce oggi",
+  "pt": "Termina hoje"
+ },
+ "evento_puntos": {
+  "es": "{0} pts",
+  "en": "{0} pts",
+  "de": "{0} Pkt.",
+  "fr": "{0} pts",
+  "it": "{0} pt",
+  "pt": "{0} pts"
+ },
+ "evento_tu": {
+  "es": "Tú",
+  "en": "You",
+  "de": "Du",
+  "fr": "Toi",
+  "it": "Tu",
+  "pt": "Tu"
+ },
+ "avisos_otros_canales": {
+  "es": "Otros sitios donde recibirlos",
+  "en": "Other places to get them",
+  "de": "Weitere Kanäle",
+  "fr": "Autres endroits où les recevoir",
+  "it": "Altri posti dove riceverli",
+  "pt": "Outros sítios onde os receber"
+ },
+ "paragon_plus": {
+  "es": "Paragon+",
+  "en": "Paragon+",
+  "de": "Paragon+",
+  "fr": "Paragon+",
+  "it": "Paragon+",
+  "pt": "Paragon+"
  }
 }

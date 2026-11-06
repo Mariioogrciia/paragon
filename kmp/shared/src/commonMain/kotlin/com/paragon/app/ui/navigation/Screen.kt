@@ -54,6 +54,8 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
         fun routeFor(gameId: String, trophyId: String) =
             "sessions/new?juego=${gameId.encodeURLParameter()}&trofeo=${trophyId.encodeURLParameter()}"
     }
+    /** "Pregúntale a Paragon" (6 nov 2026, ui/asistente). */
+    object Preguntar : Screen("preguntar", T.asistente_titulo)
     object SessionDetail : Screen("session/{sesionId}", T.nav_sesiones) {
         fun routeFor(sesionId: String) = "session/$sesionId"
     }
@@ -61,3 +63,6 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
 
 /** Abrir la ficha de un juego de otra persona desde donde sea (la hoja de su perfil...). Lo da MainScreen. */
 val LocalAbrirJuegoDe = androidx.compose.runtime.staticCompositionLocalOf<(handle: String, gameId: String) -> Unit> { { _, _ -> } }
+
+/** Abrir el perfil de alguien por su handle (los platinos más rápidos de la ficha, el evento...). Lo da MainScreen. */
+val LocalAbrirPerfil = androidx.compose.runtime.staticCompositionLocalOf<(handle: String) -> Unit> { { } }

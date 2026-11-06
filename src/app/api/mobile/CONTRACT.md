@@ -1132,3 +1132,37 @@ sale del logro más raro según los porcentajes globales de Steam
 Steam. `horas` (HowLongToBeat) y `gameId` solo si el juego ya está en
 Paragon; sin `gameId`, la app abre `url`. La primera petición tarda unos
 segundos (consulta Steam juego a juego); luego va en caché.
+
+## Añadido el 6 nov 2026 — lo de la web del 5 nov, en la app
+
+### `GET /api/mobile/games/{gameId}` — campos nuevos
+- `plan`: plan de platino (`lib/planPlatino.ts`), solo en tu ficha y sin el
+  platino: `{ actual, faltan, fases: [{ fase, total, conseguidos, pendientes: [trophyId] }] }`.
+  `fase`: perdibles, historia, coleccionables, online, habilidad, grindeo, limpieza.
+- `rapidos`: platinos más rápidos del juego (`lib/platinoRapido.ts`, hasta 5):
+  `[{ handle, nombre, avatarUrl, platform, duracionMs }]`.
+- En cada trofeo: `coleccionables` (cuántos pide su texto, o null),
+  `isMissable` y `manualProgress` `{ current, target }` (el contador manual).
+
+### `GET|PUT|DELETE /api/mobile/games/{gameId}/trophies/{trophyId}/coleccionables`
+Lista con casillas (`lib/coleccionables.ts`). GET: `{ nombres, marcados, comunidad }`.
+PUT `{ nombres? | textoPegado?, marcados, total }` → `{ nombres, marcados, total }`
+(mueve el contador del trofeo). DELETE la quita y pone el contador a cero.
+
+### `POST|DELETE /api/mobile/users/{handle}/seguir`
+Seguir o dejar de seguir (`lib/seguir.ts`) → `{ sigo, seguidores, siguiendo }`.
+`GET /api/mobile/users/{handle}` trae además `seguir` (lo mismo), `apoyo`
+(Paragon+), `estado` (frase) y `titulo`.
+
+### `GET /api/mobile/evento`
+Evento del mes (`lib/eventos.ts`): `{ mes, categoria, diasRestantes, ranking:
+[{ handle, nombre, imagen, puntos, trofeos, platinos, soyYo }], anterior: { mes, categoria, podio } }`.
+
+### `GET|POST /api/mobile/preguntar`
+"Pregúntale a Paragon" (`lib/asistente.ts`). GET `{ activo }`. POST
+`{ pregunta, historial: [{ rol: "user"|"assistant", texto }] }` → `{ ok: true, texto }`
+o `{ ok: false, motivo: "inactivo"|"limite"|"rechazo"|"fallo" }`. 4 por minuto, 20 al día.
+
+### `GET|PATCH /api/mobile/avisos/canales`
+Telegram y el correo semanal: `{ telegram: { vinculado, enlace } | null, correoSemanal: boolean | null }`
+(null = el servidor no lo tiene montado). PATCH `{ correoSemanal?, desvincularTelegram? }`.

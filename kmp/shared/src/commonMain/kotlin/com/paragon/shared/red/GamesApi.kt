@@ -21,7 +21,16 @@ data class TrophyDto(
     /** "default" = juego base; otro = un DLC (como en la web, TrophyList.tsx). */
     val groupId: String = "default",
     val groupName: String? = null,
+    /** Perdible (PowerPyx): el plan de platino lo pone primero. */
+    val isMissable: Boolean = false,
+    /** Cuántos coleccionables pide, si el texto lo dice (lib/coleccionablesReglas.ts). */
+    val coleccionables: Int? = null,
+    /** El contador manual del trofeo (lo mueve la lista de coleccionables). */
+    val manualProgress: ManualProgressDto? = null,
 )
+
+@Serializable
+data class ManualProgressDto(val current: Int = 0, val target: Int = 0)
 
 @Serializable
 data class GameDetailDto(
@@ -39,7 +48,31 @@ data class GameDetailDto(
 )
 
 @Serializable
-data class GameDetailResponse(val game: GameDetailDto, val diario: DiarioPlatinoDto? = null)
+data class GameDetailResponse(
+    val game: GameDetailDto,
+    val diario: DiarioPlatinoDto? = null,
+    /** Plan de platino (lib/planPlatino.ts): solo en tu ficha y sin el platino. */
+    val plan: PlanPlatinoDto? = null,
+    /** Platinos más rápidos del juego entre la gente de Paragon (lib/platinoRapido.ts). */
+    val rapidos: List<PlatinoRapidoDto> = emptyList(),
+)
+
+/** Una fase del plan: perdibles, historia, coleccionables, online, habilidad, grindeo o limpieza. */
+@Serializable
+data class FasePlanDto(val fase: String, val total: Int = 0, val conseguidos: Int = 0, val pendientes: List<String> = emptyList())
+
+@Serializable
+data class PlanPlatinoDto(val actual: String? = null, val faltan: Int = 0, val fases: List<FasePlanDto> = emptyList())
+
+@Serializable
+data class PlatinoRapidoDto(val handle: String? = null, val nombre: String? = null, val avatarUrl: String? = null, val platform: String = "", val duracionMs: Long = 0)
+
+/** Lista de coleccionables de un trofeo (games/[gameId]/trophies/[trophyId]/coleccionables). */
+@Serializable
+data class ColeccionablesDto(val nombres: List<String> = emptyList(), val marcados: List<Int> = emptyList(), val comunidad: List<String> = emptyList(), val total: Int = 0)
+
+@Serializable
+data class GuardarColeccionablesRequest(val nombres: List<String>? = null, val textoPegado: String? = null, val marcados: List<Int>, val total: Int)
 
 /** "El Diario del Platino" (src/lib/diarioPlatino.ts); null sin platino o sin fechas. */
 @Serializable
@@ -94,6 +127,18 @@ class GamesApi internal constructor(private val c: ClienteParagon) {
     /** "¿Ya lo tengo?" de Modo Enfoque — ver games/[gameId]/resync/route.ts. Siempre 200. */
     suspend fun resync(gameId: String): ResyncResponse =
         c.http.post("api/mobile/games/${gameId.encodeURLPathPart()}/resync").body()
+
+    /** Coleccionables de un trofeo, con la lista de la comunidad si hay (6 nov 2026). */
+    suspend fun getColeccionables(gameId: String, trophyId: String): ColeccionablesDto =
+        c.http.get("api/mobile/games/${gameId.encodeURLPathPart()}/trophies/${trophyId.encodeURLPathPart()}/coleccionables").body()
+
+    /** Guarda la lista entera (nombres o texto pegado + marcados). Mueve el contador del trofeo. */
+    suspend fun guardarColeccionables(gameId: String, trophyId: String, cuerpo: GuardarColeccionablesRequest): ColeccionablesDto =
+        c.http.put("api/mobile/games/${gameId.encodeURLPathPart()}/trophies/${trophyId.encodeURLPathPart()}/coleccionables") { json(cuerpo) }.body()
+
+    suspend fun quitarColeccionables(gameId: String, trophyId: String) {
+        c.http.delete("api/mobile/games/${gameId.encodeURLPathPart()}/trophies/${trophyId.encodeURLPathPart()}/coleccionables")
+    }
 
     /** Vídeo de guía cacheado (mismo dato que la web) — ver games/[gameId]/trophies/[trophyId]/guide/route.ts. */
     suspend fun getTrophyGuide(gameId: String, trophyId: String): TrophyGuideResponse =
