@@ -1,5 +1,6 @@
 package com.paragon.app.ui.panel
 
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -101,16 +102,21 @@ fun PanelScreen(
     // Contador de la campana (16 oct 2026): al entrar en Inicio y cada minuto
     // mientras sigue a la vista.
     var avisosSinLeer by remember { mutableIntStateOf(0) }
-    LaunchedEffect(tokenStore) {
-        while (true) {
-            avisosSinLeer = try {
-                com.paragon.app.data.network.ApiClient.avisosApi(tokenStore).avisos().noLeidos
-            } catch (e: kotlinx.coroutines.CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                avisosSinLeer
+    // Solo con la app a la vista (6 nov 2026): antes seguía preguntando cada
+    // minuto en segundo plano, mientras Android no cerrara la actividad.
+    val ciclo = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(tokenStore, ciclo) {
+        ciclo.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            while (true) {
+                avisosSinLeer = try {
+                    com.paragon.app.data.network.ApiClient.avisosApi(tokenStore).avisos().noLeidos
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    avisosSinLeer
+                }
+                kotlinx.coroutines.delay(60_000)
             }
-            kotlinx.coroutines.delay(60_000)
         }
     }
     var pinnedGame by remember { mutableStateOf<LibraryGame?>(null) }

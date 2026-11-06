@@ -8486,5 +8486,13 @@
   "fr": "Paragon+",
   "it": "Paragon+",
   "pt": "Paragon+"
+ },
+ "stats_badges_titulo": {
+  "es": "Insignias",
+  "en": "Badges",
+  "de": "Abzeichen",
+  "fr": "Badges",
+  "it": "Badge",
+  "pt": "Insígnias"
  }
 }

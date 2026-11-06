@@ -955,6 +955,7 @@
     <string name="stats_badge_primer">PRIMER TROFEO</string>
     <string name="stats_badge_raro">TROFEO MÁS RARO</string>
     <string name="stats_badges_sub">Insignias que has ido desbloqueando</string>
+    <string name="stats_badges_titulo">Insignias</string>
     <string name="stats_coste">COSTE POR HORA</string>
     <string name="stats_coste_sub">Solo juegos con precio y tiempo jugado registrados</string>
     <string name="stats_dias_activos">Días activos</string>

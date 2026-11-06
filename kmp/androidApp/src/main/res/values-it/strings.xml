@@ -953,6 +953,7 @@
     <string name="stats_badge_primer">PRIMO TROFEO</string>
     <string name="stats_badge_raro">TROFEO PIÙ RARO</string>
     <string name="stats_badges_sub">Badge che hai sbloccato</string>
+    <string name="stats_badges_titulo">Badge</string>
     <string name="stats_coste">COSTO ORARIO</string>
     <string name="stats_coste_sub">Solo giochi con prezzo e tempo di gioco registrati</string>
     <string name="stats_dias_activos">Giorni attivi</string>

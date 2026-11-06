@@ -953,6 +953,7 @@
     <string name="stats_badge_primer">ERSTE TROPHÄE</string>
     <string name="stats_badge_raro">SELTENSTE TROPHÄE</string>
     <string name="stats_badges_sub">Abzeichen, die du freigeschaltet hast</string>
+    <string name="stats_badges_titulo">Abzeichen</string>
     <string name="stats_coste">KOSTEN PRO STUNDE</string>
     <string name="stats_coste_sub">Nur Spiele mit erfasstem Preis und Spielzeit</string>
     <string name="stats_dias_activos">Aktive Tage</string>

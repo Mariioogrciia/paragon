@@ -64,6 +64,16 @@ export async function getMobileUserId(req: Request): Promise<string | null> {
 
   // Cuenta el día como "usó la app" para Admin → Analítica (lib/trafico.ts). Sin esperar.
   if (row?.userId) void registrarActividadApp(row.userId);
+  // Sesión que se renueva con el uso (6 nov 2026), como la cookie de Auth.js
+  // (updateAge de un día): antes caducaba a los 30 días de entrar aunque la
+  // app se usara a diario, y te echaba sin avisar. Una vez al día como mucho.
+  if (row && row.expires.getTime() - Date.now() < TREINTA_DIAS_MS - UN_DIA_MS) {
+    void db
+      .update(sessions)
+      .set({ expires: new Date(Date.now() + TREINTA_DIAS_MS) })
+      .where(eq(sessions.sessionToken, row.sessionToken))
+      .catch((error) => console.error("[mobileAuth] renovar sesión", error));
+  }
   return row?.userId ?? null;
 }
 
@@ -71,7 +81,8 @@ export async function getMobileUserId(req: Request): Promise<string | null> {
 // (no hay `session.maxAge` propio en auth.ts, así que hereda ese valor) —
 // se replica aquí a mano porque esta fila la creamos nosotros, no el
 // adaptador de Auth.js.
-const TREINTA_DIAS_MS = 30 * 24 * 60 * 60 * 1000;
+const UN_DIA_MS = 24 * 60 * 60 * 1000;
+const TREINTA_DIAS_MS = 30 * UN_DIA_MS;
 
 /**
  * Cambia la sesión "prestada" (la cookie que puso el login por Custom

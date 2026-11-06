@@ -953,6 +953,7 @@
     <string name="stats_badge_primer">PRIMEIRO TROFÉU</string>
     <string name="stats_badge_raro">TROFÉU MAIS RARO</string>
     <string name="stats_badges_sub">Insígnias que foste desbloqueando</string>
+    <string name="stats_badges_titulo">Insígnias</string>
     <string name="stats_coste">CUSTO POR HORA</string>
     <string name="stats_coste_sub">Só jogos com preço e tempo de jogo registados</string>
     <string name="stats_dias_activos">Dias ativos</string>

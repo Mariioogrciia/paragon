@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { crearJuego, crearUsuario, darJuego, trofeos } from "./datos";
@@ -105,6 +106,19 @@ describe("tokens de la app", () => {
     expect(await getMobileUserId(pedir(viejo))).toBe(u.id);
     // La huella copiada de la base no sirve como token.
     expect(await getMobileUserId(pedir(huellaToken(nuevo)))).toBeNull();
+  });
+
+  it("renueva la sesión con el uso, una vez al día como mucho", async () => {
+    const u = await crearUsuario();
+    const token = `renovable-${u.id}`;
+    const enDiezDias = new Date(Date.now() + 10 * 86_400_000);
+    await db.insert(sessions).values({ sessionToken: huellaToken(token), userId: u.id, expires: enDiezDias });
+    const pedir = new Request("http://x.test", { headers: { authorization: `Bearer ${token}` } });
+    expect(await getMobileUserId(pedir)).toBe(u.id);
+    // La renovación va sin esperar: se le da un momento.
+    await new Promise((r) => setTimeout(r, 200));
+    const [fila] = await db.select({ expires: sessions.expires }).from(sessions).where(eq(sessions.sessionToken, huellaToken(token)));
+    expect(fila.expires.getTime()).toBeGreaterThan(Date.now() + 29 * 86_400_000);
   });
 });
 

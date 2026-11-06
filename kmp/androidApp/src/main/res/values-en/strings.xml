@@ -953,6 +953,7 @@
     <string name="stats_badge_primer">FIRST TROPHY</string>
     <string name="stats_badge_raro">RAREST TROPHY</string>
     <string name="stats_badges_sub">Badges you\'ve unlocked</string>
+    <string name="stats_badges_titulo">Badges</string>
     <string name="stats_coste">COST PER HOUR</string>
     <string name="stats_coste_sub">Only games with a recorded price and playtime</string>
     <string name="stats_dias_activos">Active days</string>

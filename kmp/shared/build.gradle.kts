@@ -48,6 +48,8 @@ kotlin {
             implementation("io.coil-kt.coil3:coil-network-ktor3:$versionCoil")
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.10.0-beta01")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+            // Pausar lo que se repite (la campana del Panel) con la app en segundo plano.
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
             // Base local (cachés y diario de sesiones): Room con SQLite propio.
             api("androidx.room:room-runtime:2.8.5")
             implementation("androidx.sqlite:sqlite-bundled:2.6.2")

@@ -537,7 +537,7 @@ private val ICONO_BADGE = mapOf(
 /** Insignias por hitos (`checkAndGrantBadges`, se conceden solas al sincronizar) — sin tarjeta si no hay ninguna todavía. */
 @Composable
 private fun BadgesCard(badges: List<Badge>) {
-    SectionCard(title = "Badges", subtitle = Textos.t(T.stats_badges_sub)) {
+    SectionCard(title = Textos.t(T.stats_badges_titulo), subtitle = Textos.t(T.stats_badges_sub)) {
         badges.forEachIndexed { index, badge ->
             if (index > 0) {
                 Spacer(Modifier.height(12.dp))
