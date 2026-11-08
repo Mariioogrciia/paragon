@@ -787,6 +787,20 @@
     <string name="plan_siguiente">Up next</string>
     <string name="plan_titulo">Platinum plan</string>
     <string name="plan_y_mas">and %1$s more</string>
+    <string name="plat_ayer">played yesterday</string>
+    <string name="plat_cerca">Closest</string>
+    <string name="plat_desc_cerca" formatted="false">What you have least left. On Steam and Xbox, 100% counts.</string>
+    <string name="plat_desc_jugando">What you\'ve played in the last two months and can platinum.</string>
+    <string name="plat_faltan">%1$s left</string>
+    <string name="plat_faltan_cien">%1$s to 100%%</string>
+    <string name="plat_hace">%1$s days ago</string>
+    <string name="plat_horas">~%1$s h</string>
+    <string name="plat_hoy">played today</string>
+    <string name="plat_jugando">Playing now</string>
+    <string name="plat_titulo">One step from platinum</string>
+    <string name="plat_vacio">Nothing you\'ve played in these two months is halfway there.</string>
+    <string name="plat_ver_mas">Show %1$s more</string>
+    <string name="plat_ver_menos">Show less</string>
     <string name="precio_alerta_activa">We\'ll alert you below %1$s</string>
     <string name="precio_alerta_campo">Target price (€)</string>
     <string name="precio_alerta_error">Enter a price between €0.01 and €999.</string>

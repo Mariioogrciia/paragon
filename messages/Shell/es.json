@@ -300,7 +300,20 @@
     "lecturas": "Lecturas",
     "cabinaPie": "{n, plural, =0 {Todos los módulos a la vista} one {# módulo oculto} other {# módulos ocultos}}",
     "cabinaPieAccion": "Elige qué módulos ves",
-    "descargarPng": "Descargar imagen (PNG)"
+    "descargarPng": "Descargar imagen (PNG)",
+    "platinables": {
+      "cerca": "Más cerca",
+      "jugando": "Lo que juegas ahora",
+      "descCerca": "Lo que menos te queda, por trofeos pendientes. En Steam y Xbox cuenta el 100 %.",
+      "descJugando": "Lo que has jugado en los últimos dos meses y te puedes platinar, lo más avanzado primero.",
+      "vacio": "No has tocado nada en los últimos dos meses que esté a mitad de camino.",
+      "verMas": "Ver {n} más",
+      "verMenos": "Ver menos",
+      "faltan": "{count, plural, one {Falta # trofeo} other {Faltan # trofeos}}",
+      "faltanCien": "{count, plural, one {# logro para el 100 %} other {# logros para el 100 %}}",
+      "jugado": "{count, plural, =0 {jugado hoy} one {jugado ayer} other {jugado hace # días}}",
+      "horas": "~{n} h"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Perfil de ejemplo",

@@ -1,6 +1,7 @@
 import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
-import { esPlatinoEquivalente, gameProgress } from "@/lib/stats";
+import { esPlatinoEquivalente } from "@/lib/stats";
+import { platinables, type Platinable } from "@/lib/platinables";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { ultimosTrofeos } from "@/lib/history";
@@ -59,15 +60,22 @@ export async function GET(req: Request) {
   // igual que la portada web.
   const recent = games.filter((g) => !g.isWishlist).slice(0, 6);
 
-  const nearPlatinum = games
-    .map((g) => ({ game: g, progress: gameProgress(g) }))
-    .filter((g) => g.progress.hasPlatinum && !g.progress.platinumEarned)
-    .sort((a, b) => a.progress.total - a.progress.earned - (b.progress.total - b.progress.earned))
-    .slice(0, 3)
-    .map((g) => g.game);
+  // Qué te puedes platinar (8 nov 2026, lib/platinables.ts): las dos listas
+  // de la web. `nearPlatinum` se queda (los 3 primeros) para las versiones
+  // de la app que aún no conocen `platinables`.
+  const listas = platinables(games);
+  const nearPlatinum = listas.cerca.slice(0, 3).map((p) => p.game);
+  const aFila = (p: Platinable) => ({
+    ...toCard(p.game),
+    faltan: p.faltan,
+    tienePlatino: (p.game.defined?.platinum ?? 0) > 0,
+    diasDesdeJugado: p.diasDesdeJugado,
+    horasRestantes: p.horasRestantes,
+  });
 
   return jsonConEtag(req, {
     nearPlatinum: nearPlatinum.map(toCard),
+    platinables: { cerca: listas.cerca.map(aFila), jugando: listas.jugando.map(aFila) },
     recent: recent.map(toCard),
     nextTrophies: recomendaciones.map((r) => ({
       gameId: r.gameId,

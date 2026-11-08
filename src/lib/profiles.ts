@@ -1046,6 +1046,9 @@ export const getLibrary = cache(
     publisher: r.publisher ?? undefined,
     genres: r.genres ?? undefined,
     pegi: r.pegi ?? undefined,
+    // Se leía y no se pasaba (8 nov 2026): sin esto, «¿qué me platino con X horas?»
+    // y las horas que quedan en «A un paso del platino» no tenían datos.
+    hltb: r.hltb ?? undefined,
     igdbId: r.igdbId,
     platinumRarity: r.platinumRarity ?? undefined,
     steamTrophyXp: steamXpPorJuego.get(r.id),

@@ -300,7 +300,20 @@
     "lecturas": "Letture",
     "cabinaPie": "{n, plural, =0 {Tutti i moduli in vista} one {# modulo nascosto} other {# moduli nascosti}}",
     "cabinaPieAccion": "Scegli quali moduli vedere",
-    "descargarPng": "Scarica immagine (PNG)"
+    "descargarPng": "Scarica immagine (PNG)",
+    "platinables": {
+      "cerca": "I più vicini",
+      "jugando": "Quello che giochi ora",
+      "descCerca": "Quello che ti manca di meno, per trofei mancanti. Su Steam e Xbox conta il 100%.",
+      "descJugando": "Quello che hai giocato negli ultimi due mesi e puoi platinare, il più avanzato prima.",
+      "vacio": "Niente di quello che hai giocato negli ultimi due mesi è a metà strada.",
+      "verMas": "Mostra altri {n}",
+      "verMenos": "Mostra meno",
+      "faltan": "{count, plural, one {Manca # trofeo} other {Mancano # trofei}}",
+      "faltanCien": "{count, plural, one {# obiettivo al 100%} other {# obiettivi al 100%}}",
+      "jugado": "{count, plural, =0 {giocato oggi} one {giocato ieri} other {giocato # giorni fa}}",
+      "horas": "~{n} h"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Profilo di esempio",

@@ -286,6 +286,14 @@ fun PanelScreen(
                         fila()
                     }
                 }
+                // Qué te puedes platinar: lo más cerca y lo que juegas ahora (8 nov 2026).
+                ok?.platinables?.let { datos ->
+                    SeccionPlatinables(
+                        datos = datos,
+                        onAbrir = { id -> navController.navigate(Screen.GameDetail.routeFor(id)) },
+                        onVerTodo = { onBiblioteca() },
+                    )
+                }
                 (highlights as? HighlightsResult.Error)?.let { e ->
                     Row(Modifier.padding(horizontal = 24.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(text = e.message, color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))

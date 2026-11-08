@@ -300,7 +300,20 @@
     "lecturas": "Readouts",
     "cabinaPie": "{n, plural, =0 {Every module on display} one {# module hidden} other {# modules hidden}}",
     "cabinaPieAccion": "Choose which modules you see",
-    "descargarPng": "Download image (PNG)"
+    "descargarPng": "Download image (PNG)",
+    "platinables": {
+      "cerca": "Closest",
+      "jugando": "What you're playing",
+      "descCerca": "What you have least left, by pending trophies. On Steam and Xbox, 100% counts.",
+      "descJugando": "What you've played in the last two months and can platinum, most advanced first.",
+      "vacio": "Nothing you've touched in the last two months is halfway there.",
+      "verMas": "Show {n} more",
+      "verMenos": "Show less",
+      "faltan": "{count, plural, one {# trophy left} other {# trophies left}}",
+      "faltanCien": "{count, plural, one {# achievement to 100%} other {# achievements to 100%}}",
+      "jugado": "{count, plural, =0 {played today} one {played yesterday} other {played # days ago}}",
+      "horas": "~{n} h"
+    }
   },
   "Ejemplo": {
     "perfilDeEjemplo": "Sample profile",

@@ -787,6 +787,20 @@
     <string name="plan_siguiente">Ora tocca a</string>
     <string name="plan_titulo">Piano per il platino</string>
     <string name="plan_y_mas">e altri %1$s</string>
+    <string name="plat_ayer">giocato ieri</string>
+    <string name="plat_cerca">I più vicini</string>
+    <string name="plat_desc_cerca" formatted="false">Quello che ti manca di meno. Su Steam e Xbox conta il 100%.</string>
+    <string name="plat_desc_jugando">Quello che hai giocato negli ultimi due mesi e puoi platinare.</string>
+    <string name="plat_faltan">Ne mancano %1$s</string>
+    <string name="plat_faltan_cien">%1$s al 100%%</string>
+    <string name="plat_hace">%1$s giorni fa</string>
+    <string name="plat_horas">~%1$s h</string>
+    <string name="plat_hoy">giocato oggi</string>
+    <string name="plat_jugando">In corso</string>
+    <string name="plat_titulo">A un passo dal platino</string>
+    <string name="plat_vacio">Niente di quello che hai giocato in questi due mesi è a metà strada.</string>
+    <string name="plat_ver_mas">Mostra altri %1$s</string>
+    <string name="plat_ver_menos">Mostra meno</string>
     <string name="precio_alerta_activa">Ti avvisiamo sotto %1$s</string>
     <string name="precio_alerta_campo">Prezzo obiettivo (€)</string>
     <string name="precio_alerta_error">Inserisci un prezzo tra 0,01 e 999 €.</string>

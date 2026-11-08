@@ -122,6 +122,7 @@ sealed class HighlightsResult {
         val recent: List<GameProgress>,
         val nextTrophies: List<NextTrophy> = emptyList(),
         val latestTrophies: List<LatestTrophy> = emptyList(),
+        val platinables: com.paragon.shared.red.PlatinablesDto = com.paragon.shared.red.PlatinablesDto(),
     ) : HighlightsResult()
     data class Error(val message: String) : HighlightsResult()
 }
@@ -271,6 +272,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 recent = response.recent.map { it.toGameProgress() },
                 nextTrophies = response.nextTrophies.map { it.toNextTrophy() },
                 latestTrophies = response.latestTrophies.map { it.toLatestTrophy() },
+                platinables = response.platinables,
             )
         } catch (e: HttpException) {
             HighlightsResult.Error(Textos.t(T.error_servidor, e.code()))

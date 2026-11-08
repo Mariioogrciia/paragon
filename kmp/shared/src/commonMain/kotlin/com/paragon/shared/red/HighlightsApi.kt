@@ -59,7 +59,25 @@ data class HighlightsResponse(
     // PanelRepository en vez de mostrar la sección vacía sin más.
     val nextTrophies: List<NextTrophyDto> = emptyList(),
     val latestTrophies: List<LatestTrophyDto> = emptyList(),
+    /** Qué te puedes platinar (8 nov 2026, lib/platinables.ts): lo más cerca y lo que juegas ahora. */
+    val platinables: PlatinablesDto = PlatinablesDto(),
 )
+
+@Serializable
+data class PlatinableDto(
+    val id: String,
+    val title: String,
+    val coverUrl: String = "",
+    val percent: Int = 0,
+    val faltan: Int = 0,
+    /** Sin platino (Steam, Xbox…) el objetivo es el 100 %. */
+    val tienePlatino: Boolean = true,
+    val diasDesdeJugado: Int? = null,
+    val horasRestantes: Int? = null,
+)
+
+@Serializable
+data class PlatinablesDto(val cerca: List<PlatinableDto> = emptyList(), val jugando: List<PlatinableDto> = emptyList())
 
 class HighlightsApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/panel/highlights/route.ts en el proyecto Next.js. */

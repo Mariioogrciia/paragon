@@ -8494,5 +8494,117 @@
   "fr": "Badges",
   "it": "Badge",
   "pt": "Insígnias"
+ },
+ "plat_titulo": {
+  "es": "A un paso del platino",
+  "en": "One step from platinum",
+  "de": "Kurz vor Platin",
+  "fr": "À un pas du platine",
+  "it": "A un passo dal platino",
+  "pt": "A um passo da platina"
+ },
+ "plat_cerca": {
+  "es": "Más cerca",
+  "en": "Closest",
+  "de": "Am nächsten",
+  "fr": "Les plus proches",
+  "it": "I più vicini",
+  "pt": "Mais perto"
+ },
+ "plat_jugando": {
+  "es": "Jugando ahora",
+  "en": "Playing now",
+  "de": "Gerade gespielt",
+  "fr": "En cours",
+  "it": "In corso",
+  "pt": "A jogar agora"
+ },
+ "plat_desc_cerca": {
+  "es": "Lo que menos te queda. En Steam y Xbox cuenta el 100 %.",
+  "en": "What you have least left. On Steam and Xbox, 100% counts.",
+  "de": "Wo dir am wenigsten fehlt. Bei Steam und Xbox zählen 100 %.",
+  "fr": "Ce qu'il te reste le moins. Sur Steam et Xbox, c'est le 100 %.",
+  "it": "Quello che ti manca di meno. Su Steam e Xbox conta il 100%.",
+  "pt": "O que te falta menos. No Steam e Xbox conta o 100 %."
+ },
+ "plat_desc_jugando": {
+  "es": "Lo que has jugado en los últimos dos meses y te puedes platinar.",
+  "en": "What you've played in the last two months and can platinum.",
+  "de": "Was du in den letzten zwei Monaten gespielt hast und platinieren kannst.",
+  "fr": "Ce que tu as joué ces deux derniers mois et que tu peux platiner.",
+  "it": "Quello che hai giocato negli ultimi due mesi e puoi platinare.",
+  "pt": "O que jogaste nos últimos dois meses e podes platinar."
+ },
+ "plat_vacio": {
+  "es": "Nada de lo que has jugado estos dos meses está a mitad de camino.",
+  "en": "Nothing you've played in these two months is halfway there.",
+  "de": "Nichts aus den letzten zwei Monaten ist halb fertig.",
+  "fr": "Rien de ce que tu as joué ces deux mois n'est à mi-chemin.",
+  "it": "Niente di quello che hai giocato in questi due mesi è a metà strada.",
+  "pt": "Nada do que jogaste nestes dois meses está a meio caminho."
+ },
+ "plat_faltan": {
+  "es": "Faltan {0}",
+  "en": "{0} left",
+  "de": "Noch {0}",
+  "fr": "Encore {0}",
+  "it": "Ne mancano {0}",
+  "pt": "Faltam {0}"
+ },
+ "plat_faltan_cien": {
+  "es": "{0} para el 100 %",
+  "en": "{0} to 100%",
+  "de": "{0} bis 100 %",
+  "fr": "{0} pour le 100 %",
+  "it": "{0} al 100%",
+  "pt": "{0} para os 100 %"
+ },
+ "plat_hoy": {
+  "es": "jugado hoy",
+  "en": "played today",
+  "de": "heute gespielt",
+  "fr": "joué aujourd'hui",
+  "it": "giocato oggi",
+  "pt": "jogado hoje"
+ },
+ "plat_ayer": {
+  "es": "jugado ayer",
+  "en": "played yesterday",
+  "de": "gestern gespielt",
+  "fr": "joué hier",
+  "it": "giocato ieri",
+  "pt": "jogado ontem"
+ },
+ "plat_hace": {
+  "es": "hace {0} días",
+  "en": "{0} days ago",
+  "de": "vor {0} Tagen",
+  "fr": "il y a {0} jours",
+  "it": "{0} giorni fa",
+  "pt": "há {0} dias"
+ },
+ "plat_horas": {
+  "es": "~{0} h",
+  "en": "~{0} h",
+  "de": "~{0} Std.",
+  "fr": "~{0} h",
+  "it": "~{0} h",
+  "pt": "~{0} h"
+ },
+ "plat_ver_mas": {
+  "es": "Ver {0} más",
+  "en": "Show {0} more",
+  "de": "{0} weitere",
+  "fr": "Voir {0} de plus",
+  "it": "Mostra altri {0}",
+  "pt": "Ver mais {0}"
+ },
+ "plat_ver_menos": {
+  "es": "Ver menos",
+  "en": "Show less",
+  "de": "Weniger",
+  "fr": "Voir moins",
+  "it": "Mostra meno",
+  "pt": "Ver menos"
  }
 }

@@ -787,6 +787,20 @@
     <string name="plan_siguiente">À faire maintenant</string>
     <string name="plan_titulo">Plan de platine</string>
     <string name="plan_y_mas">et %1$s de plus</string>
+    <string name="plat_ayer">joué hier</string>
+    <string name="plat_cerca">Les plus proches</string>
+    <string name="plat_desc_cerca" formatted="false">Ce qu\'il te reste le moins. Sur Steam et Xbox, c\'est le 100 %.</string>
+    <string name="plat_desc_jugando">Ce que tu as joué ces deux derniers mois et que tu peux platiner.</string>
+    <string name="plat_faltan">Encore %1$s</string>
+    <string name="plat_faltan_cien">%1$s pour le 100 %%</string>
+    <string name="plat_hace">il y a %1$s jours</string>
+    <string name="plat_horas">~%1$s h</string>
+    <string name="plat_hoy">joué aujourd\'hui</string>
+    <string name="plat_jugando">En cours</string>
+    <string name="plat_titulo">À un pas du platine</string>
+    <string name="plat_vacio">Rien de ce que tu as joué ces deux mois n\'est à mi-chemin.</string>
+    <string name="plat_ver_mas">Voir %1$s de plus</string>
+    <string name="plat_ver_menos">Voir moins</string>
     <string name="precio_alerta_activa">On te prévient sous %1$s</string>
     <string name="precio_alerta_campo">Prix visé (€)</string>
     <string name="precio_alerta_error">Indique un prix entre 0,01 et 999 €.</string>

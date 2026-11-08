@@ -9,6 +9,8 @@ import { TrophyIcon } from "@/components/TrophyIcon";
 import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
+import { platinables, type Platinable } from "@/lib/platinables";
+import { PlatinablesPanel, type FilaPlatinable } from "@/components/PlatinablesPanel";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
 import { UpcomingGames } from "@/components/UpcomingGames";
@@ -96,11 +98,23 @@ async function Inicio() {
   const UMBRAL_ATASCO = 5;
   const mostrarAtasco = juegoAnclado && diasAtascado !== null && diasAtascado >= UMBRAL_ATASCO;
 
-  const nearPlatinum = games
-    .map((g) => ({ game: g, progress: gameProgress(g) }))
-    .filter((g) => g.progress.hasPlatinum && !g.progress.platinumEarned)
-    .sort((a, b) => a.progress.total - a.progress.earned - (b.progress.total - b.progress.earned))
-    .slice(0, 3);
+  // Qué te puedes platinar (8 nov 2026, lib/platinables.ts): lo que menos te
+  // queda y lo que estás jugando, también Steam/Xbox (al 100 %). La tarjeta
+  // grande es el primero de "más cerca"; la lista va debajo con pestañas.
+  const listas = platinables(games);
+  const nearPlatinum = listas.cerca.slice(0, 1).map((p) => ({ game: p.game, progress: gameProgress(p.game) }));
+  const fila = (p: Platinable): FilaPlatinable => ({
+    id: p.game.id,
+    titulo: p.game.title,
+    iconUrl: p.game.iconUrl ?? null,
+    percent: p.percent,
+    href: `/u/${profile.handle}/${p.game.id}`,
+    faltan: (p.game.defined?.platinum ?? 0) > 0 ? t("platinables.faltan", { count: p.faltan }) : t("platinables.faltanCien", { count: p.faltan }),
+    extra: [
+      ...(p.diasDesdeJugado !== null && p.diasDesdeJugado <= 365 ? [t("platinables.jugado", { count: p.diasDesdeJugado })] : []),
+      ...(p.horasRestantes ? [t("platinables.horas", { n: p.horasRestantes })] : []),
+    ],
+  });
 
   // Lo contrario de "a un paso": empezados y parados hace más de un año
   // (mismo umbral que el filtro "Abandonados" de la biblioteca). Sin esto,
@@ -113,13 +127,11 @@ async function Inicio() {
 
   const now = new Date().getTime();
 
-  const nearPlatinumSection = nearPlatinum.length > 0 && (
+  const nearPlatinumSection = (listas.cerca.length > 0 || listas.jugando.length > 0) && (
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
         <h2 className="font-heading text-2xl font-bold">{t("aUnPasoDelPlatino")}</h2>
-        <p className="text-[0.8125rem] text-muted">
-          {t("loQueMenosTeQueda")}
-        </p>
+
         <Link
           href={`/u/${profile.handle}/biblioteca?estado=a-punto`}
           className="ml-auto text-xs font-bold uppercase tracking-wide text-accent hover:underline"
@@ -129,6 +141,7 @@ async function Inicio() {
       </div>
 
       <div className="grid gap-4">
+        {nearPlatinum.length > 0 && (<>
         {/* Widget Hero (El Próximo Objetivo Principal) */}
         <TiltCard
           href={`/u/${profile.handle}/${nearPlatinum[0].game.id}`}
@@ -188,54 +201,22 @@ async function Inicio() {
           </div>
         </TiltCard>
 
-        {/* Los demás juegos, si hay, en formato pequeño debajo */}
-        {nearPlatinum.slice(1).length > 0 && (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {nearPlatinum.slice(1).map(({ game, progress }) => (
-              <TiltCard
-                key={game.id}
-                href={`/u/${profile.handle}/${game.id}`}
-                className="group relative block overflow-hidden rounded-[20px] transition-all duration-300 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-              >
-                <div className="relative flex aspect-[21/9] items-end p-4 overflow-hidden">
-                  {/* La carátula NÍTIDA como imagen de fondo — antes esto
-                      llevaba solo una versión desenfocada (blur-2xl) a modo
-                      de decoración, así que la carátula real nunca llegaba a
-                      verse, solo un borrón de color irreconocible. */}
-                  <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={game.iconUrl ? { backgroundImage: `url(${game.iconUrl})` } : { background: coverGradient(game.id) }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
-                  <p
-                    className="font-heading relative z-10 translate-y-1 text-lg font-bold text-foreground transition-transform duration-300 group-hover:translate-y-0"
-                    style={{ textShadow: "0 1px 10px var(--background)" }}
-                  >
-                    {game.title}
-                  </p>
-                </div>
-                <div className="relative z-10 bg-[var(--surface)] p-[14px]">
-                  <div className="flex items-end gap-2.5">
-                    <p className="font-heading text-3xl font-bold leading-[0.9] text-platinum">
-                      {progress.total - progress.earned}
-                    </p>
-                    <p className="pb-1 text-[0.625rem] font-bold uppercase leading-tight tracking-[0.1em] text-muted">
-                      {t("restantes")}
-                    </p>
-                    <span className="ml-auto font-bold text-sm" style={{ color: "var(--accent-text)" }}>{progress.percent}%</span>
-                  </div>
-                  <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-2">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${progress.percent}%`, background: "var(--accent-grad-h)" }}
-                    />
-                  </div>
-                </div>
-              </TiltCard>
-            ))}
-          </div>
-        )}
+        </>)}
+
+        {/* Los demás, con pestañas: más cerca / lo que juegas ahora */}
+        <PlatinablesPanel
+          cerca={listas.cerca.slice(1).map(fila)}
+          jugando={listas.jugando.map(fila)}
+          textos={{
+            cerca: t("platinables.cerca"),
+            jugando: t("platinables.jugando"),
+            descCerca: t("platinables.descCerca"),
+            descJugando: t("platinables.descJugando"),
+            vacioJugando: t("platinables.vacio"),
+            verMas: t("platinables.verMas", { n: "{n}" }),
+            verMenos: t("platinables.verMenos"),
+          }}
+        />
       </div>
     </section>
   );
