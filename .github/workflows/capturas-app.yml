@@ -58,6 +58,8 @@ jobs:
         if: always()
         run: |
           cd capturas-salida
+          # Solo hay imágenes: que Vercel no intente desplegar esta rama.
+          echo '{"git":{"deploymentEnabled":false}}' > vercel.json
           git init -q
           git checkout -q -b capturas-app
           git add -A
