@@ -50,6 +50,7 @@ fun rutaAppDeAviso(rutaWeb: String, miHandle: String?): String? {
             "plataformas" -> Screen.LinkedAccounts.route
             "avisos" -> Screen.PreferenciasAvisos.route
             "apariencia" -> Screen.Apariencia.route
+            "ocultar" -> Screen.Retirados.route
             null -> Screen.Settings.route
             else -> null
         }

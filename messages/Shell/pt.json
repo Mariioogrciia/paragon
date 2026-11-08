@@ -312,7 +312,8 @@
       "faltan": "{count, plural, one {Falta # troféu} other {Faltam # troféus}}",
       "faltanCien": "{count, plural, one {# conquista para os 100 %} other {# conquistas para os 100 %}}",
       "jugado": "{count, plural, =0 {jogado hoje} one {jogado ontem} other {jogado há # dias}}",
-      "horas": "~{n} h"
+      "horas": "~{n} h",
+      "yaNoLoTengo": "Já não o tenho"
     }
   },
   "Ejemplo": {

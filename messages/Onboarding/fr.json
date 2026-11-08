@@ -93,7 +93,15 @@
     "description": "Rien à voir avec la communauté — c'est uniquement pour toi. Retire du menu les fonctions qui ne t'intéressent pas ; elles restent visibles pour tout le monde, toi seul arrêtes de les voir.",
     "panelTitle": "Sections du tableau de bord",
     "panelDescription": "Celles que tu coches n’apparaissent pas (et ne sont pas calculées, ça charge plus vite).",
-    "navTitle": "Menu de navigation"
+    "navTitle": "Menu de navigation",
+    "retiradosTitle": "Ce que tu n'as plus",
+    "retiradosDescription": "Les consoles que tu n'as plus et les jeux que tu masques n'apparaissent plus dans « À un pas du platine », les trophées recommandés ni les suggestions de l'assistant. Ils comptent toujours dans ton historique.",
+    "retiradosConsolas": "Consoles (décoche celles que tu n'as plus)",
+    "retiradosJuegos": "Jeux masqués",
+    "retiradosVolver": "Réafficher",
+    "retiradosNinguno": "Tu n'as masqué aucun jeu. Tu peux le faire avec « Je ne l'ai plus » dans « À un pas du platine ».",
+    "retiradosNJuegos": "{n} jeux",
+    "retiradosNJuego": "{n} jeu"
   },
   "ajustesPlataformas": {
     "title": "Comptes de jeu",

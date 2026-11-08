@@ -312,7 +312,8 @@
       "faltan": "{count, plural, one {# trophy left} other {# trophies left}}",
       "faltanCien": "{count, plural, one {# achievement to 100%} other {# achievements to 100%}}",
       "jugado": "{count, plural, =0 {played today} one {played yesterday} other {played # days ago}}",
-      "horas": "~{n} h"
+      "horas": "~{n} h",
+      "yaNoLoTengo": "I don't have it anymore"
     }
   },
   "Ejemplo": {

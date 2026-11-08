@@ -2,6 +2,8 @@ import { getMobileUserId } from "@/lib/mobileAuth";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { platinables, type Platinable } from "@/lib/platinables";
+import { getRetirados } from "@/lib/retirados";
+import { sinRetirados } from "@/lib/retiradosReglas";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { ultimosTrofeos } from "@/lib/history";
@@ -63,7 +65,7 @@ export async function GET(req: Request) {
   // Qué te puedes platinar (8 nov 2026, lib/platinables.ts): las dos listas
   // de la web. `nearPlatinum` se queda (los 3 primeros) para las versiones
   // de la app que aún no conocen `platinables`.
-  const listas = platinables(games);
+  const listas = platinables(sinRetirados(games, await getRetirados(userId)));
   const nearPlatinum = listas.cerca.slice(0, 3).map((p) => p.game);
   const aFila = (p: Platinable) => ({
     ...toCard(p.game),

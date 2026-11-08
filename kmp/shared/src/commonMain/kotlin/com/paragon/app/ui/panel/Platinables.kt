@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -61,18 +65,22 @@ private fun extras(p: PlatinableDto): List<String> = listOfNotNull(
  * enseñaba el primero, dentro de «Para hoy».
  */
 @Composable
-fun SeccionPlatinables(datos: PlatinablesDto, onAbrir: (String) -> Unit, onVerTodo: () -> Unit) {
-    if (datos.cerca.isEmpty() && datos.jugando.isEmpty()) return
-    var pestana by remember { mutableIntStateOf(if (datos.cerca.isNotEmpty()) 0 else 1) }
+fun SeccionPlatinables(datos: PlatinablesDto, onAbrir: (String) -> Unit, onVerTodo: () -> Unit, onRetirar: (String) -> Unit = {}) {
+    // "Ya no lo tengo" (lib/retirados.ts): desaparece al momento de las dos listas.
+    var quitados by remember { mutableStateOf(emptySet<String>()) }
+    val cerca = datos.cerca.filter { it.id !in quitados }
+    val jugando = datos.jugando.filter { it.id !in quitados }
+    if (cerca.isEmpty() && jugando.isEmpty()) return
+    var pestana by remember { mutableIntStateOf(if (cerca.isNotEmpty()) 0 else 1) }
     var todos by remember { mutableStateOf(false) }
-    val lista = if (pestana == 0) datos.cerca else datos.jugando
+    val lista = if (pestana == 0) cerca else jugando
 
     TituloSeccion(Textos.t(T.plat_titulo), Textos.t(T.inicio_ver_todo)) { onVerTodo() }
     Column(Modifier.padding(horizontal = 20.dp).animateContentSize()) {
         ControlSegmentado(
             opciones = listOf(
-                Textos.t(T.plat_cerca) + " · " + datos.cerca.size,
-                Textos.t(T.plat_jugando) + " · " + datos.jugando.size,
+                Textos.t(T.plat_cerca) + " · " + cerca.size,
+                Textos.t(T.plat_jugando) + " · " + jugando.size,
             ),
             seleccion = pestana,
             onCambio = { pestana = it; todos = false },
@@ -91,7 +99,7 @@ fun SeccionPlatinables(datos: PlatinablesDto, onAbrir: (String) -> Unit, onVerTo
                 val visibles = if (todos) lista else lista.take(VISIBLES)
                 visibles.forEachIndexed { i, p ->
                     if (i > 0) SeparadorFila()
-                    FilaPlatinable(p) { onAbrir(p.id) }
+                    FilaPlatinable(p, onRetirar = { quitados = quitados + p.id; onRetirar(p.id) }) { onAbrir(p.id) }
                 }
             }
             if (lista.size > VISIBLES) {
@@ -109,7 +117,7 @@ fun SeccionPlatinables(datos: PlatinablesDto, onAbrir: (String) -> Unit, onVerTo
 }
 
 @Composable
-private fun FilaPlatinable(p: PlatinableDto, onClick: () -> Unit) {
+private fun FilaPlatinable(p: PlatinableDto, onRetirar: () -> Unit, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -134,5 +142,8 @@ private fun FilaPlatinable(p: PlatinableDto, onClick: () -> Unit) {
             }
         }
         Text("${p.percent}%", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        IconButton(onClick = onRetirar, modifier = Modifier.size(36.dp)) {
+            Icon(Icons.Default.Close, contentDescription = Textos.t(T.retirados_ya_no), tint = Muted, modifier = Modifier.size(16.dp))
+        }
     }
 }

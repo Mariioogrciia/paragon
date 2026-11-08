@@ -5,6 +5,8 @@ import { gameTrophies, games, userGames, userTrophies } from "@/db/schema";
 import type { TrophyGrade } from "@/lib/types";
 import { traduccionesEnCache } from "@/lib/trofeosIdioma";
 import type { Idioma } from "@/lib/idiomasTrofeo";
+import { getRetirados } from "@/lib/retirados";
+import { juegoRetirado } from "@/lib/retiradosReglas";
 
 export interface TrophyRecommendation {
   gameId: string;
@@ -22,10 +24,11 @@ export interface TrophyRecommendation {
 }
 
 export async function getTrophyRecommendations(userId: string, limit = 6, idioma?: Idioma): Promise<TrophyRecommendation[]> {
-  const rows = await db
+  const filas = await db
     .select({
       gameId: userTrophies.gameId,
       gameTitle: games.title,
+      deviceLabel: games.deviceLabel,
       trophyId: userTrophies.trophyId,
       trophyName: gameTrophies.name,
       detail: gameTrophies.detail,
@@ -49,12 +52,15 @@ export async function getTrophyRecommendations(userId: string, limit = 6, idioma
       desc(userTrophies.rarityPercent),
       asc(userTrophies.earnedAt),
     )
-    .limit(limit);
+    // De más: luego se quitan los de consolas o juegos que ya no tienes (lib/retirados.ts).
+    .limit(limit * 4);
+  const retirado = await getRetirados(userId);
+  const rows = filas.filter((f) => !juegoRetirado({ id: f.gameId, deviceLabel: f.deviceLabel }, retirado)).slice(0, limit);
 
   // Solo lo ya guardado: la traducción se trae al abrir la ficha del juego (lib/trofeosIdioma.ts).
   const tr = idioma ? await traduccionesEnCache(rows.map((r) => ({ gameId: r.gameId, trophyId: r.trophyId })), idioma).catch(() => null) : null;
 
-  return rows.map((row) => {
+  return rows.map(({ deviceLabel: _consola, ...row }) => {
     const t = tr?.get(`${row.gameId}:${row.trophyId}`);
     return {
       ...row,

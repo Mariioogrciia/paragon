@@ -65,6 +65,7 @@ pantalla 22-preferencias-avisos /ajustes/avisos 2
 pantalla 23-preguntar /preguntar
 tocar "fin|weekend"; foto 23-preguntar-respuesta 3
 pantalla 24-comparar /comparar/nerea 2
+pantalla 25-retirados /ajustes/ocultar
 
 # Tema oscuro (el del sistema) y otra pasada por las principales.
 adb shell cmd uimode night yes; sleep 3

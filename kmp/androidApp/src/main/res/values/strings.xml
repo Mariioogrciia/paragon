@@ -840,6 +840,15 @@
     <string name="rapidos_titulo">Platinos más rápidos</string>
     <string name="recordatorio_racha">Llevas %1$s días seguidos con trofeo. Saca uno hoy para no perderla.</string>
     <string name="recordatorio_racha_titulo">🔥 ¡Tu racha sigue viva!</string>
+    <string name="retirados_consolas">Consolas (apaga las que ya no tienes)</string>
+    <string name="retirados_fila_sub">Consolas y juegos que no salen en las sugerencias</string>
+    <string name="retirados_juegos">Juegos ocultos</string>
+    <string name="retirados_n_juegos">%1$s juegos</string>
+    <string name="retirados_ninguno">No has ocultado ningún juego. Toca la × de uno en «A un paso del platino».</string>
+    <string name="retirados_sub">No sale en «A un paso del platino» ni en las recomendaciones. Sigue contando en tu historial.</string>
+    <string name="retirados_titulo">Lo que ya no tienes</string>
+    <string name="retirados_volver">Volver a mostrar</string>
+    <string name="retirados_ya_no">Ya no lo tengo</string>
     <string name="ritmo_comparar_con">Comparar con</string>
     <string name="ritmo_dia_a_dia">Día a día</string>
     <string name="ritmo_empate">Empate</string>

@@ -62,6 +62,8 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
 
 export interface Contexto {
   games: Game[];
+  /** Los mismos sin consolas ni juegos que ya no tienes (lib/retirados.ts): para sugerir qué jugar. */
+  jugables?: Game[];
   nivel: number;
   racha: { actual: number; mejor: number };
 }
@@ -117,7 +119,7 @@ export function ejecutarHerramienta(nombre: string, entrada: unknown, ctx: Conte
     case "sugerir_por_tiempo": {
       const horas = typeof e.horas === "number" && e.horas > 0 ? Math.min(e.horas, 24) : 1;
       const genero = CATEGORIAS_GENERO.some((c) => c.key === e.genero) ? (e.genero as CategoriaDna) : undefined;
-      const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(ctx.games, horas, genero);
+      const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(ctx.jugables ?? ctx.games, horas, genero);
       const corta = (s: { gameId: string; titulo: string; motivo: string; trofeosRestantes: number }) => ({ id: s.gameId, titulo: s.titulo, motivo: s.motivo, faltan: s.trofeosRestantes });
       return { contenido: JSON.stringify({ victoriasRapidas: victoriasRapidas.slice(0, 5).map(corta), paraProfundizar: paraProfundizar.slice(0, 5).map(corta) }), error: false };
     }

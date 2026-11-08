@@ -477,6 +477,7 @@ fun MainScreen(
                     onNavigateToLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                     onNavigateToApariencia = { navController.navigate(Screen.Apariencia.route) },
                     onNavigateToAvisos = { navController.navigate(Screen.PreferenciasAvisos.route) },
+                    onNavigateToRetirados = { navController.navigate(Screen.Retirados.route) },
                     onLogout = {
                         coroutineScope.launch {
                             // Común: el servidor desasocia el token de push (va en el
@@ -510,6 +511,10 @@ fun MainScreen(
                     onBack = { navController.popBackStack() },
                     onAbrirJuego = { g -> navController.navigate(Screen.GameDetail.routeFor(g)) },
                 )
+            }
+
+            composable(Screen.Retirados.route) {
+                com.paragon.app.ui.settings.RetiradosScreen(tokenStore, onBack = { navController.popBackStack() })
             }
 
             composable(Screen.Preguntar.route) {

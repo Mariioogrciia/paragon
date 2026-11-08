@@ -1,7 +1,8 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- carátulas de CDNs externos (PSN, Steam...), como en el resto del panel */
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { cambiarRetiradoAction } from "@/app/actions/retirados";
 import Link from "@/components/Enlace";
 import { coverGradient } from "@/lib/design";
 
@@ -29,11 +30,18 @@ export function PlatinablesPanel({
 }: {
   cerca: FilaPlatinable[];
   jugando: FilaPlatinable[];
-  textos: { cerca: string; jugando: string; descCerca: string; descJugando: string; vacioJugando: string; verMas: string; verMenos: string };
+  textos: { cerca: string; jugando: string; descCerca: string; descJugando: string; vacioJugando: string; verMas: string; verMenos: string; yaNoLoTengo: string };
 }) {
+  // "Ya no lo tengo" (lib/retirados.ts): desaparece al momento de las dos listas.
+  const [quitados, setQuitados] = useState<Set<string>>(() => new Set());
+  const [, empezar] = useTransition();
+  const retirar = (id: string) => {
+    setQuitados((s) => new Set(s).add(id));
+    empezar(() => void cambiarRetiradoAction("juego", id, true));
+  };
   const [pestana, setPestana] = useState<"cerca" | "jugando">(cerca.length > 0 ? "cerca" : "jugando");
   const [todos, setTodos] = useState(false);
-  const lista = pestana === "cerca" ? cerca : jugando;
+  const lista = (pestana === "cerca" ? cerca : jugando).filter((j) => !quitados.has(j.id));
   const visibles = todos ? lista : lista.slice(0, 6);
 
   return (
@@ -55,7 +63,7 @@ export function PlatinablesPanel({
                 : { background: "var(--surface)", color: "var(--muted)", border: "1px solid var(--border)" }
             }
           >
-            {p === "cerca" ? textos.cerca : textos.jugando} · {(p === "cerca" ? cerca : jugando).length}
+            {p === "cerca" ? textos.cerca : textos.jugando} · {(p === "cerca" ? cerca : jugando).filter((j) => !quitados.has(j.id)).length}
           </button>
         ))}
       </div>
@@ -66,7 +74,16 @@ export function PlatinablesPanel({
       ) : (
         <ul className="grid gap-2.5 sm:grid-cols-2">
           {visibles.map((j) => (
-            <li key={j.id}>
+            <li key={j.id} className="group/fila relative">
+              <button
+                type="button"
+                onClick={() => retirar(j.id)}
+                title={textos.yaNoLoTengo}
+                aria-label={`${textos.yaNoLoTengo}: ${j.titulo}`}
+                className="absolute right-1.5 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full text-sm text-muted opacity-60 transition-opacity hover:bg-surface-2 hover:text-foreground hover:opacity-100 sm:opacity-0 sm:group-hover/fila:opacity-100"
+              >
+                ×
+              </button>
               <Link
                 href={j.href}
                 className="group flex items-center gap-3 rounded-[14px] p-2.5 transition-colors hover:bg-surface-2"

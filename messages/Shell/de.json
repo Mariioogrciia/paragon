@@ -312,7 +312,8 @@
       "faltan": "{count, plural, one {Noch # Trophäe} other {Noch # Trophäen}}",
       "faltanCien": "{count, plural, one {# Erfolg bis 100 %} other {# Erfolge bis 100 %}}",
       "jugado": "{count, plural, =0 {heute gespielt} one {gestern gespielt} other {vor # Tagen gespielt}}",
-      "horas": "~{n} Std."
+      "horas": "~{n} Std.",
+      "yaNoLoTengo": "Hab ich nicht mehr"
     }
   },
   "Ejemplo": {

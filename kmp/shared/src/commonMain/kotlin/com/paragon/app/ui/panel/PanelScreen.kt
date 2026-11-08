@@ -102,6 +102,7 @@ fun PanelScreen(
     // Contador de la campana (16 oct 2026): al entrar en Inicio y cada minuto
     // mientras sigue a la vista.
     var avisosSinLeer by remember { mutableIntStateOf(0) }
+    val ambitoPanel = androidx.compose.runtime.rememberCoroutineScope()
     // Solo con la app a la vista (6 nov 2026): antes seguía preguntando cada
     // minuto en segundo plano, mientras Android no cerrara la actividad.
     val ciclo = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
@@ -292,6 +293,18 @@ fun PanelScreen(
                         datos = datos,
                         onAbrir = { id -> navController.navigate(Screen.GameDetail.routeFor(id)) },
                         onVerTodo = { onBiblioteca() },
+                        onRetirar = { id ->
+                            ambitoPanel.launch {
+                                try {
+                                    com.paragon.app.data.network.ApiClient.retiradosApi(tokenStore)
+                                        .cambiar(com.paragon.shared.red.CambiarRetiradoRequest("juego", id, true))
+                                } catch (e: kotlinx.coroutines.CancellationException) {
+                                    throw e
+                                } catch (_: Exception) {
+                                    // Sin red: vuelve a salir en la próxima carga; no hay nada que avisar.
+                                }
+                            }
+                        },
                     )
                 }
                 (highlights as? HighlightsResult.Error)?.let { e ->

@@ -67,3 +67,23 @@ class NovedadesApi internal constructor(private val c: ClienteParagon) {
     suspend fun cambiarCanales(cuerpo: CambiarCanalesRequest): CanalesAvisosDto =
         c.http.patch("api/mobile/avisos/canales") { json(cuerpo) }.body()
 }
+
+/** Lo que ya no tienes (api/mobile/retirados, 8 nov 2026). */
+@Serializable
+data class ConsolaRetiradaDto(val dispositivo: String, val juegos: Int = 0, val retirado: Boolean = false)
+
+@Serializable
+data class JuegoRetiradoDto(val id: String, val titulo: String, val iconUrl: String? = null)
+
+@Serializable
+data class RetiradosDto(val consolas: List<ConsolaRetiradaDto> = emptyList(), val juegos: List<JuegoRetiradoDto> = emptyList())
+
+@Serializable
+data class CambiarRetiradoRequest(val tipo: String, val valor: String, val retirado: Boolean)
+
+class RetiradosApi internal constructor(private val c: ClienteParagon) {
+    suspend fun get(): RetiradosDto = c.http.get("api/mobile/retirados").body()
+
+    suspend fun cambiar(cuerpo: CambiarRetiradoRequest): RetiradosDto =
+        c.http.put("api/mobile/retirados") { json(cuerpo) }.body()
+}

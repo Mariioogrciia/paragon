@@ -82,6 +82,15 @@ const TABLAS: Record<string, string> = {
       PRIMARY KEY ("userId", "gameId", "trophyId")
     );
     CREATE INDEX IF NOT EXISTS "coleccionable_trofeo_idx" ON "coleccionable_trofeo" ("gameId", "trophyId");`,
+  // Consolas y juegos que ya no tienes (8 nov 2026, lib/retirados.ts).
+  retirado: `
+    CREATE TABLE IF NOT EXISTS "retirado" (
+      "userId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+      "tipo" text NOT NULL,
+      "valor" text NOT NULL,
+      "creadoAt" timestamp NOT NULL DEFAULT now(),
+      PRIMARY KEY ("userId", "tipo", "valor")
+    );`,
 };
 
 async function main() {

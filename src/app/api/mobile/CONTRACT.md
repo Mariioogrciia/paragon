@@ -1166,3 +1166,19 @@ o `{ ok: false, motivo: "inactivo"|"limite"|"rechazo"|"fallo" }`. 4 por minuto, 
 ### `GET|PATCH /api/mobile/avisos/canales`
 Telegram y el correo semanal: `{ telegram: { vinculado, enlace } | null, correoSemanal: boolean | null }`
 (null = el servidor no lo tiene montado). PATCH `{ correoSemanal?, desvincularTelegram? }`.
+
+## Añadido el 8 nov 2026
+
+### `GET /api/mobile/panel/highlights` — `platinables`
+`{ cerca: [...], jugando: [...] }` (lib/platinables.ts), cada uno con
+`id, title, coverUrl, percent, faltan, tienePlatino, diasDesdeJugado, horasRestantes`.
+Sin las consolas y juegos que ya no tienes.
+
+### `GET|PUT /api/mobile/retirados`
+Lo que ya no tienes (lib/retirados.ts): `{ consolas: [{ dispositivo, juegos, retirado }],
+juegos: [{ id, titulo, iconUrl }] }`. PUT `{ tipo: "dispositivo"|"juego", valor, retirado }`.
+
+### Anclar = reservar
+`POST games/{id}/pin` también reserva el juego para tu próximo platino (tus
+platinos + 1) y `POST games/{id}/reserve` también lo ancla. `milestone.proximo.numero`
+es tus platinos + 1 (antes, el siguiente número redondo).

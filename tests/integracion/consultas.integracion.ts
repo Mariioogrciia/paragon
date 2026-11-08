@@ -279,3 +279,19 @@ describe("reservar el próximo platino", () => {
     expect(await estado()).toMatchObject({ reservado: null, anclado: null });
   });
 });
+
+describe("lo que ya no tienes", () => {
+  it("guarda consolas (en mayúsculas) y juegos, y se pueden quitar", async () => {
+    const { cambiarRetirado, getRetirados } = await import("@/lib/retirados");
+    const u = await crearUsuario();
+    await cambiarRetirado(u.id, "dispositivo", "ps3", true);
+    await cambiarRetirado(u.id, "juego", "psn-x", true);
+    await cambiarRetirado(u.id, "juego", "psn-x", true); // dos veces no rompe
+    let r = await getRetirados(u.id);
+    expect([...r.dispositivos]).toEqual(["PS3"]);
+    expect([...r.juegos]).toEqual(["psn-x"]);
+    await cambiarRetirado(u.id, "dispositivo", "PS3", false);
+    r = await getRetirados(u.id);
+    expect(r.dispositivos.size).toBe(0);
+  });
+});

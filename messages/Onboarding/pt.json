@@ -93,7 +93,15 @@
     "description": "Nada de comunidade — isto é só teu. Tira do menu as funções que não te interessam; continuam lá para toda a gente, tu só deixas de as ver.",
     "panelTitle": "Secções do painel",
     "panelDescription": "As que marcares não aparecem no teu painel (nem se calculam, assim carrega mais depressa).",
-    "navTitle": "Menu de navegação"
+    "navTitle": "Menu de navegação",
+    "retiradosTitle": "O que já não tens",
+    "retiradosDescription": "As consolas que já não tens e os jogos que ocultares não aparecem em «A um passo da platina», nos troféus recomendados nem nas sugestões do assistente. Continuam a contar no teu histórico.",
+    "retiradosConsolas": "Consolas (desmarca as que já não tens)",
+    "retiradosJuegos": "Jogos ocultos",
+    "retiradosVolver": "Voltar a mostrar",
+    "retiradosNinguno": "Não ocultaste nenhum jogo. Podes fazê-lo com «Já não o tenho» em «A um passo da platina».",
+    "retiradosNJuegos": "{n} jogos",
+    "retiradosNJuego": "{n} jogo"
   },
   "ajustesPlataformas": {
     "title": "Contas de jogos",

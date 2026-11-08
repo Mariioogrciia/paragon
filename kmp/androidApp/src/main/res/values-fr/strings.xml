@@ -838,6 +838,15 @@
     <string name="rapidos_titulo">Platines les plus rapides</string>
     <string name="recordatorio_racha">Tu as eu un trophée %1$s jours d’affilée. Obtiens-en un aujourd’hui pour ne pas la perdre.</string>
     <string name="recordatorio_racha_titulo">🔥 Ta série est toujours en vie !</string>
+    <string name="retirados_consolas">Consoles (désactive celles que tu n\'as plus)</string>
+    <string name="retirados_fila_sub">Consoles et jeux exclus des suggestions</string>
+    <string name="retirados_juegos">Jeux masqués</string>
+    <string name="retirados_n_juegos">%1$s jeux</string>
+    <string name="retirados_ninguno">Tu n\'as masqué aucun jeu. Touche le × d\'un jeu dans « À un pas du platine ».</string>
+    <string name="retirados_sub">N\'apparaît plus dans « À un pas du platine » ni dans les recommandations. Compte toujours dans ton historique.</string>
+    <string name="retirados_titulo">Ce que tu n\'as plus</string>
+    <string name="retirados_volver">Réafficher</string>
+    <string name="retirados_ya_no">Je ne l\'ai plus</string>
     <string name="ritmo_comparar_con">Comparer avec</string>
     <string name="ritmo_dia_a_dia">Jour par jour</string>
     <string name="ritmo_empate">Égalité</string>

@@ -56,4 +56,5 @@ object ApiClient {
     fun aparienciaApi(tokenStore: TokenStore) = cliente(tokenStore).apariencia
     fun steamApi(tokenStore: TokenStore) = cliente(tokenStore).steam
     fun novedadesApi(tokenStore: TokenStore) = cliente(tokenStore).novedades
+    fun retiradosApi(tokenStore: TokenStore) = cliente(tokenStore).retirados
 }

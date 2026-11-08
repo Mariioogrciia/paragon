@@ -8606,5 +8606,77 @@
   "fr": "Voir moins",
   "it": "Mostra meno",
   "pt": "Ver menos"
+ },
+ "retirados_titulo": {
+  "es": "Lo que ya no tienes",
+  "en": "What you no longer have",
+  "de": "Was du nicht mehr hast",
+  "fr": "Ce que tu n'as plus",
+  "it": "Quello che non hai più",
+  "pt": "O que já não tens"
+ },
+ "retirados_sub": {
+  "es": "No sale en «A un paso del platino» ni en las recomendaciones. Sigue contando en tu historial.",
+  "en": "It won't show in “One step from platinum” or recommendations. It still counts in your history.",
+  "de": "Erscheint nicht bei „Kurz vor Platin“ oder in Empfehlungen. Zählt weiter in deiner Historie.",
+  "fr": "N'apparaît plus dans « À un pas du platine » ni dans les recommandations. Compte toujours dans ton historique.",
+  "it": "Non compare in «A un passo dal platino» né nei consigli. Conta comunque nella tua cronologia.",
+  "pt": "Não aparece em «A um passo da platina» nem nas recomendações. Continua a contar no teu histórico."
+ },
+ "retirados_fila_sub": {
+  "es": "Consolas y juegos que no salen en las sugerencias",
+  "en": "Consoles and games left out of suggestions",
+  "de": "Konsolen und Spiele ohne Vorschläge",
+  "fr": "Consoles et jeux exclus des suggestions",
+  "it": "Console e giochi esclusi dai suggerimenti",
+  "pt": "Consolas e jogos fora das sugestões"
+ },
+ "retirados_consolas": {
+  "es": "Consolas (apaga las que ya no tienes)",
+  "en": "Consoles (turn off the ones you no longer have)",
+  "de": "Konsolen (schalte aus, was du nicht mehr hast)",
+  "fr": "Consoles (désactive celles que tu n'as plus)",
+  "it": "Console (spegni quelle che non hai più)",
+  "pt": "Consolas (desliga as que já não tens)"
+ },
+ "retirados_juegos": {
+  "es": "Juegos ocultos",
+  "en": "Hidden games",
+  "de": "Ausgeblendete Spiele",
+  "fr": "Jeux masqués",
+  "it": "Giochi nascosti",
+  "pt": "Jogos ocultos"
+ },
+ "retirados_volver": {
+  "es": "Volver a mostrar",
+  "en": "Show again",
+  "de": "Wieder anzeigen",
+  "fr": "Réafficher",
+  "it": "Mostra di nuovo",
+  "pt": "Voltar a mostrar"
+ },
+ "retirados_ninguno": {
+  "es": "No has ocultado ningún juego. Toca la × de uno en «A un paso del platino».",
+  "en": "You haven't hidden any game. Tap the × on one in “One step from platinum”.",
+  "de": "Du hast kein Spiel ausgeblendet. Tippe bei „Kurz vor Platin“ auf das ×.",
+  "fr": "Tu n'as masqué aucun jeu. Touche le × d'un jeu dans « À un pas du platine ».",
+  "it": "Non hai nascosto nessun gioco. Tocca la × di uno in «A un passo dal platino».",
+  "pt": "Não ocultaste nenhum jogo. Toca no × de um em «A um passo da platina»."
+ },
+ "retirados_n_juegos": {
+  "es": "{0} juegos",
+  "en": "{0} games",
+  "de": "{0} Spiele",
+  "fr": "{0} jeux",
+  "it": "{0} giochi",
+  "pt": "{0} jogos"
+ },
+ "retirados_ya_no": {
+  "es": "Ya no lo tengo",
+  "en": "I don't have it anymore",
+  "de": "Hab ich nicht mehr",
+  "fr": "Je ne l'ai plus",
+  "it": "Non ce l'ho più",
+  "pt": "Já não o tenho"
  }
 }

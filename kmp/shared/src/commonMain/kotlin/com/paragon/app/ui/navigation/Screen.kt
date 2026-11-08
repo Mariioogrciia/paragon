@@ -56,6 +56,8 @@ sealed class Screen(val route: String, val titleTexto: Texto) {
     }
     /** "Pregúntale a Paragon" (6 nov 2026, ui/asistente). */
     object Preguntar : Screen("preguntar", T.asistente_titulo)
+    /** Consolas y juegos que ya no tienes (8 nov 2026, ui/settings/RetiradosScreen). */
+    object Retirados : Screen("retirados", T.retirados_titulo)
     object SessionDetail : Screen("session/{sesionId}", T.nav_sesiones) {
         fun routeFor(sesionId: String) = "session/$sesionId"
     }

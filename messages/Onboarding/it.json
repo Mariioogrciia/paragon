@@ -93,7 +93,15 @@
     "description": "Niente community — questo è solo tuo. Togli dal menu le funzioni che non ti interessano; restano lì per tutti, tu smetti solo di vederle.",
     "panelTitle": "Sezioni del pannello",
     "panelDescription": "Quelle che selezioni non appaiono nel tuo pannello (e non vengono calcolate, così carica prima).",
-    "navTitle": "Menu di navigazione"
+    "navTitle": "Menu di navigazione",
+    "retiradosTitle": "Quello che non hai più",
+    "retiradosDescription": "Le console che non hai più e i giochi che nascondi non compaiono in «A un passo dal platino», nei trofei consigliati né nei suggerimenti dell'assistente. Contano comunque nella tua cronologia.",
+    "retiradosConsolas": "Console (togli la spunta a quelle che non hai più)",
+    "retiradosJuegos": "Giochi nascosti",
+    "retiradosVolver": "Mostra di nuovo",
+    "retiradosNinguno": "Non hai nascosto nessun gioco. Puoi farlo con «Non ce l'ho più» in «A un passo dal platino».",
+    "retiradosNJuegos": "{n} giochi",
+    "retiradosNJuego": "{n} gioco"
   },
   "ajustesPlataformas": {
     "title": "Account di gioco",

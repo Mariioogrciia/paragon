@@ -1521,3 +1521,22 @@ export const coleccionablesTrofeo = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.gameId, t.trophyId] }), index("coleccionable_trofeo_idx").on(t.gameId, t.trophyId)],
 );
+
+/**
+ * Lo que ya no tienes (8 nov 2026, lib/retirados.ts): consolas enteras
+ * (`tipo = "dispositivo"`, `valor` = "PS3", "PSVITA"…, como en
+ * `games.deviceLabel`) o juegos sueltos (`tipo = "juego"`, `valor` = games.id).
+ * Lo retirado no sale en «A un paso del platino» ni en las recomendaciones.
+ */
+export const retirados = pgTable(
+  "retirado",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tipo: text("tipo").$type<"dispositivo" | "juego">().notNull(),
+    valor: text("valor").notNull(),
+    creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.tipo, t.valor] })],
+);

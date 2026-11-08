@@ -93,7 +93,15 @@
     "description": "Nichts mit der Community zu tun — das ist nur für dich. Entferne Funktionen, die dich nicht interessieren, aus dem Menü; sie bleiben für alle anderen sichtbar, nur du siehst sie nicht mehr.",
     "panelTitle": "Bereiche des Dashboards",
     "panelDescription": "Markierte Bereiche erscheinen nicht im Dashboard (und werden nicht berechnet, es lädt schneller).",
-    "navTitle": "Navigationsmenü"
+    "navTitle": "Navigationsmenü",
+    "retiradosTitle": "Was du nicht mehr hast",
+    "retiradosDescription": "Konsolen, die du nicht mehr hast, und ausgeblendete Spiele erscheinen nicht mehr bei „Kurz vor Platin“, empfohlenen Trophäen oder Vorschlägen des Assistenten. In deiner Historie zählen sie weiter.",
+    "retiradosConsolas": "Konsolen (entferne den Haken bei denen, die du nicht mehr hast)",
+    "retiradosJuegos": "Ausgeblendete Spiele",
+    "retiradosVolver": "Wieder anzeigen",
+    "retiradosNinguno": "Du hast kein Spiel ausgeblendet. Das geht mit „Hab ich nicht mehr“ bei „Kurz vor Platin“.",
+    "retiradosNJuegos": "{n} Spiele",
+    "retiradosNJuego": "{n} Spiel"
   },
   "ajustesPlataformas": {
     "title": "Spielkonten",

@@ -122,6 +122,7 @@ class ClienteParagon(
     val logout by lazy { LogoutApi(this) }
     val milestone by lazy { MilestoneApi(this) }
     val novedades by lazy { NovedadesApi(this) }
+    val retirados by lazy { RetiradosApi(this) }
     val panel by lazy { PanelApi(this) }
     val precios by lazy { PreciosApi(this) }
     val pushToken by lazy { PushTokenApi(this) }

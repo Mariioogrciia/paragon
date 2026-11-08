@@ -2,6 +2,7 @@ package com.paragon.app.ui.settings
 
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Notifications
@@ -54,7 +55,8 @@ fun SettingsScreen(
     onNavigateToLinkedAccounts: () -> Unit,
     onNavigateToApariencia: () -> Unit,
     onNavigateToAvisos: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNavigateToRetirados: () -> Unit = {},
 ) {
     var nameInput by remember { mutableStateOf(profile.name) }
     // Arranca con la misma foto que ya se ve en la web (`profile.image`,
@@ -264,6 +266,13 @@ fun SettingsScreen(
                     icono = Icons.Default.Link,
                     titulo = Textos.t(T.cuentas_titulo),
                     onClick = onNavigateToLinkedAccounts,
+                )
+                com.paragon.app.ui.common.SeparadorFila()
+                com.paragon.app.ui.common.FilaNativa(
+                    icono = Icons.Default.VisibilityOff,
+                    titulo = Textos.t(T.retirados_titulo),
+                    subtitulo = Textos.t(T.retirados_fila_sub),
+                    onClick = onNavigateToRetirados,
                 )
             }
 

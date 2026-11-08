@@ -5,6 +5,10 @@ import { HiddenNavForm } from "@/components/forms/Forms";
 import { PANEL_OCULTABLE, getPanelOculto } from "@/lib/panelPreferences";
 import { setPanelOcultoAction } from "@/app/actions";
 import { getTranslations } from "next-intl/server";
+import { getLibrary, getProfileByUserId } from "@/lib/profiles";
+import { getRetirados } from "@/lib/retirados";
+import { dispositivosDeBiblioteca } from "@/lib/retiradosReglas";
+import { RetiradosForm } from "@/components/RetiradosForm";
 
 export const metadata = { title: "Ocultar · Ajustes · Paragon" };
 
@@ -12,7 +16,16 @@ export default async function AjustesOcultarPage() {
   const session = await auth();
   if (!session?.user) redirect("/entrar");
 
-  const [ocultas, panelOculto] = await Promise.all([getHiddenNavItems(session.user.id), getPanelOculto(session.user.id)]);
+  const [ocultas, panelOculto, perfil, retirados] = await Promise.all([
+    getHiddenNavItems(session.user.id),
+    getPanelOculto(session.user.id),
+    getProfileByUserId(session.user.id),
+    getRetirados(session.user.id),
+  ]);
+  // Lo que ya no tienes (8 nov 2026, lib/retirados.ts): las consolas salen de tu biblioteca.
+  const games = perfil ? (await getLibrary(perfil)).games : [];
+  const consolas = dispositivosDeBiblioteca(games).map((c) => ({ ...c, retirado: retirados.dispositivos.has(c.dispositivo) }));
+  const juegosOcultos = games.filter((g) => retirados.juegos.has(g.id)).map((g) => ({ id: g.id, titulo: g.title }));
   const t = await getTranslations("Onboarding");
 
   // Las claves son la fuente de la verdad (navPreferences.ts/panelPreferences.ts);
@@ -34,6 +47,25 @@ export default async function AjustesOcultarPage() {
         <h2>{t("ajustesOcultar.navTitle")}</h2>
         <HiddenNavForm opciones={navTraducido} ocultas={ocultas} />
       </section>
+
+      {consolas.length > 0 && (
+        <section className="ajustes-grupo">
+          <h2>{t("ajustesOcultar.retiradosTitle")}</h2>
+          <p className="ajustes-ayuda">{t("ajustesOcultar.retiradosDescription")}</p>
+          <RetiradosForm
+            consolas={consolas}
+            juegos={juegosOcultos}
+            textos={{
+              consolas: t("ajustesOcultar.retiradosConsolas"),
+              juegos: t("ajustesOcultar.retiradosJuegos"),
+              volverAMostrar: t("ajustesOcultar.retiradosVolver"),
+              ningunJuego: t("ajustesOcultar.retiradosNinguno"),
+              nJuego: t("ajustesOcultar.retiradosNJuego", { n: "{n}" }),
+              nJuegos: t("ajustesOcultar.retiradosNJuegos", { n: "{n}" }),
+            }}
+          />
+        </section>
+      )}
 
       <section className="ajustes-grupo">
         <h2>{t("ajustesOcultar.panelTitle")}</h2>

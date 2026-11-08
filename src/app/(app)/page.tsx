@@ -10,6 +10,8 @@ import { coverGradient } from "@/lib/design";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { platinables, type Platinable } from "@/lib/platinables";
+import { getRetirados } from "@/lib/retirados";
+import { sinRetirados } from "@/lib/retiradosReglas";
 import { PlatinablesPanel, type FilaPlatinable } from "@/components/PlatinablesPanel";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
@@ -101,7 +103,8 @@ async function Inicio() {
   // Qué te puedes platinar (8 nov 2026, lib/platinables.ts): lo que menos te
   // queda y lo que estás jugando, también Steam/Xbox (al 100 %). La tarjeta
   // grande es el primero de "más cerca"; la lista va debajo con pestañas.
-  const listas = platinables(games);
+  // Sin las consolas y juegos que ya no tienes (Ajustes → Ocultar, lib/retirados.ts).
+  const listas = platinables(sinRetirados(games, await getRetirados(session.user.id)));
   const nearPlatinum = listas.cerca.slice(0, 1).map((p) => ({ game: p.game, progress: gameProgress(p.game) }));
   const fila = (p: Platinable): FilaPlatinable => ({
     id: p.game.id,
@@ -215,6 +218,7 @@ async function Inicio() {
             vacioJugando: t("platinables.vacio"),
             verMas: t("platinables.verMas", { n: "{n}" }),
             verMenos: t("platinables.verMenos"),
+            yaNoLoTengo: t("platinables.yaNoLoTengo"),
           }}
         />
       </div>

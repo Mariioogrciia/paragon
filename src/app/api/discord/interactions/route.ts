@@ -7,6 +7,8 @@ import { acceptLeagueInvite, declineLeagueInvite } from "@/lib/leagues";
 import { apuntarMiembroServidor, miembrosParagonDelServidor, titulosParaAutocompletar } from "@/lib/discordServidor";
 import { platinosAlAlcance, salonDeLaVerguenza } from "@/lib/backlog";
 import { sugerirPorTiempo } from "@/lib/recomendadorTiempo";
+import { getRetirados } from "@/lib/retirados";
+import { sinRetirados } from "@/lib/retiradosReglas";
 import { summarise } from "@/lib/stats";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { rachas } from "@/lib/history";
@@ -198,7 +200,8 @@ async function comandoRuleta(discordUserId: string, minutos: number, genero?: Ca
   if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
 
   const { games } = await getLibrary(profile);
-  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(games, minutos / 60, genero);
+  // Sin lo que ya no tienes (Ajustes → Ocultar, lib/retirados.ts).
+  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(sinRetirados(games, await getRetirados(userId)), minutos / 60, genero);
   const pool = [...victoriasRapidas, ...paraProfundizar];
 
   if (pool.length === 0) {
@@ -236,7 +239,8 @@ async function comandoHoy(discordUserId: string, minutos: number, genero?: Categ
   if (!profile) return mensaje("No encuentro tu perfil de Paragon.");
 
   const { games } = await getLibrary(profile);
-  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(games, minutos / 60, genero);
+  // Sin lo que ya no tienes (Ajustes → Ocultar, lib/retirados.ts).
+  const { victoriasRapidas, paraProfundizar } = sugerirPorTiempo(sinRetirados(games, await getRetirados(userId)), minutos / 60, genero);
 
   if (victoriasRapidas.length === 0 && paraProfundizar.length === 0) {
     return mensaje(

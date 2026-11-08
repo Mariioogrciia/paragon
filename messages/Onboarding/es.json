@@ -93,7 +93,15 @@
     "description": "Nada de comunidad — esto es solo tuyo. Quita del menú las funciones que no te interesen; siguen ahí para todo el mundo, tú solo dejas de verlas.",
     "panelTitle": "Secciones del panel",
     "panelDescription": "Las que marques no salen en tu panel (ni se calculan, así carga antes).",
-    "navTitle": "Menú de navegación"
+    "navTitle": "Menú de navegación",
+    "retiradosTitle": "Lo que ya no tienes",
+    "retiradosDescription": "Las consolas que ya no tienes y los juegos que ocultes no salen en «A un paso del platino», en los trofeos recomendados ni en las sugerencias del asistente. Siguen contando en tu historial.",
+    "retiradosConsolas": "Consolas (desmarca las que ya no tienes)",
+    "retiradosJuegos": "Juegos ocultos",
+    "retiradosVolver": "Volver a mostrar",
+    "retiradosNinguno": "No has ocultado ningún juego. Puedes hacerlo con «Ya no lo tengo» en «A un paso del platino».",
+    "retiradosNJuegos": "{n} juegos",
+    "retiradosNJuego": "{n} juego"
   },
   "ajustesPlataformas": {
     "title": "Cuentas de Juegos",

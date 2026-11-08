@@ -74,6 +74,8 @@ object DatosDemo {
         return """{"cerca":[${cerca.joinToString(",")}],"jugando":[${jugando.joinToString(",")}]}"""
     }
 
+    private const val RETIRADOS = """{"consolas":[{"dispositivo":"PS5","juegos":64,"retirado":false},{"dispositivo":"PS4","juegos":118,"retirado":false},{"dispositivo":"PC","juegos":40,"retirado":false},{"dispositivo":"PS3","juegos":22,"retirado":true},{"dispositivo":"PSVITA","juegos":9,"retirado":false}],"juegos":[{"id":"epic-cyber","titulo":"Cyberpunk 2077","iconUrl":null}]}"""
+
     fun respuesta(metodo: String, ruta: String): String? {
         if (metodo != "GET") return when {
             ruta.endsWith("/react") -> """{"reacted":true}"""
@@ -86,6 +88,7 @@ object DatosDemo {
             ruta.endsWith("/seguir") -> """{"sigo":${metodo == "POST"},"seguidores":${if (metodo == "POST") 13 else 12},"siguiendo":4}"""
             ruta.endsWith("/coleccionables") -> """{"nombres":["Grillo del bosque de Jogaku","Grillo del templo de Akashima","Grillo del río Kamiagata","Grillo de la cueva de Otsuna"],"marcados":[0,1,2],"total":4}"""
             ruta == "api/mobile/avisos/canales" -> """{"telegram":{"vinculado":true,"enlace":null},"correoSemanal":true}"""
+            ruta == "api/mobile/retirados" -> RETIRADOS
             else -> """{"ok":true}"""
         }
         return when {
@@ -108,6 +111,7 @@ object DatosDemo {
                 {"handle":"iker","nombre":"Iker","imagen":null,"puntos":180,"trofeos":12,"platinos":0,"soyYo":false}
               ],"anterior":{"mes":"2026-10","categoria":"rpg","podio":[{"handle":"iker","nombre":"Iker","imagen":null,"puntos":910,"trofeos":40,"platinos":3,"soyYo":false}]}}"""
             ruta == "api/mobile/preguntar" -> """{"activo":true}"""
+            ruta == "api/mobile/retirados" -> RETIRADOS
             ruta.endsWith("/coleccionables") -> """{"nombres":["Grillo del bosque de Jogaku","Grillo del templo de Akashima","Grillo del río Kamiagata","Grillo de la cueva de Otsuna"],"marcados":[0,2],"comunidad":[]}"""
             ruta == "api/mobile/panel" ->
                 """{"profile":{"handle":"lagrena","name":"La Greña","level":42,"psnId":"lagrena_69","image":null},"stats":{"platinums":87,"trophies":4312,"games":214,"completionRate":68,"gold":341,"silver":812,"bronze":3072},"racha":{"actual":6,"mejor":23}}"""

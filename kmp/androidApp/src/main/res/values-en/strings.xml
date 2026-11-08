@@ -838,6 +838,15 @@
     <string name="rapidos_titulo">Fastest platinums</string>
     <string name="recordatorio_racha">You\'re on a %1$s-day trophy streak. Earn one today so you don\'t lose it.</string>
     <string name="recordatorio_racha_titulo">🔥 Your streak is still alive!</string>
+    <string name="retirados_consolas">Consoles (turn off the ones you no longer have)</string>
+    <string name="retirados_fila_sub">Consoles and games left out of suggestions</string>
+    <string name="retirados_juegos">Hidden games</string>
+    <string name="retirados_n_juegos">%1$s games</string>
+    <string name="retirados_ninguno">You haven\'t hidden any game. Tap the × on one in “One step from platinum”.</string>
+    <string name="retirados_sub">It won\'t show in “One step from platinum” or recommendations. It still counts in your history.</string>
+    <string name="retirados_titulo">What you no longer have</string>
+    <string name="retirados_volver">Show again</string>
+    <string name="retirados_ya_no">I don\'t have it anymore</string>
     <string name="ritmo_comparar_con">Compare with</string>
     <string name="ritmo_dia_a_dia">Day by day</string>
     <string name="ritmo_empate">Tie</string>

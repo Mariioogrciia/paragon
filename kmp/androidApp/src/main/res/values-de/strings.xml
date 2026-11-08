@@ -838,6 +838,15 @@
     <string name="rapidos_titulo">Schnellste Platin</string>
     <string name="recordatorio_racha">Du hast seit %1$s Tagen jeden Tag eine Trophäe. Hol dir heute eine, damit sie nicht reißt.</string>
     <string name="recordatorio_racha_titulo">🔥 Deine Serie lebt noch!</string>
+    <string name="retirados_consolas">Konsolen (schalte aus, was du nicht mehr hast)</string>
+    <string name="retirados_fila_sub">Konsolen und Spiele ohne Vorschläge</string>
+    <string name="retirados_juegos">Ausgeblendete Spiele</string>
+    <string name="retirados_n_juegos">%1$s Spiele</string>
+    <string name="retirados_ninguno">Du hast kein Spiel ausgeblendet. Tippe bei „Kurz vor Platin“ auf das ×.</string>
+    <string name="retirados_sub">Erscheint nicht bei „Kurz vor Platin“ oder in Empfehlungen. Zählt weiter in deiner Historie.</string>
+    <string name="retirados_titulo">Was du nicht mehr hast</string>
+    <string name="retirados_volver">Wieder anzeigen</string>
+    <string name="retirados_ya_no">Hab ich nicht mehr</string>
     <string name="ritmo_comparar_con">Vergleichen mit</string>
     <string name="ritmo_dia_a_dia">Tag für Tag</string>
     <string name="ritmo_empate">Unentschieden</string>

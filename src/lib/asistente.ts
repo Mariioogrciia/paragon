@@ -1,6 +1,8 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { getLibrary, getProfileByUserId } from "@/lib/profiles";
+import { getRetirados } from "@/lib/retirados";
+import { sinRetirados } from "@/lib/retiradosReglas";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { rachas } from "@/lib/history";
 import { ejecutarHerramienta, HERRAMIENTAS, type Contexto } from "@/lib/asistenteHerramientas";
@@ -59,8 +61,8 @@ export async function preguntarAParagon(userId: string, pregunta: string, histor
   const profile = await getProfileByUserId(userId);
   if (!profile) return { ok: false, motivo: "fallo" };
 
-  const [{ games }, nivel, racha] = await Promise.all([getLibrary(profile), getParagonLevel(userId), rachas(userId)]);
-  const ctx: Contexto = { games, nivel: nivel.level, racha: { actual: racha.actual, mejor: racha.mejor } };
+  const [{ games }, nivel, racha, retirados] = await Promise.all([getLibrary(profile), getParagonLevel(userId), rachas(userId), getRetirados(userId)]);
+  const ctx: Contexto = { games, jugables: sinRetirados(games, retirados), nivel: nivel.level, racha: { actual: racha.actual, mejor: racha.mejor } };
 
   const client = new Anthropic();
   // Solo los últimos turnos de texto: suficiente para "¿y el segundo?", sin arrastrar toda la charla.

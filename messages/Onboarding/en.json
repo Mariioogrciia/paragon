@@ -93,7 +93,15 @@
     "description": "Nothing to do with community — this is just for you. Remove features you're not interested in from the menu; they're still there for everyone else, you just stop seeing them.",
     "panelTitle": "Dashboard sections",
     "panelDescription": "The ones you tick won’t appear on your dashboard (nor be calculated, so it loads faster).",
-    "navTitle": "Navigation menu"
+    "navTitle": "Navigation menu",
+    "retiradosTitle": "What you no longer have",
+    "retiradosDescription": "Consoles you no longer have and games you hide won't show up in “One step from platinum”, recommended trophies or the assistant's suggestions. They still count in your history.",
+    "retiradosConsolas": "Consoles (untick the ones you no longer have)",
+    "retiradosJuegos": "Hidden games",
+    "retiradosVolver": "Show again",
+    "retiradosNinguno": "You haven't hidden any game. You can do it with “I don't have it anymore” in “One step from platinum”.",
+    "retiradosNJuegos": "{n} games",
+    "retiradosNJuego": "{n} game"
   },
   "ajustesPlataformas": {
     "title": "Game Accounts",
