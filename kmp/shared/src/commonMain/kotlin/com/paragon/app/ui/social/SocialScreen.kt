@@ -872,7 +872,8 @@ private fun LeaguePodium(top3: List<LigaRow>, onClick: (String?) -> Unit) {
             ) {
                 Box(contentAlignment = Alignment.BottomEnd) {
                     RowAvatar(primero.name, primero.avatarUrl, size = 56.dp)
-                    Text("🥇", fontSize = 20.sp)
+                    // Fuera del círculo y con su fondo: encima tapaba la inicial (capturas, 8 nov 2026).
+                    Text("🥇", fontSize = 18.sp, modifier = Modifier.offset(x = 8.dp, y = 6.dp).background(Surface, CircleShape).padding(2.dp))
                 }
                 Text(primero.name, color = Foreground, fontWeight = FontWeight.Black, fontSize = 17.sp, modifier = Modifier.padding(top = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(Textos.t(T.comun_puntos, primero.points), color = PodiumGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -907,7 +908,7 @@ private fun PodiumSecondaryCard(row: LigaRow, medalla: String, color: androidx.c
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
             RowAvatar(row.name, row.avatarUrl, size = 40.dp)
-            Text(medalla, fontSize = 14.sp)
+            Text(medalla, fontSize = 13.sp, modifier = Modifier.offset(x = 7.dp, y = 5.dp).background(Surface, CircleShape).padding(2.dp))
         }
         Text(row.name, color = Foreground, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, modifier = Modifier.padding(top = 6.dp))
         Text(Textos.t(T.comun_puntos, row.points), color = Muted, fontSize = 11.sp)

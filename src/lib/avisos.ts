@@ -19,7 +19,8 @@ export async function avisarUsuario(
   categoria?: CategoriaAviso,
 ): Promise<void> {
   if (categoria && !(await avisoPermitido(userId, categoria))) return;
-  const push = { title: aviso.titulo, body: aviso.texto, url: aviso.ruta };
+  // Las notificaciones del sistema no entienden `**negrita**`: fuera los asteriscos (8 nov 2026).
+  const push = { title: aviso.titulo.replace(/\*\*/g, ""), body: aviso.texto.replace(/\*\*/g, ""), url: aviso.ruta };
   const resultados = await Promise.allSettled([
     enviarPush(userId, push),
     enviarPushFcm(userId, push),

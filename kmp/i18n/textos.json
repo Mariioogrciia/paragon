@@ -106,7 +106,7 @@
  "ajustes_acento": {
   "de": "Eigene Akzentfarbe",
   "en": "Custom accent colour",
-  "es": "Color de Acento Personalizado",
+  "es": "Color de acento personalizado",
   "fr": "Couleur d'accent personnalisée",
   "it": "Colore d'accento personalizzato",
   "pt": "Cor de destaque personalizada"
@@ -146,7 +146,7 @@
  "ajustes_cerrar_sesion_boton": {
   "de": "Abmelden",
   "en": "Sign out",
-  "es": "Cerrar Sesión",
+  "es": "Cerrar sesión",
   "fr": "Se déconnecter",
   "it": "Esci",
   "pt": "Terminar sessão"
@@ -242,7 +242,7 @@
  "ajustes_material": {
   "de": "Material You (dynamische Farben)",
   "en": "Material You (dynamic colour)",
-  "es": "Material You (Colores Dinámicos)",
+  "es": "Material You (colores dinámicos)",
   "fr": "Material You (couleurs dynamiques)",
   "it": "Material You (colori dinamici)",
   "pt": "Material You (cores dinâmicas)"
@@ -712,12 +712,12 @@
   "pt": "Platinados"
  },
  "biblio_titulo": {
-  "de": "BIBLIOTHEK",
-  "en": "LIBRARY",
-  "es": "BIBLIOTECA",
-  "fr": "BIBLIOTHÈQUE",
-  "it": "LIBRERIA",
-  "pt": "BIBLIOTECA"
+  "de": "Bibliothek",
+  "en": "Library",
+  "es": "Biblioteca",
+  "fr": "Bibliothèque",
+  "it": "Libreria",
+  "pt": "Biblioteca"
  },
  "biblio_todos": {
   "de": "Alle",
@@ -872,12 +872,12 @@
   "pt": "Agrupa os teus jogos como quiseres — por saga, por plataforma, pelo que for — e cria pastas com o + lá em cima."
  },
  "carpetas_titulo": {
-  "de": "ORDNER",
-  "en": "FOLDERS",
-  "es": "CARPETAS",
-  "fr": "DOSSIERS",
-  "it": "CARTELLE",
-  "pt": "PASTAS"
+  "de": "Ordner",
+  "en": "Folders",
+  "es": "Carpetas",
+  "fr": "Dossiers",
+  "it": "Cartelle",
+  "pt": "Pastas"
  },
  "clan_abandonar": {
   "de": "Clan verlassen",
@@ -946,7 +946,7 @@
  "clan_act_platino": {
   "de": "hat die Platin in {0} geholt",
   "en": "got the Platinum in {0}",
-  "es": "consiguió el Platino en {0}",
+  "es": "consiguió el platino en {0}",
   "fr": "a eu le platine de {0}",
   "it": "ha ottenuto il Platino in {0}",
   "pt": "conseguiu a Platina em {0}"
@@ -1296,12 +1296,12 @@
   "pt": "Ainda não há jogos em comum."
  },
  "comparar_titulo": {
-  "de": "VERGLEICHEN",
-  "en": "COMPARE",
-  "es": "COMPARAR",
-  "fr": "COMPARER",
-  "it": "CONFRONTA",
-  "pt": "COMPARAR"
+  "de": "Vergleichen",
+  "en": "Compare",
+  "es": "Comparar",
+  "fr": "Comparer",
+  "it": "Confronta",
+  "pt": "Comparar"
  },
  "comparar_trofeos_juegos": {
   "de": "{0} Trophäen · {1} Spiele",
@@ -1842,7 +1842,7 @@
  "cuentas_ph_otro": {
   "de": "Öffentliche ID / Gamertag",
   "en": "Public ID / Gamertag",
-  "es": "ID Público / Gamertag",
+  "es": "ID público / Gamertag",
   "fr": "ID public / gamertag",
   "it": "ID pubblico / Gamertag",
   "pt": "ID público / Gamertag"
@@ -2010,7 +2010,7 @@
  "cuentas_titulo": {
   "de": "Verknüpfte Konten",
   "en": "Linked accounts",
-  "es": "Cuentas Vinculadas",
+  "es": "Cuentas vinculadas",
   "fr": "Comptes associés",
   "it": "Account collegati",
   "pt": "Contas ligadas"
@@ -2650,7 +2650,7 @@
  "feed_platino": {
   "de": "Hat die Platin in {0} geholt.",
   "en": "Got the Platinum in {0}.",
-  "es": "Ha conseguido el Platino en {0}.",
+  "es": "Ha conseguido el platino en {0}.",
   "fr": "A décroché le platine de {0}.",
   "it": "Ha ottenuto il Platino in {0}.",
   "pt": "Conseguiu a Platina em {0}."
@@ -2664,12 +2664,12 @@
   "pt": "Escreveu uma análise de {0}."
  },
  "feed_titulo": {
-  "de": "COMMUNITY",
-  "en": "COMMUNITY",
-  "es": "COMUNIDAD",
-  "fr": "COMMUNAUTÉ",
-  "it": "COMMUNITY",
-  "pt": "COMUNIDADE"
+  "de": "Community",
+  "en": "Community",
+  "es": "Comunidad",
+  "fr": "Communauté",
+  "it": "Community",
+  "pt": "Comunidade"
  },
  "feed_vacio": {
   "de": "Noch keine Aktivität",
@@ -2722,7 +2722,7 @@
  "ficha_buscar_guia": {
   "de": "Guide suchen",
   "en": "Find guide",
-  "es": "Buscar Guía",
+  "es": "Buscar guía",
   "fr": "Chercher un guide",
   "it": "Cerca guida",
   "pt": "Procurar guia"
@@ -2730,7 +2730,7 @@
  "ficha_compartir_platino": {
   "de": "Platin teilen",
   "en": "Share platinum",
-  "es": "Compartir Platino",
+  "es": "Compartir platino",
   "fr": "Partager le platine",
   "it": "Condividi platino",
   "pt": "Partilhar platina"
@@ -3538,7 +3538,7 @@
  "nav_atascados_menu": {
   "de": "Festgefahrene Trophäen",
   "en": "Stuck trophies",
-  "es": "Trofeos Atascados",
+  "es": "Trofeos atascados",
   "fr": "Trophées bloqués",
   "it": "Trofei bloccati",
   "pt": "Troféus encravados"
@@ -3674,7 +3674,7 @@
  "panel_meta_eliminar": {
   "de": "Ziel entfernen",
   "en": "Remove goal",
-  "es": "Eliminar Meta",
+  "es": "Eliminar meta",
   "fr": "Supprimer l'objectif",
   "it": "Rimuovi obiettivo",
   "pt": "Remover meta"
@@ -3706,7 +3706,7 @@
  "panel_meta_titulo": {
   "de": "Platin-Ziel",
   "en": "Platinum goal",
-  "es": "Meta de Platinos",
+  "es": "Meta de platinos",
   "fr": "Objectif de platines",
   "it": "Obiettivo di platini",
   "pt": "Meta de platinas"
@@ -4320,12 +4320,12 @@
   "pt": "Utilizador não encontrado."
  },
  "perfil_fijar_rival": {
-  "de": "Als Hauptrival:in festlegen",
-  "en": "Set as main rival",
-  "es": "Fijar como rival principal",
-  "fr": "Définir comme rival principal",
-  "it": "Imposta come rivale principale",
-  "pt": "Definir como rival principal"
+  "es": "Hacer mi rival",
+  "en": "Make my rival",
+  "de": "Als Rival:in",
+  "fr": "Mon rival",
+  "it": "Mio rivale",
+  "pt": "Tornar rival"
  },
  "perfil_nivel_arquetipo": {
   "de": "Paragon-Stufe {0} · {1}",
@@ -4674,7 +4674,7 @@
  "social_tab_mis_ligas": {
   "de": "Meine Ligen",
   "en": "My leagues",
-  "es": "Mis Ligas",
+  "es": "Mis ligas",
   "fr": "Mes ligues",
   "it": "Le mie leghe",
   "pt": "As minhas ligas"
@@ -5160,12 +5160,12 @@
   "pt": "Ainda sem dados suficientes."
  },
  "stats_titulo": {
-  "de": "STATISTIKEN",
-  "en": "STATS",
-  "es": "ESTADÍSTICAS",
-  "fr": "STATISTIQUES",
-  "it": "STATISTICHE",
-  "pt": "ESTATÍSTICAS"
+  "de": "Statistiken",
+  "en": "Stats",
+  "es": "Estadísticas",
+  "fr": "Statistiques",
+  "it": "Statistiche",
+  "pt": "Estatísticas"
  },
  "tema_claro": {
   "de": "Hell",
@@ -6888,12 +6888,12 @@
   "pt": "Horas"
  },
  "perfil_completado_medio": {
-  "de": "Ø abgeschlossen",
-  "en": "Avg. completion",
-  "es": "Completado medio",
-  "fr": "Complétion moy.",
-  "it": "Completamento medio",
-  "pt": "Conclusão média"
+  "es": "Completado",
+  "en": "Completion",
+  "de": "Abgeschlossen",
+  "fr": "Complétion",
+  "it": "Completamento",
+  "pt": "Conclusão"
  },
  "perfil_este_anio": {
   "de": "Dieses Jahr",

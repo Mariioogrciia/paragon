@@ -90,7 +90,7 @@ fun CabeceraInicio(
                 fontWeight = FontWeight.Medium,
             )
             Text(
-                Textos.t(T.inicio_hola, profile.name.trim().split(" ").first()),
+                Textos.t(T.inicio_hola, nombreParaSaludar(profile.name)),
                 color = Foreground,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
@@ -331,4 +331,16 @@ fun TarjetaSigueJugando(
             )
         }
     }
+}
+
+/**
+ * El nombre del saludo: la primera palabra ("Hola, Mario"), salvo que sea un
+ * artículo o algo muy corto ("La Greña" daba "Hola, La", visto en las
+ * capturas del 8 nov 2026): entonces el nombre entero.
+ */
+internal fun nombreParaSaludar(nombre: String): String {
+    val limpio = nombre.trim()
+    val primera = limpio.split(" ").first()
+    val articulos = setOf("el", "la", "los", "las", "the", "le", "les", "der", "die", "das", "il", "lo", "o", "a", "os", "as")
+    return if (primera.length <= 2 || primera.lowercase() in articulos) limpio else primera
 }

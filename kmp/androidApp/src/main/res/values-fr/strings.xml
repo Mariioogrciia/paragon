@@ -160,7 +160,7 @@
     <string name="biblio_platinados">Platinés</string>
     <string name="biblio_resumen">%1$s jeux · %2$s platines</string>
     <string name="biblio_ruleta">Roulette : un jeu au hasard de ta pile</string>
-    <string name="biblio_titulo">BIBLIOTHÈQUE</string>
+    <string name="biblio_titulo">Bibliothèque</string>
     <string name="biblio_todos">Tous</string>
     <string name="biblio_vacia">Ta bibliothèque est vide</string>
     <string name="biblio_vacia_sub">Dès que tu associes un compte et synchronises, tes jeux apparaîtront ici.</string>
@@ -191,7 +191,7 @@
     <string name="carpeta_vacio_crear">Tu n\'as encore aucun dossier. Crées-en un depuis la Bibliothèque.</string>
     <string name="carpeta_vacio_sheet">Tu n\'as pas encore de dossier. Crées-en un ci-dessous.</string>
     <string name="carpeta_vacio_sub">Regroupe tes jeux comme tu veux — par saga, plateforme, n\'importe quoi — et crée des dossiers avec le + en haut.</string>
-    <string name="carpetas_titulo">DOSSIERS</string>
+    <string name="carpetas_titulo">Dossiers</string>
     <string name="clan_abandonar">Quitter le clan</string>
     <string name="clan_abandonar_borra">Quitter le clan (le supprime)</string>
     <string name="clan_abandonar_propio">Quitter ton propre clan ?</string>
@@ -284,7 +284,7 @@
     <string name="comparar_ph">le @handle de quelqu\'un</string>
     <string name="comparar_sin_amigos">Tu n\'as pas encore d\'amis au profil public à comparer d\'un geste — cherche n\'importe quel @handle ci-dessus.</string>
     <string name="comparar_sin_comun">Aucun jeu en commun pour l\'instant.</string>
-    <string name="comparar_titulo">COMPARER</string>
+    <string name="comparar_titulo">Comparer</string>
     <string name="comparar_trofeos_juegos">%1$s trophées · %2$s jeux</string>
     <string name="comparar_tu">TOI</string>
     <string name="comparar_tu_pct">Toi %1$s %%%2$s</string>
@@ -534,7 +534,7 @@
     <string name="feed_otro_sin">A fait quelque chose.</string>
     <string name="feed_platino">A décroché le platine de %1$s.</string>
     <string name="feed_resena">A écrit une critique de %1$s.</string>
-    <string name="feed_titulo">COMMUNAUTÉ</string>
+    <string name="feed_titulo">Communauté</string>
     <string name="feed_vacio">Pas encore d\'activité</string>
     <string name="feed_vacio_sub">La tienne et celle de tes amis apparaîtront ici — platines, critiques, nouveaux jeux.</string>
     <string name="feed_valoro">A noté %1$s</string>
@@ -730,7 +730,7 @@
     <string name="perfil_acumulado">Cumul</string>
     <string name="perfil_cifras">CHIFFRES</string>
     <string name="perfil_comparar">⚔ Comparer les trophées</string>
-    <string name="perfil_completado_medio">Complétion moy.</string>
+    <string name="perfil_completado_medio">Complétion</string>
     <string name="perfil_con_otros">Avec les autres</string>
     <string name="perfil_conectado_1">%1$s connecté</string>
     <string name="perfil_conectado_n">%1$s connectés</string>
@@ -741,7 +741,7 @@
     <string name="perfil_ellos">Eux %1$s</string>
     <string name="perfil_err_no_encontrado">Utilisateur introuvable.</string>
     <string name="perfil_este_anio">Cette année</string>
-    <string name="perfil_fijar_rival">Définir comme rival principal</string>
+    <string name="perfil_fijar_rival">Mon rival</string>
     <string name="perfil_horas">Heures</string>
     <string name="perfil_juegos_mes">JEUX DU MOIS</string>
     <string name="perfil_leyenda_tu">Toi</string>
@@ -1003,7 +1003,7 @@
     <string name="stats_score_fila">%1$s pts · %2$s trophées</string>
     <string name="stats_score_sub">Un score unique entre plateformes</string>
     <string name="stats_sin_datos">Pas encore assez de données.</string>
-    <string name="stats_titulo">STATISTIQUES</string>
+    <string name="stats_titulo">Statistiques</string>
     <string name="stats_trofeos_en">trophées en %1$s</string>
     <string name="stats_trofeos_semana">trophées ces 7 derniers jours</string>
     <string name="stats_trofeos_siempre">trophées à date connue</string>

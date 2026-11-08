@@ -48,6 +48,7 @@ import coil3.compose.AsyncImage
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.ui.common.CabeceraNativa
+import androidx.compose.ui.layout.layout
 import com.paragon.app.ui.common.EsqueletoTarjetas
 import com.paragon.app.ui.common.huecoBarra
 import com.paragon.app.ui.common.premiumClickable
@@ -280,7 +281,18 @@ fun PlatinosOfertaScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirJueg
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            CabeceraNativa(titulo = Textos.t(T.ofertas_titulo), atras = Textos.t(T.nav_perfil), onBack = onBack)
+            // La lista lleva 20 dp a los lados y la cabecera ya trae los suyos: sin
+            // esto el título salía más metido que en el resto de pantallas.
+            CabeceraNativa(
+                titulo = Textos.t(T.ofertas_titulo),
+                atras = Textos.t(T.nav_perfil),
+                onBack = onBack,
+                modifier = Modifier.layout { medible, limites ->
+                    val extra = 40.dp.roundToPx()
+                    val p = medible.measure(limites.copy(minWidth = limites.maxWidth + extra, maxWidth = limites.maxWidth + extra))
+                    layout(limites.maxWidth, p.height) { p.place(-extra / 2, 0) }
+                },
+            )
         }
 
         // Tus alertas

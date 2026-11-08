@@ -227,7 +227,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                         modifier = Modifier.padding(top = 12.dp),
                     )
                     Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 28.dp)) {
-                        Text(text = data.esteAnio.toString(), color = Color.White, fontSize = 56.sp, fontWeight = FontWeight.Bold)
+                        Text(text = com.paragon.app.util.cifra(data.esteAnio), color = Color.White, fontSize = 56.sp, fontWeight = FontWeight.Bold)
                         Text(
                             text = Textos.t(T.wrap_trofeos_conseguidos),
                             color = Color.White.copy(alpha = 0.8f),
@@ -326,7 +326,7 @@ private fun buildSlides(data: WrapData): List<Slide> {
                             modifier = Modifier.padding(top = 20.dp),
                         )
                         Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 12.dp)) {
-                            Text(text = mejorMes.total.toString(), color = Color(0xFF9FD4EC), fontSize = 44.sp, fontWeight = FontWeight.Bold)
+                            Text(text = com.paragon.app.util.cifra(mejorMes.total), color = Color(0xFF9FD4EC), fontSize = 44.sp, fontWeight = FontWeight.Bold)
                             Text(text = Textos.t(T.wrap_trofeos_mes), color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, modifier = Modifier.padding(bottom = 6.dp))
                         }
                     }

@@ -1,7 +1,7 @@
 package com.paragon.app.ui.stats
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,21 +53,19 @@ fun TrophyDnaRadar(ejes: List<TrophyDnaEje>, modifier: Modifier = Modifier) {
     val mutedColor = Muted
     val gridColor = Border
 
-    // El gesto consume CUALQUIER arrastre dentro del radar (no solo
-    // horizontal) para poder girarlo, así que mientras el dedo esté encima
-    // del gráfico la pantalla de Estadísticas no hace scroll — el usuario
-    // tiene que arrastrar fuera del radar para seguir bajando. Mismo
-    // compromiso que cualquier gráfico interactivo dentro de una lista.
+    // Solo los arrastres horizontales giran el radar (8 nov 2026): antes se
+    // comía cualquier arrastre y, con el dedo encima del gráfico, la pantalla
+    // de Estadísticas no bajaba (se vio en las capturas del emulador).
     Canvas(
         modifier = modifier
             .aspectRatio(1f)
             .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
+                detectHorizontalDragGestures { change, dragAmount ->
                     change.consume()
                     // Sensibilidad ajustada a mano: un arrastre de punta a
                     // punta de un móvil normal da más o menos una vuelta
                     // completa, ni muy brusco ni demasiado lento.
-                    rotationDegrees += dragAmount.x * 0.5f
+                    rotationDegrees += dragAmount * 0.5f
                 }
             },
     ) {

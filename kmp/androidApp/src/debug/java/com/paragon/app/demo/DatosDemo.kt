@@ -58,7 +58,7 @@ object DatosDemo {
 
     private fun sesion(i: Int): String {
         val j = juegos[i]
-        return """{"id":"s$i","trofeo":"${trofeos[2 + i].first}","trofeoInfo":{"trophyId":"t${2 + i}","iconUrl":null,"grade":"${trofeos[2 + i].second}","detail":"Gana 10 partidas online."},"descripcion":"Cooperativo tranquilo, con micro.","fechaHora":"2026-11-0${9 + i}T20:00:00.000Z","plazasTotales":4,"ocupadas":${2 + i},"libres":${2 - i},"cancelada":false,
+        return """{"id":"s$i","trofeo":"${trofeos[2 + i].first}","trofeoInfo":{"trophyId":"t${2 + i}","iconUrl":null,"grade":"${trofeos[2 + i].second}","detail":"Gana 10 partidas online."},"descripcion":"Cooperativo tranquilo, con micro.","fechaHora":"2026-11-${(9 + i).toString().padStart(2, '0')}T20:00:00.000Z","plazasTotales":4,"ocupadas":${2 + i},"libres":${2 - i},"cancelada":false,
             "juego":{"id":"${j.id}","titulo":"${j.titulo}","iconUrl":"${portada(j.app)}","platform":"${j.plat}","deviceLabel":"PS5"},
             "anfitrion":{"userId":"u2","handle":"nerea","name":"Nerea","image":null},"participantes":[{"userId":"u3","handle":"iker","name":"Iker","image":null}],"soyAnfitrion":false,"estoyApuntado":${i == 0}}"""
     }

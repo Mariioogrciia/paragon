@@ -141,7 +141,7 @@ private fun FilaAviso(aviso: AvisoDto, onClick: () -> Unit) {
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
             Text(aviso.titulo, color = Foreground, fontSize = 14.sp, fontWeight = FontWeight.Bold, lineHeight = 18.sp)
             Text(
-                aviso.texto,
+                com.paragon.app.ui.common.conNegritasMarkdown(aviso.texto, colorNegrita = Foreground),
                 color = Muted,
                 fontSize = 13.sp,
                 lineHeight = 17.sp,

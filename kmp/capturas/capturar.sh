@@ -33,8 +33,8 @@ adb shell run-as $PAQ mkdir -p files
 adb shell run-as $PAQ touch files/modo_demo
 adb shell run-as $PAQ ls files
 
-adb shell am start -n "$ACT" >/dev/null; sleep 12
-foto 01-panel; bajar; foto 01-panel-2 0.5; bajar; foto 01-panel-3 0.5
+adb shell am start -n "$ACT" >/dev/null; sleep 15
+pantalla 01-panel /panel 2
 
 pantalla 02-biblioteca /biblioteca 2
 pantalla 03-comunidad /feed 1
@@ -66,10 +66,14 @@ pantalla 23-preguntar /preguntar
 tocar "fin|weekend"; foto 23-preguntar-respuesta 3
 pantalla 24-comparar /comparar/nerea 2
 
-# Tema claro: Apariencia → Claro, y otra pasada por las principales.
-abrir /ajustes/apariencia; tocar "Claro|Light"
-pantalla 30-claro-panel /panel 1
-pantalla 31-claro-ficha /juego/psn-elden 2
-pantalla 32-claro-perfil /u/nerea 1
-pantalla 33-claro-ligas /ligas
+# Tema oscuro (el del sistema) y otra pasada por las principales.
+adb shell cmd uimode night yes; sleep 3
+pantalla 30-oscuro-panel /panel 1
+pantalla 31-oscuro-ficha /juego/psn-elden 2
+pantalla 32-oscuro-perfil /u/nerea 1
+pantalla 33-oscuro-ligas /ligas
+pantalla 34-oscuro-estadisticas /estadisticas 2
+pantalla 35-oscuro-avisos /avisos
+pantalla 36-oscuro-ajustes /ajustes 1
+pantalla 37-oscuro-biblioteca /biblioteca
 ls -1 "$SALIDA" | wc -l

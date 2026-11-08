@@ -55,14 +55,28 @@ fun ParagonTheme(
             background = Background, surface = Surface, surfaceVariant = Surface2,
             primary = Accent, onPrimary = OnAccent, secondary = Accent2,
             onBackground = Foreground, onSurface = Foreground, onSurfaceVariant = Muted,
-            outline = Border, error = Danger,
+            // 8 nov 2026 (capturas del emulador): sin estos, Material ponía sus
+            // morados y rosas de serie en interruptores, casillas y pastillas.
+            outline = Muted, outlineVariant = Border, error = Danger,
+            primaryContainer = AccentSoft, onPrimaryContainer = Foreground,
+            secondaryContainer = AccentSoft, onSecondaryContainer = Foreground,
+            tertiary = Accent2, surfaceTint = Accent, inversePrimary = Accent,
+            surfaceContainerLowest = Surface, surfaceContainerLow = Surface, surfaceContainer = Surface2,
+            surfaceContainerHigh = Surface2, surfaceContainerHighest = Border,
         )
     } else {
         lightColorScheme(
             background = Background, surface = Surface, surfaceVariant = Surface2,
             primary = Accent, onPrimary = OnAccent, secondary = Accent2,
             onBackground = Foreground, onSurface = Foreground, onSurfaceVariant = Muted,
-            outline = Border, error = Danger,
+            // 8 nov 2026 (capturas del emulador): sin estos, Material ponía sus
+            // morados y rosas de serie en interruptores, casillas y pastillas.
+            outline = Muted, outlineVariant = Border, error = Danger,
+            primaryContainer = AccentSoft, onPrimaryContainer = Foreground,
+            secondaryContainer = AccentSoft, onSecondaryContainer = Foreground,
+            tertiary = Accent2, surfaceTint = Accent, inversePrimary = Accent,
+            surfaceContainerLowest = Surface, surfaceContainerLow = Surface, surfaceContainer = Surface2,
+            surfaceContainerHigh = Surface2, surfaceContainerHighest = Border,
         )
     }
 

@@ -284,7 +284,8 @@ private fun Cabecera(p: UserProfileDto, aura: Color?) {
             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (p.apoyo) Text(
                     "💜 " + Textos.t(T.paragon_plus),
-                    color = Color(0xFFD8B4FE),
+                    // Morado claro sobre oscuro; en tema claro no se leía (capturas, 8 nov 2026).
+                    color = if (com.paragon.app.ui.theme.isDarkTheme) Color(0xFFD8B4FE) else Color(0xFF7E22CE),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clip(RoundedCornerShape(50)).background(Color(0x24C084FC)).border(1.dp, Color(0x66C084FC), RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp),

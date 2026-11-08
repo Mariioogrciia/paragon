@@ -304,7 +304,7 @@ private fun ParagonScoreCard(score: ParagonScoreStats) {
     }
 
     SectionCard(title = "Paragon Score", subtitle = Textos.t(T.stats_score_sub)) {
-        Text(text = animatedTotal.toString(), color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        Text(text = com.paragon.app.util.cifra(animatedTotal), color = Accent2, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         if (score.porPlataforma.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
             score.porPlataforma.forEach { fila ->
@@ -360,7 +360,7 @@ private fun TrophyDnaCard(dna: TrophyDnaStats, estiloDeCaza: EstiloDeCazaStats?)
             Column(modifier = Modifier.padding(vertical = 6.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = eje.label, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    Text(text = "${eje.trofeos}", color = Muted, fontSize = 12.sp)
+                    Text(text = com.paragon.app.util.cifra(eje.trofeos), color = Muted, fontSize = 12.sp)
                 }
                 Spacer(Modifier.height(6.dp))
                 val fraccionObjetivo = if (max > 0) eje.valor / 100f else 0f
