@@ -534,10 +534,10 @@
     "message": "You have your platinum <strong>#{numero}</strong> reserved for <link>{titulo}</link>. If you earn this platinum now, you'll take it from them."
   },
   "ReservarHitoButton": {
-    "quitarReserva": "Remove the reservation on this milestone",
-    "reservarTitulo": "Reserve this game for your platinum #{numero}",
-    "reservado": "Reserved for #{numero}",
-    "reservar": "Reserve for #{numero}",
+    "quitarReserva": "Remove the reservation (and stop targeting it)",
+    "reservarTitulo": "Pins it as your goal and saves your platinum #{numero} for it",
+    "reservado": "Reserved for platinum #{numero}",
+    "reservar": "Reserve for platinum #{numero}",
     "reservarFaltan": "Reserve for #{numero} · {faltan, plural, one {# platinum to go} other {# platinums to go}}",
     "reservarTituloFaltan": "Reserve this game for your platinum #{numero} ({faltan, plural, one {# platinum to go} other {# platinums to go}})"
   },

@@ -569,11 +569,11 @@
     <string name="ficha_prediccion">🔮 A questo ritmo, ce l\'avrai il %1$s</string>
     <string name="ficha_progreso">%1$s/%2$s trofei · %3$s%%</string>
     <string name="ficha_reservado">Riservato</string>
-    <string name="ficha_reservado_n">Riservato per il #%1$s</string>
-    <string name="ficha_reservar">Riserva traguardo</string>
+    <string name="ficha_reservado_n">Prenotato per il platino #%1$s</string>
+    <string name="ficha_reservar">Prenota per il platino</string>
     <string name="ficha_reservar_faltan_1">Riserva per il #%1$s · ne manca %2$s</string>
     <string name="ficha_reservar_faltan_n">Riserva per il #%1$s · ne mancano %2$s</string>
-    <string name="ficha_reservar_n">Riserva per il #%1$s</string>
+    <string name="ficha_reservar_n">Prenota per il platino #%1$s</string>
     <string name="ficha_sin_trofeos_filtro">Nessun trofeo con questo filtro.</string>
     <string name="ficha_solo_faltan">Mi mancano · %1$s</string>
     <string name="fuente_casual">Casual</string>
@@ -698,7 +698,7 @@
     <string name="ofertas_tus_alertas">I TUOI AVVISI DI PREZZO</string>
     <string name="ofertas_vacio" formatted="false">Al momento non ci sono offerte con un 100% alla portata.</string>
     <string name="panel_a_por_este">PUNTA A QUESTO PLATINO ORA</string>
-    <string name="panel_cerrojo">BLOCCO TRAGUARDI</string>
+    <string name="panel_cerrojo">IL TUO PROSSIMO PLATINO</string>
     <string name="panel_cerrojo_texto">%1$s riservato per il tuo platino #%2$s</string>
     <string name="panel_completado">Completato</string>
     <string name="panel_hola">CIAO, %1$s</string>

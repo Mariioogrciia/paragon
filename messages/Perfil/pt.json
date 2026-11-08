@@ -534,10 +534,10 @@
     "message": "Tens a tua platina <strong>#{numero}</strong> reservada para <link>{titulo}</link>. Se tirares esta platina agora, tiras-lha."
   },
   "ReservarHitoButton": {
-    "quitarReserva": "Tirar a reserva deste marco",
-    "reservarTitulo": "Reservar este jogo para a tua platina #{numero}",
-    "reservado": "Reservado para a #{numero}",
-    "reservar": "Reservar para a #{numero}",
+    "quitarReserva": "Tirar a reserva (e deixar de ser o objetivo)",
+    "reservarTitulo": "Fixa-o como objetivo e guarda-lhe a tua platina #{numero}",
+    "reservado": "Reservado para a platina #{numero}",
+    "reservar": "Reservar para a platina #{numero}",
     "reservarFaltan": "Reservar para a #{numero} · {faltan, plural, one {falta # platina} other {faltam # platinas}}",
     "reservarTituloFaltan": "Reservar este jogo para a tua platina #{numero} ({faltan, plural, one {falta-te # platina} other {faltam-te # platinas}} para lá chegares)"
   },

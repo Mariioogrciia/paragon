@@ -1,21 +1,22 @@
 import "server-only";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { games as gamesTable, users } from "@/db/schema";
+import { games as gamesTable, userGames, users } from "@/db/schema";
 import type { Game } from "@/lib/types";
 import { esPlatinoEquivalente } from "@/lib/stats";
 
 /**
- * "Cerrojo de Hitos": el juego reservado para tu PRÓXIMO platino en número
- * redondo (#25, #50, #100...) — para que ese número no caiga en un juego
- * de relleno por accidente.
+ * "Cerrojo de Hitos": el juego reservado para tu PRÓXIMO platino — desde el
+ * 8 nov 2026 el siguiente de verdad (tus platinos + 1), no el próximo número
+ * redondo (#25, #50…), y reservar es lo mismo que anclar el juego como
+ * objetivo (togglePinnedGame en lib/profiles.ts mantiene las dos cosas a la par).
  *
- * El número del hito NUNCA se guarda — sale siempre de contar tus platinos
- * actuales en el momento de mirarlo, así que no hay forma de que quede
- * desincronizado con un número viejo si sacas más platinos mientras tanto.
+ * El número NUNCA se guarda — sale siempre de contar tus platinos actuales
+ * en el momento de mirarlo, así que no queda desincronizado si sacas más
+ * platinos mientras tanto.
  */
 export function proximoHito(platinosActuales: number): number {
-  return Math.ceil((platinosActuales + 1) / 25) * 25;
+  return platinosActuales + 1;
 }
 
 export interface HitoReservado {
@@ -59,6 +60,13 @@ export async function toggleReservedMilestone(userId: string, gameId: string): P
     .update(users)
     .set({ reservedMilestoneGameId: yaReservado ? null : gameId })
     .where(eq(users.id, userId));
+
+  // Reservar también lo ancla como objetivo (y quitar la reserva lo desancla):
+  // las versiones de la app con los dos botones siguen funcionando igual.
+  await db.update(userGames).set({ pinnedAt: null }).where(eq(userGames.userId, userId));
+  if (!yaReservado) {
+    await db.update(userGames).set({ pinnedAt: new Date() }).where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
+  }
 
   return { reservado: !yaReservado };
 }

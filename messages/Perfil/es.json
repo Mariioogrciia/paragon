@@ -534,10 +534,10 @@
     "message": "Tienes reservado tu platino <strong>#{numero}</strong> para <link>{titulo}</link>. Si sacas este platino ahora, se lo quitas."
   },
   "ReservarHitoButton": {
-    "quitarReserva": "Quitar la reserva de este hito",
-    "reservarTitulo": "Reservar este juego para tu platino #{numero}",
-    "reservado": "Reservado para el #{numero}",
-    "reservar": "Reservar para el #{numero}",
+    "quitarReserva": "Quitar la reserva (y dejar de tenerlo como objetivo)",
+    "reservarTitulo": "Lo ancla como objetivo y le guarda tu platino #{numero}",
+    "reservado": "Reservado para el platino #{numero}",
+    "reservar": "Reservar para el platino #{numero}",
     "reservarFaltan": "Reservar para el #{numero} · {faltan, plural, one {falta # platino} other {faltan # platinos}}",
     "reservarTituloFaltan": "Reservar este juego para tu platino #{numero} (te {faltan, plural, one {falta # platino} other {faltan # platinos}} para llegar)"
   },

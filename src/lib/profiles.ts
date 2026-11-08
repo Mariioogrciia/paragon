@@ -737,6 +737,13 @@ export async function togglePinnedGame(userId: string, gameId: string): Promise<
       .where(and(eq(userGames.userId, userId), eq(userGames.gameId, gameId)));
   }
 
+  // Anclar = reservarlo para tu próximo platino (8 nov 2026, lib/milestones.ts):
+  // una sola idea en vez de dos botones. Al desanclar, se quita la reserva si era este.
+  await db
+    .update(users)
+    .set({ reservedMilestoneGameId: yaAnclado ? null : gameId })
+    .where(yaAnclado ? and(eq(users.id, userId), eq(users.reservedMilestoneGameId, gameId)) : eq(users.id, userId));
+
   return { pinned: !yaAnclado };
 }
 

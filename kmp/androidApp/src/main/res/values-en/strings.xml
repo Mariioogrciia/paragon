@@ -569,11 +569,11 @@
     <string name="ficha_prediccion">🔮 At this pace, you\'ll have it on %1$s</string>
     <string name="ficha_progreso">%1$s/%2$s trophies · %3$s%%</string>
     <string name="ficha_reservado">Reserved</string>
-    <string name="ficha_reservado_n">Reserved for #%1$s</string>
-    <string name="ficha_reservar">Reserve milestone</string>
+    <string name="ficha_reservado_n">Reserved for platinum #%1$s</string>
+    <string name="ficha_reservar">Reserve for platinum</string>
     <string name="ficha_reservar_faltan_1">Reserve for #%1$s · %2$s to go</string>
     <string name="ficha_reservar_faltan_n">Reserve for #%1$s · %2$s to go</string>
-    <string name="ficha_reservar_n">Reserve for #%1$s</string>
+    <string name="ficha_reservar_n">Reserve for platinum #%1$s</string>
     <string name="ficha_sin_trofeos_filtro">No trophies match this filter.</string>
     <string name="ficha_solo_faltan">Missing · %1$s</string>
     <string name="fuente_casual">Casual</string>
@@ -698,7 +698,7 @@
     <string name="ofertas_tus_alertas">YOUR PRICE ALERTS</string>
     <string name="ofertas_vacio" formatted="false">No deals with an achievable 100% right now.</string>
     <string name="panel_a_por_este">GO FOR THIS PLATINUM NOW</string>
-    <string name="panel_cerrojo">MILESTONE LOCK</string>
+    <string name="panel_cerrojo">YOUR NEXT PLATINUM</string>
     <string name="panel_cerrojo_texto">%1$s reserved for your platinum #%2$s</string>
     <string name="panel_completado">Completed</string>
     <string name="panel_hola">HI, %1$s</string>

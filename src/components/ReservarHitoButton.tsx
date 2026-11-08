@@ -6,20 +6,18 @@ import { toggleReservarHitoAction } from "@/app/actions";
 import { ToggleChip } from "@/components/ToggleChip";
 
 /**
- * "Reservar para el hito #X" — Cerrojo de Hitos (lib/milestones.ts). Mismo
+ * "Reservar para el platino #X" (X = tus platinos + 1) — lib/milestones.ts.
+ * Reservar también lo ancla como objetivo (8 nov 2026). Mismo
  * patrón optimista que `PinGameButton`: se pinta al momento, sin esperar la
  * respuesta del servidor.
  */
 export function ReservarHitoButton({
   gameId,
   numero,
-  faltan,
   reservadoInicial,
 }: {
   gameId: string;
   numero: number;
-  /** Platinos que te quedan hasta el hito (el hito incluido): el #25 con 14 platinos = 11. */
-  faltan: number;
   reservadoInicial: boolean;
 }) {
   const [reservado, setReservado] = useState(reservadoInicial);
@@ -31,7 +29,7 @@ export function ReservarHitoButton({
       active={reservado}
       size="md"
       accentColor="226, 181, 62"
-      title={reservado ? t("ReservarHitoButton.quitarReserva") : t("ReservarHitoButton.reservarTituloFaltan", { numero, faltan })}
+      title={reservado ? t("ReservarHitoButton.quitarReserva") : t("ReservarHitoButton.reservarTitulo", { numero })}
       onClick={() => {
         setReservado((r) => !r);
         startTransition(async () => {
@@ -43,7 +41,7 @@ export function ReservarHitoButton({
       <svg width="14" height="14" viewBox="0 0 24 24" fill={reservado ? "#e2b53e" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z" />
       </svg>
-      {reservado ? t("ReservarHitoButton.reservado", { numero }) : t("ReservarHitoButton.reservarFaltan", { numero, faltan })}
+      {reservado ? t("ReservarHitoButton.reservado", { numero }) : t("ReservarHitoButton.reservar", { numero })}
     </ToggleChip>
   );
 }

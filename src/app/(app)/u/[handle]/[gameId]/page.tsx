@@ -289,7 +289,6 @@ export default async function JuegoPage({
                   <ReservarHitoButton
                     gameId={game.id}
                     numero={hito.numero}
-                    faltan={hito.faltan}
                     reservadoInicial={hito.reservado?.gameId === game.id}
                   />
                 )}

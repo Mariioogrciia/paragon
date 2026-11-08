@@ -534,10 +534,10 @@
     "message": "Du hast dein Platin <strong>Nr. {numero}</strong> für <link>{titulo}</link> reserviert. Wenn du dieses Platin jetzt holst, nimmst du es der Person weg."
   },
   "ReservarHitoButton": {
-    "quitarReserva": "Reservierung für diesen Meilenstein aufheben",
-    "reservarTitulo": "Dieses Spiel für dein Platin Nr. {numero} reservieren",
-    "reservado": "Reserviert für Nr. {numero}",
-    "reservar": "Für Nr. {numero} reservieren",
+    "quitarReserva": "Reservierung aufheben (und nicht mehr als Ziel)",
+    "reservarTitulo": "Setzt es als Ziel und hebt dein Platin #{numero} dafür auf",
+    "reservado": "Reserviert für Platin #{numero}",
+    "reservar": "Für Platin #{numero} reservieren",
     "reservarFaltan": "Für #{numero} reservieren · {faltan, plural, one {noch # Platin} other {noch # Platin}}",
     "reservarTituloFaltan": "Dieses Spiel für deine Platin #{numero} reservieren (noch {faltan} bis dahin)"
   },

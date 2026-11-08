@@ -534,10 +534,10 @@
     "message": "Tu as réservé ton platine <strong>n°{numero}</strong> pour <link>{titulo}</link>. Si tu obtiens ce platine maintenant, tu le lui prends."
   },
   "ReservarHitoButton": {
-    "quitarReserva": "Retirer la réservation de ce palier",
-    "reservarTitulo": "Réserver ce jeu pour ton platine n°{numero}",
-    "reservado": "Réservé pour le n°{numero}",
-    "reservar": "Réserver pour le n°{numero}",
+    "quitarReserva": "Retirer la réservation (et ne plus le viser)",
+    "reservarTitulo": "L'épingle comme objectif et lui garde ton platine #{numero}",
+    "reservado": "Réservé pour le platine #{numero}",
+    "reservar": "Réserver pour le platine #{numero}",
     "reservarFaltan": "Réserver pour le n°{numero} · {faltan, plural, one {encore # platine} other {encore # platines}}",
     "reservarTituloFaltan": "Réserver ce jeu pour ton platine n°{numero} (encore {faltan} pour y arriver)"
   },

@@ -2872,20 +2872,20 @@
   "pt": "Reservado"
  },
  "ficha_reservado_n": {
-  "de": "Reserviert für #{0}",
-  "en": "Reserved for #{0}",
-  "es": "Reservado para el #{0}",
-  "fr": "Réservé pour le n°{0}",
-  "it": "Riservato per il #{0}",
-  "pt": "Reservado para o #{0}"
+  "es": "Reservado para el platino #{0}",
+  "en": "Reserved for platinum #{0}",
+  "de": "Reserviert für Platin #{0}",
+  "fr": "Réservé pour le platine #{0}",
+  "it": "Prenotato per il platino #{0}",
+  "pt": "Reservado para a platina #{0}"
  },
  "ficha_reservar": {
-  "de": "Meilenstein reservieren",
-  "en": "Reserve milestone",
-  "es": "Reservar hito",
-  "fr": "Réserver l'étape",
-  "it": "Riserva traguardo",
-  "pt": "Reservar marco"
+  "es": "Reservar para el platino",
+  "en": "Reserve for platinum",
+  "de": "Für Platin reservieren",
+  "fr": "Réserver pour le platine",
+  "it": "Prenota per il platino",
+  "pt": "Reservar para a platina"
  },
  "ficha_reservar_faltan_1": {
   "de": "Für #{0} reservieren · noch {1}",
@@ -2904,12 +2904,12 @@
   "pt": "Reservar para o #{0} · faltam {1}"
  },
  "ficha_reservar_n": {
-  "de": "Für #{0} reservieren",
-  "en": "Reserve for #{0}",
-  "es": "Reservar para el #{0}",
-  "fr": "Réserver pour le n°{0}",
-  "it": "Riserva per il #{0}",
-  "pt": "Reservar para o #{0}"
+  "es": "Reservar para el platino #{0}",
+  "en": "Reserve for platinum #{0}",
+  "de": "Für Platin #{0} reservieren",
+  "fr": "Réserver pour le platine #{0}",
+  "it": "Prenota per il platino #{0}",
+  "pt": "Reservar para a platina #{0}"
  },
  "fuente_casual": {
   "de": "Locker",
@@ -3624,12 +3624,12 @@
   "pt": "VAI A ESTA PLATINA AGORA"
  },
  "panel_cerrojo": {
-  "de": "MEILENSTEIN-SPERRE",
-  "en": "MILESTONE LOCK",
-  "es": "CERROJO DE HITOS",
-  "fr": "VERROU D'ÉTAPE",
-  "it": "BLOCCO TRAGUARDI",
-  "pt": "CADEADO DE MARCOS"
+  "es": "TU PRÓXIMO PLATINO",
+  "en": "YOUR NEXT PLATINUM",
+  "de": "DEIN NÄCHSTES PLATIN",
+  "fr": "TON PROCHAIN PLATINE",
+  "it": "IL TUO PROSSIMO PLATINO",
+  "pt": "A TUA PRÓXIMA PLATINA"
  },
  "panel_cerrojo_texto": {
   "de": "{0} für deine Platin #{1} reserviert",

@@ -249,3 +249,33 @@ describe("lista de coleccionables", () => {
     expect((await guardarColeccionables(beto.id, juego, "7", { nombres: [], marcados: [1], total: 16 })).total).toBe(16);
   });
 });
+
+describe("reservar el próximo platino", () => {
+  it("anclar lo reserva, reservar lo ancla, y el número es tus platinos + 1", async () => {
+    const { togglePinnedGame } = await import("@/lib/profiles");
+    const { toggleReservedMilestone, getHitoReservado, proximoHito } = await import("@/lib/milestones");
+    const { users, userGames } = await import("@/db/schema");
+    const u = await crearUsuario();
+    const a = await crearJuego("psn");
+    const b = await crearJuego("psn");
+    await darJuego(u.id, a);
+    await darJuego(u.id, b);
+    const estado = async () => {
+      const [fila] = await db.select({ r: users.reservedMilestoneGameId }).from(users).where(eq(users.id, u.id));
+      const anclados = await db.select({ g: userGames.gameId }).from(userGames).where(eq(userGames.userId, u.id));
+      const conPin = await db.select({ g: userGames.gameId, p: userGames.pinnedAt }).from(userGames).where(eq(userGames.userId, u.id));
+      return { reservado: fila.r, anclado: conPin.find((x) => x.p)?.g ?? null, total: anclados.length };
+    };
+
+    expect(proximoHito(87)).toBe(88);
+    await togglePinnedGame(u.id, a);
+    expect(await estado()).toMatchObject({ reservado: a, anclado: a });
+    expect((await getHitoReservado(u.id, 87))?.numero).toBe(88);
+
+    await toggleReservedMilestone(u.id, b);
+    expect(await estado()).toMatchObject({ reservado: b, anclado: b });
+
+    await togglePinnedGame(u.id, b);
+    expect(await estado()).toMatchObject({ reservado: null, anclado: null });
+  });
+});

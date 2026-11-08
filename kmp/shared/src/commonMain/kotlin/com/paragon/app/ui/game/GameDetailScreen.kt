@@ -266,10 +266,18 @@ private fun GameDetailContent(
     val faltanHito = proximoHito?.second
 
     fun togglePin() {
-        pinned = !pinned
+        // Anclar también reserva el próximo platino (el servidor lleva las dos a la par).
+        val nuevo = !(pinned || reservado)
+        // Reservado de antes sin anclar (versiones con dos botones): quitarlo es quitar la reserva.
+        val soloReserva = !nuevo && !pinned
+        pinned = nuevo
+        reservado = nuevo
         coroutineScope.launch {
-            val real = repository.togglePin(gameId)
-            if (real != null) pinned = real
+            val real = if (soloReserva) repository.toggleReserve(gameId) else repository.togglePin(gameId)
+            if (real != null) {
+                pinned = real
+                reservado = real
+            }
             // La API ya lo ancló/desancló de verdad — sin esto, la caché
             // local (de la que lee el widget) se queda con el juego
             // anclado ANTERIOR hasta la próxima sincronización completa de
@@ -707,24 +715,30 @@ private fun GameActionsRow(
             .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        ActionChip(
-            label = if (pinned) Textos.t(T.ficha_objetivo_actual) else Textos.t(T.ficha_anclar),
-            active = pinned,
-            accentColor = dynamicColor,
-            onClick = onTogglePin,
-        )
-        ActionChip(
-            label = when {
-                reservado && numeroHito != null -> Textos.t(T.ficha_reservado_n, numeroHito)
-                reservado -> Textos.t(T.ficha_reservado)
-                numeroHito != null && faltanHito != null -> stringResource(if (faltanHito == 1) T.ficha_reservar_faltan_1 else T.ficha_reservar_faltan_n, numeroHito, faltanHito)
-                numeroHito != null -> Textos.t(T.ficha_reservar_n, numeroHito)
-                else -> Textos.t(T.ficha_reservar)
-            },
-            active = reservado,
-            accentColor = Gold,
-            onClick = onToggleReserve,
-        )
+        // Anclar y reservar son lo mismo desde el 8 nov 2026: «Reservar para el
+        // platino #N» (tus platinos + 1) lo ancla como objetivo y le guarda ese
+        // número. Con el platino ya conseguido no hay número que guardar: solo anclar.
+        if (platinoConseguido) {
+            ActionChip(
+                label = if (pinned) Textos.t(T.ficha_objetivo_actual) else Textos.t(T.ficha_anclar),
+                active = pinned,
+                accentColor = dynamicColor,
+                onClick = onTogglePin,
+            )
+        } else {
+            val activo = pinned || reservado
+            ActionChip(
+                label = when {
+                    activo && numeroHito != null -> Textos.t(T.ficha_reservado_n, numeroHito)
+                    activo -> Textos.t(T.ficha_reservado)
+                    numeroHito != null -> Textos.t(T.ficha_reservar_n, numeroHito)
+                    else -> Textos.t(T.ficha_reservar)
+                },
+                active = activo,
+                accentColor = Gold,
+                onClick = onTogglePin,
+            )
+        }
         ActionChip(
             label = Textos.t(T.nav_carpetas),
             active = false,

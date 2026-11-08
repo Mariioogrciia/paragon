@@ -569,11 +569,11 @@
     <string name="ficha_prediccion">🔮 À ce rythme, tu l\'auras le %1$s</string>
     <string name="ficha_progreso">%1$s/%2$s trophées · %3$s %%</string>
     <string name="ficha_reservado">Réservé</string>
-    <string name="ficha_reservado_n">Réservé pour le n°%1$s</string>
-    <string name="ficha_reservar">Réserver l\'étape</string>
+    <string name="ficha_reservado_n">Réservé pour le platine #%1$s</string>
+    <string name="ficha_reservar">Réserver pour le platine</string>
     <string name="ficha_reservar_faltan_1">Réserver pour le n°%1$s · encore %2$s</string>
     <string name="ficha_reservar_faltan_n">Réserver pour le n°%1$s · encore %2$s</string>
-    <string name="ficha_reservar_n">Réserver pour le n°%1$s</string>
+    <string name="ficha_reservar_n">Réserver pour le platine #%1$s</string>
     <string name="ficha_sin_trofeos_filtro">Aucun trophée avec ce filtre.</string>
     <string name="ficha_solo_faltan">Manquants · %1$s</string>
     <string name="fuente_casual">Décontractée</string>
@@ -698,7 +698,7 @@
     <string name="ofertas_tus_alertas">TES ALERTES DE PRIX</string>
     <string name="ofertas_vacio" formatted="false">Aucune promo avec un 100 % abordable pour l\'instant.</string>
     <string name="panel_a_por_este">VISE CE PLATINE MAINTENANT</string>
-    <string name="panel_cerrojo">VERROU D\'ÉTAPE</string>
+    <string name="panel_cerrojo">TON PROCHAIN PLATINE</string>
     <string name="panel_cerrojo_texto">%1$s réservé pour ton platine n°%2$s</string>
     <string name="panel_completado">Terminé</string>
     <string name="panel_hola">SALUT, %1$s</string>
