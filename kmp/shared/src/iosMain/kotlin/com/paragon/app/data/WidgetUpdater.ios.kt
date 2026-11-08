@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.AppIOS
 import com.paragon.app.GRUPO_APP
 import com.paragon.app.data.local.ParagonDatabase
@@ -22,6 +24,8 @@ actual fun notifyWidgetUpdate(context: ContextoPlataforma?) {
     MainScope().launch {
         val juego = try {
             ParagonDatabase.getDatabase(ContextoIOS).libraryDao().getPinnedGame()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             return@launch
         }

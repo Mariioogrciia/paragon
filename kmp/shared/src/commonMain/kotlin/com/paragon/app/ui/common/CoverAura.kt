@@ -1,5 +1,7 @@
 package com.paragon.app.ui.common
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +43,8 @@ fun rememberCoverAuraColor(coverUrl: String?): Color? {
                 val color = extractAuraColor(image)
                 if (color != null) aura = color
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Se queda en null — la tarjeta sigue con su degradado neutro.
         }

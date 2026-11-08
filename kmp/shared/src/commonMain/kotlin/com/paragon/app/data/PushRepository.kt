@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.PushTokenRequest
@@ -11,6 +13,8 @@ class PushRepository(private val tokenStore: TokenStore? = null) {
         try {
             ApiClient.pushTokenApi(store).registerToken(PushTokenRequest(token))
             store.fcmToken = token
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Sin conexión o servidor caído: Firebase reintenta darnos el
             // mismo token más adelante (onNewToken no vuelve a saltar solo),

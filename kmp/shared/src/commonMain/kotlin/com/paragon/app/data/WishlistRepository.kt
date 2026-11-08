@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.shared.red.AddWishlistRequest
 import com.paragon.app.data.network.ApiClient
@@ -25,6 +27,8 @@ class WishlistRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return emptyList()
         return try {
             ApiClient.wishlistApi(store).search(query).results.map { it.toDomain() }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emptyList()
         }
@@ -47,6 +51,8 @@ class WishlistRepository(private val tokenStore: TokenStore? = null) {
                 ),
             )
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }

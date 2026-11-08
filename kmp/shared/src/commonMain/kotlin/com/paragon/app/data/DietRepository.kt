@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 
@@ -15,6 +17,8 @@ class DietRepository(private val tokenStore: TokenStore? = null) {
             ApiClient.dietApi(store).getDiet().dieta?.let { dto ->
                 DietaGamer(dto.genero, dto.juegos.map { DietaJuego(it.gameId, it.titulo) }, dto.horasTotales)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }

@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.shared.red.jsonParagon
 
 import kotlinx.serialization.Serializable
@@ -125,6 +127,8 @@ class FeedRepository(private val tokenStore: TokenStore? = null, private val cac
             FeedResult.Ok(items)
         } catch (e: HttpException) {
             cachedFeed() ?: FeedResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             cachedFeed() ?: FeedResult.Error(Textos.t(T.error_conexion))
         }
@@ -147,6 +151,8 @@ class FeedRepository(private val tokenStore: TokenStore? = null, private val cac
         val store = tokenStore ?: return null
         return try {
             ApiClient.feedApi(store).react(activityId, ReactRequest(reaction)).reacted
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -162,6 +168,8 @@ class FeedRepository(private val tokenStore: TokenStore? = null, private val cac
         val store = tokenStore ?: return null
         return try {
             ApiClient.feedApi(store).registerView(activityId).isNew
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -172,6 +180,8 @@ class FeedRepository(private val tokenStore: TokenStore? = null, private val cac
         val store = tokenStore ?: return null
         return try {
             ApiClient.feedApi(store).addComment(activityId, NewCommentRequest(body)).toFeedComment()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }

@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.i18n.T
@@ -25,6 +27,8 @@ class SesionesRepository(private val tokenStore: TokenStore? = null) {
             SesionResultado.Ok(bloque(store))
         } catch (e: HttpException) {
             SesionResultado.Error(e.paragonErrorMessage() ?: Textos.t(T.error_conexion))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SesionResultado.Error(Textos.t(T.error_conexion))
         }

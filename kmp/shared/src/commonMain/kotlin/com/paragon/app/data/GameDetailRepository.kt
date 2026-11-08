@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.shared.red.jsonParagon
 
 import kotlinx.serialization.Serializable
@@ -184,23 +186,43 @@ private fun GameDetailData.toCachedEntity() = CachedGameDetailEntity(
     playtimeMinutes = playtimeMinutes,
 )
 
-private fun CachedGameDetailEntity.toDomain() = GameDetailData(
+private fun CachedGameDetailEntity.toDomain(anclado: Boolean) = GameDetailData(
     id = gameId,
     title = title,
     coverUrl = coverUrl,
     earnedTrophies = earnedTrophies,
     totalTrophies = totalTrophies,
     percent = percent,
-    isPinned = true, // solo se cachea el juego anclado (ver FocusScreen)
+    isPinned = anclado,
     notes = notes,
     playtimeMinutes = playtimeMinutes,
     trophies = try { jsonParagon.decodeFromString(trophyListSerializer, trophiesJson) } catch (e: Exception) { emptyList() },
 )
 
+/** Cuántas fichas abiertas se guardan para verlas sin conexión (más la del juego anclado). */
+private const val FICHAS_SIN_CONEXION = 40
+
 class GameDetailRepository(
     private val tokenStore: TokenStore? = null,
     private val gameDetailDao: GameDetailDao? = null,
+    /** Para saber cuál es el juego anclado (que nunca se borra de la caché). */
+    private val libraryDao: com.paragon.app.data.local.LibraryDao? = null,
 ) {
+    private suspend fun idAnclado(): String? = try {
+        libraryDao?.getPinnedGame()?.id
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        null
+    }
+
+    private suspend fun desdeCache(gameId: String): GameDetailResult? {
+        val cached = gameDetailDao?.getCachedDetail(gameId) ?: return null
+        // Sin la Biblioteca a mano (FocusScreen), lo cacheado es el anclado, como antes.
+        val anclado = if (libraryDao == null) true else idAnclado() == gameId
+        return GameDetailResult.Ok(cached.toDomain(anclado), fromCache = true)
+    }
+
     /**
      * Guía de bolsillo offline: red primero, y en cuanto responde se
      * refresca la caché local (mismo patrón "network-first, cache-aside"
@@ -217,6 +239,8 @@ class GameDetailRepository(
                 GameDetailResult.Ok(response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos))
             } catch (e: HttpException) {
                 GameDetailResult.Error(if (e.code() == 404) Textos.t(T.ficha_err_no_existe) else Textos.t(T.error_servidor, e.code()))
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 GameDetailResult.Error(Textos.t(T.error_conexion))
             }
@@ -228,19 +252,22 @@ class GameDetailRepository(
             val pending = gameDetailDao?.getPendingNote(gameId)
             if (pending != null) detail = detail.copy(notes = pending.notes)
             gameDetailDao?.upsertDetail(detail.toCachedEntity())
+            if (libraryDao != null) gameDetailDao?.recortar(FICHAS_SIN_CONEXION, idAnclado() ?: "")
             GameDetailResult.Ok(detail)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: HttpException) {
-            val cached = gameDetailDao?.getCachedDetail(gameId)
-            if (cached != null) return GameDetailResult.Ok(cached.toDomain(), fromCache = true)
+            desdeCache(gameId)?.let { return it }
             val message = if (e.code() == 404) {
                 Textos.t(T.ficha_err_no_existe)
             } else {
                 Textos.t(T.error_servidor, e.code())
             }
             GameDetailResult.Error(message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            val cached = gameDetailDao?.getCachedDetail(gameId)
-            if (cached != null) return GameDetailResult.Ok(cached.toDomain(), fromCache = true)
+            desdeCache(gameId)?.let { return it }
             GameDetailResult.Error(Textos.t(T.error_conexion))
         }
     }
@@ -250,6 +277,8 @@ class GameDetailRepository(
         val store = tokenStore ?: return null
         return try {
             ApiClient.gamesApi(store).togglePin(gameId).pinned
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -260,6 +289,8 @@ class GameDetailRepository(
         val store = tokenStore ?: return null
         return try {
             ApiClient.gamesApi(store).toggleReserve(gameId).reservado
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -284,6 +315,8 @@ class GameDetailRepository(
             } else {
                 NoteSaveResult.Error
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             if (gameDetailDao != null) {
                 gameDetailDao.upsertPendingNote(PendingNoteEntity(gameId, notes))
@@ -307,6 +340,8 @@ class GameDetailRepository(
             try {
                 val ok = ApiClient.gamesApi(store).saveNotes(pending.gameId, NotesRequest(pending.notes)).ok
                 if (ok) dao.clearPendingNote(pending.gameId)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 // Se queda en la cola — se reintenta en la próxima reconexión.
             }
@@ -323,6 +358,8 @@ class GameDetailRepository(
         val store = tokenStore ?: return null
         return try {
             ApiClient.gamesApi(store).getTrophyGuide(gameId, trophyId).videoId
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -336,6 +373,8 @@ class GameDetailRepository(
             ResyncOutcome(response.nuevos, response.error, response.platinoNuevo?.let { PlatinoNuevo(it.nombre, it.iconUrl) })
         } catch (e: HttpException) {
             ResyncOutcome(0, e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ResyncOutcome(0, Textos.t(T.error_conexion))
         }

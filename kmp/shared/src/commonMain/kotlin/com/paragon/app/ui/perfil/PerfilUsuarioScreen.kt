@@ -1,5 +1,7 @@
 package com.paragon.app.ui.perfil
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.ui.common.premiumClickable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -363,6 +365,8 @@ private fun BotonAmistad(profile: UserProfileDto, tokenStore: TokenStore) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         } catch (e: HttpException) {
                             error = e.paragonErrorMessage() ?: Textos.t(T.error_conexion)
+                        } catch (e: CancellationException) {
+                            throw e
                         } catch (e: Exception) {
                             error = Textos.t(T.error_conexion)
                         }
@@ -552,6 +556,8 @@ private fun MesDiaADia(p: UserProfileDto, tokenStore: TokenStore) {
             val r = ApiClient.usersApi(tokenStore).getMesComparado(p.handle, mes)
             datos = r
             if (mes == null) mes = r.mes
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             error = true
         }

@@ -1,5 +1,7 @@
 package com.paragon.app.ui.common
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.ui.graphics.Color
 import androidx.palette.graphics.Palette
 import coil3.BitmapImage
@@ -11,6 +13,8 @@ actual fun extractAuraColor(image: Image): Color? {
         val palette = Palette.from(image.bitmap).generate()
         val swatch = palette.vibrantSwatch ?: palette.dominantSwatch ?: palette.mutedSwatch
         swatch?.let { Color(it.rgb) }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         null
     }

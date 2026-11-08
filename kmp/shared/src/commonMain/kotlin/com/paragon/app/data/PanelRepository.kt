@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.local.PanelCacheEntity
 import com.paragon.app.data.local.PanelDao
@@ -227,6 +229,8 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 409 -> PanelResult.NeedsOnboarding
                 else -> cachedPanel() ?: PanelResult.Error(Textos.t(T.error_servidor, e.code()))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             cachedPanel() ?: PanelResult.Error(Textos.t(T.error_conexion))
         }
@@ -240,6 +244,8 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
             ChooseHandleResult.Ok
         } catch (e: HttpException) {
             ChooseHandleResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ChooseHandleResult.Error(Textos.t(T.error_conexion))
         }
@@ -268,6 +274,8 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
             )
         } catch (e: HttpException) {
             HighlightsResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             HighlightsResult.Error(Textos.t(T.error_conexion))
         }
@@ -287,6 +295,8 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
             // Con el token de FCM: el servidor lo desasocia de la cuenta y
             // este teléfono deja de recibir sus avisos (auditoría, 4 oct 2026).
             ApiClient.logoutApi(store).logout(LogoutRequest(store.fcmToken))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Sin conexión o servidor caído: la sesión del móvil puede
             // quedar viva en el servidor hasta que caduque sola, pero

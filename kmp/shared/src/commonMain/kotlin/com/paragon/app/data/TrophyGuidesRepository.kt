@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.SaveTrophyGuideRequest
@@ -33,6 +35,8 @@ class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
                 guides = response.guides.map { TrophyGuideRow(it.id, it.body, it.createdAt, it.updatedAt, it.authorId, it.authorHandle, it.authorName, it.authorImage) },
                 currentUserId = response.currentUserId,
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             TrophyGuidesResult.Error(Textos.t(T.error_conexion))
         }
@@ -46,6 +50,8 @@ class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
             null
         } catch (e: HttpException) {
             Textos.t(T.error_guardar_guia)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Textos.t(T.error_conexion)
         }
@@ -56,6 +62,8 @@ class TrophyGuidesRepository(private val tokenStore: TokenStore? = null) {
         return try {
             ApiClient.trophyGuidesApi(store).deleteGuide(gameId, trophyId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }

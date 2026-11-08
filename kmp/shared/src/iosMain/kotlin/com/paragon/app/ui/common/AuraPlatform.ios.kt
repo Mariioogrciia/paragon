@@ -1,5 +1,7 @@
 package com.paragon.app.ui.common
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.ui.graphics.Color
 import coil3.Image
 import coil3.toBitmap
@@ -36,6 +38,8 @@ actual fun extractAuraColor(image: Image): Color? = try {
         n > 0 -> Color(r / n, g / n, b / n)
         else -> null
     }
+} catch (e: CancellationException) {
+    throw e
 } catch (e: Exception) {
     null
 }

@@ -35,20 +35,28 @@ export async function GET(
   // El perfil completo de la app (9 oct 2026): además de la cabecera, lo
   // mismo que cuenta el perfil de la web — racha, año, meses, últimos
   // trofeos, horas y clan. Todo sale de lo ya guardado, sin llamar a PSN.
-  const [{ games, xpMisiones }, amistad, racha, resumen, meses, ultimos, horas, clan, seguir, apoyo] = await Promise.all([
+  // En tandas de 3 (8 nov 2026), como el perfil de la web (PerfilJugador.tsx):
+  // el pool de la base es de 5 conexiones compartidas con todo lo demás, y
+  // antes salían 10 consultas de golpe (más las de getLibrary).
+  const [{ games, xpMisiones }, amistad, racha] = await Promise.all([
     getLibrary(profile),
     // Para el botón de amistad del perfil (6 oct 2026): "yo" si es tu perfil.
     profile.userId === userId ? Promise.resolve("yo" as const) : getFriendshipStatus(userId, profile.userId),
     rachas(profile.userId),
+  ]);
+  const [resumen, meses, ultimos] = await Promise.all([
     resumenHistorico(profile.userId),
     trofeosPorMes(profile.userId, 12),
     ultimosTrofeos(profile.userId, 8, idiomaDeCabecera(req.headers.get("accept-language"))),
+  ]);
+  const [horas, clan, apoyo] = await Promise.all([
     horasTotales(profile.userId),
     getUserClan(profile.userId),
-    // Seguir y Paragon+ (6 nov 2026, lo de la web del 5 nov): si fallan, el perfil sale igual.
-    estadoSeguir(userId, profile.userId).catch(() => ({ sigo: false, seguidores: 0, siguiendo: 0 })),
+    // Paragon+ (6 nov 2026): si falla, el perfil sale igual.
     esApoyo(profile.userId).catch(() => false),
   ]);
+  // Seguir hace sus 3 consultas en paralelo por su cuenta.
+  const seguir = await estadoSeguir(userId, profile.userId).catch(() => ({ sigo: false, seguidores: 0, siguiendo: 0 }));
   const stats = summarise(games);
   const nivel = paragonProgress(games, xpMisiones);
 

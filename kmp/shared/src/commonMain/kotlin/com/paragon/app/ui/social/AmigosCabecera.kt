@@ -1,5 +1,7 @@
 package com.paragon.app.ui.social
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
@@ -96,7 +98,7 @@ fun AmigosCabecera(
     var recarga by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(recarga) {
-        pendientes = try { ApiClient.amigosApi(tokenStore).pendientes().pendientes } catch (e: Exception) { emptyList() }
+        pendientes = try { ApiClient.amigosApi(tokenStore).pendientes().pendientes } catch (e: CancellationException) { throw e } catch (e: Exception) { emptyList() }
     }
 
     fun enviar() {
@@ -117,6 +119,8 @@ fun AmigosCabecera(
                 (if (r.amigos) Textos.t(T.amigos_ya_sois, limpio) else Textos.t(T.amigos_enviada, limpio)) to false
             } catch (e: HttpException) {
                 (e.paragonErrorMessage() ?: Textos.t(T.error_conexion)) to true
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Textos.t(T.error_conexion) to true
             }
@@ -244,7 +248,7 @@ fun AmigosCabecera(
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.premiumClickable {
                                 scope.launch {
-                                    try { ApiClient.amigosApi(tokenStore).quitar(p.userId) } catch (e: Exception) {}
+                                    try { ApiClient.amigosApi(tokenStore).quitar(p.userId) } catch (e: CancellationException) { throw e } catch (e: Exception) {}
                                     recarga++
                                 }
                             }.padding(8.dp),
@@ -253,7 +257,7 @@ fun AmigosCabecera(
                             Modifier.clip(RoundedCornerShape(50)).background(Accent)
                                 .premiumClickable {
                                     scope.launch {
-                                        try { ApiClient.amigosApi(tokenStore).aceptar(p.userId) } catch (e: Exception) {}
+                                        try { ApiClient.amigosApi(tokenStore).aceptar(p.userId) } catch (e: CancellationException) { throw e } catch (e: Exception) {}
                                         recarga++
                                         onCambio()
                                     }

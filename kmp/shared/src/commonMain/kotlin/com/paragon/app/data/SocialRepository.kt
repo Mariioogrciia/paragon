@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.shared.red.jsonParagon
 
 import kotlinx.serialization.Serializable
@@ -86,6 +88,8 @@ class SocialRepository(private val tokenStore: TokenStore? = null, private val c
             SocialResult.Ok(data)
         } catch (e: HttpException) {
             cachedSocial() ?: SocialResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             cachedSocial() ?: SocialResult.Error(Textos.t(T.error_conexion))
         }

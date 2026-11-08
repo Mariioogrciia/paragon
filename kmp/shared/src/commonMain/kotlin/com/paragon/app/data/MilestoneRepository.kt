@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.HitoDto
@@ -31,6 +33,8 @@ class MilestoneRepository(private val tokenStore: TokenStore? = null) {
             MilestoneResult.Ok(response.hito?.toHitoReservado(), response.proximo?.numero, response.proximo?.faltan)
         } catch (e: HttpException) {
             MilestoneResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             MilestoneResult.Error(Textos.t(T.error_conexion))
         }

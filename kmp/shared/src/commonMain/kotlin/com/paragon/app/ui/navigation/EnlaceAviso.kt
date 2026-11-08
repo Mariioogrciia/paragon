@@ -1,5 +1,7 @@
 package com.paragon.app.ui.navigation
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,7 +28,7 @@ fun rutaAppDeAviso(rutaWeb: String, miHandle: String?): String? {
     val sinDominio = rutaWeb.trim().let { if (it.contains("://")) "/" + it.substringAfter("://").substringAfter('/', "") else it }
     val partes = sinDominio.substringBefore('?').substringBefore('#')
         .split('/').filter { it.isNotEmpty() }
-        .map { try { it.decodeURLPart() } catch (e: Exception) { it } }
+        .map { try { it.decodeURLPart() } catch (e: CancellationException) { throw e } catch (e: Exception) { it } }
     return when (partes.firstOrNull()) {
         "juego" -> partes.getOrNull(1)?.let { Screen.GameDetail.routeFor(it) }
         "u" -> {

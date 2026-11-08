@@ -1,5 +1,7 @@
 package com.paragon.app
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -107,7 +109,7 @@ object AppIOS {
      * en curso no se descifra y se ignora (ver EnlaceSeguro).
      */
     fun recibirEnlace(url: String) {
-        val enlace = try { Url(url) } catch (e: Exception) { return }
+        val enlace = try { Url(url) } catch (e: CancellationException) { throw e } catch (e: Exception) { return }
         // Universal Links (5 nov 2026): un enlace de la web abre su pantalla,
         // igual que tocar un aviso (EnlaceAviso → rutaAppDeAviso).
         if (enlace.protocol.name == "https" && (enlace.host == "www.paragontrophies.com" || enlace.host == "paragontrophies.com")) {

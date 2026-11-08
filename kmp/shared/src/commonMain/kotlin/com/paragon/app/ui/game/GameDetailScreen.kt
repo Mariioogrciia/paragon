@@ -98,6 +98,9 @@ import com.paragon.shared.i18n.Textos
  * contra GET /api/mobile/games/{gameId} (GameDetailRepository).
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
+/** Portada, tarjetas y filtros: lo que hay en la lista antes del primer trofeo. */
+private const val INDICE_PRIMER_TROFEO = 3
+
 @Composable
 fun GameDetailScreen(
     gameId: String,
@@ -112,7 +115,12 @@ fun GameDetailScreen(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
-    val repository = remember(tokenStore) { GameDetailRepository(tokenStore) }
+    // Con caché (8 nov 2026): las fichas que abres se ven también sin conexión.
+    val contextoBd = contextoPlataforma()
+    val repository = remember(tokenStore, contextoBd) {
+        val bd = ParagonDatabase.getDatabase(contextoBd)
+        GameDetailRepository(tokenStore, bd.gameDetailDao(), bd.libraryDao())
+    }
     val milestoneRepository = remember(tokenStore) { MilestoneRepository(tokenStore) }
     var result by remember { mutableStateOf<GameDetailResult?>(null) }
     var hito by remember { mutableStateOf<HitoReservado?>(null) }
@@ -283,9 +291,9 @@ private fun GameDetailContent(
     }
 
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
-    // Llegando desde un trofeo: se baja hasta él una sola vez. El índice se
-    // cuenta igual que se pintan los elementos de la LazyColumn de abajo
-    // (cabecera, acciones, notas, diario, filtros y luego cada grupo).
+    // Llegando desde un trofeo (o tocándolo en el plan): se baja hasta él.
+    // Antes de los trofeos siempre hay 3 elementos (portada, tarjetas y
+    // filtros); luego cada grupo con su cabecera.
     var resaltado by remember(gameId) { mutableStateOf(trofeoInicial) }
     // A qué trofeo bajar: el de llegada o el que se toque en el plan de platino.
     var irATrofeo by remember(gameId) { mutableStateOf(trofeoInicial) }
@@ -303,7 +311,7 @@ private fun GameDetailContent(
         }
         kotlinx.coroutines.delay(350) // que la lista se recomponga con los filtros quitados
         val cuadricula = com.paragon.app.ui.trofeos.vistaTrofeosActual == com.paragon.app.ui.trofeos.VistaTrofeos.CUADRICULA
-        var indice = 5 + (if (game.diario != null) 1 else 0) + (if (conPlan) 1 else 0) + (if (conRapidos) 1 else 0)
+        var indice = INDICE_PRIMER_TROFEO
         for ((grupoId, lista) in gruposActuales) {
             if (grupoId != null) indice++
             val pos = lista.indexOfFirst { it.id == objetivo }
@@ -347,68 +355,67 @@ private fun GameDetailContent(
             )
         }
 
-        // De otra persona: sin acciones ni notas (son tuyas), pero el elemento
-        // sigue ahí vacío para que el índice de "bajar al trofeo" no cambie.
-        if (soloLectura) item {} else item {
-            GameActionsRow(
-                pinned = pinned,
-                reservado = reservado,
-                numeroHito = numeroHito,
-                faltanHito = faltanHito,
-                platinoConseguido = platinoConseguido,
-                onTogglePin = { togglePin() },
-                onToggleReserve = { toggleReserve() },
-                onOpenCollections = { showCollections = true },
-                onShare = { showShare = true },
-                dynamicColor = dynamicColor,
-            )
-        }
-
-        if (soloLectura) item {} else item {
-            NotesSection(
-                initialNotes = game.notes,
-                dynamicColor = dynamicColor,
-                onSaveNotes = { newNotes ->
-                    coroutineScope.launch {
-                        repository.saveNotes(gameId, newNotes)
-                    }
+        // Todo lo que va entre la portada y los filtros, en UN solo elemento
+        // de la lista (8 nov 2026): antes era uno por tarjeta, y "bajar al
+        // trofeo" tenía que contarlas a mano (una tarjeta nueva sin sumar
+        // llevaba al trofeo equivocado). Ahora la lista siempre es: portada,
+        // tarjetas, filtros y los trofeos (INDICE_PRIMER_TROFEO).
+        item(key = "tarjetas") {
+            Column {
+                // De otra persona: sin acciones ni notas (son tuyas).
+                if (!soloLectura) {
+                    GameActionsRow(
+                        pinned = pinned,
+                        reservado = reservado,
+                        numeroHito = numeroHito,
+                        faltanHito = faltanHito,
+                        platinoConseguido = platinoConseguido,
+                        onTogglePin = { togglePin() },
+                        onToggleReserve = { toggleReserve() },
+                        onOpenCollections = { showCollections = true },
+                        onShare = { showShare = true },
+                        dynamicColor = dynamicColor,
+                    )
+                    NotesSection(
+                        initialNotes = game.notes,
+                        dynamicColor = dynamicColor,
+                        onSaveNotes = { newNotes ->
+                            coroutineScope.launch {
+                                repository.saveNotes(gameId, newNotes)
+                            }
+                        }
+                    )
                 }
-            )
-        }
 
-        // Precio en PC con alerta (8 oct 2026, ui/precios). No en tus propios
-        // juegos de Steam (ya los tienes); sin versión de PC no pinta nada.
-        // Elemento fijo, aunque esté vacío, para el índice de "bajar al trofeo".
-        if (gameId.startsWith("steam-") && !soloLectura) item {} else item {
-            com.paragon.app.ui.precios.TarjetaPrecioFicha(
-                gameId = gameId,
-                titulo = game.title,
-                tokenStore = tokenStore,
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-            )
-        }
+                // Precio en PC con alerta (8 oct 2026, ui/precios). No en tus propios
+                // juegos de Steam (ya los tienes); sin versión de PC no pinta nada.
+                if (!(gameId.startsWith("steam-") && !soloLectura)) {
+                    com.paragon.app.ui.precios.TarjetaPrecioFicha(
+                        gameId = gameId,
+                        titulo = game.title,
+                        tokenStore = tokenStore,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                    )
+                }
 
-        // "El Diario del Platino", como en la web: solo con el platino y fechas.
-        game.diario?.let { diario ->
-            item {
-                com.paragon.app.ui.trofeos.DiarioPlatinoCard(diario, game.title, Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+                // "El Diario del Platino", como en la web: solo con el platino y fechas.
+                game.diario?.let { diario ->
+                    com.paragon.app.ui.trofeos.DiarioPlatinoCard(diario, game.title, Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+                }
+
+                // Plan de platino y platinos más rápidos (6 nov 2026, como la web).
+                if (conPlan) game.plan?.let { plan ->
+                    PlanPlatinoCard(plan, game.trophies, onTrofeo = { irATrofeo = it }, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+                }
+                if (conRapidos) {
+                    val abrirPerfil = com.paragon.app.ui.navigation.LocalAbrirPerfil.current
+                    PlatinosRapidosCard(game.rapidos, onPersona = abrirPerfil, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+                }
             }
-        }
-
-        // Plan de platino y platinos más rápidos (6 nov 2026, como la web).
-        // Cuentan en el índice de "bajar al trofeo" (conPlan/conRapidos, arriba).
-        if (conPlan) game.plan?.let { plan ->
-            item {
-                PlanPlatinoCard(plan, game.trophies, onTrofeo = { irATrofeo = it }, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
-            }
-        }
-        if (conRapidos) item {
-            val abrirPerfil = com.paragon.app.ui.navigation.LocalAbrirPerfil.current
-            PlatinosRapidosCard(game.rapidos, onPersona = abrirPerfil, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
         }
 
         // Filtros: estado (segmentado) y, si hay DLC, una fila de pastillas por grupo.
-        item {
+        item(key = "filtros") {
             Column(Modifier.padding(top = 12.dp)) {
                 Row(modifier = Modifier.padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                     com.paragon.app.ui.common.ControlSegmentado(

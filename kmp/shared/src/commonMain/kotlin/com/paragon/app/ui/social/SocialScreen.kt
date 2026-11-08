@@ -1,5 +1,7 @@
 package com.paragon.app.ui.social
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.foundation.verticalScroll
 
 import androidx.compose.animation.core.Animatable
@@ -72,7 +74,7 @@ fun SocialScreen(tokenStore: TokenStore, themeStore: ThemeStore, myHandle: Strin
     LaunchedEffect(selectedTab, subAmigos) {
         if (selectedTab == 2) nSolicitudes = try {
             com.paragon.app.data.network.ApiClient.amigosApi(tokenStore).pendientes().pendientes.size
-        } catch (e: Exception) { nSolicitudes }
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { nSolicitudes }
     }
     val retryCounter = remember { mutableIntStateOf(0) }
     val leaguesRefresh = remember { mutableIntStateOf(0) }

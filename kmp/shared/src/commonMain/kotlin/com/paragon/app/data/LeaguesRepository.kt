@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.shared.red.jsonParagon
 
 import kotlinx.serialization.Serializable
@@ -89,6 +91,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
             val leagues = response.leagues.map { League(it.id, it.name, it.ownerId, it.memberCount, it.endsAt, it.terminada || ligaTerminada(it.endsAt)) }
             cacheDao?.put(SimpleCacheEntity(CACHE_KEY, jsonParagon.encodeToString(leaguesListSerializer, leagues)))
             LeaguesResult.Ok(leagues)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             cachedLeagues() ?: LeaguesResult.Error(Textos.t(T.error_conexion))
         }
@@ -105,6 +109,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         val store = tokenStore ?: return emptyList()
         return try {
             ApiClient.leaguesApi(store).getInvites().invites.map { LeagueInvite(it.id, it.name, it.ownerName ?: Textos.t(T.comun_alguien)) }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emptyList()
         }
@@ -115,6 +121,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).acceptInvite(leagueId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -125,6 +133,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).declineInvite(leagueId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -136,6 +146,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             val dto = ApiClient.leaguesApi(store).createLeague(NewLeagueRequest(name, durationValue, durationUnit))
             League(dto.id, dto.name, dto.ownerId, dto.memberCount, dto.endsAt)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -175,6 +187,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         } catch (e: HttpException) {
             val message = if (e.code() == 404) Textos.t(T.liga_err_no_existe) else Textos.t(T.error_servidor, e.code())
             LeagueDetailResult.Error(message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             LeagueDetailResult.Error(Textos.t(T.error_conexion))
         }
@@ -186,6 +200,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).setChallenge(leagueId, SetLeagueChallengeRequest(gameId))
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -197,6 +213,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).addMember(leagueId, AddLeagueMemberRequest(userId))
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -208,6 +226,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).removeMember(leagueId, userId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -219,6 +239,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).leaveLeague(leagueId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -229,6 +251,8 @@ class LeaguesRepository(private val tokenStore: TokenStore? = null, private val 
         return try {
             ApiClient.leaguesApi(store).deleteLeague(leagueId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }

@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.CollectionDto
@@ -31,6 +33,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
             CollectionsResult.Ok(response.collections.map { it.toColeccion() })
         } catch (e: HttpException) {
             CollectionsResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             CollectionsResult.Error(Textos.t(T.error_conexion))
         }
@@ -44,6 +48,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
             MutationOutcome(true)
         } catch (e: HttpException) {
             MutationOutcome(false, e.paragonErrorMessage() ?: Textos.t(T.carpeta_err_crear))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             MutationOutcome(false, Textos.t(T.error_conexion))
         }
@@ -56,6 +62,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
             MutationOutcome(true)
         } catch (e: HttpException) {
             MutationOutcome(false, e.paragonErrorMessage() ?: Textos.t(T.carpeta_err_renombrar))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             MutationOutcome(false, Textos.t(T.error_conexion))
         }
@@ -66,6 +74,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
         return try {
             ApiClient.collectionsApi(store).deleteCollection(id)
             MutationOutcome(true)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             MutationOutcome(false, Textos.t(T.carpeta_err_borrar))
         }
@@ -76,6 +86,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return false
         return try {
             ApiClient.collectionsApi(store).toggleGameInCollection(collectionId, gameId).dentro
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -89,6 +101,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
             if (r.url != null) null else r.error ?: Textos.t(T.ajustes_err_subir_imagen)
         } catch (e: HttpException) {
             e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code())
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Textos.t(T.error_red)
         }
@@ -99,6 +113,8 @@ class CollectionsRepository(private val tokenStore: TokenStore? = null) {
         val store = tokenStore ?: return false
         return try {
             ApiClient.collectionsApi(store).quitarPortada(id).ok
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }

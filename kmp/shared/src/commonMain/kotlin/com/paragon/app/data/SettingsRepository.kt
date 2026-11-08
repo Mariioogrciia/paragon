@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.LinkedAccountsResponse
@@ -22,6 +24,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(response)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.ajustes_err_cuentas, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -40,6 +44,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -51,6 +57,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -64,6 +72,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -75,6 +85,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(ApiClient.settingsApi(tokenStore).comprobarCuenta(com.paragon.shared.red.ComprobarCuentaRequest(platform, entrada)))
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -85,6 +97,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(ApiClient.settingsApi(tokenStore).anadirSteamExtra(LinkPlatformRequest(entrada)))
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -96,6 +110,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -107,6 +123,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(ApiClient.settingsApi(tokenStore).syncPlatform(platform).nuevos)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -118,6 +136,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             SettingsResult.Ok(Unit)
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }
@@ -142,6 +162,8 @@ class SettingsRepository(private val tokenStore: TokenStore) {
             }
         } catch (e: HttpException) {
             SettingsResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor_corto, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             SettingsResult.Error(Textos.t(T.error_red))
         }

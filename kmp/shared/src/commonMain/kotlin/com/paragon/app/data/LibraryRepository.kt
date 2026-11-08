@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.LibraryGameDto
@@ -118,6 +120,8 @@ class LibraryRepository(
         } catch (e: HttpException) {
             if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)
             else LibraryResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             if (!localGames.isNullOrEmpty()) LibraryResult.Ok(localGames, fromCache = true)
             else LibraryResult.Error(Textos.t(T.error_conexion))
@@ -138,6 +142,8 @@ class LibraryRepository(
         val store = tokenStore ?: return null
         return try {
             ApiClient.libraryApi(store).getLibrary().games.find { it.isPinned == true }?.id
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -150,6 +156,8 @@ class LibraryRepository(
         val store = tokenStore ?: return null
         return try {
             ApiClient.libraryApi(store).getLibrary().games.find { it.isPinned == true }?.toLibraryGame()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }

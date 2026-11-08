@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 
@@ -29,6 +31,8 @@ class SteamRepository(private val tokenStore: TokenStore) {
                 // Sin nada pendiente, o un lote sin ningún juego (Steam no deja leerlos): no hay más que hacer.
                 if (lote.restantes == 0 || lote.hechos == 0) break
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Sin red o límite de uso: se reintenta en la siguiente sincronización.
         }

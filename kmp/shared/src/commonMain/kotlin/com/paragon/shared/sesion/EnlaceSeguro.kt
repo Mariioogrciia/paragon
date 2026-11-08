@@ -1,5 +1,7 @@
 package com.paragon.shared.sesion
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.shared.red.URL_BASE
 import dev.whyoleg.cryptography.BinarySize.Companion.bits
 import dev.whyoleg.cryptography.CryptographyProvider
@@ -54,6 +56,8 @@ object EnlaceSeguro {
             val token = clave.cipher(tagSize = 128.bits).decryptBlocking(datos).decodeToString()
             tokenStore.pendingLoginKey = null
             token.takeIf { it.isNotBlank() }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }

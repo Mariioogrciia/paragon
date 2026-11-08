@@ -1,5 +1,7 @@
 package com.paragon.app.ui.feed
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
@@ -83,6 +85,8 @@ fun ComunidadScreen(
                                 if (r.amigos) Textos.t(T.amigos_ya_sois, destino.handle) else Textos.t(T.amigos_enviada, destino.handle)
                             } catch (e: HttpException) {
                                 e.paragonErrorMessage() ?: Textos.t(T.error_conexion)
+                            } catch (e: CancellationException) {
+                                throw e
                             } catch (e: Exception) {
                                 Textos.t(T.error_conexion)
                             }

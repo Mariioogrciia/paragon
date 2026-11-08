@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.shared.red.jsonParagon
 
 import kotlinx.serialization.Serializable
@@ -144,6 +146,8 @@ class StatsRepository(private val tokenStore: TokenStore? = null, private val ca
             StatsResult.Ok(stats)
         } catch (e: HttpException) {
             cachedStats() ?: StatsResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             cachedStats() ?: StatsResult.Error(Textos.t(T.error_conexion))
         }

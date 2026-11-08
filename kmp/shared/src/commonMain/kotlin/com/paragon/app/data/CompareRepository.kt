@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.paragonErrorMessage
@@ -57,6 +59,8 @@ class CompareRepository(private val tokenStore: TokenStore? = null) {
                 else -> Textos.t(T.error_servidor, e.code())
             }
             CompareResult.Error(message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             CompareResult.Error(Textos.t(T.error_conexion))
         }

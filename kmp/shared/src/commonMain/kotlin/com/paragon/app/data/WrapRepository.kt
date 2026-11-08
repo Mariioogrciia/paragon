@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.i18n.Textos
@@ -49,6 +51,8 @@ class WrapRepository(private val tokenStore: TokenStore? = null) {
                     percentil = dto.percentil?.let { WrapPercentil(it.percentil, it.totalUsuarios, it.miTotal) },
                 ),
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             WrapResult.Error(Textos.t(T.error_conexion))
         }

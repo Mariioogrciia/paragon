@@ -2,6 +2,8 @@
 
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -16,6 +18,8 @@ internal fun ahoraMillis(): Long = Clock.System.now().toEpochMilliseconds()
 internal fun isoAMillis(iso: String?): Long? =
     if (iso.isNullOrBlank()) null else try {
         Instant.parse(iso).toEpochMilliseconds()
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         null
     }

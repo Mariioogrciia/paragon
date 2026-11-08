@@ -32,6 +32,18 @@ Fallos encontrados en la auditoría, arreglados:
   plano: ahora `repeatOnLifecycle(STARTED)`.
 - «Badges» sin traducir en Estadísticas.
 
+Y lo que quedó apuntado, arreglado el 8 nov:
+- Los `catch (e: Exception)` de la app (109) también cazaban la cancelación
+  de las corrutinas: ahora la relanzan (`catch (e: CancellationException) {
+  throw e }` delante). En código nuevo, hazlo igual.
+- La ficha: todo lo que va entre la portada y los filtros es UN elemento de
+  la lista (`item(key = "tarjetas")`), así que «bajar al trofeo» ya no cuenta
+  tarjetas a mano (`INDICE_PRIMER_TROFEO = 3`). Una tarjeta nueva va dentro
+  de ese Column y no toca el índice.
+- Sin conexión se ven las últimas 40 fichas abiertas (y siempre la del
+  juego anclado), no solo la anclada (`GameDetailDao.recortar`).
+- El perfil de la API móvil hace sus consultas en tandas de 3, como la web.
+
 ### Auditoría completa y todo lo que salió de ella (5 nov)
 
 Pedido: «una auditoría completísima» y luego «ponte con absolutamente todo

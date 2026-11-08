@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.InviteToClanRequest
@@ -83,6 +85,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
                 clans = response.clans.map { ClanSummary(it.id, it.name, it.tag, it.description, it.memberCount, it.emblema) },
                 myClan = response.myClan?.let { MyClan(it.tag, it.name, it.role, it.emblema) },
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClansResult.Error(Textos.t(T.error_conexion))
         }
@@ -95,6 +99,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ApiClient.clansApi(store).getInvites().invites.map {
                 ClanInvite(it.clanId, it.clanTag, it.clanName, it.invitedByName ?: it.invitedByHandle ?: Textos.t(T.comun_alguien))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emptyList()
         }
@@ -105,6 +111,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
         return try {
             ApiClient.clansApi(store).acceptInvite(clanId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -115,6 +123,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
         return try {
             ApiClient.clansApi(store).declineInvite(clanId)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -133,6 +143,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ClanActionResult.Ok
         } catch (e: HttpException) {
             ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.clan_err_crear))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanActionResult.Error(Textos.t(T.error_conexion))
         }
@@ -169,6 +181,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
         } catch (e: HttpException) {
             val message = if (e.code() == 404) Textos.t(T.clan_err_no_existe) else Textos.t(T.error_servidor, e.code())
             ClanDetailResult.Error(message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanDetailResult.Error(Textos.t(T.error_conexion))
         }
@@ -192,6 +206,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ClanActionResult.Ok
         } catch (e: HttpException) {
             ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanActionResult.Error(Textos.t(T.error_conexion))
         }
@@ -205,6 +221,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ClanActionResult.Ok
         } catch (e: HttpException) {
             ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanActionResult.Error(Textos.t(T.error_conexion))
         }
@@ -217,6 +235,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ClanActionResult.Ok
         } catch (e: HttpException) {
             ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.clan_err_unir))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanActionResult.Error(Textos.t(T.error_conexion))
         }
@@ -228,6 +248,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
         return try {
             ApiClient.clansApi(store).leaveClan(tag)
             true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -250,6 +272,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ClanActionResult.Ok
         } catch (e: HttpException) {
             ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanActionResult.Error(Textos.t(T.error_conexion))
         }
@@ -262,6 +286,8 @@ class ClansRepository(private val tokenStore: TokenStore? = null) {
             ClanActionResult.Ok
         } catch (e: HttpException) {
             ClanActionResult.Error(e.paragonErrorMessage() ?: Textos.t(T.clan_err_invitar))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ClanActionResult.Error(Textos.t(T.error_conexion))
         }

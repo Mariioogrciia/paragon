@@ -1,5 +1,7 @@
 package com.paragon.app.ui.precios
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -102,7 +104,7 @@ fun TarjetaPrecioFicha(gameId: String, titulo: String, tokenStore: TokenStore, m
     var datos by remember(gameId) { mutableStateOf<PreciosJuegoDto?>(null) }
     var dialogo by remember { mutableStateOf(false) }
     LaunchedEffect(gameId) {
-        datos = try { ApiClient.preciosApi(tokenStore).getPrecios(gameId).precios } catch (e: Exception) { null }
+        datos = try { ApiClient.preciosApi(tokenStore).getPrecios(gameId).precios } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
     }
     val d = datos ?: return
 
@@ -220,6 +222,8 @@ private fun DialogoAlertaPrecio(
                         try {
                             onGuardar(valor)
                             onCerrar()
+                        } catch (e: CancellationException) {
+                            throw e
                         } catch (e: Exception) {
                             error = Textos.t(T.error_conexion)
                         } finally {
@@ -239,6 +243,8 @@ private fun DialogoAlertaPrecio(
                             try {
                                 onQuitar()
                                 onCerrar()
+                            } catch (e: CancellationException) {
+                                throw e
                             } catch (e: Exception) {
                                 error = Textos.t(T.error_conexion)
                             } finally {
@@ -262,10 +268,10 @@ fun PlatinosOfertaScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirJueg
     var alertas by remember { mutableStateOf<List<AlertaPrecioDto>?>(null) }
     var ofertas by remember { mutableStateOf<List<PlatinoOfertaDto>?>(null) }
     LaunchedEffect(Unit) {
-        alertas = try { ApiClient.preciosApi(tokenStore).getAlertas().alertas } catch (e: Exception) { emptyList() }
+        alertas = try { ApiClient.preciosApi(tokenStore).getAlertas().alertas } catch (e: CancellationException) { throw e } catch (e: Exception) { emptyList() }
     }
     LaunchedEffect(Unit) {
-        ofertas = try { ApiClient.preciosApi(tokenStore).getPlatinosOferta().ofertas } catch (e: Exception) { emptyList() }
+        ofertas = try { ApiClient.preciosApi(tokenStore).getPlatinosOferta().ofertas } catch (e: CancellationException) { throw e } catch (e: Exception) { emptyList() }
     }
 
     LazyColumn(

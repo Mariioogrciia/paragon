@@ -1,5 +1,7 @@
 package com.paragon.shared.red
 
+import kotlinx.coroutines.CancellationException
+
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -60,6 +62,8 @@ private data class CuerpoError(val error: String? = null)
  */
 fun HttpException.paragonErrorMessage(): String? = try {
     cuerpo?.let { jsonParagon.decodeFromString(CuerpoError.serializer(), it).error }
+} catch (e: CancellationException) {
+    throw e
 } catch (e: Exception) {
     null
 }
@@ -95,7 +99,7 @@ class ClienteParagon(
         HttpResponseValidator {
             validateResponse { respuesta ->
                 if (!respuesta.status.isSuccess()) {
-                    val cuerpo = try { respuesta.bodyAsText() } catch (e: Exception) { null }
+                    val cuerpo = try { respuesta.bodyAsText() } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
                     throw HttpException(respuesta.status.value, cuerpo)
                 }
             }

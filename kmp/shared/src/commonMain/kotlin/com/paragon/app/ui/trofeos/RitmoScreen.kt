@@ -1,5 +1,7 @@
 package com.paragon.app.ui.trofeos
 
+import kotlinx.coroutines.CancellationException
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -114,12 +116,12 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirTrofeo: (game
     LaunchedEffect(Unit) {
         amigos = try {
             ApiClient.socialApi(tokenStore).getSocial().amigos.mapNotNull { a -> a.handle?.let { it to (a.name ?: it) } }
-        } catch (e: Exception) { emptyList() }
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { emptyList() }
     }
     LaunchedEffect(mes, con) {
         val h = con
         val m = mes
-        datosAmigo = if (h == null || m == null) null else try { ApiClient.statsApi(tokenStore).getMes(m, h) } catch (e: Exception) { null }
+        datosAmigo = if (h == null || m == null) null else try { ApiClient.statsApi(tokenStore).getMes(m, h) } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
     }
 
     LaunchedEffect(mes, recarga) {
@@ -132,6 +134,8 @@ fun RitmoScreen(tokenStore: TokenStore, onBack: () -> Unit, onAbrirTrofeo: (game
             val r = ApiClient.statsApi(tokenStore).getMes(mes)
             datos = r
             if (mes == null) mes = r.mes
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             error = true
         }

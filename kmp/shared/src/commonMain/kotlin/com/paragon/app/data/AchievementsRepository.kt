@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.shared.red.HttpException
@@ -33,6 +35,8 @@ class AchievementsRepository(private val tokenStore: TokenStore? = null) {
             )
         } catch (e: HttpException) {
             AchievementsResult.Error(Textos.t(T.error_servidor, e.code()))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             AchievementsResult.Error(Textos.t(T.error_conexion))
         }

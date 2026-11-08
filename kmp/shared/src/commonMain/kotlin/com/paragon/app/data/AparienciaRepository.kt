@@ -1,5 +1,7 @@
 package com.paragon.app.data
 
+import kotlinx.coroutines.CancellationException
+
 import com.paragon.app.data.auth.TokenStore
 import com.paragon.app.data.network.ApiClient
 import com.paragon.app.data.theme.ThemeSettings
@@ -24,6 +26,8 @@ class AparienciaRepository(private val tokenStore: TokenStore, private val theme
                 return
             }
             themeSettings.aplicarDeCuenta(dto)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Sin red: se queda la del teléfono.
         }
@@ -36,6 +40,8 @@ class AparienciaRepository(private val tokenStore: TokenStore, private val theme
             val request = themeSettings.requestParaGuardar()
             val dto = ApiClient.aparienciaApi(tokenStore).guardar(request)
             themeSettings.aplicarDeCuenta(dto)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Sin red: se reintenta con el siguiente cambio o al volver a abrir la app.
         }
