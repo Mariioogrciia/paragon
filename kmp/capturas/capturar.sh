@@ -28,7 +28,10 @@ until adb shell getprop sys.boot_completed 2>/dev/null | grep -q 1; do sleep 2; 
 for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 0; done
 adb install -r -g "$APK"
 adb shell pm grant $PAQ android.permission.POST_NOTIFICATIONS 2>/dev/null
-adb shell run-as $PAQ sh -c 'mkdir -p files && touch files/modo_demo'
+# Dos órdenes sueltas: `adb shell` junta los argumentos y se perderían las comillas de un `sh -c`.
+adb shell run-as $PAQ mkdir -p files
+adb shell run-as $PAQ touch files/modo_demo
+adb shell run-as $PAQ ls files
 
 adb shell am start -n "$ACT" >/dev/null; sleep 12
 foto 01-panel; bajar; foto 01-panel-2 0.5; bajar; foto 01-panel-3 0.5
