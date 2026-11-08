@@ -1,0 +1,65 @@
+name: Capturas de la app (emulador)
+
+# Recorre todas las pantallas de la app Android en un emulador con el modo
+# demo (datos de ejemplo, sin cuenta) y deja las capturas en la rama
+# `capturas-app` (y como artefacto). Para revisar el diseño pantalla a
+# pantalla sin un móvil a mano. Solo a mano: tarda unos 15 minutos.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capturas:
+    name: Capturas de pantalla
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: APK de debug (con el modo demo)
+        working-directory: kmp
+        run: ./gradlew --no-daemon :androidApp:assembleDebug
+
+      # El emulador necesita KVM en los ejecutores de Linux.
+      - name: Activar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Recorrer las pantallas
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: APK=$(ls kmp/androidApp/build/outputs/apk/debug/*.apk | head -1) SALIDA=capturas-salida bash kmp/capturas/capturar.sh
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: capturas-app
+          path: capturas-salida/
+          if-no-files-found: warn
+
+      - name: Subir las capturas a la rama capturas-app
+        if: always()
+        run: |
+          cd capturas-salida
+          git init -q
+          git checkout -q -b capturas-app
+          git add -A
+          git -c user.name="capturas" -c user.email="capturas@paragontrophies.com" commit -qm "Capturas de ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" capturas-app

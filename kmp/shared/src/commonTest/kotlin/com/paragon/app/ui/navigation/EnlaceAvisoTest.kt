@@ -30,7 +30,9 @@ class EnlaceAvisoTest {
     fun cuentaQueNoSePuedeLeerVaACuentasVinculadas() {
         assertEquals(Screen.LinkedAccounts.route, rutaAppDeAviso("/vincular?plataforma=steam", "yo"))
         assertEquals(Screen.LinkedAccounts.route, rutaAppDeAviso("/ajustes/plataformas", "yo"))
-        assertNull(rutaAppDeAviso("/ajustes/apariencia", "yo"))
+        assertEquals(Screen.Apariencia.route, rutaAppDeAviso("/ajustes/apariencia", "yo"))
+        assertEquals(Screen.Settings.route, rutaAppDeAviso("/ajustes", "yo"))
+        assertEquals(Screen.Preguntar.route, rutaAppDeAviso("/preguntar", "yo"))
     }
 
     @Test

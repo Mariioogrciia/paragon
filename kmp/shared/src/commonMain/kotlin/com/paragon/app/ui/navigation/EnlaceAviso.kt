@@ -49,6 +49,8 @@ fun rutaAppDeAviso(rutaWeb: String, miHandle: String?): String? {
         "ajustes" -> when (partes.getOrNull(1)) {
             "plataformas" -> Screen.LinkedAccounts.route
             "avisos" -> Screen.PreferenciasAvisos.route
+            "apariencia" -> Screen.Apariencia.route
+            null -> Screen.Settings.route
             else -> null
         }
         // App Links (5 nov 2026) y accesos directos del icono: un enlace de la
@@ -61,6 +63,14 @@ fun rutaAppDeAviso(rutaWeb: String, miHandle: String?): String? {
         "biblioteca" -> Screen.Library.route
         "estadisticas" -> Screen.Stats.route
         "avisos" -> Screen.Avisos.route
+        // 8 nov 2026: el resto de pantallas, para los accesos directos y para
+        // recorrerlas todas en el emulador (kmp/capturas/capturar.sh).
+        "panel" -> Screen.Dashboard.route
+        "perfil" -> Screen.Perfil.route
+        "carpetas" -> Screen.Collections.route
+        "atascados" -> Screen.StuckTrophies.route
+        "ofertas" -> Screen.PlatinosOferta.route
+        "preguntar" -> Screen.Preguntar.route
         else -> null
     }
 }

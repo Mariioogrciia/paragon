@@ -35,6 +35,36 @@ object DatosDemo {
         Triple("Hechizo legendario", "bronze", 29.9), Triple("Cenizas legendarias", "bronze", 35.2),
     )
 
+    /** Un mes de trofeos (Ritmo, perfil de otra persona); `escala` para que el tuyo y el suyo no sean iguales. */
+    private fun mes(escala: Double = 1.0): String {
+        val dias = (1..8).joinToString(",") { d -> """{"dia":"2026-11-0$d","total":${((d * 7 % 11) * escala).toInt()}}""" }
+        val porJuego = juegos.take(3).mapIndexed { i, j -> """{"gameId":"${j.id}","juego":"${j.titulo}","iconUrl":"${portada(j.app)}","total":${((12 - i * 4) * escala).toInt()}}""" }.joinToString(",")
+        val lista = trofeos.take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"${juegos[i].id}","juego":"${juegos[i].titulo}","trophyId":"t$i","nombre":"$n","detalle":"","grade":"$g","iconUrl":null,"earnedAt":"2026-11-0${7 - i}T20:00:00.000Z","rarityPercent":$r}""" }.joinToString(",")
+        return """{"mes":"2026-11","total":${(42 * escala).toInt()},"porDia":[$dias],"porJuego":[$porJuego],"trofeos":[$lista]}"""
+    }
+
+    private fun perfil(handle: String): String {
+        val yo = handle == "lagrena"
+        val nombre = when (handle) { "nerea" -> "Nerea"; "iker" -> "Iker"; else -> "La Greña" }
+        val meses = (1..11).joinToString(",") { m -> """{"mes":"2026-${m.toString().padStart(2, '0')}","total":${(m * 37) % 140 + 20},"platinos":${m % 3}}""" }
+        val ultimos = trofeos.take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"${juegos[i].id}","juego":"${juegos[i].titulo}","trophyId":"t$i","nombre":"$n","detalle":"","grade":"$g","iconUrl":null,"earnedAt":"2026-11-0${7 - i}T20:00:00.000Z","rarityPercent":$r}""" }.joinToString(",")
+        val recientes = juegos.take(5).joinToString(",") { """{"id":"${it.id}","title":"${it.titulo}","coverUrl":"${portada(it.app)}","percent":${it.pct}}""" }
+        return """{"userId":"u-$handle","name":"$nombre","handle":"$handle","image":null,"level":51,"platinos":112,"trofeos":5120,"juegos":240,"oros":402,"platas":1180,"bronces":3426,"completadoMedio":71,"horas":3480,
+            "accounts":[{"platform":"psn","username":"${handle}_ps"},{"platform":"steam","username":"$nombre"}],"recentGames":[$recientes],
+            "amistad":"${if (yo) "yo" else "amigos"}","racha":{"actual":12,"mejor":40,"diasActivos":210},"esteAnio":980,"mejorMes":{"mes":"marzo de 2026","total":160},
+            "porMes":[$meses],"clan":{"tag":"ALBA","name":"Cazadores del Alba","logoUrl":null},"ultimosTrofeos":[$ultimos],
+            "seguir":{"sigo":${!yo},"seguidores":12,"siguiendo":4},"apoyo":${handle == "nerea"},"estado":"A por los 150 platinos","titulo":"Cazadora de leyendas"}"""
+    }
+
+    private fun sesion(i: Int): String {
+        val j = juegos[i]
+        return """{"id":"s$i","trofeo":"${trofeos[2 + i].first}","trofeoInfo":{"trophyId":"t${2 + i}","iconUrl":null,"grade":"${trofeos[2 + i].second}","detail":"Gana 10 partidas online."},"descripcion":"Cooperativo tranquilo, con micro.","fechaHora":"2026-11-0${9 + i}T20:00:00.000Z","plazasTotales":4,"ocupadas":${2 + i},"libres":${2 - i},"cancelada":false,
+            "juego":{"id":"${j.id}","titulo":"${j.titulo}","iconUrl":"${portada(j.app)}","platform":"${j.plat}","deviceLabel":"PS5"},
+            "anfitrion":{"userId":"u2","handle":"nerea","name":"Nerea","image":null},"participantes":[{"userId":"u3","handle":"iker","name":"Iker","image":null}],"soyAnfitrion":false,"estoyApuntado":${i == 0}}"""
+    }
+
+    private fun sesiones() = """{"sesiones":[${sesion(0)},${sesion(1)}],"juegos":[${juegos.filter { it.pct < 100 }.take(4).joinToString(",") { """{"id":"${it.id}","titulo":"${it.titulo}","platform":"${it.plat}","deviceLabel":"PS5","progreso":${it.pct}}""" }}]}"""
+
     fun respuesta(metodo: String, ruta: String): String? {
         if (metodo != "GET") return when {
             ruta.endsWith("/react") -> """{"reacted":true}"""
@@ -43,9 +73,33 @@ object DatosDemo {
             ruta.endsWith("/reserve") -> """{"reservado":true}"""
             ruta.endsWith("/resync") -> """{"nuevos":0}"""
             ruta == "api/mobile/appearance" -> null // POST: sin respuesta, se queda lo elegido en el teléfono
+            ruta == "api/mobile/preguntar" -> """{"ok":true,"texto":"Con unas 6 horas, Hollow Knight es tu mejor apuesta: llevas el 74 % y los trofeos que faltan son de exploración. Si prefieres algo más corto, a Marvel's Spider-Man 2 solo le quedan 2 trofeos."}"""
+            ruta.endsWith("/seguir") -> """{"sigo":${metodo == "POST"},"seguidores":${if (metodo == "POST") 13 else 12},"siguiendo":4}"""
+            ruta.endsWith("/coleccionables") -> """{"nombres":["Grillo del bosque de Jogaku","Grillo del templo de Akashima","Grillo del río Kamiagata","Grillo de la cueva de Otsuna"],"marcados":[0,1,2],"total":4}"""
+            ruta == "api/mobile/avisos/canales" -> """{"telegram":{"vinculado":true,"enlace":null},"correoSemanal":true}"""
             else -> """{"ok":true}"""
         }
         return when {
+            // 8 nov 2026: lo que faltaba para recorrer todas las pantallas en el emulador (kmp/capturas).
+            ruta == "api/mobile/stats/month" -> mes()
+            ruta.startsWith("api/mobile/users/") && ruta.endsWith("/month") -> """{"mes":"2026-11","ellos":${mes()},"yo":${mes(0.7)}}"""
+            ruta.startsWith("api/mobile/users/") && ruta.count { it == '/' } == 3 -> perfil(ruta.substringAfterLast('/'))
+            ruta == "api/mobile/sessions" -> sesiones()
+            ruta.startsWith("api/mobile/sessions/") -> sesion(0)
+            ruta == "api/mobile/avisos" -> """{"avisos":[
+                {"id":"v1","titulo":"🏆 ¡Platino!","texto":"Has conseguido el platino de **Hades**.","ruta":"/juego/steam-1145360","leido":false,"createdAt":"2026-11-07T21:10:00.000Z"},
+                {"id":"v2","titulo":"Nerea te ha adelantado","texto":"Te ha pasado en la liga mensual por 25 puntos.","ruta":"/ligas","leido":false,"createdAt":"2026-11-07T18:00:00.000Z"},
+                {"id":"v3","titulo":"Sesión mañana a las 21:00","texto":"Elden Ring · Cooperativo: te esperan 3 personas.","ruta":"/sesiones","leido":true,"createdAt":"2026-11-06T12:00:00.000Z"}
+              ],"noLeidos":2}"""
+            ruta == "api/mobile/avisos/preferencias" -> """{"categorias":[{"clave":"trofeos","activa":true},{"clave":"perdibles","activa":true},{"clave":"lanzamientos","activa":false},{"clave":"precios","activa":true},{"clave":"ligas","activa":true},{"clave":"social","activa":true},{"clave":"amigos","activa":true},{"clave":"resumen","activa":true}],"discord":{"vinculado":true,"activo":true}}"""
+            ruta == "api/mobile/avisos/canales" -> """{"telegram":{"vinculado":false,"enlace":"https://t.me/ParagonBot?start=demo"},"correoSemanal":true}"""
+            ruta == "api/mobile/evento" -> """{"mes":"2026-11","categoria":"aventura","diasRestantes":22,"ranking":[
+                {"handle":"nerea","nombre":"Nerea","imagen":null,"puntos":640,"trofeos":21,"platinos":2,"soyYo":false},
+                {"handle":"lagrena","nombre":"La Greña","imagen":null,"puntos":455,"trofeos":18,"platinos":1,"soyYo":true},
+                {"handle":"iker","nombre":"Iker","imagen":null,"puntos":180,"trofeos":12,"platinos":0,"soyYo":false}
+              ],"anterior":{"mes":"2026-10","categoria":"rpg","podio":[{"handle":"iker","nombre":"Iker","imagen":null,"puntos":910,"trofeos":40,"platinos":3,"soyYo":false}]}}"""
+            ruta == "api/mobile/preguntar" -> """{"activo":true}"""
+            ruta.endsWith("/coleccionables") -> """{"nombres":["Grillo del bosque de Jogaku","Grillo del templo de Akashima","Grillo del río Kamiagata","Grillo de la cueva de Otsuna"],"marcados":[0,2],"comunidad":[]}"""
             ruta == "api/mobile/panel" ->
                 """{"profile":{"handle":"lagrena","name":"La Greña","level":42,"psnId":"lagrena_69","image":null},"stats":{"platinums":87,"trophies":4312,"games":214,"completionRate":68,"gold":341,"silver":812,"bronze":3072},"racha":{"actual":6,"mejor":23}}"""
             ruta == "api/mobile/panel/highlights" ->
@@ -57,9 +111,11 @@ object DatosDemo {
                 val j = juegos.firstOrNull { ruta.endsWith(it.id) } ?: juegos[0]
                 val lista = trofeos.mapIndexed { i, (n, g, r) ->
                     val ganado = i % 3 != 1
-                    """{"id":"t$i","name":"$n","detail":"Consigue algo memorable en ${j.titulo}.","grade":"$g","earned":$ganado,"earnedAt":${if (ganado) "\"2026-0${1 + i}-1${i}T18:30:00.000Z\"" else "null"},"rarityPercent":$r,"iconUrl":null}"""
+                    """{"id":"t$i","name":"$n","detail":"${if (i == 4) "Encuentra los 16 grillos cantores." else "Consigue algo memorable en ${j.titulo}."}","grade":"$g","earned":$ganado,"earnedAt":${if (ganado) "\"2026-0${1 + i}-1${i}T18:30:00.000Z\"" else "null"},"rarityPercent":$r,"iconUrl":null,"isMissable":${i == 7},"coleccionables":${if (i == 4) 16 else null},"manualProgress":${if (i == 4) "{\"current\":2,\"target\":16}" else "null"}}"""
                 }.joinToString(",")
-                """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]}}"""
+                val plan = if (j.pct == 100) "null" else """{"actual":"perdibles","faltan":3,"fases":[{"fase":"perdibles","total":1,"conseguidos":0,"pendientes":["t7"]},{"fase":"historia","total":3,"conseguidos":2,"pendientes":["t1"]},{"fase":"coleccionables","total":2,"conseguidos":1,"pendientes":["t4"]},{"fase":"limpieza","total":2,"conseguidos":2,"pendientes":[]}]}"""
+                val rapidos = """[{"handle":"nerea","nombre":"Nerea","avatarUrl":null,"platform":"psn","duracionMs":${9L * 86_400_000 + 4L * 3_600_000}},{"handle":"iker","nombre":"Iker","avatarUrl":null,"platform":"psn","duracionMs":${14L * 86_400_000}},{"handle":"lagrena","nombre":"La Greña","avatarUrl":null,"platform":"psn","duracionMs":${21L * 86_400_000 + 7L * 3_600_000}}]"""
+                """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]},"plan":$plan,"rapidos":$rapidos}"""
             }
             // Precios y "Platinos de oferta" (8 oct 2026), con datos reales de ese día.
             ruta.startsWith("api/mobile/games/") && ruta.endsWith("/precios") ->
