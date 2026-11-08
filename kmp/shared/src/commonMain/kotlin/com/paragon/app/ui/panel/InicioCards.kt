@@ -92,9 +92,11 @@ fun CabeceraInicio(
             Text(
                 Textos.t(T.inicio_hola, nombreParaSaludar(profile.name)),
                 color = Foreground,
-                fontSize = 32.sp,
+                // Un nombre largo baja de tamaño en vez de cortarse («Hola, La Gre…»).
+                fontSize = if (nombreParaSaludar(profile.name).length > 9) 26.sp else 32.sp,
+                lineHeight = 32.sp,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }

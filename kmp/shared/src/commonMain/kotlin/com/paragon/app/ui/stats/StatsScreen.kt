@@ -442,11 +442,11 @@ private fun FinancieroCard(financiero: FinancieroStats, horasTotales: Int) {
             Text(text = Textos.t(T.stats_sin_datos), color = Muted, fontSize = 13.sp)
         } else {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MiniStat(label = Textos.t(T.stats_gastado), value = "${financiero.totalGastado.roundToInt()}€", modifier = Modifier.weight(1f))
-                MiniStat(label = Textos.t(T.stats_horas_precio), value = financiero.totalHoras.roundToInt().toString(), modifier = Modifier.weight(1f))
+                MiniStat(label = Textos.t(T.stats_gastado), value = "${com.paragon.app.util.cifra(financiero.totalGastado.roundToInt())} €", modifier = Modifier.weight(1f))
+                MiniStat(label = Textos.t(T.stats_horas_precio), value = com.paragon.app.util.cifra(financiero.totalHoras.roundToInt()), modifier = Modifier.weight(1f))
                 MiniStat(
                     label = "€/hora",
-                    value = financiero.costeHoraMedio?.let { "${formatDecimal(it, 2)}€" } ?: "—",
+                    value = financiero.costeHoraMedio?.let { "${formatDecimal(it, 2)} €" } ?: "—",
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -485,8 +485,8 @@ private fun BacklogCard(backlog: BacklogStats) {
             Text(text = Textos.t(T.stats_backlog_vacio), color = Muted, fontSize = 13.sp)
         } else {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MiniStat(label = Textos.t(T.stats_hasta_final), value = "${backlog.horasHistoriaRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
-                MiniStat(label = Textos.t(T.stats_hasta_platino), value = "${backlog.horasPlatinoRestantes.roundToInt()}h", modifier = Modifier.weight(1f))
+                MiniStat(label = Textos.t(T.stats_hasta_final), value = "${com.paragon.app.util.cifra(backlog.horasHistoriaRestantes.roundToInt())} h", modifier = Modifier.weight(1f))
+                MiniStat(label = Textos.t(T.stats_hasta_platino), value = "${com.paragon.app.util.cifra(backlog.horasPlatinoRestantes.roundToInt())} h", modifier = Modifier.weight(1f))
                 MiniStat(label = Textos.t(T.stats_juegos_contados), value = backlog.juegosContados.toString(), modifier = Modifier.weight(1f))
             }
         }
@@ -601,7 +601,9 @@ private fun MiniStat(label: String, value: String, modifier: Modifier = Modifier
             text = label,
             color = Muted,
             fontSize = 11.sp,
-            maxLines = 1,
+            // Dos líneas: «Horas con precio» o «Hasta el platino» salían cortadas (capturas, 8 nov 2026).
+            maxLines = 2,
+            lineHeight = 13.sp,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         )
     }

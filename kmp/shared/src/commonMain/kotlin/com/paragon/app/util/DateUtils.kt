@@ -58,3 +58,10 @@ fun diasRestantesMes(): Int {
     }
     return diasMes - hoy.day
 }
+
+/** Año y mes de hoy (1-12) en la zona del teléfono, sin pasar por un formato localizado. */
+@OptIn(ExperimentalTime::class)
+fun anioYMesDeHoy(): Pair<Int, Int> {
+    val hoy = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    return hoy.year to hoy.month.number
+}

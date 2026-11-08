@@ -136,14 +136,11 @@ private fun diferencia(ahora: Int, antes: Int): String? {
 
 /** Índice del mes actual en las barras del año (o el último si el año no es el de hoy). */
 private fun mesActual(anio: Int, meses: Int): Int {
-    val hoy = fechaConPatron(ahoraMillis(), "yyyy-MM")
-    // El patrón localizado puede traer otros separadores: se leen solo los dígitos.
-    val digitos = hoy.filter { it.isDigit() }
-    return if (digitos.length >= 6 && digitos.take(4).toIntOrNull() == anio) {
-        ((digitos.drop(4).take(2).toIntOrNull() ?: meses) - 1).coerceIn(0, meses - 1)
-    } else {
-        meses - 1
-    }
+    // Antes salía de una fecha con formato localizado ("11/2026" en español) y
+    // se leían sus dígitos como "2026-11": nunca cuadraba y se resaltaba
+    // diciembre en noviembre (capturas del emulador, 8 nov 2026).
+    val (anioHoy, mesHoy) = com.paragon.app.util.anioYMesDeHoy()
+    return if (anioHoy == anio) (mesHoy - 1).coerceIn(0, meses - 1) else meses - 1
 }
 
 @Composable
