@@ -108,6 +108,7 @@ data class GameDetailData(
     /** Plan de platino y platinos más rápidos (6 nov 2026); tampoco van a la caché. */
     val plan: com.paragon.shared.red.PlanPlatinoDto? = null,
     val rapidos: List<com.paragon.shared.red.PlatinoRapidoDto> = emptyList(),
+    val marcas: com.paragon.shared.red.MarcasJuegoDto? = null,
 )
 
 sealed class GameDetailResult {
@@ -236,7 +237,7 @@ class GameDetailRepository(
         if (de != null) {
             return try {
                 val response = ApiClient.gamesApi(store).getGameDetail(gameId, de)
-                GameDetailResult.Ok(response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos))
+                GameDetailResult.Ok(response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos, marcas = response.marcas))
             } catch (e: HttpException) {
                 GameDetailResult.Error(if (e.code() == 404) Textos.t(T.ficha_err_no_existe) else Textos.t(T.error_servidor, e.code()))
             } catch (e: CancellationException) {
@@ -248,7 +249,7 @@ class GameDetailRepository(
 
         return try {
             val response = ApiClient.gamesApi(store).getGameDetail(gameId)
-            var detail = response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos)
+            var detail = response.game.toGameDetailData().copy(diario = response.diario, plan = response.plan, rapidos = response.rapidos, marcas = response.marcas)
             val pending = gameDetailDao?.getPendingNote(gameId)
             if (pending != null) detail = detail.copy(notes = pending.notes)
             gameDetailDao?.upsertDetail(detail.toCachedEntity())

@@ -67,11 +67,19 @@ object DatosDemo {
 
     /** «A un paso del platino» del panel (lib/platinables.ts): lo más cerca y lo que juegas ahora. */
     private fun platinablesDemo(): String {
-        fun fila(j: J, dias: Int?, horas: Int?) =
-            """{"id":"${j.id}","title":"${j.titulo}","coverUrl":"${portada(j.app)}","percent":${j.pct},"faltan":${j.def - j.gan},"tienePlatino":${j.plat == "psn"},"diasDesdeJugado":${dias ?: "null"},"horasRestantes":${horas ?: "null"}}"""
-        val cerca = listOf(fila(juegos[6], 2, 3), fila(juegos[0], 0, 12), fila(juegos[2], 9, 8), fila(juegos[3], 30, 21), fila(juegos[8], 120, null), fila(juegos[4], 4, 60))
-        val jugando = listOf(fila(juegos[0], 0, 12), fila(juegos[6], 2, 3), fila(juegos[4], 4, 60), fila(juegos[2], 9, 8))
-        return """{"cerca":[${cerca.joinToString(",")}],"jugando":[${jugando.joinToString(",")}]}"""
+        fun fila(j: J, dias: Int?, horas: Int?, extra: String = "") =
+            """{"id":"${j.id}","title":"${j.titulo}","coverUrl":"${portada(j.app)}","percent":${j.pct},"faltan":${j.def - j.gan},"tienePlatino":${j.plat == "psn"},"sinEmpezar":${j.gan == 0},"diasDesdeJugado":${dias ?: "null"},"horasRestantes":${horas ?: "null"},"dispositivos":["${if (j.plat == "psn") "PS5" else if (j.plat == "xbox") "XBOX SERIES" else "PC"}"]$extra}"""
+        val cerca = listOf(
+            fila(juegos[6], 2, 3, ""","perdibles":1,"amigos":[{"nombre":"Nerea","percent":88}]"""),
+            fila(juegos[0], 0, 12, ""","masRaroPendiente":0.8,"instalado":true"""),
+            fila(juegos[2], 9, 8, ""","suscripcion":"ps_plus""""),
+            fila(juegos[3], 30, 21),
+            fila(juegos[8], 120, null),
+        )
+        val jugando = listOf(fila(juegos[0], 0, 12, ""","instalado":true"""), fila(juegos[6], 2, 3), fila(juegos[4], 4, 60))
+        val faciles = listOf(fila(juegos[9], null, 6, ""","rarezaPlatino":41.2"""))
+        val dobles = """[{"id":"psn-hades-ps5","titulo":"Hades","coverUrl":"${portada(1145360)}","consola":"PS5","platinadoEn":"PC","laTienes":null}]"""
+        return """{"cerca":[${cerca.joinToString(",")}],"jugando":[${jugando.joinToString(",")}],"faciles":[${faciles.joinToString(",")}],"dobles":$dobles,"sugerenciaRetirar":{"dispositivo":"PS3","anios":3,"juegos":22}}"""
     }
 
     private const val RETIRADOS = """{"consolas":[{"dispositivo":"PS5","juegos":64,"retirado":false},{"dispositivo":"PS4","juegos":118,"retirado":false},{"dispositivo":"PC","juegos":40,"retirado":false},{"dispositivo":"PS3","juegos":22,"retirado":true},{"dispositivo":"PSVITA","juegos":9,"retirado":false}],"juegos":[{"id":"epic-cyber","titulo":"Cyberpunk 2077","iconUrl":null}]}"""
@@ -129,7 +137,7 @@ object DatosDemo {
                 }.joinToString(",")
                 val plan = if (j.pct == 100) "null" else """{"actual":"perdibles","faltan":3,"fases":[{"fase":"perdibles","total":1,"conseguidos":0,"pendientes":["t7"]},{"fase":"historia","total":3,"conseguidos":2,"pendientes":["t1"]},{"fase":"coleccionables","total":2,"conseguidos":1,"pendientes":["t4"]},{"fase":"limpieza","total":2,"conseguidos":2,"pendientes":[]}]}"""
                 val rapidos = """[{"handle":"nerea","nombre":"Nerea","avatarUrl":null,"platform":"psn","duracionMs":${9L * 86_400_000 + 4L * 3_600_000}},{"handle":"iker","nombre":"Iker","avatarUrl":null,"platform":"psn","duracionMs":${14L * 86_400_000}},{"handle":"lagrena","nombre":"La Greña","avatarUrl":null,"platform":"psn","duracionMs":${21L * 86_400_000 + 7L * 3_600_000}}]"""
-                """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]},"plan":$plan,"rapidos":$rapidos}"""
+                """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]},"plan":$plan,"rapidos":$rapidos,"marcas":{"instalado":true,"ocultoPerfil":false,"fechaObjetivo":"2026-11-30"}}"""
             }
             // Precios y "Platinos de oferta" (8 oct 2026), con datos reales de ese día.
             ruta.startsWith("api/mobile/games/") && ruta.endsWith("/precios") ->

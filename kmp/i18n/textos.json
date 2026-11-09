@@ -8678,5 +8678,269 @@
   "fr": "Je ne l'ai plus",
   "it": "Non ce l'ho più",
   "pt": "Já não o tenho"
+ },
+ "plat_sin_empezar": {
+  "es": "{0} trofeos · sin empezar",
+  "en": "{0} trophies · not started",
+  "de": "{0} Trophäen · nicht begonnen",
+  "fr": "{0} trophées · pas commencé",
+  "it": "{0} trofei · non iniziato",
+  "pt": "{0} troféus · por começar"
+ },
+ "plat_rareza_platino": {
+  "es": "platino del {0} %",
+  "en": "platinum by {0}%",
+  "de": "Platin bei {0} %",
+  "fr": "platine par {0} %",
+  "it": "platino del {0}%",
+  "pt": "platina de {0} %"
+ },
+ "plat_perdibles": {
+  "es": "⚠ {0} perdibles",
+  "en": "⚠ {0} missable",
+  "de": "⚠ {0} verpassbar",
+  "fr": "⚠ {0} ratables",
+  "it": "⚠ {0} perdibili",
+  "pt": "⚠ {0} perdíveis"
+ },
+ "plat_dificil": {
+  "es": "Lo que falta: {0} %",
+  "en": "What's left: {0}%",
+  "de": "Der Rest: {0} %",
+  "fr": "Ce qui reste : {0} %",
+  "it": "Quello che manca: {0}%",
+  "pt": "O que falta: {0} %"
+ },
+ "plat_instalado": {
+  "es": "Instalado",
+  "en": "Installed",
+  "de": "Installiert",
+  "fr": "Installé",
+  "it": "Installato",
+  "pt": "Instalado"
+ },
+ "plat_amigos": {
+  "es": "También a medias: {0}",
+  "en": "Also halfway: {0}",
+  "de": "Auch halb fertig: {0}",
+  "fr": "Aussi en cours : {0}",
+  "it": "Anche a metà: {0}",
+  "pt": "Também a meio: {0}"
+ },
+ "plat_doble_la_tienes": {
+  "es": "Tienes la de {0}",
+  "en": "You have the {0} one",
+  "de": "Du hast die {0}-Version",
+  "fr": "Tu as la version {0}",
+  "it": "Hai quella per {0}",
+  "pt": "Tens a de {0}"
+ },
+ "plat_doble_otra": {
+  "es": "Otro platino en {0}",
+  "en": "Another platinum on {0}",
+  "de": "Noch ein Platin auf {0}",
+  "fr": "Un autre platine sur {0}",
+  "it": "Un altro platino su {0}",
+  "pt": "Outra platina na {0}"
+ },
+ "plat_doble_ya": {
+  "es": "ya platinado en {0}",
+  "en": "already platinumed on {0}",
+  "de": "schon platiniert auf {0}",
+  "fr": "déjà platiné sur {0}",
+  "it": "già platinato su {0}",
+  "pt": "já platinado na {0}"
+ },
+ "plat_faciles": {
+  "es": "Fáciles",
+  "en": "Easy",
+  "de": "Leicht",
+  "fr": "Faciles",
+  "it": "Facili",
+  "pt": "Fáceis"
+ },
+ "plat_dobles": {
+  "es": "Doble platino",
+  "en": "Double platinum",
+  "de": "Doppel-Platin",
+  "fr": "Double platine",
+  "it": "Doppio platino",
+  "pt": "Dupla platina"
+ },
+ "plat_desc_faciles": {
+  "es": "Juegos que tienes sin empezar y se platinan en pocas horas o los platina mucha gente.",
+  "en": "Unstarted games that take few hours or that lots of people platinum.",
+  "de": "Nicht begonnene Spiele, schnell oder von vielen platiniert.",
+  "fr": "Jeux pas commencés, rapides ou que beaucoup platinent.",
+  "it": "Giochi non iniziati, rapidi o che platinano in tanti.",
+  "pt": "Jogos por começar, rápidos ou que muita gente platina."
+ },
+ "plat_desc_dobles": {
+  "es": "Ya los platinaste y su otra versión (PS4/PS5, PS3/Vita…) da otro platino.",
+  "en": "You platinumed them and their other version gives another platinum.",
+  "de": "Schon platiniert; die andere Version gibt noch ein Platin.",
+  "fr": "Déjà platinés ; l'autre version donne un autre platine.",
+  "it": "Già platinati; l'altra versione dà un altro platino.",
+  "pt": "Já os platinaste e a outra versão dá outra platina."
+ },
+ "plat_todas": {
+  "es": "Todas",
+  "en": "All",
+  "de": "Alle",
+  "fr": "Toutes",
+  "it": "Tutte",
+  "pt": "Todas"
+ },
+ "plat_filtro_corto": {
+  "es": "≤ 5 h",
+  "en": "≤ 5 h",
+  "de": "≤ 5 Std.",
+  "fr": "≤ 5 h",
+  "it": "≤ 5 h",
+  "pt": "≤ 5 h"
+ },
+ "plat_filtro_instalados": {
+  "es": "Instalados",
+  "en": "Installed",
+  "de": "Installiert",
+  "fr": "Installés",
+  "it": "Installati",
+  "pt": "Instalados"
+ },
+ "plat_filtro_suscripcion": {
+  "es": "PS Plus / Game Pass",
+  "en": "PS Plus / Game Pass",
+  "de": "PS Plus / Game Pass",
+  "fr": "PS Plus / Game Pass",
+  "it": "PS Plus / Game Pass",
+  "pt": "PS Plus / Game Pass"
+ },
+ "plat_retirar_pregunta": {
+  "es": "Hace {0} años que no juegas a nada de {1}. ¿La quitas de las sugerencias?",
+  "en": "You haven't played anything on {1} for {0} years. Remove it from suggestions?",
+  "de": "Seit {0} Jahren nichts auf {1} gespielt. Aus den Vorschlägen entfernen?",
+  "fr": "{0} ans sans jouer sur {1}. La retirer des suggestions ?",
+  "it": "Sono {0} anni che non giochi su {1}. La togli dai suggerimenti?",
+  "pt": "Há {0} anos que não jogas na {1}. Tiras-la das sugestões?"
+ },
+ "plat_retirar_si": {
+  "es": "Quitarla",
+  "en": "Remove it",
+  "de": "Entfernen",
+  "fr": "La retirer",
+  "it": "Toglila",
+  "pt": "Tirar"
+ },
+ "plat_retirar_no": {
+  "es": "No, la tengo",
+  "en": "No, I have it",
+  "de": "Nein, hab sie",
+  "fr": "Non, je l'ai",
+  "it": "No, ce l'ho",
+  "pt": "Não, tenho-a"
+ },
+ "marca_quedan": {
+  "es": "quedan {0} días",
+  "en": "{0} days left",
+  "de": "noch {0} Tage",
+  "fr": "encore {0} jours",
+  "it": "mancano {0} giorni",
+  "pt": "faltam {0} dias"
+ },
+ "marca_queda_1": {
+  "es": "queda 1 día",
+  "en": "1 day left",
+  "de": "noch 1 Tag",
+  "fr": "encore 1 jour",
+  "it": "manca 1 giorno",
+  "pt": "falta 1 dia"
+ },
+ "marca_hoy": {
+  "es": "¡es hoy!",
+  "en": "it's today!",
+  "de": "heute!",
+  "fr": "c'est aujourd'hui !",
+  "it": "è oggi!",
+  "pt": "é hoje!"
+ },
+ "marca_tarde": {
+  "es": "vas {0} días tarde",
+  "en": "{0} days late",
+  "de": "{0} Tage zu spät",
+  "fr": "{0} jours de retard",
+  "it": "{0} giorni di ritardo",
+  "pt": "{0} dias de atraso"
+ },
+ "marca_fecha": {
+  "es": "Fecha objetivo",
+  "en": "Target date",
+  "de": "Zieldatum",
+  "fr": "Date objectif",
+  "it": "Data obiettivo",
+  "pt": "Data objetivo"
+ },
+ "marca_fecha_titulo": {
+  "es": "¿Para cuándo lo quieres?",
+  "en": "When do you want it by?",
+  "de": "Bis wann willst du es?",
+  "fr": "Pour quand le veux-tu ?",
+  "it": "Entro quando lo vuoi?",
+  "pt": "Para quando o queres?"
+ },
+ "marca_una_semana": {
+  "es": "En una semana",
+  "en": "In a week",
+  "de": "In einer Woche",
+  "fr": "Dans une semaine",
+  "it": "Tra una settimana",
+  "pt": "Daqui a uma semana"
+ },
+ "marca_dos_semanas": {
+  "es": "En dos semanas",
+  "en": "In two weeks",
+  "de": "In zwei Wochen",
+  "fr": "Dans deux semaines",
+  "it": "Tra due settimane",
+  "pt": "Daqui a duas semanas"
+ },
+ "marca_un_mes": {
+  "es": "En un mes",
+  "en": "In a month",
+  "de": "In einem Monat",
+  "fr": "Dans un mois",
+  "it": "Tra un mese",
+  "pt": "Daqui a um mês"
+ },
+ "marca_tres_meses": {
+  "es": "En tres meses",
+  "en": "In three months",
+  "de": "In drei Monaten",
+  "fr": "Dans trois mois",
+  "it": "Tra tre mesi",
+  "pt": "Daqui a três meses"
+ },
+ "marca_quitar_fecha": {
+  "es": "Quitar la fecha",
+  "en": "Remove the date",
+  "de": "Datum entfernen",
+  "fr": "Retirer la date",
+  "it": "Togli la data",
+  "pt": "Tirar a data"
+ },
+ "marca_instalado": {
+  "es": "Instalado",
+  "en": "Installed",
+  "de": "Installiert",
+  "fr": "Installé",
+  "it": "Installato",
+  "pt": "Instalado"
+ },
+ "marca_oculto": {
+  "es": "Oculto en mi perfil",
+  "en": "Hidden on my profile",
+  "de": "In meinem Profil verborgen",
+  "fr": "Masqué sur mon profil",
+  "it": "Nascosto nel mio profilo",
+  "pt": "Oculto no meu perfil"
  }
 }

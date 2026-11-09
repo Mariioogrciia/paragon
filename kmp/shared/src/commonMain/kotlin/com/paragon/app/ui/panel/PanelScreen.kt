@@ -305,6 +305,18 @@ fun PanelScreen(
                                 }
                             }
                         },
+                        onRetirarConsola = { consola ->
+                            ambitoPanel.launch {
+                                try {
+                                    com.paragon.app.data.network.ApiClient.retiradosApi(tokenStore)
+                                        .cambiar(com.paragon.shared.red.CambiarRetiradoRequest("dispositivo", consola, true))
+                                    highlights = repository.getHighlights()
+                                } catch (e: kotlinx.coroutines.CancellationException) {
+                                    throw e
+                                } catch (_: Exception) {
+                                }
+                            }
+                        },
                     )
                 }
                 (highlights as? HighlightsResult.Error)?.let { e ->

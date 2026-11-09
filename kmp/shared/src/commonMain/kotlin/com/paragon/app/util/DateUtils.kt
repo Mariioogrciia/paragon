@@ -6,6 +6,8 @@ import com.paragon.shared.i18n.Textos
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.todayIn
+import kotlinx.datetime.plus
+import kotlinx.datetime.daysUntil
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -64,4 +66,18 @@ fun diasRestantesMes(): Int {
 fun anioYMesDeHoy(): Pair<Int, Int> {
     val hoy = Clock.System.todayIn(TimeZone.currentSystemDefault())
     return hoy.year to hoy.month.number
+}
+
+/** "2026-11-23": hoy más `dias`, en la zona del teléfono (fecha objetivo del platino reservado). */
+@OptIn(ExperimentalTime::class)
+fun fechaDentroDe(dias: Int): String =
+    Clock.System.todayIn(TimeZone.currentSystemDefault()).plus(dias, kotlinx.datetime.DateTimeUnit.DAY).toString()
+
+/** Días de hoy a esa fecha ("2026-11-23"); negativo si ya pasó, null si no se entiende. */
+@OptIn(ExperimentalTime::class)
+fun diasHastaFecha(iso: String): Int? = try {
+    val hoy = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    hoy.daysUntil(kotlinx.datetime.LocalDate.parse(iso))
+} catch (e: IllegalArgumentException) {
+    null
 }

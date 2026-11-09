@@ -55,7 +55,12 @@ data class GameDetailResponse(
     val plan: PlanPlatinoDto? = null,
     /** Platinos más rápidos del juego entre la gente de Paragon (lib/platinoRapido.ts). */
     val rapidos: List<PlatinoRapidoDto> = emptyList(),
+    /** Tus marcas de este juego (8 nov 2026); null en la ficha de otra persona. */
+    val marcas: MarcasJuegoDto? = null,
 )
+
+@Serializable
+data class MarcasJuegoDto(val instalado: Boolean = false, val ocultoPerfil: Boolean = false, val fechaObjetivo: String? = null)
 
 /** Una fase del plan: perdibles, historia, coleccionables, online, habilidad, grindeo o limpieza. */
 @Serializable

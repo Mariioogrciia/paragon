@@ -74,10 +74,37 @@ data class PlatinableDto(
     val tienePlatino: Boolean = true,
     val diasDesdeJugado: Int? = null,
     val horasRestantes: Int? = null,
+    // 8 nov 2026: filtros y avisos (lib/platinables.ts, platinablesExtras.ts).
+    val sinEmpezar: Boolean = false,
+    val dispositivos: List<String> = emptyList(),
+    /** "ps_plus" o "game_pass". */
+    val suscripcion: String? = null,
+    val instalado: Boolean = false,
+    val rarezaPlatino: Double? = null,
+    val perdibles: Int = 0,
+    val masRaroPendiente: Double? = null,
+    val amigos: List<AmigoAMediasDto> = emptyList(),
 )
 
 @Serializable
-data class PlatinablesDto(val cerca: List<PlatinableDto> = emptyList(), val jugando: List<PlatinableDto> = emptyList())
+data class AmigoAMediasDto(val nombre: String? = null, val percent: Int = 0)
+
+/** Otra versión de un juego que ya platinaste, con su propio platino. */
+@Serializable
+data class DoblePlatinoDto(val id: String, val titulo: String, val coverUrl: String = "", val consola: String = "", val platinadoEn: String = "", val laTienes: Int? = null)
+
+/** "Hace N años que no juegas a nada de PS3". */
+@Serializable
+data class SugerenciaRetirarDto(val dispositivo: String, val anios: Int = 0, val juegos: Int = 0)
+
+@Serializable
+data class PlatinablesDto(
+    val cerca: List<PlatinableDto> = emptyList(),
+    val jugando: List<PlatinableDto> = emptyList(),
+    val faciles: List<PlatinableDto> = emptyList(),
+    val dobles: List<DoblePlatinoDto> = emptyList(),
+    val sugerenciaRetirar: SugerenciaRetirarDto? = null,
+)
 
 class HighlightsApi internal constructor(private val c: ClienteParagon) {
     /** Ver src/app/api/mobile/panel/highlights/route.ts en el proyecto Next.js. */

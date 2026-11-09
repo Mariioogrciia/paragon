@@ -218,6 +218,22 @@ private fun GameDetailContent(
     var pinned by remember(gameId) { mutableStateOf(game.isPinned) }
     var reservado by remember(gameId, hitoInicial) { mutableStateOf(hitoInicial?.gameId == gameId) }
     var showCollections by remember { mutableStateOf(false) }
+    // Tus marcas (8 nov 2026, lib/retirados.ts): instalado, oculto en tu perfil y fecha objetivo.
+    var instalado by remember(gameId) { mutableStateOf(game.marcas?.instalado == true) }
+    var ocultoPerfil by remember(gameId) { mutableStateOf(game.marcas?.ocultoPerfil == true) }
+    var fechaObjetivo by remember(gameId) { mutableStateOf(game.marcas?.fechaObjetivo) }
+    var showFecha by remember { mutableStateOf(false) }
+    fun marca(tipo: String, valor: String, activo: Boolean) {
+        coroutineScope.launch {
+            try {
+                com.paragon.app.data.network.ApiClient.retiradosApi(tokenStore)
+                    .cambiar(com.paragon.shared.red.CambiarRetiradoRequest(tipo, valor, activo))
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (_: Exception) {
+            }
+        }
+    }
     var showShare by remember { mutableStateOf(false) }
     var dynamicColor by remember { mutableStateOf(Accent) }
     // "Platino conseguido" real (mismo criterio que el filtro "Platinados"
@@ -383,6 +399,21 @@ private fun GameDetailContent(
                         onOpenCollections = { showCollections = true },
                         onShare = { showShare = true },
                         dynamicColor = dynamicColor,
+                        instalado = instalado,
+                        ocultoPerfil = ocultoPerfil,
+                        fechaTexto = if ((pinned || reservado) && !platinoConseguido) {
+                            fechaObjetivo?.let { com.paragon.app.util.diasHastaFecha(it) }?.let { d ->
+                                when {
+                                    d > 1 -> Textos.t(T.marca_quedan, d)
+                                    d == 1 -> Textos.t(T.marca_queda_1)
+                                    d == 0 -> Textos.t(T.marca_hoy)
+                                    else -> Textos.t(T.marca_tarde, -d)
+                                }
+                            } ?: Textos.t(T.marca_fecha)
+                        } else null,
+                        onToggleInstalado = { instalado = !instalado; marca("instalado", gameId, instalado) },
+                        onToggleOculto = { ocultoPerfil = !ocultoPerfil; marca("oculto_perfil", gameId, ocultoPerfil) },
+                        onFecha = { showFecha = true },
                     )
                     NotesSection(
                         initialNotes = game.notes,
@@ -541,6 +572,35 @@ private fun GameDetailContent(
         onTitulo = { coroutineScope.launch { listState.animateScrollToItem(0) } },
         modifier = Modifier.align(Alignment.TopStart),
     )
+    }
+
+    if (showFecha) {
+        // Fecha objetivo del platino reservado: atajos en vez de un calendario.
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showFecha = false },
+            containerColor = com.paragon.app.ui.theme.SurfaceSolida,
+            title = { Text(Textos.t(T.marca_fecha_titulo), color = Foreground) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    listOf(7 to T.marca_una_semana, 14 to T.marca_dos_semanas, 30 to T.marca_un_mes, 90 to T.marca_tres_meses).forEach { (dias, texto) ->
+                        TextButton(onClick = {
+                            val f = com.paragon.app.util.fechaDentroDe(dias)
+                            fechaObjetivo = f
+                            marca("fecha_objetivo", f, true)
+                            showFecha = false
+                        }) { Text(Textos.t(texto), color = Accent, fontWeight = FontWeight.SemiBold) }
+                    }
+                }
+            },
+            confirmButton = {
+                if (fechaObjetivo != null) TextButton(onClick = {
+                    fechaObjetivo = null
+                    marca("fecha_objetivo", "-", false)
+                    showFecha = false
+                }) { Text(Textos.t(T.marca_quitar_fecha), color = Danger) }
+            },
+            dismissButton = { TextButton(onClick = { showFecha = false }) { Text(Textos.t(T.comun_cancelar), color = Muted) } },
+        )
     }
 
     if (showCollections) {
@@ -704,6 +764,13 @@ private fun GameActionsRow(
     onOpenCollections: () -> Unit,
     onShare: () -> Unit,
     dynamicColor: Color,
+    instalado: Boolean = false,
+    ocultoPerfil: Boolean = false,
+    /** Cuenta atrás de la fecha objetivo (o "Fecha objetivo"); null si no hay platino reservado. */
+    fechaTexto: String? = null,
+    onToggleInstalado: () -> Unit = {},
+    onToggleOculto: () -> Unit = {},
+    onFecha: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -739,6 +806,11 @@ private fun GameActionsRow(
                 onClick = onTogglePin,
             )
         }
+        fechaTexto?.let { texto ->
+            ActionChip(label = "🎯 $texto", active = true, accentColor = Gold, onClick = onFecha)
+        }
+        ActionChip(label = "💾 " + Textos.t(T.marca_instalado), active = instalado, accentColor = dynamicColor, onClick = onToggleInstalado)
+        ActionChip(label = "🙈 " + Textos.t(T.marca_oculto), active = ocultoPerfil, accentColor = dynamicColor, onClick = onToggleOculto)
         ActionChip(
             label = Textos.t(T.nav_carpetas),
             active = false,
