@@ -39,7 +39,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.paragon.app.ui.theme.Accent2
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -227,9 +226,9 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
     // carátulas reales que se desliza despacio (MuroCaratulas.kt) y, abajo,
     // la marca, el titular y los botones en la zona del pulgar.
     val titular = Textos.t(T.login_titular)
-    // "Todos tus trofeos. Un solo sitio." → la segunda frase con el degradado de acento.
+    // "Todos tus trofeos. Un solo sitio." → la segunda frase en el color de acento
+    // (con `brush` en el SpanStyle salía en el color del texto: capturas del 9 nov).
     val corte = titular.indexOf(". ").takeIf { it > 0 }?.plus(2)
-    val degradado = Brush.linearGradient(listOf(Accent, Accent2))
     Box(Modifier.fillMaxSize().background(Background)) {
         MuroCaratulas(Modifier.fillMaxWidth().fillMaxHeight(0.74f))
         Box(
@@ -256,7 +255,7 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
                     } else {
                         append(titular.substring(0, corte).trimEnd())
                         append("\n")
-                        withStyle(SpanStyle(brush = degradado)) { append(titular.substring(corte)) }
+                        withStyle(SpanStyle(color = Accent)) { append(titular.substring(corte)) }
                     }
                 },
                 color = Foreground,
