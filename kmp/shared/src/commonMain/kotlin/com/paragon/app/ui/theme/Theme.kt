@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import com.paragon.app.data.theme.ThemeMode
@@ -127,9 +128,11 @@ fun colorDeHex(hex: String): Color? {
     return limpio.toLongOrNull(16)?.let { Color(0xFF000000 or it) }
 }
 
-/** Todos los estilos con interlineado proporcional a su tamaño de letra. */
+/** Todos los estilos con interlineado proporcional a su tamaño de letra y sin espaciado extra. */
 private fun interlineadoRelativo(t: Typography): Typography {
-    fun TextStyle.rel(f: Float) = copy(lineHeight = f.em)
+    // Sin el espaciado entre letras de serie de Material (+0,5 sp en el cuerpo, 9 nov 2026):
+    // con él todo el texto se veía "ancho" y nada nativo, sobre todo en iPhone.
+    fun TextStyle.rel(f: Float) = copy(lineHeight = f.em, letterSpacing = 0.sp)
     return Typography(
         displayLarge = t.displayLarge.rel(1.12f), displayMedium = t.displayMedium.rel(1.15f), displaySmall = t.displaySmall.rel(1.2f),
         headlineLarge = t.headlineLarge.rel(1.22f), headlineMedium = t.headlineMedium.rel(1.25f), headlineSmall = t.headlineSmall.rel(1.28f),

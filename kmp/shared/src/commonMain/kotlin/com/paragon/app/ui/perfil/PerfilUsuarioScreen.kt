@@ -182,7 +182,7 @@ private fun ContenidoPerfil(
 ) {
     val esYo = p.amistad == "yo"
     val aura = rememberCoverAuraColor(p.image)
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 40.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra() + 24.dp)) {
         Cabecera(p, aura)
 
         if (!esYo) {
@@ -490,8 +490,8 @@ private fun Actividad(p: UserProfileDto) {
                 Icon(Icons.Default.Whatshot, contentDescription = null, tint = if (p.racha.actual > 0) Gold else Muted, modifier = Modifier.size(18.dp))
                 Text(Textos.t(T.stats_racha_actual), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Text(Textos.t(T.perfil_dias_n, p.racha.actual), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-            Text("${Textos.t(T.stats_mejor_racha)}: ${Textos.t(T.perfil_dias_n, p.racha.mejor)}", color = Muted, fontSize = 12.sp)
+            Text(Textos.t(if (p.racha.actual == 1) T.duracion_dias_1 else T.perfil_dias_n, p.racha.actual), color = Foreground, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+            Text("${Textos.t(T.stats_mejor_racha)}: ${Textos.t(if (p.racha.mejor == 1) T.duracion_dias_1 else T.perfil_dias_n, p.racha.mejor)}", color = Muted, fontSize = 12.sp)
         }
         Tarjeta(Modifier.weight(1f)) {
             Text(Textos.t(T.perfil_este_anio), color = Muted, fontSize = 12.sp)
