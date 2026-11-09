@@ -648,5 +648,11 @@
     "placeholder": "1. Jogaku forest cricket\n2. Akashima temple cricket\n…",
     "guardarLista": "Save the list",
     "todosHechos": "You've got them all! 🎉"
+  },
+  "EstadisticasJuego": {
+    "titulo": "In-game stats",
+    "fuente": "What Steam keeps from your playthrough",
+    "verTodas": "Show {n} more",
+    "verMenos": "Show less"
   }
 }

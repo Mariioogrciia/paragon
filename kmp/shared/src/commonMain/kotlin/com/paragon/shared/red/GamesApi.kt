@@ -112,7 +112,17 @@ data class ResyncResponse(val nuevos: Int, val error: String? = null, val platin
 @Serializable
 data class TrophyGuideResponse(val videoId: String?)
 
+/** Estadísticas dentro del juego (Steam, 9 nov 2026): `texto` ya formateado en tu idioma. */
+@Serializable
+data class EstadisticaJuegoDto(val id: String, val nombre: String, val valor: Double = 0.0, val formato: String = "numero", val texto: String)
+@Serializable
+data class EstadisticasJuegoResponse(val estadisticas: List<EstadisticaJuegoDto> = emptyList())
+
 class GamesApi internal constructor(private val c: ClienteParagon) {
+    /** Ver games/[gameId]/estadisticas/route.ts. Lista vacía si no hay nada. */
+    suspend fun getEstadisticas(gameId: String, de: String? = null): EstadisticasJuegoResponse =
+        c.http.get("api/mobile/games/${gameId.encodeURLPathPart()}/estadisticas") { de?.let { parameter("de", it) } }.body()
+
     /** Ver src/app/api/mobile/games/[gameId]/route.ts en el proyecto Next.js. */
     suspend fun getGameDetail(gameId: String, de: String? = null): GameDetailResponse =
         c.http.get("api/mobile/games/${gameId.encodeURLPathPart()}") { de?.let { parameter("de", it) } }.body()

@@ -170,6 +170,7 @@ fun GameDetailScreen(
             gameId = gameId,
             trofeoInicial = trofeoInicial,
             soloLectura = de != null,
+            de = de,
             game = current.detail,
             fromCache = current.fromCache,
             hitoInicial = hito,
@@ -192,6 +193,7 @@ private fun GameDetailContent(
     gameId: String,
     trofeoInicial: String?,
     soloLectura: Boolean,
+    de: String?,
     game: GameDetailData,
     fromCache: Boolean,
     hitoInicial: HitoReservado?,
@@ -435,6 +437,11 @@ private fun GameDetailContent(
                         tokenStore = tokenStore,
                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                     )
+                }
+
+                // Estadísticas dentro del juego (Steam, 9 nov 2026), tipo tracker.
+                if (gameId.startsWith("steam-")) {
+                    EstadisticasJuegoCard(gameId, de, tokenStore, acento = dynamicColor, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
                 }
 
                 // "El Diario del Platino", como en la web: solo con el platino y fechas.

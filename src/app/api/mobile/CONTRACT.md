@@ -1182,3 +1182,15 @@ juegos: [{ id, titulo, iconUrl }] }`. PUT `{ tipo: "dispositivo"|"juego", valor,
 `POST games/{id}/pin` también reserva el juego para tu próximo platino (tus
 platinos + 1) y `POST games/{id}/reserve` también lo ancla. `milestone.proximo.numero`
 es tus platinos + 1 (antes, el siguiente número redondo).
+
+### `GET /api/mobile/games/{gameId}/estadisticas` — Estadísticas dentro del juego (9 nov 2026)
+
+Solo juegos de Steam: lo que el juego guarda de ti en Steam (bajas, partidas,
+distancia…), tipo tracker. Aparte de la ficha para no retrasarla. Admite
+`?de=<handle>` como la ficha. Necesita los "Detalles del juego" públicos en Steam.
+
+```json
+{ "estadisticas": [{ "id": "total_kills", "nombre": "Bajas totales", "valor": 1234, "formato": "numero|tiempo|distancia|porcentaje", "texto": "1234" }] }
+```
+
+`texto` ya va formateado en el idioma de `Accept-Language`. Lista vacía = nada que enseñar (no es de Steam, el juego no guarda estadísticas o son privadas). Lógica en `src/lib/estadisticasJuego.ts`.

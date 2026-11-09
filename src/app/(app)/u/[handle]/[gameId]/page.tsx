@@ -48,6 +48,8 @@ import { games } from "@/db/schema";
 import { MarcaDeclarado } from "@/components/MarcaDeclarado";
 import { esDeclarada } from "@/lib/declarado";
 import { idiomaActual } from "@/lib/trofeosIdioma";
+import { Suspense } from "react";
+import { EstadisticasJuegoCard } from "@/components/EstadisticasJuegoCard";
 
 async function ProximoRow({ trophy }: { trophy: Trophy }) {
   const t = await getTranslations("Biblioteca");
@@ -500,6 +502,13 @@ export default async function JuegoPage({
               {t("GameDetailPage.difficultyExplanation")}
             </p>
           </section>
+        )}
+
+        {/* Estadísticas dentro del juego (Steam): sin bloquear la ficha. */}
+        {game.platform === "steam" && (
+          <Suspense fallback={null}>
+            <EstadisticasJuegoCard profile={profile} gameId={game.id} />
+          </Suspense>
         )}
 
         <HltbCard hltb={game.hltb} />

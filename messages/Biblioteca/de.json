@@ -648,5 +648,11 @@
     "placeholder": "1. Grille im Jogaku-Wald\n2. Grille am Akashima-Tempel\n…",
     "guardarLista": "Liste speichern",
     "todosHechos": "Du hast alle! 🎉"
+  },
+  "EstadisticasJuego": {
+    "titulo": "Spielstatistiken",
+    "fuente": "Was Steam von deinem Spielstand speichert",
+    "verTodas": "{n} weitere anzeigen",
+    "verMenos": "Weniger anzeigen"
   }
 }

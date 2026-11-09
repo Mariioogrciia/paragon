@@ -648,5 +648,11 @@
     "placeholder": "1. Grillon de la forêt de Jogaku\n2. Grillon du temple d’Akashima\n…",
     "guardarLista": "Enregistrer la liste",
     "todosHechos": "Tu les as tous ! 🎉"
+  },
+  "EstadisticasJuego": {
+    "titulo": "Statistiques en jeu",
+    "fuente": "Ce que Steam garde de ta partie",
+    "verTodas": "Voir {n} de plus",
+    "verMenos": "Voir moins"
   }
 }

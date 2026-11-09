@@ -648,5 +648,11 @@
     "placeholder": "1. Grilo da floresta de Jogaku\n2. Grilo do templo de Akashima\n…",
     "guardarLista": "Guardar a lista",
     "todosHechos": "Tens todos! 🎉"
+  },
+  "EstadisticasJuego": {
+    "titulo": "Estatísticas do jogo",
+    "fuente": "O que a Steam guarda da tua partida",
+    "verTodas": "Ver mais {n}",
+    "verMenos": "Ver menos"
   }
 }

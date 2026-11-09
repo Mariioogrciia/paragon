@@ -488,6 +488,10 @@
     <string name="error_servidor">Il server ha risposto con un errore (%1$s).</string>
     <string name="error_servidor_corto">Errore del server (%1$s).</string>
     <string name="error_sin_sesion">Non hai effettuato l\'accesso.</string>
+    <string name="estad_fuente">Quello che Steam salva della tua partita</string>
+    <string name="estad_titulo">Statistiche di gioco</string>
+    <string name="estad_ver_mas">Mostra altre %1$s</string>
+    <string name="estad_ver_menos">Mostra meno</string>
     <string name="estilo_brutalista">Brutalista</string>
     <string name="estilo_brutalista_desc">Niente angoli, bordi netti</string>
     <string name="estilo_clasico">Classico</string>

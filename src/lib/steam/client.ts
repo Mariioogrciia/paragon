@@ -419,3 +419,31 @@ export async function fetchDefinicionesSteam(
     detail: d.description ?? "",
   }));
 }
+
+/**
+ * Estadísticas del jugador dentro del juego (9 nov 2026, tipo tracker):
+ * bajas, partidas, distancia… las que el juego guarde en Steam. Necesita los
+ * "Detalles del juego" en público, como los logros. Los nombres bonitos salen
+ * del esquema en el idioma pedido (`l=spanish|english…`). Sin nada → [].
+ * El formato lo pone lib/estadisticasJuego.ts.
+ */
+export async function fetchEstadisticasJuego(
+  steamId: string,
+  appId: string,
+  idioma: string,
+): Promise<{ stats: { name: string; value: number }[]; esquema: { name: string; displayName?: string }[] }> {
+  const key = apiKey();
+  const [jugador, schema] = await Promise.all([
+    get<{ playerstats?: { stats?: { name: string; value: number | string }[] } }>(
+      `${API}/ISteamUserStats/GetUserStatsForGame/v2/?key=${key}&steamid=${encodeURIComponent(steamId)}&appid=${encodeURIComponent(appId)}`,
+    ),
+    get<{ game?: { availableGameStats?: { stats?: { name: string; displayName?: string }[] } } }>(
+      `${API}/ISteamUserStats/GetSchemaForGame/v2/?key=${key}&appid=${encodeURIComponent(appId)}&l=${encodeURIComponent(idioma)}`,
+      true,
+    ),
+  ]);
+  return {
+    stats: (jugador?.playerstats?.stats ?? []).map((s) => ({ name: s.name, value: Number(s.value) })),
+    esquema: schema?.game?.availableGameStats?.stats ?? [],
+  };
+}

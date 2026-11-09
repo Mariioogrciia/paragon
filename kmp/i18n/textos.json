@@ -8942,5 +8942,37 @@
   "fr": "Masqué sur mon profil",
   "it": "Nascosto nel mio profilo",
   "pt": "Oculto no meu perfil"
+ },
+ "estad_titulo": {
+  "de": "Spielstatistiken",
+  "en": "In-game stats",
+  "es": "Estadísticas del juego",
+  "fr": "Statistiques en jeu",
+  "it": "Statistiche di gioco",
+  "pt": "Estatísticas do jogo"
+ },
+ "estad_fuente": {
+  "de": "Was Steam von deinem Spielstand speichert",
+  "en": "What Steam keeps from your playthrough",
+  "es": "Lo que guarda Steam de tu partida",
+  "fr": "Ce que Steam garde de ta partie",
+  "it": "Quello che Steam salva della tua partita",
+  "pt": "O que a Steam guarda da tua partida"
+ },
+ "estad_ver_mas": {
+  "de": "{0} weitere anzeigen",
+  "en": "Show {0} more",
+  "es": "Ver {0} más",
+  "fr": "Voir {0} de plus",
+  "it": "Mostra altre {0}",
+  "pt": "Ver mais {0}"
+ },
+ "estad_ver_menos": {
+  "de": "Weniger anzeigen",
+  "en": "Show less",
+  "es": "Ver menos",
+  "fr": "Voir moins",
+  "it": "Mostra meno",
+  "pt": "Ver menos"
  }
 }

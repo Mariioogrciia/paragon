@@ -648,5 +648,11 @@
     "placeholder": "1. Grillo del bosque de Jogaku\n2. Grillo del templo de Akashima\n…",
     "guardarLista": "Guardar la lista",
     "todosHechos": "¡Los tienes todos! 🎉"
+  },
+  "EstadisticasJuego": {
+    "titulo": "Estadísticas del juego",
+    "fuente": "Lo que guarda Steam de tu partida",
+    "verTodas": "Ver {n} más",
+    "verMenos": "Ver menos"
   }
 }

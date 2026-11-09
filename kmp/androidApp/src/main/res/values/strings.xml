@@ -490,6 +490,10 @@
     <string name="error_servidor">El servidor respondió con un error (%1$s).</string>
     <string name="error_servidor_corto">Error del servidor (%1$s).</string>
     <string name="error_sin_sesion">Sin sesión.</string>
+    <string name="estad_fuente">Lo que guarda Steam de tu partida</string>
+    <string name="estad_titulo">Estadísticas del juego</string>
+    <string name="estad_ver_mas">Ver %1$s más</string>
+    <string name="estad_ver_menos">Ver menos</string>
     <string name="estilo_brutalista">Brutalista</string>
     <string name="estilo_brutalista_desc">Sin esquinas, bordes duros</string>
     <string name="estilo_clasico">Clásico</string>

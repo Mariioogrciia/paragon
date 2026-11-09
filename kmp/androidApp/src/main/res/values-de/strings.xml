@@ -488,6 +488,10 @@
     <string name="error_servidor">Der Server hat einen Fehler gemeldet (%1$s).</string>
     <string name="error_servidor_corto">Serverfehler (%1$s).</string>
     <string name="error_sin_sesion">Nicht angemeldet.</string>
+    <string name="estad_fuente">Was Steam von deinem Spielstand speichert</string>
+    <string name="estad_titulo">Spielstatistiken</string>
+    <string name="estad_ver_mas">%1$s weitere anzeigen</string>
+    <string name="estad_ver_menos">Weniger anzeigen</string>
     <string name="estilo_brutalista">Brutalistisch</string>
     <string name="estilo_brutalista_desc">Keine Rundungen, harte Kanten</string>
     <string name="estilo_clasico">Klassisch</string>
