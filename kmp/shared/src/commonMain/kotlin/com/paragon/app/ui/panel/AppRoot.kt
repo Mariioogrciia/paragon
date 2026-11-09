@@ -226,9 +226,10 @@ private fun LoginGate(onLogin: (provider: String) -> Unit) {
     // carátulas reales que se desliza despacio (MuroCaratulas.kt) y, abajo,
     // la marca, el titular y los botones en la zona del pulgar.
     val titular = Textos.t(T.login_titular)
-    // "Todos tus trofeos. Un solo sitio." → la segunda frase en el color de acento
-    // (con `brush` en el SpanStyle salía en el color del texto: capturas del 9 nov).
-    val corte = titular.indexOf(". ").takeIf { it > 0 }?.plus(2)
+    // "Todos tus trofeos. / Un solo sitio." → la segunda frase en el color de acento.
+    // En textos.json van separadas por un salto de línea; antes se buscaba ". " y
+    // nunca se encontraba, así que todo salía del mismo color (capturas del 9 nov).
+    val corte = (titular.indexOf('\n').takeIf { it > 0 } ?: titular.indexOf(". ").takeIf { it > 0 }?.plus(1))?.plus(1)
     Box(Modifier.fillMaxSize().background(Background)) {
         MuroCaratulas(Modifier.fillMaxWidth().fillMaxHeight(0.74f))
         Box(
