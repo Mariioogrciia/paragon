@@ -10,6 +10,7 @@ import { horasTotales } from "@/lib/profileStats";
 import { getUserClan } from "@/lib/clans";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { estadoSeguir } from "@/lib/seguir";
+import { ocultosDelPerfil } from "@/lib/retirados";
 import { esApoyo } from "@/lib/apoyo";
 
 export async function GET(
@@ -63,7 +64,10 @@ export async function GET(
   // Los últimos jugados de verdad (sin lista de deseos). getLibrary ordena con
   // `desc(lastPlayedAt)`, y en Postgres eso pone primero los juegos SIN fecha
   // (NULLS FIRST): salían juegos cualquiera en vez de los recientes (6 oct 2026).
+  // Lo que su dueño ocultó de su perfil público no sale en los recientes ni en los últimos trofeos.
+  const ocultos = profile.userId === userId ? new Set<string>() : await ocultosDelPerfil(profile.userId);
   const recent = games
+    .filter((g) => !ocultos.has(g.id))
     .filter((g) => !g.isWishlist)
     .sort((a, b) => (b.lastPlayedAt ?? "").localeCompare(a.lastPlayedAt ?? ""))
     .slice(0, 6);
@@ -92,7 +96,7 @@ export async function GET(
     mejorMes: resumen.mejorMes,
     porMes: meses,
     clan: clan ? { tag: clan.clan.tag, name: clan.clan.name, logoUrl: clan.clan.logoUrl ?? null } : null,
-    ultimosTrofeos: ultimos.map((t) => ({
+    ultimosTrofeos: ultimos.filter((t) => !ocultos.has(t.gameId)).map((t) => ({
       gameId: t.gameId,
       juego: t.juego,
       trophyId: t.trophyId,

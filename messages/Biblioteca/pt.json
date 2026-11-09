@@ -33,7 +33,21 @@
     "focusModeLink": "Modo foco",
     "nextStepsExplanation": "Ordenado pelo que mais gente consegue. A platina vai sempre no fim: não é uma tarefa, é a consequência.",
     "allTrophiesHeading": "Todos os troféus",
-    "trophiesEarnedOf": "{earned} de {total} conquistados"
+    "trophiesEarnedOf": "{earned} de {total} conquistados",
+    "marcas": {
+      "instalado": "Instalado",
+      "oculto": "Oculto no teu perfil",
+      "ocultoTitulo": "Não aparece no teu perfil público, mas continua a contar para ti",
+      "fecha": "Data objetivo",
+      "quedan": "faltam {n} dias",
+      "queda1": "falta 1 dia",
+      "hoy": "é hoje!",
+      "tarde": "{n} dias de atraso",
+      "tarde1": "1 dia de atraso",
+      "quitarFecha": "Tirar a data",
+      "amigos": "Também a meio:",
+      "sesion": "Organizar uma sessão"
+    }
   },
   "JuegoPage": {
     "verFicha": "Ver a minha ficha",

@@ -33,7 +33,21 @@
     "focusModeLink": "Focus mode",
     "nextStepsExplanation": "Sorted by what most people get. The platinum always comes last: it's not a task, it's the consequence.",
     "allTrophiesHeading": "All trophies",
-    "trophiesEarnedOf": "{earned} of {total} earned"
+    "trophiesEarnedOf": "{earned} of {total} earned",
+    "marcas": {
+      "instalado": "Installed",
+      "oculto": "Hidden on your profile",
+      "ocultoTitulo": "Not shown on your public profile, but it still counts for you",
+      "fecha": "Target date",
+      "quedan": "{n} days left",
+      "queda1": "1 day left",
+      "hoy": "it's today!",
+      "tarde": "{n} days late",
+      "tarde1": "1 day late",
+      "quitarFecha": "Remove the date",
+      "amigos": "Also halfway through:",
+      "sesion": "Set up a session"
+    }
   },
   "JuegoPage": {
     "verFicha": "See my page",

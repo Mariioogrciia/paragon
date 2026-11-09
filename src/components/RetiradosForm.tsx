@@ -2,12 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { cambiarRetiradoAction } from "@/app/actions/retirados";
+import { nombreConsola } from "@/lib/retiradosReglas";
 
-/** Nombre bonito de lo que guarda la plataforma en `deviceLabel`. */
-export function nombreConsola(d: string): string {
-  const nombres: Record<string, string> = { PSVITA: "PS Vita", PSPC: "PC (PlayStation)", "XBOX360": "Xbox 360", "XBOX 360": "Xbox 360", "XBOX ONE": "Xbox One", XBOXONE: "Xbox One", "XBOX SERIES": "Xbox Series" };
-  return nombres[d] ?? d;
-}
 
 /**
  * Ajustes → Ocultar → «Lo que ya no tienes» (8 nov 2026, lib/retirados.ts):

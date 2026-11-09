@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "@/components/Enlace";
 import { notFound } from "next/navigation";
+import { getRetirados } from "@/lib/retirados";
+import { extrasPlatinables } from "@/lib/platinablesExtras";
+import { MarcasJuego } from "@/components/MarcasJuego";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { Avatar } from "@/components/Avatar";
@@ -118,6 +121,10 @@ export default async function JuegoPage({
 
   const game = await getGameDetail(profile, gameId, await idiomaActual());
   if (!game) notFound();
+  // Tus marcas (lib/retirados.ts): instalado, oculto en tu perfil y fecha objetivo.
+  // Un juego oculto de tu perfil público no se abre para nadie más (8 nov 2026).
+  const marcas = await getRetirados(profile.userId);
+  if (marcas.ocultosPerfil.has(game.id) && (await auth())?.user?.id !== profile.userId) notFound();
 
   // Fondo de la cabecera (7 oct 2026, "la veo sosa"): el artwork del juego
   // en IGDB (o una captura); sin nada, la carátula ampliada y desenfocada.
@@ -133,6 +140,10 @@ export default async function JuegoPage({
   // organizar la biblioteca propia.
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
+  // Amigos que lo tienen empezado y sin platinar (lib/platinablesExtras.ts), para hacerlo juntos.
+  const amigosAMedias = esMio && !gameProgress(game).platinumEarned
+    ? ((await extrasPlatinables(profile.userId, [game.id]).catch(() => null))?.get(game.id)?.amigos ?? [])
+    : [];
   // Dato original de la plataforma (aunque esté ignorado) para el interruptor
   // "ignorar horas" — `game.playtimeMinutes` ya viene sin las ignoradas.
   const horasPlataforma = esMio ? await horasDeLaPlataforma(profile.userId, gameId).catch(() => null) : null;
@@ -293,6 +304,49 @@ export default async function JuegoPage({
                   />
                 )}
               </div>
+              {esMio && (
+                <MarcasJuego
+                  gameId={game.id}
+                  instaladoInicial={marcas.instalados.has(game.id)}
+                  ocultoInicial={marcas.ocultosPerfil.has(game.id)}
+                  reservado={!progress.platinumEarned && hito?.reservado?.gameId === game.id}
+                  fechaInicial={marcas.fechaObjetivo}
+                  textos={{
+                    instalado: t("GameDetailPage.marcas.instalado"),
+                    oculto: t("GameDetailPage.marcas.oculto"),
+                    ocultoTitulo: t("GameDetailPage.marcas.ocultoTitulo"),
+                    fecha: t("GameDetailPage.marcas.fecha"),
+                    quedan: t("GameDetailPage.marcas.quedan", { n: "{n}" }),
+                    queda1: t("GameDetailPage.marcas.queda1"),
+                    hoy: t("GameDetailPage.marcas.hoy"),
+                    tarde: t("GameDetailPage.marcas.tarde", { n: "{n}" }),
+                    tarde1: t("GameDetailPage.marcas.tarde1"),
+                    quitarFecha: t("GameDetailPage.marcas.quitarFecha"),
+                  }}
+                />
+              )}
+              {amigosAMedias.length > 0 && (
+                <p className="mt-3 text-sm text-muted">
+                  {t("GameDetailPage.marcas.amigos")}{" "}
+                  {amigosAMedias.map((a, i) => (
+                    <span key={a.handle ?? i}>
+                      {i > 0 && ", "}
+                      {a.handle ? (
+                        <Link href={`/u/${a.handle}/${game.id}`} className="font-semibold text-foreground hover:text-[var(--accent-text)]">
+                          {a.nombre ?? `@${a.handle}`}
+                        </Link>
+                      ) : (
+                        a.nombre
+                      )}{" "}
+                      ({a.percent} %)
+                    </span>
+                  ))}
+                  {" · "}
+                  <Link href="/sesiones" className="font-semibold text-accent hover:underline">
+                    {t("GameDetailPage.marcas.sesion")}
+                  </Link>
+                </p>
+              )}
 
               <div className="mt-5 flex max-w-[560px] items-center gap-4">
                 <div

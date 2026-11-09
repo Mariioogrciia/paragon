@@ -33,7 +33,21 @@
     "focusModeLink": "Fokus-Modus",
     "nextStepsExplanation": "Sortiert nach dem, was die meisten Leute schaffen. Das Platin kommt immer zuletzt: Es ist keine Aufgabe, sondern die Folge.",
     "allTrophiesHeading": "Alle Trophäen",
-    "trophiesEarnedOf": "{earned} von {total} erhalten"
+    "trophiesEarnedOf": "{earned} von {total} erhalten",
+    "marcas": {
+      "instalado": "Installiert",
+      "oculto": "In deinem Profil verborgen",
+      "ocultoTitulo": "Nicht in deinem öffentlichen Profil, zählt aber weiter für dich",
+      "fecha": "Zieldatum",
+      "quedan": "noch {n} Tage",
+      "queda1": "noch 1 Tag",
+      "hoy": "heute!",
+      "tarde": "{n} Tage zu spät",
+      "tarde1": "1 Tag zu spät",
+      "quitarFecha": "Datum entfernen",
+      "amigos": "Auch halb fertig:",
+      "sesion": "Session planen"
+    }
   },
   "JuegoPage": {
     "verFicha": "Meine Seite ansehen",

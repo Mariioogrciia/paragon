@@ -19,6 +19,7 @@ function juego(id: string, o: Partial<Game> & { def: number; gan: number; pct: n
     isWishlist: o.isWishlist ?? false,
     hltb: o.hltb,
     playtimeMinutes: o.playtimeMinutes,
+    platinumRarity: (o as { platinumRarity?: number }).platinumRarity,
   } as Game;
 }
 
@@ -57,5 +58,20 @@ describe("platinables", () => {
   it("horas que quedan según HowLongToBeat menos lo jugado", () => {
     const { cerca } = platinables([juego("h", { def: 10, gan: 9, pct: 90, hltb: { completionist: 50 }, playtimeMinutes: 44 * 60 })], AHORA);
     expect(cerca[0].horasRestantes).toBe(6);
+  });
+});
+
+describe("platinables: fáciles sin empezar", () => {
+  it("los de pocas horas o mucho porcentaje de platino, sin los empezados", () => {
+    const { faciles } = platinables(
+      [
+        juego("corto", { def: 20, gan: 0, pct: 0, hltb: { completionist: 6 } }),
+        juego("popular", { def: 40, gan: 0, pct: 0, platinumRarity: 45 } as never),
+        juego("largo", { def: 50, gan: 0, pct: 0, hltb: { completionist: 120 } }),
+        juego("empezado", { def: 20, gan: 3, pct: 15, hltb: { completionist: 5 } }),
+      ],
+      AHORA,
+    );
+    expect(faciles.map((p) => p.game.id)).toEqual(["corto", "popular"]);
   });
 });

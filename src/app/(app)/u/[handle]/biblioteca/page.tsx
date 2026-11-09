@@ -9,6 +9,7 @@ import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { TrophyCountRow } from "@/components/TrophyCounts";
 import { listCollections } from "@/lib/collections";
 import { getLibrary, getProfileByHandle } from "@/lib/profiles";
+import { ocultosDelPerfil } from "@/lib/retirados";
 import { summarise } from "@/lib/stats";
 import type { GameStatus, SortKey } from "@/lib/stats";
 
@@ -65,7 +66,11 @@ export default async function BibliotecaPage({
   const session = await auth();
   const esMio = session?.user?.id === profile.userId;
 
-  const { games } = await getLibrary(profile);
+  const { games: todos } = await getLibrary(profile);
+  // Los que su dueño ocultó de su perfil público (lib/retirados.ts) no se
+  // ven en la biblioteca de otra persona (8 nov 2026).
+  const ocultos = esMio ? new Set<string>() : await ocultosDelPerfil(profile.userId);
+  const games = ocultos.size > 0 ? todos.filter((g) => !ocultos.has(g.id)) : todos;
   // Las carpetas son de quien mira, no de quien se mira — mismo criterio
   // que en la ficha de un juego.
   const carpetas = await listCollections(profile.userId);

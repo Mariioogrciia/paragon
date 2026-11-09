@@ -13,7 +13,56 @@ export interface Retirados {
   juegos: Set<string>;
 }
 
-export const SIN_RETIRADOS: Retirados = { dispositivos: new Set(), juegos: new Set() };
+/**
+ * Todo lo que marcas tú sobre tus juegos (misma tabla `retirado`, 8 nov 2026):
+ * lo que ya no tienes, lo instalado ahora, lo oculto de tu perfil público y
+ * la fecha objetivo del platino reservado ("2026-12-01").
+ */
+export interface Marcas extends Retirados {
+  instalados: Set<string>;
+  ocultosPerfil: Set<string>;
+  fechaObjetivo: string | null;
+}
+
+export type TipoMarca = "dispositivo" | "juego" | "instalado" | "oculto_perfil" | "fecha_objetivo";
+
+export const SIN_RETIRADOS: Marcas = { dispositivos: new Set(), juegos: new Set(), instalados: new Set(), ocultosPerfil: new Set(), fechaObjetivo: null };
+
+const DIA_MS = 86_400_000;
+
+/**
+ * Consolas que llevas mucho sin tocar (8 nov 2026): "hace 3 años que no
+ * juegas a nada de PS3, ¿la quitamos?". Solo las no retiradas, con la última
+ * partida de hace más de `anios` años.
+ */
+export function consolasParaRetirar(
+  games: Pick<Game, "deviceLabel" | "lastPlayedAt" | "isWishlist">[],
+  r: Retirados,
+  ahora = Date.now(),
+  anios = 2,
+): { dispositivo: string; anios: number; juegos: number }[] {
+  const ultima = new Map<string, number>();
+  const cuenta = new Map<string, number>();
+  for (const g of games) {
+    if (g.isWishlist) continue;
+    const t = g.lastPlayedAt ? new Date(g.lastPlayedAt).getTime() : 0;
+    for (const d of dispositivosDe(g.deviceLabel)) {
+      cuenta.set(d, (cuenta.get(d) ?? 0) + 1);
+      ultima.set(d, Math.max(ultima.get(d) ?? 0, Number.isFinite(t) ? t : 0));
+    }
+  }
+  return [...ultima]
+    .filter(([d, t]) => !r.dispositivos.has(d) && t > 0 && ahora - t > anios * 365 * DIA_MS)
+    .map(([d, t]) => ({ dispositivo: d, anios: Math.floor((ahora - t) / (365 * DIA_MS)), juegos: cuenta.get(d) ?? 0 }))
+    .sort((a, b) => b.anios - a.anios);
+}
+
+/** Días que quedan hasta la fecha objetivo (negativo si ya pasó); null si no hay. */
+export function diasHastaObjetivo(fecha: string | null, ahora = Date.now()): number | null {
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return null;
+  const objetivo = new Date(`${fecha}T23:59:59Z`).getTime();
+  return Math.ceil((objetivo - ahora) / DIA_MS);
+}
 
 /** "PS3,PSVITA" → ["PS3", "PSVITA"]; "Xbox 360" → ["XBOX 360"]. */
 export function dispositivosDe(deviceLabel: string | null | undefined): string[] {
@@ -42,4 +91,10 @@ export function dispositivosDeBiblioteca(games: Pick<Game, "deviceLabel" | "isWi
     for (const d of dispositivosDe(g.deviceLabel)) cuenta.set(d, (cuenta.get(d) ?? 0) + 1);
   }
   return [...cuenta].map(([dispositivo, juegos]) => ({ dispositivo, juegos })).sort((a, b) => b.juegos - a.juegos || a.dispositivo.localeCompare(b.dispositivo));
+}
+
+/** Nombre bonito de lo que guarda la plataforma en `deviceLabel` ("PSVITA" → "PS Vita"). */
+export function nombreConsola(d: string): string {
+  const nombres: Record<string, string> = { PSVITA: "PS Vita", PSPC: "PC (PlayStation)", XBOX360: "Xbox 360", "XBOX 360": "Xbox 360", "XBOX ONE": "Xbox One", XBOXONE: "Xbox One", "XBOX SERIES": "Xbox Series" };
+  return nombres[d] ?? d;
 }

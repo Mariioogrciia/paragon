@@ -1534,7 +1534,7 @@ export const retirados = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    tipo: text("tipo").$type<"dispositivo" | "juego">().notNull(),
+    tipo: text("tipo").$type<"dispositivo" | "juego" | "instalado" | "oculto_perfil" | "fecha_objetivo">().notNull(),
     valor: text("valor").notNull(),
     creadoAt: timestamp("creadoAt", { mode: "date" }).notNull().defaultNow(),
   },

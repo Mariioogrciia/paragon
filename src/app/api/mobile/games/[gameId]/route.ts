@@ -8,6 +8,7 @@ import { generarDiarioPlatino } from "@/lib/diarioPlatino";
 import { planPlatino } from "@/lib/planPlatino";
 import { platinosMasRapidos } from "@/lib/platinoRapido";
 import { cantidadDelTexto } from "@/lib/coleccionablesReglas";
+import { getRetirados, ocultosDelPerfil } from "@/lib/retirados";
 
 /**
  * Ficha de un juego para GameDetailScreen (Android) — mismo `getGameDetail`
@@ -37,6 +38,10 @@ export async function GET(
   }
 
   const { gameId } = await params;
+  // Un juego que su dueño ocultó de su perfil público no se abre para nadie más.
+  if (profile !== propio && (await ocultosDelPerfil(profile.userId)).has(gameId)) {
+    return errorMovil(req, "Juego no encontrado", 404);
+  }
   const detail = await getGameDetail(profile, gameId, idiomaDeCabecera(req.headers.get("accept-language")));
   if (!detail) {
     return errorMovil(req, "Juego no encontrado", 404);
@@ -58,9 +63,14 @@ export async function GET(
     ...detail,
     trophies: detail.trophies.map((t) => ({ ...t, coleccionables: cantidadDelTexto(t.name, t.detail) })),
   };
+  const marcas = profile === propio ? await getRetirados(propio.userId) : null;
   return NextResponse.json({
     game,
     diario,
+    // Tus marcas de este juego (8 nov 2026): instalado, oculto en tu perfil y la fecha objetivo del platino reservado.
+    marcas: marcas
+      ? { instalado: marcas.instalados.has(detail.id), ocultoPerfil: marcas.ocultosPerfil.has(detail.id), fechaObjetivo: marcas.fechaObjetivo }
+      : null,
     plan:
       plan && plan.faltan > 0
         ? {

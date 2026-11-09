@@ -33,7 +33,21 @@
     "focusModeLink": "Modalità concentrazione",
     "nextStepsExplanation": "Ordinati per quelli che ottiene più gente. Il platino va sempre per ultimo: non è un compito, è la conseguenza.",
     "allTrophiesHeading": "Tutti i trofei",
-    "trophiesEarnedOf": "{earned} di {total} ottenuti"
+    "trophiesEarnedOf": "{earned} di {total} ottenuti",
+    "marcas": {
+      "instalado": "Installato",
+      "oculto": "Nascosto nel tuo profilo",
+      "ocultoTitulo": "Non si vede nel tuo profilo pubblico, ma conta comunque per te",
+      "fecha": "Data obiettivo",
+      "quedan": "mancano {n} giorni",
+      "queda1": "manca 1 giorno",
+      "hoy": "è oggi!",
+      "tarde": "{n} giorni di ritardo",
+      "tarde1": "1 giorno di ritardo",
+      "quitarFecha": "Togli la data",
+      "amigos": "Anche a metà:",
+      "sesion": "Organizza una sessione"
+    }
   },
   "JuegoPage": {
     "verFicha": "Vedi la mia scheda",

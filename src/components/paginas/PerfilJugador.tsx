@@ -49,6 +49,7 @@ import { BackButton } from "@/components/BackButton";
 import { ProfileTabsNav } from "@/components/ProfileTabsNav";
 import { PinnedGameBanner } from "@/components/PinnedGameBanner";
 import { getOrComputeAuraColor } from "@/lib/coverAura";
+import { ocultosDelPerfil } from "@/lib/retirados";
 import { ArteDeFondo, CapaFondo } from "@/components/FondoPerfil";
 import { getUserClan } from "@/lib/clans";
 import { CompartirPerfil } from "@/components/CompartirPerfil";
@@ -205,13 +206,16 @@ export async function PerfilJugador({
     getUserBadges(profile.userId),
     wrapAnual(profile.userId),
   ]);
-  const [recientes, palmares, clanMembership, vitrinas] = await Promise.all([
+  const [recientesTodos, palmares, clanMembership, vitrinas] = await Promise.all([
     ultimosTrofeos(profile.userId, 8, await idiomaActual()),
     getUserTrophyCase(profile.userId),
     getUserClan(profile.userId),
     // Si la tabla no existiera, el perfil se enseña igual, sin vitrinas.
     getVitrinas(profile.userId).catch(() => []),
   ]);
+  // Lo que su dueño ocultó de su perfil público (lib/retirados.ts) no sale en sus últimos trofeos.
+  const ocultosPerfil = esMio ? new Set<string>() : await ocultosDelPerfil(profile.userId).catch(() => new Set<string>());
+  const recientes = recientesTodos.filter((r) => !ocultosPerfil.has(r.gameId));
   const [[rachasPerfil, percentilAnio], estadoAmistad, seguir, apoyo] = await Promise.all([
     games.length > 0
       ? Promise.all([rachasDelAnio(profile.userId), percentilTrofeosAnio(profile.userId)])

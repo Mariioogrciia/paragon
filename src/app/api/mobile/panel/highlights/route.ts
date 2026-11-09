@@ -3,7 +3,8 @@ import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { platinables, type Platinable } from "@/lib/platinables";
 import { getRetirados } from "@/lib/retirados";
-import { sinRetirados } from "@/lib/retiradosReglas";
+import { consolasParaRetirar, sinRetirados } from "@/lib/retiradosReglas";
+import { doblesPlatinos, extrasPlatinables, type ExtrasJuego } from "@/lib/platinablesExtras";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
 import { ultimosTrofeos } from "@/lib/history";
@@ -65,19 +66,43 @@ export async function GET(req: Request) {
   // Qué te puedes platinar (8 nov 2026, lib/platinables.ts): las dos listas
   // de la web. `nearPlatinum` se queda (los 3 primeros) para las versiones
   // de la app que aún no conocen `platinables`.
-  const listas = platinables(sinRetirados(games, await getRetirados(userId)));
+  const marcas = await getRetirados(userId);
+  const listas = platinables(sinRetirados(games, marcas), undefined, marcas.instalados);
+  const [extras, dobles] = await Promise.all([
+    extrasPlatinables(userId, [...listas.cerca, ...listas.jugando].map((p) => p.game.id)).catch(() => new Map<string, ExtrasJuego>()),
+    doblesPlatinos(sinRetirados(games, marcas)).catch(() => []),
+  ]);
   const nearPlatinum = listas.cerca.slice(0, 3).map((p) => p.game);
-  const aFila = (p: Platinable) => ({
-    ...toCard(p.game),
-    faltan: p.faltan,
-    tienePlatino: (p.game.defined?.platinum ?? 0) > 0,
-    diasDesdeJugado: p.diasDesdeJugado,
-    horasRestantes: p.horasRestantes,
-  });
+  const aFila = (p: Platinable) => {
+    const e = extras.get(p.game.id);
+    return {
+      ...toCard(p.game),
+      faltan: p.faltan,
+      tienePlatino: (p.game.defined?.platinum ?? 0) > 0,
+      sinEmpezar: p.game.earnedTotal === 0,
+      diasDesdeJugado: p.diasDesdeJugado,
+      horasRestantes: p.horasRestantes,
+      dispositivos: p.dispositivos,
+      suscripcion: p.suscripcion,
+      instalado: p.instalado,
+      rarezaPlatino: p.rarezaPlatino,
+      perdibles: e?.perdibles ?? 0,
+      masRaroPendiente: e?.masRaroPendiente ?? null,
+      amigos: (e?.amigos ?? []).map((a) => ({ nombre: a.nombre ?? a.handle, percent: a.percent })),
+    };
+  };
+  const sugerencia = consolasParaRetirar(games, marcas)[0] ?? null;
 
   return jsonConEtag(req, {
     nearPlatinum: nearPlatinum.map(toCard),
-    platinables: { cerca: listas.cerca.map(aFila), jugando: listas.jugando.map(aFila) },
+    platinables: {
+      cerca: listas.cerca.map(aFila),
+      jugando: listas.jugando.map(aFila),
+      faciles: listas.faciles.map(aFila),
+      dobles: dobles.map((d) => ({ id: d.otra.id, titulo: d.otra.titulo, coverUrl: d.otra.iconUrl ?? "", consola: d.otra.dispositivo, platinadoEn: d.platinado.dispositivo, laTienes: d.laTienes })),
+      // "Hace 3 años que no juegas a nada de PS3": la app pregunta si la quita de las sugerencias.
+      sugerenciaRetirar: sugerencia,
+    },
     recent: recent.map(toCard),
     nextTrophies: recomendaciones.map((r) => ({
       gameId: r.gameId,

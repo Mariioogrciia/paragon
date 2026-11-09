@@ -1,0 +1,95 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { cambiarRetiradoAction } from "@/app/actions/retirados";
+import { ToggleChip } from "@/components/ToggleChip";
+
+/**
+ * Tus marcas en la ficha de un juego (8 nov 2026, lib/retirados.ts):
+ * «Instalado» (para filtrar «A un paso del platino» por lo que tienes
+ * instalado ahora), «Oculto en tu perfil» (no se ve en tu perfil público,
+ * pero cuenta para ti) y, si lo tienes reservado, la fecha objetivo del
+ * platino con la cuenta atrás. Los textos llegan traducidos del servidor.
+ */
+export function MarcasJuego({
+  gameId,
+  instaladoInicial,
+  ocultoInicial,
+  reservado,
+  fechaInicial,
+  textos,
+}: {
+  gameId: string;
+  instaladoInicial: boolean;
+  ocultoInicial: boolean;
+  reservado: boolean;
+  fechaInicial: string | null;
+  textos: { instalado: string; oculto: string; ocultoTitulo: string; fecha: string; quedan: string; queda1: string; hoy: string; tarde: string; tarde1: string; quitarFecha: string };
+}) {
+  const [instalado, setInstalado] = useState(instaladoInicial);
+  const [oculto, setOculto] = useState(ocultoInicial);
+  const [fecha, setFecha] = useState(fechaInicial ?? "");
+  const [, empezar] = useTransition();
+
+  // Días hasta el final del día objetivo (negativo: ya pasó). Mismo cálculo que diasHastaObjetivo.
+  const dias = fecha ? Math.ceil((new Date(`${fecha}T23:59:59Z`).getTime() - new Date().getTime()) / 86_400_000) : null;
+  const cuenta =
+    dias === null ? null : dias > 1 ? textos.quedan.replace("{n}", String(dias)) : dias === 1 ? textos.queda1 : dias === 0 ? textos.hoy : dias === -1 ? textos.tarde1 : textos.tarde.replace("{n}", String(-dias));
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-3">
+      <ToggleChip
+        active={instalado}
+        size="md"
+        onClick={() => {
+          setInstalado(!instalado);
+          empezar(() => void cambiarRetiradoAction("instalado", gameId, !instalado));
+        }}
+      >
+        💾 {textos.instalado}
+      </ToggleChip>
+      <ToggleChip
+        active={oculto}
+        size="md"
+        title={textos.ocultoTitulo}
+        onClick={() => {
+          setOculto(!oculto);
+          empezar(() => void cambiarRetiradoAction("oculto_perfil", gameId, !oculto));
+        }}
+      >
+        🙈 {textos.oculto}
+      </ToggleChip>
+      {reservado && (
+        <label className="flex items-center gap-2 text-xs font-semibold text-muted">
+          🎯 {textos.fecha}
+          <input
+            type="date"
+            value={fecha}
+            min={new Date().toISOString().slice(0, 10)}
+            onChange={(e) => {
+              const v = e.target.value;
+              setFecha(v);
+              empezar(() => void cambiarRetiradoAction("fecha_objetivo", v || "-", Boolean(v)));
+            }}
+            className="rounded-lg px-2 py-1 text-xs text-foreground"
+            style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}
+          />
+          {cuenta && <span className={dias !== null && dias < 0 ? "font-bold text-[var(--danger)]" : "font-bold text-[var(--accent-text)]"}>{cuenta}</span>}
+          {fecha && (
+            <button
+              type="button"
+              onClick={() => {
+                setFecha("");
+                empezar(() => void cambiarRetiradoAction("fecha_objetivo", "-", false));
+              }}
+              className="text-muted hover:text-foreground"
+              aria-label={textos.quitarFecha}
+            >
+              ×
+            </button>
+          )}
+        </label>
+      )}
+    </div>
+  );
+}

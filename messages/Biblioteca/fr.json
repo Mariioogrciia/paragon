@@ -33,7 +33,21 @@
     "focusModeLink": "Mode concentration",
     "nextStepsExplanation": "Classé selon ce que le plus de monde obtient. Le platine arrive toujours en dernier : ce n'est pas une tâche, c'est la conséquence.",
     "allTrophiesHeading": "Tous les trophées",
-    "trophiesEarnedOf": "{earned} sur {total} obtenus"
+    "trophiesEarnedOf": "{earned} sur {total} obtenus",
+    "marcas": {
+      "instalado": "Installé",
+      "oculto": "Masqué sur ton profil",
+      "ocultoTitulo": "Pas visible sur ton profil public, mais il compte toujours pour toi",
+      "fecha": "Date objectif",
+      "quedan": "encore {n} jours",
+      "queda1": "encore 1 jour",
+      "hoy": "c'est aujourd'hui !",
+      "tarde": "{n} jours de retard",
+      "tarde1": "1 jour de retard",
+      "quitarFecha": "Retirer la date",
+      "amigos": "Aussi en cours :",
+      "sesion": "Organiser une session"
+    }
   },
   "JuegoPage": {
     "verFicha": "Voir ma fiche",

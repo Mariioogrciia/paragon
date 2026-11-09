@@ -29,9 +29,10 @@ export async function PUT(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) return errorMovil(req, "No autenticado", 401);
   const cuerpo = (await req.json().catch(() => null)) as { tipo?: unknown; valor?: unknown; retirado?: unknown } | null;
-  if (!cuerpo || (cuerpo.tipo !== "dispositivo" && cuerpo.tipo !== "juego") || typeof cuerpo.valor !== "string") {
+  const tipos = ["dispositivo", "juego", "instalado", "oculto_perfil", "fecha_objetivo"] as const;
+  if (!cuerpo || !tipos.includes(cuerpo.tipo as (typeof tipos)[number]) || typeof cuerpo.valor !== "string") {
     return errorMovil(req, "Datos no válidos", 400);
   }
-  await cambiarRetirado(userId, cuerpo.tipo, cuerpo.valor, cuerpo.retirado === true);
+  await cambiarRetirado(userId, cuerpo.tipo as (typeof tipos)[number], cuerpo.valor, cuerpo.retirado === true);
   return NextResponse.json(await estado(userId));
 }

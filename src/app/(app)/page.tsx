@@ -11,7 +11,8 @@ import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { platinables, type Platinable } from "@/lib/platinables";
 import { getRetirados } from "@/lib/retirados";
-import { sinRetirados } from "@/lib/retiradosReglas";
+import { consolasParaRetirar, dispositivosDe, nombreConsola, sinRetirados } from "@/lib/retiradosReglas";
+import { doblesPlatinos, extrasPlatinables, type DoblePlatino, type ExtrasJuego } from "@/lib/platinablesExtras";
 import { PlatinablesPanel, type FilaPlatinable } from "@/components/PlatinablesPanel";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
@@ -101,22 +102,64 @@ async function Inicio() {
   const mostrarAtasco = juegoAnclado && diasAtascado !== null && diasAtascado >= UMBRAL_ATASCO;
 
   // Qué te puedes platinar (8 nov 2026, lib/platinables.ts): lo que menos te
-  // queda y lo que estás jugando, también Steam/Xbox (al 100 %). La tarjeta
+  // queda, lo que estás jugando, platinos fáciles sin empezar y doble platino,
+  // sin las consolas y juegos que ya no tienes (lib/retirados.ts). La tarjeta
   // grande es el primero de "más cerca"; la lista va debajo con pestañas.
-  // Sin las consolas y juegos que ya no tienes (Ajustes → Ocultar, lib/retirados.ts).
-  const listas = platinables(sinRetirados(games, await getRetirados(session.user.id)));
+  const marcas = await getRetirados(session.user.id);
+  const listas = platinables(sinRetirados(games, marcas), undefined, marcas.instalados);
+  const [extras, dobles] = await Promise.all([
+    extrasPlatinables(session.user.id, [...listas.cerca, ...listas.jugando].map((p) => p.game.id)).catch(() => new Map<string, ExtrasJuego>()),
+    doblesPlatinos(sinRetirados(games, marcas)).catch(() => []),
+  ]);
+  const sugerenciaRetirar = consolasParaRetirar(games, marcas)[0] ?? null;
   const nearPlatinum = listas.cerca.slice(0, 1).map((p) => ({ game: p.game, progress: gameProgress(p.game) }));
-  const fila = (p: Platinable): FilaPlatinable => ({
-    id: p.game.id,
-    titulo: p.game.title,
-    iconUrl: p.game.iconUrl ?? null,
-    percent: p.percent,
-    href: `/u/${profile.handle}/${p.game.id}`,
-    faltan: (p.game.defined?.platinum ?? 0) > 0 ? t("platinables.faltan", { count: p.faltan }) : t("platinables.faltanCien", { count: p.faltan }),
-    extra: [
-      ...(p.diasDesdeJugado !== null && p.diasDesdeJugado <= 365 ? [t("platinables.jugado", { count: p.diasDesdeJugado })] : []),
-      ...(p.horasRestantes ? [t("platinables.horas", { n: p.horasRestantes })] : []),
-    ],
+  const fila = (p: Platinable): FilaPlatinable => {
+    const e = extras.get(p.game.id);
+    return {
+      id: p.game.id,
+      titulo: p.game.title,
+      iconUrl: p.game.iconUrl ?? null,
+      percent: p.percent,
+      href: `/u/${profile.handle}/${p.game.id}`,
+      faltan:
+        p.game.earnedTotal === 0
+          ? t("platinables.sinEmpezar", { count: p.faltan })
+          : (p.game.defined?.platinum ?? 0) > 0
+            ? t("platinables.faltan", { count: p.faltan })
+            : t("platinables.faltanCien", { count: p.faltan }),
+      extra: [
+        ...(p.game.earnedTotal > 0 && p.diasDesdeJugado !== null && p.diasDesdeJugado <= 365 ? [t("platinables.jugado", { count: p.diasDesdeJugado })] : []),
+        ...(p.horasRestantes ? [t("platinables.horas", { n: p.horasRestantes })] : []),
+        ...(p.game.earnedTotal === 0 && p.rarezaPlatino !== null ? [t("platinables.rarezaPlatino", { r: p.rarezaPlatino.toLocaleString(idioma, { maximumFractionDigits: 1 }) })] : []),
+      ],
+      dispositivos: p.dispositivos,
+      horas: p.horasRestantes,
+      instalado: p.instalado,
+      suscripcion: p.suscripcion !== null,
+      avisos: [
+        ...(e && e.perdibles > 0 ? [t("platinables.perdibles", { count: e.perdibles })] : []),
+        ...(e && e.masRaroPendiente !== null && e.masRaroPendiente < 2 ? [t("platinables.dificil", { r: e.masRaroPendiente.toLocaleString(idioma, { maximumFractionDigits: 1 }) })] : []),
+        ...(p.suscripcion === "ps_plus" ? ["PS Plus"] : p.suscripcion === "game_pass" ? ["Game Pass"] : []),
+        ...(p.instalado ? [t("platinables.instalado")] : []),
+      ],
+      amigos: e && e.amigos.length > 0 ? t("platinables.amigos", { nombres: e.amigos.map((a) => `${a.nombre ?? a.handle} (${a.percent} %)`).join(", ") }) : null,
+    };
+  };
+  const filaDoble = (d: DoblePlatino): FilaPlatinable => ({
+    id: d.otra.id,
+    titulo: d.otra.titulo,
+    iconUrl: d.otra.iconUrl,
+    percent: d.laTienes ?? 0,
+    href: d.laTienes !== null ? `/u/${profile.handle}/${d.otra.id}` : `/juego/${d.otra.id}`,
+    faltan: d.laTienes !== null ? t("platinables.dobleLaTienes", { consola: nombreConsola(d.otra.dispositivo) }) : t("platinables.dobleOtra", { consola: nombreConsola(d.otra.dispositivo) }),
+    extra: [t("platinables.dobleYa", { consola: nombreConsola(d.platinado.dispositivo) })],
+    dispositivos: dispositivosDe(d.otra.dispositivo),
+    horas: null,
+    instalado: false,
+    suscripcion: false,
+    avisos: [],
+    amigos: null,
+    sinOcultar: true,
   });
 
   // Lo contrario de "a un paso": empezados y parados hace más de un año
@@ -130,7 +173,7 @@ async function Inicio() {
 
   const now = new Date().getTime();
 
-  const nearPlatinumSection = (listas.cerca.length > 0 || listas.jugando.length > 0) && (
+  const nearPlatinumSection = (listas.cerca.length > 0 || listas.jugando.length > 0 || listas.faciles.length > 0 || dobles.length > 0) && (
     <section>
       <div className="mb-4 flex flex-wrap items-baseline gap-3.5">
         <h2 className="font-heading text-2xl font-bold">{t("aUnPasoDelPlatino")}</h2>
@@ -208,17 +251,40 @@ async function Inicio() {
 
         {/* Los demás, con pestañas: más cerca / lo que juegas ahora */}
         <PlatinablesPanel
-          cerca={listas.cerca.slice(1).map(fila)}
-          jugando={listas.jugando.map(fila)}
+          listas={{
+            cerca: listas.cerca.slice(1).map(fila),
+            jugando: listas.jugando.map(fila),
+            faciles: listas.faciles.map(fila),
+            dobles: dobles.map(filaDoble),
+          }}
+          sugerencia={
+            sugerenciaRetirar
+              ? { dispositivo: sugerenciaRetirar.dispositivo, texto: t("platinables.retirarPregunta", { anios: sugerenciaRetirar.anios, consola: nombreConsola(sugerenciaRetirar.dispositivo) }) }
+              : null
+          }
+          nombresConsola={Object.fromEntries(Object.values(listas).flat().flatMap((p) => p.dispositivos).map((d) => [d, nombreConsola(d)]))}
           textos={{
             cerca: t("platinables.cerca"),
             jugando: t("platinables.jugando"),
-            descCerca: t("platinables.descCerca"),
-            descJugando: t("platinables.descJugando"),
-            vacioJugando: t("platinables.vacio"),
+            faciles: t("platinables.faciles"),
+            dobles: t("platinables.dobles"),
+            desc_cerca: t("platinables.descCerca"),
+            desc_jugando: t("platinables.descJugando"),
+            desc_faciles: t("platinables.descFaciles"),
+            desc_dobles: t("platinables.descDobles"),
+            vacio_cerca: t("platinables.vacioCerca"),
+            vacio_jugando: t("platinables.vacio"),
+            vacio_faciles: t("platinables.vacioFaciles"),
+            vacio_dobles: t("platinables.vacioCerca"),
             verMas: t("platinables.verMas", { n: "{n}" }),
             verMenos: t("platinables.verMenos"),
             yaNoLoTengo: t("platinables.yaNoLoTengo"),
+            todas: t("platinables.todas"),
+            corto: t("platinables.filtroCorto"),
+            instalados: t("platinables.filtroInstalados"),
+            suscripcion: t("platinables.filtroSuscripcion"),
+            quitar: t("platinables.retirarSi"),
+            dejar: t("platinables.retirarNo"),
           }}
         />
       </div>
