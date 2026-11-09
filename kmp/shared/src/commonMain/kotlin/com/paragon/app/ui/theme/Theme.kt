@@ -12,6 +12,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import com.paragon.shared.recursos.Res
+import com.paragon.shared.recursos.manrope_bold
+import com.paragon.shared.recursos.manrope_extrabold
+import com.paragon.shared.recursos.manrope_medium
+import com.paragon.shared.recursos.manrope_regular
+import com.paragon.shared.recursos.manrope_semibold
+import org.jetbrains.compose.resources.Font
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
@@ -81,21 +89,21 @@ fun ParagonTheme(
         )
     }
 
-    // Terminal: monoespaciada en toda la interfaz (la web hace lo mismo).
+    // Letra de la app (9 nov 2026, elegida entre cinco): Manrope, metida en
+    // la app (composeResources/font, licencia OFL en kmp/LICENCIAS). Terminal
+    // sigue en monoespaciada en toda la interfaz, como en la web.
+    val familia = if (estiloActivo.monoespaciada) FontFamily.Monospace else manrope()
     val base = Typography()
-    val tipografia = if (estiloActivo.monoespaciada) {
-        val m = FontFamily.Monospace
-        Typography(
-            displayLarge = base.displayLarge.copy(fontFamily = m), displayMedium = base.displayMedium.copy(fontFamily = m),
-            displaySmall = base.displaySmall.copy(fontFamily = m), headlineLarge = base.headlineLarge.copy(fontFamily = m),
-            headlineMedium = base.headlineMedium.copy(fontFamily = m), headlineSmall = base.headlineSmall.copy(fontFamily = m),
-            titleLarge = base.titleLarge.copy(fontFamily = m), titleMedium = base.titleMedium.copy(fontFamily = m),
-            titleSmall = base.titleSmall.copy(fontFamily = m), bodyLarge = base.bodyLarge.copy(fontFamily = m),
-            bodyMedium = base.bodyMedium.copy(fontFamily = m), bodySmall = base.bodySmall.copy(fontFamily = m),
-            labelLarge = base.labelLarge.copy(fontFamily = m), labelMedium = base.labelMedium.copy(fontFamily = m),
-            labelSmall = base.labelSmall.copy(fontFamily = m),
-        )
-    } else base
+    val tipografia = Typography(
+        displayLarge = base.displayLarge.copy(fontFamily = familia), displayMedium = base.displayMedium.copy(fontFamily = familia),
+        displaySmall = base.displaySmall.copy(fontFamily = familia), headlineLarge = base.headlineLarge.copy(fontFamily = familia),
+        headlineMedium = base.headlineMedium.copy(fontFamily = familia), headlineSmall = base.headlineSmall.copy(fontFamily = familia),
+        titleLarge = base.titleLarge.copy(fontFamily = familia), titleMedium = base.titleMedium.copy(fontFamily = familia),
+        titleSmall = base.titleSmall.copy(fontFamily = familia), bodyLarge = base.bodyLarge.copy(fontFamily = familia),
+        bodyMedium = base.bodyMedium.copy(fontFamily = familia), bodySmall = base.bodySmall.copy(fontFamily = familia),
+        labelLarge = base.labelLarge.copy(fontFamily = familia), labelMedium = base.labelMedium.copy(fontFamily = familia),
+        labelSmall = base.labelSmall.copy(fontFamily = familia),
+    )
     // Interlineado relativo a la letra (7 oct 2026): los estilos de Material
     // traen uno fijo (24 sp en el de cuerpo) y, en un texto de 11-12 sp que
     // salta de línea, quedaba un hueco enorme entre líneas ("Miembro · 0 /
@@ -140,4 +148,18 @@ private fun interlineadoRelativo(t: Typography): Typography {
         bodyLarge = t.bodyLarge.rel(1.35f), bodyMedium = t.bodyMedium.rel(1.35f), bodySmall = t.bodySmall.rel(1.35f),
         labelLarge = t.labelLarge.rel(1.3f), labelMedium = t.labelMedium.rel(1.3f), labelSmall = t.labelSmall.rel(1.3f),
     )
+}
+
+/** Manrope en sus cinco pesos; el resto (Light, Black…) lo aproxima el sistema. */
+@Composable
+fun manrope(): FontFamily {
+    val regular = Font(Res.font.manrope_regular, FontWeight.Normal)
+    val medium = Font(Res.font.manrope_medium, FontWeight.Medium)
+    val semibold = Font(Res.font.manrope_semibold, FontWeight.SemiBold)
+    val bold = Font(Res.font.manrope_bold, FontWeight.Bold)
+    val extrabold = Font(Res.font.manrope_extrabold, FontWeight.ExtraBold)
+    // Siempre la misma familia: si no, cada recomposición del tema estrenaría tipografía.
+    return androidx.compose.runtime.remember(regular, medium, semibold, bold, extrabold) {
+        FontFamily(regular, medium, semibold, bold, extrabold)
+    }
 }

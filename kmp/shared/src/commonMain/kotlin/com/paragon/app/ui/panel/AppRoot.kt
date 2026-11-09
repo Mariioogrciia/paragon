@@ -39,6 +39,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.paragon.app.ui.theme.Accent2
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.paragon.shared.recursos.Res
@@ -218,82 +223,79 @@ private fun LoadingGate() {
  */
 @Composable
 private fun LoginGate(onLogin: (provider: String) -> Unit) {
-    // Diseño v2 (maqueta "20 · Entrar"): la marca y un titular grande arriba,
-    // y los botones abajo, en la zona del pulgar, como las apps de verdad.
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.radialGradient(colors = listOf(Accent.copy(alpha = 0.14f), Background), radius = 1100f))
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(horizontal = 24.dp),
-    ) {
-        Spacer(Modifier.weight(1f))
-        com.paragon.app.ui.common.ParagonMark(modifier = Modifier.size(72.dp))
-        Text(
-            text = Textos.t(T.login_titular),
-            color = Foreground,
-            fontSize = 38.sp,
-            lineHeight = 41.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 22.dp),
+    // Diseño v3 (9 nov 2026, propuesta A elegida): un muro inclinado de
+    // carátulas reales que se desliza despacio (MuroCaratulas.kt) y, abajo,
+    // la marca, el titular y los botones en la zona del pulgar.
+    val titular = Textos.t(T.login_titular)
+    // "Todos tus trofeos. Un solo sitio." → la segunda frase con el degradado de acento.
+    val corte = titular.indexOf(". ").takeIf { it > 0 }?.plus(2)
+    val degradado = Brush.linearGradient(listOf(Accent, Accent2))
+    Box(Modifier.fillMaxSize().background(Background)) {
+        MuroCaratulas(Modifier.fillMaxWidth().fillMaxHeight(0.74f))
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    0f to Background.copy(alpha = 0.15f),
+                    0.4f to Background.copy(alpha = 0.6f),
+                    0.66f to Background,
+                ),
+            ),
         )
-        Text(
-            text = Textos.t(T.login_subtitulo),
-            color = Muted,
-            fontSize = 16.sp,
-            lineHeight = 23.sp,
-            modifier = Modifier.padding(top = 12.dp),
-        )
-        Row(
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(top = 20.dp),
-        ) {
-            GradeChip(Textos.t(T.grado_platino), Platinum)
-            GradeChip(Textos.t(T.grado_oro), Gold)
-            GradeChip(Textos.t(T.grado_plata), Silver)
-            GradeChip(Textos.t(T.grado_bronce), Bronze)
-        }
-        Spacer(Modifier.weight(1f))
-        ProviderButton(
-            label = Textos.t(T.login_google),
-            iconRes = Res.drawable.ic_google,
-            fondo = Color.White,
-            texto = textoSobre(Color.White),
-            onClick = { onLogin("google") },
-        )
-        Spacer(Modifier.height(10.dp))
-        ProviderButton(
-            label = Textos.t(T.login_discord),
-            iconRes = Res.drawable.ic_discord,
-            fondo = MarcaDiscord,
-            texto = Color.White,
-            tintarIcono = true,
-            onClick = { onLogin("discord") },
-        )
-        Text(
-            text = Textos.t(T.login_sin_contrasenas),
-            color = Muted,
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
-        )
-    }
-}
-
-@Composable
-private fun GradeChip(label: String, color: Color) {
-    Surface(
-        shape = RoundedCornerShape(radio(12)),
-        color = SurfaceColor,
-        border = BorderStroke(1.dp, Border),
-    ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .padding(horizontal = 24.dp),
         ) {
-            Box(Modifier.size(10.dp).background(color, CircleShape))
-            Spacer(Modifier.height(6.dp))
-            Text(text = label, color = Muted, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
+            com.paragon.app.ui.common.ParagonMark(modifier = Modifier.size(48.dp))
+            Text(
+                text = buildAnnotatedString {
+                    if (corte == null) {
+                        append(titular)
+                    } else {
+                        append(titular.substring(0, corte).trimEnd())
+                        append("\n")
+                        withStyle(SpanStyle(brush = degradado)) { append(titular.substring(corte)) }
+                    }
+                },
+                color = Foreground,
+                fontSize = 36.sp,
+                lineHeight = 39.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = (-0.5).sp,
+                modifier = Modifier.padding(top = 16.dp),
+            )
+            Text(
+                text = Textos.t(T.login_subtitulo),
+                color = Muted,
+                fontSize = 15.sp,
+                lineHeight = 22.sp,
+                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp),
+            )
+            ProviderButton(
+                label = Textos.t(T.login_google),
+                iconRes = Res.drawable.ic_google,
+                fondo = Color.White,
+                texto = textoSobre(Color.White),
+                onClick = { onLogin("google") },
+            )
+            Spacer(Modifier.height(10.dp))
+            ProviderButton(
+                label = Textos.t(T.login_discord),
+                iconRes = Res.drawable.ic_discord,
+                fondo = MarcaDiscord,
+                texto = Color.White,
+                tintarIcono = true,
+                onClick = { onLogin("discord") },
+            )
+            Text(
+                text = Textos.t(T.login_sin_contrasenas),
+                color = Muted,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
+            )
         }
     }
 }

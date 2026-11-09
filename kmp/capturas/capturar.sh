@@ -28,6 +28,11 @@ until adb shell getprop sys.boot_completed 2>/dev/null | grep -q 1; do sleep 2; 
 for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 0; done
 adb install -r -g "$APK"
 adb shell pm grant $PAQ android.permission.POST_NOTIFICATIONS 2>/dev/null
+# «Entrar» (sin sesión, antes del modo demo): con animaciones, para ver el muro moverse.
+for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 1; done
+adb shell am start -n "$ACT" >/dev/null; foto 00-entrar 15; foto 00-entrar-2 4
+adb shell am force-stop $PAQ
+for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 0; done
 # Dos órdenes sueltas: `adb shell` junta los argumentos y se perderían las comillas de un `sh -c`.
 adb shell run-as $PAQ mkdir -p files
 adb shell run-as $PAQ touch files/modo_demo
