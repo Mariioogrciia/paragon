@@ -28,9 +28,17 @@ until adb shell getprop sys.boot_completed 2>/dev/null | grep -q 1; do sleep 2; 
 for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 0; done
 adb install -r -g "$APK"
 adb shell pm grant $PAQ android.permission.POST_NOTIFICATIONS 2>/dev/null
+# Las carátulas del muro de «Entrar»: cuáles sirve Steam en cada ruta (desde el runner).
+MURO="$AQUI/../shared/src/commonMain/kotlin/com/paragon/app/ui/panel/MuroCaratulas.kt"
+for id in $(grep -oE '^ +[0-9]{5,7},' "$MURO" | tr -dc '0-9\n'); do
+  v=$(curl -s -o /dev/null -w '%{http_code}' "https://cdn.cloudflare.steamstatic.com/steam/apps/$id/library_600x900.jpg")
+  n=$(curl -s -o /dev/null -w '%{http_code}' "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/$id/library_600x900.jpg")
+  echo "$id clasica=$v nueva=$n"
+done > "$SALIDA/caratulas-muro.txt"
+
 # «Entrar» (sin sesión, antes del modo demo): con animaciones, para ver el muro moverse.
 for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 1; done
-adb shell am start -n "$ACT" >/dev/null; foto 00-entrar 15; foto 00-entrar-2 4
+adb shell am start -n "$ACT" >/dev/null; foto 00-entrar 15; foto 00-entrar-2 6; foto 00-entrar-3 8
 adb shell am force-stop $PAQ
 for a in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $a 0; done
 # Dos órdenes sueltas: `adb shell` junta los argumentos y se perderían las comillas de un `sh -c`.

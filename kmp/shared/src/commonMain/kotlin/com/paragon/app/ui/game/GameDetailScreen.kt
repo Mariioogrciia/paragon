@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Search
@@ -548,7 +549,7 @@ private fun GameDetailContent(
         }
 
         // Hueco para el botón de abajo (no tapar el último trofeo).
-        item { Spacer(Modifier.height(104.dp)) }
+        item { Spacer(Modifier.height(72.dp)) }
     }
 
     // "Modo Enfoque" en la zona del pulgar (maqueta "3 · Ficha"): ancla el
@@ -559,16 +560,21 @@ private fun GameDetailContent(
             onModoEnfoque()
         },
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Accent, contentColor = com.paragon.app.ui.theme.OnAccent),
-        shape = RoundedCornerShape(radio(28)),
+        shape = RoundedCornerShape(50),
+        // Pastilla compacta a la derecha (9 nov 2026, repaso de pantallas): a lo
+        // ancho, encima de la barra flotante, tapaba media pantalla de trofeos.
+        contentPadding = PaddingValues(start = 16.dp, end = 20.dp),
+        elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
         modifier = Modifier
-            .align(Alignment.BottomCenter)
+            .align(Alignment.BottomEnd)
             // Encima de la barra flotante de abajo (desde el 7 oct el
             // contenido pasa por detrás de ella y el botón quedaba tapado).
-            .padding(start = 16.dp, end = 16.dp, bottom = (com.paragon.app.ui.common.huecoBarra() + 6.dp).coerceAtLeast(16.dp))
-            .fillMaxWidth()
-            .height(56.dp),
+            .padding(end = 16.dp, bottom = (com.paragon.app.ui.common.huecoBarra() + 8.dp).coerceAtLeast(16.dp))
+            .height(46.dp),
     ) {
-        Text(Textos.t(T.nav_enfoque), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.CenterFocusStrong, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(Textos.t(T.nav_enfoque), fontSize = 15.sp, fontWeight = FontWeight.Bold)
     }
     // Volver siempre a mano (diseño v2): fijo arriba aunque se baje por la ficha.
     CabeceraFicha(
@@ -733,7 +739,6 @@ private fun CifraFicha(valor: String, etiqueta: String, modifier: Modifier, colo
             color = color,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
             maxLines = 1,
         )
         Text(etiqueta, color = Muted, fontSize = 12.sp, maxLines = 1)
@@ -1462,7 +1467,7 @@ private fun CabeceraGrupoTrofeos(nombre: String, conseguidos: Int, total: Int, e
                 Spacer(Modifier.width(8.dp))
             }
             Text(nombre, color = Foreground, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-            Text("$conseguidos/$total", color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+            Text("$conseguidos/$total", color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         Box(Modifier.padding(top = 8.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(com.paragon.app.ui.theme.Border)) {
             Box(Modifier.fillMaxWidth(if (total > 0) conseguidos / total.toFloat() else 0f).height(4.dp).background(Accent))

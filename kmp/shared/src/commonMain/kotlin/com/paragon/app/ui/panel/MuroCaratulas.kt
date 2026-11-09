@@ -25,6 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,35 +45,45 @@ import com.paragon.app.ui.theme.Platinum
 
 /**
  * Juegos del muro de «Entrar» (9 nov 2026, propuesta A): carátulas reales de
- * la tienda de Steam (`library_600x900`), de juegos conocidos de todas las
- * plataformas. Si una no carga (sin red, o Steam la mueve), queda el
- * degradado de debajo y el muro sigue viéndose entero.
+ * la tienda de Steam (`library_600x900`). Sobre todo de PlayStation (los de
+ * Sony que también están en PC), mezclados con otros muy conocidos. Si una no
+ * carga (sin red, o Steam la mueve), queda el degradado de debajo y el muro
+ * sigue viéndose entero. En orden de columna: el n.º i va a la columna i % 4.
  */
 private val JUEGOS_MURO = listOf(
-    1245620, // Elden Ring
     1593500, // God of War
-    1145360, // Hades
-    1174180, // Red Dead Redemption 2
-    367520, // Hollow Knight
+    2215430, // Ghost of Tsushima
     1817070, // Marvel's Spider-Man Remastered
-    1086940, // Baldur's Gate 3
-    814380, // Sekiro
-    1091500, // Cyberpunk 2077
+    1888930, // The Last of Us Part I
+    2322010, // God of War Ragnarök
+    1659420, // Uncharted: Legacy of Thieves
+    1245620, // Elden Ring
     1151640, // Horizon Zero Dawn
-    504230, // Celeste
-    292030, // The Witcher 3
-    1190460, // Death Stranding
-    1687950, // Persona 5 Royal
-    374320, // Dark Souls III
-    413150, // Stardew Valley
-    2050650, // Resident Evil 4
-    582010, // Monster Hunter: World
+    2651280, // Marvel's Spider-Man 2
+    1895880, // Ratchet & Clank: Rift Apart
     1649240, // Returnal
-    1426210, // It Takes Two
-    990080, // Hogwarts Legacy
+    1687950, // Persona 5 Royal
+    2420110, // Horizon Forbidden West
+    1817190, // Marvel's Spider-Man: Miles Morales
+    1259420, // Days Gone
+    1190460, // Death Stranding
+    2531310, // The Last of Us Part II Remastered
+    553850, // Helldivers 2
+    3489700, // Stellar Blade
+    1462040, // Final Fantasy VII Remake Intergrade
+    1599660, // Sackboy: Una aventura a lo grande
+    2515020, // Final Fantasy XVI
+    2050650, // Resident Evil 4
+    1174180, // Red Dead Redemption 2
+    1145360, // Hades
+    1091500, // Cyberpunk 2077
+    367520, // Hollow Knight
+    1086940, // Baldur's Gate 3
 )
 
+/** Ruta clásica de la tienda y la nueva (los juegos recientes solo están en la nueva). */
 private fun caratula(appId: Int) = "https://cdn.cloudflare.steamstatic.com/steam/apps/$appId/library_600x900.jpg"
+private fun caratulaNueva(appId: Int) = "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/$appId/library_600x900.jpg"
 
 /** Colores de relleno mientras carga (o si no carga) cada carátula. */
 private val RELLENOS = listOf(
@@ -80,7 +93,7 @@ private val RELLENOS = listOf(
 )
 
 private const val COLUMNAS = 4
-private const val POR_COLUMNA = 6
+private const val POR_COLUMNA = 7
 
 /**
  * Mosaico inclinado de carátulas que se desliza despacio en bucle: columnas
@@ -110,7 +123,7 @@ fun MuroCaratulas(modifier: Modifier = Modifier) {
         ) {
             repeat(COLUMNAS) { c ->
                 // Cada columna con sus juegos y su desfase; las pares bajan y las impares suben.
-                val juegos = List(POR_COLUMNA) { i -> JUEGOS_MURO[(c * POR_COLUMNA + i * 3 + c) % JUEGOS_MURO.size] }
+                val juegos = List(POR_COLUMNA) { i -> JUEGOS_MURO[(c + i * COLUMNAS) % JUEGOS_MURO.size] }
                 val sentido = if (c % 2 == 0) avance else 1f - avance
                 val desfase = ((sentido + c * 0.21f) % 1f) * cicloPx
                 Box(Modifier.weight(1f).fillMaxHeight()) {
@@ -141,10 +154,13 @@ private fun Caratula(appId: Int, indice: Int, platino: Boolean) {
             .clip(RoundedCornerShape(12.dp))
             .background(Brush.linearGradient(listOf(claro, oscuro))),
     ) {
+        // Primero la ruta clásica; si falla, la nueva; si también, se queda el degradado.
+        var url by remember(appId) { mutableStateOf(caratula(appId)) }
         AsyncImage(
-            model = caratula(appId),
+            model = url,
             contentDescription = null,
             contentScale = ContentScale.Crop,
+            onError = { if (url == caratula(appId)) url = caratulaNueva(appId) },
             modifier = Modifier.fillMaxSize(),
         )
         if (platino) {

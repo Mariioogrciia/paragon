@@ -1,5 +1,6 @@
 package com.paragon.app.ui.avisos
 
+import com.paragon.app.ui.common.recogida
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -115,8 +116,9 @@ fun PreferenciasAvisosScreen(tokenStore: TokenStore, onBack: () -> Unit) {
         }
     }
 
+    val desplazamiento = rememberScrollState()
     Column(Modifier.fillMaxSize().background(Background)) {
-        CabeceraNativa(titulo = Textos.t(T.ajustes_avisos_fila), atras = Textos.t(T.nav_ajustes), onBack = onBack)
+        CabeceraNativa(titulo = Textos.t(T.ajustes_avisos_fila), atras = Textos.t(T.nav_ajustes), onBack = onBack, compacta = desplazamiento.recogida())
         val actual = estado
         when {
             errorCarga -> Text(Textos.t(T.error_red), color = Muted, fontSize = 14.sp, modifier = Modifier.padding(32.dp))
@@ -124,7 +126,7 @@ fun PreferenciasAvisosScreen(tokenStore: TokenStore, onBack: () -> Unit) {
             else -> Column(
                 Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(desplazamiento)
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = huecoBarra() + 24.dp),
             ) {
                 GrupoNativo {

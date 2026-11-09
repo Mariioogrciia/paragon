@@ -1,5 +1,6 @@
 package com.paragon.app.ui.perfil
 
+import com.paragon.app.ui.common.recogida
 import kotlinx.coroutines.CancellationException
 
 import com.paragon.app.ui.common.premiumClickable
@@ -64,7 +65,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -162,12 +162,13 @@ fun PerfilUsuarioScreen(
         if (panel is PanelResult.Ok) misCifras = panel.stats
     }
 
+    val desplazamiento = rememberScrollState()
     Column(Modifier.fillMaxSize().background(Background)) {
-        CabeceraNativa(titulo = "@$handle", atras = atras, onBack = onBack)
+        CabeceraNativa(titulo = "@$handle", atras = atras, onBack = onBack, compacta = desplazamiento.recogida())
         when (val r = result) {
             null -> EsqueletoLista()
             is UserProfileResult.Error -> EmptyState(Icons.Default.PersonSearch, r.message, "", Textos.t(T.comun_reintentar), { recarga++ })
-            is UserProfileResult.Ok -> ContenidoPerfil(r.profile, misCifras, tokenStore, themeStore, onComparar)
+            is UserProfileResult.Ok -> ContenidoPerfil(r.profile, misCifras, tokenStore, themeStore, onComparar, desplazamiento)
         }
     }
 }
@@ -179,10 +180,11 @@ private fun ContenidoPerfil(
     tokenStore: TokenStore,
     themeStore: com.paragon.app.data.theme.ThemeStore,
     onComparar: (String) -> Unit,
+    desplazamiento: androidx.compose.foundation.ScrollState,
 ) {
     val esYo = p.amistad == "yo"
     val aura = rememberCoverAuraColor(p.image)
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra() + 24.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(desplazamiento).padding(bottom = com.paragon.app.ui.common.huecoBarra() + 24.dp)) {
         Cabecera(p, aura)
 
         if (!esYo) {
@@ -458,7 +460,7 @@ private fun Tarjeta(modifier: Modifier = Modifier, contenido: @Composable () -> 
 @Composable
 private fun Cifra(valor: String, etiqueta: String, color: Color, modifier: Modifier = Modifier) {
     Column(modifier) {
-        Text(valor, color = color, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, maxLines = 1)
+        Text(valor, color = color, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         Text(etiqueta, color = Muted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
@@ -677,7 +679,7 @@ private fun Marcador(nombre: String, lado: LadoMesDto, color: Color, modifier: M
             Box(Modifier.size(10.dp).clip(CircleShape).background(color))
             Text(nombre, color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 6.dp))
         }
-        Text(cifra(lado.total), color = Foreground, fontSize = 28.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+        Text(cifra(lado.total), color = Foreground, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Text(Textos.t(T.perfil_dias_activos, activos), color = Muted, fontSize = 11.sp)
         if (mejor != null) {
             Text(Textos.t(T.perfil_mejor_dia, mejor.dia.takeLast(2).trimStart('0'), mejor.total), color = Muted, fontSize = 11.sp)

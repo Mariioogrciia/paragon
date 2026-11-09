@@ -1,5 +1,9 @@
 package com.paragon.app.ui.panel
 
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,7 +35,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -89,15 +92,19 @@ fun CabeceraInicio(
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
             )
+            // En una sola línea, encogiendo la letra lo que haga falta (9 nov 2026):
+            // con dos líneas salía «Hola, La / Greña» partido al lado de la campana.
+            var tamSaludo by remember { mutableStateOf(30f) }
             Text(
                 Textos.t(T.inicio_hola, nombreParaSaludar(profile.name)),
                 color = Foreground,
-                // Un nombre largo baja de tamaño en vez de cortarse («Hola, La Gre…»).
-                fontSize = if (nombreParaSaludar(profile.name).length > 9) 26.sp else 32.sp,
-                lineHeight = 32.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
+                fontSize = tamSaludo.sp,
+                lineHeight = (tamSaludo * 1.15f).sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                softWrap = false,
                 overflow = TextOverflow.Ellipsis,
+                onTextLayout = { if (it.hasVisualOverflow && tamSaludo > 20f) tamSaludo -= 2f },
             )
         }
         Box {
@@ -130,7 +137,7 @@ fun CabeceraInicio(
         ) {
             Icon(Icons.Default.Whatshot, contentDescription = null, tint = Accent, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
-            Text("${racha.actual}", color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+            Text("${racha.actual}", color = Foreground, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(Modifier.width(8.dp))
         Box(Modifier.size(44.dp).clip(CircleShape).background(Accent).padding(2.dp).premiumClickable(onClick = onPerfil)) {
@@ -149,7 +156,7 @@ fun AnilloProgreso(porcentaje: Int, tam: Int = 64, fondo: androidx.compose.ui.gr
             drawArc(fondo, 0f, 360f, false, style = Stroke(grosor))
             drawArc(acento, -90f, 360f * porcentaje.coerceIn(0, 100) / 100f, false, style = Stroke(grosor, cap = StrokeCap.Round))
         }
-        Text("$porcentaje%", color = Foreground, fontSize = (tam / 4.3f).sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+        Text("$porcentaje%", color = Foreground, fontSize = (tam / 4.3f).sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -234,7 +241,7 @@ private fun Cifra(valor: String, etiqueta: String, modifier: Modifier, destacada
             .then(if (onClick != null) Modifier.premiumClickable(onClick = onClick) else Modifier)
             .padding(12.dp),
     ) {
-        Text(valor, color = if (destacada) Accent else Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, maxLines = 1)
+        Text(valor, color = if (destacada) Accent else Foreground, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         Text(etiqueta, color = Muted, fontSize = 12.sp, maxLines = 1)
     }
 }
@@ -268,7 +275,7 @@ fun ProximaSesionCard(s: SesionDto, onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(millis?.let { fechaConPatron(it, "EEE").uppercase() } ?: "", color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-            Text(millis?.let { fechaConPatron(it, "d") } ?: "", color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+            Text(millis?.let { fechaConPatron(it, "d") } ?: "", color = Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
@@ -282,7 +289,7 @@ fun ProximaSesionCard(s: SesionDto, onClick: () -> Unit) {
             )
             Text("${s.juego.titulo} · ${s.juego.deviceLabel}", color = Muted, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        Text("${s.ocupadas}/${s.plazasTotales}", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+        Text("${s.ocupadas}/${s.plazasTotales}", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -327,7 +334,6 @@ fun TarjetaSigueJugando(
                 },
                 color = Muted,
                 fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace,
                 maxLines = 1,
                 modifier = Modifier.padding(top = 6.dp),
             )

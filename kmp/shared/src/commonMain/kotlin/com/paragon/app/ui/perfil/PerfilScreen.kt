@@ -50,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -164,7 +163,7 @@ fun PerfilScreen(
 @Composable
 private fun Cifra(valor: String, etiqueta: String, modifier: Modifier = Modifier, destacada: Boolean = false) {
     Column(modifier) {
-        Text(valor, color = if (destacada) Accent else Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, maxLines = 1)
+        Text(valor, color = if (destacada) Accent else Foreground, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         Text(etiqueta, color = Muted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

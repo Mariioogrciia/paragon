@@ -1,5 +1,6 @@
 package com.paragon.app.ui.settings
 
+import com.paragon.app.ui.common.recogida
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -90,11 +91,12 @@ fun RetiradosScreen(tokenStore: TokenStore, onBack: () -> Unit) {
         }
     }
 
+    val desplazamiento = rememberScrollState()
     Column(Modifier.fillMaxSize().background(Background)) {
-        CabeceraNativa(titulo = Textos.t(T.retirados_titulo), atras = Textos.t(T.nav_ajustes), onBack = onBack, subtitulo = Textos.t(T.retirados_sub))
+        CabeceraNativa(titulo = Textos.t(T.retirados_titulo), atras = Textos.t(T.nav_ajustes), onBack = onBack, subtitulo = Textos.t(T.retirados_sub), compacta = desplazamiento.recogida())
         val d = datos
         Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+            Modifier.fillMaxSize().verticalScroll(desplazamiento)
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = huecoBarra() + 24.dp),
         ) {
             if (d == null) {

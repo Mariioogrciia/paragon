@@ -79,7 +79,7 @@ fun FilaNativa(
             }
         }
         Column(Modifier.weight(1f).padding(start = if (icono != null) 12.dp else 0.dp)) {
-            Text(titulo, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(titulo, color = Foreground, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (subtitulo != null) {
                 Text(subtitulo, color = Muted, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 1.dp))
             }

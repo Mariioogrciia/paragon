@@ -1,5 +1,6 @@
 package com.paragon.app.ui.settings
 
+import com.paragon.app.ui.common.recogida
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.ui.text.style.TextOverflow
@@ -144,10 +145,11 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
     var editandoFondo by remember { mutableStateOf(false) }
     val materialYou = themeStore.useDynamicColor
 
+    val desplazamiento = rememberScrollState()
     Scaffold(
         containerColor = Background,
         topBar = {
-            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.apariencia_titulo), atras = Textos.t(T.nav_ajustes), onBack = onBack, modifier = Modifier.padding(bottom = 8.dp))
+            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.apariencia_titulo), atras = Textos.t(T.nav_ajustes), onBack = onBack, modifier = Modifier.padding(bottom = 8.dp), compacta = desplazamiento.recogida())
         },
     ) { padding ->
         Column(
@@ -155,7 +157,7 @@ fun AparienciaScreen(tokenStore: TokenStore, themeStore: ThemeStore, onBack: () 
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra()),
+                .verticalScroll(desplazamiento).padding(bottom = com.paragon.app.ui.common.huecoBarra()),
         ) {
             Muestra(tokenStore)
 
@@ -615,7 +617,10 @@ private fun ConNombre(nombre: String, activo: Boolean, contenido: @Composable ()
             color = if (activo) Accent else Muted,
             fontSize = 11.sp,
             fontWeight = if (activo) FontWeight.Bold else FontWeight.Medium,
-            maxLines = 1,
+            // Dos líneas: «Hoja de servicios» o «Liga de carreras» se cortaban.
+            maxLines = 2,
+            lineHeight = 13.sp,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 6.dp),
         )

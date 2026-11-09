@@ -140,7 +140,9 @@ fun colorDeHex(hex: String): Color? {
 private fun interlineadoRelativo(t: Typography): Typography {
     // Sin el espaciado entre letras de serie de Material (+0,5 sp en el cuerpo, 9 nov 2026):
     // con él todo el texto se veía "ancho" y nada nativo, sobre todo en iPhone.
-    fun TextStyle.rel(f: Float) = copy(lineHeight = f.em, letterSpacing = 0.sp)
+    // Y cifras tabulares ("tnum"): los números de las tarjetas cuadran en columna
+    // sin tener que pasarlos a monoespaciada (antes salían con letra de máquina de escribir).
+    fun TextStyle.rel(f: Float) = copy(lineHeight = f.em, letterSpacing = 0.sp, fontFeatureSettings = "tnum")
     return Typography(
         displayLarge = t.displayLarge.rel(1.12f), displayMedium = t.displayMedium.rel(1.15f), displaySmall = t.displaySmall.rel(1.2f),
         headlineLarge = t.headlineLarge.rel(1.22f), headlineMedium = t.headlineMedium.rel(1.25f), headlineSmall = t.headlineSmall.rel(1.28f),

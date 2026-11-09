@@ -1,5 +1,6 @@
 package com.paragon.app.ui.settings
 
+import com.paragon.app.ui.common.recogida
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -104,10 +105,11 @@ fun SettingsScreen(
         }
     }) { onPickImage ->
 
+    val desplazamiento = rememberScrollState()
     Scaffold(
         containerColor = Background,
         topBar = {
-            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_ajustes), atras = Textos.t(T.nav_perfil), onBack = onBack, modifier = Modifier.padding(bottom = 8.dp))
+            com.paragon.app.ui.common.CabeceraNativa(titulo = Textos.t(T.nav_ajustes), atras = Textos.t(T.nav_perfil), onBack = onBack, modifier = Modifier.padding(bottom = 8.dp), compacta = desplazamiento.recogida())
         }
     ) { paddingValues ->
         Column(
@@ -115,7 +117,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()).padding(bottom = com.paragon.app.ui.common.huecoBarra())
+                .verticalScroll(desplazamiento).padding(bottom = com.paragon.app.ui.common.huecoBarra())
         ) {
             Text(Textos.t(T.ajustes_seccion_perfil), color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(12.dp))

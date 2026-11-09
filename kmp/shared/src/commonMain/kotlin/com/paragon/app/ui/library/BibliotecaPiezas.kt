@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -139,7 +138,6 @@ fun TarjetaBiblioteca(
                     color = Foreground,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier.align(Alignment.TopStart).padding(10.dp)
                         .clip(RoundedCornerShape(50)).background(Background.copy(alpha = 0.75f)).padding(horizontal = 8.dp, vertical = 3.dp),
                 )
@@ -170,7 +168,6 @@ fun TarjetaBiblioteca(
             color = Muted,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
             maxLines = 1,
         )
     }

@@ -1,6 +1,12 @@
 package com.paragon.app.ui.common
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -34,6 +40,11 @@ import com.paragon.shared.i18n.Textos
  *
  * `atras` es el nombre de la pantalla anterior ("Perfil", "Ajustes"...); sin
  * `onBack` no hay fila de volver (pestañas principales).
+ *
+ * `compacta` (9 nov 2026, como el título grande de iOS): al bajar, el título
+ * grande y el subtítulo se recogen y el título pasa, pequeño y centrado, a la
+ * fila de arriba. Antes el título grande se quedaba fijo y el contenido se
+ * cortaba de golpe debajo de él ("@fende21" tapando la tarjeta).
  */
 @Composable
 fun CabeceraNativa(
@@ -43,9 +54,22 @@ fun CabeceraNativa(
     onBack: (() -> Unit)? = null,
     subtitulo: String? = null,
     acciones: @Composable RowScope.() -> Unit = {},
+    compacta: Boolean = false,
 ) {
     Column(modifier.fillMaxWidth()) {
+        if (onBack == null) {
+            // Pestañas principales: al bajar, una fila fina con el título centrado.
+            AnimatedVisibility(visible = compacta, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                Box(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 16.dp), contentAlignment = Alignment.Center) {
+                    TituloPequeno(titulo)
+                }
+            }
+        }
         if (onBack != null) {
+            Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.Center) {
+            AnimatedVisibility(visible = compacta, enter = fadeIn(), exit = fadeOut()) {
+                TituloPequeno(titulo, Modifier.padding(horizontal = 96.dp))
+            }
             Row(
                 Modifier.fillMaxWidth().height(44.dp).padding(start = 6.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -70,7 +94,10 @@ fun CabeceraNativa(
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically, content = acciones)
             }
+            }
         }
+        AnimatedVisibility(visible = !compacta, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+        Column {
         Row(
             Modifier.fillMaxWidth().padding(start = 20.dp, end = 16.dp, top = if (onBack != null) 0.dp else 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -96,5 +123,27 @@ fun CabeceraNativa(
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp),
             )
         }
+        }
+        }
     }
+}
+
+/** ¿Ya se ha bajado lo bastante como para recoger la cabecera? Para `compacta`. */
+@Composable
+fun androidx.compose.foundation.ScrollState.recogida(): Boolean {
+    val estado = this
+    return androidx.compose.runtime.remember(estado) { androidx.compose.runtime.derivedStateOf { estado.value > 24 } }.value
+}
+
+@Composable
+fun androidx.compose.foundation.lazy.LazyListState.recogida(): Boolean {
+    val estado = this
+    return androidx.compose.runtime.remember(estado) {
+        androidx.compose.runtime.derivedStateOf { estado.firstVisibleItemIndex > 0 || estado.firstVisibleItemScrollOffset > 24 }
+    }.value
+}
+
+@Composable
+private fun TituloPequeno(titulo: String, modifier: Modifier = Modifier) {
+    Text(titulo, color = Foreground, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = modifier)
 }

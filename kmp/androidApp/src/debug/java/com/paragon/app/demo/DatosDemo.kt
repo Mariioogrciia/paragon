@@ -139,6 +139,10 @@ object DatosDemo {
                 val rapidos = """[{"handle":"nerea","nombre":"Nerea","avatarUrl":null,"platform":"psn","duracionMs":${9L * 86_400_000 + 4L * 3_600_000}},{"handle":"iker","nombre":"Iker","avatarUrl":null,"platform":"psn","duracionMs":${14L * 86_400_000}},{"handle":"lagrena","nombre":"La Greña","avatarUrl":null,"platform":"psn","duracionMs":${21L * 86_400_000 + 7L * 3_600_000}}]"""
                 """{"game":{"id":"${j.id}","platform":"${j.plat}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","progressPercent":${j.pct},"definedTotal":${j.def},"earnedTotal":${j.gan},"isPinned":false,"notes":null,"playtimeMinutes":${j.horas?.times(60) ?: "null"},"trophies":[$lista]},"plan":$plan,"rapidos":$rapidos,"marcas":{"instalado":true,"ocultoPerfil":false,"fechaObjetivo":"2026-11-30"}}"""
             }
+            // Comparar 1 a 1 (repaso de pantallas, 9 nov 2026: sin esto salía «No existe ese usuario»).
+            ruta.startsWith("api/mobile/compare/") ->
+                """{"resultado":"pierdo","me":{"name":"La Greña","avatarUrl":null,"level":42,"platinos":87,"trofeos":4312,"juegos":214},"them":{"name":"Nerea","avatarUrl":null,"level":51,"platinos":112,"trofeos":5120,"juegos":240},"sharedGames":[""" +
+                    juegos.take(5).mapIndexed { i, j -> """{"id":"${j.id}","title":"${j.titulo}","iconUrl":"${portada(j.app)}","myPercent":${j.pct},"theirPercent":${listOf(100, 64, 88, 100, 35)[i]},"myHours":${j.horas ?: "null"},"theirHours":${listOf(120, 40, 66, 52, 18)[i]}}""" }.joinToString(",") + "]}"
             // Estadísticas dentro del juego (Steam, 9 nov 2026).
             ruta.startsWith("api/mobile/games/") && ruta.endsWith("/estadisticas") ->
                 if (!ruta.contains("steam-")) """{"estadisticas":[]}"""

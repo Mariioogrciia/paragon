@@ -287,7 +287,6 @@ private fun FocusContent(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                 maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -562,7 +561,6 @@ private fun AnilloPlatino(porcentaje: Int, modifier: Modifier = Modifier) {
                 color = Color.White,
                 fontSize = 44.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
             )
             Text(text = Textos.t(T.enfoque_al_platino), color = FocoTenue, fontSize = 13.sp)
         }
@@ -646,7 +644,6 @@ private fun FilaDespues(trofeo: TrophyItem) {
                 text = "${com.paragon.app.util.formatDecimal(it, if (it < 10) 1 else 0)} %",
                 color = FocoTenue,
                 fontSize = 12.sp,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
             )
         }
     }

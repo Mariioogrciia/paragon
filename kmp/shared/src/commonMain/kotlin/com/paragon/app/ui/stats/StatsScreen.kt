@@ -1,5 +1,6 @@
 package com.paragon.app.ui.stats
 
+import com.paragon.app.ui.common.recogida
 import androidx.compose.foundation.background
 import com.paragon.shared.i18n.Textos
 import com.paragon.shared.i18n.T
@@ -67,12 +68,14 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", database: com.parag
         }
     }
 
+    val lista = androidx.compose.foundation.lazy.rememberLazyListState()
     Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize().background(Background)) {
         com.paragon.app.ui.common.CabeceraNativa(
             titulo = Textos.t(T.stats_titulo),
             atras = Textos.t(T.nav_perfil),
             onBack = onBack,
+            compacta = lista.recogida(),
         ) {
             IconButton(onClick = { showWrap = true }) {
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Accent)
@@ -91,7 +94,7 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", database: com.parag
                     ) { Text(Textos.t(T.comun_reintentar)) }
                 }
             }
-            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok), dieta, current.fromCache)
+            is StatsResult.Ok -> StatsContent(current.stats, handle, (achievements as? AchievementsResult.Ok), dieta, current.fromCache, lista)
         }
     }
 
@@ -102,8 +105,9 @@ fun StatsScreen(tokenStore: TokenStore, handle: String = "", database: com.parag
 }
 
 @Composable
-private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?, dieta: DietaGamer?, fromCache: Boolean = false) {
+private fun StatsContent(stats: ParagonStats, handle: String, achievements: AchievementsResult.Ok?, dieta: DietaGamer?, fromCache: Boolean = false, lista: androidx.compose.foundation.lazy.LazyListState) {
     LazyColumn(
+        state = lista,
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
         // 32dp se quedaba corto y la última tarjeta (o el radar, según el
