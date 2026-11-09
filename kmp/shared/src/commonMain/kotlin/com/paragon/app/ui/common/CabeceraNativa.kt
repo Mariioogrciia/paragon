@@ -1,6 +1,9 @@
 package com.paragon.app.ui.common
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.alpha
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -53,8 +56,8 @@ fun CabeceraNativa(
     atras: String? = null,
     onBack: (() -> Unit)? = null,
     subtitulo: String? = null,
-    acciones: @Composable RowScope.() -> Unit = {},
     compacta: Boolean = false,
+    acciones: @Composable RowScope.() -> Unit = {},
 ) {
     Column(modifier.fillMaxWidth()) {
         if (onBack == null) {
@@ -67,9 +70,10 @@ fun CabeceraNativa(
         }
         if (onBack != null) {
             Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.Center) {
-            AnimatedVisibility(visible = compacta, enter = fadeIn(), exit = fadeOut()) {
-                TituloPequeno(titulo, Modifier.padding(horizontal = 96.dp))
-            }
+            // Fundido a mano: dentro de un Box en una Column, AnimatedVisibility se
+            // resuelve a la versión de ColumnScope y no compila.
+            val opacidad by animateFloatAsState(if (compacta) 1f else 0f, label = "tituloPequeno")
+            if (opacidad > 0f) TituloPequeno(titulo, Modifier.padding(horizontal = 96.dp).alpha(opacidad))
             Row(
                 Modifier.fillMaxWidth().height(44.dp).padding(start = 6.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
