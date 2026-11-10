@@ -27,6 +27,9 @@ on:
     # día, hasta 22 s cada vez. Abrir la app o la web ya sincroniza al
     # momento, así que esto solo cubre a quien no entra en días.
     - cron: "17 */4 * * *"
+    # Foto semanal de las ligas (lo que hacía el cron de vercel.json de los
+    # lunes, 10 nov 2026: en Cloud Run no hay crons de Vercel).
+    - cron: "7 4 * * 1"
   workflow_dispatch: {} # Para poder lanzarlo a mano desde la pestaña Actions, sin esperar al reloj.
 
 jobs:
@@ -40,9 +43,13 @@ jobs:
             exit 1
           fi
 
-          respuesta=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+          ruta=/api/cron/sync
+          if [ "${{ github.event.schedule }}" = "7 4 * * 1" ]; then ruta=/api/cron/league-snapshot; fi
+          echo "Llamando a $ruta"
+
+          respuesta=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 120 \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "${{ secrets.SITE_URL }}/api/cron/sync")
+            "${{ secrets.SITE_URL }}$ruta")
 
           echo "HTTP $respuesta"
           cat /tmp/resp.json

@@ -4,11 +4,18 @@ import { politicaCsp } from "./src/lib/csp";
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
+// En Vercel o en Cloud Run (10 nov 2026, mudanza por el límite de CPU del
+// plan gratis de Vercel). Cloud Run define K_SERVICE; el Dockerfile, ENVIO.
+const enVercel = Boolean(process.env.VERCEL);
+
 const nextConfig: NextConfig = {
+  // Cloud Run: carpeta `.next/standalone` con su propio server.js y solo los
+  // node_modules que hacen falta (ver Dockerfile). En Vercel no se usa.
+  ...(enVercel ? {} : { output: "standalone" as const }),
   // Versión del Service Worker (`/sw.js?v=`, ver ServiceWorkerRegister.tsx):
   // un valor por despliegue para que se reinstale y renueve la copia offline.
   env: {
-    NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) ?? "dev",
+    NEXT_PUBLIC_BUILD_ID: (process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GIT_SHA)?.slice(0, 8) ?? "dev",
   },
   // Dominios conocidos de carátulas/capturas externas para poder usar
   // next/image en vez de <img> a pelo (auditoría de rendimiento, 22 sept
@@ -46,9 +53,9 @@ const nextConfig: NextConfig = {
   // (9 GB / 10 GB, 25 sept 2026) — son MB × cada despliegue conservado.
   // Ojo: `next start` en local sí lo necesita para `/_next/image` (lo
   // encuentra en node_modules igual; esto solo afecta a lo que se sube).
-  outputFileTracingExcludes: {
-    "/**": ["node_modules/sharp/**", "node_modules/@img/**"],
-  },
+  // Fuera de Vercel (Cloud Run) el optimizador corre en nuestro servidor y
+  // SÍ necesita sharp, así que solo se excluye en Vercel.
+  outputFileTracingExcludes: enVercel ? { "/**": ["node_modules/sharp/**", "node_modules/@img/**"] } : {},
   // Cabeceras de seguridad (auditoría del 25 sept 2026): hasta ahora solo
   // salía el HSTS que pone Vercel. Sin `frame-ancestors`/X-Frame-Options,
   // cualquier web podía meter Paragon en un iframe invisible y hacer que

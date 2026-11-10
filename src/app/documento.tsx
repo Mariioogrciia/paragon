@@ -208,7 +208,8 @@ export function Documento({
       <body className="flex min-h-screen flex-col transition-colors duration-300">
         <ServiceWorkerRegister />
         <ArrastrarParaDesplazar />
-        <Analytics />
+        {/* Las analíticas de Vercel solo existen en Vercel (en Cloud Run darían 404). */}
+        {process.env.VERCEL && <Analytics />}
         <NextIntlClientProvider locale={locale} messages={mensajesCliente(messages)}>
           <CookieBanner />
           <ContadorVisitas />

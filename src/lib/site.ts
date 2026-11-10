@@ -22,9 +22,14 @@ export function dominioPublico(): string {
   return dominioProduccion() ? `https://${DOMINIO}` : "http://localhost:3000";
 }
 
-/** El dominio sin protocolo en Vercel (producción y previas); null en local. */
+/**
+ * El dominio sin protocolo desplegado (Vercel, o Cloud Run desde el 10 nov
+ * 2026); null en local. PARAGON_PRODUCCION lo pone el Dockerfile ya al
+ * compilar: robots.txt, el sitemap y demás páginas estáticas se generan en
+ * `next build`, donde Cloud Run (K_SERVICE) todavía no existe.
+ */
 export function dominioProduccion(): string | null {
-  return process.env.VERCEL ? DOMINIO : null;
+  return process.env.VERCEL || process.env.PARAGON_PRODUCCION || process.env.K_SERVICE ? DOMINIO : null;
 }
 
 /**

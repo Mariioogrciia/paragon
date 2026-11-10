@@ -1,0 +1,104 @@
+name: Desplegar en Cloud Run
+
+# Paragon en Google Cloud Run (10 nov 2026, mudanza desde Vercel: su plan
+# gratis daba 4 h de CPU al mes y avisó de que pausaba la cuenta). Cada push
+# a master construye la imagen (Dockerfile), la sube a Artifact Registry y
+# despliega una revisión nueva. Pasos de configuración, una sola vez, en
+# docs/CLOUD-RUN.md.
+#
+# Hace falta en GitHub (Settings → Secrets and variables → Actions):
+#   - Variable GCP_PROYECTO:  el id del proyecto de Google Cloud.
+#   - Secret   GCP_CLAVE:     la clave JSON de la cuenta de servicio que despliega.
+#   - Secret   ENV_PRODUCCION: el .env entero de producción (`vercel env pull`).
+# Sin GCP_PROYECTO el trabajo ni arranca (para no fallar antes de configurarlo).
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "kmp/**"
+      - "extension/**"
+      - "docs/**"
+      - "video/**"
+      - "**.md"
+  workflow_dispatch: {}
+
+concurrency:
+  group: desplegar-cloud-run
+  cancel-in-progress: false
+
+env:
+  REGION: europe-west1
+  SERVICIO: paragon
+  REPOSITORIO: paragon
+
+jobs:
+  desplegar:
+    if: vars.GCP_PROYECTO != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Variables de entorno (de ENV_PRODUCCION)
+        env:
+          ENV_PRODUCCION: ${{ secrets.ENV_PRODUCCION }}
+        run: |
+          if [ -z "$ENV_PRODUCCION" ]; then echo "Falta el secret ENV_PRODUCCION"; exit 1; fi
+          printf '%s\n' "$ENV_PRODUCCION" > "$RUNNER_TEMP/entrada.env"
+          # El script, en una carpeta aparte con solo dotenv (sin instalar todo el proyecto).
+          mkdir -p "$RUNNER_TEMP/entorno" && cp scripts/cloudrun/entorno.mjs "$RUNNER_TEMP/entorno/"
+          npm install --prefix "$RUNNER_TEMP/entorno" --no-audit --no-fund --ignore-scripts dotenv@17.4.2 >/dev/null
+          node "$RUNNER_TEMP/entorno/entorno.mjs" "$RUNNER_TEMP/entrada.env" "$RUNNER_TEMP/compilar.env" "$RUNNER_TEMP/ejecutar.yaml"
+          rm -f "$RUNNER_TEMP/entrada.env"
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CLAVE }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Construir y subir la imagen
+        run: |
+          IMAGEN="$REGION-docker.pkg.dev/${{ vars.GCP_PROYECTO }}/$REPOSITORIO/paragon:$GITHUB_SHA"
+          echo "IMAGEN=$IMAGEN" >> "$GITHUB_ENV"
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker buildx build \
+            --secret id=entorno,src="$RUNNER_TEMP/compilar.env" \
+            --build-arg GIT_SHA="$GITHUB_SHA" \
+            --tag "$IMAGEN" \
+            --push .
+
+      - name: Desplegar
+        run: |
+          # Escala a cero (gratis sin visitas) y CPU solo durante las peticiones,
+          # que es lo que cubre la capa gratuita de Cloud Run.
+          gcloud run deploy "$SERVICIO" \
+            --image "$IMAGEN" \
+            --region "$REGION" \
+            --project "${{ vars.GCP_PROYECTO }}" \
+            --env-vars-file "$RUNNER_TEMP/ejecutar.yaml" \
+            --allow-unauthenticated \
+            --port 8080 \
+            --cpu 1 \
+            --memory 1Gi \
+            --min-instances 0 \
+            --max-instances 3 \
+            --concurrency 80 \
+            --timeout 300 \
+            --quiet
+          rm -f "$RUNNER_TEMP/ejecutar.yaml" "$RUNNER_TEMP/compilar.env"
+
+      - name: Borrar imágenes viejas (Artifact Registry solo da 0,5 GB gratis)
+        continue-on-error: true
+        run: |
+          RUTA="$REGION-docker.pkg.dev/${{ vars.GCP_PROYECTO }}/$REPOSITORIO/paragon"
+          gcloud artifacts docker images list "$RUTA" --sort-by=~UPDATE_TIME --format='value(version)' \
+            | tail -n +3 \
+            | while read -r digest; do gcloud artifacts docker images delete "$RUTA@$digest" --delete-tags --quiet; done

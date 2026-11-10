@@ -1,0 +1,16 @@
+# Lo que NO entra en la imagen de Cloud Run (ver Dockerfile).
+.git
+.github
+.next
+node_modules
+.env*
+!.env.example
+kmp
+extension
+tests
+docs
+coverage
+playwright-report
+test-results
+*.log
+video
