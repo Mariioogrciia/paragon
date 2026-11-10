@@ -116,7 +116,8 @@ fun PanelScreen(
                 } catch (_: Exception) {
                     avisosSinLeer
                 }
-                kotlinx.coroutines.delay(60_000)
+                // Cada 3 min (antes 1): cada pregunta es una función de Vercel (10 nov 2026, aviso de CPU del plan gratis).
+                kotlinx.coroutines.delay(180_000)
             }
         }
     }
