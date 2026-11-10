@@ -21,9 +21,12 @@ on:
     # GitHub no garantiza el minuto exacto bajo carga de la plataforma —
     # puede llegar con algunos minutos de retraso en horas punta, es una
     # limitación conocida de los cron de GitHub Actions, no de este repo.
-    # Cada 30 min (antes 10): con el cron saltándose a quien se sincronizó
-    # hace menos de 2 h, más a menudo solo gastaba CPU del plan de Vercel.
-    - cron: "*/30 * * * *"
+    # Cada 4 h (antes 30 min, y antes 10): el 10 nov 2026 Vercel avisó de que
+    # el plan gratis iba al 115 % de su CPU activa (4 h al mes) y de que
+    # pausaría la cuenta. Esta ruta era lo único que corría solo, 48 veces al
+    # día, hasta 22 s cada vez. Abrir la app o la web ya sincroniza al
+    # momento, así que esto solo cubre a quien no entra en días.
+    - cron: "17 */4 * * *"
   workflow_dispatch: {} # Para poder lanzarlo a mano desde la pestaña Actions, sin esperar al reloj.
 
 jobs:
