@@ -72,6 +72,8 @@ jobs:
           docker buildx build \
             --secret id=entorno,src="$RUNNER_TEMP/compilar.env" \
             --build-arg GIT_SHA="$GITHUB_SHA" \
+            --provenance=false \
+            --sbom=false \
             --tag "$IMAGEN" \
             --push .
 
@@ -95,10 +97,13 @@ jobs:
             --quiet
           rm -f "$RUNNER_TEMP/ejecutar.yaml" "$RUNNER_TEMP/compilar.env"
 
+      # Sin --provenance ni --sbom la imagen es un único manifiesto (antes
+      # buildx colgaba de ella una «atestación» que Google no deja borrar
+      # suelta). Y si alguna no se deja borrar, se sigue con las demás.
       - name: Borrar imágenes viejas (Artifact Registry solo da 0,5 GB gratis)
         continue-on-error: true
         run: |
           RUTA="$REGION-docker.pkg.dev/${{ vars.GCP_PROYECTO }}/$REPOSITORIO/paragon"
           gcloud artifacts docker images list "$RUTA" --sort-by=~UPDATE_TIME --format='value(version)' \
             | tail -n +3 \
-            | while read -r digest; do gcloud artifacts docker images delete "$RUTA@$digest" --delete-tags --quiet; done
+            | while read -r digest; do gcloud artifacts docker images delete "$RUTA@$digest" --delete-tags --quiet || true; done
