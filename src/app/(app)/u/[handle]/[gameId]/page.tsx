@@ -315,6 +315,7 @@ export default async function JuegoPage({
                   fechaInicial={marcas.fechaObjetivo}
                   textos={{
                     instalado: t("GameDetailPage.marcas.instalado"),
+                    instaladoAyuda: t("GameDetailPage.marcas.instaladoAyuda"),
                     oculto: t("GameDetailPage.marcas.oculto"),
                     ocultoTitulo: t("GameDetailPage.marcas.ocultoTitulo"),
                     fecha: t("GameDetailPage.marcas.fecha"),

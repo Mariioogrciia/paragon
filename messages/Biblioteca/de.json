@@ -36,6 +36,7 @@
     "trophiesEarnedOf": "{earned} von {total} erhalten",
     "marcas": {
       "instalado": "Installiert",
+      "instaladoAyuda": "Gerade installiert: Es erscheint im Filter „Installiert“ bei „Kurz vor Platin“, damit du siehst, welche Platins du sofort angehen kannst.",
       "oculto": "In deinem Profil verborgen",
       "ocultoTitulo": "Nicht in deinem öffentlichen Profil, zählt aber weiter für dich",
       "fecha": "Zieldatum",

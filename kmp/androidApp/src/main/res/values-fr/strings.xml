@@ -680,7 +680,9 @@
     <string name="marca_fecha_titulo">Pour quand le veux-tu ?</string>
     <string name="marca_hoy">c\'est aujourd\'hui !</string>
     <string name="marca_instalado">Installé</string>
+    <string name="marca_instalado_ayuda">💾 Installé en ce moment : il apparaît dans le filtre « Installés » de « À un pas du platine », pour voir quels platines tu peux aller chercher tout de suite.</string>
     <string name="marca_oculto">Masqué sur mon profil</string>
+    <string name="marca_oculto_ayuda">🙈 Invisible sur ton profil public, mais il compte toujours pour toi.</string>
     <string name="marca_queda_1">encore 1 jour</string>
     <string name="marca_quedan">encore %1$s jours</string>
     <string name="marca_quitar_fecha">Retirer la date</string>

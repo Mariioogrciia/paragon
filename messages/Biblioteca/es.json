@@ -36,6 +36,7 @@
     "trophiesEarnedOf": "{earned} de {total} conseguidos",
     "marcas": {
       "instalado": "Instalado",
+      "instaladoAyuda": "Lo tienes instalado ahora: sale en el filtro «Instalados» de «A un paso del platino», para ver qué platinos puedes ir a sacar ya.",
       "oculto": "Oculto en tu perfil",
       "ocultoTitulo": "No se ve en tu perfil público, pero sigue contando para ti",
       "fecha": "Fecha objetivo",

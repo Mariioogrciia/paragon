@@ -24,6 +24,8 @@ export interface EstadisticaJuego {
 /** Lo que no le dice nada a nadie: banderas, versiones, contadores de logro… */
 const INTERNAS = /(^_|version|bitfield|flags?$|^flag_|unlock|^ach_|_ach_|achievement|checksum|seed|timestamp|^last_|_id$|^id_|dummy|test|debug|dlc_owned|has_|^is_|_bool$)/i;
 
+const TIENE_LETRAS = /\p{L}{2,}/u;
+
 /** "total_kills_ak47" / "TotalKillsAk47" / "STAT_KILLS" → "Total kills ak47". */
 export function nombreBonito(nombreInterno: string): string {
   const limpio = nombreInterno
@@ -71,7 +73,10 @@ export function prepararEstadisticas(
       vistos.add(s.name);
       const bautizada = bonitos.get(s.name)?.displayName;
       // Con nombre bonito de verdad se enseña aunque el interno parezca raro.
-      return (bautizada && bautizada !== s.name) || !INTERNAS.test(s.name);
+      // Sin letras no se enseña nunca (11 nov 2026): hay juegos que llaman a
+      // sus estadísticas "11", "20", "23"… y eso no le dice nada a nadie.
+      if (bautizada && bautizada !== s.name && TIENE_LETRAS.test(bautizada)) return true;
+      return TIENE_LETRAS.test(s.name) && !INTERNAS.test(s.name);
     })
     .map((s) => {
       const info = bonitos.get(s.name);
@@ -82,6 +87,9 @@ export function prepararEstadisticas(
         orden: info?.orden ?? Number.MAX_SAFE_INTEGER,
       };
     });
+  // Si todo lo que queda son unos (marcas de "hecho / no hecho" del juego),
+  // no es un tracker: mejor no enseñar nada que una lista de 1.
+  if (filas.every((f) => f.e.valor === 1)) return [];
   filas.sort((a, b) => Number(b.bautizada) - Number(a.bautizada) || (a.bautizada ? a.orden - b.orden : b.e.valor - a.e.valor));
   return filas.slice(0, max).map((f) => f.e);
 }

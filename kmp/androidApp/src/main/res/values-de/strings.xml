@@ -680,7 +680,9 @@
     <string name="marca_fecha_titulo">Bis wann willst du es?</string>
     <string name="marca_hoy">heute!</string>
     <string name="marca_instalado">Installiert</string>
+    <string name="marca_instalado_ayuda">💾 Gerade installiert: Es erscheint im Filter „Installiert“ bei „Kurz vor Platin“, damit du siehst, welche Platins du sofort angehen kannst.</string>
     <string name="marca_oculto">In meinem Profil verborgen</string>
+    <string name="marca_oculto_ayuda">🙈 In deinem öffentlichen Profil unsichtbar, zählt aber weiter für dich.</string>
     <string name="marca_queda_1">noch 1 Tag</string>
     <string name="marca_quedan">noch %1$s Tage</string>
     <string name="marca_quitar_fecha">Datum entfernen</string>

@@ -36,6 +36,7 @@
     "trophiesEarnedOf": "{earned} of {total} earned",
     "marcas": {
       "instalado": "Installed",
+      "instaladoAyuda": "Installed right now: it shows up in the “Installed” filter of “One step from platinum”, so you can see which platinums you can go for straight away.",
       "oculto": "Hidden on your profile",
       "ocultoTitulo": "Not shown on your public profile, but it still counts for you",
       "fecha": "Target date",

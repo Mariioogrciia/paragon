@@ -784,6 +784,7 @@ private fun GameActionsRow(
     onToggleOculto: () -> Unit = {},
     onFecha: () -> Unit = {},
 ) {
+    Column {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -841,6 +842,14 @@ private fun GameActionsRow(
                 onClick = onShare,
             )
         }
+    }
+    // Qué hace cada marca (11 nov 2026, «el botón de instalado, ¿qué es?»).
+    listOfNotNull(
+        if (instalado) Textos.t(T.marca_instalado_ayuda) else null,
+        if (ocultoPerfil) Textos.t(T.marca_oculto_ayuda) else null,
+    ).forEach { ayuda ->
+        Text(ayuda, color = Muted, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 6.dp))
+    }
     }
 }
 

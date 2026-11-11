@@ -24,7 +24,7 @@ export function MarcasJuego({
   ocultoInicial: boolean;
   reservado: boolean;
   fechaInicial: string | null;
-  textos: { instalado: string; oculto: string; ocultoTitulo: string; fecha: string; quedan: string; queda1: string; hoy: string; tarde: string; tarde1: string; quitarFecha: string };
+  textos: { instalado: string; instaladoAyuda: string; oculto: string; ocultoTitulo: string; fecha: string; quedan: string; queda1: string; hoy: string; tarde: string; tarde1: string; quitarFecha: string };
 }) {
   const [instalado, setInstalado] = useState(instaladoInicial);
   const [oculto, setOculto] = useState(ocultoInicial);
@@ -37,10 +37,12 @@ export function MarcasJuego({
     dias === null ? null : dias > 1 ? textos.quedan.replace("{n}", String(dias)) : dias === 1 ? textos.queda1 : dias === 0 ? textos.hoy : dias === -1 ? textos.tarde1 : textos.tarde.replace("{n}", String(-dias));
 
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-3">
+    <div className="mt-3">
+    <div className="flex flex-wrap items-center gap-3">
       <ToggleChip
         active={instalado}
         size="md"
+        title={textos.instaladoAyuda}
         onClick={() => {
           setInstalado(!instalado);
           empezar(() => void cambiarRetiradoAction("instalado", gameId, !instalado));
@@ -90,6 +92,15 @@ export function MarcasJuego({
           )}
         </label>
       )}
+    </div>
+    {/* Qué hace cada marca (11 nov 2026, «el botón de instalado, ¿qué es?»): el
+        title no se ve en el móvil, así que al marcarla se explica debajo. */}
+    {(instalado || oculto) && (
+      <div className="mt-2 space-y-0.5 text-xs text-muted">
+        {instalado && <p>💾 {textos.instaladoAyuda}</p>}
+        {oculto && <p>🙈 {textos.ocultoTitulo}</p>}
+      </div>
+    )}
     </div>
   );
 }

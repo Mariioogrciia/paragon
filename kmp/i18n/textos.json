@@ -8974,5 +8974,21 @@
   "fr": "Voir moins",
   "it": "Mostra meno",
   "pt": "Ver menos"
+ },
+ "marca_instalado_ayuda": {
+  "de": "💾 Gerade installiert: Es erscheint im Filter „Installiert“ bei „Kurz vor Platin“, damit du siehst, welche Platins du sofort angehen kannst.",
+  "en": "💾 Installed right now: it shows up in the “Installed” filter of “One step from platinum”, so you can see which platinums you can go for straight away.",
+  "es": "💾 Lo tienes instalado ahora: sale en el filtro «Instalados» de «A un paso del platino», para ver qué platinos puedes ir a sacar ya.",
+  "fr": "💾 Installé en ce moment : il apparaît dans le filtre « Installés » de « À un pas du platine », pour voir quels platines tu peux aller chercher tout de suite.",
+  "it": "💾 Installato ora: compare nel filtro «Installati» di «A un passo dal platino», per vedere quali platini puoi andare a prendere subito.",
+  "pt": "💾 Instalado agora: aparece no filtro «Instalados» de «A um passo da platina», para veres que platinas podes ir buscar já."
+ },
+ "marca_oculto_ayuda": {
+  "de": "🙈 In deinem öffentlichen Profil unsichtbar, zählt aber weiter für dich.",
+  "en": "🙈 Hidden from your public profile, but it still counts for you.",
+  "es": "🙈 No se ve en tu perfil público, pero sigue contando para ti.",
+  "fr": "🙈 Invisible sur ton profil public, mais il compte toujours pour toi.",
+  "it": "🙈 Non si vede nel tuo profilo pubblico, ma continua a contare per te.",
+  "pt": "🙈 Não aparece no teu perfil público, mas continua a contar para ti."
  }
 }

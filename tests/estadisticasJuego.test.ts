@@ -46,6 +46,14 @@ describe("prepararEstadisticas", () => {
     expect(r[0].valor).toBe(120);
   });
 
+  it("no enseña estadísticas sin letras ni listas de solo marcas (1)", () => {
+    const numeros = ["11", "20", "23", "32", "33", "34", "35"].map((name) => ({ name, value: 1 }));
+    expect(prepararEstadisticas(numeros, [])).toEqual([]);
+    expect(prepararEstadisticas([...numeros, { name: "visited_area", value: 1 }], [])).toEqual([]);
+    const r = prepararEstadisticas([...numeros, { name: "kills", value: 340 }, { name: "12", value: 900 }], [{ name: "12", displayName: "12" }]);
+    expect(r.map((e) => e.nombre)).toEqual(["Kills"]);
+  });
+
   it("respeta el máximo", () => {
     const stats = Array.from({ length: 40 }, (_, i) => ({ name: `stat${i}`, value: i + 1 }));
     expect(prepararEstadisticas(stats, [], 10)).toHaveLength(10);

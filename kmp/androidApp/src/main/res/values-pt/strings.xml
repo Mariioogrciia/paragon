@@ -680,7 +680,9 @@
     <string name="marca_fecha_titulo">Para quando o queres?</string>
     <string name="marca_hoy">é hoje!</string>
     <string name="marca_instalado">Instalado</string>
+    <string name="marca_instalado_ayuda">💾 Instalado agora: aparece no filtro «Instalados» de «A um passo da platina», para veres que platinas podes ir buscar já.</string>
     <string name="marca_oculto">Oculto no meu perfil</string>
+    <string name="marca_oculto_ayuda">🙈 Não aparece no teu perfil público, mas continua a contar para ti.</string>
     <string name="marca_queda_1">falta 1 dia</string>
     <string name="marca_quedan">faltam %1$s dias</string>
     <string name="marca_quitar_fecha">Tirar a data</string>

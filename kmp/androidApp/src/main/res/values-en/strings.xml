@@ -680,7 +680,9 @@
     <string name="marca_fecha_titulo">When do you want it by?</string>
     <string name="marca_hoy">it\'s today!</string>
     <string name="marca_instalado">Installed</string>
+    <string name="marca_instalado_ayuda">💾 Installed right now: it shows up in the “Installed” filter of “One step from platinum”, so you can see which platinums you can go for straight away.</string>
     <string name="marca_oculto">Hidden on my profile</string>
+    <string name="marca_oculto_ayuda">🙈 Hidden from your public profile, but it still counts for you.</string>
     <string name="marca_queda_1">1 day left</string>
     <string name="marca_quedan">%1$s days left</string>
     <string name="marca_quitar_fecha">Remove the date</string>
