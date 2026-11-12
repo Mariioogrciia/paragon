@@ -9,7 +9,7 @@ name: Sincronización frecuente de trofeos
 #
 # Configuración necesaria en GitHub (Settings → Secrets and variables →
 # Actions), una sola vez:
-#   - Secret  SITE_URL:     https://tu-dominio-real (sin barra al final)
+#   - (Ya no hace falta SITE_URL: el dominio va fijo más abajo.)
 #   - Secret  CRON_SECRET:  el mismo valor exacto que ya tiene Vercel
 #     (Vercel → Project → Settings → Environment Variables → CRON_SECRET)
 #
@@ -21,12 +21,10 @@ on:
     # GitHub no garantiza el minuto exacto bajo carga de la plataforma —
     # puede llegar con algunos minutos de retraso en horas punta, es una
     # limitación conocida de los cron de GitHub Actions, no de este repo.
-    # Cada 4 h (antes 30 min, y antes 10): el 10 nov 2026 Vercel avisó de que
-    # el plan gratis iba al 115 % de su CPU activa (4 h al mes) y de que
-    # pausaría la cuenta. Esta ruta era lo único que corría solo, 48 veces al
-    # día, hasta 22 s cada vez. Abrir la app o la web ya sincroniza al
-    # momento, así que esto solo cubre a quien no entra en días.
-    - cron: "17 */4 * * *"
+    # Cada 30 min otra vez (12 nov 2026). En Vercel se bajó a cada 4 h por
+    # su límite de 4 h de CPU al mes; en Cloud Run el margen gratis es de
+    # unas 50 h, y 48 pasadas al día de ~22 s son ~9 h al mes.
+    - cron: "*/30 * * * *"
     # Foto semanal de las ligas (lo que hacía el cron de vercel.json de los
     # lunes, 10 nov 2026: en Cloud Run no hay crons de Vercel).
     - cron: "7 4 * * 1"
@@ -38,10 +36,13 @@ jobs:
     steps:
       - name: Llamar a /api/cron/sync
         run: |
-          if [ -z "${{ secrets.SITE_URL }}" ] || [ -z "${{ secrets.CRON_SECRET }}" ]; then
-            echo "Faltan los secrets SITE_URL y/o CRON_SECRET en este repo (Settings → Secrets and variables → Actions)."
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "Falta el secret CRON_SECRET en este repo (Settings → Secrets and variables → Actions)."
             exit 1
           fi
+          # El dominio, fijo (12 nov 2026): el secret SITE_URL se quedó con la
+          # dirección de Vercel, que ya no existe (402 DEPLOYMENT_DISABLED).
+          SITIO=https://www.paragontrophies.com
 
           ruta=/api/cron/sync
           if [ "${{ github.event.schedule }}" = "7 4 * * 1" ]; then ruta=/api/cron/league-snapshot; fi
@@ -49,7 +50,7 @@ jobs:
 
           respuesta=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 120 \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "${{ secrets.SITE_URL }}$ruta")
+            "$SITIO$ruta")
 
           echo "HTTP $respuesta"
           cat /tmp/resp.json
