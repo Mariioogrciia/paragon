@@ -193,6 +193,11 @@
     <string name="carpeta_vacio_sub">Group your games however you like — by series, platform, anything — and create folders with the + above.</string>
     <string name="carpetas_titulo">Folders</string>
     <string name="caza_llena">You already have 8 hunts: remove one to add another.</string>
+    <string name="cazas_anadir">Add</string>
+    <string name="cazas_elegida">Picked</string>
+    <string name="cazas_elegir">Pick</string>
+    <string name="cazas_hecho">Done</string>
+    <string name="cazas_sin_resultados">No unfinished game with that name.</string>
     <string name="cazas_titulo">Resume your hunts</string>
     <string name="cazas_vacio">You haven\'t picked any hunts yet. Tap 🎯 on a game page or in “One step from platinum” and it\'ll show up here.</string>
     <string name="clan_abandonar">Leave clan</string>

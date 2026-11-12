@@ -9038,5 +9038,45 @@
   "fr": "Tu as déjà 8 chasses : retires-en une pour en ajouter une autre.",
   "it": "Hai già 8 cacce: togline una per aggiungerne un'altra.",
   "pt": "Já tens 8 caçadas: tira uma para juntar outra."
+ },
+ "cazas_elegir": {
+  "de": "Wählen",
+  "en": "Pick",
+  "es": "Elegir",
+  "fr": "Choisir",
+  "it": "Scegli",
+  "pt": "Escolher"
+ },
+ "cazas_hecho": {
+  "de": "Fertig",
+  "en": "Done",
+  "es": "Hecho",
+  "fr": "OK",
+  "it": "Fatto",
+  "pt": "Feito"
+ },
+ "cazas_anadir": {
+  "de": "Hinzufügen",
+  "en": "Add",
+  "es": "Añadir",
+  "fr": "Ajouter",
+  "it": "Aggiungi",
+  "pt": "Juntar"
+ },
+ "cazas_elegida": {
+  "de": "Gewählt",
+  "en": "Picked",
+  "es": "Elegida",
+  "fr": "Choisie",
+  "it": "Scelta",
+  "pt": "Escolhida"
+ },
+ "cazas_sin_resultados": {
+  "de": "Kein unfertiges Spiel mit diesem Namen.",
+  "en": "No unfinished game with that name.",
+  "es": "No hay ningún juego sin platinar con ese nombre.",
+  "fr": "Aucun jeu non platiné avec ce nom.",
+  "it": "Nessun gioco non platinato con questo nome.",
+  "pt": "Nenhum jogo por platinar com esse nome."
  }
 }

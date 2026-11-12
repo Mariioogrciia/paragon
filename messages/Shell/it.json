@@ -344,7 +344,14 @@
       "quitar": "Togli dalle mie cacce",
       "cazar": "Aggiungi alle mie cacce",
       "enCazas": "Nelle mie cacce · togli",
-      "llena": "Hai già {n} cacce: togline una sopra per aggiungerne un'altra."
+      "llena": "Hai già {n} cacce: togline una sopra per aggiungerne un'altra.",
+      "elegir": "Scegli le cacce",
+      "buscar": "Cerca nella tua libreria…",
+      "cerrar": "Fatto",
+      "anadir": "Aggiungi",
+      "anadida": "Scelta",
+      "cuenta": "{n} su {max}",
+      "sinResultados": "Nessun gioco non platinato con questo nome."
     }
   },
   "Ejemplo": {

@@ -351,10 +351,29 @@ private fun FilaPlatinable(
  * orden en que los elegiste. La × los quita de aquí sin tocar nada más.
  */
 @Composable
-fun SeccionCazas(cazas: List<PlatinableDto>, onAbrir: (String) -> Unit, onQuitar: (String) -> Unit) {
+fun SeccionCazas(
+    cazas: List<PlatinableDto>,
+    onAbrir: (String) -> Unit,
+    onQuitar: (String) -> Unit,
+    max: Int = 8,
+    /** Para elegir desde aquí mismo (12 nov 2026): la biblioteca, y qué hacer al añadir/quitar. */
+    cargarBiblioteca: (suspend () -> List<com.paragon.app.data.LibraryGame>)? = null,
+    onCaza: suspend (String, Boolean) -> Boolean = { _, _ -> true },
+    onCambiado: () -> Unit = {},
+) {
     var quitadas by remember { mutableStateOf(emptySet<String>()) }
+    var eligiendo by remember { mutableStateOf(false) }
     val lista = cazas.filter { it.id !in quitadas }.map(::fila)
-    TituloSeccion("🎯 " + Textos.t(T.cazas_titulo))
+    TituloSeccion("🎯 " + Textos.t(T.cazas_titulo), if (cargarBiblioteca != null) "+ " + Textos.t(T.cazas_elegir) else null) { eligiendo = true }
+    if (eligiendo && cargarBiblioteca != null) {
+        ElegirCazasSheet(
+            elegidasIniciales = lista.map { it.id }.toSet(),
+            max = max,
+            cargarBiblioteca = cargarBiblioteca,
+            onCaza = onCaza,
+            onCerrar = { eligiendo = false; onCambiado() },
+        )
+    }
     Column(Modifier.padding(horizontal = 20.dp).animateContentSize()) {
         if (lista.isEmpty()) {
             Text(

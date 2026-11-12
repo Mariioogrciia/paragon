@@ -213,6 +213,12 @@ fun PanelScreen(
                         cazas = ok.cazas,
                         onAbrir = { id -> navController.navigate(Screen.GameDetail.routeFor(id)) },
                         onQuitar = { id -> ambitoPanel.launch { cambiarCaza(tokenStore, id, false) } },
+                        max = ok.maxCazas,
+                        cargarBiblioteca = {
+                            (libraryRepository.getLibrary() as? com.paragon.app.data.LibraryResult.Ok)?.games.orEmpty()
+                        },
+                        onCaza = { id, activa -> cambiarCaza(tokenStore, id, activa) },
+                        onCambiado = { ambitoPanel.launch { highlights = repository.getHighlights() } },
                     )
                 }
                 val recientes = ok?.recent.orEmpty()

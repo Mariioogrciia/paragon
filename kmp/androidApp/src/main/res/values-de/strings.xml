@@ -193,6 +193,11 @@
     <string name="carpeta_vacio_sub">Gruppiere deine Spiele, wie du willst — nach Reihe, Plattform, egal — und erstelle Ordner mit dem + oben.</string>
     <string name="carpetas_titulo">Ordner</string>
     <string name="caza_llena">Du hast schon 8 Jagden: entferne eine, um eine weitere hinzuzufügen.</string>
+    <string name="cazas_anadir">Hinzufügen</string>
+    <string name="cazas_elegida">Gewählt</string>
+    <string name="cazas_elegir">Wählen</string>
+    <string name="cazas_hecho">Fertig</string>
+    <string name="cazas_sin_resultados">Kein unfertiges Spiel mit diesem Namen.</string>
     <string name="cazas_titulo">Setze deine Jagden fort</string>
     <string name="cazas_vacio">Du hast noch keine Jagd gewählt. Tippe auf 🎯 auf einer Spielseite oder bei „Kurz vor Platin“.</string>
     <string name="clan_abandonar">Clan verlassen</string>

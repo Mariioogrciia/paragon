@@ -195,6 +195,11 @@
     <string name="carpeta_vacio_sub">Agrupa tus juegos como quieras — por saga, por plataforma, por lo que sea — y créalas con el + de arriba.</string>
     <string name="carpetas_titulo">Carpetas</string>
     <string name="caza_llena">Ya tienes 8 cazas: quita alguna para añadir otra.</string>
+    <string name="cazas_anadir">Añadir</string>
+    <string name="cazas_elegida">Elegida</string>
+    <string name="cazas_elegir">Elegir</string>
+    <string name="cazas_hecho">Hecho</string>
+    <string name="cazas_sin_resultados">No hay ningún juego sin platinar con ese nombre.</string>
     <string name="cazas_titulo">Reanuda tus cazas</string>
     <string name="cazas_vacio">Aún no has elegido ninguna caza. Pulsa 🎯 en la ficha de un juego o en «A un paso del platino» y saldrá aquí.</string>
     <string name="clan_abandonar">Abandonar clan</string>

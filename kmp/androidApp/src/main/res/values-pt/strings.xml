@@ -193,6 +193,11 @@
     <string name="carpeta_vacio_sub">Agrupa os teus jogos como quiseres — por saga, por plataforma, pelo que for — e cria pastas com o + lá em cima.</string>
     <string name="carpetas_titulo">Pastas</string>
     <string name="caza_llena">Já tens 8 caçadas: tira uma para juntar outra.</string>
+    <string name="cazas_anadir">Juntar</string>
+    <string name="cazas_elegida">Escolhida</string>
+    <string name="cazas_elegir">Escolher</string>
+    <string name="cazas_hecho">Feito</string>
+    <string name="cazas_sin_resultados">Nenhum jogo por platinar com esse nome.</string>
     <string name="cazas_titulo">Retoma as tuas caçadas</string>
     <string name="cazas_vacio">Ainda não escolheste nenhuma caçada. Toca em 🎯 na ficha de um jogo ou em «A um passo da platina».</string>
     <string name="clan_abandonar">Sair do clã</string>

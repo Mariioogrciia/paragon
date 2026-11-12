@@ -554,7 +554,24 @@ async function Inicio() {
         <div className="cabina-celda lg:col-span-12">
           <MisCazas
             cazas={cazas}
-            textos={{ titulo: t("cazas.titulo"), sub: t("cazas.sub"), vacio: t("cazas.vacio"), quitar: t("cazas.quitar") }}
+            max={MAX_CAZAS}
+            candidatos={sinRetirados(games, marcas)
+              .filter((g) => !g.isWishlist && g.platform !== "manual" && g.definedTotal > 0 && !esPlatinoEquivalente(g))
+              .map((g) => ({ id: g.id, titulo: g.title, iconUrl: g.iconUrl ?? null, percent: g.progressPercent }))}
+            textos={{
+              titulo: t("cazas.titulo"),
+              sub: t("cazas.sub"),
+              vacio: t("cazas.vacio"),
+              quitar: t("cazas.quitar"),
+              elegir: t("cazas.elegir"),
+              buscar: t("cazas.buscar"),
+              cerrar: t("cazas.cerrar"),
+              anadir: t("cazas.anadir"),
+              anadida: t("cazas.anadida"),
+              llena: t("cazas.llena", { n: MAX_CAZAS }),
+              cuenta: t("cazas.cuenta", { n: "{n}", max: "{max}" }),
+              sinResultados: t("cazas.sinResultados"),
+            }}
           />
         </div>
 

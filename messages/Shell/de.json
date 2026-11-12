@@ -344,7 +344,14 @@
       "quitar": "Aus meinen Jagden entfernen",
       "cazar": "Zu meinen Jagden",
       "enCazas": "In meinen Jagden · entfernen",
-      "llena": "Du hast schon {n} Jagden: entferne oben eine, um eine weitere hinzuzufügen."
+      "llena": "Du hast schon {n} Jagden: entferne oben eine, um eine weitere hinzuzufügen.",
+      "elegir": "Jagden wählen",
+      "buscar": "In deiner Bibliothek suchen…",
+      "cerrar": "Fertig",
+      "anadir": "Hinzufügen",
+      "anadida": "Gewählt",
+      "cuenta": "{n} von {max}",
+      "sinResultados": "Kein unfertiges Spiel mit diesem Namen."
     }
   },
   "Ejemplo": {

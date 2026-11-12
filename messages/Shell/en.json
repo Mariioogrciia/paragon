@@ -344,7 +344,14 @@
       "quitar": "Remove from my hunts",
       "cazar": "Add to my hunts",
       "enCazas": "In my hunts · remove",
-      "llena": "You already have {n} hunts: remove one above to add another."
+      "llena": "You already have {n} hunts: remove one above to add another.",
+      "elegir": "Pick hunts",
+      "buscar": "Search your library…",
+      "cerrar": "Done",
+      "anadir": "Add",
+      "anadida": "Picked",
+      "cuenta": "{n} of {max}",
+      "sinResultados": "No unfinished game with that name."
     }
   },
   "Ejemplo": {

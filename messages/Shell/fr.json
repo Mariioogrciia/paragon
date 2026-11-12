@@ -344,7 +344,14 @@
       "quitar": "Retirer de mes chasses",
       "cazar": "Ajouter à mes chasses",
       "enCazas": "Dans mes chasses · retirer",
-      "llena": "Tu as déjà {n} chasses : retires-en une plus haut pour en ajouter une autre."
+      "llena": "Tu as déjà {n} chasses : retires-en une plus haut pour en ajouter une autre.",
+      "elegir": "Choisir des chasses",
+      "buscar": "Cherche dans ta bibliothèque…",
+      "cerrar": "OK",
+      "anadir": "Ajouter",
+      "anadida": "Choisie",
+      "cuenta": "{n} sur {max}",
+      "sinResultados": "Aucun jeu non platiné avec ce nom."
     }
   },
   "Ejemplo": {

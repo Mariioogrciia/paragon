@@ -344,7 +344,14 @@
       "quitar": "Tirar das minhas caçadas",
       "cazar": "Juntar às minhas caçadas",
       "enCazas": "Nas minhas caçadas · tirar",
-      "llena": "Já tens {n} caçadas: tira uma acima para juntar outra."
+      "llena": "Já tens {n} caçadas: tira uma acima para juntar outra.",
+      "elegir": "Escolher caçadas",
+      "buscar": "Procura na tua biblioteca…",
+      "cerrar": "Feito",
+      "anadir": "Juntar",
+      "anadida": "Escolhida",
+      "cuenta": "{n} de {max}",
+      "sinResultados": "Nenhum jogo por platinar com esse nome."
     }
   },
   "Ejemplo": {

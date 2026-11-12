@@ -344,7 +344,14 @@
       "quitar": "Quitar de mis cazas",
       "cazar": "Añadir a mis cazas",
       "enCazas": "En mis cazas · quitar",
-      "llena": "Ya tienes {n} cazas: quita alguna arriba para añadir otra."
+      "llena": "Ya tienes {n} cazas: quita alguna arriba para añadir otra.",
+      "elegir": "Elegir cazas",
+      "buscar": "Busca en tu biblioteca…",
+      "cerrar": "Hecho",
+      "anadir": "Añadir",
+      "anadida": "Elegida",
+      "cuenta": "{n} de {max}",
+      "sinResultados": "No hay ningún juego sin platinar con ese nombre."
     }
   },
   "Ejemplo": {

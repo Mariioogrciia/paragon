@@ -193,6 +193,11 @@
     <string name="carpeta_vacio_sub">Regroupe tes jeux comme tu veux — par saga, plateforme, n\'importe quoi — et crée des dossiers avec le + en haut.</string>
     <string name="carpetas_titulo">Dossiers</string>
     <string name="caza_llena">Tu as déjà 8 chasses : retires-en une pour en ajouter une autre.</string>
+    <string name="cazas_anadir">Ajouter</string>
+    <string name="cazas_elegida">Choisie</string>
+    <string name="cazas_elegir">Choisir</string>
+    <string name="cazas_hecho">OK</string>
+    <string name="cazas_sin_resultados">Aucun jeu non platiné avec ce nom.</string>
     <string name="cazas_titulo">Reprends tes chasses</string>
     <string name="cazas_vacio">Tu n\'as encore choisi aucune chasse. Appuie sur 🎯 sur la fiche d\'un jeu ou dans « À un pas du platine ».</string>
     <string name="clan_abandonar">Quitter le clan</string>

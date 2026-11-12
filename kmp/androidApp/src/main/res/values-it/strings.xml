@@ -193,6 +193,11 @@
     <string name="carpeta_vacio_sub">Raggruppa i tuoi giochi come vuoi — per saga, per piattaforma, per qualsiasi cosa — e crea le cartelle con il + in alto.</string>
     <string name="carpetas_titulo">Cartelle</string>
     <string name="caza_llena">Hai già 8 cacce: togline una per aggiungerne un\'altra.</string>
+    <string name="cazas_anadir">Aggiungi</string>
+    <string name="cazas_elegida">Scelta</string>
+    <string name="cazas_elegir">Scegli</string>
+    <string name="cazas_hecho">Fatto</string>
+    <string name="cazas_sin_resultados">Nessun gioco non platinato con questo nome.</string>
     <string name="cazas_titulo">Riprendi le tue cacce</string>
     <string name="cazas_vacio">Non hai ancora scelto nessuna caccia. Tocca 🎯 nella scheda di un gioco o in «A un passo dal platino».</string>
     <string name="clan_abandonar">Lascia il clan</string>
