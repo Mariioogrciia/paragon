@@ -290,18 +290,21 @@ export function bibliotecaDesdeResumenes(entries: AchievementsSummaryEntry[]): G
     .filter((e): e is AchievementsSummaryEntry & { product: { name: string; slug: string } } => !!e.product?.name)
     .map((e) => {
       // Epic a veces cuenta más desbloqueados que el total del producto (12 nov
-      // 2026: un GTA V salía al 390 %). El total nunca puede ser menor que
-      // lo conseguido, y el porcentaje nunca pasa de 100.
-      const total = Math.max(e.productAchievements?.totalAchievements ?? 0, e.totalUnlocked);
+      // 2026: un GTA V salía al 390 %, probablemente sumando sus varias
+      // ediciones). Si no cuadra, el resumen no vale: 0 aquí, y el porcentaje
+      // de verdad lo pone la sincronización del juego, logro a logro
+      // (lib/sync.ts); como el de la biblioteca solo sube, ese no se pisa.
+      const total = e.productAchievements?.totalAchievements ?? 0;
+      const cuadra = e.totalUnlocked <= total;
       return {
         id: gameKey("epic", e.sandboxId),
         platform: "epic" as const,
         title: e.product.name,
         deviceLabel: "PC",
         iconUrl: bestImage(e.baseOfferForSandbox?.keyImages),
-        progressPercent: total > 0 ? Math.min(100, Math.round((e.totalUnlocked / total) * 100)) : 0,
+        progressPercent: total > 0 && cuadra ? Math.round((e.totalUnlocked / total) * 100) : 0,
         definedTotal: total,
-        earnedTotal: e.totalUnlocked,
+        earnedTotal: cuadra ? e.totalUnlocked : 0,
       };
     });
 }

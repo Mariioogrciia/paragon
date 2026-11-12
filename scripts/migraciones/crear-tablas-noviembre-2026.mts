@@ -105,9 +105,24 @@ async function main() {
       console.log("OK:", tabla);
     }
     // Arreglo de datos (12 nov 2026), idempotente: porcentajes por encima de
-    // 100 que guardó Epic (un GTA V al 390 %); el código ya no los deja pasar.
-    const arreglados = await sql`update "user_game" set "progressPercent" = 100 where "progressPercent" > 100`;
-    console.log("Porcentajes de más de 100 arreglados:", arreglados.count);
+    // 100 que guardó Epic (un GTA V al 390 %). Donde ya hay logros guardados,
+    // el porcentaje de verdad, logro a logro; donde no, a 0 y pendiente de
+    // sincronizar, para que lo calcule la próxima pasada.
+    const conLogros = await sql`
+      update "user_game" ug
+      set "progressPercent" = l.pct, "earnedTotal" = l.ganados
+      from (
+        select "userId", "gameId",
+               count(*) filter (where earned) as ganados,
+               round(100.0 * count(*) filter (where earned) / count(*))::int as pct
+        from "user_trophy"
+        group by "userId", "gameId"
+      ) l
+      where ug."userId" = l."userId" and ug."gameId" = l."gameId" and ug."progressPercent" > 100`;
+    const sinLogros = await sql`
+      update "user_game" set "progressPercent" = 0, "earnedTotal" = 0, "trophiesSyncedAt" = null
+      where "progressPercent" > 100`;
+    console.log("Porcentajes de más de 100 rehechos:", conLogros.count, "con sus logros,", sinLogros.count, "pendientes de sincronizar");
   } finally {
     await sql.end();
   }
