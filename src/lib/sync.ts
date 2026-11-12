@@ -280,7 +280,9 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
       .onConflictDoUpdate({
         target: [userGames.userId, userGames.gameId],
         set: {
-          progressPercent: sql`greatest(${userGames.progressPercent}, excluded."progressPercent")`,
+          // `least(100, …)`: un porcentaje mal contado por la plataforma (390 %)
+          // se quedaba para siempre, porque aquí solo puede subir.
+          progressPercent: sql`least(100, greatest(${userGames.progressPercent}, excluded."progressPercent"))`,
           earnedTotal: sql`greatest(${userGames.earnedTotal}, excluded."earnedTotal")`,
           earned: sql`coalesce(excluded."earned", ${userGames.earned})`,
           // `greatest` (ignora los null) en vez de quedarse con lo último: con

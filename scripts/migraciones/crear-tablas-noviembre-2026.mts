@@ -104,6 +104,10 @@ async function main() {
       await sql.unsafe(`REVOKE ALL ON "${tabla}" FROM anon, authenticated`);
       console.log("OK:", tabla);
     }
+    // Arreglo de datos (12 nov 2026), idempotente: porcentajes por encima de
+    // 100 que guardó Epic (un GTA V al 390 %); el código ya no los deja pasar.
+    const arreglados = await sql`update "user_game" set "progressPercent" = 100 where "progressPercent" > 100`;
+    console.log("Porcentajes de más de 100 arreglados:", arreglados.count);
   } finally {
     await sql.end();
   }

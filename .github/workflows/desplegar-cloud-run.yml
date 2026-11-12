@@ -58,6 +58,20 @@ jobs:
           node "$RUNNER_TEMP/entorno/entorno.mjs" "$RUNNER_TEMP/entrada.env" "$RUNNER_TEMP/compilar.env" "$RUNNER_TEMP/ejecutar.yaml"
           rm -f "$RUNNER_TEMP/entrada.env"
 
+      # Las tablas nuevas, antes de desplegar (12 nov 2026): la de «retirado»
+      # no se había creado en producción y «A mis cazas» o «Instalado»
+      # rompían la página. El script es idempotente (CREATE … IF NOT EXISTS).
+      # Con DIRECT_URL (sesión) si existe: el pooler de transacciones no va
+      # bien con DDL.
+      - name: Migraciones de la base (idempotentes)
+        run: |
+          mkdir -p "$RUNNER_TEMP/migrar" && cp scripts/migraciones/crear-tablas-noviembre-2026.mts "$RUNNER_TEMP/migrar/"
+          npm install --prefix "$RUNNER_TEMP/migrar" --no-audit --no-fund --ignore-scripts postgres@3.4.9 dotenv@17.4.2 tsx@4.23.13 >/dev/null
+          URL_BASE=$(cd "$RUNNER_TEMP/migrar" && node -e "const e=require('dotenv').parse(require('fs').readFileSync(process.argv[1]));process.stdout.write(e.DIRECT_URL||e.DATABASE_URL||'')" "$RUNNER_TEMP/compilar.env")
+          if [ -z "$URL_BASE" ]; then echo "Sin DATABASE_URL en ENV_PRODUCCION: no se migra"; exit 0; fi
+          echo "::add-mask::$URL_BASE"
+          cd "$RUNNER_TEMP/migrar" && DATABASE_URL="$URL_BASE" npx --no-install tsx crear-tablas-noviembre-2026.mts
+
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_CLAVE }}

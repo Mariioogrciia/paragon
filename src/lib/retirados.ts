@@ -41,6 +41,17 @@ export async function ocultosDelPerfil(userId: string): Promise<Set<string>> {
 
 /** `false` si no se pudo (por ahora, solo «Mis cazas» llena: MAX_CAZAS). */
 export async function cambiarRetirado(userId: string, tipo: TipoMarca, valor: string, activo: boolean): Promise<boolean> {
+  try {
+    return await cambiar(userId, tipo, valor, activo);
+  } catch (error) {
+    // Sin la tabla (migración sin lanzar) no se puede guardar, pero tampoco
+    // se rompe la página: antes «A mis cazas» daba «Algo se ha roto».
+    if (tablaFalta(error)) return false;
+    throw error;
+  }
+}
+
+async function cambiar(userId: string, tipo: TipoMarca, valor: string, activo: boolean): Promise<boolean> {
   const limpio = tipo === "dispositivo" ? valor.trim().toUpperCase() : valor.trim();
   if (!limpio || limpio.length > 200) return false;
   if (tipo === "caza" && activo) {

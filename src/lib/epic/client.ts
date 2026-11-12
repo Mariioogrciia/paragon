@@ -289,14 +289,17 @@ export function bibliotecaDesdeResumenes(entries: AchievementsSummaryEntry[]): G
     // (vistos en pruebas reales) sin oferta de tienda asociada.
     .filter((e): e is AchievementsSummaryEntry & { product: { name: string; slug: string } } => !!e.product?.name)
     .map((e) => {
-      const total = e.productAchievements?.totalAchievements ?? 0;
+      // Epic a veces cuenta más desbloqueados que el total del producto (12 nov
+      // 2026: un GTA V salía al 390 %). El total nunca puede ser menor que
+      // lo conseguido, y el porcentaje nunca pasa de 100.
+      const total = Math.max(e.productAchievements?.totalAchievements ?? 0, e.totalUnlocked);
       return {
         id: gameKey("epic", e.sandboxId),
         platform: "epic" as const,
         title: e.product.name,
         deviceLabel: "PC",
         iconUrl: bestImage(e.baseOfferForSandbox?.keyImages),
-        progressPercent: total > 0 ? Math.round((e.totalUnlocked / total) * 100) : 0,
+        progressPercent: total > 0 ? Math.min(100, Math.round((e.totalUnlocked / total) * 100)) : 0,
         definedTotal: total,
         earnedTotal: e.totalUnlocked,
       };
